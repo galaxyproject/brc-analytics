@@ -8,7 +8,7 @@ cp ./site-config/$1/local/.env .env.development
 
 # check if PUBLIC_DIR does not exists
 if [ ! -d "$PUBLIC_DIR" ]; then
-	mkdir $PUBLIC_DIR
+	mkdir -p $PUBLIC_DIR
 fi
 
 # look for empty directory
