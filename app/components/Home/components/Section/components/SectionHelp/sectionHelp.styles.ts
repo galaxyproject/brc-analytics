@@ -9,6 +9,7 @@ import {
   SectionLayout as DefaultLayout,
 } from "../../../../../Layout/components/AppLayout/components/Section/section.styles";
 import {
+  muiLink,
   SectionHeadline,
   SectionSubtitle,
   SectionTitle,
@@ -41,14 +42,6 @@ export const StyledSectionTitle = styled(SectionTitle)`
 `;
 
 export const StyledSectionSubTitle = styled(SectionSubtitle)`
+  ${muiLink};
   line-height: 28px;
-
-  .MuiLink-root {
-    color: #28285b;
-    text-decoration: underline;
-
-    &:hover {
-      text-decoration: none;
-    }
-  }
 `;

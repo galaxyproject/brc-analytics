@@ -7,6 +7,7 @@ import {
   sectionGrid,
   SectionLayout as DefaultLayout,
 } from "../../../../../Layout/components/AppLayout/components/Section/section.styles";
+import { muiLink } from "../../section.styles";
 
 export const Section = styled.section`
   background-color: ${white};
@@ -22,6 +23,7 @@ export const SectionLayout = styled(DefaultLayout)`
 `;
 
 export const Subhead = styled.div`
+  ${muiLink};
   font-size: 32px;
   font-weight: 400;
   line-height: 48px;
