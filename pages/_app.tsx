@@ -42,9 +42,13 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
   const appConfig = config();
   const { layout, redirectRootToPath, themeOptions } = appConfig;
   const { floating, footer, header } = layout || {};
+  const {
+    entityListType = DEFAULT_ENTITY_LIST_TYPE,
+    pageTitle,
+    themeOptions: pageTheme,
+  } = pageProps;
   const defaultTheme = createAppTheme(themeOptions);
-  const appTheme = mergeAppTheme(defaultTheme);
-  const { entityListType = DEFAULT_ENTITY_LIST_TYPE, pageTitle } = pageProps;
+  const appTheme = mergeAppTheme(defaultTheme, pageTheme);
   const AppLayout = Component.AppLayout || DXAppLayout;
   const Main = Component.Main || DXMain;
   return (

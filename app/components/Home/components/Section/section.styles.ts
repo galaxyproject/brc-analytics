@@ -1,18 +1,6 @@
 import { inkLight } from "@databiosphere/findable-ui/lib/styles/common/mixins/colors";
 import { textBodyLarge400 } from "@databiosphere/findable-ui/lib/styles/common/mixins/fonts";
-import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-
-export const muiLink = css`
-  .MuiLink-root {
-    color: #28285b;
-    text-decoration: underline;
-
-    &:hover {
-      text-decoration: none;
-    }
-  }
-`;
 
 export const SectionHeadline = styled.div`
   display: grid;

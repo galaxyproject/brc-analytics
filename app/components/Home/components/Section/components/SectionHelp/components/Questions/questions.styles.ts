@@ -8,7 +8,6 @@ import { elevation01 } from "@databiosphere/findable-ui/lib/theme/common/shadows
 import styled from "@emotion/styled";
 import { Accordion as MAccordion } from "@mui/material";
 import { sectionGrid } from "../../../../../../../Layout/components/AppLayout/components/Section/section.styles";
-import { muiLink } from "../../../../section.styles";
 
 export const Grid = styled.div`
   ${sectionGrid};
@@ -39,7 +38,6 @@ export const StyledAccordion = styled(MAccordion)`
   }
 
   .MuiAccordionDetails-root {
-    ${muiLink};
     ${textBodyLarge4002Lines};
     color: ${inkLight};
     margin: 0;

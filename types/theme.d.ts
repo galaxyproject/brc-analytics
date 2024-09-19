@@ -18,6 +18,9 @@ declare module "@mui/material/styles/createPalette" {
  * Button prop options.
  */
 declare module "@mui/material/Button" {
+  interface ButtonClasses {
+    containedHero: true;
+  }
   interface ButtonPropsColorOverrides {
     hero: true;
   }

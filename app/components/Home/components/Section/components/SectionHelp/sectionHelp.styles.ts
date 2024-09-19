@@ -9,7 +9,6 @@ import {
   sectionLayout,
 } from "../../../../../Layout/components/AppLayout/components/Section/section.styles";
 import {
-  muiLink,
   SectionHeadline,
   SectionSubtitle,
   SectionTitle,
@@ -43,6 +42,5 @@ export const StyledSectionTitle = styled(SectionTitle)`
 `;
 
 export const StyledSectionSubTitle = styled(SectionSubtitle)`
-  ${muiLink};
   line-height: 28px;
 `;

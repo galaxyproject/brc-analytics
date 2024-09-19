@@ -55,6 +55,11 @@ export const StyledCardActions = styled.div`
   .MuiLink-root {
     ${textBody500};
     color: #035c94;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 `;
 
