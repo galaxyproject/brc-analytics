@@ -6,9 +6,7 @@ import { ThemeProps } from "@databiosphere/findable-ui/lib/theme/theme";
 import { css } from "@emotion/react";
 
 export const section = css`
-  position: relative; /* Position relative to allow for z-index stacking */
   width: 100%;
-  z-index: 1; /* Above the background */
 `;
 
 export const sectionGrid = css`

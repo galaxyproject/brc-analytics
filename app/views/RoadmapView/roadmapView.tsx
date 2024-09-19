@@ -1,5 +1,4 @@
 import { Fragment } from "react";
-import { SectionBranding } from "../../components/Layout/components/AppLayout/components/Section/components/SectionBranding/sectionBranding";
 import { SectionHero } from "../../components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import { SectionRoadmap } from "../../components/Roadmap/components/Section/components/SectionRoadmap/sectionRoadmap";
 import { SectionSubhero } from "../../components/Roadmap/components/Section/components/SectionSubhero/sectionSubhero";
@@ -15,7 +14,6 @@ export const RoadmapView = (): JSX.Element => {
       />
       <SectionSubhero />
       <SectionRoadmap />
-      <SectionBranding />
     </Fragment>
   );
 };

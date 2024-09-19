@@ -1,11 +1,18 @@
 import { mediaTabletUp } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
-import { inkLight } from "@databiosphere/findable-ui/lib/styles/common/mixins/colors";
+import {
+  inkLight,
+  smokeLightest,
+} from "@databiosphere/findable-ui/lib/styles/common/mixins/colors";
 import { textBodyLarge400 } from "@databiosphere/findable-ui/lib/styles/common/mixins/fonts";
 import styled from "@emotion/styled";
 import { section, sectionGrid, sectionLayout } from "../../section.styles";
 
 export const Section = styled.section`
   ${section};
+  background-color: ${smokeLightest};
+  overflow: hidden;
+  position: relative; /* positions svg */
+  z-index: 0; /* section content above svg */
 `;
 
 export const SectionLayout = styled.div`

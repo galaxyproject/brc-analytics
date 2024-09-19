@@ -10,6 +10,7 @@ import { CoralPinkCircle } from "../../../../../../../Hero/components/Defs/Coral
 import { SmokeCircle } from "../../../../../../../Hero/components/Defs/SmokeCircle/smokeCircle";
 import { SmokeRect } from "../../../../../../../Hero/components/Defs/SmokeRect/smokeRect";
 import { YellowRect } from "../../../../../../../Hero/components/Defs/YellowRect/yellowRect";
+import { SVG } from "./hero.styles";
 
 export interface HeroProps {
   gridSize?: number;
@@ -21,7 +22,7 @@ export const Hero = ({
   height = GRID_SIZE * 1.5,
 }: HeroProps): JSX.Element => {
   return (
-    <svg
+    <SVG
       fill={FILL.NONE}
       height={height}
       preserveAspectRatio="xMinYMin meet"
@@ -49,6 +50,6 @@ export const Hero = ({
         </Fragment>
       ))}
       <use href={getElementHref(ELEMENT_ID.GROUP_CORAL_PINK_CIRLCLE)} />
-    </svg>
+    </SVG>
   );
 };

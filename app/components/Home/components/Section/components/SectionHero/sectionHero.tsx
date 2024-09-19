@@ -1,5 +1,6 @@
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { Button } from "@mui/material";
+import { Hero } from "./components/Hero/hero";
 import {
   Head,
   Headline,
@@ -13,6 +14,7 @@ import {
 export const SectionHero = (): JSX.Element => {
   return (
     <Section>
+      <Hero />
       <SectionLayout>
         <Headline>
           <Head>

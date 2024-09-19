@@ -1,7 +1,6 @@
 import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { Fragment } from "react";
 import { SectionAbout } from "../../components/About/components/Section/components/SectionAbout/sectionAbout";
-import { SectionBranding } from "../../components/Layout/components/AppLayout/components/Section/components/SectionBranding/sectionBranding";
 import { SectionHero } from "../../components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import { BREADCRUMBS } from "./common/constants";
 
@@ -25,7 +24,6 @@ export const AboutView = (): JSX.Element => {
         }
       />
       <SectionAbout />
-      <SectionBranding />
     </Fragment>
   );
 };
