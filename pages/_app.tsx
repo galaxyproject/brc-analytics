@@ -11,7 +11,6 @@ import { ConfigProvider as DXConfigProvider } from "@databiosphere/findable-ui/l
 import { ExploreStateProvider } from "@databiosphere/findable-ui/lib/providers/exploreState";
 import { LayoutStateProvider } from "@databiosphere/findable-ui/lib/providers/layoutState";
 import { SystemStatusProvider } from "@databiosphere/findable-ui/lib/providers/systemStatus";
-import { createAppTheme } from "@databiosphere/findable-ui/lib/theme/theme";
 import { DataExplorerError } from "@databiosphere/findable-ui/lib/types/error";
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { CssBaseline, ThemeProvider } from "@mui/material";
@@ -40,15 +39,18 @@ export type AppPropsWithComponent = AppProps & {
 function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
   // Set up the site configuration, layout and theme.
   const appConfig = config();
-  const { layout, redirectRootToPath, themeOptions } = appConfig;
+  const {
+    layout,
+    redirectRootToPath,
+    themeOptions: baseThemeOptions,
+  } = appConfig;
   const { floating, footer, header } = layout || {};
   const {
     entityListType = DEFAULT_ENTITY_LIST_TYPE,
     pageTitle,
-    themeOptions: pageTheme,
+    themeOptions,
   } = pageProps;
-  const defaultTheme = createAppTheme(themeOptions);
-  const appTheme = mergeAppTheme(defaultTheme, pageTheme);
+  const appTheme = mergeAppTheme(baseThemeOptions, themeOptions);
   const AppLayout = Component.AppLayout || DXAppLayout;
   const Main = Component.Main || DXMain;
   return (

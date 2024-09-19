@@ -24,7 +24,9 @@ export const getStaticProps: GetStaticProps = async () => {
             },
           },
         },
-        palette: { background: { default: smokeLightest } },
+        palette: {
+          background: { default: smokeLightest },
+        },
       },
     },
   };
