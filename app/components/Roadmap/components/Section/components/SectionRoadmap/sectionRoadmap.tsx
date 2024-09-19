@@ -1,22 +1,20 @@
 import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
-import {
-  SectionContent,
-  Subhead,
-  SubHeadline,
-} from "../../../../../About/components/Section/section.styles";
+import { Section } from "../../section.styles";
 import {
   Category,
   CategorySubTitle,
   CategoryText,
   CategoryTitle,
-  StyledSection,
-  StyledSectionLayout,
+  SectionContent,
+  SectionLayout,
+  Subhead,
+  SubHeadline,
 } from "./sectionRoadmap.styles";
 
 export const SectionRoadmap = (): JSX.Element => {
   return (
-    <StyledSection>
-      <StyledSectionLayout>
+    <Section>
+      <SectionLayout>
         <SubHeadline>
           <Subhead>Development Plan</Subhead>
         </SubHeadline>
@@ -90,7 +88,7 @@ export const SectionRoadmap = (): JSX.Element => {
             </CategoryText>
           </Category>
         </SectionContent>
-      </StyledSectionLayout>
-    </StyledSection>
+      </SectionLayout>
+    </Section>
   );
 };

@@ -1,10 +1,11 @@
 import { StaticImage } from "@databiosphere/findable-ui/lib/components/common/StaticImage/staticImage";
-import { StyledSection, StyledSectionLayout } from "./sectionSubhero.styles";
+import { Section } from "../../section.styles";
+import { SectionLayout } from "./sectionSubhero.styles";
 
 export const SectionSubhero = (): JSX.Element => {
   return (
-    <StyledSection>
-      <StyledSectionLayout>
+    <Section>
+      <SectionLayout>
         <StaticImage alt="Roadmap" src="/roadmap/roadmap.svg" />
         <figcaption>
           The Data integration component will include utilization of existing
@@ -24,7 +25,7 @@ export const SectionSubhero = (): JSX.Element => {
           interactive tutorials that can be used by users of all skill levels
           from computationally naive experimentalists to system engineers.
         </figcaption>
-      </StyledSectionLayout>
-    </StyledSection>
+      </SectionLayout>
+    </Section>
   );
 };

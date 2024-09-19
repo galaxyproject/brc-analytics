@@ -3,8 +3,8 @@ import {
   Breadcrumbs,
 } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import { ReactNode } from "react";
-import { Head } from "../../section.styles";
 import {
+  Head,
   Headline,
   Section,
   SectionLayout,

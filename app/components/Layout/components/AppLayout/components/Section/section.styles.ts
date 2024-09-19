@@ -1,7 +1,15 @@
-import { mediaTabletUp } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
+import {
+  smokeMain,
+  white,
+} from "@databiosphere/findable-ui/lib/styles/common/mixins/colors";
+import { ThemeProps } from "@databiosphere/findable-ui/lib/theme/theme";
 import { css } from "@emotion/react";
-import styled from "@emotion/styled";
-import { Divider as MDivider } from "@mui/material";
+
+export const section = css`
+  position: relative; /* Position relative to allow for z-index stacking */
+  width: 100%;
+  z-index: 1; /* Above the background */
+`;
 
 export const sectionGrid = css`
   display: grid;
@@ -9,33 +17,14 @@ export const sectionGrid = css`
   grid-template-columns: repeat(12, 1fr);
 `;
 
-export const Section = styled.section`
-  width: 100%;
-`;
-
-export const SectionLayout = styled.div`
+export const sectionLayout = css`
   box-sizing: content-box;
   margin: 0 auto;
   max-width: 1136px;
 `;
 
-export const Head = styled.h1`
-  font-family: "Inter Tight", sans-serif;
-  font-size: 64px;
-  font-weight: 500;
-  letter-spacing: -0.4px;
-  line-height: 72px;
-  margin: 0;
-
-  ${mediaTabletUp} {
-    span {
-      display: block;
-    }
-  }
-`;
-
-export const StyledDivider = styled(MDivider)`
-  margin: 0 auto;
-  max-width: 1136px;
-  width: 100%;
+export const sectionSubHero = (props: ThemeProps) => css`
+  ${section};
+  background-color: ${white(props)};
+  border-top: 1px solid ${smokeMain(props)};
 `;

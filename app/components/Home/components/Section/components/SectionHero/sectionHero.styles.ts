@@ -7,10 +7,15 @@ import { textBodyLarge400 } from "@databiosphere/findable-ui/lib/styles/common/m
 import styled from "@emotion/styled";
 import {
   sectionGrid,
-  SectionLayout as DefaultLayout,
+  sectionLayout,
 } from "../../../../../Layout/components/AppLayout/components/Section/section.styles";
 
-export const SectionLayout = styled(DefaultLayout)`
+export const Section = styled.section`
+  width: 100%;
+`;
+
+export const SectionLayout = styled.div`
+  ${sectionLayout};
   ${sectionGrid};
   align-content: flex-end;
   min-height: 400px;

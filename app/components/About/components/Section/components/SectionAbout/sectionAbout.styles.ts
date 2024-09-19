@@ -1,7 +1,12 @@
 import styled from "@emotion/styled";
-import { SectionLayout } from "../../section.styles";
+import {
+  sectionGrid,
+  sectionLayout,
+} from "../../../../../Layout/components/AppLayout/components/Section/section.styles";
 
-export const StyledSectionLayout = styled(SectionLayout)`
+export const SectionLayout = styled.div`
+  ${sectionLayout};
+  ${sectionGrid};
   grid-template-columns: 1fr;
   padding: 98px 16px;
 

@@ -5,7 +5,7 @@ import {
 import styled from "@emotion/styled";
 import {
   sectionGrid,
-  SectionLayout as DefaultLayout,
+  sectionLayout,
 } from "../../../../../Layout/components/AppLayout/components/Section/section.styles";
 import { muiLink } from "../../section.styles";
 
@@ -15,7 +15,8 @@ export const Section = styled.section`
   width: 100%;
 `;
 
-export const SectionLayout = styled(DefaultLayout)`
+export const SectionLayout = styled.div`
+  ${sectionLayout};
   ${sectionGrid};
   grid-template-columns: 1fr;
   justify-items: center;

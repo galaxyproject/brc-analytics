@@ -1,13 +1,13 @@
 import { AboutContent } from "../../../../content";
 import { Section } from "../../section.styles";
-import { StyledSectionLayout } from "./sectionAbout.styles";
+import { SectionLayout } from "./sectionAbout.styles";
 
 export const SectionAbout = (): JSX.Element => {
   return (
     <Section>
-      <StyledSectionLayout>
+      <SectionLayout>
         <AboutContent />
-      </StyledSectionLayout>
+      </SectionLayout>
     </Section>
   );
 };

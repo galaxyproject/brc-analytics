@@ -3,7 +3,7 @@ import {
   smokeMain,
 } from "@databiosphere/findable-ui/lib/styles/common/mixins/colors";
 import styled from "@emotion/styled";
-import { SectionLayout as DefaultLayout } from "../../../../../Layout/components/AppLayout/components/Section/section.styles";
+import { sectionLayout } from "../../../../../Layout/components/AppLayout/components/Section/section.styles";
 import { SectionHeadline } from "../../section.styles";
 
 export const Section = styled.section`
@@ -13,7 +13,8 @@ export const Section = styled.section`
   width: 100%;
 `;
 
-export const SectionLayout = styled(DefaultLayout)`
+export const SectionLayout = styled.div`
+  ${sectionLayout};
   display: flex;
   flex-direction: column;
   gap: 48px 16px;
