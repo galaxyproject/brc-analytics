@@ -48,8 +48,8 @@ export function makeConfig(browserUrl: string): SiteConfig {
         navigation: [
           undefined,
           [
-            { label: "Datasets", url: ROUTES.ORGANISMS },
             { label: "About", url: ROUTES.ABOUT },
+            { label: "Datasets", url: ROUTES.ORGANISMS },
             { label: "Analyze", url: ROUTES.ANALYZE },
             { label: "Roadmap", url: ROUTES.ROADMAP },
           ],
