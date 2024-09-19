@@ -8,7 +8,7 @@ import {
 export const SectionLayout = styled.div`
   ${sectionLayout};
   ${sectionGrid};
-  gap: 32px 16px;
+  gap: 64px 16px;
   padding: 64px 16px;
 `;
 
@@ -43,4 +43,11 @@ export const Subhead = styled.h2`
   font-weight: 500;
   line-height: 40px;
   margin: 0;
+`;
+
+export const SectionContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  grid-column: 1 / -1;
 `;
