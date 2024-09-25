@@ -16,9 +16,6 @@ import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
 } from "../../category";
-import { mainColumn as analysisMethodsMainColumn } from "../entity/genome/analysisMethodMainColumn";
-import { sideColumn as analysisMethodsSideColumn } from "../entity/genome/analysisMethodsSideColumn";
-import { top as analysisMethodsTop } from "../entity/genome/analysisMethodsTop";
 import { listHero } from "../listView/listHero";
 
 /**
@@ -53,15 +50,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
   detail: {
     detailOverviews: [],
     staticLoad: true,
-    tabs: [
-      {
-        label: "Choose Analysis Method",
-        mainColumn: analysisMethodsMainColumn,
-        route: "",
-        sideColumn: analysisMethodsSideColumn,
-        top: analysisMethodsTop,
-      },
-    ],
+    tabs: [],
   },
   exploreMode: EXPLORE_MODE.CS_FETCH_CS_FILTERING,
   explorerTitle: "Organisms",
@@ -70,16 +59,6 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
   label: "Organisms",
   list: {
     columns: [
-      {
-        componentConfig: {
-          component: C.AnalyzeGenome,
-          viewBuilder: V.buildAnalyzeGenome,
-        } as ComponentConfig<typeof C.AnalyzeGenome, BRCDataCatalogGenome>,
-        disableSorting: true,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANALYZE_GENOME,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.ANALYZE_GENOME,
-        width: "auto",
-      },
       {
         componentConfig: {
           component: C.BasicCell,

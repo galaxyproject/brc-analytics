@@ -52,6 +52,7 @@ export function makeConfig(browserUrl: string): SiteConfig {
           [
             { label: "About", url: ROUTES.ABOUT },
             { label: "Datasets", url: ROUTES.ORGANISMS },
+            { label: "Analyze", url: ROUTES.ANALYZE },
             { label: "Roadmap", url: ROUTES.ROADMAP },
           ],
           undefined,

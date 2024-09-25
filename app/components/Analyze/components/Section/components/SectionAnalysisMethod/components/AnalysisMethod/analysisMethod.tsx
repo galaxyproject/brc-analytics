@@ -1,16 +1,16 @@
 import { CardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
-import { CardSection } from "@databiosphere/findable-ui/lib/components/common/Card/card.styles";
-import { CardText } from "@databiosphere/findable-ui/lib/components/common/Card/components/CardText/cardText";
 import { CardTitle } from "@databiosphere/findable-ui/lib/components/common/Card/components/CardTitle/cardTitle";
-import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
+import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,
 } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
-import { Card } from "@mui/material";
+import { TEXT_BODY_SMALL_400_2_LINES } from "@databiosphere/findable-ui/lib/theme/common/typography";
+import { Card, Typography } from "@mui/material";
 import {
   StyledButtonPrimary,
   StyledCardContent,
+  StyledCardSection,
 } from "./analysisMethod.styles";
 
 export interface AnalysisMethodProps extends CardProps {
@@ -18,17 +18,19 @@ export interface AnalysisMethodProps extends CardProps {
 }
 
 export const AnalysisMethod = ({
-  Paper = FluidPaper,
+  Paper = RoundedPaper,
   text,
   title,
   url,
 }: AnalysisMethodProps): JSX.Element => {
   return (
     <Card component={Paper}>
-      <CardSection>
+      <StyledCardSection>
         <StyledCardContent>
           <CardTitle>{title}</CardTitle>
-          <CardText>{text}</CardText>
+          <Typography color="ink.light" variant={TEXT_BODY_SMALL_400_2_LINES}>
+            {text}
+          </Typography>
         </StyledCardContent>
         <StyledButtonPrimary
           disabled={!url}
@@ -42,7 +44,7 @@ export const AnalysisMethod = ({
         >
           Analyze
         </StyledButtonPrimary>
-      </CardSection>
+      </StyledCardSection>
     </Card>
   );
 };
