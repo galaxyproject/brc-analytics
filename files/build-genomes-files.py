@@ -34,6 +34,8 @@ def build_genomes_files():
   if (len(unmatched_assemblies) != 0):
     print(f"Omitted {len(unmatched_assemblies)} assemblies that had no matches: {", ".join(unmatched_assemblies)}")
 
+  result_df["taxId"] = result_df["taxId"].astype(int)
+
   result_df.to_csv(OUTPUT_PATH, index=False, sep="\t")
 
   print(f"Wrote to {OUTPUT_PATH}")

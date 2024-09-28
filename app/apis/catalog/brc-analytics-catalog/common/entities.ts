@@ -4,6 +4,7 @@ export interface BRCDataCatalogGenome {
   chromosomes: number;
   contigs: number;
   genomeVersionAssemblyId: string;
+  ncbiTaxonomyId: string;
   organism: string;
   species: string;
   strain: string;

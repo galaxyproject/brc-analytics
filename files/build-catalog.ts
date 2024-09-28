@@ -23,6 +23,7 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
       chromosomes: parseNumber(row.Chromosomes),
       contigs: parseNumber(row.Contigs),
       genomeVersionAssemblyId: row["Genome Version/Assembly ID"],
+      ncbiTaxonomyId: row.taxId,
       organism: row.Organism,
       species: row.Species,
       strain: row.Strain,
