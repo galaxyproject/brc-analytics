@@ -128,7 +128,9 @@ export const buildGenomeDetails = (
     "Species",
     C.Link({
       label: genome.species,
-      url: `https://www.ncbi.nlm.nih.gov/datasets/taxonomy/${genome.ncbiTaxonomyId}/`,
+      url: `https://www.ncbi.nlm.nih.gov/datasets/taxonomy/${encodeURIComponent(
+        genome.ncbiTaxonomyId
+      )}/`,
     })
   );
   keyValuePairs.set("Strain", genome.strain);
@@ -182,7 +184,9 @@ export const buildSpecies = (
 ): ComponentProps<typeof C.Link> => {
   return {
     label: genome.species,
-    url: `https://www.ncbi.nlm.nih.gov/datasets/taxonomy/${genome.ncbiTaxonomyId}/`,
+    url: `https://www.ncbi.nlm.nih.gov/datasets/taxonomy/${encodeURIComponent(
+      genome.ncbiTaxonomyId
+    )}/`,
   };
 };
 
