@@ -8,6 +8,7 @@ export { KeyValuePairs } from "@databiosphere/findable-ui/lib/components/common/
 export {
   FluidPaper,
   GridPaper,
+  RoundedPaper,
 } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 export { SectionTitle } from "@databiosphere/findable-ui/lib/components/common/Section/components/SectionTitle/sectionTitle";
 export { GridPaperSection } from "@databiosphere/findable-ui/lib/components/common/Section/section.styles";

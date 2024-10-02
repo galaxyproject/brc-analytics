@@ -6,10 +6,9 @@ import {
 import { textBodyLarge400 } from "@databiosphere/findable-ui/lib/styles/common/mixins/fonts";
 import styled from "@emotion/styled";
 import { Section } from "../../../../../../../common/Section/section";
-import { section, sectionGrid, sectionLayout } from "../../section.styles";
+import { sectionGrid, sectionLayout } from "../../section.styles";
 
 export const StyledSection = styled(Section)`
-  ${section};
   background-color: ${smokeLightest};
   overflow: hidden;
   position: relative; /* positions svg */

@@ -1,21 +1,15 @@
-import { AddIcon as DXAddIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/AddIcon/addIcon";
-import { RoundedPaper as DXRoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import { Link as DXLink } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
-import {
-  AccordionDetails as MAccordionDetails,
-  AccordionSummary as MAccordionSummary,
-} from "@mui/material";
+import { AccordionDetails as MAccordionDetails } from "@mui/material";
+import { Accordion } from "../../../../../../../common/Accordion/accordion";
+import { AccordionSummary } from "../../../../../../../common/Accordion/components/AccordionSummary/accordionSummary";
 import { URLS } from "../../../../../../common/constants";
-import { Grid, StyledAccordion } from "./questions.styles";
+import { Grid } from "./questions.styles";
 
 export const Questions = (): JSX.Element => {
-  const expandIcon = <DXAddIcon color="inkLight" fontSize="small" />;
   return (
     <Grid>
-      <StyledAccordion component={DXRoundedPaper}>
-        <MAccordionSummary expandIcon={expandIcon}>
-          What is the plan?
-        </MAccordionSummary>
+      <Accordion>
+        <AccordionSummary>What is the plan?</AccordionSummary>
         <MAccordionDetails>
           BRC-Analytics is very new. Out plan is (1) establish access to
           official versions of VEuPathDB’s 785 genomes; (2) develop analytical
@@ -24,22 +18,18 @@ export const Questions = (): JSX.Element => {
           provide access to custom annotations that were previously available
           from VEuPathDB. To learn more click “Roadmap” on top.
         </MAccordionDetails>
-      </StyledAccordion>
-      <StyledAccordion component={DXRoundedPaper}>
-        <MAccordionSummary expandIcon={expandIcon}>
-          Where is the data?
-        </MAccordionSummary>
+      </Accordion>
+      <Accordion>
+        <AccordionSummary>Where is the data?</AccordionSummary>
         <MAccordionDetails>
           I used to be able to access many types of data including genomes and
           associated annotations. Where do I find it now? Data for the majority
           of VEuPathDB organisms is available by clicking the “Datasets” link at
           the top.
         </MAccordionDetails>
-      </StyledAccordion>
-      <StyledAccordion component={DXRoundedPaper}>
-        <MAccordionSummary expandIcon={expandIcon}>
-          How do I do analyses?
-        </MAccordionSummary>
+      </Accordion>
+      <Accordion>
+        <AccordionSummary>How do I do analyses?</AccordionSummary>
         <MAccordionDetails>
           I used to rely on VEuPathDB to perform my analyses. Now that it is no
           longer available, what can I do? Many types of analyses are possible
@@ -47,11 +37,9 @@ export const Questions = (): JSX.Element => {
           <DXLink label="Galaxy system" url={URLS.GALAXY_SYSTEM} /> while we
           continue to build this new BRC resource.
         </MAccordionDetails>
-      </StyledAccordion>
-      <StyledAccordion component={DXRoundedPaper}>
-        <MAccordionSummary expandIcon={expandIcon}>
-          How does brc-analytics work?
-        </MAccordionSummary>
+      </Accordion>
+      <Accordion>
+        <AccordionSummary>How does brc-analytics work?</AccordionSummary>
         <MAccordionDetails>
           BRC-Analytics will provide access to genomic data and an analytical
           environment. The data will be based on the official releases provided
@@ -61,7 +49,7 @@ export const Questions = (): JSX.Element => {
           Center (<DXLink label="TACC" url={URLS.TACC} />) and{" "}
           <DXLink label="ACCESS-CI" url={URLS.ACCESS_CONSORTIUM} /> consortium.
         </MAccordionDetails>
-      </StyledAccordion>
+      </Accordion>
     </Grid>
   );
 };
