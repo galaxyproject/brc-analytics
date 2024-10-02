@@ -22,6 +22,33 @@ export interface SectionProps {
   divider?: boolean;
 }
 
+export const list = css`
+  ol,
+  ul {
+    margin: 0;
+    padding-left: 24px;
+  }
+
+  ol + p,
+  ul + p {
+    margin-top: 16px;
+  }
+
+  ol ol {
+    list-style-type: lower-roman;
+  }
+`;
+
+export const listItem = css`
+  li {
+    margin: 4px 0;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+`;
+
 export const Section = styled.section<SectionProps>`
   ${(props) =>
     props.border &&
@@ -81,6 +108,8 @@ export const SubHeadline = styled.div`
 `;
 
 export const SectionContent = styled.div<LayoutProps>`
+  ${list};
+  ${listItem};
   grid-column: 1 / -1;
   margin-top: 16px;
 

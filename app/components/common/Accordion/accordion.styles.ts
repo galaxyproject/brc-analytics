@@ -29,5 +29,9 @@ export const StyledAccordion = styled(MAccordion)`
     color: ${inkLight};
     margin: 0;
     padding: 0 20px 8px;
+
+    > *:last-child {
+      margin-bottom: 0;
+    }
   }
 ` as typeof MAccordion;
