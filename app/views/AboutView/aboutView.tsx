@@ -8,8 +8,8 @@ export const AboutView = (): JSX.Element => {
     <Fragment>
       <SectionHero
         breadcrumbs={BREADCRUMBS}
-        head="About BRC-Analytics"
-        subHead="BRC-analytics is a collaborative effort of four mature software and infrastructure projects that have been sustained for decades."
+        head="About BRC Analytics"
+        subHead="BRC Analytics is a collaborative effort of four mature software and infrastructure projects that have been sustained for decades."
       />
       <SectionAbout />
     </Fragment>

@@ -14,20 +14,20 @@
           <AccordionDetails>
             This set of tasks deals with transferring data from VEuPathDb
             infrastructure and creating a list of genomes that will be initially
-            maintained within BRC-Analytics. The number of taxa included in our
+            maintained within BRC Analytics. The number of taxa included in our
             system will
 
             1. Transferring databases and associated data from VEuPathDb servers to TACC infrastructure.
             1. Understanding the structure of VEuPathDb database and deciding which data will be ingested as custom
-            tracks for the BRC-analytics instance of the UCSC Genome Browser.
+            tracks for the BRC Analytics instance of the UCSC Genome Browser.
             1. Uncovering how JBrowse instances were created within VEuPathDb gene pages and replicating this data at
-            the BRC-analytics instance of the UCSC Genome Browser.
+            the BRC Analytics instance of the UCSC Genome Browser.
           </AccordionDetails>
         </Accordion>
         <Accordion>
           <AccordionSummary>Harmonization of genomic data for all taxa</AccordionSummary>
           <AccordionDetails>
-            This set of tasks ensures that BRC-analytics provides access to the latest versions of all 785 VEuPathDb
+            This set of tasks ensures that BRC Analytics provides access to the latest versions of all 785 VEuPathDb
             taxa and associated annotations.
 
             1. Build UCSC Genome Browsers for all 785 taxa by matching genomes found in VEuPathDb against NCBI Datasets.
@@ -44,7 +44,7 @@
             1. Create a dedicated Galaxy instance at [https://brc.usegalaxy.org](https://brc.usegalaxy.org)
             1. Prepare reference data for all 785 genomes that will initially be served by the system. This includes
             creation of indices for bowtie, bowtie2, bwa-mem, bwa-mem2, hisat2, STAR, and SnpEff.
-            1. Create a single sign-on so that user accounts are shared between brc-analytics and Galaxy. When creating
+            1. Create a single sign-on so that user accounts are shared between BRC Analytics and Galaxy. When creating
             an account the user should be able to specify the default Galaxy instances (.org, .eu., .org.au, .fr ...)
             1. Develop functionality for "focusing" Galaxy on a particular genome build selected by the user (see
             ["Focusing" Galaxy on a particular genome
