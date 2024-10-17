@@ -134,7 +134,13 @@ export const buildGenomeDetails = (
     })
   );
   keyValuePairs.set("Strain", genome.strain);
-  keyValuePairs.set("Assembly Version ID", genome.genomeVersionAssemblyId);
+  keyValuePairs.set(
+    "Assembly Version ID",
+    C.CopyText({
+      children: genome.genomeVersionAssemblyId,
+      text: genome.genomeVersionAssemblyId,
+    })
+  );
   keyValuePairs.set("VeUPathDB Project", genome.vEuPathDbProject);
   keyValuePairs.set("Contigs", genome.contigs);
   keyValuePairs.set("Super Contigs", genome.supercontigs);

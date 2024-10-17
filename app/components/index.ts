@@ -11,7 +11,6 @@ export {
   RoundedPaper,
 } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 export { SectionTitle } from "@databiosphere/findable-ui/lib/components/common/Section/components/SectionTitle/sectionTitle";
-export { GridPaperSection } from "@databiosphere/findable-ui/lib/components/common/Section/section.styles";
 export { Stack } from "@databiosphere/findable-ui/lib/components/common/Stack/stack";
 export { StaticImage } from "@databiosphere/findable-ui/lib/components/common/StaticImage/staticImage";
 export {
@@ -22,8 +21,10 @@ export {
 export { Logo } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/components/Content/components/Logo/logo";
 export { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 export { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
+export { CopyText } from "./common/CopyText/copyText";
 export { AnalysisMethod } from "./Entity/components/AnalysisMethod/analysisMethod";
 export { AnalysisPortals } from "./Entity/components/AnalysisPortals/analysisPortals";
 export { DetailViewHero } from "./Layout/components/Detail/components/DetailViewHero/detailViewHero";
+export { GridPaperSection } from "./Layout/components/Detail/components/Section/section.styles";
 export { Branding } from "./Layout/components/Footer/components/Branding/branding";
 export { AnalyzeGenome } from "./Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
