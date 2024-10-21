@@ -8,21 +8,32 @@ import {
   REL_ATTRIBUTE,
 } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { Card } from "@mui/material";
+import { WORKFLOW_IDS_BY_ANALYSIS_METHOD } from "app/apis/catalog/brc-analytics-catalog/common/constants";
+import { getWorkflowLandingId } from "app/utils/galaxy-api";
+import { useState } from "react";
+import { ANALYSIS_METHOD } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import {
   StyledButtonPrimary,
   StyledCardContent,
 } from "./analysisMethod.styles";
 
 export interface AnalysisMethodProps extends CardProps {
-  url: string;
+  analysisMethod: ANALYSIS_METHOD;
+  genomeVersionAssemblyId: string;
 }
 
+const WORKFLOW_LANDING_URL_PREFIX =
+  "https://test.galaxyproject.org/workflow_landings/";
+
 export const AnalysisMethod = ({
+  analysisMethod,
+  genomeVersionAssemblyId,
   Paper = FluidPaper,
   text,
   title,
-  url,
 }: AnalysisMethodProps): JSX.Element => {
+  const workflowId = WORKFLOW_IDS_BY_ANALYSIS_METHOD[analysisMethod];
+  const [urlIsLoading, setUrlIsLoading] = useState(false);
   return (
     <Card component={Paper}>
       <CardSection>
@@ -31,8 +42,16 @@ export const AnalysisMethod = ({
           <CardText>{text}</CardText>
         </StyledCardContent>
         <StyledButtonPrimary
-          disabled={!url}
-          onClick={(): void => {
+          disabled={!workflowId || urlIsLoading}
+          onClick={async (): Promise<void> => {
+            if (!workflowId) return;
+            setUrlIsLoading(true);
+            const url =
+              WORKFLOW_LANDING_URL_PREFIX +
+              encodeURIComponent(
+                await getWorkflowLandingId(workflowId, genomeVersionAssemblyId)
+              );
+            setUrlIsLoading(false);
             window.open(
               url,
               ANCHOR_TARGET.BLANK,
@@ -40,7 +59,7 @@ export const AnalysisMethod = ({
             );
           }}
         >
-          Analyze
+          {urlIsLoading ? "Loading..." : "Analyze"}
         </StyledButtonPrimary>
       </CardSection>
     </Card>
