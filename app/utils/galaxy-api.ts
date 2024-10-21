@@ -32,6 +32,9 @@ export async function getWorkflowLandingId(
   };
   const res = await ky.post<WorkflowLanding>(WORKFLOW_LANDINGS_URL, {
     json: body,
+    retry: {
+      methods: ["post"],
+    },
   });
   return (await res.json()).uuid;
 }
