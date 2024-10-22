@@ -10,16 +10,19 @@ interface WorkflowLanding {
   uuid: string;
 }
 
-const WORKFLOW_LANDINGS_URL =
+const WORKFLOW_LANDINGS_API_URL =
   "https://test.galaxyproject.org/api/workflow_landings";
 
+const WORKFLOW_LANDING_URL_PREFIX =
+  "https://test.galaxyproject.org/workflow_landings/";
+
 /**
- * Get the ID of the workflow landing page for the given genome workflow.
+ * Get the URL of the workflow landing page for the given genome workflow.
  * @param workflowId - Value for the `workflow_id` parameter sent to the API.
  * @param referenceGenome - Genome version/assembly ID.
- * @returns workflow landing UUID.
+ * @returns workflow landing URL.
  */
-export async function getWorkflowLandingId(
+export async function getWorkflowLandingUrl(
   workflowId: string,
   referenceGenome: string
 ): Promise<string> {
@@ -30,11 +33,12 @@ export async function getWorkflowLandingId(
     workflow_id: workflowId,
     workflow_target_type: "trs_url",
   };
-  const res = await ky.post<WorkflowLanding>(WORKFLOW_LANDINGS_URL, {
+  const res = await ky.post<WorkflowLanding>(WORKFLOW_LANDINGS_API_URL, {
     json: body,
     retry: {
       methods: ["post"],
     },
   });
-  return (await res.json()).uuid;
+  const id = (await res.json()).uuid;
+  return WORKFLOW_LANDING_URL_PREFIX + encodeURIComponent(id);
 }

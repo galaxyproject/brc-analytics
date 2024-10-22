@@ -9,7 +9,7 @@ import {
 } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { Card } from "@mui/material";
 import { WORKFLOW_IDS_BY_ANALYSIS_METHOD } from "app/apis/catalog/brc-analytics-catalog/common/constants";
-import { getWorkflowLandingId } from "app/utils/galaxy-api";
+import { getWorkflowLandingUrl } from "app/utils/galaxy-api";
 import { useState } from "react";
 import { ANALYSIS_METHOD } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import {
@@ -21,9 +21,6 @@ export interface AnalysisMethodProps extends CardProps {
   analysisMethod: ANALYSIS_METHOD;
   genomeVersionAssemblyId: string;
 }
-
-const WORKFLOW_LANDING_URL_PREFIX =
-  "https://test.galaxyproject.org/workflow_landings/";
 
 export const AnalysisMethod = ({
   analysisMethod,
@@ -46,11 +43,10 @@ export const AnalysisMethod = ({
           onClick={async (): Promise<void> => {
             if (!workflowId) return;
             setUrlIsLoading(true);
-            const url =
-              WORKFLOW_LANDING_URL_PREFIX +
-              encodeURIComponent(
-                await getWorkflowLandingId(workflowId, genomeVersionAssemblyId)
-              );
+            const url = await getWorkflowLandingUrl(
+              workflowId,
+              genomeVersionAssemblyId
+            );
             setUrlIsLoading(false);
             window.open(
               url,
