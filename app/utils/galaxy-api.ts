@@ -43,7 +43,7 @@ export async function getWorkflowLandingUrl(
     },
   });
   const id = (await res.json()).uuid;
-  return WORKFLOW_LANDING_URL_PREFIX + encodeURIComponent(id);
+  return `${WORKFLOW_LANDING_URL_PREFIX}${encodeURIComponent(id)}?public=true`;
 }
 
 /**
