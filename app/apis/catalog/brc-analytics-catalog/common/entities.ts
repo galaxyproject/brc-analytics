@@ -34,3 +34,7 @@ export interface EntitiesResponsePagination {
   size: number;
   total: number;
 }
+
+export enum WORKFLOW_ID {
+  REGULATION = "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.12",
+}
