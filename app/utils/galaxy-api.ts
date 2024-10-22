@@ -2,6 +2,7 @@ import ky from "ky";
 import { WORKFLOW_ID } from "../apis/catalog/brc-analytics-catalog/common/entities";
 
 interface WorkflowLandingsBody {
+  public: true;
   request_state: WorkflowLandingsBodyRequestState;
   workflow_id: string;
   workflow_target_type: "trs_url";
@@ -30,6 +31,7 @@ export async function getWorkflowLandingUrl(
   referenceGenome: string
 ): Promise<string> {
   const body: WorkflowLandingsBody = {
+    public: true,
     request_state: getWorkflowLandingsRequestState(workflowId, referenceGenome),
     workflow_id: workflowId,
     workflow_target_type: "trs_url",
