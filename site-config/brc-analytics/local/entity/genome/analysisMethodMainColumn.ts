@@ -16,8 +16,8 @@ export const mainColumn: ComponentsConfig = [
       {
         component: C.FluidAlert,
         props: {
-          severity: "warning",
-          title: "Preview.",
+          severity: "info",
+          title: "Preview the worklows below in a test enviornment.",
           variant: "banner",
         },
       },
@@ -39,7 +39,7 @@ export const mainColumn: ComponentsConfig = [
       {
         component: C.FluidAlert,
         props: {
-          severity: "warning",
+          severity: "info",
           title:
             "We are in the process of adopting these workflows to the needs of the pathogen community.",
           variant: "banner",
