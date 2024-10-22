@@ -1,3 +1,12 @@
+export enum ANALYSIS_METHOD {
+  ASSEMBLY = "ASSEMBLY",
+  GENOME_COMPARISONS = "GENOME_COMPARISONS",
+  PROTEIN_FOLDING = "PROTEIN_FOLDING",
+  REGULATION = "REGULATION",
+  TRANSCRIPTOMICS = "TRANSCRIPTOMICS",
+  VARIANT_CALLING = "VARIANT_CALLING",
+}
+
 export type BRCCatalog = BRCDataCatalogGenome;
 
 export interface BRCDataCatalogGenome {
@@ -24,4 +33,8 @@ export interface EntitiesResponsePagination {
   pages: number;
   size: number;
   total: number;
+}
+
+export enum WORKFLOW_ID {
+  REGULATION = "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.12",
 }

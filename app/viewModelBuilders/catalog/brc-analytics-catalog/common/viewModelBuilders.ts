@@ -7,7 +7,10 @@ import {
 import { ViewContext } from "@databiosphere/findable-ui/lib/config/entities";
 import { ComponentProps } from "react";
 import { ROUTES } from "../../../../../routes/constants";
-import { BRCDataCatalogGenome } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
+import {
+  ANALYSIS_METHOD,
+  BRCDataCatalogGenome,
+} from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "../../../../components";
 import { GENOME_BROWSER } from "./constants";
 
@@ -62,17 +65,22 @@ export const buildContigs = (
  * @param cardProps - Card properties.
  * @param cardProps.text - Card text.
  * @param cardProps.title - Card title.
- * @param cardProps.url - Card url.
+ * @param cardProps.analysisMethod - Analysis method.
  * @returns Props to be used for the AnalysisMethod component.
  */
 export const buildGenomeAnalysisMethod = (
   genome: BRCDataCatalogGenome,
-  { text, title, url }: Partial<CardProps> & { url: string }
-): ComponentProps<typeof C.AnalysisMethod> => {
-  return {
+  {
+    analysisMethod,
     text,
     title,
-    url,
+  }: Partial<CardProps> & { analysisMethod: ANALYSIS_METHOD }
+): ComponentProps<typeof C.AnalysisMethod> => {
+  return {
+    analysisMethod,
+    genomeVersionAssemblyId: genome.genomeVersionAssemblyId,
+    text,
+    title,
   };
 };
 
