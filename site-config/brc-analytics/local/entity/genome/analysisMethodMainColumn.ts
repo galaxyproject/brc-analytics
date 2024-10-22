@@ -17,7 +17,7 @@ export const mainColumn: ComponentsConfig = [
         component: C.FluidAlert,
         props: {
           severity: "info",
-          title: "Preview the worklows below in a test enviornment.",
+          title: "Preview the worklows below in a test environment.",
           variant: "banner",
         },
       },
