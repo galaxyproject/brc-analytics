@@ -8,6 +8,35 @@ export const mainColumn: ComponentsConfig = [
   {
     children: [
       {
+        component: C.AnalysisMethodsTitle,
+        props: {
+          title: "Preview",
+        },
+      },
+      {
+        component: C.FluidAlert,
+        props: {
+          severity: "warning",
+          title: "Preview.",
+          variant: "banner",
+        },
+      },
+      {
+        component: C.AnalysisMethod,
+        viewBuilder: (r) =>
+          V.buildGenomeAnalysisMethod(r, {
+            analysisMethod: ANALYSIS_METHOD.REGULATION,
+            text: MDX.Regulation({}),
+            title: "Regulation",
+          }),
+      },
+      {
+        component: C.AnalysisMethodsTitle,
+        props: {
+          title: "Coming Soon",
+        },
+      },
+      {
         component: C.FluidAlert,
         props: {
           severity: "warning",
@@ -32,15 +61,6 @@ export const mainColumn: ComponentsConfig = [
             analysisMethod: ANALYSIS_METHOD.TRANSCRIPTOMICS,
             text: MDX.Transcriptomics({}),
             title: "Transcriptomics",
-          }),
-      },
-      {
-        component: C.AnalysisMethod,
-        viewBuilder: (r) =>
-          V.buildGenomeAnalysisMethod(r, {
-            analysisMethod: ANALYSIS_METHOD.REGULATION,
-            text: MDX.Regulation({}),
-            title: "Regulation",
           }),
       },
       {
