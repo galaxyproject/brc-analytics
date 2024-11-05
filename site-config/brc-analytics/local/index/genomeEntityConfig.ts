@@ -82,9 +82,9 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
       },
       {
         componentConfig: {
-          component: C.Link,
+          component: C.BasicCell,
           viewBuilder: V.buildSpecies,
-        } as ComponentConfig<typeof C.Link, BRCDataCatalogGenome>,
+        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.SPECIES,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.SPECIES,
         width: { max: "1fr", min: "284px" },

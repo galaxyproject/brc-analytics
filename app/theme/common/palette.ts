@@ -1,25 +1,24 @@
-import { PaletteColor } from "@mui/material";
+import { PaletteColorOptions } from "@mui/material";
 
 /**
- * Palette "Hero"
+ * Palette "Primary"
  */
-export const HERO = {
-  LIGHT: "#28285B",
+const PRIMARY = {
+  DARK: "#1F1F47",
   MAIN: "#28285B",
 };
 
 /**
  * Color constants
  */
-export const heroLight = HERO.LIGHT;
-export const heroMain = HERO.MAIN;
+const primaryDark = PRIMARY.DARK;
+const primaryMain = PRIMARY.MAIN;
 
 /**
- * Palette Option "Hero"
+ * Palette Option "Primary"
  */
-export const hero: PaletteColor = {
+export const primary: PaletteColorOptions = {
   contrastText: "#FFFFFF",
-  dark: heroMain,
-  light: heroLight,
-  main: heroMain,
+  dark: primaryDark,
+  main: primaryMain,
 };

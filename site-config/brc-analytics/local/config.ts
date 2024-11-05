@@ -2,7 +2,6 @@ import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { EntityConfig } from "@databiosphere/findable-ui/src/config/entities";
 import { BRCDataCatalogGenome } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "../../../app/components";
-import * as P from "../../../app/theme/common/palette";
 import { ROUTES } from "../../../routes/constants";
 import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genomeEntityConfig";
@@ -59,11 +58,7 @@ export function makeConfig(browserUrl: string): SiteConfig {
       },
     },
     redirectRootToPath: "/",
-    themeOptions: {
-      palette: {
-        hero: P.hero,
-      },
-    },
+    themeOptions: {},
   };
 }
 

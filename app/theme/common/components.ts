@@ -4,28 +4,38 @@ import { Components, Theme } from "@mui/material";
 
 /**
  * MuiButton Component
- * @param theme - Theme.
  * @returns MuiButton component theme styles.
  */
-export const MuiButton = (theme: Theme): Components["MuiButton"] => {
-  return {
-    styleOverrides: {
-      containedHero: {
+export const MuiButton: Components["MuiButton"] = {
+  styleOverrides: {
+    containedPrimary: {
+      boxShadow: `0px 1px 0px 0px rgba(0, 0, 0, 0.08), 0px -1px 0px 0px rgba(0, 0, 0, 0.20) inset`,
+      // eslint-disable-next-line sort-keys -- disabling key order for readability
+      "&:hover": {
         boxShadow: `0px 1px 0px 0px rgba(0, 0, 0, 0.08), 0px -1px 0px 0px rgba(0, 0, 0, 0.20) inset`,
-        color: theme.palette.common.white,
-        // eslint-disable-next-line sort-keys -- disabling key order for readability
-        "&:hover": {
-          backgroundColor: theme.palette.hero.main,
-          boxShadow: `0px 1px 0px 0px rgba(0, 0, 0, 0.08), 0px -1px 0px 0px rgba(0, 0, 0, 0.20) inset`,
-        },
-        // eslint-disable-next-line sort-keys -- disabling key order for readability
-        "&:active": {
-          backgroundColor: theme.palette.hero.main,
-          boxShadow: "none",
-        },
+      },
+      // eslint-disable-next-line sort-keys -- disabling key order for readability
+      "&.Mui-disabled": {
+        boxShadow: `0px 1px 0px 0px rgba(0, 0, 0, 0.08), 0px -1px 0px 0px rgba(0, 0, 0, 0.20) inset`,
       },
     },
-  };
+    root: {
+      variants: [
+        {
+          props: { size: "large" },
+          style: {
+            padding: "10px 16px",
+          },
+        },
+        {
+          props: { size: "medium" },
+          style: {
+            padding: "8px 16px",
+          },
+        },
+      ],
+    },
+  },
 };
 
 export const MuiButtonGroup = (theme: Theme): Components["MuiButtonGroup"] => {

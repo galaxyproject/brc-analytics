@@ -1,76 +1,57 @@
+import { DropdownButton } from "@databiosphere/findable-ui/lib/components/common/Button/components/DropdownButton/dropdownButton";
+import { DropdownMenuButtonProps } from "@databiosphere/findable-ui/lib/components/common/DropdownMenu/common/entities";
+import { DropdownMenu } from "@databiosphere/findable-ui/lib/components/common/DropdownMenu/dropdownMenu";
 import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,
 } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
-import { Button, Tooltip } from "@mui/material";
-import Router from "next/router";
-import { ROUTES } from "../../../../../../../routes/constants";
-import { AnalyzeGenomeIcon } from "../../../../../common/CustomIcon/components/AnalyzeGenomeIcon/analyzeGenomeIcon";
-import { ViewGenomeIcon } from "../../../../../common/CustomIcon/components/ViewGenomeIcon/viewGenomeIcon";
-import { StyledButtonGroup } from "./analyzeGenome.styles";
-import {
-  BUTTON_GROUP_PROPS,
-  BUTTON_PROPS,
-  ICON_PROPS,
-} from "./common/constants";
-
-export interface AnalyzeGenomeProps {
-  genomeVersionAssemblyId: string;
-  rowId?: string;
-  ucscBrowserUrl: string;
-}
+import { Button, Grid2, MenuItem } from "@mui/material";
+import NLink from "next/link";
+import { BUTTON_PROPS, GRID2_PROPS, MENU_PROPS } from "./constants";
+import { AnalyzeGenomeProps } from "./types";
 
 export const AnalyzeGenome = ({
-  genomeVersionAssemblyId,
-  rowId,
-  ucscBrowserUrl,
+  analyze,
+  views,
 }: AnalyzeGenomeProps): JSX.Element => {
-  const onAnalyze = (rowId?: string): void => {
-    if (!rowId) return;
-    Router.push(`${ROUTES.ORGANISMS}/${rowId}`);
-  };
-
-  const onView = (url: string | null): void => {
-    if (!url) return;
-    window.open(url, ANCHOR_TARGET.BLANK, REL_ATTRIBUTE.NO_OPENER_NO_REFERRER);
-  };
-
   return (
-    <StyledButtonGroup
-      {...BUTTON_GROUP_PROPS}
-      Buttons={[
-        <Tooltip key="analyze" title="Analyze">
-          <Button
-            {...BUTTON_PROPS}
-            disabled={!rowId}
-            onClick={(): void => onAnalyze(rowId)}
-          >
-            <AnalyzeGenomeIcon {...ICON_PROPS} />
-          </Button>
-        </Tooltip>,
-        <Tooltip key="view-browser" title="UCSC Genome Browser">
-          <Button
-            {...BUTTON_PROPS}
-            disabled={!ucscBrowserUrl}
-            onClick={(): void => onView(ucscBrowserUrl)}
-          >
-            <ViewGenomeIcon {...ICON_PROPS} />
-          </Button>
-        </Tooltip>,
-        <Tooltip key="view-datasets" title="NCBI datasets">
-          <Button
-            {...BUTTON_PROPS}
-            disabled={!genomeVersionAssemblyId}
-            onClick={(): void =>
-              onView(
-                `https://www.ncbi.nlm.nih.gov/datasets/genome/${genomeVersionAssemblyId}`
-              )
-            }
-          >
-            NCBI
-          </Button>
-        </Tooltip>,
-      ]}
-    />
+    <Grid2 {...GRID2_PROPS}>
+      <Button
+        {...BUTTON_PROPS}
+        component={NLink}
+        disabled={!analyze.url}
+        href={analyze.url}
+      >
+        {analyze.label}
+      </Button>
+      <DropdownMenu {...MENU_PROPS} Button={renderButton}>
+        {({ closeMenu }): JSX.Element[] =>
+          views.map((view, i) => (
+            <MenuItem
+              key={i}
+              onClick={(): void => {
+                closeMenu();
+                window.open(
+                  view.url,
+                  ANCHOR_TARGET.BLANK,
+                  REL_ATTRIBUTE.NO_OPENER_NO_REFERRER
+                );
+              }}
+            >
+              {view.label}
+            </MenuItem>
+          ))
+        }
+      </DropdownMenu>
+    </Grid2>
   );
 };
+
+/**
+ * Render the dropdown button.
+ * @param props - Button props e.g. "onClick".
+ * @returns button element.
+ */
+function renderButton(props: DropdownMenuButtonProps): JSX.Element {
+  return <DropdownButton {...props}>View</DropdownButton>;
+}

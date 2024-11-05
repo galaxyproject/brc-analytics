@@ -12,7 +12,7 @@ import {
   BRCDataCatalogGenome,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "../../../../components";
-import { GENOME_BROWSER } from "./constants";
+import { GENOME_BROWSER, NCBI_DATASETS_URL } from "./constants";
 
 /**
  * Build props for the genome analysis cell.
@@ -24,12 +24,26 @@ export const buildAnalyzeGenome = (
   genome: BRCDataCatalogGenome,
   viewContext: ViewContext<BRCDataCatalogGenome>
 ): ComponentProps<typeof C.AnalyzeGenome> => {
-  const { cellContext } = viewContext;
-  const { row } = cellContext || {};
+  const { genomeVersionAssemblyId, ncbiTaxonomyId, ucscBrowserUrl } = genome;
+  const rowId = viewContext.cellContext?.row?.id;
   return {
-    genomeVersionAssemblyId: genome.genomeVersionAssemblyId,
-    rowId: row?.id,
-    ucscBrowserUrl: genome.ucscBrowserUrl,
+    analyze: {
+      label: "Analyze",
+      url: rowId ? `${ROUTES.ORGANISMS}/${rowId}` : "",
+    },
+    views: [
+      { label: "UCSC Genome Browser", url: ucscBrowserUrl },
+      {
+        label: "NCBI Genome Assembly",
+        url: `${NCBI_DATASETS_URL}/genome/${genomeVersionAssemblyId}`,
+      },
+      {
+        label: "NCBI Taxonomy",
+        url: `${NCBI_DATASETS_URL}/taxonomy/${encodeURIComponent(
+          ncbiTaxonomyId
+        )}`,
+      },
+    ],
   };
 };
 
@@ -198,12 +212,9 @@ export const buildOrganismListHero = (): ComponentProps<
  */
 export const buildSpecies = (
   genome: BRCDataCatalogGenome
-): ComponentProps<typeof C.Link> => {
+): ComponentProps<typeof C.BasicCell> => {
   return {
-    label: genome.species,
-    url: `https://www.ncbi.nlm.nih.gov/datasets/taxonomy/${encodeURIComponent(
-      genome.ncbiTaxonomyId
-    )}/`,
+    value: genome.species,
   };
 };
 

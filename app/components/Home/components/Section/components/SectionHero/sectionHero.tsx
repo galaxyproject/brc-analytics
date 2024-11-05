@@ -4,6 +4,7 @@ import { ROUTES } from "../../../../../../../routes/constants";
 import { calculateGridSize } from "../../../../../Layout/components/Hero/common/utils";
 import { Carousel } from "./components/Carousel/carousel";
 import { Hero } from "./components/Hero/hero";
+import { BUTTON_PROPS } from "./constants";
 import {
   Head,
   Headline,
@@ -31,11 +32,7 @@ export const SectionHero = (): JSX.Element => {
                   annotations and functional insights into disease-causing
                   organisms and their carriers
                 </Subhead>
-                <Button
-                  color="hero"
-                  href={ROUTES.ORGANISMS}
-                  variant="contained"
-                >
+                <Button {...BUTTON_PROPS} href={ROUTES.ORGANISMS}>
                   Get started
                 </Button>
               </SubHeadline>
