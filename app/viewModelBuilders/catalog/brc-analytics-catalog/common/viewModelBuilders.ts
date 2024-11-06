@@ -1,5 +1,4 @@
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
-import { CardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
 import {
   Key,
   Value,
@@ -7,10 +6,7 @@ import {
 import { ViewContext } from "@databiosphere/findable-ui/lib/config/entities";
 import { ComponentProps } from "react";
 import { ROUTES } from "../../../../../routes/constants";
-import {
-  ANALYSIS_METHOD,
-  BRCDataCatalogGenome,
-} from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
+import { BRCDataCatalogGenome } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "../../../../components";
 import { GENOME_BROWSER, NCBI_DATASETS_URL } from "./constants";
 
@@ -76,28 +72,22 @@ export const buildContigs = (
 /**
  * Build props for the genome AnalysisMethod component.
  * @param genome - Genome entity.
- * @param cardProps - Card properties.
- * @param cardProps.text - Card text.
- * @param cardProps.title - Card title.
- * @param cardProps.analysisMethod - Analysis method.
+ * @param analysisMethodProps - Analysis Method properties.
+ * @param analysisMethodProps.analysisMethod - Analysis method.
+ * @param analysisMethodProps.content - Content to be displayed.
  * @returns Props to be used for the AnalysisMethod component.
  */
 export const buildGenomeAnalysisMethod = (
   genome: BRCDataCatalogGenome,
-  {
-    analysisMethod,
-    text,
-    title,
-  }: Partial<CardProps> & {
-    analysisMethod: ANALYSIS_METHOD;
-  }
+  analysisMethodProps: Pick<
+    ComponentProps<typeof C.AnalysisMethod>,
+    "analysisMethod" | "content"
+  >
 ): ComponentProps<typeof C.AnalysisMethod> => {
   return {
-    analysisMethod,
+    ...analysisMethodProps,
     geneModelUrl: genome.geneModelUrl,
     genomeVersionAssemblyId: genome.genomeVersionAssemblyId,
-    text,
-    title,
   };
 };
 

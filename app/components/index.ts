@@ -23,6 +23,7 @@ export { Link } from "@databiosphere/findable-ui/lib/components/Links/components
 export { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
 export { CopyText } from "./common/CopyText/copyText";
 export { AnalysisMethod } from "./Entity/components/AnalysisMethod/analysisMethod";
+export { AnalysisMethods } from "./Entity/components/AnalysisMethods/analysisMethods";
 export { AnalysisMethodsTitle } from "./Entity/components/AnalysisMethodsTitle/analysisMethodsTitle";
 export { AnalysisPortals } from "./Entity/components/AnalysisPortals/analysisPortals";
 export { DetailViewHero } from "./Layout/components/Detail/components/DetailViewHero/detailViewHero";

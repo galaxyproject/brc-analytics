@@ -8,87 +8,57 @@ export const mainColumn: ComponentsConfig = [
   {
     children: [
       {
-        component: C.AnalysisMethodsTitle,
-        props: {
-          title: "Preview",
-        },
-      },
-      {
-        component: C.FluidAlert,
-        props: {
-          severity: "info",
-          title: "Preview the worklows below in a test environment.",
-          variant: "banner",
-        },
-      },
-      {
-        component: C.AnalysisMethod,
-        viewBuilder: (r) =>
-          V.buildGenomeAnalysisMethod(r, {
-            analysisMethod: ANALYSIS_METHOD.VARIANT_CALLING,
-            text: MDX.VariantCalling({}),
-            title: "Variant calling",
-          }),
-      },
-      {
-        component: C.AnalysisMethod,
-        viewBuilder: (r) =>
-          V.buildGenomeAnalysisMethod(r, {
-            analysisMethod: ANALYSIS_METHOD.TRANSCRIPTOMICS,
-            text: MDX.Transcriptomics({}),
-            title: "Transcriptomics",
-          }),
-      },
-      {
-        component: C.AnalysisMethod,
-        viewBuilder: (r) =>
-          V.buildGenomeAnalysisMethod(r, {
-            analysisMethod: ANALYSIS_METHOD.REGULATION,
-            text: MDX.Regulation({}),
-            title: "Regulation",
-          }),
-      },
-      {
-        component: C.AnalysisMethodsTitle,
-        props: {
-          title: "Coming Soon",
-        },
-      },
-      {
-        component: C.FluidAlert,
-        props: {
-          severity: "info",
-          title:
-            "We are in the process of adapting these workflows to the needs of the pathogen community.",
-          variant: "banner",
-        },
-      },
-      {
-        component: C.AnalysisMethod,
-        viewBuilder: (r) =>
-          V.buildGenomeAnalysisMethod(r, {
-            analysisMethod: ANALYSIS_METHOD.ASSEMBLY,
-            text: MDX.Assembly({}),
-            title: "Assembly",
-          }),
-      },
-      {
-        component: C.AnalysisMethod,
-        viewBuilder: (r) =>
-          V.buildGenomeAnalysisMethod(r, {
-            analysisMethod: ANALYSIS_METHOD.GENOME_COMPARISONS,
-            text: MDX.GenomeComparisons({}),
-            title: "Genome comparisons",
-          }),
-      },
-      {
-        component: C.AnalysisMethod,
-        viewBuilder: (r) =>
-          V.buildGenomeAnalysisMethod(r, {
-            analysisMethod: ANALYSIS_METHOD.PROTEIN_FOLDING,
-            text: MDX.ProteinFolding({}),
-            title: "Protein folding",
-          }),
+        children: [
+          {
+            component: C.AnalysisMethod,
+            viewBuilder: (r) =>
+              V.buildGenomeAnalysisMethod(r, {
+                analysisMethod: ANALYSIS_METHOD.VARIANT_CALLING,
+                content: MDX.VariantCalling({}),
+              }),
+          },
+          {
+            component: C.AnalysisMethod,
+            viewBuilder: (r) =>
+              V.buildGenomeAnalysisMethod(r, {
+                analysisMethod: ANALYSIS_METHOD.TRANSCRIPTOMICS,
+                content: MDX.Transcriptomics({}),
+              }),
+          },
+          {
+            component: C.AnalysisMethod,
+            viewBuilder: (r) =>
+              V.buildGenomeAnalysisMethod(r, {
+                analysisMethod: ANALYSIS_METHOD.REGULATION,
+                content: MDX.Regulation({}),
+              }),
+          },
+          {
+            component: C.AnalysisMethod,
+            viewBuilder: (r) =>
+              V.buildGenomeAnalysisMethod(r, {
+                analysisMethod: ANALYSIS_METHOD.ASSEMBLY,
+                content: MDX.Assembly({}),
+              }),
+          },
+          {
+            component: C.AnalysisMethod,
+            viewBuilder: (r) =>
+              V.buildGenomeAnalysisMethod(r, {
+                analysisMethod: ANALYSIS_METHOD.GENOME_COMPARISONS,
+                content: MDX.GenomeComparisons({}),
+              }),
+          },
+          {
+            component: C.AnalysisMethod,
+            viewBuilder: (r) =>
+              V.buildGenomeAnalysisMethod(r, {
+                analysisMethod: ANALYSIS_METHOD.PROTEIN_FOLDING,
+                content: MDX.ProteinFolding({}),
+              }),
+          },
+        ],
+        component: C.AnalysisMethods,
       },
     ],
     component: C.BackPageContentMainColumn,
