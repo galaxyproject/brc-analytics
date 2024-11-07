@@ -12,22 +12,6 @@ export const getStaticProps: GetStaticProps = async () => {
     props: {
       pageTitle: "Roadmap",
       themeOptions: {
-        components: {
-          MuiLink: {
-            styleOverrides: {
-              root: {
-                color: "#28285b",
-                textDecoration: "underline",
-                textDecorationSkipInk: "none",
-                textUnderlinePosition: "from-font",
-                // eslint-disable-next-line sort-keys -- disabling key order for readability
-                "&:hover": {
-                  textDecoration: "none",
-                },
-              },
-            },
-          },
-        },
         palette: { background: { default: smokeLightest } },
       },
     },

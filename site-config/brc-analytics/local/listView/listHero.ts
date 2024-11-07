@@ -1,13 +1,19 @@
+import { ALERT_PROPS } from "@databiosphere/findable-ui/lib/components/common/Alert/constants";
 import {
   ComponentConfig,
   ComponentsConfig,
 } from "@databiosphere/findable-ui/lib/config/entities";
+import { SIZE } from "@databiosphere/findable-ui/lib/styles/common/constants/size";
 import * as C from "../../../../app/components";
-import * as V from "../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import * as MDX from "../../../../app/components/EntityList/components/Organisms/content/index";
 
 export const listHero: ComponentsConfig = [
   {
-    component: C.FluidAlert,
-    viewBuilder: V.buildOrganismListHero,
-  } as ComponentConfig<typeof C.FluidAlert>,
+    component: MDX.OrganismsWarning,
+    props: {
+      ...ALERT_PROPS.STANDARD_WARNING,
+      component: C.FluidPaper,
+      size: SIZE.LARGE,
+    },
+  } as ComponentConfig<typeof MDX.OrganismsWarning>,
 ];

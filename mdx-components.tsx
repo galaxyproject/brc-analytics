@@ -1,4 +1,7 @@
-import { AccordionDetails as MAccordionDetails } from "@mui/material";
+import {
+  AlertTitle,
+  AccordionDetails as MAccordionDetails,
+} from "@mui/material";
 import { MDXComponents } from "mdx/types";
 import * as C from "./app/components";
 import { CardActions } from "./app/components/Home/components/Section/components/SectionHero/components/Carousel/components/Cards/cards.styles";
@@ -19,6 +22,8 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     Accordion,
     AccordionDetails: MAccordionDetails,
     AccordionSummary,
+    Alert: C.Alert,
+    AlertTitle,
     CardActions,
     Figure,
     Grid: C.Grid,

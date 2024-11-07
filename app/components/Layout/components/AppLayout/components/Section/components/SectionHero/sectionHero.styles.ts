@@ -57,13 +57,4 @@ export const Subhead = styled.div`
   ${textBodyLarge400};
   color: ${inkLight};
   margin: 0;
-
-  .MuiLink-root {
-    color: inherit;
-    text-decoration: underline;
-
-    &:hover {
-      text-decoration: none;
-    }
-  }
 `;

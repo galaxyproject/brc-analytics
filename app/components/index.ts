@@ -1,4 +1,4 @@
-export { FluidAlert } from "@databiosphere/findable-ui/lib/components/common/Alert/alert.styles";
+export { Alert } from "@databiosphere/findable-ui/lib/components/common/Alert/alert";
 export { Breadcrumbs } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 export { Grid } from "@databiosphere/findable-ui/lib/components/common/Grid/grid";
 export { KeyElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/KeyElType/keyElType";
