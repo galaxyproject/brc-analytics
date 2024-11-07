@@ -19,14 +19,24 @@ TAXA = [
 
 ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.json"
 
-OUTPUT_PATH = "files/source/genomes-from-ncbi.tsv"
+ORGANISMS_OUTPUT_PATH = "files/source/organisms-from-ncbi.tsv"
+GENOMES_OUTPUT_PATH = "files/source/genomes-from-ncbi.tsv"
 
 def build_taxonomy_request_body(taxa):
   return {"taxons": taxa, "children": False, "ranks": ["genus"]}
 
-def get_tax_ids(taxa):
-  taxonomy_info = requests.post(TAXONOMY_URL, json=build_taxonomy_request_body(taxa)).json()
-  return [organism_info["taxonomy"]["tax_id"] for organism_info in taxonomy_info["reports"]]
+def get_organism_row(organism_taxonomy):
+  return {
+    "taxon": organism_taxonomy["current_scientific_name"]["name"],
+    "taxonomyId": organism_taxonomy["tax_id"],
+    "assemblyCount": next(count["count"] for count in organism_taxonomy["counts"] if count["type"] == "COUNT_TYPE_ASSEMBLY"),
+  }
+
+def get_organisms_df(taxa):
+  return pd.DataFrame([get_organism_row(organism_info["taxonomy"]) for organism_info in requests.post(TAXONOMY_URL, json=build_taxonomy_request_body(taxa)).json()["reports"]])
+
+def get_tax_ids(organisms_df):
+  return list(organisms_df["taxonomyId"])
 
 def build_genomes_url(tax_ids):
   return f"https://api.ncbi.nlm.nih.gov/datasets/v2/genome/taxon/{url_quote(",".join([str(id) for id in tax_ids]))}/dataset_report?filters.assembly_source=refseq&filters.has_annotation=true&filters.exclude_paired_reports=true&filters.exclude_atypical=true&filters.assembly_level=scaffold&filters.assembly_level=chromosome&filters.assembly_level=complete_genome"
@@ -53,10 +63,16 @@ def get_genome_row(genome_info):
 def get_genomes_df(tax_ids):
   return pd.DataFrame(data=[get_genome_row(genome_info) for genome_info in requests.get(build_genomes_url(tax_ids)).json()["reports"]])
 
-def build_genomes_files():
+def build_files():
   print("Building files")
 
-  genomes_source_df = get_genomes_df(get_tax_ids(TAXA))
+  organisms_df = get_organisms_df(TAXA)
+
+  organisms_df.to_csv(ORGANISMS_OUTPUT_PATH, index=False, sep="\t")
+
+  print(f"Wrote to {ORGANISMS_OUTPUT_PATH}")
+
+  genomes_source_df = get_genomes_df(get_tax_ids(organisms_df))
   assemblies_df = pd.DataFrame(requests.get(ASSEMBLIES_URL).json()["data"])[["ucscBrowser", "genBank", "refSeq"]]
 
   gen_bank_merge_df = genomes_source_df.merge(assemblies_df, how="left", left_on="pairedAccession", right_on="genBank")
@@ -64,9 +80,9 @@ def build_genomes_files():
 
   result_df = gen_bank_merge_df.combine_first(ref_seq_merge_df)
 
-  result_df.to_csv(OUTPUT_PATH, index=False, sep="\t")
+  result_df.to_csv(GENOMES_OUTPUT_PATH, index=False, sep="\t")
 
-  print(f"Wrote to {OUTPUT_PATH}")
+  print(f"Wrote to {GENOMES_OUTPUT_PATH}")
 
 if __name__ == "__main__":
-  build_genomes_files()
+  build_files()
