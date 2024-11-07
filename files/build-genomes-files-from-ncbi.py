@@ -17,6 +17,8 @@ TAXA = [
   "Coccidioides immitis"
 ]
 
+ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.json"
+
 OUTPUT_PATH = "files/source/genomes-from-ncbi.tsv"
 
 def build_taxonomy_request_body(taxa):
@@ -45,6 +47,7 @@ def get_genome_row(genome_info):
     "coverage": genome_info["assembly_stats"].get("genome_coverage"),
     "gcPercent": genome_info["assembly_stats"]["gc_percent"],
     "annotationStatus": genome_info["annotation_info"].get("status"),
+    "pairedAccession": genome_info["paired_accession"],
   }
 
 def get_genomes_df(tax_ids):
@@ -53,9 +56,15 @@ def get_genomes_df(tax_ids):
 def build_genomes_files():
   print("Building files")
 
-  df = get_genomes_df(get_tax_ids(TAXA))
+  genomes_source_df = get_genomes_df(get_tax_ids(TAXA))
+  assemblies_df = pd.DataFrame(requests.get(ASSEMBLIES_URL).json()["data"])[["ucscBrowser", "genBank", "refSeq"]]
 
-  df.to_csv(OUTPUT_PATH, index=False, sep="\t")
+  gen_bank_merge_df = genomes_source_df.merge(assemblies_df, how="left", left_on="pairedAccession", right_on="genBank")
+  ref_seq_merge_df = genomes_source_df.merge(assemblies_df, how="left", left_on="accession", right_on="refSeq")
+
+  result_df = gen_bank_merge_df.combine_first(ref_seq_merge_df)
+
+  result_df.to_csv(OUTPUT_PATH, index=False, sep="\t")
 
   print(f"Wrote to {OUTPUT_PATH}")
 
