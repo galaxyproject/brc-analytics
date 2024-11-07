@@ -32,3 +32,11 @@ python3 ./files/build-genomes-files.py
 
 The environment can be deactivated by running `deactivate`, and re-activated by running `source ./venv/bin/activate`
 again.
+
+## Building data files from the NCBI API
+
+Using the Python environment described above, run the script:
+
+```shell
+python3 ./files/build-files-from-ncbi.py
+```
