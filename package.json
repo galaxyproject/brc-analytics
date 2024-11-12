@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "./scripts/dev.sh brc-analytics && next dev",
-    "build:local": "./scripts/build.sh brc-analytics local && next build",
+    "dev": "./scripts/dev.sh brc-analytics && ./scripts/set-version.sh dev && next dev",
+    "build:local": "./scripts/build.sh brc-analytics local && ./scripts/set-version.sh && next build",
     "start": "npx serve out",
     "lint": "next lint --dir .",
     "check-format": "prettier --check .",
