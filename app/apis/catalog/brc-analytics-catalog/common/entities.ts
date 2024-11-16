@@ -10,17 +10,20 @@ export enum ANALYSIS_METHOD {
 export type BRCCatalog = BRCDataCatalogGenome;
 
 export interface BRCDataCatalogGenome {
-  chromosomes: number;
-  contigs: number;
-  geneModelUrl: string;
-  genomeVersionAssemblyId: string;
+  accession: string;
+  annotationStatus: string | null;
+  chromosomes: number | null;
+  coverage: string | null;
+  gcPercent: number;
+  isRef: boolean;
+  length: number;
+  level: string;
   ncbiTaxonomyId: string;
   organism: string;
-  species: string;
-  strain: string;
-  supercontigs: number;
-  ucscBrowserUrl: string;
-  vEuPathDbProject: string;
+  scaffoldCount: number;
+  scaffoldL50: number;
+  scaffoldN50: number;
+  ucscBrowserUrl: string | null;
 }
 
 export interface EntitiesResponse<R> {
