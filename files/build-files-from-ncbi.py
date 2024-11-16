@@ -2,20 +2,9 @@ from urllib.parse import quote as url_quote
 import pandas as pd
 import requests
 
-TAXONOMY_URL = "https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/dataset_report"
+TAXA_URL = "https://docs.google.com/spreadsheets/d/1Gg9sw2Qw765tOx2To53XkTAn-RAMiBtqYrfItlLXXrc/gviz/tq?tqx=out:csv&sheet=Sheet1.csv"
 
-TAXA = [
-  "Plasmodium falciparum",
-  "Plasmodium vivax",
-  "Plasmodium yoelii",
-  "Plasmodium vinckei",
-  "Culex pipiens",
-  "Anopheles gambiae",
-  "Toxoplasma gondii",
-  "Mycobacterium tuberculosis",
-  "Coccidioides posadasii",
-  "Coccidioides immitis"
-]
+TAXONOMY_URL = "https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/dataset_report"
 
 ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.json"
 
@@ -66,7 +55,11 @@ def get_genomes_df(tax_ids):
 def build_files():
   print("Building files")
 
-  organisms_df = get_organisms_df(TAXA)
+  taxa_df = pd.read_csv(TAXA_URL, keep_default_na=False)
+
+  organisms_source_df = get_organisms_df(list(taxa_df["Name"]))
+
+  organisms_df = organisms_source_df.merge(taxa_df[["TaxId", "CustomTags"]], how="left", left_on="taxonomyId", right_on="TaxId").drop(columns=["TaxId"])
 
   organisms_df.to_csv(ORGANISMS_OUTPUT_PATH, index=False, sep="\t")
 
@@ -78,9 +71,9 @@ def build_files():
   gen_bank_merge_df = genomes_source_df.merge(assemblies_df, how="left", left_on="pairedAccession", right_on="genBank")
   ref_seq_merge_df = genomes_source_df.merge(assemblies_df, how="left", left_on="accession", right_on="refSeq")
 
-  result_df = gen_bank_merge_df.combine_first(ref_seq_merge_df)
+  genomes_df = gen_bank_merge_df.combine_first(ref_seq_merge_df)
 
-  result_df.to_csv(GENOMES_OUTPUT_PATH, index=False, sep="\t")
+  genomes_df.to_csv(GENOMES_OUTPUT_PATH, index=False, sep="\t")
 
   print(f"Wrote to {GENOMES_OUTPUT_PATH}")
 
