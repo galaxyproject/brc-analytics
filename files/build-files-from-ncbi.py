@@ -47,7 +47,7 @@ def get_genome_row(genome_info):
     "taxon": genome_info["organism"]["organism_name"],
     "taxonomyId": genome_info["organism"]["tax_id"],
     "accession": genome_info["accession"],
-    "isRef": (not (refseq_category is None)) and ("reference" in refseq_category),
+    "isRef": refseq_category == "reference genome",
     "level": genome_info["assembly_info"]["assembly_level"],
     "chromosomeCount": genome_info["assembly_stats"].get("total_number_of_chromosomes"),
     "length": genome_info["assembly_stats"]["total_sequence_length"],
