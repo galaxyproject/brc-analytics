@@ -11,6 +11,19 @@ import * as C from "../../../../components";
 import { GENOME_BROWSER, NCBI_DATASETS_URL } from "./constants";
 
 /**
+ * Build props for the accession cell.
+ * @param genome - Genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildAccession = (
+  genome: BRCDataCatalogGenome
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: genome.accession,
+  };
+};
+
+/**
  * Build props for the genome analysis cell.
  * @param genome - Genome entity.
  * @param viewContext - View context.
@@ -20,7 +33,7 @@ export const buildAnalyzeGenome = (
   genome: BRCDataCatalogGenome,
   viewContext: ViewContext<BRCDataCatalogGenome>
 ): ComponentProps<typeof C.AnalyzeGenome> => {
-  const { genomeVersionAssemblyId, ncbiTaxonomyId, ucscBrowserUrl } = genome;
+  const { accession, ncbiTaxonomyId, ucscBrowserUrl } = genome;
   const rowId = viewContext.cellContext?.row?.id;
   return {
     analyze: {
@@ -28,10 +41,12 @@ export const buildAnalyzeGenome = (
       url: rowId ? `${ROUTES.ORGANISMS}/${rowId}` : "",
     },
     views: [
-      { label: "UCSC Genome Browser", url: ucscBrowserUrl },
+      ...(ucscBrowserUrl
+        ? [{ label: "UCSC Genome Browser", url: ucscBrowserUrl }]
+        : []),
       {
         label: "NCBI Genome Assembly",
-        url: `${NCBI_DATASETS_URL}/genome/${genomeVersionAssemblyId}`,
+        url: `${NCBI_DATASETS_URL}/genome/${accession}`,
       },
       {
         label: "NCBI Taxonomy",
@@ -40,6 +55,19 @@ export const buildAnalyzeGenome = (
         )}`,
       },
     ],
+  };
+};
+
+/**
+ * Build props for the annotation status cell.
+ * @param genome - Genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildAnnotationStatus = (
+  genome: BRCDataCatalogGenome
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: genome.annotationStatus,
   };
 };
 
@@ -57,15 +85,132 @@ export const buildChromosomes = (
 };
 
 /**
- * Build props for the contigs cell.
+ * Build props for the coverage cell.
  * @param genome - Genome entity.
  * @returns Props to be used for the cell.
  */
-export const buildContigs = (
+export const buildCoverage = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: genome.contigs,
+    value: genome.coverage,
+  };
+};
+
+/**
+ * Build props for the GC% cell.
+ * @param genome - Genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildGcPercent = (
+  genome: BRCDataCatalogGenome
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: genome.gcPercent,
+  };
+};
+
+/**
+ * Build props for the "is ref" cell.
+ * @param genome - Genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildIsRef = (
+  genome: BRCDataCatalogGenome
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: genome.isRef ? "Yes" : "No",
+  };
+};
+
+/**
+ * Build props for the length cell.
+ * @param genome - Genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildLength = (
+  genome: BRCDataCatalogGenome
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: genome.length,
+  };
+};
+
+/**
+ * Build props for the level cell.
+ * @param genome - Genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildLevel = (
+  genome: BRCDataCatalogGenome
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: genome.level,
+  };
+};
+
+/**
+ * Build props for the organism cell.
+ * @param genome - Genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildOrganism = (
+  genome: BRCDataCatalogGenome
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: genome.organism,
+  };
+};
+
+/**
+ * Build props for the scaffold count cell.
+ * @param genome - Genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildScaffoldCount = (
+  genome: BRCDataCatalogGenome
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: genome.scaffoldCount,
+  };
+};
+
+/**
+ * Build props for the scaffold L50 cell.
+ * @param genome - Genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildScaffoldL50 = (
+  genome: BRCDataCatalogGenome
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: genome.scaffoldL50,
+  };
+};
+
+/**
+ * Build props for the scaffold N50 cell.
+ * @param genome - Genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildScaffoldN50 = (
+  genome: BRCDataCatalogGenome
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: genome.scaffoldN50,
+  };
+};
+
+/**
+ * Build props for the taxonomy ID cell.
+ * @param genome - Genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildTaxonomyId = (
+  genome: BRCDataCatalogGenome
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: genome.ncbiTaxonomyId,
   };
 };
 
@@ -86,8 +231,8 @@ export const buildGenomeAnalysisMethod = (
 ): ComponentProps<typeof C.AnalysisMethod> => {
   return {
     ...analysisMethodProps,
-    geneModelUrl: genome.geneModelUrl,
-    genomeVersionAssemblyId: genome.genomeVersionAssemblyId,
+    geneModelUrl: "",
+    genomeVersionAssemblyId: genome.accession,
   };
 };
 
@@ -100,17 +245,19 @@ export const buildGenomeAnalysisPortals = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.AnalysisPortals> => {
   return {
-    portals: [
-      {
-        imageProps: {
-          alt: GENOME_BROWSER,
-          src: "/analysis-portals/ucsc-genome.png",
-          width: 20,
-        },
-        label: GENOME_BROWSER,
-        url: genome.ucscBrowserUrl,
-      },
-    ],
+    portals: genome.ucscBrowserUrl
+      ? [
+          {
+            imageProps: {
+              alt: GENOME_BROWSER,
+              src: "/analysis-portals/ucsc-genome.png",
+              width: 20,
+            },
+            label: GENOME_BROWSER,
+            url: genome.ucscBrowserUrl,
+          },
+        ]
+      : [],
   };
 };
 
@@ -140,96 +287,27 @@ export const buildGenomeDetails = (
 ): ComponentProps<typeof C.KeyValuePairs> => {
   const keyValuePairs = new Map<Key, Value>();
   keyValuePairs.set(
-    "Species",
+    "Taxon",
     C.Link({
-      label: genome.species,
+      label: genome.organism,
       url: `https://www.ncbi.nlm.nih.gov/datasets/taxonomy/${encodeURIComponent(
         genome.ncbiTaxonomyId
       )}/`,
     })
   );
-  keyValuePairs.set("Strain", genome.strain);
   keyValuePairs.set(
-    "Assembly Version ID",
+    "Accession",
     C.CopyText({
-      children: genome.genomeVersionAssemblyId,
-      value: genome.genomeVersionAssemblyId,
+      children: genome.accession,
+      value: genome.accession,
     })
   );
-  keyValuePairs.set("VeUPathDB Project", genome.vEuPathDbProject);
-  keyValuePairs.set("Contigs", genome.contigs);
-  keyValuePairs.set("Super Contigs", genome.supercontigs);
   keyValuePairs.set("Chromosomes", genome.chromosomes);
   return {
     KeyElType: C.KeyElType,
     KeyValuesElType: (props) => C.Stack({ gap: 4, ...props }),
     ValueElType: C.ValueElType,
     keyValuePairs,
-  };
-};
-
-/**
- * Build props for the genome version/assembly ID cell.
- * @param genome - Genome entity.
- * @returns Props to be used for the cell.
- */
-export const buildGenomeVersionAssemblyId = (
-  genome: BRCDataCatalogGenome
-): ComponentProps<typeof C.BasicCell> => {
-  return {
-    value: genome.genomeVersionAssemblyId,
-  };
-};
-
-/**
- * Build props for the species cell.
- * @param genome - Genome entity.
- * @returns Props to be used for the cell.
- */
-export const buildSpecies = (
-  genome: BRCDataCatalogGenome
-): ComponentProps<typeof C.BasicCell> => {
-  return {
-    value: genome.species,
-  };
-};
-
-/**
- * Build props for the strain cell.
- * @param genome - Genome entity.
- * @returns Props to be used for the cell.
- */
-export const buildStrain = (
-  genome: BRCDataCatalogGenome
-): ComponentProps<typeof C.BasicCell> => {
-  return {
-    value: genome.strain,
-  };
-};
-
-/**
- * Build props for the supercontigs cell.
- * @param genome - Genome entity.
- * @returns Props to be used for the cell.
- */
-export const buildSupercontigs = (
-  genome: BRCDataCatalogGenome
-): ComponentProps<typeof C.BasicCell> => {
-  return {
-    value: genome.supercontigs,
-  };
-};
-
-/**
- * Build props for the VEuPathDB project cell.
- * @param genome - Genome entity.
- * @returns Props to be used for the cell.
- */
-export const buildVEuPathDbProject = (
-  genome: BRCDataCatalogGenome
-): ComponentProps<typeof C.BasicCell> => {
-  return {
-    value: genome.vEuPathDbProject,
   };
 };
 
@@ -243,7 +321,7 @@ function getGenomeEntityChooseAnalysisMethodBreadcrumbs(
 ): Breadcrumb[] {
   return [
     { path: ROUTES.ORGANISMS, text: "Organisms" },
-    { path: "", text: `${genome.species} - ${genome.strain}` },
+    { path: "", text: `${genome.organism}` },
     { path: "", text: "Choose Analysis Methods" },
   ];
 }
