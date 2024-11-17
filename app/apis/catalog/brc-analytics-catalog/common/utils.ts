@@ -6,7 +6,7 @@ export function getGenomeId(genome: BRCDataCatalogGenome): string {
 
 export function getGenomeTitle(genome?: BRCDataCatalogGenome): string {
   if (!genome) return "";
-  return `${genome.organism}`;
+  return `${genome.taxon}`;
 }
 
 export function sanitizeEntityId(entityId?: string): string {

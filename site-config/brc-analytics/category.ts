@@ -8,10 +8,10 @@ export const BRC_DATA_CATALOG_CATEGORY_KEY = {
   IS_REF: "isRef",
   LENGTH: "length",
   LEVEL: "level",
-  ORGANISM: "organism",
   SCAFFOLD_COUNT: "scaffoldCount",
   SCAFFOLD_L50: "scaffoldL50",
   SCAFFOLD_N50: "scaffoldN50",
+  TAXON: "taxon",
   TAXONOMY_ID: "ncbiTaxonomyId",
   UCSC_BROWSER_URL: "ucscBrowserUrl",
 };
@@ -26,10 +26,10 @@ export const BRC_DATA_CATALOG_CATEGORY_LABEL = {
   IS_REF: "Is Reference",
   LENGTH: "Length",
   LEVEL: "Level",
-  ORGANISM: "Organism",
   SCAFFOLD_COUNT: "Scaffolds",
   SCAFFOLD_L50: "Scaffold L50",
   SCAFFOLD_N50: "Scaffold N50",
+  TAXON: "Taxon",
   TAXONOMY_ID: "Taxonomy ID",
   UCSC_BROWSER_URL: "UCSC Browser",
 };
