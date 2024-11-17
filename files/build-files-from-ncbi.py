@@ -1,6 +1,7 @@
-from urllib.parse import quote as url_quote
 import pandas as pd
 import requests
+import urllib.parse
+import re
 
 TAXA_URL = "https://docs.google.com/spreadsheets/d/1Gg9sw2Qw765tOx2To53XkTAn-RAMiBtqYrfItlLXXrc/gviz/tq?tqx=out:csv&sheet=Sheet1.csv"
 
@@ -28,7 +29,7 @@ def get_tax_ids(organisms_df):
   return list(organisms_df["taxonomyId"])
 
 def build_genomes_url(tax_ids):
-  return f"https://api.ncbi.nlm.nih.gov/datasets/v2/genome/taxon/{url_quote(",".join([str(id) for id in tax_ids]))}/dataset_report?filters.assembly_source=refseq&filters.has_annotation=true&filters.exclude_paired_reports=true&filters.exclude_atypical=true&filters.assembly_level=scaffold&filters.assembly_level=chromosome&filters.assembly_level=complete_genome"
+  return f"https://api.ncbi.nlm.nih.gov/datasets/v2/genome/taxon/{urllib.parse.quote(",".join([str(id) for id in tax_ids]))}/dataset_report?filters.assembly_source=refseq&filters.has_annotation=true&filters.exclude_paired_reports=true&filters.exclude_atypical=true&filters.assembly_level=scaffold&filters.assembly_level=chromosome&filters.assembly_level=complete_genome"
 
 def get_genome_row(genome_info):
   refseq_category = genome_info["assembly_info"].get("refseq_category")
@@ -52,6 +53,38 @@ def get_genome_row(genome_info):
 def get_genomes_df(tax_ids):
   return pd.DataFrame(data=[get_genome_row(genome_info) for genome_info in requests.get(build_genomes_url(tax_ids)).json()["reports"]])
 
+def _id_to_gene_model_url(asm_id):
+  hubs_url = "https://hgdownload.soe.ucsc.edu/hubs/"
+  components = [asm_id[0:3], asm_id[4:7], asm_id[7:10], asm_id[10:13], asm_id, "genes"]
+  url = urllib.parse.urljoin(hubs_url, "/".join(components))
+  # url looks something like https://hgdownload.soe.ucsc.edu/hubs/GCF/030/504/385/GCF_030504385.1/genes/
+  # and contains html content with links to gene models.
+  # we need to scrape this to get the gtf
+  print(f"fetching url {url}")
+  response = requests.get(url)
+  try:
+    response.raise_for_status()
+  except Exception:
+    # FIXME?: Some accessions don't have a gene folder
+    return None
+  # find link to gtf, should ideally be ncbiRefSeq, but augustus will do
+  html_content = response.text
+  pattern = rf"{asm_id.replace('.', r'\.')}.*?\.gtf\.gz"
+  augustus_file = None
+  for match in re.findall(pattern, html_content):
+    if "ncbiRefSeq" in match:
+      return urllib.parse.urljoin(f"{url}/", match)
+    elif "augustus" in match:
+      augustus_file = match
+  if augustus_file:
+    return urllib.parse.urljoin(f"{url}/", augustus_file)
+  # No match, I guess that's OK ?
+  return None
+
+
+def add_gene_model_url(genomes_df: pd.DataFrame):
+  return pd.concat([genomes_df, genomes_df["accession"].apply(_id_to_gene_model_url).rename("geneModelUrl")], axis="columns")
+
 def build_files():
   print("Building files")
 
@@ -71,7 +104,7 @@ def build_files():
   gen_bank_merge_df = genomes_source_df.merge(assemblies_df, how="left", left_on="pairedAccession", right_on="genBank")
   ref_seq_merge_df = genomes_source_df.merge(assemblies_df, how="left", left_on="accession", right_on="refSeq")
 
-  genomes_df = gen_bank_merge_df.combine_first(ref_seq_merge_df)
+  genomes_df = add_gene_model_url(gen_bank_merge_df.combine_first(ref_seq_merge_df))
 
   genomes_df.to_csv(GENOMES_OUTPUT_PATH, index=False, sep="\t")
 
