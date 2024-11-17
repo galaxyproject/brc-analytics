@@ -30,10 +30,10 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
       length: parseNumber(row.length),
       level: row.level,
       ncbiTaxonomyId: row.taxonomyId,
-      organism: row.taxon,
       scaffoldCount: parseNumber(row.scaffoldCount),
       scaffoldL50: parseNumber(row.scaffoldL50),
       scaffoldN50: parseNumber(row.scaffoldN50),
+      taxon: row.taxon,
       ucscBrowserUrl: parseStringOrNull(row.ucscBrowser),
     })
   );

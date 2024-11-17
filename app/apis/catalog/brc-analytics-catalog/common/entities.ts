@@ -20,10 +20,10 @@ export interface BRCDataCatalogGenome {
   length: number;
   level: string;
   ncbiTaxonomyId: string;
-  organism: string;
   scaffoldCount: number;
   scaffoldL50: number;
   scaffoldN50: number;
+  taxon: string;
   ucscBrowserUrl: string | null;
 }
 

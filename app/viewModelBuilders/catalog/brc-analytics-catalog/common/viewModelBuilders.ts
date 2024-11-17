@@ -150,15 +150,15 @@ export const buildLevel = (
 };
 
 /**
- * Build props for the organism cell.
+ * Build props for the taxon cell.
  * @param genome - Genome entity.
  * @returns Props to be used for the cell.
  */
-export const buildOrganism = (
+export const buildTaxon = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: genome.organism,
+    value: genome.taxon,
   };
 };
 
@@ -289,7 +289,7 @@ export const buildGenomeDetails = (
   keyValuePairs.set(
     "Taxon",
     C.Link({
-      label: genome.organism,
+      label: genome.taxon,
       url: `https://www.ncbi.nlm.nih.gov/datasets/taxonomy/${encodeURIComponent(
         genome.ncbiTaxonomyId
       )}/`,
@@ -321,7 +321,7 @@ function getGenomeEntityChooseAnalysisMethodBreadcrumbs(
 ): Breadcrumb[] {
   return [
     { path: ROUTES.GENOMES, text: "Genomes" },
-    { path: "", text: `${genome.organism}` },
+    { path: "", text: `${genome.taxon}` },
     { path: "", text: "Choose Analysis Methods" },
   ];
 }

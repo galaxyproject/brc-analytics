@@ -10,10 +10,10 @@
     "length": 27007701,
     "level": "Chromosome",
     "ncbiTaxonomyId": "5855",
-    "organism": "Plasmodium vivax",
     "scaffoldCount": 2747,
     "scaffoldL50": 6,
     "scaffoldN50": 1678596,
+    "taxon": "Plasmodium vivax",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002415.2"
   },
   {
@@ -27,10 +27,10 @@
     "length": 26075494,
     "level": "Chromosome",
     "ncbiTaxonomyId": "185431",
-    "organism": "Trypanosoma brucei brucei TREU927",
     "scaffoldCount": 12,
     "scaffoldL50": 4,
     "scaffoldN50": 2481190,
+    "taxon": "Trypanosoma brucei brucei TREU927",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002445.2"
   },
   {
@@ -44,10 +44,10 @@
     "length": 32855089,
     "level": "Complete Genome",
     "ncbiTaxonomyId": "347515",
-    "organism": "Leishmania major strain Friedlin",
     "scaffoldCount": 36,
     "scaffoldL50": 11,
     "scaffoldN50": 1091540,
+    "taxon": "Leishmania major strain Friedlin",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002725.2"
   },
   {
@@ -61,10 +61,10 @@
     "length": 23292622,
     "level": "Complete Genome",
     "ncbiTaxonomyId": "36329",
-    "organism": "Plasmodium falciparum 3D7",
     "scaffoldCount": 14,
     "scaffoldL50": 5,
     "scaffoldN50": 1687656,
+    "taxon": "Plasmodium falciparum 3D7",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002765.5"
   },
   {
@@ -78,10 +78,10 @@
     "length": 32068771,
     "level": "Chromosome",
     "ncbiTaxonomyId": "420245",
-    "organism": "Leishmania braziliensis MHOM/BR/75/M2904",
     "scaffoldCount": 138,
     "scaffoldL50": 11,
     "scaffoldN50": 992961,
+    "taxon": "Leishmania braziliensis MHOM/BR/75/M2904",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002845.2"
   },
   {
@@ -95,10 +95,10 @@
     "length": 65633124,
     "level": "Chromosome",
     "ncbiTaxonomyId": "508771",
-    "organism": "Toxoplasma gondii ME49",
     "scaffoldCount": 2276,
     "scaffoldL50": 6,
     "scaffoldN50": 4973582,
+    "taxon": "Toxoplasma gondii ME49",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000006565.2"
   },
   {
@@ -112,10 +112,10 @@
     "length": 28947925,
     "level": "Scaffold",
     "ncbiTaxonomyId": "246410",
-    "organism": "Coccidioides immitis RS",
     "scaffoldCount": 6,
     "scaffoldL50": 3,
     "scaffoldN50": 4323945,
+    "taxon": "Coccidioides immitis RS",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000149335.2"
   },
   {
@@ -129,10 +129,10 @@
     "length": 4411532,
     "level": "Complete Genome",
     "ncbiTaxonomyId": "83332",
-    "organism": "Mycobacterium tuberculosis H37Rv",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 4411532,
+    "taxon": "Mycobacterium tuberculosis H37Rv",
     "ucscBrowserUrl": null
   },
   {
@@ -146,10 +146,10 @@
     "length": 89937456,
     "level": "Scaffold",
     "ncbiTaxonomyId": "5693",
-    "organism": "Trypanosoma cruzi",
     "scaffoldCount": 29495,
     "scaffoldL50": 212,
     "scaffoldN50": 88624,
+    "taxon": "Trypanosoma cruzi",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000209065.1"
   },
   {
@@ -163,10 +163,10 @@
     "length": 32444968,
     "level": "Chromosome",
     "ncbiTaxonomyId": "5661",
-    "organism": "Leishmania donovani",
     "scaffoldCount": 36,
     "scaffoldL50": 11,
     "scaffoldN50": 1024085,
+    "taxon": "Leishmania donovani",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000227135.1"
   },
   {
@@ -180,10 +180,10 @@
     "length": 4411709,
     "level": "Complete Genome",
     "ncbiTaxonomyId": "83332",
-    "organism": "Mycobacterium tuberculosis H37Rv",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 4411709,
+    "taxon": "Mycobacterium tuberculosis H37Rv",
     "ucscBrowserUrl": null
   },
   {
@@ -197,10 +197,10 @@
     "length": 196858,
     "level": "Complete Genome",
     "ncbiTaxonomyId": "10244",
-    "organism": "Monkeypox virus",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 196858,
+    "taxon": "Monkeypox virus",
     "ucscBrowserUrl": null
   },
   {
@@ -214,10 +214,10 @@
     "length": 29903,
     "level": "Complete Genome",
     "ncbiTaxonomyId": "2697049",
-    "organism": "Severe acute respiratory syndrome coronavirus 2",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 29903,
+    "taxon": "Severe acute respiratory syndrome coronavirus 2",
     "ucscBrowserUrl": null
   },
   {
@@ -231,10 +231,10 @@
     "length": 566339288,
     "level": "Chromosome",
     "ncbiTaxonomyId": "42434",
-    "organism": "Culex pipiens pallens",
     "scaffoldCount": 289,
     "scaffoldL50": 2,
     "scaffoldN50": 186194774,
+    "taxon": "Culex pipiens pallens",
     "ucscBrowserUrl": null
   },
   {
@@ -248,10 +248,10 @@
     "length": 28193268,
     "level": "Complete Genome",
     "ncbiTaxonomyId": "443226",
-    "organism": "Coccidioides posadasii str. Silveira",
     "scaffoldCount": 9,
     "scaffoldL50": 2,
     "scaffoldN50": 8079863,
+    "taxon": "Coccidioides posadasii str. Silveira",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_018416015.2"
   },
   {
@@ -265,10 +265,10 @@
     "length": 4516435,
     "level": "Complete Genome",
     "ncbiTaxonomyId": "1773",
-    "organism": "Mycobacterium tuberculosis",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 4516435,
+    "taxon": "Mycobacterium tuberculosis",
     "ucscBrowserUrl": null
   },
   {
@@ -282,10 +282,10 @@
     "length": 23043114,
     "level": "Complete Genome",
     "ncbiTaxonomyId": "5861",
-    "organism": "Plasmodium yoelii",
     "scaffoldCount": 14,
     "scaffoldL50": 5,
     "scaffoldN50": 2046250,
+    "taxon": "Plasmodium yoelii",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_900002385.2"
   },
   {
@@ -299,10 +299,10 @@
     "length": 18338688,
     "level": "Complete Genome",
     "ncbiTaxonomyId": "54757",
-    "organism": "Plasmodium vinckei vinckei",
     "scaffoldCount": 14,
     "scaffoldL50": 5,
     "scaffoldN50": 1692345,
+    "taxon": "Plasmodium vinckei vinckei",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_900681995.1"
   },
   {
@@ -316,10 +316,10 @@
     "length": 264451381,
     "level": "Chromosome",
     "ncbiTaxonomyId": "7165",
-    "organism": "Anopheles gambiae",
     "scaffoldCount": 190,
     "scaffoldL50": 2,
     "scaffoldN50": 99149756,
+    "taxon": "Anopheles gambiae",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_943734735.2"
   },
   {
@@ -333,10 +333,10 @@
     "length": 4469156,
     "level": "Complete Genome",
     "ncbiTaxonomyId": "1773",
-    "organism": "Mycobacterium tuberculosis",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 4469156,
+    "taxon": "Mycobacterium tuberculosis",
     "ucscBrowserUrl": null
   }
 ]
