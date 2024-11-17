@@ -15,6 +15,7 @@ export interface BRCDataCatalogGenome {
   chromosomes: number | null;
   coverage: string | null;
   gcPercent: number;
+  geneModelUrl: string | null;
   isRef: boolean;
   length: number;
   level: string;

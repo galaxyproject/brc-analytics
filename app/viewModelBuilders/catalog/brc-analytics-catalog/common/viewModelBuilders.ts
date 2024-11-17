@@ -231,7 +231,7 @@ export const buildGenomeAnalysisMethod = (
 ): ComponentProps<typeof C.AnalysisMethod> => {
   return {
     ...analysisMethodProps,
-    geneModelUrl: "",
+    geneModelUrl: genome.geneModelUrl,
     genomeVersionAssemblyId: genome.accession,
   };
 };

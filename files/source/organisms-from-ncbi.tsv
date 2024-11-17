@@ -1,7 +1,7 @@
 taxon	taxonomyId	assemblyCount	CustomTags
 Anopheles gambiae	7165	7	VEuPathDb
 Coccidioides immitis	5501	5	
-Coccidioides posadasii	199306	13	
+Coccidioides posadasii	199306	13	VEuPathDb
 Culex pipiens	7175	5	VEuPathDb
 Leishmania braziliensis	5660	11	VEuPathDb
 Leishmania donovani	5661	12	VEuPathDb
@@ -15,4 +15,4 @@ Plasmodium yoelii	5861	15	VEuPathDb
 Severe acute respiratory syndrome coronavirus 2	2697049	92	Virus
 Toxoplasma gondii	5811	29	VEuPathDb
 Trypanosoma brucei	5691	5	VEuPathDb
-Trypanosoma cruzi	5693	45	VEuPathDb
+Trypanosoma cruzi	5693	44	VEuPathDb

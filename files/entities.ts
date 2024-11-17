@@ -4,6 +4,7 @@ export interface SourceGenome {
   chromosomeCount: string;
   coverage: string;
   gcPercent: string;
+  geneModelUrl: string;
   isRef: string;
   length: string;
   level: string;
