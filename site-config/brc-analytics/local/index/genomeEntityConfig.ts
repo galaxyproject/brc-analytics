@@ -80,10 +80,10 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
     ],
   },
   exploreMode: EXPLORE_MODE.CS_FETCH_CS_FILTERING,
-  explorerTitle: "Organisms",
+  explorerTitle: "Genomes",
   getId: getGenomeId,
   getTitle: getGenomeTitle,
-  label: "Organisms",
+  label: "Genomes",
   list: {
     columns: [
       {
@@ -226,6 +226,6 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
     enableTab: false,
     listHero,
   },
-  route: "organisms",
+  route: "genomes",
   staticLoadFile: "files/out/genomes.json",
 };
