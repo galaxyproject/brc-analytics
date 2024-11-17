@@ -38,7 +38,7 @@ export const buildAnalyzeGenome = (
   return {
     analyze: {
       label: "Analyze",
-      url: rowId ? `${ROUTES.ORGANISMS}/${rowId}` : "",
+      url: rowId ? `${ROUTES.GENOMES}/${rowId}` : "",
     },
     views: [
       ...(ucscBrowserUrl
@@ -320,7 +320,7 @@ function getGenomeEntityChooseAnalysisMethodBreadcrumbs(
   genome: BRCDataCatalogGenome
 ): Breadcrumb[] {
   return [
-    { path: ROUTES.ORGANISMS, text: "Organisms" },
+    { path: ROUTES.GENOMES, text: "Genomes" },
     { path: "", text: `${genome.organism}` },
     { path: "", text: "Choose Analysis Methods" },
   ];
