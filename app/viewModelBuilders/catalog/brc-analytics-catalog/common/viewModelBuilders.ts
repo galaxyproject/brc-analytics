@@ -202,6 +202,20 @@ export const buildScaffoldN50 = (
 };
 
 /**
+ * Build props for the tags cell.
+ * @param genome - Genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildTags = (
+  genome: BRCDataCatalogGenome
+): ComponentProps<typeof C.NTagCell> => {
+  return {
+    label: "Tags",
+    values: genome.tags,
+  };
+};
+
+/**
  * Build props for the taxonomy ID cell.
  * @param genome - Genome entity.
  * @returns Props to be used for the cell.

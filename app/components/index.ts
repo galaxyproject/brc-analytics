@@ -22,6 +22,7 @@ export {
 export { Logo } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/components/Content/components/Logo/logo";
 export { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 export { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
+export { NTagCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/NTagCell/nTagCell";
 export { CopyText } from "./common/CopyText/copyText";
 export { AnalysisMethod } from "./Entity/components/AnalysisMethod/analysisMethod";
 export { AnalysisMethods } from "./Entity/components/AnalysisMethods/analysisMethods";

@@ -1,8 +1,9 @@
 import { parse as parseCsv } from "csv-parse/sync";
 import fsp from "fs/promises";
 import { BRCDataCatalogGenome } from "../app/apis/catalog/brc-analytics-catalog/common/entities";
-import { SourceGenome } from "./entities";
+import { SourceGenome, SourceOrganism } from "./entities";
 
+const SOURCE_PATH_ORGANISMS = "files/source/organisms-from-ncbi.tsv";
 const SOURCE_PATH_GENOMES = "files/source/genomes-from-ncbi.tsv";
 
 buildCatalog();
@@ -17,9 +18,16 @@ async function buildCatalog(): Promise<void> {
 }
 
 async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
+  const sourceOrganismRows = await readValuesFile<SourceOrganism>(
+    SOURCE_PATH_ORGANISMS
+  );
+  const sourceOrganismsByTaxon = new Map(
+    sourceOrganismRows.map((row) => [row.taxon, row])
+  );
   const sourceRows = await readValuesFile<SourceGenome>(SOURCE_PATH_GENOMES);
-  const mappedRows = sourceRows.map(
-    (row): BRCDataCatalogGenome => ({
+  const mappedRows = sourceRows.map((row): BRCDataCatalogGenome => {
+    const tagsString = sourceOrganismsByTaxon.get(row.taxon)?.CustomTags;
+    return {
       accession: row.accession,
       annotationStatus: parseStringOrNull(row.annotationStatus),
       chromosomes: parseNumberOrNull(row.chromosomeCount),
@@ -33,10 +41,11 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
       scaffoldCount: parseNumber(row.scaffoldCount),
       scaffoldL50: parseNumber(row.scaffoldL50),
       scaffoldN50: parseNumber(row.scaffoldN50),
+      tags: tagsString ? [tagsString] : [],
       taxon: row.taxon,
       ucscBrowserUrl: parseStringOrNull(row.ucscBrowser),
-    })
-  );
+    };
+  });
   return mappedRows.sort((a, b) => a.accession.localeCompare(b.accession));
 }
 
