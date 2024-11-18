@@ -13,6 +13,9 @@
     "scaffoldCount": 2747,
     "scaffoldL50": 6,
     "scaffoldN50": 1678596,
+    "tags": [
+      "VEuPathDb"
+    ],
     "taxon": "Plasmodium vivax",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002415.2"
   },
@@ -30,6 +33,7 @@
     "scaffoldCount": 12,
     "scaffoldL50": 4,
     "scaffoldN50": 2481190,
+    "tags": [],
     "taxon": "Trypanosoma brucei brucei TREU927",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002445.2"
   },
@@ -47,6 +51,7 @@
     "scaffoldCount": 36,
     "scaffoldL50": 11,
     "scaffoldN50": 1091540,
+    "tags": [],
     "taxon": "Leishmania major strain Friedlin",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002725.2"
   },
@@ -64,6 +69,7 @@
     "scaffoldCount": 14,
     "scaffoldL50": 5,
     "scaffoldN50": 1687656,
+    "tags": [],
     "taxon": "Plasmodium falciparum 3D7",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002765.5"
   },
@@ -81,6 +87,7 @@
     "scaffoldCount": 138,
     "scaffoldL50": 11,
     "scaffoldN50": 992961,
+    "tags": [],
     "taxon": "Leishmania braziliensis MHOM/BR/75/M2904",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002845.2"
   },
@@ -98,6 +105,7 @@
     "scaffoldCount": 2276,
     "scaffoldL50": 6,
     "scaffoldN50": 4973582,
+    "tags": [],
     "taxon": "Toxoplasma gondii ME49",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000006565.2"
   },
@@ -115,6 +123,7 @@
     "scaffoldCount": 6,
     "scaffoldL50": 3,
     "scaffoldN50": 4323945,
+    "tags": [],
     "taxon": "Coccidioides immitis RS",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000149335.2"
   },
@@ -132,6 +141,7 @@
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 4411532,
+    "tags": [],
     "taxon": "Mycobacterium tuberculosis H37Rv",
     "ucscBrowserUrl": null
   },
@@ -149,6 +159,9 @@
     "scaffoldCount": 29495,
     "scaffoldL50": 212,
     "scaffoldN50": 88624,
+    "tags": [
+      "VEuPathDb"
+    ],
     "taxon": "Trypanosoma cruzi",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000209065.1"
   },
@@ -166,6 +179,9 @@
     "scaffoldCount": 36,
     "scaffoldL50": 11,
     "scaffoldN50": 1024085,
+    "tags": [
+      "VEuPathDb"
+    ],
     "taxon": "Leishmania donovani",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000227135.1"
   },
@@ -183,6 +199,7 @@
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 4411709,
+    "tags": [],
     "taxon": "Mycobacterium tuberculosis H37Rv",
     "ucscBrowserUrl": null
   },
@@ -200,6 +217,9 @@
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 196858,
+    "tags": [
+      "Virus"
+    ],
     "taxon": "Monkeypox virus",
     "ucscBrowserUrl": null
   },
@@ -217,6 +237,9 @@
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 29903,
+    "tags": [
+      "Virus"
+    ],
     "taxon": "Severe acute respiratory syndrome coronavirus 2",
     "ucscBrowserUrl": null
   },
@@ -234,6 +257,7 @@
     "scaffoldCount": 289,
     "scaffoldL50": 2,
     "scaffoldN50": 186194774,
+    "tags": [],
     "taxon": "Culex pipiens pallens",
     "ucscBrowserUrl": null
   },
@@ -251,6 +275,7 @@
     "scaffoldCount": 9,
     "scaffoldL50": 2,
     "scaffoldN50": 8079863,
+    "tags": [],
     "taxon": "Coccidioides posadasii str. Silveira",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_018416015.2"
   },
@@ -268,6 +293,9 @@
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 4516435,
+    "tags": [
+      "Bact"
+    ],
     "taxon": "Mycobacterium tuberculosis",
     "ucscBrowserUrl": null
   },
@@ -285,6 +313,9 @@
     "scaffoldCount": 14,
     "scaffoldL50": 5,
     "scaffoldN50": 2046250,
+    "tags": [
+      "VEuPathDb"
+    ],
     "taxon": "Plasmodium yoelii",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_900002385.2"
   },
@@ -302,6 +333,7 @@
     "scaffoldCount": 14,
     "scaffoldL50": 5,
     "scaffoldN50": 1692345,
+    "tags": [],
     "taxon": "Plasmodium vinckei vinckei",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_900681995.1"
   },
@@ -319,6 +351,9 @@
     "scaffoldCount": 190,
     "scaffoldL50": 2,
     "scaffoldN50": 99149756,
+    "tags": [
+      "VEuPathDb"
+    ],
     "taxon": "Anopheles gambiae",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_943734735.2"
   },
@@ -336,6 +371,9 @@
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 4469156,
+    "tags": [
+      "Bact"
+    ],
     "taxon": "Mycobacterium tuberculosis",
     "ucscBrowserUrl": null
   }

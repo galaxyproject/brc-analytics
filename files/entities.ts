@@ -15,3 +15,10 @@ export interface SourceGenome {
   taxonomyId: string;
   ucscBrowser: string;
 }
+
+export interface SourceOrganism {
+  assemblyCount: string;
+  CustomTags: string;
+  taxon: string;
+  taxonomyId: string;
+}

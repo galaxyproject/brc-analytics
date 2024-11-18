@@ -61,6 +61,10 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.ANNOTATION_STATUS,
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.ANNOTATION_STATUS,
           },
+          {
+            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAGS,
+            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAGS,
+          },
         ],
       },
     ],
@@ -212,6 +216,15 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANNOTATION_STATUS,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.ANNOTATION_STATUS,
+        width: { max: "0.5fr", min: "142px" },
+      },
+      {
+        componentConfig: {
+          component: C.NTagCell,
+          viewBuilder: V.buildTags,
+        } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogGenome>,
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAGS,
+        id: BRC_DATA_CATALOG_CATEGORY_KEY.TAGS,
         width: { max: "0.5fr", min: "142px" },
       },
     ],
