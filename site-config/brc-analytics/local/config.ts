@@ -38,6 +38,16 @@ export function makeConfig(browserUrl: string): SiteConfig {
       floating,
       footer: {
         Branding: C.Branding(),
+        navLinks: [
+          {
+            label: "BV-BRC",
+            url: "https://www.bv-brc.org/",
+          },
+          {
+            label: "Pathogen Data Network",
+            url: "https://pathogendatanetwork.org/",
+          },
+        ],
       },
       header: {
         logo: C.Logo({
