@@ -1,6 +1,9 @@
 import { parse as parseCsv } from "csv-parse/sync";
 import fsp from "fs/promises";
-import { BRCDataCatalogGenome } from "../app/apis/catalog/brc-analytics-catalog/common/entities";
+import {
+  BRCDataCatalogGenome,
+  BRCDataCatalogOrganism,
+} from "../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { SourceGenome, SourceOrganism } from "./entities";
 
 const SOURCE_PATH_ORGANISMS = "files/source/organisms-from-ncbi.tsv";
@@ -9,7 +12,16 @@ const SOURCE_PATH_GENOMES = "files/source/genomes-from-ncbi.tsv";
 buildCatalog();
 
 async function buildCatalog(): Promise<void> {
-  const genomes = await buildGenomes();
+  const organisms = await buildOrganisms();
+
+  const organismsByTaxon = new Map(
+    organisms.map((organism) => [organism.taxon, organism])
+  );
+
+  const genomes = await buildGenomes(organismsByTaxon);
+
+  console.log("Organisms:", genomes.length);
+  await saveJson("files/out/organisms.json", organisms);
 
   console.log("Genomes:", genomes.length);
   await saveJson("files/out/genomes.json", genomes);
@@ -17,16 +29,28 @@ async function buildCatalog(): Promise<void> {
   console.log("Done");
 }
 
-async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
-  const sourceOrganismRows = await readValuesFile<SourceOrganism>(
+async function buildOrganisms(): Promise<BRCDataCatalogOrganism[]> {
+  const sourceRows = await readValuesFile<SourceOrganism>(
     SOURCE_PATH_ORGANISMS
   );
-  const sourceOrganismsByTaxon = new Map(
-    sourceOrganismRows.map((row) => [row.taxon, row])
+  const mappedRows = sourceRows.map((row): BRCDataCatalogOrganism => {
+    return {
+      assemblyCount: parseNumber(row.assemblyCount),
+      ncbiTaxonomyId: row.taxonomyId,
+      tags: row.CustomTags ? [row.CustomTags] : [],
+      taxon: row.taxon,
+    };
+  });
+  return mappedRows.sort((a, b) =>
+    a.ncbiTaxonomyId.localeCompare(b.ncbiTaxonomyId)
   );
+}
+
+async function buildGenomes(
+  organismsByTaxon: Map<string, BRCDataCatalogOrganism>
+): Promise<BRCDataCatalogGenome[]> {
   const sourceRows = await readValuesFile<SourceGenome>(SOURCE_PATH_GENOMES);
   const mappedRows = sourceRows.map((row): BRCDataCatalogGenome => {
-    const tagsString = sourceOrganismsByTaxon.get(row.taxon)?.CustomTags;
     return {
       accession: row.accession,
       annotationStatus: parseStringOrNull(row.annotationStatus),
@@ -41,7 +65,7 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
       scaffoldCount: parseNumber(row.scaffoldCount),
       scaffoldL50: parseNumber(row.scaffoldL50),
       scaffoldN50: parseNumber(row.scaffoldN50),
-      tags: tagsString ? [tagsString] : [],
+      tags: organismsByTaxon.get(row.taxon)?.tags ?? [],
       taxon: row.taxon,
       ucscBrowserUrl: parseStringOrNull(row.ucscBrowser),
     };

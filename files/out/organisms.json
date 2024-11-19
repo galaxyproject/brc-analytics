@@ -1,0 +1,136 @@
+[
+  {
+    "assemblyCount": 6911,
+    "ncbiTaxonomyId": "10244",
+    "tags": [
+      "Virus"
+    ],
+    "taxon": "Monkeypox virus"
+  },
+  {
+    "assemblyCount": 7823,
+    "ncbiTaxonomyId": "1773",
+    "tags": [
+      "Bact"
+    ],
+    "taxon": "Mycobacterium tuberculosis"
+  },
+  {
+    "assemblyCount": 13,
+    "ncbiTaxonomyId": "199306",
+    "tags": [
+      "VEuPathDb"
+    ],
+    "taxon": "Coccidioides posadasii"
+  },
+  {
+    "assemblyCount": 92,
+    "ncbiTaxonomyId": "2697049",
+    "tags": [
+      "Virus"
+    ],
+    "taxon": "Severe acute respiratory syndrome coronavirus 2"
+  },
+  {
+    "assemblyCount": 5,
+    "ncbiTaxonomyId": "5501",
+    "tags": [],
+    "taxon": "Coccidioides immitis"
+  },
+  {
+    "assemblyCount": 11,
+    "ncbiTaxonomyId": "5660",
+    "tags": [
+      "VEuPathDb"
+    ],
+    "taxon": "Leishmania braziliensis"
+  },
+  {
+    "assemblyCount": 12,
+    "ncbiTaxonomyId": "5661",
+    "tags": [
+      "VEuPathDb"
+    ],
+    "taxon": "Leishmania donovani"
+  },
+  {
+    "assemblyCount": 7,
+    "ncbiTaxonomyId": "5664",
+    "tags": [
+      "VEuPathDb"
+    ],
+    "taxon": "Leishmania major"
+  },
+  {
+    "assemblyCount": 5,
+    "ncbiTaxonomyId": "5691",
+    "tags": [
+      "VEuPathDb"
+    ],
+    "taxon": "Trypanosoma brucei"
+  },
+  {
+    "assemblyCount": 44,
+    "ncbiTaxonomyId": "5693",
+    "tags": [
+      "VEuPathDb"
+    ],
+    "taxon": "Trypanosoma cruzi"
+  },
+  {
+    "assemblyCount": 29,
+    "ncbiTaxonomyId": "5811",
+    "tags": [
+      "VEuPathDb"
+    ],
+    "taxon": "Toxoplasma gondii"
+  },
+  {
+    "assemblyCount": 67,
+    "ncbiTaxonomyId": "5833",
+    "tags": [
+      "VEuPathDb"
+    ],
+    "taxon": "Plasmodium falciparum"
+  },
+  {
+    "assemblyCount": 19,
+    "ncbiTaxonomyId": "5855",
+    "tags": [
+      "VEuPathDb"
+    ],
+    "taxon": "Plasmodium vivax"
+  },
+  {
+    "assemblyCount": 10,
+    "ncbiTaxonomyId": "5860",
+    "tags": [
+      "VEuPathDb"
+    ],
+    "taxon": "Plasmodium vinckei"
+  },
+  {
+    "assemblyCount": 15,
+    "ncbiTaxonomyId": "5861",
+    "tags": [
+      "VEuPathDb"
+    ],
+    "taxon": "Plasmodium yoelii"
+  },
+  {
+    "assemblyCount": 7,
+    "ncbiTaxonomyId": "7165",
+    "tags": [
+      "VEuPathDb"
+    ],
+    "taxon": "Anopheles gambiae"
+  },
+  {
+    "assemblyCount": 5,
+    "ncbiTaxonomyId": "7175",
+    "tags": [
+      "VEuPathDb"
+    ],
+    "taxon": "Culex pipiens"
+  }
+]

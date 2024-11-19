@@ -6,7 +6,10 @@ import {
 import { ViewContext } from "@databiosphere/findable-ui/lib/config/entities";
 import { ComponentProps } from "react";
 import { ROUTES } from "../../../../../routes/constants";
-import { BRCDataCatalogGenome } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
+import {
+  BRCDataCatalogGenome,
+  BRCDataCatalogOrganism,
+} from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "../../../../components";
 import { GENOME_BROWSER, NCBI_DATASETS_URL } from "./constants";
 
@@ -68,6 +71,19 @@ export const buildAnnotationStatus = (
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: genome.annotationStatus,
+  };
+};
+
+/**
+ * Build props for the assemblies cell.
+ * @param organism - Genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildAssemblyCount = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: organism.assemblyCount,
   };
 };
 
@@ -155,7 +171,7 @@ export const buildLevel = (
  * @returns Props to be used for the cell.
  */
 export const buildTaxon = (
-  genome: BRCDataCatalogGenome
+  genome: BRCDataCatalogOrganism | BRCDataCatalogGenome
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: genome.taxon,
@@ -207,7 +223,7 @@ export const buildScaffoldN50 = (
  * @returns Props to be used for the cell.
  */
 export const buildTags = (
-  genome: BRCDataCatalogGenome
+  genome: BRCDataCatalogOrganism | BRCDataCatalogGenome
 ): ComponentProps<typeof C.NTagCell> => {
   return {
     label: "Tags",
@@ -221,7 +237,7 @@ export const buildTags = (
  * @returns Props to be used for the cell.
  */
 export const buildTaxonomyId = (
-  genome: BRCDataCatalogGenome
+  genome: BRCDataCatalogOrganism | BRCDataCatalogGenome
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: genome.ncbiTaxonomyId,

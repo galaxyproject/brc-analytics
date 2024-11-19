@@ -28,6 +28,13 @@ export interface BRCDataCatalogGenome {
   ucscBrowserUrl: string | null;
 }
 
+export interface BRCDataCatalogOrganism {
+  assemblyCount: number;
+  ncbiTaxonomyId: string;
+  tags: string[];
+  taxon: string;
+}
+
 export interface EntitiesResponse<R> {
   hits: R[];
   pagination: EntitiesResponsePagination;
