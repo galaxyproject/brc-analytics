@@ -5,6 +5,7 @@ import * as C from "../../../app/components";
 import { ROUTES } from "../../../routes/constants";
 import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genomeEntityConfig";
+import { socialMedia } from "./socialMedia";
 
 const LOCALHOST = "http://localhost:3000";
 const APP_TITLE = "BRC Analytics";
@@ -68,6 +69,7 @@ export function makeConfig(browserUrl: string, gitHubUrl: string): SiteConfig {
           ],
           undefined,
         ],
+        socialMedia: socialMedia,
       },
     },
     redirectRootToPath: "/",

@@ -1,5 +1,6 @@
 export { Alert } from "@databiosphere/findable-ui/lib/components/common/Alert/alert";
 export { Breadcrumbs } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
+export { DiscourseIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/DiscourseIcon/discourseIcon";
 export { Grid } from "@databiosphere/findable-ui/lib/components/common/Grid/grid";
 export { KeyElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/KeyElType/keyElType";
 export { KeyValueElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/KeyValueElType/keyValueElType";
