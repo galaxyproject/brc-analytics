@@ -1,11 +1,15 @@
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { EntityConfig } from "@databiosphere/findable-ui/src/config/entities";
-import { BRCDataCatalogGenome } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
+import {
+  BRCDataCatalogGenome,
+  BRCDataCatalogOrganism,
+} from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "../../../app/components";
 import { ROUTES } from "../../../routes/constants";
 import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genomeEntityConfig";
+import { organismEntityConfig } from "./index/organismEntityConfig";
 import { socialMedia } from "./socialMedia";
 
 const LOCALHOST = "http://localhost:3000";
@@ -35,7 +39,10 @@ export function makeConfig(browserUrl: string, gitHubUrl: string): SiteConfig {
     dataSource: {
       url: "",
     },
-    entities: [genomeEntityConfig as EntityConfig<BRCDataCatalogGenome>],
+    entities: [
+      organismEntityConfig as EntityConfig<BRCDataCatalogOrganism>,
+      genomeEntityConfig as EntityConfig<BRCDataCatalogGenome>,
+    ],
     explorerTitle: APP_TITLE,
     gitHubUrl,
     layout: {
@@ -68,7 +75,8 @@ export function makeConfig(browserUrl: string, gitHubUrl: string): SiteConfig {
           undefined,
           [
             { label: "About", url: ROUTES.ABOUT },
-            { label: "Datasets", url: ROUTES.GENOMES },
+            { label: "Organisms", url: ROUTES.ORGANISMS },
+            { label: "Genomes", url: ROUTES.GENOMES },
             { label: "Roadmap", url: ROUTES.ROADMAP },
           ],
           undefined,
