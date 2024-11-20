@@ -51,6 +51,7 @@ export function makeConfig(browserUrl: string, gitHubUrl: string): SiteConfig {
             url: "https://pathogendatanetwork.org/",
           },
         ],
+        socials: socialMedia.socials,
         versionInfo: true,
       },
       header: {
