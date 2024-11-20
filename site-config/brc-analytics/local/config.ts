@@ -9,11 +9,12 @@ import { genomeEntityConfig } from "./index/genomeEntityConfig";
 const LOCALHOST = "http://localhost:3000";
 const APP_TITLE = "BRC Analytics";
 const BROWSER_URL = LOCALHOST;
+const GIT_HUB_REPO_URL = "https://github.com/galaxyproject/brc-analytics";
 
 /**
  * Make site config object.
  * @param browserUrl - Browser URL.
- *
+ * @param gitHubUrl - GitHub URL.
  * @remarks
  * The `genomeEntityConfig` is typecast to `EntityConfig<BRCDataCatalogGenome>`
  * because the `SiteConfig` interface from the `@databiosphere/findable-ui` package expects
@@ -25,7 +26,7 @@ const BROWSER_URL = LOCALHOST;
  *
  * @returns site config.
  */
-export function makeConfig(browserUrl: string): SiteConfig {
+export function makeConfig(browserUrl: string, gitHubUrl: string): SiteConfig {
   return {
     appTitle: APP_TITLE,
     browserURL: browserUrl,
@@ -34,6 +35,7 @@ export function makeConfig(browserUrl: string): SiteConfig {
     },
     entities: [genomeEntityConfig as EntityConfig<BRCDataCatalogGenome>],
     explorerTitle: APP_TITLE,
+    gitHubUrl,
     layout: {
       floating,
       footer: {
@@ -48,6 +50,7 @@ export function makeConfig(browserUrl: string): SiteConfig {
             url: "https://pathogendatanetwork.org/",
           },
         ],
+        versionInfo: true,
       },
       header: {
         logo: C.Logo({
@@ -72,6 +75,6 @@ export function makeConfig(browserUrl: string): SiteConfig {
   };
 }
 
-const config: SiteConfig = makeConfig(BROWSER_URL);
+const config: SiteConfig = makeConfig(BROWSER_URL, GIT_HUB_REPO_URL);
 
 export default config;
