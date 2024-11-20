@@ -1,3 +1,4 @@
+import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { EntityConfig } from "@databiosphere/findable-ui/src/config/entities";
 import { BRCDataCatalogGenome } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
@@ -44,10 +45,12 @@ export function makeConfig(browserUrl: string, gitHubUrl: string): SiteConfig {
         navLinks: [
           {
             label: "BV-BRC",
+            target: ANCHOR_TARGET.BLANK,
             url: "https://www.bv-brc.org/",
           },
           {
             label: "Pathogen Data Network",
+            target: ANCHOR_TARGET.BLANK,
             url: "https://pathogendatanetwork.org/",
           },
         ],
