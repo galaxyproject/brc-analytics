@@ -106,6 +106,6 @@ function parseNumber(value: string): number {
   return n;
 }
 
-function parseBoolean(value: string): boolean {
-  return value[0].toLowerCase() === "t";
+function parseBoolean(value: string): string {
+  return value[0].toLowerCase() === "t" ? "Yes" : "No";
 }
