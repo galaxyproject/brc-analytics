@@ -41,7 +41,7 @@
     "accession": "GCF_000002725.2",
     "annotationStatus": "Full annotation",
     "chromosomes": 36,
-    "coverage": null,
+    "coverage": "100.0x",
     "gcPercent": 59.5,
     "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/002/725/GCF_000002725.2/genes/GCF_000002725.2_ASM272v2.ncbiRefSeq.gtf.gz",
     "isRef": "Yes",
@@ -74,8 +74,26 @@
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002765.5"
   },
   {
+    "accession": "GCF_000002765.6",
+    "annotationStatus": "Full annotation",
+    "chromosomes": 14,
+    "coverage": "100.0x",
+    "gcPercent": 19.5,
+    "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/002/765/GCF_000002765.6/genes/GCF_000002765.6_GCA_000002765.ncbiRefSeq.gtf.gz",
+    "isRef": "Yes",
+    "length": 23292622,
+    "level": "Complete Genome",
+    "ncbiTaxonomyId": "36329",
+    "scaffoldCount": 14,
+    "scaffoldL50": 5,
+    "scaffoldN50": 1687656,
+    "tags": [],
+    "taxon": "Plasmodium falciparum 3D7",
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002765.6"
+  },
+  {
     "accession": "GCF_000002845.2",
-    "annotationStatus": null,
+    "annotationStatus": "Full annotation",
     "chromosomes": 35,
     "coverage": null,
     "gcPercent": 58,
@@ -93,7 +111,7 @@
   },
   {
     "accession": "GCF_000006565.2",
-    "annotationStatus": null,
+    "annotationStatus": "Full annotation",
     "chromosomes": 14,
     "coverage": "26.5x",
     "gcPercent": 52.5,
@@ -112,7 +130,7 @@
   {
     "accession": "GCF_000149335.2",
     "annotationStatus": "Full annotation",
-    "chromosomes": null,
+    "chromosomes": 1,
     "coverage": null,
     "gcPercent": 46,
     "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/149/335/GCF_000149335.2/genes/GCF_000149335.2_ASM14933v2.ncbiRefSeq.gtf.gz",
@@ -143,12 +161,12 @@
     "scaffoldN50": 4411532,
     "tags": [],
     "taxon": "Mycobacterium tuberculosis H37Rv",
-    "ucscBrowserUrl": null
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000195955.2"
   },
   {
     "accession": "GCF_000209065.1",
     "annotationStatus": "Full annotation",
-    "chromosomes": null,
+    "chromosomes": 1,
     "coverage": null,
     "gcPercent": 51.5,
     "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/209/065/GCF_000209065.1/genes/GCF_000209065.1_ASM20906v1.ncbiRefSeq.gtf.gz",
@@ -201,13 +219,13 @@
     "scaffoldN50": 4411709,
     "tags": [],
     "taxon": "Mycobacterium tuberculosis H37Rv",
-    "ucscBrowserUrl": null
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000857045.1"
   },
   {
     "accession": "GCF_000857045.1",
     "annotationStatus": null,
     "chromosomes": 1,
-    "coverage": null,
+    "coverage": "100.0x",
     "gcPercent": 33,
     "geneModelUrl": null,
     "isRef": "No",
@@ -221,13 +239,13 @@
       "Virus"
     ],
     "taxon": "Monkeypox virus",
-    "ucscBrowserUrl": null
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000857045.1"
   },
   {
     "accession": "GCF_009858895.2",
     "annotationStatus": null,
     "chromosomes": 1,
-    "coverage": null,
+    "coverage": "20.0x",
     "gcPercent": 38,
     "geneModelUrl": null,
     "isRef": "No",
@@ -241,7 +259,7 @@
       "Virus"
     ],
     "taxon": "Severe acute respiratory syndrome coronavirus 2",
-    "ucscBrowserUrl": null
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_009858895.2"
   },
   {
     "accession": "GCF_016801865.2",
@@ -259,7 +277,7 @@
     "scaffoldN50": 186194774,
     "tags": [],
     "taxon": "Culex pipiens pallens",
-    "ucscBrowserUrl": null
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_016801865.2"
   },
   {
     "accession": "GCF_018416015.2",
@@ -278,6 +296,24 @@
     "tags": [],
     "taxon": "Coccidioides posadasii str. Silveira",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_018416015.2"
+  },
+  {
+    "accession": "GCF_018416015.2",
+    "annotationStatus": "Full annotation",
+    "chromosomes": 9,
+    "coverage": "475.0x",
+    "gcPercent": 46.5,
+    "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/018/416/015/GCF_018416015.2/genes/GCF_018416015.2_ASM1841601v2.ncbiRefSeq.gtf.gz",
+    "isRef": "Yes",
+    "length": 28193268,
+    "level": "Complete Genome",
+    "ncbiTaxonomyId": "443226",
+    "scaffoldCount": 9,
+    "scaffoldL50": 2,
+    "scaffoldN50": 8079863,
+    "tags": [],
+    "taxon": "Coccidioides posadasii str. Silveira",
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_018416015.2"
   },
   {
     "accession": "GCF_030566675.1",
@@ -328,7 +364,7 @@
     "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/900/681/995/GCF_900681995.1/genes/GCF_900681995.1_PVVCY_v1.ncbiRefSeq.gtf.gz",
     "isRef": "Yes",
     "length": 18338688,
-    "level": "Complete Genome",
+    "level": "Chromosome",
     "ncbiTaxonomyId": "54757",
     "scaffoldCount": 14,
     "scaffoldL50": 5,

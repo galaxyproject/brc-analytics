@@ -8,7 +8,7 @@
     "taxon": "Monkeypox virus"
   },
   {
-    "assemblyCount": 7823,
+    "assemblyCount": 7829,
     "ncbiTaxonomyId": "1773",
     "tags": [
       "Bact"
@@ -24,7 +24,7 @@
     "taxon": "Coccidioides posadasii"
   },
   {
-    "assemblyCount": 92,
+    "assemblyCount": 12408,
     "ncbiTaxonomyId": "2697049",
     "tags": [
       "Virus"
@@ -62,7 +62,7 @@
     "taxon": "Leishmania major"
   },
   {
-    "assemblyCount": 5,
+    "assemblyCount": 6,
     "ncbiTaxonomyId": "5691",
     "tags": [
       "VEuPathDb"
