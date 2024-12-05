@@ -16,7 +16,7 @@ export interface BRCDataCatalogGenome {
   coverage: string | null;
   gcPercent: number;
   geneModelUrl: string | null;
-  isRef: boolean;
+  isRef: string;
   length: number;
   level: string;
   ncbiTaxonomyId: string;

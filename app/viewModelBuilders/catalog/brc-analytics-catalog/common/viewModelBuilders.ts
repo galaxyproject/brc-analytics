@@ -135,7 +135,7 @@ export const buildIsRef = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: genome.isRef ? "Yes" : "No",
+    value: genome.isRef,
   };
 };
 
