@@ -4,6 +4,6 @@ import { ANALYSIS_METHOD } from "../../../../apis/catalog/brc-analytics-catalog/
 export interface Props {
   analysisMethod: ANALYSIS_METHOD;
   content: ReactNode;
-  geneModelUrl: string;
+  geneModelUrl: string | null;
   genomeVersionAssemblyId: string;
 }
