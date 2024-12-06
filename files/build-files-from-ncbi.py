@@ -59,22 +59,6 @@ def get_genome_row(genome_info):
 def get_genomes_df(tax_ids):
   return pd.DataFrame(data=[get_genome_row(genome_info) for genome_info in requests.get(build_genomes_url(tax_ids)).json()["reports"]])
 
-def print_column_match_summary(from_df, in_df, from_column, in_column, important=True):
-  unmatched_values = from_df[from_column][~(from_df[from_column].isin(in_df[in_column]))]
-  message = (
-    f"No values from {from_column} absent in {in_column}" if len(unmatched_values) == 0
-    else f"{len(unmatched_values)} values from {from_column} absent in {in_column}: {", ".join(unmatched_values)}"
-  )
-  if not important:
-    message = "(" + message + ")"
-  print(message)
-
-def print_accession_match_summaries(genomes_source_df, assemblies_df):
-  print_column_match_summary(genomes_source_df, assemblies_df, "pairedAccession", "genBank")
-  print_column_match_summary(genomes_source_df, assemblies_df, "pairedAccession", "refSeq", False)
-  print_column_match_summary(genomes_source_df, assemblies_df, "accession", "genBank", False)
-  print_column_match_summary(genomes_source_df, assemblies_df, "accession", "refSeq")
-
 def _id_to_gene_model_url(asm_id):
   hubs_url = "https://hgdownload.soe.ucsc.edu/hubs/"
   components = [asm_id[0:3], asm_id[4:7], asm_id[7:10], asm_id[10:13], asm_id, "genes"]
@@ -122,10 +106,12 @@ def build_files():
   genomes_source_df = get_genomes_df(get_tax_ids(organisms_df))
   assemblies_df = pd.DataFrame(requests.get(ASSEMBLIES_URL).json()["data"])[["ucscBrowser", "genBank", "refSeq"]]
 
-  gen_bank_merge_df = genomes_source_df.merge(assemblies_df, how="left", left_on="pairedAccession", right_on="genBank")
+  gen_bank_merge_df = genomes_source_df.merge(assemblies_df, how="left", left_on="accession", right_on="genBank")
   ref_seq_merge_df = genomes_source_df.merge(assemblies_df, how="left", left_on="accession", right_on="refSeq")
 
-  print_accession_match_summaries(genomes_source_df, assemblies_df)
+  unmatched_accessions = genomes_source_df["accession"][~(genomes_source_df["accession"].isin(assemblies_df["genBank"]) | genomes_source_df["accession"].isin(assemblies_df["refSeq"]))]
+  if len(unmatched_accessions) > 0:
+    print(f"{len(unmatched_accessions)} accessions had no match in assembly list: {", ".join(unmatched_accessions)}")
 
   genomes_df = add_gene_model_url(gen_bank_merge_df.combine_first(ref_seq_merge_df))
 
