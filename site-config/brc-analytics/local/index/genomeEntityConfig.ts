@@ -44,10 +44,6 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
           {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.IS_REF,
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.IS_REF,
-            mapSelectCategoryValue: (value) => ({
-              ...value,
-              label: value.label ? "Yes" : "No",
-            }),
           },
           {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.LEVEL,
