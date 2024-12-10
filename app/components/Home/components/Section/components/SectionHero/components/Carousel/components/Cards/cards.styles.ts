@@ -47,7 +47,9 @@ export const CardPositioner = styled("div")<Props>`
 
 export const Card = styled(MCard)`
   border: none;
-  box-shadow: ${elevation01}, inset 0 0 0 1px ${smokeMain};
+  box-shadow:
+    ${elevation01},
+    inset 0 0 0 1px ${smokeMain};
   display: flex;
   height: 100%;
   width: 100%;

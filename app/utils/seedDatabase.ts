@@ -22,7 +22,7 @@ export const seedDatabase = async function seedDatabase(
   let jsonText;
   try {
     jsonText = await fsp.readFile(staticLoadFile, "utf8");
-  } catch (e) {
+  } catch {
     throw new Error(`File ${staticLoadFile} not found for entity ${label}`);
   }
 
