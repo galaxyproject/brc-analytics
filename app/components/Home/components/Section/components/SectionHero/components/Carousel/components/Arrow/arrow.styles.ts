@@ -26,7 +26,9 @@ export const IconButton = styled(MIconButton, {
   & {
     background-color: ${white};
     border-radius: 50%;
-    box-shadow: inset 0 0 0 1px ${smokeDark}, 0 1px 0 0 ${black08};
+    box-shadow:
+      inset 0 0 0 1px ${smokeDark},
+      0 1px 0 0 ${black08};
     color: ${inkMain};
     position: absolute;
     top: 50%;

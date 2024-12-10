@@ -61,9 +61,8 @@ export const getStaticPaths: GetStaticPaths<PageUrl> = async () => {
     // Client-side fetch, client-side filtering.
     if (exploreMode === EXPLORE_MODE.CS_FETCH_CS_FILTERING) {
       await seedDatabase(entityListType, entityConfig);
-      const entitiesResponse: EntitiesResponse<BRCCatalog> = await getEntities(
-        entityConfig
-      );
+      const entitiesResponse: EntitiesResponse<BRCCatalog> =
+        await getEntities(entityConfig);
       processEntityPaths(entityConfig, entitiesResponse, paths);
     }
   }
