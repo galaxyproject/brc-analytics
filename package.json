@@ -38,7 +38,7 @@
     "@commitlint/cli": "^19.6.0",
     "@commitlint/config-conventional": "^19.6.0",
     "@mui/types": "^7.2.18",
-    "@next/eslint-plugin-next": "^14.1.0",
+    "@next/eslint-plugin-next": "^15.0.4",
     "@playwright/test": "^1.37.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^16.0.1",
