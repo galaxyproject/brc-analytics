@@ -14,7 +14,7 @@
     "scaffoldL50": 6,
     "scaffoldN50": 1678596,
     "tags": [
-      "VEuPathDb"
+      "VEuPathDB"
     ],
     "taxon": "Plasmodium vivax",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002415.2"
@@ -36,6 +36,24 @@
     "tags": [],
     "taxon": "Trypanosoma brucei brucei TREU927",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002445.2"
+  },
+  {
+    "accession": "GCF_000002655.1",
+    "annotationStatus": "Full annotation",
+    "chromosomes": 8,
+    "coverage": null,
+    "gcPercent": 50,
+    "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/002/655/GCF_000002655.1/genes/GCF_000002655.1_ASM265v1.ncbiRefSeq.gtf.gz",
+    "isRef": "Yes",
+    "length": 29384958,
+    "level": "Chromosome",
+    "ncbiTaxonomyId": "330879",
+    "scaffoldCount": 8,
+    "scaffoldL50": 4,
+    "scaffoldN50": 3948441,
+    "tags": [],
+    "taxon": "Aspergillus fumigatus Af293",
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002655.1"
   },
   {
     "accession": "GCF_000002725.2",
@@ -110,6 +128,24 @@
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000006565.2"
   },
   {
+    "accession": "GCF_000091045.1",
+    "annotationStatus": "Full annotation",
+    "chromosomes": 14,
+    "coverage": null,
+    "gcPercent": 48.5,
+    "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/091/045/GCF_000091045.1/genes/GCF_000091045.1_ASM9104v1.ncbiRefSeq.gtf.gz",
+    "isRef": "Yes",
+    "length": 19051922,
+    "level": "Chromosome",
+    "ncbiTaxonomyId": "214684",
+    "scaffoldCount": 14,
+    "scaffoldL50": 6,
+    "scaffoldN50": 1438950,
+    "tags": [],
+    "taxon": "Cryptococcus neoformans var. neoformans JEC21",
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000091045.1"
+  },
+  {
     "accession": "GCF_000149335.2",
     "annotationStatus": "Full annotation",
     "chromosomes": null,
@@ -126,6 +162,24 @@
     "tags": [],
     "taxon": "Coccidioides immitis RS",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000149335.2"
+  },
+  {
+    "accession": "GCF_000182965.3",
+    "annotationStatus": "Full annotation",
+    "chromosomes": 8,
+    "coverage": "700.0x",
+    "gcPercent": 33.5,
+    "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/182/965/GCF_000182965.3/genes/GCF_000182965.3_ASM18296v3.ncbiRefSeq.gtf.gz",
+    "isRef": "Yes",
+    "length": 14282666,
+    "level": "Chromosome",
+    "ncbiTaxonomyId": "237561",
+    "scaffoldCount": 8,
+    "scaffoldL50": 3,
+    "scaffoldN50": 2231883,
+    "tags": [],
+    "taxon": "Candida albicans SC5314",
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000182965.3"
   },
   {
     "accession": "GCF_000195955.2",
@@ -160,7 +214,7 @@
     "scaffoldL50": 212,
     "scaffoldN50": 88624,
     "tags": [
-      "VEuPathDb"
+      "VEuPathDB"
     ],
     "taxon": "Trypanosoma cruzi",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000209065.1"
@@ -180,7 +234,7 @@
     "scaffoldL50": 11,
     "scaffoldN50": 1024085,
     "tags": [
-      "VEuPathDb"
+      "VEuPathDB"
     ],
     "taxon": "Leishmania donovani",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000227135.1"
@@ -201,47 +255,27 @@
     "scaffoldN50": 4411709,
     "tags": [],
     "taxon": "Mycobacterium tuberculosis H37Rv",
-    "ucscBrowserUrl": null
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000277735.2"
   },
   {
-    "accession": "GCF_000857045.1",
-    "annotationStatus": null,
-    "chromosomes": 1,
-    "coverage": null,
-    "gcPercent": 33,
-    "geneModelUrl": null,
-    "isRef": "No",
-    "length": 196858,
-    "level": "Complete Genome",
-    "ncbiTaxonomyId": "10244",
-    "scaffoldCount": 1,
-    "scaffoldL50": 1,
-    "scaffoldN50": 196858,
+    "accession": "GCF_015732765.1",
+    "annotationStatus": "Full annotation",
+    "chromosomes": 3,
+    "coverage": "76.0x",
+    "gcPercent": 37,
+    "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/015/732/765/GCF_015732765.1/genes/GCF_015732765.1_VPISU_Cqui_1.0_pri_paternal.ncbiRefSeq.gtf.gz",
+    "isRef": "Yes",
+    "length": 573214445,
+    "level": "Chromosome",
+    "ncbiTaxonomyId": "7176",
+    "scaffoldCount": 56,
+    "scaffoldL50": 2,
+    "scaffoldN50": 201550677,
     "tags": [
-      "Virus"
+      "VEuPathDB"
     ],
-    "taxon": "Monkeypox virus",
-    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000857045.1"
-  },
-  {
-    "accession": "GCF_009858895.2",
-    "annotationStatus": null,
-    "chromosomes": 1,
-    "coverage": null,
-    "gcPercent": 38,
-    "geneModelUrl": null,
-    "isRef": "No",
-    "length": 29903,
-    "level": "Complete Genome",
-    "ncbiTaxonomyId": "2697049",
-    "scaffoldCount": 1,
-    "scaffoldL50": 1,
-    "scaffoldN50": 29903,
-    "tags": [
-      "Virus"
-    ],
-    "taxon": "Severe acute respiratory syndrome coronavirus 2",
-    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_009858895.2"
+    "taxon": "Culex quinquefasciatus",
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_015732765.1"
   },
   {
     "accession": "GCF_016801865.2",
@@ -280,26 +314,6 @@
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_018416015.2"
   },
   {
-    "accession": "GCF_030566675.1",
-    "annotationStatus": null,
-    "chromosomes": 1,
-    "coverage": "20.0x",
-    "gcPercent": 65.5,
-    "geneModelUrl": null,
-    "isRef": "No",
-    "length": 4516435,
-    "level": "Complete Genome",
-    "ncbiTaxonomyId": "1773",
-    "scaffoldCount": 1,
-    "scaffoldL50": 1,
-    "scaffoldN50": 4516435,
-    "tags": [
-      "Bact"
-    ],
-    "taxon": "Mycobacterium tuberculosis",
-    "ucscBrowserUrl": null
-  },
-  {
     "accession": "GCF_900002385.2",
     "annotationStatus": "Full annotation",
     "chromosomes": 14,
@@ -314,7 +328,7 @@
     "scaffoldL50": 5,
     "scaffoldN50": 2046250,
     "tags": [
-      "VEuPathDb"
+      "VEuPathDB"
     ],
     "taxon": "Plasmodium yoelii",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_900002385.2"
@@ -352,29 +366,9 @@
     "scaffoldL50": 2,
     "scaffoldN50": 99149756,
     "tags": [
-      "VEuPathDb"
+      "VEuPathDB"
     ],
     "taxon": "Anopheles gambiae",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_943734735.2"
-  },
-  {
-    "accession": "GCF_963525475.1",
-    "annotationStatus": null,
-    "chromosomes": 1,
-    "coverage": "100.0x",
-    "gcPercent": 65.5,
-    "geneModelUrl": null,
-    "isRef": "No",
-    "length": 4469156,
-    "level": "Complete Genome",
-    "ncbiTaxonomyId": "1773",
-    "scaffoldCount": 1,
-    "scaffoldL50": 1,
-    "scaffoldN50": 4469156,
-    "tags": [
-      "Bact"
-    ],
-    "taxon": "Mycobacterium tuberculosis",
-    "ucscBrowserUrl": null
   }
 ]

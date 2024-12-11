@@ -95,7 +95,7 @@ def build_files():
 
   taxa_df = pd.read_csv(TAXA_URL, keep_default_na=False)
 
-  organisms_source_df = get_organisms_df([taxon for taxon in taxa_df["Name"] if taxon])
+  organisms_source_df = get_organisms_df([taxon.strip() for taxon in taxa_df["Name"] if taxon])
 
   organisms_df = organisms_source_df.merge(taxa_df[["TaxId", "CustomTags"]], how="left", left_on="taxonomyId", right_on="TaxId").drop(columns=["TaxId"])
 
