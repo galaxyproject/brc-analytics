@@ -34,6 +34,10 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXON,
           },
           {
+            key: BRC_DATA_CATALOG_CATEGORY_KEY.STRAIN,
+            label: BRC_DATA_CATALOG_CATEGORY_LABEL.STRAIN,
+          },
+          {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMY_ID,
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMY_ID,
           },
@@ -103,7 +107,16 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXON,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXON,
-        width: { max: "1fr", min: "284px" },
+        width: { max: "1fr", min: "240px" },
+      },
+      {
+        componentConfig: {
+          component: C.BasicCell,
+          viewBuilder: V.buildStrain,
+        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.STRAIN,
+        id: BRC_DATA_CATALOG_CATEGORY_KEY.STRAIN,
+        width: { max: "0.5fr", min: "180px" },
       },
       {
         componentConfig: {
