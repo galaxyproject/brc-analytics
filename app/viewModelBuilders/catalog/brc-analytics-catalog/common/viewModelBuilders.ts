@@ -3,6 +3,7 @@ import {
   Key,
   Value,
 } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/keyValuePairs";
+import { LinkProps } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { ViewContext } from "@databiosphere/findable-ui/lib/config/entities";
 import { ComponentProps } from "react";
 import { ROUTES } from "../../../../../routes/constants";
@@ -127,6 +128,19 @@ export const buildGcPercent = (
 };
 
 /**
+ * Build props for the taxon cell.
+ * @param genome - Genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildGenomeTaxon = (
+  genome: BRCDataCatalogGenome
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: genome.taxon,
+  };
+};
+
+/**
  * Build props for the "is ref" cell.
  * @param genome - Genome entity.
  * @returns Props to be used for the cell.
@@ -167,14 +181,15 @@ export const buildLevel = (
 
 /**
  * Build props for the taxon cell.
- * @param genome - Genome entity.
+ * @param organism - Organism entity.
  * @returns Props to be used for the cell.
  */
-export const buildTaxon = (
-  genome: BRCDataCatalogOrganism | BRCDataCatalogGenome
-): ComponentProps<typeof C.BasicCell> => {
+export const buildOrganismTaxon = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.Link> => {
   return {
-    value: genome.taxon,
+    label: organism.taxon,
+    url: getTaxonGenomesUrlObject(organism.taxon),
   };
 };
 
@@ -354,4 +369,25 @@ function getGenomeEntityChooseAnalysisMethodBreadcrumbs(
     { path: "", text: `${genome.taxon}` },
     { path: "", text: "Choose Analysis Methods" },
   ];
+}
+
+/**
+ * Get URL object for genomes filtered by a given taxon.
+ * @param taxon - Taxon.
+ * @returns URL object.
+ */
+function getTaxonGenomesUrlObject(taxon: string): LinkProps["url"] {
+  return {
+    href: ROUTES.GENOMES,
+    query: encodeURIComponent(
+      JSON.stringify({
+        filter: [
+          {
+            categoryKey: "taxon",
+            value: [taxon],
+          },
+        ],
+      })
+    ),
+  };
 }
