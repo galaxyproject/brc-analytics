@@ -99,7 +99,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: C.BasicCell,
-          viewBuilder: V.buildTaxon,
+          viewBuilder: V.buildGenomeTaxon,
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXON,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXON,
