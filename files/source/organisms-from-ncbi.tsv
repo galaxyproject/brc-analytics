@@ -1,22 +1,22 @@
-taxon	taxonomyId	assemblyCount	CustomTags
-Anopheles gambiae	7165	7	VEuPathDB
-Aspergillus fumigatus	746128	352	
-Candida albicans	5476	117	
-Coccidioides immitis	5501	5	
-Coccidioides posadasii	199306	13	VEuPathDB
-Cryptococcus neoformans	5207	183	
-Culex pipiens pallens	42434	1	
-Culex quinquefasciatus	7176	3	VEuPathDB
-Leishmania braziliensis	5660	11	VEuPathDB
-Leishmania donovani	5661	12	VEuPathDB
-Leishmania major	5664	7	VEuPathDB
-Monkeypox virus	10244	6911	Virus
-Mycobacterium tuberculosis	1773	7829	Bact
-Plasmodium falciparum	5833	67	VEuPathDB
-Plasmodium vinckei	5860	10	VEuPathDB
-Plasmodium vivax	5855	19	VEuPathDB
-Plasmodium yoelii	5861	15	VEuPathDB
-Severe acute respiratory syndrome coronavirus 2	2697049	12408	Virus
-Toxoplasma gondii	5811	29	VEuPathDB
-Trypanosoma brucei	5691	6	VEuPathDB
-Trypanosoma cruzi	5693	44	VEuPathDB
+taxon	taxonomyId	assemblyCount	accession	CustomTags
+Plasmodium falciparum	5833	67	GCF_000002765.6	VEuPathDB
+Plasmodium vivax	5855	19	GCF_000002415.2	VEuPathDB
+Plasmodium yoelii	5861	15	GCF_900002385.2	VEuPathDB
+Plasmodium vinckei	5860	10	GCF_900681995.1	VEuPathDB
+Culex pipiens pallens	42434	1	GCF_016801865.2	
+Culex quinquefasciatus	7176	3	GCF_015732765.1	VEuPathDB
+Anopheles gambiae	7165	7	GCF_943734735.2	VEuPathDB
+Toxoplasma gondii	5811	29	GCF_000006565.2	VEuPathDB
+Mycobacterium tuberculosis	1773	7829	GCF_000195955.2	Bact
+Coccidioides posadasii	199306	13	GCF_018416015.2	VEuPathDB
+Coccidioides immitis	5501	5	GCF_000149335.2	
+Trypanosoma cruzi	5693	44	GCF_000209065.1	VEuPathDB
+Trypanosoma brucei	5691	6	GCF_000002445.2	VEuPathDB
+Leishmania major	5664	7	GCF_000002725.2	VEuPathDB
+Leishmania donovani	5661	12	GCF_000227135.1	VEuPathDB
+Leishmania braziliensis	5660	11	GCF_000002845.2	VEuPathDB
+Severe acute respiratory syndrome coronavirus 2	2697049	12408	GCF_009858895.2	Virus
+Monkeypox virus	10244	6911	GCF_000857045.1	Virus
+Aspergillus fumigatus	746128	352	GCF_000002655.1	
+Candida albicans	5476	117	GCF_000182965.3	
+Cryptococcus neoformans	5207	183	GCF_000091045.1	

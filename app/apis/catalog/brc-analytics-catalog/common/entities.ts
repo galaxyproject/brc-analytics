@@ -23,6 +23,7 @@ export interface BRCDataCatalogGenome {
   scaffoldCount: number;
   scaffoldL50: number;
   scaffoldN50: number;
+  strain: string | null;
   tags: string[];
   taxon: string;
   ucscBrowserUrl: string | null;

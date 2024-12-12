@@ -65,6 +65,7 @@ async function buildGenomes(
       scaffoldCount: parseNumber(row.scaffoldCount),
       scaffoldL50: parseNumber(row.scaffoldL50),
       scaffoldN50: parseNumber(row.scaffoldN50),
+      strain: parseStringOrNull(row.strain),
       tags: organismsByTaxon.get(row.taxon)?.tags ?? [],
       taxon: row.taxon,
       ucscBrowserUrl: parseStringOrNull(row.ucscBrowser),

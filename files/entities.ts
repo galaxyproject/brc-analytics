@@ -11,6 +11,7 @@ export interface SourceGenome {
   scaffoldCount: string;
   scaffoldL50: string;
   scaffoldN50: string;
+  strain: string;
   taxon: string;
   taxonomyId: string;
   ucscBrowser: string;
