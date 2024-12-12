@@ -24,7 +24,7 @@ def get_organism_row(organism_info, accession):
   return {
     "taxon": organism_taxonomy["current_scientific_name"]["name"],
     "taxonomyId": str(organism_taxonomy["tax_id"]),
-    "assemblyCount": next(count["count"] for count in organism_taxonomy["counts"] if count["type"] == "COUNT_TYPE_ASSEMBLY"),
+    "assemblyCount": 1,
     "accession": accession,
   }
 
