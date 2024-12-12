@@ -52,9 +52,9 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
     columns: [
       {
         componentConfig: {
-          component: C.Link,
+          component: C.StyledLink,
           viewBuilder: V.buildOrganismTaxon,
-        } as ComponentConfig<typeof C.Link, BRCDataCatalogOrganism>,
+        } as ComponentConfig<typeof C.StyledLink, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXON,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXON,
         width: "auto",
