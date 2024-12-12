@@ -24,6 +24,7 @@ export { Link } from "@databiosphere/findable-ui/lib/components/Links/components
 export { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
 export { NTagCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/NTagCell/nTagCell";
 export { CopyText } from "./common/CopyText/copyText";
+export { StyledLink } from "./common/StyledLink/styledLink.styles";
 export { AnalysisMethod } from "./Entity/components/AnalysisMethod/analysisMethod";
 export { AnalysisMethods } from "./Entity/components/AnalysisMethods/analysisMethods";
 export { AnalysisMethodsTitle } from "./Entity/components/AnalysisMethodsTitle/analysisMethodsTitle";
