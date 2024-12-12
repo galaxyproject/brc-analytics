@@ -1,0 +1,160 @@
+[
+  {
+    "assemblyCount": 1,
+    "ncbiTaxonomyId": "10244",
+    "tags": [
+      "Virus"
+    ],
+    "taxon": "Monkeypox virus"
+  },
+  {
+    "assemblyCount": 1,
+    "ncbiTaxonomyId": "1773",
+    "tags": [
+      "Bact"
+    ],
+    "taxon": "Mycobacterium tuberculosis"
+  },
+  {
+    "assemblyCount": 1,
+    "ncbiTaxonomyId": "199306",
+    "tags": [
+      "VEuPathDB"
+    ],
+    "taxon": "Coccidioides posadasii"
+  },
+  {
+    "assemblyCount": 1,
+    "ncbiTaxonomyId": "2697049",
+    "tags": [
+      "Virus"
+    ],
+    "taxon": "Severe acute respiratory syndrome coronavirus 2"
+  },
+  {
+    "assemblyCount": 1,
+    "ncbiTaxonomyId": "42434",
+    "tags": [],
+    "taxon": "Culex pipiens pallens"
+  },
+  {
+    "assemblyCount": 1,
+    "ncbiTaxonomyId": "5207",
+    "tags": [],
+    "taxon": "Cryptococcus neoformans"
+  },
+  {
+    "assemblyCount": 1,
+    "ncbiTaxonomyId": "5476",
+    "tags": [],
+    "taxon": "Candida albicans"
+  },
+  {
+    "assemblyCount": 1,
+    "ncbiTaxonomyId": "5501",
+    "tags": [],
+    "taxon": "Coccidioides immitis"
+  },
+  {
+    "assemblyCount": 1,
+    "ncbiTaxonomyId": "5660",
+    "tags": [
+      "VEuPathDB"
+    ],
+    "taxon": "Leishmania braziliensis"
+  },
+  {
+    "assemblyCount": 1,
+    "ncbiTaxonomyId": "5661",
+    "tags": [
+      "VEuPathDB"
+    ],
+    "taxon": "Leishmania donovani"
+  },
+  {
+    "assemblyCount": 1,
+    "ncbiTaxonomyId": "5664",
+    "tags": [
+      "VEuPathDB"
+    ],
+    "taxon": "Leishmania major"
+  },
+  {
+    "assemblyCount": 1,
+    "ncbiTaxonomyId": "5691",
+    "tags": [
+      "VEuPathDB"
+    ],
+    "taxon": "Trypanosoma brucei"
+  },
+  {
+    "assemblyCount": 1,
+    "ncbiTaxonomyId": "5693",
+    "tags": [
+      "VEuPathDB"
+    ],
+    "taxon": "Trypanosoma cruzi"
+  },
+  {
+    "assemblyCount": 1,
+    "ncbiTaxonomyId": "5811",
+    "tags": [
+      "VEuPathDB"
+    ],
+    "taxon": "Toxoplasma gondii"
+  },
+  {
+    "assemblyCount": 1,
+    "ncbiTaxonomyId": "5833",
+    "tags": [
+      "VEuPathDB"
+    ],
+    "taxon": "Plasmodium falciparum"
+  },
+  {
+    "assemblyCount": 1,
+    "ncbiTaxonomyId": "5855",
+    "tags": [
+      "VEuPathDB"
+    ],
+    "taxon": "Plasmodium vivax"
+  },
+  {
+    "assemblyCount": 1,
+    "ncbiTaxonomyId": "5860",
+    "tags": [
+      "VEuPathDB"
+    ],
+    "taxon": "Plasmodium vinckei"
+  },
+  {
+    "assemblyCount": 1,
+    "ncbiTaxonomyId": "5861",
+    "tags": [
+      "VEuPathDB"
+    ],
+    "taxon": "Plasmodium yoelii"
+  },
+  {
+    "assemblyCount": 1,
+    "ncbiTaxonomyId": "7165",
+    "tags": [
+      "VEuPathDB"
+    ],
+    "taxon": "Anopheles gambiae"
+  },
+  {
+    "assemblyCount": 1,
+    "ncbiTaxonomyId": "7176",
+    "tags": [
+      "VEuPathDB"
+    ],
+    "taxon": "Culex quinquefasciatus"
+  },
+  {
+    "assemblyCount": 1,
+    "ncbiTaxonomyId": "746128",
+    "tags": [],
+    "taxon": "Aspergillus fumigatus"
+  }
+]

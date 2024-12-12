@@ -32,7 +32,7 @@ const WORKFLOW_LANDING_URL_PREFIX =
 export async function getWorkflowLandingUrl(
   workflowId: WORKFLOW_ID,
   referenceGenome: string,
-  geneModelUrl: string
+  geneModelUrl: string | null
 ): Promise<string> {
   const body: WorkflowLandingsBody = {
     public: true,
@@ -74,7 +74,7 @@ function buildFastaUrl(identifier: string): string {
 function getWorkflowLandingsRequestState(
   workflowId: WORKFLOW_ID,
   referenceGenome: string,
-  geneModelUrl: string
+  geneModelUrl: string | null
 ): WorkflowLandingsBodyRequestState {
   if (workflowId === WORKFLOW_ID.VARIANT_CALLING && geneModelUrl) {
     return {
