@@ -233,6 +233,19 @@ export const buildScaffoldN50 = (
 };
 
 /**
+ * Build props for the strain cell.
+ * @param genome - Genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildStrain = (
+  genome: BRCDataCatalogGenome
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: genome.strain,
+  };
+};
+
+/**
  * Build props for the tags cell.
  * @param genome - Genome entity.
  * @returns Props to be used for the cell.
