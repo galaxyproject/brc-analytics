@@ -15,7 +15,7 @@ GENOMES_OUTPUT_PATH = "files/source/genomes-from-ncbi.tsv"
 def build_taxonomy_request_body(taxa):
   return {"taxons": taxa, "children": False, "ranks": ["genus"]}
 
-def get_organism_row(organism_info):
+def get_organism_row(organism_info, accession):
   if len(organism_info.get("errors", [])) > 0:
     raise Exception(organism_info)
 
@@ -25,11 +25,12 @@ def get_organism_row(organism_info):
     "taxon": organism_taxonomy["current_scientific_name"]["name"],
     "taxonomyId": str(organism_taxonomy["tax_id"]),
     "assemblyCount": next(count["count"] for count in organism_taxonomy["counts"] if count["type"] == "COUNT_TYPE_ASSEMBLY"),
+    "accession": accession,
   }
 
-def get_organisms_df(taxa):
-  organisms_info = requests.post(TAXONOMY_URL, json=build_taxonomy_request_body(taxa)).json()["reports"]
-  return pd.DataFrame([get_organism_row(organism_info) for organism_info in organisms_info])
+def get_organisms_df(taxa_with_accessions):
+  organisms_info_with_accessions = [(organism_info, accession) for taxon, accession in taxa_with_accessions for organism_info in requests.post(TAXONOMY_URL, json=build_taxonomy_request_body([taxon])).json()["reports"]]
+  return pd.DataFrame([get_organism_row(organism_info, accession) for organism_info, accession in organisms_info_with_accessions])
 
 def get_tax_ids(organisms_df):
   return list(organisms_df["taxonomyId"])
@@ -37,10 +38,11 @@ def get_tax_ids(organisms_df):
 def build_genomes_url(tax_ids):
   return f"https://api.ncbi.nlm.nih.gov/datasets/v2/genome/taxon/{urllib.parse.quote(",".join([str(id) for id in tax_ids]))}/dataset_report?filters.assembly_source=refseq&filters.has_annotation=true&filters.exclude_paired_reports=true&filters.exclude_atypical=true&filters.assembly_level=scaffold&filters.assembly_level=chromosome&filters.assembly_level=complete_genome"
 
-def get_genome_row(genome_info):
+def get_genome_row(genome_info, taxon):
   refseq_category = genome_info["assembly_info"].get("refseq_category")
   return {
-    "taxon": genome_info["organism"]["organism_name"],
+    "taxon": taxon,
+    "strain": genome_info["organism"].get("infraspecific_names", {}).get("strain", ""),
     "taxonomyId": genome_info["organism"]["tax_id"],
     "accession": genome_info["accession"],
     "isRef": refseq_category == "reference genome",
@@ -56,8 +58,12 @@ def get_genome_row(genome_info):
     "pairedAccession": genome_info["paired_accession"],
   }
 
-def get_genomes_df(tax_ids):
-  return pd.DataFrame(data=[get_genome_row(genome_info) for genome_info in requests.get(build_genomes_url(tax_ids)).json()["reports"]])
+def get_organism_genomes(tax_id, accession):
+  return [genome_info for genome_info in requests.get(build_genomes_url([tax_id])).json()["reports"] if genome_info["accession"] == accession]
+
+def get_genomes_df(organism_ids):
+  genomes_info_with_organisms = [(genome_info, taxon) for tax_id, taxon, accession in organism_ids for genome_info in get_organism_genomes(tax_id, accession)]
+  return pd.DataFrame(data=[get_genome_row(*info) for info in genomes_info_with_organisms])
 
 def _id_to_gene_model_url(asm_id):
   hubs_url = "https://hgdownload.soe.ucsc.edu/hubs/"
@@ -95,7 +101,7 @@ def build_files():
 
   taxa_df = pd.read_csv(TAXA_URL, keep_default_na=False)
 
-  organisms_source_df = get_organisms_df([taxon.strip() for taxon in taxa_df["Name"] if taxon])
+  organisms_source_df = get_organisms_df([(taxon.strip(), accession.strip()) for taxon, accession in zip(taxa_df["Name"], taxa_df["RefSeq Accession"]) if taxon])
 
   organisms_df = organisms_source_df.merge(taxa_df[["TaxId", "CustomTags"]], how="left", left_on="taxonomyId", right_on="TaxId").drop(columns=["TaxId"])
 
@@ -103,7 +109,7 @@ def build_files():
 
   print(f"Wrote to {ORGANISMS_OUTPUT_PATH}")
 
-  genomes_source_df = get_genomes_df(get_tax_ids(organisms_df))
+  genomes_source_df = get_genomes_df(zip(organisms_df["taxonomyId"], organisms_df["taxon"], organisms_df["accession"]))
   assemblies_df = pd.DataFrame(requests.get(ASSEMBLIES_URL).json()["data"])[["ucscBrowser", "genBank", "refSeq"]]
 
   gen_bank_merge_df = genomes_source_df.merge(assemblies_df, how="left", left_on="accession", right_on="genBank")
