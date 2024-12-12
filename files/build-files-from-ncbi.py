@@ -35,8 +35,8 @@ def get_organisms_df(taxa_with_accessions):
 def get_tax_ids(organisms_df):
   return list(organisms_df["taxonomyId"])
 
-def build_genomes_url(tax_ids):
-  return f"https://api.ncbi.nlm.nih.gov/datasets/v2/genome/taxon/{urllib.parse.quote(",".join([str(id) for id in tax_ids]))}/dataset_report?filters.assembly_source=refseq&filters.has_annotation=true&filters.exclude_paired_reports=true&filters.exclude_atypical=true&filters.assembly_level=scaffold&filters.assembly_level=chromosome&filters.assembly_level=complete_genome"
+def build_genomes_url(tax_ids, next_page_token):
+  return f"https://api.ncbi.nlm.nih.gov/datasets/v2/genome/taxon/{urllib.parse.quote(",".join([str(id) for id in tax_ids]))}/dataset_report?page_size=1000{"&page_token=" + next_page_token if next_page_token else ""}&filters.assembly_source=refseq&filters.has_annotation=true&filters.exclude_paired_reports=true&filters.exclude_atypical=true&filters.assembly_level=scaffold&filters.assembly_level=chromosome&filters.assembly_level=complete_genome"
 
 def get_genome_row(genome_info, taxon):
   refseq_category = genome_info["assembly_info"].get("refseq_category")
@@ -58,8 +58,20 @@ def get_genome_row(genome_info, taxon):
     "pairedAccession": genome_info["paired_accession"],
   }
 
+def get_organism_genomes_results(tax_id):
+  page = 1
+  next_page_token = None
+  results = []
+  while next_page_token or page == 1:
+    print(f"Requesting page {page} of taxon {tax_id}")
+    page_data = requests.get(build_genomes_url([tax_id], next_page_token)).json()
+    results += page_data["reports"]
+    next_page_token = page_data.get("next_page_token")
+    page += 1
+  return results
+
 def get_organism_genomes(tax_id, accession):
-  return [genome_info for genome_info in requests.get(build_genomes_url([tax_id])).json()["reports"] if genome_info["accession"] == accession]
+  return [genome_info for genome_info in get_organism_genomes_results(tax_id) if genome_info["accession"] == accession]
 
 def get_genomes_df(organism_ids):
   genomes_info_with_organisms = [(genome_info, taxon) for tax_id, taxon, accession in organism_ids for genome_info in get_organism_genomes(tax_id, accession)]
