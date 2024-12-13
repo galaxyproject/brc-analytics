@@ -3,9 +3,7 @@ import { inkLight } from "@databiosphere/findable-ui/lib/styles/common/mixins/co
 import { textBodyLarge4002Lines } from "@databiosphere/findable-ui/lib/styles/common/mixins/fonts";
 import styled from "@emotion/styled";
 
-interface Props {}
-
-export const Figure = styled.figure<Props>`
+export const Figure = styled.figure`
   margin: 16px 0;
 
   img {

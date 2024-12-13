@@ -58,7 +58,6 @@
     "jsdoc/check-alignment": "error",
     "jsdoc/check-param-names": "error",
     "react-hooks/exhaustive-deps": "error",
-    "@typescript-eslint/no-empty-object-type": "warn",
     "sonarjs/redundant-type-aliases": "warn"
   },
   "overrides": [
