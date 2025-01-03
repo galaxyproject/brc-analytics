@@ -111,7 +111,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: C.BasicCell,
-          viewBuilder: V.buildVEuPathDbProject,
+          viewBuilder: V.buildVEuPathDBProject,
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.VEUPATHDB_PROJECT,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.VEUPATHDB_PROJECT,

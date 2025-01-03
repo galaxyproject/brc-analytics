@@ -10,7 +10,7 @@
     "strain": "iso-1",
     "supercontigs": 1862,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000001215.4",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -23,7 +23,7 @@
     "strain": "ATCC 18224",
     "supercontigs": 452,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000001985.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 14,
@@ -36,7 +36,7 @@
     "strain": "Sal-1",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002415.2",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 5,
@@ -49,7 +49,7 @@
     "strain": "isolate WB 2019",
     "supercontigs": 30,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002435.2",
-    "vEuPathDbProject": "GiardiaDB"
+    "vEuPathDBProject": "GiardiaDB"
   },
   {
     "chromosomes": 16,
@@ -62,7 +62,7 @@
     "strain": "brucei TREU927",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002445.2",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 7,
@@ -75,7 +75,7 @@
     "strain": "70-15",
     "supercontigs": 46,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002495.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 6,
@@ -88,7 +88,7 @@
     "strain": "NRRL Y-1140",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002515.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 6,
@@ -101,7 +101,7 @@
     "strain": "CLIB122",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002525.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 13,
@@ -114,7 +114,7 @@
     "strain": "CBS 138",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002545.3",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 8,
@@ -127,7 +127,7 @@
     "strain": "Af293",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002655.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -140,7 +140,7 @@
     "strain": "NRRL 1",
     "supercontigs": 143,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002715.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 36,
@@ -153,7 +153,7 @@
     "strain": "strain Friedlin",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002725.2",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 14,
@@ -166,7 +166,7 @@
     "strain": "3D7",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002765.5",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 0,
@@ -179,7 +179,7 @@
     "strain": "G3",
     "supercontigs": 64764,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002825.2",
-    "vEuPathDbProject": "TrichDB"
+    "vEuPathDBProject": "TrichDB"
   },
   {
     "chromosomes": 36,
@@ -192,7 +192,7 @@
     "strain": "MHOM/BR/75/M2904",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002845.2",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -205,7 +205,7 @@
     "strain": "CBS 513.88",
     "supercontigs": 19,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002855.4",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -218,7 +218,7 @@
     "strain": "yoelii 17XNL",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000003085.2",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 0,
@@ -231,7 +231,7 @@
     "strain": "ATCC 10500",
     "supercontigs": 820,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000003125.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 4,
@@ -244,7 +244,7 @@
     "strain": "strain Ankara",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000003225.1",
-    "vEuPathDbProject": "PiroplasmaDB"
+    "vEuPathDBProject": "PiroplasmaDB"
   },
   {
     "chromosomes": 0,
@@ -257,7 +257,7 @@
     "strain": "1704",
     "supercontigs": 44,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000003515.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -270,7 +270,7 @@
     "strain": "ER-3",
     "supercontigs": 25,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000003525.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -283,7 +283,7 @@
     "strain": "ATCC 42720",
     "supercontigs": 9,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000003835.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -296,7 +296,7 @@
     "strain": "SLH14081",
     "supercontigs": 100,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000003855.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -309,7 +309,7 @@
     "strain": "strain NEG-M",
     "supercontigs": 784,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000004985.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -322,7 +322,7 @@
     "strain": "NRRL3357",
     "supercontigs": 282,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000006275.3",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -335,7 +335,7 @@
     "strain": "USDA",
     "supercontigs": 1882,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000006295.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -348,7 +348,7 @@
     "strain": "MYA-3404",
     "supercontigs": 23,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000006335.3",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 14,
@@ -361,7 +361,7 @@
     "strain": "strain H",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000006355.2",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 0,
@@ -374,7 +374,7 @@
     "strain": "TU502",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000006425.1",
-    "vEuPathDbProject": "CryptoDB"
+    "vEuPathDBProject": "CryptoDB"
   },
   {
     "chromosomes": 7,
@@ -387,7 +387,7 @@
     "strain": "CBS767",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000006445.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 8,
@@ -400,7 +400,7 @@
     "strain": "CD36",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000026945.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 14,
@@ -413,7 +413,7 @@
     "strain": "var. neoformans JEC21",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000091045.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 11,
@@ -426,7 +426,7 @@
     "strain": "GB-M1",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000091225.2",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -439,7 +439,7 @@
     "strain": "T30-4",
     "supercontigs": 4921,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000142945.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -452,7 +452,7 @@
     "strain": "DAOM BR144",
     "supercontigs": 975,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000143045.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -465,7 +465,7 @@
     "strain": "H4-8",
     "supercontigs": 25,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000143185.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -478,7 +478,7 @@
     "strain": "CBS 148.51",
     "supercontigs": 21,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000143365.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 18,
@@ -491,7 +491,7 @@
     "strain": "B05.10",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000143535.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -504,7 +504,7 @@
     "strain": "R3-111a-1",
     "supercontigs": 513,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000145635.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 16,
@@ -517,7 +517,7 @@
     "strain": "S288C",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000146045.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 11,
@@ -530,7 +530,7 @@
     "strain": "ATCC 50506",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000146465.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -543,7 +543,7 @@
     "strain": "M1.001",
     "supercontigs": 653,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000149035.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 8,
@@ -556,7 +556,7 @@
     "strain": "FGSC A4",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000149205.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 14,
@@ -569,7 +569,7 @@
     "strain": "var. grubii H99",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000149245.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -582,7 +582,7 @@
     "strain": "RA 99-880",
     "supercontigs": 81,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000149305.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -595,7 +595,7 @@
     "strain": "RS",
     "supercontigs": 6,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000149335.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 14,
@@ -608,7 +608,7 @@
     "strain": "var. neoformans B-3501A",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000149385.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -621,7 +621,7 @@
     "strain": "ATCC 6260",
     "supercontigs": 9,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000149425.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -634,7 +634,7 @@
     "strain": "WO-1",
     "supercontigs": 16,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000149445.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 11,
@@ -647,7 +647,7 @@
     "strain": "7600",
     "supercontigs": 10,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000149555.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -660,7 +660,7 @@
     "strain": "NAm1",
     "supercontigs": 276,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000149585.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -673,7 +673,7 @@
     "strain": "NIH2624",
     "supercontigs": 26,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000149615.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -686,7 +686,7 @@
     "strain": "NRRL 181",
     "supercontigs": 163,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000149645.3",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -699,7 +699,7 @@
     "strain": "NRRL YB-4239",
     "supercontigs": 27,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000149685.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 14,
@@ -712,7 +712,7 @@
     "strain": "GT1",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000149715.2",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -725,7 +725,7 @@
     "strain": "strain P6497",
     "supercontigs": 82,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000149755.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -738,7 +738,7 @@
     "strain": "H538.4",
     "supercontigs": 553,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000149815.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -751,7 +751,7 @@
     "strain": "yFS275",
     "supercontigs": 32,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000149845.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -764,7 +764,7 @@
     "strain": "JEL423",
     "supercontigs": 69,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000149865.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -777,7 +777,7 @@
     "strain": "RMSCC 2394",
     "supercontigs": 23,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000149895.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -790,7 +790,7 @@
     "strain": "f. sp. tritici CRL 75-36-700-3",
     "supercontigs": 392,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000149925.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 15,
@@ -803,7 +803,7 @@
     "strain": "f. sp. lycopersici 4287",
     "supercontigs": 70,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000149955.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 14,
@@ -816,7 +816,7 @@
     "strain": "VEG",
     "supercontigs": 1290,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000150015.2",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -829,7 +829,7 @@
     "strain": "RMSCC 3488",
     "supercontigs": 6,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000150055.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -842,7 +842,7 @@
     "strain": "RMSCC 3703",
     "supercontigs": 286,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000150085.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -855,7 +855,7 @@
     "strain": "A1163",
     "supercontigs": 55,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000150145.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -868,7 +868,7 @@
     "strain": "RMSCC 2133",
     "supercontigs": 53,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000150185.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -881,7 +881,7 @@
     "strain": "RMSCC 3700",
     "supercontigs": 241,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000150215.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -894,7 +894,7 @@
     "strain": "CPA 0001",
     "supercontigs": 255,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000150245.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -907,7 +907,7 @@
     "strain": "Pb03",
     "supercontigs": 65,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000150475.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -920,7 +920,7 @@
     "strain": "yFS286",
     "supercontigs": 5,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000150505.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -933,7 +933,7 @@
     "strain": "RMSCC 1037",
     "supercontigs": 633,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000150555.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -946,7 +946,7 @@
     "strain": "RMSCC 1038",
     "supercontigs": 551,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000150585.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -959,7 +959,7 @@
     "strain": "CPA 0020",
     "supercontigs": 620,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000150615.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -972,7 +972,7 @@
     "strain": "CPA 0066",
     "supercontigs": 473,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000150645.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -985,7 +985,7 @@
     "strain": "Pb01",
     "supercontigs": 110,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000150705.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -998,7 +998,7 @@
     "strain": "Pb18",
     "supercontigs": 57,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000150735.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1011,7 +1011,7 @@
     "strain": "Mali-NIH",
     "supercontigs": 10521,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000150765.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -1024,7 +1024,7 @@
     "strain": "Pimperena",
     "supercontigs": 13042,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000150785.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -1037,7 +1037,7 @@
     "strain": "CBS 118893",
     "supercontigs": 18,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000150975.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1050,7 +1050,7 @@
     "strain": "H143",
     "supercontigs": 48,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000151035.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1063,7 +1063,7 @@
     "strain": "CBS 113480",
     "supercontigs": 16,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000151145.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1076,7 +1076,7 @@
     "strain": "CBS 127.97",
     "supercontigs": 123,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000151175.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1089,7 +1089,7 @@
     "strain": "ATCC 38327",
     "supercontigs": 101,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000151295.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1102,7 +1102,7 @@
     "strain": "C735 delta SOWgp",
     "supercontigs": 55,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000151335.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1115,7 +1115,7 @@
     "strain": "77-13-4",
     "supercontigs": 209,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000151355.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1128,7 +1128,7 @@
     "strain": "CBS 118892",
     "supercontigs": 35,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000151425.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1141,7 +1141,7 @@
     "strain": "CBS 112818",
     "supercontigs": 110,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000151455.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1154,7 +1154,7 @@
     "strain": "1-1 BBBD Race 1",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000151525.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1167,7 +1167,7 @@
     "strain": "CBS 223.65",
     "supercontigs": 1442,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000151545.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1180,7 +1180,7 @@
     "strain": "2N",
     "supercontigs": 3143,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000151735.1",
-    "vEuPathDbProject": "HostDB"
+    "vEuPathDBProject": "HostDB"
   },
   {
     "chromosomes": 8,
@@ -1193,7 +1193,7 @@
     "strain": "Iowa II",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000165345.1",
-    "vEuPathDbProject": "CryptoDB"
+    "vEuPathDBProject": "CryptoDB"
   },
   {
     "chromosomes": 2,
@@ -1206,7 +1206,7 @@
     "strain": "strain Muguga",
     "supercontigs": 6,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000165365.1",
-    "vEuPathDbProject": "PiroplasmaDB"
+    "vEuPathDBProject": "PiroplasmaDB"
   },
   {
     "chromosomes": 3,
@@ -1219,7 +1219,7 @@
     "strain": "T2Bo",
     "supercontigs": 3,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000165395.2",
-    "vEuPathDbProject": "PiroplasmaDB"
+    "vEuPathDBProject": "PiroplasmaDB"
   },
   {
     "chromosomes": 0,
@@ -1232,7 +1232,7 @@
     "strain": "ATCC 26199",
     "supercontigs": 3282,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000166155.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1245,7 +1245,7 @@
     "strain": "RP-78",
     "supercontigs": 232,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000167175.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1258,7 +1258,7 @@
     "strain": "QM6a",
     "supercontigs": 77,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000167675.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1271,7 +1271,7 @@
     "strain": "str. Silveira",
     "supercontigs": 54,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000170175.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1284,7 +1284,7 @@
     "strain": "Gv29-8",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000170995.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1297,7 +1297,7 @@
     "strain": "Emoy2",
     "supercontigs": 3044,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000173235.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1310,7 +1310,7 @@
     "strain": "CDC",
     "supercontigs": 16537,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000181055.3",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -1323,7 +1323,7 @@
     "strain": "isolate GS",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000182405.1",
-    "vEuPathDbProject": "GiardiaDB"
+    "vEuPathDBProject": "GiardiaDB"
   },
   {
     "chromosomes": 0,
@@ -1336,7 +1336,7 @@
     "strain": "DAOM BR117",
     "supercontigs": 38,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000182565.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1349,7 +1349,7 @@
     "strain": "isolate P15",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000182665.1",
-    "vEuPathDbProject": "GiardiaDB"
+    "vEuPathDBProject": "GiardiaDB"
   },
   {
     "chromosomes": 8,
@@ -1362,7 +1362,7 @@
     "strain": "CDC317",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000182765.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1375,7 +1375,7 @@
     "strain": "okayama7#130",
     "supercontigs": 67,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000182895.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 7,
@@ -1388,7 +1388,7 @@
     "strain": "OR74A",
     "supercontigs": 13,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000182925.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 8,
@@ -1401,7 +1401,7 @@
     "strain": "SC5314",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000182965.3",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1414,7 +1414,7 @@
     "strain": "BRL01",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000182985.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -1427,7 +1427,7 @@
     "strain": "20631-21",
     "supercontigs": 1846,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000184105.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 8,
@@ -1440,7 +1440,7 @@
     "strain": "RIB40",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000184455.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 14,
@@ -1453,7 +1453,7 @@
     "strain": "WM276",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000185945.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1466,7 +1466,7 @@
     "strain": "Sylvio X10/1-2012",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000188675.2",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -1479,7 +1479,7 @@
     "strain": "ERTm3",
     "supercontigs": 53,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000190615.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -1492,7 +1492,7 @@
     "strain": "subsp. floridensis",
     "supercontigs": 379,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000192795.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -1505,7 +1505,7 @@
     "strain": "ATCC 64411",
     "supercontigs": 205,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000193285.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1518,7 +1518,7 @@
     "strain": "98AG31",
     "supercontigs": 462,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000204055.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1531,7 +1531,7 @@
     "strain": "Wikel",
     "supercontigs": 369492,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000208615.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 14,
@@ -1544,7 +1544,7 @@
     "strain": "Liverpool",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000208865.1",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -1557,7 +1557,7 @@
     "strain": "HM-1:IMSS",
     "supercontigs": 1496,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000208925.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -1570,7 +1570,7 @@
     "strain": "strain CL Brener",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000209065.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -1583,7 +1583,7 @@
     "strain": "SAW760",
     "supercontigs": 3312,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000209125.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -1596,7 +1596,7 @@
     "strain": "Johannesburg",
     "supercontigs": 3171,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000209185.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -1609,7 +1609,7 @@
     "strain": "H348",
     "supercontigs": 3,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000209485.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 11,
@@ -1622,7 +1622,7 @@
     "strain": "gambiense DAL972",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000210295.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -1635,7 +1635,7 @@
     "strain": "Coari",
     "supercontigs": 2220,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000211455.3",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -1648,7 +1648,7 @@
     "strain": "FGSC 2508",
     "supercontigs": 81,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000213175.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 21,
@@ -1661,7 +1661,7 @@
     "strain": "IPO323",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000219625.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 15,
@@ -1674,7 +1674,7 @@
     "strain": "EC3",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000221245.2",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 16,
@@ -1687,7 +1687,7 @@
     "strain": "EC2",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000221265.2",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 12,
@@ -1700,7 +1700,7 @@
     "strain": "EC1",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000221285.2",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -1713,7 +1713,7 @@
     "strain": "Unknown strain",
     "supercontigs": 469,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000223845.1",
-    "vEuPathDbProject": "CryptoDB"
+    "vEuPathDBProject": "CryptoDB"
   },
   {
     "chromosomes": 0,
@@ -1726,7 +1726,7 @@
     "strain": "RUB",
     "supercontigs": 2424,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000224805.2",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -1739,7 +1739,7 @@
     "strain": "TgCATBr9",
     "supercontigs": 2452,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000224825.2",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -1752,7 +1752,7 @@
     "strain": "VAND",
     "supercontigs": 2137,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000224845.2",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -1765,7 +1765,7 @@
     "strain": "MAS",
     "supercontigs": 2180,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000224865.2",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -1778,7 +1778,7 @@
     "strain": "p89",
     "supercontigs": 2150,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000224885.2",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -1791,7 +1791,7 @@
     "strain": "FOU",
     "supercontigs": 2869,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000224905.2",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -1804,7 +1804,7 @@
     "strain": "E277",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000225285.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1817,7 +1817,7 @@
     "strain": "CM01",
     "supercontigs": 32,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000225605.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 7,
@@ -1830,7 +1830,7 @@
     "strain": "ATCC 42464",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000226095.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1843,7 +1843,7 @@
     "strain": "Wisconsin 54-1255",
     "supercontigs": 49,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000226395.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1856,7 +1856,7 @@
     "strain": "S mat+",
     "supercontigs": 33,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000226545.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 36,
@@ -1869,7 +1869,7 @@
     "strain": "BPK282A1",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000227135.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 11,
@@ -1882,7 +1882,7 @@
     "strain": "Y486",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000227375.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 11,
@@ -1895,7 +1895,7 @@
     "strain": "IL3000",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000227395.2",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 23,
@@ -1908,7 +1908,7 @@
     "strain": "SRZ2",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000230245.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1921,7 +1921,7 @@
     "strain": "JN3",
     "supercontigs": 76,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000230375.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1934,7 +1934,7 @@
     "strain": "ATCC 1015",
     "supercontigs": 24,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000230395.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1947,7 +1947,7 @@
     "strain": "USNM 41457",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000230595.3",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -1960,7 +1960,7 @@
     "strain": "NIH/UT8656",
     "supercontigs": 10,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000230625.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -1973,7 +1973,7 @@
     "strain": "ATCC 50505",
     "supercontigs": 220,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000231115.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 34,
@@ -1986,7 +1986,7 @@
     "strain": "MHOM/GT/2001/U1103",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000234665.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -1999,7 +1999,7 @@
     "strain": "IFO 4308",
     "supercontigs": 146,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000239835.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -2012,7 +2012,7 @@
     "strain": "INRA-310",
     "supercontigs": 708,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000247585.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -2025,7 +2025,7 @@
     "strain": "ERTm2",
     "supercontigs": 202,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000250695.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -2038,7 +2038,7 @@
     "strain": "strain SD 75.1",
     "supercontigs": 36,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000250755.2",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -2051,7 +2051,7 @@
     "strain": "ARI",
     "supercontigs": 2723,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000250965.2",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -2064,7 +2064,7 @@
     "strain": "ERTm1",
     "supercontigs": 65,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000250985.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -2077,7 +2077,7 @@
     "strain": "CAST",
     "supercontigs": 2656,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000256705.2",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -2090,7 +2090,7 @@
     "strain": "TgCatPRC2",
     "supercontigs": 3060,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000256725.2",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -2103,7 +2103,7 @@
     "strain": "strain H.H.34",
     "supercontigs": 14860,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000258005.1",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -2116,7 +2116,7 @@
     "strain": "TgCATBr5",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000259835.1",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -2129,7 +2129,7 @@
     "strain": "NRRL 54006",
     "supercontigs": 418,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000260195.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -2142,7 +2142,7 @@
     "strain": "f. sp. melonis 26406",
     "supercontigs": 1146,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000260495.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -2155,7 +2155,7 @@
     "strain": "Israel",
     "supercontigs": 106826,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000262795.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -2168,7 +2168,7 @@
     "strain": "Jacobina",
     "supercontigs": 11532,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000265325.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -2181,7 +2181,7 @@
     "strain": "DSM 1558",
     "supercontigs": 45,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000271645.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -2194,7 +2194,7 @@
     "strain": "Fo47",
     "supercontigs": 124,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000271705.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -2207,7 +2207,7 @@
     "strain": "NRRL 32931",
     "supercontigs": 168,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000271745.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 12,
@@ -2220,7 +2220,7 @@
     "strain": "ATCC 50504",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000277815.2",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -2233,7 +2233,7 @@
     "strain": "CtCo5",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000278365.1",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 13,
@@ -2246,7 +2246,7 @@
     "strain": "SJ-2008",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000280035.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -2259,7 +2259,7 @@
     "strain": "VS20",
     "supercontigs": 390,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000281045.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -2272,7 +2272,7 @@
     "strain": "var. asahii CBS 2479",
     "supercontigs": 77,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000293215.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -2285,7 +2285,7 @@
     "strain": "marinkellei strain B7",
     "supercontigs": 16783,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000300495.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -2298,7 +2298,7 @@
     "strain": "Indian",
     "supercontigs": 23371,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000300775.2",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -2311,7 +2311,7 @@
     "strain": "MS6",
     "supercontigs": 1506,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000302655.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -2324,7 +2324,7 @@
     "strain": "PYCC 5710",
     "supercontigs": 394,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000312925.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -2337,7 +2337,7 @@
     "strain": "str. Neff",
     "supercontigs": 384,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000313135.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -2350,7 +2350,7 @@
     "strain": "Undeen",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000313815.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -2363,7 +2363,7 @@
     "strain": "Unknown strain",
     "supercontigs": 310,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000316135.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 14,
@@ -2376,7 +2376,7 @@
     "strain": "strain B",
     "supercontigs": 1649,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000321355.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 0,
@@ -2389,7 +2389,7 @@
     "strain": "GAB2-2007-GAL-DOM2",
     "supercontigs": 2481,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000325525.2",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -2402,7 +2402,7 @@
     "strain": "strain Esmeraldo",
     "supercontigs": 796,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000327425.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 23,
@@ -2415,7 +2415,7 @@
     "strain": "521",
     "supercontigs": 4,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000328475.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -2428,7 +2428,7 @@
     "strain": "IP1",
     "supercontigs": 1144,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000330505.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 30,
@@ -2441,7 +2441,7 @@
     "strain": "strain Cf-Cl",
     "supercontigs": 427,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000331325.2",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 36,
@@ -2454,7 +2454,7 @@
     "strain": "strain LV39c5",
     "supercontigs": 773,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000331345.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -2467,7 +2467,7 @@
     "strain": "JR cl. 4",
     "supercontigs": 560,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000331405.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 36,
@@ -2480,7 +2480,7 @@
     "strain": "strain LV88",
     "supercontigs": 1925,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000333855.2",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -2493,7 +2493,7 @@
     "strain": "SE8",
     "supercontigs": 328,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000333975.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -2506,7 +2506,7 @@
     "strain": "COUG",
     "supercontigs": 105,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000338675.2",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -2519,7 +2519,7 @@
     "strain": "KU27",
     "supercontigs": 1796,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000338855.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -2532,7 +2532,7 @@
     "strain": "CIRAD86",
     "supercontigs": 56,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000340215.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 35,
@@ -2545,7 +2545,7 @@
     "strain": "MHOM/BR/75/M2903",
     "supercontigs": 709,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000340355.2",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 36,
@@ -2558,7 +2558,7 @@
     "strain": "MHOM/COL/81/L13",
     "supercontigs": 820,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000340495.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 2,
@@ -2571,7 +2571,7 @@
     "strain": "strain WA",
     "supercontigs": 8,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000342415.1",
-    "vEuPathDbProject": "PiroplasmaDB"
+    "vEuPathDBProject": "PiroplasmaDB"
   },
   {
     "chromosomes": 0,
@@ -2584,7 +2584,7 @@
     "strain": "HM-1:IMSS-B",
     "supercontigs": 1938,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000344925.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -2597,7 +2597,7 @@
     "strain": "HM-3:IMSS",
     "supercontigs": 1880,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000346345.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -2610,7 +2610,7 @@
     "strain": "20.1",
     "supercontigs": 191,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000347355.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -2623,7 +2623,7 @@
     "strain": "B123",
     "supercontigs": 20,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000349005.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -2636,7 +2636,7 @@
     "strain": "MINIMUS1",
     "supercontigs": 678,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000349025.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -2649,7 +2649,7 @@
     "strain": "SDA-500",
     "supercontigs": 1110,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000349045.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -2662,7 +2662,7 @@
     "strain": "SANGWE",
     "supercontigs": 2823,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000349065.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -2675,7 +2675,7 @@
     "strain": "Epiroticus2",
     "supercontigs": 2673,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000349105.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 5,
@@ -2688,7 +2688,7 @@
     "strain": "STECLA",
     "supercontigs": 196,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000349125.2",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -2701,7 +2701,7 @@
     "strain": "WRAIR2",
     "supercontigs": 1266,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000349145.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -2714,7 +2714,7 @@
     "strain": "ACHKN1017",
     "supercontigs": 30369,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000349165.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -2727,7 +2727,7 @@
     "strain": "Dongola",
     "supercontigs": 1214,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000349185.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -2740,7 +2740,7 @@
     "strain": "f. sp. cubense race 1",
     "supercontigs": 1341,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000350345.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -2753,7 +2753,7 @@
     "strain": "strain race 4",
     "supercontigs": 840,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000350365.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -2766,7 +2766,7 @@
     "strain": "CBS 101466",
     "supercontigs": 19,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000365145.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -2779,7 +2779,7 @@
     "strain": "CBS 160.54",
     "supercontigs": 19,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000365165.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -2792,7 +2792,7 @@
     "strain": "Tula cl2",
     "supercontigs": 1780,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000365225.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -2805,7 +2805,7 @@
     "strain": "HM-1:IMSS-A",
     "supercontigs": 1685,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000365475.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -2818,7 +2818,7 @@
     "strain": "aabys",
     "supercontigs": 20487,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000371365.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -2831,7 +2831,7 @@
     "strain": "CQ1",
     "supercontigs": 1607,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000383075.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -2844,7 +2844,7 @@
     "strain": "PRA109",
     "supercontigs": 7113,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000385855.2",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -2857,7 +2857,7 @@
     "strain": "PRA339",
     "supercontigs": 431,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000385875.2",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -2870,7 +2870,7 @@
     "strain": "DAOM BR486",
     "supercontigs": 5887,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000387425.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -2883,7 +2883,7 @@
     "strain": "DAOM BR444",
     "supercontigs": 1774,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000387445.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -2896,7 +2896,7 @@
     "strain": "DAOM BR242034",
     "supercontigs": 11542,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000387465.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -2909,7 +2909,7 @@
     "strain": "ATCC 12531",
     "supercontigs": 10972,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000387505.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -2922,7 +2922,7 @@
     "strain": "var. sporangiiferum BR650",
     "supercontigs": 5482,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000387525.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -2935,7 +2935,7 @@
     "strain": "DAOM BR484",
     "supercontigs": 3685,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000387545.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 8,
@@ -2948,7 +2948,7 @@
     "strain": "JR2",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000400815.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -2961,7 +2961,7 @@
     "strain": "1006PhL",
     "supercontigs": 470,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000401635.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 36,
@@ -2974,7 +2974,7 @@
     "strain": "LEM2494",
     "supercontigs": 215,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000409445.2",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 36,
@@ -2987,7 +2987,7 @@
     "strain": "strain LEM1108",
     "supercontigs": 132,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000410695.2",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 36,
@@ -3000,7 +3000,7 @@
     "strain": "L590",
     "supercontigs": 124,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000410715.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -3013,7 +3013,7 @@
     "strain": "UAMH 11346",
     "supercontigs": 45,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000410735.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 36,
@@ -3026,7 +3026,7 @@
     "strain": "strain LEM3045",
     "supercontigs": 459,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000410755.2",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -3039,7 +3039,7 @@
     "strain": "42_110",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000430065.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -3052,7 +3052,7 @@
     "strain": "MHOM/BR/71973/M2269",
     "supercontigs": 2627,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000438535.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -3065,7 +3065,7 @@
     "strain": "China",
     "supercontigs": 9592,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000441895.2",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 36,
@@ -3078,7 +3078,7 @@
     "strain": "strain LEM423",
     "supercontigs": 183,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000441995.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 36,
@@ -3091,7 +3091,7 @@
     "strain": "strain LEM452",
     "supercontigs": 106,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000443025.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 36,
@@ -3104,7 +3104,7 @@
     "strain": "L147",
     "supercontigs": 124,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000444285.2",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -3117,7 +3117,7 @@
     "strain": "BRL 01",
     "supercontigs": 554,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000447185.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 36,
@@ -3130,7 +3130,7 @@
     "strain": "strain BHU 1220",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000470725.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -3143,7 +3143,7 @@
     "strain": "SINENSIS",
     "supercontigs": 10448,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000472065.2",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -3156,7 +3156,7 @@
     "strain": "maculatus3",
     "supercontigs": 47797,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000473185.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -3169,7 +3169,7 @@
     "strain": "A-37",
     "supercontigs": 16162,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000473375.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -3182,7 +3182,7 @@
     "strain": "FAR1",
     "supercontigs": 310,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000473445.2",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 5,
@@ -3195,7 +3195,7 @@
     "strain": "EBRO",
     "supercontigs": 1315,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000473505.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -3208,7 +3208,7 @@
     "strain": "CM1001059_A",
     "supercontigs": 20229,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000473525.2",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -3221,7 +3221,7 @@
     "strain": "MAF",
     "supercontigs": 2027,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000473845.2",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -3234,7 +3234,7 @@
     "strain": "SC58",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000492115.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -3247,7 +3247,7 @@
     "strain": "Dm28c 2014",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000496795.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -3260,7 +3260,7 @@
     "strain": "2 isolate DH",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000498715.1",
-    "vEuPathDbProject": "GiardiaDB"
+    "vEuPathDBProject": "GiardiaDB"
   },
   {
     "chromosomes": 0,
@@ -3273,7 +3273,7 @@
     "strain": "isolate GS_B",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000498735.1",
-    "vEuPathDbProject": "GiardiaDB"
+    "vEuPathDBProject": "GiardiaDB"
   },
   {
     "chromosomes": 0,
@@ -3286,7 +3286,7 @@
     "strain": "ATCC 30863",
     "supercontigs": 1124,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000499105.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -3299,7 +3299,7 @@
     "strain": "Houghton",
     "supercontigs": 3707,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000499385.1",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -3312,7 +3312,7 @@
     "strain": "Houghton",
     "supercontigs": 3415,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000499425.1",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -3325,7 +3325,7 @@
     "strain": "Houghton",
     "supercontigs": 21348,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000499445.1",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -3338,7 +3338,7 @@
     "strain": "strain Houghton",
     "supercontigs": 4664,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000499545.1",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -3351,7 +3351,7 @@
     "strain": "Weybridge",
     "supercontigs": 3564,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000499605.1",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -3364,7 +3364,7 @@
     "strain": "Houghton",
     "supercontigs": 8575,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000499725.1",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -3377,7 +3377,7 @@
     "strain": "Houghton",
     "supercontigs": 15978,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000499745.2",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -3390,7 +3390,7 @@
     "strain": "CBS 569",
     "supercontigs": 242,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000507425.3",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -3403,7 +3403,7 @@
     "strain": "strain APO3",
     "supercontigs": 835,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000520075.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -3416,7 +3416,7 @@
     "strain": "NJM9701",
     "supercontigs": 481,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000520115.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -3429,7 +3429,7 @@
     "strain": "San Antonio 1",
     "supercontigs": 323,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000524495.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 0,
@@ -3442,7 +3442,7 @@
     "strain": "petteri strain CR",
     "supercontigs": 66,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000524515.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 0,
@@ -3455,7 +3455,7 @@
     "strain": "CBS 114405",
     "supercontigs": 8,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000585515.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -3468,7 +3468,7 @@
     "strain": "CBS 110553",
     "supercontigs": 123,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000585535.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -3481,7 +3481,7 @@
     "strain": "Harlan",
     "supercontigs": 417,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000648675.2",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -3494,7 +3494,7 @@
     "strain": "IAEA",
     "supercontigs": 2395,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000671735.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -3507,7 +3507,7 @@
     "strain": "IAEA",
     "supercontigs": 1651,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000671755.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -3520,7 +3520,7 @@
     "strain": "IAEA",
     "supercontigs": 1726,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000688715.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -3533,7 +3533,7 @@
     "strain": "TTRI",
     "supercontigs": 2205,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000688735.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -3546,7 +3546,7 @@
     "strain": "ANR4",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000691245.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 4,
@@ -3559,7 +3559,7 @@
     "strain": "strain RI",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000691945.2",
-    "vEuPathDbProject": "PiroplasmaDB"
+    "vEuPathDBProject": "PiroplasmaDB"
   },
   {
     "chromosomes": 0,
@@ -3572,7 +3572,7 @@
     "strain": "PC15",
     "supercontigs": 12,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000697685.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -3585,7 +3585,7 @@
     "strain": "vinckei strain vinckei",
     "supercontigs": 49,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000709005.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 0,
@@ -3598,7 +3598,7 @@
     "strain": "CBS 119918",
     "supercontigs": 151,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000709125.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 5,
@@ -3611,7 +3611,7 @@
     "strain": "strain BOND",
     "supercontigs": 478,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000723445.1",
-    "vEuPathDbProject": "PiroplasmaDB"
+    "vEuPathDBProject": "PiroplasmaDB"
   },
   {
     "chromosomes": 0,
@@ -3624,7 +3624,7 @@
     "strain": "JMRC:FSU:9682",
     "supercontigs": 209,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000723665.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 14,
@@ -3637,7 +3637,7 @@
     "strain": "CDC",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000723685.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 0,
@@ -3650,7 +3650,7 @@
     "strain": "SN3",
     "supercontigs": 171,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000727475.1",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -3663,7 +3663,7 @@
     "strain": "IHEM 14462",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000732125.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -3676,7 +3676,7 @@
     "strain": "IBT 40293",
     "supercontigs": 2342,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000732565.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -3689,7 +3689,7 @@
     "strain": "ERTm6",
     "supercontigs": 22,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000738915.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 4,
@@ -3702,7 +3702,7 @@
     "strain": "strain Shintoku",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000740895.1",
-    "vEuPathDbProject": "PiroplasmaDB"
+    "vEuPathDBProject": "PiroplasmaDB"
   },
   {
     "chromosomes": 35,
@@ -3715,7 +3715,7 @@
     "strain": "strain MHOM/PA/94/PSC-1",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000755165.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -3728,7 +3728,7 @@
     "strain": "UGP3",
     "supercontigs": 610,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000760515.2",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -3741,7 +3741,7 @@
     "strain": "strain CHN_HEN01",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000769155.1",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -3754,7 +3754,7 @@
     "strain": "d1",
     "supercontigs": 270,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000769735.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -3767,7 +3767,7 @@
     "strain": "OC4",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000803265.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -3780,7 +3780,7 @@
     "strain": "37999",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000804495.1",
-    "vEuPathDbProject": "CryptoDB"
+    "vEuPathDBProject": "CryptoDB"
   },
   {
     "chromosomes": 0,
@@ -3793,7 +3793,7 @@
     "strain": "ARSEF 549",
     "supercontigs": 74,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000814975.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -3806,7 +3806,7 @@
     "strain": "IAEA",
     "supercontigs": 3926,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000818775.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -3819,7 +3819,7 @@
     "strain": "5110",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000820605.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -3832,7 +3832,7 @@
     "strain": "Unknown",
     "supercontigs": 98248,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000826245.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -3845,7 +3845,7 @@
     "strain": "A1",
     "supercontigs": 72411,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000826265.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -3858,7 +3858,7 @@
     "strain": "PD2S",
     "supercontigs": 79048,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000826285.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -3871,7 +3871,7 @@
     "strain": "Reich",
     "supercontigs": 26188,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000826305.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -3884,7 +3884,7 @@
     "strain": "SH621",
     "supercontigs": 56742,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000826325.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -3897,7 +3897,7 @@
     "strain": "T4B-type",
     "supercontigs": 224482,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000826345.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -3910,7 +3910,7 @@
     "strain": "Incertae_sedis",
     "supercontigs": 24098,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000826365.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -3923,7 +3923,7 @@
     "strain": "Singh",
     "supercontigs": 62836,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000826385.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -3936,7 +3936,7 @@
     "strain": "L3a",
     "supercontigs": 67459,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000826425.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -3949,7 +3949,7 @@
     "strain": "Vil3",
     "supercontigs": 60490,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000826445.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -3962,7 +3962,7 @@
     "strain": "1652",
     "supercontigs": 67233,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000826465.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -3975,7 +3975,7 @@
     "strain": "Ma",
     "supercontigs": 221748,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000826485.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -3988,7 +3988,7 @@
     "strain": "Galka",
     "supercontigs": 224137,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000826505.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -4001,7 +4001,7 @@
     "strain": "Arlian",
     "supercontigs": 18859,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000828355.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -4014,7 +4014,7 @@
     "strain": "chipmunk LX-2015",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000831705.1",
-    "vEuPathDbProject": "CryptoDB"
+    "vEuPathDBProject": "CryptoDB"
   },
   {
     "chromosomes": 0,
@@ -4027,7 +4027,7 @@
     "strain": "CBS 271.37",
     "supercontigs": 11,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000835455.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4040,7 +4040,7 @@
     "strain": "CBS 173.52",
     "supercontigs": 60,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000835475.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4053,7 +4053,7 @@
     "strain": "strain CBS 83496",
     "supercontigs": 277,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000835495.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4066,7 +4066,7 @@
     "strain": "strain CBS 72588",
     "supercontigs": 143,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000835515.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4079,7 +4079,7 @@
     "strain": "CBS 650.93",
     "supercontigs": 17,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000835555.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4092,7 +4092,7 @@
     "strain": "EJB2",
     "supercontigs": 282,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000835745.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4105,7 +4105,7 @@
     "strain": "CBS 89968",
     "supercontigs": 28,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000836115.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4118,7 +4118,7 @@
     "strain": "strain CBS 40295",
     "supercontigs": 9,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000836275.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4131,7 +4131,7 @@
     "strain": "strain CBS 43764",
     "supercontigs": 367,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000836295.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4144,7 +4144,7 @@
     "strain": "CBS 102226",
     "supercontigs": 67,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000836435.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4157,7 +4157,7 @@
     "strain": "CA1873",
     "supercontigs": 33,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000855695.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4170,7 +4170,7 @@
     "strain": "SO SN1",
     "supercontigs": 3066,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000875885.1",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -4183,7 +4183,7 @@
     "strain": "NT10",
     "supercontigs": 226,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000935105.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4196,7 +4196,7 @@
     "strain": "strain nilgiri",
     "supercontigs": 247,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000956335.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 0,
@@ -4209,7 +4209,7 @@
     "strain": "1099-18",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000961545.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4222,7 +4222,7 @@
     "strain": "DAOM 233423",
     "supercontigs": 869,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000966635.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4235,7 +4235,7 @@
     "strain": "Charles River",
     "supercontigs": 204516,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000973045.2",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -4248,7 +4248,7 @@
     "strain": "strain PA08_1199",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000988165.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -4261,7 +4261,7 @@
     "strain": "UAMH 3008",
     "supercontigs": 1734,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001008285.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4274,7 +4274,7 @@
     "strain": "USDA",
     "supercontigs": 12042,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001015335.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -4287,7 +4287,7 @@
     "strain": "Yale",
     "supercontigs": 13807,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001077435.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -4300,7 +4300,7 @@
     "strain": "strain Rouen 1987",
     "supercontigs": 141,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001077455.2",
-    "vEuPathDbProject": "PiroplasmaDB"
+    "vEuPathDBProject": "PiroplasmaDB"
   },
   {
     "chromosomes": 15,
@@ -4313,7 +4313,7 @@
     "strain": "EcunIII-L",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001078035.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -4326,7 +4326,7 @@
     "strain": "CCMP3155",
     "supercontigs": 1064,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001179505.1",
-    "vEuPathDbProject": "CryptoDB"
+    "vEuPathDBProject": "CryptoDB"
   },
   {
     "chromosomes": 0,
@@ -4339,7 +4339,7 @@
     "strain": "CDC-V039",
     "supercontigs": 1604,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001185145.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -4352,7 +4352,7 @@
     "strain": "6684",
     "supercontigs": 99,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001189475.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4365,7 +4365,7 @@
     "strain": "strain 2046",
     "supercontigs": 14699,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001262475.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -4378,7 +4378,7 @@
     "strain": "strain RO10H11247",
     "supercontigs": 15715,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001263375.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4391,7 +4391,7 @@
     "strain": "mm55",
     "supercontigs": 804,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001275765.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4404,7 +4404,7 @@
     "strain": "CBS 1879",
     "supercontigs": 91,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001278385.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 35,
@@ -4417,7 +4417,7 @@
     "strain": "H10",
     "supercontigs": 25,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001293395.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -4430,7 +4430,7 @@
     "strain": "ATCC 30220",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001299535.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -4443,7 +4443,7 @@
     "strain": "isolate UAMH 5669",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001430925.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4456,7 +4456,7 @@
     "strain": "isolate UAMH 3576",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001430935.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4469,7 +4469,7 @@
     "strain": "isolate UAMH 3544",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001430945.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4482,7 +4482,7 @@
     "strain": "isolate CBS 280.77",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001430955.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4495,7 +4495,7 @@
     "strain": "strain MK1",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001432165.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -4508,7 +4508,7 @@
     "strain": "NRRL Y-1402",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001444555.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4521,7 +4521,7 @@
     "strain": "strain IFM 54703",
     "supercontigs": 12,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001445615.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4534,7 +4534,7 @@
     "strain": "CBS 789",
     "supercontigs": 534,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001447935.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4547,7 +4547,7 @@
     "strain": "OVI",
     "supercontigs": 2026,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001457755.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -4560,7 +4560,7 @@
     "strain": "strain Lake Konstanz",
     "supercontigs": 2256,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001460835.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -4573,7 +4573,7 @@
     "strain": "RU7",
     "supercontigs": 70,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001477535.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4586,7 +4586,7 @@
     "strain": "isolate 30976",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001483515.1",
-    "vEuPathDbProject": "CryptoDB"
+    "vEuPathDBProject": "CryptoDB"
   },
   {
     "chromosomes": 0,
@@ -4599,7 +4599,7 @@
     "strain": "AS175",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001493575.1",
-    "vEuPathDbProject": "GiardiaDB"
+    "vEuPathDBProject": "GiardiaDB"
   },
   {
     "chromosomes": 0,
@@ -4612,7 +4612,7 @@
     "strain": "isolate BAH15c1",
     "supercontigs": 508,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001543975.1",
-    "vEuPathDbProject": "GiardiaDB"
+    "vEuPathDBProject": "GiardiaDB"
   },
   {
     "chromosomes": 0,
@@ -4625,7 +4625,7 @@
     "strain": "A1 (DAOM-664342)",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001593125.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4638,7 +4638,7 @@
     "strain": "RH 2016",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001593265.1",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -4651,7 +4651,7 @@
     "strain": "strain UKMEL1",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001593445.1",
-    "vEuPathDbProject": "CryptoDB"
+    "vEuPathDBProject": "CryptoDB"
   },
   {
     "chromosomes": 0,
@@ -4664,7 +4664,7 @@
     "strain": "TAMU-09Q1",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001593455.1",
-    "vEuPathDbProject": "CryptoDB"
+    "vEuPathDBProject": "CryptoDB"
   },
   {
     "chromosomes": 0,
@@ -4677,7 +4677,7 @@
     "strain": "isolate TU502_2012",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001593465.1",
-    "vEuPathDbProject": "CryptoDB"
+    "vEuPathDBProject": "CryptoDB"
   },
   {
     "chromosomes": 0,
@@ -4690,7 +4690,7 @@
     "strain": "UKH1",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001593475.1",
-    "vEuPathDbProject": "CryptoDB"
+    "vEuPathDBProject": "CryptoDB"
   },
   {
     "chromosomes": 0,
@@ -4703,7 +4703,7 @@
     "strain": "JCM 9937",
     "supercontigs": 61,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001598995.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4716,7 +4716,7 @@
     "strain": "strain JCM 9410",
     "supercontigs": 23,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001599035.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4729,7 +4729,7 @@
     "strain": "JCM2334",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001599735.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 14,
@@ -4742,7 +4742,7 @@
     "strain": "strain SY75",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001602025.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 0,
@@ -4755,7 +4755,7 @@
     "strain": "strain SISKIN1",
     "supercontigs": 2982,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001625125.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 0,
@@ -4768,7 +4768,7 @@
     "strain": "ARSEF 7405",
     "supercontigs": 82,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001636715.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4781,7 +4781,7 @@
     "strain": "CBS 277.49",
     "supercontigs": 21,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001638945.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4794,7 +4794,7 @@
     "strain": "NRRL 1555(-)",
     "supercontigs": 80,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001638985.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4807,7 +4807,7 @@
     "strain": "SRC1lrK2f",
     "supercontigs": 79,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001642055.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4820,7 +4820,7 @@
     "strain": "strain JUm2807",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001642395.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -4833,7 +4833,7 @@
     "strain": "ERTm5",
     "supercontigs": 186,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001642415.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -4846,7 +4846,7 @@
     "strain": "PA203",
     "supercontigs": 101,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001643675.2",
-    "vEuPathDbProject": "GiardiaDB"
+    "vEuPathDBProject": "GiardiaDB"
   },
   {
     "chromosomes": 0,
@@ -4859,7 +4859,7 @@
     "strain": "strain ATCC 30222",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001650055.1",
-    "vEuPathDbProject": "PiroplasmaDB"
+    "vEuPathDBProject": "PiroplasmaDB"
   },
   {
     "chromosomes": 0,
@@ -4872,7 +4872,7 @@
     "strain": "strain ATCC PRA-99",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001650065.1",
-    "vEuPathDbProject": "PiroplasmaDB"
+    "vEuPathDBProject": "PiroplasmaDB"
   },
   {
     "chromosomes": 0,
@@ -4885,7 +4885,7 @@
     "strain": "strain GreenwichYale_Lab_strain_1",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001650075.1",
-    "vEuPathDbProject": "PiroplasmaDB"
+    "vEuPathDBProject": "PiroplasmaDB"
   },
   {
     "chromosomes": 0,
@@ -4898,7 +4898,7 @@
     "strain": "strain GI",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001650105.1",
-    "vEuPathDbProject": "PiroplasmaDB"
+    "vEuPathDBProject": "PiroplasmaDB"
   },
   {
     "chromosomes": 0,
@@ -4911,7 +4911,7 @@
     "strain": "strain Naushon",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001650135.1",
-    "vEuPathDbProject": "PiroplasmaDB"
+    "vEuPathDBProject": "PiroplasmaDB"
   },
   {
     "chromosomes": 0,
@@ -4924,7 +4924,7 @@
     "strain": "Nan_Hs_2011_N11-50",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001650145.1",
-    "vEuPathDbProject": "PiroplasmaDB"
+    "vEuPathDBProject": "PiroplasmaDB"
   },
   {
     "chromosomes": 0,
@@ -4937,7 +4937,7 @@
     "strain": "CBS 136260",
     "supercontigs": 4444,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001660665.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 11,
@@ -4950,7 +4950,7 @@
     "strain": "IMI 349063",
     "supercontigs": 14,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001672515.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 14,
@@ -4963,7 +4963,7 @@
     "strain": "Hackeri",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001680005.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 0,
@@ -4976,7 +4976,7 @@
     "strain": "1.58",
     "supercontigs": 268,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001692895.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -4989,7 +4989,7 @@
     "strain": "KSF",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001700775.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5002,7 +5002,7 @@
     "strain": "GZAAS20.1005",
     "supercontigs": 68,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001717485.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5015,7 +5015,7 @@
     "strain": "strain AWRI3580",
     "supercontigs": 18,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001747055.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 6,
@@ -5028,7 +5028,7 @@
     "strain": "CLIB89 (W29)",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001761485.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 16,
@@ -5041,7 +5041,7 @@
     "strain": "1980 UF-70",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001857865.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5054,7 +5054,7 @@
     "strain": "isolate 39726",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001865345.1",
-    "vEuPathDbProject": "CryptoDB"
+    "vEuPathDBProject": "CryptoDB"
   },
   {
     "chromosomes": 0,
@@ -5067,7 +5067,7 @@
     "strain": "isolate 30847",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001865355.1",
-    "vEuPathDbProject": "CryptoDB"
+    "vEuPathDBProject": "CryptoDB"
   },
   {
     "chromosomes": 0,
@@ -5080,7 +5080,7 @@
     "strain": "WSBS2006",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001875675.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -5093,7 +5093,7 @@
     "strain": "strain EI222",
     "supercontigs": 3868,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001883805.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5106,7 +5106,7 @@
     "strain": "Ep9510",
     "supercontigs": 1643,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001883825.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5119,7 +5119,7 @@
     "strain": "CBS 101740",
     "supercontigs": 103,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001889945.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5132,7 +5132,7 @@
     "strain": "CBS 506.65",
     "supercontigs": 246,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001890105.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5145,7 +5145,7 @@
     "strain": "CBS 583.65",
     "supercontigs": 51,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001890125.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5158,7 +5158,7 @@
     "strain": "CBS 106.47",
     "supercontigs": 100,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001890685.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5171,7 +5171,7 @@
     "strain": "CBS 593.65",
     "supercontigs": 97,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001890705.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5184,7 +5184,7 @@
     "strain": "DTO 134E9",
     "supercontigs": 27,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001890725.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5197,7 +5197,7 @@
     "strain": "CBS 134.48",
     "supercontigs": 33,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001890745.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5210,7 +5210,7 @@
     "strain": "CBS 516.65",
     "supercontigs": 82,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001890805.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5223,7 +5223,7 @@
     "strain": "ATCC 16872",
     "supercontigs": 660,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001890905.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5236,7 +5236,7 @@
     "strain": "65",
     "supercontigs": 25,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001983305.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5249,7 +5249,7 @@
     "strain": "ITEM 5010",
     "supercontigs": 829,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_001990825.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 7,
@@ -5262,7 +5262,7 @@
     "strain": "QM6a 2017",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002006585.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 16,
@@ -5275,7 +5275,7 @@
     "strain": "CBS432",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002079055.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5288,7 +5288,7 @@
     "strain": "strain TH1",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002081675.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -5301,7 +5301,7 @@
     "strain": "var. microsporus ATCC 52814",
     "supercontigs": 560,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002083745.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5314,7 +5314,7 @@
     "strain": "isolate Edinburgh",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002087225.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -5327,7 +5327,7 @@
     "strain": "strain canceri",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002087875.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -5340,7 +5340,7 @@
     "strain": "strain GB1",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002087885.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -5353,7 +5353,7 @@
     "strain": "strain GB1",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002087915.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -5366,7 +5366,7 @@
     "strain": "Xinjiang",
     "supercontigs": 215,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002095265.1",
-    "vEuPathDbProject": "PiroplasmaDB"
+    "vEuPathDBProject": "PiroplasmaDB"
   },
   {
     "chromosomes": 0,
@@ -5379,7 +5379,7 @@
     "strain": "5z489",
     "supercontigs": 108,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002110485.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5392,7 +5392,7 @@
     "strain": "EXF-2000",
     "supercontigs": 628,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002127715.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5405,7 +5405,7 @@
     "strain": "strain Malayan Strain Pk1 A",
     "supercontigs": 28,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002140095.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 3,
@@ -5418,7 +5418,7 @@
     "strain": "LVP_AGWG",
     "supercontigs": 2306,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002204515.2",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 5,
@@ -5431,7 +5431,7 @@
     "strain": "var. neoformans XL280",
     "supercontigs": 32,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002216205.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 14,
@@ -5444,7 +5444,7 @@
     "strain": "var. grubii KN99",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002216725.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5457,7 +5457,7 @@
     "strain": "Dm28c 2017",
     "supercontigs": 1029,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002219105.2",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 13,
@@ -5470,7 +5470,7 @@
     "strain": "DSY562",
     "supercontigs": 5,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002219185.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 8,
@@ -5483,7 +5483,7 @@
     "strain": "UdeA01",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002223825.1",
-    "vEuPathDbProject": "CryptoDB"
+    "vEuPathDBProject": "CryptoDB"
   },
   {
     "chromosomes": 0,
@@ -5496,7 +5496,7 @@
     "strain": "strain HMR AF 39",
     "supercontigs": 647,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002237265.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5509,7 +5509,7 @@
     "strain": "AV1007",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002247145.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5522,7 +5522,7 @@
     "strain": "Bayer Haberkorn 1970",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002271815.1",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -5535,7 +5535,7 @@
     "strain": "JHH-5317",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002276285.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5548,7 +5548,7 @@
     "strain": "Tc1/148",
     "supercontigs": 536,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002287245.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 13,
@@ -5561,7 +5561,7 @@
     "strain": "strain Bb-Ger1",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002563875.1",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -5574,7 +5574,7 @@
     "strain": "strain Wien I",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002600585.1",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -5587,7 +5587,7 @@
     "strain": "Bug2148",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002749415.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -5600,7 +5600,7 @@
     "strain": "strain Y",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002749425.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -5613,7 +5613,7 @@
     "strain": "NCCPF 102052",
     "supercontigs": 411,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002749535.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5626,7 +5626,7 @@
     "strain": "B11221",
     "supercontigs": 20,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002775015.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5639,7 +5639,7 @@
     "strain": "IBT 24754",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002846915.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5652,7 +5652,7 @@
     "strain": "IBT 16806",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002847465.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5665,7 +5665,7 @@
     "strain": "IBT 28561",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002847485.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5678,7 +5678,7 @@
     "strain": "IBT 23096",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002849105.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5691,7 +5691,7 @@
     "strain": "ISE6",
     "supercontigs": 6476,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002892825.2",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -5704,7 +5704,7 @@
     "strain": "strain Miyake",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002897235.1",
-    "vEuPathDbProject": "PiroplasmaDB"
+    "vEuPathDBProject": "PiroplasmaDB"
   },
   {
     "chromosomes": 0,
@@ -5717,7 +5717,7 @@
     "strain": "var. palmivora strain sbr112.9",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002911725.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5730,7 +5730,7 @@
     "strain": "Laredo",
     "supercontigs": 1147,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002914575.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -5743,7 +5743,7 @@
     "strain": "strain 93-210",
     "supercontigs": 492,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002920065.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5756,7 +5756,7 @@
     "strain": "93TX-2",
     "supercontigs": 561,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002920205.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5769,7 +5769,7 @@
     "strain": "CUL13",
     "supercontigs": 266,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002921335.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -5782,7 +5782,7 @@
     "strain": "B11899",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002926055.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5795,7 +5795,7 @@
     "strain": "B09383",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002926085.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 14,
@@ -5808,7 +5808,7 @@
     "strain": "R265",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002954075.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5821,7 +5821,7 @@
     "strain": "var. grubii H99 2018",
     "supercontigs": 14,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003011985.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 11,
@@ -5834,7 +5834,7 @@
     "strain": "IL3000 2019",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003013265.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 7,
@@ -5847,7 +5847,7 @@
     "strain": "B11220",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_003013715.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5860,7 +5860,7 @@
     "strain": "B12108",
     "supercontigs": 36,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_003013735.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5873,7 +5873,7 @@
     "strain": "B11243",
     "supercontigs": 238,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003014415.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 5,
@@ -5886,7 +5886,7 @@
     "strain": "strain CBS5147",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003054405.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 5,
@@ -5899,7 +5899,7 @@
     "strain": "strain CBS573",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_003054445.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5912,7 +5912,7 @@
     "strain": "TIMM 2789",
     "supercontigs": 16543,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003118255.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5925,7 +5925,7 @@
     "strain": "TCC",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003177095.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -5938,7 +5938,7 @@
     "strain": "Dm28c 2018",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003177105.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -5951,7 +5951,7 @@
     "strain": "CBS 122712",
     "supercontigs": 131,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_003184535.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5964,7 +5964,7 @@
     "strain": "CBS 117.55",
     "supercontigs": 205,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_003184545.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5977,7 +5977,7 @@
     "strain": "CBS 121057",
     "supercontigs": 166,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003184635.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -5990,7 +5990,7 @@
     "strain": "CBS 707.79",
     "supercontigs": 518,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003184645.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -6003,7 +6003,7 @@
     "strain": "CBS 121591",
     "supercontigs": 172,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_003184745.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -6016,7 +6016,7 @@
     "strain": "CBS 313.89",
     "supercontigs": 149,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_003184825.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -6029,7 +6029,7 @@
     "strain": "CBS 121593",
     "supercontigs": 116,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_003184845.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -6042,7 +6042,7 @@
     "strain": "CBS 101889",
     "supercontigs": 152,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_003184865.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -6055,7 +6055,7 @@
     "strain": "10300",
     "supercontigs": 4623,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003287315.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 9,
@@ -6068,7 +6068,7 @@
     "strain": "KCTC 27527",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_003290485.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -6081,7 +6081,7 @@
     "strain": "strain ATCC 30569",
     "supercontigs": 109,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_003324165.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 22,
@@ -6094,7 +6094,7 @@
     "strain": "isolate AG07107",
     "supercontigs": 2916,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_003339765.1",
-    "vEuPathDbProject": "HostDB"
+    "vEuPathDBProject": "HostDB"
   },
   {
     "chromosomes": 0,
@@ -6107,7 +6107,7 @@
     "strain": "ATCC 13496",
     "supercontigs": 133,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003344705.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -6120,7 +6120,7 @@
     "strain": "PvSY56",
     "supercontigs": 14,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003402215.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 0,
@@ -6133,7 +6133,7 @@
     "strain": "strain S11",
     "supercontigs": 7855,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003594385.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -6146,7 +6146,7 @@
     "strain": "strain Ycl4",
     "supercontigs": 6664,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003594405.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -6159,7 +6159,7 @@
     "strain": "strain S23b",
     "supercontigs": 7145,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003594425.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -6172,7 +6172,7 @@
     "strain": "strain S92a",
     "supercontigs": 7134,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003594445.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -6185,7 +6185,7 @@
     "strain": "strain Ycl6",
     "supercontigs": 6967,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003594465.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -6198,7 +6198,7 @@
     "strain": "strain Ycl2",
     "supercontigs": 6884,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003594485.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -6211,7 +6211,7 @@
     "strain": "strain S15",
     "supercontigs": 9197,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003594585.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -6224,7 +6224,7 @@
     "strain": "strain S162a",
     "supercontigs": 8588,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003594605.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -6237,7 +6237,7 @@
     "strain": "strain S44a",
     "supercontigs": 4971,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003594705.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -6250,7 +6250,7 @@
     "strain": "strain S154a",
     "supercontigs": 6946,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003594715.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 9,
@@ -6263,7 +6263,7 @@
     "strain": "CBS 7877",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003691605.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -6276,7 +6276,7 @@
     "strain": "EHP-ID16",
     "supercontigs": 162,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003709115.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -6289,7 +6289,7 @@
     "strain": "CBS 132003",
     "supercontigs": 118,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003709865.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -6302,7 +6302,7 @@
     "strain": "strain CL",
     "supercontigs": 7764,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003719155.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -6315,7 +6315,7 @@
     "strain": "strain G",
     "supercontigs": 1450,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003719455.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 36,
@@ -6328,7 +6328,7 @@
     "strain": "CL-SL",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003719575.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -6341,7 +6341,7 @@
     "strain": "ALCF2SS1-7",
     "supercontigs": 207,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003813185.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 7,
@@ -6354,7 +6354,7 @@
     "strain": "Fl1",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003814445.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -6367,7 +6367,7 @@
     "strain": "R13",
     "supercontigs": 784,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003843895.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 3,
@@ -6380,7 +6380,7 @@
     "strain": "FUMOZ",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003951495.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 8,
@@ -6393,7 +6393,7 @@
     "strain": "TM4",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003971505.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -6406,7 +6406,7 @@
     "strain": "CBS H-5679",
     "supercontigs": 14,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_004000055.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -6419,7 +6419,7 @@
     "strain": "Franzen",
     "supercontigs": 952,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_004000155.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -6432,7 +6432,7 @@
     "strain": "WA_211",
     "supercontigs": 62,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_004115165.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -6445,7 +6445,7 @@
     "strain": "Race XXXIII",
     "supercontigs": 116756,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_004125335.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -6458,7 +6458,7 @@
     "strain": "Ngousso",
     "supercontigs": 205,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_004136515.2",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -6471,7 +6471,7 @@
     "strain": "GB-EP-1",
     "supercontigs": 18,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_004324935.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -6484,7 +6484,7 @@
     "strain": "NO-V-7",
     "supercontigs": 21,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_004324945.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -6497,7 +6497,7 @@
     "strain": "IL-BN-2",
     "supercontigs": 3833,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_004325035.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -6510,7 +6510,7 @@
     "strain": "FI-OER-3-3",
     "supercontigs": 2915,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_004325045.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -6523,7 +6523,7 @@
     "strain": "FI-SK-17-1",
     "supercontigs": 26,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_004325055.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -6536,7 +6536,7 @@
     "strain": "BE-OM-2",
     "supercontigs": 3550,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_004325065.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -6549,7 +6549,7 @@
     "strain": "IL-G-3",
     "supercontigs": 2738,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_004325075.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 5,
@@ -6562,7 +6562,7 @@
     "strain": "Br36",
     "supercontigs": 103,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_004337985.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -6575,7 +6575,7 @@
     "strain": "Ricmel1",
     "supercontigs": 848,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_004355085.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 19,
@@ -6588,7 +6588,7 @@
     "strain": "strain SF5",
     "supercontigs": 201,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_004359215.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -6601,7 +6601,7 @@
     "strain": "NIH1004",
     "supercontigs": 1715,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_004798825.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -6614,7 +6614,7 @@
     "strain": "BRL",
     "supercontigs": 110,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_004919615.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -6627,7 +6627,7 @@
     "strain": "strain 37763",
     "supercontigs": 50,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_004936735.2",
-    "vEuPathDbProject": "CryptoDB"
+    "vEuPathDBProject": "CryptoDB"
   },
   {
     "chromosomes": 5,
@@ -6640,7 +6640,7 @@
     "strain": "strain Roberts-Thomson",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_006247105.1",
-    "vEuPathDbProject": "GiardiaDB"
+    "vEuPathDBProject": "GiardiaDB"
   },
   {
     "chromosomes": 0,
@@ -6653,7 +6653,7 @@
     "strain": "Foshan FPA",
     "supercontigs": 2196,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_006496715.2",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -6666,7 +6666,7 @@
     "strain": "MB42",
     "supercontigs": 786,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_006535955.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 8,
@@ -6679,7 +6679,7 @@
     "strain": "isolate UGA55",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_007210665.1",
-    "vEuPathDbProject": "CryptoDB"
+    "vEuPathDBProject": "CryptoDB"
   },
   {
     "chromosomes": 17,
@@ -6692,7 +6692,7 @@
     "strain": "CLX",
     "supercontigs": 1,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_007674295.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 7,
@@ -6705,7 +6705,7 @@
     "strain": "ATCC 34164",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_008080495.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 7,
@@ -6718,7 +6718,7 @@
     "strain": "B11245",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_008275145.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -6731,7 +6731,7 @@
     "strain": "strain ATCC 30894",
     "supercontigs": 81,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_008403515.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -6744,7 +6744,7 @@
     "strain": "CBS 613",
     "supercontigs": 169,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_008704595.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -6757,7 +6757,7 @@
     "strain": "CBS 4856",
     "supercontigs": 583,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_008704605.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 10,
@@ -6770,7 +6770,7 @@
     "strain": "KPH11",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_008728235.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 8,
@@ -6783,7 +6783,7 @@
     "strain": "NRRL3357 2020",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_009017415.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -6796,7 +6796,7 @@
     "strain": "CBS 117618",
     "supercontigs": 270,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_009176385.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 13,
@@ -6809,7 +6809,7 @@
     "strain": "MF34",
     "supercontigs": 2,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_009650685.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -6822,7 +6822,7 @@
     "strain": "Parrot Tar II 2019",
     "supercontigs": 179,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_009731335.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -6835,7 +6835,7 @@
     "strain": "NF135.C10",
     "supercontigs": 21,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_009761425.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 0,
@@ -6848,7 +6848,7 @@
     "strain": "NF54",
     "supercontigs": 28,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_009761475.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 0,
@@ -6861,7 +6861,7 @@
     "strain": "NF166",
     "supercontigs": 30,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_009761515.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 0,
@@ -6874,7 +6874,7 @@
     "strain": "7G8 2019",
     "supercontigs": 20,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_009761555.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 0,
@@ -6887,7 +6887,7 @@
     "strain": "isolate 45015",
     "supercontigs": 55,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_009768925.1",
-    "vEuPathDbProject": "CryptoDB"
+    "vEuPathDBProject": "CryptoDB"
   },
   {
     "chromosomes": 0,
@@ -6900,7 +6900,7 @@
     "strain": "45019",
     "supercontigs": 93,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_009792415.1",
-    "vEuPathDbProject": "CryptoDB"
+    "vEuPathDBProject": "CryptoDB"
   },
   {
     "chromosomes": 0,
@@ -6913,7 +6913,7 @@
     "strain": "strain LDM3",
     "supercontigs": 14,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_009812365.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 13,
@@ -6926,7 +6926,7 @@
     "strain": "CBS138 2020",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_010111755.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -6939,7 +6939,7 @@
     "strain": "isolate FIOC_28",
     "supercontigs": 14951,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_011037195.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -6952,7 +6952,7 @@
     "strain": "isolate WB Calgary",
     "supercontigs": 37,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_011634545.1",
-    "vEuPathDbProject": "GiardiaDB"
+    "vEuPathDBProject": "GiardiaDB"
   },
   {
     "chromosomes": 0,
@@ -6965,7 +6965,7 @@
     "strain": "Beaver",
     "supercontigs": 8,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_011634555.1",
-    "vEuPathDbProject": "GiardiaDB"
+    "vEuPathDBProject": "GiardiaDB"
   },
   {
     "chromosomes": 0,
@@ -6978,7 +6978,7 @@
     "strain": "isolate GS Calgary",
     "supercontigs": 19,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_011634595.1",
-    "vEuPathDbProject": "GiardiaDB"
+    "vEuPathDBProject": "GiardiaDB"
   },
   {
     "chromosomes": 13,
@@ -6991,7 +6991,7 @@
     "strain": "RH-88",
     "supercontigs": 183,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_013099955.1",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 7,
@@ -7004,7 +7004,7 @@
     "strain": "MYA-3404 2020",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_013177555.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 11,
@@ -7017,7 +7017,7 @@
     "strain": "Hyas-2018",
     "supercontigs": 6308,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_013339685.2",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 11,
@@ -7030,7 +7030,7 @@
     "strain": "Rmic-2018",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_013339725.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 11,
@@ -7043,7 +7043,7 @@
     "strain": "Dsil-2018",
     "supercontigs": 1653,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_013339745.2",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 11,
@@ -7056,7 +7056,7 @@
     "strain": "HaeL-2018",
     "supercontigs": 3874,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_013339765.2",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -7069,7 +7069,7 @@
     "strain": "Berenice",
     "supercontigs": 923,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_013358655.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -7082,7 +7082,7 @@
     "strain": "Iper-2018",
     "supercontigs": 11596,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_013358835.2",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -7095,7 +7095,7 @@
     "strain": "NRRL 25331",
     "supercontigs": 1222,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_013396185.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -7108,7 +7108,7 @@
     "strain": "KleinGrass",
     "supercontigs": 16339,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_013436015.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 15,
@@ -7121,7 +7121,7 @@
     "strain": "f. sp. conglutinans Fo5176",
     "supercontigs": 4,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_014154955.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -7134,7 +7134,7 @@
     "strain": "RL4",
     "supercontigs": 169,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_014183025.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 13,
@@ -7147,7 +7147,7 @@
     "strain": "BG2",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_014217725.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 40,
@@ -7160,7 +7160,7 @@
     "strain": "familiaris isolate SID07034",
     "supercontigs": 336,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_014441545.1",
-    "vEuPathDbProject": "HostDB"
+    "vEuPathDBProject": "HostDB"
   },
   {
     "chromosomes": 12,
@@ -7173,7 +7173,7 @@
     "strain": "HN6",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_014607475.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -7186,7 +7186,7 @@
     "strain": "T1",
     "supercontigs": 1391,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_014805555.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -7199,7 +7199,7 @@
     "strain": "IAEA 2018",
     "supercontigs": 7986,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_014805625.2",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -7212,7 +7212,7 @@
     "strain": "Dv6",
     "supercontigs": 7783,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_014805705.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 37,
@@ -7225,7 +7225,7 @@
     "strain": "strain Ty",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_014843625.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -7238,7 +7238,7 @@
     "strain": "strain ME49xCTG F1 S27",
     "supercontigs": 48,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_014898695.1",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 43,
@@ -7251,7 +7251,7 @@
     "strain": "Brazil A4",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_015033625.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 40,
@@ -7264,7 +7264,7 @@
     "strain": "Y C6",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_015033655.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 22,
@@ -7277,7 +7277,7 @@
     "strain": "BN/NHsdMcwi",
     "supercontigs": 153,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_015227675.2",
-    "vEuPathDbProject": "HostDB"
+    "vEuPathDBProject": "HostDB"
   },
   {
     "chromosomes": 8,
@@ -7290,7 +7290,7 @@
     "strain": "IOWA-ATCC",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_015245375.1",
-    "vEuPathDbProject": "CryptoDB"
+    "vEuPathDBProject": "CryptoDB"
   },
   {
     "chromosomes": 3,
@@ -7303,7 +7303,7 @@
     "strain": "JHB 2020",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_015732765.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -7316,7 +7316,7 @@
     "strain": "Ou3-Ou53",
     "supercontigs": 1754,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_015832245.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 13,
@@ -7329,7 +7329,7 @@
     "strain": "Liverpool 2019",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_016097395.1",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -7342,7 +7342,7 @@
     "strain": "Ou19",
     "supercontigs": 1033,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_016255985.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -7355,7 +7355,7 @@
     "strain": "Ou54",
     "supercontigs": 11522,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_016256075.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -7368,7 +7368,7 @@
     "strain": "LT1534",
     "supercontigs": 782,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_016618375.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -7381,7 +7381,7 @@
     "strain": "#326",
     "supercontigs": 31,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_016772295.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 23,
@@ -7394,7 +7394,7 @@
     "strain": "SN15",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_016801405.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -7407,7 +7407,7 @@
     "strain": "CPMC6",
     "supercontigs": 99,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_016906325.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 17,
@@ -7420,7 +7420,7 @@
     "strain": "2A",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_017301755.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 7,
@@ -7433,7 +7433,7 @@
     "strain": "WU24",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_017310585.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 6,
@@ -7446,7 +7446,7 @@
     "strain": "H88",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_017310615.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -7459,7 +7459,7 @@
     "strain": "CS1",
     "supercontigs": 38,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_017311285.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 6,
@@ -7472,7 +7472,7 @@
     "strain": "G186AR",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_017355575.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -7485,7 +7485,7 @@
     "strain": "G217B",
     "supercontigs": 11,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_017607445.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -7498,7 +7498,7 @@
     "strain": "G184AR",
     "supercontigs": 11,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_017607465.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -7511,7 +7511,7 @@
     "strain": "BP57",
     "supercontigs": 9,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_017655625.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -7524,7 +7524,7 @@
     "strain": "CanA",
     "supercontigs": 33,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_017788925.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 36,
@@ -7537,7 +7537,7 @@
     "strain": "MCAV/BR/2001/CUR178",
     "supercontigs": 18,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_017916305.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 36,
@@ -7550,7 +7550,7 @@
     "strain": "MHOM/TH/2012/LSCM1",
     "supercontigs": 6,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_017916325.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 36,
@@ -7563,7 +7563,7 @@
     "strain": "MHOM/TH/2014/LSCM4",
     "supercontigs": 62,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_017916335.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 36,
@@ -7576,7 +7576,7 @@
     "strain": "MHOM/GH/2012/GH5",
     "supercontigs": 80,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_017918215.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 36,
@@ -7589,7 +7589,7 @@
     "strain": "MPRO/NA/1975/252/LV425",
     "supercontigs": 31,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_017918225.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 36,
@@ -7602,7 +7602,7 @@
     "strain": "MCOE/PA/1965/C119",
     "supercontigs": 38,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_017918235.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 16,
@@ -7615,7 +7615,7 @@
     "strain": "P2C",
     "supercontigs": 3,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_018127085.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -7628,7 +7628,7 @@
     "strain": "Swiss",
     "supercontigs": 32,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_018342045.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -7641,7 +7641,7 @@
     "strain": "strain 1802A",
     "supercontigs": 79,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_018398725.1",
-    "vEuPathDbProject": "PiroplasmaDB"
+    "vEuPathDBProject": "PiroplasmaDB"
   },
   {
     "chromosomes": 0,
@@ -7654,7 +7654,7 @@
     "strain": "CCMP2878",
     "supercontigs": 5963,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_018398765.1",
-    "vEuPathDbProject": "CryptoDB"
+    "vEuPathDBProject": "CryptoDB"
   },
   {
     "chromosomes": 8,
@@ -7667,7 +7667,7 @@
     "strain": "strain Silveira 2022",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_018416015.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -7680,7 +7680,7 @@
     "strain": "DS4-868",
     "supercontigs": 1177,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_018466815.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -7693,7 +7693,7 @@
     "strain": "GKB4",
     "supercontigs": 133,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_018691715.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -7706,7 +7706,7 @@
     "strain": "KU48",
     "supercontigs": 1168,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_019059535.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 11,
@@ -7719,7 +7719,7 @@
     "strain": "EATRO1125",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_019096175.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 8,
@@ -7732,7 +7732,7 @@
     "strain": "2022",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_019844115.2",
-    "vEuPathDbProject": "CryptoDB"
+    "vEuPathDBProject": "CryptoDB"
   },
   {
     "chromosomes": 0,
@@ -7745,7 +7745,7 @@
     "strain": "A",
     "supercontigs": 787,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_019968955.1",
-    "vEuPathDbProject": "CryptoDB"
+    "vEuPathDBProject": "CryptoDB"
   },
   {
     "chromosomes": 0,
@@ -7758,7 +7758,7 @@
     "strain": "2922-C6/04-290x",
     "supercontigs": 281,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_020184695.1",
-    "vEuPathDbProject": "TrichDB"
+    "vEuPathDBProject": "TrichDB"
   },
   {
     "chromosomes": 0,
@@ -7771,7 +7771,7 @@
     "strain": "2922-C6/04-10x",
     "supercontigs": 187,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_020186115.1",
-    "vEuPathDbProject": "TrichDB"
+    "vEuPathDBProject": "TrichDB"
   },
   {
     "chromosomes": 0,
@@ -7784,7 +7784,7 @@
     "strain": "KU50",
     "supercontigs": 1063,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_020283535.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -7797,7 +7797,7 @@
     "strain": "strain Winnie",
     "supercontigs": 358,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_020283715.1",
-    "vEuPathDbProject": "PiroplasmaDB"
+    "vEuPathDBProject": "PiroplasmaDB"
   },
   {
     "chromosomes": 13,
@@ -7810,7 +7810,7 @@
     "strain": "BG3993",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_020450195.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -7823,7 +7823,7 @@
     "strain": "B08-376",
     "supercontigs": 545,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_020509355.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 33,
@@ -7836,7 +7836,7 @@
     "strain": "DAOM 181602=DAOM 197198",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_020716725.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 33,
@@ -7849,7 +7849,7 @@
     "strain": "C2",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_020716745.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -7862,7 +7862,7 @@
     "strain": "strain Pr102",
     "supercontigs": 28,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_020800215.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -7875,7 +7875,7 @@
     "strain": "14567",
     "supercontigs": 27,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_020800235.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 14,
@@ -7888,7 +7888,7 @@
     "strain": "yoelii 17XNL 2023",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_020844765.3",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 0,
@@ -7901,7 +7901,7 @@
     "strain": "C3",
     "supercontigs": 174,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_021020595.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -7914,7 +7914,7 @@
     "strain": "str. Neff 2021",
     "supercontigs": 111,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_021020605.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -7927,7 +7927,7 @@
     "strain": "MF1",
     "supercontigs": 7789,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_021527665.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -7940,7 +7940,7 @@
     "strain": "JUm2507",
     "supercontigs": 111,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_021653875.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -7953,7 +7953,7 @@
     "strain": "Aag2",
     "supercontigs": 3752,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_021653915.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -7966,7 +7966,7 @@
     "strain": "FI-F-10",
     "supercontigs": 22,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_021821965.1",
-    "vEuPathDbProject": "MicrosporidiaDB"
+    "vEuPathDBProject": "MicrosporidiaDB"
   },
   {
     "chromosomes": 0,
@@ -7979,7 +7979,7 @@
     "strain": "St. Kilda",
     "supercontigs": 64,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_022059095.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -7992,7 +7992,7 @@
     "strain": "CBS 124340",
     "supercontigs": 89,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_022385695.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -8005,7 +8005,7 @@
     "strain": "NL_76_15_250",
     "supercontigs": 199,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_022530875.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -8018,7 +8018,7 @@
     "strain": "DRCT72020",
     "supercontigs": 12702,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_022627015.2",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 14,
@@ -8031,7 +8031,7 @@
     "strain": "strain:VNII",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_022832995.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -8044,7 +8044,7 @@
     "strain": "isolate CIA",
     "supercontigs": 93,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_022985015.1",
-    "vEuPathDbProject": "GiardiaDB"
+    "vEuPathDBProject": "GiardiaDB"
   },
   {
     "chromosomes": 0,
@@ -8057,7 +8057,7 @@
     "strain": "isolate DID",
     "supercontigs": 260,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_022985025.1",
-    "vEuPathDbProject": "GiardiaDB"
+    "vEuPathDBProject": "GiardiaDB"
   },
   {
     "chromosomes": 0,
@@ -8070,7 +8070,7 @@
     "strain": "qqDerAnde1.1",
     "supercontigs": 8198,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_023375915.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 8,
@@ -8083,7 +8083,7 @@
     "strain": "yc1106",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_023920165.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -8096,7 +8096,7 @@
     "strain": "SK-2019",
     "supercontigs": 125877,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_023969395.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 14,
@@ -8109,7 +8109,7 @@
     "strain": "strain Bolivian I",
     "supercontigs": 29,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_023973825.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 0,
@@ -8122,7 +8122,7 @@
     "strain": "CBS 100304",
     "supercontigs": 260,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_024516155.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -8135,7 +8135,7 @@
     "strain": "strain WA1",
     "supercontigs": 7,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_024586265.1",
-    "vEuPathDbProject": "PiroplasmaDB"
+    "vEuPathDBProject": "PiroplasmaDB"
   },
   {
     "chromosomes": 0,
@@ -8148,7 +8148,7 @@
     "strain": "USDA-D6B2",
     "supercontigs": 7,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_024862765.1",
-    "vEuPathDbProject": "PiroplasmaDB"
+    "vEuPathDBProject": "PiroplasmaDB"
   },
   {
     "chromosomes": 34,
@@ -8161,7 +8161,7 @@
     "strain": "strain PH8",
     "supercontigs": 42,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_025688915.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 6,
@@ -8174,7 +8174,7 @@
     "strain": "G3 2022",
     "supercontigs": 212,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_026262505.1",
-    "vEuPathDbProject": "TrichDB"
+    "vEuPathDBProject": "TrichDB"
   },
   {
     "chromosomes": 0,
@@ -8187,7 +8187,7 @@
     "strain": "SK_2022b",
     "supercontigs": 1790,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_027943245.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -8200,7 +8200,7 @@
     "strain": "SK_2022a",
     "supercontigs": 2108,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_027943295.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -8213,7 +8213,7 @@
     "strain": "SK_2022c",
     "supercontigs": 20778,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_027944975.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -8226,7 +8226,7 @@
     "strain": "P57",
     "supercontigs": 77,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_028554745.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 5,
@@ -8239,7 +8239,7 @@
     "strain": "strain WA1 2023",
     "supercontigs": 160,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_028658345.1",
-    "vEuPathDbProject": "PiroplasmaDB"
+    "vEuPathDBProject": "PiroplasmaDB"
   },
   {
     "chromosomes": 14,
@@ -8252,7 +8252,7 @@
     "strain": "chabaudi",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_900002335.3",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8265,7 +8265,7 @@
     "strain": "ANKA",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_900002375.2",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8278,7 +8278,7 @@
     "strain": "yoelii 17X",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_900002385.2",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8291,7 +8291,7 @@
     "strain": "yoelii YM",
     "supercontigs": 181,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900002395.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8304,7 +8304,7 @@
     "strain": "SGS1-like",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_900005765.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 0,
@@ -8317,7 +8317,7 @@
     "strain": "8A",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_900005855.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 0,
@@ -8330,7 +8330,7 @@
     "strain": "strain NRRL62905",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900029915.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -8343,7 +8343,7 @@
     "strain": "MRC7560",
     "supercontigs": 254,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_900044065.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 4,
@@ -8356,7 +8356,7 @@
     "strain": "PH-1",
     "supercontigs": 1,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900044135.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -8369,7 +8369,7 @@
     "strain": "ET1",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_900067095.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 12,
@@ -8382,7 +8382,7 @@
     "strain": "IMI 58289",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_900079805.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 14,
@@ -8395,7 +8395,7 @@
     "strain": "wallikeri PowCR01",
     "supercontigs": 763,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900090025.2",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8408,7 +8408,7 @@
     "strain": "curtisi GH01",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900090035.2",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8421,7 +8421,7 @@
     "strain": "UG01",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_900090045.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8434,7 +8434,7 @@
     "strain": "P01",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900093555.2",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8447,7 +8447,7 @@
     "strain": "strain G01",
     "supercontigs": 39,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900095595.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8460,7 +8460,7 @@
     "strain": "G01",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_900097015.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8473,7 +8473,7 @@
     "strain": "G01",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900097025.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8486,7 +8486,7 @@
     "strain": "G01",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900097035.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8499,7 +8499,7 @@
     "strain": "strain G01",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900097045.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 0,
@@ -8512,7 +8512,7 @@
     "strain": "strain UTAD222",
     "supercontigs": 208,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900119595.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 8,
@@ -8525,7 +8525,7 @@
     "strain": "ATCC 42132",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900149145.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 14,
@@ -8538,7 +8538,7 @@
     "strain": "strain A1H1",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900162085.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8551,7 +8551,7 @@
     "strain": "strain M",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900180395.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 21,
@@ -8564,7 +8564,7 @@
     "strain": "ST99CH_3D1",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900184105.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -8577,7 +8577,7 @@
     "strain": "strain NIH4 ATCC 30207",
     "supercontigs": 4161,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900231805.1",
-    "vEuPathDbProject": "TrichDB"
+    "vEuPathDBProject": "TrichDB"
   },
   {
     "chromosomes": 0,
@@ -8590,7 +8590,7 @@
     "strain": "strain RACE1",
     "supercontigs": 99,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900237765.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -8603,7 +8603,7 @@
     "strain": "strain N402 (ATCC64974)",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900248155.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -8616,7 +8616,7 @@
     "strain": "strain 231",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900252365.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 14,
@@ -8629,7 +8629,7 @@
     "strain": "G01",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900257145.2",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 7,
@@ -8642,7 +8642,7 @@
     "strain": "strain T mat+",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900290415.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -8655,7 +8655,7 @@
     "strain": "UTAD17",
     "supercontigs": 1360,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900491785.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 44,
@@ -8668,7 +8668,7 @@
     "strain": "Lister strain 427 2018",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900497135.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 36,
@@ -8681,7 +8681,7 @@
     "strain": "JPCM5",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900500625.2",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 12,
@@ -8694,7 +8694,7 @@
     "strain": "f. sp. tritici 96224",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900519115.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 14,
@@ -8707,7 +8707,7 @@
     "strain": "CD01",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900617135.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8720,7 +8720,7 @@
     "strain": "KE01",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900631975.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8733,7 +8733,7 @@
     "strain": "HB3",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900631985.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8746,7 +8746,7 @@
     "strain": "GN01",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900631995.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8759,7 +8759,7 @@
     "strain": "GA01",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900632005.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8772,7 +8772,7 @@
     "strain": "KH02",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900632015.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8785,7 +8785,7 @@
     "strain": "KH01",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900632025.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8798,7 +8798,7 @@
     "strain": "GB4",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900632035.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8811,7 +8811,7 @@
     "strain": "Dd2",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900632045.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8824,7 +8824,7 @@
     "strain": "IT",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900632055.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8837,7 +8837,7 @@
     "strain": "TG01",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900632065.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8850,7 +8850,7 @@
     "strain": "SN01",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900632075.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8863,7 +8863,7 @@
     "strain": "ML01",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900632085.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 13,
@@ -8876,7 +8876,7 @@
     "strain": "SD01",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900632095.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 36,
@@ -8889,7 +8889,7 @@
     "strain": "HU3",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900635355.2",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 14,
@@ -8902,7 +8902,7 @@
     "strain": "vinckei CY",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_900681995.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 0,
@@ -8915,7 +8915,7 @@
     "strain": "2019",
     "supercontigs": 2439,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_902459845.2",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 0,
@@ -8928,7 +8928,7 @@
     "strain": "ATCC 30984",
     "supercontigs": 1925,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_902651635.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 14,
@@ -8941,7 +8941,7 @@
     "strain": "brucechwatti DA",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_903994205.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8954,7 +8954,7 @@
     "strain": "lentum DE",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_903994225.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8967,7 +8967,7 @@
     "strain": "petteri CR 2020",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_903994235.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 14,
@@ -8980,7 +8980,7 @@
     "strain": "Cameroon EL",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_903994265.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 29,
@@ -8993,7 +8993,7 @@
     "strain": "strain Cavalho ATCC PRA-265",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_903995115.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 11,
@@ -9006,7 +9006,7 @@
     "strain": "f. sp. triticale THUN-12",
     "supercontigs": 25,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_905067625.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 15,
@@ -9019,7 +9019,7 @@
     "strain": "Houghton 2021",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_905310635.1",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -9032,7 +9032,7 @@
     "strain": "PvW1",
     "supercontigs": 19,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_914969965.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 36,
@@ -9045,7 +9045,7 @@
     "strain": "Friedlin 2021",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_916722125.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -9058,7 +9058,7 @@
     "strain": "Rahman",
     "supercontigs": 18523,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_917563895.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 13,
@@ -9071,7 +9071,7 @@
     "strain": "strain STIB 805",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_917563935.1",
-    "vEuPathDbProject": "TriTrypDB"
+    "vEuPathDBProject": "TriTrypDB"
   },
   {
     "chromosomes": 0,
@@ -9084,7 +9084,7 @@
     "strain": "PAM",
     "supercontigs": 28,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_949152365.1",
-    "vEuPathDbProject": "PlasmoDB"
+    "vEuPathDBProject": "PlasmoDB"
   },
   {
     "chromosomes": 7,
@@ -9097,7 +9097,7 @@
     "strain": "AX4",
     "supercontigs": 33,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000004695.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -9110,7 +9110,7 @@
     "strain": "RN66",
     "supercontigs": 84,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000006515.1",
-    "vEuPathDbProject": "CryptoDB"
+    "vEuPathDBProject": "CryptoDB"
   },
   {
     "chromosomes": 14,
@@ -9123,7 +9123,7 @@
     "strain": "ME49",
     "supercontigs": 2248,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000006565.2",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -9136,7 +9136,7 @@
     "strain": "k-hell",
     "supercontigs": 1212,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000182805.3",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -9149,7 +9149,7 @@
     "strain": "QSDP1",
     "supercontigs": 799,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000190715.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -9162,7 +9162,7 @@
     "strain": "P19",
     "supercontigs": 5233,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000257125.1",
-    "vEuPathDbProject": "AmoebaDB"
+    "vEuPathDBProject": "AmoebaDB"
   },
   {
     "chromosomes": 0,
@@ -9175,7 +9175,7 @@
     "strain": "Pd1",
     "supercontigs": 53,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000315645.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 21,
@@ -9188,7 +9188,7 @@
     "strain": "REF",
     "supercontigs": 7579,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000364345.1",
-    "vEuPathDbProject": "HostDB"
+    "vEuPathDBProject": "HostDB"
   },
   {
     "chromosomes": 0,
@@ -9201,7 +9201,7 @@
     "strain": "CBS 131958",
     "supercontigs": 131,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001299255.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 8,
@@ -9214,7 +9214,7 @@
     "strain": "DMKU3-1042",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001417885.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -9227,7 +9227,7 @@
     "strain": "B80",
     "supercontigs": 62,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001477545.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -9240,7 +9240,7 @@
     "strain": "C6/36 cell line",
     "supercontigs": 2434,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001876365.2",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -9253,7 +9253,7 @@
     "strain": "isolate NF1_C8",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002999335.1",
-    "vEuPathDbProject": "ToxoDB"
+    "vEuPathDBProject": "ToxoDB"
   },
   {
     "chromosomes": 0,
@@ -9266,7 +9266,7 @@
     "strain": "CBS 101075",
     "supercontigs": 86,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_004022145.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 3,
@@ -9279,7 +9279,7 @@
     "strain": "UCISS2018",
     "supercontigs": 491,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_013141755.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 11,
@@ -9292,7 +9292,7 @@
     "strain": "Rsan-2018",
     "supercontigs": 2316,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_013339695.2",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 3,
@@ -9305,7 +9305,7 @@
     "strain": "STECLA 2020",
     "supercontigs": 4,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_013758885.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -9318,7 +9318,7 @@
     "strain": "mMyoMyo1",
     "supercontigs": 92,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_014108235.1",
-    "vEuPathDbProject": "HostDB"
+    "vEuPathDBProject": "HostDB"
   },
   {
     "chromosomes": 0,
@@ -9331,7 +9331,7 @@
     "strain": "PC9",
     "supercontigs": 16,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_014466165.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 41,
@@ -9344,7 +9344,7 @@
     "strain": "isolate bGalGal1",
     "supercontigs": 172,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_016699485.2",
-    "vEuPathDbProject": "HostDB"
+    "vEuPathDBProject": "HostDB"
   },
   {
     "chromosomes": 3,
@@ -9357,7 +9357,7 @@
     "strain": "MOPTI",
     "supercontigs": 196,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_016920705.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 3,
@@ -9370,7 +9370,7 @@
     "strain": "DONGOLA 2021",
     "supercontigs": 98,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_016920715.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -9383,7 +9383,7 @@
     "strain": "PalLabHiFi",
     "supercontigs": 648,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_016920785.2",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 5,
@@ -9396,7 +9396,7 @@
     "strain": "MAF 2021",
     "supercontigs": 1322,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_017562075.2",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -9409,7 +9409,7 @@
     "strain": "FSSC 5 MPI-SDFR-AT-0091",
     "supercontigs": 74,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_020744495.1",
-    "vEuPathDbProject": "FungiDB"
+    "vEuPathDBProject": "FungiDB"
   },
   {
     "chromosomes": 0,
@@ -9422,7 +9422,7 @@
     "strain": "qqDerAnde1.2",
     "supercontigs": 3118,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_023375885.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 4,
@@ -9435,7 +9435,7 @@
     "strain": "M1",
     "supercontigs": 0,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_024334085.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 5,
@@ -9448,7 +9448,7 @@
     "strain": "M1",
     "supercontigs": 640,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_024763615.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -9461,7 +9461,7 @@
     "strain": "aabys 2023",
     "supercontigs": 339,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_030504385.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 3,
@@ -9474,7 +9474,7 @@
     "strain": "AcruBR1",
     "supercontigs": 5085,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_943734635.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 3,
@@ -9487,7 +9487,7 @@
     "strain": "ScyaPA1",
     "supercontigs": 5,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_943734655.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 4,
@@ -9500,7 +9500,7 @@
     "strain": "AaquGF1",
     "supercontigs": 86,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_943734665.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 3,
@@ -9513,7 +9513,7 @@
     "strain": "AcolN3",
     "supercontigs": 125,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_943734685.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 3,
@@ -9526,7 +9526,7 @@
     "strain": "AmacGA1",
     "supercontigs": 167,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_943734695.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 3,
@@ -9539,7 +9539,7 @@
     "strain": "AcouGA1",
     "supercontigs": 416,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_943734705.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 3,
@@ -9552,7 +9552,7 @@
     "strain": "AmarGA1",
     "supercontigs": 285,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_943734725.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 3,
@@ -9565,7 +9565,7 @@
     "strain": "Ifakara",
     "supercontigs": 187,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_943734735.2",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 3,
@@ -9578,7 +9578,7 @@
     "strain": "AdarGF1",
     "supercontigs": 62,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_943734745.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 3,
@@ -9591,7 +9591,7 @@
     "strain": "AmouCM1",
     "supercontigs": 342,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_943734755.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 3,
@@ -9604,7 +9604,7 @@
     "strain": "AzieGA1",
     "supercontigs": 416,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_943734765.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 3,
@@ -9617,7 +9617,7 @@
     "strain": "AfunGA1",
     "supercontigs": 326,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_943734845.2",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 3,
@@ -9630,7 +9630,7 @@
     "strain": "AbelBR1",
     "supercontigs": 2982,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_943735745.2",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 3,
@@ -9643,7 +9643,7 @@
     "strain": "AnilCM1",
     "supercontigs": 153,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_943737925.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 0,
@@ -9656,7 +9656,7 @@
     "strain": "India",
     "supercontigs": 64,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_947086385.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   },
   {
     "chromosomes": 18,
@@ -9669,6 +9669,6 @@
     "strain": "XG47",
     "supercontigs": 25,
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_947242115.1",
-    "vEuPathDbProject": "VectorBase"
+    "vEuPathDBProject": "VectorBase"
   }
 ]

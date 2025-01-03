@@ -156,7 +156,7 @@ export const buildGenomeDetails = (
       value: genome.genomeVersionAssemblyId,
     })
   );
-  keyValuePairs.set("VeUPathDB Project", genome.vEuPathDbProject);
+  keyValuePairs.set("VEuPathDB Project", genome.vEuPathDBProject);
   keyValuePairs.set("Contigs", genome.contigs);
   keyValuePairs.set("Super Contigs", genome.supercontigs);
   keyValuePairs.set("Chromosomes", genome.chromosomes);
@@ -225,11 +225,11 @@ export const buildSupercontigs = (
  * @param genome - Genome entity.
  * @returns Props to be used for the cell.
  */
-export const buildVEuPathDbProject = (
+export const buildVEuPathDBProject = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: genome.vEuPathDbProject,
+    value: genome.vEuPathDBProject,
   };
 };
 
