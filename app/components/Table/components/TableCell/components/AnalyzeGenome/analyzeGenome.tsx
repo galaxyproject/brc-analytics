@@ -24,7 +24,7 @@ export const AnalyzeGenome = ({
       >
         {analyze.label}
       </Button>
-      <DropdownMenu {...MENU_PROPS} Button={renderButton}>
+      <DropdownMenu {...MENU_PROPS} button={renderButton}>
         {({ closeMenu }): JSX.Element[] =>
           views.map((view, i) => (
             <MenuItem
