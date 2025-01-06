@@ -9,7 +9,7 @@ export const RoadmapView = (): JSX.Element => {
       <SectionHero
         breadcrumbs={BREADCRUMBS}
         head="Roadmap"
-        subHead="BRC Analytics plans to deliver new powerful analysis functionality while provide access to some features of the VEuPathDb system. This will be an iterative process involving multiple steps in several areas."
+        subHead="BRC Analytics plans to deliver new powerful analysis functionality while provide access to some features of the VEuPathDB system. This will be an iterative process involving multiple steps in several areas."
       />
       <SectionRoadmap />
     </Fragment>
