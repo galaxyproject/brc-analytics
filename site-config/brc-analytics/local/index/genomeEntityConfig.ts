@@ -75,7 +75,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
           component: C.AnalyzeGenome,
           viewBuilder: V.buildAnalyzeGenome,
         } as ComponentConfig<typeof C.AnalyzeGenome, BRCDataCatalogGenome>,
-        disableSorting: true,
+        enableSorting: false,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANALYZE_GENOME,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.ANALYZE_GENOME,
         width: "auto",
@@ -145,9 +145,15 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         width: { max: "0.5fr", min: "142px" },
       },
     ],
-    defaultSort: {
-      desc: SORT_DIRECTION.ASCENDING,
-      id: BRC_DATA_CATALOG_CATEGORY_KEY.SPECIES,
+    tableOptions: {
+      initialState: {
+        sorting: [
+          {
+            desc: SORT_DIRECTION.ASCENDING,
+            id: BRC_DATA_CATALOG_CATEGORY_KEY.SPECIES,
+          },
+        ],
+      },
     },
   } as ListConfig<BRCDataCatalogGenome>,
   listView: {
