@@ -147,6 +147,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
     ],
     tableOptions: {
       initialState: {
+        columnVisibility: {},
         sorting: [
           {
             desc: SORT_DIRECTION.ASCENDING,
