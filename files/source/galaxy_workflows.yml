@@ -1,0 +1,15 @@
+workflows:
+  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v0.9"
+    type: "REGULATION"
+    description: "Workflows for the analysis of ChIP-seq, ATAC-Seq, and beyond."
+    ploidy: "any"
+
+  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.12"
+    type: "TRANSCRIPTOMICS"
+    description: "Analyze bulk or single-cell RNA seq data using a variety of approaches."
+    ploidy: "any"
+
+  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/haploid-variant-calling-wgs-pe/main/versions/v0.1"
+    type: "VARIANT_CALLING"
+    description: "Identify nucleotide polymorphisms and short indels from Illumina and Element data."
+    ploidy: "haploid"
