@@ -1,0 +1,7 @@
+outbreaks:
+  - tax_id: 2697049
+    name: "SARS-CoV-2"
+    description: "Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) is the virus responsible for the COVID-19 pandemic."
+  - tax_id: 10244
+    name: "Mpoxvirus"
+    description: "Monkeypox virus is a member of the Orthopoxvirus genus in the family Poxviridae."
