@@ -1,7 +1,28 @@
 outbreaks:
-  - tax_id: 2697049
-    name: "SARS-CoV-2"
-    description: "Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) is the virus responsible for the COVID-19 pandemic."
-  - tax_id: 10244
-    name: "Mpoxvirus"
-    description: "Monkeypox virus is a member of the Orthopoxvirus genus in the family Poxviridae."
+  - outbreak:
+      tax_id: 2697049
+      resources:
+        - resource:
+            title: "Coronavirus: Update Related to the Current Outbreak of COVID-19"
+            url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC7139198/"
+        - resource:
+            title: "COVID-19 Pandemic: A Review of the Global Response"
+            url: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7162758/"
+        - resource:
+            title: "The Impact of COVID-19 on Public Health"
+            url: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7275854/"
+        - resource:
+            title: "COVID-19: Epidemiology, Virology, and Clinical Features"
+            url: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7159299/"
+  - outbreak:
+      tax_id: 10244
+      resources:
+        - resource:
+            title: "Mpox Virus: Understanding the Outbreak"
+            url: "https://example.com/mpox-outbreak"
+        - resource:
+            title: "Mpox Virus: Symptoms and Treatment"
+            url: "https://example.com/mpox-symptoms-treatment"
+        - resource:
+            title: "Global Response to the Mpox Outbreak"
+            url: "https://example.com/global-response-mpox"
