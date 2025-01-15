@@ -32,7 +32,7 @@ export const SectionHero = (): JSX.Element => {
                   annotations and functional insights into disease-causing
                   organisms and their carriers
                 </Subhead>
-                <Button {...BUTTON_PROPS} href={ROUTES.GENOMES}>
+                <Button {...BUTTON_PROPS} href={ROUTES.ORGANISMS}>
                   Get started
                 </Button>
               </SubHeadline>
