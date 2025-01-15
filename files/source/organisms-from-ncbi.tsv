@@ -1,18 +1,18 @@
 taxon	taxonomyId	assemblyCount	CustomTags
-Anopheles gambiae	7165	7	VEuPathDB
+Anopheles gambiae	7165	7	VEuPathDb
 Coccidioides immitis	5501	5	
 Coccidioides posadasii	199306	13	
-Culex pipiens	7175	5	VEuPathDB
-Leishmania braziliensis	5660	11	VEuPathDB
-Leishmania donovani	5661	12	VEuPathDB
-Leishmania major	5664	7	VEuPathDB
+Culex pipiens	7175	5	VEuPathDb
+Leishmania braziliensis	5660	11	VEuPathDb
+Leishmania donovani	5661	12	VEuPathDb
+Leishmania major	5664	7	VEuPathDb
 Monkeypox virus	10244	6911	Virus
 Mycobacterium tuberculosis	1773	7823	Bact
-Plasmodium falciparum	5833	67	VEuPathDB
-Plasmodium vinckei	5860	10	VEuPathDB
-Plasmodium vivax	5855	19	VEuPathDB
-Plasmodium yoelii	5861	15	VEuPathDB
+Plasmodium falciparum	5833	67	VEuPathDb
+Plasmodium vinckei	5860	10	VEuPathDb
+Plasmodium vivax	5855	19	VEuPathDb
+Plasmodium yoelii	5861	15	VEuPathDb
 Severe acute respiratory syndrome coronavirus 2	2697049	92	Virus
-Toxoplasma gondii	5811	29	VEuPathDB
-Trypanosoma brucei	5691	5	VEuPathDB
-Trypanosoma cruzi	5693	45	VEuPathDB
+Toxoplasma gondii	5811	29	VEuPathDb
+Trypanosoma brucei	5691	5	VEuPathDb
+Trypanosoma cruzi	5693	45	VEuPathDb

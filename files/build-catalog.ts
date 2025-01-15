@@ -30,7 +30,7 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
       strain: row.Strain,
       supercontigs: parseNumber(row.Supercontigs),
       ucscBrowserUrl: row.ucscBrowser,
-      vEuPathDBProject: row["VEuPathDB Project"],
+      vEuPathDbProject: row["VEuPathDB Project"],
     })
   );
   return mappedRows.sort((a, b) =>

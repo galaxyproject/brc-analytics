@@ -20,7 +20,7 @@ export interface BRCDataCatalogGenome {
   strain: string;
   supercontigs: number;
   ucscBrowserUrl: string;
-  vEuPathDBProject: string;
+  vEuPathDbProject: string;
 }
 
 export interface EntitiesResponse<R> {
