@@ -36,6 +36,7 @@ async function buildOrganisms(): Promise<BRCDataCatalogOrganism[]> {
   const mappedRows = sourceRows.map((row): BRCDataCatalogOrganism => {
     return {
       assemblyCount: parseNumber(row.assemblyCount),
+      genomes: [],
       ncbiTaxonomyId: row.taxonomyId,
       tags: row.CustomTags ? [row.CustomTags] : [],
       taxon: row.taxon,
@@ -51,7 +52,8 @@ async function buildGenomes(
 ): Promise<BRCDataCatalogGenome[]> {
   const sourceRows = await readValuesFile<SourceGenome>(SOURCE_PATH_GENOMES);
   const mappedRows = sourceRows.map((row): BRCDataCatalogGenome => {
-    return {
+    const organism = organismsByTaxon.get(row.taxon);
+    const genome: BRCDataCatalogGenome = {
       accession: row.accession,
       annotationStatus: parseStringOrNull(row.annotationStatus),
       chromosomes: parseNumberOrNull(row.chromosomeCount),
@@ -66,10 +68,12 @@ async function buildGenomes(
       scaffoldL50: parseNumber(row.scaffoldL50),
       scaffoldN50: parseNumber(row.scaffoldN50),
       strain: parseStringOrNull(row.strain),
-      tags: organismsByTaxon.get(row.taxon)?.tags ?? [],
+      tags: organism?.tags ?? [],
       taxon: row.taxon,
       ucscBrowserUrl: parseStringOrNull(row.ucscBrowser),
     };
+    organism?.genomes.push(genome);
+    return genome;
   });
   return mappedRows.sort((a, b) => a.accession.localeCompare(b.accession));
 }
