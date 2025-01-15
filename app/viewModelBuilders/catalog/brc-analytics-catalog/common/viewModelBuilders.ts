@@ -3,8 +3,6 @@ import {
   Key,
   Value,
 } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/keyValuePairs";
-import { LinkProps } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
-import { ViewContext } from "@databiosphere/findable-ui/lib/config/entities";
 import { ComponentProps } from "react";
 import { ROUTES } from "../../../../../routes/constants";
 import {
@@ -13,6 +11,15 @@ import {
 } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "../../../../components";
 import { GENOME_BROWSER, NCBI_DATASETS_URL } from "./constants";
+import { ColumnDef } from "@tanstack/react-table";
+import {
+  BRC_DATA_CATALOG_CATEGORY_KEY,
+  BRC_DATA_CATALOG_CATEGORY_LABEL,
+} from "site-config/brc-analytics/category";
+import {
+  getGenomeId,
+  getOrganismId,
+} from "../../../../apis/catalog/brc-analytics-catalog/common/utils";
 
 /**
  * Build props for the accession cell.
@@ -30,19 +37,16 @@ export const buildAccession = (
 /**
  * Build props for the genome analysis cell.
  * @param genome - Genome entity.
- * @param viewContext - View context.
  * @returns Props to be used for the AnalyzeGenome component.
  */
 export const buildAnalyzeGenome = (
-  genome: BRCDataCatalogGenome,
-  viewContext: ViewContext<BRCDataCatalogGenome>
+  genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.AnalyzeGenome> => {
   const { accession, ncbiTaxonomyId, ucscBrowserUrl } = genome;
-  const rowId = viewContext.cellContext?.row?.id;
   return {
     analyze: {
       label: "Analyze",
-      url: rowId ? `${ROUTES.GENOMES}/${rowId}` : "",
+      url: `${ROUTES.GENOMES}/${encodeURIComponent(getGenomeId(genome))}`,
     },
     views: [
       ...(ucscBrowserUrl
@@ -189,7 +193,7 @@ export const buildOrganismTaxon = (
 ): ComponentProps<typeof C.StyledLink> => {
   return {
     label: organism.taxon,
-    url: getTaxonGenomesUrlObject(organism.taxon),
+    url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getOrganismId(organism))}`,
   };
 };
 
@@ -370,6 +374,123 @@ export const buildGenomeDetails = (
 };
 
 /**
+ * Build props for the organism DetailViewHero component.
+ * @param organism - Organism entity.
+ * @returns Props to be used for the DetailViewHero component.
+ */
+export const buildOrganismAssembliesDetailViewHero = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.DetailViewHero> => {
+  return {
+    breadcrumbs: C.Breadcrumbs({
+      breadcrumbs: getOrganismEntityAssembliesBreadcrumbs(organism),
+    }),
+    title: "Assemblies",
+  };
+};
+
+/**
+ * Build props for the genomes table for the given organism.
+ * @param organism - Organism entity.
+ * @returns props to be used for the table.
+ */
+export function buildOrganismGenomesTable(
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.DetailViewTable<BRCDataCatalogGenome>> {
+  return {
+    columns: buildOrganismGenomesTableColumns(),
+    gridTemplateColumns:
+      "auto auto minmax(240px, 1fr) minmax(180px, 0.5fr) minmax(100px, 0.5fr) minmax(164px, 1fr) minmax(100px, 0.5fr) repeat(2, minmax(142px, 0.5fr)) minmax(120px, 0.5fr) minmax(80px, 0.5fr) minmax(142px, 0.5fr) repeat(3, minmax(80px, 0.5fr)) minmax(142px, 0.5fr)",
+    items: organism.genomes,
+    noResultsTitle: "No Assemblies",
+  };
+}
+
+/**
+ * Build the column definitions for the organism genomes table.
+ * @returns column definitions.
+ */
+function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
+  return [
+    {
+      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.ANALYZE_GENOME,
+      cell: ({ row }) => C.AnalyzeGenome(buildAnalyzeGenome(row.original)),
+      header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANALYZE_GENOME,
+    },
+    {
+      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.TAXON,
+      cell: ({ row }) => C.BasicCell(buildGenomeTaxon(row.original)),
+      header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXON,
+    },
+    {
+      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.STRAIN,
+      cell: ({ row }) => C.BasicCell(buildStrain(row.original)),
+      header: BRC_DATA_CATALOG_CATEGORY_LABEL.STRAIN,
+    },
+    {
+      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMY_ID,
+      cell: ({ row }) => C.BasicCell(buildTaxonomyId(row.original)),
+      header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMY_ID,
+    },
+    {
+      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION,
+      cell: ({ row }) => C.BasicCell(buildAccession(row.original)),
+      header: BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
+    },
+    {
+      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.IS_REF,
+      cell: ({ row }) => C.BasicCell(buildIsRef(row.original)),
+      header: BRC_DATA_CATALOG_CATEGORY_LABEL.IS_REF,
+    },
+    {
+      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.LEVEL,
+      cell: ({ row }) => C.BasicCell(buildLevel(row.original)),
+      header: BRC_DATA_CATALOG_CATEGORY_LABEL.LEVEL,
+    },
+    {
+      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.CHROMOSOMES,
+      cell: ({ row }) => C.BasicCell(buildChromosomes(row.original)),
+      header: BRC_DATA_CATALOG_CATEGORY_LABEL.CHROMOSOMES,
+    },
+    {
+      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.LENGTH,
+      cell: ({ row }) => C.BasicCell(buildLength(row.original)),
+      header: BRC_DATA_CATALOG_CATEGORY_LABEL.LENGTH,
+    },
+    {
+      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_COUNT,
+      cell: ({ row }) => C.BasicCell(buildScaffoldCount(row.original)),
+      header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_COUNT,
+    },
+    {
+      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_N50,
+      cell: ({ row }) => C.BasicCell(buildScaffoldN50(row.original)),
+      header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_N50,
+    },
+    {
+      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_L50,
+      cell: ({ row }) => C.BasicCell(buildScaffoldL50(row.original)),
+      header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_L50,
+    },
+    {
+      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.COVERAGE,
+      cell: ({ row }) => C.BasicCell(buildCoverage(row.original)),
+      header: BRC_DATA_CATALOG_CATEGORY_LABEL.COVERAGE,
+    },
+    {
+      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.GC_PERCENT,
+      cell: ({ row }) => C.BasicCell(buildGcPercent(row.original)),
+      header: BRC_DATA_CATALOG_CATEGORY_LABEL.GC_PERCENT,
+    },
+    {
+      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.ANNOTATION_STATUS,
+      cell: ({ row }) => C.BasicCell(buildAnnotationStatus(row.original)),
+      header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANNOTATION_STATUS,
+    },
+  ];
+}
+
+/**
  * Get the genome entity breadcrumbs.
  * @param genome - Genome entity.
  * @returns Breadcrumbs.
@@ -385,22 +506,16 @@ function getGenomeEntityChooseAnalysisMethodBreadcrumbs(
 }
 
 /**
- * Get URL object for genomes filtered by a given taxon.
- * @param taxon - Taxon.
- * @returns URL object.
+ * Get the organism entity breadcrumbs.
+ * @param organism - Organism entity.
+ * @returns Breadcrumbs.
  */
-function getTaxonGenomesUrlObject(taxon: string): LinkProps["url"] {
-  return {
-    href: ROUTES.GENOMES,
-    query: encodeURIComponent(
-      JSON.stringify({
-        filter: [
-          {
-            categoryKey: "taxon",
-            value: [taxon],
-          },
-        ],
-      })
-    ),
-  };
+function getOrganismEntityAssembliesBreadcrumbs(
+  organism: BRCDataCatalogOrganism
+): Breadcrumb[] {
+  return [
+    { path: ROUTES.ORGANISMS, text: "Organisms" },
+    { path: "", text: `${organism.taxon}` },
+    { path: "", text: "Assemblies" },
+  ];
 }

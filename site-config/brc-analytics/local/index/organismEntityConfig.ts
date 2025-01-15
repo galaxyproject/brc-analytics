@@ -13,6 +13,8 @@ import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
 } from "../../category";
+import { assembliesMainColumn } from "../entity/organism/assembliesMainColumn";
+import { assembliesTop } from "../entity/organism/assembliesTop";
 
 /**
  * Entity config object responsible to config anything related to the /genomes route.
@@ -42,7 +44,14 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
   detail: {
     detailOverviews: [],
     staticLoad: true,
-    tabs: [],
+    tabs: [
+      {
+        label: "Assemblies",
+        mainColumn: assembliesMainColumn,
+        route: "",
+        top: assembliesTop,
+      },
+    ],
   },
   exploreMode: EXPLORE_MODE.CS_FETCH_CS_FILTERING,
   explorerTitle: "Organisms",
