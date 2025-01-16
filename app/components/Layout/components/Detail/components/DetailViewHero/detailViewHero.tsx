@@ -3,7 +3,6 @@ import { SubTitle } from "@databiosphere/findable-ui/lib/components/Layout/compo
 import { TEXT_HEADING } from "@databiosphere/findable-ui/lib/theme/common/typography";
 import { HeroTitle as Typography } from "@databiosphere/findable-ui/src/components/common/Title/title.styles";
 import { ReactNode } from "react";
-import { BackButton } from "./components/BackButton/backButton";
 import {
   DetailViewHeroHeadline,
   DetailViewHero as DetailViewHeroLayout,
@@ -29,7 +28,6 @@ export const DetailViewHero = ({
     <DetailViewHeroLayout>
       {(breadcrumbs || title) && (
         <DetailViewHeroHeadline>
-          <BackButton />
           <HeroHeader>
             {breadcrumbs}
             <HeroTitle>
