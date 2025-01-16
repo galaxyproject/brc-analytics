@@ -76,6 +76,7 @@ export function makeConfig(browserUrl: string, gitHubUrl: string): SiteConfig {
           [
             { label: "About", url: ROUTES.ABOUT },
             { label: "Organisms", url: ROUTES.ORGANISMS },
+            { label: "Assemblies", url: ROUTES.GENOMES },
             { label: "Roadmap", url: ROUTES.ROADMAP },
           ],
           undefined,
