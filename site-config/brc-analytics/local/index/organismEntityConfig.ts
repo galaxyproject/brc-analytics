@@ -83,9 +83,16 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
         width: { max: "0.5fr", min: "164px" },
       },
     ],
-    defaultSort: {
-      desc: SORT_DIRECTION.ASCENDING,
-      id: BRC_DATA_CATALOG_CATEGORY_KEY.SPECIES,
+    tableOptions: {
+      initialState: {
+        columnVisibility: {},
+        sorting: [
+          {
+            desc: SORT_DIRECTION.ASCENDING,
+            id: BRC_DATA_CATALOG_CATEGORY_KEY.SPECIES,
+          },
+        ],
+      },
     },
   } as ListConfig<BRCDataCatalogOrganism>,
   listView: {
