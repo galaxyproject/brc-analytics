@@ -185,6 +185,20 @@ export const buildLevel = (
 };
 
 /**
+ * Build props for the assembly taxonomy IDs cell.
+ * @param organism - Organism entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildOrganismAssemblyTaxonomyIds = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.NTagCell> => {
+  return {
+    label: "taxonomy IDs",
+    values: organism.assemblyTaxonomyIds,
+  };
+};
+
+/**
  * Build props for the taxon cell.
  * @param organism - Organism entity.
  * @returns Props to be used for the cell.

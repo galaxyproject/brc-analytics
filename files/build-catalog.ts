@@ -71,6 +71,9 @@ function buildOrganism(
 ): BRCDataCatalogOrganism {
   return {
     assemblyCount: (organism?.assemblyCount ?? 0) + 1,
+    assemblyTaxonomyIds: Array.from(
+      new Set([...(organism?.assemblyTaxonomyIds ?? []), genome.ncbiTaxonomyId])
+    ),
     genomes: [...(organism?.genomes ?? []), genome],
     ncbiTaxonomyId: genome.speciesTaxonomyId,
     species: genome.species,

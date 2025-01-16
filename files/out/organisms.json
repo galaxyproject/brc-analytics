@@ -1,6 +1,9 @@
 [
   {
     "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "10244"
+    ],
     "genomes": [
       {
         "accession": "GCF_000857045.1",
@@ -35,6 +38,9 @@
   },
   {
     "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "83332"
+    ],
     "genomes": [
       {
         "accession": "GCF_000195955.2",
@@ -69,6 +75,9 @@
   },
   {
     "assemblyCount": 2,
+    "assemblyTaxonomyIds": [
+      "443226"
+    ],
     "genomes": [
       {
         "accession": "GCA_000170175.2",
@@ -124,6 +133,10 @@
   },
   {
     "assemblyCount": 2,
+    "assemblyTaxonomyIds": [
+      "235443",
+      "214684"
+    ],
     "genomes": [
       {
         "accession": "GCA_000149245.3",
@@ -179,6 +192,9 @@
   },
   {
     "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "237561"
+    ],
     "genomes": [
       {
         "accession": "GCF_000182965.3",
@@ -211,6 +227,9 @@
   },
   {
     "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "246410"
+    ],
     "genomes": [
       {
         "accession": "GCF_000149335.2",
@@ -243,6 +262,9 @@
   },
   {
     "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "420245"
+    ],
     "genomes": [
       {
         "accession": "GCF_000002845.2",
@@ -275,6 +297,9 @@
   },
   {
     "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "5661"
+    ],
     "genomes": [
       {
         "accession": "GCF_000227135.1",
@@ -307,6 +332,9 @@
   },
   {
     "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "347515"
+    ],
     "genomes": [
       {
         "accession": "GCF_000002725.2",
@@ -339,6 +367,9 @@
   },
   {
     "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "185431"
+    ],
     "genomes": [
       {
         "accession": "GCF_000002445.2",
@@ -371,6 +402,9 @@
   },
   {
     "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "5693"
+    ],
     "genomes": [
       {
         "accession": "GCF_000209065.1",
@@ -403,6 +437,9 @@
   },
   {
     "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "508771"
+    ],
     "genomes": [
       {
         "accession": "GCF_000006565.2",
@@ -435,6 +472,9 @@
   },
   {
     "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "36329"
+    ],
     "genomes": [
       {
         "accession": "GCF_000002765.6",
@@ -467,6 +507,9 @@
   },
   {
     "assemblyCount": 2,
+    "assemblyTaxonomyIds": [
+      "5855"
+    ],
     "genomes": [
       {
         "accession": "GCA_900093555.2",
@@ -522,6 +565,9 @@
   },
   {
     "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "54757"
+    ],
     "genomes": [
       {
         "accession": "GCF_900681995.1",
@@ -554,6 +600,9 @@
   },
   {
     "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "5861"
+    ],
     "genomes": [
       {
         "accession": "GCF_900002385.2",
@@ -586,6 +635,9 @@
   },
   {
     "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "2697049"
+    ],
     "genomes": [
       {
         "accession": "GCF_009858895.2",
@@ -620,6 +672,10 @@
   },
   {
     "assemblyCount": 2,
+    "assemblyTaxonomyIds": [
+      "180454",
+      "7165"
+    ],
     "genomes": [
       {
         "accession": "GCF_000005575.2",
@@ -675,6 +731,9 @@
   },
   {
     "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "42434"
+    ],
     "genomes": [
       {
         "accession": "GCF_016801865.2",
@@ -707,6 +766,9 @@
   },
   {
     "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "7176"
+    ],
     "genomes": [
       {
         "accession": "GCF_015732765.1",
@@ -739,6 +801,9 @@
   },
   {
     "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "330879"
+    ],
     "genomes": [
       {
         "accession": "GCF_000002655.1",
