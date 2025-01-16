@@ -199,11 +199,11 @@ export const buildOrganismAssemblyTaxonomyIds = (
 };
 
 /**
- * Build props for the taxon cell.
+ * Build props for the species cell.
  * @param organism - Organism entity.
  * @returns Props to be used for the cell.
  */
-export const buildOrganismTaxon = (
+export const buildOrganismSpecies = (
   organism: BRCDataCatalogOrganism
 ): ComponentProps<typeof C.Link> => {
   return {

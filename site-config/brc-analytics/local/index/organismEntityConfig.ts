@@ -58,7 +58,7 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
       {
         componentConfig: {
           component: C.Link,
-          viewBuilder: V.buildOrganismTaxon,
+          viewBuilder: V.buildOrganismSpecies,
         } as ComponentConfig<typeof C.Link, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.SPECIES,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.SPECIES,
