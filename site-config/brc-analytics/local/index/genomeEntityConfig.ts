@@ -61,10 +61,6 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.ANNOTATION_STATUS,
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.ANNOTATION_STATUS,
           },
-          {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAGS,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAGS,
-          },
         ],
       },
     ],
@@ -101,6 +97,16 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         width: "auto",
       },
       {
+        columnPinned: true,
+        componentConfig: {
+          component: C.BasicCell,
+          viewBuilder: V.buildAccession,
+        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
+        id: BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION,
+        width: { max: "1fr", min: "164px" },
+      },
+      {
         componentConfig: {
           component: C.BasicCell,
           viewBuilder: V.buildGenomeTaxon,
@@ -126,16 +132,6 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMY_ID,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMY_ID,
         width: { max: "0.5fr", min: "100px" },
-      },
-      {
-        columnPinned: true,
-        componentConfig: {
-          component: C.BasicCell,
-          viewBuilder: V.buildAccession,
-        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION,
-        width: { max: "1fr", min: "164px" },
       },
       {
         componentConfig: {
@@ -225,15 +221,6 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANNOTATION_STATUS,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.ANNOTATION_STATUS,
-        width: { max: "0.5fr", min: "142px" },
-      },
-      {
-        componentConfig: {
-          component: C.NTagCell,
-          viewBuilder: V.buildTags,
-        } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogGenome>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAGS,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.TAGS,
         width: { max: "0.5fr", min: "142px" },
       },
     ],

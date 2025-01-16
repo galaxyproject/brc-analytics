@@ -32,10 +32,6 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMY_ID,
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMY_ID,
           },
-          {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAGS,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAGS,
-          },
         ],
       },
     ],
@@ -85,15 +81,6 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.ASSEMBLY_COUNT,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.ASSEMBLY_COUNT,
         width: { max: "0.5fr", min: "164px" },
-      },
-      {
-        componentConfig: {
-          component: C.NTagCell,
-          viewBuilder: V.buildTags,
-        } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogOrganism>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAGS,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.TAGS,
-        width: { max: "0.5fr", min: "142px" },
       },
     ],
     defaultSort: {

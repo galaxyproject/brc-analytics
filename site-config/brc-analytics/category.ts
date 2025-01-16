@@ -13,7 +13,6 @@ export const BRC_DATA_CATALOG_CATEGORY_KEY = {
   SCAFFOLD_L50: "scaffoldL50",
   SCAFFOLD_N50: "scaffoldN50",
   STRAIN: "strain",
-  TAGS: "tags",
   TAXON: "taxon",
   TAXONOMY_ID: "ncbiTaxonomyId",
   UCSC_BROWSER_URL: "ucscBrowserUrl",
@@ -34,8 +33,7 @@ export const BRC_DATA_CATALOG_CATEGORY_LABEL = {
   SCAFFOLD_L50: "Scaffold L50",
   SCAFFOLD_N50: "Scaffold N50",
   STRAIN: "Strain",
-  TAGS: "Tags",
-  TAXON: "Taxon",
+  TAXON: "Species",
   TAXONOMY_ID: "Taxonomy ID",
   UCSC_BROWSER_URL: "UCSC Browser",
 };

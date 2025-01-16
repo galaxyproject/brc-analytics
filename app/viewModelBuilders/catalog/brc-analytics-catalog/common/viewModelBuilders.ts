@@ -251,20 +251,6 @@ export const buildStrain = (
 };
 
 /**
- * Build props for the tags cell.
- * @param genome - Genome entity.
- * @returns Props to be used for the cell.
- */
-export const buildTags = (
-  genome: BRCDataCatalogOrganism | BRCDataCatalogGenome
-): ComponentProps<typeof C.NTagCell> => {
-  return {
-    label: "Tags",
-    values: genome.tags,
-  };
-};
-
-/**
  * Build props for the taxonomy ID cell.
  * @param genome - Genome entity.
  * @returns Props to be used for the cell.
@@ -401,7 +387,7 @@ export function buildOrganismGenomesTable(
   return {
     columns: buildOrganismGenomesTableColumns(),
     gridTemplateColumns:
-      "auto minmax(240px, 1fr) minmax(180px, 0.5fr) minmax(100px, 0.5fr) minmax(164px, 1fr) minmax(100px, 0.5fr) repeat(2, minmax(142px, 0.5fr)) minmax(120px, 0.5fr) minmax(80px, 0.5fr) minmax(142px, 0.5fr) repeat(3, minmax(80px, 0.5fr)) minmax(142px, 0.5fr)",
+      "auto minmax(164px, 1fr) minmax(240px, 1fr) minmax(180px, 0.5fr) minmax(100px, 0.5fr) minmax(100px, 0.5fr) repeat(2, minmax(142px, 0.5fr)) minmax(120px, 0.5fr) minmax(80px, 0.5fr) minmax(142px, 0.5fr) repeat(3, minmax(80px, 0.5fr)) minmax(142px, 0.5fr)",
     items: organism.genomes,
     noResultsTitle: "No Assemblies",
     tableOptions: {
@@ -425,6 +411,11 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANALYZE_GENOME,
     },
     {
+      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION,
+      cell: ({ row }) => C.BasicCell(buildAccession(row.original)),
+      header: BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
+    },
+    {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.TAXON,
       cell: ({ row }) => C.BasicCell(buildGenomeTaxon(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXON,
@@ -438,11 +429,6 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMY_ID,
       cell: ({ row }) => C.BasicCell(buildTaxonomyId(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMY_ID,
-    },
-    {
-      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION,
-      cell: ({ row }) => C.BasicCell(buildAccession(row.original)),
-      header: BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.IS_REF,
