@@ -506,7 +506,7 @@ function getGenomeEntityChooseAnalysisMethodBreadcrumbs(
   genome: BRCDataCatalogGenome
 ): Breadcrumb[] {
   return [
-    { path: ROUTES.GENOMES, text: "Genomes" },
+    { path: ROUTES.GENOMES, text: "Assemblies" },
     { path: "", text: `${genome.taxon}` },
     { path: "", text: "Choose Analysis Methods" },
   ];

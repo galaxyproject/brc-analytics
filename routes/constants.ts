@@ -1,6 +1,6 @@
 export const ROUTES = {
   ABOUT: "/about",
-  GENOMES: "/data/genomes",
+  GENOMES: "/data/assemblies",
   ORGANISMS: "/data/organisms",
   ROADMAP: "/roadmap",
 };

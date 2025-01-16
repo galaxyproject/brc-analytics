@@ -22,7 +22,7 @@ import { top as analysisMethodsTop } from "../entity/genome/analysisMethodsTop";
 import { listHero } from "../listView/listHero";
 
 /**
- * Entity config object responsible to config anything related to the /genomes route.
+ * Entity config object responsible to config anything related to the /assemblies route.
  */
 export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
   categoryGroupConfig: {
@@ -68,7 +68,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         ],
       },
     ],
-    key: "genomes",
+    key: "assemblies",
   },
   detail: {
     detailOverviews: [],
@@ -84,10 +84,10 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
     ],
   },
   exploreMode: EXPLORE_MODE.CS_FETCH_CS_FILTERING,
-  explorerTitle: "Genomes",
+  explorerTitle: "Assemblies",
   getId: getGenomeId,
   getTitle: getGenomeTitle,
-  label: "Genomes",
+  label: "Assemblies",
   list: {
     columns: [
       {
@@ -255,6 +255,6 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
     enableTab: false,
     listHero,
   },
-  route: "genomes",
+  route: "assemblies",
   staticLoadFile: "files/out/genomes.json",
 };
