@@ -191,7 +191,7 @@ export const buildLevel = (
  */
 export const buildOrganismTaxon = (
   organism: BRCDataCatalogOrganism
-): ComponentProps<typeof C.StyledLink> => {
+): ComponentProps<typeof C.Link> => {
   return {
     label: organism.taxon,
     url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getOrganismId(organism))}`,
