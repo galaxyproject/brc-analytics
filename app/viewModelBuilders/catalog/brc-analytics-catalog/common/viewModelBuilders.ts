@@ -401,7 +401,7 @@ export function buildOrganismGenomesTable(
   return {
     columns: buildOrganismGenomesTableColumns(),
     gridTemplateColumns:
-      "auto minmax(164px, 1fr) minmax(240px, 1fr) minmax(180px, 0.5fr) minmax(100px, 0.5fr) minmax(100px, 0.5fr) repeat(2, minmax(142px, 0.5fr)) minmax(120px, 0.5fr) minmax(80px, 0.5fr) minmax(142px, 0.5fr) repeat(3, minmax(80px, 0.5fr)) minmax(142px, 0.5fr)",
+      "auto repeat(2, minmax(164px, 1fr)) minmax(100px, 0.5fr) minmax(100px, 0.5fr) minmax(80px, 0.5fr) repeat(2, minmax(142px, 0.5fr)) minmax(120px, 0.5fr) minmax(80px, 0.5fr) minmax(120px, 0.5fr) repeat(3, minmax(80px, 0.5fr)) minmax(142px, 0.5fr)",
     items: organism.genomes,
     noResultsTitle: "No Assemblies",
     tableOptions: {

@@ -28,7 +28,7 @@ export const BRC_DATA_CATALOG_CATEGORY_LABEL = {
   CHROMOSOMES: "Chromosomes",
   COVERAGE: "Coverage",
   GC_PERCENT: "GC%",
-  IS_REF: "Is Reference",
+  IS_REF: "Is Ref",
   LENGTH: "Length",
   LEVEL: "Level",
   SCAFFOLD_COUNT: "Scaffolds",
