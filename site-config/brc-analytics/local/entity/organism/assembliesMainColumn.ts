@@ -10,6 +10,6 @@ export const assembliesMainColumn: ComponentsConfig = [
         viewBuilder: V.buildOrganismGenomesTable,
       },
     ],
-    component: C.BackPageContentMainColumn,
+    component: C.BackPageContentSingleColumn,
   },
 ];

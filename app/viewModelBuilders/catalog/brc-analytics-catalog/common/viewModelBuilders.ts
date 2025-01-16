@@ -20,6 +20,7 @@ import {
   getGenomeId,
   getOrganismId,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/utils";
+import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
 
 /**
  * Build props for the accession cell.
@@ -400,9 +401,15 @@ export function buildOrganismGenomesTable(
   return {
     columns: buildOrganismGenomesTableColumns(),
     gridTemplateColumns:
-      "auto auto minmax(240px, 1fr) minmax(180px, 0.5fr) minmax(100px, 0.5fr) minmax(164px, 1fr) minmax(100px, 0.5fr) repeat(2, minmax(142px, 0.5fr)) minmax(120px, 0.5fr) minmax(80px, 0.5fr) minmax(142px, 0.5fr) repeat(3, minmax(80px, 0.5fr)) minmax(142px, 0.5fr)",
+      "auto minmax(240px, 1fr) minmax(180px, 0.5fr) minmax(100px, 0.5fr) minmax(164px, 1fr) minmax(100px, 0.5fr) repeat(2, minmax(142px, 0.5fr)) minmax(120px, 0.5fr) minmax(80px, 0.5fr) minmax(142px, 0.5fr) repeat(3, minmax(80px, 0.5fr)) minmax(142px, 0.5fr)",
     items: organism.genomes,
     noResultsTitle: "No Assemblies",
+    tableOptions: {
+      enableRowPosition: false,
+      initialState: {
+        columnVisibility: { [COLUMN_IDENTIFIER.ROW_POSITION]: false },
+      },
+    },
   };
 }
 
