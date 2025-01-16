@@ -19,7 +19,6 @@ import {
 import { mainColumn as analysisMethodsMainColumn } from "../entity/genome/analysisMethodMainColumn";
 import { sideColumn as analysisMethodsSideColumn } from "../entity/genome/analysisMethodsSideColumn";
 import { top as analysisMethodsTop } from "../entity/genome/analysisMethodsTop";
-import { listHero } from "../listView/listHero";
 
 /**
  * Entity config object responsible to config anything related to the /assemblies route.
@@ -240,7 +239,6 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
     disablePagination: true,
     enableDownload: true,
     enableTab: false,
-    listHero,
   },
   route: "assemblies",
   staticLoadFile: "files/out/genomes.json",
