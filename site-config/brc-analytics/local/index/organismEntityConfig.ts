@@ -62,7 +62,7 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
         } as ComponentConfig<typeof C.Link, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.SPECIES,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.SPECIES,
-        width: "auto",
+        width: { max: "1fr", min: "auto" },
       },
       {
         componentConfig: {
