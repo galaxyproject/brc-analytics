@@ -4,56 +4,29 @@ import {
   BRCDataCatalogGenome,
   BRCDataCatalogOrganism,
 } from "../app/apis/catalog/brc-analytics-catalog/common/entities";
-import { SourceGenome, SourceOrganism } from "./entities";
+import { SourceGenome } from "./entities";
 
-const SOURCE_PATH_ORGANISMS = "files/source/organisms-from-ncbi.tsv";
 const SOURCE_PATH_GENOMES = "files/source/genomes-from-ncbi.tsv";
 
 buildCatalog();
 
 async function buildCatalog(): Promise<void> {
-  const organisms = await buildOrganisms();
-
-  const organismsByTaxon = new Map(
-    organisms.map((organism) => [organism.taxon, organism])
-  );
-
-  const genomes = await buildGenomes(organismsByTaxon);
-
-  console.log("Organisms:", genomes.length);
-  await saveJson("files/out/organisms.json", organisms);
+  const genomes = await buildGenomes();
+  const organisms = buildOrganisms(genomes);
 
   console.log("Genomes:", genomes.length);
   await saveJson("files/out/genomes.json", genomes);
 
+  console.log("Organisms:", genomes.length);
+  await saveJson("files/out/organisms.json", organisms);
+
   console.log("Done");
 }
 
-async function buildOrganisms(): Promise<BRCDataCatalogOrganism[]> {
-  const sourceRows = await readValuesFile<SourceOrganism>(
-    SOURCE_PATH_ORGANISMS
-  );
-  const mappedRows = sourceRows.map((row): BRCDataCatalogOrganism => {
-    return {
-      assemblyCount: parseNumber(row.assemblyCount),
-      genomes: [],
-      ncbiTaxonomyId: row.taxonomyId,
-      tags: row.CustomTags ? [row.CustomTags] : [],
-      taxon: row.taxon,
-    };
-  });
-  return mappedRows.sort((a, b) =>
-    a.ncbiTaxonomyId.localeCompare(b.ncbiTaxonomyId)
-  );
-}
-
-async function buildGenomes(
-  organismsByTaxon: Map<string, BRCDataCatalogOrganism>
-): Promise<BRCDataCatalogGenome[]> {
+async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
   const sourceRows = await readValuesFile<SourceGenome>(SOURCE_PATH_GENOMES);
   const mappedRows = sourceRows.map((row): BRCDataCatalogGenome => {
-    const organism = organismsByTaxon.get(row.taxon);
-    const genome: BRCDataCatalogGenome = {
+    return {
       accession: row.accession,
       annotationStatus: parseStringOrNull(row.annotationStatus),
       chromosomes: parseNumberOrNull(row.chromosomeCount),
@@ -67,15 +40,42 @@ async function buildGenomes(
       scaffoldCount: parseNumber(row.scaffoldCount),
       scaffoldL50: parseNumber(row.scaffoldL50),
       scaffoldN50: parseNumber(row.scaffoldN50),
+      species: row.species,
+      speciesTaxonomyId: row.speciesTaxonomyId,
       strain: parseStringOrNull(row.strain),
-      tags: organism?.tags ?? [],
-      taxon: row.taxon,
+      tags: row.CustomTags.split(/,\s*/),
       ucscBrowserUrl: parseStringOrNull(row.ucscBrowser),
     };
-    organism?.genomes.push(genome);
-    return genome;
   });
   return mappedRows.sort((a, b) => a.accession.localeCompare(b.accession));
+}
+
+function buildOrganisms(
+  genomes: BRCDataCatalogGenome[]
+): BRCDataCatalogOrganism[] {
+  const organismsByTaxonomyId = new Map<string, BRCDataCatalogOrganism>();
+  for (const genome of genomes) {
+    organismsByTaxonomyId.set(
+      genome.speciesTaxonomyId,
+      buildOrganism(organismsByTaxonomyId.get(genome.speciesTaxonomyId), genome)
+    );
+  }
+  return Array.from(organismsByTaxonomyId.values()).sort((a, b) =>
+    a.ncbiTaxonomyId.localeCompare(b.ncbiTaxonomyId)
+  );
+}
+
+function buildOrganism(
+  organism: BRCDataCatalogOrganism | undefined,
+  genome: BRCDataCatalogGenome
+): BRCDataCatalogOrganism {
+  return {
+    assemblyCount: (organism?.assemblyCount ?? 0) + 1,
+    genomes: [...(organism?.genomes ?? []), genome],
+    ncbiTaxonomyId: genome.speciesTaxonomyId,
+    species: genome.species,
+    tags: Array.from(new Set([...(organism?.tags ?? []), ...genome.tags])),
+  };
 }
 
 async function readValuesFile<T>(

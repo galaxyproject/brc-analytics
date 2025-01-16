@@ -3,6 +3,7 @@ export interface SourceGenome {
   annotationStatus: string;
   chromosomeCount: string;
   coverage: string;
+  CustomTags: string;
   gcPercent: string;
   geneModelUrl: string;
   isRef: string;
@@ -11,15 +12,9 @@ export interface SourceGenome {
   scaffoldCount: string;
   scaffoldL50: string;
   scaffoldN50: string;
+  species: string;
+  speciesTaxonomyId: string;
   strain: string;
-  taxon: string;
   taxonomyId: string;
   ucscBrowser: string;
-}
-
-export interface SourceOrganism {
-  assemblyCount: string;
-  CustomTags: string;
-  taxon: string;
-  taxonomyId: string;
 }

@@ -133,15 +133,15 @@ export const buildGcPercent = (
 };
 
 /**
- * Build props for the taxon cell.
+ * Build props for the species cell.
  * @param genome - Genome entity.
  * @returns Props to be used for the cell.
  */
-export const buildGenomeTaxon = (
+export const buildGenomeSpecies = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: genome.taxon,
+    value: genome.species,
   };
 };
 
@@ -193,7 +193,7 @@ export const buildOrganismTaxon = (
   organism: BRCDataCatalogOrganism
 ): ComponentProps<typeof C.Link> => {
   return {
-    label: organism.taxon,
+    label: organism.species,
     url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getOrganismId(organism))}`,
   };
 };
@@ -338,7 +338,7 @@ export const buildGenomeDetails = (
   keyValuePairs.set(
     "Taxon",
     C.Link({
-      label: genome.taxon,
+      label: genome.species,
       url: `https://www.ncbi.nlm.nih.gov/datasets/taxonomy/${encodeURIComponent(
         genome.ncbiTaxonomyId
       )}/`,
@@ -416,9 +416,9 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
     },
     {
-      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.TAXON,
-      cell: ({ row }) => C.BasicCell(buildGenomeTaxon(row.original)),
-      header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXON,
+      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.SPECIES,
+      cell: ({ row }) => C.BasicCell(buildGenomeSpecies(row.original)),
+      header: BRC_DATA_CATALOG_CATEGORY_LABEL.SPECIES,
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.STRAIN,
@@ -493,7 +493,7 @@ function getGenomeEntityChooseAnalysisMethodBreadcrumbs(
 ): Breadcrumb[] {
   return [
     { path: ROUTES.GENOMES, text: "Assemblies" },
-    { path: "", text: `${genome.taxon}` },
+    { path: "", text: `${genome.species}` },
     { path: "", text: "Choose Analysis Methods" },
   ];
 }
@@ -508,7 +508,7 @@ function getOrganismEntityAssembliesBreadcrumbs(
 ): Breadcrumb[] {
   return [
     { path: ROUTES.ORGANISMS, text: "Organisms" },
-    { path: "", text: `${organism.taxon}` },
+    { path: "", text: `${organism.species}` },
     { path: "", text: "Assemblies" },
   ];
 }

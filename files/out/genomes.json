@@ -1,5 +1,71 @@
 [
   {
+    "accession": "GCA_000149245.3",
+    "annotationStatus": null,
+    "chromosomes": 14,
+    "coverage": "11.8x",
+    "gcPercent": 48,
+    "geneModelUrl": null,
+    "isRef": "No",
+    "length": 18891193,
+    "level": "Chromosome",
+    "ncbiTaxonomyId": "235443",
+    "scaffoldCount": 14,
+    "scaffoldL50": 6,
+    "scaffoldN50": 1422463,
+    "species": "Cryptococcus neoformans",
+    "speciesTaxonomyId": "5207",
+    "strain": "H99",
+    "tags": [
+      "fungidb.org"
+    ],
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000149245.1"
+  },
+  {
+    "accession": "GCA_000170175.2",
+    "annotationStatus": null,
+    "chromosomes": null,
+    "coverage": "5.0x",
+    "gcPercent": 46.5,
+    "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/000/170/175/GCA_000170175.2/genes/GCA_000170175.2_CPS2.augustus.gtf.gz",
+    "isRef": "No",
+    "length": 27583241,
+    "level": "Scaffold",
+    "ncbiTaxonomyId": "443226",
+    "scaffoldCount": 54,
+    "scaffoldL50": 8,
+    "scaffoldN50": 1220107,
+    "species": "Coccidioides posadasii",
+    "speciesTaxonomyId": "199306",
+    "strain": "Silveira",
+    "tags": [
+      "fungidb.org"
+    ],
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000170175.2"
+  },
+  {
+    "accession": "GCA_900093555.2",
+    "annotationStatus": null,
+    "chromosomes": 16,
+    "coverage": "100.0x",
+    "gcPercent": 40,
+    "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/900/093/555/GCA_900093555.2/genes/GCA_900093555.2_GCA_900093555.augustus.gtf.gz",
+    "isRef": "No",
+    "length": 29040213,
+    "level": "Chromosome",
+    "ncbiTaxonomyId": "5855",
+    "scaffoldCount": 242,
+    "scaffoldL50": 6,
+    "scaffoldN50": 1761288,
+    "species": "Plasmodium vivax",
+    "speciesTaxonomyId": "5855",
+    "strain": null,
+    "tags": [
+      "plasmodb.org"
+    ],
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900093555.2"
+  },
+  {
     "accession": "GCF_000002415.2",
     "annotationStatus": "Full annotation",
     "chromosomes": 14,
@@ -13,11 +79,12 @@
     "scaffoldCount": 2747,
     "scaffoldL50": 6,
     "scaffoldN50": 1678596,
+    "species": "Plasmodium vivax",
+    "speciesTaxonomyId": "5855",
     "strain": "Salvador I",
     "tags": [
-      "VEuPathDB"
+      "NcbiDatasets"
     ],
-    "taxon": "Plasmodium vivax",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002415.2"
   },
   {
@@ -34,11 +101,12 @@
     "scaffoldCount": 12,
     "scaffoldL50": 4,
     "scaffoldN50": 2481190,
+    "species": "Trypanosoma brucei",
+    "speciesTaxonomyId": "5691",
     "strain": null,
     "tags": [
-      "VEuPathDB"
+      "tritrypdb.org"
     ],
-    "taxon": "Trypanosoma brucei",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002445.2"
   },
   {
@@ -55,9 +123,12 @@
     "scaffoldCount": 8,
     "scaffoldL50": 4,
     "scaffoldN50": 3948441,
+    "species": "Aspergillus fumigatus",
+    "speciesTaxonomyId": "746128",
     "strain": "Af293",
-    "tags": [],
-    "taxon": "Aspergillus fumigatus",
+    "tags": [
+      "fungidb.org"
+    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002655.1"
   },
   {
@@ -74,11 +145,12 @@
     "scaffoldCount": 36,
     "scaffoldL50": 11,
     "scaffoldN50": 1091540,
+    "species": "Leishmania major",
+    "speciesTaxonomyId": "5664",
     "strain": "Friedlin",
     "tags": [
-      "VEuPathDB"
+      "tritrypdb.org"
     ],
-    "taxon": "Leishmania major",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002725.2"
   },
   {
@@ -95,11 +167,12 @@
     "scaffoldCount": 14,
     "scaffoldL50": 5,
     "scaffoldN50": 1687656,
+    "species": "Plasmodium falciparum",
+    "speciesTaxonomyId": "5833",
     "strain": null,
     "tags": [
-      "VEuPathDB"
+      "plasmodb.org"
     ],
-    "taxon": "Plasmodium falciparum",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002765.6"
   },
   {
@@ -116,12 +189,35 @@
     "scaffoldCount": 138,
     "scaffoldL50": 11,
     "scaffoldN50": 992961,
+    "species": "Leishmania braziliensis",
+    "speciesTaxonomyId": "5660",
     "strain": "MHOM/BR/75/M2904",
     "tags": [
-      "VEuPathDB"
+      "tritrypdb.org"
     ],
-    "taxon": "Leishmania braziliensis",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002845.2"
+  },
+  {
+    "accession": "GCF_000005575.2",
+    "annotationStatus": "Full annotation",
+    "chromosomes": 6,
+    "coverage": null,
+    "gcPercent": 44.5,
+    "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/005/575/GCF_000005575.2/genes/GCF_000005575.2_AgamP3.ncbiRefSeq.gtf.gz",
+    "isRef": "No",
+    "length": 265011681,
+    "level": "Chromosome",
+    "ncbiTaxonomyId": "180454",
+    "scaffoldCount": 8144,
+    "scaffoldL50": 9,
+    "scaffoldN50": 12309988,
+    "species": "Anopheles gambiae",
+    "speciesTaxonomyId": "7165",
+    "strain": "PEST",
+    "tags": [
+      "vectorbase.org"
+    ],
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000005575.2"
   },
   {
     "accession": "GCF_000006565.2",
@@ -137,11 +233,12 @@
     "scaffoldCount": 2276,
     "scaffoldL50": 6,
     "scaffoldN50": 4973582,
+    "species": "Toxoplasma gondii",
+    "speciesTaxonomyId": "5811",
     "strain": "ME49",
     "tags": [
-      "VEuPathDB"
+      "toxodb.org"
     ],
-    "taxon": "Toxoplasma gondii",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000006565.2"
   },
   {
@@ -158,9 +255,12 @@
     "scaffoldCount": 14,
     "scaffoldL50": 6,
     "scaffoldN50": 1438950,
+    "species": "Cryptococcus neoformans",
+    "speciesTaxonomyId": "5207",
     "strain": "JEC21",
-    "tags": [],
-    "taxon": "Cryptococcus neoformans",
+    "tags": [
+      "NcbiDatasets"
+    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000091045.1"
   },
   {
@@ -177,9 +277,12 @@
     "scaffoldCount": 6,
     "scaffoldL50": 3,
     "scaffoldN50": 4323945,
+    "species": "Coccidioides immitis",
+    "speciesTaxonomyId": "5501",
     "strain": "RS",
-    "tags": [],
-    "taxon": "Coccidioides immitis",
+    "tags": [
+      "fungidb.org"
+    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000149335.2"
   },
   {
@@ -196,9 +299,12 @@
     "scaffoldCount": 8,
     "scaffoldL50": 3,
     "scaffoldN50": 2231883,
+    "species": "Candida albicans",
+    "speciesTaxonomyId": "5476",
     "strain": "SC5314",
-    "tags": [],
-    "taxon": "Candida albicans",
+    "tags": [
+      "fungidb.org"
+    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000182965.3"
   },
   {
@@ -215,11 +321,13 @@
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 4411532,
+    "species": "Mycobacterium tuberculosis",
+    "speciesTaxonomyId": "1773",
     "strain": "H37Rv",
     "tags": [
-      "Bact"
+      "TB",
+      "Outbreak"
     ],
-    "taxon": "Mycobacterium tuberculosis",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000195955.2"
   },
   {
@@ -236,11 +344,12 @@
     "scaffoldCount": 29495,
     "scaffoldL50": 212,
     "scaffoldN50": 88624,
+    "species": "Trypanosoma cruzi",
+    "speciesTaxonomyId": "5693",
     "strain": "CL Brener",
     "tags": [
-      "VEuPathDB"
+      "tritrypdb.org"
     ],
-    "taxon": "Trypanosoma cruzi",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000209065.1"
   },
   {
@@ -257,11 +366,12 @@
     "scaffoldCount": 36,
     "scaffoldL50": 11,
     "scaffoldN50": 1024085,
+    "species": "Leishmania donovani",
+    "speciesTaxonomyId": "5661",
     "strain": "BPK282A1",
     "tags": [
-      "VEuPathDB"
+      "tritrypdb.org"
     ],
-    "taxon": "Leishmania donovani",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000227135.1"
   },
   {
@@ -278,11 +388,13 @@
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 196858,
+    "species": "Monkeypox virus",
+    "speciesTaxonomyId": "10244",
     "strain": "Zaire-96-I-16",
     "tags": [
-      "Virus"
+      "MPOX",
+      "Outbreak"
     ],
-    "taxon": "Monkeypox virus",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000857045.1"
   },
   {
@@ -299,11 +411,13 @@
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 29903,
+    "species": "Severe acute respiratory syndrome-related coronavirus",
+    "speciesTaxonomyId": "694009",
     "strain": null,
     "tags": [
-      "Virus"
+      "COVID",
+      "Outbreak"
     ],
-    "taxon": "Severe acute respiratory syndrome coronavirus 2",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_009858895.2"
   },
   {
@@ -320,11 +434,12 @@
     "scaffoldCount": 56,
     "scaffoldL50": 2,
     "scaffoldN50": 201550677,
+    "species": "Culex quinquefasciatus",
+    "speciesTaxonomyId": "7176",
     "strain": "JHB",
     "tags": [
-      "VEuPathDB"
+      "vectorbase.org"
     ],
-    "taxon": "Culex quinquefasciatus",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_015732765.1"
   },
   {
@@ -341,9 +456,12 @@
     "scaffoldCount": 289,
     "scaffoldL50": 2,
     "scaffoldN50": 186194774,
+    "species": "Culex pipiens",
+    "speciesTaxonomyId": "7175",
     "strain": null,
-    "tags": [],
-    "taxon": "Culex pipiens pallens",
+    "tags": [
+      "vectorbase.org"
+    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_016801865.2"
   },
   {
@@ -360,11 +478,12 @@
     "scaffoldCount": 9,
     "scaffoldL50": 2,
     "scaffoldN50": 8079863,
+    "species": "Coccidioides posadasii",
+    "speciesTaxonomyId": "199306",
     "strain": "Silveira",
     "tags": [
-      "VEuPathDB"
+      "NcbiDatasets"
     ],
-    "taxon": "Coccidioides posadasii",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_018416015.2"
   },
   {
@@ -381,11 +500,12 @@
     "scaffoldCount": 14,
     "scaffoldL50": 5,
     "scaffoldN50": 2046250,
+    "species": "Plasmodium yoelii",
+    "speciesTaxonomyId": "5861",
     "strain": "17X",
     "tags": [
-      "VEuPathDB"
+      "plasmodb.org"
     ],
-    "taxon": "Plasmodium yoelii",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_900002385.2"
   },
   {
@@ -402,11 +522,12 @@
     "scaffoldCount": 14,
     "scaffoldL50": 5,
     "scaffoldN50": 1692345,
+    "species": "Plasmodium vinckei",
+    "speciesTaxonomyId": "5860",
     "strain": null,
     "tags": [
-      "VEuPathDB"
+      "plasmodb.org"
     ],
-    "taxon": "Plasmodium vinckei",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_900681995.1"
   },
   {
@@ -423,11 +544,12 @@
     "scaffoldCount": 190,
     "scaffoldL50": 2,
     "scaffoldN50": 99149756,
+    "species": "Anopheles gambiae",
+    "speciesTaxonomyId": "7165",
     "strain": null,
     "tags": [
-      "VEuPathDB"
+      "NcbiDatasets"
     ],
-    "taxon": "Anopheles gambiae",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_943734735.2"
   }
 ]

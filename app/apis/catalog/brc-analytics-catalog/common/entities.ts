@@ -23,9 +23,10 @@ export interface BRCDataCatalogGenome {
   scaffoldCount: number;
   scaffoldL50: number;
   scaffoldN50: number;
+  species: string;
+  speciesTaxonomyId: string;
   strain: string | null;
   tags: string[];
-  taxon: string;
   ucscBrowserUrl: string | null;
 }
 
@@ -33,8 +34,8 @@ export interface BRCDataCatalogOrganism {
   assemblyCount: number;
   genomes: BRCDataCatalogGenome[];
   ncbiTaxonomyId: string;
+  species: string;
   tags: string[];
-  taxon: string;
 }
 
 export interface EntitiesResponse<R> {

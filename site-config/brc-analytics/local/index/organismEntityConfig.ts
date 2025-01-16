@@ -25,8 +25,8 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
       {
         categoryConfigs: [
           {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXON,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXON,
+            key: BRC_DATA_CATALOG_CATEGORY_KEY.SPECIES,
+            label: BRC_DATA_CATALOG_CATEGORY_LABEL.SPECIES,
           },
           {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMY_ID,
@@ -60,8 +60,8 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
           component: C.Link,
           viewBuilder: V.buildOrganismTaxon,
         } as ComponentConfig<typeof C.Link, BRCDataCatalogOrganism>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXON,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXON,
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.SPECIES,
+        id: BRC_DATA_CATALOG_CATEGORY_KEY.SPECIES,
         width: "auto",
       },
       {
@@ -85,7 +85,7 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
     ],
     defaultSort: {
       desc: SORT_DIRECTION.ASCENDING,
-      id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXON,
+      id: BRC_DATA_CATALOG_CATEGORY_KEY.SPECIES,
     },
   } as ListConfig<BRCDataCatalogOrganism>,
   listView: {
