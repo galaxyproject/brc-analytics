@@ -32,7 +32,7 @@ export const sideColumn: ComponentsConfig = [
                       {
                         component: C.SectionTitle,
                         props: {
-                          title: "Analysis Portals",
+                          title: "Resources",
                         },
                       } as ComponentConfig<typeof C.SectionTitle>,
                       {

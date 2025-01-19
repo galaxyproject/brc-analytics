@@ -10,7 +10,12 @@ import {
   BRCDataCatalogOrganism,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "../../../../components";
-import { GENOME_BROWSER, NCBI_DATASETS_URL } from "./constants";
+import {
+  GENOME_BROWSER,
+  NCBI_ASSEMBLY,
+  NCBI_DATASETS_URL,
+  NCBI_TAXONOMY,
+} from "./constants";
 import { ColumnDef } from "@tanstack/react-table";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
@@ -309,19 +314,41 @@ export const buildGenomeAnalysisPortals = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.AnalysisPortals> => {
   return {
-    portals: genome.ucscBrowserUrl
-      ? [
-          {
-            imageProps: {
-              alt: GENOME_BROWSER,
-              src: "/analysis-portals/ucsc-genome.png",
-              width: 20,
+    portals: [
+      ...(genome.ucscBrowserUrl
+        ? [
+            {
+              imageProps: {
+                alt: GENOME_BROWSER,
+                src: "/analysis-portals/ucsc-genome.png",
+                width: 20,
+              },
+              label: GENOME_BROWSER,
+              url: genome.ucscBrowserUrl,
             },
-            label: GENOME_BROWSER,
-            url: genome.ucscBrowserUrl,
-          },
-        ]
-      : [],
+          ]
+        : []),
+      {
+        imageProps: {
+          alt: NCBI_ASSEMBLY,
+          src: "/analysis-portals/ncbi.png",
+          width: 20,
+        },
+        label: NCBI_ASSEMBLY,
+        url: `${NCBI_DATASETS_URL}/genome/${genome.accession}`,
+      },
+      {
+        imageProps: {
+          alt: NCBI_TAXONOMY,
+          src: "/analysis-portals/ncbi.png",
+          width: 20,
+        },
+        label: NCBI_TAXONOMY,
+        url: `${NCBI_DATASETS_URL}/taxonomy/${encodeURIComponent(
+          genome.ncbiTaxonomyId
+        )}`,
+      },
+    ],
   };
 };
 
