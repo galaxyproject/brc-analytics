@@ -20,6 +20,7 @@ export {
   BackPageContentSingleColumn,
 } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 export { DetailViewTable } from "@databiosphere/findable-ui/lib/components/Detail/components/DetailViewTable/detailViewTable";
+export { BackPageHero } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/components/BackPageHero/backPageHero";
 export { Logo } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/components/Content/components/Logo/logo";
 export { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 export { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";

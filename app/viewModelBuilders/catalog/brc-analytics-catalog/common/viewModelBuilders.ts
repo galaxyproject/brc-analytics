@@ -375,18 +375,16 @@ export const buildGenomeDetails = (
 };
 
 /**
- * Build props for the organism DetailViewHero component.
+ * Build props for the organism BackPageHero component.
  * @param organism - Organism entity.
- * @returns Props to be used for the DetailViewHero component.
+ * @returns Props to be used for the BackPageHero component.
  */
-export const buildOrganismAssembliesDetailViewHero = (
+export const buildOrganismAssembliesHero = (
   organism: BRCDataCatalogOrganism
-): ComponentProps<typeof C.DetailViewHero> => {
+): ComponentProps<typeof C.BackPageHero> => {
   return {
-    breadcrumbs: C.Breadcrumbs({
-      breadcrumbs: getOrganismEntityAssembliesBreadcrumbs(organism),
-    }),
-    title: "Assemblies",
+    breadcrumbs: getOrganismEntityAssembliesBreadcrumbs(organism),
+    title: organism.species,
   };
 };
 

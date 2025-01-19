@@ -8,7 +8,7 @@ import * as V from "../../../../../app/viewModelBuilders/catalog/brc-analytics-c
 
 export const assembliesTop: ComponentsConfig = [
   {
-    component: C.DetailViewHero,
-    viewBuilder: V.buildOrganismAssembliesDetailViewHero,
-  } as ComponentConfig<typeof C.DetailViewHero, BRCDataCatalogOrganism>,
+    component: C.BackPageHero,
+    viewBuilder: V.buildOrganismAssembliesHero,
+  } as ComponentConfig<typeof C.BackPageHero, BRCDataCatalogOrganism>,
 ];
