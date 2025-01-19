@@ -12,3 +12,6 @@ coverage
 
 # python
 venv
+
+# releases
+/CHANGELOG.md
