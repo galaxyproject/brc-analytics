@@ -21,6 +21,7 @@ import {
   getOrganismId,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/utils";
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
+import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 
 /**
  * Build props for the accession cell.
@@ -350,7 +351,7 @@ export const buildGenomeDetails = (
 ): ComponentProps<typeof C.KeyValuePairs> => {
   const keyValuePairs = new Map<Key, Value>();
   keyValuePairs.set(
-    "Taxon",
+    BRC_DATA_CATALOG_CATEGORY_LABEL.SPECIES,
     C.Link({
       label: genome.species,
       url: `https://www.ncbi.nlm.nih.gov/datasets/taxonomy/${encodeURIComponent(
@@ -359,13 +360,51 @@ export const buildGenomeDetails = (
     })
   );
   keyValuePairs.set(
-    "Accession",
+    BRC_DATA_CATALOG_CATEGORY_LABEL.STRAIN,
+    genome.strain ?? LABEL.UNSPECIFIED
+  );
+  keyValuePairs.set(
+    BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMY_ID,
+    genome.ncbiTaxonomyId
+  );
+  keyValuePairs.set(
+    BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
     C.CopyText({
       children: genome.accession,
       value: genome.accession,
     })
   );
-  keyValuePairs.set("Chromosomes", genome.chromosomes);
+  keyValuePairs.set(
+    BRC_DATA_CATALOG_CATEGORY_LABEL.CHROMOSOMES,
+    genome.chromosomes ?? LABEL.UNSPECIFIED
+  );
+  keyValuePairs.set(BRC_DATA_CATALOG_CATEGORY_LABEL.IS_REF, genome.isRef);
+  keyValuePairs.set(BRC_DATA_CATALOG_CATEGORY_LABEL.LEVEL, genome.level);
+  keyValuePairs.set(BRC_DATA_CATALOG_CATEGORY_LABEL.LENGTH, genome.length);
+  keyValuePairs.set(
+    BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_COUNT,
+    genome.scaffoldCount
+  );
+  keyValuePairs.set(
+    BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_N50,
+    genome.scaffoldN50
+  );
+  keyValuePairs.set(
+    BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_L50,
+    genome.scaffoldL50
+  );
+  keyValuePairs.set(
+    BRC_DATA_CATALOG_CATEGORY_LABEL.COVERAGE,
+    genome.coverage ?? LABEL.UNSPECIFIED
+  );
+  keyValuePairs.set(
+    BRC_DATA_CATALOG_CATEGORY_LABEL.GC_PERCENT,
+    genome.gcPercent
+  );
+  keyValuePairs.set(
+    BRC_DATA_CATALOG_CATEGORY_LABEL.ANNOTATION_STATUS,
+    genome.annotationStatus ?? LABEL.UNSPECIFIED
+  );
   return {
     KeyElType: C.KeyElType,
     KeyValuesElType: (props) => C.Stack({ gap: 4, ...props }),
