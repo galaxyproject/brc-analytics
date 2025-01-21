@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.2.0](https://github.com/galaxyproject/brc-analytics/compare/v0.1.0...v0.2.0) (2025-01-21)
+
+
+### Features
+
+* add other fields to assembly details ([#213](https://github.com/galaxyproject/brc-analytics/issues/213)) ([#219](https://github.com/galaxyproject/brc-analytics/issues/219)) ([c53cba3](https://github.com/galaxyproject/brc-analytics/commit/c53cba3668f740cda113f673175f234f9855dfc4))
+* move resources to top of assembly side column ([#222](https://github.com/galaxyproject/brc-analytics/issues/222)) ([#224](https://github.com/galaxyproject/brc-analytics/issues/224)) ([7cd75d2](https://github.com/galaxyproject/brc-analytics/commit/7cd75d2f60e2035ad5ec0f5b42e5cf4d9722e4f0))
+* rename analysis portals to resources and add ncbi links ([#214](https://github.com/galaxyproject/brc-analytics/issues/214)) ([#220](https://github.com/galaxyproject/brc-analytics/issues/220)) ([3c12dea](https://github.com/galaxyproject/brc-analytics/commit/3c12dea03ebe855ea7b67f1436dd1cae4387c82b))
+* update organism detail page ([#212](https://github.com/galaxyproject/brc-analytics/issues/212)) ([#217](https://github.com/galaxyproject/brc-analytics/issues/217)) ([6748ee1](https://github.com/galaxyproject/brc-analytics/commit/6748ee190666fde50fd2b55d8984d841efd49c2c))
+* update titles on assembly detail page ([#221](https://github.com/galaxyproject/brc-analytics/issues/221)) ([#223](https://github.com/galaxyproject/brc-analytics/issues/223)) ([076a09b](https://github.com/galaxyproject/brc-analytics/commit/076a09b8a7ee8bb9a5bc759160c0c682638f7bdc))
+
 ## [0.1.0](https://github.com/galaxyproject/brc-analytics/compare/v0.0.0...v0.1.0) (2025-01-18)
 
 
