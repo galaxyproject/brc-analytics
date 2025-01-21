@@ -16,10 +16,16 @@ export const sideColumn: ComponentsConfig = [
               {
                 children: [
                   {
-                    component: C.KeyValuePairs,
-                    viewBuilder: V.buildGenomeDetails,
+                    component: C.SectionTitle,
+                    props: {
+                      title: "Resources",
+                    },
+                  } as ComponentConfig<typeof C.SectionTitle>,
+                  {
+                    component: C.AnalysisPortals,
+                    viewBuilder: V.buildGenomeAnalysisPortals,
                   } as ComponentConfig<
-                    typeof C.KeyValuePairs,
+                    typeof C.AnalysisPortals,
                     BRCDataCatalogGenome
                   >,
                 ],
@@ -32,14 +38,14 @@ export const sideColumn: ComponentsConfig = [
                       {
                         component: C.SectionTitle,
                         props: {
-                          title: "Resources",
+                          title: "Assembly Details",
                         },
                       } as ComponentConfig<typeof C.SectionTitle>,
                       {
-                        component: C.AnalysisPortals,
-                        viewBuilder: V.buildGenomeAnalysisPortals,
+                        component: C.KeyValuePairs,
+                        viewBuilder: V.buildGenomeDetails,
                       } as ComponentConfig<
-                        typeof C.AnalysisPortals,
+                        typeof C.KeyValuePairs,
                         BRCDataCatalogGenome
                       >,
                     ],
