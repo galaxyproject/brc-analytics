@@ -359,12 +359,10 @@ export const buildGenomeAnalysisPortals = (
  */
 export const buildGenomeChooseAnalysisMethodDetailViewHero = (
   genome: BRCDataCatalogGenome
-): ComponentProps<typeof C.DetailViewHero> => {
+): ComponentProps<typeof C.BackPageHero> => {
   return {
-    breadcrumbs: C.Breadcrumbs({
-      breadcrumbs: getGenomeEntityChooseAnalysisMethodBreadcrumbs(genome),
-    }),
-    title: "Choose Analysis Methods",
+    breadcrumbs: getGenomeEntityChooseAnalysisMethodBreadcrumbs(genome),
+    title: genome.accession,
   };
 };
 
@@ -567,7 +565,7 @@ function getGenomeEntityChooseAnalysisMethodBreadcrumbs(
   return [
     { path: ROUTES.GENOMES, text: "Assemblies" },
     { path: "", text: `${genome.species}` },
-    { path: "", text: "Choose Analysis Methods" },
+    { path: "", text: genome.accession },
   ];
 }
 

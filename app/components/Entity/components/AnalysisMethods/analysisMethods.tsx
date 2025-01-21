@@ -9,7 +9,7 @@ export const AnalysisMethods = ({ children }: Props): JSX.Element => {
   return (
     <FluidPaper>
       <GridPaper>
-        <GridPaperSection>Choose Analysis Method</GridPaperSection>
+        <GridPaperSection>Select an Analysis Workflow</GridPaperSection>
         {children}
       </GridPaper>
     </FluidPaper>
