@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/galaxyproject/brc-analytics/compare/v0.2.0...v0.3.0) (2025-01-22)
+
+
+### Features
+
+* update analysis methods heading ([#225](https://github.com/galaxyproject/brc-analytics/issues/225)) ([#226](https://github.com/galaxyproject/brc-analytics/issues/226)) ([a1bd78f](https://github.com/galaxyproject/brc-analytics/commit/a1bd78f78af2e2cc00c52727180a6dba2df79b9b))
+
 ## [0.2.0](https://github.com/galaxyproject/brc-analytics/compare/v0.1.0...v0.2.0) (2025-01-21)
 
 
