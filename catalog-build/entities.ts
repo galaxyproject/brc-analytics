@@ -3,7 +3,6 @@ export interface SourceGenome {
   annotationStatus: string;
   chromosomeCount: string;
   coverage: string;
-  CustomTags: string;
   gcPercent: string;
   geneModelUrl: string;
   isRef: string;

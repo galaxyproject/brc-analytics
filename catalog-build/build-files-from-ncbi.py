@@ -2,12 +2,17 @@ import pandas as pd
 import requests
 import urllib.parse
 import re
+import yaml
 
-SOURCE_LIST_URL = "https://docs.google.com/spreadsheets/d/1Gg9sw2Qw765tOx2To53XkTAn-RAMiBtqYrfItlLXXrc/gviz/tq?tqx=out:csv&sheet=Sheet1.csv"
+ASSEMBLIES_PATH = "catalog-build/source/assemblies.yml"
 
-ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.json"
+UCSC_ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.json"
 
 GENOMES_OUTPUT_PATH = "catalog-build/source/genomes-from-ncbi.tsv"
+
+def read_assemblies():
+  with open(ASSEMBLIES_PATH) as stream:
+    return pd.DataFrame(yaml.safe_load(stream)["assemblies"])
 
 def get_paginated_ncbi_results(base_url, query_description):
   page = 1
@@ -93,19 +98,15 @@ def add_gene_model_url(genomes_df: pd.DataFrame):
 def build_files():
   print("Building files")
 
-  source_list_df = pd.read_csv(SOURCE_LIST_URL, keep_default_na=False)
+  source_list_df = read_assemblies()
 
-  base_genomes_df = get_genomes_df(source_list_df["Reference"])
+  base_genomes_df = get_genomes_df(source_list_df["accession"])
 
   species_df = get_species_df(base_genomes_df["taxonomyId"])
 
-  genomes_with_species_df = (
-    base_genomes_df
-      .merge(source_list_df[["Reference", "CustomTags"]], how="left", left_on="accession", right_on="Reference").drop(columns=["Reference"])
-      .merge(species_df, how="left", on="taxonomyId")
-  )
+  genomes_with_species_df = base_genomes_df.merge(species_df, how="left", on="taxonomyId")
 
-  assemblies_df = pd.DataFrame(requests.get(ASSEMBLIES_URL).json()["data"])[["ucscBrowser", "genBank", "refSeq"]]
+  assemblies_df = pd.DataFrame(requests.get(UCSC_ASSEMBLIES_URL).json()["data"])[["ucscBrowser", "genBank", "refSeq"]]
 
   gen_bank_merge_df = genomes_with_species_df.merge(assemblies_df, how="left", left_on="accession", right_on="genBank")
   ref_seq_merge_df = genomes_with_species_df.merge(assemblies_df, how="left", left_on="accession", right_on="refSeq")

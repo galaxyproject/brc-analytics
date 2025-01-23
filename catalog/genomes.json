@@ -16,9 +16,6 @@
     "species": "Cryptococcus neoformans",
     "speciesTaxonomyId": "5207",
     "strain": "H99",
-    "tags": [
-      "fungidb.org"
-    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000149245.1"
   },
   {
@@ -38,9 +35,6 @@
     "species": "Coccidioides posadasii",
     "speciesTaxonomyId": "199306",
     "strain": "Silveira",
-    "tags": [
-      "fungidb.org"
-    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000170175.2"
   },
   {
@@ -60,9 +54,6 @@
     "species": "Plasmodium vivax",
     "speciesTaxonomyId": "5855",
     "strain": null,
-    "tags": [
-      "plasmodb.org"
-    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900093555.2"
   },
   {
@@ -82,9 +73,6 @@
     "species": "Plasmodium vivax",
     "speciesTaxonomyId": "5855",
     "strain": "Salvador I",
-    "tags": [
-      "NcbiDatasets"
-    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002415.2"
   },
   {
@@ -104,9 +92,6 @@
     "species": "Trypanosoma brucei",
     "speciesTaxonomyId": "5691",
     "strain": null,
-    "tags": [
-      "tritrypdb.org"
-    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002445.2"
   },
   {
@@ -126,9 +111,6 @@
     "species": "Aspergillus fumigatus",
     "speciesTaxonomyId": "746128",
     "strain": "Af293",
-    "tags": [
-      "fungidb.org"
-    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002655.1"
   },
   {
@@ -148,9 +130,6 @@
     "species": "Leishmania major",
     "speciesTaxonomyId": "5664",
     "strain": "Friedlin",
-    "tags": [
-      "tritrypdb.org"
-    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002725.2"
   },
   {
@@ -170,9 +149,6 @@
     "species": "Plasmodium falciparum",
     "speciesTaxonomyId": "5833",
     "strain": null,
-    "tags": [
-      "plasmodb.org"
-    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002765.6"
   },
   {
@@ -192,9 +168,6 @@
     "species": "Leishmania braziliensis",
     "speciesTaxonomyId": "5660",
     "strain": "MHOM/BR/75/M2904",
-    "tags": [
-      "tritrypdb.org"
-    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002845.2"
   },
   {
@@ -214,9 +187,6 @@
     "species": "Anopheles gambiae",
     "speciesTaxonomyId": "7165",
     "strain": "PEST",
-    "tags": [
-      "vectorbase.org"
-    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000005575.2"
   },
   {
@@ -236,9 +206,6 @@
     "species": "Toxoplasma gondii",
     "speciesTaxonomyId": "5811",
     "strain": "ME49",
-    "tags": [
-      "toxodb.org"
-    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000006565.2"
   },
   {
@@ -258,9 +225,6 @@
     "species": "Cryptococcus neoformans",
     "speciesTaxonomyId": "5207",
     "strain": "JEC21",
-    "tags": [
-      "NcbiDatasets"
-    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000091045.1"
   },
   {
@@ -280,9 +244,6 @@
     "species": "Coccidioides immitis",
     "speciesTaxonomyId": "5501",
     "strain": "RS",
-    "tags": [
-      "fungidb.org"
-    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000149335.2"
   },
   {
@@ -302,9 +263,6 @@
     "species": "Candida albicans",
     "speciesTaxonomyId": "5476",
     "strain": "SC5314",
-    "tags": [
-      "fungidb.org"
-    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000182965.3"
   },
   {
@@ -324,10 +282,6 @@
     "species": "Mycobacterium tuberculosis",
     "speciesTaxonomyId": "1773",
     "strain": "H37Rv",
-    "tags": [
-      "TB",
-      "Outbreak"
-    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000195955.2"
   },
   {
@@ -347,9 +301,6 @@
     "species": "Trypanosoma cruzi",
     "speciesTaxonomyId": "5693",
     "strain": "CL Brener",
-    "tags": [
-      "tritrypdb.org"
-    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000209065.1"
   },
   {
@@ -369,9 +320,6 @@
     "species": "Leishmania donovani",
     "speciesTaxonomyId": "5661",
     "strain": "BPK282A1",
-    "tags": [
-      "tritrypdb.org"
-    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000227135.1"
   },
   {
@@ -391,10 +339,6 @@
     "species": "Monkeypox virus",
     "speciesTaxonomyId": "10244",
     "strain": "Zaire-96-I-16",
-    "tags": [
-      "MPOX",
-      "Outbreak"
-    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000857045.1"
   },
   {
@@ -414,10 +358,6 @@
     "species": "Severe acute respiratory syndrome-related coronavirus",
     "speciesTaxonomyId": "694009",
     "strain": null,
-    "tags": [
-      "COVID",
-      "Outbreak"
-    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_009858895.2"
   },
   {
@@ -437,9 +377,6 @@
     "species": "Culex quinquefasciatus",
     "speciesTaxonomyId": "7176",
     "strain": "JHB",
-    "tags": [
-      "vectorbase.org"
-    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_015732765.1"
   },
   {
@@ -459,9 +396,6 @@
     "species": "Culex pipiens",
     "speciesTaxonomyId": "7175",
     "strain": null,
-    "tags": [
-      "vectorbase.org"
-    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_016801865.2"
   },
   {
@@ -481,9 +415,6 @@
     "species": "Coccidioides posadasii",
     "speciesTaxonomyId": "199306",
     "strain": "Silveira",
-    "tags": [
-      "NcbiDatasets"
-    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_018416015.2"
   },
   {
@@ -503,9 +434,6 @@
     "species": "Plasmodium yoelii",
     "speciesTaxonomyId": "5861",
     "strain": "17X",
-    "tags": [
-      "plasmodb.org"
-    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_900002385.2"
   },
   {
@@ -525,9 +453,6 @@
     "species": "Plasmodium vinckei",
     "speciesTaxonomyId": "5860",
     "strain": null,
-    "tags": [
-      "plasmodb.org"
-    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_900681995.1"
   },
   {
@@ -547,9 +472,6 @@
     "species": "Anopheles gambiae",
     "speciesTaxonomyId": "7165",
     "strain": null,
-    "tags": [
-      "NcbiDatasets"
-    ],
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_943734735.2"
   }
 ]
