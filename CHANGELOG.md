@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/galaxyproject/brc-analytics/compare/v0.3.0...v0.3.1) (2025-01-23)
+
+
+### Code Refactoring
+
+* get accessions from yaml file when building catalog source ([#228](https://github.com/galaxyproject/brc-analytics/issues/228)) ([#229](https://github.com/galaxyproject/brc-analytics/issues/229)) ([bb79f88](https://github.com/galaxyproject/brc-analytics/commit/bb79f885782fd920b02cab0b157276bb0a4fb129))
+
 ## [0.3.0](https://github.com/galaxyproject/brc-analytics/compare/v0.2.0...v0.3.0) (2025-01-22)
 
 
