@@ -7,7 +7,7 @@ SOURCE_LIST_URL = "https://docs.google.com/spreadsheets/d/1Gg9sw2Qw765tOx2To53Xk
 
 ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.json"
 
-GENOMES_OUTPUT_PATH = "files/source/genomes-from-ncbi.tsv"
+GENOMES_OUTPUT_PATH = "catalog-build/source/genomes-from-ncbi.tsv"
 
 def get_paginated_ncbi_results(base_url, query_description):
   page = 1

@@ -21,13 +21,13 @@ Create a Python virtual environment and install requirements:
 ```shell
 python3 -m venv ./venv
 source ./venv/bin/activate
-pip install -r ./files/requirements.txt
+pip install -r ./catalog-build/requirements.txt
 ```
 
 Then run the script:
 
 ```shell
-python3 ./files/build-genomes-files.py
+python3 ./catalog-build/build-files-from-ncbi.py
 ```
 
 The environment can be deactivated by running `deactivate`, and re-activated by running `source ./venv/bin/activate`
@@ -38,5 +38,5 @@ again.
 Using the Python environment described above, run the script:
 
 ```shell
-python3 ./files/build-files-from-ncbi.py
+python3 ./catalog-build/build-files-from-ncbi.py
 ```

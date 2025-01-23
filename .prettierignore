@@ -15,3 +15,6 @@ venv
 
 # releases
 /CHANGELOG.md
+
+#catalog
+/catalog

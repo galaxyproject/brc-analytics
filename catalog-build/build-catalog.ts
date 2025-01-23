@@ -6,7 +6,7 @@ import {
 } from "../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { SourceGenome } from "./entities";
 
-const SOURCE_PATH_GENOMES = "files/source/genomes-from-ncbi.tsv";
+const SOURCE_PATH_GENOMES = "catalog-build/source/genomes-from-ncbi.tsv";
 
 buildCatalog();
 
@@ -15,10 +15,10 @@ async function buildCatalog(): Promise<void> {
   const organisms = buildOrganisms(genomes);
 
   console.log("Genomes:", genomes.length);
-  await saveJson("files/out/genomes.json", genomes);
+  await saveJson("catalog/genomes.json", genomes);
 
   console.log("Organisms:", genomes.length);
-  await saveJson("files/out/organisms.json", organisms);
+  await saveJson("catalog/organisms.json", organisms);
 
   console.log("Done");
 }
