@@ -6,6 +6,10 @@ export const SOCIALS = {
     label: "Discourse",
     url: "https://help.brc-analytics.org/",
   },
+  GITHUB: {
+    label: "GitHub",
+    url: "https://github.com/galaxyproject/brc-analytics",
+  },
 };
 
 export const socialMedia: SocialMedia = {
@@ -13,6 +17,10 @@ export const socialMedia: SocialMedia = {
     {
       ...SOCIALS.DISCOURSE,
       Icon: C.DiscourseIcon,
+    },
+    {
+      ...SOCIALS.GITHUB,
+      Icon: C.GitHubIcon,
     },
   ],
 };
