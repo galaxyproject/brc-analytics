@@ -23,6 +23,7 @@ import {
 } from "site-config/brc-analytics/category";
 import {
   getGenomeId,
+  getGenomeOrganismId,
   getOrganismId,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/utils";
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
@@ -145,9 +146,10 @@ export const buildGcPercent = (
  */
 export const buildGenomeSpecies = (
   genome: BRCDataCatalogGenome
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof C.Link> => {
   return {
-    value: genome.species,
+    label: genome.species,
+    url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(genome))}`,
   };
 };
 
@@ -379,9 +381,7 @@ export const buildGenomeDetails = (
     BRC_DATA_CATALOG_CATEGORY_LABEL.SPECIES,
     C.Link({
       label: genome.species,
-      url: `https://www.ncbi.nlm.nih.gov/datasets/taxonomy/${encodeURIComponent(
-        genome.ncbiTaxonomyId
-      )}/`,
+      url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(genome))}`,
     })
   );
   keyValuePairs.set(
