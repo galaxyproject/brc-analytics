@@ -20,6 +20,7 @@ export interface BRCDataCatalogGenome {
   length: number;
   level: string;
   ncbiTaxonomyId: string;
+  organismGroup: string | null;
   scaffoldCount: number;
   scaffoldL50: number;
   scaffoldN50: number;
@@ -34,6 +35,7 @@ export interface BRCDataCatalogOrganism {
   assemblyTaxonomyIds: string[];
   genomes: BRCDataCatalogGenome[];
   ncbiTaxonomyId: string;
+  organismGroup: string | null;
   species: string;
 }
 

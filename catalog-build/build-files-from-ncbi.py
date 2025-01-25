@@ -10,6 +10,15 @@ UCSC_ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.jso
 
 GENOMES_OUTPUT_PATH = "catalog-build/source/genomes-from-ncbi.tsv"
 
+ORGANISM_GROUPS_BY_TAXONOMY_ID = {
+  2: "Bacterium",
+  10239: "Virus",
+  4751: "Fungus",
+  50557: "Insect",
+  5794: "Apicomplexan",
+  5653: "Kinetoplastid",
+}
+
 def read_assemblies():
   with open(ASSEMBLIES_PATH) as stream:
     return pd.DataFrame(yaml.safe_load(stream)["assemblies"])
@@ -29,12 +38,19 @@ def get_paginated_ncbi_results(base_url, query_description):
     page += 1
   return results
 
+def get_organism_group(lineage):
+  for tax_id in lineage:
+    if tax_id in ORGANISM_GROUPS_BY_TAXONOMY_ID:
+      return ORGANISM_GROUPS_BY_TAXONOMY_ID[tax_id]
+  return ""
+
 def get_species_row(taxon_info):
   species_info = taxon_info["taxonomy"]["classification"]["species"]
   return {
     "taxonomyId": taxon_info["taxonomy"]["tax_id"],
     "species": species_info["name"],
     "speciesTaxonomyId": species_info["id"],
+    "organismGroup": get_organism_group(taxon_info["taxonomy"]["parents"])
   }
 
 def get_species_df(taxonomy_ids):

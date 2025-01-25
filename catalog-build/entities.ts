@@ -8,6 +8,7 @@ export interface SourceGenome {
   isRef: string;
   length: string;
   level: string;
+  organismGroup: string;
   scaffoldCount: string;
   scaffoldL50: string;
   scaffoldN50: string;

@@ -37,6 +37,7 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
       length: parseNumber(row.length),
       level: row.level,
       ncbiTaxonomyId: row.taxonomyId,
+      organismGroup: parseStringOrNull(row.organismGroup),
       scaffoldCount: parseNumber(row.scaffoldCount),
       scaffoldL50: parseNumber(row.scaffoldL50),
       scaffoldN50: parseNumber(row.scaffoldN50),
@@ -75,6 +76,7 @@ function buildOrganism(
     ),
     genomes: [...(organism?.genomes ?? []), genome],
     ncbiTaxonomyId: genome.speciesTaxonomyId,
+    organismGroup: genome.organismGroup,
     species: genome.species,
   };
 }
