@@ -213,9 +213,10 @@ export const buildOrganismAssemblyTaxonomyIds = (
  */
 export const buildOrganismGroup = (
   entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof C.NTagCell> => {
   return {
-    value: entity.organismGroup,
+    label: "organism groups",
+    values: entity.organismGroup,
   };
 };
 

@@ -144,9 +144,9 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
       },
       {
         componentConfig: {
-          component: C.BasicCell,
+          component: C.NTagCell,
           viewBuilder: V.buildOrganismGroup,
-        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
+        } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.ORGANISM_GROUP,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.ORGANISM_GROUP,
         width: { max: "0.5fr", min: "142px" },

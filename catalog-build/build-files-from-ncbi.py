@@ -38,11 +38,8 @@ def get_paginated_ncbi_results(base_url, query_description):
     page += 1
   return results
 
-def get_organism_group(lineage):
-  for tax_id in lineage:
-    if tax_id in ORGANISM_GROUPS_BY_TAXONOMY_ID:
-      return ORGANISM_GROUPS_BY_TAXONOMY_ID[tax_id]
-  return ""
+def get_organism_groups(lineage):
+  return [ORGANISM_GROUPS_BY_TAXONOMY_ID[tax_id] for tax_id in lineage if tax_id in ORGANISM_GROUPS_BY_TAXONOMY_ID]
 
 def get_species_row(taxon_info):
   species_info = taxon_info["taxonomy"]["classification"]["species"]
@@ -50,7 +47,7 @@ def get_species_row(taxon_info):
     "taxonomyId": taxon_info["taxonomy"]["tax_id"],
     "species": species_info["name"],
     "speciesTaxonomyId": species_info["id"],
-    "organismGroup": get_organism_group(taxon_info["taxonomy"]["parents"])
+    "organismGroup": ",".join(get_organism_groups(taxon_info["taxonomy"]["parents"]))
   }
 
 def get_species_df(taxonomy_ids):
