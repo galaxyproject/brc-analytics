@@ -17,7 +17,7 @@
         "level": "Complete Genome",
         "ncbiTaxonomyId": "10244",
         "organismGroup": [
-          "Virus"
+          "Viruses"
         ],
         "scaffoldCount": 1,
         "scaffoldL50": 1,
@@ -30,7 +30,7 @@
     ],
     "ncbiTaxonomyId": "10244",
     "organismGroup": [
-      "Virus"
+      "Viruses"
     ],
     "species": "Monkeypox virus"
   },
@@ -52,7 +52,7 @@
         "level": "Complete Genome",
         "ncbiTaxonomyId": "83332",
         "organismGroup": [
-          "Bacterium"
+          "Bacteria"
         ],
         "scaffoldCount": 1,
         "scaffoldL50": 1,
@@ -65,7 +65,7 @@
     ],
     "ncbiTaxonomyId": "1773",
     "organismGroup": [
-      "Bacterium"
+      "Bacteria"
     ],
     "species": "Mycobacterium tuberculosis"
   },
@@ -87,7 +87,7 @@
         "level": "Scaffold",
         "ncbiTaxonomyId": "443226",
         "organismGroup": [
-          "Fungus"
+          "Fungi"
         ],
         "scaffoldCount": 54,
         "scaffoldL50": 8,
@@ -109,7 +109,7 @@
         "level": "Complete Genome",
         "ncbiTaxonomyId": "443226",
         "organismGroup": [
-          "Fungus"
+          "Fungi"
         ],
         "scaffoldCount": 9,
         "scaffoldL50": 2,
@@ -122,7 +122,7 @@
     ],
     "ncbiTaxonomyId": "199306",
     "organismGroup": [
-      "Fungus"
+      "Fungi"
     ],
     "species": "Coccidioides posadasii"
   },
@@ -145,7 +145,7 @@
         "level": "Chromosome",
         "ncbiTaxonomyId": "235443",
         "organismGroup": [
-          "Fungus"
+          "Fungi"
         ],
         "scaffoldCount": 14,
         "scaffoldL50": 6,
@@ -167,7 +167,7 @@
         "level": "Chromosome",
         "ncbiTaxonomyId": "214684",
         "organismGroup": [
-          "Fungus"
+          "Fungi"
         ],
         "scaffoldCount": 14,
         "scaffoldL50": 6,
@@ -180,7 +180,7 @@
     ],
     "ncbiTaxonomyId": "5207",
     "organismGroup": [
-      "Fungus"
+      "Fungi"
     ],
     "species": "Cryptococcus neoformans"
   },
@@ -202,7 +202,7 @@
         "level": "Chromosome",
         "ncbiTaxonomyId": "237561",
         "organismGroup": [
-          "Fungus"
+          "Fungi"
         ],
         "scaffoldCount": 8,
         "scaffoldL50": 3,
@@ -215,7 +215,7 @@
     ],
     "ncbiTaxonomyId": "5476",
     "organismGroup": [
-      "Fungus"
+      "Fungi"
     ],
     "species": "Candida albicans"
   },
@@ -237,7 +237,7 @@
         "level": "Scaffold",
         "ncbiTaxonomyId": "246410",
         "organismGroup": [
-          "Fungus"
+          "Fungi"
         ],
         "scaffoldCount": 6,
         "scaffoldL50": 3,
@@ -250,7 +250,7 @@
     ],
     "ncbiTaxonomyId": "5501",
     "organismGroup": [
-      "Fungus"
+      "Fungi"
     ],
     "species": "Coccidioides immitis"
   },
@@ -272,7 +272,7 @@
         "level": "Chromosome",
         "ncbiTaxonomyId": "420245",
         "organismGroup": [
-          "Kinetoplastid"
+          "Kinetoplastea"
         ],
         "scaffoldCount": 138,
         "scaffoldL50": 11,
@@ -285,7 +285,7 @@
     ],
     "ncbiTaxonomyId": "5660",
     "organismGroup": [
-      "Kinetoplastid"
+      "Kinetoplastea"
     ],
     "species": "Leishmania braziliensis"
   },
@@ -307,7 +307,7 @@
         "level": "Chromosome",
         "ncbiTaxonomyId": "5661",
         "organismGroup": [
-          "Kinetoplastid"
+          "Kinetoplastea"
         ],
         "scaffoldCount": 36,
         "scaffoldL50": 11,
@@ -320,7 +320,7 @@
     ],
     "ncbiTaxonomyId": "5661",
     "organismGroup": [
-      "Kinetoplastid"
+      "Kinetoplastea"
     ],
     "species": "Leishmania donovani"
   },
@@ -342,7 +342,7 @@
         "level": "Complete Genome",
         "ncbiTaxonomyId": "347515",
         "organismGroup": [
-          "Kinetoplastid"
+          "Kinetoplastea"
         ],
         "scaffoldCount": 36,
         "scaffoldL50": 11,
@@ -355,7 +355,7 @@
     ],
     "ncbiTaxonomyId": "5664",
     "organismGroup": [
-      "Kinetoplastid"
+      "Kinetoplastea"
     ],
     "species": "Leishmania major"
   },
@@ -377,7 +377,7 @@
         "level": "Chromosome",
         "ncbiTaxonomyId": "185431",
         "organismGroup": [
-          "Kinetoplastid"
+          "Kinetoplastea"
         ],
         "scaffoldCount": 12,
         "scaffoldL50": 4,
@@ -390,7 +390,7 @@
     ],
     "ncbiTaxonomyId": "5691",
     "organismGroup": [
-      "Kinetoplastid"
+      "Kinetoplastea"
     ],
     "species": "Trypanosoma brucei"
   },
@@ -412,7 +412,7 @@
         "level": "Scaffold",
         "ncbiTaxonomyId": "5693",
         "organismGroup": [
-          "Kinetoplastid"
+          "Kinetoplastea"
         ],
         "scaffoldCount": 29495,
         "scaffoldL50": 212,
@@ -425,7 +425,7 @@
     ],
     "ncbiTaxonomyId": "5693",
     "organismGroup": [
-      "Kinetoplastid"
+      "Kinetoplastea"
     ],
     "species": "Trypanosoma cruzi"
   },
@@ -447,7 +447,7 @@
         "level": "Chromosome",
         "ncbiTaxonomyId": "508771",
         "organismGroup": [
-          "Apicomplexan"
+          "Apicomplexa"
         ],
         "scaffoldCount": 2276,
         "scaffoldL50": 6,
@@ -460,7 +460,7 @@
     ],
     "ncbiTaxonomyId": "5811",
     "organismGroup": [
-      "Apicomplexan"
+      "Apicomplexa"
     ],
     "species": "Toxoplasma gondii"
   },
@@ -482,7 +482,7 @@
         "level": "Complete Genome",
         "ncbiTaxonomyId": "36329",
         "organismGroup": [
-          "Apicomplexan"
+          "Apicomplexa"
         ],
         "scaffoldCount": 14,
         "scaffoldL50": 5,
@@ -495,7 +495,7 @@
     ],
     "ncbiTaxonomyId": "5833",
     "organismGroup": [
-      "Apicomplexan"
+      "Apicomplexa"
     ],
     "species": "Plasmodium falciparum"
   },
@@ -517,7 +517,7 @@
         "level": "Chromosome",
         "ncbiTaxonomyId": "5855",
         "organismGroup": [
-          "Apicomplexan"
+          "Apicomplexa"
         ],
         "scaffoldCount": 242,
         "scaffoldL50": 6,
@@ -539,7 +539,7 @@
         "level": "Chromosome",
         "ncbiTaxonomyId": "5855",
         "organismGroup": [
-          "Apicomplexan"
+          "Apicomplexa"
         ],
         "scaffoldCount": 2747,
         "scaffoldL50": 6,
@@ -552,7 +552,7 @@
     ],
     "ncbiTaxonomyId": "5855",
     "organismGroup": [
-      "Apicomplexan"
+      "Apicomplexa"
     ],
     "species": "Plasmodium vivax"
   },
@@ -574,7 +574,7 @@
         "level": "Chromosome",
         "ncbiTaxonomyId": "54757",
         "organismGroup": [
-          "Apicomplexan"
+          "Apicomplexa"
         ],
         "scaffoldCount": 14,
         "scaffoldL50": 5,
@@ -587,7 +587,7 @@
     ],
     "ncbiTaxonomyId": "5860",
     "organismGroup": [
-      "Apicomplexan"
+      "Apicomplexa"
     ],
     "species": "Plasmodium vinckei"
   },
@@ -609,7 +609,7 @@
         "level": "Complete Genome",
         "ncbiTaxonomyId": "5861",
         "organismGroup": [
-          "Apicomplexan"
+          "Apicomplexa"
         ],
         "scaffoldCount": 14,
         "scaffoldL50": 5,
@@ -622,7 +622,7 @@
     ],
     "ncbiTaxonomyId": "5861",
     "organismGroup": [
-      "Apicomplexan"
+      "Apicomplexa"
     ],
     "species": "Plasmodium yoelii"
   },
@@ -644,7 +644,7 @@
         "level": "Complete Genome",
         "ncbiTaxonomyId": "2697049",
         "organismGroup": [
-          "Virus"
+          "Viruses"
         ],
         "scaffoldCount": 1,
         "scaffoldL50": 1,
@@ -657,7 +657,7 @@
     ],
     "ncbiTaxonomyId": "694009",
     "organismGroup": [
-      "Virus"
+      "Viruses"
     ],
     "species": "Severe acute respiratory syndrome-related coronavirus"
   },
@@ -680,7 +680,7 @@
         "level": "Chromosome",
         "ncbiTaxonomyId": "180454",
         "organismGroup": [
-          "Insect"
+          "Insecta"
         ],
         "scaffoldCount": 8144,
         "scaffoldL50": 9,
@@ -702,7 +702,7 @@
         "level": "Chromosome",
         "ncbiTaxonomyId": "7165",
         "organismGroup": [
-          "Insect"
+          "Insecta"
         ],
         "scaffoldCount": 190,
         "scaffoldL50": 2,
@@ -715,7 +715,7 @@
     ],
     "ncbiTaxonomyId": "7165",
     "organismGroup": [
-      "Insect"
+      "Insecta"
     ],
     "species": "Anopheles gambiae"
   },
@@ -737,7 +737,7 @@
         "level": "Chromosome",
         "ncbiTaxonomyId": "42434",
         "organismGroup": [
-          "Insect"
+          "Insecta"
         ],
         "scaffoldCount": 289,
         "scaffoldL50": 2,
@@ -750,7 +750,7 @@
     ],
     "ncbiTaxonomyId": "7175",
     "organismGroup": [
-      "Insect"
+      "Insecta"
     ],
     "species": "Culex pipiens"
   },
@@ -772,7 +772,7 @@
         "level": "Chromosome",
         "ncbiTaxonomyId": "7176",
         "organismGroup": [
-          "Insect"
+          "Insecta"
         ],
         "scaffoldCount": 56,
         "scaffoldL50": 2,
@@ -785,7 +785,7 @@
     ],
     "ncbiTaxonomyId": "7176",
     "organismGroup": [
-      "Insect"
+      "Insecta"
     ],
     "species": "Culex quinquefasciatus"
   },
@@ -807,7 +807,7 @@
         "level": "Chromosome",
         "ncbiTaxonomyId": "330879",
         "organismGroup": [
-          "Fungus"
+          "Fungi"
         ],
         "scaffoldCount": 8,
         "scaffoldL50": 4,
@@ -820,7 +820,7 @@
     ],
     "ncbiTaxonomyId": "746128",
     "organismGroup": [
-      "Fungus"
+      "Fungi"
     ],
     "species": "Aspergillus fumigatus"
   }
