@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.4.0](https://github.com/galaxyproject/brc-analytics/compare/v0.3.1...v0.4.0) (2025-01-27)
+
+
+### Features
+
+* add github link to header and footer ([#234](https://github.com/galaxyproject/brc-analytics/issues/234)) ([#238](https://github.com/galaxyproject/brc-analytics/issues/238)) ([d107863](https://github.com/galaxyproject/brc-analytics/commit/d107863da4979d35fb05b6ba272fd5afc127a948))
+* add organism group to entity lists and filters ([#236](https://github.com/galaxyproject/brc-analytics/issues/236)) ([#240](https://github.com/galaxyproject/brc-analytics/issues/240)) ([79def41](https://github.com/galaxyproject/brc-analytics/commit/79def410cf0cefcf9621be2126df8fd0a09a766b))
+* link to organism page from assembly list and detail ([#231](https://github.com/galaxyproject/brc-analytics/issues/231)) ([#232](https://github.com/galaxyproject/brc-analytics/issues/232)) ([15bace5](https://github.com/galaxyproject/brc-analytics/commit/15bace5f4334151333aea3e3a4331ac5ef7cea47))
+
 ## [0.3.1](https://github.com/galaxyproject/brc-analytics/compare/v0.3.0...v0.3.1) (2025-01-23)
 
 
