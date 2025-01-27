@@ -10,7 +10,7 @@ UCSC_ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.jso
 
 GENOMES_OUTPUT_PATH = "catalog-build/source/genomes-from-ncbi.tsv"
 
-ORGANISM_GROUPS_BY_TAXONOMY_ID = {
+TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
   2: "Bacteria",
   10239: "Viruses",
   4751: "Fungi",
@@ -38,8 +38,8 @@ def get_paginated_ncbi_results(base_url, query_description):
     page += 1
   return results
 
-def get_organism_groups(lineage):
-  return [ORGANISM_GROUPS_BY_TAXONOMY_ID[tax_id] for tax_id in lineage if tax_id in ORGANISM_GROUPS_BY_TAXONOMY_ID]
+def get_taxonomic_groups(lineage):
+  return [TAXONOMIC_GROUPS_BY_TAXONOMY_ID[tax_id] for tax_id in lineage if tax_id in TAXONOMIC_GROUPS_BY_TAXONOMY_ID]
 
 def get_species_row(taxon_info):
   species_info = taxon_info["taxonomy"]["classification"]["species"]
@@ -47,7 +47,7 @@ def get_species_row(taxon_info):
     "taxonomyId": taxon_info["taxonomy"]["tax_id"],
     "species": species_info["name"],
     "speciesTaxonomyId": species_info["id"],
-    "organismGroup": ",".join(get_organism_groups(taxon_info["taxonomy"]["parents"]))
+    "taxonomicGroup": ",".join(get_taxonomic_groups(taxon_info["taxonomy"]["parents"]))
   }
 
 def get_species_df(taxonomy_ids):

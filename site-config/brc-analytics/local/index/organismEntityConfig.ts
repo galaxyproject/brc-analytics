@@ -33,8 +33,8 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.ASSEMBLY_TAXONOMY_IDS,
           },
           {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.ORGANISM_GROUP,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.ORGANISM_GROUP,
+            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_GROUP,
+            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_GROUP,
           },
         ],
       },
@@ -80,10 +80,10 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
       {
         componentConfig: {
           component: C.NTagCell,
-          viewBuilder: V.buildOrganismGroup,
+          viewBuilder: V.buildTaxonomicGroup,
         } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogOrganism>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.ORGANISM_GROUP,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.ORGANISM_GROUP,
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_GROUP,
+        id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_GROUP,
         width: { max: "0.5fr", min: "164px" },
       },
       {

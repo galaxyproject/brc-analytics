@@ -20,13 +20,13 @@ export interface BRCDataCatalogGenome {
   length: number;
   level: string;
   ncbiTaxonomyId: string;
-  organismGroup: string[];
   scaffoldCount: number;
   scaffoldL50: number;
   scaffoldN50: number;
   species: string;
   speciesTaxonomyId: string;
   strain: string | null;
+  taxonomicGroup: string[];
   ucscBrowserUrl: string | null;
 }
 
@@ -35,8 +35,8 @@ export interface BRCDataCatalogOrganism {
   assemblyTaxonomyIds: string[];
   genomes: BRCDataCatalogGenome[];
   ncbiTaxonomyId: string;
-  organismGroup: string[];
   species: string;
+  taxonomicGroup: string[];
 }
 
 export interface EntitiesResponse<R> {

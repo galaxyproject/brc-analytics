@@ -8,13 +8,13 @@ export interface SourceGenome {
   isRef: string;
   length: string;
   level: string;
-  organismGroup: string;
   scaffoldCount: string;
   scaffoldL50: string;
   scaffoldN50: string;
   species: string;
   speciesTaxonomyId: string;
   strain: string;
+  taxonomicGroup: string;
   taxonomyId: string;
   ucscBrowser: string;
 }

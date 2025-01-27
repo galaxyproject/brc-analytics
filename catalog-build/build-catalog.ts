@@ -37,13 +37,13 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
       length: parseNumber(row.length),
       level: row.level,
       ncbiTaxonomyId: row.taxonomyId,
-      organismGroup: row.organismGroup ? row.organismGroup.split(",") : [],
       scaffoldCount: parseNumber(row.scaffoldCount),
       scaffoldL50: parseNumber(row.scaffoldL50),
       scaffoldN50: parseNumber(row.scaffoldN50),
       species: row.species,
       speciesTaxonomyId: row.speciesTaxonomyId,
       strain: parseStringOrNull(row.strain),
+      taxonomicGroup: row.taxonomicGroup ? row.taxonomicGroup.split(",") : [],
       ucscBrowserUrl: parseStringOrNull(row.ucscBrowser),
     };
   });
@@ -76,8 +76,8 @@ function buildOrganism(
     ),
     genomes: [...(organism?.genomes ?? []), genome],
     ncbiTaxonomyId: genome.speciesTaxonomyId,
-    organismGroup: genome.organismGroup,
     species: genome.species,
+    taxonomicGroup: genome.taxonomicGroup,
   };
 }
 

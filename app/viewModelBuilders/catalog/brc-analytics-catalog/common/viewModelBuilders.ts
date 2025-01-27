@@ -207,16 +207,16 @@ export const buildOrganismAssemblyTaxonomyIds = (
 };
 
 /**
- * Build props for the organism group cell.
+ * Build props for the taxonomic group cell.
  * @param entity - Organism or genome entity.
  * @returns Props to be used for the cell.
  */
-export const buildOrganismGroup = (
+export const buildTaxonomicGroup = (
   entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
 ): ComponentProps<typeof C.NTagCell> => {
   return {
-    label: "organism groups",
-    values: entity.organismGroup,
+    label: "taxonomic groups",
+    values: entity.taxonomicGroup,
   };
 };
 
