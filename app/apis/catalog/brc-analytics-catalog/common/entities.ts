@@ -20,9 +20,9 @@ export interface BRCDataCatalogGenome {
   length: number;
   level: string;
   ncbiTaxonomyId: string;
-  scaffoldCount: number;
-  scaffoldL50: number;
-  scaffoldN50: number;
+  scaffoldCount: number | null;
+  scaffoldL50: number | null;
+  scaffoldN50: number | null;
   species: string;
   speciesTaxonomyId: string;
   strain: string | null;

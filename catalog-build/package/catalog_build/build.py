@@ -52,12 +52,12 @@ def get_genome_row(genome_info):
     "level": genome_info["assembly_info"]["assembly_level"],
     "chromosomeCount": genome_info["assembly_stats"].get("total_number_of_chromosomes"),
     "length": genome_info["assembly_stats"]["total_sequence_length"],
-    "scaffoldCount": genome_info["assembly_stats"]["number_of_scaffolds"],
-    "scaffoldN50": genome_info["assembly_stats"]["scaffold_n50"],
-    "scaffoldL50": genome_info["assembly_stats"]["scaffold_l50"],
+    "scaffoldCount": genome_info["assembly_stats"].get("number_of_scaffolds"),
+    "scaffoldN50": genome_info["assembly_stats"].get("scaffold_n50"),
+    "scaffoldL50": genome_info["assembly_stats"].get("scaffold_l50"),
     "coverage": genome_info["assembly_stats"].get("genome_coverage"),
     "gcPercent": genome_info["assembly_stats"]["gc_percent"],
-    "annotationStatus": genome_info["annotation_info"].get("status"),
+    "annotationStatus": genome_info.get("annotation_info", {}).get("status"),
     "pairedAccession": genome_info.get("paired_accession"),
   }
 
