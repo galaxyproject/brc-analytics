@@ -1,5 +1,6 @@
 import ky from "ky";
 import { WORKFLOW_ID } from "../apis/catalog/brc-analytics-catalog/common/entities";
+import { GALAXY_ENVIRONMENT } from "site-config/common/galaxy";
 
 interface WorkflowLandingsBody {
   public: true;
@@ -16,12 +17,6 @@ interface WorkflowLanding {
   uuid: string;
 }
 
-const WORKFLOW_LANDINGS_API_URL =
-  "https://test.galaxyproject.org/api/workflow_landings";
-
-const WORKFLOW_LANDING_URL_PREFIX =
-  "https://test.galaxyproject.org/workflow_landings/";
-
 /**
  * Get the URL of the workflow landing page for the given genome workflow.
  * @param workflowId - Value for the `workflow_id` parameter sent to the API.
@@ -34,6 +29,8 @@ export async function getWorkflowLandingUrl(
   referenceGenome: string,
   geneModelUrl: string | null
 ): Promise<string> {
+  const { workflowLandingsApiUrl, workflowLandingUrlPrefix } =
+    GALAXY_ENVIRONMENT;
   const body: WorkflowLandingsBody = {
     public: true,
     request_state: getWorkflowLandingsRequestState(
@@ -44,14 +41,14 @@ export async function getWorkflowLandingUrl(
     workflow_id: workflowId,
     workflow_target_type: "trs_url",
   };
-  const res = await ky.post<WorkflowLanding>(WORKFLOW_LANDINGS_API_URL, {
+  const res = await ky.post<WorkflowLanding>(workflowLandingsApiUrl, {
     json: body,
     retry: {
       methods: ["post"],
     },
   });
   const id = (await res.json()).uuid;
-  return `${WORKFLOW_LANDING_URL_PREFIX}${encodeURIComponent(id)}?public=true`;
+  return `${workflowLandingUrlPrefix}${encodeURIComponent(id)}?public=true`;
 }
 
 function buildFastaUrl(identifier: string): string {
