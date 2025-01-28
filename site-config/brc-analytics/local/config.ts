@@ -32,7 +32,10 @@ const GIT_HUB_REPO_URL = "https://github.com/galaxyproject/brc-analytics";
  *
  * @returns site config.
  */
-export function makeConfig(browserUrl: string, gitHubUrl: string): SiteConfig {
+export function makeConfig(
+  browserUrl: string,
+  gitHubUrl = GIT_HUB_REPO_URL
+): SiteConfig {
   return {
     appTitle: APP_TITLE,
     browserURL: browserUrl,
@@ -89,6 +92,6 @@ export function makeConfig(browserUrl: string, gitHubUrl: string): SiteConfig {
   };
 }
 
-const config: SiteConfig = makeConfig(BROWSER_URL, GIT_HUB_REPO_URL);
+const config: SiteConfig = makeConfig(BROWSER_URL);
 
 export default config;

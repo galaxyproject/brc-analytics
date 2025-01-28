@@ -1,9 +1,13 @@
 import { setConfig } from "@databiosphere/findable-ui/lib/config/config";
 import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import brcAnalyticsDev from "../../site-config/brc-analytics/dev/config";
 import brcAnalyticsLocal from "../../site-config/brc-analytics/local/config";
+import brcAnalyticsProd from "../../site-config/brc-analytics/prod/config";
 
 const CONFIGS: { [k: string]: SiteConfig } = {
+  "brc-analytics-dev": brcAnalyticsDev,
   "brc-analytics-local": brcAnalyticsLocal,
+  "brc-analytics-prod": brcAnalyticsProd,
 };
 
 let appConfig: SiteConfig | null = null;
