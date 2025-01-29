@@ -1,28 +1,55 @@
 outbreaks:
   - outbreak:
+      tax_id: 11320
+      resources:
+        - resource:
+            title: "CDC: Current U.S. H5 bird flu situation summary"
+            url: "https://www.cdc.gov/bird-flu/situation-summary/?CDC_AAref_Val=https://www.cdc.gov/flu/avianflu/avian-flu-summary.htm"
+        - resource:
+            title: "NCBI BioProject: U.S. H5N1 clade 2.3.4.4b immediate releases related to emergence and spread in dairy cattle"
+            url: "https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1102327"
+        - resource:
+            title: "NCBI Virus: Worldwide H5N1 sequence data since 2024"
+            url: "https://www.ncbi.nlm.nih.gov/labs/virus/vssi/#/virus?SeqType_s=Nucleotide&VirusLineage_ss=Influenza%20A%20virus,%20taxid:11320&CollectionDate_dr=2024-01-01%20TO%202030-01-01&Serotype_s=H5N1"
+        - resource:
+            title: "Galaxy workflow for analysis of avian influenza sequencing data"
+            url: "https://iwc.galaxyproject.org/workflow/%23workflow%2Fgithub.com%2Fiwc-workflows%2Finfluenza-isolates-consensus-and-subtyping%2Fmain/"
+        - resource:
+            title: "Galaxy tutorial: Avian influenza viral strain analysis from gene segment sequencing data"
+            url: "https://gxy.io/GTN:T00308"
+  - outbreak:
       tax_id: 2697049
       resources:
         - resource:
-            title: "Coronavirus: Update Related to the Current Outbreak of COVID-19"
-            url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC7139198/"
+            title: "WHO: Coronavirus disease (COVID-19) situation reports"
+            url: "https://www.who.int/emergencies/diseases/novel-coronavirus-2019/situation-reports"
         - resource:
-            title: "COVID-19 Pandemic: A Review of the Global Response"
-            url: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7162758/"
+            title: "BV-BRC: SARS-CoV-2 variants and lineages information"
+            url: "https://www.bv-brc.org/outbreaks/SARSCoV2/"
         - resource:
-            title: "The Impact of COVID-19 on Public Health"
-            url: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7275854/"
+            title: "CoVariants: Explore the SARS-CoV-2 lineage spectrum"
+            url: "https://covariants.org/"
         - resource:
-            title: "COVID-19: Epidemiology, Virology, and Clinical Features"
-            url: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7159299/"
+            title: "covSPECTRUM: In-depth exploration of public SARS-CoV-2 molecular surveillance data"
+            url: "https://open.cov-spectrum.org/explore/United%20States/AllSamples/Past6M"
+        - resource:
+            title: "Galaxy workflows for analysis of SARS-CoV-2 sequencing data"
+            url: "https://galaxyproject.org/projects/covid19/workflows/"
+        - resource:
+            title: "Galaxy tutorial: Mutation calling, viral genome reconstruction and lineage/clade assignment from SARS-CoV-2 sequencing data"
+            url: "https://gxy.io/GTN:T00316"
   - outbreak:
       tax_id: 10244
       resources:
         - resource:
-            title: "Mpox Virus: Understanding the Outbreak"
-            url: "https://example.com/mpox-outbreak"
+            title: "WHO | Mpox outbreak: global trends"
+            url: "https://worldhealthorg.shinyapps.io/mpx_global/"
         - resource:
-            title: "Mpox Virus: Symptoms and Treatment"
-            url: "https://example.com/mpox-symptoms-treatment"
+            title: "Galaxy workflows for analysis of Mpox virus sequencing data"
+            url: "https://galaxyproject.org/projects/mpxv/"
         - resource:
-            title: "Global Response to the Mpox Outbreak"
-            url: "https://example.com/global-response-mpox"
+            title: "Galaxy workflow for pox virus Illumina half-genome amplicon sequencing data"
+            url: "https://iwc.galaxyproject.org/workflow/%23workflow%2Fgithub.com%2Fiwc-workflows%2Fpox-virus-amplicon%2Fmain/"
+        - resource:
+            title: "Galaxy tutorial: Pox virus genome analysis from tiled-amplicon sequencing data"
+            url: "https://gxy.io/GTN:T00347"
