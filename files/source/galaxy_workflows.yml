@@ -1,46 +1,40 @@
 workflows:
-  # this list of workflows and their annotations are a wip and will be updated as i learn more
-  # about their status and the tools used, etc.
-  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-pe/main"
+  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.12"
     type: "REGULATION"
     description: "Workflows for the analysis of ChIP-seq, ATAC-Seq, and beyond."
     ploidy: "any"
 
-  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-sr/main"
+  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.12"
     type: "REGULATION"
     description: "Workflows for the analysis of ChIP-seq, ATAC-Seq, and beyond."
     ploidy: "any"
 
-  - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-pe/main"
+  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.2"
     type: "TRANSCRIPTOMICS"
     description: "Analyze bulk or single-cell RNA seq data using a variety of approaches."
     ploidy: "any"
 
-  - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-sr/main"
+  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.2"
     type: "TRANSCRIPTOMICS"
     description: "Analyze bulk or single-cell RNA seq data using a variety of approaches."
     ploidy: "any"
 
-  - trs_id: "#workflow/github.com/iwc-workflows/haploid-variant-calling-wgs-pe/main"
+  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/haploid-variant-calling-wgs-pe/main/versions/v0.1"
     type: "VARIANT_CALLING"
     description: "Identify nucleotide polymorphisms and short indels from Illumina and Element data."
     ploidy: "haploid"
 
-  # im starting to wonder looking at this if the default for ploidy shouldnt be any
-  # maybe it could be multivalued [haploid, diploid].. might not matter depending on ui
-  - trs_id: "#workflow/github.com/iwc-workflows/generic-variant-calling-wgs-pe/main"
+  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/generic-variant-calling-wgs-pe/main/versions/v0.1.1"
     type: "VARIANT_CALLING"
     description: "Identify nucleotide polymorphisms and short indels from Illumina and Element data."
+    ploidy: "haploid"
+
+  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/assembly-with-flye/main/versions/v0.2"
+    type: "ASSEMBLY"
+    description: "Assemble prokaryotic and eukaryotic genomes sequenced with a variety of technologies."
     ploidy: "any"
 
-  - trs_id: "#workflow/github.com/iwc-workflows/assembly-with-flye/main"
+  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v1.1.5"
     type: "ASSEMBLY"
-    description: "Best practices for assembly of prokaryotic and eukaryotic genomes sequenced with a variety of technologies."
-    ploidy: "any"
-
-  # idk yet what makes this specific to bacteria, or if it can be easily generalized
-  # but we may need a new annotation once i figure it out
-  - trs_id: "#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main"
-    type: "ASSEMBLY"
-    description: "Best practices for assembly of prokaryotic and eukaryotic genomes sequenced with a variety of technologies."
+    description: "Assemble prokaryotic and eukaryotic genomes sequenced with a variety of technologies."
     ploidy: "any"
