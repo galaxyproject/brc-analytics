@@ -27,7 +27,7 @@ jobs:
       - name: Build Next.js Site
         env:
           NEXT_PUBLIC_BASE_PATH: ""
-        run: npm run build:local
+        run: npm run build:dev
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
