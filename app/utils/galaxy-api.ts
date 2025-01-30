@@ -29,8 +29,9 @@ export async function getWorkflowLandingUrl(
   referenceGenome: string,
   geneModelUrl: string | null
 ): Promise<string> {
-  const { workflowLandingsApiUrl, workflowLandingUrlPrefix } =
-    GALAXY_ENVIRONMENT;
+  const { galaxyInstanceUrl } = GALAXY_ENVIRONMENT;
+  const workflowLandingsApiUrl = `${galaxyInstanceUrl}api/workflow_landings`;
+  const workflowLandingUrl = `${galaxyInstanceUrl}workflow_landings`;
   const body: WorkflowLandingsBody = {
     public: true,
     request_state: getWorkflowLandingsRequestState(
@@ -48,7 +49,7 @@ export async function getWorkflowLandingUrl(
     },
   });
   const id = (await res.json()).uuid;
-  return `${workflowLandingUrlPrefix}${encodeURIComponent(id)}?public=true`;
+  return `${workflowLandingUrl}/${encodeURIComponent(id)}?public=true`;
 }
 
 function buildFastaUrl(identifier: string): string {
