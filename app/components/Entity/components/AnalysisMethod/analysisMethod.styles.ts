@@ -12,11 +12,11 @@ import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 
 interface Props {
-  isPreview: boolean;
+  isAvailable: boolean;
 }
 
 export const StyledSection = styled(GridPaperSection, {
-  shouldForwardProp: (props) => props !== "isPreview",
+  shouldForwardProp: (props) => props !== "isAvailable",
 })<Props>`
   flex-direction: row;
   gap: 16px;
@@ -38,13 +38,13 @@ export const StyledSection = styled(GridPaperSection, {
   }
 
   ${(props) =>
-    props.isPreview &&
+    props.isAvailable &&
     css`
       cursor: pointer;
     `}
 
   ${(props) =>
-    !props.isPreview &&
+    !props.isAvailable &&
     css`
       background-color: ${smokeLightest(props)};
       pointer-events: none;

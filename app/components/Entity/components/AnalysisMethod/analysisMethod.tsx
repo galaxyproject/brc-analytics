@@ -1,4 +1,5 @@
 import { SouthIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/SouthIcon/southIcon";
+import { STATUS_BADGE_COLOR } from "@databiosphere/findable-ui/lib/components/common/StatusBadge/statusBadge";
 import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,
@@ -7,14 +8,13 @@ import {
   Loading,
   LOADING_PANEL_STYLE,
 } from "@databiosphere/findable-ui/lib/components/Loading/loading";
-import { useAsync } from "@databiosphere/findable-ui/src/hooks/useAsync";
+import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
 import { Chip } from "@mui/material";
 import { WORKFLOW_IDS_BY_ANALYSIS_METHOD } from "app/apis/catalog/brc-analytics-catalog/common/constants";
 import { getWorkflowLandingUrl } from "app/utils/galaxy-api";
 import { SectionContent, StyledSection } from "./analysisMethod.styles";
 import { CHIP_PROPS, ICON_PROPS } from "./constants";
 import { Props } from "./types";
-import { getChipColor, getChipLabel } from "./utils";
 
 export const AnalysisMethod = ({
   analysisMethod,
@@ -23,11 +23,11 @@ export const AnalysisMethod = ({
   genomeVersionAssemblyId,
 }: Props): JSX.Element => {
   const workflowId = WORKFLOW_IDS_BY_ANALYSIS_METHOD[analysisMethod];
-  const isPreview = Boolean(workflowId);
+  const isAvailable = Boolean(workflowId);
   const { data: landingUrl, isLoading, run } = useAsync<string>();
   return (
     <StyledSection
-      isPreview={isPreview}
+      isAvailable={isAvailable}
       onClick={async (): Promise<void> => {
         if (!workflowId) return;
         const url =
@@ -49,11 +49,13 @@ export const AnalysisMethod = ({
     >
       <Loading loading={isLoading} panelStyle={LOADING_PANEL_STYLE.INHERIT} />
       <SectionContent>{content}</SectionContent>
-      <Chip
-        {...CHIP_PROPS}
-        color={getChipColor(isPreview)}
-        label={getChipLabel(isPreview)}
-      />
+      {!isAvailable && (
+        <Chip
+          {...CHIP_PROPS}
+          color={STATUS_BADGE_COLOR.DEFAULT}
+          label="Coming Soon"
+        />
+      )}
       <SouthIcon {...ICON_PROPS} />
     </StyledSection>
   );
