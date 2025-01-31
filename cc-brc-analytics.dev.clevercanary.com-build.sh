@@ -11,7 +11,7 @@ npm ci
 export NEXT_PUBLIC_BASE_PATH=""
 
 # Build catalog
-npm run build:local
+npm run build:dev
 
 export BUCKET=s3://tik-brc-analytics.dev/
 export SRCDIR=out/

@@ -11,7 +11,7 @@ npm ci
 export NEXT_PUBLIC_BASE_PATH=""
 
 # Build catalog
-npm run build:local
+npm run build:prod
 
 export BUCKET=s3://izk-brc-analytics.org/
 export SRCDIR=out/
