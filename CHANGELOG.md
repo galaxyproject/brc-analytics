@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.0](https://github.com/galaxyproject/brc-analytics/compare/v0.4.0...v0.5.0) (2025-01-31)
+
+
+### Features
+
+* add environment-specific galaxy urls ([#239](https://github.com/galaxyproject/brc-analytics/issues/239)) ([#241](https://github.com/galaxyproject/brc-analytics/issues/241)) ([cf9d95d](https://github.com/galaxyproject/brc-analytics/commit/cf9d95d61573debae3e56db3292b35aa85f315ea))
+* remove "Preview" chip from analysis methods ([#245](https://github.com/galaxyproject/brc-analytics/issues/245)) ([#247](https://github.com/galaxyproject/brc-analytics/issues/247)) ([d79390a](https://github.com/galaxyproject/brc-analytics/commit/d79390a61d9141bfed9c477110e26ffb93da8dfe))
+
 ## [0.4.0](https://github.com/galaxyproject/brc-analytics/compare/v0.3.1...v0.4.0) (2025-01-27)
 
 
