@@ -17,6 +17,10 @@ interface WorkflowLanding {
   uuid: string;
 }
 
+const { galaxyInstanceUrl } = GALAXY_ENVIRONMENT;
+const workflowLandingsApiUrl = `${galaxyInstanceUrl}api/workflow_landings`;
+const workflowLandingUrl = `${galaxyInstanceUrl}workflow_landings`;
+
 /**
  * Get the URL of the workflow landing page for the given genome workflow.
  * @param workflowId - Value for the `workflow_id` parameter sent to the API.
@@ -29,9 +33,6 @@ export async function getWorkflowLandingUrl(
   referenceGenome: string,
   geneModelUrl: string | null
 ): Promise<string> {
-  const { galaxyInstanceUrl } = GALAXY_ENVIRONMENT;
-  const workflowLandingsApiUrl = `${galaxyInstanceUrl}api/workflow_landings`;
-  const workflowLandingUrl = `${galaxyInstanceUrl}workflow_landings`;
   const body: WorkflowLandingsBody = {
     public: true,
     request_state: getWorkflowLandingsRequestState(
