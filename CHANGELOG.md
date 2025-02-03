@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/galaxyproject/brc-analytics/compare/v0.5.0...v0.5.1) (2025-02-03)
+
+
+### Content
+
+* cleanup NCBI icon on the assemblies page ([#248](https://github.com/galaxyproject/brc-analytics/issues/248)) ([#249](https://github.com/galaxyproject/brc-analytics/issues/249)) ([97472c9](https://github.com/galaxyproject/brc-analytics/commit/97472c93383052391bf79d86b834edde73fc2f8a))
+
 ## [0.5.0](https://github.com/galaxyproject/brc-analytics/compare/v0.4.0...v0.5.0) (2025-01-31)
 
 
