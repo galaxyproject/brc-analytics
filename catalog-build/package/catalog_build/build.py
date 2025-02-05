@@ -26,18 +26,21 @@ def get_paginated_ncbi_results(base_url, query_description):
 def get_taxonomic_groups(lineage, taxonomic_groups):
   return [taxonomic_groups[tax_id] for tax_id in lineage if tax_id in taxonomic_groups]
 
-def get_species_row(taxon_info, taxonomic_groups):
+def get_taxonomic_group_sets(lineage, taxonomic_group_sets):
+  return {field: ",".join(get_taxonomic_groups(lineage, taxonomic_groups)) for field, taxonomic_groups in taxonomic_group_sets.items()}
+
+def get_species_row(taxon_info, taxonomic_group_sets):
   species_info = taxon_info["taxonomy"]["classification"]["species"]
   return {
     "taxonomyId": taxon_info["taxonomy"]["tax_id"],
     "species": species_info["name"],
     "speciesTaxonomyId": species_info["id"],
-    "taxonomicGroup": ",".join(get_taxonomic_groups(taxon_info["taxonomy"]["parents"], taxonomic_groups))
+    **get_taxonomic_group_sets(taxon_info["taxonomy"]["parents"], taxonomic_group_sets)
   }
 
-def get_species_df(taxonomy_ids, taxonomic_groups):
+def get_species_df(taxonomy_ids, taxonomic_group_sets):
   species_info = get_paginated_ncbi_results(f"https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/taxon/{",".join([str(id) for id in taxonomy_ids])}/dataset_report", "taxa")
-  return pd.DataFrame([get_species_row(info, taxonomic_groups) for info in species_info])
+  return pd.DataFrame([get_species_row(info, taxonomic_group_sets) for info in species_info])
 
 def get_genome_row(genome_info):
   refseq_category = genome_info["assembly_info"].get("refseq_category")
@@ -93,14 +96,14 @@ def _id_to_gene_model_url(asm_id):
 def add_gene_model_url(genomes_df: pd.DataFrame):
   return pd.concat([genomes_df, genomes_df["accession"].apply(_id_to_gene_model_url).rename("geneModelUrl")], axis="columns")
 
-def build_files(assemblies_path, genomes_output_path, ucsc_assemblies_url, taxonomic_groups={}):
+def build_files(assemblies_path, genomes_output_path, ucsc_assemblies_url, taxonomic_group_sets={}):
   print("Building files")
 
   source_list_df = read_assemblies(assemblies_path)
 
   base_genomes_df = get_genomes_df(source_list_df["accession"])
 
-  species_df = get_species_df(base_genomes_df["taxonomyId"], taxonomic_groups)
+  species_df = get_species_df(base_genomes_df["taxonomyId"], taxonomic_group_sets)
 
   genomes_with_species_df = base_genomes_df.merge(species_df, how="left", on="taxonomyId")
 
