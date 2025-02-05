@@ -28,9 +28,9 @@ export const SectionHero = (): JSX.Element => {
               </Head>
               <SubHeadline>
                 <Subhead>
-                  Comprehensive tools for exploring and interpreting genomic
-                  annotations and functional insights into disease-causing
-                  organisms and their carriers
+                  Comprehensive tools and workflows for exploring and
+                  interpreting genomic annotations and functional insights into
+                  disease-causing organisms and their carriers
                 </Subhead>
                 <Button {...BUTTON_PROPS} href={ROUTES.ORGANISMS}>
                   Get started

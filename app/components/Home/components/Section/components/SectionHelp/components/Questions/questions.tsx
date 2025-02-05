@@ -11,21 +11,15 @@ export const Questions = (): JSX.Element => {
       <Accordion>
         <AccordionSummary>What is the plan?</AccordionSummary>
         <MAccordionDetails>
-          BRC Analytics is very new. Out plan is (1) establish access to
-          official versions of VEuPathDB’s 785 genomes; (2) develop analytical
-          workflows for common analyses such as transcriptomics, variation,
-          assembly, and tightly integrate them with the data; (3) ingest and
-          provide access to custom annotations that were previously available
-          from VEuPathDB. To learn more click “Roadmap” on top.
-        </MAccordionDetails>
-      </Accordion>
-      <Accordion>
-        <AccordionSummary>Where is the data?</AccordionSummary>
-        <MAccordionDetails>
-          I used to be able to access many types of data including genomes and
-          associated annotations. Where do I find it now? Data for the majority
-          of VEuPathDB organisms is available by clicking the “Datasets” link at
-          the top.
+          We are starting with a small number of pathogen and host genomes to
+          flesh out the full functionality of the system. We will then expand to
+          all genomes that are available at the VEuPathDb system and beyond.
+          Note that we can add any genome to the system as long it is officially
+          released. You can submit your own requests for additional datasets at{" "}
+          <DXLink
+            label="help@brc-analytics.org"
+            url="mailto:help@brc-analytics.org"
+          />
         </MAccordionDetails>
       </Accordion>
       <Accordion>
