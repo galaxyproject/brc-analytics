@@ -30,7 +30,7 @@ def match_taxonomic_group(tax_id, lineage, taxonomic_groups):
   name, exclude = (taxon_info["value"], taxon_info.get("exclude")) if isinstance(taxon_info, dict) else (taxon_info, None)
   if exclude is None:
     return name
-  if isinstance(exclude, str):
+  if isinstance(exclude, int):
     exclude = [exclude]
   if all(tid not in lineage for tid in exclude):
     return name
