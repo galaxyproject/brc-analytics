@@ -23,8 +23,21 @@ def get_paginated_ncbi_results(base_url, query_description):
     page += 1
   return results
 
+def match_taxonomic_group(tax_id, lineage, taxonomic_groups):
+  if not tax_id in taxonomic_groups:
+    return None
+  taxon_info = taxonomic_groups[tax_id]
+  name, exclude = (taxon_info["value"], taxon_info.get("exclude")) if isinstance(taxon_info, dict) else (taxon_info, None)
+  if exclude is None:
+    return name
+  if isinstance(exclude, str):
+    exclude = [exclude]
+  if all(tid not in lineage for tid in exclude):
+    return name
+  return None
+
 def get_taxonomic_groups(lineage, taxonomic_groups):
-  return [taxonomic_groups[tax_id] for tax_id in lineage if tax_id in taxonomic_groups]
+  return [group for group in (match_taxonomic_group(tax_id, lineage, taxonomic_groups) for tax_id in lineage) if group is not None]
 
 def get_taxonomic_group_sets(lineage, taxonomic_group_sets):
   return {field: ",".join(get_taxonomic_groups(lineage, taxonomic_groups)) for field, taxonomic_groups in taxonomic_group_sets.items()}
