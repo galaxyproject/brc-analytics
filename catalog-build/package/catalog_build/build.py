@@ -120,7 +120,8 @@ def report_missing_values(values_name, message_predicate, values_series, present
   missing_values = values_series[~present_values_mask]
   if len(missing_values) > 0:
     if len(missing_values) > len(values_series)/2:
-      print(f"Only {len(missing_values)} of {len(values_series)} {values_name} {message_predicate}: {", ".join(message_predicate[present_values_mask])}")
+      present_values = values_series[present_values_mask]
+      print(f"Only {len(present_values)} of {len(values_series)} {values_name} {message_predicate}: {", ".join(present_values)}")
     else:
       print(f"{len(missing_values)} {values_name} not {message_predicate}: {", ".join(missing_values)}")
 
