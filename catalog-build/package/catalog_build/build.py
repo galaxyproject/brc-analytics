@@ -109,6 +109,21 @@ def _id_to_gene_model_url(asm_id):
 def add_gene_model_url(genomes_df: pd.DataFrame):
   return pd.concat([genomes_df, genomes_df["accession"].apply(_id_to_gene_model_url).rename("geneModelUrl")], axis="columns")
 
+def report_missing_values_from(values_name, message_predicate, all_values_series, *partial_values_series):
+  present_values_mask = all_values_series.astype(bool)
+  present_values_mask[:] = False
+  for series in partial_values_series:
+    present_values_mask |= all_values_series.isin(series)
+  report_missing_values(values_name, message_predicate, all_values_series, present_values_mask)
+
+def report_missing_values(values_name, message_predicate, values_series, present_values_mask):
+  missing_values = values_series[~present_values_mask]
+  if len(missing_values) > 0:
+    if len(missing_values) > len(values_series)/2:
+      print(f"Only {len(missing_values)} of {len(values_series)} {values_name} {message_predicate}: {", ".join(message_predicate[present_values_mask])}")
+    else:
+      print(f"{len(missing_values)} {values_name} not {message_predicate}: {", ".join(missing_values)}")
+
 def build_files(assemblies_path, genomes_output_path, ucsc_assemblies_url, taxonomic_group_sets={}):
   print("Building files")
 
@@ -116,7 +131,11 @@ def build_files(assemblies_path, genomes_output_path, ucsc_assemblies_url, taxon
 
   base_genomes_df = get_genomes_df(source_list_df["accession"])
 
+  report_missing_values_from("accessions", "found on NCBI", source_list_df["accession"], base_genomes_df["accession"])
+
   species_df = get_species_df(base_genomes_df["taxonomyId"], taxonomic_group_sets)
+
+  report_missing_values_from("species", "found on NCBI", base_genomes_df["taxonomyId"], species_df["taxonomyId"])
 
   genomes_with_species_df = base_genomes_df.merge(species_df, how="left", on="taxonomyId")
 
@@ -125,11 +144,11 @@ def build_files(assemblies_path, genomes_output_path, ucsc_assemblies_url, taxon
   gen_bank_merge_df = genomes_with_species_df.merge(assemblies_df, how="left", left_on="accession", right_on="genBank")
   ref_seq_merge_df = genomes_with_species_df.merge(assemblies_df, how="left", left_on="accession", right_on="refSeq")
 
-  unmatched_accessions = genomes_with_species_df["accession"][~(genomes_with_species_df["accession"].isin(assemblies_df["genBank"]) | genomes_with_species_df["accession"].isin(assemblies_df["refSeq"]))]
-  if len(unmatched_accessions) > 0:
-    print(f"{len(unmatched_accessions)} accessions had no match in assembly list: {", ".join(unmatched_accessions)}")
-
+  report_missing_values_from("accessions", "matched in assembly list", genomes_with_species_df["accession"], assemblies_df["genBank"], assemblies_df["refSeq"])
+  
   genomes_df = add_gene_model_url(gen_bank_merge_df.combine_first(ref_seq_merge_df))
+
+  report_missing_values("accessions", "matched with gene model URLs", genomes_df["accession"], genomes_df["geneModelUrl"].astype(bool))
 
   genomes_df.to_csv(genomes_output_path, index=False, sep="\t")
 
