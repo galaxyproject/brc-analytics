@@ -1,0 +1,12 @@
+workflow_categories:
+  - type: "REGULATION"
+    description: "Workflows for the analysis of ChIP-seq, ATAC-Seq, and beyond."
+
+  - type: "TRANSCRIPTOMICS"
+    description: "Analyze bulk or single-cell RNA seq data using a variety of approaches."
+
+  - type: "VARIANT_CALLING"
+    description: "Identify nucleotide polymorphisms and short indels from Illumina and Element data."
+
+  - type: "ASSEMBLY"
+    description: "Assemble prokaryotic and eukaryotic genomes sequenced with a variety of technologies."

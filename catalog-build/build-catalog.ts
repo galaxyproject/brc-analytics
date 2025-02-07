@@ -1,24 +1,37 @@
 import { parse as parseCsv } from "csv-parse/sync";
 import fsp from "fs/promises";
+import YAML from "yaml";
 import {
   BRCDataCatalogGenome,
   BRCDataCatalogOrganism,
+  WorkflowCategory,
 } from "../app/apis/catalog/brc-analytics-catalog/common/entities";
-import { SourceGenome } from "./entities";
+import {
+  SourceGenome,
+  SourceWorkflowCategories,
+  SourceWorkflows,
+} from "./entities";
 
 const SOURCE_PATH_GENOMES = "catalog-build/source/genomes-from-ncbi.tsv";
+const SOURCE_PATH_WORKFLOW_CATEGORIES =
+  "catalog-build/source/workflow_categories.yml";
+const SOURCE_PATH_WORKFLOWS = "catalog-build/source/workflows.yml";
 
 buildCatalog();
 
 async function buildCatalog(): Promise<void> {
   const genomes = await buildGenomes();
   const organisms = buildOrganisms(genomes);
+  const workflows = await buildWorkflows();
 
   console.log("Genomes:", genomes.length);
   await saveJson("catalog/genomes.json", genomes);
 
-  console.log("Organisms:", genomes.length);
+  console.log("Organisms:", organisms.length);
   await saveJson("catalog/organisms.json", organisms);
+
+  console.log("Workflows:", workflows.length);
+  await saveJson("catalog/workflows.json", workflows);
 
   console.log("Done");
 }
@@ -65,6 +78,29 @@ function buildOrganisms(
   );
 }
 
+async function buildWorkflows(): Promise<WorkflowCategory[]> {
+  const sourceWorkflowCategories = await readYamlFile<SourceWorkflowCategories>(
+    SOURCE_PATH_WORKFLOW_CATEGORIES
+  );
+  const sourceWorkflows = await readYamlFile<SourceWorkflows>(
+    SOURCE_PATH_WORKFLOWS
+  );
+
+  const workflowCategories: WorkflowCategory[] =
+    sourceWorkflowCategories.workflow_categories.map((sourceCategory) => ({
+      ...sourceCategory,
+      workflows: [],
+    }));
+
+  for (const { ploidy, trs_id: trsId, type } of sourceWorkflows.workflows) {
+    const category = workflowCategories.find((c) => c.type === type);
+    if (!category) throw new Error(`Unknown workflow category: ${type}`);
+    category.workflows.push({ ploidy, trsId });
+  }
+
+  return workflowCategories;
+}
+
 function buildOrganism(
   organism: BRCDataCatalogOrganism | undefined,
   genome: BRCDataCatalogGenome
@@ -91,6 +127,11 @@ async function readValuesFile<T>(
     delimiter,
     relax_quotes: true,
   });
+}
+
+async function readYamlFile<T>(filePath: string): Promise<T> {
+  const content = await fsp.readFile(filePath, "utf8");
+  return YAML.parse(content);
 }
 
 async function saveJson(filePath: string, data: unknown): Promise<void> {

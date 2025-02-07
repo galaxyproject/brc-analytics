@@ -1,0 +1,58 @@
+[
+  {
+    "type": "REGULATION",
+    "description": "Workflows for the analysis of ChIP-seq, ATAC-Seq, and beyond.",
+    "workflows": [
+      {
+        "ploidy": "any",
+        "trsId": "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.12"
+      },
+      {
+        "ploidy": "any",
+        "trsId": "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.12"
+      }
+    ]
+  },
+  {
+    "type": "TRANSCRIPTOMICS",
+    "description": "Analyze bulk or single-cell RNA seq data using a variety of approaches.",
+    "workflows": [
+      {
+        "ploidy": "any",
+        "trsId": "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.2"
+      },
+      {
+        "ploidy": "any",
+        "trsId": "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.2"
+      }
+    ]
+  },
+  {
+    "type": "VARIANT_CALLING",
+    "description": "Identify nucleotide polymorphisms and short indels from Illumina and Element data.",
+    "workflows": [
+      {
+        "ploidy": "haploid",
+        "trsId": "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/haploid-variant-calling-wgs-pe/main/versions/v0.1"
+      },
+      {
+        "ploidy": "haploid",
+        "trsId": "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/generic-variant-calling-wgs-pe/main/versions/v0.1.1"
+      }
+    ]
+  },
+  {
+    "type": "ASSEMBLY",
+    "description": "Assemble prokaryotic and eukaryotic genomes sequenced with a variety of technologies.",
+    "workflows": [
+      {
+        "ploidy": "any",
+        "trsId": "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/assembly-with-flye/main/versions/v0.2"
+      },
+      {
+        "ploidy": "any",
+        "trsId": "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v1.1.5"
+      }
+    ]
+  }
+]

@@ -52,8 +52,24 @@ export interface EntitiesResponsePagination {
   total: number;
 }
 
+export interface WorkflowCategory {
+  description: string;
+  type: string;
+  workflows: Workflow[];
+}
+
+export interface Workflow {
+  ploidy: WORKFLOW_PLOIDY;
+  trsId: string;
+}
+
 export enum WORKFLOW_ID {
   REGULATION = "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.12",
   TRANSCRIPTOMICS = "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v0.9",
   VARIANT_CALLING = "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/haploid-variant-calling-wgs-pe/main/versions/v0.1",
+}
+
+export enum WORKFLOW_PLOIDY {
+  ANY = "any",
+  HAPLOID = "haploid",
 }

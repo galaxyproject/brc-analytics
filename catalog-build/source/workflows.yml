@@ -1,0 +1,32 @@
+workflows:
+  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.12"
+    type: "REGULATION"
+    ploidy: "any"
+
+  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.12"
+    type: "REGULATION"
+    ploidy: "any"
+
+  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.2"
+    type: "TRANSCRIPTOMICS"
+    ploidy: "any"
+
+  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.2"
+    type: "TRANSCRIPTOMICS"
+    ploidy: "any"
+
+  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/haploid-variant-calling-wgs-pe/main/versions/v0.1"
+    type: "VARIANT_CALLING"
+    ploidy: "haploid"
+
+  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/generic-variant-calling-wgs-pe/main/versions/v0.1.1"
+    type: "VARIANT_CALLING"
+    ploidy: "haploid"
+
+  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/assembly-with-flye/main/versions/v0.2"
+    type: "ASSEMBLY"
+    ploidy: "any"
+
+  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v1.1.5"
+    type: "ASSEMBLY"
+    ploidy: "any"
