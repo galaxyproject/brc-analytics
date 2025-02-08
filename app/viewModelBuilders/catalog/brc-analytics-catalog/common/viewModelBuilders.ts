@@ -300,22 +300,14 @@ export const buildTaxonomyId = (
 };
 
 /**
- * Build props for the genome AnalysisMethod component.
+ * Build props for the genome AnalysisMethodsCatalog component.
  * @param genome - Genome entity.
- * @param analysisMethodProps - Analysis Method properties.
- * @param analysisMethodProps.analysisMethod - Analysis method.
- * @param analysisMethodProps.content - Content to be displayed.
- * @returns Props to be used for the AnalysisMethod component.
+ * @returns Props to be used for the AnalysisMethodsCatalog component.
  */
-export const buildGenomeAnalysisMethod = (
-  genome: BRCDataCatalogGenome,
-  analysisMethodProps: Pick<
-    ComponentProps<typeof C.AnalysisMethod>,
-    "analysisMethod" | "content"
-  >
-): ComponentProps<typeof C.AnalysisMethod> => {
+export const buildGenomeAnalysisMethods = (
+  genome: BRCDataCatalogGenome
+): ComponentProps<typeof C.AnalysisMethodsCatalog> => {
   return {
-    ...analysisMethodProps,
     geneModelUrl: genome.geneModelUrl,
     genomeVersionAssemblyId: genome.accession,
   };

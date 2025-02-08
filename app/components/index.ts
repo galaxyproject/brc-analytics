@@ -29,6 +29,7 @@ export { NTagCell } from "@databiosphere/findable-ui/lib/components/Table/compon
 export { CopyText } from "./common/CopyText/copyText";
 export { AnalysisMethod } from "./Entity/components/AnalysisMethod/analysisMethod";
 export { AnalysisMethods } from "./Entity/components/AnalysisMethods/analysisMethods";
+export { AnalysisMethodsCatalog } from "./Entity/components/AnalysisMethodsCatalog/analysisMethodsCatalog";
 export { AnalysisMethodsTitle } from "./Entity/components/AnalysisMethodsTitle/analysisMethodsTitle";
 export { AnalysisPortals } from "./Entity/components/AnalysisPortals/analysisPortals";
 export { GridPaperSection } from "./Layout/components/Detail/components/Section/section.styles";

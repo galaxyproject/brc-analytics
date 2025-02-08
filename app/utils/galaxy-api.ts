@@ -1,5 +1,4 @@
 import ky from "ky";
-import { WORKFLOW_ID } from "../apis/catalog/brc-analytics-catalog/common/entities";
 import { GALAXY_ENVIRONMENT } from "site-config/common/galaxy";
 
 interface WorkflowLandingsBody {
@@ -17,6 +16,9 @@ interface WorkflowLanding {
   uuid: string;
 }
 
+const WORKFLOW_ID_VARIANT_CALLING =
+  "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/haploid-variant-calling-wgs-pe/main/versions/v0.1";
+
 const { galaxyInstanceUrl } = GALAXY_ENVIRONMENT;
 const workflowLandingsApiUrl = `${galaxyInstanceUrl}api/workflow_landings`;
 const workflowLandingUrl = `${galaxyInstanceUrl}workflow_landings`;
@@ -29,7 +31,7 @@ const workflowLandingUrl = `${galaxyInstanceUrl}workflow_landings`;
  * @returns workflow landing URL.
  */
 export async function getWorkflowLandingUrl(
-  workflowId: WORKFLOW_ID,
+  workflowId: string,
   referenceGenome: string,
   geneModelUrl: string | null
 ): Promise<string> {
@@ -71,11 +73,11 @@ function buildFastaUrl(identifier: string): string {
  * @returns `request_state` value for the workflow landings request body.
  */
 function getWorkflowLandingsRequestState(
-  workflowId: WORKFLOW_ID,
+  workflowId: string,
   referenceGenome: string,
   geneModelUrl: string | null
 ): WorkflowLandingsBodyRequestState {
-  if (workflowId === WORKFLOW_ID.VARIANT_CALLING && geneModelUrl) {
+  if (workflowId === WORKFLOW_ID_VARIANT_CALLING && geneModelUrl) {
     return {
       "Annotation GTF": { ext: "gtf.gz", src: "url", url: geneModelUrl },
       "Genome fasta": {

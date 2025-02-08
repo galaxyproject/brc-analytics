@@ -10,19 +10,17 @@ import {
 } from "@databiosphere/findable-ui/lib/components/Loading/loading";
 import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
 import { Chip } from "@mui/material";
-import { WORKFLOW_IDS_BY_ANALYSIS_METHOD } from "app/apis/catalog/brc-analytics-catalog/common/constants";
 import { getWorkflowLandingUrl } from "app/utils/galaxy-api";
 import { SectionContent, StyledSection } from "./analysisMethod.styles";
 import { CHIP_PROPS, ICON_PROPS } from "./constants";
 import { Props } from "./types";
 
 export const AnalysisMethod = ({
-  analysisMethod,
   content,
   geneModelUrl,
   genomeVersionAssemblyId,
+  workflowId,
 }: Props): JSX.Element => {
-  const workflowId = WORKFLOW_IDS_BY_ANALYSIS_METHOD[analysisMethod];
   const isAvailable = Boolean(workflowId);
   const { data: landingUrl, isLoading, run } = useAsync<string>();
   return (
