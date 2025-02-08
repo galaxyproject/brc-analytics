@@ -24,6 +24,7 @@ export interface SourceGenome {
 export interface SourceWorkflowCategories {
   workflow_categories: {
     description: string;
+    name: string;
     type: string;
   }[];
 }

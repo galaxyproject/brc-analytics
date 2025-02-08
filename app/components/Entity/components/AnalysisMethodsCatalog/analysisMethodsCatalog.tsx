@@ -26,7 +26,7 @@ export const AnalysisMethodsCatalog = ({
             genomeVersionAssemblyId={genomeVersionAssemblyId}
             content={
               <>
-                <h3>{workflowCategory.type}</h3>
+                <h3>{workflowCategory.name}</h3>
                 <p>{workflowCategory.description}</p>
               </>
             }
