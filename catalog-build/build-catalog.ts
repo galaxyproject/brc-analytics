@@ -8,6 +8,7 @@ import {
 } from "../app/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   SourceGenome,
+  SourceWorkflow,
   SourceWorkflowCategories,
   SourceWorkflows,
 } from "./entities";
@@ -78,29 +79,6 @@ function buildOrganisms(
   );
 }
 
-async function buildWorkflows(): Promise<WorkflowCategory[]> {
-  const sourceWorkflowCategories = await readYamlFile<SourceWorkflowCategories>(
-    SOURCE_PATH_WORKFLOW_CATEGORIES
-  );
-  const sourceWorkflows = await readYamlFile<SourceWorkflows>(
-    SOURCE_PATH_WORKFLOWS
-  );
-
-  const workflowCategories: WorkflowCategory[] =
-    sourceWorkflowCategories.workflow_categories.map((sourceCategory) => ({
-      ...sourceCategory,
-      workflows: [],
-    }));
-
-  for (const { ploidy, trs_id: trsId, type } of sourceWorkflows.workflows) {
-    const category = workflowCategories.find((c) => c.type === type);
-    if (!category) throw new Error(`Unknown workflow category: ${type}`);
-    category.workflows.push({ ploidy, trsId });
-  }
-
-  return workflowCategories;
-}
-
 function buildOrganism(
   organism: BRCDataCatalogOrganism | undefined,
   genome: BRCDataCatalogGenome
@@ -115,6 +93,51 @@ function buildOrganism(
     species: genome.species,
     taxonomicGroup: genome.taxonomicGroup,
   };
+}
+
+async function buildWorkflows(): Promise<WorkflowCategory[]> {
+  const sourceWorkflowCategories = await readYamlFile<SourceWorkflowCategories>(
+    SOURCE_PATH_WORKFLOW_CATEGORIES
+  );
+  const sourceWorkflows = await readYamlFile<SourceWorkflows>(
+    SOURCE_PATH_WORKFLOWS
+  );
+
+  const workflowCategories: WorkflowCategory[] =
+    sourceWorkflowCategories.workflow_categories.map(
+      ({ description, name, type }) => ({
+        description,
+        name,
+        type,
+        workflows: [],
+      })
+    );
+
+  for (const sourceWorkflow of sourceWorkflows.workflows) {
+    buildWorkflow(workflowCategories, sourceWorkflow);
+  }
+
+  return workflowCategories;
+}
+
+function buildWorkflow(
+  workflowCategories: WorkflowCategory[],
+  {
+    ploidy,
+    trs_id: trsId,
+    type,
+    workflow_description: workflowDescription,
+    workflow_name: workflowName,
+  }: SourceWorkflow
+): void {
+  const category = workflowCategories.find((c) => c.type === type);
+  if (!category) throw new Error(`Unknown workflow category: ${type}`);
+  category.workflows.push({
+    ploidy,
+    trsId,
+    workflowDescription,
+    workflowName,
+  });
 }
 
 async function readValuesFile<T>(

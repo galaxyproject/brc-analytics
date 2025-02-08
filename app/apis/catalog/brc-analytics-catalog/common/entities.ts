@@ -53,6 +53,8 @@ export interface WorkflowCategory {
 export interface Workflow {
   ploidy: WORKFLOW_PLOIDY;
   trsId: string;
+  workflowDescription: string;
+  workflowName: string;
 }
 
 export enum WORKFLOW_PLOIDY {

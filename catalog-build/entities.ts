@@ -30,9 +30,13 @@ export interface SourceWorkflowCategories {
 }
 
 export interface SourceWorkflows {
-  workflows: {
-    ploidy: WORKFLOW_PLOIDY;
-    trs_id: string;
-    type: string;
-  }[];
+  workflows: SourceWorkflow[];
+}
+
+export interface SourceWorkflow {
+  ploidy: WORKFLOW_PLOIDY;
+  trs_id: string;
+  type: string;
+  workflow_description: string;
+  workflow_name: string;
 }
