@@ -25,6 +25,12 @@
     "workflows": [
       {
         "ploidy": "any",
+        "trsId": "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v0.9",
+        "workflowDescription": "This workflow takes as input a list of paired-end fastqs. Adapters and bad quality bases are removed with cutadapt. Reads are mapped with STAR with ENCODE parameters and genes are counted simultaneously as well as normalized coverage (per million mapped reads) on uniquely mapped reads. The counts are reprocessed to be similar to HTSeq-count output. FPKM are computed with cufflinks and/or with StringTie. The unstranded normalized coverage is computed with bedtools.",
+        "workflowName": "RNAseq_PE"
+      },
+      {
+        "ploidy": "any",
         "trsId": "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.2",
         "workflowDescription": "This workflow takes as input a list of paired-end fastqs. Adapters and bad quality bases are removed with fastp. Reads are mapped with STAR with ENCODE parameters and genes are counted simultaneously as well as normalized coverage (per million mapped reads) on uniquely mapped reads. The counts are reprocessed to be similar to HTSeq-count output. Alternatively, featureCounts can be used to count the reads/fragments per gene. FPKM are computed with cufflinks and/or with StringTie. The unstranded normalized coverage is computed with bedtools.",
         "workflowName": "RNA-seq for Paired-end fastqs"
