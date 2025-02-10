@@ -33,10 +33,25 @@ python3 ./catalog-build/build-files-from-ncbi.py
 The environment can be deactivated by running `deactivate`, and re-activated by running `source ./venv/bin/activate`
 again.
 
-## Building data files from the NCBI API
+## Building the catalog data
 
-Using the Python environment described above, run the script:
+To build catalog data for use by the app, run the script:
 
 ```shell
-python3 ./catalog-build/build-files-from-ncbi.py
+npm run build-brc-db
+```
+
+## Adding new assemblies
+
+The list of assemblies is defined in the YAML file `catalog-build/source/assemblies.yml`. Assemblies are labeled
+with comments specifying the species name (as defined by NCBI), and sorted alphabetically by species.
+
+To add a new assembly, add a new list item to the `assemblies` entry in the YAML, labeled and sorted as appropriate,
+consisting of a dictionary with a single entry, `accession`, specifying the assembly's accession.
+
+For instance, to add a new assembly for _Anopheles gambiae_ with the accession `XXX_000000000.0`, add this line below
+the `# Anopheles gambiae` comment:
+
+```yaml
+- accession: XXX_000000000.0
 ```
