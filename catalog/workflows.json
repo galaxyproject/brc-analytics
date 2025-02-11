@@ -9,12 +9,6 @@
         "trsId": "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/haploid-variant-calling-wgs-pe/main/versions/v0.1",
         "workflowDescription": "Workflow for variant analysis against a reference genome in GenBank format",
         "workflowName": "Paired end variant calling in haploid system"
-      },
-      {
-        "ploidy": "haploid",
-        "trsId": "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/generic-variant-calling-wgs-pe/main/versions/v0.1.1",
-        "workflowDescription": "Workflow for variant analysis against  a reference genome in GenBank format",
-        "workflowName": "Generic variation analysis on WGS PE data"
       }
     ]
   },
@@ -28,18 +22,6 @@
         "trsId": "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v0.9",
         "workflowDescription": "This workflow takes as input a list of paired-end fastqs. Adapters and bad quality bases are removed with cutadapt. Reads are mapped with STAR with ENCODE parameters and genes are counted simultaneously as well as normalized coverage (per million mapped reads) on uniquely mapped reads. The counts are reprocessed to be similar to HTSeq-count output. FPKM are computed with cufflinks and/or with StringTie. The unstranded normalized coverage is computed with bedtools.",
         "workflowName": "RNAseq_PE"
-      },
-      {
-        "ploidy": "any",
-        "trsId": "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.2",
-        "workflowDescription": "This workflow takes as input a list of paired-end fastqs. Adapters and bad quality bases are removed with fastp. Reads are mapped with STAR with ENCODE parameters and genes are counted simultaneously as well as normalized coverage (per million mapped reads) on uniquely mapped reads. The counts are reprocessed to be similar to HTSeq-count output. Alternatively, featureCounts can be used to count the reads/fragments per gene. FPKM are computed with cufflinks and/or with StringTie. The unstranded normalized coverage is computed with bedtools.",
-        "workflowName": "RNA-seq for Paired-end fastqs"
-      },
-      {
-        "ploidy": "any",
-        "trsId": "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.2",
-        "workflowDescription": "This workflow takes as input a list of single-end fastqs. Adapters and bad quality bases are removed with fastp. Reads are mapped with STAR with ENCODE parameters and genes are counted simultaneously as well as normalized coverage (per million mapped reads) on uniquely mapped reads. The counts are reprocessed to be similar to HTSeq-count output. Alternatively, featureCounts can be used to count the reads/fragments per gene. FPKM are computed with cufflinks and/or with StringTie. The unstranded normalized coverage is computed with bedtools.",
-        "workflowName": "RNA-seq for Single-read fastqs"
       }
     ]
   },
@@ -53,12 +35,6 @@
         "trsId": "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.12",
         "workflowDescription": "This workflow takes as input a collection of paired fastqs. Remove adapters with cutadapt, map pairs with bowtie2. Keep MAPQ30 and concordant pairs. MACS2 for paired bam.",
         "workflowName": "ChIPseq_PE"
-      },
-      {
-        "ploidy": "any",
-        "trsId": "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.12",
-        "workflowDescription": "This workflow takes as input a collection of fastqs (single reads). Remove adapters with cutadapt, map with bowtie2. Keep MAPQ30. MACS2 for bam with fixed extension or model.",
-        "workflowName": "ChIPseq_SR"
       }
     ]
   },
@@ -66,20 +42,7 @@
     "description": "Assemble prokaryotic and eukaryotic genomes sequenced with a variety of technologies.",
     "name": "Assembly",
     "type": "ASSEMBLY",
-    "workflows": [
-      {
-        "ploidy": "any",
-        "trsId": "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/assembly-with-flye/main/versions/v0.2",
-        "workflowDescription": "Assemble long reads with Flye, then view assembly statistics and assembly graph",
-        "workflowName": "Genome assembly with Flye"
-      },
-      {
-        "ploidy": "any",
-        "trsId": "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v1.1.5",
-        "workflowDescription": "Assembly of bacterial paired-end short read data with generation of quality metrics and reports",
-        "workflowName": "Bacterial Genome Assembly using Shovill"
-      }
-    ]
+    "workflows": []
   },
   {
     "description": "Workflows for creation of pairwise and multiple genome alignments.",
