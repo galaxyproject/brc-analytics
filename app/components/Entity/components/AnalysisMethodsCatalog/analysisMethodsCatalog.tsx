@@ -1,5 +1,5 @@
 import { AnalysisMethods } from "../AnalysisMethods/analysisMethods";
-import workflows from "../../../../../catalog/workflows.json";
+import workflows from "../../../../../catalog/output/workflows.json";
 import { AnalysisMethod } from "../AnalysisMethod/analysisMethod";
 import { Props } from "./types";
 

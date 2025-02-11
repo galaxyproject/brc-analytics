@@ -114,5 +114,5 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
     enableTab: false,
   },
   route: "organisms",
-  staticLoadFile: "catalog/organisms.json",
+  staticLoadFile: "catalog/output/organisms.json",
 };

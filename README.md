@@ -21,13 +21,13 @@ Create a Python virtual environment and install requirements:
 ```shell
 python3 -m venv ./venv
 source ./venv/bin/activate
-pip install -r ./catalog-build/requirements.txt
+pip install -r ./catalog/build/py/requirements.txt
 ```
 
 Then run the script:
 
 ```shell
-python3 ./catalog-build/build-files-from-ncbi.py
+python3 ./catalog/build/py/build-files-from-ncbi.py
 ```
 
 The environment can be deactivated by running `deactivate`, and re-activated by running `source ./venv/bin/activate`
@@ -43,7 +43,7 @@ npm run build-brc-db
 
 ## Adding new assemblies
 
-The list of assemblies is defined in the YAML file `catalog-build/source/assemblies.yml`. Assemblies are labeled
+The list of assemblies is defined in the YAML file `catalog/source/assemblies.yml`. Assemblies are labeled
 with comments specifying the species name (as defined by NCBI), and sorted alphabetically by species.
 
 To add a new assembly, add a new list item to the `assemblies` entry in the YAML, labeled and sorted as appropriate,

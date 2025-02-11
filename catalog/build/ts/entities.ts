@@ -1,4 +1,4 @@
-import { WORKFLOW_PLOIDY } from "../app/apis/catalog/brc-analytics-catalog/common/entities";
+import { WORKFLOW_PLOIDY } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 
 export interface SourceGenome {
   accession: string;

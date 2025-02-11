@@ -5,7 +5,7 @@ import {
   BRCDataCatalogGenome,
   BRCDataCatalogOrganism,
   WorkflowCategory,
-} from "../app/apis/catalog/brc-analytics-catalog/common/entities";
+} from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   SourceGenome,
   SourceWorkflow,
@@ -13,10 +13,10 @@ import {
   SourceWorkflows,
 } from "./entities";
 
-const SOURCE_PATH_GENOMES = "catalog-build/source/genomes-from-ncbi.tsv";
+const SOURCE_PATH_GENOMES = "catalog/build/intermediate/genomes-from-ncbi.tsv";
 const SOURCE_PATH_WORKFLOW_CATEGORIES =
-  "catalog-build/source/workflow_categories.yml";
-const SOURCE_PATH_WORKFLOWS = "catalog-build/source/workflows.yml";
+  "catalog/source/workflow_categories.yml";
+const SOURCE_PATH_WORKFLOWS = "catalog/source/workflows.yml";
 
 buildCatalog();
 
@@ -26,13 +26,13 @@ async function buildCatalog(): Promise<void> {
   const workflows = await buildWorkflows();
 
   console.log("Genomes:", genomes.length);
-  await saveJson("catalog/genomes.json", genomes);
+  await saveJson("catalog/output/genomes.json", genomes);
 
   console.log("Organisms:", organisms.length);
-  await saveJson("catalog/organisms.json", organisms);
+  await saveJson("catalog/output/organisms.json", organisms);
 
   console.log("Workflows:", workflows.length);
-  await saveJson("catalog/workflows.json", workflows);
+  await saveJson("catalog/output/workflows.json", workflows);
 
   console.log("Done");
 }

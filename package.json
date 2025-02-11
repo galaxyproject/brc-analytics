@@ -13,7 +13,7 @@
     "format": "prettier --write . --cache",
     "prepare": "husky",
     "test": "jest --runInBand",
-    "build-brc-db": "esrun catalog-build/build-catalog.ts"
+    "build-brc-db": "esrun catalog/build/ts/build-catalog.ts"
   },
   "dependencies": {
     "@databiosphere/findable-ui": "^21.0.0",

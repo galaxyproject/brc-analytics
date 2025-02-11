@@ -1,10 +1,10 @@
 from package.catalog_build import build_files
 
-ASSEMBLIES_PATH = "catalog-build/source/assemblies.yml"
+ASSEMBLIES_PATH = "catalog/source/assemblies.yml"
 
 UCSC_ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.json"
 
-GENOMES_OUTPUT_PATH = "catalog-build/source/genomes-from-ncbi.tsv"
+GENOMES_OUTPUT_PATH = "catalog/build/intermediate/genomes-from-ncbi.tsv"
 
 TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
   2: "Bacteria",
