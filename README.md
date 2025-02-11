@@ -27,7 +27,7 @@ pip install -r ./catalog/build/py/requirements.txt
 Then run the script:
 
 ```shell
-python3 ./catalog/build/py/build-files-from-ncbi.py
+npm run build-files-from-ncbi
 ```
 
 The environment can be deactivated by running `deactivate`, and re-activated by running `source ./venv/bin/activate`
