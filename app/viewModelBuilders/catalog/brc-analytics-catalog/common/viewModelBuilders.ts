@@ -370,6 +370,10 @@ export const buildGenomeChooseAnalysisMethodDetailViewHero = (
 ): ComponentProps<typeof C.BackPageHero> => {
   return {
     breadcrumbs: getGenomeEntityChooseAnalysisMethodBreadcrumbs(genome),
+    subTitle: C.Link({
+      label: C.SubTitle({ subTitle: genome.species }),
+      url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(genome))}`,
+    }),
     title: genome.accession,
   };
 };
@@ -570,7 +574,6 @@ function getGenomeEntityChooseAnalysisMethodBreadcrumbs(
 ): Breadcrumb[] {
   return [
     { path: ROUTES.GENOMES, text: "Assemblies" },
-    { path: "", text: `${genome.species}` },
     { path: "", text: genome.accession },
   ];
 }
