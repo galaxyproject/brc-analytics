@@ -1,0 +1,37 @@
+id: https://brc-analytics.org/schema/workflows
+name: workflows
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+
+imports:
+  - linkml:types
+  - ./enums/workflow_type
+  - ./enums/workflow_ploidy
+
+classes:
+  Workflows:
+    tree_root: true
+    attributes:
+      workflows:
+        required: true
+        multivalued: true
+        range: Workflow
+
+  Workflow:
+    attributes:
+      trs_id:
+        required: true
+        range: string
+      type:
+        required: true
+        range: WorkflowType
+      ploidy:
+        required: true
+        range: WorkflowPloidy
+      workflow_name:
+        required: true
+        range: string
+      workflow_description:
+        required: true
+        range: string

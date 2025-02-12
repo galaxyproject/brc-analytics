@@ -1,0 +1,29 @@
+id: https://brc-analytics.org/schema/workflow_categories
+name: workflow_categories
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+
+imports:
+  - linkml:types
+
+classes:
+  WorkflowCategories:
+    tree_root: true
+    attributes:
+      workflow_categories:
+        required: true
+        multivalued: true
+        range: WorkflowCategory
+
+  WorkflowCategory:
+    attributes:
+      type:
+        required: true
+        range: WorkflowType
+      name:
+        required: true
+        range: string
+      description:
+        required: true
+        range: string

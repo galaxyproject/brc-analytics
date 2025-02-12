@@ -1,0 +1,8 @@
+id: https://brc-analytics.org/schema/enums/workflow_ploidy
+name: enums_workflow_ploidy
+
+enums:
+  WorkflowPloidy:
+    permissible_values:
+      ANY:
+      HAPLOID:

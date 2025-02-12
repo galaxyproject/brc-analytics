@@ -1,0 +1,23 @@
+id: https://brc-analytics.org/schema/assemblies
+name: assemblies
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+
+imports:
+  - linkml:types
+
+classes:
+  Assemblies:
+    tree_root: true
+    attributes:
+      assemblies:
+        required: true
+        multivalued: true
+        range: Assembly
+
+  Assembly:
+    attributes:
+      accession:
+        required: true
+        range: string

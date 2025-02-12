@@ -1,0 +1,10 @@
+id: https://brc-analytics.org/schema
+name: schema
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+
+imports:
+  - ./assemblies
+  - ./workflow_categories
+  - ./workflows

@@ -1,0 +1,12 @@
+id: https://brc-analytics.org/schema/enums/workflow_type
+name: enums_workflow_type
+
+enums:
+  WorkflowType:
+    permissible_values:
+      VARIANT_CALLING:
+      TRANSCRIPTOMICS:
+      REGULATION:
+      ASSEMBLY:
+      GENOME_COMPARISONS:
+      PROTEIN_FOLDING:
