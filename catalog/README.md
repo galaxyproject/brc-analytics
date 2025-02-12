@@ -7,4 +7,5 @@ This directory provides the catalog data (information on genome assemblies, orga
   - `py` - Python scripts.
   - `ts` - Typescript scripts.
 - `output` - JSON files output by the catalog build process, to be consumed by the app.
+- `schema` - LinkML schemas for source files.
 - `source` - YAML files providing data used as input for building the catalog.
