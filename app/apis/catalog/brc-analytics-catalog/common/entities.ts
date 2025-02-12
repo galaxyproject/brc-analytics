@@ -58,6 +58,6 @@ export interface Workflow {
 }
 
 export enum WORKFLOW_PLOIDY {
-  ANY = "any",
-  HAPLOID = "haploid",
+  ANY = "ANY",
+  HAPLOID = "HAPLOID",
 }
