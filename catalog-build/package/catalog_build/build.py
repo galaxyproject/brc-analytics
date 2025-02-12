@@ -3,6 +3,8 @@ import yaml
 import requests
 import urllib
 import re
+import time
+from bs4 import BeautifulSoup
 
 def read_assemblies(assemblies_path):
   with open(assemblies_path) as stream:
@@ -74,9 +76,17 @@ def get_genome_row(genome_info):
     "pairedAccession": genome_info.get("paired_accession"),
   }
 
-def get_genomes_df(accessions):
+def get_biosample_data(genome_info):
+  return {
+    "accession": genome_info["accession"],
+    "biosample": genome_info["assembly_info"]["biosample"]["accession"],
+    'sample_ids': ",".join([f"{sample['db']}:{sample['value']}" for sample in genome_info["assembly_info"]["biosample"]['sample_ids'] if 'db' in sample]),
+  }
+
+def get_genomes_and_primarydata_df(accessions):
   genomes_info = get_paginated_ncbi_results(f"https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/{",".join(accessions)}/dataset_report", "genomes")
-  return pd.DataFrame(data=[get_genome_row(info) for info in genomes_info])
+
+  return pd.DataFrame(data=[get_genome_row(info) for info in genomes_info]), pd.DataFrame(data=[get_biosample_data(info) for info in genomes_info if  'biosample' in info['assembly_info']])
 
 def _id_to_gene_model_url(asm_id):
   hubs_url = "https://hgdownload.soe.ucsc.edu/hubs/"
@@ -125,13 +135,152 @@ def report_missing_values(values_name, message_predicate, values_series, present
     else:
       print(f"{len(missing_values)} {values_name} not {message_predicate}: {", ".join(missing_values)}")
 
-def build_files(assemblies_path, genomes_output_path, ucsc_assemblies_url, taxonomic_group_sets={}, do_gene_model_urls=True):
+def fetch_sra_metadata(srs_ids):
+  #print(f"Fetching metadata for SRS {srs_id}")
+  if srs_ids is None:
+    return None
+
+  data = {}
+  sample_run_acc_mapper = {}
+
+  batch_size = 20
+  counter = 0
+  max_requests_before_wait = 2
+  wait_time = 5
+  for i in range(0, len(srs_ids), batch_size):
+    batch_srs_id = srs_ids[i:i + batch_size]
+    if counter >= max_requests_before_wait:
+          time.sleep(wait_time)
+          counter = 0
+    search_url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term={"+OR+".join(batch_srs_id)}&retmode=json&retmax=1000"
+    #print(search_url)
+    search_response = requests.get(search_url)
+    search_data = search_response.json()
+    if int(search_data.get("esearchresult", {}).get("count", 0)) == 0:
+      #print(f"No SRR IDs found for SRS {srs_id}")
+      return None
+
+    # Extract SRR IDs
+    srr_ids = search_data.get("esearchresult", {}).get("idlist", [])
+    if srr_ids:
+      # Step 2: Fetch Metadata for SRR IDs
+      for i in range(0, len(srr_ids), batch_size):
+        if counter >= max_requests_before_wait:
+          time.sleep(wait_time)
+          counter = 0
+        batch_srr_id = srr_ids[i:i + batch_size]
+        srr_str = ",".join(batch_srr_id)
+        summary_url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=sra&id={srr_str}&retmode=json&retmax=1000"
+        print(summary_url)
+        # try:
+        response = requests.get(summary_url)
+        summary_data = response.json()
+        counter += 1
+        if 'result' in summary_data:
+          for result in summary_data['result']['uids']:
+              exp_soup = BeautifulSoup(f"<Root>{summary_data['result'][result]['expxml']}</Root>", 'xml')
+              run_soup = BeautifulSoup(f"<Root>{summary_data['result'][result]['runs']}</Root>", 'xml')
+
+              # Extract data
+              title = exp_soup.find("Title").text
+              platform = exp_soup.find("Platform").text
+              instrument = exp_soup.find("Platform")["instrument_model"]
+              total_spots = exp_soup.find("Statistics")["total_spots"]
+              total_bases = exp_soup.find("Statistics")["total_bases"]
+              submitter_acc = exp_soup.find("Submitter")["acc"]
+
+              study_acc = exp_soup.find("Study")["acc"]
+              organism_name = exp_soup.find("Organism").get("ScientificName", "")
+              experiment_acc = exp_soup.find("Experiment")["acc"]
+              library_name = exp_soup.find("LIBRARY_NAME").text if exp_soup.find("LIBRARY_NAME") else ""
+              library_strategy = exp_soup.find("LIBRARY_STRATEGY").text if exp_soup.find("LIBRARY_STRATEGY") else ""
+              library_source = exp_soup.find("LIBRARY_SOURCE").text if exp_soup.find("LIBRARY_SOURCE") else ""
+              library_selection = exp_soup.find("LIBRARY_SELECTION").text if exp_soup.find("LIBRARY_SELECTION") else ""
+              bioproject_elem = exp_soup.find("Bioproject")
+              bioproject = bioproject_elem.text if bioproject_elem else ""
+              biosample = exp_soup.find("Biosample").text
+              sample_acc = exp_soup.find("Sample")["acc"]
+              run_acc = run_soup.find("Run")["acc"]
+              run_total_bases = run_soup.find("Run")["total_bases"]
+              run_total_spots = run_soup.find("Run")["total_bases"]
+
+              for run in run_soup.find_all("Run"):
+                run_acc = run["acc"]
+                run_total_bases = run["total_bases"]
+                run_total_spots = run["total_spots"]
+
+                # Print extracted information
+                d = {
+                "title": title,
+                "platform": platform,
+                "instrument": instrument,
+                "total_spots": total_spots,
+                "total_bases": total_bases,
+                "submitter_acc": submitter_acc,
+                "study_acc": study_acc,
+                "organism_name": organism_name,
+                "experiment_acc": experiment_acc,
+                "library_name": library_name,
+                "library_strategy": library_strategy,
+                "library_source": library_source,
+                "library_selection": library_selection,
+                "bioproject": bioproject,
+                "biosample": biosample,
+                "run_acc": run_acc,
+                "run_total_bases": run_total_bases,
+                "run_total_spots": run_total_spots,
+                'srs_sample_acc': sample_acc
+                }
+
+                if sample_acc in data:
+                    if run_acc in data[sample_acc]:
+                        raise Exception(f"Duplicate biosample run_acc {run_acc} found {sample_acc}")
+                    else:
+                        data[sample_acc][run_acc] = d
+                else:
+                    data[sample_acc] = {run_acc: d}
+                sample_run_acc_mapper[run_acc] = sample_acc
+  for sample_acc in data:
+    print(f"Fetching file list for {sample_acc}")
+    file_list_url = f"https://www.ebi.ac.uk/ena/portal/api/filereport?accession={sample_acc}&result=read_run&format=json&retmax=1000"
+    #May need to remove this later
+    if counter >= max_requests_before_wait:
+      time.sleep(wait_time)
+      counter = 0
+    file_list_data = requests.get(file_list_url).json()
+    for result in file_list_data:
+      if result['run_accession'] not in data[sample_acc]:
+        raise Exception(f"Not metadata found for {result['run_accession']} {sample_acc}")
+      if 'fastq_ftp' in data[sample_acc][result['run_accession']]:
+        raise Exception(f"Duplicate file list entry for {result['run_accession']}  {sample_acc}")
+
+      data[sample_acc][result['run_accession']]['file_urls'] = result['fastq_ftp']
+      data[sample_acc][result['run_accession']]['file_size'] = result['fastq_bytes']
+      data[sample_acc][result['run_accession']]['file_md5'] = result['fastq_md5']
+  print("Returning......................\n\n\n")
+  return data
+
+
+def build_files(assemblies_path, genomes_output_path, primary_output_path, ucsc_assemblies_url, taxonomic_group_sets={}, do_gene_model_urls=True, extract_data=None):
   print("Building files")
 
   source_list_df = read_assemblies(assemblies_path)
 
-  base_genomes_df = get_genomes_df(source_list_df["accession"])
+  base_genomes_df, primarydata_df = get_genomes_and_primarydata_df(source_list_df["accession"])
 
+  primarydata_df['sra_ids'] = primarydata_df["sample_ids"].str.split(",")
+  primarydata_df = primarydata_df.explode("sra_ids")
+  primarydata_df = primarydata_df[~primarydata_df["sra_ids"].isnull() & primarydata_df["sra_ids"].str.startswith('SRA')]
+  primarydata_df["sra_ids"] = primarydata_df["sra_ids"].str.replace("SRA:", "")
+  
+  sra_ids_list = primarydata_df["sra_ids"].dropna().unique().tolist()
+
+  sra_metadata = fetch_sra_metadata(sra_ids_list)
+  
+  sra_metadata_df = pd.DataFrame([sra_metadata[sra][srr] for sra in sra_metadata for srr in sra_metadata[sra]])
+  primarydata_df = primarydata_df.merge(sra_metadata_df, how="left", left_on="sra_ids", right_on="srs_sample_acc")
+  
+  
   report_missing_values_from("accessions", "found on NCBI", source_list_df["accession"], base_genomes_df["accession"])
 
   species_df = get_species_df(base_genomes_df["taxonomyId"], taxonomic_group_sets)
@@ -158,3 +307,7 @@ def build_files(assemblies_path, genomes_output_path, ucsc_assemblies_url, taxon
   genomes_df.to_csv(genomes_output_path, index=False, sep="\t")
 
   print(f"Wrote to {genomes_output_path}")
+  print(primarydata_df)
+  primarydata_df.to_csv(primary_output_path, index=False, sep="\t")
+
+  print(f"Wrote to {primary_output_path}")
