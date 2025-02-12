@@ -16,6 +16,8 @@ Run `npm run build:local` to build. The built app can be run using `npm start`, 
 
 ## Building the data source files
 
+Using Python version 3.12.4 is recommended.
+
 Create a Python virtual environment and install requirements:
 
 ```shell
