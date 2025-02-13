@@ -3,6 +3,7 @@ name: enums_workflow_ploidy
 
 enums:
   WorkflowPloidy:
+    description: Possible ploidies supported by workflows.
     permissible_values:
       ANY:
       HAPLOID:

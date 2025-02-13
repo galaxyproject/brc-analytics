@@ -1,5 +1,6 @@
 id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/assemblies.yaml#
 name: assemblies
+description: Schema for source assembly list.
 
 prefixes:
   linkml: https://w3id.org/linkml/
@@ -9,15 +10,19 @@ imports:
 
 classes:
   Assemblies:
+    description: Object containing list of assemblies.
     tree_root: true
     attributes:
       assemblies:
+        description: List of assemblies.
         required: true
         multivalued: true
         range: Assembly
 
   Assembly:
+    description: An assembly.
     attributes:
       accession:
+        description: The assembly's accession.
         required: true
         range: string

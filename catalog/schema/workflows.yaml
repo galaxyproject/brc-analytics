@@ -1,5 +1,6 @@
 id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/workflows.yaml#
 name: workflows
+description: Schema for source workflows list.
 
 prefixes:
   linkml: https://w3id.org/linkml/
@@ -11,27 +12,35 @@ imports:
 
 classes:
   Workflows:
+    description: Object containing list of workflows.
     tree_root: true
     attributes:
       workflows:
+        description: List of workflows.
         required: true
         multivalued: true
         range: Workflow
 
   Workflow:
+    description: A workflow.
     attributes:
       trs_id:
+        description: The workflow's TRS ID.
         required: true
         range: string
       type:
+        description: The ID of the workflow's category.
         required: true
         range: WorkflowType
       ploidy:
+        description: The ploidy supported by the workflow.
         required: true
         range: WorkflowPloidy
       workflow_name:
+        description: The display name of the workflow.
         required: true
         range: string
       workflow_description:
+        description: The description of the workflow.
         required: true
         range: string

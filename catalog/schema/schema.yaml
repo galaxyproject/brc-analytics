@@ -1,5 +1,6 @@
 id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/schema.yaml#
 name: schema
+description: Combined source data schemas.
 
 prefixes:
   linkml: https://w3id.org/linkml/

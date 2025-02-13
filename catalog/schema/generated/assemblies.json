@@ -2,9 +2,10 @@
     "$defs": {
         "Assemblies": {
             "additionalProperties": false,
-            "description": "",
+            "description": "Object containing list of assemblies.",
             "properties": {
                 "assemblies": {
+                    "description": "List of assemblies.",
                     "items": {
                         "$ref": "#/$defs/Assembly"
                     },
@@ -19,9 +20,10 @@
         },
         "Assembly": {
             "additionalProperties": false,
-            "description": "",
+            "description": "An assembly.",
             "properties": {
                 "accession": {
+                    "description": "The assembly's accession.",
                     "type": "string"
                 }
             },
@@ -32,13 +34,14 @@
             "type": "object"
         }
     },
-    "$id": "https://brc-analytics.org/schema/assemblies",
+    "$id": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/assemblies.yaml#",
     "$schema": "https://json-schema.org/draft/2019-09/schema",
     "additionalProperties": true,
-    "description": "",
+    "description": "Object containing list of assemblies.",
     "metamodel_version": "1.7.0",
     "properties": {
         "assemblies": {
+            "description": "List of assemblies.",
             "items": {
                 "$ref": "#/$defs/Assembly"
             },

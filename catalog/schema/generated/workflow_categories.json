@@ -2,9 +2,10 @@
     "$defs": {
         "WorkflowCategories": {
             "additionalProperties": false,
-            "description": "",
+            "description": "Object containing list of workflow categories.",
             "properties": {
                 "workflow_categories": {
+                    "description": "List of workflow categories.",
                     "items": {
                         "$ref": "#/$defs/WorkflowCategory"
                     },
@@ -19,16 +20,19 @@
         },
         "WorkflowCategory": {
             "additionalProperties": false,
-            "description": "",
+            "description": "Workflow category.",
             "properties": {
                 "description": {
+                    "description": "The description of the workflow category.",
                     "type": "string"
                 },
                 "name": {
+                    "description": "The display name of the workflow category.",
                     "type": "string"
                 },
                 "type": {
-                    "$ref": "#/$defs/WorkflowType"
+                    "$ref": "#/$defs/WorkflowType",
+                    "description": "The ID of the workflow category."
                 }
             },
             "required": [
@@ -40,7 +44,7 @@
             "type": "object"
         },
         "WorkflowType": {
-            "description": "",
+            "description": "Set of IDs of workflow categories.",
             "enum": [
                 "VARIANT_CALLING",
                 "TRANSCRIPTOMICS",
@@ -53,13 +57,14 @@
             "type": "string"
         }
     },
-    "$id": "https://brc-analytics.org/schema/workflow_categories",
+    "$id": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/workflow_categories.yaml#",
     "$schema": "https://json-schema.org/draft/2019-09/schema",
     "additionalProperties": true,
-    "description": "",
+    "description": "Object containing list of workflow categories.",
     "metamodel_version": "1.7.0",
     "properties": {
         "workflow_categories": {
+            "description": "List of workflow categories.",
             "items": {
                 "$ref": "#/$defs/WorkflowCategory"
             },

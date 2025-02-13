@@ -2,21 +2,26 @@
     "$defs": {
         "Workflow": {
             "additionalProperties": false,
-            "description": "",
+            "description": "A workflow.",
             "properties": {
                 "ploidy": {
-                    "$ref": "#/$defs/WorkflowPloidy"
+                    "$ref": "#/$defs/WorkflowPloidy",
+                    "description": "The ploidy supported by the workflow."
                 },
                 "trs_id": {
+                    "description": "The workflow's TRS ID.",
                     "type": "string"
                 },
                 "type": {
-                    "$ref": "#/$defs/WorkflowType"
+                    "$ref": "#/$defs/WorkflowType",
+                    "description": "The ID of the workflow's category."
                 },
                 "workflow_description": {
+                    "description": "The description of the workflow.",
                     "type": "string"
                 },
                 "workflow_name": {
+                    "description": "The display name of the workflow.",
                     "type": "string"
                 }
             },
@@ -31,7 +36,7 @@
             "type": "object"
         },
         "WorkflowPloidy": {
-            "description": "",
+            "description": "Possible ploidies supported by workflows.",
             "enum": [
                 "ANY",
                 "HAPLOID"
@@ -40,7 +45,7 @@
             "type": "string"
         },
         "WorkflowType": {
-            "description": "",
+            "description": "Set of IDs of workflow categories.",
             "enum": [
                 "VARIANT_CALLING",
                 "TRANSCRIPTOMICS",
@@ -54,9 +59,10 @@
         },
         "Workflows": {
             "additionalProperties": false,
-            "description": "",
+            "description": "Object containing list of workflows.",
             "properties": {
                 "workflows": {
+                    "description": "List of workflows.",
                     "items": {
                         "$ref": "#/$defs/Workflow"
                     },
@@ -70,13 +76,14 @@
             "type": "object"
         }
     },
-    "$id": "https://brc-analytics.org/schema/workflows",
+    "$id": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/workflows.yaml#",
     "$schema": "https://json-schema.org/draft/2019-09/schema",
     "additionalProperties": true,
-    "description": "",
+    "description": "Object containing list of workflows.",
     "metamodel_version": "1.7.0",
     "properties": {
         "workflows": {
+            "description": "List of workflows.",
             "items": {
                 "$ref": "#/$defs/Workflow"
             },
