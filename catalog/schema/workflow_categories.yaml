@@ -6,6 +6,7 @@ prefixes:
 
 imports:
   - linkml:types
+  - ./enums/workflow_type
 
 classes:
   WorkflowCategories:
