@@ -1,0 +1,57 @@
+{
+  "name": "BRC Analytics",
+  "children": [
+    {
+      "name": "Fungi",
+      "children": [
+        {
+          "name": "Candida albicans",
+          "children": [{ "name": "235443", "size": 1 }]
+        },
+        {
+          "name": "Aspergillus fumigatus",
+          "children": [{ "name": "214684", "size": 1 }]
+        }
+      ]
+    },
+    {
+      "name": "Bacteria",
+      "children": [
+        {
+          "name": "Escherichia coli",
+          "children": [{ "name": "562", "size": 1 }]
+        },
+        {
+          "name": "Staphylococcus aureus",
+          "children": [{ "name": "1280", "size": 1 }]
+        }
+      ]
+    },
+    {
+      "name": "Insecta",
+      "children": [
+        {
+          "name": "Apis mellifera",
+          "children": [{ "name": "7460", "size": 1 }]
+        },
+        {
+          "name": "Drosophila melanogaster",
+          "children": [{ "name": "7227", "size": 1 }]
+        }
+      ]
+    },
+    {
+      "name": "Viruses",
+      "children": [
+        {
+          "name": "Influenza A virus",
+          "children": [{ "name": "11320", "size": 1 }]
+        },
+        {
+          "name": "Human immunodeficiency virus",
+          "children": [{ "name": "11676", "size": 1 }]
+        }
+      ]
+    }
+  ]
+}

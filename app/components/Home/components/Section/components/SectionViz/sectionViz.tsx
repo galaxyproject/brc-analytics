@@ -1,68 +1,9 @@
 import * as d3 from "d3";
-import { Fragment, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
+import data from "./data.json";
 
 export const SectionViz = (): JSX.Element => {
   const svgRef = useRef<SVGSVGElement>(null);
-
-  // Sample data for organisms
-  /* eslint-disable sort-keys */
-  const data = {
-    name: "Organisms",
-    children: [
-      {
-        name: "Fungi",
-        children: [
-          {
-            name: "Candida albicans",
-            children: [{ name: "235443", size: 1 }],
-          },
-          {
-            name: "Aspergillus fumigatus",
-            children: [{ name: "214684", size: 1 }],
-          },
-        ],
-      },
-      {
-        name: "Bacteria",
-        children: [
-          {
-            name: "Escherichia coli",
-            children: [{ name: "562", size: 1 }],
-          },
-          {
-            name: "Staphylococcus aureus",
-            children: [{ name: "1280", size: 1 }],
-          },
-        ],
-      },
-      {
-        name: "Insecta",
-        children: [
-          {
-            name: "Apis mellifera",
-            children: [{ name: "7460", size: 1 }],
-          },
-          {
-            name: "Drosophila melanogaster",
-            children: [{ name: "7227", size: 1 }],
-          },
-        ],
-      },
-      {
-        name: "Viruses",
-        children: [
-          {
-            name: "Influenza A virus",
-            children: [{ name: "11320", size: 1 }],
-          },
-          {
-            name: "Human immunodeficiency virus",
-            children: [{ name: "11676", size: 1 }],
-          },
-        ],
-      },
-    ],
-  };
 
   useEffect(() => {
     if (!svgRef.current) return;
@@ -171,8 +112,8 @@ export const SectionViz = (): JSX.Element => {
   }, []);
 
   return (
-    <Fragment>
+    <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
       <svg ref={svgRef} />
-    </Fragment>
+    </div>
   );
 };
