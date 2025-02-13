@@ -12,3 +12,4 @@ enums:
       ASSEMBLY:
       GENOME_COMPARISONS:
       PROTEIN_FOLDING:
+      OTHER:
