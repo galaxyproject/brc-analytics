@@ -19,10 +19,10 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({ node }) => {
       <h3>{node.data.name}</h3>
       {node.children && node.children.length > 0 ? (
         <div>
-          <h4>Display info about..</h4>
+          <h4>Useful info about {node.data.name}</h4>
           <ul>
-            <li>...</li>
-            <li>.....</li>
+            <li>Number of entities</li>
+            <li>Quick links</li>
             <li>....</li>
           </ul>
         </div>
