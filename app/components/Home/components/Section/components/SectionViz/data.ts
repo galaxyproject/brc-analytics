@@ -1,3 +1,9 @@
+import data from "catalog/output/ncbi-taxa-tree.json";
+
+export function getData() {
+  return data;
+}
+
 /* eslint-disable sort-keys */
 function pad(n: number): string {
   return n.toString().padStart(3, "0");
@@ -21,7 +27,7 @@ function buildGroup(
   return arr;
 }
 
-export const data = {
+export const fake_data = {
   name: "BRC Analytics",
   children: [
     {
