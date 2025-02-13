@@ -48,14 +48,14 @@ export const SectionViz = (): JSX.Element => {
     // Create a hierarchy from the sample data.
     const hierarchy = d3
       .hierarchy(data)
-      .sum((d) => d.size || 1)
+      .sum((d) => (d.children.length == 0 ? 1 : 0))
       .sort((a: any, b: any) => (b.data.name < b.data.name ? -1 : 1));
 
     const root = d3.partition().size([2 * Math.PI, hierarchy.height + 1])(
       hierarchy
     );
 
-    root.each((d: any) => (d.current = d));
+    root.each((d) => (d.current = d));
 
     // Create a partition layout (compute the full layout even though we display only DEPTH layers)
     d3.partition().size([2 * Math.PI, root.height + 1])(root);
@@ -72,7 +72,7 @@ export const SectionViz = (): JSX.Element => {
       .arc()
       .startAngle((d) => d.x0)
       .endAngle((d) => d.x1)
-      .padAngle((d) => Math.min((d.x1 - d.x0) / 2, 0.02)) 
+      .padAngle((d) => Math.min((d.x1 - d.x0) / 2, 0.02))
       .padRadius(radius * 1.5)
       .innerRadius((d) => (Math.min(d.y0, DEPTH) * radius) / DEPTH)
       .outerRadius((d) => (Math.min(d.y1, DEPTH) * radius) / DEPTH - 1);
