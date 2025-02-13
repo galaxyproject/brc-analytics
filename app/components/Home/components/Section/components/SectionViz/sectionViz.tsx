@@ -1,10 +1,11 @@
 import * as d3 from "d3";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { data } from "./data";
 
 const DEPTH = 2;
 
 export const SectionViz = (): JSX.Element => {
+  const [selectedNode, setSelectedNode] = useState<any>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
@@ -216,8 +217,28 @@ export const SectionViz = (): JSX.Element => {
   }, []);
 
   return (
-    <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
-      <svg ref={svgRef} />
+    /* <!-- todo: use standard section layouts... --> */
+    <div
+      style={{
+        display: "flex",
+        width: "100%",
+        maxWidth: "1136px",
+        margin: "0 auto",
+      }}
+    >
+      <div style={{ width: "70%", display: "flex", justifyContent: "center" }}>
+      
+        <svg ref={svgRef}></svg>
+      </div>
+      <div style={{ width: "30%", padding: "1rem" }}>
+        {selectedNode ? (
+          <div>
+            <h3>{selectedNode.name}</h3>
+          </div>
+        ) : (
+          <p>No node selected</p>
+        )}
+      </div>
     </div>
   );
 };
