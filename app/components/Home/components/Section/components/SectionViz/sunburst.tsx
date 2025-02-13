@@ -137,15 +137,46 @@ export const SectionViz = (): JSX.Element => {
       .attr("transform", labelTransform)
       .text((d) => d.data.name);
 
-    // Add a separate center label that always appears horizontally at the center.
-    const centerLabel = svg
+    const centerGroup = svg
+      .append("g")
+      .attr("class", "center-group")
+      .style("pointer-events", "none");
+
+    const LOGO_WIDTH = 140;
+    const LOGO_HEIGHT = 140;
+
+    // Add foreignObject for logo
+    const logoObject = centerGroup
+      .append("foreignObject")
+      .attr("x", -LOGO_WIDTH / 2)
+      .attr("y", -LOGO_HEIGHT / 2)
+      .attr("width", LOGO_WIDTH)
+      .attr("height", LOGO_HEIGHT)
+      .style("opacity", 1);
+
+    logoObject
+      .append("xhtml:img")
+      .attr("src", "/logo/brc.svg")
+      .attr("width", LOGO_WIDTH)
+      .attr("height", LOGO_HEIGHT)
+      .style("object-fit", "contain");
+
+    // Add text element for non-root nodes
+    const centerText = centerGroup
       .append("text")
       .attr("class", "center-label")
       .attr("text-anchor", "middle")
       .attr("dy", "0.35em")
       .style("font-size", "16px")
-      .text(root.data.name)
-      .style("pointer-events", "none");
+      .style("opacity", 0);
+
+    function updateCenter(p) {
+      const isRoot = p.depth === 0;
+      logoObject.style("opacity", isRoot ? 1 : 0);
+      centerText
+        .style("opacity", isRoot ? 0 : 1)
+        .text(isRoot ? "" : p.data.name);
+    }
 
     // Add an invisible center circle to act as a zoom-out button.
     const center = svg
@@ -164,7 +195,7 @@ export const SectionViz = (): JSX.Element => {
     function clicked(event, p) {
       // Update the current center and the center label.
       currentRoot = p;
-      centerLabel.text(p.data.name);
+      updateCenter(p);
       setSelectedNode(p);
 
       // For each node, compute new coordinates relative to p.
