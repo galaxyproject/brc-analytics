@@ -6,4 +6,6 @@ enums:
     description: Possible ploidies supported by workflows.
     permissible_values:
       ANY:
+      DIPLOID:
       HAPLOID:
+      POLYPLOID:

@@ -59,5 +59,7 @@ export interface Workflow {
 
 export enum WORKFLOW_PLOIDY {
   ANY = "ANY",
+  DIPLOID = "DIPLOID",
   HAPLOID = "HAPLOID",
+  POLYPLOID = "POLYPLOID",
 }
