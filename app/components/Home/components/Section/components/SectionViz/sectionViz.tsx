@@ -193,13 +193,15 @@ export const SectionViz = (): JSX.Element => {
           };
         })
         .attrTween("d", (d) => () => arc(d.current))
-        .attr("fill-opacity", (d) =>
-          d.ancestors().indexOf(currentRoot) >= 0 && d.current.y0 <= DEPTH
-            ? 1
-            : 0
-        );
+        .attr("fill-opacity", (d) => {
+          const isVisible =
+            d.ancestors().indexOf(currentRoot) >= 0 &&
+            d.current.y0 <= DEPTH &&
+            d.y1 - p.depth <= DEPTH;
+          return isVisible ? 1 : 0;
+        });
 
-      // // Transition the labels.
+      // Transition the labels with updated visibility logic
       label
         .transition(transition)
         .tween("data", (d) => {
@@ -209,13 +211,13 @@ export const SectionViz = (): JSX.Element => {
           };
         })
         .attrTween("transform", (d) => () => labelTransform(d))
-        .attr("fill-opacity", (d) =>
-          d === currentRoot
-            ? 0
-            : d.ancestors().indexOf(currentRoot) >= 0 && d.current.y0 <= DEPTH
-              ? 1
-              : 0
-        );
+        .attr("fill-opacity", (d) => {
+          const isVisible =
+            d.ancestors().indexOf(currentRoot) >= 0 &&
+            d.current.y0 <= DEPTH &&
+            d.y1 - p.depth <= DEPTH;
+          return d === currentRoot ? 0 : isVisible ? 1 : 0;
+        });
     }
 
     // Clean up on component unmount: remove tooltip and clear svg.
