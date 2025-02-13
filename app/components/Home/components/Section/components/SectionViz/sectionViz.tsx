@@ -27,7 +27,7 @@ export const SectionViz = (): JSX.Element => {
       .attr("transform", `translate(${width / 2}, ${height / 2})`);
 
     // Define a color scale
-    const color = d3.scaleOrdinal(d3.schemeCategory10);
+    const color = d3.scaleOrdinal(d3.schemeTableau10);
 
     // Create a tooltip for interactivity
     const tooltip = d3
