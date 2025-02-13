@@ -2,7 +2,7 @@ import * as d3 from "d3";
 import { useRef, useEffect } from "react";
 import { data } from "./data";
 
-console.debug(data);
+const DEPTH = 2;
 
 export const SectionViz = (): JSX.Element => {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -50,7 +50,7 @@ export const SectionViz = (): JSX.Element => {
       .sum((d) => d.size || 1)
       .sort((a, b) => (b.value || 0) - (a.value || 0));
 
-    // Create a partition layout (compute full layout, even though we display only two levels)
+    // Create a partition layout (compute the full layout even though we display only DEPTH layers)
     d3.partition().size([2 * Math.PI, root.height + 1])(root);
 
     // Save each node’s initial coordinates for smooth transitions.
@@ -59,16 +59,16 @@ export const SectionViz = (): JSX.Element => {
     // Global variable to track the current center (zoomed) node. Initially, it’s the root.
     let currentRoot = root;
 
-    // Create an arc generator that “clamps” the radial depth so that
-    // only the center plus two levels (depth 0–2) are visible.
+    // An arc generator that “clamps” the radial depth so that
+    // only the center plus DEPTH levels are visible.
     const arc = d3
       .arc()
       .startAngle((d) => d.x0)
       .endAngle((d) => d.x1)
-      .innerRadius((d) => (Math.min(d.y0, 2) * radius) / 2)
-      .outerRadius((d) => (Math.min(d.y1, 2) * radius) / 2 - 1);
+      .innerRadius((d) => (Math.min(d.y0, DEPTH) * radius) / DEPTH)
+      .outerRadius((d) => (Math.min(d.y1, DEPTH) * radius) / DEPTH - 1);
 
-    // Draw the sunburst segments (skip drawing the root as an arc)
+    // Draw the sunburst segments (we still don’t draw the center node as an arc)
     const path = svg
       .append("g")
       .selectAll("path")
@@ -77,8 +77,8 @@ export const SectionViz = (): JSX.Element => {
       .attr("fill", (d) =>
         d.children ? color(d.data.name) : color(d.parent.data.name)
       )
-      // Initially show only nodes at depths 0–2 (relative to the root)
-      .attr("fill-opacity", (d) => (d.current.y0 <= 2 ? 1 : 0))
+      // Show only nodes with relative depth <= DEPTH.
+      .attr("fill-opacity", (d) => (d.current.y0 <= DEPTH ? 1 : 0))
       .attr("d", (d) => arc(d.current))
       .style("cursor", "pointer")
       .on("mouseover", function (event, d) {
@@ -93,14 +93,16 @@ export const SectionViz = (): JSX.Element => {
       })
       .on("click", clicked);
 
-    // Helper function to compute label transform.
-    // For nodes whose parent is the current center (i.e. first-tier),
-    // we add a small extra offset so the label does not overlap the center label.
+    /* 
+      Helper function to compute label transform.
+      Note: For first‑tier nodes (where d.parent === currentRoot) we add an offset
+      so the label doesn’t crowd the center label.
+    */
     function labelTransform(d) {
       const angle = ((d.current.x0 + d.current.x1) / 2) * (180 / Math.PI);
       let r =
-        ((Math.min(d.current.y0, 2) + Math.min(d.current.y1, 2)) / 2) *
-        (radius / 2);
+        ((Math.min(d.current.y0, DEPTH) + Math.min(d.current.y1, DEPTH)) / 2) *
+        (radius / DEPTH);
       if (d.parent === currentRoot) {
         r += 10; // extra offset for first-tier nodes
       }
@@ -108,7 +110,7 @@ export const SectionViz = (): JSX.Element => {
     }
 
     // Add labels for arcs (excluding the center node)
-    // Note: We do not filter out the center node here because we want to update its opacity later.
+    // We hide the label for the current center node (using centerLabel instead).
     const label = svg
       .append("g")
       .attr("pointer-events", "none")
@@ -116,9 +118,8 @@ export const SectionViz = (): JSX.Element => {
       .selectAll("text")
       .data(root.descendants().filter((d) => d.depth && d.x1 - d.x0 > 0.03))
       .join("text")
-      // Hide the label if this node is the current center
       .attr("fill-opacity", (d) =>
-        d === currentRoot ? 0 : d.current.y0 <= 2 ? 1 : 0
+        d === currentRoot ? 0 : d.current.y0 <= DEPTH ? 1 : 0
       )
       .attr("dy", "0.35em")
       .attr("transform", labelTransform)
@@ -133,14 +134,13 @@ export const SectionViz = (): JSX.Element => {
       .attr("dy", "0.35em")
       .style("font-size", "16px")
       .text(root.data.name)
-      .style("pointer-events", "none"); // so clicks fall through to the center circle
+      .style("pointer-events", "none");
 
     // Add an invisible center circle to act as a zoom-out button.
-    // When clicked, if the current center node has a parent, we zoom out.
     const center = svg
       .append("circle")
-      .attr("r", radius / 2) // Matches the maximum radius of level 0 (the center)
-      .attr("fill", "transparent") // Invisible but catches pointer events
+      .attr("r", radius / DEPTH)
+      .attr("fill", "transparent")
       .style("cursor", "pointer")
       .on("click", function (event) {
         if (currentRoot && currentRoot.parent) {
@@ -148,8 +148,8 @@ export const SectionViz = (): JSX.Element => {
         }
       });
 
-    // Zoom handler: on click, re-root the chart at the clicked node and show only
-    // that node plus two levels of children.
+    // Zoom handler: when a node is clicked, re-root the chart at that node and
+    // display up to DEPTH layers (i.e. its children, grandchildren, and great-grandchildren).
     function clicked(event, p) {
       // Update the current center and the center label.
       currentRoot = p;
@@ -184,7 +184,7 @@ export const SectionViz = (): JSX.Element => {
         })
         .attrTween("d", (d) => () => arc(d.current))
         .attr("fill-opacity", (d) =>
-          d.ancestors().indexOf(currentRoot) >= 0 && d.current.y0 <= 2 ? 1 : 0
+          d.ancestors().indexOf(currentRoot) >= 0 && d.current.y0 <= 3 ? 1 : 0
         );
 
       // Transition the labels.
@@ -200,7 +200,7 @@ export const SectionViz = (): JSX.Element => {
         .attr("fill-opacity", (d) =>
           d === currentRoot
             ? 0
-            : d.ancestors().indexOf(currentRoot) >= 0 && d.current.y0 <= 2
+            : d.ancestors().indexOf(currentRoot) >= 0 && d.current.y0 <= 3
               ? 1
               : 0
         );
