@@ -7,7 +7,7 @@ prefixes:
 
 imports:
   - linkml:types
-  - ./enums/workflow_type
+  - ./enums/workflow_category_id
 
 classes:
   WorkflowCategories:
@@ -23,10 +23,10 @@ classes:
   WorkflowCategory:
     description: Workflow category.
     attributes:
-      type:
+      category:
         description: The ID of the workflow category.
         required: true
-        range: WorkflowType
+        range: WorkflowCategoryId
       name:
         description: The display name of the workflow category.
         required: true

@@ -7,7 +7,7 @@ prefixes:
 
 imports:
   - linkml:types
-  - ./enums/workflow_type
+  - ./enums/workflow_category_id
   - ./enums/workflow_ploidy
 
 classes:
@@ -28,10 +28,11 @@ classes:
         description: The workflow's TRS ID.
         required: true
         range: string
-      type:
-        description: The ID of the workflow's category.
+      categories:
+        description: The IDs of the categories the workflow belongs to.
+        multivalued: true
         required: true
-        range: WorkflowType
+        range: WorkflowCategoryId
       ploidy:
         description: The ploidy supported by the workflow.
         required: true

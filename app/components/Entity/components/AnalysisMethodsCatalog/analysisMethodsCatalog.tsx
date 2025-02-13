@@ -21,7 +21,7 @@ export const AnalysisMethodsCatalog = ({
         );
         return (
           <AnalysisMethod
-            key={workflowCategory.type}
+            key={workflowCategory.category}
             geneModelUrl={geneModelUrl}
             genomeVersionAssemblyId={genomeVersionAssemblyId}
             content={

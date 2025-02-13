@@ -105,10 +105,10 @@ async function buildWorkflows(): Promise<WorkflowCategory[]> {
 
   const workflowCategories: WorkflowCategory[] =
     sourceWorkflowCategories.workflow_categories.map(
-      ({ description, name, type }) => ({
+      ({ category, description, name }) => ({
+        category,
         description,
         name,
-        type,
         workflows: [],
       })
     );
@@ -123,21 +123,23 @@ async function buildWorkflows(): Promise<WorkflowCategory[]> {
 function buildWorkflow(
   workflowCategories: WorkflowCategory[],
   {
+    categories,
     ploidy,
     trs_id: trsId,
-    type,
     workflow_description: workflowDescription,
     workflow_name: workflowName,
   }: SourceWorkflow
 ): void {
-  const category = workflowCategories.find((c) => c.type === type);
-  if (!category) throw new Error(`Unknown workflow category: ${type}`);
-  category.workflows.push({
-    ploidy,
-    trsId,
-    workflowDescription,
-    workflowName,
-  });
+  for (const category of categories) {
+    const workflowCategory = workflowCategories.find((c) => c.category === category);
+    if (!workflowCategory) throw new Error(`Unknown workflow category: ${category}`);
+    workflowCategory.workflows.push({
+      ploidy,
+      trsId,
+      workflowDescription,
+      workflowName,
+    });
+  }
 }
 
 async function readValuesFile<T>(

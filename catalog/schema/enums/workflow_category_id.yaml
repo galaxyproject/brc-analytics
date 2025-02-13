@@ -1,9 +1,9 @@
 id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/enums/workflow_type.yaml#
-name: enums_workflow_type
-description: Definition of the workflow type enum.
+name: enums_workflow_category_id
+description: Definition of the workflow category ID enum.
 
 enums:
-  WorkflowType:
+  WorkflowCategoryId:
     description: Set of IDs of workflow categories.
     permissible_values:
       VARIANT_CALLING:

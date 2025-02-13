@@ -23,9 +23,9 @@ export interface SourceGenome {
 
 export interface SourceWorkflowCategories {
   workflow_categories: {
+    category: string;
     description: string;
     name: string;
-    type: string;
   }[];
 }
 
@@ -34,9 +34,9 @@ export interface SourceWorkflows {
 }
 
 export interface SourceWorkflow {
+  categories: string[];
   ploidy: WORKFLOW_PLOIDY;
   trs_id: string;
-  type: string;
   workflow_description: string;
   workflow_name: string;
 }

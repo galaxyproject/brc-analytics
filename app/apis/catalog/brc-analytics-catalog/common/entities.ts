@@ -44,9 +44,9 @@ export interface EntitiesResponsePagination {
 }
 
 export interface WorkflowCategory {
+  category: string;
   description: string;
   name: string;
-  type: string;
   workflows: Workflow[];
 }
 

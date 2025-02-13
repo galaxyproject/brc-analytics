@@ -1,8 +1,8 @@
 [
   {
+    "category": "VARIANT_CALLING",
     "description": "Identify nucleotide polymorphisms and short indels from Illumina and Element data.",
     "name": "Variant calling",
-    "type": "VARIANT_CALLING",
     "workflows": [
       {
         "ploidy": "HAPLOID",
@@ -13,9 +13,9 @@
     ]
   },
   {
+    "category": "TRANSCRIPTOMICS",
     "description": "Analyze bulk or single-cell RNA seq data using a variety of approaches.",
     "name": "Transcriptomics",
-    "type": "TRANSCRIPTOMICS",
     "workflows": [
       {
         "ploidy": "ANY",
@@ -26,9 +26,9 @@
     ]
   },
   {
+    "category": "REGULATION",
     "description": "Workflows for the analysis of ChIP-seq, ATAC-Seq, and beyond.",
     "name": "Regulation",
-    "type": "REGULATION",
     "workflows": [
       {
         "ploidy": "ANY",
@@ -39,21 +39,21 @@
     ]
   },
   {
+    "category": "ASSEMBLY",
     "description": "Assemble prokaryotic and eukaryotic genomes sequenced with a variety of technologies.",
     "name": "Assembly",
-    "type": "ASSEMBLY",
     "workflows": []
   },
   {
+    "category": "GENOME_COMPARISONS",
     "description": "Workflows for creation of pairwise and multiple genome alignments.",
     "name": "Genome comparisons",
-    "type": "GENOME_COMPARISONS",
     "workflows": []
   },
   {
+    "category": "PROTEIN_FOLDING",
     "description": "Analysis of protein folding using the ColabFold framework.",
     "name": "Protein folding",
-    "type": "PROTEIN_FOLDING",
     "workflows": []
   }
 ]
