@@ -1,0 +1,75 @@
+{
+    "$defs": {
+        "WorkflowCategories": {
+            "additionalProperties": false,
+            "description": "",
+            "properties": {
+                "workflow_categories": {
+                    "items": {
+                        "$ref": "#/$defs/WorkflowCategory"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "workflow_categories"
+            ],
+            "title": "WorkflowCategories",
+            "type": "object"
+        },
+        "WorkflowCategory": {
+            "additionalProperties": false,
+            "description": "",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/$defs/WorkflowType"
+                }
+            },
+            "required": [
+                "type",
+                "name",
+                "description"
+            ],
+            "title": "WorkflowCategory",
+            "type": "object"
+        },
+        "WorkflowType": {
+            "description": "",
+            "enum": [
+                "VARIANT_CALLING",
+                "TRANSCRIPTOMICS",
+                "REGULATION",
+                "ASSEMBLY",
+                "GENOME_COMPARISONS",
+                "PROTEIN_FOLDING"
+            ],
+            "title": "WorkflowType",
+            "type": "string"
+        }
+    },
+    "$id": "https://brc-analytics.org/schema/workflow_categories",
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "additionalProperties": true,
+    "description": "",
+    "metamodel_version": "1.7.0",
+    "properties": {
+        "workflow_categories": {
+            "items": {
+                "$ref": "#/$defs/WorkflowCategory"
+            },
+            "type": "array"
+        }
+    },
+    "required": [
+        "workflow_categories"
+    ],
+    "title": "workflow_categories",
+    "type": "object",
+    "version": null
+}

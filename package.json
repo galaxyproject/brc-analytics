@@ -14,7 +14,8 @@
     "prepare": "husky",
     "test": "jest --runInBand",
     "build-brc-db": "esrun catalog/build/ts/build-catalog.ts",
-    "build-files-from-ncbi": "python3 ./catalog/build/py/build-files-from-ncbi.py"
+    "build-files-from-ncbi": "python3 ./catalog/build/py/build-files-from-ncbi.py",
+    "gen-schema": "./catalog/schema/scripts/gen-schema.sh"
   },
   "dependencies": {
     "@databiosphere/findable-ui": "^21.0.0",

@@ -1,0 +1,54 @@
+{
+    "$defs": {
+        "Assemblies": {
+            "additionalProperties": false,
+            "description": "",
+            "properties": {
+                "assemblies": {
+                    "items": {
+                        "$ref": "#/$defs/Assembly"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "assemblies"
+            ],
+            "title": "Assemblies",
+            "type": "object"
+        },
+        "Assembly": {
+            "additionalProperties": false,
+            "description": "",
+            "properties": {
+                "accession": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "accession"
+            ],
+            "title": "Assembly",
+            "type": "object"
+        }
+    },
+    "$id": "https://brc-analytics.org/schema/assemblies",
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "additionalProperties": true,
+    "description": "",
+    "metamodel_version": "1.7.0",
+    "properties": {
+        "assemblies": {
+            "items": {
+                "$ref": "#/$defs/Assembly"
+            },
+            "type": "array"
+        }
+    },
+    "required": [
+        "assemblies"
+    ],
+    "title": "assemblies",
+    "type": "object",
+    "version": null
+}

@@ -1,0 +1,92 @@
+{
+    "$defs": {
+        "Workflow": {
+            "additionalProperties": false,
+            "description": "",
+            "properties": {
+                "ploidy": {
+                    "$ref": "#/$defs/WorkflowPloidy"
+                },
+                "trs_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/$defs/WorkflowType"
+                },
+                "workflow_description": {
+                    "type": "string"
+                },
+                "workflow_name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "trs_id",
+                "type",
+                "ploidy",
+                "workflow_name",
+                "workflow_description"
+            ],
+            "title": "Workflow",
+            "type": "object"
+        },
+        "WorkflowPloidy": {
+            "description": "",
+            "enum": [
+                "ANY",
+                "HAPLOID"
+            ],
+            "title": "WorkflowPloidy",
+            "type": "string"
+        },
+        "WorkflowType": {
+            "description": "",
+            "enum": [
+                "VARIANT_CALLING",
+                "TRANSCRIPTOMICS",
+                "REGULATION",
+                "ASSEMBLY",
+                "GENOME_COMPARISONS",
+                "PROTEIN_FOLDING"
+            ],
+            "title": "WorkflowType",
+            "type": "string"
+        },
+        "Workflows": {
+            "additionalProperties": false,
+            "description": "",
+            "properties": {
+                "workflows": {
+                    "items": {
+                        "$ref": "#/$defs/Workflow"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "workflows"
+            ],
+            "title": "Workflows",
+            "type": "object"
+        }
+    },
+    "$id": "https://brc-analytics.org/schema/workflows",
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "additionalProperties": true,
+    "description": "",
+    "metamodel_version": "1.7.0",
+    "properties": {
+        "workflows": {
+            "items": {
+                "$ref": "#/$defs/Workflow"
+            },
+            "type": "array"
+        }
+    },
+    "required": [
+        "workflows"
+    ],
+    "title": "workflows",
+    "type": "object",
+    "version": null
+}
