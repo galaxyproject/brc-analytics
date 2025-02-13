@@ -2,15 +2,48 @@ name: Run checks
 on: [pull_request]
 
 jobs:
-  build:
+  run-checks:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: "20.10.0"
-      - run: |
-          npm ci
-          npm run check-format
-          npm run lint
-          npx tsc --noEmit
+      - name: Cache npm cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+      - name: Install dependencies
+        run: npm ci
+      - name: Next.js Build
+        run: npm run build-prod:data-portal
+      - name: Run Prettier
+        run: npm run check-format
+      - name: Run Linter (ESLint)
+        run: npm run lint
+      - name: Type Check
+        run: npx tsc --noEmit
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.4"
+          cache: "pip"
+          cache-dependency-path: "./catalog/build/requirements.txt"
+      - name: Install Python dependencies
+        run: pip install -r ./catalog/build/requirements.txt
+      - name: Run linkml-lint
+        run: linkml-lint ./catalog/schema --validate --verbose
+      - name: Test LinkML Python generation
+        run: |
+          for name in schema assemblies workflow_categories workflows
+          do
+            gen-python "./catalog/schema/$name.yaml"
+          done
+      - name: Validate catalog files
+        run: |
+          for name in assemblies workflow_categories workflows
+          do
+            linkml-validate -s "./catalog/schema/$name.yaml" "./catalog/source/$name.yml"
+          done
