@@ -6,7 +6,7 @@ UCSC_ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.jso
 
 GENOMES_OUTPUT_PATH = "catalog/build/intermediate/genomes-from-ncbi.tsv"
 
-PRIMARYDATA_OUTPUT_PATH = "catalog-build/source/primary-data-ncbi.tsv"
+PRIMARYDATA_OUTPUT_PATH = "catalog/build/intermediate/primary-data-ncbi.tsv"
 
 TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
   2: "Bacteria",
