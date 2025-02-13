@@ -75,12 +75,14 @@ export const SectionViz = (): JSX.Element => {
       .data(root.descendants().filter((d) => d.depth))
       .join("path")
       .attr("fill", (d) =>
-        d.children ? color(d.data.name) : color(d.parent.data.name)
+        d.children ? color(d.data.name) : color(d.parent!.data.name)
       )
       // Show only nodes with relative depth <= DEPTH.
       .attr("fill-opacity", (d) => (d.current.y0 <= DEPTH ? 1 : 0))
       .attr("d", (d) => arc(d.current))
       .style("cursor", "pointer")
+      .style("stroke", "#333")
+      .style("stroke-width", "1px")
       .on("mouseover", function (event, d) {
         tooltip.transition().duration(200).style("opacity", 0.9);
         tooltip
