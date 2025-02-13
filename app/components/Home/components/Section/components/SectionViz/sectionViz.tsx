@@ -1,6 +1,8 @@
 import * as d3 from "d3";
 import { useRef, useEffect } from "react";
-import data from "./data.json";
+import { data } from "./data";
+
+console.debug(data);
 
 export const SectionViz = (): JSX.Element => {
   const svgRef = useRef<SVGSVGElement>(null);
