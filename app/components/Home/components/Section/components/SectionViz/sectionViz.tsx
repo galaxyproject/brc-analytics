@@ -48,34 +48,41 @@ export const SectionViz = (): JSX.Element => {
     // The sum() function uses the 'size' field (defaulting to 1 if not present)
     const root = d3
       .hierarchy(data)
-      .sum((d: any) => d.size || 1)
+      .sum((d) => d.size || 1)
       .sort((a, b) => (b.value || 0) - (a.value || 0));
 
-    // Create a partition layout for the sunburst
+    // Create a partition layout (compute full layout, even though we display only two levels)
     d3.partition().size([2 * Math.PI, root.height + 1])(root);
 
-    // Create an arc generator for the segments
+    // Save each node’s initial coordinates for smooth transitions.
+    root.each((d) => (d.current = d));
+
+    // Global variable to track the current center (zoomed) node. Initially, it’s the root.
+    let currentRoot = root;
+
+    // Create an arc generator that “clamps” the radial depth so that
+    // only the center plus two levels (depth 0–2) are visible.
     const arc = d3
       .arc()
-      .startAngle((d: any) => d.x0)
-      .endAngle((d: any) => d.x1)
-      .innerRadius((d: any) => (d.y0 * radius) / (root.height + 1))
-      .outerRadius((d: any) => (d.y1 * radius) / (root.height + 1) - 1);
+      .startAngle((d) => d.x0)
+      .endAngle((d) => d.x1)
+      .innerRadius((d) => (Math.min(d.y0, 2) * radius) / 2)
+      .outerRadius((d) => (Math.min(d.y1, 2) * radius) / 2 - 1);
 
-    // Draw the sunburst segments
-    svg
+    // Draw the sunburst segments (skip drawing the root as an arc)
+    const path = svg
+      .append("g")
       .selectAll("path")
-      .data(root.descendants())
+      .data(root.descendants().filter((d) => d.depth))
       .join("path")
-      // Hide the very center (root) node
-      .attr("display", (d: any) => (d.depth ? null : "none"))
-      .attr("d", arc)
-      .style("fill", (d: any) =>
-        // Group nodes get their own color; leaf nodes use their parent's color
+      .attr("fill", (d) =>
         d.children ? color(d.data.name) : color(d.parent.data.name)
       )
+      // Initially show only nodes at depths 0–2 (relative to the root)
+      .attr("fill-opacity", (d) => (d.y0 <= 2 ? 1 : 0))
+      .attr("d", (d) => arc(d.current))
       .style("cursor", "pointer")
-      .on("mouseover", function (event: any, d: any) {
+      .on("mouseover", function (event, d) {
         tooltip.transition().duration(200).style("opacity", 0.9);
         tooltip
           .html(`<strong>${d.data.name}</strong><br/>Value: ${d.value}`)
@@ -85,26 +92,95 @@ export const SectionViz = (): JSX.Element => {
       .on("mouseout", function () {
         tooltip.transition().duration(500).style("opacity", 0);
       })
-      .on("click", function (event: any, d: any) {
-        console.log("Clicked node:", d.data);
-      });
+      .on("click", clicked);
 
-    // Optionally, add labels for arcs that are wide enough
-    svg
+    // Add labels for arcs that are wide enough
+    const label = svg
+      .append("g")
+      .attr("pointer-events", "none")
+      .attr("text-anchor", "middle")
       .selectAll("text")
-      .data(root.descendants().filter((d: any) => d.x1 - d.x0 > 0.03))
+      .data(root.descendants().filter((d) => d.depth && d.x1 - d.x0 > 0.03))
       .join("text")
-      .attr("transform", function (d: any) {
+      // Show labels only for nodes at depth <= 2 (relative to current view)
+      .attr("fill-opacity", (d) => (d.y0 <= 2 ? 1 : 0))
+      .attr("dy", "0.35em")
+      .attr("transform", (d) => {
         const x = ((d.x0 + d.x1) / 2) * (180 / Math.PI);
-        const y = ((d.y0 + d.y1) / 2) * (radius / (root.height + 1));
+        // Clamp the radial coordinate to level 2
+        const y = ((Math.min(d.y0, 2) + Math.min(d.y1, 2)) / 2) * (radius / 2);
         return `rotate(${x - 90}) translate(${y},0) rotate(${x < 180 ? 0 : 180})`;
       })
-      .attr("dy", "0.35em")
-      .attr("text-anchor", (d: any) =>
-        (d.x0 + d.x1) / 2 > Math.PI ? "end" : "start"
-      )
-      .text((d: any) => d.data.name)
-      .style("font-size", "10px");
+      .text((d) => d.data.name);
+
+    // Add an invisible center circle to act as a zoom-out button.
+    // When clicked, if the current center node has a parent, we zoom out.
+    const center = svg
+      .append("circle")
+      .attr("r", radius / 2) // This matches the maximum radius of level 0 (the center)
+      .attr("fill", "transparent") // Invisible but catches pointer events
+      .style("cursor", "pointer")
+      .on("click", function (event) {
+        if (currentRoot && currentRoot.parent) {
+          clicked(event, currentRoot.parent);
+        }
+      });
+
+    // Zoom handler: on click, re-root the chart at the clicked node and show only
+    // that node plus two levels of children.
+    function clicked(event, p) {
+      // Update the current center.
+      currentRoot = p;
+
+      // For each node, compute new coordinates relative to p.
+      root.each((d) => {
+        d.target = {
+          x0:
+            Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) *
+            2 *
+            Math.PI,
+          x1:
+            Math.max(0, Math.min(1, (d.x1 - p.x0) / (p.x1 - p.x0))) *
+            2 *
+            Math.PI,
+          y0: Math.max(0, d.y0 - p.depth),
+          y1: Math.max(0, d.y1 - p.depth),
+        };
+      });
+
+      const t = svg.transition().duration(750);
+
+      // Transition the arcs.
+      path
+        .transition(t)
+        .tween("data", (d) => {
+          const i = d3.interpolate(d.current, d.target);
+          return (t) => {
+            d.current = i(t);
+          };
+        })
+        .attrTween("d", (d) => () => arc(d.current))
+        // Hide nodes that are now deeper than two levels relative to the new center.
+        .attr("fill-opacity", (d) => (d.current.y0 <= 2 ? 1 : 0));
+
+      // Transition the labels.
+      label
+        .transition(t)
+        .tween("data", (d) => {
+          const i = d3.interpolate(d.current, d.target);
+          return (t) => {
+            d.current = i(t);
+          };
+        })
+        .attrTween("transform", (d) => () => {
+          const x = ((d.current.x0 + d.current.x1) / 2) * (180 / Math.PI);
+          const y =
+            ((Math.min(d.current.y0, 2) + Math.min(d.current.y1, 2)) / 2) *
+            (radius / 2);
+          return `rotate(${x - 90}) translate(${y},0) rotate(${x < 180 ? 0 : 180})`;
+        })
+        .attr("fill-opacity", (d) => (d.current.y0 <= 2 ? 1 : 0));
+    }
 
     // Clean up on component unmount: remove tooltip and clear svg.
     return () => {
