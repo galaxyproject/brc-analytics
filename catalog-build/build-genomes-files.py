@@ -8,12 +8,15 @@ ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.json"
 
 OUTPUT_PATH = "files/source/genomes.tsv"
 
+
 def get_duplicate_ids(genomes_df):
   counts = genomes_df["Genome Version/Assembly ID"].value_counts()
   return list(counts.index.to_series().loc[counts > 1])
 
+
 def get_unmatched_assemblies(assemblies_df, result_df):
   return set(assemblies_df["asmId"]) - set(result_df["asmId"])
+
 
 def _id_to_gene_model_url(asm_id):
   hubs_url = "https://hgdownload.soe.ucsc.edu/hubs/"
@@ -59,7 +62,7 @@ def build_genomes_files():
   print(f"Removing rows with duplicate Genome Version/Assembly ID values of: {', '.join(duplicate_ids)}")
 
   deduped_genomes_df = genomes_source_df.drop_duplicates(subset=["Genome Version/Assembly ID"])
-  
+
   gen_bank_merge_df = deduped_genomes_df.merge(assemblies_df, how="left", left_on="Genome Version/Assembly ID", right_on="genBank")
   ref_seq_merge_df = deduped_genomes_df.merge(assemblies_df, how="left", left_on="Genome Version/Assembly ID", right_on="refSeq")
 
@@ -76,6 +79,7 @@ def build_genomes_files():
   result_df.to_csv(OUTPUT_PATH, index=False, sep="\t")
 
   print(f"Wrote to {OUTPUT_PATH}")
+
 
 if __name__ == "__main__":
   build_genomes_files()
