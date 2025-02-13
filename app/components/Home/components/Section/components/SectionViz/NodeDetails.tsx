@@ -1,34 +1,49 @@
 import React from "react";
 
-interface NodeDetailsProps {
-  node: {
-    children?: Array<{
-      data: {
-        name: string;
-      };
-    }>;
-    data: {
-      name: string;
-    };
-  };
+interface TreeNode {
+  children?: TreeNode[];
+  name: string;
+  depth: number;
 }
 
+interface NodeDetailsProps {
+  node: TreeNode;
+}
+
+function countLeafNodes(node: TreeNode): number {
+  if (!node.children || node.children.length === 0) {
+    return 1;
+  }
+
+  let count = 0;
+  for (const child of node.children) {
+    count += countLeafNodes(child);
+  }
+  return count;
+}
+
+const TAXANOMIC_LEVELS_FOR_TREE = [
+  "superkingdom",
+  "kingdom",
+  "phylum",
+  "class",
+  "order",
+  "family",
+  "genus",
+  "species",
+  "strain",
+];
+
 export const NodeDetails: React.FC<NodeDetailsProps> = ({ node }) => {
+  const leafNodeCount = countLeafNodes(node);
+  const taxonomicLevel = TAXANOMIC_LEVELS_FOR_TREE[node.depth] || "Unknown";
+
   return (
     <div>
-      <h3>{node.data.name}</h3>
-      {node.children && node.children.length > 0 ? (
-        <div>
-          <h4>Useful info about {node.data.name}</h4>
-          <ul>
-            <li>Number of entities</li>
-            <li>Quick links</li>
-            <li>....</li>
-          </ul>
-        </div>
-      ) : (
-        <p>No children</p>
-      )}
+      <h3>
+        {node.data.name} <em>({taxonomicLevel})</em>
+      </h3>
+      <p>Available Assemblies: {leafNodeCount}</p>
     </div>
   );
 };
