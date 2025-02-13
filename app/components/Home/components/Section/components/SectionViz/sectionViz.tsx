@@ -45,7 +45,6 @@ export const SectionViz = (): JSX.Element => {
       .style("pointer-events", "none");
 
     // Create a hierarchy from the sample data.
-    // The sum() function uses the 'size' field (defaulting to 1 if not present)
     const root = d3
       .hierarchy(data)
       .sum((d) => d.size || 1)
@@ -79,7 +78,7 @@ export const SectionViz = (): JSX.Element => {
         d.children ? color(d.data.name) : color(d.parent.data.name)
       )
       // Initially show only nodes at depths 0–2 (relative to the root)
-      .attr("fill-opacity", (d) => (d.y0 <= 2 ? 1 : 0))
+      .attr("fill-opacity", (d) => (d.current.y0 <= 2 ? 1 : 0))
       .attr("d", (d) => arc(d.current))
       .style("cursor", "pointer")
       .on("mouseover", function (event, d) {
@@ -94,7 +93,22 @@ export const SectionViz = (): JSX.Element => {
       })
       .on("click", clicked);
 
-    // Add labels for arcs that are wide enough
+    // Helper function to compute label transform.
+    // For nodes whose parent is the current center (i.e. first-tier),
+    // we add a small extra offset so the label does not overlap the center label.
+    function labelTransform(d) {
+      const angle = ((d.current.x0 + d.current.x1) / 2) * (180 / Math.PI);
+      let r =
+        ((Math.min(d.current.y0, 2) + Math.min(d.current.y1, 2)) / 2) *
+        (radius / 2);
+      if (d.parent === currentRoot) {
+        r += 10; // extra offset for first-tier nodes
+      }
+      return `rotate(${angle - 90}) translate(${r},0) rotate(${angle < 180 ? 0 : 180})`;
+    }
+
+    // Add labels for arcs (excluding the center node)
+    // Note: We do not filter out the center node here because we want to update its opacity later.
     const label = svg
       .append("g")
       .attr("pointer-events", "none")
@@ -102,22 +116,30 @@ export const SectionViz = (): JSX.Element => {
       .selectAll("text")
       .data(root.descendants().filter((d) => d.depth && d.x1 - d.x0 > 0.03))
       .join("text")
-      // Show labels only for nodes at depth <= 2 (relative to current view)
-      .attr("fill-opacity", (d) => (d.y0 <= 2 ? 1 : 0))
+      // Hide the label if this node is the current center
+      .attr("fill-opacity", (d) =>
+        d === currentRoot ? 0 : d.current.y0 <= 2 ? 1 : 0
+      )
       .attr("dy", "0.35em")
-      .attr("transform", (d) => {
-        const x = ((d.x0 + d.x1) / 2) * (180 / Math.PI);
-        // Clamp the radial coordinate to level 2
-        const y = ((Math.min(d.y0, 2) + Math.min(d.y1, 2)) / 2) * (radius / 2);
-        return `rotate(${x - 90}) translate(${y},0) rotate(${x < 180 ? 0 : 180})`;
-      })
-      .text((d) => d.data.name);
+      .attr("transform", labelTransform)
+      .text((d) => d.data.name)
+      .style("font-size", "10px");
+
+    // Add a separate center label that always appears horizontally at the center.
+    const centerLabel = svg
+      .append("text")
+      .attr("class", "center-label")
+      .attr("text-anchor", "middle")
+      .attr("dy", "0.35em")
+      .style("font-size", "16px")
+      .text(root.data.name)
+      .style("pointer-events", "none"); // so clicks fall through to the center circle
 
     // Add an invisible center circle to act as a zoom-out button.
     // When clicked, if the current center node has a parent, we zoom out.
     const center = svg
       .append("circle")
-      .attr("r", radius / 2) // This matches the maximum radius of level 0 (the center)
+      .attr("r", radius / 2) // Matches the maximum radius of level 0 (the center)
       .attr("fill", "transparent") // Invisible but catches pointer events
       .style("cursor", "pointer")
       .on("click", function (event) {
@@ -129,8 +151,9 @@ export const SectionViz = (): JSX.Element => {
     // Zoom handler: on click, re-root the chart at the clicked node and show only
     // that node plus two levels of children.
     function clicked(event, p) {
-      // Update the current center.
+      // Update the current center and the center label.
       currentRoot = p;
+      centerLabel.text(p.data.name);
 
       // For each node, compute new coordinates relative to p.
       root.each((d) => {
@@ -160,8 +183,9 @@ export const SectionViz = (): JSX.Element => {
           };
         })
         .attrTween("d", (d) => () => arc(d.current))
-        // Hide nodes that are now deeper than two levels relative to the new center.
-        .attr("fill-opacity", (d) => (d.current.y0 <= 2 ? 1 : 0));
+        .attr("fill-opacity", (d) =>
+          d.ancestors().indexOf(currentRoot) >= 0 && d.current.y0 <= 2 ? 1 : 0
+        );
 
       // Transition the labels.
       label
@@ -172,14 +196,14 @@ export const SectionViz = (): JSX.Element => {
             d.current = i(t);
           };
         })
-        .attrTween("transform", (d) => () => {
-          const x = ((d.current.x0 + d.current.x1) / 2) * (180 / Math.PI);
-          const y =
-            ((Math.min(d.current.y0, 2) + Math.min(d.current.y1, 2)) / 2) *
-            (radius / 2);
-          return `rotate(${x - 90}) translate(${y},0) rotate(${x < 180 ? 0 : 180})`;
-        })
-        .attr("fill-opacity", (d) => (d.current.y0 <= 2 ? 1 : 0));
+        .attrTween("transform", (d) => () => labelTransform(d))
+        .attr("fill-opacity", (d) =>
+          d === currentRoot
+            ? 0
+            : d.ancestors().indexOf(currentRoot) >= 0 && d.current.y0 <= 2
+              ? 1
+              : 0
+        );
     }
 
     // Clean up on component unmount: remove tooltip and clear svg.
