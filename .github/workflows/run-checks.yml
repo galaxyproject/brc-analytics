@@ -37,7 +37,7 @@ jobs:
         run: |
           for name in schema assemblies workflow_categories workflows
           do
-            gen-python "./catalog/schema/$name.yaml"
+            gen-python "./catalog/schema/$name.yaml" > /dev/null
           done
       - name: Validate catalog files
         run: |
