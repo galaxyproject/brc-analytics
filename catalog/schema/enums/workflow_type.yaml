@@ -1,4 +1,4 @@
-id: https://brc-analytics.org/schema/enums/workflow_type
+id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/enums/workflow_type.yaml#
 name: enums_workflow_type
 
 enums:

@@ -1,4 +1,4 @@
-id: https://brc-analytics.org/schema/workflow_categories
+id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/workflow_categories.yaml#
 name: workflow_categories
 
 prefixes:
