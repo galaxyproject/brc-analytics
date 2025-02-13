@@ -1,6 +1,7 @@
 import * as d3 from "d3";
 import { useRef, useEffect, useState } from "react";
 import { data } from "./data";
+import { NodeDetails } from "./NodeDetails";
 
 const DEPTH = 2;
 
@@ -15,8 +16,8 @@ export const SectionViz = (): JSX.Element => {
     d3.select(svgRef.current).selectAll("*").remove();
 
     // Set up dimensions and radius for the sunburst chart
-    const width = 600;
-    const height = 600;
+    const width = 800;
+    const height = width;
     const radius = (width - 10) / 2;
 
     // Create the main SVG container and center the group
@@ -44,10 +45,16 @@ export const SectionViz = (): JSX.Element => {
       .style("pointer-events", "none");
 
     // Create a hierarchy from the sample data.
-    const root = d3
+    const hierarchy = d3
       .hierarchy(data)
       .sum((d) => d.size || 1)
-      .sort((a, b) => (b.value || 0) - (a.value || 0));
+      .sort((a: any, b: any) => (b.value || 0) - (a.value || 0));
+
+    const root = d3.partition().size([2 * Math.PI, hierarchy.height + 1])(
+      hierarchy
+    );
+
+    root.each((d: any) => (d.current = d));
 
     // Create a partition layout (compute the full layout even though we display only DEPTH layers)
     d3.partition().size([2 * Math.PI, root.height + 1])(root);
@@ -64,6 +71,8 @@ export const SectionViz = (): JSX.Element => {
       .arc()
       .startAngle((d) => d.x0)
       .endAngle((d) => d.x1)
+      .padAngle((d) => Math.min((d.x1 - d.x0) / 2, 0.005))
+      .padRadius(radius * 1.5)
       .innerRadius((d) => (Math.min(d.y0, DEPTH) * radius) / DEPTH)
       .outerRadius((d) => (Math.min(d.y1, DEPTH) * radius) / DEPTH - 1);
 
@@ -71,7 +80,7 @@ export const SectionViz = (): JSX.Element => {
     const path = svg
       .append("g")
       .selectAll("path")
-      .data(root.descendants().filter((d) => d.depth))
+      .data(root.descendants().slice(1))
       .join("path")
       .attr("fill", (d) =>
         d.children ? color(d.data.name) : color(d.parent!.data.name)
@@ -80,8 +89,8 @@ export const SectionViz = (): JSX.Element => {
       .attr("fill-opacity", (d) => (d.current.y0 <= DEPTH ? 1 : 0))
       .attr("d", (d) => arc(d.current))
       .style("cursor", "pointer")
-      .style("stroke", "#333")
-      .style("stroke-width", "1px")
+      // .style("stroke", "#333")
+      // .style("stroke-width", "1px")
       .on("mouseover", function (event, d) {
         tooltip.transition().duration(200).style("opacity", 0.9);
         tooltip
@@ -117,15 +126,14 @@ export const SectionViz = (): JSX.Element => {
       .attr("pointer-events", "none")
       .attr("text-anchor", "middle")
       .selectAll("text")
-      .data(root.descendants().filter((d) => d.depth && d.x1 - d.x0 > 0.03))
+      .data(root.descendants().slice(1))
       .join("text")
       .attr("fill-opacity", (d) =>
         d === currentRoot ? 0 : d.current.y0 <= DEPTH ? 1 : 0
       )
       .attr("dy", "0.35em")
       .attr("transform", labelTransform)
-      .text((d) => d.data.name)
-      .style("font-size", "10px");
+      .text((d) => d.data.name);
 
     // Add a separate center label that always appears horizontally at the center.
     const centerLabel = svg
@@ -155,6 +163,7 @@ export const SectionViz = (): JSX.Element => {
       // Update the current center and the center label.
       currentRoot = p;
       centerLabel.text(p.data.name);
+      setSelectedNode(p);
 
       // For each node, compute new coordinates relative to p.
       root.each((d) => {
@@ -172,15 +181,15 @@ export const SectionViz = (): JSX.Element => {
         };
       });
 
-      const t = svg.transition().duration(750);
+      const transition = svg.transition().duration(750);
 
       // Transition the arcs.
       path
-        .transition(t)
+        .transition(transition)
         .tween("data", (d) => {
           const i = d3.interpolate(d.current, d.target);
-          return (t) => {
-            d.current = i(t);
+          return (transition_duration) => {
+            d.current = i(transition_duration);
           };
         })
         .attrTween("d", (d) => () => arc(d.current))
@@ -188,13 +197,13 @@ export const SectionViz = (): JSX.Element => {
           d.ancestors().indexOf(currentRoot) >= 0 && d.current.y0 <= 3 ? 1 : 0
         );
 
-      // Transition the labels.
+      // // Transition the labels.
       label
-        .transition(t)
+        .transition(transition)
         .tween("data", (d) => {
           const i = d3.interpolate(d.current, d.target);
-          return (t) => {
-            d.current = i(t);
+          return (transition) => {
+            d.current = i(transition);
           };
         })
         .attrTween("transform", (d) => () => labelTransform(d))
@@ -225,14 +234,11 @@ export const SectionViz = (): JSX.Element => {
       }}
     >
       <div style={{ width: "70%", display: "flex", justifyContent: "center" }}>
-      
         <svg ref={svgRef}></svg>
       </div>
       <div style={{ width: "30%", padding: "1rem" }}>
         {selectedNode ? (
-          <div>
-            <h3>{selectedNode.name}</h3>
-          </div>
+          <NodeDetails node={selectedNode} />
         ) : (
           <p>No node selected</p>
         )}

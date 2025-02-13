@@ -65,4 +65,5 @@ export const data = {
       ]),
     },
   ],
+  size: 1,
 };
