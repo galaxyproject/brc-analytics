@@ -36,15 +36,7 @@ jobs:
         run: linkml-lint ./catalog/schema --validate --verbose
       - name: Test LinkML Python generation
         # Generate Python code from the main LinkML schemas, discarding the output; this will catch more subtle errors such as references to nonexistent elements.
-        run: |
-          for name in schema assemblies workflow_categories workflows
-          do
-            gen-python "./catalog/schema/$name.yaml" > /dev/null
-          done
+        run: npm run test-gen-python
       - name: Validate catalog files
         # Validate the catalog source files against their corresponding LinkML schemas.
-        run: |
-          for name in assemblies workflow_categories workflows
-          do
-            linkml-validate -s "./catalog/schema/$name.yaml" "./catalog/source/$name.yml"
-          done
+        run: npm run validate-catalog
