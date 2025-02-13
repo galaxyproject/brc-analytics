@@ -86,7 +86,7 @@ export const SectionViz = (): JSX.Element => {
         d.children ? color(d.data.name) : color(d.parent!.data.name)
       )
       // Show only nodes with relative depth <= DEPTH.
-      .attr("fill-opacity", (d) => (d.current.y0 <= DEPTH ? 1 : 0))
+      .attr("fill-opacity", (d) => (d.current.y0 <= DEPTH - 1 ? 1 : 0))
       .attr("d", (d) => arc(d.current))
       .style("cursor", "pointer")
       // .style("stroke", "#333")
@@ -129,7 +129,7 @@ export const SectionViz = (): JSX.Element => {
       .data(root.descendants().slice(1))
       .join("text")
       .attr("fill-opacity", (d) =>
-        d === currentRoot ? 0 : d.current.y0 <= DEPTH ? 1 : 0
+        d === currentRoot ? 0 : d.current.y0 <= DEPTH - 1 ? 1 : 0
       )
       .attr("dy", "0.35em")
       .attr("transform", labelTransform)
@@ -194,7 +194,9 @@ export const SectionViz = (): JSX.Element => {
         })
         .attrTween("d", (d) => () => arc(d.current))
         .attr("fill-opacity", (d) =>
-          d.ancestors().indexOf(currentRoot) >= 0 && d.current.y0 <= 3 ? 1 : 0
+          d.ancestors().indexOf(currentRoot) >= 0 && d.current.y0 <= DEPTH
+            ? 1
+            : 0
         );
 
       // // Transition the labels.
@@ -210,7 +212,7 @@ export const SectionViz = (): JSX.Element => {
         .attr("fill-opacity", (d) =>
           d === currentRoot
             ? 0
-            : d.ancestors().indexOf(currentRoot) >= 0 && d.current.y0 <= 3
+            : d.ancestors().indexOf(currentRoot) >= 0 && d.current.y0 <= DEPTH
               ? 1
               : 0
         );
