@@ -2,6 +2,8 @@ import pandas as pd
 import yaml
 import requests
 import urllib
+import re
+import json
 import time
 from functools import partial
 from bs4 import BeautifulSoup
@@ -135,6 +137,58 @@ def get_species_df(taxonomy_ids, taxonomic_group_sets, taxonomic_levels):
   )
   return pd.DataFrame([get_species_row(info, taxonomic_group_sets, taxonomic_levels) for info in species_info])
 
+
+def ncbi_tree_to_nested_tree(node_id, edges):
+  children = edges.get(str(node_id), {}).get("visible_children", [])
+  children = [str(num) for num in children]
+  # ncbi results odd again, dup children
+  children = set(children)
+  return {
+      "name": node_id,
+      "children": [ncbi_tree_to_nested_tree(child, edges) for child in children]
+  }
+
+def update_species_tree_names(tree, taxon_name_map):
+    tree["name"] = taxon_name_map.get(tree["name"], tree["name"])
+    for child in tree.get("children", []):
+        update_species_tree_names(child, taxon_name_map)
+    return tree
+
+def get_species_tree(taxonomy_ids, taxonomic_levels):
+  species_tree_url = f"https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/taxon/{','.join([str(id) for id in taxonomy_ids])}/filtered_subtree?rank_limits={','.join(taxonomic_levels)}"
+  species_tree_response = requests.get(species_tree_url).json()
+
+  # Build a tree from the response
+  edges = species_tree_response.get("edges", {})
+  all_children = {child for edge in edges.values() for child in edge.get("visible_children", [])}
+  all_children = [str(num) for num in all_children]
+  root_ids = [node_id for node_id in edges if node_id not in all_children]
+  root_ids = [str(num) for num in root_ids]
+
+  if not root_ids:
+      return {}
+  
+  # this bc the ncbi result is odd, multi-root
+  root_id = "1"
+  for root_id_candidate in root_ids:
+      if root_id_candidate != root_id:
+          edges[root_id]["visible_children"].append(root_id_candidate)
+
+  species_tree = ncbi_tree_to_nested_tree(root_id, edges)
+
+  # Find the set of all unique tax_ids and their display names
+  tax_ids = all_children + root_ids
+  tax_ids = set(tax_ids)
+  parent_taxa_info = get_paginated_ncbi_results(f"https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/taxon/{','.join([str(id) for id in tax_ids])}/dataset_report", "parent taxa")
+
+  # Replace taxon ids with display names
+  taxon_name_map = {"1": "root"}
+  for report in parent_taxa_info:
+    taxon_name_map[str(report["taxonomy"]["tax_id"])] = report["taxonomy"]["current_scientific_name"]["name"]
+
+  named_species_tree = update_species_tree_names(species_tree, taxon_name_map)
+
+  return named_species_tree
 
 def get_genome_row(genome_info):
   refseq_category = genome_info["assembly_info"].get("refseq_category")
@@ -415,6 +469,7 @@ def build_files(
   assemblies_path,
   genomes_output_path,
   ucsc_assemblies_url,
+  tree_output_path,
   taxonomic_levels_for_tree, 
   taxonomic_group_sets={},
   do_gene_model_urls=True,
@@ -478,3 +533,9 @@ def build_files(
     qc_report_text = make_qc_report(**qc_report_params)
     with open(qc_report_path, "w") as file:
       file.write(qc_report_text)
+
+  if len(taxonomic_levels_for_tree) > 0:
+    species_tree = get_species_tree(genomes_df["taxonomyId"], taxonomic_levels_for_tree)
+    with open(tree_output_path, 'w') as outfile:
+      json.dump(species_tree, outfile, indent=4)
+    print(f"Wrote to {tree_output_path}")
