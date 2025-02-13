@@ -10,8 +10,8 @@ function buildGroup(
   const arr = [];
   // Add fixed entries (an array of objects already defined)
   fixedEntries.forEach((entry) => arr.push(entry));
-  // Add species 3 to a random number between 120 and 200
-  const maxSpecies = Math.floor(Math.random() * (200 - 120 + 1)) + 120;
+  // Add species 3 to a random number between 20 and 100
+  const maxSpecies = Math.floor(Math.random() * (100 - 20 + 1)) + 20;
   for (let i = 3; i <= maxSpecies; i++) {
     arr.push({
       name: groupName + " Species " + i,
