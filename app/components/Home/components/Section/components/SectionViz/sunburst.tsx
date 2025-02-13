@@ -1,9 +1,10 @@
 import * as d3 from "d3";
 import { useRef, useEffect, useState } from "react";
-import { data } from "./data";
+import { getData } from "./data";
 import { NodeDetails } from "./NodeDetails";
 
-const DEPTH = 2;
+const DEPTH = 4;
+const data = getData();
 
 export const SectionViz = (): JSX.Element => {
   const [selectedNode, setSelectedNode] = useState<any>(null);
@@ -48,7 +49,7 @@ export const SectionViz = (): JSX.Element => {
     const hierarchy = d3
       .hierarchy(data)
       .sum((d) => d.size || 1)
-      .sort((a: any, b: any) => (b.value || 0) - (a.value || 0));
+      .sort((a: any, b: any) => (b.data.name < b.data.name ? -1 : 1));
 
     const root = d3.partition().size([2 * Math.PI, hierarchy.height + 1])(
       hierarchy
@@ -71,7 +72,7 @@ export const SectionViz = (): JSX.Element => {
       .arc()
       .startAngle((d) => d.x0)
       .endAngle((d) => d.x1)
-      .padAngle((d) => Math.min((d.x1 - d.x0) / 2, 0.005))
+      .padAngle((d) => Math.min((d.x1 - d.x0) / 2, 0.02)) 
       .padRadius(radius * 1.5)
       .innerRadius((d) => (Math.min(d.y0, DEPTH) * radius) / DEPTH)
       .outerRadius((d) => (Math.min(d.y1, DEPTH) * radius) / DEPTH - 1);
@@ -95,7 +96,7 @@ export const SectionViz = (): JSX.Element => {
       .on("mouseover", function (event, d) {
         tooltip.transition().duration(200).style("opacity", 0.9);
         tooltip
-          .html(`<strong>${d.data.name}</strong><br/>Value: ${d.value}`)
+          .html(`<strong>${d.data.name}</strong><br/>Count: ${d.value}`)
           .style("left", event.pageX + 10 + "px")
           .style("top", event.pageY - 28 + "px");
       })
