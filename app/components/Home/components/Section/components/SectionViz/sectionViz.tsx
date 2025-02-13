@@ -17,15 +17,13 @@ export const SectionViz = (): JSX.Element => {
     // Set up dimensions and radius for the sunburst chart
     const width = 600;
     const height = 600;
-    const radius = Math.min(width, height) / 2;
+    const radius = (width - 10) / 2;
 
     // Create the main SVG container and center the group
     const svg = d3
       .select(svgRef.current)
-      .attr("width", width)
-      .attr("height", height)
-      .append("g")
-      .attr("transform", `translate(${width / 2}, ${height / 2})`);
+      .attr("viewBox", [-width / 2, -height / 2, width, width])
+      .style("font", "10px sans-serif");
 
     // Define a color scale
     const color = d3.scaleOrdinal(d3.schemeTableau10);
