@@ -1,7 +1,9 @@
 import * as d3 from "d3";
 import { useRef, useEffect, useState } from "react";
-import { data } from "./data";
+import { getData } from "./data";
 import { NodeDetails } from "./NodeDetails";
+
+const data = getData();
 
 export const SectionViz = (): JSX.Element => {
   const [selectedNode, setSelectedNode] = useState<any>(null);
@@ -10,38 +12,35 @@ export const SectionViz = (): JSX.Element => {
   useEffect(() => {
     if (!svgRef.current) return;
 
-    // Clear any existing content in case of re-render
     d3.select(svgRef.current).selectAll("*").remove();
 
-    // Set up dimensions for the icicle chart.
-    const width = 800;
-    const height = 1200;
+    // Adjust dimensions to better handle deep hierarchies
+    const width = 1000;
+    const height = 600;
 
-    // Create the color scale.
-    const color = d3.scaleOrdinal(
-      d3.quantize(d3.interpolateRainbow, data.children.length + 1)
-    );
+    // Create a sequential color scale that works well with taxonomy levels
+    const color = d3.scaleSequential([0, 5], d3.interpolateBlues);
 
-    // Compute the hierarchy using the "size" property.
+    // Compute the hierarchy without using size property
     const hierarchyData = d3
       .hierarchy(data)
-      .sum((d: any) => d.size || 0)
-      .sort((a, b) => b.height - a.height || b.value - a.value);
+      .sort((a, b) => (a.data.name < b.data.name ? -1 : 1));
 
-    const root = d3
-      .partition()
-      .size([height, (hierarchyData.height + 1) * (width / 3)])(hierarchyData);
+    // Count number of leaf nodes to determine node sizes
+    hierarchyData.count();
+
+    const root = d3.partition().size([height, width])(hierarchyData);
 
     // Variable to track the current focus.
     let focus = root;
 
-    // Select the SVG container and set attributes.
+    // Select the SVG container and set attributes
     const svg = d3
       .select(svgRef.current)
       .attr("viewBox", [0, 0, width, height] as any)
       .attr("width", width)
       .attr("height", height)
-      .attr("style", "max-width: 100%; height: auto; font: 10px sans-serif;");
+      .attr("style", "max-width: 100%; height: auto; font: 12px sans-serif;");
 
     // Append a group for each node.
     const cell = svg
@@ -50,46 +49,37 @@ export const SectionViz = (): JSX.Element => {
       .join("g")
       .attr("transform", (d) => `translate(${d.y0},${d.x0})`);
 
-    // Append rectangles for each node.
+    // Update the rect attributes
     const rect = cell
       .append("rect")
-      .attr("width", (d) => d.y1 - d.y0 - 1)
-      .attr("height", (d) => rectHeight(d))
-      .attr("fill-opacity", 0.6)
-      .attr("fill", (d) => {
-        if (!d.depth) return "#ccc";
-        let current = d;
-        while (current.depth > 1) current = current.parent;
-        return color(current.data.name);
-      })
+      .attr("width", (d) => d.y1 - d.y0)
+      .attr("height", (d) => d.x1 - d.x0)
+      .attr("fill-opacity", 0.8)
+      .attr("fill", (d) => color(d.depth))
       .style("cursor", "pointer")
       .on("click", clicked);
 
-    // Append text labels.
+    // Update the text positioning and styling
     const text = cell
       .append("text")
       .style("user-select", "none")
       .attr("pointer-events", "none")
       .attr("x", 4)
-      .attr("y", 13)
+      .attr("y", (d) => (d.x1 - d.x0) / 2)
+      .attr("dy", "0.35em")
       .attr("fill-opacity", (d) => +labelVisible(d));
 
     text.append("tspan").text((d) => d.data.name);
 
-    const format = d3.format(",d");
-    const tspan = text
-      .append("tspan")
-      .attr("fill-opacity", (d) => labelVisible(d) * 0.7)
-      .text((d) => ` ${format(d.value)}`);
+    // Remove the format tspan since we don't have size values
 
-    // Add a tooltip with the full name and value.
-    cell.append("title").text(
-      (d) =>
-        `${d
-          .ancestors()
-          .map((d) => d.data.name)
-          .reverse()
-          .join("/")}\n${format(d.value)}`
+    // Update the title text
+    cell.append("title").text((d) =>
+      d
+        .ancestors()
+        .map((d) => d.data.name)
+        .reverse()
+        .join(" > ")
     );
 
     function clicked(event: any, p: any) {
@@ -122,23 +112,16 @@ export const SectionViz = (): JSX.Element => {
 
       rect.transition(t).attr("height", (d) => rectHeight(d.target));
       text.transition(t).attr("fill-opacity", (d) => +labelVisible(d.target));
-      tspan
-        .transition(t)
-        .attr("fill-opacity", (d) => labelVisible(d.target) * 0.7);
     }
 
-    // Helper function to compute rectangle height.
+    // Update the rectHeight function
     function rectHeight(d: any) {
-      return d.x1 - d.x0 - Math.min(1, (d.x1 - d.x0) / 2);
+      return d.x1 - d.x0;
     }
 
-    // Helper function to determine if a label is visible.
+    // Update the labelVisible function
     function labelVisible(d: any) {
-      // Always show labels for nodes whose parent is the current focus.
-      // (These nodes appear in the second column relative to the current view.)
-      if (d.parent === focus) return 1;
-      // Otherwise, apply the default condition.
-      return d.y1 <= width && d.y0 >= 0 && d.x1 - d.x0 > 10 ? 1 : 0;
+      return d.y1 <= width && d.y0 >= 0 && d.x1 - d.x0 > 16;
     }
 
     // Clean up on component unmount.
