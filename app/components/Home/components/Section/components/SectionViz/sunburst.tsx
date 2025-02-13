@@ -87,10 +87,11 @@ export const SectionViz = (): JSX.Element => {
       )
       // Show only nodes with relative depth <= DEPTH.
       .attr("fill-opacity", (d) => (d.current.y0 <= DEPTH - 1 ? 1 : 0))
+      .attr("stroke-opacity", (d) => (d.current.y0 <= DEPTH - 1 ? 1 : 0))
       .attr("d", (d) => arc(d.current))
       .style("cursor", "pointer")
-      // .style("stroke", "#333")
-      // .style("stroke-width", "1px")
+      .style("stroke", "#333")
+      .style("stroke-width", "1px")
       .on("mouseover", function (event, d) {
         tooltip.transition().duration(200).style("opacity", 0.9);
         tooltip
@@ -194,6 +195,13 @@ export const SectionViz = (): JSX.Element => {
         })
         .attrTween("d", (d) => () => arc(d.current))
         .attr("fill-opacity", (d) => {
+          const isVisible =
+            d.ancestors().indexOf(currentRoot) >= 0 &&
+            d.current.y0 <= DEPTH &&
+            d.y1 - p.depth <= DEPTH;
+          return isVisible ? 1 : 0;
+        })
+        .attr("stroke-opacity", (d) => {
           const isVisible =
             d.ancestors().indexOf(currentRoot) >= 0 &&
             d.current.y0 <= DEPTH &&
