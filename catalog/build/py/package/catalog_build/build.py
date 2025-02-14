@@ -236,27 +236,24 @@ def fetch_sra_metadata(srs_ids, batch_size=20):
               title = exp_soup.find("Title").text
               platform = exp_soup.find("Platform").text
               instrument = exp_soup.find("Platform")["instrument_model"]
+              organism_name = exp_soup.find("Organism").get("ScientificName", "")
               total_spots = exp_soup.find("Statistics")["total_spots"]
               total_bases = exp_soup.find("Statistics")["total_bases"]
-              submitter_acc = exp_soup.find("Submitter")["acc"]
 
-              study_acc = exp_soup.find("Study")["acc"]
-              organism_name = exp_soup.find("Organism").get("ScientificName", "")
-              experiment_acc = exp_soup.find("Experiment")["acc"]
+              sra_experiment_acc = exp_soup.find("Experiment")["acc"]
+              sra_sample_acc = exp_soup.find("Sample")["acc"]
+              sra_study_acc = exp_soup.find("Study")["acc"]
+              sra_submitter_acc = exp_soup.find("Submitter")["acc"]
+
               library_name = exp_soup.find("LIBRARY_NAME").text if exp_soup.find("LIBRARY_NAME") else ""
               library_strategy = exp_soup.find("LIBRARY_STRATEGY").text if exp_soup.find("LIBRARY_STRATEGY") else ""
               library_source = exp_soup.find("LIBRARY_SOURCE").text if exp_soup.find("LIBRARY_SOURCE") else ""
               library_selection = exp_soup.find("LIBRARY_SELECTION").text if exp_soup.find("LIBRARY_SELECTION") else ""
               bioproject_elem = exp_soup.find("Bioproject")
               bioproject = bioproject_elem.text if bioproject_elem else ""
-              biosample = exp_soup.find("Biosample").text
-              sample_acc = exp_soup.find("Sample")["acc"]
-              run_acc = run_soup.find("Run")["acc"]
-              run_total_bases = run_soup.find("Run")["total_bases"]
-              run_total_spots = run_soup.find("Run")["total_bases"]
-
+              
               for run in run_soup.find_all("Run"):
-                run_acc = run["acc"]
+                sra_run_acc = run["acc"]
                 run_total_bases = run["total_bases"]
                 run_total_spots = run["total_spots"]
 
@@ -266,30 +263,29 @@ def fetch_sra_metadata(srs_ids, batch_size=20):
                   "instrument": instrument,
                   "total_spots": total_spots,
                   "total_bases": total_bases,
-                  "submitter_acc": submitter_acc,
-                  "study_acc": study_acc,
+                  "bioproject": bioproject,
                   "organism_name": organism_name,
-                  "experiment_acc": experiment_acc,
                   "library_name": library_name,
                   'library_layout': library_layout,
                   "library_strategy": library_strategy,
                   "library_source": library_source,
                   "library_selection": library_selection,
-                  "bioproject": bioproject,
-                  "biosample": biosample,
-                  "run_acc": run_acc,
+                  "sra_experiment_acc": sra_experiment_acc,
+                  "sra_run_acc": sra_run_acc,
+                  'sra_sample_acc': sra_sample_acc,
+                  "sra_study_acc": sra_study_acc,
+                  "sra_submitter_acc": sra_submitter_acc,
                   "run_total_bases": run_total_bases,
                   "run_total_spots": run_total_spots,
-                  'srs_sample_acc': sample_acc
                 }
 
-                if sample_acc in data:
-                    if run_acc in data[sample_acc]:
-                        raise Exception(f"Duplicate biosample run_acc {run_acc} found {sample_acc}")
+                if sra_sample_acc in data:
+                    if sra_run_acc in data[sra_sample_acc]:
+                        raise Exception(f"Duplicate biosample run_acc {sra_run_acc} found {sra_sample_acc}")
                     else:
-                        data[sample_acc][run_acc] = d
+                        data[sra_sample_acc][sra_run_acc] = d
                 else:
-                    data[sample_acc] = {run_acc: d}
+                    data[sra_sample_acc] = {sra_run_acc: d}
   print(f"Processing metadata for samples: {samples_processed} of {len(srs_ids)}", end='\n')
   samples_processed = 0
   for sample_acc in data:
@@ -329,24 +325,22 @@ def fetch_sra_metadata(srs_ids, batch_size=20):
   return data
 
 
-def build_files(assemblies_path, genomes_output_path, primary_output_path, ucsc_assemblies_url, taxonomic_group_sets={}, do_gene_model_urls=True, extract_primary_data=False):
+def build_files(assemblies_path, genomes_output_path, ucsc_assemblies_url, taxonomic_group_sets={}, do_gene_model_urls=True, extract_primary_data=False, primary_output_path=None ):
   print("Building files")
 
   source_list_df = read_assemblies(assemblies_path)
 
   base_genomes_df, primarydata_df = get_genomes_and_primarydata_df(source_list_df["accession"])
 
-  primarydata_df['sra_ids'] = primarydata_df["sample_ids"].str.split(",")
-  primarydata_df = primarydata_df.explode("sra_ids")
-  primarydata_df = primarydata_df[~primarydata_df["sra_ids"].isnull() & primarydata_df["sra_ids"].str.startswith('SRA')]
-  primarydata_df["sra_ids"] = primarydata_df["sra_ids"].str.replace("SRA:", "")
-
+  primarydata_df['sra_sample_acc'] = primarydata_df["sample_ids"].str.split(",")
+  primarydata_df = primarydata_df.explode("sra_sample_acc")
+  primarydata_df = primarydata_df[~primarydata_df["sra_sample_acc"].isnull() & primarydata_df["sra_sample_acc"].str.startswith('SRA')]
+  primarydata_df["sra_sample_acc"] = primarydata_df["sra_sample_acc"].str.replace("SRA:", "")
   if extract_primary_data:
-    sra_ids_list = primarydata_df["sra_ids"].dropna().unique().tolist()
+    sra_ids_list = primarydata_df["sra_sample_acc"].dropna().unique().tolist()
     sra_metadata = fetch_sra_metadata(sra_ids_list)
     sra_metadata_df = pd.DataFrame([sra_metadata[sra][srr] for sra in sra_metadata for srr in sra_metadata[sra]])
-    primarydata_df = primarydata_df.merge(sra_metadata_df, how="left", left_on="sra_ids", right_on="srs_sample_acc")
-
+    primarydata_df = primarydata_df.merge(sra_metadata_df, how="left", left_on="sra_sample_acc", right_on="sra_sample_acc")
   report_missing_values_from("accessions", "found on NCBI", source_list_df["accession"], base_genomes_df["accession"])
 
   species_df = get_species_df(base_genomes_df["taxonomyId"], taxonomic_group_sets)
