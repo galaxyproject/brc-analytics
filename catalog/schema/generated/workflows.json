@@ -4,6 +4,13 @@
             "additionalProperties": false,
             "description": "A workflow.",
             "properties": {
+                "categories": {
+                    "description": "The IDs of the categories the workflow belongs to.",
+                    "items": {
+                        "$ref": "#/$defs/WorkflowCategoryId"
+                    },
+                    "type": "array"
+                },
                 "ploidy": {
                     "$ref": "#/$defs/WorkflowPloidy",
                     "description": "The ploidy supported by the workflow."
@@ -11,10 +18,6 @@
                 "trs_id": {
                     "description": "The workflow's TRS ID.",
                     "type": "string"
-                },
-                "type": {
-                    "$ref": "#/$defs/WorkflowType",
-                    "description": "The ID of the workflow's category."
                 },
                 "workflow_description": {
                     "description": "The description of the workflow.",
@@ -27,7 +30,7 @@
             },
             "required": [
                 "trs_id",
-                "type",
+                "categories",
                 "ploidy",
                 "workflow_name",
                 "workflow_description"
@@ -35,16 +38,7 @@
             "title": "Workflow",
             "type": "object"
         },
-        "WorkflowPloidy": {
-            "description": "Possible ploidies supported by workflows.",
-            "enum": [
-                "ANY",
-                "HAPLOID"
-            ],
-            "title": "WorkflowPloidy",
-            "type": "string"
-        },
-        "WorkflowType": {
+        "WorkflowCategoryId": {
             "description": "Set of IDs of workflow categories.",
             "enum": [
                 "VARIANT_CALLING",
@@ -52,9 +46,21 @@
                 "REGULATION",
                 "ASSEMBLY",
                 "GENOME_COMPARISONS",
-                "PROTEIN_FOLDING"
+                "PROTEIN_FOLDING",
+                "OTHER"
             ],
-            "title": "WorkflowType",
+            "title": "WorkflowCategoryId",
+            "type": "string"
+        },
+        "WorkflowPloidy": {
+            "description": "Possible ploidies supported by workflows.",
+            "enum": [
+                "ANY",
+                "DIPLOID",
+                "HAPLOID",
+                "POLYPLOID"
+            ],
+            "title": "WorkflowPloidy",
             "type": "string"
         },
         "Workflows": {

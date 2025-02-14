@@ -7,11 +7,11 @@ import {
   WorkflowCategory,
 } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import {
-  SourceGenome,
-  SourceWorkflow,
-  SourceWorkflowCategories,
-  SourceWorkflows,
-} from "./entities";
+  Workflow as SourceWorkflow,
+  WorkflowCategories as SourceWorkflowCategories,
+  Workflows as SourceWorkflows,
+} from "../../schema/generated/schema";
+import { SourceGenome } from "./entities";
 
 const SOURCE_PATH_GENOMES = "catalog/build/intermediate/genomes-from-ncbi.tsv";
 const SOURCE_PATH_WORKFLOW_CATEGORIES =

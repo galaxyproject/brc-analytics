@@ -1,5 +1,3 @@
-import { WORKFLOW_PLOIDY } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
-
 export interface SourceGenome {
   accession: string;
   annotationStatus: string;
@@ -19,24 +17,4 @@ export interface SourceGenome {
   taxonomicGroup: string;
   taxonomyId: string;
   ucscBrowser: string;
-}
-
-export interface SourceWorkflowCategories {
-  workflow_categories: {
-    category: string;
-    description: string;
-    name: string;
-  }[];
-}
-
-export interface SourceWorkflows {
-  workflows: SourceWorkflow[];
-}
-
-export interface SourceWorkflow {
-  categories: string[];
-  ploidy: WORKFLOW_PLOIDY;
-  trs_id: string;
-  workflow_description: string;
-  workflow_name: string;
 }

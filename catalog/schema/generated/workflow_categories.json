@@ -22,6 +22,10 @@
             "additionalProperties": false,
             "description": "Workflow category.",
             "properties": {
+                "category": {
+                    "$ref": "#/$defs/WorkflowCategoryId",
+                    "description": "The ID of the workflow category."
+                },
                 "description": {
                     "description": "The description of the workflow category.",
                     "type": "string"
@@ -29,21 +33,17 @@
                 "name": {
                     "description": "The display name of the workflow category.",
                     "type": "string"
-                },
-                "type": {
-                    "$ref": "#/$defs/WorkflowType",
-                    "description": "The ID of the workflow category."
                 }
             },
             "required": [
-                "type",
+                "category",
                 "name",
                 "description"
             ],
             "title": "WorkflowCategory",
             "type": "object"
         },
-        "WorkflowType": {
+        "WorkflowCategoryId": {
             "description": "Set of IDs of workflow categories.",
             "enum": [
                 "VARIANT_CALLING",
@@ -51,9 +51,10 @@
                 "REGULATION",
                 "ASSEMBLY",
                 "GENOME_COMPARISONS",
-                "PROTEIN_FOLDING"
+                "PROTEIN_FOLDING",
+                "OTHER"
             ],
-            "title": "WorkflowType",
+            "title": "WorkflowCategoryId",
             "type": "string"
         }
     },

@@ -1,3 +1,7 @@
+import { WorkflowPloidy as WORKFLOW_PLOIDY } from "../../../../../catalog/schema/generated/schema";
+
+export { WorkflowPloidy as WORKFLOW_PLOIDY } from "../../../../../catalog/schema/generated/schema";
+
 export type BRCCatalog = BRCDataCatalogGenome;
 
 export interface BRCDataCatalogGenome {
@@ -55,11 +59,4 @@ export interface Workflow {
   trsId: string;
   workflowDescription: string;
   workflowName: string;
-}
-
-export enum WORKFLOW_PLOIDY {
-  ANY = "ANY",
-  DIPLOID = "DIPLOID",
-  HAPLOID = "HAPLOID",
-  POLYPLOID = "POLYPLOID",
 }

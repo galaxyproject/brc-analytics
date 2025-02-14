@@ -6,3 +6,6 @@ coverage/*
 
 venv
 coverage
+
+# generated
+/catalog/schema/generated
