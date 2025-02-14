@@ -2,16 +2,20 @@ import {
   FluidPaper,
   GridPaper,
 } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
-import { GridPaperSection } from "@databiosphere/findable-ui/lib/components/common/Section/section.styles";
 import { Props } from "./types";
+import { Fragment } from "react";
+import { StyledTypography } from "./analysisMethods.styles";
+import { TYPOGRAPHY_PROPS } from "./constants";
 
 export const AnalysisMethods = ({ children }: Props): JSX.Element => {
   return (
-    <FluidPaper>
-      <GridPaper>
-        <GridPaperSection>Analyze in Galaxy</GridPaperSection>
-        {children}
-      </GridPaper>
-    </FluidPaper>
+    <Fragment>
+      <StyledTypography {...TYPOGRAPHY_PROPS}>
+        Select a Workflow
+      </StyledTypography>
+      <FluidPaper>
+        <GridPaper>{children}</GridPaper>
+      </FluidPaper>
+    </Fragment>
   );
 };
