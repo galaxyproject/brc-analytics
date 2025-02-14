@@ -1,6 +1,8 @@
 #!/bin/bash
 
-for name in assemblies workflow_categories workflows
+source ./catalog/schema/scripts/source-file-schema-names.sh
+
+for name in ${SOURCE_FILE_SCHEMA_NAMES[@]}
 do
   echo "$name:"
   linkml-validate -s "./catalog/schema/$name.yaml" "./catalog/source/$name.yml"
