@@ -1,0 +1,72 @@
+{
+    "$defs": {
+        "Organism": {
+            "additionalProperties": false,
+            "description": "Info for an organism.",
+            "properties": {
+                "ploidy": {
+                    "$ref": "#/$defs/OrganismPloidy",
+                    "description": "The organism's ploidy."
+                },
+                "taxonomy_id": {
+                    "description": "The organism's NCBI taxonomy ID.",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "taxonomy_id",
+                "ploidy"
+            ],
+            "title": "Organism",
+            "type": "object"
+        },
+        "OrganismPloidy": {
+            "description": "Possible ploidies of an organism.",
+            "enum": [
+                "DIPLOID",
+                "HAPLOID",
+                "POLYPLOID"
+            ],
+            "title": "OrganismPloidy",
+            "type": "string"
+        },
+        "Organisms": {
+            "additionalProperties": false,
+            "description": "Object containing list of organisms.",
+            "properties": {
+                "organisms": {
+                    "description": "List of organisms.",
+                    "items": {
+                        "$ref": "#/$defs/Organism"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "organisms"
+            ],
+            "title": "Organisms",
+            "type": "object"
+        }
+    },
+    "$id": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/organisms.yaml#",
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "additionalProperties": true,
+    "description": "Object containing list of organisms.",
+    "metamodel_version": "1.7.0",
+    "properties": {
+        "organisms": {
+            "description": "List of organisms.",
+            "items": {
+                "$ref": "#/$defs/Organism"
+            },
+            "type": "array"
+        }
+    },
+    "required": [
+        "organisms"
+    ],
+    "title": "organisms",
+    "type": "object",
+    "version": null
+}

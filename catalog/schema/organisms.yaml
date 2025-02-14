@@ -1,0 +1,33 @@
+id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/organisms.yaml#
+name: organisms
+description: Schema for source organism info.
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+
+imports:
+  - linkml:types
+  - ./enums/organism_ploidy
+
+classes:
+  Organisms:
+    description: Object containing list of organisms.
+    tree_root: true
+    attributes:
+      organisms:
+        description: List of organisms.
+        required: true
+        multivalued: true
+        range: Organism
+
+  Organism:
+    description: Info for an organism.
+    attributes:
+      taxonomy_id:
+        description: The organism's NCBI taxonomy ID.
+        required: true
+        range: string
+      ploidy:
+        description: The organism's ploidy.
+        required: true
+        range: OrganismPloidy

@@ -1,4 +1,13 @@
 /**
+* Possible ploidies of an organism.
+*/
+export enum OrganismPloidy {
+    
+    DIPLOID = "DIPLOID",
+    HAPLOID = "HAPLOID",
+    POLYPLOID = "POLYPLOID",
+};
+/**
 * Set of IDs of workflow categories.
 */
 export enum WorkflowCategoryId {
@@ -38,6 +47,26 @@ export interface Assemblies {
 export interface Assembly {
     /** The assembly's accession. */
     accession: string,
+}
+
+
+/**
+ * Object containing list of organisms.
+ */
+export interface Organisms {
+    /** List of organisms. */
+    organisms: Organism[],
+}
+
+
+/**
+ * Info for an organism.
+ */
+export interface Organism {
+    /** The organism's NCBI taxonomy ID. */
+    taxonomy_id: string,
+    /** The organism's ploidy. */
+    ploidy: OrganismPloidy,
 }
 
 
