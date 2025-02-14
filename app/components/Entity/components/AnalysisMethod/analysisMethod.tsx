@@ -8,7 +8,7 @@ import {
 import { StyledAccordion } from "./analysisMethod.styles";
 import { CHIP_PROPS, ICON_PROPS, TYPOGRAPHY_PROPS } from "./constants";
 import { Props } from "./types";
-import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
+import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import { TEXT_HEADING_SMALL } from "@databiosphere/findable-ui/lib/theme/common/typography";
 import { Fragment } from "react";
 import { Workflow } from "./components/Workflow/workflow";
@@ -22,7 +22,7 @@ export const AnalysisMethod = ({
 }: Props): JSX.Element => {
   const isDisabled = workflows.length === 0;
   return (
-    <StyledAccordion component={RoundedPaper} disabled={isDisabled}>
+    <StyledAccordion component={FluidPaper} disabled={isDisabled}>
       <AccordionSummary
         expandIcon={
           isDisabled ? (
