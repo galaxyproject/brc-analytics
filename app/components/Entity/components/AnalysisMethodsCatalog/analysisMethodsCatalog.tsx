@@ -24,15 +24,8 @@ export const AnalysisMethodsCatalog = ({
             key={workflowCategory.category}
             geneModelUrl={geneModelUrl}
             genomeVersionAssemblyId={genomeVersionAssemblyId}
-            content={
-              <>
-                <h3>{workflowCategory.name}</h3>
-                <p>{workflowCategory.description}</p>
-              </>
-            }
-            workflowId={
-              availableWorkflows.length === 0 ? "" : availableWorkflows[0].trsId
-            }
+            workflows={availableWorkflows}
+            workflowCategory={workflowCategory}
           />
         );
       })}

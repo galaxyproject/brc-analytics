@@ -1,77 +1,65 @@
-import { GridPaperSection } from "@databiosphere/findable-ui/lib/components/common/Section/section.styles";
 import {
   inkLight,
-  smokeDark,
-  smokeLightest,
+  white,
 } from "@databiosphere/findable-ui/lib/styles/common/mixins/colors";
-import {
-  textBody4002Lines,
-  textBody500,
-} from "@databiosphere/findable-ui/lib/styles/common/mixins/fonts";
-import { css } from "@emotion/react";
 import styled from "@emotion/styled";
+import { Accordion } from "@mui/material";
+import { smokeLightest } from "@databiosphere/findable-ui/lib/theme/common/palette";
+import { elevation01 } from "@databiosphere/findable-ui/lib/theme/common/shadows";
 
-interface Props {
-  isAvailable: boolean;
-}
+export const StyledAccordion = styled(Accordion)`
+  &.MuiAccordion-root {
+    background-color: ${white};
+    box-shadow: ${elevation01};
 
-export const StyledSection = styled(GridPaperSection, {
-  shouldForwardProp: (props) => props !== "isAvailable",
-})<Props>`
-  flex-direction: row;
-  gap: 16px;
+    .MuiAccordion-heading {
+      display: block;
+      padding: 20px;
 
-  .MuiChip-root,
-  .MuiSvgIcon-root {
-    align-self: center;
-  }
+      .MuiAccordionSummary-root {
+        flex-direction: row;
+        gap: 16px;
 
-  .MuiSvgIcon-root {
-    transform: rotate(180deg);
-    transition: transform 300ms;
-  }
+        .MuiAccordionSummary-content {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          margin: 0;
 
-  &:hover {
-    .MuiSvgIcon-root {
-      transform: rotate(180deg) translateX(-2px);
-    }
-  }
+          .MuiTypography-root {
+            margin: 0;
 
-  ${(props) =>
-    props.isAvailable &&
-    css`
-      cursor: pointer;
-    `}
+            &.MuiTypography-text-heading-small {
+              font-size: 16px;
+              letter-spacing: normal;
+              line-height: 24px;
+            }
+          }
+        }
 
-  ${(props) =>
-    !props.isAvailable &&
-    css`
-      background-color: ${smokeLightest(props)};
-      pointer-events: none;
+        .MuiAccordionSummary-expandIconWrapper {
+          .MuiSvgIcon-root {
+            transform: rotate(90deg);
+          }
 
-      .MuiChip-root {
-        .MuiChip-label {
-          color: ${inkLight(props)};
+          .MuiChip-root {
+            color: ${inkLight};
+          }
+        }
+
+        &.Mui-disabled {
+          opacity: 1;
         }
       }
+    }
 
-      .MuiSvgIcon-root {
-        color: ${smokeDark(props)};
-      }
-    `}
-`;
+    .MuiAccordionDetails-root {
+      margin: 0;
+      padding: 0;
+    }
 
-export const SectionContent = styled.div`
-  flex: 1;
-
-  h3 {
-    ${textBody500};
-    margin: 0 0 4px;
+    &.Mui-disabled {
+      background-color: ${smokeLightest};
+    }
   }
-
-  p {
-    ${textBody4002Lines};
-    color: ${inkLight};
-    margin: 0;
-  }
-`;
+` as typeof Accordion;
