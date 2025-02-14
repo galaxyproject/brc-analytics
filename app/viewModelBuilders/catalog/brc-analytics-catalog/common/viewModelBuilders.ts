@@ -28,6 +28,7 @@ import {
 } from "../../../../apis/catalog/brc-analytics-catalog/common/utils";
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
 import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
+import { TEXT_BODY_SMALL_400 } from "@databiosphere/findable-ui/lib/theme/common/typography";
 
 /**
  * Build props for the accession cell.
@@ -371,10 +372,12 @@ export const buildGenomeChooseAnalysisMethodDetailViewHero = (
   return {
     breadcrumbs: getGenomeEntityChooseAnalysisMethodBreadcrumbs(genome),
     subTitle: C.Link({
-      label: C.SubTitle({ subTitle: genome.species }),
+      TypographyProps: { color: "ink.light", variant: TEXT_BODY_SMALL_400 },
+      label: `Species: ${genome.species}`,
+      underline: "hover",
       url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(genome))}`,
     }),
-    title: genome.accession,
+    title: `Analyze in Galaxy - ${genome.accession}`,
   };
 };
 
@@ -575,6 +578,7 @@ function getGenomeEntityChooseAnalysisMethodBreadcrumbs(
   return [
     { path: ROUTES.GENOMES, text: "Assemblies" },
     { path: "", text: genome.accession },
+    { path: "", text: "Analyze" },
   ];
 }
 
