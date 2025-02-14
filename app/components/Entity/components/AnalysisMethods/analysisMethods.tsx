@@ -1,7 +1,3 @@
-import {
-  FluidPaper,
-  GridPaper,
-} from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import { Props } from "./types";
 import { Fragment } from "react";
 import { StyledTypography } from "./analysisMethods.styles";
@@ -13,9 +9,7 @@ export const AnalysisMethods = ({ children }: Props): JSX.Element => {
       <StyledTypography {...TYPOGRAPHY_PROPS}>
         Select a Workflow
       </StyledTypography>
-      <FluidPaper>
-        <GridPaper>{children}</GridPaper>
-      </FluidPaper>
+      {children}
     </Fragment>
   );
 };
