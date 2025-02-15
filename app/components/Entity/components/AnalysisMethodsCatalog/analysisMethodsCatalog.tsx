@@ -15,7 +15,7 @@ export const AnalysisMethodsCatalog = ({
   return (
     <AnalysisMethods>
       {compatibleWorkflows.length === 0
-        ? "Not available"
+        ? "None available"
         : compatibleWorkflows.map((workflowCategory) => {
             return (
               <AnalysisMethod
