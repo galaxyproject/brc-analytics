@@ -1,6 +1,4 @@
-import { WorkflowPloidy as WORKFLOW_PLOIDY } from "../../../../../catalog/schema/generated/schema";
-
-export { WorkflowPloidy as WORKFLOW_PLOIDY } from "../../../../../catalog/schema/generated/schema";
+import { WORKFLOW_PLOIDY } from "./schema-entities";
 
 export type BRCCatalog = BRCDataCatalogGenome;
 
