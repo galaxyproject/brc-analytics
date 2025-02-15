@@ -26,7 +26,7 @@ classes:
       taxonomy_id:
         description: The organism's NCBI taxonomy ID.
         required: true
-        range: string
+        range: integer
       ploidy:
         description: The organism's ploidy.
         required: true

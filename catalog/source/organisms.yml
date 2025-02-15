@@ -1,0 +1,64 @@
+organisms:
+  # Anopheles gambiae
+  - taxonomy_id: 7165
+    ploidy: DIPLOID
+  # Aspergillus fumigatus
+  - taxonomy_id: 746128
+    ploidy: HAPLOID
+  # Candida albicans
+  - taxonomy_id: 5476
+    ploidy: DIPLOID
+  # Coccidioides immitis
+  - taxonomy_id: 5501
+    ploidy: HAPLOID
+  # Coccidioides posadasii
+  - taxonomy_id: 199306
+    ploidy: HAPLOID
+  # Cryptococcus neoformans
+  - taxonomy_id: 5207
+    ploidy: HAPLOID
+  # Culex pipiens
+  - taxonomy_id: 7175
+    ploidy: DIPLOID
+  # Culex quinquefasciatus
+  - taxonomy_id: 7176
+    ploidy: DIPLOID
+  # Leishmania braziliensis
+  - taxonomy_id: 5660
+    ploidy: DIPLOID
+  # Leishmania donovani
+  - taxonomy_id: 5661
+    ploidy: DIPLOID
+  # Leishmania major
+  - taxonomy_id: 5664
+    ploidy: DIPLOID
+  # Monkeypox virus
+  - taxonomy_id: 10244
+    ploidy: HAPLOID
+  # Mycobacterium tuberculosis
+  - taxonomy_id: 1773
+    ploidy: HAPLOID
+  # Plasmodium falciparum
+  - taxonomy_id: 5833
+    ploidy: HAPLOID
+  # Plasmodium vinckei
+  - taxonomy_id: 5860
+    ploidy: HAPLOID
+  # Plasmodium vivax
+  - taxonomy_id: 5855
+    ploidy: HAPLOID
+  # Plasmodium yoelii
+  - taxonomy_id: 5861
+    ploidy: HAPLOID
+  # Severe acute respiratory syndrome-related coronavirus
+  - taxonomy_id: 694009
+    ploidy: HAPLOID
+  # Toxoplasma gondii
+  - taxonomy_id: 5811
+    ploidy: HAPLOID
+  # Trypanosoma brucei
+  - taxonomy_id: 5691
+    ploidy: DIPLOID
+  # Trypanosoma cruzi
+  - taxonomy_id: 5693
+    ploidy: DIPLOID

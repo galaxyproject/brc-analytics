@@ -10,7 +10,7 @@
                 },
                 "taxonomy_id": {
                     "description": "The organism's NCBI taxonomy ID.",
-                    "type": "string"
+                    "type": "integer"
                 }
             },
             "required": [
