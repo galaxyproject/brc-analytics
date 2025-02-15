@@ -2,33 +2,53 @@ import { AnalysisMethods } from "../AnalysisMethods/analysisMethods";
 import workflows from "../../../../../catalog/output/workflows.json";
 import { AnalysisMethod } from "../AnalysisMethod/analysisMethod";
 import { Props } from "./types";
-
-const AVAILABLE_TRS_IDS = [
-  "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.12",
-  "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v0.9",
-  "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/haploid-variant-calling-wgs-pe/main/versions/v0.1",
-];
+import { workflowPloidyMatchesOrganismPloidy } from "../../../../apis/catalog/brc-analytics-catalog/common/utils";
+import { ORGANISM_PLOIDY } from "../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { WorkflowCategory } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
 
 export const AnalysisMethodsCatalog = ({
+  assemblyPloidy,
   geneModelUrl,
   genomeVersionAssemblyId,
 }: Props): JSX.Element => {
+  const compatibleWorkflows = getCompatibleWorkflows(assemblyPloidy);
   return (
     <AnalysisMethods>
-      {workflows.map((workflowCategory) => {
-        const availableWorkflows = workflowCategory.workflows.filter(
-          ({ trsId }) => AVAILABLE_TRS_IDS.includes(trsId)
-        );
-        return (
-          <AnalysisMethod
-            key={workflowCategory.category}
-            geneModelUrl={geneModelUrl}
-            genomeVersionAssemblyId={genomeVersionAssemblyId}
-            workflows={availableWorkflows}
-            workflowCategory={workflowCategory}
-          />
-        );
-      })}
+      {compatibleWorkflows.length === 0
+        ? "Not available"
+        : compatibleWorkflows.map((workflowCategory) => {
+            return (
+              <AnalysisMethod
+                key={workflowCategory.category}
+                geneModelUrl={geneModelUrl}
+                genomeVersionAssemblyId={genomeVersionAssemblyId}
+                workflows={workflowCategory.workflows}
+                workflowCategory={workflowCategory}
+              />
+            );
+          })}
     </AnalysisMethods>
   );
 };
+
+function getCompatibleWorkflows(
+  assemblyPloidy: ORGANISM_PLOIDY | null
+): WorkflowCategory[] {
+  if (assemblyPloidy === null) return [];
+
+  const result: WorkflowCategory[] = [];
+
+  for (const workflowCategory of workflows) {
+    const categoryCompatibleWorkflows = workflowCategory.workflows.filter(
+      ({ ploidy }) =>
+        workflowPloidyMatchesOrganismPloidy(ploidy, assemblyPloidy)
+    );
+    if (categoryCompatibleWorkflows.length > 0)
+      result.push({
+        ...workflowCategory,
+        workflows: categoryCompatibleWorkflows,
+      });
+  }
+
+  return result;
+}
