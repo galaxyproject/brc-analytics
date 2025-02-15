@@ -58,6 +58,14 @@ the `# Anopheles gambiae` comment:
 - accession: XXX_000000000.0
 ```
 
+## Editing the LinkML schemas
+
+If the LinkML schemas in `catalog/schema` are edited, the derived JSON schemas and TypeScript definitions should be updated
+as follows:
+
+1. Ensure that the Python virtual environment is activated, as described above.
+1. Run `npm run gen-schema`.
+
 ## Overview of automated checks on catalog content
 
 The `run-checks` GitHub workflow performs checks to ensure that the catalog data and schemas are well-formed; this is done by:
