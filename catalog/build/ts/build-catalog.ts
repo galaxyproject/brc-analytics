@@ -7,6 +7,7 @@ import {
   WorkflowCategory,
 } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import {
+  Organisms as SourceOrganisms,
   Workflow as SourceWorkflow,
   WorkflowCategories as SourceWorkflowCategories,
   Workflows as SourceWorkflows,
@@ -14,6 +15,7 @@ import {
 import { SourceGenome } from "./entities";
 
 const SOURCE_PATH_GENOMES = "catalog/build/intermediate/genomes-from-ncbi.tsv";
+const SOURCE_PATH_ORGANISMS = "catalog/source/organisms.yml";
 const SOURCE_PATH_WORKFLOW_CATEGORIES =
   "catalog/source/workflow_categories.yml";
 const SOURCE_PATH_WORKFLOWS = "catalog/source/workflows.yml";
@@ -39,6 +41,8 @@ async function buildCatalog(): Promise<void> {
 
 async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
   const sourceRows = await readValuesFile<SourceGenome>(SOURCE_PATH_GENOMES);
+  const sourceOrganisms = await readYamlFile<SourceOrganisms>(SOURCE_PATH_ORGANISMS);
+  const sourceOrganismsByTaxonomyId = new Map(sourceOrganisms.organisms.map((sourceOrganism) => [String(sourceOrganism.taxonomy_id), sourceOrganism]));
   const mappedRows = sourceRows.map((row): BRCDataCatalogGenome => {
     return {
       accession: row.accession,
@@ -51,6 +55,7 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
       length: parseNumber(row.length),
       level: row.level,
       ncbiTaxonomyId: row.taxonomyId,
+      ploidy: sourceOrganismsByTaxonomyId.get(row.speciesTaxonomyId)?.ploidy ?? null,
       scaffoldCount: parseNumberOrNull(row.scaffoldCount),
       scaffoldL50: parseNumberOrNull(row.scaffoldL50),
       scaffoldN50: parseNumberOrNull(row.scaffoldN50),
