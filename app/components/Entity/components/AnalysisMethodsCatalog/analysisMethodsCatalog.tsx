@@ -32,10 +32,8 @@ export const AnalysisMethodsCatalog = ({
 };
 
 function getCompatibleWorkflows(
-  assemblyPloidy: ORGANISM_PLOIDY | null
+  assemblyPloidy: ORGANISM_PLOIDY
 ): WorkflowCategory[] {
-  if (assemblyPloidy === null) return [];
-
   const result: WorkflowCategory[] = [];
 
   for (const workflowCategory of workflows) {

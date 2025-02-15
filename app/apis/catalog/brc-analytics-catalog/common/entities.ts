@@ -13,7 +13,7 @@ export interface BRCDataCatalogGenome {
   length: number;
   level: string;
   ncbiTaxonomyId: string;
-  ploidy: ORGANISM_PLOIDY | null;
+  ploidy: ORGANISM_PLOIDY;
   scaffoldCount: number | null;
   scaffoldL50: number | null;
   scaffoldN50: number | null;

@@ -43,8 +43,14 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
   const sourceRows = await readValuesFile<SourceGenome>(SOURCE_PATH_GENOMES);
   const sourceOrganisms = await readYamlFile<SourceOrganisms>(SOURCE_PATH_ORGANISMS);
   const sourceOrganismsByTaxonomyId = new Map(sourceOrganisms.organisms.map((sourceOrganism) => [String(sourceOrganism.taxonomy_id), sourceOrganism]));
-  const mappedRows = sourceRows.map((row): BRCDataCatalogGenome => {
-    return {
+  const mappedRows: BRCDataCatalogGenome[] = [];
+  for (const row of sourceRows) {
+    const ploidy =  sourceOrganismsByTaxonomyId.get(row.speciesTaxonomyId)?.ploidy;
+    if (ploidy === undefined) {
+      console.log(`Skipping assembly ${row.accession} - ploidy not found`);
+      continue;
+    }
+    mappedRows.push({
       accession: row.accession,
       annotationStatus: parseStringOrNull(row.annotationStatus),
       chromosomes: parseNumberOrNull(row.chromosomeCount),
@@ -55,7 +61,7 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
       length: parseNumber(row.length),
       level: row.level,
       ncbiTaxonomyId: row.taxonomyId,
-      ploidy: sourceOrganismsByTaxonomyId.get(row.speciesTaxonomyId)?.ploidy ?? null,
+      ploidy,
       scaffoldCount: parseNumberOrNull(row.scaffoldCount),
       scaffoldL50: parseNumberOrNull(row.scaffoldL50),
       scaffoldN50: parseNumberOrNull(row.scaffoldN50),
@@ -64,8 +70,8 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
       strain: parseStringOrNull(row.strain),
       taxonomicGroup: row.taxonomicGroup ? row.taxonomicGroup.split(",") : [],
       ucscBrowserUrl: parseStringOrNull(row.ucscBrowser),
-    };
-  });
+    });
+  }
   return mappedRows.sort((a, b) => a.accession.localeCompare(b.accession));
 }
 
