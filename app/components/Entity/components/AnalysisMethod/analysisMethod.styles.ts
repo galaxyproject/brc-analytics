@@ -6,6 +6,7 @@ import styled from "@emotion/styled";
 import { Accordion } from "@mui/material";
 import { smokeLightest } from "@databiosphere/findable-ui/lib/theme/common/palette";
 import { elevation01 } from "@databiosphere/findable-ui/lib/theme/common/shadows";
+import { mediaTabletDown } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 
 export const StyledAccordion = styled(Accordion)`
   &.MuiAccordion-root {
@@ -54,8 +55,14 @@ export const StyledAccordion = styled(Accordion)`
     }
 
     .MuiAccordionDetails-root {
+      border-radius: 0 0 8px 8px; // bottom corners only
       margin: 0;
+      overflow: hidden; // simple way to manage workflow loading panel bleed
       padding: 0;
+
+      ${mediaTabletDown} {
+        border-radius: 0;
+      }
     }
 
     &.Mui-disabled {

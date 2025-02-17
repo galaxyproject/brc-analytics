@@ -1,13 +1,17 @@
-import { Grid2Props, SvgIconProps } from "@mui/material";
+import { ButtonProps, Grid2Props } from "@mui/material";
+import {
+  COLOR,
+  VARIANT,
+} from "@databiosphere/findable-ui/lib/styles/common/mui/button";
 
 export const GRID2_PROPS: Grid2Props = {
   container: true,
-  role: "button",
+  direction: "column",
   spacing: 4,
   wrap: "nowrap",
 };
 
-export const ICON_PROPS: Partial<SvgIconProps> = {
-  color: "inkLight",
-  fontSize: "small",
+export const BUTTON_PROPS: Partial<ButtonProps> = {
+  color: COLOR.PRIMARY,
+  variant: VARIANT.CONTAINED,
 };
