@@ -208,6 +208,34 @@ export const buildOrganismAssemblyTaxonomyIds = (
 };
 
 /**
+ * Build props for the other taxa cell.
+ * @param organism - Organism entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildOrganismTaxonomicLevelOther = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.NTagCell> => {
+  return {
+    label: "taxa",
+    values: organism.taxonomicLevelOther,
+  };
+};
+
+/**
+ * Build props for the strain cell.
+ * @param organism - Organism entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildOrganismTaxonomicLevelStrain = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.NTagCell> => {
+  return {
+    label: "strains",
+    values: organism.taxonomicLevelStrain,
+  };
+};
+
+/**
  * Build props for the taxonomic group cell.
  * @param entity - Organism or genome entity.
  * @returns Props to be used for the cell.
@@ -222,6 +250,84 @@ export const buildTaxonomicGroup = (
 };
 
 /**
+ * Build props for the class cell.
+ * @param organism - Organism entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildTaxonomicLevelClass = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: organism.taxonomicLevelClass,
+  };
+};
+
+/**
+ * Build props for the family cell.
+ * @param organism - Organism entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildTaxonomicLevelFamily = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: organism.taxonomicLevelFamily,
+  };
+};
+
+/**
+ * Build props for the genus cell.
+ * @param organism - Organism entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildTaxonomicLevelGenus = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: organism.taxonomicLevelGenus,
+  };
+};
+
+/**
+ * Build props for the kingdom cell.
+ * @param organism - Organism entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildTaxonomicLevelKingdom = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: organism.taxonomicLevelKingdom,
+  };
+};
+
+/**
+ * Build props for the order cell.
+ * @param organism - Organism entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildTaxonomicLevelOrder = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: organism.taxonomicLevelOrder,
+  };
+};
+
+/**
+ * Build props for the phylum cell.
+ * @param organism - Organism entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildTaxonomicLevelPhylum = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: organism.taxonomicLevelPhylum,
+  };
+};
+
+/**
  * Build props for the species cell.
  * @param organism - Organism entity.
  * @returns Props to be used for the cell.
@@ -232,6 +338,19 @@ export const buildTaxonomicLevelSpecies = (
   return {
     label: organism.taxonomicLevelSpecies,
     url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getOrganismId(organism))}`,
+  };
+};
+
+/**
+ * Build props for the superkingdom cell.
+ * @param organism - Organism entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildTaxonomicLevelSuperkingdom = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: organism.taxonomicLevelSuperkingdom,
   };
 };
 
