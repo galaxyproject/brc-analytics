@@ -34,7 +34,6 @@ if __name__ == "__main__":
     ASSEMBLIES_PATH,
     GENOMES_OUTPUT_PATH,
     UCSC_ASSEMBLIES_URL,
-    TREE_OUTPUT_PATH,
     TAXANOMIC_LEVELS_FOR_TREE,
     {"taxonomicGroup": TAXONOMIC_GROUPS_BY_TAXONOMY_ID}
   )

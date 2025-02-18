@@ -54,83 +54,31 @@ def get_taxonomic_group_sets(lineage, taxonomic_group_sets):
   return {field: ",".join(get_taxonomic_groups(lineage, taxonomic_groups)) for field, taxonomic_groups in taxonomic_group_sets.items()}
 
 
-def get_species_row(taxon_info, taxonomic_group_sets):
-  species_info = taxon_info["taxonomy"]["classification"]["species"]
+def get_taxonomic_level_key(level):
+  return f"taxonomicLevel{level[0].upper()}{level[1:]}"
+
+
+def get_species_row(taxon_info, taxonomic_group_sets, taxonomic_levels):
+  classification = taxon_info["taxonomy"]["classification"]
+  species_info = classification["species"]
+  taxonomic_level_fields = {get_taxonomic_level_key(level): classification.get(level, {}).get("name") for level in taxonomic_levels}
+  own_level = taxon_info["taxonomy"]["rank"].lower() if "rank" in taxon_info["taxonomy"] else None
+  if own_level not in classification:
+    if own_level is None or own_level not in taxonomic_levels:
+      own_level = "other"
+    taxonomic_level_fields[get_taxonomic_level_key(own_level)] = taxon_info["taxonomy"]["current_scientific_name"]["name"]
   return {
     "taxonomyId": taxon_info["taxonomy"]["tax_id"],
     "species": species_info["name"],
     "speciesTaxonomyId": species_info["id"],
-    **get_taxonomic_group_sets(taxon_info["taxonomy"]["parents"], taxonomic_group_sets)
+    **get_taxonomic_group_sets(taxon_info["taxonomy"]["parents"], taxonomic_group_sets),
+    **taxonomic_level_fields
   }
 
 
-def get_species_df(taxonomy_ids, taxonomic_group_sets):
+def get_species_df(taxonomy_ids, taxonomic_group_sets, taxonomic_levels):
   species_info = get_paginated_ncbi_results(f"https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/taxon/{",".join([str(id) for id in taxonomy_ids])}/dataset_report", "taxa")
-  return pd.DataFrame([get_species_row(info, taxonomic_group_sets) for info in species_info])
-
-
-def ncbi_tree_to_nested_tree_and_taxa_levels(node_id, edges, taxonomic_levels, taxa_info_by_id, taxa_levels_by_id, parent_taxon_levels={}):
-  taxon_info = taxa_info_by_id.get(node_id, {"name": node_id, "level": None})
-  
-  level_key = "taxonomicLevelOther" if (taxon_info["level"] is None or taxon_info["level"] not in taxonomic_levels) else f"taxonomicLevel{taxon_info["level"][0].upper()}{taxon_info["level"][1:].lower()}"
-  taxon_levels = parent_taxon_levels.copy()
-  
-  if node_id == "1":
-    level_key = None
-  else:
-    taxon_levels[level_key] = taxon_info["name"]
-  
-  taxa_levels_by_id[node_id] = taxon_levels
-
-  children = edges.get(node_id, {}).get("visible_children", [])
-  children = [str(num) for num in children]
-  # ncbi results odd again, dup children
-  # sorting to make diffs on output data more meaningful
-  children = sorted(set(children))
-
-  return {
-      "name": taxon_info["name"],
-      "levelKey": level_key,
-      "children": [ncbi_tree_to_nested_tree_and_taxa_levels(child, edges, taxonomic_levels, taxa_info_by_id, taxa_levels_by_id, taxon_levels) for child in children]
-  }
-
-
-def get_species_tree(taxonomy_ids, taxonomic_levels):
-  species_tree_url = f"https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/taxon/{','.join([str(id) for id in taxonomy_ids])}/filtered_subtree?rank_limits={','.join(taxonomic_levels)}"
-  species_tree_response = requests.get(species_tree_url).json()
-
-  # Build a tree from the response
-
-  edges = species_tree_response.get("edges", {})
-  all_children = {child for edge in edges.values() for child in edge.get("visible_children", [])}
-  all_children = [str(num) for num in all_children]
-  root_ids = [node_id for node_id in edges if node_id not in all_children]
-  root_ids = [str(num) for num in root_ids]
-
-  if not root_ids:
-      return {}
-
-  # Find the set of all unique tax_ids and their display names and levels
-  tax_ids = all_children + root_ids
-  tax_ids = set(tax_ids)
-  parent_taxa_info = get_paginated_ncbi_results(f"https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/taxon/{','.join([str(id) for id in tax_ids])}/dataset_report", "parent taxa")
-  taxa_info_by_id = {
-    str(report["taxonomy"]["tax_id"]): {
-      "name": report["taxonomy"]["current_scientific_name"]["name"],
-      "level": report["taxonomy"]["rank"].lower() if "rank" in report["taxonomy"] else None
-    } for report in parent_taxa_info
-  }
-
-  # this bc the ncbi result is odd, multi-root
-  root_id = "1"
-  for root_id_candidate in root_ids:
-      if root_id_candidate != root_id:
-          edges[root_id]["visible_children"].append(root_id_candidate)
-
-  taxa_levels_by_id = {}
-  species_tree = ncbi_tree_to_nested_tree_and_taxa_levels(root_id, edges, taxonomic_levels, taxa_info_by_id, taxa_levels_by_id)
-
-  return species_tree, taxa_levels_by_id
+  return pd.DataFrame([get_species_row(info, taxonomic_group_sets, taxonomic_levels) for info in species_info])
 
 
 def get_genome_row(genome_info):
@@ -394,7 +342,6 @@ def build_files(
   assemblies_path,
   genomes_output_path,
   ucsc_assemblies_url,
-  tree_output_path, 
   taxonomic_levels_for_tree, 
   taxonomic_group_sets={},
   do_gene_model_urls=True,
@@ -418,7 +365,7 @@ def build_files(
     primarydata_df = primarydata_df.merge(sra_metadata_df, how="left", left_on="sra_sample_acc", right_on="sra_sample_acc")
   report_missing_values_from("accessions", "found on NCBI", source_list_df["accession"], base_genomes_df["accession"])
 
-  species_df = get_species_df(base_genomes_df["taxonomyId"], taxonomic_group_sets)
+  species_df = get_species_df(base_genomes_df["taxonomyId"], taxonomic_group_sets, taxonomic_levels_for_tree)
 
   report_missing_values_from("species", "found on NCBI", base_genomes_df["taxonomyId"], species_df["taxonomyId"])
 
@@ -439,16 +386,6 @@ def build_files(
   else:
     genomes_df["geneModelUrl"] = ""
 
-  if len(taxonomic_levels_for_tree) > 0:
-    species_tree, taxa_levels_by_id = get_species_tree(genomes_df["taxonomyId"], taxonomic_levels_for_tree)
-
-    with open(tree_output_path, 'w') as outfile:
-      json.dump(species_tree, outfile, indent=4)
-    print(f"Wrote to {tree_output_path}")
-
-    taxonomic_levels_df = pd.DataFrame.from_dict(taxa_levels_by_id, orient="index").reset_index(names="taxonomyId").astype({"taxonomyId": int})
-    genomes_df = genomes_df.merge(taxonomic_levels_df, how="left", on="taxonomyId")
-  
   genomes_df.to_csv(genomes_output_path, index=False, sep="\t")
 
   print(f"Wrote to {genomes_output_path}")
