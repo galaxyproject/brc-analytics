@@ -8,13 +8,20 @@ import { ButtonProps } from "@mui/material";
 
 export const ACCORDION: Record<string, { details?: string; title: string }> = {
   "0": {
+    details: "Select from pathogen, vector or host organisms.",
     title: "Select an Organism",
   },
-  "1": { title: "Choose a Genome Assembly" },
+  "1": {
+    details:
+      "Select a reference assembly from NCBI and view on the UCSC Genome Browser.",
+    title: "Choose a Genome Assembly",
+  },
   "2": {
+    details: "Choose from curated Galaxy workflows for your assembly.",
     title: "Select an Analysis Workflow",
   },
   "3": {
+    details: "Run your analysis workflow in Galaxy on TACC with free compute.",
     title: "Continue in Galaxy",
   },
 };
