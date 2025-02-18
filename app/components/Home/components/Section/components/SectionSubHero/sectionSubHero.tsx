@@ -1,25 +1,23 @@
 import { SubHeroContent } from "../../../../content";
 import {
+  AccordionBox,
   Section,
   SectionLayout,
   SectionSubLayout,
   SmokeLightestBox,
+  StyledAccordion,
   StyledBox,
   StyledButton,
   StyledGrid2,
-  StyledTabs,
   Subhead,
   TransparentBox,
 } from "./sectionSubHero.styles";
-import { BUTTON, IMAGE, TAB } from "./instructions";
-import { Fragment, useState } from "react";
-import { Fade, Slide, Tab, Typography } from "@mui/material";
-import { useCurrentBreakpoint } from "@databiosphere/findable-ui/lib/hooks/useCurrentBreakpoint";
-import { TEXT_BODY_LARGE_400 } from "@databiosphere/findable-ui/lib/theme/common/typography";
-import { FADE_PROPS, SLIDE_PROPS, TABS_PROPS } from "./constants";
+import { ACCORDION, BUTTON, IMAGE } from "./instructions";
+import { useState } from "react";
+import { AccordionDetails, AccordionSummary, Fade, Slide } from "@mui/material";
+import { ACCORDION_PROPS, FADE_PROPS, SLIDE_PROPS } from "./constants";
 
 export const SectionSubHero = (): JSX.Element => {
-  const bp = useCurrentBreakpoint() || "";
   const [step, setStep] = useState<string>("0");
   return (
     <Section>
@@ -28,32 +26,20 @@ export const SectionSubHero = (): JSX.Element => {
           <Subhead>
             <SubHeroContent />
           </Subhead>
-          <StyledTabs
-            {...TABS_PROPS}
-            onChange={(_, v) => setStep(v)}
-            orientation={["md", "lg"].includes(bp) ? "vertical" : "horizontal"}
-            value={step}
-          >
-            {Object.entries(TAB).map(([value, { description, label }]) => (
-              <Tab
+          <AccordionBox>
+            {Object.entries(ACCORDION).map(([value, { details, title }]) => (
+              <StyledAccordion
+                {...ACCORDION_PROPS}
                 key={value}
-                label={
-                  <Fragment>
-                    <span>{label}</span>
-                    {description && (
-                      <Typography
-                        color="ink.light"
-                        variant={TEXT_BODY_LARGE_400}
-                      >
-                        {description}
-                      </Typography>
-                    )}
-                  </Fragment>
-                }
-                value={value}
-              />
+                disabled={!details}
+                expanded={step === value}
+                onClick={() => setStep(value)}
+              >
+                <AccordionSummary>{title}</AccordionSummary>
+                <AccordionDetails>{details}</AccordionDetails>
+              </StyledAccordion>
             ))}
-          </StyledTabs>
+          </AccordionBox>
         </SectionSubLayout>
         <StyledGrid2>
           <SmokeLightestBox>

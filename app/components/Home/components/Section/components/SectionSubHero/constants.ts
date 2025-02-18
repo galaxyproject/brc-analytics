@@ -1,5 +1,8 @@
-import { FadeProps, SlideProps, TabsProps } from "@mui/material";
-import { TabScrollFuzz } from "@databiosphere/findable-ui/lib/components/common/Tabs/tabs.styles";
+import { AccordionProps, FadeProps, SlideProps } from "@mui/material";
+
+export const ACCORDION_PROPS: Omit<AccordionProps, "children"> = {
+  slotProps: { transition: { easing: "ease-in-out", timeout: 500 } },
+};
 
 export const FADE_PROPS: Omit<FadeProps, "children"> = {
   easing: "ease-in-out",
@@ -13,10 +16,4 @@ export const SLIDE_PROPS: Omit<SlideProps, "children"> = {
   easing: "cubic-bezier(0.22, 0.61, 0.36, 1)",
   exit: false,
   timeout: 800,
-};
-
-export const TABS_PROPS: TabsProps = {
-  ScrollButtonComponent: TabScrollFuzz,
-  TabIndicatorProps: { style: { transition: "none" } },
-  allowScrollButtonsMobile: true,
 };

@@ -9,12 +9,10 @@ import {
   sectionGrid,
   sectionLayout,
 } from "../../../../../Layout/components/AppLayout/components/Section/section.styles";
-import { Box, Button, Grid2, Tabs } from "@mui/material";
-import {
-  mediaDesktopSmallDown,
-  mediaTabletDown,
-} from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
+import { Accordion, Box, Button, Grid2 } from "@mui/material";
+import { mediaTabletDown } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import { smokeLightest } from "@databiosphere/findable-ui/lib/theme/common/palette";
+import { textBodyLarge400 } from "@databiosphere/findable-ui/lib/styles/common/mixins/fonts";
 
 export const Section = styled.section`
   background-color: ${white};
@@ -24,12 +22,11 @@ export const Section = styled.section`
 
 export const SectionLayout = styled.div`
   display: grid;
-  gap: 0 16px;
+  gap: 48px 16px;
   grid-template-columns: 1fr 1fr;
   padding: 72px 0 104px;
 
-  ${mediaDesktopSmallDown} {
-    gap: 48px 16px;
+  ${mediaTabletDown} {
     grid-template-columns: repeat(12, 1fr);
   }
 `;
@@ -37,14 +34,10 @@ export const SectionLayout = styled.div`
 export const SectionSubLayout = styled.div`
   ${sectionLayout};
   ${sectionGrid};
+  gap: 32px 0;
   grid-column: 1 / -1;
   grid-row: 1;
   padding: 0 16px;
-
-  ${mediaDesktopSmallDown} {
-    gap: 32px 0;
-    grid-template-columns: 1fr;
-  }
 `;
 
 export const Subhead = styled.div`
@@ -58,88 +51,72 @@ export const Subhead = styled.div`
   margin: 0;
   padding-top: 8px;
 
-  ${mediaDesktopSmallDown} {
-    grid-column: 1 / -1;
-    justify-self: center;
-    max-width: 506px;
-    text-align: center;
+  ${mediaTabletDown} {
+    grid-column: 1 / span all;
+    padding-top: 0;
   }
 `;
 
-export const StyledTabs = styled(Tabs)`
-  & {
-    align-self: flex-end;
-    box-shadow: inset 3px 0 ${smokeMain};
-    gap: 16px;
-    grid-column: 1 / span 5;
-    justify-self: flex-start;
+export const AccordionBox = styled.div`
+  align-self: flex-end;
+  box-shadow: inset 3px 0 ${smokeMain};
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  grid-column: 1 / span 5;
+  justify-self: flex-start;
 
-    .MuiTabs-scroller {
-      .MuiTabs-flexContainer {
-        gap: 16px;
+  ${mediaTabletDown} {
+    grid-column: 1 / -1;
+  }
+`;
 
-        .MuiTab-root {
-          align-items: flex-start;
-          color: ${inkLight};
-          gap: 8px;
-          display: grid;
-          font-size: 20px;
-          font-weight: 500;
-          justify-content: flex-start;
-          line-height: 28px;
-          margin: 0 0 0 24px;
-          max-width: unset;
-          padding: 8px 0;
-          text-align: left;
+export const StyledAccordion = styled(Accordion)`
+  && {
+    box-shadow: none;
+  }
 
-          &.Mui-selected {
-            color: ${inkMain};
-          }
-        }
-      }
+  color: ${inkLight};
+  padding-left: 24px;
+
+  .MuiAccordionSummary-root {
+    min-height: unset;
+
+    .MuiAccordionSummary-content {
+      font-size: 20px;
+      font-weight: 500;
+      line-height: 28px;
+      letter-spacing: normal;
+      margin: 8px 0;
     }
 
-    .MuiTabs-indicator {
-      border-radius: 0;
-      left: 0;
+    &.Mui-disabled {
+      opacity: 1;
+    }
+  }
+
+  .MuiAccordionDetails-root {
+    ${textBodyLarge400};
+    color: ${inkLight};
+    margin-bottom: 8px;
+    padding: 0;
+  }
+
+  &.Mui-expanded {
+    color: ${inkMain};
+
+    &::before {
+      background-color: ${inkMain};
+      content: "";
+      display: block;
+      height: 100%;
+      opacity: 1;
       width: 3px;
     }
+  }
 
-    ${mediaDesktopSmallDown} {
-      align-self: unset;
-      box-shadow: none;
-      grid-column: 1 / -1;
-      justify-self: unset;
-
-      .MuiTabs-scroller {
-        .MuiTabs-flexContainer {
-          gap: 0;
-
-          .MuiTab-root {
-            box-shadow: inset 0 -3px ${smokeMain};
-            font-size: 18px;
-            justify-content: unset;
-            margin: 0;
-            max-width: 360px;
-            padding: 8px 24px;
-
-            .MuiTypography-text-body-large-400 {
-              display: none;
-            }
-          }
-        }
-      }
-
-      .MuiTabs-scrollButtons {
-        &[direction="left"] {
-          background: linear-gradient(90deg, #ffffff 5.88%, #ffffff00 94.12%);
-        }
-
-        &[direction="right"] {
-          background: linear-gradient(270deg, #ffffff 5.88%, #ffffff00 94.12%);
-        }
-      }
-    }
+  &.Mui-disabled {
+    background-color: transparent;
   }
 `;
 
@@ -148,14 +125,13 @@ export const StyledGrid2 = styled(Grid2)`
   grid-column: 2;
   grid-row: 1;
   overflow: hidden;
-
-  ${mediaDesktopSmallDown} {
-    grid-column: 4 / -1;
-    grid-row: 2;
-  }
+  padding: 0;
 
   ${mediaTabletDown} {
-    grid-column: 2 / -1;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    grid-template-columns: 1fr;
+    padding: 0 16px;
   }
 `;
 
@@ -166,8 +142,15 @@ export const SmokeLightestBox = styled.div`
   grid-column: 1;
   grid-row: 1;
   height: 628px;
+  overflow: hidden;
   padding: 56px 0 0 56px;
-  width: 768px;
+  width: 768px; // max width 712px + 56px padding
+
+  ${mediaTabletDown} {
+    height: unset;
+    padding: 32px 0 0 32px;
+    width: 100%;
+  }
 `;
 
 export const StyledBox = styled(Box)`
