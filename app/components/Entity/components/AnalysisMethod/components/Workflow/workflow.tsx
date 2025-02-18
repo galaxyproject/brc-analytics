@@ -47,7 +47,7 @@ export const Workflow = ({
           );
         }}
       >
-        Launch Galaxy
+        Launch in Galaxy
       </Button>
     </StyledGrid2>
   );
