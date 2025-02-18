@@ -40,7 +40,6 @@
       }
     ],
     "ncbiTaxonomyId": "10244",
-    "species": "Monkeypox virus",
     "taxonomicGroup": [
       "Viruses"
     ],
@@ -96,7 +95,6 @@
       }
     ],
     "ncbiTaxonomyId": "1773",
-    "species": "Mycobacterium tuberculosis",
     "taxonomicGroup": [
       "Bacteria"
     ],
@@ -187,7 +185,6 @@
       }
     ],
     "ncbiTaxonomyId": "199306",
-    "species": "Coccidioides posadasii",
     "taxonomicGroup": [
       "Fungi"
     ],
@@ -279,7 +276,6 @@
       }
     ],
     "ncbiTaxonomyId": "5207",
-    "species": "Cryptococcus neoformans",
     "taxonomicGroup": [
       "Fungi"
     ],
@@ -338,7 +334,6 @@
       }
     ],
     "ncbiTaxonomyId": "5476",
-    "species": "Candida albicans",
     "taxonomicGroup": [
       "Fungi"
     ],
@@ -396,7 +391,6 @@
       }
     ],
     "ncbiTaxonomyId": "5501",
-    "species": "Coccidioides immitis",
     "taxonomicGroup": [
       "Fungi"
     ],
@@ -454,7 +448,6 @@
       }
     ],
     "ncbiTaxonomyId": "5660",
-    "species": "Leishmania braziliensis",
     "taxonomicGroup": [
       "Kinetoplastea"
     ],
@@ -512,7 +505,6 @@
       }
     ],
     "ncbiTaxonomyId": "5661",
-    "species": "Leishmania donovani",
     "taxonomicGroup": [
       "Kinetoplastea"
     ],
@@ -568,7 +560,6 @@
       }
     ],
     "ncbiTaxonomyId": "5664",
-    "species": "Leishmania major",
     "taxonomicGroup": [
       "Kinetoplastea"
     ],
@@ -626,7 +617,6 @@
       }
     ],
     "ncbiTaxonomyId": "5691",
-    "species": "Trypanosoma brucei",
     "taxonomicGroup": [
       "Kinetoplastea"
     ],
@@ -684,7 +674,6 @@
       }
     ],
     "ncbiTaxonomyId": "5693",
-    "species": "Trypanosoma cruzi",
     "taxonomicGroup": [
       "Kinetoplastea"
     ],
@@ -740,7 +729,6 @@
       }
     ],
     "ncbiTaxonomyId": "5811",
-    "species": "Toxoplasma gondii",
     "taxonomicGroup": [
       "Apicomplexa"
     ],
@@ -798,7 +786,6 @@
       }
     ],
     "ncbiTaxonomyId": "5833",
-    "species": "Plasmodium falciparum",
     "taxonomicGroup": [
       "Apicomplexa"
     ],
@@ -887,7 +874,6 @@
       }
     ],
     "ncbiTaxonomyId": "5855",
-    "species": "Plasmodium vivax",
     "taxonomicGroup": [
       "Apicomplexa"
     ],
@@ -943,7 +929,6 @@
       }
     ],
     "ncbiTaxonomyId": "5860",
-    "species": "Plasmodium vinckei",
     "taxonomicGroup": [
       "Apicomplexa"
     ],
@@ -999,7 +984,6 @@
       }
     ],
     "ncbiTaxonomyId": "5861",
-    "species": "Plasmodium yoelii",
     "taxonomicGroup": [
       "Apicomplexa"
     ],
@@ -1055,7 +1039,6 @@
       }
     ],
     "ncbiTaxonomyId": "694009",
-    "species": "Severe acute respiratory syndrome-related coronavirus",
     "taxonomicGroup": [
       "Viruses"
     ],
@@ -1147,7 +1130,6 @@
       }
     ],
     "ncbiTaxonomyId": "7165",
-    "species": "Anopheles gambiae",
     "taxonomicGroup": [
       "Insecta"
     ],
@@ -1205,7 +1187,6 @@
       }
     ],
     "ncbiTaxonomyId": "7175",
-    "species": "Culex pipiens",
     "taxonomicGroup": [
       "Insecta"
     ],
@@ -1261,7 +1242,6 @@
       }
     ],
     "ncbiTaxonomyId": "7176",
-    "species": "Culex quinquefasciatus",
     "taxonomicGroup": [
       "Insecta"
     ],
@@ -1317,7 +1297,6 @@
       }
     ],
     "ncbiTaxonomyId": "746128",
-    "species": "Aspergillus fumigatus",
     "taxonomicGroup": [
       "Fungi"
     ],

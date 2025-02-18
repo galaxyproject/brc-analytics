@@ -109,7 +109,6 @@ function buildOrganism(
     assemblyTaxonomyIds: accumulateArrayValue(organism?.assemblyTaxonomyIds, genome.ncbiTaxonomyId),
     genomes: accumulateArrayValue(organism?.genomes, genome),
     ncbiTaxonomyId: genome.speciesTaxonomyId,
-    species: genome.species,
     taxonomicGroup: genome.taxonomicGroup,
     taxonomicLevelClass: genome.taxonomicLevelClass,
     taxonomicLevelFamily: genome.taxonomicLevelFamily,

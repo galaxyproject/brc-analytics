@@ -226,11 +226,11 @@ export const buildTaxonomicGroup = (
  * @param organism - Organism entity.
  * @returns Props to be used for the cell.
  */
-export const buildOrganismSpecies = (
+export const buildTaxonomicLevelSpecies = (
   organism: BRCDataCatalogOrganism
 ): ComponentProps<typeof C.Link> => {
   return {
-    label: organism.species,
+    label: organism.taxonomicLevelSpecies,
     url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getOrganismId(organism))}`,
   };
 };
@@ -462,7 +462,7 @@ export const buildOrganismAssembliesHero = (
 ): ComponentProps<typeof C.BackPageHero> => {
   return {
     breadcrumbs: getOrganismEntityAssembliesBreadcrumbs(organism),
-    title: organism.species,
+    title: organism.taxonomicLevelSpecies,
   };
 };
 
@@ -593,7 +593,7 @@ function getOrganismEntityAssembliesBreadcrumbs(
 ): Breadcrumb[] {
   return [
     { path: ROUTES.ORGANISMS, text: "Organisms" },
-    { path: "", text: `${organism.species}` },
+    { path: "", text: `${organism.taxonomicLevelSpecies}` },
     { path: "", text: "Assemblies" },
   ];
 }
