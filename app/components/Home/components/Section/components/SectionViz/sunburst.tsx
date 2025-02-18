@@ -77,6 +77,12 @@ export const SectionViz = (): JSX.Element => {
       .innerRadius((d) => (Math.min(d.y0, DEPTH) * radius) / DEPTH)
       .outerRadius((d) => (Math.min(d.y1, DEPTH) * radius) / DEPTH - 1);
 
+    function isVisible(d, currentRoot, targetDepth) {
+      const isDescendant = d.ancestors().indexOf(currentRoot) >= 0;
+      const withinDepth = d.depth - targetDepth <= DEPTH - 1;
+      return isDescendant && withinDepth;
+    }
+
     // Draw the sunburst segments (we still don’t draw the center node as an arc)
     const path = svg
       .append("g")
@@ -87,8 +93,8 @@ export const SectionViz = (): JSX.Element => {
         d.children ? color(d.data.name) : color(d.parent!.data.name)
       )
       // Show only nodes with relative depth <= DEPTH.
-      .attr("fill-opacity", (d) => (d.current.y0 <= DEPTH - 1 ? 1 : 0))
-      .attr("stroke-opacity", (d) => (d.current.y0 <= DEPTH - 1 ? 1 : 0))
+      .attr("fill-opacity", (d) => (isVisible(d, root, 0) ? 1 : 0))
+      .attr("stroke-opacity", (d) => (isVisible(d, root, 0) ? 1 : 0))
       .attr("d", (d) => arc(d.current))
       .style("cursor", "pointer")
       .style("stroke", "#333")
@@ -131,7 +137,7 @@ export const SectionViz = (): JSX.Element => {
       .data(root.descendants().slice(1))
       .join("text")
       .attr("fill-opacity", (d) =>
-        d === currentRoot ? 0 : d.current.y0 <= DEPTH - 1 ? 1 : 0
+        d === currentRoot ? 0 : isVisible(d, root, 0) ? 1 : 0
       )
       .attr("dy", "0.35em")
       .attr("transform", labelTransform)
@@ -226,20 +232,12 @@ export const SectionViz = (): JSX.Element => {
           };
         })
         .attrTween("d", (d) => () => arc(d.current))
-        .attr("fill-opacity", (d) => {
-          const isVisible =
-            d.ancestors().indexOf(currentRoot) >= 0 &&
-            d.current.y0 <= DEPTH &&
-            d.y1 - p.depth <= DEPTH;
-          return isVisible ? 1 : 0;
-        })
-        .attr("stroke-opacity", (d) => {
-          const isVisible =
-            d.ancestors().indexOf(currentRoot) >= 0 &&
-            d.current.y0 <= DEPTH &&
-            d.y1 - p.depth <= DEPTH;
-          return isVisible ? 1 : 0;
-        });
+        .attr("fill-opacity", (d) =>
+          isVisible(d, currentRoot, p.depth) ? 1 : 0
+        )
+        .attr("stroke-opacity", (d) =>
+          isVisible(d, currentRoot, p.depth) ? 1 : 0
+        );
 
       // Transition the labels with updated visibility logic
       label
@@ -251,13 +249,9 @@ export const SectionViz = (): JSX.Element => {
           };
         })
         .attrTween("transform", (d) => () => labelTransform(d))
-        .attr("fill-opacity", (d) => {
-          const isVisible =
-            d.ancestors().indexOf(currentRoot) >= 0 &&
-            d.current.y0 <= DEPTH &&
-            d.y1 - p.depth <= DEPTH;
-          return d === currentRoot ? 0 : isVisible ? 1 : 0;
-        });
+        .attr("fill-opacity", (d) =>
+          d === currentRoot ? 0 : isVisible(d, currentRoot, p.depth) ? 1 : 0
+        );
     }
 
     // Clean up on component unmount: remove tooltip and clear svg.
