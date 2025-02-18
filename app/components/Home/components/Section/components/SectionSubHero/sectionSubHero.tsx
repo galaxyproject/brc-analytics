@@ -11,8 +11,11 @@ import { StaticImage } from "@databiosphere/findable-ui/lib/components/common/St
 import { BUTTON, IMAGE, TAB } from "./constants";
 import { useState } from "react";
 import { Button, Tab } from "@mui/material";
+import { useCurrentBreakpoint } from "@databiosphere/findable-ui/lib/hooks/useCurrentBreakpoint";
+import { TabScrollFuzz } from "@databiosphere/findable-ui/lib/components/common/Tabs/tabs.styles";
 
 export const SectionSubHero = (): JSX.Element => {
+  const bp = useCurrentBreakpoint() || "";
   const [step, setStep] = useState<string>("0");
   return (
     <Section>
@@ -22,8 +25,10 @@ export const SectionSubHero = (): JSX.Element => {
             <SubHeroContent />
           </Subhead>
           <StyledTabs
+            allowScrollButtonsMobile
             onChange={(_, v) => setStep(v)}
-            orientation="vertical"
+            orientation={["md", "lg"].includes(bp) ? "vertical" : "horizontal"}
+            ScrollButtonComponent={TabScrollFuzz}
             value={step}
           >
             {Object.entries(TAB).map(([value, label]) => (

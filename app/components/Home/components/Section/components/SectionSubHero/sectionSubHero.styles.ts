@@ -10,6 +10,10 @@ import {
   sectionLayout,
 } from "../../../../../Layout/components/AppLayout/components/Section/section.styles";
 import { Grid2, Tabs } from "@mui/material";
+import {
+  mediaDesktopSmallDown,
+  mediaTabletDown,
+} from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 
 export const Section = styled.section`
   background-color: ${white};
@@ -22,6 +26,11 @@ export const SectionLayout = styled.div`
   gap: 0 16px;
   grid-template-columns: 1fr 1fr;
   padding: 72px 0 104px;
+
+  ${mediaDesktopSmallDown} {
+    gap: 48px 16px;
+    grid-template-columns: repeat(12, 1fr);
+  }
 `;
 
 export const SectionSubLayout = styled.div`
@@ -30,6 +39,11 @@ export const SectionSubLayout = styled.div`
   grid-column: 1 / -1;
   grid-row: 1;
   padding: 0 16px;
+
+  ${mediaDesktopSmallDown} {
+    gap: 32px 0;
+    grid-template-columns: 1fr;
+  }
 `;
 
 export const Subhead = styled.div`
@@ -42,6 +56,13 @@ export const Subhead = styled.div`
   line-height: 40px;
   margin: 0;
   padding-top: 8px;
+
+  ${mediaDesktopSmallDown} {
+    grid-column: 1 / -1;
+    justify-self: center;
+    max-width: 506px;
+    text-align: center;
+  }
 `;
 
 export const StyledTabs = styled(Tabs)`
@@ -78,6 +99,34 @@ export const StyledTabs = styled(Tabs)`
       left: 0;
       width: 3px;
     }
+
+    ${mediaDesktopSmallDown} {
+      align-self: unset;
+      box-shadow: none;
+      grid-column: 1 / -1;
+      justify-self: unset;
+
+      .MuiTabs-scroller {
+        .MuiTabs-flexContainer {
+          gap: 0;
+
+          .MuiTab-root {
+            box-shadow: inset 0 -3px ${smokeMain};
+            font-size: 18px;
+          }
+        }
+      }
+
+      .MuiTabs-scrollButtons {
+        &[direction="left"] {
+          background: linear-gradient(90deg, #ffffff 5.88%, #ffffff00 94.12%);
+        }
+
+        &[direction="right"] {
+          background: linear-gradient(270deg, #ffffff 5.88%, #ffffff00 94.12%);
+        }
+      }
+    }
   }
 `;
 
@@ -95,5 +144,14 @@ export const StyledGrid2 = styled(Grid2)`
     align-self: flex-end;
     justify-self: flex-start;
     margin: 24px;
+  }
+
+  ${mediaDesktopSmallDown} {
+    grid-column: 4 / -1;
+    grid-row: 2;
+  }
+
+  ${mediaTabletDown} {
+    grid-column: 2 / -1;
   }
 `;
