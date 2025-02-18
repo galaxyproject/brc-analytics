@@ -6,7 +6,7 @@ UCSC_ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.jso
 
 GENOMES_OUTPUT_PATH = "catalog/build/intermediate/genomes-from-ncbi.tsv"
 
-PRIMARYDATA_OUTPUT_PATH = "catalog/build/intermediate/primary-data-ncbi.tsv"
+TREE_OUTPUT_PATH = "catalog/output/ncbi-taxa-tree.json"
 
 TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
   2: "Bacteria",
@@ -17,5 +17,24 @@ TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
   5653: "Kinetoplastea",
 }
 
+TAXANOMIC_LEVELS_FOR_TREE = [
+  "superkingdom", 
+  "kingdom", 
+  "phylum", 
+  "class", 
+  "order", 
+  "family", 
+  "genus", 
+  "species",
+  "strain"
+]
+
 if __name__ == "__main__":
-  build_files(ASSEMBLIES_PATH, GENOMES_OUTPUT_PATH, UCSC_ASSEMBLIES_URL, {"taxonomicGroup": TAXONOMIC_GROUPS_BY_TAXONOMY_ID}, extract_primary_data=True, primary_output_path=PRIMARYDATA_OUTPUT_PATH)
+  build_files(
+    ASSEMBLIES_PATH,
+    GENOMES_OUTPUT_PATH,
+    UCSC_ASSEMBLIES_URL,
+    TREE_OUTPUT_PATH,
+    TAXANOMIC_LEVELS_FOR_TREE,
+    {"taxonomicGroup": TAXONOMIC_GROUPS_BY_TAXONOMY_ID}
+  )

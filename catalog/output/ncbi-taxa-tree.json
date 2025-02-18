@@ -1,0 +1,606 @@
+{
+    "name": "root",
+    "children": [
+        {
+            "name": "Bacteria",
+            "children": [
+                {
+                    "name": "Bacillati",
+                    "children": [
+                        {
+                            "name": "Actinomycetota",
+                            "children": [
+                                {
+                                    "name": "Actinomycetes",
+                                    "children": [
+                                        {
+                                            "name": "Mycobacteriales",
+                                            "children": [
+                                                {
+                                                    "name": "Mycobacteriaceae",
+                                                    "children": [
+                                                        {
+                                                            "name": "Mycobacterium",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Mycobacterium tuberculosis",
+                                                                    "children": [
+                                                                        {
+                                                                            "name": "Mycobacterium tuberculosis H37Rv",
+                                                                            "children": []
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Viruses",
+            "children": [
+                {
+                    "name": "Bamfordvirae",
+                    "children": [
+                        {
+                            "name": "Nucleocytoviricota",
+                            "children": [
+                                {
+                                    "name": "Pokkesviricetes",
+                                    "children": [
+                                        {
+                                            "name": "Chitovirales",
+                                            "children": [
+                                                {
+                                                    "name": "Poxviridae",
+                                                    "children": [
+                                                        {
+                                                            "name": "Orthopoxvirus",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Monkeypox virus",
+                                                                    "children": []
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Orthornavirae",
+                    "children": [
+                        {
+                            "name": "Pisuviricota",
+                            "children": [
+                                {
+                                    "name": "Pisoniviricetes",
+                                    "children": [
+                                        {
+                                            "name": "Nidovirales",
+                                            "children": [
+                                                {
+                                                    "name": "Coronaviridae",
+                                                    "children": [
+                                                        {
+                                                            "name": "Betacoronavirus",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Severe acute respiratory syndrome-related coronavirus",
+                                                                    "children": [
+                                                                        {
+                                                                            "name": "Severe acute respiratory syndrome coronavirus 2",
+                                                                            "children": []
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Eukaryota",
+            "children": [
+                {
+                    "name": "Apicomplexa",
+                    "children": [
+                        {
+                            "name": "Aconoidasida",
+                            "children": [
+                                {
+                                    "name": "Haemosporida",
+                                    "children": [
+                                        {
+                                            "name": "Plasmodiidae",
+                                            "children": [
+                                                {
+                                                    "name": "Plasmodium",
+                                                    "children": [
+                                                        {
+                                                            "name": "Plasmodium falciparum",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Plasmodium falciparum 3D7",
+                                                                    "children": []
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "name": "Plasmodium vivax",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Plasmodium vivax strain Belem",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Plasmodium vivax IQ07",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Plasmodium vivax Sal-1",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Plasmodium vivax North Korean",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Plasmodium vivax Brazil I",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Plasmodium vivax Mauritania I",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Plasmodium vivax India VII",
+                                                                    "children": []
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "name": "Plasmodium yoelii",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Plasmodium yoelii 17X",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Plasmodium yoelii yoelii",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Plasmodium yoelii nigeriensis",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Plasmodium yoelii killicki",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Plasmodium yoelii YM",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Plasmodium yoelii 17",
+                                                                    "children": []
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "name": "Plasmodium vinckei",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Plasmodium vinckei vinckei",
+                                                                    "children": []
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Conoidasida",
+                            "children": [
+                                {
+                                    "name": "Eucoccidiorida",
+                                    "children": [
+                                        {
+                                            "name": "Sarcocystidae",
+                                            "children": [
+                                                {
+                                                    "name": "Toxoplasma",
+                                                    "children": [
+                                                        {
+                                                            "name": "Toxoplasma gondii",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Toxoplasma gondii ME49",
+                                                                    "children": []
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Metazoa",
+                    "children": [
+                        {
+                            "name": "Arthropoda",
+                            "children": [
+                                {
+                                    "name": "Insecta",
+                                    "children": [
+                                        {
+                                            "name": "Diptera",
+                                            "children": [
+                                                {
+                                                    "name": "Culicidae",
+                                                    "children": [
+                                                        {
+                                                            "name": "Anopheles",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Anopheles gambiae",
+                                                                    "children": [
+                                                                        {
+                                                                            "name": "Anopheles gambiae str. PEST",
+                                                                            "children": []
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "name": "Culex",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Culex quinquefasciatus",
+                                                                    "children": [
+                                                                        {
+                                                                            "name": "Culex quinquefasciatus quinquefasciatus",
+                                                                            "children": []
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "name": "Culex pipiens",
+                                                                    "children": [
+                                                                        {
+                                                                            "name": "Culex pipiens pallens",
+                                                                            "children": []
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Fungi",
+                    "children": [
+                        {
+                            "name": "Basidiomycota",
+                            "children": [
+                                {
+                                    "name": "Tremellomycetes",
+                                    "children": [
+                                        {
+                                            "name": "Tremellales",
+                                            "children": [
+                                                {
+                                                    "name": "Cryptococcaceae",
+                                                    "children": [
+                                                        {
+                                                            "name": "Cryptococcus",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Cryptococcus neoformans",
+                                                                    "children": [
+                                                                        {
+                                                                            "name": "Cryptococcus neoformans var. grubii H99",
+                                                                            "children": []
+                                                                        },
+                                                                        {
+                                                                            "name": "Cryptococcus neoformans var. neoformans JEC21",
+                                                                            "children": []
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Ascomycota",
+                            "children": [
+                                {
+                                    "name": "Pichiomycetes",
+                                    "children": [
+                                        {
+                                            "name": "Serinales",
+                                            "children": [
+                                                {
+                                                    "name": "Debaryomycetaceae",
+                                                    "children": [
+                                                        {
+                                                            "name": "Candida",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Candida albicans",
+                                                                    "children": [
+                                                                        {
+                                                                            "name": "Candida albicans SC5314",
+                                                                            "children": []
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "Eurotiomycetes",
+                                    "children": [
+                                        {
+                                            "name": "Onygenales",
+                                            "children": [
+                                                {
+                                                    "name": "Onygenaceae",
+                                                    "children": [
+                                                        {
+                                                            "name": "Coccidioides",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Coccidioides posadasii",
+                                                                    "children": [
+                                                                        {
+                                                                            "name": "Coccidioides posadasii str. Silveira",
+                                                                            "children": []
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "name": "Coccidioides immitis",
+                                                                    "children": [
+                                                                        {
+                                                                            "name": "Coccidioides immitis RS",
+                                                                            "children": []
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "name": "Eurotiales",
+                                            "children": [
+                                                {
+                                                    "name": "Aspergillaceae",
+                                                    "children": [
+                                                        {
+                                                            "name": "Aspergillus",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Aspergillus fumigatus",
+                                                                    "children": [
+                                                                        {
+                                                                            "name": "Aspergillus fumigatus Af293",
+                                                                            "children": []
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Euglenozoa",
+                    "children": [
+                        {
+                            "name": "Kinetoplastea",
+                            "children": [
+                                {
+                                    "name": "Trypanosomatida",
+                                    "children": [
+                                        {
+                                            "name": "Trypanosomatidae",
+                                            "children": [
+                                                {
+                                                    "name": "Leishmania",
+                                                    "children": [
+                                                        {
+                                                            "name": "Leishmania donovani",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Leishmania donovani Ld 2001",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Leishmania donovani donovani",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Leishmania donovani Ld 39",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Leishmania donovani BPK282A1",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Leishmania donovani archibaldi",
+                                                                    "children": []
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "name": "Leishmania braziliensis",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Leishmania braziliensis MHOM/BR/75/M2904",
+                                                                    "children": []
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "name": "Leishmania major",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Leishmania major strain Friedlin",
+                                                                    "children": []
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "name": "Trypanosoma",
+                                                    "children": [
+                                                        {
+                                                            "name": "Trypanosoma brucei",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Trypanosoma brucei brucei TREU927",
+                                                                    "children": []
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "name": "Trypanosoma cruzi",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Trypanosoma sp. Panama 3",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Trypanosoma cruzi Tula cl2",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Trypanosoma cruzi cruzi",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Trypanosoma cruzi M6241 cl.6",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Trypanosoma cruzi ATCC 30160",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Trypanosoma sp. Panama 1",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Trypanosoma cruzi strain CL Brener",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Trypanosoma cruzi strain Esmeraldo",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Trypanosoma cruzi TRYCC 1522",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Trypanosoma sp. Panama 2",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Trypanosoma cruzi Dm28c",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Trypanosoma cruzi marinkellei",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Trypanosoma cruzi JR cl. 4",
+                                                                    "children": []
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
