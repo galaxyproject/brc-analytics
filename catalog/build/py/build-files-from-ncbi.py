@@ -6,8 +6,6 @@ UCSC_ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.jso
 
 GENOMES_OUTPUT_PATH = "catalog/build/intermediate/genomes-from-ncbi.tsv"
 
-TREE_OUTPUT_PATH = "catalog/output/ncbi-taxa-tree.json"
-
 TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
   2: "Bacteria",
   10239: "Viruses",

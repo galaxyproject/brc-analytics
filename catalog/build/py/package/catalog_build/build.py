@@ -6,7 +6,6 @@ import re
 import time
 from bs4 import BeautifulSoup
 import logging
-import json
 
 log = logging.getLogger(__name__)
 
