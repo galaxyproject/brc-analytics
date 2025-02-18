@@ -32,9 +32,9 @@ export const IMAGE: Record<string, string> = {
   "3": "/main/continue-in-galaxy.png",
 };
 
-export const TAB: Record<string, string> = {
-  "0": "Select an Organism",
-  "1": "Choose a Genome Assembly",
-  "2": "Select an Analysis Workflow",
-  "3": "Continue in Galaxy",
+export const TAB: Record<string, { description?: string; label: string }> = {
+  "0": { label: "Select an Organism" },
+  "1": { label: "Choose a Genome Assembly" },
+  "2": { label: "Select an Analysis Workflow" },
+  "3": { label: "Continue in Galaxy" },
 };

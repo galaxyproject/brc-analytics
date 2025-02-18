@@ -80,11 +80,15 @@ export const StyledTabs = styled(Tabs)`
         .MuiTab-root {
           align-items: flex-start;
           color: ${inkLight};
+          gap: 8px;
+          display: grid;
           font-size: 20px;
           font-weight: 500;
+          justify-content: flex-start;
           line-height: 28px;
-          margin: 0;
-          padding: 8px 24px;
+          margin: 0 0 0 24px;
+          max-width: unset;
+          padding: 8px 0;
           text-align: left;
 
           &.Mui-selected {
@@ -113,6 +117,14 @@ export const StyledTabs = styled(Tabs)`
           .MuiTab-root {
             box-shadow: inset 0 -3px ${smokeMain};
             font-size: 18px;
+            justify-content: unset;
+            margin: 0;
+            max-width: 360px;
+            padding: 8px 24px;
+
+            .MuiTypography-text-body-large-400 {
+              display: none;
+            }
           }
         }
       }

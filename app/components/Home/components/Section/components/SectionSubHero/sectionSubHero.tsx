@@ -9,10 +9,11 @@ import {
 } from "./sectionSubHero.styles";
 import { StaticImage } from "@databiosphere/findable-ui/lib/components/common/StaticImage/staticImage";
 import { BUTTON, IMAGE, TAB } from "./constants";
-import { useState } from "react";
-import { Button, Tab } from "@mui/material";
+import { Fragment, useState } from "react";
+import { Button, Tab, Typography } from "@mui/material";
 import { useCurrentBreakpoint } from "@databiosphere/findable-ui/lib/hooks/useCurrentBreakpoint";
 import { TabScrollFuzz } from "@databiosphere/findable-ui/lib/components/common/Tabs/tabs.styles";
+import { TEXT_BODY_LARGE_400 } from "@databiosphere/findable-ui/lib/theme/common/typography";
 
 export const SectionSubHero = (): JSX.Element => {
   const bp = useCurrentBreakpoint() || "";
@@ -31,13 +32,29 @@ export const SectionSubHero = (): JSX.Element => {
             ScrollButtonComponent={TabScrollFuzz}
             value={step}
           >
-            {Object.entries(TAB).map(([value, label]) => (
-              <Tab key={value} label={label} value={value} />
+            {Object.entries(TAB).map(([value, { description, label }]) => (
+              <Tab
+                key={value}
+                label={
+                  <Fragment>
+                    <span>{label}</span>
+                    {description && (
+                      <Typography
+                        color="ink.light"
+                        variant={TEXT_BODY_LARGE_400}
+                      >
+                        {description}
+                      </Typography>
+                    )}
+                  </Fragment>
+                }
+                value={value}
+              />
             ))}
           </StyledTabs>
         </SectionSubLayout>
         <StyledGrid2>
-          <StaticImage alt={TAB[step]} src={IMAGE[step]} />
+          <StaticImage alt={TAB[step].label} src={IMAGE[step]} />
         </StyledGrid2>
         {BUTTON[step] && (
           <StyledGrid2>
