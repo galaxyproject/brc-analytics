@@ -1,32 +1,626 @@
 {
     "name": "root",
+    "levelKey": "taxonomicLevelOther",
     "children": [
         {
+            "name": "Eukaryota",
+            "levelKey": "taxonomicLevelSuperkingdom",
+            "children": [
+                {
+                    "name": "Metazoa",
+                    "levelKey": "taxonomicLevelKingdom",
+                    "children": [
+                        {
+                            "name": "Arthropoda",
+                            "levelKey": "taxonomicLevelPhylum",
+                            "children": [
+                                {
+                                    "name": "Insecta",
+                                    "levelKey": "taxonomicLevelClass",
+                                    "children": [
+                                        {
+                                            "name": "Diptera",
+                                            "levelKey": "taxonomicLevelOrder",
+                                            "children": [
+                                                {
+                                                    "name": "Culicidae",
+                                                    "levelKey": "taxonomicLevelFamily",
+                                                    "children": [
+                                                        {
+                                                            "name": "Culex",
+                                                            "levelKey": "taxonomicLevelGenus",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Culex pipiens",
+                                                                    "levelKey": "taxonomicLevelSpecies",
+                                                                    "children": [
+                                                                        {
+                                                                            "name": "Culex pipiens pallens",
+                                                                            "levelKey": "taxonomicLevelSubspecies",
+                                                                            "children": []
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "name": "Culex quinquefasciatus",
+                                                                    "levelKey": "taxonomicLevelSpecies",
+                                                                    "children": [
+                                                                        {
+                                                                            "name": "Culex quinquefasciatus quinquefasciatus",
+                                                                            "levelKey": "taxonomicLevelSubspecies",
+                                                                            "children": []
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "name": "Anopheles",
+                                                            "levelKey": "taxonomicLevelGenus",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Anopheles gambiae",
+                                                                    "levelKey": "taxonomicLevelSpecies",
+                                                                    "children": [
+                                                                        {
+                                                                            "name": "Anopheles gambiae str. PEST",
+                                                                            "levelKey": "taxonomicLevelStrain",
+                                                                            "children": []
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Apicomplexa",
+                    "levelKey": "taxonomicLevelPhylum",
+                    "children": [
+                        {
+                            "name": "Conoidasida",
+                            "levelKey": "taxonomicLevelClass",
+                            "children": [
+                                {
+                                    "name": "Eucoccidiorida",
+                                    "levelKey": "taxonomicLevelOrder",
+                                    "children": [
+                                        {
+                                            "name": "Sarcocystidae",
+                                            "levelKey": "taxonomicLevelFamily",
+                                            "children": [
+                                                {
+                                                    "name": "Toxoplasma",
+                                                    "levelKey": "taxonomicLevelGenus",
+                                                    "children": [
+                                                        {
+                                                            "name": "Toxoplasma gondii",
+                                                            "levelKey": "taxonomicLevelSpecies",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Toxoplasma gondii ME49",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Aconoidasida",
+                            "levelKey": "taxonomicLevelClass",
+                            "children": [
+                                {
+                                    "name": "Haemosporida",
+                                    "levelKey": "taxonomicLevelOrder",
+                                    "children": [
+                                        {
+                                            "name": "Plasmodiidae",
+                                            "levelKey": "taxonomicLevelFamily",
+                                            "children": [
+                                                {
+                                                    "name": "Plasmodium",
+                                                    "levelKey": "taxonomicLevelGenus",
+                                                    "children": [
+                                                        {
+                                                            "name": "Plasmodium yoelii",
+                                                            "levelKey": "taxonomicLevelSpecies",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Plasmodium yoelii killicki",
+                                                                    "levelKey": "taxonomicLevelSubspecies",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Plasmodium yoelii YM",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Plasmodium yoelii 17",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Plasmodium yoelii yoelii",
+                                                                    "levelKey": "taxonomicLevelSubspecies",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Plasmodium yoelii 17X",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Plasmodium yoelii nigeriensis",
+                                                                    "levelKey": "taxonomicLevelSubspecies",
+                                                                    "children": []
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "name": "Plasmodium falciparum",
+                                                            "levelKey": "taxonomicLevelSpecies",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Plasmodium falciparum 3D7",
+                                                                    "levelKey": "taxonomicLevelIsolate",
+                                                                    "children": []
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "name": "Plasmodium vinckei",
+                                                            "levelKey": "taxonomicLevelSpecies",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Plasmodium vinckei vinckei",
+                                                                    "levelKey": "taxonomicLevelSubspecies",
+                                                                    "children": []
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "name": "Plasmodium vivax",
+                                                            "levelKey": "taxonomicLevelSpecies",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Plasmodium vivax India VII",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Plasmodium vivax IQ07",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Plasmodium vivax North Korean",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Plasmodium vivax strain Belem",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Plasmodium vivax Mauritania I",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Plasmodium vivax Sal-1",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Plasmodium vivax Brazil I",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Euglenozoa",
+                    "levelKey": "taxonomicLevelPhylum",
+                    "children": [
+                        {
+                            "name": "Kinetoplastea",
+                            "levelKey": "taxonomicLevelClass",
+                            "children": [
+                                {
+                                    "name": "Trypanosomatida",
+                                    "levelKey": "taxonomicLevelOrder",
+                                    "children": [
+                                        {
+                                            "name": "Trypanosomatidae",
+                                            "levelKey": "taxonomicLevelFamily",
+                                            "children": [
+                                                {
+                                                    "name": "Leishmania",
+                                                    "levelKey": "taxonomicLevelGenus",
+                                                    "children": [
+                                                        {
+                                                            "name": "Leishmania braziliensis",
+                                                            "levelKey": "taxonomicLevelSpecies",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Leishmania braziliensis MHOM/BR/75/M2904",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "name": "Leishmania major",
+                                                            "levelKey": "taxonomicLevelSpecies",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Leishmania major strain Friedlin",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "name": "Leishmania donovani",
+                                                            "levelKey": "taxonomicLevelSpecies",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Leishmania donovani archibaldi",
+                                                                    "levelKey": "taxonomicLevelSubspecies",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Leishmania donovani donovani",
+                                                                    "levelKey": "taxonomicLevelSubspecies",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Leishmania donovani BPK282A1",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Leishmania donovani Ld 39",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Leishmania donovani Ld 2001",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "name": "Trypanosoma",
+                                                    "levelKey": "taxonomicLevelGenus",
+                                                    "children": [
+                                                        {
+                                                            "name": "Trypanosoma brucei",
+                                                            "levelKey": "taxonomicLevelSpecies",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Trypanosoma brucei brucei TREU927",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "name": "Trypanosoma cruzi",
+                                                            "levelKey": "taxonomicLevelSpecies",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Trypanosoma cruzi TRYCC 1522",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Trypanosoma cruzi strain CL Brener",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Trypanosoma sp. Panama 1",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Trypanosoma cruzi ATCC 30160",
+                                                                    "levelKey": "taxonomicLevelSubspecies",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Trypanosoma cruzi marinkellei",
+                                                                    "levelKey": "taxonomicLevelSubspecies",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Trypanosoma cruzi M6241 cl.6",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Trypanosoma cruzi cruzi",
+                                                                    "levelKey": "taxonomicLevelSubspecies",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Trypanosoma sp. Panama 3",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Trypanosoma cruzi strain Esmeraldo",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Trypanosoma cruzi Tula cl2",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Trypanosoma cruzi Dm28c",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Trypanosoma cruzi JR cl. 4",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                },
+                                                                {
+                                                                    "name": "Trypanosoma sp. Panama 2",
+                                                                    "levelKey": "taxonomicLevelStrain",
+                                                                    "children": []
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Fungi",
+                    "levelKey": "taxonomicLevelKingdom",
+                    "children": [
+                        {
+                            "name": "Ascomycota",
+                            "levelKey": "taxonomicLevelPhylum",
+                            "children": [
+                                {
+                                    "name": "Pichiomycetes",
+                                    "levelKey": "taxonomicLevelClass",
+                                    "children": [
+                                        {
+                                            "name": "Serinales",
+                                            "levelKey": "taxonomicLevelOrder",
+                                            "children": [
+                                                {
+                                                    "name": "Debaryomycetaceae",
+                                                    "levelKey": "taxonomicLevelFamily",
+                                                    "children": [
+                                                        {
+                                                            "name": "Candida",
+                                                            "levelKey": "taxonomicLevelGenus",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Candida albicans",
+                                                                    "levelKey": "taxonomicLevelSpecies",
+                                                                    "children": [
+                                                                        {
+                                                                            "name": "Candida albicans SC5314",
+                                                                            "levelKey": "taxonomicLevelStrain",
+                                                                            "children": []
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "Eurotiomycetes",
+                                    "levelKey": "taxonomicLevelClass",
+                                    "children": [
+                                        {
+                                            "name": "Onygenales",
+                                            "levelKey": "taxonomicLevelOrder",
+                                            "children": [
+                                                {
+                                                    "name": "Onygenaceae",
+                                                    "levelKey": "taxonomicLevelFamily",
+                                                    "children": [
+                                                        {
+                                                            "name": "Coccidioides",
+                                                            "levelKey": "taxonomicLevelGenus",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Coccidioides posadasii",
+                                                                    "levelKey": "taxonomicLevelSpecies",
+                                                                    "children": [
+                                                                        {
+                                                                            "name": "Coccidioides posadasii str. Silveira",
+                                                                            "levelKey": "taxonomicLevelStrain",
+                                                                            "children": []
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "name": "Coccidioides immitis",
+                                                                    "levelKey": "taxonomicLevelSpecies",
+                                                                    "children": [
+                                                                        {
+                                                                            "name": "Coccidioides immitis RS",
+                                                                            "levelKey": "taxonomicLevelStrain",
+                                                                            "children": []
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "name": "Eurotiales",
+                                            "levelKey": "taxonomicLevelOrder",
+                                            "children": [
+                                                {
+                                                    "name": "Aspergillaceae",
+                                                    "levelKey": "taxonomicLevelFamily",
+                                                    "children": [
+                                                        {
+                                                            "name": "Aspergillus",
+                                                            "levelKey": "taxonomicLevelGenus",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Aspergillus fumigatus",
+                                                                    "levelKey": "taxonomicLevelSpecies",
+                                                                    "children": [
+                                                                        {
+                                                                            "name": "Aspergillus fumigatus Af293",
+                                                                            "levelKey": "taxonomicLevelStrain",
+                                                                            "children": []
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Basidiomycota",
+                            "levelKey": "taxonomicLevelPhylum",
+                            "children": [
+                                {
+                                    "name": "Tremellomycetes",
+                                    "levelKey": "taxonomicLevelClass",
+                                    "children": [
+                                        {
+                                            "name": "Tremellales",
+                                            "levelKey": "taxonomicLevelOrder",
+                                            "children": [
+                                                {
+                                                    "name": "Cryptococcaceae",
+                                                    "levelKey": "taxonomicLevelFamily",
+                                                    "children": [
+                                                        {
+                                                            "name": "Cryptococcus",
+                                                            "levelKey": "taxonomicLevelGenus",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Cryptococcus neoformans",
+                                                                    "levelKey": "taxonomicLevelSpecies",
+                                                                    "children": [
+                                                                        {
+                                                                            "name": "Cryptococcus neoformans var. grubii H99",
+                                                                            "levelKey": "taxonomicLevelStrain",
+                                                                            "children": []
+                                                                        },
+                                                                        {
+                                                                            "name": "Cryptococcus neoformans var. neoformans JEC21",
+                                                                            "levelKey": "taxonomicLevelStrain",
+                                                                            "children": []
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "name": "Bacteria",
+            "levelKey": "taxonomicLevelSuperkingdom",
             "children": [
                 {
                     "name": "Bacillati",
+                    "levelKey": "taxonomicLevelKingdom",
                     "children": [
                         {
                             "name": "Actinomycetota",
+                            "levelKey": "taxonomicLevelPhylum",
                             "children": [
                                 {
                                     "name": "Actinomycetes",
+                                    "levelKey": "taxonomicLevelClass",
                                     "children": [
                                         {
                                             "name": "Mycobacteriales",
+                                            "levelKey": "taxonomicLevelOrder",
                                             "children": [
                                                 {
                                                     "name": "Mycobacteriaceae",
+                                                    "levelKey": "taxonomicLevelFamily",
                                                     "children": [
                                                         {
                                                             "name": "Mycobacterium",
+                                                            "levelKey": "taxonomicLevelGenus",
                                                             "children": [
                                                                 {
                                                                     "name": "Mycobacterium tuberculosis",
+                                                                    "levelKey": "taxonomicLevelSpecies",
                                                                     "children": [
                                                                         {
                                                                             "name": "Mycobacterium tuberculosis H37Rv",
+                                                                            "levelKey": "taxonomicLevelStrain",
                                                                             "children": []
                                                                         }
                                                                     ]
@@ -47,265 +641,39 @@
         },
         {
             "name": "Viruses",
+            "levelKey": "taxonomicLevelSuperkingdom",
             "children": [
                 {
-                    "name": "Bamfordvirae",
-                    "children": [
-                        {
-                            "name": "Nucleocytoviricota",
-                            "children": [
-                                {
-                                    "name": "Pokkesviricetes",
-                                    "children": [
-                                        {
-                                            "name": "Chitovirales",
-                                            "children": [
-                                                {
-                                                    "name": "Poxviridae",
-                                                    "children": [
-                                                        {
-                                                            "name": "Orthopoxvirus",
-                                                            "children": [
-                                                                {
-                                                                    "name": "Monkeypox virus",
-                                                                    "children": []
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
                     "name": "Orthornavirae",
+                    "levelKey": "taxonomicLevelKingdom",
                     "children": [
                         {
                             "name": "Pisuviricota",
+                            "levelKey": "taxonomicLevelPhylum",
                             "children": [
                                 {
                                     "name": "Pisoniviricetes",
+                                    "levelKey": "taxonomicLevelClass",
                                     "children": [
                                         {
                                             "name": "Nidovirales",
+                                            "levelKey": "taxonomicLevelOrder",
                                             "children": [
                                                 {
                                                     "name": "Coronaviridae",
+                                                    "levelKey": "taxonomicLevelFamily",
                                                     "children": [
                                                         {
                                                             "name": "Betacoronavirus",
+                                                            "levelKey": "taxonomicLevelGenus",
                                                             "children": [
                                                                 {
                                                                     "name": "Severe acute respiratory syndrome-related coronavirus",
+                                                                    "levelKey": "taxonomicLevelSpecies",
                                                                     "children": [
                                                                         {
                                                                             "name": "Severe acute respiratory syndrome coronavirus 2",
-                                                                            "children": []
-                                                                        }
-                                                                    ]
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "Eukaryota",
-            "children": [
-                {
-                    "name": "Apicomplexa",
-                    "children": [
-                        {
-                            "name": "Aconoidasida",
-                            "children": [
-                                {
-                                    "name": "Haemosporida",
-                                    "children": [
-                                        {
-                                            "name": "Plasmodiidae",
-                                            "children": [
-                                                {
-                                                    "name": "Plasmodium",
-                                                    "children": [
-                                                        {
-                                                            "name": "Plasmodium falciparum",
-                                                            "children": [
-                                                                {
-                                                                    "name": "Plasmodium falciparum 3D7",
-                                                                    "children": []
-                                                                }
-                                                            ]
-                                                        },
-                                                        {
-                                                            "name": "Plasmodium vivax",
-                                                            "children": [
-                                                                {
-                                                                    "name": "Plasmodium vivax strain Belem",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Plasmodium vivax IQ07",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Plasmodium vivax Sal-1",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Plasmodium vivax North Korean",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Plasmodium vivax Brazil I",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Plasmodium vivax Mauritania I",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Plasmodium vivax India VII",
-                                                                    "children": []
-                                                                }
-                                                            ]
-                                                        },
-                                                        {
-                                                            "name": "Plasmodium yoelii",
-                                                            "children": [
-                                                                {
-                                                                    "name": "Plasmodium yoelii 17X",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Plasmodium yoelii yoelii",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Plasmodium yoelii nigeriensis",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Plasmodium yoelii killicki",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Plasmodium yoelii YM",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Plasmodium yoelii 17",
-                                                                    "children": []
-                                                                }
-                                                            ]
-                                                        },
-                                                        {
-                                                            "name": "Plasmodium vinckei",
-                                                            "children": [
-                                                                {
-                                                                    "name": "Plasmodium vinckei vinckei",
-                                                                    "children": []
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "name": "Conoidasida",
-                            "children": [
-                                {
-                                    "name": "Eucoccidiorida",
-                                    "children": [
-                                        {
-                                            "name": "Sarcocystidae",
-                                            "children": [
-                                                {
-                                                    "name": "Toxoplasma",
-                                                    "children": [
-                                                        {
-                                                            "name": "Toxoplasma gondii",
-                                                            "children": [
-                                                                {
-                                                                    "name": "Toxoplasma gondii ME49",
-                                                                    "children": []
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "name": "Metazoa",
-                    "children": [
-                        {
-                            "name": "Arthropoda",
-                            "children": [
-                                {
-                                    "name": "Insecta",
-                                    "children": [
-                                        {
-                                            "name": "Diptera",
-                                            "children": [
-                                                {
-                                                    "name": "Culicidae",
-                                                    "children": [
-                                                        {
-                                                            "name": "Anopheles",
-                                                            "children": [
-                                                                {
-                                                                    "name": "Anopheles gambiae",
-                                                                    "children": [
-                                                                        {
-                                                                            "name": "Anopheles gambiae str. PEST",
-                                                                            "children": []
-                                                                        }
-                                                                    ]
-                                                                }
-                                                            ]
-                                                        },
-                                                        {
-                                                            "name": "Culex",
-                                                            "children": [
-                                                                {
-                                                                    "name": "Culex quinquefasciatus",
-                                                                    "children": [
-                                                                        {
-                                                                            "name": "Culex quinquefasciatus quinquefasciatus",
-                                                                            "children": []
-                                                                        }
-                                                                    ]
-                                                                },
-                                                                {
-                                                                    "name": "Culex pipiens",
-                                                                    "children": [
-                                                                        {
-                                                                            "name": "Culex pipiens pallens",
+                                                                            "levelKey": "taxonomicLevelOther",
                                                                             "children": []
                                                                         }
                                                                     ]
@@ -323,269 +691,32 @@
                     ]
                 },
                 {
-                    "name": "Fungi",
+                    "name": "Bamfordvirae",
+                    "levelKey": "taxonomicLevelKingdom",
                     "children": [
                         {
-                            "name": "Basidiomycota",
+                            "name": "Nucleocytoviricota",
+                            "levelKey": "taxonomicLevelPhylum",
                             "children": [
                                 {
-                                    "name": "Tremellomycetes",
+                                    "name": "Pokkesviricetes",
+                                    "levelKey": "taxonomicLevelClass",
                                     "children": [
                                         {
-                                            "name": "Tremellales",
+                                            "name": "Chitovirales",
+                                            "levelKey": "taxonomicLevelOrder",
                                             "children": [
                                                 {
-                                                    "name": "Cryptococcaceae",
+                                                    "name": "Poxviridae",
+                                                    "levelKey": "taxonomicLevelFamily",
                                                     "children": [
                                                         {
-                                                            "name": "Cryptococcus",
+                                                            "name": "Orthopoxvirus",
+                                                            "levelKey": "taxonomicLevelGenus",
                                                             "children": [
                                                                 {
-                                                                    "name": "Cryptococcus neoformans",
-                                                                    "children": [
-                                                                        {
-                                                                            "name": "Cryptococcus neoformans var. grubii H99",
-                                                                            "children": []
-                                                                        },
-                                                                        {
-                                                                            "name": "Cryptococcus neoformans var. neoformans JEC21",
-                                                                            "children": []
-                                                                        }
-                                                                    ]
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "name": "Ascomycota",
-                            "children": [
-                                {
-                                    "name": "Pichiomycetes",
-                                    "children": [
-                                        {
-                                            "name": "Serinales",
-                                            "children": [
-                                                {
-                                                    "name": "Debaryomycetaceae",
-                                                    "children": [
-                                                        {
-                                                            "name": "Candida",
-                                                            "children": [
-                                                                {
-                                                                    "name": "Candida albicans",
-                                                                    "children": [
-                                                                        {
-                                                                            "name": "Candida albicans SC5314",
-                                                                            "children": []
-                                                                        }
-                                                                    ]
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                },
-                                {
-                                    "name": "Eurotiomycetes",
-                                    "children": [
-                                        {
-                                            "name": "Onygenales",
-                                            "children": [
-                                                {
-                                                    "name": "Onygenaceae",
-                                                    "children": [
-                                                        {
-                                                            "name": "Coccidioides",
-                                                            "children": [
-                                                                {
-                                                                    "name": "Coccidioides posadasii",
-                                                                    "children": [
-                                                                        {
-                                                                            "name": "Coccidioides posadasii str. Silveira",
-                                                                            "children": []
-                                                                        }
-                                                                    ]
-                                                                },
-                                                                {
-                                                                    "name": "Coccidioides immitis",
-                                                                    "children": [
-                                                                        {
-                                                                            "name": "Coccidioides immitis RS",
-                                                                            "children": []
-                                                                        }
-                                                                    ]
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            "name": "Eurotiales",
-                                            "children": [
-                                                {
-                                                    "name": "Aspergillaceae",
-                                                    "children": [
-                                                        {
-                                                            "name": "Aspergillus",
-                                                            "children": [
-                                                                {
-                                                                    "name": "Aspergillus fumigatus",
-                                                                    "children": [
-                                                                        {
-                                                                            "name": "Aspergillus fumigatus Af293",
-                                                                            "children": []
-                                                                        }
-                                                                    ]
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "name": "Euglenozoa",
-                    "children": [
-                        {
-                            "name": "Kinetoplastea",
-                            "children": [
-                                {
-                                    "name": "Trypanosomatida",
-                                    "children": [
-                                        {
-                                            "name": "Trypanosomatidae",
-                                            "children": [
-                                                {
-                                                    "name": "Leishmania",
-                                                    "children": [
-                                                        {
-                                                            "name": "Leishmania donovani",
-                                                            "children": [
-                                                                {
-                                                                    "name": "Leishmania donovani Ld 2001",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Leishmania donovani donovani",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Leishmania donovani Ld 39",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Leishmania donovani BPK282A1",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Leishmania donovani archibaldi",
-                                                                    "children": []
-                                                                }
-                                                            ]
-                                                        },
-                                                        {
-                                                            "name": "Leishmania braziliensis",
-                                                            "children": [
-                                                                {
-                                                                    "name": "Leishmania braziliensis MHOM/BR/75/M2904",
-                                                                    "children": []
-                                                                }
-                                                            ]
-                                                        },
-                                                        {
-                                                            "name": "Leishmania major",
-                                                            "children": [
-                                                                {
-                                                                    "name": "Leishmania major strain Friedlin",
-                                                                    "children": []
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
-                                                },
-                                                {
-                                                    "name": "Trypanosoma",
-                                                    "children": [
-                                                        {
-                                                            "name": "Trypanosoma brucei",
-                                                            "children": [
-                                                                {
-                                                                    "name": "Trypanosoma brucei brucei TREU927",
-                                                                    "children": []
-                                                                }
-                                                            ]
-                                                        },
-                                                        {
-                                                            "name": "Trypanosoma cruzi",
-                                                            "children": [
-                                                                {
-                                                                    "name": "Trypanosoma sp. Panama 3",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Trypanosoma cruzi Tula cl2",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Trypanosoma cruzi cruzi",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Trypanosoma cruzi M6241 cl.6",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Trypanosoma cruzi ATCC 30160",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Trypanosoma sp. Panama 1",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Trypanosoma cruzi strain CL Brener",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Trypanosoma cruzi strain Esmeraldo",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Trypanosoma cruzi TRYCC 1522",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Trypanosoma sp. Panama 2",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Trypanosoma cruzi Dm28c",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Trypanosoma cruzi marinkellei",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Trypanosoma cruzi JR cl. 4",
+                                                                    "name": "Monkeypox virus",
+                                                                    "levelKey": "taxonomicLevelSpecies",
                                                                     "children": []
                                                                 }
                                                             ]
