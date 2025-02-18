@@ -37,6 +37,17 @@ const TAXANOMIC_LEVELS_FOR_TREE = [
 export const NodeDetails: React.FC<NodeDetailsProps> = ({ node }) => {
   const leafNodeCount = countLeafNodes(node);
   const taxonomicLevel = TAXANOMIC_LEVELS_FOR_TREE[node.depth] || "Unknown";
+  const isRoot = node.depth === 0;
+
+  if (isRoot) {
+    return (
+      <div>
+        <p style={{ fontSize: "1.1em", color: "#666" }}>
+          Click the visualization to explore available assemblies
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div>
