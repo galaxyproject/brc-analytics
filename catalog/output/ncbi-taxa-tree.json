@@ -1,6 +1,6 @@
 {
     "name": "root",
-    "levelKey": "taxonomicLevelOther",
+    "levelKey": null,
     "children": [
         {
             "name": "Viruses",

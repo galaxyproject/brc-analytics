@@ -71,10 +71,13 @@ def get_species_df(taxonomy_ids, taxonomic_group_sets):
 
 def ncbi_tree_to_nested_tree_and_taxa_levels(node_id, edges, taxa_info_by_id, taxa_levels_by_id, parent_taxon_levels={}):
   taxon_info = taxa_info_by_id.get(node_id, {"name": node_id, "level": None})
+  
   level_key = "taxonomicLevelOther" if taxon_info["level"] is None else f"taxonomicLevel{taxon_info["level"][0].upper()}{taxon_info["level"][1:].lower()}"
-
   taxon_levels = parent_taxon_levels.copy()
-  if node_id != "1":
+  
+  if node_id == "1":
+    level_key = None
+  else:
     taxon_levels[level_key] = taxon_info["name"]
   
   taxa_levels_by_id[node_id] = taxon_levels
