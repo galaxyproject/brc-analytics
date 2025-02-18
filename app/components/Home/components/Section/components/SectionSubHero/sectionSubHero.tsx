@@ -3,17 +3,20 @@ import {
   Section,
   SectionLayout,
   SectionSubLayout,
+  SmokeLightestBox,
+  StyledBox,
+  StyledButton,
   StyledGrid2,
   StyledTabs,
   Subhead,
+  TransparentBox,
 } from "./sectionSubHero.styles";
-import { StaticImage } from "@databiosphere/findable-ui/lib/components/common/StaticImage/staticImage";
-import { BUTTON, IMAGE, TAB } from "./constants";
+import { BUTTON, IMAGE, TAB } from "./instructions";
 import { Fragment, useState } from "react";
-import { Button, Tab, Typography } from "@mui/material";
+import { Fade, Slide, Tab, Typography } from "@mui/material";
 import { useCurrentBreakpoint } from "@databiosphere/findable-ui/lib/hooks/useCurrentBreakpoint";
-import { TabScrollFuzz } from "@databiosphere/findable-ui/lib/components/common/Tabs/tabs.styles";
 import { TEXT_BODY_LARGE_400 } from "@databiosphere/findable-ui/lib/theme/common/typography";
+import { FADE_PROPS, SLIDE_PROPS, TABS_PROPS } from "./constants";
 
 export const SectionSubHero = (): JSX.Element => {
   const bp = useCurrentBreakpoint() || "";
@@ -26,10 +29,9 @@ export const SectionSubHero = (): JSX.Element => {
             <SubHeroContent />
           </Subhead>
           <StyledTabs
-            allowScrollButtonsMobile
+            {...TABS_PROPS}
             onChange={(_, v) => setStep(v)}
             orientation={["md", "lg"].includes(bp) ? "vertical" : "horizontal"}
-            ScrollButtonComponent={TabScrollFuzz}
             value={step}
           >
             {Object.entries(TAB).map(([value, { description, label }]) => (
@@ -54,13 +56,21 @@ export const SectionSubHero = (): JSX.Element => {
           </StyledTabs>
         </SectionSubLayout>
         <StyledGrid2>
-          <StaticImage alt={TAB[step].label} src={IMAGE[step]} />
+          <SmokeLightestBox>
+            {Object.entries(IMAGE).map(([value, src]) => (
+              <Slide {...SLIDE_PROPS} key={value} in={step === value}>
+                <StyledBox sx={{ background: `url(${src})` }} />
+              </Slide>
+            ))}
+          </SmokeLightestBox>
+          <TransparentBox>
+            {Object.entries(BUTTON).map(([value, buttonProps]) => (
+              <Fade {...FADE_PROPS} key={value} in={step === value}>
+                <StyledButton {...buttonProps} />
+              </Fade>
+            ))}
+          </TransparentBox>
         </StyledGrid2>
-        {BUTTON[step] && (
-          <StyledGrid2>
-            <Button {...BUTTON[step]} />
-          </StyledGrid2>
-        )}
       </SectionLayout>
     </Section>
   );

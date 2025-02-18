@@ -9,11 +9,12 @@ import {
   sectionGrid,
   sectionLayout,
 } from "../../../../../Layout/components/AppLayout/components/Section/section.styles";
-import { Grid2, Tabs } from "@mui/material";
+import { Box, Button, Grid2, Tabs } from "@mui/material";
 import {
   mediaDesktopSmallDown,
   mediaTabletDown,
 } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
+import { smokeLightest } from "@databiosphere/findable-ui/lib/theme/common/palette";
 
 export const Section = styled.section`
   background-color: ${white};
@@ -146,17 +147,7 @@ export const StyledGrid2 = styled(Grid2)`
   display: grid;
   grid-column: 2;
   grid-row: 1;
-
-  img {
-    height: auto;
-    width: 100%;
-  }
-
-  .MuiButton-root {
-    align-self: flex-end;
-    justify-self: flex-start;
-    margin: 24px;
-  }
+  overflow: hidden;
 
   ${mediaDesktopSmallDown} {
     grid-column: 4 / -1;
@@ -166,4 +157,38 @@ export const StyledGrid2 = styled(Grid2)`
   ${mediaTabletDown} {
     grid-column: 2 / -1;
   }
+`;
+
+export const SmokeLightestBox = styled.div`
+  background-color: ${smokeLightest};
+  border-radius: 16px;
+  display: grid;
+  grid-column: 1;
+  grid-row: 1;
+  height: 628px;
+  padding: 56px 0 0 56px;
+  width: 768px;
+`;
+
+export const StyledBox = styled(Box)`
+  aspect-ratio: 1;
+  background-position: top left;
+  background-repeat: no-repeat;
+  background-size: auto 100%;
+  grid-column: 1;
+  grid-row: 1;
+`;
+
+export const TransparentBox = styled.div`
+  display: grid;
+  grid-column: 1;
+  grid-row: 1;
+`;
+
+export const StyledButton = styled(Button)`
+  align-self: flex-end;
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: flex-start;
+  margin: 24px;
 `;

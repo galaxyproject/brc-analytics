@@ -1,40 +1,22 @@
-import { ROUTES } from "../../../../../../../routes/constants";
-import {
-  COLOR,
-  VARIANT,
-} from "@databiosphere/findable-ui/lib/styles/common/mui/button";
-import { SIZE } from "@databiosphere/findable-ui/lib/styles/common/constants/size";
-import { ButtonProps } from "@mui/material";
+import { FadeProps, SlideProps, TabsProps } from "@mui/material";
+import { TabScrollFuzz } from "@databiosphere/findable-ui/lib/components/common/Tabs/tabs.styles";
 
-const BUTTON_PROPS: Partial<ButtonProps> = {
-  color: COLOR.SECONDARY,
-  size: SIZE.LARGE,
-  variant: VARIANT.CONTAINED,
+export const FADE_PROPS: Omit<FadeProps, "children"> = {
+  easing: "ease-in-out",
+  exit: false,
+  style: { transitionDelay: "500ms" },
+  timeout: 500,
 };
 
-export const BUTTON: Record<string, ButtonProps> = {
-  "0": {
-    ...BUTTON_PROPS,
-    children: "Discover Organisms",
-    href: ROUTES.ORGANISMS,
-  },
-  "1": {
-    ...BUTTON_PROPS,
-    children: "Discover Assemblies",
-    href: ROUTES.GENOMES,
-  },
+export const SLIDE_PROPS: Omit<SlideProps, "children"> = {
+  direction: "left",
+  easing: "cubic-bezier(0.22, 0.61, 0.36, 1)",
+  exit: false,
+  timeout: 800,
 };
 
-export const IMAGE: Record<string, string> = {
-  "0": "/main/select-an-organism.png",
-  "1": "/main/chose-genome-assembly.png",
-  "2": "/main/select-analysis-workflow.png",
-  "3": "/main/continue-in-galaxy.png",
-};
-
-export const TAB: Record<string, { description?: string; label: string }> = {
-  "0": { label: "Select an Organism" },
-  "1": { label: "Choose a Genome Assembly" },
-  "2": { label: "Select an Analysis Workflow" },
-  "3": { label: "Continue in Galaxy" },
+export const TABS_PROPS: TabsProps = {
+  ScrollButtonComponent: TabScrollFuzz,
+  TabIndicatorProps: { style: { transition: "none" } },
+  allowScrollButtonsMobile: true,
 };
