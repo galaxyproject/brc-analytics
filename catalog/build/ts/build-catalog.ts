@@ -76,7 +76,7 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
       taxonomicLevelOrder: parseStringOrNull(row.taxonomicLevelOrder),
       taxonomicLevelOther: parseStringOrNull(row.taxonomicLevelOther),
       taxonomicLevelPhylum: parseStringOrNull(row.taxonomicLevelPhylum),
-      taxonomicLevelSpecies: parseStringOrNull(row.taxonomicLevelSpecies),
+      taxonomicLevelSpecies: row.taxonomicLevelSpecies,
       taxonomicLevelStrain: parseStringOrNull(row.taxonomicLevelStrain),
       taxonomicLevelSuperkingdom: parseStringOrNull(row.taxonomicLevelSuperkingdom),
       ucscBrowserUrl: parseStringOrNull(row.ucscBrowser),

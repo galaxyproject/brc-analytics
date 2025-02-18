@@ -28,7 +28,7 @@ export interface BRCDataCatalogGenome {
   taxonomicLevelOrder: string | null;
   taxonomicLevelOther: string | null;
   taxonomicLevelPhylum: string | null;
-  taxonomicLevelSpecies: string | null;
+  taxonomicLevelSpecies: string;
   taxonomicLevelStrain: string | null;
   taxonomicLevelSuperkingdom: string | null;
   ucscBrowserUrl: string | null;
@@ -47,7 +47,7 @@ export interface BRCDataCatalogOrganism {
   taxonomicLevelOrder: string | null;
   taxonomicLevelOther: string[];
   taxonomicLevelPhylum: string | null;
-  taxonomicLevelSpecies: string | null;
+  taxonomicLevelSpecies: string;
   taxonomicLevelStrain: string[];
   taxonomicLevelSuperkingdom: string | null;
 }
