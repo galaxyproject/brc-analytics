@@ -69,10 +69,10 @@ def get_species_df(taxonomy_ids, taxonomic_group_sets):
   return pd.DataFrame([get_species_row(info, taxonomic_group_sets) for info in species_info])
 
 
-def ncbi_tree_to_nested_tree_and_taxa_levels(node_id, edges, taxa_info_by_id, taxa_levels_by_id, parent_taxon_levels={}):
+def ncbi_tree_to_nested_tree_and_taxa_levels(node_id, edges, taxonomic_levels, taxa_info_by_id, taxa_levels_by_id, parent_taxon_levels={}):
   taxon_info = taxa_info_by_id.get(node_id, {"name": node_id, "level": None})
   
-  level_key = "taxonomicLevelOther" if taxon_info["level"] is None else f"taxonomicLevel{taxon_info["level"][0].upper()}{taxon_info["level"][1:].lower()}"
+  level_key = "taxonomicLevelOther" if (taxon_info["level"] is None or taxon_info["level"] not in taxonomic_levels) else f"taxonomicLevel{taxon_info["level"][0].upper()}{taxon_info["level"][1:].lower()}"
   taxon_levels = parent_taxon_levels.copy()
   
   if node_id == "1":
@@ -91,7 +91,7 @@ def ncbi_tree_to_nested_tree_and_taxa_levels(node_id, edges, taxa_info_by_id, ta
   return {
       "name": taxon_info["name"],
       "levelKey": level_key,
-      "children": [ncbi_tree_to_nested_tree_and_taxa_levels(child, edges, taxa_info_by_id, taxa_levels_by_id, taxon_levels) for child in children]
+      "children": [ncbi_tree_to_nested_tree_and_taxa_levels(child, edges, taxonomic_levels, taxa_info_by_id, taxa_levels_by_id, taxon_levels) for child in children]
   }
 
 
@@ -117,7 +117,7 @@ def get_species_tree(taxonomy_ids, taxonomic_levels):
   taxa_info_by_id = {
     str(report["taxonomy"]["tax_id"]): {
       "name": report["taxonomy"]["current_scientific_name"]["name"],
-      "level": report["taxonomy"].get("rank")
+      "level": report["taxonomy"]["rank"].lower() if "rank" in report["taxonomy"] else None
     } for report in parent_taxa_info
   }
 
@@ -128,7 +128,7 @@ def get_species_tree(taxonomy_ids, taxonomic_levels):
           edges[root_id]["visible_children"].append(root_id_candidate)
 
   taxa_levels_by_id = {}
-  species_tree = ncbi_tree_to_nested_tree_and_taxa_levels(root_id, edges, taxa_info_by_id, taxa_levels_by_id)
+  species_tree = ncbi_tree_to_nested_tree_and_taxa_levels(root_id, edges, taxonomic_levels, taxa_info_by_id, taxa_levels_by_id)
 
   return species_tree, taxa_levels_by_id
 

@@ -777,7 +777,7 @@
         "taxonomicLevelGenus": "Plasmodium",
         "taxonomicLevelKingdom": null,
         "taxonomicLevelOrder": "Haemosporida",
-        "taxonomicLevelOther": null,
+        "taxonomicLevelOther": "Plasmodium falciparum 3D7",
         "taxonomicLevelPhylum": "Apicomplexa",
         "taxonomicLevelSpecies": "Plasmodium falciparum",
         "taxonomicLevelStrain": null,
@@ -794,7 +794,9 @@
     "taxonomicLevelGenus": "Plasmodium",
     "taxonomicLevelKingdom": null,
     "taxonomicLevelOrder": "Haemosporida",
-    "taxonomicLevelOther": [],
+    "taxonomicLevelOther": [
+      "Plasmodium falciparum 3D7"
+    ],
     "taxonomicLevelPhylum": "Apicomplexa",
     "taxonomicLevelSpecies": "Plasmodium falciparum",
     "taxonomicLevelStrain": [],
@@ -920,7 +922,7 @@
         "taxonomicLevelGenus": "Plasmodium",
         "taxonomicLevelKingdom": null,
         "taxonomicLevelOrder": "Haemosporida",
-        "taxonomicLevelOther": null,
+        "taxonomicLevelOther": "Plasmodium vinckei vinckei",
         "taxonomicLevelPhylum": "Apicomplexa",
         "taxonomicLevelSpecies": "Plasmodium vinckei",
         "taxonomicLevelStrain": null,
@@ -937,7 +939,9 @@
     "taxonomicLevelGenus": "Plasmodium",
     "taxonomicLevelKingdom": null,
     "taxonomicLevelOrder": "Haemosporida",
-    "taxonomicLevelOther": [],
+    "taxonomicLevelOther": [
+      "Plasmodium vinckei vinckei"
+    ],
     "taxonomicLevelPhylum": "Apicomplexa",
     "taxonomicLevelSpecies": "Plasmodium vinckei",
     "taxonomicLevelStrain": [],
@@ -1178,7 +1182,7 @@
         "taxonomicLevelGenus": "Culex",
         "taxonomicLevelKingdom": "Metazoa",
         "taxonomicLevelOrder": "Diptera",
-        "taxonomicLevelOther": null,
+        "taxonomicLevelOther": "Culex pipiens pallens",
         "taxonomicLevelPhylum": "Arthropoda",
         "taxonomicLevelSpecies": "Culex pipiens",
         "taxonomicLevelStrain": null,
@@ -1195,7 +1199,9 @@
     "taxonomicLevelGenus": "Culex",
     "taxonomicLevelKingdom": "Metazoa",
     "taxonomicLevelOrder": "Diptera",
-    "taxonomicLevelOther": [],
+    "taxonomicLevelOther": [
+      "Culex pipiens pallens"
+    ],
     "taxonomicLevelPhylum": "Arthropoda",
     "taxonomicLevelSpecies": "Culex pipiens",
     "taxonomicLevelStrain": [],

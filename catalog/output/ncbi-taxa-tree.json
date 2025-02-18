@@ -200,7 +200,7 @@
                                                                     "children": [
                                                                         {
                                                                             "name": "Culex pipiens pallens",
-                                                                            "levelKey": "taxonomicLevelSubspecies",
+                                                                            "levelKey": "taxonomicLevelOther",
                                                                             "children": []
                                                                         }
                                                                     ]
@@ -211,7 +211,7 @@
                                                                     "children": [
                                                                         {
                                                                             "name": "Culex quinquefasciatus quinquefasciatus",
-                                                                            "levelKey": "taxonomicLevelSubspecies",
+                                                                            "levelKey": "taxonomicLevelOther",
                                                                             "children": []
                                                                         }
                                                                     ]
@@ -275,7 +275,7 @@
                                                                 },
                                                                 {
                                                                     "name": "Leishmania donovani archibaldi",
-                                                                    "levelKey": "taxonomicLevelSubspecies",
+                                                                    "levelKey": "taxonomicLevelOther",
                                                                     "children": []
                                                                 },
                                                                 {
@@ -285,7 +285,7 @@
                                                                 },
                                                                 {
                                                                     "name": "Leishmania donovani donovani",
-                                                                    "levelKey": "taxonomicLevelSubspecies",
+                                                                    "levelKey": "taxonomicLevelOther",
                                                                     "children": []
                                                                 }
                                                             ]
@@ -354,7 +354,7 @@
                                                                 },
                                                                 {
                                                                     "name": "Trypanosoma cruzi ATCC 30160",
-                                                                    "levelKey": "taxonomicLevelSubspecies",
+                                                                    "levelKey": "taxonomicLevelOther",
                                                                     "children": []
                                                                 },
                                                                 {
@@ -374,12 +374,12 @@
                                                                 },
                                                                 {
                                                                     "name": "Trypanosoma cruzi marinkellei",
-                                                                    "levelKey": "taxonomicLevelSubspecies",
+                                                                    "levelKey": "taxonomicLevelOther",
                                                                     "children": []
                                                                 },
                                                                 {
                                                                     "name": "Trypanosoma cruzi cruzi",
-                                                                    "levelKey": "taxonomicLevelSubspecies",
+                                                                    "levelKey": "taxonomicLevelOther",
                                                                     "children": []
                                                                 },
                                                                 {
@@ -628,7 +628,7 @@
                                                             "children": [
                                                                 {
                                                                     "name": "Plasmodium falciparum 3D7",
-                                                                    "levelKey": "taxonomicLevelIsolate",
+                                                                    "levelKey": "taxonomicLevelOther",
                                                                     "children": []
                                                                 }
                                                             ]
@@ -680,7 +680,7 @@
                                                             "children": [
                                                                 {
                                                                     "name": "Plasmodium vinckei vinckei",
-                                                                    "levelKey": "taxonomicLevelSubspecies",
+                                                                    "levelKey": "taxonomicLevelOther",
                                                                     "children": []
                                                                 }
                                                             ]
@@ -706,17 +706,17 @@
                                                                 },
                                                                 {
                                                                     "name": "Plasmodium yoelii killicki",
-                                                                    "levelKey": "taxonomicLevelSubspecies",
+                                                                    "levelKey": "taxonomicLevelOther",
                                                                     "children": []
                                                                 },
                                                                 {
                                                                     "name": "Plasmodium yoelii nigeriensis",
-                                                                    "levelKey": "taxonomicLevelSubspecies",
+                                                                    "levelKey": "taxonomicLevelOther",
                                                                     "children": []
                                                                 },
                                                                 {
                                                                     "name": "Plasmodium yoelii yoelii",
-                                                                    "levelKey": "taxonomicLevelSubspecies",
+                                                                    "levelKey": "taxonomicLevelOther",
                                                                     "children": []
                                                                 }
                                                             ]
