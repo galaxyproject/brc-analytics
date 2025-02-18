@@ -13,12 +13,13 @@ import {
   TransparentBox,
 } from "./sectionSubHero.styles";
 import { ACCORDION, BUTTON, IMAGE } from "./instructions";
-import { useState } from "react";
 import { AccordionDetails, AccordionSummary, Fade, Slide } from "@mui/material";
 import { ACCORDION_PROPS, FADE_PROPS, SLIDE_PROPS } from "./constants";
+import { useAutoCycle } from "./hooks";
 
 export const SectionSubHero = (): JSX.Element => {
-  const [step, setStep] = useState<string>("0");
+  const accordionKeys = Object.keys(ACCORDION);
+  const { activeIndex, onSelectIndex } = useAutoCycle(accordionKeys);
   return (
     <Section>
       <SectionLayout>
@@ -31,12 +32,11 @@ export const SectionSubHero = (): JSX.Element => {
               <StyledAccordion
                 {...ACCORDION_PROPS}
                 key={value}
-                disabled={!details}
-                expanded={step === value}
-                onClick={() => setStep(value)}
+                expanded={activeIndex === value}
+                onClick={() => onSelectIndex(value)}
               >
                 <AccordionSummary>{title}</AccordionSummary>
-                <AccordionDetails>{details}</AccordionDetails>
+                {details && <AccordionDetails>{details}</AccordionDetails>}
               </StyledAccordion>
             ))}
           </AccordionBox>
@@ -44,14 +44,14 @@ export const SectionSubHero = (): JSX.Element => {
         <StyledGrid2>
           <SmokeLightestBox>
             {Object.entries(IMAGE).map(([value, src]) => (
-              <Slide {...SLIDE_PROPS} key={value} in={step === value}>
+              <Slide {...SLIDE_PROPS} key={value} in={activeIndex === value}>
                 <StyledBox sx={{ background: `url(${src})` }} />
               </Slide>
             ))}
           </SmokeLightestBox>
           <TransparentBox>
             {Object.entries(BUTTON).map(([value, buttonProps]) => (
-              <Fade {...FADE_PROPS} key={value} in={step === value}>
+              <Fade {...FADE_PROPS} key={value} in={activeIndex === value}>
                 <StyledButton {...buttonProps} />
               </Fade>
             ))}
