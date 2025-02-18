@@ -82,7 +82,8 @@ def ncbi_tree_to_nested_tree_and_taxa_levels(node_id, edges, taxa_info_by_id, ta
   children = edges.get(node_id, {}).get("visible_children", [])
   children = [str(num) for num in children]
   # ncbi results odd again, dup children
-  children = set(children)
+  # sorting to make diffs on output data more meaningful
+  children = sorted(set(children))
 
   return {
       "name": taxon_info["name"],
