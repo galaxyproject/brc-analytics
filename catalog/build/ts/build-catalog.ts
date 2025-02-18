@@ -69,6 +69,16 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
       speciesTaxonomyId: row.speciesTaxonomyId,
       strain: parseStringOrNull(row.strain),
       taxonomicGroup: row.taxonomicGroup ? row.taxonomicGroup.split(",") : [],
+      taxonomicLevelClass: parseStringOrNull(row.taxonomicLevelClass),
+      taxonomicLevelFamily: parseStringOrNull(row.taxonomicLevelFamily),
+      taxonomicLevelGenus: parseStringOrNull(row.taxonomicLevelGenus),
+      taxonomicLevelKingdom: parseStringOrNull(row.taxonomicLevelKingdom),
+      taxonomicLevelOrder: parseStringOrNull(row.taxonomicLevelOrder),
+      taxonomicLevelOther: parseStringOrNull(row.taxonomicLevelOther),
+      taxonomicLevelPhylum: parseStringOrNull(row.taxonomicLevelPhylum),
+      taxonomicLevelSpecies: parseStringOrNull(row.taxonomicLevelSpecies),
+      taxonomicLevelStrain: parseStringOrNull(row.taxonomicLevelStrain),
+      taxonomicLevelSuperkingdom: parseStringOrNull(row.taxonomicLevelSuperkingdom),
       ucscBrowserUrl: parseStringOrNull(row.ucscBrowser),
     });
   }
@@ -96,13 +106,21 @@ function buildOrganism(
 ): BRCDataCatalogOrganism {
   return {
     assemblyCount: (organism?.assemblyCount ?? 0) + 1,
-    assemblyTaxonomyIds: Array.from(
-      new Set([...(organism?.assemblyTaxonomyIds ?? []), genome.ncbiTaxonomyId])
-    ),
-    genomes: [...(organism?.genomes ?? []), genome],
+    assemblyTaxonomyIds: accumulateArrayValue(organism?.assemblyTaxonomyIds, genome.ncbiTaxonomyId),
+    genomes: accumulateArrayValue(organism?.genomes, genome),
     ncbiTaxonomyId: genome.speciesTaxonomyId,
     species: genome.species,
     taxonomicGroup: genome.taxonomicGroup,
+    taxonomicLevelClass: genome.taxonomicLevelClass,
+    taxonomicLevelFamily: genome.taxonomicLevelFamily,
+    taxonomicLevelGenus: genome.taxonomicLevelGenus,
+    taxonomicLevelKingdom: genome.taxonomicLevelKingdom,
+    taxonomicLevelOrder: genome.taxonomicLevelOrder,
+    taxonomicLevelOther: accumulateNullableArrayValue(organism?.taxonomicLevelOther, genome.taxonomicLevelOther),
+    taxonomicLevelPhylum: genome.taxonomicLevelPhylum,
+    taxonomicLevelSpecies: genome.taxonomicLevelSpecies,
+    taxonomicLevelStrain: accumulateNullableArrayValue(organism?.taxonomicLevelStrain, genome.taxonomicLevelStrain),
+    taxonomicLevelSuperkingdom: genome.taxonomicLevelSuperkingdom,
   };
 }
 
@@ -172,6 +190,16 @@ async function readYamlFile<T>(filePath: string): Promise<T> {
 
 async function saveJson(filePath: string, data: unknown): Promise<void> {
   await fsp.writeFile(filePath, JSON.stringify(data, undefined, 2) + "\n");
+}
+
+function accumulateNullableArrayValue<T>(array: T[] | undefined, value: T | null): T[] {
+  return value === null ? array ?? [] : accumulateArrayValue(array, value);
+}
+
+function accumulateArrayValue<T>(array: T[] | undefined, value: T): T[] {
+  if (!array) return [value];
+  if (array.includes(value)) return array;
+  return [...array, value];
 }
 
 function parseStringOrNull(value: string): string | null {

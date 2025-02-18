@@ -21,6 +21,16 @@ export interface BRCDataCatalogGenome {
   speciesTaxonomyId: string;
   strain: string | null;
   taxonomicGroup: string[];
+  taxonomicLevelClass: string | null;
+  taxonomicLevelFamily: string | null;
+  taxonomicLevelGenus: string | null;
+  taxonomicLevelKingdom: string | null;
+  taxonomicLevelOrder: string | null;
+  taxonomicLevelOther: string | null;
+  taxonomicLevelPhylum: string | null;
+  taxonomicLevelSpecies: string | null;
+  taxonomicLevelStrain: string | null;
+  taxonomicLevelSuperkingdom: string | null;
   ucscBrowserUrl: string | null;
 }
 
@@ -31,6 +41,16 @@ export interface BRCDataCatalogOrganism {
   ncbiTaxonomyId: string;
   species: string;
   taxonomicGroup: string[];
+  taxonomicLevelClass: string | null;
+  taxonomicLevelFamily: string | null;
+  taxonomicLevelGenus: string | null;
+  taxonomicLevelKingdom: string | null;
+  taxonomicLevelOrder: string | null;
+  taxonomicLevelOther: string[];
+  taxonomicLevelPhylum: string | null;
+  taxonomicLevelSpecies: string | null;
+  taxonomicLevelStrain: string[];
+  taxonomicLevelSuperkingdom: string | null;
 }
 
 export interface EntitiesResponse<R> {

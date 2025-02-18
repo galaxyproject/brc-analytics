@@ -15,6 +15,16 @@ export interface SourceGenome {
   speciesTaxonomyId: string;
   strain: string;
   taxonomicGroup: string;
+  taxonomicLevelClass: string;
+  taxonomicLevelFamily: string;
+  taxonomicLevelGenus: string;
+  taxonomicLevelKingdom: string;
+  taxonomicLevelOrder: string;
+  taxonomicLevelOther: string;
+  taxonomicLevelPhylum: string;
+  taxonomicLevelSpecies: string;
+  taxonomicLevelStrain: string;
+  taxonomicLevelSuperkingdom: string;
   taxonomyId: string;
   ucscBrowser: string;
 }
