@@ -74,7 +74,8 @@ def ncbi_tree_to_nested_tree_and_taxa_levels(node_id, edges, taxa_info_by_id, ta
   level_key = "taxonomicLevelOther" if taxon_info["level"] is None else f"taxonomicLevel{taxon_info["level"][0].upper()}{taxon_info["level"][1:].lower()}"
 
   taxon_levels = parent_taxon_levels.copy()
-  taxon_levels[level_key] = taxon_info["name"]
+  if node_id != "1":
+    taxon_levels[level_key] = taxon_info["name"]
   
   taxa_levels_by_id[node_id] = taxon_levels
 
