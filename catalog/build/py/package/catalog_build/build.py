@@ -79,15 +79,19 @@ def get_species_df(taxonomy_ids, taxonomic_group_sets, taxonomic_levels):
   return pd.DataFrame([get_species_row(info, taxonomic_group_sets, taxonomic_levels) for info in species_info])
 
 
-def ncbi_tree_to_nested_tree(node_id, edges):
+def ncbi_tree_to_nested_tree(node_id, edges, taxonomy_ids):
   children = edges.get(str(node_id), {}).get("visible_children", [])
   children = [str(num) for num in children]
   # ncbi results odd again, dup children
   children = set(children)
-  return {
+  if (len(children) > 0 or node_id in taxonomy_ids):
+    child_trees = [ncbi_tree_to_nested_tree(child, edges, taxonomy_ids) for child in children]
+    child_trees = [item for item in child_trees if item is not None]
+    return {
       "name": node_id,
-      "children": [ncbi_tree_to_nested_tree(child, edges) for child in children]
-  }
+      "ncbi_tax_id": node_id,
+      "children": child_trees
+    }
 
 def update_species_tree_names(tree, taxon_name_map):
     tree["name"] = taxon_name_map.get(tree["name"], tree["name"])
@@ -115,7 +119,7 @@ def get_species_tree(taxonomy_ids, taxonomic_levels):
       if root_id_candidate != root_id:
           edges[root_id]["visible_children"].append(root_id_candidate)
 
-  species_tree = ncbi_tree_to_nested_tree(root_id, edges)
+  species_tree = ncbi_tree_to_nested_tree(root_id, edges, taxonomy_ids)
 
   # Find the set of all unique tax_ids and their display names
   tax_ids = all_children + root_ids
