@@ -21,15 +21,15 @@ export interface BRCDataCatalogGenome {
   speciesTaxonomyId: string;
   strain: string | null;
   taxonomicGroup: string[];
-  taxonomicLevelClass: string | null;
-  taxonomicLevelFamily: string | null;
-  taxonomicLevelGenus: string | null;
-  taxonomicLevelKingdom: string | null;
-  taxonomicLevelOrder: string | null;
-  taxonomicLevelPhylum: string | null;
+  taxonomicLevelClass: string;
+  taxonomicLevelFamily: string;
+  taxonomicLevelGenus: string;
+  taxonomicLevelKingdom: string;
+  taxonomicLevelOrder: string;
+  taxonomicLevelPhylum: string;
   taxonomicLevelSpecies: string;
-  taxonomicLevelStrain: string | null;
-  taxonomicLevelSuperkingdom: string | null;
+  taxonomicLevelStrain: string;
+  taxonomicLevelSuperkingdom: string;
   ucscBrowserUrl: string | null;
 }
 
@@ -39,15 +39,15 @@ export interface BRCDataCatalogOrganism {
   genomes: BRCDataCatalogGenome[];
   ncbiTaxonomyId: string;
   taxonomicGroup: string[];
-  taxonomicLevelClass: string | null;
-  taxonomicLevelFamily: string | null;
-  taxonomicLevelGenus: string | null;
-  taxonomicLevelKingdom: string | null;
-  taxonomicLevelOrder: string | null;
-  taxonomicLevelPhylum: string | null;
+  taxonomicLevelClass: string;
+  taxonomicLevelFamily: string;
+  taxonomicLevelGenus: string;
+  taxonomicLevelKingdom: string;
+  taxonomicLevelOrder: string;
+  taxonomicLevelPhylum: string;
   taxonomicLevelSpecies: string;
   taxonomicLevelStrain: string[];
-  taxonomicLevelSuperkingdom: string | null;
+  taxonomicLevelSuperkingdom: string;
 }
 
 export interface EntitiesResponse<R> {

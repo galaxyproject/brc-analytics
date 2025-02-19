@@ -70,15 +70,15 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
       speciesTaxonomyId: row.speciesTaxonomyId,
       strain: parseStringOrNull(row.strain),
       taxonomicGroup: row.taxonomicGroup ? row.taxonomicGroup.split(",") : [],
-      taxonomicLevelClass: parseStringOrNull(row.taxonomicLevelClass),
-      taxonomicLevelFamily: parseStringOrNull(row.taxonomicLevelFamily),
-      taxonomicLevelGenus: parseStringOrNull(row.taxonomicLevelGenus),
-      taxonomicLevelKingdom: parseStringOrNull(row.taxonomicLevelKingdom),
-      taxonomicLevelOrder: parseStringOrNull(row.taxonomicLevelOrder),
-      taxonomicLevelPhylum: parseStringOrNull(row.taxonomicLevelPhylum),
-      taxonomicLevelSpecies: row.taxonomicLevelSpecies,
-      taxonomicLevelStrain: parseStringOrNull(row.taxonomicLevelStrain),
-      taxonomicLevelSuperkingdom: parseStringOrNull(row.taxonomicLevelSuperkingdom),
+      taxonomicLevelClass: defaultStringToNone(row.taxonomicLevelClass),
+      taxonomicLevelFamily: defaultStringToNone(row.taxonomicLevelFamily),
+      taxonomicLevelGenus: defaultStringToNone(row.taxonomicLevelGenus),
+      taxonomicLevelKingdom: defaultStringToNone(row.taxonomicLevelKingdom),
+      taxonomicLevelOrder: defaultStringToNone(row.taxonomicLevelOrder),
+      taxonomicLevelPhylum: defaultStringToNone(row.taxonomicLevelPhylum),
+      taxonomicLevelSpecies: defaultStringToNone(row.taxonomicLevelSpecies),
+      taxonomicLevelStrain: defaultStringToNone(row.taxonomicLevelStrain),
+      taxonomicLevelSuperkingdom: defaultStringToNone(row.taxonomicLevelSuperkingdom),
       ucscBrowserUrl: parseStringOrNull(row.ucscBrowser),
     });
   }
@@ -117,7 +117,7 @@ function buildOrganism(
     taxonomicLevelOrder: genome.taxonomicLevelOrder,
     taxonomicLevelPhylum: genome.taxonomicLevelPhylum,
     taxonomicLevelSpecies: genome.taxonomicLevelSpecies,
-    taxonomicLevelStrain: accumulateNullableArrayValue(organism?.taxonomicLevelStrain, genome.taxonomicLevelStrain),
+    taxonomicLevelStrain: accumulateArrayValue(organism?.taxonomicLevelStrain, genome.taxonomicLevelStrain),
     taxonomicLevelSuperkingdom: genome.taxonomicLevelSuperkingdom,
   };
 }
@@ -198,14 +198,14 @@ async function saveJson(filePath: string, data: unknown): Promise<void> {
   await fsp.writeFile(filePath, JSON.stringify(data, undefined, 2) + "\n");
 }
 
-function accumulateNullableArrayValue<T>(array: T[] | undefined, value: T | null): T[] {
-  return value === null ? array ?? [] : accumulateArrayValue(array, value);
-}
-
 function accumulateArrayValue<T>(array: T[] | undefined, value: T): T[] {
   if (!array) return [value];
   if (array.includes(value)) return array;
   return [...array, value];
+}
+
+function defaultStringToNone(value: string): string {
+  return value || "None";
 }
 
 function parseStringOrNull(value: string): string | null {

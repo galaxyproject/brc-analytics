@@ -33,7 +33,7 @@
         "taxonomicLevelOrder": "Chitovirales",
         "taxonomicLevelPhylum": "Nucleocytoviricota",
         "taxonomicLevelSpecies": "Monkeypox virus",
-        "taxonomicLevelStrain": null,
+        "taxonomicLevelStrain": "None",
         "taxonomicLevelSuperkingdom": "Viruses",
         "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000857045.1"
       }
@@ -49,7 +49,9 @@
     "taxonomicLevelOrder": "Chitovirales",
     "taxonomicLevelPhylum": "Nucleocytoviricota",
     "taxonomicLevelSpecies": "Monkeypox virus",
-    "taxonomicLevelStrain": [],
+    "taxonomicLevelStrain": [
+      "None"
+    ],
     "taxonomicLevelSuperkingdom": "Viruses"
   },
   {
@@ -423,7 +425,7 @@
         "taxonomicLevelClass": "Kinetoplastea",
         "taxonomicLevelFamily": "Trypanosomatidae",
         "taxonomicLevelGenus": "Leishmania",
-        "taxonomicLevelKingdom": null,
+        "taxonomicLevelKingdom": "None",
         "taxonomicLevelOrder": "Trypanosomatida",
         "taxonomicLevelPhylum": "Euglenozoa",
         "taxonomicLevelSpecies": "Leishmania braziliensis",
@@ -439,7 +441,7 @@
     "taxonomicLevelClass": "Kinetoplastea",
     "taxonomicLevelFamily": "Trypanosomatidae",
     "taxonomicLevelGenus": "Leishmania",
-    "taxonomicLevelKingdom": null,
+    "taxonomicLevelKingdom": "None",
     "taxonomicLevelOrder": "Trypanosomatida",
     "taxonomicLevelPhylum": "Euglenozoa",
     "taxonomicLevelSpecies": "Leishmania braziliensis",
@@ -478,11 +480,11 @@
         "taxonomicLevelClass": "Kinetoplastea",
         "taxonomicLevelFamily": "Trypanosomatidae",
         "taxonomicLevelGenus": "Leishmania",
-        "taxonomicLevelKingdom": null,
+        "taxonomicLevelKingdom": "None",
         "taxonomicLevelOrder": "Trypanosomatida",
         "taxonomicLevelPhylum": "Euglenozoa",
         "taxonomicLevelSpecies": "Leishmania donovani",
-        "taxonomicLevelStrain": null,
+        "taxonomicLevelStrain": "None",
         "taxonomicLevelSuperkingdom": "Eukaryota",
         "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000227135.1"
       }
@@ -494,11 +496,13 @@
     "taxonomicLevelClass": "Kinetoplastea",
     "taxonomicLevelFamily": "Trypanosomatidae",
     "taxonomicLevelGenus": "Leishmania",
-    "taxonomicLevelKingdom": null,
+    "taxonomicLevelKingdom": "None",
     "taxonomicLevelOrder": "Trypanosomatida",
     "taxonomicLevelPhylum": "Euglenozoa",
     "taxonomicLevelSpecies": "Leishmania donovani",
-    "taxonomicLevelStrain": [],
+    "taxonomicLevelStrain": [
+      "None"
+    ],
     "taxonomicLevelSuperkingdom": "Eukaryota"
   },
   {
@@ -531,7 +535,7 @@
         "taxonomicLevelClass": "Kinetoplastea",
         "taxonomicLevelFamily": "Trypanosomatidae",
         "taxonomicLevelGenus": "Leishmania",
-        "taxonomicLevelKingdom": null,
+        "taxonomicLevelKingdom": "None",
         "taxonomicLevelOrder": "Trypanosomatida",
         "taxonomicLevelPhylum": "Euglenozoa",
         "taxonomicLevelSpecies": "Leishmania major",
@@ -547,7 +551,7 @@
     "taxonomicLevelClass": "Kinetoplastea",
     "taxonomicLevelFamily": "Trypanosomatidae",
     "taxonomicLevelGenus": "Leishmania",
-    "taxonomicLevelKingdom": null,
+    "taxonomicLevelKingdom": "None",
     "taxonomicLevelOrder": "Trypanosomatida",
     "taxonomicLevelPhylum": "Euglenozoa",
     "taxonomicLevelSpecies": "Leishmania major",
@@ -586,7 +590,7 @@
         "taxonomicLevelClass": "Kinetoplastea",
         "taxonomicLevelFamily": "Trypanosomatidae",
         "taxonomicLevelGenus": "Trypanosoma",
-        "taxonomicLevelKingdom": null,
+        "taxonomicLevelKingdom": "None",
         "taxonomicLevelOrder": "Trypanosomatida",
         "taxonomicLevelPhylum": "Euglenozoa",
         "taxonomicLevelSpecies": "Trypanosoma brucei",
@@ -602,7 +606,7 @@
     "taxonomicLevelClass": "Kinetoplastea",
     "taxonomicLevelFamily": "Trypanosomatidae",
     "taxonomicLevelGenus": "Trypanosoma",
-    "taxonomicLevelKingdom": null,
+    "taxonomicLevelKingdom": "None",
     "taxonomicLevelOrder": "Trypanosomatida",
     "taxonomicLevelPhylum": "Euglenozoa",
     "taxonomicLevelSpecies": "Trypanosoma brucei",
@@ -641,11 +645,11 @@
         "taxonomicLevelClass": "Kinetoplastea",
         "taxonomicLevelFamily": "Trypanosomatidae",
         "taxonomicLevelGenus": "Trypanosoma",
-        "taxonomicLevelKingdom": null,
+        "taxonomicLevelKingdom": "None",
         "taxonomicLevelOrder": "Trypanosomatida",
         "taxonomicLevelPhylum": "Euglenozoa",
         "taxonomicLevelSpecies": "Trypanosoma cruzi",
-        "taxonomicLevelStrain": null,
+        "taxonomicLevelStrain": "None",
         "taxonomicLevelSuperkingdom": "Eukaryota",
         "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000209065.1"
       }
@@ -657,11 +661,13 @@
     "taxonomicLevelClass": "Kinetoplastea",
     "taxonomicLevelFamily": "Trypanosomatidae",
     "taxonomicLevelGenus": "Trypanosoma",
-    "taxonomicLevelKingdom": null,
+    "taxonomicLevelKingdom": "None",
     "taxonomicLevelOrder": "Trypanosomatida",
     "taxonomicLevelPhylum": "Euglenozoa",
     "taxonomicLevelSpecies": "Trypanosoma cruzi",
-    "taxonomicLevelStrain": [],
+    "taxonomicLevelStrain": [
+      "None"
+    ],
     "taxonomicLevelSuperkingdom": "Eukaryota"
   },
   {
@@ -694,7 +700,7 @@
         "taxonomicLevelClass": "Conoidasida",
         "taxonomicLevelFamily": "Sarcocystidae",
         "taxonomicLevelGenus": "Toxoplasma",
-        "taxonomicLevelKingdom": null,
+        "taxonomicLevelKingdom": "None",
         "taxonomicLevelOrder": "Eucoccidiorida",
         "taxonomicLevelPhylum": "Apicomplexa",
         "taxonomicLevelSpecies": "Toxoplasma gondii",
@@ -710,7 +716,7 @@
     "taxonomicLevelClass": "Conoidasida",
     "taxonomicLevelFamily": "Sarcocystidae",
     "taxonomicLevelGenus": "Toxoplasma",
-    "taxonomicLevelKingdom": null,
+    "taxonomicLevelKingdom": "None",
     "taxonomicLevelOrder": "Eucoccidiorida",
     "taxonomicLevelPhylum": "Apicomplexa",
     "taxonomicLevelSpecies": "Toxoplasma gondii",
@@ -749,11 +755,11 @@
         "taxonomicLevelClass": "Aconoidasida",
         "taxonomicLevelFamily": "Plasmodiidae",
         "taxonomicLevelGenus": "Plasmodium",
-        "taxonomicLevelKingdom": null,
+        "taxonomicLevelKingdom": "None",
         "taxonomicLevelOrder": "Haemosporida",
         "taxonomicLevelPhylum": "Apicomplexa",
         "taxonomicLevelSpecies": "Plasmodium falciparum",
-        "taxonomicLevelStrain": null,
+        "taxonomicLevelStrain": "None",
         "taxonomicLevelSuperkingdom": "Eukaryota",
         "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002765.6"
       }
@@ -765,11 +771,13 @@
     "taxonomicLevelClass": "Aconoidasida",
     "taxonomicLevelFamily": "Plasmodiidae",
     "taxonomicLevelGenus": "Plasmodium",
-    "taxonomicLevelKingdom": null,
+    "taxonomicLevelKingdom": "None",
     "taxonomicLevelOrder": "Haemosporida",
     "taxonomicLevelPhylum": "Apicomplexa",
     "taxonomicLevelSpecies": "Plasmodium falciparum",
-    "taxonomicLevelStrain": [],
+    "taxonomicLevelStrain": [
+      "None"
+    ],
     "taxonomicLevelSuperkingdom": "Eukaryota"
   },
   {
@@ -802,11 +810,11 @@
         "taxonomicLevelClass": "Aconoidasida",
         "taxonomicLevelFamily": "Plasmodiidae",
         "taxonomicLevelGenus": "Plasmodium",
-        "taxonomicLevelKingdom": null,
+        "taxonomicLevelKingdom": "None",
         "taxonomicLevelOrder": "Haemosporida",
         "taxonomicLevelPhylum": "Apicomplexa",
         "taxonomicLevelSpecies": "Plasmodium vivax",
-        "taxonomicLevelStrain": null,
+        "taxonomicLevelStrain": "None",
         "taxonomicLevelSuperkingdom": "Eukaryota",
         "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900093555.2"
       },
@@ -834,11 +842,11 @@
         "taxonomicLevelClass": "Aconoidasida",
         "taxonomicLevelFamily": "Plasmodiidae",
         "taxonomicLevelGenus": "Plasmodium",
-        "taxonomicLevelKingdom": null,
+        "taxonomicLevelKingdom": "None",
         "taxonomicLevelOrder": "Haemosporida",
         "taxonomicLevelPhylum": "Apicomplexa",
         "taxonomicLevelSpecies": "Plasmodium vivax",
-        "taxonomicLevelStrain": null,
+        "taxonomicLevelStrain": "None",
         "taxonomicLevelSuperkingdom": "Eukaryota",
         "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002415.2"
       }
@@ -850,11 +858,13 @@
     "taxonomicLevelClass": "Aconoidasida",
     "taxonomicLevelFamily": "Plasmodiidae",
     "taxonomicLevelGenus": "Plasmodium",
-    "taxonomicLevelKingdom": null,
+    "taxonomicLevelKingdom": "None",
     "taxonomicLevelOrder": "Haemosporida",
     "taxonomicLevelPhylum": "Apicomplexa",
     "taxonomicLevelSpecies": "Plasmodium vivax",
-    "taxonomicLevelStrain": [],
+    "taxonomicLevelStrain": [
+      "None"
+    ],
     "taxonomicLevelSuperkingdom": "Eukaryota"
   },
   {
@@ -887,11 +897,11 @@
         "taxonomicLevelClass": "Aconoidasida",
         "taxonomicLevelFamily": "Plasmodiidae",
         "taxonomicLevelGenus": "Plasmodium",
-        "taxonomicLevelKingdom": null,
+        "taxonomicLevelKingdom": "None",
         "taxonomicLevelOrder": "Haemosporida",
         "taxonomicLevelPhylum": "Apicomplexa",
         "taxonomicLevelSpecies": "Plasmodium vinckei",
-        "taxonomicLevelStrain": null,
+        "taxonomicLevelStrain": "None",
         "taxonomicLevelSuperkingdom": "Eukaryota",
         "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_900681995.1"
       }
@@ -903,11 +913,13 @@
     "taxonomicLevelClass": "Aconoidasida",
     "taxonomicLevelFamily": "Plasmodiidae",
     "taxonomicLevelGenus": "Plasmodium",
-    "taxonomicLevelKingdom": null,
+    "taxonomicLevelKingdom": "None",
     "taxonomicLevelOrder": "Haemosporida",
     "taxonomicLevelPhylum": "Apicomplexa",
     "taxonomicLevelSpecies": "Plasmodium vinckei",
-    "taxonomicLevelStrain": [],
+    "taxonomicLevelStrain": [
+      "None"
+    ],
     "taxonomicLevelSuperkingdom": "Eukaryota"
   },
   {
@@ -940,11 +952,11 @@
         "taxonomicLevelClass": "Aconoidasida",
         "taxonomicLevelFamily": "Plasmodiidae",
         "taxonomicLevelGenus": "Plasmodium",
-        "taxonomicLevelKingdom": null,
+        "taxonomicLevelKingdom": "None",
         "taxonomicLevelOrder": "Haemosporida",
         "taxonomicLevelPhylum": "Apicomplexa",
         "taxonomicLevelSpecies": "Plasmodium yoelii",
-        "taxonomicLevelStrain": null,
+        "taxonomicLevelStrain": "None",
         "taxonomicLevelSuperkingdom": "Eukaryota",
         "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_900002385.2"
       }
@@ -956,11 +968,13 @@
     "taxonomicLevelClass": "Aconoidasida",
     "taxonomicLevelFamily": "Plasmodiidae",
     "taxonomicLevelGenus": "Plasmodium",
-    "taxonomicLevelKingdom": null,
+    "taxonomicLevelKingdom": "None",
     "taxonomicLevelOrder": "Haemosporida",
     "taxonomicLevelPhylum": "Apicomplexa",
     "taxonomicLevelSpecies": "Plasmodium yoelii",
-    "taxonomicLevelStrain": [],
+    "taxonomicLevelStrain": [
+      "None"
+    ],
     "taxonomicLevelSuperkingdom": "Eukaryota"
   },
   {
@@ -997,7 +1011,7 @@
         "taxonomicLevelOrder": "Nidovirales",
         "taxonomicLevelPhylum": "Pisuviricota",
         "taxonomicLevelSpecies": "Severe acute respiratory syndrome-related coronavirus",
-        "taxonomicLevelStrain": null,
+        "taxonomicLevelStrain": "None",
         "taxonomicLevelSuperkingdom": "Viruses",
         "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_009858895.2"
       }
@@ -1013,7 +1027,9 @@
     "taxonomicLevelOrder": "Nidovirales",
     "taxonomicLevelPhylum": "Pisuviricota",
     "taxonomicLevelSpecies": "Severe acute respiratory syndrome-related coronavirus",
-    "taxonomicLevelStrain": [],
+    "taxonomicLevelStrain": [
+      "None"
+    ],
     "taxonomicLevelSuperkingdom": "Viruses"
   },
   {
@@ -1083,7 +1099,7 @@
         "taxonomicLevelOrder": "Diptera",
         "taxonomicLevelPhylum": "Arthropoda",
         "taxonomicLevelSpecies": "Anopheles gambiae",
-        "taxonomicLevelStrain": null,
+        "taxonomicLevelStrain": "None",
         "taxonomicLevelSuperkingdom": "Eukaryota",
         "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_943734735.2"
       }
@@ -1100,7 +1116,8 @@
     "taxonomicLevelPhylum": "Arthropoda",
     "taxonomicLevelSpecies": "Anopheles gambiae",
     "taxonomicLevelStrain": [
-      "Anopheles gambiae str. PEST"
+      "Anopheles gambiae str. PEST",
+      "None"
     ],
     "taxonomicLevelSuperkingdom": "Eukaryota"
   },
@@ -1138,7 +1155,7 @@
         "taxonomicLevelOrder": "Diptera",
         "taxonomicLevelPhylum": "Arthropoda",
         "taxonomicLevelSpecies": "Culex pipiens",
-        "taxonomicLevelStrain": null,
+        "taxonomicLevelStrain": "None",
         "taxonomicLevelSuperkingdom": "Eukaryota",
         "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_016801865.2"
       }
@@ -1154,7 +1171,9 @@
     "taxonomicLevelOrder": "Diptera",
     "taxonomicLevelPhylum": "Arthropoda",
     "taxonomicLevelSpecies": "Culex pipiens",
-    "taxonomicLevelStrain": [],
+    "taxonomicLevelStrain": [
+      "None"
+    ],
     "taxonomicLevelSuperkingdom": "Eukaryota"
   },
   {
@@ -1191,7 +1210,7 @@
         "taxonomicLevelOrder": "Diptera",
         "taxonomicLevelPhylum": "Arthropoda",
         "taxonomicLevelSpecies": "Culex quinquefasciatus",
-        "taxonomicLevelStrain": null,
+        "taxonomicLevelStrain": "None",
         "taxonomicLevelSuperkingdom": "Eukaryota",
         "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_015732765.1"
       }
@@ -1207,7 +1226,9 @@
     "taxonomicLevelOrder": "Diptera",
     "taxonomicLevelPhylum": "Arthropoda",
     "taxonomicLevelSpecies": "Culex quinquefasciatus",
-    "taxonomicLevelStrain": [],
+    "taxonomicLevelStrain": [
+      "None"
+    ],
     "taxonomicLevelSuperkingdom": "Eukaryota"
   },
   {
