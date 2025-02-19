@@ -72,10 +72,6 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_GENUS,
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_GENUS,
           },
-          {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_OTHER,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_OTHER,
-          },
         ],
         label: "Taxonomic Lineage",
       },
@@ -184,15 +180,6 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
       {
         componentConfig: {
           component: C.NTagCell,
-          viewBuilder: V.buildOrganismTaxonomicLevelOther,
-        } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogOrganism>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_OTHER,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_OTHER,
-        width: { max: "1fr", min: "auto" },
-      },
-      {
-        componentConfig: {
-          component: C.NTagCell,
           viewBuilder: V.buildOrganismAssemblyTaxonomyIds,
         } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.ASSEMBLY_TAXONOMY_IDS,
@@ -226,7 +213,6 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_GENUS]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_KINGDOM]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ORDER]: false,
-          [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_OTHER]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_PHYLUM]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SUPERKINGDOM]: false,

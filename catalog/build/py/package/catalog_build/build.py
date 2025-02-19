@@ -62,9 +62,7 @@ def get_species_row(taxon_info, taxonomic_group_sets, taxonomic_levels):
   species_info = classification["species"]
   taxonomic_level_fields = {get_taxonomic_level_key(level): classification.get(level, {}).get("name") for level in taxonomic_levels}
   own_level = taxon_info["taxonomy"]["rank"].lower() if "rank" in taxon_info["taxonomy"] else None
-  if own_level not in classification:
-    if own_level is None or own_level not in taxonomic_levels:
-      own_level = "other"
+  if own_level in taxonomic_levels and own_level not in classification:
     taxonomic_level_fields[get_taxonomic_level_key(own_level)] = taxon_info["taxonomy"]["current_scientific_name"]["name"]
   return {
     "taxonomyId": taxon_info["taxonomy"]["tax_id"],

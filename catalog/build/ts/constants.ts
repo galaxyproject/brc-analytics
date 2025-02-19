@@ -20,7 +20,6 @@ export const SOURCE_GENOME_KEYS = [
   "taxonomicLevelGenus",
   "taxonomicLevelKingdom",
   "taxonomicLevelOrder",
-  "taxonomicLevelOther",
   "taxonomicLevelPhylum",
   "taxonomicLevelSpecies",
   "taxonomicLevelStrain",

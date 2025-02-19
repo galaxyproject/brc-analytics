@@ -208,20 +208,6 @@ export const buildOrganismAssemblyTaxonomyIds = (
 };
 
 /**
- * Build props for the other taxa cell.
- * @param organism - Organism entity.
- * @returns Props to be used for the cell.
- */
-export const buildOrganismTaxonomicLevelOther = (
-  organism: BRCDataCatalogOrganism
-): ComponentProps<typeof C.NTagCell> => {
-  return {
-    label: "taxa",
-    values: organism.taxonomicLevelOther,
-  };
-};
-
-/**
  * Build props for the strain cell.
  * @param organism - Organism entity.
  * @returns Props to be used for the cell.
