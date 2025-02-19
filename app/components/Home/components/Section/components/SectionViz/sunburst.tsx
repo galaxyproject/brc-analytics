@@ -27,8 +27,32 @@ export const SectionViz = (): JSX.Element => {
       .attr("viewBox", [-width / 2, -height / 2, width, width])
       .style("font", "10px sans-serif");
 
-    // Define a color scale
-    const color = d3.scaleOrdinal(d3.schemeTableau10);
+    // Define a color scale for base colors (root and first ring)
+    const baseColor = d3.scaleOrdinal(d3.schemeTableau10);
+
+    // Helper function to get color for a node
+    function getNodeColor(d) {
+      if (d.depth === 0) return baseColor(d.data.name); // root
+      if (d.depth === 1) return baseColor(d.data.name); // first ring
+
+      // For descendants, get the color of their depth=1 ancestor and modify it
+      const ancestor = d.ancestors().find((n) => n.depth === 1);
+      if (!ancestor) return "#ccc"; // fallback
+
+      const baseColorHsl = d3.hsl(baseColor(ancestor.data.name));
+
+      // Increase lightness and decrease saturation as we go deeper
+      const lightnessFactor = 0.05 * (d.depth - 1);
+      const saturationFactor = 0.1 * (d.depth - 1);
+
+      return d3
+        .hsl(
+          baseColorHsl.h,
+          Math.max(0, baseColorHsl.s - saturationFactor),
+          Math.min(1, baseColorHsl.l + lightnessFactor)
+        )
+        .toString();
+    }
 
     // Create a tooltip for interactivity
     const tooltip = d3
@@ -89,9 +113,7 @@ export const SectionViz = (): JSX.Element => {
       .selectAll("path")
       .data(root.descendants().slice(1))
       .join("path")
-      .attr("fill", (d) =>
-        d.children ? color(d.data.name) : color(d.parent!.data.name)
-      )
+      .attr("fill", (d) => getNodeColor(d))
       // Show only nodes with relative depth <= DEPTH.
       .attr("fill-opacity", (d) => (isVisible(d, root, 0) ? 1 : 0))
       .attr("stroke-opacity", (d) => (isVisible(d, root, 0) ? 1 : 0))
