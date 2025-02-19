@@ -25,6 +25,14 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
       {
         categoryConfigs: [
           {
+            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
+            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
+          },
+          {
+            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,
+            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
+          },
+          {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.ASSEMBLY_TAXONOMY_IDS,
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.ASSEMBLY_TAXONOMY_IDS,
           },
@@ -65,19 +73,11 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_GENUS,
           },
           {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
-          },
-          {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
-          },
-          {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_OTHER,
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_OTHER,
           },
         ],
-        label: "Taxonomic Levels",
+        label: "Taxonomic Lineage",
       },
     ],
     key: "organisms",
