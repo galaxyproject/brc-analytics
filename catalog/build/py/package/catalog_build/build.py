@@ -152,10 +152,12 @@ def ncbi_tree_to_nested_tree(node_id, edges, taxonomy_ids):
       "children": child_trees
     }
 
-def update_species_tree_names(tree, taxon_name_map):
+def update_species_tree_names(tree, taxon_name_map, taxon_rank_map):
+    tree["rank"] = taxon_rank_map.get(tree["name"], "Unknown")
     tree["name"] = taxon_name_map.get(tree["name"], tree["name"])
+
     for child in tree.get("children", []):
-        update_species_tree_names(child, taxon_name_map)
+        update_species_tree_names(child, taxon_name_map, taxon_rank_map)
     return tree
 
 def get_species_tree(taxonomy_ids, taxonomic_levels):
@@ -187,10 +189,15 @@ def get_species_tree(taxonomy_ids, taxonomic_levels):
 
   # Replace taxon ids with display names
   taxon_name_map = {"1": "root"}
+  taxon_rank_map = {"1": "NA"}
   for report in parent_taxa_info:
     taxon_name_map[str(report["taxonomy"]["tax_id"])] = report["taxonomy"]["current_scientific_name"]["name"]
+    if "rank" in report["taxonomy"]:
+      taxon_rank_map[str(report["taxonomy"]["tax_id"])] = report["taxonomy"]["rank"]
+    else:
+      print(f"rank not found for tax_id: {report['taxonomy']['tax_id']}")
 
-  named_species_tree = update_species_tree_names(species_tree, taxon_name_map)
+  named_species_tree = update_species_tree_names(species_tree, taxon_name_map, taxon_rank_map)
 
   return named_species_tree
 

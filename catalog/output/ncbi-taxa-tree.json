@@ -3,342 +3,6 @@
     "ncbi_tax_id": "1",
     "children": [
         {
-            "name": "Eukaryota",
-            "ncbi_tax_id": "2759",
-            "children": [
-                {
-                    "name": "Fungi",
-                    "ncbi_tax_id": "4751",
-                    "children": [
-                        {
-                            "name": "Ascomycota",
-                            "ncbi_tax_id": "4890",
-                            "children": [
-                                {
-                                    "name": "Pichiomycetes",
-                                    "ncbi_tax_id": "3239874",
-                                    "children": [
-                                        {
-                                            "name": "Serinales",
-                                            "ncbi_tax_id": "2916678",
-                                            "children": [
-                                                {
-                                                    "name": "Debaryomycetaceae",
-                                                    "ncbi_tax_id": "766764",
-                                                    "children": [
-                                                        {
-                                                            "name": "Candida",
-                                                            "ncbi_tax_id": "5475",
-                                                            "children": [
-                                                                {
-                                                                    "name": "Candida albicans",
-                                                                    "ncbi_tax_id": "5476",
-                                                                    "children": []
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                },
-                                {
-                                    "name": "Eurotiomycetes",
-                                    "ncbi_tax_id": "147545",
-                                    "children": [
-                                        {
-                                            "name": "Eurotiales",
-                                            "ncbi_tax_id": "5042",
-                                            "children": [
-                                                {
-                                                    "name": "Aspergillaceae",
-                                                    "ncbi_tax_id": "1131492",
-                                                    "children": [
-                                                        {
-                                                            "name": "Aspergillus",
-                                                            "ncbi_tax_id": "5052",
-                                                            "children": [
-                                                                {
-                                                                    "name": "Aspergillus fumigatus",
-                                                                    "ncbi_tax_id": "746128",
-                                                                    "children": []
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            "name": "Onygenales",
-                                            "ncbi_tax_id": "33183",
-                                            "children": [
-                                                {
-                                                    "name": "Onygenaceae",
-                                                    "ncbi_tax_id": "33184",
-                                                    "children": [
-                                                        {
-                                                            "name": "Coccidioides",
-                                                            "ncbi_tax_id": "5500",
-                                                            "children": [
-                                                                {
-                                                                    "name": "Coccidioides immitis",
-                                                                    "ncbi_tax_id": "5501",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Coccidioides posadasii",
-                                                                    "ncbi_tax_id": "199306",
-                                                                    "children": []
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "name": "Basidiomycota",
-                            "ncbi_tax_id": "5204",
-                            "children": [
-                                {
-                                    "name": "Tremellomycetes",
-                                    "ncbi_tax_id": "155616",
-                                    "children": [
-                                        {
-                                            "name": "Tremellales",
-                                            "ncbi_tax_id": "5234",
-                                            "children": [
-                                                {
-                                                    "name": "Cryptococcaceae",
-                                                    "ncbi_tax_id": "1884633",
-                                                    "children": [
-                                                        {
-                                                            "name": "Cryptococcus",
-                                                            "ncbi_tax_id": "5206",
-                                                            "children": [
-                                                                {
-                                                                    "name": "Cryptococcus neoformans",
-                                                                    "ncbi_tax_id": "5207",
-                                                                    "children": []
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "name": "Metazoa",
-                    "ncbi_tax_id": "33208",
-                    "children": [
-                        {
-                            "name": "Arthropoda",
-                            "ncbi_tax_id": "6656",
-                            "children": [
-                                {
-                                    "name": "Insecta",
-                                    "ncbi_tax_id": "50557",
-                                    "children": [
-                                        {
-                                            "name": "Diptera",
-                                            "ncbi_tax_id": "7147",
-                                            "children": [
-                                                {
-                                                    "name": "Culicidae",
-                                                    "ncbi_tax_id": "7157",
-                                                    "children": [
-                                                        {
-                                                            "name": "Culex",
-                                                            "ncbi_tax_id": "7174",
-                                                            "children": [
-                                                                {
-                                                                    "name": "Culex quinquefasciatus",
-                                                                    "ncbi_tax_id": "7176",
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "name": "Culex pipiens",
-                                                                    "ncbi_tax_id": "7175",
-                                                                    "children": []
-                                                                }
-                                                            ]
-                                                        },
-                                                        {
-                                                            "name": "Anopheles",
-                                                            "ncbi_tax_id": "7164",
-                                                            "children": [
-                                                                {
-                                                                    "name": "Anopheles gambiae",
-                                                                    "ncbi_tax_id": "7165",
-                                                                    "children": []
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "name": "Apicomplexa",
-                    "ncbi_tax_id": "5794",
-                    "children": [
-                        {
-                            "name": "Conoidasida",
-                            "ncbi_tax_id": "1280412",
-                            "children": [
-                                {
-                                    "name": "Eucoccidiorida",
-                                    "ncbi_tax_id": "75739",
-                                    "children": [
-                                        {
-                                            "name": "Sarcocystidae",
-                                            "ncbi_tax_id": "5809",
-                                            "children": [
-                                                {
-                                                    "name": "Toxoplasma",
-                                                    "ncbi_tax_id": "5810",
-                                                    "children": [
-                                                        {
-                                                            "name": "Toxoplasma gondii",
-                                                            "ncbi_tax_id": "5811",
-                                                            "children": []
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "name": "Aconoidasida",
-                            "ncbi_tax_id": "422676",
-                            "children": [
-                                {
-                                    "name": "Haemosporida",
-                                    "ncbi_tax_id": "5819",
-                                    "children": [
-                                        {
-                                            "name": "Plasmodiidae",
-                                            "ncbi_tax_id": "1639119",
-                                            "children": [
-                                                {
-                                                    "name": "Plasmodium",
-                                                    "ncbi_tax_id": "5820",
-                                                    "children": [
-                                                        {
-                                                            "name": "Plasmodium vivax",
-                                                            "ncbi_tax_id": "5855",
-                                                            "children": []
-                                                        },
-                                                        {
-                                                            "name": "Plasmodium vinckei",
-                                                            "ncbi_tax_id": "5860",
-                                                            "children": []
-                                                        },
-                                                        {
-                                                            "name": "Plasmodium yoelii",
-                                                            "ncbi_tax_id": "5861",
-                                                            "children": []
-                                                        },
-                                                        {
-                                                            "name": "Plasmodium falciparum",
-                                                            "ncbi_tax_id": "5833",
-                                                            "children": []
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "name": "Euglenozoa",
-                    "ncbi_tax_id": "33682",
-                    "children": [
-                        {
-                            "name": "Kinetoplastea",
-                            "ncbi_tax_id": "5653",
-                            "children": [
-                                {
-                                    "name": "Trypanosomatida",
-                                    "ncbi_tax_id": "2704949",
-                                    "children": [
-                                        {
-                                            "name": "Trypanosomatidae",
-                                            "ncbi_tax_id": "5654",
-                                            "children": [
-                                                {
-                                                    "name": "Leishmania",
-                                                    "ncbi_tax_id": "5658",
-                                                    "children": [
-                                                        {
-                                                            "name": "Leishmania major",
-                                                            "ncbi_tax_id": "5664",
-                                                            "children": []
-                                                        },
-                                                        {
-                                                            "name": "Leishmania braziliensis",
-                                                            "ncbi_tax_id": "5660",
-                                                            "children": []
-                                                        },
-                                                        {
-                                                            "name": "Leishmania donovani",
-                                                            "ncbi_tax_id": "5661",
-                                                            "children": []
-                                                        }
-                                                    ]
-                                                },
-                                                {
-                                                    "name": "Trypanosoma",
-                                                    "ncbi_tax_id": "5690",
-                                                    "children": [
-                                                        {
-                                                            "name": "Trypanosoma cruzi",
-                                                            "ncbi_tax_id": "5693",
-                                                            "children": []
-                                                        },
-                                                        {
-                                                            "name": "Trypanosoma brucei",
-                                                            "ncbi_tax_id": "5691",
-                                                            "children": []
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "name": "Viruses",
             "ncbi_tax_id": "10239",
             "children": [
@@ -365,17 +29,23 @@
                                                         {
                                                             "name": "Orthopoxvirus",
                                                             "ncbi_tax_id": "10242",
-                                                            "children": []
+                                                            "children": [],
+                                                            "rank": "GENUS"
                                                         }
-                                                    ]
+                                                    ],
+                                                    "rank": "FAMILY"
                                                 }
-                                            ]
+                                            ],
+                                            "rank": "ORDER"
                                         }
-                                    ]
+                                    ],
+                                    "rank": "CLASS"
                                 }
-                            ]
+                            ],
+                            "rank": "PHYLUM"
                         }
-                    ]
+                    ],
+                    "rank": "KINGDOM"
                 },
                 {
                     "name": "Orthornavirae",
@@ -404,21 +74,29 @@
                                                                 {
                                                                     "name": "Severe acute respiratory syndrome-related coronavirus",
                                                                     "ncbi_tax_id": "694009",
-                                                                    "children": []
+                                                                    "children": [],
+                                                                    "rank": "SPECIES"
                                                                 }
-                                                            ]
+                                                            ],
+                                                            "rank": "GENUS"
                                                         }
-                                                    ]
+                                                    ],
+                                                    "rank": "FAMILY"
                                                 }
-                                            ]
+                                            ],
+                                            "rank": "ORDER"
                                         }
-                                    ]
+                                    ],
+                                    "rank": "CLASS"
                                 }
-                            ]
+                            ],
+                            "rank": "PHYLUM"
                         }
-                    ]
+                    ],
+                    "rank": "KINGDOM"
                 }
-            ]
+            ],
+            "rank": "SUPERKINGDOM"
         },
         {
             "name": "Bacteria",
@@ -451,21 +129,425 @@
                                                                 {
                                                                     "name": "Mycobacterium tuberculosis",
                                                                     "ncbi_tax_id": "1773",
-                                                                    "children": []
+                                                                    "children": [],
+                                                                    "rank": "SPECIES"
                                                                 }
-                                                            ]
+                                                            ],
+                                                            "rank": "GENUS"
                                                         }
-                                                    ]
+                                                    ],
+                                                    "rank": "FAMILY"
                                                 }
-                                            ]
+                                            ],
+                                            "rank": "ORDER"
                                         }
-                                    ]
+                                    ],
+                                    "rank": "CLASS"
                                 }
-                            ]
+                            ],
+                            "rank": "PHYLUM"
                         }
-                    ]
+                    ],
+                    "rank": "KINGDOM"
                 }
-            ]
+            ],
+            "rank": "SUPERKINGDOM"
+        },
+        {
+            "name": "Eukaryota",
+            "ncbi_tax_id": "2759",
+            "children": [
+                {
+                    "name": "Metazoa",
+                    "ncbi_tax_id": "33208",
+                    "children": [
+                        {
+                            "name": "Arthropoda",
+                            "ncbi_tax_id": "6656",
+                            "children": [
+                                {
+                                    "name": "Insecta",
+                                    "ncbi_tax_id": "50557",
+                                    "children": [
+                                        {
+                                            "name": "Diptera",
+                                            "ncbi_tax_id": "7147",
+                                            "children": [
+                                                {
+                                                    "name": "Culicidae",
+                                                    "ncbi_tax_id": "7157",
+                                                    "children": [
+                                                        {
+                                                            "name": "Culex",
+                                                            "ncbi_tax_id": "7174",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Culex pipiens",
+                                                                    "ncbi_tax_id": "7175",
+                                                                    "children": [],
+                                                                    "rank": "SPECIES"
+                                                                },
+                                                                {
+                                                                    "name": "Culex quinquefasciatus",
+                                                                    "ncbi_tax_id": "7176",
+                                                                    "children": [],
+                                                                    "rank": "SPECIES"
+                                                                }
+                                                            ],
+                                                            "rank": "GENUS"
+                                                        },
+                                                        {
+                                                            "name": "Anopheles",
+                                                            "ncbi_tax_id": "7164",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Anopheles gambiae",
+                                                                    "ncbi_tax_id": "7165",
+                                                                    "children": [],
+                                                                    "rank": "SPECIES"
+                                                                }
+                                                            ],
+                                                            "rank": "GENUS"
+                                                        }
+                                                    ],
+                                                    "rank": "FAMILY"
+                                                }
+                                            ],
+                                            "rank": "ORDER"
+                                        }
+                                    ],
+                                    "rank": "CLASS"
+                                }
+                            ],
+                            "rank": "PHYLUM"
+                        }
+                    ],
+                    "rank": "KINGDOM"
+                },
+                {
+                    "name": "Euglenozoa",
+                    "ncbi_tax_id": "33682",
+                    "children": [
+                        {
+                            "name": "Kinetoplastea",
+                            "ncbi_tax_id": "5653",
+                            "children": [
+                                {
+                                    "name": "Trypanosomatida",
+                                    "ncbi_tax_id": "2704949",
+                                    "children": [
+                                        {
+                                            "name": "Trypanosomatidae",
+                                            "ncbi_tax_id": "5654",
+                                            "children": [
+                                                {
+                                                    "name": "Trypanosoma",
+                                                    "ncbi_tax_id": "5690",
+                                                    "children": [
+                                                        {
+                                                            "name": "Trypanosoma cruzi",
+                                                            "ncbi_tax_id": "5693",
+                                                            "children": [],
+                                                            "rank": "SPECIES"
+                                                        },
+                                                        {
+                                                            "name": "Trypanosoma brucei",
+                                                            "ncbi_tax_id": "5691",
+                                                            "children": [],
+                                                            "rank": "SPECIES"
+                                                        }
+                                                    ],
+                                                    "rank": "GENUS"
+                                                },
+                                                {
+                                                    "name": "Leishmania",
+                                                    "ncbi_tax_id": "5658",
+                                                    "children": [
+                                                        {
+                                                            "name": "Leishmania braziliensis",
+                                                            "ncbi_tax_id": "5660",
+                                                            "children": [],
+                                                            "rank": "SPECIES"
+                                                        },
+                                                        {
+                                                            "name": "Leishmania donovani",
+                                                            "ncbi_tax_id": "5661",
+                                                            "children": [],
+                                                            "rank": "SPECIES"
+                                                        },
+                                                        {
+                                                            "name": "Leishmania major",
+                                                            "ncbi_tax_id": "5664",
+                                                            "children": [],
+                                                            "rank": "SPECIES"
+                                                        }
+                                                    ],
+                                                    "rank": "GENUS"
+                                                }
+                                            ],
+                                            "rank": "FAMILY"
+                                        }
+                                    ],
+                                    "rank": "ORDER"
+                                }
+                            ],
+                            "rank": "CLASS"
+                        }
+                    ],
+                    "rank": "PHYLUM"
+                },
+                {
+                    "name": "Apicomplexa",
+                    "ncbi_tax_id": "5794",
+                    "children": [
+                        {
+                            "name": "Conoidasida",
+                            "ncbi_tax_id": "1280412",
+                            "children": [
+                                {
+                                    "name": "Eucoccidiorida",
+                                    "ncbi_tax_id": "75739",
+                                    "children": [
+                                        {
+                                            "name": "Sarcocystidae",
+                                            "ncbi_tax_id": "5809",
+                                            "children": [
+                                                {
+                                                    "name": "Toxoplasma",
+                                                    "ncbi_tax_id": "5810",
+                                                    "children": [
+                                                        {
+                                                            "name": "Toxoplasma gondii",
+                                                            "ncbi_tax_id": "5811",
+                                                            "children": [],
+                                                            "rank": "SPECIES"
+                                                        }
+                                                    ],
+                                                    "rank": "GENUS"
+                                                }
+                                            ],
+                                            "rank": "FAMILY"
+                                        }
+                                    ],
+                                    "rank": "ORDER"
+                                }
+                            ],
+                            "rank": "CLASS"
+                        },
+                        {
+                            "name": "Aconoidasida",
+                            "ncbi_tax_id": "422676",
+                            "children": [
+                                {
+                                    "name": "Haemosporida",
+                                    "ncbi_tax_id": "5819",
+                                    "children": [
+                                        {
+                                            "name": "Plasmodiidae",
+                                            "ncbi_tax_id": "1639119",
+                                            "children": [
+                                                {
+                                                    "name": "Plasmodium",
+                                                    "ncbi_tax_id": "5820",
+                                                    "children": [
+                                                        {
+                                                            "name": "Plasmodium vivax",
+                                                            "ncbi_tax_id": "5855",
+                                                            "children": [],
+                                                            "rank": "SPECIES"
+                                                        },
+                                                        {
+                                                            "name": "Plasmodium falciparum",
+                                                            "ncbi_tax_id": "5833",
+                                                            "children": [],
+                                                            "rank": "SPECIES"
+                                                        },
+                                                        {
+                                                            "name": "Plasmodium vinckei",
+                                                            "ncbi_tax_id": "5860",
+                                                            "children": [],
+                                                            "rank": "SPECIES"
+                                                        },
+                                                        {
+                                                            "name": "Plasmodium yoelii",
+                                                            "ncbi_tax_id": "5861",
+                                                            "children": [],
+                                                            "rank": "SPECIES"
+                                                        }
+                                                    ],
+                                                    "rank": "GENUS"
+                                                }
+                                            ],
+                                            "rank": "FAMILY"
+                                        }
+                                    ],
+                                    "rank": "ORDER"
+                                }
+                            ],
+                            "rank": "CLASS"
+                        }
+                    ],
+                    "rank": "PHYLUM"
+                },
+                {
+                    "name": "Fungi",
+                    "ncbi_tax_id": "4751",
+                    "children": [
+                        {
+                            "name": "Ascomycota",
+                            "ncbi_tax_id": "4890",
+                            "children": [
+                                {
+                                    "name": "Eurotiomycetes",
+                                    "ncbi_tax_id": "147545",
+                                    "children": [
+                                        {
+                                            "name": "Eurotiales",
+                                            "ncbi_tax_id": "5042",
+                                            "children": [
+                                                {
+                                                    "name": "Aspergillaceae",
+                                                    "ncbi_tax_id": "1131492",
+                                                    "children": [
+                                                        {
+                                                            "name": "Aspergillus",
+                                                            "ncbi_tax_id": "5052",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Aspergillus fumigatus",
+                                                                    "ncbi_tax_id": "746128",
+                                                                    "children": [],
+                                                                    "rank": "SPECIES"
+                                                                }
+                                                            ],
+                                                            "rank": "GENUS"
+                                                        }
+                                                    ],
+                                                    "rank": "FAMILY"
+                                                }
+                                            ],
+                                            "rank": "ORDER"
+                                        },
+                                        {
+                                            "name": "Onygenales",
+                                            "ncbi_tax_id": "33183",
+                                            "children": [
+                                                {
+                                                    "name": "Onygenaceae",
+                                                    "ncbi_tax_id": "33184",
+                                                    "children": [
+                                                        {
+                                                            "name": "Coccidioides",
+                                                            "ncbi_tax_id": "5500",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Coccidioides immitis",
+                                                                    "ncbi_tax_id": "5501",
+                                                                    "children": [],
+                                                                    "rank": "SPECIES"
+                                                                },
+                                                                {
+                                                                    "name": "Coccidioides posadasii",
+                                                                    "ncbi_tax_id": "199306",
+                                                                    "children": [],
+                                                                    "rank": "SPECIES"
+                                                                }
+                                                            ],
+                                                            "rank": "GENUS"
+                                                        }
+                                                    ],
+                                                    "rank": "FAMILY"
+                                                }
+                                            ],
+                                            "rank": "ORDER"
+                                        }
+                                    ],
+                                    "rank": "CLASS"
+                                },
+                                {
+                                    "name": "Pichiomycetes",
+                                    "ncbi_tax_id": "3239874",
+                                    "children": [
+                                        {
+                                            "name": "Serinales",
+                                            "ncbi_tax_id": "2916678",
+                                            "children": [
+                                                {
+                                                    "name": "Debaryomycetaceae",
+                                                    "ncbi_tax_id": "766764",
+                                                    "children": [
+                                                        {
+                                                            "name": "Candida",
+                                                            "ncbi_tax_id": "5475",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Candida albicans",
+                                                                    "ncbi_tax_id": "5476",
+                                                                    "children": [],
+                                                                    "rank": "SPECIES"
+                                                                }
+                                                            ],
+                                                            "rank": "GENUS"
+                                                        }
+                                                    ],
+                                                    "rank": "FAMILY"
+                                                }
+                                            ],
+                                            "rank": "ORDER"
+                                        }
+                                    ],
+                                    "rank": "CLASS"
+                                }
+                            ],
+                            "rank": "PHYLUM"
+                        },
+                        {
+                            "name": "Basidiomycota",
+                            "ncbi_tax_id": "5204",
+                            "children": [
+                                {
+                                    "name": "Tremellomycetes",
+                                    "ncbi_tax_id": "155616",
+                                    "children": [
+                                        {
+                                            "name": "Tremellales",
+                                            "ncbi_tax_id": "5234",
+                                            "children": [
+                                                {
+                                                    "name": "Cryptococcaceae",
+                                                    "ncbi_tax_id": "1884633",
+                                                    "children": [
+                                                        {
+                                                            "name": "Cryptococcus",
+                                                            "ncbi_tax_id": "5206",
+                                                            "children": [
+                                                                {
+                                                                    "name": "Cryptococcus neoformans",
+                                                                    "ncbi_tax_id": "5207",
+                                                                    "children": [],
+                                                                    "rank": "SPECIES"
+                                                                }
+                                                            ],
+                                                            "rank": "GENUS"
+                                                        }
+                                                    ],
+                                                    "rank": "FAMILY"
+                                                }
+                                            ],
+                                            "rank": "ORDER"
+                                        }
+                                    ],
+                                    "rank": "CLASS"
+                                }
+                            ],
+                            "rank": "PHYLUM"
+                        }
+                    ],
+                    "rank": "KINGDOM"
+                }
+            ],
+            "rank": "SUPERKINGDOM"
         }
-    ]
+    ],
+    "rank": "NA"
 }
