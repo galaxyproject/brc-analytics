@@ -13,6 +13,7 @@ import {
   Workflows as SourceWorkflows,
 } from "../../schema/generated/schema";
 import { SourceGenome } from "./entities";
+import { SOURCE_GENOME_KEYS } from "./constants";
 
 const SOURCE_PATH_GENOMES = "catalog/build/intermediate/genomes-from-ncbi.tsv";
 const SOURCE_PATH_ORGANISMS = "catalog/source/organisms.yml";
@@ -40,7 +41,7 @@ async function buildCatalog(): Promise<void> {
 }
 
 async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
-  const sourceRows = await readValuesFile<SourceGenome>(SOURCE_PATH_GENOMES);
+  const sourceRows = await readValuesFile<SourceGenome>(SOURCE_PATH_GENOMES, undefined, SOURCE_GENOME_KEYS);
   const sourceOrganisms = await readYamlFile<SourceOrganisms>(SOURCE_PATH_ORGANISMS);
   const sourceOrganismsByTaxonomyId = new Map(sourceOrganisms.organisms.map((sourceOrganism) => [String(sourceOrganism.taxonomy_id), sourceOrganism]));
   const mappedRows: BRCDataCatalogGenome[] = [];
@@ -172,14 +173,22 @@ function buildWorkflow(
 
 async function readValuesFile<T>(
   filePath: string,
-  delimiter = "\t"
+  delimiter = "\t",
+  checkKeys?: readonly string[]
 ): Promise<T[]> {
   const content = await fsp.readFile(filePath, "utf8");
-  return parseCsv(content, {
+  const result = parseCsv(content, {
     columns: true,
     delimiter,
     relax_quotes: true,
   });
+  if (checkKeys && result[0]) {
+    for (const key of checkKeys) {
+      if (!Object.hasOwn(result[0], key))
+        throw new Error(`Missing column ${JSON.stringify(key)} in ${filePath}`);
+    }
+  }
+  return result;
 }
 
 async function readYamlFile<T>(filePath: string): Promise<T> {
