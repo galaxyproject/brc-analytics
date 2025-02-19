@@ -25,55 +25,52 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
       {
         categoryConfigs: [
           {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
-          },
-          {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
           },
           {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.ASSEMBLY_TAXONOMY_IDS,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.ASSEMBLY_TAXONOMY_IDS,
+            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
+            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
           },
           {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_GROUP,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_GROUP,
-          },
-        ],
-      },
-      {
-        categoryConfigs: [
-          {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SUPERKINGDOM,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SUPERKINGDOM,
-          },
-          {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_KINGDOM,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_KINGDOM,
-          },
-          {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_CLASS,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_CLASS,
-          },
-          {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ORDER,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_ORDER,
-          },
-          {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_PHYLUM,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_PHYLUM,
+            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_GENUS,
+            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_GENUS,
           },
           {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_FAMILY,
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_FAMILY,
           },
           {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_GENUS,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_GENUS,
+            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_PHYLUM,
+            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_PHYLUM,
+          },
+          {
+            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ORDER,
+            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_ORDER,
+          },
+          {
+            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_CLASS,
+            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_CLASS,
+          },
+          {
+            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_KINGDOM,
+            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_KINGDOM,
+          },
+          {
+            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SUPERKINGDOM,
+            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SUPERKINGDOM,
           },
         ],
         label: "Taxonomic Lineage",
+      },
+      {
+        categoryConfigs: [
+          {
+            key: BRC_DATA_CATALOG_CATEGORY_KEY.ASSEMBLY_TAXONOMY_IDS,
+            label: BRC_DATA_CATALOG_CATEGORY_LABEL.ASSEMBLY_TAXONOMY_IDS,
+          },
+        ],
+        label: "Identifier",
       },
     ],
     key: "organisms",
