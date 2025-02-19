@@ -234,7 +234,7 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
         sorting: [
           {
             desc: SORT_DIRECTION.ASCENDING,
-            id: BRC_DATA_CATALOG_CATEGORY_KEY.SPECIES,
+            id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
           },
         ],
       },
