@@ -66,7 +66,6 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
       scaffoldCount: parseNumberOrNull(row.scaffoldCount),
       scaffoldL50: parseNumberOrNull(row.scaffoldL50),
       scaffoldN50: parseNumberOrNull(row.scaffoldN50),
-      species: row.species,
       speciesTaxonomyId: row.speciesTaxonomyId,
       strain: parseStringOrNull(row.strain),
       taxonomicGroup: row.taxonomicGroup ? row.taxonomicGroup.split(",") : [],

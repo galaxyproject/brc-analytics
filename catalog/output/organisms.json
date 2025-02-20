@@ -20,7 +20,6 @@
         "scaffoldCount": 1,
         "scaffoldL50": 1,
         "scaffoldN50": 196858,
-        "species": "Monkeypox virus",
         "speciesTaxonomyId": "10244",
         "strain": "Zaire-96-I-16",
         "taxonomicGroup": [
@@ -75,7 +74,6 @@
         "scaffoldCount": 1,
         "scaffoldL50": 1,
         "scaffoldN50": 4411532,
-        "species": "Mycobacterium tuberculosis",
         "speciesTaxonomyId": "1773",
         "strain": "H37Rv",
         "taxonomicGroup": [
@@ -130,7 +128,6 @@
         "scaffoldCount": 54,
         "scaffoldL50": 8,
         "scaffoldN50": 1220107,
-        "species": "Coccidioides posadasii",
         "speciesTaxonomyId": "199306",
         "strain": "Silveira",
         "taxonomicGroup": [
@@ -162,7 +159,6 @@
         "scaffoldCount": 9,
         "scaffoldL50": 2,
         "scaffoldN50": 8079863,
-        "species": "Coccidioides posadasii",
         "speciesTaxonomyId": "199306",
         "strain": "Silveira",
         "taxonomicGroup": [
@@ -218,7 +214,6 @@
         "scaffoldCount": 14,
         "scaffoldL50": 6,
         "scaffoldN50": 1422463,
-        "species": "Cryptococcus neoformans",
         "speciesTaxonomyId": "5207",
         "strain": "H99",
         "taxonomicGroup": [
@@ -250,7 +245,6 @@
         "scaffoldCount": 14,
         "scaffoldL50": 6,
         "scaffoldN50": 1438950,
-        "species": "Cryptococcus neoformans",
         "speciesTaxonomyId": "5207",
         "strain": "JEC21",
         "taxonomicGroup": [
@@ -306,7 +300,6 @@
         "scaffoldCount": 8,
         "scaffoldL50": 3,
         "scaffoldN50": 2231883,
-        "species": "Candida albicans",
         "speciesTaxonomyId": "5476",
         "strain": "SC5314",
         "taxonomicGroup": [
@@ -361,7 +354,6 @@
         "scaffoldCount": 6,
         "scaffoldL50": 3,
         "scaffoldN50": 4323945,
-        "species": "Coccidioides immitis",
         "speciesTaxonomyId": "5501",
         "strain": "RS",
         "taxonomicGroup": [
@@ -416,7 +408,6 @@
         "scaffoldCount": 138,
         "scaffoldL50": 11,
         "scaffoldN50": 992961,
-        "species": "Leishmania braziliensis",
         "speciesTaxonomyId": "5660",
         "strain": "MHOM/BR/75/M2904",
         "taxonomicGroup": [
@@ -471,7 +462,6 @@
         "scaffoldCount": 36,
         "scaffoldL50": 11,
         "scaffoldN50": 1024085,
-        "species": "Leishmania donovani",
         "speciesTaxonomyId": "5661",
         "strain": "BPK282A1",
         "taxonomicGroup": [
@@ -526,7 +516,6 @@
         "scaffoldCount": 36,
         "scaffoldL50": 11,
         "scaffoldN50": 1091540,
-        "species": "Leishmania major",
         "speciesTaxonomyId": "5664",
         "strain": "Friedlin",
         "taxonomicGroup": [
@@ -581,7 +570,6 @@
         "scaffoldCount": 12,
         "scaffoldL50": 4,
         "scaffoldN50": 2481190,
-        "species": "Trypanosoma brucei",
         "speciesTaxonomyId": "5691",
         "strain": null,
         "taxonomicGroup": [
@@ -636,7 +624,6 @@
         "scaffoldCount": 29495,
         "scaffoldL50": 212,
         "scaffoldN50": 88624,
-        "species": "Trypanosoma cruzi",
         "speciesTaxonomyId": "5693",
         "strain": "CL Brener",
         "taxonomicGroup": [
@@ -691,7 +678,6 @@
         "scaffoldCount": 2276,
         "scaffoldL50": 6,
         "scaffoldN50": 4973582,
-        "species": "Toxoplasma gondii",
         "speciesTaxonomyId": "5811",
         "strain": "ME49",
         "taxonomicGroup": [
@@ -746,7 +732,6 @@
         "scaffoldCount": 14,
         "scaffoldL50": 5,
         "scaffoldN50": 1687656,
-        "species": "Plasmodium falciparum",
         "speciesTaxonomyId": "5833",
         "strain": null,
         "taxonomicGroup": [
@@ -801,7 +786,6 @@
         "scaffoldCount": 242,
         "scaffoldL50": 6,
         "scaffoldN50": 1761288,
-        "species": "Plasmodium vivax",
         "speciesTaxonomyId": "5855",
         "strain": null,
         "taxonomicGroup": [
@@ -833,7 +817,6 @@
         "scaffoldCount": 2747,
         "scaffoldL50": 6,
         "scaffoldN50": 1678596,
-        "species": "Plasmodium vivax",
         "speciesTaxonomyId": "5855",
         "strain": "Salvador I",
         "taxonomicGroup": [
@@ -888,7 +871,6 @@
         "scaffoldCount": 14,
         "scaffoldL50": 5,
         "scaffoldN50": 1692345,
-        "species": "Plasmodium vinckei",
         "speciesTaxonomyId": "5860",
         "strain": null,
         "taxonomicGroup": [
@@ -943,7 +925,6 @@
         "scaffoldCount": 14,
         "scaffoldL50": 5,
         "scaffoldN50": 2046250,
-        "species": "Plasmodium yoelii",
         "speciesTaxonomyId": "5861",
         "strain": "17X",
         "taxonomicGroup": [
@@ -998,7 +979,6 @@
         "scaffoldCount": 1,
         "scaffoldL50": 1,
         "scaffoldN50": 29903,
-        "species": "Severe acute respiratory syndrome-related coronavirus",
         "speciesTaxonomyId": "694009",
         "strain": null,
         "taxonomicGroup": [
@@ -1054,7 +1034,6 @@
         "scaffoldCount": 8144,
         "scaffoldL50": 9,
         "scaffoldN50": 12309988,
-        "species": "Anopheles gambiae",
         "speciesTaxonomyId": "7165",
         "strain": "PEST",
         "taxonomicGroup": [
@@ -1086,7 +1065,6 @@
         "scaffoldCount": 190,
         "scaffoldL50": 2,
         "scaffoldN50": 99149756,
-        "species": "Anopheles gambiae",
         "speciesTaxonomyId": "7165",
         "strain": null,
         "taxonomicGroup": [
@@ -1142,7 +1120,6 @@
         "scaffoldCount": 289,
         "scaffoldL50": 2,
         "scaffoldN50": 186194774,
-        "species": "Culex pipiens",
         "speciesTaxonomyId": "7175",
         "strain": null,
         "taxonomicGroup": [
@@ -1197,7 +1174,6 @@
         "scaffoldCount": 56,
         "scaffoldL50": 2,
         "scaffoldN50": 201550677,
-        "species": "Culex quinquefasciatus",
         "speciesTaxonomyId": "7176",
         "strain": "JHB",
         "taxonomicGroup": [
@@ -1252,7 +1228,6 @@
         "scaffoldCount": 8,
         "scaffoldL50": 4,
         "scaffoldN50": 3948441,
-        "species": "Aspergillus fumigatus",
         "speciesTaxonomyId": "746128",
         "strain": "Af293",
         "taxonomicGroup": [

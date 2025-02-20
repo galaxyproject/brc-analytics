@@ -149,7 +149,7 @@ export const buildGenomeSpecies = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.Link> => {
   return {
-    label: genome.species,
+    label: genome.taxonomicLevelSpecies,
     url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(genome))}`,
   };
 };
@@ -479,7 +479,7 @@ export const buildGenomeChooseAnalysisMethodDetailViewHero = (
     breadcrumbs: getGenomeEntityChooseAnalysisMethodBreadcrumbs(genome),
     subTitle: C.Link({
       TypographyProps: { color: "ink.light", variant: TEXT_BODY_SMALL_400 },
-      label: `Species: ${genome.species}`,
+      label: `Species: ${genome.taxonomicLevelSpecies}`,
       underline: "hover",
       url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(genome))}`,
     }),
@@ -497,9 +497,9 @@ export const buildGenomeDetails = (
 ): ComponentProps<typeof C.KeyValuePairs> => {
   const keyValuePairs = new Map<Key, Value>();
   keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.SPECIES,
+    BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
     C.Link({
-      label: genome.species,
+      label: genome.taxonomicLevelSpecies,
       url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(genome))}`,
     })
   );
