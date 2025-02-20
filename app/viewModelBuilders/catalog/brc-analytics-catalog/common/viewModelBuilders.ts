@@ -145,12 +145,26 @@ export const buildGcPercent = (
  * @param genome - Genome entity.
  * @returns Props to be used for the cell.
  */
-export const buildGenomeSpecies = (
+export const buildGenomeTaxonomicLevelSpecies = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.Link> => {
   return {
     label: genome.taxonomicLevelSpecies,
     url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(genome))}`,
+  };
+};
+
+/**
+ * Build props for the strain cell.
+ * @param genome - Genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildGenomeTaxonomicLevelStrain = (
+  genome: BRCDataCatalogGenome
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    // Although the name including species (`taxonomicLevelStrain`) is used for the unrelying value, the strain-only name is displayed in the table by default.
+    value: genome.strain || genome.taxonomicLevelStrain,
   };
 };
 
@@ -208,6 +222,20 @@ export const buildOrganismAssemblyTaxonomyIds = (
 };
 
 /**
+ * Build props for the species cell.
+ * @param organism - Organism entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildOrganismTaxonomicLevelSpecies = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.Link> => {
+  return {
+    label: organism.taxonomicLevelSpecies,
+    url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getOrganismId(organism))}`,
+  };
+};
+
+/**
  * Build props for the strain cell.
  * @param organism - Organism entity.
  * @returns Props to be used for the cell.
@@ -237,106 +265,92 @@ export const buildTaxonomicGroup = (
 
 /**
  * Build props for the class cell.
- * @param organism - Organism entity.
+ * @param entity - Organism or genome entity.
  * @returns Props to be used for the cell.
  */
 export const buildTaxonomicLevelClass = (
-  organism: BRCDataCatalogOrganism
+  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: organism.taxonomicLevelClass,
+    value: entity.taxonomicLevelClass,
   };
 };
 
 /**
  * Build props for the family cell.
- * @param organism - Organism entity.
+ * @param entity - Organism or genome entity.
  * @returns Props to be used for the cell.
  */
 export const buildTaxonomicLevelFamily = (
-  organism: BRCDataCatalogOrganism
+  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: organism.taxonomicLevelFamily,
+    value: entity.taxonomicLevelFamily,
   };
 };
 
 /**
  * Build props for the genus cell.
- * @param organism - Organism entity.
+ * @param entity - Organism or genome entity.
  * @returns Props to be used for the cell.
  */
 export const buildTaxonomicLevelGenus = (
-  organism: BRCDataCatalogOrganism
+  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: organism.taxonomicLevelGenus,
+    value: entity.taxonomicLevelGenus,
   };
 };
 
 /**
  * Build props for the kingdom cell.
- * @param organism - Organism entity.
+ * @param entity - Organism or genome entity.
  * @returns Props to be used for the cell.
  */
 export const buildTaxonomicLevelKingdom = (
-  organism: BRCDataCatalogOrganism
+  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: organism.taxonomicLevelKingdom,
+    value: entity.taxonomicLevelKingdom,
   };
 };
 
 /**
  * Build props for the order cell.
- * @param organism - Organism entity.
+ * @param entity - Organism or genome entity.
  * @returns Props to be used for the cell.
  */
 export const buildTaxonomicLevelOrder = (
-  organism: BRCDataCatalogOrganism
+  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: organism.taxonomicLevelOrder,
+    value: entity.taxonomicLevelOrder,
   };
 };
 
 /**
  * Build props for the phylum cell.
- * @param organism - Organism entity.
+ * @param entity - Organism or genome entity.
  * @returns Props to be used for the cell.
  */
 export const buildTaxonomicLevelPhylum = (
-  organism: BRCDataCatalogOrganism
+  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: organism.taxonomicLevelPhylum,
-  };
-};
-
-/**
- * Build props for the species cell.
- * @param organism - Organism entity.
- * @returns Props to be used for the cell.
- */
-export const buildTaxonomicLevelSpecies = (
-  organism: BRCDataCatalogOrganism
-): ComponentProps<typeof C.Link> => {
-  return {
-    label: organism.taxonomicLevelSpecies,
-    url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getOrganismId(organism))}`,
+    value: entity.taxonomicLevelPhylum,
   };
 };
 
 /**
  * Build props for the superkingdom cell.
- * @param organism - Organism entity.
+ * @param entity - Organism or genome entity.
  * @returns Props to be used for the cell.
  */
 export const buildTaxonomicLevelSuperkingdom = (
-  organism: BRCDataCatalogOrganism
+  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: organism.taxonomicLevelSuperkingdom,
+    value: entity.taxonomicLevelSuperkingdom,
   };
 };
 
@@ -376,19 +390,6 @@ export const buildScaffoldN50 = (
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: genome.scaffoldN50,
-  };
-};
-
-/**
- * Build props for the strain cell.
- * @param genome - Genome entity.
- * @returns Props to be used for the cell.
- */
-export const buildStrain = (
-  genome: BRCDataCatalogGenome
-): ComponentProps<typeof C.BasicCell> => {
-  return {
-    value: genome.strain,
   };
 };
 
@@ -504,7 +505,7 @@ export const buildGenomeDetails = (
     })
   );
   keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.STRAIN,
+    BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
     genome.strain ?? LABEL.UNSPECIFIED
   );
   keyValuePairs.set(
@@ -611,9 +612,10 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
     },
     {
-      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.STRAIN,
-      cell: ({ row }) => C.BasicCell(buildStrain(row.original)),
-      header: BRC_DATA_CATALOG_CATEGORY_LABEL.STRAIN,
+      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,
+      cell: ({ row }) =>
+        C.BasicCell(buildGenomeTaxonomicLevelStrain(row.original)),
+      header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMY_ID,
