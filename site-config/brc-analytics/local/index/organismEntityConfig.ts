@@ -25,13 +25,21 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
       {
         categoryConfigs: [
           {
+            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
+            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
+          },
+          {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
           },
           {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
+            key: BRC_DATA_CATALOG_CATEGORY_KEY.ASSEMBLY_TAXONOMY_IDS,
+            label: BRC_DATA_CATALOG_CATEGORY_LABEL.ASSEMBLY_TAXONOMY_IDS,
           },
+        ],
+      },
+      {
+        categoryConfigs: [
           {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_GENUS,
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_GENUS,
@@ -41,16 +49,16 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_FAMILY,
           },
           {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_PHYLUM,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_PHYLUM,
-          },
-          {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ORDER,
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_ORDER,
           },
           {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_CLASS,
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_CLASS,
+          },
+          {
+            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_PHYLUM,
+            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_PHYLUM,
           },
           {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_KINGDOM,
@@ -62,15 +70,6 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
           },
         ],
         label: "Taxonomic Lineage",
-      },
-      {
-        categoryConfigs: [
-          {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.ASSEMBLY_TAXONOMY_IDS,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.ASSEMBLY_TAXONOMY_IDS,
-          },
-        ],
-        label: "Identifier",
       },
     ],
     key: "organisms",
