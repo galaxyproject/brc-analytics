@@ -40,10 +40,6 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMY_ID,
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMY_ID,
           },
-          {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_GROUP,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_GROUP,
-          },
         ],
         label: "Organism",
       },
