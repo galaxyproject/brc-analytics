@@ -18,7 +18,7 @@ export interface BRCDataCatalogGenome {
   scaffoldL50: number | null;
   scaffoldN50: number | null;
   speciesTaxonomyId: string;
-  strain: string | null;
+  strainName: string | null;
   taxonomicGroup: string[];
   taxonomicLevelClass: string;
   taxonomicLevelFamily: string;

@@ -164,7 +164,7 @@ export const buildGenomeTaxonomicLevelStrain = (
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     // Although the name including species (`taxonomicLevelStrain`) is used for the unrelying value, the strain-only name is displayed in the table by default.
-    value: genome.strain || genome.taxonomicLevelStrain,
+    value: genome.strainName || genome.taxonomicLevelStrain,
   };
 };
 
@@ -506,7 +506,7 @@ export const buildGenomeDetails = (
   );
   keyValuePairs.set(
     BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
-    genome.strain ?? LABEL.UNSPECIFIED
+    genome.strainName ?? LABEL.UNSPECIFIED
   );
   keyValuePairs.set(
     BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMY_ID,
