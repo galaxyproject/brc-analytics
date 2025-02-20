@@ -506,7 +506,7 @@ export const buildGenomeDetails = (
   );
   keyValuePairs.set(
     BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
-    genome.strainName ?? LABEL.UNSPECIFIED
+    genome.strainName || genome.taxonomicLevelStrain
   );
   keyValuePairs.set(
     BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMY_ID,
