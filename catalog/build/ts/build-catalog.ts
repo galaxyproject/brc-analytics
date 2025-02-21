@@ -51,6 +51,7 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
       console.log(`Skipping assembly ${row.accession} - ploidy not found`);
       continue;
     }
+    const taxonomicLevelStrain = row.taxonomicLevelStrain || (row.strain ? `${row.taxonomicLevelSpecies} strain ${row.strain}` : "None");
     mappedRows.push({
       accession: row.accession,
       annotationStatus: parseStringOrNull(row.annotationStatus),
@@ -76,7 +77,7 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
       taxonomicLevelOrder: defaultStringToNone(row.taxonomicLevelOrder),
       taxonomicLevelPhylum: defaultStringToNone(row.taxonomicLevelPhylum),
       taxonomicLevelSpecies: defaultStringToNone(row.taxonomicLevelSpecies),
-      taxonomicLevelStrain: defaultStringToNone(row.taxonomicLevelStrain),
+      taxonomicLevelStrain,
       taxonomicLevelSuperkingdom: defaultStringToNone(row.taxonomicLevelSuperkingdom),
       ucscBrowserUrl: parseStringOrNull(row.ucscBrowser),
     });

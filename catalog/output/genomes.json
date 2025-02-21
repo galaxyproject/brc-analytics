@@ -119,7 +119,7 @@
     "taxonomicLevelOrder": "Haemosporida",
     "taxonomicLevelPhylum": "Apicomplexa",
     "taxonomicLevelSpecies": "Plasmodium vivax",
-    "taxonomicLevelStrain": "None",
+    "taxonomicLevelStrain": "Plasmodium vivax strain Salvador I",
     "taxonomicLevelSuperkingdom": "Eukaryota",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002415.2"
   },
@@ -491,7 +491,7 @@
     "taxonomicLevelOrder": "Trypanosomatida",
     "taxonomicLevelPhylum": "Euglenozoa",
     "taxonomicLevelSpecies": "Trypanosoma cruzi",
-    "taxonomicLevelStrain": "None",
+    "taxonomicLevelStrain": "Trypanosoma cruzi strain CL Brener",
     "taxonomicLevelSuperkingdom": "Eukaryota",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000209065.1"
   },
@@ -522,7 +522,7 @@
     "taxonomicLevelOrder": "Trypanosomatida",
     "taxonomicLevelPhylum": "Euglenozoa",
     "taxonomicLevelSpecies": "Leishmania donovani",
-    "taxonomicLevelStrain": "None",
+    "taxonomicLevelStrain": "Leishmania donovani strain BPK282A1",
     "taxonomicLevelSuperkingdom": "Eukaryota",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000227135.1"
   },
@@ -553,7 +553,7 @@
     "taxonomicLevelOrder": "Chitovirales",
     "taxonomicLevelPhylum": "Nucleocytoviricota",
     "taxonomicLevelSpecies": "Monkeypox virus",
-    "taxonomicLevelStrain": "None",
+    "taxonomicLevelStrain": "Monkeypox virus strain Zaire-96-I-16",
     "taxonomicLevelSuperkingdom": "Viruses",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000857045.1"
   },
@@ -615,7 +615,7 @@
     "taxonomicLevelOrder": "Diptera",
     "taxonomicLevelPhylum": "Arthropoda",
     "taxonomicLevelSpecies": "Culex quinquefasciatus",
-    "taxonomicLevelStrain": "None",
+    "taxonomicLevelStrain": "Culex quinquefasciatus strain JHB",
     "taxonomicLevelSuperkingdom": "Eukaryota",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_015732765.1"
   },
@@ -708,7 +708,7 @@
     "taxonomicLevelOrder": "Haemosporida",
     "taxonomicLevelPhylum": "Apicomplexa",
     "taxonomicLevelSpecies": "Plasmodium yoelii",
-    "taxonomicLevelStrain": "None",
+    "taxonomicLevelStrain": "Plasmodium yoelii strain 17X",
     "taxonomicLevelSuperkingdom": "Eukaryota",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_900002385.2"
   },
