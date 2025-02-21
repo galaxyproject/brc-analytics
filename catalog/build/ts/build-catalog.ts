@@ -41,17 +41,34 @@ async function buildCatalog(): Promise<void> {
 }
 
 async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
-  const sourceRows = await readValuesFile<SourceGenome>(SOURCE_PATH_GENOMES, undefined, SOURCE_GENOME_KEYS);
-  const sourceOrganisms = await readYamlFile<SourceOrganisms>(SOURCE_PATH_ORGANISMS);
-  const sourceOrganismsByTaxonomyId = new Map(sourceOrganisms.organisms.map((sourceOrganism) => [String(sourceOrganism.taxonomy_id), sourceOrganism]));
+  const sourceRows = await readValuesFile<SourceGenome>(
+    SOURCE_PATH_GENOMES,
+    undefined,
+    SOURCE_GENOME_KEYS
+  );
+  const sourceOrganisms = await readYamlFile<SourceOrganisms>(
+    SOURCE_PATH_ORGANISMS
+  );
+  const sourceOrganismsByTaxonomyId = new Map(
+    sourceOrganisms.organisms.map((sourceOrganism) => [
+      String(sourceOrganism.taxonomy_id),
+      sourceOrganism,
+    ])
+  );
   const mappedRows: BRCDataCatalogGenome[] = [];
   for (const row of sourceRows) {
-    const ploidy =  sourceOrganismsByTaxonomyId.get(row.speciesTaxonomyId)?.ploidy;
+    const ploidy = sourceOrganismsByTaxonomyId.get(
+      row.speciesTaxonomyId
+    )?.ploidy;
     if (ploidy === undefined) {
       console.log(`Skipping assembly ${row.accession} - ploidy not found`);
       continue;
     }
-    const taxonomicLevelStrain = row.taxonomicLevelStrain || (row.strain ? `${row.taxonomicLevelSpecies} strain ${row.strain}` : "None");
+    const taxonomicLevelStrain =
+      row.taxonomicLevelStrain ||
+      (row.strain
+        ? `${row.taxonomicLevelSpecies} strain ${row.strain}`
+        : "None");
     mappedRows.push({
       accession: row.accession,
       annotationStatus: parseStringOrNull(row.annotationStatus),
@@ -78,7 +95,9 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
       taxonomicLevelPhylum: defaultStringToNone(row.taxonomicLevelPhylum),
       taxonomicLevelSpecies: defaultStringToNone(row.taxonomicLevelSpecies),
       taxonomicLevelStrain,
-      taxonomicLevelSuperkingdom: defaultStringToNone(row.taxonomicLevelSuperkingdom),
+      taxonomicLevelSuperkingdom: defaultStringToNone(
+        row.taxonomicLevelSuperkingdom
+      ),
       ucscBrowserUrl: parseStringOrNull(row.ucscBrowser),
     });
   }
@@ -106,7 +125,10 @@ function buildOrganism(
 ): BRCDataCatalogOrganism {
   return {
     assemblyCount: (organism?.assemblyCount ?? 0) + 1,
-    assemblyTaxonomyIds: accumulateArrayValue(organism?.assemblyTaxonomyIds, genome.ncbiTaxonomyId),
+    assemblyTaxonomyIds: accumulateArrayValue(
+      organism?.assemblyTaxonomyIds,
+      genome.ncbiTaxonomyId
+    ),
     genomes: accumulateArrayValue(organism?.genomes, genome),
     ncbiTaxonomyId: genome.speciesTaxonomyId,
     taxonomicGroup: genome.taxonomicGroup,
@@ -117,7 +139,10 @@ function buildOrganism(
     taxonomicLevelOrder: genome.taxonomicLevelOrder,
     taxonomicLevelPhylum: genome.taxonomicLevelPhylum,
     taxonomicLevelSpecies: genome.taxonomicLevelSpecies,
-    taxonomicLevelStrain: accumulateArrayValue(organism?.taxonomicLevelStrain, genome.taxonomicLevelStrain),
+    taxonomicLevelStrain: accumulateArrayValue(
+      organism?.taxonomicLevelStrain,
+      genome.taxonomicLevelStrain
+    ),
     taxonomicLevelSuperkingdom: genome.taxonomicLevelSuperkingdom,
   };
 }
@@ -158,8 +183,11 @@ function buildWorkflow(
   }: SourceWorkflow
 ): void {
   for (const category of categories) {
-    const workflowCategory = workflowCategories.find((c) => c.category === category);
-    if (!workflowCategory) throw new Error(`Unknown workflow category: ${category}`);
+    const workflowCategory = workflowCategories.find(
+      (c) => c.category === category
+    );
+    if (!workflowCategory)
+      throw new Error(`Unknown workflow category: ${category}`);
     workflowCategory.workflows.push({
       ploidy,
       trsId,
