@@ -15,7 +15,7 @@
     "scaffoldL50": 6,
     "scaffoldN50": 1422463,
     "speciesTaxonomyId": "5207",
-    "strain": "H99",
+    "strainName": "H99",
     "taxonomicGroup": [
       "Fungi"
     ],
@@ -46,7 +46,7 @@
     "scaffoldL50": 8,
     "scaffoldN50": 1220107,
     "speciesTaxonomyId": "199306",
-    "strain": "Silveira",
+    "strainName": "Silveira",
     "taxonomicGroup": [
       "Fungi"
     ],
@@ -77,7 +77,7 @@
     "scaffoldL50": 6,
     "scaffoldN50": 1761288,
     "speciesTaxonomyId": "5855",
-    "strain": null,
+    "strainName": null,
     "taxonomicGroup": [
       "Apicomplexa"
     ],
@@ -108,7 +108,7 @@
     "scaffoldL50": 6,
     "scaffoldN50": 1678596,
     "speciesTaxonomyId": "5855",
-    "strain": "Salvador I",
+    "strainName": "Salvador I",
     "taxonomicGroup": [
       "Apicomplexa"
     ],
@@ -139,7 +139,7 @@
     "scaffoldL50": 4,
     "scaffoldN50": 2481190,
     "speciesTaxonomyId": "5691",
-    "strain": null,
+    "strainName": null,
     "taxonomicGroup": [
       "Kinetoplastea"
     ],
@@ -170,7 +170,7 @@
     "scaffoldL50": 4,
     "scaffoldN50": 3948441,
     "speciesTaxonomyId": "746128",
-    "strain": "Af293",
+    "strainName": "Af293",
     "taxonomicGroup": [
       "Fungi"
     ],
@@ -201,7 +201,7 @@
     "scaffoldL50": 11,
     "scaffoldN50": 1091540,
     "speciesTaxonomyId": "5664",
-    "strain": "Friedlin",
+    "strainName": "Friedlin",
     "taxonomicGroup": [
       "Kinetoplastea"
     ],
@@ -232,7 +232,7 @@
     "scaffoldL50": 5,
     "scaffoldN50": 1687656,
     "speciesTaxonomyId": "5833",
-    "strain": null,
+    "strainName": null,
     "taxonomicGroup": [
       "Apicomplexa"
     ],
@@ -263,7 +263,7 @@
     "scaffoldL50": 11,
     "scaffoldN50": 992961,
     "speciesTaxonomyId": "5660",
-    "strain": "MHOM/BR/75/M2904",
+    "strainName": "MHOM/BR/75/M2904",
     "taxonomicGroup": [
       "Kinetoplastea"
     ],
@@ -294,7 +294,7 @@
     "scaffoldL50": 9,
     "scaffoldN50": 12309988,
     "speciesTaxonomyId": "7165",
-    "strain": "PEST",
+    "strainName": "PEST",
     "taxonomicGroup": [
       "Insecta"
     ],
@@ -325,7 +325,7 @@
     "scaffoldL50": 6,
     "scaffoldN50": 4973582,
     "speciesTaxonomyId": "5811",
-    "strain": "ME49",
+    "strainName": "ME49",
     "taxonomicGroup": [
       "Apicomplexa"
     ],
@@ -356,7 +356,7 @@
     "scaffoldL50": 6,
     "scaffoldN50": 1438950,
     "speciesTaxonomyId": "5207",
-    "strain": "JEC21",
+    "strainName": "JEC21",
     "taxonomicGroup": [
       "Fungi"
     ],
@@ -387,7 +387,7 @@
     "scaffoldL50": 3,
     "scaffoldN50": 4323945,
     "speciesTaxonomyId": "5501",
-    "strain": "RS",
+    "strainName": "RS",
     "taxonomicGroup": [
       "Fungi"
     ],
@@ -418,7 +418,7 @@
     "scaffoldL50": 3,
     "scaffoldN50": 2231883,
     "speciesTaxonomyId": "5476",
-    "strain": "SC5314",
+    "strainName": "SC5314",
     "taxonomicGroup": [
       "Fungi"
     ],
@@ -449,7 +449,7 @@
     "scaffoldL50": 1,
     "scaffoldN50": 4411532,
     "speciesTaxonomyId": "1773",
-    "strain": "H37Rv",
+    "strainName": "H37Rv",
     "taxonomicGroup": [
       "Bacteria"
     ],
@@ -480,7 +480,7 @@
     "scaffoldL50": 212,
     "scaffoldN50": 88624,
     "speciesTaxonomyId": "5693",
-    "strain": "CL Brener",
+    "strainName": "CL Brener",
     "taxonomicGroup": [
       "Kinetoplastea"
     ],
@@ -511,7 +511,7 @@
     "scaffoldL50": 11,
     "scaffoldN50": 1024085,
     "speciesTaxonomyId": "5661",
-    "strain": "BPK282A1",
+    "strainName": "BPK282A1",
     "taxonomicGroup": [
       "Kinetoplastea"
     ],
@@ -542,7 +542,7 @@
     "scaffoldL50": 1,
     "scaffoldN50": 196858,
     "speciesTaxonomyId": "10244",
-    "strain": "Zaire-96-I-16",
+    "strainName": "Zaire-96-I-16",
     "taxonomicGroup": [
       "Viruses"
     ],
@@ -573,7 +573,7 @@
     "scaffoldL50": 1,
     "scaffoldN50": 29903,
     "speciesTaxonomyId": "694009",
-    "strain": null,
+    "strainName": null,
     "taxonomicGroup": [
       "Viruses"
     ],
@@ -604,7 +604,7 @@
     "scaffoldL50": 2,
     "scaffoldN50": 201550677,
     "speciesTaxonomyId": "7176",
-    "strain": "JHB",
+    "strainName": "JHB",
     "taxonomicGroup": [
       "Insecta"
     ],
@@ -635,7 +635,7 @@
     "scaffoldL50": 2,
     "scaffoldN50": 186194774,
     "speciesTaxonomyId": "7175",
-    "strain": null,
+    "strainName": null,
     "taxonomicGroup": [
       "Insecta"
     ],
@@ -666,7 +666,7 @@
     "scaffoldL50": 2,
     "scaffoldN50": 8079863,
     "speciesTaxonomyId": "199306",
-    "strain": "Silveira",
+    "strainName": "Silveira",
     "taxonomicGroup": [
       "Fungi"
     ],
@@ -697,7 +697,7 @@
     "scaffoldL50": 5,
     "scaffoldN50": 2046250,
     "speciesTaxonomyId": "5861",
-    "strain": "17X",
+    "strainName": "17X",
     "taxonomicGroup": [
       "Apicomplexa"
     ],
@@ -728,7 +728,7 @@
     "scaffoldL50": 5,
     "scaffoldN50": 1692345,
     "speciesTaxonomyId": "5860",
-    "strain": null,
+    "strainName": null,
     "taxonomicGroup": [
       "Apicomplexa"
     ],
@@ -759,7 +759,7 @@
     "scaffoldL50": 2,
     "scaffoldN50": 99149756,
     "speciesTaxonomyId": "7165",
-    "strain": null,
+    "strainName": null,
     "taxonomicGroup": [
       "Insecta"
     ],
