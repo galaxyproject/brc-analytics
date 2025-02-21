@@ -163,8 +163,7 @@ export const buildGenomeTaxonomicLevelStrain = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    // Although the name including species (`taxonomicLevelStrain`) is used for the unrelying value, the strain-only name is displayed in the table by default.
-    value: genome.strainName || genome.taxonomicLevelStrain,
+    value: getGenomeStrainText(genome),
   };
 };
 
@@ -506,7 +505,7 @@ export const buildGenomeDetails = (
   );
   keyValuePairs.set(
     BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
-    genome.strainName || genome.taxonomicLevelStrain
+    getGenomeStrainText(genome, LABEL.UNSPECIFIED)
   );
   keyValuePairs.set(
     BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMY_ID,
@@ -688,6 +687,22 @@ function getGenomeEntityChooseAnalysisMethodBreadcrumbs(
     { path: "", text: genome.accession },
     { path: "", text: "Analyze" },
   ];
+}
+
+/**
+ * Get text for genome strain, consisting of, from highest to lowest priority, either: strain-only name; strain name including species; or the specified default value.
+ * @param genome - Genome entity.
+ * @param defaultValue - Default value to use if there's no strain.
+ * @returns strain text.
+ */
+function getGenomeStrainText(
+  genome: BRCDataCatalogGenome,
+  defaultValue = ""
+): string {
+  if (genome.strainName) return genome.strainName;
+  if (genome.taxonomicLevelStrain !== "None")
+    return genome.taxonomicLevelStrain;
+  return defaultValue;
 }
 
 /**
