@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.7.0](https://github.com/galaxyproject/brc-analytics/compare/v0.6.0...v0.7.0) (2025-02-21)
+
+
+### Features
+
+* add filters for taxonomic levels to organisms list ([#301](https://github.com/galaxyproject/brc-analytics/issues/301)) ([#306](https://github.com/galaxyproject/brc-analytics/issues/306)) ([665a20a](https://github.com/galaxyproject/brc-analytics/commit/665a20afb8bfdf1dc0aba4c32841f0bbd379902b))
+* add taxonomic levels to assembly list ([#312](https://github.com/galaxyproject/brc-analytics/issues/312)) ([#316](https://github.com/galaxyproject/brc-analytics/issues/316)) ([06bdb3c](https://github.com/galaxyproject/brc-analytics/commit/06bdb3ce1765e43123da5199a03d3c7093fee83e))
+
+
+### Styles
+
+* fix prettierignoring of catalog files ([#317](https://github.com/galaxyproject/brc-analytics/issues/317)) ([#318](https://github.com/galaxyproject/brc-analytics/issues/318)) ([9c97653](https://github.com/galaxyproject/brc-analytics/commit/9c97653ca99ebb307c9092e810009b720f42ac6e))
+
 ## [0.6.0](https://github.com/galaxyproject/brc-analytics/compare/v0.5.1...v0.6.0) (2025-02-18)
 
 
