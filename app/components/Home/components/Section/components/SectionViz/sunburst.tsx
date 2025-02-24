@@ -89,6 +89,7 @@ export const SectionViz = (): JSX.Element => {
 
     // Global variable to track the current center (zoomed) node. Initially, it’s the root.
     let currentRoot = root;
+    setSelectedNode(currentRoot);
 
     // An arc generator that “clamps” the radial depth so that
     // only the center plus DEPTH levels are visible.
