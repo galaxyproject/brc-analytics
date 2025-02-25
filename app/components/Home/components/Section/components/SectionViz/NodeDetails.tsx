@@ -1,9 +1,15 @@
 import React from "react";
 
-interface TreeNode {
+export interface TreeNode {
   children?: TreeNode[];
-  name: string;
+  data: {
+    name: string;
+    ncbi_tax_id?: number;
+    rank: string;
+  };
   depth: number;
+  height: number;
+  name: string;
 }
 
 interface NodeDetailsProps {
@@ -22,27 +28,14 @@ function countLeafNodes(node: TreeNode): number {
   return count;
 }
 
-const TAXANOMIC_LEVELS_FOR_TREE = [
-  "superkingdom",
-  "kingdom",
-  "phylum",
-  "class",
-  "order",
-  "family",
-  "genus",
-  "species",
-  "strain",
-];
-
 export const NodeDetails: React.FC<NodeDetailsProps> = ({ node }) => {
   const leafNodeCount = countLeafNodes(node);
-  const taxonomicLevel = TAXANOMIC_LEVELS_FOR_TREE[node.depth] || "Unknown";
   const isRoot = node.depth === 0;
 
   if (isRoot) {
     return (
       <div>
-        <p style={{ fontSize: "1.1em", color: "#666" }}>
+        <p style={{ color: "#666", fontSize: "1.1em" }}>
           Click the visualization to explore available assemblies
         </p>
       </div>
@@ -52,9 +45,23 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({ node }) => {
   return (
     <div>
       <h3>
-        {node.data.name} <em>({taxonomicLevel})</em>
+        {node.data.name} <em>({node.data.rank})</em>
       </h3>
       <p>Available Assemblies: {leafNodeCount}</p>
+      {node.height == 0 && node.data.ncbi_tax_id && (
+        <>
+          <p>NCBI Taxonomy ID: {node.data.ncbi_tax_id}</p>
+          <p>
+            <a
+              href={`/data/organisms/${node.data.ncbi_tax_id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View Organism Page →
+            </a>
+          </p>
+        </>
+      )}
     </div>
   );
 };
