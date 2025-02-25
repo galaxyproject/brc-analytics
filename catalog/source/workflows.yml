@@ -1,4 +1,32 @@
 workflows:
+  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.13"
+    categories:
+      - "REGULATION"
+    workflow_name: "CUTandRUN"
+    workflow_description: "This workflow take as input a collection of paired fastq. Remove adapters with cutadapt, map pairs with bowtie2 allowing dovetail. Keep MAPQ30 and concordant pairs. BAM to BED. MACS2 with 'ATAC' parameters."
+    ploidy: "ANY"
+
+  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/atacseq/main/versions/v1.0"
+    categories:
+      - "REGULATION"
+    workflow_name: "ATACseq"
+    workflow_description: "This workflow takes as input a collection of paired fastq. It will remove bad quality and adapters with cutadapt. Map with Bowtie2 end-to-end. Will remove reads on MT and unconcordant pairs and pairs with mapping quality below 30 and PCR duplicates. Will compute the pile-up on 5'' +- 100bp. Will call peaks and count the number of reads falling in the 1kb region centered on the summit. Will compute 2 normalization for coverage: normalized by million reads and normalized by million reads in peaks. Will plot the number of reads for each fragment length."
+    ploidy: "ANY"
+
+  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/main/versions/v0.5"
+    categories:
+      - "TRANSCRIPTOMICS"
+    workflow_name: "scRNA-seq preprocessing 10X cellPlex"
+    workflow_description: "This workflow processes the CMO fastqs with CITE-seq-Count and include the translation step required for cellPlex processing. In parallel it processes the Gene Expresion fastqs with STARsolo, filter cells with DropletUtils and reformat all outputs to be easily used by the function 'Read10X' from Seurat."
+    ploidy: "ANY"
+
+  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/main/versions/v0.5"
+    categories:
+      - "TRANSCRIPTOMICS"
+    workflow_name: "scRNA-seq preprocessing 10X Bundle"
+    workflow_description: "This workflow processes the Gene Expresion fastqs with STARsolo, filter cells with DropletUtils and reformat all outputs to be easily used by the function 'Read10X' from Seurat."
+    ploidy: "ANY"
+
   - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.12"
     categories:
       - "REGULATION"
