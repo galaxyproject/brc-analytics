@@ -1,13 +1,13 @@
 import * as d3 from "d3";
 import { useRef, useEffect, useState } from "react";
 import { getData } from "./data";
-import { NodeDetails } from "./NodeDetails";
+import { TreeNode, NodeDetails } from "./NodeDetails";
 
 const DEPTH = 4;
 const data = getData();
 
 export const SectionViz = (): JSX.Element => {
-  const [selectedNode, setSelectedNode] = useState<any>(null);
+  const [selectedNode, setSelectedNode] = useState<TreeNode | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export const SectionViz = (): JSX.Element => {
     const baseColor = d3.scaleOrdinal(d3.schemeTableau10);
 
     // Helper function to get color for a node
-    function getNodeColor(d) {
+    function getNodeColor(d): string {
       if (d.depth === 0) return baseColor(d.data.name); // root
       if (d.depth === 1) return baseColor(d.data.name); // first ring
 
@@ -125,7 +125,7 @@ export const SectionViz = (): JSX.Element => {
       .on("mouseover", function (event, d) {
         tooltip.transition().duration(200).style("opacity", 0.9);
         tooltip
-          .html(`<strong>${d.data.name}</strong><br/>Count: ${d.value}`)
+          .html(`<strong>${d.data.name}</strong><br/>Assemblies: ${d.value}`)
           .style("left", event.pageX + 10 + "px")
           .style("top", event.pageY - 28 + "px");
       })
@@ -226,6 +226,7 @@ export const SectionViz = (): JSX.Element => {
       currentRoot = p;
       updateCenter(p);
       setSelectedNode(p);
+      console.debug(p);
 
       // For each node, compute new coordinates relative to p.
       root.each((d) => {
@@ -289,15 +290,15 @@ export const SectionViz = (): JSX.Element => {
     <div
       style={{
         display: "flex",
-        width: "100%",
-        maxWidth: "1136px",
         margin: "0 auto",
+        maxWidth: "1136px",
+        width: "100%",
       }}
     >
-      <div style={{ width: "70%", display: "flex", justifyContent: "center" }}>
+      <div style={{ display: "flex", justifyContent: "center", width: "70%" }}>
         <svg ref={svgRef}></svg>
       </div>
-      <div style={{ width: "30%", padding: "1rem" }}>
+      <div style={{ padding: "1rem", width: "30%" }}>
         {selectedNode ? (
           <NodeDetails node={selectedNode} />
         ) : (
