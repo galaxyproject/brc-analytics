@@ -5,7 +5,7 @@ import { Props } from "./types";
 import { workflowPloidyMatchesOrganismPloidy } from "../../../../apis/catalog/brc-analytics-catalog/common/utils";
 
 export const AnalysisMethodsCatalog = ({
-  assemblyPloidy,
+  assemblyPloidies,
   geneModelUrl,
   genomeVersionAssemblyId,
 }: Props): JSX.Element => {
@@ -14,7 +14,9 @@ export const AnalysisMethodsCatalog = ({
       {workflows.map((workflowCategory) => {
         const compatibleWorkflows = workflowCategory.workflows.filter(
           ({ ploidy }) =>
-            workflowPloidyMatchesOrganismPloidy(ploidy, assemblyPloidy)
+            assemblyPloidies.some((assemblyPloidy) =>
+              workflowPloidyMatchesOrganismPloidy(ploidy, assemblyPloidy)
+            )
         );
         return (
           <AnalysisMethod

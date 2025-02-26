@@ -30,4 +30,5 @@ classes:
       ploidy:
         description: The organism's ploidy.
         required: true
+        multivalued: true
         range: OrganismPloidy

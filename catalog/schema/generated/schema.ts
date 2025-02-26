@@ -66,7 +66,7 @@ export interface Organism {
     /** The organism's NCBI taxonomy ID. */
     taxonomy_id: number,
     /** The organism's ploidy. */
-    ploidy: OrganismPloidy,
+    ploidy: OrganismPloidy[],
 }
 
 

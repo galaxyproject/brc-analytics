@@ -414,7 +414,7 @@ export const buildGenomeAnalysisMethods = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.AnalysisMethodsCatalog> => {
   return {
-    assemblyPloidy: genome.ploidy,
+    assemblyPloidies: genome.ploidy,
     geneModelUrl: genome.geneModelUrl,
     genomeVersionAssemblyId: genome.accession,
   };

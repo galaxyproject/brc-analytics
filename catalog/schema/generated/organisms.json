@@ -5,8 +5,11 @@
             "description": "Info for an organism.",
             "properties": {
                 "ploidy": {
-                    "$ref": "#/$defs/OrganismPloidy",
-                    "description": "The organism's ploidy."
+                    "description": "The organism's ploidy.",
+                    "items": {
+                        "$ref": "#/$defs/OrganismPloidy"
+                    },
+                    "type": "array"
                 },
                 "taxonomy_id": {
                     "description": "The organism's NCBI taxonomy ID.",
