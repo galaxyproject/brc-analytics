@@ -28,7 +28,7 @@ classes:
         required: true
         range: integer
       ploidy:
-        description: The organism's ploidy.
+        description: The ploidies that the organism may have.
         required: true
         multivalued: true
         range: OrganismPloidy
