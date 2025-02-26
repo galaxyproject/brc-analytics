@@ -4,26 +4,31 @@ const items_limit = 100;
 
 
 
-export async function GET(request: Request) {
-  
-  const fields = ['accession', 'sra_md5', 'base_count', 'study_accession', 'instrument_platform', 'instrument_model', 'library_layout'];  // ['all'];
-  // const { searchParams } = new URL(request.url);
-  const accessions = ["GCA_009859065.2"]; // const accessions = searchParams.getAll('accessions');
-  const sample_ids = []
+export async function POST(request: Request) {
 
-  await new Promise(resolve => setTimeout(resolve, 5000));
+  let { filter } = await request.json();
+  const fields = ['accession', 'sra_md5', 'base_count', 'study_accession', 'instrument_platform', 'instrument_model', 'library_layout'];  // ['all'];
+  const accessions = [];
+  const accessionsDict: { [key: string]: string } = {};
+  if (filter.includes('accession=')) {
+    const accessionRegex = /(accession\s*!?=\s*)(GC[FA]_[0-9]+\.[0-9]+)/g;     
+    let match;
+    while ((match = accessionRegex.exec(filter)) !== null) {
+      accessions.push(match[2]);
+      accessionsDict[match[2]] = `${match[1]}${match[2]}`;
+    }
+  }
+  
+  const sample_ids: { [key: string]: string[] } = {}
+
   // Check if there are any accession IDs provided
   if (accessions.length > 0) {
-    console.debug(`The accessions are ${accessions}`);
-    
     // Create query parameters for the API request using the accession IDs
     const queryParams = new URLSearchParams({
-      assembly_set_accession: `"${accessions.join(',')}"`, 
+      query: `${accessions.map((item) => `assembly_set_accession="${item}"`).join(' OR ')}`, 
     });
-   
-    // Construct the URL for the API request to fetch sample IDs based on accession IDs
-    const accesion_check_url = `https://www.ebi.ac.uk/ena/portal/api/search?result=assembly&fields=sample_accession&query=${queryParams.toString().replace(/=/g, '%3D')}&format=json`;
-    console.debug(`Fetching sample id: ${accesion_check_url}`);
+    // Construct the URL for the API request to fetch sample IDs based on accession IDs   
+    const accesion_check_url = `https://www.ebi.ac.uk/ena/portal/api/search?result=assembly&fields=assembly_set_accession,sample_accession&${queryParams.toString()}&format=json`;
     
     // Fetch the data from the API
     const response = await fetch(accesion_check_url);
@@ -31,34 +36,50 @@ export async function GET(request: Request) {
 
     // Extract sample IDs from the API response and add them to the sample_ids array
     for (const assembly of result) {
-      console.log(`Sample accession: ${assembly}`);
-      sample_ids.push(assembly.sample_accession);
+      if (!sample_ids[assembly.assembly_set_accession]) {
+        sample_ids[assembly.assembly_set_accession] = [assembly.sample_accession];
+      } else {
+        sample_ids[assembly.assembly_set_accession].push(assembly.sample_accession);
+      }
     }
-    if (sample_ids.length === 0) {
-      console.debug('No sample IDs found.');
-      return NextResponse.json({ 'count': 0 });
+    for (const accession of accessions) {
+      if (sample_ids[accession]){
+        filter = filter.replace(accessionsDict[accession],  "(" + sample_ids[accession].map(sample_id => `sample_accession="${sample_id}"`).join(' OR ') + ")");
+      } else {
+        filter = filter.replace(accessionsDict[accession],  `sample_accession="NO_SAMPLE"`);
+      }
     }
+    
   }
   
-  
-  const filter_parameters = sample_ids.map((sample_id: String) => `sample_accession=="${sample_id}"`).join(' AND ');
+  // const filter_parameters = sample_ids.map((sample_id: String) => `sample_accession=="${sample_id}"`).join(' AND ');
   const runQueryParams = new URLSearchParams({
-    query: filter_parameters,
+    query: filter,
   });
   const filter_url = `${runQueryParams.toString().replace(/%3D%3D/g, '%3D')}`;
   const count_url = `https://www.ebi.ac.uk/ena/portal/api/count?result=read_run&${filter_url}&format=json`;
-  console.debug(`Count URL: ${count_url}`);
+  // console.debug(`Count URL: ${count_url}`);
   var response = await fetch(count_url);
+    if (response.status !== 200) {
+    const errorMessageText = await response.text();
+    let errorMessage;
+    try {
+      errorMessage = JSON.parse(errorMessageText).message;
+    } catch (e) {
+      errorMessage = errorMessageText;
+    }
+    return NextResponse.json({'error':  `from ENA, ${errorMessage}`, 'count': 0});
+  }
   var result = await response.json();
-  if (result.count > items_limit) {
-    console.debug(`The number of items is ${result.count}, which is more than the limit of ${items_limit}.`);
-    return NextResponse.json(result)
+  var count = parseInt(result.count);
+  if (count === 0) {
+    return NextResponse.json(result);
+  }
+  if (count > items_limit) {
+    return NextResponse.json({'error': `To many entries return: ${count}, please add filters to reduce the number of entries.`});
   } 
-  
   const url_search = `https://www.ebi.ac.uk/ena/portal/api/search?result=read_run&${filter_url}&fields=${fields.join(',')}&limit=1000&format=json`;
-  console.debug(`Item url: ${url_search}`);
   response = await fetch(url_search);
   result = await response.json();
-  
-  return NextResponse.json(result);  // Send the API response back to the clien
+  return NextResponse.json({ count: count, data: result }); 
 }

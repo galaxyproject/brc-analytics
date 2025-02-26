@@ -9,6 +9,10 @@ export const mainColumn: ComponentsConfig = [
         component: C.AnalysisMethodsCatalog,
         viewBuilder: V.buildGenomeAnalysisMethods,
       },
+      {
+        component: C.PrimaryDataViewer,
+        viewBuilder: V.buildGenomePrimaryData,
+      },
     ],
     component: C.BackPageContentMainColumn,
   },
