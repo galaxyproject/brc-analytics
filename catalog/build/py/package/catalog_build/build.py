@@ -92,7 +92,7 @@ def get_genome_row(genome_info):
     "scaffoldN50": genome_info["assembly_stats"].get("scaffold_n50"),
     "scaffoldL50": genome_info["assembly_stats"].get("scaffold_l50"),
     "coverage": genome_info["assembly_stats"].get("genome_coverage"),
-    "gcPercent": genome_info["assembly_stats"]["gc_percent"],
+    "gcPercent": genome_info["assembly_stats"].get("gc_percent"),
     "annotationStatus": genome_info.get("annotation_info", {}).get("status"),
     "pairedAccession": genome_info.get("paired_accession"),
   }
@@ -102,16 +102,25 @@ def get_biosample_data(genome_info):
   return {
     "accession": genome_info["accession"],
     "biosample": genome_info["assembly_info"]["biosample"]["accession"],
-    'sample_ids': ",".join([f"{sample['db']}:{sample['value']}" for sample in genome_info["assembly_info"]["biosample"]['sample_ids'] if 'db' in sample]),
+    'sample_ids': ",".join([f"{sample['db']}:{sample['value']}" for sample in genome_info["assembly_info"]["biosample"].get('sample_ids', '') if 'db' in sample]),
   }
 
 
 def get_genomes_and_primarydata_df(accessions):
-  genomes_info = get_paginated_ncbi_results(f"https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/{",".join(accessions)}/dataset_report", "genomes")
+  # Send accessions in batches of 100
+  # ncbi api produces a 414 error if there are too many accessions
+  batch_size = 100
+  genomes_info = []
+  biosamples_info = []
+  for i in range(0, len(accessions), batch_size):
+    batch = accessions[i:i+batch_size]
+    batch_genomes_info = get_paginated_ncbi_results(f"https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/{','.join(batch)}/dataset_report", "genomes")
+    genomes_info.extend([get_genome_row(info) for info in batch_genomes_info])
+    biosamples_info.extend([get_biosample_data(info) for info in batch_genomes_info if 'biosample' in info['assembly_info']])
 
   return (
-          pd.DataFrame(data=[get_genome_row(info) for info in genomes_info]),
-          pd.DataFrame(data=[get_biosample_data(info) for info in genomes_info if 'biosample' in info['assembly_info']]))
+          pd.DataFrame(data=genomes_info),
+          pd.DataFrame(data=biosamples_info))
 
 
 def _id_to_gene_model_url(asm_id):

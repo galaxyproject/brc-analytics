@@ -7,7 +7,7 @@ export interface BRCDataCatalogGenome {
   annotationStatus: string | null;
   chromosomes: number | null;
   coverage: string | null;
-  gcPercent: number;
+  gcPercent: number | null;
   geneModelUrl: string | null;
   isRef: string;
   length: number;

@@ -74,7 +74,7 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
       annotationStatus: parseStringOrNull(row.annotationStatus),
       chromosomes: parseNumberOrNull(row.chromosomeCount),
       coverage: parseStringOrNull(row.coverage),
-      gcPercent: parseNumber(row.gcPercent),
+      gcPercent: parseNumberOrNull(row.gcPercent),
       geneModelUrl: parseStringOrNull(row.geneModelUrl),
       isRef: parseBoolean(row.isRef),
       length: parseNumber(row.length),
