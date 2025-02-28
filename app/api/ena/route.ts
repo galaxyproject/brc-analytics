@@ -10,6 +10,7 @@ export async function POST(request: Request) {
   const fields = ['accession', 'sra_md5', 'base_count', 'study_accession', 'instrument_platform', 'instrument_model', 'library_layout'];  // ['all'];
   const accessions = [];
   const accessionsDict: { [key: string]: string } = {};
+  //return NextResponse.json({count: 0})
   if (filter.includes('accession=')) {
     const accessionRegex = /(accession\s*!?=\s*)(GC[FA]_[0-9]+\.[0-9]+)/g;     
     let match;
@@ -58,7 +59,7 @@ export async function POST(request: Request) {
   });
   const filter_url = `${runQueryParams.toString().replace(/%3D%3D/g, '%3D')}`;
   const count_url = `https://www.ebi.ac.uk/ena/portal/api/count?result=read_run&${filter_url}&format=json`;
-  // console.debug(`Count URL: ${count_url}`);
+  console.debug(`Count URL: ${count_url}`);
   var response = await fetch(count_url);
     if (response.status !== 200) {
     const errorMessageText = await response.text();

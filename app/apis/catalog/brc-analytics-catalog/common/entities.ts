@@ -46,6 +46,12 @@ export interface EntitiesResponsePagination {
   total: number;
 }
 
+export interface RunReadsFields {
+  name: string;
+  descritption: string;
+  type: string;
+}
+
 export interface WorkflowCategory {
   category: string;
   description: string;

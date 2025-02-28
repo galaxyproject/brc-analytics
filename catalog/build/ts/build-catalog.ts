@@ -4,6 +4,7 @@ import YAML from "yaml";
 import {
   BRCDataCatalogGenome,
   BRCDataCatalogOrganism,
+  RunReadsFields,
   WorkflowCategory,
 } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import {
@@ -13,6 +14,7 @@ import {
   Workflows as SourceWorkflows,
 } from "../../schema/generated/schema";
 import { SourceGenome } from "./entities";
+import { Url } from "next/dist/shared/lib/router/router";
 
 const SOURCE_PATH_GENOMES = "catalog/build/intermediate/genomes-from-ncbi.tsv";
 const SOURCE_PATH_ORGANISMS = "catalog/source/organisms.yml";
@@ -25,7 +27,8 @@ buildCatalog();
 async function buildCatalog(): Promise<void> {
   const genomes = await buildGenomes();
   const organisms = buildOrganisms(genomes);
-  const workflows = await buildWorkflows();
+  const runFields = await buildRunReadFields('https://www.ebi.ac.uk/ena/portal/api/searchFields?result=read_run&format=json');
+  const workflows = await buildWorkflows(); 
 
   console.log("Genomes:", genomes.length);
   await saveJson("catalog/output/genomes.json", genomes);
@@ -33,6 +36,9 @@ async function buildCatalog(): Promise<void> {
   console.log("Organisms:", organisms.length);
   await saveJson("catalog/output/organisms.json", organisms);
 
+  console.log("Run Read Fields:", runFields.length);
+  await saveJson("catalog/output/runReadFields.json", runFields);
+  
   console.log("Workflows:", workflows.length);
   await saveJson("catalog/output/workflows.json", workflows);
 
@@ -104,6 +110,27 @@ function buildOrganism(
     species: genome.species,
     taxonomicGroup: genome.taxonomicGroup,
   };
+}
+
+async function buildRunReadFields(
+  filePath: string
+): Promise<RunReadsFields[]> {
+  const response = await fetch(filePath);
+  const sourceRows = await response.json();
+  const mappedRows: RunReadsFields[] = [];
+  for (const row of sourceRows) { 
+    mappedRows.push({
+      name: row.columnId,
+      description: row.description,
+      type: row.type
+    });
+  }
+  mappedRows.push({
+    name: "accession",
+    description: "GCF/GCA accession id",
+    type: 'string'
+  });
+  return mappedRows.sort((a, b) => a.name.localeCompare(b.name));
 }
 
 async function buildWorkflows(): Promise<WorkflowCategory[]> {

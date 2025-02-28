@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 
+import runReadFields from "../../../../../catalog/output/runReadFields.json";
 
 import {
   FluidPaper,
@@ -9,13 +10,15 @@ import {
 } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 
 import { GridPaperSection } from "@databiosphere/findable-ui/lib/components/common/Section/section.styles";
-
 import {BlinkingDots, StyledSection} from "./primaryDataViewer.style";
 import { Fragment } from 'react';
 import { RUN_FILTER_CATEGORIES } from "../../../../../site-config/brc-analytics/runFilterCategories";
 import { config } from 'process';
 import { validate } from 'validate.js';
 
+import { RunReadsFields } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
+
+const expression_bullder = /(\(|\)|\s*AND\s|\s*OR\s)/
 
 interface PrimaryDataTableProps {
     data: any[];
@@ -38,14 +41,6 @@ const columns = [
     { Header: "Platform", accessor: "instrument_platform" },
     { Header: "Model", accessor: "instrument_model" },
   ];
-
-
-// const renderFilterSection = (accessions: String[]): JSX.Element => {
-//     const accessionsString = accessions.map((item) => `accesions=${item}`).join(' OR ');
-//     return (
-//         <input type="text" placeholder="Enter filter criteria" value={accessionsString} />
-//     );
-// };
 
 const renderPrimaryData = (data: Object[] | { count: number}, columns: { Header: string }[]): JSX.Element => {
     const renderRows = (data: Object[] | { count: number}, columns: { Header: string }[]): JSX.Element => {
@@ -111,8 +106,50 @@ const renderPrimaryData = (data: Object[] | { count: number}, columns: { Header:
     );
 };
 
-function validateExpression(expression: string, setSearchSyntaxError: React.Dispatch<React.SetStateAction<string[] | undefined>>, setFilterString: React.Dispatch<React.SetStateAction<string | undefined>>, setData: React.Dispatch<React.SetStateAction<string | undefined>>): boolean {
+function splitUnqouatedSpace(s: string): string[] {
+    const parts = []
+    if (!/\s/.test(s)) {
+        return [s];
+    } else {
+        let quouted = false;
+        let qouteChar = ''
+        let newPart = "";        
+        for (const p of s.split(/\s+/)){
+            if (quouted) {
+                newPart += ` ${p}`;
+                if (p.endsWith(qouteChar)) {
+                    parts.push(newPart);
+                    newPart = "";
+                    quouted = false;
+                }
+            } else {
+                const firstQuoteIndex = p.search(/['"]/);
+                if (firstQuoteIndex === -1) {
+                    parts.push(p);
+                } else {
+                    qouteChar = p[firstQuoteIndex];
+                    if (p.endsWith(qouteChar)) {
+                        parts.push(p);
+                    } else {
+                        newPart = p;
+                        quouted = true;
+                    }
+                }
+            }
+            
+        }
+    }
+    return parts;
+}
+
+
+function validateExpression(expression: string,
+                            setSearchSyntaxError: React.Dispatch<React.SetStateAction<string[] | undefined>>,
+                            setFilterString: React.Dispatch<React.SetStateAction<string | undefined>>,
+                            setData: React.Dispatch<React.SetStateAction<string | undefined>>): boolean {
     // Check if parentheses are balanced
+
+    expression = expression.replace(/\s[Aa][Nn][Dd]\s/, ' AND ').replace(/\s[Oo][Rr]\s/, ' OR ');
     const areParenthesesBalanced = (s: string): boolean => {
         let count = 0;
         for (const char of s) {
@@ -131,22 +168,22 @@ function validateExpression(expression: string, setSearchSyntaxError: React.Disp
         }
 
         // Regular expressions for validation
-        const conditionPattern = /^\s*([a-z_]+)\s*!?=\s*([a-z0-9._-]+)\s*$/;
-        const conditionPatternWithSpace = /^\s*([a-z_]+)\s*!?=\s*(["'][a-z0-9._ -]+["'])\s*$/;
+        const conditionPattern = /^\s*([a-z_]+)\s*!?=\s*([A-Za-z0-9._-]+)\s*$/;
+        const conditionPatternWithSpace = /^\s*([a-z_]+)\s*!?=\s*(["'][A-Za-z0-9._ -]+["'])\s*$/;
         const emptyParentheses = /\s*\(\s*\)/;
-        const operatorPattern = /^\s*(and|or)\s*$/;
+        const operatorPattern = /^\s*(AND|OR)\s*$/;
 
         if (emptyParentheses.test(expression_lowercase)) {
             expression_status.push("Error: Parentheses wihtout content.");
         }
         // Tokenize the expression
-        const tokens = expression_lowercase.split(/(\(|\)|\s+and\s+|\s+or\s+)/).map(t => t.trim()).filter(t => t.length > 0);
+        
+        const tokens = expression.split(expression_bullder).map(t => t.trim()).filter(t => t.length > 0);
 
         let prevWasCondition = false;
         const parenStack: string[] = [];
         for (let i = 0; i < tokens.length; i++) {
             const token = tokens[i];
-
             if (token === "(") {
                 parenStack.push(token);
                 prevWasCondition = false;
@@ -165,7 +202,6 @@ function validateExpression(expression: string, setSearchSyntaxError: React.Disp
                 if (!prevWasCondition) {
                     expression_status.push(`Error: Operator '${token}' must be between conditions.`);
                 }
-                console.log("Operator: ", token);
                 prevWasCondition = false;
             } else {
                 expression_status.push(`Error: Invalid token '${token}'.`);
@@ -192,6 +228,7 @@ function validateExpression(expression: string, setSearchSyntaxError: React.Disp
 
 const fetchData = async (filterString: String, setData: React.Dispatch<React.SetStateAction<string | undefined>>) => {
     try {
+        console.log('Fetching data:', filterString);
         const script = document.createElement("script");
         const response = await fetch(`http://127.0.0.1:3000/api/ena`, {
             method: 'POST',
@@ -208,10 +245,129 @@ const fetchData = async (filterString: String, setData: React.Dispatch<React.Set
     }
 };
 
+function renderBuild(tokens: string, validateQueryExpression: (expression: string) => boolean): JSX.Element {
+    const split_on_first_equals = (s: string): string[] => {
+        const index = s.indexOf("=");
+        return index !== -1 ? [s.slice(0, index), s.slice(index + 1)] : [s];
+    }
+    // const token_parts = tokens.split(expression_bullder).flatMap((item) => /[a-c_]+="[A-Za-z0-9-_. ]*"/.test(item) ? [item] : item.split('\s*')).map((item) => split_on_first_equals(item));
+    const token_parts = splitUnqouatedSpace(tokens).map((item) => split_on_first_equals(item));
+    console.log('Token parts:', token_parts);
+    return (
+        <>
+            <p style={{ fontWeight: 'bold' }}>Query builder</p>
+            <table>
+                {token_parts.length ? token_parts.map((token, index) => (
+                    <tr key={index}>
+                        <td style={{ width: '100px' }}></td>
+                        <td style={{ width: '150px' }}>
+                            <select value={token[0].trim()} style={{ width: '150px' }}
+                                onChange={(e) => {
+                                    const selectedValue = e.target.value;
+                                    token_parts[index][0] = selectedValue;
+                                    validateQueryExpression(combineTokens(token_parts));
+                                    const selectedField = runReadFields.find(field => field.name === selectedValue);
+                                    const inputElement = e.target.closest('tr')?.querySelector('input');
+                                    if (inputElement && selectedField) {
+                                        inputElement.placeholder = selectedField.description;
+                                    }
+                                }}
+                            >
+                                <option></option>
+                                {runReadFields && runReadFields.map((field, index) => (
+                                    <option key={index} value={field.name} >{field.name}</option>
+                                ))}
+                            </select>
+                        </td>
+                        <td style={{ width: 'calc(100% - 250px)' }}>
+                            <input 
+                                hidden={ ['AND', 'OR', ''].includes(token[0].trim())}
+                                type="text" 
+                                placeholder="Enter value" 
+                                value={token.slice(1).join('=')}
+                                style={{ width: '100%' }}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    const tokenIndex = index;
+                                    token_parts[index][1] = value;
+                                    validateQueryExpression(combineTokens(token_parts));
+                                }} 
+                            />
+                        </td>
+                        <td>
+                            <button
+                                style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+                                onClick={() => {
+                                    const newTokenParts = [...token_parts];
+                                    newTokenParts.splice(index, 1);
+                                    validateQueryExpression(combineTokens(newTokenParts));
+                                }}
+                            >
+                                &#10006;
+                            </button>
+                            <button
+                                style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+                                onClick={() => {
+                                    const newTokenParts = [...token_parts];
+                                    newTokenParts.splice(index + 1, 0, [" AND "]);
+                                    validateQueryExpression(combineTokens(newTokenParts));
+                                }}
+                            >
+                                &#43;
+                            </button>
+                        </td>
+                    </tr>
+                )) : (
+                    <tr>
+                        <td style={{ width: '100px' }}></td>
+                        <td style={{ width: '150px' }}>
+                            <select 
+                                style={{ width: '150px' }} 
+                                onChange={(e) => {
+                                    const selectedField = runReadFields.find(field => field.name === e.target.value);
+                                    const inputElement = e.target.closest('tr')?.querySelector('input');
+                                    if (inputElement && selectedField) {
+                                        inputElement.placeholder = selectedField.description;
+                                    }
+                                }}
+                            >
+                                {runReadFields && runReadFields.map((field, index) => (
+                                    <option key={index} value={field.name}>{field.name}</option>
+                                ))}
+                            </select>
+                        </td>
+                        <td style={{ width: 'calc(100% - 250px)' }}>
+                            <input type="text" placeholder={runReadFields[0]?.description || "Enter value"} style={{ width: '100%' }} />
+                        </td>
+                        <td>
+                            <button style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+                                &#10006;
+                            </button>
+                        </td>
+                    </tr>
+                )}
+            </table>
+        </>
+    );
+}
+
+const combineTokens = (tokens: string[][]): string => {
+    console.log('Combining tokens:', tokens);
+    console.log(tokens.map((item) => item.join('=')).join(' '));
+    // return tokens.map((token) => ['AND', 'OR'].includes(token[0]) ? ` ${token[0]} ` : token.join('=')).join('');
+    return tokens.map((item) => item.join('=')).join(' ').replace(/\s+/g, ' ');
+}
+
+
 export const PrimaryDataViewer = ({ accessions }: PrimaryDataViewerProps): JSX.Element => {
     const [data, setData] = useState<any>(null);
     const [filterString, setFilterString] = useState<string>(accessions.map((item) => `accession=${item}`).join(' OR '));
     const [searchSyntaxError, setSearchSyntaxError] = useState<string[]>();
+    const [tokens, setTokens] = useState<string>(filterString);
+
+    const validateQueryExpression = (expression: string): boolean => {
+        return validateExpression(expression, setSearchSyntaxError, setFilterString, setData);
+    }
 
     useEffect(() => {
         fetchData(filterString, setData);
@@ -224,12 +380,14 @@ export const PrimaryDataViewer = ({ accessions }: PrimaryDataViewerProps): JSX.E
                 <StyledSection>
                     <Fragment>
                         <h2>Primary Data Viewer {accessions}</h2>
+
                         <input 
                             type="text" 
                             placeholder="Enter filter criteria" 
                             value={filterString} 
-                            onChange={(e) => validateExpression(e.target.value, setSearchSyntaxError, setFilterString, setData)} 
+                            onChange={(e) => validateQueryExpression(e.target.value)} 
                         />
+                        {renderBuild(filterString, validateQueryExpression)}
                         {searchSyntaxError && searchSyntaxError.map((error, index) => (
                             <p key={index} style={{ color: 'red' }}>{error}</p>
                         ))}
