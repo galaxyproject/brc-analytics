@@ -114,7 +114,7 @@ function splitUnqouatedSpace(s: string): string[] {
         let quouted = false;
         let qouteChar = ''
         let newPart = "";        
-        for (const p of s.split(/\s+/)){
+        for (const p of s.split(/(\(|\)|\s+)/).filter(part => part.trim() !== '')){
             if (quouted) {
                 newPart += ` ${p}`;
                 if (p.endsWith(qouteChar)) {
@@ -281,7 +281,7 @@ function renderBuild(tokens: string, validateQueryExpression: (expression: strin
                         </td>
                         <td style={{ width: 'calc(100% - 250px)' }}>
                             <input 
-                                hidden={ ['AND', 'OR', ''].includes(token[0].trim())}
+                                hidden={ ['AND', 'OR', '(', ')', ''].includes(token[0].trim())}
                                 type="text" 
                                 placeholder="Enter value" 
                                 value={token.slice(1).join('=')}
@@ -354,7 +354,6 @@ function renderBuild(tokens: string, validateQueryExpression: (expression: strin
 const combineTokens = (tokens: string[][]): string => {
     console.log('Combining tokens:', tokens);
     console.log(tokens.map((item) => item.join('=')).join(' '));
-    // return tokens.map((token) => ['AND', 'OR'].includes(token[0]) ? ` ${token[0]} ` : token.join('=')).join('');
     return tokens.map((item) => item.join('=')).join(' ').replace(/\s+/g, ' ');
 }
 
