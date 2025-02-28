@@ -9,10 +9,18 @@ GENOMES_OUTPUT_PATH = "catalog/build/intermediate/genomes-from-ncbi.tsv"
 TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
   2: "Bacteria",
   10239: "Viruses",
-  4751: "Fungi",
-  50557: "Insecta",
   5794: "Apicomplexa",
   5653: "Kinetoplastea",
+  6029: "Microsporidia",
+  4762: "Oomycota",
+  7742: "Vertebra",
+  554915: "Amoebozoa",
+  2611341: "Metamonada",
+  6656: "Arthropoda",
+  4890: "Ascomycota",
+  5204: "Basidiomycota",
+  4761: "Chytridiomycota",
+  1913637: "Mucoromycota"
 }
 
 TAXANOMIC_LEVELS_FOR_TREE = [

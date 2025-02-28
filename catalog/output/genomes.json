@@ -18,7 +18,9 @@
     "scaffoldN50": 27122,
     "speciesTaxonomyId": "5722",
     "strainName": "G3",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Metamonada"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Trichomonadidae",
     "taxonomicLevelGenus": "Trichomonas",
@@ -50,7 +52,7 @@
     "speciesTaxonomyId": "5059",
     "strainName": "NRRL3357",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -83,7 +85,9 @@
     "scaffoldN50": 837833,
     "speciesTaxonomyId": "2052682",
     "strainName": "DAOM BR144",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Oomycota"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Pythiaceae",
     "taxonomicLevelGenus": "Globisporangium",
@@ -115,7 +119,7 @@
     "speciesTaxonomyId": "5476",
     "strainName": "WO-1",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pichiomycetes",
     "taxonomicLevelFamily": "Debaryomycetaceae",
@@ -181,7 +185,7 @@
     "speciesTaxonomyId": "5501",
     "strainName": "H538.4",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Onygenaceae",
@@ -215,7 +219,7 @@
     "speciesTaxonomyId": "109871",
     "strainName": "JEL423",
     "taxonomicGroup": [
-      "Fungi"
+      "Chytridiomycota"
     ],
     "taxonomicLevelClass": "Chytridiomycetes",
     "taxonomicLevelFamily": "None",
@@ -248,7 +252,7 @@
     "speciesTaxonomyId": "5501",
     "strainName": "RMSCC 2394",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Onygenaceae",
@@ -314,7 +318,7 @@
     "speciesTaxonomyId": "199306",
     "strainName": "RMSCC 3488",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Onygenaceae",
@@ -347,7 +351,7 @@
     "speciesTaxonomyId": "5501",
     "strainName": "RMSCC 3703",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Onygenaceae",
@@ -380,7 +384,7 @@
     "speciesTaxonomyId": "746128",
     "strainName": "A1163",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -413,7 +417,7 @@
     "speciesTaxonomyId": "199306",
     "strainName": "RMSCC 2133",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Onygenaceae",
@@ -446,7 +450,7 @@
     "speciesTaxonomyId": "199306",
     "strainName": "RMSCC 3700",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Onygenaceae",
@@ -479,7 +483,7 @@
     "speciesTaxonomyId": "199306",
     "strainName": "CPA 0001",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Onygenaceae",
@@ -512,7 +516,7 @@
     "speciesTaxonomyId": "121759",
     "strainName": "Pb03",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Ajellomycetaceae",
@@ -545,7 +549,7 @@
     "speciesTaxonomyId": "199306",
     "strainName": "RMSCC 1037",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Onygenaceae",
@@ -578,7 +582,7 @@
     "speciesTaxonomyId": "199306",
     "strainName": "RMSCC 1038",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Onygenaceae",
@@ -611,7 +615,7 @@
     "speciesTaxonomyId": "199306",
     "strainName": "CPA 0020",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Onygenaceae",
@@ -644,7 +648,7 @@
     "speciesTaxonomyId": "199306",
     "strainName": "CPA 0066",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Onygenaceae",
@@ -677,7 +681,7 @@
     "speciesTaxonomyId": "1518534",
     "strainName": "M",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -710,7 +714,7 @@
     "speciesTaxonomyId": "7165",
     "strainName": "S",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -743,7 +747,7 @@
     "speciesTaxonomyId": "5037",
     "strainName": "H143",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Ajellomycetaceae",
@@ -776,7 +780,7 @@
     "speciesTaxonomyId": "63418",
     "strainName": "CBS 127.97",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Arthrodermataceae",
@@ -809,9 +813,7 @@
     "scaffoldN50": 1114524,
     "speciesTaxonomyId": "28583",
     "strainName": "ATCC 38327",
-    "taxonomicGroup": [
-      "Fungi"
-    ],
+    "taxonomicGroup": [],
     "taxonomicLevelClass": "Blastocladiomycetes",
     "taxonomicLevelFamily": "Blastocladiaceae",
     "taxonomicLevelGenus": "Allomyces",
@@ -843,7 +845,7 @@
     "speciesTaxonomyId": "34387",
     "strainName": "CBS 112818",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Arthrodermataceae",
@@ -876,7 +878,7 @@
     "speciesTaxonomyId": "208348",
     "strainName": "1-1 BBBD Race 1",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Pucciniomycetes",
     "taxonomicLevelFamily": "Pucciniaceae",
@@ -909,7 +911,7 @@
     "speciesTaxonomyId": "5039",
     "strainName": "ATCC 26199",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Ajellomycetaceae",
@@ -943,7 +945,7 @@
     "speciesTaxonomyId": "2822231",
     "strainName": "RP-78",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Agaricomycetes",
     "taxonomicLevelFamily": "Phanerochaetaceae",
@@ -976,7 +978,7 @@
     "speciesTaxonomyId": "199306",
     "strainName": "Silveira",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Onygenaceae",
@@ -1009,7 +1011,9 @@
     "scaffoldN50": 332402,
     "speciesTaxonomyId": "272952",
     "strainName": "Emoy2",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Oomycota"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Peronosporaceae",
     "taxonomicLevelGenus": "Hyaloperonospora",
@@ -1041,7 +1045,7 @@
     "speciesTaxonomyId": "13249",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Reduviidae",
@@ -1073,7 +1077,9 @@
     "scaffoldN50": null,
     "speciesTaxonomyId": "5741",
     "strainName": "GS/M clone H7",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Metamonada"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Hexamitidae",
     "taxonomicLevelGenus": "Giardia",
@@ -1104,7 +1110,9 @@
     "scaffoldN50": null,
     "speciesTaxonomyId": "5741",
     "strainName": "P15",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Metamonada"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Hexamitidae",
     "taxonomicLevelGenus": "Giardia",
@@ -1170,7 +1178,7 @@
     "speciesTaxonomyId": "586133",
     "strainName": "ERTm3",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "None",
@@ -1203,7 +1211,7 @@
     "speciesTaxonomyId": "148304",
     "strainName": "ATCC 64411",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Magnaporthaceae",
@@ -1236,7 +1244,7 @@
     "speciesTaxonomyId": "43151",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -1270,7 +1278,7 @@
     "speciesTaxonomyId": "6035",
     "strainName": "EC3",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Unikaryonidae",
@@ -1304,7 +1312,7 @@
     "speciesTaxonomyId": "6035",
     "strainName": "EC2",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Unikaryonidae",
@@ -1338,7 +1346,7 @@
     "speciesTaxonomyId": "6035",
     "strainName": "EC1",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Unikaryonidae",
@@ -1569,7 +1577,7 @@
     "speciesTaxonomyId": "79591",
     "strainName": "E277",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Clavicipitaceae",
@@ -1670,7 +1678,7 @@
     "speciesTaxonomyId": "72558",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Ustilaginomycetes",
     "taxonomicLevelFamily": "Ustilaginaceae",
@@ -1703,7 +1711,7 @@
     "speciesTaxonomyId": "5061",
     "strainName": "ATCC 1015",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -1737,7 +1745,7 @@
     "speciesTaxonomyId": "70536",
     "strainName": "USNM 41457",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Culicosporidae",
@@ -1770,7 +1778,7 @@
     "speciesTaxonomyId": "1069201",
     "strainName": "IFO4308",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -1804,7 +1812,7 @@
     "speciesTaxonomyId": "1913371",
     "strainName": "ERTm2",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "None",
@@ -2002,7 +2010,7 @@
     "speciesTaxonomyId": "5507",
     "strainName": "26406",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Nectriaceae",
@@ -2035,7 +2043,7 @@
     "speciesTaxonomyId": "29031",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Psychodidae",
@@ -2068,7 +2076,7 @@
     "speciesTaxonomyId": "7200",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Psychodidae",
@@ -2101,7 +2109,7 @@
     "speciesTaxonomyId": "5507",
     "strainName": "Fo47",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Nectriaceae",
@@ -2200,7 +2208,7 @@
     "speciesTaxonomyId": "30069",
     "strainName": "Indian Wild Type (Walter Reed)",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -2233,7 +2241,7 @@
     "speciesTaxonomyId": "35725",
     "strainName": "MS6",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Dothideomycetes",
     "taxonomicLevelFamily": "Botryosphaeriaceae",
@@ -2268,7 +2276,7 @@
     "speciesTaxonomyId": "5011",
     "strainName": "PYCC 5710",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Taphrinomycetes",
     "taxonomicLevelFamily": "Taphrinaceae",
@@ -2302,7 +2310,7 @@
     "speciesTaxonomyId": "723287",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Tubulinosematidae",
@@ -2336,7 +2344,7 @@
     "speciesTaxonomyId": "72359",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Pleistophoridae",
@@ -2567,7 +2575,7 @@
     "speciesTaxonomyId": "42068",
     "strainName": "SE8",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pneumocystomycetes",
     "taxonomicLevelFamily": "Pneumocystaceae",
@@ -2632,7 +2640,9 @@
     "scaffoldN50": 12189,
     "speciesTaxonomyId": "5759",
     "strainName": "KU27",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Entamoebidae",
     "taxonomicLevelGenus": "Entamoeba",
@@ -2729,7 +2739,9 @@
     "scaffoldN50": 8820,
     "speciesTaxonomyId": "5759",
     "strainName": "HM-1:IMSS-B",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Entamoebidae",
     "taxonomicLevelGenus": "Entamoeba",
@@ -2760,7 +2772,9 @@
     "scaffoldN50": 11217,
     "speciesTaxonomyId": "5759",
     "strainName": "HM-3:IMSS",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Entamoebidae",
     "taxonomicLevelGenus": "Entamoeba",
@@ -2794,7 +2808,7 @@
     "speciesTaxonomyId": "5111",
     "strainName": "20.1",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Clavicipitaceae",
@@ -2827,7 +2841,7 @@
     "speciesTaxonomyId": "112268",
     "strainName": "MINIMUS1",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -2860,7 +2874,7 @@
     "speciesTaxonomyId": "30069",
     "strainName": "SDA-500",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -2893,7 +2907,7 @@
     "speciesTaxonomyId": "34691",
     "strainName": "QUAD4_A",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -2926,7 +2940,7 @@
     "speciesTaxonomyId": "199890",
     "strainName": "epiroticus2",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -2959,7 +2973,7 @@
     "speciesTaxonomyId": "7167",
     "strainName": "ALBI9_A",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -2992,7 +3006,7 @@
     "speciesTaxonomyId": "7168",
     "strainName": "WRAIR2",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -3025,7 +3039,7 @@
     "speciesTaxonomyId": "43041",
     "strainName": "ACHKN1017",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -3058,7 +3072,7 @@
     "speciesTaxonomyId": "7173",
     "strainName": "DONG5_A",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -3091,7 +3105,7 @@
     "speciesTaxonomyId": "5507",
     "strainName": "race 1",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Nectriaceae",
@@ -3124,7 +3138,7 @@
     "speciesTaxonomyId": "2502994",
     "strainName": "race 4",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Nectriaceae",
@@ -3189,7 +3203,9 @@
     "scaffoldN50": 9673,
     "speciesTaxonomyId": "5759",
     "strainName": "HM-1:IMSS-A",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Entamoebidae",
     "taxonomicLevelGenus": "Entamoeba",
@@ -3222,7 +3238,7 @@
     "speciesTaxonomyId": "27978",
     "strainName": "CQ1",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Nosematidae",
@@ -3256,7 +3272,7 @@
     "speciesTaxonomyId": "723287",
     "strainName": "PRA109",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Tubulinosematidae",
@@ -3290,7 +3306,7 @@
     "speciesTaxonomyId": "723287",
     "strainName": "PRA339",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Tubulinosematidae",
@@ -3323,7 +3339,9 @@
     "scaffoldN50": 23217,
     "speciesTaxonomyId": "36331",
     "strainName": "DAOM BR486",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Oomycota"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Pythiaceae",
     "taxonomicLevelGenus": "Globisporangium",
@@ -3355,7 +3373,9 @@
     "scaffoldN50": 37384,
     "speciesTaxonomyId": "65070",
     "strainName": "DAOM BR444",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Oomycota"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Pythiaceae",
     "taxonomicLevelGenus": "Pythium",
@@ -3387,7 +3407,9 @@
     "scaffoldN50": 11008,
     "speciesTaxonomyId": "115417",
     "strainName": "DAOM BR242034",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Oomycota"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Pythiaceae",
     "taxonomicLevelGenus": "Globisporangium",
@@ -3419,7 +3441,9 @@
     "scaffoldN50": 9784,
     "speciesTaxonomyId": "82932",
     "strainName": "ATCC 12531",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Oomycota"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Pythiaceae",
     "taxonomicLevelGenus": "Pythium",
@@ -3451,7 +3475,9 @@
     "scaffoldN50": 19114,
     "speciesTaxonomyId": "2052682",
     "strainName": "DAOM BR650",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Oomycota"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Pythiaceae",
     "taxonomicLevelGenus": "Globisporangium",
@@ -3483,7 +3509,9 @@
     "scaffoldN50": 29235,
     "speciesTaxonomyId": "907947",
     "strainName": "DAOM BR484",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Oomycota"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Pythiaceae",
     "taxonomicLevelGenus": "Phytopythium",
@@ -3515,7 +3543,7 @@
     "speciesTaxonomyId": "27337",
     "strainName": "JR2",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Plectosphaerellaceae",
@@ -3550,7 +3578,7 @@
     "speciesTaxonomyId": "36080",
     "strainName": "1006PhL",
     "taxonomicGroup": [
-      "Fungi"
+      "Mucoromycota"
     ],
     "taxonomicLevelClass": "Mucoromycetes",
     "taxonomicLevelFamily": "Mucoraceae",
@@ -3682,7 +3710,7 @@
     "speciesTaxonomyId": "61273",
     "strainName": "UAMH 11346",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Ophiostomataceae",
@@ -3749,7 +3777,7 @@
     "speciesTaxonomyId": "51541",
     "strainName": "42_110",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Spragueidae",
@@ -3815,7 +3843,7 @@
     "speciesTaxonomyId": "74873",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -3948,7 +3976,7 @@
     "speciesTaxonomyId": "35231",
     "strainName": "BRL 01",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Nosematidae",
@@ -4014,7 +4042,7 @@
     "speciesTaxonomyId": "74873",
     "strainName": "SINENSIS",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -4047,7 +4075,7 @@
     "speciesTaxonomyId": "74869",
     "strainName": "maculatus3",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -4080,7 +4108,7 @@
     "speciesTaxonomyId": "139723",
     "strainName": "species A-37_1",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -4113,7 +4141,7 @@
     "speciesTaxonomyId": "69004",
     "strainName": "FAR1",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -4146,7 +4174,7 @@
     "speciesTaxonomyId": "41427",
     "strainName": "EBRO",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -4179,7 +4207,7 @@
     "speciesTaxonomyId": "34690",
     "strainName": "CM1001059_A",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -4212,7 +4240,7 @@
     "speciesTaxonomyId": "30066",
     "strainName": "MAF",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -4310,7 +4338,9 @@
     "scaffoldN50": null,
     "speciesTaxonomyId": "5741",
     "strainName": "DH",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Metamonada"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Hexamitidae",
     "taxonomicLevelGenus": "Giardia",
@@ -4341,7 +4371,9 @@
     "scaffoldN50": null,
     "speciesTaxonomyId": "5741",
     "strainName": "GS",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Metamonada"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Hexamitidae",
     "taxonomicLevelGenus": "Giardia",
@@ -4471,7 +4503,7 @@
     "speciesTaxonomyId": "89924",
     "strainName": "CBS 569",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Tremellomycetes",
     "taxonomicLevelFamily": "Cryptococcaceae",
@@ -4537,7 +4569,7 @@
     "speciesTaxonomyId": "7396",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Glossinidae",
@@ -4570,7 +4602,7 @@
     "speciesTaxonomyId": "37001",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Glossinidae",
@@ -4603,7 +4635,7 @@
     "speciesTaxonomyId": "7398",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Glossinidae",
@@ -4636,7 +4668,7 @@
     "speciesTaxonomyId": "7395",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Glossinidae",
@@ -4671,7 +4703,7 @@
     "speciesTaxonomyId": "5322",
     "strainName": "PC15",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Agaricomycetes",
     "taxonomicLevelFamily": "Pleurotaceae",
@@ -4739,7 +4771,7 @@
     "speciesTaxonomyId": "42458",
     "strainName": "FSU 9682",
     "taxonomicGroup": [
-      "Fungi"
+      "Mucoromycota"
     ],
     "taxonomicLevelClass": "Mucoromycetes",
     "taxonomicLevelFamily": "Lichtheimiaceae",
@@ -4805,7 +4837,7 @@
     "speciesTaxonomyId": "74722",
     "strainName": "IBT 40293",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Stachybotryaceae",
@@ -4838,7 +4870,7 @@
     "speciesTaxonomyId": "27334",
     "strainName": "d1",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -4904,7 +4936,7 @@
     "speciesTaxonomyId": "3151832",
     "strainName": "ARSEF 549",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Clavicipitaceae",
@@ -4937,7 +4969,7 @@
     "speciesTaxonomyId": "7397",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Glossinidae",
@@ -4969,7 +5001,9 @@
     "scaffoldN50": 6445,
     "speciesTaxonomyId": "65658",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Acanthamoebidae",
     "taxonomicLevelGenus": "Acanthamoeba",
@@ -5000,7 +5034,9 @@
     "scaffoldN50": 16470,
     "speciesTaxonomyId": "43142",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Acanthamoebidae",
     "taxonomicLevelGenus": "Acanthamoeba",
@@ -5031,7 +5067,9 @@
     "scaffoldN50": 5152,
     "speciesTaxonomyId": "29196",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Acanthamoebidae",
     "taxonomicLevelGenus": "Acanthamoeba",
@@ -5062,7 +5100,9 @@
     "scaffoldN50": 9058,
     "speciesTaxonomyId": "65661",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Acanthamoebidae",
     "taxonomicLevelGenus": "Acanthamoeba",
@@ -5093,7 +5133,9 @@
     "scaffoldN50": 3940,
     "speciesTaxonomyId": "28015",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Acanthamoebidae",
     "taxonomicLevelGenus": "Acanthamoeba",
@@ -5124,7 +5166,9 @@
     "scaffoldN50": 2200,
     "speciesTaxonomyId": "5757",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Acanthamoebidae",
     "taxonomicLevelGenus": "Acanthamoeba",
@@ -5155,7 +5199,9 @@
     "scaffoldN50": 22637,
     "speciesTaxonomyId": "32600",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Acanthamoebidae",
     "taxonomicLevelGenus": "Acanthamoeba",
@@ -5186,7 +5232,9 @@
     "scaffoldN50": 4435,
     "speciesTaxonomyId": "32599",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Acanthamoebidae",
     "taxonomicLevelGenus": "Acanthamoeba",
@@ -5217,7 +5265,9 @@
     "scaffoldN50": 3407,
     "speciesTaxonomyId": "61605",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Acanthamoebidae",
     "taxonomicLevelGenus": "Acanthamoeba",
@@ -5248,7 +5298,9 @@
     "scaffoldN50": 4515,
     "speciesTaxonomyId": "211522",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Acanthamoebidae",
     "taxonomicLevelGenus": "Acanthamoeba",
@@ -5279,7 +5331,9 @@
     "scaffoldN50": 3760,
     "speciesTaxonomyId": "196912",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Acanthamoebidae",
     "taxonomicLevelGenus": "Acanthamoeba",
@@ -5310,7 +5364,9 @@
     "scaffoldN50": 2046,
     "speciesTaxonomyId": "5755",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Acanthamoebidae",
     "taxonomicLevelGenus": "Acanthamoeba",
@@ -5341,7 +5397,9 @@
     "scaffoldN50": 2067,
     "speciesTaxonomyId": "65662",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Acanthamoebidae",
     "taxonomicLevelGenus": "Acanthamoeba",
@@ -5372,7 +5430,9 @@
     "scaffoldN50": 11557,
     "speciesTaxonomyId": "52283",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Arthropoda"
+    ],
     "taxonomicLevelClass": "Arachnida",
     "taxonomicLevelFamily": "Sarcoptidae",
     "taxonomicLevelGenus": "Sarcoptes",
@@ -5437,7 +5497,7 @@
     "speciesTaxonomyId": "37769",
     "strainName": "EJB2",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Tremellomycetes",
     "taxonomicLevelFamily": "Cryptococcaceae",
@@ -5470,7 +5530,7 @@
     "speciesTaxonomyId": "552467",
     "strainName": "CA1873",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Tremellomycetes",
     "taxonomicLevelFamily": "Cryptococcaceae",
@@ -5536,7 +5596,7 @@
     "speciesTaxonomyId": "37769",
     "strainName": "NT-10",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Tremellomycetes",
     "taxonomicLevelFamily": "Cryptococcaceae",
@@ -5569,7 +5629,7 @@
     "speciesTaxonomyId": "5518",
     "strainName": "233423",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Nectriaceae",
@@ -5601,7 +5661,9 @@
     "scaffoldN50": 3065,
     "speciesTaxonomyId": "34613",
     "strainName": "Charles River",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Arthropoda"
+    ],
     "taxonomicLevelClass": "Arachnida",
     "taxonomicLevelFamily": "Ixodidae",
     "taxonomicLevelGenus": "Ixodes",
@@ -5633,7 +5695,7 @@
     "speciesTaxonomyId": "73230",
     "strainName": "UAMH 3008",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Ajellomycetaceae",
@@ -5666,7 +5728,9 @@
     "scaffoldN50": null,
     "speciesTaxonomyId": "114742",
     "strainName": "Pi-S",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Oomycota"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Pythiaceae",
     "taxonomicLevelGenus": "Pythium",
@@ -5698,7 +5762,7 @@
     "speciesTaxonomyId": "7394",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Glossinidae",
@@ -5765,7 +5829,7 @@
     "speciesTaxonomyId": "6035",
     "strainName": "EcunIII-L",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Unikaryonidae",
@@ -5830,7 +5894,9 @@
     "scaffoldN50": 93953,
     "speciesTaxonomyId": "66527",
     "strainName": "CDC-V039",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Balamuthiidae",
     "taxonomicLevelGenus": "Balamuthia",
@@ -5861,7 +5927,9 @@
     "scaffoldN50": 26144,
     "speciesTaxonomyId": "66527",
     "strainName": "2046",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Balamuthiidae",
     "taxonomicLevelGenus": "Balamuthia",
@@ -5893,7 +5961,7 @@
     "speciesTaxonomyId": "27349",
     "strainName": "RO10H11247",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Pucciniomycetes",
     "taxonomicLevelFamily": "Pucciniaceae",
@@ -5926,7 +5994,7 @@
     "speciesTaxonomyId": "100816",
     "strainName": "mm55",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "None",
@@ -5994,7 +6062,7 @@
     "speciesTaxonomyId": "166112",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Onygenaceae",
@@ -6027,7 +6095,7 @@
     "speciesTaxonomyId": "2074759",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Onygenaceae",
@@ -6060,7 +6128,7 @@
     "speciesTaxonomyId": "89421",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Onygenaceae",
@@ -6093,7 +6161,7 @@
     "speciesTaxonomyId": "264361",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Onygenaceae",
@@ -6127,7 +6195,7 @@
     "speciesTaxonomyId": "146866",
     "strainName": "MK1",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "None",
@@ -6160,7 +6228,7 @@
     "speciesTaxonomyId": "7160",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -6194,7 +6262,7 @@
     "speciesTaxonomyId": "100951",
     "strainName": "NRRL Y-1402",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Tremellomycetes",
     "taxonomicLevelFamily": "Filobasidiaceae",
@@ -6227,7 +6295,7 @@
     "speciesTaxonomyId": "293939",
     "strainName": "IFM 54703",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -6326,7 +6394,9 @@
     "scaffoldN50": null,
     "speciesTaxonomyId": "5741",
     "strainName": "AS175",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Metamonada"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Hexamitidae",
     "taxonomicLevelGenus": "Giardia",
@@ -6357,7 +6427,9 @@
     "scaffoldN50": 52012,
     "speciesTaxonomyId": "5741",
     "strainName": "BAH15c1",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Metamonada"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Hexamitidae",
     "taxonomicLevelGenus": "Giardia",
@@ -6389,7 +6461,7 @@
     "speciesTaxonomyId": "588596",
     "strainName": "A1",
     "taxonomicGroup": [
-      "Fungi"
+      "Mucoromycota"
     ],
     "taxonomicLevelClass": "Glomeromycetes",
     "taxonomicLevelFamily": "Glomeraceae",
@@ -6588,7 +6660,7 @@
     "speciesTaxonomyId": "82521",
     "strainName": "JCM 9937",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Tremellomycetes",
     "taxonomicLevelFamily": "Trichosporonaceae",
@@ -6621,7 +6693,7 @@
     "speciesTaxonomyId": "63577",
     "strainName": "JCM 9410",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Hypocreaceae",
@@ -6655,7 +6727,7 @@
     "speciesTaxonomyId": "100951",
     "strainName": "JCM 2334",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Tremellomycetes",
     "taxonomicLevelFamily": "Filobasidiaceae",
@@ -6721,7 +6793,7 @@
     "speciesTaxonomyId": "5105",
     "strainName": "ARSEF 7405",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Ascosphaeraceae",
@@ -6756,7 +6828,7 @@
     "speciesTaxonomyId": "29924",
     "strainName": "CBS 277.49",
     "taxonomicGroup": [
-      "Fungi"
+      "Mucoromycota"
     ],
     "taxonomicLevelClass": "Mucoromycetes",
     "taxonomicLevelFamily": "Mucoraceae",
@@ -6790,7 +6862,7 @@
     "speciesTaxonomyId": "1805481",
     "strainName": "ERTm5",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "None",
@@ -7021,7 +7093,7 @@
     "speciesTaxonomyId": "1955775",
     "strainName": "CBS 136260",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Ajellomycetaceae",
@@ -7054,7 +7126,7 @@
     "speciesTaxonomyId": "86049",
     "strainName": "KSF",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Herpotrichiellaceae",
@@ -7087,7 +7159,7 @@
     "speciesTaxonomyId": "573508",
     "strainName": "GZAAS20.1005",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -7120,7 +7192,7 @@
     "speciesTaxonomyId": "5208",
     "strainName": "CBS 7855",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Tremellomycetes",
     "taxonomicLevelFamily": "Cryptococcaceae",
@@ -7154,7 +7226,7 @@
     "speciesTaxonomyId": "29833",
     "strainName": "AWRI3580",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Saccharomycetes",
     "taxonomicLevelFamily": "Saccharomycodaceae",
@@ -7187,7 +7259,7 @@
     "speciesTaxonomyId": "5180",
     "strainName": "1980",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Leotiomycetes",
     "taxonomicLevelFamily": "Sclerotiniaceae",
@@ -7221,7 +7293,7 @@
     "speciesTaxonomyId": "1866961",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Amphiacanthidae",
@@ -7254,7 +7326,7 @@
     "speciesTaxonomyId": "1658174",
     "strainName": "EI222",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Ajellomycetaceae",
@@ -7287,7 +7359,7 @@
     "speciesTaxonomyId": "1955774",
     "strainName": "UAMH 9510",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Ajellomycetaceae",
@@ -7320,7 +7392,7 @@
     "speciesTaxonomyId": "1069201",
     "strainName": "CBS 106.47",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -7353,7 +7425,7 @@
     "speciesTaxonomyId": "5068",
     "strainName": "CBS 134.48",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -7386,7 +7458,7 @@
     "speciesTaxonomyId": "36022",
     "strainName": "65",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Saccharomycetes",
     "taxonomicLevelFamily": "Phaffomycetaceae",
@@ -7419,7 +7491,7 @@
     "speciesTaxonomyId": "40993",
     "strainName": "ITEM 5010",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -7452,7 +7524,7 @@
     "speciesTaxonomyId": "51453",
     "strainName": "QM6a",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Hypocreaceae",
@@ -7486,7 +7558,7 @@
     "speciesTaxonomyId": "1357716",
     "strainName": "AMFP13",
     "taxonomicGroup": [
-      "Fungi"
+      "Chytridiomycota"
     ],
     "taxonomicLevelClass": "Chytridiomycetes",
     "taxonomicLevelFamily": "None",
@@ -7520,7 +7592,7 @@
     "speciesTaxonomyId": "646526",
     "strainName": "TH1",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Enterocytozoonidae",
@@ -7555,7 +7627,7 @@
     "speciesTaxonomyId": "58291",
     "strainName": "ATCC 52814",
     "taxonomicGroup": [
-      "Fungi"
+      "Mucoromycota"
     ],
     "taxonomicLevelClass": "Mucoromycetes",
     "taxonomicLevelFamily": "Rhizopodaceae",
@@ -7589,7 +7661,7 @@
     "speciesTaxonomyId": "1081669",
     "strainName": "canceri",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Hepatosporidae",
@@ -7623,7 +7695,7 @@
     "speciesTaxonomyId": "1081669",
     "strainName": "GB1",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Hepatosporidae",
@@ -7657,7 +7729,7 @@
     "speciesTaxonomyId": "1081671",
     "strainName": "GB1",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Enterocytozoonidae",
@@ -7690,7 +7762,7 @@
     "speciesTaxonomyId": "1972497",
     "strainName": "5z489",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Ajellomycetaceae",
@@ -7723,7 +7795,7 @@
     "speciesTaxonomyId": "91943",
     "strainName": "EXF-2000",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Dothideomycetes",
     "taxonomicLevelFamily": "Teratosphaeriaceae",
@@ -7789,7 +7861,7 @@
     "speciesTaxonomyId": "5207",
     "strainName": "XL280",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Tremellomycetes",
     "taxonomicLevelFamily": "Cryptococcaceae",
@@ -7822,7 +7894,7 @@
     "speciesTaxonomyId": "5207",
     "strainName": "KN99",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Tremellomycetes",
     "taxonomicLevelFamily": "Cryptococcaceae",
@@ -7888,7 +7960,7 @@
     "speciesTaxonomyId": "5478",
     "strainName": "DSY562",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Saccharomycetes",
     "taxonomicLevelFamily": "Saccharomycetaceae",
@@ -7953,7 +8025,9 @@
     "scaffoldN50": 48620,
     "speciesTaxonomyId": "639000",
     "strainName": "AV1007",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Oomycota"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Peronosporaceae",
     "taxonomicLevelGenus": "Phytophthora",
@@ -8018,7 +8092,7 @@
     "speciesTaxonomyId": "41688",
     "strainName": "JHH-5317",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Microascaceae",
@@ -8152,7 +8226,7 @@
     "speciesTaxonomyId": "760013",
     "strainName": "NCCPF 102052",
     "taxonomicGroup": [
-      "Fungi"
+      "Mucoromycota"
     ],
     "taxonomicLevelClass": "Mucoromycetes",
     "taxonomicLevelFamily": "Mucoraceae",
@@ -8185,7 +8259,7 @@
     "speciesTaxonomyId": "498019",
     "strainName": "B8441",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pichiomycetes",
     "taxonomicLevelFamily": "Metschnikowiaceae",
@@ -8217,7 +8291,9 @@
     "scaffoldN50": 6694,
     "speciesTaxonomyId": "4796",
     "strainName": "sbr112.9",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Oomycota"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Peronosporaceae",
     "taxonomicLevelGenus": "Phytophthora",
@@ -8248,7 +8324,9 @@
     "scaffoldN50": 40197,
     "speciesTaxonomyId": "41668",
     "strainName": "Laredo",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Entamoebidae",
     "taxonomicLevelGenus": "Entamoeba",
@@ -8280,7 +8358,7 @@
     "speciesTaxonomyId": "27350",
     "strainName": "93-210",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Pucciniomycetes",
     "taxonomicLevelFamily": "Pucciniaceae",
@@ -8313,7 +8391,7 @@
     "speciesTaxonomyId": "27350",
     "strainName": "93TX-2",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Pucciniomycetes",
     "taxonomicLevelFamily": "Pucciniaceae",
@@ -8380,7 +8458,7 @@
     "speciesTaxonomyId": "5207",
     "strainName": "H99",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Tremellomycetes",
     "taxonomicLevelFamily": "Cryptococcaceae",
@@ -8446,7 +8524,7 @@
     "speciesTaxonomyId": "498019",
     "strainName": "B11243",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pichiomycetes",
     "taxonomicLevelFamily": "Metschnikowiaceae",
@@ -8480,7 +8558,7 @@
     "speciesTaxonomyId": "4909",
     "strainName": "CBS5147",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pichiomycetes",
     "taxonomicLevelFamily": "Pichiaceae",
@@ -8579,7 +8657,7 @@
     "speciesTaxonomyId": "523103",
     "strainName": "TIMM 2789",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Arthrodermataceae",
@@ -8678,7 +8756,7 @@
     "speciesTaxonomyId": "487660",
     "strainName": "CBS 121057",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -8711,7 +8789,7 @@
     "speciesTaxonomyId": "41066",
     "strainName": "CBS 707.79",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -8743,7 +8821,9 @@
     "scaffoldN50": 56285,
     "speciesTaxonomyId": "29920",
     "strainName": "10300",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Oomycota"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Peronosporaceae",
     "taxonomicLevelGenus": "Phytophthora",
@@ -8775,7 +8855,7 @@
     "speciesTaxonomyId": "5061",
     "strainName": "ATCC 13496",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -9170,7 +9250,9 @@
     "scaffoldN50": 2941,
     "speciesTaxonomyId": "299467",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Arthropoda"
+    ],
     "taxonomicLevelClass": "Arachnida",
     "taxonomicLevelFamily": "Trombiculidae",
     "taxonomicLevelGenus": "Leptotrombidium",
@@ -9203,7 +9285,7 @@
     "speciesTaxonomyId": "76775",
     "strainName": "CBS 7877",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Malasseziomycetes",
     "taxonomicLevelFamily": "Malasseziaceae",
@@ -9237,7 +9319,7 @@
     "speciesTaxonomyId": "646526",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Enterocytozoonidae",
@@ -9270,7 +9352,7 @@
     "speciesTaxonomyId": "2249419",
     "strainName": "CBS 132003",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "None",
@@ -9402,7 +9484,7 @@
     "speciesTaxonomyId": "35717",
     "strainName": "Fl1",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Clavicipitaceae",
@@ -9434,7 +9516,9 @@
     "scaffoldN50": 72179,
     "speciesTaxonomyId": "542832",
     "strainName": "R13",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Oomycota"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Peronosporaceae",
     "taxonomicLevelGenus": "Peronospora",
@@ -9466,7 +9550,7 @@
     "speciesTaxonomyId": "62324",
     "strainName": "FUMOZ",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -9499,7 +9583,7 @@
     "speciesTaxonomyId": "37727",
     "strainName": "TM4",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Trichocomaceae",
@@ -9533,7 +9617,7 @@
     "speciesTaxonomyId": "291195",
     "strainName": "Franzen",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Tubulinosematidae",
@@ -9566,7 +9650,7 @@
     "speciesTaxonomyId": "5501",
     "strainName": "WA_211",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Onygenaceae",
@@ -9601,7 +9685,7 @@
     "speciesTaxonomyId": "203904",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Pucciniomycetes",
     "taxonomicLevelFamily": "Zaghouaniaceae",
@@ -9634,7 +9718,7 @@
     "speciesTaxonomyId": "1518534",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -9668,7 +9752,7 @@
     "speciesTaxonomyId": "174685",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Ordosporidae",
@@ -9702,7 +9786,7 @@
     "speciesTaxonomyId": "174685",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Ordosporidae",
@@ -9736,7 +9820,7 @@
     "speciesTaxonomyId": "148818",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Dubosqiidae",
@@ -9770,7 +9854,7 @@
     "speciesTaxonomyId": "1176355",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Dubosqiidae",
@@ -9804,7 +9888,7 @@
     "speciesTaxonomyId": "174685",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Ordosporidae",
@@ -9838,7 +9922,7 @@
     "speciesTaxonomyId": "148818",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Dubosqiidae",
@@ -9872,7 +9956,7 @@
     "speciesTaxonomyId": "1176355",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Dubosqiidae",
@@ -9906,7 +9990,7 @@
     "speciesTaxonomyId": "50990",
     "strainName": "SZMC22713",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Agaricomycetes",
     "taxonomicLevelFamily": "Rickenellaceae",
@@ -9939,7 +10023,7 @@
     "speciesTaxonomyId": "1220188",
     "strainName": "NIH1004",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -9973,7 +10057,7 @@
     "speciesTaxonomyId": "40302",
     "strainName": "BRL",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Nosematidae",
@@ -10005,7 +10089,9 @@
     "scaffoldN50": 2398647,
     "speciesTaxonomyId": "5742",
     "strainName": "Roberts-Thomson",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Metamonada"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Hexamitidae",
     "taxonomicLevelGenus": "Giardia",
@@ -10038,7 +10124,7 @@
     "speciesTaxonomyId": "286115",
     "strainName": "MB42",
     "taxonomicGroup": [
-      "Fungi"
+      "Chytridiomycota"
     ],
     "taxonomicLevelClass": "Chytridiomycetes",
     "taxonomicLevelFamily": "Synchytriaceae",
@@ -10105,7 +10191,7 @@
     "speciesTaxonomyId": "278021",
     "strainName": "CLX",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "None",
@@ -10138,7 +10224,7 @@
     "speciesTaxonomyId": "73501",
     "strainName": "ATCC 34164",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Cordycipitaceae",
@@ -10171,7 +10257,7 @@
     "speciesTaxonomyId": "498019",
     "strainName": "B11245",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pichiomycetes",
     "taxonomicLevelFamily": "Metschnikowiaceae",
@@ -10204,7 +10290,7 @@
     "speciesTaxonomyId": "44093",
     "strainName": "CBS 4856",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Dipodascomycetes",
     "taxonomicLevelFamily": "Trichomonascaceae",
@@ -10239,7 +10325,7 @@
     "speciesTaxonomyId": "688394",
     "strainName": "KPH11",
     "taxonomicGroup": [
-      "Fungi"
+      "Mucoromycota"
     ],
     "taxonomicLevelClass": "Mucoromycetes",
     "taxonomicLevelFamily": "Lichtheimiaceae",
@@ -10272,7 +10358,7 @@
     "speciesTaxonomyId": "5059",
     "strainName": "NRRL 3357",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -10305,7 +10391,7 @@
     "speciesTaxonomyId": "5067",
     "strainName": "CBS 117618",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -10338,7 +10424,7 @@
     "speciesTaxonomyId": "2268382",
     "strainName": "MF34",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Tremellomycetes",
     "taxonomicLevelFamily": "Cryptococcaceae",
@@ -10536,7 +10622,7 @@
     "speciesTaxonomyId": "5061",
     "strainName": "LDM3",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -10569,7 +10655,7 @@
     "speciesTaxonomyId": "30076",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Reduviidae",
@@ -10601,7 +10687,9 @@
     "scaffoldN50": null,
     "speciesTaxonomyId": "5741",
     "strainName": "WB",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Metamonada"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Hexamitidae",
     "taxonomicLevelGenus": "Giardia",
@@ -10632,7 +10720,9 @@
     "scaffoldN50": null,
     "speciesTaxonomyId": "5741",
     "strainName": "beaver",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Metamonada"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Hexamitidae",
     "taxonomicLevelGenus": "Giardia",
@@ -10663,7 +10753,9 @@
     "scaffoldN50": null,
     "speciesTaxonomyId": "5741",
     "strainName": "GS",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Metamonada"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Hexamitidae",
     "taxonomicLevelGenus": "Giardia",
@@ -10728,7 +10820,7 @@
     "speciesTaxonomyId": "5482",
     "strainName": "MYA-3404",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pichiomycetes",
     "taxonomicLevelFamily": "Debaryomycetaceae",
@@ -10760,7 +10852,9 @@
     "scaffoldN50": 137335073,
     "speciesTaxonomyId": "266040",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Arthropoda"
+    ],
     "taxonomicLevelClass": "Arachnida",
     "taxonomicLevelFamily": "Ixodidae",
     "taxonomicLevelGenus": "Hyalomma",
@@ -10791,7 +10885,9 @@
     "scaffoldN50": 204922340,
     "speciesTaxonomyId": "44386",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Arthropoda"
+    ],
     "taxonomicLevelClass": "Arachnida",
     "taxonomicLevelFamily": "Ixodidae",
     "taxonomicLevelGenus": "Haemaphysalis",
@@ -10855,7 +10951,9 @@
     "scaffoldN50": 532020,
     "speciesTaxonomyId": "34615",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Arthropoda"
+    ],
     "taxonomicLevelClass": "Arachnida",
     "taxonomicLevelFamily": "Ixodidae",
     "taxonomicLevelGenus": "Ixodes",
@@ -10887,7 +10985,7 @@
     "speciesTaxonomyId": "48490",
     "strainName": "NRRL 25331",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Nectriaceae",
@@ -10919,7 +11017,9 @@
     "scaffoldN50": null,
     "speciesTaxonomyId": "34611",
     "strainName": "Klein Grass",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Arthropoda"
+    ],
     "taxonomicLevelClass": "Arachnida",
     "taxonomicLevelFamily": "Ixodidae",
     "taxonomicLevelGenus": "Rhipicephalus",
@@ -10951,7 +11051,7 @@
     "speciesTaxonomyId": "5507",
     "strainName": "Fo5176",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Nectriaceae",
@@ -10984,7 +11084,7 @@
     "speciesTaxonomyId": "483707",
     "strainName": "RL4",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Ophiostomataceae",
@@ -11017,7 +11117,7 @@
     "speciesTaxonomyId": "5478",
     "strainName": "BG2",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Saccharomycetes",
     "taxonomicLevelFamily": "Saccharomycetaceae",
@@ -11050,7 +11150,7 @@
     "speciesTaxonomyId": "176275",
     "strainName": "HN6",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Cordycipitaceae",
@@ -11084,7 +11184,7 @@
     "speciesTaxonomyId": "164912",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Astathelohaniidae",
@@ -11118,7 +11218,7 @@
     "speciesTaxonomyId": "658444",
     "strainName": "Dv6",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "None",
@@ -11315,7 +11415,7 @@
     "speciesTaxonomyId": "83296",
     "strainName": "Ou3-Ou53",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Nosematidae",
@@ -11382,7 +11482,7 @@
     "speciesTaxonomyId": "288439",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "None",
@@ -11416,7 +11516,7 @@
     "speciesTaxonomyId": "279532",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "None",
@@ -11448,7 +11548,9 @@
     "scaffoldN50": 485876,
     "speciesTaxonomyId": "4784",
     "strainName": "LT1534-B",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Oomycota"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Peronosporaceae",
     "taxonomicLevelGenus": "Phytophthora",
@@ -11481,7 +11583,7 @@
     "speciesTaxonomyId": "5346",
     "strainName": "A43mut B43mut pab1-1 #326",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Agaricomycetes",
     "taxonomicLevelFamily": "Psathyrellaceae",
@@ -11514,7 +11616,7 @@
     "speciesTaxonomyId": "13684",
     "strainName": "SN15",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Dothideomycetes",
     "taxonomicLevelFamily": "Phaeosphaeriaceae",
@@ -11547,7 +11649,7 @@
     "speciesTaxonomyId": "38448",
     "strainName": "CPMC6",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Leotiomycetes",
     "taxonomicLevelFamily": "Sclerotiniaceae",
@@ -11580,7 +11682,7 @@
     "speciesTaxonomyId": "38082",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pneumocystomycetes",
     "taxonomicLevelFamily": "Pneumocystaceae",
@@ -11613,7 +11715,7 @@
     "speciesTaxonomyId": "5037",
     "strainName": "WU24",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Ajellomycetaceae",
@@ -11646,7 +11748,7 @@
     "speciesTaxonomyId": "5037",
     "strainName": "H88",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Ajellomycetaceae",
@@ -11679,7 +11781,7 @@
     "speciesTaxonomyId": "42067",
     "strainName": "RABM",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pneumocystomycetes",
     "taxonomicLevelFamily": "Pneumocystaceae",
@@ -11712,7 +11814,7 @@
     "speciesTaxonomyId": "5037",
     "strainName": "G186AR",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Ajellomycetaceae",
@@ -11745,7 +11847,7 @@
     "speciesTaxonomyId": "2902605",
     "strainName": "G217B",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Ajellomycetaceae",
@@ -11778,7 +11880,7 @@
     "speciesTaxonomyId": "5037",
     "strainName": "G184AR",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Ajellomycetaceae",
@@ -11811,7 +11913,7 @@
     "speciesTaxonomyId": "2698477",
     "strainName": "CanA",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pneumocystomycetes",
     "taxonomicLevelFamily": "Pneumocystaceae",
@@ -11844,7 +11946,7 @@
     "speciesTaxonomyId": "2698480",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pneumocystomycetes",
     "taxonomicLevelFamily": "Pneumocystaceae",
@@ -11878,7 +11980,7 @@
     "speciesTaxonomyId": "27973",
     "strainName": "Swiss",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Unikaryonidae",
@@ -11974,7 +12076,9 @@
     "scaffoldN50": null,
     "speciesTaxonomyId": "5759",
     "strainName": "DS4-868",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Entamoebidae",
     "taxonomicLevelGenus": "Entamoeba",
@@ -12005,7 +12109,9 @@
     "scaffoldN50": null,
     "speciesTaxonomyId": "5759",
     "strainName": "KU48",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Entamoebidae",
     "taxonomicLevelGenus": "Entamoeba",
@@ -12102,7 +12208,9 @@
     "scaffoldN50": null,
     "speciesTaxonomyId": "135588",
     "strainName": "2922-C6/04-290x",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Metamonada"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Dientamoebidae",
     "taxonomicLevelGenus": "Histomonas",
@@ -12133,7 +12241,9 @@
     "scaffoldN50": null,
     "speciesTaxonomyId": "5759",
     "strainName": "KU50",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Entamoebidae",
     "taxonomicLevelGenus": "Entamoeba",
@@ -12198,7 +12308,7 @@
     "speciesTaxonomyId": "5478",
     "strainName": "BG3993",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Saccharomycetes",
     "taxonomicLevelFamily": "Saccharomycetaceae",
@@ -12264,7 +12374,7 @@
     "speciesTaxonomyId": "588596",
     "strainName": "DAOM-197198",
     "taxonomicGroup": [
-      "Fungi"
+      "Mucoromycota"
     ],
     "taxonomicLevelClass": "Glomeromycetes",
     "taxonomicLevelFamily": "Glomeraceae",
@@ -12297,7 +12407,7 @@
     "speciesTaxonomyId": "588596",
     "strainName": "C2",
     "taxonomicGroup": [
-      "Fungi"
+      "Mucoromycota"
     ],
     "taxonomicLevelClass": "Glomeromycetes",
     "taxonomicLevelFamily": "Glomeraceae",
@@ -12362,7 +12472,9 @@
     "scaffoldN50": null,
     "speciesTaxonomyId": "5755",
     "strainName": "C3",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Acanthamoebidae",
     "taxonomicLevelGenus": "Acanthamoeba",
@@ -12393,7 +12505,9 @@
     "scaffoldN50": null,
     "speciesTaxonomyId": "5755",
     "strainName": "Neff",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Acanthamoebidae",
     "taxonomicLevelGenus": "Acanthamoeba",
@@ -12425,7 +12539,9 @@
     "scaffoldN50": 24852,
     "speciesTaxonomyId": "100861",
     "strainName": "MF1",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Oomycota"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Saprolegniaceae",
     "taxonomicLevelGenus": "Aphanomyces",
@@ -12457,7 +12573,7 @@
     "speciesTaxonomyId": "7159",
     "strainName": "Aag2",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -12490,7 +12606,7 @@
     "speciesTaxonomyId": "114810",
     "strainName": "CBS 124340",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Xylariaceae",
@@ -12556,7 +12672,7 @@
     "speciesTaxonomyId": "79252",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Leotiomycetes",
     "taxonomicLevelFamily": "Erysiphaceae",
@@ -12589,7 +12705,7 @@
     "speciesTaxonomyId": "5207",
     "strainName": "VNII",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Tremellomycetes",
     "taxonomicLevelFamily": "Cryptococcaceae",
@@ -12621,7 +12737,9 @@
     "scaffoldN50": null,
     "speciesTaxonomyId": "5741",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Metamonada"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Hexamitidae",
     "taxonomicLevelGenus": "Giardia",
@@ -12652,7 +12770,9 @@
     "scaffoldN50": 93060,
     "speciesTaxonomyId": "5741",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Metamonada"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Hexamitidae",
     "taxonomicLevelGenus": "Giardia",
@@ -12683,7 +12803,9 @@
     "scaffoldN50": null,
     "speciesTaxonomyId": "34620",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Arthropoda"
+    ],
     "taxonomicLevelClass": "Arachnida",
     "taxonomicLevelFamily": "Ixodidae",
     "taxonomicLevelGenus": "Dermacentor",
@@ -12748,7 +12870,7 @@
     "speciesTaxonomyId": "95742",
     "strainName": "yc1106",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Dothideomycetes",
     "taxonomicLevelFamily": "Pleosporaceae",
@@ -12780,7 +12902,9 @@
     "scaffoldN50": 159301,
     "speciesTaxonomyId": "34609",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Arthropoda"
+    ],
     "taxonomicLevelClass": "Arachnida",
     "taxonomicLevelFamily": "Ixodidae",
     "taxonomicLevelGenus": "Amblyomma",
@@ -12812,7 +12936,7 @@
     "speciesTaxonomyId": "337075",
     "strainName": "CBS 144459",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pezizomycetes",
     "taxonomicLevelFamily": "Pyronemataceae",
@@ -12910,7 +13034,9 @@
     "scaffoldN50": null,
     "speciesTaxonomyId": "2919604",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Acanthamoebidae",
     "taxonomicLevelGenus": "Acanthamoeba",
@@ -12941,7 +13067,9 @@
     "scaffoldN50": null,
     "speciesTaxonomyId": "2919605",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Acanthamoebidae",
     "taxonomicLevelGenus": "Acanthamoeba",
@@ -12972,7 +13100,9 @@
     "scaffoldN50": null,
     "speciesTaxonomyId": "2919603",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Acanthamoebidae",
     "taxonomicLevelGenus": "Acanthamoeba",
@@ -13071,7 +13201,7 @@
     "speciesTaxonomyId": "948311",
     "strainName": "NRRL62905",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Nectriaceae",
@@ -13104,7 +13234,7 @@
     "speciesTaxonomyId": "5518",
     "strainName": "PH-1",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Nectriaceae",
@@ -13369,7 +13499,7 @@
     "speciesTaxonomyId": "56406",
     "strainName": "UTAD222",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Saccharomycetes",
     "taxonomicLevelFamily": "Saccharomycodaceae",
@@ -13403,7 +13533,7 @@
     "speciesTaxonomyId": "76777",
     "strainName": "ATCC 42132",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Malasseziomycetes",
     "taxonomicLevelFamily": "Malasseziaceae",
@@ -13502,7 +13632,7 @@
     "speciesTaxonomyId": "1047171",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Dothideomycetes",
     "taxonomicLevelFamily": "Mycosphaerellaceae",
@@ -13534,7 +13664,9 @@
     "scaffoldN50": null,
     "speciesTaxonomyId": "43075",
     "strainName": "NIH4 ATCC 30207",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Metamonada"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Trichomonadidae",
     "taxonomicLevelGenus": "Trichomonas",
@@ -13568,7 +13700,7 @@
     "speciesTaxonomyId": "2867405",
     "strainName": "RACE1",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Leotiomycetes",
     "taxonomicLevelFamily": "Erysiphaceae",
@@ -13601,7 +13733,7 @@
     "speciesTaxonomyId": "5061",
     "strainName": "N402 (ATCC 64974)",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -13700,7 +13832,7 @@
     "speciesTaxonomyId": "179676",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Ceratopogonidae",
@@ -13733,7 +13865,7 @@
     "speciesTaxonomyId": "48703",
     "strainName": "T",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Podosporaceae",
@@ -13768,7 +13900,7 @@
     "speciesTaxonomyId": "36035",
     "strainName": "UTAD17",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Saccharomycetes",
     "taxonomicLevelFamily": "Saccharomycodaceae",
@@ -13869,7 +14001,7 @@
     "speciesTaxonomyId": "34373",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Leotiomycetes",
     "taxonomicLevelFamily": "Erysiphaceae",
@@ -14431,7 +14563,9 @@
     "scaffoldN50": 442475,
     "speciesTaxonomyId": "108607",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Mastigamoebidae",
     "taxonomicLevelGenus": "Mastigamoeba",
@@ -14630,7 +14764,7 @@
     "speciesTaxonomyId": "34373",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Leotiomycetes",
     "taxonomicLevelFamily": "Erysiphaceae",
@@ -14761,7 +14895,9 @@
     "scaffoldN50": 15672,
     "speciesTaxonomyId": "5759",
     "strainName": "Rahman",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Entamoebidae",
     "taxonomicLevelGenus": "Entamoeba",
@@ -14859,7 +14995,7 @@
     "speciesTaxonomyId": "7227",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Drosophilidae",
@@ -14891,7 +15027,9 @@
     "scaffoldN50": 67794873,
     "speciesTaxonomyId": "9606",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Vertebra"
+    ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Hominidae",
     "taxonomicLevelGenus": "Homo",
@@ -14922,7 +15060,9 @@
     "scaffoldN50": 106145001,
     "speciesTaxonomyId": "10090",
     "strainName": "C57BL/6J",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Vertebra"
+    ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Muridae",
     "taxonomicLevelGenus": "Mus",
@@ -14954,7 +15094,7 @@
     "speciesTaxonomyId": "37727",
     "strainName": "ATCC 18224",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Trichocomaceae",
@@ -15019,7 +15159,9 @@
     "scaffoldN50": 2761001,
     "speciesTaxonomyId": "5741",
     "strainName": "WB C6",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Metamonada"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Hexamitidae",
     "taxonomicLevelGenus": "Giardia",
@@ -15086,7 +15228,7 @@
     "speciesTaxonomyId": "318829",
     "strainName": "70-15",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Pyriculariaceae",
@@ -15121,7 +15263,7 @@
     "speciesTaxonomyId": "28985",
     "strainName": "NRRL Y-1140",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Saccharomycetes",
     "taxonomicLevelFamily": "Saccharomycetaceae",
@@ -15155,7 +15297,7 @@
     "speciesTaxonomyId": "4952",
     "strainName": "CLIB122",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Dipodascomycetes",
     "taxonomicLevelFamily": "None",
@@ -15188,7 +15330,7 @@
     "speciesTaxonomyId": "5478",
     "strainName": "CBS 138",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Saccharomycetes",
     "taxonomicLevelFamily": "Saccharomycetaceae",
@@ -15221,7 +15363,7 @@
     "speciesTaxonomyId": "746128",
     "strainName": "Af293",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -15254,7 +15396,7 @@
     "speciesTaxonomyId": "5057",
     "strainName": "NRRL 1",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -15386,7 +15528,7 @@
     "speciesTaxonomyId": "5061",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -15421,7 +15563,7 @@
     "speciesTaxonomyId": "4896",
     "strainName": "972h-",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Schizosaccharomycetes",
     "taxonomicLevelFamily": "Schizosaccharomycetaceae",
@@ -15487,7 +15629,7 @@
     "speciesTaxonomyId": "28564",
     "strainName": "ATCC 10500",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Trichocomaceae",
@@ -15520,7 +15662,7 @@
     "speciesTaxonomyId": "33188",
     "strainName": "1704",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Onygenaceae",
@@ -15553,7 +15695,7 @@
     "speciesTaxonomyId": "5039",
     "strainName": "ER-3",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Ajellomycetaceae",
@@ -15586,7 +15728,7 @@
     "speciesTaxonomyId": "36911",
     "strainName": "ATCC 42720",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pichiomycetes",
     "taxonomicLevelFamily": "Metschnikowiaceae",
@@ -15619,7 +15761,7 @@
     "speciesTaxonomyId": "1681229",
     "strainName": "SLH14081",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Ajellomycetaceae",
@@ -15651,7 +15793,9 @@
     "scaffoldN50": 5450249,
     "speciesTaxonomyId": "44689",
     "strainName": "AX4",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "Eumycetozoa",
     "taxonomicLevelFamily": "Dictyosteliaceae",
     "taxonomicLevelGenus": "Dictyostelium",
@@ -15714,7 +15858,7 @@
     "speciesTaxonomyId": "7165",
     "strainName": "PEST",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -15747,7 +15891,7 @@
     "speciesTaxonomyId": "121225",
     "strainName": "USDA",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Pediculidae",
@@ -15780,7 +15924,7 @@
     "speciesTaxonomyId": "5482",
     "strainName": "MYA-3404",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pichiomycetes",
     "taxonomicLevelFamily": "Debaryomycetaceae",
@@ -15879,7 +16023,7 @@
     "speciesTaxonomyId": "4959",
     "strainName": "CBS767",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pichiomycetes",
     "taxonomicLevelFamily": "Debaryomycetaceae",
@@ -15978,7 +16122,7 @@
     "speciesTaxonomyId": "42374",
     "strainName": "CD36",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pichiomycetes",
     "taxonomicLevelFamily": "Debaryomycetaceae",
@@ -16011,7 +16155,7 @@
     "speciesTaxonomyId": "5207",
     "strainName": "JEC21",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Tremellomycetes",
     "taxonomicLevelFamily": "Cryptococcaceae",
@@ -16045,7 +16189,7 @@
     "speciesTaxonomyId": "6035",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Unikaryonidae",
@@ -16077,7 +16221,9 @@
     "scaffoldN50": 1588622,
     "speciesTaxonomyId": "4787",
     "strainName": "T30-4",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Oomycota"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Peronosporaceae",
     "taxonomicLevelGenus": "Phytophthora",
@@ -16110,7 +16256,7 @@
     "speciesTaxonomyId": "5334",
     "strainName": "H4-8",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Agaricomycetes",
     "taxonomicLevelFamily": "Schizophyllaceae",
@@ -16143,7 +16289,7 @@
     "speciesTaxonomyId": "38033",
     "strainName": "CBS 148.51",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Chaetomiaceae",
@@ -16176,7 +16322,7 @@
     "speciesTaxonomyId": "40559",
     "strainName": "B05.10",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Leotiomycetes",
     "taxonomicLevelFamily": "Sclerotiniaceae",
@@ -16209,7 +16355,7 @@
     "speciesTaxonomyId": "36779",
     "strainName": "R3-111a-1",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Magnaporthaceae",
@@ -16244,7 +16390,7 @@
     "speciesTaxonomyId": "4932",
     "strainName": "S288C",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Saccharomycetes",
     "taxonomicLevelFamily": "Saccharomycetaceae",
@@ -16278,7 +16424,7 @@
     "speciesTaxonomyId": "58839",
     "strainName": "ATCC 50506",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Unikaryonidae",
@@ -16311,7 +16457,7 @@
     "speciesTaxonomyId": "31870",
     "strainName": "M1.001",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Glomerellaceae",
@@ -16344,7 +16490,7 @@
     "speciesTaxonomyId": "162425",
     "strainName": "FGSC A4",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -16377,7 +16523,7 @@
     "speciesTaxonomyId": "5207",
     "strainName": "H99",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Tremellomycetes",
     "taxonomicLevelFamily": "Cryptococcaceae",
@@ -16412,7 +16558,7 @@
     "speciesTaxonomyId": "936053",
     "strainName": "RA 99-880",
     "taxonomicGroup": [
-      "Fungi"
+      "Mucoromycota"
     ],
     "taxonomicLevelClass": "Mucoromycetes",
     "taxonomicLevelFamily": "Rhizopodaceae",
@@ -16445,7 +16591,7 @@
     "speciesTaxonomyId": "5501",
     "strainName": "RS",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Onygenaceae",
@@ -16478,7 +16624,7 @@
     "speciesTaxonomyId": "5207",
     "strainName": "B-3501A",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Tremellomycetes",
     "taxonomicLevelFamily": "Cryptococcaceae",
@@ -16511,7 +16657,7 @@
     "speciesTaxonomyId": "4929",
     "strainName": "ATCC 6260",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pichiomycetes",
     "taxonomicLevelFamily": "Debaryomycetaceae",
@@ -16544,7 +16690,7 @@
     "speciesTaxonomyId": "117187",
     "strainName": "7600",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Nectriaceae",
@@ -16577,7 +16723,7 @@
     "speciesTaxonomyId": "2059318",
     "strainName": "NAm1",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Ajellomycetaceae",
@@ -16610,7 +16756,7 @@
     "speciesTaxonomyId": "33178",
     "strainName": "NIH2624",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -16643,7 +16789,7 @@
     "speciesTaxonomyId": "36630",
     "strainName": "NRRL 181",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -16676,7 +16822,7 @@
     "speciesTaxonomyId": "36914",
     "strainName": "NRRL YB-4239",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pichiomycetes",
     "taxonomicLevelFamily": "Debaryomycetaceae",
@@ -16708,7 +16854,9 @@
     "scaffoldN50": 7609242,
     "speciesTaxonomyId": "67593",
     "strainName": "P6497",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Oomycota"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Peronosporaceae",
     "taxonomicLevelGenus": "Phytophthora",
@@ -16740,7 +16888,7 @@
     "speciesTaxonomyId": "4897",
     "strainName": "yFS275",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Schizosaccharomycetes",
     "taxonomicLevelFamily": "Schizosaccharomycetaceae",
@@ -16773,7 +16921,7 @@
     "speciesTaxonomyId": "5297",
     "strainName": "CRL 75-36-700-3",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Pucciniomycetes",
     "taxonomicLevelFamily": "Pucciniaceae",
@@ -16806,7 +16954,7 @@
     "speciesTaxonomyId": "5507",
     "strainName": "4287",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Nectriaceae",
@@ -16839,7 +16987,7 @@
     "speciesTaxonomyId": "4899",
     "strainName": "yFS286",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Schizosaccharomycetes",
     "taxonomicLevelFamily": "Schizosaccharomycetaceae",
@@ -16872,7 +17020,7 @@
     "speciesTaxonomyId": "1048829",
     "strainName": "Pb01",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Ajellomycetaceae",
@@ -16905,7 +17053,7 @@
     "speciesTaxonomyId": "121759",
     "strainName": "Pb18",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Ajellomycetaceae",
@@ -16938,7 +17086,7 @@
     "speciesTaxonomyId": "63402",
     "strainName": "CBS 118893",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Arthrodermataceae",
@@ -16971,7 +17119,7 @@
     "speciesTaxonomyId": "63405",
     "strainName": "CBS 113480",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Arthrodermataceae",
@@ -17004,7 +17152,7 @@
     "speciesTaxonomyId": "199306",
     "strainName": "C735 delta SOWgp",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Onygenaceae",
@@ -17037,7 +17185,7 @@
     "speciesTaxonomyId": "2747968",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Nectriaceae",
@@ -17070,7 +17218,7 @@
     "speciesTaxonomyId": "5551",
     "strainName": "CBS 118892",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Arthrodermataceae",
@@ -17103,7 +17251,9 @@
     "scaffoldN50": 280942,
     "speciesTaxonomyId": "101203",
     "strainName": "CBS 223.65",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Oomycota"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Saprolegniaceae",
     "taxonomicLevelGenus": "Saprolegnia",
@@ -17134,7 +17284,9 @@
     "scaffoldN50": 27942054,
     "speciesTaxonomyId": "10141",
     "strainName": "inbred line 2N",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Vertebra"
+    ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Caviidae",
     "taxonomicLevelGenus": "Cavia",
@@ -17265,7 +17417,7 @@
     "speciesTaxonomyId": "51453",
     "strainName": "QM6a",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Hypocreaceae",
@@ -17298,7 +17450,7 @@
     "speciesTaxonomyId": "29875",
     "strainName": "Gv29-8",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Hypocreaceae",
@@ -17332,7 +17484,7 @@
     "speciesTaxonomyId": "76773",
     "strainName": "CBS 7966",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Malasseziomycetes",
     "taxonomicLevelFamily": "Malasseziaceae",
@@ -17367,7 +17519,7 @@
     "speciesTaxonomyId": "109760",
     "strainName": "DAOM BR117",
     "taxonomicGroup": [
-      "Fungi"
+      "Chytridiomycota"
     ],
     "taxonomicLevelClass": "Chytridiomycetes",
     "taxonomicLevelFamily": "Spizellomycetaceae",
@@ -17400,7 +17552,7 @@
     "speciesTaxonomyId": "5480",
     "strainName": "CDC317",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pichiomycetes",
     "taxonomicLevelFamily": "Debaryomycetaceae",
@@ -17433,7 +17585,7 @@
     "speciesTaxonomyId": "5147",
     "strainName": "k-hell",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Sordariaceae",
@@ -17467,7 +17619,7 @@
     "speciesTaxonomyId": "5346",
     "strainName": "okayama7#130",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Agaricomycetes",
     "taxonomicLevelFamily": "Psathyrellaceae",
@@ -17500,7 +17652,7 @@
     "speciesTaxonomyId": "5141",
     "strainName": "OR74A",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Sordariaceae",
@@ -17533,7 +17685,7 @@
     "speciesTaxonomyId": "5476",
     "strainName": "SC5314",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pichiomycetes",
     "taxonomicLevelFamily": "Debaryomycetaceae",
@@ -17567,7 +17719,7 @@
     "speciesTaxonomyId": "40302",
     "strainName": "BRL01",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Nosematidae",
@@ -17600,7 +17752,7 @@
     "speciesTaxonomyId": "655981",
     "strainName": "20631-21",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Leotiomycetes",
     "taxonomicLevelFamily": "Thelebolaceae",
@@ -17633,7 +17785,7 @@
     "speciesTaxonomyId": "5062",
     "strainName": "RIB40",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -17666,7 +17818,7 @@
     "speciesTaxonomyId": "37769",
     "strainName": "WM276",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Tremellomycetes",
     "taxonomicLevelFamily": "Cryptococcaceae",
@@ -17698,7 +17850,9 @@
     "scaffoldN50": 66881,
     "speciesTaxonomyId": "5786",
     "strainName": "QSDP1",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "Eumycetozoa",
     "taxonomicLevelFamily": "Dictyosteliaceae",
     "taxonomicLevelGenus": "Dictyostelium",
@@ -17731,7 +17885,7 @@
     "speciesTaxonomyId": "103449",
     "strainName": "floridensis",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Pleistophoridae",
@@ -17798,7 +17952,7 @@
     "speciesTaxonomyId": "203908",
     "strainName": "98AG31",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Pucciniomycetes",
     "taxonomicLevelFamily": "Melampsoraceae",
@@ -17830,7 +17984,9 @@
     "scaffoldN50": 76228,
     "speciesTaxonomyId": "6945",
     "strainName": "Wikel colony",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Arthropoda"
+    ],
     "taxonomicLevelClass": "Arachnida",
     "taxonomicLevelFamily": "Ixodidae",
     "taxonomicLevelGenus": "Ixodes",
@@ -17894,7 +18050,9 @@
     "scaffoldN50": 48877,
     "speciesTaxonomyId": "5759",
     "strainName": "HM-1:IMSS",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Entamoebidae",
     "taxonomicLevelGenus": "Entamoeba",
@@ -17958,7 +18116,9 @@
     "scaffoldN50": 13158,
     "speciesTaxonomyId": "46681",
     "strainName": "SAW760",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Entamoebidae",
     "taxonomicLevelGenus": "Entamoeba",
@@ -17990,7 +18150,7 @@
     "speciesTaxonomyId": "7176",
     "strainName": "JHB",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -18024,7 +18184,7 @@
     "speciesTaxonomyId": "31281",
     "strainName": "H348",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Enterocytozoonidae",
@@ -18090,7 +18250,7 @@
     "speciesTaxonomyId": "40127",
     "strainName": "FGSC 2508",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Sordariaceae",
@@ -18123,7 +18283,7 @@
     "speciesTaxonomyId": "1047171",
     "strainName": "IPO323",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Dothideomycetes",
     "taxonomicLevelFamily": "Mycosphaerellaceae",
@@ -18189,7 +18349,7 @@
     "speciesTaxonomyId": "73501",
     "strainName": "CM01",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Cordycipitaceae",
@@ -18222,7 +18382,7 @@
     "speciesTaxonomyId": "78579",
     "strainName": "ATCC 42464",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Chaetomiaceae",
@@ -18255,7 +18415,7 @@
     "speciesTaxonomyId": "1108849",
     "strainName": "Wisconsin 54-1255",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -18288,7 +18448,7 @@
     "speciesTaxonomyId": "2587412",
     "strainName": "S mat+",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Podosporaceae",
@@ -18356,7 +18516,7 @@
     "speciesTaxonomyId": "5022",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Dothideomycetes",
     "taxonomicLevelFamily": "Leptosphaeriaceae",
@@ -18389,7 +18549,7 @@
     "speciesTaxonomyId": "5970",
     "strainName": "NIH/UT8656",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Herpotrichiellaceae",
@@ -18423,7 +18583,7 @@
     "speciesTaxonomyId": "42399",
     "strainName": "ATCC 50505",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Nosematidae",
@@ -18488,7 +18648,9 @@
     "scaffoldN50": 888348,
     "speciesTaxonomyId": "4792",
     "strainName": "INRA-310",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Oomycota"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Peronosporaceae",
     "taxonomicLevelGenus": "Phytophthora",
@@ -18521,7 +18683,7 @@
     "speciesTaxonomyId": "586133",
     "strainName": "ERTm1",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "None",
@@ -18553,7 +18715,9 @@
     "scaffoldN50": 7707,
     "speciesTaxonomyId": "412467",
     "strainName": "P19",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Entamoebidae",
     "taxonomicLevelGenus": "Entamoeba",
@@ -18618,7 +18782,7 @@
     "speciesTaxonomyId": "2502994",
     "strainName": "54006",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Nectriaceae",
@@ -18653,7 +18817,7 @@
     "speciesTaxonomyId": "5217",
     "strainName": "Fries",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Tremellomycetes",
     "taxonomicLevelFamily": "Tremellaceae",
@@ -18686,7 +18850,7 @@
     "speciesTaxonomyId": "5507",
     "strainName": "NRRL 32931",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Nectriaceae",
@@ -18753,7 +18917,7 @@
     "speciesTaxonomyId": "27973",
     "strainName": "ATCC 50504",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Unikaryonidae",
@@ -18787,7 +18951,7 @@
     "speciesTaxonomyId": "571949",
     "strainName": "SJ-2008",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Unikaryonidae",
@@ -18820,7 +18984,9 @@
     "scaffoldN50": 602571,
     "speciesTaxonomyId": "112098",
     "strainName": "VS20",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Oomycota"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Saprolegniaceae",
     "taxonomicLevelGenus": "Saprolegnia",
@@ -18853,7 +19019,7 @@
     "speciesTaxonomyId": "82508",
     "strainName": "CBS 2479",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Tremellomycetes",
     "taxonomicLevelFamily": "Trichosporonaceae",
@@ -18885,7 +19051,9 @@
     "scaffoldN50": 344205,
     "speciesTaxonomyId": "5755",
     "strainName": "Neff",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Acanthamoebidae",
     "taxonomicLevelGenus": "Acanthamoeba",
@@ -18917,7 +19085,7 @@
     "speciesTaxonomyId": "36651",
     "strainName": "Pd1",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -18985,7 +19153,7 @@
     "speciesTaxonomyId": "5270",
     "strainName": "521",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Ustilaginomycetes",
     "taxonomicLevelFamily": "Ustilaginaceae",
@@ -19017,7 +19185,9 @@
     "scaffoldN50": 243235,
     "speciesTaxonomyId": "33085",
     "strainName": "IP1",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Amoebozoa"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Entamoebidae",
     "taxonomicLevelGenus": "Entamoeba",
@@ -19049,7 +19219,7 @@
     "speciesTaxonomyId": "1873960",
     "strainName": "CIRAD86",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Dothideomycetes",
     "taxonomicLevelFamily": "Mycosphaerellaceae",
@@ -19115,7 +19285,7 @@
     "speciesTaxonomyId": "263815",
     "strainName": "B123",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pneumocystomycetes",
     "taxonomicLevelFamily": "Pneumocystaceae",
@@ -19147,7 +19317,9 @@
     "scaffoldN50": 88649475,
     "speciesTaxonomyId": "9541",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Vertebra"
+    ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Cercopithecidae",
     "taxonomicLevelGenus": "Macaca",
@@ -19179,7 +19351,7 @@
     "speciesTaxonomyId": "293227",
     "strainName": "CBS 101466",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Cyphellophoraceae",
@@ -19212,7 +19384,7 @@
     "speciesTaxonomyId": "86049",
     "strainName": "CBS 160.54",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Herpotrichiellaceae",
@@ -19245,7 +19417,7 @@
     "speciesTaxonomyId": "7370",
     "strainName": "aabys",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Muscidae",
@@ -19442,7 +19614,7 @@
     "speciesTaxonomyId": "463800",
     "strainName": "CBS 8507",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Tremellomycetes",
     "taxonomicLevelFamily": "Cryptococcaceae",
@@ -19476,7 +19648,7 @@
     "speciesTaxonomyId": "324770",
     "strainName": "CBS 10117",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Tremellomycetes",
     "taxonomicLevelFamily": "Cryptococcaceae",
@@ -19510,7 +19682,7 @@
     "speciesTaxonomyId": "324769",
     "strainName": "CBS 10118",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Tremellomycetes",
     "taxonomicLevelFamily": "Cryptococcaceae",
@@ -19543,7 +19715,9 @@
     "scaffoldN50": 657536,
     "speciesTaxonomyId": "112090",
     "strainName": "APO3",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Oomycota"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Saprolegniaceae",
     "taxonomicLevelGenus": "Aphanomyces",
@@ -19575,7 +19749,9 @@
     "scaffoldN50": 1130244,
     "speciesTaxonomyId": "157072",
     "strainName": "NJM9701",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Oomycota"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Saprolegniaceae",
     "taxonomicLevelGenus": "Aphanomyces",
@@ -19640,7 +19816,7 @@
     "speciesTaxonomyId": "470704",
     "strainName": "CBS 114405",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Herpotrichiellaceae",
@@ -19673,7 +19849,7 @@
     "speciesTaxonomyId": "1182553",
     "strainName": "CBS 110553",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Herpotrichiellaceae",
@@ -19706,7 +19882,7 @@
     "speciesTaxonomyId": "79782",
     "strainName": "Harlan",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Cimicidae",
@@ -19838,7 +20014,7 @@
     "speciesTaxonomyId": "1033840",
     "strainName": "CBS 119918",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Herpotrichiellaceae",
@@ -19904,7 +20080,7 @@
     "speciesTaxonomyId": "563466",
     "strainName": "IHEM 14462",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Microascaceae",
@@ -19938,7 +20114,7 @@
     "speciesTaxonomyId": "1913371",
     "strainName": "ERTm6",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "None",
@@ -20038,7 +20214,7 @@
     "speciesTaxonomyId": "1485682",
     "strainName": "UGP3",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "None",
@@ -20105,7 +20281,7 @@
     "speciesTaxonomyId": "174685",
     "strainName": "OC4",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Ordosporidae",
@@ -20138,7 +20314,7 @@
     "speciesTaxonomyId": "545650",
     "strainName": "5110",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Ophiostomataceae",
@@ -20171,7 +20347,7 @@
     "speciesTaxonomyId": "40355",
     "strainName": "CBS 271.37",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Herpotrichiellaceae",
@@ -20204,7 +20380,7 @@
     "speciesTaxonomyId": "89940",
     "strainName": "CBS 173.52",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Herpotrichiellaceae",
@@ -20237,7 +20413,7 @@
     "speciesTaxonomyId": "569365",
     "strainName": "CBS 83496",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Herpotrichiellaceae",
@@ -20270,7 +20446,7 @@
     "speciesTaxonomyId": "215243",
     "strainName": "CBS 72588",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Herpotrichiellaceae",
@@ -20303,7 +20479,7 @@
     "speciesTaxonomyId": "86056",
     "strainName": "CBS 650.93",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Herpotrichiellaceae",
@@ -20336,7 +20512,7 @@
     "speciesTaxonomyId": "1859121",
     "strainName": "IND107",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Tremellomycetes",
     "taxonomicLevelFamily": "Cryptococcaceae",
@@ -20369,7 +20545,7 @@
     "speciesTaxonomyId": "91928",
     "strainName": "CBS 89968",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Herpotrichiellaceae",
@@ -20402,7 +20578,7 @@
     "speciesTaxonomyId": "212818",
     "strainName": "CBS 40295",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Herpotrichiellaceae",
@@ -20435,7 +20611,7 @@
     "speciesTaxonomyId": "253628",
     "strainName": "CBS 43764",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Dothideomycetes",
     "taxonomicLevelFamily": "Sympoventuriaceae",
@@ -20468,7 +20644,7 @@
     "speciesTaxonomyId": "979981",
     "strainName": "CBS 102226",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Herpotrichiellaceae",
@@ -20567,7 +20743,7 @@
     "speciesTaxonomyId": "29908",
     "strainName": "1099-18",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Ophiostomataceae",
@@ -20601,7 +20777,7 @@
     "speciesTaxonomyId": "40302",
     "strainName": "PA08 1199",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Nosematidae",
@@ -20634,7 +20810,7 @@
     "speciesTaxonomyId": "35570",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Muscidae",
@@ -20667,7 +20843,7 @@
     "speciesTaxonomyId": "498019",
     "strainName": "6684",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pichiomycetes",
     "taxonomicLevelFamily": "Metschnikowiaceae",
@@ -20701,7 +20877,7 @@
     "speciesTaxonomyId": "77020",
     "strainName": "CBS 1879",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Malasseziomycetes",
     "taxonomicLevelFamily": "Malasseziaceae",
@@ -20769,7 +20945,7 @@
     "speciesTaxonomyId": "1664694",
     "strainName": "CBS 131958",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Cyphellophoraceae",
@@ -20804,7 +20980,7 @@
     "speciesTaxonomyId": "4911",
     "strainName": "DMKU3-1042",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Saccharomycetes",
     "taxonomicLevelFamily": "Saccharomycetaceae",
@@ -20837,7 +21013,7 @@
     "speciesTaxonomyId": "58627",
     "strainName": "CBS 789",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pichiomycetes",
     "taxonomicLevelFamily": "Debaryomycetaceae",
@@ -20903,7 +21079,7 @@
     "speciesTaxonomyId": "42068",
     "strainName": "RU7",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pneumocystomycetes",
     "taxonomicLevelFamily": "Pneumocystaceae",
@@ -20936,7 +21112,7 @@
     "speciesTaxonomyId": "4754",
     "strainName": "B80",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pneumocystomycetes",
     "taxonomicLevelFamily": "Pneumocystaceae",
@@ -21003,7 +21179,7 @@
     "speciesTaxonomyId": "4837",
     "strainName": "NRRL 1555(-)",
     "taxonomicGroup": [
-      "Fungi"
+      "Mucoromycota"
     ],
     "taxonomicLevelClass": "Mucoromycetes",
     "taxonomicLevelFamily": "Phycomycetaceae",
@@ -21036,7 +21212,7 @@
     "speciesTaxonomyId": "5599",
     "strainName": "SRC1lrK2f",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Dothideomycetes",
     "taxonomicLevelFamily": "Pleosporaceae",
@@ -21070,7 +21246,7 @@
     "speciesTaxonomyId": "1805483",
     "strainName": "JUm2807",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "None",
@@ -21102,7 +21278,9 @@
     "scaffoldN50": null,
     "speciesTaxonomyId": "2049356",
     "strainName": "PA203",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Metamonada"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Polymastigidae",
     "taxonomicLevelGenus": "Monocercomonoides",
@@ -21134,7 +21312,7 @@
     "speciesTaxonomyId": "80884",
     "strainName": "IMI 349063",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Glomerellaceae",
@@ -21200,7 +21378,7 @@
     "speciesTaxonomyId": "5570",
     "strainName": "1.58",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Dothideomycetes",
     "taxonomicLevelFamily": "Gloniaceae",
@@ -21233,7 +21411,7 @@
     "speciesTaxonomyId": "5208",
     "strainName": "CBS 7841",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Tremellomycetes",
     "taxonomicLevelFamily": "Cryptococcaceae",
@@ -21267,7 +21445,7 @@
     "speciesTaxonomyId": "4952",
     "strainName": "CLIB89(W29)",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Dipodascomycetes",
     "taxonomicLevelFamily": "None",
@@ -21299,7 +21477,9 @@
     "scaffoldN50": 86531,
     "speciesTaxonomyId": "1144522",
     "strainName": "K",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Metamonada"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Tritrichomonadidae",
     "taxonomicLevelGenus": "Tritrichomonas",
@@ -21397,7 +21577,7 @@
     "speciesTaxonomyId": "7160",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -21430,7 +21610,7 @@
     "speciesTaxonomyId": "319629",
     "strainName": "CBS 101740",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -21463,7 +21643,7 @@
     "speciesTaxonomyId": "41063",
     "strainName": "CBS 506.65",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -21496,7 +21676,7 @@
     "speciesTaxonomyId": "46472",
     "strainName": "CBS 583.65",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -21529,7 +21709,7 @@
     "speciesTaxonomyId": "75750",
     "strainName": "CBS 593.65",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -21562,7 +21742,7 @@
     "speciesTaxonomyId": "5066",
     "strainName": "DTO 134E9",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -21595,7 +21775,7 @@
     "speciesTaxonomyId": "41413",
     "strainName": "CBS 516.65",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -21628,7 +21808,7 @@
     "speciesTaxonomyId": "5053",
     "strainName": "ATCC 16872",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -21663,7 +21843,7 @@
     "speciesTaxonomyId": "27291",
     "strainName": "CBS432",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Saccharomycetes",
     "taxonomicLevelFamily": "Saccharomycetaceae",
@@ -21762,7 +21942,7 @@
     "speciesTaxonomyId": "7159",
     "strainName": "LVP_AGWG",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -21795,7 +21975,7 @@
     "speciesTaxonomyId": "41047",
     "strainName": "HMR AF 39",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -21827,7 +22007,9 @@
     "scaffoldN50": 103308737,
     "speciesTaxonomyId": "9913",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Vertebra"
+    ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Bovidae",
     "taxonomicLevelGenus": "Bos",
@@ -21925,7 +22107,7 @@
     "speciesTaxonomyId": "498019",
     "strainName": "B11221",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pichiomycetes",
     "taxonomicLevelFamily": "Metschnikowiaceae",
@@ -21958,7 +22140,7 @@
     "speciesTaxonomyId": "138278",
     "strainName": "IBT 24754",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -21991,7 +22173,7 @@
     "speciesTaxonomyId": "340412",
     "strainName": "IBT 16806",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -22024,7 +22206,7 @@
     "speciesTaxonomyId": "41068",
     "strainName": "IBT 28561",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -22057,7 +22239,7 @@
     "speciesTaxonomyId": "306088",
     "strainName": "IBT 23096",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -22089,7 +22271,9 @@
     "scaffoldN50": null,
     "speciesTaxonomyId": "6945",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Arthropoda"
+    ],
     "taxonomicLevelClass": "Arachnida",
     "taxonomicLevelFamily": "Ixodidae",
     "taxonomicLevelGenus": "Ixodes",
@@ -22154,7 +22338,7 @@
     "speciesTaxonomyId": "45357",
     "strainName": "B11899",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pichiomycetes",
     "taxonomicLevelFamily": "Metschnikowiaceae",
@@ -22187,7 +22371,7 @@
     "speciesTaxonomyId": "1231522",
     "strainName": "B09383",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pichiomycetes",
     "taxonomicLevelFamily": "Metschnikowiaceae",
@@ -22220,7 +22404,7 @@
     "speciesTaxonomyId": "1859096",
     "strainName": null,
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Tremellomycetes",
     "taxonomicLevelFamily": "Cryptococcaceae",
@@ -22286,7 +22470,7 @@
     "speciesTaxonomyId": "498019",
     "strainName": "B11220",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pichiomycetes",
     "taxonomicLevelFamily": "Metschnikowiaceae",
@@ -22319,7 +22503,7 @@
     "speciesTaxonomyId": "418784",
     "strainName": "B12108",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pichiomycetes",
     "taxonomicLevelFamily": "Metschnikowiaceae",
@@ -22353,7 +22537,7 @@
     "speciesTaxonomyId": "4909",
     "strainName": "CBS573",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pichiomycetes",
     "taxonomicLevelFamily": "Pichiaceae",
@@ -22386,7 +22570,7 @@
     "speciesTaxonomyId": "1340029",
     "strainName": "CBS 122712",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -22419,7 +22603,7 @@
     "speciesTaxonomyId": "51019",
     "strainName": "CBS 117.55",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -22452,7 +22636,7 @@
     "speciesTaxonomyId": "446911",
     "strainName": "CBS 121591",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -22485,7 +22669,7 @@
     "speciesTaxonomyId": "1191702",
     "strainName": "CBS 313.89",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -22518,7 +22702,7 @@
     "speciesTaxonomyId": "301854",
     "strainName": "CBS 121593",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -22551,7 +22735,7 @@
     "speciesTaxonomyId": "319626",
     "strainName": "CBS 101889",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Aspergillaceae",
@@ -22585,7 +22769,7 @@
     "speciesTaxonomyId": "76775",
     "strainName": "KCTC 27527",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Malasseziomycetes",
     "taxonomicLevelFamily": "Malasseziaceae",
@@ -22648,7 +22832,9 @@
     "scaffoldN50": 82346004,
     "speciesTaxonomyId": "9544",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Vertebra"
+    ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Cercopithecidae",
     "taxonomicLevelGenus": "Macaca",
@@ -22681,7 +22867,7 @@
     "speciesTaxonomyId": "5365",
     "strainName": "ALCF2SS1-7",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Agaricomycetes",
     "taxonomicLevelFamily": "Polyporaceae",
@@ -22714,7 +22900,7 @@
     "speciesTaxonomyId": "97331",
     "strainName": "CBS H-5679",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Orbiliomycetes",
     "taxonomicLevelFamily": "Orbiliaceae",
@@ -22747,7 +22933,7 @@
     "speciesTaxonomyId": "264951",
     "strainName": "CBS 101075",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Thermoascaceae",
@@ -22780,7 +22966,7 @@
     "speciesTaxonomyId": "1578925",
     "strainName": "Br36",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Pyriculariaceae",
@@ -22812,7 +22998,9 @@
     "scaffoldN50": 5324134,
     "speciesTaxonomyId": "4779",
     "strainName": "SF5",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Oomycota"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Peronosporaceae",
     "taxonomicLevelGenus": "Bremia",
@@ -22877,7 +23065,7 @@
     "speciesTaxonomyId": "7160",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -22941,7 +23129,7 @@
     "speciesTaxonomyId": "5481",
     "strainName": "CBS 613",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pichiomycetes",
     "taxonomicLevelFamily": "Debaryomycetaceae",
@@ -23073,7 +23261,7 @@
     "speciesTaxonomyId": "5478",
     "strainName": "ATCC 2001",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Saccharomycetes",
     "taxonomicLevelFamily": "Saccharomycetaceae",
@@ -23106,7 +23294,7 @@
     "speciesTaxonomyId": "30069",
     "strainName": "Indian",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -23138,7 +23326,9 @@
     "scaffoldN50": 208696187,
     "speciesTaxonomyId": "34632",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Arthropoda"
+    ],
     "taxonomicLevelClass": "Arachnida",
     "taxonomicLevelFamily": "Ixodidae",
     "taxonomicLevelGenus": "Rhipicephalus",
@@ -23169,7 +23359,9 @@
     "scaffoldN50": 183350851,
     "speciesTaxonomyId": "6941",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Arthropoda"
+    ],
     "taxonomicLevelClass": "Arachnida",
     "taxonomicLevelFamily": "Ixodidae",
     "taxonomicLevelGenus": "Rhipicephalus",
@@ -23200,7 +23392,9 @@
     "scaffoldN50": 189477455,
     "speciesTaxonomyId": "543639",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Arthropoda"
+    ],
     "taxonomicLevelClass": "Arachnida",
     "taxonomicLevelFamily": "Ixodidae",
     "taxonomicLevelGenus": "Dermacentor",
@@ -23232,7 +23426,7 @@
     "speciesTaxonomyId": "7167",
     "strainName": "STELCA",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -23264,7 +23458,9 @@
     "scaffoldN50": 94448911,
     "speciesTaxonomyId": "51298",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Vertebra"
+    ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Vespertilionidae",
     "taxonomicLevelGenus": "Myotis",
@@ -23295,7 +23491,9 @@
     "scaffoldN50": 64037277,
     "speciesTaxonomyId": "9612",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Vertebra"
+    ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Canidae",
     "taxonomicLevelGenus": "Canis",
@@ -23329,7 +23527,7 @@
     "speciesTaxonomyId": "5322",
     "strainName": "PC9",
     "taxonomicGroup": [
-      "Fungi"
+      "Basidiomycota"
     ],
     "taxonomicLevelClass": "Agaricomycetes",
     "taxonomicLevelFamily": "Pleurotaceae",
@@ -23362,7 +23560,7 @@
     "speciesTaxonomyId": "7396",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Glossinidae",
@@ -23394,7 +23592,9 @@
     "scaffoldN50": 135012528,
     "speciesTaxonomyId": "10116",
     "strainName": "BN/NHsdMcwi",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Vertebra"
+    ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Muridae",
     "taxonomicLevelGenus": "Rattus",
@@ -23426,7 +23626,7 @@
     "speciesTaxonomyId": "7176",
     "strainName": "JHB",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -23458,7 +23658,9 @@
     "scaffoldN50": 90861225,
     "speciesTaxonomyId": "9031",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Vertebra"
+    ],
     "taxonomicLevelClass": "Aves",
     "taxonomicLevelFamily": "Phasianidae",
     "taxonomicLevelGenus": "Gallus",
@@ -23490,7 +23692,7 @@
     "speciesTaxonomyId": "7175",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -23523,7 +23725,7 @@
     "speciesTaxonomyId": "1518534",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -23556,7 +23758,7 @@
     "speciesTaxonomyId": "7173",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -23588,7 +23790,9 @@
     "scaffoldN50": 132052651,
     "speciesTaxonomyId": "6945",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Arthropoda"
+    ],
     "taxonomicLevelClass": "Arachnida",
     "taxonomicLevelFamily": "Ixodidae",
     "taxonomicLevelGenus": "Ixodes",
@@ -23620,7 +23824,7 @@
     "speciesTaxonomyId": "30066",
     "strainName": "MAF",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -23653,7 +23857,7 @@
     "speciesTaxonomyId": "273372",
     "strainName": "BP57",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Pichiomycetes",
     "taxonomicLevelFamily": "Debaryomycetaceae",
@@ -23884,7 +24088,7 @@
     "speciesTaxonomyId": "199306",
     "strainName": "Silveira",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Eurotiomycetes",
     "taxonomicLevelFamily": "Onygenaceae",
@@ -23916,7 +24120,9 @@
     "scaffoldN50": 1187988,
     "speciesTaxonomyId": "4785",
     "strainName": "GKB4",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Oomycota"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Peronosporaceae",
     "taxonomicLevelGenus": "Phytophthora",
@@ -24013,7 +24219,9 @@
     "scaffoldN50": 673467,
     "speciesTaxonomyId": "135588",
     "strainName": "2922-C6/04-10x",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Metamonada"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Dientamoebidae",
     "taxonomicLevelGenus": "Histomonas",
@@ -24045,7 +24253,7 @@
     "speciesTaxonomyId": "169388",
     "strainName": "FSSC 5 MPI-SDFR-AT-0091",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Nectriaceae",
@@ -24077,7 +24285,9 @@
     "scaffoldN50": 3611744,
     "speciesTaxonomyId": "164328",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Oomycota"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Peronosporaceae",
     "taxonomicLevelGenus": "Phytophthora",
@@ -24110,7 +24320,7 @@
     "speciesTaxonomyId": "1912982",
     "strainName": "JUm2507",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "None",
@@ -24144,7 +24354,7 @@
     "speciesTaxonomyId": "3039483",
     "strainName": "FI-F-10",
     "taxonomicGroup": [
-      "Fungi"
+      "Microsporidia"
     ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Ordosporidae",
@@ -24209,7 +24419,9 @@
     "scaffoldN50": 56155975,
     "speciesTaxonomyId": "34620",
     "strainName": null,
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Arthropoda"
+    ],
     "taxonomicLevelClass": "Arachnida",
     "taxonomicLevelFamily": "Ixodidae",
     "taxonomicLevelGenus": "Dermacentor",
@@ -24274,7 +24486,7 @@
     "speciesTaxonomyId": "7200",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Psychodidae",
@@ -24307,7 +24519,7 @@
     "speciesTaxonomyId": "29031",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Psychodidae",
@@ -24372,7 +24584,9 @@
     "scaffoldN50": 27737965,
     "speciesTaxonomyId": "5722",
     "strainName": "G3",
-    "taxonomicGroup": [],
+    "taxonomicGroup": [
+      "Metamonada"
+    ],
     "taxonomicLevelClass": "None",
     "taxonomicLevelFamily": "Trichomonadidae",
     "taxonomicLevelGenus": "Trichomonas",
@@ -24437,7 +24651,7 @@
     "speciesTaxonomyId": "7370",
     "strainName": "aabys",
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Muscidae",
@@ -24668,7 +24882,7 @@
     "speciesTaxonomyId": "192010",
     "strainName": "MRC7560",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Nectriaceae",
@@ -24701,7 +24915,7 @@
     "speciesTaxonomyId": "948311",
     "strainName": "ET1",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Nectriaceae",
@@ -24734,7 +24948,7 @@
     "speciesTaxonomyId": "5127",
     "strainName": "IMI 58289",
     "taxonomicGroup": [
-      "Fungi"
+      "Ascomycota"
     ],
     "taxonomicLevelClass": "Sordariomycetes",
     "taxonomicLevelFamily": "Nectriaceae",
@@ -24866,7 +25080,7 @@
     "speciesTaxonomyId": "68878",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -24899,7 +25113,7 @@
     "speciesTaxonomyId": "53552",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -24932,7 +25146,7 @@
     "speciesTaxonomyId": "42839",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -24965,7 +25179,7 @@
     "speciesTaxonomyId": "1518534",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -24998,7 +25212,7 @@
     "speciesTaxonomyId": "1496333",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -25031,7 +25245,7 @@
     "speciesTaxonomyId": "139045",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -25064,7 +25278,7 @@
     "speciesTaxonomyId": "1521116",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -25097,7 +25311,7 @@
     "speciesTaxonomyId": "7165",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -25130,7 +25344,7 @@
     "speciesTaxonomyId": "43151",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -25163,7 +25377,7 @@
     "speciesTaxonomyId": "186751",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -25196,7 +25410,7 @@
     "speciesTaxonomyId": "345580",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -25229,7 +25443,7 @@
     "speciesTaxonomyId": "62324",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -25262,7 +25476,7 @@
     "speciesTaxonomyId": "139047",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -25295,7 +25509,7 @@
     "speciesTaxonomyId": "185578",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Culicidae",
@@ -25328,7 +25542,7 @@
     "speciesTaxonomyId": "94469",
     "strainName": null,
     "taxonomicGroup": [
-      "Insecta"
+      "Arthropoda"
     ],
     "taxonomicLevelClass": "Insecta",
     "taxonomicLevelFamily": "Psychodidae",
