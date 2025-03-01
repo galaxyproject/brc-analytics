@@ -2,3642 +2,2334 @@ assemblies:
   # organism: Trichomonas vaginalis G3
   # common_name: trichomonads (G3 2022 genbank)
   - accession: GCA_000002825.3
-    ploidy: haploid
-    source: trichdb.org
   # organism: Aspergillus flavus NRRL3357
   # common_name: ascomycetes A.flavus (NRRL3357 2020)
   - accession: GCA_000006275.3
-    ploidy: haploid
-    source: fungidb.org
   # organism: Globisporangium ultimum DAOM BR144
   # common_name: oomycetes (DAOM BR144 2010)
   - accession: GCA_000143045.1
-    source: fungidb.org
   # organism: Candida albicans WO-1
   # common_name: budding yeast C.albicans (WO-1 2009)
   - accession: GCA_000149445.2
-    ploidy: diploid
-    source: fungidb.org
   # organism: Toxoplasma gondii GT1
   # common_name: apicomplexans T.gondii (GT1 2013)
   - accession: GCA_000149715.2
-    ploidy: haploid
-    source: toxodb.org
   # organism: Coccidioides immitis H538.4
   # common_name: ascomycetes C.immitis (H538.4 2006)
   - accession: GCA_000149815.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Batrachochytrium dendrobatidis JEL423
   # common_name: chytrids B.dendrobatidis (JEL423 2006)
   - accession: GCA_000149865.1
-    source: fungidb.org
   # organism: Coccidioides immitis RMSCC 2394
   # common_name: ascomycetes C.immitis (RMSCC 2394 2006)
   - accession: GCA_000149895.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Toxoplasma gondii VEG
   # common_name: apicomplexans T.gondii (VEG 2013)
   - accession: GCA_000150015.2
-    ploidy: haploid
-    source: toxodb.org
   # organism: Coccidioides posadasii RMSCC 3488
   # common_name: ascomycetes C.posadasii (RMSCC 3488 2007)
   - accession: GCA_000150055.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Coccidioides immitis RMSCC 3703
   # common_name: ascomycetes C.immitis (RMSCC 3703 2007)
   - accession: GCA_000150085.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Aspergillus fumigatus A1163
   # common_name: ascomycetes A.fumigatus (A1163 2007)
   - accession: GCA_000150145.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Coccidioides posadasii RMSCC 2133
   # common_name: ascomycetes C.posadasii (RMSCC 2133 2007)
   - accession: GCA_000150185.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Coccidioides posadasii RMSCC 3700
   # common_name: ascomycetes C.posadasii (RMSCC 3700 2007)
   - accession: GCA_000150215.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Coccidioides posadasii CPA 0001
   # common_name: ascomycetes C.posadasii (CPA 0001 2007)
   - accession: GCA_000150245.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Paracoccidioides brasiliensis Pb03
   # common_name: ascomycetes P.brasiliensis (Pb03 2014)
   - accession: GCA_000150475.2
-    source: fungidb.org
   # organism: Coccidioides posadasii RMSCC 1037
   # common_name: ascomycetes C.posadasii (RMSCC 1037 2008)
   - accession: GCA_000150555.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Coccidioides posadasii RMSCC 1038
   # common_name: ascomycetes C.posadasii (RMSCC 1038 2008)
   - accession: GCA_000150585.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Coccidioides posadasii CPA 0020
   # common_name: ascomycetes C.posadasii (CPA 0020 2008)
   - accession: GCA_000150615.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Coccidioides posadasii CPA 0066
   # common_name: ascomycetes C.posadasii (CPA 0066 2008)
   - accession: GCA_000150645.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Anopheles coluzzii
   # common_name: mosquito A.coluzzii (M 2008)
   - accession: GCA_000150765.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles gambiae
   # common_name: African malaria mosquito (S 2008)
   - accession: GCA_000150785.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Histoplasma capsulatum H143
   # common_name: ascomycetes H.capsulatum (H143 2009)
   - accession: GCA_000151035.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Trichophyton equinum CBS 127.97
   # common_name: ascomycetes T.equinum (CBS 127.97 2008)
   - accession: GCA_000151175.1
-    source: fungidb.org
   # organism: Allomyces macrogynus ATCC 38327
   # common_name: blastocladiomycotan A.macrogynus (ATCC 38327 2010)
   - accession: GCA_000151295.1
-    source: fungidb.org
   # organism: Trichophyton tonsurans CBS 112818
   # common_name: ascomycetes T.tonsurans (CBS 112818 2009)
   - accession: GCA_000151455.1
-    source: fungidb.org
   # organism: Puccinia triticina 1-1 BBBD Race 1
   # common_name: wheat leaf rust (1-1 BBBD Race 1 2016)
   - accession: GCA_000151525.2
-    ploidy: diploid
-    source: fungidb.org
   # organism: Blastomyces dermatitidis ATCC 26199
   # common_name: ascomycetes B.dermatitidis (ATCC 26199 2010)
   - accession: GCA_000166155.1
-    ploidy: polyploid
-    source: fungidb.org
   # organism: Phanerochaete chrysosporium RP-78
   # common_name: basidiomycetes P.chrysosporium (RP-78 2004)
   - accession: GCA_000167175.1
-    source: fungidb.org
   # organism: Coccidioides posadasii str. Silveira
   # common_name: ascomycetes C.Silveira (Silveira 2011)
   - accession: GCA_000170175.2
-    ploidy: haploid
-    source: fungidb.org
   # organism: Hyaloperonospora arabidopsidis Emoy2
   # common_name: downy mildews (Emoy2 2012)
   - accession: GCA_000173235.2
-    source: fungidb.org
   # organism: Rhodnius prolixus
   # common_name: bugs R.prolixus (2015)
   - accession: GCA_000181055.3
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Giardia intestinalis ATCC 50581
   # common_name: diplomonads (GS/M clone H7 2009)
   - accession: GCA_000182405.1
-    ploidy: polyploid
-    source: giardiadb.org
   # organism: Giardia lamblia P15
   # common_name: diplomonads (P15 2010)
   - accession: GCA_000182665.1
-    ploidy: polyploid
-    source: giardiadb.org
   # organism: Trypanosoma cruzi
   # common_name: Trypanosoma cruzi (Sylvio X10/1 2012)
   - accession: GCA_000188675.2
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Nematocida parisii ERTm3
   # common_name: microsporidians N.parisii (ERTm3 2011)
   - accession: GCA_000190615.1
-    source: microsporidiadb.org
   # organism: Magnaporthiopsis poae ATCC 64411
   # common_name: ascomycetes M.poae (ATCC 64411 2011)
   - accession: GCA_000193285.1
-    source: fungidb.org
   # organism: Anopheles darlingi
   # common_name: American malaria mosquito (2013)
   - accession: GCA_000211455.3
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Encephalitozoon cuniculi EC3
   # common_name: microsporidians E.cuniculi (EC3 2011)
   - accession: GCA_000221245.2
-    source: microsporidiadb.org
   # organism: Encephalitozoon cuniculi EC2
   # common_name: microsporidians E.cuniculi (EC2 2011)
   - accession: GCA_000221265.2
-    source: microsporidiadb.org
   # organism: Encephalitozoon cuniculi EC1
   # common_name: microsporidians E.cuniculi (EC1 2011)
   - accession: GCA_000221285.2
-    source: microsporidiadb.org
   # organism: Toxoplasma gondii RUB
   # common_name: apicomplexans T.gondii (RUB 2014)
   - accession: GCA_000224805.2
-    ploidy: haploid
-    source: toxodb.org
   # organism: Toxoplasma gondii TgCATBr9
   # common_name: apicomplexans T.gondii (TgCATBr9 2018)
   - accession: GCA_000224825.2
-    ploidy: haploid
-    source: toxodb.org
   # organism: Toxoplasma gondii VAND
   # common_name: apicomplexans T.gondii (VAND 2014)
   - accession: GCA_000224845.2
-    ploidy: haploid
-    source: toxodb.org
   # organism: Toxoplasma gondii MAS
   # common_name: apicomplexans T.gondii (MAS 2014)
   - accession: GCA_000224865.2
-    ploidy: haploid
-    source: toxodb.org
   # organism: Toxoplasma gondii p89
   # common_name: apicomplexans T.gondii (p89 2014)
   - accession: GCA_000224885.2
-    ploidy: haploid
-    source: toxodb.org
   # organism: Toxoplasma gondii FOU
   # common_name: apicomplexans T.gondii (FOU 2014)
   - accession: GCA_000224905.2
-    ploidy: haploid
-    source: toxodb.org
   # organism: Epichloe glyceriae E277
   # common_name: ascomycetes E.glyceriae (E277 2011)
   - accession: GCA_000225285.2
-    source: fungidb.org
   # organism: Trypanosoma vivax Y486
   # common_name: Trypanosoma vivax (Y486 2011)
   - accession: GCA_000227375.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Trypanosoma congolense IL3000
   # common_name: Trypanosoma congolense (IL3000 2011)
   - accession: GCA_000227395.2
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Sporisorium reilianum SRZ2
   # common_name: smut fungi S.reilianum SRZ2 (2011)
   - accession: GCA_000230245.1
-    source: fungidb.org
   # organism: Aspergillus niger ATCC 1015
   # common_name: ascomycetes A.niger (ATCC 1015 2011)
   - accession: GCA_000230395.2
-    ploidy: haploid
-    source: fungidb.org
   # organism: Edhazardia aedis USNM 41457
   # common_name: microsporidians E.aedis (USNM 41457 2015)
   - accession: GCA_000230595.3
-    source: microsporidiadb.org
   # organism: Aspergillus luchuensis IFO 4308
   # common_name: ascomycetes A.luchuensis IFO 4308 (IFO4308 2011)
   - accession: GCA_000239835.2
-    ploidy: haploid
-    source: fungidb.org
   # organism: Nematocida ausubeli
   # common_name: microsporidians N.ausubeli (ERTm2 2012)
   - accession: GCA_000250695.1
-    source: microsporidiadb.org
   # organism: Leishmania major strain SD 75.1
   # common_name: Leishmania major strain (SD 75.1 2012)
   - accession: GCA_000250755.2
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Toxoplasma gondii ARI
   # common_name: apicomplexans T.gondii (ARI 2016)
   - accession: GCA_000250965.2
-    ploidy: haploid
-    source: toxodb.org
   # organism: Toxoplasma gondii CAST
   # common_name: apicomplexans T.gondii (CAST 2018)
   - accession: GCA_000256705.2
-    ploidy: haploid
-    source: toxodb.org
   # organism: Toxoplasma gondii TgCatPRC2
   # common_name: apicomplexans T.gondii (TgCatPRC2 2016)
   - accession: GCA_000256725.2
-    ploidy: haploid
-    source: toxodb.org
   # organism: Toxoplasma gondii TgCATBr5
   # common_name: apicomplexans T.gondii (TgCATBr5 2011)
   - accession: GCA_000259835.1
-    ploidy: haploid
-    source: toxodb.org
   # organism: Fusarium oxysporum f. sp. melonis 26406
   # common_name: ascomycetes F.oxysporum f. sp. melonis (26406 2014)
   - accession: GCA_000260495.2
-    ploidy: haploid
-    source: fungidb.org
   # organism: Phlebotomus papatasi
   # common_name: fly P.papatasi (2012)
   - accession: GCA_000262795.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Lutzomyia longipalpis
   # common_name: fly L.longipalpis (2012)
   - accession: GCA_000265325.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Fusarium oxysporum Fo47
   # common_name: ascomycetes F.oxysporum (Fo47 2014)
   - accession: GCA_000271705.2
-    ploidy: haploid
-    source: fungidb.org
   # organism: Toxoplasma gondii CtCo5
   # common_name: apicomplexans T.gondii (CtCo5 2012)
   - accession: GCA_000278365.1
-    ploidy: haploid
-    source: toxodb.org
   # organism: Trypanosoma cruzi marinkellei
   # common_name: Trypanosoma cruzi marinkellei (B7 2012)
   - accession: GCA_000300495.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Anopheles stephensi
   # common_name: Asian malaria mosquito (Indian Wild Type Walter Reed 2013)
   - accession: GCA_000300775.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Macrophomina phaseolina MS6
   # common_name: charcoal rot (MS6 2012)
   - accession: GCA_000302655.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Taphrina deformans PYCC 5710
   # common_name: peach leaf curl fungus (PYCC 5710 2013)
   - accession: GCA_000312925.2
-    source: fungidb.org
   # organism: Anncaliia algerae
   # common_name: microsporidians A.algerae (Undeen 2012)
   - accession: GCA_000313815.1
-    source: microsporidiadb.org
   # organism: Trachipleistophora hominis
   # common_name: microsporidians T.hominis (2013)
   - accession: GCA_000316135.1
-    source: microsporidiadb.org
   # organism: Toxoplasma gondii GAB2-2007-GAL-DOM2
   # common_name: apicomplexans T.gondii (GAB2-2007-GAL-DOM2 2014)
   - accession: GCA_000325525.2
-    ploidy: haploid
-    source: toxodb.org
   # organism: Trypanosoma cruzi strain Esmeraldo
   # common_name: Trypanosoma cruzi strain (Esmeraldo cl. 3 2013)
   - accession: GCA_000327425.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Crithidia fasciculata
   # common_name: Crithidia fasciculata (Cf-Cl 2015)
   - accession: GCA_000331325.2
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Leishmania major strain LV39c5
   # common_name: Leishmania major strain (LV39c5 2013)
   - accession: GCA_000331345.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Trypanosoma cruzi JR cl. 4
   # common_name: Trypanosoma cruzi (JR cl. 4 2013)
   - accession: GCA_000331405.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Endotrypanum monterogeii
   # common_name: Endotrypanum monterogeii (LV88 2016)
   - accession: GCA_000333855.2
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Pneumocystis jirovecii
   # common_name: ascomycetes P.jirovecii (SE8 2012)
   - accession: GCA_000333975.2
-    ploidy: haploid
-    source: fungidb.org
   # organism: Toxoplasma gondii COUG
   # common_name: apicomplexans T.gondii (COUG 2017)
   - accession: GCA_000338675.2
-    ploidy: haploid
-    source: toxodb.org
   # organism: Entamoeba histolytica KU27
   # common_name: E.histolytica (KU27 2013)
   - accession: GCA_000338855.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Leishmania braziliensis MHOM/BR/75/M2903
   # common_name: Leishmania braziliensis (MHOM/BR/75/M2903 2016 kinetoplastids)
   - accession: GCA_000340355.2
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Leishmania panamensis MHOM/COL/81/L13
   # common_name: Leishmania panamensis (MHOM/COL/81/L13 2013)
   - accession: GCA_000340495.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Entamoeba histolytica HM-1:IMSS-B
   # common_name: E.histolytica (HM-1:IMSS-B 2013)
   - accession: GCA_000344925.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Entamoeba histolytica HM-3:IMSS
   # common_name: E.histolytica (HM-3:IMSS 2013)
   - accession: GCA_000346345.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Claviceps purpurea 20.1
   # common_name: ergot fungus (20.1 2012)
   - accession: GCA_000347355.1
-    source: fungidb.org
   # organism: Anopheles minimus
   # common_name: mosquito A.minimus (MINIMUS1 2013)
   - accession: GCA_000349025.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles stephensi
   # common_name: Asian malaria mosquito (SDA-500 2013)
   - accession: GCA_000349045.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles quadriannulatus
   # common_name: mosquito A.quadriannulatus (QUAD4_A 2013)
   - accession: GCA_000349065.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles epiroticus
   # common_name: mosquito A.epiroticus (epiroticus2 2013)
   - accession: GCA_000349105.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles albimanus
   # common_name: mosquito A.albimanus (ALBI9_A 2017)
   - accession: GCA_000349125.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles dirus
   # common_name: mosquito A.dirus (WRAIR2 2013)
   - accession: GCA_000349145.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles christyi
   # common_name: mosquito A.christyi (ACHKN1017 2013)
   - accession: GCA_000349165.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles arabiensis
   # common_name: mosquito A.arabiensis (DONG5_A 2013)
   - accession: GCA_000349185.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Fusarium oxysporum f. sp. cubense race 1
   # common_name: ascomycetes F.oxysporum f. sp. cubense (race 1 2013)
   - accession: GCA_000350345.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Fusarium odoratissimum
   # common_name: ascomycetes F.odoratissimum (race 4 2013)
   - accession: GCA_000350365.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Trypanosoma cruzi Tula cl2
   # common_name: Trypanosoma cruzi (Tula cl2 2013)
   - accession: GCA_000365225.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Entamoeba histolytica HM-1:IMSS-A
   # common_name: E.histolytica (HM-1:IMSS-A 2013)
   - accession: GCA_000365475.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Nosema bombycis CQ1
   # common_name: microsporidians N.bombycis (CQ1 2013)
   - accession: GCA_000383075.1
-    source: microsporidiadb.org
   # organism: Anncaliia algerae PRA109
   # common_name: microsporidians A.algerae (PRA109 2014)
   - accession: GCA_000385855.2
-    source: microsporidiadb.org
   # organism: Anncaliia algerae PRA339
   # common_name: microsporidians A.algerae (PRA339 2014)
   - accession: GCA_000385875.2
-    source: microsporidiadb.org
   # organism: Globisporangium irregulare DAOM BR486
   # common_name: oomycetes (DAOM BR486 2013)
   - accession: GCA_000387425.2
-    source: fungidb.org
   # organism: Pythium aphanidermatum DAOM BR444
   # common_name: oomycetes (DAOM BR444 2013)
   - accession: GCA_000387445.2
-    source: fungidb.org
   # organism: Globisporangium iwayamae DAOM BR242034
   # common_name: oomycetes (DAOM BR242034 2013)
   - accession: GCA_000387465.2
-    source: fungidb.org
   # organism: Pythium arrhenomanes ATCC 12531
   # common_name: oomycetes (ATCC 12531 2013)
   - accession: GCA_000387505.2
-    source: fungidb.org
   # organism: Globisporangium ultimum var. sporangiiferum BR650
   # common_name: oomycetes (DAOM BR650 2013)
   - accession: GCA_000387525.2
-    source: fungidb.org
   # organism: Phytopythium vexans DAOM BR484
   # common_name: oomycetes (DAOM BR484 2013)
   - accession: GCA_000387545.2
-    ploidy: polyploid
-    source: fungidb.org
   # organism: Verticillium dahliae JR2
   # common_name: ascomycetes V.dahliae (JR2 2014)
   - accession: GCA_000400815.2
-    source: fungidb.org
   # organism: Mucor circinelloides 1006PhL
   # common_name: fungi M.circinelloides (1006PhL 2013)
   - accession: GCA_000401635.1
-    source: fungidb.org
   # organism: Leishmania sp. MAR LEM2494
   # common_name: Leishmania sp. MAR (LEM2494 2016)
   - accession: GCA_000409445.2
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Leishmania arabica
   # common_name: Leishmania arabica (LEM1108 2016)
   - accession: GCA_000410695.2
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Leishmania tropica L590
   # common_name: Leishmania tropica (L590 2013)
   - accession: GCA_000410715.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Ophiostoma piceae UAMH 11346
   # common_name: ascomycetes O.piceae (UAMH 11346 2013)
   - accession: GCA_000410735.1
-    source: fungidb.org
   # organism: Leishmania enriettii
   # common_name: Leishmania enriettii (LEM3045 2016)
   - accession: GCA_000410755.2
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Spraguea lophii 42_110
   # common_name: microsporidians S.lophii (42_110 2013)
   - accession: GCA_000430065.1
-    source: microsporidiadb.org
   # organism: Leishmania amazonensis
   # common_name: Leishmania amazonensis (2013)
   - accession: GCA_000438535.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Anopheles sinensis
   # common_name: mosquito A.sinensis (2014)
   - accession: GCA_000441895.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Leishmania turanica
   # common_name: Leishmania turanica (LEM423 2013)
   - accession: GCA_000441995.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Leishmania gerbilli
   # common_name: Leishmania gerbilli (LEM452 2013)
   - accession: GCA_000443025.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Leishmania aethiopica L147
   # common_name: Leishmania aethiopica (L147 2016)
   - accession: GCA_000444285.2
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Vairimorpha apis BRL 01
   # common_name: microsporidians V.apis (BRL 01 2013)
   - accession: GCA_000447185.1
-    source: microsporidiadb.org
   # organism: Leishmania donovani
   # common_name: Leishmania donovani (BHU 1220 2013)
   - accession: GCA_000470725.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Anopheles sinensis
   # common_name: mosquito A.sinensis (SINENSIS 2014)
   - accession: GCA_000472065.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles maculatus
   # common_name: mosquito A.maculatus (maculatus3 2013)
   - accession: GCA_000473185.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles culicifacies
   # common_name: mosquito A.culicifacies (species A-37_1 2013)
   - accession: GCA_000473375.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles farauti
   # common_name: mosquito A.farauti (FAR1 2014)
   - accession: GCA_000473445.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles atroparvus
   # common_name: mosquito A.atroparvus (EBRO 2013)
   - accession: GCA_000473505.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles melas
   # common_name: mosquito A.melas (CM1001059_A 2014)
   - accession: GCA_000473525.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles merus
   # common_name: mosquito A.merus (MAF 2014)
   - accession: GCA_000473845.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Trypanosoma rangeli SC58
   # common_name: Trypanosoma rangeli (SC58 2013)
   - accession: GCA_000492115.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Trypanosoma cruzi Dm28c
   # common_name: Trypanosoma cruzi (Dm28c 2013)
   - accession: GCA_000496795.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Giardia intestinalis
   # common_name: diplomonads (DH 2013)
   - accession: GCA_000498715.1
-    ploidy: polyploid
-    source: giardiadb.org
   # organism: Giardia intestinalis
   # common_name: diplomonads (GS 2013)
   - accession: GCA_000498735.1
-    ploidy: polyploid
-    source: giardiadb.org
   # organism: Naegleria fowleri
   # common_name: brain-eating amoeba (ATCC 30863 2013)
   - accession: GCA_000499105.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Eimeria praecox
   # common_name: apicomplexans E.praecox (Houghton 2013)
   - accession: GCA_000499445.1
-    ploidy: haploid
-    source: toxodb.org
   # organism: Eimeria brunetti
   # common_name: apicomplexans E.brunetti (Houghton 2013)
   - accession: GCA_000499725.1
-    ploidy: haploid
-    source: toxodb.org
   # organism: Kwoniella heveanensis CBS 569
   # common_name: basidiomycetes K.heveanensis (CBS 569 2016)
   - accession: GCA_000507425.3
-    source: fungidb.org
   # organism: Plasmodium vinckei petteri
   # common_name: apicomplexans P.vinckei petteri (CR 2014)
   - accession: GCA_000524515.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Glossina fuscipes fuscipes
   # common_name: tsetse fly G.fuscipes fuscipes (2014)
   - accession: GCA_000671735.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Glossina brevipalpis
   # common_name: tsetse fly G.brevipalpis (2014)
   - accession: GCA_000671755.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Glossina pallidipes
   # common_name: tsetse fly G.pallidipes (2014)
   - accession: GCA_000688715.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Glossina austeni
   # common_name: tsetse fly G.austeni (2014)
   - accession: GCA_000688735.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Pleurotus ostreatus PC15
   # common_name: oyster mushroom (PC15 2014)
   - accession: GCA_000697685.1
-    source: fungidb.org
   # organism: Babesia bigemina
   # common_name: apicomplexans B.bigemina (BOND 2014)
   - accession: GCA_000723445.1
-    ploidy: haploid
-    source: piroplasmadb.org
   # organism: Lichtheimia corymbifera JMRC:FSU:9682
   # common_name: mucoromycotan L.corymbifera JMRC:FSU:9682 (FSU 9682 2014)
   - accession: GCA_000723665.1
-    source: fungidb.org
   # organism: Sarcocystis neurona
   # common_name: apicomplexans S.neurona (SN3 2014)
   - accession: GCA_000727475.1
-    ploidy: haploid
-    source: toxodb.org
   # organism: Stachybotrys chartarum IBT 40293
   # common_name: ascomycetes S.chartarum (IBT 40293 2014)
   - accession: GCA_000732565.1
-    source: fungidb.org
   # organism: Penicillium expansum
   # common_name: ascomycetes P.expansum (d1 2014)
   - accession: GCA_000769735.1
-    source: fungidb.org
   # organism: Cryptosporidium hominis
   # common_name: apicomplexans C.hominis (37999 2014)
   - accession: GCA_000804495.1
-    ploidy: haploid
-    source: cryptodb.org
   # organism: Metarhizium anisopliae ARSEF 549
   # common_name: ascomycetes M.anisopliae (ARSEF 549 2015)
   - accession: GCA_000814975.1
-    source: fungidb.org
   # organism: Glossina palpalis gambiensis
   # common_name: tsetse fly G.palpalis gambiensis (146720 2015)
   - accession: GCA_000818775.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Acanthamoeba astronyxis
   # common_name: A.astronyxis (2015)
   - accession: GCA_000826245.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Acanthamoeba culbertsoni
   # common_name: A.culbertsoni (2015)
   - accession: GCA_000826265.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Acanthamoeba lenticulata
   # common_name: A.lenticulata (2015)
   - accession: GCA_000826285.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Acanthamoeba healyi
   # common_name: A.healyi (2015)
   - accession: GCA_000826305.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Acanthamoeba palestinensis
   # common_name: A.palestinensis (2015)
   - accession: GCA_000826325.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Acanthamoeba polyphaga
   # common_name: A.polyphaga (2015)
   - accession: GCA_000826345.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Acanthamoeba royreba
   # common_name: A.royreba (2015)
   - accession: GCA_000826365.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Acanthamoeba rhysodes
   # common_name: A.rhysodes (2015)
   - accession: GCA_000826385.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Acanthamoeba lugdunensis
   # common_name: A.lugdunensis (2015)
   - accession: GCA_000826425.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Acanthamoeba quina
   # common_name: A.quina (2015)
   - accession: GCA_000826445.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Acanthamoeba mauritaniensis
   # common_name: A.mauritaniensis (2015)
   - accession: GCA_000826465.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Acanthamoeba castellanii
   # common_name: A.castellanii (2015)
   - accession: GCA_000826485.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Acanthamoeba pearcei
   # common_name: A.pearcei (2015)
   - accession: GCA_000826505.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Sarcoptes scabiei
   # common_name: mite/tick S.scabiei (Arlian Lab 2015)
   - accession: GCA_000828355.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Cryptosporidium sp. chipmunk LX-2015
   # common_name: apicomplexans C.sp. (chipmunk LX-2015 2015)
   - accession: GCA_000831705.1
-    ploidy: haploid
-    source: cryptodb.org
   # organism: Cryptococcus gattii EJB2
   # common_name: basidiomycetes C.gattii (EJB2 2015)
   - accession: GCA_000835745.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Cryptococcus bacillisporus CA1873
   # common_name: basidiomycetes C.bacillisporus (CA1873 2015)
   - accession: GCA_000855695.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Sarcocystis neurona
   # common_name: apicomplexans S.neurona (SN1 2015)
   - accession: GCA_000875885.1
-    ploidy: haploid
-    source: toxodb.org
   # organism: Cryptococcus gattii NT-10
   # common_name: basidiomycetes C.gattii (NT-10 2015)
   - accession: GCA_000935105.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Fusarium graminearum
   # common_name: ascomycetes F.graminearum (233423 2015)
   - accession: GCA_000966635.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Ixodes ricinus
   # common_name: castor bean tick (Charles River 2016)
   - accession: GCA_000973045.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Emmonsia crescens UAMH 3008
   # common_name: ascomycetes E.crescens (UAMH 3008 2015)
   - accession: GCA_001008285.1
-    source: fungidb.org
   # organism: Pythium insidiosum
   # common_name: oomycetes (Pi-S 2022)
   - accession: GCA_001029375.2
-    source: fungidb.org
   # organism: Glossina morsitans morsitans
   # common_name: tsetse fly G.morsitans morsitans (Yale 2014)
   - accession: GCA_001077435.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Babesia divergens
   # common_name: apicomplexans B.divergens (Rouen 1987 2018)
   - accession: GCA_001077455.2
-    ploidy: haploid
-    source: piroplasmadb.org
   # organism: Encephalitozoon cuniculi EcunIII-L
   # common_name: microsporidians E.cuniculi (EcunIII-L 2015)
   - accession: GCA_001078035.1
-    source: microsporidiadb.org
   # organism: Vitrella brassicaformis CCMP3155
   # common_name: V.brassicaformis CCMP3155 (2015)
   - accession: GCA_001179505.1
-    source: cryptodb.org
   # organism: Balamuthia mandrillaris
   # common_name: B.mandrillaris (CDC-V039 2015)
   - accession: GCA_001185145.1
-    ploidy: haploid
-    source: amoebadb.org
   # organism: Balamuthia mandrillaris
   # common_name: B.mandrillaris (2046 2015)
   - accession: GCA_001262475.1
-    ploidy: haploid
-    source: amoebadb.org
   # organism: Puccinia sorghi
   # common_name: rust P.sorghi (RO10H11247 2015)
   - accession: GCA_001263375.1
-    ploidy: diploid
-    source: fungidb.org
   # organism: Madurella mycetomatis
   # common_name: ascomycetes M.mycetomatis (mm55 2016)
   - accession: GCA_001275765.2
-    source: fungidb.org
   # organism: Leptomonas seymouri
   # common_name: Leptomonas seymouri (ATCC 30220 2015)
   - accession: GCA_001299535.1
-    source: tritrypdb.org
   # organism: Byssoonygena ceratinophila
   # common_name: ascomycetes B.ceratinophila (UAMH 5669 2015)
   - accession: GCA_001430925.1
-    source: fungidb.org
   # organism: Amauroascus verrucosus
   # common_name: ascomycetes A.verrucosus (UAMH 3576 2015)
   - accession: GCA_001430935.1
-    source: fungidb.org
   # organism: Amauroascus niger
   # common_name: ascomycetes A.niger (UAMH 3544 2015)
   - accession: GCA_001430945.1
-    source: fungidb.org
   # organism: Chrysosporium queenslandicum
   # common_name: ascomycetes C.queenslandicum (CBS 280.77 2015)
   - accession: GCA_001430955.1
-    source: fungidb.org
   # organism: Pseudoloma neurophilia
   # common_name: microsporidians P.neurophilia (MK1 2015)
   - accession: GCA_001432165.1
-    source: microsporidiadb.org
   # organism: Aedes albopictus
   # common_name: Asian tiger mosquito (Foshan BGI 2016)
   - accession: GCA_001444175.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Naganishia albida
   # common_name: basidiomycetes N.albida (NRRL Y-1402 2015)
   - accession: GCA_001444555.1
-    source: fungidb.org
   # organism: Aspergillus lentulus
   # common_name: ascomycetes A.lentulus (IFM 54703 2021)
   - accession: GCA_001445615.2
-    ploidy: haploid
-    source: fungidb.org
   # organism: Bodo saltans
   # common_name: Bodo saltans (Lake Konstanz 2015)
   - accession: GCA_001460835.1
-    source: tritrypdb.org
   # organism: Cryptosporidium hominis
   # common_name: apicomplexans C.hominis (30976 2015)
   - accession: GCA_001483515.1
-    ploidy: haploid
-    source: cryptodb.org
   # organism: Giardia intestinalis assemblage A
   # common_name: diplomonads (AS175 2013)
   - accession: GCA_001493575.1
-    ploidy: polyploid
-    source: giardiadb.org
   # organism: Giardia intestinalis assemblage B
   # common_name: diplomonads (BAH15c1 2016)
   - accession: GCA_001543975.1
-    ploidy: polyploid
-    source: giardiadb.org
   # organism: Rhizophagus irregularis
   # common_name: glomeromycetes (A1 2016)
   - accession: GCA_001593125.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Toxoplasma gondii RH
   # common_name: apicomplexans T.gondii (RH 2016)
   - accession: GCA_001593265.1
-    ploidy: haploid
-    source: toxodb.org
   # organism: Cryptosporidium meleagridis
   # common_name: apicomplexans C.meleagridis (UKMEL1 2016)
   - accession: GCA_001593445.1
-    ploidy: haploid
-    source: cryptodb.org
   # organism: Cryptosporidium baileyi
   # common_name: apicomplexans C.baileyi (TAMU-09Q1 2016)
   - accession: GCA_001593455.1
-    ploidy: haploid
-    source: cryptodb.org
   # organism: Cryptosporidium hominis
   # common_name: apicomplexans C.hominis (TU502_2012 2016)
   - accession: GCA_001593465.1
-    ploidy: haploid
-    source: cryptodb.org
   # organism: Cryptosporidium hominis
   # common_name: apicomplexans C.hominis (UKH1 2016)
   - accession: GCA_001593475.1
-    ploidy: haploid
-    source: cryptodb.org
   # organism: Apiotrichum montevideense
   # common_name: basidiomycetes A.montevideense (JCM 9937 2016)
   - accession: GCA_001598995.1
-    source: fungidb.org
   # organism: Trichoderma atroviride
   # common_name: ascomycetes T.atroviride (JCM 9410 2016)
   - accession: GCA_001599035.1
-    source: fungidb.org
   # organism: Naganishia albida
   # common_name: basidiomycetes N.albida (JCM 2334 2016)
   - accession: GCA_001599735.1
-    source: fungidb.org
   # organism: Haemoproteus tartakovskyi
   # common_name: apicomplexans H.tartakovskyi (SISKIN1 2016)
   - accession: GCA_001625125.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Ascosphaera apis ARSEF 7405
   # common_name: ascomycetes A.apis (ARSEF 7405 2016)
   - accession: GCA_001636715.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Mucor lusitanicus CBS 277.49
   # common_name: fungi M.lusitanicus (CBS 277.49 2016)
   - accession: GCA_001638945.1
-    source: fungidb.org
   # organism: Nematocida sp. ERTm5
   # common_name: microsporidians N.sp. (ERTm5 2016)
   - accession: GCA_001642415.1
-    source: microsporidiadb.org
   # organism: Babesia microti
   # common_name: apicomplexans B.microti (ATCC 30222 2016)
   - accession: GCA_001650055.1
-    ploidy: haploid
-    source: piroplasmadb.org
   # organism: Babesia microti
   # common_name: apicomplexans B.microti (ATCC PRA-99 2016)
   - accession: GCA_001650065.1
-    ploidy: haploid
-    source: piroplasmadb.org
   # organism: Babesia microti
   # common_name: apicomplexans B.microti (GreenwichYale_Lab_strain_1 2016)
   - accession: GCA_001650075.1
-    ploidy: haploid
-    source: piroplasmadb.org
   # organism: Babesia microti
   # common_name: apicomplexans B.microti (GI 2016)
   - accession: GCA_001650105.1
-    ploidy: haploid
-    source: piroplasmadb.org
   # organism: Babesia microti
   # common_name: apicomplexans B.microti (Naushon 2016)
   - accession: GCA_001650135.1
-    ploidy: haploid
-    source: piroplasmadb.org
   # organism: Babesia microti
   # common_name: apicomplexans B.microti (Nan_Hs_2011_N11-50 2016)
   - accession: GCA_001650145.1
-    ploidy: haploid
-    source: piroplasmadb.org
   # organism: Emergomyces africanus
   # common_name: ascomycetes E.africanus (CBS 136260 2016)
   - accession: GCA_001660665.1
-    source: fungidb.org
   # organism: Cladophialophora carrionii
   # common_name: ascomycetes C.carrionii (KSF 2016)
   - accession: GCA_001700775.1
-    source: fungidb.org
   # organism: Aspergillus cristatus
   # common_name: ascomycetes A.cristatus (GZAAS20.1005 2016)
   - accession: GCA_001717485.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Cryptococcus depauperatus
   # common_name: basidiomycetes C.depauperatus (CBS 7855 2024 gebnak)
   - accession: GCA_001720245.2
-    ploidy: haploid
-    source: fungidb.org
   # organism: Hanseniaspora uvarum
   # common_name: budding yeast H.uvarum (AWRI3580 2016)
   - accession: GCA_001747055.1
-    source: fungidb.org
   # organism: Sclerotinia sclerotiorum 1980 UF-70
   # common_name: ascomycetes S.sclerotiorum UF-70 (1980 2016)
   - accession: GCA_001857865.1
-    source: fungidb.org
   # organism: Amphiamblys sp. WSBS2006
   # common_name: microsporidians A.sp. (WSBS2006 2016)
   - accession: GCA_001875675.1
-    source: microsporidiadb.org
   # organism: Blastomyces percursus
   # common_name: ascomycetes B.percursus (EI222 2016)
   - accession: GCA_001883805.1
-    ploidy: polyploid
-    source: fungidb.org
   # organism: Emergomyces pasteurianus Ep9510
   # common_name: ascomycetes E.pasteurianus Ep9510 (UAMH 9510 2016)
   - accession: GCA_001883825.1
-    source: fungidb.org
   # organism: Aspergillus luchuensis CBS 106.47
   # common_name: ascomycetes A.luchuensis (CBS 106.47 2016)
   - accession: GCA_001890685.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Aspergillus tubingensis CBS 134.48
   # common_name: ascomycetes A.tubingensis (CBS 134.48 2016)
   - accession: GCA_001890745.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Cyberlindnera fabianii
   # common_name: budding yeast C.fabianii (65 2017)
   - accession: GCA_001983305.1
-    source: fungidb.org
   # organism: Aspergillus carbonarius ITEM 5010
   # common_name: ascomycetes A.carbonaris (ITEM 5010 2017)
   - accession: GCA_001990825.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Trichoderma reesei QM6a
   # common_name: ascomycetes T.reesei (QM6a 2017)
   - accession: GCA_002006585.1
-    source: fungidb.org
   # organism: Batrachochytrium salamandrivorans
   # common_name: chytrids B.salamandrivorans (AMFP13 2022)
   - accession: GCA_002006685.2
-    source: fungidb.org
   # organism: Ecytonucleospora hepatopenaei
   # common_name: microsporidians E.hepatopenaei (TH1 2017)
   - accession: GCA_002081675.1
-    source: microsporidiadb.org
   # organism: Rhizopus microsporus var. microsporus
   # common_name: fungi R.microsporus var. microsporus (ATCC 52814 2017)
   - accession: GCA_002083745.1
-    source: fungidb.org
   # organism: Hepatospora eriocheir
   # common_name: microsporidians H.eriocheir (canceri 2017)
   - accession: GCA_002087875.1
-    source: microsporidiadb.org
   # organism: Hepatospora eriocheir
   # common_name: microsporidians H.eriocheir (GB1 2017)
   - accession: GCA_002087885.1
-    source: microsporidiadb.org
   # organism: Enterospora canceri
   # common_name: microsporidians E.canceri (GB1 2017)
   - accession: GCA_002087915.1
-    source: microsporidiadb.org
   # organism: Emergomyces orientalis
   # common_name: ascomycetes E.orientalis (5z489 2017)
   - accession: GCA_002110485.1
-    source: fungidb.org
   # organism: Hortaea werneckii EXF-2000
   # common_name: ascomycetes H.werneckii (EXF-2000 2017)
   - accession: GCA_002127715.1
-    source: fungidb.org
   # organism: Plasmodium knowlesi
   # common_name: apicomplexans P.knowlesi (Malayan Strain Pk1 A 2017)
   - accession: GCA_002140095.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Cryptococcus neoformans var. neoformans XL280
   # common_name: basidiomycetes C.neoformans var. neoformans (XL280 2017)
   - accession: GCA_002216205.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Cryptococcus neoformans var. grubii
   # common_name: basidiomycetes C.neoformans var. grubii (KN99 2017)
   - accession: GCA_002216725.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Trypanosoma cruzi cruzi
   # common_name: Trypanosoma cruzi cruzi (Dm28c 2017)
   - accession: GCA_002219105.2
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Nakaseomyces glabratus
   # common_name: budding yeast N.glabratus (DSY562 2017)
   - accession: GCA_002219185.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Cryptosporidium hominis
   # common_name: apicomplexans C.hominis (2015)
   - accession: GCA_002223825.1
-    ploidy: haploid
-    source: cryptodb.org
   # organism: Phytophthora plurivora
   # common_name: downy mildews (AV1007 2017)
   - accession: GCA_002247145.1
-    ploidy: polyploid
-    source: fungidb.org
   # organism: Eimeria falciformis
   # common_name: apicomplexans E.falciformis (Bayer Haberkorn 1970 2017)
   - accession: GCA_002271815.1
-    ploidy: haploid
-    source: toxodb.org
   # organism: Lomentospora prolificans
   # common_name: ascomycetes L.prolificans (JHH-5317 2017)
   - accession: GCA_002276285.1
-    source: fungidb.org
   # organism: Trypanosoma congolense
   # common_name: Trypanosoma congolense (Tc1/148 2017)
   - accession: GCA_002287245.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Trypanosoma cruzi
   # common_name: Trypanosoma cruzi (Bug2148 2017)
   - accession: GCA_002749415.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Trypanosoma cruzi
   # common_name: Trypanosoma cruzi (Y 2017)
   - accession: GCA_002749425.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Apophysomyces variabilis
   # common_name: fungi A.variabilis (NCCPF 102052 2017)
   - accession: GCA_002749535.1
-    source: fungidb.org
   # organism: Candidozyma auris
   # common_name: budding yeast C.auris (B8441 2024)
   - accession: GCA_002759435.3
-    source: fungidb.org
   # organism: Phytophthora palmivora
   # common_name: downy mildews (sbr112.9 2018)
   - accession: GCA_002911725.1
-    ploidy: polyploid
-    source: fungidb.org
   # organism: Entamoeba moshkovskii
   # common_name: E.moshkovskii (Laredo 2018)
   - accession: GCA_002914575.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Puccinia striiformis
   # common_name: rust P.striiformis (93-210 2018)
   - accession: GCA_002920065.1
-    ploidy: diploid
-    source: fungidb.org
   # organism: Puccinia striiformis
   # common_name: rust P.striiformis (93TX-2 2018)
   - accession: GCA_002920205.1
-    ploidy: diploid
-    source: fungidb.org
   # organism: Paratrypanosoma confusum
   # common_name: Paratrypanosoma confusum (CUL13MS 2018)
   - accession: GCA_002921335.1
-    source: tritrypdb.org
   # organism: Cryptococcus neoformans serotype A
   # common_name: basidiomycetes C.neoformans var. grubii (H99 2018)
   - accession: GCA_003011985.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Trypanosoma congolense IL3000
   # common_name: Trypanosoma congolense (IL3000 2018 kinetoplastids)
   - accession: GCA_003013265.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Candidozyma auris
   # common_name: budding yeast C.auris (B11243 2018)
   - accession: GCA_003014415.1
-    source: fungidb.org
   # organism: Pichia kudriavzevii
   # common_name: budding yeast P.kudriavzevii (CBS5147 2018)
   - accession: GCA_003054405.1
-    source: fungidb.org
   # organism: Theileria orientalis
   # common_name: apicomplexans T.orientalis (Goon Nure 2022)
   - accession: GCA_003072535.4
-    ploidy: haploid
-    source: piroplasmadb.org
   # organism: Theileria orientalis
   # common_name: apicomplexans T.orientalis (Fish Creek 2022)
   - accession: GCA_003072545.4
-    ploidy: haploid
-    source: piroplasmadb.org
   # organism: Trichophyton mentagrophytes
   # common_name: ascomycetes T.mentagrophytes (TIMM 2789 2018)
   - accession: GCA_003118255.1
-    source: fungidb.org
   # organism: Trypanosoma cruzi
   # common_name: Trypanosoma cruzi (TCC 2018)
   - accession: GCA_003177095.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Trypanosoma cruzi
   # common_name: Trypanosoma cruzi (Dm28c 2018)
   - accession: GCA_003177105.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Aspergillus sclerotiicarbonarius CBS 121057
   # common_name: ascomycetes A.sclerotiicarbonarius (CBS 121057 2018)
   - accession: GCA_003184635.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Aspergillus ellipticus CBS 707.79
   # common_name: ascomycetes A.ellipticus (CBS 707.79 2018)
   - accession: GCA_003184645.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Phytophthora cactorum
   # common_name: downy mildews (10300 2018)
   - accession: GCA_003287315.1
-    ploidy: polyploid
-    source: fungidb.org
   # organism: Aspergillus niger ATCC 13496
   # common_name: ascomycetes A.niger (ATCC 13496 2018)
   - accession: GCA_003344705.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Plasmodium vivax
   # common_name: malaria parasite P. vivax (PvSY56 2018)
   - accession: GCA_003402215.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Trypanosoma cruzi
   # common_name: Trypanosoma cruzi (S11 2018)
   - accession: GCA_003594385.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Trypanosoma cruzi
   # common_name: Trypanosoma cruzi (Ycl4 2018)
   - accession: GCA_003594405.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Trypanosoma cruzi
   # common_name: Trypanosoma cruzi (S23b 2018)
   - accession: GCA_003594425.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Trypanosoma cruzi
   # common_name: Trypanosoma cruzi (S92a 2018)
   - accession: GCA_003594445.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Trypanosoma cruzi
   # common_name: Trypanosoma cruzi (Ycl6 2018)
   - accession: GCA_003594465.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Trypanosoma cruzi
   # common_name: Trypanosoma cruzi (Ycl2 2018)
   - accession: GCA_003594485.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Trypanosoma cruzi
   # common_name: Trypanosoma cruzi (S15 2018)
   - accession: GCA_003594585.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Trypanosoma cruzi
   # common_name: Trypanosoma cruzi (S162a 2018)
   - accession: GCA_003594605.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Trypanosoma cruzi
   # common_name: Trypanosoma cruzi (S44a 2018)
   - accession: GCA_003594705.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Trypanosoma cruzi
   # common_name: Trypanosoma cruzi (S154a 2018)
   - accession: GCA_003594715.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Leptotrombidium deliense
   # common_name: scrub typhus mite (UoL-UT 2018)
   - accession: GCA_003675905.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Malassezia restricta CBS 7877
   # common_name: basidiomycetes M.restricta (CBS 7877 2018)
   - accession: GCA_003691605.1
-    source: fungidb.org
   # organism: Ecytonucleospora hepatopenaei
   # common_name: microsporidians E.hepatopenaei (EHP-ID16 2018)
   - accession: GCA_003709115.1
-    source: microsporidiadb.org
   # organism: Chaetothyriales sp. CBS 132003
   # common_name: ascomycetes C.sp. (CBS 132003 2018)
   - accession: GCA_003709865.1
-    source: fungidb.org
   # organism: Trypanosoma cruzi
   # common_name: Trypanosoma cruzi (CL 2018)
   - accession: GCA_003719155.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Trypanosoma cruzi
   # common_name: Trypanosoma cruzi (G 2018)
   - accession: GCA_003719455.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Leishmania donovani
   # common_name: Leishmania donovani (LdCL 2018)
   - accession: GCA_003719575.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Epichloe festucae Fl1
   # common_name: ascomycetes E.festucae (Fl1 2018)
   - accession: GCA_003814445.1
-    source: fungidb.org
   # organism: Peronospora effusa
   # common_name: downy mildews (R13 2018)
   - accession: GCA_003843895.1
-    source: fungidb.org
   # organism: Anopheles funestus
   # common_name: African malaria mosquito (FUMOZ 2018)
   - accession: GCA_003951495.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Talaromyces marneffei
   # common_name: ascomycetes T.marneffei (TM4 2018)
   - accession: GCA_003971505.1
-    source: fungidb.org
   # organism: Tubulinosema ratisbonensis
   # common_name: microsporidians T.ratisbonensis (Franzen 2019)
   - accession: GCA_004000155.1
-    source: microsporidiadb.org
   # organism: Coccidioides immitis
   # common_name: ascomycetes C.immitis (WA_211 2019)
   - accession: GCA_004115165.2
-    ploidy: haploid
-    source: fungidb.org
   # organism: Hemileia vastatrix
   # common_name: coffee rust fungus (Race XXXIII 2019)
   - accession: GCA_004125335.1
-    source: fungidb.org
   # organism: Anopheles coluzzii
   # common_name: mosquito A.coluzzii (Ngousso colony 2019)
   - accession: GCA_004136515.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Ordospora colligata
   # common_name: microsporidians O.colligata (GB-EP-1 2019)
   - accession: GCA_004324935.1
-    source: microsporidiadb.org
   # organism: Ordospora colligata
   # common_name: microsporidians O.colligata (NO-V-7 2019)
   - accession: GCA_004324945.1
-    source: microsporidiadb.org
   # organism: Hamiltosporidium magnivora
   # common_name: microsporidians H.magnivora (IL-BN-2 2019)
   - accession: GCA_004325035.1
-    source: microsporidiadb.org
   # organism: Hamiltosporidium tvaerminnensis
   # common_name: microsporidians H.tvaerminnensis (FI-OER-3-3 2019)
   - accession: GCA_004325045.1
-    source: microsporidiadb.org
   # organism: Ordospora colligata
   # common_name: microsporidians O.colligata (FI-SK-17-1 2019)
   - accession: GCA_004325055.1
-    source: microsporidiadb.org
   # organism: Hamiltosporidium magnivora
   # common_name: microsporidians H.magnivora (BE-OM-2 2019)
   - accession: GCA_004325065.1
-    source: microsporidiadb.org
   # organism: Hamiltosporidium tvaerminnensis
   # common_name: microsporidians H.tvaerminnensis (IL-G-3 2019)
   - accession: GCA_004325075.1
-    source: microsporidiadb.org
   # organism: Rickenella mellea
   # common_name: basidiomycetes R.mellea (SZMC22713 2019)
   - accession: GCA_004355085.1
-    source: fungidb.org
   # organism: Aspergillus tanneri
   # common_name: ascomycetes A.tanneri (NIH1004 2019)
   - accession: GCA_004798825.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Vairimorpha ceranae
   # common_name: microsporidians V.ceranae (BRL 2019)
   - accession: GCA_004919615.1
-    source: microsporidiadb.org
   # organism: Giardia muris
   # common_name: diplomonads (Roberts-Thomson 2019)
   - accession: GCA_006247105.1
-    ploidy: polyploid
-    source: giardiadb.org
   # organism: Synchytrium endobioticum
   # common_name: chytrids & allies (MB42 2019)
   - accession: GCA_006535955.1
-    ploidy: diploid
-    source: fungidb.org
   # organism: Cryptosporidium tyzzeri
   # common_name: apicomplexans C.tyzzeri (UGA55 2019)
   - accession: GCA_007210665.1
-    ploidy: haploid
-    source: cryptodb.org
   # organism: Antonospora locustae
   # common_name: microsporidians A.locustae (CLX 2019)
   - accession: GCA_007674295.1
-    source: microsporidiadb.org
   # organism: Cordyceps militaris
   # common_name: ascomycetes C.militaris (ATCC 34164 2017)
   - accession: GCA_008080495.1
-    source: fungidb.org
   # organism: Candidozyma auris
   # common_name: budding yeast C.auris (B11245 2019)
   - accession: GCA_008275145.1
-    source: fungidb.org
   # organism: Trichomonascus ciferrii
   # common_name: budding yeast T.ciferrii (CBS 4856 2019)
   - accession: GCA_008704605.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Lichtheimia ramosa
   # common_name: fungi L.ramosa (KPH11 2019)
   - accession: GCA_008728235.1
-    source: fungidb.org
   # organism: Aspergillus flavus
   # common_name: ascomycetes A.flavus (NRRL 3357 2019)
   - accession: GCA_009017415.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Aspergillus parasiticus
   # common_name: ascomycetes A.parasiticus (CBS 117618 2019)
   - accession: GCA_009176385.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Cryptococcus gattii VGV
   # common_name: basidiomycetes C.gattii VGV (MF34 2019)
   - accession: GCA_009650685.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Leishmania tarentolae
   # common_name: Leishmania tarentolae (Parrot Tar II 2019)
   - accession: GCA_009731335.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Plasmodium falciparum
   # common_name: malaria parasite P. falciparum (NF135.C10 2019)
   - accession: GCA_009761425.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium falciparum
   # common_name: malaria parasite P. falciparum (NF54 2019)
   - accession: GCA_009761475.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium falciparum
   # common_name: malaria parasite P. falciparum (NF166 2019)
   - accession: GCA_009761515.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium falciparum
   # common_name: malaria parasite P. falciparum (7G8 2019)
   - accession: GCA_009761555.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Aspergillus niger
   # common_name: ascomycetes A.niger (LDM3 2019)
   - accession: GCA_009812365.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Triatoma infestans
   # common_name: bugs T.infestans (FIOC_28 2020)
   - accession: GCA_011037195.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Giardia intestinalis
   # common_name: diplomonads (WB 2020)
   - accession: GCA_011634545.1
-    ploidy: polyploid
-    source: giardiadb.org
   # organism: Giardia intestinalis
   # common_name: diplomonads (beaver 2020)
   - accession: GCA_011634555.1
-    ploidy: polyploid
-    source: giardiadb.org
   # organism: Giardia intestinalis
   # common_name: diplomonads (GS 2020)
   - accession: GCA_011634595.1
-    ploidy: polyploid
-    source: giardiadb.org
   # organism: Toxoplasma gondii
   # common_name: apicomplexans T.gondii (RH-88 2020)
   - accession: GCA_013099955.1
-    ploidy: haploid
-    source: toxodb.org
   # organism: Candida tropicalis
   # common_name: budding yeast C.tropicalis (MYA-3404 2020)
   - accession: GCA_013177555.1
-    ploidy: diploid
-    source: fungidb.org
   # organism: Hyalomma asiaticum
   # common_name: mite/tick H.asiaticum (Hyas-2018 2020)
   - accession: GCA_013339685.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Haemaphysalis longicornis
   # common_name: longhorned tick (HaeL-2018 2020)
   - accession: GCA_013339765.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Trypanosoma cruzi
   # common_name: Trypanosoma cruzi (Berenice 2020)
   - accession: GCA_013358655.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Ixodes persulcatus
   # common_name: taiga tick (Iper-2018 2020)
   - accession: GCA_013358835.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Fusarium circinatum
   # common_name: ascomycetes F.circinatum (NRRL 25331 2020)
   - accession: GCA_013396185.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Rhipicephalus annulatus
   # common_name: mite/tick R.annulatus (Klein Grass 2020)
   - accession: GCA_013436015.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Fusarium oxysporum f. sp. conglutinans
   # common_name: ascomycetes F.oxysporum f. sp. conglutinans (Fo5176 2020)
   - accession: GCA_014154955.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Harringtonia lauricola
   # common_name: ascomycetes H.lauricola (RL4 2020)
   - accession: GCA_014183025.1
-    source: fungidb.org
   # organism: Nakaseomyces glabratus
   # common_name: budding yeast N.glabratus (BG2 2020)
   - accession: GCA_014217725.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Beauveria bassiana
   # common_name: ascomycetes B.bassiana (HN6 2020)
   - accession: GCA_014607475.1
-    source: fungidb.org
   # organism: Astathelohania contejeani
   # common_name: microsporidians A.contejeani (T1 2020)
   - accession: GCA_014805555.1
-    source: microsporidiadb.org
   # organism: Cucumispora dikerogammari
   # common_name: microsporidians C.dikerogammari (Dv6 2020)
   - accession: GCA_014805705.1
-    source: microsporidiadb.org
   # organism: Naegleria fowleri
   # common_name: brain-eating amoeba (Ty 2020)
   - accession: GCA_014843625.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Toxoplasma gondii
   # common_name: apicomplexans T.gondii (ME49xCTG S27 2020)
   - accession: GCA_014898695.1
-    ploidy: haploid
-    source: toxodb.org
   # organism: Trypanosoma cruzi
   # common_name: Trypanosoma cruzi (Brazil clone A4 2020)
   - accession: GCA_015033625.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Trypanosoma cruzi
   # common_name: Trypanosoma cruzi (Y clone C6 2020)
   - accession: GCA_015033655.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Cryptosporidium parvum
   # common_name: apicomplexans C.parvum (IOWA-ATCC 2020)
   - accession: GCA_015245375.1
-    ploidy: haploid
-    source: cryptodb.org
   # organism: Nosema granulosis
   # common_name: microsporidians N.granulosis (Ou3-Ou53 2020)
   - accession: GCA_015832245.1
-    source: microsporidiadb.org
   # organism: Neospora caninum
   # common_name: apicomplexans N.caninum (Liverpool 2020)
   - accession: GCA_016097395.1
-    ploidy: haploid
-    source: toxodb.org
   # organism: Dictyocoela roeselum
   # common_name: microsporidians D.roeselum (Ou19 2020)
   - accession: GCA_016255985.1
-    source: microsporidiadb.org
   # organism: Dictyocoela muelleri
   # common_name: microsporidians D.muelleri (Ou54 2020)
   - accession: GCA_016256075.1
-    source: microsporidiadb.org
   # organism: Phytophthora capsici
   # common_name: downy mildews (LT1534-B 2021)
   - accession: GCA_016618375.1
-    ploidy: polyploid
-    source: fungidb.org
   # organism: Coprinopsis cinerea AmutBmut pab1-1
   # common_name: 'basidiomycetes C.cinerea (A43mut B43mut pab1-1 #326 2021)'
   - accession: GCA_016772295.1
-    source: fungidb.org
   # organism: Parastagonospora nodorum SN15
   # common_name: ascomycetes P.nodorum (SN15 2021)
   - accession: GCA_016801405.1
-    source: fungidb.org
   # organism: Monilinia fructicola
   # common_name: ascomycetes M.fructicola (CPMC6 2021)
   - accession: GCA_016906325.1
-    source: fungidb.org
   # organism: Pneumocystis wakefieldiae
   # common_name: ascomycetes P.wakefieldiae (2A 2021)
   - accession: GCA_017301755.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Histoplasma capsulatum
   # common_name: ascomycetes H.capsulatum (WU24 2021)
   - accession: GCA_017310585.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Histoplasma capsulatum var. duboisii H88
   # common_name: ascomycetes H.capsulatum var. duboisii (H88 2021)
   - accession: GCA_017310615.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Pneumocystis oryctolagi
   # common_name: ascomycetes P.oryctolagi (RABM 2021)
   - accession: GCA_017311285.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Histoplasma capsulatum G186AR
   # common_name: ascomycetes H.capsulatum (G186AR 2021)
   - accession: GCA_017355575.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Histoplasma ohiense
   # common_name: ascomycetes H.ohiense (G217B 2021)
   - accession: GCA_017607445.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Histoplasma capsulatum
   # common_name: ascomycetes H.capsulatum (G184AR 2021)
   - accession: GCA_017607465.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Pneumocystis canis
   # common_name: ascomycetes P.canis (CanA 2021)
   - accession: GCA_017788925.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Pneumocystis sp. 'macacae'
   # common_name: ascomycetes P.sp. 'macacae' (P2C 2021)
   - accession: GCA_018127085.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Encephalitozoon hellem
   # common_name: microsporidians E.hellem (Swiss 2021)
   - accession: GCA_018342045.1
-    source: microsporidiadb.org
   # organism: Babesia divergens
   # common_name: apicomplexans B.divergens (1802A 2021)
   - accession: GCA_018398725.1
-    ploidy: haploid
-    source: piroplasmadb.org
   # organism: Chromera velia CCMP2878
   # common_name: C.velia (CCMP2878 2021)
   - accession: GCA_018398765.1
-    ploidy: haploid
-    source: cryptodb.org
   # organism: Entamoeba histolytica DS4-868
   # common_name: E.histolytica (DS4-868 2021)
   - accession: GCA_018466815.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Entamoeba histolytica KU48
   # common_name: E.histolytica (KU48 2021)
   - accession: GCA_019059535.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Trypanosoma brucei
   # common_name: Trypanosoma brucei (EATRO1125 2021)
   - accession: GCA_019096175.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Cryptosporidium parvum
   # common_name: apicomplexans C.parvum (2021)
   - accession: GCA_019844115.2
-    ploidy: haploid
-    source: cryptodb.org
   # organism: Histomonas meleagridis
   # common_name: H.meleagridis (2922-C6/04-290x 2021)
   - accession: GCA_020184695.1
-    source: trichdb.org
   # organism: Entamoeba histolytica KU50
   # common_name: E.histolytica (KU50 2021)
   - accession: GCA_020283535.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Cytauxzoon felis
   # common_name: apicomplexans C.felis (Winnie 2021)
   - accession: GCA_020283715.1
-    ploidy: haploid
-    source: piroplasmadb.org
   # organism: Nakaseomyces glabratus
   # common_name: budding yeast N.glabratus (BG3993 2021)
   - accession: GCA_020450195.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Blechomonas ayalai
   # common_name: Blechomonas ayalai (B08-376 2021)
   - accession: GCA_020509355.1
-    source: tritrypdb.org
   # organism: Rhizophagus irregularis
   # common_name: glomeromycetes (DAOM-197198 2021)
   - accession: GCA_020716725.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Rhizophagus irregularis
   # common_name: glomeromycetes (C2 2021)
   - accession: GCA_020716745.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Phytophthora ramorum
   # common_name: sudden oak death agent (14567 PR-15-019 primary hap 2021)
   - accession: GCA_020800235.1
-    ploidy: polyploid
-    source: fungidb.org
   # organism: Plasmodium yoelii yoelii
   # common_name: apicomplexans P.yoelii yoelii (17XNL clone 1.1 2023)
   - accession: GCA_020844765.3
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Acanthamoeba castellanii
   # common_name: A.castellanii (C3 2021)
   - accession: GCA_021020595.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Acanthamoeba castellanii
   # common_name: A.castellanii (Neff 2021)
   - accession: GCA_021020605.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Aphanomyces euteiches
   # common_name: oomycetes (MF1 2022)
   - accession: GCA_021527665.1
-    source: fungidb.org
   # organism: Aedes aegypti
   # common_name: yellow fever mosquito (Aag2 2022)
   - accession: GCA_021653915.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Xylaria arbuscula
   # common_name: ascomycetes X.arbuscula (CBS 124340 2022)
   - accession: GCA_022385695.1
-    source: fungidb.org
   # organism: Naegleria lovaniensis
   # common_name: N.lovaniensis (NL_76_15_250 2022)
   - accession: GCA_022530875.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Podosphaera aphanis
   # common_name: powdery mildews (DRCT72020 2022)
   - accession: GCA_022627015.2
-    source: fungidb.org
   # organism: Cryptococcus neoformans
   # common_name: basidiomycetes C.neoformans (VNII 2022)
   - accession: GCA_022832995.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Giardia intestinalis
   # common_name: diplomonads (CIA 2022)
   - accession: GCA_022985015.1
-    ploidy: polyploid
-    source: giardiadb.org
   # organism: Giardia intestinalis
   # common_name: diplomonads (DID 2022)
   - accession: GCA_022985025.1
-    ploidy: polyploid
-    source: giardiadb.org
   # organism: Dermacentor andersoni
   # common_name: mite/tick D.andersoni (qqDerAnde1 alternate hap 2022)
   - accession: GCA_023375915.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Babesia ovis
   # common_name: apicomplexans B.ovis (Selcuk 2022)
   - accession: GCA_023705535.2
-    ploidy: haploid
-    source: piroplasmadb.org
   # organism: Curvularia clavata
   # common_name: ascomycetes C.clavata (yc1106 2022)
   - accession: GCA_023920165.1
-    source: fungidb.org
   # organism: Amblyomma maculatum
   # common_name: Gulf Coast tick (SK-2019 2022)
   - accession: GCA_023969395.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Pyronema omphalodes
   # common_name: ascomycetes P.omphalodes (CBS 144459 2022)
   - accession: GCA_024516155.1
-    source: fungidb.org
   # organism: Babesia duncani
   # common_name: apicomplexans B.duncani (WA1 2022)
   - accession: GCA_024586265.1
-    ploidy: haploid
-    source: piroplasmadb.org
   # organism: Leishmania amazonensis
   # common_name: Leishmania amazonensis (PH8 2022)
   - accession: GCA_025688915.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Acanthamoeba sp. SK_2022b
   # common_name: A.sp. (SK_2022b 2023)
   - accession: GCA_027943245.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Acanthamoeba sp. SK_2022a
   # common_name: A.sp. (SK_2022a 2023)
   - accession: GCA_027943295.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Acanthamoeba sp. SK_2022c
   # common_name: A.sp. (SK_2022c 2023)
   - accession: GCA_027944975.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Blastocrithidia sp. p57
   # common_name: Blastocrithidia sp. (p57 2023)
   - accession: GCA_028554745.1
-    source: tritrypdb.org
   # organism: Plasmodium yoelii
   # common_name: apicomplexans P.yoelii (YM 2014)
   - accession: GCA_900002395.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Fusarium proliferatum
   # common_name: ascomycetes F.proliferatum (NRRL62905 2016)
   - accession: GCA_900029915.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Fusarium graminearum
   # common_name: ascomycetes F.graminearum (PH-1 GZPH1RResV1 2016)
   - accession: GCA_900044135.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Plasmodium ovale
   # common_name: malaria parasite P. ovale (2016)
   - accession: GCA_900090025.2
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium ovale
   # common_name: malaria parasite P. ovale (2016)
   - accession: GCA_900090035.2
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium vivax
   # common_name: malaria parasite P. vivax (PvP01 2019)
   - accession: GCA_900093555.2
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium sp. gorilla clade G1
   # common_name: apicomplexans P.sp. gorilla clade G1 (2018)
   - accession: GCA_900095595.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium reichenowi
   # common_name: apicomplexans P.reichenowi (2018)
   - accession: GCA_900097025.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium sp. gorilla clade G3
   # common_name: apicomplexans P.sp. gorilla clade G3 (2018)
   - accession: GCA_900097035.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium gaboni
   # common_name: apicomplexans P.gaboni (2021)
   - accession: GCA_900097045.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Hanseniaspora guilliermondii
   # common_name: budding yeast H.guilliermondii (UTAD222 2016)
   - accession: GCA_900119595.1
-    source: fungidb.org
   # organism: Malassezia sympodialis ATCC 42132
   # common_name: basidiomycetes M.sympodialis (ATCC 42132 2017)
   - accession: GCA_900149145.1
-    source: fungidb.org
   # organism: Plasmodium knowlesi
   # common_name: apicomplexans P.knowlesi (2017)
   - accession: GCA_900162085.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium cynomolgi
   # common_name: apicomplexans P.cynomolgi (M 2017)
   - accession: GCA_900180395.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Zymoseptoria tritici ST99CH_3D1
   # common_name: ascomycetes Z.tritici ST99CH_3D1 (2017)
   - accession: GCA_900184105.1
-    source: fungidb.org
   # organism: Trichomonas tenax
   # common_name: trichomonads (NIH4 ATCC 30207 2019)
   - accession: GCA_900231805.1
-    ploidy: haploid
-    source: trichdb.org
   # organism: Blumeria hordei
   # common_name: grass mildew (RACE1 RACE1 2018)
   - accession: GCA_900237765.1
-    source: fungidb.org
   # organism: Aspergillus niger
   # common_name: ascomycetes A.niger (N402 ATCC 64974 2018)
   - accession: GCA_900248155.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Trypanosoma cruzi
   # common_name: Trypanosoma cruzi (231 2018)
   - accession: GCA_900252365.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Plasmodium sp. DRC-Itaito
   # common_name: apicomplexans P.sp. DRC-Itaito (2020)
   - accession: GCA_900257145.2
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Culicoides sonorensis
   # common_name: fly C.sonorensis (2021)
   - accession: GCA_900258525.3
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Podospora comata
   # common_name: ascomycetes P.comata (T 2018)
   - accession: GCA_900290415.1
-    source: fungidb.org
   # organism: Saccharomycodes ludwigii
   # common_name: budding yeast S.ludwigii (UTAD17 2018)
   - accession: GCA_900491785.1
-    source: fungidb.org
   # organism: Trypanosoma brucei brucei
   # common_name: Trypanosoma brucei brucei (2018)
   - accession: GCA_900497135.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Leishmania infantum
   # common_name: Leishmania infantum (2020)
   - accession: GCA_900500625.2
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Blumeria graminis f. sp. tritici
   # common_name: grass mildew (2019)
   - accession: GCA_900519115.1
-    source: fungidb.org
   # organism: Plasmodium falciparum
   # common_name: malaria parasite P. falciparum (2018)
   - accession: GCA_900617135.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium falciparum
   # common_name: malaria parasite P. falciparum (2018)
   - accession: GCA_900631975.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium falciparum
   # common_name: malaria parasite P. falciparum (HB3 2018)
   - accession: GCA_900631985.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium falciparum
   # common_name: malaria parasite P. falciparum (2018)
   - accession: GCA_900631995.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium falciparum
   # common_name: malaria parasite P. falciparum (2018)
   - accession: GCA_900632005.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium falciparum
   # common_name: malaria parasite P. falciparum (KH2 2018)
   - accession: GCA_900632015.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium falciparum
   # common_name: malaria parasite P. falciparum (KH1 2018)
   - accession: GCA_900632025.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium falciparum
   # common_name: malaria parasite P. falciparum (GB4 2018)
   - accession: GCA_900632035.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium falciparum
   # common_name: malaria parasite P. falciparum (2018)
   - accession: GCA_900632045.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium falciparum
   # common_name: 'malaria parasite P. falciparum (type strain: I 2018)'
   - accession: GCA_900632055.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium falciparum
   # common_name: malaria parasite P. falciparum (2018)
   - accession: GCA_900632065.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium falciparum
   # common_name: malaria parasite P. falciparum (2018)
   - accession: GCA_900632075.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium falciparum
   # common_name: malaria parasite P. falciparum (2018)
   - accession: GCA_900632085.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium falciparum
   # common_name: malaria parasite P. falciparum (2018)
   - accession: GCA_900632095.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Leishmania donovani
   # common_name: Leishmania donovani (2020)
   - accession: GCA_900635355.2
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Hepatocystis sp. ex Piliocolobus tephrosceles
   # common_name: apicomplexans H.sp. ex Piliocolobus tephrosceles (2020)
   - accession: GCA_902459845.2
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Mastigamoeba balamuthi
   # common_name: M.balamuthi (2019)
   - accession: GCA_902651635.1
-    source: amoebadb.org
   # organism: Plasmodium vinckei brucechwatti
   # common_name: apicomplexans P.vinckei brucechwatti (2020)
   - accession: GCA_903994205.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium vinckei lentum
   # common_name: apicomplexans P.vinckei lentum (2020)
   - accession: GCA_903994225.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium vinckei petteri
   # common_name: apicomplexans P.vinckei petteri (2020)
   - accession: GCA_903994235.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium vinckei
   # common_name: apicomplexans P.vinckei (2020)
   - accession: GCA_903994265.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Angomonas deanei
   # common_name: Angomonas (Crithidia deanei Carvalho ATCC PRA-265 2020)
   - accession: GCA_903995115.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Blumeria graminis f. sp. triticale
   # common_name: grass mildew (THUN-12 2021)
   - accession: GCA_905067625.1
-    source: fungidb.org
   # organism: Eimeria tenella
   # common_name: apicomplexans E.tenella (2021)
   - accession: GCA_905310635.1
-    ploidy: haploid
-    source: toxodb.org
   # organism: Plasmodium vivax
   # common_name: malaria parasite P. vivax (PvW1 2021)
   - accession: GCA_914969965.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Leishmania major strain Friedlin
   # common_name: Leishmania major strain (Friedlin 2021)
   - accession: GCA_916722125.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Entamoeba histolytica HM-1:IMSS
   # common_name: E.histolytica HM-1:IMSS (Rahman 2021)
   - accession: GCA_917563895.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Trypanosoma evansi
   # common_name: Trypanosoma evansi (2021)
   - accession: GCA_917563935.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Plasmodium vivax
   # common_name: malaria parasite P. vivax (Pv01-19 2023)
   - accession: GCA_949152365.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Drosophila melanogaster
   # common_name: fly D.melanogaster
   - accession: GCF_000001215.4
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Homo sapiens
   # common_name: Human - Dec. 2013 (GRCh38/hg38)
   - accession: GCF_000001405.40
-    ploidy: diploid
-    source: hostdb.org
   # organism: Mus musculus
   # common_name: Mouse - Jun. 2020 (GRCm39/mm39)
   - accession: GCF_000001635.27
-    ploidy: diploid
-    source: hostdb.org
   # organism: Talaromyces marneffei ATCC 18224
   # common_name: ascomycetes T.marneffei (ATCC 18224 2008 refseq)
   - accession: GCF_000001985.1
-    source: fungidb.org
   # organism: Plasmodium vivax
   # common_name: malaria parasite P. vivax (Salvador I 2009)
   - accession: GCF_000002415.2
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Giardia intestinalis
   # common_name: diplomonads (WB C6 2019)
   - accession: GCF_000002435.2
-    ploidy: polyploid
-    source: giardiadb.org
   # organism: Trypanosoma brucei brucei TREU927
   # common_name: Trypanosoma brucei brucei (927/4 GUTat10.1 2005 kinetoplastids)
   - accession: GCF_000002445.2
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Pyricularia oryzae 70-15
   # common_name: rice blast fungus
   - accession: GCF_000002495.2
-    source: fungidb.org
   # organism: Kluyveromyces lactis
   # common_name: budding yeast K.lactis
   - accession: GCF_000002515.2
-    source: fungidb.org
   # organism: Yarrowia lipolytica CLIB122
   # common_name: budding yeast Y.lipolytica (CLIB122 2004 refseq)
   - accession: GCF_000002525.2
-    source: fungidb.org
   # organism: Nakaseomyces glabratus
   # common_name: budding yeast N.glabratus (CBS 138 2008 refseq)
   - accession: GCF_000002545.3
-    ploidy: haploid
-    source: fungidb.org
   # organism: Aspergillus fumigatus Af293
   # common_name: ascomycetes A.fumigatus Af293
   - accession: GCF_000002655.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Aspergillus clavatus NRRL 1
   # common_name: ascomycetes A.clavatus NRRL 1
   - accession: GCF_000002715.2
-    ploidy: haploid
-    source: fungidb.org
   # organism: Leishmania major strain Friedlin
   # common_name: Leishmania major (Friedlin 2011 kinetoplastids refseq)
   - accession: GCF_000002725.2
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Plasmodium falciparum 3D7
   # common_name: malaria parasite P. falciparum (3D7 2016 refseq)
   - accession: GCF_000002765.5
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium falciparum 3D7
   # common_name: malaria parasite P. falciparum (3D7 2016)
   - accession: GCF_000002765.6
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Trichomonas vaginalis G3
   # common_name: trichomonads (G3; ATCC PRA-98 2007)
   - accession: GCF_000002825.2
-    ploidy: haploid
-    source: trichdb.org
   # organism: Leishmania braziliensis MHOM/BR/75/M2904
   # common_name: Leishmania braziliensis (MHOM/BR/75/M2904 2011 kinetoplastids)
   - accession: GCF_000002845.2
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Aspergillus niger
   # common_name: ascomycetes A.niger (v4 2007)
   - accession: GCF_000002855.4
-    ploidy: haploid
-    source: fungidb.org
   # organism: Schizosaccharomyces pombe
   # common_name: fission yeast (972h- 2019)
   - accession: GCF_000002945.2
-    source: fungidb.org
   # organism: Plasmodium yoelii yoelii 17XNL
   # common_name: apicomplexans P.yoelii yoelii (17XNL 2002)
   - accession: GCF_000003085.2
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Talaromyces stipitatus ATCC 10500
   # common_name: ascomycetes T.stipitatus ATCC 10500
   - accession: GCF_000003125.1
-    source: fungidb.org
   # organism: Theileria annulata
   # common_name: apicomplexans T.annulata (Ankara isolate clone C9 2005)
   - accession: GCA_000003225.2
-    ploidy: haploid
-    source: piroplasmadb.org
   # organism: Uncinocarpus reesii 1704
   # common_name: ascomycetes U.reesii 1704
   - accession: GCF_000003515.1
-    source: fungidb.org
   # organism: Blastomyces dermatitidis ER-3
   # common_name: ascomycetes B.dermatitidis (ER-3 2009 refseq)
   - accession: GCF_000003525.1
-    ploidy: polyploid
-    source: fungidb.org
   # organism: Clavispora lusitaniae ATCC 42720
   # common_name: budding yeast C.lusitaniae (ATCC 42720 2009 refseq)
   - accession: GCF_000003835.1
-    source: fungidb.org
   # organism: Blastomyces gilchristii SLH14081
   # common_name: ascomycetes B.gilchristii (SLH14081 2009 refseq)
   - accession: GCF_000003855.2
-    ploidy: polyploid
-    source: fungidb.org
   # organism: Dictyostelium discoideum AX4
   # common_name: cellular slime molds (AX4 2009)
   - accession: GCF_000004695.1
-    ploidy: haploid
-    source: amoebadb.org
   # organism: Naegleria gruberi
   # common_name: N.gruberi (NEG-M 2010)
   - accession: GCF_000004985.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Anopheles gambiae str. PEST
   # common_name: African malaria mosquito (PEST 2006)
   - accession: GCF_000005575.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Pediculus humanus corporis
   # common_name: human body louse
   - accession: GCF_000006295.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Candida tropicalis MYA-3404
   # common_name: budding yeast C.tropicalis MYA-3404
   - accession: GCF_000006335.3
-    ploidy: diploid
-    source: fungidb.org
   # organism: Plasmodium knowlesi strain H
   # common_name: apicomplexans P.knowlesi strain (H 2020)
   - accession: GCF_000006355.2
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Cryptosporidium hominis TU502
   # common_name: apicomplexans C.hominis (TU502 2004 refseq)
   - accession: GCF_000006425.1
-    ploidy: haploid
-    source: cryptodb.org
   # organism: Debaryomyces hansenii CBS767
   # common_name: budding yeast D.hansenii CBS767
   - accession: GCF_000006445.2
-    source: fungidb.org
   # organism: Cryptosporidium muris RN66
   # common_name: apicomplexans C.muris (RN66 2008)
   - accession: GCF_000006515.1
-    ploidy: haploid
-    source: cryptodb.org
   # organism: Toxoplasma gondii ME49
   # common_name: Toxoplasma gondii (ME49 2013)
   - accession: GCF_000006565.2
-    ploidy: haploid
-    source: toxodb.org
   # organism: Candida dubliniensis CD36
   # common_name: budding yeast C.dubliniensis CD36
   - accession: GCF_000026945.1
-    ploidy: diploid
-    source: fungidb.org
   # organism: Cryptococcus neoformans var. neoformans JEC21
   # common_name: basidiomycetes C.neoformans (JEC21 2005 refseq)
   - accession: GCF_000091045.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Encephalitozoon cuniculi GB-M1
   # common_name: microsporidians E.cuniculi (v2 GB-M1 2017)
   - accession: GCF_000091225.2
-    source: microsporidiadb.org
   # organism: Phytophthora infestans T30-4
   # common_name: potato late blight agent (T30-4 2009)
   - accession: GCF_000142945.1
-    ploidy: polyploid
-    source: fungidb.org
   # organism: Schizophyllum commune H4-8
   # common_name: basidiomycetes S.commune (v2 H4-8 2022)
   - accession: GCF_000143185.2
-    source: fungidb.org
   # organism: Chaetomium globosum CBS 148.51
   # common_name: ascomycetes C.globosum CBS 148.51
   - accession: GCF_000143365.1
-    source: fungidb.org
   # organism: Botrytis cinerea B05.10
   # common_name: ascomycetes B.cinerea B05.10
   - accession: GCF_000143535.2
-    source: fungidb.org
   # organism: Gaeumannomyces tritici R3-111a-1
   # common_name: ascomycetes G.tritici R3-111a-1
   - accession: GCF_000145635.1
-    source: fungidb.org
   # organism: Saccharomyces cerevisiae S288C
   # common_name: baker's yeast S288C (2014)
   - accession: GCF_000146045.2
-    source: fungidb.org
   # organism: Encephalitozoon intestinalis ATCC 50506
   # common_name: microsporidians E.intestinalis ATCC 50506
   - accession: GCF_000146465.1
-    source: microsporidiadb.org
   # organism: Colletotrichum graminicola M1.001
   # common_name: ascomycetes C.graminicola M1.001
   - accession: GCF_000149035.1
-    source: fungidb.org
   # organism: Aspergillus nidulans FGSC A4
   # common_name: ascomycetes A.nidulans (FGSC A4 2012 refseq)
   - accession: GCF_000149205.2
-    ploidy: haploid
-    source: fungidb.org
   # organism: Cryptococcus neoformans var. grubii H99
   # common_name: basidiomycetes C.neoformans var. grubii H99
   - accession: GCF_000149245.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Rhizopus delemar RA 99-880
   # common_name: mucoromycotan R.delemar (RA 99-880 2009)
   - accession: GCF_000149305.1
-    source: fungidb.org
   # organism: Coccidioides immitis RS
   # common_name: ascomycetes C.immitis RS
   - accession: GCF_000149335.2
-    ploidy: haploid
-    source: fungidb.org
   # organism: Cryptococcus neoformans var. neoformans B-3501A
   # common_name: basidiomycetes C.neoformans var. neoformans B-3501A
   - accession: GCF_000149385.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Meyerozyma guilliermondii ATCC 6260
   # common_name: budding yeast M.guilliermondii ATCC 6260
   - accession: GCF_000149425.1
-    source: fungidb.org
   # organism: Fusarium verticillioides 7600
   # common_name: ascomycetes F.verticillioides 7600
   - accession: GCF_000149555.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Histoplasma mississippiense
   # common_name: ascomycetes H.capsulatum NAm1
   - accession: GCF_000149585.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Aspergillus terreus NIH2624
   # common_name: ascomycetes A.terreus NIH2624
   - accession: GCF_000149615.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Aspergillus fischeri NRRL 181
   # common_name: ascomycetes A.fischeri (v4 NRRL 181 2006)
   - accession: GCF_000149645.3
-    ploidy: haploid
-    source: fungidb.org
   # organism: Lodderomyces elongisporus NRRL YB-4239
   # common_name: budding yeast L.elongisporus (NRRL YB-4239 2007 refseq)
   - accession: GCF_000149685.1
-    source: fungidb.org
   # organism: Phytophthora sojae
   # common_name: downy mildews (P6497 2011)
   - accession: GCF_000149755.1
-    ploidy: polyploid
-    source: fungidb.org
   # organism: Schizosaccharomyces japonicus yFS275
   # common_name: ascomycetes S.japonicus yFS275
   - accession: GCF_000149845.2
-    source: fungidb.org
   # organism: Puccinia graminis f. sp. tritici CRL 75-36-700-3
   # common_name: rust fungi P.graminis f. sp. tritici CRL 75-36-700-3
   - accession: GCF_000149925.1
-    ploidy: diploid
-    source: fungidb.org
   # organism: Fusarium oxysporum f. sp. lycopersici 4287
   # common_name: ascomycetes F.oxysporum (f. sp. lycopersici 4287 2015)
   - accession: GCF_000149955.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Schizosaccharomyces octosporus yFS286
   # common_name: ascomycetes S.octosporus yFS286
   - accession: GCF_000150505.1
-    source: fungidb.org
   # organism: Paracoccidioides lutzii Pb01
   # common_name: ascomycetes P.lutzii Pb01
   - accession: GCF_000150705.2
-    source: fungidb.org
   # organism: Paracoccidioides brasiliensis Pb18
   # common_name: ascomycetes P.brasiliensis Pb18
   - accession: GCF_000150735.1
-    source: fungidb.org
   # organism: Nannizzia gypsea CBS 118893
   # common_name: ascomycetes N.gypsea CBS 118893
   - accession: GCF_000150975.2
-    source: fungidb.org
   # organism: Microsporum canis CBS 113480
   # common_name: ascomycetes M.canis CBS 113480
   - accession: GCF_000151145.1
-    source: fungidb.org
   # organism: Coccidioides posadasii C735 delta SOWgp
   # common_name: ascomycetes C.posadasii (C735 delta SOWgp 2009 refseq)
   - accession: GCF_000151335.2
-    ploidy: haploid
-    source: fungidb.org
   # organism: Fusarium vanettenii 77-13-4
   # common_name: ascomycetes F.vanettenii 77-13-4
   - accession: GCF_000151355.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Trichophyton rubrum CBS 118892
   # common_name: ascomycetes T.rubrum CBS 118892
   - accession: GCF_000151425.1
-    source: fungidb.org
   # organism: Saprolegnia parasitica CBS 223.65
   # common_name: oomycetes (CBS 223.65 2014)
   - accession: GCF_000151545.1
-    source: fungidb.org
   # organism: Cavia porcellus
   # common_name: domestic guinea pig (2N 2008 refseq)
   - accession: GCF_000151735.1
-    ploidy: diploid
-    source: hostdb.org
   # organism: Cryptosporidium parvum Iowa II
   # common_name: apicomplexans C.parvum (Iowa type II 2007)
   - accession: GCF_000165345.1
-    ploidy: haploid
-    source: cryptodb.org
   # organism: Theileria parva strain Muguga
   # common_name: apicomplexans T.parva strain (Muguga 2005)
   - accession: GCF_000165365.1
-    ploidy: haploid
-    source: piroplasmadb.org
   # organism: Babesia bovis T2Bo
   # common_name: apicomplexans B.bovis (T2Bo 2021)
   - accession: GCF_000165395.2
-    ploidy: haploid
-    source: piroplasmadb.org
   # organism: Trichoderma reesei QM6a
   # common_name: ascomycetes T.reesei QM6a
   - accession: GCF_000167675.1
-    source: fungidb.org
   # organism: Trichoderma virens Gv29-8
   # common_name: ascomycetes T.virens Gv29-8
   - accession: GCF_000170995.1
-    source: fungidb.org
   # organism: Malassezia globosa CBS 7966
   # common_name: basidiomycetes M.globosa (v2 CBS 7966 2007)
   - accession: GCF_000181695.2
-    source: fungidb.org
   # organism: Spizellomyces punctatus DAOM BR117
   # common_name: chytrids S.punctatus DAOM BR117
   - accession: GCF_000182565.1
-    source: fungidb.org
   # organism: Candida parapsilosis
   # common_name: budding yeast C.parapsilosis
   - accession: GCF_000182765.1
-    ploidy: diploid
-    source: fungidb.org
   # organism: Sordaria macrospora k-hell
   # common_name: ascomycetes S.macrospora (v3 k-hell 2012)
   - accession: GCF_000182805.3
-    source: fungidb.org
   # organism: Coprinopsis cinerea okayama7#130
   # common_name: basidiomycetes C.cinerea (okayama7#130 2010 refseq)
   - accession: GCF_000182895.1
-    source: fungidb.org
   # organism: Neurospora crassa OR74A
   # common_name: ascomycetes N.crassa OR74A
   - accession: GCF_000182925.2
-    source: fungidb.org
   # organism: Candida albicans SC5314
   # common_name: budding yeast C.albicans SC5314
   - accession: GCF_000182965.3
-    ploidy: diploid
-    source: fungidb.org
   # organism: Nosema ceranae BRL01
   # common_name: microsporidians N.ceranae (BRL01 2009)
   - accession: GCF_000182985.1
-    source: microsporidiadb.org
   # organism: Pseudogymnoascus destructans 20631-21
   # common_name: ascomycetes P.destructans (20631-21 2010)
   - accession: GCF_000184105.1
-    source: fungidb.org
   # organism: Aspergillus oryzae RIB40
   # common_name: ascomycetes A.oryzae RIB40
   - accession: GCF_000184455.2
-    ploidy: haploid
-    source: fungidb.org
   # organism: Cryptococcus gattii WM276
   # common_name: basidiomycetes C.gattii WM276
   - accession: GCF_000185945.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Dictyostelium purpureum
   # common_name: cellular slime molds (QSDP1 2011)
   - accession: GCF_000190715.1
-    ploidy: haploid
-    source: amoebadb.org
   # organism: Vavraia culicis subsp. floridensis
   # common_name: microsporidians V.culicis subsp. floridensis
   - accession: GCF_000192795.1
-    source: microsporidiadb.org
   # organism: Mycobacterium tuberculosis H37Rv
   # common_name: Mycobacterium tuberculosis (ASM19595v2 H37Rv 2013)
   - accession: GCF_000195955.2
-    ploidy: haploid
   # organism: Melampsora larici-populina 98AG31
   # common_name: rust fungi M.larici-populina 98AG31
   - accession: GCF_000204055.1
-    source: fungidb.org
   # organism: Ixodes scapularis
   # common_name: black-legged tick (Wikel colony 2008)
   - accession: GCF_000208615.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Neospora caninum Liverpool
   # common_name: apicomplexans N.caninum (Liverpool 2011)
   - accession: GCF_000208865.1
-    ploidy: haploid
-    source: toxodb.org
   # organism: Entamoeba histolytica HM-1:IMSS
   # common_name: E.histolytica (HM-1:IMSS 2008)
   - accession: GCF_000208925.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Trypanosoma cruzi
   # common_name: Trypanosoma cruzi (CL Brener 2005 kinetoplastids)
   - accession: GCF_000209065.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Entamoeba dispar SAW760
   # common_name: E.dispar (SAW760 2008)
   - accession: GCF_000209125.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Culex quinquefasciatus
   # common_name: southern house mosquito (JHB 2007)
   - accession: GCF_000209185.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Enterocytozoon bieneusi H348
   # common_name: microsporidians E.bieneusi (H348 2009)
   - accession: GCF_000209485.1
-    source: microsporidiadb.org
   # organism: Trypanosoma brucei gambiense DAL972
   # common_name: Trypanosoma brucei gambiense (Dal972 MHOM/CI/86/DAL972 2009 kinetoplastids)
   - accession: GCF_000210295.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Neurospora tetrasperma FGSC 2508
   # common_name: ascomycetes N.tetrasperma FGSC 2508
   - accession: GCF_000213175.1
-    source: fungidb.org
   # organism: Zymoseptoria tritici IPO323
   # common_name: ascomycetes Z.tritici (IPO323 2011 refseq)
   - accession: GCF_000219625.1
-    source: fungidb.org
   # organism: Gregarina niphandrodes
   # common_name: apicomplexans G.niphandrodes (2014)
   - accession: GCF_000223845.1
-    ploidy: haploid
-    source: cryptodb.org
   # organism: Cordyceps militaris CM01
   # common_name: ascomycetes C.militaris CM01
   - accession: GCF_000225605.1
-    source: fungidb.org
   # organism: Thermothelomyces thermophilus ATCC 42464
   # common_name: ascomycetes T.thermophilus ATCC 42464
   - accession: GCF_000226095.1
-    source: fungidb.org
   # organism: Penicillium rubens Wisconsin 54-1255
   # common_name: ascomycetes P.rubens (Wisconsin 54-1255 2008 refseq)
   - accession: GCF_000226395.1
-    source: fungidb.org
   # organism: Podospora anserina S mat
   # common_name: ascomycetes P.anserina S mat+
   - accession: GCF_000226545.1
-    source: fungidb.org
   # organism: Leishmania donovani
   # common_name: Leishmania donovani (BPK282A1 2011 kinetoplastids)
   - accession: GCF_000227135.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Plenodomus lingam JN3
   # common_name: blackleg of rapeseed fungus
   - accession: GCF_000230375.1
-    source: fungidb.org
   # organism: Exophiala dermatitidis NIH/UT8656
   # common_name: ascomycetes E.dermatitidis NIH/UT8656
   - accession: GCF_000230625.1
-    source: fungidb.org
   # organism: Vittaforma corneae ATCC 50505
   # common_name: microsporidians V.corneae ATCC 50505
   - accession: GCF_000231115.1
-    source: microsporidiadb.org
   # organism: Leishmania mexicana MHOM/GT/2001/U1103
   # common_name: Leishmania mexicana (MHOM/GT/2001/U1103 2011 kinetoplastids)
   - accession: GCF_000234665.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Phytophthora nicotianae INRA-310
   # common_name: black shank of tobacco agent (INRA-310 2013)
   - accession: GCF_000247585.1
-    ploidy: polyploid
-    source: fungidb.org
   # organism: Nematocida parisii ERTm1
   # common_name: microsporidians N.parisii ERTm1
   - accession: GCF_000250985.1
-    source: microsporidiadb.org
   # organism: Entamoeba nuttalli P19
   # common_name: E.nuttalli (P19 2012)
   - accession: GCF_000257125.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Hammondia hammondi
   # common_name: apicomplexans H.hammondi (H.H.34 2014)
   - accession: GCF_000258005.1
-    ploidy: haploid
-    source: toxodb.org
   # organism: Fusarium odoratissimum NRRL 54006
   # common_name: ascomycetes F.odoratissimum NRRL 54006
   - accession: GCF_000260195.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Tremella mesenterica DSM 1558
   # common_name: witches' butter
   - accession: GCF_000271645.1
-    source: fungidb.org
   # organism: Fusarium oxysporum NRRL 32931
   # common_name: ascomycetes F.oxysporum (NRRL 32931 2014 refseq)
   - accession: GCF_000271745.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Mycobacterium tuberculosis H37Rv
   # common_name: Mycobacterium tuberculosis (H37Rv 2013)
   - accession: GCF_000277735.2
-    ploidy: haploid
   # organism: Encephalitozoon hellem ATCC 50504
   # common_name: microsporidians E.hellem ATCC 50504
   - accession: GCF_000277815.2
-    source: microsporidiadb.org
   # organism: Encephalitozoon romaleae SJ-2008
   # common_name: microsporidians E.romaleae SJ-2008
   - accession: GCF_000280035.1
-    source: microsporidiadb.org
   # organism: Saprolegnia diclina VS20
   # common_name: oomycetes (VS20 2013)
   - accession: GCF_000281045.1
-    source: fungidb.org
   # organism: Trichosporon asahii var. asahii CBS 2479
   # common_name: basidiomycetes T.asahii var. asahii CBS 2479
   - accession: GCF_000293215.1
-    source: fungidb.org
   # organism: Acanthamoeba castellanii str. Neff
   # common_name: A.castellanii str. (Neff 2013)
   - accession: GCF_000313135.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Penicillium digitatum Pd1
   # common_name: ascomycetes P.digitatum (Pd1 2012 refseq)
   - accession: GCF_000315645.1
-    source: fungidb.org
   # organism: Plasmodium cynomolgi strain B
   # common_name: apicomplexans P.cynomolgi strain (B 2012)
   - accession: GCF_000321355.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Mycosarcoma maydis
   # common_name: smut fungi U.maydis 521
   - accession: GCF_000328475.2
-    source: fungidb.org
   # organism: Entamoeba invadens IP1
   # common_name: E.invadens (IP1 2013)
   - accession: GCF_000330505.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Pseudocercospora fijiensis CIRAD86
   # common_name: ascomycetes P.fijiensis CIRAD86
   - accession: GCF_000340215.1
-    source: fungidb.org
   # organism: Theileria equi strain WA
   # common_name: apicomplexans T.equi strain (WA 2012)
   - accession: GCF_000342415.1
-    ploidy: haploid
-    source: piroplasmadb.org
   # organism: Pneumocystis murina B123
   # common_name: ascomycetes P.murina B123
   - accession: GCF_000349005.2
-    ploidy: haploid
-    source: fungidb.org
   # organism: Macaca fascicularis
   # common_name: crab-eating macaque WashU 2013 refseq
   - accession: GCF_000364345.1
-    ploidy: diploid
-    source: hostdb.org
   # organism: Cyphellophora europaea CBS 101466
   # common_name: ascomycetes C.europaea CBS 101466
   - accession: GCF_000365145.1
-    source: fungidb.org
   # organism: Cladophialophora carrionii CBS 160.54
   # common_name: ascomycetes C.carrionii CBS 160.54
   - accession: GCF_000365165.1
-    source: fungidb.org
   # organism: Musca domestica
   # common_name: house fly (aabys 2013 refseq)
   - accession: GCF_000371365.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Biomphalaria glabrata
   # common_name: bloodfluke planorb (BB02 2013)
   - accession: GCF_000457365.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Eimeria necatrix
   # common_name: apicomplexans E.necatrix (Houghton 2013)
   - accession: GCF_000499385.1
-    ploidy: haploid
-    source: toxodb.org
   # organism: Eimeria acervulina
   # common_name: apicomplexans E.acervulina (Houghton 2013)
   - accession: GCF_000499425.1
-    ploidy: haploid
-    source: toxodb.org
   # organism: Eimeria tenella
   # common_name: apicomplexans E.tenella (Houghton 2013)
   - accession: GCF_000499545.1
-    ploidy: haploid
-    source: toxodb.org
   # organism: Eimeria maxima
   # common_name: apicomplexans E.maxima (Weybridge 2013)
   - accession: GCF_000499605.1
-    ploidy: haploid
-    source: toxodb.org
   # organism: Eimeria mitis
   # common_name: apicomplexans E.mitis (Houghton 2013)
   - accession: GCF_000499745.2
-    ploidy: haploid
-    source: toxodb.org
   # organism: Kwoniella mangroviensis CBS 8507
   # common_name: basidiomycetes K.mangroviensis (CBS 8507 2024)
   - accession: GCF_000507465.2
-    source: fungidb.org
   # organism: Kwoniella dejecticola CBS 10117
   # common_name: basidiomycetes K.dejecticola (CBS 10117 2024)
   - accession: GCF_000512565.2
-    source: fungidb.org
   # organism: Kwoniella bestiolae CBS 10118
   # common_name: basidiomycetes K.bestiolae (CBS 10118 2024)
   - accession: GCF_000512585.2
-    source: fungidb.org
   # organism: Aphanomyces astaci
   # common_name: oomycetes (APO3 2014)
   - accession: GCF_000520075.1
-    source: fungidb.org
   # organism: Aphanomyces invadans
   # common_name: oomycetes (NJM9701 2014)
   - accession: GCF_000520115.1
-    source: fungidb.org
   # organism: Plasmodium inui San Antonio 1
   # common_name: apicomplexans P.inui (San Antonio 1 2014)
   - accession: GCF_000524495.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Cladophialophora yegresii CBS 114405
   # common_name: ascomycetes C.yegresii CBS 114405
   - accession: GCF_000585515.1
-    source: fungidb.org
   # organism: Cladophialophora psammophila CBS 110553
   # common_name: ascomycetes C.psammophila CBS 110553
   - accession: GCF_000585535.1
-    source: fungidb.org
   # organism: Cimex lectularius
   # common_name: bed bug
   - accession: GCF_000648675.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Trypanosoma grayi
   # common_name: Trypanosoma grayi (ANR4 2014 kinetoplastids)
   - accession: GCF_000691245.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Babesia microti strain RI
   # common_name: apicomplexans B.microti strain (RI 2015)
   - accession: GCF_000691945.2
-    ploidy: haploid
-    source: piroplasmadb.org
   # organism: Plasmodium vinckei vinckei
   # common_name: apicomplexans P.vinckei (vinckei 2014)
   - accession: GCF_000709005.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Exophiala aquamarina CBS 119918
   # common_name: ascomycetes E.aquamarina CBS 119918
   - accession: GCF_000709125.1
-    source: fungidb.org
   # organism: Plasmodium reichenowi
   # common_name: apicomplexans P.reichenowi (CDC 2014)
   - accession: GCF_000723685.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Scedosporium apiospermum
   # common_name: ascomycetes S.apiospermum
   - accession: GCF_000732125.1
-    source: fungidb.org
   # organism: Nematocida ausubeli
   # common_name: microsporidians N.ausubeli (ERTm6 2014)
   - accession: GCF_000738915.1
-    source: microsporidiadb.org
   # organism: Theileria orientalis strain Shintoku
   # common_name: apicomplexans T.orientalis strain (Shintoku 2012)
   - accession: GCF_000740895.1
-    ploidy: haploid
-    source: piroplasmadb.org
   # organism: Leishmania panamensis
   # common_name: Leishmania panamensis (MHOM/PA/94/PSC-1 2014 kinetoplastids)
   - accession: GCF_000755165.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Mitosporidium daphniae
   # common_name: microsporidians M.daphniae
   - accession: GCF_000760515.2
-    source: microsporidiadb.org
   # organism: Cyclospora cayetanensis
   # common_name: apicomplexans C.cayetanensis (CHN_HEN01 2016)
   - accession: GCF_000769155.1
-    ploidy: haploid
-    source: toxodb.org
   # organism: Ordospora colligata OC4
   # common_name: microsporidians O.colligata OC4
   - accession: GCF_000803265.1
-    source: microsporidiadb.org
   # organism: Sporothrix brasiliensis 5110
   # common_name: ascomycetes S.brasiliensis 5110
   - accession: GCF_000820605.1
-    source: fungidb.org
   # organism: Fonsecaea pedrosoi CBS 271.37
   # common_name: ascomycetes F.pedrosoi CBS 271.37
   - accession: GCF_000835455.1
-    source: fungidb.org
   # organism: Cladophialophora bantiana CBS 173.52
   # common_name: ascomycetes C.bantiana CBS 173.52
   - accession: GCF_000835475.1
-    source: fungidb.org
   # organism: Cladophialophora immunda
   # common_name: ascomycetes C.immunda
   - accession: GCF_000835495.1
-    source: fungidb.org
   # organism: Exophiala oligosperma
   # common_name: ascomycetes E.oligosperma
   - accession: GCF_000835515.1
-    source: fungidb.org
   # organism: Rhinocladiella mackenziei CBS 650.93
   # common_name: ascomycetes R.mackenziei CBS 650.93
   - accession: GCF_000835555.1
-    source: fungidb.org
   # organism: Cryptococcus tetragattii IND107
   # common_name: basidiomycetes C.tetragattii (IND107 2024)
   - accession: GCF_000835755.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Exophiala spinifera
   # common_name: ascomycetes E.spinifera
   - accession: GCF_000836115.1
-    source: fungidb.org
   # organism: Exophiala mesophila
   # common_name: ascomycetes E.mesophila
   - accession: GCF_000836275.1
-    source: fungidb.org
   # organism: Verruconis gallopava
   # common_name: ascomycetes V.gallopava
   - accession: GCF_000836295.1
-    source: fungidb.org
   # organism: Fonsecaea multimorphosa CBS 102226
   # common_name: ascomycetes F.multimorphosa CBS 102226
   - accession: GCF_000836435.1
-    source: fungidb.org
   # organism: Monkeypox virus
   # common_name: Monkeypox virus (Zaire-96-I-16 2021)
   - accession: GCF_000857045.1
-    ploidy: haploid
   # organism: Plasmodium fragile
   # common_name: apicomplexans P.fragile (nilgiri 2015)
   - accession: GCF_000956335.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Sporothrix schenckii 1099-18
   # common_name: ascomycetes S.schenckii (1099-18 2015 refseq)
   - accession: GCF_000961545.1
-    source: fungidb.org
   # organism: Vairimorpha ceranae
   # common_name: microsporidians N.ceranae
   - accession: GCF_000988165.1
-    source: microsporidiadb.org
   # organism: Stomoxys calcitrans
   # common_name: stable fly (8C7A2A5H3J4 2015 rewfseq)
   - accession: GCF_001015335.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Candida auris
   # common_name: budding yeast C.auris (6684 2015 refseq)
   - accession: GCF_001189475.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Malassezia pachydermatis
   # common_name: basidiomycetes M.pachydermatis
   - accession: GCF_001278385.1
-    source: fungidb.org
   # organism: Leptomonas pyrrhocoris
   # common_name: Leptomonas pyrrhocoris (H10 2015 kinetoplastids)
   - accession: GCF_001293395.1
-    source: tritrypdb.org
   # organism: Cyphellophora attinorum
   # common_name: ascomycetes P.attinorum
   - accession: GCF_001299255.1
-    source: fungidb.org
   # organism: Kluyveromyces marxianus DMKU3-1042
   # common_name: budding yeast K.marxianus (DMKU3-1042 2014 refseq)
   - accession: GCF_001417885.1
-    source: fungidb.org
   # organism: Debaryomyces fabryi
   # common_name: budding yeast D.fabryi
   - accession: GCF_001447935.2
-    source: fungidb.org
   # organism: Trypanosoma equiperdum
   # common_name: Trypanosoma equiperdum (OVI 2016)
   - accession: GCF_001457755.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Pneumocystis jirovecii RU7
   # common_name: ascomycetes P.jirovecii RU7
   - accession: GCF_001477535.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Pneumocystis carinii B80
   # common_name: ascomycetes P.carinii B80
   - accession: GCF_001477545.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Plasmodium gaboni
   # common_name: apicomplexans P.gaboni (SY75 2016)
   - accession: GCF_001602025.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Phycomyces blakesleeanus NRRL 1555-
   # common_name: fungi P.blakesleeanus NRRL 1555(-)
   - accession: GCF_001638985.1
-    source: fungidb.org
   # organism: Alternaria alternata
   # common_name: ascomycetes A.alternata
   - accession: GCF_001642055.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Nematocida displodere
   # common_name: microsporidians N.displodere (JUm2807 2016)
   - accession: GCF_001642395.1
-    source: microsporidiadb.org
   # organism: Monocercomonoides exilis
   # common_name: M.exilis (PA203 2021)
   - accession: GCF_001643675.1
-    ploidy: haploid
-    source: giardiadb.org
   # organism: Colletotrichum higginsianum IMI 349063
   # common_name: ascomycetes C.higginsianum IMI 349063
   - accession: GCF_001672515.1
-    source: fungidb.org
   # organism: Plasmodium coatneyi
   # common_name: apicomplexans P.coatneyi (Hackeri 2016)
   - accession: GCF_001680005.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Cenococcum geophilum 1.58
   # common_name: ascomycetes C.geophilum (1.58 2016)
   - accession: GCF_001692895.1
-    source: fungidb.org
   # organism: Cryptococcus depauperatus CBS 7841
   # common_name: basidiomycetes C.depauperatus (CBS 7841 2024)
   - accession: GCF_001720195.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Yarrowia lipolytica
   # common_name: budding yeast Y.lipolytica (CLIB89W29 2016)
   - accession: GCF_001761485.1
-    source: fungidb.org
   # organism: Tritrichomonas foetus
   # common_name: T.foetus (K 2016)
   - accession: GCF_001839685.1
-    ploidy: polyploid
-    source: trichdb.org
   # organism: Cryptosporidium ubiquitum
   # common_name: apicomplexans C.ubiquitum (39726 2016)
   - accession: GCF_001865345.1
-    ploidy: haploid
-    source: cryptodb.org
   # organism: Cryptosporidium andersoni
   # common_name: apicomplexans C.andersoni (30847 2016)
   - accession: GCF_001865355.1
-    ploidy: haploid
-    source: cryptodb.org
   # organism: Aedes albopictus
   # common_name: Asian tiger mosquito (C6/36 2017 refseq)
   - accession: GCF_001876365.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Aspergillus brasiliensis CBS 101740
   # common_name: ascomycetes A.brasiliensis (CBS 101740 2016)
   - accession: GCF_001889945.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Penicilliopsis zonata CBS 506.65
   # common_name: ascomycetes P.zonata CBS 506.65
   - accession: GCF_001890105.1
-    source: fungidb.org
   # organism: Aspergillus versicolor CBS 583.65
   # common_name: ascomycetes A.versicolor CBS 583.65
   - accession: GCF_001890125.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Aspergillus sydowii CBS 593.65
   # common_name: ascomycetes A.sydowii CBS 593.65
   - accession: GCF_001890705.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Aspergillus wentii DTO 134E9
   # common_name: ascomycetes A.wentii DTO 134E9
   - accession: GCF_001890725.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Aspergillus glaucus CBS 516.65
   # common_name: ascomycetes A.glaucus CBS 516.65
   - accession: GCF_001890805.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Aspergillus aculeatus ATCC 16872
   # common_name: ascomycetes A.aculeatus ATCC 16872
   - accession: GCF_001890905.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Saccharomyces paradoxus
   # common_name: budding yeast S.paradoxus
   - accession: GCF_002079055.1
-    source: fungidb.org
   # organism: Trypanosoma theileri
   # common_name: Trypanosoma theileri (Edinburgh 2017 kinetoplastids)
   - accession: GCF_002087225.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Babesia sp. Xinjiang
   # common_name: apicomplexans B.sp. (Xinjiang 2017)
   - accession: GCF_002095265.1
-    ploidy: haploid
-    source: piroplasmadb.org
   # organism: Aedes aegypti
   # common_name: yellow fever mosquito (LVP_AGWG 2017 refseq)
   - accession: GCF_002204515.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Aspergillus thermomutatus
   # common_name: ascomycetes A.thermomutatus
   - accession: GCF_002237265.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Bos taurus
   # common_name: cattle (Hereford L1 Dominette 01449 42190680 v2.0 2023 USDA)
   - accession: GCF_002263795.3
-    ploidy: diploid
-    source: hostdb.org
   # organism: Besnoitia besnoiti
   # common_name: apicomplexans B.besnoiti (Bb-Ger1 2017)
   - accession: GCF_002563875.1
-    ploidy: haploid
-    source: toxodb.org
   # organism: Cystoisospora suis
   # common_name: apicomplexans C.suis (Wien I 2017)
   - accession: GCF_002600585.1
-    ploidy: haploid
-    source: toxodb.org
   # organism: Candida auris
   # common_name: budding yeast C.auris (B11221 2017 refseq)
   - accession: GCF_002775015.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Aspergillus ochraceoroseus IBT 24754
   # common_name: ascomycetes A.ochraceoroseus IBT 24754
   - accession: GCF_002846915.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Aspergillus novofumigatus IBT 16806
   # common_name: ascomycetes A.novofumigatus IBT 16806
   - accession: GCF_002847465.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Aspergillus campestris IBT 28561
   # common_name: ascomycetes A.campestris IBT 28561
   - accession: GCF_002847485.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Aspergillus steynii IBT 23096
   # common_name: ascomycetes A.steynii IBT 23096
   - accession: GCF_002849105.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Ixodes scapularis
   # common_name: black-legged tick (JCVI 2018)
   - accession: GCF_002892825.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Babesia ovata
   # common_name: apicomplexans B.ovata (Miyake 2017)
   - accession: GCF_002897235.1
-    ploidy: haploid
-    source: piroplasmadb.org
   # organism: Candidozyma haemuli
   # common_name: budding yeast C.haemuloni
   - accession: GCF_002926055.2
-    source: fungidb.org
   # organism: Candidozyma duobushaemuli
   # common_name: budding yeast C.duobushaemulonis
   - accession: GCF_002926085.2
-    source: fungidb.org
   # organism: Cryptococcus deuterogattii R265
   # common_name: basidiomycetes C.deuterogattii (R265 2018)
   - accession: GCF_002954075.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Cyclospora cayetanensis
   # common_name: apicomplexans C.cayetanensis (NF1_C8 2018)
   - accession: GCF_002999335.1
-    ploidy: haploid
-    source: toxodb.org
   # organism: Candidozyma auris
   # common_name: budding yeast C.auris (B11220 2019)
   - accession: GCF_003013715.1
-    source: fungidb.org
   # organism: Candidozyma pseudohaemuli
   # common_name: budding yeast C.pseudohaemulonis
   - accession: GCF_003013735.1
-    source: fungidb.org
   # organism: Pichia kudriavzevii
   # common_name: budding yeast P.kudriavzevii
   - accession: GCF_003054445.1
-    source: fungidb.org
   # organism: Aspergillus eucalypticola CBS 122712
   # common_name: ascomycetes A.eucalypticola CBS 122712
   - accession: GCF_003184535.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Aspergillus heteromorphus CBS 117.55
   # common_name: ascomycetes A.heteromorphus CBS 117.55
   - accession: GCF_003184545.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Aspergillus uvarum CBS 121591
   # common_name: ascomycetes A.uvarum CBS 121591
   - accession: GCF_003184745.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Aspergillus fijiensis CBS 313.89
   # common_name: ascomycetes A.fijiensis CBS 313.89
   - accession: GCF_003184825.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Aspergillus ibericus CBS 121593
   # common_name: ascomycetes A.ibericus CBS 121593
   - accession: GCF_003184845.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Aspergillus homomorphus CBS 101889
   # common_name: ascomycetes A.homomorphus CBS 101889
   - accession: GCF_003184865.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Malassezia restricta
   # common_name: basidiomycetes M.restricta
   - accession: GCF_003290485.1
-    source: fungidb.org
   # organism: Naegleria lovaniensis
   # common_name: N.lovaniensis (ATCC 30569 2021)
   - accession: GCF_003324165.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Macaca mulatta
   # common_name: Rhesus monkey (2019 U. Washington)
   - accession: GCF_003339765.1
-    ploidy: diploid
-    source: hostdb.org
   # organism: Lentinus tigrinus ALCF2SS1-7
   # common_name: basidiomycetes L.tigrinus (ALCF2SS1-7 2018)
   - accession: GCF_003813185.1
-    source: fungidb.org
   # organism: Arthrobotrys flagrans
   # common_name: ascomycetes A.flagrans (CBS H-5679 2019)
   - accession: GCF_004000055.1
-    source: fungidb.org
   # organism: Paecilomyces variotii
   # common_name: ascomycetes B.spectabilis
   - accession: GCF_004022145.1
-    source: fungidb.org
   # organism: Pyricularia pennisetigena
   # common_name: ascomycetes P.pennisetigena (Br36 2019 refseq)
   - accession: GCF_004337985.1
-    source: fungidb.org
   # organism: Bremia lactucae
   # common_name: lettuce downy mildew (SF5 2021)
   - accession: GCF_004359215.1
-    source: fungidb.org
   # organism: Cryptosporidium sp. chipmunk genotype I
   # common_name: apicomplexans C.sp. chipmunk genotype I (37763 2021)
   - accession: GCF_004936735.1
-    ploidy: haploid
-    source: cryptodb.org
   # organism: Aedes albopictus
   # common_name: Asian tiger mosquito (v2 FPA 2019)
   - accession: GCF_006496715.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Naegleria fowleri
   # common_name: brain-eating amoeba (ATCC 30894 2019)
   - accession: GCF_008403515.1
-    ploidy: polyploid
-    source: amoebadb.org
   # organism: Diutina rugosa
   # common_name: budding yeast D.rugosa
   - accession: GCF_008704595.1
-    source: fungidb.org
   # organism: Cryptosporidium bovis
   # common_name: apicomplexans C.bovis (45015 2021)
   - accession: GCF_009768925.1
-    ploidy: haploid
-    source: cryptodb.org
   # organism: Cryptosporidium ryanae
   # common_name: apicomplexans C.ryanae (45019 2022)
   - accession: GCF_009792415.1
-    ploidy: haploid
-    source: cryptodb.org
   # organism: Severe acute respiratory syndrome coronavirus 2
   # common_name: SARS-CoV-2 (Jan 2020 COVID-19)
   - accession: GCF_009858895.2
-    ploidy: haploid
   # organism: Nakaseomyces glabratus
   # common_name: budding yeast N.glabratus (ATCC 2001 2020)
   - accession: GCF_010111755.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Anopheles stephensi
   # common_name: Asian malaria mosquito
   - accession: GCF_013141755.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Rhipicephalus sanguineus
   # common_name: brown dog tick (v1.4 Rsan-2018 2022)
   - accession: GCF_013339695.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Rhipicephalus microplus
   # common_name: southern cattle tick (Rmic-2018 2020 refseq)
   - accession: GCF_013339725.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Dermacentor silvarum
   # common_name: mites & ticks D.silvarum (v2 Dsil-2018 2022)
   - accession: GCF_013339745.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles albimanus
   # common_name: mosquito A.albimanus (STELCA 2020)
   - accession: GCF_013758885.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Myotis myotis
   # common_name: greater mouse-eared bat (2020 Bat1K)
   - accession: GCF_014108235.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Canis lupus familiaris
   # common_name: dog (labrador SID07034 2020)
   - accession: GCF_014441545.1
-    ploidy: diploid
-    source: hostdb.org
   # organism: Pleurotus ostreatus
   # common_name: oyster mushroom
   - accession: GCF_014466165.1
-    source: fungidb.org
   # organism: Glossina fuscipes
   # common_name: tsetse fly (v2 IAEA_lab_2018 2020)
   - accession: GCF_014805625.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Rattus norvegicus
   # common_name: Norway rat BN7.2
   - accession: GCF_015227675.2
-    ploidy: diploid
-    source: hostdb.org
   # organism: Culex quinquefasciatus
   # common_name: southern house mosquito
   - accession: GCF_015732765.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Gallus gallus
   # common_name: chicken white leghorn layer X broiler (v2 broiler haplotype 2021 2021)
   - accession: GCF_016699485.2
-    ploidy: diploid
-    source: hostdb.org
   # organism: Culex pipiens pallens
   # common_name: northern house mosquito (v2 TS 2022)
   - accession: GCF_016801865.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles coluzzii
   # common_name: mosquito A.coluzzi (MOPTI 2021)
   - accession: GCF_016920705.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles arabiensis
   # common_name: mosquito A.arabiensis (DONGOLA 2021)
   - accession: GCF_016920715.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Ixodes scapularis
   # common_name: black-legged tick (U.Maryland v2 2021)
   - accession: GCF_016920785.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles merus
   # common_name: mosquito A.merus (MAF 2021)
   - accession: GCF_017562075.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Candida metapsilosis
   # common_name: budding yeast C.metapsilosis (2021)
   - accession: GCF_017655625.1
-    ploidy: diploid
-    source: fungidb.org
   # organism: Leishmania enriettii
   # common_name: Leishmania enriettii (CUR178 2021)
   - accession: GCF_017916305.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Leishmania martiniquensis
   # common_name: Leishmania martiniquensis (LSCM1 2021 refseq)
   - accession: GCF_017916325.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Leishmania orientalis
   # common_name: Leishmania orientalis (LSCM4 2021)
   - accession: GCF_017916335.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Leishmania sp. Ghana 2012 LV757
   # common_name: Leishmania sp. Ghana 2012 LV757 (GH5 2021)
   - accession: GCF_017918215.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Leishmania sp. Namibia
   # common_name: Leishmania sp. Namibia (253 2021)
   - accession: GCF_017918225.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Porcisia hertigi
   # common_name: Porcisia hertigi (C119 2021)
   - accession: GCF_017918235.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Coccidioides posadasii str. Silveira
   # common_name: ascomycetes C.posadasii str. (Silveira 2022)
   - accession: GCF_018416015.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Coccidioides posadasii str. Silveira
   # common_name: ascomycetes C.posadasii str. (Silveira 2022)
   - accession: GCF_018416015.2
-    ploidy: haploid
-    source: fungidb.org
   # organism: Phytophthora cinnamomi
   # common_name: downy mildews (GKB4 2021)
   - accession: GCF_018691715.1
-    ploidy: polyploid
-    source: fungidb.org
   # organism: Porospora cf. gigantea A
   # common_name: apicomplexans P.cf. gigantea (A 2021)
   - accession: GCF_019968955.1
-    ploidy: haploid
-    source: cryptodb.org
   # organism: Porospora cf. gigantea B
   # common_name: apicomplexans P.cf. gigantea (B 2021)
   - accession: GCF_019968985.1
-    ploidy: haploid
-    source: cryptodb.org
   # organism: Histomonas meleagridis
   # common_name: H.meleagridis (2922-C6/04-10x 2021)
   - accession: GCF_020186115.1
-    source: trichdb.org
   # organism: Fusarium solani
   # common_name: ascomycetes F.solani
   - accession: GCF_020744495.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Phytophthora ramorum
   # common_name: sudden oak death agent (Pr-102 primary hap 2021)
   - accession: GCF_020800215.1
-    ploidy: polyploid
-    source: fungidb.org
   # organism: Nematocida major
   # common_name: microsporidians N.major (JUm2507 2022)
   - accession: GCF_021653875.1
-    source: microsporidiadb.org
   # organism: Ordospora pajunii
   # common_name: microsporidians O.pajunii (FI-F-10  2022)
   - accession: GCF_021821965.1
-    source: microsporidiadb.org
   # organism: Trypanosoma melophagium
   # common_name: Trypanosoma melophagium (St. Kilda St. Kilda 2022 refseq)
   - accession: GCF_022059095.1
-    ploidy: diploid
-    source: tritrypdb.org
   # organism: Dermacentor andersoni
   # common_name: mites & ticks D.andersoni (primary hap 2022)
   - accession: GCF_023375885.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Plasmodium brasilianum
   # common_name: apicomplexans P.brasilianum (Bolivian I 2022)
   - accession: GCF_023973825.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Lutzomyia longipalpis
   # common_name: fly L.longipalpis (SR_M1_2022 2022)
   - accession: GCF_024334085.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Phlebotomus papatasi
   # common_name: fly P.papatasi (M1 2022)
   - accession: GCF_024763615.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Babesia caballi
   # common_name: apicomplexans B.caballi (USDA-D6B2 2022)
   - accession: GCF_024862765.1
-    ploidy: haploid
-    source: piroplasmadb.org
   # organism: Trichomonas vaginalis G3
   # common_name: Trichomonas vaginalis (G3 2022)
   - accession: GCF_026262505.1
-    ploidy: haploid
-    source: trichdb.org
   # organism: Babesia duncani
   # common_name: apicomplexans B.duncani (WA1 2023)
   - accession: GCF_028658345.1
-    ploidy: haploid
-    source: piroplasmadb.org
   # organism: Musca domestica
   # common_name: house fly (aabys 2023)
   - accession: GCF_030504385.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Mycobacterium tuberculosis
   # common_name: Mycobacterium tuberculosis (MTb-Oman-3215873 2023)
   - accession: GCF_030566675.1
-    ploidy: haploid
   # organism: Plasmodium chabaudi chabaudi
   # common_name: apicomplexans P.chabaudi chabaudi (AS 2019)
   - accession: GCF_900002335.3
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium berghei ANKA
   # common_name: apicomplexans P.berghei (ANKA 2019)
   - accession: GCF_900002375.2
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium yoelii
   # common_name: apicomplexans P.yoelii (17X 2019)
   - accession: GCF_900002385.2
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium relictum
   # common_name: apicomplexans P.relictum (SGS1 2016)
   - accession: GCF_900005765.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium gallinaceum
   # common_name: apicomplexans P.gallinaceum (8A 2016)
   - accession: GCF_900005855.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Fusarium mangiferae
   # common_name: ascomycetes F.mangiferae MRC7560
   - accession: GCF_900044065.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Fusarium proliferatum ET1
   # common_name: ascomycetes F.proliferatum ET1
   - accession: GCF_900067095.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Fusarium fujikuroi IMI 58289
   # common_name: ascomycetes F.fujikuroi IMI 58289
   - accession: GCF_900079805.1
-    ploidy: haploid
-    source: fungidb.org
   # organism: Plasmodium malariae
   # common_name: Plasmodium malariae (2016)
   - accession: GCF_900090045.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium sp. gorilla clade G2
   # common_name: apicomplexans P.sp. gorilla clade G2 (2018)
   - accession: GCF_900097015.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Plasmodium vinckei vinckei
   # common_name: apicomplexans P.vinckei vinckei (2019)
   - accession: GCF_900681995.1
-    ploidy: haploid
-    source: plasmodb.org
   # organism: Anopheles cruzii
   # common_name: mosquito A.cruzii (2022)
   - accession: GCF_943734635.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Sabethes cyaneus
   # common_name: mosquito S.cyaneus (primary hap 2022)
   - accession: GCF_943734655.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles aquasalis
   # common_name: mosquito A.aquasalis (primary hap 2022)
   - accession: GCF_943734665.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles coluzzii
   # common_name: mosquito A.coluzzii (primary hap 2022)
   - accession: GCF_943734685.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles maculipalpis
   # common_name: mosquito A.maculipalpis (primary hap 2022)
   - accession: GCF_943734695.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles coustani
   # common_name: mosquito A.coustani (2023)
   - accession: GCF_943734705.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles marshallii
   # common_name: mosquito A.marshallii (primary hap 2022)
   - accession: GCF_943734725.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles gambiae
   # common_name: African malaria mosquito (primary hap 2022)
   - accession: GCF_943734735.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles darlingi
   # common_name: American malaria mosquito (primary hap 2022)
   - accession: GCF_943734745.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles moucheti
   # common_name: mosquito A.moucheti (primary hap 2022)
   - accession: GCF_943734755.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles ziemanni
   # common_name: mosquito A.ziemanni (2023)
   - accession: GCF_943734765.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles funestus
   # common_name: African malaria mosquito (primary hap 2022)
   - accession: GCF_943734845.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles bellator
   # common_name: mosquito A.bellator (2023)
   - accession: GCF_943735745.2
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Anopheles nili
   # common_name: mosquito A.nili (primary hap 2022)
   - accession: GCF_943737925.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Phlebotomus argentipes
   # common_name: fly P.argentipes (2022)
   - accession: GCF_947086385.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Biomphalaria glabrata
   # common_name: bloodfluke planorb (primary hap 2022)
   - accession: GCF_947242115.1
-    ploidy: diploid
-    source: vectorbase.org
   # organism: Mycobacterium tuberculosis
   # common_name: Mycobacterium tuberculosis (GReAT_CRyPTIC_Unmapped_H37Rv 2023)
   - accession: GCF_963525475.1
-    ploidy: haploid

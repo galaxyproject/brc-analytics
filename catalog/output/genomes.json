@@ -13121,7 +13121,7 @@
     "coverage": "240.0x",
     "gcPercent": 34.5,
     "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/028/554/745/GCA_028554745.1/genes/GCA_028554745.1_ASM2855474v1.augustus.gtf.gz",
-    "isRef": "No",
+    "isRef": "Yes",
     "length": 24706389,
     "level": "Contig",
     "ncbiTaxonomyId": "2592485",
@@ -15028,7 +15028,7 @@
     "speciesTaxonomyId": "9606",
     "strainName": null,
     "taxonomicGroup": [
-      "Vertebra"
+      "Vertebrata"
     ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Hominidae",
@@ -15061,7 +15061,7 @@
     "speciesTaxonomyId": "10090",
     "strainName": "C57BL/6J",
     "taxonomicGroup": [
-      "Vertebra"
+      "Vertebrata"
     ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Muridae",
@@ -17285,7 +17285,7 @@
     "speciesTaxonomyId": "10141",
     "strainName": "inbred line 2N",
     "taxonomicGroup": [
-      "Vertebra"
+      "Vertebrata"
     ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Caviidae",
@@ -19318,7 +19318,7 @@
     "speciesTaxonomyId": "9541",
     "strainName": null,
     "taxonomicGroup": [
-      "Vertebra"
+      "Vertebrata"
     ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Cercopithecidae",
@@ -22008,7 +22008,7 @@
     "speciesTaxonomyId": "9913",
     "strainName": null,
     "taxonomicGroup": [
-      "Vertebra"
+      "Vertebrata"
     ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Bovidae",
@@ -22833,7 +22833,7 @@
     "speciesTaxonomyId": "9544",
     "strainName": null,
     "taxonomicGroup": [
-      "Vertebra"
+      "Vertebrata"
     ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Cercopithecidae",
@@ -23459,7 +23459,7 @@
     "speciesTaxonomyId": "51298",
     "strainName": null,
     "taxonomicGroup": [
-      "Vertebra"
+      "Vertebrata"
     ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Vespertilionidae",
@@ -23492,7 +23492,7 @@
     "speciesTaxonomyId": "9612",
     "strainName": null,
     "taxonomicGroup": [
-      "Vertebra"
+      "Vertebrata"
     ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Canidae",
@@ -23593,7 +23593,7 @@
     "speciesTaxonomyId": "10116",
     "strainName": "BN/NHsdMcwi",
     "taxonomicGroup": [
-      "Vertebra"
+      "Vertebrata"
     ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Muridae",
@@ -23659,7 +23659,7 @@
     "speciesTaxonomyId": "9031",
     "strainName": null,
     "taxonomicGroup": [
-      "Vertebra"
+      "Vertebrata"
     ],
     "taxonomicLevelClass": "Aves",
     "taxonomicLevelFamily": "Phasianidae",

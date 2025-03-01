@@ -138,7 +138,7 @@
         "speciesTaxonomyId": "10090",
         "strainName": "C57BL/6J",
         "taxonomicGroup": [
-          "Vertebra"
+          "Vertebrata"
         ],
         "taxonomicLevelClass": "Mammalia",
         "taxonomicLevelFamily": "Muridae",
@@ -154,7 +154,7 @@
     ],
     "ncbiTaxonomyId": "10090",
     "taxonomicGroup": [
-      "Vertebra"
+      "Vertebrata"
     ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Muridae",
@@ -286,7 +286,7 @@
         "speciesTaxonomyId": "10116",
         "strainName": "BN/NHsdMcwi",
         "taxonomicGroup": [
-          "Vertebra"
+          "Vertebrata"
         ],
         "taxonomicLevelClass": "Mammalia",
         "taxonomicLevelFamily": "Muridae",
@@ -302,7 +302,7 @@
     ],
     "ncbiTaxonomyId": "10116",
     "taxonomicGroup": [
-      "Vertebra"
+      "Vertebrata"
     ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Muridae",
@@ -399,7 +399,7 @@
         "speciesTaxonomyId": "10141",
         "strainName": "inbred line 2N",
         "taxonomicGroup": [
-          "Vertebra"
+          "Vertebrata"
         ],
         "taxonomicLevelClass": "Mammalia",
         "taxonomicLevelFamily": "Caviidae",
@@ -415,7 +415,7 @@
     ],
     "ncbiTaxonomyId": "10141",
     "taxonomicGroup": [
-      "Vertebra"
+      "Vertebrata"
     ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Caviidae",
@@ -7411,7 +7411,7 @@
         "coverage": "240.0x",
         "gcPercent": 34.5,
         "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/028/554/745/GCA_028554745.1/genes/GCA_028554745.1_ASM2855474v1.augustus.gtf.gz",
-        "isRef": "No",
+        "isRef": "Yes",
         "length": 24706389,
         "level": "Contig",
         "ncbiTaxonomyId": "2592485",
@@ -19163,7 +19163,7 @@
         "speciesTaxonomyId": "51298",
         "strainName": null,
         "taxonomicGroup": [
-          "Vertebra"
+          "Vertebrata"
         ],
         "taxonomicLevelClass": "Mammalia",
         "taxonomicLevelFamily": "Vespertilionidae",
@@ -19179,7 +19179,7 @@
     ],
     "ncbiTaxonomyId": "51298",
     "taxonomicGroup": [
-      "Vertebra"
+      "Vertebrata"
     ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Vespertilionidae",
@@ -36626,7 +36626,7 @@
         "speciesTaxonomyId": "9031",
         "strainName": null,
         "taxonomicGroup": [
-          "Vertebra"
+          "Vertebrata"
         ],
         "taxonomicLevelClass": "Aves",
         "taxonomicLevelFamily": "Phasianidae",
@@ -36642,7 +36642,7 @@
     ],
     "ncbiTaxonomyId": "9031",
     "taxonomicGroup": [
-      "Vertebra"
+      "Vertebrata"
     ],
     "taxonomicLevelClass": "Aves",
     "taxonomicLevelFamily": "Phasianidae",
@@ -37168,7 +37168,7 @@
         "speciesTaxonomyId": "9541",
         "strainName": null,
         "taxonomicGroup": [
-          "Vertebra"
+          "Vertebrata"
         ],
         "taxonomicLevelClass": "Mammalia",
         "taxonomicLevelFamily": "Cercopithecidae",
@@ -37184,7 +37184,7 @@
     ],
     "ncbiTaxonomyId": "9541",
     "taxonomicGroup": [
-      "Vertebra"
+      "Vertebrata"
     ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Cercopithecidae",
@@ -37224,7 +37224,7 @@
         "speciesTaxonomyId": "9544",
         "strainName": null,
         "taxonomicGroup": [
-          "Vertebra"
+          "Vertebrata"
         ],
         "taxonomicLevelClass": "Mammalia",
         "taxonomicLevelFamily": "Cercopithecidae",
@@ -37240,7 +37240,7 @@
     ],
     "ncbiTaxonomyId": "9544",
     "taxonomicGroup": [
-      "Vertebra"
+      "Vertebrata"
     ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Cercopithecidae",
@@ -37336,7 +37336,7 @@
         "speciesTaxonomyId": "9606",
         "strainName": null,
         "taxonomicGroup": [
-          "Vertebra"
+          "Vertebrata"
         ],
         "taxonomicLevelClass": "Mammalia",
         "taxonomicLevelFamily": "Hominidae",
@@ -37352,7 +37352,7 @@
     ],
     "ncbiTaxonomyId": "9606",
     "taxonomicGroup": [
-      "Vertebra"
+      "Vertebrata"
     ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Hominidae",
@@ -37392,7 +37392,7 @@
         "speciesTaxonomyId": "9612",
         "strainName": null,
         "taxonomicGroup": [
-          "Vertebra"
+          "Vertebrata"
         ],
         "taxonomicLevelClass": "Mammalia",
         "taxonomicLevelFamily": "Canidae",
@@ -37408,7 +37408,7 @@
     ],
     "ncbiTaxonomyId": "9612",
     "taxonomicGroup": [
-      "Vertebra"
+      "Vertebrata"
     ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Canidae",
@@ -37560,7 +37560,7 @@
         "speciesTaxonomyId": "9913",
         "strainName": null,
         "taxonomicGroup": [
-          "Vertebra"
+          "Vertebrata"
         ],
         "taxonomicLevelClass": "Mammalia",
         "taxonomicLevelFamily": "Bovidae",
@@ -37576,7 +37576,7 @@
     ],
     "ncbiTaxonomyId": "9913",
     "taxonomicGroup": [
-      "Vertebra"
+      "Vertebrata"
     ],
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelFamily": "Bovidae",

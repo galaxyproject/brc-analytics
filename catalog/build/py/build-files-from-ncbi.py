@@ -13,7 +13,7 @@ TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
   5653: "Kinetoplastea",
   6029: "Microsporidia",
   4762: "Oomycota",
-  7742: "Vertebra",
+  7742: "Vertebrata",
   554915: "Amoebozoa",
   2611341: "Metamonada",
   6656: "Arthropoda",
