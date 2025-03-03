@@ -45,3 +45,7 @@ classes:
         description: The description of the workflow.
         required: true
         range: string
+      active:
+        description: Determines if workflow should be included.
+        required: true
+        range: boolean

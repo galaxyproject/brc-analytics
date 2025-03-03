@@ -65,7 +65,7 @@ export interface Organisms {
 export interface Organism {
     /** The organism's NCBI taxonomy ID. */
     taxonomy_id: number,
-    /** The organism's ploidy. */
+    /** The ploidies that the organism may have. */
     ploidy: OrganismPloidy[],
 }
 
@@ -115,6 +115,8 @@ export interface Workflow {
     workflow_name: string,
     /** The description of the workflow. */
     workflow_description: string,
+    /** Determines if workflow should be included. */
+    active: boolean,
 }
 
 
