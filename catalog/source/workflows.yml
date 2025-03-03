@@ -25,14 +25,7 @@ workflows:
       peaks) and fragment length distribution plots for quality assessment.
     ploidy: ANY
     parameters:
-      PE fastq input:
-        class: Collection
-      reference_genome:
-        class: text
-      effective_genome_size:
-        class: integer
-      bin_size:
-        class: integer
+      reference_genome: "{{ reference_genome }}"
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/average-bigwig-between-replicates/main/versions/v0.2"
     categories:
@@ -159,18 +152,7 @@ workflows:
       downstream analysis.
     ploidy: ANY
     parameters:
-      PE fastq input:
-        class: Collection
-      adapter_forward:
-        class: text
-      adapter_reverse:
-        class: text
-      reference_genome:
-        class: text
-      effective_genome_size:
-        class: integer
-      normalize_profile:
-        class: boolean
+      reference_genome: "{{ reference_genome }}"
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.13"
     categories:
@@ -185,16 +167,7 @@ workflows:
       analysis.
     ploidy: ANY
     parameters:
-      SR fastq input:
-        class: Collection
-      adapter_forward:
-        class: text
-      reference_genome:
-        class: text
-      effective_genome_size:
-        class: integer
-      normalize_profile:
-        class: boolean
+      reference_genome: "{{ reference_genome }}"
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.3"
     categories:
@@ -208,16 +181,7 @@ workflows:
       on the combined normalized data, and retains only peaks whose summits overlap
       with intersections from a user-defined minimum number of replicates.
     ploidy: ANY
-    parameters:
-      n rmDup BAM:
-        class: Collection
-        ext: bam
-      Minimum number of overlap:
-        class: integer
-      effective_genome_size:
-        class: integer
-      bin_size:
-        class: integer
+    parameters: {}
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-pe/versions/v1.3"
     categories:
@@ -231,16 +195,7 @@ workflows:
       normalized data, and retains only peaks whose summits overlap with intersections
       from a user-defined minimum number of replicates.
     ploidy: ANY
-    parameters:
-      n rmDup BAMPE:
-        class: Collection
-        ext: bam
-      Minimum number of overlap:
-        class: integer
-      effective_genome_size:
-        class: integer
-      bin_size:
-        class: integer
+    parameters: {}
     active: false
   - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-sr/versions/v1.3"
     categories:
@@ -254,16 +209,7 @@ workflows:
       normalized data, and retains only peaks whose summits overlap with intersections
       from a user-defined minimum number of replicates.
     ploidy: ANY
-    parameters:
-      n rmDup BAMSR:
-        class: Collection
-        ext: bam
-      Minimum number of overlap:
-        class: integer
-      effective_genome_size:
-        class: integer
-      bin_size:
-        class: integer
+    parameters: {}
     active: false
   - trs_id: "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.14"
     categories:
@@ -278,18 +224,7 @@ workflows:
       characteristic of CUT&RUN/CUT&TAG experiments.
     ploidy: ANY
     parameters:
-      PE fastq input:
-        class: Collection
-      adapter_forward:
-        class: text
-      adapter_reverse:
-        class: text
-      reference_genome:
-        class: text
-      effective_genome_size:
-        class: integer
-      normalize_profile:
-        class: boolean
+      reference_genome: "{{ reference_genome }}"
     active: false
   - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6"
     categories:
@@ -302,23 +237,8 @@ workflows:
       and reformat all outputs to be easily used by the function 'Read10X' from Seurat.
     ploidy: ANY
     parameters:
-      fastq PE collection GEX:
-        class: Collection
-      reference genome:
-        class: text
-      gtf:
-        class: File
-      cellranger_barcodes_3M-february-2018.txt:
-        class: File
-      Barcode Size is same size of the Read:
-        class: boolean
-      fastq PE collection CMO:
-        class: Collection
-      sample name and CMO sequence collection:
-        class: Collection
-        ext: csv
-      Number of expected cells:
-        class: integer
+      reference genome: "{{ reference_genome }}"
+      gtf: "{{ gene_model_url }}"
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6"
     categories:
@@ -330,16 +250,8 @@ workflows:
       function 'Read10X' from Seurat.
     ploidy: ANY
     parameters:
-      fastq PE collection:
-        class: Collection
-      reference genome:
-        class: text
-      gtf:
-        class: File
-      cellranger_barcodes_3M-february-2018.txt:
-        class: File
-      Barcode Size is same size of the Read:
-        class: boolean
+      reference genome: "{{ reference_genome }}"
+      gtf: "{{ gene_model_url }}"
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/generic-variant-calling-wgs-pe/main/versions/v0.1.1"
     categories:
@@ -403,10 +315,8 @@ workflows:
         ext:
           - fastqsanger
           - fastqsanger.gz
-      Annotation GTF:
-        class: File
-      Genome fasta:
-        class: File
+      Annotation GTF: "{{ gene_model_url }}"
+      Genome fasta: "{{ assembly_fasta_url }}"
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/hic-hicup-cooler/chic-fastq-to-cool-hicup-cooler/versions/v0.3"
     categories:
@@ -650,28 +560,8 @@ workflows:
       both HTSeq-compatible counts and normalized measures for downstream analysis."
     ploidy: ANY
     parameters:
-      Collection paired FASTQ files:
-        class: Collection
-      Forward adapter:
-        class: text
-      Reverse adapter:
-        class: text
-      Generate additional QC reports:
-        class: boolean
-      Reference genome:
-        class: text
-      GTF file of annotation:
-        class: File
-      Strandedness:
-        class: text
-      Use featureCounts for generating count tables:
-        class: boolean
-      Compute Cufflinks FPKM:
-        class: boolean
-      GTF with regions to exclude from FPKM normalization with Cufflinks:
-        class: File
-      Compute StringTie FPKM:
-        class: boolean
+      Reference genome: "{{ reference_genome }}"
+      GTF file of annotation: "{{ gene_model_url }}"
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.2"
     categories:
@@ -687,26 +577,8 @@ workflows:
       both HTSeq-compatible counts and normalized measures for downstream analysis."
     ploidy: ANY
     parameters:
-      Collection of FASTQ files:
-        class: Collection
-      Forward adapter:
-        class: text
-      Generate additional QC reports:
-        class: boolean
-      Reference genome:
-        class: text
-      GTF file of annotation:
-        class: File
-      Strandedness:
-        class: text
-      Use featureCounts for generating count tables:
-        class: boolean
-      Compute Cufflinks FPKM:
-        class: boolean
-      GTF with regions to exclude from FPKM normalization with Cufflinks:
-        class: File
-      Compute StringTie FPKM:
-        class: boolean
+      Reference genome: "{{ reference_genome }}"
+      GTF file of annotation: "{{ gene_model_url }}"
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/variation-reporting/main/versions/v0.1.1"
     categories:
