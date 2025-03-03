@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.7.0](https://github.com/galaxyproject/brc-analytics/compare/v0.6.0...v0.7.0) (2025-03-03)
+
+
+### Features
+
+* add back all assemblies ([#323](https://github.com/galaxyproject/brc-analytics/issues/323)) ([#340](https://github.com/galaxyproject/brc-analytics/issues/340)) ([6bff3c8](https://github.com/galaxyproject/brc-analytics/commit/6bff3c898f00b206056f144484ee04d1cc87d4a9))
+* add filters for taxonomic levels to organisms list ([#301](https://github.com/galaxyproject/brc-analytics/issues/301)) ([#306](https://github.com/galaxyproject/brc-analytics/issues/306)) ([665a20a](https://github.com/galaxyproject/brc-analytics/commit/665a20afb8bfdf1dc0aba4c32841f0bbd379902b))
+* add taxonomic levels to assembly list ([#312](https://github.com/galaxyproject/brc-analytics/issues/312)) ([#316](https://github.com/galaxyproject/brc-analytics/issues/316)) ([06bdb3c](https://github.com/galaxyproject/brc-analytics/commit/06bdb3ce1765e43123da5199a03d3c7093fee83e))
+* added additional workflows ([#322](https://github.com/galaxyproject/brc-analytics/issues/322)) ([#335](https://github.com/galaxyproject/brc-analytics/issues/335)) ([8cab2ad](https://github.com/galaxyproject/brc-analytics/commit/8cab2ad655282fea804c2c6378d7601e4fa38765))
+* allow organisms to have multiple ploidies separately matched with workflows ([#334](https://github.com/galaxyproject/brc-analytics/issues/334)) ([#338](https://github.com/galaxyproject/brc-analytics/issues/338)) ([7ce865a](https://github.com/galaxyproject/brc-analytics/commit/7ce865ab35cc161e7dea08178998c766b3af3aef))
+
+
+### Styles
+
+* fix prettierignoring of catalog files ([#317](https://github.com/galaxyproject/brc-analytics/issues/317)) ([#318](https://github.com/galaxyproject/brc-analytics/issues/318)) ([9c97653](https://github.com/galaxyproject/brc-analytics/commit/9c97653ca99ebb307c9092e810009b720f42ac6e))
+
 ## [0.6.0](https://github.com/galaxyproject/brc-analytics/compare/v0.5.1...v0.6.0) (2025-02-18)
 
 
