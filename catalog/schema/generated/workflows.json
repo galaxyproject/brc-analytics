@@ -4,6 +4,10 @@
             "additionalProperties": false,
             "description": "A workflow.",
             "properties": {
+                "active": {
+                    "description": "Determines if workflow should be included.",
+                    "type": "boolean"
+                },
                 "categories": {
                     "description": "The IDs of the categories the workflow belongs to.",
                     "items": {
@@ -33,7 +37,8 @@
                 "categories",
                 "ploidy",
                 "workflow_name",
-                "workflow_description"
+                "workflow_description",
+                "active"
             ],
             "title": "Workflow",
             "type": "object"

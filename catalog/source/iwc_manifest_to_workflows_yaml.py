@@ -1,6 +1,7 @@
 import argparse
 import json
 import os
+import subprocess
 from dataclasses import asdict, dataclass
 from typing import Any, Dict, List, Literal, Optional
 
@@ -161,6 +162,8 @@ def to_workflows_yaml(exclude_other: bool):
             allow_unicode=True,
             sort_keys=False,
         )
+    # Turns out the YAML style prettier likes is really hard to create in python ...
+    subprocess.run(["npx", "prettier", "--write", WORKFLOWS_PATH])
 
 
 if __name__ == "__main__":
