@@ -15,6 +15,11 @@
                     },
                     "type": "array"
                 },
+                "parameters": {
+                    "description": "The parameters of the workflow. Dictionary with arbitrary depth, string keys and primitive values.",
+                    "type": "object",
+                    "additionalProperties": true
+                },
                 "ploidy": {
                     "$ref": "#/$defs/WorkflowPloidy",
                     "description": "The ploidy supported by the workflow."
