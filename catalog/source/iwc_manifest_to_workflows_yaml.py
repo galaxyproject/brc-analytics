@@ -2,12 +2,11 @@ import argparse
 import json
 import os
 from dataclasses import asdict, dataclass
-from typing import Any, Dict, List, Literal
+from typing import Any, Dict, List, Literal, Optional
 
 import requests
 import yaml
 
-# quick and dirty, could build manifest as part of CI
 URL = "https://iwc.galaxyproject.org/workflow_manifest.json"
 WORKFLOWS_PATH = "workflows.yml"
 CATEGORIES = Literal[
@@ -30,22 +29,22 @@ DOCKSTORE_COLLECTION_TO_CATEGORY = {
 @dataclass
 class WorkflowInput:
     trs_id: str
-    workflow_categories: List[str]
+    categories: List[str]
     workflow_name: str
     workflow_description: str
     ploidy: str
     # readme: str
-    parameters: Dict[str, Any]
+    parameters: Optional[Dict[str, Any]] = None
     active: bool = False
 
     def as_dict(self):
         # convert to brc category enum
         d = asdict(self)
-        d["workflow_categories"] = sorted(
+        d["categories"] = sorted(
             list(
                 set(
                     DOCKSTORE_COLLECTION_TO_CATEGORY.get(c, "OTHER")
-                    for c in self.workflow_categories
+                    for c in self.categories
                 )
             )
         )
@@ -105,9 +104,9 @@ def generate_current_workflows():
                 active=False,
                 trs_id=f'{workflow["trsID"]}/versions/v{workflow["definition"]["release"]}',
                 workflow_name=workflow["definition"]["name"],
-                workflow_categories=workflow["collections"],
+                categories=workflow["collections"],
                 workflow_description=workflow["definition"]["annotation"],
-                ploidy="any",
+                ploidy="ANY",
                 # readme=workflow["readme"],
                 # shortcut so we don't need to parse out the whole inputs section
                 parameters=get_input_types(workflow["definition"]),
@@ -148,9 +147,9 @@ def to_workflows_yaml(exclude_other: bool):
         print("excluding!")
         final_workflows = []
         for workflow in sorted_workflows:
-            if "OTHER" in workflow["workflow_categories"]:
-                workflow["workflow_categories"].remove("OTHER")
-                if not workflow["workflow_categories"]:
+            if "OTHER" in workflow["categories"]:
+                workflow["categories"].remove("OTHER")
+                if not workflow["categories"]:
                     print(f'Excluding workflow {workflow["trs_id"]}, category unknown')
                     continue
             final_workflows.append(workflow)
@@ -160,6 +159,7 @@ def to_workflows_yaml(exclude_other: bool):
         yaml.safe_dump(
             {"workflows": final_workflows},
             out,
+            allow_unicode=True,
             sort_keys=False,
         )
 
