@@ -74,34 +74,46 @@ def get_species_row(taxon_info, taxonomic_group_sets, taxonomic_levels):
   }
 
 
-def get_species_df(taxonomy_ids, taxonomic_group_sets, taxonomic_levels):
-  species_info = get_paginated_ncbi_results(f"https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/taxon/{",".join([str(id) for id in taxonomy_ids])}/dataset_report", "taxa")
+def get_species_info(taxonomy_ids):
+  """
+  Fetches species information from NCBI API for the given taxonomy IDs.
+  
+  Args:
+    taxonomy_ids: List of taxonomy IDs to fetch information for
+    
+  Returns:
+    List of species information dictionaries from NCBI
+  """
+  return get_paginated_ncbi_results(f"https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/taxon/{",".join([str(id) for id in taxonomy_ids])}/dataset_report", "taxa")
+
+
+def get_species_df(species_info, taxonomic_group_sets, taxonomic_levels):
+  """
+  Converts species information into a DataFrame.
+  
+  Args:
+    species_info: List of species information dictionaries from NCBI
+    taxonomic_group_sets: Dictionary of taxonomic group sets
+    taxonomic_levels: List of taxonomic levels to include
+    
+  Returns:
+    DataFrame containing species information
+  """
   return pd.DataFrame([get_species_row(info, taxonomic_group_sets, taxonomic_levels) for info in species_info])
 
 
-def ncbi_tree_to_nested_tree(node_id, edges, taxonomy_ids):
-  children = edges.get(str(node_id), {}).get("visible_children", [])
-  children = [str(num) for num in children]
-  # ncbi results odd again, dup children
-  children = set(children)
-  if (len(children) > 0 or node_id in taxonomy_ids):
-    child_trees = [ncbi_tree_to_nested_tree(child, edges, taxonomy_ids) for child in children]
-    child_trees = [item for item in child_trees if item is not None]
-    return {
-      "name": node_id,
-      "ncbi_tax_id": node_id,
-      "children": child_trees
-    }
-
-def update_species_tree_names(tree, taxon_name_map, taxon_rank_map):
-    tree["rank"] = taxon_rank_map.get(tree["name"], "Unknown")
-    tree["name"] = taxon_name_map.get(tree["name"], tree["name"])
-
-    for child in tree.get("children", []):
-        update_species_tree_names(child, taxon_name_map, taxon_rank_map)
-    return tree
-
-def get_species_tree(taxonomy_ids, taxonomic_levels):
+def get_species_tree(taxonomy_ids, taxonomic_levels, species_info=None):
+  """
+  Builds a species tree from taxonomy IDs and taxonomic levels.
+  
+  Args:
+    taxonomy_ids: List of taxonomy IDs to include in the tree
+    taxonomic_levels: List of taxonomic levels to include in the tree
+    species_info: Optional pre-fetched species information to avoid additional API calls
+    
+  Returns:
+    A nested tree structure of species
+  """
   species_tree_url = f"https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/taxon/{','.join([str(id) for id in taxonomy_ids])}/filtered_subtree?rank_limits={','.join(taxonomic_levels)}"
   species_tree_response = requests.get(species_tree_url).json()
 
@@ -126,21 +138,104 @@ def get_species_tree(taxonomy_ids, taxonomic_levels):
   # Find the set of all unique tax_ids and their display names
   tax_ids = all_children + root_ids
   tax_ids = set(tax_ids)
-  parent_taxa_info = get_paginated_ncbi_results(f"https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/taxon/{','.join([str(id) for id in tax_ids])}/dataset_report", "parent taxa")
-
-  # Replace taxon ids with display names
+  
+  # Initialize maps with root node
   taxon_name_map = {"1": "root"}
   taxon_rank_map = {"1": "NA"}
-  for report in parent_taxa_info:
-    taxon_name_map[str(report["taxonomy"]["tax_id"])] = report["taxonomy"]["current_scientific_name"]["name"]
-    if "rank" in report["taxonomy"]:
-      taxon_rank_map[str(report["taxonomy"]["tax_id"])] = report["taxonomy"]["rank"]
-    else:
-      print(f"rank not found for tax_id: {report['taxonomy']['tax_id']}")
+  
+  # If we have pre-fetched species_info, use it to populate the name and rank maps
+  if species_info:
+    # Extract taxon names and ranks from species_info
+    for info in species_info:
+      tax_id = str(info["taxonomy"]["tax_id"])
+      if tax_id in tax_ids:
+        taxon_name_map[tax_id] = info["taxonomy"]["current_scientific_name"]["name"]
+        if "rank" in info["taxonomy"]:
+          taxon_rank_map[tax_id] = info["taxonomy"]["rank"]
+        else:
+          print(f"rank not found for tax_id: {tax_id}")
+      
+      # Also extract parent taxa information if available
+      if "classification" in info["taxonomy"]:
+        for rank_level, rank_info in info["taxonomy"]["classification"].items():
+          if isinstance(rank_info, dict) and "id" in rank_info and "name" in rank_info:
+            parent_name = rank_info["name"]
+            parent_id = rank_info["id"]
+            parent_id_str = str(parent_id)
+            if parent_id_str in tax_ids and parent_id_str not in taxon_name_map:
+              taxon_name_map[parent_id_str] = parent_name
+              taxon_rank_map[parent_id_str] = rank_level
+    
+  # Fetch any missing taxa information
+  fetch_taxa_info_in_batches(tax_ids, taxon_name_map, taxon_rank_map, "missing parent taxa")
 
   named_species_tree = update_species_tree_names(species_tree, taxon_name_map, taxon_rank_map)
 
   return named_species_tree
+
+
+def fetch_taxa_info_in_batches(tax_ids, taxon_name_map, taxon_rank_map, description="taxa"):
+  """
+  Fetches taxonomic information in batches and updates the provided name and rank maps.
+  
+  Args:
+    tax_ids: List or set of taxonomy IDs to fetch
+    taxon_name_map: Dictionary to update with taxon ID to name mappings
+    taxon_rank_map: Dictionary to update with taxon ID to rank mappings
+    description: Description of the taxa being fetched for logging
+    
+  Returns:
+    None (updates the provided maps in-place)
+  """
+  # Filter out tax_ids that are already in the map
+  missing_tax_ids = [tid for tid in tax_ids if tid not in taxon_name_map and tid != "1"]
+  
+  if not missing_tax_ids:
+    return
+    
+  print(f"Fetching information for {len(missing_tax_ids)} {description}")
+  
+  # Process in batches of 100 to avoid API limitations
+  batch_size = 100
+  for i in range(0, len(missing_tax_ids), batch_size):
+    batch = missing_tax_ids[i:i+batch_size]
+    print(f"Fetching batch {i//batch_size + 1} of {(len(missing_tax_ids) + batch_size - 1)//batch_size} ({len(batch)} taxa)")
+    
+    taxa_info = get_paginated_ncbi_results(
+      f"https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/taxon/{','.join(batch)}/dataset_report", 
+      f"{description} batch {i//batch_size + 1}"
+    )
+    
+    for report in taxa_info:
+      tax_id = str(report["taxonomy"]["tax_id"])
+      taxon_name_map[tax_id] = report["taxonomy"]["current_scientific_name"]["name"]
+      if "rank" in report["taxonomy"]:
+        taxon_rank_map[tax_id] = report["taxonomy"]["rank"]
+      else:
+        print(f"rank not found for tax_id: {tax_id}")
+
+
+def ncbi_tree_to_nested_tree(node_id, edges, taxonomy_ids):
+  children = edges.get(str(node_id), {}).get("visible_children", [])
+  children = [str(num) for num in children]
+  # ncbi results odd again, dup children
+  children = set(children)
+  if (len(children) > 0 or node_id in taxonomy_ids):
+    child_trees = [ncbi_tree_to_nested_tree(child, edges, taxonomy_ids) for child in children]
+    child_trees = [item for item in child_trees if item is not None]
+    return {
+      "name": node_id,
+      "ncbi_tax_id": node_id,
+      "children": child_trees
+    }
+
+def update_species_tree_names(tree, taxon_name_map, taxon_rank_map):
+    tree["rank"] = taxon_rank_map.get(tree["name"], "Unknown")
+    tree["name"] = taxon_name_map.get(tree["name"], tree["name"])
+
+    for child in tree.get("children", []):
+        update_species_tree_names(child, taxon_name_map, taxon_rank_map)
+    return tree
 
 def get_genome_row(genome_info):
   refseq_category = genome_info["assembly_info"].get("refseq_category")
@@ -436,7 +531,11 @@ def build_files(
     primarydata_df = primarydata_df.merge(sra_metadata_df, how="left", left_on="sra_sample_acc", right_on="sra_sample_acc")
   report_missing_values_from("accessions", "found on NCBI", source_list_df["accession"], base_genomes_df["accession"])
 
-  species_df = get_species_df(base_genomes_df["taxonomyId"], taxonomic_group_sets, taxonomic_levels_for_tree)
+  # Fetch species information once to be used by both species_df and species_tree
+  species_info = get_species_info(base_genomes_df["taxonomyId"])
+  
+  # Create species DataFrame using the fetched species_info
+  species_df = get_species_df(species_info, taxonomic_group_sets, taxonomic_levels_for_tree)
 
   report_missing_values_from("species", "found on NCBI", base_genomes_df["taxonomyId"], species_df["taxonomyId"])
 
@@ -461,13 +560,14 @@ def build_files(
 
   print(f"Wrote to {genomes_output_path}")
 
-  if extract_primary_data:
-    primarydata_df.to_csv(primary_output_path, index=False, sep="\t")
-
-    print(f"Wrote to {primary_output_path}")
-  
   if len(taxonomic_levels_for_tree) > 0:
-    species_tree = get_species_tree(genomes_df["taxonomyId"], taxonomic_levels_for_tree)
+    # Use the taxonomy IDs from the genomes_df to build the species tree
+    # Pass the previously fetched species_info to avoid another API call
+    species_tree = get_species_tree(genomes_df["taxonomyId"], taxonomic_levels_for_tree, species_info)
     with open(tree_output_path, 'w') as outfile:
       json.dump(species_tree, outfile, indent=4)
     print(f"Wrote to {tree_output_path}")
+  
+  if extract_primary_data:
+    primarydata_df.to_csv(primary_output_path, index=False, sep="\t")
+    print(f"Wrote to {primary_output_path}")
