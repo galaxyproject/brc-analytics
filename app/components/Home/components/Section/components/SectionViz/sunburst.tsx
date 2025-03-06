@@ -39,26 +39,43 @@ export const SectionViz = (): JSX.Element => {
     // Define a color scale for base colors (root and first ring)
     const baseColor = scaleOrdinal(schemeTableau10);
 
-    // Helper function to get color for a node
-    function getNodeColor(d): string {
-      if (d.depth === 0) return baseColor(d.data.name); // root
-      if (d.depth === 1) return baseColor(d.data.name); // first ring
-
-      // For descendants, get the color of their depth=1 ancestor and modify it
-      const ancestor = d.ancestors().find((n) => n.depth === 1);
-      if (!ancestor) return "#ccc"; // fallback
-
-      const baseColorHsl = hsl(baseColor(ancestor.data.name));
-
+    // Helper function to get color for a node based on the current root
+    function getNodeColor(d, root): string {
+      // Adjust depth relative to current root
+      const relativeDepth = d.depth - root.depth;
+      
+      if (relativeDepth === 0) return "#555"; // Current root is dark gray
+      if (relativeDepth === 1) return baseColor(d.data.name); // Direct children of root get base colors
+      
+      // For descendants, get the color of their direct child of the root ancestor and modify it
+      const rootChild = findRootChild(d, root);
+      if (!rootChild) return "#ccc"; // fallback
+      
+      const baseColorHsl = hsl(baseColor(rootChild.data.name));
+      
       // Increase lightness and decrease saturation as we go deeper
-      const lightnessFactor = 0.05 * (d.depth - 1);
-      const saturationFactor = 0.1 * (d.depth - 1);
-
+      const lightnessFactor = 0.05 * (relativeDepth - 1);
+      const saturationFactor = 0.1 * (relativeDepth - 1);
+      
       return hsl(
         baseColorHsl.h,
         Math.max(0, baseColorHsl.s - saturationFactor),
         Math.min(1, baseColorHsl.l + lightnessFactor)
       ).toString();
+    }
+    
+    // Helper function to find the ancestor that is a direct child of the current root
+    function findRootChild(node, root) {
+      if (node === root) return null;
+      
+      const ancestors = node.ancestors();
+      // Find the ancestor that is a direct child of root
+      for (let i = 0; i < ancestors.length; i++) {
+        if (ancestors[i].parent === root) {
+          return ancestors[i];
+        }
+      }
+      return null;
     }
 
     // Create a tooltip for interactivity
@@ -118,7 +135,7 @@ export const SectionViz = (): JSX.Element => {
       .selectAll("path")
       .data(root.descendants().slice(1))
       .join("path")
-      .attr("fill", (d) => getNodeColor(d))
+      .attr("fill", (d) => getNodeColor(d, root))
       // Show only nodes with relative depth <= DEPTH.
       .attr("fill-opacity", (d) => (isVisible(d, root, 0) ? 1 : 0))
       .attr("stroke-opacity", (d) => (isVisible(d, root, 0) ? 1 : 0))
@@ -260,6 +277,7 @@ export const SectionViz = (): JSX.Element => {
           };
         })
         .attrTween("d", (d) => () => arc(d.current))
+        .attr("fill", (d) => getNodeColor(d, p)) // Update colors based on new root
         .attr("fill-opacity", (d) =>
           isVisible(d, currentRoot, p.depth) ? 1 : 0
         )
