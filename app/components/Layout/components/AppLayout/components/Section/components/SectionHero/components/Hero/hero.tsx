@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { FILL, GRID_SIZE } from "../../../../../../../Hero/common/constants";
-import { ELEMENT_ID, Height } from "../../../../../../../Hero/common/entities";
+import { ELEMENT_ID } from "../../../../../../../Hero/common/entities";
 import { getFillUrl, getViewBox } from "../../../../../../../Hero/common/utils";
 import { CoralPinkCircle } from "../../../../../../../Hero/components/Defs/CoralPinkCircle/coralPinkCircle";
 import { SmokeCircle } from "../../../../../../../Hero/components/Defs/SmokeCircle/smokeCircle";
@@ -10,7 +10,7 @@ import { SVG } from "./hero.styles";
 
 export interface HeroProps {
   gridSize?: number;
-  height?: Height;
+  height?: number;
 }
 
 export const Hero = ({

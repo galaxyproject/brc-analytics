@@ -18,4 +18,5 @@ venv
 /CHANGELOG.md
 
 #catalog
-/catalog
+/catalog/output
+/catalog/schema/generated

@@ -28,6 +28,7 @@ import {
 } from "../../../../apis/catalog/brc-analytics-catalog/common/utils";
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
 import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
+import { TEXT_BODY_SMALL_400 } from "@databiosphere/findable-ui/lib/theme/common/typography";
 
 /**
  * Build props for the accession cell.
@@ -144,12 +145,25 @@ export const buildGcPercent = (
  * @param genome - Genome entity.
  * @returns Props to be used for the cell.
  */
-export const buildGenomeSpecies = (
+export const buildGenomeTaxonomicLevelSpecies = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.Link> => {
   return {
-    label: genome.species,
+    label: genome.taxonomicLevelSpecies,
     url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(genome))}`,
+  };
+};
+
+/**
+ * Build props for the strain cell.
+ * @param genome - Genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildGenomeTaxonomicLevelStrain = (
+  genome: BRCDataCatalogGenome
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: getGenomeStrainText(genome),
   };
 };
 
@@ -207,6 +221,34 @@ export const buildOrganismAssemblyTaxonomyIds = (
 };
 
 /**
+ * Build props for the species cell.
+ * @param organism - Organism entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildOrganismTaxonomicLevelSpecies = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.Link> => {
+  return {
+    label: organism.taxonomicLevelSpecies,
+    url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getOrganismId(organism))}`,
+  };
+};
+
+/**
+ * Build props for the strain cell.
+ * @param organism - Organism entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildOrganismTaxonomicLevelStrain = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.NTagCell> => {
+  return {
+    label: "strains",
+    values: organism.taxonomicLevelStrain,
+  };
+};
+
+/**
  * Build props for the taxonomic group cell.
  * @param entity - Organism or genome entity.
  * @returns Props to be used for the cell.
@@ -221,16 +263,93 @@ export const buildTaxonomicGroup = (
 };
 
 /**
- * Build props for the species cell.
- * @param organism - Organism entity.
+ * Build props for the class cell.
+ * @param entity - Organism or genome entity.
  * @returns Props to be used for the cell.
  */
-export const buildOrganismSpecies = (
-  organism: BRCDataCatalogOrganism
-): ComponentProps<typeof C.Link> => {
+export const buildTaxonomicLevelClass = (
+  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
+): ComponentProps<typeof C.BasicCell> => {
   return {
-    label: organism.species,
-    url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getOrganismId(organism))}`,
+    value: entity.taxonomicLevelClass,
+  };
+};
+
+/**
+ * Build props for the family cell.
+ * @param entity - Organism or genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildTaxonomicLevelFamily = (
+  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: entity.taxonomicLevelFamily,
+  };
+};
+
+/**
+ * Build props for the genus cell.
+ * @param entity - Organism or genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildTaxonomicLevelGenus = (
+  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: entity.taxonomicLevelGenus,
+  };
+};
+
+/**
+ * Build props for the kingdom cell.
+ * @param entity - Organism or genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildTaxonomicLevelKingdom = (
+  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: entity.taxonomicLevelKingdom,
+  };
+};
+
+/**
+ * Build props for the order cell.
+ * @param entity - Organism or genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildTaxonomicLevelOrder = (
+  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: entity.taxonomicLevelOrder,
+  };
+};
+
+/**
+ * Build props for the phylum cell.
+ * @param entity - Organism or genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildTaxonomicLevelPhylum = (
+  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: entity.taxonomicLevelPhylum,
+  };
+};
+
+/**
+ * Build props for the superkingdom cell.
+ * @param entity - Organism or genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildTaxonomicLevelSuperkingdom = (
+  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: entity.taxonomicLevelSuperkingdom,
   };
 };
 
@@ -274,19 +393,6 @@ export const buildScaffoldN50 = (
 };
 
 /**
- * Build props for the strain cell.
- * @param genome - Genome entity.
- * @returns Props to be used for the cell.
- */
-export const buildStrain = (
-  genome: BRCDataCatalogGenome
-): ComponentProps<typeof C.BasicCell> => {
-  return {
-    value: genome.strain,
-  };
-};
-
-/**
  * Build props for the taxonomy ID cell.
  * @param genome - Genome entity.
  * @returns Props to be used for the cell.
@@ -308,6 +414,7 @@ export const buildGenomeAnalysisMethods = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.AnalysisMethodsCatalog> => {
   return {
+    assemblyPloidies: genome.ploidy,
     geneModelUrl: genome.geneModelUrl,
     genomeVersionAssemblyId: genome.accession,
   };
@@ -371,10 +478,12 @@ export const buildGenomeChooseAnalysisMethodDetailViewHero = (
   return {
     breadcrumbs: getGenomeEntityChooseAnalysisMethodBreadcrumbs(genome),
     subTitle: C.Link({
-      label: C.SubTitle({ subTitle: genome.species }),
+      TypographyProps: { color: "ink.light", variant: TEXT_BODY_SMALL_400 },
+      label: `Species: ${genome.taxonomicLevelSpecies}`,
+      underline: "hover",
       url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(genome))}`,
     }),
-    title: genome.accession,
+    title: `Analyze in Galaxy - ${genome.accession}`,
   };
 };
 
@@ -388,15 +497,15 @@ export const buildGenomeDetails = (
 ): ComponentProps<typeof C.KeyValuePairs> => {
   const keyValuePairs = new Map<Key, Value>();
   keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.SPECIES,
+    BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
     C.Link({
-      label: genome.species,
+      label: genome.taxonomicLevelSpecies,
       url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(genome))}`,
     })
   );
   keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.STRAIN,
-    genome.strain ?? LABEL.UNSPECIFIED
+    BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
+    getGenomeStrainText(genome, LABEL.UNSPECIFIED)
   );
   keyValuePairs.set(
     BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMY_ID,
@@ -458,7 +567,7 @@ export const buildOrganismAssembliesHero = (
 ): ComponentProps<typeof C.BackPageHero> => {
   return {
     breadcrumbs: getOrganismEntityAssembliesBreadcrumbs(organism),
-    title: organism.species,
+    title: organism.taxonomicLevelSpecies,
   };
 };
 
@@ -502,9 +611,10 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
     },
     {
-      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.STRAIN,
-      cell: ({ row }) => C.BasicCell(buildStrain(row.original)),
-      header: BRC_DATA_CATALOG_CATEGORY_LABEL.STRAIN,
+      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,
+      cell: ({ row }) =>
+        C.BasicCell(buildGenomeTaxonomicLevelStrain(row.original)),
+      header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMY_ID,
@@ -575,7 +685,24 @@ function getGenomeEntityChooseAnalysisMethodBreadcrumbs(
   return [
     { path: ROUTES.GENOMES, text: "Assemblies" },
     { path: "", text: genome.accession },
+    { path: "", text: "Analyze" },
   ];
+}
+
+/**
+ * Get text for genome strain, consisting of, from highest to lowest priority, either: strain-only name; strain name including species; or the specified default value.
+ * @param genome - Genome entity.
+ * @param defaultValue - Default value to use if there's no strain.
+ * @returns strain text.
+ */
+function getGenomeStrainText(
+  genome: BRCDataCatalogGenome,
+  defaultValue = ""
+): string {
+  if (genome.strainName) return genome.strainName;
+  if (genome.taxonomicLevelStrain !== "None")
+    return genome.taxonomicLevelStrain;
+  return defaultValue;
 }
 
 /**
@@ -588,7 +715,7 @@ function getOrganismEntityAssembliesBreadcrumbs(
 ): Breadcrumb[] {
   return [
     { path: ROUTES.ORGANISMS, text: "Organisms" },
-    { path: "", text: `${organism.species}` },
+    { path: "", text: `${organism.taxonomicLevelSpecies}` },
     { path: "", text: "Assemblies" },
   ];
 }

@@ -1,0 +1,105 @@
+{
+    "$defs": {
+        "Workflow": {
+            "additionalProperties": false,
+            "description": "A workflow.",
+            "properties": {
+                "categories": {
+                    "description": "The IDs of the categories the workflow belongs to.",
+                    "items": {
+                        "$ref": "#/$defs/WorkflowCategoryId"
+                    },
+                    "type": "array"
+                },
+                "ploidy": {
+                    "$ref": "#/$defs/WorkflowPloidy",
+                    "description": "The ploidy supported by the workflow."
+                },
+                "trs_id": {
+                    "description": "The workflow's TRS ID.",
+                    "type": "string"
+                },
+                "workflow_description": {
+                    "description": "The description of the workflow.",
+                    "type": "string"
+                },
+                "workflow_name": {
+                    "description": "The display name of the workflow.",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "trs_id",
+                "categories",
+                "ploidy",
+                "workflow_name",
+                "workflow_description"
+            ],
+            "title": "Workflow",
+            "type": "object"
+        },
+        "WorkflowCategoryId": {
+            "description": "Set of IDs of workflow categories.",
+            "enum": [
+                "VARIANT_CALLING",
+                "TRANSCRIPTOMICS",
+                "REGULATION",
+                "ASSEMBLY",
+                "GENOME_COMPARISONS",
+                "PROTEIN_FOLDING",
+                "OTHER"
+            ],
+            "title": "WorkflowCategoryId",
+            "type": "string"
+        },
+        "WorkflowPloidy": {
+            "description": "Possible ploidies supported by workflows.",
+            "enum": [
+                "ANY",
+                "DIPLOID",
+                "HAPLOID",
+                "POLYPLOID"
+            ],
+            "title": "WorkflowPloidy",
+            "type": "string"
+        },
+        "Workflows": {
+            "additionalProperties": false,
+            "description": "Object containing list of workflows.",
+            "properties": {
+                "workflows": {
+                    "description": "List of workflows.",
+                    "items": {
+                        "$ref": "#/$defs/Workflow"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "workflows"
+            ],
+            "title": "Workflows",
+            "type": "object"
+        }
+    },
+    "$id": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/workflows.yaml#",
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "additionalProperties": true,
+    "description": "Object containing list of workflows.",
+    "metamodel_version": "1.7.0",
+    "properties": {
+        "workflows": {
+            "description": "List of workflows.",
+            "items": {
+                "$ref": "#/$defs/Workflow"
+            },
+            "type": "array"
+        }
+    },
+    "required": [
+        "workflows"
+    ],
+    "title": "workflows",
+    "type": "object",
+    "version": null
+}

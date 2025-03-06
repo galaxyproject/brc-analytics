@@ -1,5 +1,57 @@
 # Changelog
 
+## [0.7.0](https://github.com/galaxyproject/brc-analytics/compare/v0.6.0...v0.7.0) (2025-03-03)
+
+
+### Features
+
+* add back all assemblies ([#323](https://github.com/galaxyproject/brc-analytics/issues/323)) ([#340](https://github.com/galaxyproject/brc-analytics/issues/340)) ([6bff3c8](https://github.com/galaxyproject/brc-analytics/commit/6bff3c898f00b206056f144484ee04d1cc87d4a9))
+* add filters for taxonomic levels to organisms list ([#301](https://github.com/galaxyproject/brc-analytics/issues/301)) ([#306](https://github.com/galaxyproject/brc-analytics/issues/306)) ([665a20a](https://github.com/galaxyproject/brc-analytics/commit/665a20afb8bfdf1dc0aba4c32841f0bbd379902b))
+* add taxonomic levels to assembly list ([#312](https://github.com/galaxyproject/brc-analytics/issues/312)) ([#316](https://github.com/galaxyproject/brc-analytics/issues/316)) ([06bdb3c](https://github.com/galaxyproject/brc-analytics/commit/06bdb3ce1765e43123da5199a03d3c7093fee83e))
+* added additional workflows ([#322](https://github.com/galaxyproject/brc-analytics/issues/322)) ([#335](https://github.com/galaxyproject/brc-analytics/issues/335)) ([8cab2ad](https://github.com/galaxyproject/brc-analytics/commit/8cab2ad655282fea804c2c6378d7601e4fa38765))
+* allow organisms to have multiple ploidies separately matched with workflows ([#334](https://github.com/galaxyproject/brc-analytics/issues/334)) ([#338](https://github.com/galaxyproject/brc-analytics/issues/338)) ([7ce865a](https://github.com/galaxyproject/brc-analytics/commit/7ce865ab35cc161e7dea08178998c766b3af3aef))
+
+
+### Styles
+
+* fix prettierignoring of catalog files ([#317](https://github.com/galaxyproject/brc-analytics/issues/317)) ([#318](https://github.com/galaxyproject/brc-analytics/issues/318)) ([9c97653](https://github.com/galaxyproject/brc-analytics/commit/9c97653ca99ebb307c9092e810009b720f42ac6e))
+
+## [0.6.0](https://github.com/galaxyproject/brc-analytics/compare/v0.5.1...v0.6.0) (2025-02-18)
+
+
+### Features
+
+* add instructions section to home page ([#278](https://github.com/galaxyproject/brc-analytics/issues/278)) ([#303](https://github.com/galaxyproject/brc-analytics/issues/303)) ([173f3b1](https://github.com/galaxyproject/brc-analytics/commit/173f3b14f28c3fbad08bdc0d08c1a7697d0d7099))
+* add linkml schemas for data source files ([#269](https://github.com/galaxyproject/brc-analytics/issues/269), [#270](https://github.com/galaxyproject/brc-analytics/issues/270)) ([#283](https://github.com/galaxyproject/brc-analytics/issues/283)) ([b208c53](https://github.com/galaxyproject/brc-analytics/commit/b208c53dba820b2d232cdd14047a04fa994a0264))
+* create catalog build python package ([#251](https://github.com/galaxyproject/brc-analytics/issues/251)) ([#258](https://github.com/galaxyproject/brc-analytics/issues/258)) ([c31cf6e](https://github.com/galaxyproject/brc-analytics/commit/c31cf6ece2d9e316471a42688fd945445a5bc19f))
+* derive workflows from yaml files ([#260](https://github.com/galaxyproject/brc-analytics/issues/260)) ([#265](https://github.com/galaxyproject/brc-analytics/issues/265)) ([0b42fd7](https://github.com/galaxyproject/brc-analytics/commit/0b42fd71cad4fb552be44b36ae87dbbff1588f38))
+* fetch raw/primary data information from sra ([#295](https://github.com/galaxyproject/brc-analytics/issues/295)) ([5ded790](https://github.com/galaxyproject/brc-analytics/commit/5ded7902ee02693e4b9c1c547c14a3cda913e7fa))
+* move assembly species from breadcrumbs to subtitle ([#276](https://github.com/galaxyproject/brc-analytics/issues/276)) ([#280](https://github.com/galaxyproject/brc-analytics/issues/280)) ([aedfc32](https://github.com/galaxyproject/brc-analytics/commit/aedfc32eef1635c040fc14e25949118a67d33110))
+* only show workflows with compatible ploidies ([#297](https://github.com/galaxyproject/brc-analytics/issues/297)) ([#299](https://github.com/galaxyproject/brc-analytics/issues/299)) ([9e2e04c](https://github.com/galaxyproject/brc-analytics/commit/9e2e04c832fe2c9cab6d28ecff42e7560e630f7a))
+* support multiple analysis methods per category ([#279](https://github.com/galaxyproject/brc-analytics/issues/279)) ([#296](https://github.com/galaxyproject/brc-analytics/issues/296)) ([57d55db](https://github.com/galaxyproject/brc-analytics/commit/57d55dbb13b5efbe00c73651b4445ef68775e727))
+* update workflow card for "Launch Galaxy" button ([#300](https://github.com/galaxyproject/brc-analytics/issues/300)) ([#302](https://github.com/galaxyproject/brc-analytics/issues/302)) ([1004775](https://github.com/galaxyproject/brc-analytics/commit/1004775a5c54c58f8ed78ccdfbfbb1b547fb926c))
+
+
+### Chores
+
+* delete unused `build-genomes-files.py` ([#267](https://github.com/galaxyproject/brc-analytics/issues/267)) ([#274](https://github.com/galaxyproject/brc-analytics/issues/274)) ([4032561](https://github.com/galaxyproject/brc-analytics/commit/4032561b6bb2425635c596074b004094eb3acb20))
+
+
+### Content
+
+* update main page ([#243](https://github.com/galaxyproject/brc-analytics/issues/243)) ([#259](https://github.com/galaxyproject/brc-analytics/issues/259)) ([bbdee9f](https://github.com/galaxyproject/brc-analytics/commit/bbdee9f6b06787eedc80304194043a06b2ba679d))
+
+
+### Documentation
+
+* add instructions for building the catalog and adding assemblies ([#266](https://github.com/galaxyproject/brc-analytics/issues/266)) ([#268](https://github.com/galaxyproject/brc-analytics/issues/268)) ([56110b9](https://github.com/galaxyproject/brc-analytics/commit/56110b9761d6317692dd08e7125079d927a011df))
+
+
+### Code Refactoring
+
+* remove unused workflows from catalog ([#272](https://github.com/galaxyproject/brc-analytics/issues/272)) ([#273](https://github.com/galaxyproject/brc-analytics/issues/273)) ([9d37334](https://github.com/galaxyproject/brc-analytics/commit/9d3733411910f9f7226feab67b78a054e2490205))
+* reorganize catalog folders ([#271](https://github.com/galaxyproject/brc-analytics/issues/271)) ([#281](https://github.com/galaxyproject/brc-analytics/issues/281)) ([b9e3a38](https://github.com/galaxyproject/brc-analytics/commit/b9e3a388992571dcde540e494a4bcf9c6e59b721))
+
 ## [0.5.1](https://github.com/galaxyproject/brc-analytics/compare/v0.5.0...v0.5.1) (2025-02-03)
 
 

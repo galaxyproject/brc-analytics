@@ -1,0 +1,37 @@
+id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/workflow_categories.yaml#
+name: workflow_categories
+description: Schema for source workflow categories list.
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+
+imports:
+  - linkml:types
+  - ./enums/workflow_category_id
+
+classes:
+  WorkflowCategories:
+    description: Object containing list of workflow categories.
+    tree_root: true
+    attributes:
+      workflow_categories:
+        description: List of workflow categories.
+        required: true
+        multivalued: true
+        range: WorkflowCategory
+
+  WorkflowCategory:
+    description: Workflow category.
+    attributes:
+      category:
+        description: The ID of the workflow category.
+        required: true
+        range: WorkflowCategoryId
+      name:
+        description: The display name of the workflow category.
+        required: true
+        range: string
+      description:
+        description: The description of the workflow category.
+        required: true
+        range: string

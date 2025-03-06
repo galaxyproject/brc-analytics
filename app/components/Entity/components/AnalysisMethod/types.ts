@@ -1,8 +1,11 @@
-import { ReactNode } from "react";
+import {
+  Workflow,
+  WorkflowCategory,
+} from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
 
 export interface Props {
-  content: ReactNode;
   geneModelUrl: string | null;
   genomeVersionAssemblyId: string;
-  workflowId: string;
+  workflowCategory: WorkflowCategory;
+  workflows: Workflow[];
 }

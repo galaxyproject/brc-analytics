@@ -1,0 +1,10 @@
+id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/enums/organism_ploidy.yaml#
+name: enums_organism_ploidy
+
+enums:
+  OrganismPloidy:
+    description: Possible ploidies of an organism.
+    permissible_values:
+      DIPLOID:
+      HAPLOID:
+      POLYPLOID:

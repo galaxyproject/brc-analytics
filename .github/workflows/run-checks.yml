@@ -2,15 +2,41 @@ name: Run checks
 on: [pull_request]
 
 jobs:
-  build:
+  run-checks:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: "20.10.0"
-      - run: |
-          npm ci
-          npm run check-format
-          npm run lint
-          npx tsc --noEmit
+      - name: Cache npm cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+      - name: Install dependencies
+        run: npm ci
+      - name: Run Prettier
+        run: npm run check-format
+      - name: Run Linter (ESLint)
+        run: npm run lint
+      - name: Type Check
+        run: npx tsc --noEmit
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.4"
+          cache: "pip"
+          cache-dependency-path: "./catalog/build/py/requirements.txt"
+      - name: Install Python dependencies
+        run: pip install -r ./catalog/build/py/requirements.txt
+      - name: Run linkml-lint
+        # Run linting on the LinkML schemas, to enforce conventions such as in naming, and to catch simple errors.
+        run: linkml-lint ./catalog/schema --validate --verbose
+      - name: Test LinkML Python generation
+        # Generate Python code from the main LinkML schemas, discarding the output; this will catch more subtle errors such as references to nonexistent elements.
+        run: npm run test-gen-python
+      - name: Validate catalog files
+        # Validate the catalog source files against their corresponding LinkML schemas.
+        run: npm run validate-catalog

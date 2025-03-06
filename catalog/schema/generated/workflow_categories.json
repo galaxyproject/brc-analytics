@@ -1,0 +1,81 @@
+{
+    "$defs": {
+        "WorkflowCategories": {
+            "additionalProperties": false,
+            "description": "Object containing list of workflow categories.",
+            "properties": {
+                "workflow_categories": {
+                    "description": "List of workflow categories.",
+                    "items": {
+                        "$ref": "#/$defs/WorkflowCategory"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "workflow_categories"
+            ],
+            "title": "WorkflowCategories",
+            "type": "object"
+        },
+        "WorkflowCategory": {
+            "additionalProperties": false,
+            "description": "Workflow category.",
+            "properties": {
+                "category": {
+                    "$ref": "#/$defs/WorkflowCategoryId",
+                    "description": "The ID of the workflow category."
+                },
+                "description": {
+                    "description": "The description of the workflow category.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "The display name of the workflow category.",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "category",
+                "name",
+                "description"
+            ],
+            "title": "WorkflowCategory",
+            "type": "object"
+        },
+        "WorkflowCategoryId": {
+            "description": "Set of IDs of workflow categories.",
+            "enum": [
+                "VARIANT_CALLING",
+                "TRANSCRIPTOMICS",
+                "REGULATION",
+                "ASSEMBLY",
+                "GENOME_COMPARISONS",
+                "PROTEIN_FOLDING",
+                "OTHER"
+            ],
+            "title": "WorkflowCategoryId",
+            "type": "string"
+        }
+    },
+    "$id": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/workflow_categories.yaml#",
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "additionalProperties": true,
+    "description": "Object containing list of workflow categories.",
+    "metamodel_version": "1.7.0",
+    "properties": {
+        "workflow_categories": {
+            "description": "List of workflow categories.",
+            "items": {
+                "$ref": "#/$defs/WorkflowCategory"
+            },
+            "type": "array"
+        }
+    },
+    "required": [
+        "workflow_categories"
+    ],
+    "title": "workflow_categories",
+    "type": "object",
+    "version": null
+}

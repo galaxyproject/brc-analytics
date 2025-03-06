@@ -1,3 +1,5 @@
+import { ORGANISM_PLOIDY, WORKFLOW_PLOIDY } from "./schema-entities";
+
 export type BRCCatalog = BRCDataCatalogGenome;
 
 export interface BRCDataCatalogGenome {
@@ -5,19 +7,28 @@ export interface BRCDataCatalogGenome {
   annotationStatus: string | null;
   chromosomes: number | null;
   coverage: string | null;
-  gcPercent: number;
+  gcPercent: number | null;
   geneModelUrl: string | null;
   isRef: string;
   length: number;
   level: string;
   ncbiTaxonomyId: string;
+  ploidy: ORGANISM_PLOIDY[];
   scaffoldCount: number | null;
   scaffoldL50: number | null;
   scaffoldN50: number | null;
-  species: string;
   speciesTaxonomyId: string;
-  strain: string | null;
+  strainName: string | null;
   taxonomicGroup: string[];
+  taxonomicLevelClass: string;
+  taxonomicLevelFamily: string;
+  taxonomicLevelGenus: string;
+  taxonomicLevelKingdom: string;
+  taxonomicLevelOrder: string;
+  taxonomicLevelPhylum: string;
+  taxonomicLevelSpecies: string;
+  taxonomicLevelStrain: string;
+  taxonomicLevelSuperkingdom: string;
   ucscBrowserUrl: string | null;
 }
 
@@ -26,8 +37,16 @@ export interface BRCDataCatalogOrganism {
   assemblyTaxonomyIds: string[];
   genomes: BRCDataCatalogGenome[];
   ncbiTaxonomyId: string;
-  species: string;
   taxonomicGroup: string[];
+  taxonomicLevelClass: string;
+  taxonomicLevelFamily: string;
+  taxonomicLevelGenus: string;
+  taxonomicLevelKingdom: string;
+  taxonomicLevelOrder: string;
+  taxonomicLevelPhylum: string;
+  taxonomicLevelSpecies: string;
+  taxonomicLevelStrain: string[];
+  taxonomicLevelSuperkingdom: string;
 }
 
 export interface EntitiesResponse<R> {
@@ -44,9 +63,9 @@ export interface EntitiesResponsePagination {
 }
 
 export interface WorkflowCategory {
+  category: string;
   description: string;
   name: string;
-  type: string;
   workflows: Workflow[];
 }
 
@@ -55,9 +74,4 @@ export interface Workflow {
   trsId: string;
   workflowDescription: string;
   workflowName: string;
-}
-
-export enum WORKFLOW_PLOIDY {
-  ANY = "any",
-  HAPLOID = "haploid",
 }

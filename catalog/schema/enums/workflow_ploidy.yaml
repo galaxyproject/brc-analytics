@@ -1,0 +1,11 @@
+id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/enums/workflow_ploidy.yaml#
+name: enums_workflow_ploidy
+
+enums:
+  WorkflowPloidy:
+    description: Possible ploidies supported by workflows.
+    permissible_values:
+      ANY:
+      DIPLOID:
+      HAPLOID:
+      POLYPLOID:

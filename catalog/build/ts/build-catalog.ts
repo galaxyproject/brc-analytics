@@ -7,13 +7,16 @@ import {
   WorkflowCategory,
 } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import {
-  SourceGenome,
-  SourceWorkflow,
-  SourceWorkflowCategories,
-  SourceWorkflows,
-} from "./entities";
+  Organisms as SourceOrganisms,
+  Workflow as SourceWorkflow,
+  WorkflowCategories as SourceWorkflowCategories,
+  Workflows as SourceWorkflows,
+} from "../../schema/generated/schema";
+import { SourceGenome } from "./entities";
+import { SOURCE_GENOME_KEYS } from "./constants";
 
 const SOURCE_PATH_GENOMES = "catalog/build/intermediate/genomes-from-ncbi.tsv";
+const SOURCE_PATH_ORGANISMS = "catalog/source/organisms.yml";
 const SOURCE_PATH_WORKFLOW_CATEGORIES =
   "catalog/source/workflow_categories.yml";
 const SOURCE_PATH_WORKFLOWS = "catalog/source/workflows.yml";
@@ -38,29 +41,68 @@ async function buildCatalog(): Promise<void> {
 }
 
 async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
-  const sourceRows = await readValuesFile<SourceGenome>(SOURCE_PATH_GENOMES);
-  const mappedRows = sourceRows.map((row): BRCDataCatalogGenome => {
-    return {
+  const sourceRows = await readValuesFile<SourceGenome>(
+    SOURCE_PATH_GENOMES,
+    undefined,
+    SOURCE_GENOME_KEYS
+  );
+  const sourceOrganisms = await readYamlFile<SourceOrganisms>(
+    SOURCE_PATH_ORGANISMS
+  );
+  const sourceOrganismsByTaxonomyId = new Map(
+    sourceOrganisms.organisms.map((sourceOrganism) => [
+      String(sourceOrganism.taxonomy_id),
+      sourceOrganism,
+    ])
+  );
+  const mappedRows: BRCDataCatalogGenome[] = [];
+  for (const row of sourceRows) {
+    const ploidy = sourceOrganismsByTaxonomyId.get(
+      row.speciesTaxonomyId
+    )?.ploidy;
+    if (ploidy === undefined) {
+      console.log(
+        `Skipping assembly ${row.accession} [tax_id: ${row.speciesTaxonomyId}] - ploidy not found`
+      );
+      continue;
+    }
+    const taxonomicLevelStrain =
+      row.taxonomicLevelStrain ||
+      (row.strain
+        ? `${row.taxonomicLevelSpecies} strain ${row.strain}`
+        : "None");
+    mappedRows.push({
       accession: row.accession,
       annotationStatus: parseStringOrNull(row.annotationStatus),
       chromosomes: parseNumberOrNull(row.chromosomeCount),
       coverage: parseStringOrNull(row.coverage),
-      gcPercent: parseNumber(row.gcPercent),
+      gcPercent: parseNumberOrNull(row.gcPercent),
       geneModelUrl: parseStringOrNull(row.geneModelUrl),
       isRef: parseBoolean(row.isRef),
       length: parseNumber(row.length),
       level: row.level,
       ncbiTaxonomyId: row.taxonomyId,
+      ploidy,
       scaffoldCount: parseNumberOrNull(row.scaffoldCount),
       scaffoldL50: parseNumberOrNull(row.scaffoldL50),
       scaffoldN50: parseNumberOrNull(row.scaffoldN50),
-      species: row.species,
       speciesTaxonomyId: row.speciesTaxonomyId,
-      strain: parseStringOrNull(row.strain),
+      strainName: parseStringOrNull(row.strain),
       taxonomicGroup: row.taxonomicGroup ? row.taxonomicGroup.split(",") : [],
+      taxonomicLevelClass: defaultStringToNone(row.taxonomicLevelClass),
+      taxonomicLevelFamily: defaultStringToNone(row.taxonomicLevelFamily),
+      taxonomicLevelGenus: defaultStringToNone(row.taxonomicLevelGenus),
+      taxonomicLevelKingdom: defaultStringToNone(row.taxonomicLevelKingdom),
+      taxonomicLevelOrder: defaultStringToNone(row.taxonomicLevelOrder),
+      taxonomicLevelPhylum: defaultStringToNone(row.taxonomicLevelPhylum),
+      taxonomicLevelSpecies: defaultStringToNone(row.taxonomicLevelSpecies),
+      taxonomicLevelStrain,
+      taxonomicLevelSuperkingdom: defaultStringToNone(
+        row.taxonomicLevelSuperkingdom
+      ),
       ucscBrowserUrl: parseStringOrNull(row.ucscBrowser),
-    };
-  });
+    });
+  }
   return mappedRows.sort((a, b) => a.accession.localeCompare(b.accession));
 }
 
@@ -85,13 +127,25 @@ function buildOrganism(
 ): BRCDataCatalogOrganism {
   return {
     assemblyCount: (organism?.assemblyCount ?? 0) + 1,
-    assemblyTaxonomyIds: Array.from(
-      new Set([...(organism?.assemblyTaxonomyIds ?? []), genome.ncbiTaxonomyId])
+    assemblyTaxonomyIds: accumulateArrayValue(
+      organism?.assemblyTaxonomyIds,
+      genome.ncbiTaxonomyId
     ),
-    genomes: [...(organism?.genomes ?? []), genome],
+    genomes: accumulateArrayValue(organism?.genomes, genome),
     ncbiTaxonomyId: genome.speciesTaxonomyId,
-    species: genome.species,
     taxonomicGroup: genome.taxonomicGroup,
+    taxonomicLevelClass: genome.taxonomicLevelClass,
+    taxonomicLevelFamily: genome.taxonomicLevelFamily,
+    taxonomicLevelGenus: genome.taxonomicLevelGenus,
+    taxonomicLevelKingdom: genome.taxonomicLevelKingdom,
+    taxonomicLevelOrder: genome.taxonomicLevelOrder,
+    taxonomicLevelPhylum: genome.taxonomicLevelPhylum,
+    taxonomicLevelSpecies: genome.taxonomicLevelSpecies,
+    taxonomicLevelStrain: accumulateArrayValue(
+      organism?.taxonomicLevelStrain,
+      genome.taxonomicLevelStrain
+    ),
+    taxonomicLevelSuperkingdom: genome.taxonomicLevelSuperkingdom,
   };
 }
 
@@ -105,10 +159,10 @@ async function buildWorkflows(): Promise<WorkflowCategory[]> {
 
   const workflowCategories: WorkflowCategory[] =
     sourceWorkflowCategories.workflow_categories.map(
-      ({ description, name, type }) => ({
+      ({ category, description, name }) => ({
+        category,
         description,
         name,
-        type,
         workflows: [],
       })
     );
@@ -123,33 +177,46 @@ async function buildWorkflows(): Promise<WorkflowCategory[]> {
 function buildWorkflow(
   workflowCategories: WorkflowCategory[],
   {
+    categories,
     ploidy,
     trs_id: trsId,
-    type,
     workflow_description: workflowDescription,
     workflow_name: workflowName,
   }: SourceWorkflow
 ): void {
-  const category = workflowCategories.find((c) => c.type === type);
-  if (!category) throw new Error(`Unknown workflow category: ${type}`);
-  category.workflows.push({
-    ploidy,
-    trsId,
-    workflowDescription,
-    workflowName,
-  });
+  for (const category of categories) {
+    const workflowCategory = workflowCategories.find(
+      (c) => c.category === category
+    );
+    if (!workflowCategory)
+      throw new Error(`Unknown workflow category: ${category}`);
+    workflowCategory.workflows.push({
+      ploidy,
+      trsId,
+      workflowDescription,
+      workflowName,
+    });
+  }
 }
 
 async function readValuesFile<T>(
   filePath: string,
-  delimiter = "\t"
+  delimiter = "\t",
+  checkKeys?: readonly string[]
 ): Promise<T[]> {
   const content = await fsp.readFile(filePath, "utf8");
-  return parseCsv(content, {
+  const result = parseCsv(content, {
     columns: true,
     delimiter,
     relax_quotes: true,
   });
+  if (checkKeys && result[0]) {
+    for (const key of checkKeys) {
+      if (!Object.hasOwn(result[0], key))
+        throw new Error(`Missing column ${JSON.stringify(key)} in ${filePath}`);
+    }
+  }
+  return result;
 }
 
 async function readYamlFile<T>(filePath: string): Promise<T> {
@@ -159,6 +226,16 @@ async function readYamlFile<T>(filePath: string): Promise<T> {
 
 async function saveJson(filePath: string, data: unknown): Promise<void> {
   await fsp.writeFile(filePath, JSON.stringify(data, undefined, 2) + "\n");
+}
+
+function accumulateArrayValue<T>(array: T[] | undefined, value: T): T[] {
+  if (!array) return [value];
+  if (array.includes(value)) return array;
+  return [...array, value];
+}
+
+function defaultStringToNone(value: string): string {
+  return value || "None";
 }
 
 function parseStringOrNull(value: string): string | null {

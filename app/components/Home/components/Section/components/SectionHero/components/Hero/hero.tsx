@@ -3,10 +3,7 @@ import {
   FILL,
   GRID_SIZE,
 } from "../../../../../../../Layout/components/Hero/common/constants";
-import {
-  ELEMENT_ID,
-  Height,
-} from "../../../../../../../Layout/components/Hero/common/entities";
+import { ELEMENT_ID } from "../../../../../../../Layout/components/Hero/common/entities";
 import {
   getFillUrl,
   getViewBox,
@@ -21,7 +18,7 @@ import { SVG } from "./hero.styles";
 
 export interface HeroProps {
   gridSize?: number;
-  height?: Height;
+  height?: number;
 }
 
 export const Hero = ({
