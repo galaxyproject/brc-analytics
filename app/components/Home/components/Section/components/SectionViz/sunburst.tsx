@@ -1,13 +1,13 @@
-import { 
-  select, 
-  scaleOrdinal, 
-  schemeTableau10, 
-  hsl, 
-  hierarchy, 
-  partition, 
+import {
+  select,
+  scaleOrdinal,
+  schemeTableau10,
+  hsl,
+  hierarchy,
+  partition,
   arc as d3Arc,
   interpolate,
-  transition as d3Transition
+  transition as d3Transition,
 } from "d3";
 import { useRef, useEffect, useState } from "react";
 import { getData } from "./data";
@@ -40,49 +40,57 @@ export const SectionViz = (): JSX.Element => {
     // Function to get equidistant colors from the palette
     function getEquidistantColors(palette, count) {
       const result = [];
-      
+
       // If we need just one color, return a color 25% of the way along the palette
       if (count === 1) {
         const quarterIndex = Math.floor(palette.length * 0.25);
         return [palette[quarterIndex]];
       }
-      
+
       // Trim 5% from each end of the palette
       // these colors in continuous palettes tend to be very dark or very light
       const trimPercentage = 0.05;
       const trimAmount = Math.floor(palette.length * trimPercentage);
-      const trimmedPalette = palette.slice(trimAmount, palette.length - trimAmount);
-      
+      const trimmedPalette = palette.slice(
+        trimAmount,
+        palette.length - trimAmount
+      );
+
       // Calculate step size to get equidistant colors from the trimmed palette
       const step = (trimmedPalette.length - 1) / (count - 1);
-      
+
       for (let i = 0; i < count; i++) {
         const index = Math.min(Math.round(i * step), trimmedPalette.length - 1);
         result.push(trimmedPalette[index]);
       }
-      
+
       return result;
     }
 
     // Function to create a color mapping for a given root node
     function createColorMapping(rootNode) {
       // Get the unique first-level children to determine how many colors we need
-      const firstLevelChildren = rootNode.children ? rootNode.children.map(child => child.data.name) : [];
+      const firstLevelChildren = rootNode.children
+        ? rootNode.children.map((child) => child.data.name)
+        : [];
       const uniqueFirstLevelNames = [...new Set(firstLevelChildren)];
-      
+
       // Reverse the color scheme before getting equidistant colors
       // this just for aesthetics w the particular color scheme were using
       const reversedColorScheme = [...colorScheme].reverse();
-      
+
       // Get equidistant colors from the reversed palette
-      const discreteColors = getEquidistantColors(reversedColorScheme, uniqueFirstLevelNames.length);
-      
+      const discreteColors = getEquidistantColors(
+        reversedColorScheme,
+        uniqueFirstLevelNames.length
+      );
+
       // Create a color mapping for first-level children
       const mapping = {};
       uniqueFirstLevelNames.forEach((name, index) => {
         mapping[name] = discreteColors[index];
       });
-      
+
       return mapping;
     }
 
@@ -120,9 +128,12 @@ export const SectionViz = (): JSX.Element => {
       if (currentRoot !== root && currentRoot.colorMap === undefined) {
         currentRoot.colorMap = createColorMapping(currentRoot);
       }
-      
+
       // Use the appropriate color map
-      const map = (currentRoot !== root && currentRoot.colorMap) ? currentRoot.colorMap : colorMap;
+      const map =
+        currentRoot !== root && currentRoot.colorMap
+          ? currentRoot.colorMap
+          : colorMap;
       return map[name] || "#ccc"; // Fallback to gray if name not found
     };
 
@@ -130,31 +141,31 @@ export const SectionViz = (): JSX.Element => {
     function getNodeColor(d, currentRoot): string {
       // Adjust depth relative to current root
       const relativeDepth = d.depth - currentRoot.depth;
-      
+
       if (relativeDepth === 0) return "#555"; // Current root is dark gray
       if (relativeDepth === 1) return baseColor(d.data.name, currentRoot); // Direct children of root get discrete colors
-      
+
       // For descendants, get the color of their direct child of the root ancestor and modify it
       const rootChild = findRootChild(d, currentRoot);
       if (!rootChild) return "#ccc"; // fallback
-      
+
       const baseColorHsl = hsl(baseColor(rootChild.data.name, currentRoot));
-      
+
       // Increase lightness and decrease saturation as we go deeper
       const lightnessFactor = 0.05 * (relativeDepth - 1);
       const saturationFactor = 0.1 * (relativeDepth - 1);
-      
+
       return hsl(
         baseColorHsl.h,
         Math.max(0, baseColorHsl.s - saturationFactor),
         Math.min(1, baseColorHsl.l + lightnessFactor)
       ).toString();
     }
-    
+
     // Helper function to find the ancestor that is a direct child of the current root
     function findRootChild(node, root) {
       if (node === root) return null;
-      
+
       const ancestors = node.ancestors();
       // Find the ancestor that is a direct child of root
       for (let i = 0; i < ancestors.length; i++) {
@@ -311,7 +322,7 @@ export const SectionViz = (): JSX.Element => {
           ...p.data,
           depth: p.depth,
           height: p.height,
-          value: p.value
+          value: p.value,
         });
         return;
       }
@@ -395,7 +406,10 @@ export const SectionViz = (): JSX.Element => {
       </div>
       <div style={{ padding: "1rem", width: "30%" }}>
         {selectedNode ? (
-          <NodeDetails node={selectedNode} onClose={() => setSelectedNode(null)} />
+          <NodeDetails
+            node={selectedNode}
+            onClose={() => setSelectedNode(null)}
+          />
         ) : (
           <p>No node selected</p>
         )}

@@ -39,36 +39,39 @@ function createFilterUrl(rank?: string, name?: string): string | null {
 
   // Convert rank to the expected format for the filter
   const rankMap: Record<string, string> = {
-    "superkingdom": "taxonomicLevelSuperkingdom",
-    "kingdom": "taxonomicLevelKingdom",
-    "phylum": "taxonomicLevelPhylum",
-    "class": "taxonomicLevelClass",
-    "order": "taxonomicLevelOrder",
-    "family": "taxonomicLevelFamily",
-    "genus": "taxonomicLevelGenus",
-    "species": "taxonomicLevelSpecies"
+    class: "taxonomicLevelClass",
+    family: "taxonomicLevelFamily",
+    genus: "taxonomicLevelGenus",
+    kingdom: "taxonomicLevelKingdom",
+    order: "taxonomicLevelOrder",
+    phylum: "taxonomicLevelPhylum",
+    species: "taxonomicLevelSpecies",
+    superkingdom: "taxonomicLevelSuperkingdom",
   };
-  
+
   const categoryKey = rankMap[rank.toLowerCase()] || "taxonomicLevelGenus";
-  
+
   // Create the filter object
   const filter = [
     {
       categoryKey,
-      value: [name]
-    }
+      value: [name],
+    },
   ];
-  
+
   // Encode the filter as a URL parameter
   return `/data/assemblies?filter=${encodeURIComponent(JSON.stringify(filter))}`;
 }
 
-export const NodeDetails: React.FC<NodeDetailsProps> = ({ node, onClose }) => {
+export const NodeDetails: React.FC<NodeDetailsProps> = ({
+  node,
+  onClose,
+}): JSX.Element => {
   const leafNodeCount = node ? countLeafNodes(node) : 0;
   const isRoot = node?.depth === 0;
-  
+
   // Get node name and rank safely
-  const nodeName = node?.data?.name || "Unknown";
+  const nodeName = node?.data?.name || node?.name || "Unknown";
   const nodeRank = node?.data?.rank || "Unknown";
 
   if (isRoot) {
@@ -86,19 +89,25 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({ node, onClose }) => {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div
+        style={{
+          alignItems: "center",
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
         <h3>
           {nodeName} {nodeRank !== "Unknown" && <em>({nodeRank})</em>}
         </h3>
         {onClose && (
-          <button 
+          <button
             onClick={onClose}
-            style={{ 
-              background: 'none', 
-              border: 'none', 
-              cursor: 'pointer',
-              fontSize: '1.2rem',
-              color: '#666'
+            style={{
+              background: "none",
+              border: "none",
+              color: "#666",
+              cursor: "pointer",
+              fontSize: "1.2rem",
             }}
           >
             ×
@@ -106,13 +115,24 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({ node, onClose }) => {
         )}
       </div>
       <p>Available Assemblies: {leafNodeCount}</p>
+      {node?.value !== undefined && <p>Number of Organisms: {node.value}</p>}
+      {node?.height === 0 && node?.data?.ncbi_tax_id && (
+        <>
+          <p>NCBI Taxonomy ID: {node.data.ncbi_tax_id}</p>
+          <p>
+            <a
+              href={`/data/organisms/${node.data.ncbi_tax_id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View Organism Page →
+            </a>
+          </p>
+        </>
+      )}
       {filterUrl && (
         <p>
-          <a
-            href={filterUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href={filterUrl} target="_blank" rel="noopener noreferrer">
             View All Assemblies →
           </a>
         </p>
