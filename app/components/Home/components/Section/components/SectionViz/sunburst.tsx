@@ -305,13 +305,22 @@ export const SectionViz = (): JSX.Element => {
     // Zoom handler: when a node is clicked, re-root the chart at that node and
     // display up to DEPTH layers (i.e. its children, grandchildren, and great-grandchildren).
     function clicked(event, p) {
-      // Don't zoom if we're clicking on the current root
-      if (p === currentRoot) return;
+      // If the node has no children or is a leaf node, show details
+      if (!p.children || p.children.length === 0) {
+        setSelectedNode({
+          ...p.data,
+          depth: p.depth,
+          height: p.height,
+          value: p.value
+        });
+        return;
+      }
 
+      // Otherwise, zoom to the clicked node
       // Update the current root reference
       currentRoot = p;
       updateCenter(p);
-      setSelectedNode(p);
+      setSelectedNode(currentRoot);
       console.debug(p);
 
       // For each node, compute new coordinates relative to p.
@@ -373,7 +382,6 @@ export const SectionViz = (): JSX.Element => {
   }, []);
 
   return (
-    /* <!-- todo: use standard section layouts... --> */
     <div
       style={{
         display: "flex",
@@ -383,11 +391,11 @@ export const SectionViz = (): JSX.Element => {
       }}
     >
       <div style={{ display: "flex", justifyContent: "center", width: "70%" }}>
-        <svg ref={svgRef}></svg>
+        <svg ref={svgRef} width="100%" height="800"></svg>
       </div>
       <div style={{ padding: "1rem", width: "30%" }}>
         {selectedNode ? (
-          <NodeDetails node={selectedNode} />
+          <NodeDetails node={selectedNode} onClose={() => setSelectedNode(null)} />
         ) : (
           <p>No node selected</p>
         )}
