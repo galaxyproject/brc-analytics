@@ -118,36 +118,36 @@ async function buildRunReadFields(
   const sourceRows = await response.json();
   const mappedRows: RunReadsFields[] = [
     {
-      "description": "AND statment",
-      "name": "AND",      
-      "type": "expression"
+      description: "AND statment",
+      name: "AND",      
+      type: "expression"
     },
     {
-      "description": "OR statement",
-      "name": "OR",
-      "type": "expression"
+      description: "OR statement",
+      name: "OR",
+      type: "expression"
     },
     {
-      "description": "starting paranthesis",
-      "name": "(",
-      "type": "expression"
+      description: "starting paranthesis",
+      name: "(",
+      type: "expression"
     },
     {
-      "description": "ending paranthesis",
-      "name": ")",
-      "type": "expression"
+      description: "ending paranthesis",
+      name: ")",
+      type: "expression"
     },
     {
-      "description": "GCF/GCA accession id",
-      "name": "accession",
-      "type": "string"
+      description: "GCF/GCA accession id",
+      name: "accession",
+      type: "string"
     }
   ];
-  for (const row of sourceRows) { 
+  for (const row of sourceRows) {
     mappedRows.push({
       description: row.description,
       name: row.columnId,
-      type: row.type
+      type: row.type,
     });
   }
 
