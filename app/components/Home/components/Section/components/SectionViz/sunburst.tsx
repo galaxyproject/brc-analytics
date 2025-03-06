@@ -12,6 +12,7 @@ import {
 import { useRef, useEffect, useState } from "react";
 import { getData } from "./data";
 import { TreeNode, NodeDetails } from "./NodeDetails";
+import { cyclic_roma_vibrant as colorScheme } from "../../../../../../../color-maps/crameri";
 
 const DEPTH = 4;
 const data = getData();
@@ -36,46 +37,53 @@ export const SectionViz = (): JSX.Element => {
       .attr("viewBox", [-width / 2, -height / 2, width, width])
       .style("font", "10px sans-serif");
 
-    // Define a color scale for base colors (root and first ring)
-    const baseColor = scaleOrdinal(schemeTableau10);
-
-    // Helper function to get color for a node based on the current root
-    function getNodeColor(d, root): string {
-      // Adjust depth relative to current root
-      const relativeDepth = d.depth - root.depth;
+    // Function to get equidistant colors from the palette
+    function getEquidistantColors(palette, count) {
+      const result = [];
       
-      if (relativeDepth === 0) return "#555"; // Current root is dark gray
-      if (relativeDepth === 1) return baseColor(d.data.name); // Direct children of root get base colors
-      
-      // For descendants, get the color of their direct child of the root ancestor and modify it
-      const rootChild = findRootChild(d, root);
-      if (!rootChild) return "#ccc"; // fallback
-      
-      const baseColorHsl = hsl(baseColor(rootChild.data.name));
-      
-      // Increase lightness and decrease saturation as we go deeper
-      const lightnessFactor = 0.05 * (relativeDepth - 1);
-      const saturationFactor = 0.1 * (relativeDepth - 1);
-      
-      return hsl(
-        baseColorHsl.h,
-        Math.max(0, baseColorHsl.s - saturationFactor),
-        Math.min(1, baseColorHsl.l + lightnessFactor)
-      ).toString();
-    }
-    
-    // Helper function to find the ancestor that is a direct child of the current root
-    function findRootChild(node, root) {
-      if (node === root) return null;
-      
-      const ancestors = node.ancestors();
-      // Find the ancestor that is a direct child of root
-      for (let i = 0; i < ancestors.length; i++) {
-        if (ancestors[i].parent === root) {
-          return ancestors[i];
-        }
+      // If we need just one color, return a color 25% of the way along the palette
+      if (count === 1) {
+        const quarterIndex = Math.floor(palette.length * 0.25);
+        return [palette[quarterIndex]];
       }
-      return null;
+      
+      // Trim 5% from each end of the palette
+      // these colors in continuous palettes tend to be very dark or very light
+      const trimPercentage = 0.05;
+      const trimAmount = Math.floor(palette.length * trimPercentage);
+      const trimmedPalette = palette.slice(trimAmount, palette.length - trimAmount);
+      
+      // Calculate step size to get equidistant colors from the trimmed palette
+      const step = (trimmedPalette.length - 1) / (count - 1);
+      
+      for (let i = 0; i < count; i++) {
+        const index = Math.min(Math.round(i * step), trimmedPalette.length - 1);
+        result.push(trimmedPalette[index]);
+      }
+      
+      return result;
+    }
+
+    // Function to create a color mapping for a given root node
+    function createColorMapping(rootNode) {
+      // Get the unique first-level children to determine how many colors we need
+      const firstLevelChildren = rootNode.children ? rootNode.children.map(child => child.data.name) : [];
+      const uniqueFirstLevelNames = [...new Set(firstLevelChildren)];
+      
+      // Reverse the color scheme before getting equidistant colors
+      // this just for aesthetics w the particular color scheme were using
+      const reversedColorScheme = [...colorScheme].reverse();
+      
+      // Get equidistant colors from the reversed palette
+      const discreteColors = getEquidistantColors(reversedColorScheme, uniqueFirstLevelNames.length);
+      
+      // Create a color mapping for first-level children
+      const mapping = {};
+      uniqueFirstLevelNames.forEach((name, index) => {
+        mapping[name] = discreteColors[index];
+      });
+      
+      return mapping;
     }
 
     // Create a tooltip for interactivity
@@ -102,6 +110,60 @@ export const SectionViz = (): JSX.Element => {
     );
 
     root.each((d) => (d.current = d));
+
+    // Create initial color mapping
+    let colorMap = createColorMapping(root);
+
+    // Define a color scale for base colors (root and first ring)
+    const baseColor = (name, currentRoot) => {
+      // If we have a new root, we need to update the color mapping
+      if (currentRoot !== root && currentRoot.colorMap === undefined) {
+        currentRoot.colorMap = createColorMapping(currentRoot);
+      }
+      
+      // Use the appropriate color map
+      const map = (currentRoot !== root && currentRoot.colorMap) ? currentRoot.colorMap : colorMap;
+      return map[name] || "#ccc"; // Fallback to gray if name not found
+    };
+
+    // Helper function to get color for a node based on the current root
+    function getNodeColor(d, currentRoot): string {
+      // Adjust depth relative to current root
+      const relativeDepth = d.depth - currentRoot.depth;
+      
+      if (relativeDepth === 0) return "#555"; // Current root is dark gray
+      if (relativeDepth === 1) return baseColor(d.data.name, currentRoot); // Direct children of root get discrete colors
+      
+      // For descendants, get the color of their direct child of the root ancestor and modify it
+      const rootChild = findRootChild(d, currentRoot);
+      if (!rootChild) return "#ccc"; // fallback
+      
+      const baseColorHsl = hsl(baseColor(rootChild.data.name, currentRoot));
+      
+      // Increase lightness and decrease saturation as we go deeper
+      const lightnessFactor = 0.05 * (relativeDepth - 1);
+      const saturationFactor = 0.1 * (relativeDepth - 1);
+      
+      return hsl(
+        baseColorHsl.h,
+        Math.max(0, baseColorHsl.s - saturationFactor),
+        Math.min(1, baseColorHsl.l + lightnessFactor)
+      ).toString();
+    }
+    
+    // Helper function to find the ancestor that is a direct child of the current root
+    function findRootChild(node, root) {
+      if (node === root) return null;
+      
+      const ancestors = node.ancestors();
+      // Find the ancestor that is a direct child of root
+      for (let i = 0; i < ancestors.length; i++) {
+        if (ancestors[i].parent === root) {
+          return ancestors[i];
+        }
+      }
+      return null;
+    }
 
     // Create a partition layout (compute the full layout even though we display only DEPTH layers)
     partition().size([2 * Math.PI, root.height + 1])(root);
@@ -243,7 +305,10 @@ export const SectionViz = (): JSX.Element => {
     // Zoom handler: when a node is clicked, re-root the chart at that node and
     // display up to DEPTH layers (i.e. its children, grandchildren, and great-grandchildren).
     function clicked(event, p) {
-      // Update the current center and the center label.
+      // Don't zoom if we're clicking on the current root
+      if (p === currentRoot) return;
+
+      // Update the current root reference
       currentRoot = p;
       updateCenter(p);
       setSelectedNode(p);
