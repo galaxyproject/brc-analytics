@@ -46,10 +46,36 @@ export interface EntitiesResponsePagination {
   total: number;
 }
 
+export interface ENAAssembly {
+  assembly_set_accession: string;
+  sample_accession: string;
+}
+
+export interface ENAReadRuns {
+  accession: string;
+  base_count: string;
+  sample_accession: string;
+  studies_accession: string;
+}
+
+export interface PrimaryDataApiResult {
+  count: number;
+  data: [];
+  error: string;
+  status: number;
+}
+
 export interface RunReadsFields {
+  description: string;
   name: string;
-  descritption: string;
   type: string;
+}
+
+export interface ReadRunStatistics {
+  bases: number;
+  biosamples: number;
+  read_runs: number;
+  studies: number;
 }
 
 export interface WorkflowCategory {

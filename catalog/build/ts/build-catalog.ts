@@ -14,7 +14,6 @@ import {
   Workflows as SourceWorkflows,
 } from "../../schema/generated/schema";
 import { SourceGenome } from "./entities";
-import { Url } from "next/dist/shared/lib/router/router";
 
 const SOURCE_PATH_GENOMES = "catalog/build/intermediate/genomes-from-ncbi.tsv";
 const SOURCE_PATH_ORGANISMS = "catalog/source/organisms.yml";
@@ -117,19 +116,41 @@ async function buildRunReadFields(
 ): Promise<RunReadsFields[]> {
   const response = await fetch(filePath);
   const sourceRows = await response.json();
-  const mappedRows: RunReadsFields[] = [];
+  const mappedRows: RunReadsFields[] = [
+    {
+      "description": "AND statment",
+      "name": "AND",      
+      "type": "expression"
+    },
+    {
+      "description": "OR statement",
+      "name": "OR",
+      "type": "expression"
+    },
+    {
+      "description": "starting paranthesis",
+      "name": "(",
+      "type": "expression"
+    },
+    {
+      "description": "ending paranthesis",
+      "name": ")",
+      "type": "expression"
+    },
+    {
+      "description": "GCF/GCA accession id",
+      "name": "accession",
+      "type": "string"
+    }
+  ];
   for (const row of sourceRows) { 
     mappedRows.push({
-      name: row.columnId,
       description: row.description,
+      name: row.columnId,
       type: row.type
     });
   }
-  mappedRows.push({
-    name: "accession",
-    description: "GCF/GCA accession id",
-    type: 'string'
-  });
+
   return mappedRows.sort((a, b) => a.name.localeCompare(b.name));
 }
 

@@ -324,7 +324,7 @@ export const buildGenomePrimaryData = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.PrimaryDataViewer> => {
   return {
-    accessions: [genome.accession],
+    initialQuery: `tax_id=${genome.speciesTaxonomyId}`,
   };
 };
 
