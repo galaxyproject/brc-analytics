@@ -39,7 +39,7 @@ async function buildCatalog(): Promise<void> {
 
   console.log("Run Read Fields:", runFields.length);
   await saveJson("catalog/output/runReadFields.json", runFields);
-  
+
   console.log("Workflows:", workflows.length);
   await saveJson("catalog/output/workflows.json", workflows);
 
