@@ -48,7 +48,7 @@ classes:
       parameters:
         description: The parameters of the workflow. Dictionary with arbitrary depth, string keys and primitive values.
         required: false
-        range: object
+        range: string
       active:
         description: Determines if workflow should be included.
         required: true
