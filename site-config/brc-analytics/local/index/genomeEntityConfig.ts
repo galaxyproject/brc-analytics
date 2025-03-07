@@ -360,5 +360,5 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
     enableTab: false,
   },
   route: "assemblies",
-  staticLoadFile: "catalog/output/genomes.json",
+  staticLoadFile: "catalog/output/assemblies.json",
 };

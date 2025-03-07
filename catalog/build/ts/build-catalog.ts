@@ -28,8 +28,8 @@ async function buildCatalog(): Promise<void> {
   const organisms = buildOrganisms(genomes);
   const workflows = await buildWorkflows();
 
-  console.log("Genomes:", genomes.length);
-  await saveJson("catalog/output/genomes.json", genomes);
+  console.log("Assemblies:", genomes.length);
+  await saveJson("catalog/output/assemblies.json", genomes);
 
   console.log("Organisms:", organisms.length);
   await saveJson("catalog/output/organisms.json", organisms);
