@@ -29,7 +29,7 @@ async function buildCatalog(): Promise<void> {
   const runFields = await buildRunReadFields(
     "https://www.ebi.ac.uk/ena/portal/api/searchFields?result=read_run&format=json"
   );
-  const workflows = await buildWorkflows(); 
+  const workflows = await buildWorkflows();
 
   console.log("Genomes:", genomes.length);
   await saveJson("catalog/output/genomes.json", genomes);
