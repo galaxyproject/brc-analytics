@@ -4,12 +4,21 @@
             "additionalProperties": false,
             "description": "A workflow.",
             "properties": {
+                "active": {
+                    "description": "Determines if workflow should be included.",
+                    "type": "boolean"
+                },
                 "categories": {
                     "description": "The IDs of the categories the workflow belongs to.",
                     "items": {
                         "$ref": "#/$defs/WorkflowCategoryId"
                     },
                     "type": "array"
+                },
+                "parameters": {
+                    "description": "The parameters of the workflow. Dictionary with arbitrary depth, string keys and primitive values.",
+                    "type": "object",
+                    "additionalProperties": true
                 },
                 "ploidy": {
                     "$ref": "#/$defs/WorkflowPloidy",
@@ -33,7 +42,8 @@
                 "categories",
                 "ploidy",
                 "workflow_name",
-                "workflow_description"
+                "workflow_description",
+                "active"
             ],
             "title": "Workflow",
             "type": "object"
