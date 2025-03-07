@@ -119,29 +119,29 @@ async function buildRunReadFields(filePath: string): Promise<RunReadsFields[]> {
   const mappedRows: RunReadsFields[] = [
     {
       description: "AND statment",
-      name: "AND",      
-      type: "expression"
+      name: "AND",
+      type: "expression",
     },
     {
       description: "OR statement",
       name: "OR",
-      type: "expression"
+      type: "expression",
     },
     {
       description: "starting paranthesis",
       name: "(",
-      type: "expression"
+      type: "expression",
     },
     {
       description: "ending paranthesis",
       name: ")",
-      type: "expression"
+      type: "expression",
     },
     {
       description: "GCF/GCA accession id",
       name: "accession",
-      type: "string"
-    }
+      type: "string",
+    },
   ];
   for (const row of sourceRows) {
     mappedRows.push({
