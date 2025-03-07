@@ -26,7 +26,9 @@ buildCatalog();
 async function buildCatalog(): Promise<void> {
   const genomes = await buildGenomes();
   const organisms = buildOrganisms(genomes);
-  const runFields = await buildRunReadFields('https://www.ebi.ac.uk/ena/portal/api/searchFields?result=read_run&format=json');
+  const runFields = await buildRunReadFields(
+    "https://www.ebi.ac.uk/ena/portal/api/searchFields?result=read_run&format=json"
+  );
   const workflows = await buildWorkflows(); 
 
   console.log("Genomes:", genomes.length);
@@ -111,9 +113,7 @@ function buildOrganism(
   };
 }
 
-async function buildRunReadFields(
-  filePath: string
-): Promise<RunReadsFields[]> {
+async function buildRunReadFields(filePath: string): Promise<RunReadsFields[]> {
   const response = await fetch(filePath);
   const sourceRows = await response.json();
   const mappedRows: RunReadsFields[] = [
