@@ -7,6 +7,8 @@ import time
 from bs4 import BeautifulSoup
 import logging
 
+MAX_NCBI_URL_LENGTH = 2000 # The actual limit seems to be a bit over 4000
+
 log = logging.getLogger(__name__)
 
 
@@ -28,6 +30,37 @@ def get_paginated_ncbi_results(base_url, query_description):
     results += page_data["reports"]
     next_page_token = page_data.get("next_page_token")
     page += 1
+  return results
+
+
+def get_next_ncbi_url_batch(get_url, items, start_index):
+  # Do a binary search to find the longest possible URL
+  max_valid_end_index = start_index
+  min_invalid_end_index = len(items)
+  end_index = len(items)
+  while end_index != max_valid_end_index:
+    test_url = get_url(items[start_index:end_index])
+    if len(test_url) > MAX_NCBI_URL_LENGTH:
+      min_invalid_end_index = end_index
+    else:
+      max_valid_end_index = end_index
+    end_index = int((max_valid_end_index + min_invalid_end_index)/2)
+  return get_url(items[start_index:end_index]), end_index
+
+
+def get_batched_ncbi_urls(get_url, items):
+  urls = []
+  index = 0
+  while index < len(items):
+    url, index = get_next_ncbi_url_batch(get_url, items, index)
+    urls.append(url)
+  return urls
+
+
+def get_batched_ncbi_results(get_base_url, items, query_description):
+  results = []
+  for batch_index, batch_url in enumerate(get_batched_ncbi_urls(get_base_url, items)):
+    results.extend(get_paginated_ncbi_results(batch_url, f"{query_description} batch {batch_index + 1}"))
   return results
 
 
@@ -74,7 +107,11 @@ def get_species_row(taxon_info, taxonomic_group_sets, taxonomic_levels):
 
 
 def get_species_df(taxonomy_ids, taxonomic_group_sets, taxonomic_levels):
-  species_info = get_paginated_ncbi_results(f"https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/taxon/{",".join([str(id) for id in taxonomy_ids])}/dataset_report", "taxa")
+  species_info = get_batched_ncbi_results(
+    lambda ids: f"https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/taxon/{",".join(ids)}/dataset_report",
+    [str(id) for id in taxonomy_ids],
+    "taxa"
+  )
   return pd.DataFrame([get_species_row(info, taxonomic_group_sets, taxonomic_levels) for info in species_info])
 
 
@@ -107,20 +144,15 @@ def get_biosample_data(genome_info):
 
 
 def get_genomes_and_primarydata_df(accessions):
-  # Send accessions in batches of 100
-  # ncbi api produces a 414 error if there are too many accessions
-  batch_size = 100
-  genomes_info = []
-  biosamples_info = []
-  for i in range(0, len(accessions), batch_size):
-    batch = accessions[i:i+batch_size]
-    batch_genomes_info = get_paginated_ncbi_results(f"https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/{','.join(batch)}/dataset_report", "genomes")
-    genomes_info.extend([get_genome_row(info) for info in batch_genomes_info])
-    biosamples_info.extend([get_biosample_data(info) for info in batch_genomes_info if 'biosample' in info['assembly_info']])
+  genomes_info = get_batched_ncbi_results(
+    lambda a: f"https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/{",".join(a)}/dataset_report",
+    accessions,
+    "genomes"
+  )
 
   return (
-          pd.DataFrame(data=genomes_info),
-          pd.DataFrame(data=biosamples_info))
+          pd.DataFrame(data=[get_genome_row(info) for info in genomes_info]),
+          pd.DataFrame(data=[get_biosample_data(info) for info in genomes_info if 'biosample' in info['assembly_info']]))
 
 
 def _id_to_gene_model_url(asm_id):
