@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.8.0](https://github.com/galaxyproject/brc-analytics/compare/v0.7.0...v0.8.0) (2025-03-08)
+
+
+### Features
+
+* build catalog and add qc report ([#344](https://github.com/galaxyproject/brc-analytics/issues/344)) ([#364](https://github.com/galaxyproject/brc-analytics/issues/364)) ([a3a70ca](https://github.com/galaxyproject/brc-analytics/commit/a3a70cad6a777071fbc0a62329b74bdb737dffd8))
+
+
+### Chores
+
+* rename genomes.json to assemblies.json ([#343](https://github.com/galaxyproject/brc-analytics/issues/343)) ([#360](https://github.com/galaxyproject/brc-analytics/issues/360)) ([bebcfb2](https://github.com/galaxyproject/brc-analytics/commit/bebcfb265ed4ee8c7990db795425b2c863c01d91))
+
 ## [0.7.0](https://github.com/galaxyproject/brc-analytics/compare/v0.6.0...v0.7.0) (2025-03-03)
 
 
