@@ -77,15 +77,21 @@ function getWorkflowLandingsRequestState(
   referenceGenome: string,
   geneModelUrl: string | null
 ): WorkflowLandingsBodyRequestState {
-  if (workflowId === WORKFLOW_ID_VARIANT_CALLING && geneModelUrl) {
-    return {
-      "Annotation GTF": { ext: "gtf.gz", src: "url", url: geneModelUrl },
+  if (workflowId === WORKFLOW_ID_VARIANT_CALLING) {
+    const result: WorkflowLandingsBodyRequestState = {
       "Genome fasta": {
         ext: "fasta.gz",
         src: "url",
         url: buildFastaUrl(referenceGenome),
       },
     };
+    if (geneModelUrl)
+      result["Annotation GTF"] = {
+        ext: "gtf.gz",
+        src: "url",
+        url: geneModelUrl,
+      };
+    return result;
   }
   return { reference_genome: referenceGenome };
 }
