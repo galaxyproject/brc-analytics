@@ -6,6 +6,8 @@ UCSC_ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.jso
 
 GENOMES_OUTPUT_PATH = "catalog/build/intermediate/genomes-from-ncbi.tsv"
 
+QC_REPORT_PATH = "catalog/output/qc-report.md"
+
 TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
   2: "Bacteria",
   10239: "Viruses",
@@ -41,5 +43,6 @@ if __name__ == "__main__":
     GENOMES_OUTPUT_PATH,
     UCSC_ASSEMBLIES_URL,
     TAXANOMIC_LEVELS_FOR_TREE,
-    {"taxonomicGroup": TAXONOMIC_GROUPS_BY_TAXONOMY_ID}
+    {"taxonomicGroup": TAXONOMIC_GROUPS_BY_TAXONOMY_ID},
+    qc_report_path=QC_REPORT_PATH
   )

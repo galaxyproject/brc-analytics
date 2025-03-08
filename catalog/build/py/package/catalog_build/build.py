@@ -193,7 +193,7 @@ def report_missing_values_from(values_name, message_predicate, all_values_series
   present_values_mask[:] = False
   for series in partial_values_series:
     present_values_mask |= all_values_series.isin(series)
-  report_missing_values(values_name, message_predicate, all_values_series, present_values_mask)
+  return report_missing_values(values_name, message_predicate, all_values_series, present_values_mask)
 
 
 def report_missing_values(values_name, message_predicate, values_series, present_values_mask):
@@ -204,6 +204,15 @@ def report_missing_values(values_name, message_predicate, values_series, present
       print(f"Only {len(present_values)} of {len(values_series)} {values_name} {message_predicate}: {", ".join(present_values)}")
     else:
       print(f"{len(missing_values)} {values_name} not {message_predicate}: {", ".join(missing_values)}")
+  return missing_values
+
+
+def report_inconsistent_taxonomy_ids(df):
+  inconsistent_ids_series = df.groupby(["species", "strain"]).filter(lambda g: g["taxonomyId"].nunique() > 1).groupby(["species", "strain"])["taxonomyId"].apply(set)
+  inconsistent_ids_strings = [(f"{species} strain {strain}" if strain else species, ", ".join([str(id) for id in ids])) for (species, strain), ids in inconsistent_ids_series.items()]
+  if len(inconsistent_ids_strings) > 0:
+    print(f"Taxa with inconsistent taxonomy IDs: {", ".join([f"{taxon} ({ids})" for taxon, ids in inconsistent_ids_strings])}")
+  return inconsistent_ids_strings
 
 
 def fetch_sra_metadata(srs_ids, batch_size=20):
@@ -376,6 +385,14 @@ def fetch_sra_metadata(srs_ids, batch_size=20):
   return data
 
 
+def make_qc_report(missing_ncbi_assemblies, inconsistent_taxonomy_ids, missing_ucsc_assemblies, missing_gene_model_urls=None):
+  ncbi_assemblies_text = "None" if len(missing_ncbi_assemblies) == 0 else "\n".join([f"- {accession}" for accession in missing_ncbi_assemblies])
+  ucsc_assemblies_text = "None" if len(missing_ucsc_assemblies) == 0 else "\n".join([f"- {accession}" for accession in missing_ucsc_assemblies])
+  gene_model_urls_text = "N/A" if missing_gene_model_urls is None else "None" if len(missing_gene_model_urls) == 0 else "\n".join([f"- {accession}" for accession in missing_gene_model_urls])
+  taxonomy_ids_text = "None" if len(inconsistent_taxonomy_ids) == 0 else "\n".join([f"- {taxon}: {ids}" for taxon, ids in inconsistent_taxonomy_ids])
+  return f"# Catalog QC report\n\n## Assemblies not found on NCBI\n\n{ncbi_assemblies_text}\n\n## Assemblies not found in UCSC list\n\n{ucsc_assemblies_text}\n\n## Assemblies with gene model URLs not found\n\n{gene_model_urls_text}\n\n## Species and strain combinations with multiple taxonomy IDs\n\n{taxonomy_ids_text}\n"
+
+
 def build_files(
   assemblies_path,
   genomes_output_path,
@@ -384,9 +401,12 @@ def build_files(
   taxonomic_group_sets={},
   do_gene_model_urls=True,
   extract_primary_data=False,
-  primary_output_path=None
+  primary_output_path=None,
+  qc_report_path=None
 ):
   print("Building files")
+
+  qc_report_params = {}
 
   source_list_df = read_assemblies(assemblies_path)
 
@@ -401,7 +421,8 @@ def build_files(
     sra_metadata = fetch_sra_metadata(sra_ids_list)
     sra_metadata_df = pd.DataFrame([sra_metadata[sra][srr] for sra in sra_metadata for srr in sra_metadata[sra]])
     primarydata_df = primarydata_df.merge(sra_metadata_df, how="left", left_on="sra_sample_acc", right_on="sra_sample_acc")
-  report_missing_values_from("accessions", "found on NCBI", source_list_df["accession"], base_genomes_df["accession"])
+  
+  qc_report_params["missing_ncbi_assemblies"] = report_missing_values_from("accessions", "found on NCBI", source_list_df["accession"], base_genomes_df["accession"])
 
   species_df = get_species_df(base_genomes_df["taxonomyId"], taxonomic_group_sets, taxonomic_levels_for_tree)
 
@@ -409,18 +430,20 @@ def build_files(
 
   genomes_with_species_df = base_genomes_df.merge(species_df, how="left", on="taxonomyId")
 
+  qc_report_params["inconsistent_taxonomy_ids"] = report_inconsistent_taxonomy_ids(genomes_with_species_df)
+
   assemblies_df = pd.DataFrame(requests.get(ucsc_assemblies_url).json()["data"])[["ucscBrowser", "genBank", "refSeq"]]
 
   gen_bank_merge_df = genomes_with_species_df.merge(assemblies_df, how="left", left_on="accession", right_on="genBank")
   ref_seq_merge_df = genomes_with_species_df.merge(assemblies_df, how="left", left_on="accession", right_on="refSeq")
 
-  report_missing_values_from("accessions", "matched in assembly list", genomes_with_species_df["accession"], assemblies_df["genBank"], assemblies_df["refSeq"])
+  qc_report_params["missing_ucsc_assemblies"] = report_missing_values_from("accessions", "matched in assembly list", genomes_with_species_df["accession"], assemblies_df["genBank"], assemblies_df["refSeq"])
 
   genomes_df = gen_bank_merge_df.combine_first(ref_seq_merge_df)
 
   if do_gene_model_urls:
     genomes_df = add_gene_model_url(genomes_df)
-    report_missing_values("accessions", "matched with gene model URLs", genomes_df["accession"], genomes_df["geneModelUrl"].astype(bool))
+    qc_report_params["missing_gene_model_urls"] = report_missing_values("accessions", "matched with gene model URLs", genomes_df["accession"], genomes_df["geneModelUrl"].astype(bool))
   else:
     genomes_df["geneModelUrl"] = ""
 
@@ -432,3 +455,8 @@ def build_files(
     primarydata_df.to_csv(primary_output_path, index=False, sep="\t")
 
     print(f"Wrote to {primary_output_path}")
+  
+  if qc_report_path is not None:
+    qc_report_text = make_qc_report(**qc_report_params)
+    with open(qc_report_path, "w") as file:
+      file.write(qc_report_text)
