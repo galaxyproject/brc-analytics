@@ -8,20 +8,9 @@ interface WorkflowLandingsBody {
   workflow_target_type: "trs_url";
 }
 
-type WorkflowLandingsBodyRequestState =
-  | { reference_genome: string }
-  | {
-      "Annotation GTF"?: {
-        ext: string;
-        src: string;
-        url: string;
-      };
-      "Genome fasta": {
-        ext: string;
-        src: string;
-        url: string;
-      };
-    };
+type WorkflowLandingsBodyRequestState = {
+  [key: string]: { [key: string]: string } | string;
+};
 
 interface WorkflowLanding {
   uuid: string;
@@ -89,20 +78,20 @@ function getWorkflowLandingsRequestState(
   geneModelUrl: string | null
 ): WorkflowLandingsBodyRequestState {
   if (workflowId === WORKFLOW_ID_VARIANT_CALLING) {
-    return {
-      "Annotation GTF": geneModelUrl
-        ? {
-            ext: "gtf.gz",
-            src: "url",
-            url: geneModelUrl,
-          }
-        : undefined,
+    const result: WorkflowLandingsBodyRequestState = {
       "Genome fasta": {
         ext: "fasta.gz",
         src: "url",
         url: buildFastaUrl(referenceGenome),
       },
     };
+    if (geneModelUrl)
+      result["Annotation GTF"] = {
+        ext: "gtf.gz",
+        src: "url",
+        url: geneModelUrl,
+      };
+    return result;
   }
   return { reference_genome: referenceGenome };
 }
