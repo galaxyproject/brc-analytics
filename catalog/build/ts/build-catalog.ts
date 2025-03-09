@@ -7,6 +7,10 @@ import {
   WorkflowCategory,
 } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import {
+  getGenomeId,
+  getOrganismId,
+} from "../../../app/apis/catalog/brc-analytics-catalog/common/utils";
+import {
   Organisms as SourceOrganisms,
   Workflow as SourceWorkflow,
   WorkflowCategories as SourceWorkflowCategories,
@@ -27,6 +31,9 @@ async function buildCatalog(): Promise<void> {
   const genomes = await buildGenomes();
   const organisms = buildOrganisms(genomes);
   const workflows = await buildWorkflows();
+
+  verifyUniqueIds("assembly", genomes, getGenomeId);
+  verifyUniqueIds("organism", organisms, getOrganismId);
 
   console.log("Assemblies:", genomes.length);
   await saveJson("catalog/output/assemblies.json", genomes);
@@ -226,6 +233,33 @@ async function readYamlFile<T>(filePath: string): Promise<T> {
 
 async function saveJson(filePath: string, data: unknown): Promise<void> {
   await fsp.writeFile(filePath, JSON.stringify(data, undefined, 2) + "\n");
+}
+
+/**
+ * Take a list of entities and check for duplicate IDs, as calculated by the given function, and throw an error if there are any.
+ * @param entityName - Name of the entity type, to use in the error message.
+ * @param entities - Array of entities.
+ * @param getId - Function to get an entity's ID.
+ */
+function verifyUniqueIds<T>(
+  entityName: string,
+  entities: T[],
+  getId: (entity: T) => string
+): void {
+  const idCounts = new Map<string, number>();
+  for (const entity of entities) {
+    const id = getId(entity);
+    idCounts.set(id, (idCounts.get(id) ?? 0) + 1);
+  }
+  const duplicateIdEntries = Array.from(idCounts.entries()).filter(
+    ([, count]) => count > 1
+  );
+  if (duplicateIdEntries.length > 0) {
+    const duplicateIds = duplicateIdEntries.map(([id]) => id);
+    throw new Error(
+      `Duplicate ${entityName} IDs found: ${duplicateIds.join(", ")}`
+    );
+  }
 }
 
 function accumulateArrayValue<T>(array: T[] | undefined, value: T): T[] {
