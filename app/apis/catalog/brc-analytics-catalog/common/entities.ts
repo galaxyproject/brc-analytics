@@ -12,6 +12,7 @@ export interface BRCDataCatalogGenome {
   isRef: string;
   length: number;
   level: string;
+  lineageTaxonomyIds: string[];
   ncbiTaxonomyId: string;
   ploidy: ORGANISM_PLOIDY[];
   scaffoldCount: number | null;

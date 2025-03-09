@@ -88,6 +88,7 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
       isRef: parseBoolean(row.isRef),
       length: parseNumber(row.length),
       level: row.level,
+      lineageTaxonomyIds: parseList(row.lineageTaxonomyIds),
       ncbiTaxonomyId: row.taxonomyId,
       ploidy,
       scaffoldCount: parseNumberOrNull(row.scaffoldCount),
@@ -270,6 +271,10 @@ function accumulateArrayValue<T>(array: T[] | undefined, value: T): T[] {
 
 function defaultStringToNone(value: string): string {
   return value || "None";
+}
+
+function parseList(value: string): string[] {
+  return value ? value.split(",") : [];
 }
 
 function parseStringOrNull(value: string): string | null {

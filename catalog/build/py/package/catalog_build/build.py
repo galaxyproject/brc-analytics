@@ -93,15 +93,20 @@ def get_taxonomic_level_key(level):
 def get_species_row(taxon_info, taxonomic_group_sets, taxonomic_levels):
   classification = taxon_info["taxonomy"]["classification"]
   species_info = classification["species"]
+  taxonomy_id = taxon_info["taxonomy"]["tax_id"]
+  ancestor_taxonomy_ids = taxon_info["taxonomy"]["parents"]
+
   taxonomic_level_fields = {get_taxonomic_level_key(level): classification.get(level, {}).get("name") for level in taxonomic_levels}
   own_level = taxon_info["taxonomy"]["rank"].lower() if "rank" in taxon_info["taxonomy"] else None
   if own_level in taxonomic_levels and own_level not in classification:
     taxonomic_level_fields[get_taxonomic_level_key(own_level)] = taxon_info["taxonomy"]["current_scientific_name"]["name"]
+  
   return {
-    "taxonomyId": taxon_info["taxonomy"]["tax_id"],
+    "taxonomyId": taxonomy_id,
     "species": species_info["name"],
     "speciesTaxonomyId": species_info["id"],
-    **get_taxonomic_group_sets(taxon_info["taxonomy"]["parents"], taxonomic_group_sets),
+    "lineageTaxonomyIds": ",".join([str(id) for id in ancestor_taxonomy_ids + [taxonomy_id]]),
+    **get_taxonomic_group_sets(ancestor_taxonomy_ids, taxonomic_group_sets),
     **taxonomic_level_fields
   }
 
