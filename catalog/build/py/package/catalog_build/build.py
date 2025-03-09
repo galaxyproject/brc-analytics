@@ -109,7 +109,7 @@ def get_species_row(taxon_info, taxonomic_group_sets, taxonomic_levels):
 def get_species_df(taxonomy_ids, taxonomic_group_sets, taxonomic_levels):
   species_info = get_batched_ncbi_results(
     lambda ids: f"https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/taxon/{",".join(ids)}/dataset_report",
-    [str(id) for id in taxonomy_ids],
+    [str(id) for id in set(taxonomy_ids)],
     "taxa"
   )
   return pd.DataFrame([get_species_row(info, taxonomic_group_sets, taxonomic_levels) for info in species_info])
