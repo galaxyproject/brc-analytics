@@ -72,6 +72,7 @@ export interface WorkflowCategory {
 
 export interface Workflow {
   ploidy: WORKFLOW_PLOIDY;
+  taxonomyId: string | null;
   trsId: string;
   workflowDescription: string;
   workflowName: string;
