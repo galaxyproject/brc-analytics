@@ -1,7 +1,5 @@
-import { ORGANISM_PLOIDY } from "../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { BRCDataCatalogGenome } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
 
 export interface Props {
-  assemblyPloidies: ORGANISM_PLOIDY[];
-  geneModelUrl: string | null;
-  genomeVersionAssemblyId: string;
+  assembly: BRCDataCatalogGenome;
 }
