@@ -15,6 +15,13 @@
                     "$ref": "#/$defs/WorkflowPloidy",
                     "description": "The ploidy supported by the workflow."
                 },
+                "taxonomy_id": {
+                    "description": "The NCBI ID of the taxon supported by the workflow.",
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
                 "trs_id": {
                     "description": "The workflow's TRS ID.",
                     "type": "string"
