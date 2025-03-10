@@ -30,7 +30,7 @@
     "workflows": [
       {
         "parameters": {
-          "reference genome": "{{ reference_genome }}",
+          "reference genome": "{{ assembly_id }}",
           "gtf": "{{ gene_model_url }}"
         },
         "ploidy": "ANY",
@@ -40,7 +40,7 @@
       },
       {
         "parameters": {
-          "reference genome": "{{ reference_genome }}",
+          "reference genome": "{{ assembly_id }}",
           "gtf": "{{ gene_model_url }}"
         },
         "ploidy": "ANY",
@@ -50,7 +50,7 @@
       },
       {
         "parameters": {
-          "Reference genome": "{{ reference_genome }}",
+          "Reference genome": "{{ assembly_id }}",
           "GTF file of annotation": "{{ gene_model_url }}"
         },
         "ploidy": "ANY",
@@ -60,7 +60,7 @@
       },
       {
         "parameters": {
-          "Reference genome": "{{ reference_genome }}",
+          "Reference genome": "{{ assembly_id }}",
           "GTF file of annotation": "{{ gene_model_url }}"
         },
         "ploidy": "ANY",
@@ -77,7 +77,7 @@
     "workflows": [
       {
         "parameters": {
-          "reference_genome": "{{ reference_genome }}"
+          "assembly_id": "{{ assembly_id }}"
         },
         "ploidy": "ANY",
         "trsId": "#workflow/github.com/iwc-workflows/atacseq/main/versions/v1.0",
@@ -86,7 +86,7 @@
       },
       {
         "parameters": {
-          "reference_genome": "{{ reference_genome }}"
+          "assembly_id": "{{ assembly_id }}"
         },
         "ploidy": "ANY",
         "trsId": "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.14",
@@ -95,7 +95,7 @@
       },
       {
         "parameters": {
-          "reference_genome": "{{ reference_genome }}"
+          "assembly_id": "{{ assembly_id }}"
         },
         "ploidy": "ANY",
         "trsId": "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.14",
@@ -111,7 +111,7 @@
       },
       {
         "parameters": {
-          "reference_genome": "{{ reference_genome }}"
+          "assembly_id": "{{ assembly_id }}"
         },
         "ploidy": "ANY",
         "trsId": "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.14",

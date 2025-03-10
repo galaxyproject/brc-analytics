@@ -25,7 +25,7 @@ workflows:
       peaks) and fragment length distribution plots for quality assessment.
     ploidy: ANY
     parameters:
-      reference_genome: "{{ reference_genome }}"
+      assembly_id: "{{ assembly_id }}"
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/average-bigwig-between-replicates/main/versions/v0.2"
     categories:
@@ -158,7 +158,7 @@ workflows:
       downstream analysis.
     ploidy: ANY
     parameters:
-      reference_genome: "{{ reference_genome }}"
+      assembly_id: "{{ assembly_id }}"
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.14"
     categories:
@@ -173,7 +173,7 @@ workflows:
       downstream analysis.
     ploidy: ANY
     parameters:
-      reference_genome: "{{ reference_genome }}"
+      assembly_id: "{{ assembly_id }}"
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.3"
     categories:
@@ -230,7 +230,7 @@ workflows:
       characteristic of CUT&RUN/CUT&TAG experiments.
     ploidy: ANY
     parameters:
-      reference_genome: "{{ reference_genome }}"
+      assembly_id: "{{ assembly_id }}"
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.2"
     categories:
@@ -247,7 +247,7 @@ workflows:
       (Read10X function).
     ploidy: ANY
     parameters:
-      reference genome: "{{ reference_genome }}"
+      reference genome: "{{ assembly_id }}"
       gtf: "{{ gene_model_url }}"
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.2"
@@ -263,7 +263,7 @@ workflows:
       Seurat/Scanpy (Read10X function).
     ploidy: ANY
     parameters:
-      reference genome: "{{ reference_genome }}"
+      reference genome: "{{ assembly_id }}"
       gtf: "{{ gene_model_url }}"
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/generic-variant-calling-wgs-pe/main/versions/v0.1.1"
@@ -571,7 +571,7 @@ workflows:
       both HTSeq-compatible counts and normalized measures for downstream analysis."
     ploidy: ANY
     parameters:
-      Reference genome: "{{ reference_genome }}"
+      Reference genome: "{{ assembly_id }}"
       GTF file of annotation: "{{ gene_model_url }}"
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.2"
@@ -588,7 +588,7 @@ workflows:
       both HTSeq-compatible counts and normalized measures for downstream analysis."
     ploidy: ANY
     parameters:
-      Reference genome: "{{ reference_genome }}"
+      Reference genome: "{{ assembly_id }}"
       GTF file of annotation: "{{ gene_model_url }}"
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/variation-reporting/main/versions/v0.1.1"

@@ -72,7 +72,7 @@ function paramValueToRequestValue(
   geneModelUrl: string | null,
   referenceGenome: string
 ): string | { ext: string; src: string; url: string } | undefined {
-  if (value === "{{ reference_genome }}") {
+  if (value === "{{ assembly_id }}") {
     return referenceGenome;
   } else if (value === "{{ assembly_fasta_url }}") {
     return {
