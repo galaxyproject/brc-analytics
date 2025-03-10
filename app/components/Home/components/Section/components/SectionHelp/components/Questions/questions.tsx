@@ -1,9 +1,13 @@
 import { Link as DXLink } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
-import { AccordionDetails as MAccordionDetails } from "@mui/material";
+import {
+  AccordionDetails as MAccordionDetails,
+  Typography,
+} from "@mui/material";
 import { Accordion } from "../../../../../../../common/Accordion/accordion";
 import { AccordionSummary } from "../../../../../../../common/Accordion/components/AccordionSummary/accordionSummary";
 import { URLS } from "../../../../../../common/constants";
 import { Grid } from "./questions.styles";
+import { TEXT_BODY_LARGE_500 } from "@databiosphere/findable-ui/lib/theme/common/typography";
 
 export const Questions = (): JSX.Element => {
   return (
@@ -20,6 +24,7 @@ export const Questions = (): JSX.Element => {
             label="help@brc-analytics.org"
             url="mailto:help@brc-analytics.org"
           />
+          .
         </MAccordionDetails>
       </Accordion>
       <Accordion>
@@ -42,6 +47,59 @@ export const Questions = (): JSX.Element => {
           computational infrastructure provided by the Texas Advanced Computing
           Center (<DXLink label="TACC" url={URLS.TACC} />) and{" "}
           <DXLink label="ACCESS-CI" url={URLS.ACCESS_CONSORTIUM} /> consortium.
+        </MAccordionDetails>
+      </Accordion>
+      <Accordion expanded={true}>
+        <AccordionSummary>Can I really do analyses for free?</AccordionSummary>
+        <MAccordionDetails>
+          <ol>
+            <li>
+              <Typography variant={TEXT_BODY_LARGE_500}>
+                How is this possible?
+              </Typography>{" "}
+              Analytical capabilities of BRC-analytics.org are sustained by
+              Galaxy Project. In turn, the Galaxy is deployed on vast
+              computational resources provided by the{" "}
+              <DXLink label="ACCESS-CI" url={URLS.ACCESS_CONSORTIUM} />{" "}
+              consortium and <DXLink label="TACC" url={URLS.TACC} />. Each user
+              is provided with 250 Gb of permanent storage and 1Tb of temporary
+              scratch storage. A variety of computer systems is available
+              depending on what kind of analysis tool is used. These range from
+              typical cluster nodes to large memory machines suitable for genome
+              assembly or GPU-containing nodes.
+            </li>
+            <li>
+              <Typography variant={TEXT_BODY_LARGE_500}>
+                How long are my datasets stored?
+              </Typography>{" "}
+              There is no time limit on data stored within the permanent storage
+              (250Gb). Scratch storage is limited to 60 days.
+            </li>
+            <li>
+              <Typography variant={TEXT_BODY_LARGE_500}>
+                Who can see my work?
+              </Typography>{" "}
+              You. To be seen by others you data, workflows, or visualizations
+              need to be explicitly shared or made public.
+            </li>
+            <li>
+              <Typography variant={TEXT_BODY_LARGE_500}>
+                Can I upload restricted access data?
+              </Typography>{" "}
+              BRC-analytics and Galaxy are free, public, internet accessible
+              resources. Data transfer and data storage are not encrypted. If
+              there are restrictions on the way your research data can be stored
+              and used, please consult your local institutional review board or
+              the project PI before uploading it to any public site, including
+              this Galaxy server.
+            </li>
+            <li>
+              <Typography variant={TEXT_BODY_LARGE_500}>
+                What if I mine BitCoin?
+              </Typography>{" "}
+              You will banned from using this site forever.
+            </li>
+          </ol>
         </MAccordionDetails>
       </Accordion>
     </Grid>

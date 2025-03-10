@@ -11,4 +11,23 @@ export const Grid = styled.div`
     grid-column: 6 / -1;
     grid-template-columns: repeat(7, 1fr);
   }
+
+  .MuiAccordion-root {
+    ol {
+      margin: 0;
+      padding-left: 24px;
+
+      li {
+        margin: 8px 0;
+
+        &:first-of-type {
+          margin-top: 0;
+        }
+
+        &:last-of-type {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
 `;
