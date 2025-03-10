@@ -69,13 +69,16 @@ workflows:
           - fastqsanger
           - fastqsanger.gz
     active: false
-  - trs_id: "#workflow/github.com/iwc-workflows/baredsc/baredSC-1d-logNorm/versions/v0.5"
+  - trs_id: "#workflow/github.com/iwc-workflows/baredsc/baredSC-1d-logNorm/versions/v0.6"
     categories:
       - TRANSCRIPTOMICS
-    workflow_name: baredSC_1d_logNorm
+    workflow_name: "Single-Cell Mixture Analysis: baredSC 1D Log-Normalized Models"
     workflow_description:
-      Run baredSC in 1 dimension in logNorm for 1 to N gaussians
-      and combine models.
+      Applies baredSC algorithm to fit and combine one-dimensional
+      Gaussian mixture models (from 1 to N components) on log-normalized single-cell
+      gene expression data. Enables identification of subpopulations based on expression
+      of genes of interest and provides statistical assessment of the optimal number
+      of components in heterogeneous cell populations.
     ploidy: ANY
     parameters:
       Tabular with raw expression values:
@@ -88,13 +91,16 @@ workflows:
       Maximum number of Gaussians to study:
         class: integer
     active: false
-  - trs_id: "#workflow/github.com/iwc-workflows/baredsc/baredSC-2d-logNorm/versions/v0.5"
+  - trs_id: "#workflow/github.com/iwc-workflows/baredsc/baredSC-2d-logNorm/versions/v0.6"
     categories:
       - TRANSCRIPTOMICS
-    workflow_name: baredSC_2d_logNorm
+    workflow_name: "Single-Cell Mixture Analysis: baredSC 2D Log-Normalized Models"
     workflow_description:
-      Run baredSC in 2 dimensions in logNorm for 1 to N gaussians
-      and combine models.
+      Applies baredSC algorithm to fit and combine two-dimensional
+      Gaussian mixture models (from 1 to N components) on log-normalized single-cell
+      gene expression data. Enables identification of subpopulations based on co-expression
+      patterns of two genes of interest and provides statistical assessment of the optimal
+      number of components in heterogeneous cell populations.
     ploidy: ANY
     parameters:
       Tabular with raw expression values:
@@ -139,14 +145,14 @@ workflows:
       minimum FPKM for merge:
         class: float
     active: false
-  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.13"
+  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.14"
     categories:
       - REGULATION
     workflow_name: "ChIP-seq Analysis: Paired-End Read Processing"
     workflow_description:
       Complete ChIP-seq analysis for paired-end sequencing data.
       Processes raw FASTQ files through adapter removal (cutadapt), alignment to reference
-      genome (Bowtie2), and stringent quality filtering (MAPQ ≥ 30, concordant pairs
+      genome (Bowtie2), and stringent quality filtering (MAPQ >= 30, concordant pairs
       only). Peak calling with MACS2 optimized for paired-end reads identifies protein-DNA
       binding sites. Generates alignment files, peak calls, and quality metrics for
       downstream analysis.
@@ -154,17 +160,17 @@ workflows:
     parameters:
       reference_genome: "{{ reference_genome }}"
     active: true
-  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.13"
+  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.14"
     categories:
       - REGULATION
     workflow_name: "ChIP-seq Analysis: Single-End Read Processing"
     workflow_description:
       Complete ChIP-seq analysis for single-end sequencing data.
       Processes raw FASTQ files through adapter removal (cutadapt), alignment to reference
-      genome (Bowtie2), and quality filtering (MAPQ ≥ 30). Peak calling with MACS2 uses
-      either a fixed extension parameter or built-in model to identify protein-DNA binding
-      sites. Generates alignment files, peak calls, and quality metrics for downstream
-      analysis.
+      genome (Bowtie2), and quality filtering (MAPQ >= 30). Peak calling with MACS2
+      uses either a fixed extension parameter or built-in model to identify protein-DNA
+      binding sites. Generates alignment files, peak calls, and quality metrics for
+      downstream analysis.
     ploidy: ANY
     parameters:
       reference_genome: "{{ reference_genome }}"
@@ -226,28 +232,35 @@ workflows:
     parameters:
       reference_genome: "{{ reference_genome }}"
     active: true
-  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6"
+  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.2"
     categories:
       - TRANSCRIPTOMICS
-    workflow_name: scRNA-seq_preprocessing_10X_cellPlex
+    workflow_name:
+      "Single-Cell RNA-seq Preprocessing: 10X Genomics CellPlex Multiplexed
+      Samples"
     workflow_description:
-      This workflow processes the CMO fastqs with CITE-seq-Count
-      and include the translation step required for cellPlex processing. In parallel
-      it processes the Gene Expresion fastqs with STARsolo, filter cells with DropletUtils
-      and reformat all outputs to be easily used by the function 'Read10X' from Seurat.
+      Comprehensive preprocessing for 10X Genomics CellPlex multiplexed
+      single-cell RNA-seq data. Processes Cell Multiplexing Oligo (CMO) FASTQ files
+      with CITE-seq-Count including required CellPlex-specific translation steps. Simultaneously
+      processes gene expression FASTQ files with STARsolo and DropletUtils for alignment
+      and cell filtering, and formats outputs for seamless import into Seurat/Scanpy
+      (Read10X function).
     ploidy: ANY
     parameters:
       reference genome: "{{ reference_genome }}"
       gtf: "{{ gene_model_url }}"
     active: true
-  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6"
+  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.2"
     categories:
       - TRANSCRIPTOMICS
-    workflow_name: scRNA-seq_preprocessing_10X_v3_Bundle
+    workflow_name:
+      "Single-Cell RNA-seq Preprocessing: 10X Genomics v3 to Seurat and
+      Scanpy Compatible Format"
     workflow_description:
-      This workflow processes the Gene Expresion fastqs with STARsolo,
-      filter cells with DropletUtils and reformat all outputs to be easily used by the
-      function 'Read10X' from Seurat.
+      Complete preprocessing pipeline for 10X Genomics v3 single-cell
+      RNA-seq data. Aligns raw FASTQ files using STARsolo, performs cell calling and
+      quality filtering with DropletUtils, and formats outputs for seamless import into
+      Seurat/Scanpy (Read10X function).
     ploidy: ANY
     parameters:
       reference genome: "{{ reference_genome }}"
@@ -428,7 +441,7 @@ workflows:
       Interactions to consider to calculate weights in normalization step:
         class: text
     active: false
-  - trs_id: "#workflow/github.com/iwc-workflows/mapseq-to-ampvis2/main/versions/v0.1"
+  - trs_id: "#workflow/github.com/iwc-workflows/mapseq-to-ampvis2/main/versions/v0.2"
     categories: []
     workflow_name: MAPseq to ampvis2
     workflow_description:
@@ -459,16 +472,14 @@ workflows:
   - trs_id: "#workflow/github.com/iwc-workflows/pseudobulk-worflow-decoupler-edger/main/versions/v0.1.1"
     categories:
       - TRANSCRIPTOMICS
-    workflow_name:
-      Differential gene expression for single-cell data using pseudo-bulk
-      counts with edgeR
+    workflow_name: Single-Cell Pseudobulk Differential Expression Analysis with edgeR
     workflow_description:
-      This workflow uses the decoupler tool in Galaxy to generate
-      pseudobulk counts from an annotated AnnData file obtained from scRNA-seq analysis.
-      Following the pseudobulk step, differential expression genes (DEG) are calculated
-      using the edgeR tool. The workflow also includes data sanitation steps to ensure
-      smooth operation of edgeR and minimizing potential issues. Additionally, a Volcano
-      plot tool is used to visualize the results after the DEG analysis.
+      Performs differential gene expression analysis on single-cell
+      data using a pseudobulk approach. Aggregates cell-level counts from an annotated
+      AnnData object by cell type or other metadata using Decoupler, then applies edgeR
+      for robust statistical testing between conditions. Includes data preprocessing
+      steps for compatibility with edgeR and generates interactive volcano plots to
+      visualize significantly differentially expressed genes.
     ploidy: ANY
     parameters:
       Source AnnData file:
