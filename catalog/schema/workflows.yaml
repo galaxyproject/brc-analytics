@@ -11,6 +11,10 @@ imports:
   - ./enums/workflow_ploidy
 
 classes:
+  Any:
+    class_uri: linkml:Any
+    description: "Placeholder for {[key: string]: string} type."
+
   Workflows:
     description: Object containing list of workflows.
     tree_root: true
@@ -48,7 +52,7 @@ classes:
       parameters:
         description: The parameters of the workflow. Dictionary with arbitrary depth, string keys and primitive values.
         required: false
-        range: string
+        range: Any
       active:
         description: Determines if workflow should be included.
         required: true

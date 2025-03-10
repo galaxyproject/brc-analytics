@@ -1,5 +1,17 @@
 {
     "$defs": {
+        "Any": {
+            "additionalProperties": true,
+            "description": "",
+            "title": "Any",
+            "type": [
+                "null",
+                "boolean",
+                "object",
+                "number",
+                "string"
+            ]
+        },
         "Workflow": {
             "additionalProperties": false,
             "description": "A workflow.",
@@ -16,9 +28,15 @@
                     "type": "array"
                 },
                 "parameters": {
-                    "description": "The parameters of the workflow. Dictionary with arbitrary depth, string keys and primitive values.",
-                    "type": "object",
-                    "additionalProperties": true
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/Any"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "The parameters of the workflow. Dictionary with arbitrary depth, string keys and primitive values."
                 },
                 "ploidy": {
                     "$ref": "#/$defs/WorkflowPloidy",

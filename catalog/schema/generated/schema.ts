@@ -92,6 +92,11 @@ export interface WorkflowCategory {
 }
 
 
+
+export interface Any {
+}
+
+
 /**
  * Object containing list of workflows.
  */
@@ -116,7 +121,7 @@ export interface Workflow {
     /** The description of the workflow. */
     workflow_description: string,
     /** The parameters of the workflow. Dictionary with arbitrary depth, string keys and primitive values. */
-    parameters?: Record<string, any>,
+    parameters?: Any,
     /** Determines if workflow should be included. */
     active: boolean,
 }
