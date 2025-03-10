@@ -1,13 +1,13 @@
-import { 
-  select, 
-  scaleOrdinal, 
-  schemeTableau10, 
-  hsl, 
-  hierarchy, 
-  partition, 
+import {
+  select,
+  scaleOrdinal,
+  schemeTableau10,
+  hsl,
+  hierarchy,
+  partition,
   arc as d3Arc,
   interpolate,
-  transition as d3Transition
+  transition as d3Transition,
 } from "d3";
 import { useRef, useEffect, useState } from "react";
 import { getData } from "./data";
@@ -19,6 +19,9 @@ const data = getData();
 export const SectionViz = (): JSX.Element => {
   const [selectedNode, setSelectedNode] = useState<TreeNode | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
+
+  // Add a reference to the clicked function so it can be called from NodeDetails
+  const clickedRef = useRef<(event: any, p: any) => void>();
 
   useEffect(() => {
     if (!svgRef.current) return;
@@ -282,12 +285,22 @@ export const SectionViz = (): JSX.Element => {
         );
     }
 
+    // Assign the clicked function to the ref so it can be accessed outside
+    clickedRef.current = clicked;
+
     // Clean up on component unmount: remove tooltip and clear svg.
     return () => {
       tooltip.remove();
       select(svgRef.current).selectAll("*").remove();
     };
   }, []);
+
+  // Handler for when a node is clicked in the NodeDetails component
+  const handleNodeClick = (node: TreeNode) => {
+    if (clickedRef.current) {
+      clickedRef.current(null, node);
+    }
+  };
 
   return (
     /* <!-- todo: use standard section layouts... --> */
@@ -297,6 +310,7 @@ export const SectionViz = (): JSX.Element => {
         margin: "0 auto",
         maxWidth: "1136px",
         width: "100%",
+        position: "relative",
       }}
     >
       <div style={{ display: "flex", justifyContent: "center", width: "70%" }}>
@@ -304,7 +318,11 @@ export const SectionViz = (): JSX.Element => {
       </div>
       <div style={{ padding: "1rem", width: "30%" }}>
         {selectedNode ? (
-          <NodeDetails node={selectedNode} />
+          <NodeDetails
+            node={selectedNode}
+            onClose={() => setSelectedNode(null)}
+            onNodeClick={handleNodeClick}
+          />
         ) : (
           <p>No node selected</p>
         )}
