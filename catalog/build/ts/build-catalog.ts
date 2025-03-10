@@ -175,7 +175,9 @@ async function buildWorkflows(): Promise<WorkflowCategory[]> {
     );
 
   for (const sourceWorkflow of sourceWorkflows.workflows) {
-    buildWorkflow(workflowCategories, sourceWorkflow);
+    if (sourceWorkflow.active) {
+      buildWorkflow(workflowCategories, sourceWorkflow);
+    }
   }
 
   return workflowCategories;
@@ -185,6 +187,7 @@ function buildWorkflow(
   workflowCategories: WorkflowCategory[],
   {
     categories,
+    parameters: parameters,
     ploidy,
     trs_id: trsId,
     workflow_description: workflowDescription,
@@ -198,6 +201,7 @@ function buildWorkflow(
     if (!workflowCategory)
       throw new Error(`Unknown workflow category: ${category}`);
     workflowCategory.workflows.push({
+      parameters,
       ploidy,
       trsId,
       workflowDescription,

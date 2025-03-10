@@ -1,15 +1,42 @@
 {
     "$defs": {
+        "Any": {
+            "additionalProperties": true,
+            "description": "",
+            "title": "Any",
+            "type": [
+                "null",
+                "boolean",
+                "object",
+                "number",
+                "string"
+            ]
+        },
         "Workflow": {
             "additionalProperties": false,
             "description": "A workflow.",
             "properties": {
+                "active": {
+                    "description": "Determines if workflow should be included.",
+                    "type": "boolean"
+                },
                 "categories": {
                     "description": "The IDs of the categories the workflow belongs to.",
                     "items": {
                         "$ref": "#/$defs/WorkflowCategoryId"
                     },
                     "type": "array"
+                },
+                "parameters": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/Any"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "The parameters of the workflow. Dictionary with arbitrary depth, string keys and primitive values."
                 },
                 "ploidy": {
                     "$ref": "#/$defs/WorkflowPloidy",
@@ -33,7 +60,8 @@
                 "categories",
                 "ploidy",
                 "workflow_name",
-                "workflow_description"
+                "workflow_description",
+                "active"
             ],
             "title": "Workflow",
             "type": "object"
