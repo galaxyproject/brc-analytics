@@ -37,6 +37,10 @@ classes:
         description: The ploidy supported by the workflow.
         required: true
         range: WorkflowPloidy
+      taxonomy_id:
+        description: The NCBI ID of the taxon supported by the workflow.
+        required: false
+        range: integer
       workflow_name:
         description: The display name of the workflow.
         required: true

@@ -88,6 +88,7 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
       isRef: parseBoolean(row.isRef),
       length: parseNumber(row.length),
       level: row.level,
+      lineageTaxonomyIds: parseList(row.lineageTaxonomyIds),
       ncbiTaxonomyId: row.taxonomyId,
       ploidy,
       scaffoldCount: parseNumberOrNull(row.scaffoldCount),
@@ -186,6 +187,7 @@ function buildWorkflow(
   {
     categories,
     ploidy,
+    taxonomy_id: taxonomyId,
     trs_id: trsId,
     workflow_description: workflowDescription,
     workflow_name: workflowName,
@@ -199,6 +201,7 @@ function buildWorkflow(
       throw new Error(`Unknown workflow category: ${category}`);
     workflowCategory.workflows.push({
       ploidy,
+      taxonomyId: typeof taxonomyId === "number" ? String(taxonomyId) : null,
       trsId,
       workflowDescription,
       workflowName,
@@ -270,6 +273,10 @@ function accumulateArrayValue<T>(array: T[] | undefined, value: T): T[] {
 
 function defaultStringToNone(value: string): string {
   return value || "None";
+}
+
+function parseList(value: string): string[] {
+  return value ? value.split(",") : [];
 }
 
 function parseStringOrNull(value: string): string | null {

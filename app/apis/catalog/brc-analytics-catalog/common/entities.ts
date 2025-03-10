@@ -12,6 +12,7 @@ export interface BRCDataCatalogGenome {
   isRef: string;
   length: number;
   level: string;
+  lineageTaxonomyIds: string[];
   ncbiTaxonomyId: string;
   ploidy: ORGANISM_PLOIDY[];
   scaffoldCount: number | null;
@@ -71,6 +72,7 @@ export interface WorkflowCategory {
 
 export interface Workflow {
   ploidy: WORKFLOW_PLOIDY;
+  taxonomyId: string | null;
   trsId: string;
   workflowDescription: string;
   workflowName: string;

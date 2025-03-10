@@ -8,6 +8,7 @@ export const SOURCE_GENOME_KEYS = [
   "isRef",
   "length",
   "level",
+  "lineageTaxonomyIds",
   "scaffoldCount",
   "scaffoldL50",
   "scaffoldN50",
