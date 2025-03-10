@@ -201,7 +201,7 @@ function buildWorkflow(
       throw new Error(`Unknown workflow category: ${category}`);
     workflowCategory.workflows.push({
       ploidy,
-      taxonomyId: taxonomyId === undefined ? null : String(taxonomyId),
+      taxonomyId: typeof taxonomyId === "number" ? String(taxonomyId) : null,
       trsId,
       workflowDescription,
       workflowName,

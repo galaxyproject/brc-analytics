@@ -112,7 +112,7 @@ export interface Workflow {
     /** The ploidy supported by the workflow. */
     ploidy: WorkflowPloidy,
     /** The NCBI ID of the taxon supported by the workflow. */
-    taxonomy_id?: number,
+    taxonomy_id?: number | null,
     /** The display name of the workflow. */
     workflow_name: string,
     /** The description of the workflow. */
