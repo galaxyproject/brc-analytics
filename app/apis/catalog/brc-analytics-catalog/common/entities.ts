@@ -70,6 +70,8 @@ export interface WorkflowCategory {
 }
 
 export interface Workflow {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- True type is something like { [key: string]: string | string[] }, but can't model with linkml
+  parameters: any;
   ploidy: WORKFLOW_PLOIDY;
   trsId: string;
   workflowDescription: string;

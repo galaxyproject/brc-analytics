@@ -5,6 +5,17 @@
     "name": "Variant calling",
     "workflows": [
       {
+        "parameters": {
+          "Paired Collection": {
+            "class": "Collection",
+            "ext": [
+              "fastqsanger",
+              "fastqsanger.gz"
+            ]
+          },
+          "Annotation GTF": "{{ gene_model_url }}",
+          "Genome fasta": "{{ assembly_fasta_url }}"
+        },
         "ploidy": "HAPLOID",
         "trsId": "#workflow/github.com/iwc-workflows/haploid-variant-calling-wgs-pe/main/versions/v0.1",
         "workflowDescription": "Workflow for variant analysis against a reference genome in GenBank format",
@@ -18,24 +29,40 @@
     "name": "Transcriptomics",
     "workflows": [
       {
+        "parameters": {
+          "reference genome": "{{ reference_genome }}",
+          "gtf": "{{ gene_model_url }}"
+        },
         "ploidy": "ANY",
         "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6",
         "workflowDescription": "This workflow processes the CMO fastqs with CITE-seq-Count and include the translation step required for cellPlex processing. In parallel it processes the Gene Expresion fastqs with STARsolo, filter cells with DropletUtils and reformat all outputs to be easily used by the function 'Read10X' from Seurat.",
         "workflowName": "scRNA-seq_preprocessing_10X_cellPlex"
       },
       {
+        "parameters": {
+          "reference genome": "{{ reference_genome }}",
+          "gtf": "{{ gene_model_url }}"
+        },
         "ploidy": "ANY",
         "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6",
         "workflowDescription": "This workflow processes the Gene Expresion fastqs with STARsolo, filter cells with DropletUtils and reformat all outputs to be easily used by the function 'Read10X' from Seurat.",
         "workflowName": "scRNA-seq_preprocessing_10X_v3_Bundle"
       },
       {
+        "parameters": {
+          "Reference genome": "{{ reference_genome }}",
+          "GTF file of annotation": "{{ gene_model_url }}"
+        },
         "ploidy": "ANY",
         "trsId": "#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.2",
         "workflowDescription": "Complete RNA-Seq analysis for paired-end data: Processes raw FASTQ data through adapter and bad quality removal (fastp), alignment with STAR using ENCODE parameters, gene quantification via multiple methods (STAR and featureCounts), and expression calculation (FPKM with Cufflinks/StringTie, normalized coverage with bedtools). Produces count tables, normalized expression values, and genomic coverage tracks. Supports stranded and unstranded libraries, generating both HTSeq-compatible counts and normalized measures for downstream analysis.",
         "workflowName": "RNA-Seq Analysis: Paired-End Read Processing and Quantification"
       },
       {
+        "parameters": {
+          "Reference genome": "{{ reference_genome }}",
+          "GTF file of annotation": "{{ gene_model_url }}"
+        },
         "ploidy": "ANY",
         "trsId": "#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.2",
         "workflowDescription": "Complete RNA-Seq analysis for single-end data:  Processes raw FASTQ data through adapter and bad quality removal (fastp), alignment with STAR using ENCODE parameters, gene quantification via multiple methods (STAR and featureCounts), and expression calculation (FPKM with Cufflinks/StringTie, normalized coverage with bedtools). Produces count tables, normalized expression values, and genomic coverage tracks. Supports stranded and unstranded libraries, generating both HTSeq-compatible counts and normalized measures for downstream analysis.",
@@ -49,24 +76,34 @@
     "name": "Regulation",
     "workflows": [
       {
+        "parameters": {
+          "reference_genome": "{{ reference_genome }}"
+        },
         "ploidy": "ANY",
         "trsId": "#workflow/github.com/iwc-workflows/atacseq/main/versions/v1.0",
         "workflowDescription": "Complete ATAC-seq analysis pipeline for paired-end reads. Processes raw FASTQ data through adapter and bad quality removal (cutadapt), alignment (Bowtie2 end-to-end), and filtering (removes MT reads, discordant pairs, low mapping quality <30, PCR duplicates). Generates 5' cut site pileups (±100bp), performs peak calling, and quantifies reads in 1kb summit-centered regions. Produces two normalized coverage tracks (per million mapped reads and per million reads in peaks) and fragment length distribution plots for quality assessment.",
         "workflowName": "ATAC-seq Analysis: Chromatin Accessibility Profiling"
       },
       {
+        "parameters": {
+          "reference_genome": "{{ reference_genome }}"
+        },
         "ploidy": "ANY",
         "trsId": "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.13",
         "workflowDescription": "Complete ChIP-seq analysis for paired-end sequencing data. Processes raw FASTQ files through adapter removal (cutadapt), alignment to reference genome (Bowtie2), and stringent quality filtering (MAPQ ≥ 30, concordant pairs only). Peak calling with MACS2 optimized for paired-end reads identifies protein-DNA binding sites. Generates alignment files, peak calls, and quality metrics for downstream analysis.",
         "workflowName": "ChIP-seq Analysis: Paired-End Read Processing"
       },
       {
+        "parameters": {
+          "reference_genome": "{{ reference_genome }}"
+        },
         "ploidy": "ANY",
         "trsId": "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.13",
         "workflowDescription": "Complete ChIP-seq analysis for single-end sequencing data. Processes raw FASTQ files through adapter removal (cutadapt), alignment to reference genome (Bowtie2), and quality filtering (MAPQ ≥ 30). Peak calling with MACS2 uses either a fixed extension parameter or built-in model to identify protein-DNA binding sites. Generates alignment files, peak calls, and quality metrics for downstream analysis.",
         "workflowName": "ChIP-seq Analysis: Single-End Read Processing"
       },
       {
+        "parameters": {},
         "ploidy": "ANY",
         "trsId": "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.3",
         "workflowDescription": "Identifies high-confidence consensus peaks from ATAC-seq or CUT&RUN replicate experiments. The workflow calls peaks on individual replicates and identifies their intersection. To control for sequencing depth differences, it subsamples all replicates to the smallest library size, performs peak calling on the combined normalized data, and retains only peaks whose summits overlap with intersections from a user-defined minimum number of replicates.",
