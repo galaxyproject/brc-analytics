@@ -49,7 +49,7 @@ export const Questions = (): JSX.Element => {
           <DXLink label="ACCESS-CI" url={URLS.ACCESS_CONSORTIUM} /> consortium.
         </MAccordionDetails>
       </Accordion>
-      <Accordion expanded={true}>
+      <Accordion>
         <AccordionSummary>Can I really do analyses for free?</AccordionSummary>
         <MAccordionDetails>
           <ol>
