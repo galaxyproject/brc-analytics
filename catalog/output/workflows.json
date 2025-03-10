@@ -108,6 +108,15 @@
         "trsId": "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.3",
         "workflowDescription": "Identifies high-confidence consensus peaks from ATAC-seq or CUT&RUN replicate experiments. The workflow calls peaks on individual replicates and identifies their intersection. To control for sequencing depth differences, it subsamples all replicates to the smallest library size, performs peak calling on the combined normalized data, and retains only peaks whose summits overlap with intersections from a user-defined minimum number of replicates.",
         "workflowName": "Consensus Peak Calling for ATAC-seq and CUT&RUN Replicates"
+      },
+      {
+        "parameters": {
+          "reference_genome": "{{ reference_genome }}"
+        },
+        "ploidy": "ANY",
+        "trsId": "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.14",
+        "workflowDescription": "Complete CUT&RUN/CUT&TAG analysis workflow for paired-end sequencing data. Processes raw FASTQ files through adapter removal (cutadapt) and alignment (Bowtie2 with dovetail option enabled). Applies quality filtering (MAPQ ≥ 30, concordant pairs only), converts BAM to BED format, and performs peak calling using MACS2 with parameters optimized for the punctate signal profile characteristic of CUT&RUN/CUT&TAG experiments.",
+        "workflowName": "CUT&RUN/CUT&TAG Analysis: Protein-DNA Interaction Mapping"
       }
     ]
   },

@@ -225,7 +225,7 @@ workflows:
     ploidy: ANY
     parameters:
       reference_genome: "{{ reference_genome }}"
-    active: false
+    active: true
   - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6"
     categories:
       - TRANSCRIPTOMICS
