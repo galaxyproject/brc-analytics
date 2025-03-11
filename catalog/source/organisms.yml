@@ -28,7 +28,6 @@ organisms:
       - HAPLOID
       - DIPLOID
   - taxonomy_id: 4896
-    invalid_key: test
     ploidy:
       - HAPLOID
       - DIPLOID
