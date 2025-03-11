@@ -419,6 +419,19 @@ export const buildGenomeAnalysisMethods = (
 };
 
 /**
+ * Build props for the genome AnalysisMethodsCatalog component.
+ * @param genome - Genome entity.
+ * @returns Props to be used for the AnalysisMethodsCatalog component.
+ */
+export const buildGenomePrimaryData = (
+  genome: BRCDataCatalogGenome
+): ComponentProps<typeof C.PrimaryDataViewer> => {
+  return {
+    initialQuery: `tax_id=${genome.speciesTaxonomyId}`,
+  };
+};
+
+/**
  * Build props for the genome AnalysisPortals component.
  * @param genome - Genome entity.
  * @returns Props to be used for the AnalysisPortals component.
