@@ -2,7 +2,6 @@ import pandas as pd
 import yaml
 import requests
 import urllib
-import re
 import time
 from bs4 import BeautifulSoup
 import logging
@@ -161,30 +160,25 @@ def get_genomes_and_primarydata_df(accessions):
 
 
 def _id_to_gene_model_url(asm_id):
-  hubs_url = "https://hgdownload.soe.ucsc.edu/hubs/"
-  components = [asm_id[0:3], asm_id[4:7], asm_id[7:10], asm_id[10:13], asm_id, "genes"]
-  url = urllib.parse.urljoin(hubs_url, "/".join(components))
-  # url looks something like https://hgdownload.soe.ucsc.edu/hubs/GCF/030/504/385/GCF_030504385.1/genes/
-  # and contains html content with links to gene models.
-  # we need to scrape this to get the gtf
-  print(f"fetching url {url}")
-  response = requests.get(url)
+  ucsc_files_endpoint = "https://genome.ucsc.edu/list/files"
+  download_base_url = "https://hgdownload.soe.ucsc.edu"
+  response = requests.get(ucsc_files_endpoint, params={"genome": asm_id})
   try:
     response.raise_for_status()
   except Exception:
     # FIXME?: Some accessions don't have a gene folder
     return None
   # find link to gtf, should ideally be ncbiRefSeq, but augustus will do
-  html_content = response.text
-  pattern = rf"{asm_id.replace('.', r'\.')}.*?\.gtf\.gz"
-  augustus_file = None
-  for match in re.findall(pattern, html_content):
-    if "ncbiRefSeq" in match:
-      return urllib.parse.urljoin(f"{url}/", match)
-    elif "augustus" in match:
-      augustus_file = match
-  if augustus_file:
-    return urllib.parse.urljoin(f"{url}/", augustus_file)
+  files = response.json()
+  gtf_urls = [entry["url"] for entry in files["urlList"] if entry["url"].endswith(".gtf.gz")]
+  augustus_url = None
+  for url in gtf_urls:
+    if "ncbiRefSeq" in url:
+      return urllib.parse.urljoin(f"{download_base_url}/", url)
+    elif "augustus" in url:
+      augustus_url = url
+  if augustus_url:
+    return urllib.parse.urljoin(f"{download_base_url}/", augustus_url)
   # No match, I guess that's OK ?
   return None
 
