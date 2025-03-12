@@ -1,5 +1,7 @@
 name: Check pull request title
-on: [pull_request]
+on:
+  pull_request:
+    types: [edited, opened, synchronize, reopened]
 
 jobs:
   run-checks:
