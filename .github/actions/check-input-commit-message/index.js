@@ -35,9 +35,9 @@ function checkIssueNumber(message) {
 async function checkMessage() {
   const message = core.getInput("message");
   const failedChecks = [];
+  if (!checkIssueNumber(message)) failedChecks.push("issue number");
   if (!(await runCommitlint(message)))
     failedChecks.push("Conventional Commits");
-  if (!checkIssueNumber(message)) failedChecks.push("issue number");
   if (failedChecks.length > 0)
     core.setFailed(
       `Failed ${failedChecks.join(" and ")} check${failedChecks.length > 1 ? "s" : ""}`
