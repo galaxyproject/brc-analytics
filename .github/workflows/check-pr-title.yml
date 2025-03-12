@@ -18,7 +18,7 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
       - name: Install dependencies
         run: npm ci
-      - name: Check pull request title for commit message format
+      - name: Check pull request title for Conventional Commits format and GitHub issue number
         uses: ./.github/actions/check-input-commit-message
         with:
           message: ${{ github.event.pull_request.title }}
