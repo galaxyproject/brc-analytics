@@ -4,7 +4,7 @@ on:
     types: [edited, opened, synchronize, reopened]
 
 jobs:
-  run-checks:
+  check-pr-title:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
