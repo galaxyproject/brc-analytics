@@ -1916,3 +1916,13 @@ organisms:
   - taxonomy_id: 3151832
     ploidy:
       - HAPLOID
+  - taxonomy_id: 2955291
+    ploidy:
+      - HAPLOID
+  # zombie ant fungus
+  # couldnt find species? just genus?
+  # double check ploidy TODO
+  - taxonomy_id: 474995
+    ploidy:
+      - HAPLOID
+      - DIPLOID

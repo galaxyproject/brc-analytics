@@ -2333,3 +2333,14 @@ assemblies:
   # organism: Mycobacterium tuberculosis
   # common_name: Mycobacterium tuberculosis (GReAT_CRyPTIC_Unmapped_H37Rv 2023)
   - accession: GCF_963525475.1
+  # organism: Influenza A
+  - accession: GCF_001343785.1
+  - accession: GCF_000928555.1
+  - accession: GCF_000866645.1
+  - accession: GCF_000865725.1
+  - accession: GCF_000865085.1
+  - accession: GCF_000864105.1
+  - accession: GCF_000851145.1
+  # organism: Ophiocordyceps unilateralis
+  # common_name: zombie ant fungus
+  - accession: GCA_001272575.2
