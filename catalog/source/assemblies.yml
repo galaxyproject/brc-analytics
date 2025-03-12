@@ -1883,6 +1883,7 @@ assemblies:
   # organism: Monkeypox virus
   # common_name: Monkeypox virus (Zaire-96-I-16 2021)
   - accession: GCF_000857045.1
+  - accession: GCF_014621545.1
   # organism: Plasmodium fragile
   # common_name: apicomplexans P.fragile (nilgiri 2015)
   - accession: GCF_000956335.1
@@ -2341,6 +2342,216 @@ assemblies:
   - accession: GCF_000865085.1
   - accession: GCF_000864105.1
   - accession: GCF_000851145.1
-  # organism: Ophiocordyceps unilateralis
-  # common_name: zombie ant fungus
-  - accession: GCA_001272575.2
+  # Alkhurma hemorrhagic fever
+  - accession: GCA_031116565.1
+  # Cache valley virus
+  - accession: GCF_004789995.1
+  # Caliciviridae viruses
+  # norovirus and its animal infecting relatives
+  - accession: GCF_000864005.1
+  - accession: GCF_007609015.1
+  - accession: GCF_007608995.1
+  - accession: GCF_008767155.1
+  - accession: GCF_008792745.1
+  - accession: GCF_000849945.1
+  - accession: GCF_000861285.1
+  - accession: GCF_000847705.1
+  - accession: GCF_004786895.1
+  - accession: GCF_004786995.1
+  - accession: GCF_000867125.1
+  - accession: GCF_000851625.1
+  - accession: GCF_000919195.1
+  - accession: GCF_000857785.1
+  - accession: GCF_004786795.1
+  - accession: GCF_002285005.1
+  - accession: GCF_000883855.1
+  - accession: GCF_003638685.1
+  - accession: GCF_008711635.1
+  - accession: GCF_004193815.1
+  - accession: GCF_010478905.1
+  - accession: GCF_003813225.1
+  - accession: GCF_008704025.1
+  - accession: GCF_008703985.1
+  - accession: GCF_008703965.1
+  - accession: GCF_003638645.1
+  - accession: GCF_007609035.1
+  - accession: GCF_003638665.1
+  - accession: GCF_001595715.1
+  - accession: GCF_001595695.1
+  - accession: GCF_008704005.1
+  - accession: GCF_000868425.1
+  - accession: GCF_001595675.1
+  - accession: GCF_000853345.1
+  - accession: GCF_001008475.1
+  - accession: GCF_000855765.1
+  - accession: GCF_000853825.1
+  - accession: GCF_000854265.1
+  - accession: GCF_000851085.1
+  - accession: GCF_000925155.1
+  - accession: GCF_000901135.1
+  - accession: GCF_002118765.1
+  - accession: GCF_000867805.1
+  - accession: GCF_001019935.1
+  - accession: GCF_000879655.1
+  - accession: GCF_000852525.1
+  - accession: GCF_001963095.1
+  - accession: GCF_000920715.1
+  - accession: GCF_001755385.1
+  - accession: GCF_000894635.1
+  - accession: GCF_001714355.1
+  - accession: GCF_002005625.1
+  - accession: GCF_000859525.1
+  - accession: GCF_000882575.1
+  - accession: GCF_004130475.1
+  # California encephalitis virus
+  - accession: GCF_003972565.1
+  # chapare virus
+  - accession: GCF_000879235.1
+  # Chikungunya virus
+  - accession: GCF_000854045.1
+  # Crimean-Congo hemorrhagic fever virus
+  - accession: GCA_032106395.1
+  # dengue
+  - accession: GCF_000871845.1
+  - accession: GCF_000866625.1
+  - accession: GCF_000865065.1
+  - accession: GCF_000862125.1
+  - accession: GCA_004786575.1
+  - accession: GCA_004788295.1
+  # Eastern equine encephalitis virus
+  - accession: GCF_000862705.1
+  # ebola
+  - accession: GCF_000848505.1
+  - accession: GCF_000888475.1
+  - accession: GCF_000854085.1
+  - accession: GCF_000855585.1
+  # Enterovirus d68
+  - accession: GCF_002816725.1
+  # enterovirus a71
+  - accession: GCA_008766895.1
+  - accession: GCA_031109255.1
+  - accession: GCA_031116425.1
+  - accession: GCA_031116435.1
+  - accession: GCA_031128755.1
+  # Guanarito virus
+  - accession: GCF_000853765.1
+  # hantaviruses
+  - accession: GCF_002117615.1
+  - accession: GCF_002146125.1
+  - accession: GCF_002145545.1
+  - accession: GCF_002145825.3
+  - accession: GCF_000854765.1
+  - accession: GCF_002830985.1
+  - accession: GCF_002994685.1
+  - accession: GCF_002830685.1
+  - accession: GCF_002816435.1
+  - accession: GCF_002118085.1
+  - accession: GCF_000855225.1
+  - accession: GCF_002117675.1
+  - accession: GCF_002827125.1
+  - accession: GCF_000856085.1
+  - accession: GCF_002119025.1
+  - accession: GCF_000863045.1
+  - accession: GCF_002118945.1
+  - accession: GCF_002145925.1
+  - accession: GCF_000855645.1
+  - accession: GCF_002117715.1
+  - accession: GCF_002145785.1
+  - accession: GCF_002146025.1
+  - accession: GCF_018595015.1
+  - accession: GCF_018594985.1
+  - accession: GCF_002815935.1
+  - accession: GCF_000854405.1
+  - accession: GCF_000855785.1
+  # heartland virus
+  - accession: GCF_013086545.1
+  - accession: GCF_000922255.1
+  # Hendra virus
+  - accession: GCF_000852685.1
+  # hepatitis a
+  - accession: GCF_000860505.1
+  - accession: GCF_001502175.1
+  - accession: GCA_008776015.1
+  # Japanese encephalitis
+  - accession: GCF_000862145.1
+  # junin virus
+  - accession: GCF_000856545.1
+  # Kyasanur Forest
+  - accession: GCF_002820625.1
+  # la crosse virus
+  - accession: GCF_004789695.1
+  - accession: GCF_000850965.1
+  - accession: GCA_002831285.1
+  # Langya virus
+  - accession: GCA_031319335.1
+  # lassa virus
+  - accession: GCF_000851705.1
+  - accession: GCA_900094045.1
+  - accession: GCF_000855745.1
+  # lujo virus
+  - accession: GCF_000885555.1
+  # Lymphocytic choriomeningitis virus
+  - accession: GCF_004789475.1
+  - accession: GCA_031580275.1
+  - accession: GCF_000851025.1
+  # Machupo virus
+  - accession: GCF_000853725.1
+  # marburg virus
+  - accession: GCF_000943645.1
+  - accession: GCF_000857325.2
+  - accession: GCA_000857325.3
+  - accession: GCA_031121245.1
+  - accession: GCA_031121255.1
+  - accession: GCA_031129775.1
+  - accession: GCA_031121995.1
+  # mayaro virus
+  - accession: GCF_000863385.1
+  # Nipah virus
+  - accession: GCF_000863625.1
+  # O’nyong-nyong virus
+  - accession: GCF_000863005.1
+  - accession: GCF_002888795.1
+  - accession: GCA_002888815.1
+  # Omsk hemorrhagic fever virus
+  - accession: GCF_000855505.1
+  # Oropouche virus
+  - accession: GCF_000853785.1
+  # Poliovirus
+  - accession: GCA_008766755.1
+  - accession: GCA_008766715.1
+  - accession: GCA_003108605.1
+  # Powassan (deer tick) virus
+  - accession: GCF_000860485.1
+  - accession: GCA_004786555.1
+  # Punta Toro virus
+  - accession: GCF_002815115.1
+  - accession: GCA_001021295.1
+  - accession: GCA_031322265.1
+  # Rabies virus
+  - accession: GCF_000859625.1
+  # Rift Valley fever virus
+  - accession: GCF_000847345.1
+  # St. Louis encephalitis virus
+  - accession: GCF_000866785.1
+  # Severe fever with thrombocytopenia syndrome virus
+  - accession: GCF_003087855.1
+  # Tickborne encephalitis virus
+  - accession: GCF_000863125.1
+  - accession: GCA_004788235.1
+  # variola (smallpox)
+  - accession: GCF_000859885.1
+  # Venezuelan equine encephalitis
+  - accession: GCF_002889695.1
+  - accession: GCF_000862105.1
+  # west nile virus
+  - accession: GCF_000875385.1
+  - accession: GCF_000861085.1
+  - accession: GCA_004786635.1
+  # Western equine encephalitis virus
+  - accession: GCF_002889215.1
+  - accession: GCF_000850885.1
+  # yellow fever
+  - accession: GCF_000857725.1
+  # zika
+  - accession: GCF_000882815.3
+  - accession: GCF_002366285.1
