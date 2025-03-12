@@ -1,0 +1,10 @@
+id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/enums/workflow_parameter_variable.yaml#
+name: enums_workflow_parameter_variable
+
+enums:
+  WorkflowParameterVariable:
+    description: Possible variables that can be inserted into workflow parameters.
+    permissible_values:
+      ASSEMBLY_ID:
+      ASSEMBLY_FASTA_URL:
+      GENE_MODEL_URL:

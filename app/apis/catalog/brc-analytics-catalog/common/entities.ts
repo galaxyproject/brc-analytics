@@ -1,4 +1,8 @@
-import { ORGANISM_PLOIDY, WORKFLOW_PLOIDY } from "./schema-entities";
+import {
+  ORGANISM_PLOIDY,
+  WORKFLOW_PARAMETER_VARIABLE,
+  WORKFLOW_PLOIDY,
+} from "./schema-entities";
 
 export type BRCCatalog = BRCDataCatalogGenome;
 
@@ -71,11 +75,15 @@ export interface WorkflowCategory {
 }
 
 export interface Workflow {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- True type is something like { [key: string]: string | string[] }, but can't model with linkml
-  parameters: any;
+  parameters: WorkflowParameter[];
   ploidy: WORKFLOW_PLOIDY;
   taxonomyId: string | null;
   trsId: string;
   workflowDescription: string;
   workflowName: string;
+}
+
+export interface WorkflowParameter {
+  key: string;
+  variable: WORKFLOW_PARAMETER_VARIABLE;
 }

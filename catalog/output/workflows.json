@@ -5,17 +5,16 @@
     "name": "Variant calling",
     "workflows": [
       {
-        "parameters": {
-          "Paired Collection": {
-            "class": "Collection",
-            "ext": [
-              "fastqsanger",
-              "fastqsanger.gz"
-            ]
+        "parameters": [
+          {
+            "key": "Annotation GTF",
+            "variable": "GENE_MODEL_URL"
           },
-          "Annotation GTF": "{{ gene_model_url }}",
-          "Genome fasta": "{{ assembly_fasta_url }}"
-        },
+          {
+            "key": "Genome fasta",
+            "variable": "ASSEMBLY_FASTA_URL"
+          }
+        ],
         "ploidy": "HAPLOID",
         "taxonomyId": null,
         "trsId": "#workflow/github.com/iwc-workflows/haploid-variant-calling-wgs-pe/main/versions/v0.1",
@@ -30,10 +29,16 @@
     "name": "Transcriptomics",
     "workflows": [
       {
-        "parameters": {
-          "reference genome": "{{ assembly_id }}",
-          "gtf": "{{ gene_model_url }}"
-        },
+        "parameters": [
+          {
+            "key": "reference genome",
+            "variable": "ASSEMBLY_ID"
+          },
+          {
+            "key": "gtf",
+            "variable": "GENE_MODEL_URL"
+          }
+        ],
         "ploidy": "ANY",
         "taxonomyId": null,
         "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.2",
@@ -41,10 +46,16 @@
         "workflowName": "Single-Cell RNA-seq Preprocessing: 10X Genomics CellPlex Multiplexed Samples"
       },
       {
-        "parameters": {
-          "reference genome": "{{ assembly_id }}",
-          "gtf": "{{ gene_model_url }}"
-        },
+        "parameters": [
+          {
+            "key": "reference genome",
+            "variable": "ASSEMBLY_ID"
+          },
+          {
+            "key": "gtf",
+            "variable": "GENE_MODEL_URL"
+          }
+        ],
         "ploidy": "ANY",
         "taxonomyId": null,
         "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.2",
@@ -52,10 +63,16 @@
         "workflowName": "Single-Cell RNA-seq Preprocessing: 10X Genomics v3 to Seurat and Scanpy Compatible Format"
       },
       {
-        "parameters": {
-          "Reference genome": "{{ assembly_id }}",
-          "GTF file of annotation": "{{ gene_model_url }}"
-        },
+        "parameters": [
+          {
+            "key": "Reference genome",
+            "variable": "ASSEMBLY_ID"
+          },
+          {
+            "key": "GTF file of annotation",
+            "variable": "GENE_MODEL_URL"
+          }
+        ],
         "ploidy": "ANY",
         "taxonomyId": null,
         "trsId": "#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.2",
@@ -63,10 +80,16 @@
         "workflowName": "RNA-Seq Analysis: Paired-End Read Processing and Quantification"
       },
       {
-        "parameters": {
-          "Reference genome": "{{ assembly_id }}",
-          "GTF file of annotation": "{{ gene_model_url }}"
-        },
+        "parameters": [
+          {
+            "key": "Reference genome",
+            "variable": "ASSEMBLY_ID"
+          },
+          {
+            "key": "GTF file of annotation",
+            "variable": "GENE_MODEL_URL"
+          }
+        ],
         "ploidy": "ANY",
         "taxonomyId": null,
         "trsId": "#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.2",
@@ -81,9 +104,12 @@
     "name": "Regulation",
     "workflows": [
       {
-        "parameters": {
-          "assembly_id": "{{ assembly_id }}"
-        },
+        "parameters": [
+          {
+            "key": "reference_genome",
+            "variable": "ASSEMBLY_ID"
+          }
+        ],
         "ploidy": "ANY",
         "taxonomyId": null,
         "trsId": "#workflow/github.com/iwc-workflows/atacseq/main/versions/v1.0",
@@ -91,9 +117,12 @@
         "workflowName": "ATAC-seq Analysis: Chromatin Accessibility Profiling"
       },
       {
-        "parameters": {
-          "assembly_id": "{{ assembly_id }}"
-        },
+        "parameters": [
+          {
+            "key": "reference_genome",
+            "variable": "ASSEMBLY_ID"
+          }
+        ],
         "ploidy": "ANY",
         "taxonomyId": null,
         "trsId": "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.14",
@@ -101,9 +130,12 @@
         "workflowName": "ChIP-seq Analysis: Paired-End Read Processing"
       },
       {
-        "parameters": {
-          "assembly_id": "{{ assembly_id }}"
-        },
+        "parameters": [
+          {
+            "key": "reference_genome",
+            "variable": "ASSEMBLY_ID"
+          }
+        ],
         "ploidy": "ANY",
         "taxonomyId": null,
         "trsId": "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.14",
@@ -111,7 +143,7 @@
         "workflowName": "ChIP-seq Analysis: Single-End Read Processing"
       },
       {
-        "parameters": {},
+        "parameters": [],
         "ploidy": "ANY",
         "taxonomyId": null,
         "trsId": "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.3",
@@ -119,9 +151,12 @@
         "workflowName": "Consensus Peak Calling for ATAC-seq and CUT&RUN Replicates"
       },
       {
-        "parameters": {
-          "assembly_id": "{{ assembly_id }}"
-        },
+        "parameters": [
+          {
+            "key": "reference_genome",
+            "variable": "ASSEMBLY_ID"
+          }
+        ],
         "ploidy": "ANY",
         "taxonomyId": null,
         "trsId": "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.14",

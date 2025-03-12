@@ -1,3 +1,5 @@
+import { WORKFLOW_PARAMETER_VARIABLE } from "../apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { WorkflowParameter } from "../apis/catalog/brc-analytics-catalog/common/entities";
 import ky from "ky";
 import { GALAXY_ENVIRONMENT } from "site-config/common/galaxy";
 
@@ -34,8 +36,7 @@ export async function getWorkflowLandingUrl(
   workflowId: string,
   referenceGenome: string,
   geneModelUrl: string | null,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- True type is something like { [key: string]: string | string[] }, but can't model with linkml
-  parameters: any
+  parameters: WorkflowParameter[]
 ): Promise<string> {
   const body: WorkflowLandingsBody = {
     public: true,
@@ -67,27 +68,29 @@ function buildFastaUrl(identifier: string): string {
   return `${baseUrl}${formattedPath}`;
 }
 
-function paramValueToRequestValue(
-  value: string,
+function paramVariableToRequestValue(
+  variable: WORKFLOW_PARAMETER_VARIABLE,
   geneModelUrl: string | null,
   referenceGenome: string
-): string | { ext: string; src: string; url: string } | undefined {
-  if (value === "{{ assembly_id }}") {
-    return referenceGenome;
-  } else if (value === "{{ assembly_fasta_url }}") {
-    return {
-      ext: "fasta.gz",
-      src: "url",
-      url: buildFastaUrl(referenceGenome),
-    };
-  } else if (value === "{{ gene_model_url }}" && geneModelUrl) {
-    return {
-      ext: "gtf.gz",
-      src: "url",
-      url: geneModelUrl,
-    };
+): WorkflowLandingsBodyRequestState[string] | undefined {
+  switch (variable) {
+    case WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_ID:
+      return referenceGenome;
+    case WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_FASTA_URL:
+      return {
+        ext: "fasta.gz",
+        src: "url",
+        url: buildFastaUrl(referenceGenome),
+      };
+    case WORKFLOW_PARAMETER_VARIABLE.GENE_MODEL_URL:
+      return geneModelUrl
+        ? {
+            ext: "gtf.gz",
+            src: "url",
+            url: geneModelUrl,
+          }
+        : undefined;
   }
-  return undefined;
 }
 
 /**
@@ -100,23 +103,18 @@ function paramValueToRequestValue(
 function getWorkflowLandingsRequestState(
   referenceGenome: string,
   geneModelUrl: string | null,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- True type is something like { [key: string]: string | string[] }, but can't model with linkml
-  parameters: any
+  parameters: WorkflowParameter[]
 ): WorkflowLandingsBodyRequestState {
   const result: WorkflowLandingsBodyRequestState = {};
-  if (parameters) {
-    // this is the true type, but no idea how to model this with linkml
-    const paramObject = parameters as { [key: string]: string };
-    Object.entries(paramObject).forEach(([key, value]) => {
-      const maybeParam = paramValueToRequestValue(
-        value,
-        geneModelUrl,
-        referenceGenome
-      );
-      if (maybeParam !== undefined) {
-        result[key] = maybeParam;
-      }
-    });
-  }
+  parameters.forEach(({ key, variable }) => {
+    const maybeParam = paramVariableToRequestValue(
+      variable,
+      geneModelUrl,
+      referenceGenome
+    );
+    if (maybeParam !== undefined) {
+      result[key] = maybeParam;
+    }
+  });
   return result;
 }

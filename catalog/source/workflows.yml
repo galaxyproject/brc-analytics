@@ -8,8 +8,9 @@ workflows:
       and assembly graph
     ploidy: ANY
     parameters:
-      Input sequence reads:
-        class: File
+      - key: Input sequence reads
+        type_guide:
+          class: File
     active: false
   - trs_id: "#workflow/github.com/iwc-workflows/atacseq/main/versions/v1.0"
     categories:
@@ -25,7 +26,8 @@ workflows:
       peaks) and fragment length distribution plots for quality assessment.
     ploidy: ANY
     parameters:
-      assembly_id: "{{ assembly_id }}"
+      - key: reference_genome
+        variable: ASSEMBLY_ID
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/average-bigwig-between-replicates/main/versions/v0.2"
     categories:
@@ -40,10 +42,12 @@ workflows:
       named after the common sample prefix (without the replicate ID suffix).
     ploidy: ANY
     parameters:
-      Bigwig to average:
-        class: Collection
-      bin_size:
-        class: integer
+      - key: Bigwig to average
+        type_guide:
+          class: Collection
+      - key: bin_size
+        type_guide:
+          class: integer
     active: false
   - trs_id: "#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v1.1.5"
     categories:
@@ -54,20 +58,22 @@ workflows:
       of quality metrics and reports
     ploidy: ANY
     parameters:
-      Input adapter trimmed sequence reads (forward):
-        class: File
-        ext:
-          - fastq
-          - fastq.gz
-          - fastqsanger
-          - fastqsanger.gz
-      Input adapter trimmed sequence reads (reverse):
-        class: File
-        ext:
-          - fastq
-          - fastq.gz
-          - fastqsanger
-          - fastqsanger.gz
+      - key: Input adapter trimmed sequence reads (forward)
+        type_guide:
+          class: File
+          ext:
+            - fastq
+            - fastq.gz
+            - fastqsanger
+            - fastqsanger.gz
+      - key: Input adapter trimmed sequence reads (reverse)
+        type_guide:
+          class: File
+          ext:
+            - fastq
+            - fastq.gz
+            - fastqsanger
+            - fastqsanger.gz
     active: false
   - trs_id: "#workflow/github.com/iwc-workflows/baredsc/baredSC-1d-logNorm/versions/v0.6"
     categories:
@@ -81,15 +87,19 @@ workflows:
       of components in heterogeneous cell populations.
     ploidy: ANY
     parameters:
-      Tabular with raw expression values:
-        class: File
-        ext: tabular
-      Gene name:
-        class: text
-      Maximum value in logNorm:
-        class: float
-      Maximum number of Gaussians to study:
-        class: integer
+      - key: Tabular with raw expression values
+        type_guide:
+          class: File
+          ext: tabular
+      - key: Gene name
+        type_guide:
+          class: text
+      - key: Maximum value in logNorm
+        type_guide:
+          class: float
+      - key: Maximum number of Gaussians to study
+        type_guide:
+          class: integer
     active: false
   - trs_id: "#workflow/github.com/iwc-workflows/baredsc/baredSC-2d-logNorm/versions/v0.6"
     categories:
@@ -103,21 +113,28 @@ workflows:
       number of components in heterogeneous cell populations.
     ploidy: ANY
     parameters:
-      Tabular with raw expression values:
-        class: File
-        ext: tabular
-      Gene name for x axis:
-        class: text
-      maximum value in logNorm for x-axis:
-        class: float
-      Gene name for y axis:
-        class: text
-      maximum value in logNorm for y-axis:
-        class: float
-      Maximum number of Gaussians to study:
-        class: integer
-      compute p-value:
-        class: boolean
+      - key: Tabular with raw expression values
+        type_guide:
+          class: File
+          ext: tabular
+      - key: Gene name for x axis
+        type_guide:
+          class: text
+      - key: maximum value in logNorm for x-axis
+        type_guide:
+          class: float
+      - key: Gene name for y axis
+        type_guide:
+          class: text
+      - key: maximum value in logNorm for y-axis
+        type_guide:
+          class: float
+      - key: Maximum number of Gaussians to study
+        type_guide:
+          class: integer
+      - key: compute p-value
+        type_guide:
+          class: boolean
     active: false
   - trs_id: "#workflow/github.com/iwc-workflows/brew3r/main/versions/v0.2"
     categories:
@@ -132,18 +149,23 @@ workflows:
       in single-cell and bulk RNA-seq experiments.
     ploidy: ANY
     parameters:
-      Input gtf:
-        class: File
-        ext: gtf
-      BAM collection:
-        class: Collection
-        ext: bam
-      strandedness:
-        class: text
-      minimum coverage:
-        class: integer
-      minimum FPKM for merge:
-        class: float
+      - key: Input gtf
+        type_guide:
+          class: File
+          ext: gtf
+      - key: BAM collection
+        type_guide:
+          class: Collection
+          ext: bam
+      - key: strandedness
+        type_guide:
+          class: text
+      - key: minimum coverage
+        type_guide:
+          class: integer
+      - key: minimum FPKM for merge
+        type_guide:
+          class: float
     active: false
   - trs_id: "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.14"
     categories:
@@ -158,7 +180,8 @@ workflows:
       downstream analysis.
     ploidy: ANY
     parameters:
-      assembly_id: "{{ assembly_id }}"
+      - key: reference_genome
+        variable: ASSEMBLY_ID
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.14"
     categories:
@@ -173,7 +196,8 @@ workflows:
       downstream analysis.
     ploidy: ANY
     parameters:
-      assembly_id: "{{ assembly_id }}"
+      - key: reference_genome
+        variable: ASSEMBLY_ID
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.3"
     categories:
@@ -187,7 +211,7 @@ workflows:
       on the combined normalized data, and retains only peaks whose summits overlap
       with intersections from a user-defined minimum number of replicates.
     ploidy: ANY
-    parameters: {}
+    parameters: []
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-pe/versions/v1.3"
     categories:
@@ -201,7 +225,7 @@ workflows:
       normalized data, and retains only peaks whose summits overlap with intersections
       from a user-defined minimum number of replicates.
     ploidy: ANY
-    parameters: {}
+    parameters: []
     active: false
   - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-sr/versions/v1.3"
     categories:
@@ -215,7 +239,7 @@ workflows:
       normalized data, and retains only peaks whose summits overlap with intersections
       from a user-defined minimum number of replicates.
     ploidy: ANY
-    parameters: {}
+    parameters: []
     active: false
   - trs_id: "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.14"
     categories:
@@ -230,7 +254,8 @@ workflows:
       characteristic of CUT&RUN/CUT&TAG experiments.
     ploidy: ANY
     parameters:
-      assembly_id: "{{ assembly_id }}"
+      - key: reference_genome
+        variable: ASSEMBLY_ID
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.2"
     categories:
@@ -247,8 +272,10 @@ workflows:
       (Read10X function).
     ploidy: ANY
     parameters:
-      reference genome: "{{ assembly_id }}"
-      gtf: "{{ gene_model_url }}"
+      - key: reference genome
+        variable: ASSEMBLY_ID
+      - key: gtf
+        variable: GENE_MODEL_URL
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.2"
     categories:
@@ -263,8 +290,10 @@ workflows:
       Seurat/Scanpy (Read10X function).
     ploidy: ANY
     parameters:
-      reference genome: "{{ assembly_id }}"
-      gtf: "{{ gene_model_url }}"
+      - key: reference genome
+        variable: ASSEMBLY_ID
+      - key: gtf
+        variable: GENE_MODEL_URL
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/generic-variant-calling-wgs-pe/main/versions/v0.1.1"
     categories:
@@ -275,16 +304,19 @@ workflows:
       in GenBank format
     ploidy: ANY
     parameters:
-      Paired Collection:
-        class: Collection
-        ext:
-          - fastqsanger
-          - fastqsanger.gz
-      GenBank genome:
-        class: File
-        ext: genbank
-      Name for genome database:
-        class: text
+      - key: Paired Collection
+        type_guide:
+          class: Collection
+          ext:
+            - fastqsanger
+            - fastqsanger.gz
+      - key: GenBank genome
+        type_guide:
+          class: File
+          ext: genbank
+      - key: Name for genome database
+        type_guide:
+          class: text
     active: false
   - trs_id: "#workflow/github.com/iwc-workflows/goseq/main/versions/v0.1"
     categories:
@@ -300,19 +332,24 @@ workflows:
       as KEGG pathway enrichment results.
     ploidy: ANY
     parameters:
-      Select genome to use:
-        class: text
-      Differential expression result:
-        class: File
-        ext: tabular
-      Select gene ID format:
-        class: text
-      gene length:
-        class: File
-        ext: tabular
-      KEGG pathways:
-        class: File
-        ext: tabular
+      - key: Select genome to use
+        type_guide:
+          class: text
+      - key: Differential expression result
+        type_guide:
+          class: File
+          ext: tabular
+      - key: Select gene ID format
+        type_guide:
+          class: text
+      - key: gene length
+        type_guide:
+          class: File
+          ext: tabular
+      - key: KEGG pathways
+        type_guide:
+          class: File
+          ext: tabular
     active: false
   - trs_id: "#workflow/github.com/iwc-workflows/haploid-variant-calling-wgs-pe/main/versions/v0.1"
     categories:
@@ -323,13 +360,16 @@ workflows:
       GenBank format
     ploidy: HAPLOID
     parameters:
-      Paired Collection:
-        class: Collection
-        ext:
-          - fastqsanger
-          - fastqsanger.gz
-      Annotation GTF: "{{ gene_model_url }}"
-      Genome fasta: "{{ assembly_fasta_url }}"
+      - key: Paired Collection
+        type_guide:
+          class: Collection
+          ext:
+            - fastqsanger
+            - fastqsanger.gz
+      - key: Annotation GTF
+        variable: GENE_MODEL_URL
+      - key: Genome fasta
+        variable: ASSEMBLY_FASTA_URL
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/hic-hicup-cooler/chic-fastq-to-cool-hicup-cooler/versions/v0.3"
     categories:
@@ -344,26 +384,36 @@ workflows:
       for downstream analysis and visualization.
     ploidy: ANY
     parameters:
-      PE fastq input:
-        class: Collection
-      genome name:
-        class: text
-      Restriction enzyme:
-        class: text
-      No fill-in:
-        class: boolean
-      minimum MAPQ:
-        class: integer
-      Bin size in bp:
-        class: integer
-      Interactions to consider to calculate weights in normalization step:
-        class: text
-      capture region (chromosome):
-        class: text
-      capture region (start):
-        class: integer
-      capture region (end):
-        class: integer
+      - key: PE fastq input
+        type_guide:
+          class: Collection
+      - key: genome name
+        type_guide:
+          class: text
+      - key: Restriction enzyme
+        type_guide:
+          class: text
+      - key: No fill-in
+        type_guide:
+          class: boolean
+      - key: minimum MAPQ
+        type_guide:
+          class: integer
+      - key: Bin size in bp
+        type_guide:
+          class: integer
+      - key: Interactions to consider to calculate weights in normalization step
+        type_guide:
+          class: text
+      - key: capture region (chromosome)
+        type_guide:
+          class: text
+      - key: capture region (start)
+        type_guide:
+          class: integer
+      - key: capture region (end)
+        type_guide:
+          class: integer
     active: false
   - trs_id: "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-cool-hicup-cooler/versions/v0.3"
     categories:
@@ -378,22 +428,30 @@ workflows:
       ready for multi-resolution contact matrix analysis.
     ploidy: ANY
     parameters:
-      PE fastq input:
-        class: Collection
-      genome name:
-        class: text
-      Restriction enzyme:
-        class: text
-      No fill-in:
-        class: boolean
-      minimum MAPQ:
-        class: integer
-      Bin size in bp:
-        class: integer
-      Interactions to consider to calculate weights in normalization step:
-        class: text
-      region for matrix plotting:
-        class: text
+      - key: PE fastq input
+        type_guide:
+          class: Collection
+      - key: genome name
+        type_guide:
+          class: text
+      - key: Restriction enzyme
+        type_guide:
+          class: text
+      - key: No fill-in
+        type_guide:
+          class: boolean
+      - key: minimum MAPQ
+        type_guide:
+          class: integer
+      - key: Bin size in bp
+        type_guide:
+          class: integer
+      - key: Interactions to consider to calculate weights in normalization step
+        type_guide:
+          class: text
+      - key: region for matrix plotting
+        type_guide:
+          class: text
     active: false
   - trs_id: "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-pairs-hicup/versions/v0.3"
     categories:
@@ -409,16 +467,21 @@ workflows:
       high-confidence interaction data.
     ploidy: ANY
     parameters:
-      PE fastq input:
-        class: Collection
-      genome name:
-        class: text
-      Restriction enzyme:
-        class: text
-      No fill-in:
-        class: boolean
-      minimum MAPQ:
-        class: integer
+      - key: PE fastq input
+        type_guide:
+          class: Collection
+      - key: genome name
+        type_guide:
+          class: text
+      - key: Restriction enzyme
+        type_guide:
+          class: text
+      - key: No fill-in
+        type_guide:
+          class: boolean
+      - key: minimum MAPQ
+        type_guide:
+          class: integer
     active: false
   - trs_id: "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-juicermediumtabix-to-cool-cooler/versions/v0.3"
     categories:
@@ -432,14 +495,18 @@ workflows:
       between different Hi-C analysis ecosystems while maintaining data integrity.
     ploidy: ANY
     parameters:
-      Bin size in bp:
-        class: integer
-      genome name:
-        class: text
-      Juicer Medium Tabix with validPairs:
-        class: Collection
-      Interactions to consider to calculate weights in normalization step:
-        class: text
+      - key: Bin size in bp
+        type_guide:
+          class: integer
+      - key: genome name
+        type_guide:
+          class: text
+      - key: Juicer Medium Tabix with validPairs
+        type_guide:
+          class: Collection
+      - key: Interactions to consider to calculate weights in normalization step
+        type_guide:
+          class: text
     active: false
   - trs_id: "#workflow/github.com/iwc-workflows/mapseq-to-ampvis2/main/versions/v0.2"
     categories: []
@@ -450,10 +517,12 @@ workflows:
       MAPseq output datasets to produce structured output files suitable for Ampvis2.
     ploidy: ANY
     parameters:
-      MAPseq OTU tables:
-        class: Collection
-      OTU table metadata:
-        class: File
+      - key: MAPseq OTU tables
+        type_guide:
+          class: Collection
+      - key: OTU table metadata
+        type_guide:
+          class: File
     active: false
   - trs_id: "#workflow/github.com/iwc-workflows/polish-with-long-reads/main/versions/v0.1"
     categories:
@@ -462,12 +531,15 @@ workflows:
     workflow_description: Racon polish with long reads, x4
     ploidy: ANY
     parameters:
-      Assembly to be polished:
-        class: File
-      long reads:
-        class: File
-      "minimap setting (for long reads) ":
-        class: text
+      - key: Assembly to be polished
+        type_guide:
+          class: File
+      - key: long reads
+        type_guide:
+          class: File
+      - key: "minimap setting (for long reads) "
+        type_guide:
+          class: text
     active: false
   - trs_id: "#workflow/github.com/iwc-workflows/pseudobulk-worflow-decoupler-edger/main/versions/v0.1.1"
     categories:
@@ -482,25 +554,33 @@ workflows:
       visualize significantly differentially expressed genes.
     ploidy: ANY
     parameters:
-      Source AnnData file:
-        class: File
-        ext:
-          - h5
-          - h5ad
-      "Pseudo-bulk: Fields to merge":
-        class: text
-      Group by column:
-        class: text
-      Sample key column:
-        class: text
-      Name Your Raw Counts Layer:
-        class: text
-      Factor fields:
-        class: text
-      Formula:
-        class: text
-      Gene symbol column:
-        class: text
+      - key: Source AnnData file
+        type_guide:
+          class: File
+          ext:
+            - h5
+            - h5ad
+      - key: "Pseudo-bulk: Fields to merge"
+        type_guide:
+          class: text
+      - key: Group by column
+        type_guide:
+          class: text
+      - key: Sample key column
+        type_guide:
+          class: text
+      - key: Name Your Raw Counts Layer
+        type_guide:
+          class: text
+      - key: Factor fields
+        type_guide:
+          class: text
+      - key: Formula
+        type_guide:
+          class: text
+      - key: Gene symbol column
+        type_guide:
+          class: text
     active: false
   - trs_id: "#workflow/github.com/iwc-workflows/quality-and-contamination-control/main/versions/v1.1.6"
     categories:
@@ -511,24 +591,28 @@ workflows:
       read cleaning and taxonomy assignation
     ploidy: ANY
     parameters:
-      Input sequence reads (forward):
-        class: File
-        ext:
-          - fastq
-          - fastq.gz
-          - fastqsanger
-          - fastqsanger.gz
-      Input sequence reads (reverse):
-        class: File
-        ext:
-          - fastq
-          - fastq.gz
-          - fastqsanger
-          - fastqsanger.gz
-      Select a taxonomy database:
-        class: text
-      Select a NCBI taxonomy database:
-        class: text
+      - key: Input sequence reads (forward)
+        type_guide:
+          class: File
+          ext:
+            - fastq
+            - fastq.gz
+            - fastqsanger
+            - fastqsanger.gz
+      - key: Input sequence reads (reverse)
+        type_guide:
+          class: File
+          ext:
+            - fastq
+            - fastq.gz
+            - fastqsanger
+            - fastqsanger.gz
+      - key: Select a taxonomy database
+        type_guide:
+          class: text
+      - key: Select a NCBI taxonomy database
+        type_guide:
+          class: text
     active: false
   - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-de/main/versions/v0.3"
     categories:
@@ -544,18 +628,24 @@ workflows:
       for simple two-condition experimental designs.
     ploidy: ANY
     parameters:
-      Counts from changed condition:
-        class: Collection
-      Counts from reference condition:
-        class: Collection
-      Count files have header:
-        class: boolean
-      Gene Annotaton:
-        class: File
-      Adjusted p-value threshold:
-        class: float
-      log2 fold change threshold:
-        class: float
+      - key: Counts from changed condition
+        type_guide:
+          class: Collection
+      - key: Counts from reference condition
+        type_guide:
+          class: Collection
+      - key: Count files have header
+        type_guide:
+          class: boolean
+      - key: Gene Annotaton
+        type_guide:
+          class: File
+      - key: Adjusted p-value threshold
+        type_guide:
+          class: float
+      - key: log2 fold change threshold
+        type_guide:
+          class: float
     active: false
   - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.2"
     categories:
@@ -571,8 +661,10 @@ workflows:
       both HTSeq-compatible counts and normalized measures for downstream analysis."
     ploidy: ANY
     parameters:
-      Reference genome: "{{ assembly_id }}"
-      GTF file of annotation: "{{ gene_model_url }}"
+      - key: Reference genome
+        variable: ASSEMBLY_ID
+      - key: GTF file of annotation
+        variable: GENE_MODEL_URL
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.2"
     categories:
@@ -588,8 +680,10 @@ workflows:
       both HTSeq-compatible counts and normalized measures for downstream analysis."
     ploidy: ANY
     parameters:
-      Reference genome: "{{ assembly_id }}"
-      GTF file of annotation: "{{ gene_model_url }}"
+      - key: Reference genome
+        variable: ASSEMBLY_ID
+      - key: GTF file of annotation
+        variable: GENE_MODEL_URL
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/variation-reporting/main/versions/v0.1.1"
     categories:
@@ -602,15 +696,19 @@ workflows:
       plot of variants and their allele-frequencies.
     ploidy: ANY
     parameters:
-      Variation data to report:
-        class: Collection
-        ext:
-          - vcf
-          - vcf_bgzip
-      AF Filter:
-        class: float
-      DP Filter:
-        class: integer
-      DP_ALT Filter:
-        class: integer
+      - key: Variation data to report
+        type_guide:
+          class: Collection
+          ext:
+            - vcf
+            - vcf_bgzip
+      - key: AF Filter
+        type_guide:
+          class: float
+      - key: DP Filter
+        type_guide:
+          class: integer
+      - key: DP_ALT Filter
+        type_guide:
+          class: integer
     active: false

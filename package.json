@@ -15,6 +15,7 @@
     "test": "jest --runInBand",
     "build-brc-db": "esrun catalog/build/ts/build-catalog.ts",
     "build-files-from-ncbi": "python3 ./catalog/build/py/build-files-from-ncbi.py",
+    "iwc-manifest-to-workflows-yaml": "python3 ./catalog/build/py/iwc_manifest_to_workflows_yaml.py --exclude-other",
     "gen-schema": "./catalog/schema/scripts/gen-schema.sh",
     "test-gen-python": "./catalog/schema/scripts/test-gen-python.sh",
     "validate-catalog": "./catalog/schema/scripts/validate-catalog.sh"
