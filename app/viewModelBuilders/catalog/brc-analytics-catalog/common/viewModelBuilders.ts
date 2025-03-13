@@ -276,6 +276,19 @@ export const buildTaxonomicLevelClass = (
 };
 
 /**
+ * Build props for the domain cell.
+ * @param entity - Organism or genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildTaxonomicLevelDomain = (
+  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: entity.taxonomicLevelDomain,
+  };
+};
+
+/**
  * Build props for the family cell.
  * @param entity - Organism or genome entity.
  * @returns Props to be used for the cell.
@@ -337,19 +350,6 @@ export const buildTaxonomicLevelPhylum = (
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.taxonomicLevelPhylum,
-  };
-};
-
-/**
- * Build props for the superkingdom cell.
- * @param entity - Organism or genome entity.
- * @returns Props to be used for the cell.
- */
-export const buildTaxonomicLevelSuperkingdom = (
-  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
-): ComponentProps<typeof C.BasicCell> => {
-  return {
-    value: entity.taxonomicLevelSuperkingdom,
   };
 };
 

@@ -26,7 +26,7 @@ TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
 }
 
 TAXANOMIC_LEVELS_FOR_TREE = [
-  "superkingdom", 
+  "domain", 
   "kingdom", 
   "phylum", 
   "class", 

@@ -98,6 +98,7 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
       strainName: parseStringOrNull(row.strain),
       taxonomicGroup: row.taxonomicGroup ? row.taxonomicGroup.split(",") : [],
       taxonomicLevelClass: defaultStringToNone(row.taxonomicLevelClass),
+      taxonomicLevelDomain: defaultStringToNone(row.taxonomicLevelDomain),
       taxonomicLevelFamily: defaultStringToNone(row.taxonomicLevelFamily),
       taxonomicLevelGenus: defaultStringToNone(row.taxonomicLevelGenus),
       taxonomicLevelKingdom: defaultStringToNone(row.taxonomicLevelKingdom),
@@ -105,9 +106,6 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
       taxonomicLevelPhylum: defaultStringToNone(row.taxonomicLevelPhylum),
       taxonomicLevelSpecies: defaultStringToNone(row.taxonomicLevelSpecies),
       taxonomicLevelStrain,
-      taxonomicLevelSuperkingdom: defaultStringToNone(
-        row.taxonomicLevelSuperkingdom
-      ),
       ucscBrowserUrl: parseStringOrNull(row.ucscBrowser),
     });
   }
@@ -143,6 +141,7 @@ function buildOrganism(
     ncbiTaxonomyId: genome.speciesTaxonomyId,
     taxonomicGroup: genome.taxonomicGroup,
     taxonomicLevelClass: genome.taxonomicLevelClass,
+    taxonomicLevelDomain: genome.taxonomicLevelDomain,
     taxonomicLevelFamily: genome.taxonomicLevelFamily,
     taxonomicLevelGenus: genome.taxonomicLevelGenus,
     taxonomicLevelKingdom: genome.taxonomicLevelKingdom,
@@ -153,7 +152,6 @@ function buildOrganism(
       organism?.taxonomicLevelStrain,
       genome.taxonomicLevelStrain
     ),
-    taxonomicLevelSuperkingdom: genome.taxonomicLevelSuperkingdom,
   };
 }
 
