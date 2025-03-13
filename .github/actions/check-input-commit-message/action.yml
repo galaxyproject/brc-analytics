@@ -1,0 +1,9 @@
+name: Check input commit message
+description: Check an input string for Conventional Commits format and issue number
+inputs:
+  message:
+    description: String to check as a commit message
+    required: true
+runs:
+  using: "node20"
+  main: "index.js"

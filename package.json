@@ -40,9 +40,13 @@
     "validate.js": "^0.13.1"
   },
   "devDependencies": {
+    "@actions/core": "^1.11.1",
     "@babel/core": "^7.17.10",
     "@commitlint/cli": "^19.6.0",
     "@commitlint/config-conventional": "^19.6.0",
+    "@commitlint/format": "^19.8.0",
+    "@commitlint/lint": "^19.8.0",
+    "@commitlint/load": "^19.8.0",
     "@mui/types": "^7.2.18",
     "@next/eslint-plugin-next": "^15.0.4",
     "@playwright/test": "^1.49.1",
