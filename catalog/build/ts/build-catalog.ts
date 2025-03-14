@@ -104,6 +104,7 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
       taxonomicLevelKingdom: defaultStringToNone(row.taxonomicLevelKingdom),
       taxonomicLevelOrder: defaultStringToNone(row.taxonomicLevelOrder),
       taxonomicLevelPhylum: defaultStringToNone(row.taxonomicLevelPhylum),
+      taxonomicLevelRealm: defaultStringToNone(row.taxonomicLevelRealm),
       taxonomicLevelSpecies: defaultStringToNone(row.taxonomicLevelSpecies),
       taxonomicLevelStrain,
       ucscBrowserUrl: parseStringOrNull(row.ucscBrowser),
@@ -147,6 +148,7 @@ function buildOrganism(
     taxonomicLevelKingdom: genome.taxonomicLevelKingdom,
     taxonomicLevelOrder: genome.taxonomicLevelOrder,
     taxonomicLevelPhylum: genome.taxonomicLevelPhylum,
+    taxonomicLevelRealm: genome.taxonomicLevelRealm,
     taxonomicLevelSpecies: genome.taxonomicLevelSpecies,
     taxonomicLevelStrain: accumulateArrayValue(
       organism?.taxonomicLevelStrain,

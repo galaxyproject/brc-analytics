@@ -26,13 +26,14 @@ TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
 }
 
 TAXANOMIC_LEVELS_FOR_TREE = [
-  "domain", 
-  "kingdom", 
-  "phylum", 
-  "class", 
-  "order", 
-  "family", 
-  "genus", 
+  "domain",
+  "realm",
+  "kingdom",
+  "phylum",
+  "class",
+  "order",
+  "family",
+  "genus",
   "species",
   "strain"
 ]

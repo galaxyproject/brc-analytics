@@ -354,6 +354,19 @@ export const buildTaxonomicLevelPhylum = (
 };
 
 /**
+ * Build props for the realm cell.
+ * @param entity - Organism or genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildTaxonomicLevelRealm = (
+  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: entity.taxonomicLevelRealm,
+  };
+};
+
+/**
  * Build props for the scaffold count cell.
  * @param genome - Genome entity.
  * @returns Props to be used for the cell.

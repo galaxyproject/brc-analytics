@@ -65,6 +65,10 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_KINGDOM,
           },
           {
+            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_REALM,
+            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_REALM,
+          },
+          {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_DOMAIN,
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_DOMAIN,
           },
@@ -99,6 +103,15 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_DOMAIN,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_DOMAIN,
+        width: { max: "1fr", min: "auto" },
+      },
+      {
+        componentConfig: {
+          component: C.BasicCell,
+          viewBuilder: V.buildTaxonomicLevelRealm,
+        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_REALM,
+        id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_REALM,
         width: { max: "1fr", min: "auto" },
       },
       {
@@ -211,6 +224,7 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ORDER]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_PHYLUM]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN]: false,
+          [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_REALM]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_DOMAIN]: false,
         },
         sorting: [
