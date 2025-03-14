@@ -8,9 +8,14 @@ prefixes:
 imports:
   - linkml:types
   - ./enums/workflow_category_id
+  - ./enums/workflow_parameter_variable
   - ./enums/workflow_ploidy
 
 classes:
+  Any:
+    class_uri: linkml:Any
+    description: Placeholder type; used avoid unnecessary restrictions on the `type_guide` slot.
+
   Workflows:
     description: Object containing list of workflows.
     tree_root: true
@@ -33,14 +38,6 @@ classes:
         multivalued: true
         required: true
         range: WorkflowCategoryId
-      ploidy:
-        description: The ploidy supported by the workflow.
-        required: true
-        range: WorkflowPloidy
-      taxonomy_id:
-        description: The NCBI ID of the taxon supported by the workflow.
-        required: false
-        range: integer
       workflow_name:
         description: The display name of the workflow.
         required: true
@@ -49,3 +46,36 @@ classes:
         description: The description of the workflow.
         required: true
         range: string
+      ploidy:
+        description: The ploidy supported by the workflow.
+        required: true
+        range: WorkflowPloidy
+      taxonomy_id:
+        description: The NCBI ID of the taxon supported by the workflow.
+        required: false
+        range: integer
+      parameters:
+        description: The parameters of the workflow.
+        required: true
+        multivalued: true
+        range: WorkflowParameter
+      active:
+        description: Determines if workflow should be included.
+        required: true
+        range: boolean
+
+  WorkflowParameter:
+    description: A parameter that is provided to a workflow; must include a source for the parameter's value in order to be provided.
+    attributes:
+      key:
+        description: The key in which the parameter will be set.
+        required: true
+        range: string
+      variable:
+        description: A variable to substitute in as the value of the parameter.
+        required: false
+        range: WorkflowParameterVariable
+      type_guide:
+        description: Arbitrary data describing the type of the parameter, intended only as convenient reference for maintainers.
+        required: false
+        range: Any

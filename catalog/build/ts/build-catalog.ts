@@ -4,6 +4,7 @@ import YAML from "yaml";
 import {
   BRCDataCatalogGenome,
   BRCDataCatalogOrganism,
+  Workflow,
   WorkflowCategory,
 } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import {
@@ -176,7 +177,9 @@ async function buildWorkflows(): Promise<WorkflowCategory[]> {
     );
 
   for (const sourceWorkflow of sourceWorkflows.workflows) {
-    buildWorkflow(workflowCategories, sourceWorkflow);
+    if (sourceWorkflow.active) {
+      buildWorkflow(workflowCategories, sourceWorkflow);
+    }
   }
 
   return workflowCategories;
@@ -186,6 +189,7 @@ function buildWorkflow(
   workflowCategories: WorkflowCategory[],
   {
     categories,
+    parameters: sourceParameters,
     ploidy,
     taxonomy_id: taxonomyId,
     trs_id: trsId,
@@ -193,19 +197,25 @@ function buildWorkflow(
     workflow_name: workflowName,
   }: SourceWorkflow
 ): void {
+  const parameters = [];
+  for (const { key, variable } of sourceParameters) {
+    if (variable) parameters.push({ key, variable });
+  }
+  const workflow: Workflow = {
+    parameters,
+    ploidy,
+    taxonomyId: typeof taxonomyId === "number" ? String(taxonomyId) : null,
+    trsId,
+    workflowDescription,
+    workflowName,
+  };
   for (const category of categories) {
     const workflowCategory = workflowCategories.find(
       (c) => c.category === category
     );
     if (!workflowCategory)
       throw new Error(`Unknown workflow category: ${category}`);
-    workflowCategory.workflows.push({
-      ploidy,
-      taxonomyId: typeof taxonomyId === "number" ? String(taxonomyId) : null,
-      trsId,
-      workflowDescription,
-      workflowName,
-    });
+    workflowCategory.workflows.push(workflow);
   }
 }
 
