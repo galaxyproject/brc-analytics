@@ -40,7 +40,7 @@ def get_paginated_ncbi_results(base_url, query_description):
   results = []
   while next_page_token or page == 1:
     print(f"Requesting page {page} of {query_description}")
-    request_url = f"{base_url}?page_size=1000{"&page_token=" + next_page_token if next_page_token else ""}"
+    request_url = f'{base_url}?page_size=1000{"&page_token=" + next_page_token if next_page_token else ""}'
     response = rate_limit_handler(partial(requests.get, request_url))
     page_data = response.json()
     if len(page_data["reports"][0].get("errors", [])) > 0:
@@ -328,7 +328,7 @@ def get_biosample_data(genome_info):
 
 def get_genomes_and_primarydata_df(accessions):
   genomes_info = get_batched_ncbi_results(
-    lambda a: f"https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/{",".join(a)}/dataset_report",
+    lambda a: f'https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/{",".join(a)}/dataset_report',
     accessions,
     "genomes"
   )
