@@ -17,7 +17,7 @@ npm run lint ||
 )
 
 # Format Python files
-echo '🐍 Formatting Python files with Black...'
+echo '🐍 Formatting Python files with Ruff...'
 npm run format:python
 
 # Check TypeScript
