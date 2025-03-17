@@ -1,22 +1,16 @@
-[tool.black]
+[tool.ruff]
+target-version = "py38"
 line-length = 88
-target-version = ['py38']
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | venv
-  | _build
-  | buck-out
-  | dist
-)/
-'''
+indent-width = 4
 
-[tool.isort]
-profile = "black"
-line_length = 88
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = []
+fixable = ["ALL"]
+unfixable = []
