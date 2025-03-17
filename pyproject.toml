@@ -10,7 +10,7 @@ skip-magic-trailing-comma = false
 line-ending = "auto"
 
 [tool.ruff.lint]
-select = ["E", "F", "I"]
+select = ["E", "F", "I", "B"]
 ignore = []
 fixable = ["ALL"]
 unfixable = []
