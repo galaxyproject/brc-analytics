@@ -437,7 +437,8 @@ def report_inconsistent_taxonomy_ids(df):
   inconsistent_ids_series = df.groupby(["species", "strain"]).filter(lambda g: g["taxonomyId"].nunique() > 1).groupby(["species", "strain"])["taxonomyId"].apply(set)
   inconsistent_ids_strings = [(f"{species} strain {strain}" if strain else species, ", ".join([str(id) for id in ids])) for (species, strain), ids in inconsistent_ids_series.items()]
   if len(inconsistent_ids_strings) > 0:
-    print(f"Taxa with inconsistent taxonomy IDs: {", ".join([f"{taxon} ({ids})" for taxon, ids in inconsistent_ids_strings])}")
+    inconsistent_taxonmy_ids_combined = ", ".join([f"{taxon} ({ids})" for taxon, ids in inconsistent_ids_strings])
+    print(f"Taxa with inconsistent taxonomy IDs: {inconsistent_taxonmy_ids_combined}")
   return inconsistent_ids_strings
 
 
