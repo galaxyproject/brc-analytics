@@ -1,8 +1,12 @@
 #!/bin/bash
 
-# Format Python files using Black
-echo "Formatting Python files with Black..."
-black catalog/
+# Format Python files using Ruff (Rust-based formatter)
+echo "Formatting Python files with Ruff..."
+ruff format catalog/
 
-# Exit with Black's status code
+# Sort imports with Ruff
+echo "Sorting imports with Ruff..."
+ruff check --select I --fix catalog/
+
+# Exit with Ruff's status code
 exit $?
