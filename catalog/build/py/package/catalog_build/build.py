@@ -1,11 +1,12 @@
-import pandas as pd
-import yaml
-import requests
-import urllib
+import logging
 import re
 import time
+import urllib
+
+import pandas as pd
+import requests
+import yaml
 from bs4 import BeautifulSoup
-import logging
 
 MAX_NCBI_URL_LENGTH = 2000  # The actual limit seems to be a bit over 4000
 
@@ -23,7 +24,7 @@ def get_paginated_ncbi_results(base_url, query_description):
     results = []
     while next_page_token or page == 1:
         print(f"Requesting page {page} of {query_description}")
-        request_url = f'{base_url}?page_size=1000{"&page_token=" + next_page_token if next_page_token else ""}'
+        request_url = f"{base_url}?page_size=1000{'&page_token=' + next_page_token if next_page_token else ''}"
         page_data = requests.get(request_url).json()
         if len(page_data["reports"][0].get("errors", [])) > 0:
             raise Exception(page_data["reports"][0])
@@ -142,7 +143,7 @@ def get_species_row(taxon_info, taxonomic_group_sets, taxonomic_levels):
 
 def get_species_df(taxonomy_ids, taxonomic_group_sets, taxonomic_levels):
     species_info = get_batched_ncbi_results(
-        lambda ids: f'https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/taxon/{",".join(ids)}/dataset_report',
+        lambda ids: f"https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/taxon/{','.join(ids)}/dataset_report",
         [str(id) for id in set(taxonomy_ids)],
         "taxa",
     )
@@ -196,7 +197,7 @@ def get_biosample_data(genome_info):
 
 def get_genomes_and_primarydata_df(accessions):
     genomes_info = get_batched_ncbi_results(
-        lambda a: f'https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/{",".join(a)}/dataset_report',
+        lambda a: f"https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/{','.join(a)}/dataset_report",
         accessions,
         "genomes",
     )
@@ -279,11 +280,11 @@ def report_missing_values(
         if len(missing_values) > len(values_series) / 2:
             present_values = values_series[present_values_mask]
             print(
-                f"Only {len(present_values)} of {len(values_series)} {values_name} {message_predicate}: {", ".join(present_values)}"
+                f"Only {len(present_values)} of {len(values_series)} {values_name} {message_predicate}: {', '.join(present_values)}"
             )
         else:
             print(
-                f"{len(missing_values)} {values_name} not {message_predicate}: {", ".join(missing_values)}"
+                f"{len(missing_values)} {values_name} not {message_predicate}: {', '.join(missing_values)}"
             )
     return missing_values
 
@@ -379,7 +380,7 @@ def fetch_sra_metadata(srs_ids, batch_size=20):
         batch_srs_id = srs_ids[i : i + batch_size]
         samples_processed += len(batch_srs_id)
         search_data, counter = fetch_url_data(
-            f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term={"+OR+".join(batch_srs_id)}&retmode=json&retmax=1000",
+            f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term={'+OR+'.join(batch_srs_id)}&retmode=json&retmax=1000",
             counter,
         )
         search_data = search_data.json()

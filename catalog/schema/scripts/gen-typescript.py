@@ -1,4 +1,5 @@
 import sys
+
 from linkml.generators.typescriptgen import TypescriptGenerator
 
 # The source for the base TypeScript generator can be found at https://github.com/linkml/linkml/blob/main/linkml/generators/typescriptgen.py
