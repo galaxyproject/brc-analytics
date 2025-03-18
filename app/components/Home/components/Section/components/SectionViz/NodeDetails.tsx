@@ -1,4 +1,3 @@
-import { filter } from "d3";
 import React from "react";
 
 export interface TreeNode {
@@ -90,7 +89,7 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
         </p>
       )}
 
-      {filterUrl && (
+      {!isRoot && filterUrl && (
         <p>
           <a href={filterUrl} target="_blank" rel="noopener noreferrer">
             View All Assemblies →
@@ -98,8 +97,23 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
         </p>
       )}
 
+      {!isRoot && onClose && (
+        <button
+          onClick={onClose}
+          style={{
+            background: "none",
+            border: "none",
+            color: "#666",
+            cursor: "pointer",
+          }}
+        >
+          ×
+        </button>
+      )}
+
       {firstLevelChildren.length > 0 && (
         <div style={{ marginTop: "20px" }}>
+          <h4>Subcategories</h4>
           <ul
             style={{
               listStyle: "none",
