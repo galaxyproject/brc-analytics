@@ -337,6 +337,7 @@ def get_genomes_and_primarydata_df(accessions):
 
 
 def _id_to_gene_model_url(asm_id: str, session: requests.Session):
+  print(f"finding gene model url for: {asm_id}")
   ucsc_files_endpoint = "https://genome.ucsc.edu/list/files"
   download_base_url = "https://hgdownload.soe.ucsc.edu"
   response = session.get(ucsc_files_endpoint, params={"genome": asm_id})
