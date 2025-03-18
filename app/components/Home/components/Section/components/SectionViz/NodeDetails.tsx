@@ -1,3 +1,4 @@
+import { filter } from "d3";
 import React from "react";
 
 export interface TreeNode {
@@ -68,83 +69,70 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
   onClose,
   onNodeClick,
 }): JSX.Element => {
-  const leafNodeCount = node ? countLeafNodes(node) : 0;
   const isRoot = node?.depth === 0;
 
   // Get node name and rank safely
   const nodeName = node?.data?.name || node?.name || "Unknown";
   const nodeRank = node?.data?.rank || "Unknown";
 
-  if (isRoot) {
-    // Get first-level children for navigation
-    const firstLevelChildren = node?.children || [];
+  // Get first-level children for navigation
+  const firstLevelChildren = node?.children || [];
 
-    return (
-      <div>
-        <p style={{ color: "#666", fontSize: "1.1em" }}>
-          Click the visualization to explore available assemblies
-        </p>
-
-        {firstLevelChildren.length > 0 && (
-          <div style={{ marginTop: "20px" }}>
-            <h4>Quick Navigation:</h4>
-            <ul
-              style={{
-                listStyle: "none",
-                padding: 0,
-                maxHeight: "300px",
-                overflowY: "auto",
-              }}
-            >
-              {firstLevelChildren.map((child, index) => (
-                <li
-                  key={index}
-                  onClick={() => onNodeClick && onNodeClick(child)}
-                  style={{
-                    padding: "6px 0",
-                    cursor: "pointer",
-                    borderBottom: "1px solid #eee",
-                    color: "#0066cc",
-                  }}
-                >
-                  {child.name || child.data?.name}
-                  <span
-                    style={{
-                      color: "#888",
-                      fontSize: "0.9em",
-                      marginLeft: "5px",
-                    }}
-                  >
-                    ({countLeafNodes(child)} assemblies)
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
-    );
-  }
+  // Create the filter URL for this node if possible
+  const filterUrl = createFilterUrl(nodeRank, nodeName);
 
   return (
     <div>
-      <h3>
-        {node.data.name} <em>({node.data.rank})</em>
-      </h3>
-      <p>Available Assemblies: {leafNodeCount}</p>
-      {node.height == 0 && node.data.ncbi_tax_id && (
-        <>
-          <p>NCBI Taxonomy ID: {node.data.ncbi_tax_id}</p>
-          <p>
-            <a
-              href={`/data/organisms/${node.data.ncbi_tax_id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              View Organism Page →
-            </a>
-          </p>
-        </>
+      {isRoot && (
+        <p style={{ color: "#666" }}>
+          Click the visualization to explore available assemblies, or select an
+          option below.
+        </p>
+      )}
+
+      {filterUrl && (
+        <p>
+          <a href={filterUrl} target="_blank" rel="noopener noreferrer">
+            View All Assemblies →
+          </a>
+        </p>
+      )}
+
+      {firstLevelChildren.length > 0 && (
+        <div style={{ marginTop: "20px" }}>
+          <ul
+            style={{
+              listStyle: "none",
+              maxHeight: "300px",
+              overflowY: "auto",
+              padding: 0,
+            }}
+          >
+            {firstLevelChildren.map((child, index) => (
+              <li
+                key={index}
+                onClick={() => onNodeClick && onNodeClick(child)}
+                style={{
+                  borderBottom: "1px solid #eee",
+                  color: "#0066cc",
+                  cursor: "pointer",
+                  padding: "6px 0",
+                }}
+              >
+                {child.name || child.data?.name}
+                <span
+                  style={{
+                    color: "#888",
+                    fontSize: "0.9em",
+                    marginLeft: "5px",
+                  }}
+                >
+                  ({countLeafNodes(child)} assemblies)
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );
