@@ -685,6 +685,194 @@ workflows:
       - key: GTF file of annotation
         variable: GENE_MODEL_URL
     active: true
+  - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-consensus-from-variation/COVID-19-CONSENSUS-CONSTRUCTION/versions/v0.4.2"
+    categories:
+      - VARIANT_CALLING
+    workflow_name: "COVID-19: consensus construction"
+    workflow_description:
+      "Build a consensus sequence from FILTER PASS variants with
+      intrasample allele-frequency above a configurable consensus threshold.
+
+      Hard-mask regions with low coverage (but not consensus variants within them) and
+      ambiguous sites."
+    ploidy: ANY
+    parameters:
+      - key: Variant calls
+        type_guide:
+          class: Collection
+      - key: min-AF for consensus variant
+        type_guide:
+          class: float
+      - key: min-AF for failed variants
+        type_guide:
+          class: float
+      - key: aligned reads data for depth calculation
+        type_guide:
+          class: Collection
+          ext: bam
+      - key: Depth-threshold for masking
+        type_guide:
+          class: integer
+      - key: Reference genome
+        type_guide:
+          class: File
+    active: false
+  - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-ont-artic-variant-calling/COVID-19-ARTIC-ONT/versions/v0.3.2"
+    categories:
+      - VARIANT_CALLING
+    workflow_name: "COVID-19: variation analysis of ARTIC ONT data"
+    workflow_description:
+      This workflow for ONT-sequenced ARTIC data is modeled after
+      the alignment/variant-calling steps of the [ARTIC pipeline](https://artic.readthedocs.io/en/latest/).
+      It performs, essentially, the same steps as that pipeline’s minion command, i.e.
+      read mapping with minimap2 and variant calling with medaka. Like the Illumina
+      ARTIC workflow it uses ivar for primer trimming. Since ONT-sequenced reads have
+      a much higher error rate than Illumina-sequenced reads and are therefor plagued
+      more by false-positive variant calls, this workflow does make no attempt to handle
+      amplicons affected by potential primer-binding site mutations.
+    ploidy: ANY
+    parameters:
+      - key: ONT-sequenced reads
+        type_guide:
+          class: Collection
+          ext:
+            - fastqsanger
+            - fastqsanger.gz
+      - key: Minimum read length
+        type_guide:
+          class: integer
+      - key: Maximum read length
+        type_guide:
+          class: integer
+      - key: NC_045512.2 FASTA sequence of SARS-CoV-2
+        type_guide:
+          class: File
+          ext:
+            - fasta
+            - fasta.gz
+      - key: Primer binding sites info in BED format
+        type_guide:
+          class: File
+          ext: bed
+    active: false
+  - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-variant-calling/COVID-19-PE-ARTIC-ILLUMINA/versions/v0.5.3"
+    categories:
+      - VARIANT_CALLING
+    workflow_name: "COVID-19: variation analysis on ARTIC PE data"
+    workflow_description:
+      The workflow for Illumina-sequenced ARTIC data builds on the
+      RNASeq workflow for paired-end data using the same steps for mapping and variant
+      calling, but adds extra logic for trimming ARTIC primer sequences off reads with
+      the ivar package. In addition, this workflow uses ivar also to identify amplicons
+      affected by ARTIC primer-binding site mutations and tries to exclude reads derived
+      from such tainted amplicons when calculating allele-frequencies of other variants.
+    ploidy: HAPLOID
+    taxonomy_id: 694009
+    parameters:
+      - key: Paired Collection
+        type_guide:
+          class: Collection
+          ext:
+            - fastqsanger
+            - fastqsanger.gz
+      - key: NC_045512.2 FASTA sequence of SARS-CoV-2
+        variable: ASSEMBLY_ID
+      - key: ARTIC primer BED
+        type_guide:
+          class: File
+          ext: bed
+      - key: ARTIC primers to amplicon assignments
+        type_guide:
+          class: File
+          ext: tabular
+      - key: Read removal minimum AF
+        type_guide:
+          class: float
+      - key: Read removal maximum AF
+        type_guide:
+          class: float
+      - key: Minimum DP required after amplicon bias correction
+        type_guide:
+          class: integer
+      - key: Minimum DP_ALT required after amplicon bias correction
+        type_guide:
+          class: integer
+    active: true
+  - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-wgs-variant-calling/COVID-19-PE-WGS-ILLUMINA/versions/v0.2.4"
+    categories:
+      - VARIANT_CALLING
+    workflow_name: "COVID-19: variation analysis on WGS PE data"
+    workflow_description:
+      This workflows performs paired end read mapping with bwa-mem
+      followed by sensitive variant calling across a wide range of AFs with lofreq
+    ploidy: HAPLOID
+    taxonomy_id: 694009
+    parameters:
+      - key: Paired Collection
+        type_guide:
+          class: Collection
+          ext:
+            - fastqsanger
+            - fastqsanger.gz
+      - key: NC_045512.2 FASTA sequence of SARS-CoV-2
+        variable: ASSEMBLY_ID
+    active: true
+  - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-se-illumina-wgs-variant-calling/COVID-19-SE-WGS-ILLUMINA/versions/v0.1.5"
+    categories:
+      - VARIANT_CALLING
+    workflow_name: "COVID-19: variation analysis on WGS SE data"
+    workflow_description:
+      This workflows performs single end read mapping with bowtie2
+      followed by sensitive variant calling across a wide range of AFs with lofreq
+    ploidy: ANY
+    parameters:
+      - key: Single End Collection
+        type_guide:
+          class: Collection
+          ext:
+            - fastqsanger
+            - fastqsanger.gz
+      - key: NC_045512.2 FASTA sequence of SARS-CoV-2
+        type_guide:
+          class: File
+          ext:
+            - fasta
+            - fasta.gz
+    active: false
+  - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-variation-reporting/COVID-19-VARIATION-REPORTING/versions/v0.3.4"
+    categories:
+      - VARIANT_CALLING
+    workflow_name: "COVID-19: variation analysis reporting"
+    workflow_description:
+      This workflow takes a VCF dataset of variants produced by
+      any of the *-variant-calling workflows in https://github.com/galaxyproject/iwc/tree/main/workflows/sars-cov-2-variant-calling
+      and generates tabular lists of variants by Samples and by Variant, and an overview
+      plot of variants and their allele-frequencies.
+    ploidy: ANY
+    parameters:
+      - key: Variation data to report
+        type_guide:
+          class: Collection
+          ext:
+            - vcf
+            - vcf_bgzip
+      - key: AF Filter
+        type_guide:
+          class: float
+      - key: DP Filter
+        type_guide:
+          class: integer
+      - key: DP_ALT Filter
+        type_guide:
+          class: integer
+      - key: gene products translations
+        type_guide:
+          class: File
+          ext: tabular
+      - key: Number of Clusters
+        type_guide:
+          class: integer
+    active: false
   - trs_id: "#workflow/github.com/iwc-workflows/variation-reporting/main/versions/v0.1.1"
     categories:
       - VARIANT_CALLING
