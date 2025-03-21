@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.1](https://github.com/galaxyproject/brc-analytics/compare/v0.8.0...v0.8.1) (2025-03-21)
+
+
+### Bug Fixes
+
+* handle NCBI rate limit ([df84da0](https://github.com/galaxyproject/brc-analytics/commit/df84da079a267d157035ee0a408cc00d53789ce5))
+* handle NCBI rate limit ([#407](https://github.com/galaxyproject/brc-analytics/issues/407)) ([#406](https://github.com/galaxyproject/brc-analytics/issues/406)) ([df84da0](https://github.com/galaxyproject/brc-analytics/commit/df84da079a267d157035ee0a408cc00d53789ce5))
+
 ## [0.8.0](https://github.com/galaxyproject/brc-analytics/compare/v0.7.0...v0.8.0) (2025-03-20)
 
 
