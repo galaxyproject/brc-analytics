@@ -62,11 +62,23 @@ export interface EntitiesResponse<R> {
   termFacets: Record<never, never>;
 }
 
+export interface ENAAssembly {
+  assembly_set_accession: string;
+  sample_accession: string;
+}
+
 export interface EntitiesResponsePagination {
   count: number;
   pages: number;
   size: number;
   total: number;
+}
+
+export interface PrimaryDataApiResult {
+  count: number;
+  data: [];
+  error: string;
+  status: number;
 }
 
 export interface WorkflowCategory {
