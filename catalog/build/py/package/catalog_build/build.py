@@ -173,8 +173,10 @@ def get_species_tree(taxonomy_ids, taxonomic_levels, species_info=None):
   Returns:
     A nested tree structure of species
   """
-  species_tree_url = f"https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/taxon/{','.join([str(id) for id in taxonomy_ids])}/filtered_subtree?rank_limits={','.join(taxonomic_levels)}"
-  species_tree_response = requests.get(species_tree_url).json()
+  species_tree_response = requests.post(
+    "https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/filtered_subtree",
+    json={"taxons": [str(int(t)) for t in taxonomy_ids], "rank_limits": [t.upper() for t in taxonomic_levels]},
+  ).json()
 
   # Build a tree from the response
   edges = species_tree_response.get("edges", {})
