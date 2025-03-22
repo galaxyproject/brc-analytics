@@ -281,7 +281,7 @@ def ncbi_tree_to_nested_tree(node_id, edges, taxonomy_ids):
   children = [str(num) for num in children]
   # ncbi results odd again, dup children
   children = set(children)
-  if (len(children) > 0 or node_id in taxonomy_ids):
+  if (len(children) > 0 or int(node_id) in taxonomy_ids):
     child_trees = [ncbi_tree_to_nested_tree(child, edges, taxonomy_ids) for child in children]
     child_trees = [item for item in child_trees if item is not None]
     return {
@@ -649,7 +649,7 @@ def build_files(
   if len(taxonomic_levels_for_tree) > 0:
     # Use the taxonomy IDs from the genomes_df to build the species tree
     # Pass the previously fetched species_info to avoid another API call
-    species_tree = get_species_tree(genomes_df["taxonomyId"], taxonomic_levels_for_tree, species_info)
+    species_tree = get_species_tree(list(genomes_df["taxonomyId"]), taxonomic_levels_for_tree, species_info)
     with open(tree_output_path, 'w') as outfile:
       json.dump(species_tree, outfile, indent=4)
     print(f"Wrote to {tree_output_path}")
