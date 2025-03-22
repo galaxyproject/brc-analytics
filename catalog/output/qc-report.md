@@ -8,6 +8,7 @@
 - GCA_000003225.2
 - GCF_000499545.1
 - GCF_018416015.1
+- GCF_023375885.1
 
 ## Assemblies not found in UCSC list
 
