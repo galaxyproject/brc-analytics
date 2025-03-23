@@ -16,6 +16,10 @@ npm run lint ||
         false;
 )
 
+# Format Python files
+echo '🐍 Formatting Python files with Ruff...'
+npm run format:python
+
 # Check TypeScript
 npx tsc --noEmit ||
 (
