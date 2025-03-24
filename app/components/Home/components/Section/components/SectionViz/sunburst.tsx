@@ -18,6 +18,7 @@ const data = getData();
 
 export const SectionViz = (): JSX.Element => {
   const [selectedNode, setSelectedNode] = useState<TreeNode | null>(null);
+  const [rootNode, setRootNode] = useState<TreeNode | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
   // Add a reference to the clicked function so it can be called from NodeDetails
@@ -91,6 +92,9 @@ export const SectionViz = (): JSX.Element => {
     );
 
     root.each((d) => (d.current = d));
+
+    // Save the root node to state
+    setRootNode(root);
 
     // Create a partition layout (compute the full layout even though we display only DEPTH layers)
     partition().size([2 * Math.PI, root.height + 1])(root);
@@ -363,7 +367,11 @@ export const SectionViz = (): JSX.Element => {
         {selectedNode ? (
           <NodeDetails
             node={selectedNode}
-            onClose={() => setSelectedNode(null)}
+            onClose={() =>
+              rootNode &&
+              clickedRef.current &&
+              clickedRef.current(null, rootNode)
+            }
             onNodeClick={handleNodeClick}
           />
         ) : (
