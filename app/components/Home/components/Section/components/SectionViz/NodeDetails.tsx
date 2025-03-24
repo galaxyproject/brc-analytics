@@ -93,12 +93,12 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
       {!isRoot && filterUrl && (
         <p>
           <a href={filterUrl} target="_blank" rel="noopener noreferrer">
-            View All Assemblies →
+            View {countLeafNodes(node)} Assemblie{countLeafNodes(node) > 1 ? 's' : ''} for {nodeName}
           </a>
         </p>
       )}
 
-      {!isRoot && onClose && (
+      {/* {!isRoot && onClose && (
         <button
           onClick={onClose}
           style={{
@@ -110,7 +110,7 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
         >
           ×
         </button>
-      )}
+      )} */}
 
       {firstLevelChildren.length > 0 && (
         <div style={{ marginTop: "20px" }}>
@@ -118,7 +118,7 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
           <ul
             style={{
               listStyle: "none",
-              maxHeight: "300px",
+              maxHeight: "600px",
               overflowY: "auto",
               padding: 0,
             }}
