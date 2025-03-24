@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.9.0](https://github.com/galaxyproject/brc-analytics/compare/v0.8.0...v0.9.0) (2025-03-24)
+
+
+### Features
+
+* landing page organism viz - data ([#289](https://github.com/galaxyproject/brc-analytics/issues/289)) ([#290](https://github.com/galaxyproject/brc-analytics/issues/290)) ([6817ece](https://github.com/galaxyproject/brc-analytics/commit/6817ece12b0fb0fa6830f3dbd3866372dc6f883d))
+
+
+### Bug Fixes
+
+* don't run deploy jobs on forks ([#408](https://github.com/galaxyproject/brc-analytics/issues/408)) ([#409](https://github.com/galaxyproject/brc-analytics/issues/409)) ([17f317c](https://github.com/galaxyproject/brc-analytics/commit/17f317c198193a084eb8a913e083a89083fe2c0f))
+* github action syntax needs single quotes, resolves deploys ([d142b04](https://github.com/galaxyproject/brc-analytics/commit/d142b04d4dd360c4ce3756372ca598ca1a495b7c))
+* github action syntax needs single quotes, resolves deploys ([#417](https://github.com/galaxyproject/brc-analytics/issues/417)) ([#416](https://github.com/galaxyproject/brc-analytics/issues/416)) ([d142b04](https://github.com/galaxyproject/brc-analytics/commit/d142b04d4dd360c4ce3756372ca598ca1a495b7c))
+* handle NCBI rate limit ([df84da0](https://github.com/galaxyproject/brc-analytics/commit/df84da079a267d157035ee0a408cc00d53789ce5))
+* handle NCBI rate limit ([#407](https://github.com/galaxyproject/brc-analytics/issues/407)) ([#406](https://github.com/galaxyproject/brc-analytics/issues/406)) ([df84da0](https://github.com/galaxyproject/brc-analytics/commit/df84da079a267d157035ee0a408cc00d53789ce5))
+* include ncbiGene.gtf.gz file if there's no refSeq gtf ([#414](https://github.com/galaxyproject/brc-analytics/issues/414)) ([#413](https://github.com/galaxyproject/brc-analytics/issues/413)) ([89799d4](https://github.com/galaxyproject/brc-analytics/commit/89799d437c158682e1d49b9ce84b6dc36a67ad35))
+
+
+### Chores
+
+* use requests session to reuse tcp connection ([#397](https://github.com/galaxyproject/brc-analytics/issues/397)) ([#405](https://github.com/galaxyproject/brc-analytics/issues/405)) ([dacdbb2](https://github.com/galaxyproject/brc-analytics/commit/dacdbb2b81251d549a6c8110b8ad385a893e3776))
+
 ## [0.8.0](https://github.com/galaxyproject/brc-analytics/compare/v0.7.0...v0.8.0) (2025-03-20)
 
 
