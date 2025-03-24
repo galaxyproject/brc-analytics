@@ -1,14 +1,4 @@
-import {
-  select,
-  scaleOrdinal,
-  schemeTableau10,
-  hsl,
-  hierarchy,
-  partition,
-  arc as d3Arc,
-  interpolate,
-  HierarchyNode,
-} from "d3";
+import * as d3 from "d3";
 import { useRef, useEffect, useState } from "react";
 import { getData } from "./data";
 import { TreeNode, NodeDetails } from "./NodeDetails";
@@ -32,7 +22,7 @@ export const SectionViz = (): JSX.Element => {
     const svgNode = svgRef.current;
 
     // Clear any existing content in case of re-render
-    select(svgNode).selectAll("*").remove();
+    d3.select(svgNode).selectAll("*").remove();
 
     // Set up dimensions and radius for the sunburst chart
     const width = 800;
@@ -40,11 +30,12 @@ export const SectionViz = (): JSX.Element => {
     const radius = (width - 10) / 2;
 
     // Create the main SVG container and center the group
-    const svg = select(svgNode)
+    const svg = d3
+      .select(svgNode)
       .attr("viewBox", [-width / 2, -height / 2, width, width])
       .style("font", "10px sans-serif");
     // Define a color scale for base colors (root and first ring)
-    const baseColor = scaleOrdinal(schemeTableau10);
+    const baseColor = d3.scaleOrdinal(d3.schemeTableau10);
 
     // Helper function to get color for a node
     function getNodeColor(d): string {
@@ -55,21 +46,24 @@ export const SectionViz = (): JSX.Element => {
       const ancestor = d.ancestors().find((n) => n.depth === 1);
       if (!ancestor) return "#ccc"; // fallback
 
-      const baseColorHsl = hsl(baseColor(ancestor.data.name));
+      const baseColorHsl = d3.hsl(baseColor(ancestor.data.name));
 
       // Increase lightness and decrease saturation as we go deeper
       const lightnessFactor = 0.05 * (d.depth - 1);
       const saturationFactor = 0.1 * (d.depth - 1);
 
-      return hsl(
-        baseColorHsl.h,
-        Math.max(0, baseColorHsl.s - saturationFactor),
-        Math.min(1, baseColorHsl.l + lightnessFactor)
-      ).toString();
+      return d3
+        .hsl(
+          baseColorHsl.h,
+          Math.max(0, baseColorHsl.s - saturationFactor),
+          Math.min(1, baseColorHsl.l + lightnessFactor)
+        )
+        .toString();
     }
 
     // Create a tooltip for interactivity
-    const tooltip = select("body")
+    const tooltip = d3
+      .select("body")
       .append("div")
       .attr("class", "tooltip")
       .style("opacity", 0)
@@ -83,11 +77,12 @@ export const SectionViz = (): JSX.Element => {
       .style("pointer-events", "none");
 
     // Create a hierarchy from the sample data.
-    const hierarchyData = hierarchy(data)
+    const hierarchyData = d3
+      .hierarchy(data)
       .sum((d) => (d.children.length == 0 ? 1 : 0))
       .sort((a: unknown, b: unknown) => (a.data.name < b.data.name ? -1 : 1));
 
-    const root = partition().size([2 * Math.PI, hierarchyData.height + 1])(
+    const root = d3.partition().size([2 * Math.PI, hierarchyData.height + 1])(
       hierarchyData
     );
 
@@ -97,7 +92,7 @@ export const SectionViz = (): JSX.Element => {
     setRootNode(root);
 
     // Create a partition layout (compute the full layout even though we display only DEPTH layers)
-    partition().size([2 * Math.PI, root.height + 1])(root);
+    d3.partition().size([2 * Math.PI, root.height + 1])(root);
 
     // Save each node’s initial coordinates for smooth transitions.
     root.each((d) => (d.current = d));
@@ -108,7 +103,8 @@ export const SectionViz = (): JSX.Element => {
 
     // An arc generator that “clamps” the radial depth so that
     // only the center plus DEPTH levels are visible.
-    const arc = d3Arc()
+    const arc = d3
+      .arc()
       .startAngle((d) => d.x0)
       .endAngle((d) => d.x1)
       .padAngle((d) => Math.min((d.x1 - d.x0) / 2, 0.005))
@@ -117,8 +113,8 @@ export const SectionViz = (): JSX.Element => {
       .outerRadius((d) => (Math.min(d.y1, DEPTH) * radius) / DEPTH - 0.5);
 
     function isVisible(
-      d: HierarchyNode<TreeNode>,
-      currentRoot: HierarchyNode<TreeNode>,
+      d: d3.HierarchyNode<TreeNode>,
+      currentRoot: d3.HierarchyNode<TreeNode>,
       targetDepth: number
     ): boolean {
       const isDescendant = d.ancestors().indexOf(currentRoot) >= 0;
@@ -282,13 +278,12 @@ export const SectionViz = (): JSX.Element => {
         } as NodeTarget;
       });
 
-      const transition = svg.transition().duration(750);
-
       // Transition the arcs.
       path
-        .transition(transition)
+        .transition()
+        .duration(750)
         .tween("data", (d: TreeNode) => {
-          const i = interpolate(d.current, d.target);
+          const i = d3.interpolate(d.current, d.target);
           // eslint-disable-next-line sonarjs/no-nested-functions -- cleaner in d3 to keep this inlined
           return (transition_duration: number): void => {
             d.current = i(transition_duration);
@@ -305,12 +300,13 @@ export const SectionViz = (): JSX.Element => {
 
       // Transition the labels with updated visibility logic
       label
-        .transition(svg.transition().duration(750))
+        .transition()
+        .duration(750)
         .tween("data", (d) => {
-          const i = interpolate(d.current, d.target);
+          const i = d3.interpolate(d.current, d.target);
           // eslint-disable-next-line sonarjs/no-nested-functions -- cleaner in d3 to keep this inlined
-          return (transition: number): void => {
-            d.current = i(transition);
+          return (transition_duration: number): void => {
+            d.current = i(transition_duration);
           };
         })
         .attrTween(
@@ -339,7 +335,7 @@ export const SectionViz = (): JSX.Element => {
     // Clean up on component unmount: remove tooltip and clear svg.
     return (): void => {
       tooltip.remove();
-      select(svgNode).selectAll("*").remove();
+      d3.select(svgNode).selectAll("*").remove();
     };
   }, []);
 
