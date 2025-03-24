@@ -2,6 +2,7 @@ import React from "react";
 
 export interface TreeNode {
   children?: TreeNode[];
+  current?: boolean;
   data: {
     name: string;
     ncbi_tax_id?: number;
