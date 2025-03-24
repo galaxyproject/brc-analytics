@@ -1,5 +1,45 @@
 # Changelog
 
+## [0.8.0](https://github.com/galaxyproject/brc-analytics/compare/v0.7.0...v0.8.0) (2025-03-20)
+
+
+### Features
+
+* add realm to taxonomic lineage filters ([#389](https://github.com/galaxyproject/brc-analytics/issues/389)) ([#390](https://github.com/galaxyproject/brc-analytics/issues/390)) ([0d96267](https://github.com/galaxyproject/brc-analytics/commit/0d96267c7136b0293fc1ddcf0d6b776640bba1e5))
+* allow limiting workflows by taxonomy id ([#356](https://github.com/galaxyproject/brc-analytics/issues/356)) ([#369](https://github.com/galaxyproject/brc-analytics/issues/369)) ([364876f](https://github.com/galaxyproject/brc-analytics/commit/364876f1922018b36363c129d09db113caf3914d))
+* build catalog and add qc report ([#344](https://github.com/galaxyproject/brc-analytics/issues/344)) ([#364](https://github.com/galaxyproject/brc-analytics/issues/364)) ([a3a70ca](https://github.com/galaxyproject/brc-analytics/commit/a3a70cad6a777071fbc0a62329b74bdb737dffd8))
+* remove retired ncbi superkingdom rank and add domain ([#385](https://github.com/galaxyproject/brc-analytics/issues/385)) ([#386](https://github.com/galaxyproject/brc-analytics/issues/386)) ([a7af98a](https://github.com/galaxyproject/brc-analytics/commit/a7af98abc9863ff7f4e046b69cbe72b8e2f2a571))
+* update workflows from IWC manifest and set assembly-specific parameters ([#351](https://github.com/galaxyproject/brc-analytics/issues/351), [#339](https://github.com/galaxyproject/brc-analytics/issues/339)) ([#342](https://github.com/galaxyproject/brc-analytics/issues/342)) ([f5720a8](https://github.com/galaxyproject/brc-analytics/commit/f5720a8a42526db46f47c9af43d61522e76dd4ee))
+
+
+### Bug Fixes
+
+* avoid assembly duplication due to duplicate taxonomy ids and add checks for duplicate entity ids ([#367](https://github.com/galaxyproject/brc-analytics/issues/367)) ([#368](https://github.com/galaxyproject/brc-analytics/issues/368)) ([e625081](https://github.com/galaxyproject/brc-analytics/commit/e62508112a7b95d4e254f0926c3aa3c03d4693d1))
+* use correct variant calling landing body even when gene model url is absent ([#347](https://github.com/galaxyproject/brc-analytics/issues/347)) ([#365](https://github.com/galaxyproject/brc-analytics/issues/365)) ([038d76e](https://github.com/galaxyproject/brc-analytics/commit/038d76e56d5ed586d82a18dffff331ba6651f951))
+
+
+### Chores
+
+* add .venv to prettier ignore list ([28981f7](https://github.com/galaxyproject/brc-analytics/commit/28981f7582972fca554d5980b4cfdbee70b40ba1))
+* add .venv to prettier ignore list ([#373](https://github.com/galaxyproject/brc-analytics/issues/373)) ([#374](https://github.com/galaxyproject/brc-analytics/issues/374)) ([28981f7](https://github.com/galaxyproject/brc-analytics/commit/28981f7582972fca554d5980b4cfdbee70b40ba1))
+* remove issue number check from commit message validation ([bba7273](https://github.com/galaxyproject/brc-analytics/commit/bba72730d9223f041c1b8c527ae16d709f71097f))
+* Remove issue number check from husky ([#363](https://github.com/galaxyproject/brc-analytics/issues/363)) ([#372](https://github.com/galaxyproject/brc-analytics/issues/372)) ([bba7273](https://github.com/galaxyproject/brc-analytics/commit/bba72730d9223f041c1b8c527ae16d709f71097f))
+* rename genomes.json to assemblies.json ([#343](https://github.com/galaxyproject/brc-analytics/issues/343)) ([#360](https://github.com/galaxyproject/brc-analytics/issues/360)) ([bebcfb2](https://github.com/galaxyproject/brc-analytics/commit/bebcfb265ed4ee8c7990db795425b2c863c01d91))
+* replace HTML scraping with API calls ([#346](https://github.com/galaxyproject/brc-analytics/issues/346)) ([#378](https://github.com/galaxyproject/brc-analytics/issues/378)) ([6b6c3c0](https://github.com/galaxyproject/brc-analytics/commit/6b6c3c0998ba96d48e085e3d6383dc60ce28fbcd))
+* update findable-ui to latest v22.0.0 ([#391](https://github.com/galaxyproject/brc-analytics/issues/391)) ([#395](https://github.com/galaxyproject/brc-analytics/issues/395)) ([8ee5a6a](https://github.com/galaxyproject/brc-analytics/commit/8ee5a6a9196c01fd12dbe25bbe935e144bbeb002))
+
+
+### Content
+
+* explain 'free' compute at tacc ([#237](https://github.com/galaxyproject/brc-analytics/issues/237)) ([#370](https://github.com/galaxyproject/brc-analytics/issues/370)) ([39bab23](https://github.com/galaxyproject/brc-analytics/commit/39bab23b119d76cab8f28e1785f6ada9db7f1c70))
+* remove cards from the carousel/card deck ([#403](https://github.com/galaxyproject/brc-analytics/issues/403)) ([#404](https://github.com/galaxyproject/brc-analytics/issues/404)) ([9f4f70e](https://github.com/galaxyproject/brc-analytics/commit/9f4f70ef000dec064784a7d21f37658609a934fa))
+
+
+### Continuous Integration
+
+* add github action and workflow to check pr title for commit message format ([#377](https://github.com/galaxyproject/brc-analytics/issues/377)) ([#380](https://github.com/galaxyproject/brc-analytics/issues/380)) ([b128499](https://github.com/galaxyproject/brc-analytics/commit/b1284998dc50f9f54a703e9df2efd687b3f04bf7))
+* fix linkml checks so that they exit with failure if the check fails for any file ([#341](https://github.com/galaxyproject/brc-analytics/issues/341)) ([#376](https://github.com/galaxyproject/brc-analytics/issues/376)) ([a450ea5](https://github.com/galaxyproject/brc-analytics/commit/a450ea515c5ab03ff5874a35914e60c1ce5d8e05))
+
 ## [0.7.0](https://github.com/galaxyproject/brc-analytics/compare/v0.6.0...v0.7.0) (2025-03-03)
 
 

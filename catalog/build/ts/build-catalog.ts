@@ -4,6 +4,7 @@ import YAML from "yaml";
 import {
   BRCDataCatalogGenome,
   BRCDataCatalogOrganism,
+  Workflow,
   WorkflowCategory,
 } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import {
@@ -98,16 +99,15 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
       strainName: parseStringOrNull(row.strain),
       taxonomicGroup: row.taxonomicGroup ? row.taxonomicGroup.split(",") : [],
       taxonomicLevelClass: defaultStringToNone(row.taxonomicLevelClass),
+      taxonomicLevelDomain: defaultStringToNone(row.taxonomicLevelDomain),
       taxonomicLevelFamily: defaultStringToNone(row.taxonomicLevelFamily),
       taxonomicLevelGenus: defaultStringToNone(row.taxonomicLevelGenus),
       taxonomicLevelKingdom: defaultStringToNone(row.taxonomicLevelKingdom),
       taxonomicLevelOrder: defaultStringToNone(row.taxonomicLevelOrder),
       taxonomicLevelPhylum: defaultStringToNone(row.taxonomicLevelPhylum),
+      taxonomicLevelRealm: defaultStringToNone(row.taxonomicLevelRealm),
       taxonomicLevelSpecies: defaultStringToNone(row.taxonomicLevelSpecies),
       taxonomicLevelStrain,
-      taxonomicLevelSuperkingdom: defaultStringToNone(
-        row.taxonomicLevelSuperkingdom
-      ),
       ucscBrowserUrl: parseStringOrNull(row.ucscBrowser),
     });
   }
@@ -143,17 +143,18 @@ function buildOrganism(
     ncbiTaxonomyId: genome.speciesTaxonomyId,
     taxonomicGroup: genome.taxonomicGroup,
     taxonomicLevelClass: genome.taxonomicLevelClass,
+    taxonomicLevelDomain: genome.taxonomicLevelDomain,
     taxonomicLevelFamily: genome.taxonomicLevelFamily,
     taxonomicLevelGenus: genome.taxonomicLevelGenus,
     taxonomicLevelKingdom: genome.taxonomicLevelKingdom,
     taxonomicLevelOrder: genome.taxonomicLevelOrder,
     taxonomicLevelPhylum: genome.taxonomicLevelPhylum,
+    taxonomicLevelRealm: genome.taxonomicLevelRealm,
     taxonomicLevelSpecies: genome.taxonomicLevelSpecies,
     taxonomicLevelStrain: accumulateArrayValue(
       organism?.taxonomicLevelStrain,
       genome.taxonomicLevelStrain
     ),
-    taxonomicLevelSuperkingdom: genome.taxonomicLevelSuperkingdom,
   };
 }
 
@@ -176,7 +177,9 @@ async function buildWorkflows(): Promise<WorkflowCategory[]> {
     );
 
   for (const sourceWorkflow of sourceWorkflows.workflows) {
-    buildWorkflow(workflowCategories, sourceWorkflow);
+    if (sourceWorkflow.active) {
+      buildWorkflow(workflowCategories, sourceWorkflow);
+    }
   }
 
   return workflowCategories;
@@ -186,6 +189,7 @@ function buildWorkflow(
   workflowCategories: WorkflowCategory[],
   {
     categories,
+    parameters: sourceParameters,
     ploidy,
     taxonomy_id: taxonomyId,
     trs_id: trsId,
@@ -193,19 +197,25 @@ function buildWorkflow(
     workflow_name: workflowName,
   }: SourceWorkflow
 ): void {
+  const parameters = [];
+  for (const { key, variable } of sourceParameters) {
+    if (variable) parameters.push({ key, variable });
+  }
+  const workflow: Workflow = {
+    parameters,
+    ploidy,
+    taxonomyId: typeof taxonomyId === "number" ? String(taxonomyId) : null,
+    trsId,
+    workflowDescription,
+    workflowName,
+  };
   for (const category of categories) {
     const workflowCategory = workflowCategories.find(
       (c) => c.category === category
     );
     if (!workflowCategory)
       throw new Error(`Unknown workflow category: ${category}`);
-    workflowCategory.workflows.push({
-      ploidy,
-      taxonomyId: typeof taxonomyId === "number" ? String(taxonomyId) : null,
-      trsId,
-      workflowDescription,
-      workflowName,
-    });
+    workflowCategory.workflows.push(workflow);
   }
 }
 

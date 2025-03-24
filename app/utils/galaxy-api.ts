@@ -1,3 +1,5 @@
+import { WORKFLOW_PARAMETER_VARIABLE } from "../apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { WorkflowParameter } from "../apis/catalog/brc-analytics-catalog/common/entities";
 import ky from "ky";
 import { GALAXY_ENVIRONMENT } from "site-config/common/galaxy";
 
@@ -16,8 +18,7 @@ interface WorkflowLanding {
   uuid: string;
 }
 
-const WORKFLOW_ID_VARIANT_CALLING =
-  "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/haploid-variant-calling-wgs-pe/main/versions/v0.1";
+const DOCKSTORE_API_URL = "https://dockstore.org/api/ga4gh/trs/v2/tools";
 
 const { galaxyInstanceUrl } = GALAXY_ENVIRONMENT;
 const workflowLandingsApiUrl = `${galaxyInstanceUrl}api/workflow_landings`;
@@ -28,21 +29,23 @@ const workflowLandingUrl = `${galaxyInstanceUrl}workflow_landings`;
  * @param workflowId - Value for the `workflow_id` parameter sent to the API.
  * @param referenceGenome - Genome version/assembly ID.
  * @param geneModelUrl - URL for gene model parameter sent to the API.
+ * @param parameters - Parameters for this workflow.
  * @returns workflow landing URL.
  */
 export async function getWorkflowLandingUrl(
   workflowId: string,
   referenceGenome: string,
-  geneModelUrl: string | null
+  geneModelUrl: string | null,
+  parameters: WorkflowParameter[]
 ): Promise<string> {
   const body: WorkflowLandingsBody = {
     public: true,
     request_state: getWorkflowLandingsRequestState(
-      workflowId,
       referenceGenome,
-      geneModelUrl
+      geneModelUrl,
+      parameters
     ),
-    workflow_id: workflowId,
+    workflow_id: `${DOCKSTORE_API_URL}/${workflowId}`,
     workflow_target_type: "trs_url",
   };
   const res = await ky.post<WorkflowLanding>(workflowLandingsApiUrl, {
@@ -65,33 +68,53 @@ function buildFastaUrl(identifier: string): string {
   return `${baseUrl}${formattedPath}`;
 }
 
-/**
- * Get the appropriate `request_state` object for the given workflow ID and reference genome.
- * @param workflowId - Workflow ID.
- * @param referenceGenome - Reference genome.
- * @param geneModelUrl - URL for gene model parameter.
- * @returns `request_state` value for the workflow landings request body.
- */
-function getWorkflowLandingsRequestState(
-  workflowId: string,
-  referenceGenome: string,
-  geneModelUrl: string | null
-): WorkflowLandingsBodyRequestState {
-  if (workflowId === WORKFLOW_ID_VARIANT_CALLING) {
-    const result: WorkflowLandingsBodyRequestState = {
-      "Genome fasta": {
+function paramVariableToRequestValue(
+  variable: WORKFLOW_PARAMETER_VARIABLE,
+  geneModelUrl: string | null,
+  referenceGenome: string
+): WorkflowLandingsBodyRequestState[string] | undefined {
+  switch (variable) {
+    case WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_ID:
+      return referenceGenome;
+    case WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_FASTA_URL:
+      return {
         ext: "fasta.gz",
         src: "url",
         url: buildFastaUrl(referenceGenome),
-      },
-    };
-    if (geneModelUrl)
-      result["Annotation GTF"] = {
-        ext: "gtf.gz",
-        src: "url",
-        url: geneModelUrl,
       };
-    return result;
+    case WORKFLOW_PARAMETER_VARIABLE.GENE_MODEL_URL:
+      return geneModelUrl
+        ? {
+            ext: "gtf.gz",
+            src: "url",
+            url: geneModelUrl,
+          }
+        : undefined;
   }
-  return { reference_genome: referenceGenome };
+}
+
+/**
+ * Get the appropriate `request_state` object for the given workflow ID and reference genome.
+ * @param referenceGenome - Reference genome.
+ * @param geneModelUrl - URL for gene model parameter.
+ * @param parameters - Parameters for this workflow.
+ * @returns `request_state` value for the workflow landings request body.
+ */
+function getWorkflowLandingsRequestState(
+  referenceGenome: string,
+  geneModelUrl: string | null,
+  parameters: WorkflowParameter[]
+): WorkflowLandingsBodyRequestState {
+  const result: WorkflowLandingsBodyRequestState = {};
+  parameters.forEach(({ key, variable }) => {
+    const maybeParam = paramVariableToRequestValue(
+      variable,
+      geneModelUrl,
+      referenceGenome
+    );
+    if (maybeParam !== undefined) {
+      result[key] = maybeParam;
+    }
+  });
+  return result;
 }

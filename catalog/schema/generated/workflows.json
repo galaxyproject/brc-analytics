@@ -1,13 +1,36 @@
 {
     "$defs": {
+        "Any": {
+            "additionalProperties": true,
+            "description": "Placeholder type; used avoid unnecessary restrictions on the `type_guide` slot.",
+            "title": "Any",
+            "type": [
+                "null",
+                "boolean",
+                "object",
+                "number",
+                "string"
+            ]
+        },
         "Workflow": {
             "additionalProperties": false,
             "description": "A workflow.",
             "properties": {
+                "active": {
+                    "description": "Determines if workflow should be included.",
+                    "type": "boolean"
+                },
                 "categories": {
                     "description": "The IDs of the categories the workflow belongs to.",
                     "items": {
                         "$ref": "#/$defs/WorkflowCategoryId"
+                    },
+                    "type": "array"
+                },
+                "parameters": {
+                    "description": "The parameters of the workflow.",
+                    "items": {
+                        "$ref": "#/$defs/WorkflowParameter"
                     },
                     "type": "array"
                 },
@@ -38,9 +61,11 @@
             "required": [
                 "trs_id",
                 "categories",
-                "ploidy",
                 "workflow_name",
-                "workflow_description"
+                "workflow_description",
+                "ploidy",
+                "parameters",
+                "active"
             ],
             "title": "Workflow",
             "type": "object"
@@ -57,6 +82,46 @@
                 "OTHER"
             ],
             "title": "WorkflowCategoryId",
+            "type": "string"
+        },
+        "WorkflowParameter": {
+            "additionalProperties": false,
+            "description": "A parameter that is provided to a workflow; must include a source for the parameter's value in order to be provided.",
+            "properties": {
+                "key": {
+                    "description": "The key in which the parameter will be set.",
+                    "type": "string"
+                },
+                "type_guide": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/Any"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Arbitrary data describing the type of the parameter, intended only as convenient reference for maintainers."
+                },
+                "variable": {
+                    "$ref": "#/$defs/WorkflowParameterVariable",
+                    "description": "A variable to substitute in as the value of the parameter."
+                }
+            },
+            "required": [
+                "key"
+            ],
+            "title": "WorkflowParameter",
+            "type": "object"
+        },
+        "WorkflowParameterVariable": {
+            "description": "Possible variables that can be inserted into workflow parameters.",
+            "enum": [
+                "ASSEMBLY_ID",
+                "ASSEMBLY_FASTA_URL",
+                "GENE_MODEL_URL"
+            ],
+            "title": "WorkflowParameterVariable",
             "type": "string"
         },
         "WorkflowPloidy": {

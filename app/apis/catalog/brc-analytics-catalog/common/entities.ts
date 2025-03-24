@@ -1,4 +1,8 @@
-import { ORGANISM_PLOIDY, WORKFLOW_PLOIDY } from "./schema-entities";
+import {
+  ORGANISM_PLOIDY,
+  WORKFLOW_PARAMETER_VARIABLE,
+  WORKFLOW_PLOIDY,
+} from "./schema-entities";
 
 export type BRCCatalog = BRCDataCatalogGenome;
 
@@ -22,14 +26,15 @@ export interface BRCDataCatalogGenome {
   strainName: string | null;
   taxonomicGroup: string[];
   taxonomicLevelClass: string;
+  taxonomicLevelDomain: string;
   taxonomicLevelFamily: string;
   taxonomicLevelGenus: string;
   taxonomicLevelKingdom: string;
   taxonomicLevelOrder: string;
   taxonomicLevelPhylum: string;
+  taxonomicLevelRealm: string;
   taxonomicLevelSpecies: string;
   taxonomicLevelStrain: string;
-  taxonomicLevelSuperkingdom: string;
   ucscBrowserUrl: string | null;
 }
 
@@ -40,14 +45,15 @@ export interface BRCDataCatalogOrganism {
   ncbiTaxonomyId: string;
   taxonomicGroup: string[];
   taxonomicLevelClass: string;
+  taxonomicLevelDomain: string;
   taxonomicLevelFamily: string;
   taxonomicLevelGenus: string;
   taxonomicLevelKingdom: string;
   taxonomicLevelOrder: string;
   taxonomicLevelPhylum: string;
+  taxonomicLevelRealm: string;
   taxonomicLevelSpecies: string;
   taxonomicLevelStrain: string[];
-  taxonomicLevelSuperkingdom: string;
 }
 
 export interface EntitiesResponse<R> {
@@ -71,9 +77,15 @@ export interface WorkflowCategory {
 }
 
 export interface Workflow {
+  parameters: WorkflowParameter[];
   ploidy: WORKFLOW_PLOIDY;
   taxonomyId: string | null;
   trsId: string;
   workflowDescription: string;
   workflowName: string;
+}
+
+export interface WorkflowParameter {
+  key: string;
+  variable: WORKFLOW_PARAMETER_VARIABLE;
 }

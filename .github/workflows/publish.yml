@@ -8,6 +8,7 @@ on:
 
 jobs:
   build-and-deploy:
+    if: github.repository == "galaxyproject/brc-analytics"
     runs-on: ubuntu-latest
     environment: ${{ github.ref == 'refs/heads/production' && 'production' || 'development' }}
 

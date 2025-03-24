@@ -18,7 +18,7 @@ export const Workflow = ({
   genomeVersionAssemblyId,
   workflow,
 }: Props): JSX.Element => {
-  const { trsId, workflowDescription, workflowName } = workflow;
+  const { parameters, trsId, workflowDescription, workflowName } = workflow;
   const { data: landingUrl, isLoading, run } = useAsync<string>();
   return (
     <StyledGrid2 {...GRID2_PROPS}>
@@ -37,7 +37,8 @@ export const Workflow = ({
               getWorkflowLandingUrl(
                 trsId,
                 genomeVersionAssemblyId,
-                geneModelUrl
+                geneModelUrl,
+                parameters
               )
             ));
           window.open(

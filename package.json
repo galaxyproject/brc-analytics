@@ -1,6 +1,6 @@
 {
   "name": "brc-analytics",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "private": true,
   "scripts": {
     "dev": "./scripts/dev.sh brc-analytics && ./scripts/set-version.sh dev && next dev",
@@ -15,12 +15,13 @@
     "test": "jest --runInBand",
     "build-brc-db": "esrun catalog/build/ts/build-catalog.ts",
     "build-files-from-ncbi": "python3 ./catalog/build/py/build-files-from-ncbi.py",
+    "iwc-manifest-to-workflows-yaml": "python3 ./catalog/build/py/iwc_manifest_to_workflows_yaml.py --exclude-other",
     "gen-schema": "./catalog/schema/scripts/gen-schema.sh",
     "test-gen-python": "./catalog/schema/scripts/test-gen-python.sh",
     "validate-catalog": "./catalog/schema/scripts/validate-catalog.sh"
   },
   "dependencies": {
-    "@databiosphere/findable-ui": "^21.0.0",
+    "@databiosphere/findable-ui": "^22.0.0",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@mdx-js/loader": "^3.0.1",
@@ -30,6 +31,7 @@
     "@next/mdx": "^14.1.0",
     "@tanstack/react-table": "^8.19.2",
     "copy-to-clipboard": "^3.3.1",
+    "isomorphic-dompurify": "^2.22.0",
     "ky": "^1.7.2",
     "next": "^14.1.0",
     "next-compose-plugins": "^2.2.1",
@@ -37,7 +39,7 @@
     "react-dom": "^18.3.1",
     "react-window": "1.8.9",
     "uuid": "8.3.2",
-    "validate.js": "^0.13.1"
+    "yup": "^1.6.1"
   },
   "devDependencies": {
     "@actions/core": "^1.11.1",

@@ -7,6 +7,7 @@ UCSC_ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.jso
 GENOMES_OUTPUT_PATH = "catalog/build/intermediate/genomes-from-ncbi.tsv"
 
 QC_REPORT_PATH = "catalog/output/qc-report.md"
+TREE_OUTPUT_PATH = "catalog/output/ncbi-taxa-tree.json"
 
 TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
   2: "Bacteria",
@@ -26,13 +27,14 @@ TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
 }
 
 TAXANOMIC_LEVELS_FOR_TREE = [
-  "superkingdom", 
-  "kingdom", 
-  "phylum", 
-  "class", 
-  "order", 
-  "family", 
-  "genus", 
+  "domain",
+  "realm",
+  "kingdom",
+  "phylum",
+  "class",
+  "order",
+  "family",
+  "genus",
   "species",
   "strain"
 ]
@@ -42,6 +44,7 @@ if __name__ == "__main__":
     ASSEMBLIES_PATH,
     GENOMES_OUTPUT_PATH,
     UCSC_ASSEMBLIES_URL,
+    TREE_OUTPUT_PATH,
     TAXANOMIC_LEVELS_FOR_TREE,
     {"taxonomicGroup": TAXONOMIC_GROUPS_BY_TAXONOMY_ID},
     qc_report_path=QC_REPORT_PATH

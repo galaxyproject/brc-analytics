@@ -8,6 +8,7 @@ permissions:
   contents: read
 jobs:
   build-and-deploy:
+    if: github.repository == "galaxyproject/brc-analytics"
     runs-on: ubuntu-latest
 
     steps:

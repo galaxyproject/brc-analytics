@@ -1,63 +1,714 @@
 workflows:
-  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.13"
+  - trs_id: "#workflow/github.com/iwc-workflows/assembly-with-flye/main/versions/v0.2"
     categories:
-      - "REGULATION"
-    workflow_name: "CUTandRUN"
-    workflow_description: "This workflow take as input a collection of paired fastq. Remove adapters with cutadapt, map pairs with bowtie2 allowing dovetail. Keep MAPQ30 and concordant pairs. BAM to BED. MACS2 with 'ATAC' parameters."
-    ploidy: "ANY"
-
-  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/atacseq/main/versions/v1.0"
+      - ASSEMBLY
+    workflow_name: Genome assembly with Flye
+    workflow_description:
+      Assemble long reads with Flye, then view assembly statistics
+      and assembly graph
+    ploidy: ANY
+    parameters:
+      - key: Input sequence reads
+        type_guide:
+          class: File
+    active: false
+  - trs_id: "#workflow/github.com/iwc-workflows/atacseq/main/versions/v1.0"
     categories:
-      - "REGULATION"
-    workflow_name: "ATACseq"
-    workflow_description: "This workflow takes as input a collection of paired fastq. It will remove bad quality and adapters with cutadapt. Map with Bowtie2 end-to-end. Will remove reads on MT and unconcordant pairs and pairs with mapping quality below 30 and PCR duplicates. Will compute the pile-up on 5'' +- 100bp. Will call peaks and count the number of reads falling in the 1kb region centered on the summit. Will compute 2 normalization for coverage: normalized by million reads and normalized by million reads in peaks. Will plot the number of reads for each fragment length."
-    ploidy: "ANY"
-
-  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/main/versions/v0.5"
+      - REGULATION
+    workflow_name: "ATAC-seq Analysis: Chromatin Accessibility Profiling"
+    workflow_description:
+      Complete ATAC-seq analysis pipeline for paired-end reads.
+      Processes raw FASTQ data through adapter and bad quality removal (cutadapt), alignment
+      (Bowtie2 end-to-end), and filtering (removes MT reads, discordant pairs, low mapping
+      quality <30, PCR duplicates). Generates 5' cut site pileups (±100bp), performs
+      peak calling, and quantifies reads in 1kb summit-centered regions. Produces two
+      normalized coverage tracks (per million mapped reads and per million reads in
+      peaks) and fragment length distribution plots for quality assessment.
+    ploidy: ANY
+    parameters:
+      - key: reference_genome
+        variable: ASSEMBLY_ID
+    active: true
+  - trs_id: "#workflow/github.com/iwc-workflows/average-bigwig-between-replicates/main/versions/v0.2"
     categories:
-      - "TRANSCRIPTOMICS"
-    workflow_name: "scRNA-seq preprocessing 10X cellPlex"
-    workflow_description: "This workflow processes the CMO fastqs with CITE-seq-Count and include the translation step required for cellPlex processing. In parallel it processes the Gene Expresion fastqs with STARsolo, filter cells with DropletUtils and reformat all outputs to be easily used by the function 'Read10X' from Seurat."
-    ploidy: "ANY"
-
-  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/main/versions/v0.5"
+      - REGULATION
+      - TRANSCRIPTOMICS
+    workflow_name: BigWig Replicates Averaging Workflow
+    workflow_description:
+      Calculates average signal values across replicate BigWig files
+      to generate a single consolidated track. Requires input file identifiers formatted
+      as "sample_name_replicateID". The tool automatically groups files by sample name,
+      computes the mean signal at each position, and outputs consolidated BigWig files
+      named after the common sample prefix (without the replicate ID suffix).
+    ploidy: ANY
+    parameters:
+      - key: Bigwig to average
+        type_guide:
+          class: Collection
+      - key: bin_size
+        type_guide:
+          class: integer
+    active: false
+  - trs_id: "#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v1.1.5"
     categories:
-      - "TRANSCRIPTOMICS"
-    workflow_name: "scRNA-seq preprocessing 10X Bundle"
-    workflow_description: "This workflow processes the Gene Expresion fastqs with STARsolo, filter cells with DropletUtils and reformat all outputs to be easily used by the function 'Read10X' from Seurat."
-    ploidy: "ANY"
-
-  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.12"
+      - ASSEMBLY
+    workflow_name: Bacterial Genome Assembly using Shovill
+    workflow_description:
+      Assembly of bacterial paired-end short read data with generation
+      of quality metrics and reports
+    ploidy: ANY
+    parameters:
+      - key: Input adapter trimmed sequence reads (forward)
+        type_guide:
+          class: File
+          ext:
+            - fastq
+            - fastq.gz
+            - fastqsanger
+            - fastqsanger.gz
+      - key: Input adapter trimmed sequence reads (reverse)
+        type_guide:
+          class: File
+          ext:
+            - fastq
+            - fastq.gz
+            - fastqsanger
+            - fastqsanger.gz
+    active: false
+  - trs_id: "#workflow/github.com/iwc-workflows/baredsc/baredSC-1d-logNorm/versions/v0.6"
     categories:
-      - "REGULATION"
-    ploidy: "ANY"
-    workflow_name: "ChIPseq for Paired-end fastqs"
-    workflow_description: "This workflow takes as input a collection of paired fastqs. Remove adapters with cutadapt, map pairs with bowtie2. Keep MAPQ30 and concordant pairs. MACS2 for paired bam."
-
-  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v0.9"
+      - TRANSCRIPTOMICS
+    workflow_name: "Single-Cell Mixture Analysis: baredSC 1D Log-Normalized Models"
+    workflow_description:
+      Applies baredSC algorithm to fit and combine one-dimensional
+      Gaussian mixture models (from 1 to N components) on log-normalized single-cell
+      gene expression data. Enables identification of subpopulations based on expression
+      of genes of interest and provides statistical assessment of the optimal number
+      of components in heterogeneous cell populations.
+    ploidy: ANY
+    parameters:
+      - key: Tabular with raw expression values
+        type_guide:
+          class: File
+          ext: tabular
+      - key: Gene name
+        type_guide:
+          class: text
+      - key: Maximum value in logNorm
+        type_guide:
+          class: float
+      - key: Maximum number of Gaussians to study
+        type_guide:
+          class: integer
+    active: false
+  - trs_id: "#workflow/github.com/iwc-workflows/baredsc/baredSC-2d-logNorm/versions/v0.6"
     categories:
-      - "TRANSCRIPTOMICS"
-    ploidy: "ANY"
-    workflow_name: "RNA-seq for Paired-end fastqs"
-    workflow_description: "This workflow takes as input a list of paired-end fastqs. Adapters and bad quality bases are removed with cutadapt. Reads are mapped with STAR with ENCODE parameters and genes are counted simultaneously as well as normalized coverage (per million mapped reads) on uniquely mapped reads. The counts are reprocessed to be similar to HTSeq-count output. FPKM are computed with cufflinks and/or with StringTie. The unstranded normalized coverage is computed with bedtools."
-
-  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/haploid-variant-calling-wgs-pe/main/versions/v0.1"
+      - TRANSCRIPTOMICS
+    workflow_name: "Single-Cell Mixture Analysis: baredSC 2D Log-Normalized Models"
+    workflow_description:
+      Applies baredSC algorithm to fit and combine two-dimensional
+      Gaussian mixture models (from 1 to N components) on log-normalized single-cell
+      gene expression data. Enables identification of subpopulations based on co-expression
+      patterns of two genes of interest and provides statistical assessment of the optimal
+      number of components in heterogeneous cell populations.
+    ploidy: ANY
+    parameters:
+      - key: Tabular with raw expression values
+        type_guide:
+          class: File
+          ext: tabular
+      - key: Gene name for x axis
+        type_guide:
+          class: text
+      - key: maximum value in logNorm for x-axis
+        type_guide:
+          class: float
+      - key: Gene name for y axis
+        type_guide:
+          class: text
+      - key: maximum value in logNorm for y-axis
+        type_guide:
+          class: float
+      - key: Maximum number of Gaussians to study
+        type_guide:
+          class: integer
+      - key: compute p-value
+        type_guide:
+          class: boolean
+    active: false
+  - trs_id: "#workflow/github.com/iwc-workflows/brew3r/main/versions/v0.2"
     categories:
-      - "VARIANT_CALLING"
-    ploidy: "HAPLOID"
-    workflow_name: "Paired end variant calling in haploid system"
-    workflow_description: "Workflow for variant analysis against a reference genome in GenBank format"
-
-  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.12"
+      - TRANSCRIPTOMICS
+    workflow_name: BREW3R
+    workflow_description:
+      Extends 3' ends of gene annotations using BAM files (from
+      STAR alignments) and a reference GTF. Specifically designed for 3'-biased sequencing
+      techniques like 10X scRNA-seq or BRB-seq that primarily capture transcript 3'
+      ends. The BREW3R tool enhances annotations by using evidence from RNA-seq data
+      to improve 3' UTR definitions, which is particularly important for accurate quantification
+      in single-cell and bulk RNA-seq experiments.
+    ploidy: ANY
+    parameters:
+      - key: Input gtf
+        type_guide:
+          class: File
+          ext: gtf
+      - key: BAM collection
+        type_guide:
+          class: Collection
+          ext: bam
+      - key: strandedness
+        type_guide:
+          class: text
+      - key: minimum coverage
+        type_guide:
+          class: integer
+      - key: minimum FPKM for merge
+        type_guide:
+          class: float
+    active: false
+  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.14"
     categories:
-      - "REGULATION"
-    ploidy: "ANY"
-    workflow_name: "ChIPseq for Single-read fastqs"
-    workflow_description: "This workflow takes as input a collection of fastqs (single reads). Remove adapters with cutadapt, map with bowtie2. Keep MAPQ30. MACS2 for bam with fixed extension or model."
-
-  - trs_id: "https://dockstore.org/api/ga4gh/trs/v2/tools/#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v0.9"
+      - REGULATION
+    workflow_name: "ChIP-seq Analysis: Paired-End Read Processing"
+    workflow_description:
+      Complete ChIP-seq analysis for paired-end sequencing data.
+      Processes raw FASTQ files through adapter removal (cutadapt), alignment to reference
+      genome (Bowtie2), and stringent quality filtering (MAPQ >= 30, concordant pairs
+      only). Peak calling with MACS2 optimized for paired-end reads identifies protein-DNA
+      binding sites. Generates alignment files, peak calls, and quality metrics for
+      downstream analysis.
+    ploidy: ANY
+    parameters:
+      - key: reference_genome
+        variable: ASSEMBLY_ID
+    active: true
+  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.14"
     categories:
-      - "TRANSCRIPTOMICS"
-    ploidy: "ANY"
-    workflow_name: "RNA-seq for Single-read fastqs"
-    workflow_description: "This workflow takes as input a list of single-end fastqs. Adapters and bad quality bases are removed with fastp. Reads are mapped with STAR with ENCODE parameters and genes are counted simultaneously as well as normalized coverage (per million mapped reads) on uniquely mapped reads. The counts are reprocessed to be similar to HTSeq-count output. Alternatively, featureCounts can be used to count the reads/fragments per gene. FPKM are computed with cufflinks and/or with StringTie. The unstranded normalized coverage is computed with bedtools."
+      - REGULATION
+    workflow_name: "ChIP-seq Analysis: Single-End Read Processing"
+    workflow_description:
+      Complete ChIP-seq analysis for single-end sequencing data.
+      Processes raw FASTQ files through adapter removal (cutadapt), alignment to reference
+      genome (Bowtie2), and quality filtering (MAPQ >= 30). Peak calling with MACS2
+      uses either a fixed extension parameter or built-in model to identify protein-DNA
+      binding sites. Generates alignment files, peak calls, and quality metrics for
+      downstream analysis.
+    ploidy: ANY
+    parameters:
+      - key: reference_genome
+        variable: ASSEMBLY_ID
+    active: true
+  - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.3"
+    categories:
+      - REGULATION
+    workflow_name: Consensus Peak Calling for ATAC-seq and CUT&RUN Replicates
+    workflow_description:
+      Identifies high-confidence consensus peaks from ATAC-seq or
+      CUT&RUN replicate experiments. The workflow calls peaks on individual replicates
+      and identifies their intersection. To control for sequencing depth differences,
+      it subsamples all replicates to the smallest library size, performs peak calling
+      on the combined normalized data, and retains only peaks whose summits overlap
+      with intersections from a user-defined minimum number of replicates.
+    ploidy: ANY
+    parameters: []
+    active: true
+  - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-pe/versions/v1.3"
+    categories:
+      - REGULATION
+    workflow_name: Consensus Peak Calling for ChIP-seq Paired-End Replicates
+    workflow_description:
+      Identifies high-confidence consensus peaks from ChIP-seq paired-end
+      replicate experiments. The workflow calls peaks on individual replicates and identifies
+      their intersection. To control for sequencing depth differences, it subsamples
+      all replicates to the smallest library size, performs peak calling on the combined
+      normalized data, and retains only peaks whose summits overlap with intersections
+      from a user-defined minimum number of replicates.
+    ploidy: ANY
+    parameters: []
+    active: false
+  - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-sr/versions/v1.3"
+    categories:
+      - REGULATION
+    workflow_name: Consensus Peak Calling for ChIP-seq Single-End Replicates
+    workflow_description:
+      Identifies high-confidence consensus peaks from ChIP-seq single-end
+      replicate experiments. The workflow calls peaks on individual replicates and identifies
+      their intersection. To control for sequencing depth differences, it subsamples
+      all replicates to the smallest library size, performs peak calling on the combined
+      normalized data, and retains only peaks whose summits overlap with intersections
+      from a user-defined minimum number of replicates.
+    ploidy: ANY
+    parameters: []
+    active: false
+  - trs_id: "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.14"
+    categories:
+      - REGULATION
+    workflow_name: "CUT&RUN/CUT&TAG Analysis: Protein-DNA Interaction Mapping"
+    workflow_description:
+      Complete CUT&RUN/CUT&TAG analysis workflow for paired-end
+      sequencing data. Processes raw FASTQ files through adapter removal (cutadapt)
+      and alignment (Bowtie2 with dovetail option enabled). Applies quality filtering
+      (MAPQ ≥ 30, concordant pairs only), converts BAM to BED format, and performs peak
+      calling using MACS2 with parameters optimized for the punctate signal profile
+      characteristic of CUT&RUN/CUT&TAG experiments.
+    ploidy: ANY
+    parameters:
+      - key: reference_genome
+        variable: ASSEMBLY_ID
+    active: true
+  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.2"
+    categories:
+      - TRANSCRIPTOMICS
+    workflow_name:
+      "Single-Cell RNA-seq Preprocessing: 10X Genomics CellPlex Multiplexed
+      Samples"
+    workflow_description:
+      Comprehensive preprocessing for 10X Genomics CellPlex multiplexed
+      single-cell RNA-seq data. Processes Cell Multiplexing Oligo (CMO) FASTQ files
+      with CITE-seq-Count including required CellPlex-specific translation steps. Simultaneously
+      processes gene expression FASTQ files with STARsolo and DropletUtils for alignment
+      and cell filtering, and formats outputs for seamless import into Seurat/Scanpy
+      (Read10X function).
+    ploidy: ANY
+    parameters:
+      - key: reference genome
+        variable: ASSEMBLY_ID
+      - key: gtf
+        variable: GENE_MODEL_URL
+    active: true
+  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.2"
+    categories:
+      - TRANSCRIPTOMICS
+    workflow_name:
+      "Single-Cell RNA-seq Preprocessing: 10X Genomics v3 to Seurat and
+      Scanpy Compatible Format"
+    workflow_description:
+      Complete preprocessing pipeline for 10X Genomics v3 single-cell
+      RNA-seq data. Aligns raw FASTQ files using STARsolo, performs cell calling and
+      quality filtering with DropletUtils, and formats outputs for seamless import into
+      Seurat/Scanpy (Read10X function).
+    ploidy: ANY
+    parameters:
+      - key: reference genome
+        variable: ASSEMBLY_ID
+      - key: gtf
+        variable: GENE_MODEL_URL
+    active: true
+  - trs_id: "#workflow/github.com/iwc-workflows/generic-variant-calling-wgs-pe/main/versions/v0.1.1"
+    categories:
+      - VARIANT_CALLING
+    workflow_name: Generic variation analysis on WGS PE data
+    workflow_description:
+      Workflow for variant analysis against  a reference genome
+      in GenBank format
+    ploidy: ANY
+    parameters:
+      - key: Paired Collection
+        type_guide:
+          class: Collection
+          ext:
+            - fastqsanger
+            - fastqsanger.gz
+      - key: GenBank genome
+        type_guide:
+          class: File
+          ext: genbank
+      - key: Name for genome database
+        type_guide:
+          class: text
+    active: false
+  - trs_id: "#workflow/github.com/iwc-workflows/goseq/main/versions/v0.1"
+    categories:
+      - TRANSCRIPTOMICS
+    workflow_name: Gene Ontology and KEGG Pathway Enrichment Analysis
+    workflow_description:
+      Performs functional enrichment analysis of gene sets using
+      GOseq, identifying over-represented Gene Ontology terms and KEGG pathways. This
+      workflow accounts for gene length bias in RNA-seq data when calculating enrichment
+      statistics. Input requires differentially expressed genes and gene lengths. Generates
+      comprehensive tables and visualizations of enriched GO terms across all three
+      ontologies (Biological Process, Molecular Function, Cellular Component) as well
+      as KEGG pathway enrichment results.
+    ploidy: ANY
+    parameters:
+      - key: Select genome to use
+        type_guide:
+          class: text
+      - key: Differential expression result
+        type_guide:
+          class: File
+          ext: tabular
+      - key: Select gene ID format
+        type_guide:
+          class: text
+      - key: gene length
+        type_guide:
+          class: File
+          ext: tabular
+      - key: KEGG pathways
+        type_guide:
+          class: File
+          ext: tabular
+    active: false
+  - trs_id: "#workflow/github.com/iwc-workflows/haploid-variant-calling-wgs-pe/main/versions/v0.1"
+    categories:
+      - VARIANT_CALLING
+    workflow_name: Paired end variant calling in haploid system
+    workflow_description:
+      Workflow for variant analysis against a reference genome in
+      GenBank format
+    ploidy: HAPLOID
+    parameters:
+      - key: Paired Collection
+        type_guide:
+          class: Collection
+          ext:
+            - fastqsanger
+            - fastqsanger.gz
+      - key: Annotation GTF
+        variable: GENE_MODEL_URL
+      - key: Genome fasta
+        variable: ASSEMBLY_FASTA_URL
+    active: true
+  - trs_id: "#workflow/github.com/iwc-workflows/hic-hicup-cooler/chic-fastq-to-cool-hicup-cooler/versions/v0.3"
+    categories:
+      - REGULATION
+    workflow_name: "Capture Hi-C Processing: FASTQ to Balanced Cool Files"
+    workflow_description:
+      End-to-end processing of Capture Hi-C paired-end sequencing
+      data. Transforms raw FASTQ files into balanced contact matrices using HiCUP for
+      processing Hi-C reads (adapter trimming, mapping, filtering for valid pairs) with
+      additional filtering for MAPQ and captured regions. The workflow generates sorted
+      tabix files via cooler and produces balanced cool files at user-specified resolution
+      for downstream analysis and visualization.
+    ploidy: ANY
+    parameters:
+      - key: PE fastq input
+        type_guide:
+          class: Collection
+      - key: genome name
+        type_guide:
+          class: text
+      - key: Restriction enzyme
+        type_guide:
+          class: text
+      - key: No fill-in
+        type_guide:
+          class: boolean
+      - key: minimum MAPQ
+        type_guide:
+          class: integer
+      - key: Bin size in bp
+        type_guide:
+          class: integer
+      - key: Interactions to consider to calculate weights in normalization step
+        type_guide:
+          class: text
+      - key: capture region (chromosome)
+        type_guide:
+          class: text
+      - key: capture region (start)
+        type_guide:
+          class: integer
+      - key: capture region (end)
+        type_guide:
+          class: integer
+    active: false
+  - trs_id: "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-cool-hicup-cooler/versions/v0.3"
+    categories:
+      - REGULATION
+    workflow_name: "Hi-C Processing: FASTQ to Balanced Cool Files"
+    workflow_description:
+      Comprehensive Hi-C data processing workflow that converts
+      paired-end FASTQ files to balanced contact matrices. Uses HiCUP for pre-processing
+      (adapter trimming, mapping, filtering) with fragment midpoint coordinate assignment,
+      filters reads by mapping quality, and generates sorted tabix files. The final
+      output is a balanced cool file at user-specified resolution created with cooler,
+      ready for multi-resolution contact matrix analysis.
+    ploidy: ANY
+    parameters:
+      - key: PE fastq input
+        type_guide:
+          class: Collection
+      - key: genome name
+        type_guide:
+          class: text
+      - key: Restriction enzyme
+        type_guide:
+          class: text
+      - key: No fill-in
+        type_guide:
+          class: boolean
+      - key: minimum MAPQ
+        type_guide:
+          class: integer
+      - key: Bin size in bp
+        type_guide:
+          class: integer
+      - key: Interactions to consider to calculate weights in normalization step
+        type_guide:
+          class: text
+      - key: region for matrix plotting
+        type_guide:
+          class: text
+    active: false
+  - trs_id: "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-pairs-hicup/versions/v0.3"
+    categories:
+      - REGULATION
+    workflow_name: "Hi-C Data Processing: FASTQ to Valid Interaction Pairs"
+    workflow_description:
+      Processes Hi-C paired-end FASTQ files to generate validated
+      interaction pairs using HiCUP. The workflow truncates reads at ligation junctions,
+      maps to reference genome, assigns to restriction fragments, and filters out experimental
+      artifacts (self-ligated, dangling ends, internal fragments, and size outliers).
+      Removes duplicates and converts outputs to formats compatible with Juicebox/cooler
+      using fragment midpoints as coordinates. Final filtering by mapping quality ensures
+      high-confidence interaction data.
+    ploidy: ANY
+    parameters:
+      - key: PE fastq input
+        type_guide:
+          class: Collection
+      - key: genome name
+        type_guide:
+          class: text
+      - key: Restriction enzyme
+        type_guide:
+          class: text
+      - key: No fill-in
+        type_guide:
+          class: boolean
+      - key: minimum MAPQ
+        type_guide:
+          class: integer
+    active: false
+  - trs_id: "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-juicermediumtabix-to-cool-cooler/versions/v0.3"
+    categories:
+      - REGULATION
+    workflow_name: "Hi-C Format Conversion: Juicer Medium to Cooler Files"
+    workflow_description:
+      Converts Hi-C interaction data from Juicer medium format (tabix
+      files) to balanced cooler format. This streamlined workflow takes a collection
+      of Juicer medium tabix files and a reference genome name as input and generates
+      balanced cool files at user-specified resolution. Enables seamless transition
+      between different Hi-C analysis ecosystems while maintaining data integrity.
+    ploidy: ANY
+    parameters:
+      - key: Bin size in bp
+        type_guide:
+          class: integer
+      - key: genome name
+        type_guide:
+          class: text
+      - key: Juicer Medium Tabix with validPairs
+        type_guide:
+          class: Collection
+      - key: Interactions to consider to calculate weights in normalization step
+        type_guide:
+          class: text
+    active: false
+  - trs_id: "#workflow/github.com/iwc-workflows/mapseq-to-ampvis2/main/versions/v0.2"
+    categories: []
+    workflow_name: MAPseq to ampvis2
+    workflow_description:
+      The MAPseq to Ampvis workflow processes MAPseq OTU tables
+      and associated metadata for analysis in Ampvis2. This workflow involves reformatting
+      MAPseq output datasets to produce structured output files suitable for Ampvis2.
+    ploidy: ANY
+    parameters:
+      - key: MAPseq OTU tables
+        type_guide:
+          class: Collection
+      - key: OTU table metadata
+        type_guide:
+          class: File
+    active: false
+  - trs_id: "#workflow/github.com/iwc-workflows/polish-with-long-reads/main/versions/v0.1"
+    categories:
+      - ASSEMBLY
+    workflow_name: Assembly polishing with long reads
+    workflow_description: Racon polish with long reads, x4
+    ploidy: ANY
+    parameters:
+      - key: Assembly to be polished
+        type_guide:
+          class: File
+      - key: long reads
+        type_guide:
+          class: File
+      - key: "minimap setting (for long reads) "
+        type_guide:
+          class: text
+    active: false
+  - trs_id: "#workflow/github.com/iwc-workflows/pseudobulk-worflow-decoupler-edger/main/versions/v0.1.1"
+    categories:
+      - TRANSCRIPTOMICS
+    workflow_name: Single-Cell Pseudobulk Differential Expression Analysis with edgeR
+    workflow_description:
+      Performs differential gene expression analysis on single-cell
+      data using a pseudobulk approach. Aggregates cell-level counts from an annotated
+      AnnData object by cell type or other metadata using Decoupler, then applies edgeR
+      for robust statistical testing between conditions. Includes data preprocessing
+      steps for compatibility with edgeR and generates interactive volcano plots to
+      visualize significantly differentially expressed genes.
+    ploidy: ANY
+    parameters:
+      - key: Source AnnData file
+        type_guide:
+          class: File
+          ext:
+            - h5
+            - h5ad
+      - key: "Pseudo-bulk: Fields to merge"
+        type_guide:
+          class: text
+      - key: Group by column
+        type_guide:
+          class: text
+      - key: Sample key column
+        type_guide:
+          class: text
+      - key: Name Your Raw Counts Layer
+        type_guide:
+          class: text
+      - key: Factor fields
+        type_guide:
+          class: text
+      - key: Formula
+        type_guide:
+          class: text
+      - key: Gene symbol column
+        type_guide:
+          class: text
+    active: false
+  - trs_id: "#workflow/github.com/iwc-workflows/quality-and-contamination-control/main/versions/v1.1.6"
+    categories:
+      - ASSEMBLY
+    workflow_name: Quality and Contamination Control For Genome Assembly
+    workflow_description:
+      Short paired-end read analysis to provide quality analysis,
+      read cleaning and taxonomy assignation
+    ploidy: ANY
+    parameters:
+      - key: Input sequence reads (forward)
+        type_guide:
+          class: File
+          ext:
+            - fastq
+            - fastq.gz
+            - fastqsanger
+            - fastqsanger.gz
+      - key: Input sequence reads (reverse)
+        type_guide:
+          class: File
+          ext:
+            - fastq
+            - fastq.gz
+            - fastqsanger
+            - fastqsanger.gz
+      - key: Select a taxonomy database
+        type_guide:
+          class: text
+      - key: Select a NCBI taxonomy database
+        type_guide:
+          class: text
+    active: false
+  - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-de/main/versions/v0.3"
+    categories:
+      - TRANSCRIPTOMICS
+    workflow_name: RNA-Seq Differential Expression Analysis with Visualization
+    workflow_description:
+      Identifies differentially expressed genes between exactly
+      two experimental conditions from count tables. The workflow performs statistical
+      testing, applies filters based on adjusted p-value and log2 fold change thresholds,
+      and generates publication-quality visualizations including volcano plots, MA plots,
+      and heatmaps. Takes two collections of count tables as input and produces filtered
+      gene lists and interactive plots for interpreting expression differences. Optimal
+      for simple two-condition experimental designs.
+    ploidy: ANY
+    parameters:
+      - key: Counts from changed condition
+        type_guide:
+          class: Collection
+      - key: Counts from reference condition
+        type_guide:
+          class: Collection
+      - key: Count files have header
+        type_guide:
+          class: boolean
+      - key: Gene Annotaton
+        type_guide:
+          class: File
+      - key: Adjusted p-value threshold
+        type_guide:
+          class: float
+      - key: log2 fold change threshold
+        type_guide:
+          class: float
+    active: false
+  - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.2"
+    categories:
+      - TRANSCRIPTOMICS
+    workflow_name: "RNA-Seq Analysis: Paired-End Read Processing and Quantification"
+    workflow_description:
+      "Complete RNA-Seq analysis for paired-end data: Processes
+      raw FASTQ data through adapter and bad quality removal (fastp), alignment with
+      STAR using ENCODE parameters, gene quantification via multiple methods (STAR and
+      featureCounts), and expression calculation (FPKM with Cufflinks/StringTie, normalized
+      coverage with bedtools). Produces count tables, normalized expression values,
+      and genomic coverage tracks. Supports stranded and unstranded libraries, generating
+      both HTSeq-compatible counts and normalized measures for downstream analysis."
+    ploidy: ANY
+    parameters:
+      - key: Reference genome
+        variable: ASSEMBLY_ID
+      - key: GTF file of annotation
+        variable: GENE_MODEL_URL
+    active: true
+  - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.2"
+    categories:
+      - TRANSCRIPTOMICS
+    workflow_name: "RNA-Seq Analysis: Single-End Read Processing and Quantification"
+    workflow_description:
+      "Complete RNA-Seq analysis for single-end data:  Processes
+      raw FASTQ data through adapter and bad quality removal (fastp), alignment with
+      STAR using ENCODE parameters, gene quantification via multiple methods (STAR and
+      featureCounts), and expression calculation (FPKM with Cufflinks/StringTie, normalized
+      coverage with bedtools). Produces count tables, normalized expression values,
+      and genomic coverage tracks. Supports stranded and unstranded libraries, generating
+      both HTSeq-compatible counts and normalized measures for downstream analysis."
+    ploidy: ANY
+    parameters:
+      - key: Reference genome
+        variable: ASSEMBLY_ID
+      - key: GTF file of annotation
+        variable: GENE_MODEL_URL
+    active: true
+  - trs_id: "#workflow/github.com/iwc-workflows/variation-reporting/main/versions/v0.1.1"
+    categories:
+      - VARIANT_CALLING
+    workflow_name: Generic variation analysis reporting
+    workflow_description:
+      This workflow takes a VCF dataset of variants produced by
+      any of the variant calling workflows in https://github.com/galaxyproject/iwc/tree/main/workflows/sars-cov-2-variant-calling
+      and generates tabular lists of variants by Samples and by Variant, and an overview
+      plot of variants and their allele-frequencies.
+    ploidy: ANY
+    parameters:
+      - key: Variation data to report
+        type_guide:
+          class: Collection
+          ext:
+            - vcf
+            - vcf_bgzip
+      - key: AF Filter
+        type_guide:
+          class: float
+      - key: DP Filter
+        type_guide:
+          class: integer
+      - key: DP_ALT Filter
+        type_guide:
+          class: integer
+    active: false

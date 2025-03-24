@@ -2,6 +2,9 @@
 
 source ./catalog/schema/scripts/source-file-schema-names.sh
 
+# Generate Pydantic models for all source data types
+gen-pydantic ./catalog/schema/schema.yaml > ./catalog/build/py/generated_schema/schema.py
+
 # Generate TypeScript definitions for all source data types
 python3 ./catalog/schema/scripts/gen-typescript.py ./catalog/schema/schema.yaml > ./catalog/schema/generated/schema.ts
 
