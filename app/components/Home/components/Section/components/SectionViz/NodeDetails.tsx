@@ -82,7 +82,7 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
   const filterUrl = createFilterUrl(nodeRank, nodeName);
 
   return (
-    <div>
+    <div style={{ position: "relative" }}>
       {isRoot && (
         <p style={{ color: "#666" }}>
           Click the visualization to explore available assemblies, or select an
@@ -93,12 +93,13 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
       {!isRoot && filterUrl && (
         <p>
           <a href={filterUrl} target="_blank" rel="noopener noreferrer">
-            View {countLeafNodes(node)} Assemblie{countLeafNodes(node) > 1 ? 's' : ''} for {nodeName}
+            View {countLeafNodes(node)} Assembl
+            {countLeafNodes(node) > 1 ? "ies" : "y"} for {nodeName}
           </a>
         </p>
       )}
 
-      {/* {!isRoot && onClose && (
+      {!isRoot && onClose && (
         <button
           onClick={onClose}
           style={{
@@ -106,11 +107,16 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
             border: "none",
             color: "#666",
             cursor: "pointer",
+            fontSize: "20px",
+            padding: "5px",
+            position: "absolute",
+            right: "0",
+            top: "0",
           }}
         >
           ×
         </button>
-      )} */}
+      )}
 
       {firstLevelChildren.length > 0 && (
         <div style={{ marginTop: "20px" }}>
