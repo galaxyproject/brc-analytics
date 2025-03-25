@@ -16,7 +16,7 @@ DOCKSTORE_COLLECTION_TO_CATEGORY = {
     "Transcriptomics": WorkflowCategoryId.TRANSCRIPTOMICS,
     "Epigenetics": WorkflowCategoryId.REGULATION,
     "Genome assembly": WorkflowCategoryId.ASSEMBLY,
-    "SARS-COV-2": WorkflowCategoryId.VARIANT_CALLING
+    "Virology": WorkflowCategoryId.CONSENSUS_SEQUENCES
 }
 MANIFEST_SOURCE_OF_TRUTH = ("trs_id", "workflow_name", "categories", "workflow_description")
 

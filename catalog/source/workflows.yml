@@ -541,6 +541,37 @@ workflows:
         type_guide:
           class: text
     active: false
+  - trs_id: "#workflow/github.com/iwc-workflows/pox-virus-amplicon/main/versions/v0.3"
+    categories:
+      - CONSENSUS_SEQUENCES
+    workflow_name: Pox Virus Illumina Amplicon Workflow from half-genomes
+    workflow_description:
+      A workflow for the analysis of pox virus genomes sequenced
+      as half-genomes (for ITR resolution) in a tiled-amplicon approach
+    ploidy: HAPLOID
+    taxonomy_id: 10244
+    parameters:
+      - key: Reference FASTA
+        variable: ASSEMBLY_FASTA_URL
+      - key: Primer Scheme
+        type_guide:
+          class: File
+      - key: PE Reads Pool1
+        type_guide:
+          class: Collection
+      - key: PE Reads Pool2
+        type_guide:
+          class: Collection
+      - key: Minimum quality score to call base
+        type_guide:
+          class: integer
+      - key: Allele frequency to call SNV
+        type_guide:
+          class: float
+      - key: Allele frequency to call indel
+        type_guide:
+          class: float
+    active: true
   - trs_id: "#workflow/github.com/iwc-workflows/pseudobulk-worflow-decoupler-edger/main/versions/v0.1.1"
     categories:
       - TRANSCRIPTOMICS
@@ -614,7 +645,7 @@ workflows:
         type_guide:
           class: text
     active: false
-  - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-de/main/versions/v0.3"
+  - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-de/main/versions/v0.4"
     categories:
       - TRANSCRIPTOMICS
     workflow_name: RNA-Seq Differential Expression Analysis with Visualization
@@ -685,38 +716,6 @@ workflows:
       - key: GTF file of annotation
         variable: GENE_MODEL_URL
     active: true
-  - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-consensus-from-variation/COVID-19-CONSENSUS-CONSTRUCTION/versions/v0.4.2"
-    categories:
-      - VARIANT_CALLING
-    workflow_name: "COVID-19: consensus construction"
-    workflow_description:
-      "Build a consensus sequence from FILTER PASS variants with
-      intrasample allele-frequency above a configurable consensus threshold.
-
-      Hard-mask regions with low coverage (but not consensus variants within them) and
-      ambiguous sites."
-    ploidy: ANY
-    parameters:
-      - key: Variant calls
-        type_guide:
-          class: Collection
-      - key: min-AF for consensus variant
-        type_guide:
-          class: float
-      - key: min-AF for failed variants
-        type_guide:
-          class: float
-      - key: aligned reads data for depth calculation
-        type_guide:
-          class: Collection
-          ext: bam
-      - key: Depth-threshold for masking
-        type_guide:
-          class: integer
-      - key: Reference genome
-        type_guide:
-          class: File
-    active: false
   - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-ont-artic-variant-calling/COVID-19-ARTIC-ONT/versions/v0.3.2"
     categories:
       - VARIANT_CALLING
@@ -755,7 +754,7 @@ workflows:
           class: File
           ext: bed
     active: false
-  - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-variant-calling/COVID-19-PE-ARTIC-ILLUMINA/versions/v0.5.3"
+  - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-variant-calling/COVID-19-PE-ARTIC-ILLUMINA/versions/v0.5.4"
     categories:
       - VARIANT_CALLING
     workflow_name: "COVID-19: variation analysis on ARTIC PE data"
@@ -776,7 +775,7 @@ workflows:
             - fastqsanger
             - fastqsanger.gz
       - key: NC_045512.2 FASTA sequence of SARS-CoV-2
-        variable: ASSEMBLY_ID
+        variable: ASSEMBLY_FASTA_URL
       - key: ARTIC primer BED
         type_guide:
           class: File
@@ -815,16 +814,17 @@ workflows:
             - fastqsanger
             - fastqsanger.gz
       - key: NC_045512.2 FASTA sequence of SARS-CoV-2
-        variable: ASSEMBLY_ID
+        variable: ASSEMBLY_FASTA_URL
     active: true
-  - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-se-illumina-wgs-variant-calling/COVID-19-SE-WGS-ILLUMINA/versions/v0.1.5"
+  - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-se-illumina-wgs-variant-calling/COVID-19-SE-WGS-ILLUMINA/versions/v0.1.6"
     categories:
       - VARIANT_CALLING
     workflow_name: "COVID-19: variation analysis on WGS SE data"
     workflow_description:
       This workflows performs single end read mapping with bowtie2
       followed by sensitive variant calling across a wide range of AFs with lofreq
-    ploidy: ANY
+    ploidy: HAPLOID
+    taxonomy_id: 694009
     parameters:
       - key: Single End Collection
         type_guide:
@@ -833,12 +833,8 @@ workflows:
             - fastqsanger
             - fastqsanger.gz
       - key: NC_045512.2 FASTA sequence of SARS-CoV-2
-        type_guide:
-          class: File
-          ext:
-            - fasta
-            - fasta.gz
-    active: false
+        variable: ASSEMBLY_FASTA_URL
+    active: true
   - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-variation-reporting/COVID-19-VARIATION-REPORTING/versions/v0.3.4"
     categories:
       - VARIANT_CALLING
