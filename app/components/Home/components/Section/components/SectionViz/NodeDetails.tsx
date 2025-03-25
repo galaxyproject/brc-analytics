@@ -92,7 +92,7 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
 
       {!isRoot && filterUrl && (
         <p>
-          <a href={filterUrl} target="_blank" rel="noopener noreferrer">
+          <a href={filterUrl} rel="noopener noreferrer">
             View {countLeafNodes(node)} Assembl
             {countLeafNodes(node) > 1 ? "ies" : "y"} for {nodeName}
           </a>
