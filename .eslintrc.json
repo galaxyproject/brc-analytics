@@ -68,6 +68,12 @@
       "rules": {
         "@typescript-eslint/explicit-function-return-type": "error"
       }
+    },
+    {
+      "files": "sunburst.tsx",
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": "off"
+      }
     }
   ]
 }
