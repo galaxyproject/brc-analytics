@@ -16,12 +16,7 @@ None
 
 ## Assemblies with gene model URLs not found
 
-- GCF_000195955.2
-- GCF_000277735.2
-- GCF_009858895.2
-- GCF_000857045.1
-- GCF_030566675.1
-- GCF_963525475.1
+None
 
 ## Species and strain combinations with multiple taxonomy IDs
 
