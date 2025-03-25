@@ -79,6 +79,7 @@
                 "ASSEMBLY",
                 "GENOME_COMPARISONS",
                 "PROTEIN_FOLDING",
+                "CONSENSUS_SEQUENCES",
                 "OTHER"
             ],
             "title": "WorkflowCategoryId",
