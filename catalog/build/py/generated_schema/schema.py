@@ -94,6 +94,7 @@ class WorkflowCategoryId(str, Enum):
     ASSEMBLY = "ASSEMBLY"
     GENOME_COMPARISONS = "GENOME_COMPARISONS"
     PROTEIN_FOLDING = "PROTEIN_FOLDING"
+    CONSENSUS_SEQUENCES = "CONSENSUS_SEQUENCES"
     OTHER = "OTHER"
 
 
@@ -211,7 +212,19 @@ class WorkflowParameter(ConfiguredBaseModel):
 
     key: str = Field(default=..., description="""The key in which the parameter will be set.""", json_schema_extra = { "linkml_meta": {'alias': 'key', 'domain_of': ['WorkflowParameter']} })
     variable: Optional[WorkflowParameterVariable] = Field(default=None, description="""A variable to substitute in as the value of the parameter.""", json_schema_extra = { "linkml_meta": {'alias': 'variable', 'domain_of': ['WorkflowParameter']} })
+    url_spec: Optional[WorkflowUrlSpec] = Field(default=None, description="""A direct URL specification for the parameter.""", json_schema_extra = { "linkml_meta": {'alias': 'url_spec', 'domain_of': ['WorkflowParameter']} })
     type_guide: Optional[Any] = Field(default=None, description="""Arbitrary data describing the type of the parameter, intended only as convenient reference for maintainers.""", json_schema_extra = { "linkml_meta": {'alias': 'type_guide', 'domain_of': ['WorkflowParameter']} })
+
+
+class WorkflowUrlSpec(ConfiguredBaseModel):
+    """
+    A URL specification for a workflow parameter.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/workflows.yaml#'})
+
+    ext: str = Field(default=..., description="""The file extension of the URL.""", json_schema_extra = { "linkml_meta": {'alias': 'ext', 'domain_of': ['WorkflowUrlSpec']} })
+    src: str = Field(default=..., description="""The source type, typically 'url'.""", json_schema_extra = { "linkml_meta": {'alias': 'src', 'domain_of': ['WorkflowUrlSpec']} })
+    url: str = Field(default=..., description="""The URL to the resource.""", json_schema_extra = { "linkml_meta": {'alias': 'url', 'domain_of': ['WorkflowUrlSpec']} })
 
 
 # Model rebuild
@@ -225,4 +238,5 @@ WorkflowCategory.model_rebuild()
 Workflows.model_rebuild()
 Workflow.model_rebuild()
 WorkflowParameter.model_rebuild()
+WorkflowUrlSpec.model_rebuild()
 

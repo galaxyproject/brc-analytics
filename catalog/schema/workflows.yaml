@@ -75,7 +75,27 @@ classes:
         description: A variable to substitute in as the value of the parameter.
         required: false
         range: WorkflowParameterVariable
+      url_spec:
+        description: A direct URL specification for the parameter.
+        required: false
+        range: WorkflowUrlSpec
       type_guide:
         description: Arbitrary data describing the type of the parameter, intended only as convenient reference for maintainers.
         required: false
         range: Any
+
+  WorkflowUrlSpec:
+    description: A URL specification for a workflow parameter.
+    attributes:
+      ext:
+        description: The file extension of the URL.
+        required: true
+        range: string
+      src:
+        description: The source type, typically 'url'.
+        required: true
+        range: string
+      url:
+        description: The URL to the resource.
+        required: true
+        range: string
