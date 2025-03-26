@@ -777,13 +777,15 @@ workflows:
       - key: NC_045512.2 FASTA sequence of SARS-CoV-2
         variable: ASSEMBLY_FASTA_URL
       - key: ARTIC primer BED
-        type_guide:
-          class: File
+        variable:
           ext: bed
+          src: url
+          url: https://zenodo.org/record/4555735/files/ARTIC_nCoV-2019_v3.bed
       - key: ARTIC primers to amplicon assignments
-        type_guide:
-          class: File
+        variable:
           ext: tabular
+          src: url
+          url: https://zenodo.org/record/4555735/files/ARTIC_amplicon_info_v3.tsv
       - key: Read removal minimum AF
         type_guide:
           class: float

@@ -1,5 +1,9 @@
 import { WORKFLOW_PARAMETER_VARIABLE } from "../apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { WorkflowParameter } from "../apis/catalog/brc-analytics-catalog/common/entities";
+import {
+  WorkflowParameter,
+  WorkflowUrlParameter,
+  isWorkflowUrlParameter,
+} from "../apis/catalog/brc-analytics-catalog/common/entities";
 import ky from "ky";
 import { GALAXY_ENVIRONMENT } from "site-config/common/galaxy";
 
@@ -11,7 +15,7 @@ interface WorkflowLandingsBody {
 }
 
 type WorkflowLandingsBodyRequestState = {
-  [key: string]: { [key: string]: string } | string;
+  [key: string]: { [key: string]: string } | string | WorkflowUrlParameter;
 };
 
 interface WorkflowLanding {
@@ -69,10 +73,14 @@ function buildFastaUrl(identifier: string): string {
 }
 
 function paramVariableToRequestValue(
-  variable: WORKFLOW_PARAMETER_VARIABLE,
+  variable: WORKFLOW_PARAMETER_VARIABLE | WorkflowUrlParameter,
   geneModelUrl: string | null,
   referenceGenome: string
 ): WorkflowLandingsBodyRequestState[string] | undefined {
+  if (isWorkflowUrlParameter(variable)) {
+    return variable;
+  }
+
   switch (variable) {
     case WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_ID:
       return referenceGenome;
@@ -81,14 +89,14 @@ function paramVariableToRequestValue(
         ext: "fasta.gz",
         src: "url",
         url: buildFastaUrl(referenceGenome),
-      };
+      } as WorkflowUrlParameter;
     case WORKFLOW_PARAMETER_VARIABLE.GENE_MODEL_URL:
       return geneModelUrl
-        ? {
+        ? ({
             ext: "gtf.gz",
             src: "url",
             url: geneModelUrl,
-          }
+          } as WorkflowUrlParameter)
         : undefined;
   }
 }
