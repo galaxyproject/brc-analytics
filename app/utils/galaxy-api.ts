@@ -2,7 +2,6 @@ import { WORKFLOW_PARAMETER_VARIABLE } from "../apis/catalog/brc-analytics-catal
 import {
   WorkflowParameter,
   WorkflowUrlParameter,
-  isWorkflowUrlParameter,
 } from "../apis/catalog/brc-analytics-catalog/common/entities";
 import ky from "ky";
 import { GALAXY_ENVIRONMENT } from "site-config/common/galaxy";
@@ -73,14 +72,10 @@ function buildFastaUrl(identifier: string): string {
 }
 
 function paramVariableToRequestValue(
-  variable: WORKFLOW_PARAMETER_VARIABLE | WorkflowUrlParameter,
+  variable: WORKFLOW_PARAMETER_VARIABLE,
   geneModelUrl: string | null,
   referenceGenome: string
 ): WorkflowLandingsBodyRequestState[string] | undefined {
-  if (isWorkflowUrlParameter(variable)) {
-    return variable;
-  }
-
   switch (variable) {
     case WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_ID:
       return referenceGenome;
@@ -114,15 +109,19 @@ function getWorkflowLandingsRequestState(
   parameters: WorkflowParameter[]
 ): WorkflowLandingsBodyRequestState {
   const result: WorkflowLandingsBodyRequestState = {};
-  parameters.forEach(({ key, variable }) => {
-    const maybeParam = paramVariableToRequestValue(
-      variable,
-      geneModelUrl,
-      referenceGenome
-    );
-    if (maybeParam !== undefined) {
-      result[key] = maybeParam;
+  for (const { key, url_spec, variable } of parameters) {
+    if (url_spec) {
+      // If url_spec is provided, use it directly
+      result[key] = url_spec as WorkflowUrlParameter;
+    } else if (variable) {
+      // Otherwise, use the variable to determine the value
+      const value = paramVariableToRequestValue(
+        variable,
+        geneModelUrl,
+        referenceGenome
+      );
+      if (value !== undefined) result[key] = value;
     }
-  });
+  }
   return result;
 }

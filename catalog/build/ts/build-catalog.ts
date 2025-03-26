@@ -198,8 +198,10 @@ function buildWorkflow(
   }: SourceWorkflow
 ): void {
   const parameters = [];
-  for (const { key, variable } of sourceParameters) {
+  for (const { key, url_spec, variable } of sourceParameters) {
+    // Add parameter if either variable or url_spec is defined
     if (variable) parameters.push({ key, variable });
+    else if (url_spec) parameters.push({ key, url_spec });
   }
   const workflow: Workflow = {
     parameters,

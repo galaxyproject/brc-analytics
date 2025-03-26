@@ -29,7 +29,7 @@
           },
           {
             "key": "ARTIC primer BED",
-            "variable": {
+            "url_spec": {
               "ext": "bed",
               "src": "url",
               "url": "https://zenodo.org/record/4555735/files/ARTIC_nCoV-2019_v3.bed"
@@ -37,7 +37,7 @@
           },
           {
             "key": "ARTIC primers to amplicon assignments",
-            "variable": {
+            "url_spec": {
               "ext": "tabular",
               "src": "url",
               "url": "https://zenodo.org/record/4555735/files/ARTIC_amplicon_info_v3.tsv"

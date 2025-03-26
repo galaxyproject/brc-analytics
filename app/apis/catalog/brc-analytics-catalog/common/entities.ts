@@ -10,19 +10,6 @@ export interface WorkflowUrlParameter {
   url: string;
 }
 
-export function isWorkflowUrlParameter(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Necessary for type guard pattern
-  value: any
-): value is WorkflowUrlParameter {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "ext" in value &&
-    "src" in value &&
-    "url" in value
-  );
-}
-
 export type BRCCatalog = BRCDataCatalogGenome;
 
 export interface BRCDataCatalogGenome {
@@ -106,5 +93,6 @@ export interface Workflow {
 
 export interface WorkflowParameter {
   key: string;
-  variable: WORKFLOW_PARAMETER_VARIABLE | WorkflowUrlParameter;
+  url_spec?: WorkflowUrlParameter;
+  variable?: WORKFLOW_PARAMETER_VARIABLE;
 }
