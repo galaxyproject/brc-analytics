@@ -4,6 +4,7 @@ import YAML from "yaml";
 import {
   BRCDataCatalogGenome,
   BRCDataCatalogOrganism,
+  RunReadsFields,
   Workflow,
   WorkflowCategory,
 } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
@@ -31,6 +32,9 @@ buildCatalog();
 async function buildCatalog(): Promise<void> {
   const genomes = await buildGenomes();
   const organisms = buildOrganisms(genomes);
+  const runFields = await buildRunReadFields(
+    "https://www.ebi.ac.uk/ena/portal/api/searchFields?result=read_run&format=json"
+  );
   const workflows = await buildWorkflows();
 
   verifyUniqueIds("assembly", genomes, getGenomeId);
@@ -41,6 +45,9 @@ async function buildCatalog(): Promise<void> {
 
   console.log("Organisms:", organisms.length);
   await saveJson("catalog/output/organisms.json", organisms);
+
+  console.log("Run Read Fields:", runFields.length);
+  await saveJson("catalog/output/runReadFields.json", runFields);
 
   console.log("Workflows:", workflows.length);
   await saveJson("catalog/output/workflows.json", workflows);
@@ -156,6 +163,47 @@ function buildOrganism(
       genome.taxonomicLevelStrain
     ),
   };
+}
+
+async function buildRunReadFields(filePath: string): Promise<RunReadsFields[]> {
+  const response = await fetch(filePath);
+  const sourceRows = await response.json();
+  const mappedRows: RunReadsFields[] = [
+    {
+      description: "AND statment",
+      name: "AND",
+      type: "expression",
+    },
+    {
+      description: "OR statement",
+      name: "OR",
+      type: "expression",
+    },
+    {
+      description: "starting paranthesis",
+      name: "(",
+      type: "expression",
+    },
+    {
+      description: "ending paranthesis",
+      name: ")",
+      type: "expression",
+    },
+    {
+      description: "GCF/GCA accession id",
+      name: "accession",
+      type: "string",
+    },
+  ];
+  for (const row of sourceRows) {
+    mappedRows.push({
+      description: row.description,
+      name: row.columnId,
+      type: row.type,
+    });
+  }
+
+  return mappedRows.sort((a, b) => a.name.localeCompare(b.name));
 }
 
 async function buildWorkflows(): Promise<WorkflowCategory[]> {

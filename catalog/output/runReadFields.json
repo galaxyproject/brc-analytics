@@ -1,0 +1,790 @@
+[
+  {
+    "description": "starting paranthesis",
+    "name": "(",
+    "type": "expression"
+  },
+  {
+    "description": "ending paranthesis",
+    "name": ")",
+    "type": "expression"
+  },
+  {
+    "description": "GCF/GCA accession id",
+    "name": "accession",
+    "type": "string"
+  },
+  {
+    "description": "Age when the sample was taken",
+    "name": "age",
+    "type": "text"
+  },
+  {
+    "description": "Altitude (m)",
+    "name": "altitude",
+    "type": "number"
+  },
+  {
+    "description": "AND statment",
+    "name": "AND",
+    "type": "expression"
+  },
+  {
+    "description": "Quality of assembly",
+    "name": "assembly_quality",
+    "type": "text"
+  },
+  {
+    "description": "Assembly software",
+    "name": "assembly_software",
+    "type": "text"
+  },
+  {
+    "description": "number of base pairs",
+    "name": "base_count",
+    "type": "number"
+  },
+  {
+    "description": "Binning software",
+    "name": "binning_software",
+    "type": "text"
+  },
+  {
+    "description": "identifier for biological material including institute and collection code",
+    "name": "bio_material",
+    "type": "text"
+  },
+  {
+    "description": "text",
+    "name": "bisulfite_protocol"
+  },
+  {
+    "description": "Report the major environmental system the sample or specimen came from. The system(s) identified should have a coarse spatial grain, to provide the general environmental context of where the sampling was done (e.g. in the desert or a rainforest). We recommend using subclasses of EnvO’s biome class: http://purl.obolibrary.org/obo/ENVO_00000428. EnvO documentation about how to use the field: https://github.com/EnvironmentOntology/envo/wiki/Using-ENVO-with-MIxS.",
+    "name": "broad_scale_environmental_context",
+    "type": "text"
+  },
+  {
+    "description": "broker name",
+    "name": "broker_name",
+    "type": "controlled value"
+  },
+  {
+    "description": "Link to the protocol for CAGE-seq experiments",
+    "name": "cage_protocol",
+    "type": "text"
+  },
+  {
+    "description": "cell line from which the sample was obtained",
+    "name": "cell_line",
+    "type": "text"
+  },
+  {
+    "description": "cell type from which the sample was obtained",
+    "name": "cell_type",
+    "type": "text"
+  },
+  {
+    "description": "Submitting center",
+    "name": "center_name",
+    "type": "text"
+  },
+  {
+    "description": "ENA metadata reporting standard used to register the biosample (Checklist used)",
+    "name": "checklist",
+    "type": "controlled value"
+  },
+  {
+    "description": "text",
+    "name": "chip_ab_provider"
+  },
+  {
+    "description": "text",
+    "name": "chip_protocol"
+  },
+  {
+    "description": "Chip target",
+    "name": "chip_target",
+    "type": "text"
+  },
+  {
+    "description": "name of the person who collected the specimen",
+    "name": "collected_by",
+    "type": "text"
+  },
+  {
+    "description": "Completeness score (%)",
+    "name": "completeness_score",
+    "type": "number"
+  },
+  {
+    "description": "Contamination score (%)",
+    "name": "contamination_score",
+    "type": "number"
+  },
+  {
+    "description": "Control experiment",
+    "name": "control_experiment",
+    "type": "text"
+  },
+  {
+    "description": "locality of sample isolation: country names, oceans or seas, followed by regions and localities",
+    "name": "country",
+    "type": "text"
+  },
+  {
+    "description": "cultivar (cultivated variety) of plant from which sample was obtained",
+    "name": "cultivar",
+    "type": "text"
+  },
+  {
+    "description": "identifier for the sample culture including institute and collection code",
+    "name": "culture_collection",
+    "type": "text"
+  },
+  {
+    "description": "DCC datahub name",
+    "name": "datahub",
+    "type": "controlled value"
+  },
+  {
+    "description": "brief sequence description",
+    "name": "description",
+    "type": "text"
+  },
+  {
+    "description": "sample obtained from an organism in a specific developmental stage",
+    "name": "dev_stage",
+    "type": "text"
+  },
+  {
+    "description": "Disease associated with the sample",
+    "name": "disease",
+    "type": "text"
+  },
+  {
+    "description": "text",
+    "name": "dnase_protocol"
+  },
+  {
+    "description": "a population within a given species displaying traits that reflect adaptation to a local habitat",
+    "name": "ecotype",
+    "type": "text"
+  },
+  {
+    "description": "Elevation (m)",
+    "name": "elevation",
+    "type": "number"
+  },
+  {
+    "description": "Environment (Biome)",
+    "name": "environment_biome",
+    "type": "text"
+  },
+  {
+    "description": "Environment (Feature)",
+    "name": "environment_feature",
+    "type": "text"
+  },
+  {
+    "description": "Environment (Material)",
+    "name": "environment_material",
+    "type": "text"
+  },
+  {
+    "description": "Report the environmental material(s) immediately surrounding the sample or specimen at the time of sampling. We recommend using subclasses of 'environmental material' (http://purl.obolibrary.org/obo/ENVO_00010483). EnvO documentation about how to use the field: https://github.com/EnvironmentOntology/envo/wiki/Using-ENVO-with-MIxS . Terms from other OBO ontologies are permissible as long as they reference mass/volume nouns (e.g. air, water, blood) and not discrete, countable entities (e.g. a tree, a leaf, a table top).",
+    "name": "environmental_medium",
+    "type": "text"
+  },
+  {
+    "description": "identifies sequences derived by direct molecular isolation from an environmental DNA sample",
+    "name": "environmental_sample",
+    "type": "boolean"
+  },
+  {
+    "description": "experiment accession number",
+    "name": "experiment_accession",
+    "type": "text"
+  },
+  {
+    "description": "submitter's name for the experiment",
+    "name": "experiment_alias",
+    "type": "text"
+  },
+  {
+    "description": "text",
+    "name": "experiment_target"
+  },
+  {
+    "description": "brief experiment title",
+    "name": "experiment_title",
+    "type": "text"
+  },
+  {
+    "description": "variable aspects of the experimental design",
+    "name": "experimental_factor",
+    "type": "text"
+  },
+  {
+    "description": "text",
+    "name": "experimental_protocol"
+  },
+  {
+    "description": "text",
+    "name": "extraction_protocol"
+  },
+  {
+    "description": "Library Selection for FAANG WGS/BS-Seq experiments",
+    "name": "faang_library_selection",
+    "type": "text"
+  },
+  {
+    "description": "date when first created",
+    "name": "first_created",
+    "type": "date"
+  },
+  {
+    "description": "date when made public",
+    "name": "first_public",
+    "type": "date"
+  },
+  {
+    "description": "the sample is an unrearranged molecule that was inherited from the parental germline",
+    "name": "germline",
+    "type": "boolean"
+  },
+  {
+    "description": "Link to Hi-C Protocol for FAANG experiments",
+    "name": "hi_c_protocol",
+    "type": "text"
+  },
+  {
+    "description": "natural (as opposed to laboratory) host to the organism from which sample was obtained",
+    "name": "host",
+    "type": "text"
+  },
+  {
+    "description": "name of body site from where the sample was obtained",
+    "name": "host_body_site",
+    "type": "text"
+  },
+  {
+    "description": "genotype of host",
+    "name": "host_genotype",
+    "type": "text"
+  },
+  {
+    "description": "whether or not subject is gravid, including date due or date post-conception where applicable",
+    "name": "host_gravidity",
+    "type": "text"
+  },
+  {
+    "description": "literature reference giving growth conditions of the host",
+    "name": "host_growth_conditions",
+    "type": "text"
+  },
+  {
+    "description": "phenotype of host",
+    "name": "host_phenotype",
+    "type": "text"
+  },
+  {
+    "description": "Scientific name of the natural (as opposed to laboratory) host to the organism from which sample was obtained",
+    "name": "host_scientific_name",
+    "type": "text"
+  },
+  {
+    "description": "physical sex of the host",
+    "name": "host_sex",
+    "type": "controlled value"
+  },
+  {
+    "description": "condition of host (eg. diseased or healthy)",
+    "name": "host_status",
+    "type": "text"
+  },
+  {
+    "description": "NCBI taxon id of the host",
+    "name": "host_tax_id",
+    "type": "number"
+  },
+  {
+    "description": "name of the taxonomist who identified the specimen",
+    "name": "identified_by",
+    "type": "text"
+  },
+  {
+    "description": "instrument model used in sequencing experiment",
+    "name": "instrument_model",
+    "type": "text"
+  },
+  {
+    "description": "instrument platform used in sequencing experiment",
+    "name": "instrument_platform",
+    "type": "controlled value"
+  },
+  {
+    "description": "the study type targeted by the sequencing",
+    "name": "investigation_type",
+    "type": "text"
+  },
+  {
+    "description": "individual isolate from which sample was obtained",
+    "name": "isolate",
+    "type": "text"
+  },
+  {
+    "description": "describes the physical, environmental and/or local geographical source of the sample",
+    "name": "isolation_source",
+    "type": "text"
+  },
+  {
+    "description": "date when last updated",
+    "name": "last_updated",
+    "type": "date"
+  },
+  {
+    "description": "Library construction protocol",
+    "name": "library_construction_protocol",
+    "type": "text"
+  },
+  {
+    "description": "text",
+    "name": "library_gen_protocol"
+  },
+  {
+    "description": "sequencing library layout",
+    "name": "library_layout",
+    "type": "controlled value"
+  },
+  {
+    "description": "number",
+    "name": "library_max_fragment_size"
+  },
+  {
+    "description": "number",
+    "name": "library_min_fragment_size"
+  },
+  {
+    "description": "sequencing library name",
+    "name": "library_name",
+    "type": "text"
+  },
+  {
+    "description": "text",
+    "name": "library_pcr_isolation_protocol"
+  },
+  {
+    "description": "text",
+    "name": "library_prep_date"
+  },
+  {
+    "description": "text",
+    "name": "library_prep_date_format"
+  },
+  {
+    "description": "number",
+    "name": "library_prep_latitude"
+  },
+  {
+    "description": "text",
+    "name": "library_prep_location"
+  },
+  {
+    "description": "number",
+    "name": "library_prep_longitude"
+  },
+  {
+    "description": "method used to select or enrich the material being sequenced",
+    "name": "library_selection",
+    "type": "text"
+  },
+  {
+    "description": "source material being sequenced",
+    "name": "library_source",
+    "type": "controlled value"
+  },
+  {
+    "description": "sequencing technique intended for the library",
+    "name": "library_strategy",
+    "type": "text"
+  },
+  {
+    "description": "Report the entity or entities which are in the sample or specimen’s local vicinity and which you believe have significant causal influences on your sample or specimen. We recommend using EnvO terms which are of smaller spatial grain than your entry for \"broad-scale environmental context\". Terms, such as anatomical sites, from other OBO Library ontologies which interoperate with EnvO (e.g. UBERON) are accepted in this field. EnvO documentation about how to use the field: https://github.com/EnvironmentOntology/envo/wiki/Using-ENVO-with-MIxS.",
+    "name": "local_environmental_context",
+    "type": "text"
+  },
+  {
+    "description": "geographic location of isolation of the sample",
+    "name": "location",
+    "type": "latlon"
+  },
+  {
+    "description": "latlon",
+    "name": "location_end"
+  },
+  {
+    "description": "latlon",
+    "name": "location_start"
+  },
+  {
+    "description": "geographical origin of the sample as defined by the marine region",
+    "name": "marine_region",
+    "type": "text"
+  },
+  {
+    "description": "mating type of the organism from which the sequence was obtained",
+    "name": "mating_type",
+    "type": "text"
+  },
+  {
+    "description": "NCBI metadata reporting standard used to register the biosample (Package used)",
+    "name": "ncbi_reporting_standard",
+    "type": "controlled value"
+  },
+  {
+    "description": "average fragmentation size of paired reads",
+    "name": "nominal_length",
+    "type": "number"
+  },
+  {
+    "description": "standard deviation of fragmentation size of paired reads",
+    "name": "nominal_sdev",
+    "type": "number"
+  },
+  {
+    "description": "OR statement",
+    "name": "OR",
+    "type": "expression"
+  },
+  {
+    "description": "text",
+    "name": "pcr_isolation_protocol"
+  },
+  {
+    "description": "name of the project within which the sequencing was organized",
+    "name": "project_name",
+    "type": "text"
+  },
+  {
+    "description": "the protocol used to produce the sample",
+    "name": "protocol_label",
+    "type": "text"
+  },
+  {
+    "description": "number of reads",
+    "name": "read_count",
+    "type": "number"
+  },
+  {
+    "description": "text",
+    "name": "read_strand"
+  },
+  {
+    "description": "text",
+    "name": "restriction_enzyme"
+  },
+  {
+    "description": "The DNA sequence targeted by the restrict enzyme",
+    "name": "restriction_enzyme_target_sequence",
+    "type": "text"
+  },
+  {
+    "description": "text",
+    "name": "restriction_site"
+  },
+  {
+    "description": "number",
+    "name": "rna_integrity_num"
+  },
+  {
+    "description": "text",
+    "name": "rna_prep_3_protocol"
+  },
+  {
+    "description": "text",
+    "name": "rna_prep_5_protocol"
+  },
+  {
+    "description": "number",
+    "name": "rna_purity_230_ratio"
+  },
+  {
+    "description": "number",
+    "name": "rna_purity_280_ratio"
+  },
+  {
+    "description": "text",
+    "name": "rt_prep_protocol"
+  },
+  {
+    "description": "accession number",
+    "name": "run_accession",
+    "type": "text"
+  },
+  {
+    "description": "submitter's name for the run",
+    "name": "run_alias",
+    "type": "text"
+  },
+  {
+    "description": "Salinity (PSU)",
+    "name": "salinity",
+    "type": "number"
+  },
+  {
+    "description": "sample accession number",
+    "name": "sample_accession",
+    "type": "text"
+  },
+  {
+    "description": "submitter's name for the sample",
+    "name": "sample_alias",
+    "type": "text"
+  },
+  {
+    "description": "Sample capture status",
+    "name": "sample_capture_status",
+    "type": "text"
+  },
+  {
+    "description": "the method or device employed for collecting the sample",
+    "name": "sample_collection",
+    "type": "text"
+  },
+  {
+    "description": "detailed sample description",
+    "name": "sample_description",
+    "type": "text"
+  },
+  {
+    "description": "sample material label",
+    "name": "sample_material",
+    "type": "text"
+  },
+  {
+    "description": "number",
+    "name": "sample_prep_interval"
+  },
+  {
+    "description": "text",
+    "name": "sample_prep_interval_units"
+  },
+  {
+    "description": "text",
+    "name": "sample_storage"
+  },
+  {
+    "description": "text",
+    "name": "sample_storage_processing"
+  },
+  {
+    "description": "brief sample title",
+    "name": "sample_title",
+    "type": "text"
+  },
+  {
+    "description": "the activity within which this sample was collected",
+    "name": "sampling_campaign",
+    "type": "text"
+  },
+  {
+    "description": "the large infrastructure from which this sample was collected",
+    "name": "sampling_platform",
+    "type": "text"
+  },
+  {
+    "description": "the site/station where this sample was collection",
+    "name": "sampling_site",
+    "type": "text"
+  },
+  {
+    "description": "scientific name of an organism",
+    "name": "scientific_name",
+    "type": "text"
+  },
+  {
+    "description": "Secondary project",
+    "name": "secondary_project",
+    "type": "text"
+  },
+  {
+    "description": "secondary sample accession number",
+    "name": "secondary_sample_accession",
+    "type": "text"
+  },
+  {
+    "description": "secondary study accession number",
+    "name": "secondary_study_accession",
+    "type": "text"
+  },
+  {
+    "description": "text",
+    "name": "sequencing_date"
+  },
+  {
+    "description": "text",
+    "name": "sequencing_date_format"
+  },
+  {
+    "description": "text",
+    "name": "sequencing_location"
+  },
+  {
+    "description": "number",
+    "name": "sequencing_longitude"
+  },
+  {
+    "description": "sequencing method used",
+    "name": "sequencing_method",
+    "type": "text"
+  },
+  {
+    "description": "The catalog from which the sequencing primer library was purchased",
+    "name": "sequencing_primer_catalog",
+    "type": "text"
+  },
+  {
+    "description": "The lot identifier of the sequencing primer library",
+    "name": "sequencing_primer_lot",
+    "type": "text"
+  },
+  {
+    "description": "The name of the company, laboratory or person that provided the sequencing primer library",
+    "name": "sequencing_primer_provider",
+    "type": "text"
+  },
+  {
+    "description": "serological variety of a species characterized by its antigenic properties",
+    "name": "serotype",
+    "type": "text"
+  },
+  {
+    "description": "serological variety of a species (usually a prokaryote) characterized by its antigenic properties",
+    "name": "serovar",
+    "type": "text"
+  },
+  {
+    "description": "sex of the organism from which the sample was obtained",
+    "name": "sex",
+    "type": "controlled value"
+  },
+  {
+    "description": "identifier for the sample culture including institute and collection code",
+    "name": "specimen_voucher",
+    "type": "text"
+  },
+  {
+    "description": "Status",
+    "name": "status",
+    "type": "number"
+  },
+  {
+    "description": "strain from which sample was obtained",
+    "name": "strain",
+    "type": "text"
+  },
+  {
+    "description": "study accession number",
+    "name": "study_accession",
+    "type": "text"
+  },
+  {
+    "description": "submitter's name for the study",
+    "name": "study_alias",
+    "type": "text"
+  },
+  {
+    "description": "brief sequencing study description",
+    "name": "study_title",
+    "type": "text"
+  },
+  {
+    "description": "name of sub-species of organism from which sample was obtained",
+    "name": "sub_species",
+    "type": "text"
+  },
+  {
+    "description": "name or identifier of a genetically or otherwise modified strain from which sample was obtained",
+    "name": "sub_strain",
+    "type": "text"
+  },
+  {
+    "description": "submission accession number",
+    "name": "submission_accession",
+    "type": "text"
+  },
+  {
+    "description": "Submission tool",
+    "name": "submission_tool",
+    "type": "text"
+  },
+  {
+    "description": "format of submitted reads",
+    "name": "submitted_format",
+    "type": "text"
+  },
+  {
+    "description": "physical sex of the host",
+    "name": "submitted_host_sex",
+    "type": "text"
+  },
+  {
+    "description": "MD5 checksum of submitted files",
+    "name": "submitted_md5",
+    "type": "text"
+  },
+  {
+    "description": "submitted FASTQ read type",
+    "name": "submitted_read_type",
+    "type": "list"
+  },
+  {
+    "description": "Classification Tags",
+    "name": "tag",
+    "type": "controlled value"
+  },
+  {
+    "description": "targeted gene or locus name for marker gene studies",
+    "name": "target_gene",
+    "type": "text"
+  },
+  {
+    "description": "NCBI taxonomic classification",
+    "name": "tax_id",
+    "type": "taxonomy"
+  },
+  {
+    "description": "Taxonomic classification",
+    "name": "taxonomic_classification",
+    "type": "text"
+  },
+  {
+    "description": "Taxonomic identity marker",
+    "name": "taxonomic_identity_marker",
+    "type": "text"
+  },
+  {
+    "description": "Temperature (C)",
+    "name": "temperature",
+    "type": "number"
+  },
+  {
+    "description": "tissue library from which sample was obtained",
+    "name": "tissue_lib",
+    "type": "text"
+  },
+  {
+    "description": "tissue type from which the sample was obtained",
+    "name": "tissue_type",
+    "type": "text"
+  },
+  {
+    "description": "text",
+    "name": "transposase_protocol"
+  },
+  {
+    "description": "variety (varietas, a formal Linnaean rank) of organism from which sample was derived",
+    "name": "variety",
+    "type": "text"
+  }
+]
