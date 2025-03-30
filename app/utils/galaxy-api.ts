@@ -14,7 +14,7 @@ interface WorkflowLandingsBody {
 }
 
 type WorkflowLandingsBodyRequestState = {
-  [key: string]: { [key: string]: string } | string | WorkflowUrlParameter;
+  [key: string]: string | WorkflowUrlParameter;
 };
 
 interface WorkflowLanding {
@@ -84,14 +84,14 @@ function paramVariableToRequestValue(
         ext: "fasta.gz",
         src: "url",
         url: buildFastaUrl(referenceGenome),
-      } as WorkflowUrlParameter;
+      };
     case WORKFLOW_PARAMETER_VARIABLE.GENE_MODEL_URL:
       return geneModelUrl
-        ? ({
+        ? {
             ext: "gtf.gz",
             src: "url",
             url: geneModelUrl,
-          } as WorkflowUrlParameter)
+          }
         : undefined;
   }
 }
@@ -112,7 +112,7 @@ function getWorkflowLandingsRequestState(
   for (const { key, url_spec, variable } of parameters) {
     if (url_spec) {
       // If url_spec is provided, use it directly
-      result[key] = url_spec as WorkflowUrlParameter;
+      result[key] = url_spec;
     } else if (variable) {
       // Otherwise, use the variable to determine the value
       const value = paramVariableToRequestValue(
