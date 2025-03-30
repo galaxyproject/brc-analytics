@@ -14,10 +14,10 @@ import { ParsedUrlQuery } from "querystring";
 import {
   BRCCatalog,
   EntitiesResponse,
-} from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
-import { config } from "../../../app/config/config";
-import { seedDatabase } from "../../../app/utils/seedDatabase";
-import { EntityDetailView } from "../../../app/views/EntityView/entityView";
+} from "../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
+import { config } from "../../../../app/config/config";
+import { seedDatabase } from "../../../../app/utils/seedDatabase";
+import { EntityDetailView } from "../../../../app/views/EntityView/entityView";
 
 const setOfProcessedIds = new Set<string>();
 
