@@ -11,6 +11,10 @@ workflow_categories:
     name: "Regulation"
     description: "Workflows for the analysis of ChIP-seq, ATAC-Seq, and beyond."
 
+  - category: "CONSENSUS_SEQUENCES"
+    name: "Consensus sequences"
+    description: "Build consensus sequences for related isolates."
+
   - category: "ASSEMBLY"
     name: "Assembly"
     description: "Assemble prokaryotic and eukaryotic genomes sequenced with a variety of technologies."

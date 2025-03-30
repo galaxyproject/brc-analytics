@@ -4,6 +4,12 @@ import {
   WORKFLOW_PLOIDY,
 } from "./schema-entities";
 
+export interface WorkflowUrlParameter {
+  ext: string;
+  src: string;
+  url: string;
+}
+
 export type BRCCatalog = BRCDataCatalogGenome;
 
 export interface BRCDataCatalogGenome {
@@ -87,5 +93,6 @@ export interface Workflow {
 
 export interface WorkflowParameter {
   key: string;
-  variable: WORKFLOW_PARAMETER_VARIABLE;
+  url_spec?: WorkflowUrlParameter;
+  variable?: WORKFLOW_PARAMETER_VARIABLE;
 }

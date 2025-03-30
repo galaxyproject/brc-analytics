@@ -79,6 +79,7 @@
                 "ASSEMBLY",
                 "GENOME_COMPARISONS",
                 "PROTEIN_FOLDING",
+                "CONSENSUS_SEQUENCES",
                 "OTHER"
             ],
             "title": "WorkflowCategoryId",
@@ -102,6 +103,17 @@
                         }
                     ],
                     "description": "Arbitrary data describing the type of the parameter, intended only as convenient reference for maintainers."
+                },
+                "url_spec": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/WorkflowUrlSpec"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "A direct URL specification for the parameter."
                 },
                 "variable": {
                     "$ref": "#/$defs/WorkflowParameterVariable",
@@ -134,6 +146,31 @@
             ],
             "title": "WorkflowPloidy",
             "type": "string"
+        },
+        "WorkflowUrlSpec": {
+            "additionalProperties": false,
+            "description": "A URL specification for a workflow parameter.",
+            "properties": {
+                "ext": {
+                    "description": "The file extension of the URL.",
+                    "type": "string"
+                },
+                "src": {
+                    "description": "The source type, typically 'url'.",
+                    "type": "string"
+                },
+                "url": {
+                    "description": "The URL to the resource.",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "ext",
+                "src",
+                "url"
+            ],
+            "title": "WorkflowUrlSpec",
+            "type": "object"
         },
         "Workflows": {
             "additionalProperties": false,

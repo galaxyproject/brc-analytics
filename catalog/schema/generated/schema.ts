@@ -18,6 +18,7 @@ export enum WorkflowCategoryId {
     ASSEMBLY = "ASSEMBLY",
     GENOME_COMPARISONS = "GENOME_COMPARISONS",
     PROTEIN_FOLDING = "PROTEIN_FOLDING",
+    CONSENSUS_SEQUENCES = "CONSENSUS_SEQUENCES",
     OTHER = "OTHER",
 };
 /**
@@ -148,8 +149,23 @@ export interface WorkflowParameter {
     key: string,
     /** A variable to substitute in as the value of the parameter. */
     variable?: WorkflowParameterVariable | null,
+    /** A direct URL specification for the parameter. */
+    url_spec?: WorkflowUrlSpec | null,
     /** Arbitrary data describing the type of the parameter, intended only as convenient reference for maintainers. */
     type_guide?: Any | null,
+}
+
+
+/**
+ * A URL specification for a workflow parameter.
+ */
+export interface WorkflowUrlSpec {
+    /** The file extension of the URL. */
+    ext: string,
+    /** The source type, typically 'url'. */
+    src: string,
+    /** The URL to the resource. */
+    url: string,
 }
 
 

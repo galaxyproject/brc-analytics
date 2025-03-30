@@ -1,5 +1,8 @@
 import { WORKFLOW_PARAMETER_VARIABLE } from "../apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { WorkflowParameter } from "../apis/catalog/brc-analytics-catalog/common/entities";
+import {
+  WorkflowParameter,
+  WorkflowUrlParameter,
+} from "../apis/catalog/brc-analytics-catalog/common/entities";
 import ky from "ky";
 import { GALAXY_ENVIRONMENT } from "site-config/common/galaxy";
 
@@ -11,7 +14,7 @@ interface WorkflowLandingsBody {
 }
 
 type WorkflowLandingsBodyRequestState = {
-  [key: string]: { [key: string]: string } | string;
+  [key: string]: string | WorkflowUrlParameter;
 };
 
 interface WorkflowLanding {
@@ -106,15 +109,19 @@ function getWorkflowLandingsRequestState(
   parameters: WorkflowParameter[]
 ): WorkflowLandingsBodyRequestState {
   const result: WorkflowLandingsBodyRequestState = {};
-  parameters.forEach(({ key, variable }) => {
-    const maybeParam = paramVariableToRequestValue(
-      variable,
-      geneModelUrl,
-      referenceGenome
-    );
-    if (maybeParam !== undefined) {
-      result[key] = maybeParam;
+  for (const { key, url_spec, variable } of parameters) {
+    if (url_spec) {
+      // If url_spec is provided, use it directly
+      result[key] = url_spec;
+    } else if (variable) {
+      // Otherwise, use the variable to determine the value
+      const value = paramVariableToRequestValue(
+        variable,
+        geneModelUrl,
+        referenceGenome
+      );
+      if (value !== undefined) result[key] = value;
     }
-  });
+  }
   return result;
 }
