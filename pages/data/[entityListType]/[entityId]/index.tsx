@@ -11,8 +11,6 @@ import { seedDatabase } from "../../../../app/utils/seedDatabase";
 import { getEntities, getEntity } from "../../../../app/utils/entityUtils";
 import { EntityDetailView } from "../../../../app/views/EntityView/entityView";
 
-const setOfProcessedIds = new Set<string>();
-
 interface StaticPath {
   params: PageUrl;
 }
@@ -111,9 +109,6 @@ function processEntityPaths<R>(
   for (const entity of entities) {
     const entityId = entityConfig.getId?.(entity);
     if (!entityId) continue;
-    // Skip the entity if it has already been processed.
-    if (setOfProcessedIds.has(entityId)) continue;
-    setOfProcessedIds.add(entityId);
     paths.push({
       params: {
         entityId,
