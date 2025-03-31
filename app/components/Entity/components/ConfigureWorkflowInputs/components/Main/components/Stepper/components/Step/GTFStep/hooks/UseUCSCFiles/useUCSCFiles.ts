@@ -14,7 +14,7 @@ export const useUCSCFiles = (genome: BRCDataCatalogGenome): UseUCSCFiles => {
       .then(parseUCSCFilesResult)
       .then((urls) => setGeneModelUrls(urls))
       .catch((e) => {
-        console.error("Failed to fetch UCSC files", e);
+        throw new Error("Failed to fetch UCSC files", e);
       });
   }, [assemblyId]);
 
