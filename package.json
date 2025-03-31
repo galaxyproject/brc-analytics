@@ -21,7 +21,7 @@
     "validate-catalog": "./catalog/schema/scripts/validate-catalog.sh"
   },
   "dependencies": {
-    "@databiosphere/findable-ui": "^22.0.0",
+    "@databiosphere/findable-ui": "^24.0.0",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@mdx-js/loader": "^3.0.1",
