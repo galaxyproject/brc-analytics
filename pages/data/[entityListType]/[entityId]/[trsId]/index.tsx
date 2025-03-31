@@ -19,6 +19,7 @@ import {
   workflowIsCompatibleWithAssembly,
 } from "../../../../../app/components/Entity/components/AnalysisMethodsCatalog/utils";
 import { getEntityConfig } from "@databiosphere/findable-ui/lib/config/utils";
+import { WorkflowInputsView } from "../../../../../app/views/WorkflowInputsView/workflowInputsView";
 
 interface StaticPath {
   params: PageUrlParams;
@@ -92,12 +93,7 @@ export const getStaticProps = async (
 };
 
 const ConfigureWorkflowInputs = (props: Props): JSX.Element => {
-  return (
-    <div>
-      <h1>Configure Inputs</h1>
-      <span>{props.genome.accession}</span>
-    </div>
-  );
+  return <WorkflowInputsView {...props} />;
 };
 
 export default ConfigureWorkflowInputs;
