@@ -16,7 +16,7 @@ None
 
 ## Assemblies with gene model URLs not found
 
-None
+N/A
 
 ## Species and strain combinations with multiple taxonomy IDs
 
@@ -31,3 +31,7 @@ None
 - Plasmodium vinckei: 5860, 54757, 119398, 138297, 138298
 - Trypanosoma brucei: 5702, 185431
 - Trypanosoma cruzi strain Dm28c: 85057, 5693, 1416333
+
+## Assemblies without ploidy information
+
+None
