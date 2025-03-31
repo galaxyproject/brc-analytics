@@ -8,6 +8,7 @@ import { ROUTES } from "../../../../../routes/constants";
 import {
   BRCDataCatalogGenome,
   BRCDataCatalogOrganism,
+  Workflow,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "../../../../components";
 import {
@@ -562,7 +563,7 @@ export const buildGenomeDetails = (
   );
   return {
     KeyElType: C.KeyElType,
-    KeyValuesElType: (props) => C.Stack({ gap: 4, ...props }),
+    KeyValuesElType: (props) => C.Stack({ ...props, gap: 4 }),
     ValueElType: C.ValueElType,
     keyValuePairs,
   };
@@ -684,6 +685,25 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     },
   ];
 }
+
+/**
+ * Build props for the workflow details KeyValuePairs component.
+ * @param workflow - Workflow.
+ * @returns Props to be used for the KeyValuePairs component.
+ */
+export const buildWorkflowDetails = (
+  workflow: Workflow
+): ComponentProps<typeof C.KeyValuePairs> => {
+  const keyValuePairs = new Map<Key, Value>();
+  keyValuePairs.set("Workflow", workflow.workflowName);
+  keyValuePairs.set("Description", workflow.workflowDescription);
+  return {
+    KeyElType: C.KeyElType,
+    KeyValuesElType: (props) => C.Stack({ ...props, gap: 4 }),
+    ValueElType: C.ValueElType,
+    keyValuePairs,
+  };
+};
 
 /**
  * Get the genome entity breadcrumbs.
