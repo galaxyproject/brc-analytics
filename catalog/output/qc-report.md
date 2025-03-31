@@ -16,7 +16,7 @@ None
 
 ## Assemblies with gene model URLs not found
 
-N/A
+None
 
 ## Species and strain combinations with multiple taxonomy IDs
 
