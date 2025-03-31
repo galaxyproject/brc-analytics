@@ -4,6 +4,7 @@ import {
   BRCDataCatalogGenome,
   Workflow,
 } from "../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
+import { OnConfigure } from "../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 
 export interface StepConfig {
   description?: ReactNode;
@@ -18,5 +19,6 @@ export interface StepProps
     Pick<MStepProps, "active" | "completed" | "index" | "last"> {
   configKey: string;
   genome: BRCDataCatalogGenome;
+  onConfigure: OnConfigure;
   workflow: Workflow;
 }

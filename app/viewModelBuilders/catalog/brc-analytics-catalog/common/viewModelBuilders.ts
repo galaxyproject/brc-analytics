@@ -30,6 +30,7 @@ import {
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
 import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import { TEXT_BODY_SMALL_400 } from "@databiosphere/findable-ui/lib/theme/common/typography";
+import { ConfiguredInput } from "../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 
 /**
  * Build props for the accession cell.
@@ -685,6 +686,27 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     },
   ];
 }
+
+/**
+ * Build props for the workflow configuration KeyValuePairs component.
+ * @param configuredInput - Configured inputs.
+ * @returns Props to be used for the KeyValuePairs component.
+ */
+export const buildWorkflowConfiguration = (
+  configuredInput: ConfiguredInput
+): ComponentProps<typeof C.KeyValuePairs> => {
+  const keyValuePairs = new Map<Key, Value>();
+  for (const { label, values } of Object.values(configuredInput)) {
+    if (values.length > 0)
+      keyValuePairs.set(label, values.map(({ value }) => value).join(", "));
+  }
+  return {
+    KeyElType: C.KeyElType,
+    KeyValuesElType: (props) => C.Stack({ ...props, gap: 4 }),
+    ValueElType: C.ValueElType,
+    keyValuePairs,
+  };
+};
 
 /**
  * Build props for the workflow details KeyValuePairs component.

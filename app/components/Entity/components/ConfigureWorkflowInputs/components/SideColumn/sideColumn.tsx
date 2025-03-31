@@ -7,14 +7,21 @@ import { KeyValuePairs } from "@databiosphere/findable-ui/lib/components/common/
 import { Props } from "./types";
 import {
   buildGenomeDetails,
+  buildWorkflowConfiguration,
   buildWorkflowDetails,
 } from "../../../../../../viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 
-export const SideColumn = ({ genome, workflow }: Props): JSX.Element => {
+export const SideColumn = ({
+  configuredInput,
+  genome,
+  workflow,
+}: Props): JSX.Element => {
   return (
     <FluidPaper>
       <GridPaper>
-        <CollapsableSection title="Configuration">None</CollapsableSection>
+        <CollapsableSection title="Configuration">
+          <KeyValuePairs {...buildWorkflowConfiguration(configuredInput)} />
+        </CollapsableSection>
         <CollapsableSection title="Workflow Details">
           <KeyValuePairs {...buildWorkflowDetails(workflow)} />
         </CollapsableSection>
