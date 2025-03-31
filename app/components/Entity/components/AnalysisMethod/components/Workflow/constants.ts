@@ -1,4 +1,4 @@
-import { ButtonProps, Grid2Props } from "@mui/material";
+import { Grid2Props } from "@mui/material";
 import {
   COLOR,
   VARIANT,
