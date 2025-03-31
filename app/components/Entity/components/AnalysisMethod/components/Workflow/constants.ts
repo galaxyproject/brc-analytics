@@ -1,4 +1,4 @@
-import { ButtonProps, Grid2Props } from "@mui/material";
+import { ButtonOwnProps, Grid2Props } from "@mui/material";
 import {
   COLOR,
   VARIANT,
@@ -11,7 +11,7 @@ export const GRID2_PROPS: Grid2Props = {
   wrap: "nowrap",
 };
 
-export const BUTTON_PROPS: Partial<ButtonProps> = {
+export const BUTTON_PROPS: ButtonOwnProps = {
   color: COLOR.PRIMARY,
   variant: VARIANT.CONTAINED,
 };
