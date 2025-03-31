@@ -1,5 +1,9 @@
 import { ComponentType, ReactNode } from "react";
 import { StepProps as MStepProps } from "@mui/material";
+import {
+  BRCDataCatalogGenome,
+  Workflow,
+} from "../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
 
 export interface StepConfig {
   description?: ReactNode;
@@ -13,4 +17,6 @@ export interface StepProps
   extends Omit<StepConfig, "Step" | "key">,
     Pick<MStepProps, "active" | "completed" | "index" | "last"> {
   configKey: string;
+  genome: BRCDataCatalogGenome;
+  workflow: Workflow;
 }
