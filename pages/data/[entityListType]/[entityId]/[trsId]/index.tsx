@@ -131,7 +131,6 @@ function processEntityPaths(
     compatibleWorkflows.forEach((workflow) => {
       // Format the trsId for URL use
       const trsId = formatTrsId(workflow.trsId);
-      console.log(entityListType, entityId, trsId);
       paths.push({
         params: {
           entityId,
