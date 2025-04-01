@@ -27,14 +27,16 @@ export const configureGTFStep = (
     return;
   }
 
-  // Get the priority value and update radio group state.
-  const value = getPriorityValue(geneModelUrls);
+  // Get the preferred gene model.
+  const value = getPreferredGeneModel(geneModelUrls);
+
+  // Update radio state.
   onValueChange(value);
 
-  // If no priority value is found, do nothing.
+  // If no preferred gene model is found, do nothing.
   if (!value) return;
 
-  // Otherwise, use the priority value to configure the step.
+  // Otherwise, use the gene model to configure the step.
   onConfigure(entryKey, entryLabel, [
     { key: value, value: getGeneModelLabel(value) },
   ]);
@@ -64,16 +66,16 @@ export const getGeneModelLabel = (url: string): string => {
 };
 
 /**
- * Returns the priority value based on the order of preference for gene model URLs.
+ * Returns the preferred gene model based on the order of preference.
  * Preference is given to NCBI RefSeq, NCBI Gene, then Augustus, otherwise empty string.
  * @param geneModelUrls - Gene model URLs.
- * @returns The priority value.
+ * @returns The preferred gene model.
  */
-export const getPriorityValue = (geneModelUrls: string[]): string => {
-  const priorityTypes = ["ncbiRefSeq", "ncbiGene", "augustus"];
-  for (const priorityType of priorityTypes) {
+export const getPreferredGeneModel = (geneModelUrls: string[]): string => {
+  const preferredTypes = ["ncbiRefSeq", "ncbiGene", "augustus"];
+  for (const preferredType of preferredTypes) {
     for (const url of geneModelUrls) {
-      if (url.includes(priorityType)) {
+      if (url.includes(preferredType)) {
         return url;
       }
     }
