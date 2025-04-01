@@ -176,6 +176,7 @@ class WorkflowCategory(ConfiguredBaseModel):
     category: WorkflowCategoryId = Field(default=..., description="""The ID of the workflow category.""", json_schema_extra = { "linkml_meta": {'alias': 'category', 'domain_of': ['WorkflowCategory']} })
     name: str = Field(default=..., description="""The display name of the workflow category.""", json_schema_extra = { "linkml_meta": {'alias': 'name', 'domain_of': ['WorkflowCategory']} })
     description: str = Field(default=..., description="""The description of the workflow category.""", json_schema_extra = { "linkml_meta": {'alias': 'description', 'domain_of': ['WorkflowCategory']} })
+    show_coming_soon: bool = Field(default=..., description="""Whether to show 'Coming Soon' for the workflow category when it is not available.""", json_schema_extra = { "linkml_meta": {'alias': 'show_coming_soon', 'domain_of': ['WorkflowCategory']} })
 
 
 class Workflows(ConfiguredBaseModel):

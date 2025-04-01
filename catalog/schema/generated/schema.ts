@@ -99,6 +99,8 @@ export interface WorkflowCategory {
     name: string,
     /** The description of the workflow category. */
     description: string,
+    /** Whether to show 'Coming Soon' for the workflow category when it is not available. */
+    show_coming_soon: boolean,
 }
 
 

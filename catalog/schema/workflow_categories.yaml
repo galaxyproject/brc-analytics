@@ -35,3 +35,7 @@ classes:
         description: The description of the workflow category.
         required: true
         range: string
+      show_coming_soon:
+        description: Whether to show 'Coming Soon' for the workflow category when it is not available.
+        required: true
+        range: boolean

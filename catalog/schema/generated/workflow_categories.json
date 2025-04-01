@@ -33,12 +33,17 @@
                 "name": {
                     "description": "The display name of the workflow category.",
                     "type": "string"
+                },
+                "show_coming_soon": {
+                    "description": "Whether to show 'Coming Soon' for the workflow category when it is not available.",
+                    "type": "boolean"
                 }
             },
             "required": [
                 "category",
                 "name",
-                "description"
+                "description",
+                "show_coming_soon"
             ],
             "title": "WorkflowCategory",
             "type": "object"
