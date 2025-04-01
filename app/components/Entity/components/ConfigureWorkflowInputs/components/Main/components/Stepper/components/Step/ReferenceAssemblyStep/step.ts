@@ -4,6 +4,6 @@ import { ReferenceAssemblyStep } from "./referenceAssemblyStep";
 export const STEP: StepConfig = {
   Step: ReferenceAssemblyStep,
   disabled: true,
-  key: "reference-assembly",
+  key: "referenceAssembly",
   label: "Reference Assembly",
 };

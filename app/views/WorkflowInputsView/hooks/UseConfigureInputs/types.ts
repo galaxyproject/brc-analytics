@@ -1,15 +1,21 @@
-export type OnConfigure = (configuredInput: ConfiguredInput) => void;
+export type OnConfigure = (
+  entryKey: string,
+  entryLabel: string,
+  values: ConfiguredValue[]
+) => void;
 
 export interface ConfigurationEntry {
-  label: string;
-  values: SelectedValue[];
+  entryLabel: string;
+  values: ConfiguredValue[];
 }
 
-export type ConfiguredInput = Record<string, ConfigurationEntry>;
+export interface ConfiguredInput {
+  [key: string]: ConfigurationEntry;
+}
 
-export interface SelectedValue {
-  key: string;
-  value: string;
+export interface ConfiguredValue {
+  key: string | null;
+  value: string | null;
 }
 
 export interface UseConfigureInputs {

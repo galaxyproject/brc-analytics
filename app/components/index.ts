@@ -36,3 +36,4 @@ export { AnalysisPortals } from "./Entity/components/AnalysisPortals/analysisPor
 export { GridPaperSection } from "./Layout/components/Detail/components/Section/section.styles";
 export { Branding } from "./Layout/components/Footer/components/Branding/branding";
 export { AnalyzeGenome } from "./Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
+export { TypographyWordBreak } from "@databiosphere/findable-ui/lib/components/common/Typography/TypographyWordBreak/TypographyWordBreak";

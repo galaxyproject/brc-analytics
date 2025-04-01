@@ -1,12 +1,18 @@
 import { useCallback, useState } from "react";
-import { ConfiguredInput, UseConfigureInputs } from "./types";
+import { ConfiguredInput, ConfiguredValue, UseConfigureInputs } from "./types";
 
 export const useConfigureInputs = (): UseConfigureInputs => {
   const [configuredInput, setConfiguredInput] = useState<ConfiguredInput>({});
 
-  const onConfigure = useCallback((configuredEntry: ConfiguredInput): void => {
-    setConfiguredInput((prev) => ({ ...prev, ...configuredEntry }));
-  }, []);
+  const onConfigure = useCallback(
+    (entryKey: string, entryLabel: string, values: ConfiguredValue[]): void => {
+      setConfiguredInput((prev) => ({
+        ...prev,
+        [entryKey]: { entryLabel, values },
+      }));
+    },
+    []
+  );
 
   return { configuredInput, onConfigure };
 };
