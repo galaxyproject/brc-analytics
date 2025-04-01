@@ -1,5 +1,5 @@
 import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { getWorkflowLandingUrl } from "../../../../../../../../../../../../utils/galaxy-api";
 import {
   ANCHOR_TARGET,
@@ -18,18 +18,24 @@ export const useLaunchGalaxy = ({
 
   const onLaunch = useCallback(async (): Promise<void> => {
     if (!configuredValue) return;
-    const url =
-      landingUrl ??
-      (await run(
-        getWorkflowLandingUrl(
-          workflow.trsId,
-          configuredValue.referenceAssembly,
-          configuredValue.geneModelUrl,
-          workflow.parameters
-        )
-      ));
-    window.open(url, ANCHOR_TARGET.BLANK, REL_ATTRIBUTE.NO_OPENER_NO_REFERRER);
-  }, [configuredValue, landingUrl, run, workflow]);
+    await run(
+      getWorkflowLandingUrl(
+        workflow.trsId,
+        configuredValue.referenceAssembly,
+        configuredValue.geneModelUrl,
+        workflow.parameters
+      )
+    );
+  }, [configuredValue, run, workflow]);
+
+  useEffect(() => {
+    if (!landingUrl) return;
+    window.open(
+      landingUrl,
+      ANCHOR_TARGET.BLANK,
+      REL_ATTRIBUTE.NO_OPENER_NO_REFERRER
+    );
+  }, [landingUrl]);
 
   return { launchStatus: { disabled, loading }, onLaunch };
 };
