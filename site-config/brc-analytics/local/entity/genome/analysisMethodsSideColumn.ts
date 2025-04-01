@@ -25,7 +25,7 @@ export const sideColumn: ComponentsConfig = [
                       } as ComponentConfig<typeof C.SectionTitle>,
                       {
                         component: C.KeyValuePairs,
-                        viewBuilder: V.buildGenomeDetails,
+                        viewBuilder: V.buildAssemblyDetails,
                       } as ComponentConfig<
                         typeof C.KeyValuePairs,
                         BRCDataCatalogGenome

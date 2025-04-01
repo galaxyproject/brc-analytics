@@ -103,6 +103,41 @@ export const buildAssemblyBackPageHero = (
 };
 
 /**
+ * Build props for the assembly details KeyValuePairs component.
+ * @param assembly - Assembly entity.
+ * @returns Props to be used for the KeyValuePairs component.
+ */
+export const buildAssemblyDetails = (
+  assembly: BRCDataCatalogGenome
+): ComponentProps<typeof C.KeyValuePairs> => {
+  const keyValuePairs = new Map<Key, Value>();
+  keyValuePairs.set(
+    BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
+    C.Link({
+      label: assembly.taxonomicLevelSpecies,
+      url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(assembly))}`,
+    })
+  );
+  keyValuePairs.set(
+    BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
+    getGenomeStrainText(assembly, LABEL.UNSPECIFIED)
+  );
+  keyValuePairs.set(
+    BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
+    C.CopyText({
+      children: assembly.accession,
+      value: assembly.accession,
+    })
+  );
+  return {
+    KeyElType: C.KeyElType,
+    KeyValuesElType: (props) => C.Stack({ ...props, gap: 4 }),
+    ValueElType: C.ValueElType,
+    keyValuePairs,
+  };
+};
+
+/**
  * Build props for the assemblies cell.
  * @param organism - Genome entity.
  * @returns Props to be used for the cell.
@@ -489,76 +524,6 @@ export const buildGenomeAnalysisPortals = (
         )}`,
       },
     ],
-  };
-};
-
-/**
- * Build props for the genome detail KeyValuePairs component.
- * @param genome - Genome entity.
- * @returns Props to be used for the KeyValuePairs component.
- */
-export const buildGenomeDetails = (
-  genome: BRCDataCatalogGenome
-): ComponentProps<typeof C.KeyValuePairs> => {
-  const keyValuePairs = new Map<Key, Value>();
-  keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
-    C.Link({
-      label: genome.taxonomicLevelSpecies,
-      url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(genome))}`,
-    })
-  );
-  keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
-    getGenomeStrainText(genome, LABEL.UNSPECIFIED)
-  );
-  keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMY_ID,
-    genome.ncbiTaxonomyId
-  );
-  keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
-    C.CopyText({
-      children: genome.accession,
-      value: genome.accession,
-    })
-  );
-  keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.CHROMOSOMES,
-    genome.chromosomes ?? LABEL.UNSPECIFIED
-  );
-  keyValuePairs.set(BRC_DATA_CATALOG_CATEGORY_LABEL.IS_REF, genome.isRef);
-  keyValuePairs.set(BRC_DATA_CATALOG_CATEGORY_LABEL.LEVEL, genome.level);
-  keyValuePairs.set(BRC_DATA_CATALOG_CATEGORY_LABEL.LENGTH, genome.length);
-  keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_COUNT,
-    genome.scaffoldCount
-  );
-  keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_N50,
-    genome.scaffoldN50
-  );
-  keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_L50,
-    genome.scaffoldL50
-  );
-  keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.COVERAGE,
-    genome.coverage ?? LABEL.UNSPECIFIED
-  );
-  keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.GC_PERCENT,
-    genome.gcPercent
-  );
-  keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.ANNOTATION_STATUS,
-    genome.annotationStatus ?? LABEL.UNSPECIFIED
-  );
-  return {
-    KeyElType: C.KeyElType,
-    KeyValuesElType: (props) => C.Stack({ ...props, gap: 4 }),
-    ValueElType: C.ValueElType,
-    keyValuePairs,
   };
 };
 
