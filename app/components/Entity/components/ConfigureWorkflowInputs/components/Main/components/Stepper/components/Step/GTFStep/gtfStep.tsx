@@ -18,6 +18,10 @@ import { BUTTON_PROPS } from "../components/Button/constants";
 import { useUCSCFiles } from "./hooks/UseUCSCFiles/hook";
 import { useRadioGroup } from "./hooks/UseRadioGroup/hook";
 import { useEffect } from "react";
+import {
+  Loading,
+  LOADING_PANEL_STYLE,
+} from "@databiosphere/findable-ui/lib/components/Loading/loading";
 
 export const GTFStep = ({
   active,
@@ -51,6 +55,12 @@ export const GTFStep = ({
       completed={completed}
       index={index}
     >
+      {/* Step component `children` should be subcomponents such as `StepLabel`, `StepContent`. */}
+      {/* We ignore this; the loading UI is in the DOM while `geneModelUrls` is `undefined` and the Step is not `active`. */}
+      <Loading
+        loading={geneModelUrls === undefined}
+        panelStyle={LOADING_PANEL_STYLE.INHERIT}
+      />
       <StepLabel>
         {entryLabel}
         <Icon slotProps={{ tooltip: { title: description } }} />
