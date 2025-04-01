@@ -656,14 +656,18 @@ export const buildWorkflowConfiguration = (
   configuredInput: ConfiguredInput
 ): ComponentProps<typeof C.KeyValuePairs> => {
   const keyValuePairs = new Map<Key, Value>();
-  for (const { label, values } of Object.values(configuredInput)) {
-    if (values.length > 0)
-      keyValuePairs.set(label, values.map(({ value }) => value).join(", "));
+  for (const { entryLabel, values } of Object.values(configuredInput)) {
+    if (values.length > 0) {
+      keyValuePairs.set(
+        entryLabel,
+        values.map(({ value }) => value).join(", ")
+      );
+    }
   }
   return {
     KeyElType: C.KeyElType,
     KeyValuesElType: (props) => C.Stack({ ...props, gap: 4 }),
-    ValueElType: C.ValueElType,
+    ValueElType: C.TypographyWordBreak,
     keyValuePairs,
   };
 };

@@ -9,7 +9,13 @@ export const WorkflowInputsView = (props: Props): JSX.Element => {
   const { configuredInput, onConfigure } = useConfigureInputs();
   return (
     <Detail
-      mainColumn={<Main onConfigure={onConfigure} {...props} />}
+      mainColumn={
+        <Main
+          configuredInput={configuredInput}
+          onConfigure={onConfigure}
+          {...props}
+        />
+      }
       sideColumn={<SideColumn configuredInput={configuredInput} {...props} />}
       top={<Top {...props} />}
     />
