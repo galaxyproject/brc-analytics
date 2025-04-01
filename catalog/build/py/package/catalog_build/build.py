@@ -33,6 +33,9 @@ def read_assemblies(assemblies_path):
   with open(assemblies_path) as stream:
     return pd.DataFrame(yaml.safe_load(stream)["assemblies"])
 
+def read_organisms(organisms_path):
+  with open(organisms_path) as stream:
+    return pd.DataFrame(yaml.safe_load(stream)["organisms"])
 
 def get_paginated_ncbi_results(base_url, query_description):
   page = 1
@@ -567,13 +570,46 @@ def fetch_sra_metadata(srs_ids, batch_size=20):
   print(f"Adding file urls to : {samples_processed} of {len(data)}", end='\n')
   return data
 
+def report_missing_ploidy_info(genomes_df, organisms_df):
+    """
+    Reports assemblies that are missing ploidy information.
+    
+    Args:
+        genomes_df: DataFrame containing genome information
+        organisms_df: DataFrame containing organism information, including ploidy information
+        
+    Returns:
+        A list of tuples containing (accession, speciesTaxonomyId) for assemblies without ploidy information
+    """
+    # Create a mapping from taxonomy_id to ploidy
+    ploidy_map = organisms_df.set_index("taxonomy_id")["ploidy"].to_dict()
 
-def make_qc_report(missing_ncbi_assemblies, inconsistent_taxonomy_ids, missing_ucsc_assemblies, missing_gene_model_urls=None):
-  ncbi_assemblies_text = "None" if len(missing_ncbi_assemblies) == 0 else "\n".join([f"- {accession}" for accession in missing_ncbi_assemblies])
-  ucsc_assemblies_text = "None" if len(missing_ucsc_assemblies) == 0 else "\n".join([f"- {accession}" for accession in missing_ucsc_assemblies])
-  gene_model_urls_text = "N/A" if missing_gene_model_urls is None else "None" if len(missing_gene_model_urls) == 0 else "\n".join([f"- {accession}" for accession in missing_gene_model_urls])
-  taxonomy_ids_text = "None" if len(inconsistent_taxonomy_ids) == 0 else "\n".join([f"- {taxon}: {ids}" for taxon, ids in inconsistent_taxonomy_ids])
-  return f"# Catalog QC report\n\n## Assemblies not found on NCBI\n\n{ncbi_assemblies_text}\n\n## Assemblies not found in UCSC list\n\n{ucsc_assemblies_text}\n\n## Assemblies with gene model URLs not found\n\n{gene_model_urls_text}\n\n## Species and strain combinations with multiple taxonomy IDs\n\n{taxonomy_ids_text}\n"
+    # Create a DataFrame with just the relevant columns for the check
+    check_df = genomes_df[["accession", "speciesTaxonomyId", "species"]].copy()
+
+    # Check which species tax IDs we have ploidy information for
+    check_df["has_ploidy"] = check_df["speciesTaxonomyId"].apply(lambda tax_id: tax_id in ploidy_map)
+
+    # Find assemblies where we have no ploidy information
+    missing_ploidy = check_df[~check_df["has_ploidy"]]
+    missing_count = len(missing_ploidy)
+
+    if missing_count > 0:
+        print(f"Warning: Found {missing_count} assemblies without ploidy information")
+        print("Missing ploidy assemblies:")
+        for _, row in missing_ploidy.iterrows():
+            print(f"  {row['accession']}: {row['speciesTaxonomyId']}")
+
+    return list(zip(missing_ploidy['accession'], missing_ploidy['speciesTaxonomyId']))
+
+
+def make_qc_report(missing_ncbi_assemblies, inconsistent_taxonomy_ids, missing_ucsc_assemblies, missing_gene_model_urls=None, missing_ploidy_assemblies=None):
+    ncbi_assemblies_text = "None" if len(missing_ncbi_assemblies) == 0 else "\n".join([f"- {accession}" for accession in missing_ncbi_assemblies])
+    ucsc_assemblies_text = "None" if len(missing_ucsc_assemblies) == 0 else "\n".join([f"- {accession}" for accession in missing_ucsc_assemblies])
+    gene_model_urls_text = "N/A" if missing_gene_model_urls is None else "None" if len(missing_gene_model_urls) == 0 else "\n".join([f"- {accession}" for accession in missing_gene_model_urls])
+    taxonomy_ids_text = "None" if len(inconsistent_taxonomy_ids) == 0 else "\n".join([f"- {taxon}: {ids}" for taxon, ids in inconsistent_taxonomy_ids])
+    ploidy_assemblies_text = "None" if missing_ploidy_assemblies is None else "None" if len(missing_ploidy_assemblies) == 0 else "\n".join([f"- {accession} (speciesTaxonomyId: {tax_id})" for accession, tax_id in missing_ploidy_assemblies])
+    return f"# Catalog QC report\n\n## Assemblies not found on NCBI\n\n{ncbi_assemblies_text}\n\n## Assemblies not found in UCSC list\n\n{ucsc_assemblies_text}\n\n## Assemblies with gene model URLs not found\n\n{gene_model_urls_text}\n\n## Species and strain combinations with multiple taxonomy IDs\n\n{taxonomy_ids_text}\n\n## Assemblies without ploidy information\n\n{ploidy_assemblies_text}"
 
 
 def build_files(
@@ -586,7 +622,8 @@ def build_files(
   do_gene_model_urls=True,
   extract_primary_data=False,
   primary_output_path=None,
-  qc_report_path=None
+  qc_report_path=None,
+  organisms_path=None
 ):
   print("Building files")
 
@@ -643,11 +680,6 @@ def build_files(
     primarydata_df.to_csv(primary_output_path, index=False, sep="\t")
     print(f"Wrote to {primary_output_path}")
   
-  if qc_report_path is not None:
-    qc_report_text = make_qc_report(**qc_report_params)
-    with open(qc_report_path, "w") as file:
-      file.write(qc_report_text)
-
   if len(taxonomic_levels_for_tree) > 0:
     # Use the taxonomy IDs from the genomes_df to build the species tree
     # Pass the previously fetched species_info to avoid another API call
@@ -655,4 +687,14 @@ def build_files(
     with open(tree_output_path, 'w') as outfile:
       json.dump(species_tree, outfile, indent=4)
     print(f"Wrote to {tree_output_path}")
-  
+
+  if organisms_path is not None:
+    organisms_df = read_organisms(organisms_path)
+    qc_report_params["missing_ploidy_assemblies"] = report_missing_ploidy_info(genomes_df, organisms_df)
+    print(f"Checked ploidy for {len(genomes_df)} assemblies")
+
+  if qc_report_path is not None:
+    qc_report_text = make_qc_report(**qc_report_params)
+    with open(qc_report_path, "w") as file:
+      file.write(qc_report_text)
+
