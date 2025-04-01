@@ -6,8 +6,13 @@ from typing import Dict
 
 import requests
 import yaml
-
-from generated_schema.schema import Workflows, Workflow, WorkflowParameter, WorkflowCategoryId, WorkflowPloidy
+from generated_schema.schema import (
+    Workflow,
+    WorkflowCategoryId,
+    WorkflowParameter,
+    WorkflowPloidy,
+    Workflows,
+)
 
 URL = "https://iwc.galaxyproject.org/workflow_manifest.json"
 WORKFLOWS_PATH = "catalog/source/workflows.yml"
@@ -16,9 +21,14 @@ DOCKSTORE_COLLECTION_TO_CATEGORY = {
     "Transcriptomics": WorkflowCategoryId.TRANSCRIPTOMICS,
     "Epigenetics": WorkflowCategoryId.REGULATION,
     "Genome assembly": WorkflowCategoryId.ASSEMBLY,
-    "Virology": WorkflowCategoryId.CONSENSUS_SEQUENCES
+    "Virology": WorkflowCategoryId.CONSENSUS_SEQUENCES,
 }
-MANIFEST_SOURCE_OF_TRUTH = ("trs_id", "workflow_name", "categories", "workflow_description")
+MANIFEST_SOURCE_OF_TRUTH = (
+    "trs_id",
+    "workflow_name",
+    "categories",
+    "workflow_description",
+)
 
 
 def read_existing_yaml():
@@ -36,7 +46,10 @@ def get_workflow_categories_from_collections(collections):
     return sorted(
         list(
             set(
-                [DOCKSTORE_COLLECTION_TO_CATEGORY.get(c, WorkflowCategoryId.OTHER) for c in collections]
+                [
+                    DOCKSTORE_COLLECTION_TO_CATEGORY.get(c, WorkflowCategoryId.OTHER)
+                    for c in collections
+                ]
             )
         )
     )
@@ -64,9 +77,16 @@ def get_input_types(workflow_definition):
                     step_input_guide["ext"] = input_formats[0]
                 else:
                     step_input_guide["ext"] = input_formats
-            inputs.append(WorkflowParameter(key=step_label, type_guide=step_input_guide))
+            inputs.append(
+                WorkflowParameter(key=step_label, type_guide=step_input_guide)
+            )
         if step_type == "parameter_input":
-            inputs.append(WorkflowParameter(key=step_label, type_guide={"class": tool_state.get("parameter_type")}))
+            inputs.append(
+                WorkflowParameter(
+                    key=step_label,
+                    type_guide={"class": tool_state.get("parameter_type")},
+                )
+            )
     return inputs
 
 
@@ -81,9 +101,11 @@ def generate_current_workflows():
                 continue
             workflow_input = Workflow(
                 active=False,
-                trs_id=f'{workflow["trsID"]}/versions/v{workflow["definition"]["release"]}',
+                trs_id=f"{workflow['trsID']}/versions/v{workflow['definition']['release']}",
                 workflow_name=workflow["definition"]["name"],
-                categories=get_workflow_categories_from_collections(workflow["collections"]),
+                categories=get_workflow_categories_from_collections(
+                    workflow["collections"]
+                ),
                 workflow_description=workflow["definition"]["annotation"],
                 ploidy=WorkflowPloidy.ANY,
                 # readme=workflow["readme"],
@@ -108,7 +130,9 @@ def merge_into_existing():
             for key in MANIFEST_SOURCE_OF_TRUTH:
                 exisiting_dict[key] = new_dict[key]
             # check that specified parameters still exist
-            current_workflow_parameter_keys = {param.key for param in current_workflow_input.parameters}
+            current_workflow_parameter_keys = {
+                param.key for param in current_workflow_input.parameters
+            }
             for param in existing_workflow_input.parameters:
                 if param.key not in current_workflow_parameter_keys:
                     # Should be rare, but can happen.
@@ -131,7 +155,7 @@ def to_workflows_yaml(exclude_other: bool):
             if WorkflowCategoryId.OTHER in workflow.categories:
                 workflow.categories.remove(WorkflowCategoryId.OTHER)
                 if not workflow.categories:
-                    print(f'Excluding workflow {workflow.trs_id}, category unknown')
+                    print(f"Excluding workflow {workflow.trs_id}, category unknown")
                     continue
             final_workflows.append(workflow)
         sorted_workflows = final_workflows
