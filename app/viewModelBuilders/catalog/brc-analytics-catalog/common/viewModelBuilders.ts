@@ -28,7 +28,6 @@ import {
   getOrganismId,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/utils";
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
-import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 
 /**
  * Build props for the accession cell.
@@ -118,10 +117,13 @@ export const buildAssemblyDetails = (
       url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(assembly))}`,
     })
   );
-  keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
-    getGenomeStrainText(assembly, LABEL.UNSPECIFIED)
-  );
+  const strain = getGenomeStrainText(assembly);
+  if (strain) {
+    keyValuePairs.set(
+      BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
+      strain
+    );
+  }
   keyValuePairs.set(
     BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
     C.CopyText({
