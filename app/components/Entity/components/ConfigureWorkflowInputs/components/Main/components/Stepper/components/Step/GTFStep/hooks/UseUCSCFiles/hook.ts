@@ -6,7 +6,7 @@ import { UseUCSCFiles } from "./types";
 
 export const useUCSCFiles = (genome: BRCDataCatalogGenome): UseUCSCFiles => {
   const assemblyId = genome.accession;
-  const [geneModelUrls, setGeneModelUrls] = useState<string[]>([]);
+  const [geneModelUrls, setGeneModelUrls] = useState<string[] | undefined>();
 
   useEffect(() => {
     fetch(`${UCSC_FILES_ENDPOINT}?genome=${assemblyId}`)

@@ -3,34 +3,56 @@ import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/com
 import { Icon } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Label/components/Icon/icon";
 import { StepProps } from "../types";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
-import { useUCSCFiles } from "./hooks/UseUCSCFiles/useUCSCFiles";
-import { FormControlLabel, Radio, RadioGroup, Typography } from "@mui/material";
-import { useRadioGroup } from "../hooks/UseRadioGroup/hook";
+import {
+  Button,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+  Typography,
+} from "@mui/material";
 import { StyledGrid2 } from "./gtfStep.styles";
 import { TYPOGRAPHY_PROPS } from "./constants";
-import { getGeneModelLabel, getInitialValue } from "./utils";
+import { TYPOGRAPHY_PROPS as MUI_TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
+import { configureGTFStep } from "./utils";
+import { BUTTON_PROPS } from "../components/Button/constants";
+import { useUCSCFiles } from "./hooks/UseUCSCFiles/hook";
+import { useRadioGroup } from "./hooks/UseRadioGroup/hook";
 import { useEffect } from "react";
 
 export const GTFStep = ({
   active,
   completed,
   description,
+  entryKey,
+  entryLabel,
   genome,
   index,
-  label,
+  launchStatus,
+  onConfigure,
+  onLaunch,
 }: StepProps): JSX.Element => {
   const { geneModelUrls } = useUCSCFiles(genome);
-  const { onChange, onValueChange, value } = useRadioGroup("");
-  const hasGeneModels = geneModelUrls.length > 0;
+  const { controls, onChange, onValueChange, value } =
+    useRadioGroup(geneModelUrls);
 
   useEffect(() => {
-    onValueChange(getInitialValue(geneModelUrls));
-  }, [geneModelUrls, onValueChange]);
+    configureGTFStep(
+      geneModelUrls,
+      entryKey,
+      entryLabel,
+      onConfigure,
+      onValueChange
+    );
+  }, [geneModelUrls, entryKey, entryLabel, onConfigure, onValueChange]);
 
   return (
-    <Step active={active && hasGeneModels} completed={completed} index={index}>
+    <Step
+      active={active && !!geneModelUrls}
+      completed={completed}
+      index={index}
+    >
       <StepLabel>
-        {label}
+        {entryLabel}
         <Icon slotProps={{ tooltip: { title: description } }} />
       </StepLabel>
       <StepContent>
@@ -38,16 +60,34 @@ export const GTFStep = ({
           <Typography {...TYPOGRAPHY_PROPS}>
             Genes and Gene Predictions
           </Typography>
-          <RadioGroup onChange={onChange} value={value}>
-            {geneModelUrls.map((url, index) => (
-              <FormControlLabel
-                control={<Radio />}
-                key={index}
-                label={getGeneModelLabel(url)}
-                value={url}
-              />
-            ))}
-          </RadioGroup>
+          {controls.length > 0 ? (
+            <RadioGroup onChange={onChange} value={value}>
+              {controls.map(({ label, value }, i) => (
+                <FormControlLabel
+                  control={<Radio />}
+                  key={i}
+                  onChange={() =>
+                    onConfigure(entryKey, entryLabel, [
+                      { key: value, value: label },
+                    ])
+                  }
+                  label={label}
+                  value={value}
+                />
+              ))}
+            </RadioGroup>
+          ) : (
+            <Typography variant={MUI_TYPOGRAPHY_PROPS.VARIANT.TEXT_BODY_400}>
+              No gene models found.
+            </Typography>
+          )}
+          <Button
+            {...BUTTON_PROPS}
+            disabled={launchStatus.disabled || launchStatus.loading}
+            onClick={onLaunch}
+          >
+            Launch Galaxy
+          </Button>
         </StyledGrid2>
       </StepContent>
     </Step>
