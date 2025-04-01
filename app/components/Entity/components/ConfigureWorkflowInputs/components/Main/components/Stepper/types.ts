@@ -2,14 +2,16 @@ import {
   BRCDataCatalogGenome,
   Workflow,
 } from "../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
+import { OnConfigure } from "../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import {
-  ConfiguredInput,
-  OnConfigure,
-} from "../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+  LaunchStatus,
+  OnLaunch,
+} from "./components/Step/hooks/UseLaunchGalaxy/types";
 
 export interface Props {
-  configuredInput: ConfiguredInput;
   genome: BRCDataCatalogGenome;
+  launchStatus: LaunchStatus;
   onConfigure: OnConfigure;
+  onLaunch: OnLaunch;
   workflow: Workflow;
 }
