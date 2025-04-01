@@ -78,7 +78,7 @@ export const GTFStep = ({
             </RadioGroup>
           ) : (
             <Typography variant={MUI_TYPOGRAPHY_PROPS.VARIANT.TEXT_BODY_400}>
-              No gene predictions found.
+              No gene models found.
             </Typography>
           )}
           <Button
