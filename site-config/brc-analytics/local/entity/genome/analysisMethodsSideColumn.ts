@@ -16,24 +16,6 @@ export const sideColumn: ComponentsConfig = [
               {
                 children: [
                   {
-                    component: C.SectionTitle,
-                    props: {
-                      title: "Resources",
-                    },
-                  } as ComponentConfig<typeof C.SectionTitle>,
-                  {
-                    component: C.AnalysisPortals,
-                    viewBuilder: V.buildGenomeAnalysisPortals,
-                  } as ComponentConfig<
-                    typeof C.AnalysisPortals,
-                    BRCDataCatalogGenome
-                  >,
-                ],
-                component: C.GridPaperSection,
-              },
-              {
-                children: [
-                  {
                     children: [
                       {
                         component: C.SectionTitle,
@@ -54,6 +36,24 @@ export const sideColumn: ComponentsConfig = [
                       gridSx: { gap: 4 },
                     },
                   } as ComponentConfig<typeof C.Grid>,
+                ],
+                component: C.GridPaperSection,
+              },
+              {
+                children: [
+                  {
+                    component: C.SectionTitle,
+                    props: {
+                      title: "Resources",
+                    },
+                  } as ComponentConfig<typeof C.SectionTitle>,
+                  {
+                    component: C.AnalysisPortals,
+                    viewBuilder: V.buildGenomeAnalysisPortals,
+                  } as ComponentConfig<
+                    typeof C.AnalysisPortals,
+                    BRCDataCatalogGenome
+                  >,
                 ],
                 component: C.GridPaperSection,
               },
