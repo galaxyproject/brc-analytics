@@ -1,10 +1,10 @@
-import { AnalysisMethods } from "../AnalysisMethods/analysisMethods";
 import workflows from "../../../../../catalog/output/workflows.json";
 import { AnalysisMethod } from "../AnalysisMethod/analysisMethod";
 import { Props } from "./types";
 import { workflowIsCompatibleWithAssembly } from "./utils";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import { useRouter } from "next/router";
+import { Fragment } from "react";
 
 export const AnalysisMethodsCatalog = ({ assembly }: Props): JSX.Element => {
   const isFeatureEnabled = useFeatureFlag("workflow");
@@ -12,7 +12,7 @@ export const AnalysisMethodsCatalog = ({ assembly }: Props): JSX.Element => {
     query: { entityId },
   } = useRouter();
   return (
-    <AnalysisMethods>
+    <Fragment>
       {workflows.map((workflowCategory) => {
         const compatibleWorkflows = workflowCategory.workflows.filter(
           (workflow) => workflowIsCompatibleWithAssembly(workflow, assembly)
@@ -29,6 +29,6 @@ export const AnalysisMethodsCatalog = ({ assembly }: Props): JSX.Element => {
           />
         );
       })}
-    </AnalysisMethods>
+    </Fragment>
   );
 };

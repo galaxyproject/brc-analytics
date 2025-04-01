@@ -29,7 +29,6 @@ import {
 } from "../../../../apis/catalog/brc-analytics-catalog/common/utils";
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
 import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
-import { TEXT_BODY_SMALL_400 } from "@databiosphere/findable-ui/lib/theme/common/typography";
 
 /**
  * Build props for the accession cell.
@@ -86,6 +85,20 @@ export const buildAnnotationStatus = (
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: genome.annotationStatus,
+  };
+};
+
+/**
+ * Build props for the assembly BackPageHero component.
+ * @param assembly - Assembly entity.
+ * @returns Props to be used for the BackPageHero component.
+ */
+export const buildAssemblyBackPageHero = (
+  assembly: BRCDataCatalogGenome
+): ComponentProps<typeof C.BackPageHero> => {
+  return {
+    breadcrumbs: getAssemblyBreadcrumbs(assembly),
+    title: "Select a Workflow",
   };
 };
 
@@ -480,26 +493,6 @@ export const buildGenomeAnalysisPortals = (
 };
 
 /**
- * Build props for the genome DetailViewHero component.
- * @param genome - Genome entity.
- * @returns Props to be used for the DetailViewHero component.
- */
-export const buildGenomeChooseAnalysisMethodDetailViewHero = (
-  genome: BRCDataCatalogGenome
-): ComponentProps<typeof C.BackPageHero> => {
-  return {
-    breadcrumbs: getGenomeEntityChooseAnalysisMethodBreadcrumbs(genome),
-    subTitle: C.Link({
-      TypographyProps: { color: "ink.light", variant: TEXT_BODY_SMALL_400 },
-      label: `Species: ${genome.taxonomicLevelSpecies}`,
-      underline: "hover",
-      url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(genome))}`,
-    }),
-    title: `Analyze in Galaxy - ${genome.accession}`,
-  };
-};
-
-/**
  * Build props for the genome detail KeyValuePairs component.
  * @param genome - Genome entity.
  * @returns Props to be used for the KeyValuePairs component.
@@ -706,17 +699,15 @@ export const buildWorkflowDetails = (
 };
 
 /**
- * Get the genome entity breadcrumbs.
- * @param genome - Genome entity.
+ * Get the assembly breadcrumbs.
+ * @param assembly - Assembly entity.
  * @returns Breadcrumbs.
  */
-function getGenomeEntityChooseAnalysisMethodBreadcrumbs(
-  genome: BRCDataCatalogGenome
-): Breadcrumb[] {
+function getAssemblyBreadcrumbs(assembly: BRCDataCatalogGenome): Breadcrumb[] {
   return [
     { path: ROUTES.GENOMES, text: "Assemblies" },
-    { path: "", text: genome.accession },
-    { path: "", text: "Analyze" },
+    { path: "", text: assembly.accession },
+    { path: "", text: "Select a Workflow" },
   ];
 }
 
