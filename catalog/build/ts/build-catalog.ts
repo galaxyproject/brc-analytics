@@ -168,10 +168,11 @@ async function buildWorkflows(): Promise<WorkflowCategory[]> {
 
   const workflowCategories: WorkflowCategory[] =
     sourceWorkflowCategories.workflow_categories.map(
-      ({ category, description, name }) => ({
+      ({ category, description, name, show_coming_soon }) => ({
         category,
         description,
         name,
+        showComingSoon: show_coming_soon,
         workflows: [],
       })
     );

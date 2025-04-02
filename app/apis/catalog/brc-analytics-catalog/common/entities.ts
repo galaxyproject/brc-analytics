@@ -79,6 +79,7 @@ export interface WorkflowCategory {
   category: string;
   description: string;
   name: string;
+  showComingSoon: boolean;
   workflows: Workflow[];
 }
 

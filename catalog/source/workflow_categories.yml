@@ -2,27 +2,34 @@ workflow_categories:
   - category: "VARIANT_CALLING"
     name: "Variant calling"
     description: "Identify nucleotide polymorphisms and short indels from Illumina and Element data."
+    show_coming_soon: true
 
   - category: "TRANSCRIPTOMICS"
     name: "Transcriptomics"
     description: "Analyze bulk or single-cell RNA seq data using a variety of approaches."
+    show_coming_soon: true
 
   - category: "REGULATION"
     name: "Regulation"
     description: "Workflows for the analysis of ChIP-seq, ATAC-Seq, and beyond."
+    show_coming_soon: true
 
   - category: "CONSENSUS_SEQUENCES"
     name: "Consensus sequences"
     description: "Build consensus sequences for related isolates."
+    show_coming_soon: false
 
   - category: "ASSEMBLY"
     name: "Assembly"
     description: "Assemble prokaryotic and eukaryotic genomes sequenced with a variety of technologies."
+    show_coming_soon: false
 
   - category: "GENOME_COMPARISONS"
     name: "Genome comparisons"
     description: "Workflows for creation of pairwise and multiple genome alignments."
+    show_coming_soon: true
 
   - category: "PROTEIN_FOLDING"
     name: "Protein folding"
     description: "Analysis of protein folding using the ColabFold framework."
+    show_coming_soon: true

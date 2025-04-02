@@ -3,6 +3,7 @@
     "category": "VARIANT_CALLING",
     "description": "Identify nucleotide polymorphisms and short indels from Illumina and Element data.",
     "name": "Variant calling",
+    "showComingSoon": true,
     "workflows": [
       {
         "parameters": [
@@ -82,6 +83,7 @@
     "category": "TRANSCRIPTOMICS",
     "description": "Analyze bulk or single-cell RNA seq data using a variety of approaches.",
     "name": "Transcriptomics",
+    "showComingSoon": true,
     "workflows": [
       {
         "parameters": [
@@ -157,6 +159,7 @@
     "category": "REGULATION",
     "description": "Workflows for the analysis of ChIP-seq, ATAC-Seq, and beyond.",
     "name": "Regulation",
+    "showComingSoon": true,
     "workflows": [
       {
         "parameters": [
@@ -224,6 +227,7 @@
     "category": "CONSENSUS_SEQUENCES",
     "description": "Build consensus sequences for related isolates.",
     "name": "Consensus sequences",
+    "showComingSoon": false,
     "workflows": [
       {
         "parameters": [
@@ -244,18 +248,21 @@
     "category": "ASSEMBLY",
     "description": "Assemble prokaryotic and eukaryotic genomes sequenced with a variety of technologies.",
     "name": "Assembly",
+    "showComingSoon": false,
     "workflows": []
   },
   {
     "category": "GENOME_COMPARISONS",
     "description": "Workflows for creation of pairwise and multiple genome alignments.",
     "name": "Genome comparisons",
+    "showComingSoon": true,
     "workflows": []
   },
   {
     "category": "PROTEIN_FOLDING",
     "description": "Analysis of protein folding using the ColabFold framework.",
     "name": "Protein folding",
+    "showComingSoon": true,
     "workflows": []
   }
 ]
