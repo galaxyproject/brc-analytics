@@ -1,5 +1,42 @@
 # Changelog
 
+## [0.10.0](https://github.com/galaxyproject/brc-analytics/compare/v0.9.0...v0.10.0) (2025-04-02)
+
+
+### Features
+
+* add check for ploidy to the assemblies qc report ([#366](https://github.com/galaxyproject/brc-analytics/issues/366)) ([#441](https://github.com/galaxyproject/brc-analytics/issues/441)) ([b421c04](https://github.com/galaxyproject/brc-analytics/commit/b421c04d4d00d0f72eb286970c369bfd34a981d2))
+* add launch galaxy button to workflow stepper ([#437](https://github.com/galaxyproject/brc-analytics/issues/437)) ([#443](https://github.com/galaxyproject/brc-analytics/issues/443)) ([a94c7b6](https://github.com/galaxyproject/brc-analytics/commit/a94c7b6caf728dbf9900cd44a25dd10e61f46d53))
+* add loading ui to gtf step and stepper when launching galaxy ([#446](https://github.com/galaxyproject/brc-analytics/issues/446)) ([#447](https://github.com/galaxyproject/brc-analytics/issues/447)) ([b762e84](https://github.com/galaxyproject/brc-analytics/commit/b762e84e174fbab3a00ccd6771cabc9685a558ac))
+* adding organism specific workflows ([#357](https://github.com/galaxyproject/brc-analytics/issues/357)) ([#412](https://github.com/galaxyproject/brc-analytics/issues/412)) ([a63f0fb](https://github.com/galaxyproject/brc-analytics/commit/a63f0fb7264350a6d4c8cd68e53a52d60f6750e6))
+* create configure inputs title and breadcrumbs ([#427](https://github.com/galaxyproject/brc-analytics/issues/427)) ([#428](https://github.com/galaxyproject/brc-analytics/issues/428)) ([577d897](https://github.com/galaxyproject/brc-analytics/commit/577d897f61c884afd318794fd3b06a20dfa52c62))
+* create workflow configuration main column with two placeholder steps ([#433](https://github.com/galaxyproject/brc-analytics/issues/433)) ([#434](https://github.com/galaxyproject/brc-analytics/issues/434)) ([96930a2](https://github.com/galaxyproject/brc-analytics/commit/96930a26844b1066fc77f6101fa0abb2e099ae0a))
+* create workflow configuration side column ([#431](https://github.com/galaxyproject/brc-analytics/issues/431)) ([#432](https://github.com/galaxyproject/brc-analytics/issues/432)) ([5d9d111](https://github.com/galaxyproject/brc-analytics/commit/5d9d1117d2325b7c53e7864bfd37d4a94a68eb9e))
+* fetch gtf file types for the gtf step ([#435](https://github.com/galaxyproject/brc-analytics/issues/435)) ([#436](https://github.com/galaxyproject/brc-analytics/issues/436)) ([fd20496](https://github.com/galaxyproject/brc-analytics/commit/fd20496702dc7802241487a9baed7923b87727cc))
+* introduce workflow configuration page ([#422](https://github.com/galaxyproject/brc-analytics/issues/422)) ([#426](https://github.com/galaxyproject/brc-analytics/issues/426)) ([6ed9eac](https://github.com/galaxyproject/brc-analytics/commit/6ed9eacbbc068903154ed0a490a5581ac295c0d3))
+* optionally hide 'coming soon' for empty workflow categories ([#442](https://github.com/galaxyproject/brc-analytics/issues/442)) ([#449](https://github.com/galaxyproject/brc-analytics/issues/449)) ([62ba68b](https://github.com/galaxyproject/brc-analytics/commit/62ba68bfb4b2319ed012dd30f714329ef955c27f))
+* update assembly page title and side column for selecting a workflow ([#444](https://github.com/galaxyproject/brc-analytics/issues/444)) ([#445](https://github.com/galaxyproject/brc-analytics/issues/445)) ([2e69b61](https://github.com/galaxyproject/brc-analytics/commit/2e69b6154b273ee3cdc0c93a567ca3dcfb0a8d63))
+
+
+### Bug Fixes
+
+* add error handling to ucsc files request ([#438](https://github.com/galaxyproject/brc-analytics/issues/438)) ([#439](https://github.com/galaxyproject/brc-analytics/issues/439)) ([744644a](https://github.com/galaxyproject/brc-analytics/commit/744644ad975b6f8d0e4632b2bc9e242f1b2fc505))
+
+
+### Chores
+
+* update findable-ui to latest version v24.0.0 ([#429](https://github.com/galaxyproject/brc-analytics/issues/429)) ([#430](https://github.com/galaxyproject/brc-analytics/issues/430)) ([bc51e93](https://github.com/galaxyproject/brc-analytics/commit/bc51e9387b4c2bfa0c2e877dc09ee66bf74292d1))
+
+
+### Content
+
+* update cards on main page to add webinar YouTube link ([#454](https://github.com/galaxyproject/brc-analytics/issues/454)) ([#455](https://github.com/galaxyproject/brc-analytics/issues/455)) ([0269348](https://github.com/galaxyproject/brc-analytics/commit/026934889eae16360beeeacc42cc08521094ba66))
+
+
+### Code Refactoring
+
+* refactor dynamic route from data/[...params] to data/[params]/index ([#424](https://github.com/galaxyproject/brc-analytics/issues/424)) ([#425](https://github.com/galaxyproject/brc-analytics/issues/425)) ([8bc5d20](https://github.com/galaxyproject/brc-analytics/commit/8bc5d205fe30ae13d40ba73dc2322f0717113b54))
+
 ## [0.9.0](https://github.com/galaxyproject/brc-analytics/compare/v0.8.0...v0.9.0) (2025-03-24)
 
 
