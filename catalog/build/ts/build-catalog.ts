@@ -83,6 +83,7 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
       accession: row.accession,
       annotationStatus: parseStringOrNull(row.annotationStatus),
       chromosomes: parseNumberOrNull(row.chromosomeCount),
+      commonName: parseStringOrNull(row.commonName),
       coverage: parseStringOrNull(row.coverage),
       gcPercent: parseNumberOrNull(row.gcPercent),
       geneModelUrl: parseStringOrNull(row.geneModelUrl),
@@ -139,6 +140,7 @@ function buildOrganism(
       organism?.assemblyTaxonomyIds,
       genome.ncbiTaxonomyId
     ),
+    commonName: genome.commonName,
     genomes: accumulateArrayValue(organism?.genomes, genome),
     ncbiTaxonomyId: genome.speciesTaxonomyId,
     taxonomicGroup: genome.taxonomicGroup,
