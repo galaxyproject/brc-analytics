@@ -114,7 +114,7 @@ def get_taxonomic_level_key(level):
   return f"taxonomicLevel{level[0].upper()}{level[1:]}"
 
 
-def get_species_row(taxon_info, taxonomic_group_sets, taxonomic_levels):
+def get_species_row(taxon_info, taxonomic_group_sets, taxonomic_levels, name_info=None):
   classification = taxon_info["taxonomy"]["classification"]
   species_info = classification["species"]
   taxonomy_id = taxon_info["taxonomy"]["tax_id"]
@@ -125,6 +125,11 @@ def get_species_row(taxon_info, taxonomic_group_sets, taxonomic_levels):
   if own_level in taxonomic_levels and own_level not in classification:
     taxonomic_level_fields[get_taxonomic_level_key(own_level)] = taxon_info["taxonomy"]["current_scientific_name"]["name"]
   
+  if name_info:
+    common_names = name_info["taxonomy"].get("other_common_names")
+    if common_names:
+      taxonomic_level_fields["commonName"] = common_names[0]
+
   return {
     "taxonomyId": taxonomy_id,
     "species": species_info["name"],
@@ -150,19 +155,48 @@ def get_species_info(taxonomy_ids):
   return post_ncbi_request(url, {"taxons": taxon_ids})
 
 
-def get_species_df(species_info, taxonomic_group_sets, taxonomic_levels):
+def get_species_name_info(taxonomy_ids):
+  """
+  Fetches species name information from NCBI API for the given taxonomy IDs.
+  
+  Args:
+    taxonomy_ids: List of taxonomy IDs to fetch information for
+    
+  Returns:
+    List of species name information dictionaries from NCBI
+  """
+  url = "https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/name_report"
+  taxon_ids = list(set(str(id) for id in taxonomy_ids))
+  return post_ncbi_request(url, {"taxons": taxon_ids})
+
+
+def get_species_df(species_info, species_name_info, taxonomic_group_sets, taxonomic_levels):
   """
   Converts species information into a DataFrame.
   
   Args:
     species_info: List of species information dictionaries from NCBI
+    species_name_info: List of species name information dictionaries from NCBI
     taxonomic_group_sets: Dictionary of taxonomic group sets
     taxonomic_levels: List of taxonomic levels to include
     
   Returns:
     DataFrame containing species information
   """
-  return pd.DataFrame([get_species_row(info, taxonomic_group_sets, taxonomic_levels) for info in species_info])
+  # Create a dictionary mapping tax_id to name_info for easy lookup
+  name_info_dict = {
+      str(info["taxonomy"]["tax_id"]): info
+      for info in species_name_info
+  }
+  
+  # Create rows with both species_info and corresponding name_info
+  rows = []
+  for info in species_info:
+    tax_id = str(info["taxonomy"]["tax_id"])
+    name_info = name_info_dict.get(tax_id)
+    rows.append(get_species_row(info, taxonomic_group_sets, taxonomic_levels, name_info))
+  
+  return pd.DataFrame(rows)
 
 
 def get_species_tree(taxonomy_ids, taxonomic_levels, species_info=None):
@@ -349,6 +383,8 @@ def _id_to_gene_model_url(asm_id: str, session: requests.Session):
   print(f"finding gene model url for: {asm_id}")
   ucsc_files_endpoint = "https://genome.ucsc.edu/list/files"
   download_base_url = "https://hgdownload.soe.ucsc.edu"
+  #wait 1s because of rate limiting
+  time.sleep(1)
   response = session.get(ucsc_files_endpoint, params={"genome": asm_id})
   try:
     response.raise_for_status()
@@ -623,7 +659,7 @@ def build_files(
   tree_output_path,
   taxonomic_levels_for_tree, 
   taxonomic_group_sets={},
-  do_gene_model_urls=False,
+  do_gene_model_urls=True,
   extract_primary_data=False,
   primary_output_path=None,
   qc_report_path=None,
@@ -651,9 +687,10 @@ def build_files(
 
   # Fetch species information once to be used by both species_df and species_tree
   species_info = get_species_info(base_genomes_df["taxonomyId"])
+  species_name_info = get_species_name_info(base_genomes_df["taxonomyId"])
   
   # Create species DataFrame using the fetched species_info
-  species_df = get_species_df(species_info, taxonomic_group_sets, taxonomic_levels_for_tree)
+  species_df = get_species_df(species_info, species_name_info, taxonomic_group_sets, taxonomic_levels_for_tree)
 
   report_missing_values_from("species", "found on NCBI", base_genomes_df["taxonomyId"], species_df["taxonomyId"])
 
