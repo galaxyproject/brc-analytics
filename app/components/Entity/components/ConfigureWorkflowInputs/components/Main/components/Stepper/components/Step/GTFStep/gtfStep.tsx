@@ -17,11 +17,13 @@ import { configureGTFStep } from "./utils";
 import { BUTTON_PROPS } from "../components/Button/constants";
 import { useUCSCFiles } from "./hooks/UseUCSCFiles/hook";
 import { useRadioGroup } from "./hooks/UseRadioGroup/hook";
-import { useEffect } from "react";
+import { Fragment, useEffect } from "react";
 import {
   Loading,
   LOADING_PANEL_STYLE,
 } from "@databiosphere/findable-ui/lib/components/Loading/loading";
+import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Optional/optional";
+import { getGeneModelLabel } from "./utils";
 
 export const GTFStep = ({
   active,
@@ -31,9 +33,8 @@ export const GTFStep = ({
   entryLabel,
   genome,
   index,
-  launchStatus,
   onConfigure,
-  onLaunch,
+  onStep,
 }: StepProps): JSX.Element => {
   const { geneModelUrls } = useUCSCFiles(genome);
   const { controls, onChange, onValueChange, value } =
@@ -61,7 +62,16 @@ export const GTFStep = ({
         loading={geneModelUrls === undefined}
         panelStyle={LOADING_PANEL_STYLE.INHERIT}
       />
-      <StepLabel>
+      <StepLabel
+        optional={
+          completed && (
+            <Fragment>
+              <Optional noWrap>{getGeneModelLabel(value)}</Optional>
+              <Button onClick={() => onStep(index)}>Edit</Button>
+            </Fragment>
+          )
+        }
+      >
         {entryLabel}
         <Icon slotProps={{ tooltip: { title: description } }} />
       </StepLabel>
@@ -91,12 +101,8 @@ export const GTFStep = ({
               No gene models found.
             </Typography>
           )}
-          <Button
-            {...BUTTON_PROPS}
-            disabled={launchStatus.disabled || launchStatus.loading}
-            onClick={onLaunch}
-          >
-            Launch Galaxy
+          <Button {...BUTTON_PROPS} disabled={!value} onClick={() => onStep()}>
+            Continue
           </Button>
         </StyledGrid>
       </StepContent>

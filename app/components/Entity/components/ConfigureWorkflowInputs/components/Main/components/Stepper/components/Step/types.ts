@@ -10,6 +10,7 @@ import {
   LaunchStatus,
   OnLaunch,
 } from "./hooks/UseLaunchGalaxy/types";
+import { OnStep } from "../../hooks/UseStepper/types";
 
 export interface StepConfig {
   description?: ReactNode;
@@ -28,5 +29,6 @@ export interface StepProps
   launchStatus: LaunchStatus;
   onConfigure: OnConfigure;
   onLaunch: OnLaunch;
+  onStep: OnStep;
   workflow: Workflow;
 }
