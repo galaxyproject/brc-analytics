@@ -3,6 +3,7 @@ import { ConfiguredInput } from "../../../../../../../../../../../../views/Workf
 
 export interface ConfiguredValue {
   geneModelUrl: string | null;
+  pairedEnd: string | null;
   referenceAssembly: string;
 }
 

@@ -3,10 +3,15 @@ import { STEPPER_PROPS as MUI_STEPPER_PROPS } from "@databiosphere/findable-ui/l
 import { StepConfig } from "./components/Step/types";
 import { STEP as REFERENCE_ASSEMBLY_STEP } from "./components/Step/ReferenceAssemblyStep/step";
 import { STEP as GTF_STEP } from "./components/Step/GTFStep/step";
+import { STEP as PAIRED_END_STEP } from "./components/Step/PairedEndStep/step";
 
 export const STEPPER_PROPS: StepperProps = {
   connector: null,
   orientation: MUI_STEPPER_PROPS.ORIENTATION.VERTICAL,
 };
 
-export const STEPS: StepConfig[] = [REFERENCE_ASSEMBLY_STEP, GTF_STEP];
+export const STEPS: StepConfig[] = [
+  REFERENCE_ASSEMBLY_STEP,
+  GTF_STEP,
+  PAIRED_END_STEP,
+];
