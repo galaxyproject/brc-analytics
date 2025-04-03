@@ -29,60 +29,63 @@ def rate_limit_handler(request_call):
       return response
     raise
 
+
+def post_ncbi_request(url, json_data):
+  """
+  Makes a POST request to the NCBI API with error handling and rate limiting.
+  Handles pagination if the response contains next_page_token.
+  
+  Args:
+    url: The API endpoint URL
+    json_data: The data to send in the request body
+    
+  Returns:
+    List of all reports from paginated responses
+    
+  Raises:
+    Exception: If the request fails or contains errors
+  """
+  all_reports = []
+  page = 1
+  
+  while True:
+    print(f"Requesting page {page} of {url}")
+    
+    # Add page token to request if it exists
+    if "next_page_token" in json_data:
+      json_data["page_token"] = json_data.pop("next_page_token")
+    
+    response = requests.post(url, json=json_data)
+    response = rate_limit_handler(lambda: response)
+    
+    if response.status_code != 200:
+      raise Exception(f"Failed to fetch data: {response.status_code} {response.text}")
+    
+    data = response.json()
+    
+    if len(data["reports"][0].get("errors", [])) > 0:
+      raise Exception(data["reports"][0])
+    
+    all_reports.extend(data["reports"])
+    
+    next_page_token = data.get("next_page_token")
+    if not next_page_token:
+      break
+    
+    json_data["next_page_token"] = next_page_token
+    page += 1
+    
+  return all_reports
+
+
 def read_assemblies(assemblies_path):
   with open(assemblies_path) as stream:
     return pd.DataFrame(yaml.safe_load(stream)["assemblies"])
 
+
 def read_organisms(organisms_path):
   with open(organisms_path) as stream:
     return pd.DataFrame(yaml.safe_load(stream)["organisms"])
-
-def get_paginated_ncbi_results(base_url, query_description):
-  page = 1
-  next_page_token = None
-  results = []
-  while next_page_token or page == 1:
-    print(f"Requesting page {page} of {query_description}")
-    request_url = f"{base_url}?page_size=1000{"&page_token=" + next_page_token if next_page_token else ""}"
-    response = rate_limit_handler(partial(requests.get, request_url))
-    page_data = response.json()
-    if len(page_data["reports"][0].get("errors", [])) > 0:
-      raise Exception(page_data["reports"][0])
-    results += page_data["reports"]
-    next_page_token = page_data.get("next_page_token")
-    page += 1
-  return results
-
-
-def get_next_ncbi_url_batch(get_url, items, start_index):
-  # Do a binary search to find the longest possible URL
-  max_valid_end_index = start_index
-  min_invalid_end_index = len(items)
-  end_index = len(items)
-  while end_index != max_valid_end_index:
-    test_url = get_url(items[start_index:end_index])
-    if len(test_url) > MAX_NCBI_URL_LENGTH:
-      min_invalid_end_index = end_index
-    else:
-      max_valid_end_index = end_index
-    end_index = int((max_valid_end_index + min_invalid_end_index)/2)
-  return get_url(items[start_index:end_index]), end_index
-
-
-def get_batched_ncbi_urls(get_url, items):
-  urls = []
-  index = 0
-  while index < len(items):
-    url, index = get_next_ncbi_url_batch(get_url, items, index)
-    urls.append(url)
-  return urls
-
-
-def get_batched_ncbi_results(get_base_url, items, query_description):
-  results = []
-  for batch_index, batch_url in enumerate(get_batched_ncbi_urls(get_base_url, items)):
-    results.extend(get_paginated_ncbi_results(batch_url, f"{query_description} batch {batch_index + 1}"))
-  return results
 
 
 def match_taxonomic_group(tax_id, lineage, taxonomic_groups):
@@ -142,11 +145,9 @@ def get_species_info(taxonomy_ids):
   Returns:
     List of species information dictionaries from NCBI
   """
-  return get_batched_ncbi_results(
-    lambda ids: f"https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/taxon/{",".join(ids)}/dataset_report",
-    [str(id) for id in set(taxonomy_ids)],
-    "taxa"
-  )
+  url = "https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/dataset_report"
+  taxon_ids = list(set(str(id) for id in taxonomy_ids))
+  return post_ncbi_request(url, {"taxons": taxon_ids})
 
 
 def get_species_df(species_info, taxonomic_group_sets, taxonomic_levels):
@@ -231,16 +232,16 @@ def get_species_tree(taxonomy_ids, taxonomic_levels, species_info=None):
               taxon_rank_map[parent_id_str] = rank_level
     
   # Fetch any missing taxa information
-  fetch_taxa_info_in_batches(tax_ids, taxon_name_map, taxon_rank_map, "missing parent taxa")
+  fetch_taxa_info(tax_ids, taxon_name_map, taxon_rank_map, "missing parent taxa")
 
   named_species_tree = update_species_tree_names(species_tree, taxon_name_map, taxon_rank_map)
 
   return named_species_tree
 
 
-def fetch_taxa_info_in_batches(tax_ids, taxon_name_map, taxon_rank_map, description="taxa"):
+def fetch_taxa_info(tax_ids, taxon_name_map, taxon_rank_map, description="taxa"):
   """
-  Fetches taxonomic information in batches and updates the provided name and rank maps.
+  Fetches taxonomic information and updates the provided name and rank maps.
   
   Args:
     tax_ids: List or set of taxonomy IDs to fetch
@@ -259,24 +260,16 @@ def fetch_taxa_info_in_batches(tax_ids, taxon_name_map, taxon_rank_map, descript
     
   print(f"Fetching information for {len(missing_tax_ids)} {description}")
   
-  # Process in batches of 100 to avoid API limitations
-  batch_size = 100
-  for i in range(0, len(missing_tax_ids), batch_size):
-    batch = missing_tax_ids[i:i+batch_size]
-    print(f"Fetching batch {i//batch_size + 1} of {(len(missing_tax_ids) + batch_size - 1)//batch_size} ({len(batch)} taxa)")
-    
-    taxa_info = get_paginated_ncbi_results(
-      f"https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/taxon/{','.join(batch)}/dataset_report", 
-      f"{description} batch {i//batch_size + 1}"
-    )
-    
-    for report in taxa_info:
-      tax_id = str(report["taxonomy"]["tax_id"])
-      taxon_name_map[tax_id] = report["taxonomy"]["current_scientific_name"]["name"]
-      if "rank" in report["taxonomy"]:
-        taxon_rank_map[tax_id] = report["taxonomy"]["rank"]
-      else:
-        print(f"rank not found for tax_id: {tax_id}")
+  url = "https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/dataset_report"
+  reports = post_ncbi_request(url, {"taxons": missing_tax_ids})
+  
+  for report in reports:
+    tax_id = str(report["taxonomy"]["tax_id"])
+    taxon_name_map[tax_id] = report["taxonomy"]["current_scientific_name"]["name"]
+    if "rank" in report["taxonomy"]:
+      taxon_rank_map[tax_id] = report["taxonomy"]["rank"]
+    else:
+      print(f"rank not found for tax_id: {tax_id}")
 
 
 def ncbi_tree_to_nested_tree(node_id, edges, taxonomy_ids):
@@ -330,15 +323,26 @@ def get_biosample_data(genome_info):
 
 
 def get_genomes_and_primarydata_df(accessions):
-  genomes_info = get_batched_ncbi_results(
-    lambda a: f"https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/{",".join(a)}/dataset_report",
-    accessions,
-    "genomes"
-  )
-
+  """
+  Fetches genome information and creates DataFrames for genomes and biosample data.
+  
+  Args:
+    accessions: List of genome accessions to fetch information for
+    
+  Returns:
+    Tuple of (genomes_df, biosample_df)
+  """
+  # Convert pandas Series to list if necessary
+  if isinstance(accessions, pd.Series):
+    accessions = accessions.tolist()
+  
+  url = "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/dataset_report"
+  reports = post_ncbi_request(url, {"accessions": accessions})
+  
   return (
-          pd.DataFrame(data=[get_genome_row(info) for info in genomes_info]),
-          pd.DataFrame(data=[get_biosample_data(info) for info in genomes_info if 'biosample' in info['assembly_info']]))
+    pd.DataFrame(data=[get_genome_row(info) for info in reports]),
+    pd.DataFrame(data=[get_biosample_data(info) for info in reports if 'biosample' in info['assembly_info']])
+  )
 
 
 def _id_to_gene_model_url(asm_id: str, session: requests.Session):
@@ -619,7 +623,7 @@ def build_files(
   tree_output_path,
   taxonomic_levels_for_tree, 
   taxonomic_group_sets={},
-  do_gene_model_urls=True,
+  do_gene_model_urls=False,
   extract_primary_data=False,
   primary_output_path=None,
   qc_report_path=None,
@@ -698,3 +702,18 @@ def build_files(
     with open(qc_report_path, "w") as file:
       file.write(qc_report_text)
 
+
+def test_post_request():
+  """
+  Test function to verify pagination works correctly
+  """
+  url = "https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/dataset_report"
+  taxons = [str(i) for i in range(1, 1000)]  # Test with a large number of taxons
+  reports = post_ncbi_request(url, {"taxons": taxons})
+  print(f"Retrieved {len(reports)} reports")
+  for i, report in enumerate(reports[:5]):
+    print(f"Report {i+1} - Tax ID: {report['taxonomy']['tax_id']}")
+
+
+if __name__ == "__main__":
+  test_post_request()
