@@ -6,8 +6,9 @@ import {
   COLOR,
   VARIANT,
 } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
 import { Table } from "./components/Table/table";
+import { RowSelectionState } from "@tanstack/table-core";
 
 export const CollectionSelector = ({
   entryKey,
@@ -18,8 +19,10 @@ export const CollectionSelector = ({
   open,
   table,
 }: Props): JSX.Element => {
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   return (
     <StyledDialog
+      onTransitionEnter={() => setRowSelection(table.getState().rowSelection)}
       open={open}
       PaperProps={{
         component: "form",
@@ -33,7 +36,10 @@ export const CollectionSelector = ({
       <DialogActions>
         <Button
           color={COLOR.SECONDARY}
-          onClick={onClose}
+          onClick={() => {
+            table.setRowSelection(rowSelection);
+            onClose();
+          }}
           variant={VARIANT.CONTAINED}
         >
           Cancel
