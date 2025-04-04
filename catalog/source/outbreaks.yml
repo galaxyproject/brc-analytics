@@ -76,3 +76,41 @@ outbreaks:
       - title: "Galaxy tutorial: Pox virus genome analysis from tiled-amplicon sequencing data"
         url: "https://gxy.io/GTN:T00347"
         type: REFERENCE
+
+  - taxonomy_id: 1773
+    priority: CRITICAL
+    active: true
+    description:
+      path: outbreaks/tuberculosis.md
+    resources:
+      - title: "WHO | Tuberculosis Fact Sheet"
+        url: "https://www.who.int/news-room/fact-sheets/detail/tuberculosis"
+        type: REFERENCE
+      - title: "BV-BRC: Mycobacterium tuberculosis"
+        url: "https://www.bv-brc.org/view/Taxonomy/1773"
+        type: REFERENCE
+      - title: "NIH | TB Research Information"
+        url: "https://www.niaid.nih.gov/diseases-conditions/tuberculosis"
+        type: REFERENCE
+      - title: "WHO | Tuberculosis Deaths and Disease Increase During the COVID-19 Pandemic"
+        url: "https://www.who.int/news/item/27-10-2022-tuberculosis-deaths-and-disease-increase-during-the-covid-19-pandemic"
+        type: REFERENCE
+
+  - taxonomy_id: 5833
+    priority: HIGH
+    active: true
+    description:
+      path: outbreaks/malaria.md
+    resources:
+      - title: "WHO | Malaria Fact Sheet"
+        url: "https://www.who.int/news-room/fact-sheets/detail/malaria"
+        type: REFERENCE
+      - title: "NIH | Malaria Research Information"
+        url: "https://www.niaid.nih.gov/diseases-conditions/malaria"
+        type: REFERENCE
+      - title: "PlasmoDB: Genome Info and Stats"
+        url: "https://plasmodb.org/plasmo/app/search/organism/GenomeDataTypes/result?filterTerm=Plasmodium%20falciparum"
+        type: REFERENCE
+      - title: "Global malaria predictors at a localized scale"
+        url: "https://pubmed.ncbi.nlm.nih.gov/38045403/"
+        type: PUBLICATION
