@@ -2,6 +2,6 @@ import { ConfiguredValue } from "./types";
 
 export const CONFIGURED_VALUE_KEYS: (keyof ConfiguredValue)[] = [
   "geneModelUrl",
-  "referenceAssembly",
   "readRuns",
+  "referenceAssembly",
 ];

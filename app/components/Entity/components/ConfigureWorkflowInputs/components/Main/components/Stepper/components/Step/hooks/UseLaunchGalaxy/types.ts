@@ -4,8 +4,8 @@ import { ConfiguredInput } from "../../../../../../../../../../../../views/Workf
 export interface ConfiguredValue {
   geneModelUrl: string | null;
   pairedEnd: string | null;
-  referenceAssembly: string;
   readRuns: string | null;
+  referenceAssembly: string;
 }
 
 export interface LaunchStatus {
