@@ -108,9 +108,76 @@ outbreaks:
       - title: "NIH | Malaria Research Information"
         url: "https://www.niaid.nih.gov/diseases-conditions/malaria"
         type: REFERENCE
-      - title: "PlasmoDB: Genome Info and Stats"
+      - title: "PlasmoDB | Genome Info and Stats"
         url: "https://plasmodb.org/plasmo/app/search/organism/GenomeDataTypes/result?filterTerm=Plasmodium%20falciparum"
         type: REFERENCE
       - title: "Global malaria predictors at a localized scale"
         url: "https://pubmed.ncbi.nlm.nih.gov/38045403/"
         type: PUBLICATION
+
+  - taxonomy_id: 498019
+    priority: HIGH
+    active: true
+    description:
+      path: outbreaks/candida_auris.md
+    resources:
+      - title: "UC Davis Health | Candida auris Warning"
+        url: "https://health.ucdavis.edu/news/headlines/cdc-issues-warning-about-increase-of-drug-resistant-candida-auris-infections/2023/03"
+        type: OTHER
+      - title: "FungiDB | Genome Info and Stats"
+        url: "https://fungidb.org/fungidb/app/search/organism/GenomeDataTypes/result?filterTerm=Candida%20auris"
+        type: REFERENCE
+      - title: "NIH | Fungal Disease-Specific Research"
+        url: "https://www.niaid.nih.gov/diseases-conditions/fungal-disease-specific-research"
+        type: REFERENCE
+
+  - taxonomy_id: 5207
+    priority: HIGH
+    active: true
+    description:
+      path: outbreaks/cryptococcus_neoformans.md
+    resources:
+      - title: "DNDi | On World Meningitis Day, too many people are dying of cryptococcal meningitis in Africa"
+        url: "https://dndi.org/viewpoints/2024/on-world-meningitis-day-too-many-people-are-dying-of-cryptococcal-meningitis-in-africa/"
+        type: OTHER
+      - title: "Cryptococcal meningitis causes 15% of AIDS-related deaths globally"
+        url: "https://www.healio.com/news/infectious-disease/20170512/cryptococcal-meningitis-causes-15-of-aidsrelated-deaths-globally"
+        type: OTHER
+      - title: "The WHO fungal priority pathogens list as a game-changer"
+        url: "https://www.cidrap.umn.edu/antimicrobial-stewardship/who-fungal-priority-pathogens-list-game-changer"
+        type: OTHER
+      - title: "FungiDB | Genome Info and Stats"
+        url: "https://fungidb.org/fungidb/app/search/organism/GenomeDataTypes/result?filterTerm=Cryptococcus%20neoformans"
+        type: REFERENCE
+      - title: "NIH | Fungal Disease-Specific Research"
+        url: "https://www.niaid.nih.gov/diseases-conditions/fungal-disease-specific-research"
+        type: REFERENCE
+
+  - taxonomy_id: 199306
+    priority: HIGH
+    active: true
+    description:
+      path: outbreaks/coccidioides_posadasii.md
+    resources:
+      - title: "CDPH | Valley Fever Information"
+        url: "https://www.cdph.ca.gov/Programs/CID/DCDC/pages/Coccidioidomycosis.aspx"
+        type: REFERENCE
+      - title: "NIAID | Fungal Disease-Specific Research"
+        url: "https://www.niaid.nih.gov/diseases-conditions/fungal-disease-specific-research"
+        type: REFERENCE
+      - title: "FungiDB | Genome Info and Stats"
+        url: "https://fungidb.org/fungidb/app/search/organism/GenomeDataTypes/result?filterTerm=Coccidioides%20posadasii"
+        type: REFERENCE
+
+  - taxonomy_id: 5037
+    priority: HIGH
+    active: true
+    description:
+      path: outbreaks/histoplasma_capsulatum.md
+    resources:
+      - title: "NIH | Fungal Disease-Specific Research"
+        url: "https://www.niaid.nih.gov/diseases-conditions/fungal-disease-specific-research"
+        type: REFERENCE
+      - title: "FungiDB | Genome Info and Stats"
+        url: "https://fungidb.org/fungidb/app/search/organism/GenomeDataTypes/result?filterTerm=Histoplasma%20capsulatum"
+        type: REFERENCE
