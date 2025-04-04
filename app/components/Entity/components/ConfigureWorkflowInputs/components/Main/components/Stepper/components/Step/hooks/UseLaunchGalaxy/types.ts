@@ -5,6 +5,7 @@ export interface ConfiguredValue {
   geneModelUrl: string | null;
   pairedEnd: string | null;
   referenceAssembly: string;
+  readRuns: string | null;
 }
 
 export interface LaunchStatus {

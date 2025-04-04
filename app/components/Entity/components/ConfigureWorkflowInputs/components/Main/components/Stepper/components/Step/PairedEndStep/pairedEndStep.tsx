@@ -6,9 +6,10 @@ import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/comp
 import { Button } from "@mui/material";
 import { useToggleButtonGroup } from "../hooks/UseToggleButtonGroup/useToggleButtonGroup";
 import { BUTTON_PROPS } from "../components/Button/constants";
-import { PairedEndDataSelectorPanel } from "./components/PairedEndDataSelectorPanel/pairedEndDataSelectorPanel";
 import { ToggleButtonGroup } from "./components/ToggleButtonGroup/toggleButtonGroup";
 import { VIEW } from "./components/ToggleButtonGroup/types";
+import { ENASequencingData } from "./components/ENASequencingData/enaSequencingData";
+import { useENA } from "./components/ENASequencingData/hooks/UseENA/useENA";
 
 export const PairedEndStep = ({
   active,
@@ -18,13 +19,14 @@ export const PairedEndStep = ({
   launchStatus,
   onLaunch,
 }: StepProps): JSX.Element => {
+  const ena = useENA();
   const { onChange, value } = useToggleButtonGroup(VIEW.ENA);
   return (
     <Step active={active} completed={completed} index={index}>
       <StepLabel optional={<Optional>TODO</Optional>}>{entryLabel}</StepLabel>
       <StepContent>
         <ToggleButtonGroup onChange={onChange} value={value} />
-        <PairedEndDataSelectorPanel />
+        {value === VIEW.ENA ? <ENASequencingData {...ena} /> : null}
         <Button
           {...BUTTON_PROPS}
           disabled={launchStatus.disabled || launchStatus.loading}

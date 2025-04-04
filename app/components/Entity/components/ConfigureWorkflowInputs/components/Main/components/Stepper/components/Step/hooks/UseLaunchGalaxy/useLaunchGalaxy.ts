@@ -23,6 +23,7 @@ export const useLaunchGalaxy = ({
         workflow.trsId,
         configuredValue.referenceAssembly,
         configuredValue.geneModelUrl,
+        configuredValue.readRuns,
         workflow.parameters
       )
     );
