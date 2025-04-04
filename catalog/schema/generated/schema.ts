@@ -29,6 +29,7 @@ export enum WorkflowParameterVariable {
     ASSEMBLY_ID = "ASSEMBLY_ID",
     ASSEMBLY_FASTA_URL = "ASSEMBLY_FASTA_URL",
     GENE_MODEL_URL = "GENE_MODEL_URL",
+    SANGER_READ_RUN = "SANGER_READ_RUN",
 };
 /**
 * Possible ploidies supported by workflows.

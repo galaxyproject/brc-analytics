@@ -95,6 +95,8 @@ function paramVariableToRequestValue(
             url: geneModelUrl,
           }
         : null;
+    case WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN:
+      return null; // TODO pass in necessary information and generate an actual value for this
   }
 }
 

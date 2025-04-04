@@ -131,7 +131,8 @@
             "enum": [
                 "ASSEMBLY_ID",
                 "ASSEMBLY_FASTA_URL",
-                "GENE_MODEL_URL"
+                "GENE_MODEL_URL",
+                "SANGER_READ_RUN"
             ],
             "title": "WorkflowParameterVariable",
             "type": "string"
