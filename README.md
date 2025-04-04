@@ -69,12 +69,14 @@ npm run build-brc-db
 
 to fetch a list of current workflows from https://iwc.galaxyproject.org/workflow_manifest.json.
 Only workflows for currently enabled categories are fetched.
-If necessary, update parameters that require a reference genome id, fasta or gtf file to include the variable slot, containing one of `ASSEMBLY_ID`, `ASSEMBLY_FASTA_URL`, or `GENE_MODEL_URL`.
+If necessary, update parameters that require a reference genome id, fasta or gtf file to include the variable slot,
+containing one of `ASSEMBLY_ID`, `ASSEMBLY_FASTA_URL`, `GENE_MODEL_URL`, or `SANGER_READ_RUN`.
 These values will be substituted with assembly-specific values at runtime.
 
 ## Editing the LinkML schemas
 
-If the LinkML schemas in `catalog/schema` are edited, the derived JSON schemas and TypeScript definitions should be updated
+If the LinkML schemas in `catalog/schema` are edited, the derived JSON schemas and TypeScript definitions should be
+updated
 as follows:
 
 1. Ensure that the Python virtual environment is activated, as described above.
@@ -82,7 +84,8 @@ as follows:
 
 ## Overview of automated checks on catalog content
 
-The `run-checks` GitHub workflow performs checks to ensure that the catalog data and schemas are well-formed; this is done by:
+The `run-checks` GitHub workflow performs checks to ensure that the catalog data and schemas are well-formed; this is
+done by:
 
 - Linting the schemas via `linkml-lint`.
 - Converting the schemas to Python, to catch any errors that occur.

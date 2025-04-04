@@ -211,7 +211,7 @@ workflows:
       on the combined normalized data, and retains only peaks whose summits overlap
       with intersections from a user-defined minimum number of replicates.
     ploidy: ANY
-    parameters: []
+    parameters: [ ]
     active: true
   - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-pe/versions/v1.3"
     categories:
@@ -225,7 +225,7 @@ workflows:
       normalized data, and retains only peaks whose summits overlap with intersections
       from a user-defined minimum number of replicates.
     ploidy: ANY
-    parameters: []
+    parameters: [ ]
     active: false
   - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-sr/versions/v1.3"
     categories:
@@ -239,7 +239,7 @@ workflows:
       normalized data, and retains only peaks whose summits overlap with intersections
       from a user-defined minimum number of replicates.
     ploidy: ANY
-    parameters: []
+    parameters: [ ]
     active: false
   - trs_id: "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.14"
     categories:
@@ -366,6 +366,7 @@ workflows:
           ext:
             - fastqsanger
             - fastqsanger.gz
+        variable: SANGER_READ_RUN
       - key: Annotation GTF
         variable: GENE_MODEL_URL
       - key: Genome fasta
@@ -509,7 +510,7 @@ workflows:
           class: text
     active: false
   - trs_id: "#workflow/github.com/iwc-workflows/mapseq-to-ampvis2/main/versions/v0.2"
-    categories: []
+    categories: [ ]
     workflow_name: MAPseq to ampvis2
     workflow_description:
       The MAPseq to Ampvis workflow processes MAPseq OTU tables

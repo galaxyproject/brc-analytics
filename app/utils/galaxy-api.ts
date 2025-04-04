@@ -32,6 +32,7 @@ const workflowLandingUrl = `${galaxyInstanceUrl}workflow_landings`;
  * @param workflowId - Value for the `workflow_id` parameter sent to the API.
  * @param referenceGenome - Genome version/assembly ID.
  * @param geneModelUrl - URL for gene model parameter sent to the API.
+ * @param readRuns - Read runs parameter sent to the API.
  * @param parameters - Parameters for this workflow.
  * @returns workflow landing URL.
  */
@@ -39,6 +40,7 @@ export async function getWorkflowLandingUrl(
   workflowId: string,
   referenceGenome: string,
   geneModelUrl: string | null,
+  readRuns: string | null,
   parameters: WorkflowParameter[]
 ): Promise<string> {
   const body: WorkflowLandingsBody = {
@@ -46,6 +48,7 @@ export async function getWorkflowLandingUrl(
     request_state: getWorkflowLandingsRequestState(
       referenceGenome,
       geneModelUrl,
+      readRuns,
       parameters
     ),
     workflow_id: `${DOCKSTORE_API_URL}/${workflowId}`,
@@ -74,6 +77,7 @@ function buildFastaUrl(identifier: string): string {
 function paramVariableToRequestValue(
   variable: WORKFLOW_PARAMETER_VARIABLE,
   geneModelUrl: string | null,
+  readRuns: string | null,
   referenceGenome: string
 ): WorkflowLandingsBodyRequestState[string] | null {
   // Because this `switch` has no default case, and the function doesn't allow `undefined` as a return type,
@@ -96,7 +100,13 @@ function paramVariableToRequestValue(
           }
         : null;
     case WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN:
-      return null; // TODO pass in necessary information and generate an actual value for this
+      return readRuns
+        ? {
+            ext: "fastqsanger.gz",
+            src: "url",
+            url: readRuns,
+          }
+        : null;
   }
 }
 
@@ -104,12 +114,14 @@ function paramVariableToRequestValue(
  * Get the appropriate `request_state` object for the given workflow ID and reference genome.
  * @param referenceGenome - Reference genome.
  * @param geneModelUrl - URL for gene model parameter.
+ * @param readRuns - Read runs parameter.
  * @param parameters - Parameters for this workflow.
  * @returns `request_state` value for the workflow landings request body.
  */
 function getWorkflowLandingsRequestState(
   referenceGenome: string,
   geneModelUrl: string | null,
+  readRuns: string | null,
   parameters: WorkflowParameter[]
 ): WorkflowLandingsBodyRequestState {
   const result: WorkflowLandingsBodyRequestState = {};
@@ -122,6 +134,7 @@ function getWorkflowLandingsRequestState(
       const value = paramVariableToRequestValue(
         variable,
         geneModelUrl,
+        readRuns,
         referenceGenome
       );
       if (value !== null) result[key] = value;
