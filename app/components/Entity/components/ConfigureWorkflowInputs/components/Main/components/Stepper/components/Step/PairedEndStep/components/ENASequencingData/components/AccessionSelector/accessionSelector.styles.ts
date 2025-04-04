@@ -2,6 +2,8 @@ import {
   inkLight,
   inkMain,
   smokeLight,
+  smokeMain,
+  white,
 } from "@databiosphere/findable-ui/lib/styles/common/mixins/colors";
 import { textBody400 } from "@databiosphere/findable-ui/lib/styles/common/mixins/fonts";
 import styled from "@emotion/styled";
@@ -9,7 +11,12 @@ import { Dialog } from "@mui/material";
 
 export const StyledDialog = styled(Dialog)`
   .MuiDialog-paper {
+    background-color: ${smokeMain};
+    gap: 1px;
+    max-width: 824px;
+
     .MuiDialogTitle-root {
+      background-color: ${white};
       font-size: 16px;
       font-weight: 500;
       line-height: 24px;
@@ -42,6 +49,10 @@ export const StyledDialog = styled(Dialog)`
           }
         }
       }
+    }
+
+    .MuiDialogActions-root {
+      background-color: ${white};
     }
   }
 `;

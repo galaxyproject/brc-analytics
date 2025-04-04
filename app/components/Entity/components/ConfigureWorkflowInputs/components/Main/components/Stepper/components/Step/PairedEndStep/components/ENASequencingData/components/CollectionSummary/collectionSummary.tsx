@@ -1,41 +1,29 @@
-import { Button, TableContainer, Toolbar, Typography } from "@mui/material";
-import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import { ReadRun } from "../../types";
+import {
+  Button,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Toolbar,
+  Typography,
+} from "@mui/material";
 import { GridPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import { GridTable } from "@databiosphere/findable-ui/lib/components/Table/table.styles";
 import { getColumnTrackSizing } from "@databiosphere/findable-ui/lib/components/TableCreator/options/columnTrackSizing/utils";
-import { TableHead } from "@databiosphere/findable-ui/lib/components/Table/components/TableHead/tableHead";
-import { ROW_DIRECTION } from "@databiosphere/findable-ui/lib/components/Table/common/entities";
-import { TableBody } from "@databiosphere/findable-ui/lib/components/Detail/components/Table/components/TableBody/tableBody";
-import { ROW_POSITION } from "@databiosphere/findable-ui/lib/components/Table/features/RowPosition/constants";
-import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/features/RowPreview/constants";
 import { StyledPaper } from "./collectionSummary.styles";
 import { ToolbarActions } from "@databiosphere/findable-ui/lib/components/Table/components/TableToolbar/tableToolbar.styles";
+import { Props } from "./types";
+import { flexRender } from "@tanstack/react-table";
 
 export const CollectionSummary = ({
+  isRunSelected,
   onClear,
   onEdit,
-  selectedReadRuns,
-}: {
-  onClear: () => void;
-  onEdit: () => void;
-  selectedReadRuns: ReadRun[];
-}): JSX.Element => {
-  const table = useReactTable({
-    _features: [ROW_POSITION, ROW_PREVIEW],
-    columns: [
-      {
-        accessorKey: "run_accession",
-        header: "Run accession",
-        meta: {
-          width: "1fr",
-        },
-      },
-    ],
-    data: selectedReadRuns,
-    getCoreRowModel: getCoreRowModel(),
-  });
-  const count = table.getRowCount();
+  table,
+}: Props): JSX.Element | null => {
+  const count = 1;
+  if (!isRunSelected) return null;
   return (
     <StyledPaper variant="table">
       <GridPaper>
@@ -55,17 +43,46 @@ export const CollectionSummary = ({
         <TableContainer>
           <GridTable
             gridTemplateColumns={getColumnTrackSizing(
-              table.getVisibleFlatColumns()
+              table
+                .getVisibleFlatColumns()
+                .filter((column) => column.id === "run_accession")
             )}
           >
-            <TableHead
-              rowDirection={ROW_DIRECTION.DEFAULT}
-              tableInstance={table}
-            />
-            <TableBody
-              rowDirection={ROW_DIRECTION.DEFAULT}
-              tableInstance={table}
-            />
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableHead key={headerGroup.id}>
+                <TableRow>
+                  {headerGroup.headers
+                    .filter((header) => header.column.id === "run_accession")
+                    .map((header) => (
+                      <TableCell key={header.id}>
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                </TableRow>
+              </TableHead>
+            ))}
+            <TableBody>
+              {table.getSelectedRowModel().rows.map((row) => (
+                <TableRow key={row.id}>
+                  {row
+                    .getVisibleCells()
+                    .filter((cell) => cell.column.id === "run_accession")
+                    .map((cell) => {
+                      return (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      );
+                    })}
+                </TableRow>
+              ))}
+            </TableBody>
           </GridTable>
         </TableContainer>
       </GridPaper>

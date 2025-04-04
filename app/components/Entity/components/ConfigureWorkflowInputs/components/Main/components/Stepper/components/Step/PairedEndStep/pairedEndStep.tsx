@@ -2,7 +2,6 @@ import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/componen
 import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepContent/stepContent";
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { StepProps } from "../types";
-import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Optional/optional";
 import { Button } from "@mui/material";
 import { useToggleButtonGroup } from "../hooks/UseToggleButtonGroup/useToggleButtonGroup";
 import { BUTTON_PROPS } from "../components/Button/constants";
@@ -28,12 +27,11 @@ export const PairedEndStep = ({
   const { onChange, value } = useToggleButtonGroup(VIEW.ENA);
   return (
     <Step active={active} completed={completed} index={index}>
-      <StepLabel optional={<Optional>TODO</Optional>}>{entryLabel}</StepLabel>
+      <StepLabel>{entryLabel}</StepLabel>
       <StepContent>
         <ToggleButtonGroup onChange={onChange} value={value} />
         {value === VIEW.ENA ? (
           <ENASequencingData
-            clearErrors={ena.clearErrors}
             entryKey={entryKey}
             entryLabel={entryLabel}
             onConfigure={onConfigure}

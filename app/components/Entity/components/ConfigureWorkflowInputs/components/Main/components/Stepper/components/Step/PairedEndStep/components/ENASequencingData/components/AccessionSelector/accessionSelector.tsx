@@ -21,17 +21,15 @@ import { ErrorIcon } from "@databiosphere/findable-ui/src/components/common/Cust
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 
 export const AccessionSelector = ({
-  clearErrors,
   onClose,
+  onContinue,
   onRequestData,
-  onSelect,
   open,
   requestStatus,
 }: Props): JSX.Element => {
-  const error = requestStatus.errors?.accession;
-  const isError = Boolean(error);
   return (
     <StyledDialog
+      fullWidth
       onClose={onClose}
       open={open}
       PaperProps={{
@@ -39,20 +37,22 @@ export const AccessionSelector = ({
         onSubmit: (event: FormEvent<HTMLFormElement>) =>
           onRequestData(event, {
             onSuccess: () => {
+              onContinue();
               onClose();
-              onSelect();
             },
           }),
       }}
     >
       <DialogTitle onClose={onClose} title="Select initial filtering" />
       <DialogContent>
-        <FormControl disabled={requestStatus.loading} error={isError}>
+        <FormControl
+          disabled={requestStatus.loading}
+          error={requestStatus.error}
+        >
           <FormLabel>Run, experiment, sample, or study accessions</FormLabel>
           <OutlinedInput
             disabled={requestStatus.loading}
             name="accession"
-            onChange={() => clearErrors("accession")}
             size="small"
           />
           <FormHelperText component="div">
@@ -61,9 +61,9 @@ export const AccessionSelector = ({
               color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
             >
               Separate multiple accessions with any character (like commas or
-              spaces). SRR13423209, PRJNA68264, PRJNA604451!
+              spaces).
             </Typography>
-            {isError && (
+            {requestStatus.error && (
               <Grid2
                 alignItems="center"
                 columnGap={1}
@@ -71,7 +71,7 @@ export const AccessionSelector = ({
                 direction="row"
               >
                 <ErrorIcon fontSize="xxsmall" />
-                {error}
+                {requestStatus.errors?.accession}
               </Grid2>
             )}
           </FormHelperText>

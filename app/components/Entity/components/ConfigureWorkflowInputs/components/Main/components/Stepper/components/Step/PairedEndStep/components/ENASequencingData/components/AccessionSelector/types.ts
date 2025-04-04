@@ -1,10 +1,9 @@
-import { ClearErrors, OnRequestData, RequestStatus } from "../../hooks/UseENA/types";
+import { OnRequestData, RequestStatus } from "../../hooks/UseENA/types";
 
 export interface Props {
-  clearErrors: ClearErrors;
   onClose: () => void;
-  open: boolean;
+  onContinue: () => void;
   onRequestData: OnRequestData;
-  onSelect: () => void;
+  open: boolean;
   requestStatus: RequestStatus;
 }

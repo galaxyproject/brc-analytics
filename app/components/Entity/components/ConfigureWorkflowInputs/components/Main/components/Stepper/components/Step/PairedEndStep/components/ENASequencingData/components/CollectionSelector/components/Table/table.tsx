@@ -1,5 +1,3 @@
-import { Table as TanStackTable } from "@tanstack/react-table";
-import { ReadRun } from "../../../../types";
 import { GridTable } from "@databiosphere/findable-ui/lib/components/Table/table.styles";
 import { TableHead } from "@databiosphere/findable-ui/lib/components/Table/components/TableHead/tableHead";
 import { ROW_DIRECTION } from "@databiosphere/findable-ui/lib/components/Table/common/entities";
@@ -8,16 +6,13 @@ import { StyledRoundedPaper } from "./table.styles";
 import { GridPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import { TableContainer } from "@mui/material";
 import { getColumnTrackSizing } from "@databiosphere/findable-ui/lib/components/TableCreator/options/columnTrackSizing/utils";
+import { Props } from "./types";
 
-export const Table = ({
-  table,
-}: {
-  table: TanStackTable<ReadRun>;
-}): JSX.Element => {
+export const Table = ({ table }: Props): JSX.Element => {
   return (
     <StyledRoundedPaper variant="table">
       <GridPaper>
-        <TableContainer sx={{ maxHeight: "100%", overflow: "hidden" }}>
+        <TableContainer sx={{ maxHeight: "100%", overflowY: "hidden" }}>
           <GridTable
             gridTemplateColumns={getColumnTrackSizing(
               table.getVisibleFlatColumns()

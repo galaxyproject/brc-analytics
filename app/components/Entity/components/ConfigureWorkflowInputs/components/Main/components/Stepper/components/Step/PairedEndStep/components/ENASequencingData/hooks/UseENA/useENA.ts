@@ -7,11 +7,6 @@ export const useENA = <T>(): UseENA<T> => {
   const { data, isLoading: loading, run } = useAsync<T[]>();
   const [error, setError] = useState<boolean>(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [success, setSuccess] = useState(Boolean(data));
-
-  const clearErrors = useCallback((fieldName: string) => {
-    setErrors((prevErrors) => ({ ...prevErrors, [fieldName]: "" }));
-  }, []);
 
   const onRequestData = useCallback(
     async (event: FormEvent, submitOptions: SubmitOptions): Promise<void> => {
@@ -21,11 +16,13 @@ export const useENA = <T>(): UseENA<T> => {
       const accession = formData.get("accession");
 
       if (!accession) {
+        setError(true);
         setErrors({ accession: "Accession is required." });
         return;
       }
 
       if (typeof accession !== "string") {
+        setError(true);
         setErrors({ accession: "Invalid accession type." });
         return;
       }
@@ -33,6 +30,7 @@ export const useENA = <T>(): UseENA<T> => {
       const accessionType = getAccessionType(accession);
 
       if (!accessionType) {
+        setError(true);
         setErrors({ accession: "Unsupported accession type." });
         return;
       }
@@ -43,20 +41,17 @@ export const useENA = <T>(): UseENA<T> => {
             accession,
             accessionType,
             submitOptions: {
-              ...submitOptions,
               onError: () => {
+                setError(true);
                 setErrors({
                   accession:
                     "Accessions were not found. Please check the IDs and try again.",
                 });
-                setError(true);
-                setSuccess(false);
                 submitOptions.onError?.();
               },
               onSuccess: () => {
-                setErrors({});
                 setError(false);
-                setSuccess(true);
+                setErrors({});
                 submitOptions.onSuccess?.();
               },
             },
@@ -70,9 +65,8 @@ export const useENA = <T>(): UseENA<T> => {
   );
 
   return {
-    clearErrors,
     data,
     onRequestData,
-    requestStatus: { error, errors, loading, success },
+    requestStatus: { error, errors, loading },
   };
 };

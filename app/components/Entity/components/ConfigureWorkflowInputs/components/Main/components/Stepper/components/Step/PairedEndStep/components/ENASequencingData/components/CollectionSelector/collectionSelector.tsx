@@ -12,6 +12,7 @@ import { Table } from "./components/Table/table";
 export const CollectionSelector = ({
   entryKey,
   entryLabel,
+  isRunSelected,
   onClose,
   onConfigure,
   open,
@@ -23,14 +24,6 @@ export const CollectionSelector = ({
       PaperProps={{
         component: "form",
         onSubmit: (event: FormEvent<HTMLFormElement>) => event.preventDefault(),
-        sx: {
-          boxSizing: "border-box",
-          height: "100%",
-          margin: "64px 32px",
-          maxHeight: "calc(100% - 128px)",
-          maxWidth: "calc(100% - 64px)",
-          width: "100%",
-        },
       }}
     >
       <DialogTitle onClose={onClose} title="Select Sequencing Runs" />
@@ -47,14 +40,14 @@ export const CollectionSelector = ({
         </Button>
         <Button
           color={COLOR.PRIMARY}
-          disabled={!table.getIsSomeRowsSelected()}
+          disabled={!isRunSelected}
           onClick={() => {
             const selectedRows = table
               .getSelectedRowModel()
               .rows.map((row) => ({
                 key: row.original.fastq_ftp,
                 value: row.original.run_accession,
-              }));
+              })); // TODO potentially combine multiple runs into `;` separated string?
             onConfigure(entryKey, entryLabel, selectedRows);
             onClose();
           }}
