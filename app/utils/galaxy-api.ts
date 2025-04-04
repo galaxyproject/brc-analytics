@@ -75,7 +75,9 @@ function paramVariableToRequestValue(
   variable: WORKFLOW_PARAMETER_VARIABLE,
   geneModelUrl: string | null,
   referenceGenome: string
-): WorkflowLandingsBodyRequestState[string] | undefined {
+): WorkflowLandingsBodyRequestState[string] | null {
+  // Because this `switch` has no default case, and the function doesn't allow `undefined` as a return type,
+  // we ensure through TypeScript that all possible variables are handled.
   switch (variable) {
     case WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_ID:
       return referenceGenome;
@@ -92,7 +94,9 @@ function paramVariableToRequestValue(
             src: "url",
             url: geneModelUrl,
           }
-        : undefined;
+        : null;
+    case WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN:
+      return null; // TODO pass in necessary information and generate an actual value for this
   }
 }
 
@@ -120,7 +124,7 @@ function getWorkflowLandingsRequestState(
         geneModelUrl,
         referenceGenome
       );
-      if (value !== undefined) result[key] = value;
+      if (value !== null) result[key] = value;
     }
   }
   return result;

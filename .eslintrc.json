@@ -58,7 +58,8 @@
     "jsdoc/check-alignment": "error",
     "jsdoc/check-param-names": "error",
     "react-hooks/exhaustive-deps": "error",
-    "sonarjs/redundant-type-aliases": "warn"
+    "sonarjs/redundant-type-aliases": "warn",
+    "sonarjs/todo-tag": "warn"
   },
   "overrides": [
     {
