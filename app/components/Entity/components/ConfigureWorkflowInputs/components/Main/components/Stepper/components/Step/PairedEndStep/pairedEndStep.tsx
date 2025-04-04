@@ -11,6 +11,7 @@ import { VIEW } from "./components/ToggleButtonGroup/types";
 import { ENASequencingData } from "./components/ENASequencingData/enaSequencingData";
 import { useENA } from "./components/ENASequencingData/hooks/UseENA/useENA";
 import { ReadRun } from "./components/ENASequencingData/types";
+import { useTable } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseTable/hook";
 
 export const PairedEndStep = ({
   active,
@@ -23,6 +24,7 @@ export const PairedEndStep = ({
   onLaunch,
 }: StepProps): JSX.Element => {
   const ena = useENA<ReadRun>();
+  const table = useTable(ena.data);
   const { onChange, value } = useToggleButtonGroup(VIEW.ENA);
   return (
     <Step active={active} completed={completed} index={index}>
@@ -32,12 +34,12 @@ export const PairedEndStep = ({
         {value === VIEW.ENA ? (
           <ENASequencingData
             clearErrors={ena.clearErrors}
-            data={ena.data}
             entryKey={entryKey}
             entryLabel={entryLabel}
             onConfigure={onConfigure}
             onRequestData={ena.onRequestData}
             requestStatus={ena.requestStatus}
+            table={table}
           />
         ) : null}
         <Button

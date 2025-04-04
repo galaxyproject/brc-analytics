@@ -40,10 +40,7 @@ export const CollectionSelector = ({
       <DialogActions>
         <Button
           color={COLOR.SECONDARY}
-          onClick={() => {
-            table.resetRowSelection();
-            onClose();
-          }}
+          onClick={onClose}
           variant={VARIANT.CONTAINED}
         >
           Cancel

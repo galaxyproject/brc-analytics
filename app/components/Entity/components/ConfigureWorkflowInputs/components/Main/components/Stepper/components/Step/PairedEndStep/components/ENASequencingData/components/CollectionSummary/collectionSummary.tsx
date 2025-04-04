@@ -1,5 +1,5 @@
-import { Button, TableContainer, Toolbar } from "@mui/material";
-import { getCoreRowModel, Table, useReactTable } from "@tanstack/react-table";
+import { Button, TableContainer, Toolbar, Typography } from "@mui/material";
+import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { ReadRun } from "../../types";
 import { GridPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import { GridTable } from "@databiosphere/findable-ui/lib/components/Table/table.styles";
@@ -9,22 +9,19 @@ import { ROW_DIRECTION } from "@databiosphere/findable-ui/lib/components/Table/c
 import { TableBody } from "@databiosphere/findable-ui/lib/components/Detail/components/Table/components/TableBody/tableBody";
 import { ROW_POSITION } from "@databiosphere/findable-ui/lib/components/Table/features/RowPosition/constants";
 import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/features/RowPreview/constants";
-import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
 import { StyledPaper } from "./collectionSummary.styles";
-import { useMemo } from "react";
+import { ToolbarActions } from "@databiosphere/findable-ui/lib/components/Table/components/TableToolbar/tableToolbar.styles";
 
 export const CollectionSummary = ({
+  onClear,
   onEdit,
-  table,
+  selectedReadRuns,
 }: {
+  onClear: () => void;
   onEdit: () => void;
-  table: Table<ReadRun>;
+  selectedReadRuns: ReadRun[];
 }): JSX.Element => {
-  const selectedRows = useMemo(
-    () => table.getSelectedRowModel().rows.map((row) => row.original),
-    [table]
-  );
-  const tableInstance = useReactTable({
+  const table = useReactTable({
     _features: [ROW_POSITION, ROW_PREVIEW],
     columns: [
       {
@@ -35,37 +32,39 @@ export const CollectionSummary = ({
         },
       },
     ],
-    data: selectedRows,
-    enableRowPosition: false,
+    data: selectedReadRuns,
     getCoreRowModel: getCoreRowModel(),
-    initialState: {
-      columnVisibility: { [COLUMN_IDENTIFIER.ROW_POSITION]: false },
-    },
   });
+  const count = table.getRowCount();
   return (
     <StyledPaper variant="table">
       <GridPaper>
         <Toolbar variant="table">
-          <Button color="secondary" onClick={onEdit} variant="contained">
-            Edit list
-          </Button>
-          <Button color="secondary" onClick={onEdit} variant="contained">
-            Clear all
-          </Button>
+          <Typography variant="text-body-400">
+            {count} Collection{count > 1 ? "s" : ""} Selected
+          </Typography>
+          <ToolbarActions>
+            <Button color="secondary" onClick={onEdit} variant="contained">
+              Edit list
+            </Button>
+            <Button color="secondary" onClick={onClear} variant="contained">
+              Clear all
+            </Button>
+          </ToolbarActions>
         </Toolbar>
         <TableContainer>
           <GridTable
             gridTemplateColumns={getColumnTrackSizing(
-              tableInstance.getVisibleFlatColumns()
+              table.getVisibleFlatColumns()
             )}
           >
             <TableHead
               rowDirection={ROW_DIRECTION.DEFAULT}
-              tableInstance={tableInstance}
+              tableInstance={table}
             />
             <TableBody
               rowDirection={ROW_DIRECTION.DEFAULT}
-              tableInstance={tableInstance}
+              tableInstance={table}
             />
           </GridTable>
         </TableContainer>
