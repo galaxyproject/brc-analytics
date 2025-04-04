@@ -1,0 +1,78 @@
+outbreaks:
+  - taxonomy_id: 11320
+    priority: MODERATE
+    active: true
+    description:
+      path: outbreaks/avian_influenza.md
+    resources:
+      - title: "CDC: Current U.S. H5 bird flu situation summary"
+        url: "https://www.cdc.gov/bird-flu/situation-summary/?CDC_AAref_Val=https://www.cdc.gov/flu/avianflu/avian-flu-summary.htm"
+        type: REFERENCE
+      - title: "NCBI BioProject: U.S. H5N1 clade 2.3.4.4b immediate releases related to emergence and spread in dairy cattle"
+        url: "https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1102327"
+        type: DATA
+      - title: "NCBI Virus: Worldwide H5N1 sequence data since 2024"
+        url: "https://www.ncbi.nlm.nih.gov/labs/virus/vssi/#/virus?SeqType_s=Nucleotide&VirusLineage_ss=Influenza%20A%20virus,%20taxid:11320&CollectionDate_dr=2024-01-01%20TO%202030-01-01&Serotype_s=H5N1"
+        type: DATA
+      - title: "Galaxy workflow for analysis of avian influenza sequencing data"
+        url: "https://iwc.galaxyproject.org/workflow/%23workflow%2Fgithub.com%2Fiwc-workflows%2Finfluenza-isolates-consensus-and-subtyping%2Fmain/"
+        type: WORKFLOW
+      - title: "Galaxy tutorial: Avian influenza viral strain analysis from gene segment sequencing data"
+        url: "https://gxy.io/GTN:T00308"
+        type: REFERENCE
+      - title: "BV-BRC: Influenza A virus Taxonomy View"
+        url: "https://www.bv-brc.org/view/Taxonomy/11320"
+        type: REFERENCE
+
+  - taxonomy_id: 2697049
+    priority: HIGHEST
+    active: true
+    description:
+      path: outbreaks/covid19.md
+    resources:
+      - title: "WHO: Coronavirus disease (COVID-19) situation reports"
+        url: "https://www.who.int/emergencies/diseases/novel-coronavirus-2019/situation-reports"
+        type: REFERENCE
+      - title: "WHO COVID-19 Fact Sheet"
+        url: "https://www.who.int/news-room/fact-sheets/detail/coronavirus-disease-(covid-19)"
+        type: REFERENCE
+      - title: "BV-BRC: SARS-CoV-2 variants and lineages information"
+        url: "https://www.bv-brc.org/outbreaks/SARSCoV2/"
+        type: REFERENCE
+      - title: "CoVariants: Explore the SARS-CoV-2 lineage spectrum"
+        url: "https://covariants.org/"
+        type: REFERENCE
+      - title: "covSPECTRUM: In-depth exploration of public SARS-CoV-2 molecular surveillance data"
+        url: "https://open.cov-spectrum.org/explore/United%20States/AllSamples/Past6M"
+        type: REFERENCE
+      - title: "Galaxy workflows for analysis of SARS-CoV-2 sequencing data"
+        url: "https://galaxyproject.org/projects/covid19/workflows/"
+        type: WORKFLOW
+      - title: "Galaxy tutorial: Mutation calling, viral genome reconstruction and lineage/clade assignment from SARS-CoV-2 sequencing data"
+        url: "https://gxy.io/GTN:T00316"
+        type: REFERENCE
+
+  - taxonomy_id: 10244
+    priority: MODERATE-HIGH
+    active: true
+    description:
+      path: outbreaks/mpox.md
+    resources:
+      - title: "WHO | Mpox outbreak: global trends"
+        url: "https://worldhealthorg.shinyapps.io/mpx_global/"
+        type: REFERENCE
+      - title: "NIH Mpox Research Agenda"
+        url: "https://www.niaid.nih.gov/news-events/nih-releases-mpox-research-agenda"
+        type: REFERENCE
+      - title: "Yale Medicine Mpox Fact Sheet"
+        url: "https://www.yalemedicine.org/conditions/monkeypox-mpox"
+        type: REFERENCE
+      - title: "Galaxy workflows for analysis of Mpox virus sequencing data"
+        url: "https://galaxyproject.org/projects/mpxv/"
+        type: WORKFLOW
+      - title: "Galaxy workflow for pox virus Illumina half-genome amplicon sequencing data"
+        url: "https://iwc.galaxyproject.org/workflow/%23workflow%2Fgithub.com%2Fiwc-workflows%2Fpox-virus-amplicon%2Fmain/"
+        type: WORKFLOW
+      - title: "Galaxy tutorial: Pox virus genome analysis from tiled-amplicon sequencing data"
+        url: "https://gxy.io/GTN:T00347"
+        type: REFERENCE
