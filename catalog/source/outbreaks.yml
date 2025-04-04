@@ -181,3 +181,32 @@ outbreaks:
       - title: "FungiDB | Genome Info and Stats"
         url: "https://fungidb.org/fungidb/app/search/organism/GenomeDataTypes/result?filterTerm=Histoplasma%20capsulatum"
         type: REFERENCE
+
+  - taxonomy_id: 5807
+    priority: MODERATE-HIGH
+    active: true
+    description:
+      path: outbreaks/cryptosporidium_parvum.md
+    resources:
+      - title: "CryptoDB | Genome Info and Stats"
+        url: "https://cryptodb.org/cryptodb/app/search/organism/GenomeDataTypes/result?filterTerm=Cryptosporidium%20parvum"
+        type: REFERENCE
+      - title: "CDC | Cryptosporidiosis Outbreaks — United States, 2009–2017"
+        url: "https://www.cdc.gov/mmwr/volumes/68/wr/mm6825a3.htm"
+        type: REFERENCE
+
+  - taxonomy_id: 5763
+    priority: MODERATE
+    active: true
+    description:
+      path: outbreaks/naegleria_fowleri.md
+    resources:
+      - title: "Oxford Academic | Fatal Naegleria fowleri Infection Acquired in Minnesota"
+        url: "https://academic.oup.com/cid/article-abstract/54/6/805/290592"
+        type: PUBLICATION
+      - title: "PLOS Pathogens | Enolase Inhibitors Research"
+        url: "https://journals.plos.org/plospathogens/article?id=10.1371/journal.ppat.1012412"
+        type: PUBLICATION
+      - title: "AmoebaDB | Genome Info and Stats"
+        url: "https://amoebadb.org/amoeba/app/search/organism/GenomeDataTypes/result?filterTerm=Naegleria%20fowleri"
+        type: REFERENCE
