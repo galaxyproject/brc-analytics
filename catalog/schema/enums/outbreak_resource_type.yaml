@@ -1,0 +1,13 @@
+id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/enums/outbreak_resource_type.yaml#
+name: enums_outbreak_resource_type
+
+enums:
+  OutbreakResourceType:
+    description: Possible types of an outbreak resource.
+    permissible_values:
+      - PUBLICATION:
+      - REFERENCE:
+      - NEWS:
+      - WORKFLOW:
+      - DATA:
+      - OTHER:

@@ -1,0 +1,12 @@
+id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/enums/outbreak_priority.yaml#
+name: enums_outbreak_priority
+
+enums:
+  OutbreakPriority:
+    description: Possible priorities of an outbreak.
+    permissible_values:
+      HIGHEST:
+      CRITICAL:
+      HIGH:
+      MODERATE-HIGH:
+      MODERATE:

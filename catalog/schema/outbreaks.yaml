@@ -1,0 +1,72 @@
+id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/outbreaks.yaml#
+name: outbreaks
+description: Schema for source outbreak info.
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+
+imports:
+  - linkml:types
+  - enums/outbreak_priority
+  - enums/outbreak_resource_type
+
+classes:
+  Outbreaks:
+    description: Object containing list of outbreaks.
+    tree_root: true
+    attributes:
+      outbreaks:
+        description: List of outbreaks.
+        required: true
+        multivalued: true
+        range: Outbreak
+
+  Outbreak:
+    description: Info for an outbreak.
+    attributes:
+      taxonomy_id:
+        description: The outbreak's NCBI taxonomy ID.
+        required: true
+        range: integer
+      priority:
+        description: The priority of the outbreak.
+        required: true
+        range: OutbreakPriority
+      resources:
+        description: The resources associated with the outbreak.
+        required: true
+        multivalued: true
+        range: OutbreakResource
+      description:
+        description: The description of the outbreak.
+        required: true
+        range: MarkdownFileReference
+      active:
+        description: Determines if outbreak should be included, as they presumably change over time.
+        required: true
+        range: boolean
+
+  OutbreakResource:
+    description: A resource associated with an outbreak.
+    attributes:
+      url:
+        description: The URL of the resource.
+        required: true
+        range: string
+      title:
+        description: The title of the resource.
+        required: true
+        range: string
+      type:
+        description: The type of the resource.
+        required: true
+        range: OutbreakResourceType
+
+  MarkdownFileReference:
+    description: A reference to a markdown file
+    attributes:
+      path:
+        description: Path to the markdown file
+        required: true
+        range: string
+        pattern: '.*\.md$'
