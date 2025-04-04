@@ -8,13 +8,19 @@ export const ACCESSION_TYPE_FIELD_MAP: Record<string, string> = {
 };
 
 export const ENA_FIELDS = [
-  "run_accession",
-  "fastq_ftp",
-  "fastq_aspera",
+  "base_count",
   "experiment_accession",
-  "study_accession",
-  "library_layout",
+  "fastq_ftp",
+  "fastq_md5",
   "instrument_model",
+  "instrument_platform",
+  "library_layout",
+  "library_strategy",
+  "read_count",
+  "run_accession",
+  "sample_accession",
+  "scientific_name",
+  "study_accession",
 ];
 
 const FIELDS = ENA_FIELDS.join(",");
@@ -27,7 +33,7 @@ export default async function handler(
     return res.status(405).json({ error: "Method Not Allowed" });
   }
 
-  const { accessionType, accessionId } = req.query;
+  const { accessionId, accessionType } = req.query;
 
   if (!accessionType || !accessionId) {
     return res

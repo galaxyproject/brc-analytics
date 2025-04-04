@@ -26,7 +26,6 @@ export const ENASequencingData = ({
   onConfigure,
   onRequestData,
   requestStatus,
-  ...props
 }: Props): JSX.Element => {
   const table = useReactTable<ReadRun>({
     _features: [ROW_POSITION, ROW_PREVIEW],
@@ -48,6 +47,11 @@ export const ENASequencingData = ({
         meta: META,
       },
       {
+        accessorKey: "sample_accession",
+        header: "Sample Accession",
+        meta: META,
+      },
+      {
         accessorKey: "study_accession",
         header: "Study Accession",
         meta: META,
@@ -65,11 +69,6 @@ export const ENASequencingData = ({
       {
         accessorKey: "instrument_model",
         header: "Instrument Model",
-        meta: META,
-      },
-      {
-        accessorKey: "sample_accession",
-        header: "Sample Accession",
         meta: META,
       },
       {
@@ -100,11 +99,10 @@ export const ENASequencingData = ({
     getRowId: (row) => row.run_accession,
   });
   const dialogProps = useDialog();
-  // console.log(table.getIsSomeRowsSelected());
   return (
     <Fragment>
       {table.getIsSomeRowsSelected() && !dialogProps.open ? (
-        <CollectionSummary table={table} />
+        <CollectionSummary table={table} onEdit={dialogProps.onOpen} />
       ) : (
         <DataSelector
           clearErrors={clearErrors}

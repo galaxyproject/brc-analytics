@@ -1,4 +1,4 @@
-import { TableContainer } from "@mui/material";
+import { Button, TableContainer, Toolbar } from "@mui/material";
 import { getCoreRowModel, Table, useReactTable } from "@tanstack/react-table";
 import { ReadRun } from "../../types";
 import { GridPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
@@ -14,15 +14,16 @@ import { StyledPaper } from "./collectionSummary.styles";
 import { useMemo } from "react";
 
 export const CollectionSummary = ({
+  onEdit,
   table,
 }: {
+  onEdit: () => void;
   table: Table<ReadRun>;
 }): JSX.Element => {
   const selectedRows = useMemo(
     () => table.getSelectedRowModel().rows.map((row) => row.original),
     [table]
   );
-  console.log("selectedRows", selectedRows);
   const tableInstance = useReactTable({
     _features: [ROW_POSITION, ROW_PREVIEW],
     columns: [
@@ -44,6 +45,14 @@ export const CollectionSummary = ({
   return (
     <StyledPaper variant="table">
       <GridPaper>
+        <Toolbar variant="table">
+          <Button color="secondary" onClick={onEdit} variant="contained">
+            Edit list
+          </Button>
+          <Button color="secondary" onClick={onEdit} variant="contained">
+            Clear all
+          </Button>
+        </Toolbar>
         <TableContainer>
           <GridTable
             gridTemplateColumns={getColumnTrackSizing(
