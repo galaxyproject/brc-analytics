@@ -1,6 +1,6 @@
-export interface ENAResponse {
-  readRun: ReadRun[];
-}
+import { OnConfigure } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { UseENA } from "./hooks/UseENA/types";
+import { StepProps } from "../../../types";
 
 export interface ReadRun {
   base_count: number;
@@ -18,4 +18,10 @@ export interface ReadRun {
   study_accession: string;
   submitted_ftp: string;
   tax_id: number;
+}
+
+export interface Props
+  extends UseENA<ReadRun>,
+    Pick<StepProps, "entryKey" | "entryLabel"> {
+  onConfigure: OnConfigure;
 }

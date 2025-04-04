@@ -7,6 +7,7 @@ import { TableBody } from "@databiosphere/findable-ui/lib/components/Detail/comp
 import { StyledRoundedPaper } from "./table.styles";
 import { GridPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import { TableContainer } from "@mui/material";
+import { getColumnTrackSizing } from "@databiosphere/findable-ui/lib/components/TableCreator/options/columnTrackSizing/utils";
 
 export const Table = ({
   table,
@@ -16,8 +17,13 @@ export const Table = ({
   return (
     <StyledRoundedPaper variant="table">
       <GridPaper>
-        <TableContainer>
-          <GridTable gridTemplateColumns="repeat(12, minmax(120px, 1fr))">
+        <TableContainer sx={{ maxHeight: "100%", overflow: "hidden" }}>
+          <GridTable
+            gridTemplateColumns={getColumnTrackSizing(
+              table.getVisibleFlatColumns()
+            )}
+            stickyHeader
+          >
             <TableHead
               rowDirection={ROW_DIRECTION.DEFAULT}
               tableInstance={table}

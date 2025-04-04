@@ -22,7 +22,7 @@ export interface SubmitOptions {
 
 export interface UseENA<T> {
   clearErrors: ClearErrors;
-  data?: T;
+  data?: T[];
   onRequestData: OnRequestData;
   requestStatus: RequestStatus;
 }

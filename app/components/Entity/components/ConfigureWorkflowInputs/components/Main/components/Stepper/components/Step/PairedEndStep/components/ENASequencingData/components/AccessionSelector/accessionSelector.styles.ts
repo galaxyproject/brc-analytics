@@ -1,7 +1,7 @@
 import {
-  smokeLight,
-  inkMain,
   inkLight,
+  inkMain,
+  smokeLight,
 } from "@databiosphere/findable-ui/lib/styles/common/mixins/colors";
 import { textBody400 } from "@databiosphere/findable-ui/lib/styles/common/mixins/fonts";
 import styled from "@emotion/styled";
@@ -35,6 +35,8 @@ export const StyledDialog = styled(Dialog)`
         }
 
         .MuiFormHelperText-root {
+          margin: 0;
+
           &:not(.Mui-error) {
             color: ${inkLight};
           }

@@ -22,11 +22,11 @@ import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/m
 
 export const AccessionSelector = ({
   clearErrors,
-  onRequestData,
-  requestStatus,
   onClose,
+  onRequestData,
   onSelect,
   open,
+  requestStatus,
 }: Props): JSX.Element => {
   const error = requestStatus.errors?.accession;
   const isError = Boolean(error);
@@ -55,10 +55,13 @@ export const AccessionSelector = ({
             onChange={() => clearErrors("accession")}
             size="small"
           />
-          <FormHelperText>
-            <Typography color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}>
+          <FormHelperText component="div">
+            <Typography
+              component="div"
+              color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
+            >
               Separate multiple accessions with any character (like commas or
-              spaces). SRR13423209, PRJNA68264
+              spaces). SRR13423209, PRJNA68264, PRJNA604451!
             </Typography>
             {isError && (
               <Grid2

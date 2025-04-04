@@ -1,11 +1,10 @@
 import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
 import { FormEvent, useCallback, useState } from "react";
-import { fetchENAData } from "./utils";
-import { UseENA, SubmitOptions } from "./types";
-import { getAccessionType } from "./utils";
+import { fetchENAData, getAccessionType } from "./utils";
+import { SubmitOptions, UseENA } from "./types";
 
 export const useENA = <T>(): UseENA<T> => {
-  const { data, isLoading: loading, run } = useAsync<T>();
+  const { data, isLoading: loading, run } = useAsync<T[]>();
   const [error, setError] = useState<boolean>(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [success, setSuccess] = useState(Boolean(data));
@@ -45,12 +44,6 @@ export const useENA = <T>(): UseENA<T> => {
             accessionType,
             submitOptions: {
               ...submitOptions,
-              onSuccess: () => {
-                setErrors({});
-                setError(false);
-                setSuccess(true);
-                submitOptions.onSuccess?.();
-              },
               onError: () => {
                 setErrors({
                   accession:
@@ -59,6 +52,12 @@ export const useENA = <T>(): UseENA<T> => {
                 setError(true);
                 setSuccess(false);
                 submitOptions.onError?.();
+              },
+              onSuccess: () => {
+                setErrors({});
+                setError(false);
+                setSuccess(true);
+                submitOptions.onSuccess?.();
               },
             },
           })

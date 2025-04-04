@@ -7,72 +7,16 @@ import {
   VARIANT,
 } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
 import { FormEvent } from "react";
-import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { Table } from "./components/Table/table";
-import { ROW_POSITION } from "@databiosphere/findable-ui/lib/components/Table/features/RowPosition/constants";
-import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/features/RowPreview/constants";
 
 export const CollectionSelector = ({
-  readRuns,
+  entryKey,
+  entryLabel,
   onClose,
+  onConfigure,
   open,
+  table,
 }: Props): JSX.Element => {
-  const table = useReactTable({
-    _features: [ROW_POSITION, ROW_PREVIEW],
-    data: readRuns,
-    enableRowSelection: true,
-    getCoreRowModel: getCoreRowModel(),
-    columns: [
-      {
-        header: "Run Accession",
-        accessorKey: "run_accession",
-      },
-      {
-        header: "Fastq FTP",
-        accessorKey: "fastq_ftp",
-      },
-      {
-        header: "Experiment Accession",
-        accessorKey: "experiment_accession",
-      },
-      {
-        header: "Study Accession",
-        accessorKey: "study_accession",
-      },
-      {
-        header: "Scientific Name",
-        accessorKey: "scientific_name",
-      },
-      {
-        header: "Instrument Platform",
-        accessorKey: "instrument_platform",
-      },
-      {
-        header: "Instrument Model",
-        accessorKey: "instrument_model",
-      },
-      {
-        header: "Sample Accession",
-        accessorKey: "sample_accession",
-      },
-      {
-        header: "Library Strategy",
-        accessorKey: "library_strategy",
-      },
-      {
-        header: "Library Layout",
-        accessorKey: "library_layout",
-      },
-      {
-        header: "Read Count",
-        accessorKey: "read_count",
-      },
-      {
-        header: "Base Count",
-        accessorKey: "base_count",
-      },
-    ],
-  });
   return (
     <StyledDialog
       open={open}
@@ -96,12 +40,29 @@ export const CollectionSelector = ({
       <DialogActions>
         <Button
           color={COLOR.SECONDARY}
-          onClick={onClose}
+          onClick={() => {
+            table.resetRowSelection();
+            onClose();
+          }}
           variant={VARIANT.CONTAINED}
         >
           Cancel
         </Button>
-        <Button color={COLOR.PRIMARY} type="submit" variant={VARIANT.CONTAINED}>
+        <Button
+          color={COLOR.PRIMARY}
+          disabled={!table.getIsSomeRowsSelected()}
+          onClick={() => {
+            const selectedRows = table
+              .getSelectedRowModel()
+              .rows.map((row) => ({
+                key: row.original.fastq_ftp,
+                value: row.original.run_accession,
+              }));
+            onConfigure(entryKey, entryLabel, selectedRows);
+            onClose();
+          }}
+          variant={VARIANT.CONTAINED}
+        >
           Add Sequencing Run
         </Button>
       </DialogActions>
