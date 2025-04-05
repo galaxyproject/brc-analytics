@@ -13,10 +13,10 @@ import { RowSelectionState } from "@tanstack/table-core";
 export const CollectionSelector = ({
   entryKey,
   entryLabel,
-  isRunSelected,
   onClose,
   onConfigure,
   open,
+  selectedCount,
   table,
 }: Props): JSX.Element => {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
@@ -46,7 +46,7 @@ export const CollectionSelector = ({
         </Button>
         <Button
           color={COLOR.PRIMARY}
-          disabled={!isRunSelected}
+          disabled={selectedCount === 0}
           onClick={() => {
             const selectedRows = table
               .getSelectedRowModel()
@@ -59,7 +59,8 @@ export const CollectionSelector = ({
           }}
           variant={VARIANT.CONTAINED}
         >
-          Add Sequencing Run
+          Add {selectedCount ? selectedCount : ""} Sequencing Run
+          {selectedCount > 1 ? "s" : ""}
         </Button>
       </DialogActions>
     </StyledDialog>

@@ -6,10 +6,10 @@ import { PAPER_PROPS, TYPOGRAPHY_PROPS } from "./constants";
 import { Props } from "./types";
 
 export const DataSelector = ({
-  isRunSelected,
   onOpen,
+  selectedCount,
 }: Props): JSX.Element | null => {
-  if (isRunSelected) return null;
+  if (selectedCount > 0) return null;
   return (
     <StyledPaper {...PAPER_PROPS}>
       <Typography {...TYPOGRAPHY_PROPS}>No Sequencing Data Selected</Typography>

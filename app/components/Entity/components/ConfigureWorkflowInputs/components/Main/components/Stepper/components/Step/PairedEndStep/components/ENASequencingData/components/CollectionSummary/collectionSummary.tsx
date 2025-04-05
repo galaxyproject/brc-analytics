@@ -17,13 +17,13 @@ import { Props } from "./types";
 import { flexRender } from "@tanstack/react-table";
 
 export const CollectionSummary = ({
-  isRunSelected,
   onClear,
   onEdit,
+  selectedCount,
   table,
 }: Props): JSX.Element | null => {
-  const count = 1;
-  if (!isRunSelected) return null;
+  const count = Object.keys(table.getState().rowSelection).length;
+  if (selectedCount === 0) return null;
   return (
     <StyledPaper variant="table">
       <GridPaper>

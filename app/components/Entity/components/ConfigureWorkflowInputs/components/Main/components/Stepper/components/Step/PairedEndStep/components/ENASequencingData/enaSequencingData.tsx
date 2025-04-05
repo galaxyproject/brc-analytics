@@ -16,12 +16,12 @@ export const ENASequencingData = ({
 }: Props): JSX.Element => {
   const accessionDialog = useDialog();
   const collectionDialog = useDialog();
-  const isRunSelected = Object.values(table.getState().rowSelection).length > 0;
+  const selectedCount = Object.values(table.getState().rowSelection).length;
   return (
     <Fragment>
       <DataSelector
-        isRunSelected={isRunSelected}
         onOpen={accessionDialog.onOpen}
+        selectedCount={selectedCount}
       />
       <AccessionSelector
         onClose={accessionDialog.onClose}
@@ -33,19 +33,19 @@ export const ENASequencingData = ({
       <CollectionSelector
         entryKey={entryKey}
         entryLabel={entryLabel}
-        isRunSelected={isRunSelected}
         onClose={collectionDialog.onClose}
         onConfigure={onConfigure}
         open={collectionDialog.open}
+        selectedCount={selectedCount}
         table={table}
       />
       <CollectionSummary
-        isRunSelected={isRunSelected}
         onClear={() => {
           onConfigure(entryKey, entryLabel, [{ key: null, value: "None" }]);
           table.resetRowSelection();
         }}
         onEdit={collectionDialog.onOpen}
+        selectedCount={selectedCount}
         table={table}
       />
     </Fragment>
