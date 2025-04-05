@@ -1,0 +1,156 @@
+{
+    "$defs": {
+        "MarkdownFileReference": {
+            "additionalProperties": false,
+            "description": "A reference to a markdown file",
+            "properties": {
+                "path": {
+                    "description": "Path to the markdown file",
+                    "pattern": ".*\\.md$",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "path"
+            ],
+            "title": "MarkdownFileReference",
+            "type": "object"
+        },
+        "Outbreak": {
+            "additionalProperties": false,
+            "description": "Info for an outbreak.",
+            "properties": {
+                "active": {
+                    "description": "Determines if outbreak should be included, as they presumably change over time.",
+                    "type": "boolean"
+                },
+                "description": {
+                    "$ref": "#/$defs/MarkdownFileReference",
+                    "description": "The description of the outbreak."
+                },
+                "highlight_descendant_taxonomy_ids": {
+                    "description": "Taxonomy IDs of child taxa that should be highlighted.",
+                    "items": {
+                        "type": "integer"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "priority": {
+                    "$ref": "#/$defs/OutbreakPriority",
+                    "description": "The priority of the outbreak."
+                },
+                "resources": {
+                    "description": "The resources associated with the outbreak.",
+                    "items": {
+                        "$ref": "#/$defs/OutbreakResource"
+                    },
+                    "type": "array"
+                },
+                "taxonomy_id": {
+                    "description": "The outbreak's NCBI taxonomy ID.",
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "taxonomy_id",
+                "priority",
+                "resources",
+                "description",
+                "active"
+            ],
+            "title": "Outbreak",
+            "type": "object"
+        },
+        "OutbreakPriority": {
+            "description": "Possible priorities of an outbreak.",
+            "enum": [
+                "HIGHEST",
+                "CRITICAL",
+                "HIGH",
+                "MODERATE-HIGH",
+                "MODERATE"
+            ],
+            "title": "OutbreakPriority",
+            "type": "string"
+        },
+        "OutbreakResource": {
+            "additionalProperties": false,
+            "description": "A resource associated with an outbreak.",
+            "properties": {
+                "title": {
+                    "description": "The title of the resource.",
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/$defs/OutbreakResourceType",
+                    "description": "The type of the resource."
+                },
+                "url": {
+                    "description": "The URL of the resource.",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "url",
+                "title",
+                "type"
+            ],
+            "title": "OutbreakResource",
+            "type": "object"
+        },
+        "OutbreakResourceType": {
+            "description": "Possible types of an outbreak resource.",
+            "enum": [
+                "PUBLICATION",
+                "REFERENCE",
+                "NEWS",
+                "WORKFLOW",
+                "DATA",
+                "OTHER"
+            ],
+            "title": "OutbreakResourceType",
+            "type": "string"
+        },
+        "Outbreaks": {
+            "additionalProperties": false,
+            "description": "Object containing list of outbreaks.",
+            "properties": {
+                "outbreaks": {
+                    "description": "List of outbreaks.",
+                    "items": {
+                        "$ref": "#/$defs/Outbreak"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "outbreaks"
+            ],
+            "title": "Outbreaks",
+            "type": "object"
+        }
+    },
+    "$id": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/outbreaks.yaml#",
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "additionalProperties": true,
+    "description": "Object containing list of outbreaks.",
+    "metamodel_version": "1.7.0",
+    "properties": {
+        "outbreaks": {
+            "description": "List of outbreaks.",
+            "items": {
+                "$ref": "#/$defs/Outbreak"
+            },
+            "type": "array"
+        }
+    },
+    "required": [
+        "outbreaks"
+    ],
+    "title": "outbreaks",
+    "type": "object",
+    "version": null
+}

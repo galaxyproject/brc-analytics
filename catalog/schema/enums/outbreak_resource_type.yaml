@@ -5,9 +5,9 @@ enums:
   OutbreakResourceType:
     description: Possible types of an outbreak resource.
     permissible_values:
-      - PUBLICATION:
-      - REFERENCE:
-      - NEWS:
-      - WORKFLOW:
-      - DATA:
-      - OTHER:
+      PUBLICATION:
+      REFERENCE:
+      NEWS:
+      WORKFLOW:
+      DATA:
+      OTHER:
