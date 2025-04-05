@@ -26,6 +26,7 @@ export const SOURCE_GENOME_KEYS = [
   "taxonomicLevelSpecies",
   "taxonomicLevelStrain",
   "taxonomicLevelDomain",
+  "commonName",
   "taxonomyId",
   "ucscBrowser",
 ] as const;
