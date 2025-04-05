@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.11.0](https://github.com/galaxyproject/brc-analytics/compare/v0.10.0...v0.11.0) (2025-04-05)
+
+
+### Features
+
+* add species common names to data catalog ([#451](https://github.com/galaxyproject/brc-analytics/issues/451)) ([#458](https://github.com/galaxyproject/brc-analytics/issues/458)) ([3050521](https://github.com/galaxyproject/brc-analytics/commit/3050521002526afab647b7d1defa56e455aaa1d5))
+* add stub of SANGER_READ_RUN workflow parameter variable ([#459](https://github.com/galaxyproject/brc-analytics/issues/459)) ([#460](https://github.com/galaxyproject/brc-analytics/issues/460)) ([8b08415](https://github.com/galaxyproject/brc-analytics/commit/8b08415f3079dc819bf0fde5d77d8909ce216163))
+
 ## [0.10.0](https://github.com/galaxyproject/brc-analytics/compare/v0.9.0...v0.10.0) (2025-04-02)
 
 
