@@ -738,19 +738,3 @@ def build_files(
     qc_report_text = make_qc_report(**qc_report_params)
     with open(qc_report_path, "w") as file:
       file.write(qc_report_text)
-
-
-def test_post_request():
-  """
-  Test function to verify pagination works correctly
-  """
-  url = "https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/dataset_report"
-  taxons = [str(i) for i in range(1, 1000)]  # Test with a large number of taxons
-  reports = post_ncbi_request(url, {"taxons": taxons})
-  print(f"Retrieved {len(reports)} reports")
-  for i, report in enumerate(reports[:5]):
-    print(f"Report {i+1} - Tax ID: {report['taxonomy']['tax_id']}")
-
-
-if __name__ == "__main__":
-  test_post_request()
