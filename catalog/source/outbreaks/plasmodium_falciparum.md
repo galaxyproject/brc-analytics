@@ -1,4 +1,4 @@
-# Malaria (Plasmodium falciparum)
+# Plasmodium falciparum
 
 ## Overview
 
