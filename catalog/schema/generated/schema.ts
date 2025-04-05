@@ -15,7 +15,7 @@ export enum OutbreakPriority {
     HIGHEST = "HIGHEST",
     CRITICAL = "CRITICAL",
     HIGH = "HIGH",
-    MODERATE_HIGH = "MODERATE-HIGH",
+    MODERATE_HIGH = "MODERATE_HIGH",
     MODERATE = "MODERATE",
 };
 /**

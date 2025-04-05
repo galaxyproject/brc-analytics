@@ -8,5 +8,5 @@ enums:
       HIGHEST:
       CRITICAL:
       HIGH:
-      MODERATE-HIGH:
+      MODERATE_HIGH:
       MODERATE:

@@ -53,7 +53,7 @@ outbreaks:
         type: REFERENCE
 
   - taxonomy_id: 10244
-    priority: MODERATE-HIGH
+    priority: MODERATE_HIGH
     active: true
     description:
       path: outbreaks/mpox.md
@@ -183,7 +183,7 @@ outbreaks:
         type: REFERENCE
 
   - taxonomy_id: 5807
-    priority: MODERATE-HIGH
+    priority: MODERATE_HIGH
     active: true
     description:
       path: outbreaks/cryptosporidium_parvum.md
