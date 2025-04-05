@@ -8,6 +8,29 @@ export enum OrganismPloidy {
     POLYPLOID = "POLYPLOID",
 };
 /**
+* Possible priorities of an outbreak.
+*/
+export enum OutbreakPriority {
+    
+    HIGHEST = "HIGHEST",
+    CRITICAL = "CRITICAL",
+    HIGH = "HIGH",
+    MODERATE_HIGH = "MODERATE_HIGH",
+    MODERATE = "MODERATE",
+};
+/**
+* Possible types of an outbreak resource.
+*/
+export enum OutbreakResourceType {
+    
+    PUBLICATION = "PUBLICATION",
+    REFERENCE = "REFERENCE",
+    NEWS = "NEWS",
+    WORKFLOW = "WORKFLOW",
+    DATA = "DATA",
+    OTHER = "OTHER",
+};
+/**
 * Set of IDs of workflow categories.
 */
 export enum WorkflowCategoryId {
@@ -78,6 +101,56 @@ export interface Organism {
     taxonomy_id: number,
     /** The ploidies that the organism may have. */
     ploidy: OrganismPloidy[],
+}
+
+
+/**
+ * Object containing list of outbreaks.
+ */
+export interface Outbreaks {
+    /** List of outbreaks. */
+    outbreaks: Outbreak[],
+}
+
+
+/**
+ * Info for an outbreak.
+ */
+export interface Outbreak {
+    /** The outbreak's NCBI taxonomy ID. */
+    taxonomy_id: number,
+    /** The priority of the outbreak. */
+    priority: OutbreakPriority,
+    /** The resources associated with the outbreak. */
+    resources: OutbreakResource[],
+    /** The description of the outbreak. */
+    description: MarkdownFileReference,
+    /** Determines if outbreak should be included, as they presumably change over time. */
+    active: boolean,
+    /** Taxonomy IDs of child taxa that should be highlighted. */
+    highlight_descendant_taxonomy_ids?: number[] | null,
+}
+
+
+/**
+ * A resource associated with an outbreak.
+ */
+export interface OutbreakResource {
+    /** The URL of the resource. */
+    url: string,
+    /** The title of the resource. */
+    title: string,
+    /** The type of the resource. */
+    type: OutbreakResourceType,
+}
+
+
+/**
+ * A reference to a markdown file
+ */
+export interface MarkdownFileReference {
+    /** Path to the markdown file */
+    path: string,
 }
 
 

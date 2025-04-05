@@ -1,0 +1,268 @@
+outbreaks:
+  - taxonomy_id: 11320
+    priority: MODERATE
+    active: true
+    description:
+      path: outbreaks/avian_influenza.md
+    resources:
+      - title: "CDC: Current U.S. H5 bird flu situation summary"
+        url: "https://www.cdc.gov/bird-flu/situation-summary/?CDC_AAref_Val=https://www.cdc.gov/flu/avianflu/avian-flu-summary.htm"
+        type: REFERENCE
+      - title: "NCBI BioProject: U.S. H5N1 clade 2.3.4.4b immediate releases related to emergence and spread in dairy cattle"
+        url: "https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1102327"
+        type: DATA
+      - title: "NCBI Virus: Worldwide H5N1 sequence data since 2024"
+        url: "https://www.ncbi.nlm.nih.gov/labs/virus/vssi/#/virus?SeqType_s=Nucleotide&VirusLineage_ss=Influenza%20A%20virus,%20taxid:11320&CollectionDate_dr=2024-01-01%20TO%202030-01-01&Serotype_s=H5N1"
+        type: DATA
+      - title: "Galaxy workflow for analysis of avian influenza sequencing data"
+        url: "https://iwc.galaxyproject.org/workflow/%23workflow%2Fgithub.com%2Fiwc-workflows%2Finfluenza-isolates-consensus-and-subtyping%2Fmain/"
+        type: WORKFLOW
+      - title: "Galaxy tutorial: Avian influenza viral strain analysis from gene segment sequencing data"
+        url: "https://gxy.io/GTN:T00308"
+        type: REFERENCE
+      - title: "BV-BRC: Influenza A virus Taxonomy View"
+        url: "https://www.bv-brc.org/view/Taxonomy/11320"
+        type: REFERENCE
+
+  - taxonomy_id: 2697049
+    priority: HIGHEST
+    active: true
+    description:
+      path: outbreaks/covid19.md
+    resources:
+      - title: "WHO: Coronavirus disease (COVID-19) situation reports"
+        url: "https://www.who.int/emergencies/diseases/novel-coronavirus-2019/situation-reports"
+        type: REFERENCE
+      - title: "WHO COVID-19 Fact Sheet"
+        url: "https://www.who.int/news-room/fact-sheets/detail/coronavirus-disease-(covid-19)"
+        type: REFERENCE
+      - title: "BV-BRC: SARS-CoV-2 variants and lineages information"
+        url: "https://www.bv-brc.org/outbreaks/SARSCoV2/"
+        type: REFERENCE
+      - title: "CoVariants: Explore the SARS-CoV-2 lineage spectrum"
+        url: "https://covariants.org/"
+        type: REFERENCE
+      - title: "covSPECTRUM: In-depth exploration of public SARS-CoV-2 molecular surveillance data"
+        url: "https://open.cov-spectrum.org/explore/United%20States/AllSamples/Past6M"
+        type: REFERENCE
+      - title: "Galaxy workflows for analysis of SARS-CoV-2 sequencing data"
+        url: "https://galaxyproject.org/projects/covid19/workflows/"
+        type: WORKFLOW
+      - title: "Galaxy tutorial: Mutation calling, viral genome reconstruction and lineage/clade assignment from SARS-CoV-2 sequencing data"
+        url: "https://gxy.io/GTN:T00316"
+        type: REFERENCE
+
+  - taxonomy_id: 10244
+    priority: MODERATE_HIGH
+    active: true
+    description:
+      path: outbreaks/mpox.md
+    resources:
+      - title: "WHO | Mpox outbreak: global trends"
+        url: "https://worldhealthorg.shinyapps.io/mpx_global/"
+        type: REFERENCE
+      - title: "NIH Mpox Research Agenda"
+        url: "https://www.niaid.nih.gov/news-events/nih-releases-mpox-research-agenda"
+        type: REFERENCE
+      - title: "Yale Medicine Mpox Fact Sheet"
+        url: "https://www.yalemedicine.org/conditions/monkeypox-mpox"
+        type: REFERENCE
+      - title: "Galaxy workflows for analysis of Mpox virus sequencing data"
+        url: "https://galaxyproject.org/projects/mpxv/"
+        type: WORKFLOW
+      - title: "Galaxy workflow for pox virus Illumina half-genome amplicon sequencing data"
+        url: "https://iwc.galaxyproject.org/workflow/%23workflow%2Fgithub.com%2Fiwc-workflows%2Fpox-virus-amplicon%2Fmain/"
+        type: WORKFLOW
+      - title: "Galaxy tutorial: Pox virus genome analysis from tiled-amplicon sequencing data"
+        url: "https://gxy.io/GTN:T00347"
+        type: REFERENCE
+
+  - taxonomy_id: 1773
+    priority: CRITICAL
+    active: true
+    description:
+      path: outbreaks/tuberculosis.md
+    resources:
+      - title: "WHO | Tuberculosis Fact Sheet"
+        url: "https://www.who.int/news-room/fact-sheets/detail/tuberculosis"
+        type: REFERENCE
+      - title: "BV-BRC: Mycobacterium tuberculosis"
+        url: "https://www.bv-brc.org/view/Taxonomy/1773"
+        type: REFERENCE
+      - title: "NIH | TB Research Information"
+        url: "https://www.niaid.nih.gov/diseases-conditions/tuberculosis"
+        type: REFERENCE
+      - title: "WHO | Tuberculosis Deaths and Disease Increase During the COVID-19 Pandemic"
+        url: "https://www.who.int/news/item/27-10-2022-tuberculosis-deaths-and-disease-increase-during-the-covid-19-pandemic"
+        type: REFERENCE
+
+  - taxonomy_id: 5833
+    priority: HIGH
+    active: true
+    description:
+      path: outbreaks/malaria.md
+    resources:
+      - title: "WHO | Malaria Fact Sheet"
+        url: "https://www.who.int/news-room/fact-sheets/detail/malaria"
+        type: REFERENCE
+      - title: "NIH | Malaria Research Information"
+        url: "https://www.niaid.nih.gov/diseases-conditions/malaria"
+        type: REFERENCE
+      - title: "PlasmoDB | Genome Info and Stats"
+        url: "https://plasmodb.org/plasmo/app/search/organism/GenomeDataTypes/result?filterTerm=Plasmodium%20falciparum"
+        type: REFERENCE
+      - title: "Global malaria predictors at a localized scale"
+        url: "https://pubmed.ncbi.nlm.nih.gov/38045403/"
+        type: PUBLICATION
+
+  - taxonomy_id: 498019
+    priority: HIGH
+    active: true
+    description:
+      path: outbreaks/candida_auris.md
+    resources:
+      - title: "UC Davis Health | Candida auris Warning"
+        url: "https://health.ucdavis.edu/news/headlines/cdc-issues-warning-about-increase-of-drug-resistant-candida-auris-infections/2023/03"
+        type: OTHER
+      - title: "FungiDB | Genome Info and Stats"
+        url: "https://fungidb.org/fungidb/app/search/organism/GenomeDataTypes/result?filterTerm=Candida%20auris"
+        type: REFERENCE
+      - title: "NIH | Fungal Disease-Specific Research"
+        url: "https://www.niaid.nih.gov/diseases-conditions/fungal-disease-specific-research"
+        type: REFERENCE
+
+  - taxonomy_id: 5207
+    priority: HIGH
+    active: true
+    description:
+      path: outbreaks/cryptococcus_neoformans.md
+    resources:
+      - title: "DNDi | On World Meningitis Day, too many people are dying of cryptococcal meningitis in Africa"
+        url: "https://dndi.org/viewpoints/2024/on-world-meningitis-day-too-many-people-are-dying-of-cryptococcal-meningitis-in-africa/"
+        type: OTHER
+      - title: "Cryptococcal meningitis causes 15% of AIDS-related deaths globally"
+        url: "https://www.healio.com/news/infectious-disease/20170512/cryptococcal-meningitis-causes-15-of-aidsrelated-deaths-globally"
+        type: OTHER
+      - title: "The WHO fungal priority pathogens list as a game-changer"
+        url: "https://www.cidrap.umn.edu/antimicrobial-stewardship/who-fungal-priority-pathogens-list-game-changer"
+        type: OTHER
+      - title: "FungiDB | Genome Info and Stats"
+        url: "https://fungidb.org/fungidb/app/search/organism/GenomeDataTypes/result?filterTerm=Cryptococcus%20neoformans"
+        type: REFERENCE
+      - title: "NIH | Fungal Disease-Specific Research"
+        url: "https://www.niaid.nih.gov/diseases-conditions/fungal-disease-specific-research"
+        type: REFERENCE
+
+  - taxonomy_id: 199306
+    priority: HIGH
+    active: true
+    description:
+      path: outbreaks/coccidioides_posadasii.md
+    resources:
+      - title: "CDPH | Valley Fever Information"
+        url: "https://www.cdph.ca.gov/Programs/CID/DCDC/pages/Coccidioidomycosis.aspx"
+        type: REFERENCE
+      - title: "NIAID | Fungal Disease-Specific Research"
+        url: "https://www.niaid.nih.gov/diseases-conditions/fungal-disease-specific-research"
+        type: REFERENCE
+      - title: "FungiDB | Genome Info and Stats"
+        url: "https://fungidb.org/fungidb/app/search/organism/GenomeDataTypes/result?filterTerm=Coccidioides%20posadasii"
+        type: REFERENCE
+
+  - taxonomy_id: 5037
+    priority: HIGH
+    active: true
+    description:
+      path: outbreaks/histoplasma_capsulatum.md
+    resources:
+      - title: "NIH | Fungal Disease-Specific Research"
+        url: "https://www.niaid.nih.gov/diseases-conditions/fungal-disease-specific-research"
+        type: REFERENCE
+      - title: "FungiDB | Genome Info and Stats"
+        url: "https://fungidb.org/fungidb/app/search/organism/GenomeDataTypes/result?filterTerm=Histoplasma%20capsulatum"
+        type: REFERENCE
+
+  - taxonomy_id: 5807
+    priority: MODERATE_HIGH
+    active: true
+    description:
+      path: outbreaks/cryptosporidium_parvum.md
+    resources:
+      - title: "CryptoDB | Genome Info and Stats"
+        url: "https://cryptodb.org/cryptodb/app/search/organism/GenomeDataTypes/result?filterTerm=Cryptosporidium%20parvum"
+        type: REFERENCE
+      - title: "CDC | Cryptosporidiosis Outbreaks — United States, 2009–2017"
+        url: "https://www.cdc.gov/mmwr/volumes/68/wr/mm6825a3.htm"
+        type: REFERENCE
+
+  - taxonomy_id: 5763
+    priority: MODERATE
+    active: true
+    description:
+      path: outbreaks/naegleria_fowleri.md
+    resources:
+      - title: "Oxford Academic | Fatal Naegleria fowleri Infection Acquired in Minnesota"
+        url: "https://academic.oup.com/cid/article-abstract/54/6/805/290592"
+        type: PUBLICATION
+      - title: "PLOS Pathogens | Enolase Inhibitors Research"
+        url: "https://journals.plos.org/plospathogens/article?id=10.1371/journal.ppat.1012412"
+        type: PUBLICATION
+      - title: "AmoebaDB | Genome Info and Stats"
+        url: "https://amoebadb.org/amoeba/app/search/organism/GenomeDataTypes/result?filterTerm=Naegleria%20fowleri"
+        type: REFERENCE
+
+  - taxonomy_id: 5052
+    priority: HIGH
+    active: true
+    description:
+      path: outbreaks/aspergillus.md
+    highlight_descendant_taxonomy_ids:
+      - 746128
+      - 5059
+    resources:
+      - title: "NIAID | Fungal Disease-Specific Research"
+        url: "https://www.niaid.nih.gov/diseases-conditions/fungal-disease-specific-research"
+        type: REFERENCE
+      - title: "FungiDB | Genome Info and Stats"
+        url: "https://fungidb.org/fungidb/app/search/organism/GenomeDataTypes/result?filterTerm=Aspergillus"
+        type: REFERENCE
+
+  - taxonomy_id: 38574
+    priority: MODERATE
+    active: true
+    description:
+      path: outbreaks/leishmania.md
+    highlight_descendant_taxonomy_ids:
+      - 5661
+      - 5671
+    resources:
+      - title: "WHO | Leishmaniasis Information"
+        url: "https://www.who.int/news-room/fact-sheets/detail/leishmaniasis"
+        type: REFERENCE
+      - title: "NIAID | Leishmaniasis Research"
+        url: "https://www.niaid.nih.gov/diseases-conditions/leishmaniasis"
+        type: REFERENCE
+      - title: "TriTrypDB | Genome Info and Stats"
+        url: "https://tritrypdb.org/tritrypdb/app/search/organism/GenomeDataTypes/result?filterTerm=Leishmania%20donovani"
+        type: REFERENCE
+
+  - taxonomy_id: 4827
+    priority: MODERATE
+    active: true
+    description:
+      path: outbreaks/mucorales.md
+    highlight_descendant_taxonomy_ids:
+      - 688394
+      - 42458
+      - 58291
+      - 936053
+    resources:
+      - title: "WHO | COVID-19 associated mucormycosis"
+        url: "https://www.who.int/india/home/emergencies/coronavirus-disease-(covid-19)/mucormycosis"
+        type: REFERENCE
+      - title: "PubMed | Epidemiology and Pathophysiology of COVID-19-Associated Mucormycosis"
+        url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC8375614/"
+        type: PUBLICATION
+      - title: "FungiDB | Genome Info and Stats"
+        url: "https://fungidb.org/fungidb/app/search/organism/GenomeDataTypes/result?filterTerm=Mucor"
+        type: REFERENCE
