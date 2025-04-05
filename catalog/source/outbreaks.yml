@@ -210,3 +210,59 @@ outbreaks:
       - title: "AmoebaDB | Genome Info and Stats"
         url: "https://amoebadb.org/amoeba/app/search/organism/GenomeDataTypes/result?filterTerm=Naegleria%20fowleri"
         type: REFERENCE
+
+  - taxonomy_id: 5052
+    priority: HIGH
+    active: true
+    description:
+      path: outbreaks/aspergillus.md
+    highlight_descendant_taxonomy_ids:
+      - 746128
+      - 5059
+    resources:
+      - title: "NIAID | Fungal Disease-Specific Research"
+        url: "https://www.niaid.nih.gov/diseases-conditions/fungal-disease-specific-research"
+        type: REFERENCE
+      - title: "FungiDB | Genome Info and Stats"
+        url: "https://fungidb.org/fungidb/app/search/organism/GenomeDataTypes/result?filterTerm=Aspergillus"
+        type: REFERENCE
+
+  - taxonomy_id: 38574
+    priority: MODERATE
+    active: true
+    description:
+      path: outbreaks/leishmania.md
+    highlight_descendant_taxonomy_ids:
+      - 5661
+      - 5671
+    resources:
+      - title: "WHO | Leishmaniasis Information"
+        url: "https://www.who.int/news-room/fact-sheets/detail/leishmaniasis"
+        type: REFERENCE
+      - title: "NIAID | Leishmaniasis Research"
+        url: "https://www.niaid.nih.gov/diseases-conditions/leishmaniasis"
+        type: REFERENCE
+      - title: "TriTrypDB | Genome Info and Stats"
+        url: "https://tritrypdb.org/tritrypdb/app/search/organism/GenomeDataTypes/result?filterTerm=Leishmania%20donovani"
+        type: REFERENCE
+
+  - taxonomy_id: 4827
+    priority: MODERATE
+    active: true
+    description:
+      path: outbreaks/mucorales.md
+    highlight_descendant_taxonomy_ids:
+      - 688394
+      - 42458
+      - 58291
+      - 936053
+    resources:
+      - title: "WHO | COVID-19 associated mucormycosis"
+        url: "https://www.who.int/india/home/emergencies/coronavirus-disease-(covid-19)/mucormycosis"
+        type: REFERENCE
+      - title: "PubMed | Epidemiology and Pathophysiology of COVID-19-Associated Mucormycosis"
+        url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC8375614/"
+        type: PUBLICATION
+      - title: "FungiDB | Genome Info and Stats"
+        url: "https://fungidb.org/fungidb/app/search/organism/GenomeDataTypes/result?filterTerm=Mucor"
+        type: REFERENCE

@@ -1,4 +1,4 @@
-# Avian Influenza
+# Influenza A
 
 ## Overview
 

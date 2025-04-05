@@ -1,4 +1,4 @@
-# Coccidioides posadasii (Valley Fever)
+# Coccidioides posadasii
 
 ## Overview
 

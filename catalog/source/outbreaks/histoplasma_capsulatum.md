@@ -1,4 +1,4 @@
-# Histoplasma capsulatum (Histoplasmosis)
+# Histoplasma capsulatum
 
 ## Overview
 
