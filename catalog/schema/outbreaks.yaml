@@ -45,6 +45,11 @@ classes:
         description: Determines if outbreak should be included, as they presumably change over time.
         required: true
         range: boolean
+      highlight_descendant_taxonomy_ids:
+        description: Taxonomy IDs of child taxa that should be highlighted.
+        required: false
+        multivalued: true
+        range: integer
 
   OutbreakResource:
     description: A resource associated with an outbreak.

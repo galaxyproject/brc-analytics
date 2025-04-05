@@ -203,6 +203,7 @@ class Outbreak(ConfiguredBaseModel):
     resources: List[OutbreakResource] = Field(default=..., description="""The resources associated with the outbreak.""", json_schema_extra = { "linkml_meta": {'alias': 'resources', 'domain_of': ['Outbreak']} })
     description: MarkdownFileReference = Field(default=..., description="""The description of the outbreak.""", json_schema_extra = { "linkml_meta": {'alias': 'description', 'domain_of': ['Outbreak', 'WorkflowCategory']} })
     active: bool = Field(default=..., description="""Determines if outbreak should be included, as they presumably change over time.""", json_schema_extra = { "linkml_meta": {'alias': 'active', 'domain_of': ['Outbreak', 'Workflow']} })
+    highlight_descendant_taxonomy_ids: Optional[List[int]] = Field(default=None, description="""Taxonomy IDs of child taxa that should be highlighted.""", json_schema_extra = { "linkml_meta": {'alias': 'highlight_descendant_taxonomy_ids', 'domain_of': ['Outbreak']} })
 
 
 class OutbreakResource(ConfiguredBaseModel):

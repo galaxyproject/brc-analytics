@@ -127,6 +127,8 @@ export interface Outbreak {
     description: MarkdownFileReference,
     /** Determines if outbreak should be included, as they presumably change over time. */
     active: boolean,
+    /** Taxonomy IDs of child taxa that should be highlighted. */
+    highlight_descendant_taxonomy_ids?: number[] | null,
 }
 
 
