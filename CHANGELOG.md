@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.11.0](https://github.com/galaxyproject/brc-analytics/compare/v0.10.0...v0.11.0) (2025-04-07)
+
+
+### Features
+
+* add common name column and filter to organisms list ([#463](https://github.com/galaxyproject/brc-analytics/issues/463)) ([#464](https://github.com/galaxyproject/brc-analytics/issues/464)) ([74ec338](https://github.com/galaxyproject/brc-analytics/commit/74ec338ccb9882a5317b711069b8daa0c5a741f3))
+* add outbreak schema and initial outbreaks ([#450](https://github.com/galaxyproject/brc-analytics/issues/450)) ([#462](https://github.com/galaxyproject/brc-analytics/issues/462)) ([617f361](https://github.com/galaxyproject/brc-analytics/commit/617f361bbcea719108463837931588cd8fd427f5))
+* add species common names to data catalog ([#451](https://github.com/galaxyproject/brc-analytics/issues/451)) ([#458](https://github.com/galaxyproject/brc-analytics/issues/458)) ([3050521](https://github.com/galaxyproject/brc-analytics/commit/3050521002526afab647b7d1defa56e455aaa1d5))
+* add stub of SANGER_READ_RUN workflow parameter variable ([#459](https://github.com/galaxyproject/brc-analytics/issues/459)) ([#460](https://github.com/galaxyproject/brc-analytics/issues/460)) ([8b08415](https://github.com/galaxyproject/brc-analytics/commit/8b08415f3079dc819bf0fde5d77d8909ce216163))
+
 ## [0.10.0](https://github.com/galaxyproject/brc-analytics/compare/v0.9.0...v0.10.0) (2025-04-02)
 
 
