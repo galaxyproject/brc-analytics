@@ -29,6 +29,10 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
           },
           {
+            key: BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME,
+            label: BRC_DATA_CATALOG_CATEGORY_LABEL.COMMON_NAME,
+          },
+          {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
           },
@@ -188,12 +192,21 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
       },
       {
         componentConfig: {
+          component: C.BasicCell,
+          viewBuilder: V.buildCommonName,
+        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.COMMON_NAME,
+        id: BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME,
+        width: { max: "0.65fr", min: "auto" },
+      },
+      {
+        componentConfig: {
           component: C.NTagCell,
           viewBuilder: V.buildOrganismAssemblyTaxonomyIds,
         } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.ASSEMBLY_TAXONOMY_IDS,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.ASSEMBLY_TAXONOMY_IDS,
-        width: { max: "0.5fr", min: "164px" },
+        width: { max: "0.65fr", min: "164px" },
       },
       {
         componentConfig: {
@@ -202,7 +215,7 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
         } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_GROUP,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_GROUP,
-        width: { max: "0.5fr", min: "164px" },
+        width: { max: "0.65fr", min: "164px" },
       },
       {
         componentConfig: {
@@ -211,7 +224,7 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.ASSEMBLY_COUNT,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.ASSEMBLY_COUNT,
-        width: { max: "0.5fr", min: "164px" },
+        width: { max: "0.65fr", min: "164px" },
       },
     ],
     tableOptions: {

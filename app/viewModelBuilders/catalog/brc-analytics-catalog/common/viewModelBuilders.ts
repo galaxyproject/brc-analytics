@@ -167,6 +167,19 @@ export const buildChromosomes = (
 };
 
 /**
+ * Build props for the common name cell.
+ * @param organism - Organism entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildCommonName = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: organism.commonName,
+  };
+};
+
+/**
  * Build props for the coverage cell.
  * @param genome - Genome entity.
  * @returns Props to be used for the cell.
