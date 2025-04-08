@@ -384,7 +384,7 @@ def _id_to_gene_model_url(asm_id: str, session: requests.Session):
   ucsc_files_endpoint = "https://genome.ucsc.edu/list/files"
   download_base_url = "https://hgdownload.soe.ucsc.edu"
   #wait 1s because of rate limiting
-  time.sleep(1)
+  time.sleep(2)
   response = session.get(ucsc_files_endpoint, params={"genome": asm_id})
   try:
     response.raise_for_status()
@@ -699,13 +699,17 @@ def build_files(
   qc_report_params["inconsistent_taxonomy_ids"] = report_inconsistent_taxonomy_ids(genomes_with_species_df)
 
   assemblies_df = pd.DataFrame(requests.get(ucsc_assemblies_url).json()["data"])[["ucscBrowser", "genBank", "refSeq"]]
+  
+  # Create a mapping of both GenBank and RefSeq accessions to UCSC browser IDs
+  ucsc_mapping = pd.concat([
+    assemblies_df[["ucscBrowser", "genBank"]].rename(columns={"genBank": "accession"}),
+    assemblies_df[["ucscBrowser", "refSeq"]].rename(columns={"refSeq": "accession"})
+  ]).dropna().drop_duplicates(subset=["accession"])
 
-  gen_bank_merge_df = genomes_with_species_df.merge(assemblies_df, how="left", left_on="accession", right_on="genBank")
-  ref_seq_merge_df = genomes_with_species_df.merge(assemblies_df, how="left", left_on="accession", right_on="refSeq")
+  # Single merge with the combined mapping
+  genomes_df = genomes_with_species_df.merge(ucsc_mapping, how="left", on="accession")
 
   qc_report_params["missing_ucsc_assemblies"] = report_missing_values_from("accessions", "matched in assembly list", genomes_with_species_df["accession"], assemblies_df["genBank"], assemblies_df["refSeq"])
-
-  genomes_df = gen_bank_merge_df.combine_first(ref_seq_merge_df)
 
   if do_gene_model_urls:
     genomes_df = add_gene_model_url(genomes_df)
