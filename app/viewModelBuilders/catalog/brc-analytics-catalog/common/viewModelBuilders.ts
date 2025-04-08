@@ -8,6 +8,7 @@ import { ROUTES } from "../../../../../routes/constants";
 import {
   BRCDataCatalogGenome,
   BRCDataCatalogOrganism,
+  Workflow,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "../../../../components";
 import {
@@ -27,8 +28,7 @@ import {
   getOrganismId,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/utils";
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
-import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
-import { TEXT_BODY_SMALL_400 } from "@databiosphere/findable-ui/lib/theme/common/typography";
+import { ConfiguredInput } from "../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 
 /**
  * Build props for the accession cell.
@@ -89,6 +89,58 @@ export const buildAnnotationStatus = (
 };
 
 /**
+ * Build props for the assembly BackPageHero component.
+ * @param assembly - Assembly entity.
+ * @returns Props to be used for the BackPageHero component.
+ */
+export const buildAssemblyBackPageHero = (
+  assembly: BRCDataCatalogGenome
+): ComponentProps<typeof C.BackPageHero> => {
+  return {
+    breadcrumbs: getAssemblyBreadcrumbs(assembly),
+    title: "Select a Workflow",
+  };
+};
+
+/**
+ * Build props for the assembly details KeyValuePairs component.
+ * @param assembly - Assembly entity.
+ * @returns Props to be used for the KeyValuePairs component.
+ */
+export const buildAssemblyDetails = (
+  assembly: BRCDataCatalogGenome
+): ComponentProps<typeof C.KeyValuePairs> => {
+  const keyValuePairs = new Map<Key, Value>();
+  keyValuePairs.set(
+    BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
+    C.Link({
+      label: assembly.taxonomicLevelSpecies,
+      url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(assembly))}`,
+    })
+  );
+  const strain = getGenomeStrainText(assembly);
+  if (strain) {
+    keyValuePairs.set(
+      BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
+      strain
+    );
+  }
+  keyValuePairs.set(
+    BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
+    C.CopyText({
+      children: assembly.accession,
+      value: assembly.accession,
+    })
+  );
+  return {
+    KeyElType: C.KeyElType,
+    KeyValuesElType: (props) => C.Stack({ ...props, gap: 4 }),
+    ValueElType: C.ValueElType,
+    keyValuePairs,
+  };
+};
+
+/**
  * Build props for the assemblies cell.
  * @param organism - Genome entity.
  * @returns Props to be used for the cell.
@@ -111,6 +163,19 @@ export const buildChromosomes = (
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: genome.chromosomes,
+  };
+};
+
+/**
+ * Build props for the common name cell.
+ * @param organism - Organism entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildCommonName = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: organism.commonName,
   };
 };
 
@@ -479,96 +544,6 @@ export const buildGenomeAnalysisPortals = (
 };
 
 /**
- * Build props for the genome DetailViewHero component.
- * @param genome - Genome entity.
- * @returns Props to be used for the DetailViewHero component.
- */
-export const buildGenomeChooseAnalysisMethodDetailViewHero = (
-  genome: BRCDataCatalogGenome
-): ComponentProps<typeof C.BackPageHero> => {
-  return {
-    breadcrumbs: getGenomeEntityChooseAnalysisMethodBreadcrumbs(genome),
-    subTitle: C.Link({
-      TypographyProps: { color: "ink.light", variant: TEXT_BODY_SMALL_400 },
-      label: `Species: ${genome.taxonomicLevelSpecies}`,
-      underline: "hover",
-      url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(genome))}`,
-    }),
-    title: `Analyze in Galaxy - ${genome.accession}`,
-  };
-};
-
-/**
- * Build props for the genome detail KeyValuePairs component.
- * @param genome - Genome entity.
- * @returns Props to be used for the KeyValuePairs component.
- */
-export const buildGenomeDetails = (
-  genome: BRCDataCatalogGenome
-): ComponentProps<typeof C.KeyValuePairs> => {
-  const keyValuePairs = new Map<Key, Value>();
-  keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
-    C.Link({
-      label: genome.taxonomicLevelSpecies,
-      url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(genome))}`,
-    })
-  );
-  keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
-    getGenomeStrainText(genome, LABEL.UNSPECIFIED)
-  );
-  keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMY_ID,
-    genome.ncbiTaxonomyId
-  );
-  keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
-    C.CopyText({
-      children: genome.accession,
-      value: genome.accession,
-    })
-  );
-  keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.CHROMOSOMES,
-    genome.chromosomes ?? LABEL.UNSPECIFIED
-  );
-  keyValuePairs.set(BRC_DATA_CATALOG_CATEGORY_LABEL.IS_REF, genome.isRef);
-  keyValuePairs.set(BRC_DATA_CATALOG_CATEGORY_LABEL.LEVEL, genome.level);
-  keyValuePairs.set(BRC_DATA_CATALOG_CATEGORY_LABEL.LENGTH, genome.length);
-  keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_COUNT,
-    genome.scaffoldCount
-  );
-  keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_N50,
-    genome.scaffoldN50
-  );
-  keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_L50,
-    genome.scaffoldL50
-  );
-  keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.COVERAGE,
-    genome.coverage ?? LABEL.UNSPECIFIED
-  );
-  keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.GC_PERCENT,
-    genome.gcPercent
-  );
-  keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.ANNOTATION_STATUS,
-    genome.annotationStatus ?? LABEL.UNSPECIFIED
-  );
-  return {
-    KeyElType: C.KeyElType,
-    KeyValuesElType: (props) => C.Stack({ gap: 4, ...props }),
-    ValueElType: C.ValueElType,
-    keyValuePairs,
-  };
-};
-
-/**
  * Build props for the organism BackPageHero component.
  * @param organism - Organism entity.
  * @returns Props to be used for the BackPageHero component.
@@ -686,17 +661,59 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
 }
 
 /**
- * Get the genome entity breadcrumbs.
- * @param genome - Genome entity.
+ * Build props for the workflow configuration KeyValuePairs component.
+ * @param configuredInput - Configured inputs.
+ * @returns Props to be used for the KeyValuePairs component.
+ */
+export const buildWorkflowConfiguration = (
+  configuredInput: ConfiguredInput
+): ComponentProps<typeof C.KeyValuePairs> => {
+  const keyValuePairs = new Map<Key, Value>();
+  for (const { entryLabel, values } of Object.values(configuredInput)) {
+    if (values.length > 0) {
+      keyValuePairs.set(
+        entryLabel,
+        values.map(({ value }) => value).join(", ")
+      );
+    }
+  }
+  return {
+    KeyElType: C.KeyElType,
+    KeyValuesElType: (props) => C.Stack({ ...props, gap: 4 }),
+    ValueElType: C.TypographyWordBreak,
+    keyValuePairs,
+  };
+};
+
+/**
+ * Build props for the workflow details KeyValuePairs component.
+ * @param workflow - Workflow.
+ * @returns Props to be used for the KeyValuePairs component.
+ */
+export const buildWorkflowDetails = (
+  workflow: Workflow
+): ComponentProps<typeof C.KeyValuePairs> => {
+  const keyValuePairs = new Map<Key, Value>();
+  keyValuePairs.set("Workflow", workflow.workflowName);
+  keyValuePairs.set("Description", workflow.workflowDescription);
+  return {
+    KeyElType: C.KeyElType,
+    KeyValuesElType: (props) => C.Stack({ ...props, gap: 4 }),
+    ValueElType: C.ValueElType,
+    keyValuePairs,
+  };
+};
+
+/**
+ * Get the assembly breadcrumbs.
+ * @param assembly - Assembly entity.
  * @returns Breadcrumbs.
  */
-function getGenomeEntityChooseAnalysisMethodBreadcrumbs(
-  genome: BRCDataCatalogGenome
-): Breadcrumb[] {
+function getAssemblyBreadcrumbs(assembly: BRCDataCatalogGenome): Breadcrumb[] {
   return [
     { path: ROUTES.GENOMES, text: "Assemblies" },
-    { path: "", text: genome.accession },
-    { path: "", text: "Analyze" },
+    { path: "", text: assembly.accession },
+    { path: "", text: "Select a Workflow" },
   ];
 }
 

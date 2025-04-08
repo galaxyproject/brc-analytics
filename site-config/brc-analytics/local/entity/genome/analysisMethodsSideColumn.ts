@@ -16,6 +16,32 @@ export const sideColumn: ComponentsConfig = [
               {
                 children: [
                   {
+                    children: [
+                      {
+                        component: C.SectionTitle,
+                        props: {
+                          title: "Assembly Details",
+                        },
+                      } as ComponentConfig<typeof C.SectionTitle>,
+                      {
+                        component: C.KeyValuePairs,
+                        viewBuilder: V.buildAssemblyDetails,
+                      } as ComponentConfig<
+                        typeof C.KeyValuePairs,
+                        BRCDataCatalogGenome
+                      >,
+                    ],
+                    component: C.Grid,
+                    props: {
+                      gridSx: { gap: 4 },
+                    },
+                  } as ComponentConfig<typeof C.Grid>,
+                ],
+                component: C.GridPaperSection,
+              },
+              {
+                children: [
+                  {
                     component: C.SectionTitle,
                     props: {
                       title: "Resources",
@@ -28,32 +54,6 @@ export const sideColumn: ComponentsConfig = [
                     typeof C.AnalysisPortals,
                     BRCDataCatalogGenome
                   >,
-                ],
-                component: C.GridPaperSection,
-              },
-              {
-                children: [
-                  {
-                    children: [
-                      {
-                        component: C.SectionTitle,
-                        props: {
-                          title: "Assembly Details",
-                        },
-                      } as ComponentConfig<typeof C.SectionTitle>,
-                      {
-                        component: C.KeyValuePairs,
-                        viewBuilder: V.buildGenomeDetails,
-                      } as ComponentConfig<
-                        typeof C.KeyValuePairs,
-                        BRCDataCatalogGenome
-                      >,
-                    ],
-                    component: C.Grid,
-                    props: {
-                      gridSx: { gap: 4 },
-                    },
-                  } as ComponentConfig<typeof C.Grid>,
                 ],
                 component: C.GridPaperSection,
               },

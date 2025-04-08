@@ -4,12 +4,19 @@ import {
   WORKFLOW_PLOIDY,
 } from "./schema-entities";
 
+export interface WorkflowUrlParameter {
+  ext: string;
+  src: string;
+  url: string;
+}
+
 export type BRCCatalog = BRCDataCatalogGenome;
 
 export interface BRCDataCatalogGenome {
   accession: string;
   annotationStatus: string | null;
   chromosomes: number | null;
+  commonName: string | null;
   coverage: string | null;
   gcPercent: number | null;
   geneModelUrl: string | null;
@@ -41,6 +48,7 @@ export interface BRCDataCatalogGenome {
 export interface BRCDataCatalogOrganism {
   assemblyCount: number;
   assemblyTaxonomyIds: string[];
+  commonName: string | null;
   genomes: BRCDataCatalogGenome[];
   ncbiTaxonomyId: string;
   taxonomicGroup: string[];
@@ -73,6 +81,7 @@ export interface WorkflowCategory {
   category: string;
   description: string;
   name: string;
+  showComingSoon: boolean;
   workflows: Workflow[];
 }
 
@@ -87,5 +96,6 @@ export interface Workflow {
 
 export interface WorkflowParameter {
   key: string;
-  variable: WORKFLOW_PARAMETER_VARIABLE;
+  url_spec?: WorkflowUrlParameter;
+  variable?: WORKFLOW_PARAMETER_VARIABLE;
 }

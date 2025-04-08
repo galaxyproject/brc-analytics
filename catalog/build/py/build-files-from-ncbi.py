@@ -1,6 +1,7 @@
 from package.catalog_build import build_files
 
 ASSEMBLIES_PATH = "catalog/source/assemblies.yml"
+ORGANISMS_PATH = "catalog/source/organisms.yml"
 
 UCSC_ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.json"
 
@@ -47,5 +48,6 @@ if __name__ == "__main__":
     TREE_OUTPUT_PATH,
     TAXANOMIC_LEVELS_FOR_TREE,
     {"taxonomicGroup": TAXONOMIC_GROUPS_BY_TAXONOMY_ID},
-    qc_report_path=QC_REPORT_PATH
+    qc_report_path=QC_REPORT_PATH,
+    organisms_path=ORGANISMS_PATH
   )

@@ -8,3 +8,4 @@ enums:
       ASSEMBLY_ID:
       ASSEMBLY_FASTA_URL:
       GENE_MODEL_URL:
+      SANGER_READ_RUN:

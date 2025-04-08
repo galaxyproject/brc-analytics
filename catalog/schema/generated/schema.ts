@@ -8,6 +8,29 @@ export enum OrganismPloidy {
     POLYPLOID = "POLYPLOID",
 };
 /**
+* Possible priorities of an outbreak.
+*/
+export enum OutbreakPriority {
+    
+    HIGHEST = "HIGHEST",
+    CRITICAL = "CRITICAL",
+    HIGH = "HIGH",
+    MODERATE_HIGH = "MODERATE_HIGH",
+    MODERATE = "MODERATE",
+};
+/**
+* Possible types of an outbreak resource.
+*/
+export enum OutbreakResourceType {
+    
+    PUBLICATION = "PUBLICATION",
+    REFERENCE = "REFERENCE",
+    NEWS = "NEWS",
+    WORKFLOW = "WORKFLOW",
+    DATA = "DATA",
+    OTHER = "OTHER",
+};
+/**
 * Set of IDs of workflow categories.
 */
 export enum WorkflowCategoryId {
@@ -18,6 +41,7 @@ export enum WorkflowCategoryId {
     ASSEMBLY = "ASSEMBLY",
     GENOME_COMPARISONS = "GENOME_COMPARISONS",
     PROTEIN_FOLDING = "PROTEIN_FOLDING",
+    CONSENSUS_SEQUENCES = "CONSENSUS_SEQUENCES",
     OTHER = "OTHER",
 };
 /**
@@ -28,6 +52,7 @@ export enum WorkflowParameterVariable {
     ASSEMBLY_ID = "ASSEMBLY_ID",
     ASSEMBLY_FASTA_URL = "ASSEMBLY_FASTA_URL",
     GENE_MODEL_URL = "GENE_MODEL_URL",
+    SANGER_READ_RUN = "SANGER_READ_RUN",
 };
 /**
 * Possible ploidies supported by workflows.
@@ -80,6 +105,56 @@ export interface Organism {
 
 
 /**
+ * Object containing list of outbreaks.
+ */
+export interface Outbreaks {
+    /** List of outbreaks. */
+    outbreaks: Outbreak[],
+}
+
+
+/**
+ * Info for an outbreak.
+ */
+export interface Outbreak {
+    /** The outbreak's NCBI taxonomy ID. */
+    taxonomy_id: number,
+    /** The priority of the outbreak. */
+    priority: OutbreakPriority,
+    /** The resources associated with the outbreak. */
+    resources: OutbreakResource[],
+    /** The description of the outbreak. */
+    description: MarkdownFileReference,
+    /** Determines if outbreak should be included, as they presumably change over time. */
+    active: boolean,
+    /** Taxonomy IDs of child taxa that should be highlighted. */
+    highlight_descendant_taxonomy_ids?: number[] | null,
+}
+
+
+/**
+ * A resource associated with an outbreak.
+ */
+export interface OutbreakResource {
+    /** The URL of the resource. */
+    url: string,
+    /** The title of the resource. */
+    title: string,
+    /** The type of the resource. */
+    type: OutbreakResourceType,
+}
+
+
+/**
+ * A reference to a markdown file
+ */
+export interface MarkdownFileReference {
+    /** Path to the markdown file */
+    path: string,
+}
+
+
+/**
  * Object containing list of workflow categories.
  */
 export interface WorkflowCategories {
@@ -98,6 +173,8 @@ export interface WorkflowCategory {
     name: string,
     /** The description of the workflow category. */
     description: string,
+    /** Whether to show 'Coming Soon' for the workflow category when it is not available. */
+    show_coming_soon: boolean,
 }
 
 
@@ -148,8 +225,23 @@ export interface WorkflowParameter {
     key: string,
     /** A variable to substitute in as the value of the parameter. */
     variable?: WorkflowParameterVariable | null,
+    /** A direct URL specification for the parameter. */
+    url_spec?: WorkflowUrlSpec | null,
     /** Arbitrary data describing the type of the parameter, intended only as convenient reference for maintainers. */
     type_guide?: Any | null,
+}
+
+
+/**
+ * A URL specification for a workflow parameter.
+ */
+export interface WorkflowUrlSpec {
+    /** The file extension of the URL. */
+    ext: string,
+    /** The source type, typically 'url'. */
+    src: string,
+    /** The URL to the resource. */
+    url: string,
 }
 
 

@@ -29,57 +29,63 @@ def rate_limit_handler(request_call):
       return response
     raise
 
+
+def post_ncbi_request(url, json_data):
+  """
+  Makes a POST request to the NCBI API with error handling and rate limiting.
+  Handles pagination if the response contains next_page_token.
+  
+  Args:
+    url: The API endpoint URL
+    json_data: The data to send in the request body
+    
+  Returns:
+    List of all reports from paginated responses
+    
+  Raises:
+    Exception: If the request fails or contains errors
+  """
+  all_reports = []
+  page = 1
+  
+  while True:
+    print(f"Requesting page {page} of {url}")
+    
+    # Add page token to request if it exists
+    if "next_page_token" in json_data:
+      json_data["page_token"] = json_data.pop("next_page_token")
+    
+    response = requests.post(url, json=json_data)
+    response = rate_limit_handler(lambda: response)
+    
+    if response.status_code != 200:
+      raise Exception(f"Failed to fetch data: {response.status_code} {response.text}")
+    
+    data = response.json()
+    
+    if len(data["reports"][0].get("errors", [])) > 0:
+      raise Exception(data["reports"][0])
+    
+    all_reports.extend(data["reports"])
+    
+    next_page_token = data.get("next_page_token")
+    if not next_page_token:
+      break
+    
+    json_data["next_page_token"] = next_page_token
+    page += 1
+    
+  return all_reports
+
+
 def read_assemblies(assemblies_path):
   with open(assemblies_path) as stream:
     return pd.DataFrame(yaml.safe_load(stream)["assemblies"])
 
 
-def get_paginated_ncbi_results(base_url, query_description):
-  page = 1
-  next_page_token = None
-  results = []
-  while next_page_token or page == 1:
-    print(f"Requesting page {page} of {query_description}")
-    request_url = f"{base_url}?page_size=1000{"&page_token=" + next_page_token if next_page_token else ""}"
-    response = rate_limit_handler(partial(requests.get, request_url))
-    page_data = response.json()
-    if len(page_data["reports"][0].get("errors", [])) > 0:
-      raise Exception(page_data["reports"][0])
-    results += page_data["reports"]
-    next_page_token = page_data.get("next_page_token")
-    page += 1
-  return results
-
-
-def get_next_ncbi_url_batch(get_url, items, start_index):
-  # Do a binary search to find the longest possible URL
-  max_valid_end_index = start_index
-  min_invalid_end_index = len(items)
-  end_index = len(items)
-  while end_index != max_valid_end_index:
-    test_url = get_url(items[start_index:end_index])
-    if len(test_url) > MAX_NCBI_URL_LENGTH:
-      min_invalid_end_index = end_index
-    else:
-      max_valid_end_index = end_index
-    end_index = int((max_valid_end_index + min_invalid_end_index)/2)
-  return get_url(items[start_index:end_index]), end_index
-
-
-def get_batched_ncbi_urls(get_url, items):
-  urls = []
-  index = 0
-  while index < len(items):
-    url, index = get_next_ncbi_url_batch(get_url, items, index)
-    urls.append(url)
-  return urls
-
-
-def get_batched_ncbi_results(get_base_url, items, query_description):
-  results = []
-  for batch_index, batch_url in enumerate(get_batched_ncbi_urls(get_base_url, items)):
-    results.extend(get_paginated_ncbi_results(batch_url, f"{query_description} batch {batch_index + 1}"))
-  return results
+def read_organisms(organisms_path):
+  with open(organisms_path) as stream:
+    return pd.DataFrame(yaml.safe_load(stream)["organisms"])
 
 
 def match_taxonomic_group(tax_id, lineage, taxonomic_groups):
@@ -108,7 +114,7 @@ def get_taxonomic_level_key(level):
   return f"taxonomicLevel{level[0].upper()}{level[1:]}"
 
 
-def get_species_row(taxon_info, taxonomic_group_sets, taxonomic_levels):
+def get_species_row(taxon_info, taxonomic_group_sets, taxonomic_levels, name_info=None):
   classification = taxon_info["taxonomy"]["classification"]
   species_info = classification["species"]
   taxonomy_id = taxon_info["taxonomy"]["tax_id"]
@@ -119,6 +125,11 @@ def get_species_row(taxon_info, taxonomic_group_sets, taxonomic_levels):
   if own_level in taxonomic_levels and own_level not in classification:
     taxonomic_level_fields[get_taxonomic_level_key(own_level)] = taxon_info["taxonomy"]["current_scientific_name"]["name"]
   
+  if name_info:
+    common_names = name_info["taxonomy"].get("other_common_names")
+    if common_names:
+      taxonomic_level_fields["commonName"] = common_names[0]
+
   return {
     "taxonomyId": taxonomy_id,
     "species": species_info["name"],
@@ -139,26 +150,53 @@ def get_species_info(taxonomy_ids):
   Returns:
     List of species information dictionaries from NCBI
   """
-  return get_batched_ncbi_results(
-    lambda ids: f"https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/taxon/{",".join(ids)}/dataset_report",
-    [str(id) for id in set(taxonomy_ids)],
-    "taxa"
-  )
+  url = "https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/dataset_report"
+  taxon_ids = list(set(str(id) for id in taxonomy_ids))
+  return post_ncbi_request(url, {"taxons": taxon_ids})
 
 
-def get_species_df(species_info, taxonomic_group_sets, taxonomic_levels):
+def get_species_name_info(taxonomy_ids):
+  """
+  Fetches species name information from NCBI API for the given taxonomy IDs.
+  
+  Args:
+    taxonomy_ids: List of taxonomy IDs to fetch information for
+    
+  Returns:
+    List of species name information dictionaries from NCBI
+  """
+  url = "https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/name_report"
+  taxon_ids = list(set(str(id) for id in taxonomy_ids))
+  return post_ncbi_request(url, {"taxons": taxon_ids})
+
+
+def get_species_df(species_info, species_name_info, taxonomic_group_sets, taxonomic_levels):
   """
   Converts species information into a DataFrame.
   
   Args:
     species_info: List of species information dictionaries from NCBI
+    species_name_info: List of species name information dictionaries from NCBI
     taxonomic_group_sets: Dictionary of taxonomic group sets
     taxonomic_levels: List of taxonomic levels to include
     
   Returns:
     DataFrame containing species information
   """
-  return pd.DataFrame([get_species_row(info, taxonomic_group_sets, taxonomic_levels) for info in species_info])
+  # Create a dictionary mapping tax_id to name_info for easy lookup
+  name_info_dict = {
+      str(info["taxonomy"]["tax_id"]): info
+      for info in species_name_info
+  }
+  
+  # Create rows with both species_info and corresponding name_info
+  rows = []
+  for info in species_info:
+    tax_id = str(info["taxonomy"]["tax_id"])
+    name_info = name_info_dict.get(tax_id)
+    rows.append(get_species_row(info, taxonomic_group_sets, taxonomic_levels, name_info))
+  
+  return pd.DataFrame(rows)
 
 
 def get_species_tree(taxonomy_ids, taxonomic_levels, species_info=None):
@@ -228,16 +266,16 @@ def get_species_tree(taxonomy_ids, taxonomic_levels, species_info=None):
               taxon_rank_map[parent_id_str] = rank_level
     
   # Fetch any missing taxa information
-  fetch_taxa_info_in_batches(tax_ids, taxon_name_map, taxon_rank_map, "missing parent taxa")
+  fetch_taxa_info(tax_ids, taxon_name_map, taxon_rank_map, "missing parent taxa")
 
   named_species_tree = update_species_tree_names(species_tree, taxon_name_map, taxon_rank_map)
 
   return named_species_tree
 
 
-def fetch_taxa_info_in_batches(tax_ids, taxon_name_map, taxon_rank_map, description="taxa"):
+def fetch_taxa_info(tax_ids, taxon_name_map, taxon_rank_map, description="taxa"):
   """
-  Fetches taxonomic information in batches and updates the provided name and rank maps.
+  Fetches taxonomic information and updates the provided name and rank maps.
   
   Args:
     tax_ids: List or set of taxonomy IDs to fetch
@@ -256,24 +294,16 @@ def fetch_taxa_info_in_batches(tax_ids, taxon_name_map, taxon_rank_map, descript
     
   print(f"Fetching information for {len(missing_tax_ids)} {description}")
   
-  # Process in batches of 100 to avoid API limitations
-  batch_size = 100
-  for i in range(0, len(missing_tax_ids), batch_size):
-    batch = missing_tax_ids[i:i+batch_size]
-    print(f"Fetching batch {i//batch_size + 1} of {(len(missing_tax_ids) + batch_size - 1)//batch_size} ({len(batch)} taxa)")
-    
-    taxa_info = get_paginated_ncbi_results(
-      f"https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/taxon/{','.join(batch)}/dataset_report", 
-      f"{description} batch {i//batch_size + 1}"
-    )
-    
-    for report in taxa_info:
-      tax_id = str(report["taxonomy"]["tax_id"])
-      taxon_name_map[tax_id] = report["taxonomy"]["current_scientific_name"]["name"]
-      if "rank" in report["taxonomy"]:
-        taxon_rank_map[tax_id] = report["taxonomy"]["rank"]
-      else:
-        print(f"rank not found for tax_id: {tax_id}")
+  url = "https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/dataset_report"
+  reports = post_ncbi_request(url, {"taxons": missing_tax_ids})
+  
+  for report in reports:
+    tax_id = str(report["taxonomy"]["tax_id"])
+    taxon_name_map[tax_id] = report["taxonomy"]["current_scientific_name"]["name"]
+    if "rank" in report["taxonomy"]:
+      taxon_rank_map[tax_id] = report["taxonomy"]["rank"]
+    else:
+      print(f"rank not found for tax_id: {tax_id}")
 
 
 def ncbi_tree_to_nested_tree(node_id, edges, taxonomy_ids):
@@ -327,21 +357,34 @@ def get_biosample_data(genome_info):
 
 
 def get_genomes_and_primarydata_df(accessions):
-  genomes_info = get_batched_ncbi_results(
-    lambda a: f"https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/{",".join(a)}/dataset_report",
-    accessions,
-    "genomes"
-  )
-
+  """
+  Fetches genome information and creates DataFrames for genomes and biosample data.
+  
+  Args:
+    accessions: List of genome accessions to fetch information for
+    
+  Returns:
+    Tuple of (genomes_df, biosample_df)
+  """
+  # Convert pandas Series to list if necessary
+  if isinstance(accessions, pd.Series):
+    accessions = accessions.tolist()
+  
+  url = "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/dataset_report"
+  reports = post_ncbi_request(url, {"accessions": accessions})
+  
   return (
-          pd.DataFrame(data=[get_genome_row(info) for info in genomes_info]),
-          pd.DataFrame(data=[get_biosample_data(info) for info in genomes_info if 'biosample' in info['assembly_info']]))
+    pd.DataFrame(data=[get_genome_row(info) for info in reports]),
+    pd.DataFrame(data=[get_biosample_data(info) for info in reports if 'biosample' in info['assembly_info']])
+  )
 
 
 def _id_to_gene_model_url(asm_id: str, session: requests.Session):
   print(f"finding gene model url for: {asm_id}")
   ucsc_files_endpoint = "https://genome.ucsc.edu/list/files"
   download_base_url = "https://hgdownload.soe.ucsc.edu"
+  #wait 1s because of rate limiting
+  time.sleep(1)
   response = session.get(ucsc_files_endpoint, params={"genome": asm_id})
   try:
     response.raise_for_status()
@@ -354,6 +397,8 @@ def _id_to_gene_model_url(asm_id: str, session: requests.Session):
   augustus_url = None
   for url in gtf_urls:
     if "ncbiRefSeq" in url:
+      return urllib.parse.urljoin(f"{download_base_url}/", url)
+    elif "ncbiGene" in url:
       return urllib.parse.urljoin(f"{download_base_url}/", url)
     elif "augustus" in url:
       augustus_url = url
@@ -565,13 +610,46 @@ def fetch_sra_metadata(srs_ids, batch_size=20):
   print(f"Adding file urls to : {samples_processed} of {len(data)}", end='\n')
   return data
 
+def report_missing_ploidy_info(genomes_df, organisms_df):
+    """
+    Reports assemblies that are missing ploidy information.
+    
+    Args:
+        genomes_df: DataFrame containing genome information
+        organisms_df: DataFrame containing organism information, including ploidy information
+        
+    Returns:
+        A list of tuples containing (accession, speciesTaxonomyId) for assemblies without ploidy information
+    """
+    # Create a mapping from taxonomy_id to ploidy
+    ploidy_map = organisms_df.set_index("taxonomy_id")["ploidy"].to_dict()
 
-def make_qc_report(missing_ncbi_assemblies, inconsistent_taxonomy_ids, missing_ucsc_assemblies, missing_gene_model_urls=None):
-  ncbi_assemblies_text = "None" if len(missing_ncbi_assemblies) == 0 else "\n".join([f"- {accession}" for accession in missing_ncbi_assemblies])
-  ucsc_assemblies_text = "None" if len(missing_ucsc_assemblies) == 0 else "\n".join([f"- {accession}" for accession in missing_ucsc_assemblies])
-  gene_model_urls_text = "N/A" if missing_gene_model_urls is None else "None" if len(missing_gene_model_urls) == 0 else "\n".join([f"- {accession}" for accession in missing_gene_model_urls])
-  taxonomy_ids_text = "None" if len(inconsistent_taxonomy_ids) == 0 else "\n".join([f"- {taxon}: {ids}" for taxon, ids in inconsistent_taxonomy_ids])
-  return f"# Catalog QC report\n\n## Assemblies not found on NCBI\n\n{ncbi_assemblies_text}\n\n## Assemblies not found in UCSC list\n\n{ucsc_assemblies_text}\n\n## Assemblies with gene model URLs not found\n\n{gene_model_urls_text}\n\n## Species and strain combinations with multiple taxonomy IDs\n\n{taxonomy_ids_text}\n"
+    # Create a DataFrame with just the relevant columns for the check
+    check_df = genomes_df[["accession", "speciesTaxonomyId", "species"]].copy()
+
+    # Check which species tax IDs we have ploidy information for
+    check_df["has_ploidy"] = check_df["speciesTaxonomyId"].apply(lambda tax_id: tax_id in ploidy_map)
+
+    # Find assemblies where we have no ploidy information
+    missing_ploidy = check_df[~check_df["has_ploidy"]]
+    missing_count = len(missing_ploidy)
+
+    if missing_count > 0:
+        print(f"Warning: Found {missing_count} assemblies without ploidy information")
+        print("Missing ploidy assemblies:")
+        for _, row in missing_ploidy.iterrows():
+            print(f"  {row['accession']}: {row['speciesTaxonomyId']}")
+
+    return list(zip(missing_ploidy['accession'], missing_ploidy['speciesTaxonomyId']))
+
+
+def make_qc_report(missing_ncbi_assemblies, inconsistent_taxonomy_ids, missing_ucsc_assemblies, missing_gene_model_urls=None, missing_ploidy_assemblies=None):
+    ncbi_assemblies_text = "None" if len(missing_ncbi_assemblies) == 0 else "\n".join([f"- {accession}" for accession in missing_ncbi_assemblies])
+    ucsc_assemblies_text = "None" if len(missing_ucsc_assemblies) == 0 else "\n".join([f"- {accession}" for accession in missing_ucsc_assemblies])
+    gene_model_urls_text = "N/A" if missing_gene_model_urls is None else "None" if len(missing_gene_model_urls) == 0 else "\n".join([f"- {accession}" for accession in missing_gene_model_urls])
+    taxonomy_ids_text = "None" if len(inconsistent_taxonomy_ids) == 0 else "\n".join([f"- {taxon}: {ids}" for taxon, ids in inconsistent_taxonomy_ids])
+    ploidy_assemblies_text = "None" if missing_ploidy_assemblies is None else "None" if len(missing_ploidy_assemblies) == 0 else "\n".join([f"- {accession} (speciesTaxonomyId: {tax_id})" for accession, tax_id in missing_ploidy_assemblies])
+    return f"# Catalog QC report\n\n## Assemblies not found on NCBI\n\n{ncbi_assemblies_text}\n\n## Assemblies not found in UCSC list\n\n{ucsc_assemblies_text}\n\n## Assemblies with gene model URLs not found\n\n{gene_model_urls_text}\n\n## Species and strain combinations with multiple taxonomy IDs\n\n{taxonomy_ids_text}\n\n## Assemblies without ploidy information\n\n{ploidy_assemblies_text}"
 
 
 def build_files(
@@ -584,7 +662,8 @@ def build_files(
   do_gene_model_urls=True,
   extract_primary_data=False,
   primary_output_path=None,
-  qc_report_path=None
+  qc_report_path=None,
+  organisms_path=None
 ):
   print("Building files")
 
@@ -608,9 +687,10 @@ def build_files(
 
   # Fetch species information once to be used by both species_df and species_tree
   species_info = get_species_info(base_genomes_df["taxonomyId"])
+  species_name_info = get_species_name_info(base_genomes_df["taxonomyId"])
   
   # Create species DataFrame using the fetched species_info
-  species_df = get_species_df(species_info, taxonomic_group_sets, taxonomic_levels_for_tree)
+  species_df = get_species_df(species_info, species_name_info, taxonomic_group_sets, taxonomic_levels_for_tree)
 
   report_missing_values_from("species", "found on NCBI", base_genomes_df["taxonomyId"], species_df["taxonomyId"])
 
@@ -641,11 +721,6 @@ def build_files(
     primarydata_df.to_csv(primary_output_path, index=False, sep="\t")
     print(f"Wrote to {primary_output_path}")
   
-  if qc_report_path is not None:
-    qc_report_text = make_qc_report(**qc_report_params)
-    with open(qc_report_path, "w") as file:
-      file.write(qc_report_text)
-
   if len(taxonomic_levels_for_tree) > 0:
     # Use the taxonomy IDs from the genomes_df to build the species tree
     # Pass the previously fetched species_info to avoid another API call
@@ -653,4 +728,13 @@ def build_files(
     with open(tree_output_path, 'w') as outfile:
       json.dump(species_tree, outfile, indent=4)
     print(f"Wrote to {tree_output_path}")
-  
+
+  if organisms_path is not None:
+    organisms_df = read_organisms(organisms_path)
+    qc_report_params["missing_ploidy_assemblies"] = report_missing_ploidy_info(genomes_df, organisms_df)
+    print(f"Checked ploidy for {len(genomes_df)} assemblies")
+
+  if qc_report_path is not None:
+    qc_report_text = make_qc_report(**qc_report_params)
+    with open(qc_report_path, "w") as file:
+      file.write(qc_report_text)

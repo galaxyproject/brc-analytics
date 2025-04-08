@@ -1,5 +1,8 @@
 import { WORKFLOW_PARAMETER_VARIABLE } from "../apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { WorkflowParameter } from "../apis/catalog/brc-analytics-catalog/common/entities";
+import {
+  WorkflowParameter,
+  WorkflowUrlParameter,
+} from "../apis/catalog/brc-analytics-catalog/common/entities";
 import ky from "ky";
 import { GALAXY_ENVIRONMENT } from "site-config/common/galaxy";
 
@@ -11,7 +14,7 @@ interface WorkflowLandingsBody {
 }
 
 type WorkflowLandingsBodyRequestState = {
-  [key: string]: { [key: string]: string } | string;
+  [key: string]: string | WorkflowUrlParameter;
 };
 
 interface WorkflowLanding {
@@ -72,7 +75,9 @@ function paramVariableToRequestValue(
   variable: WORKFLOW_PARAMETER_VARIABLE,
   geneModelUrl: string | null,
   referenceGenome: string
-): WorkflowLandingsBodyRequestState[string] | undefined {
+): WorkflowLandingsBodyRequestState[string] | null {
+  // Because this `switch` has no default case, and the function doesn't allow `undefined` as a return type,
+  // we ensure through TypeScript that all possible variables are handled.
   switch (variable) {
     case WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_ID:
       return referenceGenome;
@@ -89,7 +94,9 @@ function paramVariableToRequestValue(
             src: "url",
             url: geneModelUrl,
           }
-        : undefined;
+        : null;
+    case WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN:
+      return null; // TODO pass in necessary information and generate an actual value for this
   }
 }
 
@@ -106,15 +113,19 @@ function getWorkflowLandingsRequestState(
   parameters: WorkflowParameter[]
 ): WorkflowLandingsBodyRequestState {
   const result: WorkflowLandingsBodyRequestState = {};
-  parameters.forEach(({ key, variable }) => {
-    const maybeParam = paramVariableToRequestValue(
-      variable,
-      geneModelUrl,
-      referenceGenome
-    );
-    if (maybeParam !== undefined) {
-      result[key] = maybeParam;
+  for (const { key, url_spec, variable } of parameters) {
+    if (url_spec) {
+      // If url_spec is provided, use it directly
+      result[key] = url_spec;
+    } else if (variable) {
+      // Otherwise, use the variable to determine the value
+      const value = paramVariableToRequestValue(
+        variable,
+        geneModelUrl,
+        referenceGenome
+      );
+      if (value !== null) result[key] = value;
     }
-  });
+  }
   return result;
 }

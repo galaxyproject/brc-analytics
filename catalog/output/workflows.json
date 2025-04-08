@@ -3,6 +3,7 @@
     "category": "VARIANT_CALLING",
     "description": "Identify nucleotide polymorphisms and short indels from Illumina and Element data.",
     "name": "Variant calling",
+    "showComingSoon": true,
     "workflows": [
       {
         "parameters": [
@@ -20,6 +21,61 @@
         "trsId": "#workflow/github.com/iwc-workflows/haploid-variant-calling-wgs-pe/main/versions/v0.1",
         "workflowDescription": "Workflow for variant analysis against a reference genome in GenBank format",
         "workflowName": "Paired end variant calling in haploid system"
+      },
+      {
+        "parameters": [
+          {
+            "key": "NC_045512.2 FASTA sequence of SARS-CoV-2",
+            "variable": "ASSEMBLY_FASTA_URL"
+          },
+          {
+            "key": "ARTIC primer BED",
+            "url_spec": {
+              "ext": "bed",
+              "src": "url",
+              "url": "https://zenodo.org/record/4555735/files/ARTIC_nCoV-2019_v3.bed"
+            }
+          },
+          {
+            "key": "ARTIC primers to amplicon assignments",
+            "url_spec": {
+              "ext": "tabular",
+              "src": "url",
+              "url": "https://zenodo.org/record/4555735/files/ARTIC_amplicon_info_v3.tsv"
+            }
+          }
+        ],
+        "ploidy": "HAPLOID",
+        "taxonomyId": "694009",
+        "trsId": "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-variant-calling/COVID-19-PE-ARTIC-ILLUMINA/versions/v0.5.4",
+        "workflowDescription": "The workflow for Illumina-sequenced ARTIC data builds on the RNASeq workflow for paired-end data using the same steps for mapping and variant calling, but adds extra logic for trimming ARTIC primer sequences off reads with the ivar package. In addition, this workflow uses ivar also to identify amplicons affected by ARTIC primer-binding site mutations and tries to exclude reads derived from such tainted amplicons when calculating allele-frequencies of other variants.",
+        "workflowName": "COVID-19: variation analysis on ARTIC PE data"
+      },
+      {
+        "parameters": [
+          {
+            "key": "NC_045512.2 FASTA sequence of SARS-CoV-2",
+            "variable": "ASSEMBLY_FASTA_URL"
+          }
+        ],
+        "ploidy": "HAPLOID",
+        "taxonomyId": "694009",
+        "trsId": "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-wgs-variant-calling/COVID-19-PE-WGS-ILLUMINA/versions/v0.2.4",
+        "workflowDescription": "This workflows performs paired end read mapping with bwa-mem followed by sensitive variant calling across a wide range of AFs with lofreq",
+        "workflowName": "COVID-19: variation analysis on WGS PE data"
+      },
+      {
+        "parameters": [
+          {
+            "key": "NC_045512.2 FASTA sequence of SARS-CoV-2",
+            "variable": "ASSEMBLY_FASTA_URL"
+          }
+        ],
+        "ploidy": "HAPLOID",
+        "taxonomyId": "694009",
+        "trsId": "#workflow/github.com/iwc-workflows/sars-cov-2-se-illumina-wgs-variant-calling/COVID-19-SE-WGS-ILLUMINA/versions/v0.1.6",
+        "workflowDescription": "This workflows performs single end read mapping with bowtie2 followed by sensitive variant calling across a wide range of AFs with lofreq",
+        "workflowName": "COVID-19: variation analysis on WGS SE data"
       }
     ]
   },
@@ -27,6 +83,7 @@
     "category": "TRANSCRIPTOMICS",
     "description": "Analyze bulk or single-cell RNA seq data using a variety of approaches.",
     "name": "Transcriptomics",
+    "showComingSoon": true,
     "workflows": [
       {
         "parameters": [
@@ -102,6 +159,7 @@
     "category": "REGULATION",
     "description": "Workflows for the analysis of ChIP-seq, ATAC-Seq, and beyond.",
     "name": "Regulation",
+    "showComingSoon": true,
     "workflows": [
       {
         "parameters": [
@@ -166,21 +224,45 @@
     ]
   },
   {
+    "category": "CONSENSUS_SEQUENCES",
+    "description": "Build consensus sequences for related isolates.",
+    "name": "Consensus sequences",
+    "showComingSoon": false,
+    "workflows": [
+      {
+        "parameters": [
+          {
+            "key": "Reference FASTA",
+            "variable": "ASSEMBLY_FASTA_URL"
+          }
+        ],
+        "ploidy": "HAPLOID",
+        "taxonomyId": "10244",
+        "trsId": "#workflow/github.com/iwc-workflows/pox-virus-amplicon/main/versions/v0.3",
+        "workflowDescription": "A workflow for the analysis of pox virus genomes sequenced as half-genomes (for ITR resolution) in a tiled-amplicon approach",
+        "workflowName": "Pox Virus Illumina Amplicon Workflow from half-genomes"
+      }
+    ]
+  },
+  {
     "category": "ASSEMBLY",
     "description": "Assemble prokaryotic and eukaryotic genomes sequenced with a variety of technologies.",
     "name": "Assembly",
+    "showComingSoon": false,
     "workflows": []
   },
   {
     "category": "GENOME_COMPARISONS",
     "description": "Workflows for creation of pairwise and multiple genome alignments.",
     "name": "Genome comparisons",
+    "showComingSoon": true,
     "workflows": []
   },
   {
     "category": "PROTEIN_FOLDING",
     "description": "Analysis of protein folding using the ColabFold framework.",
     "name": "Protein folding",
+    "showComingSoon": true,
     "workflows": []
   }
 ]
