@@ -3,11 +3,11 @@ import data from "catalog/output/ncbi-taxa-tree.json";
 /**
  * Interface representing a node in the NCBI taxonomy tree
  */
-export interface TreeNode {
+export interface TaxonomyNode {
   /**
    * Child nodes in the taxonomy tree
    */
-  children: TreeNode[];
+  children: TaxonomyNode[];
 
   /**
    * The name of the taxonomic entity
@@ -26,7 +26,7 @@ export interface TreeNode {
   rank?: string;
 }
 
-export function getData(): TreeNode {
+export function getData(): TaxonomyNode {
   // Any data massaging can be done at this extension point.
   return data;
 }
