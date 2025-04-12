@@ -1,7 +1,6 @@
-// @ts-nocheck
 import * as d3 from "d3";
 import { useRef, useEffect, useState } from "react";
-import { getData } from "./data";
+import { getData, TaxonomyNode } from "./data";
 import { TreeNode, NodeDetails } from "./NodeDetails";
 
 const DEPTH = 4;
@@ -39,7 +38,7 @@ export const SectionViz = (): JSX.Element => {
     const baseColor = d3.scaleOrdinal(d3.schemeTableau10);
 
     // Helper function to get color for a node based on the current root
-    function getNodeColor(d, root): string {
+    function getNodeColor(d: TreeNode, root: TreeNode): string {
       // Adjust depth relative to current root
       const relativeDepth = d.depth - root.depth;
 
@@ -66,7 +65,7 @@ export const SectionViz = (): JSX.Element => {
     }
 
     // Helper function to find the ancestor that is a direct child of the current root
-    function findRootChild(node, root): TreeNode | null {
+    function findRootChild(node: TreeNode, root: TreeNode): TreeNode | null {
       if (node === root) return null;
 
       const ancestors = node.ancestors();
@@ -100,33 +99,50 @@ export const SectionViz = (): JSX.Element => {
 
     // Create a hierarchy from the sample data.
     const hierarchyData = d3
-      .hierarchy(data)
+      .hierarchy<TaxonomyNode>(data)
       .sum((d) => (d.children.length == 0 ? 1 : 0))
-      .sort((a: unknown, b: unknown) => (a.data.name < b.data.name ? -1 : 1));
+      .sort((a, b) => (a.data.name < b.data.name ? -1 : 1));
 
-    const root = d3.partition().size([2 * Math.PI, hierarchyData.height + 1])(
-      hierarchyData
-    );
+    // Create the partition layout and initialize the TreeNode properties
+    const rootNode = d3
+      .partition<TaxonomyNode>()
+      .size([2 * Math.PI, hierarchyData.height + 1])(hierarchyData);
 
-    root.each((d) => (d.current = d));
+    // Initialize the custom properties needed for D3 transitions
+    const root = rootNode as unknown as TreeNode;
+    root.each((d) => {
+      // Need to use type assertion to add custom properties to d3 nodes
+      const node = d as unknown as TreeNode;
+
+      // Initialize current and target with the node's own coordinates
+      node.current = {
+        x0: d.x0,
+        x1: d.x1,
+        y0: d.y0,
+        y1: d.y1,
+      };
+      node.target = {
+        x0: d.x0,
+        x1: d.x1,
+        y0: d.y0,
+        y1: d.y1,
+      };
+    });
 
     // Save the root node to state
     setRootNode(root);
 
-    // Create a partition layout (compute the full layout even though we display only DEPTH layers)
-    d3.partition().size([2 * Math.PI, root.height + 1])(root);
-
-    // Save each node’s initial coordinates for smooth transitions.
+    // Save each node's initial coordinates for smooth transitions.
     root.each((d) => (d.current = d));
 
-    // Global variable to track the current center (zoomed) node. Initially, it’s the root.
+    // Global variable to track the current center (zoomed) node. Initially, it's the root.
     let currentRoot = root;
     setSelectedNode(currentRoot);
 
-    // An arc generator that “clamps” the radial depth so that
+    // An arc generator that "clamps" the radial depth so that
     // only the center plus DEPTH levels are visible.
     const arc = d3
-      .arc()
+      .arc<{ x0: number; x1: number; y0: number; y1: number }>()
       .startAngle((d) => d.x0)
       .endAngle((d) => d.x1)
       .padAngle((d) => Math.min((d.x1 - d.x0) / 2, 0.005))
@@ -135,8 +151,8 @@ export const SectionViz = (): JSX.Element => {
       .outerRadius((d) => (Math.min(d.y1, DEPTH) * radius) / DEPTH - 0.5);
 
     function isVisible(
-      d: d3.HierarchyNode<TreeNode>,
-      currentRoot: d3.HierarchyNode<TreeNode>,
+      d: TreeNode,
+      currentRoot: TreeNode,
       targetDepth: number
     ): boolean {
       const isDescendant = d.ancestors().indexOf(currentRoot) >= 0;
@@ -144,7 +160,7 @@ export const SectionViz = (): JSX.Element => {
       return isDescendant && withinDepth;
     }
 
-    // Draw the sunburst segments (we still don’t draw the center node as an arc)
+    // Draw the sunburst segments (we still don't draw the center node as an arc)
     const path = svg
       .append("g")
       .selectAll("path")
@@ -173,9 +189,9 @@ export const SectionViz = (): JSX.Element => {
     /* 
       Helper function to compute label transform.
       Note: For first‑tier nodes (where d.parent === currentRoot) we add an offset
-      so the label doesn’t crowd the center label.
+      so the label doesn't crowd the center label.
     */
-    function labelTransform(d): string {
+    function labelTransform(d: TreeNode): string {
       const angle = ((d.current.x0 + d.current.x1) / 2) * (180 / Math.PI);
       let r =
         ((Math.min(d.current.y0, DEPTH) + Math.min(d.current.y1, DEPTH)) / 2) *
@@ -244,7 +260,7 @@ export const SectionViz = (): JSX.Element => {
       .style("font-size", "16px")
       .style("opacity", 0);
 
-    function updateCenter(p): void {
+    function updateCenter(p: TreeNode): void {
       const isRoot = p.depth === 0;
       logoObject.style("opacity", isRoot ? 1 : 0);
       centerText
@@ -274,10 +290,7 @@ export const SectionViz = (): JSX.Element => {
       y1: number;
     }
 
-    function clicked(
-      event: React.MouseEvent | null,
-      p: HierarchyNode<TreeNode>
-    ): void {
+    function clicked(event: React.MouseEvent | null, p: TreeNode): void {
       // Update the current center and the center label.
       currentRoot = p;
       updateCenter(p);
@@ -285,7 +298,7 @@ export const SectionViz = (): JSX.Element => {
       console.debug(p);
 
       // For each node, compute new coordinates relative to p.
-      root.each((d: TreeNode) => {
+      root.each((d) => {
         d.target = {
           x0:
             Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) *
@@ -304,7 +317,7 @@ export const SectionViz = (): JSX.Element => {
       path
         .transition()
         .duration(750)
-        .tween("data", (d: TreeNode) => {
+        .tween("data", (d) => {
           const i = d3.interpolate(d.current, d.target);
           // eslint-disable-next-line sonarjs/no-nested-functions -- cleaner in d3 to keep this inlined
           return (transition_duration: number): void => {
@@ -312,12 +325,12 @@ export const SectionViz = (): JSX.Element => {
           };
         })
         // eslint-disable-next-line sonarjs/no-nested-functions -- cleaner in d3 to keep this inlined
-        .attrTween("d", (d: TreeNode) => (): string => arc(d.current))
+        .attrTween("d", (d) => (): string => arc(d.current) || "")
         .attr("fill", (d) => getNodeColor(d, p)) // Update colors based on new root
-        .attr("fill-opacity", (d: TreeNode): number =>
+        .attr("fill-opacity", (d): number =>
           isVisible(d, currentRoot, p.depth) ? 1 : 0
         )
-        .attr("stroke-opacity", (d: TreeNode) =>
+        .attr("stroke-opacity", (d) =>
           isVisible(d, currentRoot, p.depth) ? 1 : 0
         );
 

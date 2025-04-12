@@ -1,17 +1,30 @@
 import React from "react";
+import { TaxonomyNode } from "./data";
+import { HierarchyNode } from "d3";
 
-export interface TreeNode {
-  children?: TreeNode[];
-  current?: boolean;
-  data: {
-    name: string;
-    ncbi_tax_id?: number;
-    rank: string;
+// Define additional properties used by D3 during transitions
+interface D3TransitionNode {
+  current: {
+    x0: number;
+    x1: number;
+    y0: number;
+    y1: number;
   };
-  depth: number;
-  height: number;
-  name: string;
+  target: {
+    x0: number;
+    x1: number;
+    y0: number;
+    y1: number;
+  };
+  x0: number;
+  x1: number;
+  y0: number;
+  y1: number;
 }
+
+// Define a type that represents a d3 hierarchy node with taxonomy data
+// and additional properties used during transitions
+export type TreeNode = HierarchyNode<TaxonomyNode> & D3TransitionNode;
 
 interface NodeDetailsProps {
   node: TreeNode;
@@ -72,7 +85,7 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
   const isRoot = node?.depth === 0;
 
   // Get node name and rank safely
-  const nodeName = node?.data?.name || node?.name || "Unknown";
+  const nodeName = node?.data?.name || "Unknown";
   const nodeRank = node?.data?.rank || "Unknown";
 
   // Get first-level children for navigation
@@ -140,7 +153,7 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
                   padding: "6px 0",
                 }}
               >
-                {child.name || child.data?.name}
+                {child.data.name}
                 <span
                   style={{
                     color: "#888",
