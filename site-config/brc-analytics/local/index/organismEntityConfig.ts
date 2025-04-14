@@ -239,6 +239,7 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_REALM]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_DOMAIN]: false,
+          [BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME]: false,
         },
         sorting: [
           {
