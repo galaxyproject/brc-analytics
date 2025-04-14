@@ -29,12 +29,12 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
           },
           {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.COMMON_NAME,
-          },
-          {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
+          },
+          {
+            key: BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME,
+            label: BRC_DATA_CATALOG_CATEGORY_LABEL.COMMON_NAME,
           },
           {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.ASSEMBLY_TAXONOMY_IDS,
@@ -239,6 +239,7 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_REALM]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_DOMAIN]: false,
+          [BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME]: false,
         },
         sorting: [
           {

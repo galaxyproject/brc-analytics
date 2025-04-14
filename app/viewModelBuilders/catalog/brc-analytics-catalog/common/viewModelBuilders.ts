@@ -168,14 +168,14 @@ export const buildChromosomes = (
 
 /**
  * Build props for the common name cell.
- * @param organism - Organism entity.
+ * @param entity - Organism or genome entity.
  * @returns Props to be used for the cell.
  */
 export const buildCommonName = (
-  organism: BRCDataCatalogOrganism
+  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: organism.commonName,
+    value: entity.commonName,
   };
 };
 
