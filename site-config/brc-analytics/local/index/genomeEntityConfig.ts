@@ -37,6 +37,10 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
           },
           {
+            key: BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME,
+            label: BRC_DATA_CATALOG_CATEGORY_LABEL.COMMON_NAME,
+          },
+          {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMY_ID,
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMY_ID,
           },
@@ -241,6 +245,15 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: C.BasicCell,
+          viewBuilder: V.buildCommonName,
+        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.COMMON_NAME,
+        id: BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME,
+        width: { max: "1fr", min: "auto" },
+      },
+      {
+        componentConfig: {
+          component: C.BasicCell,
           viewBuilder: V.buildTaxonomyId,
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMY_ID,
@@ -358,6 +371,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_PHYLUM]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_REALM]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_DOMAIN]: false,
+          [BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME]: false,
         },
         sorting: [
           {

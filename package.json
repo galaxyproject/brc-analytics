@@ -11,6 +11,7 @@
     "lint": "next lint --dir .",
     "check-format": "prettier --check .",
     "format": "prettier --write . --cache",
+    "format:python": "./scripts/format-python.sh",
     "prepare": "husky",
     "test": "jest --runInBand",
     "build-brc-db": "esrun catalog/build/ts/build-catalog.ts",
