@@ -3,7 +3,6 @@ import logging
 import re
 import time
 import urllib
-from functools import partial
 
 import pandas as pd
 import requests
@@ -446,46 +445,96 @@ def get_genomes_and_primarydata_df(accessions):
     )
 
 
-def _id_to_gene_model_url(asm_id: str, session: requests.Session):
-    print(f"finding gene model url for: {asm_id}")
-    ucsc_files_endpoint = "https://genome.ucsc.edu/list/files"
-    download_base_url = "https://hgdownload.soe.ucsc.edu"
-    # wait 1s because of rate limiting
-    time.sleep(2)
-    response = session.get(ucsc_files_endpoint, params={"genome": asm_id})
-    try:
-        response.raise_for_status()
-    except Exception:
-        # FIXME?: Some accessions don't have a gene folder
-        return None
-    # find link to gtf, should ideally be ncbiRefSeq, but augustus will do
-    files = response.json()
-    gtf_urls = [
-        entry["url"] for entry in files["urlList"] if entry["url"].endswith(".gtf.gz")
-    ]
-    augustus_url = None
-    for url in gtf_urls:
-        if "ncbiRefSeq" in url:
-            return urllib.parse.urljoin(f"{download_base_url}/", url)
-        elif "ncbiGene" in url:
-            return urllib.parse.urljoin(f"{download_base_url}/", url)
-        elif "augustus" in url:
-            augustus_url = url
-    if augustus_url:
-        return urllib.parse.urljoin(f"{download_base_url}/", augustus_url)
-    # No match, I guess that's OK ?
-    return None
+def _get_gene_model_urls_from_genark_list():
+    """Download and parse the genArkFileList.txt.gz file to extract GTF URLs.
+
+    Returns:
+        dict: A dictionary mapping genome assembly IDs to their GTF file URLs
+    """
+    # Import required modules for this function
+    import gzip
+    import io
+
+    import requests
+
+    print("Downloading genArkFileList.txt.gz...")
+    genark_url = "https://hgdownload.soe.ucsc.edu/hubs/genArkFileList.txt.gz"
+    download_base_url = "https://hgdownload.soe.ucsc.edu/hubs"
+    response = requests.get(genark_url)
+    response.raise_for_status()
+
+    # Dictionary to store the best GTF URL for each assembly ID
+    gene_model_urls = {}
+
+    # Process the gzipped file content
+    with gzip.GzipFile(fileobj=io.BytesIO(response.content)) as f:
+        for line in f:
+            line = line.decode("utf-8").strip()
+            # Filter for GTF files
+            if line.endswith(".gtf.gz"):
+                # Extract assembly ID from the path
+                # Format: GCF/001/559/675/GCF_001559675.1/genes/GCF_001559675.1.ncbiGene.gtf.gz
+                parts = line.split("/")
+
+                # We need at least 7 parts to have a valid path with genes directory
+                if len(parts) >= 7:
+                    # Check if the 6th part (index 5) is 'genes'
+                    if parts[5] == "genes":
+                        # The assembly ID is in the 5th position (index 4)
+                        asm_id = parts[4]
+
+                        if asm_id:
+                            # Apply the same priority logic as before
+                            url = urllib.parse.urljoin(f"{download_base_url}/", line)
+
+                            # If we haven't seen this assembly yet, add it
+                            if asm_id not in gene_model_urls:
+                                gene_model_urls[asm_id] = url
+                            else:
+                                # Apply priority logic: ncbiRefSeq > ncbiGene > augustus
+                                current_url = gene_model_urls[asm_id]
+
+                                # Replace with higher priority URL if found
+                                if (
+                                    "ncbiRefSeq" in url
+                                    and "ncbiRefSeq" not in current_url
+                                ):
+                                    gene_model_urls[asm_id] = url
+                                elif "ncbiGene" in url and not any(
+                                    x in current_url for x in ["ncbiRefSeq"]
+                                ):
+                                    gene_model_urls[asm_id] = url
+                                elif "augustus" in url and not any(
+                                    x in current_url for x in ["ncbiRefSeq", "ncbiGene"]
+                                ):
+                                    gene_model_urls[asm_id] = url
+
+    print(f"Found GTF URLs for {len(gene_model_urls)} assemblies")
+    return gene_model_urls
 
 
 def add_gene_model_url(genomes_df: pd.DataFrame):
-    print("Fetching gene model URLs")
-    session = requests.Session()
+    """Add gene model URLs to the genomes DataFrame using the genArkFileList.txt.gz file.
+
+    Args:
+        genomes_df: DataFrame containing genome information with 'accession' column
+
+    Returns:
+        DataFrame with added 'geneModelUrl' column
+    """
+    print("Fetching gene model URLs from genArkFileList.txt.gz")
+
+    # Get all gene model URLs at once
+    gene_model_urls = _get_gene_model_urls_from_genark_list()
+
+    # Map accessions to URLs
+    gene_model_url_series = genomes_df["accession"].map(gene_model_urls)
+
+    # Add the URLs to the DataFrame
     return pd.concat(
         [
             genomes_df,
-            genomes_df["accession"]
-            .apply(partial(_id_to_gene_model_url, session=session))
-            .rename("geneModelUrl"),
+            gene_model_url_series.rename("geneModelUrl"),
         ],
         axis="columns",
     )
@@ -943,10 +992,20 @@ def build_files(
     ]
 
     # Create a mapping of both GenBank and RefSeq accessions to UCSC browser IDs
-    ucsc_mapping = pd.concat([
-      assemblies_df[["ucscBrowser", "genBank"]].rename(columns={"genBank": "accession"}),
-      assemblies_df[["ucscBrowser", "refSeq"]].rename(columns={"refSeq": "accession"})
-    ]).dropna().drop_duplicates(subset=["accession"])
+    ucsc_mapping = (
+        pd.concat(
+            [
+                assemblies_df[["ucscBrowser", "genBank"]].rename(
+                    columns={"genBank": "accession"}
+                ),
+                assemblies_df[["ucscBrowser", "refSeq"]].rename(
+                    columns={"refSeq": "accession"}
+                ),
+            ]
+        )
+        .dropna()
+        .drop_duplicates(subset=["accession"])
+    )
 
     # Single merge with the combined mapping
     genomes_df = genomes_with_species_df.merge(ucsc_mapping, how="left", on="accession")
