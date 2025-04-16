@@ -88,7 +88,7 @@ function paramVariableToRequestValue(
       if (!readRuns) return null;
       const [forwardUrl, reverseUrl] = readRuns
         .split(";")
-        .map((url) => `http://${url}`);
+        .map((url) => `http://${url}`); // Using HTTP because ENA's download URLs don't support HTTPS
       return {
         class: "Collection",
         collection_type: "list:paired",
