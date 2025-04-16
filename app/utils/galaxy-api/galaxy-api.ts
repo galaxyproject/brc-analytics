@@ -1,25 +1,13 @@
-import { WORKFLOW_PARAMETER_VARIABLE } from "../apis/catalog/brc-analytics-catalog/common/schema-entities";
-import {
-  WorkflowParameter,
-  WorkflowUrlParameter,
-} from "../apis/catalog/brc-analytics-catalog/common/entities";
+import { WORKFLOW_PARAMETER_VARIABLE } from "../../apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { WorkflowParameter } from "../../apis/catalog/brc-analytics-catalog/common/entities";
 import ky from "ky";
 import { GALAXY_ENVIRONMENT } from "site-config/common/galaxy";
-
-interface WorkflowLandingsBody {
-  public: true;
-  request_state: WorkflowLandingsBodyRequestState;
-  workflow_id: string;
-  workflow_target_type: "trs_url";
-}
-
-type WorkflowLandingsBodyRequestState = {
-  [key: string]: string | WorkflowUrlParameter;
-};
-
-interface WorkflowLanding {
-  uuid: string;
-}
+import {
+  WorkflowLanding,
+  WorkflowLandingsBody,
+  WorkflowLandingsBodyRequestState,
+  WorkflowParameterValue,
+} from "./entities";
 
 const DOCKSTORE_API_URL = "https://dockstore.org/api/ga4gh/trs/v2/tools";
 
@@ -74,8 +62,9 @@ function buildFastaUrl(identifier: string): string {
 function paramVariableToRequestValue(
   variable: WORKFLOW_PARAMETER_VARIABLE,
   geneModelUrl: string | null,
+  readRuns: string | null,
   referenceGenome: string
-): WorkflowLandingsBodyRequestState[string] | null {
+): WorkflowParameterValue | null {
   // Because this `switch` has no default case, and the function doesn't allow `undefined` as a return type,
   // we ensure through TypeScript that all possible variables are handled.
   switch (variable) {
@@ -95,8 +84,37 @@ function paramVariableToRequestValue(
             url: geneModelUrl,
           }
         : null;
-    case WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN:
-      return null; // TODO pass in necessary information and generate an actual value for this
+    case WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN: {
+      if (!readRuns) return null;
+      const [forwardUrl, reverseUrl] = readRuns
+        .split(";")
+        .map((url) => `http://${url}`);
+      return {
+        class: "Collection",
+        collection_type: "list:paired",
+        elements: [
+          {
+            class: "Collection",
+            elements: [
+              {
+                class: "File",
+                filetype: "fastqsanger.gz",
+                identifier: "forward",
+                location: forwardUrl,
+              },
+              {
+                class: "File",
+                filetype: "fastqsanger.gz",
+                identifier: "reverse",
+                location: reverseUrl,
+              },
+            ],
+            identifier: crypto.randomUUID(),
+            type: "paired",
+          },
+        ],
+      };
+    }
   }
 }
 
@@ -122,6 +140,7 @@ function getWorkflowLandingsRequestState(
       const value = paramVariableToRequestValue(
         variable,
         geneModelUrl,
+        null,
         referenceGenome
       );
       if (value !== null) result[key] = value;
