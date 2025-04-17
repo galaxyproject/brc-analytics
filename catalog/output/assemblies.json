@@ -1675,7 +1675,7 @@
     "coverage": "8.3",
     "gcPercent": 34,
     "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/000/181/055/GCA_000181055.3/genes/GCA_000181055.3_Rhodnius_prolixus-3.0.3.augustus.gtf.gz",
-    "isRef": "Yes",
+    "isRef": "No",
     "length": 706824083,
     "level": "Scaffold",
     "lineageTaxonomyIds": [
@@ -9028,7 +9028,7 @@
     "taxonomicLevelRealm": "Riboviria",
     "taxonomicLevelSpecies": "Orthomarburgvirus marburgense",
     "taxonomicLevelStrain": "Orthomarburgvirus marburgense strain Musoke",
-    "ucscBrowserUrl": null
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000857325.3"
   },
   {
     "accession": "GCA_000875885.1",
@@ -21617,7 +21617,7 @@
     "taxonomicLevelRealm": "Riboviria",
     "taxonomicLevelSpecies": "Orthomarburgvirus marburgense",
     "taxonomicLevelStrain": "Orthomarburgvirus marburgense strain Ang1379c",
-    "ucscBrowserUrl": null
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_031121245.1"
   },
   {
     "accession": "GCA_031121255.1",
@@ -21666,7 +21666,7 @@
     "taxonomicLevelRealm": "Riboviria",
     "taxonomicLevelSpecies": "Orthomarburgvirus marburgense",
     "taxonomicLevelStrain": "Orthomarburgvirus marburgense strain 07DRC99",
-    "ucscBrowserUrl": null
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_031121255.1"
   },
   {
     "accession": "GCA_031121995.1",
@@ -21715,7 +21715,7 @@
     "taxonomicLevelRealm": "Riboviria",
     "taxonomicLevelSpecies": "Orthomarburgvirus marburgense",
     "taxonomicLevelStrain": "None",
-    "ucscBrowserUrl": null
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_031121995.1"
   },
   {
     "accession": "GCA_031128755.1",
@@ -34007,7 +34007,7 @@
     "taxonomicLevelRealm": "Riboviria",
     "taxonomicLevelSpecies": "Vesicular exanthema of swine virus",
     "taxonomicLevelStrain": "None",
-    "ucscBrowserUrl": null
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000847705.1"
   },
   {
     "accession": "GCF_000848505.1",
@@ -34683,7 +34683,7 @@
     "taxonomicLevelRealm": "Riboviria",
     "taxonomicLevelSpecies": "Mammarenavirus guanaritoense",
     "taxonomicLevelStrain": "Mammarenavirus guanaritoense strain INH-95551",
-    "ucscBrowserUrl": null
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000853765.1"
   },
   {
     "accession": "GCF_000853785.1",
@@ -34877,7 +34877,7 @@
     "taxonomicLevelRealm": "Riboviria",
     "taxonomicLevelSpecies": "Orthoebolavirus restonense",
     "taxonomicLevelStrain": "None",
-    "ucscBrowserUrl": null
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000854085.1"
   },
   {
     "accession": "GCF_000854265.1",
@@ -37789,7 +37789,7 @@
     "taxonomicLevelRealm": "Riboviria",
     "taxonomicLevelSpecies": "Orthomarburgvirus marburgense",
     "taxonomicLevelStrain": "None",
-    "ucscBrowserUrl": null
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000943645.1"
   },
   {
     "accession": "GCF_000956335.1",

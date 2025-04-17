@@ -12,14 +12,7 @@
 
 ## Assemblies not found in UCSC list
 
-- GCF_000943645.1
-- GCA_000857325.3
-- GCF_000854085.1
-- GCF_000847705.1
-- GCF_000853765.1
-- GCA_031121245.1
-- GCA_031121255.1
-- GCA_031121995.1
+None
 
 ## Assemblies with gene model URLs not found
 
