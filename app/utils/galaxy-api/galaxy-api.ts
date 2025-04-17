@@ -86,9 +86,8 @@ function paramVariableToRequestValue(
         : null;
     case WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN: {
       if (!readRuns) return null;
-      const [forwardUrl, reverseUrl] = readRuns
-        .split(";")
-        .map((url) => `http://${url}`); // Using HTTP because ENA's download URLs don't support HTTPS
+      const { forwardUrl, reverseUrl, runAccession } =
+        getPairedRunUrlsInfo(readRuns);
       return {
         class: "Collection",
         collection_type: "list:paired",
@@ -109,13 +108,46 @@ function paramVariableToRequestValue(
                 location: reverseUrl,
               },
             ],
-            identifier: crypto.randomUUID(),
+            identifier: runAccession,
             type: "paired",
           },
         ],
       };
     }
   }
+}
+
+/**
+ * Get run accession and full URL for the given pair run URLs from ENA.
+ * @param enaUrls - Concatenated paired run URLs, as provided by ENA.
+ * @returns info for forward and reverse runs.
+ */
+function getPairedRunUrlsInfo(enaUrls: string): {
+  forwardUrl: string;
+  reverseUrl: string;
+  runAccession: string;
+} {
+  let forwardUrl: string | null = null;
+  let reverseUrl: string | null = null;
+  let runAccession: string | null = null;
+  for (const url of enaUrls.split(";")) {
+    const urlMatch = /\/([EDS]RR\d{6,})_([12])\.fastq\.gz$/.exec(url);
+    if (!urlMatch) continue;
+    const [, accession, readIndex] = urlMatch;
+    if (runAccession === null) runAccession = accession;
+    else if (accession !== runAccession)
+      throw new Error(
+        `Inconsistent run accessions: ${JSON.stringify(runAccession)} and ${JSON.stringify(accession)}`
+      );
+    const fullUrl = `http://${url}`; // Using HTTP because ENA's download URLs don't support HTTPS
+    if (readIndex === "1") forwardUrl = fullUrl;
+    else reverseUrl = fullUrl;
+  }
+  if (runAccession === null)
+    throw new Error("No URLs with expected format found");
+  if (forwardUrl === null) throw new Error("No URL for forward read found");
+  if (reverseUrl === null) throw new Error("No URL for reverse read found");
+  return { forwardUrl, reverseUrl, runAccession };
 }
 
 /**
