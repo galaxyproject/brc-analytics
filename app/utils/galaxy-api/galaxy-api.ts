@@ -86,6 +86,7 @@ function paramVariableToRequestValue(
         : null;
     case WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN: {
       if (!readRuns) return null;
+      // TODO get this info earlier? In particular, it might be better to explicitly get the run accession from ENA rather than getting it from the filenames.
       const { forwardUrl, reverseUrl, runAccession } =
         getPairedRunUrlsInfo(readRuns);
       return {
@@ -172,7 +173,7 @@ function getWorkflowLandingsRequestState(
       const value = paramVariableToRequestValue(
         variable,
         geneModelUrl,
-        null,
+        null, // TODO pass in actual read run URLs
         referenceGenome
       );
       if (value !== null) result[key] = value;
