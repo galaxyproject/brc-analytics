@@ -139,7 +139,7 @@ function getPairedRunUrlsInfo(enaUrls: string): {
       throw new Error(
         `Inconsistent run accessions: ${JSON.stringify(runAccession)} and ${JSON.stringify(accession)}`
       );
-    const fullUrl = `http://${url}`; // Using HTTP because ENA's download URLs don't support HTTPS
+    const fullUrl = `ftp://${url}`;
     if (readIndex === "1") forwardUrl = fullUrl;
     else reverseUrl = fullUrl;
   }
