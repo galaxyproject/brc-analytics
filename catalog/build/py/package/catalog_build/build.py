@@ -1,6 +1,7 @@
+import gzip
+import io
 import json
 import logging
-import re
 import time
 import urllib
 
@@ -451,11 +452,6 @@ def _get_gene_model_urls_from_genark_list():
     Returns:
         dict: A dictionary mapping genome assembly IDs to their GTF file URLs
     """
-    # Import required modules for this function
-    import gzip
-    import io
-
-    import requests
 
     print("Downloading genArkFileList.txt.gz...")
     genark_url = "https://hgdownload.soe.ucsc.edu/hubs/genArkFileList.txt.gz"
