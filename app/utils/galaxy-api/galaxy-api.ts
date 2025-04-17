@@ -118,9 +118,9 @@ function paramVariableToRequestValue(
 }
 
 /**
- * Get run accession and full URL for the given pair run URLs from ENA.
+ * Get run accession and full URLs for the given paired run URLs from ENA.
  * @param enaUrls - Concatenated paired run URLs, as provided by ENA.
- * @returns info for forward and reverse runs.
+ * @returns accession and URLs for forward and reverse runs.
  */
 function getPairedRunUrlsInfo(enaUrls: string): {
   forwardUrl: string;
