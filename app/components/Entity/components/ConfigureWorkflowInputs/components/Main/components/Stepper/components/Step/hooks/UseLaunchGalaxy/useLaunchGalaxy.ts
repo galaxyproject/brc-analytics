@@ -1,6 +1,6 @@
 import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
 import { useCallback, useEffect } from "react";
-import { getWorkflowLandingUrl } from "../../../../../../../../../../../../utils/galaxy-api";
+import { getWorkflowLandingUrl } from "../../../../../../../../../../../../utils/galaxy-api/galaxy-api";
 import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,

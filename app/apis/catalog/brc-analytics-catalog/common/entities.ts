@@ -1,14 +1,9 @@
+import { WorkflowUrlParameter } from "../../../../utils/galaxy-api/entities";
 import {
   ORGANISM_PLOIDY,
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_PLOIDY,
 } from "./schema-entities";
-
-export interface WorkflowUrlParameter {
-  ext: string;
-  src: string;
-  url: string;
-}
 
 export type BRCCatalog = BRCDataCatalogGenome;
 

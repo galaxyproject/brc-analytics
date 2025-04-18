@@ -6,7 +6,7 @@ import { TEXT_BODY_500 } from "@databiosphere/findable-ui/lib/theme/common/typog
 import { StyledGrid2 } from "./workflow.styles";
 import { TYPOGRAPHY_PROPS } from "../../constants";
 import { BUTTON_PROPS, GRID2_PROPS } from "./constants";
-import { getWorkflowLandingUrl } from "../../../../../../utils/galaxy-api";
+import { getWorkflowLandingUrl } from "../../../../../../utils/galaxy-api/galaxy-api";
 import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,
