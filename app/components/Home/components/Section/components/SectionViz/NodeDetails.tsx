@@ -51,17 +51,19 @@ function createFilterUrl(rank?: string, name?: string): string | null {
     return null;
   }
 
+  /* eslint-disable sort-keys -- Keep these in natural order of hierarchy */
   // Convert rank to the expected format for the filter
   const rankMap: Record<string, string> = {
-    class: "taxonomicLevelClass",
-    family: "taxonomicLevelFamily",
-    genus: "taxonomicLevelGenus",
-    kingdom: "taxonomicLevelKingdom",
-    order: "taxonomicLevelOrder",
-    phylum: "taxonomicLevelPhylum",
     species: "taxonomicLevelSpecies",
-    superkingdom: "taxonomicLevelSuperkingdom",
+    genus: "taxonomicLevelGenus",
+    family: "taxonomicLevelFamily",
+    order: "taxonomicLevelOrder",
+    class: "taxonomicLevelClass",
+    phylum: "taxonomicLevelPhylum",
+    kingdom: "taxonomicLevelKingdom",
+    domain: "taxonomicLevelDomain",
   };
+  /* eslint-enable sort-keys -- re-enable sort keys */
 
   const categoryKey = rankMap[rank.toLowerCase()] || "taxonomicLevelGenus";
 
