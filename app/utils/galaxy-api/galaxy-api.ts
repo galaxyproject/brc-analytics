@@ -132,6 +132,7 @@ function getPairedRunUrlsInfo(enaUrls: string): {
   let reverseUrl: string | null = null;
   let runAccession: string | null = null;
   for (const url of enaUrls.split(";")) {
+    // Regarding file name format, see https://ena-docs.readthedocs.io/en/latest/faq/archive-generated-files.html#generated-fastq-files and https://ena-docs.readthedocs.io/en/latest/submit/general-guide/accessions.html#accession-numbers
     const urlMatch = /\/([EDS]RR\d{6,})_([12])\.fastq\.gz$/.exec(url);
     if (!urlMatch) continue;
     const [, accession, readIndex] = urlMatch;
