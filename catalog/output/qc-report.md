@@ -25,12 +25,17 @@ None
 - Candida tropicalis strain MYA-3404: 5482, 294747
 - Cryptococcus neoformans strain H99: 235443, 178876
 - Cryptosporidium parvum: 353152, 5807
+- Enterovirus A: 150846, 156647
 - Glossina fuscipes: 7396, 201502
 - Neospora caninum strain Liverpool: 29176, 572307
-- Plasmodium falciparum: 5833, 36329
+- Norwalk virus: 1529924, 122928, 122929, 1529909, 1246677, 490039, 1529918
+- Orthoflavivirus denguei: 11069, 11053, 11070
+- Orthomarburgvirus marburgense: 3052505, 448086
+- Plasmodium falciparum: 36329, 5833
 - Plasmodium vinckei: 5860, 54757, 119398, 138297, 138298
 - Trypanosoma brucei: 5702, 185431
 - Trypanosoma cruzi strain Dm28c: 85057, 5693, 1416333
+- Vesicular exanthema of swine virus: 146073, 35612
 
 ## Assemblies without ploidy information
 
