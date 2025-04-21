@@ -1,8 +1,13 @@
 import React from "react";
+import { Link as DXLink } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { TaxonomyNode } from "./data";
 import { HierarchyNode } from "d3";
 import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
-import { ChevronRightRounded, ArrowBackRounded } from "@mui/icons-material";
+import {
+  ChevronRightRounded,
+  ArrowBackRounded,
+  ViewListOutlined,
+} from "@mui/icons-material";
 
 // Define additional properties used by D3 during transitions
 interface D3TransitionNode {
@@ -146,6 +151,17 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
 
   // Create the filter URL for this node if possible
   const filterUrl = createFilterUrl(nodeRank, nodeName);
+  // Fallback URL to the main assemblies page
+  const linkUrl = filterUrl || "/data/assemblies";
+
+  // Create the appropriate display text based on node type
+  let filterLinkText = "Browse All Assemblies";
+  if (!isRoot) {
+    const assemblyCount = countLeafNodes(node);
+    const assemblySuffix = assemblyCount > 1 ? "ies" : "y";
+    filterLinkText = `View ${assemblyCount} Assembl${assemblySuffix} for ${nodeName}`;
+  }
+
 
   return (
     <div
@@ -158,29 +174,19 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
     >
       <div style={{ flex: "1", marginTop: "20px" }}>
         <RoundedPaper>
-          {/* View Assemblies Row - Always visible within the card */}
-          {!isRoot && filterUrl ? (
-            <div
-              style={{
-                borderBottom: "1px solid #eee",
-                padding: "12px 16px",
-              }}
-            >
-              <a
-                href={filterUrl}
-                rel="noopener noreferrer"
-                style={{
-                  color: "#1976d2",
-                  display: "block",
-                  fontSize: "14px",
-                  textDecoration: "none",
-                }}
-              >
-                View {countLeafNodes(node)} Assembl
-                {countLeafNodes(node) > 1 ? "ies" : "y"} for {nodeName}
-              </a>
-            </div>
-          ) : null}
+          <div
+            style={{
+              alignItems: "center",
+              borderBottom: "1px solid #e0e0e0",
+              borderTopLeftRadius: "8px",
+              borderTopRightRadius: "8px",
+              display: "flex",
+              padding: "12px 16px",
+            }}
+          >
+            <ViewListOutlined style={{ marginRight: "8px" }} />
+            <DXLink label={filterLinkText} url={linkUrl} />
+          </div>
 
           <div
             style={{
