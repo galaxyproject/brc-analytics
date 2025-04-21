@@ -2,7 +2,7 @@ import React from "react";
 import { TaxonomyNode } from "./data";
 import { HierarchyNode } from "d3";
 import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
-import { ChevronRightRounded } from "@mui/icons-material";
+import { ChevronRightRounded, ArrowBackRounded } from "@mui/icons-material";
 
 // Define additional properties used by D3 during transitions
 interface D3TransitionNode {
@@ -156,137 +156,100 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
         position: "relative",
       }}
     >
-      {!isRoot && filterUrl && (
-        <p>
-          <a href={filterUrl} rel="noopener noreferrer">
-            View {countLeafNodes(node)} Assembl
-            {countLeafNodes(node) > 1 ? "ies" : "y"} for {nodeName}
-          </a>
-        </p>
-      )}
-
-      {!isRoot && onClose && (
-        <button
-          onClick={onClose}
-          style={{
-            background: "none",
-            border: "none",
-            color: "#666",
-            cursor: "pointer",
-            fontSize: "20px",
-            padding: "5px",
-            position: "absolute",
-            right: "0",
-            top: "0",
-          }}
-        >
-          ×
-        </button>
-      )}
-
-      {isRoot && (
-        <div style={{ flex: "1" }}>
-          <RoundedPaper>
-            <div style={{ padding: "16px 16px 8px 16px" }}>
-              <h4
+      <div style={{ flex: "1", marginTop: "20px" }}>
+        <RoundedPaper>
+          {/* View Assemblies Row - Always visible within the card */}
+          {!isRoot && filterUrl ? (
+            <div
+              style={{
+                borderBottom: "1px solid #eee",
+                padding: "12px 16px",
+              }}
+            >
+              <a
+                href={filterUrl}
+                rel="noopener noreferrer"
                 style={{
-                  color: "#000",
-                  fontFamily: "'Inter Tight', sans-serif",
-                  fontSize: "20px",
-                  fontWeight: 500,
-                  margin: 0,
+                  color: "#1976d2",
+                  display: "block",
+                  fontSize: "14px",
+                  textDecoration: "none",
                 }}
               >
-                Categories
-              </h4>
+                View {countLeafNodes(node)} Assembl
+                {countLeafNodes(node) > 1 ? "ies" : "y"} for {nodeName}
+              </a>
             </div>
+          ) : null}
 
-            <div>
-              {firstLevelChildren.map((child, index) => (
-                <div
-                  key={index}
-                  onClick={() => onNodeClick && onNodeClick(child)}
-                  style={{
-                    alignItems: "center",
-                    borderTop: "1px solid #eee",
-                    color: "#000",
-                    cursor: "pointer",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    padding: "8px 16px",
-                  }}
-                >
-                  <div>
-                    <span style={{ fontWeight: 500 }}>{child.data.name}</span>
-                    <span
-                      style={{
-                        color: "#666",
-                        fontSize: "0.9em",
-                        marginLeft: "8px",
-                      }}
-                    >
-                      ({countLeafNodes(child)})
-                    </span>
-                  </div>
-                  <ChevronRightRounded style={{ color: "#666" }} />
-                </div>
-              ))}
-            </div>
-          </RoundedPaper>
-        </div>
-      )}
+          <div
+            style={{
+              alignItems: "center",
+              display: "flex",
+              justifyContent: "space-between",
+              padding: "16px 16px 8px 16px",
+            }}
+          >
+            <h4
+              style={{
+                color: "#000",
+                fontFamily: "'Inter Tight', sans-serif",
+                fontSize: "20px",
+                fontWeight: 500,
+                margin: 0,
+              }}
+            >
+              {childTaxaClassification}
+            </h4>
 
-      {!isRoot && firstLevelChildren.length > 0 && (
-        <div style={{ flex: "1", marginTop: "20px" }}>
-          <RoundedPaper>
-            <div style={{ padding: "16px 16px 8px 16px" }}>
-              <h4
+            {!isRoot && onClose && (
+              <div
+                onClick={onClose}
                 style={{
-                  color: "#000",
-                  fontFamily: "'Inter Tight', sans-serif",
-                  fontSize: "20px",
-                  fontWeight: 500,
-                  margin: 0,
+                  alignItems: "center",
+                  cursor: "pointer",
+                  display: "flex",
+                  padding: "4px",
                 }}
               >
-                {childTaxaClassification}
-              </h4>
-            </div>
+                <ArrowBackRounded style={{ color: "#666" }} fontSize="small" />
+              </div>
+            )}
+          </div>
 
-            <div>
-              {firstLevelChildren.map((child, index) => (
-                <div
-                  key={index}
-                  onClick={() => onNodeClick && onNodeClick(child)}
-                  style={{
-                    alignItems: "center",
-                    borderTop: "1px solid #eee",
-                    color: "#000",
-                    cursor: "pointer",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    padding: "10px 16px",
-                  }}
-                >
-                  <div>
-                    <span style={{ fontWeight: 500 }}>{child.data.name}</span>
-                    <span
-                      style={{
-                        color: "#666",
-                        fontSize: "0.9em",
-                        marginLeft: "8px",
-                      }}
-                    >
-                      ({countLeafNodes(child)})
-                    </span>
-                  </div>
-                  <ChevronRightRounded style={{ color: "#666" }} />
+          <div>
+            {firstLevelChildren.map((child, index) => (
+              <div
+                key={index}
+                onClick={() => onNodeClick && onNodeClick(child)}
+                style={{
+                  alignItems: "center",
+                  borderTop: "1px solid #eee",
+                  color: "#000",
+                  cursor: "pointer",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  padding: "10px 16px",
+                }}
+              >
+                <div>
+                  <span style={{ fontWeight: 500 }}>{child.data.name}</span>
+                  <span
+                    style={{
+                      color: "#666",
+                      fontSize: "0.9em",
+                      marginLeft: "8px",
+                    }}
+                  >
+                    ({countLeafNodes(child)})
+                  </span>
                 </div>
-              ))}
-            </div>
-          </RoundedPaper>
-        </div>
-      )}
+                <ChevronRightRounded style={{ color: "#666" }} />
+              </div>
+            ))}
+          </div>
+        </RoundedPaper>
+      </div>
 
       {isRoot && (
         <p
