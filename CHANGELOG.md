@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.11.0](https://github.com/galaxyproject/brc-analytics/compare/v0.10.0...v0.11.0) (2025-04-21)
+
+
+### Features
+
+* add common name column and filter to organisms list ([#463](https://github.com/galaxyproject/brc-analytics/issues/463)) ([#464](https://github.com/galaxyproject/brc-analytics/issues/464)) ([74ec338](https://github.com/galaxyproject/brc-analytics/commit/74ec338ccb9882a5317b711069b8daa0c5a741f3))
+* add outbreak schema and initial outbreaks ([#450](https://github.com/galaxyproject/brc-analytics/issues/450)) ([#462](https://github.com/galaxyproject/brc-analytics/issues/462)) ([617f361](https://github.com/galaxyproject/brc-analytics/commit/617f361bbcea719108463837931588cd8fd427f5))
+* add species common names to data catalog ([#451](https://github.com/galaxyproject/brc-analytics/issues/451)) ([#458](https://github.com/galaxyproject/brc-analytics/issues/458)) ([3050521](https://github.com/galaxyproject/brc-analytics/commit/3050521002526afab647b7d1defa56e455aaa1d5))
+* add stub of SANGER_READ_RUN workflow parameter variable ([#459](https://github.com/galaxyproject/brc-analytics/issues/459)) ([#460](https://github.com/galaxyproject/brc-analytics/issues/460)) ([8b08415](https://github.com/galaxyproject/brc-analytics/commit/8b08415f3079dc819bf0fde5d77d8909ce216163))
+* adding niaid biodefense viruses ([#383](https://github.com/galaxyproject/brc-analytics/issues/383)) ([#387](https://github.com/galaxyproject/brc-analytics/issues/387)) ([32f5837](https://github.com/galaxyproject/brc-analytics/commit/32f583714d149573f3501226f6985446bdc12e8e))
+* return collection for `SANGER_READ_RUN` workflow parameter variable ([#468](https://github.com/galaxyproject/brc-analytics/issues/468)) ([#469](https://github.com/galaxyproject/brc-analytics/issues/469)) ([260bf9b](https://github.com/galaxyproject/brc-analytics/commit/260bf9bdcdd3cc73e8d024da9f601d91f2cf4f90))
+* update settings for common name in organisms list and add to assemblies list ([#465](https://github.com/galaxyproject/brc-analytics/issues/465)) ([#467](https://github.com/galaxyproject/brc-analytics/issues/467)) ([b7bdbac](https://github.com/galaxyproject/brc-analytics/commit/b7bdbac3a72536bb6d1a041b1e4071337816cf21))
+
+
+### Styles
+
+* apply consistent python formatting, import sorting --  automate w/ ruff [#393](https://github.com/galaxyproject/brc-analytics/issues/393) ([#392](https://github.com/galaxyproject/brc-analytics/issues/392)) ([44effc6](https://github.com/galaxyproject/brc-analytics/commit/44effc63dbaf5199a1808185e9b76aa209a6d966))
+
 ## [0.10.0](https://github.com/galaxyproject/brc-analytics/compare/v0.9.0...v0.10.0) (2025-04-02)
 
 
