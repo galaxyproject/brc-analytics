@@ -1,25 +1,13 @@
-import { WORKFLOW_PARAMETER_VARIABLE } from "../apis/catalog/brc-analytics-catalog/common/schema-entities";
-import {
-  WorkflowParameter,
-  WorkflowUrlParameter,
-} from "../apis/catalog/brc-analytics-catalog/common/entities";
+import { WORKFLOW_PARAMETER_VARIABLE } from "../../apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { WorkflowParameter } from "../../apis/catalog/brc-analytics-catalog/common/entities";
 import ky from "ky";
 import { GALAXY_ENVIRONMENT } from "site-config/common/galaxy";
-
-interface WorkflowLandingsBody {
-  public: true;
-  request_state: WorkflowLandingsBodyRequestState;
-  workflow_id: string;
-  workflow_target_type: "trs_url";
-}
-
-type WorkflowLandingsBodyRequestState = {
-  [key: string]: string | WorkflowUrlParameter;
-};
-
-interface WorkflowLanding {
-  uuid: string;
-}
+import {
+  WorkflowLanding,
+  WorkflowLandingsBody,
+  WorkflowLandingsBodyRequestState,
+  WorkflowParameterValue,
+} from "./entities";
 
 const DOCKSTORE_API_URL = "https://dockstore.org/api/ga4gh/trs/v2/tools";
 
@@ -74,8 +62,9 @@ function buildFastaUrl(identifier: string): string {
 function paramVariableToRequestValue(
   variable: WORKFLOW_PARAMETER_VARIABLE,
   geneModelUrl: string | null,
+  readRuns: string | null,
   referenceGenome: string
-): WorkflowLandingsBodyRequestState[string] | null {
+): WorkflowParameterValue | null {
   // Because this `switch` has no default case, and the function doesn't allow `undefined` as a return type,
   // we ensure through TypeScript that all possible variables are handled.
   switch (variable) {
@@ -95,9 +84,72 @@ function paramVariableToRequestValue(
             url: geneModelUrl,
           }
         : null;
-    case WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN:
-      return null; // TODO pass in necessary information and generate an actual value for this
+    case WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN: {
+      if (!readRuns) return null;
+      // TODO get this info earlier? In particular, it might be better to explicitly get the run accession from ENA rather than getting it from the filenames.
+      const { forwardUrl, reverseUrl, runAccession } =
+        getPairedRunUrlsInfo(readRuns);
+      return {
+        class: "Collection",
+        collection_type: "list:paired",
+        elements: [
+          {
+            class: "Collection",
+            elements: [
+              {
+                class: "File",
+                filetype: "fastqsanger.gz",
+                identifier: "forward",
+                location: forwardUrl,
+              },
+              {
+                class: "File",
+                filetype: "fastqsanger.gz",
+                identifier: "reverse",
+                location: reverseUrl,
+              },
+            ],
+            identifier: runAccession,
+            type: "paired",
+          },
+        ],
+      };
+    }
   }
+}
+
+/**
+ * Get run accession and full URLs for the given paired run URLs from ENA.
+ * @param enaUrls - Concatenated paired run URLs, as provided by ENA.
+ * @returns accession and URLs for forward and reverse runs.
+ */
+function getPairedRunUrlsInfo(enaUrls: string): {
+  forwardUrl: string;
+  reverseUrl: string;
+  runAccession: string;
+} {
+  let forwardUrl: string | null = null;
+  let reverseUrl: string | null = null;
+  let runAccession: string | null = null;
+  for (const url of enaUrls.split(";")) {
+    // Regarding file name format, see https://ena-docs.readthedocs.io/en/latest/faq/archive-generated-files.html#generated-fastq-files and https://ena-docs.readthedocs.io/en/latest/submit/general-guide/accessions.html#accession-numbers
+    const urlMatch = /\/([EDS]RR\d{6,})_([12])\.fastq\.gz$/.exec(url);
+    if (!urlMatch) continue;
+    const [, accession, readIndex] = urlMatch;
+    if (runAccession === null) runAccession = accession;
+    else if (accession !== runAccession)
+      throw new Error(
+        `Inconsistent run accessions: ${JSON.stringify(runAccession)} and ${JSON.stringify(accession)}`
+      );
+    const fullUrl = `ftp://${url}`;
+    if (readIndex === "1") forwardUrl = fullUrl;
+    else reverseUrl = fullUrl;
+  }
+  if (runAccession === null)
+    throw new Error("No URLs with expected format found");
+  if (forwardUrl === null) throw new Error("No URL for forward read found");
+  if (reverseUrl === null) throw new Error("No URL for reverse read found");
+  return { forwardUrl, reverseUrl, runAccession };
 }
 
 /**
@@ -122,6 +174,7 @@ function getWorkflowLandingsRequestState(
       const value = paramVariableToRequestValue(
         variable,
         geneModelUrl,
+        null, // TODO pass in actual read run URLs
         referenceGenome
       );
       if (value !== null) result[key] = value;
