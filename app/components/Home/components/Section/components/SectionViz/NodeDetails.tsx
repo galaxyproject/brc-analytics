@@ -1,6 +1,8 @@
 import React from "react";
 import { TaxonomyNode } from "./data";
 import { HierarchyNode } from "d3";
+import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
+import { ChevronRightRounded } from "@mui/icons-material";
 
 // Define additional properties used by D3 during transitions
 interface D3TransitionNode {
@@ -86,6 +88,45 @@ function createFilterUrl(rank?: string, name?: string): string | null {
   return `/data/assemblies?filter=${encodeURIComponent(JSON.stringify(filter))}`;
 }
 
+// Helper function to determine child taxa classification
+function getChildTaxonRank(node: TreeNode): string {
+  if (!node?.children?.length) return "Subcategories";
+
+  // Get rank of first child with a rank defined
+  const firstChildWithRank = node.children.find((child) => child.data?.rank);
+  if (!firstChildWithRank) return "Subcategories";
+
+  const rank = firstChildWithRank.data.rank?.toLowerCase();
+
+  // Create plural form based on rank
+  switch (rank) {
+    case "domain":
+      return "Domains";
+    case "realm":
+      return "Realms";
+    case "kingdom":
+      return "Kingdoms";
+    case "phylum":
+      return "Phyla";
+    case "class":
+      return "Classes";
+    case "order":
+      return "Orders";
+    case "family":
+      return "Families";
+    case "genus":
+      return "Genera";
+    case "species":
+      return "Species";
+    case "strain":
+      return "Strains";
+    default:
+      return rank
+        ? `${rank.charAt(0).toUpperCase() + rank.slice(1)}s`
+        : "Subcategories";
+  }
+}
+
 export const NodeDetails: React.FC<NodeDetailsProps> = ({
   node,
   onClose,
@@ -100,18 +141,21 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
   // Get first-level children for navigation
   const firstLevelChildren = node?.children || [];
 
+  // Get child taxa classification
+  const childTaxaClassification = getChildTaxonRank(node);
+
   // Create the filter URL for this node if possible
   const filterUrl = createFilterUrl(nodeRank, nodeName);
 
   return (
-    <div style={{ position: "relative" }}>
-      {isRoot && (
-        <p style={{ color: "#666" }}>
-          Click the visualization to explore available assemblies, or select an
-          option below.
-        </p>
-      )}
-
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        position: "relative",
+      }}
+    >
       {!isRoot && filterUrl && (
         <p>
           <a href={filterUrl} rel="noopener noreferrer">
@@ -140,42 +184,123 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
         </button>
       )}
 
-      {firstLevelChildren.length > 0 && (
-        <div style={{ marginTop: "20px" }}>
-          <h4>Subcategories</h4>
-          <ul
-            style={{
-              listStyle: "none",
-              maxHeight: "600px",
-              overflowY: "auto",
-              padding: 0,
-            }}
-          >
-            {firstLevelChildren.map((child, index) => (
-              <li
-                key={index}
-                onClick={() => onNodeClick && onNodeClick(child)}
+      {isRoot && (
+        <div style={{ flex: "1" }}>
+          <RoundedPaper>
+            <div style={{ padding: "16px 16px 8px 16px" }}>
+              <h4
                 style={{
-                  borderBottom: "1px solid #eee",
-                  color: "#0066cc",
-                  cursor: "pointer",
-                  padding: "6px 0",
+                  color: "#000",
+                  fontFamily: "'Inter Tight', sans-serif",
+                  fontSize: "20px",
+                  fontWeight: 500,
+                  margin: 0,
                 }}
               >
-                {child.data.name}
-                <span
+                Categories
+              </h4>
+            </div>
+
+            <div>
+              {firstLevelChildren.map((child, index) => (
+                <div
+                  key={index}
+                  onClick={() => onNodeClick && onNodeClick(child)}
                   style={{
-                    color: "#888",
-                    fontSize: "0.9em",
-                    marginLeft: "5px",
+                    alignItems: "center",
+                    borderTop: "1px solid #eee",
+                    color: "#000",
+                    cursor: "pointer",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    padding: "8px 16px",
                   }}
                 >
-                  ({countLeafNodes(child)} assemblies)
-                </span>
-              </li>
-            ))}
-          </ul>
+                  <div>
+                    <span style={{ fontWeight: 500 }}>{child.data.name}</span>
+                    <span
+                      style={{
+                        color: "#666",
+                        fontSize: "0.9em",
+                        marginLeft: "8px",
+                      }}
+                    >
+                      ({countLeafNodes(child)})
+                    </span>
+                  </div>
+                  <ChevronRightRounded style={{ color: "#666" }} />
+                </div>
+              ))}
+            </div>
+          </RoundedPaper>
         </div>
+      )}
+
+      {!isRoot && firstLevelChildren.length > 0 && (
+        <div style={{ flex: "1", marginTop: "20px" }}>
+          <RoundedPaper>
+            <div style={{ padding: "16px 16px 8px 16px" }}>
+              <h4
+                style={{
+                  color: "#000",
+                  fontFamily: "'Inter Tight', sans-serif",
+                  fontSize: "20px",
+                  fontWeight: 500,
+                  margin: 0,
+                }}
+              >
+                {childTaxaClassification}
+              </h4>
+            </div>
+
+            <div>
+              {firstLevelChildren.map((child, index) => (
+                <div
+                  key={index}
+                  onClick={() => onNodeClick && onNodeClick(child)}
+                  style={{
+                    alignItems: "center",
+                    borderTop: "1px solid #eee",
+                    color: "#000",
+                    cursor: "pointer",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    padding: "10px 16px",
+                  }}
+                >
+                  <div>
+                    <span style={{ fontWeight: 500 }}>{child.data.name}</span>
+                    <span
+                      style={{
+                        color: "#666",
+                        fontSize: "0.9em",
+                        marginLeft: "8px",
+                      }}
+                    >
+                      ({countLeafNodes(child)})
+                    </span>
+                  </div>
+                  <ChevronRightRounded style={{ color: "#666" }} />
+                </div>
+              ))}
+            </div>
+          </RoundedPaper>
+        </div>
+      )}
+
+      {isRoot && (
+        <p
+          style={{
+            color: "#666",
+            fontSize: "0.9em",
+            fontStyle: "italic",
+            marginTop: "auto",
+            textAlign: "right",
+          }}
+        >
+          Click the visualization to explore available assemblies, or make a
+          selection above.
+        </p>
       )}
     </div>
   );
