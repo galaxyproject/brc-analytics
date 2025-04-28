@@ -162,7 +162,6 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
     filterLinkText = `View ${assemblyCount} Assembl${assemblySuffix} for ${nodeName}`;
   }
 
-
   return (
     <div
       style={{

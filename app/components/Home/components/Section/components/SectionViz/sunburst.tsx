@@ -69,13 +69,10 @@ export const SectionViz = (): JSX.Element => {
       if (node === root) return null;
 
       const ancestors = node.ancestors();
-      console.debug("Node is ", node);
-      console.debug("Ancestors are ", ancestors);
       // Find the ancestor that is a direct child of root
       for (let i = 0; i < ancestors.length; i++) {
         if (ancestors[i].parent === root) {
           // Return the first ancestor that is a direct child of root
-          console.debug("Found root child: ", ancestors[i]);
           return ancestors[i];
         }
       }
@@ -295,7 +292,6 @@ export const SectionViz = (): JSX.Element => {
       currentRoot = p;
       updateCenter(p);
       setSelectedNode(p);
-      console.debug(p);
 
       // For each node, compute new coordinates relative to p.
       root.each((d) => {
