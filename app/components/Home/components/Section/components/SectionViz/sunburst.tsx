@@ -201,6 +201,8 @@ export const SectionViz = (): JSX.Element => {
       .style("stroke", "#333")
       .style("stroke-width", "1px")
       .on("mouseover", function (event, d) {
+        // Hghlight the arc, and display the node name and value in the tooltip.
+        d3.select(this).style("stroke-width", "2px");
         tooltip.transition().duration(200).style("opacity", 0.9);
         tooltip
           .html(`<strong>${d.data.name}</strong><br/>Assemblies: ${d.value}`)
@@ -208,6 +210,8 @@ export const SectionViz = (): JSX.Element => {
           .style("top", event.pageY - 28 + "px");
       })
       .on("mouseout", function () {
+        // Restore the original stroke color and width
+        d3.select(this).style("stroke-width", "1px");
         tooltip.transition().duration(500).style("opacity", 0);
       })
       .on("click", clicked);
