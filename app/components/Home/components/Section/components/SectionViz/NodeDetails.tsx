@@ -93,45 +93,6 @@ function createFilterUrl(rank?: string, name?: string): string | null {
   return `/data/assemblies?filter=${encodeURIComponent(JSON.stringify(filter))}`;
 }
 
-// Helper function to determine child taxa classification
-function getChildTaxonRank(node: TreeNode): string {
-  if (!node?.children?.length) return "Subcategories";
-
-  // Get rank of first child with a rank defined
-  const firstChildWithRank = node.children.find((child) => child.data?.rank);
-  if (!firstChildWithRank) return "Subcategories";
-
-  const rank = firstChildWithRank.data.rank?.toLowerCase();
-
-  // Create plural form based on rank
-  switch (rank) {
-    case "domain":
-      return "Domains";
-    case "realm":
-      return "Realms";
-    case "kingdom":
-      return "Kingdoms";
-    case "phylum":
-      return "Phyla";
-    case "class":
-      return "Classes";
-    case "order":
-      return "Orders";
-    case "family":
-      return "Families";
-    case "genus":
-      return "Genera";
-    case "species":
-      return "Species";
-    case "strain":
-      return "Strains";
-    default:
-      return rank
-        ? `${rank.charAt(0).toUpperCase() + rank.slice(1)}s`
-        : "Subcategories";
-  }
-}
-
 export const NodeDetails: React.FC<NodeDetailsProps> = ({
   node,
   onClose,
@@ -145,9 +106,6 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
 
   // Get first-level children for navigation
   const firstLevelChildren = node?.children || [];
-
-  // Get child taxa classification
-  const childTaxaClassification = getChildTaxonRank(node);
 
   // Create the filter URL for this node if possible
   const filterUrl = createFilterUrl(nodeRank, nodeName);
