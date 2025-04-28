@@ -163,6 +163,15 @@ export const SectionViz = (): JSX.Element => {
       return isDescendant && withinDepth;
     }
 
+    // Function to check if an arc is large enough to display a label (at least 1% of the circle)
+    function isLargeEnoughForLabel(d: TreeNode): boolean {
+      // Calculate the angular size of the arc as a percentage of the full circle
+      const arcSizePercentage =
+        ((d.current.x1 - d.current.x0) / (2 * Math.PI)) * 100;
+      // Only show labels for arcs that are at least 1% (3.6 degrees) of the circle
+      return arcSizePercentage >= 1.0;
+    }
+
     // Draw the sunburst segments (we still don't draw the center node as an arc)
     const path = svg
       .append("g")
@@ -219,8 +228,8 @@ export const SectionViz = (): JSX.Element => {
         if (d === currentRoot) {
           return 0;
         }
-        // Otherwise, check if it's visible in the current view
-        if (isVisible(d, root, 0)) {
+        // Otherwise, check if it's visible in the current view and large enough for a label
+        if (isVisible(d, root, 0) && isLargeEnoughForLabel(d)) {
           return 1;
         } else {
           return 0;
@@ -352,18 +361,24 @@ export const SectionViz = (): JSX.Element => {
           // eslint-disable-next-line sonarjs/no-nested-functions -- cleaner in d3 to keep this inlined
           (d) => (): string => labelTransform(d)
         )
-        .attr("fill-opacity", (d) => {
-          // If this node is the current root, make it invisible
-          if (d === currentRoot) {
-            return 0;
-          }
+        .attrTween("fill-opacity", (d) => {
+          return () => {
+            // If this node is the current root, make it invisible
+            if (d === currentRoot) {
+              return "0";
+            }
 
-          // Otherwise, check if it's visible based on the current depth
-          if (isVisible(d, currentRoot, p.depth)) {
-            return 1; // Visible node
-          } else {
-            return 0; // Hidden node
-          }
+            // Otherwise, check if it's visible based on the current depth and large enough
+            // We evaluate this during the transition which fixes the "zooming out" issue
+            if (
+              isVisible(d, currentRoot, p.depth) &&
+              isLargeEnoughForLabel(d)
+            ) {
+              return "1"; // Visible node with sufficient size
+            } else {
+              return "0"; // Hidden node or too small for label
+            }
+          };
         });
     }
 
