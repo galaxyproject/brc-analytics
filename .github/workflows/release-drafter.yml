@@ -8,15 +8,16 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
-  issues: write
 
 jobs:
   update_release_draft:
+    permissions:
+      contents: write
+      pull-requests: write
     if: github.repository == 'galaxyproject/brc-analytics'
     runs-on: ubuntu-latest
     steps:
-      - uses: release-drafter/release-drafter@v5
+      - uses: release-drafter/release-drafter@v6
         with:
           config-name: release-drafter.yml
         env:
