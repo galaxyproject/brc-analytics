@@ -2,6 +2,7 @@ import * as d3 from "d3";
 import { useRef, useEffect, useState } from "react";
 import { getData, TaxonomyNode } from "./data";
 import { TreeNode, NodeDetails } from "./NodeDetails";
+import { smokeLightest } from "@databiosphere/findable-ui/lib/theme/common/palette";
 
 const DEPTH = 4;
 const data = getData();
@@ -42,8 +43,13 @@ export const SectionViz = (): JSX.Element => {
       // Adjust depth relative to current root
       const relativeDepth = d.depth - root.depth;
 
-      if (relativeDepth === 0 || relativeDepth === 1)
-        return baseColor(d.data.name); // Direct children of root get base colors
+      if (relativeDepth === 0) {
+        // Keep center node color consistent, background-light
+        return smokeLightest;
+      } else if (relativeDepth === 1) {
+        // Direct children of root get base colors
+        return baseColor(d.data.name);
+      }
 
       // For descendants, get the color of their direct child of the root ancestor and modify it
       const rootChild = findRootChild(d, root);
