@@ -62,7 +62,7 @@ function buildFastaUrl(identifier: string): string {
 function paramVariableToRequestValue(
   variable: WORKFLOW_PARAMETER_VARIABLE,
   geneModelUrl: string | null,
-  readRuns: string | null,
+  readRuns: string[] | null,
   referenceGenome: string
 ): WorkflowParameterValue | null {
   // Because this `switch` has no default case, and the function doesn't allow `undefined` as a return type,
@@ -85,15 +85,15 @@ function paramVariableToRequestValue(
           }
         : null;
     case WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN: {
-      if (!readRuns) return null;
-      // TODO get this info earlier? In particular, it might be better to explicitly get the run accession from ENA rather than getting it from the filenames.
-      const { forwardUrl, reverseUrl, runAccession } =
-        getPairedRunUrlsInfo(readRuns);
+      if (!readRuns?.length) return null;
       return {
         class: "Collection",
         collection_type: "list:paired",
-        elements: [
-          {
+        elements: readRuns.map((readRunsPair) => {
+          // TODO get this info earlier? In particular, it might be better to explicitly get the run accession from ENA rather than getting it from the filenames.
+          const { forwardUrl, reverseUrl, runAccession } =
+            getPairedRunUrlsInfo(readRunsPair);
+          return {
             class: "Collection",
             elements: [
               {
@@ -111,8 +111,8 @@ function paramVariableToRequestValue(
             ],
             identifier: runAccession,
             type: "paired",
-          },
-        ],
+          };
+        }),
       };
     }
   }
