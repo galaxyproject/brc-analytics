@@ -34,7 +34,7 @@ export const SectionViz = (): JSX.Element => {
     const svg = d3
       .select(svgNode)
       .attr("viewBox", [-width / 2, -height / 2, width, width])
-      .style("font", "10px sans-serif");
+      .style("font", "10px 'Inter Tight', sans-serif");
     // Define a color scale for base colors (root and first ring)
     const baseColor = d3.scaleOrdinal(d3.schemeTableau10);
 
@@ -94,8 +94,8 @@ export const SectionViz = (): JSX.Element => {
       .style("position", "absolute")
       .style("text-align", "center")
       .style("padding", "6px")
-      .style("font", "12px sans-serif")
-      .style("background", "lightsteelblue")
+      .style("font", "12px 'Inter Tight', sans-serif")
+      .style("background", smokeLightest)
       .style("border", "0px")
       .style("border-radius", "8px")
       .style("pointer-events", "none");
