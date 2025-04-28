@@ -1,3 +1,5 @@
+name: Release Drafter
+
 on:
   push:
     branches:
@@ -5,18 +7,17 @@ on:
   workflow_dispatch: # Enable manual triggering
 
 permissions:
-  contents: write
+  contents: read
   pull-requests: write
-
-name: release-please
+  issues: write
 
 jobs:
-  release-please:
+  update_release_draft:
     if: github.repository == 'galaxyproject/brc-analytics'
     runs-on: ubuntu-latest
     steps:
-      - uses: googleapis/release-please-action@v4
-        id: release
+      - uses: release-drafter/release-drafter@v5
         with:
-          config-file: release-please-config.json
-          token: ${{ secrets.GITHUB_TOKEN }}
+          config-name: release-drafter.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
