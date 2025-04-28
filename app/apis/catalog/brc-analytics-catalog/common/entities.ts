@@ -1,3 +1,4 @@
+import { WorkflowUrlParameter } from "../../../../utils/galaxy-api/entities";
 import {
   ORGANISM_PLOIDY,
   WORKFLOW_PARAMETER_VARIABLE,
@@ -10,6 +11,7 @@ export interface BRCDataCatalogGenome {
   accession: string;
   annotationStatus: string | null;
   chromosomes: number | null;
+  commonName: string | null;
   coverage: string | null;
   gcPercent: number | null;
   geneModelUrl: string | null;
@@ -41,6 +43,7 @@ export interface BRCDataCatalogGenome {
 export interface BRCDataCatalogOrganism {
   assemblyCount: number;
   assemblyTaxonomyIds: string[];
+  commonName: string | null;
   genomes: BRCDataCatalogGenome[];
   ncbiTaxonomyId: string;
   taxonomicGroup: string[];
@@ -73,6 +76,7 @@ export interface WorkflowCategory {
   category: string;
   description: string;
   name: string;
+  showComingSoon: boolean;
   workflows: Workflow[];
 }
 
@@ -87,5 +91,6 @@ export interface Workflow {
 
 export interface WorkflowParameter {
   key: string;
-  variable: WORKFLOW_PARAMETER_VARIABLE;
+  url_spec?: WorkflowUrlParameter;
+  variable?: WORKFLOW_PARAMETER_VARIABLE;
 }

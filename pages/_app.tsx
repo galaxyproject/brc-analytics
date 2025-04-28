@@ -9,7 +9,7 @@ import { Header as DXHeader } from "@databiosphere/findable-ui/lib/components/La
 import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main";
 import { ConfigProvider as DXConfigProvider } from "@databiosphere/findable-ui/lib/providers/config";
 import { ExploreStateProvider } from "@databiosphere/findable-ui/lib/providers/exploreState";
-import { LayoutStateProvider } from "@databiosphere/findable-ui/lib/providers/layoutState";
+import { LayoutDimensionsProvider } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/provider";
 import { SystemStatusProvider } from "@databiosphere/findable-ui/lib/providers/systemStatus";
 import { DataExplorerError } from "@databiosphere/findable-ui/lib/types/error";
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
@@ -20,8 +20,11 @@ import { StyledFooter } from "../app/components/Layout/components/Footer/footer.
 import { config } from "../app/config/config";
 import { mergeAppTheme } from "../app/theme/theme";
 import { GoogleSignInAuthenticationProvider } from "@databiosphere/findable-ui/lib/providers/googleSignInAuthentication/provider";
+import { setFeatureFlags } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/common/utils";
 
 const DEFAULT_ENTITY_LIST_TYPE = "organisms";
+
+setFeatureFlags(["workflow"]);
 
 export interface PageProps extends AzulEntitiesStaticResponse {
   pageTitle?: string;
@@ -62,7 +65,7 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
           <CssBaseline />
           <SystemStatusProvider>
             <GoogleSignInAuthenticationProvider>
-              <LayoutStateProvider>
+              <LayoutDimensionsProvider>
                 <AppLayout>
                   <DXHeader {...header} />
                   <ExploreStateProvider entityListType={entityListType}>
@@ -90,7 +93,7 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
                   </ExploreStateProvider>
                   <StyledFooter {...footer} />
                 </AppLayout>
-              </LayoutStateProvider>
+              </LayoutDimensionsProvider>
             </GoogleSignInAuthenticationProvider>
           </SystemStatusProvider>
         </DXConfigProvider>

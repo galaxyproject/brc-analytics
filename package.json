@@ -1,6 +1,6 @@
 {
   "name": "brc-analytics",
-  "version": "0.8.0",
+  "version": "0.10.0",
   "private": true,
   "scripts": {
     "dev": "./scripts/dev.sh brc-analytics && ./scripts/set-version.sh dev && next dev",
@@ -11,6 +11,7 @@
     "lint": "next lint --dir .",
     "check-format": "prettier --check .",
     "format": "prettier --write . --cache",
+    "format:python": "./scripts/format-python.sh",
     "prepare": "husky",
     "test": "jest --runInBand",
     "build-brc-db": "esrun catalog/build/ts/build-catalog.ts",
@@ -21,7 +22,7 @@
     "validate-catalog": "./catalog/schema/scripts/validate-catalog.sh"
   },
   "dependencies": {
-    "@databiosphere/findable-ui": "^22.0.0",
+    "@databiosphere/findable-ui": "^24.0.0",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@mdx-js/loader": "^3.0.1",

@@ -11,7 +11,7 @@ export const GRID2_PROPS: Grid2Props = {
   wrap: "nowrap",
 };
 
-export const BUTTON_PROPS: Partial<ButtonProps> = {
+export const BUTTON_PROPS: Pick<ButtonProps, "color" | "variant"> = {
   color: COLOR.PRIMARY,
   variant: VARIANT.CONTAINED,
 };

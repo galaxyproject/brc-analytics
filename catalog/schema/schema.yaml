@@ -8,5 +8,6 @@ prefixes:
 imports:
   - ./assemblies
   - ./organisms
+  - ./outbreaks
   - ./workflow_categories
   - ./workflows

@@ -83,6 +83,7 @@ async function buildGenomes(): Promise<BRCDataCatalogGenome[]> {
       accession: row.accession,
       annotationStatus: parseStringOrNull(row.annotationStatus),
       chromosomes: parseNumberOrNull(row.chromosomeCount),
+      commonName: parseStringOrNull(row.commonName),
       coverage: parseStringOrNull(row.coverage),
       gcPercent: parseNumberOrNull(row.gcPercent),
       geneModelUrl: parseStringOrNull(row.geneModelUrl),
@@ -139,6 +140,7 @@ function buildOrganism(
       organism?.assemblyTaxonomyIds,
       genome.ncbiTaxonomyId
     ),
+    commonName: genome.commonName,
     genomes: accumulateArrayValue(organism?.genomes, genome),
     ncbiTaxonomyId: genome.speciesTaxonomyId,
     taxonomicGroup: genome.taxonomicGroup,
@@ -168,10 +170,11 @@ async function buildWorkflows(): Promise<WorkflowCategory[]> {
 
   const workflowCategories: WorkflowCategory[] =
     sourceWorkflowCategories.workflow_categories.map(
-      ({ category, description, name }) => ({
+      ({ category, description, name, show_coming_soon }) => ({
         category,
         description,
         name,
+        showComingSoon: show_coming_soon,
         workflows: [],
       })
     );
@@ -198,8 +201,10 @@ function buildWorkflow(
   }: SourceWorkflow
 ): void {
   const parameters = [];
-  for (const { key, variable } of sourceParameters) {
+  for (const { key, url_spec, variable } of sourceParameters) {
+    // Add parameter if either variable or url_spec is defined
     if (variable) parameters.push({ key, variable });
+    else if (url_spec) parameters.push({ key, url_spec });
   }
   const workflow: Workflow = {
     parameters,
