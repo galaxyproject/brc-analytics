@@ -2,6 +2,7 @@ import * as d3 from "d3";
 import { useRef, useEffect, useState } from "react";
 import { getData, TaxonomyNode } from "./data";
 import { TreeNode, NodeDetails } from "./NodeDetails";
+import { smokeLightest } from "@databiosphere/findable-ui/lib/theme/common/palette";
 
 const DEPTH = 4;
 const data = getData();
@@ -44,7 +45,7 @@ export const SectionViz = (): JSX.Element => {
 
       if (relativeDepth === 0) {
         // Keep center node color consistent, background-light
-        return "#eee";
+        return smokeLightest;
       } else if (relativeDepth === 1) {
         // Direct children of root get base colors
         return baseColor(d.data.name);
