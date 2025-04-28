@@ -168,8 +168,22 @@ export const SectionViz = (): JSX.Element => {
       // Calculate the angular size of the arc as a percentage of the full circle
       const arcSizePercentage =
         ((d.current.x1 - d.current.x0) / (2 * Math.PI)) * 100;
-      // Only show labels for arcs that are at least 1% (3.6 degrees) of the circle
-      return arcSizePercentage >= 1.0;
+      return arcSizePercentage >= 1; // Only show labels for arcs that are at least 1% of the circle
+    }
+
+    // Consolidated function to check if a label should be visible
+    function isLabelVisible(
+      d: TreeNode,
+      currentRoot: TreeNode,
+      targetDepth: number
+    ): boolean {
+      // Labels should not be visible for the current root node
+      if (d === currentRoot) {
+        return false;
+      }
+
+      // Labels should only be visible if the node is visible and large enough
+      return isVisible(d, currentRoot, targetDepth) && isLargeEnoughForLabel(d);
     }
 
     // Draw the sunburst segments (we still don't draw the center node as an arc)
@@ -224,16 +238,8 @@ export const SectionViz = (): JSX.Element => {
       .data(root.descendants().slice(1))
       .join("text")
       .attr("fill-opacity", (d) => {
-        // If this node is the current root, make it invisible
-        if (d === currentRoot) {
-          return 0;
-        }
-        // Otherwise, check if it's visible in the current view and large enough for a label
-        if (isVisible(d, root, 0) && isLargeEnoughForLabel(d)) {
-          return 1;
-        } else {
-          return 0;
-        }
+        // Use the consolidated visibility function for consistent behavior
+        return isLabelVisible(d, root, 0) ? 1 : 0;
       })
       .attr("dy", "0.35em")
       .attr("transform", labelTransform)
@@ -302,6 +308,16 @@ export const SectionViz = (): JSX.Element => {
       y1: number;
     }
 
+    // Helper function that returns a tween function for fill opacity
+    function createOpacityTween(
+      d: TreeNode,
+      currentRoot: TreeNode,
+      targetDepth: number
+    ) {
+      return (): string =>
+        isLabelVisible(d, currentRoot, targetDepth) ? "1" : "0";
+    }
+
     function clicked(event: React.MouseEvent | null, p: TreeNode): void {
       // Update the current center and the center label.
       currentRoot = p;
@@ -361,25 +377,9 @@ export const SectionViz = (): JSX.Element => {
           // eslint-disable-next-line sonarjs/no-nested-functions -- cleaner in d3 to keep this inlined
           (d) => (): string => labelTransform(d)
         )
-        .attrTween("fill-opacity", (d) => {
-          return () => {
-            // If this node is the current root, make it invisible
-            if (d === currentRoot) {
-              return "0";
-            }
-
-            // Otherwise, check if it's visible based on the current depth and large enough
-            // We evaluate this during the transition which fixes the "zooming out" issue
-            if (
-              isVisible(d, currentRoot, p.depth) &&
-              isLargeEnoughForLabel(d)
-            ) {
-              return "1"; // Visible node with sufficient size
-            } else {
-              return "0"; // Hidden node or too small for label
-            }
-          };
-        });
+        .attrTween("fill-opacity", (d) =>
+          createOpacityTween(d, currentRoot, p.depth)
+        );
     }
 
     // Assign the clicked function to the ref so it can be accessed outside
