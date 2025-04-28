@@ -87,3 +87,17 @@ The `run-checks` GitHub workflow performs checks to ensure that the catalog data
 - Linting the schemas via `linkml-lint`.
 - Converting the schemas to Python, to catch any errors that occur.
 - Validating the catalog source files against their corresponding schemas.
+
+## Release Process
+
+This repository uses [Release Drafter](https://github.com/release-drafter/release-drafter) to automatically generate release notes based on PR titles.
+
+### How it works
+
+1. PRs are categorized based on their titles using the conventional commit format (e.g., `feat:`, `fix:`, `docs:`, etc.)
+2. When PRs are merged to `main`, a draft release is automatically updated
+3. The version number is determined based on the type of changes:
+   - PRs with `breaking` or `major` labels trigger a major version bump
+   - PRs with `feat`, `feature`, `enhancement`, or `minor` labels trigger a minor version bump
+   - All other types trigger a patch version bump
+4. When ready to release, the draft can be published manually through the GitHub interface or using the `publish-release` workflow
