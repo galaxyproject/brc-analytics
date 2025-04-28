@@ -4,7 +4,13 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch: # Enable manual triggering
+  pull_request:
+    types: [opened, reopened, synchronize]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version"
+        required: true
 
 permissions:
   contents: read
