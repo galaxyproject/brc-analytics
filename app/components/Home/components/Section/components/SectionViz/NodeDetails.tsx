@@ -204,7 +204,7 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
                 margin: 0,
               }}
             >
-              {childTaxaClassification}
+              Subcategories
             </h4>
 
             {!isRoot && onClose && (
