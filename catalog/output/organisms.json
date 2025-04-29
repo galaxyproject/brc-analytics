@@ -35783,6 +35783,82 @@
     ]
   },
   {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "2697049"
+    ],
+    "commonName": "SARS-CoV-2",
+    "genomes": [
+      {
+        "accession": "GCF_009858895.2",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "SARS-CoV-2",
+        "coverage": null,
+        "gcPercent": 38,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/009/858/895/GCF_009858895.2/genes/GCF_009858895.2_ASM985889v3.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 29903,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "76804",
+          "2499399",
+          "11118",
+          "2501931",
+          "694002",
+          "2509511",
+          "3418604",
+          "2697049"
+        ],
+        "ncbiTaxonomyId": "2697049",
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 29903,
+        "speciesTaxonomyId": "3418604",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Coronaviridae",
+        "taxonomicLevelGenus": "Betacoronavirus",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Nidovirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSpecies": "Betacoronavirus pandemicum",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_009858895.2"
+      }
+    ],
+    "ncbiTaxonomyId": "3418604",
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Pisoniviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Coronaviridae",
+    "taxonomicLevelGenus": "Betacoronavirus",
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Nidovirales",
+    "taxonomicLevelPhylum": "Pisuviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSpecies": "Betacoronavirus pandemicum",
+    "taxonomicLevelStrain": [
+      "None"
+    ]
+  },
+  {
     "assemblyCount": 2,
     "assemblyTaxonomyIds": [
       "62690",
@@ -69285,82 +69361,6 @@
     "taxonomicLevelSpecies": "Anopheles farauti",
     "taxonomicLevelStrain": [
       "Anopheles farauti strain FAR1"
-    ]
-  },
-  {
-    "assemblyCount": 1,
-    "assemblyTaxonomyIds": [
-      "2697049"
-    ],
-    "commonName": "SARS-CoV-2",
-    "genomes": [
-      {
-        "accession": "GCF_009858895.2",
-        "annotationStatus": null,
-        "chromosomes": 1,
-        "commonName": "SARS-CoV-2",
-        "coverage": null,
-        "gcPercent": 38,
-        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/009/858/895/GCF_009858895.2/genes/GCF_009858895.2_ASM985889v3.ncbiGene.gtf.gz",
-        "isRef": "No",
-        "length": 29903,
-        "level": "Complete Genome",
-        "lineageTaxonomyIds": [
-          "1",
-          "10239",
-          "2559587",
-          "2732396",
-          "2732408",
-          "2732506",
-          "76804",
-          "2499399",
-          "11118",
-          "2501931",
-          "694002",
-          "2509511",
-          "694009",
-          "2697049"
-        ],
-        "ncbiTaxonomyId": "2697049",
-        "ploidy": [
-          "HAPLOID"
-        ],
-        "scaffoldCount": 1,
-        "scaffoldL50": 1,
-        "scaffoldN50": 29903,
-        "speciesTaxonomyId": "694009",
-        "strainName": null,
-        "taxonomicGroup": [
-          "Viruses"
-        ],
-        "taxonomicLevelClass": "Pisoniviricetes",
-        "taxonomicLevelDomain": "None",
-        "taxonomicLevelFamily": "Coronaviridae",
-        "taxonomicLevelGenus": "Betacoronavirus",
-        "taxonomicLevelKingdom": "Orthornavirae",
-        "taxonomicLevelOrder": "Nidovirales",
-        "taxonomicLevelPhylum": "Pisuviricota",
-        "taxonomicLevelRealm": "Riboviria",
-        "taxonomicLevelSpecies": "Severe acute respiratory syndrome-related coronavirus",
-        "taxonomicLevelStrain": "None",
-        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_009858895.2"
-      }
-    ],
-    "ncbiTaxonomyId": "694009",
-    "taxonomicGroup": [
-      "Viruses"
-    ],
-    "taxonomicLevelClass": "Pisoniviricetes",
-    "taxonomicLevelDomain": "None",
-    "taxonomicLevelFamily": "Coronaviridae",
-    "taxonomicLevelGenus": "Betacoronavirus",
-    "taxonomicLevelKingdom": "Orthornavirae",
-    "taxonomicLevelOrder": "Nidovirales",
-    "taxonomicLevelPhylum": "Pisuviricota",
-    "taxonomicLevelRealm": "Riboviria",
-    "taxonomicLevelSpecies": "Severe acute respiratory syndrome-related coronavirus",
-    "taxonomicLevelStrain": [
-      "None"
     ]
   },
   {

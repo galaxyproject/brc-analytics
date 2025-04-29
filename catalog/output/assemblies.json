@@ -51560,7 +51560,7 @@
       "2501931",
       "694002",
       "2509511",
-      "694009",
+      "3418604",
       "2697049"
     ],
     "ncbiTaxonomyId": "2697049",
@@ -51570,7 +51570,7 @@
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 29903,
-    "speciesTaxonomyId": "694009",
+    "speciesTaxonomyId": "3418604",
     "strainName": null,
     "taxonomicGroup": [
       "Viruses"
@@ -51583,7 +51583,7 @@
     "taxonomicLevelOrder": "Nidovirales",
     "taxonomicLevelPhylum": "Pisuviricota",
     "taxonomicLevelRealm": "Riboviria",
-    "taxonomicLevelSpecies": "Severe acute respiratory syndrome-related coronavirus",
+    "taxonomicLevelSpecies": "Betacoronavirus pandemicum",
     "taxonomicLevelStrain": "None",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_009858895.2"
   },
