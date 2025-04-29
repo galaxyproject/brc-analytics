@@ -24,27 +24,25 @@ export interface WorkflowUrlParameter {
 interface WorkflowPairedCollectionParameter {
   class: "Collection";
   collection_type: "list:paired";
-  elements: [
-    {
-      class: "Collection";
-      elements: [
-        {
-          class: "File";
-          filetype: string;
-          identifier: "forward";
-          location: string;
-        },
-        {
-          class: "File";
-          filetype: string;
-          identifier: "reverse";
-          location: string;
-        },
-      ];
-      identifier: string;
-      type: "paired";
-    },
-  ];
+  elements: Array<{
+    class: "Collection";
+    elements: [
+      {
+        class: "File";
+        filetype: string;
+        identifier: "forward";
+        location: string;
+      },
+      {
+        class: "File";
+        filetype: string;
+        identifier: "reverse";
+        location: string;
+      },
+    ];
+    identifier: string;
+    type: "paired";
+  }>;
 }
 
 export interface WorkflowLanding {
