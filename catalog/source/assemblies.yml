@@ -2525,7 +2525,7 @@ assemblies:
   - accession: GCA_004786555.1
   # Punta Toro virus
   - accession: GCF_002815115.1
-  - accession: GCA_001021295.1
+  - accession: GCF_001021295.1
   - accession: GCA_031322265.1
   # Rabies virus
   - accession: GCF_000859625.1
