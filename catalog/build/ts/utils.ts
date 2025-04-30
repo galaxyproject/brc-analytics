@@ -1,5 +1,7 @@
 import { parse as parseCsv } from "csv-parse/sync";
 import fsp from "fs/promises";
+import { MDXRemoteSerializeResult } from "next-mdx-remote";
+import { serialize } from "next-mdx-remote/serialize";
 import YAML from "yaml";
 
 export async function readValuesFile<T>(
@@ -25,6 +27,12 @@ export async function readValuesFile<T>(
 export async function readYamlFile<T>(filePath: string): Promise<T> {
   const content = await fsp.readFile(filePath, "utf8");
   return YAML.parse(content);
+}
+
+export async function readMdxFile(
+  filePath: string
+): Promise<MDXRemoteSerializeResult> {
+  return await serialize(await fsp.readFile(filePath));
 }
 
 export async function saveJson(filePath: string, data: unknown): Promise<void> {
