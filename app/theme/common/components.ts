@@ -2,6 +2,7 @@ import { TEXT_BODY_LARGE_400_2_LINES } from "@databiosphere/findable-ui/lib/them
 import { Components, Theme } from "@mui/material";
 import { COLOR_MIXES } from "@databiosphere/findable-ui/lib/styles/common/constants/colorMixes";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
+import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
 
 /**
  * MuiButton Component
@@ -23,13 +24,13 @@ export const MuiButton: Components["MuiButton"] = {
     root: {
       variants: [
         {
-          props: { size: "large" },
+          props: { size: BUTTON_PROPS.SIZE.LARGE },
           style: {
             padding: "10px 16px",
           },
         },
         {
-          props: { size: "medium" },
+          props: { size: BUTTON_PROPS.SIZE.MEDIUM },
           style: {
             padding: "8px 16px",
           },

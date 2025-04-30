@@ -29,14 +29,6 @@ export function mergeAppTheme(
       MuiCssBaseline: C.MuiCssBaseline(baseAppTheme),
     },
   });
-  if (themeOptions?.components) {
-    // Return app theme - with custom component overrides.
-    return createTheme(
-      deepmerge(appTheme, {
-        components: themeOptions.components,
-      })
-    );
-  }
   // Return app theme.
   return appTheme;
 }
