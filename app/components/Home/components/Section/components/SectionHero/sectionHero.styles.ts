@@ -1,10 +1,5 @@
 import { mediaDesktopSmallUp } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
-import {
-  inkLight,
-  smokeLightest,
-} from "@databiosphere/findable-ui/lib/styles/common/mixins/colors";
 import { textBodyLarge4002Lines } from "@databiosphere/findable-ui/lib/styles/common/mixins/fonts";
-import { black } from "@databiosphere/findable-ui/lib/theme/common/palette";
 import styled from "@emotion/styled";
 import { Section } from "../../../../../common/Section/section";
 import {
@@ -12,10 +7,11 @@ import {
   sectionGrid,
   sectionLayout,
 } from "../../../../../Layout/components/AppLayout/components/Section/section.styles";
+import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 
 export const StyledSection = styled(Section)`
   ${section};
-  background-color: ${smokeLightest};
+  background-color: ${PALETTE.SMOKE_LIGHTEST};
   overflow: hidden;
   position: relative; /* positions svg */
   z-index: 0; /* section content above svg */
@@ -49,7 +45,7 @@ export const Headline = styled.div`
 `;
 
 export const Head = styled.h1`
-  color: ${black};
+  color: ${PALETTE.COMMON_BLACK};
   font-family: "Inter", sans-serif;
   font-size: 48px;
   font-weight: 500;
@@ -74,6 +70,6 @@ export const SubHeadline = styled.div`
 
 export const Subhead = styled.h2`
   ${textBodyLarge4002Lines};
-  color: ${inkLight};
+  color: ${PALETTE.INK_LIGHT};
   margin: 0;
 `;

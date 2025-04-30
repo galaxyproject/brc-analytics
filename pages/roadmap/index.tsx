@@ -1,4 +1,3 @@
-import { smokeLightest } from "@databiosphere/findable-ui/lib/theme/common/palette";
 import { GetStaticProps } from "next";
 import { StyledPagesMain } from "../../app/components/Layout/components/Main/main.styles";
 import { RoadmapView } from "../../app/views/RoadmapView/roadmapView";
@@ -12,7 +11,7 @@ export const getStaticProps: GetStaticProps = async () => {
     props: {
       pageTitle: "Roadmap",
       themeOptions: {
-        palette: { background: { default: smokeLightest } },
+        palette: { background: { default: "#FAFBFB" } }, // SMOKE_LIGHTEST
       },
     },
   };

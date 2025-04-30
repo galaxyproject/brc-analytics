@@ -1,6 +1,6 @@
-import { inkLight } from "@databiosphere/findable-ui/lib/styles/common/mixins/colors";
 import { textBodyLarge400 } from "@databiosphere/findable-ui/lib/styles/common/mixins/fonts";
 import styled from "@emotion/styled";
+import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 
 export const SectionHeadline = styled.div`
   display: grid;
@@ -17,6 +17,6 @@ export const SectionTitle = styled.h2`
 
 export const SectionSubtitle = styled.h3`
   ${textBodyLarge400};
-  color: ${inkLight};
+  color: ${PALETTE.INK_LIGHT};
   margin: 0;
 `;

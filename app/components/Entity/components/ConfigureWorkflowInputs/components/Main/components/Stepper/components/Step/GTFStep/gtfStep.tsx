@@ -10,7 +10,7 @@ import {
   RadioGroup,
   Typography,
 } from "@mui/material";
-import { StyledGrid2 } from "./gtfStep.styles";
+import { StyledGrid } from "./gtfStep.styles";
 import { TYPOGRAPHY_PROPS } from "./constants";
 import { TYPOGRAPHY_PROPS as MUI_TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { configureGTFStep } from "./utils";
@@ -66,7 +66,7 @@ export const GTFStep = ({
         <Icon slotProps={{ tooltip: { title: description } }} />
       </StepLabel>
       <StepContent>
-        <StyledGrid2>
+        <StyledGrid>
           <Typography {...TYPOGRAPHY_PROPS}>
             Genes and Gene Predictions
           </Typography>
@@ -98,7 +98,7 @@ export const GTFStep = ({
           >
             Launch Galaxy
           </Button>
-        </StyledGrid2>
+        </StyledGrid>
       </StepContent>
     </Step>
   );

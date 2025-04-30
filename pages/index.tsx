@@ -1,4 +1,3 @@
-import { smokeLightest } from "@databiosphere/findable-ui/lib/theme/common/palette";
 import { GetStaticProps } from "next";
 import { StyledMain } from "../app/components/Layout/components/Main/main.styles";
 import { HomeView } from "../app/views/HomeView/homeView";
@@ -13,7 +12,7 @@ export const getStaticProps: GetStaticProps = async () => {
       pageTitle: "BRC Analytics",
       themeOptions: {
         palette: {
-          background: { default: smokeLightest },
+          palette: { background: { default: "#FAFBFB" } }, // SMOKE_LIGHTEST
         },
       },
     },
