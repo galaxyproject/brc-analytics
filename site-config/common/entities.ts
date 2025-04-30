@@ -3,7 +3,7 @@ import {
   BackPageConfig,
   BackPageTabConfig,
   ComponentsConfig,
-} from "@databiosphere/findable-ui/src/config/entities";
+} from "@databiosphere/findable-ui/lib/config/entities";
 
 export interface BRCBackPageConfig
   extends Omit<BackPageConfig, "tabs" | "top"> {

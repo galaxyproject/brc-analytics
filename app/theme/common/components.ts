@@ -1,6 +1,8 @@
-import { black08 } from "@databiosphere/findable-ui/lib/theme/common/palette";
 import { TEXT_BODY_LARGE_400_2_LINES } from "@databiosphere/findable-ui/lib/theme/common/typography";
 import { Components, Theme } from "@mui/material";
+import { COLOR_MIXES } from "@databiosphere/findable-ui/lib/styles/common/constants/colorMixes";
+import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
+import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
 
 /**
  * MuiButton Component
@@ -22,13 +24,13 @@ export const MuiButton: Components["MuiButton"] = {
     root: {
       variants: [
         {
-          props: { size: "large" },
+          props: { size: BUTTON_PROPS.SIZE.LARGE },
           style: {
             padding: "10px 16px",
           },
         },
         {
-          props: { size: "medium" },
+          props: { size: BUTTON_PROPS.SIZE.MEDIUM },
           style: {
             padding: "8px 16px",
           },
@@ -38,16 +40,14 @@ export const MuiButton: Components["MuiButton"] = {
   },
 };
 
-export const MuiButtonGroup = (theme: Theme): Components["MuiButtonGroup"] => {
-  return {
-    styleOverrides: {
-      grouped: {
-        "&.MuiButton-containedSecondary": {
-          boxShadow: `inset 0 0 0 1px ${theme.palette.smoke.dark}, 0 1px 0 0 ${black08}`,
-        },
+export const MuiButtonGroup: Components["MuiButtonGroup"] = {
+  styleOverrides: {
+    grouped: {
+      "&.MuiButton-containedSecondary": {
+        boxShadow: `inset 0 0 0 1px ${PALETTE.SMOKE_DARK}, 0 1px 0 0 ${COLOR_MIXES.COMMON_BLACK_08}`,
       },
     },
-  };
+  },
 };
 
 /**

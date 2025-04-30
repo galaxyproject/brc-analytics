@@ -5,9 +5,9 @@ import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,
 } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
-import { Button, Grid2, MenuItem } from "@mui/material";
+import { Button, Grid, MenuItem } from "@mui/material";
 import NLink from "next/link";
-import { BUTTON_PROPS, GRID2_PROPS, MENU_PROPS } from "./constants";
+import { BUTTON_PROPS, GRID_PROPS, MENU_PROPS } from "./constants";
 import { AnalyzeGenomeProps } from "./types";
 
 export const AnalyzeGenome = ({
@@ -15,7 +15,7 @@ export const AnalyzeGenome = ({
   views,
 }: AnalyzeGenomeProps): JSX.Element => {
   return (
-    <Grid2 {...GRID2_PROPS}>
+    <Grid {...GRID_PROPS}>
       <Button
         {...BUTTON_PROPS}
         component={NLink}
@@ -43,7 +43,7 @@ export const AnalyzeGenome = ({
           ))
         }
       </DropdownMenu>
-    </Grid2>
+    </Grid>
   );
 };
 

@@ -1,9 +1,5 @@
 import { ROUTES } from "../../../../../../../routes/constants";
-import {
-  COLOR,
-  VARIANT,
-} from "@databiosphere/findable-ui/lib/styles/common/mui/button";
-import { SIZE } from "@databiosphere/findable-ui/lib/styles/common/constants/size";
+import { BUTTON_PROPS as MUI_BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
 import { ButtonProps } from "@mui/material";
 
 export const ACCORDION: Record<string, { details?: string; title: string }> = {
@@ -27,9 +23,9 @@ export const ACCORDION: Record<string, { details?: string; title: string }> = {
 };
 
 const BUTTON_PROPS: Partial<ButtonProps> = {
-  color: COLOR.SECONDARY,
-  size: SIZE.LARGE,
-  variant: VARIANT.CONTAINED,
+  color: MUI_BUTTON_PROPS.COLOR.SECONDARY,
+  size: MUI_BUTTON_PROPS.SIZE.LARGE,
+  variant: MUI_BUTTON_PROPS.VARIANT.CONTAINED,
 };
 
 export const BUTTON: Record<string, ButtonProps> = {

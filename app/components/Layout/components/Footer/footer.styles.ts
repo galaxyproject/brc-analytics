@@ -1,7 +1,7 @@
 import { Footer } from "@databiosphere/findable-ui/lib/components/Layout/components/Footer/footer";
-import { smokeLightest } from "@databiosphere/findable-ui/lib/styles/common/mixins/colors";
 import styled from "@emotion/styled";
+import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 
 export const StyledFooter = styled(Footer)`
-  background-color: ${smokeLightest};
+  background-color: ${PALETTE.SMOKE_LIGHTEST};
 `;

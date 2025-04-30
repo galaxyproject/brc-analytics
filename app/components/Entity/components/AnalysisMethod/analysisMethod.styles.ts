@@ -1,17 +1,13 @@
-import {
-  inkLight,
-  white,
-} from "@databiosphere/findable-ui/lib/styles/common/mixins/colors";
 import styled from "@emotion/styled";
 import { Accordion } from "@mui/material";
-import { smokeLightest } from "@databiosphere/findable-ui/lib/theme/common/palette";
-import { elevation01 } from "@databiosphere/findable-ui/lib/theme/common/shadows";
 import { mediaTabletDown } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
+import { SHADOWS } from "@databiosphere/findable-ui/lib/styles/common/constants/shadows";
+import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 
 export const StyledAccordion = styled(Accordion)`
   &.MuiAccordion-root {
-    background-color: ${white};
-    box-shadow: ${elevation01};
+    background-color: ${PALETTE.COMMON_WHITE};
+    box-shadow: ${SHADOWS["01"]};
 
     .MuiAccordion-heading {
       display: block;
@@ -44,7 +40,7 @@ export const StyledAccordion = styled(Accordion)`
           }
 
           .MuiChip-root {
-            color: ${inkLight};
+            color: ${PALETTE.INK_LIGHT};
           }
         }
 
@@ -66,7 +62,7 @@ export const StyledAccordion = styled(Accordion)`
     }
 
     &.Mui-disabled {
-      background-color: ${smokeLightest};
+      background-color: ${PALETTE.SMOKE_LIGHTEST};
     }
   }
 ` as typeof Accordion;

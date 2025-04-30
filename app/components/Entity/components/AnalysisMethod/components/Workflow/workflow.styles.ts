@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
-import { Grid2 } from "@mui/material";
+import { Grid } from "@mui/material";
 
-export const StyledGrid2 = styled(Grid2)`
+export const StyledGrid = styled(Grid)`
   padding: 20px;
 
   .MuiButton-root {
