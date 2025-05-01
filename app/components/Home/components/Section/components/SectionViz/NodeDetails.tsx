@@ -1,5 +1,8 @@
 import React from "react";
-import { Link as DXLink } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
+import {
+  Link as DXLink,
+  LinkProps,
+} from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { TaxonomyNode } from "./data";
 import { HierarchyNode } from "d3";
 import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
@@ -52,10 +55,10 @@ function countLeafNodes(node: TreeNode): number {
 }
 
 // Helper function to create a filter URL based on taxonomic level and name
-function createFilterUrl(rank?: string, name?: string): string | null {
+function createFilterUrl(rank?: string, name?: string): LinkProps["url"] {
   // If rank or name is missing, we can't create a filter
   if (!rank || !name) {
-    return null;
+    return "";
   }
 
   /* eslint-disable sort-keys -- Keep these in natural order of hierarchy */
@@ -78,7 +81,7 @@ function createFilterUrl(rank?: string, name?: string): string | null {
 
   // If we couldn't map the rank, we can't create a filter
   if (!categoryKey) {
-    return null;
+    return "";
   }
 
   // Create the filter object
@@ -89,8 +92,11 @@ function createFilterUrl(rank?: string, name?: string): string | null {
     },
   ];
 
-  // Encode the filter as a URL parameter
-  return `/data/assemblies?filter=${encodeURIComponent(JSON.stringify(filter))}`;
+  // Return a Link URL object with href and query parameters
+  return {
+    href: "/data/assemblies",
+    query: encodeURIComponent(JSON.stringify({ filter })),
+  };
 }
 
 export const NodeDetails: React.FC<NodeDetailsProps> = ({
