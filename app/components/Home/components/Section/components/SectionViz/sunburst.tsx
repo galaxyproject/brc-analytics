@@ -34,7 +34,7 @@ export const SectionViz = (): JSX.Element => {
     const svg = d3
       .select(svgNode)
       .attr("viewBox", [-width / 2, -height / 2, width, width])
-      .style("font", "10px sans-serif");
+      .style("font", "10px 'Inter Tight', sans-serif");
     // Define a color scale for base colors (root and first ring)
     const baseColor = d3.scaleOrdinal(d3.schemeTableau10);
 
@@ -94,8 +94,8 @@ export const SectionViz = (): JSX.Element => {
       .style("position", "absolute")
       .style("text-align", "center")
       .style("padding", "6px")
-      .style("font", "12px sans-serif")
-      .style("background", "lightsteelblue")
+      .style("font", "12px 'Inter Tight', sans-serif")
+      .style("background", smokeLightest)
       .style("border", "0px")
       .style("border-radius", "8px")
       .style("pointer-events", "none");
@@ -163,6 +163,29 @@ export const SectionViz = (): JSX.Element => {
       return isDescendant && withinDepth;
     }
 
+    // Function to check if an arc is large enough to display a label (at least 1% of the circle)
+    function isLargeEnoughForLabel(d: TreeNode): boolean {
+      // Calculate the angular size of the arc as a percentage of the full circle
+      const arcSizePercentage =
+        ((d.current.x1 - d.current.x0) / (2 * Math.PI)) * 100;
+      return arcSizePercentage >= 1; // Only show labels for arcs that are at least 1% of the circle
+    }
+
+    // Consolidated function to check if a label should be visible
+    function isLabelVisible(
+      d: TreeNode,
+      currentRoot: TreeNode,
+      targetDepth: number
+    ): boolean {
+      // Labels should not be visible for the current root node
+      if (d === currentRoot) {
+        return false;
+      }
+
+      // Labels should only be visible if the node is visible and large enough
+      return isVisible(d, currentRoot, targetDepth) && isLargeEnoughForLabel(d);
+    }
+
     // Draw the sunburst segments (we still don't draw the center node as an arc)
     const path = svg
       .append("g")
@@ -178,6 +201,8 @@ export const SectionViz = (): JSX.Element => {
       .style("stroke", "#333")
       .style("stroke-width", "1px")
       .on("mouseover", function (event, d) {
+        // Hghlight the arc, and display the node name and value in the tooltip.
+        d3.select(this).style("stroke-width", "2px");
         tooltip.transition().duration(200).style("opacity", 0.9);
         tooltip
           .html(`<strong>${d.data.name}</strong><br/>Assemblies: ${d.value}`)
@@ -185,6 +210,8 @@ export const SectionViz = (): JSX.Element => {
           .style("top", event.pageY - 28 + "px");
       })
       .on("mouseout", function () {
+        // Restore the original stroke color and width
+        d3.select(this).style("stroke-width", "1px");
         tooltip.transition().duration(500).style("opacity", 0);
       })
       .on("click", clicked);
@@ -215,16 +242,8 @@ export const SectionViz = (): JSX.Element => {
       .data(root.descendants().slice(1))
       .join("text")
       .attr("fill-opacity", (d) => {
-        // If this node is the current root, make it invisible
-        if (d === currentRoot) {
-          return 0;
-        }
-        // Otherwise, check if it's visible in the current view
-        if (isVisible(d, root, 0)) {
-          return 1;
-        } else {
-          return 0;
-        }
+        // Use the consolidated visibility function for consistent behavior
+        return isLabelVisible(d, root, 0) ? 1 : 0;
       })
       .attr("dy", "0.35em")
       .attr("transform", labelTransform)
@@ -293,6 +312,16 @@ export const SectionViz = (): JSX.Element => {
       y1: number;
     }
 
+    // Helper function that returns a tween function for fill opacity
+    function createOpacityTween(
+      d: TreeNode,
+      currentRoot: TreeNode,
+      targetDepth: number
+    ) {
+      return (): string =>
+        isLabelVisible(d, currentRoot, targetDepth) ? "1" : "0";
+    }
+
     function clicked(event: React.MouseEvent | null, p: TreeNode): void {
       // Update the current center and the center label.
       currentRoot = p;
@@ -352,19 +381,9 @@ export const SectionViz = (): JSX.Element => {
           // eslint-disable-next-line sonarjs/no-nested-functions -- cleaner in d3 to keep this inlined
           (d) => (): string => labelTransform(d)
         )
-        .attr("fill-opacity", (d) => {
-          // If this node is the current root, make it invisible
-          if (d === currentRoot) {
-            return 0;
-          }
-
-          // Otherwise, check if it's visible based on the current depth
-          if (isVisible(d, currentRoot, p.depth)) {
-            return 1; // Visible node
-          } else {
-            return 0; // Hidden node
-          }
-        });
+        .attrTween("fill-opacity", (d) =>
+          createOpacityTween(d, currentRoot, p.depth)
+        );
     }
 
     // Assign the clicked function to the ref so it can be accessed outside
