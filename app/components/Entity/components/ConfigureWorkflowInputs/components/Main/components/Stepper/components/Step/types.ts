@@ -7,8 +7,8 @@ import {
 import { OnConfigure } from "../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import {
   ConfiguredValue,
-  LaunchStatus,
-  OnLaunch,
+  Status,
+  OnLaunchGalaxy,
 } from "./hooks/UseLaunchGalaxy/types";
 import { OnStep } from "../../hooks/UseStepper/types";
 
@@ -26,9 +26,9 @@ export interface StepProps
   entryKey: keyof ConfiguredValue;
   entryLabel: string;
   genome: BRCDataCatalogGenome;
-  launchStatus: LaunchStatus;
   onConfigure: OnConfigure;
-  onLaunch: OnLaunch;
+  onLaunchGalaxy: OnLaunchGalaxy;
   onStep: OnStep;
+  status: Status;
   workflow: Workflow;
 }

@@ -11,10 +11,8 @@ import {
   Typography,
 } from "@mui/material";
 import { StyledGrid } from "./gtfStep.styles";
-import { TYPOGRAPHY_PROPS } from "./constants";
-import { TYPOGRAPHY_PROPS as MUI_TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
+import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { configureGTFStep } from "./utils";
-import { BUTTON_PROPS } from "../components/Button/constants";
 import { useUCSCFiles } from "./hooks/UseUCSCFiles/hook";
 import { useRadioGroup } from "./hooks/UseRadioGroup/hook";
 import { Fragment, useEffect } from "react";
@@ -24,6 +22,7 @@ import {
 } from "@databiosphere/findable-ui/lib/components/Loading/loading";
 import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Optional/optional";
 import { getGeneModelLabel } from "./utils";
+import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/button/constants";
 
 export const GTFStep = ({
   active,
@@ -77,7 +76,10 @@ export const GTFStep = ({
       </StepLabel>
       <StepContent>
         <StyledGrid>
-          <Typography {...TYPOGRAPHY_PROPS}>
+          <Typography
+            component="div"
+            variant={TYPOGRAPHY_PROPS.VARIANT.TEXT_BODY_500}
+          >
             Genes and Gene Predictions
           </Typography>
           {controls.length > 0 ? (
@@ -97,11 +99,15 @@ export const GTFStep = ({
               ))}
             </RadioGroup>
           ) : (
-            <Typography variant={MUI_TYPOGRAPHY_PROPS.VARIANT.TEXT_BODY_400}>
+            <Typography variant={TYPOGRAPHY_PROPS.VARIANT.TEXT_BODY_400}>
               No gene models found.
             </Typography>
           )}
-          <Button {...BUTTON_PROPS} disabled={!value} onClick={() => onStep()}>
+          <Button
+            {...BUTTON_PROPS.PRIMARY_CONTAINED}
+            disabled={!value}
+            onClick={() => onStep()}
+          >
             Continue
           </Button>
         </StyledGrid>
