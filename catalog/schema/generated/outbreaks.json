@@ -38,6 +38,10 @@
                         "null"
                     ]
                 },
+                "name": {
+                    "description": "The name of the outbreak/ pathogen.",
+                    "type": "string"
+                },
                 "priority": {
                     "$ref": "#/$defs/OutbreakPriority",
                     "description": "The priority of the outbreak."
@@ -55,6 +59,7 @@
                 }
             },
             "required": [
+                "name",
                 "taxonomy_id",
                 "priority",
                 "resources",

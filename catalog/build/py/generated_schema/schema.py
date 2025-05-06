@@ -262,6 +262,16 @@ class Outbreak(ConfiguredBaseModel):
         }
     )
 
+    name: str = Field(
+        default=...,
+        description="""The name of the outbreak/ pathogen.""",
+        json_schema_extra={
+            "linkml_meta": {
+                "alias": "name",
+                "domain_of": ["Outbreak", "WorkflowCategory"],
+            }
+        },
+    )
     taxonomy_id: int = Field(
         default=...,
         description="""The outbreak's NCBI taxonomy ID.""",
@@ -430,7 +440,10 @@ class WorkflowCategory(ConfiguredBaseModel):
         default=...,
         description="""The display name of the workflow category.""",
         json_schema_extra={
-            "linkml_meta": {"alias": "name", "domain_of": ["WorkflowCategory"]}
+            "linkml_meta": {
+                "alias": "name",
+                "domain_of": ["Outbreak", "WorkflowCategory"],
+            }
         },
     )
     description: str = Field(
