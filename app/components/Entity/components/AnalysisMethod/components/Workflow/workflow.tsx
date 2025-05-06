@@ -58,6 +58,7 @@ export const Workflow = ({
                   workflow.trsId,
                   genomeVersionAssemblyId,
                   geneModelUrl,
+                  null, // Read runs.
                   parameters
                 )
               ));

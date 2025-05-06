@@ -7,9 +7,10 @@ import {
 import { OnConfigure } from "../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import {
   ConfiguredValue,
-  LaunchStatus,
-  OnLaunch,
+  Status,
+  OnLaunchGalaxy,
 } from "./hooks/UseLaunchGalaxy/types";
+import { OnContinue, OnEdit } from "../../hooks/UseStepper/types";
 
 export interface StepConfig {
   description?: ReactNode;
@@ -21,12 +22,15 @@ export interface StepConfig {
 
 export interface StepProps
   extends Omit<StepConfig, "Step" | "key" | "label">,
-    Pick<MStepProps, "active" | "completed" | "index" | "last"> {
+    Pick<MStepProps, "active" | "completed" | "last">,
+    Required<Pick<MStepProps, "index">> {
   entryKey: keyof ConfiguredValue;
   entryLabel: string;
   genome: BRCDataCatalogGenome;
-  launchStatus: LaunchStatus;
   onConfigure: OnConfigure;
-  onLaunch: OnLaunch;
+  onContinue: OnContinue;
+  onEdit: OnEdit;
+  onLaunchGalaxy: OnLaunchGalaxy;
+  status: Status;
   workflow: Workflow;
 }
