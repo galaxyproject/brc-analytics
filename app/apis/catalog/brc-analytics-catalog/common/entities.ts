@@ -1,6 +1,9 @@
+import { MDXRemoteSerializeResult } from "next-mdx-remote";
 import { WorkflowUrlParameter } from "../../../../utils/galaxy-api/entities";
 import {
   ORGANISM_PLOIDY,
+  OUTBREAK_PRIORITY,
+  OUTBREAK_RESOURCE_TYPE,
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_PLOIDY,
 } from "./schema-entities";
@@ -70,6 +73,21 @@ export interface EntitiesResponsePagination {
   pages: number;
   size: number;
   total: number;
+}
+
+export interface Outbreak {
+  active: boolean;
+  description: MDXRemoteSerializeResult;
+  highlight_descendant_taxonomy_ids: number[] | null;
+  priority: OUTBREAK_PRIORITY;
+  resources: OutbreakResource[];
+  taxonomy_id: number;
+}
+
+export interface OutbreakResource {
+  title: string;
+  type: OUTBREAK_RESOURCE_TYPE;
+  url: string;
 }
 
 export interface WorkflowCategory {

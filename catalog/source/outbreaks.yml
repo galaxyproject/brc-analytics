@@ -100,7 +100,7 @@ outbreaks:
     priority: HIGH
     active: true
     description:
-      path: outbreaks/malaria.md
+      path: outbreaks/plasmodium_falciparum.md
     resources:
       - title: "WHO | Malaria Fact Sheet"
         url: "https://www.who.int/news-room/fact-sheets/detail/malaria"

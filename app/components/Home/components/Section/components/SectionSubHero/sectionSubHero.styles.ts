@@ -1,22 +1,16 @@
-import {
-  inkLight,
-  inkMain,
-  smokeMain,
-  white,
-} from "@databiosphere/findable-ui/lib/styles/common/mixins/colors";
 import styled from "@emotion/styled";
 import {
   sectionGrid,
   sectionLayout,
 } from "../../../../../Layout/components/AppLayout/components/Section/section.styles";
-import { Accordion, Box, Button, Grid2 } from "@mui/material";
+import { Accordion, Box, Button, Grid } from "@mui/material";
 import { mediaTabletDown } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
-import { smokeLightest } from "@databiosphere/findable-ui/lib/theme/common/palette";
+import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { textBodyLarge400 } from "@databiosphere/findable-ui/lib/styles/common/mixins/fonts";
 
 export const Section = styled.section`
-  background-color: ${white};
-  border-top: 1px solid ${smokeMain};
+  background-color: ${PALETTE.COMMON_WHITE};
+  border-top: 1px solid ${PALETTE.SMOKE_MAIN};
   width: 100%;
 `;
 
@@ -59,7 +53,7 @@ export const Subhead = styled.div`
 
 export const AccordionBox = styled.div`
   align-self: flex-end;
-  box-shadow: inset 3px 0 ${smokeMain};
+  box-shadow: inset 3px 0 ${PALETTE.SMOKE_MAIN};
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -76,7 +70,7 @@ export const StyledAccordion = styled(Accordion)`
     box-shadow: none;
   }
 
-  color: ${inkLight};
+  color: ${PALETTE.INK_LIGHT};
   padding-left: 24px;
 
   .MuiAccordionSummary-root {
@@ -97,16 +91,16 @@ export const StyledAccordion = styled(Accordion)`
 
   .MuiAccordionDetails-root {
     ${textBodyLarge400};
-    color: ${inkLight};
+    color: ${PALETTE.INK_LIGHT};
     margin-bottom: 8px;
     padding: 0;
   }
 
   &.Mui-expanded {
-    color: ${inkMain};
+    color: ${PALETTE.INK_MAIN};
 
     &::before {
-      background-color: ${inkMain};
+      background-color: ${PALETTE.INK_MAIN};
       content: "";
       display: block;
       height: 100%;
@@ -120,7 +114,7 @@ export const StyledAccordion = styled(Accordion)`
   }
 `;
 
-export const StyledGrid2 = styled(Grid2)`
+export const StyledGrid = styled(Grid)`
   display: grid;
   grid-column: 2;
   grid-row: 1;
@@ -136,7 +130,7 @@ export const StyledGrid2 = styled(Grid2)`
 `;
 
 export const SmokeLightestBox = styled.div`
-  background-color: ${smokeLightest};
+  background-color: ${PALETTE.SMOKE_LIGHTEST};
   border-radius: 16px;
   display: grid;
   grid-column: 1;

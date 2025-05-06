@@ -1,14 +1,11 @@
-import {
-  smokeLightest,
-  smokeMain,
-} from "@databiosphere/findable-ui/lib/styles/common/mixins/colors";
 import styled from "@emotion/styled";
 import { sectionLayout } from "../../../../../Layout/components/AppLayout/components/Section/section.styles";
 import { SectionHeadline } from "../../section.styles";
+import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 
 export const Section = styled.section`
-  background-color: ${smokeLightest};
-  border-top: 1px solid ${smokeMain};
+  background-color: ${PALETTE.SMOKE_LIGHTEST};
+  border-top: 1px solid ${PALETTE.SMOKE_MAIN};
   overflow: hidden;
   width: 100%;
 `;

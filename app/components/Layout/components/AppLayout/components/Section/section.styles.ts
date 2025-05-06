@@ -1,9 +1,5 @@
-import {
-  smokeMain,
-  white,
-} from "@databiosphere/findable-ui/lib/styles/common/mixins/colors";
-import { ThemeProps } from "@databiosphere/findable-ui/lib/theme/theme";
 import { css } from "@emotion/react";
+import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 
 export const section = css`
   width: 100%;
@@ -25,18 +21,18 @@ export const sectionLayout = css`
   max-width: 1136px;
 `;
 
-export const sectionSubHero = (props: ThemeProps) => css`
+export const sectionSubHero = css`
   ${section};
-  background-color: ${white(props)};
-  border-top: 1px solid ${smokeMain(props)};
+  background-color: ${PALETTE.COMMON_WHITE};
+  border-top: 1px solid ${PALETTE.SMOKE_MAIN};
 `;
 
-export const sectionWithDivider = (props: ThemeProps) => css`
+export const sectionWithDivider = css`
   position: relative; /* positions divider */
   width: 100%;
 
   > div:before {
-    background-color: ${smokeMain(props)};
+    background-color: ${PALETTE.SMOKE_MAIN};
     content: "";
     height: 1px;
     max-width: min(1136px, calc(100vw - 32px));

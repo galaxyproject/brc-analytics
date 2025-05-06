@@ -8,7 +8,7 @@ import {
   StyledAccordion,
   StyledBox,
   StyledButton,
-  StyledGrid2,
+  StyledGrid,
   Subhead,
   TransparentBox,
 } from "./sectionSubHero.styles";
@@ -41,7 +41,7 @@ export const SectionSubHero = (): JSX.Element => {
             ))}
           </AccordionBox>
         </SectionSubLayout>
-        <StyledGrid2>
+        <StyledGrid>
           <SmokeLightestBox>
             {Object.entries(IMAGE).map(([value, src]) => (
               <Slide {...SLIDE_PROPS} key={value} in={activeIndex === value}>
@@ -56,7 +56,7 @@ export const SectionSubHero = (): JSX.Element => {
               </Fade>
             ))}
           </TransparentBox>
-        </StyledGrid2>
+        </StyledGrid>
       </SectionLayout>
     </Section>
   );

@@ -1,8 +1,4 @@
 import { mediaTabletUp } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
-import {
-  smokeMain,
-  white,
-} from "@databiosphere/findable-ui/lib/styles/common/mixins/colors";
 import styled from "@emotion/styled";
 import {
   sectionGrid,
@@ -13,10 +9,11 @@ import {
   SectionSubtitle,
   SectionTitle,
 } from "../../section.styles";
+import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 
 export const Section = styled.section`
-  background-color: ${white};
-  border-top: 1px solid ${smokeMain};
+  background-color: ${PALETTE.COMMON_WHITE};
+  border-top: 1px solid ${PALETTE.SMOKE_MAIN};
   width: 100%;
 `;
 

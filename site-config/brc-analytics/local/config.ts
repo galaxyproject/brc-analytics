@@ -1,6 +1,6 @@
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
-import { EntityConfig } from "@databiosphere/findable-ui/src/config/entities";
+import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import {
   BRCDataCatalogGenome,
   BRCDataCatalogOrganism,

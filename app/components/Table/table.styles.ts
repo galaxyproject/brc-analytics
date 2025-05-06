@@ -1,6 +1,6 @@
 import { Table as DXTable } from "@databiosphere/findable-ui/lib/components/Detail/components/Table/table";
+import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { mediaTabletUp } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
-import { smokeLightest } from "@databiosphere/findable-ui/lib/styles/common/mixins/colors";
 import { ThemeProps } from "@databiosphere/findable-ui/lib/theme/theme";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
@@ -10,7 +10,7 @@ export const tableStyles = (props: ThemeProps) => css`
     .MuiTableHead-root {
       .MuiTableRow-root {
         .MuiTableCell-root {
-          background-color: ${smokeLightest(props)};
+          background-color: ${PALETTE.SMOKE_LIGHTEST};
         }
       }
     }

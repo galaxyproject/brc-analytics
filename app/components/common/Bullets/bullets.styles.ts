@@ -1,8 +1,8 @@
 import { Dot } from "@databiosphere/findable-ui/lib/components/common/Dot/dot";
-import { smokeMain } from "@databiosphere/findable-ui/lib/styles/common/mixins/colors";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { ButtonBase as MButtonBase } from "@mui/material";
+import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 
 interface Props {
   isActive: boolean;
@@ -20,7 +20,7 @@ export const Bullet = styled(MButtonBase)`
 export const StyledDot = styled(Dot, {
   shouldForwardProp: (props) => props !== "isActive",
 })<Props>`
-  background-color: ${smokeMain};
+  background-color: ${PALETTE.SMOKE_MAIN};
   height: 6px;
   width: 6px;
 
