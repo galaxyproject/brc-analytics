@@ -2,14 +2,14 @@ import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceP
 import { ENA_FIELDS } from "./constants";
 import { SubmitOptions } from "./types";
 
-const ENA_API = `https://brc-analytics.dev.clevercanary.com/ena/portal/api/search?result=read_run&query={accessionType}={accession}&fields=${ENA_FIELDS.join(",")}&format=json`;
+const ENA_API = `${process.env.NEXT_PUBLIC_ENA_PROXY_DOMAIN}/ena/portal/api/search?result=read_run&query={accessionType}={accession}&fields=${ENA_FIELDS.join(",")}&format=json`;
 
 /**
  * Fetch ENA data for a given accession number.
- * @param {Object} options - Options for the ENA data fetch.
- * @param {string} options.accession - The accession number to fetch data for.
- * @param {string} options.accessionType - The type of accession (e.g., experiment, run, sample, study).
- * @param {SubmitOptions} options.submitOptions - Options for the submission.
+ * @param options - Options for the ENA data fetch.
+ * @param options.accession - The accession number to fetch data for.
+ * @param options.accessionType - The type of accession (e.g., experiment, run, sample, study).
+ * @param options.submitOptions - Options for the submission.
  * @returns Promise with the ENA data.
  */
 export async function fetchENAData<T>({

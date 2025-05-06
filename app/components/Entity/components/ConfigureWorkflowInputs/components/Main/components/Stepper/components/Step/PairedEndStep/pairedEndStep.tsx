@@ -8,7 +8,7 @@ import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/b
 import { ToggleButtonGroup } from "./components/ToggleButtonGroup/toggleButtonGroup";
 import { VIEW } from "./components/ToggleButtonGroup/types";
 import { ENASequencingData } from "./components/ENASequencingData/enaSequencingData";
-import { useENA } from "./components/ENASequencingData/hooks/UseENA/useENA";
+import { useENA } from "./components/ENASequencingData/hooks/UseENA/hook";
 import { ReadRun } from "./components/ENASequencingData/types";
 import { useTable } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseTable/hook";
 
