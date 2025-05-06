@@ -1,6 +1,9 @@
-export type OnStep = (step?: number) => void;
+export type OnContinue = () => void;
+
+export type OnEdit = (step: number) => void;
 
 export interface UseStepper {
   activeStep: number;
-  onStep: OnStep;
+  onContinue: OnContinue;
+  onEdit: OnEdit;
 }

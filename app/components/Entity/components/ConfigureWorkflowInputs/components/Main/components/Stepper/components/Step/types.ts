@@ -10,7 +10,7 @@ import {
   Status,
   OnLaunchGalaxy,
 } from "./hooks/UseLaunchGalaxy/types";
-import { OnStep } from "../../hooks/UseStepper/types";
+import { OnContinue, OnEdit } from "../../hooks/UseStepper/types";
 
 export interface StepConfig {
   description?: ReactNode;
@@ -22,13 +22,15 @@ export interface StepConfig {
 
 export interface StepProps
   extends Omit<StepConfig, "Step" | "key" | "label">,
-    Pick<MStepProps, "active" | "completed" | "index" | "last"> {
+    Pick<MStepProps, "active" | "completed" | "last">,
+    Required<Pick<MStepProps, "index">> {
   entryKey: keyof ConfiguredValue;
   entryLabel: string;
   genome: BRCDataCatalogGenome;
   onConfigure: OnConfigure;
+  onContinue: OnContinue;
+  onEdit: OnEdit;
   onLaunchGalaxy: OnLaunchGalaxy;
-  onStep: OnStep;
   status: Status;
   workflow: Workflow;
 }

@@ -6,7 +6,7 @@ import { useStepper } from "./hooks/UseStepper/hook";
 const steps = STEPS;
 
 export const Stepper = ({ workflow, ...props }: Props): JSX.Element => {
-  const { activeStep, onStep } = useStepper(steps);
+  const { activeStep, onContinue, onEdit } = useStepper(steps);
   return (
     <StyledStepper activeStep={activeStep} {...STEPPER_PROPS}>
       {steps.map(({ key, label, Step, ...stepProps }, i) => {
@@ -19,7 +19,9 @@ export const Stepper = ({ workflow, ...props }: Props): JSX.Element => {
             completed={completed}
             entryKey={key}
             entryLabel={label}
-            onStep={onStep}
+            index={i}
+            onContinue={onContinue}
+            onEdit={onEdit}
             workflow={workflow}
             {...stepProps}
             {...props}

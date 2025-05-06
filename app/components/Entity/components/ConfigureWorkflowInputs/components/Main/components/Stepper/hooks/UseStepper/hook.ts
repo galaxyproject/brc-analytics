@@ -8,14 +8,16 @@ export const useStepper = (steps: StepConfig[]): UseStepper => {
     getInitialActiveStep(steps)
   );
 
-  const onStep = useCallback(
-    (step?: number): void => {
-      setActiveStep((currentStep) =>
-        step ? step : getNextActiveStep(steps, currentStep)
-      );
+  const onContinue = useCallback((): void => {
+    setActiveStep((currentStep) => getNextActiveStep(steps, currentStep));
+  }, [steps]);
+
+  const onEdit = useCallback(
+    (step: number): void => {
+      setActiveStep(step);
     },
     [steps]
   );
 
-  return { activeStep, onStep };
+  return { activeStep, onContinue, onEdit };
 };

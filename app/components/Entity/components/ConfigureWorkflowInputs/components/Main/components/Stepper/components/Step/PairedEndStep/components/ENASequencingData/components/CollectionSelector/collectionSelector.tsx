@@ -2,7 +2,7 @@ import { Button, DialogActions, DialogContent } from "@mui/material";
 import { StyledDialog } from "./collectionSelector.styles";
 import { Props } from "./types";
 import { DialogTitle } from "@databiosphere/findable-ui/lib/components/common/Dialog/components/DialogTitle/dialogTitle";
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/button/constants";
+import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { useState } from "react";
 import { Table } from "./components/Table/table";
 import { RowSelectionState } from "@tanstack/table-core";

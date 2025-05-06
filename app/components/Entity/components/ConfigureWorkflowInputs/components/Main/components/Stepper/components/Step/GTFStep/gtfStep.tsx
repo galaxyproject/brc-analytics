@@ -22,7 +22,7 @@ import {
 } from "@databiosphere/findable-ui/lib/components/Loading/loading";
 import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Optional/optional";
 import { getGeneModelLabel } from "./utils";
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/button/constants";
+import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 
 export const GTFStep = ({
   active,
@@ -33,7 +33,8 @@ export const GTFStep = ({
   genome,
   index,
   onConfigure,
-  onStep,
+  onContinue,
+  onEdit,
 }: StepProps): JSX.Element => {
   const { geneModelUrls } = useUCSCFiles(genome);
   const { controls, onChange, onValueChange, value } =
@@ -66,7 +67,7 @@ export const GTFStep = ({
           completed && (
             <Fragment>
               <Optional noWrap>{getGeneModelLabel(value)}</Optional>
-              <Button onClick={() => onStep(index)}>Edit</Button>
+              <Button onClick={() => onEdit(index)}>Edit</Button>
             </Fragment>
           )
         }
@@ -106,7 +107,7 @@ export const GTFStep = ({
           <Button
             {...BUTTON_PROPS.PRIMARY_CONTAINED}
             disabled={!value}
-            onClick={() => onStep()}
+            onClick={() => onContinue()}
           >
             Continue
           </Button>

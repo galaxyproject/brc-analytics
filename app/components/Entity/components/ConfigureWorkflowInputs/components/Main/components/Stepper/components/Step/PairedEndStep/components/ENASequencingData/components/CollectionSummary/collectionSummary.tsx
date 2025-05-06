@@ -16,7 +16,7 @@ import { ToolbarActions } from "@databiosphere/findable-ui/lib/components/Table/
 import { Props } from "./types";
 import { flexRender } from "@tanstack/react-table";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/button/constants";
+import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 
 export const CollectionSummary = ({
   onClear,

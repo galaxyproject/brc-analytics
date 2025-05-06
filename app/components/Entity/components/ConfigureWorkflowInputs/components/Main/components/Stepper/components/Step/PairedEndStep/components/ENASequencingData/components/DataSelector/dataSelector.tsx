@@ -3,7 +3,7 @@ import { StyledPaper } from "./dataSelector.styles";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { PAPER_PROPS } from "./constants";
 import { Props } from "./types";
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/button/constants";
+import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 
 export const DataSelector = ({
   onOpen,

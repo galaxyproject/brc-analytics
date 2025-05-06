@@ -4,7 +4,7 @@ import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/com
 import { StepProps } from "../types";
 import { Button } from "@mui/material";
 import { useToggleButtonGroup } from "../hooks/UseToggleButtonGroup/useToggleButtonGroup";
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/button/constants";
+import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { ToggleButtonGroup } from "./components/ToggleButtonGroup/toggleButtonGroup";
 import { VIEW } from "./components/ToggleButtonGroup/types";
 import { ENASequencingData } from "./components/ENASequencingData/enaSequencingData";
