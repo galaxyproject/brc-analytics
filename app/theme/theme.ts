@@ -25,18 +25,10 @@ export function mergeAppTheme(
   const appTheme = createTheme(baseAppTheme, {
     components: {
       MuiButton: C.MuiButton,
-      MuiButtonGroup: C.MuiButtonGroup(baseAppTheme),
+      MuiButtonGroup: C.MuiButtonGroup,
       MuiCssBaseline: C.MuiCssBaseline(baseAppTheme),
     },
   });
-  if (themeOptions?.components) {
-    // Return app theme - with custom component overrides.
-    return createTheme(
-      deepmerge(appTheme, {
-        components: themeOptions.components,
-      })
-    );
-  }
   // Return app theme.
   return appTheme;
 }

@@ -10,4 +10,4 @@ Mpox, formerly known as monkeypox, is a viral zoonotic disease caused by the mpo
 - **Healthcare**: Increased demand for diagnostic testing and treatment
 - **Community**: Disproportionate impact on certain populations
 - **Travel**: Enhanced screening at international borders
-- **Mortality**: Case-fatality rate <0.1% in non-endemic countries (2022), ~10% in Africa for more virulent clades
+- **Mortality**: Case-fatality rate \<0.1% in non-endemic countries (2022), ~10% in Africa for more virulent clades

@@ -1,7 +1,7 @@
-import { Grid2 } from "@mui/material";
+import { Grid } from "@mui/material";
 import styled from "@emotion/styled";
 
-export const StyledGrid2 = styled(Grid2)`
+export const StyledGrid = styled(Grid)`
   display: grid;
   gap: 16px;
   justify-items: flex-start;

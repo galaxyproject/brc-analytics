@@ -1,4 +1,4 @@
-import { Grid2, Grid2Props, Typography } from "@mui/material";
+import { Grid, GridProps, Typography } from "@mui/material";
 import { ReactNode } from "react";
 import {
   ClipboardCopy,
@@ -7,7 +7,7 @@ import {
 
 export interface CopyTextProps extends CopyToClipboardProps {
   children: ReactNode;
-  gridProps?: Partial<Grid2Props>;
+  gridProps?: Partial<GridProps>;
 }
 
 export const CopyText = ({
@@ -18,7 +18,7 @@ export const CopyText = ({
   value,
 }: CopyTextProps): JSX.Element => {
   return (
-    <Grid2 container columnSpacing={1} wrap="nowrap" {...gridProps}>
+    <Grid container columnSpacing={1} wrap="nowrap" {...gridProps}>
       <Typography component="span" noWrap>
         {children}
       </Typography>
@@ -27,6 +27,6 @@ export const CopyText = ({
         tooltipProps={tooltipProps}
         value={value}
       />
-    </Grid2>
+    </Grid>
   );
 };

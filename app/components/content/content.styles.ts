@@ -1,5 +1,4 @@
 import { mediaTabletUp } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
-import { inkLight } from "@databiosphere/findable-ui/lib/styles/common/mixins/colors";
 import { textBodyLarge400 } from "@databiosphere/findable-ui/lib/styles/common/mixins/fonts";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
@@ -11,6 +10,7 @@ import {
   sectionSubHero,
   sectionWithDivider,
 } from "../Layout/components/AppLayout/components/Section/section.styles";
+import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 
 export interface LayoutProps {
   centered?: boolean;
@@ -50,16 +50,16 @@ export const listItem = css`
 `;
 
 export const Section = styled.section<SectionProps>`
-  ${(props) =>
-    props.border &&
+  ${({ border }) =>
+    border &&
     css`
-      ${sectionSubHero(props)};
+      ${sectionSubHero};
     `}
 
-  ${(props) =>
-    props.divider &&
+  ${({ divider }) =>
+    divider &&
     css`
-      ${sectionWithDivider(props)};
+      ${sectionWithDivider};
     `}
 `;
 
@@ -100,7 +100,7 @@ export const SectionHeadline = styled.div<LayoutProps>`
 
 export const SubHeadline = styled.div`
   ${textBodyLarge400};
-  color: ${inkLight};
+  color: ${PALETTE.INK_LIGHT};
 
   ${SectionHeadline} & {
     margin-top: 16px;

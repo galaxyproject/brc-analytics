@@ -3,7 +3,7 @@ import {
   ListConfig,
   SORT_DIRECTION,
 } from "@databiosphere/findable-ui/lib/config/entities";
-import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode";
+import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
 import { BRCDataCatalogGenome } from "../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   getGenomeId,

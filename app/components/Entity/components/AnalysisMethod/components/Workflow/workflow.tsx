@@ -1,11 +1,11 @@
 import { Loading } from "@databiosphere/findable-ui/lib/components/Loading/loading";
 import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
-import { Button, Grid2, Typography } from "@mui/material";
+import { Button, Grid, Typography } from "@mui/material";
 import { Props } from "./types";
 import { TEXT_BODY_500 } from "@databiosphere/findable-ui/lib/theme/common/typography";
-import { StyledGrid2 } from "./workflow.styles";
+import { StyledGrid } from "./workflow.styles";
 import { TYPOGRAPHY_PROPS } from "../../constants";
-import { BUTTON_PROPS, GRID2_PROPS } from "./constants";
+import { BUTTON_PROPS, GRID_PROPS } from "./constants";
 import { getWorkflowLandingUrl } from "../../../../../../utils/galaxy-api/galaxy-api";
 import {
   ANCHOR_TARGET,
@@ -27,12 +27,12 @@ export const Workflow = ({
   const { parameters, workflowDescription, workflowName } = workflow;
   const { data: landingUrl, isLoading, run } = useAsync<string>();
   return (
-    <StyledGrid2 {...GRID2_PROPS}>
+    <StyledGrid {...GRID_PROPS}>
       <Loading loading={isLoading} panelStyle={PAPER_PANEL_STYLE.NONE} />
-      <Grid2 container spacing={1}>
+      <Grid container spacing={1}>
         <Typography variant={TEXT_BODY_500}>{workflowName}</Typography>
         <Typography {...TYPOGRAPHY_PROPS}>{workflowDescription}</Typography>
-      </Grid2>
+      </Grid>
       {isFeatureEnabled ? (
         <Button
           {...BUTTON_PROPS}
@@ -71,6 +71,6 @@ export const Workflow = ({
           Launch in Galaxy
         </Button>
       )}
-    </StyledGrid2>
+    </StyledGrid>
   );
 };

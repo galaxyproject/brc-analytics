@@ -9,16 +9,10 @@ const PRIMARY = {
 };
 
 /**
- * Color constants
- */
-const primaryDark = PRIMARY.DARK;
-const primaryMain = PRIMARY.MAIN;
-
-/**
  * Palette Option "Primary"
  */
 export const primary: PaletteColorOptions = {
   contrastText: "#FFFFFF",
-  dark: primaryDark,
-  main: primaryMain,
+  dark: PRIMARY.DARK,
+  main: PRIMARY.MAIN,
 };
