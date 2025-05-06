@@ -1,5 +1,3 @@
-# SARS-CoV-2
-
 ## Overview
 
 This novel coronavirus emerged in late 2019 and caused a global pandemic with unprecedented impact. It has infected over 760 million people and caused roughly 6.9 million reported deaths worldwide as of 2023, making it one of the deadliest outbreaks in modern history.

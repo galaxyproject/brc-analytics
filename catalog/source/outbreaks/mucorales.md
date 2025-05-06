@@ -1,5 +1,3 @@
-# Mucorales
-
 ## Overview
 
 Mucorales cause mucormycosis, a severe infection affecting immunocompromised individuals and those with uncontrolled diabetes. These environmental molds can invade blood vessels and cause rapid tissue necrosis in sinuses, lungs, or skin.
