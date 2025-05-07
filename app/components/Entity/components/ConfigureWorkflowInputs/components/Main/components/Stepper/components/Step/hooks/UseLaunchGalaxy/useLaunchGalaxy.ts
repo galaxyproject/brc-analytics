@@ -16,13 +16,14 @@ export const useLaunchGalaxy = ({
   const configuredValue = getConfiguredValues(configuredInput);
   const disabled = !configuredValue;
 
-  const onLaunch = useCallback(async (): Promise<void> => {
+  const onLaunchGalaxy = useCallback(async (): Promise<void> => {
     if (!configuredValue) return;
     await run(
       getWorkflowLandingUrl(
         workflow.trsId,
         configuredValue.referenceAssembly,
         configuredValue.geneModelUrl,
+        configuredValue.readRuns,
         workflow.parameters
       )
     );
@@ -37,5 +38,5 @@ export const useLaunchGalaxy = ({
     );
   }, [landingUrl]);
 
-  return { launchStatus: { disabled, loading }, onLaunch };
+  return { onLaunchGalaxy, status: { disabled, loading } };
 };

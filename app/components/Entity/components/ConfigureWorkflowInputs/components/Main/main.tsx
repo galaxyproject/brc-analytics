@@ -11,21 +11,18 @@ export const Main = ({
   onConfigure,
   workflow,
 }: Props): JSX.Element => {
-  const { launchStatus, onLaunch } = useLaunchGalaxy({
+  const { onLaunchGalaxy, status } = useLaunchGalaxy({
     configuredInput,
     workflow,
   });
   return (
     <StyledMainContainer>
-      <Loading
-        loading={launchStatus.loading}
-        panelStyle={PAPER_PANEL_STYLE.FLUID}
-      />
+      <Loading loading={status.loading} panelStyle={PAPER_PANEL_STYLE.FLUID} />
       <Stepper
         genome={genome}
-        launchStatus={launchStatus}
-        onLaunch={onLaunch}
         onConfigure={onConfigure}
+        onLaunchGalaxy={onLaunchGalaxy}
+        status={status}
         workflow={workflow}
       />
     </StyledMainContainer>
