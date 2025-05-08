@@ -7,7 +7,9 @@ OUTBREAKS_PATH = "catalog/source/outbreaks.yml"
 UCSC_ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.json"
 
 GENOMES_OUTPUT_PATH = "catalog/build/intermediate/genomes-from-ncbi.tsv"
-OUTBREAK_TAXONOMY_MAPPING_PATH = "catalog/build/intermediate/outbreak-taxonomy-mapping.tsv"
+OUTBREAK_TAXONOMY_MAPPING_PATH = (
+    "catalog/build/intermediate/outbreak-taxonomy-mapping.tsv"
+)
 
 QC_REPORT_PATH = "catalog/output/qc-report.md"
 TREE_OUTPUT_PATH = "catalog/output/ncbi-taxa-tree.json"

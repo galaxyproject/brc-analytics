@@ -40,3 +40,7 @@ None
 ## Assemblies without ploidy information
 
 None
+
+## Outbreak descendant taxonomy IDs not found in genomes data
+
+None
