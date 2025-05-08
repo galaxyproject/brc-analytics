@@ -2,10 +2,12 @@ from package.catalog_build import build_files
 
 ASSEMBLIES_PATH = "catalog/source/assemblies.yml"
 ORGANISMS_PATH = "catalog/source/organisms.yml"
+OUTBREAKS_PATH = "catalog/source/outbreaks.yml"
 
 UCSC_ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.json"
 
 GENOMES_OUTPUT_PATH = "catalog/build/intermediate/genomes-from-ncbi.tsv"
+OUTBREAK_TAXONOMY_MAPPING_PATH = "catalog/build/intermediate/outbreak-taxonomy-mapping.tsv"
 
 QC_REPORT_PATH = "catalog/output/qc-report.md"
 TREE_OUTPUT_PATH = "catalog/output/ncbi-taxa-tree.json"
@@ -50,4 +52,6 @@ if __name__ == "__main__":
         {"taxonomicGroup": TAXONOMIC_GROUPS_BY_TAXONOMY_ID},
         qc_report_path=QC_REPORT_PATH,
         organisms_path=ORGANISMS_PATH,
+        outbreaks_path=OUTBREAKS_PATH,
+        outbreak_taxonomy_mapping_path=OUTBREAK_TAXONOMY_MAPPING_PATH,
     )

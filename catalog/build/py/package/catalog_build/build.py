@@ -31,14 +31,15 @@ def rate_limit_handler(request_call):
         raise
 
 
-def post_ncbi_request(url, json_data):
+def post_ncbi_request(url, json_data, batch_size=1000):
     """
     Makes a POST request to the NCBI API with error handling and rate limiting.
-    Handles pagination if the response contains next_page_token.
+    Handles pagination if the response contains next_page_token and processes requests in batches.
 
     Args:
       url: The API endpoint URL
       json_data: The data to send in the request body
+      batch_size: Maximum number of items to process in a single request
 
     Returns:
       List of all reports from paginated responses
@@ -48,35 +49,56 @@ def post_ncbi_request(url, json_data):
     """
     all_reports = []
     page = 1
+    processed_count = 0
 
-    while True:
-        print(f"Requesting page {page} of {url}")
+    # Get the list of IDs to process (assuming they're in a list in the json_data)
+    id_key = next((k for k in json_data if isinstance(json_data[k], list)), None)
+    if not id_key:
+        raise ValueError("No list of IDs found in json_data")
+    
+    ids = json_data[id_key]
+    total_ids = len(ids)
 
-        # Add page token to request if it exists
-        if "next_page_token" in json_data:
-            json_data["page_token"] = json_data.pop("next_page_token")
+    while processed_count < total_ids:
+        # Create a batch of IDs
+        batch = ids[processed_count:processed_count + batch_size]
+        print(f"Processing batch {processed_count//batch_size + 1} of {total_ids//batch_size + 1}")
+        
+        # Create a new json_data with just the current batch
+        batch_data = {**json_data}
+        batch_data[id_key] = batch
 
-        response = requests.post(url, json=json_data)
-        response = rate_limit_handler(lambda: response)
+        while True:
+            print(f"Requesting page {page} of {url} (batch size: {len(batch)})")
 
-        if response.status_code != 200:
-            raise Exception(
-                f"Failed to fetch data: {response.status_code} {response.text}"
-            )
+            # Add page token to request if it exists
+            if "next_page_token" in batch_data:
+                batch_data["page_token"] = batch_data.pop("next_page_token")
 
-        data = response.json()
+            # Use rate_limit_handler to make the request with proper retry logic
+            response = rate_limit_handler(lambda: requests.post(url, json=batch_data))
 
-        if len(data["reports"][0].get("errors", [])) > 0:
-            raise Exception(data["reports"][0])
+            if response.status_code != 200:
+                raise Exception(
+                    f"Failed to fetch data: {response.status_code} {response.text}"
+                )
 
-        all_reports.extend(data["reports"])
+            data = response.json()
 
-        next_page_token = data.get("next_page_token")
-        if not next_page_token:
-            break
+            if len(data["reports"][0].get("errors", [])) > 0:
+                raise Exception(data["reports"][0])
 
-        json_data["next_page_token"] = next_page_token
-        page += 1
+            all_reports.extend(data["reports"])
+
+            next_page_token = data.get("next_page_token")
+            if not next_page_token:
+                break
+
+            batch_data["next_page_token"] = next_page_token
+            page += 1
+
+        processed_count += len(batch)
+        page = 1  # Reset page counter for next batch
 
     return all_reports
 
@@ -289,8 +311,8 @@ def get_species_tree(taxonomy_ids, taxonomic_levels, species_info=None):
                 ]
                 if "rank" in info["taxonomy"]:
                     taxon_rank_map[tax_id] = info["taxonomy"]["rank"]
-                else:
-                    print(f"rank not found for tax_id: {tax_id}")
+                # else:
+                #     # print(f"rank not found for tax_id: {tax_id}")
 
             # Also extract parent taxa information if available
             if "classification" in info["taxonomy"]:
@@ -333,26 +355,26 @@ def fetch_taxa_info(tax_ids, taxon_name_map, taxon_rank_map, description="taxa")
     Returns:
       None (updates the provided maps in-place)
     """
-    # Filter out tax_ids that are already in the map
+    # Filter out tax_ids that are already in the map and convert to strings
     missing_tax_ids = [
-        tid for tid in tax_ids if tid not in taxon_name_map and tid != "1"
+        str(tid) for tid in tax_ids if str(tid) not in taxon_name_map and str(tid) != "1"
     ]
 
     if not missing_tax_ids:
         return
 
     print(f"Fetching information for {len(missing_tax_ids)} {description}")
-
+    
     url = "https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/dataset_report"
     reports = post_ncbi_request(url, {"taxons": missing_tax_ids})
-
+    
     for report in reports:
         tax_id = str(report["taxonomy"]["tax_id"])
         taxon_name_map[tax_id] = report["taxonomy"]["current_scientific_name"]["name"]
         if "rank" in report["taxonomy"]:
             taxon_rank_map[tax_id] = report["taxonomy"]["rank"]
-        else:
-            print(f"rank not found for tax_id: {tax_id}")
+        #else:
+        #    print(f"rank not found for tax_id: {tax_id}")
 
 
 def ncbi_tree_to_nested_tree(node_id, edges, taxonomy_ids):
@@ -857,12 +879,33 @@ def report_missing_ploidy_info(genomes_df, organisms_df):
     return list(zip(missing_ploidy["accession"], missing_ploidy["speciesTaxonomyId"]))
 
 
+def check_missing_outbreak_descendants(outbreak_taxonomy_ids, all_taxonomy_ids):
+    """
+    Check for outbreak taxonomy IDs that are not found in the genomes data.
+    
+    Args:
+        outbreak_taxonomy_ids: List of taxonomy IDs from outbreaks, including descendants
+        all_taxonomy_ids: List of all taxonomy IDs found in the genomes data
+        
+    Returns:
+        List of missing taxonomy IDs
+    """
+    # Convert all_taxonomy_ids to a set for faster lookups
+    all_taxonomy_ids_set = set(all_taxonomy_ids)
+    
+    # Find taxonomy IDs that are in outbreak_taxonomy_ids but not in all_taxonomy_ids
+    missing_ids = [tax_id for tax_id in outbreak_taxonomy_ids if tax_id not in all_taxonomy_ids_set]
+    
+    return missing_ids
+
+
 def make_qc_report(
     missing_ncbi_assemblies,
     inconsistent_taxonomy_ids,
     missing_ucsc_assemblies,
     missing_gene_model_urls=None,
     missing_ploidy_assemblies=None,
+    missing_outbreak_descendants=None,
 ):
     ncbi_assemblies_text = (
         "None"
@@ -900,7 +943,77 @@ def make_qc_report(
             ]
         )
     )
-    return f"# Catalog QC report\n\n## Assemblies not found on NCBI\n\n{ncbi_assemblies_text}\n\n## Assemblies not found in UCSC list\n\n{ucsc_assemblies_text}\n\n## Assemblies with gene model URLs not found\n\n{gene_model_urls_text}\n\n## Species and strain combinations with multiple taxonomy IDs\n\n{taxonomy_ids_text}\n\n## Assemblies without ploidy information\n\n{ploidy_assemblies_text}"
+    if missing_outbreak_descendants is None or len(missing_outbreak_descendants) == 0:
+        outbreak_descendants_text = "None"
+    else:
+        outbreak_descendants_text = "\n".join(
+            [f"- {tax_id}" for tax_id in missing_outbreak_descendants]
+        )
+    return (
+        f"# Catalog QC report\n\n"
+        f"## Assemblies not found on NCBI\n\n{ncbi_assemblies_text}\n\n"
+        f"## Assemblies not found in UCSC list\n\n{ucsc_assemblies_text}\n\n"
+        f"## Assemblies with gene model URLs not found\n\n{gene_model_urls_text}\n\n"
+        f"## Species and strain combinations with multiple taxonomy IDs\n\n{taxonomy_ids_text}\n\n"
+        f"## Assemblies without ploidy information\n\n{ploidy_assemblies_text}\n\n"
+        f"## Outbreak descendant taxonomy IDs not found in genomes data\n\n{outbreak_descendants_text}"
+    )
+
+
+def get_outbreak_taxonomy_ids(outbreaks_path, get_primary=True, get_descendants=False):
+    """Read outbreaks from YAML file and return a list of taxonomy IDs.
+    
+    Includes both primary taxonomy_id and any highlight_descendant_taxonomy_ids.
+    """
+    if not get_primary and not get_descendants:
+        raise ValueError("At least one of get_primary or get_descendants must be True")
+
+    if outbreaks_path is None:
+        return []
+    
+    taxonomy_ids = []
+    with open(outbreaks_path) as stream:
+        outbreaks_data = yaml.safe_load(stream)
+        if not outbreaks_data:
+            return []
+            
+        for outbreak in outbreaks_data.get("outbreaks", []):
+            # Add primary taxonomy ID
+            if get_primary:
+                taxonomy_ids.append(outbreak["taxonomy_id"])
+            
+            # Add any highlight descendant taxonomy IDs
+            if get_descendants and outbreak.get("highlight_descendant_taxonomy_ids"):
+                taxonomy_ids.extend(outbreak["highlight_descendant_taxonomy_ids"])
+    
+    # Return unique taxonomy IDs
+    return list(set(taxonomy_ids))
+
+def save_taxonomy_mapping(taxonomy_ids, taxon_name_map, taxon_rank_map, output_path):
+    """
+    Create and save a TSV file with taxonomy ID to name and rank mapping.
+    
+    Args:
+        taxonomy_ids: List of taxonomy IDs to include in the mapping
+        output_path: Path to save the TSV file
+    """
+    if not taxonomy_ids:
+        return
+    
+    # Create DataFrame with taxonomy ID, name, and rank
+    rows = []
+    for tax_id in taxonomy_ids:
+        if str(tax_id) in taxon_name_map:
+            rows.append({
+                "taxonomy_id": tax_id,
+                "name": taxon_name_map.get(str(tax_id), ""),
+                "rank": taxon_rank_map.get(str(tax_id), "")
+            })
+    
+    # Save to TSV file
+    if rows:
+        pd.DataFrame(rows).to_csv(output_path, index=False, sep="\t")
+        print(f"Wrote taxonomy mapping to {output_path}")
 
 
 def build_files(
@@ -915,10 +1028,21 @@ def build_files(
     primary_output_path=None,
     qc_report_path=None,
     organisms_path=None,
+    outbreaks_path=None,
+    outbreak_taxonomy_mapping_path=None,
 ):
     print("Building files")
 
     qc_report_params = {}
+
+    # Read outbreak taxonomy IDs if outbreaks path is provided
+    outbreak_taxonomy_ids = []
+    if outbreaks_path:
+        outbreak_taxonomy_ids = get_outbreak_taxonomy_ids(outbreaks_path)
+    print(f"Found {len(outbreak_taxonomy_ids)} outbreak taxonomy IDs")
+    
+    # We'll get the taxa names after we've built the species info to reuse the taxon maps
+
 
     source_list_df = read_assemblies(assemblies_path)
 
@@ -966,6 +1090,46 @@ def build_files(
     # Create species DataFrame using the fetched species_info
     species_df = get_species_df(
         species_info, species_name_info, taxonomic_group_sets, taxonomic_levels_for_tree
+        )
+    
+    print(f"Found {len(outbreak_taxonomy_ids)} outbreak taxonomy IDs")
+    # Add otherTaxa field with outbreak-associated taxa names
+    if outbreak_taxonomy_ids:
+        # Convert lineageTaxonomyIds from comma-separated string to list of integers
+        species_df["lineageTaxonomyIdsList"] = species_df["lineageTaxonomyIds"].apply(
+            lambda x: [int(id) for id in x.split(",")]
+        )
+
+        # Get taxon names and ranks for outbreak taxonomy IDs
+        outbreak_taxon_name_map = {}
+        outbreak_taxon_rank_map = {}
+        fetch_taxa_info(outbreak_taxonomy_ids, outbreak_taxon_name_map, outbreak_taxon_rank_map, "outbreak taxa")
+    
+        # For each row, check if any lineage taxonomy ID is in the outbreak taxonomy IDs
+        # and add the corresponding taxon name to otherTaxa only if its rank is not in taxonomic_levels_for_tree
+        def get_other_taxa(lineage_ids):
+            taxa = []
+            for tax_id in lineage_ids:
+                if tax_id in outbreak_taxonomy_ids:
+                    # Check if this taxon's rank is already covered by taxonomic_levels_for_tree
+                    rank = outbreak_taxon_rank_map.get(str(tax_id), "").lower()
+                    if rank not in taxonomic_levels_for_tree:
+                        # Use the taxon name instead of the raw ID
+                        taxa.append(outbreak_taxon_name_map[str(tax_id)])
+            return taxa if taxa else None
+        
+        species_df["otherTaxa"] = (
+            species_df["lineageTaxonomyIdsList"].apply(get_other_taxa)
+        )
+        
+        # Drop the temporary column
+        species_df = species_df.drop(
+            columns=["lineageTaxonomyIdsList"]
+        )
+
+    qc_report_params["missing_outbreak_descendants"] = check_missing_outbreak_descendants(
+        get_outbreak_taxonomy_ids(outbreaks_path, get_primary=False, get_descendants=True),
+        species_df["speciesTaxonomyId"],
     )
 
     report_missing_values_from(
@@ -1054,3 +1218,14 @@ def build_files(
         qc_report_text = make_qc_report(**qc_report_params)
         with open(qc_report_path, "w") as file:
             file.write(qc_report_text)
+            
+    # If taxonomy_mapping_path is provided and we have outbreak taxonomy IDs,
+    # save the taxonomy mapping for use by build-outbreaks.ts
+    if outbreak_taxonomy_mapping_path is not None and outbreak_taxonomy_ids:
+        print(f"Saving taxonomy mapping to {outbreak_taxonomy_mapping_path}")
+        save_taxonomy_mapping(
+            outbreak_taxonomy_ids, 
+            outbreak_taxon_name_map, 
+            outbreak_taxon_rank_map, 
+            outbreak_taxonomy_mapping_path
+        )
