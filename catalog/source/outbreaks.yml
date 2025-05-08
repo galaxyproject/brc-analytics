@@ -24,7 +24,7 @@ outbreaks:
         url: "https://www.bv-brc.org/view/Taxonomy/11320"
         type: REFERENCE
 
-  - taxonomy_id: 2697049
+  - taxonomy_id: 3418604
     priority: HIGHEST
     active: true
     description:

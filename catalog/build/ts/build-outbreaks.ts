@@ -27,10 +27,6 @@ const STANDARD_TAXONOMIC_RANKS = [
   "order",
   "family",
   "genus",
-  "kingdom",
-  "order",
-  "phylum",
-  "realm",
   "species",
   "strain",
 ];

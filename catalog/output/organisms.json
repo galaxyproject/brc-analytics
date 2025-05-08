@@ -27754,9 +27754,7 @@
           "2697049"
         ],
         "ncbiTaxonomyId": "2697049",
-        "otherTaxa": [
-          "['Severe acute respiratory syndrome coronavirus 2']"
-        ],
+        "otherTaxa": null,
         "ploidy": [
           "HAPLOID"
         ],
@@ -27782,9 +27780,7 @@
       }
     ],
     "ncbiTaxonomyId": "3418604",
-    "otherTaxa": [
-      "['Severe acute respiratory syndrome coronavirus 2']"
-    ],
+    "otherTaxa": null,
     "taxonomicGroup": [
       "Viruses"
     ],

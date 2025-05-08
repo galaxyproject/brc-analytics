@@ -90,9 +90,9 @@
         "type": "REFERENCE"
       }
     ],
-    "taxonomy_id": 2697049,
-    "taxonNameField": "otherTaxa",
-    "taxonName": "Severe acute respiratory syndrome coronavirus 2"
+    "taxonomy_id": 3418604,
+    "taxonNameField": "taxonomicLevelSpecies",
+    "taxonName": "Betacoronavirus pandemicum"
   },
   {
     "active": true,
