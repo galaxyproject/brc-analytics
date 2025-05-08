@@ -117,6 +117,8 @@ export interface Outbreaks {
  * Info for an outbreak.
  */
 export interface Outbreak {
+    /** The name of the outbreak/ pathogen. */
+    name: string,
     /** The outbreak's NCBI taxonomy ID. */
     taxonomy_id: number,
     /** The priority of the outbreak. */

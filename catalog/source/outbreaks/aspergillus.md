@@ -1,5 +1,3 @@
-# Aspergillus
-
 ## Overview
 
 Aspergillus molds are ubiquitous in the environment and cause a range of diseases, from allergies to deadly invasive infections. A. fumigatus is the most common cause of invasive aspergillosis in immunosuppressed patients.
