@@ -23,6 +23,7 @@ export interface BRCDataCatalogGenome {
   level: string;
   lineageTaxonomyIds: string[];
   ncbiTaxonomyId: string;
+  otherTaxa: string[] | null;
   ploidy: ORGANISM_PLOIDY[];
   scaffoldCount: number | null;
   scaffoldL50: number | null;
@@ -49,6 +50,7 @@ export interface BRCDataCatalogOrganism {
   commonName: string | null;
   genomes: BRCDataCatalogGenome[];
   ncbiTaxonomyId: string;
+  otherTaxa: string[] | null;
   taxonomicGroup: string[];
   taxonomicLevelClass: string;
   taxonomicLevelDomain: string;
@@ -81,6 +83,8 @@ export interface Outbreak {
   highlight_descendant_taxonomy_ids: number[] | null;
   priority: OUTBREAK_PRIORITY;
   resources: OutbreakResource[];
+  taxonName?: string;
+  taxonNameField?: string;
   taxonomy_id: number;
 }
 
