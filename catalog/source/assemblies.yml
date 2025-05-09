@@ -2525,7 +2525,7 @@ assemblies:
   - accession: GCA_004786555.1
   # Punta Toro virus
   - accession: GCF_002815115.1
-  - accession: GCA_001021295.1
+  - accession: GCF_001021295.1
   - accession: GCA_031322265.1
   # Rabies virus
   - accession: GCF_000859625.1
@@ -2555,3 +2555,240 @@ assemblies:
   # zika
   - accession: GCF_000882815.3
   - accession: GCF_002366285.1
+  # anthrax
+  - accession: GCF_000008445.1
+  # pertussis (whooping cough)
+  - accession: GCF_004008975.1
+  # Lyme disease
+  # Borrelia mayonii
+  - accession: GCF_001945665.1
+  # Borrelia burgdorferi
+  - accession: GCF_000181575.2
+  # Hard tick relapsing fever
+  # Borrelia miyamotoi
+  - accession: GCF_019668505.1
+  # brucella
+  - accession: GCF_000007125.1
+  - accession: GCF_000007505.1
+  - accession: GCF_000018525.1
+  - accession: GCF_000016845.1
+  - accession: GCF_000022745.1
+  - accession: GCF_015326295.1
+  - accession: GCF_047324105.1
+  - accession: GCF_022024335.1
+  - accession: GCF_025118245.1
+  - accession: GCF_900095155.1
+  - accession: GCF_000369945.1
+  - accession: GCF_900454225.1
+  - accession: GCF_006376675.1
+  - accession: GCF_005938105.1
+  - accession: GCF_041929965.1
+  - accession: GCF_900446125.1
+  - accession: GCF_002252535.1
+  - accession: GCF_038433355.1
+  - accession: GCF_041930145.1
+  - accession: GCF_002252475.1
+  - accession: GCF_006476605.1
+  - accession: GCF_002252505.1
+  - accession: GCF_014199265.1
+  - accession: GCF_014640615.1
+  - accession: GCF_002252445.1
+  - accession: GCF_002803535.1
+  - accession: GCF_008932285.1
+  # Burkholderia mallei (glanders)
+  - accession: GCF_033956065.1
+  # Burkholderia pseudomallei (melioidosis)
+  - accession: GCF_030297255.1
+  # Campylobacter jejuni
+  - accession: GCF_000009085.1
+  # Chlamydia psittaci (psittacosis)
+  - accession: GCF_000204255.1
+  # Coxiella burnetii (Q fever)
+  - accession: GCF_000007765.2
+  # Ehrlichia
+  - accession: GCF_000026005.1
+  - accession: GCF_000013145.1
+  - accession: GCF_000508225.1
+  - accession: GCF_000632845.1
+  - accession: GCF_000012565.1
+  - accession: GCF_004181775.1
+  # Anaplasma phagocytophilum
+  - accession: GCF_000964685.1
+  # Neorickettsia sennetsu
+  - accession: GCF_000013165.1
+  # e. coli
+  - accession: GCF_000005845.2
+  - accession: GCF_000008865.2
+  # Francisella tularensis (tularemia)
+  - accession: GCF_000833355.1
+  # Leptospira
+  - accession: GCF_000313175.2
+  - accession: GCF_000017685.1
+  - accession: GCF_000306675.2
+  - accession: GCF_001729245.1
+  - accession: GCF_003114835.2
+  - accession: GCF_040833995.1
+  - accession: GCF_002073495.2
+  - accession: GCF_003516145.1
+  - accession: GCF_006874765.1
+  - accession: GCF_003722295.1
+  - accession: GCF_000243695.2
+  - accession: GCF_000526875.1
+  - accession: GCF_004368965.1
+  - accession: GCF_000306255.2
+  - accession: GCF_000347175.1
+  - accession: GCF_000243675.2
+  - accession: GCF_000243815.2
+  - accession: GCF_000332515.2
+  - accession: GCF_000243715.2
+  - accession: GCF_000306235.2
+  - accession: GCF_000332495.1
+  - accession: GCF_022267325.1
+  - accession: GCF_026151395.1
+  - accession: GCF_002811945.1
+  - accession: GCF_026151345.1
+  - accession: GCF_002150035.1
+  - accession: GCF_004770055.1
+  - accession: GCF_002812085.1
+  - accession: GCF_003114855.1
+  - accession: GCF_003545925.1
+  - accession: GCF_002811765.1
+  - accession: GCF_004770615.1
+  - accession: GCF_004769405.1
+  - accession: GCF_003112675.1
+  - accession: GCF_002811475.1
+  - accession: GCF_004769195.1
+  - accession: GCF_002812205.1
+  - accession: GCF_003114815.1
+  - accession: GCF_002811925.1
+  - accession: GCF_002811875.1
+  - accession: GCF_004771275.1
+  - accession: GCF_004770745.1
+  - accession: GCF_026151335.1
+  - accession: GCF_004771005.1
+  - accession: GCF_016918785.1
+  - accession: GCF_016918735.1
+  - accession: GCF_002811955.2
+  - accession: GCF_016919175.1
+  - accession: GCF_016919165.1
+  - accession: GCF_002811985.1
+  - accession: GCF_004770635.1
+  - accession: GCF_004769275.1
+  - accession: GCF_004770365.1
+  - accession: GCF_004769295.1
+  - accession: GCF_004770555.1
+  - accession: GCF_004770475.1
+  - accession: GCF_003545875.1
+  - accession: GCF_004770625.1
+  - accession: GCF_004769235.1
+  - accession: GCF_004770045.1
+  - accession: GCF_004769555.1
+  - accession: GCF_004769575.1
+  - accession: GCF_004769775.1
+  - accession: GCF_004770265.1
+  - accession: GCF_004770765.1
+  - accession: GCF_004770895.1
+  - accession: GCF_004770145.1
+  - accession: GCF_004770105.1
+  - accession: GCF_004769615.1
+  - accession: GCF_002812225.1
+  - accession: GCF_004769665.1
+  - accession: GCF_004770155.1
+  - accession: GCF_004770995.1
+  # Listeria monocytogenes
+  - accession: GCF_000196035.1
+  # Rickettsia
+  - accession: GCF_000007025.1
+  - accession: GCF_000283595.1
+  - accession: GCF_000284075.1
+  - accession: GCF_000012385.1
+  - accession: GCF_000166935.1
+  - accession: GCF_000499665.2
+  - accession: GCF_000237845.1
+  - accession: GCF_000008045.1
+  - accession: GCF_016743795.2
+  - accession: GCF_000018225.1
+  - accession: GCF_000277165.1
+  - accession: GCF_000284155.1
+  - accession: GCF_000283915.1
+  - accession: GCF_963970025.1
+  - accession: GCF_000018205.1
+  - accession: GCF_936269705.1
+  - accession: GCF_964026385.1
+  - accession: GCF_964026435.1
+  - accession: GCF_965196655.1
+  - accession: GCF_964026565.1
+  - accession: GCF_964291875.1
+  - accession: GCF_964026465.1
+  - accession: GCF_964030775.1
+  - accession: GCF_964026455.1
+  - accession: GCF_964030815.1
+  - accession: GCF_964026445.1
+  - accession: GCF_007989425.1
+  - accession: GCF_000825685.1
+  - accession: GCF_000751075.1
+  - accession: GCF_000263055.1
+  - accession: GCF_046532895.1
+  - accession: GCF_900243065.1
+  - accession: GCF_000485845.1
+  - accession: GCF_045865205.1
+  - accession: GCF_000828125.2
+  - accession: GCF_000804505.1
+  - accession: GCF_964030945.1
+  - accession: GCF_964030725.1
+  - accession: GCF_049278075.1
+  - accession: GCF_015476335.1
+  - accession: GCF_003664375.1
+  - accession: GCF_002259525.1
+  # Salmonella
+  - accession: GCF_000006945.2
+  - accession: GCF_000252995.1
+  # Shigella
+  - accession: GCF_002950395.1
+  - accession: GCF_000006925.2
+  - accession: GCF_022354085.1
+  - accession: GCF_002290485.1
+  # pathogenic vibrio
+  # cholera
+  - accession: GCF_008369605.1
+  - accession: GCF_013085145.1
+  - accession: GCF_000963555.1
+  - accession: GCF_013085105.1
+  - accession: GCF_002946655.1
+  - accession: GCF_013085165.1
+  - accession: GCF_013085125.1
+  - accession: GCF_900205735.1
+  - accession: GCF_009938115.1
+  - accession: GCF_001318185.1
+  - accession: GCF_000166455.1
+  - accession: GCF_000250855.1
+  # Vibrio parahaemolyticus
+  - accession: GCF_000196095.1
+  # Vibrio vulnificus
+  - accession: GCF_002224265.1
+  # Vibrio mimicus
+  - accession: GCF_900460385.1
+  # Vibrio fluvialis
+  - accession: GCF_001558415.2
+  # Vibrio furnissii
+  - accession: GCF_006364355.1
+  # Vibrio alginolyticus
+  - accession: GCF_023650915.1
+  # Vibrio metschnikovii
+  - accession: GCF_900460295.1
+  # Vibrio cincinnatiensis
+  - accession: GCF_900460255.1
+  # Vibrio metoecus
+  - accession: GCF_030580635.1
+  # Vibrio injensis
+  - accession: GCF_001895205.1
+  # Vibrio harveyi
+  - accession: GCF_030060435.1
+  # Grimontia hollisae
+  - accession: GCF_001558255.2
+  # Photobacterium damselae
+  - accession: GCF_038086725.1
+  # Yersinia enterocolitica
+  - accession: GCF_000253175.1
+  # Yersinia pestis (plague)
+  - accession: GCF_000222975.1
