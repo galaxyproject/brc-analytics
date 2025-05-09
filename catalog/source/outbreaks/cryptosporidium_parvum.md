@@ -1,5 +1,3 @@
-# Cryptosporidium parvum
-
 ## Overview
 
 Cryptosporidium is a protozoan parasite that causes diarrheal illness, which can be severe in young children and immunocompromised individuals. It spreads through waterborne transmission, with oocysts that are resistant to chlorine.

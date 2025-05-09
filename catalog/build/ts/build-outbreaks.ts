@@ -99,6 +99,7 @@ export async function buildOutbreaks(): Promise<Outbreak[]> {
       description: await readMdxFile(descriptionPath),
       highlight_descendant_taxonomy_ids:
         sourceOutbreak.highlight_descendant_taxonomy_ids ?? null,
+      name: sourceOutbreak.name,
       priority: sourceOutbreak.priority,
       resources: sourceOutbreak.resources,
       taxonomy_id: sourceOutbreak.taxonomy_id,
