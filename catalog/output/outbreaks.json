@@ -41,7 +41,9 @@
         "type": "REFERENCE"
       }
     ],
-    "taxonomy_id": 11320
+    "taxonomy_id": 11320,
+    "taxonNameField": "otherTaxa",
+    "taxonName": "Influenza A virus"
   },
   {
     "name": "SARS-CoV-2",
@@ -90,7 +92,9 @@
         "type": "REFERENCE"
       }
     ],
-    "taxonomy_id": 2697049
+    "taxonomy_id": 3418604,
+    "taxonNameField": "taxonomicLevelSpecies",
+    "taxonName": "Betacoronavirus pandemicum"
   },
   {
     "name": "Mpox",
@@ -134,7 +138,9 @@
         "type": "REFERENCE"
       }
     ],
-    "taxonomy_id": 10244
+    "taxonomy_id": 10244,
+    "taxonNameField": "taxonomicLevelSpecies",
+    "taxonName": "Monkeypox virus"
   },
   {
     "name": "Tuberculosis",
@@ -168,7 +174,9 @@
         "type": "REFERENCE"
       }
     ],
-    "taxonomy_id": 1773
+    "taxonomy_id": 1773,
+    "taxonNameField": "taxonomicLevelSpecies",
+    "taxonName": "Mycobacterium tuberculosis"
   },
   {
     "name": "Malaria/ Plasmodium falciparum",
@@ -202,7 +210,9 @@
         "type": "PUBLICATION"
       }
     ],
-    "taxonomy_id": 5833
+    "taxonomy_id": 5833,
+    "taxonNameField": "taxonomicLevelSpecies",
+    "taxonName": "Plasmodium falciparum"
   },
   {
     "name": "Candidozyma (Candida) auris",
@@ -231,7 +241,9 @@
         "type": "REFERENCE"
       }
     ],
-    "taxonomy_id": 498019
+    "taxonomy_id": 498019,
+    "taxonNameField": "taxonomicLevelSpecies",
+    "taxonName": "Candidozyma auris"
   },
   {
     "name": "Cryptococcosis/ Cryptococcus neoformans",
@@ -270,7 +282,9 @@
         "type": "REFERENCE"
       }
     ],
-    "taxonomy_id": 5207
+    "taxonomy_id": 5207,
+    "taxonNameField": "taxonomicLevelSpecies",
+    "taxonName": "Cryptococcus neoformans"
   },
   {
     "name": "Valley Fever/ Coccidioides posadasii",
@@ -299,7 +313,9 @@
         "type": "REFERENCE"
       }
     ],
-    "taxonomy_id": 199306
+    "taxonomy_id": 199306,
+    "taxonNameField": "taxonomicLevelSpecies",
+    "taxonName": "Coccidioides posadasii"
   },
   {
     "name": "Histoplasmosis/ Histoplasma capsulatum",
@@ -323,7 +339,9 @@
         "type": "REFERENCE"
       }
     ],
-    "taxonomy_id": 5037
+    "taxonomy_id": 5037,
+    "taxonNameField": "taxonomicLevelSpecies",
+    "taxonName": "Histoplasma capsulatum"
   },
   {
     "name": "Cryptosporidiosis/ Cryptosporidium parvum",
@@ -347,7 +365,9 @@
         "type": "REFERENCE"
       }
     ],
-    "taxonomy_id": 5807
+    "taxonomy_id": 5807,
+    "taxonNameField": "taxonomicLevelSpecies",
+    "taxonName": "Cryptosporidium parvum"
   },
   {
     "name": "Primary amoebic meningoencephalitis/ Naegleria fowleri",
@@ -376,7 +396,9 @@
         "type": "REFERENCE"
       }
     ],
-    "taxonomy_id": 5763
+    "taxonomy_id": 5763,
+    "taxonNameField": "taxonomicLevelSpecies",
+    "taxonName": "Naegleria fowleri"
   },
   {
     "name": "Aspergillosis/ Aspergillus",
@@ -403,7 +425,9 @@
         "type": "REFERENCE"
       }
     ],
-    "taxonomy_id": 5052
+    "taxonomy_id": 5052,
+    "taxonNameField": "taxonomicLevelGenus",
+    "taxonName": "Aspergillus"
   },
   {
     "name": "Visceral Leishmaniasis/ Leishmania donovani complex",
@@ -435,7 +459,9 @@
         "type": "REFERENCE"
       }
     ],
-    "taxonomy_id": 38574
+    "taxonomy_id": 38574,
+    "taxonNameField": "otherTaxa",
+    "taxonName": "Leishmania donovani species complex"
   },
   {
     "name": "Mucormycosis/ Mucorales",
@@ -469,6 +495,8 @@
         "type": "REFERENCE"
       }
     ],
-    "taxonomy_id": 4827
+    "taxonomy_id": 4827,
+    "taxonNameField": "taxonomicLevelOrder",
+    "taxonName": "Mucorales"
   }
 ]

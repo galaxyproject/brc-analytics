@@ -26,7 +26,7 @@ outbreaks:
         type: REFERENCE
 
   - name: SARS-CoV-2
-    taxonomy_id: 2697049
+    taxonomy_id: 3418604
     priority: HIGHEST
     active: true
     description:

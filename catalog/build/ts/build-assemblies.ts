@@ -62,6 +62,7 @@ export async function buildAssemblies(): Promise<BRCDataCatalogGenome[]> {
       level: row.level,
       lineageTaxonomyIds: parseList(row.lineageTaxonomyIds),
       ncbiTaxonomyId: row.taxonomyId,
+      otherTaxa: row.otherTaxa ? row.otherTaxa.split(",") : null,
       ploidy,
       scaffoldCount: parseNumberOrNull(row.scaffoldCount),
       scaffoldL50: parseNumberOrNull(row.scaffoldL50),

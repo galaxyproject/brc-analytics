@@ -66,10 +66,18 @@ export function verifyUniqueIds<T>(
   }
 }
 
-export function accumulateArrayValue<T>(array: T[] | undefined, value: T): T[] {
-  if (!array) return [value];
-  if (array.includes(value)) return array;
-  return [...array, value];
+export function accumulateArrayValue<T>(
+  array: T[] | undefined,
+  ...values: T[]
+): T[] {
+  if (!array) return [...values];
+  const result = [...array];
+  for (const value of values) {
+    if (!result.includes(value)) {
+      result.push(value);
+    }
+  }
+  return result;
 }
 
 export function defaultStringToNone(value: string): string {
