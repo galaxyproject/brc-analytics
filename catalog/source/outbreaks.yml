@@ -1,5 +1,6 @@
 outbreaks:
-  - taxonomy_id: 11320
+  - name: Avian influenza
+    taxonomy_id: 11320
     priority: MODERATE
     active: true
     description:
@@ -24,7 +25,8 @@ outbreaks:
         url: "https://www.bv-brc.org/view/Taxonomy/11320"
         type: REFERENCE
 
-  - taxonomy_id: 2697049
+  - name: SARS-CoV-2
+    taxonomy_id: 2697049
     priority: HIGHEST
     active: true
     description:
@@ -52,7 +54,8 @@ outbreaks:
         url: "https://gxy.io/GTN:T00316"
         type: REFERENCE
 
-  - taxonomy_id: 10244
+  - name: Mpox
+    taxonomy_id: 10244
     priority: MODERATE_HIGH
     active: true
     description:
@@ -77,7 +80,8 @@ outbreaks:
         url: "https://gxy.io/GTN:T00347"
         type: REFERENCE
 
-  - taxonomy_id: 1773
+  - name: Tuberculosis
+    taxonomy_id: 1773
     priority: CRITICAL
     active: true
     description:
@@ -96,7 +100,8 @@ outbreaks:
         url: "https://www.who.int/news/item/27-10-2022-tuberculosis-deaths-and-disease-increase-during-the-covid-19-pandemic"
         type: REFERENCE
 
-  - taxonomy_id: 5833
+  - name: Malaria/ Plasmodium falciparum
+    taxonomy_id: 5833
     priority: HIGH
     active: true
     description:
@@ -115,7 +120,8 @@ outbreaks:
         url: "https://pubmed.ncbi.nlm.nih.gov/38045403/"
         type: PUBLICATION
 
-  - taxonomy_id: 498019
+  - name: Candidozyma (Candida) auris
+    taxonomy_id: 498019
     priority: HIGH
     active: true
     description:
@@ -131,7 +137,8 @@ outbreaks:
         url: "https://www.niaid.nih.gov/diseases-conditions/fungal-disease-specific-research"
         type: REFERENCE
 
-  - taxonomy_id: 5207
+  - name: Cryptococcosis/ Cryptococcus neoformans
+    taxonomy_id: 5207
     priority: HIGH
     active: true
     description:
@@ -153,7 +160,8 @@ outbreaks:
         url: "https://www.niaid.nih.gov/diseases-conditions/fungal-disease-specific-research"
         type: REFERENCE
 
-  - taxonomy_id: 199306
+  - name: Valley Fever/ Coccidioides posadasii
+    taxonomy_id: 199306
     priority: HIGH
     active: true
     description:
@@ -169,7 +177,8 @@ outbreaks:
         url: "https://fungidb.org/fungidb/app/search/organism/GenomeDataTypes/result?filterTerm=Coccidioides%20posadasii"
         type: REFERENCE
 
-  - taxonomy_id: 5037
+  - name: Histoplasmosis/ Histoplasma capsulatum
+    taxonomy_id: 5037
     priority: HIGH
     active: true
     description:
@@ -182,7 +191,8 @@ outbreaks:
         url: "https://fungidb.org/fungidb/app/search/organism/GenomeDataTypes/result?filterTerm=Histoplasma%20capsulatum"
         type: REFERENCE
 
-  - taxonomy_id: 5807
+  - name: Cryptosporidiosis/ Cryptosporidium parvum
+    taxonomy_id: 5807
     priority: MODERATE_HIGH
     active: true
     description:
@@ -195,7 +205,8 @@ outbreaks:
         url: "https://www.cdc.gov/mmwr/volumes/68/wr/mm6825a3.htm"
         type: REFERENCE
 
-  - taxonomy_id: 5763
+  - name: Primary amoebic meningoencephalitis/ Naegleria fowleri
+    taxonomy_id: 5763
     priority: MODERATE
     active: true
     description:
@@ -211,7 +222,8 @@ outbreaks:
         url: "https://amoebadb.org/amoeba/app/search/organism/GenomeDataTypes/result?filterTerm=Naegleria%20fowleri"
         type: REFERENCE
 
-  - taxonomy_id: 5052
+  - name: Aspergillosis/ Aspergillus
+    taxonomy_id: 5052
     priority: HIGH
     active: true
     description:
@@ -227,7 +239,8 @@ outbreaks:
         url: "https://fungidb.org/fungidb/app/search/organism/GenomeDataTypes/result?filterTerm=Aspergillus"
         type: REFERENCE
 
-  - taxonomy_id: 38574
+  - name: Visceral Leishmaniasis/ Leishmania donovani complex
+    taxonomy_id: 38574
     priority: MODERATE
     active: true
     description:
@@ -246,7 +259,8 @@ outbreaks:
         url: "https://tritrypdb.org/tritrypdb/app/search/organism/GenomeDataTypes/result?filterTerm=Leishmania%20donovani"
         type: REFERENCE
 
-  - taxonomy_id: 4827
+  - name: Mucormycosis/ Mucorales
+    taxonomy_id: 4827
     priority: MODERATE
     active: true
     description:

@@ -11,17 +11,18 @@ import {
   Typography,
 } from "@mui/material";
 import { StyledGrid } from "./gtfStep.styles";
-import { TYPOGRAPHY_PROPS } from "./constants";
-import { TYPOGRAPHY_PROPS as MUI_TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
+import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { configureGTFStep } from "./utils";
-import { BUTTON_PROPS } from "../components/Button/constants";
 import { useUCSCFiles } from "./hooks/UseUCSCFiles/hook";
 import { useRadioGroup } from "./hooks/UseRadioGroup/hook";
-import { useEffect } from "react";
+import { Fragment, useEffect } from "react";
 import {
   Loading,
   LOADING_PANEL_STYLE,
 } from "@databiosphere/findable-ui/lib/components/Loading/loading";
+import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Optional/optional";
+import { getGeneModelLabel } from "./utils";
+import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 
 export const GTFStep = ({
   active,
@@ -31,9 +32,9 @@ export const GTFStep = ({
   entryLabel,
   genome,
   index,
-  launchStatus,
   onConfigure,
-  onLaunch,
+  onContinue,
+  onEdit,
 }: StepProps): JSX.Element => {
   const { geneModelUrls } = useUCSCFiles(genome);
   const { controls, onChange, onValueChange, value } =
@@ -61,13 +62,25 @@ export const GTFStep = ({
         loading={geneModelUrls === undefined}
         panelStyle={LOADING_PANEL_STYLE.INHERIT}
       />
-      <StepLabel>
+      <StepLabel
+        optional={
+          completed && (
+            <Fragment>
+              <Optional noWrap>{getGeneModelLabel(value)}</Optional>
+              <Button onClick={() => onEdit(index)}>Edit</Button>
+            </Fragment>
+          )
+        }
+      >
         {entryLabel}
         <Icon slotProps={{ tooltip: { title: description } }} />
       </StepLabel>
       <StepContent>
         <StyledGrid>
-          <Typography {...TYPOGRAPHY_PROPS}>
+          <Typography
+            component="div"
+            variant={TYPOGRAPHY_PROPS.VARIANT.TEXT_BODY_500}
+          >
             Genes and Gene Predictions
           </Typography>
           {controls.length > 0 ? (
@@ -87,16 +100,16 @@ export const GTFStep = ({
               ))}
             </RadioGroup>
           ) : (
-            <Typography variant={MUI_TYPOGRAPHY_PROPS.VARIANT.TEXT_BODY_400}>
+            <Typography variant={TYPOGRAPHY_PROPS.VARIANT.TEXT_BODY_400}>
               No gene models found.
             </Typography>
           )}
           <Button
-            {...BUTTON_PROPS}
-            disabled={launchStatus.disabled || launchStatus.loading}
-            onClick={onLaunch}
+            {...BUTTON_PROPS.PRIMARY_CONTAINED}
+            disabled={!value}
+            onClick={() => onContinue()}
           >
-            Launch Galaxy
+            Continue
           </Button>
         </StyledGrid>
       </StepContent>

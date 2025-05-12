@@ -1,5 +1,3 @@
-# Naegleria fowleri
-
 ## Overview
 
 Naegleria fowleri is a free-living amoeba that causes Primary Amoebic Meningoencephalitis (PAM), an acute brain infection. It enters the nasal passages during freshwater activities and migrates to the brain.

@@ -3,15 +3,16 @@ import { ConfiguredInput } from "../../../../../../../../../../../../views/Workf
 
 export interface ConfiguredValue {
   geneModelUrl: string | null;
+  readRuns: string[] | null;
   referenceAssembly: string;
 }
 
-export interface LaunchStatus {
+export interface Status {
   disabled: boolean;
   loading: boolean;
 }
 
-export type OnLaunch = () => Promise<void>;
+export type OnLaunchGalaxy = () => Promise<void>;
 
 export interface Props {
   configuredInput: ConfiguredInput;
@@ -19,6 +20,6 @@ export interface Props {
 }
 
 export interface UseLaunchGalaxy {
-  launchStatus: LaunchStatus;
-  onLaunch: OnLaunch;
+  onLaunchGalaxy: OnLaunchGalaxy;
+  status: Status;
 }

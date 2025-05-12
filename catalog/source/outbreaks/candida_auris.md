@@ -1,5 +1,3 @@
-# Candida auris
-
 ## Overview
 
 Candida auris is an emerging multidrug-resistant fungus that has caused hospital outbreaks worldwide. Identified in 2009, it has spread to dozens of countries and is difficult to eradicate in healthcare settings.

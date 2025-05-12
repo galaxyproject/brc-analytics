@@ -24,6 +24,10 @@ classes:
   Outbreak:
     description: Info for an outbreak.
     attributes:
+      name:
+        description: The name of the outbreak/ pathogen.
+        required: true
+        range: string
       taxonomy_id:
         description: The outbreak's NCBI taxonomy ID.
         required: true
