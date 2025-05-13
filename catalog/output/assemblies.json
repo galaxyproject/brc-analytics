@@ -6579,9 +6579,7 @@
       "5661"
     ],
     "ncbiTaxonomyId": "5661",
-    "otherTaxa": [
-      "['Leishmania donovani species complex']"
-    ],
+    "otherTaxa": null,
     "ploidy": [
       "DIPLOID"
     ],
@@ -12902,7 +12900,6 @@
       "1884633",
       "5206",
       "1897064",
-      "5207",
       "40410",
       "1396488"
     ],
@@ -12914,7 +12911,7 @@
     "scaffoldCount": 37,
     "scaffoldL50": 7,
     "scaffoldN50": 1076535,
-    "speciesTaxonomyId": "5207",
+    "speciesTaxonomyId": "40410",
     "strainName": "XL280",
     "taxonomicGroup": [
       "Basidiomycota"
@@ -12927,62 +12924,9 @@
     "taxonomicLevelOrder": "Tremellales",
     "taxonomicLevelPhylum": "Basidiomycota",
     "taxonomicLevelRealm": "None",
-    "taxonomicLevelSpecies": "Cryptococcus neoformans",
-    "taxonomicLevelStrain": "Cryptococcus neoformans var. neoformans XL280",
+    "taxonomicLevelSpecies": "Cryptococcus deneoformans",
+    "taxonomicLevelStrain": "Cryptococcus deneoformans XL280",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002216205.1"
-  },
-  {
-    "accession": "GCA_002216725.1",
-    "annotationStatus": null,
-    "chromosomes": 14,
-    "commonName": null,
-    "coverage": "1140",
-    "gcPercent": 48,
-    "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/002/216/725/GCA_002216725.1/genes/GCA_002216725.1_ASM221672v1.ncbiGene.gtf.gz",
-    "isRef": "No",
-    "length": 18889724,
-    "level": "Chromosome",
-    "lineageTaxonomyIds": [
-      "1",
-      "131567",
-      "2759",
-      "33154",
-      "4751",
-      "451864",
-      "5204",
-      "5302",
-      "155616",
-      "5234",
-      "1884633",
-      "5206",
-      "1897064",
-      "5207",
-      "178876"
-    ],
-    "ncbiTaxonomyId": "178876",
-    "otherTaxa": null,
-    "ploidy": [
-      "HAPLOID"
-    ],
-    "scaffoldCount": 14,
-    "scaffoldL50": 6,
-    "scaffoldN50": 1422463,
-    "speciesTaxonomyId": "5207",
-    "strainName": "KN99",
-    "taxonomicGroup": [
-      "Basidiomycota"
-    ],
-    "taxonomicLevelClass": "Tremellomycetes",
-    "taxonomicLevelDomain": "Eukaryota",
-    "taxonomicLevelFamily": "Cryptococcaceae",
-    "taxonomicLevelGenus": "Cryptococcus",
-    "taxonomicLevelKingdom": "Fungi",
-    "taxonomicLevelOrder": "Tremellales",
-    "taxonomicLevelPhylum": "Basidiomycota",
-    "taxonomicLevelRealm": "None",
-    "taxonomicLevelSpecies": "Cryptococcus neoformans",
-    "taxonomicLevelStrain": "Cryptococcus neoformans strain KN99",
-    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002216725.1"
   },
   {
     "accession": "GCA_002219105.2",
@@ -13894,59 +13838,6 @@
     "taxonomicLevelSpecies": "Paratrypanosoma confusum",
     "taxonomicLevelStrain": "None",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002921335.1"
-  },
-  {
-    "accession": "GCA_003011985.1",
-    "annotationStatus": null,
-    "chromosomes": null,
-    "commonName": null,
-    "coverage": "95",
-    "gcPercent": 48,
-    "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/003/011/985/GCA_003011985.1/genes/GCA_003011985.1_ASM301198v1.augustus.gtf.gz",
-    "isRef": "No",
-    "length": 18928706,
-    "level": "Scaffold",
-    "lineageTaxonomyIds": [
-      "1",
-      "131567",
-      "2759",
-      "33154",
-      "4751",
-      "451864",
-      "5204",
-      "5302",
-      "155616",
-      "5234",
-      "1884633",
-      "5206",
-      "1897064",
-      "5207",
-      "178876"
-    ],
-    "ncbiTaxonomyId": "178876",
-    "otherTaxa": null,
-    "ploidy": [
-      "HAPLOID"
-    ],
-    "scaffoldCount": 14,
-    "scaffoldL50": 6,
-    "scaffoldN50": 1422457,
-    "speciesTaxonomyId": "5207",
-    "strainName": "H99",
-    "taxonomicGroup": [
-      "Basidiomycota"
-    ],
-    "taxonomicLevelClass": "Tremellomycetes",
-    "taxonomicLevelDomain": "Eukaryota",
-    "taxonomicLevelFamily": "Cryptococcaceae",
-    "taxonomicLevelGenus": "Cryptococcus",
-    "taxonomicLevelKingdom": "Fungi",
-    "taxonomicLevelOrder": "Tremellales",
-    "taxonomicLevelPhylum": "Basidiomycota",
-    "taxonomicLevelRealm": "None",
-    "taxonomicLevelSpecies": "Cryptococcus neoformans",
-    "taxonomicLevelStrain": "Cryptococcus neoformans strain H99",
-    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003011985.1"
   },
   {
     "accession": "GCA_003013265.1",
@@ -15517,9 +15408,7 @@
       "5661"
     ],
     "ncbiTaxonomyId": "5661",
-    "otherTaxa": [
-      "['Leishmania donovani species complex']"
-    ],
+    "otherTaxa": null,
     "ploidy": [
       "DIPLOID"
     ],
@@ -21069,7 +20958,7 @@
     "accession": "GCA_022832995.1",
     "annotationStatus": null,
     "chromosomes": 14,
-    "commonName": null,
+    "commonName": "Cryptococcus neoformans serotype A",
     "coverage": "246",
     "gcPercent": 48,
     "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/022/832/995/GCA_022832995.1/genes/GCA_022832995.1_ASM2283299v1.ncbiGene.gtf.gz",
@@ -23775,9 +23664,7 @@
       "5671"
     ],
     "ncbiTaxonomyId": "5671",
-    "otherTaxa": [
-      "['Leishmania donovani species complex']"
-    ],
+    "otherTaxa": null,
     "ploidy": [
       "DIPLOID"
     ],
@@ -24586,9 +24473,7 @@
       "5661"
     ],
     "ncbiTaxonomyId": "5661",
-    "otherTaxa": [
-      "['Leishmania donovani species complex']"
-    ],
+    "otherTaxa": null,
     "ploidy": [
       "DIPLOID"
     ],
@@ -27287,7 +27172,6 @@
       "1884633",
       "5206",
       "1897064",
-      "5207",
       "40410",
       "214684"
     ],
@@ -27299,7 +27183,7 @@
     "scaffoldCount": 14,
     "scaffoldL50": 6,
     "scaffoldN50": 1438950,
-    "speciesTaxonomyId": "5207",
+    "speciesTaxonomyId": "40410",
     "strainName": "JEC21",
     "taxonomicGroup": [
       "Basidiomycota"
@@ -27312,8 +27196,8 @@
     "taxonomicLevelOrder": "Tremellales",
     "taxonomicLevelPhylum": "Basidiomycota",
     "taxonomicLevelRealm": "None",
-    "taxonomicLevelSpecies": "Cryptococcus neoformans",
-    "taxonomicLevelStrain": "Cryptococcus neoformans var. neoformans JEC21",
+    "taxonomicLevelSpecies": "Cryptococcus deneoformans",
+    "taxonomicLevelStrain": "Cryptococcus deneoformans JEC21",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000091045.1"
   },
   {
@@ -27883,7 +27767,6 @@
       "5206",
       "1897064",
       "5207",
-      "178876",
       "235443"
     ],
     "ncbiTaxonomyId": "235443",
@@ -27908,7 +27791,7 @@
     "taxonomicLevelPhylum": "Basidiomycota",
     "taxonomicLevelRealm": "None",
     "taxonomicLevelSpecies": "Cryptococcus neoformans",
-    "taxonomicLevelStrain": "Cryptococcus neoformans var. grubii H99",
+    "taxonomicLevelStrain": "Cryptococcus neoformans H99",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000149245.1"
   },
   {
@@ -28046,7 +27929,6 @@
       "1884633",
       "5206",
       "1897064",
-      "5207",
       "40410",
       "283643"
     ],
@@ -28058,7 +27940,7 @@
     "scaffoldCount": 14,
     "scaffoldL50": 5,
     "scaffoldN50": 1461964,
-    "speciesTaxonomyId": "5207",
+    "speciesTaxonomyId": "40410",
     "strainName": "B-3501A",
     "taxonomicGroup": [
       "Basidiomycota"
@@ -28071,8 +27953,8 @@
     "taxonomicLevelOrder": "Tremellales",
     "taxonomicLevelPhylum": "Basidiomycota",
     "taxonomicLevelRealm": "None",
-    "taxonomicLevelSpecies": "Cryptococcus neoformans",
-    "taxonomicLevelStrain": "Cryptococcus neoformans var. neoformans B-3501A",
+    "taxonomicLevelSpecies": "Cryptococcus deneoformans",
+    "taxonomicLevelStrain": "Cryptococcus deneoformans B-3501A",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000149385.1"
   },
   {
@@ -31080,9 +30962,7 @@
       "5661"
     ],
     "ncbiTaxonomyId": "5661",
-    "otherTaxa": [
-      "['Leishmania donovani species complex']"
-    ],
+    "otherTaxa": null,
     "ploidy": [
       "DIPLOID"
     ],
@@ -34994,9 +34874,7 @@
       "130760"
     ],
     "ncbiTaxonomyId": "130760",
-    "otherTaxa": [
-      "['Influenza A virus']"
-    ],
+    "otherTaxa": null,
     "ploidy": [
       "HAPLOID"
     ],
@@ -36213,55 +36091,6 @@
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000857045.1"
   },
   {
-    "accession": "GCF_000857325.2",
-    "annotationStatus": null,
-    "chromosomes": 1,
-    "commonName": "MBG",
-    "coverage": null,
-    "gcPercent": 38.5,
-    "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/857/325/GCF_000857325.2/genes/GCF_000857325.2_ViralProj15199.ncbiGene.gtf.gz",
-    "isRef": "No",
-    "length": 19111,
-    "level": "Complete Genome",
-    "lineageTaxonomyIds": [
-      "1",
-      "10239",
-      "2559587",
-      "2732396",
-      "2497569",
-      "2497570",
-      "2497574",
-      "11157",
-      "11266",
-      "3044783",
-      "3052505"
-    ],
-    "ncbiTaxonomyId": "3052505",
-    "otherTaxa": null,
-    "ploidy": [
-      "HAPLOID"
-    ],
-    "scaffoldCount": 1,
-    "scaffoldL50": 1,
-    "scaffoldN50": 19111,
-    "speciesTaxonomyId": "3052505",
-    "strainName": null,
-    "taxonomicGroup": [
-      "Viruses"
-    ],
-    "taxonomicLevelClass": "Monjiviricetes",
-    "taxonomicLevelDomain": "None",
-    "taxonomicLevelFamily": "Filoviridae",
-    "taxonomicLevelGenus": "Orthomarburgvirus",
-    "taxonomicLevelKingdom": "Orthornavirae",
-    "taxonomicLevelOrder": "Mononegavirales",
-    "taxonomicLevelPhylum": "Negarnaviricota",
-    "taxonomicLevelRealm": "Riboviria",
-    "taxonomicLevelSpecies": "Orthomarburgvirus marburgense",
-    "taxonomicLevelStrain": "None",
-    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000857325.2"
-  },
-  {
     "accession": "GCF_000857725.1",
     "annotationStatus": null,
     "chromosomes": 1,
@@ -37218,9 +37047,7 @@
       "93838"
     ],
     "ncbiTaxonomyId": "93838",
-    "otherTaxa": [
-      "['Influenza A virus']"
-    ],
+    "otherTaxa": null,
     "ploidy": [
       "HAPLOID"
     ],
@@ -37322,9 +37149,7 @@
       "335341"
     ],
     "ncbiTaxonomyId": "335341",
-    "otherTaxa": [
-      "['Influenza A virus']"
-    ],
+    "otherTaxa": null,
     "ploidy": [
       "HAPLOID"
     ],
@@ -37376,9 +37201,7 @@
       "211044"
     ],
     "ncbiTaxonomyId": "211044",
-    "otherTaxa": [
-      "['Influenza A virus']"
-    ],
+    "otherTaxa": null,
     "ploidy": [
       "HAPLOID"
     ],
@@ -37480,9 +37303,7 @@
       "488241"
     ],
     "ncbiTaxonomyId": "488241",
-    "otherTaxa": [
-      "['Influenza A virus']"
-    ],
+    "otherTaxa": null,
     "ploidy": [
       "HAPLOID"
     ],
@@ -38468,9 +38289,7 @@
       "1332244"
     ],
     "ncbiTaxonomyId": "1332244",
-    "otherTaxa": [
-      "['Influenza A virus']"
-    ],
+    "otherTaxa": null,
     "ploidy": [
       "HAPLOID"
     ],
@@ -39106,9 +38925,7 @@
       "641809"
     ],
     "ncbiTaxonomyId": "641809",
-    "otherTaxa": [
-      "['Influenza A virus']"
-    ],
+    "otherTaxa": null,
     "ploidy": [
       "HAPLOID"
     ],

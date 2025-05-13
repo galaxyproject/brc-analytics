@@ -1,15 +1,15 @@
 taxonomy_id	name	rank
-498019	Candidozyma auris	SPECIES
 10244	Monkeypox virus	SPECIES
-5763	Naegleria fowleri	SPECIES
-5833	Plasmodium falciparum	SPECIES
+5207	Cryptococcus neoformans	SPECIES
+1773	Mycobacterium tuberculosis	SPECIES
+5052	Aspergillus	GENUS
+5037	Histoplasma capsulatum	SPECIES
+4827	Mucorales	ORDER
+498019	Candidozyma auris	SPECIES
 199306	Coccidioides posadasii	SPECIES
 3418604	Betacoronavirus pandemicum	SPECIES
-1773	Mycobacterium tuberculosis	SPECIES
-5037	Histoplasma capsulatum	SPECIES
+5833	Plasmodium falciparum	SPECIES
 5807	Cryptosporidium parvum	SPECIES
-38574	Leishmania donovani species complex	SPECIES_GROUP
-5207	Cryptococcus neoformans	SPECIES
 11320	Influenza A virus	
-4827	Mucorales	ORDER
-5052	Aspergillus	GENUS
+38574	Leishmania donovani species complex	SPECIES_GROUP
+5763	Naegleria fowleri	SPECIES

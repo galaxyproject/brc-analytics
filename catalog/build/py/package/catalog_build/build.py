@@ -112,7 +112,11 @@ def read_assemblies(assemblies_path):
 
 def read_organisms(organisms_path):
     with open(organisms_path) as stream:
-        return pd.DataFrame(yaml.safe_load(stream)["organisms"])
+        organisms_data = yaml.safe_load(stream)["organisms"]
+        # Convert taxonomy_id to string to ensure consistent type handling
+        for organism in organisms_data:
+            organism["taxonomy_id"] = str(organism["taxonomy_id"])
+        return pd.DataFrame(organisms_data)
 
 
 def match_taxonomic_group(tax_id, lineage, taxonomic_groups):
@@ -156,6 +160,7 @@ def get_taxonomic_level_key(level):
 
 
 def get_species_row(taxon_info, taxonomic_group_sets, taxonomic_levels, name_info=None):
+    # print(f"get_species_row: {taxon_info}")
     classification = taxon_info["taxonomy"]["classification"]
     species_info = classification["species"]
     taxonomy_id = taxon_info["taxonomy"]["tax_id"]
@@ -181,9 +186,9 @@ def get_species_row(taxon_info, taxonomic_group_sets, taxonomic_levels, name_inf
             taxonomic_level_fields["commonName"] = common_names[0]
 
     return {
-        "taxonomyId": taxonomy_id,
+        "taxonomyId": str(taxonomy_id),
         "species": species_info["name"],
-        "speciesTaxonomyId": species_info["id"],
+        "speciesTaxonomyId": str(species_info["id"]),
         "lineageTaxonomyIds": ",".join(
             [str(id) for id in ancestor_taxonomy_ids + [taxonomy_id]]
         ),
@@ -313,8 +318,8 @@ def get_species_tree(taxonomy_ids, taxonomic_levels, species_info=None):
                 ]
                 if "rank" in info["taxonomy"]:
                     taxon_rank_map[tax_id] = info["taxonomy"]["rank"]
-                # else:
-                #     # print(f"rank not found for tax_id: {tax_id}")
+                else:
+                    print(f"rank not found for tax_id: {tax_id}")
 
             # Also extract parent taxa information if available
             if "classification" in info["taxonomy"]:
@@ -377,8 +382,8 @@ def fetch_taxa_info(tax_ids, taxon_name_map, taxon_rank_map, description="taxa")
         taxon_name_map[tax_id] = report["taxonomy"]["current_scientific_name"]["name"]
         if "rank" in report["taxonomy"]:
             taxon_rank_map[tax_id] = report["taxonomy"]["rank"]
-        # else:
-        #    print(f"rank not found for tax_id: {tax_id}")
+        else:
+            print(f"rank not found for tax_id: {tax_id}")
 
 
 def ncbi_tree_to_nested_tree(node_id, edges, taxonomy_ids):
@@ -409,7 +414,7 @@ def get_genome_row(genome_info):
         "strain": genome_info["organism"]
         .get("infraspecific_names", {})
         .get("strain", ""),
-        "taxonomyId": genome_info["organism"]["tax_id"],
+        "taxonomyId": str(genome_info["organism"]["tax_id"]),
         "accession": genome_info["accession"],
         "isRef": refseq_category == "reference genome",
         "level": genome_info["assembly_info"]["assembly_level"],
@@ -582,11 +587,13 @@ def report_missing_values(
         if len(missing_values) > len(values_series) / 2:
             present_values = values_series[present_values_mask]
             print(
-                f"Only {len(present_values)} of {len(values_series)} {values_name} {message_predicate}: {', '.join(present_values)}"
+                f"Only {len(present_values)} of {len(values_series)} {values_name} "
+                f"{message_predicate}: {', '.join(present_values)}"
             )
         else:
             print(
-                f"{len(missing_values)} {values_name} not {message_predicate}: {', '.join(missing_values)}"
+                f"{len(missing_values)} {values_name} not {message_predicate}: "
+                f"{', '.join(missing_values)}"
             )
     return missing_values
 
@@ -986,11 +993,17 @@ def get_outbreak_taxonomy_ids(outbreaks_path, get_primary=True, get_descendants=
         for outbreak in outbreaks_data.get("outbreaks", []):
             # Add primary taxonomy ID
             if get_primary:
-                taxonomy_ids.append(outbreak["taxonomy_id"])
+                taxonomy_ids.append(str(outbreak["taxonomy_id"]))
 
             # Add any highlight descendant taxonomy IDs
             if get_descendants and outbreak.get("highlight_descendant_taxonomy_ids"):
-                taxonomy_ids.extend(outbreak["highlight_descendant_taxonomy_ids"])
+                # Convert each ID to string before adding
+                taxonomy_ids.extend(
+                    [
+                        str(tax_id)
+                        for tax_id in outbreak["highlight_descendant_taxonomy_ids"]
+                    ]
+                )
 
     # Return unique taxonomy IDs
     return list(set(taxonomy_ids))
@@ -1129,7 +1142,8 @@ def build_files(
                     if rank not in taxonomic_levels_for_tree:
                         # Use the taxon name instead of the raw ID
                         taxa.append(outbreak_taxon_name_map[str(tax_id)])
-            return taxa if taxa else None
+            # Convert list to comma-separated string for build-assemblies.ts
+            return ",".join(taxa) if taxa else None
 
         species_df["otherTaxa"] = species_df["lineageTaxonomyIdsList"].apply(
             get_other_taxa
@@ -1203,6 +1217,12 @@ def build_files(
         )
     else:
         genomes_df["geneModelUrl"] = ""
+
+    # Drop any duplicate rows based on accession before writing to file
+    genomes_df = genomes_df.drop_duplicates(subset=["accession"])
+
+    # Sort by accession for consistent output
+    genomes_df = genomes_df.sort_values("accession")
 
     genomes_df.to_csv(genomes_output_path, index=False, sep="\t")
 
