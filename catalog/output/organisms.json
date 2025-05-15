@@ -18681,7 +18681,9 @@
           "130760"
         ],
         "ncbiTaxonomyId": "130760",
-        "otherTaxa": null,
+        "otherTaxa": [
+          "Influenza A virus"
+        ],
         "ploidy": [
           "HAPLOID"
         ],
@@ -18733,7 +18735,9 @@
           "93838"
         ],
         "ncbiTaxonomyId": "93838",
-        "otherTaxa": null,
+        "otherTaxa": [
+          "Influenza A virus"
+        ],
         "ploidy": [
           "HAPLOID"
         ],
@@ -18785,7 +18789,9 @@
           "335341"
         ],
         "ncbiTaxonomyId": "335341",
-        "otherTaxa": null,
+        "otherTaxa": [
+          "Influenza A virus"
+        ],
         "ploidy": [
           "HAPLOID"
         ],
@@ -18837,7 +18843,9 @@
           "211044"
         ],
         "ncbiTaxonomyId": "211044",
-        "otherTaxa": null,
+        "otherTaxa": [
+          "Influenza A virus"
+        ],
         "ploidy": [
           "HAPLOID"
         ],
@@ -18889,7 +18897,9 @@
           "488241"
         ],
         "ncbiTaxonomyId": "488241",
-        "otherTaxa": null,
+        "otherTaxa": [
+          "Influenza A virus"
+        ],
         "ploidy": [
           "HAPLOID"
         ],
@@ -18941,7 +18951,9 @@
           "1332244"
         ],
         "ncbiTaxonomyId": "1332244",
-        "otherTaxa": null,
+        "otherTaxa": [
+          "Influenza A virus"
+        ],
         "ploidy": [
           "HAPLOID"
         ],
@@ -18993,7 +19005,9 @@
           "641809"
         ],
         "ncbiTaxonomyId": "641809",
-        "otherTaxa": null,
+        "otherTaxa": [
+          "Influenza A virus"
+        ],
         "ploidy": [
           "HAPLOID"
         ],
@@ -19019,7 +19033,9 @@
       }
     ],
     "ncbiTaxonomyId": "2955291",
-    "otherTaxa": null,
+    "otherTaxa": [
+      "Influenza A virus"
+    ],
     "taxonomicGroup": [
       "Viruses"
     ],
@@ -39650,13 +39666,117 @@
     ]
   },
   {
-    "assemblyCount": 2,
+    "assemblyCount": 4,
     "assemblyTaxonomyIds": [
       "5207",
       "235443"
     ],
     "commonName": null,
     "genomes": [
+      {
+        "accession": "GCA_002216725.1",
+        "annotationStatus": null,
+        "chromosomes": 14,
+        "commonName": "Cryptococcus neoformans serotype A",
+        "coverage": "1140",
+        "gcPercent": 48,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/002/216/725/GCA_002216725.1/genes/GCA_002216725.1_ASM221672v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 18889724,
+        "level": "Chromosome",
+        "lineageTaxonomyIds": [
+          "1",
+          "131567",
+          "2759",
+          "33154",
+          "4751",
+          "451864",
+          "5204",
+          "5302",
+          "155616",
+          "5234",
+          "1884633",
+          "5206",
+          "1897064",
+          "5207"
+        ],
+        "ncbiTaxonomyId": "5207",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "scaffoldCount": 14,
+        "scaffoldL50": 6,
+        "scaffoldN50": 1422463,
+        "speciesTaxonomyId": "5207",
+        "strainName": "KN99",
+        "taxonomicGroup": [
+          "Basidiomycota"
+        ],
+        "taxonomicLevelClass": "Tremellomycetes",
+        "taxonomicLevelDomain": "Eukaryota",
+        "taxonomicLevelFamily": "Cryptococcaceae",
+        "taxonomicLevelGenus": "Cryptococcus",
+        "taxonomicLevelKingdom": "Fungi",
+        "taxonomicLevelOrder": "Tremellales",
+        "taxonomicLevelPhylum": "Basidiomycota",
+        "taxonomicLevelRealm": "None",
+        "taxonomicLevelSpecies": "Cryptococcus neoformans",
+        "taxonomicLevelStrain": "Cryptococcus neoformans strain KN99",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002216725.1"
+      },
+      {
+        "accession": "GCA_003011985.1",
+        "annotationStatus": null,
+        "chromosomes": null,
+        "commonName": "Cryptococcus neoformans serotype A",
+        "coverage": "95",
+        "gcPercent": 48,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/003/011/985/GCA_003011985.1/genes/GCA_003011985.1_ASM301198v1.augustus.gtf.gz",
+        "isRef": "No",
+        "length": 18928706,
+        "level": "Scaffold",
+        "lineageTaxonomyIds": [
+          "1",
+          "131567",
+          "2759",
+          "33154",
+          "4751",
+          "451864",
+          "5204",
+          "5302",
+          "155616",
+          "5234",
+          "1884633",
+          "5206",
+          "1897064",
+          "5207"
+        ],
+        "ncbiTaxonomyId": "5207",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "scaffoldCount": 14,
+        "scaffoldL50": 6,
+        "scaffoldN50": 1422457,
+        "speciesTaxonomyId": "5207",
+        "strainName": "H99",
+        "taxonomicGroup": [
+          "Basidiomycota"
+        ],
+        "taxonomicLevelClass": "Tremellomycetes",
+        "taxonomicLevelDomain": "Eukaryota",
+        "taxonomicLevelFamily": "Cryptococcaceae",
+        "taxonomicLevelGenus": "Cryptococcus",
+        "taxonomicLevelKingdom": "Fungi",
+        "taxonomicLevelOrder": "Tremellales",
+        "taxonomicLevelPhylum": "Basidiomycota",
+        "taxonomicLevelRealm": "None",
+        "taxonomicLevelSpecies": "Cryptococcus neoformans",
+        "taxonomicLevelStrain": "Cryptococcus neoformans strain H99",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003011985.1"
+      },
       {
         "accession": "GCA_022832995.1",
         "annotationStatus": null,
@@ -39717,7 +39837,7 @@
         "coverage": "11.8",
         "gcPercent": 48,
         "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/149/245/GCF_000149245.1/genes/GCF_000149245.1_CNA3.ncbiRefSeq.gtf.gz",
-        "isRef": "No",
+        "isRef": "Yes",
         "length": 18891193,
         "level": "Chromosome",
         "lineageTaxonomyIds": [
@@ -39778,6 +39898,8 @@
     "taxonomicLevelRealm": "None",
     "taxonomicLevelSpecies": "Cryptococcus neoformans",
     "taxonomicLevelStrain": [
+      "Cryptococcus neoformans strain KN99",
+      "Cryptococcus neoformans strain H99",
       "Cryptococcus neoformans strain VNII",
       "Cryptococcus neoformans H99"
     ]
@@ -43574,7 +43696,9 @@
           "5661"
         ],
         "ncbiTaxonomyId": "5661",
-        "otherTaxa": null,
+        "otherTaxa": [
+          "Leishmania donovani species complex"
+        ],
         "ploidy": [
           "DIPLOID"
         ],
@@ -43626,7 +43750,9 @@
           "5661"
         ],
         "ncbiTaxonomyId": "5661",
-        "otherTaxa": null,
+        "otherTaxa": [
+          "Leishmania donovani species complex"
+        ],
         "ploidy": [
           "DIPLOID"
         ],
@@ -43678,7 +43804,9 @@
           "5661"
         ],
         "ncbiTaxonomyId": "5661",
-        "otherTaxa": null,
+        "otherTaxa": [
+          "Leishmania donovani species complex"
+        ],
         "ploidy": [
           "DIPLOID"
         ],
@@ -43730,7 +43858,9 @@
           "5661"
         ],
         "ncbiTaxonomyId": "5661",
-        "otherTaxa": null,
+        "otherTaxa": [
+          "Leishmania donovani species complex"
+        ],
         "ploidy": [
           "DIPLOID"
         ],
@@ -43756,7 +43886,9 @@
       }
     ],
     "ncbiTaxonomyId": "5661",
-    "otherTaxa": null,
+    "otherTaxa": [
+      "Leishmania donovani species complex"
+    ],
     "taxonomicGroup": [
       "Kinetoplastea"
     ],
@@ -44419,7 +44551,9 @@
           "5671"
         ],
         "ncbiTaxonomyId": "5671",
-        "otherTaxa": null,
+        "otherTaxa": [
+          "Leishmania donovani species complex"
+        ],
         "ploidy": [
           "DIPLOID"
         ],
@@ -44445,7 +44579,9 @@
       }
     ],
     "ncbiTaxonomyId": "5671",
-    "otherTaxa": null,
+    "otherTaxa": [
+      "Leishmania donovani species complex"
+    ],
     "taxonomicGroup": [
       "Kinetoplastea"
     ],

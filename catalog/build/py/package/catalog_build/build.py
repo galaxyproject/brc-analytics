@@ -1116,9 +1116,9 @@ def build_files(
     print(f"Found {len(outbreak_taxonomy_ids)} outbreak taxonomy IDs")
     # Add otherTaxa field with outbreak-associated taxa names
     if outbreak_taxonomy_ids:
-        # Convert lineageTaxonomyIds from comma-separated string to list of integers
+        # Convert lineageTaxonomyIds from comma-separated string to list of strings
         species_df["lineageTaxonomyIdsList"] = species_df["lineageTaxonomyIds"].apply(
-            lambda x: [int(id) for id in x.split(",")]
+            lambda x: [id for id in x.split(",")]
         )
 
         # Get taxon names and ranks for outbreak taxonomy IDs
