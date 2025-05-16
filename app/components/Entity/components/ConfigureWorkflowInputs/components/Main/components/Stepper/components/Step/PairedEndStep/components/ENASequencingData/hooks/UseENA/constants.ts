@@ -1,3 +1,5 @@
+export const ACCESSION_SEPARATOR_REGEX = /[\s,]+/;
+
 export const ENA_ACCESSION_REGEX_PATTERN: Record<string, RegExp> = {
   experiment_accession: /^(?:[EDS]RX\d{6,})$/i,
   run_accession: /^(?:[EDS]RR\d{6,})$/i,

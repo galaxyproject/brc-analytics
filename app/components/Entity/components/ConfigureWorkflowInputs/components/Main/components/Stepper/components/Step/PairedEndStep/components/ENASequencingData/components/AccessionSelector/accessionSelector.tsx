@@ -62,8 +62,8 @@ export const AccessionSelector = ({
               component="div"
               color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
             >
-              Separate multiple accessions with any character (like commas or
-              spaces).
+              Separate multiple accessions with any combination of commas and
+              spaces.
             </Typography>
             {status.errors?.accession && (
               <Grid alignItems="center" columnGap={1} container direction="row">
