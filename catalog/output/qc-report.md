@@ -13,30 +13,41 @@
 
 ## Assemblies not found in UCSC list
 
-None
+- GCF_000018525.1
+- GCF_000013145.1
+- GCF_000005845.2
+- GCF_000008865.2
+- GCF_000009085.1
+- GCF_000006945.2
+- GCF_000006925.2
 
 ## Assemblies with gene model URLs not found
 
-None
+- GCF_000943645.1
+- GCA_000857325.3
+- GCA_031121245.1
+- GCA_031121255.1
+- GCA_031121995.1
+- GCF_001021295.1
 
 ## Species and strain combinations with multiple taxonomy IDs
 
 - Acanthamoeba castellanii strain Neff: 1257118, 5755
-- Blumeria graminis: 1689686, 62690
+- Blumeria graminis: 62690, 1689686
 - Candida tropicalis strain MYA-3404: 294747, 5482
-- Cryptococcus neoformans strain H99: 5207, 235443
-- Cryptosporidium parvum: 353152, 5807
+- Cryptococcus neoformans strain H99: 235443, 5207
+- Cryptosporidium parvum: 5807, 353152
 - Enterovirus A: 156647, 150846
 - Glossina fuscipes: 201502, 7396
 - Neospora caninum strain Liverpool: 572307, 29176
-- Norwalk virus: 122928, 1529924, 490039, 1529918, 122929, 1529909, 1246677
-- Orthoflavivirus denguei: 11053, 11069, 11070
+- Norwalk virus: 122929, 1529918, 490039, 122928, 1529924, 1246677, 1529909
+- Orthoflavivirus denguei: 11070, 11069, 11053
 - Orthomarburgvirus marburgense: 3052505, 448086
 - Plasmodium falciparum: 36329, 5833
-- Plasmodium vinckei: 5860, 54757, 138297, 119398, 138298
+- Plasmodium vinckei: 5860, 54757, 119398, 138297, 138298
 - Trypanosoma brucei: 185431, 5702
-- Trypanosoma cruzi strain Dm28c: 1416333, 85057, 5693
-- Vesicular exanthema of swine virus: 35612, 146073
+- Trypanosoma cruzi strain Dm28c: 1416333, 5693, 85057
+- Vesicular exanthema of swine virus: 146073, 35612
 
 ## Assemblies without ploidy information
 

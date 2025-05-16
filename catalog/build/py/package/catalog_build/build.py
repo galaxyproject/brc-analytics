@@ -285,8 +285,9 @@ def get_species_tree(taxonomy_ids, taxonomic_levels, species_info=None):
         child for edge in edges.values() for child in edge.get("visible_children", [])
     }
     all_children = [str(num) for num in all_children]
-    root_ids = [node_id for node_id in edges if node_id not in all_children]
-    root_ids = [str(num) for num in root_ids]
+    # Determine root IDs and sort them for consistent ordering
+    roots = [node_id for node_id in edges if node_id not in all_children]
+    root_ids = sorted([str(num) for num in roots], key=lambda x: int(x))
 
     if not root_ids:
         return {}
@@ -372,25 +373,37 @@ def fetch_taxa_info(tax_ids, taxon_name_map, taxon_rank_map, description="taxa")
     if not missing_tax_ids:
         return
 
-    print(f"Fetching information for {len(missing_tax_ids)} {description}")
-
+    # Fetch in batches to avoid overwhelming the NCBI server
     url = "https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/dataset_report"
-    reports = post_ncbi_request(url, {"taxons": missing_tax_ids})
-
-    for report in reports:
-        tax_id = str(report["taxonomy"]["tax_id"])
-        taxon_name_map[tax_id] = report["taxonomy"]["current_scientific_name"]["name"]
-        if "rank" in report["taxonomy"]:
-            taxon_rank_map[tax_id] = report["taxonomy"]["rank"]
-        else:
-            print(f"rank not found for tax_id: {tax_id}")
+    batch_size = 2500
+    total = len(missing_tax_ids)
+    total_batches = (total + batch_size - 1) // batch_size
+    print(f"Fetching information for {total} {description} in {total_batches} batches")
+    for batch_index in range(total_batches):
+        batch = missing_tax_ids[
+            batch_index * batch_size : (batch_index + 1) * batch_size
+        ]
+        print(
+            f"  Batch {batch_index + 1}/{total_batches}: fetching {len(batch)} {description}"
+        )
+        reports = post_ncbi_request(url, {"taxons": batch})
+        for report in reports:
+            tax_id = str(report["taxonomy"]["tax_id"])
+            taxon_name_map[tax_id] = report["taxonomy"]["current_scientific_name"][
+                "name"
+            ]
+            if "rank" in report["taxonomy"]:
+                taxon_rank_map[tax_id] = report["taxonomy"]["rank"]
+            else:
+                print(f"rank not found for tax_id: {tax_id}")
 
 
 def ncbi_tree_to_nested_tree(node_id, edges, taxonomy_ids):
     children = edges.get(str(node_id), {}).get("visible_children", [])
     children = [str(num) for num in children]
     # ncbi results odd again, dup children
-    children = set(children)
+    # Deduplicate and sort children by taxonomy ID for consistent ordering
+    children = sorted(set(children), key=lambda x: int(x))
     if len(children) > 0 or int(node_id) in taxonomy_ids:
         child_trees = [
             ncbi_tree_to_nested_tree(child, edges, taxonomy_ids) for child in children
@@ -1213,7 +1226,7 @@ def build_files(
             "accessions",
             "matched with gene model URLs",
             genomes_df["accession"],
-            genomes_df["geneModelUrl"].astype(bool),
+            genomes_df["geneModelUrl"].notna(),
         )
     else:
         genomes_df["geneModelUrl"] = ""
@@ -1239,7 +1252,8 @@ def build_files(
             list(genomes_df["taxonomyId"]), taxonomic_levels_for_tree, species_info
         )
         with open(tree_output_path, "w") as outfile:
-            json.dump(species_tree, outfile, indent=4)
+            # Dump with sorted keys and consistent indentation
+            json.dump(species_tree, outfile, indent=4, sort_keys=True)
         print(f"Wrote to {tree_output_path}")
 
     if organisms_path is not None:
