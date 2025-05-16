@@ -8,10 +8,6 @@
       {
         "parameters": [
           {
-            "key": "Paired Collection",
-            "variable": "SANGER_READ_RUN"
-          },
-          {
             "key": "Annotation GTF",
             "variable": "GENE_MODEL_URL"
           },

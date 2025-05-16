@@ -35,6 +35,9 @@ function buildOrganism(
     commonName: genome.commonName,
     genomes: accumulateArrayValue(organism?.genomes, genome),
     ncbiTaxonomyId: genome.speciesTaxonomyId,
+    otherTaxa: genome.otherTaxa
+      ? accumulateArrayValue(organism?.otherTaxa || [], ...genome.otherTaxa)
+      : organism?.otherTaxa || null,
     taxonomicGroup: genome.taxonomicGroup,
     taxonomicLevelClass: genome.taxonomicLevelClass,
     taxonomicLevelDomain: genome.taxonomicLevelDomain,

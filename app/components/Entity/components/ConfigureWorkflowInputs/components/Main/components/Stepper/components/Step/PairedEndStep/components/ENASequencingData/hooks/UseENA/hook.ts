@@ -1,6 +1,6 @@
 import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
 import { FormEvent, useCallback, useState } from "react";
-import { getAccessionType } from "./utils";
+import { parseAccessionList } from "./utils";
 import { SubmitOptions, UseENA } from "./types";
 import { SCHEMA } from "./schema";
 import { ValidationError } from "yup";
@@ -19,15 +19,25 @@ export const useENA = <T>(): UseENA<T> => {
       event.preventDefault();
       const form = event.target as HTMLFormElement;
       const formData = new FormData(form);
-      const accession = formData.get("accession");
-      const accessionType = getAccessionType(accession);
+      const inputValues = {
+        accession: formData.get("accession"),
+      };
 
-      SCHEMA.validate({ accession, accessionType }, { abortEarly: false })
+      SCHEMA.validate(inputValues, { abortEarly: false })
         .then((result) => {
+          const accessionsInfo = parseAccessionList(
+            result.accession,
+            "accession"
+          );
+          if (accessionsInfo.length === 0)
+            throw new ValidationError(
+              "Accession is required",
+              inputValues.accession,
+              "accession"
+            );
           run(
             fetchENAData({
-              accession: result.accession,
-              accessionType: result.accessionType,
+              accessionsInfo,
               submitOptions: {
                 onError: () => {
                   setErrors({
@@ -46,7 +56,10 @@ export const useENA = <T>(): UseENA<T> => {
         })
         .catch((validationError: ValidationError) => {
           const fieldErrors: Record<string, string> = {};
-          for (const error of validationError.inner) {
+          const validationErrors = validationError.inner.length
+            ? validationError.inner
+            : [validationError];
+          for (const error of validationErrors) {
             if (error.path) fieldErrors[error.path] = error.message;
           }
           setErrors(fieldErrors);
