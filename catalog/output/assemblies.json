@@ -26825,7 +26825,7 @@
     "taxonomicLevelRealm": "None",
     "taxonomicLevelSpecies": "Escherichia coli",
     "taxonomicLevelStrain": "Escherichia coli strain K-12 substr. MG1655",
-    "ucscBrowserUrl": null
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000005845.2"
   },
   {
     "accession": "GCF_000006295.1",
@@ -27253,7 +27253,7 @@
     "taxonomicLevelRealm": "None",
     "taxonomicLevelSpecies": "Shigella flexneri",
     "taxonomicLevelStrain": "Shigella flexneri 2a str. 301",
-    "ucscBrowserUrl": null
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000006925.2"
   },
   {
     "accession": "GCF_000006945.2",
@@ -27304,7 +27304,7 @@
     "taxonomicLevelRealm": "None",
     "taxonomicLevelSpecies": "Salmonella enterica",
     "taxonomicLevelStrain": "Salmonella enterica subsp. enterica serovar Typhimurium str. LT2",
-    "ucscBrowserUrl": null
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000006945.2"
   },
   {
     "accession": "GCF_000007025.1",
@@ -27656,7 +27656,7 @@
     "taxonomicLevelRealm": "None",
     "taxonomicLevelSpecies": "Escherichia coli",
     "taxonomicLevelStrain": "Escherichia coli O157:H7 str. Sakai",
-    "ucscBrowserUrl": null
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000008865.2"
   },
   {
     "accession": "GCF_000009085.1",
@@ -27706,7 +27706,7 @@
     "taxonomicLevelRealm": "None",
     "taxonomicLevelSpecies": "Campylobacter jejuni",
     "taxonomicLevelStrain": "Campylobacter jejuni subsp. jejuni NCTC 11168 = ATCC 700819",
-    "ucscBrowserUrl": null
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000009085.1"
   },
   {
     "accession": "GCF_000012385.1",
@@ -27857,7 +27857,7 @@
     "taxonomicLevelRealm": "None",
     "taxonomicLevelSpecies": "Ehrlichia chaffeensis",
     "taxonomicLevelStrain": "Ehrlichia chaffeensis str. Arkansas",
-    "ucscBrowserUrl": null
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000013145.1"
   },
   {
     "accession": "GCF_000013165.1",
@@ -28158,7 +28158,7 @@
     "taxonomicLevelRealm": "None",
     "taxonomicLevelSpecies": "Brucella canis",
     "taxonomicLevelStrain": "Brucella canis ATCC 23365",
-    "ucscBrowserUrl": null
+    "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000018525.1"
   },
   {
     "accession": "GCF_000022745.1",

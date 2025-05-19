@@ -1,15 +1,15 @@
 taxonomy_id	name	rank
-4827	Mucorales	ORDER
-5833	Plasmodium falciparum	SPECIES
-11320	Influenza A virus	
 1773	Mycobacterium tuberculosis	SPECIES
-498019	Candidozyma auris	SPECIES
-38574	Leishmania donovani species complex	SPECIES_GROUP
 5763	Naegleria fowleri	SPECIES
-10244	Monkeypox virus	SPECIES
-3418604	Betacoronavirus pandemicum	SPECIES
-199306	Coccidioides posadasii	SPECIES
-5807	Cryptosporidium parvum	SPECIES
+4827	Mucorales	ORDER
 5052	Aspergillus	GENUS
+3418604	Betacoronavirus pandemicum	SPECIES
+11320	Influenza A virus	
+10244	Monkeypox virus	SPECIES
+199306	Coccidioides posadasii	SPECIES
+5833	Plasmodium falciparum	SPECIES
+498019	Candidozyma auris	SPECIES
 5037	Histoplasma capsulatum	SPECIES
+5807	Cryptosporidium parvum	SPECIES
+38574	Leishmania donovani species complex	SPECIES_GROUP
 5207	Cryptococcus neoformans	SPECIES
