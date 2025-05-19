@@ -280,3 +280,188 @@ outbreaks:
       - title: "FungiDB | Genome Info and Stats"
         url: "https://fungidb.org/fungidb/app/search/organism/GenomeDataTypes/result?filterTerm=Mucor"
         type: REFERENCE
+
+  - name: Arenaviridae
+    taxonomy_id: 11617
+    priority: MODERATE_HIGH
+    active: true
+    description:
+      path: outbreaks/arenaviridae.md
+    resources:
+      - title: "CDC | Arenaviridae Viral Family"
+        url: "https://www.cdc.gov/vhf/virus-families/arenaviridae.html"
+        type: REFERENCE
+      - title: "NIAID | Scientists Discuss Prototype Pathogens for Pandemic Preparedness"
+        url: "https://www.niaid.nih.gov/news-events/scientists-discuss-prototype-pathogens-pandemic-preparedness"
+        type: REFERENCE
+      - title: "PMC | Prototype Pathogen Approach for Pandemic Preparedness"
+        url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
+        type: REFERENCE
+
+  - name: Hantaviridae
+    taxonomy_id: 1980413
+    priority: MODERATE_HIGH
+    active: true
+    description:
+      path: outbreaks/hantaviridae.md
+    resources:
+      - title: "CDC | Hantavirus"
+        url: "https://www.cdc.gov/hantavirus/index.html"
+        type: REFERENCE
+      - title: "NIAID | Scientists Discuss Prototype Pathogens for Pandemic Preparedness"
+        url: "https://www.niaid.nih.gov/news-events/scientists-discuss-prototype-pathogens-pandemic-preparedness"
+        type: REFERENCE
+      - title: "PMC | Prototype Pathogen Approach for Pandemic Preparedness"
+        url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
+        type: REFERENCE
+
+  - name: Nairoviridae
+    taxonomy_id: 1980415
+    priority: MODERATE_HIGH
+    active: true
+    description:
+      path: outbreaks/nairoviridae.md
+    resources:
+      - title: "CDC | Crimean-Congo Hemorrhagic Fever (CCHF)"
+        url: "https://www.cdc.gov/vhf/crimean-congo/index.html"
+        type: REFERENCE
+      - title: "NIAID | Scientists Discuss Prototype Pathogens for Pandemic Preparedness"
+        url: "https://www.niaid.nih.gov/news-events/scientists-discuss-prototype-pathogens-pandemic-preparedness"
+        type: REFERENCE
+      - title: "PMC | Prototype Pathogen Approach for Pandemic Preparedness"
+        url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
+        type: REFERENCE
+
+  - name: Peribunyaviridae
+    taxonomy_id: 1980416
+    priority: MODERATE
+    active: true
+    description:
+      path: outbreaks/peribunyaviridae.md
+    resources:
+      - title: "CDC | La Crosse Encephalitis"
+        url: "https://www.cdc.gov/lac/index.html"
+        type: REFERENCE
+      - title: "NIAID | Scientists Discuss Prototype Pathogens for Pandemic Preparedness"
+        url: "https://www.niaid.nih.gov/news-events/scientists-discuss-prototype-pathogens-pandemic-preparedness"
+        type: REFERENCE
+      - title: "PMC | Prototype Pathogen Approach for Pandemic Preparedness"
+        url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
+        type: REFERENCE
+
+  - name: Phenuiviridae
+    taxonomy_id: 1980418
+    priority: MODERATE
+    active: true
+    description:
+      path: outbreaks/phenuiviridae.md
+    resources:
+      - title: "CDC | Rift Valley Fever"
+        url: "https://www.cdc.gov/vhf/rvf/index.html"
+        type: REFERENCE
+      - title: "NIAID | Scientists Discuss Prototype Pathogens for Pandemic Preparedness"
+        url: "https://www.niaid.nih.gov/news-events/scientists-discuss-prototype-pathogens-pandemic-preparedness"
+        type: REFERENCE
+      - title: "PMC | Prototype Pathogen Approach for Pandemic Preparedness"
+        url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
+        type: REFERENCE
+
+  - name: Paramyxoviridae
+    taxonomy_id: 11158
+    priority: HIGH
+    active: true
+    description:
+      path: outbreaks/paramyxoviridae.md
+    resources:
+      - title: "CDC | Nipah Virus (NiV)"
+        url: "https://www.cdc.gov/vhf/nipah/index.html"
+        type: REFERENCE
+      - title: "WHO | Measles"
+        url: "https://www.who.int/news-room/fact-sheets/detail/measles"
+        type: REFERENCE
+      - title: "NIAID | Scientists Discuss Prototype Pathogens for Pandemic Preparedness"
+        url: "https://www.niaid.nih.gov/news-events/scientists-discuss-prototype-pathogens-pandemic-preparedness"
+        type: REFERENCE
+      - title: "PMC | Prototype Pathogen Approach for Pandemic Preparedness"
+        url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
+        type: REFERENCE
+
+  - name: Flaviviridae
+    taxonomy_id: 11050
+    priority: HIGH
+    active: true
+    description:
+      path: outbreaks/flaviviridae.md
+    resources:
+      - title: "CDC | Dengue"
+        url: "https://www.cdc.gov/dengue/index.html"
+        type: REFERENCE
+      - title: "CDC | Zika Virus"
+        url: "https://www.cdc.gov/zika/index.html"
+        type: REFERENCE
+      - title: "NIAID | Scientists Discuss Prototype Pathogens for Pandemic Preparedness"
+        url: "https://www.niaid.nih.gov/news-events/scientists-discuss-prototype-pathogens-pandemic-preparedness"
+        type: REFERENCE
+      - title: "PMC | Prototype Pathogen Approach for Pandemic Preparedness"
+        url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
+        type: REFERENCE
+
+  - name: Togaviridae
+    taxonomy_id: 11018
+    priority: MODERATE_HIGH
+    active: true
+    description:
+      path: outbreaks/togaviridae.md
+    resources:
+      - title: "CDC | Chikungunya Virus"
+        url: "https://www.cdc.gov/chikungunya/index.html"
+        type: REFERENCE
+      - title: "CDC | Eastern Equine Encephalitis"
+        url: "https://www.cdc.gov/eee/index.html"
+        type: REFERENCE
+      - title: "NIAID | Scientists Discuss Prototype Pathogens for Pandemic Preparedness"
+        url: "https://www.niaid.nih.gov/news-events/scientists-discuss-prototype-pathogens-pandemic-preparedness"
+        type: REFERENCE
+      - title: "PMC | Prototype Pathogen Approach for Pandemic Preparedness"
+        url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
+        type: REFERENCE
+
+  - name: Picornaviridae
+    taxonomy_id: 12058
+    priority: MODERATE
+    active: true
+    description:
+      path: outbreaks/picornaviridae.md
+    resources:
+      - title: "CDC | Enterovirus D68"
+        url: "https://www.cdc.gov/non-polio-enterovirus/about/ev-d68.html"
+        type: REFERENCE
+      - title: "WHO | Poliomyelitis"
+        url: "https://www.who.int/news-room/fact-sheets/detail/poliomyelitis"
+        type: REFERENCE
+      - title: "NIAID | Scientists Discuss Prototype Pathogens for Pandemic Preparedness"
+        url: "https://www.niaid.nih.gov/news-events/scientists-discuss-prototype-pathogens-pandemic-preparedness"
+        type: REFERENCE
+      - title: "PMC | Prototype Pathogen Approach for Pandemic Preparedness"
+        url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
+        type: REFERENCE
+
+  - name: Filoviridae
+    taxonomy_id: 11266
+    priority: CRITICAL
+    active: true
+    description:
+      path: outbreaks/filoviridae.md
+    resources:
+      - title: "CDC | Ebola (Ebola Virus Disease)"
+        url: "https://www.cdc.gov/vhf/ebola/index.html"
+        type: REFERENCE
+      - title: "CDC | Marburg (Marburg Virus Disease)"
+        url: "https://www.cdc.gov/vhf/marburg/index.html"
+        type: REFERENCE
+      - title: "NIAID | Scientists Discuss Prototype Pathogens for Pandemic Preparedness"
+        url: "https://www.niaid.nih.gov/news-events/scientists-discuss-prototype-pathogens-pandemic-preparedness"
+        type: REFERENCE
+      - title: "PMC | Prototype Pathogen Approach for Pandemic Preparedness"
+        url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
+        type: REFERENCE
