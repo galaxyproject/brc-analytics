@@ -14,13 +14,14 @@ import { OnContinue, OnEdit } from "../../hooks/UseStepper/types";
 export interface StepConfig {
   description?: ReactNode;
   disabled?: boolean;
+  key: keyof ConfiguredInput;
   label: string;
   renderValue: (ci: ConfiguredInput) => string | undefined;
   Step: ComponentType<StepProps>;
 }
 
 export interface StepProps
-  extends Omit<StepConfig, "Step" | "key" | "label">,
+  extends Pick<StepConfig, "description" | "disabled">,
     Pick<MStepProps, "active" | "completed" | "last">,
     Required<Pick<MStepProps, "index">> {
   entryLabel: string;

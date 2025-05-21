@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Table } from "./components/Table/table";
 import { RowSelectionState } from "@tanstack/table-core";
 import { EnaPairedReads } from "app/utils/galaxy-api/entities";
+import { STEP } from "../../../../step";
 
 export const CollectionSelector = ({
   onClose,
@@ -46,7 +47,7 @@ export const CollectionSelector = ({
                 urls: row.original.fastq_ftp,
               })
             );
-            onConfigure("readRuns", selectedRows);
+            onConfigure(STEP.key, selectedRows);
             onClose();
           }}
         >

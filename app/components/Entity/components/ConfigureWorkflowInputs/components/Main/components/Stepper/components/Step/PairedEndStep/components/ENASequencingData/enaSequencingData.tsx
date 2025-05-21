@@ -5,6 +5,7 @@ import { useDialog } from "@databiosphere/findable-ui/lib/components/common/Dial
 import { Props } from "./types";
 import { CollectionSummary } from "./components/CollectionSummary/collectionSummary";
 import { AccessionSelector } from "./components/AccessionSelector/accessionSelector";
+import { STEP } from "../../step";
 
 export const ENASequencingData = ({
   clearErrors,
@@ -39,7 +40,7 @@ export const ENASequencingData = ({
       />
       <CollectionSummary
         onClear={() => {
-          onConfigure("readRuns", null);
+          onConfigure(STEP.key, null);
           table.resetRowSelection();
         }}
         onEdit={collectionDialog.onOpen}

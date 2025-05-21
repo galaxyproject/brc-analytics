@@ -1,5 +1,6 @@
 import { UseRadioGroup } from "../hooks/UseRadioGroup/types";
 import { OnConfigure } from "../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { STEP } from "./step";
 
 /**
  * Configures the GTF step.
@@ -17,7 +18,7 @@ export const configureGTFStep = (
 
   // Gene model URLs are not available for this workflow.
   if (geneModelUrls.length === 0) {
-    onConfigure("geneModelUrl", null);
+    onConfigure(STEP.key, null);
     return;
   }
 
@@ -31,7 +32,7 @@ export const configureGTFStep = (
   if (!value) return;
 
   // Otherwise, use the gene model to configure the step.
-  onConfigure("geneModelUrl", value);
+  onConfigure(STEP.key, value);
 };
 
 /**
