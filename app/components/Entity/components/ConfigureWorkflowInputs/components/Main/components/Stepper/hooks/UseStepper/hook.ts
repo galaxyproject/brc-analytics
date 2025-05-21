@@ -12,12 +12,9 @@ export const useStepper = (steps: StepConfig[]): UseStepper => {
     setActiveStep((currentStep) => getNextActiveStep(steps, currentStep));
   }, [steps]);
 
-  const onEdit = useCallback(
-    (step: number): void => {
-      setActiveStep(step);
-    },
-    [steps]
-  );
+  const onEdit = useCallback((step: number): void => {
+    setActiveStep(step);
+  }, []);
 
   return { activeStep, onContinue, onEdit };
 };
