@@ -8,8 +8,6 @@ import { AccessionSelector } from "./components/AccessionSelector/accessionSelec
 
 export const ENASequencingData = ({
   clearErrors,
-  entryKey,
-  entryLabel,
   onConfigure,
   onRequestData,
   status,
@@ -33,8 +31,6 @@ export const ENASequencingData = ({
         status={status}
       />
       <CollectionSelector
-        entryKey={entryKey}
-        entryLabel={entryLabel}
         onClose={collectionDialog.onClose}
         onConfigure={onConfigure}
         open={collectionDialog.open}
@@ -43,7 +39,7 @@ export const ENASequencingData = ({
       />
       <CollectionSummary
         onClear={() => {
-          onConfigure(entryKey, entryLabel, [{ key: null, value: "None" }]);
+          onConfigure("readRuns", null);
           table.resetRowSelection();
         }}
         onEdit={collectionDialog.onOpen}

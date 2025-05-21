@@ -1,21 +1,15 @@
-export type OnConfigure = (
-  entryKey: string,
-  entryLabel: string,
-  values: ConfiguredValue[]
-) => void;
+import { EnaPairedReads } from "app/utils/galaxy-api/entities";
 
-export interface ConfigurationEntry {
-  entryLabel: string;
-  values: ConfiguredValue[];
-}
+export type OnConfigure = (...p: OnConfigureParams) => void;
+
+export type OnConfigureParams = {
+  [K in keyof Required<ConfiguredInput>]: [K, ConfiguredInput[K]];
+}[keyof ConfiguredInput];
 
 export interface ConfiguredInput {
-  [key: string]: ConfigurationEntry;
-}
-
-export interface ConfiguredValue {
-  key: string | null;
-  value: string | null;
+  geneModelUrl?: string | null;
+  readRuns?: EnaPairedReads[] | null;
+  referenceAssembly?: string;
 }
 
 export interface UseConfigureInputs {

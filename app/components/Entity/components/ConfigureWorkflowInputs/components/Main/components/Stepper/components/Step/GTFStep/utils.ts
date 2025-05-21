@@ -1,20 +1,14 @@
-import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
-import { ConfiguredValue } from "../hooks/UseLaunchGalaxy/types";
 import { UseRadioGroup } from "../hooks/UseRadioGroup/types";
 import { OnConfigure } from "../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 
 /**
  * Configures the GTF step.
  * @param geneModelUrls - Gene model URLs.
- * @param entryKey - Configured value key.
- * @param entryLabel - Configured value display label.
  * @param onConfigure - Callback function to configure the step.
  * @param onValueChange - Callback function to handle value changes.
  */
 export const configureGTFStep = (
   geneModelUrls: string[] | undefined,
-  entryKey: keyof ConfiguredValue,
-  entryLabel: string,
   onConfigure: OnConfigure,
   onValueChange: UseRadioGroup["onValueChange"]
 ): void => {
@@ -23,7 +17,7 @@ export const configureGTFStep = (
 
   // Gene model URLs are not available for this workflow.
   if (geneModelUrls.length === 0) {
-    onConfigure(entryKey, entryLabel, [{ key: null, value: LABEL.NONE }]);
+    onConfigure("geneModelUrl", null);
     return;
   }
 
@@ -37,9 +31,7 @@ export const configureGTFStep = (
   if (!value) return;
 
   // Otherwise, use the gene model to configure the step.
-  onConfigure(entryKey, entryLabel, [
-    { key: value, value: getGeneModelLabel(value) },
-  ]);
+  onConfigure("geneModelUrl", value);
 };
 
 /**

@@ -1,3 +1,9 @@
+export interface EnaPairedReads {
+  md5Hashes: string;
+  runAccession: string;
+  urls: string;
+}
+
 export interface WorkflowLandingsBody {
   public: true;
   request_state: WorkflowLandingsBodyRequestState;

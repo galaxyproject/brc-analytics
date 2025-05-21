@@ -8,7 +8,6 @@ import { useEffect } from "react";
 export const ReferenceAssemblyStep = ({
   active,
   completed,
-  entryKey,
   entryLabel,
   genome,
   index,
@@ -17,8 +16,8 @@ export const ReferenceAssemblyStep = ({
   const { accession } = genome;
 
   useEffect(() => {
-    onConfigure(entryKey, entryLabel, [{ key: accession, value: accession }]);
-  }, [accession, entryKey, entryLabel, onConfigure]);
+    onConfigure("referenceAssembly", accession);
+  }, [accession, entryLabel, onConfigure]);
 
   return (
     <Step active={active} completed={completed} index={index}>

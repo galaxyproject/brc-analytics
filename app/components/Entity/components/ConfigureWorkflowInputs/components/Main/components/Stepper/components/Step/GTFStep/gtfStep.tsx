@@ -28,7 +28,6 @@ export const GTFStep = ({
   active,
   completed,
   description,
-  entryKey,
   entryLabel,
   genome,
   index,
@@ -41,14 +40,8 @@ export const GTFStep = ({
     useRadioGroup(geneModelUrls);
 
   useEffect(() => {
-    configureGTFStep(
-      geneModelUrls,
-      entryKey,
-      entryLabel,
-      onConfigure,
-      onValueChange
-    );
-  }, [geneModelUrls, entryKey, entryLabel, onConfigure, onValueChange]);
+    configureGTFStep(geneModelUrls, onConfigure, onValueChange);
+  }, [geneModelUrls, onConfigure, onValueChange]);
 
   return (
     <Step
@@ -89,11 +82,7 @@ export const GTFStep = ({
                 <FormControlLabel
                   control={<Radio />}
                   key={i}
-                  onChange={() =>
-                    onConfigure(entryKey, entryLabel, [
-                      { key: value, value: label },
-                    ])
-                  }
+                  onChange={() => onConfigure("geneModelUrl", value)}
                   label={label}
                   value={value}
                 />

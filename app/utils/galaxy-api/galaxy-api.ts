@@ -3,6 +3,7 @@ import { WorkflowParameter } from "../../apis/catalog/brc-analytics-catalog/comm
 import ky from "ky";
 import { GALAXY_ENVIRONMENT } from "site-config/common/galaxy";
 import {
+  EnaPairedReads,
   WorkflowLanding,
   WorkflowLandingsBody,
   WorkflowLandingsBodyRequestState,
@@ -28,7 +29,7 @@ export async function getWorkflowLandingUrl(
   workflowId: string,
   referenceGenome: string,
   geneModelUrl: string | null,
-  readRuns: string[] | null,
+  readRuns: EnaPairedReads[] | null,
   parameters: WorkflowParameter[]
 ): Promise<string> {
   const body: WorkflowLandingsBody = {
@@ -65,7 +66,7 @@ function buildFastaUrl(identifier: string): string {
 function paramVariableToRequestValue(
   variable: WORKFLOW_PARAMETER_VARIABLE,
   geneModelUrl: string | null,
-  readRuns: string[] | null,
+  readRuns: EnaPairedReads[] | null,
   referenceGenome: string
 ): WorkflowParameterValue | null {
   // Because this `switch` has no default case, and the function doesn't allow `undefined` as a return type,
@@ -92,7 +93,7 @@ function paramVariableToRequestValue(
       return {
         class: "Collection",
         collection_type: "list:paired",
-        elements: readRuns.map((readRunsPair) => {
+        elements: readRuns.map(({ urls: readRunsPair }) => {
           // TODO get this info earlier? In particular, it might be better to explicitly get the run accession from ENA rather than getting it from the filenames.
           const { forwardUrl, reverseUrl, runAccession } =
             getPairedRunUrlsInfo(readRunsPair);
@@ -166,7 +167,7 @@ function getPairedRunUrlsInfo(enaUrls: string): {
 function getWorkflowLandingsRequestState(
   referenceGenome: string,
   geneModelUrl: string | null,
-  readRuns: string[] | null,
+  readRuns: EnaPairedReads[] | null,
   parameters: WorkflowParameter[]
 ): WorkflowLandingsBodyRequestState {
   const result: WorkflowLandingsBodyRequestState = {};
