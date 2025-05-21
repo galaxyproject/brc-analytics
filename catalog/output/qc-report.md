@@ -23,19 +23,19 @@ None
 
 - Acanthamoeba castellanii strain Neff: 1257118, 5755
 - Blumeria graminis: 1689686, 62690
-- Candida tropicalis strain MYA-3404: 294747, 5482
+- Candida tropicalis strain MYA-3404: 5482, 294747
 - Cryptococcus neoformans strain H99: 5207, 235443
-- Cryptosporidium parvum: 353152, 5807
-- Enterovirus A: 156647, 150846
-- Glossina fuscipes: 201502, 7396
+- Cryptosporidium parvum: 5807, 353152
+- Enterovirus A: 150846, 156647
+- Glossina fuscipes: 7396, 201502
 - Neospora caninum strain Liverpool: 572307, 29176
-- Norwalk virus: 122928, 1529924, 490039, 1529918, 122929, 1529909, 1246677
-- Orthoflavivirus denguei: 11053, 11069, 11070
-- Orthomarburgvirus marburgense: 3052505, 448086
+- Norwalk virus: 122928, 1529924, 122929, 1529909, 1246677, 1529918, 490039
+- Orthoflavivirus denguei: 11069, 11053, 11070
+- Orthomarburgvirus marburgense: 448086, 3052505
 - Plasmodium falciparum: 36329, 5833
-- Plasmodium vinckei: 5860, 54757, 138297, 119398, 138298
+- Plasmodium vinckei: 138298, 138297, 119398, 5860, 54757
 - Trypanosoma brucei: 185431, 5702
-- Trypanosoma cruzi strain Dm28c: 1416333, 85057, 5693
+- Trypanosoma cruzi strain Dm28c: 1416333, 5693, 85057
 - Vesicular exanthema of swine virus: 35612, 146073
 
 ## Assemblies without ploidy information
@@ -44,4 +44,10 @@ None
 
 ## Outbreak descendant taxonomy IDs not found in genomes data
 
-None
+- 138949
+- 463676
+- 3052599
+- 3052560
+- 1980456
+- 3052686
+- 3052518

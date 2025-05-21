@@ -2,7 +2,7 @@
 
 Filoviridae is a family of filamentous, enveloped, negative-sense RNA viruses that includes some of the most virulent human pathogens known. The most notable members are Ebola virus and Marburg virus, which cause severe hemorrhagic fevers with extremely high mortality rates. The name "filo" comes from the Latin word for "thread" or "filament," referring to their distinctive filamentous structure.
 
-Filoviridae has been designated as a prototype pathogen family for pandemic preparedness research, representing a viral group with significant potential for causing outbreaks and public health emergencies.
+Filoviridae has been designated as a prototype pathogen family for pandemic preparedness research by the National Institute of Allergy and Infectious Diseases (NIAID). As part of the NIAID-funded Research and Development of Vaccines and Monoclonal Antibodies for Pandemic Preparedness (ReVAMPP) project, this viral family was prioritized due to its significant potential for causing outbreaks and public health emergencies. NIAID selected virus families of concern with insufficient research, inadequate medical countermeasures, and low to moderate historical support.
 
 ## Impact
 

@@ -2,7 +2,7 @@
 
 Flaviviridae is a family of positive-sense, single-stranded RNA viruses that includes numerous important human pathogens. Notable members include dengue virus, Zika virus, yellow fever virus, West Nile virus, and hepatitis C virus. Many flaviviruses are arthropod-borne (arboviruses), primarily transmitted by mosquitoes or ticks, while others like hepatitis C are transmitted through blood and other body fluids.
 
-Flaviviridae has been designated as a prototype pathogen family for pandemic preparedness research, representing a viral group with significant potential for causing outbreaks and public health emergencies.
+Flaviviridae has been designated as a prototype pathogen family for pandemic preparedness research by the National Institute of Allergy and Infectious Diseases (NIAID). As part of the NIAID-funded Research and Development of Vaccines and Monoclonal Antibodies for Pandemic Preparedness (ReVAMPP) project, this viral family was prioritized due to its significant potential for causing outbreaks and public health emergencies. NIAID selected virus families of concern with insufficient research, inadequate medical countermeasures, and low to moderate historical support.
 
 ## Impact
 
