@@ -303,7 +303,7 @@ outbreaks:
         type: REFERENCE
       - title: "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development"
         url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
-        type: REFERENCE
+        type: PUBLICATION
 
   - name: Hantaviridae (Prototype Pathogen Viral Family)
     taxonomy_id: 1980413
@@ -329,7 +329,7 @@ outbreaks:
         type: REFERENCE
       - title: "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development"
         url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
-        type: REFERENCE
+        type: PUBLICATION
 
   - name: Nairoviridae (Prototype Pathogen Viral Family)
     taxonomy_id: 1980415
@@ -351,7 +351,7 @@ outbreaks:
         type: REFERENCE
       - title: "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development"
         url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
-        type: REFERENCE
+        type: PUBLICATION
 
   - name: Peribunyaviridae (Prototype Pathogen Viral Family)
     taxonomy_id: 1980416
@@ -378,7 +378,7 @@ outbreaks:
         type: REFERENCE
       - title: "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development"
         url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
-        type: REFERENCE
+        type: PUBLICATION
 
   - name: Phenuiviridae (Prototype Pathogen Viral Family)
     taxonomy_id: 1980418
@@ -404,7 +404,7 @@ outbreaks:
         type: REFERENCE
       - title: "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development"
         url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
-        type: REFERENCE
+        type: PUBLICATION
 
   - name: Paramyxoviridae (Prototype Pathogen Viral Family)
     taxonomy_id: 11158
@@ -432,7 +432,7 @@ outbreaks:
         type: REFERENCE
       - title: "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development"
         url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
-        type: REFERENCE
+        type: PUBLICATION
 
   - name: Flaviviridae (Prototype Pathogen Viral Family)
     taxonomy_id: 11050
@@ -462,7 +462,7 @@ outbreaks:
         type: REFERENCE
       - title: "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development"
         url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
-        type: REFERENCE
+        type: PUBLICATION
 
   - name: Togaviridae (Prototype Pathogen Viral Family)
     taxonomy_id: 11018
@@ -491,7 +491,7 @@ outbreaks:
         type: REFERENCE
       - title: "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development"
         url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
-        type: REFERENCE
+        type: PUBLICATION
 
   - name: Picornaviridae (Prototype Pathogen Viral Family)
     taxonomy_id: 12058
@@ -519,7 +519,7 @@ outbreaks:
         type: REFERENCE
       - title: "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development"
         url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
-        type: REFERENCE
+        type: PUBLICATION
 
   - name: Filoviridae (Prototype Pathogen Viral Family)
     taxonomy_id: 11266
@@ -545,4 +545,4 @@ outbreaks:
         type: REFERENCE
       - title: "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development"
         url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
-        type: REFERENCE
+        type: PUBLICATION
