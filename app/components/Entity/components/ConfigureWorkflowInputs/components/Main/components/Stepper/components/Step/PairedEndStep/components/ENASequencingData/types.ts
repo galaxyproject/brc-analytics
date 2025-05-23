@@ -1,6 +1,5 @@
 import { OnConfigure } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { UseENA } from "./hooks/UseENA/types";
-import { StepProps } from "../../../types";
 import { Table } from "@tanstack/react-table";
 
 export interface ReadRun {
@@ -21,9 +20,7 @@ export interface ReadRun {
   tax_id: number;
 }
 
-export interface Props
-  extends UseENA<ReadRun>,
-    Pick<StepProps, "entryKey" | "entryLabel"> {
+export interface Props extends UseENA<ReadRun> {
   onConfigure: OnConfigure;
   table: Table<ReadRun>;
 }

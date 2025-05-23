@@ -11,6 +11,7 @@ import {
   Workflow,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "../../../../components";
+import { STEPS as WORKFLOW_STEPS } from "../../../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/constants";
 import {
   GENOME_BROWSER,
   NCBI_ASSEMBLY,
@@ -669,13 +670,10 @@ export const buildWorkflowConfiguration = (
   configuredInput: ConfiguredInput
 ): ComponentProps<typeof C.KeyValuePairs> => {
   const keyValuePairs = new Map<Key, Value>();
-  for (const { entryLabel, values } of Object.values(configuredInput)) {
-    if (values.length > 0) {
-      keyValuePairs.set(
-        entryLabel,
-        values.map(({ value }) => value).join(", ")
-      );
-    }
+  for (const stepConfig of WORKFLOW_STEPS) {
+    const value = stepConfig.renderValue(configuredInput);
+    if (value === undefined) continue;
+    keyValuePairs.set(stepConfig.label, value);
   }
   return {
     KeyElType: C.KeyElType,

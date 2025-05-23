@@ -3,6 +3,8 @@ import { WorkflowParameter } from "../../apis/catalog/brc-analytics-catalog/comm
 import ky from "ky";
 import { GALAXY_ENVIRONMENT } from "site-config/common/galaxy";
 import {
+  EnaFileInfo,
+  EnaPairedReads,
   WorkflowLanding,
   WorkflowLandingsBody,
   WorkflowLandingsBodyRequestState,
@@ -28,7 +30,7 @@ export async function getWorkflowLandingUrl(
   workflowId: string,
   referenceGenome: string,
   geneModelUrl: string | null,
-  readRuns: string[] | null,
+  readRuns: EnaPairedReads[] | null,
   parameters: WorkflowParameter[]
 ): Promise<string> {
   const body: WorkflowLandingsBody = {
@@ -65,7 +67,7 @@ function buildFastaUrl(identifier: string): string {
 function paramVariableToRequestValue(
   variable: WORKFLOW_PARAMETER_VARIABLE,
   geneModelUrl: string | null,
-  readRuns: string[] | null,
+  readRuns: EnaPairedReads[] | null,
   referenceGenome: string
 ): WorkflowParameterValue | null {
   // Because this `switch` has no default case, and the function doesn't allow `undefined` as a return type,
@@ -92,24 +94,28 @@ function paramVariableToRequestValue(
       return {
         class: "Collection",
         collection_type: "list:paired",
-        elements: readRuns.map((readRunsPair) => {
+        elements: readRuns.map((pairInfo) => {
           // TODO get this info earlier? In particular, it might be better to explicitly get the run accession from ENA rather than getting it from the filenames.
-          const { forwardUrl, reverseUrl, runAccession } =
-            getPairedRunUrlsInfo(readRunsPair);
+          const { forward, reverse, runAccession } = getPairedRunUrlsInfo(
+            pairInfo.urls,
+            pairInfo.md5Hashes
+          );
           return {
             class: "Collection",
             elements: [
               {
                 class: "File",
                 filetype: "fastqsanger.gz",
+                hashes: [{ hash_function: "MD5", hash_value: forward.md5 }],
                 identifier: "forward",
-                location: forwardUrl,
+                location: forward.url,
               },
               {
                 class: "File",
                 filetype: "fastqsanger.gz",
+                hashes: [{ hash_function: "MD5", hash_value: reverse.md5 }],
                 identifier: "reverse",
-                location: reverseUrl,
+                location: reverse.url,
               },
             ],
             identifier: runAccession,
@@ -124,17 +130,25 @@ function paramVariableToRequestValue(
 /**
  * Get run accession and full URLs for the given paired run URLs from ENA.
  * @param enaUrls - Concatenated paired run URLs, as provided by ENA.
- * @returns accession and URLs for forward and reverse runs.
+ * @param enaMd5Hashes - Concatenated MD5 hashes of the files referenced by the URLs, as provided by ENA.
+ * @returns accession, URLs, and hashes for forward and reverse runs.
  */
-function getPairedRunUrlsInfo(enaUrls: string): {
-  forwardUrl: string;
-  reverseUrl: string;
+function getPairedRunUrlsInfo(
+  enaUrls: string,
+  enaMd5Hashes: string
+): {
+  forward: EnaFileInfo;
+  reverse: EnaFileInfo;
   runAccession: string;
 } {
-  let forwardUrl: string | null = null;
-  let reverseUrl: string | null = null;
+  const splitUrls = enaUrls.split(";");
+  const splitMd5Hashes = enaMd5Hashes.split(";");
+  if (splitMd5Hashes.length !== splitUrls.length)
+    throw new Error("Hash list has different length than URL list");
+  let forward: EnaFileInfo | null = null;
+  let reverse: EnaFileInfo | null = null;
   let runAccession: string | null = null;
-  for (const url of enaUrls.split(";")) {
+  for (const [i, url] of splitUrls.entries()) {
     // Regarding file name format, see https://ena-docs.readthedocs.io/en/latest/faq/archive-generated-files.html#generated-fastq-files and https://ena-docs.readthedocs.io/en/latest/submit/general-guide/accessions.html#accession-numbers
     const urlMatch = /\/([EDS]RR\d{6,})_([12])\.fastq\.gz$/.exec(url);
     if (!urlMatch) continue;
@@ -144,15 +158,18 @@ function getPairedRunUrlsInfo(enaUrls: string): {
       throw new Error(
         `Inconsistent run accessions: ${JSON.stringify(runAccession)} and ${JSON.stringify(accession)}`
       );
-    const fullUrl = `ftp://${url}`;
-    if (readIndex === "1") forwardUrl = fullUrl;
-    else reverseUrl = fullUrl;
+    const fileInfo: EnaFileInfo = {
+      md5: splitMd5Hashes[i],
+      url: `ftp://${url}`,
+    };
+    if (readIndex === "1") forward = fileInfo;
+    else reverse = fileInfo;
   }
   if (runAccession === null)
     throw new Error("No URLs with expected format found");
-  if (forwardUrl === null) throw new Error("No URL for forward read found");
-  if (reverseUrl === null) throw new Error("No URL for reverse read found");
-  return { forwardUrl, reverseUrl, runAccession };
+  if (forward === null) throw new Error("No URL for forward read found");
+  if (reverse === null) throw new Error("No URL for reverse read found");
+  return { forward, reverse, runAccession };
 }
 
 /**
@@ -166,7 +183,7 @@ function getPairedRunUrlsInfo(enaUrls: string): {
 function getWorkflowLandingsRequestState(
   referenceGenome: string,
   geneModelUrl: string | null,
-  readRuns: string[] | null,
+  readRuns: EnaPairedReads[] | null,
   parameters: WorkflowParameter[]
 ): WorkflowLandingsBodyRequestState {
   const result: WorkflowLandingsBodyRequestState = {};

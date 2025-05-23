@@ -23,12 +23,12 @@ import {
 import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Optional/optional";
 import { getGeneModelLabel } from "./utils";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
+import { STEP } from "./step";
 
 export const GTFStep = ({
   active,
   completed,
   description,
-  entryKey,
   entryLabel,
   genome,
   index,
@@ -41,14 +41,8 @@ export const GTFStep = ({
     useRadioGroup(geneModelUrls);
 
   useEffect(() => {
-    configureGTFStep(
-      geneModelUrls,
-      entryKey,
-      entryLabel,
-      onConfigure,
-      onValueChange
-    );
-  }, [geneModelUrls, entryKey, entryLabel, onConfigure, onValueChange]);
+    configureGTFStep(geneModelUrls, onConfigure, onValueChange);
+  }, [geneModelUrls, onConfigure, onValueChange]);
 
   return (
     <Step
@@ -89,11 +83,7 @@ export const GTFStep = ({
                 <FormControlLabel
                   control={<Radio />}
                   key={i}
-                  onChange={() =>
-                    onConfigure(entryKey, entryLabel, [
-                      { key: value, value: label },
-                    ])
-                  }
+                  onChange={() => onConfigure(STEP.key, value)}
                   label={label}
                   value={value}
                 />
