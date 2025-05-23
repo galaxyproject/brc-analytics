@@ -258,7 +258,7 @@ export const SectionViz = (): JSX.Element => {
         d3.select(this).style("stroke-width", "2px");
         tooltip.transition().duration(200).style("opacity", 0.9);
         tooltip
-          .html(`<strong>${d.data.name}</strong><br/>Assemblies: ${d.value}`)
+          .html(`<strong>${d.data.name}</strong>`)
           .style("left", event.pageX + 10 + "px")
           .style("top", event.pageY - 28 + "px");
       })
