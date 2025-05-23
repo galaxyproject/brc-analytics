@@ -121,7 +121,9 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
   // Create the appropriate display text based on node type
   let filterLinkText = "Browse All Assemblies";
   if (!isRoot) {
-    filterLinkText = `View assemblies for ${nodeName}`;
+    const assemblyCount = node.data.assembly_count;
+    const assemblySuffix = assemblyCount > 1 ? "ies" : "y";
+    filterLinkText = `View ${assemblyCount} Assembl${assemblySuffix} for ${nodeName}`;
   }
 
   return (
