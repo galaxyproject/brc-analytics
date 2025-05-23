@@ -312,6 +312,7 @@ def get_species_subtree(
     if len(taxonomic_levels) > 0:
         child_rank = taxonomic_levels[0]
         child_taxonomic_levels = taxonomic_levels[1:]
+        # Group by next rank down in order to generate child nodes
         grouped_assemblies = assemblies_df.groupby(
             [
                 get_taxonomic_level_key(child_rank),
@@ -328,6 +329,7 @@ def get_species_subtree(
                 # If there's no taxon at the next level for some descendants, skip that level for those descendants and insert them into this level's children
                 children += child_node["children"]
     
+    # Sort to maintain consistent order in output
     children.sort(key=lambda node: int(node["ncbi_tax_id"]))
 
     return {
