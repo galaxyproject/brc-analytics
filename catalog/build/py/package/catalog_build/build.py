@@ -180,15 +180,17 @@ def get_species_row(taxon_info, taxonomic_group_sets, taxonomic_levels, name_inf
             **classification,
             own_level: {
                 "name": taxon_info["taxonomy"]["current_scientific_name"]["name"],
-                "id": taxonomy_id
-            }
+                "id": taxonomy_id,
+            },
         }
     taxonomic_level_fields = {
         get_taxonomic_level_key(level): classification.get(level, {}).get("name")
         for level in taxonomic_levels
     }
     taxonomic_level_id_fields = {
-        get_taxonomic_level_id_key(level): (str(classification[level]["id"]) if level in classification else None)
+        get_taxonomic_level_id_key(level): (
+            str(classification[level]["id"]) if level in classification else None
+        )
         for level in taxonomic_levels
     }
 
@@ -284,10 +286,14 @@ def get_species_tree(assemblies_df, taxonomic_levels):
       A nested tree structure of species
     """
     # Generate the tree, filling NA in the assemblies dataframe to enable grouping for absent values
-    return get_species_subtree("root", "1", "NA", assemblies_df.fillna(""), taxonomic_levels)
+    return get_species_subtree(
+        "root", "1", "NA", assemblies_df.fillna(""), taxonomic_levels
+    )
 
 
-def get_species_subtree(node_name, node_taxonomy_id, node_rank, assemblies_df, taxonomic_levels):
+def get_species_subtree(
+    node_name, node_taxonomy_id, node_rank, assemblies_df, taxonomic_levels
+):
     """
     Builds a node of the species tree and its descendants.
 
@@ -306,9 +312,16 @@ def get_species_subtree(node_name, node_taxonomy_id, node_rank, assemblies_df, t
     if len(taxonomic_levels) > 0:
         child_rank = taxonomic_levels[0]
         child_taxonomic_levels = taxonomic_levels[1:]
-        grouped_assemblies = assemblies_df.groupby([get_taxonomic_level_key(child_rank), get_taxonomic_level_id_key(child_rank)])
+        grouped_assemblies = assemblies_df.groupby(
+            [
+                get_taxonomic_level_key(child_rank),
+                get_taxonomic_level_id_key(child_rank),
+            ]
+        )
         for (child_name, child_id), child_df in grouped_assemblies:
-            child_node = get_species_subtree(child_name, child_id, child_rank, child_df, child_taxonomic_levels)
+            child_node = get_species_subtree(
+                child_name, child_id, child_rank, child_df, child_taxonomic_levels
+            )
             if child_name:
                 children.append(child_node)
             else:
@@ -322,7 +335,7 @@ def get_species_subtree(node_name, node_taxonomy_id, node_rank, assemblies_df, t
         "ncbi_tax_id": node_taxonomy_id,
         "children": children,
         "rank": node_rank,
-        "assembly_count": len(assemblies_df.index)
+        "assembly_count": len(assemblies_df.index),
     }
 
 
@@ -1200,9 +1213,7 @@ def build_files(
 
     if len(taxonomic_levels_for_tree) > 0:
         # Use the assemblies info from genomes_df to build the species tree
-        species_tree = get_species_tree(
-            genomes_df, taxonomic_levels_for_tree
-        )
+        species_tree = get_species_tree(genomes_df, taxonomic_levels_for_tree)
         with open(tree_output_path, "w") as outfile:
             # Dump with sorted keys and consistent indentation
             json.dump(species_tree, outfile, indent=4, sort_keys=True)
