@@ -159,6 +159,10 @@ def get_taxonomic_level_key(level):
     return f"taxonomicLevel{level[0].upper()}{level[1:]}"
 
 
+def get_taxonomic_level_id_key(level):
+    return f"{get_taxonomic_level_key(level)}Id"
+
+
 def get_species_row(taxon_info, taxonomic_group_sets, taxonomic_levels, name_info=None):
     # print(f"get_species_row: {taxon_info}")
     classification = taxon_info["taxonomy"]["classification"]
@@ -166,19 +170,27 @@ def get_species_row(taxon_info, taxonomic_group_sets, taxonomic_levels, name_inf
     taxonomy_id = taxon_info["taxonomy"]["tax_id"]
     ancestor_taxonomy_ids = taxon_info["taxonomy"]["parents"]
 
-    taxonomic_level_fields = {
-        get_taxonomic_level_key(level): classification.get(level, {}).get("name")
-        for level in taxonomic_levels
-    }
     own_level = (
         taxon_info["taxonomy"]["rank"].lower()
         if "rank" in taxon_info["taxonomy"]
         else None
     )
     if own_level in taxonomic_levels and own_level not in classification:
-        taxonomic_level_fields[get_taxonomic_level_key(own_level)] = taxon_info[
-            "taxonomy"
-        ]["current_scientific_name"]["name"]
+        classification = {
+            **classification,
+            own_level: {
+                "name": taxon_info["taxonomy"]["current_scientific_name"]["name"],
+                "id": taxonomy_id
+            }
+        }
+    taxonomic_level_fields = {
+        get_taxonomic_level_key(level): classification.get(level, {}).get("name")
+        for level in taxonomic_levels
+    }
+    taxonomic_level_id_fields = {
+        get_taxonomic_level_id_key(level): (str(classification[level]["id"]) if level in classification else None)
+        for level in taxonomic_levels
+    }
 
     if name_info:
         common_names = name_info["taxonomy"].get("other_common_names")
@@ -194,6 +206,7 @@ def get_species_row(taxon_info, taxonomic_group_sets, taxonomic_levels, name_inf
         ),
         **get_taxonomic_group_sets(ancestor_taxonomy_ids, taxonomic_group_sets),
         **taxonomic_level_fields,
+        **taxonomic_level_id_fields,
     }
 
 
@@ -259,95 +272,58 @@ def get_species_df(
     return pd.DataFrame(rows)
 
 
-def get_species_tree(taxonomy_ids, taxonomic_levels, species_info=None):
+def get_species_tree(assemblies_df, taxonomic_levels):
     """
-    Builds a species tree from taxonomy IDs and taxonomic levels.
+    Builds a species tree from assemblies and taxonomic levels.
 
     Args:
-      taxonomy_ids: List of taxonomy IDs to include in the tree
-      taxonomic_levels: List of taxonomic levels to include in the tree
-      species_info: Optional pre-fetched species information to avoid additional API calls
+      assemblies_df: Assemblies dataframe containing names and taxonomy IDs for the given taxonomic levels
+      taxonomic_levels: List of taxonomic levels to include in the tree, from highest to lowest
 
     Returns:
       A nested tree structure of species
     """
-    species_tree_response = requests.post(
-        "https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/filtered_subtree",
-        json={
-            "taxons": [str(int(t)) for t in taxonomy_ids],
-            "rank_limits": [t.upper() for t in taxonomic_levels],
-        },
-    ).json()
+    # Generate the tree, filling NA in the assemblies dataframe to enable grouping for absent values
+    return get_species_subtree("root", "1", "NA", assemblies_df.fillna(""), taxonomic_levels)
 
-    # Build a tree from the response
-    edges = species_tree_response.get("edges", {})
-    all_children = {
-        child for edge in edges.values() for child in edge.get("visible_children", [])
+
+def get_species_subtree(node_name, node_taxonomy_id, node_rank, assemblies_df, taxonomic_levels):
+    """
+    Builds a node of the species tree and its descendants.
+
+    Args:
+      node_name: Taxon name to use for this node
+      node_taxonomy_id: Taxonomy ID to use for this node
+      node_rank: Taxonomic rank to use for this node
+      assemblies_df: Dataframe of assemblies for the current subtree; the taxonomic level columns should contain valid values to group on
+      taxonomic_levels: List of remaining taxonomic levels to build subtrees for
+
+    Returns:
+      A nested tree structure of species
+    """
+    children = []
+
+    if len(taxonomic_levels) > 0:
+        child_rank = taxonomic_levels[0]
+        child_taxonomic_levels = taxonomic_levels[1:]
+        grouped_assemblies = assemblies_df.groupby([get_taxonomic_level_key(child_rank), get_taxonomic_level_id_key(child_rank)])
+        for (child_name, child_id), child_df in grouped_assemblies:
+            child_node = get_species_subtree(child_name, child_id, child_rank, child_df, child_taxonomic_levels)
+            if child_name:
+                children.append(child_node)
+            else:
+                # If there's no taxon at the next level for some descendants, skip that level for those descendants and insert them into this level's children
+                children += child_node["children"]
+    
+    children.sort(key=lambda node: int(node["ncbi_tax_id"]))
+
+    return {
+        "name": node_name,
+        "ncbi_tax_id": node_taxonomy_id,
+        "children": children,
+        "rank": node_rank,
+        "assembly_count": len(assemblies_df.index)
     }
-    all_children = [str(num) for num in all_children]
-    # Determine root IDs and sort them for consistent ordering
-    roots = [node_id for node_id in edges if node_id not in all_children]
-    root_ids = sorted([str(num) for num in roots], key=lambda x: int(x))
-
-    if not root_ids:
-        return {}
-
-    # this bc the ncbi result is odd, multi-root
-    root_id = "1"
-    for root_id_candidate in root_ids:
-        if root_id_candidate != root_id:
-            edges[root_id]["visible_children"].append(root_id_candidate)
-
-    species_tree = ncbi_tree_to_nested_tree(root_id, edges, taxonomy_ids)
-
-    # Find the set of all unique tax_ids and their display names
-    tax_ids = all_children + root_ids
-    tax_ids = set(tax_ids)
-
-    # Initialize maps with root node
-    taxon_name_map = {"1": "root"}
-    taxon_rank_map = {"1": "NA"}
-
-    # If we have pre-fetched species_info, use it to populate the name and rank maps
-    if species_info:
-        # Extract taxon names and ranks from species_info
-        for info in species_info:
-            tax_id = str(info["taxonomy"]["tax_id"])
-            if tax_id in tax_ids:
-                taxon_name_map[tax_id] = info["taxonomy"]["current_scientific_name"][
-                    "name"
-                ]
-                if "rank" in info["taxonomy"]:
-                    taxon_rank_map[tax_id] = info["taxonomy"]["rank"]
-                else:
-                    print(f"rank not found for tax_id: {tax_id}")
-
-            # Also extract parent taxa information if available
-            if "classification" in info["taxonomy"]:
-                for rank_level, rank_info in info["taxonomy"]["classification"].items():
-                    if (
-                        isinstance(rank_info, dict)
-                        and "id" in rank_info
-                        and "name" in rank_info
-                    ):
-                        parent_name = rank_info["name"]
-                        parent_id = rank_info["id"]
-                        parent_id_str = str(parent_id)
-                        if (
-                            parent_id_str in tax_ids
-                            and parent_id_str not in taxon_name_map
-                        ):
-                            taxon_name_map[parent_id_str] = parent_name
-                            taxon_rank_map[parent_id_str] = rank_level
-
-    # Fetch any missing taxa information
-    fetch_taxa_info(tax_ids, taxon_name_map, taxon_rank_map, "missing parent taxa")
-
-    named_species_tree = update_species_tree_names(
-        species_tree, taxon_name_map, taxon_rank_map
-    )
-
-    return named_species_tree
 
 
 def fetch_taxa_info(tax_ids, taxon_name_map, taxon_rank_map, description="taxa"):
@@ -396,29 +372,6 @@ def fetch_taxa_info(tax_ids, taxon_name_map, taxon_rank_map, description="taxa")
                 taxon_rank_map[tax_id] = report["taxonomy"]["rank"]
             else:
                 print(f"rank not found for tax_id: {tax_id}")
-
-
-def ncbi_tree_to_nested_tree(node_id, edges, taxonomy_ids):
-    children = edges.get(str(node_id), {}).get("visible_children", [])
-    children = [str(num) for num in children]
-    # ncbi results odd again, dup children
-    # Deduplicate and sort children by taxonomy ID for consistent ordering
-    children = sorted(set(children), key=lambda x: int(x))
-    if len(children) > 0 or int(node_id) in taxonomy_ids:
-        child_trees = [
-            ncbi_tree_to_nested_tree(child, edges, taxonomy_ids) for child in children
-        ]
-        child_trees = [item for item in child_trees if item is not None]
-        return {"name": node_id, "ncbi_tax_id": node_id, "children": child_trees}
-
-
-def update_species_tree_names(tree, taxon_name_map, taxon_rank_map):
-    tree["rank"] = taxon_rank_map.get(tree["name"], "Unknown")
-    tree["name"] = taxon_name_map.get(tree["name"], tree["name"])
-
-    for child in tree.get("children", []):
-        update_species_tree_names(child, taxon_name_map, taxon_rank_map)
-    return tree
 
 
 def get_genome_row(genome_info):
@@ -1246,10 +1199,9 @@ def build_files(
         print(f"Wrote to {primary_output_path}")
 
     if len(taxonomic_levels_for_tree) > 0:
-        # Use the taxonomy IDs from the genomes_df to build the species tree
-        # Pass the previously fetched species_info to avoid another API call
+        # Use the assemblies info from genomes_df to build the species tree
         species_tree = get_species_tree(
-            list(genomes_df["taxonomyId"]), taxonomic_levels_for_tree, species_info
+            genomes_df, taxonomic_levels_for_tree
         )
         with open(tree_output_path, "w") as outfile:
             # Dump with sorted keys and consistent indentation
