@@ -3,6 +3,7 @@ import { useRef, useEffect, useState } from "react";
 import { getData, TaxonomyNode } from "./data";
 import { TreeNode, NodeDetails } from "./NodeDetails";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
+import { roma_cyclic } from "../../../../../../theme/color-maps/crameri";
 
 const DEPTH = 4;
 const data = getData();
@@ -35,8 +36,49 @@ export const SectionViz = (): JSX.Element => {
       .select(svgNode)
       .attr("viewBox", [-width / 2, -height / 2, width, width])
       .style("font", "10px 'Inter Tight', sans-serif");
-    // Define a color scale for base colors (root and first ring)
-    const baseColor = d3.scaleOrdinal(d3.schemeTableau10);
+    // Create an array of equidistant colors from roma_cyclic with interpolation
+    const getEquidistantColors = (
+      colorMap: string[],
+      count: number
+    ): string[] => {
+      if (count <= 0) return [];
+      if (count === 1) return [colorMap[0]];
+
+      // If we have fewer or equal colors in the map than requested, we can use direct mapping
+      if (count <= colorMap.length) {
+        const result: string[] = [];
+        const step = colorMap.length / count;
+
+        for (let i = 0; i < count; i++) {
+          const index = Math.floor(i * step);
+          result.push(colorMap[index]);
+        }
+
+        return result;
+      }
+
+      // If we need more colors than available in the map, we'll interpolate between colors
+      const result: string[] = [];
+      const colorScale = d3
+        .scaleLinear<string>()
+        .domain(d3.range(0, 1, 1 / (colorMap.length - 1)).concat([1]))
+        .range(colorMap)
+        .interpolate(d3.interpolateRgb.gamma(2.2)); // Use RGB interpolation with gamma correction
+
+      // Generate evenly spaced points along the color scale
+      for (let i = 0; i < count; i++) {
+        const t = i / (count - 1);
+        result.push(colorScale(t));
+      }
+
+      return result;
+    };
+
+    // Create a reversed copy of the roma_cyclic colormap
+    const reversedRomaCyclic = [...roma_cyclic].reverse();
+
+    // Initially use a placeholder color scale with the reversed colormap, we'll update it after creating the hierarchy
+    const baseColor = d3.scaleOrdinal(reversedRomaCyclic);
 
     // Helper function to get color for a node based on the current root
     function getNodeColor(d: TreeNode, root: TreeNode): string {
@@ -47,7 +89,7 @@ export const SectionViz = (): JSX.Element => {
         // Keep center node color consistent, background-light
         return PALETTE.SMOKE_LIGHTEST;
       } else if (relativeDepth === 1) {
-        // Direct children of root get base colors
+        // Direct children of root get colors from color scale
         return baseColor(d.data.name);
       }
 
@@ -105,6 +147,17 @@ export const SectionViz = (): JSX.Element => {
       .hierarchy<TaxonomyNode>(data)
       .sum((d) => (d.children.length == 0 ? 1 : 0))
       .sort((a, b) => (a.data.name < b.data.name ? -1 : 1));
+
+    // Now that we have the hierarchy, get the root's direct children to determine how many colors we need
+    const rootChildren = hierarchyData.children || [];
+    const numColors = rootChildren.length;
+
+    // Get equidistant colors from the reversed roma_cyclic and update the color scale
+    const equidistantColors = getEquidistantColors(
+      reversedRomaCyclic,
+      numColors
+    );
+    baseColor.range(equidistantColors);
 
     // Create the partition layout and initialize the TreeNode properties
     const rootNode = d3
@@ -327,6 +380,16 @@ export const SectionViz = (): JSX.Element => {
       currentRoot = p;
       updateCenter(p);
       setSelectedNode(p);
+
+      // When a new center is selected, remap colors for its children
+      if (p.children && p.children.length > 0) {
+        const numChildren = p.children.length;
+        const newEquidistantColors = getEquidistantColors(
+          reversedRomaCyclic,
+          numChildren
+        );
+        baseColor.range(newEquidistantColors);
+      }
 
       // For each node, compute new coordinates relative to p.
       root.each((d) => {
