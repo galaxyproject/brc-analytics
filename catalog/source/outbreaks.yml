@@ -24,6 +24,12 @@ outbreaks:
       - title: "BV-BRC: Influenza A virus Taxonomy View"
         url: "https://www.bv-brc.org/view/Taxonomy/11320"
         type: REFERENCE
+      - title: "hgPhyloPlace: Place your sequences in a global phylogenetic tree (H5N1 B3.13 2024)"
+        url: "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?hgpp_org=h5n1_outbreak_concat"
+        type: HGPHYLOPLACE
+      - title: "hgPhyloPlace: Place your sequences in a global phylogenetic tree (H5N1 D1.1 2024)"
+        url: "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?hgpp_org=h5n1_D1.1_2024"
+        type: HGPHYLOPLACE
 
   - name: SARS-CoV-2
     taxonomy_id: 3418604
@@ -53,6 +59,9 @@ outbreaks:
       - title: "Galaxy tutorial: Mutation calling, viral genome reconstruction and lineage/clade assignment from SARS-CoV-2 sequencing data"
         url: "https://gxy.io/GTN:T00316"
         type: REFERENCE
+      - title: "hgPhyloPlace: Place your sequences in a global phylogenetic tree"
+        url: "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?hgpp_org=wuhCor1"
+        type: HGPHYLOPLACE
 
   - name: Mpox
     taxonomy_id: 10244
@@ -79,6 +88,9 @@ outbreaks:
       - title: "Galaxy tutorial: Pox virus genome analysis from tiled-amplicon sequencing data"
         url: "https://gxy.io/GTN:T00347"
         type: REFERENCE
+      - title: "hgPhyloPlace: Place your sequences in a global phylogenetic tree"
+        url: "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?hgpp_org=mpxv"
+        type: HGPHYLOPLACE
 
   - name: Tuberculosis
     taxonomy_id: 1773
@@ -99,6 +111,9 @@ outbreaks:
       - title: "WHO | Tuberculosis Deaths and Disease Increase During the COVID-19 Pandemic"
         url: "https://www.who.int/news/item/27-10-2022-tuberculosis-deaths-and-disease-increase-during-the-covid-19-pandemic"
         type: REFERENCE
+      - title: "hgPhyloPlace: Place your sequences in a global phylogenetic tree"
+        url: "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?hgpp_org=hub_3070967_GCF_000195955.2"
+        type: HGPHYLOPLACE
 
   - name: Malaria/ Plasmodium falciparum
     taxonomy_id: 5833

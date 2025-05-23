@@ -114,7 +114,8 @@
                 "NEWS",
                 "WORKFLOW",
                 "DATA",
-                "OTHER"
+                "OTHER",
+                "HGPHYLOPLACE"
             ],
             "title": "OutbreakResourceType",
             "type": "string"
