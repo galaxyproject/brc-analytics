@@ -1,6 +1,6 @@
 id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/workflow_categories.yaml#
 name: workflow_categories
-description: Schema for source workflow categories list.
+description: Schema for defining workflow categories used to organize Galaxy workflows in the BRC Analytics platform.
 
 prefixes:
   linkml: https://w3id.org/linkml/
@@ -11,31 +11,31 @@ imports:
 
 classes:
   WorkflowCategories:
-    description: Object containing list of workflow categories.
+    description: Root object containing a collection of workflow category definitions used to organize workflows in the BRC Analytics platform.
     tree_root: true
     attributes:
       workflow_categories:
-        description: List of workflow categories.
+        description: Collection of workflow category entries that will be used to group and organize workflows in the BRC Analytics interface.
         required: true
         multivalued: true
         range: WorkflowCategory
 
   WorkflowCategory:
-    description: Workflow category.
+    description: Definition of a workflow category used to group related workflows for organization and display purposes.
     attributes:
       category:
-        description: The ID of the workflow category.
+        description: The unique identifier for the workflow category, used to link workflows to their respective categories.
         required: true
         range: WorkflowCategoryId
       name:
-        description: The display name of the workflow category.
+        description: The human-readable display name of the workflow category as it will appear in the BRC Analytics interface.
         required: true
         range: string
       description:
-        description: The description of the workflow category.
+        description: A detailed description of the workflow category explaining its purpose and the types of workflows it contains.
         required: true
         range: string
       show_coming_soon:
-        description: Whether to show 'Coming Soon' for the workflow category when it is not available.
+        description: Boolean flag that determines whether to display a 'Coming Soon' indicator for this category in the BRC Analytics interface when workflows in this category are not yet available.
         required: true
         range: boolean

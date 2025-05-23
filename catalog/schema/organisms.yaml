@@ -1,6 +1,6 @@
 id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/organisms.yaml#
 name: organisms
-description: Schema for source organism info.
+description: Schema for defining source organism information used in the BRC Analytics platform.
 
 prefixes:
   linkml: https://w3id.org/linkml/
@@ -11,24 +11,24 @@ imports:
 
 classes:
   Organisms:
-    description: Object containing list of organisms.
+    description: Root object containing a collection of organism definitions for the BRC Analytics platform.
     tree_root: true
     attributes:
       organisms:
-        description: List of organisms.
+        description: Collection of organism entries that will be available in the BRC Analytics platform.
         required: true
         multivalued: true
         range: Organism
 
   Organism:
-    description: Info for an organism.
+    description: Definition of an organism with its taxonomic and genetic characteristics.
     attributes:
       taxonomy_id:
-        description: The organism's NCBI taxonomy ID.
+        description: An NCBI Taxonomy ID. If non-null, all assemblies which have this ID as part of their taxonomic lineage will display this workflow.
         required: true
         range: integer
       ploidy:
-        description: The ploidies that the organism may have.
+        description: The possible ploidy states (number of chromosome sets) that the organism may have, which determines compatible workflows.
         required: true
         multivalued: true
         range: OrganismPloidy

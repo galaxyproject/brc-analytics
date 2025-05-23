@@ -2,10 +2,10 @@
     "$defs": {
         "MarkdownFileReference": {
             "additionalProperties": false,
-            "description": "A reference to a markdown file",
+            "description": "A reference to a markdown file containing detailed content about a priority pathogen.",
             "properties": {
                 "path": {
-                    "description": "Path to the markdown file",
+                    "description": "Relative path to the markdown file from the project root. Must end with .md extension.",
                     "pattern": ".*\\.md$",
                     "type": "string"
                 }
@@ -18,18 +18,18 @@
         },
         "Outbreak": {
             "additionalProperties": false,
-            "description": "Info for an outbreak.",
+            "description": "Definition of a priority pathogen with its taxonomic classification, priority level, and associated resources.",
             "properties": {
                 "active": {
-                    "description": "Determines if outbreak should be included, as they presumably change over time.",
+                    "description": "Boolean flag that determines if the pathogen should be included in the BRC Analytics interface. Used to manage visibility as pathogen relevance changes over time.",
                     "type": "boolean"
                 },
                 "description": {
                     "$ref": "#/$defs/MarkdownFileReference",
-                    "description": "The description of the outbreak."
+                    "description": "Reference to a markdown file containing detailed information about the pathogen."
                 },
                 "highlight_descendant_taxonomy_ids": {
-                    "description": "Taxonomy IDs of child taxa that should be highlighted.",
+                    "description": "List of NCBI Taxonomy IDs for descendant taxa (e.g., specific strains or serotypes) that should be highlighted within the outbreak category.",
                     "items": {
                         "type": "integer"
                     },
@@ -39,22 +39,22 @@
                     ]
                 },
                 "name": {
-                    "description": "The name of the outbreak/ pathogen.",
+                    "description": "The display name of the pathogen as it will appear in the BRC Analytics interface.",
                     "type": "string"
                 },
                 "priority": {
                     "$ref": "#/$defs/OutbreakPriority",
-                    "description": "The priority of the outbreak."
+                    "description": "The priority level of the pathogen, which determines its visibility and prominence in the BRC Analytics interface."
                 },
                 "resources": {
-                    "description": "The resources associated with the outbreak.",
+                    "description": "Collection of external resources (references, tools, databases) related to the pathogen.",
                     "items": {
                         "$ref": "#/$defs/OutbreakResource"
                     },
                     "type": "array"
                 },
                 "taxonomy_id": {
-                    "description": "The outbreak's NCBI taxonomy ID.",
+                    "description": "The NCBI Taxonomy ID for the pathogen. Used to link to relevant genomic data and workflows.",
                     "type": "integer"
                 }
             },
@@ -83,18 +83,18 @@
         },
         "OutbreakResource": {
             "additionalProperties": false,
-            "description": "A resource associated with an outbreak.",
+            "description": "Definition of an external resource (reference, tool, database) associated with a priority pathogen.",
             "properties": {
                 "title": {
-                    "description": "The title of the resource.",
+                    "description": "The display title for the resource link as it will appear in the BRC Analytics interface.",
                     "type": "string"
                 },
                 "type": {
                     "$ref": "#/$defs/OutbreakResourceType",
-                    "description": "The type of the resource."
+                    "description": "The category or type of the resource (e.g., REFERENCE, TOOL, DATABASE), which determines how it is displayed and organized."
                 },
                 "url": {
-                    "description": "The URL of the resource.",
+                    "description": "The complete URL (including http/https protocol) to the external resource.",
                     "type": "string"
                 }
             },
@@ -121,10 +121,10 @@
         },
         "Outbreaks": {
             "additionalProperties": false,
-            "description": "Object containing list of outbreaks.",
+            "description": "Root object containing a collection of pathogen definitions for the BRC Analytics platform to highlight as outbreaks/priority pathogens.",
             "properties": {
                 "outbreaks": {
-                    "description": "List of outbreaks.",
+                    "description": "Collection of pathogen entries that will be displayed in the BRC Analytics platform as outbreaks/priority pathogens.",
                     "items": {
                         "$ref": "#/$defs/Outbreak"
                     },
@@ -141,11 +141,11 @@
     "$id": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/outbreaks.yaml#",
     "$schema": "https://json-schema.org/draft/2019-09/schema",
     "additionalProperties": true,
-    "description": "Object containing list of outbreaks.",
+    "description": "Root object containing a collection of pathogen definitions for the BRC Analytics platform to highlight as outbreaks/priority pathogens.",
     "metamodel_version": "1.7.0",
     "properties": {
         "outbreaks": {
-            "description": "List of outbreaks.",
+            "description": "Collection of pathogen entries that will be displayed in the BRC Analytics platform as outbreaks/priority pathogens.",
             "items": {
                 "$ref": "#/$defs/Outbreak"
             },
