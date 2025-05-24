@@ -5,6 +5,11 @@ import data from "catalog/output/ncbi-taxa-tree.json";
  */
 export interface TaxonomyNode {
   /**
+   * The number of assemblies for the taxon that are present in the catalog
+   */
+  assembly_count: number;
+
+  /**
    * Child nodes in the taxonomy tree
    */
   children: TaxonomyNode[];
