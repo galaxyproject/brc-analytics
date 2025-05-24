@@ -328,7 +328,7 @@ def get_species_subtree(
             else:
                 # If there's no taxon at the next level for some descendants, skip that level for those descendants and insert them into this level's children
                 children += child_node["children"]
-    
+
     # Sort to maintain consistent order in output
     children.sort(key=lambda node: int(node["ncbi_tax_id"]))
 
@@ -1034,6 +1034,24 @@ def build_files(
     outbreaks_path=None,
     outbreak_taxonomy_mapping_path=None,
 ):
+    """
+    Build catalog-related data files based on specified input data and data from services such as the NCBI API.
+
+    Args:
+      assemblies_path: Path of input assemblies YAML
+      genomes_output_path: Path to save output assemblies TSV at
+      ucsc_assemblies_url: URL to fetch UCSC's assembly information from
+      tree_output_path: Path to save tree of cataloged taxa to
+      taxonomic_levels_for_tree: List of lowercase taxonomic ranks, as identified by NCBI, to build tree from; listed from highest to lowest level
+      taxonomic_group_sets: Dict describing taxa or groups of taxa to be given specified names in the "taxonomic group" field
+      do_gene_model_urls: Boolean specifying whether to fetch gene model URLs (if False, the `geneModelUrl` column is filled with empty string)
+      extract_primary_data: Boolean specifying whether to fetch and save metadata from SRA
+      primary_output_path: Path to save SRA metadata at
+      qc_report_path: Path to save QC report to (if omitted, no report is generated)
+      organisms_path: Path of input organisms YAML, used to perform checks
+      outbreaks_path: Path of input outbreaks YAML
+      outbreak_taxonomy_mapping_path: Path to save taxonomic information for outbreaks at
+    """
     print("Building files")
 
     qc_report_params = {}
