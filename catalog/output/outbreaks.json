@@ -523,5 +523,451 @@
     "taxonomy_id": 4827,
     "taxonNameField": "taxonomicLevelOrder",
     "taxonName": "Mucorales"
+  },
+  {
+    "active": true,
+    "description": {
+      "compiledSource": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction _createMdxContent(props) {\n  const _components = Object.assign({\n    h2: \"h2\",\n    p: \"p\",\n    ul: \"ul\",\n    li: \"li\",\n    strong: \"strong\"\n  }, _provideComponents(), props.components);\n  return _jsxs(_Fragment, {\n    children: [_jsx(_components.h2, {\n      children: \"Overview\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"Arenaviridae is a family of viruses that includes several important human pathogens. These viruses are primarily rodent-borne and can cause hemorrhagic fevers in humans. The family name comes from the Latin \\\"arenosus,\\\" meaning sandy, which refers to the grainy appearance of virions under electron microscopy due to ribosomes inside the viral particles.\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"Arenaviridae has been designated as a prototype pathogen family for pandemic preparedness research by the National Institute of Allergy and Infectious Diseases (NIAID). As part of the NIAID-funded Research and Development of Vaccines and Monoclonal Antibodies for Pandemic Preparedness (ReVAMPP) project, this viral family was prioritized due to its significant potential for causing outbreaks and public health emergencies. NIAID selected virus families of concern with insufficient research, inadequate medical countermeasures, and low to moderate historical support.\"\n    }), \"\\n\", _jsx(_components.h2, {\n      children: \"Impact\"\n    }), \"\\n\", _jsxs(_components.ul, {\n      children: [\"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Human Health\"\n        }), \": Several members cause severe hemorrhagic fevers with high mortality rates\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Endemic Regions\"\n        }), \": Primarily in South America (Junin, Machupo, Guanarito viruses) and Africa (Lassa virus)\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Transmission\"\n        }), \": Primarily through contact with infected rodent excreta or person-to-person spread\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Public Health\"\n        }), \": Significant burden in endemic areas with limited treatment options\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Research\"\n        }), \": Important models for studying viral hemorrhagic fevers and immune responses\"]\n      }), \"\\n\"]\n    })]\n  });\n}\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, props)\n  })) : _createMdxContent(props);\n}\nreturn {\n  default: MDXContent\n};\n",
+      "frontmatter": {},
+      "scope": {}
+    },
+    "highlight_descendant_taxonomy_ids": [
+      3052310,
+      3052317,
+      3052303
+    ],
+    "name": "Arenaviridae (Prototype Pathogen Viral Family)",
+    "priority": "MODERATE",
+    "resources": [
+      {
+        "title": "ICTV | Family: Arenaviridae",
+        "url": "https://ictv.global/report/chapter/arenaviridae/arenaviridae",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "ReVAMPP | Research and Development of Vaccines and Monoclonal Antibodies for Pandemic Preparedness",
+        "url": "https://revampp.org/",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "NIAID | Scientists Discuss Prototype Pathogens for Pandemic Preparedness",
+        "url": "https://www.niaid.nih.gov/news-events/scientists-discuss-prototype-pathogens-pandemic-preparedness",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/",
+        "type": "PUBLICATION"
+      }
+    ],
+    "taxonomy_id": 11617,
+    "taxonNameField": "taxonomicLevelFamily",
+    "taxonName": "Arenaviridae"
+  },
+  {
+    "active": true,
+    "description": {
+      "compiledSource": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction _createMdxContent(props) {\n  const _components = Object.assign({\n    h2: \"h2\",\n    p: \"p\",\n    ul: \"ul\",\n    li: \"li\",\n    strong: \"strong\"\n  }, _provideComponents(), props.components);\n  return _jsxs(_Fragment, {\n    children: [_jsx(_components.h2, {\n      children: \"Overview\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"Hantaviridae is a family of viruses primarily but not exclusively carried by rodents. These viruses can cause severe and sometimes fatal diseases in humans, including Hantavirus Pulmonary Syndrome (HPS) and Hemorrhagic Fever with Renal Syndrome (HFRS). Unlike many other viral families, hantaviruses are not transmitted between humans but are primarily spread through contact with infected rodent urine, droppings, or saliva.\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"Hantaviridae has been designated as a prototype pathogen family for pandemic preparedness research by the National Institute of Allergy and Infectious Diseases (NIAID). As part of the NIAID-funded Research and Development of Vaccines and Monoclonal Antibodies for Pandemic Preparedness (ReVAMPP) project, this viral family was prioritized due to its significant potential for causing outbreaks and public health emergencies. NIAID selected virus families of concern with insufficient research, inadequate medical countermeasures, and low to moderate historical support.\"\n    }), \"\\n\", _jsx(_components.h2, {\n      children: \"Impact\"\n    }), \"\\n\", _jsxs(_components.ul, {\n      children: [\"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Human Health\"\n        }), \": Causes severe respiratory disease (HPS) in the Americas and kidney disease (HFRS) in Europe and Asia\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Mortality\"\n        }), \": HPS has a mortality rate of approximately 38%\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Geographic Distribution\"\n        }), \": Worldwide, with specific viruses endemic to particular regions\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Reservoir Hosts\"\n        }), \": Primarily carried by specific rodent species with long-term infections\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Public Health\"\n        }), \": Requires significant prevention efforts in endemic areas\"]\n      }), \"\\n\"]\n    })]\n  });\n}\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, props)\n  })) : _createMdxContent(props);\n}\nreturn {\n  default: MDXContent\n};\n",
+      "frontmatter": {},
+      "scope": {}
+    },
+    "highlight_descendant_taxonomy_ids": [
+      1980456,
+      3052499
+    ],
+    "name": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priority": "MODERATE_HIGH",
+    "resources": [
+      {
+        "title": "CDC | Hantavirus",
+        "url": "https://www.cdc.gov/hantavirus/index.html",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "ICTV | Family: Hantaviridae",
+        "url": "https://ictv.global/report/chapter/hantaviridae/hantaviridae",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "ReVAMPP | Research and Development of Vaccines and Monoclonal Antibodies for Pandemic Preparedness",
+        "url": "https://revampp.org/",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "NIAID | Scientists Discuss Prototype Pathogens for Pandemic Preparedness",
+        "url": "https://www.niaid.nih.gov/news-events/scientists-discuss-prototype-pathogens-pandemic-preparedness",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/",
+        "type": "PUBLICATION"
+      }
+    ],
+    "taxonomy_id": 1980413,
+    "taxonNameField": "taxonomicLevelFamily",
+    "taxonName": "Hantaviridae"
+  },
+  {
+    "active": true,
+    "description": {
+      "compiledSource": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction _createMdxContent(props) {\n  const _components = Object.assign({\n    h2: \"h2\",\n    p: \"p\",\n    ul: \"ul\",\n    li: \"li\",\n    strong: \"strong\"\n  }, _provideComponents(), props.components);\n  return _jsxs(_Fragment, {\n    children: [_jsx(_components.h2, {\n      children: \"Overview\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"Nairoviridae is a family of arthropod-borne viruses that includes several important human and animal pathogens. The most notable member is Crimean-Congo hemorrhagic fever virus (CCHFV), which causes severe hemorrhagic disease in humans. These viruses are characterized by their segmented, negative-sense RNA genomes and transmission primarily through tick vectors.\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"Nairoviridae has been designated as a prototype pathogen family for pandemic preparedness research by the National Institute of Allergy and Infectious Diseases (NIAID). As part of the NIAID-funded Research and Development of Vaccines and Monoclonal Antibodies for Pandemic Preparedness (ReVAMPP) project, this viral family was prioritized due to its significant potential for causing outbreaks and public health emergencies. NIAID selected virus families of concern with insufficient research, inadequate medical countermeasures, and low to moderate historical support.\"\n    }), \"\\n\", _jsx(_components.h2, {\n      children: \"Impact\"\n    }), \"\\n\", _jsxs(_components.ul, {\n      children: [\"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Human Health\"\n        }), \": Crimean-Congo hemorrhagic fever has a high mortality rate (10-40%)\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Geographic Range\"\n        }), \": Widespread across Africa, the Balkans, Middle East, and Asia\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Vectors\"\n        }), \": Primarily transmitted by Hyalomma ticks\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Healthcare\"\n        }), \": Poses significant nosocomial infection risk to healthcare workers\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Public Health\"\n        }), \": Requires specialized containment facilities for handling\"]\n      }), \"\\n\"]\n    })]\n  });\n}\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, props)\n  })) : _createMdxContent(props);\n}\nreturn {\n  default: MDXContent\n};\n",
+      "frontmatter": {},
+      "scope": {}
+    },
+    "highlight_descendant_taxonomy_ids": [
+      3052518
+    ],
+    "name": "Nairoviridae (Prototype Pathogen Viral Family)",
+    "priority": "MODERATE_HIGH",
+    "resources": [
+      {
+        "title": "ICTV | Family: Nairoviridae",
+        "url": "https://ictv.global/report/chapter/nairoviridae/nairoviridae",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "ReVAMPP | Research and Development of Vaccines and Monoclonal Antibodies for Pandemic Preparedness",
+        "url": "https://revampp.org/",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "NIAID | Scientists Discuss Prototype Pathogens for Pandemic Preparedness",
+        "url": "https://www.niaid.nih.gov/news-events/scientists-discuss-prototype-pathogens-pandemic-preparedness",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/",
+        "type": "PUBLICATION"
+      }
+    ],
+    "taxonomy_id": 1980415,
+    "taxonNameField": "taxonomicLevelFamily",
+    "taxonName": "Nairoviridae"
+  },
+  {
+    "active": true,
+    "description": {
+      "compiledSource": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction _createMdxContent(props) {\n  const _components = Object.assign({\n    h2: \"h2\",\n    p: \"p\",\n    ul: \"ul\",\n    li: \"li\",\n    strong: \"strong\"\n  }, _provideComponents(), props.components);\n  return _jsxs(_Fragment, {\n    children: [_jsx(_components.h2, {\n      children: \"Overview\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"Peribunyaviridae is a family of arthropod-borne viruses (arboviruses) that includes several important human and animal pathogens. These viruses have a tripartite, negative-sense RNA genome and are primarily transmitted by mosquitoes and other arthropod vectors. Notable members include La Crosse virus, California encephalitis virus, and Bunyamwera virus.\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"These viruses are remarkably ecologically diverse, having been identified on every continent except Antarctica. They interact with a wide range of arthropod and vertebrate hosts, demonstrating significant adaptability. Clinical outcomes from peribunyavirus infections vary widely, from subclinical cases to fatal disease. In mammals, these viruses often target specific organs or cell types. An important characteristic of peribunyaviruses is their ability to undergo genetic reassortment both in laboratory settings and in nature, with such reassortment events being linked to outbreaks of human disease, particularly within the Orthobunyavirus genus.\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"Peribunyaviridae has been designated as a prototype pathogen family for pandemic preparedness research by the National Institute of Allergy and Infectious Diseases (NIAID). As part of the NIAID-funded Research and Development of Vaccines and Monoclonal Antibodies for Pandemic Preparedness (ReVAMPP) project, this viral family was prioritized due to its significant potential for causing outbreaks and public health emergencies. NIAID selected virus families of concern with insufficient research, inadequate medical countermeasures, and low to moderate historical support.\"\n    }), \"\\n\", _jsx(_components.h2, {\n      children: \"Impact\"\n    }), \"\\n\", _jsxs(_components.ul, {\n      children: [\"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Human Health\"\n        }), \": May cause encephalitis, particularly in children (La Crosse virus)\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Geographic Distribution\"\n        }), \": Worldwide, with specific viruses endemic to particular regions\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Vectors\"\n        }), \": Primarily transmitted by mosquitoes\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Seasonality\"\n        }), \": Outbreaks typically occur during mosquito season\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Agriculture\"\n        }), \": Some members cause significant disease in livestock\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Public Health\"\n        }), \": Requires vector control measures in endemic areas\"]\n      }), \"\\n\"]\n    })]\n  });\n}\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, props)\n  })) : _createMdxContent(props);\n}\nreturn {\n  default: MDXContent\n};\n",
+      "frontmatter": {},
+      "scope": {}
+    },
+    "highlight_descendant_taxonomy_ids": [
+      3052429,
+      3052409,
+      3052385
+    ],
+    "name": "Peribunyaviridae (Prototype Pathogen Viral Family)",
+    "priority": "MODERATE",
+    "resources": [
+      {
+        "title": "CDC | La Crosse Encephalitis",
+        "url": "https://www.cdc.gov/lac/index.html",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "ICTV | Family: Peribunyaviridae",
+        "url": "https://ictv.global/report/chapter/peribunyaviridae/peribunyaviridae",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "ReVAMPP | Research and Development of Vaccines and Monoclonal Antibodies for Pandemic Preparedness",
+        "url": "https://revampp.org/",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "NIAID | Scientists Discuss Prototype Pathogens for Pandemic Preparedness",
+        "url": "https://www.niaid.nih.gov/news-events/scientists-discuss-prototype-pathogens-pandemic-preparedness",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/",
+        "type": "PUBLICATION"
+      }
+    ],
+    "taxonomy_id": 1980416,
+    "taxonNameField": "taxonomicLevelFamily",
+    "taxonName": "Peribunyaviridae"
+  },
+  {
+    "active": true,
+    "description": {
+      "compiledSource": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction _createMdxContent(props) {\n  const _components = Object.assign({\n    h2: \"h2\",\n    p: \"p\",\n    ul: \"ul\",\n    li: \"li\",\n    strong: \"strong\"\n  }, _provideComponents(), props.components);\n  return _jsxs(_Fragment, {\n    children: [_jsx(_components.h2, {\n      children: \"Overview\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"Phenuiviridae is a family of segmented, negative-strand RNA viruses that includes several important human and animal pathogens. The most notable member is Rift Valley fever virus, which causes significant disease in both livestock and humans. These viruses are primarily transmitted by arthropod vectors, especially mosquitoes and ticks.\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"Phenuivirids are remarkably diverse ecologically, infecting a wide range of hosts including humans, livestock, birds, crustaceans, plants, and fungi. Many are found in arthropods, which may serve as either unique hosts or biological vectors for transmission to other organisms. The family includes significant pathogens affecting human health, livestock production, seafood industries, and agricultural crops.\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"Phenuiviridae has been designated as a prototype pathogen family for pandemic preparedness research by the National Institute of Allergy and Infectious Diseases (NIAID). As part of the NIAID-funded Research and Development of Vaccines and Monoclonal Antibodies for Pandemic Preparedness (ReVAMPP) project, this viral family was prioritized due to its significant potential for causing outbreaks and public health emergencies. NIAID selected virus families of concern with insufficient research, inadequate medical countermeasures, and low to moderate historical support.\"\n    }), \"\\n\", _jsx(_components.h2, {\n      children: \"Impact\"\n    }), \"\\n\", _jsxs(_components.ul, {\n      children: [\"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Human Health\"\n        }), \": Causes febrile illness and occasionally severe complications like hemorrhagic fever or encephalitis\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Agriculture\"\n        }), \": Significant impact on livestock with high mortality in young animals and abortion in pregnant animals\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Economic\"\n        }), \": Major economic losses in affected agricultural regions\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Geographic Distribution\"\n        }), \": Primarily Africa, with recent spread to Arabian Peninsula\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Vectors\"\n        }), \": Transmitted by multiple mosquito species\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Public Health\"\n        }), \": Potential for epidemics when environmental conditions favor vector populations\"]\n      }), \"\\n\"]\n    })]\n  });\n}\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, props)\n  })) : _createMdxContent(props);\n}\nreturn {\n  default: MDXContent\n};\n",
+      "frontmatter": {},
+      "scope": {}
+    },
+    "highlight_descendant_taxonomy_ids": [
+      3052676,
+      3052686
+    ],
+    "name": "Phenuiviridae (Prototype Pathogen Viral Family)",
+    "priority": "MODERATE",
+    "resources": [
+      {
+        "title": "CDC | Rift Valley Fever",
+        "url": "https://www.cdc.gov/vhf/rvf/index.html",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "ICTV | Family: Phenuiviridae",
+        "url": "https://ictv.global/report/chapter/phenuiviridae/phenuiviridae",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "ReVAMPP | Research and Development of Vaccines and Monoclonal Antibodies for Pandemic Preparedness",
+        "url": "https://revampp.org/",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "NIAID | Scientists Discuss Prototype Pathogens for Pandemic Preparedness",
+        "url": "https://www.niaid.nih.gov/news-events/scientists-discuss-prototype-pathogens-pandemic-preparedness",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/",
+        "type": "PUBLICATION"
+      }
+    ],
+    "taxonomy_id": 1980418,
+    "taxonNameField": "taxonomicLevelFamily",
+    "taxonName": "Phenuiviridae"
+  },
+  {
+    "active": true,
+    "description": {
+      "compiledSource": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction _createMdxContent(props) {\n  const _components = Object.assign({\n    h2: \"h2\",\n    p: \"p\",\n    ul: \"ul\",\n    li: \"li\",\n    strong: \"strong\"\n  }, _provideComponents(), props.components);\n  return _jsxs(_Fragment, {\n    children: [_jsx(_components.h2, {\n      children: \"Overview\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"Paramyxoviridae is a family of enveloped, negative-sense RNA viruses that includes several significant human and animal pathogens. Notable members include measles virus, mumps virus, respiratory syncytial virus (RSV), parainfluenza viruses, and the highly virulent Nipah and Hendra viruses. These viruses are responsible for a range of respiratory and systemic diseases in humans and animals.\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"Paramyxoviridae has been designated as a prototype pathogen family for pandemic preparedness research by the National Institute of Allergy and Infectious Diseases (NIAID). As part of the NIAID-funded Research and Development of Vaccines and Monoclonal Antibodies for Pandemic Preparedness (ReVAMPP) project, this viral family was prioritized due to its significant potential for causing outbreaks and public health emergencies. NIAID selected virus families of concern with insufficient research, inadequate medical countermeasures, and low to moderate historical support.\"\n    }), \"\\n\", _jsx(_components.h2, {\n      children: \"Impact\"\n    }), \"\\n\", _jsxs(_components.ul, {\n      children: [\"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Human Health\"\n        }), \": Causes widespread respiratory illnesses, childhood diseases, and emerging zoonotic infections\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Vaccination\"\n        }), \": Several members are targets of routine childhood vaccination programs\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Mortality\"\n        }), \": Measles remains a leading cause of vaccine-preventable childhood mortality globally\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Emerging Threats\"\n        }), \": Nipah and Hendra viruses have high mortality rates and pandemic potential\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Economic\"\n        }), \": Significant healthcare costs associated with respiratory infections\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Public Health\"\n        }), \": Requires ongoing surveillance and vaccination campaigns\"]\n      }), \"\\n\"]\n    })]\n  });\n}\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, props)\n  })) : _createMdxContent(props);\n}\nreturn {\n  default: MDXContent\n};\n",
+      "frontmatter": {},
+      "scope": {}
+    },
+    "highlight_descendant_taxonomy_ids": [
+      3052225,
+      3052223,
+      3052599,
+      3052560
+    ],
+    "name": "Paramyxoviridae (Prototype Pathogen Viral Family)",
+    "priority": "HIGH",
+    "resources": [
+      {
+        "title": "WHO | Measles",
+        "url": "https://www.who.int/news-room/fact-sheets/detail/measles",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "ICTV | Family: Paramyxoviridae",
+        "url": "https://ictv.global/report/chapter/paramyxoviridae/paramyxoviridae",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "ReVAMPP | Research and Development of Vaccines and Monoclonal Antibodies for Pandemic Preparedness",
+        "url": "https://revampp.org/",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "NIAID | Scientists Discuss Prototype Pathogens for Pandemic Preparedness",
+        "url": "https://www.niaid.nih.gov/news-events/scientists-discuss-prototype-pathogens-pandemic-preparedness",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/",
+        "type": "PUBLICATION"
+      }
+    ],
+    "taxonomy_id": 11158,
+    "taxonNameField": "taxonomicLevelFamily",
+    "taxonName": "Paramyxoviridae"
+  },
+  {
+    "active": true,
+    "description": {
+      "compiledSource": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction _createMdxContent(props) {\n  const _components = Object.assign({\n    h2: \"h2\",\n    p: \"p\",\n    ul: \"ul\",\n    li: \"li\",\n    strong: \"strong\"\n  }, _provideComponents(), props.components);\n  return _jsxs(_Fragment, {\n    children: [_jsx(_components.h2, {\n      children: \"Overview\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"Flaviviridae is a family of positive-sense, single-stranded RNA viruses that includes numerous important human pathogens. Notable members include dengue virus, Zika virus, yellow fever virus, West Nile virus, and hepatitis C virus. Many flaviviruses are arthropod-borne (arboviruses), primarily transmitted by mosquitoes or ticks, while others like hepatitis C are transmitted through blood and other body fluids.\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"Flaviviridae has been designated as a prototype pathogen family for pandemic preparedness research by the National Institute of Allergy and Infectious Diseases (NIAID). As part of the NIAID-funded Research and Development of Vaccines and Monoclonal Antibodies for Pandemic Preparedness (ReVAMPP) project, this viral family was prioritized due to its significant potential for causing outbreaks and public health emergencies. NIAID selected virus families of concern with insufficient research, inadequate medical countermeasures, and low to moderate historical support.\"\n    }), \"\\n\", _jsx(_components.h2, {\n      children: \"Impact\"\n    }), \"\\n\", _jsxs(_components.ul, {\n      children: [\"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Human Health\"\n        }), \": Causes a wide range of diseases from mild febrile illness to severe hemorrhagic fever, encephalitis, and chronic liver disease\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Geographic Distribution\"\n        }), \": Worldwide, with many members endemic to tropical and subtropical regions\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Vectors\"\n        }), \": Many members transmitted by mosquitoes (Aedes and Culex species) or ticks\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Emerging Threats\"\n        }), \": Several members have caused major outbreaks in recent decades (Zika, dengue, West Nile)\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Economic\"\n        }), \": Significant healthcare costs and productivity losses\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Chronic Disease\"\n        }), \": Hepatitis C is a leading cause of liver cirrhosis and cancer worldwide\"]\n      }), \"\\n\"]\n    })]\n  });\n}\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, props)\n  })) : _createMdxContent(props);\n}\nreturn {\n  default: MDXContent\n};\n",
+      "frontmatter": {},
+      "scope": {}
+    },
+    "highlight_descendant_taxonomy_ids": [
+      3052464,
+      3052465,
+      3048448
+    ],
+    "name": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priority": "HIGH",
+    "resources": [
+      {
+        "title": "CDC | Dengue",
+        "url": "https://www.cdc.gov/dengue/index.html",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "CDC | Zika Virus",
+        "url": "https://www.cdc.gov/zika/index.html",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "ICTV | Family: Flaviviridae",
+        "url": "https://ictv.global/report/chapter/flaviviridae/flaviviridae",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "ReVAMPP | Research and Development of Vaccines and Monoclonal Antibodies for Pandemic Preparedness",
+        "url": "https://revampp.org/",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "NIAID | Scientists Discuss Prototype Pathogens for Pandemic Preparedness",
+        "url": "https://www.niaid.nih.gov/news-events/scientists-discuss-prototype-pathogens-pandemic-preparedness",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/",
+        "type": "PUBLICATION"
+      }
+    ],
+    "taxonomy_id": 11050,
+    "taxonNameField": "taxonomicLevelFamily",
+    "taxonName": "Flaviviridae"
+  },
+  {
+    "active": true,
+    "description": {
+      "compiledSource": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction _createMdxContent(props) {\n  const _components = Object.assign({\n    h2: \"h2\",\n    p: \"p\",\n    ul: \"ul\",\n    li: \"li\",\n    strong: \"strong\"\n  }, _provideComponents(), props.components);\n  return _jsxs(_Fragment, {\n    children: [_jsx(_components.h2, {\n      children: \"Overview\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"Togaviridae is a family of enveloped, positive-sense, single-stranded RNA viruses that includes important human and animal pathogens. The family consists of a single genus, Alphavirus, which includes chikungunya virus, Venezuelan equine encephalitis virus, and others. Most alphaviruses are arthropod-borne (arboviruses), primarily transmitted by mosquitoes.\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"Togaviridae has been designated as a prototype pathogen family for pandemic preparedness research by the National Institute of Allergy and Infectious Diseases (NIAID). As part of the NIAID-funded Research and Development of Vaccines and Monoclonal Antibodies for Pandemic Preparedness (ReVAMPP) project, this viral family was prioritized due to its significant potential for causing outbreaks and public health emergencies. NIAID selected virus families of concern with insufficient research, inadequate medical countermeasures, and low to moderate historical support.\"\n    }), \"\\n\", _jsx(_components.h2, {\n      children: \"Impact\"\n    }), \"\\n\", _jsxs(_components.ul, {\n      children: [\"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Human Health\"\n        }), \": Causes diseases ranging from mild febrile illness to severe encephalitis and arthritis\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Geographic Distribution\"\n        }), \": Worldwide, with specific viruses endemic to particular regions\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Vectors\"\n        }), \": Most members transmitted by mosquitoes\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Emerging Threats\"\n        }), \": Chikungunya has caused major outbreaks across multiple continents in recent decades\"]\n      }), \"\\n\"]\n    })]\n  });\n}\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, props)\n  })) : _createMdxContent(props);\n}\nreturn {\n  default: MDXContent\n};\n",
+      "frontmatter": {},
+      "scope": {}
+    },
+    "highlight_descendant_taxonomy_ids": [
+      37124,
+      11036
+    ],
+    "name": "Togaviridae (Prototype Pathogen Viral Family)",
+    "priority": "MODERATE_HIGH",
+    "resources": [
+      {
+        "title": "CDC | Chikungunya Virus",
+        "url": "https://www.cdc.gov/chikungunya/index.html",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "CDC | Eastern Equine Encephalitis",
+        "url": "https://www.cdc.gov/eee/index.html",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "ICTV | Family: Togaviridae",
+        "url": "https://ictv.global/report/chapter/togaviridae/togaviridae",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "ReVAMPP | Research and Development of Vaccines and Monoclonal Antibodies for Pandemic Preparedness",
+        "url": "https://revampp.org/",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "NIAID | Scientists Discuss Prototype Pathogens for Pandemic Preparedness",
+        "url": "https://www.niaid.nih.gov/news-events/scientists-discuss-prototype-pathogens-pandemic-preparedness",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/",
+        "type": "PUBLICATION"
+      }
+    ],
+    "taxonomy_id": 11018,
+    "taxonNameField": "taxonomicLevelFamily",
+    "taxonName": "Togaviridae"
+  },
+  {
+    "active": true,
+    "description": {
+      "compiledSource": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction _createMdxContent(props) {\n  const _components = Object.assign({\n    h2: \"h2\",\n    p: \"p\",\n    ul: \"ul\",\n    li: \"li\",\n    strong: \"strong\"\n  }, _provideComponents(), props.components);\n  return _jsxs(_Fragment, {\n    children: [_jsx(_components.h2, {\n      children: \"Overview\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"Picornaviridae is a family of small, non-enveloped viruses with positive-sense, single-stranded RNA genomes. This diverse family includes many significant human and animal pathogens, including poliovirus, rhinoviruses (common cold), enteroviruses, hepatitis A virus, and foot-and-mouth disease virus. The name \\\"picorna\\\" comes from \\\"pico\\\" (small) and \\\"RNA,\\\" reflecting their tiny size and RNA genome. Most picornaviruses for which the natural hosts have been identified are specific for one, or a very few host species. Transmission by arthropod vectors is not known, although EMCV has been isolated from mosquitoes and ticks, and poliovirus from flies; therefore mechanical transmission may be possible.\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"Picornaviridae has been designated as a prototype pathogen family for pandemic preparedness research by the National Institute of Allergy and Infectious Diseases (NIAID). As part of the NIAID-funded Research and Development of Vaccines and Monoclonal Antibodies for Pandemic Preparedness (ReVAMPP) project, this viral family was prioritized due to its significant potential for causing outbreaks and public health emergencies. NIAID selected virus families of concern with insufficient research, inadequate medical countermeasures, and low to moderate historical support.\"\n    }), \"\\n\", _jsx(_components.h2, {\n      children: \"Impact\"\n    }), \"\\n\", _jsxs(_components.ul, {\n      children: [\"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Human Health\"\n        }), \": Causes a wide range of diseases from mild respiratory infections to severe neurological conditions\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Agriculture\"\n        }), \": Foot-and-mouth disease has devastating impacts on livestock industries\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Public Health\"\n        }), \": Several members require ongoing surveillance and vaccination programs\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Neurological Disease\"\n        }), \": Some enteroviruses cause paralysis, meningitis, and encephalitis\"]\n      }), \"\\n\"]\n    })]\n  });\n}\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, props)\n  })) : _createMdxContent(props);\n}\nreturn {\n  default: MDXContent\n};\n",
+      "frontmatter": {},
+      "scope": {}
+    },
+    "highlight_descendant_taxonomy_ids": [
+      138948,
+      138949,
+      138951,
+      463676
+    ],
+    "name": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priority": "MODERATE",
+    "resources": [
+      {
+        "title": "WHO | Poliomyelitis",
+        "url": "https://www.who.int/news-room/fact-sheets/detail/poliomyelitis",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "ICTV | Family: Picornaviridae",
+        "url": "https://ictv.global/report/chapter/picornaviridae/picornaviridae",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "ReVAMPP | Research and Development of Vaccines and Monoclonal Antibodies for Pandemic Preparedness",
+        "url": "https://revampp.org/",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "NIAID | Scientists Discuss Prototype Pathogens for Pandemic Preparedness",
+        "url": "https://www.niaid.nih.gov/news-events/scientists-discuss-prototype-pathogens-pandemic-preparedness",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/",
+        "type": "PUBLICATION"
+      }
+    ],
+    "taxonomy_id": 12058,
+    "taxonNameField": "taxonomicLevelFamily",
+    "taxonName": "Picornaviridae"
+  },
+  {
+    "active": true,
+    "description": {
+      "compiledSource": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction _createMdxContent(props) {\n  const _components = Object.assign({\n    h2: \"h2\",\n    p: \"p\",\n    ul: \"ul\",\n    li: \"li\",\n    strong: \"strong\"\n  }, _provideComponents(), props.components);\n  return _jsxs(_Fragment, {\n    children: [_jsx(_components.h2, {\n      children: \"Overview\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"Filoviridae is a family of filamentous, enveloped, negative-sense RNA viruses that includes some of the most virulent human pathogens known. The most notable members are Ebola virus and Marburg virus, which cause severe hemorrhagic fevers with extremely high mortality rates. The name \\\"filo\\\" comes from the Latin word for \\\"thread\\\" or \\\"filament,\\\" referring to their distinctive filamentous structure.\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"Filoviridae has been designated as a prototype pathogen family for pandemic preparedness research by the National Institute of Allergy and Infectious Diseases (NIAID). As part of the NIAID-funded Research and Development of Vaccines and Monoclonal Antibodies for Pandemic Preparedness (ReVAMPP) project, this viral family was prioritized due to its significant potential for causing outbreaks and public health emergencies. NIAID selected virus families of concern with insufficient research, inadequate medical countermeasures, and low to moderate historical support.\"\n    }), \"\\n\", _jsx(_components.h2, {\n      children: \"Impact\"\n    }), \"\\n\", _jsxs(_components.ul, {\n      children: [\"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Human Health\"\n        }), \": Causes severe hemorrhagic fevers with mortality rates ranging from 25% to 90%\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Outbreaks\"\n        }), \": Multiple outbreaks in Africa with the largest occurring in West Africa (2014-2016)\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Healthcare Systems\"\n        }), \": Outbreaks can overwhelm local healthcare systems and require international response\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Biosecurity\"\n        }), \": Classified as biosafety level 4 pathogens requiring maximum containment\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Research\"\n        }), \": Significant focus on vaccine and therapeutic development\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Zoonotic Potential\"\n        }), \": Natural reservoir believed to be certain bat species\"]\n      }), \"\\n\"]\n    })]\n  });\n}\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, props)\n  })) : _createMdxContent(props);\n}\nreturn {\n  default: MDXContent\n};\n",
+      "frontmatter": {},
+      "scope": {}
+    },
+    "highlight_descendant_taxonomy_ids": [
+      3052462,
+      3052505
+    ],
+    "name": "Filoviridae (Prototype Pathogen Viral Family)",
+    "priority": "CRITICAL",
+    "resources": [
+      {
+        "title": "CDC | Ebola (Ebola Virus Disease)",
+        "url": "https://www.cdc.gov/vhf/ebola/index.html",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "ICTV | Family: Filoviridae",
+        "url": "https://ictv.global/report/chapter/filoviridae/filoviridae",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "ReVAMPP | Research and Development of Vaccines and Monoclonal Antibodies for Pandemic Preparedness",
+        "url": "https://revampp.org/",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "NIAID | Scientists Discuss Prototype Pathogens for Pandemic Preparedness",
+        "url": "https://www.niaid.nih.gov/news-events/scientists-discuss-prototype-pathogens-pandemic-preparedness",
+        "type": "REFERENCE"
+      },
+      {
+        "title": "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/",
+        "type": "PUBLICATION"
+      }
+    ],
+    "taxonomy_id": 11266,
+    "taxonNameField": "taxonomicLevelFamily",
+    "taxonName": "Filoviridae"
   }
 ]
