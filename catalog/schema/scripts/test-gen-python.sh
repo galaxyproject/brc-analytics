@@ -6,7 +6,7 @@ validation_failed=false
 
 for name in schema ${SOURCE_FILE_SCHEMA_NAMES[@]}
 do
-  gen-python "./catalog/schema/$name.yaml" > /dev/null
+  gen-python "./catalog/py_package/catalog_build/schema/$name.yaml" > /dev/null
   if [ $? -ne 0 ]; then
     validation_failed=true
   fi

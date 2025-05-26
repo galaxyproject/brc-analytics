@@ -1,4 +1,4 @@
-id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/workflows.yaml#
+id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/workflows.yaml#
 name: workflows
 description: Schema for source workflows list.
 

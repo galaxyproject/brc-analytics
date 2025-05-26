@@ -1,4 +1,4 @@
-id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/assemblies.yaml#
+id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/assemblies.yaml#
 name: assemblies
 description: Schema for source assembly list.
 
