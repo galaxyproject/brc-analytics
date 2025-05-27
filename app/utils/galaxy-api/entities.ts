@@ -1,3 +1,14 @@
+export interface EnaPairedReads {
+  md5Hashes: string;
+  runAccession: string;
+  urls: string;
+}
+
+export interface EnaFileInfo {
+  md5: string;
+  url: string;
+}
+
 export interface WorkflowLandingsBody {
   public: true;
   request_state: WorkflowLandingsBodyRequestState;
@@ -30,12 +41,14 @@ interface WorkflowPairedCollectionParameter {
       {
         class: "File";
         filetype: string;
+        hashes: WorkflowDatasetHash[];
         identifier: "forward";
         location: string;
       },
       {
         class: "File";
         filetype: string;
+        hashes: WorkflowDatasetHash[];
         identifier: "reverse";
         location: string;
       },
@@ -43,6 +56,11 @@ interface WorkflowPairedCollectionParameter {
     identifier: string;
     type: "paired";
   }>;
+}
+
+interface WorkflowDatasetHash {
+  hash_function: "MD5" | "SHA-1" | "SHA-256" | "SHA-512";
+  hash_value: string;
 }
 
 export interface WorkflowLanding {

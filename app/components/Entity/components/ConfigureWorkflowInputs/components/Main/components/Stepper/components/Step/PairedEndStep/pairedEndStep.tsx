@@ -15,7 +15,6 @@ import { useTable } from "./components/ENASequencingData/components/CollectionSe
 export const PairedEndStep = ({
   active,
   completed,
-  entryKey,
   entryLabel,
   index,
   onConfigure,
@@ -33,8 +32,6 @@ export const PairedEndStep = ({
         {value === VIEW.ENA ? (
           <ENASequencingData
             clearErrors={ena.clearErrors}
-            entryKey={entryKey}
-            entryLabel={entryLabel}
             onConfigure={onConfigure}
             onRequestData={ena.onRequestData}
             status={ena.status}
