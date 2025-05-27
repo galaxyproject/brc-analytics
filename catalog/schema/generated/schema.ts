@@ -29,6 +29,7 @@ export enum OutbreakResourceType {
     WORKFLOW = "WORKFLOW",
     DATA = "DATA",
     OTHER = "OTHER",
+    HGPHYLOPLACE = "HGPHYLOPLACE",
 };
 /**
 * Set of IDs of workflow categories.
