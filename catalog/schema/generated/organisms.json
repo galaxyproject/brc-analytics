@@ -52,7 +52,7 @@
             "type": "object"
         }
     },
-    "$id": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/organisms.yaml#",
+    "$id": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/organisms.yaml#",
     "$schema": "https://json-schema.org/draft/2019-09/schema",
     "additionalProperties": true,
     "description": "Object containing list of organisms.",

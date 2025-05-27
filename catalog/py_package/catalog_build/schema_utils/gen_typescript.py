@@ -24,4 +24,5 @@ class TypescriptGeneratorFixed(TypescriptGenerator):
         return base_result if slot.required else f"{base_result} | null"
 
 
-print(TypescriptGeneratorFixed(sys.argv[1]).serialize())
+if __name__ == "__main__":
+    print(TypescriptGeneratorFixed(sys.argv[1]).serialize())
