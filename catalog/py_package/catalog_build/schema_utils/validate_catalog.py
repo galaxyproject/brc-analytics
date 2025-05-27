@@ -38,8 +38,12 @@ def validate_catalog(source_dir, source_types):
 
 def cli():
     parser = ArgumentParser()
-    parser.add_argument("source_dir")
-    parser.add_argument("source_type", nargs="+")
+    parser.add_argument(
+        "source_dir", help="path of directory to validate catalog source files from"
+    )
+    parser.add_argument(
+        "source_type", nargs="+", help="name of a schema/entity type to validate"
+    )
     args = parser.parse_args()
     validate_catalog(args.source_dir, args.source_type)
 

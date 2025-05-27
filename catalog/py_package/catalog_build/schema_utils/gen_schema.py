@@ -58,13 +58,35 @@ def gen_schema(
 
 def cli():
     parser = ArgumentParser()
-    parser.add_argument("schema_name", nargs="*")
-    parser.add_argument("--py-path")
-    parser.add_argument("--py-name", action="append")
-    parser.add_argument("--ts-path")
-    parser.add_argument("--ts-name", action="append")
-    parser.add_argument("--json-path")
-    parser.add_argument("--json-name", action="append")
+    parser.add_argument(
+        "schema_name",
+        nargs="*",
+        help="name of a default schema to generate from if generator-specific schemas aren't specified",
+    )
+    parser.add_argument(
+        "--py-path", help="path of directory to output pydantic files to"
+    )
+    parser.add_argument(
+        "--py-name",
+        action="append",
+        help="name of a schema to generate pydantic models from",
+    )
+    parser.add_argument(
+        "--ts-path", help="path of directory to output typescript files to"
+    )
+    parser.add_argument(
+        "--ts-name",
+        action="append",
+        help="name of a schema to generate typescript definitions from",
+    )
+    parser.add_argument(
+        "--json-path", help="path of directory to output json schema files to"
+    )
+    parser.add_argument(
+        "--json-name",
+        action="append",
+        help="name of a schema to generate json schema from",
+    )
     args = parser.parse_args()
     gen_schema(
         args.schema_name,
