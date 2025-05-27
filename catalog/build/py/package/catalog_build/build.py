@@ -87,7 +87,9 @@ def post_ncbi_request(url, json_data, batch_size=1000):
 
             data = response.json()
 
-            if len(data["reports"][0].get("errors", [])) > 0:
+            if "reports" not in data:
+                raise Exception(data)
+            elif len(data["reports"][0].get("errors", [])) > 0:
                 raise Exception(data["reports"][0])
 
             all_reports.extend(data["reports"])
