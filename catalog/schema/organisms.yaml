@@ -24,7 +24,7 @@ classes:
     description: Definition of an organism with its taxonomic and genetic characteristics.
     attributes:
       taxonomy_id:
-        description: An NCBI Taxonomy ID. If non-null, all assemblies which have this ID as part of their taxonomic lineage will display this workflow.
+        description: An NCBI Taxonomy ID at rank 'species'.
         required: true
         range: integer
       ploidy:

@@ -214,7 +214,7 @@ class Organism(ConfiguredBaseModel):
 
     taxonomy_id: int = Field(
         default=...,
-        description="""An NCBI Taxonomy ID. If non-null, all assemblies which have this ID as part of their taxonomic lineage will display this workflow.""",
+        description="""An NCBI Taxonomy ID at rank 'species'.""",
         json_schema_extra={
             "linkml_meta": {
                 "alias": "taxonomy_id",

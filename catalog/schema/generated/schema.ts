@@ -98,7 +98,7 @@ export interface Organisms {
  * Definition of an organism with its taxonomic and genetic characteristics.
  */
 export interface Organism {
-    /** An NCBI Taxonomy ID. If non-null, all assemblies which have this ID as part of their taxonomic lineage will display this workflow. */
+    /** An NCBI Taxonomy ID at rank 'species'. */
     taxonomy_id: number,
     /** The possible ploidy states (number of chromosome sets) that the organism may have, which determines compatible workflows. */
     ploidy: OrganismPloidy[],
