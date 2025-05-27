@@ -99,6 +99,7 @@ class OutbreakResourceType(str, Enum):
     WORKFLOW = "WORKFLOW"
     DATA = "DATA"
     OTHER = "OTHER"
+    HGPHYLOPLACE = "HGPHYLOPLACE"
 
 
 class WorkflowCategoryId(str, Enum):
