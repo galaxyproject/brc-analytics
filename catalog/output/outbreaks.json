@@ -39,6 +39,16 @@
         "title": "BV-BRC: Influenza A virus Taxonomy View",
         "url": "https://www.bv-brc.org/view/Taxonomy/11320",
         "type": "REFERENCE"
+      },
+      {
+        "title": "hgPhyloPlace: Place your sequences in a global phylogenetic tree (H5N1 B3.13 2024)",
+        "url": "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?hgpp_org=h5n1_outbreak_concat",
+        "type": "HGPHYLOPLACE"
+      },
+      {
+        "title": "hgPhyloPlace: Place your sequences in a global phylogenetic tree (H5N1 D1.1 2024)",
+        "url": "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?hgpp_org=h5n1_D1.1_2024",
+        "type": "HGPHYLOPLACE"
       }
     ],
     "taxonomy_id": 11320,
@@ -90,6 +100,11 @@
         "title": "Galaxy tutorial: Mutation calling, viral genome reconstruction and lineage/clade assignment from SARS-CoV-2 sequencing data",
         "url": "https://gxy.io/GTN:T00316",
         "type": "REFERENCE"
+      },
+      {
+        "title": "hgPhyloPlace: Place your sequences in a global phylogenetic tree",
+        "url": "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?hgpp_org=wuhCor1",
+        "type": "HGPHYLOPLACE"
       }
     ],
     "taxonomy_id": 3418604,
@@ -136,6 +151,11 @@
         "title": "Galaxy tutorial: Pox virus genome analysis from tiled-amplicon sequencing data",
         "url": "https://gxy.io/GTN:T00347",
         "type": "REFERENCE"
+      },
+      {
+        "title": "hgPhyloPlace: Place your sequences in a global phylogenetic tree",
+        "url": "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?hgpp_org=mpxv",
+        "type": "HGPHYLOPLACE"
       }
     ],
     "taxonomy_id": 10244,
@@ -172,6 +192,11 @@
         "title": "WHO | Tuberculosis Deaths and Disease Increase During the COVID-19 Pandemic",
         "url": "https://www.who.int/news/item/27-10-2022-tuberculosis-deaths-and-disease-increase-during-the-covid-19-pandemic",
         "type": "REFERENCE"
+      },
+      {
+        "title": "hgPhyloPlace: Place your sequences in a global phylogenetic tree",
+        "url": "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?hgpp_org=hub_3070967_GCF_000195955.2",
+        "type": "HGPHYLOPLACE"
       }
     ],
     "taxonomy_id": 1773,
@@ -532,7 +557,7 @@
       {
         "title": "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development",
         "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/",
-        "type": "REFERENCE"
+        "type": "PUBLICATION"
       }
     ],
     "taxonomy_id": 11617,
@@ -576,7 +601,7 @@
       {
         "title": "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development",
         "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/",
-        "type": "REFERENCE"
+        "type": "PUBLICATION"
       }
     ],
     "taxonomy_id": 1980413,
@@ -614,7 +639,7 @@
       {
         "title": "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development",
         "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/",
-        "type": "REFERENCE"
+        "type": "PUBLICATION"
       }
     ],
     "taxonomy_id": 1980415,
@@ -659,7 +684,7 @@
       {
         "title": "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development",
         "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/",
-        "type": "REFERENCE"
+        "type": "PUBLICATION"
       }
     ],
     "taxonomy_id": 1980416,
@@ -703,7 +728,7 @@
       {
         "title": "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development",
         "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/",
-        "type": "REFERENCE"
+        "type": "PUBLICATION"
       }
     ],
     "taxonomy_id": 1980418,
@@ -749,7 +774,7 @@
       {
         "title": "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development",
         "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/",
-        "type": "REFERENCE"
+        "type": "PUBLICATION"
       }
     ],
     "taxonomy_id": 11158,
@@ -799,7 +824,7 @@
       {
         "title": "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development",
         "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/",
-        "type": "REFERENCE"
+        "type": "PUBLICATION"
       }
     ],
     "taxonomy_id": 11050,
@@ -848,7 +873,7 @@
       {
         "title": "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development",
         "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/",
-        "type": "REFERENCE"
+        "type": "PUBLICATION"
       }
     ],
     "taxonomy_id": 11018,
@@ -894,7 +919,7 @@
       {
         "title": "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development",
         "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/",
-        "type": "REFERENCE"
+        "type": "PUBLICATION"
       }
     ],
     "taxonomy_id": 12058,
@@ -938,7 +963,7 @@
       {
         "title": "PMC | Prototype Pathogen Approach for Vaccine and Monoclonal Antibody Development",
         "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/",
-        "type": "REFERENCE"
+        "type": "PUBLICATION"
       }
     ],
     "taxonomy_id": 11266,
