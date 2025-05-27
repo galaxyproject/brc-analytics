@@ -1,3 +1,4 @@
+// https://sronpersonalpages.nl/~pault/
 export const bright = [
   "#4477AA",
   "#EE6677",

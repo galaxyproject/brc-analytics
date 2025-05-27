@@ -1,3 +1,4 @@
+// https://www.fabiocrameri.ch/colourmaps/
 export const berlin = [
   "#9eb0ff",
   "#9cb0fe",
