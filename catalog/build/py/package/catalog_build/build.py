@@ -1042,7 +1042,7 @@ def build_files(
       genomes_output_path: Path to save output assemblies TSV at
       ucsc_assemblies_url: URL to fetch UCSC's assembly information from
       tree_output_path: Path to save tree of cataloged taxa to
-      taxonomic_levels_for_tree: List of lowercase taxonomic ranks, as identified by NCBI, to build tree from; listed from highest to lowest level
+      taxonomic_levels_for_tree: List of lowercase taxonomic ranks, as identified by NCBI, to build tree from; listed from highest to lowest level (with order being insignificant for categories that are at the same level as each other)
       taxonomic_group_sets: Dict describing taxa or groups of taxa to be given specified names in the "taxonomic group" field
       do_gene_model_urls: Boolean specifying whether to fetch gene model URLs (if False, the `geneModelUrl` column is filled with empty string)
       extract_primary_data: Boolean specifying whether to fetch and save metadata from SRA
