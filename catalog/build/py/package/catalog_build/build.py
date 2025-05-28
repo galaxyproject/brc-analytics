@@ -603,6 +603,30 @@ def report_inconsistent_taxonomy_ids(df):
     return inconsistent_ids_strings
 
 
+def do_taxonomy_tree_checks(tree, assembly_count):
+    zero_assemblies_taxa = []
+
+    def check_node(node):
+        if node["assembly_count"] == 0:
+            zero_assemblies_taxa.append(node["ncbi_tax_id"])
+        if node["children"]:
+            assembly_count = 0
+            for child_node in node["children"]:
+                assembly_count += check_node(child_node)
+        else:
+            assembly_count = node["assembly_count"]
+        return assembly_count
+
+    combined_assembly_count = check_node(tree)
+
+    return {
+        "assemblies_actual_vs_expected": None
+        if combined_assembly_count == assembly_count
+        else (combined_assembly_count, assembly_count),
+        "zero_assemblies_taxa": zero_assemblies_taxa,
+    }
+
+
 def fetch_sra_metadata(srs_ids, batch_size=20):
     """
     Fetches metadata for a list of SRS IDs from the SRA database.
@@ -900,6 +924,7 @@ def make_qc_report(
     missing_gene_model_urls=None,
     missing_ploidy_assemblies=None,
     missing_outbreak_descendants=None,
+    tree_checks=None,
 ):
     ncbi_assemblies_text = (
         "None"
@@ -943,6 +968,23 @@ def make_qc_report(
         outbreak_descendants_text = "\n".join(
             [f"- {tax_id}" for tax_id in missing_outbreak_descendants]
         )
+    if tree_checks is None:
+        tree_checks_text = "No checks done"
+    else:
+        tree_assemblies_actual_vs_expected = tree_checks[
+            "assemblies_actual_vs_expected"
+        ]
+        tree_zero_assemblies_taxa = tree_checks["zero_assemblies_taxa"]
+        tree_checks_text = "Assembly count mismatch: " + (
+            "None"
+            if tree_assemblies_actual_vs_expected is None
+            else f"Found combined assembly count of {tree_assemblies_actual_vs_expected[0]} among leaf nodes, expected {tree_assemblies_actual_vs_expected[1]}\n\n"
+        )
+        tree_checks_text += "Taxa with assembly count 0: " + (
+            "None"
+            if not tree_zero_assemblies_taxa
+            else ", ".join(tree_zero_assemblies_taxa)
+        )
     return (
         f"# Catalog QC report\n\n"
         f"## Assemblies not found on NCBI\n\n{ncbi_assemblies_text}\n\n"
@@ -950,7 +992,8 @@ def make_qc_report(
         f"## Assemblies with gene model URLs not found\n\n{gene_model_urls_text}\n\n"
         f"## Species and strain combinations with multiple taxonomy IDs\n\n{taxonomy_ids_text}\n\n"
         f"## Assemblies without ploidy information\n\n{ploidy_assemblies_text}\n\n"
-        f"## Outbreak descendant taxonomy IDs not found in genomes data\n\n{outbreak_descendants_text}"
+        f"## Outbreak descendant taxonomy IDs not found in genomes data\n\n{outbreak_descendants_text}\n\n"
+        f"## Taxonomy tree\n\n{tree_checks_text}\n"
     )
 
 
@@ -1238,6 +1281,9 @@ def build_files(
             # Dump with sorted keys and consistent indentation
             json.dump(species_tree, outfile, indent=4, sort_keys=True)
         print(f"Wrote to {tree_output_path}")
+        qc_report_params["tree_checks"] = do_taxonomy_tree_checks(
+            species_tree, genomes_df.shape[0]
+        )
 
     if organisms_path is not None:
         organisms_df = read_organisms(organisms_path)
