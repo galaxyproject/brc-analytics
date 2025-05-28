@@ -2,10 +2,10 @@
     "$defs": {
         "WorkflowCategories": {
             "additionalProperties": false,
-            "description": "Object containing list of workflow categories.",
+            "description": "Root object containing a collection of workflow category definitions used to organize workflows in the BRC Analytics platform.",
             "properties": {
                 "workflow_categories": {
-                    "description": "List of workflow categories.",
+                    "description": "Collection of workflow category entries that will be used to group and organize workflows in the BRC Analytics interface.",
                     "items": {
                         "$ref": "#/$defs/WorkflowCategory"
                     },
@@ -20,22 +20,22 @@
         },
         "WorkflowCategory": {
             "additionalProperties": false,
-            "description": "Workflow category.",
+            "description": "Definition of a workflow category used to group related workflows for organization and display purposes.",
             "properties": {
                 "category": {
                     "$ref": "#/$defs/WorkflowCategoryId",
-                    "description": "The ID of the workflow category."
+                    "description": "The unique identifier for the workflow category, used to link workflows to their respective categories."
                 },
                 "description": {
-                    "description": "The description of the workflow category.",
+                    "description": "A detailed description of the workflow category explaining its purpose and the types of workflows it contains.",
                     "type": "string"
                 },
                 "name": {
-                    "description": "The display name of the workflow category.",
+                    "description": "The human-readable display name of the workflow category as it will appear in the BRC Analytics interface.",
                     "type": "string"
                 },
                 "show_coming_soon": {
-                    "description": "Whether to show 'Coming Soon' for the workflow category when it is not available.",
+                    "description": "Boolean flag that determines whether to display a 'Coming Soon' indicator for this category in the BRC Analytics interface when workflows in this category are not yet available.",
                     "type": "boolean"
                 }
             },
@@ -67,11 +67,11 @@
     "$id": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/workflow_categories.yaml#",
     "$schema": "https://json-schema.org/draft/2019-09/schema",
     "additionalProperties": true,
-    "description": "Object containing list of workflow categories.",
+    "description": "Root object containing a collection of workflow category definitions used to organize workflows in the BRC Analytics platform.",
     "metamodel_version": "1.7.0",
     "properties": {
         "workflow_categories": {
-            "description": "List of workflow categories.",
+            "description": "Collection of workflow category entries that will be used to group and organize workflows in the BRC Analytics interface.",
             "items": {
                 "$ref": "#/$defs/WorkflowCategory"
             },

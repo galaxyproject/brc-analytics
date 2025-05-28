@@ -141,7 +141,7 @@ class WorkflowPloidy(str, Enum):
 
 class Assemblies(ConfiguredBaseModel):
     """
-    Object containing list of assemblies.
+    Root object containing a collection of genomic assembly definitions for the BRC Analytics platform.
     """
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
@@ -153,7 +153,7 @@ class Assemblies(ConfiguredBaseModel):
 
     assemblies: List[Assembly] = Field(
         default=...,
-        description="""List of assemblies.""",
+        description="""Collection of genomic assembly entries that will be available for analysis in the BRC Analytics platform.""",
         json_schema_extra={
             "linkml_meta": {"alias": "assemblies", "domain_of": ["Assemblies"]}
         },
@@ -162,7 +162,7 @@ class Assemblies(ConfiguredBaseModel):
 
 class Assembly(ConfiguredBaseModel):
     """
-    An assembly.
+    Definition of a genomic assembly with its unique identifier.
     """
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
@@ -173,7 +173,7 @@ class Assembly(ConfiguredBaseModel):
 
     accession: str = Field(
         default=...,
-        description="""The assembly's accession.""",
+        description="""The unique accession identifier for the assembly (e.g., GCA_000001405.28 for GRCh38), used to retrieve the assembly data from public repositories.""",
         json_schema_extra={
             "linkml_meta": {"alias": "accession", "domain_of": ["Assembly"]}
         },
@@ -182,7 +182,7 @@ class Assembly(ConfiguredBaseModel):
 
 class Organisms(ConfiguredBaseModel):
     """
-    Object containing list of organisms.
+    Root object containing a collection of organism definitions for the BRC Analytics platform.
     """
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
@@ -194,7 +194,7 @@ class Organisms(ConfiguredBaseModel):
 
     organisms: List[Organism] = Field(
         default=...,
-        description="""List of organisms.""",
+        description="""Collection of organism entries that will be available in the BRC Analytics platform.""",
         json_schema_extra={
             "linkml_meta": {"alias": "organisms", "domain_of": ["Organisms"]}
         },
@@ -203,7 +203,7 @@ class Organisms(ConfiguredBaseModel):
 
 class Organism(ConfiguredBaseModel):
     """
-    Info for an organism.
+    Definition of an organism with its taxonomic and genetic characteristics.
     """
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
@@ -214,7 +214,7 @@ class Organism(ConfiguredBaseModel):
 
     taxonomy_id: int = Field(
         default=...,
-        description="""The organism's NCBI taxonomy ID.""",
+        description="""An NCBI Taxonomy ID at rank 'species'.""",
         json_schema_extra={
             "linkml_meta": {
                 "alias": "taxonomy_id",
@@ -224,7 +224,7 @@ class Organism(ConfiguredBaseModel):
     )
     ploidy: List[OrganismPloidy] = Field(
         default=...,
-        description="""The ploidies that the organism may have.""",
+        description="""The possible ploidy states (number of chromosome sets) that the organism may have, which determines compatible workflows.""",
         json_schema_extra={
             "linkml_meta": {"alias": "ploidy", "domain_of": ["Organism", "Workflow"]}
         },
@@ -233,7 +233,7 @@ class Organism(ConfiguredBaseModel):
 
 class Outbreaks(ConfiguredBaseModel):
     """
-    Object containing list of outbreaks.
+    Root object containing a collection of pathogen definitions for the BRC Analytics platform to highlight as outbreaks/priority pathogens.
     """
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
@@ -245,7 +245,7 @@ class Outbreaks(ConfiguredBaseModel):
 
     outbreaks: List[Outbreak] = Field(
         default=...,
-        description="""List of outbreaks.""",
+        description="""Collection of pathogen entries that will be displayed in the BRC Analytics platform as outbreaks/priority pathogens.""",
         json_schema_extra={
             "linkml_meta": {"alias": "outbreaks", "domain_of": ["Outbreaks"]}
         },
@@ -254,7 +254,7 @@ class Outbreaks(ConfiguredBaseModel):
 
 class Outbreak(ConfiguredBaseModel):
     """
-    Info for an outbreak.
+    Definition of a priority pathogen with its taxonomic classification, priority level, and associated resources.
     """
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
@@ -265,7 +265,7 @@ class Outbreak(ConfiguredBaseModel):
 
     name: str = Field(
         default=...,
-        description="""The name of the outbreak/ pathogen.""",
+        description="""The display name of the pathogen as it will appear in the BRC Analytics interface.""",
         json_schema_extra={
             "linkml_meta": {
                 "alias": "name",
@@ -275,7 +275,7 @@ class Outbreak(ConfiguredBaseModel):
     )
     taxonomy_id: int = Field(
         default=...,
-        description="""The outbreak's NCBI taxonomy ID.""",
+        description="""The NCBI Taxonomy ID for the pathogen. Used to link to relevant genomic data and workflows.""",
         json_schema_extra={
             "linkml_meta": {
                 "alias": "taxonomy_id",
@@ -285,21 +285,21 @@ class Outbreak(ConfiguredBaseModel):
     )
     priority: OutbreakPriority = Field(
         default=...,
-        description="""The priority of the outbreak.""",
+        description="""The priority level of the pathogen, which determines its visibility and prominence in the BRC Analytics interface.""",
         json_schema_extra={
             "linkml_meta": {"alias": "priority", "domain_of": ["Outbreak"]}
         },
     )
     resources: List[OutbreakResource] = Field(
         default=...,
-        description="""The resources associated with the outbreak.""",
+        description="""Collection of external resources (references, tools, databases) related to the pathogen.""",
         json_schema_extra={
             "linkml_meta": {"alias": "resources", "domain_of": ["Outbreak"]}
         },
     )
     description: MarkdownFileReference = Field(
         default=...,
-        description="""The description of the outbreak.""",
+        description="""Reference to a markdown file containing detailed information about the pathogen.""",
         json_schema_extra={
             "linkml_meta": {
                 "alias": "description",
@@ -309,14 +309,14 @@ class Outbreak(ConfiguredBaseModel):
     )
     active: bool = Field(
         default=...,
-        description="""Determines if outbreak should be included, as they presumably change over time.""",
+        description="""Boolean flag that determines if the pathogen should be included in the BRC Analytics interface. Used to manage visibility as pathogen relevance changes over time.""",
         json_schema_extra={
             "linkml_meta": {"alias": "active", "domain_of": ["Outbreak", "Workflow"]}
         },
     )
     highlight_descendant_taxonomy_ids: Optional[List[int]] = Field(
         default=None,
-        description="""Taxonomy IDs of child taxa that should be highlighted.""",
+        description="""List of NCBI Taxonomy IDs for descendant taxa (e.g., specific strains or serotypes) that should be highlighted within the outbreak category.""",
         json_schema_extra={
             "linkml_meta": {
                 "alias": "highlight_descendant_taxonomy_ids",
@@ -328,7 +328,7 @@ class Outbreak(ConfiguredBaseModel):
 
 class OutbreakResource(ConfiguredBaseModel):
     """
-    A resource associated with an outbreak.
+    Definition of an external resource (reference, tool, database) associated with a priority pathogen.
     """
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
@@ -339,7 +339,7 @@ class OutbreakResource(ConfiguredBaseModel):
 
     url: str = Field(
         default=...,
-        description="""The URL of the resource.""",
+        description="""The complete URL (including http/https protocol) to the external resource.""",
         json_schema_extra={
             "linkml_meta": {
                 "alias": "url",
@@ -349,14 +349,14 @@ class OutbreakResource(ConfiguredBaseModel):
     )
     title: str = Field(
         default=...,
-        description="""The title of the resource.""",
+        description="""The display title for the resource link as it will appear in the BRC Analytics interface.""",
         json_schema_extra={
             "linkml_meta": {"alias": "title", "domain_of": ["OutbreakResource"]}
         },
     )
     type: OutbreakResourceType = Field(
         default=...,
-        description="""The type of the resource.""",
+        description="""The category or type of the resource (e.g., REFERENCE, TOOL, DATABASE), which determines how it is displayed and organized.""",
         json_schema_extra={
             "linkml_meta": {"alias": "type", "domain_of": ["OutbreakResource"]}
         },
@@ -365,7 +365,7 @@ class OutbreakResource(ConfiguredBaseModel):
 
 class MarkdownFileReference(ConfiguredBaseModel):
     """
-    A reference to a markdown file
+    A reference to a markdown file containing detailed content about a priority pathogen.
     """
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
@@ -376,7 +376,7 @@ class MarkdownFileReference(ConfiguredBaseModel):
 
     path: str = Field(
         default=...,
-        description="""Path to the markdown file""",
+        description="""Relative path to the markdown file from the project root. Must end with .md extension.""",
         json_schema_extra={
             "linkml_meta": {"alias": "path", "domain_of": ["MarkdownFileReference"]}
         },
@@ -397,7 +397,7 @@ class MarkdownFileReference(ConfiguredBaseModel):
 
 class WorkflowCategories(ConfiguredBaseModel):
     """
-    Object containing list of workflow categories.
+    Root object containing a collection of workflow category definitions used to organize workflows in the BRC Analytics platform.
     """
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
@@ -409,7 +409,7 @@ class WorkflowCategories(ConfiguredBaseModel):
 
     workflow_categories: List[WorkflowCategory] = Field(
         default=...,
-        description="""List of workflow categories.""",
+        description="""Collection of workflow category entries that will be used to group and organize workflows in the BRC Analytics interface.""",
         json_schema_extra={
             "linkml_meta": {
                 "alias": "workflow_categories",
@@ -421,7 +421,7 @@ class WorkflowCategories(ConfiguredBaseModel):
 
 class WorkflowCategory(ConfiguredBaseModel):
     """
-    Workflow category.
+    Definition of a workflow category used to group related workflows for organization and display purposes.
     """
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
@@ -432,14 +432,14 @@ class WorkflowCategory(ConfiguredBaseModel):
 
     category: WorkflowCategoryId = Field(
         default=...,
-        description="""The ID of the workflow category.""",
+        description="""The unique identifier for the workflow category, used to link workflows to their respective categories.""",
         json_schema_extra={
             "linkml_meta": {"alias": "category", "domain_of": ["WorkflowCategory"]}
         },
     )
     name: str = Field(
         default=...,
-        description="""The display name of the workflow category.""",
+        description="""The human-readable display name of the workflow category as it will appear in the BRC Analytics interface.""",
         json_schema_extra={
             "linkml_meta": {
                 "alias": "name",
@@ -449,7 +449,7 @@ class WorkflowCategory(ConfiguredBaseModel):
     )
     description: str = Field(
         default=...,
-        description="""The description of the workflow category.""",
+        description="""A detailed description of the workflow category explaining its purpose and the types of workflows it contains.""",
         json_schema_extra={
             "linkml_meta": {
                 "alias": "description",
@@ -459,7 +459,7 @@ class WorkflowCategory(ConfiguredBaseModel):
     )
     show_coming_soon: bool = Field(
         default=...,
-        description="""Whether to show 'Coming Soon' for the workflow category when it is not available.""",
+        description="""Boolean flag that determines whether to display a 'Coming Soon' indicator for this category in the BRC Analytics interface when workflows in this category are not yet available.""",
         json_schema_extra={
             "linkml_meta": {
                 "alias": "show_coming_soon",
@@ -471,7 +471,7 @@ class WorkflowCategory(ConfiguredBaseModel):
 
 class Workflows(ConfiguredBaseModel):
     """
-    Object containing list of workflows.
+    Root object containing a collection of Galaxy workflow definitions for the BRC Analytics platform.
     """
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
@@ -483,7 +483,7 @@ class Workflows(ConfiguredBaseModel):
 
     workflows: List[Workflow] = Field(
         default=...,
-        description="""List of workflows.""",
+        description="""Collection of workflow entries that will be available to users in the BRC Analytics platform.""",
         json_schema_extra={
             "linkml_meta": {"alias": "workflows", "domain_of": ["Workflows"]}
         },
@@ -492,7 +492,7 @@ class Workflows(ConfiguredBaseModel):
 
 class Workflow(ConfiguredBaseModel):
     """
-    A workflow.
+    Definition of a Galaxy workflow with its metadata, parameters, and organism compatibility information.
     """
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
@@ -503,42 +503,42 @@ class Workflow(ConfiguredBaseModel):
 
     trs_id: str = Field(
         default=...,
-        description="""The workflow's TRS ID.""",
+        description="""The Tool Repository Service (TRS) identifier for the workflow, used to locate and retrieve the workflow from a Galaxy server.""",
         json_schema_extra={
             "linkml_meta": {"alias": "trs_id", "domain_of": ["Workflow"]}
         },
     )
     categories: List[WorkflowCategoryId] = Field(
         default=...,
-        description="""The IDs of the categories the workflow belongs to.""",
+        description="""List of category identifiers that this workflow belongs to, determining how it is organized and displayed in the BRC Analytics interface.""",
         json_schema_extra={
             "linkml_meta": {"alias": "categories", "domain_of": ["Workflow"]}
         },
     )
     workflow_name: str = Field(
         default=...,
-        description="""The display name of the workflow.""",
+        description="""The human-readable display name of the workflow as it will appear in the BRC Analytics interface.""",
         json_schema_extra={
             "linkml_meta": {"alias": "workflow_name", "domain_of": ["Workflow"]}
         },
     )
     workflow_description: str = Field(
         default=...,
-        description="""The description of the workflow.""",
+        description="""A detailed description of the workflow's purpose, functionality, and expected outputs for users.""",
         json_schema_extra={
             "linkml_meta": {"alias": "workflow_description", "domain_of": ["Workflow"]}
         },
     )
     ploidy: WorkflowPloidy = Field(
         default=...,
-        description="""The ploidy supported by the workflow.""",
+        description="""The ploidy state (number of chromosome sets) that this workflow is designed to work with, ensuring compatibility with organism data.""",
         json_schema_extra={
             "linkml_meta": {"alias": "ploidy", "domain_of": ["Organism", "Workflow"]}
         },
     )
     taxonomy_id: Optional[int] = Field(
         default=None,
-        description="""The NCBI ID of the taxon supported by the workflow.""",
+        description="""The NCBI Taxonomy ID of the organism this workflow is designed for. If specified, the workflow will be available for all assemblies with this ID in their taxonomic lineage.""",
         json_schema_extra={
             "linkml_meta": {
                 "alias": "taxonomy_id",
@@ -548,14 +548,14 @@ class Workflow(ConfiguredBaseModel):
     )
     parameters: List[WorkflowParameter] = Field(
         default=...,
-        description="""The parameters of the workflow.""",
+        description="""Collection of input parameters that will be passed to the workflow when it is executed, including data sources and configuration options.""",
         json_schema_extra={
             "linkml_meta": {"alias": "parameters", "domain_of": ["Workflow"]}
         },
     )
     active: bool = Field(
         default=...,
-        description="""Determines if workflow should be included.""",
+        description="""Boolean flag that determines if the workflow should be included in the BRC Analytics interface. Used to manage visibility of workflows that may be under development or deprecated.""",
         json_schema_extra={
             "linkml_meta": {"alias": "active", "domain_of": ["Outbreak", "Workflow"]}
         },
@@ -564,7 +564,7 @@ class Workflow(ConfiguredBaseModel):
 
 class WorkflowParameter(ConfiguredBaseModel):
     """
-    A parameter that is provided to a workflow; must include a source for the parameter's value in order to be provided.
+    Definition of an input parameter for a Galaxy workflow, specifying how the parameter value should be determined when the workflow is executed.
     """
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
@@ -575,28 +575,28 @@ class WorkflowParameter(ConfiguredBaseModel):
 
     key: str = Field(
         default=...,
-        description="""The key in which the parameter will be set.""",
+        description="""The identifier for the parameter as expected by the Galaxy workflow, used to map the parameter value to the correct input.""",
         json_schema_extra={
             "linkml_meta": {"alias": "key", "domain_of": ["WorkflowParameter"]}
         },
     )
     variable: Optional[WorkflowParameterVariable] = Field(
         default=None,
-        description="""A variable to substitute in as the value of the parameter.""",
+        description="""A predefined variable that will be substituted as the value of the parameter at runtime, such as assembly information.""",
         json_schema_extra={
             "linkml_meta": {"alias": "variable", "domain_of": ["WorkflowParameter"]}
         },
     )
     url_spec: Optional[WorkflowUrlSpec] = Field(
         default=None,
-        description="""A direct URL specification for the parameter.""",
+        description="""A direct URL specification for the parameter, allowing for external data sources to be provided to the workflow.""",
         json_schema_extra={
             "linkml_meta": {"alias": "url_spec", "domain_of": ["WorkflowParameter"]}
         },
     )
     type_guide: Optional[Any] = Field(
         default=None,
-        description="""Arbitrary data describing the type of the parameter, intended only as convenient reference for maintainers.""",
+        description="""Arbitrary data describing the expected type and format of the parameter, intended as a reference for catalog maintainers and not used in workflow execution.""",
         json_schema_extra={
             "linkml_meta": {"alias": "type_guide", "domain_of": ["WorkflowParameter"]}
         },
@@ -605,7 +605,7 @@ class WorkflowParameter(ConfiguredBaseModel):
 
 class WorkflowUrlSpec(ConfiguredBaseModel):
     """
-    A URL specification for a workflow parameter.
+    Definition of a URL-based data source for a workflow parameter, typically used for reference data or external resources.
     """
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
@@ -616,21 +616,21 @@ class WorkflowUrlSpec(ConfiguredBaseModel):
 
     ext: str = Field(
         default=...,
-        description="""The file extension of the URL.""",
+        description="""The file extension of the resource at the URL, which determines how Galaxy will interpret the data (e.g., 'fasta', 'gff', 'tabular').""",
         json_schema_extra={
             "linkml_meta": {"alias": "ext", "domain_of": ["WorkflowUrlSpec"]}
         },
     )
     src: str = Field(
         default=...,
-        description="""The source type, typically 'url'.""",
+        description="""The source type for the parameter, typically 'url' to indicate an external URL source rather than a Galaxy dataset or other source type.""",
         json_schema_extra={
             "linkml_meta": {"alias": "src", "domain_of": ["WorkflowUrlSpec"]}
         },
     )
     url: str = Field(
         default=...,
-        description="""The URL to the resource.""",
+        description="""The complete URL (including http/https protocol) to the external resource that will be used as input to the workflow.""",
         json_schema_extra={
             "linkml_meta": {
                 "alias": "url",

@@ -1,6 +1,6 @@
 id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/assemblies.yaml#
 name: assemblies
-description: Schema for source assembly list.
+description: Schema for defining genomic assemblies available in the BRC Analytics platform.
 
 prefixes:
   linkml: https://w3id.org/linkml/
@@ -10,19 +10,19 @@ imports:
 
 classes:
   Assemblies:
-    description: Object containing list of assemblies.
+    description: Root object containing a collection of genomic assembly definitions for the BRC Analytics platform.
     tree_root: true
     attributes:
       assemblies:
-        description: List of assemblies.
+        description: Collection of genomic assembly entries that will be available for analysis in the BRC Analytics platform.
         required: true
         multivalued: true
         range: Assembly
 
   Assembly:
-    description: An assembly.
+    description: Definition of a genomic assembly with its unique identifier.
     attributes:
       accession:
-        description: The assembly's accession.
+        description: The unique accession identifier for the assembly (e.g., GCA_000001405.28 for GRCh38), used to retrieve the assembly data from public repositories.
         required: true
         range: string

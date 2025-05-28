@@ -9,21 +9,21 @@ export const Stepper = ({ workflow, ...props }: Props): JSX.Element => {
   const { activeStep, onContinue, onEdit } = useStepper(steps);
   return (
     <StyledStepper activeStep={activeStep} {...STEPPER_PROPS}>
-      {steps.map(({ key, label, Step, ...stepProps }, i) => {
+      {steps.map(({ description, disabled, label, Step }, i) => {
         const active = activeStep === i;
         const completed = activeStep > i;
         return (
           <Step
-            key={key}
+            key={i}
             active={active}
             completed={completed}
-            entryKey={key}
+            description={description}
+            disabled={disabled}
             entryLabel={label}
             index={i}
             onContinue={onContinue}
             onEdit={onEdit}
             workflow={workflow}
-            {...stepProps}
             {...props}
           />
         );

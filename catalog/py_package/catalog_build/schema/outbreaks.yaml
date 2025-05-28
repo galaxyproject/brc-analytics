@@ -1,6 +1,6 @@
 id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/outbreaks.yaml#
 name: outbreaks
-description: Schema for source outbreak info.
+description: Schema for defining outbreak and pathogen information used in the BRC Analytics platform.
 
 prefixes:
   linkml: https://w3id.org/linkml/
@@ -12,70 +12,70 @@ imports:
 
 classes:
   Outbreaks:
-    description: Object containing list of outbreaks.
+    description: Root object containing a collection of pathogen definitions for the BRC Analytics platform to highlight as outbreaks/priority pathogens.
     tree_root: true
     attributes:
       outbreaks:
-        description: List of outbreaks.
+        description: Collection of pathogen entries that will be displayed in the BRC Analytics platform as outbreaks/priority pathogens.
         required: true
         multivalued: true
         range: Outbreak
 
   Outbreak:
-    description: Info for an outbreak.
+    description: Definition of a priority pathogen with its taxonomic classification, priority level, and associated resources.
     attributes:
       name:
-        description: The name of the outbreak/ pathogen.
+        description: The display name of the pathogen as it will appear in the BRC Analytics interface.
         required: true
         range: string
       taxonomy_id:
-        description: The outbreak's NCBI taxonomy ID.
+        description: The NCBI Taxonomy ID for the pathogen. Used to link to relevant genomic data and workflows.
         required: true
         range: integer
       priority:
-        description: The priority of the outbreak.
+        description: The priority level of the pathogen, which determines its visibility and prominence in the BRC Analytics interface.
         required: true
         range: OutbreakPriority
       resources:
-        description: The resources associated with the outbreak.
+        description: Collection of external resources (references, tools, databases) related to the pathogen.
         required: true
         multivalued: true
         range: OutbreakResource
       description:
-        description: The description of the outbreak.
+        description: Reference to a markdown file containing detailed information about the pathogen.
         required: true
         range: MarkdownFileReference
       active:
-        description: Determines if outbreak should be included, as they presumably change over time.
+        description: Boolean flag that determines if the pathogen should be included in the BRC Analytics interface. Used to manage visibility as pathogen relevance changes over time.
         required: true
         range: boolean
       highlight_descendant_taxonomy_ids:
-        description: Taxonomy IDs of child taxa that should be highlighted.
+        description: List of NCBI Taxonomy IDs for descendant taxa (e.g., specific strains or serotypes) that should be highlighted within the outbreak category.
         required: false
         multivalued: true
         range: integer
 
   OutbreakResource:
-    description: A resource associated with an outbreak.
+    description: Definition of an external resource (reference, tool, database) associated with a priority pathogen.
     attributes:
       url:
-        description: The URL of the resource.
+        description: The complete URL (including http/https protocol) to the external resource.
         required: true
         range: string
       title:
-        description: The title of the resource.
+        description: The display title for the resource link as it will appear in the BRC Analytics interface.
         required: true
         range: string
       type:
-        description: The type of the resource.
+        description: The category or type of the resource (e.g., REFERENCE, TOOL, DATABASE), which determines how it is displayed and organized.
         required: true
         range: OutbreakResourceType
 
   MarkdownFileReference:
-    description: A reference to a markdown file
+    description: A reference to a markdown file containing detailed content about a priority pathogen.
     attributes:
       path:
-        description: Path to the markdown file
+        description: Relative path to the markdown file from the project root. Must end with .md extension.
         required: true
         range: string
         pattern: '.*\.md$'
