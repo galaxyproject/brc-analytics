@@ -605,24 +605,30 @@ def report_inconsistent_taxonomy_ids(df):
 
 def do_taxonomy_tree_checks(tree, assembly_count):
     zero_assemblies_taxa = []
+    leaves_missing_species = []
 
     def check_node(node):
         if node["assembly_count"] == 0:
             zero_assemblies_taxa.append(node["ncbi_tax_id"])
-        if node["children"]:
+        if node["rank"] == "species" or len(node["children"]) == 0:
+            assembly_count = node["assembly_count"]
+            if node["rank"] != "species":
+                leaves_missing_species.append(node["ncbi_tax_id"])
+        else:
             assembly_count = 0
             for child_node in node["children"]:
                 assembly_count += check_node(child_node)
-        else:
-            assembly_count = node["assembly_count"]
         return assembly_count
 
     combined_assembly_count = check_node(tree)
 
     return {
-        "assemblies_actual_vs_expected": None
-        if combined_assembly_count == assembly_count
-        else (combined_assembly_count, assembly_count),
+        "assemblies_actual_vs_expected": (
+            None
+            if combined_assembly_count == assembly_count
+            else (combined_assembly_count, assembly_count)
+        ),
+        "leaves_missing_species": leaves_missing_species,
         "zero_assemblies_taxa": zero_assemblies_taxa,
     }
 
@@ -974,13 +980,19 @@ def make_qc_report(
         tree_assemblies_actual_vs_expected = tree_checks[
             "assemblies_actual_vs_expected"
         ]
+        tree_leaves_missing_species = tree_checks["leaves_missing_species"]
         tree_zero_assemblies_taxa = tree_checks["zero_assemblies_taxa"]
         tree_checks_text = "Assembly count mismatch: " + (
             "None"
             if tree_assemblies_actual_vs_expected is None
-            else f"Found combined assembly count of {tree_assemblies_actual_vs_expected[0]} among leaf nodes, expected {tree_assemblies_actual_vs_expected[1]}\n\n"
+            else f"Found combined assembly count of {tree_assemblies_actual_vs_expected[0]} among nodes of species rank, expected {tree_assemblies_actual_vs_expected[1]}"
         )
-        tree_checks_text += "Taxa with assembly count 0: " + (
+        tree_checks_text += "\n\nList of leaves without species in lineage: " + (
+            "None"
+            if not tree_leaves_missing_species
+            else ", ".join(tree_leaves_missing_species)
+        )
+        tree_checks_text += "\n\nList of taxa with assembly count 0: " + (
             "None"
             if not tree_zero_assemblies_taxa
             else ", ".join(tree_zero_assemblies_taxa)
