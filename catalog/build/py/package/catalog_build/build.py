@@ -603,21 +603,33 @@ def report_inconsistent_taxonomy_ids(df):
     return inconsistent_ids_strings
 
 
-def do_taxonomy_tree_checks(tree, assembly_count):
+def do_taxonomy_tree_checks(tree, taxonomic_levels, assembly_count):
     zero_assemblies_taxa = []
     leaves_missing_species = []
+    present_ranks = set()
 
-    def check_node(node):
+    def check_node(node, lineage_has_species=False):
+        present_ranks.add(node["rank"])
+
         if node["assembly_count"] == 0:
             zero_assemblies_taxa.append(node["ncbi_tax_id"])
-        if node["rank"] == "species" or len(node["children"]) == 0:
+
+        if node["rank"] == "species":
+            lineage_has_species = True
+
+        if len(node["children"]) == 0:
             assembly_count = node["assembly_count"]
-            if node["rank"] != "species":
+            if not lineage_has_species:
                 leaves_missing_species.append(node["ncbi_tax_id"])
+        elif node["rank"] == "species":
+            assembly_count = node["assembly_count"]
+            for child_node in node["children"]:
+                check_node(child_node, lineage_has_species)
         else:
             assembly_count = 0
             for child_node in node["children"]:
-                assembly_count += check_node(child_node)
+                assembly_count += check_node(child_node, lineage_has_species)
+
         return assembly_count
 
     combined_assembly_count = check_node(tree)
@@ -630,6 +642,7 @@ def do_taxonomy_tree_checks(tree, assembly_count):
         ),
         "leaves_missing_species": leaves_missing_species,
         "zero_assemblies_taxa": zero_assemblies_taxa,
+        "missing_ranks": set(taxonomic_levels) - present_ranks,
     }
 
 
@@ -982,6 +995,7 @@ def make_qc_report(
         ]
         tree_leaves_missing_species = tree_checks["leaves_missing_species"]
         tree_zero_assemblies_taxa = tree_checks["zero_assemblies_taxa"]
+        tree_missing_ranks = tree_checks["missing_ranks"]
         tree_checks_text = "Assembly count mismatch: " + (
             "None"
             if tree_assemblies_actual_vs_expected is None
@@ -996,6 +1010,10 @@ def make_qc_report(
             "None"
             if not tree_zero_assemblies_taxa
             else ", ".join(tree_zero_assemblies_taxa)
+        )
+        tree_checks_text += (
+            "\n\nList of taxonomic levels specified in parameters but absent in tree: "
+            + ("None" if not tree_missing_ranks else ", ".join(tree_missing_ranks))
         )
     return (
         f"# Catalog QC report\n\n"
@@ -1294,7 +1312,7 @@ def build_files(
             json.dump(species_tree, outfile, indent=4, sort_keys=True)
         print(f"Wrote to {tree_output_path}")
         qc_report_params["tree_checks"] = do_taxonomy_tree_checks(
-            species_tree, genomes_df.shape[0]
+            species_tree, taxonomic_levels_for_tree, genomes_df.shape[0]
         )
 
     if organisms_path is not None:
