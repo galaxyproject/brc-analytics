@@ -139,7 +139,7 @@
             "type": "object"
         }
     },
-    "$id": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/outbreaks.yaml#",
+    "$id": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/outbreaks.yaml#",
     "$schema": "https://json-schema.org/draft/2019-09/schema",
     "additionalProperties": true,
     "description": "Root object containing a collection of pathogen definitions for the BRC Analytics platform to highlight as outbreaks/priority pathogens.",

@@ -33,7 +33,7 @@ jobs:
         run: pip install -r ./catalog/build/py/requirements.txt
       - name: Run linkml-lint
         # Run linting on the LinkML schemas, to enforce conventions such as in naming, and to catch simple errors.
-        run: linkml-lint ./catalog/schema --validate --verbose
+        run: npm run lint-schema
       - name: Test LinkML Python generation
         # Generate Python code from the main LinkML schemas, discarding the output; this will catch more subtle errors such as references to nonexistent elements.
         run: npm run test-gen-python

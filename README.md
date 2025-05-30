@@ -75,7 +75,7 @@ These values will be substituted with assembly-specific values at runtime.
 
 ## Editing the LinkML schemas
 
-If the LinkML schemas in `catalog/schema` are edited, the derived JSON schemas and TypeScript definitions should be
+If the LinkML schemas in `catalog/py_package/catalog_build/schema` are edited, the derived JSON schemas and TypeScript definitions should be
 updated
 as follows:
 

@@ -44,9 +44,9 @@ class LinkMLMeta(RootModel):
 
 linkml_meta = LinkMLMeta(
     {
-        "default_prefix": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/schema.yaml#",
+        "default_prefix": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/schema.yaml#",
         "description": "Combined source data schemas.",
-        "id": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/schema.yaml#",
+        "id": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/schema.yaml#",
         "imports": [
             "./assemblies",
             "./organisms",
@@ -61,7 +61,7 @@ linkml_meta = LinkMLMeta(
                 "prefix_reference": "https://w3id.org/linkml/",
             }
         },
-        "source_file": "./catalog/schema/schema.yaml",
+        "source_file": "/Users/hunter/git-repos/brc-analytics/catalog/py_package/catalog_build/schema_utils/../schema/schema.yaml",
     }
 )
 
@@ -146,7 +146,7 @@ class Assemblies(ConfiguredBaseModel):
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
         {
-            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/assemblies.yaml#",
+            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/assemblies.yaml#",
             "tree_root": True,
         }
     )
@@ -167,7 +167,7 @@ class Assembly(ConfiguredBaseModel):
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
         {
-            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/assemblies.yaml#"
+            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/assemblies.yaml#"
         }
     )
 
@@ -187,7 +187,7 @@ class Organisms(ConfiguredBaseModel):
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
         {
-            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/organisms.yaml#",
+            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/organisms.yaml#",
             "tree_root": True,
         }
     )
@@ -208,7 +208,7 @@ class Organism(ConfiguredBaseModel):
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
         {
-            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/organisms.yaml#"
+            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/organisms.yaml#"
         }
     )
 
@@ -238,7 +238,7 @@ class Outbreaks(ConfiguredBaseModel):
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
         {
-            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/outbreaks.yaml#",
+            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/outbreaks.yaml#",
             "tree_root": True,
         }
     )
@@ -259,7 +259,7 @@ class Outbreak(ConfiguredBaseModel):
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
         {
-            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/outbreaks.yaml#"
+            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/outbreaks.yaml#"
         }
     )
 
@@ -333,7 +333,7 @@ class OutbreakResource(ConfiguredBaseModel):
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
         {
-            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/outbreaks.yaml#"
+            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/outbreaks.yaml#"
         }
     )
 
@@ -370,7 +370,7 @@ class MarkdownFileReference(ConfiguredBaseModel):
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
         {
-            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/outbreaks.yaml#"
+            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/outbreaks.yaml#"
         }
     )
 
@@ -402,7 +402,7 @@ class WorkflowCategories(ConfiguredBaseModel):
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
         {
-            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/workflow_categories.yaml#",
+            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/workflow_categories.yaml#",
             "tree_root": True,
         }
     )
@@ -426,7 +426,7 @@ class WorkflowCategory(ConfiguredBaseModel):
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
         {
-            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/workflow_categories.yaml#"
+            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/workflow_categories.yaml#"
         }
     )
 
@@ -476,7 +476,7 @@ class Workflows(ConfiguredBaseModel):
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
         {
-            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/workflows.yaml#",
+            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/workflows.yaml#",
             "tree_root": True,
         }
     )
@@ -497,7 +497,7 @@ class Workflow(ConfiguredBaseModel):
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
         {
-            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/workflows.yaml#"
+            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/workflows.yaml#"
         }
     )
 
@@ -569,7 +569,7 @@ class WorkflowParameter(ConfiguredBaseModel):
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
         {
-            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/workflows.yaml#"
+            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/workflows.yaml#"
         }
     )
 
@@ -610,7 +610,7 @@ class WorkflowUrlSpec(ConfiguredBaseModel):
 
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
         {
-            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/workflows.yaml#"
+            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/workflows.yaml#"
         }
     )
 

@@ -6,7 +6,8 @@ from typing import Dict
 
 import requests
 import yaml
-from generated_schema.schema import (
+
+from .generated_schema.schema import (
     Workflow,
     WorkflowCategoryId,
     WorkflowParameter,
@@ -15,7 +16,6 @@ from generated_schema.schema import (
 )
 
 URL = "https://iwc.galaxyproject.org/workflow_manifest.json"
-WORKFLOWS_PATH = "catalog/source/workflows.yml"
 DOCKSTORE_COLLECTION_TO_CATEGORY = {
     "Variant Calling": WorkflowCategoryId.VARIANT_CALLING,
     "Transcriptomics": WorkflowCategoryId.TRANSCRIPTOMICS,
@@ -31,9 +31,9 @@ MANIFEST_SOURCE_OF_TRUTH = (
 )
 
 
-def read_existing_yaml():
-    if os.path.exists(WORKFLOWS_PATH):
-        with open(WORKFLOWS_PATH) as fh:
+def read_existing_yaml(workflows_path):
+    if os.path.exists(workflows_path):
+        with open(workflows_path) as fh:
             workflows = Workflows.model_validate(yaml.safe_load(fh)).workflows
     else:
         # start from scratch
@@ -116,8 +116,8 @@ def generate_current_workflows():
     return by_trs_id
 
 
-def merge_into_existing():
-    existing = read_existing_yaml()
+def merge_into_existing(workflows_path):
+    existing = read_existing_yaml(workflows_path)
     current = generate_current_workflows()
     merged: Dict[str, Workflow] = {}
     for versionless_trs_id, current_workflow_input in current.items():
@@ -144,8 +144,8 @@ def merge_into_existing():
     return merged
 
 
-def to_workflows_yaml(exclude_other: bool):
-    by_trs_id = merge_into_existing()
+def to_workflows_yaml(workflows_path: str, exclude_other: bool):
+    by_trs_id = merge_into_existing(workflows_path)
     # sort by trs id, should play nicer with git diffs
     sorted_workflows = list(dict(sorted(by_trs_id.items())).values())
     if exclude_other:
@@ -160,7 +160,7 @@ def to_workflows_yaml(exclude_other: bool):
             final_workflows.append(workflow)
         sorted_workflows = final_workflows
     final_workflows = sorted_workflows
-    with open(WORKFLOWS_PATH, "w") as out:
+    with open(workflows_path, "w") as out:
         yaml.safe_dump(
             Workflows(workflows=final_workflows).model_dump(exclude_none=True),
             out,
@@ -168,7 +168,7 @@ def to_workflows_yaml(exclude_other: bool):
             sort_keys=False,
         )
     # Turns out the YAML style prettier likes is really hard to create in python ...
-    subprocess.run(["npx", "prettier", "--write", WORKFLOWS_PATH])
+    subprocess.run(["npx", "prettier", "--write", workflows_path])
 
 
 if __name__ == "__main__":
@@ -176,9 +176,12 @@ if __name__ == "__main__":
         description="Build workflows.yaml file from latest IWC JSON manifest."
     )
     parser.add_argument(
+        "workflows_path", help="Path of workflows YAML file to read/write."
+    )
+    parser.add_argument(
         "--exclude-other",
         action="store_true",
         help="Exclude other items from processing.",
     )
     args = parser.parse_args()
-    to_workflows_yaml(exclude_other=args.exclude_other)
+    to_workflows_yaml(args.workflows_path, exclude_other=args.exclude_other)

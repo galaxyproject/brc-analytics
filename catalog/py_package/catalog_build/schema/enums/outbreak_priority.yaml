@@ -1,4 +1,4 @@
-id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/enums/outbreak_priority.yaml#
+id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/enums/outbreak_priority.yaml#
 name: enums_outbreak_priority
 
 enums:
