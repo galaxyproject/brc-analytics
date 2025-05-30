@@ -42,18 +42,6 @@ interface NodeDetailsProps {
   onNodeClick?: (node: TreeNode) => void;
 }
 
-function countLeafNodes(node: TreeNode): number {
-  if (!node.children || node.children.length === 0) {
-    return 1;
-  }
-
-  let count = 0;
-  for (const child of node.children) {
-    count += countLeafNodes(child);
-  }
-  return count;
-}
-
 // Helper function to create a filter URL based on taxonomic level and name
 function createFilterUrl(rank?: string, name?: string): LinkProps["url"] {
   // If rank or name is missing, we can't create a filter
@@ -121,7 +109,9 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
   // Create the appropriate display text based on node type
   let filterLinkText = "Browse All Assemblies";
   if (!isRoot) {
-    filterLinkText = `View assemblies for ${nodeName}`;
+    const assemblyCount = node.data.assembly_count;
+    const assemblySuffix = assemblyCount > 1 ? "ies" : "y";
+    filterLinkText = `View ${assemblyCount} Assembl${assemblySuffix} for ${nodeName}`;
   }
 
   return (
@@ -208,7 +198,7 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
                       marginLeft: "8px",
                     }}
                   >
-                    ({countLeafNodes(child)})
+                    ({child.data.assembly_count})
                   </span>
                 </div>
                 <ChevronRightRounded style={{ color: "#666" }} />

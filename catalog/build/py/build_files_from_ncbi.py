@@ -31,6 +31,9 @@ TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
     1913637: "Mucoromycota",
 }
 
+# TAXONOMIC_LEVELS_FOR_TREE should be listed in order, as the order is used in building the taxonomy tree;
+# higher-level categories should be listed earlier than lower-level categories (while categories that are
+# at the same level, such as domain and realm, can be listed in any order relative to each other)
 TAXANOMIC_LEVELS_FOR_TREE = [
     "domain",
     "realm",
