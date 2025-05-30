@@ -171,9 +171,17 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
               Subcategories
             </h4>
 
-            {!isRoot && onClose && (
+            {!isRoot && (
               <div
-                onClick={onClose}
+                onClick={() => {
+                  // Navigate to parent node
+                  if (node.parent && onNodeClick) {
+                    onNodeClick(node.parent);
+                  } else if (onClose) {
+                    // Fallback to onClose if parent is not available
+                    onClose();
+                  }
+                }}
                 style={{
                   alignItems: "center",
                   cursor: "pointer",
