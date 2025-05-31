@@ -171,7 +171,7 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
               Subcategories
             </h4>
 
-            {!isRoot && (
+            {!isRoot && (onNodeClick || onClose) && (
               <div
                 onClick={() => {
                   // Navigate to parent node
