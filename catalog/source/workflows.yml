@@ -49,7 +49,7 @@ workflows:
         type_guide:
           class: integer
     active: false
-  - trs_id: "#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v1.1.5"
+  - trs_id: "#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v1.1.6"
     categories:
       - ASSEMBLY
     workflow_name: Bacterial Genome Assembly using Shovill
@@ -361,12 +361,12 @@ workflows:
     ploidy: HAPLOID
     parameters:
       - key: Paired Collection
+        variable: SANGER_READ_RUN
         type_guide:
           class: Collection
           ext:
             - fastqsanger
             - fastqsanger.gz
-        variable: SANGER_READ_RUN
       - key: Annotation GTF
         variable: GENE_MODEL_URL
       - key: Genome fasta
@@ -614,7 +614,7 @@ workflows:
         type_guide:
           class: text
     active: false
-  - trs_id: "#workflow/github.com/iwc-workflows/quality-and-contamination-control/main/versions/v1.1.6"
+  - trs_id: "#workflow/github.com/iwc-workflows/quality-and-contamination-control/main/versions/v1.1.8"
     categories:
       - ASSEMBLY
     workflow_name: Quality and Contamination Control For Genome Assembly
