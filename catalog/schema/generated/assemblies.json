@@ -2,10 +2,10 @@
     "$defs": {
         "Assemblies": {
             "additionalProperties": false,
-            "description": "Object containing list of assemblies.",
+            "description": "Root object containing a collection of genomic assembly definitions for the BRC Analytics platform.",
             "properties": {
                 "assemblies": {
-                    "description": "List of assemblies.",
+                    "description": "Collection of genomic assembly entries that will be available for analysis in the BRC Analytics platform.",
                     "items": {
                         "$ref": "#/$defs/Assembly"
                     },
@@ -20,10 +20,10 @@
         },
         "Assembly": {
             "additionalProperties": false,
-            "description": "An assembly.",
+            "description": "Definition of a genomic assembly with its unique identifier.",
             "properties": {
                 "accession": {
-                    "description": "The assembly's accession.",
+                    "description": "The unique accession identifier for the assembly (e.g., GCA_000001405.28 for GRCh38), used to retrieve the assembly data from public repositories.",
                     "type": "string"
                 }
             },
@@ -37,11 +37,11 @@
     "$id": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/assemblies.yaml#",
     "$schema": "https://json-schema.org/draft/2019-09/schema",
     "additionalProperties": true,
-    "description": "Object containing list of assemblies.",
+    "description": "Root object containing a collection of genomic assembly definitions for the BRC Analytics platform.",
     "metamodel_version": "1.7.0",
     "properties": {
         "assemblies": {
-            "description": "List of assemblies.",
+            "description": "Collection of genomic assembly entries that will be available for analysis in the BRC Analytics platform.",
             "items": {
                 "$ref": "#/$defs/Assembly"
             },

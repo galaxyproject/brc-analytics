@@ -4,11 +4,11 @@ import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/com
 import { StepProps } from "../types";
 import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Optional/optional";
 import { useEffect } from "react";
+import { STEP } from "./step";
 
 export const ReferenceAssemblyStep = ({
   active,
   completed,
-  entryKey,
   entryLabel,
   genome,
   index,
@@ -17,8 +17,8 @@ export const ReferenceAssemblyStep = ({
   const { accession } = genome;
 
   useEffect(() => {
-    onConfigure(entryKey, entryLabel, [{ key: accession, value: accession }]);
-  }, [accession, entryKey, entryLabel, onConfigure]);
+    onConfigure(STEP.key, accession);
+  }, [accession, entryLabel, onConfigure]);
 
   return (
     <Step active={active} completed={completed} index={index}>

@@ -2,17 +2,17 @@
     "$defs": {
         "Organism": {
             "additionalProperties": false,
-            "description": "Info for an organism.",
+            "description": "Definition of an organism with its taxonomic and genetic characteristics.",
             "properties": {
                 "ploidy": {
-                    "description": "The ploidies that the organism may have.",
+                    "description": "The possible ploidy states (number of chromosome sets) that the organism may have, which determines compatible workflows.",
                     "items": {
                         "$ref": "#/$defs/OrganismPloidy"
                     },
                     "type": "array"
                 },
                 "taxonomy_id": {
-                    "description": "The organism's NCBI taxonomy ID.",
+                    "description": "An NCBI Taxonomy ID at rank 'species'.",
                     "type": "integer"
                 }
             },
@@ -35,10 +35,10 @@
         },
         "Organisms": {
             "additionalProperties": false,
-            "description": "Object containing list of organisms.",
+            "description": "Root object containing a collection of organism definitions for the BRC Analytics platform.",
             "properties": {
                 "organisms": {
-                    "description": "List of organisms.",
+                    "description": "Collection of organism entries that will be available in the BRC Analytics platform.",
                     "items": {
                         "$ref": "#/$defs/Organism"
                     },
@@ -55,11 +55,11 @@
     "$id": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/organisms.yaml#",
     "$schema": "https://json-schema.org/draft/2019-09/schema",
     "additionalProperties": true,
-    "description": "Object containing list of organisms.",
+    "description": "Root object containing a collection of organism definitions for the BRC Analytics platform.",
     "metamodel_version": "1.7.0",
     "properties": {
         "organisms": {
-            "description": "List of organisms.",
+            "description": "Collection of organism entries that will be available in the BRC Analytics platform.",
             "items": {
                 "$ref": "#/$defs/Organism"
             },

@@ -5,11 +5,10 @@ import { useDialog } from "@databiosphere/findable-ui/lib/components/common/Dial
 import { Props } from "./types";
 import { CollectionSummary } from "./components/CollectionSummary/collectionSummary";
 import { AccessionSelector } from "./components/AccessionSelector/accessionSelector";
+import { STEP } from "../../step";
 
 export const ENASequencingData = ({
   clearErrors,
-  entryKey,
-  entryLabel,
   onConfigure,
   onRequestData,
   status,
@@ -33,8 +32,6 @@ export const ENASequencingData = ({
         status={status}
       />
       <CollectionSelector
-        entryKey={entryKey}
-        entryLabel={entryLabel}
         onClose={collectionDialog.onClose}
         onConfigure={onConfigure}
         open={collectionDialog.open}
@@ -43,7 +40,7 @@ export const ENASequencingData = ({
       />
       <CollectionSummary
         onClear={() => {
-          onConfigure(entryKey, entryLabel, [{ key: null, value: "None" }]);
+          onConfigure(STEP.key, null);
           table.resetRowSelection();
         }}
         onEdit={collectionDialog.onOpen}
