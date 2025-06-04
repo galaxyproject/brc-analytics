@@ -1,4 +1,4 @@
-id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/enums/workflow_type.yaml#
+id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/enums/workflow_type.yaml#
 name: enums_workflow_category_id
 description: Definition of the workflow category ID enum.
 
