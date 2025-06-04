@@ -80,11 +80,8 @@ function createFilterUrl(rank?: string, name?: string): LinkProps["url"] {
     },
   ];
 
-  // Return a Link URL object with href and query parameters
-  return {
-    href: "/data/assemblies",
-    query: encodeURIComponent(JSON.stringify({ filter })),
-  };
+  // Return the link with query params.
+  return `/data/assemblies?filter=${encodeURIComponent(JSON.stringify(filter))}`;
 }
 
 export const NodeDetails: React.FC<NodeDetailsProps> = ({
