@@ -80,8 +80,13 @@ function createFilterUrl(rank?: string, name?: string): LinkProps["url"] {
     },
   ];
 
+  // Create the URLSearchParams object.
+  const params = new URLSearchParams({
+    filter: JSON.stringify(filter),
+  });
+
   // Return the link with query params.
-  return `/data/assemblies?filter=${encodeURIComponent(JSON.stringify(filter))}`;
+  return `/data/assemblies?${params.toString()}`;
 }
 
 export const NodeDetails: React.FC<NodeDetailsProps> = ({
