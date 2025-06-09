@@ -1,4 +1,4 @@
-id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/schema.yaml#
+id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/schema.yaml#
 name: schema
 description: Combined source data schemas.
 

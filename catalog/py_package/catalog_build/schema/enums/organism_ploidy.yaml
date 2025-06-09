@@ -1,4 +1,4 @@
-id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/enums/organism_ploidy.yaml#
+id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/enums/organism_ploidy.yaml#
 name: enums_organism_ploidy
 
 enums:

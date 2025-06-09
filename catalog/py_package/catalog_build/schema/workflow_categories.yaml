@@ -1,4 +1,4 @@
-id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/schema/workflow_categories.yaml#
+id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/workflow_categories.yaml#
 name: workflow_categories
 description: Schema for defining workflow categories used to organize Galaxy workflows in the BRC Analytics platform.
 
