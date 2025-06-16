@@ -2463,6 +2463,7 @@ assemblies:
   - accession: GCF_002815935.1
   - accession: GCF_000854405.1
   - accession: GCF_000855785.1
+  - accession: GCF_000850405.1
   # heartland virus
   - accession: GCF_013086545.1
   - accession: GCF_000922255.1
@@ -3316,5 +3317,7 @@ assemblies:
   - accession: GCF_000850985.1
   - accession: GCA_014883335.1
   - accession: GCA_001629985.1
+  - accession: GCF_000854165.1
   # Phlebovirus
   - accession: GCF_001019855.1
+  - accession: GCA_031497085.1

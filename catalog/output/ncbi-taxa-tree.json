@@ -1,5 +1,5 @@
 {
-    "assembly_count": 1590,
+    "assembly_count": 1593,
     "children": [
         {
             "assembly_count": 201,
@@ -1311,7 +1311,7 @@
                                                             "rank": "genus"
                                                         },
                                                         {
-                                                            "assembly_count": 6,
+                                                            "assembly_count": 7,
                                                             "children": [
                                                                 {
                                                                     "assembly_count": 1,
@@ -1364,6 +1364,21 @@
                                                                         {
                                                                             "assembly_count": 1,
                                                                             "children": [],
+                                                                            "name": "Ehrlichia sennetsu str. Miyayama",
+                                                                            "ncbi_tax_id": "222891",
+                                                                            "rank": "strain"
+                                                                        }
+                                                                    ],
+                                                                    "name": "Ehrlichia sennetsu",
+                                                                    "ncbi_tax_id": "951",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
                                                                             "name": "Ehrlichia muris AS145",
                                                                             "ncbi_tax_id": "1423892",
                                                                             "rank": "strain"
@@ -1390,29 +1405,6 @@
                                                             ],
                                                             "name": "Ehrlichia",
                                                             "ncbi_tax_id": "943",
-                                                            "rank": "genus"
-                                                        },
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [
-                                                                        {
-                                                                            "assembly_count": 1,
-                                                                            "children": [],
-                                                                            "name": "Neorickettsia sennetsu str. Miyayama",
-                                                                            "ncbi_tax_id": "222891",
-                                                                            "rank": "strain"
-                                                                        }
-                                                                    ],
-                                                                    "name": "Neorickettsia sennetsu",
-                                                                    "ncbi_tax_id": "951",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Neorickettsia",
-                                                            "ncbi_tax_id": "33993",
                                                             "rank": "genus"
                                                         }
                                                     ],
@@ -11249,7 +11241,7 @@
                                                         {
                                                             "assembly_count": 1,
                                                             "children": [],
-                                                            "name": "Giardia intestinalis ATCC 50581",
+                                                            "name": "Giardia duodenalis ATCC 50581",
                                                             "ncbi_tax_id": "598745",
                                                             "rank": "strain"
                                                         },
@@ -11261,7 +11253,7 @@
                                                             "rank": "strain"
                                                         }
                                                     ],
-                                                    "name": "Giardia intestinalis",
+                                                    "name": "Giardia duodenalis",
                                                     "ncbi_tax_id": "5741",
                                                     "rank": "species"
                                                 },
@@ -12217,13 +12209,13 @@
             "rank": "species"
         },
         {
-            "assembly_count": 351,
+            "assembly_count": 354,
             "children": [
                 {
-                    "assembly_count": 337,
+                    "assembly_count": 340,
                     "children": [
                         {
-                            "assembly_count": 154,
+                            "assembly_count": 157,
                             "children": [
                                 {
                                     "assembly_count": 53,
@@ -12364,8 +12356,8 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Langya virus",
-                                                                    "ncbi_tax_id": "2971765",
+                                                                    "name": "Parahenipavirus langyaense",
+                                                                    "ncbi_tax_id": "3431360",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -12749,10 +12741,10 @@
                                     "rank": "class"
                                 },
                                 {
-                                    "assembly_count": 83,
+                                    "assembly_count": 86,
                                     "children": [
                                         {
-                                            "assembly_count": 83,
+                                            "assembly_count": 86,
                                             "children": [
                                                 {
                                                     "assembly_count": 11,
@@ -12835,16 +12827,23 @@
                                                     "rank": "family"
                                                 },
                                                 {
-                                                    "assembly_count": 29,
+                                                    "assembly_count": 30,
                                                     "children": [
                                                         {
-                                                            "assembly_count": 27,
+                                                            "assembly_count": 28,
                                                             "children": [
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
                                                                     "name": "Hantavirus Z10",
                                                                     "ncbi_tax_id": "93830",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Orthohantavirus andesense",
+                                                                    "ncbi_tax_id": "1980456",
                                                                     "rank": "species"
                                                                 },
                                                                 {
@@ -13055,7 +13054,7 @@
                                                     "rank": "family"
                                                 },
                                                 {
-                                                    "assembly_count": 15,
+                                                    "assembly_count": 16,
                                                     "children": [
                                                         {
                                                             "assembly_count": 14,
@@ -13063,22 +13062,8 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Beiji nairovirus",
-                                                                    "ncbi_tax_id": "2304647",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
                                                                     "name": "Camel Crimean-Congo hemorrhagic fever orthonairovirus",
                                                                     "ncbi_tax_id": "2770106",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Songling virus",
-                                                                    "ncbi_tax_id": "2795181",
                                                                     "rank": "species"
                                                                 },
                                                                 {
@@ -13093,6 +13078,13 @@
                                                                     "children": [],
                                                                     "name": "Orthonairovirus erveense",
                                                                     "ncbi_tax_id": "3052515",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Orthonairovirus haemorrhagiae",
+                                                                    "ncbi_tax_id": "3052518",
                                                                     "rank": "species"
                                                                 },
                                                                 {
@@ -13147,6 +13139,13 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
+                                                                    "name": "Orthonairovirus songlingense",
+                                                                    "ncbi_tax_id": "3060504",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
                                                                     "name": "Orthonairovirus yezoense",
                                                                     "ncbi_tax_id": "3060506",
                                                                     "rank": "species"
@@ -13157,13 +13156,20 @@
                                                             "rank": "genus"
                                                         },
                                                         {
-                                                            "assembly_count": 1,
+                                                            "assembly_count": 2,
                                                             "children": [
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
                                                                     "name": "Norwavirus grotenhoutense",
                                                                     "ncbi_tax_id": "3052362",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Norwavirus beijiense",
+                                                                    "ncbi_tax_id": "3060422",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -13263,10 +13269,10 @@
                                                     "rank": "family"
                                                 },
                                                 {
-                                                    "assembly_count": 16,
+                                                    "assembly_count": 17,
                                                     "children": [
                                                         {
-                                                            "assembly_count": 10,
+                                                            "assembly_count": 11,
                                                             "children": [
                                                                 {
                                                                     "assembly_count": 1,
@@ -13322,6 +13328,13 @@
                                                                     "children": [],
                                                                     "name": "Phlebovirus toroense",
                                                                     "ncbi_tax_id": "3052684",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Phlebovirus toscanaense",
+                                                                    "ncbi_tax_id": "3052686",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -13559,36 +13572,36 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Changuinola virus",
-                                                                    "ncbi_tax_id": "40052",
+                                                                    "name": "Orbivirus alphamitchellense",
+                                                                    "ncbi_tax_id": "3431237",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Corriparta virus",
-                                                                    "ncbi_tax_id": "40053",
+                                                                    "name": "Orbivirus changuinolaense",
+                                                                    "ncbi_tax_id": "3431241",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Lebombo virus",
-                                                                    "ncbi_tax_id": "40057",
+                                                                    "name": "Orbivirus lebomboense",
+                                                                    "ncbi_tax_id": "3431248",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Orungo virus",
-                                                                    "ncbi_tax_id": "40058",
+                                                                    "name": "Orbivirus magninsulae",
+                                                                    "ncbi_tax_id": "3431249",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Great Island virus",
-                                                                    "ncbi_tax_id": "204269",
+                                                                    "name": "Orbivirus orungoense",
+                                                                    "ncbi_tax_id": "3431250",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -13602,29 +13615,29 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Rotavirus A",
-                                                                    "ncbi_tax_id": "28875",
+                                                                    "name": "Rotavirus alphagastroenteritidis",
+                                                                    "ncbi_tax_id": "3432193",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Rotavirus B",
-                                                                    "ncbi_tax_id": "28876",
+                                                                    "name": "Rotavirus aspergastroenteritidis",
+                                                                    "ncbi_tax_id": "3432194",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Rotavirus C",
-                                                                    "ncbi_tax_id": "36427",
+                                                                    "name": "Rotavirus betagastroenteritidis",
+                                                                    "ncbi_tax_id": "3432195",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Rotavirus H",
-                                                                    "ncbi_tax_id": "1348384",
+                                                                    "name": "Rotavirus tritogastroenteritidis",
+                                                                    "ncbi_tax_id": "3432203",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -13659,17 +13672,17 @@
                                                             "assembly_count": 3,
                                                             "children": [
                                                                 {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Nelson Bay orthoreovirus",
-                                                                    "ncbi_tax_id": "118027",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
                                                                     "assembly_count": 2,
                                                                     "children": [],
                                                                     "name": "Mammalian orthoreovirus",
                                                                     "ncbi_tax_id": "351073",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Orthoreovirus nelsonense",
+                                                                    "ncbi_tax_id": "3431496",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -13784,29 +13797,8 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Barmah Forest virus",
-                                                                    "ncbi_tax_id": "11020",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
                                                                     "name": "Eastern equine encephalitis virus",
                                                                     "ncbi_tax_id": "11021",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Ross River virus",
-                                                                    "ncbi_tax_id": "11029",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Semliki Forest virus",
-                                                                    "ncbi_tax_id": "11033",
                                                                     "rank": "species"
                                                                 },
                                                                 {
@@ -13831,27 +13823,6 @@
                                                                     "rank": "species"
                                                                 },
                                                                 {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Chikungunya virus",
-                                                                    "ncbi_tax_id": "37124",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Mayaro virus",
-                                                                    "ncbi_tax_id": "59301",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 2,
-                                                                    "children": [],
-                                                                    "name": "Madariaga virus",
-                                                                    "ncbi_tax_id": "1440170",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
                                                                     "assembly_count": 3,
                                                                     "children": [],
                                                                     "name": "Onyong-nyong virus",
@@ -13861,8 +13832,50 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Caaingua virus",
-                                                                    "ncbi_tax_id": "2499242",
+                                                                    "name": "Alphavirus barmah",
+                                                                    "ncbi_tax_id": "3426294",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Alphavirus caaingua",
+                                                                    "ncbi_tax_id": "3426296",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Alphavirus chikungunya",
+                                                                    "ncbi_tax_id": "3426298",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 2,
+                                                                    "children": [],
+                                                                    "name": "Alphavirus madariaga",
+                                                                    "ncbi_tax_id": "3426305",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Alphavirus mayaro",
+                                                                    "ncbi_tax_id": "3426306",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Alphavirus rossriver",
+                                                                    "ncbi_tax_id": "3426314",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Alphavirus semliki",
+                                                                    "ncbi_tax_id": "3426317",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -14128,15 +14141,15 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Human coronavirus 229E",
-                                                                    "ncbi_tax_id": "11137",
+                                                                    "name": "Alphacoronavirus chicagoense",
+                                                                    "ncbi_tax_id": "3433756",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Human coronavirus NL63",
-                                                                    "ncbi_tax_id": "277944",
+                                                                    "name": "Alphacoronavirus amsterdamense",
+                                                                    "ncbi_tax_id": "3433809",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -14150,13 +14163,6 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Human coronavirus HKU1",
-                                                                    "ncbi_tax_id": "290028",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
                                                                     "name": "Betacoronavirus 1",
                                                                     "ncbi_tax_id": "694003",
                                                                     "rank": "species"
@@ -14164,15 +14170,22 @@
                                                                 {
                                                                     "assembly_count": 2,
                                                                     "children": [],
-                                                                    "name": "Middle East respiratory syndrome-related coronavirus",
-                                                                    "ncbi_tax_id": "1335626",
+                                                                    "name": "Betacoronavirus pandemicum",
+                                                                    "ncbi_tax_id": "3418604",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 2,
                                                                     "children": [],
-                                                                    "name": "Betacoronavirus pandemicum",
-                                                                    "ncbi_tax_id": "3418604",
+                                                                    "name": "Betacoronavirus cameli",
+                                                                    "ncbi_tax_id": "3433633",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Betacoronavirus hongkongense",
+                                                                    "ncbi_tax_id": "3433758",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -14199,20 +14212,6 @@
                                                         {
                                                             "assembly_count": 11,
                                                             "children": [
-                                                                {
-                                                                    "assembly_count": 2,
-                                                                    "children": [],
-                                                                    "name": "Feline calicivirus",
-                                                                    "ncbi_tax_id": "11978",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 2,
-                                                                    "children": [],
-                                                                    "name": "Vesicular exanthema of swine virus",
-                                                                    "ncbi_tax_id": "35612",
-                                                                    "rank": "species"
-                                                                },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
@@ -14261,6 +14260,20 @@
                                                                     "name": "Hom-1 vesivirus",
                                                                     "ncbi_tax_id": "1960046",
                                                                     "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 2,
+                                                                    "children": [],
+                                                                    "name": "Vesivirus exanthema",
+                                                                    "ncbi_tax_id": "3433198",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 2,
+                                                                    "children": [],
+                                                                    "name": "Vesivirus felis",
+                                                                    "ncbi_tax_id": "3433199",
+                                                                    "rank": "species"
                                                                 }
                                                             ],
                                                             "name": "Vesivirus",
@@ -14273,22 +14286,15 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Rabbit hemorrhagic disease virus",
-                                                                    "ncbi_tax_id": "11976",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "European brown hare syndrome virus",
-                                                                    "ncbi_tax_id": "33756",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
                                                                     "name": "Rabbit calicivirus Australia 1 MIC-07",
                                                                     "ncbi_tax_id": "576948",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 2,
+                                                                    "children": [],
+                                                                    "name": "Lagovirus europaeus",
+                                                                    "ncbi_tax_id": "3430318",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -14299,13 +14305,6 @@
                                                         {
                                                             "assembly_count": 8,
                                                             "children": [
-                                                                {
-                                                                    "assembly_count": 6,
-                                                                    "children": [],
-                                                                    "name": "Sapporo virus",
-                                                                    "ncbi_tax_id": "95342",
-                                                                    "rank": "species"
-                                                                },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
@@ -14319,6 +14318,13 @@
                                                                     "name": "Bat sapovirus",
                                                                     "ncbi_tax_id": "1959930",
                                                                     "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 6,
+                                                                    "children": [],
+                                                                    "name": "Sapovirus sapporoense",
+                                                                    "ncbi_tax_id": "3432266",
+                                                                    "rank": "species"
                                                                 }
                                                             ],
                                                             "name": "Sapovirus",
@@ -14329,24 +14335,17 @@
                                                             "assembly_count": 21,
                                                             "children": [
                                                                 {
-                                                                    "assembly_count": 19,
-                                                                    "children": [],
-                                                                    "name": "Norwalk virus",
-                                                                    "ncbi_tax_id": "11983",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Primate norovirus",
-                                                                    "ncbi_tax_id": "1903318",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
                                                                     "assembly_count": 1,
                                                                     "children": [],
                                                                     "name": "Marmot norovirus",
                                                                     "ncbi_tax_id": "2161807",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 20,
+                                                                    "children": [],
+                                                                    "name": "Norovirus norwalkense",
+                                                                    "ncbi_tax_id": "3431196",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -14381,8 +14380,8 @@
                                                                 {
                                                                     "assembly_count": 2,
                                                                     "children": [],
-                                                                    "name": "Newbury 1 virus",
-                                                                    "ncbi_tax_id": "2170030",
+                                                                    "name": "Nebovirus newburyense",
+                                                                    "ncbi_tax_id": "3431062",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -14772,29 +14771,29 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Mamastrovirus 1",
-                                                                    "ncbi_tax_id": "1239565",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Mamastrovirus 6",
-                                                                    "ncbi_tax_id": "1239570",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Mamastrovirus 9",
-                                                                    "ncbi_tax_id": "1239573",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
                                                                     "name": "Burkina Faso astrovirus",
                                                                     "ncbi_tax_id": "1518574",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Mamastrovirus hominis",
+                                                                    "ncbi_tax_id": "3430629",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Mamastrovirus melbournense",
+                                                                    "ncbi_tax_id": "3430631",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Mamastrovirus virginiaense",
+                                                                    "ncbi_tax_id": "3430641",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -14910,31 +14909,31 @@
                                                             "assembly_count": 7,
                                                             "children": [
                                                                 {
-                                                                    "assembly_count": 2,
-                                                                    "children": [],
-                                                                    "name": "Primate T-lymphotropic virus 1",
-                                                                    "ncbi_tax_id": "194440",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 2,
-                                                                    "children": [],
-                                                                    "name": "Primate T-lymphotropic virus 2",
-                                                                    "ncbi_tax_id": "194441",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 2,
-                                                                    "children": [],
-                                                                    "name": "Primate T-lymphotropic virus 3",
-                                                                    "ncbi_tax_id": "194443",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
                                                                     "assembly_count": 1,
                                                                     "children": [],
                                                                     "name": "Human T-lymphotropic virus 4",
                                                                     "ncbi_tax_id": "318279",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 2,
+                                                                    "children": [],
+                                                                    "name": "Deltaretrovirus priTlym1",
+                                                                    "ncbi_tax_id": "3428212",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 2,
+                                                                    "children": [],
+                                                                    "name": "Deltaretrovirus priTlym2",
+                                                                    "ncbi_tax_id": "3428213",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 2,
+                                                                    "children": [],
+                                                                    "name": "Deltaretrovirus priTlym3",
+                                                                    "ncbi_tax_id": "3428214",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -15267,7 +15266,7 @@
                     "assembly_count": 141,
                     "children": [
                         {
-                            "assembly_count": 99,
+                            "assembly_count": 98,
                             "children": [
                                 {
                                     "assembly_count": 80,
@@ -15793,13 +15792,13 @@
                                     "rank": "class"
                                 },
                                 {
-                                    "assembly_count": 19,
+                                    "assembly_count": 18,
                                     "children": [
                                         {
-                                            "assembly_count": 19,
+                                            "assembly_count": 18,
                                             "children": [
                                                 {
-                                                    "assembly_count": 19,
+                                                    "assembly_count": 18,
                                                     "children": [
                                                         {
                                                             "assembly_count": 8,
@@ -15852,13 +15851,6 @@
                                                             "name": "Iteradensovirus",
                                                             "ncbi_tax_id": "40122",
                                                             "rank": "genus"
-                                                        },
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [],
-                                                            "name": "Parvovirus NIH-CQV",
-                                                            "ncbi_tax_id": "1341019",
-                                                            "rank": "species"
                                                         },
                                                         {
                                                             "assembly_count": 1,
@@ -15947,27 +15939,20 @@
                             "rank": "phylum"
                         },
                         {
-                            "assembly_count": 42,
+                            "assembly_count": 43,
                             "children": [
                                 {
-                                    "assembly_count": 32,
+                                    "assembly_count": 33,
                                     "children": [
                                         {
-                                            "assembly_count": 18,
+                                            "assembly_count": 17,
                                             "children": [
                                                 {
-                                                    "assembly_count": 18,
+                                                    "assembly_count": 17,
                                                     "children": [
                                                         {
-                                                            "assembly_count": 2,
+                                                            "assembly_count": 1,
                                                             "children": [
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Human circovirus VS6600022",
-                                                                    "ncbi_tax_id": "1525173",
-                                                                    "rank": "species"
-                                                                },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
@@ -16243,6 +16228,68 @@
                                             "name": "Recrevirales",
                                             "ncbi_tax_id": "2732547",
                                             "rank": "order"
+                                        },
+                                        {
+                                            "assembly_count": 1,
+                                            "children": [
+                                                {
+                                                    "assembly_count": 1,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Amaruvirus aka",
+                                                                    "ncbi_tax_id": "3426330",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Amaruvirus",
+                                                            "ncbi_tax_id": "3153056",
+                                                            "rank": "genus"
+                                                        }
+                                                    ],
+                                                    "name": "Pecoviridae",
+                                                    "ncbi_tax_id": "3152143",
+                                                    "rank": "family"
+                                                }
+                                            ],
+                                            "name": "Ringavirales",
+                                            "ncbi_tax_id": "3151844",
+                                            "rank": "order"
+                                        },
+                                        {
+                                            "assembly_count": 1,
+                                            "children": [
+                                                {
+                                                    "assembly_count": 1,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Nicoomyvirus moldensis",
+                                                                    "ncbi_tax_id": "3431103",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Nicoomyvirus",
+                                                            "ncbi_tax_id": "3425078",
+                                                            "rank": "genus"
+                                                        }
+                                                    ],
+                                                    "name": "Oomyviridae",
+                                                    "ncbi_tax_id": "3424666",
+                                                    "rank": "family"
+                                                }
+                                            ],
+                                            "name": "Lineavirales",
+                                            "ncbi_tax_id": "3420544",
+                                            "rank": "order"
                                         }
                                     ],
                                     "name": "Arfiviricetes",
@@ -16407,8 +16454,8 @@
                                                                 {
                                                                     "assembly_count": 12,
                                                                     "children": [],
-                                                                    "name": "African swine fever virus",
-                                                                    "ncbi_tax_id": "10497",
+                                                                    "name": "Asfivirus haemorrhagiae",
+                                                                    "ncbi_tax_id": "3426474",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -16436,13 +16483,6 @@
                                                             "assembly_count": 5,
                                                             "children": [
                                                                 {
-                                                                    "assembly_count": 2,
-                                                                    "children": [],
-                                                                    "name": "Monkeypox virus",
-                                                                    "ncbi_tax_id": "10244",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
                                                                     "assembly_count": 1,
                                                                     "children": [],
                                                                     "name": "Orthopoxvirus vaccinia",
@@ -16452,15 +16492,22 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Variola virus",
-                                                                    "ncbi_tax_id": "10255",
+                                                                    "name": "Orthopoxvirus akhmetapox",
+                                                                    "ncbi_tax_id": "2200830",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 2,
+                                                                    "children": [],
+                                                                    "name": "Orthopoxvirus monkeypox",
+                                                                    "ncbi_tax_id": "3431483",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Orthopoxvirus akhmetapox",
-                                                                    "ncbi_tax_id": "2200830",
+                                                                    "name": "Orthopoxvirus variola",
+                                                                    "ncbi_tax_id": "3431487",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -16474,8 +16521,8 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Orf virus",
-                                                                    "ncbi_tax_id": "10258",
+                                                                    "name": "Parapoxvirus orf",
+                                                                    "ncbi_tax_id": "3431389",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -16489,8 +16536,8 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Molluscum contagiosum virus",
-                                                                    "ncbi_tax_id": "10279",
+                                                                    "name": "Molluscipoxvirus molluscum",
+                                                                    "ncbi_tax_id": "3430922",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -16504,15 +16551,15 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Yaba monkey tumor virus",
-                                                                    "ncbi_tax_id": "38804",
+                                                                    "name": "Yatapoxvirus tanapox",
+                                                                    "ncbi_tax_id": "3433538",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Tanapox virus",
-                                                                    "ncbi_tax_id": "99000",
+                                                                    "name": "Yatapoxvirus yabapox",
+                                                                    "ncbi_tax_id": "3433539",
                                                                     "rank": "species"
                                                                 }
                                                             ],
