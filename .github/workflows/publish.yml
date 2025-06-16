@@ -5,6 +5,9 @@ on:
     branches:
       # - main  # todo, consolidate auth approach and merge dev-deploy into this.
       - production
+  workflow_dispatch:
+    branches:
+      - production
 
 jobs:
   build-and-deploy:

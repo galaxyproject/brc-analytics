@@ -1,5 +1,61 @@
 # Changelog
 
+## [0.11.0](https://github.com/galaxyproject/brc-analytics/compare/v0.10.0...v0.11.0) (2025-01-06)
+
+
+### Features
+
+* move schemas and iwc workflows script to python package ([#540](https://github.com/galaxyproject/brc-analytics/issues/540)) ([#552](https://github.com/galaxyproject/brc-analytics/issues/552)) ([2c9970a](https://github.com/galaxyproject/brc-analytics/commit/2c9970a))
+* generate taxa tree from assemblies and display accurate assembly count in sunburst ([#522](https://github.com/galaxyproject/brc-analytics/issues/522)) ([#550](https://github.com/galaxyproject/brc-analytics/issues/550))
+* add paired collection parameter to haploid variant calling workflow ([#562](https://github.com/galaxyproject/brc-analytics/issues/562)) ([#563](https://github.com/galaxyproject/brc-analytics/issues/563))
+* include hashes in paired collections sent to galaxy ([#470](https://github.com/galaxyproject/brc-analytics/issues/470)) ([#538](https://github.com/galaxyproject/brc-analytics/issues/538))
+* update sunburst colors ([#482](https://github.com/galaxyproject/brc-analytics/issues/482)) ([#549](https://github.com/galaxyproject/brc-analytics/issues/549))
+* improve schema descriptions ([#375](https://github.com/galaxyproject/brc-analytics/issues/375)) ([#541](https://github.com/galaxyproject/brc-analytics/issues/541))
+* add basic hgPhyloPlace links to outbreaks schema ([#528](https://github.com/galaxyproject/brc-analytics/issues/528)) ([#542](https://github.com/galaxyproject/brc-analytics/issues/542))
+* adding niaid biodefense bacteria ([#384](https://github.com/galaxyproject/brc-analytics/issues/384)) ([#486](https://github.com/galaxyproject/brc-analytics/issues/486))
+* highlight prototype pathogen viral families in outbreaks tab ([#525](https://github.com/galaxyproject/brc-analytics/issues/525)) ([#536](https://github.com/galaxyproject/brc-analytics/issues/536))
+* update data catalog to support filtering on outbreak taxa ([#495](https://github.com/galaxyproject/brc-analytics/issues/495)) ([#501](https://github.com/galaxyproject/brc-analytics/issues/501))
+* allow multiple accessions to be specified when getting data from ena ([#513](https://github.com/galaxyproject/brc-analytics/issues/513)) ([#526](https://github.com/galaxyproject/brc-analytics/issues/526))
+* create paired-end workflow configuration step ([#456](https://github.com/galaxyproject/brc-analytics/issues/456)) ([#497](https://github.com/galaxyproject/brc-analytics/issues/497))
+* add outbreaks.json ([#484](https://github.com/galaxyproject/brc-analytics/issues/484)) ([#490](https://github.com/galaxyproject/brc-analytics/issues/490))
+* add support for multiple pairs in `SANGER_READ_RUN` value ([#473](https://github.com/galaxyproject/brc-analytics/issues/473)) ([#487](https://github.com/galaxyproject/brc-analytics/issues/487))
+* visibility and navigation improvements for hierarchical viz ([#289](https://github.com/galaxyproject/brc-analytics/issues/289)) ([#485](https://github.com/galaxyproject/brc-analytics/issues/485))
+* homepage sunburst display of available data ([#289](https://github.com/galaxyproject/brc-analytics/issues/289)) ([#396](https://github.com/galaxyproject/brc-analytics/issues/396))
+* add Release Drafter configuration and publish release workflow ([#478](https://github.com/galaxyproject/brc-analytics/issues/478)) ([#448](https://github.com/galaxyproject/brc-analytics/issues/448))
+* return collection for `SANGER_READ_RUN` workflow parameter variable ([#468](https://github.com/galaxyproject/brc-analytics/issues/468)) ([#469](https://github.com/galaxyproject/brc-analytics/issues/469))
+* adding niaid biodefense viruses ([#383](https://github.com/galaxyproject/brc-analytics/issues/383)) ([#387](https://github.com/galaxyproject/brc-analytics/issues/387))
+* update settings for common name in organisms list and add to assemblies list ([#465](https://github.com/galaxyproject/brc-analytics/issues/465)) ([#467](https://github.com/galaxyproject/brc-analytics/issues/467))
+* add common name column and filter to organisms list ([#463](https://github.com/galaxyproject/brc-analytics/issues/463)) ([#464](https://github.com/galaxyproject/brc-analytics/issues/464))
+* add outbreak schema and initial outbreaks ([#450](https://github.com/galaxyproject/brc-analytics/issues/450)) ([#462](https://github.com/galaxyproject/brc-analytics/issues/462))
+* add species common names to data catalog ([#451](https://github.com/galaxyproject/brc-analytics/issues/451)) ([#458](https://github.com/galaxyproject/brc-analytics/issues/458))
+* add stub of SANGER\_READ\_RUN workflow parameter variable ([#459](https://github.com/galaxyproject/brc-analytics/issues/459)) ([#460](https://github.com/galaxyproject/brc-analytics/issues/460))
+
+
+### Bug Fixes
+
+* make consistent navigation behavior between sunburst and side panel ([#557](https://github.com/galaxyproject/brc-analytics/issues/557)) ([#567](https://github.com/galaxyproject/brc-analytics/issues/567)) ([f0b1f06](https://github.com/galaxyproject/brc-analytics/commit/f0b1f06))
+* counts in sunburst side panel represent assemblies ([#564](https://github.com/galaxyproject/brc-analytics/issues/564)) ([#566](https://github.com/galaxyproject/brc-analytics/issues/566))
+* refreshing on organisms or assemblies page hangs on dev ([#561](https://github.com/galaxyproject/brc-analytics/issues/561)) ([#565](https://github.com/galaxyproject/brc-analytics/issues/565))
+* remove count from sunburst tooltip/link for clarity ([#481](https://github.com/galaxyproject/brc-analytics/issues/481)) ([#545](https://github.com/galaxyproject/brc-analytics/issues/545)) ([#546](https://github.com/galaxyproject/brc-analytics/issues/546))
+* filter labels incorrect for taxonomic level ([#544](https://github.com/galaxyproject/brc-analytics/issues/544)) ([#548](https://github.com/galaxyproject/brc-analytics/issues/548))
+* fix back button behaviour from assemblies back to sunburst on homepage ([#521](https://github.com/galaxyproject/brc-analytics/issues/521)) ([#543](https://github.com/galaxyproject/brc-analytics/issues/543))
+* fix sunburst links to assemblies page ([#520](https://github.com/galaxyproject/brc-analytics/issues/520)) ([#534](https://github.com/galaxyproject/brc-analytics/issues/534))
+* outbreak titles should be explicit ([#494](https://github.com/galaxyproject/brc-analytics/issues/494)) ([#498](https://github.com/galaxyproject/brc-analytics/issues/498))
+* adjust color application at root node of hierarchy ([#289](https://github.com/galaxyproject/brc-analytics/issues/289)) ([#479](https://github.com/galaxyproject/brc-analytics/issues/479))
+* use generic title for hierarchy viewer list nav ([#289](https://github.com/galaxyproject/brc-analytics/issues/289)) ([#480](https://github.com/galaxyproject/brc-analytics/issues/480))
+
+
+### Chores
+
+* update findable-ui to latest version v28.0.0 ([#491](https://github.com/galaxyproject/brc-analytics/issues/491)) ([#492](https://github.com/galaxyproject/brc-analytics/issues/492))
+* adjust release-drafter configuration for better display ([#478](https://github.com/galaxyproject/brc-analytics/issues/478)) ([#477](https://github.com/galaxyproject/brc-analytics/issues/477))
+* automate data catalog building ([#397](https://github.com/galaxyproject/brc-analytics/issues/397)) ([#410](https://github.com/galaxyproject/brc-analytics/issues/410))
+
+
+### Styles
+
+* apply consistent python formatting, import sorting -- automate w/ ruff ([#393](https://github.com/galaxyproject/brc-analytics/issues/393)) ([#392](https://github.com/galaxyproject/brc-analytics/issues/392))
+
 ## [0.10.0](https://github.com/galaxyproject/brc-analytics/compare/v0.9.0...v0.10.0) (2025-04-02)
 
 
