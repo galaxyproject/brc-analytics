@@ -486,7 +486,7 @@ outbreaks:
     description:
       path: outbreaks/togaviridae.md
     highlight_descendant_taxonomy_ids:
-      - 37124
+      - 3426298
       - 11036
     resources:
       - title: "CDC | Chikungunya Virus"

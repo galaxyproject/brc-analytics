@@ -2463,6 +2463,7 @@ assemblies:
   - accession: GCF_002815935.1
   - accession: GCF_000854405.1
   - accession: GCF_000855785.1
+  - accession: GCF_000850405.1
   # heartland virus
   - accession: GCF_013086545.1
   - accession: GCF_000922255.1
@@ -2792,3 +2793,531 @@ assemblies:
   - accession: GCF_000253175.1
   # Yersinia pestis (plague)
   - accession: GCF_000222975.1
+  # The following list is from NCBI Virus
+  # It represents everything that it claims is:
+  # 1) RefSeq annotated
+  # 2) Human host
+  - accession: GCF_029888495.1
+  - accession: GCF_029888155.1
+  - accession: GCF_029888075.1
+  - accession: GCF_018595055.1
+  - accession: GCF_013086615.1
+  - accession: GCF_006298385.1
+  - accession: GCF_029887105.1
+  - accession: GCF_024749945.1
+  - accession: GCF_023122845.1
+  - accession: GCF_018591295.1
+  - accession: GCF_018584815.1
+  - accession: GCF_018583805.1
+  - accession: GCF_018583635.1
+  - accession: GCF_018583605.1
+  - accession: GCF_018583595.1
+  - accession: GCF_018580895.1
+  - accession: GCF_018580875.1
+  - accession: GCF_018580825.1
+  - accession: GCF_018580665.1
+  - accession: GCF_018580655.1
+  - accession: GCF_018580215.1
+  - accession: GCF_018580125.1
+  - accession: GCF_013087445.1
+  - accession: GCF_006370125.1
+  - accession: GCF_004287355.1
+  - accession: GCF_004287315.1
+  - accession: GCF_004287275.1
+  - accession: GCF_004286855.1
+  - accession: GCF_004286755.1
+  - accession: GCF_004286695.1
+  - accession: GCF_004286675.1
+  - accession: GCF_004286455.1
+  - accession: GCF_004286375.1
+  - accession: GCF_004285795.1
+  - accession: GCF_004285675.1
+  - accession: GCF_004285195.1
+  - accession: GCF_003963575.1
+  - accession: GCF_003033285.1
+  - accession: GCF_002889255.1
+  - accession: GCF_013088445.1
+  - accession: GCF_013086435.1
+  - accession: GCF_013086425.1
+  - accession: GCF_013086385.1
+  - accession: GCF_006452035.1
+  - accession: GCF_003443495.1
+  - accession: GCF_004789975.1
+  - accession: GCF_004789595.1
+  - accession: GCF_003032775.1
+  - accession: GCF_002815815.1
+  - accession: GCF_004131685.1
+  - accession: GCF_004131665.1
+  - accession: GCF_004131585.1
+  - accession: GCF_004131565.1
+  - accession: GCF_004131645.1
+  - accession: GCF_004131545.1
+  - accession: GCF_004131625.1
+  - accession: GCF_004131525.1
+  - accession: GCF_004131605.1
+  - accession: GCF_003727435.1
+  - accession: GCF_003726995.1
+  - accession: GCF_000845685.2
+  - accession: GCF_001712785.1
+  - accession: GCF_003055605.1
+  - accession: GCF_003033575.1
+  - accession: GCF_003033495.1
+  - accession: GCF_003033485.1
+  - accession: GCF_003033475.1
+  - accession: GCF_003033315.1
+  - accession: GCF_003032765.1
+  - accession: GCF_003032755.1
+  - accession: GCF_002987365.1
+  - accession: GCF_002831305.1
+  - accession: GCF_002829445.1
+  - accession: GCF_002829425.1
+  - accession: GCF_002820205.1
+  - accession: GCF_002827025.1
+  - accession: GCF_002827045.1
+  - accession: GCF_002827005.1
+  - accession: GCF_002826985.1
+  - accession: GCF_002826025.1
+  - accession: GCF_002826005.1
+  - accession: GCF_002821385.1
+  - accession: GCF_002820785.1
+  - accession: GCF_002820225.1
+  - accession: GCF_002820185.1
+  - accession: GCF_002820165.1
+  - accession: GCF_002820145.1
+  - accession: GCF_002820125.1
+  - accession: GCF_002820105.1
+  - accession: GCF_002820065.1
+  - accession: GCF_002819605.1
+  - accession: GCF_002818765.1
+  - accession: GCF_002818745.1
+  - accession: GCF_002818725.1
+  - accession: GCF_002818705.1
+  - accession: GCF_002818685.1
+  - accession: GCF_002818665.1
+  - accession: GCF_002818645.1
+  - accession: GCF_002818625.1
+  - accession: GCF_002818605.1
+  - accession: GCF_002818585.1
+  - accession: GCF_002818565.1
+  - accession: GCF_002818545.1
+  - accession: GCF_002818485.1
+  - accession: GCF_002818465.1
+  - accession: GCF_002818445.1
+  - accession: GCF_002818245.1
+  - accession: GCF_002816685.1
+  - accession: GCF_002816195.1
+  - accession: GCF_002815875.1
+  - accession: GCF_002815855.1
+  - accession: GCF_002402265.1
+  - accession: GCF_001939215.2
+  - accession: GCF_002820085.1
+  - accession: GCF_002374975.1
+  - accession: GCF_000918035.2
+  - accession: GCF_002375055.1
+  - accession: GCF_002285025.1
+  - accession: GCF_002271185.1
+  - accession: GCF_002270605.1
+  - accession: GCF_002219885.1
+  - accession: GCF_002219705.1
+  - accession: GCF_002219525.1
+  - accession: GCF_002153865.1
+  - accession: GCF_002118905.1
+  - accession: GCF_002118805.1
+  - accession: GCF_002118505.1
+  - accession: GCF_002118405.1
+  - accession: GCF_002117635.1
+  - accession: GCF_002080215.1
+  - accession: GCF_002006915.1
+  - accession: GCF_001684625.1
+  - accession: GCF_001679875.1
+  - accession: GCF_001679855.1
+  - accession: GCF_001678815.1
+  - accession: GCF_001661815.1
+  - accession: GCF_001310135.2
+  - accession: GCF_001448435.1
+  - accession: GCF_001430115.1
+  - accession: GCF_001274345.1
+  - accession: GCF_001184845.1
+  - accession: GCF_000858385.2
+  - accession: GCF_000989155.1
+  - accession: GCF_000973295.1
+  - accession: GCF_000871625.2
+  - accession: GCF_000930495.1
+  - accession: GCF_000930055.1
+  - accession: GCF_000929855.1
+  - accession: GCF_000929235.1
+  - accession: GCF_000926235.1
+  - accession: GCF_000924495.1
+  - accession: GCF_000924255.1
+  - accession: GCF_000924015.1
+  - accession: GCF_000923215.1
+  - accession: GCF_000922675.1
+  - accession: GCF_000921075.1
+  - accession: GCF_000920655.1
+  - accession: GCF_000919735.1
+  - accession: GCF_000918175.1
+  - accession: GCF_000918095.1
+  - accession: GCF_000913875.1
+  - accession: GCF_000913595.1
+  - accession: GCF_000913075.1
+  - accession: GCF_000912535.1
+  - accession: GCF_000912415.1
+  - accession: GCF_000910875.1
+  - accession: GCF_000908835.1
+  - accession: GCF_000908695.1
+  - accession: GCF_000906815.1
+  - accession: GCF_000905375.1
+  - accession: GCF_000905335.1
+  - accession: GCF_000904055.1
+  - accession: GCF_000901475.1
+  - accession: GCF_000901155.1
+  - accession: GCF_000899695.1
+  - accession: GCF_000899535.1
+  - accession: GCF_000899515.1
+  - accession: GCF_000899075.1
+  - accession: GCF_000898855.1
+  - accession: GCF_000898335.1
+  - accession: GCF_000898235.1
+  - accession: GCF_000898255.1
+  - accession: GCF_000897955.1
+  - accession: GCF_000897355.1
+  - accession: GCF_000897255.1
+  - accession: GCF_000896975.1
+  - accession: GCF_000896435.1
+  - accession: GCF_000895575.1
+  - accession: GCF_000891955.1
+  - accession: GCF_000891915.1
+  - accession: GCF_000891615.1
+  - accession: GCF_000891495.1
+  - accession: GCF_000890535.1
+  - accession: GCF_000890115.1
+  - accession: GCF_000889695.1
+  - accession: GCF_000889675.1
+  - accession: GCF_000889175.1
+  - accession: GCF_000889155.1
+  - accession: GCF_000889075.1
+  - accession: GCF_000888975.1
+  - accession: GCF_000888495.1
+  - accession: GCF_000888315.1
+  - accession: GCF_000888015.1
+  - accession: GCF_000887495.1
+  - accession: GCF_000887335.1
+  - accession: GCF_000887355.1
+  - accession: GCF_000887215.1
+  - accession: GCF_000886535.1
+  - accession: GCF_000886455.1
+  - accession: GCF_000886475.1
+  - accession: GCF_000886375.1
+  - accession: GCF_000885815.1
+  - accession: GCF_000885595.1
+  - accession: GCF_000885035.1
+  - accession: GCF_000884955.1
+  - accession: GCF_000884395.1
+  - accession: GCF_000884175.1
+  - accession: GCF_000882855.1
+  - accession: GCF_000882675.1
+  - accession: GCF_000882595.1
+  - accession: GCF_000880515.1
+  - accession: GCF_000874865.1
+  - accession: GCF_000874265.1
+  - accession: GCF_000874285.1
+  - accession: GCF_000873605.1
+  - accession: GCF_000872045.1
+  - accession: GCF_000870545.1
+  - accession: GCF_000864885.1
+  - accession: GCF_000864765.1
+  - accession: GCF_000861885.1
+  - accession: GCF_000861005.1
+  - accession: GCF_000860145.1
+  - accession: GCF_000859305.1
+  - accession: GCF_000858765.1
+  - accession: GCF_000858285.1
+  - accession: GCF_000857085.1
+  - accession: GCF_000856385.1
+  - accession: GCF_000848125.1
+  - accession: GCF_000846805.1
+  - accession: GCF_000846685.1
+  - accession: GCF_000846365.1
+  - accession: GCF_000845985.1
+  - accession: GCF_000845245.1
+  - accession: GCF_000845085.1
+  - accession: GCF_000841965.1
+  - accession: GCF_000838265.1
+  # These from bv-brc
+  # betapolyomavirus
+  - accession: GCF_000837865.1
+  - accession: GCF_000863805.1
+  - accession: GCF_000870785.1
+  - accession: GCF_000873085.1
+  # alphapapillomavirus
+  - accession: GCF_000863945.3
+  - accession: GCF_000862685.1
+  - accession: GCF_000836865.1
+  - accession: GCF_000861925.1
+  - accession: GCF_002826825.1
+  - accession: GCF_000896995.1
+  - accession: GCF_000862805.1
+  - accession: GCF_000864925.1
+  - accession: GCF_000864905.1
+  - accession: GCF_000861945.1
+  - accession: GCF_000864945.1
+  - accession: GCF_000865665.1
+  - accession: GCF_000865685.1
+  - accession: GCF_000866485.1
+  - accession: GCF_002987345.1
+  - accession: GCF_000864725.1
+  - accession: GCF_000863965.1
+  - accession: GCF_004134585.1
+  # betapapillomavirus
+  - accession: GCF_000866505.1
+  - accession: GCF_000892175.1
+  - accession: GCF_000892835.1
+  - accession: GCF_000862825.1
+  - accession: GCF_000846285.1
+  - accession: GCF_000864825.1
+  - accession: GCF_000863685.1
+  # mupapillomavirus
+  - accession: GCF_000866405.1
+  - accession: GCF_000865565.1
+  # asfivirus
+  - accession: GCF_003032905.1
+  - accession: GCF_003047755.2
+  - accession: GCF_003033005.1
+  - accession: GCF_003032915.1
+  - accession: GCF_003032925.1
+  - accession: GCF_003032865.1
+  - accession: GCF_003032885.1
+  - accession: GCF_000858485.1
+  - accession: GCF_003047675.1
+  - accession: GCF_003047715.1
+  - accession: GCF_003047695.1
+  - accession: GCF_003032875.1
+  # Molluscipoxvirus
+  - accession: GCF_000843325.1
+  # vaccinia virus
+  - accession: GCF_000860085.1
+  # orf virus
+  - accession: GCF_000844845.1
+  # yatapoxvirus
+  - accession: GCF_000845705.1
+  - accession: GCF_000847185.1
+  # herpes 1
+  - accession: GCF_000859985.2
+  # b virus
+  - accession: GCF_018580855.1
+  - accession: GCF_018580865.1
+  - accession: GCF_000844145.1
+  # adenoviruses
+  - accession: GCF_000897015.1
+  - accession: GCF_000859665.1
+  - accession: GCF_000847325.1
+  # hepatitis B
+  - accession: GCF_000861825.2
+  # human picobirnavirus
+  - accession: GCF_000859285.1
+  # orbivirus
+  - accession: GCF_002829365.1
+  - accession: GCF_000911195.1
+  - accession: GCF_000887635.1
+  # rotavirus
+  - accession: GCF_000880735.1
+  - accession: GCF_000864245.1
+  - accession: GCF_000907835.1
+  - accession: GCF_000864225.1
+  # Primate T-lymphotropic virus 1
+  - accession: GCF_000861125.1
+  # Human T-lymphotropic virus 2
+  - accession: GCF_000847505.1
+  # Primate T-lymphotropic virus 3
+  - accession: GCF_000847845.1
+  # Colorado tick fever virus
+  - accession: GCF_000853265.1
+  # Pulau reovirus
+  - accession: GCF_002829605.1
+  # Banna virus strain JKT-6423
+  - accession: GCF_000858185.1
+  # Human T-cell leukemia virus type I
+  - accession: GCF_000863585.1
+  # Mammalian orthoreovirus 3
+  - accession: GCF_000924315.1
+  # Simian T-cell lymphotropic virus 6
+  - accession: GCF_000881775.1
+  # Simian T-lymphotropic virus 2
+  - accession: GCF_000860005.1
+  # Gemykibivirus
+  - accession: GCF_000923355.1
+  - accession: GCF_000973195.1
+  - accession: GCF_000930855.1
+  # lung-associated brisavirus
+  - accession: GCA_014883705.1
+  - accession: GCA_014883685.1
+  - accession: GCA_014883715.1
+  - accession: GCA_014883695.1
+  # torque teno
+  - accession: GCF_000857545.1
+  - accession: GCF_000887255.1
+  - accession: GCF_000888935.1
+  - accession: GCF_000887275.1
+  - accession: GCF_000888995.1
+  - accession: GCF_000886355.1
+  - accession: GCF_002818425.1
+  - accession: GCF_002986195.1
+  - accession: GCF_002818305.1
+  - accession: GCF_002986165.1
+  - accession: GCF_002818335.1
+  - accession: GCF_002818195.1
+  - accession: GCF_002818355.1
+  # Betatorquevirus
+  - accession: GCF_000888255.1
+  - accession: GCF_000837005.1
+  - accession: GCF_000887315.1
+  - accession: GCF_000888295.1
+  - accession: GCF_000888275.1
+  # Human CSF-associated densovirus
+  - accession: GCF_029883595.1
+  # adeno-associated virus
+  - accession: GCF_000838645.1
+  - accession: GCF_000846385.1
+  - accession: GCF_000836885.1
+  - accession: GCF_000841585.1
+  - accession: GCF_000845645.1
+  - accession: GCF_000863065.1
+  - accession: GCF_000846525.1
+  - accession: GCF_000846165.1
+  # Protoparvovirus
+  - accession: GCF_002827465.1
+  # flu b/c/d
+  - accession: GCF_000820495.2
+  - accession: GCF_002867775.1
+  - accession: GCF_000856665.10
+  # Sinu virus
+  - accession: GCF_023157055.1
+  # Upolu virus
+  - accession: GCF_023156825.1
+  # Oz virus
+  - accession: GCF_004117175.1
+  # Jos virus
+  - accession: GCF_023156725.1
+  # Bourbon virus
+  - accession: GCF_023156645.1
+  # Thailand tick thogotovirus
+  - accession: GCF_023156685.1
+  # Thogotovirus thogotoense
+  - accession: GCF_000854245.1
+  # Thogotovirus dhoriense
+  - accession: GCF_002116195.1
+  # orthobornavirus
+  - accession: GCF_000847565.3
+  - accession: GCF_001698295.1
+  # Cuevavirus
+  - accession: GCF_000896415.1
+  # Dianlovirus
+  - accession: GCF_013088285.1
+  # Striavirus
+  - accession: GCF_004788975.1
+  # Thamnovirus
+  - accession: GCF_004788995.1
+  - accession: GCF_023131885.1
+  - accession: GCF_023155475.1
+  # Respirovirus
+  - accession: GCF_000848705.1
+  - accession: GCF_006298365.1
+  # measles
+  - accession: GCF_000854845.1
+  # Orthorubulavirus
+  - accession: GCF_000863525.1
+  - accession: GCF_000910675.1
+  - accession: GCF_000854805.1
+  - accession: GCF_000873165.1
+  - accession: GCF_000856685.1
+  # menangle virus
+  - accession: GCF_002815295.1
+  # Metapneumovirus
+  - accession: GCF_002815375.1
+  # Orthopneumovirus
+  - accession: GCF_002815475.1
+  - accession: GCF_000855545.1
+  - accession: GCF_000856445.1
+  # Ledantevirus nkolbisson
+  - accession: GCF_002145865.1
+  # Vesiculovirus
+  - accession: GCF_002816055.1
+  - accession: GCF_002815995.1
+  - accession: GCF_000923855.1
+  - accession: GCF_000906835.1
+  - accession: GCF_000924515.1
+  - accession: GCF_001440915.1
+  - accession: GCF_000850045.1
+  # hepatitis d
+  - accession: GCF_018547925.1
+  - accession: GCF_018547915.1
+  - accession: GCF_018547935.1
+  - accession: GCF_018547805.1
+  - accession: GCF_018547875.1
+  - accession: GCF_003033645.1
+  - accession: GCF_018547865.1
+  # Orthoflavivirus
+  - accession: GCF_000863565.1
+  - accession: GCF_000860805.1
+  - accession: GCF_000863165.1
+  - accession: GCF_000883915.1
+  # pegivirus
+  - accession: GCF_002821105.1
+  - accession: GCF_000847425.1
+  - accession: GCF_000862005.1
+  - accession: GCF_000921975.1
+  # Paslahepevirus balayani
+  - accession: GCF_002826225.1
+  - accession: GCF_000861105.1
+  - accession: GCF_023120075.1
+  - accession: GCF_023120345.1
+  # Alphavirus
+  - accession: GCF_000860545.1
+  - accession: GCF_000860285.1
+  - accession: GCF_018585185.1
+  - accession: GCF_000917835.1
+  - accession: GCF_002888955.1
+  - accession: GCF_000847585.1
+  # alphacoronavirus
+  - accession: GCF_000853865.1
+  - accession: GCF_000853505.1
+  # betacoronavirus
+  - accession: GCF_003972325.1
+  # foot-and-mouth
+  - accession: GCF_002816555.1
+  # saffold virus/ cardiovirus d
+  - accession: GCF_000875265.1
+  # rhinovirus
+  - accession: GCF_000872325.1
+  - accession: GCF_002816885.1
+  - accession: GCF_000861265.1
+  - accession: GCF_002816855.1
+  - accession: GCF_002816835.1
+  - accession: GCF_000862245.1
+  # coxsackievirus
+  - accession: GCF_002816655.1
+  # parechovirus A
+  - accession: GCF_000861505.1
+  # mamastrovirus
+  - accession: GCF_001736695.1
+  - accession: GCF_000880715.1
+  # Thottimvirus
+  - accession: GCF_000879955.1
+  - accession: GCF_002146225.1
+  # Norwavirus
+  - accession: GCF_018594915.1
+  # Orthonairovirus
+  - accession: GCF_014883185.1
+  - accession: GCF_001755105.1
+  - accession: GCF_018594555.1
+  - accession: GCF_002117695.1
+  - accession: GCF_002288735.2
+  - accession: GCF_014883305.1
+  - accession: GCF_018595155.1
+  - accession: GCF_000850985.1
+  - accession: GCA_014883335.1
+  - accession: GCA_001629985.1
+  - accession: GCF_000854165.1
+  # Phlebovirus
+  - accession: GCF_001019855.1
+  - accession: GCA_031497085.1

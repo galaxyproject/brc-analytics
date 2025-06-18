@@ -159,7 +159,7 @@
       }
     ],
     "taxonomy_id": 10244,
-    "taxonNameField": "taxonomicLevelSpecies",
+    "taxonNameField": "otherTaxa",
     "taxonName": "Monkeypox virus"
   },
   {
@@ -839,7 +839,7 @@
       "scope": {}
     },
     "highlight_descendant_taxonomy_ids": [
-      37124,
+      3426298,
       11036
     ],
     "name": "Togaviridae (Prototype Pathogen Viral Family)",
