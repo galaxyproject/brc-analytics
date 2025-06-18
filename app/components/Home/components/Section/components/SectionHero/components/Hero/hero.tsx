@@ -31,7 +31,7 @@ export const Hero = ({
       height={height}
       preserveAspectRatio="xMinYMin meet"
       viewBox={getViewBox(gridSize, height)}
-      width="100vw"
+      width="100%"
       xmlns="http://www.w3.org/2000/svg"
     >
       <SmokeRect gridSize={gridSize} />
@@ -46,7 +46,7 @@ export const Hero = ({
             <rect
               fill={getFillUrl(elementId)}
               height={height}
-              width="100vw"
+              width="100%"
               x={0}
               y={0}
             />
