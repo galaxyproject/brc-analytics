@@ -310,21 +310,16 @@ export const SectionViz = (): JSX.Element => {
     const LOGO_WIDTH = 140;
     const LOGO_HEIGHT = 140;
 
-    // Add foreignObject for logo
-    const logoObject = centerGroup
-      .append("foreignObject")
+    // Add image element for logo (Safari-compatible)
+    const logoImage = centerGroup
+      .append("image")
       .attr("x", -LOGO_WIDTH / 2)
       .attr("y", -LOGO_HEIGHT / 2)
       .attr("width", LOGO_WIDTH)
       .attr("height", LOGO_HEIGHT)
+      .attr("href", "/logo/brc.svg")
+      .attr("preserveAspectRatio", "xMidYMid meet")
       .style("opacity", 1);
-
-    logoObject
-      .append("xhtml:img")
-      .attr("src", "/logo/brc.svg")
-      .attr("width", LOGO_WIDTH)
-      .attr("height", LOGO_HEIGHT)
-      .style("object-fit", "contain");
 
     // Add text element for non-root nodes
     const centerText = centerGroup
@@ -337,7 +332,7 @@ export const SectionViz = (): JSX.Element => {
 
     function updateCenter(p: TreeNode): void {
       const isRoot = p.depth === 0;
-      logoObject.style("opacity", isRoot ? 1 : 0);
+      logoImage.style("opacity", isRoot ? 1 : 0);
       centerText
         .style("opacity", isRoot ? 0 : 1)
         .text(isRoot ? "" : p.data.name);
