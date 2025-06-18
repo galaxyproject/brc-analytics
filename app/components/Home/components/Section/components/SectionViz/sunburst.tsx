@@ -472,7 +472,7 @@ export const SectionViz = (): JSX.Element => {
       }}
     >
       <div style={{ display: "flex", justifyContent: "center", width: "70%" }}>
-        <svg ref={svgRef}></svg>
+        <svg ref={svgRef} style={{ maxWidth: "800px", width: "100%" }}></svg>
       </div>
       <div style={{ marginLeft: "3rem", padding: "1rem", width: "30%" }}>
         {selectedNode ? (
