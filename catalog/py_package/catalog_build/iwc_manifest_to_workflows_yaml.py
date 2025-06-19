@@ -28,6 +28,7 @@ MANIFEST_SOURCE_OF_TRUTH = (
     "workflow_name",
     "categories",
     "workflow_description",
+    "iwc_id",
 )
 
 
@@ -108,6 +109,7 @@ def generate_current_workflows():
                 ),
                 workflow_description=workflow["definition"]["annotation"],
                 ploidy=WorkflowPloidy.ANY,
+                iwc_id=workflow.get("iwcID"),
                 # readme=workflow["readme"],
                 # shortcut so we don't need to parse out the whole inputs section
                 parameters=get_input_types(workflow["definition"]),

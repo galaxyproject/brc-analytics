@@ -43,16 +43,18 @@ export async function buildWorkflows(): Promise<WorkflowCategory[]> {
 
 function buildWorkflow(
   workflowCategories: WorkflowCategory[],
-  {
+  sourceWorkflow: SourceWorkflow
+): void {
+  const {
     categories,
+    iwc_id: iwcId,
     parameters: sourceParameters,
     ploidy,
     taxonomy_id: taxonomyId,
     trs_id: trsId,
     workflow_description: workflowDescription,
     workflow_name: workflowName,
-  }: SourceWorkflow
-): void {
+  } = sourceWorkflow;
   const parameters = [];
   for (const { key, url_spec, variable } of sourceParameters) {
     // Add parameter if either variable or url_spec is defined
@@ -60,6 +62,7 @@ function buildWorkflow(
     else if (url_spec) parameters.push({ key, url_spec });
   }
   const workflow: Workflow = {
+    iwcId: iwcId || undefined,
     parameters,
     ploidy,
     taxonomyId: typeof taxonomyId === "number" ? String(taxonomyId) : null,
