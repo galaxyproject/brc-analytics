@@ -62,7 +62,7 @@ function buildWorkflow(
     else if (url_spec) parameters.push({ key, url_spec });
   }
   const workflow: Workflow = {
-    iwcId: iwcId || undefined,
+    iwcId,
     parameters,
     ploidy,
     taxonomyId: typeof taxonomyId === "number" ? String(taxonomyId) : null,
