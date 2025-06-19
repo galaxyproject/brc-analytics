@@ -6,6 +6,7 @@
     "showComingSoon": true,
     "workflows": [
       {
+        "iwcId": "haploid-variant-calling-wgs-pe-main",
         "parameters": [
           {
             "key": "Paired Collection",
@@ -27,6 +28,7 @@
         "workflowName": "Paired end variant calling in haploid system"
       },
       {
+        "iwcId": "sars-cov-2-pe-illumina-artic-variant-calling-covid-19-pe-artic-illumina",
         "parameters": [
           {
             "key": "NC_045512.2 FASTA sequence of SARS-CoV-2",
@@ -56,6 +58,7 @@
         "workflowName": "COVID-19: variation analysis on ARTIC PE data"
       },
       {
+        "iwcId": "sars-cov-2-pe-illumina-wgs-variant-calling-covid-19-pe-wgs-illumina",
         "parameters": [
           {
             "key": "NC_045512.2 FASTA sequence of SARS-CoV-2",
@@ -69,6 +72,7 @@
         "workflowName": "COVID-19: variation analysis on WGS PE data"
       },
       {
+        "iwcId": "sars-cov-2-se-illumina-wgs-variant-calling-covid-19-se-wgs-illumina",
         "parameters": [
           {
             "key": "NC_045512.2 FASTA sequence of SARS-CoV-2",
@@ -90,6 +94,7 @@
     "showComingSoon": true,
     "workflows": [
       {
+        "iwcId": "fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-cellplex",
         "parameters": [
           {
             "key": "reference genome",
@@ -107,6 +112,7 @@
         "workflowName": "Single-Cell RNA-seq Preprocessing: 10X Genomics CellPlex Multiplexed Samples"
       },
       {
+        "iwcId": "fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-v3",
         "parameters": [
           {
             "key": "reference genome",
@@ -124,6 +130,7 @@
         "workflowName": "Single-Cell RNA-seq Preprocessing: 10X Genomics v3 to Seurat and Scanpy Compatible Format"
       },
       {
+        "iwcId": "rnaseq-pe-main",
         "parameters": [
           {
             "key": "Reference genome",
@@ -141,6 +148,7 @@
         "workflowName": "RNA-Seq Analysis: Paired-End Read Processing and Quantification"
       },
       {
+        "iwcId": "rnaseq-sr-main",
         "parameters": [
           {
             "key": "Reference genome",
@@ -166,6 +174,7 @@
     "showComingSoon": true,
     "workflows": [
       {
+        "iwcId": "atacseq-main",
         "parameters": [
           {
             "key": "reference_genome",
@@ -179,6 +188,7 @@
         "workflowName": "ATAC-seq Analysis: Chromatin Accessibility Profiling"
       },
       {
+        "iwcId": "chipseq-pe-main",
         "parameters": [
           {
             "key": "reference_genome",
@@ -192,6 +202,7 @@
         "workflowName": "ChIP-seq Analysis: Paired-End Read Processing"
       },
       {
+        "iwcId": "chipseq-sr-main",
         "parameters": [
           {
             "key": "reference_genome",
@@ -205,6 +216,7 @@
         "workflowName": "ChIP-seq Analysis: Single-End Read Processing"
       },
       {
+        "iwcId": "consensus-peaks-consensus-peaks-atac-cutandrun",
         "parameters": [],
         "ploidy": "ANY",
         "taxonomyId": null,
@@ -213,6 +225,7 @@
         "workflowName": "Consensus Peak Calling for ATAC-seq and CUT&RUN Replicates"
       },
       {
+        "iwcId": "cutandrun-main",
         "parameters": [
           {
             "key": "reference_genome",
@@ -234,6 +247,7 @@
     "showComingSoon": false,
     "workflows": [
       {
+        "iwcId": "pox-virus-amplicon-main",
         "parameters": [
           {
             "key": "Reference FASTA",
