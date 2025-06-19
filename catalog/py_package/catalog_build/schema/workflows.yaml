@@ -65,7 +65,7 @@ classes:
         range: boolean
       iwc_id:
         description: The Intergalactic Workflow Commission (IWC) identifier for the workflow, used to link to the workflow's page on the IWC website.
-        required: false
+        required: true
         range: string
 
   WorkflowParameter:
