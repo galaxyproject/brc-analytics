@@ -9,6 +9,7 @@ from typing import Any, ClassVar, Dict, List, Literal, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field, RootModel, field_validator
 
+
 metamodel_version = "None"
 version = "None"
 
@@ -61,7 +62,7 @@ linkml_meta = LinkMLMeta(
                 "prefix_reference": "https://w3id.org/linkml/",
             }
         },
-        "source_file": "/Users/hunter/git-repos/brc-analytics/catalog/py_package/catalog_build/schema_utils/../schema/schema.yaml",
+        "source_file": "/Users/dannon/work/brc-analytics/catalog/py_package/catalog_build/schema_utils/../schema/schema.yaml",
     }
 )
 
@@ -558,6 +559,13 @@ class Workflow(ConfiguredBaseModel):
         description="""Boolean flag that determines if the workflow should be included in the BRC Analytics interface. Used to manage visibility of workflows that may be under development or deprecated.""",
         json_schema_extra={
             "linkml_meta": {"alias": "active", "domain_of": ["Outbreak", "Workflow"]}
+        },
+    )
+    iwc_id: Optional[str] = Field(
+        default=None,
+        description="""The Intergalactic Workflow Commission (IWC) identifier for the workflow, used to link to the workflow's page on the IWC website.""",
+        json_schema_extra={
+            "linkml_meta": {"alias": "iwc_id", "domain_of": ["Workflow"]}
         },
     )
 
