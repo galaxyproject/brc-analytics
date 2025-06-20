@@ -63,6 +63,10 @@ classes:
         description: Boolean flag that determines if the workflow should be included in the BRC Analytics interface. Used to manage visibility of workflows that may be under development or deprecated.
         required: true
         range: boolean
+      iwc_id:
+        description: The Intergalactic Workflow Commission (IWC) identifier for the workflow, used to link to the workflow's page on the IWC website.
+        required: true
+        range: string
 
   WorkflowParameter:
     description: Definition of an input parameter for a Galaxy workflow, specifying how the parameter value should be determined when the workflow is executed.

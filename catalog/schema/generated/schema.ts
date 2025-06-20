@@ -217,6 +217,8 @@ export interface Workflow {
     parameters: WorkflowParameter[],
     /** Boolean flag that determines if the workflow should be included in the BRC Analytics interface. Used to manage visibility of workflows that may be under development or deprecated. */
     active: boolean,
+    /** The Intergalactic Workflow Commission (IWC) identifier for the workflow, used to link to the workflow's page on the IWC website. */
+    iwc_id: string,
 }
 
 
