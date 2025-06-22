@@ -93,14 +93,77 @@ done by:
 
 ## Release Process
 
-This repository uses [Release Drafter](https://github.com/release-drafter/release-drafter) to automatically generate release notes based on PR titles.
+This repository uses [Release Drafter](https://github.com/release-drafter/release-drafter) to automatically generate release notes based on PR titles and semantic versioning.
 
-### How it works
+### Overview
 
-1. PRs are categorized based on their titles using the conventional commit format (e.g., `feat:`, `fix:`, `docs:`, etc.)
-2. When PRs are merged to `main`, a draft release is automatically updated
-3. The version number is determined based on the type of changes:
-   - PRs with `breaking` or `major` labels trigger a major version bump
-   - PRs with `feat`, `feature`, `enhancement`, or `minor` labels trigger a minor version bump
-   - All other types trigger a patch version bump
-4. When ready to release, the draft can be published manually through the GitHub interface or using the `publish-release` workflow
+The release process involves three main components:
+
+1. **Release Drafter**: Automatically creates/updates draft releases based on merged PRs
+2. **Publish Release Workflow**: Publishes the draft and creates a version bump PR
+3. **Version Display**: Shows build info in the UI footer using environment variables set at build time
+
+### Automated Version Determination
+
+PRs are categorized based on their titles using conventional commit format:
+
+- `breaking!` or `major` labels → **major** version bump (e.g., 1.0.0 → 2.0.0)
+- `feat:`, `feature:`, `enhancement:`, `minor` labels → **minor** version bump (e.g., 1.0.0 → 1.1.0)
+- `fix:`, `docs:`, `chore:`, etc. → **patch** version bump (e.g., 1.0.0 → 1.0.1)
+
+### Manual Release Steps
+
+#### 1. Verify Draft Release
+
+```bash
+# Check current draft releases
+gh release list
+
+# View the draft release details
+gh release view v<VERSION> --json body,name,tagName,targetCommitish
+```
+
+#### 2. Publish the Release
+
+```bash
+# Get the release ID from the list above
+gh release list | grep "Draft"
+
+# Publish using the workflow (recommended)
+gh workflow run publish-release.yml -f release_id=<RELEASE_ID>
+```
+
+**OR** publish directly:
+
+```bash
+gh release edit <RELEASE_ID> --draft=false
+```
+
+#### 3. Handle Version Bump PR
+
+The `publish-release` workflow will automatically:
+
+- Create a branch `release/update-version-<VERSION>`
+- Update `package.json` and `package-lock.json`
+- Create a PR with the version changes
+
+**You must manually merge this PR** to complete the release process.
+
+#### 4. Verify Release Success
+
+```bash
+# Check that tag points to correct commit
+git fetch --tags
+git log --oneline --decorate | head -5
+
+# Verify version display will work
+git tag --points-at HEAD  # Should show the new version tag
+```
+
+### Deployment
+
+Production deployment happens automatically when changes are merged to the `prod` branch. To deploy a release:
+
+1. Merge the release version bump PR to `main`
+2. Create a PR from `main` to `prod`
+3. Once merged to `prod`, the deployment workflow automatically builds and deploys to production
