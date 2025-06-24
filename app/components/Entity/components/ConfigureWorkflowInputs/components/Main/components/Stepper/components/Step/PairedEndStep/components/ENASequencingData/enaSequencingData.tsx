@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { DataSelector } from "./components/DataSelector/dataSelector";
 import { CollectionSelector } from "./components/CollectionSelector/collectionSelector";
 import { useDialog } from "@databiosphere/findable-ui/lib/components/common/Dialog/hooks/useDialog";
@@ -6,6 +6,7 @@ import { Props } from "./types";
 import { CollectionSummary } from "./components/CollectionSummary/collectionSummary";
 import { AccessionSelector } from "./components/AccessionSelector/accessionSelector";
 import { STEP } from "../../step";
+import { buildEnaPairedReads } from "./utils";
 
 export const ENASequencingData = ({
   clearErrors,
@@ -17,6 +18,13 @@ export const ENASequencingData = ({
   const accessionDialog = useDialog();
   const collectionDialog = useDialog();
   const selectedCount = Object.values(table.getState().rowSelection).length;
+
+  useEffect(() => {
+    const pairedReads = buildEnaPairedReads(table);
+    onConfigure(STEP.key, pairedReads.length > 0 ? pairedReads : null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Intended behavior to only run on mount.
+  }, []);
+
   return (
     <Fragment>
       <DataSelector
