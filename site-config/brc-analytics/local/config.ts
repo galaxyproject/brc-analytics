@@ -4,12 +4,14 @@ import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import {
   BRCDataCatalogGenome,
   BRCDataCatalogOrganism,
+  Outbreak,
 } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "../../../app/components";
 import { ROUTES } from "../../../routes/constants";
 import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organismEntityConfig";
+import { priorityPathogensEntityConfig } from "./index/priorityPathogensEntityConfig";
 import { socialMedia } from "./socialMedia";
 
 const LOCALHOST = "http://localhost:3000";
@@ -45,6 +47,7 @@ export function makeConfig(
     entities: [
       organismEntityConfig as EntityConfig<BRCDataCatalogOrganism>,
       genomeEntityConfig as EntityConfig<BRCDataCatalogGenome>,
+      priorityPathogensEntityConfig as EntityConfig<Outbreak>,
     ],
     explorerTitle: APP_TITLE,
     gitHubUrl,
@@ -80,6 +83,7 @@ export function makeConfig(
             { label: "About", url: ROUTES.ABOUT },
             { label: "Organisms", url: ROUTES.ORGANISMS },
             { label: "Assemblies", url: ROUTES.GENOMES },
+            { label: "Priority Pathogens", url: ROUTES.PRIORITY_PATHOGENS },
             { label: "Roadmap", url: ROUTES.ROADMAP },
           ],
           undefined,

@@ -8,7 +8,10 @@ import {
   WORKFLOW_PLOIDY,
 } from "./schema-entities";
 
-export type BRCCatalog = BRCDataCatalogGenome;
+export type BRCCatalog =
+  | BRCDataCatalogGenome
+  | BRCDataCatalogOrganism
+  | Outbreak;
 
 export interface BRCDataCatalogGenome {
   accession: string;
