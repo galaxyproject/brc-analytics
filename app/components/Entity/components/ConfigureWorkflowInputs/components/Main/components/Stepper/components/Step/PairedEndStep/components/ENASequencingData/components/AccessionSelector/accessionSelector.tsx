@@ -14,7 +14,7 @@ import { Props } from "./types";
 import { DialogTitle } from "@databiosphere/findable-ui/lib/components/common/Dialog/components/DialogTitle/dialogTitle";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { FormEvent } from "react";
-import { ErrorIcon } from "@databiosphere/findable-ui/src/components/common/CustomIcon/components/ErrorIcon/errorIcon";
+import { ErrorIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/ErrorIcon/errorIcon";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 
 export const AccessionSelector = ({

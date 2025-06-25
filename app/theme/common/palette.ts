@@ -1,4 +1,12 @@
-import { PaletteColorOptions } from "@mui/material";
+import { PaletteColorOptions, PaletteOptions } from "@mui/material";
+
+/**
+ * Palette "Caution"
+ */
+const CAUTION = {
+  LIGHT: "#FFEB78",
+  MAIN: "#956F00",
+};
 
 /**
  * Palette "Primary"
@@ -9,10 +17,26 @@ const PRIMARY = {
 };
 
 /**
+ * Palette Option "Caution"
+ */
+const caution: PaletteColorOptions = {
+  light: CAUTION.LIGHT,
+  main: CAUTION.MAIN,
+};
+
+/**
  * Palette Option "Primary"
  */
-export const primary: PaletteColorOptions = {
+const primary: PaletteColorOptions = {
   contrastText: "#FFFFFF",
   dark: PRIMARY.DARK,
   main: PRIMARY.MAIN,
+};
+
+/**
+ * App Palette
+ */
+export const palette: PaletteOptions = {
+  caution,
+  primary,
 };
