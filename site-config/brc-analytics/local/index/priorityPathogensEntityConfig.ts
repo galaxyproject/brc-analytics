@@ -14,7 +14,7 @@ export const priorityPathogensEntityConfig: BRCEntityConfig<Outbreak> = {
   },
   exploreMode: EXPLORE_MODE.CS_FETCH_CS_FILTERING,
   explorerTitle: "Priority Pathogens",
-  getId: (priorityPathogen) => priorityPathogen.name,
+  getId: () => "",
   label: "Priority Pathogens",
   list: {
     columns: [],
