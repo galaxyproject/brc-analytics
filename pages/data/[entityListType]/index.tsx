@@ -11,7 +11,7 @@ import {
 import { config } from "../../../app/config/config";
 import { seedDatabase } from "../../../app/utils/seedDatabase";
 import { StyledExploreView } from "../../../app/views/ExploreView/exploreView.styles";
-import { PriorityPathogensView } from "../../../app/views/PriorityPathogenView/priorityPathogensView";
+import { PriorityPathogensView } from "../../../app/views/PriorityPathogensView/priorityPathogensView";
 import { Outbreak } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 
