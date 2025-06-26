@@ -8,6 +8,7 @@ import { ROUTES } from "../../../../../routes/constants";
 import {
   BRCDataCatalogGenome,
   BRCDataCatalogOrganism,
+  Outbreak,
   Workflow,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "../../../../components";
@@ -30,6 +31,17 @@ import {
 } from "../../../../apis/catalog/brc-analytics-catalog/common/utils";
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
 import { ConfiguredInput } from "../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
+import {
+  getPriorityColor,
+  getPriorityLabel,
+} from "../../../../views/PriorityPathogensView/components/PriorityPathogens/utils";
+import { KeyValueSection } from "../../../../components/Entity/components/Section/KeyValueSection/keyValueSection";
+import {
+  getActiveColor,
+  getActiveLabel,
+} from "../../../../views/PriorityPathogenView/utils";
+import { ResourcesSection } from "app/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
 
 /**
  * Build props for the accession cell.
@@ -311,6 +323,79 @@ export const buildOrganismTaxonomicLevelStrain = (
   return {
     label: "strains",
     values: organism.taxonomicLevelStrain,
+  };
+};
+
+/**
+ * Build props for the priority pathogen BackPageHero component.
+ * @param priorityPathogen - Priority pathogen entity.
+ * @returns Props to be used for the BackPageHero component.
+ */
+export const buildPriorityPathogenHero = (
+  priorityPathogen: Outbreak
+): ComponentProps<typeof C.BackPageHero> => {
+  return {
+    breadcrumbs: getPriorityPathogenEntityBreadcrumbs(priorityPathogen),
+    title: priorityPathogen.name,
+  };
+};
+
+/**
+ * Build props for the priority pathogen description section.
+ * @param priorityPathogen - Priority pathogen entity.
+ * @returns Props to be used for the MDXSection component.
+ */
+export const buildPriorityPathogenDescription = (
+  priorityPathogen: Outbreak
+): ComponentProps<typeof C.MDXSection> => {
+  return {
+    mdxRemoteSerializeResult: priorityPathogen.description,
+    title: "Description",
+  };
+};
+
+/**
+ * Build props for the priority pathogen details section..
+ * @param priorityPathogen - Priority pathogen entity.
+ * @returns Props to be used for the KeyValuePairs component.
+ */
+export const buildPriorityPathogenDetails = (
+  priorityPathogen: Outbreak
+): ComponentProps<typeof KeyValueSection> => {
+  const keyValuePairs = new Map<Key, Value>();
+  keyValuePairs.set(
+    "Status",
+    C.Chip({
+      color: getActiveColor(priorityPathogen.active),
+      label: getActiveLabel(priorityPathogen.active),
+      variant: CHIP_PROPS.VARIANT.STATUS,
+    })
+  );
+  keyValuePairs.set(
+    "Priority",
+    C.Chip({
+      color: getPriorityColor(priorityPathogen.priority),
+      label: getPriorityLabel(priorityPathogen.priority),
+      variant: CHIP_PROPS.VARIANT.STATUS,
+    })
+  );
+  return {
+    keyValuePairs,
+    title: "Priority Pathogen details",
+  };
+};
+
+/**
+ * Build props for the priority pathogen resources section.
+ * @param priorityPathogen - Priority pathogen entity.
+ * @returns Props to be used for the ResourcesSection component.
+ */
+export const buildPriorityPathogenResources = (
+  priorityPathogen: Outbreak
+): ComponentProps<typeof ResourcesSection> => {
+  return {
+    resources: priorityPathogen.resources,
+    title: "Resources",
   };
 };
 
@@ -743,5 +828,19 @@ function getOrganismEntityAssembliesBreadcrumbs(
     { path: ROUTES.ORGANISMS, text: "Organisms" },
     { path: "", text: `${organism.taxonomicLevelSpecies}` },
     { path: "", text: "Assemblies" },
+  ];
+}
+
+/**
+ * Get the priority pathogen entity breadcrumbs.
+ * @param priorityPathogen - Priority pathogen entity.
+ * @returns Breadcrumbs.
+ */
+function getPriorityPathogenEntityBreadcrumbs(
+  priorityPathogen: Outbreak
+): Breadcrumb[] {
+  return [
+    { path: ROUTES.PRIORITY_PATHOGENS, text: "Priority Pathogens" },
+    { path: "", text: priorityPathogen.name },
   ];
 }
