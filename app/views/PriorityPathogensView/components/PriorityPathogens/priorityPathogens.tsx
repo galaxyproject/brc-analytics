@@ -8,7 +8,7 @@ import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/m
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { MDXRemote } from "next-mdx-remote";
 import { StyledGrid, StyledSectionText } from "./priorityPathogens.styles";
-import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
+import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import { getPriorityColor, getPriorityLabel } from "./utils";
 
 export const PriorityPathogens = ({
@@ -17,7 +17,7 @@ export const PriorityPathogens = ({
   return (
     <StyledGrid container gap={4}>
       {priorityPathogens.map((priorityPathogen) => (
-        <RoundedPaper key={priorityPathogen.name}>
+        <FluidPaper key={priorityPathogen.name}>
           <Section>
             <SectionContent>
               <Typography
@@ -38,7 +38,7 @@ export const PriorityPathogens = ({
               variant={CHIP_PROPS.VARIANT.STATUS}
             />
           </Section>
-        </RoundedPaper>
+        </FluidPaper>
       ))}
     </StyledGrid>
   );
