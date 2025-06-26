@@ -28,6 +28,8 @@ export interface BRCDataCatalogGenome {
   ncbiTaxonomyId: string;
   otherTaxa: string[] | null;
   ploidy: ORGANISM_PLOIDY[];
+  priority: OUTBREAK_PRIORITY | null;
+  priorityPathogenName: string | null;
   scaffoldCount: number | null;
   scaffoldL50: number | null;
   scaffoldN50: number | null;
@@ -54,6 +56,8 @@ export interface BRCDataCatalogOrganism {
   genomes: BRCDataCatalogGenome[];
   ncbiTaxonomyId: string;
   otherTaxa: string[] | null;
+  priority: OUTBREAK_PRIORITY | null;
+  priorityPathogenName: string | null;
   taxonomicGroup: string[];
   taxonomicLevelClass: string;
   taxonomicLevelDomain: string;

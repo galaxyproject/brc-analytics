@@ -7,9 +7,13 @@ import { saveJson } from "./utils";
 buildCatalog();
 
 async function buildCatalog(): Promise<void> {
-  const genomes = await buildAssemblies();
-  const organisms = buildOrganisms(genomes);
   const outbreaks = await buildOutbreaks();
+  const outbreaksByTaxonomyId = new Map(
+    outbreaks.map((outbreak) => [outbreak.taxonomy_id, outbreak])
+  );
+
+  const genomes = await buildAssemblies(outbreaksByTaxonomyId);
+  const organisms = buildOrganisms(genomes);
   const workflows = await buildWorkflows();
 
   console.log("Assemblies:", genomes.length);
