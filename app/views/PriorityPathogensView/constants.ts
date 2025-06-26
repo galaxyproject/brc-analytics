@@ -1,1 +1,1 @@
-export const SLUGIFY_OPTIONS = { lower: true, remove: /[()/]/g };
+export const SLUGIFY_OPTIONS = { lower: true, strict: true };
