@@ -41,7 +41,7 @@ import {
   getActiveColor,
   getActiveLabel,
 } from "../../../../views/PriorityPathogenView/utils";
-import { ResourcesSection } from "app/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
+import { ResourcesSection } from "../../../../views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
 
 /**
  * Build props for the accession cell.
