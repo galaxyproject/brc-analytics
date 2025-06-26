@@ -355,7 +355,7 @@ export const buildPriorityPathogenDescription = (
 };
 
 /**
- * Build props for the priority pathogen details section..
+ * Build props for the priority pathogen details section.
  * @param priorityPathogen - Priority pathogen entity.
  * @returns Props to be used for the KeyValuePairs component.
  */
