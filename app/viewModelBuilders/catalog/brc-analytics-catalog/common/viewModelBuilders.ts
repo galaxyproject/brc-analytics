@@ -37,10 +37,6 @@ import {
   getPriorityLabel,
 } from "../../../../views/PriorityPathogensView/components/PriorityPathogens/utils";
 import { KeyValueSection } from "../../../../components/Entity/components/Section/KeyValueSection/keyValueSection";
-import {
-  getActiveColor,
-  getActiveLabel,
-} from "../../../../views/PriorityPathogenView/utils";
 import { ResourcesSection } from "../../../../views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
 
 /**
@@ -363,14 +359,6 @@ export const buildPriorityPathogenDetails = (
   priorityPathogen: Outbreak
 ): ComponentProps<typeof KeyValueSection> => {
   const keyValuePairs = new Map<Key, Value>();
-  keyValuePairs.set(
-    "Status",
-    C.Chip({
-      color: getActiveColor(priorityPathogen.active),
-      label: getActiveLabel(priorityPathogen.active),
-      variant: CHIP_PROPS.VARIANT.STATUS,
-    })
-  );
   keyValuePairs.set(
     "Priority",
     C.Chip({

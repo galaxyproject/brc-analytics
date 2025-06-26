@@ -85,7 +85,6 @@ export interface EntitiesResponsePagination {
 }
 
 export interface Outbreak {
-  active: boolean;
   description: MDXRemoteSerializeResult;
   highlight_descendant_taxonomy_ids: number[] | null;
   name: string;

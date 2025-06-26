@@ -88,6 +88,8 @@ export async function buildOutbreaks(): Promise<Outbreak[]> {
   const outbreaks: Outbreak[] = [];
 
   for (const sourceOutbreak of sourceOutbreaks) {
+    if (!sourceOutbreak.active) continue;
+
     const descriptionPath = path.resolve(
       SOURCE_PATH_ROOT,
       sourceOutbreak.description.path
@@ -95,7 +97,6 @@ export async function buildOutbreaks(): Promise<Outbreak[]> {
 
     // Create the base outbreak object
     const outbreak: Outbreak = {
-      active: sourceOutbreak.active,
       description: await readMdxFile(descriptionPath),
       highlight_descendant_taxonomy_ids:
         sourceOutbreak.highlight_descendant_taxonomy_ids ?? null,
