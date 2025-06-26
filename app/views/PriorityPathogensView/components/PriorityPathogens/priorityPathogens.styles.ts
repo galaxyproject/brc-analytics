@@ -1,6 +1,7 @@
 import { Grid, Typography } from "@mui/material";
 import styled from "@emotion/styled";
 import { mediaTabletUp } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
+import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 
 export const StyledGrid = styled(Grid)`
   display: grid;
@@ -8,6 +9,16 @@ export const StyledGrid = styled(Grid)`
 
   .MuiPaper-root {
     align-self: flex-start;
+  }
+
+  .MuiCardActionArea-root {
+    &:hover {
+      background-color: ${PALETTE.SMOKE_LIGHTEST};
+
+      .MuiCardActionArea-focusHighlight {
+        opacity: 0;
+      }
+    }
   }
 
   ${mediaTabletUp} {

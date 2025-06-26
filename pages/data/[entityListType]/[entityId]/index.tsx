@@ -10,6 +10,7 @@ import { config } from "../../../../app/config/config";
 import { seedDatabase } from "../../../../app/utils/seedDatabase";
 import { getEntities, getEntity } from "../../../../app/utils/entityUtils";
 import { EntityDetailView } from "../../../../app/views/EntityView/entityView";
+import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 
 interface StaticPath {
   params: PageUrl;
@@ -31,6 +32,12 @@ export interface EntityPageProps<R> {
  * @returns Entity detail view component.
  */
 const EntityDetailPage = <R,>(props: EntityPageProps<R>): JSX.Element => {
+  const isPriorityPathogensEnabled = useFeatureFlag("priority-pathogens");
+  if (
+    props.entityListType === "priority-pathogens" &&
+    !isPriorityPathogensEnabled
+  )
+    return <></>;
   return <EntityDetailView {...props} />;
 };
 

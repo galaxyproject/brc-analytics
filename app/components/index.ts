@@ -36,3 +36,6 @@ export { GridPaperSection } from "./Layout/components/Detail/components/Section/
 export { Branding } from "./Layout/components/Footer/components/Branding/branding";
 export { AnalyzeGenome } from "./Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 export { TypographyWordBreak } from "@databiosphere/findable-ui/lib/components/common/Typography/TypographyWordBreak/TypographyWordBreak";
+export { MDXSection } from "./Entity/components/Section/MDXSection/mdxSection";
+export { Chip } from "./common/Chip/chip";
+export { Sections } from "./Entity/components/Sections/sections";
