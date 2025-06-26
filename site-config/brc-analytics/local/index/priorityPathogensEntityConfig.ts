@@ -4,7 +4,7 @@ import { BRCEntityConfig } from "../../../common/entities";
 import { priorityPathogenMainColumn } from "../entity/priorityPathogen/priorityPathogenMainColumn";
 import { priorityPathogenTop } from "../entity/priorityPathogen/priorityPathogenTop";
 import slugify from "slugify";
-import { SLUGIFY_OPTIONS } from "../../../../app/views/PriorityPathogensView/constants";
+import { SLUGIFY_OPTIONS } from "../../../../app/common/constants";
 import { priorityPathogenSideColumn } from "../entity/priorityPathogen/priorityPathogenSideColumn";
 
 /**

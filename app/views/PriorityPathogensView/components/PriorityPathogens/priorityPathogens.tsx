@@ -13,7 +13,7 @@ import { getPriorityColor, getPriorityLabel } from "./utils";
 import { useRouter } from "next/router";
 import { ROUTES } from "../../../../../routes/constants";
 import slugify from "slugify";
-import { SLUGIFY_OPTIONS } from "../../constants";
+import { SLUGIFY_OPTIONS } from "../../../../common/constants";
 
 export const PriorityPathogens = ({
   priorityPathogens,
