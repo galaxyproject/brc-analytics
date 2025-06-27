@@ -219,6 +219,21 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
       },
       {
         componentConfig: {
+          children: [
+            {
+              component: C.Chip,
+              viewBuilder: V.buildPriorityPathogen,
+            } as ComponentConfig<typeof C.Chip, BRCDataCatalogOrganism>,
+          ],
+          component: C.Tooltip,
+          viewBuilder: V.buildPriorityPathogenTooltip,
+        } as ComponentConfig<typeof C.Tooltip, BRCDataCatalogOrganism>,
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.PRIORITY_PATHOGEN_NAME,
+        id: BRC_DATA_CATALOG_CATEGORY_KEY.PRIORITY_PATHOGEN_NAME,
+        width: { max: "0.5fr", min: "142px" },
+      },
+      {
+        componentConfig: {
           component: C.BasicCell,
           viewBuilder: V.buildAssemblyCount,
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
