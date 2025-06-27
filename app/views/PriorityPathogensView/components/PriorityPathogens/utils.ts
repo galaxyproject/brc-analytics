@@ -9,7 +9,7 @@ import { CHIP_PROPS as APP_CHIP_PROPS } from "../../../../styles/common/mui/chip
  * @returns The color for the priority of the outbreak.
  */
 export function getPriorityColor(
-  priority: OUTBREAK_PRIORITY
+  priority: OUTBREAK_PRIORITY | null
 ): ChipProps["color"] {
   switch (priority) {
     case OUTBREAK_PRIORITY.CRITICAL:
@@ -23,7 +23,7 @@ export function getPriorityColor(
     case OUTBREAK_PRIORITY.MODERATE_HIGH:
       return CHIP_PROPS.COLOR.DEFAULT;
     default:
-      return CHIP_PROPS.COLOR.DEFAULT;
+      return APP_CHIP_PROPS.COLOR.NONE;
   }
 }
 
@@ -32,7 +32,7 @@ export function getPriorityColor(
  * @param priority - The priority of the outbreak.
  * @returns The label for the priority of the outbreak.
  */
-export function getPriorityLabel(priority: OUTBREAK_PRIORITY): string {
+export function getPriorityLabel(priority: OUTBREAK_PRIORITY | null): string {
   switch (priority) {
     case OUTBREAK_PRIORITY.CRITICAL:
       return "Critical Priority";
@@ -45,6 +45,6 @@ export function getPriorityLabel(priority: OUTBREAK_PRIORITY): string {
     case OUTBREAK_PRIORITY.MODERATE_HIGH:
       return "Moderate High Priority";
     default:
-      return "Unknown Priority";
+      return "-";
   }
 }

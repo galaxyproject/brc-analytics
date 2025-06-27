@@ -90,6 +90,13 @@ export const MuiChip: Components["MuiChip"] = {
             color: APP_PALETTE.CAUTION_MAIN,
           },
         },
+        {
+          props: { color: APP_CHIP_PROPS.COLOR.NONE },
+          style: {
+            backgroundColor: "transparent",
+            color: PALETTE.INK_MAIN,
+          },
+        },
       ],
     },
   },

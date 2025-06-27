@@ -38,6 +38,9 @@ import {
 } from "../../../../views/PriorityPathogensView/components/PriorityPathogens/utils";
 import { KeyValueSection } from "../../../../components/Entity/components/Section/KeyValueSection/keyValueSection";
 import { ResourcesSection } from "../../../../views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
+import Router from "next/router";
+import slugify from "slugify";
+import { SLUGIFY_OPTIONS } from "../../../../common/constants";
 
 /**
  * Build props for the accession cell.
@@ -319,6 +322,33 @@ export const buildOrganismTaxonomicLevelStrain = (
   return {
     label: "strains",
     values: organism.taxonomicLevelStrain,
+  };
+};
+
+/**
+ * Build props for the priority pathogen cell.
+ * @param entity - Genome or organism entity.
+ * @returns Props to be used for the Chip cell.
+ */
+export const buildPriorityPathogen = (
+  entity: BRCDataCatalogGenome | BRCDataCatalogOrganism
+): ComponentProps<typeof C.Chip> => {
+  const { priority, priorityPathogenName } = entity;
+  return {
+    clickable: !!priorityPathogenName,
+    color: getPriorityColor(priority),
+    label: getPriorityLabel(priority),
+    onClick: (): void => {
+      if (!priorityPathogenName) return;
+      Router.push({
+        pathname: ROUTES.PRIORITY_PATHOGEN,
+        query: {
+          entityId: slugify(priorityPathogenName, SLUGIFY_OPTIONS),
+          entityListType: "priority-pathogens",
+        },
+      });
+    },
+    variant: CHIP_PROPS.VARIANT.STATUS,
   };
 };
 
