@@ -14,7 +14,7 @@ export const PRIORITY: ColumnConfig<
   BRCDataCatalogGenome | BRCDataCatalogOrganism
 > = {
   componentConfig: { component: C.BasicCell, viewBuilder: V.buildPriority },
-  enableHiding: false,
+  enableHiding: true,
   header: BRC_DATA_CATALOG_CATEGORY_LABEL.PRIORITY,
   id: BRC_DATA_CATALOG_CATEGORY_KEY.PRIORITY,
   width: "auto",
