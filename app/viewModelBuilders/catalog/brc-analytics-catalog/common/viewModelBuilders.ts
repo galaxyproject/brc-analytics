@@ -362,7 +362,9 @@ export const buildPriorityPathogenTooltip = (
 ): Omit<ComponentProps<typeof C.Tooltip>, "children"> => {
   return {
     arrow: true,
-    title: entity.priorityPathogenName || undefined,
+    title: entity.priorityPathogenName
+      ? `${entity.priorityPathogenName} - ${getPriorityLabel(entity.priority)}`
+      : undefined,
   };
 };
 

@@ -45,6 +45,6 @@ export function getPriorityLabel(priority: OUTBREAK_PRIORITY | null): string {
     case OUTBREAK_PRIORITY.MODERATE_HIGH:
       return "Moderate High Priority";
     default:
-      return "Unknown Priority";
+      return "Unprioritized";
   }
 }
