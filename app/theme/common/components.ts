@@ -116,13 +116,6 @@ export const MuiChip: Components["MuiChip"] = {
             "&:hover": { backgroundColor: PALETTE.WARNING_LIGHT },
           },
         },
-        {
-          props: { color: APP_CHIP_PROPS.COLOR.NONE },
-          style: {
-            backgroundColor: "transparent",
-            color: PALETTE.INK_MAIN,
-          },
-        },
       ],
     },
   },
