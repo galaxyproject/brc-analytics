@@ -145,7 +145,7 @@ export const buildAssemblyDetails = (
     })
   );
   keyValuePairs.set(
-    "Priority Pathogen",
+    BRC_DATA_CATALOG_CATEGORY_LABEL.PRIORITY_PATHOGEN_NAME,
     C.Chip(buildPriorityPathogen(assembly))
   );
   return {
