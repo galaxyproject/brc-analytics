@@ -17,6 +17,16 @@ export const StyledExploreView = styled(DXExploreView)`
     ${tableStyles};
   }
 
+  .MuiTable-root {
+    .MuiTableBody-root {
+      .MuiTableCell-root {
+        .MuiChip-root {
+          max-width: 100%;
+        }
+      }
+    }
+  }
+
   ${mediaTabletDown} {
     .MuiPaper-table {
       min-height: 64px;

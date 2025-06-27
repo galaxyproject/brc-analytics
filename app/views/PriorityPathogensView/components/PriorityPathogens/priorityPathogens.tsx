@@ -29,7 +29,7 @@ export const PriorityPathogens = ({
               onClick={() =>
                 push({
                   pathname: ROUTES.PRIORITY_PATHOGEN,
-                  query: { entityId },
+                  query: { entityId, entityListType: "priority-pathogens" },
                 })
               }
             >
