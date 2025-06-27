@@ -271,6 +271,21 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
       },
       {
         componentConfig: {
+          children: [
+            {
+              component: C.Chip,
+              viewBuilder: V.buildPriorityPathogen,
+            } as ComponentConfig<typeof C.Chip, BRCDataCatalogGenome>,
+          ],
+          component: C.Tooltip,
+          viewBuilder: V.buildPriorityPathogenTooltip,
+        } as ComponentConfig<typeof C.Tooltip, BRCDataCatalogGenome>,
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.PRIORITY_PATHOGEN_NAME,
+        id: BRC_DATA_CATALOG_CATEGORY_KEY.PRIORITY_PATHOGEN_NAME,
+        width: { max: "0.5fr", min: "142px" },
+      },
+      {
+        componentConfig: {
           component: C.BasicCell,
           viewBuilder: V.buildIsRef,
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
