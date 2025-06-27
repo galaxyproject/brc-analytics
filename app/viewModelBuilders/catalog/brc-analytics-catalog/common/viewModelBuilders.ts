@@ -326,9 +326,22 @@ export const buildOrganismTaxonomicLevelStrain = (
 };
 
 /**
+ * Build props for the priority cell.
+ * @param entity - Genome or organism entity.
+ * @returns Props to be used for the BasicCell component.
+ */
+export const buildPriority = (
+  entity: BRCDataCatalogGenome | BRCDataCatalogOrganism
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: entity.priority ?? "Unprioritized",
+  };
+};
+
+/**
  * Build props for the priority pathogen cell.
  * @param entity - Genome or organism entity.
- * @returns Props to be used for the Chip cell.
+ * @returns Props to be used for the Chip component.
  */
 export const buildPriorityPathogen = (
   entity: BRCDataCatalogGenome | BRCDataCatalogOrganism

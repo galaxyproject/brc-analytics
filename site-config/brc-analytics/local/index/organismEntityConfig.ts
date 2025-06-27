@@ -15,6 +15,8 @@ import {
 } from "../../category";
 import { assembliesMainColumn } from "../entity/organism/assembliesMainColumn";
 import { assembliesTop } from "../entity/organism/assembliesTop";
+import { CATEGORY_GROUPS } from "./common/category/categories";
+import { COLUMN_REGISTRY } from "./common/column/columnRegistry";
 
 /**
  * Entity config object responsible to config anything related to the /genomes route.
@@ -42,6 +44,7 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
           },
         ],
       },
+      CATEGORY_GROUPS.PRIORITY_PATHOGENS,
       {
         categoryConfigs: [
           {
@@ -241,10 +244,12 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
         id: BRC_DATA_CATALOG_CATEGORY_KEY.ASSEMBLY_COUNT,
         width: { max: "0.65fr", min: "164px" },
       },
+      COLUMN_REGISTRY.PRIORITY,
     ],
     tableOptions: {
       initialState: {
         columnVisibility: {
+          [BRC_DATA_CATALOG_CATEGORY_KEY.PRIORITY]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_CLASS]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_FAMILY]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_GENUS]: false,
