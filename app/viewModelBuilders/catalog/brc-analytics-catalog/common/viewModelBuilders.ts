@@ -144,6 +144,10 @@ export const buildAssemblyDetails = (
       value: assembly.accession,
     })
   );
+  keyValuePairs.set(
+    "Priority Pathogen",
+    C.Chip(buildPriorityPathogen(assembly))
+  );
   return {
     KeyElType: C.KeyElType,
     KeyValuesElType: (props) => C.Stack({ ...props, gap: 4 }),
