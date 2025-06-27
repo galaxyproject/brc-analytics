@@ -144,6 +144,10 @@ export const buildAssemblyDetails = (
       value: assembly.accession,
     })
   );
+  keyValuePairs.set(
+    BRC_DATA_CATALOG_CATEGORY_LABEL.PRIORITY_PATHOGEN_NAME,
+    C.Chip(buildPriorityPathogen(assembly))
+  );
   return {
     KeyElType: C.KeyElType,
     KeyValuesElType: (props) => C.Stack({ ...props, gap: 4 }),
