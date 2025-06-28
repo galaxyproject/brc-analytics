@@ -41,6 +41,7 @@ import { ResourcesSection } from "../../../../views/PriorityPathogenView/compone
 import Router from "next/router";
 import slugify from "slugify";
 import { SLUGIFY_OPTIONS } from "../../../../common/constants";
+import { LinkProps } from "next/link";
 
 /**
  * Build props for the accession cell.
@@ -423,13 +424,28 @@ export const buildPriorityPathogenDetails = (
 ): ComponentProps<typeof KeyValueSection> => {
   const keyValuePairs = new Map<Key, Value>();
   keyValuePairs.set(
-    "Priority",
+    BRC_DATA_CATALOG_CATEGORY_LABEL.PRIORITY,
     C.Chip({
       color: getPriorityColor(priorityPathogen.priority),
       label: getPriorityLabel(priorityPathogen.priority),
       variant: CHIP_PROPS.VARIANT.STATUS,
     })
   );
+  [
+    ["Organisms", ROUTES.ORGANISMS],
+    ["Assemblies", ROUTES.GENOMES],
+  ].forEach(([key, pathname]) => {
+    keyValuePairs.set(
+      key,
+      C.AppLink({
+        children: priorityPathogen.taxonName,
+        href: getEntityLinkWithPriorityPathogenFilter(
+          priorityPathogen,
+          pathname
+        ),
+      })
+    );
+  });
   return {
     keyValuePairs,
     title: "Priority Pathogen details",
@@ -849,6 +865,29 @@ function getAssemblyBreadcrumbs(assembly: BRCDataCatalogGenome): Breadcrumb[] {
     { path: "", text: assembly.accession },
     { path: "", text: "Select a Workflow" },
   ];
+}
+
+/**
+ * Returns an entity list link with a priority pathogen filter.
+ * @param priorityPathogen - Priority pathogen entity.
+ * @param pathname - Pathname to use for the link.
+ * @returns Props to be used for the AppLink component.
+ */
+function getEntityLinkWithPriorityPathogenFilter(
+  priorityPathogen: Outbreak,
+  pathname: string
+): LinkProps["href"] {
+  return {
+    pathname,
+    query: {
+      filter: JSON.stringify([
+        {
+          categoryKey: BRC_DATA_CATALOG_CATEGORY_KEY.PRIORITY_PATHOGEN_NAME,
+          value: [priorityPathogen.name],
+        },
+      ]),
+    },
+  };
 }
 
 /**
