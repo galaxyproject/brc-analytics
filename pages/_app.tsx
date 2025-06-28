@@ -22,13 +22,10 @@ import { mergeAppTheme } from "../app/theme/theme";
 import { GoogleSignInAuthenticationProvider } from "@databiosphere/findable-ui/lib/providers/googleSignInAuthentication/provider";
 import { ServicesProvider } from "@databiosphere/findable-ui/lib/providers/services/provider";
 import { setFeatureFlags } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/common/utils";
-import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
-import { ROUTES } from "../routes/constants";
-import { Navigation } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/common/entities";
 
 const DEFAULT_ENTITY_LIST_TYPE = "organisms";
 
-setFeatureFlags(["priority-pathogens", "workflow"]);
+setFeatureFlags(["workflow"]);
 
 export interface PageProps extends AzulEntitiesStaticResponse {
   pageTitle?: string;
@@ -61,18 +58,6 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
   const appTheme = mergeAppTheme(baseThemeOptions, themeOptions);
   const AppLayout = Component.AppLayout || DXAppLayout;
   const Main = Component.Main || DXMain;
-
-  // Determine if priority pathogens feature is enabled.
-  const isPriorityPathogensEnabled = useFeatureFlag("priority-pathogens");
-
-  // Temporarily filter out priority pathogens navigation item until feature is ready.
-  const navigation = header?.navigation?.map((nav) =>
-    nav?.filter(
-      (item) =>
-        isPriorityPathogensEnabled || item.url !== ROUTES.PRIORITY_PATHOGENS
-    )
-  ) as Navigation;
-
   return (
     <EmotionThemeProvider theme={appTheme}>
       <ThemeProvider theme={appTheme}>
@@ -84,7 +69,7 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
               <GoogleSignInAuthenticationProvider>
                 <LayoutDimensionsProvider>
                   <AppLayout>
-                    <DXHeader {...header} navigation={navigation} />
+                    <DXHeader {...header} />
                     <ExploreStateProvider entityListType={entityListType}>
                       <Main>
                         <ErrorBoundary
