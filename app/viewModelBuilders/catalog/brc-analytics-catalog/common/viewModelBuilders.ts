@@ -432,7 +432,7 @@ export const buildPriorityPathogenDetails = (
     })
   );
   [
-    ["Organims", ROUTES.ORGANISMS],
+    ["Organisms", ROUTES.ORGANISMS],
     ["Assemblies", ROUTES.GENOMES],
   ].forEach(([key, pathname]) => {
     keyValuePairs.set(
