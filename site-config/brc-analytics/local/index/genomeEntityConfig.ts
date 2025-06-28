@@ -19,6 +19,8 @@ import {
 import { mainColumn as analysisMethodsMainColumn } from "../entity/genome/analysisMethodMainColumn";
 import { sideColumn as analysisMethodsSideColumn } from "../entity/genome/analysisMethodsSideColumn";
 import { top as analysisMethodsTop } from "../entity/genome/analysisMethodsTop";
+import { CATEGORY_GROUPS } from "./common/category/categories";
+import { COLUMN_REGISTRY } from "./common/column/columnRegistry";
 
 /**
  * Entity config object responsible to config anything related to the /assemblies route.
@@ -47,6 +49,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         ],
         label: "Organism",
       },
+      CATEGORY_GROUPS.PRIORITY_PATHOGENS,
       {
         categoryConfigs: [
           {
@@ -271,6 +274,21 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
       },
       {
         componentConfig: {
+          children: [
+            {
+              component: C.Chip,
+              viewBuilder: V.buildPriorityPathogen,
+            } as ComponentConfig<typeof C.Chip, BRCDataCatalogGenome>,
+          ],
+          component: C.Tooltip,
+          viewBuilder: V.buildPriorityPathogenTooltip,
+        } as ComponentConfig<typeof C.Tooltip, BRCDataCatalogGenome>,
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.PRIORITY_PATHOGEN_NAME,
+        id: BRC_DATA_CATALOG_CATEGORY_KEY.PRIORITY_PATHOGEN_NAME,
+        width: { max: "0.5fr", min: "142px" },
+      },
+      {
+        componentConfig: {
           component: C.BasicCell,
           viewBuilder: V.buildIsRef,
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
@@ -359,10 +377,12 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         id: BRC_DATA_CATALOG_CATEGORY_KEY.ANNOTATION_STATUS,
         width: { max: "0.5fr", min: "142px" },
       },
+      COLUMN_REGISTRY.PRIORITY,
     ],
     tableOptions: {
       initialState: {
         columnVisibility: {
+          [BRC_DATA_CATALOG_CATEGORY_KEY.PRIORITY]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_CLASS]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_FAMILY]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_GENUS]: false,

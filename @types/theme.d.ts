@@ -20,5 +20,6 @@ declare module "@mui/material/Chip" {
   interface ChipPropsColorOverrides {
     alert: true;
     caution: true;
+    none: true;
   }
 }
