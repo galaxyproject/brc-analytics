@@ -39,4 +39,5 @@ export { TypographyWordBreak } from "@databiosphere/findable-ui/lib/components/c
 export { MDXSection } from "./Entity/components/Section/MDXSection/mdxSection";
 export { Chip } from "./common/Chip/chip";
 export { Tooltip } from "./common/Tooltip/tooltip";
+export { AppLink } from "./common/AppLink/appLink";
 export { Sections } from "./Entity/components/Sections/sections";
