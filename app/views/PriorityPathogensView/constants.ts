@@ -1,4 +1,4 @@
-import { OUTBREAK_PRIORITY } from "app/apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { OUTBREAK_PRIORITY } from "../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 
 export const PRIORITY: Record<OUTBREAK_PRIORITY, number> = {
   CRITICAL: 1,
