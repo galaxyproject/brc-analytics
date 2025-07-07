@@ -19,6 +19,7 @@ import {
 import { mainColumn as analysisMethodsMainColumn } from "../entity/genome/analysisMethodMainColumn";
 import { sideColumn as analysisMethodsSideColumn } from "../entity/genome/analysisMethodsSideColumn";
 import { top as analysisMethodsTop } from "../entity/genome/analysisMethodsTop";
+import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
 
 /**
  * Entity config object responsible to config anything related to the /assemblies route.
@@ -360,8 +361,10 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
       },
     ],
     tableOptions: {
+      enableRowPosition: true,
       initialState: {
         columnVisibility: {
+          [COLUMN_IDENTIFIER.ROW_POSITION]: true,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_CLASS]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_FAMILY]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_GENUS]: false,
