@@ -49,7 +49,6 @@ export function makeConfig(
       genomeEntityConfig as EntityConfig<BRCDataCatalogGenome>,
       priorityPathogensEntityConfig as EntityConfig<Outbreak>,
     ],
-    explorerTitle: APP_TITLE,
     gitHubUrl,
     layout: {
       floating,

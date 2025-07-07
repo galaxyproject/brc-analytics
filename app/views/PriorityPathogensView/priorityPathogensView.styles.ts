@@ -1,8 +1,8 @@
 import styled from "@emotion/styled";
-import { Index } from "@databiosphere/findable-ui/lib/components/Index/index.styles";
+import { StyledGrid as DXStyledGrid } from "@databiosphere/findable-ui/lib/components/Index/index.styles";
 import { mediaTabletUp } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 
-export const StyledIndex = styled(Index)`
+export const StyledGrid = styled(DXStyledGrid)`
   grid-template-columns: 1fr;
 
   ${mediaTabletUp} {

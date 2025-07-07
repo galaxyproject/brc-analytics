@@ -1,15 +1,14 @@
-import { CustomSVGIconProps } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/common/entities";
-import { SvgIcon } from "@mui/material";
+import { SvgIcon, SvgIconProps } from "@mui/material";
 
 /**
  * Custom analyze genome icon.
  */
 
 export const AnalyzeGenomeIcon = ({
-  fontSize = "xsmall",
+  fontSize = "small",
   viewBox = "0 0 18 18",
   ...props /* Spread props to allow for Mui SvgIconProps specific prop overrides e.g. "htmlColor". */
-}: CustomSVGIconProps): JSX.Element => {
+}: SvgIconProps): JSX.Element => {
   return (
     <SvgIcon fontSize={fontSize} viewBox={viewBox} {...props}>
       <path

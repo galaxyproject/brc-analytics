@@ -26,11 +26,13 @@ export const priorityPathogensEntityConfig: BRCEntityConfig<Outbreak> = {
     ],
   },
   exploreMode: EXPLORE_MODE.CS_FETCH_CS_FILTERING,
-  explorerTitle: "Priority Pathogens",
   getId: (priorityPathogen) => slugify(priorityPathogen.name, SLUGIFY_OPTIONS),
   label: "Priority Pathogens",
   list: {
     columns: [],
+  },
+  listView: {
+    title: "Priority Pathogens",
   },
   route: "priority-pathogens",
   staticLoadFile: "catalog/output/outbreaks.json",

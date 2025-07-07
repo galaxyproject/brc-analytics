@@ -95,7 +95,6 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
     ],
   },
   exploreMode: EXPLORE_MODE.CS_FETCH_CS_FILTERING,
-  explorerTitle: "Organisms",
   getId: getOrganismId,
   label: "Organisms",
   list: {
@@ -254,6 +253,7 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
     disablePagination: true,
     enableDownload: true,
     enableTab: false,
+    title: "Organisms",
   },
   route: "organisms",
   staticLoadFile: "catalog/output/organisms.json",

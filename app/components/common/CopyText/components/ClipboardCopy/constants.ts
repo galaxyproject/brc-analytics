@@ -1,7 +1,7 @@
 import { IconButtonProps, IconProps, TooltipProps } from "@mui/material";
 
 export const ICON_BUTTON_PROPS: Partial<IconButtonProps> = {
-  size: "xxsmall",
+  size: "small",
 };
 
 export const ICON_PROPS: Pick<IconProps, "color" | "fontSize"> = {

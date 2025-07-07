@@ -9,7 +9,7 @@ import { Props } from "./types";
 
 export const Table = ({ table }: Props): JSX.Element => {
   return (
-    <StyledRoundedPaper variant="table">
+    <StyledRoundedPaper>
       <TableContainer>
         <GridTable
           gridTemplateColumns={getColumnTrackSizing(

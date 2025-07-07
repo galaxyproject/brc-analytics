@@ -10,10 +10,10 @@ import {
 } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { config } from "../../../app/config/config";
 import { seedDatabase } from "../../../app/utils/seedDatabase";
-import { StyledExploreView } from "../../../app/views/ExploreView/exploreView.styles";
 import { PriorityPathogensView } from "../../../app/views/PriorityPathogensView/priorityPathogensView";
 import { Outbreak } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
+import { ExploreView } from "@databiosphere/findable-ui/lib/views/ExploreView/exploreView";
 
 interface PageUrl extends ParsedUrlQuery {
   entityListType: string;
@@ -52,7 +52,7 @@ const IndexPage = <R,>({
   }
 
   // Return the ExploreView component for all other routes.
-  return <StyledExploreView entityListType={entityListType} {...props} />;
+  return <ExploreView entityListType={entityListType} {...props} />;
 };
 
 /**

@@ -1,5 +1,6 @@
 import {
   Button,
+  Grid,
   TableBody,
   TableCell,
   TableContainer,
@@ -12,7 +13,6 @@ import { GridPaper } from "@databiosphere/findable-ui/lib/components/common/Pape
 import { GridTable } from "@databiosphere/findable-ui/lib/components/Table/table.styles";
 import { getColumnTrackSizing } from "@databiosphere/findable-ui/lib/components/TableCreator/options/columnTrackSizing/utils";
 import { StyledPaper } from "./collectionSummary.styles";
-import { ToolbarActions } from "@databiosphere/findable-ui/lib/components/Table/components/TableToolbar/tableToolbar.styles";
 import { Props } from "./types";
 import { flexRender } from "@tanstack/react-table";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
@@ -27,20 +27,20 @@ export const CollectionSummary = ({
   const count = Object.keys(table.getState().rowSelection).length;
   if (selectedCount === 0) return null;
   return (
-    <StyledPaper variant="table">
+    <StyledPaper>
       <GridPaper>
-        <Toolbar variant="table">
+        <Toolbar>
           <Typography variant={TYPOGRAPHY_PROPS.VARIANT.TEXT_BODY_400}>
             {count} Collection{count > 1 ? "s" : ""} Selected
           </Typography>
-          <ToolbarActions>
+          <Grid gap={4}>
             <Button {...BUTTON_PROPS.SECONDARY_CONTAINED} onClick={onEdit}>
               Edit list
             </Button>
             <Button {...BUTTON_PROPS.SECONDARY_CONTAINED} onClick={onClear}>
               Clear all
             </Button>
-          </ToolbarActions>
+          </Grid>
         </Toolbar>
         <TableContainer>
           <GridTable
