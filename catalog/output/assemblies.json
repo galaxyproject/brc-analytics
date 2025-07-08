@@ -86,7 +86,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 282,
     "scaffoldL50": 6,
     "scaffoldN50": 2388123,
@@ -529,7 +529,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Valley Fever/ Coccidioides posadasii",
+    "priorityPathogenName": "Coccidioides posadasii",
     "scaffoldCount": 6,
     "scaffoldL50": 3,
     "scaffoldN50": 4351581,
@@ -644,7 +644,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 55,
     "scaffoldL50": 4,
     "scaffoldN50": 3791214,
@@ -701,7 +701,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Valley Fever/ Coccidioides posadasii",
+    "priorityPathogenName": "Coccidioides posadasii",
     "scaffoldCount": 53,
     "scaffoldL50": 4,
     "scaffoldN50": 3719881,
@@ -758,7 +758,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Valley Fever/ Coccidioides posadasii",
+    "priorityPathogenName": "Coccidioides posadasii",
     "scaffoldCount": 241,
     "scaffoldL50": 29,
     "scaffoldN50": 284654,
@@ -815,7 +815,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Valley Fever/ Coccidioides posadasii",
+    "priorityPathogenName": "Coccidioides posadasii",
     "scaffoldCount": 255,
     "scaffoldL50": 44,
     "scaffoldN50": 210522,
@@ -929,7 +929,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Valley Fever/ Coccidioides posadasii",
+    "priorityPathogenName": "Coccidioides posadasii",
     "scaffoldCount": 633,
     "scaffoldL50": 150,
     "scaffoldN50": 62331,
@@ -986,7 +986,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Valley Fever/ Coccidioides posadasii",
+    "priorityPathogenName": "Coccidioides posadasii",
     "scaffoldCount": 551,
     "scaffoldL50": 124,
     "scaffoldN50": 77341,
@@ -1043,7 +1043,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Valley Fever/ Coccidioides posadasii",
+    "priorityPathogenName": "Coccidioides posadasii",
     "scaffoldCount": 620,
     "scaffoldL50": 129,
     "scaffoldN50": 74903,
@@ -1100,7 +1100,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Valley Fever/ Coccidioides posadasii",
+    "priorityPathogenName": "Coccidioides posadasii",
     "scaffoldCount": 473,
     "scaffoldL50": 104,
     "scaffoldN50": 87602,
@@ -1297,7 +1297,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Histoplasmosis/ Histoplasma capsulatum",
+    "priorityPathogenName": "Histoplasma capsulatum",
     "scaffoldCount": 48,
     "scaffoldL50": 7,
     "scaffoldN50": 1740271,
@@ -1687,7 +1687,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Valley Fever/ Coccidioides posadasii",
+    "priorityPathogenName": "Coccidioides posadasii",
     "scaffoldCount": 54,
     "scaffoldL50": 8,
     "scaffoldN50": 1220107,
@@ -2906,7 +2906,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 24,
     "scaffoldL50": 6,
     "scaffoldN50": 1937564,
@@ -3017,7 +3017,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 1162,
     "scaffoldL50": 14,
     "scaffoldN50": 897557,
@@ -6109,7 +6109,7 @@
       "POLYPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Mucormycosis/ Mucorales",
+    "priorityPathogenName": "Mucorales",
     "scaffoldCount": 470,
     "scaffoldL50": 82,
     "scaffoldN50": 140649,
@@ -6826,7 +6826,7 @@
       "DIPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Visceral Leishmaniasis/ Leishmania donovani complex",
+    "priorityPathogenName": "Leishmania donovani",
     "scaffoldCount": 36,
     "scaffoldL50": 11,
     "scaffoldN50": 1024085,
@@ -7575,7 +7575,7 @@
       "POLYPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Primary amoebic meningoencephalitis/ Naegleria fowleri",
+    "priorityPathogenName": "Naegleria fowleri",
     "scaffoldCount": 574,
     "scaffoldL50": 56,
     "scaffoldN50": 145869,
@@ -8237,7 +8237,7 @@
       "POLYPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Mucormycosis/ Mucorales",
+    "priorityPathogenName": "Mucorales",
     "scaffoldCount": 209,
     "scaffoldL50": 25,
     "scaffoldN50": 367562,
@@ -9515,7 +9515,7 @@
       "HAPLOID"
     ],
     "priority": "CRITICAL",
-    "priorityPathogenName": "Filoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Filoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 19112,
@@ -10795,7 +10795,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 12,
     "scaffoldL50": 4,
     "scaffoldN50": 4166724,
@@ -11589,7 +11589,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Nairoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Nairoviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 11684,
@@ -11703,7 +11703,7 @@
       "POLYPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Mucormycosis/ Mucorales",
+    "priorityPathogenName": "Mucorales",
     "scaffoldCount": 21,
     "scaffoldL50": 4,
     "scaffoldN50": 4318338,
@@ -12230,7 +12230,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 68,
     "scaffoldL50": 4,
     "scaffoldN50": 2316641,
@@ -12619,7 +12619,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 100,
     "scaffoldL50": 6,
     "scaffoldN50": 2197438,
@@ -12677,7 +12677,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 33,
     "scaffoldL50": 5,
     "scaffoldN50": 2949984,
@@ -12789,7 +12789,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 829,
     "scaffoldL50": 8,
     "scaffoldN50": 1827541,
@@ -13010,7 +13010,7 @@
       "POLYPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Mucormycosis/ Mucorales",
+    "priorityPathogenName": "Mucorales",
     "scaffoldCount": 560,
     "scaffoldL50": 71,
     "scaffoldN50": 105542,
@@ -13441,7 +13441,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Cryptococcosis/ Cryptococcus neoformans",
+    "priorityPathogenName": "Cryptococcus neoformans",
     "scaffoldCount": 14,
     "scaffoldL50": 6,
     "scaffoldN50": 1422463,
@@ -13973,7 +13973,7 @@
       "POLYPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Mucormycosis/ Mucorales",
+    "priorityPathogenName": "Mucorales",
     "scaffoldCount": 411,
     "scaffoldL50": 16,
     "scaffoldN50": 647494,
@@ -14079,7 +14079,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Peribunyaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Peribunyaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6980,
@@ -14130,7 +14130,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Togaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Togaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 11821,
@@ -14442,7 +14442,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Cryptococcosis/ Cryptococcus neoformans",
+    "priorityPathogenName": "Cryptococcus neoformans",
     "scaffoldCount": 14,
     "scaffoldL50": 6,
     "scaffoldN50": 1422457,
@@ -14758,7 +14758,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7440,
@@ -14976,7 +14976,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 166,
     "scaffoldL50": 33,
     "scaffoldN50": 362770,
@@ -15034,7 +15034,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 518,
     "scaffoldL50": 84,
     "scaffoldN50": 158998,
@@ -15142,7 +15142,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 133,
     "scaffoldL50": 18,
     "scaffoldN50": 705420,
@@ -16099,7 +16099,7 @@
       "DIPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Visceral Leishmaniasis/ Leishmania donovani complex",
+    "priorityPathogenName": "Leishmania donovani",
     "scaffoldCount": 36,
     "scaffoldL50": 11,
     "scaffoldN50": 1067468,
@@ -17038,7 +17038,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 10800,
@@ -17090,7 +17090,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 10649,
@@ -17142,7 +17142,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 10664,
@@ -17193,7 +17193,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 10927,
@@ -17245,7 +17245,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 10696,
@@ -17302,7 +17302,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 1715,
     "scaffoldL50": 270,
     "scaffoldN50": 41225,
@@ -17783,7 +17783,7 @@
       "POLYPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Mucormycosis/ Mucorales",
+    "priorityPathogenName": "Mucorales",
     "scaffoldCount": 10,
     "scaffoldL50": 4,
     "scaffoldN50": 3350511,
@@ -17835,7 +17835,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7432,
@@ -17888,7 +17888,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7441,
@@ -17940,7 +17940,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7408,
@@ -17992,7 +17992,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7569,
@@ -18049,7 +18049,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 8,
     "scaffoldL50": 4,
     "scaffoldN50": 4810201,
@@ -18106,7 +18106,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 270,
     "scaffoldL50": 34,
     "scaffoldN50": 354721,
@@ -18266,7 +18266,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Malaria/ Plasmodium falciparum",
+    "priorityPathogenName": "Plasmodium falciparum",
     "scaffoldCount": 21,
     "scaffoldL50": 5,
     "scaffoldN50": 1631396,
@@ -18318,7 +18318,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Malaria/ Plasmodium falciparum",
+    "priorityPathogenName": "Plasmodium falciparum",
     "scaffoldCount": 28,
     "scaffoldL50": 5,
     "scaffoldN50": 1527116,
@@ -18370,7 +18370,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Malaria/ Plasmodium falciparum",
+    "priorityPathogenName": "Plasmodium falciparum",
     "scaffoldCount": 30,
     "scaffoldL50": 5,
     "scaffoldN50": 1610926,
@@ -18422,7 +18422,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Malaria/ Plasmodium falciparum",
+    "priorityPathogenName": "Plasmodium falciparum",
     "scaffoldCount": 20,
     "scaffoldL50": 6,
     "scaffoldN50": 1455033,
@@ -18479,7 +18479,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 14,
     "scaffoldL50": 4,
     "scaffoldN50": 4028368,
@@ -19543,7 +19543,7 @@
       "POLYPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Primary amoebic meningoencephalitis/ Naegleria fowleri",
+    "priorityPathogenName": "Naegleria fowleri",
     "scaffoldCount": 37,
     "scaffoldL50": 16,
     "scaffoldN50": 756811,
@@ -19593,7 +19593,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Nairoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Nairoviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 12215,
@@ -20007,7 +20007,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Cryptosporidiosis/ Cryptosporidium parvum",
+    "priorityPathogenName": "Cryptosporidium parvum",
     "scaffoldCount": 8,
     "scaffoldL50": 4,
     "scaffoldN50": 1108396,
@@ -20545,7 +20545,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Histoplasmosis/ Histoplasma capsulatum",
+    "priorityPathogenName": "Histoplasma capsulatum",
     "scaffoldCount": 7,
     "scaffoldL50": 3,
     "scaffoldN50": 5328076,
@@ -20603,7 +20603,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Histoplasmosis/ Histoplasma capsulatum",
+    "priorityPathogenName": "Histoplasma capsulatum",
     "scaffoldCount": 6,
     "scaffoldL50": 3,
     "scaffoldN50": 7000705,
@@ -20713,7 +20713,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Histoplasmosis/ Histoplasma capsulatum",
+    "priorityPathogenName": "Histoplasma capsulatum",
     "scaffoldCount": 6,
     "scaffoldL50": 3,
     "scaffoldN50": 5585295,
@@ -20826,7 +20826,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Histoplasmosis/ Histoplasma capsulatum",
+    "priorityPathogenName": "Histoplasma capsulatum",
     "scaffoldCount": 11,
     "scaffoldL50": 3,
     "scaffoldN50": 4063218,
@@ -21291,7 +21291,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Cryptosporidiosis/ Cryptosporidium parvum",
+    "priorityPathogenName": "Cryptosporidium parvum",
     "scaffoldCount": 8,
     "scaffoldL50": 4,
     "scaffoldN50": 1108772,
@@ -22143,7 +22143,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Cryptococcosis/ Cryptococcus neoformans",
+    "priorityPathogenName": "Cryptococcus neoformans",
     "scaffoldCount": 14,
     "scaffoldL50": 6,
     "scaffoldN50": 1423448,
@@ -22890,7 +22890,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7464,
@@ -22943,7 +22943,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7411,
@@ -22996,7 +22996,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7411,
@@ -23048,7 +23048,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 10775,
@@ -23100,7 +23100,7 @@
       "HAPLOID"
     ],
     "priority": "CRITICAL",
-    "priorityPathogenName": "Filoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Filoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 19114,
@@ -23152,7 +23152,7 @@
       "HAPLOID"
     ],
     "priority": "CRITICAL",
-    "priorityPathogenName": "Filoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Filoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 19114,
@@ -23204,7 +23204,7 @@
       "HAPLOID"
     ],
     "priority": "CRITICAL",
-    "priorityPathogenName": "Filoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Filoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 19112,
@@ -23257,7 +23257,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7405,
@@ -23309,7 +23309,7 @@
       "HAPLOID"
     ],
     "priority": "CRITICAL",
-    "priorityPathogenName": "Filoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Filoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 19113,
@@ -23362,7 +23362,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Paramyxoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Paramyxoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 18402,
@@ -23414,7 +23414,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Phenuiviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Phenuiviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6440,
@@ -23466,7 +23466,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Phenuiviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Phenuiviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6427,
@@ -23518,7 +23518,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Arenaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Arenaviridae",
     "scaffoldCount": 2,
     "scaffoldL50": 1,
     "scaffoldN50": 7215,
@@ -23570,7 +23570,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Nairoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Nairoviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 12066,
@@ -23945,7 +23945,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Arenaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Arenaviridae",
     "scaffoldCount": 2,
     "scaffoldL50": 1,
     "scaffoldN50": 7282,
@@ -24589,7 +24589,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 19,
     "scaffoldL50": 4,
     "scaffoldN50": 2899611,
@@ -24984,7 +24984,7 @@
       "DIPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Visceral Leishmaniasis/ Leishmania donovani complex",
+    "priorityPathogenName": "Leishmania donovani",
     "scaffoldCount": 36,
     "scaffoldL50": 11,
     "scaffoldN50": 1055293,
@@ -25095,7 +25095,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Malaria/ Plasmodium falciparum",
+    "priorityPathogenName": "Plasmodium falciparum",
     "scaffoldCount": 19,
     "scaffoldL50": 5,
     "scaffoldN50": 1680329,
@@ -25147,7 +25147,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Malaria/ Plasmodium falciparum",
+    "priorityPathogenName": "Plasmodium falciparum",
     "scaffoldCount": 19,
     "scaffoldL50": 5,
     "scaffoldN50": 1627361,
@@ -25199,7 +25199,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Malaria/ Plasmodium falciparum",
+    "priorityPathogenName": "Plasmodium falciparum",
     "scaffoldCount": 26,
     "scaffoldL50": 5,
     "scaffoldN50": 1593931,
@@ -25251,7 +25251,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Malaria/ Plasmodium falciparum",
+    "priorityPathogenName": "Plasmodium falciparum",
     "scaffoldCount": 17,
     "scaffoldL50": 5,
     "scaffoldN50": 1701451,
@@ -25303,7 +25303,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Malaria/ Plasmodium falciparum",
+    "priorityPathogenName": "Plasmodium falciparum",
     "scaffoldCount": 18,
     "scaffoldL50": 5,
     "scaffoldN50": 1671281,
@@ -25355,7 +25355,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Malaria/ Plasmodium falciparum",
+    "priorityPathogenName": "Plasmodium falciparum",
     "scaffoldCount": 19,
     "scaffoldL50": 5,
     "scaffoldN50": 1635582,
@@ -25407,7 +25407,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Malaria/ Plasmodium falciparum",
+    "priorityPathogenName": "Plasmodium falciparum",
     "scaffoldCount": 20,
     "scaffoldL50": 5,
     "scaffoldN50": 1620677,
@@ -25459,7 +25459,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Malaria/ Plasmodium falciparum",
+    "priorityPathogenName": "Plasmodium falciparum",
     "scaffoldCount": 24,
     "scaffoldL50": 5,
     "scaffoldN50": 1565165,
@@ -25511,7 +25511,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Malaria/ Plasmodium falciparum",
+    "priorityPathogenName": "Plasmodium falciparum",
     "scaffoldCount": 14,
     "scaffoldL50": 5,
     "scaffoldN50": 1661861,
@@ -25563,7 +25563,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Malaria/ Plasmodium falciparum",
+    "priorityPathogenName": "Plasmodium falciparum",
     "scaffoldCount": 25,
     "scaffoldL50": 5,
     "scaffoldN50": 1587719,
@@ -25615,7 +25615,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Malaria/ Plasmodium falciparum",
+    "priorityPathogenName": "Plasmodium falciparum",
     "scaffoldCount": 77,
     "scaffoldL50": 6,
     "scaffoldN50": 1483156,
@@ -25667,7 +25667,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Malaria/ Plasmodium falciparum",
+    "priorityPathogenName": "Plasmodium falciparum",
     "scaffoldCount": 34,
     "scaffoldL50": 5,
     "scaffoldN50": 1632330,
@@ -25719,7 +25719,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Malaria/ Plasmodium falciparum",
+    "priorityPathogenName": "Plasmodium falciparum",
     "scaffoldCount": 115,
     "scaffoldL50": 6,
     "scaffoldN50": 1487517,
@@ -25771,7 +25771,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Malaria/ Plasmodium falciparum",
+    "priorityPathogenName": "Plasmodium falciparum",
     "scaffoldCount": 17,
     "scaffoldL50": 5,
     "scaffoldN50": 1823838,
@@ -25827,7 +25827,7 @@
       "DIPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Visceral Leishmaniasis/ Leishmania donovani complex",
+    "priorityPathogenName": "Leishmania donovani",
     "scaffoldCount": 36,
     "scaffoldL50": 11,
     "scaffoldN50": 1062302,
@@ -27285,7 +27285,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 8,
     "scaffoldL50": 4,
     "scaffoldN50": 3948441,
@@ -27343,7 +27343,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 143,
     "scaffoldL50": 5,
     "scaffoldN50": 2493640,
@@ -27451,7 +27451,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Malaria/ Plasmodium falciparum",
+    "priorityPathogenName": "Plasmodium falciparum",
     "scaffoldCount": 14,
     "scaffoldL50": 5,
     "scaffoldN50": 1687656,
@@ -27563,7 +27563,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 19,
     "scaffoldL50": 6,
     "scaffoldN50": 2525243,
@@ -30341,7 +30341,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 90,
     "scaffoldL50": 5,
     "scaffoldN50": 2478513,
@@ -30396,7 +30396,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Cryptococcosis/ Cryptococcus neoformans",
+    "priorityPathogenName": "Cryptococcus neoformans",
     "scaffoldCount": 14,
     "scaffoldL50": 6,
     "scaffoldN50": 1422463,
@@ -30453,7 +30453,7 @@
       "POLYPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Mucormycosis/ Mucorales",
+    "priorityPathogenName": "Mucorales",
     "scaffoldCount": 81,
     "scaffoldL50": 6,
     "scaffoldN50": 3104119,
@@ -30794,7 +30794,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 26,
     "scaffoldL50": 7,
     "scaffoldN50": 1912493,
@@ -30852,7 +30852,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 163,
     "scaffoldL50": 4,
     "scaffoldN50": 2929192,
@@ -31466,7 +31466,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Valley Fever/ Coccidioides posadasii",
+    "priorityPathogenName": "Coccidioides posadasii",
     "scaffoldCount": 55,
     "scaffoldL50": 4,
     "scaffoldN50": 2376830,
@@ -31757,7 +31757,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Cryptosporidiosis/ Cryptosporidium parvum",
+    "priorityPathogenName": "Cryptosporidium parvum",
     "scaffoldCount": 8,
     "scaffoldL50": 4,
     "scaffoldN50": 1104417,
@@ -32697,7 +32697,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 11,
     "scaffoldL50": 4,
     "scaffoldN50": 4887096,
@@ -34073,7 +34073,7 @@
       "DIPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Visceral Leishmaniasis/ Leishmania donovani complex",
+    "priorityPathogenName": "Leishmania donovani",
     "scaffoldCount": 36,
     "scaffoldL50": 11,
     "scaffoldN50": 1024085,
@@ -40786,7 +40786,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Phenuiviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Phenuiviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6404,
@@ -40836,7 +40836,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 9550,
@@ -40992,7 +40992,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Togaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Togaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 11488,
@@ -41199,7 +41199,7 @@
       "HAPLOID"
     ],
     "priority": "CRITICAL",
-    "priorityPathogenName": "Filoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Filoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 18959,
@@ -41252,7 +41252,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Paramyxoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Paramyxoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 15600,
@@ -41409,7 +41409,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6562,
@@ -41459,7 +41459,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Togaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Togaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 11484,
@@ -41511,7 +41511,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Peribunyaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Peribunyaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6980,
@@ -41562,7 +41562,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Nairoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Nairoviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 12255,
@@ -41613,7 +41613,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Arenaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Arenaviridae",
     "scaffoldCount": 2,
     "scaffoldL50": 1,
     "scaffoldN50": 6680,
@@ -41720,7 +41720,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Avian influenza",
+    "priorityPathogenName": "Avian Influenza",
     "scaffoldCount": 8,
     "scaffoldL50": 3,
     "scaffoldN50": 2225,
@@ -41823,7 +41823,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Arenaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Arenaviridae",
     "scaffoldCount": 2,
     "scaffoldL50": 1,
     "scaffoldN50": 7279,
@@ -41927,7 +41927,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Paramyxoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Paramyxoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 18234,
@@ -42134,7 +42134,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Arenaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Arenaviridae",
     "scaffoldCount": 2,
     "scaffoldL50": 1,
     "scaffoldN50": 7196,
@@ -42185,7 +42185,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Arenaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Arenaviridae",
     "scaffoldCount": 2,
     "scaffoldL50": 1,
     "scaffoldN50": 7081,
@@ -42237,7 +42237,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Peribunyaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Peribunyaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6846,
@@ -42395,7 +42395,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Togaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Togaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 11826,
@@ -42447,7 +42447,7 @@
       "HAPLOID"
     ],
     "priority": "CRITICAL",
-    "priorityPathogenName": "Filoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Filoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 18891,
@@ -42498,7 +42498,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Nairoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Nairoviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 12108,
@@ -42654,7 +42654,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6550,
@@ -42706,7 +42706,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6562,
@@ -42759,7 +42759,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Paramyxoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Paramyxoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 15246,
@@ -42812,7 +42812,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Paramyxoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Paramyxoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 15894,
@@ -42864,7 +42864,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6541,
@@ -42915,7 +42915,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 10787,
@@ -43019,7 +43019,7 @@
       "HAPLOID"
     ],
     "priority": "CRITICAL",
-    "priorityPathogenName": "Filoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Filoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 18875,
@@ -43071,7 +43071,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6530,
@@ -43125,7 +43125,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Arenaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Arenaviridae",
     "scaffoldCount": 2,
     "scaffoldL50": 1,
     "scaffoldN50": 7271,
@@ -43232,7 +43232,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6533,
@@ -43284,7 +43284,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6533,
@@ -43440,7 +43440,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Arenaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Arenaviridae",
     "scaffoldCount": 2,
     "scaffoldL50": 1,
     "scaffoldN50": 7114,
@@ -43546,7 +43546,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Paramyxoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Paramyxoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 15384,
@@ -43748,7 +43748,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 10862,
@@ -44616,7 +44616,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Togaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Togaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 11442,
@@ -44667,7 +44667,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 10839,
@@ -44719,7 +44719,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7478,
@@ -44769,7 +44769,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Togaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Togaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 11703,
@@ -44820,7 +44820,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 10943,
@@ -44923,7 +44923,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 10962,
@@ -45078,7 +45078,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7212,
@@ -45180,7 +45180,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7348,
@@ -45282,7 +45282,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 8251,
@@ -45437,7 +45437,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 9392,
@@ -45487,7 +45487,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Togaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Togaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 11444,
@@ -45539,7 +45539,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 10735,
@@ -45590,7 +45590,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 10976,
@@ -45641,7 +45641,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7152,
@@ -45743,7 +45743,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Togaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Togaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 11675,
@@ -45896,7 +45896,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Togaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Togaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 11835,
@@ -45948,7 +45948,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6532,
@@ -46052,7 +46052,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 11141,
@@ -46103,7 +46103,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 10871,
@@ -46154,7 +46154,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Togaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Togaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 11411,
@@ -46207,7 +46207,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Paramyxoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Paramyxoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 15646,
@@ -46258,7 +46258,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 11014,
@@ -46363,7 +46363,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Paramyxoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Paramyxoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 18246,
@@ -46678,7 +46678,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Avian influenza",
+    "priorityPathogenName": "Avian Influenza",
     "scaffoldCount": 8,
     "scaffoldL50": 3,
     "scaffoldN50": 2233,
@@ -47200,7 +47200,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 10649,
@@ -47256,7 +47256,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Avian influenza",
+    "priorityPathogenName": "Avian Influenza",
     "scaffoldCount": 8,
     "scaffoldL50": 3,
     "scaffoldN50": 2233,
@@ -47468,7 +47468,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Avian influenza",
+    "priorityPathogenName": "Avian Influenza",
     "scaffoldCount": 8,
     "scaffoldL50": 3,
     "scaffoldN50": 2233,
@@ -47675,7 +47675,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 10707,
@@ -47731,7 +47731,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Avian influenza",
+    "priorityPathogenName": "Avian Influenza",
     "scaffoldCount": 8,
     "scaffoldL50": 3,
     "scaffoldN50": 2233,
@@ -47782,7 +47782,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 10940,
@@ -48140,7 +48140,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 10723,
@@ -48244,7 +48244,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7099,
@@ -48346,7 +48346,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Paramyxoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Paramyxoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 15486,
@@ -48397,7 +48397,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 9343,
@@ -48448,7 +48448,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 9355,
@@ -48499,7 +48499,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 9456,
@@ -48602,7 +48602,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7961,
@@ -48653,7 +48653,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 11029,
@@ -48704,7 +48704,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Arenaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Arenaviridae",
     "scaffoldCount": 2,
     "scaffoldL50": 1,
     "scaffoldN50": 7107,
@@ -48808,7 +48808,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6581,
@@ -49220,7 +49220,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 10794,
@@ -49374,7 +49374,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 10814,
@@ -49529,7 +49529,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7205,
@@ -49580,7 +49580,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7989,
@@ -49631,7 +49631,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Arenaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Arenaviridae",
     "scaffoldCount": 2,
     "scaffoldL50": 1,
     "scaffoldN50": 7163,
@@ -49682,7 +49682,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7632,
@@ -49884,7 +49884,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 6580,
@@ -49935,7 +49935,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7215,
@@ -49987,7 +49987,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7982,
@@ -50663,7 +50663,7 @@
       "HAPLOID"
     ],
     "priority": "CRITICAL",
-    "priorityPathogenName": "Filoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Filoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 18935,
@@ -50959,7 +50959,7 @@
       "HAPLOID"
     ],
     "priority": "CRITICAL",
-    "priorityPathogenName": "Filoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Filoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 18940,
@@ -51373,7 +51373,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Phenuiviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Phenuiviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6327,
@@ -51425,7 +51425,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Phenuiviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Phenuiviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6439,
@@ -51681,7 +51681,7 @@
       "HAPLOID"
     ],
     "priority": "CRITICAL",
-    "priorityPathogenName": "Filoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Filoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 18927,
@@ -51987,7 +51987,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Phenuiviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Phenuiviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6368,
@@ -53066,7 +53066,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Paramyxoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Paramyxoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 17052,
@@ -53469,7 +53469,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Togaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Togaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 11624,
@@ -53624,7 +53624,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 8931,
@@ -53775,7 +53775,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7802,
@@ -53925,7 +53925,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 9525,
@@ -53977,7 +53977,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Phenuiviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Phenuiviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6368,
@@ -54391,7 +54391,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Paramyxoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Paramyxoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 15480,
@@ -54547,7 +54547,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7998,
@@ -54603,7 +54603,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Avian influenza",
+    "priorityPathogenName": "Avian Influenza",
     "scaffoldCount": 8,
     "scaffoldL50": 3,
     "scaffoldN50": 2176,
@@ -54754,7 +54754,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7213,
@@ -54905,7 +54905,7 @@
       "HAPLOID"
     ],
     "priority": "CRITICAL",
-    "priorityPathogenName": "Filoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Filoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 19114,
@@ -55504,7 +55504,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Phenuiviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Phenuiviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6333,
@@ -55607,7 +55607,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Phenuiviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Phenuiviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6407,
@@ -55979,7 +55979,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 9867,
@@ -56087,7 +56087,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Avian influenza",
+    "priorityPathogenName": "Avian Influenza",
     "scaffoldCount": 8,
     "scaffoldL50": 3,
     "scaffoldN50": 2151,
@@ -56566,7 +56566,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7417,
@@ -56929,7 +56929,7 @@
       "DIPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Mucormycosis/ Mucorales",
+    "priorityPathogenName": "Mucorales",
     "scaffoldCount": 80,
     "scaffoldL50": 11,
     "scaffoldN50": 1515579,
@@ -57447,7 +57447,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7317,
@@ -57608,7 +57608,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 9443,
@@ -57866,7 +57866,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Nairoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Nairoviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 12184,
@@ -58256,7 +58256,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 103,
     "scaffoldL50": 6,
     "scaffoldN50": 2027382,
@@ -58371,7 +58371,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 51,
     "scaffoldL50": 5,
     "scaffoldN50": 2487993,
@@ -58429,7 +58429,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 97,
     "scaffoldL50": 5,
     "scaffoldN50": 2288531,
@@ -58487,7 +58487,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 27,
     "scaffoldL50": 4,
     "scaffoldN50": 4128426,
@@ -58545,7 +58545,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 82,
     "scaffoldL50": 10,
     "scaffoldN50": 1040687,
@@ -58603,7 +58603,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 660,
     "scaffoldL50": 8,
     "scaffoldN50": 1634707,
@@ -59275,7 +59275,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6588,
@@ -59326,7 +59326,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 6656,
@@ -59379,7 +59379,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6538,
@@ -59431,7 +59431,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Nairoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Nairoviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 12081,
@@ -59483,7 +59483,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6529,
@@ -59536,7 +59536,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6551,
@@ -59588,7 +59588,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Peribunyaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Peribunyaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6872,
@@ -59744,7 +59744,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Peribunyaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Peribunyaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6824,
@@ -59795,7 +59795,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Peribunyaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Peribunyaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6934,
@@ -59848,7 +59848,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6531,
@@ -59900,7 +59900,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6533,
@@ -59952,7 +59952,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6578,
@@ -60005,7 +60005,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6508,
@@ -60058,7 +60058,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6563,
@@ -60163,7 +60163,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6531,
@@ -60216,7 +60216,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6499,
@@ -60268,7 +60268,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6581,
@@ -60321,7 +60321,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6581,
@@ -60749,7 +60749,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 647,
     "scaffoldL50": 107,
     "scaffoldN50": 93306,
@@ -61332,7 +61332,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Nairoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Nairoviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 12063,
@@ -61433,7 +61433,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 10808,
@@ -62343,7 +62343,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Phenuiviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Phenuiviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6407,
@@ -62396,7 +62396,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Paramyxoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Paramyxoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 15516,
@@ -62710,7 +62710,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 3628,
@@ -62923,7 +62923,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6554,
@@ -62975,7 +62975,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 8201,
@@ -63027,7 +63027,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7398,
@@ -63079,7 +63079,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7399,
@@ -63131,7 +63131,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7367,
@@ -63183,7 +63183,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7137,
@@ -63235,7 +63235,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 7208,
@@ -63288,7 +63288,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Picornaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 6944,
@@ -64845,7 +64845,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 10376,
@@ -64895,7 +64895,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 9143,
@@ -64945,7 +64945,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 9653,
@@ -64996,7 +64996,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Flaviviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 9538,
@@ -65464,7 +65464,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6538,
@@ -65773,7 +65773,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6558,
@@ -65825,7 +65825,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6562,
@@ -65877,7 +65877,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Peribunyaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Peribunyaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6797,
@@ -65935,7 +65935,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 34,
     "scaffoldL50": 4,
     "scaffoldN50": 2489623,
@@ -65993,7 +65993,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 62,
     "scaffoldL50": 4,
     "scaffoldN50": 3768347,
@@ -66051,7 +66051,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 62,
     "scaffoldL50": 6,
     "scaffoldN50": 1703432,
@@ -66109,7 +66109,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 37,
     "scaffoldL50": 4,
     "scaffoldN50": 3921250,
@@ -66212,7 +66212,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Togaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Togaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 11822,
@@ -66263,7 +66263,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Togaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Togaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 11604,
@@ -66313,7 +66313,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Togaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Togaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 11562,
@@ -66364,7 +66364,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Togaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Togaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 11948,
@@ -66414,7 +66414,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Togaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Togaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 11447,
@@ -67041,7 +67041,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6559,
@@ -68429,7 +68429,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Phenuiviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Phenuiviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6255,
@@ -68687,7 +68687,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 131,
     "scaffoldL50": 14,
     "scaffoldN50": 865111,
@@ -68745,7 +68745,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 205,
     "scaffoldL50": 15,
     "scaffoldN50": 657941,
@@ -68803,7 +68803,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 172,
     "scaffoldL50": 30,
     "scaffoldN50": 396097,
@@ -68860,7 +68860,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 149,
     "scaffoldL50": 28,
     "scaffoldN50": 411512,
@@ -68918,7 +68918,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 116,
     "scaffoldL50": 20,
     "scaffoldN50": 622403,
@@ -68976,7 +68976,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Aspergillosis/ Aspergillus",
+    "priorityPathogenName": "Aspergillus",
     "scaffoldCount": 152,
     "scaffoldL50": 19,
     "scaffoldN50": 535630,
@@ -69968,7 +69968,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Peribunyaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Peribunyaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6978,
@@ -73167,7 +73167,7 @@
       "HAPLOID"
     ],
     "priority": "CRITICAL",
-    "priorityPathogenName": "Filoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Filoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 17221,
@@ -73219,7 +73219,7 @@
       "HAPLOID"
     ],
     "priority": "CRITICAL",
-    "priorityPathogenName": "Filoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Filoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 14280,
@@ -73270,7 +73270,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Arenaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Arenaviridae",
     "scaffoldCount": 2,
     "scaffoldL50": 1,
     "scaffoldN50": 7228,
@@ -73322,7 +73322,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Peribunyaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Peribunyaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6888,
@@ -73374,7 +73374,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Peribunyaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Peribunyaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6980,
@@ -73426,7 +73426,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Peribunyaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Peribunyaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6883,
@@ -73478,7 +73478,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Peribunyaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Peribunyaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6870,
@@ -73637,7 +73637,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Paramyxoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Paramyxoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 15462,
@@ -74371,7 +74371,7 @@
       "POLYPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Primary amoebic meningoencephalitis/ Naegleria fowleri",
+    "priorityPathogenName": "Naegleria fowleri",
     "scaffoldCount": 82,
     "scaffoldL50": 18,
     "scaffoldN50": 717491,
@@ -75415,7 +75415,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Phenuiviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Phenuiviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6418,
@@ -75467,7 +75467,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Phenuiviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Phenuiviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6411,
@@ -75519,7 +75519,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Phenuiviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Phenuiviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6305,
@@ -75571,7 +75571,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Phenuiviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Phenuiviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6356,
@@ -75623,7 +75623,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Phenuiviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Phenuiviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 2,
     "scaffoldN50": 4352,
@@ -75724,7 +75724,7 @@
       "HAPLOID"
     ],
     "priority": "CRITICAL",
-    "priorityPathogenName": "Filoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Filoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 18300,
@@ -76573,7 +76573,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Nairoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Nairoviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 12238,
@@ -76625,7 +76625,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Nairoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Nairoviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 12003,
@@ -77968,7 +77968,7 @@
       "HAPLOID"
     ],
     "priority": "HIGH",
-    "priorityPathogenName": "Valley Fever/ Coccidioides posadasii",
+    "priorityPathogenName": "Coccidioides posadasii",
     "scaffoldCount": 9,
     "scaffoldL50": 2,
     "scaffoldN50": 8079863,
@@ -78973,7 +78973,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Togaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Togaviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 12096,
@@ -79076,7 +79076,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Nairoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Nairoviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 12170,
@@ -79128,7 +79128,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Nairoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Nairoviridae",
     "scaffoldCount": 2,
     "scaffoldL50": 1,
     "scaffoldN50": 14854,
@@ -79180,7 +79180,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6447,
@@ -79232,7 +79232,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Hantaviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6465,
@@ -79284,7 +79284,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE",
-    "priorityPathogenName": "Phenuiviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Phenuiviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 6474,
@@ -79335,7 +79335,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Nairoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Nairoviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 11943,
@@ -80202,7 +80202,7 @@
       "HAPLOID"
     ],
     "priority": "CRITICAL",
-    "priorityPathogenName": "Filoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Filoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 13764,
@@ -80254,7 +80254,7 @@
       "HAPLOID"
     ],
     "priority": "CRITICAL",
-    "priorityPathogenName": "Filoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Filoviridae",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
     "scaffoldN50": 13066,
@@ -81314,7 +81314,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Nairoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Nairoviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 12001,
@@ -81366,7 +81366,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Nairoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Nairoviridae",
     "scaffoldCount": 2,
     "scaffoldL50": 1,
     "scaffoldN50": 14851,
@@ -81418,7 +81418,7 @@
       "HAPLOID"
     ],
     "priority": "MODERATE_HIGH",
-    "priorityPathogenName": "Nairoviridae (Prototype Pathogen Viral Family)",
+    "priorityPathogenName": "Nairoviridae",
     "scaffoldCount": 3,
     "scaffoldL50": 1,
     "scaffoldN50": 12143,
