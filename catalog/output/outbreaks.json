@@ -6,7 +6,7 @@
       "scope": {}
     },
     "highlight_descendant_taxonomy_ids": null,
-    "name": "Avian influenza",
+    "name": "Avian Influenza",
     "priority": "MODERATE",
     "resources": [
       {
@@ -206,7 +206,7 @@
       "scope": {}
     },
     "highlight_descendant_taxonomy_ids": null,
-    "name": "Malaria/ Plasmodium falciparum",
+    "name": "Plasmodium falciparum",
     "priority": "HIGH",
     "resources": [
       {
@@ -241,7 +241,7 @@
       "scope": {}
     },
     "highlight_descendant_taxonomy_ids": null,
-    "name": "Candidozyma (Candida) auris",
+    "name": "Candida auris",
     "priority": "HIGH",
     "resources": [
       {
@@ -271,7 +271,7 @@
       "scope": {}
     },
     "highlight_descendant_taxonomy_ids": null,
-    "name": "Cryptococcosis/ Cryptococcus neoformans",
+    "name": "Cryptococcus neoformans",
     "priority": "HIGH",
     "resources": [
       {
@@ -311,7 +311,7 @@
       "scope": {}
     },
     "highlight_descendant_taxonomy_ids": null,
-    "name": "Valley Fever/ Coccidioides posadasii",
+    "name": "Coccidioides posadasii",
     "priority": "HIGH",
     "resources": [
       {
@@ -341,7 +341,7 @@
       "scope": {}
     },
     "highlight_descendant_taxonomy_ids": null,
-    "name": "Histoplasmosis/ Histoplasma capsulatum",
+    "name": "Histoplasma capsulatum",
     "priority": "HIGH",
     "resources": [
       {
@@ -366,7 +366,7 @@
       "scope": {}
     },
     "highlight_descendant_taxonomy_ids": null,
-    "name": "Cryptosporidiosis/ Cryptosporidium parvum",
+    "name": "Cryptosporidium parvum",
     "priority": "MODERATE_HIGH",
     "resources": [
       {
@@ -391,7 +391,7 @@
       "scope": {}
     },
     "highlight_descendant_taxonomy_ids": null,
-    "name": "Primary amoebic meningoencephalitis/ Naegleria fowleri",
+    "name": "Naegleria fowleri",
     "priority": "MODERATE",
     "resources": [
       {
@@ -424,7 +424,7 @@
       746128,
       5059
     ],
-    "name": "Aspergillosis/ Aspergillus",
+    "name": "Aspergillus",
     "priority": "HIGH",
     "resources": [
       {
@@ -452,7 +452,7 @@
       5661,
       5671
     ],
-    "name": "Visceral Leishmaniasis/ Leishmania donovani complex",
+    "name": "Leishmania donovani",
     "priority": "MODERATE",
     "resources": [
       {
@@ -487,7 +487,7 @@
       58291,
       936053
     ],
-    "name": "Mucormycosis/ Mucorales",
+    "name": "Mucorales",
     "priority": "MODERATE",
     "resources": [
       {
@@ -521,7 +521,7 @@
       3052317,
       3052303
     ],
-    "name": "Arenaviridae (Prototype Pathogen Viral Family)",
+    "name": "Arenaviridae",
     "priority": "MODERATE",
     "resources": [
       {
@@ -559,7 +559,7 @@
       1980456,
       3052499
     ],
-    "name": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "name": "Hantaviridae",
     "priority": "MODERATE_HIGH",
     "resources": [
       {
@@ -601,7 +601,7 @@
     "highlight_descendant_taxonomy_ids": [
       3052518
     ],
-    "name": "Nairoviridae (Prototype Pathogen Viral Family)",
+    "name": "Nairoviridae",
     "priority": "MODERATE_HIGH",
     "resources": [
       {
@@ -640,7 +640,7 @@
       3052409,
       3052385
     ],
-    "name": "Peribunyaviridae (Prototype Pathogen Viral Family)",
+    "name": "Peribunyaviridae",
     "priority": "MODERATE",
     "resources": [
       {
@@ -683,7 +683,7 @@
       3052676,
       3052686
     ],
-    "name": "Phenuiviridae (Prototype Pathogen Viral Family)",
+    "name": "Phenuiviridae",
     "priority": "MODERATE",
     "resources": [
       {
@@ -728,7 +728,7 @@
       3052599,
       3052560
     ],
-    "name": "Paramyxoviridae (Prototype Pathogen Viral Family)",
+    "name": "Paramyxoviridae",
     "priority": "HIGH",
     "resources": [
       {
@@ -772,7 +772,7 @@
       3052465,
       3048448
     ],
-    "name": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "name": "Flaviviridae",
     "priority": "HIGH",
     "resources": [
       {
@@ -820,7 +820,7 @@
       3426298,
       11036
     ],
-    "name": "Togaviridae (Prototype Pathogen Viral Family)",
+    "name": "Togaviridae",
     "priority": "MODERATE_HIGH",
     "resources": [
       {
@@ -870,7 +870,7 @@
       138951,
       463676
     ],
-    "name": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "name": "Picornaviridae",
     "priority": "MODERATE",
     "resources": [
       {
@@ -913,7 +913,7 @@
       3052462,
       3052505
     ],
-    "name": "Filoviridae (Prototype Pathogen Viral Family)",
+    "name": "Filoviridae",
     "priority": "CRITICAL",
     "resources": [
       {
