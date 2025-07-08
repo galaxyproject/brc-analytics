@@ -1,6 +1,6 @@
 ## Overview
 
-Candida auris is an emerging multidrug-resistant fungus that has caused hospital outbreaks worldwide. Identified in 2009, it has spread to dozens of countries and is difficult to eradicate in healthcare settings.
+_Candidozyma auris_ (formerly _Candida auris_) is an emerging multidrug-resistant fungus that has caused hospital outbreaks worldwide. Identified in 2009, it has spread to dozens of countries and is difficult to eradicate in healthcare settings.
 
 ## Impact
 

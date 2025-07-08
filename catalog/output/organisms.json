@@ -81526,7 +81526,7 @@
           "HAPLOID"
         ],
         "priority": "HIGH",
-        "priorityPathogenName": "Candida auris",
+        "priorityPathogenName": "Candidozyma (Candida) auris",
         "scaffoldCount": 7,
         "scaffoldL50": 2,
         "scaffoldN50": 2367702,
@@ -81580,7 +81580,7 @@
           "HAPLOID"
         ],
         "priority": "HIGH",
-        "priorityPathogenName": "Candida auris",
+        "priorityPathogenName": "Candidozyma (Candida) auris",
         "scaffoldCount": 238,
         "scaffoldL50": 39,
         "scaffoldN50": 86716,
@@ -81634,7 +81634,7 @@
           "HAPLOID"
         ],
         "priority": "HIGH",
-        "priorityPathogenName": "Candida auris",
+        "priorityPathogenName": "Candidozyma (Candida) auris",
         "scaffoldCount": 7,
         "scaffoldL50": 2,
         "scaffoldN50": 2321794,
@@ -81688,7 +81688,7 @@
           "HAPLOID"
         ],
         "priority": "HIGH",
-        "priorityPathogenName": "Candida auris",
+        "priorityPathogenName": "Candidozyma (Candida) auris",
         "scaffoldCount": 99,
         "scaffoldL50": 14,
         "scaffoldN50": 267017,
@@ -81742,7 +81742,7 @@
           "HAPLOID"
         ],
         "priority": "HIGH",
-        "priorityPathogenName": "Candida auris",
+        "priorityPathogenName": "Candidozyma (Candida) auris",
         "scaffoldCount": 20,
         "scaffoldL50": 2,
         "scaffoldN50": 2363944,
@@ -81796,7 +81796,7 @@
           "HAPLOID"
         ],
         "priority": "HIGH",
-        "priorityPathogenName": "Candida auris",
+        "priorityPathogenName": "Candidozyma (Candida) auris",
         "scaffoldCount": 7,
         "scaffoldL50": 3,
         "scaffoldN50": 2336890,
@@ -81821,7 +81821,7 @@
     "ncbiTaxonomyId": "498019",
     "otherTaxa": null,
     "priority": "HIGH",
-    "priorityPathogenName": "Candida auris",
+    "priorityPathogenName": "Candidozyma (Candida) auris",
     "taxonomicGroup": [
       "Ascomycota"
     ],

@@ -135,7 +135,7 @@ outbreaks:
         url: "https://pubmed.ncbi.nlm.nih.gov/38045403/"
         type: PUBLICATION
 
-  - name: Candida auris
+  - name: Candidozyma (Candida) auris
     taxonomy_id: 498019
     priority: HIGH
     active: true
