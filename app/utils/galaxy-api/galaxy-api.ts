@@ -77,6 +77,7 @@ function paramVariableToRequestValue(
       return referenceGenome;
     case WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_FASTA_URL:
       return {
+        dbkey: referenceGenome,
         ext: "fasta.gz",
         src: "url",
         url: buildFastaUrl(referenceGenome),
@@ -84,6 +85,7 @@ function paramVariableToRequestValue(
     case WORKFLOW_PARAMETER_VARIABLE.GENE_MODEL_URL:
       return geneModelUrl
         ? {
+            dbkey: referenceGenome,
             ext: "gtf.gz",
             src: "url",
             url: geneModelUrl,
