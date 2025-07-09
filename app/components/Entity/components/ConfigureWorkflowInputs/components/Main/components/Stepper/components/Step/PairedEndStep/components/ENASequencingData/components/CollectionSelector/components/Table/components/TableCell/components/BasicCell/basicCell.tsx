@@ -8,7 +8,7 @@ export const BasicCell = ({
   getValue,
 }: CellContext<ReadRun, ReadRun[keyof ReadRun]>): JSX.Element => {
   return (
-    <Typography noWrap variant={TYPOGRAPHY_PROPS.VARIANT.INHERIT}>
+    <Typography variant={TYPOGRAPHY_PROPS.VARIANT.INHERIT}>
       {getValue()}
     </Typography>
   );

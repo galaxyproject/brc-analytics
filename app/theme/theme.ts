@@ -2,7 +2,7 @@ import { createAppTheme } from "@databiosphere/findable-ui/lib/theme/theme";
 import { createTheme, Theme, ThemeOptions } from "@mui/material";
 import { deepmerge } from "@mui/utils";
 import * as C from "./common/components";
-import { primary } from "./common/palette";
+import { palette } from "./common/palette";
 
 /**
  * Returns BRC customized theme.
@@ -17,7 +17,7 @@ export function mergeAppTheme(
   // Merge custom options (palette, shadows, typography).
   const customOptions = deepmerge(baseThemeOptions, {
     ...themeOptions,
-    palette: { ...themeOptions?.palette, primary },
+    palette: { ...themeOptions?.palette, ...palette },
   });
   // Create base app theme with custom options.
   const baseAppTheme = createAppTheme(customOptions);
@@ -26,6 +26,7 @@ export function mergeAppTheme(
     components: {
       MuiButton: C.MuiButton,
       MuiButtonGroup: C.MuiButtonGroup,
+      MuiChip: C.MuiChip,
       MuiCssBaseline: C.MuiCssBaseline(baseAppTheme),
     },
   });

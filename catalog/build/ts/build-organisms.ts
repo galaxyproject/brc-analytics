@@ -38,6 +38,9 @@ function buildOrganism(
     otherTaxa: genome.otherTaxa
       ? accumulateArrayValue(organism?.otherTaxa || [], ...genome.otherTaxa)
       : organism?.otherTaxa || null,
+    priority: organism?.priority ?? genome.priority,
+    priorityPathogenName:
+      organism?.priorityPathogenName ?? genome.priorityPathogenName,
     taxonomicGroup: genome.taxonomicGroup,
     taxonomicLevelClass: genome.taxonomicLevelClass,
     taxonomicLevelDomain: genome.taxonomicLevelDomain,

@@ -11,6 +11,8 @@ import {
 import { config } from "../../../app/config/config";
 import { seedDatabase } from "../../../app/utils/seedDatabase";
 import { StyledExploreView } from "../../../app/views/ExploreView/exploreView.styles";
+import { PriorityPathogensView } from "../../../app/views/PriorityPathogensView/priorityPathogensView";
+import { Outbreak } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 
 interface PageUrl extends ParsedUrlQuery {
   entityListType: string;
@@ -32,6 +34,19 @@ const IndexPage = <R,>({
   ...props
 }: EntitiesPageProps<R>): JSX.Element => {
   if (!entityListType) return <></>;
+
+  // Return the PriorityPathogensView component for the priority pathogens route.
+  if (entityListType === "priority-pathogens") {
+    // Throw an error if no priority pathogen data is provided.
+    if (!props.data) throw new Error("No priority pathogen data provided");
+
+    // Return the PriorityPathogensView component.
+    return (
+      <PriorityPathogensView data={props.data as EntitiesResponse<Outbreak>} />
+    );
+  }
+
+  // Return the ExploreView component for all other routes.
   return <StyledExploreView entityListType={entityListType} {...props} />;
 };
 

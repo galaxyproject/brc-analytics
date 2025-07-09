@@ -1,5 +1,5 @@
 outbreaks:
-  - name: Avian influenza
+  - name: Avian Influenza
     taxonomy_id: 11320
     priority: MODERATE
     active: true
@@ -115,7 +115,7 @@ outbreaks:
         url: "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?hgpp_org=hub_3070967_GCF_000195955.2"
         type: HGPHYLOPLACE
 
-  - name: Malaria/ Plasmodium falciparum
+  - name: Plasmodium falciparum
     taxonomy_id: 5833
     priority: HIGH
     active: true
@@ -152,7 +152,7 @@ outbreaks:
         url: "https://www.niaid.nih.gov/diseases-conditions/fungal-disease-specific-research"
         type: REFERENCE
 
-  - name: Cryptococcosis/ Cryptococcus neoformans
+  - name: Cryptococcus neoformans
     taxonomy_id: 5207
     priority: HIGH
     active: true
@@ -175,7 +175,7 @@ outbreaks:
         url: "https://www.niaid.nih.gov/diseases-conditions/fungal-disease-specific-research"
         type: REFERENCE
 
-  - name: Valley Fever/ Coccidioides posadasii
+  - name: Coccidioides posadasii
     taxonomy_id: 199306
     priority: HIGH
     active: true
@@ -192,7 +192,7 @@ outbreaks:
         url: "https://fungidb.org/fungidb/app/search/organism/GenomeDataTypes/result?filterTerm=Coccidioides%20posadasii"
         type: REFERENCE
 
-  - name: Histoplasmosis/ Histoplasma capsulatum
+  - name: Histoplasma capsulatum
     taxonomy_id: 5037
     priority: HIGH
     active: true
@@ -206,7 +206,7 @@ outbreaks:
         url: "https://fungidb.org/fungidb/app/search/organism/GenomeDataTypes/result?filterTerm=Histoplasma%20capsulatum"
         type: REFERENCE
 
-  - name: Cryptosporidiosis/ Cryptosporidium parvum
+  - name: Cryptosporidium parvum
     taxonomy_id: 5807
     priority: MODERATE_HIGH
     active: true
@@ -220,7 +220,7 @@ outbreaks:
         url: "https://www.cdc.gov/mmwr/volumes/68/wr/mm6825a3.htm"
         type: REFERENCE
 
-  - name: Primary amoebic meningoencephalitis/ Naegleria fowleri
+  - name: Naegleria fowleri
     taxonomy_id: 5763
     priority: MODERATE
     active: true
@@ -237,7 +237,7 @@ outbreaks:
         url: "https://amoebadb.org/amoeba/app/search/organism/GenomeDataTypes/result?filterTerm=Naegleria%20fowleri"
         type: REFERENCE
 
-  - name: Aspergillosis/ Aspergillus
+  - name: Aspergillus
     taxonomy_id: 5052
     priority: HIGH
     active: true
@@ -254,7 +254,7 @@ outbreaks:
         url: "https://fungidb.org/fungidb/app/search/organism/GenomeDataTypes/result?filterTerm=Aspergillus"
         type: REFERENCE
 
-  - name: Visceral Leishmaniasis/ Leishmania donovani complex
+  - name: Leishmania donovani
     taxonomy_id: 38574
     priority: MODERATE
     active: true
@@ -274,7 +274,7 @@ outbreaks:
         url: "https://tritrypdb.org/tritrypdb/app/search/organism/GenomeDataTypes/result?filterTerm=Leishmania%20donovani"
         type: REFERENCE
 
-  - name: Mucormycosis/ Mucorales
+  - name: Mucorales
     taxonomy_id: 4827
     priority: MODERATE
     active: true
@@ -296,7 +296,7 @@ outbreaks:
         url: "https://fungidb.org/fungidb/app/search/organism/GenomeDataTypes/result?filterTerm=Mucor"
         type: REFERENCE
 
-  - name: Arenaviridae (Prototype Pathogen Viral Family)
+  - name: Arenaviridae
     taxonomy_id: 11617
     priority: MODERATE
     active: true
@@ -320,7 +320,7 @@ outbreaks:
         url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
         type: PUBLICATION
 
-  - name: Hantaviridae (Prototype Pathogen Viral Family)
+  - name: Hantaviridae
     taxonomy_id: 1980413
     priority: MODERATE_HIGH
     active: true
@@ -346,7 +346,7 @@ outbreaks:
         url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
         type: PUBLICATION
 
-  - name: Nairoviridae (Prototype Pathogen Viral Family)
+  - name: Nairoviridae
     taxonomy_id: 1980415
     priority: MODERATE_HIGH
     active: true
@@ -368,7 +368,7 @@ outbreaks:
         url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
         type: PUBLICATION
 
-  - name: Peribunyaviridae (Prototype Pathogen Viral Family)
+  - name: Peribunyaviridae
     taxonomy_id: 1980416
     priority: MODERATE
     active: true
@@ -395,7 +395,7 @@ outbreaks:
         url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
         type: PUBLICATION
 
-  - name: Phenuiviridae (Prototype Pathogen Viral Family)
+  - name: Phenuiviridae
     taxonomy_id: 1980418
     priority: MODERATE
     active: true
@@ -421,7 +421,7 @@ outbreaks:
         url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
         type: PUBLICATION
 
-  - name: Paramyxoviridae (Prototype Pathogen Viral Family)
+  - name: Paramyxoviridae
     taxonomy_id: 11158
     priority: HIGH
     active: true
@@ -449,7 +449,7 @@ outbreaks:
         url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
         type: PUBLICATION
 
-  - name: Flaviviridae (Prototype Pathogen Viral Family)
+  - name: Flaviviridae
     taxonomy_id: 11050
     priority: HIGH
     active: true
@@ -479,7 +479,7 @@ outbreaks:
         url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
         type: PUBLICATION
 
-  - name: Togaviridae (Prototype Pathogen Viral Family)
+  - name: Togaviridae
     taxonomy_id: 11018
     priority: MODERATE_HIGH
     active: true
@@ -508,7 +508,7 @@ outbreaks:
         url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
         type: PUBLICATION
 
-  - name: Picornaviridae (Prototype Pathogen Viral Family)
+  - name: Picornaviridae
     taxonomy_id: 12058
     priority: MODERATE
     active: true
@@ -536,7 +536,7 @@ outbreaks:
         url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9384504/"
         type: PUBLICATION
 
-  - name: Filoviridae (Prototype Pathogen Viral Family)
+  - name: Filoviridae
     taxonomy_id: 11266
     priority: CRITICAL
     active: true

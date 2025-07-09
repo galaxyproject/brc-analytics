@@ -4,5 +4,7 @@ export const ROUTES = {
   GENOME: "/data/assemblies/{entityId}",
   GENOMES: "/data/assemblies",
   ORGANISMS: "/data/organisms",
+  PRIORITY_PATHOGEN: "/data/[entityListType]/[entityId]",
+  PRIORITY_PATHOGENS: "/data/priority-pathogens",
   ROADMAP: "/roadmap",
 };

@@ -11,6 +11,7 @@ import { ENASequencingData } from "./components/ENASequencingData/enaSequencingD
 import { useENA } from "./components/ENASequencingData/hooks/UseENA/hook";
 import { ReadRun } from "./components/ENASequencingData/types";
 import { useTable } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseTable/hook";
+import { UploadMyData } from "./components/UploadMyData/uploadMyData";
 
 export const PairedEndStep = ({
   active,
@@ -37,7 +38,9 @@ export const PairedEndStep = ({
             status={ena.status}
             table={table}
           />
-        ) : null}
+        ) : (
+          <UploadMyData onConfigure={onConfigure} />
+        )}
         <Button
           {...BUTTON_PROPS.PRIMARY_CONTAINED}
           disabled={status.disabled || status.loading}

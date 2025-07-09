@@ -6,8 +6,8 @@ import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/B
 import { useState } from "react";
 import { Table } from "./components/Table/table";
 import { RowSelectionState } from "@tanstack/table-core";
-import { EnaPairedReads } from "app/utils/galaxy-api/entities";
 import { STEP } from "../../../../step";
+import { buildEnaPairedReads } from "../../utils";
 
 export const CollectionSelector = ({
   onClose,
@@ -40,14 +40,7 @@ export const CollectionSelector = ({
           {...BUTTON_PROPS.PRIMARY_CONTAINED}
           disabled={selectedCount === 0}
           onClick={() => {
-            const selectedRows = table.getSelectedRowModel().rows.map(
-              (row): EnaPairedReads => ({
-                md5Hashes: row.original.fastq_md5,
-                runAccession: row.original.run_accession,
-                urls: row.original.fastq_ftp,
-              })
-            );
-            onConfigure(STEP.key, selectedRows);
+            onConfigure(STEP.key, buildEnaPairedReads(table));
             onClose();
           }}
         >

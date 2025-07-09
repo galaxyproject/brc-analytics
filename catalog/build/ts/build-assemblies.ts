@@ -1,4 +1,7 @@
-import { BRCDataCatalogGenome } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
+import {
+  BRCDataCatalogGenome,
+  Outbreak,
+} from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { getGenomeId } from "../../../app/apis/catalog/brc-analytics-catalog/common/utils";
 import { Organisms as SourceOrganisms } from "../../schema/generated/schema";
 import { SOURCE_GENOME_KEYS } from "./constants";
@@ -18,7 +21,9 @@ import {
 const SOURCE_PATH_GENOMES = "catalog/build/intermediate/genomes-from-ncbi.tsv";
 const SOURCE_PATH_ORGANISMS = "catalog/source/organisms.yml";
 
-export async function buildAssemblies(): Promise<BRCDataCatalogGenome[]> {
+export async function buildAssemblies(
+  outbreaksByTaxonomyId: Map<number, Outbreak>
+): Promise<BRCDataCatalogGenome[]> {
   const sourceRows = await readValuesFile<SourceGenome>(
     SOURCE_PATH_GENOMES,
     undefined,
@@ -49,6 +54,11 @@ export async function buildAssemblies(): Promise<BRCDataCatalogGenome[]> {
       (row.strain
         ? `${row.taxonomicLevelSpecies} strain ${row.strain}`
         : "None");
+    const lineageTaxonomyIds = parseList(row.lineageTaxonomyIds);
+    const outbreak = getOutbreakMatchingLineage(
+      outbreaksByTaxonomyId,
+      lineageTaxonomyIds
+    );
     mappedRows.push({
       accession: row.accession,
       annotationStatus: parseStringOrNull(row.annotationStatus),
@@ -60,10 +70,12 @@ export async function buildAssemblies(): Promise<BRCDataCatalogGenome[]> {
       isRef: parseBoolean(row.isRef),
       length: parseNumber(row.length),
       level: row.level,
-      lineageTaxonomyIds: parseList(row.lineageTaxonomyIds),
+      lineageTaxonomyIds,
       ncbiTaxonomyId: row.taxonomyId,
       otherTaxa: row.otherTaxa ? row.otherTaxa.split(",") : null,
       ploidy,
+      priority: outbreak?.priority ?? null,
+      priorityPathogenName: outbreak?.name ?? null,
       scaffoldCount: parseNumberOrNull(row.scaffoldCount),
       scaffoldL50: parseNumberOrNull(row.scaffoldL50),
       scaffoldN50: parseNumberOrNull(row.scaffoldN50),
@@ -88,4 +100,21 @@ export async function buildAssemblies(): Promise<BRCDataCatalogGenome[]> {
   );
   verifyUniqueIds("assembly", sortedRows, getGenomeId);
   return sortedRows;
+}
+
+/**
+ * Get the outbreak associated with the first of the given lineage taxa that has an assocated outbreak, or null if none is found.
+ * @param outbreaksByTaxonomyId - Map from taxonomy ID (number) to outbreak.
+ * @param lineageTaxonomyIds - Taxonomic lineage (array of taxonomy ID strings).
+ * @returns matching outbreak, or null.
+ */
+function getOutbreakMatchingLineage(
+  outbreaksByTaxonomyId: Map<number, Outbreak>,
+  lineageTaxonomyIds: string[]
+): Outbreak | null {
+  for (const stringId of lineageTaxonomyIds) {
+    const outbreak = outbreaksByTaxonomyId.get(Number(stringId));
+    if (outbreak !== undefined) return outbreak;
+  }
+  return null;
 }

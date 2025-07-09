@@ -8,7 +8,10 @@ import {
   WORKFLOW_PLOIDY,
 } from "./schema-entities";
 
-export type BRCCatalog = BRCDataCatalogGenome;
+export type BRCCatalog =
+  | BRCDataCatalogGenome
+  | BRCDataCatalogOrganism
+  | Outbreak;
 
 export interface BRCDataCatalogGenome {
   accession: string;
@@ -25,6 +28,8 @@ export interface BRCDataCatalogGenome {
   ncbiTaxonomyId: string;
   otherTaxa: string[] | null;
   ploidy: ORGANISM_PLOIDY[];
+  priority: OUTBREAK_PRIORITY | null;
+  priorityPathogenName: string | null;
   scaffoldCount: number | null;
   scaffoldL50: number | null;
   scaffoldN50: number | null;
@@ -51,6 +56,8 @@ export interface BRCDataCatalogOrganism {
   genomes: BRCDataCatalogGenome[];
   ncbiTaxonomyId: string;
   otherTaxa: string[] | null;
+  priority: OUTBREAK_PRIORITY | null;
+  priorityPathogenName: string | null;
   taxonomicGroup: string[];
   taxonomicLevelClass: string;
   taxonomicLevelDomain: string;
@@ -78,7 +85,6 @@ export interface EntitiesResponsePagination {
 }
 
 export interface Outbreak {
-  active: boolean;
   description: MDXRemoteSerializeResult;
   highlight_descendant_taxonomy_ids: number[] | null;
   name: string;
