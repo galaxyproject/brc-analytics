@@ -27,6 +27,10 @@
                     },
                     "type": "array"
                 },
+                "iwc_id": {
+                    "description": "The Intergalactic Workflow Commission (IWC) identifier for the workflow, used to link to the workflow's page on the IWC website.",
+                    "type": "string"
+                },
                 "parameters": {
                     "description": "Collection of input parameters that will be passed to the workflow when it is executed, including data sources and configuration options.",
                     "items": {
@@ -65,7 +69,8 @@
                 "workflow_description",
                 "ploidy",
                 "parameters",
-                "active"
+                "active",
+                "iwc_id"
             ],
             "title": "Workflow",
             "type": "object"
