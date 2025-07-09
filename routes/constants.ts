@@ -1,5 +1,6 @@
 export const ROUTES = {
   ABOUT: "/about",
+  CALENDAR: "/calendar",
   CONFIGURE_WORKFLOW: "/data/assemblies/{entityId}/{trsId}",
   GENOME: "/data/assemblies/{entityId}",
   GENOMES: "/data/assemblies",
