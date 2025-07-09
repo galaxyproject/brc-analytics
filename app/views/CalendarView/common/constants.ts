@@ -1,4 +1,5 @@
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
+import { ROUTES } from "../../../../routes/constants";
 
 export const BREADCRUMBS: Breadcrumb[] = [
   {
@@ -6,7 +7,7 @@ export const BREADCRUMBS: Breadcrumb[] = [
     text: "Home",
   },
   {
-    path: "/calendar",
+    path: ROUTES.CALENDAR,
     text: "Calendar",
   },
 ];

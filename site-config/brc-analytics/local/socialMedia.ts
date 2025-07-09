@@ -1,10 +1,11 @@
 import { SocialMedia } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/common/entities";
 import * as C from "../../../app/components";
+import { ROUTES } from "../../../routes/constants";
 
 export const SOCIALS = {
   CALENDAR: {
     label: "Calendar",
-    url: "/calendar",
+    url: ROUTES.CALENDAR,
   },
   DISCOURSE: {
     label: "Discourse",
