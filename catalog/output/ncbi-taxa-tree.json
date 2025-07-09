@@ -4081,29 +4081,6 @@
                                                             "rank": "genus"
                                                         },
                                                         {
-                                                            "assembly_count": 1,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [
-                                                                        {
-                                                                            "assembly_count": 1,
-                                                                            "children": [],
-                                                                            "name": "Emmonsia crescens UAMH 3008",
-                                                                            "ncbi_tax_id": "1247875",
-                                                                            "rank": "strain"
-                                                                        }
-                                                                    ],
-                                                                    "name": "Emmonsia crescens",
-                                                                    "ncbi_tax_id": "73230",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Emmonsia",
-                                                            "ncbi_tax_id": "73229",
-                                                            "rank": "genus"
-                                                        },
-                                                        {
                                                             "assembly_count": 4,
                                                             "children": [
                                                                 {
@@ -4156,8 +4133,15 @@
                                                             "rank": "genus"
                                                         },
                                                         {
-                                                            "assembly_count": 3,
+                                                            "assembly_count": 4,
                                                             "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "[Emmonsia] crescens",
+                                                                    "ncbi_tax_id": "73230",
+                                                                    "rank": "species"
+                                                                },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [
@@ -8470,7 +8454,15 @@
                                             "children": [
                                                 {
                                                     "assembly_count": 2,
-                                                    "children": [],
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 2,
+                                                            "children": [],
+                                                            "name": "Trichomonas vaginalis G3",
+                                                            "ncbi_tax_id": "412133",
+                                                            "rank": "isolate"
+                                                        }
+                                                    ],
                                                     "name": "Trichomonas vaginalis",
                                                     "ncbi_tax_id": "5722",
                                                     "rank": "species"
@@ -8662,7 +8654,15 @@
                                                         },
                                                         {
                                                             "assembly_count": 19,
-                                                            "children": [],
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Plasmodium falciparum 3D7",
+                                                                    "ncbi_tax_id": "36329",
+                                                                    "rank": "isolate"
+                                                                }
+                                                            ],
                                                             "name": "Plasmodium falciparum",
                                                             "ncbi_tax_id": "5833",
                                                             "rank": "species"
@@ -9271,6 +9271,13 @@
                                                                     "name": "Toxoplasma gondii TgCATBr5",
                                                                     "ncbi_tax_id": "943121",
                                                                     "rank": "strain"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Toxoplasma gondii CAST",
+                                                                    "ncbi_tax_id": "943122",
+                                                                    "rank": "isolate"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
@@ -11569,6 +11576,20 @@
                                                             "name": "Entamoeba histolytica HM-3:IMSS",
                                                             "ncbi_tax_id": "885315",
                                                             "rank": "strain"
+                                                        },
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [],
+                                                            "name": "Entamoeba histolytica HM-1:IMSS-A",
+                                                            "ncbi_tax_id": "885318",
+                                                            "rank": "isolate"
+                                                        },
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [],
+                                                            "name": "Entamoeba histolytica HM-1:IMSS-B",
+                                                            "ncbi_tax_id": "885319",
+                                                            "rank": "isolate"
                                                         }
                                                     ],
                                                     "name": "Entamoeba histolytica",
@@ -11976,6 +11997,13 @@
                         {
                             "assembly_count": 1,
                             "children": [],
+                            "name": "Betatorquevirus homini32",
+                            "ncbi_tax_id": "3048399",
+                            "rank": "species"
+                        },
+                        {
+                            "assembly_count": 1,
+                            "children": [],
                             "name": "Betatorquevirus homini2",
                             "ncbi_tax_id": "3048400",
                             "rank": "species"
@@ -12027,13 +12055,6 @@
                             "children": [],
                             "name": "Betatorquevirus homini9",
                             "ncbi_tax_id": "3048407",
-                            "rank": "species"
-                        },
-                        {
-                            "assembly_count": 1,
-                            "children": [],
-                            "name": "Betatorquevirus homini18",
-                            "ncbi_tax_id": "3050361",
                             "rank": "species"
                         },
                         {
@@ -12830,7 +12851,7 @@
                                                     "assembly_count": 30,
                                                     "children": [
                                                         {
-                                                            "assembly_count": 28,
+                                                            "assembly_count": 27,
                                                             "children": [
                                                                 {
                                                                     "assembly_count": 1,
@@ -12968,13 +12989,6 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Orthohantavirus robinaense",
-                                                                    "ncbi_tax_id": "3052494",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
                                                                     "name": "Orthohantavirus rockportense",
                                                                     "ncbi_tax_id": "3052495",
                                                                     "rank": "species"
@@ -13024,6 +13038,21 @@
                                                             ],
                                                             "name": "Orthohantavirus",
                                                             "ncbi_tax_id": "1980442",
+                                                            "rank": "genus"
+                                                        },
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Mobatvirus robinaense",
+                                                                    "ncbi_tax_id": "3430915",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Mobatvirus",
+                                                            "ncbi_tax_id": "2501367",
                                                             "rank": "genus"
                                                         },
                                                         {
@@ -13674,8 +13703,8 @@
                                                                 {
                                                                     "assembly_count": 2,
                                                                     "children": [],
-                                                                    "name": "Mammalian orthoreovirus",
-                                                                    "ncbi_tax_id": "351073",
+                                                                    "name": "Orthoreovirus mammalis",
+                                                                    "ncbi_tax_id": "3422298",
                                                                     "rank": "species"
                                                                 },
                                                                 {
@@ -13696,8 +13725,8 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Colorado tick fever coltivirus",
-                                                                    "ncbi_tax_id": "2748762",
+                                                                    "name": "Coltivirus dermacentoris",
+                                                                    "ncbi_tax_id": "3428066",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -13795,20 +13824,6 @@
                                                             "assembly_count": 17,
                                                             "children": [
                                                                 {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Eastern equine encephalitis virus",
-                                                                    "ncbi_tax_id": "11021",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Sindbis virus",
-                                                                    "ncbi_tax_id": "11034",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
                                                                     "assembly_count": 2,
                                                                     "children": [],
                                                                     "name": "Venezuelan equine encephalitis virus",
@@ -13820,13 +13835,6 @@
                                                                     "children": [],
                                                                     "name": "Western equine encephalitis virus",
                                                                     "ncbi_tax_id": "11039",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 3,
-                                                                    "children": [],
-                                                                    "name": "Onyong-nyong virus",
-                                                                    "ncbi_tax_id": "2169701",
                                                                     "rank": "species"
                                                                 },
                                                                 {
@@ -13851,6 +13859,13 @@
                                                                     "rank": "species"
                                                                 },
                                                                 {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Alphavirus eastern",
+                                                                    "ncbi_tax_id": "3426299",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
                                                                     "assembly_count": 2,
                                                                     "children": [],
                                                                     "name": "Alphavirus madariaga",
@@ -13865,6 +13880,13 @@
                                                                     "rank": "species"
                                                                 },
                                                                 {
+                                                                    "assembly_count": 3,
+                                                                    "children": [],
+                                                                    "name": "Alphavirus onyong",
+                                                                    "ncbi_tax_id": "3426312",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
                                                                     "assembly_count": 1,
                                                                     "children": [],
                                                                     "name": "Alphavirus rossriver",
@@ -13876,6 +13898,13 @@
                                                                     "children": [],
                                                                     "name": "Alphavirus semliki",
                                                                     "ncbi_tax_id": "3426317",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Alphavirus sindbis",
+                                                                    "ncbi_tax_id": "3426318",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -14161,13 +14190,6 @@
                                                             "assembly_count": 6,
                                                             "children": [
                                                                 {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Betacoronavirus 1",
-                                                                    "ncbi_tax_id": "694003",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
                                                                     "assembly_count": 2,
                                                                     "children": [],
                                                                     "name": "Betacoronavirus pandemicum",
@@ -14179,6 +14201,13 @@
                                                                     "children": [],
                                                                     "name": "Betacoronavirus cameli",
                                                                     "ncbi_tax_id": "3433633",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Betacoronavirus gravedinis",
+                                                                    "ncbi_tax_id": "3433757",
                                                                     "rank": "species"
                                                                 },
                                                                 {
@@ -14395,8 +14424,8 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Recovirus A",
-                                                                    "ncbi_tax_id": "2560702",
+                                                                    "name": "Recovirus tulani",
+                                                                    "ncbi_tax_id": "3432145",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -14424,8 +14453,8 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Bavaria virus",
-                                                                    "ncbi_tax_id": "2560343",
+                                                                    "name": "Bavovirus bavariaense",
+                                                                    "ncbi_tax_id": "3426654",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -14439,8 +14468,8 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Minovirus A",
-                                                                    "ncbi_tax_id": "2560597",
+                                                                    "name": "Minovirus pimephalis",
+                                                                    "ncbi_tax_id": "3430886",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -14454,8 +14483,8 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Nacovirus A",
-                                                                    "ncbi_tax_id": "2560612",
+                                                                    "name": "Nacovirus meleagridis",
+                                                                    "ncbi_tax_id": "3430984",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -14492,50 +14521,50 @@
                                                                 {
                                                                     "assembly_count": 7,
                                                                     "children": [],
-                                                                    "name": "Enterovirus A",
-                                                                    "ncbi_tax_id": "138948",
+                                                                    "name": "Enterovirus alphacoxsackie",
+                                                                    "ncbi_tax_id": "3428500",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 2,
+                                                                    "children": [],
+                                                                    "name": "Enterovirus alpharhino",
+                                                                    "ncbi_tax_id": "3428501",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Enterovirus B",
-                                                                    "ncbi_tax_id": "138949",
+                                                                    "name": "Enterovirus betacoxsackie",
+                                                                    "ncbi_tax_id": "3428502",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 2,
+                                                                    "children": [],
+                                                                    "name": "Enterovirus betarhino",
+                                                                    "ncbi_tax_id": "3428503",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 2,
+                                                                    "children": [],
+                                                                    "name": "Enterovirus cerhino",
+                                                                    "ncbi_tax_id": "3428504",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 3,
                                                                     "children": [],
-                                                                    "name": "Enterovirus C",
-                                                                    "ncbi_tax_id": "138950",
+                                                                    "name": "Enterovirus coxsackiepol",
+                                                                    "ncbi_tax_id": "3428505",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Enterovirus D",
-                                                                    "ncbi_tax_id": "138951",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 2,
-                                                                    "children": [],
-                                                                    "name": "Rhinovirus A",
-                                                                    "ncbi_tax_id": "147711",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 2,
-                                                                    "children": [],
-                                                                    "name": "Rhinovirus B",
-                                                                    "ncbi_tax_id": "147712",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 2,
-                                                                    "children": [],
-                                                                    "name": "Rhinovirus C",
-                                                                    "ncbi_tax_id": "463676",
+                                                                    "name": "Enterovirus deconjuncti",
+                                                                    "ncbi_tax_id": "3428506",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -14571,8 +14600,8 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Cardiovirus D",
-                                                                    "ncbi_tax_id": "2734523",
+                                                                    "name": "Cardiovirus saffoldi",
+                                                                    "ncbi_tax_id": "3427731",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -14586,8 +14615,8 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Foot-and-mouth disease virus",
-                                                                    "ncbi_tax_id": "12110",
+                                                                    "name": "Aphthovirus vesiculae",
+                                                                    "ncbi_tax_id": "3426401",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -14601,8 +14630,8 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Parechovirus A",
-                                                                    "ncbi_tax_id": "1803956",
+                                                                    "name": "Parechovirus ahumpari",
+                                                                    "ncbi_tax_id": "3431395",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -14638,13 +14667,6 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Cosavirus A",
-                                                                    "ncbi_tax_id": "1330491",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
                                                                     "name": "Cosavirus JMY-2014",
                                                                     "ncbi_tax_id": "1582094",
                                                                     "rank": "species"
@@ -14652,29 +14674,36 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Cosavirus B",
-                                                                    "ncbi_tax_id": "2003649",
+                                                                    "name": "Cosavirus asiani",
+                                                                    "ncbi_tax_id": "3428094",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Cosavirus D",
-                                                                    "ncbi_tax_id": "2003650",
+                                                                    "name": "Cosavirus bepakis",
+                                                                    "ncbi_tax_id": "3428095",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Cosavirus E",
-                                                                    "ncbi_tax_id": "2003651",
+                                                                    "name": "Cosavirus depakis",
+                                                                    "ncbi_tax_id": "3428096",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Cosavirus F",
-                                                                    "ncbi_tax_id": "2003652",
+                                                                    "name": "Cosavirus eaustrali",
+                                                                    "ncbi_tax_id": "3428097",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Cosavirus fepakis",
+                                                                    "ncbi_tax_id": "3428098",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -14686,17 +14715,17 @@
                                                             "assembly_count": 3,
                                                             "children": [
                                                                 {
-                                                                    "assembly_count": 2,
-                                                                    "children": [],
-                                                                    "name": "Salivirus A",
-                                                                    "ncbi_tax_id": "1330524",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
                                                                     "assembly_count": 1,
                                                                     "children": [],
                                                                     "name": "Salivirus FHB",
                                                                     "ncbi_tax_id": "1547495",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 2,
+                                                                    "children": [],
+                                                                    "name": "Salivirus aklasse",
+                                                                    "ncbi_tax_id": "3432241",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -14710,8 +14739,8 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Rosavirus A",
-                                                                    "ncbi_tax_id": "1511805",
+                                                                    "name": "Rosavirus acaliforni",
+                                                                    "ncbi_tax_id": "3432189",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -14947,22 +14976,22 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Central cimpanzee simian foamy virus",
-                                                                    "ncbi_tax_id": "2170194",
+                                                                    "name": "Simiispumavirus cernic",
+                                                                    "ncbi_tax_id": "3432451",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Eastern chimpanzee simian foamy virus",
-                                                                    "ncbi_tax_id": "2170195",
+                                                                    "name": "Simiispumavirus pantrosch",
+                                                                    "ncbi_tax_id": "3432458",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Guenon simian foamy virus",
-                                                                    "ncbi_tax_id": "2170197",
+                                                                    "name": "Simiispumavirus pantrotro",
+                                                                    "ncbi_tax_id": "3432459",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -14992,8 +15021,8 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Hepatitis B virus",
-                                                                    "ncbi_tax_id": "10407",
+                                                                    "name": "Orthohepadnavirus hominoidei",
+                                                                    "ncbi_tax_id": "3431302",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -15420,91 +15449,244 @@
                                                             "children": [
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus 134",
+                                                                            "ncbi_tax_id": "909333",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Gammapapillomavirus 7",
                                                                     "ncbi_tax_id": "1175849",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 2,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus 116",
+                                                                            "ncbi_tax_id": "915428",
+                                                                            "rank": "serotype"
+                                                                        },
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "human papillomavirus 129",
+                                                                            "ncbi_tax_id": "931210",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Gammapapillomavirus 9",
                                                                     "ncbi_tax_id": "1175851",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus 121",
+                                                                            "ncbi_tax_id": "915429",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Gammapapillomavirus 10",
                                                                     "ncbi_tax_id": "1175852",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 4,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus 126",
+                                                                            "ncbi_tax_id": "1055684",
+                                                                            "rank": "serotype"
+                                                                        },
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus 136",
+                                                                            "ncbi_tax_id": "1070409",
+                                                                            "rank": "serotype"
+                                                                        },
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus 140",
+                                                                            "ncbi_tax_id": "1070413",
+                                                                            "rank": "serotype"
+                                                                        },
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus 154",
+                                                                            "ncbi_tax_id": "1195796",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Gammapapillomavirus 11",
                                                                     "ncbi_tax_id": "1513256",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 2,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus 127",
+                                                                            "ncbi_tax_id": "746832",
+                                                                            "rank": "serotype"
+                                                                        },
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus 132",
+                                                                            "ncbi_tax_id": "909331",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Gammapapillomavirus 12",
                                                                     "ncbi_tax_id": "1513257",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "human papillomavirus 128",
+                                                                            "ncbi_tax_id": "931209",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Gammapapillomavirus 13",
                                                                     "ncbi_tax_id": "1513258",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "human papillomavirus 131",
+                                                                            "ncbi_tax_id": "909330",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Gammapapillomavirus 14",
                                                                     "ncbi_tax_id": "1513259",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 2,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus 135",
+                                                                            "ncbi_tax_id": "1070408",
+                                                                            "rank": "serotype"
+                                                                        },
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus 179",
+                                                                            "ncbi_tax_id": "1472342",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Gammapapillomavirus 15",
                                                                     "ncbi_tax_id": "1513260",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "human papillomavirus 137",
+                                                                            "ncbi_tax_id": "1070410",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Gammapapillomavirus 16",
                                                                     "ncbi_tax_id": "1513261",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus 144",
+                                                                            "ncbi_tax_id": "1070417",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Gammapapillomavirus 17",
                                                                     "ncbi_tax_id": "1513262",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus 156",
+                                                                            "ncbi_tax_id": "1248396",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Gammapapillomavirus 18",
                                                                     "ncbi_tax_id": "1513263",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 2,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "human papillomavirus 166",
+                                                                            "ncbi_tax_id": "1315259",
+                                                                            "rank": "serotype"
+                                                                        },
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus type 161",
+                                                                            "ncbi_tax_id": "1315264",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Gammapapillomavirus 19",
                                                                     "ncbi_tax_id": "1513264",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "human papillomavirus 163",
+                                                                            "ncbi_tax_id": "1315262",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Gammapapillomavirus 20",
                                                                     "ncbi_tax_id": "1513265",
                                                                     "rank": "species"
@@ -15518,42 +15700,90 @@
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus 167",
+                                                                            "ncbi_tax_id": "1420545",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Gammapapillomavirus 21",
                                                                     "ncbi_tax_id": "1961678",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus 172",
+                                                                            "ncbi_tax_id": "1434987",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Gammapapillomavirus 22",
                                                                     "ncbi_tax_id": "1961679",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus 175",
+                                                                            "ncbi_tax_id": "1434782",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Gammapapillomavirus 23",
                                                                     "ncbi_tax_id": "1961680",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus 178",
+                                                                            "ncbi_tax_id": "1478160",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Gammapapillomavirus 24",
                                                                     "ncbi_tax_id": "1961681",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus 184",
+                                                                            "ncbi_tax_id": "1472343",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Gammapapillomavirus 25",
                                                                     "ncbi_tax_id": "1961682",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus 187",
+                                                                            "ncbi_tax_id": "1851130",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Gammapapillomavirus 26",
                                                                     "ncbi_tax_id": "1961683",
                                                                     "rank": "species"
@@ -15567,7 +15797,15 @@
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus 201",
+                                                                            "ncbi_tax_id": "1682340",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Gammapapillomavirus 27",
                                                                     "ncbi_tax_id": "2169902",
                                                                     "rank": "species"
@@ -15582,28 +15820,60 @@
                                                             "children": [
                                                                 {
                                                                     "assembly_count": 2,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Papio hamadryas papillomavirus 1",
+                                                                            "ncbi_tax_id": "990303",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Alphapapillomavirus 12",
                                                                     "ncbi_tax_id": "10570",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus type 6b",
+                                                                            "ncbi_tax_id": "10600",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Alphapapillomavirus 10",
                                                                     "ncbi_tax_id": "333754",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus type 7",
+                                                                            "ncbi_tax_id": "10620",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Alphapapillomavirus 8",
                                                                     "ncbi_tax_id": "333757",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus type 54",
+                                                                            "ncbi_tax_id": "1671798",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Alphapapillomavirus 13",
                                                                     "ncbi_tax_id": "333766",
                                                                     "rank": "species"
@@ -15617,21 +15887,45 @@
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "human papillomavirus 10",
+                                                                            "ncbi_tax_id": "333759",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Alphapapillomavirus 2",
                                                                     "ncbi_tax_id": "337039",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus 16",
+                                                                            "ncbi_tax_id": "333760",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Alphapapillomavirus 9",
                                                                     "ncbi_tax_id": "337041",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "human papillomavirus 18",
+                                                                            "ncbi_tax_id": "333761",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Alphapapillomavirus 7",
                                                                     "ncbi_tax_id": "337042",
                                                                     "rank": "species"
@@ -15645,35 +15939,89 @@
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus type 26",
+                                                                            "ncbi_tax_id": "333762",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Alphapapillomavirus 5",
                                                                     "ncbi_tax_id": "337044",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "human papillomavirus 32",
+                                                                            "ncbi_tax_id": "333763",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Alphapapillomavirus 1",
                                                                     "ncbi_tax_id": "337048",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus type 34",
+                                                                            "ncbi_tax_id": "333764",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Alphapapillomavirus 11",
                                                                     "ncbi_tax_id": "337049",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 2,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "human papillomavirus 30",
+                                                                            "ncbi_tax_id": "10611",
+                                                                            "rank": "serotype"
+                                                                        },
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus type 53",
+                                                                            "ncbi_tax_id": "333765",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Alphapapillomavirus 6",
                                                                     "ncbi_tax_id": "337050",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 2,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "human papillomavirus 71",
+                                                                            "ncbi_tax_id": "120686",
+                                                                            "rank": "serotype"
+                                                                        },
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus type 90",
+                                                                            "ncbi_tax_id": "333769",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Alphapapillomavirus 14",
                                                                     "ncbi_tax_id": "931244",
                                                                     "rank": "species"
@@ -15695,42 +16043,97 @@
                                                             "children": [
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus 9",
+                                                                            "ncbi_tax_id": "10621",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Betapapillomavirus 2",
                                                                     "ncbi_tax_id": "333924",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus type 49",
+                                                                            "ncbi_tax_id": "10616",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Betapapillomavirus 3",
                                                                     "ncbi_tax_id": "334207",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus type 92",
+                                                                            "ncbi_tax_id": "211787",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Betapapillomavirus 4",
                                                                     "ncbi_tax_id": "334208",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus type 96",
+                                                                            "ncbi_tax_id": "247269",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Betapapillomavirus 5",
                                                                     "ncbi_tax_id": "334209",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 2,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus 5",
+                                                                            "ncbi_tax_id": "333923",
+                                                                            "rank": "serotype"
+                                                                        },
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Colobus guereza papillomavirus 2",
+                                                                            "ncbi_tax_id": "889813",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Betapapillomavirus 1",
                                                                     "ncbi_tax_id": "337051",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Macaca fascicularis papillomavirus 2",
+                                                                            "ncbi_tax_id": "915424",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Betapapillomavirus 6",
                                                                     "ncbi_tax_id": "1172193",
                                                                     "rank": "species"
@@ -15752,14 +16155,30 @@
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus type 63",
+                                                                            "ncbi_tax_id": "28311",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Mupapillomavirus 2",
                                                                     "ncbi_tax_id": "334204",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Human papillomavirus 204",
+                                                                            "ncbi_tax_id": "1650736",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Mupapillomavirus 3",
                                                                     "ncbi_tax_id": "1961783",
                                                                     "rank": "species"
@@ -16114,22 +16533,22 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Human associated huchismacovirus 1",
-                                                                    "ncbi_tax_id": "2169934",
+                                                                    "name": "Huchismacovirus humas1",
+                                                                    "ncbi_tax_id": "2844967",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Human associated huchismacovirus 2",
-                                                                    "ncbi_tax_id": "2169935",
+                                                                    "name": "Huchismacovirus humas2",
+                                                                    "ncbi_tax_id": "2844968",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Human associated huchismacovirus 3",
-                                                                    "ncbi_tax_id": "2169936",
+                                                                    "name": "Huchismacovirus humas3",
+                                                                    "ncbi_tax_id": "2844969",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -16203,15 +16622,15 @@
                                                                 {
                                                                     "assembly_count": 4,
                                                                     "children": [],
-                                                                    "name": "Brisavirus",
-                                                                    "ncbi_tax_id": "2732654",
+                                                                    "name": "Torbevirus brisa",
+                                                                    "ncbi_tax_id": "3432910",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Vientovirus",
-                                                                    "ncbi_tax_id": "2732655",
+                                                                    "name": "Torbevirus viento",
+                                                                    "ncbi_tax_id": "3432911",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -16618,52 +17037,52 @@
                                                             "assembly_count": 9,
                                                             "children": [
                                                                 {
-                                                                    "assembly_count": 2,
-                                                                    "children": [],
-                                                                    "name": "Human mastadenovirus B",
-                                                                    "ncbi_tax_id": "108098",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Human mastadenovirus A",
-                                                                    "ncbi_tax_id": "129875",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Human mastadenovirus C",
-                                                                    "ncbi_tax_id": "129951",
+                                                                    "name": "Mastadenovirus adami",
+                                                                    "ncbi_tax_id": "3241402",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 2,
                                                                     "children": [],
-                                                                    "name": "Human mastadenovirus E",
-                                                                    "ncbi_tax_id": "130308",
+                                                                    "name": "Mastadenovirus blackbeardi",
+                                                                    "ncbi_tax_id": "3241406",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Human mastadenovirus F",
-                                                                    "ncbi_tax_id": "130309",
+                                                                    "name": "Mastadenovirus caesari",
+                                                                    "ncbi_tax_id": "3241411",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Human mastadenovirus D",
-                                                                    "ncbi_tax_id": "130310",
+                                                                    "name": "Mastadenovirus dominans",
+                                                                    "ncbi_tax_id": "3241420",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 2,
+                                                                    "children": [],
+                                                                    "name": "Mastadenovirus exoticum",
+                                                                    "ncbi_tax_id": "3241425",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Human mastadenovirus G",
-                                                                    "ncbi_tax_id": "536079",
+                                                                    "name": "Mastadenovirus faecale",
+                                                                    "ncbi_tax_id": "3241426",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Mastadenovirus russelli",
+                                                                    "ncbi_tax_id": "3241445",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -16718,14 +17137,7 @@
                             "assembly_count": 7,
                             "children": [
                                 {
-                                    "assembly_count": 4,
-                                    "children": [],
-                                    "name": "Hepatitis delta virus",
-                                    "ncbi_tax_id": "12475",
-                                    "rank": "species"
-                                },
-                                {
-                                    "assembly_count": 1,
+                                    "assembly_count": 5,
                                     "children": [],
                                     "name": "Deltavirus italiense",
                                     "ncbi_tax_id": "2844074",
