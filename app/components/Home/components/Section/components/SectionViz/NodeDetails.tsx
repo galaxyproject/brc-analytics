@@ -52,6 +52,8 @@ function createFilterUrl(rank?: string, name?: string): LinkProps["url"] {
   /* eslint-disable sort-keys -- Keep these in natural order of hierarchy */
   // Convert rank to the expected format for the filter
   const rankMap: Record<string, string> = {
+    isolate: "taxonomicLevelIsolate",
+    serotype: "taxonomicLevelSerotype",
     strain: "taxonomicLevelStrain",
     species: "taxonomicLevelSpecies",
     genus: "taxonomicLevelGenus",

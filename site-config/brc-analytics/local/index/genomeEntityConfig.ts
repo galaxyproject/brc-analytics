@@ -37,6 +37,14 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
           },
           {
+            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SEROTYPE,
+            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SEROTYPE,
+          },
+          {
+            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ISOLATE,
+            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_ISOLATE,
+          },
+          {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME,
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.COMMON_NAME,
           },
@@ -240,6 +248,24 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,
+        width: { max: "0.5fr", min: "100px" },
+      },
+      {
+        componentConfig: {
+          component: C.BasicCell,
+          viewBuilder: V.buildGenomeTaxonomicLevelSerotype,
+        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SEROTYPE,
+        id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SEROTYPE,
+        width: { max: "0.5fr", min: "100px" },
+      },
+      {
+        componentConfig: {
+          component: C.BasicCell,
+          viewBuilder: V.buildGenomeTaxonomicLevelIsolate,
+        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_ISOLATE,
+        id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ISOLATE,
         width: { max: "0.5fr", min: "100px" },
       },
       {
