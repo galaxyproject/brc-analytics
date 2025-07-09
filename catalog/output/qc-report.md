@@ -24,39 +24,39 @@ None
 ## Species and strain combinations with multiple taxonomy IDs
 
 - Acanthamoeba castellanii strain Neff: 1257118, 5755
-- Alphapapillomavirus 12: 990303, 10570
-- Alphapapillomavirus 14: 333769, 120686
-- Alphapapillomavirus 6: 10611, 333765
-- Asfivirus haemorrhagiae: 443876, 443878, 10497
+- Alphapapillomavirus 12: 10570, 990303
+- Alphapapillomavirus 14: 120686, 333769
+- Alphapapillomavirus 6: 333765, 10611
+- Asfivirus haemorrhagiae: 443878, 10497, 443876
 - Betacoronavirus pandemicum: 227984, 2697049
-- Betapapillomavirus 1: 889813, 333923
+- Betapapillomavirus 1: 333923, 889813
 - Blumeria graminis: 1689686, 62690
-- Candida tropicalis strain MYA-3404: 5482, 294747
-- Cryptococcus neoformans strain H99: 235443, 5207
+- Candida tropicalis strain MYA-3404: 294747, 5482
+- Cryptococcus neoformans strain H99: 5207, 235443
 - Cryptosporidium parvum: 353152, 5807
 - Deltaretrovirus priTlym1: 194440, 11908
 - Dependoparvovirus mammalian1: 82300, 256548
-- Dependoparvovirus primate1: 57579, 202813, 10804, 202812, 85106
+- Dependoparvovirus primate1: 10804, 202813, 202812, 85106, 57579
 - Enterovirus alphacoxsackie: 156647, 150846
-- Enterovirus betarhino: 44130, 12131
-- Gammapapillomavirus 11: 1070413, 1070409, 1195796
-- Gammapapillomavirus 12: 746832, 909331
-- Gammapapillomavirus 15: 1070408, 1472342
+- Enterovirus betarhino: 12131, 44130
+- Gammapapillomavirus 11: 1070409, 1070413, 1195796
+- Gammapapillomavirus 12: 909331, 746832
+- Gammapapillomavirus 15: 1472342, 1070408
 - Gammapapillomavirus 19: 1315259, 1315264
-- Gemykibivirus humas1: 1519409, 1516081
-- Glossina fuscipes: 7396, 201502
-- Hepacivirus hominis: 1544901, 33745, 356114
-- Neospora caninum strain Liverpool: 29176, 572307
-- Norovirus norwalkense: 1529918, 1529924, 490039, 1529909, 122929, 122928, 1246677
-- Orthoflavivirus denguei: 11070, 11069, 11053
+- Gemykibivirus humas1: 1516081, 1519409
+- Glossina fuscipes: 201502, 7396
+- Hepacivirus hominis: 33745, 1544901, 356114
+- Neospora caninum strain Liverpool: 572307, 29176
+- Norovirus norwalkense: 122929, 1529918, 122928, 1246677, 1529909, 1529924, 490039
+- Orthoflavivirus denguei: 11069, 11053, 11070
 - Orthomarburgvirus marburgense: 448086, 3052505
 - Pegivirus columbiaense: 1704090, 1729141
 - Plasmodium falciparum: 5833, 36329
-- Plasmodium vinckei: 5860, 54757, 138298, 119398, 138297
-- Small anellovirus: 289366, 289367
-- Torbevirus brisa: 2571077, 2571078, 3116878, 2571075
-- Trypanosoma brucei: 5702, 185431
-- Trypanosoma cruzi strain Dm28c: 85057, 1416333, 5693
+- Plasmodium vinckei: 119398, 138297, 54757, 138298, 5860
+- Small anellovirus: 289367, 289366
+- Torbevirus brisa: 2571075, 3116878, 2571078, 2571077
+- Trypanosoma brucei: 185431, 5702
+- Trypanosoma cruzi strain Dm28c: 5693, 85057, 1416333
 - Vesivirus exanthema: 146073, 35612
 
 ## Assemblies without ploidy information
@@ -129,10 +129,10 @@ None
 
 ## Outbreak descendant taxonomy IDs not found in genomes data
 
-- 463676
+- 138949
 - 138948
 - 138951
-- 138949
+- 463676
 
 ## Taxonomy tree
 

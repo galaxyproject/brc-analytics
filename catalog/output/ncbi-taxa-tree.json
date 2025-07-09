@@ -216,6 +216,13 @@
                                                                         {
                                                                             "assembly_count": 1,
                                                                             "children": [],
+                                                                            "name": "Escherichia coli K-12",
+                                                                            "ncbi_tax_id": "83333",
+                                                                            "rank": "strain"
+                                                                        },
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
                                                                             "name": "Escherichia coli O157:H7 str. Sakai",
                                                                             "ncbi_tax_id": "386585",
                                                                             "rank": "strain"
@@ -290,7 +297,15 @@
                                                                     "children": [
                                                                         {
                                                                             "assembly_count": 1,
-                                                                            "children": [],
+                                                                            "children": [
+                                                                                {
+                                                                                    "assembly_count": 1,
+                                                                                    "children": [],
+                                                                                    "name": "Shigella flexneri 2a",
+                                                                                    "ncbi_tax_id": "42897",
+                                                                                    "rank": "serotype"
+                                                                                }
+                                                                            ],
                                                                             "name": "Shigella flexneri 2a str. 301",
                                                                             "ncbi_tax_id": "198214",
                                                                             "rank": "strain"
@@ -11536,8 +11551,23 @@
                                                     "assembly_count": 9,
                                                     "children": [
                                                         {
-                                                            "assembly_count": 2,
-                                                            "children": [],
+                                                            "assembly_count": 4,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Entamoeba histolytica HM-1:IMSS-A",
+                                                                    "ncbi_tax_id": "885318",
+                                                                    "rank": "isolate"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Entamoeba histolytica HM-1:IMSS-B",
+                                                                    "ncbi_tax_id": "885319",
+                                                                    "rank": "isolate"
+                                                                }
+                                                            ],
                                                             "name": "Entamoeba histolytica HM-1:IMSS",
                                                             "ncbi_tax_id": "294381",
                                                             "rank": "strain"
@@ -11576,20 +11606,6 @@
                                                             "name": "Entamoeba histolytica HM-3:IMSS",
                                                             "ncbi_tax_id": "885315",
                                                             "rank": "strain"
-                                                        },
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [],
-                                                            "name": "Entamoeba histolytica HM-1:IMSS-A",
-                                                            "ncbi_tax_id": "885318",
-                                                            "rank": "isolate"
-                                                        },
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [],
-                                                            "name": "Entamoeba histolytica HM-1:IMSS-B",
-                                                            "ncbi_tax_id": "885319",
-                                                            "rank": "isolate"
                                                         }
                                                     ],
                                                     "name": "Entamoeba histolytica",
@@ -13508,7 +13524,50 @@
                                                             "children": [
                                                                 {
                                                                     "assembly_count": 7,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "H5N1 subtype",
+                                                                            "ncbi_tax_id": "102793",
+                                                                            "rank": "serotype"
+                                                                        },
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "H9N2 subtype",
+                                                                            "ncbi_tax_id": "102796",
+                                                                            "rank": "serotype"
+                                                                        },
+                                                                        {
+                                                                            "assembly_count": 2,
+                                                                            "children": [],
+                                                                            "name": "H1N1 subtype",
+                                                                            "ncbi_tax_id": "114727",
+                                                                            "rank": "serotype"
+                                                                        },
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "H2N2 subtype",
+                                                                            "ncbi_tax_id": "114729",
+                                                                            "rank": "serotype"
+                                                                        },
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "H3N2 subtype",
+                                                                            "ncbi_tax_id": "119210",
+                                                                            "rank": "serotype"
+                                                                        },
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "H7N9 subtype",
+                                                                            "ncbi_tax_id": "333278",
+                                                                            "rank": "serotype"
+                                                                        }
+                                                                    ],
                                                                     "name": "Alphainfluenzavirus influenzae",
                                                                     "ncbi_tax_id": "2955291",
                                                                     "rank": "species"
