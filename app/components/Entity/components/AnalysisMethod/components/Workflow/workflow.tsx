@@ -80,8 +80,8 @@ export const Workflow = ({
         {iwcId && (
           <Grid>
             <Button
-              {...BUTTON_PROPS}
-              variant="outlined"
+              color="secondary"
+              variant="contained"
               onClick={(): void => {
                 window.open(
                   `https://iwc.galaxyproject.org/workflow/${iwcId}`,
