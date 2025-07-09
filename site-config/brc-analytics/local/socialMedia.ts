@@ -2,6 +2,10 @@ import { SocialMedia } from "@databiosphere/findable-ui/lib/components/Layout/co
 import * as C from "../../../app/components";
 
 export const SOCIALS = {
+  CALENDAR: {
+    label: "Calendar",
+    url: "/calendar",
+  },
   DISCOURSE: {
     label: "Discourse",
     url: "https://help.brc-analytics.org/",
@@ -14,6 +18,10 @@ export const SOCIALS = {
 
 export const socialMedia: SocialMedia = {
   socials: [
+    {
+      ...SOCIALS.CALENDAR,
+      Icon: C.CalendarIcon,
+    },
     {
       ...SOCIALS.DISCOURSE,
       Icon: C.DiscourseIcon,

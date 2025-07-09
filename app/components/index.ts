@@ -40,4 +40,5 @@ export { MDXSection } from "./Entity/components/Section/MDXSection/mdxSection";
 export { Chip } from "./common/Chip/chip";
 export { Tooltip } from "./common/Tooltip/tooltip";
 export { AppLink } from "./common/AppLink/appLink";
+export { CalendarIcon } from "./common/CustomIcon/components/CalendarIcon/calendarIcon";
 export { Sections } from "./Entity/components/Sections/sections";
