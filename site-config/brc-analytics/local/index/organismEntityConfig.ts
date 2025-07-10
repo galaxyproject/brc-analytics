@@ -181,6 +181,7 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
         } as ComponentConfig<typeof C.Link, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
+        meta: { columnPinned: true },
         width: { max: "1fr", min: "auto" },
       },
       {
