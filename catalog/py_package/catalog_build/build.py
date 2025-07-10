@@ -1063,6 +1063,33 @@ def find_suppressed_genomes(genomes_df):
     return suppressed_assemblies
 
 
+def find_gca_with_paired_gcf(genomes_df):
+    """
+    Identifies GenBank (GCA) assemblies that have paired RefSeq (GCF) accessions available.
+
+    Args:
+        genomes_df: DataFrame containing genome information with 'accession' and
+            'pairedAccession' columns
+
+    Returns:
+        List of tuples containing (GCA_accession, GCF_paired_accession)
+    """
+    # Filter for GCA accessions that have a paired GCF accession
+    gca_mask = genomes_df["accession"].str.startswith("GCA_")
+    has_paired_mask = genomes_df["pairedAccession"].notna() & genomes_df[
+        "pairedAccession"
+    ].str.startswith("GCF_")
+
+    # Combine masks to find GCA accessions with GCF paired accessions
+    paired_mask = gca_mask & has_paired_mask
+
+    # Extract the accession and paired accession for matching rows
+    paired_assemblies = genomes_df[paired_mask][
+        ["accession", "pairedAccession"]
+    ].values.tolist()
+    return paired_assemblies
+
+
 def make_qc_report(
     missing_ncbi_assemblies,
     inconsistent_taxonomy_ids,
@@ -1073,6 +1100,7 @@ def make_qc_report(
     tree_checks=None,
     outdated_accessions=None,
     suppressed_genomes=None,
+    paired_accessions=None,
 ):
     ncbi_assemblies_text = (
         "None"
@@ -1152,12 +1180,20 @@ def make_qc_report(
             [f"- {acc} (current: {curr_acc})" for acc, curr_acc in outdated_accessions]
         )
     )
-    
+
     suppressed_genomes_text = (
         "None"
         if suppressed_genomes is None or len(suppressed_genomes) == 0
         else "\n".join(
             [f"- {acc} (status: {status})" for acc, status in suppressed_genomes]
+        )
+    )
+
+    paired_accessions_text = (
+        "None"
+        if paired_accessions is None or len(paired_accessions) == 0
+        else "\n".join(
+            [f"- {gca} (paired RefSeq: {gcf})" for gca, gcf in paired_accessions]
         )
     )
     return (
@@ -1170,6 +1206,7 @@ def make_qc_report(
         f"## Outbreak descendant taxonomy IDs not found in genomes data\n\n{outbreak_descendants_text}\n\n"
         f"## Outdated assembly accessions\n\n{outdated_accessions_text}\n\n"
         f"## Suppressed or retired genomes\n\n{suppressed_genomes_text}\n\n"
+        f"## GenBank assemblies with paired RefSeq accessions\n\n{paired_accessions_text}\n\n"
         f"## Taxonomy tree\n\n{tree_checks_text}\n"
     )
 
@@ -1441,6 +1478,7 @@ def build_files(
     if qc_report_path:
         qc_report_params["outdated_accessions"] = find_outdated_accessions(genomes_df)
         qc_report_params["suppressed_genomes"] = find_suppressed_genomes(genomes_df)
+        qc_report_params["paired_accessions"] = find_gca_with_paired_gcf(genomes_df)
 
     # Drop any duplicate rows based on accession before writing to file
     genomes_df = genomes_df.drop_duplicates(subset=["accession"])

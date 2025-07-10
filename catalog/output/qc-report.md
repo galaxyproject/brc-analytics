@@ -19,39 +19,39 @@ None
 
 - Acanthamoeba castellanii strain Neff: 1257118, 5755
 - Alphapapillomavirus 12: 10570, 990303
-- Alphapapillomavirus 14: 120686, 333769
-- Alphapapillomavirus 6: 333765, 10611
-- Asfivirus haemorrhagiae: 10497, 443878, 443876
+- Alphapapillomavirus 14: 333769, 120686
+- Alphapapillomavirus 6: 10611, 333765
+- Asfivirus haemorrhagiae: 443876, 443878, 10497
 - Betacoronavirus pandemicum: 227984, 2697049
 - Betapapillomavirus 1: 889813, 333923
 - Blumeria graminis: 62690, 1689686
-- Candida tropicalis strain MYA-3404: 294747, 5482
+- Candida tropicalis strain MYA-3404: 5482, 294747
 - Cryptococcus neoformans strain H99: 235443, 5207
-- Cryptosporidium parvum: 353152, 5807
+- Cryptosporidium parvum: 5807, 353152
 - Deltaretrovirus priTlym1: 194440, 11908
-- Dependoparvovirus mammalian1: 82300, 256548
-- Dependoparvovirus primate1: 57579, 10804, 85106, 202813, 202812
-- Enterovirus alphacoxsackie: 150846, 156647
-- Enterovirus betarhino: 12131, 44130
-- Gammapapillomavirus 11: 1070413, 1070409, 1195796
+- Dependoparvovirus mammalian1: 256548, 82300
+- Dependoparvovirus primate1: 10804, 57579, 202813, 202812, 85106
+- Enterovirus alphacoxsackie: 156647, 150846
+- Enterovirus betarhino: 44130, 12131
+- Gammapapillomavirus 11: 1195796, 1070413, 1070409
 - Gammapapillomavirus 12: 746832, 909331
 - Gammapapillomavirus 15: 1070408, 1472342
 - Gammapapillomavirus 19: 1315264, 1315259
-- Gemykibivirus humas1: 1519409, 1516081
+- Gemykibivirus humas1: 1516081, 1519409
 - Glossina fuscipes: 7396, 201502
-- Hepacivirus hominis: 33745, 356114, 1544901
-- Neospora caninum strain Liverpool: 572307, 29176
-- Norovirus norwalkense: 122929, 490039, 1529918, 122928, 1529909, 1529924, 1246677
-- Orthoflavivirus denguei: 11053, 11069, 11070
+- Hepacivirus hominis: 356114, 1544901, 33745
+- Neospora caninum strain Liverpool: 29176, 572307
+- Norovirus norwalkense: 1529924, 490039, 1529918, 1529909, 122929, 1246677, 122928
+- Orthoflavivirus denguei: 11070, 11053, 11069
 - Orthomarburgvirus marburgense: 3052505, 448086
-- Pegivirus columbiaense: 1704090, 1729141
+- Pegivirus columbiaense: 1729141, 1704090
 - Plasmodium falciparum: 5833, 36329
-- Plasmodium vinckei: 5860, 138297, 119398, 138298, 54757
-- Small anellovirus: 289366, 289367
-- Torbevirus brisa: 2571078, 3116878, 2571075, 2571077
+- Plasmodium vinckei: 119398, 138298, 5860, 138297, 54757
+- Small anellovirus: 289367, 289366
+- Torbevirus brisa: 3116878, 2571075, 2571078, 2571077
 - Trypanosoma brucei: 185431, 5702
-- Trypanosoma cruzi strain Dm28c: 1416333, 5693, 85057
-- Vesivirus exanthema: 35612, 146073
+- Trypanosoma cruzi strain Dm28c: 5693, 1416333, 85057
+- Vesivirus exanthema: 146073, 35612
 
 ## Assemblies without ploidy information
 
@@ -123,9 +123,9 @@ None
 
 ## Outbreak descendant taxonomy IDs not found in genomes data
 
+- 463676
 - 138948
 - 138951
-- 463676
 - 138949
 
 ## Outdated assembly accessions
@@ -177,6 +177,25 @@ None
 - GCF_000209485.1 (status: suppressed)
 - GCF_000258005.1 (status: suppressed)
 - GCF_000709005.1 (status: suppressed)
+
+## GenBank assemblies with paired RefSeq accessions
+
+- GCA_009017415.1 (paired RefSeq: GCF_009017415.1)
+- GCA_000857325.3 (paired RefSeq: GCF_000857325.3)
+- GCA_004788295.1 (paired RefSeq: GCF_004788295.1)
+- GCA_004786575.1 (paired RefSeq: GCF_004786575.1)
+- GCA_004786635.1 (paired RefSeq: GCF_004786635.1)
+- GCA_003108605.1 (paired RefSeq: GCF_003108605.1)
+- GCA_008766755.1 (paired RefSeq: GCF_008766755.1)
+- GCA_008766715.1 (paired RefSeq: GCF_008766715.1)
+- GCA_004788235.1 (paired RefSeq: GCF_004788235.1)
+- GCA_008776015.1 (paired RefSeq: GCF_008776015.1)
+- GCA_000003225.1 (paired RefSeq: GCF_000003225.4)
+- GCA_014883705.1 (paired RefSeq: GCF_014883705.1)
+- GCA_014883685.1 (paired RefSeq: GCF_014883685.1)
+- GCA_014883715.1 (paired RefSeq: GCF_014883715.1)
+- GCA_014883695.1 (paired RefSeq: GCF_014883695.1)
+- GCA_001629985.1 (paired RefSeq: GCF_001629985.1)
 
 ## Taxonomy tree
 
