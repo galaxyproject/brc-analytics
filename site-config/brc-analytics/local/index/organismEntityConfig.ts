@@ -15,6 +15,8 @@ import {
 } from "../../category";
 import { assembliesMainColumn } from "../entity/organism/assembliesMainColumn";
 import { assembliesTop } from "../entity/organism/assembliesTop";
+import { CATEGORY_GROUPS } from "./common/category/categories";
+import { COLUMN_REGISTRY } from "./common/column/columnRegistry";
 
 /**
  * Entity config object responsible to config anything related to the /genomes route.
@@ -38,6 +40,7 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
           },
         ],
       },
+      CATEGORY_GROUPS.PRIORITY_PATHOGENS,
       {
         categoryConfigs: [
           {
@@ -233,6 +236,21 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
       },
       {
         componentConfig: {
+          children: [
+            {
+              component: C.Chip,
+              viewBuilder: V.buildPriorityPathogen,
+            } as ComponentConfig<typeof C.Chip, BRCDataCatalogOrganism>,
+          ],
+          component: C.Tooltip,
+          viewBuilder: V.buildPriorityPathogenTooltip,
+        } as ComponentConfig<typeof C.Tooltip, BRCDataCatalogOrganism>,
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.PRIORITY_PATHOGEN_NAME,
+        id: BRC_DATA_CATALOG_CATEGORY_KEY.PRIORITY_PATHOGEN_NAME,
+        width: { max: "0.5fr", min: "142px" },
+      },
+      {
+        componentConfig: {
           component: C.BasicCell,
           viewBuilder: V.buildAssemblyCount,
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
@@ -240,10 +258,12 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
         id: BRC_DATA_CATALOG_CATEGORY_KEY.ASSEMBLY_COUNT,
         width: { max: "0.65fr", min: "164px" },
       },
+      COLUMN_REGISTRY.PRIORITY,
     ],
     tableOptions: {
       initialState: {
         columnVisibility: {
+          [BRC_DATA_CATALOG_CATEGORY_KEY.PRIORITY]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_CLASS]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_FAMILY]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_GENUS]: false,

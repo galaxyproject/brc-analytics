@@ -7,6 +7,7 @@ type ChipPropsOptions = {
 const COLOR: Record<string, ChipProps["color"]> = {
   ALERT: "alert",
   CAUTION: "caution",
+  NONE: "none",
 };
 
 export const CHIP_PROPS: ChipPropsOptions = {

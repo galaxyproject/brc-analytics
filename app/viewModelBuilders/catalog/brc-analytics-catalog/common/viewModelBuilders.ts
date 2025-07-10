@@ -38,6 +38,10 @@ import {
 } from "../../../../views/PriorityPathogensView/components/PriorityPathogens/utils";
 import { KeyValueSection } from "../../../../components/Entity/components/Section/KeyValueSection/keyValueSection";
 import { ResourcesSection } from "../../../../views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
+import Router from "next/router";
+import slugify from "slugify";
+import { SLUGIFY_OPTIONS } from "../../../../common/constants";
+import { LinkProps } from "next/link";
 
 /**
  * Build props for the accession cell.
@@ -140,6 +144,10 @@ export const buildAssemblyDetails = (
       children: assembly.accession,
       value: assembly.accession,
     })
+  );
+  keyValuePairs.set(
+    BRC_DATA_CATALOG_CATEGORY_LABEL.PRIORITY_PATHOGEN_NAME,
+    C.Chip(buildPriorityPathogen(assembly))
   );
   return {
     KeyElType: C.KeyElType,
@@ -377,6 +385,62 @@ export const buildOrganismTaxonomicLevelIsolate = (
 };
 
 /**
+ * Build props for the priority cell.
+ * @param entity - Genome or organism entity.
+ * @returns Props to be used for the BasicCell component.
+ */
+export const buildPriority = (
+  entity: BRCDataCatalogGenome | BRCDataCatalogOrganism
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: entity.priority ?? "Unprioritized",
+  };
+};
+
+/**
+ * Build props for the priority pathogen cell.
+ * @param entity - Genome or organism entity.
+ * @returns Props to be used for the Chip component.
+ */
+export const buildPriorityPathogen = (
+  entity: BRCDataCatalogGenome | BRCDataCatalogOrganism
+): ComponentProps<typeof C.Chip> => {
+  const { priority, priorityPathogenName } = entity;
+  return {
+    color: getPriorityColor(priority),
+    label: priorityPathogenName || "-",
+    onClick: priorityPathogenName
+      ? (): void => {
+          Router.push({
+            pathname: ROUTES.PRIORITY_PATHOGEN,
+            query: {
+              entityId: slugify(priorityPathogenName, SLUGIFY_OPTIONS),
+              entityListType: "priority-pathogens",
+            },
+          });
+        }
+      : undefined,
+    variant: CHIP_PROPS.VARIANT.STATUS,
+  };
+};
+
+/**
+ * Build props for the priority pathogen tooltip.
+ * @param entity - Genome or organism entity.
+ * @returns Props to be used for the Tooltip component.
+ */
+export const buildPriorityPathogenTooltip = (
+  entity: BRCDataCatalogGenome | BRCDataCatalogOrganism
+): Omit<ComponentProps<typeof C.Tooltip>, "children"> => {
+  return {
+    arrow: true,
+    title: entity.priorityPathogenName
+      ? `${entity.priorityPathogenName} - ${getPriorityLabel(entity.priority)}`
+      : undefined,
+  };
+};
+
+/**
  * Build props for the priority pathogen BackPageHero component.
  * @param priorityPathogen - Priority pathogen entity.
  * @returns Props to be used for the BackPageHero component.
@@ -414,13 +478,28 @@ export const buildPriorityPathogenDetails = (
 ): ComponentProps<typeof KeyValueSection> => {
   const keyValuePairs = new Map<Key, Value>();
   keyValuePairs.set(
-    "Priority",
+    BRC_DATA_CATALOG_CATEGORY_LABEL.PRIORITY,
     C.Chip({
       color: getPriorityColor(priorityPathogen.priority),
       label: getPriorityLabel(priorityPathogen.priority),
       variant: CHIP_PROPS.VARIANT.STATUS,
     })
   );
+  [
+    ["Organisms", ROUTES.ORGANISMS],
+    ["Assemblies", ROUTES.GENOMES],
+  ].forEach(([key, pathname]) => {
+    keyValuePairs.set(
+      key,
+      C.AppLink({
+        children: priorityPathogen.taxonName,
+        href: getEntityLinkWithPriorityPathogenFilter(
+          priorityPathogen,
+          pathname
+        ),
+      })
+    );
+  });
   return {
     keyValuePairs,
     title: "Priority Pathogen details",
@@ -852,6 +931,29 @@ function getAssemblyBreadcrumbs(assembly: BRCDataCatalogGenome): Breadcrumb[] {
     { path: "", text: assembly.accession },
     { path: "", text: "Select a Workflow" },
   ];
+}
+
+/**
+ * Returns an entity list link with a priority pathogen filter.
+ * @param priorityPathogen - Priority pathogen entity.
+ * @param pathname - Pathname to use for the link.
+ * @returns Props to be used for the AppLink component.
+ */
+function getEntityLinkWithPriorityPathogenFilter(
+  priorityPathogen: Outbreak,
+  pathname: string
+): LinkProps["href"] {
+  return {
+    pathname,
+    query: {
+      filter: JSON.stringify([
+        {
+          categoryKey: BRC_DATA_CATALOG_CATEGORY_KEY.PRIORITY_PATHOGEN_NAME,
+          value: [priorityPathogen.name],
+        },
+      ]),
+    },
+  };
 }
 
 /**

@@ -1,6 +1,6 @@
 ## Overview
 
-Coccidioides causes coccidioidomycosis, known as Valley Fever, a respiratory disease endemic in the arid Americas (southwestern US, parts of Latin America). Infection is acquired by inhaling airborne fungal spores from soil.
+_Coccidioides posadasii_ causes coccidioidomycosis, known as Valley Fever, a respiratory disease endemic in the arid Americas (southwestern US, parts of Latin America). Infection is acquired by inhaling airborne fungal spores from soil.
 
 ## Impact
 

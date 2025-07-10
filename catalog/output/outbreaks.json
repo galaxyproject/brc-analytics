@@ -6,7 +6,7 @@
       "scope": {}
     },
     "highlight_descendant_taxonomy_ids": null,
-    "name": "Avian influenza",
+    "name": "Avian Influenza",
     "priority": "MODERATE",
     "resources": [
       {
@@ -201,12 +201,12 @@
   },
   {
     "description": {
-      "compiledSource": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction _createMdxContent(props) {\n  const _components = Object.assign({\n    h2: \"h2\",\n    p: \"p\",\n    ul: \"ul\",\n    li: \"li\",\n    strong: \"strong\"\n  }, _provideComponents(), props.components);\n  return _jsxs(_Fragment, {\n    children: [_jsx(_components.h2, {\n      children: \"Overview\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"Plasmodium falciparum causes the most lethal form of malaria, a disease that remains a massive global burden especially in sub-Saharan Africa. In 2021, there were over 247 million malaria cases worldwide and about 619,000 deaths, mostly in young children.\"\n    }), \"\\n\", _jsx(_components.h2, {\n      children: \"Impact\"\n    }), \"\\n\", _jsxs(_components.ul, {\n      children: [\"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Public Health\"\n        }), \": Leading cause of childhood mortality in endemic regions\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Healthcare\"\n        }), \": Significant economic impacts\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Mortality\"\n        }), \": ~619,000 deaths annually\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Geography\"\n        }), \": Highest burden in sub-Saharan Africa\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Economic Impact\"\n        }), \": Major economic burden in affected regions\"]\n      }), \"\\n\"]\n    })]\n  });\n}\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, props)\n  })) : _createMdxContent(props);\n}\nreturn {\n  default: MDXContent\n};\n",
+      "compiledSource": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction _createMdxContent(props) {\n  const _components = Object.assign({\n    h2: \"h2\",\n    p: \"p\",\n    em: \"em\",\n    ul: \"ul\",\n    li: \"li\",\n    strong: \"strong\"\n  }, _provideComponents(), props.components);\n  return _jsxs(_Fragment, {\n    children: [_jsx(_components.h2, {\n      children: \"Overview\"\n    }), \"\\n\", _jsxs(_components.p, {\n      children: [_jsx(_components.em, {\n        children: \"Plasmodium falciparum\"\n      }), \" causes the most lethal form of malaria, a disease that remains a massive global burden especially in sub-Saharan Africa. In 2021, there were over 247 million malaria cases worldwide and about 619,000 deaths, mostly in young children.\"]\n    }), \"\\n\", _jsx(_components.h2, {\n      children: \"Impact\"\n    }), \"\\n\", _jsxs(_components.ul, {\n      children: [\"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Public Health\"\n        }), \": Leading cause of childhood mortality in endemic regions\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Healthcare\"\n        }), \": Significant economic impacts\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Mortality\"\n        }), \": ~619,000 deaths annually\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Geography\"\n        }), \": Highest burden in sub-Saharan Africa\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Economic Impact\"\n        }), \": Major economic burden in affected regions\"]\n      }), \"\\n\"]\n    })]\n  });\n}\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, props)\n  })) : _createMdxContent(props);\n}\nreturn {\n  default: MDXContent\n};\n",
       "frontmatter": {},
       "scope": {}
     },
     "highlight_descendant_taxonomy_ids": null,
-    "name": "Malaria/ Plasmodium falciparum",
+    "name": "Plasmodium falciparum",
     "priority": "HIGH",
     "resources": [
       {
@@ -236,7 +236,7 @@
   },
   {
     "description": {
-      "compiledSource": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction _createMdxContent(props) {\n  const _components = Object.assign({\n    h2: \"h2\",\n    p: \"p\",\n    ul: \"ul\",\n    li: \"li\",\n    strong: \"strong\"\n  }, _provideComponents(), props.components);\n  return _jsxs(_Fragment, {\n    children: [_jsx(_components.h2, {\n      children: \"Overview\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"Candida auris is an emerging multidrug-resistant fungus that has caused hospital outbreaks worldwide. Identified in 2009, it has spread to dozens of countries and is difficult to eradicate in healthcare settings.\"\n    }), \"\\n\", _jsx(_components.h2, {\n      children: \"Impact\"\n    }), \"\\n\", _jsxs(_components.ul, {\n      children: [\"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Public Health\"\n        }), \": Rapidly increasing cases globally\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Healthcare\"\n        }), \": Major infection control challenge in hospitals\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Mortality\"\n        }), \": Over 1 in 3 patients with bloodstream infection die\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Drug Resistance\"\n        }), \": Often resistant to multiple antifungal drugs\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Growth\"\n        }), \": U.S. infections jumped from 173 in 2017 to 2,377 in 2022\"]\n      }), \"\\n\"]\n    })]\n  });\n}\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, props)\n  })) : _createMdxContent(props);\n}\nreturn {\n  default: MDXContent\n};\n",
+      "compiledSource": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction _createMdxContent(props) {\n  const _components = Object.assign({\n    h2: \"h2\",\n    p: \"p\",\n    em: \"em\",\n    ul: \"ul\",\n    li: \"li\",\n    strong: \"strong\"\n  }, _provideComponents(), props.components);\n  return _jsxs(_Fragment, {\n    children: [_jsx(_components.h2, {\n      children: \"Overview\"\n    }), \"\\n\", _jsxs(_components.p, {\n      children: [_jsx(_components.em, {\n        children: \"Candidozyma auris\"\n      }), \" (formerly \", _jsx(_components.em, {\n        children: \"Candida auris\"\n      }), \") is an emerging multidrug-resistant fungus that has caused hospital outbreaks worldwide. Identified in 2009, it has spread to dozens of countries and is difficult to eradicate in healthcare settings.\"]\n    }), \"\\n\", _jsx(_components.h2, {\n      children: \"Impact\"\n    }), \"\\n\", _jsxs(_components.ul, {\n      children: [\"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Public Health\"\n        }), \": Rapidly increasing cases globally\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Healthcare\"\n        }), \": Major infection control challenge in hospitals\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Mortality\"\n        }), \": Over 1 in 3 patients with bloodstream infection die\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Drug Resistance\"\n        }), \": Often resistant to multiple antifungal drugs\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Growth\"\n        }), \": U.S. infections jumped from 173 in 2017 to 2,377 in 2022\"]\n      }), \"\\n\"]\n    })]\n  });\n}\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, props)\n  })) : _createMdxContent(props);\n}\nreturn {\n  default: MDXContent\n};\n",
       "frontmatter": {},
       "scope": {}
     },
@@ -266,12 +266,12 @@
   },
   {
     "description": {
-      "compiledSource": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction _createMdxContent(props) {\n  const _components = Object.assign({\n    h2: \"h2\",\n    p: \"p\",\n    ul: \"ul\",\n    li: \"li\",\n    strong: \"strong\"\n  }, _provideComponents(), props.components);\n  return _jsxs(_Fragment, {\n    children: [_jsx(_components.h2, {\n      children: \"Overview\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"Cryptococcus neoformans is a leading cause of deadly meningitis in immunocompromised individuals, especially those with advanced HIV/AIDS. It causes an estimated ~220,000 new cases of cryptococcal meningitis each year, resulting in about 181,000 deaths – roughly 15% of all AIDS-related deaths globally.\"\n    }), \"\\n\", _jsx(_components.h2, {\n      children: \"Impact\"\n    }), \"\\n\", _jsxs(_components.ul, {\n      children: [\"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Public Health\"\n        }), \": Leading cause of meningitis in immunocompromised individuals\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Healthcare\"\n        }), \": Significant burden on healthcare systems\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Mortality\"\n        }), \": ~181,000 deaths annually\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"HIV Impact\"\n        }), \": Major cause of AIDS-related deaths\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Geography\"\n        }), \": Highest burden in sub-Saharan Africa\"]\n      }), \"\\n\"]\n    })]\n  });\n}\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, props)\n  })) : _createMdxContent(props);\n}\nreturn {\n  default: MDXContent\n};\n",
+      "compiledSource": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction _createMdxContent(props) {\n  const _components = Object.assign({\n    h2: \"h2\",\n    p: \"p\",\n    em: \"em\",\n    ul: \"ul\",\n    li: \"li\",\n    strong: \"strong\"\n  }, _provideComponents(), props.components);\n  return _jsxs(_Fragment, {\n    children: [_jsx(_components.h2, {\n      children: \"Overview\"\n    }), \"\\n\", _jsxs(_components.p, {\n      children: [_jsx(_components.em, {\n        children: \"Cryptococcus neoformans\"\n      }), \" is a leading cause of deadly meningitis in immunocompromised individuals, especially those with advanced HIV/AIDS. It causes an estimated ~220,000 new cases of cryptococcal meningitis each year, resulting in about 181,000 deaths – roughly 15% of all AIDS-related deaths globally.\"]\n    }), \"\\n\", _jsx(_components.h2, {\n      children: \"Impact\"\n    }), \"\\n\", _jsxs(_components.ul, {\n      children: [\"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Public Health\"\n        }), \": Leading cause of meningitis in immunocompromised individuals\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Healthcare\"\n        }), \": Significant burden on healthcare systems\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Mortality\"\n        }), \": ~181,000 deaths annually\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"HIV Impact\"\n        }), \": Major cause of AIDS-related deaths\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Geography\"\n        }), \": Highest burden in sub-Saharan Africa\"]\n      }), \"\\n\"]\n    })]\n  });\n}\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, props)\n  })) : _createMdxContent(props);\n}\nreturn {\n  default: MDXContent\n};\n",
       "frontmatter": {},
       "scope": {}
     },
     "highlight_descendant_taxonomy_ids": null,
-    "name": "Cryptococcosis/ Cryptococcus neoformans",
+    "name": "Cryptococcus neoformans",
     "priority": "HIGH",
     "resources": [
       {
@@ -306,12 +306,12 @@
   },
   {
     "description": {
-      "compiledSource": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction _createMdxContent(props) {\n  const _components = Object.assign({\n    h2: \"h2\",\n    p: \"p\",\n    ul: \"ul\",\n    li: \"li\",\n    strong: \"strong\"\n  }, _provideComponents(), props.components);\n  return _jsxs(_Fragment, {\n    children: [_jsx(_components.h2, {\n      children: \"Overview\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"Coccidioides causes coccidioidomycosis, known as Valley Fever, a respiratory disease endemic in the arid Americas (southwestern US, parts of Latin America). Infection is acquired by inhaling airborne fungal spores from soil.\"\n    }), \"\\n\", _jsx(_components.h2, {\n      children: \"Impact\"\n    }), \"\\n\", _jsxs(_components.ul, {\n      children: [\"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Public Health\"\n        }), \": Significant impact in endemic areas\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Geography\"\n        }), \": Endemic in southwestern US and parts of Latin America\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Severity\"\n        }), \": Can lead to severe pneumonia or disseminated disease\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Growth\"\n        }), \": California cases tripled from 2014 to 2018 (7,000-9,000 cases annually)\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Climate Impact\"\n        }), \": Range and incidence expanding due to climate change\"]\n      }), \"\\n\"]\n    })]\n  });\n}\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, props)\n  })) : _createMdxContent(props);\n}\nreturn {\n  default: MDXContent\n};\n",
+      "compiledSource": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction _createMdxContent(props) {\n  const _components = Object.assign({\n    h2: \"h2\",\n    p: \"p\",\n    em: \"em\",\n    ul: \"ul\",\n    li: \"li\",\n    strong: \"strong\"\n  }, _provideComponents(), props.components);\n  return _jsxs(_Fragment, {\n    children: [_jsx(_components.h2, {\n      children: \"Overview\"\n    }), \"\\n\", _jsxs(_components.p, {\n      children: [_jsx(_components.em, {\n        children: \"Coccidioides posadasii\"\n      }), \" causes coccidioidomycosis, known as Valley Fever, a respiratory disease endemic in the arid Americas (southwestern US, parts of Latin America). Infection is acquired by inhaling airborne fungal spores from soil.\"]\n    }), \"\\n\", _jsx(_components.h2, {\n      children: \"Impact\"\n    }), \"\\n\", _jsxs(_components.ul, {\n      children: [\"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Public Health\"\n        }), \": Significant impact in endemic areas\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Geography\"\n        }), \": Endemic in southwestern US and parts of Latin America\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Severity\"\n        }), \": Can lead to severe pneumonia or disseminated disease\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Growth\"\n        }), \": California cases tripled from 2014 to 2018 (7,000-9,000 cases annually)\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Climate Impact\"\n        }), \": Range and incidence expanding due to climate change\"]\n      }), \"\\n\"]\n    })]\n  });\n}\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, props)\n  })) : _createMdxContent(props);\n}\nreturn {\n  default: MDXContent\n};\n",
       "frontmatter": {},
       "scope": {}
     },
     "highlight_descendant_taxonomy_ids": null,
-    "name": "Valley Fever/ Coccidioides posadasii",
+    "name": "Coccidioides posadasii",
     "priority": "HIGH",
     "resources": [
       {
@@ -336,12 +336,12 @@
   },
   {
     "description": {
-      "compiledSource": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction _createMdxContent(props) {\n  const _components = Object.assign({\n    h2: \"h2\",\n    p: \"p\",\n    ul: \"ul\",\n    li: \"li\",\n    strong: \"strong\"\n  }, _provideComponents(), props.components);\n  return _jsxs(_Fragment, {\n    children: [_jsx(_components.h2, {\n      children: \"Overview\"\n    }), \"\\n\", _jsx(_components.p, {\n      children: \"Histoplasma is a soil-based fungus (often associated with bird or bat droppings) that causes histoplasmosis when its spores are inhaled. It is endemic in parts of North America (Ohio/Mississippi River valleys), Latin America, Asia, and Africa.\"\n    }), \"\\n\", _jsx(_components.h2, {\n      children: \"Impact\"\n    }), \"\\n\", _jsxs(_components.ul, {\n      children: [\"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Geography\"\n        }), \": Endemic in multiple continents\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Severity\"\n        }), \": Can cause acute pulmonary infection or disseminated disease\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"HIV Impact\"\n        }), \": Major cause of death in HIV-positive patients\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Mortality\"\n        }), \": 50-80% mortality in AIDS-associated cases without proper therapy\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Treatment\"\n        }), \": Requires antifungal therapy like liposomal amphotericin B\"]\n      }), \"\\n\"]\n    })]\n  });\n}\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, props)\n  })) : _createMdxContent(props);\n}\nreturn {\n  default: MDXContent\n};\n",
+      "compiledSource": "/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction _createMdxContent(props) {\n  const _components = Object.assign({\n    h2: \"h2\",\n    p: \"p\",\n    em: \"em\",\n    ul: \"ul\",\n    li: \"li\",\n    strong: \"strong\"\n  }, _provideComponents(), props.components);\n  return _jsxs(_Fragment, {\n    children: [_jsx(_components.h2, {\n      children: \"Overview\"\n    }), \"\\n\", _jsxs(_components.p, {\n      children: [_jsx(_components.em, {\n        children: \"Histoplasma capsulatum\"\n      }), \" is a soil-based fungus (often associated with bird or bat droppings) that causes histoplasmosis when its spores are inhaled. It is endemic in parts of North America (Ohio/Mississippi River valleys), Latin America, Asia, and Africa.\"]\n    }), \"\\n\", _jsx(_components.h2, {\n      children: \"Impact\"\n    }), \"\\n\", _jsxs(_components.ul, {\n      children: [\"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Geography\"\n        }), \": Endemic in multiple continents\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Severity\"\n        }), \": Can cause acute pulmonary infection or disseminated disease\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"HIV Impact\"\n        }), \": Major cause of death in HIV-positive patients\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Mortality\"\n        }), \": 50-80% mortality in AIDS-associated cases without proper therapy\"]\n      }), \"\\n\", _jsxs(_components.li, {\n        children: [_jsx(_components.strong, {\n          children: \"Treatment\"\n        }), \": Requires antifungal therapy like liposomal amphotericin B\"]\n      }), \"\\n\"]\n    })]\n  });\n}\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, props)\n  })) : _createMdxContent(props);\n}\nreturn {\n  default: MDXContent\n};\n",
       "frontmatter": {},
       "scope": {}
     },
     "highlight_descendant_taxonomy_ids": null,
-    "name": "Histoplasmosis/ Histoplasma capsulatum",
+    "name": "Histoplasma capsulatum",
     "priority": "HIGH",
     "resources": [
       {
@@ -366,7 +366,7 @@
       "scope": {}
     },
     "highlight_descendant_taxonomy_ids": null,
-    "name": "Cryptosporidiosis/ Cryptosporidium parvum",
+    "name": "Cryptosporidium parvum",
     "priority": "MODERATE_HIGH",
     "resources": [
       {
@@ -391,7 +391,7 @@
       "scope": {}
     },
     "highlight_descendant_taxonomy_ids": null,
-    "name": "Primary amoebic meningoencephalitis/ Naegleria fowleri",
+    "name": "Naegleria fowleri",
     "priority": "MODERATE",
     "resources": [
       {
@@ -424,7 +424,7 @@
       746128,
       5059
     ],
-    "name": "Aspergillosis/ Aspergillus",
+    "name": "Aspergillus",
     "priority": "HIGH",
     "resources": [
       {
@@ -452,7 +452,7 @@
       5661,
       5671
     ],
-    "name": "Visceral Leishmaniasis/ Leishmania donovani complex",
+    "name": "Leishmania donovani",
     "priority": "MODERATE",
     "resources": [
       {
@@ -487,7 +487,7 @@
       58291,
       936053
     ],
-    "name": "Mucormycosis/ Mucorales",
+    "name": "Mucorales",
     "priority": "MODERATE",
     "resources": [
       {
@@ -521,7 +521,7 @@
       3052317,
       3052303
     ],
-    "name": "Arenaviridae (Prototype Pathogen Viral Family)",
+    "name": "Arenaviridae",
     "priority": "MODERATE",
     "resources": [
       {
@@ -559,7 +559,7 @@
       1980456,
       3052499
     ],
-    "name": "Hantaviridae (Prototype Pathogen Viral Family)",
+    "name": "Hantaviridae",
     "priority": "MODERATE_HIGH",
     "resources": [
       {
@@ -601,7 +601,7 @@
     "highlight_descendant_taxonomy_ids": [
       3052518
     ],
-    "name": "Nairoviridae (Prototype Pathogen Viral Family)",
+    "name": "Nairoviridae",
     "priority": "MODERATE_HIGH",
     "resources": [
       {
@@ -640,7 +640,7 @@
       3052409,
       3052385
     ],
-    "name": "Peribunyaviridae (Prototype Pathogen Viral Family)",
+    "name": "Peribunyaviridae",
     "priority": "MODERATE",
     "resources": [
       {
@@ -683,7 +683,7 @@
       3052676,
       3052686
     ],
-    "name": "Phenuiviridae (Prototype Pathogen Viral Family)",
+    "name": "Phenuiviridae",
     "priority": "MODERATE",
     "resources": [
       {
@@ -728,7 +728,7 @@
       3052599,
       3052560
     ],
-    "name": "Paramyxoviridae (Prototype Pathogen Viral Family)",
+    "name": "Paramyxoviridae",
     "priority": "HIGH",
     "resources": [
       {
@@ -772,7 +772,7 @@
       3052465,
       3048448
     ],
-    "name": "Flaviviridae (Prototype Pathogen Viral Family)",
+    "name": "Flaviviridae",
     "priority": "HIGH",
     "resources": [
       {
@@ -820,7 +820,7 @@
       3426298,
       11036
     ],
-    "name": "Togaviridae (Prototype Pathogen Viral Family)",
+    "name": "Togaviridae",
     "priority": "MODERATE_HIGH",
     "resources": [
       {
@@ -870,7 +870,7 @@
       138951,
       463676
     ],
-    "name": "Picornaviridae (Prototype Pathogen Viral Family)",
+    "name": "Picornaviridae",
     "priority": "MODERATE",
     "resources": [
       {
@@ -913,7 +913,7 @@
       3052462,
       3052505
     ],
-    "name": "Filoviridae (Prototype Pathogen Viral Family)",
+    "name": "Filoviridae",
     "priority": "CRITICAL",
     "resources": [
       {

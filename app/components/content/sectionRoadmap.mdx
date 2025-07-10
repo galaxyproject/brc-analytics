@@ -3,67 +3,77 @@
     <SectionHeadline paired>
       ## Our plan
       <SubHeadline>
-        This will be an iterative process involving multiple steps in several
-        areas.
+        ### Creating an integrated platform that connects public data, analysis tools, and community knowledge
       </SubHeadline>
     </SectionHeadline>
     <SectionContent paired>
       <Grid gridSx={{ gap: 4 }}>
         <Accordion>
-          <AccordionSummary>VEuPathDB database migration</AccordionSummary>
+          <AccordionSummary><b>★ Upcoming features</b></AccordionSummary>
           <AccordionDetails>
-            This set of tasks deals with transferring data from VEuPathDB
-            infrastructure and creating a list of genomes that will be initially
-            maintained within BRC Analytics. Our system currently includes 799 taxa
-            and will continue to expand over time.
+            Specific features planned for upcoming releases:
 
-            1. Transferring databases and associated data from VEuPathDB servers to TACC infrastructure.
-            1. Understanding the structure of VEuPathDB database and deciding which data will be ingested as custom
-            tracks for the BRC Analytics instance of the UCSC Genome Browser.
-            1. Uncovering how JBrowse instances were created within VEuPathDB gene pages and replicating this data at
-            the BRC Analytics instance of the UCSC Genome Browser.
+            1. Natural language query interface for ENA with automatic Galaxy integration
+            2. Embedded Galaxy Pages (notebook-like documents containing workflow results) in relevant BRC Analytics pages
+            3. Gene pages and gene sets with meaningful query and comparison capabilities
+            4. Enhanced Galaxy workflows for comparative genomics and other analyses
+            5. Priority pathogens/outbreaks tab highlighting specific organisms and relevant resources
+            6. Integration with specialized tools like hgPhyloPlace from UCSC for phylogenetic analysis
+            7. Importing gene model data from VEuPathDB
+            8. Access to Galaxy's MCP server to provide a natural language interface to Galaxy itself
           </AccordionDetails>
         </Accordion>
         <Accordion>
-          <AccordionSummary>Harmonization of genomic data for all taxa</AccordionSummary>
+          <AccordionSummary><b>Community-driven knowledge platform</b></AccordionSummary>
           <AccordionDetails>
-            This set of tasks ensures that BRC Analytics provides access to the latest versions of all 785 VEuPathDB
-            taxa and associated annotations.
+            In building a collaborative environment where researchers can share insights and analyses, we aim to:
 
-            1. Build UCSC Genome Browsers for all 785 taxa by matching genomes found in VEuPathDB against NCBI Datasets.
-            1. Add annotations that can be extracted from the VEuPathDB databases and JBrowse instances (related to 2
-            and 3 above)
-            1. Create links from UCSC Gene Pages to NCBI Gene pages
-            1. Work with NCBI on evolution of gene pages to contain information valuable for understanding the structure
-            and function of genes from a wide range of eukaryotes including eukaryotic pathogens and vectors.
+            1. Embed results of Galaxy analyses directly in the BRC Analytics site for community reference
+            2. Empower users to self-curate organism knowledge bases through peer review
+            3. Establish community forums for discussing research questions and methodologies
+            4. Enable contribution of custom workflows, analysis pipelines and visualizations tailored to specific organisms
           </AccordionDetails>
         </Accordion>
         <Accordion>
-          <AccordionSummary>Galaxy integration</AccordionSummary>
+          <AccordionSummary><b>Tailored support for organisms</b></AccordionSummary>
           <AccordionDetails>
-            1. Create a dedicated Galaxy instance at [https://brc.usegalaxy.org](https://brc.usegalaxy.org)
-            1. Prepare reference data for all 785 genomes that will initially be served by the system. This includes
-            creation of indices for bowtie, bowtie2, bwa-mem, bwa-mem2, hisat2, STAR, and SnpEff.
-            1. Create a single sign-on so that user accounts are shared between BRC Analytics and Galaxy. When creating
-            an account the user should be able to specify the default Galaxy instances (.org, .eu., .org.au, .fr ...)
-            1. Develop functionality for "focusing" Galaxy on a particular genome build selected by the user (see
-            ["Focusing" Galaxy on a particular genome
-            galaxy#18882](https://github.com/galaxyproject/galaxy/issues/18882)).
-            1. Develop "simplified workflow" interface (see [Simplified workflow run interface
-            galaxy#18883](https://github.com/galaxyproject/galaxy/issues/18883))
-            1. Develop and polish workflows for variant discovery, epigenetics, transcriptomics, assembly, and protein
-            folding that were previously available to the users on VEuPathDB Galaxy instance.
+            We recognize that each organism is different, with unique biology, research communities, and funding landscapes that drive diverse analytical needs. To address this, we intend to:
+
+            1. Build a flexible platform that can adapt to the specific requirements of different organisms
+            2. Accommodate varying levels of genomic resources, from well-studied model organisms to neglected pathogens
+            3. Enable communities to prioritize the data types and analyses most relevant to their organism of interest
+            4. Design adaptable interfaces that can evolve as research interests and priorities shift over time
+            5. Support both emerging and established research communities with appropriate tools
+
+            While maintaining this flexibility, we will give special attention to NIAID-designated prototype pathogen viral families, biodefense priorities, and emerging threats.
           </AccordionDetails>
         </Accordion>
         <Accordion>
-          <AccordionSummary>Help and community outreach</AccordionSummary>
+          <AccordionSummary><b>Seamless data integration</b></AccordionSummary>
           <AccordionDetails>
-            1. Create dedicated linkedin, mastodon, and bluesky accounts
-            1. Create a dedicated support channel using Discourse infrastructure.
-            1. Try to connect with as many users of VEuPathDB as possible to solicit their feedback across multiple
-            areas including: which features are needed, what genomes should be integrated, which key datasets need to be
-            re-analyzed and contextualized within the available genomic data.
-            1. Beginning on Oct 1st begin posting regular updates via social media channels.
+            We aim to create a unified experience that brings together diverse data sources and analysis capabilities. Our goals include:
+
+            1. Automatically manage reference genomes and annotations from NCBI
+            2. Provide an integrated and intuitive interface for ENA with automatic upload to Galaxy
+            3. Import gene models and other data from public resources (e.g. VEuPathDB)
+            4. Pre-build essential bioinformatics resources (indices, etc.) for supported organisms
+            5. Create a comprehensive resource that reduces the need to navigate between multiple platforms
+            6. Embed a wide diversity of analysis results from Galaxy as essential context for research on supported organisms
+            7. Build a flexible system that can be extended to support additional organisms, data sources and analysis tools quickly
+          </AccordionDetails>
+        </Accordion>
+        <Accordion>
+          <AccordionSummary><b>Lowering barriers to bioinformatics</b></AccordionSummary>
+          <AccordionDetails>
+            In order to make complex analyses accessible to researchers with varying computational expertise, we will:
+
+            1. Leverage Galaxy's GUI-based platform, pre-built workflows and in-development MCP server, eliminating the need to learn command-line interfaces
+            2. Utilize TACC's compute resources, removing the need for institutional or paid hardware and associated configuration
+            3. Integrate curated, community-developed Galaxy workflows from the Intergalactic Workflow Commission (IWC)
+            4. Create intuitive interfaces that bring together multiple resources in a single, unified experience
+            5. Build on Galaxy team's strengths in tutorials and training networks to provide comprehensive educational resources
+            6. Gather dedicated resources for priority pathogens in one place for streamlined research
+            7. Implement LLM-powered natural language queries of data sources with automatic data upload to Galaxy
           </AccordionDetails>
         </Accordion>
       </Grid>
