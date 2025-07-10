@@ -429,6 +429,19 @@ export const buildPriorityPathogenDetails = (
     C.Chip({
       color: getPriorityColor(priorityPathogen.priority),
       label: getPriorityLabel(priorityPathogen.priority),
+      onClick: (): void => {
+        Router.push({
+          pathname: ROUTES.ORGANISMS,
+          query: {
+            filter: JSON.stringify([
+              {
+                categoryKey: BRC_DATA_CATALOG_CATEGORY_KEY.PRIORITY,
+                value: [priorityPathogen.priority],
+              },
+            ]),
+          },
+        });
+      },
       variant: CHIP_PROPS.VARIANT.STATUS,
     })
   );
