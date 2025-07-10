@@ -477,6 +477,9 @@ def get_genome_row(genome_info):
         ),
         "isRef": refseq_category == "reference genome",
         "level": genome_info["assembly_info"]["assembly_level"],
+        "assemblyStatus": genome_info["assembly_info"].get(
+            "assembly_status", "ASSEMBLY_STATUS_UNKNOWN"
+        ),
         "chromosomeCount": genome_info["assembly_stats"].get(
             "total_number_of_chromosomes"
         ),
@@ -1042,6 +1045,24 @@ def find_outdated_accessions(genomes_df):
     return outdated_assemblies
 
 
+def find_suppressed_genomes(genomes_df):
+    """
+    Identifies assemblies that have been suppressed by NCBI.
+
+    Args:
+        genomes_df: DataFrame containing genome information with 'assemblyStatus' column
+
+    Returns:
+        List of accessions for suppressed assemblies and their status
+    """
+    # Look for assemblies with status 'suppressed' or 'retired'
+    suppressed_mask = genomes_df["assemblyStatus"].isin(["suppressed", "retired"])
+    suppressed_assemblies = genomes_df[suppressed_mask][
+        ["accession", "assemblyStatus"]
+    ].values.tolist()
+    return suppressed_assemblies
+
+
 def make_qc_report(
     missing_ncbi_assemblies,
     inconsistent_taxonomy_ids,
@@ -1051,6 +1072,7 @@ def make_qc_report(
     missing_outbreak_descendants=None,
     tree_checks=None,
     outdated_accessions=None,
+    suppressed_genomes=None,
 ):
     ncbi_assemblies_text = (
         "None"
@@ -1130,6 +1152,14 @@ def make_qc_report(
             [f"- {acc} (current: {curr_acc})" for acc, curr_acc in outdated_accessions]
         )
     )
+    
+    suppressed_genomes_text = (
+        "None"
+        if suppressed_genomes is None or len(suppressed_genomes) == 0
+        else "\n".join(
+            [f"- {acc} (status: {status})" for acc, status in suppressed_genomes]
+        )
+    )
     return (
         f"# Catalog QC report\n\n"
         f"## Assemblies not found on NCBI\n\n{ncbi_assemblies_text}\n\n"
@@ -1139,6 +1169,7 @@ def make_qc_report(
         f"## Assemblies without ploidy information\n\n{ploidy_assemblies_text}\n\n"
         f"## Outbreak descendant taxonomy IDs not found in genomes data\n\n{outbreak_descendants_text}\n\n"
         f"## Outdated assembly accessions\n\n{outdated_accessions_text}\n\n"
+        f"## Suppressed or retired genomes\n\n{suppressed_genomes_text}\n\n"
         f"## Taxonomy tree\n\n{tree_checks_text}\n"
     )
 
@@ -1409,6 +1440,7 @@ def build_files(
     # Find outdated accessions (where accession != currentAccession)
     if qc_report_path:
         qc_report_params["outdated_accessions"] = find_outdated_accessions(genomes_df)
+        qc_report_params["suppressed_genomes"] = find_suppressed_genomes(genomes_df)
 
     # Drop any duplicate rows based on accession before writing to file
     genomes_df = genomes_df.drop_duplicates(subset=["accession"])

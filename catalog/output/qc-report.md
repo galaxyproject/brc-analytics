@@ -17,40 +17,40 @@ None
 
 ## Species and strain combinations with multiple taxonomy IDs
 
-- Acanthamoeba castellanii strain Neff: 5755, 1257118
-- Alphapapillomavirus 12: 990303, 10570
+- Acanthamoeba castellanii strain Neff: 1257118, 5755
+- Alphapapillomavirus 12: 10570, 990303
 - Alphapapillomavirus 14: 120686, 333769
 - Alphapapillomavirus 6: 333765, 10611
-- Asfivirus haemorrhagiae: 443876, 10497, 443878
+- Asfivirus haemorrhagiae: 10497, 443878, 443876
 - Betacoronavirus pandemicum: 227984, 2697049
-- Betapapillomavirus 1: 333923, 889813
+- Betapapillomavirus 1: 889813, 333923
 - Blumeria graminis: 62690, 1689686
 - Candida tropicalis strain MYA-3404: 294747, 5482
 - Cryptococcus neoformans strain H99: 235443, 5207
 - Cryptosporidium parvum: 353152, 5807
-- Deltaretrovirus priTlym1: 11908, 194440
+- Deltaretrovirus priTlym1: 194440, 11908
 - Dependoparvovirus mammalian1: 82300, 256548
-- Dependoparvovirus primate1: 10804, 202812, 202813, 57579, 85106
+- Dependoparvovirus primate1: 57579, 10804, 85106, 202813, 202812
 - Enterovirus alphacoxsackie: 150846, 156647
-- Enterovirus betarhino: 44130, 12131
-- Gammapapillomavirus 11: 1195796, 1070409, 1070413
+- Enterovirus betarhino: 12131, 44130
+- Gammapapillomavirus 11: 1070413, 1070409, 1195796
 - Gammapapillomavirus 12: 746832, 909331
 - Gammapapillomavirus 15: 1070408, 1472342
 - Gammapapillomavirus 19: 1315264, 1315259
 - Gemykibivirus humas1: 1519409, 1516081
 - Glossina fuscipes: 7396, 201502
-- Hepacivirus hominis: 1544901, 33745, 356114
+- Hepacivirus hominis: 33745, 356114, 1544901
 - Neospora caninum strain Liverpool: 572307, 29176
-- Norovirus norwalkense: 1246677, 1529909, 122929, 490039, 1529924, 122928, 1529918
+- Norovirus norwalkense: 122929, 490039, 1529918, 122928, 1529909, 1529924, 1246677
 - Orthoflavivirus denguei: 11053, 11069, 11070
 - Orthomarburgvirus marburgense: 3052505, 448086
 - Pegivirus columbiaense: 1704090, 1729141
 - Plasmodium falciparum: 5833, 36329
-- Plasmodium vinckei: 138298, 119398, 138297, 5860, 54757
-- Small anellovirus: 289367, 289366
-- Torbevirus brisa: 2571078, 2571077, 2571075, 3116878
-- Trypanosoma brucei: 5702, 185431
-- Trypanosoma cruzi strain Dm28c: 1416333, 85057, 5693
+- Plasmodium vinckei: 5860, 138297, 119398, 138298, 54757
+- Small anellovirus: 289366, 289367
+- Torbevirus brisa: 2571078, 3116878, 2571075, 2571077
+- Trypanosoma brucei: 185431, 5702
+- Trypanosoma cruzi strain Dm28c: 1416333, 5693, 85057
 - Vesivirus exanthema: 35612, 146073
 
 ## Assemblies without ploidy information
@@ -123,10 +123,10 @@ None
 
 ## Outbreak descendant taxonomy IDs not found in genomes data
 
-- 138949
-- 463676
 - 138948
 - 138951
+- 463676
+- 138949
 
 ## Outdated assembly accessions
 
@@ -136,6 +136,47 @@ None
 - GCF_000499545.1 (current: GCF_000499545.2)
 - GCA_020800235.1 (current: GCA_020800235.2)
 - GCF_023375885.1 (current: GCF_023375885.2)
+
+## Suppressed or retired genomes
+
+- GCF_001021295.1 (status: suppressed)
+- GCF_000002825.2 (status: suppressed)
+- GCF_000002545.3 (status: suppressed)
+- GCF_000002525.2 (status: suppressed)
+- GCF_015227675.2 (status: suppressed)
+- GCF_000364345.1 (status: suppressed)
+- GCF_000005575.2 (status: suppressed)
+- GCF_016920705.1 (status: suppressed)
+- GCF_000149205.2 (status: suppressed)
+- GCF_000457365.2 (status: suppressed)
+- GCF_000226395.1 (status: suppressed)
+- GCF_000271745.1 (status: suppressed)
+- GCF_002775015.1 (status: suppressed)
+- GCF_001189475.1 (status: suppressed)
+- GCF_000151735.1 (status: suppressed)
+- GCF_001876365.2 (status: suppressed)
+- GCF_006496715.2 (status: suppressed)
+- GCF_020744495.1 (status: suppressed)
+- GCF_000371365.1 (status: suppressed)
+- GCF_002892825.2 (status: suppressed)
+- GCF_000208615.1 (status: suppressed)
+- GCF_000003085.2 (status: suppressed)
+- GCF_000209185.1 (status: suppressed)
+- GCF_000001985.1 (status: suppressed)
+- GCF_000003835.1 (status: suppressed)
+- GCF_000315645.1 (status: suppressed)
+- GCF_000230375.1 (status: suppressed)
+- GCF_000151335.2 (status: suppressed)
+- GCF_000769155.1 (status: suppressed)
+- GCF_000184105.1 (status: suppressed)
+- GCF_000149685.1 (status: suppressed)
+- GCF_000182805.3 (status: suppressed)
+- GCF_000182985.1 (status: suppressed)
+- GCF_000723685.1 (status: suppressed)
+- GCF_001015335.1 (status: suppressed)
+- GCF_000209485.1 (status: suppressed)
+- GCF_000258005.1 (status: suppressed)
+- GCF_000709005.1 (status: suppressed)
 
 ## Taxonomy tree
 
