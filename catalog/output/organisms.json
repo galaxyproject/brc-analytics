@@ -34492,6 +34492,267 @@
   {
     "assemblyCount": 1,
     "assemblyTaxonomyIds": [
+      "2169934"
+    ],
+    "commonName": null,
+    "genomes": [
+      {
+        "accession": "GCF_003033475.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 42.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/003/033/475/GCF_003033475.1/genes/GCF_003033475.1_ASM303347v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 2460,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2731342",
+          "2732092",
+          "2732416",
+          "2732423",
+          "2732537",
+          "2169574",
+          "2169662",
+          "2844967",
+          "2169934"
+        ],
+        "ncbiTaxonomyId": "2169934",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 2460,
+        "speciesTaxonomyId": "2844967",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Arfiviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Smacoviridae",
+        "taxonomicLevelGenus": "Huchismacovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Shotokuvirae",
+        "taxonomicLevelOrder": "Cremevirales",
+        "taxonomicLevelPhylum": "Cressdnaviricota",
+        "taxonomicLevelRealm": "Monodnaviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Huchismacovirus humas1",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_003033475.1"
+      }
+    ],
+    "ncbiTaxonomyId": "2844967",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Arfiviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Smacoviridae",
+    "taxonomicLevelGenus": "Huchismacovirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Shotokuvirae",
+    "taxonomicLevelOrder": "Cremevirales",
+    "taxonomicLevelPhylum": "Cressdnaviricota",
+    "taxonomicLevelRealm": "Monodnaviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Huchismacovirus humas1",
+    "taxonomicLevelStrain": [
+      "None"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "2169935"
+    ],
+    "commonName": null,
+    "genomes": [
+      {
+        "accession": "GCF_003033485.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 44,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/003/033/485/GCF_003033485.1/genes/GCF_003033485.1_ASM303348v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 2471,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2731342",
+          "2732092",
+          "2732416",
+          "2732423",
+          "2732537",
+          "2169574",
+          "2169662",
+          "2844968",
+          "2169935"
+        ],
+        "ncbiTaxonomyId": "2169935",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 2471,
+        "speciesTaxonomyId": "2844968",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Arfiviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Smacoviridae",
+        "taxonomicLevelGenus": "Huchismacovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Shotokuvirae",
+        "taxonomicLevelOrder": "Cremevirales",
+        "taxonomicLevelPhylum": "Cressdnaviricota",
+        "taxonomicLevelRealm": "Monodnaviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Huchismacovirus humas2",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_003033485.1"
+      }
+    ],
+    "ncbiTaxonomyId": "2844968",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Arfiviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Smacoviridae",
+    "taxonomicLevelGenus": "Huchismacovirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Shotokuvirae",
+    "taxonomicLevelOrder": "Cremevirales",
+    "taxonomicLevelPhylum": "Cressdnaviricota",
+    "taxonomicLevelRealm": "Monodnaviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Huchismacovirus humas2",
+    "taxonomicLevelStrain": [
+      "None"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "2169936"
+    ],
+    "commonName": null,
+    "genomes": [
+      {
+        "accession": "GCF_003033495.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 42.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/003/033/495/GCF_003033495.1/genes/GCF_003033495.1_ASM303349v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 2459,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2731342",
+          "2732092",
+          "2732416",
+          "2732423",
+          "2732537",
+          "2169574",
+          "2169662",
+          "2844969",
+          "2169936"
+        ],
+        "ncbiTaxonomyId": "2169936",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 2459,
+        "speciesTaxonomyId": "2844969",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Arfiviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Smacoviridae",
+        "taxonomicLevelGenus": "Huchismacovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Shotokuvirae",
+        "taxonomicLevelOrder": "Cremevirales",
+        "taxonomicLevelPhylum": "Cressdnaviricota",
+        "taxonomicLevelRealm": "Monodnaviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Huchismacovirus humas3",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_003033495.1"
+      }
+    ],
+    "ncbiTaxonomyId": "2844969",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Arfiviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Smacoviridae",
+    "taxonomicLevelGenus": "Huchismacovirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Shotokuvirae",
+    "taxonomicLevelOrder": "Cremevirales",
+    "taxonomicLevelPhylum": "Cressdnaviricota",
+    "taxonomicLevelRealm": "Monodnaviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Huchismacovirus humas3",
+    "taxonomicLevelStrain": [
+      "None"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
       "28450"
     ],
     "commonName": null,
@@ -45425,6 +45686,90 @@
       "None"
     ],
     "taxonomicLevelSpecies": "Betatorquevirus homini12",
+    "taxonomicLevelStrain": [
+      "None"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "1859149"
+    ],
+    "commonName": null,
+    "genomes": [
+      {
+        "accession": "GCF_001661815.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 38.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/001/661/815/GCF_001661815.1/genes/GCF_001661815.1_ViralProj325264.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 2803,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "3403061",
+          "687329",
+          "687332",
+          "3048399",
+          "3050361",
+          "1859149"
+        ],
+        "ncbiTaxonomyId": "1859149",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 2803,
+        "speciesTaxonomyId": "3048399",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "None",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Anelloviridae",
+        "taxonomicLevelGenus": "Betatorquevirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "None",
+        "taxonomicLevelOrder": "None",
+        "taxonomicLevelPhylum": "None",
+        "taxonomicLevelRealm": "None",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Betatorquevirus homini32",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001661815.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3048399",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "None",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Anelloviridae",
+    "taxonomicLevelGenus": "Betatorquevirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "None",
+    "taxonomicLevelOrder": "None",
+    "taxonomicLevelPhylum": "None",
+    "taxonomicLevelRealm": "None",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Betatorquevirus homini32",
     "taxonomicLevelStrain": [
       "None"
     ]
@@ -62237,6 +62582,726 @@
   {
     "assemblyCount": 1,
     "assemblyTaxonomyIds": [
+      "129875"
+    ],
+    "commonName": "HAdV-A",
+    "genomes": [
+      {
+        "accession": "GCF_000846805.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "HAdV-A",
+        "coverage": null,
+        "gcPercent": 46.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/846/805/GCF_000846805.1/genes/GCF_000846805.1_ViralProj14517.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 34125,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2732004",
+          "2732005",
+          "2732008",
+          "2732529",
+          "2732559",
+          "10508",
+          "10509",
+          "3241402",
+          "129875"
+        ],
+        "ncbiTaxonomyId": "129875",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 34125,
+        "speciesTaxonomyId": "3241402",
+        "strainName": "Huie",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Tectiliviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Adenoviridae",
+        "taxonomicLevelGenus": "Mastadenovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Bamfordvirae",
+        "taxonomicLevelOrder": "Rowavirales",
+        "taxonomicLevelPhylum": "Preplasmiviricota",
+        "taxonomicLevelRealm": "Varidnaviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Mastadenovirus adami",
+        "taxonomicLevelStrain": "Mastadenovirus adami strain Huie",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000846805.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3241402",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Tectiliviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Adenoviridae",
+    "taxonomicLevelGenus": "Mastadenovirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Bamfordvirae",
+    "taxonomicLevelOrder": "Rowavirales",
+    "taxonomicLevelPhylum": "Preplasmiviricota",
+    "taxonomicLevelRealm": "Varidnaviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Mastadenovirus adami",
+    "taxonomicLevelStrain": [
+      "Mastadenovirus adami strain Huie"
+    ]
+  },
+  {
+    "assemblyCount": 2,
+    "assemblyTaxonomyIds": [
+      "108098"
+    ],
+    "commonName": "HAdV-B",
+    "genomes": [
+      {
+        "accession": "GCF_000857085.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "HAdV-B",
+        "coverage": null,
+        "gcPercent": 49,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/857/085/GCF_000857085.1/genes/GCF_000857085.1_ViralProj15150.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 34794,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2732004",
+          "2732005",
+          "2732008",
+          "2732529",
+          "2732559",
+          "10508",
+          "10509",
+          "3241406",
+          "108098"
+        ],
+        "ncbiTaxonomyId": "108098",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 34794,
+        "speciesTaxonomyId": "3241406",
+        "strainName": "Slobitski",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Tectiliviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Adenoviridae",
+        "taxonomicLevelGenus": "Mastadenovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Bamfordvirae",
+        "taxonomicLevelOrder": "Rowavirales",
+        "taxonomicLevelPhylum": "Preplasmiviricota",
+        "taxonomicLevelRealm": "Varidnaviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Mastadenovirus blackbeardi",
+        "taxonomicLevelStrain": "Mastadenovirus blackbeardi strain Slobitski",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000857085.1"
+      },
+      {
+        "accession": "GCF_000880515.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "HAdV-B",
+        "coverage": null,
+        "gcPercent": 51,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/880/515/GCF_000880515.1/genes/GCF_000880515.1_ViralProj31177.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 35343,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2732004",
+          "2732005",
+          "2732008",
+          "2732529",
+          "2732559",
+          "10508",
+          "10509",
+          "3241406",
+          "108098"
+        ],
+        "ncbiTaxonomyId": "108098",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 35343,
+        "speciesTaxonomyId": "3241406",
+        "strainName": "GB",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Tectiliviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Adenoviridae",
+        "taxonomicLevelGenus": "Mastadenovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Bamfordvirae",
+        "taxonomicLevelOrder": "Rowavirales",
+        "taxonomicLevelPhylum": "Preplasmiviricota",
+        "taxonomicLevelRealm": "Varidnaviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Mastadenovirus blackbeardi",
+        "taxonomicLevelStrain": "Mastadenovirus blackbeardi strain GB",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000880515.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3241406",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Tectiliviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Adenoviridae",
+    "taxonomicLevelGenus": "Mastadenovirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Bamfordvirae",
+    "taxonomicLevelOrder": "Rowavirales",
+    "taxonomicLevelPhylum": "Preplasmiviricota",
+    "taxonomicLevelRealm": "Varidnaviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Mastadenovirus blackbeardi",
+    "taxonomicLevelStrain": [
+      "Mastadenovirus blackbeardi strain Slobitski",
+      "Mastadenovirus blackbeardi strain GB"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "129951"
+    ],
+    "commonName": "HAdV-C",
+    "genomes": [
+      {
+        "accession": "GCF_000845085.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "HAdV-C",
+        "coverage": null,
+        "gcPercent": 55,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/845/085/GCF_000845085.1/genes/GCF_000845085.1_ViralProj14518.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 35937,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2732004",
+          "2732005",
+          "2732008",
+          "2732529",
+          "2732559",
+          "10508",
+          "10509",
+          "3241411",
+          "129951"
+        ],
+        "ncbiTaxonomyId": "129951",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 35937,
+        "speciesTaxonomyId": "3241411",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Tectiliviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Adenoviridae",
+        "taxonomicLevelGenus": "Mastadenovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Bamfordvirae",
+        "taxonomicLevelOrder": "Rowavirales",
+        "taxonomicLevelPhylum": "Preplasmiviricota",
+        "taxonomicLevelRealm": "Varidnaviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Mastadenovirus caesari",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000845085.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3241411",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Tectiliviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Adenoviridae",
+    "taxonomicLevelGenus": "Mastadenovirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Bamfordvirae",
+    "taxonomicLevelOrder": "Rowavirales",
+    "taxonomicLevelPhylum": "Preplasmiviricota",
+    "taxonomicLevelRealm": "Varidnaviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Mastadenovirus caesari",
+    "taxonomicLevelStrain": [
+      "None"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "130310"
+    ],
+    "commonName": "HAdV-D",
+    "genomes": [
+      {
+        "accession": "GCF_000845985.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "HAdV-D",
+        "coverage": null,
+        "gcPercent": 57,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/845/985/GCF_000845985.1/genes/GCF_000845985.1_ViralProj14535.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 35083,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2732004",
+          "2732005",
+          "2732008",
+          "2732529",
+          "2732559",
+          "10508",
+          "10509",
+          "3241420",
+          "130310"
+        ],
+        "ncbiTaxonomyId": "130310",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 35083,
+        "speciesTaxonomyId": "3241420",
+        "strainName": "Hicks; NIAID V-209-003-014",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Tectiliviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Adenoviridae",
+        "taxonomicLevelGenus": "Mastadenovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Bamfordvirae",
+        "taxonomicLevelOrder": "Rowavirales",
+        "taxonomicLevelPhylum": "Preplasmiviricota",
+        "taxonomicLevelRealm": "Varidnaviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Mastadenovirus dominans",
+        "taxonomicLevelStrain": "Mastadenovirus dominans strain Hicks; NIAID V-209-003-014",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000845985.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3241420",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Tectiliviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Adenoviridae",
+    "taxonomicLevelGenus": "Mastadenovirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Bamfordvirae",
+    "taxonomicLevelOrder": "Rowavirales",
+    "taxonomicLevelPhylum": "Preplasmiviricota",
+    "taxonomicLevelRealm": "Varidnaviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Mastadenovirus dominans",
+    "taxonomicLevelStrain": [
+      "Mastadenovirus dominans strain Hicks; NIAID V-209-003-014"
+    ]
+  },
+  {
+    "assemblyCount": 2,
+    "assemblyTaxonomyIds": [
+      "130308",
+      "1123958"
+    ],
+    "commonName": null,
+    "genomes": [
+      {
+        "accession": "GCF_000859665.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "HAdV-E",
+        "coverage": null,
+        "gcPercent": 57.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/859/665/GCF_000859665.1/genes/GCF_000859665.1_ViralProj15152.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 35994,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2732004",
+          "2732005",
+          "2732008",
+          "2732529",
+          "2732559",
+          "10508",
+          "10509",
+          "3241425",
+          "130308"
+        ],
+        "ncbiTaxonomyId": "130308",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 35994,
+        "speciesTaxonomyId": "3241425",
+        "strainName": "vaccine (CL 68578)",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Tectiliviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Adenoviridae",
+        "taxonomicLevelGenus": "Mastadenovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Bamfordvirae",
+        "taxonomicLevelOrder": "Rowavirales",
+        "taxonomicLevelPhylum": "Preplasmiviricota",
+        "taxonomicLevelRealm": "Varidnaviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Mastadenovirus exoticum",
+        "taxonomicLevelStrain": "Mastadenovirus exoticum strain vaccine (CL 68578)",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000859665.1"
+      },
+      {
+        "accession": "GCF_000897015.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 59,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/897/015/GCF_000897015.1/genes/GCF_000897015.1_ViralProj162489.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 36711,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2732004",
+          "2732005",
+          "2732008",
+          "2732529",
+          "2732559",
+          "10508",
+          "10509",
+          "3241425",
+          "130308",
+          "1123958"
+        ],
+        "ncbiTaxonomyId": "1123958",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 36711,
+        "speciesTaxonomyId": "3241425",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Tectiliviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Adenoviridae",
+        "taxonomicLevelGenus": "Mastadenovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Bamfordvirae",
+        "taxonomicLevelOrder": "Rowavirales",
+        "taxonomicLevelPhylum": "Preplasmiviricota",
+        "taxonomicLevelRealm": "Varidnaviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Mastadenovirus exoticum",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000897015.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3241425",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Tectiliviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Adenoviridae",
+    "taxonomicLevelGenus": "Mastadenovirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Bamfordvirae",
+    "taxonomicLevelOrder": "Rowavirales",
+    "taxonomicLevelPhylum": "Preplasmiviricota",
+    "taxonomicLevelRealm": "Varidnaviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Mastadenovirus exoticum",
+    "taxonomicLevelStrain": [
+      "Mastadenovirus exoticum strain vaccine (CL 68578)",
+      "None"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "130309"
+    ],
+    "commonName": "HAdV-F",
+    "genomes": [
+      {
+        "accession": "GCF_000846685.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "HAdV-F",
+        "coverage": null,
+        "gcPercent": 51,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/846/685/GCF_000846685.1/genes/GCF_000846685.1_ViralProj14487.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 34214,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2732004",
+          "2732005",
+          "2732008",
+          "2732529",
+          "2732559",
+          "10508",
+          "10509",
+          "3241426",
+          "130309"
+        ],
+        "ncbiTaxonomyId": "130309",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 34214,
+        "speciesTaxonomyId": "3241426",
+        "strainName": "Dugan",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Tectiliviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Adenoviridae",
+        "taxonomicLevelGenus": "Mastadenovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Bamfordvirae",
+        "taxonomicLevelOrder": "Rowavirales",
+        "taxonomicLevelPhylum": "Preplasmiviricota",
+        "taxonomicLevelRealm": "Varidnaviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Mastadenovirus faecale",
+        "taxonomicLevelStrain": "Mastadenovirus faecale strain Dugan",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000846685.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3241426",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Tectiliviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Adenoviridae",
+    "taxonomicLevelGenus": "Mastadenovirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Bamfordvirae",
+    "taxonomicLevelOrder": "Rowavirales",
+    "taxonomicLevelPhylum": "Preplasmiviricota",
+    "taxonomicLevelRealm": "Varidnaviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Mastadenovirus faecale",
+    "taxonomicLevelStrain": [
+      "Mastadenovirus faecale strain Dugan"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "310540"
+    ],
+    "commonName": "SAdV-1",
+    "genomes": [
+      {
+        "accession": "GCF_000847325.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "SAdV-1",
+        "coverage": null,
+        "gcPercent": 55,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/847/325/GCF_000847325.1/genes/GCF_000847325.1_ViralProj14626.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 34450,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2732004",
+          "2732005",
+          "2732008",
+          "2732529",
+          "2732559",
+          "10508",
+          "10509",
+          "3241445",
+          "536079",
+          "310540"
+        ],
+        "ncbiTaxonomyId": "310540",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 34450,
+        "speciesTaxonomyId": "3241445",
+        "strainName": "ATCC VR-195",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Tectiliviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Adenoviridae",
+        "taxonomicLevelGenus": "Mastadenovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Bamfordvirae",
+        "taxonomicLevelOrder": "Rowavirales",
+        "taxonomicLevelPhylum": "Preplasmiviricota",
+        "taxonomicLevelRealm": "Varidnaviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Mastadenovirus russelli",
+        "taxonomicLevelStrain": "Mastadenovirus russelli strain ATCC VR-195",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000847325.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3241445",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Tectiliviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Adenoviridae",
+    "taxonomicLevelGenus": "Mastadenovirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Bamfordvirae",
+    "taxonomicLevelOrder": "Rowavirales",
+    "taxonomicLevelPhylum": "Preplasmiviricota",
+    "taxonomicLevelRealm": "Varidnaviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Mastadenovirus russelli",
+    "taxonomicLevelStrain": [
+      "Mastadenovirus russelli strain ATCC VR-195"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
       "1296100"
     ],
     "commonName": null,
@@ -65900,6 +66965,155 @@
     ]
   },
   {
+    "assemblyCount": 2,
+    "assemblyTaxonomyIds": [
+      "538123",
+      "10886"
+    ],
+    "commonName": null,
+    "genomes": [
+      {
+        "accession": "GCF_000924315.1",
+        "annotationStatus": null,
+        "chromosomes": 10,
+        "commonName": "MRV-3",
+        "coverage": null,
+        "gcPercent": 47,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/924/315/GCF_000924315.1/genes/GCF_000924315.1_ViralMultiSegProj262089.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 23176,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732405",
+          "2732459",
+          "2788829",
+          "2732541",
+          "2946187",
+          "10882",
+          "381638",
+          "3422298",
+          "351073",
+          "538123"
+        ],
+        "ncbiTaxonomyId": "538123",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 10,
+        "scaffoldL50": 4,
+        "scaffoldN50": 2251,
+        "speciesTaxonomyId": "3422298",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Resentoviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Spinareoviridae",
+        "taxonomicLevelGenus": "Orthoreovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Reovirales",
+        "taxonomicLevelPhylum": "Duplornaviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Orthoreovirus mammalis",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000924315.1"
+      },
+      {
+        "accession": "GCF_006298385.1",
+        "annotationStatus": null,
+        "chromosomes": 10,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 47,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/006/298/385/GCF_006298385.1/genes/GCF_006298385.1_ASM629838v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 23570,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732405",
+          "2732459",
+          "2788829",
+          "2732541",
+          "2946187",
+          "10882",
+          "381638",
+          "3422298",
+          "351073",
+          "538123",
+          "10886"
+        ],
+        "ncbiTaxonomyId": "10886",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 10,
+        "scaffoldL50": 4,
+        "scaffoldN50": 2304,
+        "speciesTaxonomyId": "3422298",
+        "strainName": "T3D",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Resentoviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Spinareoviridae",
+        "taxonomicLevelGenus": "Orthoreovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Reovirales",
+        "taxonomicLevelPhylum": "Duplornaviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Orthoreovirus mammalis",
+        "taxonomicLevelStrain": "Orthoreovirus mammalis strain T3D",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_006298385.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3422298",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Resentoviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Spinareoviridae",
+    "taxonomicLevelGenus": "Orthoreovirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Reovirales",
+    "taxonomicLevelPhylum": "Duplornaviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Orthoreovirus mammalis",
+    "taxonomicLevelStrain": [
+      "None",
+      "Orthoreovirus mammalis strain T3D"
+    ]
+  },
+  {
     "assemblyCount": 1,
     "assemblyTaxonomyIds": [
       "11020"
@@ -66161,6 +67375,93 @@
     ]
   },
   {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "11021"
+    ],
+    "commonName": null,
+    "genomes": [
+      {
+        "accession": "GCF_000862705.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 48.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/862/705/GCF_000862705.1/genes/GCF_000862705.1_ViralProj15429.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 11675,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732406",
+          "2732461",
+          "2732544",
+          "11018",
+          "11019",
+          "3426299",
+          "11021"
+        ],
+        "ncbiTaxonomyId": "11021",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE_HIGH",
+        "priorityPathogenName": "Togaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 11675,
+        "speciesTaxonomyId": "3426299",
+        "strainName": "ssp. North American variant",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Alsuviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Togaviridae",
+        "taxonomicLevelGenus": "Alphavirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Martellivirales",
+        "taxonomicLevelPhylum": "Kitrinoviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Alphavirus eastern",
+        "taxonomicLevelStrain": "Alphavirus eastern strain ssp. North American variant",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000862705.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3426299",
+    "otherTaxa": null,
+    "priority": "MODERATE_HIGH",
+    "priorityPathogenName": "Togaviridae",
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Alsuviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Togaviridae",
+    "taxonomicLevelGenus": "Alphavirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Martellivirales",
+    "taxonomicLevelPhylum": "Kitrinoviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Alphavirus eastern",
+    "taxonomicLevelStrain": [
+      "Alphavirus eastern strain ssp. North American variant"
+    ]
+  },
+  {
     "assemblyCount": 2,
     "assemblyTaxonomyIds": [
       "1440170"
@@ -66389,6 +67690,203 @@
     ]
   },
   {
+    "assemblyCount": 3,
+    "assemblyTaxonomyIds": [
+      "79899",
+      "2169701"
+    ],
+    "commonName": "ONN",
+    "genomes": [
+      {
+        "accession": "GCA_002888815.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 48,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/002/888/815/GCA_002888815.1/genes/GCA_002888815.1_ASM288881v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 11821,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732406",
+          "2732461",
+          "2732544",
+          "11018",
+          "11019",
+          "3426312",
+          "2169701",
+          "79899"
+        ],
+        "ncbiTaxonomyId": "79899",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE_HIGH",
+        "priorityPathogenName": "Togaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 11821,
+        "speciesTaxonomyId": "3426312",
+        "strainName": "IBH10964",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Alsuviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Togaviridae",
+        "taxonomicLevelGenus": "Alphavirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Martellivirales",
+        "taxonomicLevelPhylum": "Kitrinoviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Alphavirus onyong",
+        "taxonomicLevelStrain": "Alphavirus onyong strain IBH10964",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_002888815.1"
+      },
+      {
+        "accession": "GCF_000863005.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "ONN",
+        "coverage": null,
+        "gcPercent": 48.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/863/005/GCF_000863005.1/genes/GCF_000863005.1_ViralProj15311.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 11835,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732406",
+          "2732461",
+          "2732544",
+          "11018",
+          "11019",
+          "3426312",
+          "2169701"
+        ],
+        "ncbiTaxonomyId": "2169701",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE_HIGH",
+        "priorityPathogenName": "Togaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 11835,
+        "speciesTaxonomyId": "3426312",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Alsuviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Togaviridae",
+        "taxonomicLevelGenus": "Alphavirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Martellivirales",
+        "taxonomicLevelPhylum": "Kitrinoviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Alphavirus onyong",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000863005.1"
+      },
+      {
+        "accession": "GCF_002888795.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "ONN",
+        "coverage": null,
+        "gcPercent": 48,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/002/888/795/GCF_002888795.1/genes/GCF_002888795.1_ASM288879v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 11822,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732406",
+          "2732461",
+          "2732544",
+          "11018",
+          "11019",
+          "3426312",
+          "2169701"
+        ],
+        "ncbiTaxonomyId": "2169701",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE_HIGH",
+        "priorityPathogenName": "Togaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 11822,
+        "speciesTaxonomyId": "3426312",
+        "strainName": "SG650",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Alsuviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Togaviridae",
+        "taxonomicLevelGenus": "Alphavirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Martellivirales",
+        "taxonomicLevelPhylum": "Kitrinoviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Alphavirus onyong",
+        "taxonomicLevelStrain": "Alphavirus onyong strain SG650",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002888795.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3426312",
+    "otherTaxa": null,
+    "priority": "MODERATE_HIGH",
+    "priorityPathogenName": "Togaviridae",
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Alsuviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Togaviridae",
+    "taxonomicLevelGenus": "Alphavirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Martellivirales",
+    "taxonomicLevelPhylum": "Kitrinoviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Alphavirus onyong",
+    "taxonomicLevelStrain": [
+      "Alphavirus onyong strain IBH10964",
+      "None",
+      "Alphavirus onyong strain SG650"
+    ]
+  },
+  {
     "assemblyCount": 1,
     "assemblyTaxonomyIds": [
       "11029"
@@ -66565,6 +68063,93 @@
   {
     "assemblyCount": 1,
     "assemblyTaxonomyIds": [
+      "11034"
+    ],
+    "commonName": null,
+    "genomes": [
+      {
+        "accession": "GCF_000860545.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 51,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/860/545/GCF_000860545.1/genes/GCF_000860545.1_ViralProj15316.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 11703,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732406",
+          "2732461",
+          "2732544",
+          "11018",
+          "11019",
+          "3426318",
+          "11034"
+        ],
+        "ncbiTaxonomyId": "11034",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE_HIGH",
+        "priorityPathogenName": "Togaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 11703,
+        "speciesTaxonomyId": "3426318",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Alsuviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Togaviridae",
+        "taxonomicLevelGenus": "Alphavirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Martellivirales",
+        "taxonomicLevelPhylum": "Kitrinoviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Alphavirus sindbis",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000860545.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3426318",
+    "otherTaxa": null,
+    "priority": "MODERATE_HIGH",
+    "priorityPathogenName": "Togaviridae",
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Alsuviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Togaviridae",
+    "taxonomicLevelGenus": "Alphavirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Martellivirales",
+    "taxonomicLevelPhylum": "Kitrinoviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Alphavirus sindbis",
+    "taxonomicLevelStrain": [
+      "None"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
       "1525173"
     ],
     "commonName": null,
@@ -66647,6 +68232,95 @@
     "taxonomicLevelSpecies": "Amaruvirus aka",
     "taxonomicLevelStrain": [
       "None"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "12118"
+    ],
+    "commonName": "FMDV-O",
+    "genomes": [
+      {
+        "accession": "GCF_002816555.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "FMDV-O",
+        "coverage": null,
+        "gcPercent": 54,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/002/816/555/GCF_002816555.1/genes/GCF_002816555.1_ASM281655v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 8201,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946627",
+          "12109",
+          "3426401",
+          "12110",
+          "12118"
+        ],
+        "ncbiTaxonomyId": "12118",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 8201,
+        "speciesTaxonomyId": "3426401",
+        "strainName": "O6",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Aphthovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Aphthovirus vesiculae",
+        "taxonomicLevelStrain": "Aphthovirus vesiculae strain O6",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002816555.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3426401",
+    "otherTaxa": null,
+    "priority": "MODERATE",
+    "priorityPathogenName": "Picornaviridae",
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Pisoniviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Picornaviridae",
+    "taxonomicLevelGenus": "Aphthovirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Picornavirales",
+    "taxonomicLevelPhylum": "Pisuviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Aphthovirus vesiculae",
+    "taxonomicLevelStrain": [
+      "Aphthovirus vesiculae strain O6"
     ]
   },
   {
@@ -67333,6 +69007,713 @@
     ]
   },
   {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "1172196"
+    ],
+    "commonName": null,
+    "genomes": [
+      {
+        "accession": "GCF_001963095.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 54,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/001/963/095/GCF_001963095.1/genes/GCF_001963095.1_ViralProj361922.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 8176,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "11974",
+          "2560097",
+          "3426654",
+          "2560343",
+          "1172196"
+        ],
+        "ncbiTaxonomyId": "1172196",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 8176,
+        "speciesTaxonomyId": "3426654",
+        "strainName": "RS/BR/2015",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Caliciviridae",
+        "taxonomicLevelGenus": "Bavovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Bavovirus bavariaense",
+        "taxonomicLevelStrain": "Bavovirus bavariaense strain RS/BR/2015",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001963095.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3426654",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Pisoniviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Caliciviridae",
+    "taxonomicLevelGenus": "Bavovirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Picornavirales",
+    "taxonomicLevelPhylum": "Pisuviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Bavovirus bavariaense",
+    "taxonomicLevelStrain": [
+      "Bavovirus bavariaense strain RS/BR/2015"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "1425211"
+    ],
+    "commonName": "SAFV-2",
+    "genomes": [
+      {
+        "accession": "GCF_000875265.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "SAFV-2",
+        "coverage": null,
+        "gcPercent": 43.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/875/265/GCF_000875265.1/genes/GCF_000875265.1_ViralProj30053.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 7961,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946627",
+          "12103",
+          "3427731",
+          "2734523",
+          "1425211"
+        ],
+        "ncbiTaxonomyId": "1425211",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 7961,
+        "speciesTaxonomyId": "3427731",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Cardiovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Cardiovirus saffoldi",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000875265.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3427731",
+    "otherTaxa": null,
+    "priority": "MODERATE",
+    "priorityPathogenName": "Picornaviridae",
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Pisoniviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Picornaviridae",
+    "taxonomicLevelGenus": "Cardiovirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Picornavirales",
+    "taxonomicLevelPhylum": "Pisuviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Cardiovirus saffoldi",
+    "taxonomicLevelStrain": [
+      "None"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "46839"
+    ],
+    "commonName": "CTFV",
+    "genomes": [
+      {
+        "accession": "GCF_000853265.1",
+        "annotationStatus": null,
+        "chromosomes": 12,
+        "commonName": "CTFV",
+        "coverage": null,
+        "gcPercent": 46.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/853/265/GCF_000853265.1/genes/GCF_000853265.1_ViralMultiSegProj14857.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 29174,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732405",
+          "2732459",
+          "2788829",
+          "2732541",
+          "2946187",
+          "10911",
+          "3428066",
+          "2748762",
+          "46839"
+        ],
+        "ncbiTaxonomyId": "46839",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 12,
+        "scaffoldL50": 4,
+        "scaffoldN50": 3157,
+        "speciesTaxonomyId": "3428066",
+        "strainName": "Florio; N-7180",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Resentoviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Spinareoviridae",
+        "taxonomicLevelGenus": "Coltivirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Reovirales",
+        "taxonomicLevelPhylum": "Duplornaviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Coltivirus dermacentoris",
+        "taxonomicLevelStrain": "Coltivirus dermacentoris strain Florio; N-7180",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000853265.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3428066",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Resentoviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Spinareoviridae",
+    "taxonomicLevelGenus": "Coltivirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Reovirales",
+    "taxonomicLevelPhylum": "Duplornaviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Coltivirus dermacentoris",
+    "taxonomicLevelStrain": [
+      "Coltivirus dermacentoris strain Florio; N-7180"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "1330491"
+    ],
+    "commonName": "HCoSV-A",
+    "genomes": [
+      {
+        "accession": "GCF_000885595.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "HCoSV-A",
+        "coverage": null,
+        "gcPercent": 43.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/885/595/GCF_000885595.1/genes/GCF_000885595.1_ViralProj38497.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 7632,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946627",
+          "586418",
+          "3428094",
+          "1330491"
+        ],
+        "ncbiTaxonomyId": "1330491",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 7632,
+        "speciesTaxonomyId": "3428094",
+        "strainName": "HCoSV-A1",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Cosavirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Cosavirus asiani",
+        "taxonomicLevelStrain": "Cosavirus asiani strain HCoSV-A1",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000885595.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3428094",
+    "otherTaxa": null,
+    "priority": "MODERATE",
+    "priorityPathogenName": "Picornaviridae",
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Pisoniviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Picornaviridae",
+    "taxonomicLevelGenus": "Cosavirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Picornavirales",
+    "taxonomicLevelPhylum": "Pisuviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Cosavirus asiani",
+    "taxonomicLevelStrain": [
+      "Cosavirus asiani strain HCoSV-A1"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "586420"
+    ],
+    "commonName": "HCoSV-B",
+    "genomes": [
+      {
+        "accession": "GCF_000884955.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "HCoSV-B",
+        "coverage": null,
+        "gcPercent": 44,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/884/955/GCF_000884955.1/genes/GCF_000884955.1_ViralProj38499.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 7205,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946627",
+          "586418",
+          "3428095",
+          "2003649",
+          "586420"
+        ],
+        "ncbiTaxonomyId": "586420",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 7205,
+        "speciesTaxonomyId": "3428095",
+        "strainName": "HCoSV-B1",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Cosavirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Cosavirus bepakis",
+        "taxonomicLevelStrain": "Cosavirus bepakis strain HCoSV-B1",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000884955.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3428095",
+    "otherTaxa": null,
+    "priority": "MODERATE",
+    "priorityPathogenName": "Picornaviridae",
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Pisoniviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Picornaviridae",
+    "taxonomicLevelGenus": "Cosavirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Picornavirales",
+    "taxonomicLevelPhylum": "Pisuviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Cosavirus bepakis",
+    "taxonomicLevelStrain": [
+      "Cosavirus bepakis strain HCoSV-B1"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "2003650"
+    ],
+    "commonName": "HCoSV-D",
+    "genomes": [
+      {
+        "accession": "GCF_000886475.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "HCoSV-D",
+        "coverage": null,
+        "gcPercent": 42.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/886/475/GCF_000886475.1/genes/GCF_000886475.1_ViralProj38501.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 7215,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946627",
+          "586418",
+          "3428096",
+          "2003650"
+        ],
+        "ncbiTaxonomyId": "2003650",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 7215,
+        "speciesTaxonomyId": "3428096",
+        "strainName": "HCoSV-D1",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Cosavirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Cosavirus depakis",
+        "taxonomicLevelStrain": "Cosavirus depakis strain HCoSV-D1",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000886475.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3428096",
+    "otherTaxa": null,
+    "priority": "MODERATE",
+    "priorityPathogenName": "Picornaviridae",
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Pisoniviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Picornaviridae",
+    "taxonomicLevelGenus": "Cosavirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Picornavirales",
+    "taxonomicLevelPhylum": "Pisuviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Cosavirus depakis",
+    "taxonomicLevelStrain": [
+      "Cosavirus depakis strain HCoSV-D1"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "2003651"
+    ],
+    "commonName": "HCoSV-E",
+    "genomes": [
+      {
+        "accession": "GCF_000886455.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "HCoSV-E",
+        "coverage": null,
+        "gcPercent": 42,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/886/455/GCF_000886455.1/genes/GCF_000886455.1_ViralProj38493.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 6580,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946627",
+          "586418",
+          "3428097",
+          "2003651"
+        ],
+        "ncbiTaxonomyId": "2003651",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 6580,
+        "speciesTaxonomyId": "3428097",
+        "strainName": "HCoSV-E1",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Cosavirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Cosavirus eaustrali",
+        "taxonomicLevelStrain": "Cosavirus eaustrali strain HCoSV-E1",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000886455.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3428097",
+    "otherTaxa": null,
+    "priority": "MODERATE",
+    "priorityPathogenName": "Picornaviridae",
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Pisoniviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Picornaviridae",
+    "taxonomicLevelGenus": "Cosavirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Picornavirales",
+    "taxonomicLevelPhylum": "Pisuviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Cosavirus eaustrali",
+    "taxonomicLevelStrain": [
+      "Cosavirus eaustrali strain HCoSV-E1"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "2003652"
+    ],
+    "commonName": null,
+    "genomes": [
+      {
+        "accession": "GCF_002117635.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 44.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/002/117/635/GCF_002117635.1/genes/GCF_002117635.1_ViralProj384965.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 6656,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946627",
+          "586418",
+          "3428098",
+          "2003652"
+        ],
+        "ncbiTaxonomyId": "2003652",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 6656,
+        "speciesTaxonomyId": "3428098",
+        "strainName": "PK5006",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Cosavirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Cosavirus fepakis",
+        "taxonomicLevelStrain": "Cosavirus fepakis strain PK5006",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002117635.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3428098",
+    "otherTaxa": null,
+    "priority": "MODERATE",
+    "priorityPathogenName": "Picornaviridae",
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Pisoniviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Picornaviridae",
+    "taxonomicLevelGenus": "Cosavirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Picornavirales",
+    "taxonomicLevelPhylum": "Pisuviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Cosavirus fepakis",
+    "taxonomicLevelStrain": [
+      "Cosavirus fepakis strain PK5006"
+    ]
+  },
+  {
     "assemblyCount": 2,
     "assemblyTaxonomyIds": [
       "194440",
@@ -67768,6 +70149,1274 @@
     ]
   },
   {
+    "assemblyCount": 7,
+    "assemblyTaxonomyIds": [
+      "39054",
+      "150846",
+      "156647",
+      "1006008",
+      "2760809",
+      "33757"
+    ],
+    "commonName": "CV-A2",
+    "genomes": [
+      {
+        "accession": "GCA_008766895.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "EV-A71",
+        "coverage": null,
+        "gcPercent": 47.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/008/766/895/GCA_008766895.1/genes/GCA_008766895.1_ASM876689v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 7408,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946630",
+          "2960224",
+          "12059",
+          "3428500",
+          "138948",
+          "39054"
+        ],
+        "ncbiTaxonomyId": "39054",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 7408,
+        "speciesTaxonomyId": "3428500",
+        "strainName": "BrCr",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Enterovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Enterovirus alphacoxsackie",
+        "taxonomicLevelStrain": "Enterovirus alphacoxsackie strain BrCr",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_008766895.1"
+      },
+      {
+        "accession": "GCA_031109255.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "EV-A71",
+        "coverage": null,
+        "gcPercent": 48,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/031/109/255/GCA_031109255.1/genes/GCA_031109255.1_ASM3110925v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 7464,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946630",
+          "2960224",
+          "12059",
+          "3428500",
+          "138948",
+          "39054"
+        ],
+        "ncbiTaxonomyId": "39054",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 7464,
+        "speciesTaxonomyId": "3428500",
+        "strainName": "pinf7-54A",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Enterovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Enterovirus alphacoxsackie",
+        "taxonomicLevelStrain": "Enterovirus alphacoxsackie strain pinf7-54A",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_031109255.1"
+      },
+      {
+        "accession": "GCA_031116425.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 48,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/031/116/425/GCA_031116425.1/genes/GCA_031116425.1_ASM3111642v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 7411,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946630",
+          "2960224",
+          "12059",
+          "3428500",
+          "138948",
+          "39054",
+          "150846"
+        ],
+        "ncbiTaxonomyId": "150846",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 7411,
+        "speciesTaxonomyId": "3428500",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Enterovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Enterovirus alphacoxsackie",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_031116425.1"
+      },
+      {
+        "accession": "GCA_031116435.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 48,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/031/116/435/GCA_031116435.1/genes/GCA_031116435.1_ASM3111643v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 7411,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946630",
+          "2960224",
+          "12059",
+          "3428500",
+          "138948",
+          "39054",
+          "156647"
+        ],
+        "ncbiTaxonomyId": "156647",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 7411,
+        "speciesTaxonomyId": "3428500",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Enterovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Enterovirus alphacoxsackie",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_031116435.1"
+      },
+      {
+        "accession": "GCA_031128755.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 48,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/031/128/755/GCA_031128755.1/genes/GCA_031128755.1_ASM3112875v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 7405,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946630",
+          "2960224",
+          "12059",
+          "3428500",
+          "138948",
+          "39054",
+          "1006008"
+        ],
+        "ncbiTaxonomyId": "1006008",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 7405,
+        "speciesTaxonomyId": "3428500",
+        "strainName": "HZ08",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Enterovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Enterovirus alphacoxsackie",
+        "taxonomicLevelStrain": "Enterovirus alphacoxsackie strain HZ08",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_031128755.1"
+      },
+      {
+        "accession": "GCF_001684625.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 47.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/001/684/625/GCF_001684625.1/genes/GCF_001684625.1_ViralProj328671.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 7317,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946630",
+          "2960224",
+          "12059",
+          "3428500",
+          "138948",
+          "2760809"
+        ],
+        "ncbiTaxonomyId": "2760809",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 7317,
+        "speciesTaxonomyId": "3428500",
+        "strainName": "V13-0285",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Enterovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Enterovirus alphacoxsackie",
+        "taxonomicLevelStrain": "Enterovirus alphacoxsackie strain V13-0285",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_001684625.1"
+      },
+      {
+        "accession": "GCF_002816655.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "CV-A2",
+        "coverage": null,
+        "gcPercent": 48.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/002/816/655/GCF_002816655.1/genes/GCF_002816655.1_ASM281665v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 7398,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946630",
+          "2960224",
+          "12059",
+          "3428500",
+          "138948",
+          "33757"
+        ],
+        "ncbiTaxonomyId": "33757",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 7398,
+        "speciesTaxonomyId": "3428500",
+        "strainName": "Fleetwood",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Enterovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Enterovirus alphacoxsackie",
+        "taxonomicLevelStrain": "Enterovirus alphacoxsackie strain Fleetwood",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002816655.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3428500",
+    "otherTaxa": null,
+    "priority": "MODERATE",
+    "priorityPathogenName": "Picornaviridae",
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Pisoniviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Picornaviridae",
+    "taxonomicLevelGenus": "Enterovirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Picornavirales",
+    "taxonomicLevelPhylum": "Pisuviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Enterovirus alphacoxsackie",
+    "taxonomicLevelStrain": [
+      "Enterovirus alphacoxsackie strain BrCr",
+      "Enterovirus alphacoxsackie strain pinf7-54A",
+      "None",
+      "Enterovirus alphacoxsackie strain HZ08",
+      "Enterovirus alphacoxsackie strain V13-0285",
+      "Enterovirus alphacoxsackie strain Fleetwood"
+    ]
+  },
+  {
+    "assemblyCount": 2,
+    "assemblyTaxonomyIds": [
+      "147711",
+      "573824"
+    ],
+    "commonName": null,
+    "genomes": [
+      {
+        "accession": "GCF_000862245.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 39,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/862/245/GCF_000862245.1/genes/GCF_000862245.1_ViralProj15330.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 7152,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946630",
+          "2960224",
+          "12059",
+          "3428501",
+          "147711"
+        ],
+        "ncbiTaxonomyId": "147711",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 7152,
+        "speciesTaxonomyId": "3428501",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Enterovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Enterovirus alpharhino",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000862245.1"
+      },
+      {
+        "accession": "GCF_002816835.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 37.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/002/816/835/GCF_002816835.1/genes/GCF_002816835.1_ASM281683v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 7137,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946630",
+          "2960224",
+          "12059",
+          "3428501",
+          "147711",
+          "573824"
+        ],
+        "ncbiTaxonomyId": "573824",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 7137,
+        "speciesTaxonomyId": "3428501",
+        "strainName": "ATCC VR-1559",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Enterovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Enterovirus alpharhino",
+        "taxonomicLevelStrain": "Enterovirus alpharhino strain ATCC VR-1559",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002816835.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3428501",
+    "otherTaxa": null,
+    "priority": "MODERATE",
+    "priorityPathogenName": "Picornaviridae",
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Pisoniviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Picornaviridae",
+    "taxonomicLevelGenus": "Enterovirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Picornavirales",
+    "taxonomicLevelPhylum": "Pisuviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Enterovirus alpharhino",
+    "taxonomicLevelStrain": [
+      "None",
+      "Enterovirus alpharhino strain ATCC VR-1559"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "12072"
+    ],
+    "commonName": "CVB3",
+    "genomes": [
+      {
+        "accession": "GCF_002816685.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "CVB3",
+        "coverage": null,
+        "gcPercent": 47.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/002/816/685/GCF_002816685.1/genes/GCF_002816685.1_ASM281668v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 7399,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946630",
+          "2960224",
+          "12059",
+          "3428502",
+          "138949",
+          "12072"
+        ],
+        "ncbiTaxonomyId": "12072",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 7399,
+        "speciesTaxonomyId": "3428502",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Enterovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Enterovirus betacoxsackie",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002816685.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3428502",
+    "otherTaxa": null,
+    "priority": "MODERATE",
+    "priorityPathogenName": "Picornaviridae",
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Pisoniviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Picornaviridae",
+    "taxonomicLevelGenus": "Enterovirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Picornavirales",
+    "taxonomicLevelPhylum": "Pisuviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Enterovirus betacoxsackie",
+    "taxonomicLevelStrain": [
+      "None"
+    ]
+  },
+  {
+    "assemblyCount": 2,
+    "assemblyTaxonomyIds": [
+      "12131",
+      "44130"
+    ],
+    "commonName": null,
+    "genomes": [
+      {
+        "accession": "GCF_000861265.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "HRV-14",
+        "coverage": null,
+        "gcPercent": 40.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/861/265/GCF_000861265.1/genes/GCF_000861265.1_ViralProj15309.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 7212,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946630",
+          "2960224",
+          "12059",
+          "3428503",
+          "147712",
+          "12131"
+        ],
+        "ncbiTaxonomyId": "12131",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 7212,
+        "speciesTaxonomyId": "3428503",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Enterovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Enterovirus betarhino",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000861265.1"
+      },
+      {
+        "accession": "GCF_002816855.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 40,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/002/816/855/GCF_002816855.1/genes/GCF_002816855.1_ASM281685v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 7208,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946630",
+          "2960224",
+          "12059",
+          "3428503",
+          "147712",
+          "44130"
+        ],
+        "ncbiTaxonomyId": "44130",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 7208,
+        "speciesTaxonomyId": "3428503",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Enterovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Enterovirus betarhino",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002816855.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3428503",
+    "otherTaxa": null,
+    "priority": "MODERATE",
+    "priorityPathogenName": "Picornaviridae",
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Pisoniviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Picornaviridae",
+    "taxonomicLevelGenus": "Enterovirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Picornavirales",
+    "taxonomicLevelPhylum": "Pisuviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Enterovirus betarhino",
+    "taxonomicLevelStrain": [
+      "None"
+    ]
+  },
+  {
+    "assemblyCount": 2,
+    "assemblyTaxonomyIds": [
+      "463676",
+      "992230"
+    ],
+    "commonName": null,
+    "genomes": [
+      {
+        "accession": "GCF_000872325.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 43,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/872/325/GCF_000872325.1/genes/GCF_000872325.1_ViralProj27901.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 7099,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946630",
+          "2960224",
+          "12059",
+          "3428504",
+          "463676"
+        ],
+        "ncbiTaxonomyId": "463676",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 7099,
+        "speciesTaxonomyId": "3428504",
+        "strainName": "024",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Enterovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Enterovirus cerhino",
+        "taxonomicLevelStrain": "Enterovirus cerhino strain 024",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000872325.1"
+      },
+      {
+        "accession": "GCF_002816885.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 43.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/002/816/885/GCF_002816885.1/genes/GCF_002816885.1_ASM281688v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 6944,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946630",
+          "2960224",
+          "12059",
+          "3428504",
+          "463676",
+          "1219416",
+          "992230"
+        ],
+        "ncbiTaxonomyId": "992230",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 6944,
+        "speciesTaxonomyId": "3428504",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Enterovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Enterovirus cerhino",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002816885.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3428504",
+    "otherTaxa": null,
+    "priority": "MODERATE",
+    "priorityPathogenName": "Picornaviridae",
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Pisoniviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Picornaviridae",
+    "taxonomicLevelGenus": "Enterovirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Picornavirales",
+    "taxonomicLevelPhylum": "Pisuviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Enterovirus cerhino",
+    "taxonomicLevelStrain": [
+      "Enterovirus cerhino strain 024",
+      "None"
+    ]
+  },
+  {
+    "assemblyCount": 3,
+    "assemblyTaxonomyIds": [
+      "12083",
+      "12086",
+      "12082"
+    ],
+    "commonName": null,
+    "genomes": [
+      {
+        "accession": "GCA_003108605.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "HPV-2",
+        "coverage": null,
+        "gcPercent": 46.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/003/108/605/GCA_003108605.1/genes/GCA_003108605.1_ASM310860v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 7440,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946630",
+          "2960224",
+          "12059",
+          "3428505",
+          "138950",
+          "12083"
+        ],
+        "ncbiTaxonomyId": "12083",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 7440,
+        "speciesTaxonomyId": "3428505",
+        "strainName": "Lansing",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Enterovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Enterovirus coxsackiepol",
+        "taxonomicLevelStrain": "Enterovirus coxsackiepol strain Lansing",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_003108605.1"
+      },
+      {
+        "accession": "GCA_008766715.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "HPV-3",
+        "coverage": null,
+        "gcPercent": 47,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/008/766/715/GCA_008766715.1/genes/GCA_008766715.1_ASM876671v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 7432,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946630",
+          "2960224",
+          "12059",
+          "3428505",
+          "138950",
+          "12086"
+        ],
+        "ncbiTaxonomyId": "12086",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 7432,
+        "speciesTaxonomyId": "3428505",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Enterovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Enterovirus coxsackiepol",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_008766715.1"
+      },
+      {
+        "accession": "GCA_008766755.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 46.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/008/766/755/GCA_008766755.1/genes/GCA_008766755.1_ASM876675v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 7441,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946630",
+          "2960224",
+          "12059",
+          "3428505",
+          "138950",
+          "12080",
+          "12082"
+        ],
+        "ncbiTaxonomyId": "12082",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 7441,
+        "speciesTaxonomyId": "3428505",
+        "strainName": "Sabin 1",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Enterovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Enterovirus coxsackiepol",
+        "taxonomicLevelStrain": "Enterovirus coxsackiepol strain Sabin 1",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_008766755.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3428505",
+    "otherTaxa": null,
+    "priority": "MODERATE",
+    "priorityPathogenName": "Picornaviridae",
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Pisoniviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Picornaviridae",
+    "taxonomicLevelGenus": "Enterovirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Picornavirales",
+    "taxonomicLevelPhylum": "Pisuviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Enterovirus coxsackiepol",
+    "taxonomicLevelStrain": [
+      "Enterovirus coxsackiepol strain Lansing",
+      "None",
+      "Enterovirus coxsackiepol strain Sabin 1"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "42789"
+    ],
+    "commonName": "EV-D68",
+    "genomes": [
+      {
+        "accession": "GCF_002816725.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "EV-D68",
+        "coverage": null,
+        "gcPercent": 41,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/002/816/725/GCF_002816725.1/genes/GCF_002816725.1_ASM281672v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 7367,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946630",
+          "2960224",
+          "12059",
+          "3428506",
+          "138951",
+          "42789"
+        ],
+        "ncbiTaxonomyId": "42789",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 7367,
+        "speciesTaxonomyId": "3428506",
+        "strainName": "Fermon",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Enterovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Enterovirus deconjuncti",
+        "taxonomicLevelStrain": "Enterovirus deconjuncti strain Fermon",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002816725.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3428506",
+    "otherTaxa": null,
+    "priority": "MODERATE",
+    "priorityPathogenName": "Picornaviridae",
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Pisoniviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Picornaviridae",
+    "taxonomicLevelGenus": "Enterovirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Picornavirales",
+    "taxonomicLevelPhylum": "Pisuviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Enterovirus deconjuncti",
+    "taxonomicLevelStrain": [
+      "Enterovirus deconjuncti strain Fermon"
+    ]
+  },
+  {
     "assemblyCount": 2,
     "assemblyTaxonomyIds": [
       "33756",
@@ -68175,6 +71824,183 @@
   {
     "assemblyCount": 1,
     "assemblyTaxonomyIds": [
+      "1949201"
+    ],
+    "commonName": null,
+    "genomes": [
+      {
+        "accession": "GCF_002285005.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 50.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/002/285/005/GCF_002285005.1/genes/GCF_002285005.1_ViralProj400925.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 6564,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "11974",
+          "2560177",
+          "3430886",
+          "2560597",
+          "1949201"
+        ],
+        "ncbiTaxonomyId": "1949201",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 6564,
+        "speciesTaxonomyId": "3430886",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Caliciviridae",
+        "taxonomicLevelGenus": "Minovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Minovirus pimephalis",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_002285005.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3430886",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Pisoniviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Caliciviridae",
+    "taxonomicLevelGenus": "Minovirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Picornavirales",
+    "taxonomicLevelPhylum": "Pisuviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Minovirus pimephalis",
+    "taxonomicLevelStrain": [
+      "None"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "3052494"
+    ],
+    "commonName": null,
+    "genomes": [
+      {
+        "accession": "GCF_018594985.1",
+        "annotationStatus": null,
+        "chromosomes": 3,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 40.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/018/594/985/GCF_018594985.1/genes/GCF_018594985.1_ASM1859498v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 11139,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2497569",
+          "2497571",
+          "2497576",
+          "1980410",
+          "1980413",
+          "2560074",
+          "2501367",
+          "3430915",
+          "3052494"
+        ],
+        "ncbiTaxonomyId": "3052494",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE_HIGH",
+        "priorityPathogenName": "Hantaviridae",
+        "scaffoldCount": 3,
+        "scaffoldL50": 1,
+        "scaffoldN50": 6447,
+        "speciesTaxonomyId": "3430915",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Ellioviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Hantaviridae",
+        "taxonomicLevelGenus": "Mobatvirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Bunyavirales",
+        "taxonomicLevelPhylum": "Negarnaviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Mobatvirus robinaense",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_018594985.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3430915",
+    "otherTaxa": null,
+    "priority": "MODERATE_HIGH",
+    "priorityPathogenName": "Hantaviridae",
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Ellioviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Hantaviridae",
+    "taxonomicLevelGenus": "Mobatvirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Bunyavirales",
+    "taxonomicLevelPhylum": "Negarnaviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Mobatvirus robinaense",
+    "taxonomicLevelStrain": [
+      "None"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
       "10280"
     ],
     "commonName": "McVI",
@@ -68257,6 +72083,94 @@
       "None"
     ],
     "taxonomicLevelSpecies": "Molluscipoxvirus molluscum",
+    "taxonomicLevelStrain": [
+      "None"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "1172195"
+    ],
+    "commonName": null,
+    "genomes": [
+      {
+        "accession": "GCF_004786995.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 50,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/004/786/995/GCF_004786995.1/genes/GCF_004786995.1_ASM478699v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 7656,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "11974",
+          "2560182",
+          "3430984",
+          "2560612",
+          "1172195"
+        ],
+        "ncbiTaxonomyId": "1172195",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 7656,
+        "speciesTaxonomyId": "3430984",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Caliciviridae",
+        "taxonomicLevelGenus": "Nacovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Nacovirus meleagridis",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_004786995.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3430984",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Pisoniviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Caliciviridae",
+    "taxonomicLevelGenus": "Nacovirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Picornavirales",
+    "taxonomicLevelPhylum": "Pisuviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Nacovirus meleagridis",
     "taxonomicLevelStrain": [
       "None"
     ]
@@ -70083,6 +73997,93 @@
   {
     "assemblyCount": 1,
     "assemblyTaxonomyIds": [
+      "10407"
+    ],
+    "commonName": "HBV",
+    "genomes": [
+      {
+        "accession": "GCF_000861825.2",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "HBV",
+        "coverage": null,
+        "gcPercent": 48.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/861/825/GCF_000861825.2/genes/GCF_000861825.2_ViralProj15428.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 3182,
+        "level": "Scaffold",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732397",
+          "2732409",
+          "2732514",
+          "2732515",
+          "10404",
+          "10405",
+          "3431302",
+          "10407"
+        ],
+        "ncbiTaxonomyId": "10407",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 3182,
+        "speciesTaxonomyId": "3431302",
+        "strainName": "ayw",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Revtraviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Hepadnaviridae",
+        "taxonomicLevelGenus": "Orthohepadnavirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Pararnavirae",
+        "taxonomicLevelOrder": "Blubervirales",
+        "taxonomicLevelPhylum": "Artverviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Orthohepadnavirus hominoidei",
+        "taxonomicLevelStrain": "Orthohepadnavirus hominoidei strain ayw",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000861825.2"
+      }
+    ],
+    "ncbiTaxonomyId": "3431302",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Revtraviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Hepadnaviridae",
+    "taxonomicLevelGenus": "Orthohepadnavirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Pararnavirae",
+    "taxonomicLevelOrder": "Blubervirales",
+    "taxonomicLevelPhylum": "Artverviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Orthohepadnavirus hominoidei",
+    "taxonomicLevelStrain": [
+      "Orthohepadnavirus hominoidei strain ayw"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
       "2971765"
     ],
     "commonName": null,
@@ -70255,6 +74256,94 @@
     "taxonomicLevelSpecies": "Parapoxvirus orf",
     "taxonomicLevelStrain": [
       "Parapoxvirus orf strain OV-SA00"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "1803956"
+    ],
+    "commonName": null,
+    "genomes": [
+      {
+        "accession": "GCF_000861505.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 39.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/861/505/GCF_000861505.1/genes/GCF_000861505.1_ViralProj15357.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 7348,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946640",
+          "138954",
+          "3431395",
+          "1803956"
+        ],
+        "ncbiTaxonomyId": "1803956",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 7348,
+        "speciesTaxonomyId": "3431395",
+        "strainName": "Gregory",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Parechovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Parechovirus ahumpari",
+        "taxonomicLevelStrain": "Parechovirus ahumpari strain Gregory",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000861505.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3431395",
+    "otherTaxa": null,
+    "priority": "MODERATE",
+    "priorityPathogenName": "Picornaviridae",
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Pisoniviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Picornaviridae",
+    "taxonomicLevelGenus": "Parechovirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Picornavirales",
+    "taxonomicLevelPhylum": "Pisuviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Parechovirus ahumpari",
+    "taxonomicLevelStrain": [
+      "Parechovirus ahumpari strain Gregory"
     ]
   },
   {
@@ -70581,6 +74670,183 @@
     "taxonomicLevelSpecies": "Orthoreovirus nelsonense",
     "taxonomicLevelStrain": [
       "None"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "512169"
+    ],
+    "commonName": null,
+    "genomes": [
+      {
+        "accession": "GCF_004786795.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 46.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/004/786/795/GCF_004786795.1/genes/GCF_004786795.1_ASM478679v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 6714,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "11974",
+          "873551",
+          "3432145",
+          "2560702",
+          "512169"
+        ],
+        "ncbiTaxonomyId": "512169",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 6714,
+        "speciesTaxonomyId": "3432145",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Caliciviridae",
+        "taxonomicLevelGenus": "Recovirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Recovirus tulani",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_004786795.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3432145",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Pisoniviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Caliciviridae",
+    "taxonomicLevelGenus": "Recovirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Picornavirales",
+    "taxonomicLevelPhylum": "Pisuviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Recovirus tulani",
+    "taxonomicLevelStrain": [
+      "None"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "1511807"
+    ],
+    "commonName": "RoV-A2",
+    "genomes": [
+      {
+        "accession": "GCF_000918175.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "RoV-A2",
+        "coverage": null,
+        "gcPercent": 51.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/918/175/GCF_000918175.1/genes/GCF_000918175.1_ViralProj246130.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 8931,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946635",
+          "1511804",
+          "3432189",
+          "1511805",
+          "1511807"
+        ],
+        "ncbiTaxonomyId": "1511807",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 8931,
+        "speciesTaxonomyId": "3432189",
+        "strainName": "GA7403",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Rosavirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Rosavirus acaliforni",
+        "taxonomicLevelStrain": "Rosavirus acaliforni strain GA7403",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000918175.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3432189",
+    "otherTaxa": null,
+    "priority": "MODERATE",
+    "priorityPathogenName": "Picornaviridae",
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Pisoniviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Picornaviridae",
+    "taxonomicLevelGenus": "Rosavirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Picornavirales",
+    "taxonomicLevelPhylum": "Pisuviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Rosavirus acaliforni",
+    "taxonomicLevelStrain": [
+      "Rosavirus acaliforni strain GA7403"
     ]
   },
   {
@@ -70935,6 +75201,151 @@
     "taxonomicLevelSpecies": "Rotavirus tritogastroenteritidis",
     "taxonomicLevelStrain": [
       "Rotavirus tritogastroenteritidis strain Bristol"
+    ]
+  },
+  {
+    "assemblyCount": 2,
+    "assemblyTaxonomyIds": [
+      "1330524",
+      "651733"
+    ],
+    "commonName": null,
+    "genomes": [
+      {
+        "accession": "GCF_000885035.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 56.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/885/035/GCF_000885035.1/genes/GCF_000885035.1_ViralProj39553.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 7989,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946635",
+          "688449",
+          "3432241",
+          "1330524"
+        ],
+        "ncbiTaxonomyId": "1330524",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 7989,
+        "speciesTaxonomyId": "3432241",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Salivirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Salivirus aklasse",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000885035.1"
+      },
+      {
+        "accession": "GCF_000886535.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 56.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/886/535/GCF_000886535.1/genes/GCF_000886535.1_ViralProj39349.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 7982,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "464095",
+          "12058",
+          "2946635",
+          "688449",
+          "3432241",
+          "1330524",
+          "651733"
+        ],
+        "ncbiTaxonomyId": "651733",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "MODERATE",
+        "priorityPathogenName": "Picornaviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 7982,
+        "speciesTaxonomyId": "3432241",
+        "strainName": "NG-J1",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Picornaviridae",
+        "taxonomicLevelGenus": "Salivirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Picornavirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Salivirus aklasse",
+        "taxonomicLevelStrain": "Salivirus aklasse strain NG-J1",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000886535.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3432241",
+    "otherTaxa": null,
+    "priority": "MODERATE",
+    "priorityPathogenName": "Picornaviridae",
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Pisoniviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Picornaviridae",
+    "taxonomicLevelGenus": "Salivirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Picornavirales",
+    "taxonomicLevelPhylum": "Pisuviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Salivirus aklasse",
+    "taxonomicLevelStrain": [
+      "None",
+      "Salivirus aklasse strain NG-J1"
     ]
   },
   {
@@ -71308,6 +75719,614 @@
       "Sapovirus sapporoense strain C12",
       "Sapovirus sapporoense strain Hu/SaV/Nagoya/NGY-1/2012/JPN",
       "Sapovirus sapporoense strain Hu/GI/Sapporo/MT-2010/1982"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "2170197"
+    ],
+    "commonName": null,
+    "genomes": [
+      {
+        "accession": "GCF_003032775.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 38.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/003/032/775/GCF_003032775.1/genes/GCF_003032775.1_ASM303277v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 13072,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732397",
+          "2732409",
+          "2732514",
+          "2169561",
+          "11632",
+          "327046",
+          "2788687",
+          "2169668",
+          "3432451",
+          "2170197"
+        ],
+        "ncbiTaxonomyId": "2170197",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 13072,
+        "speciesTaxonomyId": "3432451",
+        "strainName": "Cercopithecus nictitans",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Revtraviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Retroviridae",
+        "taxonomicLevelGenus": "Simiispumavirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Pararnavirae",
+        "taxonomicLevelOrder": "Ortervirales",
+        "taxonomicLevelPhylum": "Artverviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Simiispumavirus cernic",
+        "taxonomicLevelStrain": "Simiispumavirus cernic strain Cercopithecus nictitans",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_003032775.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3432451",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Revtraviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Retroviridae",
+    "taxonomicLevelGenus": "Simiispumavirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Pararnavirae",
+    "taxonomicLevelOrder": "Ortervirales",
+    "taxonomicLevelPhylum": "Artverviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Simiispumavirus cernic",
+    "taxonomicLevelStrain": [
+      "Simiispumavirus cernic strain Cercopithecus nictitans"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "2170195"
+    ],
+    "commonName": null,
+    "genomes": [
+      {
+        "accession": "GCF_003032765.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 38,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/003/032/765/GCF_003032765.1/genes/GCF_003032765.1_ASM303276v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 11954,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732397",
+          "2732409",
+          "2732514",
+          "2169561",
+          "11632",
+          "327046",
+          "2788687",
+          "2169668",
+          "3432458",
+          "2170195"
+        ],
+        "ncbiTaxonomyId": "2170195",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 11954,
+        "speciesTaxonomyId": "3432458",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Revtraviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Retroviridae",
+        "taxonomicLevelGenus": "Simiispumavirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Pararnavirae",
+        "taxonomicLevelOrder": "Ortervirales",
+        "taxonomicLevelPhylum": "Artverviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Simiispumavirus pantrosch",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_003032765.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3432458",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Revtraviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Retroviridae",
+    "taxonomicLevelGenus": "Simiispumavirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Pararnavirae",
+    "taxonomicLevelOrder": "Ortervirales",
+    "taxonomicLevelPhylum": "Artverviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Simiispumavirus pantrosch",
+    "taxonomicLevelStrain": [
+      "None"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "2170194"
+    ],
+    "commonName": null,
+    "genomes": [
+      {
+        "accession": "GCF_003032755.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 38.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/003/032/755/GCF_003032755.1/genes/GCF_003032755.1_ASM303275v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 13220,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732397",
+          "2732409",
+          "2732514",
+          "2169561",
+          "11632",
+          "327046",
+          "2788687",
+          "2169668",
+          "3432459",
+          "2170194"
+        ],
+        "ncbiTaxonomyId": "2170194",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 13220,
+        "speciesTaxonomyId": "3432459",
+        "strainName": "Pan troglodytes troglodytes",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Revtraviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Retroviridae",
+        "taxonomicLevelGenus": "Simiispumavirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Pararnavirae",
+        "taxonomicLevelOrder": "Ortervirales",
+        "taxonomicLevelPhylum": "Artverviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Simiispumavirus pantrotro",
+        "taxonomicLevelStrain": "Simiispumavirus pantrotro strain Pan troglodytes troglodytes",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_003032755.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3432459",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Revtraviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Retroviridae",
+    "taxonomicLevelGenus": "Simiispumavirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Pararnavirae",
+    "taxonomicLevelOrder": "Ortervirales",
+    "taxonomicLevelPhylum": "Artverviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Simiispumavirus pantrotro",
+    "taxonomicLevelStrain": [
+      "Simiispumavirus pantrotro strain Pan troglodytes troglodytes"
+    ]
+  },
+  {
+    "assemblyCount": 4,
+    "assemblyTaxonomyIds": [
+      "2571075",
+      "3116878",
+      "2571077",
+      "2571078"
+    ],
+    "commonName": null,
+    "genomes": [
+      {
+        "accession": "GCA_014883685.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 34.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/014/883/685/GCA_014883685.1/genes/GCA_014883685.1_ASM1488368v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 3049,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2731342",
+          "2732092",
+          "2732416",
+          "2732423",
+          "2732547",
+          "2732652",
+          "2732653",
+          "3432910",
+          "2732654",
+          "2571075"
+        ],
+        "ncbiTaxonomyId": "2571075",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 3049,
+        "speciesTaxonomyId": "3432910",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Arfiviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Redondoviridae",
+        "taxonomicLevelGenus": "Torbevirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Shotokuvirae",
+        "taxonomicLevelOrder": "Recrevirales",
+        "taxonomicLevelPhylum": "Cressdnaviricota",
+        "taxonomicLevelRealm": "Monodnaviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Torbevirus brisa",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_014883685.1"
+      },
+      {
+        "accession": "GCA_014883695.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 33.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/014/883/695/GCA_014883695.1/genes/GCA_014883695.1_ASM1488369v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 3023,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2731342",
+          "2732092",
+          "2732416",
+          "2732423",
+          "2732547",
+          "2732652",
+          "2732653",
+          "3432910",
+          "2732654",
+          "3116878"
+        ],
+        "ncbiTaxonomyId": "3116878",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 3023,
+        "speciesTaxonomyId": "3432910",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Arfiviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Redondoviridae",
+        "taxonomicLevelGenus": "Torbevirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Shotokuvirae",
+        "taxonomicLevelOrder": "Recrevirales",
+        "taxonomicLevelPhylum": "Cressdnaviricota",
+        "taxonomicLevelRealm": "Monodnaviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Torbevirus brisa",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_014883695.1"
+      },
+      {
+        "accession": "GCA_014883705.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 33.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/014/883/705/GCA_014883705.1/genes/GCA_014883705.1_ASM1488370v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 3050,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2731342",
+          "2732092",
+          "2732416",
+          "2732423",
+          "2732547",
+          "2732652",
+          "2732653",
+          "3432910",
+          "2732654",
+          "2571077"
+        ],
+        "ncbiTaxonomyId": "2571077",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 3050,
+        "speciesTaxonomyId": "3432910",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Arfiviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Redondoviridae",
+        "taxonomicLevelGenus": "Torbevirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Shotokuvirae",
+        "taxonomicLevelOrder": "Recrevirales",
+        "taxonomicLevelPhylum": "Cressdnaviricota",
+        "taxonomicLevelRealm": "Monodnaviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Torbevirus brisa",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_014883705.1"
+      },
+      {
+        "accession": "GCA_014883715.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 35,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/014/883/715/GCA_014883715.1/genes/GCA_014883715.1_ASM1488371v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 3026,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2731342",
+          "2732092",
+          "2732416",
+          "2732423",
+          "2732547",
+          "2732652",
+          "2732653",
+          "3432910",
+          "2732654",
+          "2571078"
+        ],
+        "ncbiTaxonomyId": "2571078",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 3026,
+        "speciesTaxonomyId": "3432910",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Arfiviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Redondoviridae",
+        "taxonomicLevelGenus": "Torbevirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Shotokuvirae",
+        "taxonomicLevelOrder": "Recrevirales",
+        "taxonomicLevelPhylum": "Cressdnaviricota",
+        "taxonomicLevelRealm": "Monodnaviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Torbevirus brisa",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_014883715.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3432910",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Arfiviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Redondoviridae",
+    "taxonomicLevelGenus": "Torbevirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Shotokuvirae",
+    "taxonomicLevelOrder": "Recrevirales",
+    "taxonomicLevelPhylum": "Cressdnaviricota",
+    "taxonomicLevelRealm": "Monodnaviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Torbevirus brisa",
+    "taxonomicLevelStrain": [
+      "None"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "2571082"
+    ],
+    "commonName": null,
+    "genomes": [
+      {
+        "accession": "GCF_013088445.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 34,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/013/088/445/GCF_013088445.1/genes/GCF_013088445.1_ASM1308844v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 3056,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2731342",
+          "2732092",
+          "2732416",
+          "2732423",
+          "2732547",
+          "2732652",
+          "2732653",
+          "3432911",
+          "2732655",
+          "2571082"
+        ],
+        "ncbiTaxonomyId": "2571082",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 3056,
+        "speciesTaxonomyId": "3432911",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Arfiviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Redondoviridae",
+        "taxonomicLevelGenus": "Torbevirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Shotokuvirae",
+        "taxonomicLevelOrder": "Recrevirales",
+        "taxonomicLevelPhylum": "Cressdnaviricota",
+        "taxonomicLevelRealm": "Monodnaviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Torbevirus viento",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_013088445.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3432911",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Arfiviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Redondoviridae",
+    "taxonomicLevelGenus": "Torbevirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Shotokuvirae",
+    "taxonomicLevelOrder": "Recrevirales",
+    "taxonomicLevelPhylum": "Cressdnaviricota",
+    "taxonomicLevelRealm": "Monodnaviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Torbevirus viento",
+    "taxonomicLevelStrain": [
+      "None"
     ]
   },
   {
@@ -72007,6 +77026,97 @@
     "taxonomicLevelSpecies": "Alphacoronavirus chicagoense",
     "taxonomicLevelStrain": [
       "None"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "31631"
+    ],
+    "commonName": "HCoV-OC43",
+    "genomes": [
+      {
+        "accession": "GCF_003972325.1",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "HCoV-OC43",
+        "coverage": null,
+        "gcPercent": 37,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/003/972/325/GCF_003972325.1/genes/GCF_003972325.1_ASM397232v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 30741,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2732408",
+          "2732506",
+          "76804",
+          "2499399",
+          "11118",
+          "2501931",
+          "694002",
+          "2509481",
+          "3433757",
+          "694003",
+          "31631"
+        ],
+        "ncbiTaxonomyId": "31631",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 30741,
+        "speciesTaxonomyId": "3433757",
+        "strainName": "ATCC VR-759",
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Pisoniviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Coronaviridae",
+        "taxonomicLevelGenus": "Betacoronavirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Nidovirales",
+        "taxonomicLevelPhylum": "Pisuviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Betacoronavirus gravedinis",
+        "taxonomicLevelStrain": "Betacoronavirus gravedinis strain ATCC VR-759",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_003972325.1"
+      }
+    ],
+    "ncbiTaxonomyId": "3433757",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Viruses"
+    ],
+    "taxonomicLevelClass": "Pisoniviricetes",
+    "taxonomicLevelDomain": "None",
+    "taxonomicLevelFamily": "Coronaviridae",
+    "taxonomicLevelGenus": "Betacoronavirus",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Orthornavirae",
+    "taxonomicLevelOrder": "Nidovirales",
+    "taxonomicLevelPhylum": "Pisuviricota",
+    "taxonomicLevelRealm": "Riboviria",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Betacoronavirus gravedinis",
+    "taxonomicLevelStrain": [
+      "Betacoronavirus gravedinis strain ATCC VR-759"
     ]
   },
   {

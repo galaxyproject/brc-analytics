@@ -1922,7 +1922,7 @@ organisms:
   - taxonomy_id: 10255
     ploidy:
       - HAPLOID
-  - taxonomy_id: 11021
+  - taxonomy_id: 3426299
     ploidy:
       - HAPLOID
   - taxonomy_id: 11036
@@ -1952,13 +1952,13 @@ organisms:
   - taxonomy_id: 12092
     ploidy:
       - HAPLOID
-  - taxonomy_id: 138948
+  - taxonomy_id: 3428500
     ploidy:
       - HAPLOID
-  - taxonomy_id: 138950
+  - taxonomy_id: 3428505
     ploidy:
       - HAPLOID
-  - taxonomy_id: 138951
+  - taxonomy_id: 3428506
     ploidy:
       - HAPLOID
   - taxonomy_id: 1493858
@@ -1994,7 +1994,7 @@ organisms:
   - taxonomy_id: 2161807
     ploidy:
       - HAPLOID
-  - taxonomy_id: 2169701
+  - taxonomy_id: 3426312
     ploidy:
       - HAPLOID
   - taxonomy_id: 2169991
@@ -2006,16 +2006,16 @@ organisms:
   - taxonomy_id: 243550
     ploidy:
       - HAPLOID
-  - taxonomy_id: 2560343
+  - taxonomy_id: 3426654
     ploidy:
       - HAPLOID
-  - taxonomy_id: 2560597
+  - taxonomy_id: 3430886
     ploidy:
       - HAPLOID
-  - taxonomy_id: 2560612
+  - taxonomy_id: 3432911
     ploidy:
       - HAPLOID
-  - taxonomy_id: 2560702
+  - taxonomy_id: 3432145
     ploidy:
       - HAPLOID
   - taxonomy_id: 268505
@@ -2165,7 +2165,7 @@ organisms:
   - taxonomy_id: 3052493
     ploidy:
       - HAPLOID
-  - taxonomy_id: 3052494
+  - taxonomy_id: 3430915
     ploidy:
       - HAPLOID
   - taxonomy_id: 3052495
@@ -2193,6 +2193,9 @@ organisms:
     ploidy:
       - HAPLOID
   - taxonomy_id: 3052676
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 3430984
     ploidy:
       - HAPLOID
   - taxonomy_id: 3052684
@@ -2807,7 +2810,7 @@ organisms:
   - taxonomy_id: 10279
     ploidy:
       - HAPLOID
-  - taxonomy_id: 10407
+  - taxonomy_id: 3431302
     ploidy:
       - HAPLOID
   - taxonomy_id: 10497
@@ -2819,7 +2822,7 @@ organisms:
   - taxonomy_id: 10570
     ploidy:
       - HAPLOID
-  - taxonomy_id: 108098
+  - taxonomy_id: 3241406
     ploidy:
       - HAPLOID
   - taxonomy_id: 11020
@@ -2831,7 +2834,7 @@ organisms:
   - taxonomy_id: 11033
     ploidy:
       - HAPLOID
-  - taxonomy_id: 11034
+  - taxonomy_id: 3426318
     ploidy:
       - HAPLOID
   - taxonomy_id: 11137
@@ -2861,7 +2864,7 @@ organisms:
   - taxonomy_id: 1208309
     ploidy:
       - HAPLOID
-  - taxonomy_id: 12110
+  - taxonomy_id: 3426401
     ploidy:
       - HAPLOID
   - taxonomy_id: 1233383
@@ -2885,25 +2888,25 @@ organisms:
   - taxonomy_id: 12475
     ploidy:
       - HAPLOID
-  - taxonomy_id: 129875
+  - taxonomy_id: 3241402
     ploidy:
       - HAPLOID
-  - taxonomy_id: 129951
+  - taxonomy_id: 3241411
     ploidy:
       - HAPLOID
-  - taxonomy_id: 130308
+  - taxonomy_id: 3241425
     ploidy:
       - HAPLOID
-  - taxonomy_id: 130309
+  - taxonomy_id: 3241426
     ploidy:
       - HAPLOID
-  - taxonomy_id: 130310
+  - taxonomy_id: 3241420
     ploidy:
       - HAPLOID
-  - taxonomy_id: 1330491
+  - taxonomy_id: 3428094
     ploidy:
       - HAPLOID
-  - taxonomy_id: 1330524
+  - taxonomy_id: 3432241
     ploidy:
       - HAPLOID
   - taxonomy_id: 1335626
@@ -2915,7 +2918,7 @@ organisms:
   - taxonomy_id: 1348384
     ploidy:
       - HAPLOID
-  - taxonomy_id: 138949
+  - taxonomy_id: 3428502
     ploidy:
       - HAPLOID
   - taxonomy_id: 1391667
@@ -2927,13 +2930,13 @@ organisms:
   - taxonomy_id: 1440170
     ploidy:
       - HAPLOID
-  - taxonomy_id: 147711
+  - taxonomy_id: 3428501
     ploidy:
       - HAPLOID
-  - taxonomy_id: 147712
+  - taxonomy_id: 3428503
     ploidy:
       - HAPLOID
-  - taxonomy_id: 1511805
+  - taxonomy_id: 3432189
     ploidy:
       - HAPLOID
   - taxonomy_id: 1511891
@@ -2996,7 +2999,7 @@ organisms:
   - taxonomy_id: 1714619
     ploidy:
       - HAPLOID
-  - taxonomy_id: 1803956
+  - taxonomy_id: 3431395
     ploidy:
       - HAPLOID
   - taxonomy_id: 1820160
@@ -3113,16 +3116,16 @@ organisms:
   - taxonomy_id: 1987019
     ploidy:
       - HAPLOID
-  - taxonomy_id: 2003649
+  - taxonomy_id: 3428095
     ploidy:
       - HAPLOID
-  - taxonomy_id: 2003650
+  - taxonomy_id: 3428096
     ploidy:
       - HAPLOID
-  - taxonomy_id: 2003651
+  - taxonomy_id: 3428097
     ploidy:
       - HAPLOID
-  - taxonomy_id: 2003652
+  - taxonomy_id: 3428098
     ploidy:
       - HAPLOID
   - taxonomy_id: 2017081
@@ -3155,22 +3158,22 @@ organisms:
   - taxonomy_id: 2169902
     ploidy:
       - HAPLOID
-  - taxonomy_id: 2169934
+  - taxonomy_id: 2844967
     ploidy:
       - HAPLOID
-  - taxonomy_id: 2169935
+  - taxonomy_id: 2844968
     ploidy:
       - HAPLOID
-  - taxonomy_id: 2169936
+  - taxonomy_id: 2844969
     ploidy:
       - HAPLOID
-  - taxonomy_id: 2170194
+  - taxonomy_id: 3432459
     ploidy:
       - HAPLOID
-  - taxonomy_id: 2170195
+  - taxonomy_id: 3432458
     ploidy:
       - HAPLOID
-  - taxonomy_id: 2170197
+  - taxonomy_id: 3432451
     ploidy:
       - HAPLOID
   - taxonomy_id: 2200830
@@ -3185,7 +3188,7 @@ organisms:
   - taxonomy_id: 2499242
     ploidy:
       - HAPLOID
-  - taxonomy_id: 2732654
+  - taxonomy_id: 3432910
     ploidy:
       - HAPLOID
   - taxonomy_id: 2732655
@@ -3197,10 +3200,10 @@ organisms:
   - taxonomy_id: 2734436
     ploidy:
       - HAPLOID
-  - taxonomy_id: 2734523
+  - taxonomy_id: 3427731
     ploidy:
       - HAPLOID
-  - taxonomy_id: 2748762
+  - taxonomy_id: 3428066
     ploidy:
       - HAPLOID
   - taxonomy_id: 277944
@@ -3539,7 +3542,7 @@ organisms:
   - taxonomy_id: 3050305
     ploidy:
       - HAPLOID
-  - taxonomy_id: 3050361
+  - taxonomy_id: 3048399
     ploidy:
       - HAPLOID
   - taxonomy_id: 3051989
@@ -3776,7 +3779,7 @@ organisms:
   - taxonomy_id: 3418651
     ploidy:
       - HAPLOID
-  - taxonomy_id: 351073
+  - taxonomy_id: 3422298
     ploidy:
       - HAPLOID
   - taxonomy_id: 36427
@@ -3806,10 +3809,10 @@ organisms:
   - taxonomy_id: 45617
     ploidy:
       - HAPLOID
-  - taxonomy_id: 463676
+  - taxonomy_id: 3428504
     ploidy:
       - HAPLOID
-  - taxonomy_id: 536079
+  - taxonomy_id: 3241445
     ploidy:
       - HAPLOID
   - taxonomy_id: 652810
@@ -3827,7 +3830,7 @@ organisms:
   - taxonomy_id: 68887
     ploidy:
       - HAPLOID
-  - taxonomy_id: 694003
+  - taxonomy_id: 3433757
     ploidy:
       - HAPLOID
   - taxonomy_id: 72149
