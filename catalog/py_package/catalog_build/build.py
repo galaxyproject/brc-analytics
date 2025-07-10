@@ -31,24 +31,25 @@ def rate_limit_handler(request_call):
         raise
 
 
-def post_ncbi_request(url, json_data, batch_size=1000):
+def post_ncbi_request(url, json_data, batch_size=1000, min_batch_size=50):
     """
     Makes a POST request to the NCBI API with error handling and rate limiting.
     Handles pagination if the response contains next_page_token and processes requests in batches.
+    Adaptively reduces batch size if requests fail.
 
     Args:
       url: The API endpoint URL
       json_data: The data to send in the request body
-      batch_size: Maximum number of items to process in a single request
+      batch_size: Initial maximum number of items to process in a single request
+      min_batch_size: Minimum batch size to try before giving up
 
     Returns:
       List of all reports from paginated responses
 
     Raises:
-      Exception: If the request fails or contains errors
+      Exception: If the request fails or contains errors even with minimum batch size
     """
     all_reports = []
-    page = 1
     processed_count = 0
 
     # Get the list of IDs to process (assuming they're in a list in the json_data)
@@ -58,51 +59,123 @@ def post_ncbi_request(url, json_data, batch_size=1000):
 
     ids = json_data[id_key]
     total_ids = len(ids)
+    current_batch_size = batch_size
 
     while processed_count < total_ids:
         # Create a batch of IDs
-        batch = ids[processed_count : processed_count + batch_size]
+        batch = ids[processed_count : processed_count + current_batch_size]
+        batch_num = processed_count // current_batch_size + 1
         print(
-            f"Processing batch {processed_count // batch_size + 1} of {total_ids // batch_size + 1}"
+            f"Processing batch {batch_num} (size: {len(batch)}, {processed_count}/{total_ids})"
         )
 
         # Create a new json_data with just the current batch
         batch_data = {**json_data}
         batch_data[id_key] = batch
 
-        while True:
-            print(f"Requesting page {page} of {url} (batch size: {len(batch)})")
+        # Add page_size parameter if not present
+        if "page_size" not in batch_data:
+            batch_data["page_size"] = 100
 
-            # Add page token to request if it exists
-            if "next_page_token" in batch_data:
-                batch_data["page_token"] = batch_data.pop("next_page_token")
+        success = False
+        retry_count = 0
 
-            # Use rate_limit_handler to make the request with proper retry logic
-            response = rate_limit_handler(lambda: requests.post(url, json=batch_data))
+        # Try with progressively smaller batch sizes until success or minimum reached
+        while not success and current_batch_size >= min_batch_size:
+            try:
+                batch_reports = []
+                inner_page = 1
 
-            if response.status_code != 200:
-                raise Exception(
-                    f"Failed to fetch data: {response.status_code} {response.text}"
-                )
+                # Remove any page token from previous attempts
+                if "page_token" in batch_data:
+                    del batch_data["page_token"]
+                if "next_page_token" in batch_data:
+                    del batch_data["next_page_token"]
 
-            data = response.json()
+                while True:
+                    print(f"Requesting page {inner_page} (batch size: {len(batch)})")
 
-            if "reports" not in data:
-                raise Exception(data)
-            elif len(data["reports"][0].get("errors", [])) > 0:
-                raise Exception(data["reports"][0])
+                    # Add page token to request if it exists
+                    if "next_page_token" in batch_data:
+                        batch_data["page_token"] = batch_data.pop("next_page_token")
 
-            all_reports.extend(data["reports"])
+                    # Use rate_limit_handler to make the request with proper retry logic
+                    response = rate_limit_handler(
+                        lambda: requests.post(url, json=batch_data)
+                    )
 
-            next_page_token = data.get("next_page_token")
-            if not next_page_token:
-                break
+                    if response.status_code != 200:
+                        raise Exception(
+                            f"Failed to fetch data: {response.status_code} {response.text}"
+                        )
 
-            batch_data["next_page_token"] = next_page_token
-            page += 1
+                    data = response.json()
 
-        processed_count += len(batch)
-        page = 1  # Reset page counter for next batch
+                    if "reports" not in data:
+                        if "total_count" in data:
+                            # API returned total_count but no reports, likely too many results
+                            total = data["total_count"]
+                            print(f"API returned total_count of {total} but no reports")
+                            raise ValueError(
+                                "Too many results, need to reduce batch size"
+                            )
+                        else:
+                            # Some other issue with the response
+                            raise Exception(f"Unexpected response format: {data}")
+                    elif len(data["reports"][0].get("errors", [])) > 0:
+                        raise Exception(data["reports"][0])
+
+                    batch_reports.extend(data["reports"])
+
+                    next_page_token = data.get("next_page_token")
+                    if not next_page_token:
+                        break
+
+                    batch_data["next_page_token"] = next_page_token
+                    inner_page += 1
+
+                # If we get here, the batch was processed successfully
+                all_reports.extend(batch_reports)
+                processed_count += len(batch)
+                success = True
+
+            except ValueError as e:
+                # Specific error for batch size issues
+                if "reduce batch size" in str(e):
+                    retry_count += 1
+                    current_batch_size = max(current_batch_size // 2, min_batch_size)
+                    print(f"Reducing batch size to {current_batch_size}")
+
+                    # If we're at the minimum batch size, try with an even smaller page_size
+                    if (
+                        current_batch_size == min_batch_size
+                        and batch_data["page_size"] > 10
+                    ):
+                        batch_data["page_size"] = batch_data["page_size"] // 2
+                        new_page_size = batch_data["page_size"]
+                        print(f"Also reducing page_size to {new_page_size}")
+                else:
+                    # Not a batch size issue, re-raise
+                    raise
+            except Exception as e:
+                # For other exceptions, also try reducing batch size
+                retry_count += 1
+                if retry_count <= 3:  # Limit retries
+                    current_batch_size = max(current_batch_size // 2, min_batch_size)
+                    print(
+                        f"Request failed. Reducing batch size to {current_batch_size}"
+                    )
+                else:
+                    # Too many retries, give up
+                    msg = f"Failed after {retry_count} retries with size {current_batch_size}"
+                    raise Exception(msg) from e
+
+        # If we couldn't process even with minimum batch size, raise exception
+        if not success:
+            msg = f"Failed to process batch even with minimum size of {min_batch_size}"
+            raise Exception(msg)
+
+        # Reset for next batch
 
     return all_reports
 
@@ -399,6 +472,9 @@ def get_genome_row(genome_info):
         .get("strain", ""),
         "taxonomyId": str(genome_info["organism"]["tax_id"]),
         "accession": genome_info["accession"],
+        "currentAccession": genome_info.get(
+            "current_accession", genome_info["accession"]
+        ),
         "isRef": refseq_category == "reference genome",
         "level": genome_info["assembly_info"]["assembly_level"],
         "chromosomeCount": genome_info["assembly_stats"].get(
@@ -446,7 +522,18 @@ def get_genomes_and_primarydata_df(accessions):
         accessions = accessions.tolist()
 
     url = "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/dataset_report"
-    reports = post_ncbi_request(url, {"accessions": accessions})
+
+    # Use post_ncbi_request with adaptive batch sizing
+    reports = post_ncbi_request(
+        url,
+        {
+            "accessions": accessions,
+            "filters": {
+                "assembly_version": "all_assemblies"  # Include old or suppressed assemblies
+            },
+            "page_size": 500,  # Initial page size for pagination
+        },
+    )
 
     return (
         pd.DataFrame(data=[get_genome_row(info) for info in reports]),
@@ -938,6 +1025,23 @@ def check_missing_outbreak_descendants(outbreak_taxonomy_ids, all_taxonomy_ids):
     return missing_ids
 
 
+def find_outdated_accessions(genomes_df):
+    """
+    Identifies assemblies where the accession is outdated (different from current_accession).
+
+    Args:
+        genomes_df: DataFrame containing genome information with 'accession' and 'currentAccession' columns
+
+    Returns:
+        List of tuples containing (accession, current_accession) for outdated assemblies
+    """
+    outdated_mask = genomes_df["accession"] != genomes_df["currentAccession"]
+    outdated_assemblies = genomes_df[outdated_mask][
+        ["accession", "currentAccession"]
+    ].values.tolist()
+    return outdated_assemblies
+
+
 def make_qc_report(
     missing_ncbi_assemblies,
     inconsistent_taxonomy_ids,
@@ -946,6 +1050,7 @@ def make_qc_report(
     missing_ploidy_assemblies=None,
     missing_outbreak_descendants=None,
     tree_checks=None,
+    outdated_accessions=None,
 ):
     ncbi_assemblies_text = (
         "None"
@@ -1017,6 +1122,14 @@ def make_qc_report(
             "\n\nList of taxonomic levels specified in parameters but absent in tree: "
             + ("None" if not tree_missing_ranks else ", ".join(tree_missing_ranks))
         )
+
+    outdated_accessions_text = (
+        "None"
+        if outdated_accessions is None or len(outdated_accessions) == 0
+        else "\n".join(
+            [f"- {acc} (current: {curr_acc})" for acc, curr_acc in outdated_accessions]
+        )
+    )
     return (
         f"# Catalog QC report\n\n"
         f"## Assemblies not found on NCBI\n\n{ncbi_assemblies_text}\n\n"
@@ -1025,6 +1138,7 @@ def make_qc_report(
         f"## Species and strain combinations with multiple taxonomy IDs\n\n{taxonomy_ids_text}\n\n"
         f"## Assemblies without ploidy information\n\n{ploidy_assemblies_text}\n\n"
         f"## Outbreak descendant taxonomy IDs not found in genomes data\n\n{outbreak_descendants_text}\n\n"
+        f"## Outdated assembly accessions\n\n{outdated_accessions_text}\n\n"
         f"## Taxonomy tree\n\n{tree_checks_text}\n"
     )
 
@@ -1291,6 +1405,10 @@ def build_files(
         )
     else:
         genomes_df["geneModelUrl"] = ""
+
+    # Find outdated accessions (where accession != currentAccession)
+    if qc_report_path:
+        qc_report_params["outdated_accessions"] = find_outdated_accessions(genomes_df)
 
     # Drop any duplicate rows based on accession before writing to file
     genomes_df = genomes_df.drop_duplicates(subset=["accession"])
