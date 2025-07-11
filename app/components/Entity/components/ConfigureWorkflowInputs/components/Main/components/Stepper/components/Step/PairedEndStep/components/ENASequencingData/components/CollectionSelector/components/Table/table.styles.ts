@@ -1,4 +1,4 @@
-import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
+import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/components/RoundedPaper/roundedPaper";
 import styled from "@emotion/styled";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 
@@ -9,16 +9,12 @@ export const StyledRoundedPaper = styled(RoundedPaper)`
   max-width: 100%;
   min-height: 0;
   min-width: 0;
-  overflow: auto;
 
   .MuiTableContainer-root {
-    overflow: unset;
+    height: 100%;
 
-    .MuiTableHead-root {
-      box-shadow: 0 1px 0 0 ${PALETTE.SMOKE_MAIN};
-      position: sticky;
-      top: 0;
-      z-index: 1;
+    .MuiTableCell-root {
+      word-break: break-word;
     }
   }
 `;

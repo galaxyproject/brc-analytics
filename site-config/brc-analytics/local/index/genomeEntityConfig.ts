@@ -129,7 +129,6 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
     ],
   },
   exploreMode: EXPLORE_MODE.CS_FETCH_CS_FILTERING,
-  explorerTitle: "Assemblies",
   getId: getGenomeId,
   getTitle: getGenomeTitle,
   label: "Assemblies",
@@ -405,8 +404,8 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
   listView: {
     disablePagination: true,
     enableDownload: true,
-    enableTab: false,
   },
   route: "assemblies",
   staticLoadFile: "catalog/output/assemblies.json",
+  ui: { title: "Assemblies" },
 };

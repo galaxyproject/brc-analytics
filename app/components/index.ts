@@ -8,10 +8,10 @@ export { KeyValueElType } from "@databiosphere/findable-ui/lib/components/common
 export { ValueElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/ValueElType/valueElType";
 export { KeyValuePairs } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/keyValuePairs";
 export {
-  FluidPaper,
   GridPaper,
   RoundedPaper,
 } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
+export { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/components/FluidPaper/fluidPaper";
 export { SectionTitle } from "@databiosphere/findable-ui/lib/components/common/Section/components/SectionTitle/sectionTitle";
 export { Stack } from "@databiosphere/findable-ui/lib/components/common/Stack/stack";
 export { StaticImage } from "@databiosphere/findable-ui/lib/components/common/StaticImage/staticImage";
