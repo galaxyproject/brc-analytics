@@ -17,7 +17,7 @@ export const RoadmapView = (): JSX.Element => {
             highlight and provide dedicated resources for priority pathogens
             while simultaneously supporting neglected organisms. Our goal is to
             create a{" "}
-            <Typography component="span" sx={{ fontWeight: "bold" }}>
+            <Typography component="span" variant={"text-body-large-500"}>
               community-driven knowledge platform
             </Typography>{" "}
             that lowers barriers to entry for complex bioinformatics analyses.

@@ -98,7 +98,6 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
     ],
   },
   exploreMode: EXPLORE_MODE.CS_FETCH_CS_FILTERING,
-  explorerTitle: "Organisms",
   getId: getOrganismId,
   label: "Organisms",
   list: {
@@ -182,6 +181,7 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
         } as ComponentConfig<typeof C.Link, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
+        meta: { columnPinned: true },
         width: { max: "1fr", min: "auto" },
       },
       {
@@ -273,8 +273,8 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
   listView: {
     disablePagination: true,
     enableDownload: true,
-    enableTab: false,
   },
   route: "organisms",
   staticLoadFile: "catalog/output/organisms.json",
+  ui: { title: "Organisms" },
 };

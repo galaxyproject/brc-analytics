@@ -42,6 +42,7 @@ import Router from "next/router";
 import slugify from "slugify";
 import { SLUGIFY_OPTIONS } from "../../../../common/constants";
 import { LinkProps } from "next/link";
+import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 
 /**
  * Build props for the accession cell.
@@ -428,6 +429,19 @@ export const buildPriorityPathogenDetails = (
     C.Chip({
       color: getPriorityColor(priorityPathogen.priority),
       label: getPriorityLabel(priorityPathogen.priority),
+      onClick: (): void => {
+        Router.push({
+          pathname: ROUTES.ORGANISMS,
+          query: {
+            filter: JSON.stringify([
+              {
+                categoryKey: BRC_DATA_CATALOG_CATEGORY_KEY.PRIORITY,
+                value: [priorityPathogen.priority],
+              },
+            ]),
+          },
+        });
+      },
       variant: CHIP_PROPS.VARIANT.STATUS,
     })
   );
@@ -719,6 +733,7 @@ export function buildOrganismGenomesTable(
   organism: BRCDataCatalogOrganism
 ): ComponentProps<typeof C.DetailViewTable<BRCDataCatalogGenome>> {
   return {
+    Paper: FluidPaper,
     columns: buildOrganismGenomesTableColumns(),
     gridTemplateColumns:
       "auto minmax(164px, 1fr) minmax(100px, 0.5fr) minmax(100px, 0.5fr) minmax(80px, 0.5fr) repeat(2, minmax(142px, 0.5fr)) minmax(120px, 0.5fr) minmax(80px, 0.5fr) minmax(120px, 0.5fr) repeat(3, minmax(80px, 0.5fr)) minmax(142px, 0.5fr)",
@@ -748,6 +763,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION,
       cell: ({ row }) => C.BasicCell(buildAccession(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
+      meta: { columnPinned: true },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,

@@ -9,17 +9,15 @@ import { Props } from "./types";
 
 export const Table = ({ table }: Props): JSX.Element => {
   return (
-    <StyledRoundedPaper variant="table">
+    <StyledRoundedPaper elevation={0}>
       <TableContainer>
         <GridTable
           gridTemplateColumns={getColumnTrackSizing(
             table.getVisibleFlatColumns()
           )}
+          stickyHeader
         >
-          <TableHead
-            rowDirection={ROW_DIRECTION.DEFAULT}
-            tableInstance={table}
-          />
+          <TableHead tableInstance={table} />
           <TableBody
             rowDirection={ROW_DIRECTION.DEFAULT}
             tableInstance={table}
