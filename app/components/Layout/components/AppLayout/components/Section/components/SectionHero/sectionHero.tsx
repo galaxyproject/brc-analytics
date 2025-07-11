@@ -27,9 +27,13 @@ export const SectionHero = ({
 }: SectionHeroProps): JSX.Element => {
   return (
     <StyledSection>
-      {(height): JSX.Element => (
+      {(height, width): JSX.Element => (
         <Fragment>
-          <Hero gridSize={calculateGridSize(height)} height={height} />
+          <Hero
+            gridSize={calculateGridSize(height)}
+            height={height}
+            width={width}
+          />
           <SectionLayout>
             <Headline>
               <Breadcrumbs breadcrumbs={breadcrumbs} />

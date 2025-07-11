@@ -11,11 +11,13 @@ import { SVG } from "./hero.styles";
 export interface HeroProps {
   gridSize?: number;
   height?: number;
+  width?: number;
 }
 
 export const Hero = ({
   gridSize = GRID_SIZE,
   height = gridSize * 1.5,
+  width = 0,
 }: HeroProps): JSX.Element => {
   return (
     <SVG
@@ -23,7 +25,6 @@ export const Hero = ({
       height={height}
       preserveAspectRatio="xMinYMin meet"
       viewBox={getViewBox(gridSize, height)}
-      width="100%"
       xmlns="http://www.w3.org/2000/svg"
     >
       <SmokeRect gridSize={gridSize} />
@@ -36,7 +37,7 @@ export const Hero = ({
             <rect
               fill={getFillUrl(elementId)}
               height={height}
-              width="100%"
+              width={width}
               x={0}
               y={0}
             />

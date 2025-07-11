@@ -19,11 +19,13 @@ import { SVG } from "./hero.styles";
 export interface HeroProps {
   gridSize?: number;
   height?: number;
+  width?: number;
 }
 
 export const Hero = ({
   gridSize = GRID_SIZE,
   height = gridSize * 3,
+  width = 0,
 }: HeroProps): JSX.Element => {
   return (
     <SVG
@@ -46,7 +48,7 @@ export const Hero = ({
             <rect
               fill={getFillUrl(elementId)}
               height={height}
-              width="100%"
+              width={width}
               x={0}
               y={0}
             />
