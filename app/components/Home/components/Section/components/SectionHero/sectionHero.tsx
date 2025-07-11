@@ -17,9 +17,13 @@ import {
 export const SectionHero = (): JSX.Element => {
   return (
     <StyledSection>
-      {(height): JSX.Element => (
+      {(height, width): JSX.Element => (
         <Fragment>
-          <Hero gridSize={calculateGridSize(height)} height={height} />
+          <Hero
+            gridSize={calculateGridSize(height)}
+            height={height}
+            width={width}
+          />
           <SectionLayout>
             <Headline>
               <Head>
