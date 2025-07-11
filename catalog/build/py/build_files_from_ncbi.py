@@ -45,6 +45,8 @@ TAXANOMIC_LEVELS_FOR_TREE = [
     "genus",
     "species",
     "strain",
+    "serotype",
+    "isolate",
 ]
 
 if __name__ == "__main__":
