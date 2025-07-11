@@ -1423,7 +1423,7 @@ assemblies:
   - accession: GCF_000003125.1
   # organism: Theileria annulata
   # common_name: apicomplexans T.annulata (Ankara isolate clone C9 2005)
-  - accession: GCA_000003225.2
+  - accession: GCA_000003225.1
   # organism: Uncinocarpus reesii 1704
   # common_name: ascomycetes U.reesii 1704
   - accession: GCF_000003515.1
