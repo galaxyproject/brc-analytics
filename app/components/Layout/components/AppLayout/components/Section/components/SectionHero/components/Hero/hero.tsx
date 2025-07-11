@@ -25,6 +25,7 @@ export const Hero = ({
       height={height}
       preserveAspectRatio="xMinYMin meet"
       viewBox={getViewBox(gridSize, height)}
+      width="100%"
       xmlns="http://www.w3.org/2000/svg"
     >
       <SmokeRect gridSize={gridSize} />
