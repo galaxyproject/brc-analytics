@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   publish-release:
@@ -35,12 +36,33 @@ jobs:
           echo "tag=$RELEASE_TAG" >> $GITHUB_OUTPUT
 
       - name: Update package version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION="${{ steps.get_release.outputs.tag }}"
           VERSION=${VERSION#v} # Remove 'v' prefix
+          BRANCH_NAME="release/update-version-$VERSION"
+
+          # Create and switch to new branch
+          git checkout -b "$BRANCH_NAME"
+
+          # Update version
           npm version $VERSION --no-git-tag-version
+
+          # Configure git
           git config user.name github-actions
           git config user.email github-actions@github.com
+
+          # Commit changes
           git add package.json package-lock.json
           git commit -m "chore: update version to $VERSION [skip ci]"
-          git push
+
+          # Push branch
+          git push -u origin "$BRANCH_NAME"
+
+          # Create PR
+          gh pr create \
+            --title "chore: update version to $VERSION" \
+            --body "Automated version bump for release ${{ steps.get_release.outputs.tag }}" \
+            --head "$BRANCH_NAME" \
+            --base main
