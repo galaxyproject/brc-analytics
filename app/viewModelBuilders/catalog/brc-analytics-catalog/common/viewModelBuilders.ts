@@ -251,6 +251,32 @@ export const buildGenomeTaxonomicLevelStrain = (
 };
 
 /**
+ * Build props for the serotype cell.
+ * @param genome - Genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildGenomeTaxonomicLevelSerotype = (
+  genome: BRCDataCatalogGenome
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: getGenomeSerotypeText(genome),
+  };
+};
+
+/**
+ * Build props for the isolate cell.
+ * @param genome - Genome entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildGenomeTaxonomicLevelIsolate = (
+  genome: BRCDataCatalogGenome
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: getGenomeIsolateText(genome),
+  };
+};
+
+/**
  * Build props for the "is ref" cell.
  * @param genome - Genome entity.
  * @returns Props to be used for the cell.
@@ -328,6 +354,34 @@ export const buildOrganismTaxonomicLevelStrain = (
   return {
     label: "strains",
     values: organism.taxonomicLevelStrain,
+  };
+};
+
+/**
+ * Build props for the serotype cell.
+ * @param organism - Organism entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildOrganismTaxonomicLevelSerotype = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.NTagCell> => {
+  return {
+    label: "serotypes",
+    values: organism.taxonomicLevelSerotype,
+  };
+};
+
+/**
+ * Build props for the isolate cell.
+ * @param organism - Organism entity.
+ * @returns Props to be used for the cell.
+ */
+export const buildOrganismTaxonomicLevelIsolate = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.NTagCell> => {
+  return {
+    label: "isolates",
+    values: organism.taxonomicLevelIsolate,
   };
 };
 
@@ -736,7 +790,7 @@ export function buildOrganismGenomesTable(
     Paper: FluidPaper,
     columns: buildOrganismGenomesTableColumns(),
     gridTemplateColumns:
-      "auto minmax(164px, 1fr) minmax(100px, 0.5fr) minmax(100px, 0.5fr) minmax(80px, 0.5fr) repeat(2, minmax(142px, 0.5fr)) minmax(120px, 0.5fr) minmax(80px, 0.5fr) minmax(120px, 0.5fr) repeat(3, minmax(80px, 0.5fr)) minmax(142px, 0.5fr)",
+      "auto minmax(164px, 1fr) minmax(100px, 0.5fr) minmax(100px, 0.5fr) minmax(100px, 0.5fr) minmax(100px, 0.5fr) minmax(80px, 0.5fr) repeat(2, minmax(142px, 0.5fr)) minmax(120px, 0.5fr) minmax(80px, 0.5fr) minmax(120px, 0.5fr) repeat(3, minmax(80px, 0.5fr)) minmax(142px, 0.5fr)",
     items: organism.genomes,
     noResultsTitle: "No Assemblies",
     tableOptions: {
@@ -770,6 +824,18 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
       cell: ({ row }) =>
         C.BasicCell(buildGenomeTaxonomicLevelStrain(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
+    },
+    {
+      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SEROTYPE,
+      cell: ({ row }) =>
+        C.BasicCell(buildGenomeTaxonomicLevelSerotype(row.original)),
+      header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SEROTYPE,
+    },
+    {
+      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ISOLATE,
+      cell: ({ row }) =>
+        C.BasicCell(buildGenomeTaxonomicLevelIsolate(row.original)),
+      header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_ISOLATE,
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMY_ID,
@@ -919,6 +985,36 @@ function getGenomeStrainText(
   if (genome.strainName) return genome.strainName;
   if (genome.taxonomicLevelStrain !== "None")
     return genome.taxonomicLevelStrain;
+  return defaultValue;
+}
+
+/**
+ * Get the genome serotype text.
+ * @param genome - Genome entity.
+ * @param defaultValue - Default value if no serotype is found.
+ * @returns serotype text.
+ */
+function getGenomeSerotypeText(
+  genome: BRCDataCatalogGenome,
+  defaultValue = ""
+): string {
+  if (genome.taxonomicLevelSerotype !== "None")
+    return genome.taxonomicLevelSerotype;
+  return defaultValue;
+}
+
+/**
+ * Get the genome isolate text.
+ * @param genome - Genome entity.
+ * @param defaultValue - Default value if no isolate is found.
+ * @returns isolate text.
+ */
+function getGenomeIsolateText(
+  genome: BRCDataCatalogGenome,
+  defaultValue = ""
+): string {
+  if (genome.taxonomicLevelIsolate !== "None")
+    return genome.taxonomicLevelIsolate;
   return defaultValue;
 }
 

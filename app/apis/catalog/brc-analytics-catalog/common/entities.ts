@@ -40,10 +40,12 @@ export interface BRCDataCatalogGenome {
   taxonomicLevelDomain: string;
   taxonomicLevelFamily: string;
   taxonomicLevelGenus: string;
+  taxonomicLevelIsolate: string;
   taxonomicLevelKingdom: string;
   taxonomicLevelOrder: string;
   taxonomicLevelPhylum: string;
   taxonomicLevelRealm: string;
+  taxonomicLevelSerotype: string;
   taxonomicLevelSpecies: string;
   taxonomicLevelStrain: string;
   ucscBrowserUrl: string | null;
@@ -63,10 +65,12 @@ export interface BRCDataCatalogOrganism {
   taxonomicLevelDomain: string;
   taxonomicLevelFamily: string;
   taxonomicLevelGenus: string;
+  taxonomicLevelIsolate: string[];
   taxonomicLevelKingdom: string;
   taxonomicLevelOrder: string;
   taxonomicLevelPhylum: string;
   taxonomicLevelRealm: string;
+  taxonomicLevelSerotype: string[];
   taxonomicLevelSpecies: string;
   taxonomicLevelStrain: string[];
 }

@@ -46,10 +46,18 @@ function buildOrganism(
     taxonomicLevelDomain: genome.taxonomicLevelDomain,
     taxonomicLevelFamily: genome.taxonomicLevelFamily,
     taxonomicLevelGenus: genome.taxonomicLevelGenus,
+    taxonomicLevelIsolate: accumulateArrayValue(
+      organism?.taxonomicLevelIsolate,
+      genome.taxonomicLevelIsolate
+    ),
     taxonomicLevelKingdom: genome.taxonomicLevelKingdom,
     taxonomicLevelOrder: genome.taxonomicLevelOrder,
     taxonomicLevelPhylum: genome.taxonomicLevelPhylum,
     taxonomicLevelRealm: genome.taxonomicLevelRealm,
+    taxonomicLevelSerotype: accumulateArrayValue(
+      organism?.taxonomicLevelSerotype,
+      genome.taxonomicLevelSerotype
+    ),
     taxonomicLevelSpecies: genome.taxonomicLevelSpecies,
     taxonomicLevelStrain: accumulateArrayValue(
       organism?.taxonomicLevelStrain,

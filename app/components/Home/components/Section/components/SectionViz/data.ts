@@ -25,7 +25,7 @@ export interface TaxonomyNode {
   ncbi_tax_id: string;
 
   /**
-   * Taxonomic rank (e.g., "domain", "phylum", "class", "order", "family", "genus", "species", "strain")
+   * Taxonomic rank (e.g., "domain", "phylum", "class", "order", "family", "genus", "species", "strain", "serotype", "isolate")
    * This is optional as some nodes might not have rank specified
    */
   rank?: string;

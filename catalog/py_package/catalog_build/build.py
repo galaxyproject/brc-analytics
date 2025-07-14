@@ -238,12 +238,40 @@ def get_taxonomic_level_id_key(level):
     return f"{get_taxonomic_level_key(level)}Id"
 
 
-def get_species_row(taxon_info, taxonomic_group_sets, taxonomic_levels, name_info=None):
+def get_species_row(
+    taxon_info,
+    taxonomic_group_sets,
+    taxonomic_levels,
+    name_info=None,
+    taxon_name_map=None,
+    taxon_rank_map=None,
+):
     # print(f"get_species_row: {taxon_info}")
     classification = taxon_info["taxonomy"]["classification"]
     species_info = classification["species"]
     taxonomy_id = taxon_info["taxonomy"]["tax_id"]
     ancestor_taxonomy_ids = taxon_info["taxonomy"]["parents"]
+
+    # If we need to support serotype and isolate, ensure we have name and rank maps
+    if any(level in taxonomic_levels for level in ["serotype", "isolate"]):
+        if taxon_name_map is None:
+            taxon_name_map = {}
+        if taxon_rank_map is None:
+            taxon_rank_map = {}
+
+        # Fetch info for all ancestor taxonomy IDs
+        fetch_taxa_info(ancestor_taxonomy_ids, taxon_name_map, taxon_rank_map)
+
+        # Now extend the classification with serotype and isolate if they exist
+        for tax_id in ancestor_taxonomy_ids:
+            str_tax_id = str(tax_id)
+            if str_tax_id in taxon_rank_map:
+                rank = taxon_rank_map[str_tax_id].lower()
+                if rank in taxonomic_levels and rank not in classification:
+                    classification[rank] = {
+                        "name": taxon_name_map[str_tax_id],
+                        "id": str_tax_id,
+                    }
 
     own_level = (
         taxon_info["taxonomy"]["rank"].lower()
@@ -332,6 +360,10 @@ def get_species_df(
     Returns:
       DataFrame containing species information
     """
+    # Create maps to store taxon names and ranks if we need serotype or isolate
+    taxon_name_map = {}
+    taxon_rank_map = {}
+
     # Create a dictionary mapping tax_id to name_info for easy lookup
     name_info_dict = {
         str(info["taxonomy"]["tax_id"]): info for info in species_name_info
@@ -343,7 +375,14 @@ def get_species_df(
         tax_id = str(info["taxonomy"]["tax_id"])
         name_info = name_info_dict.get(tax_id)
         rows.append(
-            get_species_row(info, taxonomic_group_sets, taxonomic_levels, name_info)
+            get_species_row(
+                info,
+                taxonomic_group_sets,
+                taxonomic_levels,
+                name_info,
+                taxon_name_map,
+                taxon_rank_map,
+            )
         )
 
     return pd.DataFrame(rows)

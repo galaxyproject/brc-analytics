@@ -31,10 +31,6 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
           },
           {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
-          },
-          {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME,
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.COMMON_NAME,
           },
@@ -195,6 +191,24 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
       },
       {
         componentConfig: {
+          component: C.NTagCell,
+          viewBuilder: V.buildOrganismTaxonomicLevelSerotype,
+        } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogOrganism>,
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SEROTYPE,
+        id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SEROTYPE,
+        width: { max: "1fr", min: "auto" },
+      },
+      {
+        componentConfig: {
+          component: C.NTagCell,
+          viewBuilder: V.buildOrganismTaxonomicLevelIsolate,
+        } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogOrganism>,
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_ISOLATE,
+        id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ISOLATE,
+        width: { max: "1fr", min: "auto" },
+      },
+      {
+        componentConfig: {
           component: C.BasicCell,
           viewBuilder: V.buildCommonName,
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
@@ -257,6 +271,8 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ORDER]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_PHYLUM]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN]: false,
+          [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SEROTYPE]: false,
+          [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ISOLATE]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_REALM]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_DOMAIN]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME]: false,

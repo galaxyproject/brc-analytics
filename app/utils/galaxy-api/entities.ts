@@ -26,6 +26,7 @@ export type WorkflowParameterValue =
   | WorkflowPairedCollectionParameter;
 
 export interface WorkflowUrlParameter {
+  dbkey?: string;
   ext: string;
   src: string;
   url: string;
