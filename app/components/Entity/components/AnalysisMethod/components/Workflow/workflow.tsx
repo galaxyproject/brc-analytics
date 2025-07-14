@@ -90,7 +90,7 @@ export const Workflow = ({
                 );
               }}
             >
-              View on IWC
+              View Workflow Details
             </Button>
           </Grid>
         )}
