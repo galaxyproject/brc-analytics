@@ -12260,12 +12260,64 @@
     ]
   },
   {
-    "assemblyCount": 1,
+    "assemblyCount": 2,
     "assemblyTaxonomyIds": [
       "164328"
     ],
     "commonName": null,
     "genomes": [
+      {
+        "accession": "GCA_020800235.1",
+        "annotationStatus": null,
+        "chromosomes": null,
+        "commonName": null,
+        "coverage": "180",
+        "gcPercent": 54.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/020/800/235/GCA_020800235.1/genes/GCA_020800235.1_ASM2080023v1.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 57500797,
+        "level": "Scaffold",
+        "lineageTaxonomyIds": [
+          "1",
+          "131567",
+          "2759",
+          "2698737",
+          "33634",
+          "4762",
+          "4776",
+          "4777",
+          "4783",
+          "164328"
+        ],
+        "ncbiTaxonomyId": "164328",
+        "otherTaxa": null,
+        "ploidy": [
+          "POLYPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 27,
+        "scaffoldL50": 7,
+        "scaffoldN50": 3522112,
+        "speciesTaxonomyId": "164328",
+        "strainName": "14567",
+        "taxonomicGroup": [
+          "Oomycota"
+        ],
+        "taxonomicLevelClass": "None",
+        "taxonomicLevelDomain": "Eukaryota",
+        "taxonomicLevelFamily": "Peronosporaceae",
+        "taxonomicLevelGenus": "Phytophthora",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "None",
+        "taxonomicLevelOrder": "Peronosporales",
+        "taxonomicLevelPhylum": "Oomycota",
+        "taxonomicLevelRealm": "None",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Phytophthora ramorum",
+        "taxonomicLevelStrain": "Phytophthora ramorum strain 14567",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_020800235.1"
+      },
       {
         "accession": "GCF_020800215.1",
         "annotationStatus": "Full annotation",
@@ -12342,6 +12394,7 @@
     ],
     "taxonomicLevelSpecies": "Phytophthora ramorum",
     "taxonomicLevelStrain": [
+      "Phytophthora ramorum strain 14567",
       "None"
     ]
   },
@@ -20234,7 +20287,7 @@
     ]
   },
   {
-    "assemblyCount": 11,
+    "assemblyCount": 12,
     "assemblyTaxonomyIds": [
       "454284",
       "469470",
@@ -20838,6 +20891,65 @@
         "taxonomicLevelSpecies": "Coccidioides posadasii",
         "taxonomicLevelStrain": "Coccidioides posadasii C735 delta SOWgp",
         "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000151335.2"
+      },
+      {
+        "accession": "GCF_018416015.1",
+        "annotationStatus": "Full annotation",
+        "chromosomes": 9,
+        "commonName": null,
+        "coverage": "475",
+        "gcPercent": 46.5,
+        "geneModelUrl": null,
+        "isRef": "No",
+        "length": 28193268,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "131567",
+          "2759",
+          "33154",
+          "4751",
+          "451864",
+          "4890",
+          "716545",
+          "147538",
+          "716546",
+          "147545",
+          "451871",
+          "33183",
+          "33184",
+          "5500",
+          "199306",
+          "443226"
+        ],
+        "ncbiTaxonomyId": "443226",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "HIGH",
+        "priorityPathogenName": "Coccidioides posadasii",
+        "scaffoldCount": 9,
+        "scaffoldL50": 2,
+        "scaffoldN50": 8079863,
+        "speciesTaxonomyId": "199306",
+        "strainName": "Silveira",
+        "taxonomicGroup": [
+          "Ascomycota"
+        ],
+        "taxonomicLevelClass": "Eurotiomycetes",
+        "taxonomicLevelDomain": "Eukaryota",
+        "taxonomicLevelFamily": "Onygenaceae",
+        "taxonomicLevelGenus": "Coccidioides",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Fungi",
+        "taxonomicLevelOrder": "Onygenales",
+        "taxonomicLevelPhylum": "Ascomycota",
+        "taxonomicLevelRealm": "None",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Coccidioides posadasii",
+        "taxonomicLevelStrain": "Coccidioides posadasii str. Silveira",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_018416015.2"
       },
       {
         "accession": "GCF_018416015.2",
@@ -55973,7 +56085,7 @@
     ]
   },
   {
-    "assemblyCount": 6,
+    "assemblyCount": 7,
     "assemblyTaxonomyIds": [
       "33727",
       "378830",
@@ -56258,6 +56370,60 @@
         "taxonomicLevelSpecies": "Orthomarburgvirus marburgense",
         "taxonomicLevelStrain": "Orthomarburgvirus marburgense strain Leiden",
         "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_031129775.1"
+      },
+      {
+        "accession": "GCF_000857325.2",
+        "annotationStatus": null,
+        "chromosomes": 1,
+        "commonName": "MBG",
+        "coverage": null,
+        "gcPercent": 38.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/857/325/GCF_000857325.2/genes/GCF_000857325.2_ViralProj15199.ncbiGene.gtf.gz",
+        "isRef": "No",
+        "length": 19111,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "10239",
+          "2559587",
+          "2732396",
+          "2497569",
+          "2497570",
+          "2497574",
+          "11157",
+          "1955138",
+          "11266",
+          "3044783",
+          "3052505"
+        ],
+        "ncbiTaxonomyId": "3052505",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "CRITICAL",
+        "priorityPathogenName": "Filoviridae",
+        "scaffoldCount": 1,
+        "scaffoldL50": 1,
+        "scaffoldN50": 19111,
+        "speciesTaxonomyId": "3052505",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Viruses"
+        ],
+        "taxonomicLevelClass": "Monjiviricetes",
+        "taxonomicLevelDomain": "None",
+        "taxonomicLevelFamily": "Filoviridae",
+        "taxonomicLevelGenus": "Orthomarburgvirus",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Orthornavirae",
+        "taxonomicLevelOrder": "Mononegavirales",
+        "taxonomicLevelPhylum": "Negarnaviricota",
+        "taxonomicLevelRealm": "Riboviria",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Orthomarburgvirus marburgense",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000857325.2"
       },
       {
         "accession": "GCF_000943645.1",
@@ -78046,7 +78212,7 @@
     ]
   },
   {
-    "assemblyCount": 1,
+    "assemblyCount": 2,
     "assemblyTaxonomyIds": [
       "34620"
     ],
@@ -78114,6 +78280,69 @@
         "taxonomicLevelSpecies": "Dermacentor andersoni",
         "taxonomicLevelStrain": "None",
         "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_023375915.1"
+      },
+      {
+        "accession": "GCF_023375885.1",
+        "annotationStatus": "Full annotation",
+        "chromosomes": null,
+        "commonName": null,
+        "coverage": "38",
+        "gcPercent": 46.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/023/375/885/GCF_023375885.1/genes/GCF_023375885.1_qqDerAnde1.2.ncbiRefSeq.gtf.gz",
+        "isRef": "No",
+        "length": 2485971885,
+        "level": "Scaffold",
+        "lineageTaxonomyIds": [
+          "1",
+          "131567",
+          "2759",
+          "33154",
+          "33208",
+          "6072",
+          "33213",
+          "33317",
+          "1206794",
+          "88770",
+          "6656",
+          "6843",
+          "6854",
+          "6933",
+          "6934",
+          "6935",
+          "297308",
+          "6939",
+          "426437",
+          "34619",
+          "34620"
+        ],
+        "ncbiTaxonomyId": "34620",
+        "otherTaxa": null,
+        "ploidy": [
+          "DIPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 3118,
+        "scaffoldL50": 12,
+        "scaffoldN50": 56155975,
+        "speciesTaxonomyId": "34620",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Arthropoda"
+        ],
+        "taxonomicLevelClass": "Arachnida",
+        "taxonomicLevelDomain": "Eukaryota",
+        "taxonomicLevelFamily": "Ixodidae",
+        "taxonomicLevelGenus": "Dermacentor",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Metazoa",
+        "taxonomicLevelOrder": "Ixodida",
+        "taxonomicLevelPhylum": "Arthropoda",
+        "taxonomicLevelRealm": "None",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Dermacentor andersoni",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_023375885.1"
       }
     ],
     "ncbiTaxonomyId": "34620",
@@ -102154,7 +102383,7 @@
     ]
   },
   {
-    "assemblyCount": 2,
+    "assemblyCount": 3,
     "assemblyTaxonomyIds": [
       "412133"
     ],
@@ -102211,6 +102440,58 @@
         "taxonomicLevelSpecies": "Trichomonas vaginalis",
         "taxonomicLevelStrain": "Trichomonas vaginalis strain G3",
         "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000002825.3"
+      },
+      {
+        "accession": "GCF_000002825.2",
+        "annotationStatus": null,
+        "chromosomes": null,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 33,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/002/825/GCF_000002825.2/genes/GCF_000002825.2_ASM282v1.ncbiRefSeq.gtf.gz",
+        "isRef": "No",
+        "length": 176420065,
+        "level": "Scaffold",
+        "lineageTaxonomyIds": [
+          "1",
+          "131567",
+          "2759",
+          "2611341",
+          "5719",
+          "37104",
+          "181550",
+          "5721",
+          "5722",
+          "412133"
+        ],
+        "ncbiTaxonomyId": "412133",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 64769,
+        "scaffoldL50": 1020,
+        "scaffoldN50": 27122,
+        "speciesTaxonomyId": "5722",
+        "strainName": "G3; ATCC PRA-98",
+        "taxonomicGroup": [
+          "Metamonada"
+        ],
+        "taxonomicLevelClass": "None",
+        "taxonomicLevelDomain": "Eukaryota",
+        "taxonomicLevelFamily": "Trichomonadidae",
+        "taxonomicLevelGenus": "Trichomonas",
+        "taxonomicLevelIsolate": "Trichomonas vaginalis G3",
+        "taxonomicLevelKingdom": "None",
+        "taxonomicLevelOrder": "Trichomonadida",
+        "taxonomicLevelPhylum": "Parabasalia",
+        "taxonomicLevelRealm": "None",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Trichomonas vaginalis",
+        "taxonomicLevelStrain": "Trichomonas vaginalis strain G3; ATCC PRA-98",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002825.2"
       },
       {
         "accession": "GCF_026262505.1",
@@ -102288,7 +102569,8 @@
     ],
     "taxonomicLevelSpecies": "Trichomonas vaginalis",
     "taxonomicLevelStrain": [
-      "Trichomonas vaginalis strain G3"
+      "Trichomonas vaginalis strain G3",
+      "Trichomonas vaginalis strain G3; ATCC PRA-98"
     ]
   },
   {
@@ -104535,7 +104817,7 @@
     ]
   },
   {
-    "assemblyCount": 1,
+    "assemblyCount": 2,
     "assemblyTaxonomyIds": [
       "5802"
     ],
@@ -104595,6 +104877,61 @@
         "taxonomicLevelSpecies": "Eimeria tenella",
         "taxonomicLevelStrain": "None",
         "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_905310635.1"
+      },
+      {
+        "accession": "GCF_000499545.1",
+        "annotationStatus": null,
+        "chromosomes": null,
+        "commonName": null,
+        "coverage": "168",
+        "gcPercent": 51.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/499/545/GCF_000499545.1/genes/GCF_000499545.1_ETH001.ncbiRefSeq.gtf.gz",
+        "isRef": "No",
+        "length": 51859607,
+        "level": "Scaffold",
+        "lineageTaxonomyIds": [
+          "1",
+          "131567",
+          "2759",
+          "2698737",
+          "33630",
+          "5794",
+          "1280412",
+          "5796",
+          "75739",
+          "423054",
+          "5799",
+          "5800",
+          "5802"
+        ],
+        "ncbiTaxonomyId": "5802",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 4664,
+        "scaffoldL50": 68,
+        "scaffoldN50": 200914,
+        "speciesTaxonomyId": "5802",
+        "strainName": "Houghton",
+        "taxonomicGroup": [
+          "Apicomplexa"
+        ],
+        "taxonomicLevelClass": "Conoidasida",
+        "taxonomicLevelDomain": "Eukaryota",
+        "taxonomicLevelFamily": "Eimeriidae",
+        "taxonomicLevelGenus": "Eimeria",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "None",
+        "taxonomicLevelOrder": "Eucoccidiorida",
+        "taxonomicLevelPhylum": "Apicomplexa",
+        "taxonomicLevelRealm": "None",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Eimeria tenella",
+        "taxonomicLevelStrain": "Eimeria tenella strain Houghton",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000499545.1"
       }
     ],
     "ncbiTaxonomyId": "5802",
@@ -104620,7 +104957,8 @@
     ],
     "taxonomicLevelSpecies": "Eimeria tenella",
     "taxonomicLevelStrain": [
-      "None"
+      "None",
+      "Eimeria tenella strain Houghton"
     ]
   },
   {
@@ -106643,7 +106981,7 @@
     ]
   },
   {
-    "assemblyCount": 19,
+    "assemblyCount": 20,
     "assemblyTaxonomyIds": [
       "5833",
       "36329"
@@ -107621,6 +107959,61 @@
         "taxonomicLevelSpecies": "Plasmodium falciparum",
         "taxonomicLevelStrain": "None",
         "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900632095.1"
+      },
+      {
+        "accession": "GCF_000002765.5",
+        "annotationStatus": "Full annotation",
+        "chromosomes": 14,
+        "commonName": null,
+        "coverage": "100",
+        "gcPercent": 19.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/002/765/GCF_000002765.5/genes/GCF_000002765.5_GCA_000002765.ncbiRefSeq.gtf.gz",
+        "isRef": "No",
+        "length": 23292622,
+        "level": "Complete Genome",
+        "lineageTaxonomyIds": [
+          "1",
+          "131567",
+          "2759",
+          "2698737",
+          "33630",
+          "5794",
+          "422676",
+          "5819",
+          "1639119",
+          "5820",
+          "418107",
+          "5833",
+          "36329"
+        ],
+        "ncbiTaxonomyId": "36329",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": "HIGH",
+        "priorityPathogenName": "Plasmodium falciparum",
+        "scaffoldCount": 14,
+        "scaffoldL50": 5,
+        "scaffoldN50": 1687656,
+        "speciesTaxonomyId": "5833",
+        "strainName": null,
+        "taxonomicGroup": [
+          "Apicomplexa"
+        ],
+        "taxonomicLevelClass": "Aconoidasida",
+        "taxonomicLevelDomain": "Eukaryota",
+        "taxonomicLevelFamily": "Plasmodiidae",
+        "taxonomicLevelGenus": "Plasmodium",
+        "taxonomicLevelIsolate": "Plasmodium falciparum 3D7",
+        "taxonomicLevelKingdom": "None",
+        "taxonomicLevelOrder": "Haemosporida",
+        "taxonomicLevelPhylum": "Apicomplexa",
+        "taxonomicLevelRealm": "None",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Plasmodium falciparum",
+        "taxonomicLevelStrain": "None",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002765.5"
       },
       {
         "accession": "GCF_000002765.6",
@@ -110387,6 +110780,93 @@
     "taxonomicLevelSpecies": "Theileria equi",
     "taxonomicLevelStrain": [
       "Theileria equi strain WA"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "5874"
+    ],
+    "commonName": null,
+    "genomes": [
+      {
+        "accession": "GCA_000003225.1",
+        "annotationStatus": null,
+        "chromosomes": 4,
+        "commonName": null,
+        "coverage": null,
+        "gcPercent": 32.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/000/003/225/GCA_000003225.1/genes/GCA_000003225.1_ASM322v1.ncbiGene.gtf.gz",
+        "isRef": "Yes",
+        "length": 8352220,
+        "level": "Chromosome",
+        "lineageTaxonomyIds": [
+          "1",
+          "131567",
+          "2759",
+          "2698737",
+          "33630",
+          "5794",
+          "422676",
+          "5863",
+          "27994",
+          "5873",
+          "5874"
+        ],
+        "ncbiTaxonomyId": "5874",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "scaffoldCount": 7,
+        "scaffoldL50": 2,
+        "scaffoldN50": 1979170,
+        "speciesTaxonomyId": "5874",
+        "strainName": "Ankara isolate clone C9",
+        "taxonomicGroup": [
+          "Apicomplexa"
+        ],
+        "taxonomicLevelClass": "Aconoidasida",
+        "taxonomicLevelDomain": "Eukaryota",
+        "taxonomicLevelFamily": "Theileriidae",
+        "taxonomicLevelGenus": "Theileria",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "None",
+        "taxonomicLevelOrder": "Piroplasmida",
+        "taxonomicLevelPhylum": "Apicomplexa",
+        "taxonomicLevelRealm": "None",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Theileria annulata",
+        "taxonomicLevelStrain": "Theileria annulata strain Ankara isolate clone C9",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000003225.1"
+      }
+    ],
+    "ncbiTaxonomyId": "5874",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Apicomplexa"
+    ],
+    "taxonomicLevelClass": "Aconoidasida",
+    "taxonomicLevelDomain": "Eukaryota",
+    "taxonomicLevelFamily": "Theileriidae",
+    "taxonomicLevelGenus": "Theileria",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "None",
+    "taxonomicLevelOrder": "Piroplasmida",
+    "taxonomicLevelPhylum": "Apicomplexa",
+    "taxonomicLevelRealm": "None",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Theileria annulata",
+    "taxonomicLevelStrain": [
+      "Theileria annulata strain Ankara isolate clone C9"
     ]
   },
   {
