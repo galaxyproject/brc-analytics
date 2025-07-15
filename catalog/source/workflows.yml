@@ -1,4 +1,34 @@
 workflows:
+  - trs_id: "#workflow/github.com/iwc-workflows/annotation-maker/main/versions/v0.1"
+    categories: []
+    workflow_name: Genome annotation with Maker
+    workflow_description:
+      This workflow allows for genome annotation using Maker and
+      evaluates the quality of the annotation.
+    ploidy: ANY
+    parameters:
+      - key: BUSCO lineage
+        type_guide:
+          class: text
+      - key: Genome sequence
+        type_guide:
+          class: File
+          ext: fasta
+      - key: Genome assembly
+        type_guide:
+          class: File
+          ext: fasta
+      - key: Protein sequences
+        type_guide:
+          class: File
+      - key: Augustus training
+        type_guide:
+          class: File
+      - key: SNAP training
+        type_guide:
+          class: File
+    active: false
+    iwc_id: annotation-maker-main
   - trs_id: "#workflow/github.com/iwc-workflows/assembly-with-flye/main/versions/v0.2"
     categories:
       - ASSEMBLY
@@ -12,6 +42,7 @@ workflows:
         type_guide:
           class: File
     active: false
+    iwc_id: assembly-with-flye-main
   - trs_id: "#workflow/github.com/iwc-workflows/atacseq/main/versions/v1.0"
     categories:
       - REGULATION
@@ -29,6 +60,7 @@ workflows:
       - key: reference_genome
         variable: ASSEMBLY_ID
     active: true
+    iwc_id: atacseq-main
   - trs_id: "#workflow/github.com/iwc-workflows/average-bigwig-between-replicates/main/versions/v0.2"
     categories:
       - REGULATION
@@ -49,7 +81,8 @@ workflows:
         type_guide:
           class: integer
     active: false
-  - trs_id: "#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v1.1.5"
+    iwc_id: average-bigwig-between-replicates-main
+  - trs_id: "#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v1.1.7"
     categories:
       - ASSEMBLY
     workflow_name: Bacterial Genome Assembly using Shovill
@@ -75,6 +108,7 @@ workflows:
             - fastqsanger
             - fastqsanger.gz
     active: false
+    iwc_id: bacterial-genome-assembly-main
   - trs_id: "#workflow/github.com/iwc-workflows/baredsc/baredSC-1d-logNorm/versions/v0.6"
     categories:
       - TRANSCRIPTOMICS
@@ -101,6 +135,7 @@ workflows:
         type_guide:
           class: integer
     active: false
+    iwc_id: baredsc-baredsc-1d-lognorm
   - trs_id: "#workflow/github.com/iwc-workflows/baredsc/baredSC-2d-logNorm/versions/v0.6"
     categories:
       - TRANSCRIPTOMICS
@@ -136,6 +171,7 @@ workflows:
         type_guide:
           class: boolean
     active: false
+    iwc_id: baredsc-baredsc-2d-lognorm
   - trs_id: "#workflow/github.com/iwc-workflows/brew3r/main/versions/v0.2"
     categories:
       - TRANSCRIPTOMICS
@@ -167,6 +203,7 @@ workflows:
         type_guide:
           class: float
     active: false
+    iwc_id: brew3r-main
   - trs_id: "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.14"
     categories:
       - REGULATION
@@ -183,6 +220,7 @@ workflows:
       - key: reference_genome
         variable: ASSEMBLY_ID
     active: true
+    iwc_id: chipseq-pe-main
   - trs_id: "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.14"
     categories:
       - REGULATION
@@ -199,6 +237,7 @@ workflows:
       - key: reference_genome
         variable: ASSEMBLY_ID
     active: true
+    iwc_id: chipseq-sr-main
   - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.3"
     categories:
       - REGULATION
@@ -213,6 +252,7 @@ workflows:
     ploidy: ANY
     parameters: []
     active: true
+    iwc_id: consensus-peaks-consensus-peaks-atac-cutandrun
   - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-pe/versions/v1.3"
     categories:
       - REGULATION
@@ -227,6 +267,7 @@ workflows:
     ploidy: ANY
     parameters: []
     active: false
+    iwc_id: consensus-peaks-consensus-peaks-chip-pe
   - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-sr/versions/v1.3"
     categories:
       - REGULATION
@@ -241,6 +282,7 @@ workflows:
     ploidy: ANY
     parameters: []
     active: false
+    iwc_id: consensus-peaks-consensus-peaks-chip-sr
   - trs_id: "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.14"
     categories:
       - REGULATION
@@ -257,6 +299,7 @@ workflows:
       - key: reference_genome
         variable: ASSEMBLY_ID
     active: true
+    iwc_id: cutandrun-main
   - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.2"
     categories:
       - TRANSCRIPTOMICS
@@ -277,6 +320,7 @@ workflows:
       - key: gtf
         variable: GENE_MODEL_URL
     active: true
+    iwc_id: fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-cellplex
   - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.2"
     categories:
       - TRANSCRIPTOMICS
@@ -295,6 +339,7 @@ workflows:
       - key: gtf
         variable: GENE_MODEL_URL
     active: true
+    iwc_id: fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-v3
   - trs_id: "#workflow/github.com/iwc-workflows/generic-variant-calling-wgs-pe/main/versions/v0.1.1"
     categories:
       - VARIANT_CALLING
@@ -318,6 +363,7 @@ workflows:
         type_guide:
           class: text
     active: false
+    iwc_id: generic-variant-calling-wgs-pe-main
   - trs_id: "#workflow/github.com/iwc-workflows/goseq/main/versions/v0.1"
     categories:
       - TRANSCRIPTOMICS
@@ -351,6 +397,7 @@ workflows:
           class: File
           ext: tabular
     active: false
+    iwc_id: goseq-main
   - trs_id: "#workflow/github.com/iwc-workflows/haploid-variant-calling-wgs-pe/main/versions/v0.1"
     categories:
       - VARIANT_CALLING
@@ -361,17 +408,18 @@ workflows:
     ploidy: HAPLOID
     parameters:
       - key: Paired Collection
+        variable: SANGER_READ_RUN
         type_guide:
           class: Collection
           ext:
             - fastqsanger
             - fastqsanger.gz
-        variable: SANGER_READ_RUN
       - key: Annotation GTF
         variable: GENE_MODEL_URL
       - key: Genome fasta
         variable: ASSEMBLY_FASTA_URL
     active: true
+    iwc_id: haploid-variant-calling-wgs-pe-main
   - trs_id: "#workflow/github.com/iwc-workflows/hic-hicup-cooler/chic-fastq-to-cool-hicup-cooler/versions/v0.3"
     categories:
       - REGULATION
@@ -416,6 +464,7 @@ workflows:
         type_guide:
           class: integer
     active: false
+    iwc_id: hic-hicup-cooler-chic-fastq-to-cool-hicup-cooler
   - trs_id: "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-cool-hicup-cooler/versions/v0.3"
     categories:
       - REGULATION
@@ -454,6 +503,7 @@ workflows:
         type_guide:
           class: text
     active: false
+    iwc_id: hic-hicup-cooler-hic-fastq-to-cool-hicup-cooler
   - trs_id: "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-pairs-hicup/versions/v0.3"
     categories:
       - REGULATION
@@ -484,6 +534,7 @@ workflows:
         type_guide:
           class: integer
     active: false
+    iwc_id: hic-hicup-cooler-hic-fastq-to-pairs-hicup
   - trs_id: "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-juicermediumtabix-to-cool-cooler/versions/v0.3"
     categories:
       - REGULATION
@@ -509,6 +560,24 @@ workflows:
         type_guide:
           class: text
     active: false
+    iwc_id: hic-hicup-cooler-hic-juicermediumtabix-to-cool-cooler
+  - trs_id: "#workflow/github.com/iwc-workflows/influenza-isolates-consensus-and-subtyping/main/versions/v0.2"
+    categories:
+      - CONSENSUS_SEQUENCES
+    workflow_name: Influenza A isolate subtyping and consensus sequence generation
+    workflow_description:
+      This workflow performs subtyping and consensus sequence generation
+      for batches of Illumina PE sequenced Influenza A isolates.
+    ploidy: ANY
+    parameters:
+      - key: References per segment collection
+        type_guide:
+          class: Collection
+      - key: Sequenced paired-end data
+        type_guide:
+          class: Collection
+    active: false
+    iwc_id: influenza-isolates-consensus-and-subtyping-main
   - trs_id: "#workflow/github.com/iwc-workflows/mapseq-to-ampvis2/main/versions/v0.2"
     categories: []
     workflow_name: MAPseq to ampvis2
@@ -525,6 +594,7 @@ workflows:
         type_guide:
           class: File
     active: false
+    iwc_id: mapseq-to-ampvis2-main
   - trs_id: "#workflow/github.com/iwc-workflows/polish-with-long-reads/main/versions/v0.1"
     categories:
       - ASSEMBLY
@@ -542,6 +612,7 @@ workflows:
         type_guide:
           class: text
     active: false
+    iwc_id: polish-with-long-reads-main
   - trs_id: "#workflow/github.com/iwc-workflows/pox-virus-amplicon/main/versions/v0.3"
     categories:
       - CONSENSUS_SEQUENCES
@@ -573,6 +644,7 @@ workflows:
         type_guide:
           class: float
     active: true
+    iwc_id: pox-virus-amplicon-main
   - trs_id: "#workflow/github.com/iwc-workflows/pseudobulk-worflow-decoupler-edger/main/versions/v0.1.1"
     categories:
       - TRANSCRIPTOMICS
@@ -614,7 +686,8 @@ workflows:
         type_guide:
           class: text
     active: false
-  - trs_id: "#workflow/github.com/iwc-workflows/quality-and-contamination-control/main/versions/v1.1.6"
+    iwc_id: pseudobulk-worflow-decoupler-edger-main
+  - trs_id: "#workflow/github.com/iwc-workflows/quality-and-contamination-control/main/versions/v1.1.9"
     categories:
       - ASSEMBLY
     workflow_name: Quality and Contamination Control For Genome Assembly
@@ -646,6 +719,7 @@ workflows:
         type_guide:
           class: text
     active: false
+    iwc_id: quality-and-contamination-control-main
   - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-de/main/versions/v0.4"
     categories:
       - TRANSCRIPTOMICS
@@ -679,6 +753,7 @@ workflows:
         type_guide:
           class: float
     active: false
+    iwc_id: rnaseq-de-main
   - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.2"
     categories:
       - TRANSCRIPTOMICS
@@ -698,6 +773,7 @@ workflows:
       - key: GTF file of annotation
         variable: GENE_MODEL_URL
     active: true
+    iwc_id: rnaseq-pe-main
   - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.2"
     categories:
       - TRANSCRIPTOMICS
@@ -717,6 +793,7 @@ workflows:
       - key: GTF file of annotation
         variable: GENE_MODEL_URL
     active: true
+    iwc_id: rnaseq-sr-main
   - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-ont-artic-variant-calling/COVID-19-ARTIC-ONT/versions/v0.3.2"
     categories:
       - VARIANT_CALLING
@@ -755,6 +832,33 @@ workflows:
           class: File
           ext: bed
     active: false
+    iwc_id: sars-cov-2-ont-artic-variant-calling-covid-19-artic-ont
+  - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-ivar-analysis/SARS-COV-2-ILLUMINA-AMPLICON-IVAR-PANGOLIN-NEXTCLADE/versions/v0.2.3"
+    categories:
+      - VARIANT_CALLING
+    workflow_name: SARS-CoV-2 Illumina Amplicon pipeline - iVar based
+    workflow_description:
+      Find and annotate variants in ampliconic SARS-CoV-2 Illumina
+      sequencing data and classify samples with pangolin and nextclade
+    ploidy: ANY
+    parameters:
+      - key: Paired read collection for samples
+        type_guide:
+          class: Collection
+      - key: Reference FASTA
+        type_guide:
+          class: File
+      - key: Primer BED
+        type_guide:
+          class: File
+      - key: Read fraction to call variant
+        type_guide:
+          class: float
+      - key: Minimum quality score to call base
+        type_guide:
+          class: integer
+    active: false
+    iwc_id: sars-cov-2-pe-illumina-artic-ivar-analysis-sars-cov-2-illumina-amplicon-ivar-pangolin-nextclade
   - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-variant-calling/COVID-19-PE-ARTIC-ILLUMINA/versions/v0.5.4"
     categories:
       - VARIANT_CALLING
@@ -800,6 +904,7 @@ workflows:
         type_guide:
           class: integer
     active: true
+    iwc_id: sars-cov-2-pe-illumina-artic-variant-calling-covid-19-pe-artic-illumina
   - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-wgs-variant-calling/COVID-19-PE-WGS-ILLUMINA/versions/v0.2.4"
     categories:
       - VARIANT_CALLING
@@ -819,6 +924,7 @@ workflows:
       - key: NC_045512.2 FASTA sequence of SARS-CoV-2
         variable: ASSEMBLY_FASTA_URL
     active: true
+    iwc_id: sars-cov-2-pe-illumina-wgs-variant-calling-covid-19-pe-wgs-illumina
   - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-se-illumina-wgs-variant-calling/COVID-19-SE-WGS-ILLUMINA/versions/v0.1.6"
     categories:
       - VARIANT_CALLING
@@ -838,6 +944,7 @@ workflows:
       - key: NC_045512.2 FASTA sequence of SARS-CoV-2
         variable: ASSEMBLY_FASTA_URL
     active: true
+    iwc_id: sars-cov-2-se-illumina-wgs-variant-calling-covid-19-se-wgs-illumina
   - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-variation-reporting/COVID-19-VARIATION-REPORTING/versions/v0.3.4"
     categories:
       - VARIANT_CALLING
@@ -872,6 +979,7 @@ workflows:
         type_guide:
           class: integer
     active: false
+    iwc_id: sars-cov-2-variation-reporting-covid-19-variation-reporting
   - trs_id: "#workflow/github.com/iwc-workflows/variation-reporting/main/versions/v0.1.1"
     categories:
       - VARIANT_CALLING
@@ -899,3 +1007,4 @@ workflows:
         type_guide:
           class: integer
     active: false
+    iwc_id: variation-reporting-main

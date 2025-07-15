@@ -5,7 +5,7 @@ import { Props } from "./types";
 import { TEXT_BODY_500 } from "@databiosphere/findable-ui/lib/theme/common/typography";
 import { StyledGrid } from "./workflow.styles";
 import { TYPOGRAPHY_PROPS } from "../../constants";
-import { BUTTON_PROPS, GRID_PROPS } from "./constants";
+import { BUTTON_PROPS, GRID_PROPS, OUTLINED_BUTTON_PROPS } from "./constants";
 import { getWorkflowLandingUrl } from "../../../../../../utils/galaxy-api/galaxy-api";
 import {
   ANCHOR_TARGET,
@@ -24,7 +24,7 @@ export const Workflow = ({
   isFeatureEnabled,
   workflow,
 }: Props): JSX.Element => {
-  const { parameters, workflowDescription, workflowName } = workflow;
+  const { iwcId, parameters, workflowDescription, workflowName } = workflow;
   const { data: landingUrl, isLoading, run } = useAsync<string>();
   return (
     <StyledGrid {...GRID_PROPS}>
@@ -33,45 +33,67 @@ export const Workflow = ({
         <Typography variant={TEXT_BODY_500}>{workflowName}</Typography>
         <Typography {...TYPOGRAPHY_PROPS}>{workflowDescription}</Typography>
       </Grid>
-      {isFeatureEnabled ? (
-        <Button
-          {...BUTTON_PROPS}
-          component={Link}
-          disabled={!workflow.trsId}
-          href={replaceParameters(ROUTES.CONFIGURE_WORKFLOW, {
-            entityId,
-            trsId: formatTrsId(workflow.trsId),
-          })}
-          rel={REL_ATTRIBUTE.NO_OPENER}
-        >
-          Configure Inputs
-        </Button>
-      ) : (
-        <Button
-          {...BUTTON_PROPS}
-          disabled={!workflow.trsId}
-          onClick={async (): Promise<void> => {
-            const url =
-              landingUrl ??
-              (await run(
-                getWorkflowLandingUrl(
-                  workflow.trsId,
-                  genomeVersionAssemblyId,
-                  geneModelUrl,
-                  null, // Read runs.
-                  parameters
-                )
-              ));
-            window.open(
-              url,
-              ANCHOR_TARGET.BLANK,
-              REL_ATTRIBUTE.NO_OPENER_NO_REFERRER
-            );
-          }}
-        >
-          Launch in Galaxy
-        </Button>
-      )}
+      <Grid container spacing={1}>
+        {isFeatureEnabled ? (
+          <Grid>
+            <Button
+              {...BUTTON_PROPS}
+              component={Link}
+              disabled={!workflow.trsId}
+              href={replaceParameters(ROUTES.CONFIGURE_WORKFLOW, {
+                entityId,
+                trsId: formatTrsId(workflow.trsId),
+              })}
+              rel={REL_ATTRIBUTE.NO_OPENER}
+            >
+              Configure Inputs
+            </Button>
+          </Grid>
+        ) : (
+          <Grid>
+            <Button
+              {...BUTTON_PROPS}
+              disabled={!workflow.trsId}
+              onClick={async (): Promise<void> => {
+                const url =
+                  landingUrl ??
+                  (await run(
+                    getWorkflowLandingUrl(
+                      workflow.trsId,
+                      genomeVersionAssemblyId,
+                      geneModelUrl,
+                      null, // Read runs.
+                      parameters
+                    )
+                  ));
+                window.open(
+                  url,
+                  ANCHOR_TARGET.BLANK,
+                  REL_ATTRIBUTE.NO_OPENER_NO_REFERRER
+                );
+              }}
+            >
+              Launch in Galaxy
+            </Button>
+          </Grid>
+        )}
+        {iwcId && (
+          <Grid>
+            <Button
+              {...OUTLINED_BUTTON_PROPS}
+              onClick={(): void => {
+                window.open(
+                  `https://iwc.galaxyproject.org/workflow/${iwcId}`,
+                  ANCHOR_TARGET.BLANK,
+                  REL_ATTRIBUTE.NO_OPENER_NO_REFERRER
+                );
+              }}
+            >
+              View Workflow Details
+            </Button>
+          </Grid>
+        )}
+      </Grid>
     </StyledGrid>
   );
 };
