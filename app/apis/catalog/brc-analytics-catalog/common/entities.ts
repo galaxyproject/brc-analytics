@@ -114,6 +114,7 @@ export interface WorkflowCategory {
 }
 
 export interface Workflow {
+  iwcId: string;
   parameters: WorkflowParameter[];
   ploidy: WORKFLOW_PLOIDY;
   taxonomyId: string | null;
