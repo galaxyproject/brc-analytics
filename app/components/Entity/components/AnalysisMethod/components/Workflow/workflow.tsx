@@ -5,7 +5,7 @@ import { Props } from "./types";
 import { TEXT_BODY_500 } from "@databiosphere/findable-ui/lib/theme/common/typography";
 import { StyledGrid } from "./workflow.styles";
 import { TYPOGRAPHY_PROPS } from "../../constants";
-import { BUTTON_PROPS, GRID_PROPS } from "./constants";
+import { BUTTON_PROPS, GRID_PROPS, OUTLINED_BUTTON_PROPS } from "./constants";
 import { getWorkflowLandingUrl } from "../../../../../../utils/galaxy-api/galaxy-api";
 import {
   ANCHOR_TARGET,
@@ -80,8 +80,7 @@ export const Workflow = ({
         {iwcId && (
           <Grid>
             <Button
-              {...BUTTON_PROPS}
-              variant="outlined"
+              {...OUTLINED_BUTTON_PROPS}
               onClick={(): void => {
                 window.open(
                   `https://iwc.galaxyproject.org/workflow/${iwcId}`,
