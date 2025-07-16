@@ -78,6 +78,8 @@ def get_input_types(workflow_definition):
                     step_input_guide["ext"] = input_formats[0]
                 else:
                     step_input_guide["ext"] = input_formats
+            if collection_type := tool_state.get("collection_type"):
+                step_input_guide["collection_type"] = collection_type
             inputs.append(
                 WorkflowParameter(key=step_label, type_guide=step_input_guide)
             )
