@@ -91,7 +91,26 @@ function paramVariableToRequestValue(
             url: geneModelUrl,
           }
         : null;
-    case WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN: {
+    case WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE:
+      if (!readRuns?.length) return null;
+      return {
+        class: "Collection",
+        collection_type: "list",
+        elements: readRuns.map((runInfo) => {
+          const { forward, runAccession } = getSingleRunUrlsInfo(
+            runInfo.urls,
+            runInfo.md5Hashes
+          );
+          return {
+            class: "File",
+            filetype: "fastqsanger.gz",
+            hashes: [{ hash_function: "MD5", hash_value: forward.md5 }],
+            identifier: runAccession,
+            location: forward.url,
+          };
+        }),
+      };
+    case WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_PAIRED: {
       if (!readRuns?.length) return null;
       return {
         class: "Collection",
@@ -130,10 +149,27 @@ function paramVariableToRequestValue(
 }
 
 /**
- * Get run accession and full URLs for the given paired run URLs from ENA.
+ * Get forward read URL and run accession for the given single run URLs from ENA.
+ * @param enaUrls - Concatenated single run URLs, as provided by ENA.
+ * @param enaMd5Hashes - Concatenated MD5 hashes of the files referenced by the URLs, as provided by ENA.
+ * @returns forward read URL and run accession.
+ */
+function getSingleRunUrlsInfo(
+  enaUrls: string,
+  enaMd5Hashes: string
+): {
+  forward: EnaFileInfo;
+  runAccession: string;
+} {
+  const { forward, runAccession } = getRunUrlsInfo(enaUrls, enaMd5Hashes);
+  return { forward, runAccession };
+}
+
+/**
+ * Get forward and reverse read URLs and run accession for the given paired run URLs from ENA.
  * @param enaUrls - Concatenated paired run URLs, as provided by ENA.
  * @param enaMd5Hashes - Concatenated MD5 hashes of the files referenced by the URLs, as provided by ENA.
- * @returns accession, URLs, and hashes for forward and reverse runs.
+ * @returns forward and reverse read URLs and run accession.
  */
 function getPairedRunUrlsInfo(
   enaUrls: string,
@@ -141,6 +177,28 @@ function getPairedRunUrlsInfo(
 ): {
   forward: EnaFileInfo;
   reverse: EnaFileInfo;
+  runAccession: string;
+} {
+  const { forward, reverse, runAccession } = getRunUrlsInfo(
+    enaUrls,
+    enaMd5Hashes
+  );
+  if (!reverse) throw new Error("No reverse read URL found in paired run URLs");
+  return { forward, reverse, runAccession };
+}
+
+/**
+ * Get run accession and full URLs for the given run URLs from ENA.
+ * @param enaUrls - Concatenated paired run URLs, as provided by ENA.
+ * @param enaMd5Hashes - Concatenated MD5 hashes of the files referenced by the URLs, as provided by ENA.
+ * @returns accession, URLs, and hashes for forward and reverse runs.
+ */
+function getRunUrlsInfo(
+  enaUrls: string,
+  enaMd5Hashes: string
+): {
+  forward: EnaFileInfo;
+  reverse: EnaFileInfo | null;
   runAccession: string;
 } {
   const splitUrls = enaUrls.split(";");
@@ -170,7 +228,6 @@ function getPairedRunUrlsInfo(
   if (runAccession === null)
     throw new Error("No URLs with expected format found");
   if (forward === null) throw new Error("No URL for forward read found");
-  if (reverse === null) throw new Error("No URL for reverse read found");
   return { forward, reverse, runAccession };
 }
 

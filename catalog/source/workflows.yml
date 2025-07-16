@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=../schema/generated/workflows.json
 workflows:
   - trs_id: "#workflow/github.com/iwc-workflows/annotation-maker/main/versions/v0.1"
     categories: []
@@ -63,6 +64,7 @@ workflows:
         type_guide:
           class: Collection
           collection_type: list:paired
+        variable: SANGER_READ_RUN_PAIRED
       - key: effective_genome_size
         type_guide:
           class: integer
@@ -233,6 +235,7 @@ workflows:
         type_guide:
           class: Collection
           collection_type: list:paired
+        variable: SANGER_READ_RUN_PAIRED
       - key: adapter_forward
         type_guide:
           class: text
@@ -266,6 +269,7 @@ workflows:
         type_guide:
           class: Collection
           collection_type: list
+        variable: SANGER_READ_RUN_SINGLE
       - key: adapter_forward
         type_guide:
           class: text
@@ -383,6 +387,7 @@ workflows:
         type_guide:
           class: Collection
           collection_type: list:paired
+        variable: SANGER_READ_RUN_PAIRED
       - key: adapter_forward
         type_guide:
           class: text
@@ -461,6 +466,7 @@ workflows:
         type_guide:
           class: Collection
           collection_type: list:paired
+        variable: SANGER_READ_RUN_PAIRED
       - key: cellranger_barcodes_3M-february-2018.txt
         type_guide:
           class: File
@@ -484,6 +490,7 @@ workflows:
           ext:
             - fastqsanger
             - fastqsanger.gz
+        variable: SANGER_READ_RUN_PAIRED
       - key: GenBank genome
         type_guide:
           class: File
@@ -537,7 +544,7 @@ workflows:
     ploidy: HAPLOID
     parameters:
       - key: Paired Collection
-        variable: SANGER_READ_RUN
+        variable: SANGER_READ_RUN_PAIRED
         type_guide:
           class: Collection
           ext:
@@ -905,6 +912,7 @@ workflows:
         type_guide:
           class: Collection
           collection_type: list:paired
+        variable: SANGER_READ_RUN_PAIRED
       - key: Forward adapter
         type_guide:
           class: text
@@ -953,6 +961,7 @@ workflows:
         type_guide:
           class: Collection
           collection_type: list
+        variable: SANGER_READ_RUN_SINGLE
       - key: Forward adapter
         type_guide:
           class: text
@@ -1061,6 +1070,7 @@ workflows:
           ext:
             - fastqsanger
             - fastqsanger.gz
+        variable: SANGER_READ_RUN_PAIRED
       - key: NC_045512.2 FASTA sequence of SARS-CoV-2
         variable: ASSEMBLY_FASTA_URL
       - key: ARTIC primer BED
@@ -1103,6 +1113,7 @@ workflows:
           ext:
             - fastqsanger
             - fastqsanger.gz
+        variable: SANGER_READ_RUN_PAIRED
       - key: NC_045512.2 FASTA sequence of SARS-CoV-2
         variable: ASSEMBLY_FASTA_URL
     active: true
@@ -1123,6 +1134,7 @@ workflows:
           ext:
             - fastqsanger
             - fastqsanger.gz
+          variable: SANGER_READ_RUN_SINGLE
       - key: NC_045512.2 FASTA sequence of SARS-CoV-2
         variable: ASSEMBLY_FASTA_URL
     active: true
