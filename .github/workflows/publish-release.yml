@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       release_id:
-        description: "ID of the draft release to publish"
+        description: "Tag name of the draft release to publish (e.g., v0.13.0)"
         required: true
 
 permissions:

@@ -13,7 +13,12 @@ GIT_HASH=$(git rev-parse HEAD)
 BUILD_DATE=$(TZ="America/Los_Angeles" date +"%Y-%m-%d %H:%M:%S %Z")
 
 # Get the current code version from git
-VERSION=$(git tag --points-at HEAD)
+# Using git describe to handle commits after tags gracefully
+# This will show:
+# - "v0.13.0" when HEAD is exactly on a tag
+# - "v0.13.0-2-g1234567" when HEAD is 2 commits after v0.13.0
+# - Just the commit hash if no tags exist
+VERSION=$(git describe --tags --always 2>/dev/null || git rev-parse --short HEAD)
 
 # Append newline to ensure following lines are separated from existing content
 echo "" >> "$TARGET_ENV_FILE"
