@@ -2,9 +2,7 @@ import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/componen
 import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepContent/stepContent";
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { StepProps } from "../types";
-import { Button } from "@mui/material";
 import { useToggleButtonGroup } from "../hooks/UseToggleButtonGroup/useToggleButtonGroup";
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { ToggleButtonGroup } from "./components/ToggleButtonGroup/toggleButtonGroup";
 import { VIEW } from "./components/ToggleButtonGroup/types";
 import { ENASequencingData } from "./components/ENASequencingData/enaSequencingData";
@@ -41,13 +39,6 @@ export const PairedEndStep = ({
         ) : (
           <UploadMyData onConfigure={onConfigure} />
         )}
-        <Button
-          {...BUTTON_PROPS.PRIMARY_CONTAINED}
-          disabled={status.disabled || status.loading}
-          onClick={onLaunchGalaxy}
-        >
-          Launch In Galaxy
-        </Button>
       </StepContent>
     </Step>
   );
