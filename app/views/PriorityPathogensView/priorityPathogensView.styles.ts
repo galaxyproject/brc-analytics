@@ -8,11 +8,15 @@ import { Title } from "@databiosphere/findable-ui/lib/components/Index/component
 
 export const StyledGrid = styled(StyledGridEntityView)`
   grid-template-columns: 1fr;
+  height: auto;
+  max-height: none;
+  overflow: visible;
 
   ${mediaTabletUp} {
     margin-left: auto;
     margin-right: auto;
     max-width: min(calc(100% - 32px), 1232px);
+    padding-bottom: 24px;
   }
 `;
 
