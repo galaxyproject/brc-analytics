@@ -17,8 +17,6 @@ export const PairedEndStep = ({
   entryLabel,
   index,
   onConfigure,
-  onLaunchGalaxy,
-  status,
 }: StepProps): JSX.Element => {
   const ena = useENA<ReadRun>();
   const table = useTable(ena.data);

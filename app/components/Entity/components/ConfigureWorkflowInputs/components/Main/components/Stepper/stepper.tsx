@@ -8,9 +8,19 @@ export const Stepper = ({ workflow, ...props }: Props): JSX.Element => {
   const requiresGTF = workflow.parameters.some(
     (param) => param.variable === WORKFLOW_PARAMETER_VARIABLE.GENE_MODEL_URL
   );
-  const steps = requiresGTF
-    ? STEPS
-    : STEPS.filter((step) => step.key !== "geneModelUrl");
+  const requiresFASTQ = workflow.parameters.some(
+    (param) =>
+      param.variable === WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_PAIRED ||
+      param.variable === WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE
+  );
+
+  let steps = STEPS;
+  if (!requiresGTF) {
+    steps = steps.filter((step) => step.key !== "geneModelUrl");
+  }
+  if (!requiresFASTQ) {
+    steps = steps.filter((step) => step.key !== "readRuns");
+  }
   const { activeStep, onContinue, onEdit } = useStepper(steps);
   return (
     <StyledStepper activeStep={activeStep} {...STEPPER_PROPS}>
