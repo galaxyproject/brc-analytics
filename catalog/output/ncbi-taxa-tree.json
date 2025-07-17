@@ -1,5 +1,5 @@
 {
-    "assembly_count": 1593,
+    "assembly_count": 1601,
     "children": [
         {
             "assembly_count": 201,
@@ -2348,10 +2348,10 @@
             "rank": "domain"
         },
         {
-            "assembly_count": 765,
+            "assembly_count": 772,
             "children": [
                 {
-                    "assembly_count": 354,
+                    "assembly_count": 355,
                     "children": [
                         {
                             "assembly_count": 4,
@@ -2478,7 +2478,7 @@
                             "rank": "phylum"
                         },
                         {
-                            "assembly_count": 237,
+                            "assembly_count": 238,
                             "children": [
                                 {
                                     "assembly_count": 13,
@@ -2989,7 +2989,7 @@
                                     "rank": "class"
                                 },
                                 {
-                                    "assembly_count": 112,
+                                    "assembly_count": 113,
                                     "children": [
                                         {
                                             "assembly_count": 49,
@@ -3644,7 +3644,7 @@
                                             "rank": "order"
                                         },
                                         {
-                                            "assembly_count": 46,
+                                            "assembly_count": 47,
                                             "children": [
                                                 {
                                                     "assembly_count": 1,
@@ -3678,10 +3678,10 @@
                                                     "rank": "family"
                                                 },
                                                 {
-                                                    "assembly_count": 21,
+                                                    "assembly_count": 22,
                                                     "children": [
                                                         {
-                                                            "assembly_count": 16,
+                                                            "assembly_count": 17,
                                                             "children": [
                                                                 {
                                                                     "assembly_count": 5,
@@ -3720,7 +3720,7 @@
                                                                     "rank": "species"
                                                                 },
                                                                 {
-                                                                    "assembly_count": 11,
+                                                                    "assembly_count": 12,
                                                                     "children": [
                                                                         {
                                                                             "assembly_count": 1,
@@ -3730,7 +3730,7 @@
                                                                             "rank": "strain"
                                                                         },
                                                                         {
-                                                                            "assembly_count": 2,
+                                                                            "assembly_count": 3,
                                                                             "children": [],
                                                                             "name": "Coccidioides posadasii str. Silveira",
                                                                             "ncbi_tax_id": "443226",
@@ -8065,7 +8065,7 @@
                     "rank": "kingdom"
                 },
                 {
-                    "assembly_count": 25,
+                    "assembly_count": 26,
                     "children": [
                         {
                             "assembly_count": 5,
@@ -8151,10 +8151,10 @@
                             "rank": "order"
                         },
                         {
-                            "assembly_count": 12,
+                            "assembly_count": 13,
                             "children": [
                                 {
-                                    "assembly_count": 12,
+                                    "assembly_count": 13,
                                     "children": [
                                         {
                                             "assembly_count": 1,
@@ -8172,7 +8172,7 @@
                                             "rank": "genus"
                                         },
                                         {
-                                            "assembly_count": 9,
+                                            "assembly_count": 10,
                                             "children": [
                                                 {
                                                     "assembly_count": 1,
@@ -8240,7 +8240,7 @@
                                                     "rank": "species"
                                                 },
                                                 {
-                                                    "assembly_count": 1,
+                                                    "assembly_count": 2,
                                                     "children": [],
                                                     "name": "Phytophthora ramorum",
                                                     "ncbi_tax_id": "164328",
@@ -8456,22 +8456,22 @@
                     "rank": "phylum"
                 },
                 {
-                    "assembly_count": 6,
+                    "assembly_count": 7,
                     "children": [
                         {
-                            "assembly_count": 3,
+                            "assembly_count": 4,
                             "children": [
                                 {
-                                    "assembly_count": 3,
+                                    "assembly_count": 4,
                                     "children": [
                                         {
-                                            "assembly_count": 3,
+                                            "assembly_count": 4,
                                             "children": [
                                                 {
-                                                    "assembly_count": 2,
+                                                    "assembly_count": 3,
                                                     "children": [
                                                         {
-                                                            "assembly_count": 2,
+                                                            "assembly_count": 3,
                                                             "children": [],
                                                             "name": "Trichomonas vaginalis G3",
                                                             "ncbi_tax_id": "412133",
@@ -8609,19 +8609,19 @@
                     "rank": "phylum"
                 },
                 {
-                    "assembly_count": 142,
+                    "assembly_count": 145,
                     "children": [
                         {
-                            "assembly_count": 84,
+                            "assembly_count": 86,
                             "children": [
                                 {
-                                    "assembly_count": 61,
+                                    "assembly_count": 62,
                                     "children": [
                                         {
-                                            "assembly_count": 60,
+                                            "assembly_count": 61,
                                             "children": [
                                                 {
-                                                    "assembly_count": 59,
+                                                    "assembly_count": 60,
                                                     "children": [
                                                         {
                                                             "assembly_count": 1,
@@ -8668,10 +8668,10 @@
                                                             "rank": "species"
                                                         },
                                                         {
-                                                            "assembly_count": 19,
+                                                            "assembly_count": 20,
                                                             "children": [
                                                                 {
-                                                                    "assembly_count": 1,
+                                                                    "assembly_count": 2,
                                                                     "children": [],
                                                                     "name": "Plasmodium falciparum 3D7",
                                                                     "ncbi_tax_id": "36329",
@@ -8879,13 +8879,13 @@
                                     "rank": "order"
                                 },
                                 {
-                                    "assembly_count": 23,
+                                    "assembly_count": 24,
                                     "children": [
                                         {
-                                            "assembly_count": 6,
+                                            "assembly_count": 7,
                                             "children": [
                                                 {
-                                                    "assembly_count": 5,
+                                                    "assembly_count": 6,
                                                     "children": [
                                                         {
                                                             "assembly_count": 1,
@@ -8900,6 +8900,13 @@
                                                             ],
                                                             "name": "Theileria equi",
                                                             "ncbi_tax_id": "5872",
+                                                            "rank": "species"
+                                                        },
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [],
+                                                            "name": "Theileria annulata",
+                                                            "ncbi_tax_id": "5874",
                                                             "rank": "species"
                                                         },
                                                         {
@@ -9055,7 +9062,7 @@
                             "rank": "class"
                         },
                         {
-                            "assembly_count": 58,
+                            "assembly_count": 59,
                             "children": [
                                 {
                                     "assembly_count": 3,
@@ -9119,13 +9126,13 @@
                                     "rank": "order"
                                 },
                                 {
-                                    "assembly_count": 55,
+                                    "assembly_count": 56,
                                     "children": [
                                         {
-                                            "assembly_count": 10,
+                                            "assembly_count": 11,
                                             "children": [
                                                 {
-                                                    "assembly_count": 8,
+                                                    "assembly_count": 9,
                                                     "children": [
                                                         {
                                                             "assembly_count": 1,
@@ -9135,7 +9142,7 @@
                                                             "rank": "species"
                                                         },
                                                         {
-                                                            "assembly_count": 1,
+                                                            "assembly_count": 2,
                                                             "children": [],
                                                             "name": "Eimeria tenella",
                                                             "ncbi_tax_id": "5802",
@@ -9574,7 +9581,7 @@
                     "rank": "phylum"
                 },
                 {
-                    "assembly_count": 98,
+                    "assembly_count": 99,
                     "children": [
                         {
                             "assembly_count": 2,
@@ -9616,16 +9623,16 @@
                             "rank": "phylum"
                         },
                         {
-                            "assembly_count": 86,
+                            "assembly_count": 87,
                             "children": [
                                 {
-                                    "assembly_count": 15,
+                                    "assembly_count": 16,
                                     "children": [
                                         {
-                                            "assembly_count": 13,
+                                            "assembly_count": 14,
                                             "children": [
                                                 {
-                                                    "assembly_count": 13,
+                                                    "assembly_count": 14,
                                                     "children": [
                                                         {
                                                             "assembly_count": 1,
@@ -9672,10 +9679,10 @@
                                                             "rank": "genus"
                                                         },
                                                         {
-                                                            "assembly_count": 2,
+                                                            "assembly_count": 3,
                                                             "children": [
                                                                 {
-                                                                    "assembly_count": 1,
+                                                                    "assembly_count": 2,
                                                                     "children": [],
                                                                     "name": "Dermacentor andersoni",
                                                                     "ncbi_tax_id": "34620",
@@ -12246,19 +12253,19 @@
             "rank": "species"
         },
         {
-            "assembly_count": 354,
+            "assembly_count": 355,
             "children": [
                 {
-                    "assembly_count": 340,
+                    "assembly_count": 341,
                     "children": [
                         {
-                            "assembly_count": 157,
+                            "assembly_count": 158,
                             "children": [
                                 {
-                                    "assembly_count": 53,
+                                    "assembly_count": 54,
                                     "children": [
                                         {
-                                            "assembly_count": 53,
+                                            "assembly_count": 54,
                                             "children": [
                                                 {
                                                     "assembly_count": 13,
@@ -12446,7 +12453,7 @@
                                                     "rank": "family"
                                                 },
                                                 {
-                                                    "assembly_count": 17,
+                                                    "assembly_count": 18,
                                                     "children": [
                                                         {
                                                             "assembly_count": 1,
@@ -12566,10 +12573,10 @@
                                                             "rank": "genus"
                                                         },
                                                         {
-                                                            "assembly_count": 6,
+                                                            "assembly_count": 7,
                                                             "children": [
                                                                 {
-                                                                    "assembly_count": 6,
+                                                                    "assembly_count": 7,
                                                                     "children": [],
                                                                     "name": "Orthomarburgvirus marburgense",
                                                                     "ncbi_tax_id": "3052505",

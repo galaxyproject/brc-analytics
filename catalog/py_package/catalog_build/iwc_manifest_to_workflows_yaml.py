@@ -28,6 +28,7 @@ MANIFEST_SOURCE_OF_TRUTH = (
     "workflow_name",
     "categories",
     "workflow_description",
+    "iwc_id",
 )
 
 
@@ -77,6 +78,8 @@ def get_input_types(workflow_definition):
                     step_input_guide["ext"] = input_formats[0]
                 else:
                     step_input_guide["ext"] = input_formats
+            if collection_type := tool_state.get("collection_type"):
+                step_input_guide["collection_type"] = collection_type
             inputs.append(
                 WorkflowParameter(key=step_label, type_guide=step_input_guide)
             )
@@ -108,12 +111,41 @@ def generate_current_workflows():
                 ),
                 workflow_description=workflow["definition"]["annotation"],
                 ploidy=WorkflowPloidy.ANY,
+                iwc_id=workflow.get("iwcID"),
                 # readme=workflow["readme"],
                 # shortcut so we don't need to parse out the whole inputs section
                 parameters=get_input_types(workflow["definition"]),
             )
             by_trs_id[workflow["trsID"]] = workflow_input
     return by_trs_id
+
+
+def ensure_parameters_exist(
+    current_workflow_input: Workflow, existing_workflow_input: Workflow
+):
+    # check that specified parameters still exist
+    current_workflow_parameter_keys = {
+        param.key for param in current_workflow_input.parameters
+    }
+    for param in existing_workflow_input.parameters:
+        if param.key not in current_workflow_parameter_keys:
+            # Should be rare, but can happen.
+            raise Exception(
+                f"{param.key} specified but is not part of updated workflow {current_workflow_input.trs_id}! Review and fix manually"
+            )
+
+
+def add_missing_parameters(
+    current_workflow_input: Workflow, existing_workflow_input: Workflow
+):
+    # check for missing parameters in the existing workflow
+    existing_parameter_keys = {
+        param.key for param in existing_workflow_input.parameters
+    }
+    for param in current_workflow_input.parameters:
+        if param.key not in existing_parameter_keys:
+            # If a parameter is missing in the existing workflow, add it
+            existing_workflow_input.parameters.append(param)
 
 
 def merge_into_existing(workflows_path):
@@ -129,17 +161,10 @@ def merge_into_existing(workflows_path):
             new_dict = current_workflow_input.model_dump()
             for key in MANIFEST_SOURCE_OF_TRUTH:
                 exisiting_dict[key] = new_dict[key]
-            # check that specified parameters still exist
-            current_workflow_parameter_keys = {
-                param.key for param in current_workflow_input.parameters
-            }
-            for param in existing_workflow_input.parameters:
-                if param.key not in current_workflow_parameter_keys:
-                    # Should be rare, but can happen.
-                    raise Exception(
-                        f"{param.key} specified but is not part of updated workflow {current_workflow_input.trs_id}! Review and fix manually"
-                    )
-            current_workflow_input = Workflow(**exisiting_dict)
+            ensure_parameters_exist(current_workflow_input, existing_workflow_input)
+            updated_existing_workflow = Workflow(**exisiting_dict)
+            add_missing_parameters(current_workflow_input, updated_existing_workflow)
+            current_workflow_input = updated_existing_workflow
         merged[versionless_trs_id] = current_workflow_input
     return merged
 
