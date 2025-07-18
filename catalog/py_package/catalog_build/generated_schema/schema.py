@@ -1,11 +1,8 @@
 from __future__ import annotations
 
 import re
-import sys
-from datetime import date, datetime, time
-from decimal import Decimal
 from enum import Enum
-from typing import Any, ClassVar, Dict, List, Literal, Optional, Union
+from typing import Any, ClassVar, Dict, List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, RootModel, field_validator
 
@@ -61,7 +58,7 @@ linkml_meta = LinkMLMeta(
                 "prefix_reference": "https://w3id.org/linkml/",
             }
         },
-        "source_file": "/Users/dannon/work/brc-analytics/catalog/py_package/catalog_build/schema_utils/../schema/schema.yaml",
+        "source_file": "/Users/mvandenb/src/brc-analytics/catalog/py_package/catalog_build/schema_utils/../schema/schema.yaml",
     }
 )
 
@@ -125,7 +122,8 @@ class WorkflowParameterVariable(str, Enum):
     ASSEMBLY_ID = "ASSEMBLY_ID"
     ASSEMBLY_FASTA_URL = "ASSEMBLY_FASTA_URL"
     GENE_MODEL_URL = "GENE_MODEL_URL"
-    SANGER_READ_RUN = "SANGER_READ_RUN"
+    SANGER_READ_RUN_PAIRED = "SANGER_READ_RUN_PAIRED"
+    SANGER_READ_RUN_SINGLE = "SANGER_READ_RUN_SINGLE"
 
 
 class WorkflowPloidy(str, Enum):

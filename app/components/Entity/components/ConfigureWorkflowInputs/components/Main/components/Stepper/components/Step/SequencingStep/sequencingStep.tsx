@@ -2,9 +2,7 @@ import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/componen
 import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepContent/stepContent";
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { StepProps } from "../types";
-import { Button } from "@mui/material";
 import { useToggleButtonGroup } from "../hooks/UseToggleButtonGroup/useToggleButtonGroup";
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { ToggleButtonGroup } from "./components/ToggleButtonGroup/toggleButtonGroup";
 import { VIEW } from "./components/ToggleButtonGroup/types";
 import { ENASequencingData } from "./components/ENASequencingData/enaSequencingData";
@@ -13,18 +11,19 @@ import { ReadRun } from "./components/ENASequencingData/types";
 import { useTable } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseTable/hook";
 import { UploadMyData } from "./components/UploadMyData/uploadMyData";
 
-export const PairedEndStep = ({
+export const SequencingStep = ({
   active,
   completed,
   entryLabel,
   index,
   onConfigure,
-  onLaunchGalaxy,
-  status,
+  stepKey,
 }: StepProps): JSX.Element => {
   const ena = useENA<ReadRun>();
   const table = useTable(ena.data);
   const { onChange, value } = useToggleButtonGroup(VIEW.ENA);
+
+  // Default to "readRunsPaired" if stepKey is undefined
   return (
     <Step active={active} completed={completed} index={index}>
       <StepLabel>{entryLabel}</StepLabel>
@@ -37,17 +36,11 @@ export const PairedEndStep = ({
             onRequestData={ena.onRequestData}
             status={ena.status}
             table={table}
+            stepKey={stepKey as "readRunsSingle" | "readRunsPaired"}
           />
         ) : (
           <UploadMyData onConfigure={onConfigure} />
         )}
-        <Button
-          {...BUTTON_PROPS.PRIMARY_CONTAINED}
-          disabled={status.disabled || status.loading}
-          onClick={onLaunchGalaxy}
-        >
-          Launch In Galaxy
-        </Button>
       </StepContent>
     </Step>
   );

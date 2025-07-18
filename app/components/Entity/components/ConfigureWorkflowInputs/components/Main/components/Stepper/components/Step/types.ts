@@ -31,5 +31,6 @@ export interface StepProps
   onEdit: OnEdit;
   onLaunchGalaxy: OnLaunchGalaxy;
   status: Status;
+  stepKey: keyof ConfiguredInput;
   workflow: Workflow;
 }

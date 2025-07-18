@@ -10,7 +10,7 @@
         "parameters": [
           {
             "key": "Paired Collection",
-            "variable": "SANGER_READ_RUN"
+            "variable": "SANGER_READ_RUN_PAIRED"
           },
           {
             "key": "Annotation GTF",
@@ -30,6 +30,10 @@
       {
         "iwcId": "sars-cov-2-pe-illumina-artic-variant-calling-covid-19-pe-artic-illumina",
         "parameters": [
+          {
+            "key": "Paired Collection",
+            "variable": "SANGER_READ_RUN_PAIRED"
+          },
           {
             "key": "NC_045512.2 FASTA sequence of SARS-CoV-2",
             "variable": "ASSEMBLY_FASTA_URL"
@@ -60,6 +64,10 @@
       {
         "iwcId": "sars-cov-2-pe-illumina-wgs-variant-calling-covid-19-pe-wgs-illumina",
         "parameters": [
+          {
+            "key": "Paired Collection",
+            "variable": "SANGER_READ_RUN_PAIRED"
+          },
           {
             "key": "NC_045512.2 FASTA sequence of SARS-CoV-2",
             "variable": "ASSEMBLY_FASTA_URL"
@@ -121,6 +129,10 @@
           {
             "key": "gtf",
             "variable": "GENE_MODEL_URL"
+          },
+          {
+            "key": "fastq PE collection",
+            "variable": "SANGER_READ_RUN_PAIRED"
           }
         ],
         "ploidy": "ANY",
@@ -139,6 +151,10 @@
           {
             "key": "GTF file of annotation",
             "variable": "GENE_MODEL_URL"
+          },
+          {
+            "key": "Collection paired FASTQ files",
+            "variable": "SANGER_READ_RUN_PAIRED"
           }
         ],
         "ploidy": "ANY",
@@ -157,6 +173,10 @@
           {
             "key": "GTF file of annotation",
             "variable": "GENE_MODEL_URL"
+          },
+          {
+            "key": "Collection of FASTQ files",
+            "variable": "SANGER_READ_RUN_SINGLE"
           }
         ],
         "ploidy": "ANY",
@@ -179,6 +199,10 @@
           {
             "key": "reference_genome",
             "variable": "ASSEMBLY_ID"
+          },
+          {
+            "key": "PE fastq input",
+            "variable": "SANGER_READ_RUN_PAIRED"
           }
         ],
         "ploidy": "ANY",
@@ -193,6 +217,10 @@
           {
             "key": "reference_genome",
             "variable": "ASSEMBLY_ID"
+          },
+          {
+            "key": "PE fastq input",
+            "variable": "SANGER_READ_RUN_PAIRED"
           }
         ],
         "ploidy": "ANY",
@@ -207,6 +235,10 @@
           {
             "key": "reference_genome",
             "variable": "ASSEMBLY_ID"
+          },
+          {
+            "key": "SR fastq input",
+            "variable": "SANGER_READ_RUN_SINGLE"
           }
         ],
         "ploidy": "ANY",
@@ -230,6 +262,10 @@
           {
             "key": "reference_genome",
             "variable": "ASSEMBLY_ID"
+          },
+          {
+            "key": "PE fastq input",
+            "variable": "SANGER_READ_RUN_PAIRED"
           }
         ],
         "ploidy": "ANY",

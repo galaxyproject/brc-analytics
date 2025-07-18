@@ -23,6 +23,7 @@ export type WorkflowLandingsBodyRequestState = {
 export type WorkflowParameterValue =
   | string
   | WorkflowUrlParameter
+  | WorkflowListCollectionParameter
   | WorkflowPairedCollectionParameter;
 
 export interface WorkflowUrlParameter {
@@ -32,7 +33,20 @@ export interface WorkflowUrlParameter {
   url: string;
 }
 
-// Narrow type specific to the one kind of collection we use -- might be worth defining a more general collection type if we need other kinds of collections
+// Narrow type specific to the two kinds of collections we use -- might be worth defining a more general collection type if we need other kinds of collections
+
+interface WorkflowListCollectionParameter {
+  class: "Collection";
+  collection_type: "list";
+  elements: Array<{
+    class: "File";
+    filetype: string;
+    hashes: WorkflowDatasetHash[];
+    identifier: string;
+    location: string;
+  }>;
+}
+
 interface WorkflowPairedCollectionParameter {
   class: "Collection";
   collection_type: "list:paired";
