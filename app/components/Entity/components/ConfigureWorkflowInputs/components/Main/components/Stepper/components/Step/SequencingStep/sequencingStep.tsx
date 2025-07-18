@@ -11,16 +11,19 @@ import { ReadRun } from "./components/ENASequencingData/types";
 import { useTable } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseTable/hook";
 import { UploadMyData } from "./components/UploadMyData/uploadMyData";
 
-export const PairedEndStep = ({
+export const SequencingStep = ({
   active,
   completed,
   entryLabel,
   index,
   onConfigure,
+  stepKey,
 }: StepProps): JSX.Element => {
   const ena = useENA<ReadRun>();
   const table = useTable(ena.data);
   const { onChange, value } = useToggleButtonGroup(VIEW.ENA);
+
+  // Default to "readRunsPaired" if stepKey is undefined
   return (
     <Step active={active} completed={completed} index={index}>
       <StepLabel>{entryLabel}</StepLabel>
@@ -33,6 +36,7 @@ export const PairedEndStep = ({
             onRequestData={ena.onRequestData}
             status={ena.status}
             table={table}
+            stepKey={stepKey as "readRunsSingle" | "readRunsPaired"}
           />
         ) : (
           <UploadMyData onConfigure={onConfigure} />

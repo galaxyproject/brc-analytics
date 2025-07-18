@@ -7,5 +7,6 @@ export interface Props {
   onConfigure: OnConfigure;
   open: boolean;
   selectedCount: number;
+  stepKey: "readRunsSingle" | "readRunsPaired";
   table: Table<ReadRun>;
 }

@@ -22,7 +22,8 @@ const workflowLandingUrl = `${galaxyInstanceUrl}workflow_landings`;
  * @param workflowId - Value for the `workflow_id` parameter sent to the API.
  * @param referenceGenome - Genome version/assembly ID.
  * @param geneModelUrl - URL for gene model parameter sent to the API.
- * @param readRuns - Read runs parameter sent to the API.
+ * @param readRunsSingle - Single read runs parameter sent to the API.
+ * @param readRunsPaired - Paired read runs parameter sent to the API.
  * @param parameters - Parameters for this workflow.
  * @returns workflow landing URL.
  */
@@ -30,7 +31,8 @@ export async function getWorkflowLandingUrl(
   workflowId: string,
   referenceGenome: string,
   geneModelUrl: string | null,
-  readRuns: EnaPairedReads[] | null,
+  readRunsSingle: EnaPairedReads[] | null,
+  readRunsPaired: EnaPairedReads[] | null,
   parameters: WorkflowParameter[]
 ): Promise<string> {
   const body: WorkflowLandingsBody = {
@@ -38,7 +40,8 @@ export async function getWorkflowLandingUrl(
     request_state: getWorkflowLandingsRequestState(
       referenceGenome,
       geneModelUrl,
-      readRuns,
+      readRunsSingle,
+      readRunsPaired,
       parameters
     ),
     workflow_id: `${DOCKSTORE_API_URL}/${workflowId}`,
@@ -67,7 +70,8 @@ function buildFastaUrl(identifier: string): string {
 function paramVariableToRequestValue(
   variable: WORKFLOW_PARAMETER_VARIABLE,
   geneModelUrl: string | null,
-  readRuns: EnaPairedReads[] | null,
+  readRunsSingle: EnaPairedReads[] | null,
+  readRunsPaired: EnaPairedReads[] | null,
   referenceGenome: string
 ): WorkflowParameterValue | null {
   // Because this `switch` has no default case, and the function doesn't allow `undefined` as a return type,
@@ -92,12 +96,13 @@ function paramVariableToRequestValue(
           }
         : null;
     case WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE:
-      if (!readRuns?.length) return null;
+      if (!readRunsSingle?.length) return null;
       return {
         class: "Collection",
         collection_type: "list",
-        elements: readRuns.map((runInfo) => {
-          const { forward, runAccession } = getSingleRunUrlsInfo(
+        elements: readRunsSingle.map((runInfo) => {
+          const runAccession = runInfo.runAccession;
+          const { forward } = getSingleRunUrlsInfo(
             runInfo.urls,
             runInfo.md5Hashes
           );
@@ -111,13 +116,13 @@ function paramVariableToRequestValue(
         }),
       };
     case WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_PAIRED: {
-      if (!readRuns?.length) return null;
+      if (!readRunsPaired?.length) return null;
       return {
         class: "Collection",
         collection_type: "list:paired",
-        elements: readRuns.map((pairInfo) => {
-          // TODO get this info earlier? In particular, it might be better to explicitly get the run accession from ENA rather than getting it from the filenames.
-          const { forward, reverse, runAccession } = getPairedRunUrlsInfo(
+        elements: readRunsPaired.map((pairInfo) => {
+          const runAccession = pairInfo.runAccession;
+          const { forward, reverse } = getPairedRunUrlsInfo(
             pairInfo.urls,
             pairInfo.md5Hashes
           );
@@ -159,10 +164,9 @@ function getSingleRunUrlsInfo(
   enaMd5Hashes: string
 ): {
   forward: EnaFileInfo;
-  runAccession: string;
 } {
-  const { forward, runAccession } = getRunUrlsInfo(enaUrls, enaMd5Hashes);
-  return { forward, runAccession };
+  const { forward } = getRunUrlsInfo(enaUrls, enaMd5Hashes);
+  return { forward };
 }
 
 /**
@@ -177,14 +181,10 @@ function getPairedRunUrlsInfo(
 ): {
   forward: EnaFileInfo;
   reverse: EnaFileInfo;
-  runAccession: string;
 } {
-  const { forward, reverse, runAccession } = getRunUrlsInfo(
-    enaUrls,
-    enaMd5Hashes
-  );
+  const { forward, reverse } = getRunUrlsInfo(enaUrls, enaMd5Hashes);
   if (!reverse) throw new Error("No reverse read URL found in paired run URLs");
-  return { forward, reverse, runAccession };
+  return { forward, reverse };
 }
 
 /**
@@ -199,25 +199,25 @@ function getRunUrlsInfo(
 ): {
   forward: EnaFileInfo;
   reverse: EnaFileInfo | null;
-  runAccession: string;
 } {
   const splitUrls = enaUrls.split(";");
   const splitMd5Hashes = enaMd5Hashes.split(";");
   if (splitMd5Hashes.length !== splitUrls.length)
     throw new Error("Hash list has different length than URL list");
+  if (splitUrls.length === 1) {
+    // Single read case
+    return {
+      forward: { md5: splitMd5Hashes[0], url: `ftp://${splitUrls[0]}` },
+      reverse: null,
+    };
+  }
   let forward: EnaFileInfo | null = null;
   let reverse: EnaFileInfo | null = null;
-  let runAccession: string | null = null;
   for (const [i, url] of splitUrls.entries()) {
     // Regarding file name format, see https://ena-docs.readthedocs.io/en/latest/faq/archive-generated-files.html#generated-fastq-files and https://ena-docs.readthedocs.io/en/latest/submit/general-guide/accessions.html#accession-numbers
     const urlMatch = /\/([EDS]RR\d{6,})_([12])\.fastq\.gz$/.exec(url);
     if (!urlMatch) continue;
-    const [, accession, readIndex] = urlMatch;
-    if (runAccession === null) runAccession = accession;
-    else if (accession !== runAccession)
-      throw new Error(
-        `Inconsistent run accessions: ${JSON.stringify(runAccession)} and ${JSON.stringify(accession)}`
-      );
+    const [, , readIndex] = urlMatch;
     const fileInfo: EnaFileInfo = {
       md5: splitMd5Hashes[i],
       url: `ftp://${url}`,
@@ -225,24 +225,24 @@ function getRunUrlsInfo(
     if (readIndex === "1") forward = fileInfo;
     else reverse = fileInfo;
   }
-  if (runAccession === null)
-    throw new Error("No URLs with expected format found");
   if (forward === null) throw new Error("No URL for forward read found");
-  return { forward, reverse, runAccession };
+  return { forward, reverse };
 }
 
 /**
  * Get the appropriate `request_state` object for the given workflow ID and reference genome.
  * @param referenceGenome - Reference genome.
  * @param geneModelUrl - URL for gene model parameter.
- * @param readRuns - Read runs parameter.
+ * @param readRunsSingle - Single read runs parameter.
+ * @param readRunsPaired - Paired read runs parameter.
  * @param parameters - Parameters for this workflow.
  * @returns `request_state` value for the workflow landings request body.
  */
 function getWorkflowLandingsRequestState(
   referenceGenome: string,
   geneModelUrl: string | null,
-  readRuns: EnaPairedReads[] | null,
+  readRunsSingle: EnaPairedReads[] | null,
+  readRunsPaired: EnaPairedReads[] | null,
   parameters: WorkflowParameter[]
 ): WorkflowLandingsBodyRequestState {
   const result: WorkflowLandingsBodyRequestState = {};
@@ -255,7 +255,8 @@ function getWorkflowLandingsRequestState(
       const value = paramVariableToRequestValue(
         variable,
         geneModelUrl,
-        readRuns,
+        readRunsSingle,
+        readRunsPaired,
         referenceGenome
       );
       if (value !== null) result[key] = value;

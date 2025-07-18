@@ -3,6 +3,20 @@ import { Workflow } from "../../../../../../../../../../../../apis/catalog/brc-a
 import { WORKFLOW_PARAMETER_VARIABLE } from "../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { ConfiguredValue } from "./types";
 
+export function getRequiredParameterTypes(
+  workflow: Workflow
+): Record<WORKFLOW_PARAMETER_VARIABLE, boolean> {
+  const result: Record<WORKFLOW_PARAMETER_VARIABLE, boolean> =
+    Object.fromEntries(
+      Object.values(WORKFLOW_PARAMETER_VARIABLE).map((variable) => [
+        variable,
+        workflow.parameters.some((param) => param.variable === variable),
+      ])
+    ) as Record<WORKFLOW_PARAMETER_VARIABLE, boolean>;
+
+  return result;
+}
+
 /**
  * Returns the configured values from the configured input.
  * @param configuredInput - Configured input.
@@ -13,32 +27,26 @@ export function getConfiguredValues(
   configuredInput: ConfiguredInput,
   workflow: Workflow
 ): ConfiguredValue | undefined {
-  const { geneModelUrl, readRuns, referenceAssembly } = configuredInput;
+  const { geneModelUrl, readRunsPaired, readRunsSingle, referenceAssembly } =
+    configuredInput;
 
   // If workflow is not available yet, return undefined
   if (!workflow?.parameters) return undefined;
-
   // Check which parameters are required by the workflow
-  const requiresReference = workflow.parameters.some(
-    (param) => param.variable === WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_FASTA_URL
-  );
-  const requiresGTF = workflow.parameters.some(
-    (param) => param.variable === WORKFLOW_PARAMETER_VARIABLE.GENE_MODEL_URL
-  );
-  const requiresFASTQ = workflow.parameters.some(
-    (param) =>
-      param.variable === WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_PAIRED ||
-      param.variable === WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE
-  );
+  const requiredParams = getRequiredParameterTypes(workflow);
 
   // Only check for required values
-  if (requiresReference && !referenceAssembly) return;
-  if (requiresGTF && !geneModelUrl) return;
-  if (requiresFASTQ && !readRuns) return;
+  if (requiredParams.ASSEMBLY_FASTA_URL && !referenceAssembly) return;
+  if (requiredParams.GENE_MODEL_URL && !geneModelUrl) return;
+  if (requiredParams.SANGER_READ_RUN_SINGLE && !readRunsSingle) return;
+  if (requiredParams.SANGER_READ_RUN_PAIRED && !readRunsPaired) return;
 
   return {
-    geneModelUrl,
-    readRuns,
-    referenceAssembly,
+    geneModelUrl: geneModelUrl ?? null,
+    readRunsPaired: readRunsPaired ?? null,
+    readRunsSingle: readRunsSingle ?? null,
+    // referenceAssembly is currently always set, but there are workflows that don't require referenceAssembly.
+    // xref https://github.com/galaxyproject/brc-analytics/issues/652
+    referenceAssembly: referenceAssembly!,
   };
 }
