@@ -3364,7 +3364,7 @@ assemblies:
   - accession: GCA_000699445.3
   # organism: Caenorhabditis sp. 31 LS-2015
   # project: PRJEB12600
-  - accession: GCA_900536295
+  - accession: GCA_900536295.3
   # organism: Dracunculus medinensis
   # project: PRJEB500
   - accession: GCA_900625125.1
@@ -3673,7 +3673,7 @@ assemblies:
   - accession: GCA_000797555.1
   # organism: Acrobeloides nanus
   # project: PRJEB26554
-  - accession: GCA_900406225
+  - accession: GCA_900406225.1
   # organism: Caenorhabditis elegans
   # project: PRJNA13758
   - accession: GCA_000002985.3
@@ -3778,7 +3778,7 @@ assemblies:
   - accession: GCA_000757705.1
   # organism: Echinococcus granulosus
   # project: PRJEB121
-  - accession: GCA_000469785
+  - accession: GCA_000469785.1
   # organism: Heterodera schachtii
   # project: PRJNA522950
   - accession: GCA_023374025.1
@@ -3940,7 +3940,7 @@ assemblies:
   # organism: Capnocytophaga sputigena
   - accession: GCF_002302495.1
   # organism: Chromobacterium violaceum
-  - accesion: GCF_016890085.1
+  - accession: GCF_016890085.1
   # organism: Chryseobacterium indologenes
   - accession: GCF_002706795.1
   # organism: Citrobacter freundii
