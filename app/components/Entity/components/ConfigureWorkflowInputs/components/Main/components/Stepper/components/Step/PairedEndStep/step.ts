@@ -9,7 +9,7 @@ export const STEP = {
   label: "Paired-End Sequencing Data",
   renderValue({ readRuns }): string | undefined {
     if (readRuns === null) return LABEL.NONE;
-    if (readRuns === undefined) return LABEL.NONE;
+    if (readRuns === undefined) return undefined;
     if (readRuns.length === 0) return "User upload to Galaxy";
     return readRuns.map(({ runAccession }) => runAccession).join(", ");
   },
