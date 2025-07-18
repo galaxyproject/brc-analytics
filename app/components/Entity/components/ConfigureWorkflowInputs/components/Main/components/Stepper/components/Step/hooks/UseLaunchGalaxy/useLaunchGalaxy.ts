@@ -18,12 +18,14 @@ export const useLaunchGalaxy = ({
 
   const onLaunchGalaxy = useCallback(async (): Promise<void> => {
     if (!configuredValue) return;
+
     await run(
       getWorkflowLandingUrl(
         workflow.trsId,
         configuredValue.referenceAssembly,
         configuredValue.geneModelUrl,
-        configuredValue.readRuns,
+        configuredValue.readRunsSingle,
+        configuredValue.readRunsPaired,
         workflow.parameters
       )
     );

@@ -11,7 +11,8 @@ export type OnConfigureParams = {
 
 export interface ConfiguredInput {
   geneModelUrl?: string | null;
-  readRuns?: EnaPairedReads[] | null;
+  readRunsPaired?: EnaPairedReads[] | null;
+  readRunsSingle?: EnaPairedReads[] | null;
   referenceAssembly?: string;
 }
 

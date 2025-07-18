@@ -4,7 +4,8 @@ import { ConfiguredInput } from "../../../../../../../../../../../../views/Workf
 
 export interface ConfiguredValue {
   geneModelUrl: string | null;
-  readRuns: EnaPairedReads[] | null;
+  readRunsPaired: EnaPairedReads[] | null;
+  readRunsSingle: EnaPairedReads[] | null;
   referenceAssembly: string;
 }
 
