@@ -8,15 +8,14 @@ import { Title } from "@databiosphere/findable-ui/lib/components/Index/component
 
 export const StyledGrid = styled(StyledGridEntityView)`
   grid-template-columns: 1fr;
-  height: auto;
-  max-height: none;
-  overflow: visible;
+  max-height: unset; // override StyledGridEntityView max-height property to allow for scrolling
+  overflow: unset; // override StyledGridEntityView overflow property to allow for scrolling
+  padding-bottom: 24px;
 
   ${mediaTabletUp} {
     margin-left: auto;
     margin-right: auto;
     max-width: min(calc(100% - 32px), 1232px);
-    padding-bottom: 24px;
   }
 `;
 
