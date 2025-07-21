@@ -1,25 +1,25 @@
 taxonomy_id	name	rank
-5833	Plasmodium falciparum	SPECIES
-5763	Naegleria fowleri	SPECIES
-5052	Aspergillus	GENUS
-11050	Flaviviridae	FAMILY
-12058	Picornaviridae	FAMILY
-5037	Histoplasma capsulatum	SPECIES
-11320	Influenza A virus	
-4827	Mucorales	ORDER
-38574	Leishmania donovani species complex	SPECIES_GROUP
-11266	Filoviridae	FAMILY
-5207	Cryptococcus neoformans	SPECIES
-199306	Coccidioides posadasii	SPECIES
-1980413	Hantaviridae	FAMILY
 498019	Candidozyma auris	SPECIES
-1980418	Phenuiviridae	FAMILY
-5807	Cryptosporidium parvum	SPECIES
-11018	Togaviridae	FAMILY
-11617	Arenaviridae	FAMILY
-10244	Monkeypox virus	
 11158	Paramyxoviridae	FAMILY
-1773	Mycobacterium tuberculosis	SPECIES
+11266	Filoviridae	FAMILY
+1980413	Hantaviridae	FAMILY
+199306	Coccidioides posadasii	SPECIES
+5833	Plasmodium falciparum	SPECIES
+5052	Aspergillus	GENUS
+5037	Histoplasma capsulatum	SPECIES
 3418604	Betacoronavirus pandemicum	SPECIES
+5807	Cryptosporidium parvum	SPECIES
+10244	Monkeypox virus	
+11050	Flaviviridae	FAMILY
 1980415	Nairoviridae	FAMILY
+11617	Arenaviridae	FAMILY
+12058	Picornaviridae	FAMILY
 1980416	Peribunyaviridae	FAMILY
+38574	Leishmania donovani species complex	SPECIES_GROUP
+11018	Togaviridae	FAMILY
+1773	Mycobacterium tuberculosis	SPECIES
+4827	Mucorales	ORDER
+5763	Naegleria fowleri	SPECIES
+11320	Influenza A virus	
+5207	Cryptococcus neoformans	SPECIES
+1980418	Phenuiviridae	FAMILY

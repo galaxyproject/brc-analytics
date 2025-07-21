@@ -3361,7 +3361,7 @@ assemblies:
   - accession: GCA_000469685.2
   # organism: Schistosoma haematobium
   # project: PRJNA78265
-  - accession: GCA_000699445.3
+  - accession: GCF_000699445.3
   # organism: Caenorhabditis sp. 31 LS-2015
   # project: PRJEB12600
   - accession: GCA_900536295.3
@@ -3463,7 +3463,7 @@ assemblies:
   - accession: GCA_900490705.1
   # organism: Caenorhabditis briggsae
   # project: PRJNA10731
-  - accession: GCA_000004555.3
+  - accession: GCF_000004555.2
   # organism: Onchocerca volvulus
   # project: PRJEB513
   - accession: GCA_000499405.2
@@ -3577,7 +3577,7 @@ assemblies:
   - accession: GCA_900537255.1
   # organism: Echinococcus granulosus
   # project: PRJNA182977
-  - accession: GCA_000524195.1
+  - accession: GCF_000524195.1
   # organism: Aphelenchoides besseyi
   # project: PRJNA834627
   - accession: GCA_024699835.1
@@ -3625,7 +3625,7 @@ assemblies:
   - accession: GCA_000941615.1
   # organism: Trichinella spiralis
   # project: PRJNA12603
-  - accession: GCA_000181795.2
+  - accession: GCF_000181795.1
   # organism: Ascaris suum
   # project: PRJNA62057
   - accession: GCA_000187025.3
@@ -3730,7 +3730,7 @@ assemblies:
   - accession: GCA_900576705.1
   # organism: Necator americanus
   # project: PRJNA1007425
-  - accession: GCA_031761385.1
+  - accession: GCF_031761385.1
   # organism: Halicephalobus sp. NKZ332
   # project: PRJNA555616
   - accession: GCA_009761265.1
@@ -3760,7 +3760,7 @@ assemblies:
   - accession: GCA_911812115.1
   # organism: Brugia malayi
   # project: PRJNA10729
-  - accession: GCA_000002995.5
+  - accession: GCF_000002995.4
   # organism: Wuchereria bancrofti
   # project: PRJEB536
   - accession: GCA_900622535.1
@@ -3820,7 +3820,7 @@ assemblies:
   - accession: GCA_000751915.1
   # organism: Opisthorchis viverrini
   # project: PRJNA222628
-  - accession: GCA_000715545.1
+  - accession: GCF_000715545.1
   # organism: Meloidogyne hapla
   # project: PRJNA29083
   - accession: GCA_000172435.1
@@ -3841,13 +3841,13 @@ assemblies:
   - accession: GCA_904066225.2
   # organism: Strongyloides ratti
   # project: PRJEB125
-  - accession: GCA_001040885.1
+  - accession: GCF_001040885.1
   # organism: Parapristionchus giblindavisi
   # project: PRJEB53331
   - accession: GCA_943737045.1
   # organism: Loa loa
   # project: PRJNA37757
-  - accession: GCA_000183805.3
+  - accession: GCF_000183805.2
   # organism: Caenorhabditis panamensis
   # project: PRJEB28259
   - accession: GCA_900536275.1
