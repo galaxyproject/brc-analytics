@@ -22,5 +22,6 @@ export interface ReadRun {
 
 export interface Props extends UseENA<ReadRun> {
   onConfigure: OnConfigure;
+  stepKey: "readRunsSingle" | "readRunsPaired";
   table: Table<ReadRun>;
 }

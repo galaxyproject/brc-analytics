@@ -13,17 +13,19 @@ export const useLaunchGalaxy = ({
   workflow,
 }: Props): UseLaunchGalaxy => {
   const { data: landingUrl, isLoading: loading, run } = useAsync<string>();
-  const configuredValue = getConfiguredValues(configuredInput);
+  const configuredValue = getConfiguredValues(configuredInput, workflow);
   const disabled = !configuredValue;
 
   const onLaunchGalaxy = useCallback(async (): Promise<void> => {
     if (!configuredValue) return;
+
     await run(
       getWorkflowLandingUrl(
         workflow.trsId,
         configuredValue.referenceAssembly,
         configuredValue.geneModelUrl,
-        configuredValue.readRuns,
+        configuredValue.readRunsSingle,
+        configuredValue.readRunsPaired,
         workflow.parameters
       )
     );

@@ -5,14 +5,14 @@ import { useDialog } from "@databiosphere/findable-ui/lib/components/common/Dial
 import { Props } from "./types";
 import { CollectionSummary } from "./components/CollectionSummary/collectionSummary";
 import { AccessionSelector } from "./components/AccessionSelector/accessionSelector";
-import { STEP } from "../../step";
-import { buildEnaPairedReads } from "./utils";
+import { buildEnaSequencingReads } from "./utils";
 
 export const ENASequencingData = ({
   clearErrors,
   onConfigure,
   onRequestData,
   status,
+  stepKey,
   table,
 }: Props): JSX.Element => {
   const accessionDialog = useDialog();
@@ -20,8 +20,8 @@ export const ENASequencingData = ({
   const selectedCount = Object.values(table.getState().rowSelection).length;
 
   useEffect(() => {
-    const pairedReads = buildEnaPairedReads(table);
-    onConfigure(STEP.key, pairedReads.length > 0 ? pairedReads : null);
+    const pairedReads = buildEnaSequencingReads(table);
+    onConfigure(stepKey, pairedReads.length > 0 ? pairedReads : null);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Intended behavior to only run on mount.
   }, []);
 
@@ -45,10 +45,11 @@ export const ENASequencingData = ({
         open={collectionDialog.open}
         selectedCount={selectedCount}
         table={table}
+        stepKey={stepKey}
       />
       <CollectionSummary
         onClear={() => {
-          onConfigure(STEP.key, null);
+          onConfigure(stepKey, null);
           table.resetRowSelection();
         }}
         onEdit={collectionDialog.onOpen}

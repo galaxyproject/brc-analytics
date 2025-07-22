@@ -4,11 +4,10 @@ import { Typography } from "@mui/material";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { PAPER_PROPS } from "./constants";
 import { useEffect } from "react";
-import { STEP } from "../../step";
 
-export const UploadMyData = ({ onConfigure }: Props): JSX.Element => {
+export const UploadMyData = ({ onConfigure, stepKey }: Props): JSX.Element => {
   useEffect(() => {
-    onConfigure(STEP.key, []);
+    onConfigure(stepKey, []);
   }, [onConfigure]);
   return (
     <StyledPaper {...PAPER_PROPS}>
