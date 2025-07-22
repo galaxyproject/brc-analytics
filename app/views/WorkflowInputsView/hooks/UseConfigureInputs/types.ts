@@ -1,4 +1,4 @@
-import { EnaPairedReads } from "app/utils/galaxy-api/entities";
+import { EnaSequencingReads } from "app/utils/galaxy-api/entities";
 
 export type OnConfigure = (...p: OnConfigureParams) => void;
 
@@ -11,8 +11,8 @@ export type OnConfigureParams = {
 
 export interface ConfiguredInput {
   geneModelUrl?: string | null;
-  readRunsPaired?: EnaPairedReads[] | null;
-  readRunsSingle?: EnaPairedReads[] | null;
+  readRunsPaired?: EnaSequencingReads[] | null;
+  readRunsSingle?: EnaSequencingReads[] | null;
   referenceAssembly?: string;
 }
 

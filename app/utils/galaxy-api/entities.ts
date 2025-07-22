@@ -1,4 +1,4 @@
-export interface EnaPairedReads {
+export interface EnaSequencingReads {
   md5Hashes: string;
   runAccession: string;
   urls: string;

@@ -4,7 +4,7 @@ import ky from "ky";
 import { GALAXY_ENVIRONMENT } from "site-config/common/galaxy";
 import {
   EnaFileInfo,
-  EnaPairedReads,
+  EnaSequencingReads,
   WorkflowLanding,
   WorkflowLandingsBody,
   WorkflowLandingsBodyRequestState,
@@ -31,8 +31,8 @@ export async function getWorkflowLandingUrl(
   workflowId: string,
   referenceGenome: string,
   geneModelUrl: string | null,
-  readRunsSingle: EnaPairedReads[] | null,
-  readRunsPaired: EnaPairedReads[] | null,
+  readRunsSingle: EnaSequencingReads[] | null,
+  readRunsPaired: EnaSequencingReads[] | null,
   parameters: WorkflowParameter[]
 ): Promise<string> {
   const body: WorkflowLandingsBody = {
@@ -70,8 +70,8 @@ function buildFastaUrl(identifier: string): string {
 function paramVariableToRequestValue(
   variable: WORKFLOW_PARAMETER_VARIABLE,
   geneModelUrl: string | null,
-  readRunsSingle: EnaPairedReads[] | null,
-  readRunsPaired: EnaPairedReads[] | null,
+  readRunsSingle: EnaSequencingReads[] | null,
+  readRunsPaired: EnaSequencingReads[] | null,
   referenceGenome: string
 ): WorkflowParameterValue | null {
   // Because this `switch` has no default case, and the function doesn't allow `undefined` as a return type,
@@ -241,8 +241,8 @@ function getRunUrlsInfo(
 function getWorkflowLandingsRequestState(
   referenceGenome: string,
   geneModelUrl: string | null,
-  readRunsSingle: EnaPairedReads[] | null,
-  readRunsPaired: EnaPairedReads[] | null,
+  readRunsSingle: EnaSequencingReads[] | null,
+  readRunsPaired: EnaSequencingReads[] | null,
   parameters: WorkflowParameter[]
 ): WorkflowLandingsBodyRequestState {
   const result: WorkflowLandingsBodyRequestState = {};

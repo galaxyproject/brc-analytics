@@ -6,7 +6,7 @@ import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/B
 import { useState } from "react";
 import { Table } from "./components/Table/table";
 import { RowSelectionState } from "@tanstack/table-core";
-import { buildEnaPairedReads } from "../../utils";
+import { buildEnaSequencingReads } from "../../utils";
 
 export const CollectionSelector = ({
   onClose,
@@ -40,7 +40,7 @@ export const CollectionSelector = ({
           {...BUTTON_PROPS.PRIMARY_CONTAINED}
           disabled={selectedCount === 0}
           onClick={() => {
-            onConfigure(stepKey, buildEnaPairedReads(table));
+            onConfigure(stepKey, buildEnaSequencingReads(table));
             onClose();
           }}
         >

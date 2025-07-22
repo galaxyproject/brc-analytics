@@ -5,7 +5,7 @@ import { useDialog } from "@databiosphere/findable-ui/lib/components/common/Dial
 import { Props } from "./types";
 import { CollectionSummary } from "./components/CollectionSummary/collectionSummary";
 import { AccessionSelector } from "./components/AccessionSelector/accessionSelector";
-import { buildEnaPairedReads } from "./utils";
+import { buildEnaSequencingReads } from "./utils";
 
 export const ENASequencingData = ({
   clearErrors,
@@ -20,7 +20,7 @@ export const ENASequencingData = ({
   const selectedCount = Object.values(table.getState().rowSelection).length;
 
   useEffect(() => {
-    const pairedReads = buildEnaPairedReads(table);
+    const pairedReads = buildEnaSequencingReads(table);
     onConfigure(stepKey, pairedReads.length > 0 ? pairedReads : null);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Intended behavior to only run on mount.
   }, []);
