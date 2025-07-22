@@ -37,7 +37,10 @@ export const SequencingStep = ({
             stepKey={stepKey as "readRunsSingle" | "readRunsPaired"}
           />
         ) : (
-          <UploadMyData onConfigure={onConfigure} />
+          <UploadMyData
+            onConfigure={onConfigure}
+            stepKey={stepKey as "readRunsSingle" | "readRunsPaired"}
+          />
         )}
       </StepContent>
     </Step>

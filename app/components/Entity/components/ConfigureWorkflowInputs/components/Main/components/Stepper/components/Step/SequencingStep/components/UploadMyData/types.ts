@@ -2,4 +2,5 @@ import { OnConfigure } from "../../../../../../../../../../../../../views/Workfl
 
 export interface Props {
   onConfigure: OnConfigure;
+  stepKey: "readRunsSingle" | "readRunsPaired";
 }
