@@ -20,11 +20,11 @@ This installs the package from the BRC Analytics GitHub repository, referencing 
 
 #### Scripts
 
-The package provides modules that can be used for scripts to manage the catalog and schema; it may be desirable to set up shortcuts for running these. See below for details on using each module.
+The package provides modules that can be used to run scripts to manage the catalog and schema; it may be desirable to set up shortcuts for running these. See below for details on using each module.
 
 ### Updating
 
-The package can be updated by using the same installation command but with the new version tag. If using a `requirements.txt`, it may be updated manually by updating the version referenced in the line that looks like `-e "git+https://github.com/galaxyproject/brc-analytics.git@...`.
+The package can be updated by using the same installation command as above, substituting in the new version tag. If using a `requirements.txt`, it may be updated manually by updating the version referenced in the line containing the `pip install` arguments for the package (i.e. the one starting with `-e "git+https://github.com/galaxyproject/...`).
 
 When the package is updated, derived schema files must be re-generated to guarantee that they're up-to-date. (See `schema_utils.gen_schema` below.)
 
@@ -45,7 +45,7 @@ Used to build catalog data from local input files and external resources. The `b
   - Taxonomic tree JSON to be directly used by the app.
   - A quality control report in Markdown format.
 
-`build_files` can be called from a Python script with appropriate arguments to perform this initial data aggregation step of building the catalog.
+A Python script can be used to call `build_files` with appropriate arguments in order to perform this initial data aggregation step of building the catalog.
 
 Example:
 
@@ -76,7 +76,7 @@ build_files(
 
 #### `iwc_manifest_to_workflows_yaml`
 
-Can be run as a command-line script to update the catalog input workflows file based on the IWC manifest. Any missing workflows and workflow parameters are added to the specified workflows YAML file. New workflows will have `active` set to `false`, and must be manually updated in the YAML in order to be available in the app, and new parameters will only have a `type_guide` for human reference, and must be manually given a value source (such as a `variable` field) in order to be populated by the app when launching Galaxy.
+Can be run as a command-line script to update the catalog input workflows file based on the IWC manifest. Any missing workflows and workflow parameters are added to the specified workflows YAML file. New workflows will have `active` set to `false`, and must be manually updated in the YAML in order to be made available in the app, and new parameters will only contain a `type_guide` to be used for human reference, and must be manually given a value source (such as a `variable` field) in order to be populated by the app when launching Galaxy.
 
 Example:
 
@@ -92,7 +92,7 @@ Contains Pydantic models for schema entities. Mainly included for internal use, 
 
 #### `schema_utils.gen_schema`
 
-Can be run as a command-line script to generate derived schema files (e.g. TypeScript definitions, JSON Schema, Pydantic models). Notably, this should be used to keep types up-to-date if catalog files are being processed in TypeScript.
+Can be run as a command-line script to generate derived schema files (e.g. TypeScript definitions, JSON Schema, Pydantic models). As mentioned in the section on updating, this is important for keeping definitions up-to-date. (In particular, it's important for the TypeScript definitions used in the app to be consistent with the models used to manage the catalog.)
 
 Example:
 
@@ -110,15 +110,13 @@ Used internally to generate TypeScript definitions.
 
 #### `schema_utils.validate_catalog`
 
-Can be run as a command-line script to validate catalog YAML files.
+Can be run as a command-line script to validate catalog YAML files. The catalog source files to be validated are assumed to be named in the form `<SCHEMA_NAME>.yml`, where `<SCHEMA_NAME>` is the name of the corresponding schema.
 
 Example:
 
 ```bash
 # Validate source files under ./catalog/source using schemas for assemblies,
-# organisms, workflow categories, and workflows. The catalog source files are
-# assumed to be named `<SCHEMA_NAME>.yml`, where <SCHEMA_NAME> is the name of
-# the corresponding schema. (E.g. the `assemblies` schema will be used to
-# validate ./catalog/source/assemblies.yml, etc.)
+# organisms, workflow categories, and workflows. For example, the `assemblies`
+# schema will be used to validate ./catalog/source/assemblies.yml.
 python -m catalog_build.schema_utils.validate_catalog ./catalog/source assemblies organisms workflow_categories workflows
 ```
