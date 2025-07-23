@@ -16,7 +16,7 @@ The package can be installed using Pip with a command of the form:
 pip install -e "git+https://github.com/galaxyproject/brc-analytics.git@catalog_build_v<VERSION>#egg=catalog_build&subdirectory=catalog/py_package"
 ```
 
-This installs the package from the BRC Analytics GitHub repository, referencing a git tag named in the pattern `catalog_build_v<VERSION>`; `<VERSION>` should be replaced with the desired version number of the package as defined in `setup.py` (although note that this requires that a tag for that version actually exist in the BRC Analytics repository).
+This installs the package from the BRC Analytics GitHub repository, referencing a Git tag named in the pattern `catalog_build_v<VERSION>`; `<VERSION>` should be replaced with the desired version number of the package as defined in `setup.py` (although note that this requires that a tag for that version actually exist in the BRC Analytics repository).
 
 #### Scripts
 
