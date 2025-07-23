@@ -1,5 +1,25 @@
 {
   "parser": "@typescript-eslint/parser",
+  "ignorePatterns": [
+    "node_modules",
+    ".next/",
+    ".DS_Store",
+    "*.pem",
+    "npm-debug.log*",
+    ".env*.local",
+    ".env.development",
+    ".env.production",
+    "*.tsbuildinfo",
+    ".vscode",
+    ".idea",
+    ".nvmrc",
+    "public/favicons/*",
+    "playwright-report",
+    "test-results",
+    "out",
+    "venv",
+    "__pycache__"
+  ],
   "plugins": [
     "@typescript-eslint",
     "sonarjs",
