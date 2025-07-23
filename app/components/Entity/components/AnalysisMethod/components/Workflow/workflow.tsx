@@ -6,7 +6,7 @@ import { TEXT_BODY_500 } from "@databiosphere/findable-ui/lib/theme/common/typog
 import { StyledGrid } from "./workflow.styles";
 import { TYPOGRAPHY_PROPS } from "../../constants";
 import { BUTTON_PROPS, GRID_PROPS, OUTLINED_BUTTON_PROPS } from "./constants";
-import { getWorkflowLandingUrl } from "../../../../../../utils/galaxy-api/galaxy-api";
+
 import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,
@@ -17,15 +17,9 @@ import { ROUTES } from "../../../../../../../routes/constants";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { formatTrsId } from "../../../AnalysisMethodsCatalog/utils";
 
-export const Workflow = ({
-  entityId,
-  geneModelUrl,
-  genomeVersionAssemblyId,
-  isFeatureEnabled,
-  workflow,
-}: Props): JSX.Element => {
-  const { iwcId, parameters, workflowDescription, workflowName } = workflow;
-  const { data: landingUrl, isLoading, run } = useAsync<string>();
+export const Workflow = ({ entityId, workflow }: Props): JSX.Element => {
+  const { iwcId, workflowDescription, workflowName } = workflow;
+  const { isLoading } = useAsync<string>();
   return (
     <StyledGrid {...GRID_PROPS}>
       <Loading loading={isLoading} panelStyle={PAPER_PANEL_STYLE.NONE} />
@@ -34,50 +28,20 @@ export const Workflow = ({
         <Typography {...TYPOGRAPHY_PROPS}>{workflowDescription}</Typography>
       </Grid>
       <Grid container spacing={1}>
-        {isFeatureEnabled ? (
-          <Grid>
-            <Button
-              {...BUTTON_PROPS}
-              component={Link}
-              disabled={!workflow.trsId}
-              href={replaceParameters(ROUTES.CONFIGURE_WORKFLOW, {
-                entityId,
-                trsId: formatTrsId(workflow.trsId),
-              })}
-              rel={REL_ATTRIBUTE.NO_OPENER}
-            >
-              Configure Inputs
-            </Button>
-          </Grid>
-        ) : (
-          <Grid>
-            <Button
-              {...BUTTON_PROPS}
-              disabled={!workflow.trsId}
-              onClick={async (): Promise<void> => {
-                const url =
-                  landingUrl ??
-                  (await run(
-                    getWorkflowLandingUrl(
-                      workflow.trsId,
-                      genomeVersionAssemblyId,
-                      geneModelUrl,
-                      null, // Read runs single.
-                      null, // Read runs paired.
-                      parameters
-                    )
-                  ));
-                window.open(
-                  url,
-                  ANCHOR_TARGET.BLANK,
-                  REL_ATTRIBUTE.NO_OPENER_NO_REFERRER
-                );
-              }}
-            >
-              Launch in Galaxy
-            </Button>
-          </Grid>
-        )}
+        <Grid>
+          <Button
+            {...BUTTON_PROPS}
+            component={Link}
+            disabled={!workflow.trsId}
+            href={replaceParameters(ROUTES.CONFIGURE_WORKFLOW, {
+              entityId,
+              trsId: formatTrsId(workflow.trsId),
+            })}
+            rel={REL_ATTRIBUTE.NO_OPENER}
+          >
+            Configure Inputs
+          </Button>
+        </Grid>
         {iwcId && (
           <Grid>
             <Button
