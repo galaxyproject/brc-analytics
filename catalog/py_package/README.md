@@ -36,7 +36,7 @@ The package root exports `build_files` from the `build` module -- see below.
 
 #### `build`
 
-Used to build catalog data from local input files and external resources. The `build_files` function from this module goes through roughly the following actions:
+Used to build catalog data from local input files and external resources. The `build_files` function from this module carries out roughly the following actions:
 
 - Read source YAML files (assemblies, organisms, outbreaks) from provided paths.
 - Fetch additional data from UCSC (using the specified URL) and NCBI.
