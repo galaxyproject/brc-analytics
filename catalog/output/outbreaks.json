@@ -733,7 +733,7 @@
     "resources": [
       {
         "title": "hgPhyloPlace | Place you sequences in a global phylogenetic tree (Measles)",
-        "url": "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?hgpp_org=hub_6572355_GCF_000854845.1",
+        "url": "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?hgpp_org=hub_3526175_GCF_000854845.1",
         "type": "HGPHYLOPLACE"
       },
       {
