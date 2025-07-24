@@ -47,6 +47,7 @@ export const getGeneModelLabel = (url: string): string => {
     [/\.augustus\./, "Augustus"],
     [/\.ncbiRefSeq\./, "NCBI RefSeq"],
     [/\.ncbiGene\./, "NCBI Gene"],
+    [/\.xenoRefGene\./, "UCSC Xeno RefGene"],
   ];
 
   for (const [pattern, label] of labelPatterns) {
