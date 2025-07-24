@@ -11,6 +11,7 @@ export interface ConfiguredValue {
 
 export interface Status {
   disabled: boolean;
+  error: string | null;
   loading: boolean;
 }
 

@@ -7,5 +7,7 @@ export interface UrlList {
 }
 
 export interface UseUCSCFiles {
+  error: string | null;
   geneModelUrls: string[] | undefined;
+  isLoading: boolean;
 }
