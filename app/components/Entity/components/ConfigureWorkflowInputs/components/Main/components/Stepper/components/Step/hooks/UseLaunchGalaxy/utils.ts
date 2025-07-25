@@ -37,7 +37,8 @@ export function getConfiguredValues(
 
   // Only check for required values
   if (requiredParams.ASSEMBLY_FASTA_URL && !referenceAssembly) return;
-  if (requiredParams.GENE_MODEL_URL && !geneModelUrl) return;
+  // For geneModelUrl, treat empty string as valid (user skipped or will upload manually)
+  if (requiredParams.GENE_MODEL_URL && geneModelUrl === null) return;
   if (requiredParams.SANGER_READ_RUN_SINGLE && !readRunsSingle) return;
   if (requiredParams.SANGER_READ_RUN_PAIRED && !readRunsPaired) return;
 

@@ -24,7 +24,7 @@ import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/comp
 import { getGeneModelLabel } from "./utils";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { STEP } from "./step";
-import { StepError } from "../components/StepError/stepError";
+import { StepWarning } from "../components/StepWarning/stepWarning";
 import { getStepActiveState, getButtonDisabledState } from "../utils/stepUtils";
 
 export const GTFStep = ({
@@ -45,6 +45,14 @@ export const GTFStep = ({
   useEffect(() => {
     configureGTFStep(geneModelUrls, onConfigure, onValueChange);
   }, [geneModelUrls, onConfigure, onValueChange]);
+
+  // Auto-configure step with empty string if there's an error
+  // Empty string represents "user will provide in Galaxy" similar to how sequencing steps use empty arrays
+  useEffect(() => {
+    if (error && active) {
+      onConfigure(STEP.key, ""); // Use empty string instead of null
+    }
+  }, [error, active, onConfigure]);
 
   return (
     <Step
@@ -76,7 +84,7 @@ export const GTFStep = ({
           >
             Genes and Gene Predictions
           </Typography>
-          <StepError error={error} />
+          <StepWarning error={error} />
           {!error && controls.length > 0 ? (
             <RadioGroup onChange={onChange} value={value}>
               {controls.map(({ label, value }, i) => (
@@ -98,10 +106,10 @@ export const GTFStep = ({
           )}
           <Button
             {...BUTTON_PROPS.PRIMARY_CONTAINED}
-            disabled={getButtonDisabledState(!value, false, !!error)}
+            disabled={getButtonDisabledState(!value && !error, isLoading)}
             onClick={() => onContinue()}
           >
-            Continue
+            {error ? "Skip This Step" : "Continue"}
           </Button>
         </StyledGrid>
       </StepContent>
