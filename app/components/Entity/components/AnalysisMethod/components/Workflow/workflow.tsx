@@ -1,5 +1,3 @@
-import { Loading } from "@databiosphere/findable-ui/lib/components/Loading/loading";
-import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
 import { Button, Grid, Typography } from "@mui/material";
 import { Props } from "./types";
 import { TEXT_BODY_500 } from "@databiosphere/findable-ui/lib/theme/common/typography";
@@ -11,7 +9,6 @@ import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,
 } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
-import { PAPER_PANEL_STYLE } from "@databiosphere/findable-ui/lib/components/common/Paper/paper";
 import Link from "next/link";
 import { ROUTES } from "../../../../../../../routes/constants";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
@@ -19,10 +16,8 @@ import { formatTrsId } from "../../../AnalysisMethodsCatalog/utils";
 
 export const Workflow = ({ entityId, workflow }: Props): JSX.Element => {
   const { iwcId, workflowDescription, workflowName } = workflow;
-  const { isLoading } = useAsync<string>();
   return (
     <StyledGrid {...GRID_PROPS}>
-      <Loading loading={isLoading} panelStyle={PAPER_PANEL_STYLE.NONE} />
       <Grid container spacing={1}>
         <Typography variant={TEXT_BODY_500}>{workflowName}</Typography>
         <Typography {...TYPOGRAPHY_PROPS}>{workflowDescription}</Typography>
