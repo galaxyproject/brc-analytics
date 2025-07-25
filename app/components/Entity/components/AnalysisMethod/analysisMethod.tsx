@@ -16,9 +16,6 @@ import { ChevronRightRounded } from "@mui/icons-material";
 
 export const AnalysisMethod = ({
   entityId,
-  geneModelUrl,
-  genomeVersionAssemblyId,
-  isFeatureEnabled,
   workflowCategory,
   workflows,
 }: Props): JSX.Element => {
@@ -45,13 +42,7 @@ export const AnalysisMethod = ({
         {workflows.map((workflow) => (
           <Fragment key={workflow.workflowName}>
             <Divider />
-            <Workflow
-              entityId={entityId}
-              geneModelUrl={geneModelUrl}
-              genomeVersionAssemblyId={genomeVersionAssemblyId}
-              isFeatureEnabled={isFeatureEnabled}
-              workflow={workflow}
-            />
+            <Workflow entityId={entityId} workflow={workflow} />
           </Fragment>
         ))}
       </AccordionDetails>
