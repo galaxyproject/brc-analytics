@@ -4,6 +4,8 @@ import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/com
 import { StepProps } from "../types";
 import { Button } from "@mui/material";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
+import { StepError } from "../components/StepError/stepError";
+import { getStepActiveState, getButtonDisabledState } from "../utils/stepUtils";
 
 export const LaunchStep = ({
   active,
@@ -14,12 +16,21 @@ export const LaunchStep = ({
   status,
 }: StepProps): JSX.Element => {
   return (
-    <Step active={active} completed={completed} index={index}>
+    <Step
+      active={getStepActiveState(active, status.loading)}
+      completed={completed}
+      index={index}
+    >
       <StepLabel>{entryLabel}</StepLabel>
       <StepContent>
+        <StepError error={status.error} />
         <Button
           {...BUTTON_PROPS.PRIMARY_CONTAINED}
-          disabled={status.disabled || status.loading}
+          disabled={getButtonDisabledState(
+            status.disabled,
+            status.loading,
+            !!status.error
+          )}
           onClick={onLaunchGalaxy}
         >
           Launch In Galaxy

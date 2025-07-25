@@ -12,7 +12,12 @@ export const useLaunchGalaxy = ({
   configuredInput,
   workflow,
 }: Props): UseLaunchGalaxy => {
-  const { data: landingUrl, isLoading: loading, run } = useAsync<string>();
+  const {
+    data: landingUrl,
+    error,
+    isLoading: loading,
+    run,
+  } = useAsync<string>();
   const configuredValue = getConfiguredValues(configuredInput, workflow);
   const disabled = !configuredValue;
 
@@ -40,5 +45,10 @@ export const useLaunchGalaxy = ({
     );
   }, [landingUrl]);
 
-  return { onLaunchGalaxy, status: { disabled, loading } };
+  let errorMessage: string | null = null;
+  if (error) {
+    errorMessage = (error as Error).message || "Failed to launch Galaxy";
+  }
+
+  return { onLaunchGalaxy, status: { disabled, error: errorMessage, loading } };
 };
