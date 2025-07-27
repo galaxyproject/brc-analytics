@@ -9,6 +9,7 @@ export const STEP = {
   label: "GTF Files",
   renderValue({ geneModelUrl }): string | undefined {
     if (geneModelUrl === null) return LABEL.NONE;
+    if (geneModelUrl === "") return "User upload to Galaxy";
     if (geneModelUrl !== undefined) return getGeneModelLabel(geneModelUrl);
   },
 } satisfies StepConfig;
