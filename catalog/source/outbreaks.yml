@@ -33,7 +33,7 @@ outbreaks:
 
   - name: SARS-CoV-2
     taxonomy_id: 3418604
-    priority: HIGHEST
+    priority: CRITICAL
     active: true
     description:
       path: outbreaks/covid19.md
@@ -434,7 +434,7 @@ outbreaks:
       - 3052560
     resources:
       - title: "hgPhyloPlace | Place you sequences in a global phylogenetic tree (Measles)"
-        url: "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?hgpp_org=hub_6572355_GCF_000854845.1"
+        url: "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?hgpp_org=hub_3526175_GCF_000854845.1"
         type: HGPHYLOPLACE
       - title: "WHO | Measles"
         url: "https://www.who.int/news-room/fact-sheets/detail/measles"
