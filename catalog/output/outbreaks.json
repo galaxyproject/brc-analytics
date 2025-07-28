@@ -62,7 +62,7 @@
     },
     "highlight_descendant_taxonomy_ids": null,
     "name": "SARS-CoV-2",
-    "priority": "HIGHEST",
+    "priority": "CRITICAL",
     "resources": [
       {
         "title": "WHO: Coronavirus disease (COVID-19) situation reports",

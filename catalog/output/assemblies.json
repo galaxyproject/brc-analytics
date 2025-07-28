@@ -49109,7 +49109,7 @@
     "ploidy": [
       "HAPLOID"
     ],
-    "priority": "HIGHEST",
+    "priority": "CRITICAL",
     "priorityPathogenName": "SARS-CoV-2",
     "scaffoldCount": 1,
     "scaffoldL50": 1,
@@ -78325,7 +78325,7 @@
     "ploidy": [
       "HAPLOID"
     ],
-    "priority": "HIGHEST",
+    "priority": "CRITICAL",
     "priorityPathogenName": "SARS-CoV-2",
     "scaffoldCount": 1,
     "scaffoldL50": 1,

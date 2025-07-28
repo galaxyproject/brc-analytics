@@ -66845,7 +66845,7 @@
         "ploidy": [
           "HAPLOID"
         ],
-        "priority": "HIGHEST",
+        "priority": "CRITICAL",
         "priorityPathogenName": "SARS-CoV-2",
         "scaffoldCount": 1,
         "scaffoldL50": 1,
@@ -66901,7 +66901,7 @@
         "ploidy": [
           "HAPLOID"
         ],
-        "priority": "HIGHEST",
+        "priority": "CRITICAL",
         "priorityPathogenName": "SARS-CoV-2",
         "scaffoldCount": 1,
         "scaffoldL50": 1,
@@ -66928,7 +66928,7 @@
     ],
     "ncbiTaxonomyId": "3418604",
     "otherTaxa": null,
-    "priority": "HIGHEST",
+    "priority": "CRITICAL",
     "priorityPathogenName": "SARS-CoV-2",
     "taxonomicGroup": [
       "Viruses"
