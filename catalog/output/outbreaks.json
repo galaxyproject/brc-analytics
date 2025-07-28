@@ -62,7 +62,7 @@
     },
     "highlight_descendant_taxonomy_ids": null,
     "name": "SARS-CoV-2",
-    "priority": "HIGHEST",
+    "priority": "CRITICAL",
     "resources": [
       {
         "title": "WHO: Coronavirus disease (COVID-19) situation reports",
@@ -731,6 +731,11 @@
     "name": "Paramyxoviridae",
     "priority": "HIGH",
     "resources": [
+      {
+        "title": "hgPhyloPlace | Place you sequences in a global phylogenetic tree (Measles)",
+        "url": "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?hgpp_org=hub_3526175_GCF_000854845.1",
+        "type": "HGPHYLOPLACE"
+      },
       {
         "title": "WHO | Measles",
         "url": "https://www.who.int/news-room/fact-sheets/detail/measles",

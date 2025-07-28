@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=../schema/generated/workflows.json
 workflows:
   - trs_id: "#workflow/github.com/iwc-workflows/annotation-maker/main/versions/v0.1"
     categories: []
@@ -59,6 +60,17 @@ workflows:
     parameters:
       - key: reference_genome
         variable: ASSEMBLY_ID
+      - key: PE fastq input
+        type_guide:
+          class: Collection
+          collection_type: list:paired
+        variable: SANGER_READ_RUN_PAIRED
+      - key: effective_genome_size
+        type_guide:
+          class: integer
+      - key: bin_size
+        type_guide:
+          class: integer
     active: true
     iwc_id: atacseq-main
   - trs_id: "#workflow/github.com/iwc-workflows/average-bigwig-between-replicates/main/versions/v0.2"
@@ -219,6 +231,23 @@ workflows:
     parameters:
       - key: reference_genome
         variable: ASSEMBLY_ID
+      - key: PE fastq input
+        type_guide:
+          class: Collection
+          collection_type: list:paired
+        variable: SANGER_READ_RUN_PAIRED
+      - key: adapter_forward
+        type_guide:
+          class: text
+      - key: adapter_reverse
+        type_guide:
+          class: text
+      - key: effective_genome_size
+        type_guide:
+          class: integer
+      - key: normalize_profile
+        type_guide:
+          class: boolean
     active: true
     iwc_id: chipseq-pe-main
   - trs_id: "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.14"
@@ -236,6 +265,20 @@ workflows:
     parameters:
       - key: reference_genome
         variable: ASSEMBLY_ID
+      - key: SR fastq input
+        type_guide:
+          class: Collection
+          collection_type: list
+        variable: SANGER_READ_RUN_SINGLE
+      - key: adapter_forward
+        type_guide:
+          class: text
+      - key: effective_genome_size
+        type_guide:
+          class: integer
+      - key: normalize_profile
+        type_guide:
+          class: boolean
     active: true
     iwc_id: chipseq-sr-main
   - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.3"
@@ -250,7 +293,21 @@ workflows:
       on the combined normalized data, and retains only peaks whose summits overlap
       with intersections from a user-defined minimum number of replicates.
     ploidy: ANY
-    parameters: []
+    parameters:
+      - key: n rmDup BAM
+        type_guide:
+          class: Collection
+          ext: bam
+          collection_type: list
+      - key: Minimum number of overlap
+        type_guide:
+          class: integer
+      - key: effective_genome_size
+        type_guide:
+          class: integer
+      - key: bin_size
+        type_guide:
+          class: integer
     active: true
     iwc_id: consensus-peaks-consensus-peaks-atac-cutandrun
   - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-pe/versions/v1.3"
@@ -265,7 +322,21 @@ workflows:
       normalized data, and retains only peaks whose summits overlap with intersections
       from a user-defined minimum number of replicates.
     ploidy: ANY
-    parameters: []
+    parameters:
+      - key: n rmDup BAMPE
+        type_guide:
+          class: Collection
+          ext: bam
+          collection_type: list
+      - key: Minimum number of overlap
+        type_guide:
+          class: integer
+      - key: effective_genome_size
+        type_guide:
+          class: integer
+      - key: bin_size
+        type_guide:
+          class: integer
     active: false
     iwc_id: consensus-peaks-consensus-peaks-chip-pe
   - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-sr/versions/v1.3"
@@ -280,7 +351,21 @@ workflows:
       normalized data, and retains only peaks whose summits overlap with intersections
       from a user-defined minimum number of replicates.
     ploidy: ANY
-    parameters: []
+    parameters:
+      - key: n rmDup BAMSR
+        type_guide:
+          class: Collection
+          ext: bam
+          collection_type: list
+      - key: Minimum number of overlap
+        type_guide:
+          class: integer
+      - key: effective_genome_size
+        type_guide:
+          class: integer
+      - key: bin_size
+        type_guide:
+          class: integer
     active: false
     iwc_id: consensus-peaks-consensus-peaks-chip-sr
   - trs_id: "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.14"
@@ -298,6 +383,23 @@ workflows:
     parameters:
       - key: reference_genome
         variable: ASSEMBLY_ID
+      - key: PE fastq input
+        type_guide:
+          class: Collection
+          collection_type: list:paired
+        variable: SANGER_READ_RUN_PAIRED
+      - key: adapter_forward
+        type_guide:
+          class: text
+      - key: adapter_reverse
+        type_guide:
+          class: text
+      - key: effective_genome_size
+        type_guide:
+          class: integer
+      - key: normalize_profile
+        type_guide:
+          class: boolean
     active: true
     iwc_id: cutandrun-main
   - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.2"
@@ -319,6 +421,28 @@ workflows:
         variable: ASSEMBLY_ID
       - key: gtf
         variable: GENE_MODEL_URL
+      - key: fastq PE collection GEX
+        type_guide:
+          class: Collection
+          collection_type: list:paired
+      - key: cellranger_barcodes_3M-february-2018.txt
+        type_guide:
+          class: File
+      - key: Barcode Size is same size of the Read
+        type_guide:
+          class: boolean
+      - key: fastq PE collection CMO
+        type_guide:
+          class: Collection
+          collection_type: list:paired
+      - key: sample name and CMO sequence collection
+        type_guide:
+          class: Collection
+          ext: csv
+          collection_type: list
+      - key: Number of expected cells
+        type_guide:
+          class: integer
     active: true
     iwc_id: fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-cellplex
   - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.2"
@@ -338,6 +462,17 @@ workflows:
         variable: ASSEMBLY_ID
       - key: gtf
         variable: GENE_MODEL_URL
+      - key: fastq PE collection
+        type_guide:
+          class: Collection
+          collection_type: list:paired
+        variable: SANGER_READ_RUN_PAIRED
+      - key: cellranger_barcodes_3M-february-2018.txt
+        type_guide:
+          class: File
+      - key: Barcode Size is same size of the Read
+        type_guide:
+          class: boolean
     active: true
     iwc_id: fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-v3
   - trs_id: "#workflow/github.com/iwc-workflows/generic-variant-calling-wgs-pe/main/versions/v0.1.1"
@@ -355,6 +490,7 @@ workflows:
           ext:
             - fastqsanger
             - fastqsanger.gz
+        variable: SANGER_READ_RUN_PAIRED
       - key: GenBank genome
         type_guide:
           class: File
@@ -408,7 +544,7 @@ workflows:
     ploidy: HAPLOID
     parameters:
       - key: Paired Collection
-        variable: SANGER_READ_RUN
+        variable: SANGER_READ_RUN_PAIRED
         type_guide:
           class: Collection
           ext:
@@ -772,6 +908,35 @@ workflows:
         variable: ASSEMBLY_ID
       - key: GTF file of annotation
         variable: GENE_MODEL_URL
+      - key: Collection paired FASTQ files
+        type_guide:
+          class: Collection
+          collection_type: list:paired
+        variable: SANGER_READ_RUN_PAIRED
+      - key: Forward adapter
+        type_guide:
+          class: text
+      - key: Reverse adapter
+        type_guide:
+          class: text
+      - key: Generate additional QC reports
+        type_guide:
+          class: boolean
+      - key: Strandedness
+        type_guide:
+          class: text
+      - key: Use featureCounts for generating count tables
+        type_guide:
+          class: boolean
+      - key: Compute Cufflinks FPKM
+        type_guide:
+          class: boolean
+      - key: GTF with regions to exclude from FPKM normalization with Cufflinks
+        type_guide:
+          class: File
+      - key: Compute StringTie FPKM
+        type_guide:
+          class: boolean
     active: true
     iwc_id: rnaseq-pe-main
   - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.2"
@@ -792,6 +957,32 @@ workflows:
         variable: ASSEMBLY_ID
       - key: GTF file of annotation
         variable: GENE_MODEL_URL
+      - key: Collection of FASTQ files
+        type_guide:
+          class: Collection
+          collection_type: list
+        variable: SANGER_READ_RUN_SINGLE
+      - key: Forward adapter
+        type_guide:
+          class: text
+      - key: Generate additional QC reports
+        type_guide:
+          class: boolean
+      - key: Strandedness
+        type_guide:
+          class: text
+      - key: Use featureCounts for generating count tables
+        type_guide:
+          class: boolean
+      - key: Compute Cufflinks FPKM
+        type_guide:
+          class: boolean
+      - key: GTF with regions to exclude from FPKM normalization with Cufflinks
+        type_guide:
+          class: File
+      - key: Compute StringTie FPKM
+        type_guide:
+          class: boolean
     active: true
     iwc_id: rnaseq-sr-main
   - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-ont-artic-variant-calling/COVID-19-ARTIC-ONT/versions/v0.3.2"
@@ -879,6 +1070,7 @@ workflows:
           ext:
             - fastqsanger
             - fastqsanger.gz
+        variable: SANGER_READ_RUN_PAIRED
       - key: NC_045512.2 FASTA sequence of SARS-CoV-2
         variable: ASSEMBLY_FASTA_URL
       - key: ARTIC primer BED
@@ -921,6 +1113,7 @@ workflows:
           ext:
             - fastqsanger
             - fastqsanger.gz
+        variable: SANGER_READ_RUN_PAIRED
       - key: NC_045512.2 FASTA sequence of SARS-CoV-2
         variable: ASSEMBLY_FASTA_URL
     active: true
@@ -941,6 +1134,7 @@ workflows:
           ext:
             - fastqsanger
             - fastqsanger.gz
+          variable: SANGER_READ_RUN_SINGLE
       - key: NC_045512.2 FASTA sequence of SARS-CoV-2
         variable: ASSEMBLY_FASTA_URL
     active: true

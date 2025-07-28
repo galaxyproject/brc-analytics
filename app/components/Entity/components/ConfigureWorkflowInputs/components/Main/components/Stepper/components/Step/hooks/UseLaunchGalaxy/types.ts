@@ -1,15 +1,17 @@
-import { EnaPairedReads } from "app/utils/galaxy-api/entities";
+import { EnaSequencingReads } from "app/utils/galaxy-api/entities";
 import { Workflow } from "../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import { ConfiguredInput } from "../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 
 export interface ConfiguredValue {
   geneModelUrl: string | null;
-  readRuns: EnaPairedReads[] | null;
+  readRunsPaired: EnaSequencingReads[] | null;
+  readRunsSingle: EnaSequencingReads[] | null;
   referenceAssembly: string;
 }
 
 export interface Status {
   disabled: boolean;
+  error: string | null;
   loading: boolean;
 }
 

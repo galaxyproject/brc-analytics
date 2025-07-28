@@ -22,8 +22,8 @@ export interface StepConfig {
 
 export interface StepProps
   extends Pick<StepConfig, "description" | "disabled">,
-    Pick<MStepProps, "active" | "completed" | "last">,
-    Required<Pick<MStepProps, "index">> {
+    Pick<MStepProps, "completed" | "last">,
+    Required<Pick<MStepProps, "index" | "active">> {
   entryLabel: string;
   genome: BRCDataCatalogGenome;
   onConfigure: OnConfigure;
@@ -31,5 +31,6 @@ export interface StepProps
   onEdit: OnEdit;
   onLaunchGalaxy: OnLaunchGalaxy;
   status: Status;
+  stepKey: keyof ConfiguredInput;
   workflow: Workflow;
 }

@@ -98,7 +98,7 @@ def generate_current_workflows():
     by_trs_id: Dict[str, Workflow] = {}
     for repo in manifest_data:
         for workflow in repo["workflows"]:
-            if not "tests" in workflow:
+            if "tests" not in workflow:
                 # probably fixed on main branch of iwc ?
                 # this branch is pretty out of date
                 continue

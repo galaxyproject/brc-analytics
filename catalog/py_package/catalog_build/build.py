@@ -101,7 +101,7 @@ def post_ncbi_request(url, json_data, batch_size=1000, min_batch_size=50):
 
                     # Use rate_limit_handler to make the request with proper retry logic
                     response = rate_limit_handler(
-                        lambda: requests.post(url, json=batch_data)
+                        lambda data=batch_data: requests.post(url, json=data)
                     )
 
                     if response.status_code != 200:
@@ -990,7 +990,7 @@ def fetch_sra_metadata(srs_ids, batch_size=20):
                 # BAM files that are labeled as FASTQ.
                 # For these, we can retrieve S3 links instead.
                 file_list_data, counter = fetch_url_data(
-                    f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=sra&id=SRR25741043&retmode=xml",
+                    "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=sra&id=SRR25741043&retmode=xml",
                     counter,
                 )
                 srafile_soup = BeautifulSoup(file_list_data.text, "xml")
@@ -1154,9 +1154,11 @@ def make_qc_report(
     gene_model_urls_text = (
         "N/A"
         if missing_gene_model_urls is None
-        else "None"
-        if len(missing_gene_model_urls) == 0
-        else "\n".join([f"- {accession}" for accession in missing_gene_model_urls])
+        else (
+            "None"
+            if len(missing_gene_model_urls) == 0
+            else "\n".join([f"- {accession}" for accession in missing_gene_model_urls])
+        )
     )
     taxonomy_ids_text = (
         "None"
@@ -1168,13 +1170,15 @@ def make_qc_report(
     ploidy_assemblies_text = (
         "None"
         if missing_ploidy_assemblies is None
-        else "None"
-        if len(missing_ploidy_assemblies) == 0
-        else "\n".join(
-            [
-                f"- {accession} (speciesTaxonomyId: {tax_id})"
-                for accession, tax_id in missing_ploidy_assemblies
-            ]
+        else (
+            "None"
+            if len(missing_ploidy_assemblies) == 0
+            else "\n".join(
+                [
+                    f"- {accession} (speciesTaxonomyId: {tax_id})"
+                    for accession, tax_id in missing_ploidy_assemblies
+                ]
+            )
         )
     )
     if missing_outbreak_descendants is None or len(missing_outbreak_descendants) == 0:
@@ -1321,7 +1325,7 @@ def build_files(
     ucsc_assemblies_url,
     tree_output_path,
     taxonomic_levels_for_tree,
-    taxonomic_group_sets={},
+    taxonomic_group_sets=None,
     do_gene_model_urls=True,
     extract_primary_data=False,
     primary_output_path=None,
@@ -1348,6 +1352,8 @@ def build_files(
       outbreaks_path: Path of input outbreaks YAML
       outbreak_taxonomy_mapping_path: Path to save taxonomic information for outbreaks at
     """
+    if taxonomic_group_sets is None:
+        taxonomic_group_sets = {}
     print("Building files")
 
     qc_report_params = {}

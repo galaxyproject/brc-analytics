@@ -24,6 +24,8 @@ import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/comp
 import { getGeneModelLabel } from "./utils";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { STEP } from "./step";
+import { StepWarning } from "../components/StepWarning/stepWarning";
+import { getStepActiveState, getButtonDisabledState } from "../utils/stepUtils";
 
 export const GTFStep = ({
   active,
@@ -36,7 +38,7 @@ export const GTFStep = ({
   onContinue,
   onEdit,
 }: StepProps): JSX.Element => {
-  const { geneModelUrls } = useUCSCFiles(genome);
+  const { error, geneModelUrls, isLoading } = useUCSCFiles(genome);
   const { controls, onChange, onValueChange, value } =
     useRadioGroup(geneModelUrls);
 
@@ -44,18 +46,23 @@ export const GTFStep = ({
     configureGTFStep(geneModelUrls, onConfigure, onValueChange);
   }, [geneModelUrls, onConfigure, onValueChange]);
 
+  // Auto-configure step with empty string if there's an error
+  // Empty string represents "user will provide in Galaxy" similar to how sequencing steps use empty arrays
+  useEffect(() => {
+    if (error && active) {
+      onConfigure(STEP.key, ""); // Use empty string instead of null
+    }
+  }, [error, active, onConfigure]);
+
   return (
     <Step
-      active={active && !!geneModelUrls}
+      active={getStepActiveState(active, isLoading)}
       completed={completed}
       index={index}
     >
       {/* Step component `children` should be subcomponents such as `StepLabel`, `StepContent`. */}
       {/* We ignore this; the loading UI is in the DOM while `geneModelUrls` is `undefined` and the Step is not `active`. */}
-      <Loading
-        loading={geneModelUrls === undefined}
-        panelStyle={LOADING_PANEL_STYLE.INHERIT}
-      />
+      <Loading loading={isLoading} panelStyle={LOADING_PANEL_STYLE.INHERIT} />
       <StepLabel
         optional={
           completed && (
@@ -77,7 +84,8 @@ export const GTFStep = ({
           >
             Genes and Gene Predictions
           </Typography>
-          {controls.length > 0 ? (
+          <StepWarning error={error} />
+          {!error && controls.length > 0 ? (
             <RadioGroup onChange={onChange} value={value}>
               {controls.map(({ label, value }, i) => (
                 <FormControlLabel
@@ -90,16 +98,18 @@ export const GTFStep = ({
               ))}
             </RadioGroup>
           ) : (
-            <Typography variant={TYPOGRAPHY_PROPS.VARIANT.TEXT_BODY_400}>
-              No gene models found.
-            </Typography>
+            !error && (
+              <Typography variant={TYPOGRAPHY_PROPS.VARIANT.TEXT_BODY_400}>
+                No gene models found.
+              </Typography>
+            )
           )}
           <Button
             {...BUTTON_PROPS.PRIMARY_CONTAINED}
-            disabled={!value}
+            disabled={getButtonDisabledState(!value && !error, isLoading)}
             onClick={() => onContinue()}
           >
-            Continue
+            {error ? "Skip This Step" : "Continue"}
           </Button>
         </StyledGrid>
       </StepContent>
