@@ -1,0 +1,29 @@
+[project]
+authors = [{"name" = "The BRC Analytics Team"}]
+dependencies = [
+    "pandas==2.3.1",
+    "requests==2.32.4",
+    "PyYAML==6.0.2",
+    "beautifulsoup4==4.13.4",
+    "lxml==6.0.0"
+]
+description = "The package provides modules that can be used to run scripts to manage the catalog and schema; it may be desirable to set up shortcuts for running these."
+license = "MIT"
+name = "catalog_build"
+readme = "README.md"
+requires-python = ">=3.8"
+version = "2.2.0"
+
+[project.urls]
+repository = "https://github.com/galaxyproject/brc-analytics/tree/main/catalog/py_package/"
+documentation = "https://github.com/galaxyproject/brc-analytics/tree/main/catalog/py_package/README.md"
+issues = "https://github.com/galaxyproject/brc-analytics/issues"
+
+[tool.poetry]
+packages = [
+    { include = "catalog_build" }
+]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
