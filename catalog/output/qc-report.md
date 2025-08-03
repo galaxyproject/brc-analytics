@@ -19,47 +19,50 @@ None
 
 - Acanthamoeba castellanii strain Neff: 5755, 1257118
 - Alphapapillomavirus 12: 990303, 10570
-- Alphapapillomavirus 14: 120686, 333769
+- Alphapapillomavirus 14: 333769, 120686
 - Alphapapillomavirus 6: 333765, 10611
-- Asfivirus haemorrhagiae: 443878, 10497, 443876
+- Asfivirus haemorrhagiae: 443876, 443878, 10497
 - Betacoronavirus pandemicum: 2697049, 227984
-- Betapapillomavirus 1: 333923, 889813
+- Betapapillomavirus 1: 889813, 333923
 - Blumeria graminis: 1689686, 62690
 - Candida tropicalis strain MYA-3404: 294747, 5482
-- Cryptococcus neoformans strain H99: 5207, 235443
+- Cryptococcus neoformans strain H99: 235443, 5207
 - Cryptosporidium parvum: 353152, 5807
 - Deltaretrovirus priTlym1: 194440, 11908
 - Dependoparvovirus mammalian1: 82300, 256548
-- Dependoparvovirus primate1: 10804, 57579, 202812, 85106, 202813
+- Dependoparvovirus primate1: 85106, 10804, 202813, 57579, 202812
 - Enterovirus alphacoxsackie: 150846, 156647
-- Enterovirus betarhino: 12131, 44130
-- Gammapapillomavirus 11: 1070409, 1070413, 1195796
+- Enterovirus betarhino: 44130, 12131
+- Gammapapillomavirus 11: 1070413, 1070409, 1195796
 - Gammapapillomavirus 12: 909331, 746832
-- Gammapapillomavirus 15: 1472342, 1070408
+- Gammapapillomavirus 15: 1070408, 1472342
 - Gammapapillomavirus 19: 1315259, 1315264
-- Gemykibivirus humas1: 1519409, 1516081
-- Glossina fuscipes: 201502, 7396
-- Hepacivirus hominis: 1544901, 33745, 356114
-- Neospora caninum strain Liverpool: 572307, 29176
-- Norovirus norwalkense: 1529924, 122928, 122929, 490039, 1529909, 1246677, 1529918
-- Orthoflavivirus denguei: 11053, 11070, 11069
+- Gemykibivirus humas1: 1516081, 1519409
+- Glossina fuscipes: 7396, 201502
+- Hepacivirus hominis: 356114, 1544901, 33745
+- Neospora caninum strain Liverpool: 29176, 572307
+- Norovirus norwalkense: 1246677, 1529909, 122929, 490039, 122928, 1529918, 1529924
+- Orthoflavivirus denguei: 11070, 11069, 11053
 - Orthomarburgvirus marburgense: 3052505, 448086
 - Pegivirus columbiaense: 1729141, 1704090
-- Plasmodium falciparum: 36329, 5833
-- Plasmodium vinckei: 5860, 54757, 119398, 138298, 138297
+- Plasmodium falciparum: 5833, 36329
+- Plasmodium vinckei: 119398, 54757, 5860, 138298, 138297
 - Small anellovirus: 289367, 289366
-- Torbevirus brisa: 2571075, 2571078, 2571077, 3116878
+- Torbevirus brisa: 2571075, 2571077, 2571078, 3116878
 - Trypanosoma brucei: 185431, 5702
-- Trypanosoma cruzi strain Dm28c: 85057, 1416333, 5693
-- Vesivirus exanthema: 35612, 146073
+- Trypanosoma cruzi strain Dm28c: 5693, 1416333, 85057
+- Vesivirus exanthema: 146073, 35612
 
 ## Assemblies without ploidy information
 
-None
+- GCF_000850885.1 (speciesTaxonomyId: 3426323)
+- GCF_000862105.1 (speciesTaxonomyId: 3426322)
+- GCF_002889215.1 (speciesTaxonomyId: 3426323)
+- GCF_002889695.1 (speciesTaxonomyId: 3426322)
 
 ## Outbreak descendant taxonomy IDs not found in genomes data
 
-None
+- 11036
 
 ## Outdated assembly accessions
 
