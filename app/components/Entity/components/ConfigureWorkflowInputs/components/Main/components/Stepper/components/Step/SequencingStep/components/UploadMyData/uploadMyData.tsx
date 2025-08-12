@@ -8,7 +8,7 @@ import { useEffect } from "react";
 export const UploadMyData = ({ onConfigure, stepKey }: Props): JSX.Element => {
   useEffect(() => {
     onConfigure(stepKey, []);
-  }, [onConfigure]);
+  }, [onConfigure, stepKey]);
   return (
     <StyledPaper {...PAPER_PROPS}>
       <Typography
