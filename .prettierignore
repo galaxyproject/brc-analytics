@@ -5,10 +5,14 @@
 package.json
 package-lock.json
 node_modules
+genkit/package.json
+genkit/package-lock.json
+genkit/node_modules
 
 # build
 out
 coverage
+genkit/dist
 
 # python
 venv

@@ -1,5 +1,9 @@
 # dependencies
 /node_modules
+genkit/node_modules
+
+# ai session data
+genkit/data
 
 # next.js
 /.next/
@@ -15,6 +19,7 @@ npm-debug.log*
 /.env*.local
 /.env.development
 /.env.production
+genkit/.env
 
 # typescript
 *.tsbuildinfo
@@ -31,6 +36,7 @@ npm-debug.log*
 
 # Build Dir
 /out
+genkit/dist
 
 # python
 venv
