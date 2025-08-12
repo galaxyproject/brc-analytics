@@ -1,10 +1,8 @@
 import { Button, Grid, Typography } from "@mui/material";
 import { Props } from "./types";
-import { TEXT_BODY_500 } from "@databiosphere/findable-ui/lib/theme/common/typography";
 import { StyledGrid } from "./workflow.styles";
-import { TYPOGRAPHY_PROPS } from "../../constants";
+import { TYPOGRAPHY_PROPS as COMPONENT_TYPOGRAPHY_PROPS } from "../../constants";
 import { BUTTON_PROPS, GRID_PROPS, OUTLINED_BUTTON_PROPS } from "./constants";
-
 import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,
@@ -13,14 +11,19 @@ import Link from "next/link";
 import { ROUTES } from "../../../../../../../routes/constants";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { formatTrsId } from "../../../AnalysisMethodsCatalog/utils";
+import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 
 export const Workflow = ({ entityId, workflow }: Props): JSX.Element => {
   const { iwcId, workflowDescription, workflowName } = workflow;
   return (
     <StyledGrid {...GRID_PROPS}>
       <Grid container spacing={1}>
-        <Typography variant={TEXT_BODY_500}>{workflowName}</Typography>
-        <Typography {...TYPOGRAPHY_PROPS}>{workflowDescription}</Typography>
+        <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_500}>
+          {workflowName}
+        </Typography>
+        <Typography {...COMPONENT_TYPOGRAPHY_PROPS}>
+          {workflowDescription}
+        </Typography>
       </Grid>
       <Grid container spacing={1}>
         <Grid>

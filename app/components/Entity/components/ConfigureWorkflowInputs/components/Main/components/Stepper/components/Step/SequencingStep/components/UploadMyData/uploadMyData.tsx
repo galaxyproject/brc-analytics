@@ -13,7 +13,7 @@ export const UploadMyData = ({ onConfigure, stepKey }: Props): JSX.Element => {
     <StyledPaper {...PAPER_PROPS}>
       <Typography
         color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
-        variant={TYPOGRAPHY_PROPS.VARIANT.TEXT_BODY_400}
+        variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
       >
         I&#39;ll upload my data directly to Galaxy.
       </Typography>

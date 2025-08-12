@@ -1,7 +1,7 @@
 import { Table as DXTable } from "@databiosphere/findable-ui/lib/components/Detail/components/Table/table";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
-import { mediaTabletUp } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
-import { ThemeProps } from "@databiosphere/findable-ui/lib/theme/theme";
+import { bpUpSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
+import { ThemeProps } from "@databiosphere/findable-ui/lib/theme/types";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 
@@ -15,7 +15,7 @@ export const tableStyles = (props: ThemeProps) => css`
       }
     }
 
-    ${mediaTabletUp(props)} {
+    ${bpUpSm(props)} {
       .MuiTableHead-root,
       .MuiTableBody-root {
         .MuiTableRow-root {

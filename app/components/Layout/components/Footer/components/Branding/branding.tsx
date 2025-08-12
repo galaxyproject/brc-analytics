@@ -1,8 +1,8 @@
 import { Logo } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/components/Content/components/Logo/logo";
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
-import { TEXT_BODY_SMALL_400 } from "@databiosphere/findable-ui/lib/theme/common/typography";
 import { Brands, FooterText, LargeBrand, SmallBrand } from "./branding.styles";
+import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 
 export const Branding = (): JSX.Element => {
   return (
@@ -43,7 +43,10 @@ export const Branding = (): JSX.Element => {
           target={ANCHOR_TARGET.BLANK}
         />
       </SmallBrand>
-      <FooterText color="ink.light" variant={TEXT_BODY_SMALL_400}>
+      <FooterText
+        color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
+        variant={TYPOGRAPHY_PROPS.VARIANT.BODY_SMALL_400}
+      >
         BRC Analytics is a part of the Bioinformatics Resource Centers for
         Infectious Diseases Program developed and funded by{" "}
         <Link

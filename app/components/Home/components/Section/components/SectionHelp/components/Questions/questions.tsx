@@ -7,7 +7,7 @@ import { Accordion } from "../../../../../../../common/Accordion/accordion";
 import { AccordionSummary } from "../../../../../../../common/Accordion/components/AccordionSummary/accordionSummary";
 import { URLS } from "../../../../../../common/constants";
 import { Grid } from "./questions.styles";
-import { TEXT_BODY_LARGE_500 } from "@databiosphere/findable-ui/lib/theme/common/typography";
+import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 
 export const Questions = (): JSX.Element => {
   return (
@@ -54,7 +54,7 @@ export const Questions = (): JSX.Element => {
         <MAccordionDetails>
           <ol>
             <li>
-              <Typography variant={TEXT_BODY_LARGE_500}>
+              <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_LARGE_500}>
                 How is this possible?
               </Typography>{" "}
               Analytical capabilities of BRC-analytics.org are sustained by
@@ -69,21 +69,21 @@ export const Questions = (): JSX.Element => {
               assembly or GPU-containing nodes.
             </li>
             <li>
-              <Typography variant={TEXT_BODY_LARGE_500}>
+              <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_LARGE_500}>
                 How long are my datasets stored?
               </Typography>{" "}
               There is no time limit on data stored within the permanent storage
               (250Gb). Scratch storage is limited to 60 days.
             </li>
             <li>
-              <Typography variant={TEXT_BODY_LARGE_500}>
+              <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_LARGE_500}>
                 Who can see my work?
               </Typography>{" "}
               You. To be seen by others you data, workflows, or visualizations
               need to be explicitly shared or made public.
             </li>
             <li>
-              <Typography variant={TEXT_BODY_LARGE_500}>
+              <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_LARGE_500}>
                 Can I upload restricted access data?
               </Typography>{" "}
               BRC-analytics and Galaxy are free, public, internet accessible
@@ -94,7 +94,7 @@ export const Questions = (): JSX.Element => {
               this Galaxy server.
             </li>
             <li>
-              <Typography variant={TEXT_BODY_LARGE_500}>
+              <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_LARGE_500}>
                 What if I mine BitCoin?
               </Typography>{" "}
               You will banned from using this site forever.

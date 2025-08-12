@@ -8,7 +8,7 @@ export const ValueElType = ({
   ...props /* Mui Typography Props */
 }: ChildrenProps & TypographyProps): JSX.Element => {
   return (
-    <Typography variant={TYPOGRAPHY_PROPS.VARIANT.TEXT_BODY_400} {...props}>
+    <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400} {...props}>
       {children}
     </Typography>
   );

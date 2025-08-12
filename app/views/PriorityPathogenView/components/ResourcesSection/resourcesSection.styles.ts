@@ -1,9 +1,9 @@
-import { textBody4002Lines } from "@databiosphere/findable-ui/lib/styles/common/mixins/fonts";
 import styled from "@emotion/styled";
 import { List } from "@mui/material";
+import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 
 export const StyledList = styled(List)`
-  ${textBody4002Lines};
+  font: ${FONT.BODY_400_2_LINES};
   list-style-type: disc;
   padding-left: 24px;
 

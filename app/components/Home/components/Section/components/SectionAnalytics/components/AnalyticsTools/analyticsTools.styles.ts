@@ -1,8 +1,8 @@
-import { textBody500 } from "@databiosphere/findable-ui/lib/styles/common/mixins/fonts";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { Card as MCard } from "@mui/material";
 import { Bullets } from "../../../../../../../common/Bullets/bullets";
+import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 
 interface Props {
   interactionEnabled: boolean;
@@ -45,7 +45,7 @@ export const CardContent = styled.div`
 `;
 
 export const CardTitle = styled.span`
-  ${textBody500};
+  font: ${FONT.BODY_500};
 `;
 
 export const StyledCardActions = styled.div`
@@ -53,7 +53,7 @@ export const StyledCardActions = styled.div`
   gap: 16px;
 
   .MuiLink-root {
-    ${textBody500};
+    font: ${FONT.BODY_500};
   }
 `;
 

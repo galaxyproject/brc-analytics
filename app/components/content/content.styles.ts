@@ -1,5 +1,4 @@
-import { mediaTabletUp } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
-import { textBodyLarge400 } from "@databiosphere/findable-ui/lib/styles/common/mixins/fonts";
+import { bpUpSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import {
@@ -11,6 +10,7 @@ import {
   sectionWithDivider,
 } from "../Layout/components/AppLayout/components/Section/section.styles";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
+import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 
 export interface LayoutProps {
   centered?: boolean;
@@ -72,7 +72,7 @@ export const SectionLayout = styled.div<LayoutProps>`
   ${(props) =>
     props.paired &&
     css`
-      ${mediaTabletUp(props)} {
+      ${bpUpSm(props)} {
         ${sectionGridAreas};
       }
     `}
@@ -92,15 +92,15 @@ export const SectionHeadline = styled.div<LayoutProps>`
       grid-column: 1 / -1;
       max-width: 504px;
 
-      ${mediaTabletUp(props)} {
+      ${bpUpSm(props)} {
         grid-area: feature;
       }
     `}
 `;
 
 export const SubHeadline = styled.div`
-  ${textBodyLarge400};
   color: ${PALETTE.INK_LIGHT};
+  font: ${FONT.BODY_LARGE_400};
 
   ${SectionHeadline} & {
     margin-top: 16px;
@@ -116,7 +116,7 @@ export const SectionContent = styled.div<LayoutProps>`
   ${(props) =>
     props.paired &&
     css`
-      ${mediaTabletUp(props)} {
+      ${bpUpSm(props)} {
         grid-area: detail;
         margin-top: 0;
       }

@@ -1,11 +1,11 @@
-import { TEXT_BODY_LARGE_400_2_LINES } from "@databiosphere/findable-ui/lib/theme/common/typography";
-import { Components, Theme } from "@mui/material";
+import { Components } from "@mui/material";
 import { COLOR_MIXES } from "@databiosphere/findable-ui/lib/styles/common/constants/colorMixes";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
 import { CHIP_PROPS as APP_CHIP_PROPS } from "../../styles/common/mui/chip";
 import { PALETTE as APP_PALETTE } from "../../styles/common/constants/palette";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
+import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 
 /**
  * MuiButton Component
@@ -55,17 +55,13 @@ export const MuiButtonGroup: Components["MuiButtonGroup"] = {
 
 /**
  * MuiCssBaseline Component
- * @param theme - Theme.
- * @returns MuiCssBaseline component theme styles.
  */
-export const MuiCssBaseline = (theme: Theme): Components["MuiCssBaseline"] => {
-  return {
-    styleOverrides: {
-      body: {
-        ...theme.typography[TEXT_BODY_LARGE_400_2_LINES],
-      },
+export const MuiCssBaseline: Components["MuiCssBaseline"] = {
+  styleOverrides: {
+    body: {
+      font: FONT.BODY_LARGE_400_2_LINES,
     },
-  };
+  },
 };
 
 /**

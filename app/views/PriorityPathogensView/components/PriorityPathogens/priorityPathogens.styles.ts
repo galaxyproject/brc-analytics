@@ -1,6 +1,6 @@
 import { Grid, Typography } from "@mui/material";
 import styled from "@emotion/styled";
-import { mediaTabletUp } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
+import { bpUpSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 
 export const StyledGrid = styled(Grid)`
@@ -21,7 +21,7 @@ export const StyledGrid = styled(Grid)`
     }
   }
 
-  ${mediaTabletUp} {
+  ${bpUpSm} {
     grid-template-columns: repeat(2, 1fr);
   }
 `;

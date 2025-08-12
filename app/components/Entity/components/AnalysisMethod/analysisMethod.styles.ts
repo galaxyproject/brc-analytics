@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { Accordion } from "@mui/material";
-import { mediaTabletDown } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
+import { bpDownSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import { SHADOWS } from "@databiosphere/findable-ui/lib/styles/common/constants/shadows";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 
@@ -56,7 +56,7 @@ export const StyledAccordion = styled(Accordion)`
       overflow: hidden; // simple way to manage workflow loading panel bleed
       padding: 0;
 
-      ${mediaTabletDown} {
+      ${bpDownSm} {
         border-radius: 0;
       }
     }

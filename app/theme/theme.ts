@@ -27,7 +27,7 @@ export function mergeAppTheme(
       MuiButton: C.MuiButton,
       MuiButtonGroup: C.MuiButtonGroup,
       MuiChip: C.MuiChip,
-      MuiCssBaseline: C.MuiCssBaseline(baseAppTheme),
+      MuiCssBaseline: C.MuiCssBaseline,
     },
   });
   // Return app theme.
