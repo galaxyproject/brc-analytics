@@ -1,0 +1,44 @@
+{
+  "name": "brc-analytics-genkit",
+  "version": "1.0.0",
+  "description": "GenKit backend for BRC Analytics",
+  "main": "dist/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "ts-node-dev --respawn src/server.ts",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": [
+    "brc",
+    "analytics",
+    "genkit"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@genkit-ai/compat-oai": "^1.15.5",
+    "@genkit-ai/googleai": "^1.15.5",
+    "@types/multer": "^2.0.0",
+    "axios": "^1.11.0",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "genkit": "^1.16.0",
+    "genkitx-anthropic": "^0.23.1",
+    "genkitx-mcp": "^1.14.1",
+    "genkitx-ollama": "^1.15.5",
+    "multer": "^2.0.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^5.0.3",
+    "@types/node": "^20.11.0",
+    "concurrently": "^9.2.0",
+    "cors": "^2.8.5",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.3.3"
+  }
+}
