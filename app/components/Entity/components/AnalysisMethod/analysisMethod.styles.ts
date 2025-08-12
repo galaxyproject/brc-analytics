@@ -26,7 +26,7 @@ export const StyledAccordion = styled(Accordion)`
           .MuiTypography-root {
             margin: 0;
 
-            &.MuiTypography-text-heading-small {
+            &.MuiTypography-heading-small {
               font-size: 16px;
               letter-spacing: normal;
               line-height: 24px;
