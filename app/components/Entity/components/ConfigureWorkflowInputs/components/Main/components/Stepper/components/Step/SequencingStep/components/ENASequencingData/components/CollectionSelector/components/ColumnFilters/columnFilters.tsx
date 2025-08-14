@@ -3,12 +3,18 @@ import { ColumnFiltersAdapter } from "@databiosphere/findable-ui/lib/components/
 import { SurfaceProps } from "@databiosphere/findable-ui/lib/components/Filter/components/surfaces/types";
 import { Filters } from "@databiosphere/findable-ui/lib/components/Filter/components/Filters/filters";
 import { StyledGrid } from "./columnFilters.styles";
+import { Controls } from "@databiosphere/findable-ui/lib/components/Filter/components/controls/Controls/controls";
 
 export const ColumnFilters = ({ table }: Props): JSX.Element => {
   return (
     <StyledGrid container>
       <ColumnFiltersAdapter
-        renderSurface={(props: SurfaceProps) => <Filters {...props} />}
+        renderSurface={(props: SurfaceProps) => (
+          <>
+            <Controls onFilter={props.onFilter} />
+            <Filters {...props} />
+          </>
+        )}
         table={table}
       />
     </StyledGrid>

@@ -4,5 +4,7 @@ import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/
 
 export const StyledGrid = styled(Grid)`
   box-shadow: inset -1px 0 ${PALETTE.SMOKE_MAIN};
+  display: grid;
+  grid-template-rows: auto 1fr;
   overflow: auto;
 `;
