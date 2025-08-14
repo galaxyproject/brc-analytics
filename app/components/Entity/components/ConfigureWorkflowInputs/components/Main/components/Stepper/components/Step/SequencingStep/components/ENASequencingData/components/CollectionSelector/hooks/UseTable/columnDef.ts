@@ -1,92 +1,99 @@
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, ColumnMeta } from "@tanstack/react-table";
 import { ReadRun } from "../../../../types";
-import { COLUMN_DEF } from "@databiosphere/findable-ui/lib/components/Table/common/columnDef";
-import { META } from "./constants";
-import { BasicCell } from "../../components/Table/components/TableCell/components/BasicCell/basicCell";
 import { buildFastqFTP } from "./viewBuilders";
+import { COLUMN_DEF } from "@databiosphere/findable-ui/lib/components/Table/common/columnDef";
+import { BasicCell } from "../../components/Table/components/TableCell/components/BasicCell/basicCell";
+import { CATEGORY_CONFIGS } from "./categoryConfigs";
 
-const RUN_ACCESSION: ColumnDef<ReadRun> = {
-  accessorKey: "run_accession",
-  filterFn: "arrIncludesSome",
-  header: "Run Accession",
-  meta: { width: { max: "1fr", min: "140px" } },
+const RANGE_FILTER_FN = "inNumberRange";
+const SELECT_FILTER_FN = "arrIncludesSome";
+
+const META: ColumnMeta<ReadRun, unknown> = {
+  width: { max: "1.2fr", min: "120px" },
 };
 
-const FASTQ_FTP: ColumnDef<ReadRun> = {
-  accessorKey: "fastq_ftp",
-  cell: (props) => BasicCell(buildFastqFTP(props)),
-  filterFn: "arrIncludesSome",
-  header: "Fastq FTP",
-  meta: { width: { max: "1.8fr", min: "200px" } },
+const BASE_COUNT: ColumnDef<ReadRun> = {
+  accessorKey: CATEGORY_CONFIGS.BASE_COUNT.key,
+  filterFn: RANGE_FILTER_FN,
+  header: CATEGORY_CONFIGS.BASE_COUNT.label,
+  meta: META,
 };
 
 const EXPERIMENT_ACCESSION: ColumnDef<ReadRun> = {
-  accessorKey: "experiment_accession",
-  filterFn: "arrIncludesSome",
-  header: "Experiment Accession",
+  accessorKey: CATEGORY_CONFIGS.EXPERIMENT_ACCESSION.key,
+  filterFn: SELECT_FILTER_FN,
+  header: CATEGORY_CONFIGS.EXPERIMENT_ACCESSION.label,
   meta: META,
 };
 
-const SAMPLE_ACCESSION: ColumnDef<ReadRun> = {
-  accessorKey: "sample_accession",
-  filterFn: "arrIncludesSome",
-  header: "Sample Accession",
-  meta: META,
+const FASTQ_FTP: ColumnDef<ReadRun> = {
+  accessorKey: CATEGORY_CONFIGS.FASTQ_FTP.key,
+  cell: (ctx) => BasicCell(buildFastqFTP(ctx)),
+  filterFn: SELECT_FILTER_FN,
+  header: CATEGORY_CONFIGS.FASTQ_FTP.label,
+  meta: { width: { max: "1.8fr", min: "200px" } },
 };
 
-const STUDY_ACCESSION: ColumnDef<ReadRun> = {
-  accessorKey: "study_accession",
-  filterFn: "arrIncludesSome",
-  header: "Study Accession",
-  meta: META,
-};
-
-const SCIENTIFIC_NAME: ColumnDef<ReadRun> = {
-  accessorKey: "scientific_name",
-  filterFn: "arrIncludesSome",
-  header: "Scientific Name",
+const INSTRUMENT_MODEL: ColumnDef<ReadRun> = {
+  accessorKey: CATEGORY_CONFIGS.INSTRUMENT_MODEL.key,
+  filterFn: SELECT_FILTER_FN,
+  header: CATEGORY_CONFIGS.INSTRUMENT_MODEL.label,
   meta: META,
 };
 
 const INSTRUMENT_PLATFORM: ColumnDef<ReadRun> = {
-  accessorKey: "instrument_platform",
-  filterFn: "arrIncludesSome",
-  header: "Instrument Platform",
-  meta: META,
-};
-
-const INSTRUMENT_MODEL: ColumnDef<ReadRun> = {
-  accessorKey: "instrument_model",
-  filterFn: "arrIncludesSome",
-  header: "Instrument Model",
-  meta: META,
-};
-
-const LIBRARY_STRATEGY: ColumnDef<ReadRun> = {
-  accessorKey: "library_strategy",
-  filterFn: "arrIncludesSome",
-  header: "Library Strategy",
+  accessorKey: CATEGORY_CONFIGS.INSTRUMENT_PLATFORM.key,
+  filterFn: SELECT_FILTER_FN,
+  header: CATEGORY_CONFIGS.INSTRUMENT_PLATFORM.label,
   meta: META,
 };
 
 const LIBRARY_LAYOUT: ColumnDef<ReadRun> = {
-  accessorKey: "library_layout",
-  filterFn: "arrIncludesSome",
-  header: "Library Layout",
+  accessorKey: CATEGORY_CONFIGS.LIBRARY_LAYOUT.key,
+  filterFn: SELECT_FILTER_FN,
+  header: CATEGORY_CONFIGS.LIBRARY_LAYOUT.label,
+  meta: META,
+};
+
+const LIBRARY_STRATEGY: ColumnDef<ReadRun> = {
+  accessorKey: CATEGORY_CONFIGS.LIBRARY_STRATEGY.key,
+  filterFn: SELECT_FILTER_FN,
+  header: CATEGORY_CONFIGS.LIBRARY_STRATEGY.label,
   meta: META,
 };
 
 const READ_COUNT: ColumnDef<ReadRun> = {
-  accessorKey: "read_count",
-  filterFn: "arrIncludesSome",
-  header: "Read Count",
+  accessorKey: CATEGORY_CONFIGS.READ_COUNT.key,
+  filterFn: RANGE_FILTER_FN,
+  header: CATEGORY_CONFIGS.READ_COUNT.label,
   meta: META,
 };
 
-const BASE_COUNT: ColumnDef<ReadRun> = {
-  accessorKey: "base_count",
-  filterFn: "arrIncludesSome",
-  header: "Base Count",
+const RUN_ACCESSION: ColumnDef<ReadRun> = {
+  accessorKey: CATEGORY_CONFIGS.RUN_ACCESSION.key,
+  filterFn: SELECT_FILTER_FN,
+  header: CATEGORY_CONFIGS.RUN_ACCESSION.label,
+  meta: { width: { max: "1fr", min: "140px" } },
+};
+
+const SAMPLE_ACCESSION: ColumnDef<ReadRun> = {
+  accessorKey: CATEGORY_CONFIGS.SAMPLE_ACCESSION.key,
+  filterFn: SELECT_FILTER_FN,
+  header: CATEGORY_CONFIGS.SAMPLE_ACCESSION.label,
+  meta: META,
+};
+
+const SCIENTIFIC_NAME: ColumnDef<ReadRun> = {
+  accessorKey: CATEGORY_CONFIGS.SCIENTIFIC_NAME.key,
+  filterFn: SELECT_FILTER_FN,
+  header: CATEGORY_CONFIGS.SCIENTIFIC_NAME.label,
+  meta: META,
+};
+
+const STUDY_ACCESSION: ColumnDef<ReadRun> = {
+  accessorKey: CATEGORY_CONFIGS.STUDY_ACCESSION.key,
+  filterFn: SELECT_FILTER_FN,
+  header: CATEGORY_CONFIGS.STUDY_ACCESSION.label,
   meta: META,
 };
 
