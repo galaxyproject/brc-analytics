@@ -44,3 +44,33 @@ export async function fetchENAData<T>({
 
   return data;
 }
+
+/**
+ * Fetch ENA data for a given taxonomy ID.
+ * @param options - Options for the ENA data fetch.
+ * @param options.submitOptions - Options for the submission.
+ * @param options.taxonomyId - The taxonomy ID to fetch data for.
+ * @returns Promise with the ENA data.
+ */
+export async function fetchENADataByTaxonomy<T>({
+  submitOptions,
+  taxonomyId,
+}: {
+  submitOptions: SubmitOptions;
+  taxonomyId: string;
+}): Promise<T[] | undefined> {
+  const query = `tax_tree(${taxonomyId})`;
+
+  const res = await fetch(replaceParameters(ENA_API, { query }));
+
+  const data = await res.json();
+
+  if (!data || !data.length) {
+    submitOptions.onError?.();
+    return;
+  }
+
+  submitOptions.onSuccess?.();
+
+  return data;
+}

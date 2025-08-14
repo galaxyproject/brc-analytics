@@ -1,15 +1,20 @@
-import { Button, Typography } from "@mui/material";
+import { Button, Grid, Typography } from "@mui/material";
 import { StyledPaper } from "./dataSelector.styles";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { PAPER_PROPS } from "./constants";
 import { Props } from "./types";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
+import { renderBrowseText, canBrowseAll, getReadCount } from "./utils";
 
 export const DataSelector = ({
+  genome,
+  onContinue,
   onOpen,
+  onRequestDataByTaxonomy,
   selectedCount,
 }: Props): JSX.Element | null => {
   if (selectedCount > 0) return null;
+  const readCount = getReadCount(genome);
   return (
     <StyledPaper {...PAPER_PROPS}>
       <Typography
@@ -24,9 +29,23 @@ export const DataSelector = ({
       >
         Browse ENA to find and select a collection
       </Typography>
-      <Button {...BUTTON_PROPS.PRIMARY_CONTAINED} onClick={onOpen}>
-        Browse
-      </Button>
+      <Grid container gap={4}>
+        <Button {...BUTTON_PROPS.PRIMARY_CONTAINED} onClick={onOpen}>
+          {renderBrowseText(readCount)}
+        </Button>
+        {canBrowseAll(readCount) && (
+          <Button
+            {...BUTTON_PROPS.PRIMARY_CONTAINED}
+            onClick={() =>
+              onRequestDataByTaxonomy(genome.ncbiTaxonomyId, {
+                onSuccess: onContinue,
+              })
+            }
+          >
+            Browse All ({readCount})
+          </Button>
+        )}
+      </Grid>
     </StyledPaper>
   );
 };
