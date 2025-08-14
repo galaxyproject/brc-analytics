@@ -1,7 +1,7 @@
-import { textBody400 } from "@databiosphere/findable-ui/lib/styles/common/mixins/fonts";
 import styled from "@emotion/styled";
 import { Dialog } from "@mui/material";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
+import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 
 export const StyledDialog = styled(Dialog)`
   .MuiDialog-paper {
@@ -31,8 +31,8 @@ export const StyledDialog = styled(Dialog)`
         gap: 4px;
 
         .MuiFormLabel-root {
-          ${textBody400};
           color: ${PALETTE.INK_MAIN};
+          font: ${FONT.BODY_400};
         }
 
         .MuiFormHelperText-root {

@@ -1,4 +1,4 @@
-import { mediaTabletDown } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
+import { bpDownSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { IconButton as MIconButton } from "@mui/material";
@@ -38,7 +38,7 @@ export const IconButton = styled(MIconButton, {
       box-shadow: inset 0 0 0 1px ${PALETTE.SMOKE_DARK};
     }
 
-    ${mediaTabletDown} {
+    ${bpDownSm} {
       display: none;
     }
   }

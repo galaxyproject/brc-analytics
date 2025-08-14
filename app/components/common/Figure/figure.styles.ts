@@ -1,7 +1,7 @@
-import { mediaTabletUp } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
-import { textBodyLarge4002Lines } from "@databiosphere/findable-ui/lib/styles/common/mixins/fonts";
+import { bpUpSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
+import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 
 export const Figure = styled.figure`
   margin: 16px 0;
@@ -12,13 +12,13 @@ export const Figure = styled.figure`
   }
 
   figcaption {
-    ${textBodyLarge4002Lines};
     color: ${PALETTE.INK_LIGHT};
     display: block;
+    font: ${FONT.BODY_LARGE_400_2_LINES};
     margin-top: 32px;
     text-align: justify;
 
-    ${mediaTabletUp} {
+    ${bpUpSm} {
       display: flex;
       gap: 0 64px;
       margin-top: 52px;

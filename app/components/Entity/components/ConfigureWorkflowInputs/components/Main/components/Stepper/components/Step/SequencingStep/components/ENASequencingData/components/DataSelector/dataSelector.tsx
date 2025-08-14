@@ -14,13 +14,13 @@ export const DataSelector = ({
     <StyledPaper {...PAPER_PROPS}>
       <Typography
         component="div"
-        variant={TYPOGRAPHY_PROPS.VARIANT.TEXT_HEADING_XSMALL}
+        variant={TYPOGRAPHY_PROPS.VARIANT.HEADING_XSMALL}
       >
         No Sequencing Data Selected
       </Typography>
       <Typography
         color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
-        variant={TYPOGRAPHY_PROPS.VARIANT.TEXT_BODY_400}
+        variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
       >
         Browse ENA to find and select a collection
       </Typography>

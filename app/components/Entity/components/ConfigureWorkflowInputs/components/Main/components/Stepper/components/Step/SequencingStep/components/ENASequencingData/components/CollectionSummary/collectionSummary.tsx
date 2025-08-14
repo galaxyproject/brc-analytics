@@ -28,7 +28,7 @@ export const CollectionSummary = ({
   return (
     <StyledRoundedPaper elevation={0}>
       <StyledToolbar>
-        <Typography variant={TYPOGRAPHY_PROPS.VARIANT.TEXT_BODY_400}>
+        <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}>
           {count} Collection{count > 1 ? "s" : ""} Selected
         </Typography>
         <Grid container gap={2}>

@@ -1,9 +1,9 @@
-import { mediaTabletUp } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
-import { textBodyLarge400 } from "@databiosphere/findable-ui/lib/styles/common/mixins/fonts";
+import { bpUpSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
 import { Section } from "../../../../../../../common/Section/section";
 import { sectionGrid, sectionLayout } from "../../section.styles";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
+import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 
 export const StyledSection = styled(Section)`
   background-color: ${PALETTE.SMOKE_LIGHTEST};
@@ -35,7 +35,7 @@ export const Head = styled.h1`
   line-height: 72px;
   margin: 0;
 
-  ${mediaTabletUp} {
+  ${bpUpSm} {
     span {
       display: block;
     }
@@ -45,13 +45,13 @@ export const Head = styled.h1`
 export const SubHeadline = styled.div`
   grid-column: 1 / -1;
 
-  ${mediaTabletUp} {
+  ${bpUpSm} {
     grid-column: 1 / 8;
   }
 `;
 
 export const Subhead = styled.div`
-  ${textBodyLarge400};
   color: ${PALETTE.INK_LIGHT};
+  font: ${FONT.BODY_LARGE_400};
   margin: 0;
 `;

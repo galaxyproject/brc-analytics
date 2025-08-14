@@ -1,6 +1,6 @@
 import { Paper } from "@mui/material";
 import styled from "@emotion/styled";
-import { mediaTabletDown } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
+import { bpDownSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { SHADOWS } from "@databiosphere/findable-ui/lib/styles/common/constants/shadows";
 
@@ -11,7 +11,7 @@ export const StyledPaper = styled(Paper)`
   box-shadow: ${SHADOWS["01"]};
   overflow: hidden;
 
-  ${mediaTabletDown} {
+  ${bpDownSm} {
     border-left: none;
     border-radius: 0;
     border-right: none;
