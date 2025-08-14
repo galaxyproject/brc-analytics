@@ -5,13 +5,18 @@ export type OnRequestData = (
   submitOptions: SubmitOptions
 ) => Promise<void>;
 
+export type OnRequestDataByTaxonomy = (
+  taxonomyId: string,
+  submitOptions?: SubmitOptions
+) => Promise<void>;
+
 export interface Status {
   errors: Record<string, string>;
   loading: boolean;
 }
 
 export interface SubmitOptions {
-  onError?: () => void;
+  onError?: (error: Error) => void;
   onSuccess?: () => void;
 }
 
@@ -19,5 +24,6 @@ export interface UseENA<T> {
   clearErrors: () => void;
   data?: T[];
   onRequestData: OnRequestData;
+  onRequestDataByTaxonomy: OnRequestDataByTaxonomy;
   status: Status;
 }

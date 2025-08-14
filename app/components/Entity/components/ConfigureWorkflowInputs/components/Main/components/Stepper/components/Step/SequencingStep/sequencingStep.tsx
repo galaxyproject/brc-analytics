@@ -15,6 +15,7 @@ export const SequencingStep = ({
   active,
   completed,
   entryLabel,
+  genome,
   index,
   onConfigure,
   stepKey,
@@ -30,8 +31,10 @@ export const SequencingStep = ({
         {value === VIEW.ENA ? (
           <ENASequencingData
             clearErrors={ena.clearErrors}
+            genome={genome}
             onConfigure={onConfigure}
             onRequestData={ena.onRequestData}
+            onRequestDataByTaxonomy={ena.onRequestDataByTaxonomy}
             status={ena.status}
             table={table}
             stepKey={stepKey as "readRunsSingle" | "readRunsPaired"}
