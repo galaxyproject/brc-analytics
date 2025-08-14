@@ -36,7 +36,11 @@ export async function fetchENAData<T>({
   const data = await res.json();
 
   if (!data || !data.length) {
-    submitOptions.onError?.();
+    submitOptions.onError?.(
+      new Error(
+        "Accessions were not found. Please check the IDs and try again."
+      )
+    );
     return;
   }
 
@@ -56,21 +60,33 @@ export async function fetchENADataByTaxonomy<T>({
   submitOptions,
   taxonomyId,
 }: {
-  submitOptions: SubmitOptions;
+  submitOptions: Required<SubmitOptions>;
   taxonomyId: string;
 }): Promise<T[] | undefined> {
-  const query = `tax_tree(${taxonomyId})`;
+  try {
+    const query = `tax_tree(${taxonomyId})`;
 
-  const res = await fetch(replaceParameters(ENA_API, { query }));
+    const res = await fetch(replaceParameters(ENA_API, { query }));
 
-  const data = await res.json();
+    if (!res.ok) {
+      const errorMessage = `ENA API request failed: ${res.status} ${res.statusText}`;
+      submitOptions.onError?.(new Error(errorMessage));
+      return;
+    }
 
-  if (!data || !data.length) {
-    submitOptions.onError?.();
+    const data = await res.json();
+
+    if (!data || !data.length) {
+      const errorMessage = `No sequencing data found for taxonomy ID ${taxonomyId}`;
+      submitOptions.onError?.(new Error(errorMessage));
+      return;
+    }
+
+    submitOptions.onSuccess?.();
+
+    return data;
+  } catch (error) {
+    submitOptions.onError?.(error as Error);
     return;
   }
-
-  submitOptions.onSuccess?.();
-
-  return data;
 }

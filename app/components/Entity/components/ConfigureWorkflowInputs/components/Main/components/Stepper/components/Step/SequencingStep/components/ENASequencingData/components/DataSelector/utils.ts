@@ -20,6 +20,7 @@ export function getReadCount(genome: BRCDataCatalogGenome): number {
   const taxonomyIdReadCounts = new Map(Object.entries(taxonomyReadCounts));
   const readCount = taxonomyIdReadCounts.get(genome.ncbiTaxonomyId);
 
+  // If the read count is not found -- or is 0, return the maximum read count.
   if (!readCount) return MAX_READ_RUNS_FOR_BROWSE_ALL;
 
   return readCount;
