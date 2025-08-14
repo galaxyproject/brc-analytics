@@ -2,7 +2,7 @@
 
 ## Development
 
-In order to facilitate using the package outside the BRC Analytics repository, package versions should be tagged with Git tags of the form `catalog_build_v<VERSION>` once merged into main, where `<VERSION>` is the version number specified in `setup.py`. This version number should be updated in accordance with Semantic Versioning conventions.
+To prepare an updated version of the package for installation in another project, the version number specified in `setup.py` should be updated in accordance with Semantic Versioning conventions.
 
 ## Usage
 
@@ -13,10 +13,10 @@ In order to facilitate using the package outside the BRC Analytics repository, p
 The package can be installed using Pip with a command of the form:
 
 ```bash
-pip install -e "git+https://github.com/galaxyproject/brc-analytics.git@catalog_build_v<VERSION>#egg=catalog_build&subdirectory=catalog/py_package"
+pip install -e "git+https://github.com/galaxyproject/brc-analytics.git@<COMMIT>#egg=catalog_build&subdirectory=catalog/py_package"
 ```
 
-This installs the package from the BRC Analytics GitHub repository, referencing a Git tag named in the pattern `catalog_build_v<VERSION>`; `<VERSION>` should be replaced with the desired version number of the package as defined in `setup.py` (although note that this requires that a tag for that version actually exist in the BRC Analytics repository).
+This installs the package from the BRC Analytics GitHub repository, referencing a particular Git commit; `<COMMIT>` should be replaced with the commit hash for the desired package version.
 
 #### Scripts
 
@@ -24,7 +24,7 @@ The package provides modules that can be used to run scripts to manage the catal
 
 ### Updating
 
-The package can be updated by using the same installation command as above, substituting in the new version tag. If using a `requirements.txt`, it may be updated manually by updating the version referenced in the line containing the `pip install` arguments for the package (i.e. the one starting with `-e "git+https://github.com/galaxyproject/...`).
+The package can be updated by using the same installation command as above, substituting in a new commit hash. If using a `requirements.txt`, it may be updated manually by updating the hash referenced in the line containing the `pip install` arguments for the package (i.e. the one starting with `-e "git+https://github.com/galaxyproject/...`).
 
 When the package is updated, derived schema files must be re-generated to guarantee that they're up-to-date. (See `schema_utils.gen_schema` below.)
 
