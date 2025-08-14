@@ -29,7 +29,7 @@ export const StyledDialog = styled(Dialog)`
       align-content: flex-start;
       background-color: ${PALETTE.SMOKE_LIGHT};
       display: grid;
-      grid-template-columns: 1fr;
+      grid-template-columns: auto 1fr;
       padding: 0;
     }
 
