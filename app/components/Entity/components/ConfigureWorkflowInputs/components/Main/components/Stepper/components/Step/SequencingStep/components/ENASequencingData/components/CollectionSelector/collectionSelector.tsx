@@ -13,6 +13,7 @@ import {
   SURFACE_TYPE,
   SurfaceProps,
 } from "@databiosphere/findable-ui/lib/components/Filter/components/surfaces/types";
+import { ColumnFilters } from "./components/ColumnFilters/columnFilters";
 
 export const CollectionSelector = ({
   onClose,
@@ -30,12 +31,7 @@ export const CollectionSelector = ({
     >
       <DialogTitle onClose={onClose} title="Select Sequencing Runs" />
       <DialogContent>
-        <ColumnFiltersAdapter
-          renderSurface={(props: SurfaceProps) => (
-            <Filters surfaceType={SURFACE_TYPE.MENU} {...props} />
-          )}
-          table={table}
-        />
+        <ColumnFilters table={table} />
         <Table table={table} />
       </DialogContent>
       <DialogActions>

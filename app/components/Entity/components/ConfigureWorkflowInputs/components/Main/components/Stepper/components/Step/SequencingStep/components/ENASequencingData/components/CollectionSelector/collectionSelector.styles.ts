@@ -26,10 +26,10 @@ export const StyledDialog = styled(Dialog)`
     }
 
     .MuiDialogContent-root {
-      align-content: flex-start;
+      align-content: stretch;
       background-color: ${PALETTE.SMOKE_LIGHT};
       display: grid;
-      grid-template-columns: auto 1fr;
+      grid-template-columns: 264px 1fr;
       padding: 0;
     }
 
