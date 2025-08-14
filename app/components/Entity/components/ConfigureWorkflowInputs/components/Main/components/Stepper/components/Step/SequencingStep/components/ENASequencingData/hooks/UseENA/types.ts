@@ -16,7 +16,7 @@ export interface Status {
 }
 
 export interface SubmitOptions {
-  onError?: () => void;
+  onError?: (error: Error) => void;
   onSuccess?: () => void;
 }
 

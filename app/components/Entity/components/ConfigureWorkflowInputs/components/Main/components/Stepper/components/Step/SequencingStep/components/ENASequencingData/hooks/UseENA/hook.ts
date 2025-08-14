@@ -39,12 +39,9 @@ export const useENA = <T>(): UseENA<T> => {
             fetchENAData({
               accessionsInfo,
               submitOptions: {
-                onError: () => {
-                  setErrors({
-                    accession:
-                      "Accessions were not found. Please check the IDs and try again.",
-                  });
-                  submitOptions.onError?.();
+                onError: (e: Error) => {
+                  setErrors({ accession: e.message });
+                  submitOptions.onError?.(e);
                 },
                 onSuccess: () => {
                   setErrors({});
@@ -76,11 +73,9 @@ export const useENA = <T>(): UseENA<T> => {
       run(
         fetchENADataByTaxonomy({
           submitOptions: {
-            onError: () => {
-              setErrors({
-                taxonomyId: "No data was found for the given taxonomy ID.",
-              });
-              submitOptions?.onError?.();
+            onError: (e: Error) => {
+              setErrors({ taxonomyId: e.message });
+              submitOptions?.onError?.(e);
             },
             onSuccess: () => {
               setErrors({});
