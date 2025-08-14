@@ -4,7 +4,7 @@ import { parseAccessionList } from "./utils";
 import { SubmitOptions, UseENA } from "./types";
 import { SCHEMA } from "./schema";
 import { ValidationError } from "yup";
-import { fetchENAData } from "./request";
+import { fetchENAData, fetchENADataByTaxonomy } from "./request";
 
 export const useENA = <T>(): UseENA<T> => {
   const { data, isLoading: loading, run } = useAsync<T[] | undefined>();
@@ -68,10 +68,37 @@ export const useENA = <T>(): UseENA<T> => {
     [run]
   );
 
+  const onRequestDataByTaxonomy = useCallback(
+    async (
+      taxonomyId: string,
+      submitOptions?: SubmitOptions
+    ): Promise<void> => {
+      run(
+        fetchENADataByTaxonomy({
+          submitOptions: {
+            onError: () => {
+              setErrors({
+                accession: "No data was found for the given taxonomy ID.",
+              });
+              submitOptions?.onError?.();
+            },
+            onSuccess: () => {
+              setErrors({});
+              submitOptions?.onSuccess?.();
+            },
+          },
+          taxonomyId,
+        })
+      );
+    },
+    [run]
+  );
+
   return {
     clearErrors,
     data,
     onRequestData,
+    onRequestDataByTaxonomy,
     status: { errors, loading },
   };
 };
