@@ -24,12 +24,3 @@ export function getReadCount(genome: BRCDataCatalogGenome): number {
 
   return readCount;
 }
-
-/**
- * Render the button text for the "Browse" accession button.
- * @param readCount - Read count.
- * @returns Button text.
- */
-export function renderBrowseText(readCount: number): string {
-  return canBrowseAll(readCount) ? "Enter Accession(s)" : "Browse";
-}
