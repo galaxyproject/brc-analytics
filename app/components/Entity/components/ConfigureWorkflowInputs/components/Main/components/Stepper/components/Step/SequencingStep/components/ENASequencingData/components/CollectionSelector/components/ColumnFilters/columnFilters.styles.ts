@@ -1,10 +1,7 @@
 import styled from "@emotion/styled";
-import { Grid } from "@mui/material";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 
-export const StyledGrid = styled(Grid)`
+export const StyledContainer = styled("div")`
   box-shadow: inset -1px 0 ${PALETTE.SMOKE_MAIN};
-  display: grid;
-  grid-template-rows: auto 1fr;
   overflow: auto;
 `;
