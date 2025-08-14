@@ -20,13 +20,31 @@ This installs the package from the BRC Analytics GitHub repository, referencing 
 
 #### Scripts
 
-The package provides modules that can be used to run scripts to manage the catalog and schema; it may be desirable to set up shortcuts for running these. See below for details on using each module.
+The package provides modules that can be used to run scripts to manage the catalog and schema; it may be desirable to set up shortcuts for running these. See "Modules" section below for details on using each module.
+
+For example, if using NPM, and given a Python file located at `catalog/build/py/build_files_from_ncbi.py` that calls the `build_files` function, these scripts could be defined:
+
+```json
+{
+  "build-files-from-ncbi": "python3 -m catalog.build.py.build_files_from_ncbi",
+  "iwc-manifest-to-workflows-yaml": "python3 -m catalog_build.iwc_manifest_to_workflows_yaml ./catalog/source/workflows.yml --exclude-other",
+  "gen-schema": "python3 -m catalog_build.schema_utils.gen_schema schema --ts-path ./catalog/schema/generated",
+  "validate-catalog": "python3 -m catalog_build.schema_utils.validate_catalog ./catalog/source assemblies organisms workflow_categories workflows"
+}
+```
 
 ### Updating
 
 The package can be updated by using the same installation command as above, substituting in a new commit hash. If using a `requirements.txt`, it may be updated manually by updating the hash referenced in the line containing the `pip install` arguments for the package (i.e. the one starting with `-e "git+https://github.com/galaxyproject/...`).
 
 When the package is updated, derived schema files must be re-generated to guarantee that they're up-to-date. (See `schema_utils.gen_schema` below.)
+
+For example, given the example NPM scripts above and a new commit hash `b421c04d4d00d0f72eb286970c369bfd34a981d2`, the following commands could be used to update the package and generated files:
+
+```bash
+pip install -e "git+https://github.com/galaxyproject/brc-analytics.git@b421c04d4d00d0f72eb286970c369bfd34a981d2#egg=catalog_build&subdirectory=catalog/py_package"
+npm run gen-schema
+```
 
 ### Modules
 
