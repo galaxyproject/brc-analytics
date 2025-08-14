@@ -33,6 +33,8 @@ For example, if using NPM, and given a Python file located at `catalog/build/py/
 }
 ```
 
+(Note the explicit list of entity types in the `validate-catalog` command, which in this example consists of the minimal list of entity types likely to be used; if, for example, `outbreaks` are being used as well, that should be added to the command!)
+
 ### Updating
 
 The package can be updated by using the same installation command as above, substituting in a new commit hash. If using a `requirements.txt`, it may be updated manually by updating the hash referenced in the line containing the `pip install` arguments for the package (i.e. the one starting with `-e "git+https://github.com/galaxyproject/...`).
