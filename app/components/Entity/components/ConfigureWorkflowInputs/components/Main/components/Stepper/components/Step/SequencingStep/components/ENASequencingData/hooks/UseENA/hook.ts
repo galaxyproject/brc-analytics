@@ -78,7 +78,7 @@ export const useENA = <T>(): UseENA<T> => {
           submitOptions: {
             onError: () => {
               setErrors({
-                accession: "No data was found for the given taxonomy ID.",
+                taxonomyId: "No data was found for the given taxonomy ID.",
               });
               submitOptions?.onError?.();
             },
