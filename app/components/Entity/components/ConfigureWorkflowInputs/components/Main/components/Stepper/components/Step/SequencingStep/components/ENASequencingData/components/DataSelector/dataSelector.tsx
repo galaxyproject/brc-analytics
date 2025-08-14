@@ -4,7 +4,7 @@ import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/m
 import { PAPER_PROPS } from "./constants";
 import { Props } from "./types";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
-import { renderBrowseText, canBrowseAll, getReadCount } from "./utils";
+import { canBrowseAll, getReadCount } from "./utils";
 
 export const DataSelector = ({
   genome,
@@ -27,11 +27,11 @@ export const DataSelector = ({
         color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
         variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
       >
-        Browse ENA to find and select a collection
+        Browse ENA to find and select sequences
       </Typography>
       <Grid container gap={4}>
         <Button {...BUTTON_PROPS.PRIMARY_CONTAINED} onClick={onOpen}>
-          {renderBrowseText(readCount)}
+          Enter Accession(s)
         </Button>
         {canBrowseAll(readCount) && (
           <Button
@@ -42,7 +42,7 @@ export const DataSelector = ({
               })
             }
           >
-            Browse All ({readCount})
+            Browse All {readCount} Sequences
           </Button>
         )}
       </Grid>
