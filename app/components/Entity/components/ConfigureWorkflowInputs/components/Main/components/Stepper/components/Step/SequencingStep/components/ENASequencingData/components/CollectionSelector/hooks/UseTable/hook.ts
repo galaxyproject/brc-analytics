@@ -1,5 +1,4 @@
 import {
-  ColumnDef,
   functionalUpdate,
   getCoreRowModel,
   getFacetedRowModel,
@@ -10,11 +9,8 @@ import {
 import { ReadRun } from "../../../../types";
 import { ROW_POSITION } from "@databiosphere/findable-ui/lib/components/Table/features/RowPosition/constants";
 import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/features/RowPreview/constants";
-import { COLUMN_DEF } from "@databiosphere/findable-ui/lib/components/Table/common/columnDef";
-import { META } from "./constants";
-import { BasicCell } from "../../components/Table/components/TableCell/components/BasicCell/basicCell";
+import { columns } from "./columnDef";
 import { useCallback, useMemo, useState } from "react";
-import { buildFastqFTP } from "./viewBuilders";
 import { getFacetedUniqueValuesWithArrayValues } from "@databiosphere/findable-ui/lib/components/Table/common/utils";
 import { arrIncludesSome } from "@databiosphere/findable-ui/lib/components/Table/columnDef/columnFilters/filterFn";
 import { ColumnFiltersState, Updater } from "@tanstack/react-table";
@@ -37,82 +33,7 @@ export const useTable = (
 
   return useReactTable<ReadRun>({
     _features: [ROW_POSITION, ROW_PREVIEW],
-    columns: [
-      COLUMN_DEF.ROW_SELECTION as ColumnDef<ReadRun>,
-      {
-        accessorKey: "run_accession",
-        filterFn: "arrIncludesSome",
-        header: "Run Accession",
-        meta: { width: { max: "1fr", min: "140px" } },
-      },
-      {
-        accessorKey: "fastq_ftp",
-        cell: (props) => BasicCell(buildFastqFTP(props)),
-        filterFn: "arrIncludesSome",
-        header: "Fastq FTP",
-        meta: { width: { max: "1.8fr", min: "200px" } },
-      },
-      {
-        accessorKey: "experiment_accession",
-        filterFn: "arrIncludesSome",
-        header: "Experiment Accession",
-        meta: META,
-      },
-      {
-        accessorKey: "sample_accession",
-        filterFn: "arrIncludesSome",
-        header: "Sample Accession",
-        meta: META,
-      },
-      {
-        accessorKey: "study_accession",
-        filterFn: "arrIncludesSome",
-        header: "Study Accession",
-        meta: META,
-      },
-      {
-        accessorKey: "scientific_name",
-        filterFn: "arrIncludesSome",
-        header: "Scientific Name",
-        meta: META,
-      },
-      {
-        accessorKey: "instrument_platform",
-        filterFn: "arrIncludesSome",
-        header: "Instrument Platform",
-        meta: META,
-      },
-      {
-        accessorKey: "instrument_model",
-        filterFn: "arrIncludesSome",
-        header: "Instrument Model",
-        meta: META,
-      },
-      {
-        accessorKey: "library_strategy",
-        filterFn: "arrIncludesSome",
-        header: "Library Strategy",
-        meta: META,
-      },
-      {
-        accessorKey: "library_layout",
-        filterFn: "arrIncludesSome",
-        header: "Library Layout",
-        meta: META,
-      },
-      {
-        accessorKey: "read_count",
-        filterFn: "arrIncludesSome",
-        header: "Read Count",
-        meta: META,
-      },
-      {
-        accessorKey: "base_count",
-        filterFn: "arrIncludesSome",
-        header: "Base Count",
-        meta: META,
-      },
-    ],
+    columns,
     data,
     enableColumnFilters: true,
     enableFilters: true,
