@@ -10,4 +10,8 @@ export const StyledPaper = styled(Paper)`
   padding: 24px;
   text-align: center;
   width: 100%;
+
+  .MuiButton-root {
+    text-transform: none;
+  }
 `;
