@@ -19,6 +19,11 @@ workflow_categories:
     description: "Build consensus sequences for related isolates."
     show_coming_soon: false
 
+  - category: "ANNOTATION"
+    name: "Annotation"
+    description: "Workflows for the annotation of genomic data."
+    show_coming_soon: true
+
   - category: "ASSEMBLY"
     name: "Assembly"
     description: "Assemble prokaryotic and eukaryotic genomes sequenced with a variety of technologies."
