@@ -1,5 +1,49 @@
-# yaml-language-server: $schema=../schema/generated/workflows.json
 workflows:
+  - trs_id: "#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.5"
+    categories:
+      - ANNOTATION
+    workflow_name: AMR gene detection
+    workflow_description:
+      Antimicrobial resistance gene detection from assembled bacterial
+      genomes
+    ploidy: HAPLOID
+    taxonomy_id: 2
+    parameters:
+      - key: Input sequence fasta
+        variable: ASSEMBLY_FASTA_URL
+      - key: Select a taxonomy group point mutation
+        type_guide:
+          class: text
+      - key: Select a AMR genes detection database
+        type_guide:
+          class: text
+      - key: Select a virulence genes detection database
+        type_guide:
+          class: text
+    active: true
+    iwc_id: amr_gene_detection-main
+  - trs_id: "#workflow/github.com/iwc-workflows/annotation-helixer/main/versions/v0.3"
+    categories:
+      - ANNOTATION
+    workflow_name: Genome annotation with Helixer
+    workflow_description:
+      "This workflow allows you to annotate a genome with Helixer
+      and evaluate the quality of the annotation using BUSCO and Genome Annotation statistics.
+      GFFRead is also used to predict protein sequences derived from this annotation,
+      and BUSCO and OMArk are used to assess proteome quality. "
+    ploidy: ANY
+    taxonomy_id: 2759
+    parameters:
+      - key: Helixer lineage
+        type_guide:
+          class: text
+      - key: Genome sequence masked
+        variable: ASSEMBLY_FASTA_URL
+      - key: BUSCO lineage
+        type_guide:
+          class: text
+    active: true
+    iwc_id: annotation-helixer-main
   - trs_id: "#workflow/github.com/iwc-workflows/annotation-maker/main/versions/v0.1"
     categories: []
     workflow_name: Genome annotation with Maker
@@ -7,14 +51,13 @@ workflows:
       This workflow allows for genome annotation using Maker and
       evaluates the quality of the annotation.
     ploidy: ANY
+    taxonomy_id: 2759
     parameters:
       - key: BUSCO lineage
         type_guide:
           class: text
       - key: Genome sequence
-        type_guide:
-          class: File
-          ext: fasta
+        variable: ASSEMBLY_FASTA_URL
       - key: Genome assembly
         type_guide:
           class: File
@@ -28,9 +71,9 @@ workflows:
       - key: SNAP training
         type_guide:
           class: File
-    active: false
+    active: true
     iwc_id: annotation-maker-main
-  - trs_id: "#workflow/github.com/iwc-workflows/assembly-with-flye/main/versions/v0.2"
+  - trs_id: "#workflow/github.com/iwc-workflows/assembly-with-flye/main/versions/v0.3"
     categories:
       - ASSEMBLY
     workflow_name: Genome assembly with Flye
@@ -61,10 +104,10 @@ workflows:
       - key: reference_genome
         variable: ASSEMBLY_ID
       - key: PE fastq input
+        variable: SANGER_READ_RUN_PAIRED
         type_guide:
           class: Collection
           collection_type: list:paired
-        variable: SANGER_READ_RUN_PAIRED
       - key: effective_genome_size
         type_guide:
           class: integer
@@ -94,7 +137,7 @@ workflows:
           class: integer
     active: false
     iwc_id: average-bigwig-between-replicates-main
-  - trs_id: "#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v1.1.7"
+  - trs_id: "#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v1.1.8"
     categories:
       - ASSEMBLY
     workflow_name: Bacterial Genome Assembly using Shovill
@@ -121,6 +164,29 @@ workflows:
             - fastqsanger.gz
     active: false
     iwc_id: bacterial-genome-assembly-main
+  - trs_id: "#workflow/github.com/iwc-workflows/bacterial_genome_annotation/main/versions/v1.1.11"
+    categories:
+      - ANNOTATION
+    workflow_name: Bacterial Genome Annotation
+    workflow_description:
+      Annotation of an assembled bacterial genomes to detect genes,
+      potential plasmids, integrons and Insertion sequence (IS) elements.
+    ploidy: HAPLOID
+    taxonomy_id: 2
+    parameters:
+      - key: Input sequence fasta
+        variable: ASSEMBLY_FASTA_URL
+      - key: Select a plasmid detection database
+        type_guide:
+          class: text
+      - key: Select a bacterial genome annotation database
+        type_guide:
+          class: text
+      - key: Select a AMRFinderPlus database
+        type_guide:
+          class: text
+    active: true
+    iwc_id: bacterial_genome_annotation-main
   - trs_id: "#workflow/github.com/iwc-workflows/baredsc/baredSC-1d-logNorm/versions/v0.6"
     categories:
       - TRANSCRIPTOMICS
@@ -216,14 +282,14 @@ workflows:
           class: float
     active: false
     iwc_id: brew3r-main
-  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.14"
+  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.15"
     categories:
       - REGULATION
     workflow_name: "ChIP-seq Analysis: Paired-End Read Processing"
     workflow_description:
       Complete ChIP-seq analysis for paired-end sequencing data.
       Processes raw FASTQ files through adapter removal (cutadapt), alignment to reference
-      genome (Bowtie2), and stringent quality filtering (MAPQ >= 30, concordant pairs
+      genome (Bowtie2), and stringent quality filtering (MAPQ &gt;= 30, concordant pairs
       only). Peak calling with MACS2 optimized for paired-end reads identifies protein-DNA
       binding sites. Generates alignment files, peak calls, and quality metrics for
       downstream analysis.
@@ -232,10 +298,10 @@ workflows:
       - key: reference_genome
         variable: ASSEMBLY_ID
       - key: PE fastq input
+        variable: SANGER_READ_RUN_PAIRED
         type_guide:
           class: Collection
           collection_type: list:paired
-        variable: SANGER_READ_RUN_PAIRED
       - key: adapter_forward
         type_guide:
           class: text
@@ -250,14 +316,14 @@ workflows:
           class: boolean
     active: true
     iwc_id: chipseq-pe-main
-  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.14"
+  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.15"
     categories:
       - REGULATION
     workflow_name: "ChIP-seq Analysis: Single-End Read Processing"
     workflow_description:
       Complete ChIP-seq analysis for single-end sequencing data.
       Processes raw FASTQ files through adapter removal (cutadapt), alignment to reference
-      genome (Bowtie2), and quality filtering (MAPQ >= 30). Peak calling with MACS2
+      genome (Bowtie2), and quality filtering (MAPQ &gt;= 30). Peak calling with MACS2
       uses either a fixed extension parameter or built-in model to identify protein-DNA
       binding sites. Generates alignment files, peak calls, and quality metrics for
       downstream analysis.
@@ -266,10 +332,10 @@ workflows:
       - key: reference_genome
         variable: ASSEMBLY_ID
       - key: SR fastq input
+        variable: SANGER_READ_RUN_SINGLE
         type_guide:
           class: Collection
           collection_type: list
-        variable: SANGER_READ_RUN_SINGLE
       - key: adapter_forward
         type_guide:
           class: text
@@ -384,10 +450,10 @@ workflows:
       - key: reference_genome
         variable: ASSEMBLY_ID
       - key: PE fastq input
+        variable: SANGER_READ_RUN_PAIRED
         type_guide:
           class: Collection
           collection_type: list:paired
-        variable: SANGER_READ_RUN_PAIRED
       - key: adapter_forward
         type_guide:
           class: text
@@ -402,7 +468,7 @@ workflows:
           class: boolean
     active: true
     iwc_id: cutandrun-main
-  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.2"
+  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.3"
     categories:
       - TRANSCRIPTOMICS
     workflow_name:
@@ -445,7 +511,7 @@ workflows:
           class: integer
     active: true
     iwc_id: fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-cellplex
-  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.2"
+  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.3"
     categories:
       - TRANSCRIPTOMICS
     workflow_name:
@@ -463,10 +529,10 @@ workflows:
       - key: gtf
         variable: GENE_MODEL_URL
       - key: fastq PE collection
+        variable: SANGER_READ_RUN_PAIRED
         type_guide:
           class: Collection
           collection_type: list:paired
-        variable: SANGER_READ_RUN_PAIRED
       - key: cellranger_barcodes_3M-february-2018.txt
         type_guide:
           class: File
@@ -475,6 +541,20 @@ workflows:
           class: boolean
     active: true
     iwc_id: fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-v3
+  - trs_id: "#workflow/github.com/iwc-workflows/functional-annotation-protein-sequences/main/versions/v0.1"
+    categories:
+      - ANNOTATION
+    workflow_name: Functional annotation of protein sequences
+    workflow_description:
+      This workflow uses eggNOG mapper and InterProScan for functional
+      annotation of protein sequences.
+    ploidy: ANY
+    parameters:
+      - key: input
+        type_guide:
+          class: File
+    active: false
+    iwc_id: functional-annotation-protein-sequences-main
   - trs_id: "#workflow/github.com/iwc-workflows/generic-variant-calling-wgs-pe/main/versions/v0.1.1"
     categories:
       - VARIANT_CALLING
@@ -485,12 +565,12 @@ workflows:
     ploidy: ANY
     parameters:
       - key: Paired Collection
+        variable: SANGER_READ_RUN_PAIRED
         type_guide:
           class: Collection
           ext:
             - fastqsanger
             - fastqsanger.gz
-        variable: SANGER_READ_RUN_PAIRED
       - key: GenBank genome
         type_guide:
           class: File
@@ -714,6 +794,31 @@ workflows:
           class: Collection
     active: false
     iwc_id: influenza-isolates-consensus-and-subtyping-main
+  - trs_id: "#workflow/github.com/iwc-workflows/lncRNAs-annotation/main/versions/v0.1"
+    categories:
+      - ANNOTATION
+    workflow_name: lncRNAs annotation workflow
+    workflow_description:
+      This workflow runs the FEELnc tool to annotate long non-coding
+      RNAs. Before annotating these long non-coding RNAs, StringTie will be used to
+      assemble the RNA-seq alignments into potential trancriptions. The gffread tool
+      provides a genome annotation file in GTF format.
+    ploidy: ANY
+    taxonomy_id: 2759
+    parameters:
+      - key: strandedness
+        type_guide:
+          class: text
+      - key: Genome assembly
+        variable: ASSEMBLY_FASTA_URL
+      - key: Genome annotation
+        variable: GENE_MODEL_URL
+      - key: Alignments from RNA-seq
+        type_guide:
+          class: File
+          ext: bam
+    active: true
+    iwc_id: lncrnas-annotation-main
   - trs_id: "#workflow/github.com/iwc-workflows/mapseq-to-ampvis2/main/versions/v0.2"
     categories: []
     workflow_name: MAPseq to ampvis2
@@ -856,6 +961,18 @@ workflows:
           class: text
     active: false
     iwc_id: quality-and-contamination-control-main
+  - trs_id: "#workflow/github.com/iwc-workflows/repeatmasking/main/versions/v0.1"
+    categories:
+      - ANNOTATION
+    workflow_name: Repeat masking with RepeatModeler and RepeatMasker
+    workflow_description: ""
+    ploidy: ANY
+    parameters:
+      - key: input
+        type_guide:
+          class: File
+    active: false
+    iwc_id: repeatmasking-main
   - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-de/main/versions/v0.4"
     categories:
       - TRANSCRIPTOMICS
@@ -909,10 +1026,10 @@ workflows:
       - key: GTF file of annotation
         variable: GENE_MODEL_URL
       - key: Collection paired FASTQ files
+        variable: SANGER_READ_RUN_PAIRED
         type_guide:
           class: Collection
           collection_type: list:paired
-        variable: SANGER_READ_RUN_PAIRED
       - key: Forward adapter
         type_guide:
           class: text
@@ -958,10 +1075,10 @@ workflows:
       - key: GTF file of annotation
         variable: GENE_MODEL_URL
       - key: Collection of FASTQ files
+        variable: SANGER_READ_RUN_SINGLE
         type_guide:
           class: Collection
           collection_type: list
-        variable: SANGER_READ_RUN_SINGLE
       - key: Forward adapter
         type_guide:
           class: text
@@ -1024,7 +1141,7 @@ workflows:
           ext: bed
     active: false
     iwc_id: sars-cov-2-ont-artic-variant-calling-covid-19-artic-ont
-  - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-ivar-analysis/SARS-COV-2-ILLUMINA-AMPLICON-IVAR-PANGOLIN-NEXTCLADE/versions/v0.2.3"
+  - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-ivar-analysis/SARS-COV-2-ILLUMINA-AMPLICON-IVAR-PANGOLIN-NEXTCLADE/versions/v0.3.1"
     categories:
       - VARIANT_CALLING
     workflow_name: SARS-CoV-2 Illumina Amplicon pipeline - iVar based
@@ -1065,12 +1182,12 @@ workflows:
     taxonomy_id: 694009
     parameters:
       - key: Paired Collection
+        variable: SANGER_READ_RUN_PAIRED
         type_guide:
           class: Collection
           ext:
             - fastqsanger
             - fastqsanger.gz
-        variable: SANGER_READ_RUN_PAIRED
       - key: NC_045512.2 FASTA sequence of SARS-CoV-2
         variable: ASSEMBLY_FASTA_URL
       - key: ARTIC primer BED
@@ -1108,12 +1225,12 @@ workflows:
     taxonomy_id: 694009
     parameters:
       - key: Paired Collection
+        variable: SANGER_READ_RUN_PAIRED
         type_guide:
           class: Collection
           ext:
             - fastqsanger
             - fastqsanger.gz
-        variable: SANGER_READ_RUN_PAIRED
       - key: NC_045512.2 FASTA sequence of SARS-CoV-2
         variable: ASSEMBLY_FASTA_URL
     active: true

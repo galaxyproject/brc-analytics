@@ -115,7 +115,7 @@
         ],
         "ploidy": "ANY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.2",
+        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.3",
         "workflowDescription": "Comprehensive preprocessing for 10X Genomics CellPlex multiplexed single-cell RNA-seq data. Processes Cell Multiplexing Oligo (CMO) FASTQ files with CITE-seq-Count including required CellPlex-specific translation steps. Simultaneously processes gene expression FASTQ files with STARsolo and DropletUtils for alignment and cell filtering, and formats outputs for seamless import into Seurat/Scanpy (Read10X function).",
         "workflowName": "Single-Cell RNA-seq Preprocessing: 10X Genomics CellPlex Multiplexed Samples"
       },
@@ -137,7 +137,7 @@
         ],
         "ploidy": "ANY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.2",
+        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.3",
         "workflowDescription": "Complete preprocessing pipeline for 10X Genomics v3 single-cell RNA-seq data. Aligns raw FASTQ files using STARsolo, performs cell calling and quality filtering with DropletUtils, and formats outputs for seamless import into Seurat/Scanpy (Read10X function).",
         "workflowName": "Single-Cell RNA-seq Preprocessing: 10X Genomics v3 to Seurat and Scanpy Compatible Format"
       },
@@ -225,8 +225,8 @@
         ],
         "ploidy": "ANY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.14",
-        "workflowDescription": "Complete ChIP-seq analysis for paired-end sequencing data. Processes raw FASTQ files through adapter removal (cutadapt), alignment to reference genome (Bowtie2), and stringent quality filtering (MAPQ >= 30, concordant pairs only). Peak calling with MACS2 optimized for paired-end reads identifies protein-DNA binding sites. Generates alignment files, peak calls, and quality metrics for downstream analysis.",
+        "trsId": "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.15",
+        "workflowDescription": "Complete ChIP-seq analysis for paired-end sequencing data. Processes raw FASTQ files through adapter removal (cutadapt), alignment to reference genome (Bowtie2), and stringent quality filtering (MAPQ &gt;= 30, concordant pairs only). Peak calling with MACS2 optimized for paired-end reads identifies protein-DNA binding sites. Generates alignment files, peak calls, and quality metrics for downstream analysis.",
         "workflowName": "ChIP-seq Analysis: Paired-End Read Processing"
       },
       {
@@ -243,8 +243,8 @@
         ],
         "ploidy": "ANY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.14",
-        "workflowDescription": "Complete ChIP-seq analysis for single-end sequencing data. Processes raw FASTQ files through adapter removal (cutadapt), alignment to reference genome (Bowtie2), and quality filtering (MAPQ >= 30). Peak calling with MACS2 uses either a fixed extension parameter or built-in model to identify protein-DNA binding sites. Generates alignment files, peak calls, and quality metrics for downstream analysis.",
+        "trsId": "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.15",
+        "workflowDescription": "Complete ChIP-seq analysis for single-end sequencing data. Processes raw FASTQ files through adapter removal (cutadapt), alignment to reference genome (Bowtie2), and quality filtering (MAPQ &gt;= 30). Peak calling with MACS2 uses either a fixed extension parameter or built-in model to identify protein-DNA binding sites. Generates alignment files, peak calls, and quality metrics for downstream analysis.",
         "workflowName": "ChIP-seq Analysis: Single-End Read Processing"
       },
       {
@@ -295,6 +295,74 @@
         "trsId": "#workflow/github.com/iwc-workflows/pox-virus-amplicon/main/versions/v0.3",
         "workflowDescription": "A workflow for the analysis of pox virus genomes sequenced as half-genomes (for ITR resolution) in a tiled-amplicon approach",
         "workflowName": "Pox Virus Illumina Amplicon Workflow from half-genomes"
+      }
+    ]
+  },
+  {
+    "category": "ANNOTATION",
+    "description": "Workflows for the annotation of genomic data.",
+    "name": "Annotation",
+    "showComingSoon": true,
+    "workflows": [
+      {
+        "iwcId": "amr_gene_detection-main",
+        "parameters": [
+          {
+            "key": "Input sequence fasta",
+            "variable": "ASSEMBLY_FASTA_URL"
+          }
+        ],
+        "ploidy": "HAPLOID",
+        "taxonomyId": "2",
+        "trsId": "#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.5",
+        "workflowDescription": "Antimicrobial resistance gene detection from assembled bacterial genomes",
+        "workflowName": "AMR gene detection"
+      },
+      {
+        "iwcId": "annotation-helixer-main",
+        "parameters": [
+          {
+            "key": "Genome sequence masked",
+            "variable": "ASSEMBLY_FASTA_URL"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": "2759",
+        "trsId": "#workflow/github.com/iwc-workflows/annotation-helixer/main/versions/v0.3",
+        "workflowDescription": "This workflow allows you to annotate a genome with Helixer and evaluate the quality of the annotation using BUSCO and Genome Annotation statistics. GFFRead is also used to predict protein sequences derived from this annotation, and BUSCO and OMArk are used to assess proteome quality. ",
+        "workflowName": "Genome annotation with Helixer"
+      },
+      {
+        "iwcId": "bacterial_genome_annotation-main",
+        "parameters": [
+          {
+            "key": "Input sequence fasta",
+            "variable": "ASSEMBLY_FASTA_URL"
+          }
+        ],
+        "ploidy": "HAPLOID",
+        "taxonomyId": "2",
+        "trsId": "#workflow/github.com/iwc-workflows/bacterial_genome_annotation/main/versions/v1.1.11",
+        "workflowDescription": "Annotation of an assembled bacterial genomes to detect genes, potential plasmids, integrons and Insertion sequence (IS) elements.",
+        "workflowName": "bacterial_genome_annotation"
+      },
+      {
+        "iwcId": "lncrnas-annotation-main",
+        "parameters": [
+          {
+            "key": "Genome assembly",
+            "variable": "ASSEMBLY_FASTA_URL"
+          },
+          {
+            "key": "Genome annotation",
+            "variable": "GENE_MODEL_URL"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": "2759",
+        "trsId": "#workflow/github.com/iwc-workflows/lncRNAs-annotation/main/versions/v0.1",
+        "workflowDescription": "This workflow runs the FEELnc tool to annotate long non-coding RNAs. Before annotating these long non-coding RNAs, StringTie will be used to assemble the RNA-seq alignments into potential trancriptions. The gffread tool provides a genome annotation file in GTF format.",
+        "workflowName": "lncRNAs annotation workflow"
       }
     ]
   },
