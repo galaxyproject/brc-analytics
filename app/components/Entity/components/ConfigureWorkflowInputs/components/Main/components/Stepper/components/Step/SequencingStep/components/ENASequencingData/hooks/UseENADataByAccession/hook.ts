@@ -1,12 +1,12 @@
 import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
 import { FormEvent, useCallback, useState } from "react";
 import { parseAccessionList } from "./utils";
-import { SubmitOptions, UseENA } from "./types";
+import { SubmitOptions, UseENADataByAccession } from "./types";
 import { SCHEMA } from "./schema";
 import { ValidationError } from "yup";
-import { fetchENAData, fetchENADataByTaxonomy } from "./request";
+import { fetchENAData } from "./request";
 
-export const useENA = <T>(): UseENA<T> => {
+export const useENADataByAccession = <T>(): UseENADataByAccession<T> => {
   const { data, isLoading: loading, run } = useAsync<T[] | undefined>();
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -65,35 +65,10 @@ export const useENA = <T>(): UseENA<T> => {
     [run]
   );
 
-  const onRequestDataByTaxonomy = useCallback(
-    async (
-      taxonomyId: string,
-      submitOptions?: SubmitOptions
-    ): Promise<void> => {
-      run(
-        fetchENADataByTaxonomy({
-          submitOptions: {
-            onError: (e: Error) => {
-              setErrors({ taxonomyId: e.message });
-              submitOptions?.onError?.(e);
-            },
-            onSuccess: () => {
-              setErrors({});
-              submitOptions?.onSuccess?.();
-            },
-          },
-          taxonomyId,
-        })
-      );
-    },
-    [run]
-  );
-
   return {
     clearErrors,
     data,
     onRequestData,
-    onRequestDataByTaxonomy,
     status: { errors, loading },
   };
 };

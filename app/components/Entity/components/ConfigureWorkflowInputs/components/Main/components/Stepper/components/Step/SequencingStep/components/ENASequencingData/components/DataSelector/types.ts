@@ -1,10 +1,11 @@
-import { BRCDataCatalogGenome } from "../../../../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
-import { OnRequestDataByTaxonomy } from "../../hooks/UseENA/types";
+import { Dispatch, SetStateAction } from "react";
+import { ENA_QUERY_METHOD } from "../../../../types";
 
 export interface Props {
-  genome: BRCDataCatalogGenome;
+  loading: boolean;
   onContinue: () => void;
   onOpen: () => void;
-  onRequestDataByTaxonomy: OnRequestDataByTaxonomy;
+  readCount?: number;
   selectedCount: number;
+  setEnaQueryMethod: Dispatch<SetStateAction<ENA_QUERY_METHOD>>;
 }

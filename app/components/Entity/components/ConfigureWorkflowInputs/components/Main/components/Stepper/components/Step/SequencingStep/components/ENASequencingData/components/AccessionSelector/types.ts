@@ -1,4 +1,6 @@
-import { OnRequestData, Status } from "../../hooks/UseENA/types";
+import { OnRequestData, Status } from "../../hooks/UseENADataByAccession/types";
+import { Table } from "@tanstack/react-table";
+import { ReadRun } from "../../types";
 
 export interface Props {
   clearErrors: () => void;
@@ -7,4 +9,5 @@ export interface Props {
   onRequestData: OnRequestData;
   open: boolean;
   status: Status;
+  table: Table<ReadRun>;
 }

@@ -24,6 +24,7 @@ export const AccessionSelector = ({
   onRequestData,
   open,
   status,
+  table,
 }: Props): JSX.Element => {
   return (
     <StyledDialog
@@ -36,6 +37,7 @@ export const AccessionSelector = ({
           onSubmit: (event: FormEvent<HTMLFormElement>) =>
             onRequestData(event, {
               onSuccess: () => {
+                table.resetColumnFilters(); // Clear column filters from previous query.
                 onContinue();
                 onClose();
               },

@@ -1,6 +1,10 @@
-import { PaperProps } from "@mui/material";
+import { GridProps, PaperProps } from "@mui/material";
 
-export const MAX_READ_RUNS_FOR_BROWSE_ALL = 200;
+export const GRID_PROPS: GridProps = {
+  alignItems: "center",
+  container: true,
+  gap: 4,
+};
 
 export const PAPER_PROPS: PaperProps = {
   elevation: 0,
