@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Table } from "./components/Table/table";
 import { RowSelectionState } from "@tanstack/table-core";
 import { buildEnaSequencingReads } from "../../utils";
+import { ColumnFilters } from "./components/ColumnFilters/columnFilters";
 
 export const CollectionSelector = ({
   onClose,
@@ -24,6 +25,7 @@ export const CollectionSelector = ({
     >
       <DialogTitle onClose={onClose} title="Select Sequencing Runs" />
       <DialogContent>
+        <ColumnFilters table={table} />
         <Table table={table} />
       </DialogContent>
       <DialogActions>
