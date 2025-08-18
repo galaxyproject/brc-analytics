@@ -7,25 +7,30 @@ import { StyledRoundedPaper } from "./table.styles";
 import { TableContainer } from "@mui/material";
 import { getColumnTrackSizing } from "@databiosphere/findable-ui/lib/components/TableCreator/options/columnTrackSizing/utils";
 import { Props } from "./types";
+import { NoResults } from "@databiosphere/findable-ui/lib/components/NoResults/noResults";
 
 export const Table = ({ table }: Props): JSX.Element => {
   return (
     <StyledGrid container>
       <StyledRoundedPaper elevation={0}>
-        <TableContainer>
-          <GridTable
-            gridTemplateColumns={getColumnTrackSizing(
-              table.getVisibleFlatColumns()
-            )}
-            stickyHeader
-          >
-            <TableHead tableInstance={table} />
-            <TableBody
-              rowDirection={ROW_DIRECTION.DEFAULT}
-              tableInstance={table}
-            />
-          </GridTable>
-        </TableContainer>
+        {table.getRowModel().rows.length === 0 ? (
+          <NoResults Paper={null} title="No Results" />
+        ) : (
+          <TableContainer>
+            <GridTable
+              gridTemplateColumns={getColumnTrackSizing(
+                table.getVisibleFlatColumns()
+              )}
+              stickyHeader
+            >
+              <TableHead tableInstance={table} />
+              <TableBody
+                rowDirection={ROW_DIRECTION.DEFAULT}
+                tableInstance={table}
+              />
+            </GridTable>
+          </TableContainer>
+        )}
       </StyledRoundedPaper>
     </StyledGrid>
   );
