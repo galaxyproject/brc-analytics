@@ -8,6 +8,7 @@ import { Table } from "./components/Table/table";
 import { RowSelectionState } from "@tanstack/table-core";
 import { buildEnaSequencingReads } from "../../utils";
 import { ColumnFilters } from "./components/ColumnFilters/columnFilters";
+import { preSelectColumnFilters } from "./utils";
 
 export const CollectionSelector = ({
   onClose,
@@ -20,7 +21,11 @@ export const CollectionSelector = ({
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   return (
     <StyledDialog
-      onTransitionEnter={() => setRowSelection(table.getState().rowSelection)}
+      onTransitionEnter={() => {
+        setRowSelection(table.getState().rowSelection);
+        if (selectedCount > 0) return;
+        preSelectColumnFilters(table, stepKey);
+      }}
       onClose={onClose}
       open={open}
     >

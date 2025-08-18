@@ -46,6 +46,8 @@ export const useTable = (
 
   const data = useMemo(() => readRuns || [], [readRuns]);
 
+  const meta = { enaQueryMethod };
+
   const state = { columnFilters: columnFiltersByMethod[enaQueryMethod] };
 
   return useReactTable<ReadRun>({
@@ -61,6 +63,7 @@ export const useTable = (
     getFacetedUniqueValues: getFacetedUniqueValuesWithArrayValues(),
     getFilteredRowModel: getFilteredRowModel(),
     getRowId: (row) => row.run_accession,
+    meta,
     onColumnFiltersChange,
     state,
   });
