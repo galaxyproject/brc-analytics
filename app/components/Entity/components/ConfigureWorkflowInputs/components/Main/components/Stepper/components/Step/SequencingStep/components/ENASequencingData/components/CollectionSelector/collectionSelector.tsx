@@ -7,12 +7,6 @@ import { useState } from "react";
 import { Table } from "./components/Table/table";
 import { RowSelectionState } from "@tanstack/table-core";
 import { buildEnaSequencingReads } from "../../utils";
-import { Filters } from "@databiosphere/findable-ui/lib/components/Filter/components/Filters/filters";
-import { ColumnFiltersAdapter } from "@databiosphere/findable-ui/lib/components/Filter/components/adapters/tanstack/ColumnFiltersAdapter/columnFiltersAdapter";
-import {
-  SURFACE_TYPE,
-  SurfaceProps,
-} from "@databiosphere/findable-ui/lib/components/Filter/components/surfaces/types";
 import { ColumnFilters } from "./components/ColumnFilters/columnFilters";
 
 export const CollectionSelector = ({
