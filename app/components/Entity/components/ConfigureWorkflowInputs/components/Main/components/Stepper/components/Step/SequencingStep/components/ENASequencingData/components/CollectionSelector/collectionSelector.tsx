@@ -21,6 +21,7 @@ export const CollectionSelector = ({
   return (
     <StyledDialog
       onTransitionEnter={() => setRowSelection(table.getState().rowSelection)}
+      onClose={onClose}
       open={open}
     >
       <DialogTitle onClose={onClose} title="Select Sequencing Runs" />
@@ -46,10 +47,19 @@ export const CollectionSelector = ({
             onClose();
           }}
         >
-          Add {selectedCount ? selectedCount : ""} Sequencing Run
-          {selectedCount > 1 ? "s" : ""}
+          {renderButtonText(selectedCount)}
         </Button>
       </DialogActions>
     </StyledDialog>
   );
 };
+
+/**
+ * Renders the button text based on the selected count.
+ * @param selectedCount - The number of selected rows.
+ * @returns The button text.
+ */
+function renderButtonText(selectedCount: number): string {
+  if (selectedCount === 1) return "Add 1 Sequencing Run";
+  return `Add ${selectedCount} Sequencing Runs`;
+}

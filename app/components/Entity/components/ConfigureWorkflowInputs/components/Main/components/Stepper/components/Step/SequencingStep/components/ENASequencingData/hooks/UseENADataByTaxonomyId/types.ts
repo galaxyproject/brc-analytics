@@ -1,11 +1,4 @@
-import { FormEvent } from "react";
-
 export type OnRequestData = (
-  event: FormEvent,
-  submitOptions: SubmitOptions
-) => Promise<void>;
-
-export type OnRequestDataByTaxonomy = (
   taxonomyId: string,
   submitOptions?: SubmitOptions
 ) => Promise<void>;
@@ -20,10 +13,7 @@ export interface SubmitOptions {
   onSuccess?: () => void;
 }
 
-export interface UseENA<T> {
-  clearErrors: () => void;
+export interface UseENADataByTaxonomyId<T> {
   data?: T[];
-  onRequestData: OnRequestData;
-  onRequestDataByTaxonomy: OnRequestDataByTaxonomy;
   status: Status;
 }

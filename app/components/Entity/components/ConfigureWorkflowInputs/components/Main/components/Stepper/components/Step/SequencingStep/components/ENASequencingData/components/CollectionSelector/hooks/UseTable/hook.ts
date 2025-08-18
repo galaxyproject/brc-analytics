@@ -1,5 +1,4 @@
 import {
-  functionalUpdate,
   getCoreRowModel,
   getFacetedRowModel,
   getFilteredRowModel,
@@ -14,22 +13,40 @@ import { useCallback, useMemo, useState } from "react";
 import { getFacetedUniqueValuesWithArrayValues } from "@databiosphere/findable-ui/lib/components/Table/common/utils";
 import { arrIncludesSome } from "@databiosphere/findable-ui/lib/components/Table/columnDef/columnFilters/filterFn";
 import { ColumnFiltersState, Updater } from "@tanstack/react-table";
+import { UseENADataByAccession } from "../../../../hooks/UseENADataByAccession/types";
+import { UseENADataByTaxonomyId } from "../../../../hooks/UseENADataByTaxonomyId/types";
+import { ENA_QUERY_METHOD } from "../../../../../../types";
+import { updateColumnFilters } from "./utils";
 
 export const useTable = (
-  readRuns: ReadRun[] | undefined = []
+  enaQueryMethod: ENA_QUERY_METHOD,
+  enaAccession: UseENADataByAccession<ReadRun>,
+  enaTaxonomyId: UseENADataByTaxonomyId<ReadRun>
 ): Table<ReadRun> => {
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnFiltersByMethod, setColumnFiltersByMethod] = useState<
+    Record<ENA_QUERY_METHOD, ColumnFiltersState>
+  >({
+    [ENA_QUERY_METHOD.ACCESSION]: [],
+    [ENA_QUERY_METHOD.TAXONOMY_ID]: [],
+  });
 
   const onColumnFiltersChange = useCallback(
-    (updaterOrValue: Updater<ColumnFiltersState>): void => {
-      setColumnFilters((old) => functionalUpdate(updaterOrValue, old));
-    },
-    [setColumnFilters]
+    (updaterOrValue: Updater<ColumnFiltersState>): void =>
+      setColumnFiltersByMethod(
+        updateColumnFilters(enaQueryMethod, updaterOrValue)
+      ),
+    [enaQueryMethod]
   );
 
-  const data = useMemo(() => readRuns, [readRuns]);
+  // Get the data for the ENA query method (by accession or by taxonomy ID).
+  const { data: readRuns } =
+    enaQueryMethod === ENA_QUERY_METHOD.ACCESSION
+      ? enaAccession
+      : enaTaxonomyId;
 
-  const state = { columnFilters };
+  const data = useMemo(() => readRuns || [], [readRuns]);
+
+  const state = { columnFilters: columnFiltersByMethod[enaQueryMethod] };
 
   return useReactTable<ReadRun>({
     _features: [ROW_POSITION, ROW_PREVIEW],

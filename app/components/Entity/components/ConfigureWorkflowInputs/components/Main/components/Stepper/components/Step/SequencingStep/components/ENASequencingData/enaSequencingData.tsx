@@ -8,12 +8,10 @@ import { AccessionSelector } from "./components/AccessionSelector/accessionSelec
 import { buildEnaSequencingReads } from "./utils";
 
 export const ENASequencingData = ({
-  clearErrors,
-  genome,
+  enaAccession,
+  enaTaxonomyId,
   onConfigure,
-  onRequestData,
-  onRequestDataByTaxonomy,
-  status,
+  setEnaQueryMethod,
   stepKey,
   table,
 }: Props): JSX.Element => {
@@ -30,19 +28,21 @@ export const ENASequencingData = ({
   return (
     <Fragment>
       <DataSelector
-        genome={genome}
+        loading={enaTaxonomyId.status.loading}
         onContinue={collectionDialog.onOpen}
         onOpen={accessionDialog.onOpen}
-        onRequestDataByTaxonomy={onRequestDataByTaxonomy}
+        readCount={enaTaxonomyId.data?.length}
         selectedCount={selectedCount}
+        setEnaQueryMethod={setEnaQueryMethod}
       />
       <AccessionSelector
-        clearErrors={clearErrors}
+        clearErrors={enaAccession.clearErrors}
         onClose={accessionDialog.onClose}
         onContinue={collectionDialog.onOpen}
-        onRequestData={onRequestData}
+        onRequestData={enaAccession.onRequestData}
         open={accessionDialog.open}
-        status={status}
+        status={enaAccession.status}
+        table={table}
       />
       <CollectionSelector
         onClose={collectionDialog.onClose}
