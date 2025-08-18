@@ -4,7 +4,7 @@ import { parseAccessionList } from "./utils";
 import { SubmitOptions, UseENA } from "./types";
 import { SCHEMA } from "./schema";
 import { ValidationError } from "yup";
-import { fetchENAData } from "./request";
+import { fetchENAData, fetchENADataByTaxonomy } from "./request";
 
 export const useENA = <T>(): UseENA<T> => {
   const { data, isLoading: loading, run } = useAsync<T[] | undefined>();
@@ -39,12 +39,9 @@ export const useENA = <T>(): UseENA<T> => {
             fetchENAData({
               accessionsInfo,
               submitOptions: {
-                onError: () => {
-                  setErrors({
-                    accession:
-                      "Accessions were not found. Please check the IDs and try again.",
-                  });
-                  submitOptions.onError?.();
+                onError: (e: Error) => {
+                  setErrors({ accession: e.message });
+                  submitOptions.onError?.(e);
                 },
                 onSuccess: () => {
                   setErrors({});
@@ -68,10 +65,35 @@ export const useENA = <T>(): UseENA<T> => {
     [run]
   );
 
+  const onRequestDataByTaxonomy = useCallback(
+    async (
+      taxonomyId: string,
+      submitOptions?: SubmitOptions
+    ): Promise<void> => {
+      run(
+        fetchENADataByTaxonomy({
+          submitOptions: {
+            onError: (e: Error) => {
+              setErrors({ taxonomyId: e.message });
+              submitOptions?.onError?.(e);
+            },
+            onSuccess: () => {
+              setErrors({});
+              submitOptions?.onSuccess?.();
+            },
+          },
+          taxonomyId,
+        })
+      );
+    },
+    [run]
+  );
+
   return {
     clearErrors,
     data,
     onRequestData,
+    onRequestDataByTaxonomy,
     status: { errors, loading },
   };
 };

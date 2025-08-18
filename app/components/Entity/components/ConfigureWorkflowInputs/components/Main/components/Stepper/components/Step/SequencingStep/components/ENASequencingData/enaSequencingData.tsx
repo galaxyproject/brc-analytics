@@ -9,8 +9,10 @@ import { buildEnaSequencingReads } from "./utils";
 
 export const ENASequencingData = ({
   clearErrors,
+  genome,
   onConfigure,
   onRequestData,
+  onRequestDataByTaxonomy,
   status,
   stepKey,
   table,
@@ -28,7 +30,10 @@ export const ENASequencingData = ({
   return (
     <Fragment>
       <DataSelector
+        genome={genome}
+        onContinue={collectionDialog.onOpen}
         onOpen={accessionDialog.onOpen}
+        onRequestDataByTaxonomy={onRequestDataByTaxonomy}
         selectedCount={selectedCount}
       />
       <AccessionSelector

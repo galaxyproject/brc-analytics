@@ -1,3 +1,4 @@
+import { BRCDataCatalogGenome } from "../../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import { OnConfigure } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { UseENA } from "./hooks/UseENA/types";
 import { Table } from "@tanstack/react-table";
@@ -21,6 +22,7 @@ export interface ReadRun {
 }
 
 export interface Props extends UseENA<ReadRun> {
+  genome: BRCDataCatalogGenome;
   onConfigure: OnConfigure;
   stepKey: "readRunsSingle" | "readRunsPaired";
   table: Table<ReadRun>;
