@@ -56,6 +56,7 @@ export const ENASequencingData = ({
         onClear={() => {
           onConfigure(stepKey, null);
           table.resetRowSelection();
+          table.resetColumnFilters();
         }}
         onEdit={collectionDialog.onOpen}
         selectedCount={selectedCount}
