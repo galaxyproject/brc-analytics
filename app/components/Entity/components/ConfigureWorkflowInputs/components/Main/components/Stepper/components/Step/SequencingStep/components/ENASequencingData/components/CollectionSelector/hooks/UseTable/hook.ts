@@ -17,6 +17,8 @@ import { UseENADataByAccession } from "../../../../hooks/UseENADataByAccession/t
 import { UseENADataByTaxonomyId } from "../../../../hooks/UseENADataByTaxonomyId/types";
 import { ENA_QUERY_METHOD } from "../../../../../../types";
 import { updateColumnFilters } from "./utils";
+import { SORTING } from "./constants";
+import { getSortedRowModel } from "@tanstack/react-table";
 
 export const useTable = (
   enaQueryMethod: ENA_QUERY_METHOD,
@@ -46,6 +48,8 @@ export const useTable = (
 
   const data = useMemo(() => readRuns || [], [readRuns]);
 
+  const initialState = { sorting: SORTING };
+
   const meta = { enaQueryMethod };
 
   const state = { columnFilters: columnFiltersByMethod[enaQueryMethod] };
@@ -57,12 +61,15 @@ export const useTable = (
     enableColumnFilters: true,
     enableFilters: true,
     enableRowSelection: true,
+    enableSorting: true,
     filterFns: { arrIncludesSome },
     getCoreRowModel: getCoreRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValuesWithArrayValues(),
     getFilteredRowModel: getFilteredRowModel(),
     getRowId: (row) => row.run_accession,
+    getSortedRowModel: getSortedRowModel(),
+    initialState,
     meta,
     onColumnFiltersChange,
     state,
