@@ -169,7 +169,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_DOMAIN,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_DOMAIN,
-        width: { max: "1fr", min: "auto" },
+        width: { max: "1fr", min: "160px" },
       },
       {
         componentConfig: {
@@ -178,7 +178,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_REALM,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_REALM,
-        width: { max: "1fr", min: "auto" },
+        width: { max: "1fr", min: "160px" },
       },
       {
         componentConfig: {
@@ -187,7 +187,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_KINGDOM,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_KINGDOM,
-        width: { max: "1fr", min: "auto" },
+        width: { max: "1fr", min: "160px" },
       },
       {
         componentConfig: {
@@ -196,7 +196,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_PHYLUM,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_PHYLUM,
-        width: { max: "1fr", min: "auto" },
+        width: { max: "1fr", min: "200px" },
       },
       {
         componentConfig: {
@@ -205,7 +205,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_CLASS,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_CLASS,
-        width: { max: "1fr", min: "auto" },
+        width: { max: "1fr", min: "200px" },
       },
       {
         componentConfig: {
@@ -214,7 +214,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_ORDER,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ORDER,
-        width: { max: "1fr", min: "auto" },
+        width: { max: "1fr", min: "212px" },
       },
       {
         componentConfig: {
@@ -223,7 +223,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_FAMILY,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_FAMILY,
-        width: { max: "1fr", min: "auto" },
+        width: { max: "1fr", min: "224px" },
       },
       {
         componentConfig: {
@@ -232,7 +232,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_GENUS,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_GENUS,
-        width: { max: "1fr", min: "auto" },
+        width: { max: "1fr", min: "212px" },
       },
       {
         componentConfig: {
@@ -241,7 +241,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         } as ComponentConfig<typeof C.Link, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
-        width: { max: "1fr", min: "164px" },
+        width: { max: "1fr", min: "200px" },
       },
       {
         componentConfig: {
@@ -250,7 +250,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,
-        width: { max: "0.5fr", min: "100px" },
+        width: { max: "0.5fr", min: "160px" },
       },
       {
         componentConfig: {
@@ -259,7 +259,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SEROTYPE,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SEROTYPE,
-        width: { max: "0.5fr", min: "100px" },
+        width: { max: "0.5fr", min: "160px" },
       },
       {
         componentConfig: {
@@ -268,7 +268,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_ISOLATE,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ISOLATE,
-        width: { max: "0.5fr", min: "100px" },
+        width: { max: "0.5fr", min: "160px" },
       },
       {
         componentConfig: {
@@ -277,7 +277,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.COMMON_NAME,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME,
-        width: { max: "1fr", min: "auto" },
+        width: { max: "1fr", min: "160px" },
       },
       {
         componentConfig: {
@@ -286,7 +286,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMY_ID,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMY_ID,
-        width: { max: "0.5fr", min: "100px" },
+        width: { max: "0.5fr", min: "144px" },
       },
       {
         componentConfig: {
@@ -319,7 +319,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         } as ComponentConfig<typeof C.ChipCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.IS_REF,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.IS_REF,
-        width: { max: "0.5fr", min: "80px" },
+        width: { max: "0.5fr", min: "100px" },
       },
       {
         componentConfig: {
@@ -346,7 +346,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.LENGTH,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.LENGTH,
-        width: { max: "0.5fr", min: "120px" },
+        width: { max: "0.5fr", min: "132px" },
       },
       {
         componentConfig: {
@@ -355,7 +355,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_COUNT,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_COUNT,
-        width: { max: "0.5fr", min: "80px" },
+        width: { max: "0.5fr", min: "120px" },
       },
       {
         componentConfig: {
@@ -373,7 +373,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_L50,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_L50,
-        width: { max: "0.5fr", min: "80px" },
+        width: { max: "0.5fr", min: "120px" },
       },
       {
         componentConfig: {
@@ -382,7 +382,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.COVERAGE,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.COVERAGE,
-        width: { max: "0.5fr", min: "80px" },
+        width: { max: "0.5fr", min: "100px" },
       },
       {
         componentConfig: {
@@ -391,7 +391,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.GC_PERCENT,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.GC_PERCENT,
-        width: { max: "0.5fr", min: "80px" },
+        width: { max: "0.5fr", min: "100px" },
       },
       {
         componentConfig: {
@@ -400,7 +400,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANNOTATION_STATUS,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.ANNOTATION_STATUS,
-        width: { max: "0.5fr", min: "142px" },
+        width: { max: "0.5fr", min: "180px" },
       },
       COLUMN_REGISTRY.PRIORITY,
     ],

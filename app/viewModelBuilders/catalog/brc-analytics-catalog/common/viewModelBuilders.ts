@@ -167,7 +167,7 @@ export const buildAssemblyCount = (
   organism: BRCDataCatalogOrganism
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: organism.assemblyCount,
+    value: formatNumber(organism.assemblyCount),
   };
 };
 
@@ -180,7 +180,7 @@ export const buildChromosomes = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: genome.chromosomes,
+    value: formatNumber(genome.chromosomes),
   };
 };
 
@@ -305,7 +305,7 @@ export const buildLength = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: genome.length,
+    value: formatNumber(genome.length),
   };
 };
 
@@ -668,7 +668,7 @@ export const buildScaffoldCount = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: genome.scaffoldCount,
+    value: formatNumber(genome.scaffoldCount),
   };
 };
 
@@ -681,7 +681,7 @@ export const buildScaffoldL50 = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: genome.scaffoldL50,
+    value: formatNumber(genome.scaffoldL50),
   };
 };
 
@@ -694,7 +694,7 @@ export const buildScaffoldN50 = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: genome.scaffoldN50,
+    value: formatNumber(genome.scaffoldN50),
   };
 };
 
@@ -797,7 +797,7 @@ export function buildOrganismGenomesTable(
     Paper: FluidPaper,
     columns: buildOrganismGenomesTableColumns(),
     gridTemplateColumns:
-      "auto minmax(164px, 1fr) minmax(100px, 0.5fr) minmax(100px, 0.5fr) minmax(100px, 0.5fr) minmax(100px, 0.5fr) minmax(80px, 0.5fr) repeat(2, minmax(142px, 0.5fr)) minmax(120px, 0.5fr) minmax(80px, 0.5fr) minmax(120px, 0.5fr) repeat(3, minmax(80px, 0.5fr)) minmax(142px, 0.5fr)",
+      "auto minmax(164px, 1fr) minmax(180px, 0.5fr) minmax(180px, 0.5fr) minmax(180px, 0.5fr) minmax(144px, 0.5fr) minmax(100px, 0.5fr) repeat(2, minmax(142px, 0.5fr)) minmax(132px, 0.5fr) minmax(120px, 0.5fr) minmax(120px, 0.5fr) repeat(3, minmax(120px, 0.5fr)) minmax(180px, 0.5fr)",
     items: organism.genomes,
     noResultsTitle: "No Assemblies",
     tableOptions: {
@@ -1058,4 +1058,13 @@ function getPriorityPathogenEntityBreadcrumbs(
     { path: ROUTES.PRIORITY_PATHOGENS, text: "Priority Pathogens" },
     { path: "", text: priorityPathogen.name },
   ];
+}
+
+/**
+ * Format a number to a string.
+ * @param value - Number to format.
+ * @returns Formatted number.
+ */
+export function formatNumber(value: number | null): string {
+  return value?.toLocaleString() || "";
 }
