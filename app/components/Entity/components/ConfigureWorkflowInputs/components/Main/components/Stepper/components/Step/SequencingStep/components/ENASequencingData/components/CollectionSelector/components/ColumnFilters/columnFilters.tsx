@@ -4,6 +4,8 @@ import { SurfaceProps } from "@databiosphere/findable-ui/lib/components/Filter/c
 import { Filters } from "@databiosphere/findable-ui/lib/components/Filter/components/Filters/filters";
 import { StyledContainer } from "./columnFilters.styles";
 import { Controls } from "@databiosphere/findable-ui/lib/components/Filter/components/controls/Controls/controls";
+import { StyledSearchAllFilters } from "./columnFilters.styles";
+import { getCategoryViews } from "./utils";
 
 export const ColumnFilters = ({ table }: Props): JSX.Element => {
   return (
@@ -12,6 +14,10 @@ export const ColumnFilters = ({ table }: Props): JSX.Element => {
         renderSurface={(props: SurfaceProps) => (
           <>
             <Controls onFilter={props.onFilter} />
+            <StyledSearchAllFilters
+              categoryViews={getCategoryViews(props.categoryFilters)}
+              onFilter={props.onFilter}
+            />
             <Filters {...props} />
           </>
         )}
