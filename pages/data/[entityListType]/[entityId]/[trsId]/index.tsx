@@ -21,6 +21,8 @@ import {
 } from "../../../../../app/components/Entity/components/AnalysisMethodsCatalog/utils";
 import { getEntityConfig } from "@databiosphere/findable-ui/lib/config/utils";
 import { WorkflowInputsView } from "../../../../../app/views/WorkflowInputsView/workflowInputsView";
+import { Props as WorkflowInputsViewProps } from "../../../../../app/views/WorkflowInputsView/types";
+import { WORKFLOW_TARGET_PAGE } from "../../../../../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
 
 interface StaticPath {
   params: PageUrlParams;
@@ -85,17 +87,44 @@ export const getStaticProps = async (
   // Seed database.
   await seedDatabase(entityConfig.route, entityConfig);
 
-  // For now, only support assemblies in the workflow configuration page
-  // Organisms will need separate workflow configuration components
-  if (entityListType !== "assemblies") {
+  if (entityListType !== "assemblies" && entityListType !== "organisms") {
     return { notFound: true };
   }
 
-  const genome = await getEntity<BRCDataCatalogGenome>(entityConfig, entityId);
+  // Get the entity (assembly or organism)
+  const entity =
+    entityListType === "assemblies"
+      ? await getEntity<BRCDataCatalogGenome>(entityConfig, entityId)
+      : await getEntity<BRCDataCatalogOrganism>(entityConfig, entityId);
+
+  // For workflow configuration, we still need a genome
+  // For organisms, we'll use the first genome or return not found
+  const genome =
+    entityListType === "assemblies"
+      ? (entity as BRCDataCatalogGenome)
+      : (entity as BRCDataCatalogOrganism).genomes?.[0];
+
+  if (!genome) {
+    return { notFound: true };
+  }
 
   // Find workflow.
   const workflow = workflows
-    .flatMap((w) => w.workflows)
+    .flatMap((category) => category.workflows)
+    .filter((workflow) => {
+      // Filter by entity compatibility (ploidy and taxonomy)
+      if (!workflowIsCompatibleWithEntity(workflow, entity)) {
+        return false;
+      }
+      // Filter by target page - only show workflows scoped to the current entity type
+      if (!workflow.targetPages) return false;
+      if (entityListType === "assemblies") {
+        return workflow.targetPages.includes(WORKFLOW_TARGET_PAGE.ASSEMBLIES);
+      } else if (entityListType === "organisms") {
+        return workflow.targetPages.includes(WORKFLOW_TARGET_PAGE.ORGANISMS);
+      }
+      return false;
+    })
     .find((workflow) => formatTrsId(workflow.trsId) === trsId);
 
   if (!workflow) return { notFound: true };
@@ -109,7 +138,9 @@ export const getStaticProps = async (
   };
 };
 
-const ConfigureWorkflowInputs = (props: Props): JSX.Element => {
+const ConfigureWorkflowInputs = (
+  props: WorkflowInputsViewProps
+): JSX.Element => {
   return <WorkflowInputsView {...props} />;
 };
 

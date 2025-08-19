@@ -90,6 +90,113 @@ export const buildAnalyzeGenome = (
 };
 
 /**
+ * Build props for the organism analysis cell.
+ * @param organism - Organism entity.
+ * @returns Props to be used for the AnalyzeEntity component.
+ */
+export const buildAnalyzeOrganism = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.AnalyzeEntity> => {
+  const { ncbiTaxonomyId } = organism;
+  return {
+    analyze: {
+      label: "Analyze",
+      url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getOrganismId(organism))}`,
+    },
+    views: [
+      {
+        label: "NCBI Taxonomy",
+        url: `${NCBI_DATASETS_URL}/taxonomy/${encodeURIComponent(
+          ncbiTaxonomyId
+        )}`,
+      },
+    ],
+  };
+};
+
+/**
+ * Build props for the organism analysis methods catalog.
+ * @param organism - Organism entity.
+ * @returns Props to be used for the AnalysisMethodsCatalog component.
+ */
+export const buildOrganismAnalysisMethods = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.AnalysisMethodsCatalog> => {
+  return {
+    entity: organism,
+  };
+};
+
+/**
+ * Build props for the organism details KeyValuePairs component.
+ * @param organism - Organism entity.
+ * @returns Props to be used for the KeyValuePairs component.
+ */
+export const buildOrganismDetails = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.KeyValuePairs> => {
+  const keyValuePairs = new Map<Key, Value>();
+  keyValuePairs.set("Species", organism.taxonomicLevelSpecies);
+  keyValuePairs.set("Common Name", organism.commonName || "—");
+  keyValuePairs.set("NCBI Taxonomy ID", organism.ncbiTaxonomyId);
+  keyValuePairs.set("Assembly Count", organism.assemblyCount.toString());
+  keyValuePairs.set("Taxonomic Group", organism.taxonomicGroup.join(", "));
+  return {
+    KeyElType: C.KeyElType,
+    KeyValuesElType: (props) => C.Stack({ ...props, gap: 4 }),
+    ValueElType: C.ValueElType,
+    keyValuePairs,
+  };
+};
+
+/**
+ * Build props for the organism analysis portals component.
+ * @param organism - Organism entity.
+ * @returns Props to be used for the AnalysisPortals component.
+ */
+export const buildOrganismAnalysisPortals = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.AnalysisPortals> => {
+  const { ncbiTaxonomyId } = organism;
+  return {
+    portals: [
+      {
+        imageProps: {
+          alt: "NCBI Taxonomy",
+          src: "/analysis-portals/ncbi.png",
+          width: 20,
+        },
+        label: "NCBI Taxonomy",
+        url: `${NCBI_DATASETS_URL}/taxonomy/${encodeURIComponent(
+          ncbiTaxonomyId
+        )}`,
+      },
+    ],
+  };
+};
+
+/**
+ * Build props for the organism BackPageHero component.
+ * @param organism - Organism entity.
+ * @returns Props to be used for the BackPageHero component.
+ */
+export const buildOrganismBackPageHero = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.BackPageHero> => {
+  const organismId = getOrganismId(organism);
+  return {
+    breadcrumbs: [
+      { path: ROUTES.ORGANISMS, text: "Organisms" },
+      {
+        path: `${ROUTES.ORGANISMS}/${encodeURIComponent(organismId)}`,
+        text: organism.taxonomicLevelSpecies,
+      },
+    ],
+    title: "Select a Workflow",
+  };
+};
+
+/**
  * Build props for the annotation status cell.
  * @param genome - Genome entity.
  * @returns Props to be used for the cell.
@@ -713,7 +820,7 @@ export const buildGenomeAnalysisMethods = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.AnalysisMethodsCatalog> => {
   return {
-    assembly: genome,
+    entity: genome,
   };
 };
 

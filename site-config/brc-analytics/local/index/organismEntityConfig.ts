@@ -9,12 +9,13 @@ import { getOrganismId } from "../../../../app/apis/catalog/brc-analytics-catalo
 import * as C from "../../../../app/components";
 import * as V from "../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import { BRCEntityConfig } from "../../../common/entities";
+import { mainColumn as analysisMethodsMainColumn } from "../entity/organism/analysisMethodsMainColumn";
+import { sideColumn as analysisMethodsSideColumn } from "../entity/organism/analysisMethodsSideColumn";
+import { top as analysisMethodsTop } from "../entity/organism/analysisMethodsTop";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
 } from "../../category";
-import { assembliesMainColumn } from "../entity/organism/assembliesMainColumn";
-import { assembliesTop } from "../entity/organism/assembliesTop";
 import { CATEGORY_GROUPS } from "./common/category/categories";
 import { COLUMN_REGISTRY } from "./common/column/columnRegistry";
 
@@ -86,10 +87,11 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
     staticLoad: true,
     tabs: [
       {
-        label: "Assemblies",
-        mainColumn: assembliesMainColumn,
+        label: "Choose Analysis Method",
+        mainColumn: analysisMethodsMainColumn,
         route: "",
-        top: assembliesTop,
+        sideColumn: analysisMethodsSideColumn,
+        top: analysisMethodsTop,
       },
     ],
   },
@@ -98,6 +100,15 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
   label: "Organisms",
   list: {
     columns: [
+      {
+        componentConfig: {
+          component: C.AnalyzeEntity,
+          viewBuilder: V.buildAnalyzeOrganism,
+        } as ComponentConfig<typeof C.AnalyzeEntity, BRCDataCatalogOrganism>,
+        header: "Action",
+        id: "analyze",
+        width: { max: "0.5fr", min: "120px" },
+      },
       {
         componentConfig: {
           component: C.BasicCell,

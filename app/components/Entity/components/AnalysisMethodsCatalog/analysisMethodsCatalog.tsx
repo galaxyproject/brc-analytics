@@ -1,33 +1,66 @@
 import workflows from "../../../../../catalog/output/workflows.json";
 import { AnalysisMethod } from "../AnalysisMethod/analysisMethod";
 import { Props } from "./types";
-import { workflowIsCompatibleWithAssembly } from "./utils";
+import { workflowIsCompatibleWithEntity } from "./utils";
+import { WORKFLOW_TARGET_PAGE } from "../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { 
+  BRCDataCatalogGenome, 
+  BRCDataCatalogOrganism 
+} from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
 
 import { useRouter } from "next/router";
 import { Fragment } from "react";
 
-export const AnalysisMethodsCatalog = ({ assembly }: Props): JSX.Element => {
+export const AnalysisMethodsCatalog = ({ entity }: Props): JSX.Element => {
   const {
-    query: { entityId },
+    query: { entityId, entityListType },
   } = useRouter();
+
+  // Determine the target page based on the entity type
+  const targetPage =
+    entityListType === "organisms"
+      ? WORKFLOW_TARGET_PAGE.ORGANISMS
+      : WORKFLOW_TARGET_PAGE.ASSEMBLIES;
+
+  // For organisms, we need to get the genome properties from the first genome
+  // For assemblies, the entity itself is the genome
+  const isOrganism = entityListType === "organisms";
+  const genome = isOrganism
+    ? (entity as BRCDataCatalogOrganism).genomes?.[0]
+    : (entity as BRCDataCatalogGenome);
+
+  // If organism has no genomes, we can't proceed
+  if (isOrganism && !genome) {
+    return <Fragment>No genome data available for this organism.</Fragment>;
+  }
 
   return (
     <Fragment>
       {workflows.map((workflowCategory) => {
-        const compatibleWorkflows = workflowCategory.workflows.filter(
-          (workflow) => workflowIsCompatibleWithAssembly(workflow, assembly)
+        // First filter by targetPages, then by entity compatibility
+        const targetPageFilteredWorkflows = workflowCategory.workflows.filter(
+          (workflow) => workflow.targetPages?.includes(targetPage) ?? false
         );
+
+        const compatibleWorkflows = targetPageFilteredWorkflows.filter(
+          (workflow) => workflowIsCompatibleWithEntity(workflow, entity)
+        );
+
+        // Show category if:
+        // 1. It has compatible workflows after filtering, OR
+        // 2. It was marked for "coming soon" and had no workflows originally
         if (
           compatibleWorkflows.length === 0 &&
           !workflowCategory.showComingSoon
         ) {
           return null;
         }
+
         return (
           <AnalysisMethod
             entityId={entityId as string}
-            geneModelUrl={assembly.geneModelUrl}
-            genomeVersionAssemblyId={assembly.accession}
+            geneModelUrl={genome.geneModelUrl}
+            genomeVersionAssemblyId={genome.accession}
             key={workflowCategory.category}
             workflows={compatibleWorkflows}
             workflowCategory={workflowCategory}
