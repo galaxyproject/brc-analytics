@@ -111,6 +111,7 @@ export interface WorkflowCategory {
   description: string;
   name: string;
   showComingSoon: boolean;
+  targetPages?: WORKFLOW_TARGET_PAGE[] | null;
   workflows: Workflow[];
 }
 
@@ -118,7 +119,6 @@ export interface Workflow {
   iwcId: string;
   parameters: WorkflowParameter[];
   ploidy: WORKFLOW_PLOIDY;
-  targetPages?: WORKFLOW_TARGET_PAGE[] | null;
   taxonomyId: string | null;
   trsId: string;
   workflowDescription: string;

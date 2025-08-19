@@ -46,6 +46,16 @@ export enum WorkflowCategoryId {
     OTHER = "OTHER",
 };
 /**
+* Set of pages where workflows can be targeted.
+*/
+export enum WorkflowTargetPage {
+    
+    /** The workflow should be available on the assemblies page. */
+    ASSEMBLIES = "ASSEMBLIES",
+    /** The workflow should be available on the organisms page. */
+    ORGANISMS = "ORGANISMS",
+};
+/**
 * Possible variables that can be inserted into workflow parameters.
 */
 export enum WorkflowParameterVariable {
@@ -65,16 +75,6 @@ export enum WorkflowPloidy {
     DIPLOID = "DIPLOID",
     HAPLOID = "HAPLOID",
     POLYPLOID = "POLYPLOID",
-};
-/**
-* Set of pages where workflows can be targeted.
-*/
-export enum WorkflowTargetPage {
-    
-    /** The workflow should be available on the assemblies page. */
-    ASSEMBLIES = "ASSEMBLIES",
-    /** The workflow should be available on the organisms page. */
-    ORGANISMS = "ORGANISMS",
 };
 
 
@@ -189,6 +189,8 @@ export interface WorkflowCategory {
     description: string,
     /** Boolean flag that determines whether to display a 'Coming Soon' indicator for this category in the BRC Analytics interface when workflows in this category are not yet available. */
     show_coming_soon: boolean,
+    /** List of pages where workflows in this category should be available (e.g., assemblies page, organisms page). */
+    target_pages?: WorkflowTargetPage[] | null,
 }
 
 
@@ -230,8 +232,6 @@ export interface Workflow {
     active: boolean,
     /** The Intergalactic Workflow Commission (IWC) identifier for the workflow, used to link to the workflow's page on the IWC website. */
     iwc_id: string,
-    /** List of pages where this workflow should be available (e.g., assemblies page, organisms page). */
-    target_pages?: WorkflowTargetPage[] | null,
 }
 
 

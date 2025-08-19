@@ -110,20 +110,20 @@ export const getStaticProps = async (
 
   // Find workflow.
   const workflow = workflows
+    .filter((category) => {
+      // Filter by category-level targetPages - only include categories that target this page
+      if (!category.targetPages) return true; // Include categories without targetPages for backward compatibility
+      if (entityListType === "assemblies") {
+        return category.targetPages.includes(WORKFLOW_TARGET_PAGE.ASSEMBLIES);
+      } else if (entityListType === "organisms") {
+        return category.targetPages.includes(WORKFLOW_TARGET_PAGE.ORGANISMS);
+      }
+      return false;
+    })
     .flatMap((category) => category.workflows)
     .filter((workflow) => {
       // Filter by entity compatibility (ploidy and taxonomy)
-      if (!workflowIsCompatibleWithEntity(workflow, entity)) {
-        return false;
-      }
-      // Filter by target page - only show workflows scoped to the current entity type
-      if (!workflow.targetPages) return false;
-      if (entityListType === "assemblies") {
-        return workflow.targetPages.includes(WORKFLOW_TARGET_PAGE.ASSEMBLIES);
-      } else if (entityListType === "organisms") {
-        return workflow.targetPages.includes(WORKFLOW_TARGET_PAGE.ORGANISMS);
-      }
-      return false;
+      return workflowIsCompatibleWithEntity(workflow, entity);
     })
     .find((workflow) => formatTrsId(workflow.trsId) === trsId);
 

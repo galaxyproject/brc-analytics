@@ -37,6 +37,16 @@
                 "show_coming_soon": {
                     "description": "Boolean flag that determines whether to display a 'Coming Soon' indicator for this category in the BRC Analytics interface when workflows in this category are not yet available.",
                     "type": "boolean"
+                },
+                "target_pages": {
+                    "description": "List of pages where workflows in this category should be available (e.g., assemblies page, organisms page).",
+                    "items": {
+                        "$ref": "#/$defs/WorkflowTargetPage"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
                 }
             },
             "required": [
@@ -61,6 +71,15 @@
                 "OTHER"
             ],
             "title": "WorkflowCategoryId",
+            "type": "string"
+        },
+        "WorkflowTargetPage": {
+            "description": "Set of pages where workflows can be targeted.",
+            "enum": [
+                "ASSEMBLIES",
+                "ORGANISMS"
+            ],
+            "title": "WorkflowTargetPage",
             "type": "string"
         }
     },

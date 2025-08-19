@@ -23,11 +23,12 @@ export async function buildWorkflows(): Promise<WorkflowCategory[]> {
 
   const workflowCategories: WorkflowCategory[] =
     sourceWorkflowCategories.workflow_categories.map(
-      ({ category, description, name, show_coming_soon }) => ({
+      ({ category, description, name, show_coming_soon, target_pages }) => ({
         category,
         description,
         name,
         showComingSoon: show_coming_soon,
+        targetPages: target_pages,
         workflows: [],
       })
     );
@@ -50,7 +51,6 @@ function buildWorkflow(
     iwc_id: iwcId,
     parameters: sourceParameters,
     ploidy,
-    target_pages: targetPages,
     taxonomy_id: taxonomyId,
     trs_id: trsId,
     workflow_description: workflowDescription,
@@ -66,7 +66,6 @@ function buildWorkflow(
     iwcId,
     parameters,
     ploidy,
-    targetPages,
     taxonomyId: typeof taxonomyId === "number" ? String(taxonomyId) : null,
     trsId,
     workflowDescription,

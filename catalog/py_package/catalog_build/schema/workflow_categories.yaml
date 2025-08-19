@@ -8,6 +8,7 @@ prefixes:
 imports:
   - linkml:types
   - ./enums/workflow_category_id
+  - ./enums/workflow_target_page
 
 classes:
   WorkflowCategories:
@@ -39,3 +40,8 @@ classes:
         description: Boolean flag that determines whether to display a 'Coming Soon' indicator for this category in the BRC Analytics interface when workflows in this category are not yet available.
         required: true
         range: boolean
+      target_pages:
+        description: List of pages where workflows in this category should be available (e.g., assemblies page, organisms page).
+        multivalued: true
+        required: false
+        range: WorkflowTargetPage

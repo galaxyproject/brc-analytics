@@ -10,7 +10,6 @@ imports:
   - ./enums/workflow_category_id
   - ./enums/workflow_parameter_variable
   - ./enums/workflow_ploidy
-  - ./enums/workflow_target_page
 
 classes:
   Any:
@@ -68,11 +67,6 @@ classes:
         description: The Intergalactic Workflow Commission (IWC) identifier for the workflow, used to link to the workflow's page on the IWC website.
         required: true
         range: string
-      target_pages:
-        description: List of pages where this workflow should be available (e.g., assemblies page, organisms page).
-        multivalued: true
-        required: false
-        range: WorkflowTargetPage
 
   WorkflowParameter:
     description: Definition of an input parameter for a Galaxy workflow, specifying how the parameter value should be determined when the workflow is executed.

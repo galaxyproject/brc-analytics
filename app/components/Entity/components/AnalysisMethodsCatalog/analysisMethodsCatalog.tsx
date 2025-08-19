@@ -37,12 +37,16 @@ export const AnalysisMethodsCatalog = ({ entity }: Props): JSX.Element => {
   return (
     <Fragment>
       {workflows.map((workflowCategory) => {
-        // First filter by targetPages, then by entity compatibility
-        const targetPageFilteredWorkflows = workflowCategory.workflows.filter(
-          (workflow) => workflow.targetPages?.includes(targetPage) ?? false
-        );
+        // First filter by category-level targetPages
+        if (
+          workflowCategory.targetPages &&
+          !workflowCategory.targetPages.includes(targetPage)
+        ) {
+          return null; // Skip entire category if it doesn't target this page
+        }
 
-        const compatibleWorkflows = targetPageFilteredWorkflows.filter(
+        // Then filter workflows by entity compatibility (ploidy and taxonomy)
+        const compatibleWorkflows = workflowCategory.workflows.filter(
           (workflow) => workflowIsCompatibleWithEntity(workflow, entity)
         );
 
