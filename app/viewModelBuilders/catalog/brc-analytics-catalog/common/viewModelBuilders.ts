@@ -19,7 +19,7 @@ import {
   NCBI_DATASETS_URL,
   NCBI_TAXONOMY,
 } from "./constants";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, getSortedRowModel } from "@tanstack/react-table";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
@@ -802,8 +802,14 @@ export function buildOrganismGenomesTable(
     noResultsTitle: "No Assemblies",
     tableOptions: {
       enableRowPosition: false,
+      enableSorting: true,
+      getSortedRowModel: getSortedRowModel(),
       initialState: {
         columnVisibility: { [COLUMN_IDENTIFIER.ROW_POSITION]: false },
+        sorting: [
+          { desc: true, id: BRC_DATA_CATALOG_CATEGORY_KEY.IS_REF },
+          { desc: false, id: BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION },
+        ],
       },
     },
   };
