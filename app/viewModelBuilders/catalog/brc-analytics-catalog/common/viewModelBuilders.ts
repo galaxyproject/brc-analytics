@@ -279,14 +279,21 @@ export const buildGenomeTaxonomicLevelIsolate = (
 /**
  * Build props for the "is ref" cell.
  * @param genome - Genome entity.
- * @returns Props to be used for the cell.
+ * @returns Props to be used for the ChipCell component.
  */
 export const buildIsRef = (
   genome: BRCDataCatalogGenome
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof C.ChipCell> => {
   return {
-    value: genome.isRef,
-  };
+    getValue: () => ({
+      color:
+        genome.isRef.toLowerCase() === "yes"
+          ? CHIP_PROPS.COLOR.SUCCESS
+          : CHIP_PROPS.COLOR.DEFAULT,
+      label: genome.isRef,
+      variant: CHIP_PROPS.VARIANT.STATUS,
+    }),
+  } as ComponentProps<typeof C.ChipCell>;
 };
 
 /**
@@ -844,7 +851,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.IS_REF,
-      cell: ({ row }) => C.BasicCell(buildIsRef(row.original)),
+      cell: ({ row }) => C.ChipCell(buildIsRef(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.IS_REF,
     },
     {

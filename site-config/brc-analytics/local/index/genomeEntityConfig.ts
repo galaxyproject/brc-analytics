@@ -314,9 +314,9 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
       },
       {
         componentConfig: {
-          component: C.BasicCell,
+          component: C.ChipCell,
           viewBuilder: V.buildIsRef,
-        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
+        } as ComponentConfig<typeof C.ChipCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.IS_REF,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.IS_REF,
         width: { max: "0.5fr", min: "80px" },
