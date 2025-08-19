@@ -63,6 +63,7 @@ export const AnalysisMethodsCatalog = ({ entity }: Props): JSX.Element => {
         return (
           <AnalysisMethod
             entityId={entityId as string}
+            entityListType={entityListType as string}
             geneModelUrl={genome.geneModelUrl}
             genomeVersionAssemblyId={genome.accession}
             key={workflowCategory.category}

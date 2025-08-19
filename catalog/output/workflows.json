@@ -321,7 +321,12 @@
     "workflows": [
       {
         "iwcId": "assembly-with-flye-main",
-        "parameters": [],
+        "parameters": [
+          {
+            "key": "Input sequence reads",
+            "variable": "SANGER_READ_RUN_SINGLE"
+          }
+        ],
         "ploidy": "ANY",
         "taxonomyId": null,
         "trsId": "#workflow/github.com/iwc-workflows/assembly-with-flye/main/versions/v0.2",
@@ -330,7 +335,16 @@
       },
       {
         "iwcId": "bacterial-genome-assembly-main",
-        "parameters": [],
+        "parameters": [
+          {
+            "key": "Input adapter trimmed sequence reads (forward)",
+            "variable": "SANGER_READ_RUN_SINGLE"
+          },
+          {
+            "key": "Input adapter trimmed sequence reads (reverse)",
+            "variable": "SANGER_READ_RUN_SINGLE"
+          }
+        ],
         "ploidy": "ANY",
         "taxonomyId": "2",
         "trsId": "#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v1.1.7",
@@ -339,7 +353,16 @@
       },
       {
         "iwcId": "quality-and-contamination-control-main",
-        "parameters": [],
+        "parameters": [
+          {
+            "key": "Input sequence reads (forward)",
+            "variable": "SANGER_READ_RUN_SINGLE"
+          },
+          {
+            "key": "Input sequence reads (reverse)",
+            "variable": "SANGER_READ_RUN_SINGLE"
+          }
+        ],
         "ploidy": "ANY",
         "taxonomyId": null,
         "trsId": "#workflow/github.com/iwc-workflows/quality-and-contamination-control/main/versions/v1.1.9",

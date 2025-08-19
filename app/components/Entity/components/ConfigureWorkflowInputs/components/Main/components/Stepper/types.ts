@@ -9,7 +9,7 @@ import {
 } from "./components/Step/hooks/UseLaunchGalaxy/types";
 
 export interface Props {
-  genome: BRCDataCatalogGenome;
+  genome?: BRCDataCatalogGenome | null;
   onConfigure: OnConfigure;
   onLaunchGalaxy: OnLaunchGalaxy;
   status: Status;

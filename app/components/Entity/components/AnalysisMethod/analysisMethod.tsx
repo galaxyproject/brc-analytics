@@ -20,6 +20,7 @@ import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/m
 
 export const AnalysisMethod = ({
   entityId,
+  entityListType,
   workflowCategory,
   workflows,
 }: Props): JSX.Element => {
@@ -46,7 +47,11 @@ export const AnalysisMethod = ({
         {workflows.map((workflow) => (
           <Fragment key={workflow.workflowName}>
             <Divider />
-            <Workflow entityId={entityId} workflow={workflow} />
+            <Workflow
+              entityId={entityId}
+              entityListType={entityListType}
+              workflow={workflow}
+            />
           </Fragment>
         ))}
       </AccordionDetails>

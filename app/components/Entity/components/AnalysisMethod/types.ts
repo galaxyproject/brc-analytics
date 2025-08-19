@@ -5,6 +5,7 @@ import {
 
 export interface Props {
   entityId: string;
+  entityListType: string;
   geneModelUrl: string | null;
   genomeVersionAssemblyId: string;
   workflowCategory: WorkflowCategory;

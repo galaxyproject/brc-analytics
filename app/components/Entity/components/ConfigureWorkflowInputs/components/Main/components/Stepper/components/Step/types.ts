@@ -25,7 +25,7 @@ export interface StepProps
     Pick<MStepProps, "completed" | "last">,
     Required<Pick<MStepProps, "index" | "active">> {
   entryLabel: string;
-  genome: BRCDataCatalogGenome;
+  genome?: BRCDataCatalogGenome | null;
   onConfigure: OnConfigure;
   onContinue: OnContinue;
   onEdit: OnEdit;

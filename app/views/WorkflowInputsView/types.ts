@@ -5,6 +5,7 @@ import {
 
 export interface Props {
   entityId: string;
-  genome: BRCDataCatalogGenome;
+  entityListType: string;
+  genome?: BRCDataCatalogGenome | null;
   workflow: Workflow;
 }

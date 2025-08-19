@@ -38,7 +38,9 @@ export const GTFStep = ({
   onContinue,
   onEdit,
 }: StepProps): JSX.Element => {
-  const { error, geneModelUrls, isLoading } = useUCSCFiles(genome);
+  // Since we're filtering out this step for organism workflows in the Stepper component,
+  // we can safely use non-null assertion here
+  const { error, geneModelUrls, isLoading } = useUCSCFiles(genome!);
   const { controls, onChange, onValueChange, value } =
     useRadioGroup(geneModelUrls);
 

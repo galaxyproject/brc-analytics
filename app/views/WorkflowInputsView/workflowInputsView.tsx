@@ -16,7 +16,14 @@ export const WorkflowInputsView = (props: Props): JSX.Element => {
           {...props}
         />
       }
-      sideColumn={<SideColumn configuredInput={configuredInput} {...props} />}
+      sideColumn={
+        <SideColumn
+          configuredInput={configuredInput}
+          entityListType={props.entityListType}
+          genome={props.genome}
+          workflow={props.workflow}
+        />
+      }
       top={<Top {...props} />}
     />
   );

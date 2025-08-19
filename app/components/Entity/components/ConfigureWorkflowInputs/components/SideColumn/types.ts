@@ -6,6 +6,7 @@ import { ConfiguredInput } from "../../../../../../views/WorkflowInputsView/hook
 
 export interface Props {
   configuredInput: ConfiguredInput;
-  genome: BRCDataCatalogGenome;
+  entityListType: string;
+  genome?: BRCDataCatalogGenome | null;
   workflow: Workflow;
 }

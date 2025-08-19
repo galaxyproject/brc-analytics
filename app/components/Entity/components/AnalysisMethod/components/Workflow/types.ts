@@ -2,5 +2,6 @@ import { Workflow } from "../../../../../../apis/catalog/brc-analytics-catalog/c
 
 export interface Props {
   entityId: string;
+  entityListType: string;
   workflow: Workflow;
 }

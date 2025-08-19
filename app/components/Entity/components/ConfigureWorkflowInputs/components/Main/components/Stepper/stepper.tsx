@@ -4,7 +4,7 @@ import { Props } from "./types";
 import { useStepper } from "./hooks/UseStepper/hook";
 import { WORKFLOW_PARAMETER_VARIABLE } from "../../../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 
-export const Stepper = ({ workflow, ...props }: Props): JSX.Element => {
+export const Stepper = ({ genome, workflow, ...props }: Props): JSX.Element => {
   const requiresGTF = workflow.parameters.some(
     (param) => param.variable === WORKFLOW_PARAMETER_VARIABLE.GENE_MODEL_URL
   );
@@ -18,9 +18,20 @@ export const Stepper = ({ workflow, ...props }: Props): JSX.Element => {
   );
 
   let steps = STEPS;
-  if (!requiresGTF) {
-    steps = steps.filter((step) => step.key !== "geneModelUrl");
+
+  // For organism workflows (when genome is null), skip reference assembly and GTF steps
+  if (genome === null) {
+    steps = steps.filter(
+      (step) => step.key !== "referenceAssembly" && step.key !== "geneModelUrl"
+    );
+  } else {
+    // For assembly workflows, apply normal filtering logic
+    if (!requiresGTF) {
+      steps = steps.filter((step) => step.key !== "geneModelUrl");
+    }
   }
+
+  // These filters apply to both organism and assembly workflows
   if (!requiresReadRunSingle) {
     steps = steps.filter((step) => step.key !== "readRunsSingle");
   }

@@ -13,6 +13,7 @@ import {
 
 export const SideColumn = ({
   configuredInput,
+  entityListType,
   genome,
   workflow,
 }: Props): JSX.Element => {
@@ -25,9 +26,17 @@ export const SideColumn = ({
         <CollapsableSection title="Workflow Details">
           <KeyValuePairs {...buildWorkflowDetails(workflow)} />
         </CollapsableSection>
-        <CollapsableSection title="Assembly Details">
-          <KeyValuePairs {...buildAssemblyDetails(genome)} />
-        </CollapsableSection>
+        {genome && (
+          <CollapsableSection
+            title={
+              entityListType === "organisms"
+                ? "Organism Details"
+                : "Assembly Details"
+            }
+          >
+            <KeyValuePairs {...buildAssemblyDetails(genome)} />
+          </CollapsableSection>
+        )}
       </GridPaper>
     </FluidPaper>
   );

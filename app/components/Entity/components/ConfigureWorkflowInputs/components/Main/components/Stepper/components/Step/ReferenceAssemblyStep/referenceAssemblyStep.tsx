@@ -14,7 +14,9 @@ export const ReferenceAssemblyStep = ({
   index,
   onConfigure,
 }: StepProps): JSX.Element => {
-  const { accession } = genome;
+  // Since we're filtering out this step for organism workflows in the Stepper component,
+  // we can safely use non-null assertion here
+  const accession = genome!.accession;
 
   useEffect(() => {
     onConfigure(STEP.key, accession);

@@ -36,7 +36,8 @@ interface PageUrlParams extends ParsedUrlQuery {
 
 interface Props {
   entityId: string;
-  genome: BRCDataCatalogGenome;
+  entityListType: string;
+  genome?: BRCDataCatalogGenome | null;
   workflow: Workflow;
 }
 
@@ -78,7 +79,9 @@ export const getStaticProps = async (
   const { entityId, entityListType, trsId } = context.params as PageUrlParams;
 
   if (!entityListType || !entityId || !trsId) return { notFound: true };
-  if (entityListType !== "assemblies") return { notFound: true };
+  if (entityListType !== "assemblies" && entityListType !== "organisms") {
+    return { notFound: true };
+  }
 
   const entityConfig = getEntityConfig(entities, entityListType);
 
@@ -87,24 +90,21 @@ export const getStaticProps = async (
   // Seed database.
   await seedDatabase(entityConfig.route, entityConfig);
 
-  if (entityListType !== "assemblies" && entityListType !== "organisms") {
-    return { notFound: true };
-  }
-
   // Get the entity (assembly or organism)
   const entity =
     entityListType === "assemblies"
       ? await getEntity<BRCDataCatalogGenome>(entityConfig, entityId)
       : await getEntity<BRCDataCatalogOrganism>(entityConfig, entityId);
 
-  // For workflow configuration, we still need a genome
-  // For organisms, we'll use the first genome or return not found
+  // For assembly workflow configuration, we need the genome
+  // For organisms, we can use the organism entity directly
   const genome =
     entityListType === "assemblies"
       ? (entity as BRCDataCatalogGenome)
-      : (entity as BRCDataCatalogOrganism).genomes?.[0];
+      : undefined;
 
-  if (!genome) {
+  // Only require genome for assembly pages
+  if (entityListType === "assemblies" && !genome) {
     return { notFound: true };
   }
 
@@ -132,7 +132,8 @@ export const getStaticProps = async (
   return {
     props: {
       entityId,
-      genome,
+      entityListType,
+      genome: genome || null, // Explicitly set to null when undefined for proper serialization
       workflow,
     },
   };

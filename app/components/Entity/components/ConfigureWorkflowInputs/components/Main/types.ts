@@ -9,7 +9,7 @@ import {
 
 export interface Props {
   configuredInput: ConfiguredInput;
-  genome: BRCDataCatalogGenome;
+  genome?: BRCDataCatalogGenome | null;
   onConfigure: OnConfigure;
   workflow: Workflow;
 }

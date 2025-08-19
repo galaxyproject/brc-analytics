@@ -13,7 +13,11 @@ import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceP
 import { formatTrsId } from "../../../AnalysisMethodsCatalog/utils";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 
-export const Workflow = ({ entityId, workflow }: Props): JSX.Element => {
+export const Workflow = ({
+  entityId,
+  entityListType,
+  workflow,
+}: Props): JSX.Element => {
   const { iwcId, workflowDescription, workflowName } = workflow;
   return (
     <StyledGrid {...GRID_PROPS}>
@@ -31,10 +35,15 @@ export const Workflow = ({ entityId, workflow }: Props): JSX.Element => {
             {...BUTTON_PROPS}
             component={Link}
             disabled={!workflow.trsId}
-            href={replaceParameters(ROUTES.CONFIGURE_WORKFLOW, {
-              entityId,
-              trsId: formatTrsId(workflow.trsId),
-            })}
+            href={replaceParameters(
+              entityListType === "organisms"
+                ? ROUTES.CONFIGURE_ORGANISM_WORKFLOW
+                : ROUTES.CONFIGURE_WORKFLOW,
+              {
+                entityId,
+                trsId: formatTrsId(workflow.trsId),
+              }
+            )}
             rel={REL_ATTRIBUTE.NO_OPENER}
           >
             Configure Inputs

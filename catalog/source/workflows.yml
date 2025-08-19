@@ -42,6 +42,7 @@ workflows:
       - key: Input sequence reads
         type_guide:
           class: File
+        variable: SANGER_READ_RUN_SINGLE
     active: true
     iwc_id: assembly-with-flye-main
   - trs_id: "#workflow/github.com/iwc-workflows/atacseq/main/versions/v1.0"
@@ -107,19 +108,11 @@ workflows:
       - key: Input adapter trimmed sequence reads (forward)
         type_guide:
           class: File
-          ext:
-            - fastq
-            - fastq.gz
-            - fastqsanger
-            - fastqsanger.gz
+        variable: SANGER_READ_RUN_SINGLE
       - key: Input adapter trimmed sequence reads (reverse)
         type_guide:
           class: File
-          ext:
-            - fastq
-            - fastq.gz
-            - fastqsanger
-            - fastqsanger.gz
+        variable: SANGER_READ_RUN_SINGLE
     active: true
     iwc_id: bacterial-genome-assembly-main
   - trs_id: "#workflow/github.com/iwc-workflows/baredsc/baredSC-1d-logNorm/versions/v0.6"
@@ -836,19 +829,11 @@ workflows:
       - key: Input sequence reads (forward)
         type_guide:
           class: File
-          ext:
-            - fastq
-            - fastq.gz
-            - fastqsanger
-            - fastqsanger.gz
+        variable: SANGER_READ_RUN_SINGLE
       - key: Input sequence reads (reverse)
         type_guide:
           class: File
-          ext:
-            - fastq
-            - fastq.gz
-            - fastqsanger
-            - fastqsanger.gz
+        variable: SANGER_READ_RUN_SINGLE
       - key: Select a taxonomy database
         type_guide:
           class: text
