@@ -21,6 +21,7 @@ import { sideColumn as analysisMethodsSideColumn } from "../entity/genome/analys
 import { top as analysisMethodsTop } from "../entity/genome/analysisMethodsTop";
 import { CATEGORY_GROUPS } from "./common/category/categories";
 import { COLUMN_REGISTRY } from "./common/column/columnRegistry";
+import { VIEW_KIND } from "@databiosphere/findable-ui/lib/common/categories/views/types";
 
 /**
  * Entity config object responsible to config anything related to the /assemblies route.
@@ -112,6 +113,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
           {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.COVERAGE,
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.COVERAGE,
+            viewKind: VIEW_KIND.RANGE,
           },
           {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.ANNOTATION_STATUS,
@@ -380,6 +382,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
           component: C.BasicCell,
           viewBuilder: V.buildCoverage,
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
+        filterFn: "inNumberRange",
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.COVERAGE,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.COVERAGE,
         width: { max: "0.5fr", min: "80px" },
