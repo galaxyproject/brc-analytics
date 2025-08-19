@@ -12,7 +12,7 @@ export const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
     label: "Experiment Accession",
   },
   FASTQ_FTP: { key: "fastq_ftp", label: "Fastq FTP" },
-  FIRST_PUBLIC: { key: "first_public", label: "First Public" },
+  FIRST_CREATED: { key: "first_created", label: "First Created" },
   INSTRUMENT_MODEL: { key: "instrument_model", label: "Instrument Model" },
   INSTRUMENT_PLATFORM: {
     key: "instrument_platform",

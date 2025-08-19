@@ -34,10 +34,10 @@ const FASTQ_FTP: ColumnDef<ReadRun> = {
   meta: { width: { max: "1.8fr", min: "200px" } },
 };
 
-const FIRST_PUBLIC: ColumnDef<ReadRun> = {
-  accessorKey: CATEGORY_CONFIGS.FIRST_PUBLIC.key,
+const FIRST_CREATED: ColumnDef<ReadRun> = {
+  accessorKey: CATEGORY_CONFIGS.FIRST_CREATED.key,
   enableColumnFilter: false,
-  header: CATEGORY_CONFIGS.FIRST_PUBLIC.label,
+  header: CATEGORY_CONFIGS.FIRST_CREATED.label,
   meta: META,
 };
 
@@ -107,7 +107,7 @@ const STUDY_ACCESSION: ColumnDef<ReadRun> = {
 export const columns: ColumnDef<ReadRun>[] = [
   COLUMN_DEF.ROW_SELECTION as ColumnDef<ReadRun>,
   RUN_ACCESSION,
-  FIRST_PUBLIC,
+  FIRST_CREATED,
   FASTQ_FTP,
   EXPERIMENT_ACCESSION,
   SAMPLE_ACCESSION,
