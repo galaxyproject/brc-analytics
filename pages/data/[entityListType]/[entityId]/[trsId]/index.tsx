@@ -9,6 +9,7 @@ import { seedDatabase } from "../../../../../app/utils/seedDatabase";
 import { getEntities, getEntity } from "../../../../../app/utils/entityUtils";
 import {
   BRCDataCatalogGenome,
+  BRCDataCatalogOrganism,
   EntitiesResponse,
   Workflow,
 } from "../../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
@@ -16,7 +17,7 @@ import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import workflows from "../../../../../catalog/output/workflows.json";
 import {
   formatTrsId,
-  workflowIsCompatibleWithAssembly,
+  workflowIsCompatibleWithEntity,
 } from "../../../../../app/components/Entity/components/AnalysisMethodsCatalog/utils";
 import { getEntityConfig } from "@databiosphere/findable-ui/lib/config/utils";
 import { WorkflowInputsView } from "../../../../../app/views/WorkflowInputsView/workflowInputsView";
@@ -43,13 +44,22 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
   const paths: StaticPath[] = [];
 
-  const entityConfig = entities.find(({ route }) => route === "assemblies");
+  // Process both assemblies and organisms
+  const assemblyConfig = entities.find(({ route }) => route === "assemblies");
+  const organismConfig = entities.find(({ route }) => route === "organisms");
 
-  if (entityConfig) {
-    await seedDatabase("assemblies", entityConfig);
+  if (assemblyConfig) {
+    await seedDatabase("assemblies", assemblyConfig);
     const entitiesResponse: EntitiesResponse<BRCDataCatalogGenome> =
-      await getEntities(entityConfig);
-    processEntityPaths(entityConfig, entitiesResponse, paths);
+      await getEntities(assemblyConfig);
+    processEntityPaths(assemblyConfig, entitiesResponse, paths);
+  }
+
+  if (organismConfig) {
+    await seedDatabase("organisms", organismConfig);
+    const entitiesResponse: EntitiesResponse<BRCDataCatalogOrganism> =
+      await getEntities(organismConfig);
+    processEntityPaths(organismConfig, entitiesResponse, paths);
   }
 
   return {
@@ -74,6 +84,13 @@ export const getStaticProps = async (
 
   // Seed database.
   await seedDatabase(entityConfig.route, entityConfig);
+
+  // For now, only support assemblies in the workflow configuration page
+  // Organisms will need separate workflow configuration components
+  if (entityListType !== "assemblies") {
+    return { notFound: true };
+  }
+
   const genome = await getEntity<BRCDataCatalogGenome>(entityConfig, entityId);
 
   // Find workflow.
@@ -106,7 +123,9 @@ export default ConfigureWorkflowInputs;
  */
 function processEntityPaths(
   entityConfig: EntityConfig,
-  entitiesResponse: EntitiesResponse<BRCDataCatalogGenome>,
+  entitiesResponse: EntitiesResponse<
+    BRCDataCatalogGenome | BRCDataCatalogOrganism
+  >,
   paths: StaticPath[]
 ): void {
   const { route: entityListType } = entityConfig;
@@ -118,10 +137,10 @@ function processEntityPaths(
 
     if (!entityId) continue;
 
-    // Get the compatible workflows.
+    // Get the compatible workflows using the generic function.
     const compatibleWorkflows = workflows
       .flatMap(({ workflows }) => workflows)
-      .filter((workflow) => workflowIsCompatibleWithAssembly(workflow, entity));
+      .filter((workflow) => workflowIsCompatibleWithEntity(workflow, entity));
 
     // Create paths for each compatible workflow.
     compatibleWorkflows.forEach((workflow) => {
