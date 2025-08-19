@@ -42,7 +42,7 @@ workflows:
       - key: BUSCO lineage
         type_guide:
           class: text
-    active: true
+    active: false
     iwc_id: annotation-helixer-main
   - trs_id: "#workflow/github.com/iwc-workflows/annotation-maker/main/versions/v0.1"
     categories: []
@@ -185,7 +185,7 @@ workflows:
       - key: Select a AMRFinderPlus database
         type_guide:
           class: text
-    active: true
+    active: false
     iwc_id: bacterial_genome_annotation-main
   - trs_id: "#workflow/github.com/iwc-workflows/baredsc/baredSC-1d-logNorm/versions/v0.6"
     categories:

@@ -319,34 +319,6 @@
         "workflowName": "AMR gene detection"
       },
       {
-        "iwcId": "annotation-helixer-main",
-        "parameters": [
-          {
-            "key": "Genome sequence masked",
-            "variable": "ASSEMBLY_FASTA_URL"
-          }
-        ],
-        "ploidy": "ANY",
-        "taxonomyId": "2759",
-        "trsId": "#workflow/github.com/iwc-workflows/annotation-helixer/main/versions/v0.3",
-        "workflowDescription": "This workflow allows you to annotate a genome with Helixer and evaluate the quality of the annotation using BUSCO and Genome Annotation statistics. GFFRead is also used to predict protein sequences derived from this annotation, and BUSCO and OMArk are used to assess proteome quality. ",
-        "workflowName": "Genome annotation with Helixer"
-      },
-      {
-        "iwcId": "bacterial_genome_annotation-main",
-        "parameters": [
-          {
-            "key": "Input sequence fasta",
-            "variable": "ASSEMBLY_FASTA_URL"
-          }
-        ],
-        "ploidy": "HAPLOID",
-        "taxonomyId": "2",
-        "trsId": "#workflow/github.com/iwc-workflows/bacterial_genome_annotation/main/versions/v1.1.11",
-        "workflowDescription": "Annotation of an assembled bacterial genomes to detect genes, potential plasmids, integrons and Insertion sequence (IS) elements.",
-        "workflowName": "bacterial_genome_annotation"
-      },
-      {
         "iwcId": "lncrnas-annotation-main",
         "parameters": [
           {
