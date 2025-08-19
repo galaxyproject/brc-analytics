@@ -4,16 +4,18 @@ import { buildFastqFTP } from "./viewBuilders";
 import { COLUMN_DEF } from "@databiosphere/findable-ui/lib/components/Table/common/columnDef";
 import { BasicCell } from "../../components/Table/components/TableCell/components/BasicCell/basicCell";
 import { CATEGORY_CONFIGS } from "./categoryConfigs";
+import { formatNumber } from "../../../../../../../../../../../../../../../../../viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 
 const RANGE_FILTER_FN = "inNumberRange";
 const SELECT_FILTER_FN = "arrIncludesSome";
 
 const META: ColumnMeta<ReadRun, unknown> = {
-  width: { max: "1.2fr", min: "120px" },
+  width: { max: "1.2fr", min: "140px" },
 };
 
 const BASE_COUNT: ColumnDef<ReadRun> = {
   accessorKey: CATEGORY_CONFIGS.BASE_COUNT.key,
+  cell: (ctx) => formatNumber(Number(ctx.getValue())),
   filterFn: RANGE_FILTER_FN,
   header: CATEGORY_CONFIGS.BASE_COUNT.label,
   meta: META,
@@ -71,6 +73,7 @@ const LIBRARY_STRATEGY: ColumnDef<ReadRun> = {
 
 const READ_COUNT: ColumnDef<ReadRun> = {
   accessorKey: CATEGORY_CONFIGS.READ_COUNT.key,
+  cell: (ctx) => formatNumber(Number(ctx.getValue())),
   filterFn: RANGE_FILTER_FN,
   header: CATEGORY_CONFIGS.READ_COUNT.label,
   meta: META,
