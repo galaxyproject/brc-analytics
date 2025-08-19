@@ -12,8 +12,8 @@ from .generated_schema.schema import (
     WorkflowCategoryId,
     WorkflowParameter,
     WorkflowPloidy,
-    WorkflowTargetPage,
     Workflows,
+    WorkflowTargetPage,
 )
 
 URL = "https://iwc.galaxyproject.org/workflow_manifest.json"
