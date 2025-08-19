@@ -6,6 +6,7 @@ import {
   OUTBREAK_RESOURCE_TYPE,
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_PLOIDY,
+  WORKFLOW_TARGET_PAGE,
 } from "./schema-entities";
 
 export type BRCCatalog =
@@ -117,6 +118,7 @@ export interface Workflow {
   iwcId: string;
   parameters: WorkflowParameter[];
   ploidy: WORKFLOW_PLOIDY;
+  targetPages?: WORKFLOW_TARGET_PAGE[] | null;
   taxonomyId: string | null;
   trsId: string;
   workflowDescription: string;

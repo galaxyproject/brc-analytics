@@ -42,7 +42,9 @@ workflows:
       - key: Input sequence reads
         type_guide:
           class: File
-    active: false
+    active: true
+    target_pages:
+      - ASSEMBLIES
     iwc_id: assembly-with-flye-main
   - trs_id: "#workflow/github.com/iwc-workflows/atacseq/main/versions/v1.0"
     categories:
@@ -72,6 +74,8 @@ workflows:
         type_guide:
           class: integer
     active: true
+    target_pages:
+      - ASSEMBLIES
     iwc_id: atacseq-main
   - trs_id: "#workflow/github.com/iwc-workflows/average-bigwig-between-replicates/main/versions/v0.2"
     categories:
@@ -102,6 +106,9 @@ workflows:
       Assembly of bacterial paired-end short read data with generation
       of quality metrics and reports
     ploidy: ANY
+    taxonomy_id: 2
+    target_pages:
+      - ORGANISMS
     parameters:
       - key: Input adapter trimmed sequence reads (forward)
         type_guide:
@@ -119,7 +126,7 @@ workflows:
             - fastq.gz
             - fastqsanger
             - fastqsanger.gz
-    active: false
+    active: true
     iwc_id: bacterial-genome-assembly-main
   - trs_id: "#workflow/github.com/iwc-workflows/baredsc/baredSC-1d-logNorm/versions/v0.6"
     categories:
@@ -145,7 +152,7 @@ workflows:
           class: float
       - key: Maximum number of Gaussians to study
         type_guide:
-          class: integer
+          cass: integer
     active: false
     iwc_id: baredsc-baredsc-1d-lognorm
   - trs_id: "#workflow/github.com/iwc-workflows/baredsc/baredSC-2d-logNorm/versions/v0.6"
@@ -249,6 +256,8 @@ workflows:
         type_guide:
           class: boolean
     active: true
+    target_pages:
+      - ASSEMBLIES
     iwc_id: chipseq-pe-main
   - trs_id: "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.14"
     categories:
@@ -280,6 +289,8 @@ workflows:
         type_guide:
           class: boolean
     active: true
+    target_pages:
+      - ASSEMBLIES
     iwc_id: chipseq-sr-main
   - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.3"
     categories:
@@ -309,6 +320,8 @@ workflows:
         type_guide:
           class: integer
     active: true
+    target_pages:
+      - ASSEMBLIES
     iwc_id: consensus-peaks-consensus-peaks-atac-cutandrun
   - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-pe/versions/v1.3"
     categories:
@@ -401,6 +414,8 @@ workflows:
         type_guide:
           class: boolean
     active: true
+    target_pages:
+      - ASSEMBLIES
     iwc_id: cutandrun-main
   - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.2"
     categories:
@@ -444,6 +459,8 @@ workflows:
         type_guide:
           class: integer
     active: true
+    target_pages:
+      - ASSEMBLIES
     iwc_id: fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-cellplex
   - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.2"
     categories:
@@ -474,6 +491,8 @@ workflows:
         type_guide:
           class: boolean
     active: true
+    target_pages:
+      - ASSEMBLIES
     iwc_id: fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-v3
   - trs_id: "#workflow/github.com/iwc-workflows/generic-variant-calling-wgs-pe/main/versions/v0.1.1"
     categories:
@@ -555,6 +574,8 @@ workflows:
       - key: Genome fasta
         variable: ASSEMBLY_FASTA_URL
     active: true
+    target_pages:
+      - ASSEMBLIES
     iwc_id: haploid-variant-calling-wgs-pe-main
   - trs_id: "#workflow/github.com/iwc-workflows/hic-hicup-cooler/chic-fastq-to-cool-hicup-cooler/versions/v0.3"
     categories:
@@ -780,6 +801,8 @@ workflows:
         type_guide:
           class: float
     active: true
+    target_pages:
+      - ASSEMBLIES
     iwc_id: pox-virus-amplicon-main
   - trs_id: "#workflow/github.com/iwc-workflows/pseudobulk-worflow-decoupler-edger/main/versions/v0.1.1"
     categories:
@@ -854,7 +877,9 @@ workflows:
       - key: Select a NCBI taxonomy database
         type_guide:
           class: text
-    active: false
+    active: true
+    target_pages:
+      - ORGANISMS
     iwc_id: quality-and-contamination-control-main
   - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-de/main/versions/v0.4"
     categories:
@@ -938,6 +963,8 @@ workflows:
         type_guide:
           class: boolean
     active: true
+    target_pages:
+      - ASSEMBLIES
     iwc_id: rnaseq-pe-main
   - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.2"
     categories:
@@ -984,6 +1011,8 @@ workflows:
         type_guide:
           class: boolean
     active: true
+    target_pages:
+      - ASSEMBLIES
     iwc_id: rnaseq-sr-main
   - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-ont-artic-variant-calling/COVID-19-ARTIC-ONT/versions/v0.3.2"
     categories:
@@ -1096,6 +1125,8 @@ workflows:
         type_guide:
           class: integer
     active: true
+    target_pages:
+      - ASSEMBLIES
     iwc_id: sars-cov-2-pe-illumina-artic-variant-calling-covid-19-pe-artic-illumina
   - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-wgs-variant-calling/COVID-19-PE-WGS-ILLUMINA/versions/v0.2.4"
     categories:
@@ -1117,6 +1148,8 @@ workflows:
       - key: NC_045512.2 FASTA sequence of SARS-CoV-2
         variable: ASSEMBLY_FASTA_URL
     active: true
+    target_pages:
+      - ASSEMBLIES
     iwc_id: sars-cov-2-pe-illumina-wgs-variant-calling-covid-19-pe-wgs-illumina
   - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-se-illumina-wgs-variant-calling/COVID-19-SE-WGS-ILLUMINA/versions/v0.1.6"
     categories:
@@ -1138,6 +1171,8 @@ workflows:
       - key: NC_045512.2 FASTA sequence of SARS-CoV-2
         variable: ASSEMBLY_FASTA_URL
     active: true
+    target_pages:
+      - ASSEMBLIES
     iwc_id: sars-cov-2-se-illumina-wgs-variant-calling-covid-19-se-wgs-illumina
   - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-variation-reporting/COVID-19-VARIATION-REPORTING/versions/v0.3.4"
     categories:

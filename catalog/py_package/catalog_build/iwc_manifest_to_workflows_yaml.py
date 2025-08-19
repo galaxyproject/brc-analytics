@@ -12,6 +12,7 @@ from .generated_schema.schema import (
     WorkflowCategoryId,
     WorkflowParameter,
     WorkflowPloidy,
+    WorkflowTargetPage,
     Workflows,
 )
 
@@ -112,6 +113,8 @@ def generate_current_workflows():
                 workflow_description=workflow["definition"]["annotation"],
                 ploidy=WorkflowPloidy.ANY,
                 iwc_id=workflow.get("iwcID"),
+                # Default all workflows to appear on the assemblies page
+                target_pages=[WorkflowTargetPage.ASSEMBLIES],
                 # readme=workflow["readme"],
                 # shortcut so we don't need to parse out the whole inputs section
                 parameters=get_input_types(workflow["definition"]),

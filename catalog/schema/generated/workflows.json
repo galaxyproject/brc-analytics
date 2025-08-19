@@ -42,6 +42,16 @@
                     "$ref": "#/$defs/WorkflowPloidy",
                     "description": "The ploidy state (number of chromosome sets) that this workflow is designed to work with, ensuring compatibility with organism data."
                 },
+                "target_pages": {
+                    "description": "List of pages where this workflow should be available (e.g., assemblies page, organisms page).",
+                    "items": {
+                        "$ref": "#/$defs/WorkflowTargetPage"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
                 "taxonomy_id": {
                     "description": "The NCBI Taxonomy ID of the organism this workflow is designed for. If specified, the workflow will be available for all assemblies with this ID in their taxonomic lineage.",
                     "type": [
@@ -152,6 +162,15 @@
                 "POLYPLOID"
             ],
             "title": "WorkflowPloidy",
+            "type": "string"
+        },
+        "WorkflowTargetPage": {
+            "description": "Set of pages where workflows can be targeted.",
+            "enum": [
+                "ASSEMBLIES",
+                "ORGANISMS"
+            ],
+            "title": "WorkflowTargetPage",
             "type": "string"
         },
         "WorkflowUrlSpec": {

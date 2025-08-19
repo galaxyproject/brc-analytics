@@ -1,0 +1,12 @@
+id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/enums/workflow_target_page.yaml#
+name: enums_workflow_target_page
+description: Definition of the workflow target page enum.
+
+enums:
+  WorkflowTargetPage:
+    description: Set of pages where workflows can be targeted.
+    permissible_values:
+      ASSEMBLIES:
+        description: The workflow should be available on the assemblies page.
+      ORGANISMS:
+        description: The workflow should be available on the organisms page.
