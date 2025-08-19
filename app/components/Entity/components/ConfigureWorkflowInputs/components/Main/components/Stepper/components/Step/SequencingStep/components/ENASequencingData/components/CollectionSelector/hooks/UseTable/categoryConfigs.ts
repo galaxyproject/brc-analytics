@@ -1,9 +1,11 @@
 import { CategoryConfig } from "@databiosphere/findable-ui/lib/common/categories/config/types";
+import { VIEW_KIND } from "@databiosphere/findable-ui/lib/common/categories/views/types";
 
 export const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
   BASE_COUNT: {
     key: "base_count",
     label: "Base Count",
+    viewKind: VIEW_KIND.RANGE,
   },
   EXPERIMENT_ACCESSION: {
     key: "experiment_accession",
@@ -21,6 +23,7 @@ export const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
   READ_COUNT: {
     key: "read_count",
     label: "Read Count",
+    viewKind: VIEW_KIND.RANGE,
   },
   RUN_ACCESSION: { key: "run_accession", label: "Run Accession" },
   SAMPLE_ACCESSION: { key: "sample_accession", label: "Sample Accession" },

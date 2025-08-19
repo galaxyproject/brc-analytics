@@ -5,7 +5,7 @@ import { COLUMN_DEF } from "@databiosphere/findable-ui/lib/components/Table/comm
 import { BasicCell } from "../../components/Table/components/TableCell/components/BasicCell/basicCell";
 import { CATEGORY_CONFIGS } from "./categoryConfigs";
 
-// const RANGE_FILTER_FN = "inNumberRange";
+const RANGE_FILTER_FN = "inNumberRange";
 const SELECT_FILTER_FN = "arrIncludesSome";
 
 const META: ColumnMeta<ReadRun, unknown> = {
@@ -14,8 +14,7 @@ const META: ColumnMeta<ReadRun, unknown> = {
 
 const BASE_COUNT: ColumnDef<ReadRun> = {
   accessorKey: CATEGORY_CONFIGS.BASE_COUNT.key,
-  // filterFn: RANGE_FILTER_FN,
-  filterFn: SELECT_FILTER_FN,
+  filterFn: RANGE_FILTER_FN,
   header: CATEGORY_CONFIGS.BASE_COUNT.label,
   meta: META,
 };
@@ -72,8 +71,7 @@ const LIBRARY_STRATEGY: ColumnDef<ReadRun> = {
 
 const READ_COUNT: ColumnDef<ReadRun> = {
   accessorKey: CATEGORY_CONFIGS.READ_COUNT.key,
-  // filterFn: RANGE_FILTER_FN,
-  filterFn: SELECT_FILTER_FN,
+  filterFn: RANGE_FILTER_FN,
   header: CATEGORY_CONFIGS.READ_COUNT.label,
   meta: META,
 };
