@@ -3,9 +3,9 @@ import { AnalysisMethod } from "../AnalysisMethod/analysisMethod";
 import { Props } from "./types";
 import { workflowIsCompatibleWithEntity } from "./utils";
 import { WORKFLOW_TARGET_PAGE } from "../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { 
-  BRCDataCatalogGenome, 
-  BRCDataCatalogOrganism 
+import {
+  BRCDataCatalogGenome,
+  BRCDataCatalogOrganism,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
 
 import { useRouter } from "next/router";
