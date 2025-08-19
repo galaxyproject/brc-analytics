@@ -1063,8 +1063,9 @@ function getPriorityPathogenEntityBreadcrumbs(
 /**
  * Format a number to a string.
  * @param value - Number to format.
- * @returns Formatted number.
+ * @returns Formatted number or empty string if invalid.
  */
-export function formatNumber(value: number | null): string {
-  return value?.toLocaleString() || "";
+export function formatNumber(value: unknown): string {
+  if (typeof value !== "number" || Number.isNaN(value)) return "";
+  return value.toLocaleString();
 }
