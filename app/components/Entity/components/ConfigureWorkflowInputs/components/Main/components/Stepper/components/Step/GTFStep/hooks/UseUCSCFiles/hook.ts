@@ -9,8 +9,9 @@ const SPECIAL_CASE_ASSEMBLY_LOOKUP: Record<string, string> = {
 } as const;
 
 export const useUCSCFiles = (genome: BRCDataCatalogGenome): UseUCSCFiles => {
+  // TODO: i dont think were actually finding assembly id right now
   const assemblyId =
-    SPECIAL_CASE_ASSEMBLY_LOOKUP[genome.accession] ?? genome.accession;
+    SPECIAL_CASE_ASSEMBLY_LOOKUP[genome?.accession] ?? genome?.accession;
   const [geneModelUrls, setGeneModelUrls] = useState<string[] | undefined>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);

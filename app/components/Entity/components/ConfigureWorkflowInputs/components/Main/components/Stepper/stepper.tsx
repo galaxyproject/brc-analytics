@@ -19,8 +19,8 @@ export const Stepper = ({ genome, workflow, ...props }: Props): JSX.Element => {
 
   let steps = STEPS;
 
-  // For organism workflows (when genome is null), skip reference assembly and GTF steps
-  if (genome === null) {
+  // For organism workflows (when genome is null or undefined), skip reference assembly and GTF steps
+  if (genome === null || genome === undefined) {
     steps = steps.filter(
       (step) => step.key !== "referenceAssembly" && step.key !== "geneModelUrl"
     );
@@ -52,6 +52,7 @@ export const Stepper = ({ genome, workflow, ...props }: Props): JSX.Element => {
             description={description}
             disabled={disabled}
             entryLabel={label}
+            genome={genome}
             index={i}
             onContinue={onContinue}
             onEdit={onEdit}
