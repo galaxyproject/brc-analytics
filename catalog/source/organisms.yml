@@ -4097,3 +4097,825 @@ organisms:
   - taxonomy_id: 1980456
     ploidy:
       - HAPLOID
+  - taxonomy_id: 100268
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 100269
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 1014
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1015
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1019
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 103827
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 1147741
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 114890
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 117903
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 1187980
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 119219
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1195655
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 1195656
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 12451280
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 1255
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1260
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1280
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 13076
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1309
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1311
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1313
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 131310
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 1314
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1351
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1352
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1353
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1354
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 135651
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 1363
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 13658
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 1376
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 141969
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 1422
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 144512
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1465
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 147828
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 148309
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 1491
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1496
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1502
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1503980
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 1513
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1561998
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 156974
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1583
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 158836
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 160
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1611254
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 1648
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1659
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 166010
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 166011
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 1717
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1729975
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 1737332
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1737333
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1737334
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1737335
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1737336
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1737337
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1747
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 174720
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 178214
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1812935
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 1824
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 189291
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 2011161
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 2018661
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 2039
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 2071710
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 208224
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 210
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 2104
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 2138241
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 2173
+    ploidy:
+      - POLYPLOID
+  - taxonomy_id: 2301259
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 2301260
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 238
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 241478
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 247
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 2478464
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 2494701
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 2494702
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 2497436
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 2497875
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 2529381
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 2529382
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 2559892
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 256
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 2598192
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 2654633
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 2682772
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 269767
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 2702
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 2738
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 2761625
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 2777116
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 27835
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 27845
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 27848
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 2797505
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 2797506
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 281687
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 28188
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 282301
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 2838947
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 28454
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 287
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 2874296
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 2878363
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 289476
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 290746
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 29170
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 29172
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 29391
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 29394
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 298350
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 2994648
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 2996112
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 299767
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 3029761
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 3030997
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 3030999
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 3043721
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 31234
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 31243
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 3133180
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 3142537
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 318479
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 321387
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 329
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 334426
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 33945
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 34105
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 34504
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 34506
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 34508
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 36087
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 36090
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 37629
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 37734
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 37862
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 37863
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 38323
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 387005
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 40091
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 40324
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 40348
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 413010
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 42155
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 42156
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 42157
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 44250
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 446
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 45464
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 46124
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 46125
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 465554
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 46835
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 470
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 47715
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 480
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 48269
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 485
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 487
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 48799
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 504
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 51022
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 51028
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 51029
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 51031
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 511
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 51669
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 519352
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 52066
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 53326
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 53345
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 53468
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 536
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 539
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 539813
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 53992
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 54126
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 546
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 550
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 573
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 582
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 584
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 585
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 588
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 591449
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 59628
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 59747
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 60516
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 60517
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 61180
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 615
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 61645
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 6182
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6183
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6184
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6185
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6186
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6192
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6198
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6204
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6205
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6206
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6210
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6211
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6212
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6216
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6233
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6238
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6239
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6248
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6253
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6257
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6265
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6269
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6277
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6279
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6280
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6282
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6287
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6289
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6290
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6293
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6303
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6304
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6305
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6313
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6326
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6334
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6335
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 6339
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 637853
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 644
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 66851
+    ploidy:
+      - POLYPLOID
+  - taxonomy_id: 68888
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 69218
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 703
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 70415
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 70667
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 71452
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 71465
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 7209
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 727
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 730
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 747
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 75913
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 784
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 79327
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 79923
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 817
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 82660
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 851
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 85433
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 85698
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 860376
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 881260
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 885040
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 89093
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 90245
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 90984
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 90986
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 912562
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 93218
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 94034
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 96644
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 97005
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 99802
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 102285
+    ploidy:
+      - DIPLOID
+  - taxonomy_id: 1245
+    ploidy:
+      - HAPLOID
