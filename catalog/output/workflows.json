@@ -343,6 +343,46 @@
     ]
   },
   {
+    "category": "ANNOTATION",
+    "description": "Workflows for the annotation of genomic data.",
+    "name": "Annotation",
+    "showComingSoon": true,
+    "workflows": [
+      {
+        "iwcId": "amr_gene_detection-main",
+        "parameters": [
+          {
+            "key": "Input sequence fasta",
+            "variable": "ASSEMBLY_FASTA_URL"
+          }
+        ],
+        "ploidy": "HAPLOID",
+        "taxonomyId": "2",
+        "trsId": "#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.5",
+        "workflowDescription": "Antimicrobial resistance gene detection from assembled bacterial genomes",
+        "workflowName": "AMR gene detection"
+      },
+      {
+        "iwcId": "lncrnas-annotation-main",
+        "parameters": [
+          {
+            "key": "Genome assembly",
+            "variable": "ASSEMBLY_FASTA_URL"
+          },
+          {
+            "key": "Genome annotation",
+            "variable": "GENE_MODEL_URL"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": "2759",
+        "trsId": "#workflow/github.com/iwc-workflows/lncRNAs-annotation/main/versions/v0.1",
+        "workflowDescription": "This workflow runs the FEELnc tool to annotate long non-coding RNAs. Before annotating these long non-coding RNAs, StringTie will be used to assemble the RNA-seq alignments into potential trancriptions. The gffread tool provides a genome annotation file in GTF format.",
+        "workflowName": "lncRNAs annotation workflow"
+      }
+    ]
+  },
+  {
     "category": "ASSEMBLY",
     "description": "Assemble prokaryotic and eukaryotic genomes sequenced with a variety of technologies.",
     "name": "Assembly",

@@ -1,4 +1,49 @@
 workflows:
+  - trs_id: "#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.5"
+    categories:
+      - ANNOTATION
+    workflow_name: AMR gene detection
+    workflow_description:
+      Antimicrobial resistance gene detection from assembled bacterial
+      genomes
+    ploidy: HAPLOID
+    taxonomy_id: 2
+    parameters:
+      - key: Input sequence fasta
+        variable: ASSEMBLY_FASTA_URL
+      - key: Select a taxonomy group point mutation
+        type_guide:
+          class: text
+      - key: Select a AMR genes detection database
+        type_guide:
+          class: text
+      - key: Select a virulence genes detection database
+        type_guide:
+          class: text
+    active: true
+    iwc_id: amr_gene_detection-main
+  - trs_id: "#workflow/github.com/iwc-workflows/annotation-helixer/main/versions/v0.3"
+    categories:
+      - ANNOTATION
+    workflow_name: Genome annotation with Helixer
+    workflow_description:
+      "This workflow allows you to annotate a genome with Helixer
+      and evaluate the quality of the annotation using BUSCO and Genome Annotation statistics.
+      GFFRead is also used to predict protein sequences derived from this annotation,
+      and BUSCO and OMArk are used to assess proteome quality. "
+    ploidy: ANY
+    taxonomy_id: 2759
+    parameters:
+      - key: Helixer lineage
+        type_guide:
+          class: text
+      - key: Genome sequence masked
+        variable: ASSEMBLY_FASTA_URL
+      - key: BUSCO lineage
+        type_guide:
+          class: text
+    active: false
+    iwc_id: annotation-helixer-main
   - trs_id: "#workflow/github.com/iwc-workflows/annotation-maker/main/versions/v0.1"
     categories: []
     workflow_name: Genome annotation with Maker
@@ -6,14 +51,13 @@ workflows:
       This workflow allows for genome annotation using Maker and
       evaluates the quality of the annotation.
     ploidy: ANY
+    taxonomy_id: 2759
     parameters:
       - key: BUSCO lineage
         type_guide:
           class: text
       - key: Genome sequence
-        type_guide:
-          class: File
-          ext: fasta
+        variable: ASSEMBLY_FASTA_URL
       - key: Genome assembly
         type_guide:
           class: File
@@ -27,7 +71,7 @@ workflows:
       - key: SNAP training
         type_guide:
           class: File
-    active: false
+    active: true
     iwc_id: annotation-maker-main
   - trs_id: "#workflow/github.com/iwc-workflows/assembly-with-flye/main/versions/v0.3"
     categories:
@@ -118,6 +162,29 @@ workflows:
             - fastqsanger.gz
     active: false
     iwc_id: bacterial-genome-assembly-main
+  - trs_id: "#workflow/github.com/iwc-workflows/bacterial_genome_annotation/main/versions/v1.1.11"
+    categories:
+      - ANNOTATION
+    workflow_name: Bacterial Genome Annotation
+    workflow_description:
+      Annotation of an assembled bacterial genomes to detect genes,
+      potential plasmids, integrons and Insertion sequence (IS) elements.
+    ploidy: HAPLOID
+    taxonomy_id: 2
+    parameters:
+      - key: Input sequence fasta
+        variable: ASSEMBLY_FASTA_URL
+      - key: Select a plasmid detection database
+        type_guide:
+          class: text
+      - key: Select a bacterial genome annotation database
+        type_guide:
+          class: text
+      - key: Select a AMRFinderPlus database
+        type_guide:
+          class: text
+    active: false
+    iwc_id: bacterial_genome_annotation-main
   - trs_id: "#workflow/github.com/iwc-workflows/baredsc/baredSC-1d-logNorm/versions/v0.6"
     categories:
       - TRANSCRIPTOMICS
@@ -510,6 +577,20 @@ workflows:
           class: integer
     active: true
     iwc_id: generic-non-segmented-viral-variant-calling-main
+  - trs_id: "#workflow/github.com/iwc-workflows/functional-annotation-protein-sequences/main/versions/v0.1"
+    categories:
+      - ANNOTATION
+    workflow_name: Functional annotation of protein sequences
+    workflow_description:
+      This workflow uses eggNOG mapper and InterProScan for functional
+      annotation of protein sequences.
+    ploidy: ANY
+    parameters:
+      - key: input
+        type_guide:
+          class: File
+    active: false
+    iwc_id: functional-annotation-protein-sequences-main
   - trs_id: "#workflow/github.com/iwc-workflows/generic-variant-calling-wgs-pe/main/versions/v0.1.1"
     categories:
       - VARIANT_CALLING
@@ -749,6 +830,31 @@ workflows:
           class: Collection
     active: false
     iwc_id: influenza-isolates-consensus-and-subtyping-main
+  - trs_id: "#workflow/github.com/iwc-workflows/lncRNAs-annotation/main/versions/v0.1"
+    categories:
+      - ANNOTATION
+    workflow_name: lncRNAs annotation workflow
+    workflow_description:
+      This workflow runs the FEELnc tool to annotate long non-coding
+      RNAs. Before annotating these long non-coding RNAs, StringTie will be used to
+      assemble the RNA-seq alignments into potential trancriptions. The gffread tool
+      provides a genome annotation file in GTF format.
+    ploidy: ANY
+    taxonomy_id: 2759
+    parameters:
+      - key: strandedness
+        type_guide:
+          class: text
+      - key: Genome assembly
+        variable: ASSEMBLY_FASTA_URL
+      - key: Genome annotation
+        variable: GENE_MODEL_URL
+      - key: Alignments from RNA-seq
+        type_guide:
+          class: File
+          ext: bam
+    active: true
+    iwc_id: lncrnas-annotation-main
   - trs_id: "#workflow/github.com/iwc-workflows/mapseq-to-ampvis2/main/versions/v0.2"
     categories: []
     workflow_name: MAPseq to ampvis2
@@ -891,6 +997,18 @@ workflows:
           class: text
     active: false
     iwc_id: quality-and-contamination-control-main
+  - trs_id: "#workflow/github.com/iwc-workflows/repeatmasking/main/versions/v0.1"
+    categories:
+      - ANNOTATION
+    workflow_name: Repeat masking with RepeatModeler and RepeatMasker
+    workflow_description: ""
+    ploidy: ANY
+    parameters:
+      - key: input
+        type_guide:
+          class: File
+    active: false
+    iwc_id: repeatmasking-main
   - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-de/main/versions/v0.4"
     categories:
       - TRANSCRIPTOMICS
