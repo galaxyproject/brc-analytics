@@ -453,7 +453,7 @@ export const buildOrganismTaxonomicLevelSpecies = (
 ): ComponentProps<typeof C.Link> => {
   return {
     label: organism.taxonomicLevelSpecies,
-    url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getOrganismId(organism))}`,
+    url: `${ROUTES.GENOMES}?filter=[{"categoryKey":"taxonomicLevelSpecies","value":"${encodeURIComponent(organism.taxonomicLevelSpecies)}"}]`,
   };
 };
 
