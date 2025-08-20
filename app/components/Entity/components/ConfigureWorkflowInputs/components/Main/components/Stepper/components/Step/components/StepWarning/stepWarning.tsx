@@ -12,8 +12,8 @@ export const StepWarning = ({
 
   return (
     <Typography
-      variant={TYPOGRAPHY_PROPS.VARIANT.TEXT_BODY_400}
-      color="warning.main"
+      color={TYPOGRAPHY_PROPS.COLOR.WARNING}
+      variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
     >
       Warning: Unable to automatically configure this step. You will need to
       provide this data manually. ({error})

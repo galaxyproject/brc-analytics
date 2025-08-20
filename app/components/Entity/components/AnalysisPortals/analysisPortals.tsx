@@ -6,10 +6,10 @@ import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,
 } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
-import { TEXT_BODY_400 } from "@databiosphere/findable-ui/lib/theme/common/typography";
 import { Typography } from "@mui/material";
 import { Fragment } from "react";
 import { StyledButtonBase } from "./analysisPortals.styles";
+import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 
 export interface AnalysisPortals {
   imageProps: StaticImageProps;
@@ -39,7 +39,9 @@ export const AnalysisPortals = ({
           }}
         >
           <StaticImage {...imageProps} key={label} />
-          <Typography variant={TEXT_BODY_400}>{label}</Typography>
+          <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}>
+            {label}
+          </Typography>
         </StyledButtonBase>
       ))}
     </Fragment>

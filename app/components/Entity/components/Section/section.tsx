@@ -16,7 +16,7 @@ export const Section = ({
     <Paper {...paperProps}>
       <StyledTypography
         component="h2"
-        variant={TYPOGRAPHY_PROPS.VARIANT.TEXT_HEADING_XSMALL}
+        variant={TYPOGRAPHY_PROPS.VARIANT.HEADING_XSMALL}
       >
         {title}
       </StyledTypography>

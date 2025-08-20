@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import re
+import sys
+from datetime import date, datetime, time
+from decimal import Decimal
 from enum import Enum
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List, Literal, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field, RootModel, field_validator
 
@@ -58,7 +61,7 @@ linkml_meta = LinkMLMeta(
                 "prefix_reference": "https://w3id.org/linkml/",
             }
         },
-        "source_file": "/Users/mvandenb/src/brc-analytics/catalog/py_package/catalog_build/schema_utils/../schema/schema.yaml",
+        "source_file": "/home/dcallan-adm/Documents/brc-analytics/brc-analytics/catalog/py_package/catalog_build/schema_utils/../schema/schema.yaml",
     }
 )
 
@@ -111,6 +114,7 @@ class WorkflowCategoryId(str, Enum):
     GENOME_COMPARISONS = "GENOME_COMPARISONS"
     PROTEIN_FOLDING = "PROTEIN_FOLDING"
     CONSENSUS_SEQUENCES = "CONSENSUS_SEQUENCES"
+    ANNOTATION = "ANNOTATION"
     OTHER = "OTHER"
 
 

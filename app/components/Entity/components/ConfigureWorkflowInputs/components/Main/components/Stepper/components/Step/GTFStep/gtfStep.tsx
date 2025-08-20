@@ -80,7 +80,7 @@ export const GTFStep = ({
         <StyledGrid>
           <Typography
             component="div"
-            variant={TYPOGRAPHY_PROPS.VARIANT.TEXT_BODY_500}
+            variant={TYPOGRAPHY_PROPS.VARIANT.BODY_500}
           >
             Genes and Gene Predictions
           </Typography>
@@ -99,7 +99,7 @@ export const GTFStep = ({
             </RadioGroup>
           ) : (
             !error && (
-              <Typography variant={TYPOGRAPHY_PROPS.VARIANT.TEXT_BODY_400}>
+              <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}>
                 No gene models found.
               </Typography>
             )

@@ -1,9 +1,9 @@
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
-import { ENA_FIELDS } from "./constants";
 import { SubmitOptions } from "./types";
 import { AccessionInfo } from "./entities";
+import { ENA_FIELDS } from "./constants";
 
-const ENA_API = `${process.env.NEXT_PUBLIC_ENA_PROXY_DOMAIN}/ena/portal/api/search?result=read_run&query={query}&fields=${ENA_FIELDS.join(",")}&format=json`;
+export const ENA_API = `${process.env.NEXT_PUBLIC_ENA_PROXY_DOMAIN}/ena/portal/api/search?result=read_run&query={query}&fields=${ENA_FIELDS.join(",")}&format=json`;
 
 /**
  * Fetch ENA data for a given accession number.
@@ -36,7 +36,11 @@ export async function fetchENAData<T>({
   const data = await res.json();
 
   if (!data || !data.length) {
-    submitOptions.onError?.();
+    submitOptions.onError?.(
+      new Error(
+        "Accessions were not found. Please check the IDs and try again."
+      )
+    );
     return;
   }
 

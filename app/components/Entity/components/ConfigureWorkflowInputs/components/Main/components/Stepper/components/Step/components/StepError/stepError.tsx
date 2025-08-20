@@ -9,7 +9,10 @@ export const StepError = ({ error }: StepErrorProps): JSX.Element | null => {
   if (!error) return null;
 
   return (
-    <Typography variant={TYPOGRAPHY_PROPS.VARIANT.TEXT_BODY_400} color="error">
+    <Typography
+      color={TYPOGRAPHY_PROPS.COLOR.ERROR}
+      variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
+    >
       Error: {error}
     </Typography>
   );

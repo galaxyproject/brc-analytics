@@ -1,4 +1,4 @@
-import { mediaTabletDown } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
+import { bpDownSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
 import { Typography } from "@mui/material";
 
@@ -11,7 +11,7 @@ export const Brands = styled.div`
     margin: 0;
   }
 
-  ${mediaTabletDown} {
+  ${bpDownSm} {
     div {
       padding-left: 0;
       padding-right: 0;

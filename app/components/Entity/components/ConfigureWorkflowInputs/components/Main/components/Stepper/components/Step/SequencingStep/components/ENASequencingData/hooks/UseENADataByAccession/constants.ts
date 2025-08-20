@@ -13,6 +13,7 @@ export const ENA_FIELDS = [
   "fastq_ftp",
   "fastq_md5",
   "fastq_aspera",
+  "first_created",
   "instrument_model",
   "instrument_platform",
   "library_layout",

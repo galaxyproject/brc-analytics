@@ -1,6 +1,6 @@
-import { textBodyLarge400 } from "@databiosphere/findable-ui/lib/styles/common/mixins/fonts";
 import styled from "@emotion/styled";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
+import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 
 export const SectionHeadline = styled.div`
   display: grid;
@@ -16,7 +16,7 @@ export const SectionTitle = styled.h2`
 `;
 
 export const SectionSubtitle = styled.h3`
-  ${textBodyLarge400};
   color: ${PALETTE.INK_LIGHT};
+  font: ${FONT.BODY_LARGE_400};
   margin: 0;
 `;

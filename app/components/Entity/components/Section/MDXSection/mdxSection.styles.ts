@@ -1,4 +1,4 @@
-import { textBody4002Lines } from "@databiosphere/findable-ui/lib/styles/common/mixins/fonts";
+import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 import styled from "@emotion/styled";
 
 // See https://github.com/emotion-js/emotion/issues/1105.
@@ -18,11 +18,11 @@ export const StyledH2 = styled("h2")`
 `;
 
 export const StyledP = styled("p")`
-  ${textBody4002Lines}
+  font: ${FONT.BODY_400_2_LINES};
 `;
 
 export const StyledUL = styled("ul")`
-  ${textBody4002Lines}
+  font: ${FONT.BODY_400_2_LINES};
   margin: 0;
   padding-left: 24px;
 

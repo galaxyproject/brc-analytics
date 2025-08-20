@@ -1,6 +1,9 @@
-import { ColumnMeta } from "@tanstack/react-table";
-import { ReadRun } from "../../../../types";
+import { SortingState } from "@tanstack/react-table";
+import { CATEGORY_CONFIGS } from "./categoryConfigs";
 
-export const META: ColumnMeta<ReadRun, unknown> = {
-  width: { max: "1.2fr", min: "120px" },
-};
+export const SORTING: SortingState = [
+  {
+    desc: true,
+    id: CATEGORY_CONFIGS.FIRST_CREATED.key,
+  },
+];

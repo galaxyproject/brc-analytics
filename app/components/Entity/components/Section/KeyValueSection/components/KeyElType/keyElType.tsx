@@ -10,7 +10,7 @@ export const KeyElType = ({
   return (
     <Typography
       color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
-      variant={TYPOGRAPHY_PROPS.VARIANT.TEXT_BODY_400}
+      variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
       {...props}
     >
       {children}

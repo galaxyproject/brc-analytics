@@ -1,6 +1,6 @@
-import { textBody400 } from "@databiosphere/findable-ui/lib/styles/common/mixins/fonts";
 import styled from "@emotion/styled";
 import { Stepper } from "@mui/material";
+import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 
 export const StyledStepper = styled(Stepper)`
   gap: 16px;
@@ -16,7 +16,7 @@ export const StyledStepper = styled(Stepper)`
       }
 
       .MuiButton-root {
-        ${textBody400};
+        font: ${FONT.BODY_400};
         grid-column: 2;
         grid-row: 1 / span 2;
         text-decoration: underline;

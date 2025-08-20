@@ -4,9 +4,9 @@ import {
   sectionLayout,
 } from "../../../../../Layout/components/AppLayout/components/Section/section.styles";
 import { Accordion, Box, Button, Grid } from "@mui/material";
-import { mediaTabletDown } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
+import { bpDownSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
-import { textBodyLarge400 } from "@databiosphere/findable-ui/lib/styles/common/mixins/fonts";
+import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 
 export const Section = styled.section`
   background-color: ${PALETTE.COMMON_WHITE};
@@ -20,7 +20,7 @@ export const SectionLayout = styled.div`
   grid-template-columns: 1fr 1fr;
   padding: 72px 0 104px;
 
-  ${mediaTabletDown} {
+  ${bpDownSm} {
     grid-template-columns: repeat(12, 1fr);
   }
 `;
@@ -45,7 +45,7 @@ export const Subhead = styled.div`
   margin: 0;
   padding-top: 8px;
 
-  ${mediaTabletDown} {
+  ${bpDownSm} {
     grid-column: 1 / span all;
     padding-top: 0;
   }
@@ -60,7 +60,7 @@ export const AccordionBox = styled.div`
   grid-column: 1 / span 5;
   justify-self: flex-start;
 
-  ${mediaTabletDown} {
+  ${bpDownSm} {
     grid-column: 1 / -1;
   }
 `;
@@ -90,8 +90,8 @@ export const StyledAccordion = styled(Accordion)`
   }
 
   .MuiAccordionDetails-root {
-    ${textBodyLarge400};
     color: ${PALETTE.INK_LIGHT};
+    font: ${FONT.BODY_LARGE_400};
     margin-bottom: 8px;
     padding: 0;
   }
@@ -121,7 +121,7 @@ export const StyledGrid = styled(Grid)`
   overflow: hidden;
   padding: 0;
 
-  ${mediaTabletDown} {
+  ${bpDownSm} {
     grid-column: 1 / -1;
     grid-row: 2;
     grid-template-columns: 1fr;
@@ -140,7 +140,7 @@ export const SmokeLightestBox = styled.div`
   padding: 56px 0 0 56px;
   width: 768px; // max width 712px + 56px padding
 
-  ${mediaTabletDown} {
+  ${bpDownSm} {
     height: unset;
     padding: 32px 0 0 32px;
     width: 100%;

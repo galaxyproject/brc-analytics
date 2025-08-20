@@ -6,13 +6,17 @@ import {
   Typography,
 } from "@mui/material";
 import { StyledAccordion } from "./analysisMethod.styles";
-import { CHIP_PROPS, ICON_PROPS, TYPOGRAPHY_PROPS } from "./constants";
+import {
+  CHIP_PROPS,
+  SVG_ICON_PROPS,
+  TYPOGRAPHY_PROPS as COMPONENT_TYPOGRAPHY_PROPS,
+} from "./constants";
 import { Props } from "./types";
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
-import { TEXT_HEADING_SMALL } from "@databiosphere/findable-ui/lib/theme/common/typography";
 import { Fragment } from "react";
 import { Workflow } from "./components/Workflow/workflow";
 import { ChevronRightRounded } from "@mui/icons-material";
+import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 
 export const AnalysisMethod = ({
   entityId,
@@ -27,14 +31,14 @@ export const AnalysisMethod = ({
           isDisabled ? (
             <Chip {...CHIP_PROPS} />
           ) : (
-            <ChevronRightRounded {...ICON_PROPS} />
+            <ChevronRightRounded {...SVG_ICON_PROPS} />
           )
         }
       >
-        <Typography variant={TEXT_HEADING_SMALL}>
+        <Typography variant={TYPOGRAPHY_PROPS.VARIANT.HEADING_SMALL}>
           {workflowCategory.name}
         </Typography>
-        <Typography {...TYPOGRAPHY_PROPS}>
+        <Typography {...COMPONENT_TYPOGRAPHY_PROPS}>
           {workflowCategory.description}
         </Typography>
       </AccordionSummary>

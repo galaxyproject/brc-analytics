@@ -35,14 +35,12 @@ export const PriorityPathogens = ({
             >
               <Section>
                 <SectionContent>
-                  <Typography
-                    variant={TYPOGRAPHY_PROPS.VARIANT.TEXT_HEADING_XSMALL}
-                  >
+                  <Typography variant={TYPOGRAPHY_PROPS.VARIANT.HEADING_XSMALL}>
                     {priorityPathogen.name}
                   </Typography>
                   <StyledSectionText
                     color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
-                    variant={TYPOGRAPHY_PROPS.VARIANT.TEXT_BODY_400_2_LINES}
+                    variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400_2_LINES}
                   >
                     <MDXRemote {...priorityPathogen.description} />
                   </StyledSectionText>

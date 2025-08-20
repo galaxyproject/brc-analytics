@@ -1,12 +1,7 @@
 import {
-  mediaTabletDown,
-  mediaTabletUp,
+  bpDownSm,
+  bpUpSm,
 } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
-import {
-  textBody500,
-  textBodyLarge500,
-  textBodySmall4002Lines,
-} from "@databiosphere/findable-ui/lib/styles/common/mixins/fonts";
 import { SHADOWS } from "@databiosphere/findable-ui/lib/styles/common/constants/shadows";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import styled from "@emotion/styled";
@@ -21,6 +16,7 @@ import {
   getCardTransition,
   getCardZIndex,
 } from "../../common/utils";
+import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 
 interface Props {
   cardPosition: number;
@@ -37,7 +33,7 @@ export const CardPositioner = styled("div")<Props>`
   width: 100%;
   z-index: ${({ cardPosition }) => getCardZIndex(cardPosition)};
 
-  ${mediaTabletUp} {
+  ${bpUpSm} {
     max-height: ${MAX_CARD_HEIGHT}px;
   }
 `;
@@ -63,13 +59,13 @@ export const CardContent = styled.div`
   h1,
   h2,
   h3 {
-    ${textBodyLarge500};
+    font: ${FONT.BODY_LARGE_500};
     margin: 0;
   }
 
   p {
-    ${textBodySmall4002Lines};
     color: ${PALETTE.INK_LIGHT};
+    font: ${FONT.BODY_SMALL_400_2_LINES};
     margin: 8px 0;
 
     &:last-of-type {
@@ -77,7 +73,7 @@ export const CardContent = styled.div`
     }
   }
 
-  ${mediaTabletDown} {
+  ${bpDownSm} {
     -webkit-box-orient: vertical;
     display: -webkit-box;
     -webkit-line-clamp: 10;
@@ -86,9 +82,9 @@ export const CardContent = styled.div`
 `;
 
 export const CardActions = styled.div`
-  ${textBody500};
   align-items: center;
   display: flex;
+  font: ${FONT.BODY_500};
   gap: 16px;
   margin-top: 16px;
 `;
