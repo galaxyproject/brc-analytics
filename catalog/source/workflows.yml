@@ -1,4 +1,3 @@
-# yaml-language-server: $schema=../schema/generated/workflows.json
 workflows:
   - trs_id: "#workflow/github.com/iwc-workflows/annotation-maker/main/versions/v0.1"
     categories: []
@@ -30,7 +29,7 @@ workflows:
           class: File
     active: false
     iwc_id: annotation-maker-main
-  - trs_id: "#workflow/github.com/iwc-workflows/assembly-with-flye/main/versions/v0.2"
+  - trs_id: "#workflow/github.com/iwc-workflows/assembly-with-flye/main/versions/v0.3"
     categories:
       - ASSEMBLY
     workflow_name: Genome assembly with Flye
@@ -61,10 +60,10 @@ workflows:
       - key: reference_genome
         variable: ASSEMBLY_ID
       - key: PE fastq input
+        variable: SANGER_READ_RUN_PAIRED
         type_guide:
           class: Collection
           collection_type: list:paired
-        variable: SANGER_READ_RUN_PAIRED
       - key: effective_genome_size
         type_guide:
           class: integer
@@ -94,13 +93,11 @@ workflows:
           class: integer
     active: false
     iwc_id: average-bigwig-between-replicates-main
-  - trs_id: "#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v1.1.7"
+  - trs_id: "#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v2.0"
     categories:
       - ASSEMBLY
     workflow_name: Bacterial Genome Assembly using Shovill
-    workflow_description:
-      Assembly of bacterial paired-end short read data with generation
-      of quality metrics and reports
+    workflow_description: Assembly of bacterial paired-end short read data
     ploidy: ANY
     parameters:
       - key: Input adapter trimmed sequence reads (forward)
@@ -216,14 +213,14 @@ workflows:
           class: float
     active: false
     iwc_id: brew3r-main
-  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.14"
+  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.15"
     categories:
       - REGULATION
     workflow_name: "ChIP-seq Analysis: Paired-End Read Processing"
     workflow_description:
       Complete ChIP-seq analysis for paired-end sequencing data.
       Processes raw FASTQ files through adapter removal (cutadapt), alignment to reference
-      genome (Bowtie2), and stringent quality filtering (MAPQ >= 30, concordant pairs
+      genome (Bowtie2), and stringent quality filtering (MAPQ &gt;= 30, concordant pairs
       only). Peak calling with MACS2 optimized for paired-end reads identifies protein-DNA
       binding sites. Generates alignment files, peak calls, and quality metrics for
       downstream analysis.
@@ -232,10 +229,10 @@ workflows:
       - key: reference_genome
         variable: ASSEMBLY_ID
       - key: PE fastq input
+        variable: SANGER_READ_RUN_PAIRED
         type_guide:
           class: Collection
           collection_type: list:paired
-        variable: SANGER_READ_RUN_PAIRED
       - key: adapter_forward
         type_guide:
           class: text
@@ -250,14 +247,14 @@ workflows:
           class: boolean
     active: true
     iwc_id: chipseq-pe-main
-  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.14"
+  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.15"
     categories:
       - REGULATION
     workflow_name: "ChIP-seq Analysis: Single-End Read Processing"
     workflow_description:
       Complete ChIP-seq analysis for single-end sequencing data.
       Processes raw FASTQ files through adapter removal (cutadapt), alignment to reference
-      genome (Bowtie2), and quality filtering (MAPQ >= 30). Peak calling with MACS2
+      genome (Bowtie2), and quality filtering (MAPQ &gt;= 30). Peak calling with MACS2
       uses either a fixed extension parameter or built-in model to identify protein-DNA
       binding sites. Generates alignment files, peak calls, and quality metrics for
       downstream analysis.
@@ -266,10 +263,10 @@ workflows:
       - key: reference_genome
         variable: ASSEMBLY_ID
       - key: SR fastq input
+        variable: SANGER_READ_RUN_SINGLE
         type_guide:
           class: Collection
           collection_type: list
-        variable: SANGER_READ_RUN_SINGLE
       - key: adapter_forward
         type_guide:
           class: text
@@ -384,10 +381,10 @@ workflows:
       - key: reference_genome
         variable: ASSEMBLY_ID
       - key: PE fastq input
+        variable: SANGER_READ_RUN_PAIRED
         type_guide:
           class: Collection
           collection_type: list:paired
-        variable: SANGER_READ_RUN_PAIRED
       - key: adapter_forward
         type_guide:
           class: text
@@ -402,7 +399,7 @@ workflows:
           class: boolean
     active: true
     iwc_id: cutandrun-main
-  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.2"
+  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.3"
     categories:
       - TRANSCRIPTOMICS
     workflow_name:
@@ -445,7 +442,7 @@ workflows:
           class: integer
     active: true
     iwc_id: fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-cellplex
-  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.2"
+  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.3"
     categories:
       - TRANSCRIPTOMICS
     workflow_name:
@@ -463,10 +460,10 @@ workflows:
       - key: gtf
         variable: GENE_MODEL_URL
       - key: fastq PE collection
+        variable: SANGER_READ_RUN_PAIRED
         type_guide:
           class: Collection
           collection_type: list:paired
-        variable: SANGER_READ_RUN_PAIRED
       - key: cellranger_barcodes_3M-february-2018.txt
         type_guide:
           class: File
@@ -475,6 +472,44 @@ workflows:
           class: boolean
     active: true
     iwc_id: fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-v3
+  - trs_id: "#workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main/versions/v0.1"
+    categories:
+      - CONSENSUS_SEQUENCES
+      - VARIANT_CALLING
+    workflow_name:
+      Variant calling and consensus construction from paired end short
+      read data of non-segmented viral genomes
+    workflow_description:
+      Variant calling and consensus sequence generation for batches
+      of Illumina PE sequenced viruses with uncomplicated and stable genome structure
+      (like e.g. Morbilliviruses). It can handle both ampliconic and non-ampliconic data.
+    ploidy: ANY
+    taxonomy_id: 11158
+    parameters:
+      - key: Paired collection of sequencing data
+        type_guide:
+          class: Collection
+          collection_type: list:paired
+        variable: SANGER_READ_RUN_PAIRED
+      - key: Reference annotation
+        type_guide:
+          class: File
+        variable: GENE_MODEL_URL
+      - key: Fasta reference genome
+        type_guide:
+          class: File
+        variable: ASSEMBLY_FASTA_URL
+      - key: Primer scheme (optional)
+        type_guide:
+          class: File
+      - key: Supporting read fraction to call variant
+        type_guide:
+          class: float
+      - key: Minimum quality score to consider base for variant calling
+        type_guide:
+          class: integer
+    active: true
+    iwc_id: generic-non-segmented-viral-variant-calling-main
   - trs_id: "#workflow/github.com/iwc-workflows/generic-variant-calling-wgs-pe/main/versions/v0.1.1"
     categories:
       - VARIANT_CALLING
@@ -485,12 +520,12 @@ workflows:
     ploidy: ANY
     parameters:
       - key: Paired Collection
+        variable: SANGER_READ_RUN_PAIRED
         type_guide:
           class: Collection
           ext:
             - fastqsanger
             - fastqsanger.gz
-        variable: SANGER_READ_RUN_PAIRED
       - key: GenBank genome
         type_guide:
           class: File
@@ -909,10 +944,10 @@ workflows:
       - key: GTF file of annotation
         variable: GENE_MODEL_URL
       - key: Collection paired FASTQ files
+        variable: SANGER_READ_RUN_PAIRED
         type_guide:
           class: Collection
           collection_type: list:paired
-        variable: SANGER_READ_RUN_PAIRED
       - key: Forward adapter
         type_guide:
           class: text
@@ -958,10 +993,10 @@ workflows:
       - key: GTF file of annotation
         variable: GENE_MODEL_URL
       - key: Collection of FASTQ files
+        variable: SANGER_READ_RUN_SINGLE
         type_guide:
           class: Collection
           collection_type: list
-        variable: SANGER_READ_RUN_SINGLE
       - key: Forward adapter
         type_guide:
           class: text
@@ -1024,7 +1059,7 @@ workflows:
           ext: bed
     active: false
     iwc_id: sars-cov-2-ont-artic-variant-calling-covid-19-artic-ont
-  - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-ivar-analysis/SARS-COV-2-ILLUMINA-AMPLICON-IVAR-PANGOLIN-NEXTCLADE/versions/v0.2.3"
+  - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-ivar-analysis/SARS-COV-2-ILLUMINA-AMPLICON-IVAR-PANGOLIN-NEXTCLADE/versions/v0.3.1"
     categories:
       - VARIANT_CALLING
     workflow_name: SARS-CoV-2 Illumina Amplicon pipeline - iVar based
@@ -1065,12 +1100,12 @@ workflows:
     taxonomy_id: 694009
     parameters:
       - key: Paired Collection
+        variable: SANGER_READ_RUN_PAIRED
         type_guide:
           class: Collection
           ext:
             - fastqsanger
             - fastqsanger.gz
-        variable: SANGER_READ_RUN_PAIRED
       - key: NC_045512.2 FASTA sequence of SARS-CoV-2
         variable: ASSEMBLY_FASTA_URL
       - key: ARTIC primer BED
@@ -1108,12 +1143,12 @@ workflows:
     taxonomy_id: 694009
     parameters:
       - key: Paired Collection
+        variable: SANGER_READ_RUN_PAIRED
         type_guide:
           class: Collection
           ext:
             - fastqsanger
             - fastqsanger.gz
-        variable: SANGER_READ_RUN_PAIRED
       - key: NC_045512.2 FASTA sequence of SARS-CoV-2
         variable: ASSEMBLY_FASTA_URL
     active: true
