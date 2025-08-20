@@ -6,6 +6,28 @@
     "showComingSoon": true,
     "workflows": [
       {
+        "iwcId": "generic-non-segmented-viral-variant-calling-main",
+        "parameters": [
+          {
+            "key": "Paired collection of sequencing data",
+            "variable": "SANGER_READ_RUN_PAIRED"
+          },
+          {
+            "key": "Reference annotation",
+            "variable": "GENE_MODEL_URL"
+          },
+          {
+            "key": "Fasta reference genome",
+            "variable": "ASSEMBLY_FASTA_URL"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": "11158",
+        "trsId": "#workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main/versions/v0.1",
+        "workflowDescription": "Variant calling and consensus sequence generation for batches of Illumina PE sequenced viruses with uncomplicated and stable genome structure (like e.g. Morbilliviruses). It can handle both ampliconic and non-ampliconic data.",
+        "workflowName": "Variant calling and consensus construction from paired end short read data of non-segmented viral genomes"
+      },
+      {
         "iwcId": "haploid-variant-calling-wgs-pe-main",
         "parameters": [
           {
@@ -282,6 +304,28 @@
     "name": "Consensus sequences",
     "showComingSoon": false,
     "workflows": [
+      {
+        "iwcId": "generic-non-segmented-viral-variant-calling-main",
+        "parameters": [
+          {
+            "key": "Paired collection of sequencing data",
+            "variable": "SANGER_READ_RUN_PAIRED"
+          },
+          {
+            "key": "Reference annotation",
+            "variable": "GENE_MODEL_URL"
+          },
+          {
+            "key": "Fasta reference genome",
+            "variable": "ASSEMBLY_FASTA_URL"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": "11158",
+        "trsId": "#workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main/versions/v0.1",
+        "workflowDescription": "Variant calling and consensus sequence generation for batches of Illumina PE sequenced viruses with uncomplicated and stable genome structure (like e.g. Morbilliviruses). It can handle both ampliconic and non-ampliconic data.",
+        "workflowName": "Variant calling and consensus construction from paired end short read data of non-segmented viral genomes"
+      },
       {
         "iwcId": "pox-virus-amplicon-main",
         "parameters": [

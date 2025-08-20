@@ -137,13 +137,11 @@ workflows:
           class: integer
     active: false
     iwc_id: average-bigwig-between-replicates-main
-  - trs_id: "#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v1.1.8"
+  - trs_id: "#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v2.0"
     categories:
       - ASSEMBLY
     workflow_name: Bacterial Genome Assembly using Shovill
-    workflow_description:
-      Assembly of bacterial paired-end short read data with generation
-      of quality metrics and reports
+    workflow_description: Assembly of bacterial paired-end short read data
     ploidy: ANY
     parameters:
       - key: Input adapter trimmed sequence reads (forward)
@@ -541,6 +539,44 @@ workflows:
           class: boolean
     active: true
     iwc_id: fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-v3
+  - trs_id: "#workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main/versions/v0.1"
+    categories:
+      - CONSENSUS_SEQUENCES
+      - VARIANT_CALLING
+    workflow_name:
+      Variant calling and consensus construction from paired end short
+      read data of non-segmented viral genomes
+    workflow_description:
+      Variant calling and consensus sequence generation for batches
+      of Illumina PE sequenced viruses with uncomplicated and stable genome structure
+      (like e.g. Morbilliviruses). It can handle both ampliconic and non-ampliconic data.
+    ploidy: ANY
+    taxonomy_id: 11158
+    parameters:
+      - key: Paired collection of sequencing data
+        type_guide:
+          class: Collection
+          collection_type: list:paired
+        variable: SANGER_READ_RUN_PAIRED
+      - key: Reference annotation
+        type_guide:
+          class: File
+        variable: GENE_MODEL_URL
+      - key: Fasta reference genome
+        type_guide:
+          class: File
+        variable: ASSEMBLY_FASTA_URL
+      - key: Primer scheme (optional)
+        type_guide:
+          class: File
+      - key: Supporting read fraction to call variant
+        type_guide:
+          class: float
+      - key: Minimum quality score to consider base for variant calling
+        type_guide:
+          class: integer
+    active: true
+    iwc_id: generic-non-segmented-viral-variant-calling-main
   - trs_id: "#workflow/github.com/iwc-workflows/functional-annotation-protein-sequences/main/versions/v0.1"
     categories:
       - ANNOTATION
