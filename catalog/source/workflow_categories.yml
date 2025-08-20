@@ -31,6 +31,8 @@ workflow_categories:
     name: "Annotation"
     description: "Workflows for the annotation of genomic data."
     show_coming_soon: true
+    target_pages:
+      - ASSEMBLIES
 
   - category: "ASSEMBLY"
     name: "Assembly"

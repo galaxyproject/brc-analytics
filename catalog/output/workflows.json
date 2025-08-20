@@ -315,6 +315,9 @@
     "description": "Workflows for the annotation of genomic data.",
     "name": "Annotation",
     "showComingSoon": true,
+    "targetPages": [
+      "ASSEMBLIES"
+    ],
     "workflows": [
       {
         "iwcId": "amr_gene_detection-main",
@@ -369,7 +372,7 @@
         ],
         "ploidy": "ANY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/assembly-with-flye/main/versions/v0.2",
+        "trsId": "#workflow/github.com/iwc-workflows/assembly-with-flye/main/versions/v0.3",
         "workflowDescription": "Assemble long reads with Flye, then view assembly statistics and assembly graph",
         "workflowName": "Genome assembly with Flye"
       },
@@ -387,7 +390,7 @@
         ],
         "ploidy": "ANY",
         "taxonomyId": "2",
-        "trsId": "#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v1.1.7",
+        "trsId": "#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v1.1.8",
         "workflowDescription": "Assembly of bacterial paired-end short read data with generation of quality metrics and reports",
         "workflowName": "Bacterial Genome Assembly using Shovill"
       },

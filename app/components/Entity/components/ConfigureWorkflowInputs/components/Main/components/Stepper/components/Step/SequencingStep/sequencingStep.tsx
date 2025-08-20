@@ -27,7 +27,7 @@ export const SequencingStep = ({
     ENA_QUERY_METHOD.ACCESSION
   );
   const enaAccession = useENADataByAccession<ReadRun>();
-  const enaTaxonomyId = useENADataByTaxonomyId<ReadRun>(genome);
+  const enaTaxonomyId = useENADataByTaxonomyId<ReadRun>(genome || null);
   const table = useTable(enaQueryMethod, enaAccession, enaTaxonomyId);
   const { onChange, value } = useToggleButtonGroup(VIEW.ENA);
   return (

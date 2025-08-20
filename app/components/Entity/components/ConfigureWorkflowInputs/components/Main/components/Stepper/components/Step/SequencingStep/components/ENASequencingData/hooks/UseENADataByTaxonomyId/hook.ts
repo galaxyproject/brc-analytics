@@ -6,12 +6,13 @@ import { shouldFetch } from "./utils";
 import { BRCDataCatalogGenome } from "../../../../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
 
 export const useENADataByTaxonomyId = <T>(
-  genome: BRCDataCatalogGenome
+  genome: BRCDataCatalogGenome | null
 ): UseENADataByTaxonomyId<T> => {
   const { data, run } = useAsync<T[] | undefined>();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState<boolean>(true);
-  const { ncbiTaxonomyId: taxonomyId } = genome;
+  // TODO: i think we shouldnt fetch taxon id from genome, since some workflows dont have genome
+  const taxonomyId = genome?.ncbiTaxonomyId;
 
   const onRequestData = useCallback(async (): Promise<void> => {
     run(
@@ -25,13 +26,13 @@ export const useENADataByTaxonomyId = <T>(
             setLoading(false);
           },
         },
-        taxonomyId,
+        taxonomyId: taxonomyId || "",
       })
     );
   }, [run, taxonomyId]);
 
   useEffect(() => {
-    if (shouldFetch(taxonomyId)) {
+    if (taxonomyId && shouldFetch(taxonomyId)) {
       // Request sequencing data by taxonomy ID and configured filters.
       onRequestData();
     } else {
