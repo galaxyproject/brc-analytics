@@ -6,7 +6,22 @@ Using Node.js version `20.10.0`, run `npm install` in the root directory of the 
 
 ## Using the development server
 
+### Running the web app only
+
 The app can be run for development using `npm run dev`, and accessed at `http://localhost:3000`.
+
+### Running the Genkit server only
+
+The Genkit server can be run for development using `npm run genkit:dev`, and accessed at `http://localhost:3100`.
+
+### Running both services together
+
+To run both the web app and Genkit server together, use `npm run dev:all`. This will start:
+
+- The web app at `http://localhost:3000`
+- The Genkit server at `http://localhost:3100`
+
+This is the recommended approach for development, especially when working with features that require both services, such as the chat component.
 
 ## Building the app locally
 
