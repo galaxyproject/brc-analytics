@@ -15,6 +15,7 @@ export { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Pap
 export { SectionTitle } from "@databiosphere/findable-ui/lib/components/common/Section/components/SectionTitle/sectionTitle";
 export { Stack } from "@databiosphere/findable-ui/lib/components/common/Stack/stack";
 export { StaticImage } from "@databiosphere/findable-ui/lib/components/common/StaticImage/staticImage";
+export { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/ChipCell/chipCell";
 export {
   BackPageContentMainColumn,
   BackPageContentSideColumn,

@@ -1,12 +1,12 @@
 import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
 import { FormEvent, useCallback, useState } from "react";
 import { parseAccessionList } from "./utils";
-import { SubmitOptions, UseENA } from "./types";
+import { SubmitOptions, UseENADataByAccession } from "./types";
 import { SCHEMA } from "./schema";
 import { ValidationError } from "yup";
 import { fetchENAData } from "./request";
 
-export const useENA = <T>(): UseENA<T> => {
+export const useENADataByAccession = <T>(): UseENADataByAccession<T> => {
   const { data, isLoading: loading, run } = useAsync<T[] | undefined>();
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -39,12 +39,9 @@ export const useENA = <T>(): UseENA<T> => {
             fetchENAData({
               accessionsInfo,
               submitOptions: {
-                onError: () => {
-                  setErrors({
-                    accession:
-                      "Accessions were not found. Please check the IDs and try again.",
-                  });
-                  submitOptions.onError?.();
+                onError: (e: Error) => {
+                  setErrors({ accession: e.message });
+                  submitOptions.onError?.(e);
                 },
                 onSuccess: () => {
                   setErrors({});

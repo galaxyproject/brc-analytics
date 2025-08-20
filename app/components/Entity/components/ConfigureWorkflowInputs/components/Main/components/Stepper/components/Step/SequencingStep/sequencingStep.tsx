@@ -6,21 +6,29 @@ import { useToggleButtonGroup } from "../hooks/UseToggleButtonGroup/useToggleBut
 import { ToggleButtonGroup } from "./components/ToggleButtonGroup/toggleButtonGroup";
 import { VIEW } from "./components/ToggleButtonGroup/types";
 import { ENASequencingData } from "./components/ENASequencingData/enaSequencingData";
-import { useENA } from "./components/ENASequencingData/hooks/UseENA/hook";
+import { useENADataByAccession } from "./components/ENASequencingData/hooks/UseENADataByAccession/hook";
 import { ReadRun } from "./components/ENASequencingData/types";
 import { useTable } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseTable/hook";
 import { UploadMyData } from "./components/UploadMyData/uploadMyData";
+import { ENA_QUERY_METHOD, SEQUENCING_DATA_TYPE } from "./types";
+import { useENADataByTaxonomyId } from "./components/ENASequencingData/hooks/UseENADataByTaxonomyId/hook";
+import { useState } from "react";
 
 export const SequencingStep = ({
   active,
   completed,
   entryLabel,
+  genome,
   index,
   onConfigure,
   stepKey,
 }: StepProps): JSX.Element => {
-  const ena = useENA<ReadRun>();
-  const table = useTable(ena.data);
+  const [enaQueryMethod, setEnaQueryMethod] = useState<ENA_QUERY_METHOD>(
+    ENA_QUERY_METHOD.ACCESSION
+  );
+  const enaAccession = useENADataByAccession<ReadRun>();
+  const enaTaxonomyId = useENADataByTaxonomyId<ReadRun>(genome);
+  const table = useTable(enaQueryMethod, enaAccession, enaTaxonomyId);
   const { onChange, value } = useToggleButtonGroup(VIEW.ENA);
   return (
     <Step active={active} completed={completed} index={index}>
@@ -29,17 +37,17 @@ export const SequencingStep = ({
         <ToggleButtonGroup onChange={onChange} value={value} />
         {value === VIEW.ENA ? (
           <ENASequencingData
-            clearErrors={ena.clearErrors}
+            enaAccession={enaAccession}
+            enaTaxonomyId={enaTaxonomyId}
             onConfigure={onConfigure}
-            onRequestData={ena.onRequestData}
-            status={ena.status}
+            setEnaQueryMethod={setEnaQueryMethod}
+            stepKey={stepKey as SEQUENCING_DATA_TYPE}
             table={table}
-            stepKey={stepKey as "readRunsSingle" | "readRunsPaired"}
           />
         ) : (
           <UploadMyData
             onConfigure={onConfigure}
-            stepKey={stepKey as "readRunsSingle" | "readRunsPaired"}
+            stepKey={stepKey as SEQUENCING_DATA_TYPE}
           />
         )}
       </StepContent>

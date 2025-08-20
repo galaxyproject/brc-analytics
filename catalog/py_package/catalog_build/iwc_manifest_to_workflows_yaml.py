@@ -23,6 +23,7 @@ DOCKSTORE_COLLECTION_TO_CATEGORY = {
     "Epigenetics": WorkflowCategoryId.REGULATION,
     "Genome assembly": WorkflowCategoryId.ASSEMBLY,
     "Virology": WorkflowCategoryId.CONSENSUS_SEQUENCES,
+    "Genome Annotation": WorkflowCategoryId.ANNOTATION,
 }
 MANIFEST_SOURCE_OF_TRUTH = (
     "trs_id",

@@ -27,6 +27,11 @@ workflow_categories:
     target_pages:
       - ASSEMBLIES
 
+  - category: "ANNOTATION"
+    name: "Annotation"
+    description: "Workflows for the annotation of genomic data."
+    show_coming_soon: true
+
   - category: "ASSEMBLY"
     name: "Assembly"
     description: "Assemble prokaryotic and eukaryotic genomes sequenced with a variety of technologies."

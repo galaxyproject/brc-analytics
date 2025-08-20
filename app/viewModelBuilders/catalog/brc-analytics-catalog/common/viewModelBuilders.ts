@@ -19,7 +19,7 @@ import {
   NCBI_DATASETS_URL,
   NCBI_TAXONOMY,
 } from "./constants";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, getSortedRowModel } from "@tanstack/react-table";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
@@ -274,7 +274,7 @@ export const buildAssemblyCount = (
   organism: BRCDataCatalogOrganism
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: organism.assemblyCount,
+    value: formatNumber(organism.assemblyCount),
   };
 };
 
@@ -287,7 +287,7 @@ export const buildChromosomes = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: genome.chromosomes,
+    value: formatNumber(genome.chromosomes),
   };
 };
 
@@ -386,14 +386,21 @@ export const buildGenomeTaxonomicLevelIsolate = (
 /**
  * Build props for the "is ref" cell.
  * @param genome - Genome entity.
- * @returns Props to be used for the cell.
+ * @returns Props to be used for the ChipCell component.
  */
 export const buildIsRef = (
   genome: BRCDataCatalogGenome
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof C.ChipCell> => {
   return {
-    value: genome.isRef,
-  };
+    getValue: () => ({
+      color:
+        genome.isRef.toLowerCase() === "yes"
+          ? CHIP_PROPS.COLOR.SUCCESS
+          : CHIP_PROPS.COLOR.DEFAULT,
+      label: genome.isRef,
+      variant: CHIP_PROPS.VARIANT.STATUS,
+    }),
+  } as ComponentProps<typeof C.ChipCell>;
 };
 
 /**
@@ -405,7 +412,7 @@ export const buildLength = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: genome.length,
+    value: formatNumber(genome.length),
   };
 };
 
@@ -768,7 +775,7 @@ export const buildScaffoldCount = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: genome.scaffoldCount,
+    value: formatNumber(genome.scaffoldCount),
   };
 };
 
@@ -781,7 +788,7 @@ export const buildScaffoldL50 = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: genome.scaffoldL50,
+    value: formatNumber(genome.scaffoldL50),
   };
 };
 
@@ -794,7 +801,7 @@ export const buildScaffoldN50 = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: genome.scaffoldN50,
+    value: formatNumber(genome.scaffoldN50),
   };
 };
 
@@ -897,13 +904,19 @@ export function buildOrganismGenomesTable(
     Paper: FluidPaper,
     columns: buildOrganismGenomesTableColumns(),
     gridTemplateColumns:
-      "auto minmax(164px, 1fr) minmax(100px, 0.5fr) minmax(100px, 0.5fr) minmax(100px, 0.5fr) minmax(100px, 0.5fr) minmax(80px, 0.5fr) repeat(2, minmax(142px, 0.5fr)) minmax(120px, 0.5fr) minmax(80px, 0.5fr) minmax(120px, 0.5fr) repeat(3, minmax(80px, 0.5fr)) minmax(142px, 0.5fr)",
+      "auto minmax(164px, 1fr) minmax(180px, 0.5fr) minmax(180px, 0.5fr) minmax(180px, 0.5fr) minmax(144px, 0.5fr) minmax(100px, 0.5fr) repeat(2, minmax(142px, 0.5fr)) minmax(132px, 0.5fr) minmax(120px, 0.5fr) minmax(120px, 0.5fr) repeat(3, minmax(120px, 0.5fr)) minmax(180px, 0.5fr)",
     items: organism.genomes,
     noResultsTitle: "No Assemblies",
     tableOptions: {
       enableRowPosition: false,
+      enableSorting: true,
+      getSortedRowModel: getSortedRowModel(),
       initialState: {
         columnVisibility: { [COLUMN_IDENTIFIER.ROW_POSITION]: false },
+        sorting: [
+          { desc: true, id: BRC_DATA_CATALOG_CATEGORY_KEY.IS_REF },
+          { desc: false, id: BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION },
+        ],
       },
     },
   };
@@ -951,7 +964,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.IS_REF,
-      cell: ({ row }) => C.BasicCell(buildIsRef(row.original)),
+      cell: ({ row }) => C.ChipCell(buildIsRef(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.IS_REF,
     },
     {
@@ -1152,4 +1165,14 @@ function getPriorityPathogenEntityBreadcrumbs(
     { path: ROUTES.PRIORITY_PATHOGENS, text: "Priority Pathogens" },
     { path: "", text: priorityPathogen.name },
   ];
+}
+
+/**
+ * Format a number to a string.
+ * @param value - Number to format.
+ * @returns Formatted number or empty string if invalid.
+ */
+export function formatNumber(value: unknown): string {
+  if (typeof value !== "number" || Number.isNaN(value)) return "";
+  return value.toLocaleString();
 }

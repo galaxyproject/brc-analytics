@@ -7,6 +7,8 @@ import { useState } from "react";
 import { Table } from "./components/Table/table";
 import { RowSelectionState } from "@tanstack/table-core";
 import { buildEnaSequencingReads } from "../../utils";
+import { ColumnFilters } from "./components/ColumnFilters/columnFilters";
+import { preSelectColumnFilters } from "./utils";
 
 export const CollectionSelector = ({
   onClose,
@@ -19,11 +21,17 @@ export const CollectionSelector = ({
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   return (
     <StyledDialog
-      onTransitionEnter={() => setRowSelection(table.getState().rowSelection)}
+      onTransitionEnter={() => {
+        setRowSelection(table.getState().rowSelection);
+        if (selectedCount > 0) return;
+        preSelectColumnFilters(table, stepKey);
+      }}
+      onClose={onClose}
       open={open}
     >
       <DialogTitle onClose={onClose} title="Select Sequencing Runs" />
       <DialogContent>
+        <ColumnFilters table={table} />
         <Table table={table} />
       </DialogContent>
       <DialogActions>
@@ -44,10 +52,19 @@ export const CollectionSelector = ({
             onClose();
           }}
         >
-          Add {selectedCount ? selectedCount : ""} Sequencing Run
-          {selectedCount > 1 ? "s" : ""}
+          {renderButtonText(selectedCount)}
         </Button>
       </DialogActions>
     </StyledDialog>
   );
 };
+
+/**
+ * Renders the button text based on the selected count.
+ * @param selectedCount - The number of selected rows.
+ * @returns The button text.
+ */
+function renderButtonText(selectedCount: number): string {
+  if (selectedCount === 1) return "Add 1 Sequencing Run";
+  return `Add ${selectedCount} Sequencing Runs`;
+}
