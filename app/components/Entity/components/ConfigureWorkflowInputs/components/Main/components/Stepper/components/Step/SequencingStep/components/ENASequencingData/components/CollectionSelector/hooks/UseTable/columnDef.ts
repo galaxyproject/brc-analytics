@@ -1,8 +1,9 @@
 import { ColumnDef, ColumnMeta } from "@tanstack/react-table";
 import { ReadRun } from "../../../../types";
-import { buildFastqFTP } from "./viewBuilders";
+import { buildFastqFTP, buildStudyAccession } from "./viewBuilders";
 import { COLUMN_DEF } from "@databiosphere/findable-ui/lib/components/Table/common/columnDef";
 import { BasicCell } from "../../components/Table/components/TableCell/components/BasicCell/basicCell";
+import { LinkCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/LinkCell/linkCell";
 import { CATEGORY_CONFIGS } from "./categoryConfigs";
 import { formatNumber } from "../../../../../../../../../../../../../../../../../viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 
@@ -102,6 +103,7 @@ const SCIENTIFIC_NAME: ColumnDef<ReadRun> = {
 
 const STUDY_ACCESSION: ColumnDef<ReadRun> = {
   accessorKey: CATEGORY_CONFIGS.STUDY_ACCESSION.key,
+  cell: (ctx) => LinkCell(buildStudyAccession(ctx)),
   filterFn: SELECT_FILTER_FN,
   header: CATEGORY_CONFIGS.STUDY_ACCESSION.label,
   meta: META,
