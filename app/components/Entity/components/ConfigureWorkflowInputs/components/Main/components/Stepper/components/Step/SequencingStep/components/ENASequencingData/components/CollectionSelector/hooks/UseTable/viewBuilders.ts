@@ -1,6 +1,7 @@
 import { CellContext } from "@tanstack/react-table";
 import { ReadRun } from "../../../../types";
 import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
+import { LinkProps } from "@mui/material";
 
 /**
  * Returns Fastq FTP cell context.
@@ -27,4 +28,23 @@ export function buildFastqFTP(
   return {
     getValue: () => values.join(", "),
   } as CellContext<ReadRun, string>;
+}
+
+/**
+ * Returns Study Accession cell context.
+ * @param cellContext - Cell context.
+ * @returns Model to be used as cellContext for the LinkCell component.
+ */
+export function buildStudyAccession(
+  cellContext: CellContext<ReadRun, unknown>
+): CellContext<ReadRun, LinkProps> {
+  const value = cellContext.getValue() || "";
+  return {
+    getValue: () => {
+      return {
+        children: value,
+        href: `value ? https://www.ncbi.nlm.nih.gov/bioproject/?term=${value} : ""`,
+      };
+    },
+  } as CellContext<ReadRun, LinkProps>;
 }
