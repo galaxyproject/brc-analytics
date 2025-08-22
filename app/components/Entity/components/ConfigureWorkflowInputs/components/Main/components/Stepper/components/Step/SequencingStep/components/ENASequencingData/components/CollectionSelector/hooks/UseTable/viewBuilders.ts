@@ -43,7 +43,7 @@ export function buildStudyAccession(
     getValue: () => {
       return {
         children: value,
-        href: `https://www.ncbi.nlm.nih.gov/bioproject/?term=${value}`,
+        href: `value ? https://www.ncbi.nlm.nih.gov/bioproject/?term=${value} : ""`,
       };
     },
   } as CellContext<ReadRun, LinkProps>;
