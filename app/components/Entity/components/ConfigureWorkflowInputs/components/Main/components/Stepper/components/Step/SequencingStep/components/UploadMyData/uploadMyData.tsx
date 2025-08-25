@@ -1,22 +1,23 @@
 import { Props } from "./types";
-import { StyledPaper } from "./uploadMyData.styles";
-import { Typography } from "@mui/material";
+import { Typography, AlertTitle } from "@mui/material";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
-import { PAPER_PROPS } from "./constants";
+import { ALERT_PROPS } from "@databiosphere/findable-ui/lib/components/common/Alert/constants";
 import { useEffect } from "react";
+import { StyledAlert } from "./uploadMyData.styles";
 
 export const UploadMyData = ({ onConfigure, stepKey }: Props): JSX.Element => {
   useEffect(() => {
     onConfigure(stepKey, []);
   }, [onConfigure, stepKey]);
   return (
-    <StyledPaper {...PAPER_PROPS}>
-      <Typography
-        color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
-        variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
-      >
-        I&#39;ll upload my data directly to Galaxy.
+    <StyledAlert {...ALERT_PROPS.STANDARD_INFO}>
+      <AlertTitle variant={TYPOGRAPHY_PROPS.VARIANT.BODY_LARGE_500}>
+        Upload Your Info in Galaxy
+      </AlertTitle>
+      <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400_2_LINES}>
+        You will have an opportunity to upload your own data to your Galaxy
+        history.
       </Typography>
-    </StyledPaper>
+    </StyledAlert>
   );
 };
