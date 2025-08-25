@@ -12,7 +12,7 @@ export const UploadMyData = ({ onConfigure, stepKey }: Props): JSX.Element => {
   return (
     <StyledAlert {...ALERT_PROPS.STANDARD_INFO}>
       <AlertTitle variant={TYPOGRAPHY_PROPS.VARIANT.BODY_LARGE_500}>
-        Upload Your Info in Galaxy
+        Upload Your Data in Galaxy
       </AlertTitle>
       <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400_2_LINES}>
         You will have an opportunity to upload your own data to your Galaxy
