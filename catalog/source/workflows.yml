@@ -466,7 +466,7 @@ workflows:
           class: boolean
     active: true
     iwc_id: cutandrun-main
-  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.3"
+  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.2"
     categories:
       - TRANSCRIPTOMICS
     workflow_name:
@@ -509,7 +509,7 @@ workflows:
           class: integer
     active: true
     iwc_id: fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-cellplex
-  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.3"
+  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.2"
     categories:
       - TRANSCRIPTOMICS
     workflow_name:
