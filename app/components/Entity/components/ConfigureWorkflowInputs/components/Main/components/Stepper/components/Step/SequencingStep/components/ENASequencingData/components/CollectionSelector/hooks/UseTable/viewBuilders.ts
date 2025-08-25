@@ -39,12 +39,10 @@ export function buildStudyAccession(
   cellContext: CellContext<ReadRun, unknown>
 ): CellContext<ReadRun, LinkProps> {
   const value = cellContext.getValue() || "";
+  const href = value
+    ? `https://www.ncbi.nlm.nih.gov/bioproject/?term=${value}`
+    : "";
   return {
-    getValue: () => {
-      return {
-        children: value,
-        href: `value ? https://www.ncbi.nlm.nih.gov/bioproject/?term=${value} : ""`,
-      };
-    },
+    getValue: () => ({ children: value, href }),
   } as CellContext<ReadRun, LinkProps>;
 }
