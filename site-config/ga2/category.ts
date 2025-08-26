@@ -1,4 +1,4 @@
-export const BRC_DATA_CATALOG_CATEGORY_KEY = {
+export const GA2_CATEGORY_KEY = {
   ACCESSION: "accession",
   ANALYZE_GENOME: "analyzeGenome",
   ANNOTATION_STATUS: "annotationStatus",
@@ -33,7 +33,7 @@ export const BRC_DATA_CATALOG_CATEGORY_KEY = {
   UCSC_BROWSER_URL: "ucscBrowserUrl",
 };
 
-export const BRC_DATA_CATALOG_CATEGORY_LABEL = {
+export const GA2_CATEGORY_LABEL = {
   ACCESSION: "Accession",
   ANALYZE_GENOME: "Action",
   ANNOTATION_STATUS: "Annotation Status",
