@@ -74,7 +74,7 @@ export function makeConfig(
           alt: APP_TITLE,
           height: 26,
           link: "/",
-          src: "/logo/brc.svg",
+          src: "/logo/galaxy.png",
         }),
         navigation: [
           undefined,
