@@ -9,10 +9,7 @@ import { getOrganismId } from "../../../../app/apis/catalog/brc-analytics-catalo
 import * as C from "../../../../app/components";
 import * as V from "../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import { BRCEntityConfig } from "../../../common/entities";
-import {
-  BRC_DATA_CATALOG_CATEGORY_KEY,
-  BRC_DATA_CATALOG_CATEGORY_LABEL,
-} from "../../category";
+import { GA2_CATEGORY_KEY, GA2_CATEGORY_LABEL } from "../../category";
 import { assembliesMainColumn } from "../entity/organism/assembliesMainColumn";
 import { assembliesTop } from "../entity/organism/assembliesTop";
 import { CATEGORY_GROUPS } from "./common/category/categories";
@@ -27,16 +24,16 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
       {
         categoryConfigs: [
           {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
+            key: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
+            label: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
           },
           {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.COMMON_NAME,
+            key: GA2_CATEGORY_KEY.COMMON_NAME,
+            label: GA2_CATEGORY_LABEL.COMMON_NAME,
           },
           {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.ASSEMBLY_TAXONOMY_IDS,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.ASSEMBLY_TAXONOMY_IDS,
+            key: GA2_CATEGORY_KEY.ASSEMBLY_TAXONOMY_IDS,
+            label: GA2_CATEGORY_LABEL.ASSEMBLY_TAXONOMY_IDS,
           },
         ],
       },
@@ -44,36 +41,36 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
       {
         categoryConfigs: [
           {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_GENUS,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_GENUS,
+            key: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_GENUS,
+            label: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_GENUS,
           },
           {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_FAMILY,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_FAMILY,
+            key: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_FAMILY,
+            label: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_FAMILY,
           },
           {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ORDER,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_ORDER,
+            key: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_ORDER,
+            label: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_ORDER,
           },
           {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_CLASS,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_CLASS,
+            key: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_CLASS,
+            label: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_CLASS,
           },
           {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_PHYLUM,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_PHYLUM,
+            key: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_PHYLUM,
+            label: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_PHYLUM,
           },
           {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_KINGDOM,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_KINGDOM,
+            key: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_KINGDOM,
+            label: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_KINGDOM,
           },
           {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_REALM,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_REALM,
+            key: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_REALM,
+            label: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_REALM,
           },
           {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_DOMAIN,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_DOMAIN,
+            key: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_DOMAIN,
+            label: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_DOMAIN,
           },
         ],
         label: "Taxonomic Lineage",
@@ -103,8 +100,8 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
           component: C.BasicCell,
           viewBuilder: V.buildTaxonomicLevelDomain,
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_DOMAIN,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_DOMAIN,
+        header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_DOMAIN,
+        id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_DOMAIN,
         width: { max: "1fr", min: "auto" },
       },
       {
@@ -112,8 +109,8 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
           component: C.BasicCell,
           viewBuilder: V.buildTaxonomicLevelRealm,
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_REALM,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_REALM,
+        header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_REALM,
+        id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_REALM,
         width: { max: "1fr", min: "auto" },
       },
       {
@@ -121,8 +118,8 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
           component: C.BasicCell,
           viewBuilder: V.buildTaxonomicLevelKingdom,
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_KINGDOM,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_KINGDOM,
+        header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_KINGDOM,
+        id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_KINGDOM,
         width: { max: "1fr", min: "auto" },
       },
       {
@@ -130,8 +127,8 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
           component: C.BasicCell,
           viewBuilder: V.buildTaxonomicLevelPhylum,
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_PHYLUM,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_PHYLUM,
+        header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_PHYLUM,
+        id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_PHYLUM,
         width: { max: "1fr", min: "auto" },
       },
       {
@@ -139,8 +136,8 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
           component: C.BasicCell,
           viewBuilder: V.buildTaxonomicLevelClass,
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_CLASS,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_CLASS,
+        header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_CLASS,
+        id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_CLASS,
         width: { max: "1fr", min: "auto" },
       },
       {
@@ -148,8 +145,8 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
           component: C.BasicCell,
           viewBuilder: V.buildTaxonomicLevelOrder,
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_ORDER,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ORDER,
+        header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_ORDER,
+        id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_ORDER,
         width: { max: "1fr", min: "auto" },
       },
       {
@@ -157,8 +154,8 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
           component: C.BasicCell,
           viewBuilder: V.buildTaxonomicLevelFamily,
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_FAMILY,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_FAMILY,
+        header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_FAMILY,
+        id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_FAMILY,
         width: { max: "1fr", min: "auto" },
       },
       {
@@ -166,8 +163,8 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
           component: C.BasicCell,
           viewBuilder: V.buildTaxonomicLevelGenus,
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_GENUS,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_GENUS,
+        header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_GENUS,
+        id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_GENUS,
         width: { max: "1fr", min: "auto" },
       },
       {
@@ -175,8 +172,8 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
           component: C.Link,
           viewBuilder: V.buildOrganismTaxonomicLevelSpecies,
         } as ComponentConfig<typeof C.Link, BRCDataCatalogOrganism>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
+        header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
+        id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
         meta: { columnPinned: true },
         width: { max: "1fr", min: "auto" },
       },
@@ -185,8 +182,8 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
           component: C.NTagCell,
           viewBuilder: V.buildOrganismTaxonomicLevelStrain,
         } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogOrganism>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,
+        header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
+        id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,
         width: { max: "1fr", min: "auto" },
       },
       {
@@ -194,8 +191,8 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
           component: C.NTagCell,
           viewBuilder: V.buildOrganismTaxonomicLevelSerotype,
         } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogOrganism>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SEROTYPE,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SEROTYPE,
+        header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_SEROTYPE,
+        id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_SEROTYPE,
         width: { max: "1fr", min: "auto" },
       },
       {
@@ -203,8 +200,8 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
           component: C.NTagCell,
           viewBuilder: V.buildOrganismTaxonomicLevelIsolate,
         } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogOrganism>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_ISOLATE,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ISOLATE,
+        header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_ISOLATE,
+        id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_ISOLATE,
         width: { max: "1fr", min: "auto" },
       },
       {
@@ -212,8 +209,8 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
           component: C.BasicCell,
           viewBuilder: V.buildCommonName,
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.COMMON_NAME,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME,
+        header: GA2_CATEGORY_LABEL.COMMON_NAME,
+        id: GA2_CATEGORY_KEY.COMMON_NAME,
         width: { max: "0.65fr", min: "auto" },
       },
       {
@@ -221,8 +218,8 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
           component: C.NTagCell,
           viewBuilder: V.buildOrganismAssemblyTaxonomyIds,
         } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogOrganism>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.ASSEMBLY_TAXONOMY_IDS,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.ASSEMBLY_TAXONOMY_IDS,
+        header: GA2_CATEGORY_LABEL.ASSEMBLY_TAXONOMY_IDS,
+        id: GA2_CATEGORY_KEY.ASSEMBLY_TAXONOMY_IDS,
         width: { max: "0.65fr", min: "164px" },
       },
       {
@@ -230,8 +227,8 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
           component: C.NTagCell,
           viewBuilder: V.buildTaxonomicGroup,
         } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogOrganism>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_GROUP,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_GROUP,
+        header: GA2_CATEGORY_LABEL.TAXONOMIC_GROUP,
+        id: GA2_CATEGORY_KEY.TAXONOMIC_GROUP,
         width: { max: "0.65fr", min: "164px" },
       },
       {
@@ -245,8 +242,8 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
           component: C.Tooltip,
           viewBuilder: V.buildPriorityPathogenTooltip,
         } as ComponentConfig<typeof C.Tooltip, BRCDataCatalogOrganism>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.PRIORITY_PATHOGEN_NAME,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.PRIORITY_PATHOGEN_NAME,
+        header: GA2_CATEGORY_LABEL.PRIORITY_PATHOGEN_NAME,
+        id: GA2_CATEGORY_KEY.PRIORITY_PATHOGEN_NAME,
         width: { max: "0.5fr", min: "142px" },
       },
       {
@@ -254,8 +251,8 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
           component: C.BasicCell,
           viewBuilder: V.buildAssemblyCount,
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.ASSEMBLY_COUNT,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.ASSEMBLY_COUNT,
+        header: GA2_CATEGORY_LABEL.ASSEMBLY_COUNT,
+        id: GA2_CATEGORY_KEY.ASSEMBLY_COUNT,
         width: { max: "0.65fr", min: "164px" },
       },
       COLUMN_REGISTRY.PRIORITY,
@@ -263,24 +260,24 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
     tableOptions: {
       initialState: {
         columnVisibility: {
-          [BRC_DATA_CATALOG_CATEGORY_KEY.PRIORITY]: false,
-          [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_CLASS]: false,
-          [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_FAMILY]: false,
-          [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_GENUS]: false,
-          [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_KINGDOM]: false,
-          [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ORDER]: false,
-          [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_PHYLUM]: false,
-          [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN]: false,
-          [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SEROTYPE]: false,
-          [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ISOLATE]: false,
-          [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_REALM]: false,
-          [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_DOMAIN]: false,
-          [BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME]: false,
+          [GA2_CATEGORY_KEY.PRIORITY]: false,
+          [GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_CLASS]: false,
+          [GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_FAMILY]: false,
+          [GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_GENUS]: false,
+          [GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_KINGDOM]: false,
+          [GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_ORDER]: false,
+          [GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_PHYLUM]: false,
+          [GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN]: false,
+          [GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_SEROTYPE]: false,
+          [GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_ISOLATE]: false,
+          [GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_REALM]: false,
+          [GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_DOMAIN]: false,
+          [GA2_CATEGORY_KEY.COMMON_NAME]: false,
         },
         sorting: [
           {
             desc: SORT_DIRECTION.ASCENDING,
-            id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
+            id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
           },
         ],
       },
