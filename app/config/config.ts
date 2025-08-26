@@ -3,11 +3,17 @@ import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import brcAnalyticsDev from "../../site-config/brc-analytics/dev/config";
 import brcAnalyticsLocal from "../../site-config/brc-analytics/local/config";
 import brcAnalyticsProd from "../../site-config/brc-analytics/prod/config";
+import ga2Dev from "../../site-config/ga2/dev/config";
+import ga2Local from "../../site-config/ga2/local/config";
+import ga2Prod from "../../site-config/ga2/prod/config";
 
 const CONFIGS: { [k: string]: SiteConfig } = {
   "brc-analytics-dev": brcAnalyticsDev,
   "brc-analytics-local": brcAnalyticsLocal,
   "brc-analytics-prod": brcAnalyticsProd,
+  "ga2-dev": ga2Dev,
+  "ga2-local": ga2Local,
+  "ga2-prod": ga2Prod,
 };
 
 let appConfig: SiteConfig | null = null;
