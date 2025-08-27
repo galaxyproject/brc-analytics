@@ -2,9 +2,9 @@ import {
   ComponentConfig,
   ComponentsConfig,
 } from "@databiosphere/findable-ui/lib/config/entities";
-import { BRCDataCatalogGenome } from "../../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "../../../../../app/components";
 import * as V from "../../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import { GA2AssemblyEntity } from "../../../../../app/apis/catalog/ga2/entities";
 
 export const sideColumn: ComponentsConfig = [
   {
@@ -28,7 +28,7 @@ export const sideColumn: ComponentsConfig = [
                         viewBuilder: V.buildAssemblyDetails,
                       } as ComponentConfig<
                         typeof C.KeyValuePairs,
-                        BRCDataCatalogGenome
+                        GA2AssemblyEntity
                       >,
                     ],
                     component: C.Grid,
@@ -52,7 +52,7 @@ export const sideColumn: ComponentsConfig = [
                     viewBuilder: V.buildGenomeAnalysisPortals,
                   } as ComponentConfig<
                     typeof C.AnalysisPortals,
-                    BRCDataCatalogGenome
+                    GA2AssemblyEntity
                   >,
                 ],
                 component: C.GridPaperSection,
@@ -62,8 +62,8 @@ export const sideColumn: ComponentsConfig = [
           },
         ],
         component: C.FluidPaper,
-      } as ComponentConfig<typeof C.FluidPaper>,
+      } as ComponentConfig<typeof C.FluidPaper, GA2AssemblyEntity>,
     ],
     component: C.BackPageContentSideColumn,
-  },
+  } as ComponentConfig<typeof C.BackPageContentSideColumn, GA2AssemblyEntity>,
 ];

@@ -6,6 +6,150 @@ import { ComponentProps } from "react";
 import * as C from "../../../components";
 import { ROUTES } from "../../../../routes/constants";
 import { sanitizeEntityId } from "../../../apis/catalog/common/utils";
+import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
+import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
+import {
+  GA2_CATEGORY_KEY,
+  GA2_CATEGORY_LABEL,
+} from "../../../../site-config/ga2/category";
+import { ColumnDef, getSortedRowModel } from "@tanstack/react-table";
+import {
+  buildAnalyzeGenome,
+  buildIsRef,
+} from "../brc-analytics-catalog/common/viewModelBuilders";
+
+/**
+ * Build props for the assembly BackPageHero component.
+ * @param entity - Entity.
+ * @returns Props to be used for the BackPageHero component.
+ */
+export const buildAssemblyHero = (
+  entity: GA2AssemblyEntity
+): ComponentProps<typeof C.BackPageHero> => {
+  return {
+    breadcrumbs: [
+      { path: ROUTES.GENOMES, text: "Assemblies" },
+      { path: "", text: entity.accession },
+      { path: "", text: "Select a Workflow" },
+    ],
+    title: "Select a Workflow",
+  };
+};
+
+/**
+ * Build props for the organism BackPageHero component.
+ * @param entity - Entity.
+ * @returns Props to be used for the BackPageHero component.
+ */
+export const buildOrganismHero = (
+  entity: GA2OrganismEntity
+): ComponentProps<typeof C.BackPageHero> => {
+  return {
+    breadcrumbs: [
+      { path: ROUTES.ORGANISMS, text: "Organisms" },
+      { path: "", text: entity.species },
+      { path: "", text: "Assemblies" },
+    ],
+    title: entity.species,
+  };
+};
+
+/**
+ * Build props for the genomes table for the given organism.
+ * @param entity - Entity.
+ * @returns props to be used for the table.
+ */
+export function buildOrganismGenomesTable(
+  entity: GA2OrganismEntity
+): ComponentProps<typeof C.DetailViewTable<GA2AssemblyEntity>> {
+  return {
+    Paper: C.FluidPaper as typeof FluidPaper,
+    columns: buildOrganismGenomesTableColumns(),
+    gridTemplateColumns: "auto repeat(13, minmax(152px, 1fr))",
+    items: entity.genomes,
+    noResultsTitle: "No Assemblies",
+    tableOptions: {
+      enableRowPosition: false,
+      enableSorting: true,
+      getSortedRowModel: getSortedRowModel(),
+      initialState: {
+        columnVisibility: { [COLUMN_IDENTIFIER.ROW_POSITION]: false },
+        sorting: [
+          { desc: true, id: GA2_CATEGORY_KEY.IS_REF },
+          { desc: false, id: GA2_CATEGORY_KEY.ACCESSION },
+        ],
+      },
+    },
+  };
+}
+
+/**
+ * Build the column definitions for the organism genomes table.
+ * @returns column definitions.
+ */
+function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
+  return [
+    {
+      accessorKey: GA2_CATEGORY_KEY.ANALYZE_GENOME,
+      cell: ({ row }) => C.AnalyzeGenome(buildAnalyzeGenome(row.original)),
+      header: GA2_CATEGORY_LABEL.ANALYZE_GENOME,
+    },
+    {
+      accessorKey: GA2_CATEGORY_KEY.ACCESSION,
+      header: GA2_CATEGORY_LABEL.ACCESSION,
+      meta: { columnPinned: true },
+    },
+    {
+      accessorKey: GA2_CATEGORY_KEY.STRAIN,
+      header: GA2_CATEGORY_LABEL.STRAIN,
+    },
+    {
+      accessorKey: GA2_CATEGORY_KEY.TAXONOMY_ID,
+      header: GA2_CATEGORY_LABEL.TAXONOMY_ID,
+    },
+    {
+      accessorKey: GA2_CATEGORY_KEY.IS_REF,
+      cell: ({ row }) => C.ChipCell(buildIsRef(row.original)),
+      header: GA2_CATEGORY_LABEL.IS_REF,
+    },
+    {
+      accessorKey: GA2_CATEGORY_KEY.LEVEL,
+      header: GA2_CATEGORY_LABEL.LEVEL,
+    },
+    {
+      accessorKey: GA2_CATEGORY_KEY.CHROMOSOMES,
+      header: GA2_CATEGORY_LABEL.CHROMOSOMES,
+    },
+    {
+      accessorKey: GA2_CATEGORY_KEY.LENGTH,
+      header: GA2_CATEGORY_LABEL.LENGTH,
+    },
+    {
+      accessorKey: GA2_CATEGORY_KEY.SCAFFOLD_COUNT,
+      header: GA2_CATEGORY_LABEL.SCAFFOLD_COUNT,
+    },
+    {
+      accessorKey: GA2_CATEGORY_KEY.SCAFFOLD_N50,
+      header: GA2_CATEGORY_LABEL.SCAFFOLD_N50,
+    },
+    {
+      accessorKey: GA2_CATEGORY_KEY.SCAFFOLD_L50,
+      header: GA2_CATEGORY_LABEL.SCAFFOLD_L50,
+    },
+    {
+      accessorKey: GA2_CATEGORY_KEY.COVERAGE,
+      header: GA2_CATEGORY_LABEL.COVERAGE,
+    },
+    {
+      accessorKey: GA2_CATEGORY_KEY.GC_PERCENT,
+      header: GA2_CATEGORY_LABEL.GC_PERCENT,
+    },
+    {
+      accessorKey: GA2_CATEGORY_KEY.ANNOTATION_STATUS,
+      header: GA2_CATEGORY_LABEL.ANNOTATION_STATUS,
+    },
+  ];
+}
 
 /**
  * Build props for the species cell.
