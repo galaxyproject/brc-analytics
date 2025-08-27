@@ -3,13 +3,11 @@ import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import {
   BRCDataCatalogGenome,
   BRCDataCatalogOrganism,
-  Outbreak,
 } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "../../../app/components";
 import { ROUTES } from "../../../routes/constants";
 import { genomeEntityConfig } from "./index/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organismEntityConfig";
-import { priorityPathogensEntityConfig } from "./index/priorityPathogensEntityConfig";
 
 const LOCALHOST = "http://localhost:3000";
 const APP_TITLE = "Genome Ark 2";
@@ -44,7 +42,6 @@ export function makeConfig(
     entities: [
       organismEntityConfig as EntityConfig<BRCDataCatalogOrganism>,
       genomeEntityConfig as EntityConfig<BRCDataCatalogGenome>,
-      priorityPathogensEntityConfig as EntityConfig<Outbreak>,
     ],
     gitHubUrl,
     layout: {
