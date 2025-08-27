@@ -1,42 +1,23 @@
 import {
-  ComponentConfig,
   ListConfig,
   SORT_DIRECTION,
 } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
-import * as C from "../../../../../app/components";
-import { buildOrganismAssemblyTaxonomyIds } from "../../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import { AppEntityConfig } from "../../../../common/entities";
-import { GA2_CATEGORY_KEY, GA2_CATEGORY_LABEL } from "../../../category";
+import { GA2_CATEGORY_KEY } from "../../../category";
 import { assembliesMainColumn } from "../../entity/organism/assembliesMainColumn";
 import { assembliesTop } from "../../entity/organism/assembliesTop";
 import { GA2OrganismEntity } from "../../../../../app/apis/catalog/ga2/entities";
 import { getOrganismId } from "../../../../../app/apis/catalog/ga2/utils";
-import {
-  buildAssemblyCount,
-  buildTaxonomicGroup,
-} from "app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import * as V from "../../../../../app/viewModelBuilders/catalog/ga2/viewModelBuilders";
+import { CATEGORY_GROUPS } from "./categoryGroups";
+import { COLUMNS } from "./columns";
 
 /**
  * Entity config object responsible to config anything related to the /organisms route.
  */
 export const organismEntityConfig: AppEntityConfig<GA2OrganismEntity> = {
   categoryGroupConfig: {
-    categoryGroups: [
-      {
-        categoryConfigs: [
-          {
-            key: GA2_CATEGORY_KEY.SPECIES,
-            label: GA2_CATEGORY_LABEL.SPECIES,
-          },
-          {
-            key: GA2_CATEGORY_KEY.ASSEMBLY_TAXONOMY_IDS,
-            label: GA2_CATEGORY_LABEL.ASSEMBLY_TAXONOMY_IDS,
-          },
-        ],
-      },
-    ],
+    categoryGroups: CATEGORY_GROUPS,
     key: "organisms",
   },
   detail: {
@@ -55,45 +36,7 @@ export const organismEntityConfig: AppEntityConfig<GA2OrganismEntity> = {
   getId: getOrganismId,
   label: "Organisms",
   list: {
-    columns: [
-      {
-        componentConfig: {
-          component: C.Link,
-          viewBuilder: V.buildOrganismSpecies,
-        } as ComponentConfig<typeof C.Link, GA2OrganismEntity>,
-        header: GA2_CATEGORY_LABEL.SPECIES,
-        id: GA2_CATEGORY_KEY.SPECIES,
-        meta: { columnPinned: true },
-        width: { max: "1fr", min: "auto" },
-      },
-      {
-        componentConfig: {
-          component: C.NTagCell,
-          viewBuilder: buildOrganismAssemblyTaxonomyIds,
-        } as ComponentConfig<typeof C.NTagCell, GA2OrganismEntity>,
-        header: GA2_CATEGORY_LABEL.ASSEMBLY_TAXONOMY_IDS,
-        id: GA2_CATEGORY_KEY.ASSEMBLY_TAXONOMY_IDS,
-        width: { max: "0.65fr", min: "164px" },
-      },
-      {
-        componentConfig: {
-          component: C.NTagCell,
-          viewBuilder: buildTaxonomicGroup,
-        } as ComponentConfig<typeof C.NTagCell, GA2OrganismEntity>,
-        header: GA2_CATEGORY_LABEL.TAXONOMIC_GROUP,
-        id: GA2_CATEGORY_KEY.TAXONOMIC_GROUP,
-        width: { max: "0.65fr", min: "164px" },
-      },
-      {
-        componentConfig: {
-          component: C.BasicCell,
-          viewBuilder: buildAssemblyCount,
-        } as ComponentConfig<typeof C.BasicCell, GA2OrganismEntity>,
-        header: GA2_CATEGORY_LABEL.ASSEMBLY_COUNT,
-        id: GA2_CATEGORY_KEY.ASSEMBLY_COUNT,
-        width: { max: "0.65fr", min: "164px" },
-      },
-    ],
+    columns: COLUMNS,
     tableOptions: {
       initialState: {
         sorting: [
