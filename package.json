@@ -15,12 +15,15 @@
     "prepare": "husky",
     "test": "jest --runInBand",
     "build-brc-db": "esrun catalog/build/ts/build-catalog.ts",
-    "build-files-from-ncbi": "python3 -m catalog.build.py.build_files_from_ncbi",
+    "build-brc-from-ncbi": "python3 -m catalog.build.py.build_files_from_ncbi",
+    "build-ga2-from-ncbi": "python3 -m catalog.ga2.build.py.build_files_from_ncbi",
+    "update-ga2-assemblies": "python3 -m catalog.ga2.build.py.update_assemblies",
     "iwc-manifest-to-workflows-yaml": "python3 -m catalog.py_package.catalog_build.iwc_manifest_to_workflows_yaml ./catalog/source/workflows.yml --exclude-other",
     "lint-schema": "linkml-lint ./catalog/py_package/catalog_build/schema --validate --verbose",
     "gen-schema": "./catalog/schema/scripts/gen-schema.sh",
     "test-gen-python": "./catalog/schema/scripts/test-gen-python.sh",
-    "validate-catalog": "./catalog/schema/scripts/validate-catalog.sh"
+    "validate-brc-catalog": "./catalog/schema/scripts/validate-catalog.sh",
+    "validate-ga2-catalog": "./catalog/ga2/schema/scripts/validate-catalog.sh"
   },
   "dependencies": {
     "@databiosphere/findable-ui": "^43.0.0",
