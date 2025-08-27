@@ -1,4 +1,4 @@
-export type GA2Entity = GA2AssemblyEntity | GA2OrganismEntity;
+export type GA2Catalog = GA2AssemblyEntity | GA2OrganismEntity;
 
 /**
  * TODO: Confirm the shape of Assembly and Organism entities, including sra_data.

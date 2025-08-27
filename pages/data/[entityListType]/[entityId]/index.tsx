@@ -10,6 +10,7 @@ import { config } from "../../../../app/config/config";
 import { seedDatabase } from "../../../../app/utils/seedDatabase";
 import { getEntities, getEntity } from "../../../../app/utils/entityUtils";
 import { EntityDetailView } from "../../../../app/views/EntityView/entityView";
+import { GA2Catalog } from "../../../../app/apis/catalog/ga2/entities";
 
 interface StaticPath {
   params: PageUrl;
@@ -47,7 +48,7 @@ export const getStaticPaths: GetStaticPaths<PageUrl> = async () => {
   for (const entityConfig of entities) {
     const { route: entityListType } = entityConfig;
     await seedDatabase(entityListType, entityConfig);
-    const entitiesResponse: EntitiesResponse<BRCCatalog> =
+    const entitiesResponse: EntitiesResponse<BRCCatalog | GA2Catalog> =
       await getEntities(entityConfig);
     processEntityPaths(entityConfig, entitiesResponse, paths);
   }
@@ -65,7 +66,7 @@ export const getStaticPaths: GetStaticPaths<PageUrl> = async () => {
  * @returns Promise<GetStaticPropsContext<PageUrl>>.
  */
 export const getStaticProps: GetStaticProps<
-  EntityPageProps<BRCCatalog>
+  EntityPageProps<BRCCatalog | GA2Catalog>
 > = async ({ params }: GetStaticPropsContext) => {
   const appConfig = config();
   const { entities } = appConfig;
@@ -81,7 +82,9 @@ export const getStaticProps: GetStaticProps<
 
   const entityConfig = getEntityConfig(entities, entityListType);
 
-  const props: EntityPageProps<BRCCatalog> = { entityListType };
+  const props: EntityPageProps<BRCCatalog | GA2Catalog> = {
+    entityListType,
+  };
 
   // Process entity props.
   await processEntityProps(entityConfig, entityId, props);
