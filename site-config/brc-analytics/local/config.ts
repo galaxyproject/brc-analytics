@@ -1,5 +1,4 @@
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
-import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import {
   BRCDataCatalogGenome,
@@ -14,6 +13,7 @@ import { organismEntityConfig } from "./index/organismEntityConfig";
 import { priorityPathogensEntityConfig } from "./index/priorityPathogensEntityConfig";
 import { socialMedia } from "./socialMedia";
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
+import { AppSiteConfig } from "../../common/entities";
 
 const LOCALHOST = "http://localhost:3000";
 const APP_TITLE = "BRC Analytics";
@@ -38,7 +38,7 @@ const GIT_HUB_REPO_URL = "https://github.com/galaxyproject/brc-analytics";
 export function makeConfig(
   browserUrl: string,
   gitHubUrl = GIT_HUB_REPO_URL
-): SiteConfig {
+): AppSiteConfig {
   return {
     appTitle: APP_TITLE,
     browserURL: browserUrl,
@@ -97,6 +97,6 @@ export function makeConfig(
   };
 }
 
-const config: SiteConfig = makeConfig(BROWSER_URL);
+const config: AppSiteConfig = makeConfig(BROWSER_URL);
 
 export default config;

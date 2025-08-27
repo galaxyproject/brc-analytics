@@ -4,6 +4,7 @@ import {
   BackPageTabConfig as BaseBackPageTabConfig,
   ComponentsConfig,
 } from "@databiosphere/findable-ui/lib/config/entities";
+import { SiteConfig as BaseSiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 
 export interface AppBackPageConfig
   extends Omit<BaseBackPageConfig, "tabs" | "top"> {
@@ -18,4 +19,8 @@ export interface AppBackPageTabConfig extends BaseBackPageTabConfig {
 export interface AppEntityConfig<R>
   extends Omit<BaseEntityConfig<R>, "detail"> {
   detail: AppBackPageConfig;
+}
+
+export interface AppSiteConfig extends BaseSiteConfig {
+  allowedPaths?: string[];
 }

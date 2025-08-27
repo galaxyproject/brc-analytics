@@ -8,7 +8,9 @@ import {
   GA2AssemblyEntity,
   GA2OrganismEntity,
 } from "../../../app/apis/catalog/ga2/entities";
+import { AppSiteConfig } from "../../common/entities";
 
+const ALLOWED_PATHS = [ROUTES.ORGANISMS, ROUTES.GENOMES];
 const LOCALHOST = "http://localhost:3000";
 const APP_TITLE = "Genome Ark 2";
 const BROWSER_URL = LOCALHOST;
@@ -32,8 +34,9 @@ const GIT_HUB_REPO_URL = "https://github.com/galaxyproject/ga2";
 export function makeConfig(
   browserUrl: string,
   gitHubUrl = GIT_HUB_REPO_URL
-): SiteConfig {
+): AppSiteConfig {
   return {
+    allowedPaths: ALLOWED_PATHS,
     appTitle: APP_TITLE,
     browserURL: browserUrl,
     dataSource: {
