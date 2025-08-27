@@ -1,0 +1,184 @@
+import { ComponentConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import * as C from "../../../../../app/components";
+import {
+  buildAccession,
+  buildAnalyzeGenome,
+  buildAnnotationStatus,
+  buildChromosomes,
+  buildCoverage,
+  buildGcPercent,
+  buildIsRef,
+  buildLength,
+  buildLevel,
+  buildScaffoldCount,
+  buildScaffoldL50,
+  buildScaffoldN50,
+  buildTaxonomicGroup,
+  buildTaxonomyId,
+} from "../../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import { GA2AssemblyEntity } from "../../../../../app/apis/catalog/ga2/entities";
+import * as V from "../../../../../app/viewModelBuilders/catalog/ga2/viewModelBuilders";
+import { GA2_CATEGORY_LABEL, GA2_CATEGORY_KEY } from "../../../category";
+import { ColumnConfig } from "@databiosphere/findable-ui/lib/config/entities";
+
+export const ACCESSION: ColumnConfig<GA2AssemblyEntity> = {
+  columnPinned: true,
+  componentConfig: {
+    component: C.BasicCell,
+    viewBuilder: buildAccession,
+  } as ComponentConfig<typeof C.BasicCell, GA2AssemblyEntity>,
+  header: GA2_CATEGORY_LABEL.ACCESSION,
+  id: GA2_CATEGORY_KEY.ACCESSION,
+  width: { max: "1fr", min: "164px" },
+};
+
+export const ANALYZE_GENOME: ColumnConfig<GA2AssemblyEntity> = {
+  componentConfig: {
+    component: C.AnalyzeGenome,
+    viewBuilder: buildAnalyzeGenome,
+  } as ComponentConfig<typeof C.AnalyzeGenome, GA2AssemblyEntity>,
+  enableSorting: false,
+  header: GA2_CATEGORY_LABEL.ANALYZE_GENOME,
+  id: GA2_CATEGORY_KEY.ANALYZE_GENOME,
+  width: "auto",
+};
+
+export const ANNOTATION_STATUS: ColumnConfig<GA2AssemblyEntity> = {
+  componentConfig: {
+    component: C.BasicCell,
+    viewBuilder: buildAnnotationStatus,
+  } as ComponentConfig<typeof C.BasicCell, GA2AssemblyEntity>,
+  header: GA2_CATEGORY_LABEL.ANNOTATION_STATUS,
+  id: GA2_CATEGORY_KEY.ANNOTATION_STATUS,
+  width: { max: "0.5fr", min: "180px" },
+};
+
+export const CHROMOSOMES: ColumnConfig<GA2AssemblyEntity> = {
+  componentConfig: {
+    component: C.BasicCell,
+    viewBuilder: buildChromosomes,
+  } as ComponentConfig<typeof C.BasicCell, GA2AssemblyEntity>,
+  header: GA2_CATEGORY_LABEL.CHROMOSOMES,
+  id: GA2_CATEGORY_KEY.CHROMOSOMES,
+  width: { max: "0.5fr", min: "142px" },
+};
+
+export const COVERAGE: ColumnConfig<GA2AssemblyEntity> = {
+  componentConfig: {
+    component: C.BasicCell,
+    viewBuilder: buildCoverage,
+  } as ComponentConfig<typeof C.BasicCell, GA2AssemblyEntity>,
+  header: GA2_CATEGORY_LABEL.COVERAGE,
+  id: GA2_CATEGORY_KEY.COVERAGE,
+  width: { max: "0.5fr", min: "100px" },
+};
+
+export const GC_PERCENT: ColumnConfig<GA2AssemblyEntity> = {
+  componentConfig: {
+    component: C.BasicCell,
+    viewBuilder: buildGcPercent,
+  } as ComponentConfig<typeof C.BasicCell, GA2AssemblyEntity>,
+  header: GA2_CATEGORY_LABEL.GC_PERCENT,
+  id: GA2_CATEGORY_KEY.GC_PERCENT,
+  width: { max: "0.5fr", min: "100px" },
+};
+
+export const IS_REF: ColumnConfig<GA2AssemblyEntity> = {
+  componentConfig: {
+    component: C.ChipCell,
+    viewBuilder: buildIsRef,
+  } as ComponentConfig<typeof C.ChipCell, GA2AssemblyEntity>,
+  header: GA2_CATEGORY_LABEL.IS_REF,
+  id: GA2_CATEGORY_KEY.IS_REF,
+  width: { max: "0.5fr", min: "100px" },
+};
+
+export const LENGTH: ColumnConfig<GA2AssemblyEntity> = {
+  componentConfig: {
+    component: C.BasicCell,
+    viewBuilder: buildLength,
+  } as ComponentConfig<typeof C.BasicCell, GA2AssemblyEntity>,
+  header: GA2_CATEGORY_LABEL.LENGTH,
+  id: GA2_CATEGORY_KEY.LENGTH,
+  width: { max: "0.5fr", min: "132px" },
+};
+
+export const LEVEL: ColumnConfig<GA2AssemblyEntity> = {
+  componentConfig: {
+    component: C.BasicCell,
+    viewBuilder: buildLevel,
+  } as ComponentConfig<typeof C.BasicCell, GA2AssemblyEntity>,
+  header: GA2_CATEGORY_LABEL.LEVEL,
+  id: GA2_CATEGORY_KEY.LEVEL,
+  width: { max: "0.5fr", min: "142px" },
+};
+
+export const SCAFFOLD_COUNT: ColumnConfig<GA2AssemblyEntity> = {
+  componentConfig: {
+    component: C.BasicCell,
+    viewBuilder: buildScaffoldCount,
+  } as ComponentConfig<typeof C.BasicCell, GA2AssemblyEntity>,
+  header: GA2_CATEGORY_LABEL.SCAFFOLD_COUNT,
+  id: GA2_CATEGORY_KEY.SCAFFOLD_COUNT,
+  width: { max: "0.5fr", min: "120px" },
+};
+
+export const SCAFFOLD_L50: ColumnConfig<GA2AssemblyEntity> = {
+  componentConfig: {
+    component: C.BasicCell,
+    viewBuilder: buildScaffoldL50,
+  } as ComponentConfig<typeof C.BasicCell, GA2AssemblyEntity>,
+  header: GA2_CATEGORY_LABEL.SCAFFOLD_L50,
+  id: GA2_CATEGORY_KEY.SCAFFOLD_L50,
+  width: { max: "0.5fr", min: "120px" },
+};
+
+export const SCAFFOLD_N50: ColumnConfig<GA2AssemblyEntity> = {
+  componentConfig: {
+    component: C.BasicCell,
+    viewBuilder: buildScaffoldN50,
+  } as ComponentConfig<typeof C.BasicCell, GA2AssemblyEntity>,
+  header: GA2_CATEGORY_LABEL.SCAFFOLD_N50,
+  id: GA2_CATEGORY_KEY.SCAFFOLD_N50,
+  width: { max: "0.5fr", min: "120px" },
+};
+
+export const SPECIES: ColumnConfig<GA2AssemblyEntity> = {
+  componentConfig: {
+    component: C.Link,
+    viewBuilder: V.buildSpecies,
+  } as ComponentConfig<typeof C.Link, GA2AssemblyEntity>,
+  header: GA2_CATEGORY_LABEL.SPECIES,
+  id: GA2_CATEGORY_KEY.SPECIES,
+  width: { max: "1fr", min: "200px" },
+};
+
+export const STRAIN: ColumnConfig<GA2AssemblyEntity> = {
+  componentConfig: {
+    component: C.BasicCell,
+    viewBuilder: V.buildStrain,
+  } as ComponentConfig<typeof C.BasicCell, GA2AssemblyEntity>,
+  header: GA2_CATEGORY_LABEL.STRAIN,
+  id: GA2_CATEGORY_KEY.STRAIN,
+  width: { max: "0.5fr", min: "160px" },
+};
+
+export const TAXONOMIC_GROUP: ColumnConfig<GA2AssemblyEntity> = {
+  componentConfig: {
+    component: C.NTagCell,
+    viewBuilder: buildTaxonomicGroup,
+  } as ComponentConfig<typeof C.NTagCell, GA2AssemblyEntity>,
+  header: GA2_CATEGORY_LABEL.TAXONOMIC_GROUP,
+  id: GA2_CATEGORY_KEY.TAXONOMIC_GROUP,
+  width: { max: "0.5fr", min: "142px" },
+};
+
+export const TAXONOMY_ID: ColumnConfig<GA2AssemblyEntity> = {
+  componentConfig: {
+    component: C.BasicCell,
+    viewBuilder: buildTaxonomyId,
+  } as ComponentConfig<typeof C.BasicCell, GA2AssemblyEntity>,
+  header: GA2_CATEGORY_LABEL.TAXONOMY_ID,
+  id: GA2_CATEGORY_KEY.TAXONOMY_ID,
+  width: { max: "0.5fr", min: "144px" },
+};
