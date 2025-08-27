@@ -15,6 +15,7 @@ import {
 } from "../../../../../app/apis/catalog/ga2/utils";
 import { COLUMNS } from "./columns";
 import { GA2_CATEGORY_KEY } from "../../../category";
+import { ORGANISM_PLOIDY } from "../../../../../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
 
 /**
  * Entity config object responsible to config anything related to the /assemblies route.
@@ -37,6 +38,14 @@ export const genomeEntityConfig: AppEntityConfig<GA2AssemblyEntity> = {
       },
     ],
   },
+  /* TODO: Remove entityMapper when GA2 data is available. */
+  entityMapper: (entity: GA2AssemblyEntity) => ({
+    ...entity,
+    lineageTaxonomyIds: [entity.ncbiTaxonomyId],
+    ploidy: [ORGANISM_PLOIDY.DIPLOID, ORGANISM_PLOIDY.HAPLOID],
+    taxonomicLevelSpecies: entity.species,
+    taxonomicLevelStrain: entity.strain || "",
+  }),
   exploreMode: EXPLORE_MODE.CS_FETCH_CS_FILTERING,
   getId: getAssemblyId,
   getTitle: getAssemblyTitle,

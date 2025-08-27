@@ -126,14 +126,14 @@ export const buildAssemblyBackPageHero = (
  * @returns Props to be used for the KeyValuePairs component.
  */
 export const buildAssemblyDetails = (
-  assembly: BRCDataCatalogGenome
+  assembly: BRCDataCatalogGenome | GA2AssemblyEntity
 ): ComponentProps<typeof C.KeyValuePairs> => {
   const keyValuePairs = new Map<Key, Value>();
   keyValuePairs.set(
     BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
     C.Link({
       label: assembly.taxonomicLevelSpecies,
-      url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(assembly))}`,
+      url: `${ROUTES.ORGANISMS}/${encodeURIComponent(sanitizeEntityId(assembly.speciesTaxonomyId))}`,
     })
   );
   const strain = getGenomeStrainText(assembly);
@@ -150,10 +150,12 @@ export const buildAssemblyDetails = (
       value: assembly.accession,
     })
   );
-  keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.PRIORITY_PATHOGEN_NAME,
-    C.Chip(buildPriorityPathogen(assembly))
-  );
+  if ("priorityPathogenName" in assembly) {
+    keyValuePairs.set(
+      BRC_DATA_CATALOG_CATEGORY_LABEL.PRIORITY_PATHOGEN_NAME,
+      C.Chip(buildPriorityPathogen(assembly))
+    );
+  }
   return {
     KeyElType: C.KeyElType,
     KeyValuesElType: (props) => C.Stack({ ...props, gap: 4 }),
@@ -995,17 +997,17 @@ function getEntityLinkWithPriorityPathogenFilter(
 
 /**
  * Get text for genome strain, consisting of, from highest to lowest priority, either: strain-only name; strain name including species; or the specified default value.
- * @param genome - Genome entity.
+ * @param entity - Entity with a strainName and taxonomicLevelStrain property.
  * @param defaultValue - Default value to use if there's no strain.
  * @returns strain text.
  */
 function getGenomeStrainText(
-  genome: BRCDataCatalogGenome,
+  entity: BRCDataCatalogGenome | GA2AssemblyEntity,
   defaultValue = ""
 ): string {
-  if (genome.strainName) return genome.strainName;
-  if (genome.taxonomicLevelStrain !== "None")
-    return genome.taxonomicLevelStrain;
+  if ("strainName" in entity && entity.strainName) return entity.strainName;
+  if (entity.taxonomicLevelStrain !== "None")
+    return entity.taxonomicLevelStrain;
   return defaultValue;
 }
 

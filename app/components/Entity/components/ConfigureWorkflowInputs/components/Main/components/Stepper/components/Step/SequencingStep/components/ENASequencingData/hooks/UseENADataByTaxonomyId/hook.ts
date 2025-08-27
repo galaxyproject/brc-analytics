@@ -4,9 +4,10 @@ import { fetchENAData } from "./request";
 import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
 import { shouldFetch } from "./utils";
 import { BRCDataCatalogGenome } from "../../../../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
+import { GA2AssemblyEntity } from "../../../../../../../../../../../../../../../apis/catalog/ga2/entities";
 
 export const useENADataByTaxonomyId = <T>(
-  genome: BRCDataCatalogGenome
+  genome: BRCDataCatalogGenome | GA2AssemblyEntity
 ): UseENADataByTaxonomyId<T> => {
   const { data, run } = useAsync<T[] | undefined>();
   const [errors, setErrors] = useState<Record<string, string>>({});

@@ -1,3 +1,5 @@
+import { ORGANISM_PLOIDY } from "../brc-analytics-catalog/common/schema-entities";
+
 export type GA2Catalog = GA2AssemblyEntity | GA2OrganismEntity;
 
 /**
@@ -14,7 +16,9 @@ export interface GA2AssemblyEntity {
   isRef: "No" | "Yes";
   length: number;
   level: string;
+  lineageTaxonomyIds: string[]; // TODO: Add to API.
   ncbiTaxonomyId: string;
+  ploidy: ORGANISM_PLOIDY[]; // TODO: Add to API.
   scaffoldCount: number | null;
   scaffoldL50: number | null;
   scaffoldN50: number | null;
@@ -23,6 +27,8 @@ export interface GA2AssemblyEntity {
   sra_data: SRAData;
   strain: string | null;
   taxonomicGroup: string[];
+  taxonomicLevelSpecies: string; // TODO: Add to API.
+  taxonomicLevelStrain: string; // TODO: Add to API.
   tolId: string;
   ucscBrowserUrl: string | null;
 }
