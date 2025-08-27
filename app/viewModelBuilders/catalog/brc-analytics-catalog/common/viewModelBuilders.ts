@@ -46,6 +46,7 @@ import {
   GA2AssemblyEntity,
   GA2OrganismEntity,
 } from "../../../../apis/catalog/ga2/entities";
+import { sanitizeEntityId } from "../../../../apis/catalog/common/utils";
 
 /**
  * Build props for the accession cell.
@@ -72,7 +73,7 @@ export const buildAnalyzeGenome = (
   return {
     analyze: {
       label: "Analyze",
-      url: `${ROUTES.GENOMES}/${encodeURIComponent(accession)}`,
+      url: `${ROUTES.GENOMES}/${encodeURIComponent(sanitizeEntityId(accession))}`,
     },
     views: [
       ...(ucscBrowserUrl
