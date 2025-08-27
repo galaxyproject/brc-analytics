@@ -43,6 +43,7 @@ export const SequencingStep = ({
             setEnaQueryMethod={setEnaQueryMethod}
             stepKey={stepKey as SEQUENCING_DATA_TYPE}
             table={table}
+            taxonomicLevelSpecies={genome.taxonomicLevelSpecies}
           />
         ) : (
           <UploadMyData
