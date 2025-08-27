@@ -52,7 +52,7 @@ export function makeConfig(
         logo: C.Logo({
           alt: APP_TITLE,
           height: 26,
-          link: "/",
+          link: ROUTES.ORGANISMS,
           src: "/logo/galaxy.png",
         }),
         navigation: [
