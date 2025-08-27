@@ -20,6 +20,7 @@ import {
 } from "../../../../../app/components/Entity/components/AnalysisMethodsCatalog/utils";
 import { getEntityConfig } from "@databiosphere/findable-ui/lib/config/utils";
 import { WorkflowInputsView } from "../../../../../app/views/WorkflowInputsView/workflowInputsView";
+import { GA2AssemblyEntity } from "../../../../../app/apis/catalog/ga2/entities";
 
 interface StaticPath {
   params: PageUrlParams;
@@ -33,7 +34,7 @@ interface PageUrlParams extends ParsedUrlQuery {
 
 interface Props {
   entityId: string;
-  genome: BRCDataCatalogGenome;
+  genome: BRCDataCatalogGenome | GA2AssemblyEntity;
   workflow: Workflow;
 }
 
@@ -47,8 +48,9 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
   if (entityConfig) {
     await seedDatabase("assemblies", entityConfig);
-    const entitiesResponse: EntitiesResponse<BRCDataCatalogGenome> =
-      await getEntities(entityConfig);
+    const entitiesResponse: EntitiesResponse<
+      BRCDataCatalogGenome | GA2AssemblyEntity
+    > = await getEntities(entityConfig);
     processEntityPaths(entityConfig, entitiesResponse, paths);
   }
 
@@ -74,7 +76,10 @@ export const getStaticProps = async (
 
   // Seed database.
   await seedDatabase(entityConfig.route, entityConfig);
-  const genome = await getEntity<BRCDataCatalogGenome>(entityConfig, entityId);
+  const genome = await getEntity<BRCDataCatalogGenome | GA2AssemblyEntity>(
+    entityConfig,
+    entityId
+  );
 
   // Find workflow.
   const workflow = workflows
@@ -106,7 +111,7 @@ export default ConfigureWorkflowInputs;
  */
 function processEntityPaths(
   entityConfig: EntityConfig,
-  entitiesResponse: EntitiesResponse<BRCDataCatalogGenome>,
+  entitiesResponse: EntitiesResponse<BRCDataCatalogGenome | GA2AssemblyEntity>,
   paths: StaticPath[]
 ): void {
   const { route: entityListType } = entityConfig;
