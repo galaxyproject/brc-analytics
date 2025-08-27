@@ -4,19 +4,19 @@ import {
   SORT_DIRECTION,
 } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
-import * as C from "../../../../app/components";
-import { buildOrganismAssemblyTaxonomyIds } from "../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { AppEntityConfig } from "../../../common/entities";
-import { GA2_CATEGORY_KEY, GA2_CATEGORY_LABEL } from "../../category";
-import { assembliesMainColumn } from "../entity/organism/assembliesMainColumn";
-import { assembliesTop } from "../entity/organism/assembliesTop";
-import { GA2OrganismEntity } from "../../../../app/apis/catalog/ga2/entities";
-import { getOrganismId } from "../../../../app/apis/catalog/ga2/utils";
+import * as C from "../../../../../app/components";
+import { buildOrganismAssemblyTaxonomyIds } from "../../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import { AppEntityConfig } from "../../../../common/entities";
+import { GA2_CATEGORY_KEY, GA2_CATEGORY_LABEL } from "../../../category";
+import { assembliesMainColumn } from "../../entity/organism/assembliesMainColumn";
+import { assembliesTop } from "../../entity/organism/assembliesTop";
+import { GA2OrganismEntity } from "../../../../../app/apis/catalog/ga2/entities";
+import { getOrganismId } from "../../../../../app/apis/catalog/ga2/utils";
 import {
   buildAssemblyCount,
   buildTaxonomicGroup,
 } from "app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import * as V from "../../../../app/viewModelBuilders/catalog/ga2/viewModelBuilders";
+import * as V from "../../../../../app/viewModelBuilders/catalog/ga2/viewModelBuilders";
 
 /**
  * Entity config object responsible to config anything related to the /organisms route.

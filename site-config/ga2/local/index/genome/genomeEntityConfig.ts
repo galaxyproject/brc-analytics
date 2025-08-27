@@ -4,7 +4,7 @@ import {
   SORT_DIRECTION,
 } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
-import * as C from "../../../../app/components";
+import * as C from "../../../../../app/components";
 import {
   buildAccession,
   buildAnalyzeGenome,
@@ -20,18 +20,18 @@ import {
   buildScaffoldN50,
   buildTaxonomicGroup,
   buildTaxonomyId,
-} from "../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { AppEntityConfig } from "../../../common/entities";
-import { GA2_CATEGORY_KEY, GA2_CATEGORY_LABEL } from "../../category";
-import { mainColumn as analysisMethodsMainColumn } from "../entity/genome/analysisMethodMainColumn";
-import { sideColumn as analysisMethodsSideColumn } from "../entity/genome/analysisMethodsSideColumn";
-import { top as analysisMethodsTop } from "../entity/genome/analysisMethodsTop";
-import { GA2AssemblyEntity } from "../../../../app/apis/catalog/ga2/entities";
+} from "../../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import { AppEntityConfig } from "../../../../common/entities";
+import { GA2_CATEGORY_KEY, GA2_CATEGORY_LABEL } from "../../../category";
+import { mainColumn as analysisMethodsMainColumn } from "../../entity/genome/analysisMethodMainColumn";
+import { sideColumn as analysisMethodsSideColumn } from "../../entity/genome/analysisMethodsSideColumn";
+import { top as analysisMethodsTop } from "../../entity/genome/analysisMethodsTop";
+import { GA2AssemblyEntity } from "../../../../../app/apis/catalog/ga2/entities";
 import {
   getAssemblyId,
   getAssemblyTitle,
-} from "../../../../app/apis/catalog/ga2/utils";
-import * as V from "../../../../app/viewModelBuilders/catalog/ga2/viewModelBuilders";
+} from "../../../../../app/apis/catalog/ga2/utils";
+import * as V from "../../../../../app/viewModelBuilders/catalog/ga2/viewModelBuilders";
 
 /**
  * Entity config object responsible to config anything related to the /assemblies route.
