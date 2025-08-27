@@ -11,7 +11,7 @@ import {
 } from "../../../../app/apis/catalog/brc-analytics-catalog/common/utils";
 import * as C from "../../../../app/components";
 import * as V from "../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { BRCEntityConfig } from "../../../common/entities";
+import { AppEntityConfig } from "../../../common/entities";
 import { GA2_CATEGORY_KEY, GA2_CATEGORY_LABEL } from "../../category";
 import { mainColumn as analysisMethodsMainColumn } from "../entity/genome/analysisMethodMainColumn";
 import { sideColumn as analysisMethodsSideColumn } from "../entity/genome/analysisMethodsSideColumn";
@@ -20,7 +20,7 @@ import { top as analysisMethodsTop } from "../entity/genome/analysisMethodsTop";
 /**
  * Entity config object responsible to config anything related to the /assemblies route.
  */
-export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
+export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
   categoryGroupConfig: {
     categoryGroups: [
       {
