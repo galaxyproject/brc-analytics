@@ -8,4 +8,5 @@ export interface Props {
   readCount?: number;
   selectedCount: number;
   setEnaQueryMethod: Dispatch<SetStateAction<ENA_QUERY_METHOD>>;
+  taxonomicLevelSpecies: string;
 }
