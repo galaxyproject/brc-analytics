@@ -736,15 +736,15 @@ export const buildGenomeAnalysisMethods = (
 
 /**
  * Build props for the genome AnalysisPortals component.
- * @param genome - Genome entity.
+ * @param entity - Entity with an accession, ucscBrowserUrl and ncbiTaxonomyId property.
  * @returns Props to be used for the AnalysisPortals component.
  */
 export const buildGenomeAnalysisPortals = (
-  genome: BRCDataCatalogGenome
+  entity: BRCDataCatalogGenome | GA2AssemblyEntity
 ): ComponentProps<typeof C.AnalysisPortals> => {
   return {
     portals: [
-      ...(genome.ucscBrowserUrl
+      ...(entity.ucscBrowserUrl
         ? [
             {
               imageProps: {
@@ -753,7 +753,7 @@ export const buildGenomeAnalysisPortals = (
                 width: 20,
               },
               label: GENOME_BROWSER,
-              url: genome.ucscBrowserUrl,
+              url: entity.ucscBrowserUrl,
             },
           ]
         : []),
@@ -764,7 +764,7 @@ export const buildGenomeAnalysisPortals = (
           width: 20,
         },
         label: NCBI_ASSEMBLY,
-        url: `${NCBI_DATASETS_URL}/genome/${genome.accession}`,
+        url: `${NCBI_DATASETS_URL}/genome/${entity.accession}`,
       },
       {
         imageProps: {
@@ -774,7 +774,7 @@ export const buildGenomeAnalysisPortals = (
         },
         label: NCBI_TAXONOMY,
         url: `${NCBI_DATASETS_URL}/taxonomy/${encodeURIComponent(
-          genome.ncbiTaxonomyId
+          entity.ncbiTaxonomyId
         )}`,
       },
     ],
@@ -1051,7 +1051,7 @@ function getOrganismEntityAssembliesBreadcrumbs(
 ): Breadcrumb[] {
   return [
     { path: ROUTES.ORGANISMS, text: "Organisms" },
-    { path: "", text: `${organism.taxonomicLevelSpecies}` },
+    { path: "", text: organism.taxonomicLevelSpecies },
     { path: "", text: "Assemblies" },
   ];
 }

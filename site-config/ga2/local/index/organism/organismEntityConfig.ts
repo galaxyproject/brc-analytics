@@ -5,8 +5,8 @@ import {
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
 import { AppEntityConfig } from "../../../../common/entities";
 import { GA2_CATEGORY_KEY } from "../../../category";
-import { assembliesMainColumn } from "../../entity/organism/assembliesMainColumn";
-import { assembliesTop } from "../../entity/organism/assembliesTop";
+import { organismMainColumn } from "../../entity/organism/organismMainColumn";
+import { organismTop } from "../../entity/organism/organismTop";
 import { GA2OrganismEntity } from "../../../../../app/apis/catalog/ga2/entities";
 import { getOrganismId } from "../../../../../app/apis/catalog/ga2/utils";
 import { CATEGORY_GROUPS } from "./categoryGroups";
@@ -25,10 +25,10 @@ export const organismEntityConfig: AppEntityConfig<GA2OrganismEntity> = {
     staticLoad: true,
     tabs: [
       {
-        label: "Assemblies",
-        mainColumn: assembliesMainColumn,
+        label: "Organism",
+        mainColumn: organismMainColumn,
         route: "",
-        top: assembliesTop,
+        top: organismTop,
       },
     ],
   },
