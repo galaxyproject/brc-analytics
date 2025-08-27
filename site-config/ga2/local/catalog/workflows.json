@@ -1,0 +1,406 @@
+[
+  {
+    "category": "VARIANT_CALLING",
+    "description": "Identify nucleotide polymorphisms and short indels from Illumina and Element data.",
+    "name": "Variant calling",
+    "showComingSoon": true,
+    "workflows": [
+      {
+        "iwcId": "generic-non-segmented-viral-variant-calling-main",
+        "parameters": [
+          {
+            "key": "Paired collection of sequencing data",
+            "variable": "SANGER_READ_RUN_PAIRED"
+          },
+          {
+            "key": "Reference annotation",
+            "variable": "GENE_MODEL_URL"
+          },
+          {
+            "key": "Fasta reference genome",
+            "variable": "ASSEMBLY_FASTA_URL"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": "11158",
+        "trsId": "#workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main/versions/v0.1",
+        "workflowDescription": "Variant calling and consensus sequence generation for batches of Illumina PE sequenced viruses with uncomplicated and stable genome structure (like e.g. Morbilliviruses). It can handle both ampliconic and non-ampliconic data.",
+        "workflowName": "Variant calling and consensus construction from paired end short read data of non-segmented viral genomes"
+      },
+      {
+        "iwcId": "haploid-variant-calling-wgs-pe-main",
+        "parameters": [
+          {
+            "key": "Paired Collection",
+            "variable": "SANGER_READ_RUN_PAIRED"
+          },
+          {
+            "key": "Annotation GTF",
+            "variable": "GENE_MODEL_URL"
+          },
+          {
+            "key": "Genome fasta",
+            "variable": "ASSEMBLY_FASTA_URL"
+          }
+        ],
+        "ploidy": "HAPLOID",
+        "taxonomyId": null,
+        "trsId": "#workflow/github.com/iwc-workflows/haploid-variant-calling-wgs-pe/main/versions/v0.1",
+        "workflowDescription": "Workflow for variant analysis against a reference genome in GenBank format",
+        "workflowName": "Paired end variant calling in haploid system"
+      },
+      {
+        "iwcId": "sars-cov-2-pe-illumina-artic-variant-calling-covid-19-pe-artic-illumina",
+        "parameters": [
+          {
+            "key": "Paired Collection",
+            "variable": "SANGER_READ_RUN_PAIRED"
+          },
+          {
+            "key": "NC_045512.2 FASTA sequence of SARS-CoV-2",
+            "variable": "ASSEMBLY_FASTA_URL"
+          },
+          {
+            "key": "ARTIC primer BED",
+            "url_spec": {
+              "ext": "bed",
+              "src": "url",
+              "url": "https://zenodo.org/record/4555735/files/ARTIC_nCoV-2019_v3.bed"
+            }
+          },
+          {
+            "key": "ARTIC primers to amplicon assignments",
+            "url_spec": {
+              "ext": "tabular",
+              "src": "url",
+              "url": "https://zenodo.org/record/4555735/files/ARTIC_amplicon_info_v3.tsv"
+            }
+          }
+        ],
+        "ploidy": "HAPLOID",
+        "taxonomyId": "694009",
+        "trsId": "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-variant-calling/COVID-19-PE-ARTIC-ILLUMINA/versions/v0.5.4",
+        "workflowDescription": "The workflow for Illumina-sequenced ARTIC data builds on the RNASeq workflow for paired-end data using the same steps for mapping and variant calling, but adds extra logic for trimming ARTIC primer sequences off reads with the ivar package. In addition, this workflow uses ivar also to identify amplicons affected by ARTIC primer-binding site mutations and tries to exclude reads derived from such tainted amplicons when calculating allele-frequencies of other variants.",
+        "workflowName": "COVID-19: variation analysis on ARTIC PE data"
+      },
+      {
+        "iwcId": "sars-cov-2-pe-illumina-wgs-variant-calling-covid-19-pe-wgs-illumina",
+        "parameters": [
+          {
+            "key": "Paired Collection",
+            "variable": "SANGER_READ_RUN_PAIRED"
+          },
+          {
+            "key": "NC_045512.2 FASTA sequence of SARS-CoV-2",
+            "variable": "ASSEMBLY_FASTA_URL"
+          }
+        ],
+        "ploidy": "HAPLOID",
+        "taxonomyId": "694009",
+        "trsId": "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-wgs-variant-calling/COVID-19-PE-WGS-ILLUMINA/versions/v0.2.4",
+        "workflowDescription": "This workflows performs paired end read mapping with bwa-mem followed by sensitive variant calling across a wide range of AFs with lofreq",
+        "workflowName": "COVID-19: variation analysis on WGS PE data"
+      },
+      {
+        "iwcId": "sars-cov-2-se-illumina-wgs-variant-calling-covid-19-se-wgs-illumina",
+        "parameters": [
+          {
+            "key": "NC_045512.2 FASTA sequence of SARS-CoV-2",
+            "variable": "ASSEMBLY_FASTA_URL"
+          }
+        ],
+        "ploidy": "HAPLOID",
+        "taxonomyId": "694009",
+        "trsId": "#workflow/github.com/iwc-workflows/sars-cov-2-se-illumina-wgs-variant-calling/COVID-19-SE-WGS-ILLUMINA/versions/v0.1.6",
+        "workflowDescription": "This workflows performs single end read mapping with bowtie2 followed by sensitive variant calling across a wide range of AFs with lofreq",
+        "workflowName": "COVID-19: variation analysis on WGS SE data"
+      }
+    ]
+  },
+  {
+    "category": "TRANSCRIPTOMICS",
+    "description": "Analyze bulk or single-cell RNA seq data using a variety of approaches.",
+    "name": "Transcriptomics",
+    "showComingSoon": true,
+    "workflows": [
+      {
+        "iwcId": "fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-cellplex",
+        "parameters": [
+          {
+            "key": "reference genome",
+            "variable": "ASSEMBLY_ID"
+          },
+          {
+            "key": "gtf",
+            "variable": "GENE_MODEL_URL"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": null,
+        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.2",
+        "workflowDescription": "Comprehensive preprocessing for 10X Genomics CellPlex multiplexed single-cell RNA-seq data. Processes Cell Multiplexing Oligo (CMO) FASTQ files with CITE-seq-Count including required CellPlex-specific translation steps. Simultaneously processes gene expression FASTQ files with STARsolo and DropletUtils for alignment and cell filtering, and formats outputs for seamless import into Seurat/Scanpy (Read10X function).",
+        "workflowName": "Single-Cell RNA-seq Preprocessing: 10X Genomics CellPlex Multiplexed Samples"
+      },
+      {
+        "iwcId": "fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-v3",
+        "parameters": [
+          {
+            "key": "reference genome",
+            "variable": "ASSEMBLY_ID"
+          },
+          {
+            "key": "gtf",
+            "variable": "GENE_MODEL_URL"
+          },
+          {
+            "key": "fastq PE collection",
+            "variable": "SANGER_READ_RUN_PAIRED"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": null,
+        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.2",
+        "workflowDescription": "Complete preprocessing pipeline for 10X Genomics v3 single-cell RNA-seq data. Aligns raw FASTQ files using STARsolo, performs cell calling and quality filtering with DropletUtils, and formats outputs for seamless import into Seurat/Scanpy (Read10X function).",
+        "workflowName": "Single-Cell RNA-seq Preprocessing: 10X Genomics v3 to Seurat and Scanpy Compatible Format"
+      },
+      {
+        "iwcId": "rnaseq-pe-main",
+        "parameters": [
+          {
+            "key": "Reference genome",
+            "variable": "ASSEMBLY_ID"
+          },
+          {
+            "key": "GTF file of annotation",
+            "variable": "GENE_MODEL_URL"
+          },
+          {
+            "key": "Collection paired FASTQ files",
+            "variable": "SANGER_READ_RUN_PAIRED"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": null,
+        "trsId": "#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.2",
+        "workflowDescription": "Complete RNA-Seq analysis for paired-end data: Processes raw FASTQ data through adapter and bad quality removal (fastp), alignment with STAR using ENCODE parameters, gene quantification via multiple methods (STAR and featureCounts), and expression calculation (FPKM with Cufflinks/StringTie, normalized coverage with bedtools). Produces count tables, normalized expression values, and genomic coverage tracks. Supports stranded and unstranded libraries, generating both HTSeq-compatible counts and normalized measures for downstream analysis.",
+        "workflowName": "RNA-Seq Analysis: Paired-End Read Processing and Quantification"
+      },
+      {
+        "iwcId": "rnaseq-sr-main",
+        "parameters": [
+          {
+            "key": "Reference genome",
+            "variable": "ASSEMBLY_ID"
+          },
+          {
+            "key": "GTF file of annotation",
+            "variable": "GENE_MODEL_URL"
+          },
+          {
+            "key": "Collection of FASTQ files",
+            "variable": "SANGER_READ_RUN_SINGLE"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": null,
+        "trsId": "#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.2",
+        "workflowDescription": "Complete RNA-Seq analysis for single-end data:  Processes raw FASTQ data through adapter and bad quality removal (fastp), alignment with STAR using ENCODE parameters, gene quantification via multiple methods (STAR and featureCounts), and expression calculation (FPKM with Cufflinks/StringTie, normalized coverage with bedtools). Produces count tables, normalized expression values, and genomic coverage tracks. Supports stranded and unstranded libraries, generating both HTSeq-compatible counts and normalized measures for downstream analysis.",
+        "workflowName": "RNA-Seq Analysis: Single-End Read Processing and Quantification"
+      }
+    ]
+  },
+  {
+    "category": "REGULATION",
+    "description": "Workflows for the analysis of ChIP-seq, ATAC-Seq, and beyond.",
+    "name": "Regulation",
+    "showComingSoon": true,
+    "workflows": [
+      {
+        "iwcId": "atacseq-main",
+        "parameters": [
+          {
+            "key": "reference_genome",
+            "variable": "ASSEMBLY_ID"
+          },
+          {
+            "key": "PE fastq input",
+            "variable": "SANGER_READ_RUN_PAIRED"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": null,
+        "trsId": "#workflow/github.com/iwc-workflows/atacseq/main/versions/v1.0",
+        "workflowDescription": "Complete ATAC-seq analysis pipeline for paired-end reads. Processes raw FASTQ data through adapter and bad quality removal (cutadapt), alignment (Bowtie2 end-to-end), and filtering (removes MT reads, discordant pairs, low mapping quality <30, PCR duplicates). Generates 5' cut site pileups (±100bp), performs peak calling, and quantifies reads in 1kb summit-centered regions. Produces two normalized coverage tracks (per million mapped reads and per million reads in peaks) and fragment length distribution plots for quality assessment.",
+        "workflowName": "ATAC-seq Analysis: Chromatin Accessibility Profiling"
+      },
+      {
+        "iwcId": "chipseq-pe-main",
+        "parameters": [
+          {
+            "key": "reference_genome",
+            "variable": "ASSEMBLY_ID"
+          },
+          {
+            "key": "PE fastq input",
+            "variable": "SANGER_READ_RUN_PAIRED"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": null,
+        "trsId": "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.15",
+        "workflowDescription": "Complete ChIP-seq analysis for paired-end sequencing data. Processes raw FASTQ files through adapter removal (cutadapt), alignment to reference genome (Bowtie2), and stringent quality filtering (MAPQ &gt;= 30, concordant pairs only). Peak calling with MACS2 optimized for paired-end reads identifies protein-DNA binding sites. Generates alignment files, peak calls, and quality metrics for downstream analysis.",
+        "workflowName": "ChIP-seq Analysis: Paired-End Read Processing"
+      },
+      {
+        "iwcId": "chipseq-sr-main",
+        "parameters": [
+          {
+            "key": "reference_genome",
+            "variable": "ASSEMBLY_ID"
+          },
+          {
+            "key": "SR fastq input",
+            "variable": "SANGER_READ_RUN_SINGLE"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": null,
+        "trsId": "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.15",
+        "workflowDescription": "Complete ChIP-seq analysis for single-end sequencing data. Processes raw FASTQ files through adapter removal (cutadapt), alignment to reference genome (Bowtie2), and quality filtering (MAPQ &gt;= 30). Peak calling with MACS2 uses either a fixed extension parameter or built-in model to identify protein-DNA binding sites. Generates alignment files, peak calls, and quality metrics for downstream analysis.",
+        "workflowName": "ChIP-seq Analysis: Single-End Read Processing"
+      },
+      {
+        "iwcId": "consensus-peaks-consensus-peaks-atac-cutandrun",
+        "parameters": [],
+        "ploidy": "ANY",
+        "taxonomyId": null,
+        "trsId": "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.3",
+        "workflowDescription": "Identifies high-confidence consensus peaks from ATAC-seq or CUT&RUN replicate experiments. The workflow calls peaks on individual replicates and identifies their intersection. To control for sequencing depth differences, it subsamples all replicates to the smallest library size, performs peak calling on the combined normalized data, and retains only peaks whose summits overlap with intersections from a user-defined minimum number of replicates.",
+        "workflowName": "Consensus Peak Calling for ATAC-seq and CUT&RUN Replicates"
+      },
+      {
+        "iwcId": "cutandrun-main",
+        "parameters": [
+          {
+            "key": "reference_genome",
+            "variable": "ASSEMBLY_ID"
+          },
+          {
+            "key": "PE fastq input",
+            "variable": "SANGER_READ_RUN_PAIRED"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": null,
+        "trsId": "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.14",
+        "workflowDescription": "Complete CUT&RUN/CUT&TAG analysis workflow for paired-end sequencing data. Processes raw FASTQ files through adapter removal (cutadapt) and alignment (Bowtie2 with dovetail option enabled). Applies quality filtering (MAPQ ≥ 30, concordant pairs only), converts BAM to BED format, and performs peak calling using MACS2 with parameters optimized for the punctate signal profile characteristic of CUT&RUN/CUT&TAG experiments.",
+        "workflowName": "CUT&RUN/CUT&TAG Analysis: Protein-DNA Interaction Mapping"
+      }
+    ]
+  },
+  {
+    "category": "CONSENSUS_SEQUENCES",
+    "description": "Build consensus sequences for related isolates.",
+    "name": "Consensus sequences",
+    "showComingSoon": false,
+    "workflows": [
+      {
+        "iwcId": "generic-non-segmented-viral-variant-calling-main",
+        "parameters": [
+          {
+            "key": "Paired collection of sequencing data",
+            "variable": "SANGER_READ_RUN_PAIRED"
+          },
+          {
+            "key": "Reference annotation",
+            "variable": "GENE_MODEL_URL"
+          },
+          {
+            "key": "Fasta reference genome",
+            "variable": "ASSEMBLY_FASTA_URL"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": "11158",
+        "trsId": "#workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main/versions/v0.1",
+        "workflowDescription": "Variant calling and consensus sequence generation for batches of Illumina PE sequenced viruses with uncomplicated and stable genome structure (like e.g. Morbilliviruses). It can handle both ampliconic and non-ampliconic data.",
+        "workflowName": "Variant calling and consensus construction from paired end short read data of non-segmented viral genomes"
+      },
+      {
+        "iwcId": "pox-virus-amplicon-main",
+        "parameters": [
+          {
+            "key": "Reference FASTA",
+            "variable": "ASSEMBLY_FASTA_URL"
+          }
+        ],
+        "ploidy": "HAPLOID",
+        "taxonomyId": "10244",
+        "trsId": "#workflow/github.com/iwc-workflows/pox-virus-amplicon/main/versions/v0.3",
+        "workflowDescription": "A workflow for the analysis of pox virus genomes sequenced as half-genomes (for ITR resolution) in a tiled-amplicon approach",
+        "workflowName": "Pox Virus Illumina Amplicon Workflow from half-genomes"
+      }
+    ]
+  },
+  {
+    "category": "ANNOTATION",
+    "description": "Workflows for the annotation of genomic data.",
+    "name": "Annotation",
+    "showComingSoon": true,
+    "workflows": [
+      {
+        "iwcId": "amr_gene_detection-main",
+        "parameters": [
+          {
+            "key": "Input sequence fasta",
+            "variable": "ASSEMBLY_FASTA_URL"
+          }
+        ],
+        "ploidy": "HAPLOID",
+        "taxonomyId": "2",
+        "trsId": "#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.5",
+        "workflowDescription": "Antimicrobial resistance gene detection from assembled bacterial genomes",
+        "workflowName": "AMR gene detection"
+      },
+      {
+        "iwcId": "lncrnas-annotation-main",
+        "parameters": [
+          {
+            "key": "Genome assembly",
+            "variable": "ASSEMBLY_FASTA_URL"
+          },
+          {
+            "key": "Genome annotation",
+            "variable": "GENE_MODEL_URL"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": "2759",
+        "trsId": "#workflow/github.com/iwc-workflows/lncRNAs-annotation/main/versions/v0.1",
+        "workflowDescription": "This workflow runs the FEELnc tool to annotate long non-coding RNAs. Before annotating these long non-coding RNAs, StringTie will be used to assemble the RNA-seq alignments into potential trancriptions. The gffread tool provides a genome annotation file in GTF format.",
+        "workflowName": "lncRNAs annotation workflow"
+      }
+    ]
+  },
+  {
+    "category": "ASSEMBLY",
+    "description": "Assemble prokaryotic and eukaryotic genomes sequenced with a variety of technologies.",
+    "name": "Assembly",
+    "showComingSoon": false,
+    "workflows": []
+  },
+  {
+    "category": "GENOME_COMPARISONS",
+    "description": "Workflows for creation of pairwise and multiple genome alignments.",
+    "name": "Genome comparisons",
+    "showComingSoon": true,
+    "workflows": []
+  },
+  {
+    "category": "PROTEIN_FOLDING",
+    "description": "Analysis of protein folding using the ColabFold framework.",
+    "name": "Protein folding",
+    "showComingSoon": true,
+    "workflows": []
+  }
+]

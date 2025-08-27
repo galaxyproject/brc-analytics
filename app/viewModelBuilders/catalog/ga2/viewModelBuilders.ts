@@ -5,6 +5,7 @@ import {
 import { ComponentProps } from "react";
 import * as C from "../../../components";
 import { ROUTES } from "../../../../routes/constants";
+import { sanitizeEntityId } from "../../../apis/catalog/common/utils";
 
 /**
  * Build props for the species cell.
@@ -16,7 +17,7 @@ export const buildOrganismSpecies = (
 ): ComponentProps<typeof C.Link> => {
   return {
     label: entity.species,
-    url: `${ROUTES.ORGANISMS}/${entity.ncbiTaxonomyId}`,
+    url: `${ROUTES.ORGANISMS}/${sanitizeEntityId(entity.ncbiTaxonomyId)}`,
   };
 };
 
@@ -30,7 +31,7 @@ export const buildSpecies = (
 ): ComponentProps<typeof C.Link> => {
   return {
     label: entity.species,
-    url: `${ROUTES.ORGANISMS}/${entity.speciesTaxonomyId}`,
+    url: `${ROUTES.ORGANISMS}/${sanitizeEntityId(entity.speciesTaxonomyId)}`,
   };
 };
 
