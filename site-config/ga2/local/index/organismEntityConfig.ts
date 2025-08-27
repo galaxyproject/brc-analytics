@@ -8,7 +8,7 @@ import { BRCDataCatalogOrganism } from "../../../../app/apis/catalog/brc-analyti
 import { getOrganismId } from "../../../../app/apis/catalog/brc-analytics-catalog/common/utils";
 import * as C from "../../../../app/components";
 import * as V from "../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { BRCEntityConfig } from "../../../common/entities";
+import { AppEntityConfig } from "../../../common/entities";
 import { GA2_CATEGORY_KEY, GA2_CATEGORY_LABEL } from "../../category";
 import { assembliesMainColumn } from "../entity/organism/assembliesMainColumn";
 import { assembliesTop } from "../entity/organism/assembliesTop";
@@ -16,7 +16,7 @@ import { assembliesTop } from "../entity/organism/assembliesTop";
 /**
  * Entity config object responsible to config anything related to the /organisms route.
  */
-export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
+export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
   categoryGroupConfig: {
     categoryGroups: [
       {

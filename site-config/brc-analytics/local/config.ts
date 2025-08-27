@@ -28,7 +28,7 @@ const GIT_HUB_REPO_URL = "https://github.com/galaxyproject/brc-analytics";
  * The `genomeEntityConfig` is typecast to `EntityConfig<BRCDataCatalogGenome>`
  * because the `SiteConfig` interface from the `@databiosphere/findable-ui` package expects
  * an array of entities typed as `EntityConfig`, but we have modified the EntityConfig
- * locally with a custom `BRCEntityConfig` entity. To avoid rewriting
+ * locally with a custom `AppEntityConfig` entity. To avoid rewriting
  * the associated functions and providers across the codebase due to this modification,
  * we perform a type cast here. This allows us to retain compatibility with the existing
  * `SiteConfig` structure while accommodating the modified entity configuration.
