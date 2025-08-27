@@ -7,7 +7,7 @@ import { GA2AssemblyEntity, GA2OrganismEntity } from "./entities";
  * @returns entity ID.
  */
 export function getAssemblyId(entity?: GA2AssemblyEntity): string {
-  return entity?.accession ? sanitizeEntityId(entity.accession) : "";
+  return sanitizeEntityId(entity?.accession);
 }
 
 /**

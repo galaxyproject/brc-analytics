@@ -1,13 +1,13 @@
 import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
-import {
-  BRCDataCatalogGenome,
-  BRCDataCatalogOrganism,
-} from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "../../../app/components";
 import { ROUTES } from "../../../routes/constants";
 import { genomeEntityConfig } from "./index/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organismEntityConfig";
+import {
+  GA2AssemblyEntity,
+  GA2OrganismEntity,
+} from "../../../app/apis/catalog/ga2/entities";
 
 const LOCALHOST = "http://localhost:3000";
 const APP_TITLE = "Genome Ark 2";
@@ -40,8 +40,8 @@ export function makeConfig(
       url: "",
     },
     entities: [
-      organismEntityConfig as EntityConfig<BRCDataCatalogOrganism>,
-      genomeEntityConfig as EntityConfig<BRCDataCatalogGenome>,
+      organismEntityConfig as EntityConfig<GA2OrganismEntity>,
+      genomeEntityConfig as EntityConfig<GA2AssemblyEntity>,
     ],
     gitHubUrl,
     layout: {

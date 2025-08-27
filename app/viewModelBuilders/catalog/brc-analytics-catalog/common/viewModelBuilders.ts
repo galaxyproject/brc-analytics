@@ -25,7 +25,6 @@ import {
   BRC_DATA_CATALOG_CATEGORY_LABEL,
 } from "site-config/brc-analytics/category";
 import {
-  getGenomeId,
   getGenomeOrganismId,
   getOrganismId,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/utils";
@@ -43,33 +42,37 @@ import slugify from "slugify";
 import { SLUGIFY_OPTIONS } from "../../../../common/constants";
 import { LinkProps } from "next/link";
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
+import {
+  GA2AssemblyEntity,
+  GA2OrganismEntity,
+} from "../../../../apis/catalog/ga2/entities";
 
 /**
  * Build props for the accession cell.
- * @param genome - Genome entity.
+ * @param entity - Entity with an accession.
  * @returns Props to be used for the cell.
  */
 export const buildAccession = (
-  genome: BRCDataCatalogGenome
+  entity: BRCDataCatalogGenome | GA2AssemblyEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: genome.accession,
+    value: entity.accession,
   };
 };
 
 /**
  * Build props for the genome analysis cell.
- * @param genome - Genome entity.
+ * @param entity - Entity with an accession, ncbiTaxonomyId, and ucscBrowserUrl.
  * @returns Props to be used for the AnalyzeGenome component.
  */
 export const buildAnalyzeGenome = (
-  genome: BRCDataCatalogGenome
+  entity: BRCDataCatalogGenome | GA2AssemblyEntity
 ): ComponentProps<typeof C.AnalyzeGenome> => {
-  const { accession, ncbiTaxonomyId, ucscBrowserUrl } = genome;
+  const { accession, ncbiTaxonomyId, ucscBrowserUrl } = entity;
   return {
     analyze: {
       label: "Analyze",
-      url: `${ROUTES.GENOMES}/${encodeURIComponent(getGenomeId(genome))}`,
+      url: `${ROUTES.GENOMES}/${encodeURIComponent(accession)}`,
     },
     views: [
       ...(ucscBrowserUrl
@@ -91,14 +94,14 @@ export const buildAnalyzeGenome = (
 
 /**
  * Build props for the annotation status cell.
- * @param genome - Genome entity.
- * @returns Props to be used for the cell.
+ * @param entity - Entity with an annotationStatus property.
+ * @returns Props for the BasicCell component.
  */
 export const buildAnnotationStatus = (
-  genome: BRCDataCatalogGenome
+  entity: BRCDataCatalogGenome | GA2AssemblyEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: genome.annotationStatus,
+    value: entity.annotationStatus,
   };
 };
 
@@ -160,27 +163,27 @@ export const buildAssemblyDetails = (
 
 /**
  * Build props for the assemblies cell.
- * @param organism - Genome entity.
- * @returns Props to be used for the cell.
+ * @param entity - Entity with an assemblyCount property.
+ * @returns Props for the BasicCell component.
  */
 export const buildAssemblyCount = (
-  organism: BRCDataCatalogOrganism
+  entity: BRCDataCatalogOrganism | GA2OrganismEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: formatNumber(organism.assemblyCount),
+    value: formatNumber(entity.assemblyCount),
   };
 };
 
 /**
  * Build props for the chromosomes cell.
- * @param genome - Genome entity.
- * @returns Props to be used for the cell.
+ * @param entity - Entity with a chromosomes property.
+ * @returns Props for the BasicCell component.
  */
 export const buildChromosomes = (
-  genome: BRCDataCatalogGenome
+  entity: BRCDataCatalogGenome | GA2AssemblyEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: formatNumber(genome.chromosomes),
+    value: formatNumber(entity.chromosomes),
   };
 };
 
@@ -199,27 +202,27 @@ export const buildCommonName = (
 
 /**
  * Build props for the coverage cell.
- * @param genome - Genome entity.
- * @returns Props to be used for the cell.
+ * @param entity - Entity with a coverage property.
+ * @returns Props for the BasicCell component.
  */
 export const buildCoverage = (
-  genome: BRCDataCatalogGenome
+  entity: BRCDataCatalogGenome | GA2AssemblyEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: genome.coverage,
+    value: entity.coverage,
   };
 };
 
 /**
  * Build props for the GC% cell.
- * @param genome - Genome entity.
- * @returns Props to be used for the cell.
+ * @param entity - Entity with a gcPercent property.
+ * @returns Props for the BasicCell component.
  */
 export const buildGcPercent = (
-  genome: BRCDataCatalogGenome
+  entity: BRCDataCatalogGenome | GA2AssemblyEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: genome.gcPercent,
+    value: entity.gcPercent,
   };
 };
 
@@ -278,19 +281,19 @@ export const buildGenomeTaxonomicLevelIsolate = (
 
 /**
  * Build props for the "is ref" cell.
- * @param genome - Genome entity.
- * @returns Props to be used for the ChipCell component.
+ * @param entity - Entity with an isRef property.
+ * @returns Props for the ChipCell component.
  */
 export const buildIsRef = (
-  genome: BRCDataCatalogGenome
+  entity: BRCDataCatalogGenome | GA2AssemblyEntity
 ): ComponentProps<typeof C.ChipCell> => {
   return {
     getValue: () => ({
       color:
-        genome.isRef.toLowerCase() === "yes"
+        entity.isRef.toLowerCase() === "yes"
           ? CHIP_PROPS.COLOR.SUCCESS
           : CHIP_PROPS.COLOR.DEFAULT,
-      label: genome.isRef,
+      label: entity.isRef,
       variant: CHIP_PROPS.VARIANT.STATUS,
     }),
   } as ComponentProps<typeof C.ChipCell>;
@@ -298,41 +301,41 @@ export const buildIsRef = (
 
 /**
  * Build props for the length cell.
- * @param genome - Genome entity.
- * @returns Props to be used for the cell.
+ * @param entity - Entity with a length property.
+ * @returns Props for the BasicCell component.
  */
 export const buildLength = (
-  genome: BRCDataCatalogGenome
+  entity: BRCDataCatalogGenome | GA2AssemblyEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: formatNumber(genome.length),
+    value: formatNumber(entity.length),
   };
 };
 
 /**
  * Build props for the level cell.
- * @param genome - Genome entity.
- * @returns Props to be used for the cell.
+ * @param entity - Entity with a level property.
+ * @returns Props for the BasicCell component.
  */
 export const buildLevel = (
-  genome: BRCDataCatalogGenome
+  entity: BRCDataCatalogGenome | GA2AssemblyEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: genome.level,
+    value: entity.level,
   };
 };
 
 /**
  * Build props for the assembly taxonomy IDs cell.
- * @param organism - Organism entity.
- * @returns Props to be used for the cell.
+ * @param entity - Entity with a assemblyTaxonomyIds property.
+ * @returns Props for the NTagCell component.
  */
 export const buildOrganismAssemblyTaxonomyIds = (
-  organism: BRCDataCatalogOrganism
+  entity: BRCDataCatalogOrganism | GA2OrganismEntity
 ): ComponentProps<typeof C.NTagCell> => {
   return {
     label: "taxonomy IDs",
-    values: organism.assemblyTaxonomyIds,
+    values: entity.assemblyTaxonomyIds,
   };
 };
 
@@ -543,11 +546,15 @@ export const buildPriorityPathogenResources = (
 
 /**
  * Build props for the taxonomic group cell.
- * @param entity - Organism or genome entity.
- * @returns Props to be used for the cell.
+ * @param entity - Entity with a taxonomicGroup property.
+ * @returns Props for the NTagCell component.
  */
 export const buildTaxonomicGroup = (
-  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
+  entity:
+    | BRCDataCatalogOrganism
+    | BRCDataCatalogGenome
+    | GA2AssemblyEntity
+    | GA2OrganismEntity
 ): ComponentProps<typeof C.NTagCell> => {
   return {
     label: "taxonomic groups",
@@ -661,53 +668,53 @@ export const buildTaxonomicLevelRealm = (
 
 /**
  * Build props for the scaffold count cell.
- * @param genome - Genome entity.
- * @returns Props to be used for the cell.
+ * @param entity - Entity with a scaffoldCount property.
+ * @returns Props for the BasicCell component.
  */
 export const buildScaffoldCount = (
-  genome: BRCDataCatalogGenome
+  entity: BRCDataCatalogGenome | GA2AssemblyEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: formatNumber(genome.scaffoldCount),
+    value: formatNumber(entity.scaffoldCount),
   };
 };
 
 /**
  * Build props for the scaffold L50 cell.
- * @param genome - Genome entity.
- * @returns Props to be used for the cell.
+ * @param entity - Entity with a scaffoldL50 property.
+ * @returns Props for the BasicCell component.
  */
 export const buildScaffoldL50 = (
-  genome: BRCDataCatalogGenome
+  entity: BRCDataCatalogGenome | GA2AssemblyEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: formatNumber(genome.scaffoldL50),
+    value: formatNumber(entity.scaffoldL50),
   };
 };
 
 /**
  * Build props for the scaffold N50 cell.
- * @param genome - Genome entity.
- * @returns Props to be used for the cell.
+ * @param entity - Entity with a scaffoldN50 property.
+ * @returns Props for the BasicCell component.
  */
 export const buildScaffoldN50 = (
-  genome: BRCDataCatalogGenome
+  entity: BRCDataCatalogGenome | GA2AssemblyEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: formatNumber(genome.scaffoldN50),
+    value: formatNumber(entity.scaffoldN50),
   };
 };
 
 /**
  * Build props for the taxonomy ID cell.
- * @param genome - Genome entity.
- * @returns Props to be used for the cell.
+ * @param entity - Entity with a ncbiTaxonomyId property.
+ * @returns Props for the BasicCell component.
  */
 export const buildTaxonomyId = (
-  genome: BRCDataCatalogOrganism | BRCDataCatalogGenome
+  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome | GA2AssemblyEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: genome.ncbiTaxonomyId,
+    value: entity.ncbiTaxonomyId,
   };
 };
 
