@@ -2,8 +2,8 @@ import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import * as C from "../../../app/components";
 import { ROUTES } from "../../../routes/constants";
-import { genomeEntityConfig } from "./index/genomeEntityConfig";
-import { organismEntityConfig } from "./index/organismEntityConfig";
+import { genomeEntityConfig } from "./index/genome/genomeEntityConfig";
+import { organismEntityConfig } from "./index/organism/organismEntityConfig";
 import {
   GA2AssemblyEntity,
   GA2OrganismEntity,
