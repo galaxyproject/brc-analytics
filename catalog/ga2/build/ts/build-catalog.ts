@@ -1,0 +1,155 @@
+import {
+  GA2AssemblyEntity,
+  GA2OrganismEntity,
+  SRAData,
+} from "../../../../app/apis/catalog/ga2/entities";
+import {
+  defaultStringToNone,
+  incrementValue,
+  parseBoolean,
+  parseList,
+  parseNumber,
+  parseNumberOrNull,
+  parseStringOrNull,
+  readValuesFile,
+  saveJson,
+} from "../../../build/ts/utils";
+import { SOURCE_GENOME_KEYS, SOURCE_RAWDATA_KEYS } from "./constants";
+import { SourceGenome, SourceRawData } from "./entities";
+
+const SOURCE_PATH_GENOMES =
+  "catalog/ga2/build/intermediate/genomes-from-ncbi.tsv";
+
+const SOURCE_PATH_RAWDATA =
+  "catalog/ga2/build/intermediate/primary-data-ncbi.tsv";
+
+buildCatalog();
+
+async function buildCatalog(): Promise<void> {
+  const sraData = await buildSraData();
+  const genomes = await buildAssemblies(sraData);
+  const organisms = buildOrganisms(genomes);
+
+  console.log("Assemblies:", genomes.length);
+  await saveJson("catalog/ga2/output/assemblies.json", genomes);
+
+  console.log("Organisms:", genomes.length);
+  await saveJson("catalog/ga2/output/organisms.json", organisms);
+
+  console.log("Done");
+}
+
+async function buildSraData(): Promise<SRAData[]> {
+  const rawddataRows = await readValuesFile<SourceRawData>(
+    SOURCE_PATH_RAWDATA,
+    undefined,
+    SOURCE_RAWDATA_KEYS
+  );
+  return rawddataRows.map(
+    (row): SRAData => ({
+      accession: row.accession,
+      biosample: row.biosample,
+      instrument: row.instrument,
+      library_layout: row.library_layout,
+      library_source: row.library_source,
+      library_strategy: row.library_strategy,
+      platform: row.platform,
+      run_total_bases: parseNumberOrNull(row.run_total_bases),
+      sra_run_acc: row.sra_run_acc,
+      sra_sample_acc: row.sra_sample_acc,
+      sra_study_acc: row.sra_study_acc,
+      total_bases: parseNumberOrNull(row.total_bases),
+    })
+  );
+}
+
+async function buildAssemblies(
+  sraData: SRAData[]
+): Promise<GA2AssemblyEntity[]> {
+  const sourceRows = await readValuesFile<SourceGenome>(
+    SOURCE_PATH_GENOMES,
+    undefined,
+    SOURCE_GENOME_KEYS
+  );
+
+  const mappedRows = sourceRows.map((row): GA2AssemblyEntity => {
+    const tolIds = parseList(row.tolId);
+    if (tolIds.length > 1)
+      console.log(
+        `Warning: Multiple ToLIDs found for ${row.accession} (${tolIds.join(", ")})`
+      );
+    return {
+      accession: row.accession,
+      annotationStatus: parseStringOrNull(row.annotationStatus),
+      chromosomes: parseNumberOrNull(row.chromosomeCount),
+      coverage: parseStringOrNull(row.coverage),
+      gcPercent: parseNumberOrNull(row.gcPercent),
+      geneModelUrl: parseStringOrNull(row.geneModelUrl),
+      isRef: parseBoolean(row.isRef),
+      length: parseNumber(row.length),
+      level: row.level,
+      lineageTaxonomyIds: parseList(row.lineageTaxonomyIds),
+      ncbiTaxonomyId: row.taxonomyId,
+      scaffoldCount: parseNumberOrNull(row.scaffoldCount),
+      scaffoldL50: parseNumberOrNull(row.scaffoldL50),
+      scaffoldN50: parseNumberOrNull(row.scaffoldN50),
+      speciesTaxonomyId: row.speciesTaxonomyId,
+      sra_data: sraData.filter((rawRow) => rawRow.accession === row.accession),
+      strain: parseStringOrNull(row.strain),
+      taxonomicGroup: parseList(row.taxonomicGroup),
+      taxonomicLevelSpecies: defaultStringToNone(row.taxonomicLevelSpecies),
+      tolId: tolIds[0] ?? null,
+      ucscBrowserUrl: parseStringOrNull(row.ucscBrowser),
+    };
+  });
+  return mappedRows.sort((a, b) => a.accession.localeCompare(b.accession));
+}
+
+function buildOrganisms(genomes: GA2AssemblyEntity[]): GA2OrganismEntity[] {
+  const organismsByTaxonomyId = new Map<string, GA2OrganismEntity>();
+  for (const genome of genomes) {
+    organismsByTaxonomyId.set(
+      genome.speciesTaxonomyId,
+      buildOrganism(organismsByTaxonomyId.get(genome.speciesTaxonomyId), genome)
+    );
+  }
+  return Array.from(organismsByTaxonomyId.values()).sort((a, b) =>
+    a.ncbiTaxonomyId.localeCompare(b.ncbiTaxonomyId)
+  );
+}
+
+function buildOrganism(
+  organism: GA2OrganismEntity | undefined,
+  genome: GA2AssemblyEntity
+): GA2OrganismEntity {
+  return {
+    assemblyCount: incrementValue(organism?.assemblyCount),
+    assemblyTaxonomyIds: Array.from(
+      new Set([...(organism?.assemblyTaxonomyIds ?? []), genome.ncbiTaxonomyId])
+    ),
+    genomes: [...(organism?.genomes ?? []), genome],
+    maxScaffoldN50: getMaxDefined(organism?.maxScaffoldN50, genome.scaffoldN50),
+    ncbiTaxonomyId: genome.speciesTaxonomyId,
+    taxonomicGroup: genome.taxonomicGroup,
+    taxonomicLevelSpecies: genome.taxonomicLevelSpecies,
+    tolId: genome.tolId,
+  };
+}
+
+/**
+ * Get maximum number among two possibly-absent values, or null if both are null or undefined.
+ * @param a - First value.
+ * @param b - Second value.
+ * @returns maximum number, or null.
+ */
+function getMaxDefined(
+  a: number | null | undefined,
+  b: number | null | undefined
+): number | null {
+  if (typeof a === "number") {
+    if (typeof b === "number") return Math.max(a, b);
+    else return a;
+  } else {
+    return b ?? null;
+  }
+}

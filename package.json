@@ -15,6 +15,7 @@
     "prepare": "husky",
     "test": "jest --runInBand",
     "build-brc-db": "esrun catalog/build/ts/build-catalog.ts",
+    "build-ga2-db": "esrun catalog/ga2/build/ts/build-catalog.ts",
     "build-brc-from-ncbi": "python3 -m catalog.build.py.build_files_from_ncbi",
     "build-ga2-from-ncbi": "python3 -m catalog.ga2.build.py.build_files_from_ncbi",
     "update-ga2-assemblies": "python3 -m catalog.ga2.build.py.update_assemblies",

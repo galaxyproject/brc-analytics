@@ -195,6 +195,6 @@ export function parseNumber(value: string): number {
   return n;
 }
 
-export function parseBoolean(value: string): string {
+export function parseBoolean(value: string): "Yes" | "No" {
   return value[0].toLowerCase() === "t" ? "Yes" : "No";
 }
