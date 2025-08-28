@@ -96,6 +96,7 @@ async function buildAssemblies(
       scaffoldN50: parseNumberOrNull(row.scaffoldN50),
       speciesTaxonomyId: row.speciesTaxonomyId,
       sra_data: sraData.filter((rawRow) => rawRow.accession === row.accession),
+      strainName: parseStringOrNull(row.strain),
       taxonomicGroup: parseList(row.taxonomicGroup),
       taxonomicLevelSpecies: defaultStringToNone(row.taxonomicLevelSpecies),
       taxonomicLevelStrain: getSpeciesStrainName(

@@ -17,6 +17,7 @@ export interface GA2AssemblyEntity {
   scaffoldN50: number | null;
   speciesTaxonomyId: string;
   sra_data: SRAData[];
+  strainName: string | null;
   taxonomicGroup: string[];
   taxonomicLevelSpecies: string;
   taxonomicLevelStrain: string;
