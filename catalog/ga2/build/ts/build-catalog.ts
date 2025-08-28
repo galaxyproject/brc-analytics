@@ -5,6 +5,8 @@ import {
 } from "../../../../app/apis/catalog/ga2/entities";
 import {
   defaultStringToNone,
+  getPloidyForAssembly,
+  getSourceOrganismsByTaxonomyId,
   getSpeciesStrainName,
   incrementValue,
   parseBoolean,
@@ -17,6 +19,8 @@ import {
 } from "../../../build/ts/utils";
 import { SOURCE_GENOME_KEYS, SOURCE_RAWDATA_KEYS } from "./constants";
 import { SourceGenome, SourceRawData } from "./entities";
+
+const SOURCE_PATH_ORGANISMS = "catalog/ga2/source/organisms.yml";
 
 const SOURCE_PATH_GENOMES =
   "catalog/ga2/build/intermediate/genomes-from-ncbi.tsv";
@@ -72,14 +76,25 @@ async function buildAssemblies(
     undefined,
     SOURCE_GENOME_KEYS
   );
+  const sourceOrganismsByTaxonomyId = await getSourceOrganismsByTaxonomyId(
+    SOURCE_PATH_ORGANISMS
+  );
 
-  const mappedRows = sourceRows.map((row): GA2AssemblyEntity => {
+  const mappedRows: GA2AssemblyEntity[] = [];
+  for (const row of sourceRows) {
+    const ploidy = getPloidyForAssembly(
+      sourceOrganismsByTaxonomyId,
+      row.speciesTaxonomyId,
+      true,
+      row.accession
+    );
+    if (ploidy === null) continue;
     const tolIds = parseList(row.tolId);
     if (tolIds.length > 1)
       console.log(
         `Warning: Multiple ToLIDs found for ${row.accession} (${tolIds.join(", ")})`
       );
-    return {
+    mappedRows.push({
       accession: row.accession,
       annotationStatus: parseStringOrNull(row.annotationStatus),
       chromosomes: parseNumberOrNull(row.chromosomeCount),
@@ -91,6 +106,7 @@ async function buildAssemblies(
       level: row.level,
       lineageTaxonomyIds: parseList(row.lineageTaxonomyIds),
       ncbiTaxonomyId: row.taxonomyId,
+      ploidy,
       scaffoldCount: parseNumberOrNull(row.scaffoldCount),
       scaffoldL50: parseNumberOrNull(row.scaffoldL50),
       scaffoldN50: parseNumberOrNull(row.scaffoldN50),
@@ -106,8 +122,8 @@ async function buildAssemblies(
       ),
       tolId: tolIds[0] ?? null,
       ucscBrowserUrl: parseStringOrNull(row.ucscBrowser),
-    };
-  });
+    });
+  }
   return mappedRows.sort((a, b) => a.accession.localeCompare(b.accession));
 }
 
