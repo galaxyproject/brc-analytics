@@ -30,9 +30,10 @@ TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
     50557: "Insecta",
 }
 
+# TAXONOMIC_LEVELS_FOR_TREE should be listed in order, as the order is used in building the taxonomy tree;
+# higher-level categories should be listed earlier than lower-level categories
 TAXANOMIC_LEVELS_FOR_TREE = [
     "domain",
-    "realm",
     "kingdom",
     "phylum",
     "class",
