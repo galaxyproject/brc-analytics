@@ -115,10 +115,10 @@ organisms:
     taxonomy_id: 8296
   - ploidy:
       - DIPLOID
-    taxonomy_id: 77932
+    taxonomy_id: 9805
   - ploidy:
       - DIPLOID
-    taxonomy_id: 1914991
+    taxonomy_id: 44397
   - ploidy:
       - DIPLOID
     taxonomy_id: 426098
@@ -190,7 +190,7 @@ organisms:
     taxonomy_id: 8407
   - ploidy:
       - DIPLOID
-    taxonomy_id: 2767082
+    taxonomy_id: 681192
   - ploidy:
       - DIPLOID
     taxonomy_id: 473322
@@ -319,7 +319,7 @@ organisms:
     taxonomy_id: 72105
   - ploidy:
       - DIPLOID
-    taxonomy_id: 100784
+    taxonomy_id: 925459
   - ploidy:
       - DIPLOID
     taxonomy_id: 2857394
@@ -394,7 +394,7 @@ organisms:
     taxonomy_id: 260642
   - ploidy:
       - DIPLOID
-    taxonomy_id: 223781
+    taxonomy_id: 8962
   - ploidy:
       - DIPLOID
     taxonomy_id: 238119
@@ -406,7 +406,7 @@ organisms:
     taxonomy_id: 43566
   - ploidy:
       - DIPLOID
-    taxonomy_id: 152111
+    taxonomy_id: 8036
   - ploidy:
       - DIPLOID
     taxonomy_id: 1047088
@@ -466,7 +466,7 @@ organisms:
     taxonomy_id: 74359
   - ploidy:
       - DIPLOID
-    taxonomy_id: 3111550
+    taxonomy_id: 2707177
   - ploidy:
       - DIPLOID
     taxonomy_id: 57982
@@ -736,9 +736,6 @@ organisms:
     taxonomy_id: 9217
   - ploidy:
       - DIPLOID
-    taxonomy_id: 9218
-  - ploidy:
-      - DIPLOID
     taxonomy_id: 177155
   - ploidy:
       - DIPLOID
@@ -898,7 +895,7 @@ organisms:
     taxonomy_id: 64668
   - ploidy:
       - DIPLOID
-    taxonomy_id: 99487
+    taxonomy_id: 9783
   - ploidy:
       - DIPLOID
     taxonomy_id: 9375
@@ -994,7 +991,7 @@ organisms:
     taxonomy_id: 9470
   - ploidy:
       - DIPLOID
-    taxonomy_id: 2991368
+    taxonomy_id: 8485
   - ploidy:
       - DIPLOID
     taxonomy_id: 9483
@@ -1045,7 +1042,7 @@ organisms:
     taxonomy_id: 9541
   - ploidy:
       - DIPLOID
-    taxonomy_id: 2917703
+    taxonomy_id: 52180
   - ploidy:
       - DIPLOID
     taxonomy_id: 9545
@@ -1063,7 +1060,7 @@ organisms:
     taxonomy_id: 3061075
   - ploidy:
       - DIPLOID
-    taxonomy_id: 372063
+    taxonomy_id: 10042
   - ploidy:
       - DIPLOID
     taxonomy_id: 71010
@@ -1090,7 +1087,7 @@ organisms:
     taxonomy_id: 279927
   - ploidy:
       - DIPLOID
-    taxonomy_id: 9595
+    taxonomy_id: 9593
   - ploidy:
       - DIPLOID
     taxonomy_id: 118141
@@ -1121,9 +1118,6 @@ organisms:
   - ploidy:
       - DIPLOID
     taxonomy_id: 56716
-  - ploidy:
-      - DIPLOID
-    taxonomy_id: 9615
   - ploidy:
       - DIPLOID
     taxonomy_id: 56720
@@ -1369,7 +1363,7 @@ organisms:
     taxonomy_id: 9860
   - ploidy:
       - DIPLOID
-    taxonomy_id: 3030661
+    taxonomy_id: 3030660
   - ploidy:
       - DIPLOID
     taxonomy_id: 3053191
@@ -1456,7 +1450,7 @@ organisms:
     taxonomy_id: 75485
   - ploidy:
       - DIPLOID
-    taxonomy_id: 575201
+    taxonomy_id: 9833
   - ploidy:
       - DIPLOID
     taxonomy_id: 7906
@@ -1657,7 +1651,7 @@ organisms:
     taxonomy_id: 118683
   - ploidy:
       - DIPLOID
-    taxonomy_id: 159646
+    taxonomy_id: 71008
   - ploidy:
       - DIPLOID
     taxonomy_id: 3239838
@@ -1673,9 +1667,6 @@ organisms:
   - ploidy:
       - DIPLOID
     taxonomy_id: 30640
-  - ploidy:
-      - DIPLOID
-    taxonomy_id: 143281
   - ploidy:
       - DIPLOID
     taxonomy_id: 10166
