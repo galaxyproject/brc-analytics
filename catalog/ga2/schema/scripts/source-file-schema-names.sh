@@ -1,3 +1,3 @@
 #!/bin/bash
 
-export SOURCE_FILE_SCHEMA_NAMES=(assemblies)
+export SOURCE_FILE_SCHEMA_NAMES=(assemblies organisms)
