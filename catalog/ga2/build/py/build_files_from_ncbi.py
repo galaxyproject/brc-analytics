@@ -41,6 +41,7 @@ TAXANOMIC_LEVELS_FOR_TREE = [
     "family",
     "genus",
     "species",
+    "strain",
 ]
 
 TOLIDS_BY_TAXONOMY_ID = {

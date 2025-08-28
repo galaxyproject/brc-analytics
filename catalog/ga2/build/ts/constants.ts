@@ -11,6 +11,7 @@ export const SOURCE_GENOME_KEYS = [
   "taxonomicLevelOrder",
   "taxonomicLevelPhylum",
   "taxonomicLevelSpecies",
+  "taxonomicLevelStrain",
   "tolId",
 ] as const;
 

@@ -5,6 +5,7 @@ import {
 } from "../../../../app/apis/catalog/ga2/entities";
 import {
   defaultStringToNone,
+  getSpeciesStrainName,
   incrementValue,
   parseBoolean,
   parseList,
@@ -95,9 +96,13 @@ async function buildAssemblies(
       scaffoldN50: parseNumberOrNull(row.scaffoldN50),
       speciesTaxonomyId: row.speciesTaxonomyId,
       sra_data: sraData.filter((rawRow) => rawRow.accession === row.accession),
-      strain: parseStringOrNull(row.strain),
       taxonomicGroup: parseList(row.taxonomicGroup),
       taxonomicLevelSpecies: defaultStringToNone(row.taxonomicLevelSpecies),
+      taxonomicLevelStrain: getSpeciesStrainName(
+        row.taxonomicLevelSpecies,
+        row.taxonomicLevelStrain,
+        row.strain
+      ),
       tolId: tolIds[0] ?? null,
       ucscBrowserUrl: parseStringOrNull(row.ucscBrowser),
     };
