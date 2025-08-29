@@ -24,7 +24,7 @@
         "ploidy": "ANY",
         "taxonomyId": "11158",
         "trsId": "#workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main/versions/v0.1",
-        "workflowDescription": "Variant calling and consensus sequence generation for batches of Illumina PE sequenced viruses with uncomplicated and stable genome structure (like e.g. Morbilliviruses). It can handle both ampliconic and non-ampliconic data.",
+        "workflowDescription": "Variant calling and consensus sequence generation for batches of Illumina PE sequenced viruses with uncomplicated and stable genome structure (like e.g. Morbilliviruses).",
         "workflowName": "Variant calling and consensus construction from paired end short read data of non-segmented viral genomes"
       },
       {
@@ -323,7 +323,7 @@
         "ploidy": "ANY",
         "taxonomyId": "11158",
         "trsId": "#workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main/versions/v0.1",
-        "workflowDescription": "Variant calling and consensus sequence generation for batches of Illumina PE sequenced viruses with uncomplicated and stable genome structure (like e.g. Morbilliviruses). It can handle both ampliconic and non-ampliconic data.",
+        "workflowDescription": "Variant calling and consensus sequence generation for batches of Illumina PE sequenced viruses with uncomplicated and stable genome structure (like e.g. Morbilliviruses).",
         "workflowName": "Variant calling and consensus construction from paired end short read data of non-segmented viral genomes"
       },
       {
@@ -360,7 +360,7 @@
         "taxonomyId": "2",
         "trsId": "#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.5",
         "workflowDescription": "Antimicrobial resistance gene detection from assembled bacterial genomes",
-        "workflowName": "AMR gene detection"
+        "workflowName": "amr_gene_detection"
       },
       {
         "iwcId": "lncrnas-annotation-main",
