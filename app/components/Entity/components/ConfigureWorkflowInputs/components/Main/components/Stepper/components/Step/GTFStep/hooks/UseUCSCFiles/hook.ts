@@ -3,12 +3,15 @@ import { BRCDataCatalogGenome } from "../../../../../../../../../../../../../api
 import { parseUCSCFilesResult } from "./utils";
 import { UCSC_FILES_ENDPOINT } from "./constants";
 import { UseUCSCFiles } from "./types";
+import { GA2AssemblyEntity } from "../../../../../../../../../../../../../apis/catalog/ga2/entities";
 
 const SPECIAL_CASE_ASSEMBLY_LOOKUP: Record<string, string> = {
   "GCF_000001405.40": "hg38",
 } as const;
 
-export const useUCSCFiles = (genome: BRCDataCatalogGenome): UseUCSCFiles => {
+export const useUCSCFiles = (
+  genome: BRCDataCatalogGenome | GA2AssemblyEntity
+): UseUCSCFiles => {
   const assemblyId =
     SPECIAL_CASE_ASSEMBLY_LOOKUP[genome.accession] ?? genome.accession;
   const [geneModelUrls, setGeneModelUrls] = useState<string[] | undefined>();

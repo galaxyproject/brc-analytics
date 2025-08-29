@@ -6,7 +6,7 @@ import { useFetchEntity } from "@databiosphere/findable-ui/lib/hooks/useFetchEnt
 import { ComponentsConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import Head from "next/head";
 import { Fragment } from "react";
-import { BRCBackPageTabConfig } from "../../../site-config/common/entities";
+import { AppBackPageTabConfig } from "../../../site-config/common/entities";
 
 export interface EntityViewProps<R> {
   data?: R;
@@ -18,7 +18,7 @@ export const EntityDetailView = <R,>(
 ): JSX.Element => {
   const { currentTab } = useCurrentDetailTab();
   const { response } = useFetchEntity(props);
-  const { mainColumn, sideColumn, top } = currentTab as BRCBackPageTabConfig;
+  const { mainColumn, sideColumn, top } = currentTab as AppBackPageTabConfig;
   const title = useEntityHeadTitle(response);
   return (
     <Fragment>

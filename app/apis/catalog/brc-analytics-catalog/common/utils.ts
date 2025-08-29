@@ -1,3 +1,4 @@
+import { sanitizeEntityId } from "../../common/utils";
 import { BRCDataCatalogGenome, BRCDataCatalogOrganism } from "./entities";
 import { ORGANISM_PLOIDY, WORKFLOW_PLOIDY } from "./schema-entities";
 
@@ -21,11 +22,6 @@ export function getOrganismId(organism: BRCDataCatalogOrganism): string {
  */
 export function getGenomeOrganismId(genome: BRCDataCatalogGenome): string {
   return sanitizeEntityId(genome.speciesTaxonomyId);
-}
-
-export function sanitizeEntityId(entityId?: string): string {
-  if (!entityId) return "";
-  return entityId.replace(/\./g, "_");
 }
 
 /**

@@ -1,5 +1,4 @@
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
-import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import {
   BRCDataCatalogGenome,
@@ -13,6 +12,7 @@ import { genomeEntityConfig } from "./index/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organismEntityConfig";
 import { priorityPathogensEntityConfig } from "./index/priorityPathogensEntityConfig";
 import { socialMedia } from "./socialMedia";
+import { AppSiteConfig } from "../../common/entities";
 
 const LOCALHOST = "http://localhost:3000";
 const APP_TITLE = "BRC Analytics";
@@ -27,7 +27,7 @@ const GIT_HUB_REPO_URL = "https://github.com/galaxyproject/brc-analytics";
  * The `genomeEntityConfig` is typecast to `EntityConfig<BRCDataCatalogGenome>`
  * because the `SiteConfig` interface from the `@databiosphere/findable-ui` package expects
  * an array of entities typed as `EntityConfig`, but we have modified the EntityConfig
- * locally with a custom `BRCEntityConfig` entity. To avoid rewriting
+ * locally with a custom `AppEntityConfig` entity. To avoid rewriting
  * the associated functions and providers across the codebase due to this modification,
  * we perform a type cast here. This allows us to retain compatibility with the existing
  * `SiteConfig` structure while accommodating the modified entity configuration.
@@ -37,7 +37,7 @@ const GIT_HUB_REPO_URL = "https://github.com/galaxyproject/brc-analytics";
 export function makeConfig(
   browserUrl: string,
   gitHubUrl = GIT_HUB_REPO_URL
-): SiteConfig {
+): AppSiteConfig {
   return {
     appTitle: APP_TITLE,
     browserURL: browserUrl,
@@ -95,6 +95,6 @@ export function makeConfig(
   };
 }
 
-const config: SiteConfig = makeConfig(BROWSER_URL);
+const config: AppSiteConfig = makeConfig(BROWSER_URL);
 
 export default config;
