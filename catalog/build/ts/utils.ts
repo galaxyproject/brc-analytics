@@ -139,6 +139,24 @@ export function verifyUniqueIds<T>(
   }
 }
 
+/**
+ * Get maximum number among two possibly-absent values, or null if both are null or undefined.
+ * @param a - First value.
+ * @param b - Second value.
+ * @returns maximum number, or null.
+ */
+export function getMaxDefined(
+  a: number | null | undefined,
+  b: number | null | undefined
+): number | null {
+  if (typeof a === "number") {
+    if (typeof b === "number") return Math.max(a, b);
+    else return a;
+  } else {
+    return b ?? null;
+  }
+}
+
 export function incrementValue(value?: number): number {
   return (value ?? 0) + 1;
 }
