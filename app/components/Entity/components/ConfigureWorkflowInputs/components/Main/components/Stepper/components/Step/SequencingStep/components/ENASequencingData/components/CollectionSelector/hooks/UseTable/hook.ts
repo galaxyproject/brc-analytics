@@ -21,6 +21,7 @@ import { SORTING } from "./constants";
 import { getSortedRowModel } from "@tanstack/react-table";
 import { CATEGORY_GROUPS } from "./categoryGroups";
 import { getFacetedMinMaxValues } from "@databiosphere/findable-ui/lib/components/Table/featureOptions/facetedColumn/getFacetedMinMaxValues";
+import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 
 export const useTable = (
   enaQueryMethod: ENA_QUERY_METHOD,
@@ -52,7 +53,11 @@ export const useTable = (
 
   const initialState = { sorting: SORTING };
 
-  const meta = { categoryGroups: CATEGORY_GROUPS, enaQueryMethod };
+  const meta = {
+    categoryGroups: CATEGORY_GROUPS,
+    enaQueryMethod,
+    filterSort: FILTER_SORT.ALPHA,
+  };
 
   const state = { columnFilters: columnFiltersByMethod[enaQueryMethod] };
 
