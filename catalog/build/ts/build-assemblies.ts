@@ -3,18 +3,21 @@ import {
   Outbreak,
 } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { getGenomeId } from "../../../app/apis/catalog/brc-analytics-catalog/common/utils";
-import { Organisms as SourceOrganisms } from "../../schema/generated/schema";
 import { SOURCE_GENOME_KEYS } from "./constants";
 import { SourceGenome } from "./entities";
 import {
   defaultStringToNone,
+  getOutbreakMatchingLineage,
+  getPloidyForAssembly,
+  getSourceOrganismsByTaxonomyId,
+  getSpeciesStrainName,
   parseBoolean,
   parseList,
+  parseListOrNull,
   parseNumber,
   parseNumberOrNull,
   parseStringOrNull,
   readValuesFile,
-  readYamlFile,
   verifyUniqueIds,
 } from "./utils";
 
@@ -29,31 +32,18 @@ export async function buildAssemblies(
     undefined,
     SOURCE_GENOME_KEYS
   );
-  const sourceOrganisms = await readYamlFile<SourceOrganisms>(
+  const sourceOrganismsByTaxonomyId = await getSourceOrganismsByTaxonomyId(
     SOURCE_PATH_ORGANISMS
-  );
-  const sourceOrganismsByTaxonomyId = new Map(
-    sourceOrganisms.organisms.map((sourceOrganism) => [
-      String(sourceOrganism.taxonomy_id),
-      sourceOrganism,
-    ])
   );
   const mappedRows: BRCDataCatalogGenome[] = [];
   for (const row of sourceRows) {
-    const ploidy = sourceOrganismsByTaxonomyId.get(
-      row.speciesTaxonomyId
-    )?.ploidy;
-    if (ploidy === undefined) {
-      console.log(
-        `Skipping assembly ${row.accession} [tax_id: ${row.speciesTaxonomyId}] - ploidy not found`
-      );
-      continue;
-    }
-    const taxonomicLevelStrain =
-      row.taxonomicLevelStrain ||
-      (row.strain
-        ? `${row.taxonomicLevelSpecies} strain ${row.strain}`
-        : "None");
+    const ploidy = getPloidyForAssembly(
+      sourceOrganismsByTaxonomyId,
+      row.speciesTaxonomyId,
+      true,
+      row.accession
+    );
+    if (ploidy === null) continue;
     const lineageTaxonomyIds = parseList(row.lineageTaxonomyIds);
     const outbreak = getOutbreakMatchingLineage(
       outbreaksByTaxonomyId,
@@ -72,7 +62,7 @@ export async function buildAssemblies(
       level: row.level,
       lineageTaxonomyIds,
       ncbiTaxonomyId: row.taxonomyId,
-      otherTaxa: row.otherTaxa ? row.otherTaxa.split(",") : null,
+      otherTaxa: parseListOrNull(row.otherTaxa),
       ploidy,
       priority: outbreak?.priority ?? null,
       priorityPathogenName: outbreak?.name ?? null,
@@ -81,7 +71,7 @@ export async function buildAssemblies(
       scaffoldN50: parseNumberOrNull(row.scaffoldN50),
       speciesTaxonomyId: row.speciesTaxonomyId,
       strainName: parseStringOrNull(row.strain),
-      taxonomicGroup: row.taxonomicGroup ? row.taxonomicGroup.split(",") : [],
+      taxonomicGroup: parseList(row.taxonomicGroup),
       taxonomicLevelClass: defaultStringToNone(row.taxonomicLevelClass),
       taxonomicLevelDomain: defaultStringToNone(row.taxonomicLevelDomain),
       taxonomicLevelFamily: defaultStringToNone(row.taxonomicLevelFamily),
@@ -93,7 +83,11 @@ export async function buildAssemblies(
       taxonomicLevelRealm: defaultStringToNone(row.taxonomicLevelRealm),
       taxonomicLevelSerotype: defaultStringToNone(row.taxonomicLevelSerotype),
       taxonomicLevelSpecies: defaultStringToNone(row.taxonomicLevelSpecies),
-      taxonomicLevelStrain,
+      taxonomicLevelStrain: getSpeciesStrainName(
+        row.taxonomicLevelSpecies,
+        row.taxonomicLevelStrain,
+        row.strain
+      ),
       ucscBrowserUrl: parseStringOrNull(row.ucscBrowser),
     });
   }
@@ -102,21 +96,4 @@ export async function buildAssemblies(
   );
   verifyUniqueIds("assembly", sortedRows, getGenomeId);
   return sortedRows;
-}
-
-/**
- * Get the outbreak associated with the first of the given lineage taxa that has an assocated outbreak, or null if none is found.
- * @param outbreaksByTaxonomyId - Map from taxonomy ID (number) to outbreak.
- * @param lineageTaxonomyIds - Taxonomic lineage (array of taxonomy ID strings).
- * @returns matching outbreak, or null.
- */
-function getOutbreakMatchingLineage(
-  outbreaksByTaxonomyId: Map<number, Outbreak>,
-  lineageTaxonomyIds: string[]
-): Outbreak | null {
-  for (const stringId of lineageTaxonomyIds) {
-    const outbreak = outbreaksByTaxonomyId.get(Number(stringId));
-    if (outbreak !== undefined) return outbreak;
-  }
-  return null;
 }

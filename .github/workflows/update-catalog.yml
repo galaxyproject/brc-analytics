@@ -27,7 +27,7 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
       - name: Run catalog script
-        run: npm run build-files-from-ncbi
+        run: npm run build-brc-from-ncbi
       - name: Get current date
         id: date
         run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
