@@ -1,4 +1,8 @@
 import {
+  getAssemblyId,
+  getOrganismId,
+} from "../../../../app/apis/catalog/ga2/utils";
+import {
   GA2AssemblyEntity,
   GA2OrganismEntity,
   SRAData,
@@ -16,6 +20,7 @@ import {
   parseStringOrNull,
   readValuesFile,
   saveJson,
+  verifyUniqueIds,
 } from "../../../build/ts/utils";
 import { SOURCE_GENOME_KEYS, SOURCE_RAWDATA_KEYS } from "./constants";
 import { SourceGenome, SourceRawData } from "./entities";
@@ -124,7 +129,11 @@ async function buildAssemblies(
       ucscBrowserUrl: parseStringOrNull(row.ucscBrowser),
     });
   }
-  return mappedRows.sort((a, b) => a.accession.localeCompare(b.accession));
+  const sortedRows = mappedRows.sort((a, b) =>
+    a.accession.localeCompare(b.accession)
+  );
+  verifyUniqueIds("assembly", sortedRows, getAssemblyId);
+  return sortedRows;
 }
 
 function buildOrganisms(genomes: GA2AssemblyEntity[]): GA2OrganismEntity[] {
@@ -135,9 +144,11 @@ function buildOrganisms(genomes: GA2AssemblyEntity[]): GA2OrganismEntity[] {
       buildOrganism(organismsByTaxonomyId.get(genome.speciesTaxonomyId), genome)
     );
   }
-  return Array.from(organismsByTaxonomyId.values()).sort((a, b) =>
+  const sortedRows = Array.from(organismsByTaxonomyId.values()).sort((a, b) =>
     a.ncbiTaxonomyId.localeCompare(b.ncbiTaxonomyId)
   );
+  verifyUniqueIds("organism", sortedRows, getOrganismId);
+  return sortedRows;
 }
 
 function buildOrganism(
