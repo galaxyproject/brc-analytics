@@ -44,7 +44,7 @@ async function buildCatalog(): Promise<void> {
   console.log("Assemblies:", genomes.length);
   await saveJson("catalog/ga2/output/assemblies.json", genomes);
 
-  console.log("Organisms:", genomes.length);
+  console.log("Organisms:", organisms.length);
   await saveJson("catalog/ga2/output/organisms.json", organisms);
 
   console.log("Done");
