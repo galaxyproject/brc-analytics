@@ -245,14 +245,14 @@ export const buildGenomeTaxonomicLevelSpecies = (
 
 /**
  * Build props for the strain cell.
- * @param genome - Genome entity.
- * @returns Props to be used for the cell.
+ * @param entity - Entity with a strainName and taxonomicLevelStrain property.
+ * @returns Props to be used for the BasicCell component.
  */
 export const buildGenomeTaxonomicLevelStrain = (
-  genome: BRCDataCatalogGenome
+  entity: BRCDataCatalogGenome | GA2AssemblyEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
-    value: getGenomeStrainText(genome),
+    value: getGenomeStrainText(entity),
   };
 };
 
@@ -1005,7 +1005,7 @@ function getGenomeStrainText(
   entity: BRCDataCatalogGenome | GA2AssemblyEntity,
   defaultValue = ""
 ): string {
-  if ("strainName" in entity && entity.strainName) return entity.strainName;
+  if (entity.strainName) return entity.strainName;
   if (entity.taxonomicLevelStrain !== "None")
     return entity.taxonomicLevelStrain;
   return defaultValue;

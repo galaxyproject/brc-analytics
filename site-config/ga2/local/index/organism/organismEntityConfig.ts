@@ -42,7 +42,7 @@ export const organismEntityConfig: AppEntityConfig<GA2OrganismEntity> = {
         sorting: [
           {
             desc: SORT_DIRECTION.ASCENDING,
-            id: GA2_CATEGORY_KEY.SPECIES,
+            id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
           },
         ],
       },

@@ -32,17 +32,6 @@ export const ASSEMBLY_TAXONOMY_IDS: ColumnConfig<GA2OrganismEntity> = {
   width: { max: "0.65fr", min: "164px" },
 };
 
-export const SPECIES: ColumnConfig<GA2OrganismEntity> = {
-  componentConfig: {
-    component: C.Link,
-    viewBuilder: V.buildOrganismSpecies,
-  } as ComponentConfig<typeof C.Link, GA2OrganismEntity>,
-  header: GA2_CATEGORY_LABEL.SPECIES,
-  id: GA2_CATEGORY_KEY.SPECIES,
-  meta: { columnPinned: true },
-  width: { max: "1fr", min: "auto" },
-};
-
 export const TAXONOMIC_GROUP: ColumnConfig<GA2OrganismEntity> = {
   componentConfig: {
     component: C.NTagCell,
@@ -51,4 +40,15 @@ export const TAXONOMIC_GROUP: ColumnConfig<GA2OrganismEntity> = {
   header: GA2_CATEGORY_LABEL.TAXONOMIC_GROUP,
   id: GA2_CATEGORY_KEY.TAXONOMIC_GROUP,
   width: { max: "0.65fr", min: "164px" },
+};
+
+export const TAXONOMIC_LEVEL_SPECIES: ColumnConfig<GA2OrganismEntity> = {
+  componentConfig: {
+    component: C.Link,
+    viewBuilder: V.buildOrganismSpecies,
+  } as ComponentConfig<typeof C.Link, GA2OrganismEntity>,
+  header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
+  id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
+  meta: { columnPinned: true },
+  width: { max: "1fr", min: "auto" },
 };

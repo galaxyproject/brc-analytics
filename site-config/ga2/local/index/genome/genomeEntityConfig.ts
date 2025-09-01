@@ -43,8 +43,8 @@ export const genomeEntityConfig: AppEntityConfig<GA2AssemblyEntity> = {
     ...entity,
     lineageTaxonomyIds: [entity.ncbiTaxonomyId],
     ploidy: [ORGANISM_PLOIDY.DIPLOID, ORGANISM_PLOIDY.HAPLOID],
-    taxonomicLevelSpecies: entity.species,
-    taxonomicLevelStrain: entity.strain || "",
+    // taxonomicLevelSpecies: entity.species,
+    // taxonomicLevelStrain: entity.strain || "",
   }),
   exploreMode: EXPLORE_MODE.CS_FETCH_CS_FILTERING,
   getId: getAssemblyId,
@@ -57,7 +57,7 @@ export const genomeEntityConfig: AppEntityConfig<GA2AssemblyEntity> = {
         sorting: [
           {
             desc: SORT_DIRECTION.ASCENDING,
-            id: GA2_CATEGORY_KEY.SPECIES,
+            id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
           },
         ],
       },

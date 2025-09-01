@@ -2,6 +2,7 @@ import { ComponentConfig } from "@databiosphere/findable-ui/lib/config/entities"
 import * as C from "../../../../../app/components";
 import {
   buildAccession,
+  buildGenomeTaxonomicLevelStrain,
   buildAnalyzeGenome,
   buildAnnotationStatus,
   buildChromosomes,
@@ -143,26 +144,6 @@ export const SCAFFOLD_N50: ColumnConfig<GA2AssemblyEntity> = {
   width: { max: "0.5fr", min: "120px" },
 };
 
-export const SPECIES: ColumnConfig<GA2AssemblyEntity> = {
-  componentConfig: {
-    component: C.Link,
-    viewBuilder: V.buildSpecies,
-  } as ComponentConfig<typeof C.Link, GA2AssemblyEntity>,
-  header: GA2_CATEGORY_LABEL.SPECIES,
-  id: GA2_CATEGORY_KEY.SPECIES,
-  width: { max: "1fr", min: "200px" },
-};
-
-export const STRAIN: ColumnConfig<GA2AssemblyEntity> = {
-  componentConfig: {
-    component: C.BasicCell,
-    viewBuilder: V.buildStrain,
-  } as ComponentConfig<typeof C.BasicCell, GA2AssemblyEntity>,
-  header: GA2_CATEGORY_LABEL.STRAIN,
-  id: GA2_CATEGORY_KEY.STRAIN,
-  width: { max: "0.5fr", min: "160px" },
-};
-
 export const TAXONOMIC_GROUP: ColumnConfig<GA2AssemblyEntity> = {
   componentConfig: {
     component: C.NTagCell,
@@ -171,6 +152,26 @@ export const TAXONOMIC_GROUP: ColumnConfig<GA2AssemblyEntity> = {
   header: GA2_CATEGORY_LABEL.TAXONOMIC_GROUP,
   id: GA2_CATEGORY_KEY.TAXONOMIC_GROUP,
   width: { max: "0.5fr", min: "142px" },
+};
+
+export const TAXONOMIC_LEVEL_SPECIES: ColumnConfig<GA2AssemblyEntity> = {
+  componentConfig: {
+    component: C.Link,
+    viewBuilder: V.buildTaxonomicLevelSpecies,
+  } as ComponentConfig<typeof C.Link, GA2AssemblyEntity>,
+  header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
+  id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
+  width: { max: "1fr", min: "200px" },
+};
+
+export const TAXONOMIC_LEVEL_STRAIN: ColumnConfig<GA2AssemblyEntity> = {
+  componentConfig: {
+    component: C.BasicCell,
+    viewBuilder: buildGenomeTaxonomicLevelStrain,
+  } as ComponentConfig<typeof C.BasicCell, GA2AssemblyEntity>,
+  header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
+  id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,
+  width: { max: "0.5fr", min: "160px" },
 };
 
 export const TAXONOMY_ID: ColumnConfig<GA2AssemblyEntity> = {

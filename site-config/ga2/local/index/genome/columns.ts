@@ -3,8 +3,8 @@ import { ColumnConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import {
   ANALYZE_GENOME,
   ACCESSION,
-  SPECIES,
-  STRAIN,
+  TAXONOMIC_LEVEL_SPECIES,
+  TAXONOMIC_LEVEL_STRAIN,
   TAXONOMY_ID,
   TAXONOMIC_GROUP,
   IS_REF,
@@ -22,8 +22,8 @@ import {
 export const COLUMNS: ColumnConfig<GA2AssemblyEntity>[] = [
   ANALYZE_GENOME,
   ACCESSION,
-  SPECIES,
-  STRAIN,
+  TAXONOMIC_LEVEL_SPECIES,
+  TAXONOMIC_LEVEL_STRAIN,
   TAXONOMY_ID,
   TAXONOMIC_GROUP,
   IS_REF,

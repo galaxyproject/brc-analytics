@@ -31,19 +31,19 @@ export const LEVEL: CategoryConfig = {
   label: GA2_CATEGORY_LABEL.LEVEL,
 };
 
-export const SPECIES: CategoryConfig = {
-  key: GA2_CATEGORY_KEY.SPECIES,
-  label: GA2_CATEGORY_LABEL.SPECIES,
-};
-
-export const STRAIN: CategoryConfig = {
-  key: GA2_CATEGORY_KEY.STRAIN,
-  label: GA2_CATEGORY_LABEL.STRAIN,
-};
-
 export const TAXONOMIC_GROUP: CategoryConfig = {
   key: GA2_CATEGORY_KEY.TAXONOMIC_GROUP,
   label: GA2_CATEGORY_LABEL.TAXONOMIC_GROUP,
+};
+
+export const TAXONOMIC_LEVEL_SPECIES: CategoryConfig = {
+  key: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
+  label: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
+};
+
+export const TAXONOMIC_LEVEL_STRAIN: CategoryConfig = {
+  key: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,
+  label: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
 };
 
 export const TAXONOMY_ID: CategoryConfig = {

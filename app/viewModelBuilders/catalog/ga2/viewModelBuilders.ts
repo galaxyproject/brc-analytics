@@ -15,6 +15,7 @@ import {
 import { ColumnDef, getSortedRowModel } from "@tanstack/react-table";
 import {
   buildAnalyzeGenome,
+  buildGenomeTaxonomicLevelStrain,
   buildIsRef,
 } from "../brc-analytics-catalog/common/viewModelBuilders";
 
@@ -47,10 +48,10 @@ export const buildOrganismHero = (
   return {
     breadcrumbs: [
       { path: ROUTES.ORGANISMS, text: "Organisms" },
-      { path: "", text: entity.species },
+      { path: "", text: entity.taxonomicLevelSpecies },
       { path: "", text: "Assemblies" },
     ],
-    title: entity.species,
+    title: entity.taxonomicLevelSpecies,
   };
 };
 
@@ -100,8 +101,10 @@ function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
       meta: { columnPinned: true },
     },
     {
-      accessorKey: GA2_CATEGORY_KEY.STRAIN,
-      header: GA2_CATEGORY_LABEL.STRAIN,
+      accessorKey: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,
+      cell: ({ row }) =>
+        C.BasicCell(buildGenomeTaxonomicLevelStrain(row.original)),
+      header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
     },
     {
       accessorKey: GA2_CATEGORY_KEY.TAXONOMY_ID,
@@ -160,7 +163,7 @@ export const buildOrganismSpecies = (
   entity: GA2OrganismEntity
 ): ComponentProps<typeof C.Link> => {
   return {
-    label: entity.species,
+    label: entity.taxonomicLevelSpecies,
     url: `${ROUTES.ORGANISMS}/${sanitizeEntityId(entity.ncbiTaxonomyId)}`,
   };
 };
@@ -170,24 +173,11 @@ export const buildOrganismSpecies = (
  * @param entity - Entity with a species property.
  * @returns Props for the Link component.
  */
-export const buildSpecies = (
+export const buildTaxonomicLevelSpecies = (
   entity: GA2AssemblyEntity
 ): ComponentProps<typeof C.Link> => {
   return {
-    label: entity.species,
+    label: entity.taxonomicLevelSpecies,
     url: `${ROUTES.ORGANISMS}/${sanitizeEntityId(entity.speciesTaxonomyId)}`,
-  };
-};
-
-/**
- * Build props for the strain cell.
- * @param entity - Entity.
- * @returns Props for the BasicCell component.
- */
-export const buildStrain = (
-  entity: GA2AssemblyEntity
-): ComponentProps<typeof C.BasicCell> => {
-  return {
-    value: entity.strain,
   };
 };

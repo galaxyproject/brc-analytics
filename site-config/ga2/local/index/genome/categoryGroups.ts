@@ -4,8 +4,8 @@ import { CATEGORY_REGISTRY } from "../common/category/categoryRegistry";
 export const CATEGORY_GROUPS: CategoryGroup[] = [
   {
     categoryConfigs: [
-      CATEGORY_REGISTRY.SPECIES,
-      CATEGORY_REGISTRY.STRAIN,
+      CATEGORY_REGISTRY.TAXONOMIC_LEVEL_SPECIES,
+      CATEGORY_REGISTRY.TAXONOMIC_LEVEL_STRAIN,
       CATEGORY_REGISTRY.TAXONOMY_ID,
     ],
     label: "Organism",
