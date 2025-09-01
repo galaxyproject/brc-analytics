@@ -59,6 +59,6 @@ export const genomeEntityConfig: AppEntityConfig<GA2AssemblyEntity> = {
     enableDownload: true,
   },
   route: "assemblies",
-  staticLoadFile: "site-config/ga2/local/catalog/genomes.json",
+  staticLoadFile: "catalog/ga2/output/assemblies.json",
   ui: { title: "Assemblies" },
 };

@@ -53,6 +53,6 @@ export const organismEntityConfig: AppEntityConfig<GA2OrganismEntity> = {
     enableDownload: true,
   },
   route: "organisms",
-  staticLoadFile: "site-config/ga2/local/catalog/organisms.json",
+  staticLoadFile: "catalog/ga2/output/organisms.json",
   ui: { title: "Organisms" },
 };
