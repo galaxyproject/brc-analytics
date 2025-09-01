@@ -56,7 +56,7 @@ export const useTable = (
   const meta = {
     categoryGroups: CATEGORY_GROUPS,
     enaQueryMethod,
-    filterSort: FILTER_SORT.ALPHA,
+    filterSort: FILTER_SORT.COUNT,
   };
 
   const state = { columnFilters: columnFiltersByMethod[enaQueryMethod] };
