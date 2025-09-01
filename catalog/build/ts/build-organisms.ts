@@ -3,7 +3,12 @@ import {
   BRCDataCatalogOrganism,
 } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { getOrganismId } from "../../../app/apis/catalog/brc-analytics-catalog/common/utils";
-import { accumulateArrayValue, verifyUniqueIds } from "./utils";
+import {
+  accumulateArrayOrNullValues,
+  accumulateArrayValue,
+  incrementValue,
+  verifyUniqueIds,
+} from "./utils";
 
 export function buildOrganisms(
   genomes: BRCDataCatalogGenome[]
@@ -27,7 +32,7 @@ function buildOrganism(
   genome: BRCDataCatalogGenome
 ): BRCDataCatalogOrganism {
   return {
-    assemblyCount: (organism?.assemblyCount ?? 0) + 1,
+    assemblyCount: incrementValue(organism?.assemblyCount),
     assemblyTaxonomyIds: accumulateArrayValue(
       organism?.assemblyTaxonomyIds,
       genome.ncbiTaxonomyId
@@ -35,9 +40,10 @@ function buildOrganism(
     commonName: genome.commonName,
     genomes: accumulateArrayValue(organism?.genomes, genome),
     ncbiTaxonomyId: genome.speciesTaxonomyId,
-    otherTaxa: genome.otherTaxa
-      ? accumulateArrayValue(organism?.otherTaxa || [], ...genome.otherTaxa)
-      : organism?.otherTaxa || null,
+    otherTaxa: accumulateArrayOrNullValues(
+      organism?.otherTaxa,
+      genome.otherTaxa
+    ),
     priority: organism?.priority ?? genome.priority,
     priorityPathogenName:
       organism?.priorityPathogenName ?? genome.priorityPathogenName,
