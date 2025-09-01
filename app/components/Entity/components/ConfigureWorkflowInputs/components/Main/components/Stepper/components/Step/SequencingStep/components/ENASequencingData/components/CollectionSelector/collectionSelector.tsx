@@ -25,6 +25,7 @@ export const CollectionSelector = ({
         setRowSelection(table.getState().rowSelection);
         if (selectedCount > 0) return;
         preSelectColumnFilters(table, stepKey);
+        table.resetSorting(); // Reset sorting to default.
       }}
       onClose={onClose}
       open={open}
