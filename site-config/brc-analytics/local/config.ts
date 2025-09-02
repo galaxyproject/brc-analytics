@@ -14,6 +14,7 @@ import { priorityPathogensEntityConfig } from "./index/priorityPathogensEntityCo
 import { socialMedia } from "./socialMedia";
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 import { AppSiteConfig } from "../../common/entities";
+import { APP_KEYS } from "../../common/constants";
 
 const LOCALHOST = "http://localhost:3000";
 const APP_TITLE = "BRC Analytics";
@@ -40,6 +41,7 @@ export function makeConfig(
   gitHubUrl = GIT_HUB_REPO_URL
 ): AppSiteConfig {
   return {
+    appKey: APP_KEYS.BRC_ANALYTICS,
     appTitle: APP_TITLE,
     browserURL: browserUrl,
     dataSource: {

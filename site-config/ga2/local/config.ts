@@ -9,6 +9,7 @@ import {
   GA2OrganismEntity,
 } from "../../../app/apis/catalog/ga2/entities";
 import { AppSiteConfig } from "../../common/entities";
+import { APP_KEYS } from "../../common/constants";
 
 const ALLOWED_PATHS = [ROUTES.ORGANISMS, ROUTES.GENOMES];
 const LOCALHOST = "http://localhost:3000";
@@ -37,6 +38,7 @@ export function makeConfig(
 ): AppSiteConfig {
   return {
     allowedPaths: ALLOWED_PATHS,
+    appKey: APP_KEYS.GA2,
     appTitle: APP_TITLE,
     browserURL: browserUrl,
     dataSource: {
@@ -55,7 +57,7 @@ export function makeConfig(
         logo: C.Logo({
           alt: APP_TITLE,
           height: 26,
-          link: ROUTES.ORGANISMS,
+          link: "/",
           src: "/logo/galaxy.png",
         }),
         navigation: [
