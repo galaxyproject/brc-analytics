@@ -1925,10 +1925,7 @@ organisms:
   - taxonomy_id: 3426299
     ploidy:
       - HAPLOID
-  - taxonomy_id: 11036
-    ploidy:
-      - HAPLOID
-  - taxonomy_id: 11039
+  - taxonomy_id: 3426323
     ploidy:
       - HAPLOID
   - taxonomy_id: 11292
@@ -4917,5 +4914,8 @@ organisms:
     ploidy:
       - DIPLOID
   - taxonomy_id: 1245
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 3426322
     ploidy:
       - HAPLOID

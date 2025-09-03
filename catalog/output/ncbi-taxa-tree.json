@@ -1,5 +1,5 @@
 {
-    "assembly_count": 1986,
+    "assembly_count": 1967,
     "children": [
         {
             "assembly_count": 379,
@@ -4809,7 +4809,7 @@
             "rank": "domain"
         },
         {
-            "assembly_count": 977,
+            "assembly_count": 958,
             "children": [
                 {
                     "assembly_count": 370,
@@ -9547,7 +9547,7 @@
                                     "assembly_count": 4,
                                     "children": [
                                         {
-                                            "assembly_count": 3,
+                                            "assembly_count": 1,
                                             "children": [
                                                 {
                                                     "assembly_count": 1,
@@ -9562,13 +9562,6 @@
                                                     ],
                                                     "name": "Enterocytozoon bieneusi",
                                                     "ncbi_tax_id": "31281",
-                                                    "rank": "species"
-                                                },
-                                                {
-                                                    "assembly_count": 2,
-                                                    "children": [],
-                                                    "name": "Enterocytozoon hepatopenaei",
-                                                    "ncbi_tax_id": "646526",
                                                     "rank": "species"
                                                 }
                                             ],
@@ -9589,6 +9582,21 @@
                                             ],
                                             "name": "Enterospora",
                                             "ncbi_tax_id": "1081670",
+                                            "rank": "genus"
+                                        },
+                                        {
+                                            "assembly_count": 2,
+                                            "children": [
+                                                {
+                                                    "assembly_count": 2,
+                                                    "children": [],
+                                                    "name": "Ecytonucleospora hepatopenaei",
+                                                    "ncbi_tax_id": "646526",
+                                                    "rank": "species"
+                                                }
+                                            ],
+                                            "name": "Ecytonucleospora",
+                                            "ncbi_tax_id": "3078583",
                                             "rank": "genus"
                                         }
                                     ],
@@ -10529,6 +10537,314 @@
                     "assembly_count": 26,
                     "children": [
                         {
+                            "assembly_count": 21,
+                            "children": [
+                                {
+                                    "assembly_count": 13,
+                                    "children": [
+                                        {
+                                            "assembly_count": 13,
+                                            "children": [
+                                                {
+                                                    "assembly_count": 1,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [],
+                                                            "name": "Bremia lactucae",
+                                                            "ncbi_tax_id": "4779",
+                                                            "rank": "species"
+                                                        }
+                                                    ],
+                                                    "name": "Bremia",
+                                                    "ncbi_tax_id": "4778",
+                                                    "rank": "genus"
+                                                },
+                                                {
+                                                    "assembly_count": 10,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [],
+                                                            "name": "Phytophthora capsici",
+                                                            "ncbi_tax_id": "4784",
+                                                            "rank": "species"
+                                                        },
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [],
+                                                            "name": "Phytophthora cinnamomi",
+                                                            "ncbi_tax_id": "4785",
+                                                            "rank": "species"
+                                                        },
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Phytophthora infestans T30-4",
+                                                                    "ncbi_tax_id": "403677",
+                                                                    "rank": "strain"
+                                                                }
+                                                            ],
+                                                            "name": "Phytophthora infestans",
+                                                            "ncbi_tax_id": "4787",
+                                                            "rank": "species"
+                                                        },
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Phytophthora nicotianae INRA-310",
+                                                                    "ncbi_tax_id": "761204",
+                                                                    "rank": "strain"
+                                                                }
+                                                            ],
+                                                            "name": "Phytophthora nicotianae",
+                                                            "ncbi_tax_id": "4792",
+                                                            "rank": "species"
+                                                        },
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [],
+                                                            "name": "Phytophthora palmivora",
+                                                            "ncbi_tax_id": "4796",
+                                                            "rank": "species"
+                                                        },
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [],
+                                                            "name": "Phytophthora cactorum",
+                                                            "ncbi_tax_id": "29920",
+                                                            "rank": "species"
+                                                        },
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [],
+                                                            "name": "Phytophthora sojae",
+                                                            "ncbi_tax_id": "67593",
+                                                            "rank": "species"
+                                                        },
+                                                        {
+                                                            "assembly_count": 2,
+                                                            "children": [],
+                                                            "name": "Phytophthora ramorum",
+                                                            "ncbi_tax_id": "164328",
+                                                            "rank": "species"
+                                                        },
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [],
+                                                            "name": "Phytophthora plurivora",
+                                                            "ncbi_tax_id": "639000",
+                                                            "rank": "species"
+                                                        }
+                                                    ],
+                                                    "name": "Phytophthora",
+                                                    "ncbi_tax_id": "4783",
+                                                    "rank": "genus"
+                                                },
+                                                {
+                                                    "assembly_count": 1,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [],
+                                                            "name": "Peronospora effusa",
+                                                            "ncbi_tax_id": "542832",
+                                                            "rank": "species"
+                                                        }
+                                                    ],
+                                                    "name": "Peronospora",
+                                                    "ncbi_tax_id": "70742",
+                                                    "rank": "genus"
+                                                },
+                                                {
+                                                    "assembly_count": 1,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Hyaloperonospora arabidopsidis Emoy2",
+                                                                    "ncbi_tax_id": "559515",
+                                                                    "rank": "strain"
+                                                                }
+                                                            ],
+                                                            "name": "Hyaloperonospora arabidopsidis",
+                                                            "ncbi_tax_id": "272952",
+                                                            "rank": "species"
+                                                        }
+                                                    ],
+                                                    "name": "Hyaloperonospora",
+                                                    "ncbi_tax_id": "184462",
+                                                    "rank": "genus"
+                                                }
+                                            ],
+                                            "name": "Peronosporaceae",
+                                            "ncbi_tax_id": "4777",
+                                            "rank": "family"
+                                        }
+                                    ],
+                                    "name": "Peronosporales",
+                                    "ncbi_tax_id": "4776",
+                                    "rank": "order"
+                                },
+                                {
+                                    "assembly_count": 8,
+                                    "children": [
+                                        {
+                                            "assembly_count": 8,
+                                            "children": [
+                                                {
+                                                    "assembly_count": 3,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Pythium aphanidermatum DAOM BR444",
+                                                                    "ncbi_tax_id": "1223555",
+                                                                    "rank": "strain"
+                                                                }
+                                                            ],
+                                                            "name": "Pythium aphanidermatum",
+                                                            "ncbi_tax_id": "65070",
+                                                            "rank": "species"
+                                                        },
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Pythium arrhenomanes ATCC 12531",
+                                                                    "ncbi_tax_id": "1223556",
+                                                                    "rank": "strain"
+                                                                }
+                                                            ],
+                                                            "name": "Pythium arrhenomanes",
+                                                            "ncbi_tax_id": "82932",
+                                                            "rank": "species"
+                                                        },
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [],
+                                                            "name": "Pythium insidiosum",
+                                                            "ncbi_tax_id": "114742",
+                                                            "rank": "species"
+                                                        }
+                                                    ],
+                                                    "name": "Pythium",
+                                                    "ncbi_tax_id": "4797",
+                                                    "rank": "genus"
+                                                },
+                                                {
+                                                    "assembly_count": 1,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Phytopythium vexans DAOM BR484",
+                                                                    "ncbi_tax_id": "1223560",
+                                                                    "rank": "strain"
+                                                                }
+                                                            ],
+                                                            "name": "Phytopythium vexans",
+                                                            "ncbi_tax_id": "907947",
+                                                            "rank": "species"
+                                                        }
+                                                    ],
+                                                    "name": "Phytopythium",
+                                                    "ncbi_tax_id": "795339",
+                                                    "rank": "genus"
+                                                },
+                                                {
+                                                    "assembly_count": 4,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Globisporangium irregulare DAOM BR486",
+                                                                    "ncbi_tax_id": "1223557",
+                                                                    "rank": "strain"
+                                                                }
+                                                            ],
+                                                            "name": "Globisporangium irregulare",
+                                                            "ncbi_tax_id": "36331",
+                                                            "rank": "species"
+                                                        },
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Globisporangium iwayamae DAOM BR242034",
+                                                                    "ncbi_tax_id": "1223558",
+                                                                    "rank": "strain"
+                                                                }
+                                                            ],
+                                                            "name": "Globisporangium iwayamae",
+                                                            "ncbi_tax_id": "115417",
+                                                            "rank": "species"
+                                                        },
+                                                        {
+                                                            "assembly_count": 2,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Globisporangium ultimum DAOM BR144",
+                                                                    "ncbi_tax_id": "431595",
+                                                                    "rank": "strain"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Globisporangium ultimum var. sporangiiferum BR650",
+                                                                    "ncbi_tax_id": "1223559",
+                                                                    "rank": "strain"
+                                                                }
+                                                            ],
+                                                            "name": "Globisporangium ultimum",
+                                                            "ncbi_tax_id": "2052682",
+                                                            "rank": "species"
+                                                        }
+                                                    ],
+                                                    "name": "Globisporangium",
+                                                    "ncbi_tax_id": "1448052",
+                                                    "rank": "genus"
+                                                }
+                                            ],
+                                            "name": "Pythiaceae",
+                                            "ncbi_tax_id": "4782",
+                                            "rank": "family"
+                                        }
+                                    ],
+                                    "name": "Pythiales",
+                                    "ncbi_tax_id": "121069",
+                                    "rank": "order"
+                                }
+                            ],
+                            "name": "Peronosporomycetes",
+                            "ncbi_tax_id": "3418804",
+                            "rank": "class"
+                        },
+                        {
                             "assembly_count": 5,
                             "children": [
                                 {
@@ -10538,378 +10854,94 @@
                                             "assembly_count": 2,
                                             "children": [
                                                 {
-                                                    "assembly_count": 1,
+                                                    "assembly_count": 2,
                                                     "children": [
                                                         {
                                                             "assembly_count": 1,
-                                                            "children": [],
-                                                            "name": "Saprolegnia parasitica CBS 223.65",
-                                                            "ncbi_tax_id": "695850",
-                                                            "rank": "strain"
-                                                        }
-                                                    ],
-                                                    "name": "Saprolegnia parasitica",
-                                                    "ncbi_tax_id": "101203",
-                                                    "rank": "species"
-                                                },
-                                                {
-                                                    "assembly_count": 1,
-                                                    "children": [
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Saprolegnia parasitica CBS 223.65",
+                                                                    "ncbi_tax_id": "695850",
+                                                                    "rank": "strain"
+                                                                }
+                                                            ],
+                                                            "name": "Saprolegnia parasitica",
+                                                            "ncbi_tax_id": "101203",
+                                                            "rank": "species"
+                                                        },
                                                         {
                                                             "assembly_count": 1,
-                                                            "children": [],
-                                                            "name": "Saprolegnia diclina VS20",
-                                                            "ncbi_tax_id": "1156394",
-                                                            "rank": "strain"
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Saprolegnia diclina VS20",
+                                                                    "ncbi_tax_id": "1156394",
+                                                                    "rank": "strain"
+                                                                }
+                                                            ],
+                                                            "name": "Saprolegnia diclina",
+                                                            "ncbi_tax_id": "112098",
+                                                            "rank": "species"
                                                         }
                                                     ],
-                                                    "name": "Saprolegnia diclina",
-                                                    "ncbi_tax_id": "112098",
-                                                    "rank": "species"
+                                                    "name": "Saprolegnia",
+                                                    "ncbi_tax_id": "4769",
+                                                    "rank": "genus"
                                                 }
                                             ],
-                                            "name": "Saprolegnia",
-                                            "ncbi_tax_id": "4769",
-                                            "rank": "genus"
+                                            "name": "Saprolegniaceae",
+                                            "ncbi_tax_id": "4764",
+                                            "rank": "family"
                                         },
                                         {
                                             "assembly_count": 3,
                                             "children": [
                                                 {
-                                                    "assembly_count": 1,
-                                                    "children": [],
-                                                    "name": "Aphanomyces euteiches",
-                                                    "ncbi_tax_id": "100861",
-                                                    "rank": "species"
-                                                },
-                                                {
-                                                    "assembly_count": 1,
-                                                    "children": [],
-                                                    "name": "Aphanomyces astaci",
-                                                    "ncbi_tax_id": "112090",
-                                                    "rank": "species"
-                                                },
-                                                {
-                                                    "assembly_count": 1,
-                                                    "children": [],
-                                                    "name": "Aphanomyces invadans",
-                                                    "ncbi_tax_id": "157072",
-                                                    "rank": "species"
-                                                }
-                                            ],
-                                            "name": "Aphanomyces",
-                                            "ncbi_tax_id": "100860",
-                                            "rank": "genus"
-                                        }
-                                    ],
-                                    "name": "Saprolegniaceae",
-                                    "ncbi_tax_id": "4764",
-                                    "rank": "family"
-                                }
-                            ],
-                            "name": "Saprolegniales",
-                            "ncbi_tax_id": "4763",
-                            "rank": "order"
-                        },
-                        {
-                            "assembly_count": 13,
-                            "children": [
-                                {
-                                    "assembly_count": 13,
-                                    "children": [
-                                        {
-                                            "assembly_count": 1,
-                                            "children": [
-                                                {
-                                                    "assembly_count": 1,
-                                                    "children": [],
-                                                    "name": "Bremia lactucae",
-                                                    "ncbi_tax_id": "4779",
-                                                    "rank": "species"
-                                                }
-                                            ],
-                                            "name": "Bremia",
-                                            "ncbi_tax_id": "4778",
-                                            "rank": "genus"
-                                        },
-                                        {
-                                            "assembly_count": 10,
-                                            "children": [
-                                                {
-                                                    "assembly_count": 1,
-                                                    "children": [],
-                                                    "name": "Phytophthora capsici",
-                                                    "ncbi_tax_id": "4784",
-                                                    "rank": "species"
-                                                },
-                                                {
-                                                    "assembly_count": 1,
-                                                    "children": [],
-                                                    "name": "Phytophthora cinnamomi",
-                                                    "ncbi_tax_id": "4785",
-                                                    "rank": "species"
-                                                },
-                                                {
-                                                    "assembly_count": 1,
+                                                    "assembly_count": 3,
                                                     "children": [
                                                         {
                                                             "assembly_count": 1,
                                                             "children": [],
-                                                            "name": "Phytophthora infestans T30-4",
-                                                            "ncbi_tax_id": "403677",
-                                                            "rank": "strain"
-                                                        }
-                                                    ],
-                                                    "name": "Phytophthora infestans",
-                                                    "ncbi_tax_id": "4787",
-                                                    "rank": "species"
-                                                },
-                                                {
-                                                    "assembly_count": 1,
-                                                    "children": [
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [],
-                                                            "name": "Phytophthora nicotianae INRA-310",
-                                                            "ncbi_tax_id": "761204",
-                                                            "rank": "strain"
-                                                        }
-                                                    ],
-                                                    "name": "Phytophthora nicotianae",
-                                                    "ncbi_tax_id": "4792",
-                                                    "rank": "species"
-                                                },
-                                                {
-                                                    "assembly_count": 1,
-                                                    "children": [],
-                                                    "name": "Phytophthora palmivora",
-                                                    "ncbi_tax_id": "4796",
-                                                    "rank": "species"
-                                                },
-                                                {
-                                                    "assembly_count": 1,
-                                                    "children": [],
-                                                    "name": "Phytophthora cactorum",
-                                                    "ncbi_tax_id": "29920",
-                                                    "rank": "species"
-                                                },
-                                                {
-                                                    "assembly_count": 1,
-                                                    "children": [],
-                                                    "name": "Phytophthora sojae",
-                                                    "ncbi_tax_id": "67593",
-                                                    "rank": "species"
-                                                },
-                                                {
-                                                    "assembly_count": 2,
-                                                    "children": [],
-                                                    "name": "Phytophthora ramorum",
-                                                    "ncbi_tax_id": "164328",
-                                                    "rank": "species"
-                                                },
-                                                {
-                                                    "assembly_count": 1,
-                                                    "children": [],
-                                                    "name": "Phytophthora plurivora",
-                                                    "ncbi_tax_id": "639000",
-                                                    "rank": "species"
-                                                }
-                                            ],
-                                            "name": "Phytophthora",
-                                            "ncbi_tax_id": "4783",
-                                            "rank": "genus"
-                                        },
-                                        {
-                                            "assembly_count": 1,
-                                            "children": [
-                                                {
-                                                    "assembly_count": 1,
-                                                    "children": [],
-                                                    "name": "Peronospora effusa",
-                                                    "ncbi_tax_id": "542832",
-                                                    "rank": "species"
-                                                }
-                                            ],
-                                            "name": "Peronospora",
-                                            "ncbi_tax_id": "70742",
-                                            "rank": "genus"
-                                        },
-                                        {
-                                            "assembly_count": 1,
-                                            "children": [
-                                                {
-                                                    "assembly_count": 1,
-                                                    "children": [
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [],
-                                                            "name": "Hyaloperonospora arabidopsidis Emoy2",
-                                                            "ncbi_tax_id": "559515",
-                                                            "rank": "strain"
-                                                        }
-                                                    ],
-                                                    "name": "Hyaloperonospora arabidopsidis",
-                                                    "ncbi_tax_id": "272952",
-                                                    "rank": "species"
-                                                }
-                                            ],
-                                            "name": "Hyaloperonospora",
-                                            "ncbi_tax_id": "184462",
-                                            "rank": "genus"
-                                        }
-                                    ],
-                                    "name": "Peronosporaceae",
-                                    "ncbi_tax_id": "4777",
-                                    "rank": "family"
-                                }
-                            ],
-                            "name": "Peronosporales",
-                            "ncbi_tax_id": "4776",
-                            "rank": "order"
-                        },
-                        {
-                            "assembly_count": 8,
-                            "children": [
-                                {
-                                    "assembly_count": 8,
-                                    "children": [
-                                        {
-                                            "assembly_count": 3,
-                                            "children": [
-                                                {
-                                                    "assembly_count": 1,
-                                                    "children": [
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [],
-                                                            "name": "Pythium aphanidermatum DAOM BR444",
-                                                            "ncbi_tax_id": "1223555",
-                                                            "rank": "strain"
-                                                        }
-                                                    ],
-                                                    "name": "Pythium aphanidermatum",
-                                                    "ncbi_tax_id": "65070",
-                                                    "rank": "species"
-                                                },
-                                                {
-                                                    "assembly_count": 1,
-                                                    "children": [
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [],
-                                                            "name": "Pythium arrhenomanes ATCC 12531",
-                                                            "ncbi_tax_id": "1223556",
-                                                            "rank": "strain"
-                                                        }
-                                                    ],
-                                                    "name": "Pythium arrhenomanes",
-                                                    "ncbi_tax_id": "82932",
-                                                    "rank": "species"
-                                                },
-                                                {
-                                                    "assembly_count": 1,
-                                                    "children": [],
-                                                    "name": "Pythium insidiosum",
-                                                    "ncbi_tax_id": "114742",
-                                                    "rank": "species"
-                                                }
-                                            ],
-                                            "name": "Pythium",
-                                            "ncbi_tax_id": "4797",
-                                            "rank": "genus"
-                                        },
-                                        {
-                                            "assembly_count": 1,
-                                            "children": [
-                                                {
-                                                    "assembly_count": 1,
-                                                    "children": [
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [],
-                                                            "name": "Phytopythium vexans DAOM BR484",
-                                                            "ncbi_tax_id": "1223560",
-                                                            "rank": "strain"
-                                                        }
-                                                    ],
-                                                    "name": "Phytopythium vexans",
-                                                    "ncbi_tax_id": "907947",
-                                                    "rank": "species"
-                                                }
-                                            ],
-                                            "name": "Phytopythium",
-                                            "ncbi_tax_id": "795339",
-                                            "rank": "genus"
-                                        },
-                                        {
-                                            "assembly_count": 4,
-                                            "children": [
-                                                {
-                                                    "assembly_count": 1,
-                                                    "children": [
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [],
-                                                            "name": "Globisporangium irregulare DAOM BR486",
-                                                            "ncbi_tax_id": "1223557",
-                                                            "rank": "strain"
-                                                        }
-                                                    ],
-                                                    "name": "Globisporangium irregulare",
-                                                    "ncbi_tax_id": "36331",
-                                                    "rank": "species"
-                                                },
-                                                {
-                                                    "assembly_count": 1,
-                                                    "children": [
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [],
-                                                            "name": "Globisporangium iwayamae DAOM BR242034",
-                                                            "ncbi_tax_id": "1223558",
-                                                            "rank": "strain"
-                                                        }
-                                                    ],
-                                                    "name": "Globisporangium iwayamae",
-                                                    "ncbi_tax_id": "115417",
-                                                    "rank": "species"
-                                                },
-                                                {
-                                                    "assembly_count": 2,
-                                                    "children": [
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [],
-                                                            "name": "Globisporangium ultimum DAOM BR144",
-                                                            "ncbi_tax_id": "431595",
-                                                            "rank": "strain"
+                                                            "name": "Aphanomyces euteiches",
+                                                            "ncbi_tax_id": "100861",
+                                                            "rank": "species"
                                                         },
                                                         {
                                                             "assembly_count": 1,
                                                             "children": [],
-                                                            "name": "Globisporangium ultimum var. sporangiiferum BR650",
-                                                            "ncbi_tax_id": "1223559",
-                                                            "rank": "strain"
+                                                            "name": "Aphanomyces astaci",
+                                                            "ncbi_tax_id": "112090",
+                                                            "rank": "species"
+                                                        },
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [],
+                                                            "name": "Aphanomyces invadans",
+                                                            "ncbi_tax_id": "157072",
+                                                            "rank": "species"
                                                         }
                                                     ],
-                                                    "name": "Globisporangium ultimum",
-                                                    "ncbi_tax_id": "2052682",
-                                                    "rank": "species"
+                                                    "name": "Aphanomyces",
+                                                    "ncbi_tax_id": "100860",
+                                                    "rank": "genus"
                                                 }
                                             ],
-                                            "name": "Globisporangium",
-                                            "ncbi_tax_id": "1448052",
-                                            "rank": "genus"
+                                            "name": "Verrucalvaceae",
+                                            "ncbi_tax_id": "120409",
+                                            "rank": "family"
                                         }
                                     ],
-                                    "name": "Pythiaceae",
-                                    "ncbi_tax_id": "4782",
-                                    "rank": "family"
+                                    "name": "Saprolegniales",
+                                    "ncbi_tax_id": "4763",
+                                    "rank": "order"
                                 }
                             ],
-                            "name": "Pythiales",
-                            "ncbi_tax_id": "121069",
-                            "rank": "order"
+                            "name": "Saprolegniomycetes",
+                            "ncbi_tax_id": "3456997",
+                            "rank": "class"
                         }
                     ],
                     "name": "Oomycota",
@@ -12042,35 +12074,28 @@
                     "rank": "phylum"
                 },
                 {
-                    "assembly_count": 289,
+                    "assembly_count": 270,
                     "children": [
                         {
-                            "assembly_count": 48,
+                            "assembly_count": 42,
                             "children": [
                                 {
-                                    "assembly_count": 22,
+                                    "assembly_count": 18,
                                     "children": [
                                         {
-                                            "assembly_count": 8,
+                                            "assembly_count": 7,
                                             "children": [
                                                 {
-                                                    "assembly_count": 8,
+                                                    "assembly_count": 7,
                                                     "children": [
                                                         {
-                                                            "assembly_count": 8,
+                                                            "assembly_count": 7,
                                                             "children": [
                                                                 {
                                                                     "assembly_count": 3,
                                                                     "children": [],
                                                                     "name": "Schistosoma japonicum",
                                                                     "ncbi_tax_id": "6182",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Schistosoma mansoni",
-                                                                    "ncbi_tax_id": "6183",
                                                                     "rank": "species"
                                                                 },
                                                                 {
@@ -12170,13 +12195,13 @@
                                             "rank": "order"
                                         },
                                         {
-                                            "assembly_count": 11,
+                                            "assembly_count": 8,
                                             "children": [
                                                 {
-                                                    "assembly_count": 4,
+                                                    "assembly_count": 2,
                                                     "children": [
                                                         {
-                                                            "assembly_count": 3,
+                                                            "assembly_count": 2,
                                                             "children": [
                                                                 {
                                                                     "assembly_count": 2,
@@ -12184,32 +12209,10 @@
                                                                     "name": "Fasciola hepatica",
                                                                     "ncbi_tax_id": "6192",
                                                                     "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Fasciola gigantica",
-                                                                    "ncbi_tax_id": "46835",
-                                                                    "rank": "species"
                                                                 }
                                                             ],
                                                             "name": "Fasciola",
                                                             "ncbi_tax_id": "6191",
-                                                            "rank": "genus"
-                                                        },
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Fasciolopsis buskii",
-                                                                    "ncbi_tax_id": "27845",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Fasciolopsis",
-                                                            "ncbi_tax_id": "27844",
                                                             "rank": "genus"
                                                         }
                                                     ],
@@ -12218,10 +12221,10 @@
                                                     "rank": "family"
                                                 },
                                                 {
-                                                    "assembly_count": 5,
+                                                    "assembly_count": 4,
                                                     "children": [
                                                         {
-                                                            "assembly_count": 5,
+                                                            "assembly_count": 4,
                                                             "children": [
                                                                 {
                                                                     "assembly_count": 2,
@@ -12235,13 +12238,6 @@
                                                                     "children": [],
                                                                     "name": "Paragonimus skrjabini miyazakii",
                                                                     "ncbi_tax_id": "59628",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Paragonimus heterotremus",
-                                                                    "ncbi_tax_id": "100268",
                                                                     "rank": "species"
                                                                 },
                                                                 {
@@ -12318,13 +12314,13 @@
                                     "rank": "class"
                                 },
                                 {
-                                    "assembly_count": 20,
+                                    "assembly_count": 18,
                                     "children": [
                                         {
-                                            "assembly_count": 17,
+                                            "assembly_count": 16,
                                             "children": [
                                                 {
-                                                    "assembly_count": 12,
+                                                    "assembly_count": 11,
                                                     "children": [
                                                         {
                                                             "assembly_count": 5,
@@ -12363,10 +12359,10 @@
                                                             "rank": "genus"
                                                         },
                                                         {
-                                                            "assembly_count": 6,
+                                                            "assembly_count": 5,
                                                             "children": [
                                                                 {
-                                                                    "assembly_count": 3,
+                                                                    "assembly_count": 2,
                                                                     "children": [],
                                                                     "name": "Echinococcus granulosus",
                                                                     "ncbi_tax_id": "6210",
@@ -12492,26 +12488,11 @@
                                             "rank": "order"
                                         },
                                         {
-                                            "assembly_count": 3,
+                                            "assembly_count": 2,
                                             "children": [
                                                 {
-                                                    "assembly_count": 3,
+                                                    "assembly_count": 2,
                                                     "children": [
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Spirometra erinaceieuropaei",
-                                                                    "ncbi_tax_id": "99802",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Spirometra",
-                                                            "ncbi_tax_id": "46580",
-                                                            "rank": "genus"
-                                                        },
                                                         {
                                                             "assembly_count": 1,
                                                             "children": [
@@ -12710,7 +12691,7 @@
                             "rank": "phylum"
                         },
                         {
-                            "assembly_count": 142,
+                            "assembly_count": 129,
                             "children": [
                                 {
                                     "assembly_count": 10,
@@ -12865,16 +12846,16 @@
                                     "rank": "class"
                                 },
                                 {
-                                    "assembly_count": 132,
+                                    "assembly_count": 119,
                                     "children": [
                                         {
-                                            "assembly_count": 130,
+                                            "assembly_count": 117,
                                             "children": [
                                                 {
-                                                    "assembly_count": 29,
+                                                    "assembly_count": 27,
                                                     "children": [
                                                         {
-                                                            "assembly_count": 23,
+                                                            "assembly_count": 22,
                                                             "children": [
                                                                 {
                                                                     "assembly_count": 2,
@@ -12895,13 +12876,6 @@
                                                                     "children": [],
                                                                     "name": "Caenorhabditis remanei",
                                                                     "ncbi_tax_id": "31234",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Caenorhabditis brenneri",
-                                                                    "ncbi_tax_id": "135651",
                                                                     "rank": "species"
                                                                 },
                                                                 {
@@ -13022,10 +12996,10 @@
                                                             "rank": "genus"
                                                         },
                                                         {
-                                                            "assembly_count": 2,
+                                                            "assembly_count": 1,
                                                             "children": [
                                                                 {
-                                                                    "assembly_count": 2,
+                                                                    "assembly_count": 1,
                                                                     "children": [],
                                                                     "name": "Oscheius tipulae",
                                                                     "ncbi_tax_id": "141969",
@@ -13094,13 +13068,13 @@
                                                     "rank": "family"
                                                 },
                                                 {
-                                                    "assembly_count": 6,
+                                                    "assembly_count": 2,
                                                     "children": [
                                                         {
-                                                            "assembly_count": 5,
+                                                            "assembly_count": 2,
                                                             "children": [
                                                                 {
-                                                                    "assembly_count": 2,
+                                                                    "assembly_count": 1,
                                                                     "children": [],
                                                                     "name": "Strongyloides stercoralis",
                                                                     "ncbi_tax_id": "6248",
@@ -13112,39 +13086,10 @@
                                                                     "name": "Strongyloides ratti",
                                                                     "ncbi_tax_id": "34506",
                                                                     "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Strongyloides venezuelensis",
-                                                                    "ncbi_tax_id": "75913",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Strongyloides papillosus",
-                                                                    "ncbi_tax_id": "174720",
-                                                                    "rank": "species"
                                                                 }
                                                             ],
                                                             "name": "Strongyloides",
                                                             "ncbi_tax_id": "6247",
-                                                            "rank": "genus"
-                                                        },
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Parastrongyloides trichosuri",
-                                                                    "ncbi_tax_id": "131310",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Parastrongyloides",
-                                                            "ncbi_tax_id": "131309",
                                                             "rank": "genus"
                                                         }
                                                     ],
@@ -13631,13 +13576,13 @@
                                                     "rank": "family"
                                                 },
                                                 {
-                                                    "assembly_count": 2,
+                                                    "assembly_count": 1,
                                                     "children": [
                                                         {
-                                                            "assembly_count": 2,
+                                                            "assembly_count": 1,
                                                             "children": [
                                                                 {
-                                                                    "assembly_count": 2,
+                                                                    "assembly_count": 1,
                                                                     "children": [],
                                                                     "name": "Toxocara canis",
                                                                     "ncbi_tax_id": "6265",
@@ -13654,23 +13599,16 @@
                                                     "rank": "family"
                                                 },
                                                 {
-                                                    "assembly_count": 6,
+                                                    "assembly_count": 5,
                                                     "children": [
                                                         {
-                                                            "assembly_count": 4,
+                                                            "assembly_count": 3,
                                                             "children": [
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
                                                                     "name": "Ancylostoma caninum",
                                                                     "ncbi_tax_id": "29170",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Ancylostoma duodenale",
-                                                                    "ncbi_tax_id": "51022",
                                                                     "rank": "species"
                                                                 },
                                                                 {
@@ -13774,7 +13712,7 @@
                                                     "rank": "family"
                                                 },
                                                 {
-                                                    "assembly_count": 2,
+                                                    "assembly_count": 1,
                                                     "children": [
                                                         {
                                                             "assembly_count": 1,
@@ -13789,21 +13727,6 @@
                                                             ],
                                                             "name": "Parapristionchus",
                                                             "ncbi_tax_id": "1187979",
-                                                            "rank": "genus"
-                                                        },
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Allodiplogaster sudhausi",
-                                                                    "ncbi_tax_id": "2761625",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Allodiplogaster",
-                                                            "ncbi_tax_id": "1615864",
                                                             "rank": "genus"
                                                         }
                                                     ],
@@ -14037,36 +13960,13 @@
                                                     "rank": "family"
                                                 },
                                                 {
-                                                    "assembly_count": 1,
+                                                    "assembly_count": 2,
                                                     "children": [
                                                         {
-                                                            "assembly_count": 1,
+                                                            "assembly_count": 2,
                                                             "children": [
                                                                 {
                                                                     "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Rhabditophanes sp. KR3021",
-                                                                    "ncbi_tax_id": "114890",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Rhabditophanes",
-                                                            "ncbi_tax_id": "114889",
-                                                            "rank": "genus"
-                                                        }
-                                                    ],
-                                                    "name": "Alloionematidae",
-                                                    "ncbi_tax_id": "114888",
-                                                    "rank": "family"
-                                                },
-                                                {
-                                                    "assembly_count": 3,
-                                                    "children": [
-                                                        {
-                                                            "assembly_count": 3,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 2,
                                                                     "children": [],
                                                                     "name": "Ditylenchus destructor",
                                                                     "ncbi_tax_id": "166010",
@@ -14090,13 +13990,13 @@
                                                     "rank": "family"
                                                 },
                                                 {
-                                                    "assembly_count": 4,
+                                                    "assembly_count": 3,
                                                     "children": [
                                                         {
-                                                            "assembly_count": 2,
+                                                            "assembly_count": 1,
                                                             "children": [
                                                                 {
-                                                                    "assembly_count": 2,
+                                                                    "assembly_count": 1,
                                                                     "children": [],
                                                                     "name": "Heligmosomoides polygyrus",
                                                                     "ncbi_tax_id": "6339",
@@ -14151,10 +14051,10 @@
                                                     "rank": "family"
                                                 },
                                                 {
-                                                    "assembly_count": 7,
+                                                    "assembly_count": 6,
                                                     "children": [
                                                         {
-                                                            "assembly_count": 7,
+                                                            "assembly_count": 6,
                                                             "children": [
                                                                 {
                                                                     "assembly_count": 1,
@@ -14164,7 +14064,7 @@
                                                                     "rank": "species"
                                                                 },
                                                                 {
-                                                                    "assembly_count": 2,
+                                                                    "assembly_count": 1,
                                                                     "children": [],
                                                                     "name": "Meloidogyne arenaria",
                                                                     "ncbi_tax_id": "6304",
@@ -15161,28 +15061,20 @@
                                                     "children": [
                                                         {
                                                             "assembly_count": 1,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Pediculus humanus",
-                                                                    "ncbi_tax_id": "121225",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Pediculus",
-                                                            "ncbi_tax_id": "121222",
-                                                            "rank": "genus"
+                                                            "children": [],
+                                                            "name": "Pediculus humanus",
+                                                            "ncbi_tax_id": "121225",
+                                                            "rank": "species"
                                                         }
                                                     ],
-                                                    "name": "Pediculidae",
-                                                    "ncbi_tax_id": "121221",
-                                                    "rank": "family"
+                                                    "name": "Pediculus",
+                                                    "ncbi_tax_id": "121222",
+                                                    "rank": "genus"
                                                 }
                                             ],
-                                            "name": "Phthiraptera",
-                                            "ncbi_tax_id": "85819",
-                                            "rank": "order"
+                                            "name": "Pediculidae",
+                                            "ncbi_tax_id": "121221",
+                                            "rank": "family"
                                         }
                                     ],
                                     "name": "Insecta",
@@ -18877,22 +18769,15 @@
                                                         {
                                                             "assembly_count": 1,
                                                             "children": [],
-                                                            "name": "Calicivirus chicken/V0021/Bayern/2004",
-                                                            "ncbi_tax_id": "889389",
-                                                            "rank": "species"
-                                                        },
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [],
                                                             "name": "Goose calicivirus",
                                                             "ncbi_tax_id": "1493858",
                                                             "rank": "species"
                                                         },
                                                         {
-                                                            "assembly_count": 1,
+                                                            "assembly_count": 2,
                                                             "children": [
                                                                 {
-                                                                    "assembly_count": 1,
+                                                                    "assembly_count": 2,
                                                                     "children": [],
                                                                     "name": "Bavovirus bavariaense",
                                                                     "ncbi_tax_id": "3426654",
@@ -20503,7 +20388,7 @@
                                                                         {
                                                                             "assembly_count": 1,
                                                                             "children": [],
-                                                                            "name": "Human papillomavirus type 49",
+                                                                            "name": "human papillomavirus 49",
                                                                             "ncbi_tax_id": "10616",
                                                                             "rank": "serotype"
                                                                         }
@@ -20518,7 +20403,7 @@
                                                                         {
                                                                             "assembly_count": 1,
                                                                             "children": [],
-                                                                            "name": "Human papillomavirus type 92",
+                                                                            "name": "Human papillomavirus 92",
                                                                             "ncbi_tax_id": "211787",
                                                                             "rank": "serotype"
                                                                         }
@@ -20533,7 +20418,7 @@
                                                                         {
                                                                             "assembly_count": 1,
                                                                             "children": [],
-                                                                            "name": "Human papillomavirus type 96",
+                                                                            "name": "human papillomavirus 96",
                                                                             "ncbi_tax_id": "247269",
                                                                             "rank": "serotype"
                                                                         }

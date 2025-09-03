@@ -3343,7 +3343,7 @@ assemblies:
   - accession: GCA_900618435.1
   # organism: Schistosoma mansoni
   # project: PRJEA36577
-  - accession: GCA_000237925.2
+  #- accession: GCA_000237925.2
   # organism: Caenorhabditis tropicalis
   # project: PRJNA53597
   - accession: GCA_000186765.1
@@ -3382,7 +3382,7 @@ assemblies:
   - accession: GCA_003604175.2
   # organism: Ancylostoma duodenale
   # project: PRJNA72581
-  - accession: GCA_000816745.1
+  #- accession: GCA_000816745.1
   # organism: Auanema sp. JU1783
   # project: PRJEB51845
   - accession: GCA_943334845.2
@@ -3391,7 +3391,7 @@ assemblies:
   - accession: GCA_009193035.1
   # organism: Fasciola gigantica
   # project: PRJNA230515
-  - accession: GCA_006461475.1
+  #- accession: GCA_006461475.1
   # organism: Dibothriocephalus latus
   # project: PRJEB1206
   - accession: GCA_900617775.1
@@ -3421,7 +3421,7 @@ assemblies:
   - accession: GCA_019055375.1
   # organism: Allodiplogaster sudhausi
   # project: PRJEB48369
-  - accession: GCA_945643635.2
+  #- accession: GCA_945643635.2
   # organism: Caenorhabditis bovis
   # project: PRJEB34497
   - accession: GCA_902829315.1
@@ -3526,10 +3526,10 @@ assemblies:
   - accession: GCA_900618005.1
   # organism: Fasciolopsis buskii
   # project: PRJNA284521
-  - accession: GCA_008360955.1
+  #- accession: GCA_008360955.1
   # organism: Meloidogyne arenaria
   # project: PRJNA340324
-  - accession: GCA_003693565.1
+  #- accession: GCA_003693565.1
   # organism: Strongyloides stercoralis
   # project: PRJNA930454
   - accession: GCA_029582065.1
@@ -3562,13 +3562,13 @@ assemblies:
   - accession: GCA_000505645.1
   # organism: Caenorhabditis brenneri
   # project: PRJNA20035
-  - accession: GCA_000143925.2
+  #- accession: GCA_000143925.2
   # organism: Diploscapter pachys
   # project: PRJNA280107
   - accession: GCA_002287525.1
   # organism: Toxocara canis
   # project: PRJEB533
-  - accession: GCA_900622545.1
+  #- accession: GCA_900622545.1
   # organism: Rodentolepis nana
   # project: PRJEB508
   - accession: GCA_900617975.1
@@ -3622,7 +3622,7 @@ assemblies:
   - accession: GCA_000341325.1
   # organism: Parastrongyloides trichosuri
   # project: PRJEB515
-  - accession: GCA_000941615.1
+  #- accession: GCA_000941615.1
   # organism: Trichinella spiralis
   # project: PRJNA12603
   - accession: GCF_000181795.1
@@ -3643,7 +3643,7 @@ assemblies:
   - accession: GCA_900096555.1
   # organism: Strongyloides papillosus
   # project: PRJEB525
-  - accession: GCA_000936265.1
+  #- accession: GCA_000936265.1
   # organism: Macrostomum lignano
   # project: PRJNA284736
   - accession: GCA_001188465.1
@@ -3685,7 +3685,7 @@ assemblies:
   - accession: GCA_020449115.1
   # organism: Strongyloides venezuelensis
   # project: PRJEB530
-  - accession: GCA_001028725.1
+  #- accession: GCA_001028725.1
   # organism: Taenia saginata
   # project: PRJNA71493
   - accession: GCA_001693075.2
@@ -3700,7 +3700,7 @@ assemblies:
   - accession: GCA_001555675.1
   # organism: Strongyloides stercoralis
   # project: PRJEB528
-  - accession: GCA_000947215.1
+  #- accession: GCA_000947215.1
   # organism: Ancylostoma caninum
   # project: PRJNA72585
   - accession: GCA_003336725.1
@@ -3715,7 +3715,7 @@ assemblies:
   - accession: GCA_025215515.1
   # organism: Spirometra erinaceieuropaei
   # project: PRJEB1202
-  - accession: GCA_000951995.1
+  #- accession: GCA_000951995.1
   # organism: Caenorhabditis remanei
   # project: PRJNA577507
   - accession: GCA_010183535.1
@@ -3778,7 +3778,7 @@ assemblies:
   - accession: GCA_000757705.1
   # organism: Echinococcus granulosus
   # project: PRJEB121
-  - accession: GCA_000469785.1
+  #- accession: GCA_000469785.1
   # organism: Heterodera schachtii
   # project: PRJNA522950
   - accession: GCA_023374025.1
@@ -3805,7 +3805,7 @@ assemblies:
   - accession: GCA_001693035.2
   # organism: Heligmosomoides polygyrus
   # project: PRJEB1203
-  - accession: GCA_900618505.1
+  #- accession: GCA_900618505.1
   # organism: Globodera pallida
   # project: PRJNA702104
   - accession: GCA_023343765.1
@@ -3835,7 +3835,7 @@ assemblies:
   - accession: GCA_000402015.1
   # organism: Ditylenchus destructor
   # project: PRJNA800207
-  - accession: GCA_022814885.1
+  #- accession: GCA_022814885.1
   # organism: Bursaphelenchus okinawaensis
   # project: PRJEB40023
   - accession: GCA_904066225.2
@@ -3862,19 +3862,19 @@ assemblies:
   - accession: GCA_900536315.3
   # organism: Paragonimus heterotremus
   # project: PRJNA284523
-  - accession: GCA_013368495.1
+  #- accession: GCA_013368495.1
   # organism: Steinernema feltiae
   # project: PRJNA353610
   - accession: GCA_007213375.1
   # organism: Oscheius tipulae
   # project: PRJEB15512
-  - accession: GCA_900184235.1
+  #- accession: GCA_900184235.1
   # organism: Echinococcus granulosus
   # project: PRJNA754835
   - accession: GCA_021556725.1
   # organism: Rhabditophanes sp. KR3021
   # project: PRJEB1297
-  - accession: GCA_000944355.1
+  #- accession: GCA_000944355.1
   # organism: Brugia timori
   # project: PRJEB4663
   - accession: GCA_900618025.1
