@@ -13,6 +13,7 @@ import { genomeEntityConfig } from "./index/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organismEntityConfig";
 import { priorityPathogensEntityConfig } from "./index/priorityPathogensEntityConfig";
 import { socialMedia } from "./socialMedia";
+import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 
 const LOCALHOST = "http://localhost:3000";
 const APP_TITLE = "BRC Analytics";
@@ -49,6 +50,7 @@ export function makeConfig(
       genomeEntityConfig as EntityConfig<BRCDataCatalogGenome>,
       priorityPathogensEntityConfig as EntityConfig<Outbreak>,
     ],
+    filterSort: { sortBy: FILTER_SORT.ALPHA },
     gitHubUrl,
     layout: {
       floating,

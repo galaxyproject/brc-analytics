@@ -6,6 +6,28 @@
     "showComingSoon": true,
     "workflows": [
       {
+        "iwcId": "generic-non-segmented-viral-variant-calling-main",
+        "parameters": [
+          {
+            "key": "Paired collection of sequencing data",
+            "variable": "SANGER_READ_RUN_PAIRED"
+          },
+          {
+            "key": "Reference annotation",
+            "variable": "GENE_MODEL_URL"
+          },
+          {
+            "key": "Fasta reference genome",
+            "variable": "ASSEMBLY_FASTA_URL"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": "11158",
+        "trsId": "#workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main/versions/v0.1",
+        "workflowDescription": "Variant calling and consensus sequence generation for batches of Illumina PE sequenced viruses with uncomplicated and stable genome structure (like e.g. Morbilliviruses). It can handle both ampliconic and non-ampliconic data.",
+        "workflowName": "Variant calling and consensus construction from paired end short read data of non-segmented viral genomes"
+      },
+      {
         "iwcId": "haploid-variant-calling-wgs-pe-main",
         "parameters": [
           {
@@ -115,7 +137,7 @@
         ],
         "ploidy": "ANY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.3",
+        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.2",
         "workflowDescription": "Comprehensive preprocessing for 10X Genomics CellPlex multiplexed single-cell RNA-seq data. Processes Cell Multiplexing Oligo (CMO) FASTQ files with CITE-seq-Count including required CellPlex-specific translation steps. Simultaneously processes gene expression FASTQ files with STARsolo and DropletUtils for alignment and cell filtering, and formats outputs for seamless import into Seurat/Scanpy (Read10X function).",
         "workflowName": "Single-Cell RNA-seq Preprocessing: 10X Genomics CellPlex Multiplexed Samples"
       },
@@ -137,7 +159,7 @@
         ],
         "ploidy": "ANY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.3",
+        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.2",
         "workflowDescription": "Complete preprocessing pipeline for 10X Genomics v3 single-cell RNA-seq data. Aligns raw FASTQ files using STARsolo, performs cell calling and quality filtering with DropletUtils, and formats outputs for seamless import into Seurat/Scanpy (Read10X function).",
         "workflowName": "Single-Cell RNA-seq Preprocessing: 10X Genomics v3 to Seurat and Scanpy Compatible Format"
       },
@@ -282,6 +304,28 @@
     "name": "Consensus sequences",
     "showComingSoon": false,
     "workflows": [
+      {
+        "iwcId": "generic-non-segmented-viral-variant-calling-main",
+        "parameters": [
+          {
+            "key": "Paired collection of sequencing data",
+            "variable": "SANGER_READ_RUN_PAIRED"
+          },
+          {
+            "key": "Reference annotation",
+            "variable": "GENE_MODEL_URL"
+          },
+          {
+            "key": "Fasta reference genome",
+            "variable": "ASSEMBLY_FASTA_URL"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": "11158",
+        "trsId": "#workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main/versions/v0.1",
+        "workflowDescription": "Variant calling and consensus sequence generation for batches of Illumina PE sequenced viruses with uncomplicated and stable genome structure (like e.g. Morbilliviruses). It can handle both ampliconic and non-ampliconic data.",
+        "workflowName": "Variant calling and consensus construction from paired end short read data of non-segmented viral genomes"
+      },
       {
         "iwcId": "pox-virus-amplicon-main",
         "parameters": [

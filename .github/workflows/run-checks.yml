@@ -37,6 +37,9 @@ jobs:
       - name: Test LinkML Python generation
         # Generate Python code from the main LinkML schemas, discarding the output; this will catch more subtle errors such as references to nonexistent elements.
         run: npm run test-gen-python
-      - name: Validate catalog files
+      - name: Validate BRC catalog files
         # Validate the catalog source files against their corresponding LinkML schemas.
-        run: npm run validate-catalog
+        run: npm run validate-brc-catalog
+      - name: Validate GA2 catalog files
+        # Validate the GA2 catalog source files.
+        run: npm run validate-ga2-catalog
