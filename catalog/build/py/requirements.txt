@@ -39,6 +39,7 @@ pandas==2.2.2
 parse==1.20.2
 pluggy==1.5.0
 ply==3.11
+poetry==2.1.4
 prefixcommons==0.1.12
 prefixmaps==0.2.6
 pydantic==2.10.6
