@@ -3321,3 +3321,866 @@ assemblies:
   # Phlebovirus
   - accession: GCF_001019855.1
   - accession: GCA_031497085.1
+  # WormBase ParaSite assemblies
+  # Generated from https://parasite.wormbase.org/species.html
+  # organism: Caenorhabditis remanei
+  # project: PRJNA248911
+  - accession: GCA_002259225.3
+  # organism: Teladorsagia circumcincta
+  # project: PRJNA72569
+  - accession: GCA_002352805.1
+  # organism: Echinostoma caproni
+  # project: PRJEB1207
+  - accession: GCA_900618425.1
+  # organism: Paragonimus westermani
+  # project: PRJNA219632
+  - accession: GCA_015252655.1
+  # organism: Opisthorchis felineus
+  # project: PRJNA413383
+  - accession: GCA_004794785.1
+  # organism: Schistocephalus solidus
+  # project: PRJEB527
+  - accession: GCA_900618435.1
+  # organism: Schistosoma mansoni
+  # project: PRJEA36577
+  #- accession: GCA_000237925.2
+  # organism: Caenorhabditis tropicalis
+  # project: PRJNA53597
+  - accession: GCA_000186765.1
+  # organism: Litomosoides sigmodontis
+  # project: PRJEB3075
+  - accession: GCA_900537275.1
+  # organism: Angiostrongylus cantonensis
+  # project: PRJNA350391
+  - accession: GCA_009735665.1
+  # organism: Caenorhabditis remanei
+  # project: PRJNA248909
+  - accession: GCA_001643735.4
+  # organism: Haemonchus contortus
+  # project: PRJEB506
+  - accession: GCA_000469685.2
+  # organism: Schistosoma haematobium
+  # project: PRJNA78265
+  - accession: GCF_000699445.3
+  # organism: Caenorhabditis sp. 31 LS-2015
+  # project: PRJEB12600
+  - accession: GCA_900536295.3
+  # organism: Dracunculus medinensis
+  # project: PRJEB500
+  - accession: GCA_900625125.1
+  # organism: Steinernema glaseri
+  # project: PRJNA204943
+  - accession: GCA_000757755.1
+  # organism: Trichuris trichiura
+  # project: PRJEB535
+  - accession: GCA_000613005.1
+  # organism: Schistosoma margrebowiei
+  # project: PRJEB44434
+  - accession: GCA_944470205.2
+  # organism: Clonorchis sinensis
+  # project: PRJNA386618
+  - accession: GCA_003604175.2
+  # organism: Ancylostoma duodenale
+  # project: PRJNA72581
+  #- accession: GCA_000816745.1
+  # organism: Auanema sp. JU1783
+  # project: PRJEB51845
+  - accession: GCA_943334845.2
+  # organism: Halicephalobus mephisto
+  # project: PRJNA528747
+  - accession: GCA_009193035.1
+  # organism: Fasciola gigantica
+  # project: PRJNA230515
+  #- accession: GCA_006461475.1
+  # organism: Dibothriocephalus latus
+  # project: PRJEB1206
+  - accession: GCA_900617775.1
+  # organism: Plectus sambesii
+  # project: PRJNA390260
+  - accession: GCA_002796945.1
+  # organism: Caenorhabditis nigoni
+  # project: PRJNA384657
+  - accession: GCA_002742825.1
+  # organism: Dirofilaria immitis
+  # project: PRJEB1797
+  - accession: GCA_001077395.1
+  # organism: Steinernema scapterisci
+  # project: PRJNA204942
+  - accession: GCA_000757745.1
+  # organism: Atriophallophorus winterbourni
+  # project: PRJNA636673
+  - accession: GCA_013407085.1
+  # organism: Caenorhabditis sp. 32 LS-2015
+  # project: PRJEB12601
+  - accession: GCA_900536325.3
+  # organism: Paragonimus westermani
+  # project: PRJNA454344
+  - accession: GCA_008508345.1
+  # organism: Parelaphostrongylus tenuis
+  # project: PRJNA729714
+  - accession: GCA_019055375.1
+  # organism: Allodiplogaster sudhausi
+  # project: PRJEB48369
+  #- accession: GCA_945643635.2
+  # organism: Caenorhabditis bovis
+  # project: PRJEB34497
+  - accession: GCA_902829315.1
+  # organism: Cylicostephanus goldi
+  # project: PRJEB498
+  - accession: GCA_900617965.1
+  # organism: Schmidtea mediterranea
+  # project: PRJNA12585
+  - accession: GCA_000181075.1
+  # organism: Nippostrongylus brasiliensis
+  # project: PRJEB511
+  - accession: GCA_900618405.1
+  # organism: Hymenolepis diminuta
+  # project: PRJEB30942
+  - accession: GCA_902177915.1
+  # organism: Onchocerca flexuosa
+  # project: PRJNA230512
+  - accession: GCA_002249935.1
+  # organism: Dirofilaria immitis
+  # project: PRJNA723804
+  - accession: GCA_024305405.1
+  # organism: Haemonchus placei
+  # project: PRJEB509
+  - accession: GCA_900617895.1
+  # organism: Epsilonema sp. ZAB3_2
+  # project: PRJNA953805
+  - accession: GCA_030247985.1
+  # organism: Fasciola hepatica
+  # project: PRJNA179522
+  - accession: GCA_002763495.2
+  # organism: Trichinella nativa
+  # project: PRJNA179527
+  - accession: GCA_002148645.1
+  # organism: Paragonimus kellicotti
+  # project: PRJNA179523
+  - accession: GCA_014220965.1
+  # organism: Pristionchus arcanus
+  # project: PRJEB27334
+  - accession: GCA_900490705.1
+  # organism: Caenorhabditis briggsae
+  # project: PRJNA10731
+  - accession: GCF_000004555.2
+  # organism: Onchocerca volvulus
+  # project: PRJEB513
+  - accession: GCA_000499405.2
+  # organism: Panagrolaimus sp. JU765
+  # project: PRJEB32708
+  - accession: GCA_901765185.1
+  # organism: Trichinella murrelli
+  # project: PRJNA257433
+  - accession: GCA_001447425.1
+  # organism: Globodera rostochiensis
+  # project: PRJEB13504
+  - accession: GCA_900079975.1
+  # organism: Onchocerca ochengi
+  # project: PRJEB1465
+  - accession: GCA_900537205.1
+  # organism: Anisakis simplex
+  # project: PRJEB496
+  - accession: GCA_900617985.1
+  # organism: Steinernema hermaphroditum
+  # project: PRJNA982879
+  - accession: GCA_030435675.2
+  # organism: Caenorhabditis latens
+  # project: PRJNA248912
+  - accession: GCA_002259235.3
+  # organism: Caenorhabditis sp. 40 LS-2015
+  # project: PRJEB12608
+  - accession: GCA_900536305.3
+  # organism: Echinococcus canadensis
+  # project: PRJEB8992
+  - accession: GCA_900004735.1
+  # organism: Globodera rostochiensis
+  # project: PRJNA695196
+  - accession: GCA_018350315.1
+  # organism: Nippostrongylus brasiliensis
+  # project: PRJNA994163
+  - accession: GCA_030553155.1
+  # organism: Thelazia callipaeda
+  # project: PRJEB1205
+  - accession: GCA_900618365.1
+  # organism: Caenorhabditis angaria
+  # project: PRJNA51225
+  - accession: GCA_000165025.1
+  # organism: Trichuris muris
+  # project: PRJEB126
+  - accession: GCA_000612645.2
+  # organism: Caenorhabditis japonica
+  # project: PRJNA12591
+  - accession: GCA_000147155.1
+  # organism: Hydatigera taeniaeformis
+  # project: PRJEB534
+  - accession: GCA_900622495.1
+  # organism: Brugia pahangi
+  # project: PRJEB497
+  - accession: GCA_900618355.1
+  # organism: Schistosoma bovis
+  # project: PRJNA451066
+  - accession: GCA_003958945.1
+  # organism: Taenia asiatica
+  # project: PRJEB532
+  - accession: GCA_900618005.1
+  # organism: Fasciolopsis buskii
+  # project: PRJNA284521
+  #- accession: GCA_008360955.1
+  # organism: Meloidogyne arenaria
+  # project: PRJNA340324
+  #- accession: GCA_003693565.1
+  # organism: Strongyloides stercoralis
+  # project: PRJNA930454
+  - accession: GCA_029582065.1
+  # organism: Ditylenchus dipsaci
+  # project: PRJNA498219
+  - accession: GCA_004194705.1
+  # organism: Meloidogyne arenaria
+  # project: PRJNA438575
+  - accession: GCA_003133805.1
+  # organism: Onchocerca ochengi
+  # project: PRJEB1204
+  - accession: GCA_000950515.2
+  # organism: Dictyocaulus viviparus
+  # project: PRJNA72587
+  - accession: GCA_000816705.1
+  # organism: Heterorhabditis bacteriophora
+  # project: PRJNA13977
+  - accession: GCA_000223415.1
+  # organism: Mesorhabditis spiculigera
+  # project: PRJEB59059
+  - accession: GCA_958295435.1
+  # organism: Strongylus vulgaris
+  # project: PRJEB531
+  - accession: GCA_900624965.1
+  # organism: Schistosoma curassoni
+  # project: PRJEB519
+  - accession: GCA_900618015.1
+  # organism: Steinernema monticolum
+  # project: PRJNA205067
+  - accession: GCA_000505645.1
+  # organism: Caenorhabditis brenneri
+  # project: PRJNA20035
+  #- accession: GCA_000143925.2
+  # organism: Diploscapter pachys
+  # project: PRJNA280107
+  - accession: GCA_002287525.1
+  # organism: Toxocara canis
+  # project: PRJEB533
+  #- accession: GCA_900622545.1
+  # organism: Rodentolepis nana
+  # project: PRJEB508
+  - accession: GCA_900617975.1
+  # organism: Acanthocheilonema viteae
+  # project: PRJEB1697
+  - accession: GCA_900537255.1
+  # organism: Echinococcus granulosus
+  # project: PRJNA182977
+  - accession: GCF_000524195.1
+  # organism: Aphelenchoides besseyi
+  # project: PRJNA834627
+  - accession: GCA_024699835.1
+  # organism: Caenorhabditis sp. 26 LS-2015
+  # project: PRJEB12596
+  - accession: GCA_900536285.3
+  # organism: Trichuris suis
+  # project: PRJNA208416
+  - accession: GCA_000701025.1
+  # organism: Taenia multiceps
+  # project: PRJNA307624
+  - accession: GCA_001923025.3
+  # organism: Ancylostoma ceylanicum
+  # project: PRJNA231479
+  - accession: GCA_000688135.1
+  # organism: Echinococcus oligarthrus
+  # project: PRJEB31222
+  - accession: GCA_900683695.1
+  # organism: Fasciola hepatica
+  # project: PRJEB58756
+  - accession: GCA_948099385.2
+  # organism: Angiostrongylus costaricensis
+  # project: PRJEB494
+  - accession: GCA_900624975.1
+  # organism: Trichuris suis
+  # project: PRJNA179528
+  - accession: GCA_000797535.1
+  # organism: Caenorhabditis sp. 38 MB-2015
+  # project: PRJEB11354
+  - accession: GCA_900536415.3
+  # organism: Caenorhabditis sp. 39 LS-2015
+  # project: PRJEB12602
+  - accession: GCA_900536345.3
+  # organism: Globodera pallida
+  # project: PRJNA764088
+  - accession: GCA_020449905.1
+  # organism: Gyrodactylus bullatarudis
+  # project: PRJNA532341
+  - accession: GCA_012064415.1
+  # organism: Panagrellus redivivus
+  # project: PRJNA186477
+  - accession: GCA_000341325.1
+  # organism: Parastrongyloides trichosuri
+  # project: PRJEB515
+  #- accession: GCA_000941615.1
+  # organism: Trichinella spiralis
+  # project: PRJNA12603
+  - accession: GCF_000181795.1
+  # organism: Ascaris suum
+  # project: PRJNA62057
+  - accession: GCA_000187025.3
+  # organism: Mesocestoides corti
+  # project: PRJEB510
+  - accession: GCA_900604375.1
+  # organism: Gyrodactylus salaris
+  # project: PRJNA244375
+  - accession: GCA_000715275.1
+  # organism: Ditylenchus destructor
+  # project: PRJNA312427
+  - accession: GCA_001579705.1
+  # organism: Heligmosomoides polygyrus bakeri
+  # project: PRJEB15396
+  - accession: GCA_900096555.1
+  # organism: Strongyloides papillosus
+  # project: PRJEB525
+  #- accession: GCA_000936265.1
+  # organism: Macrostomum lignano
+  # project: PRJNA284736
+  - accession: GCA_001188465.1
+  # organism: Meloidogyne chitwoodi
+  # project: PRJNA666745
+  - accession: GCA_015183025.1
+  # organism: Schistosoma japonicum
+  # project: PRJEA34885
+  - accession: GCA_000151775.1
+  # organism: Mesorhabditis belari
+  # project: PRJEB61636
+  - accession: GCA_958450365.1
+  # organism: Steinernema carpocapsae
+  # project: PRJNA202318
+  - accession: GCA_000757645.3
+  # organism: Caenorhabditis briggsae
+  # project: PRJNA784955
+  - accession: GCA_021491975.1
+  # organism: Setaria digitata
+  # project: PRJNA479729
+  - accession: GCA_003640385.1
+  # organism: Cercopithifilaria johnstoni
+  # project: PRJEB47283
+  - accession: GCA_916381525.1
+  # organism: Oesophagostomum dentatum
+  # project: PRJNA72579
+  - accession: GCA_000797555.1
+  # organism: Acrobeloides nanus
+  # project: PRJEB26554
+  - accession: GCA_900406225.1
+  # organism: Caenorhabditis elegans
+  # project: PRJNA13758
+  - accession: GCA_000002985.3
+  # organism: Parascaris univalens
+  # project: PRJNA386823
+  - accession: GCA_002259205.1
+  # organism: Heterodera schachtii
+  # project: PRJNA767548
+  - accession: GCA_020449115.1
+  # organism: Strongyloides venezuelensis
+  # project: PRJEB530
+  #- accession: GCA_001028725.1
+  # organism: Taenia saginata
+  # project: PRJNA71493
+  - accession: GCA_001693075.2
+  # organism: Onchocerca flexuosa
+  # project: PRJEB512
+  - accession: GCA_900618345.1
+  # organism: Paragonimus skrjabini miyazakii
+  # project: PRJNA245325
+  - accession: GCA_014338405.1
+  # organism: Wuchereria bancrofti
+  # project: PRJNA275548
+  - accession: GCA_001555675.1
+  # organism: Strongyloides stercoralis
+  # project: PRJEB528
+  #- accession: GCA_000947215.1
+  # organism: Ancylostoma caninum
+  # project: PRJNA72585
+  - accession: GCA_003336725.1
+  # organism: Necator americanus
+  # project: PRJNA72135
+  - accession: GCA_000507365.1
+  # organism: Caenorhabditis auriculariae
+  # project: PRJEB40642
+  - accession: GCA_904845305.1
+  # organism: Schistosoma japonicum
+  # project: PRJNA724792
+  - accession: GCA_025215515.1
+  # organism: Spirometra erinaceieuropaei
+  # project: PRJEB1202
+  #- accession: GCA_000951995.1
+  # organism: Caenorhabditis remanei
+  # project: PRJNA577507
+  - accession: GCA_010183535.1
+  # organism: Echinococcus multilocularis
+  # project: PRJEB122
+  - accession: GCA_000469725.3
+  # organism: Globodera pallida
+  # project: PRJEB123
+  - accession: GCA_000724045.1
+  # organism: Enterobius vermicularis
+  # project: PRJEB503
+  - accession: GCA_900576705.1
+  # organism: Necator americanus
+  # project: PRJNA1007425
+  - accession: GCF_031761385.1
+  # organism: Halicephalobus sp. NKZ332
+  # project: PRJNA555616
+  - accession: GCA_009761265.1
+  # organism: Ascaris suum
+  # project: PRJNA80881
+  - accession: GCA_000298755.1
+  # organism: Bradynema listronoti
+  # project: PRJNA842945
+  - accession: GCA_024678965.1
+  # organism: Trichuris suis
+  # project: PRJNA208415
+  - accession: GCA_000701005.1
+  # organism: Oscheius tipulae
+  # project: PRJNA644888
+  - accession: GCA_013425905.1
+  # organism: Elaeophora elaphi
+  # project: PRJEB502
+  - accession: GCA_000499685.1
+  # organism: Caenorhabditis sp. 21 LS-2015
+  # project: PRJEB12595
+  - accession: GCA_900536235.3
+  # organism: Loa loa
+  # project: PRJNA246086
+  - accession: GCA_000733445.1
+  # organism: Pristionchus exspectatus
+  # project: PRJEB46690
+  - accession: GCA_911812115.1
+  # organism: Brugia malayi
+  # project: PRJNA10729
+  - accession: GCF_000002995.4
+  # organism: Wuchereria bancrofti
+  # project: PRJEB536
+  - accession: GCA_900622535.1
+  # organism: Meloidogyne javanica
+  # project: PRJEB8714
+  - accession: GCA_900003945.1
+  # organism: Protopolystoma xenopodis
+  # project: PRJEB1201
+  - accession: GCA_900617795.1
+  # organism: Heterodera glycines
+  # project: PRJNA381081
+  - accession: GCA_004148225.2
+  # organism: Steinernema feltiae
+  # project: PRJNA204661
+  - accession: GCA_000757705.1
+  # organism: Echinococcus granulosus
+  # project: PRJEB121
+  #- accession: GCA_000469785.1
+  # organism: Heterodera schachtii
+  # project: PRJNA522950
+  - accession: GCA_023374025.1
+  # organism: Romanomermis culicivorax
+  # project: PRJEB1358
+  - accession: GCA_001039655.1
+  # organism: Hymenolepis microstoma
+  # project: PRJEB124
+  - accession: GCA_000469805.3
+  # organism: Angiostrongylus vasorum
+  # project: PRJNA663250
+  - accession: GCA_018806985.1
+  # organism: Pristionchus pacificus
+  # project: PRJNA12644
+  - accession: GCA_000180635.4
+  # organism: Gongylonema pulchrum
+  # project: PRJEB505
+  - accession: GCA_900617915.1
+  # organism: Soboliphyme baturini
+  # project: PRJEB516
+  - accession: GCA_900618415.1
+  # organism: Taenia asiatica
+  # project: PRJNA299871
+  - accession: GCA_001693035.2
+  # organism: Heligmosomoides polygyrus
+  # project: PRJEB1203
+  #- accession: GCA_900618505.1
+  # organism: Globodera pallida
+  # project: PRJNA702104
+  - accession: GCA_023343765.1
+  # organism: Toxocara canis
+  # project: PRJNA248777
+  - accession: GCA_000803305.1
+  # organism: Schistosoma japonicum
+  # project: PRJNA520774
+  - accession: GCA_006368765.1
+  # organism: Meloidogyne floridensis
+  # project: PRJEB6016
+  - accession: GCA_000751915.1
+  # organism: Opisthorchis viverrini
+  # project: PRJNA222628
+  - accession: GCF_000715545.1
+  # organism: Meloidogyne hapla
+  # project: PRJNA29083
+  - accession: GCA_000172435.1
+  # organism: Macrostomum lignano
+  # project: PRJNA371498
+  - accession: GCA_002269645.1
+  # organism: Haemonchus contortus
+  # project: PRJNA205202
+  - accession: GCA_000442195.1
+  # organism: Ancylostoma ceylanicum
+  # project: PRJNA72583
+  - accession: GCA_000402015.1
+  # organism: Ditylenchus destructor
+  # project: PRJNA800207
+  #- accession: GCA_022814885.1
+  # organism: Bursaphelenchus okinawaensis
+  # project: PRJEB40023
+  - accession: GCA_904066225.2
+  # organism: Strongyloides ratti
+  # project: PRJEB125
+  - accession: GCF_001040885.1
+  # organism: Parapristionchus giblindavisi
+  # project: PRJEB53331
+  - accession: GCA_943737045.1
+  # organism: Loa loa
+  # project: PRJNA37757
+  - accession: GCF_000183805.2
+  # organism: Caenorhabditis panamensis
+  # project: PRJEB28259
+  - accession: GCA_900536275.1
+  # organism: Bursaphelenchus xylophilus
+  # project: PRJEB40022
+  - accession: GCA_904066235.2
+  # organism: Meloidogyne graminicola
+  # project: PRJNA411966
+  - accession: GCA_002778205.2
+  # organism: Caenorhabditis becei
+  # project: PRJEB28243
+  - accession: GCA_900536315.3
+  # organism: Paragonimus heterotremus
+  # project: PRJNA284523
+  #- accession: GCA_013368495.1
+  # organism: Steinernema feltiae
+  # project: PRJNA353610
+  - accession: GCA_007213375.1
+  # organism: Oscheius tipulae
+  # project: PRJEB15512
+  #- accession: GCA_900184235.1
+  # organism: Echinococcus granulosus
+  # project: PRJNA754835
+  - accession: GCA_021556725.1
+  # organism: Rhabditophanes sp. KR3021
+  # project: PRJEB1297
+  #- accession: GCA_000944355.1
+  # organism: Brugia timori
+  # project: PRJEB4663
+  - accession: GCA_900618025.1
+  # organism: Bursaphelenchus xylophilus
+  # project: PRJEA64437
+  - accession: GCA_000231135.1
+  # organism: Taenia solium
+  # project: PRJNA170813
+  - accession: GCA_001870725.1
+  # organism: Cylicocyclus nassatus
+  # project: PRJEB63274
+  - accession: GCA_958299035.1
+  # organism: Koerneria luziae
+  # project: PRJNA655932
+  - accession: GCA_014805365.1
+  # organism: Hymenolepis diminuta
+  # project: PRJEB507
+  - accession: GCA_900618445.1
+  # organism: A fumigatus
+  - accession: GCA_040142845.1
+  - accession: GCA_040142855.1
+  - accession: GCA_040142865.1
+  - accession: GCA_040142875.1
+  - accession: GCA_040142885.1
+  - accession: GCA_040142945.1
+  - accession: GCA_040142955.1
+  - accession: GCA_040142975.1
+  - accession: GCA_040167795.1
+  - accession: GCA_040167805.1
+  - accession: GCA_040126065.1
+  - accession: GCA_028752175.1
+  - accession: GCA_028752205.1
+  - accession: GCA_051225625.1
+  - accession: GCA_024220425.1
+  # organism: methanobrevibacter smithii
+  - accession: GCF_000016525.1
+  # organism: methanobrevibacter oralis
+  - accession: GCF_912073625.1
+  # organism: Abiotrophia defectiva
+  - accession: GCF_013267415.1
+  # organism: Achromobacter xylosoxidans
+  - accession: GCF_016728825.1
+  # organism: Acinetobacter baumannii
+  - accession: GCF_009035845.1
+  # organism: Actinomyces israelii
+  - accession: GCF_030253495.1
+  # organism: Aerococcus urinae
+  - accession: GCF_001543175.1
+  # organism: Aeromonas hydrophila
+  - accession: GCF_000014805.1
+  # organism: Alcaligenes faecalis
+  - accession: GCF_000967305.2
+  # organism: Bacteroides fragilis
+  - accession: GCF_000025985.1
+  # organism: Bartonella henselae
+  - accession: GCF_019930925.1
+  # organism: Bergeyella zoohelcum
+  - accession: GCF_900445655.1
+  # organism: Brevibacillus laterosporus
+  - accession: GCF_002706795.1
+  # organism: Capnocytophaga canimorsus
+  - accession: GCF_002302565.1
+  # organism: Capnocytophaga sputigena
+  - accession: GCF_002302495.1
+  # organism: Chromobacterium violaceum
+  - accession: GCF_016890085.1
+  # organism: Chryseobacterium indologenes
+  - accession: GCF_002706795.1
+  # organism: Citrobacter freundii
+  - accession: GCF_904859905.1
+  # organism: Clostridium botulinum
+  - accession: GCF_000063585.1
+  # organism:  Clostridium difficile
+  - accession: GCF_018885085.1
+  - accession: GCF_000009205.2
+  - accession: GCF_000027105.1
+  - accession: GCF_000210435.1
+  # organism: Clostridium perfringens
+  - accession: GCF_016027375.1
+  # organism: Clostridium tetani
+  - accession: GCF_000007625.1
+  # organism: Corynebacterium diphtheriae
+  - accession: GCF_001457455.1
+  - accession: GCF_000195815.1
+  - accession: GCF_000255275.1
+  # organism: Cupriavidus metallidurans
+  - accession: GCF_900185755.1
+  # organism: Dolosigranulum pigrum
+  - accession: GCF_000245815.1
+  # organism: Dysgonomonas gadei
+  - accession: GCF_000213555.1
+  # organism: Eikenella corrodens
+  - accession: GCF_900187105.1
+  # organism: Elizabethkingia meningoseptica
+  - accession: GCF_900475375.1
+  # organism: Empedobacter brevis
+  - accession: GCF_000382425.1
+  # organism: Enterobacer spp.
+  - accession: GCF_019048245.1
+  - accession: GCF_001729805.1
+  - accession: GCF_001750725.1
+  - accession: GCF_900324475.1
+  - accession: GCF_009176645.1
+  - accession: GCF_001984825.2
+  - accession: GCF_003594935.2
+  - accession: GCF_041937165.1
+  - accession: GCF_008364625.2
+  - accession: GCF_905331265.2
+  - accession: GCF_007035805.1
+  - accession: GCF_023023125.1
+  - accession: GCF_022014715.1
+  - accession: GCF_000224675.1
+  - accession: GCF_039718975.1
+  - accession: GCF_043972695.1
+  - accession: GCF_035835995.1
+  - accession: GCF_009036245.1
+  - accession: GCF_030406165.1
+  - accession: GCF_048568405.1
+  - accession: GCF_040834095.1
+  - accession: GCF_019665745.1
+  - accession: GCF_004331385.1
+  - accession: GCF_034008295.1
+  - accession: GCF_026344075.1
+  - accession: GCF_034008275.1
+  - accession: GCF_018597345.1
+  - accession: GCF_014930725.1
+  # organism: Enterococcus avium
+  - accession: GCF_002891025.1
+  # organism: Enterococcus casseliflavus
+  - accession: GCF_000157355.2
+  # organism: Enterococcus durans
+  - accession: GCF_002277935.1
+  # organism: Enterococcus faecalis
+  - accession: GCF_000393015.1
+  # organism: Enterococcus faecium
+  - accession: GCF_009734005.1
+  # organism: Enterococcus gallinarum
+  - accession: GCF_021496385.1
+  # organism: Enterococcus hirae
+  - accession: GCF_002278015.2
+  # organism: Enterococcus raffinosus
+  - accession: GCF_019175485.1
+  # organism: Erysipelothrix rhusiopathiae
+  - accession: GCF_000270085.1
+  # organism: Facklamia hominis
+  - accession: GCF_033876835.1
+  # organism: Fusobacterium nucleatum
+  - accession: GCF_003019295.1
+  # organism: Gardnerella vaginalis
+  - accession: GCF_001042655.1
+  # organism: Gemella morbillorum
+  - accession: GCF_900476045.1
+  # organism: Geobacillus stearothermophilus
+  - accession: GCF_030339115.1
+  # organism: Globicatella sanguinis
+  - accession: GCF_002847845.2
+  # organism: Granulicatella adiacens
+  - accession: GCF_019931005.1
+  # organism: Haemophilus ducreyi
+  - accession: GCF_001647695.1
+  # organism: Haemophilus influenzae
+  - accession: GCF_020736045.1
+  # organism: Helcococcus kunzii
+  - accession: GCF_000245755.1
+  # organism: Helicobacter pylori
+  - accession: GCF_025998455.1
+  - accession: GCF_000307795.1
+  - accession: GCF_000982695.1
+  - accession: GCF_000013245.1
+  # organism: Ignavigranum ruoffiae
+  - accession: GCF_023195815.2
+  # organism: Kingella kingae
+  - accession: GCF_900475905.1
+  # organism: Klebsiella pneumoniae
+  - accession: GCF_000240185.1
+  - accession: GCA_022305115.1
+  - accession: GCF_000009885.1
+  - accession: GCF_000163455.1
+  - accession: GCF_048819275.1
+  # organism: Lactobacillus rhamnosus
+  - accession: GCF_006151905.1
+  # organism: Lactococcus garvieae
+  - accession: GCF_016026695.1
+  # organism: Legionella pneumophila
+  - accession: GCF_001941585.1
+  - accession: GCF_041734345.1
+  - accession: GCF_000008485.1
+  # organism: Leuconostoc mesenteroides
+  - accession: GCF_000014445.1
+  # organism: Moraxella catarrhalis
+  - accession: GCF_002080125.1
+  # organism: Morganella morganii
+  - accession: GCF_006094455.1
+  # organism: Mycoplasma pneumoniae
+  - accession: GCF_900660465.1
+  # organism: Myroides odoratus
+  - accession: GCF_016726985.1
+  # organism: Neisseria gonorrhoeae
+  - accession: GCF_013030075.1
+  - accession: GCF_040404645.1
+  - accession: GCF_040383235.1
+  - accession: GCF_040394165.1
+  - accession: GCF_040388595.1
+  - accession: GCF_040370845.1
+  - accession: GCF_040380425.1
+  - accession: GCF_040366825.1
+  - accession: GCF_040367275.1
+  - accession: GCF_040391575.1
+  - accession: GCF_040397295.1
+  - accession: GCF_040369685.1
+  - accession: GCF_040404575.1
+  - accession: GCF_040372445.1
+  - accession: GCF_040404365.1
+  - accession: GCF_040373345.1
+  - accession: GCF_040404415.1
+  - accession: GCF_040373035.1
+  - accession: GCF_040373105.1
+  - accession: GCF_040400385.1
+  - accession: GCF_040371445.1
+  - accession: GCF_040404325.1
+  - accession: GCF_040368535.1
+  - accession: GCF_040377535.1
+  - accession: GCF_040373215.1
+  - accession: GCF_040403735.1
+  - accession: GCF_040374935.1
+  - accession: GCF_040404485.1
+  - accession: GCF_040404335.1
+  - accession: GCF_040385865.1
+  # organism: Neisseria meningitidis
+  - accession: GCF_022869645.1
+  - accession: GCF_000008805.1
+  - accession: GCF_000009105.1
+  - accession: GCF_000009465.1
+  # organism: Nocardia asteroides
+  - accession: GCF_900637185.1
+  # organism: Oligella urethralis
+  - accession: GCF_900454345.1
+  # organism: Orientia tsutsugamushi
+  - accession: GCF_900327255.1
+  # organism: Paenibacillus alvei
+  - accession: GCF_025547055.2
+  # organism: Pandoraea apista
+  - accession: GCF_001465595.2
+  # organism: Pasteurella multocida
+  - accession: GCF_002073255.2
+  - accession: GCF_002068175.1
+  - accession: GCF_900638315.1
+  # organism: Pediococcus pentosaceus
+  - accession: GCF_000014505.1
+  # organism: Finegoldia magna
+  # prev name: Peptostreptococcus magnus
+  - accession: GCF_002243135.1
+  # organism: Plesiomonas shigelloides
+  - accession: GCF_020991025.1
+  # organism: Cutibacterium acnes
+  - accession: GCF_006739385.1
+  # organism: Proteus mirabilis
+  - accession: GCF_000069965.1
+  - accession: GCF_000160755.1
+  # organism: Proteus vulgaris
+  - accession: GCF_025200655.1
+  # organism: Providencia stuartii
+  - accession: GCF_035747985.1
+  # organism: Pseudomonas aeruginosa
+  - accession: GCF_000006765.1
+  - accession: GCF_045689255.1
+  # organism: Ralstonia pickettii
+  - accession: GCF_902374465.1
+  # organism: Serratia marcescens
+  - accession: GCF_030291735.1
+  - accession: GCF_017654245.1
+  # organism: Sphingobacterium multivorum
+  - accession: GCF_016894225.1
+  # organism: Staphylococcus aureus
+  - accession: GCF_000013425.1
+  - accession: GCF_000009645.1
+  - accession: GCF_000012045.1
+  - accession: GCF_000013465.1
+  # organism: Stenotrophomonas maltophilia
+  - accession: GCF_900186865.1
+  - accession: GCF_000072485.1
+  # organism: Streptobacillus moniliformis
+  - accession: GCF_000024565.1
+  # organism: Streptococcus agalactiae
+  - accession: GCF_001552035.1
+  - accession: GCF_000007265.1
+  - accession: GCF_000012705.1
+  # organism: Streptococcus mutans
+  - accession: GCF_019048645.1
+  # organism: Streptococcus pneumoniae
+  - accession: GCF_001457635.1
+  - accession: GCF_000273445.1
+  - accession: GCF_000014365.2
+  - accession: GCF_000007045.1
+  # organism: Streptococcus pyogenes
+  - accession: GCF_900475035.1
+  - accession: GCF_000011765.3
+  # organism: Tetragenococcus halophilus
+  - accession: GCF_001712815.1
+  # organism: Treponema pallidum
+  - accession: GCF_000410535.2
+  # organism: Tropheryma whipplei
+  - accession: GCF_000196075.1
+  # organism: Vagococcus fluvialis
+  - accession: GCF_003337315.1
+  # organism: Weeksella virosa
+  - accession: GCF_900637795.1
+  # organism: Weissella confusa
+  - accession: GCF_004771075.1
