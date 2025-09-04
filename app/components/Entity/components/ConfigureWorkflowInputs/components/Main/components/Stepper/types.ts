@@ -7,9 +7,10 @@ import {
   Status,
   OnLaunchGalaxy,
 } from "./components/Step/hooks/UseLaunchGalaxy/types";
+import { GA2AssemblyEntity } from "../../../../../../../../apis/catalog/ga2/entities";
 
 export interface Props {
-  genome: BRCDataCatalogGenome;
+  genome: BRCDataCatalogGenome | GA2AssemblyEntity;
   onConfigure: OnConfigure;
   onLaunchGalaxy: OnLaunchGalaxy;
   status: Status;

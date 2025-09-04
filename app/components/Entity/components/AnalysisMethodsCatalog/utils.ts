@@ -3,6 +3,7 @@ import {
   BRCDataCatalogGenome,
   Workflow,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
+import { GA2AssemblyEntity } from "../../../../apis/catalog/ga2/entities";
 
 /**
  * Formats a trsId for use in URLs by removing the hash character if it begins with one
@@ -22,7 +23,7 @@ export function formatTrsId(trsId: string): string {
  */
 export function workflowIsCompatibleWithAssembly(
   workflow: Workflow,
-  assembly: BRCDataCatalogGenome
+  assembly: BRCDataCatalogGenome | GA2AssemblyEntity
 ): boolean {
   if (
     workflow.taxonomyId !== null &&
