@@ -52,7 +52,8 @@ function buildValidatedColumnFilters(
     // If the row is not valid, continue to the next row.
     if (!isRowValid) continue;
 
-    // The row is valid, return column filters.
+    // Found a valid row i.e. we know the pre-selected column filters will be a valid
+    // combination for the table data. There is no need to continue checking the rest of the rows.
     return Object.entries(preselectedFilters).map(([id, value]) => ({
       id,
       value,
