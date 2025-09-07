@@ -101,7 +101,7 @@ export function preSelectColumnFilters(
  * @returns An array of strings.
  */
 function toStringArray(value: unknown): string[] {
-  if (value == null) return [];
+  if (value === null) return [];
   if (Array.isArray(value)) return value.map(String);
   return [String(value)];
 }
