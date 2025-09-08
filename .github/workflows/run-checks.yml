@@ -43,3 +43,6 @@ jobs:
       - name: Validate GA2 catalog files
         # Validate the GA2 catalog source files.
         run: npm run validate-ga2-catalog
+      - name: poetry lint
+        # Validate the GA2 catalog source files.
+        run: poetry check -P catalog/py_package/

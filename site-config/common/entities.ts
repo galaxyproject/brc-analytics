@@ -1,20 +1,28 @@
-import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import { EntityConfig as BaseEntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import {
-  BackPageConfig,
-  BackPageTabConfig,
+  BackPageConfig as BaseBackPageConfig,
+  BackPageTabConfig as BaseBackPageTabConfig,
   ComponentsConfig,
 } from "@databiosphere/findable-ui/lib/config/entities";
+import { SiteConfig as BaseSiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import { APP_KEYS } from "./constants";
 
-export interface BRCBackPageConfig
-  extends Omit<BackPageConfig, "tabs" | "top"> {
-  tabs: BRCBackPageTabConfig[];
+export interface AppBackPageConfig
+  extends Omit<BaseBackPageConfig, "tabs" | "top"> {
+  tabs: AppBackPageTabConfig[];
   top?: ComponentsConfig;
 }
 
-export interface BRCBackPageTabConfig extends BackPageTabConfig {
+export interface AppBackPageTabConfig extends BaseBackPageTabConfig {
   top?: ComponentsConfig;
 }
 
-export interface BRCEntityConfig<R> extends Omit<EntityConfig<R>, "detail"> {
-  detail: BRCBackPageConfig;
+export interface AppEntityConfig<R>
+  extends Omit<BaseEntityConfig<R>, "detail"> {
+  detail: AppBackPageConfig;
+}
+
+export interface AppSiteConfig extends BaseSiteConfig {
+  allowedPaths?: string[];
+  appKey?: (typeof APP_KEYS)[keyof typeof APP_KEYS];
 }

@@ -11,7 +11,7 @@ import {
 } from "../../../../app/apis/catalog/brc-analytics-catalog/common/utils";
 import * as C from "../../../../app/components";
 import * as V from "../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { BRCEntityConfig } from "../../../common/entities";
+import { AppEntityConfig } from "../../../common/entities";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
@@ -25,7 +25,7 @@ import { COLUMN_REGISTRY } from "./common/column/columnRegistry";
 /**
  * Entity config object responsible to config anything related to the /assemblies route.
  */
-export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
+export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
   categoryGroupConfig: {
     categoryGroups: [
       {

@@ -2,7 +2,7 @@ from ....py_package.catalog_build import build_files
 
 ASSEMBLIES_PATH = "catalog/ga2/source/assemblies.yml"
 
-UCSC_ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.json"
+UCSC_ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/VGP/assemblyList.json"
 
 GENOMES_OUTPUT_PATH = "catalog/ga2/build/intermediate/genomes-from-ncbi.tsv"
 
