@@ -14,7 +14,11 @@ import {
 } from "./sectionSubHero.styles";
 import { ACCORDION, BUTTON, IMAGE } from "./instructions";
 import { AccordionDetails, AccordionSummary, Fade, Slide } from "@mui/material";
-import { ACCORDION_PROPS, FADE_PROPS, SLIDE_PROPS } from "../../SectionSubHero/constants";
+import {
+  ACCORDION_PROPS,
+  FADE_PROPS,
+  SLIDE_PROPS,
+} from "../../SectionSubHero/constants";
 import { useAutoCycle } from "../../SectionSubHero/hooks";
 
 export const SectionSubHero = (): JSX.Element => {

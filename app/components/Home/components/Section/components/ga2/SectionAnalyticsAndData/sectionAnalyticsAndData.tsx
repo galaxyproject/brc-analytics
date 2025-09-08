@@ -1,6 +1,10 @@
 import { SectionSubtitle, SectionTitle } from "../../../section.styles";
 import { AnalyticsToolsAndData } from "./components/AnalyticsToolsAndData/analyticsToolsAndData";
-import { Headline, Section, SectionLayout } from "./sectionAnalyticsAndData.styles";
+import {
+  Headline,
+  Section,
+  SectionLayout,
+} from "./sectionAnalyticsAndData.styles";
 
 export const SectionAnalyticsAndData = (): JSX.Element => {
   return (
@@ -9,10 +13,10 @@ export const SectionAnalyticsAndData = (): JSX.Element => {
         <Headline>
           <SectionTitle>What is GenomeArk Analytics?</SectionTitle>
           <SectionSubtitle>
-            GenomeArk Analytics combines GenomeArk data with official genomic data from
-            the NCBI Datasets and the UCSC Genome Browser, powered by the unlimited 
-            analytical capacity of the Galaxy Platform at the Texas Advanced Computing
-            Center (TACC) and Jetstream2.
+            GenomeArk Analytics combines GenomeArk data with official genomic
+            data from the NCBI Datasets and the UCSC Genome Browser, powered by
+            the unlimited analytical capacity of the Galaxy Platform at the
+            Texas Advanced Computing Center (TACC) and Jetstream2.
           </SectionSubtitle>
         </Headline>
         <AnalyticsToolsAndData />

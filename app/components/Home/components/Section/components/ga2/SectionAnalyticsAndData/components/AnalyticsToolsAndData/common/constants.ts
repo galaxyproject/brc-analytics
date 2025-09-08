@@ -9,10 +9,10 @@ const CARD_TEXT = {
     "A global initiative to sequence, catalog, and characterize the genomes of all of Earth's eukaryotic biodiversity",
   ABOUT_GALAXY:
     "A platform for the analysis of data at any scale using public infrastructure",
-  ABOUT_JETSTREAM2:
-    "A flexible, user-friendly cloud computing environment",
+  ABOUT_JETSTREAM2: "A flexible, user-friendly cloud computing environment",
   ABOUT_NCBI: "A singular source for standardized genomic and functional data",
-  ABOUT_T2T: "An open, community-based effort to generate the first complete assenbky of a human genome",
+  ABOUT_T2T:
+    "An open, community-based effort to generate the first complete assenbky of a human genome",
   ABOUT_TACC: "One of the world’s leading academic computing centers",
   ABOUT_UCSC:
     "A global platform for visualization and interpretation of genomic data",
