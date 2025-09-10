@@ -44,6 +44,8 @@ export const genomeEntityConfig: AppEntityConfig<GA2AssemblyEntity> = {
   list: {
     columns: COLUMNS,
     tableOptions: {
+      downloadFilename: "assemblies",
+      enableTableDownload: true,
       initialState: {
         sorting: [
           {
@@ -56,7 +58,6 @@ export const genomeEntityConfig: AppEntityConfig<GA2AssemblyEntity> = {
   } as ListConfig<GA2AssemblyEntity>,
   listView: {
     disablePagination: true,
-    enableDownload: true,
   },
   route: "assemblies",
   staticLoadFile: "catalog/ga2/output/assemblies.json",

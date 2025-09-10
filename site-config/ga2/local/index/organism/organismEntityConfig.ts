@@ -38,6 +38,8 @@ export const organismEntityConfig: AppEntityConfig<GA2OrganismEntity> = {
   list: {
     columns: COLUMNS,
     tableOptions: {
+      downloadFilename: "organisms",
+      enableTableDownload: true,
       initialState: {
         sorting: [
           {
@@ -50,7 +52,6 @@ export const organismEntityConfig: AppEntityConfig<GA2OrganismEntity> = {
   } as ListConfig<GA2OrganismEntity>,
   listView: {
     disablePagination: true,
-    enableDownload: true,
   },
   route: "organisms",
   staticLoadFile: "catalog/ga2/output/organisms.json",

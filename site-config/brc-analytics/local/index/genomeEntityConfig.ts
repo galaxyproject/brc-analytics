@@ -148,6 +148,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
           viewBuilder: V.buildAnalyzeGenome,
         } as ComponentConfig<typeof C.AnalyzeGenome, BRCDataCatalogGenome>,
         enableSorting: false,
+        enableTableDownload: false,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANALYZE_GENOME,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.ANALYZE_GENOME,
         width: "auto",
@@ -405,6 +406,8 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       COLUMN_REGISTRY.PRIORITY,
     ],
     tableOptions: {
+      downloadFilename: "assemblies",
+      enableTableDownload: true,
       initialState: {
         columnVisibility: {
           [BRC_DATA_CATALOG_CATEGORY_KEY.PRIORITY]: false,
@@ -429,7 +432,6 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
   } as ListConfig<BRCDataCatalogGenome>,
   listView: {
     disablePagination: true,
-    enableDownload: true,
   },
   route: "assemblies",
   staticLoadFile: "catalog/output/assemblies.json",
