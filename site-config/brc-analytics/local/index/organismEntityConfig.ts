@@ -261,6 +261,8 @@ export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
       COLUMN_REGISTRY.PRIORITY,
     ],
     tableOptions: {
+      downloadFilename: "organisms",
+      enableTableDownload: true,
       initialState: {
         columnVisibility: {
           [BRC_DATA_CATALOG_CATEGORY_KEY.PRIORITY]: false,
@@ -288,7 +290,6 @@ export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
   } as ListConfig<BRCDataCatalogOrganism>,
   listView: {
     disablePagination: true,
-    enableDownload: true,
   },
   route: "organisms",
   staticLoadFile: "catalog/output/organisms.json",

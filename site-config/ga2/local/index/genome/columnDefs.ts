@@ -39,6 +39,7 @@ export const ANALYZE_GENOME: ColumnConfig<GA2AssemblyEntity> = {
     viewBuilder: buildAnalyzeGenome,
   } as ComponentConfig<typeof C.AnalyzeGenome, GA2AssemblyEntity>,
   enableSorting: false,
+  enableTableDownload: false,
   header: GA2_CATEGORY_LABEL.ANALYZE_GENOME,
   id: GA2_CATEGORY_KEY.ANALYZE_GENOME,
   width: "auto",
