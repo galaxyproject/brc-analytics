@@ -22,6 +22,7 @@ import { getSortedRowModel } from "@tanstack/react-table";
 import { CATEGORY_GROUPS } from "./categoryGroups";
 import { getFacetedMinMaxValues } from "@databiosphere/findable-ui/lib/components/Table/featureOptions/facetedColumn/getFacetedMinMaxValues";
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
+import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/features/TableDownload/constants";
 
 export const useTable = (
   enaQueryMethod: ENA_QUERY_METHOD,
@@ -62,9 +63,10 @@ export const useTable = (
   const state = { columnFilters: columnFiltersByMethod[enaQueryMethod] };
 
   return useReactTable<ReadRun>({
-    _features: [ROW_POSITION, ROW_PREVIEW],
+    _features: [ROW_POSITION, ROW_PREVIEW, TABLE_DOWNLOAD],
     columns,
     data,
+    downloadFilename: "read-runs",
     enableColumnFilters: true,
     enableFilters: true,
     enableMultiSort: true,
@@ -72,6 +74,7 @@ export const useTable = (
     enableSorting: true,
     enableSortingInteraction: true,
     enableSortingRemoval: false,
+    enableTableDownload: true,
     filterFns: { arrIncludesSome },
     getCoreRowModel: getCoreRowModel(),
     getFacetedMinMaxValues: getFacetedMinMaxValues(),
