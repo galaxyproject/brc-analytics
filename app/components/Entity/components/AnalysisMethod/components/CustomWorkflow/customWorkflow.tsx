@@ -9,18 +9,19 @@ import { ROUTES } from "../../../../../../../routes/constants";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/components/FluidPaper/fluidPaper";
+import { CUSTOM_WORKFLOW } from "./constants";
 
 export const CustomWorkflow = ({ entityId }: Props): JSX.Element => {
+  const { trsId, workflowDescription, workflowName } = CUSTOM_WORKFLOW;
   return (
     <FluidPaper>
       <StyledGrid {...GRID_PROPS}>
         <Stack spacing={1}>
           <Typography variant={TYPOGRAPHY_PROPS.VARIANT.HEADING_XSMALL}>
-            Custom / No Workflow
+            {workflowName}
           </Typography>
           <Typography {...COMPONENT_TYPOGRAPHY_PROPS}>
-            Analyze selected data in the context of this assembly in your own
-            Galaxy workflow.
+            {workflowDescription}
           </Typography>
         </Stack>
         <Button
@@ -28,7 +29,7 @@ export const CustomWorkflow = ({ entityId }: Props): JSX.Element => {
           component={Link}
           href={replaceParameters(ROUTES.CONFIGURE_WORKFLOW, {
             entityId,
-            trsId: "custom-workflow",
+            trsId,
           })}
           rel={REL_ATTRIBUTE.NO_OPENER}
         >
