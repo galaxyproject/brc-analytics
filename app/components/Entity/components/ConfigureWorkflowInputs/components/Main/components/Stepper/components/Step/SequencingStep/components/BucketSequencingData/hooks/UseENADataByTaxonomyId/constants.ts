@@ -1,0 +1,1 @@
+export const MAX_READ_RUNS_FOR_BROWSE_ALL = 2000;
