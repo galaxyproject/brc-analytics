@@ -27,7 +27,7 @@ export function getRowSelectionValidation(
 ): string | undefined {
   return row.getValue(CATEGORY_CONFIGS.VALIDATION.key)
     ? undefined
-    : `"PAIRED" read run. Number of files not equal to two.`;
+    : `Number of files not equal to two for "PAIRED" read run`;
 }
 
 /**
