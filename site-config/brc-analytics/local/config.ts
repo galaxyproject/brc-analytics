@@ -11,7 +11,7 @@ import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organismEntityConfig";
 import { priorityPathogensEntityConfig } from "./index/priorityPathogensEntityConfig";
-import { socialMedia } from "./socialMedia";
+import { socialMenuItems, socialMedia } from "./socialMedia";
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 import { AppSiteConfig } from "../../common/entities";
 import { APP_KEYS } from "../../common/constants";
@@ -87,7 +87,20 @@ export function makeConfig(
             { label: "Organisms", url: ROUTES.ORGANISMS },
             { label: "Assemblies", url: ROUTES.GENOMES },
             { label: "Priority Pathogens", url: ROUTES.PRIORITY_PATHOGENS },
-            { label: "Roadmap", url: ROUTES.ROADMAP },
+            {
+              flatten: { lg: true, md: true, sm: false, xs: true },
+              label: "More",
+              menuItems: [
+                { label: "Roadmap", url: ROUTES.ROADMAP },
+                {
+                  label: "Join Us",
+                  menuItems: socialMenuItems,
+                  url: "",
+                  visible: { lg: false, xs: false },
+                },
+              ],
+              url: "",
+            },
           ],
           undefined,
         ],
