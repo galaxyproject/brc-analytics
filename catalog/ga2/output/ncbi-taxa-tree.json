@@ -8254,10 +8254,17 @@
                                                             "assembly_count": 2,
                                                             "children": [
                                                                 {
-                                                                    "assembly_count": 2,
+                                                                    "assembly_count": 1,
                                                                     "children": [],
                                                                     "name": "Amia calva",
                                                                     "ncbi_tax_id": "7924",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Amia ocellicauda",
+                                                                    "ncbi_tax_id": "2972642",
                                                                     "rank": "species"
                                                                 }
                                                             ],

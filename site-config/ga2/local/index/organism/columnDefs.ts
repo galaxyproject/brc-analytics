@@ -9,6 +9,13 @@ import { GA2OrganismEntity } from "../../../../../app/apis/catalog/ga2/entities"
 import {
   buildAssemblyCount,
   buildTaxonomicGroup,
+  buildTaxonomicLevelClass,
+  buildTaxonomicLevelDomain,
+  buildTaxonomicLevelFamily,
+  buildTaxonomicLevelGenus,
+  buildTaxonomicLevelKingdom,
+  buildTaxonomicLevelOrder,
+  buildTaxonomicLevelPhylum,
 } from "app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import * as V from "../../../../../app/viewModelBuilders/catalog/ga2/viewModelBuilders";
 
@@ -30,6 +37,76 @@ export const ASSEMBLY_TAXONOMY_IDS: ColumnConfig<GA2OrganismEntity> = {
   header: GA2_CATEGORY_LABEL.ASSEMBLY_TAXONOMY_IDS,
   id: GA2_CATEGORY_KEY.ASSEMBLY_TAXONOMY_IDS,
   width: { max: "0.65fr", min: "164px" },
+};
+
+export const TAXONOMIC_LEVEL_DOMAIN: ColumnConfig<GA2OrganismEntity> = {
+  componentConfig: {
+    component: C.BasicCell,
+    viewBuilder: buildTaxonomicLevelDomain,
+  } as ComponentConfig<typeof C.BasicCell, GA2OrganismEntity>,
+  header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_DOMAIN,
+  id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_DOMAIN,
+  width: { max: "1fr", min: "200px" },
+};
+
+export const TAXONOMIC_LEVEL_KINGDOM: ColumnConfig<GA2OrganismEntity> = {
+  componentConfig: {
+    component: C.BasicCell,
+    viewBuilder: buildTaxonomicLevelKingdom,
+  } as ComponentConfig<typeof C.BasicCell, GA2OrganismEntity>,
+  header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_KINGDOM,
+  id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_KINGDOM,
+  width: { max: "1fr", min: "200px" },
+};
+
+export const TAXONOMIC_LEVEL_PHYLUM: ColumnConfig<GA2OrganismEntity> = {
+  componentConfig: {
+    component: C.BasicCell,
+    viewBuilder: buildTaxonomicLevelPhylum,
+  } as ComponentConfig<typeof C.BasicCell, GA2OrganismEntity>,
+  header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_PHYLUM,
+  id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_PHYLUM,
+  width: { max: "1fr", min: "200px" },
+};
+
+export const TAXONOMIC_LEVEL_CLASS: ColumnConfig<GA2OrganismEntity> = {
+  componentConfig: {
+    component: C.BasicCell,
+    viewBuilder: buildTaxonomicLevelClass,
+  } as ComponentConfig<typeof C.BasicCell, GA2OrganismEntity>,
+  header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_CLASS,
+  id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_CLASS,
+  width: { max: "1fr", min: "200px" },
+};
+
+export const TAXONOMIC_LEVEL_ORDER: ColumnConfig<GA2OrganismEntity> = {
+  componentConfig: {
+    component: C.BasicCell,
+    viewBuilder: buildTaxonomicLevelOrder,
+  } as ComponentConfig<typeof C.BasicCell, GA2OrganismEntity>,
+  header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_ORDER,
+  id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_ORDER,
+  width: { max: "1fr", min: "200px" },
+};
+
+export const TAXONOMIC_LEVEL_FAMILY: ColumnConfig<GA2OrganismEntity> = {
+  componentConfig: {
+    component: C.BasicCell,
+    viewBuilder: buildTaxonomicLevelFamily,
+  } as ComponentConfig<typeof C.BasicCell, GA2OrganismEntity>,
+  header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_FAMILY,
+  id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_FAMILY,
+  width: { max: "1fr", min: "200px" },
+};
+
+export const TAXONOMIC_LEVEL_GENUS: ColumnConfig<GA2OrganismEntity> = {
+  componentConfig: {
+    component: C.BasicCell,
+    viewBuilder: buildTaxonomicLevelGenus,
+  } as ComponentConfig<typeof C.BasicCell, GA2OrganismEntity>,
+  header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_GENUS,
+  id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_GENUS,
+  width: { max: "1fr", min: "200px" },
 };
 
 export const TAXONOMIC_GROUP: ColumnConfig<GA2OrganismEntity> = {
