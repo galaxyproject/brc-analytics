@@ -29,7 +29,6 @@ import { getFacetedMinMaxValues } from "@databiosphere/findable-ui/lib/component
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 import { ROW_SELECTION_VALIDATION } from "@databiosphere/findable-ui/lib/components/Table/features/RowSelectionValidation/constants";
 import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/features/TableDownload/constants";
-import { CATEGORY_CONFIGS } from "./categoryConfigs";
 import { mapReadRuns } from "./dataTransforms";
 
 export const useTable = (
@@ -60,10 +59,7 @@ export const useTable = (
 
   const data = useMemo(() => mapReadRuns(readRuns), [readRuns]);
 
-  const initialState: InitialTableState = {
-    columnVisibility: { [CATEGORY_CONFIGS.VALIDATION.key]: false },
-    sorting: SORTING,
-  };
+  const initialState: InitialTableState = { sorting: SORTING };
 
   const meta = {
     categoryGroups: CATEGORY_GROUPS,

@@ -130,12 +130,6 @@ const STUDY_ACCESSION: ColumnDef<ReadRun> = {
   meta: META,
 };
 
-const VALIDATION: ColumnDef<ReadRun> = {
-  accessorKey: CATEGORY_CONFIGS.VALIDATION.key,
-  header: CATEGORY_CONFIGS.VALIDATION.label,
-  id: CATEGORY_CONFIGS.VALIDATION.key,
-};
-
 export const columns: ColumnDef<ReadRun>[] = [
   COLUMN_DEF.ROW_SELECTION as ColumnDef<ReadRun>,
   RUN_ACCESSION,
@@ -151,5 +145,4 @@ export const columns: ColumnDef<ReadRun>[] = [
   LIBRARY_LAYOUT,
   READ_COUNT,
   BASE_COUNT,
-  VALIDATION, // Hidden column.
 ];
