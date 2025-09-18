@@ -12,7 +12,7 @@ export function validationAccessorFn(row: ReadRun): boolean {
   // Return true if the row is "SINGLE".
   if (libraryLayout === "SINGLE") return true;
 
-  // Confirm for "PAIRED" that the row has a valid FTP URL.
+  // Confirm for "PAIRED" that the row has a valid FTP URL i.e. there are exactly two fastq files.
   const fastqs = row.fastq_ftp;
 
   if (!fastqs) return false;
