@@ -2,7 +2,7 @@ import { ReadRun } from "../../../../types";
 
 /**
  * Returns true if the row data is valid for selection.
- * Row is selectable if it is a single-end run or if it has a valid FTP URL for paired-end runs.
+ * Row is selectable if it is a single-end run (or other unknown layout values) or if it has two FTP URLs for paired-end runs.
  * @param row - Original row data.
  * @returns True if the row data is valid.
  */
