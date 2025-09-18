@@ -6,7 +6,6 @@ import {
 } from "@tanstack/react-table";
 import { ENA_QUERY_METHOD } from "../../../../../../types";
 import { ReadRun } from "../../../../types";
-import { CATEGORY_CONFIGS } from "./categoryConfigs";
 
 /**
  * Checks if the row is selectable.
@@ -14,7 +13,7 @@ import { CATEGORY_CONFIGS } from "./categoryConfigs";
  * @returns True if the row is selectable, false otherwise.
  */
 export function enableRowSelection(row: Row<ReadRun>): boolean {
-  return row.getValue(CATEGORY_CONFIGS.VALIDATION.key);
+  return row.original.validation.isValid;
 }
 
 /**
@@ -25,9 +24,7 @@ export function enableRowSelection(row: Row<ReadRun>): boolean {
 export function getRowSelectionValidation(
   row: Row<ReadRun>
 ): string | undefined {
-  return row.getValue(CATEGORY_CONFIGS.VALIDATION.key)
-    ? undefined
-    : `Number of files not equal to two for "PAIRED" read run`;
+  return row.original.validation.error;
 }
 
 /**

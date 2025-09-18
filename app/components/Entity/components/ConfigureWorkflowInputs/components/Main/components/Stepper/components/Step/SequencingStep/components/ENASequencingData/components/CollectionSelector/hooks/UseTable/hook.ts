@@ -6,7 +6,7 @@ import {
   Table,
   useReactTable,
 } from "@tanstack/react-table";
-import { ReadRun } from "../../../../types";
+import { BaseReadRun, ReadRun } from "../../../../types";
 import { ROW_POSITION } from "@databiosphere/findable-ui/lib/components/Table/features/RowPosition/constants";
 import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/features/RowPreview/constants";
 import { columns } from "./columnDef";
@@ -30,11 +30,12 @@ import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/
 import { ROW_SELECTION_VALIDATION } from "@databiosphere/findable-ui/lib/components/Table/features/RowSelectionValidation/constants";
 import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/features/TableDownload/constants";
 import { CATEGORY_CONFIGS } from "./categoryConfigs";
+import { mapReadRuns } from "./dataTransforms";
 
 export const useTable = (
   enaQueryMethod: ENA_QUERY_METHOD,
-  enaAccession: UseENADataByAccession<ReadRun>,
-  enaTaxonomyId: UseENADataByTaxonomyId<ReadRun>
+  enaAccession: UseENADataByAccession<BaseReadRun>,
+  enaTaxonomyId: UseENADataByTaxonomyId<BaseReadRun>
 ): Table<ReadRun> => {
   const [columnFiltersByMethod, setColumnFiltersByMethod] = useState<
     Record<ENA_QUERY_METHOD, ColumnFiltersState>
@@ -57,7 +58,7 @@ export const useTable = (
       ? enaAccession
       : enaTaxonomyId;
 
-  const data = useMemo(() => readRuns || [], [readRuns]);
+  const data = useMemo(() => mapReadRuns(readRuns), [readRuns]);
 
   const initialState: InitialTableState = {
     columnVisibility: { [CATEGORY_CONFIGS.VALIDATION.key]: false },

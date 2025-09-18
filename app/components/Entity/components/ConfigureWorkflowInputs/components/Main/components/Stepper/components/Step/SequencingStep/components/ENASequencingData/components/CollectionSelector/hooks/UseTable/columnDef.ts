@@ -6,7 +6,6 @@ import { BasicCell } from "../../components/Table/components/TableCell/component
 import { LinkCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/LinkCell/linkCell";
 import { CATEGORY_CONFIGS } from "./categoryConfigs";
 import { formatNumber } from "../../../../../../../../../../../../../../../../../viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { validationAccessorFn } from "./accessorFns";
 
 const RANGE_FILTER_FN = "inNumberRange";
 const SELECT_FILTER_FN = "arrIncludesSome";
@@ -132,7 +131,7 @@ const STUDY_ACCESSION: ColumnDef<ReadRun> = {
 };
 
 const VALIDATION: ColumnDef<ReadRun> = {
-  accessorFn: validationAccessorFn,
+  accessorKey: CATEGORY_CONFIGS.VALIDATION.key,
   header: CATEGORY_CONFIGS.VALIDATION.label,
   id: CATEGORY_CONFIGS.VALIDATION.key,
 };
