@@ -1,3 +1,5 @@
+import { TAXONOMIC_LEVEL_DOMAIN, TAXONOMIC_LEVEL_GENUS, TAXONOMIC_LEVEL_KINGDOM } from "./local/index/genome/columnDefs";
+
 export const GA2_CATEGORY_KEY = {
   ACCESSION: "accession",
   ANALYZE_GENOME: "analyzeGenome",
@@ -15,6 +17,13 @@ export const GA2_CATEGORY_KEY = {
   SCAFFOLD_N50: "scaffoldN50",
   STRAIN_NAME: "strainName",
   TAXONOMIC_GROUP: "taxonomicGroup",
+  TAXONOMIC_LEVEL_KINGDOM: "taxonomicLevelKingdom",
+  TAXONOMIC_LEVEL_PHYLUM: "taxonomicLevelPhylum",
+  TAXONOMIC_LEVEL_CLASS: "taxonomicLevelClass",
+  TAXONOMIC_LEVEL_ORDER: "taxonomicLevelOrder",
+  TAXONOMIC_LEVEL_DOMAIN: "taxonomicLevelDomain",
+  TAXONOMIC_LEVEL_FAMILY: "taxonomicLevelFamily",
+  TAXONOMIC_LEVEL_GENUS: "taxonomicLevelGenus",
   TAXONOMIC_LEVEL_SPECIES: "taxonomicLevelSpecies",
   TAXONOMIC_LEVEL_STRAIN: "taxonomicLevelStrain",
   TAXONOMY_ID: "ncbiTaxonomyId",
@@ -37,6 +46,13 @@ export const GA2_CATEGORY_LABEL = {
   SCAFFOLD_N50: "Scaffold N50",
   STRAIN_NAME: "Strain Name",
   TAXONOMIC_GROUP: "Taxonomic Group",
+  TAXONOMIC_LEVEL_KINGDOM: "Kingdom",
+  TAXONOMIC_LEVEL_PHYLUM: "Phylum",
+  TAXONOMIC_LEVEL_CLASS: "Class",
+  TAXONOMIC_LEVEL_ORDER: "Order",
+  TAXONOMIC_LEVEL_DOMAIN: "Domain",
+  TAXONOMIC_LEVEL_FAMILY: "Family",
+  TAXONOMIC_LEVEL_GENUS: "Genus",
   TAXONOMIC_LEVEL_SPECIES: "Species",
   TAXONOMIC_LEVEL_STRAIN: "Strain",
   TAXONOMY_ID: "Taxonomy ID",
