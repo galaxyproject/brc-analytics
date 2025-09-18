@@ -9,7 +9,7 @@ export const AboutViewGA2 = (): JSX.Element => {
       <SectionHero
         breadcrumbs={BREADCRUMBS}
         head="About GenomeArk2"
-        subHead="GenomeArk is a collaborative effort of four mature software and infrastructure projects that have been sustained for decades."
+        subHead="GenomeArk2 is a collaborative effort of four mature software and infrastructure projects that have been sustained for decades."
       />
       <SectionAboutGA2 />
     </Fragment>
