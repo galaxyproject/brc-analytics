@@ -18,5 +18,5 @@ export function validationAccessorFn(row: ReadRun): boolean {
   if (!fastqs) return false;
   if (typeof fastqs !== "string") return false;
 
-  return fastqs.split(";").length >= 2;
+  return fastqs.split(";").length === 2;
 }
