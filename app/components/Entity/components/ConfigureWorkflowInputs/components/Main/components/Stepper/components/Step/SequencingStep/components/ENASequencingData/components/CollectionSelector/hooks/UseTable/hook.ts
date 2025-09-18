@@ -2,6 +2,7 @@ import {
   getCoreRowModel,
   getFacetedRowModel,
   getFilteredRowModel,
+  InitialTableState,
   Table,
   useReactTable,
 } from "@tanstack/react-table";
@@ -16,13 +17,19 @@ import { ColumnFiltersState, Updater } from "@tanstack/react-table";
 import { UseENADataByAccession } from "../../../../hooks/UseENADataByAccession/types";
 import { UseENADataByTaxonomyId } from "../../../../hooks/UseENADataByTaxonomyId/types";
 import { ENA_QUERY_METHOD } from "../../../../../../types";
-import { updateColumnFilters } from "./utils";
+import {
+  enableRowSelection,
+  getRowSelectionValidation,
+  updateColumnFilters,
+} from "./utils";
 import { SORTING } from "./constants";
 import { getSortedRowModel } from "@tanstack/react-table";
 import { CATEGORY_GROUPS } from "./categoryGroups";
 import { getFacetedMinMaxValues } from "@databiosphere/findable-ui/lib/components/Table/featureOptions/facetedColumn/getFacetedMinMaxValues";
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
+import { ROW_SELECTION_VALIDATION } from "@databiosphere/findable-ui/lib/components/Table/features/RowSelectionValidation/constants";
 import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/features/TableDownload/constants";
+import { CATEGORY_CONFIGS } from "./categoryConfigs";
 
 export const useTable = (
   enaQueryMethod: ENA_QUERY_METHOD,
@@ -52,7 +59,10 @@ export const useTable = (
 
   const data = useMemo(() => readRuns || [], [readRuns]);
 
-  const initialState = { sorting: SORTING };
+  const initialState: InitialTableState = {
+    columnVisibility: { [CATEGORY_CONFIGS.VALIDATION.key]: false },
+    sorting: SORTING,
+  };
 
   const meta = {
     categoryGroups: CATEGORY_GROUPS,
@@ -63,14 +73,20 @@ export const useTable = (
   const state = { columnFilters: columnFiltersByMethod[enaQueryMethod] };
 
   return useReactTable<ReadRun>({
-    _features: [ROW_POSITION, ROW_PREVIEW, TABLE_DOWNLOAD],
+    _features: [
+      ROW_POSITION,
+      ROW_PREVIEW,
+      ROW_SELECTION_VALIDATION,
+      TABLE_DOWNLOAD,
+    ],
     columns,
     data,
     downloadFilename: "read-runs",
     enableColumnFilters: true,
     enableFilters: true,
     enableMultiSort: true,
-    enableRowSelection: true,
+    enableRowSelection,
+    enableRowSelectionValidation: true,
     enableSorting: true,
     enableSortingInteraction: true,
     enableSortingRemoval: false,
@@ -82,6 +98,7 @@ export const useTable = (
     getFacetedUniqueValues: getFacetedUniqueValuesWithArrayValues(),
     getFilteredRowModel: getFilteredRowModel(),
     getRowId: (row) => row.run_accession,
+    getRowSelectionValidation,
     getSortedRowModel: getSortedRowModel(),
     initialState,
     meta,
