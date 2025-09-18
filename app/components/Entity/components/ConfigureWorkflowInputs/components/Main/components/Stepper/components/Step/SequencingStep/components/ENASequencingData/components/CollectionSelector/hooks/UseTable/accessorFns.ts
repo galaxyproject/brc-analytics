@@ -9,14 +9,13 @@ import { ReadRun } from "../../../../types";
 export function validationAccessorFn(row: ReadRun): boolean {
   const libraryLayout = row.library_layout;
 
-  // Return true if the row is "SINGLE".
-  if (libraryLayout === "SINGLE") return true;
+  if (libraryLayout === "PAIRED") {
+    const fastqs = row.fastq_ftp;
+    if (!fastqs) return false;
+    if (typeof fastqs !== "string") return false;
+    return fastqs.split(";").length === 2;
+  }
 
-  // Confirm for "PAIRED" that the row has a valid FTP URL i.e. there are exactly two fastq files.
-  const fastqs = row.fastq_ftp;
-
-  if (!fastqs) return false;
-  if (typeof fastqs !== "string") return false;
-
-  return fastqs.split(";").length === 2;
+  // For all other cases, return true.
+  return true;
 }
