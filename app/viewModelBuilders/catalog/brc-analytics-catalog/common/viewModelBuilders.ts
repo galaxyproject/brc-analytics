@@ -552,12 +552,14 @@ export const buildPriorityPathogenResources = (
  * @param entity - Entity with a taxonomicGroup property.
  * @returns Props for the NTagCell component.
  */
+type TaxonomicGroupEntity =
+  | BRCDataCatalogOrganism
+  | BRCDataCatalogGenome
+  | GA2AssemblyEntity
+  | GA2OrganismEntity;
+
 export const buildTaxonomicGroup = (
-  entity:
-    | BRCDataCatalogOrganism
-    | BRCDataCatalogGenome
-    | GA2AssemblyEntity
-    | GA2OrganismEntity
+  entity: TaxonomicGroupEntity
 ): ComponentProps<typeof C.NTagCell> => {
   return {
     label: "taxonomic groups",
@@ -571,11 +573,7 @@ export const buildTaxonomicGroup = (
  * @returns Props to be used for the cell.
  */
 export const buildTaxonomicLevelClass = (
-  entity:
-    | BRCDataCatalogOrganism
-    | BRCDataCatalogGenome
-    | GA2OrganismEntity
-    | GA2AssemblyEntity
+  entity: TaxonomicGroupEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.taxonomicLevelClass,
@@ -588,11 +586,7 @@ export const buildTaxonomicLevelClass = (
  * @returns Props to be used for the cell.
  */
 export const buildTaxonomicLevelDomain = (
-  entity:
-    | BRCDataCatalogOrganism
-    | BRCDataCatalogGenome
-    | GA2OrganismEntity
-    | GA2AssemblyEntity
+  entity: TaxonomicGroupEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.taxonomicLevelDomain,
@@ -605,11 +599,7 @@ export const buildTaxonomicLevelDomain = (
  * @returns Props to be used for the cell.
  */
 export const buildTaxonomicLevelFamily = (
-  entity:
-    | BRCDataCatalogOrganism
-    | BRCDataCatalogGenome
-    | GA2OrganismEntity
-    | GA2AssemblyEntity
+  entity: TaxonomicGroupEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.taxonomicLevelFamily,
@@ -622,11 +612,7 @@ export const buildTaxonomicLevelFamily = (
  * @returns Props to be used for the cell.
  */
 export const buildTaxonomicLevelGenus = (
-  entity:
-    | BRCDataCatalogOrganism
-    | BRCDataCatalogGenome
-    | GA2OrganismEntity
-    | GA2AssemblyEntity
+  entity: TaxonomicGroupEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.taxonomicLevelGenus,
@@ -639,11 +625,7 @@ export const buildTaxonomicLevelGenus = (
  * @returns Props to be used for the cell.
  */
 export const buildTaxonomicLevelKingdom = (
-  entity:
-    | BRCDataCatalogOrganism
-    | BRCDataCatalogGenome
-    | GA2OrganismEntity
-    | GA2AssemblyEntity
+  entity: TaxonomicGroupEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.taxonomicLevelKingdom,
@@ -656,11 +638,7 @@ export const buildTaxonomicLevelKingdom = (
  * @returns Props to be used for the cell.
  */
 export const buildTaxonomicLevelOrder = (
-  entity:
-    | BRCDataCatalogOrganism
-    | BRCDataCatalogGenome
-    | GA2OrganismEntity
-    | GA2AssemblyEntity
+  entity: TaxonomicGroupEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.taxonomicLevelOrder,
@@ -673,11 +651,7 @@ export const buildTaxonomicLevelOrder = (
  * @returns Props to be used for the cell.
  */
 export const buildTaxonomicLevelPhylum = (
-  entity:
-    | BRCDataCatalogOrganism
-    | BRCDataCatalogGenome
-    | GA2OrganismEntity
-    | GA2AssemblyEntity
+  entity: TaxonomicGroupEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.taxonomicLevelPhylum,
