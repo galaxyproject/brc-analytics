@@ -12,7 +12,7 @@ const CARD_TEXT = {
   ABOUT_JETSTREAM2: "A flexible, user-friendly cloud computing environment",
   ABOUT_NCBI: "A singular source for standardized genomic and functional data",
   ABOUT_T2T:
-    "An open, community-based effort to generate the first complete assenbky of a human genome",
+    "An open, community-based effort to generate the first complete assembly of a human genome",
   ABOUT_TACC: "One of the world’s leading academic computing centers",
   ABOUT_UCSC:
     "A global platform for visualization and interpretation of genomic data",
