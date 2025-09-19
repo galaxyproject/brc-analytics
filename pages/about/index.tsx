@@ -9,7 +9,7 @@ import { ROUTES } from "../../routes/constants";
 export const About = (): JSX.Element => {
   const { appKey } = config();
 
-  if (appKey == APP_KEYS.GA2) {
+  if (appKey === APP_KEYS.GA2) {
     return <AboutViewGA2 />;
   }
   return <AboutView />;
