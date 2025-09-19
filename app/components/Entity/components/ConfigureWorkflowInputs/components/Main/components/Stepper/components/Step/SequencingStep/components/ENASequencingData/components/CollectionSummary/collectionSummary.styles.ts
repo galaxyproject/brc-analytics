@@ -7,12 +7,4 @@ export const StyledRoundedPaper = styled(RoundedPaper)`
   display: grid;
   gap: 1px;
   width: 100%;
-
-  .MuiToolbar-table {
-    background-color: ${PALETTE.COMMON_WHITE};
-    display: flex;
-    gap: 8px;
-    justify-content: space-between;
-    padding: 16px;
-  }
 `;
