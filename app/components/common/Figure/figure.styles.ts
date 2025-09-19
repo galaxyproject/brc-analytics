@@ -23,6 +23,10 @@ export const Figure = styled.figure`
       gap: 0 64px;
       margin-top: 52px;
       text-align: unset;
+
+      span {
+        flex: 1;
+      }
     }
   }
 `;
