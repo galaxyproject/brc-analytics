@@ -4,7 +4,7 @@ import { ButtonProps } from "@mui/material";
 
 export const ACCORDION: Record<string, { details?: string; title: string }> = {
   "0": {
-    details: "Select an organisms.",
+    details: "Select an organism.",
     title: "Select an Organism",
   },
   "1": {
