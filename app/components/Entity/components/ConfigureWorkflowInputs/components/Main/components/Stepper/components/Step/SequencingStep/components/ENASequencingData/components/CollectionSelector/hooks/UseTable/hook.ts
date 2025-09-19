@@ -29,7 +29,7 @@ import { getFacetedMinMaxValues } from "@databiosphere/findable-ui/lib/component
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 import { ROW_SELECTION_VALIDATION } from "@databiosphere/findable-ui/lib/components/Table/features/RowSelectionValidation/constants";
 import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/features/TableDownload/constants";
-import { mapReadRuns } from "./dataTransforms";
+import { mapReadRuns, sanitizeReadRuns } from "./dataTransforms";
 
 export const useTable = (
   enaQueryMethod: ENA_QUERY_METHOD,
@@ -57,7 +57,10 @@ export const useTable = (
       ? enaAccession
       : enaTaxonomyId;
 
-  const data = useMemo(() => mapReadRuns(readRuns), [readRuns]);
+  const data = useMemo(
+    () => sanitizeReadRuns(mapReadRuns(readRuns)),
+    [readRuns]
+  );
 
   const initialState: InitialTableState = { sorting: SORTING };
 

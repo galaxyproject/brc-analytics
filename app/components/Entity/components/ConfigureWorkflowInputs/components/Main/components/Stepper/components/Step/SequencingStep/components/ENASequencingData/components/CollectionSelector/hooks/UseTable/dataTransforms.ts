@@ -13,7 +13,7 @@ import { BaseReadRun, ReadRun, Validation } from "../../../../types";
 function buildValidation(readRun: BaseReadRun): Validation {
   const { fastq_ftp: fastqs, library_layout: libraryLayout } = readRun;
 
-  if (!isFastqValid(fastqs))
+  if (!fastqs)
     return {
       error: "FASTQ data is missing or invalid.",
       isValid: false,
@@ -36,15 +36,6 @@ function buildValidation(readRun: BaseReadRun): Validation {
 }
 
 /**
- * Checks if the fastq is a valid string.
- * @param fastq - Fastq.
- * @returns True if the fastq is a string, false otherwise.
- */
-function isFastqValid(fastq: string): fastq is string {
-  return !!fastq && typeof fastq === "string";
-}
-
-/**
  * Maps read runs to read run with validation.
  * @param readRuns - Read runs.
  * @returns Read run with validation.
@@ -54,6 +45,20 @@ export function mapReadRuns(readRuns?: BaseReadRun[]): ReadRun[] {
     readRuns?.map((readRun) => ({
       ...readRun,
       validation: buildValidation(readRun),
+    })) || []
+  );
+}
+
+/**
+ * Sanitizes read runs by ensuring that the fastq_ftp is a string.
+ * @param readRuns - Read runs.
+ * @returns Sanitized read runs.
+ */
+export function sanitizeReadRuns(readRuns: ReadRun[]): ReadRun[] {
+  return (
+    readRuns?.map((readRun) => ({
+      ...readRun,
+      fastq_ftp: typeof readRun.fastq_ftp === "string" ? readRun.fastq_ftp : "",
     })) || []
   );
 }
