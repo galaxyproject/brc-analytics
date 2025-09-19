@@ -3,7 +3,7 @@ import { RefObject, useEffect, useMemo } from "react";
 import { useSwipeInteraction } from "../../../../../../../../../../../hooks/useSwipeInteraction/useSwipeInteraction";
 import { ANALYTICS_TOOLS } from "../../common/constants";
 import { useIntersectionObserver } from "../useIntersectionObserver/useIntersectionObserver";
-import { ROWS } from "./common/contants";
+import { ROWS } from "./common/constants";
 import { UseInteractiveAnalyticsAndData } from "./common/entities";
 
 /**
