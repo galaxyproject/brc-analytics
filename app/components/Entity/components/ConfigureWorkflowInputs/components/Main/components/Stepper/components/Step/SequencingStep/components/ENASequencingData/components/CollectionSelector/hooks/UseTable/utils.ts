@@ -1,9 +1,31 @@
 import {
   ColumnFiltersState,
+  Row,
   Updater,
   functionalUpdate,
 } from "@tanstack/react-table";
 import { ENA_QUERY_METHOD } from "../../../../../../types";
+import { ReadRun } from "../../../../types";
+
+/**
+ * Checks if the row is selectable.
+ * @param row - Row to check.
+ * @returns True if the row is selectable, false otherwise.
+ */
+export function enableRowSelection(row: Row<ReadRun>): boolean {
+  return row.original.validation.isValid;
+}
+
+/**
+ * Returns the row selection validation message for a row.
+ * @param row - Row.
+ * @returns The row selection validation message for the row.
+ */
+export function getRowSelectionValidation(
+  row: Row<ReadRun>
+): string | undefined {
+  return row.original.validation.error;
+}
 
 /**
  * Updates the column filters for the specified ENA query method.
