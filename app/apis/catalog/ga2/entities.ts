@@ -22,6 +22,13 @@ export interface GA2AssemblyEntity {
   sra_data: SRAData[];
   strainName: string | null;
   taxonomicGroup: string[];
+  taxonomicLevelClass: string;
+  taxonomicLevelDomain: string;
+  taxonomicLevelFamily: string;
+  taxonomicLevelGenus: string;
+  taxonomicLevelKingdom: string;
+  taxonomicLevelOrder: string;
+  taxonomicLevelPhylum: string;
   taxonomicLevelSpecies: string;
   taxonomicLevelStrain: string;
   tolId: string;
@@ -35,6 +42,13 @@ export interface GA2OrganismEntity {
   maxScaffoldN50: number | null;
   ncbiTaxonomyId: string;
   taxonomicGroup: string[];
+  taxonomicLevelClass: string;
+  taxonomicLevelDomain: string;
+  taxonomicLevelFamily: string;
+  taxonomicLevelGenus: string;
+  taxonomicLevelKingdom: string;
+  taxonomicLevelOrder: string;
+  taxonomicLevelPhylum: string;
   taxonomicLevelSpecies: string;
   tolId: string;
 }
