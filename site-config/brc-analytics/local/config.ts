@@ -96,7 +96,7 @@ export function makeConfig(
                   label: "Join Us",
                   menuItems: socialMenuItems,
                   url: "",
-                  visible: { lg: false, xs: false },
+                  visible: { lg: false, md: false, sm: true, xs: false },
                 },
               ],
               url: "",

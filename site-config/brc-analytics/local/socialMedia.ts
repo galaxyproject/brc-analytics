@@ -56,4 +56,5 @@ export const socialMedia: SocialMedia = {
       Icon: C.GitHubIcon,
     },
   ],
+  visible: { lg: true, md: true, sm: false, xs: false },
 };
