@@ -5,13 +5,23 @@ import { TreeNode, NodeDetails } from "./NodeDetails";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { roma_cyclic } from "../../../../../../theme/color-maps/crameri";
 
-const DEPTH = 4;
 const data = getData();
 
-export const SectionViz = (): JSX.Element => {
+type SectionVizProps = {
+  depth?: number;
+  logoPath?: string;
+  startingNode?: string;
+};
+export const SectionViz = ({
+  depth = 4,
+  logoPath = "/logo/brc.svg",
+  startingNode = "root",
+}: SectionVizProps): JSX.Element => {
   const [selectedNode, setSelectedNode] = useState<TreeNode | null>(null);
   const [rootNode, setRootNode] = useState<TreeNode | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
+  const DEPTH = depth;
+  const LOGO_PATH = logoPath;
 
   // Add a reference to the clicked function so it can be called from NodeDetails
   const clickedRef =
@@ -191,8 +201,14 @@ export const SectionViz = (): JSX.Element => {
     // Save each node's initial coordinates for smooth transitions.
     root.each((d) => (d.current = d));
 
+    function findNodeByName(root: TreeNode, name: string): TreeNode {
+      if (root.data.name === name) return root;
+      const foundNode = root.descendants().find((d) => d.data.name === name);
+      return foundNode || root; // Fallback to root if not found
+    }
+
     // Global variable to track the current center (zoomed) node. Initially, it's the root.
-    let currentRoot = root;
+    let currentRoot = findNodeByName(root, startingNode);
     setSelectedNode(currentRoot);
 
     // An arc generator that "clamps" the radial depth so that
@@ -317,7 +333,7 @@ export const SectionViz = (): JSX.Element => {
       .attr("y", -LOGO_HEIGHT / 2)
       .attr("width", LOGO_WIDTH)
       .attr("height", LOGO_HEIGHT)
-      .attr("href", "/logo/brc.svg")
+      .attr("href", LOGO_PATH)
       .attr("preserveAspectRatio", "xMidYMid meet")
       .style("opacity", 1);
 
@@ -446,6 +462,10 @@ export const SectionViz = (): JSX.Element => {
 
     // Assign the clicked function to the ref so it can be accessed outside
     clickedRef.current = clicked;
+
+    if (currentRoot !== root && clickedRef.current) {
+      clickedRef.current(null, currentRoot);
+    }
 
     // Clean up on component unmount: remove tooltip and clear svg.
     return (): void => {
