@@ -22,8 +22,8 @@ export const Questions = (): JSX.Element => {
           available, and downstream analysis results will be displayed. You can
           submit your own requests for additional datasets and features at{" "}
           <DXLink
-            label="help@brc-analytics.org"
-            url="mailto:help@brc-analytics.org"
+            label="help@genomeark2.org"
+            url="mailto:help@genomeark2.org"
           />
           .
         </MAccordionDetails>
