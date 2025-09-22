@@ -1,0 +1,67 @@
+import { CardAction as DXCardAction } from "@databiosphere/findable-ui/lib/components/common/Card/components/CardAction/cardAction";
+import { CardSecondaryText as DXCardSecondaryText } from "@databiosphere/findable-ui/lib/components/common/Card/components/CardSecondaryText/cardSecondaryText";
+import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
+import { useRef } from "react";
+import { CardMedia } from "../../../../../../../../common/Card/components/CardMedia/cardMedia";
+import {
+  CardContent,
+  CardSection,
+  CardTitle,
+  Grid,
+  StyledBullets,
+  StyledCard,
+  StyledCardActions,
+} from "./analyticsToolsAndData.styles";
+import { useInteractiveAnalyticsAndData } from "./hooks/useInteractiveAnalyticsAndData/useInteractiveAnalyticsAndData";
+
+export const AnalyticsToolsAndData = (): JSX.Element => {
+  const toolsRef = useRef<HTMLDivElement>(null);
+  const {
+    activeIndex,
+    interactionEnabled,
+    interactiveAction,
+    interactiveCards,
+    interactiveIndexes,
+    onSetActiveIndex,
+  } = useInteractiveAnalyticsAndData(toolsRef);
+  return (
+    <div>
+      <Grid
+        ref={toolsRef}
+        interactionEnabled={interactionEnabled}
+        {...interactiveAction}
+      >
+        {interactiveCards.map(({ cardActions, media, text, title }, i) => (
+          <StyledCard key={i} component={RoundedPaper}>
+            <CardSection>
+              {media && <CardMedia media={media} />}
+              <CardContent>
+                <CardTitle>{title}</CardTitle>
+                <DXCardSecondaryText>{text}</DXCardSecondaryText>
+              </CardContent>
+              {cardActions && (
+                <StyledCardActions>
+                  {cardActions?.map(({ label, target, url }) => (
+                    <DXCardAction
+                      key={url}
+                      label={label}
+                      target={target}
+                      url={url}
+                    />
+                  ))}
+                </StyledCardActions>
+              )}
+            </CardSection>
+          </StyledCard>
+        ))}
+      </Grid>
+      {interactionEnabled && (
+        <StyledBullets
+          activeBullet={activeIndex}
+          bullets={interactiveIndexes}
+          onBullet={onSetActiveIndex}
+        />
+      )}
+    </div>
+  );
+};
