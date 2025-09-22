@@ -11,7 +11,12 @@ import {
 import { AppSiteConfig } from "../../common/entities";
 import { APP_KEYS } from "../../common/constants";
 
-const ALLOWED_PATHS = [ROUTES.ORGANISMS, ROUTES.GENOMES, ROUTES.ROADMAP];
+const ALLOWED_PATHS = [
+  ROUTES.ABOUT,
+  ROUTES.ORGANISMS,
+  ROUTES.GENOMES,
+  ROUTES.ROADMAP,
+];
 const LOCALHOST = "http://localhost:3000";
 const APP_TITLE = "Genome Ark 2";
 const BROWSER_URL = LOCALHOST;
@@ -63,6 +68,7 @@ export function makeConfig(
         navigation: [
           undefined,
           [
+            { label: "About", url: ROUTES.ABOUT },
             { label: "Organisms", url: ROUTES.ORGANISMS },
             { label: "Assemblies", url: ROUTES.GENOMES },
             { label: "Roadmap", url: ROUTES.ROADMAP },
