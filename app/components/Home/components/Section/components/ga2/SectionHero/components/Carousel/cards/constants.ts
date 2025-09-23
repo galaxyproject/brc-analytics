@@ -3,7 +3,7 @@ import * as MDX from "../content";
 
 export const CAROUSEL_CARDS: Pick<CardProps, "text">[] = [
   {
-    text: MDX.Roadmap({}),
+    text: MDX.NewFeatures({}),
   },
   {
     text: MDX.ShareUsageAndJoinAdvisoryPanel({}),
