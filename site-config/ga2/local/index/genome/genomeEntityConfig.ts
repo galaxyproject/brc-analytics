@@ -48,6 +48,7 @@ export const genomeEntityConfig: AppEntityConfig<GA2AssemblyEntity> = {
       enableTableDownload: true,
       initialState: {
         columnVisibility: {
+          [GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN]: false,
           [GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_CLASS]: false,
           [GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_FAMILY]: false,
           [GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_GENUS]: false,
