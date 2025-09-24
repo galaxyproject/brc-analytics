@@ -3,7 +3,6 @@ import { SectionHero } from "../../../components/Home/components/Section/compone
 import { SectionAssemblies } from "../../../components/Home/components/Section/components/ga2/SectionAssemblies/sectionAssemblies";
 import { SectionSubHero } from "../../../components/Home/components/Section/components/ga2/SectionSubHero/sectionSubHero";
 import { SectionAnalyticsAndData } from "../../../components/Home/components/Section/components/ga2/SectionAnalyticsAndData/sectionAnalyticsAndData";
-import { SectionHelp } from "../../../components/Home/components/Section/components/ga2/SectionHelp/sectionHelp";
 
 export const HomeView = (): JSX.Element => {
   return (
@@ -12,7 +11,6 @@ export const HomeView = (): JSX.Element => {
       <SectionSubHero />
       <SectionAssemblies />
       <SectionAnalyticsAndData />
-      <SectionHelp />
     </Fragment>
   );
 };

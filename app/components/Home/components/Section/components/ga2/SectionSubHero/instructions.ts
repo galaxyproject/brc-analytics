@@ -17,6 +17,10 @@ export const ACCORDION: Record<string, { details?: string; title: string }> = {
     title: "Select an Analysis Workflow",
   },
   "3": {
+    details: "Select the dataset(s) to be processed by the selected workflow.",
+    title: "Select Workflow Data",
+  },
+  "4": {
     details: "Run your analysis workflow in Galaxy on TACC with free compute.",
     title: "Continue in Galaxy",
   },
@@ -41,10 +45,10 @@ export const BUTTON: Record<string, ButtonProps> = {
   },
 };
 
-// ToDo: Update images to point to GA2 images
 export const IMAGE: Record<string, string> = {
-  "0": "/main/select-an-organism.png",
-  "1": "/main/chose-genome-assembly.png",
-  "2": "/main/select-analysis-workflow.png",
-  "3": "/main/continue-in-galaxy.png",
+  "0": "/main/select-an-organism-ga2.png",
+  "1": "/main/chose-genome-assembly-ga2.png",
+  "2": "/main/select-analysis-workflow-ga2.png",
+  "3": "/main/select-analysis-workflow-data-ga2.png",
+  "4": "/main/continue-in-galaxy-ga2.png",
 };
