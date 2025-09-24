@@ -1,4 +1,4 @@
-import data from "catalog/output/ncbi-taxa-tree.json";
+import { config } from "../../../../../../../app/config/config";
 
 /**
  * Interface representing a node in the NCBI taxonomy tree
@@ -32,6 +32,15 @@ export interface TaxonomyNode {
 }
 
 export function getData(): TaxonomyNode {
-  // Any data massaging can be done at this extension point.
-  return data;
+  const { taxTree } = config();
+  if (!taxTree) {
+    return {
+      assembly_count: 0,
+      children: [],
+      name: "root",
+      ncbi_tax_id: "",
+    };
+  }
+
+  return taxTree;
 }

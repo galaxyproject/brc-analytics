@@ -472,7 +472,7 @@ export const SectionViz = ({
       tooltip.remove();
       d3.select(svgNode).selectAll("*").remove();
     };
-  }, []);
+  }, [DEPTH, LOGO_PATH, startingNode]);
 
   // Handler for when a node is clicked in the NodeDetails component
   const handleNodeClick = (node: TreeNode): void => {
