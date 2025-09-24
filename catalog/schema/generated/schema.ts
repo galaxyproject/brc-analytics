@@ -225,6 +225,17 @@ export interface Workflow {
 
 
 /**
+ * Specification of data requirements for a workflow parameter, such as library strategy and layout.
+ */
+export interface WorkflowDataRequirements {
+    /** The library strategy values that are acceptable for this parameter (e.g., 'WGS', 'RNA-Seq'). */
+    library_strategy?: string[] | null,
+    /** The library layout that is required for this parameter (e.g., 'PAIRED', 'SINGLE'). */
+    library_layout?: string | null,
+}
+
+
+/**
  * Definition of an input parameter for a Galaxy workflow, specifying how the parameter value should be determined when the workflow is executed.
  */
 export interface WorkflowParameter {
@@ -234,6 +245,8 @@ export interface WorkflowParameter {
     variable?: WorkflowParameterVariable | null,
     /** A direct URL specification for the parameter, allowing for external data sources to be provided to the workflow. */
     url_spec?: WorkflowUrlSpec | null,
+    /** Specifications for the data requirements of this parameter, such as library strategy and layout. */
+    data_requirements?: WorkflowDataRequirements | null,
     /** Arbitrary data describing the expected type and format of the parameter, intended as a reference for catalog maintainers and not used in workflow execution. */
     type_guide?: Any | null,
 }

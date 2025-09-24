@@ -68,6 +68,19 @@ classes:
         required: true
         range: string
 
+  WorkflowDataRequirements:
+    description: Specification of data requirements for a workflow parameter, such as library strategy and layout.
+    attributes:
+      library_strategy:
+        description: The library strategy values that are acceptable for this parameter (e.g., 'WGS', 'RNA-Seq').
+        required: false
+        multivalued: true
+        range: string
+      library_layout:
+        description: The library layout that is required for this parameter (e.g., 'PAIRED', 'SINGLE').
+        required: false
+        range: string
+
   WorkflowParameter:
     description: Definition of an input parameter for a Galaxy workflow, specifying how the parameter value should be determined when the workflow is executed.
     attributes:
@@ -83,6 +96,10 @@ classes:
         description: A direct URL specification for the parameter, allowing for external data sources to be provided to the workflow.
         required: false
         range: WorkflowUrlSpec
+      data_requirements:
+        description: Specifications for the data requirements of this parameter, such as library strategy and layout.
+        required: false
+        range: WorkflowDataRequirements
       type_guide:
         description: Arbitrary data describing the expected type and format of the parameter, intended as a reference for catalog maintainers and not used in workflow execution.
         required: false

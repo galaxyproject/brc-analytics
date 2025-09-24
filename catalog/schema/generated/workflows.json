@@ -91,10 +91,46 @@
             "title": "WorkflowCategoryId",
             "type": "string"
         },
+        "WorkflowDataRequirements": {
+            "additionalProperties": false,
+            "description": "Specification of data requirements for a workflow parameter, such as library strategy and layout.",
+            "properties": {
+                "library_layout": {
+                    "description": "The library layout that is required for this parameter (e.g., 'PAIRED', 'SINGLE').",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "library_strategy": {
+                    "description": "The library strategy values that are acceptable for this parameter (e.g., 'WGS', 'RNA-Seq').",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                }
+            },
+            "title": "WorkflowDataRequirements",
+            "type": "object"
+        },
         "WorkflowParameter": {
             "additionalProperties": false,
             "description": "Definition of an input parameter for a Galaxy workflow, specifying how the parameter value should be determined when the workflow is executed.",
             "properties": {
+                "data_requirements": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/WorkflowDataRequirements"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Specifications for the data requirements of this parameter, such as library strategy and layout."
+                },
                 "key": {
                     "description": "The identifier for the parameter as expected by the Galaxy workflow, used to map the parameter value to the correct input.",
                     "type": "string"
