@@ -123,7 +123,15 @@ export interface Workflow {
   workflowName: string;
 }
 
+export interface WorkflowDataRequirements {
+  description?: string;
+  library_layout?: string;
+  library_source?: string[];
+  library_strategy?: string[];
+}
+
 export interface WorkflowParameter {
+  data_requirements?: WorkflowDataRequirements;
   key: string;
   url_spec?: WorkflowUrlParameter;
   variable?: WORKFLOW_PARAMETER_VARIABLE;
