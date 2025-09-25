@@ -1585,7 +1585,7 @@ def generate_taxon_read_run_count(taxonomy_ids):
             "result": "read_run",
             "query": f"tax_tree({tId})",
             "fields": "experiment_accession,study_accession",
-            "format": "json"
+            "format": "json",
         }
         resp = requests.get(url, params=params)
         resp.raise_for_status()
