@@ -1,4 +1,7 @@
 from ....py_package.catalog_build import build_files
+from ....py_package.catalog_build import generate_taxon_read_run_count
+import json
+import pandas as pd
 
 ASSEMBLIES_PATH = "catalog/ga2/source/assemblies.yml"
 
@@ -9,6 +12,8 @@ GENOMES_OUTPUT_PATH = "catalog/ga2/build/intermediate/genomes-from-ncbi.tsv"
 PRIMARYDATA_OUTPUT_PATH = "catalog/ga2/build/intermediate/primary-data-ncbi.tsv"
 
 TREE_OUTPUT_PATH = "catalog/ga2/output/ncbi-taxa-tree.json"
+
+TAXONOMY_READ_RUN_COUNTS_OUTPUT_PATH = "catalog/ga2/build/intermediate/taxId.json"
 
 TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
     40674: "Mammalia",
@@ -71,6 +76,16 @@ TOLIDS_BY_TAXONOMY_ID = {
 }
 
 
+def create_taxonomy_read_run_count(genomes_tsv_path: str, output_path: str):
+    df = pd.read_csv(genomes_tsv_path, sep='\t')
+    unique_taxonomy_ids = df['taxonomyId'].drop_duplicates()
+    print("Creating taxonomy read run counts")
+    with open(output_path, 'w') as writer:
+        writer.write(json.dumps(
+            generate_taxon_read_run_count(unique_taxonomy_ids.tolist()), indent=2))
+    print("Taxonomy read run counts created")
+
+
 def build_ncbi_data():
     build_files(
         ASSEMBLIES_PATH,
@@ -86,6 +101,7 @@ def build_ncbi_data():
         primary_output_path=PRIMARYDATA_OUTPUT_PATH,
         extract_primary_data=True,
     )
+    create_taxonomy_read_run_count(GENOMES_OUTPUT_PATH, TAXONOMY_READ_RUN_COUNTS_OUTPUT_PATH)
 
 
 if __name__ == "__main__":
