@@ -95,10 +95,27 @@
             "additionalProperties": false,
             "description": "Specification of data requirements for a workflow parameter, such as library strategy and layout.",
             "properties": {
+                "description": {
+                    "description": "A descriptive text to provide additional context about the data requirements, useful for non-standard library strategies like 'OTHER'.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
                 "library_layout": {
                     "description": "The library layout that is required for this parameter (e.g., 'PAIRED', 'SINGLE').",
                     "type": [
                         "string",
+                        "null"
+                    ]
+                },
+                "library_source": {
+                    "description": "The library source values that are acceptable for this parameter (e.g., 'GENOMIC', 'TRANSCRIPTOMIC SINGLE CELL').",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": [
+                        "array",
                         "null"
                     ]
                 },

@@ -80,6 +80,15 @@ classes:
         description: The library layout that is required for this parameter (e.g., 'PAIRED', 'SINGLE').
         required: false
         range: string
+      library_source:
+        description: The library source values that are acceptable for this parameter (e.g., 'GENOMIC', 'TRANSCRIPTOMIC SINGLE CELL').
+        required: false
+        multivalued: true
+        range: string
+      description:
+        description: A descriptive text to provide additional context about the data requirements, useful for non-standard library strategies like 'OTHER'.
+        required: false
+        range: string
 
   WorkflowParameter:
     description: Definition of an input parameter for a Galaxy workflow, specifying how the parameter value should be determined when the workflow is executed.

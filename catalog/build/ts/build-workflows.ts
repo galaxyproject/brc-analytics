@@ -75,10 +75,13 @@ function buildWorkflow(
     // Add data_requirements if defined
     if (data_requirements) {
       // Convert any null values to undefined to match the expected type
-      const sanitizedDataRequirements: WorkflowParameter['data_requirements'] = {
-        library_strategy: data_requirements.library_strategy || undefined,
-        library_layout: data_requirements.library_layout || undefined
-      };
+      const sanitizedDataRequirements: WorkflowParameter["data_requirements"] =
+        {
+          description: data_requirements.description || undefined,
+          library_layout: data_requirements.library_layout || undefined,
+          library_source: data_requirements.library_source || undefined,
+          library_strategy: data_requirements.library_strategy || undefined,
+        };
       parameter.data_requirements = sanitizedDataRequirements;
     }
 

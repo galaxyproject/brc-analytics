@@ -205,7 +205,8 @@ class Outbreak(ConfiguredBaseModel):
     taxonomy_id: int = Field(default=..., description="""The NCBI Taxonomy ID for the pathogen. Used to link to relevant genomic data and workflows.""", json_schema_extra = { "linkml_meta": {'alias': 'taxonomy_id', 'domain_of': ['Organism', 'Outbreak', 'Workflow']} })
     priority: OutbreakPriority = Field(default=..., description="""The priority level of the pathogen, which determines its visibility and prominence in the BRC Analytics interface.""", json_schema_extra = { "linkml_meta": {'alias': 'priority', 'domain_of': ['Outbreak']} })
     resources: List[OutbreakResource] = Field(default=..., description="""Collection of external resources (references, tools, databases) related to the pathogen.""", json_schema_extra = { "linkml_meta": {'alias': 'resources', 'domain_of': ['Outbreak']} })
-    description: MarkdownFileReference = Field(default=..., description="""Reference to a markdown file containing detailed information about the pathogen.""", json_schema_extra = { "linkml_meta": {'alias': 'description', 'domain_of': ['Outbreak', 'WorkflowCategory']} })
+    description: MarkdownFileReference = Field(default=..., description="""Reference to a markdown file containing detailed information about the pathogen.""", json_schema_extra = { "linkml_meta": {'alias': 'description',
+         'domain_of': ['Outbreak', 'WorkflowCategory', 'WorkflowDataRequirements']} })
     active: bool = Field(default=..., description="""Boolean flag that determines if the pathogen should be included in the BRC Analytics interface. Used to manage visibility as pathogen relevance changes over time.""", json_schema_extra = { "linkml_meta": {'alias': 'active', 'domain_of': ['Outbreak', 'Workflow']} })
     highlight_descendant_taxonomy_ids: Optional[List[int]] = Field(default=None, description="""List of NCBI Taxonomy IDs for descendant taxa (e.g., specific strains or serotypes) that should be highlighted within the outbreak category.""", json_schema_extra = { "linkml_meta": {'alias': 'highlight_descendant_taxonomy_ids', 'domain_of': ['Outbreak']} })
 
@@ -260,7 +261,8 @@ class WorkflowCategory(ConfiguredBaseModel):
 
     category: WorkflowCategoryId = Field(default=..., description="""The unique identifier for the workflow category, used to link workflows to their respective categories.""", json_schema_extra = { "linkml_meta": {'alias': 'category', 'domain_of': ['WorkflowCategory']} })
     name: str = Field(default=..., description="""The human-readable display name of the workflow category as it will appear in the BRC Analytics interface.""", json_schema_extra = { "linkml_meta": {'alias': 'name', 'domain_of': ['Outbreak', 'WorkflowCategory']} })
-    description: str = Field(default=..., description="""A detailed description of the workflow category explaining its purpose and the types of workflows it contains.""", json_schema_extra = { "linkml_meta": {'alias': 'description', 'domain_of': ['Outbreak', 'WorkflowCategory']} })
+    description: str = Field(default=..., description="""A detailed description of the workflow category explaining its purpose and the types of workflows it contains.""", json_schema_extra = { "linkml_meta": {'alias': 'description',
+         'domain_of': ['Outbreak', 'WorkflowCategory', 'WorkflowDataRequirements']} })
     show_coming_soon: bool = Field(default=..., description="""Boolean flag that determines whether to display a 'Coming Soon' indicator for this category in the BRC Analytics interface when workflows in this category are not yet available.""", json_schema_extra = { "linkml_meta": {'alias': 'show_coming_soon', 'domain_of': ['WorkflowCategory']} })
 
 
@@ -299,6 +301,9 @@ class WorkflowDataRequirements(ConfiguredBaseModel):
 
     library_strategy: Optional[List[str]] = Field(default=None, description="""The library strategy values that are acceptable for this parameter (e.g., 'WGS', 'RNA-Seq').""", json_schema_extra = { "linkml_meta": {'alias': 'library_strategy', 'domain_of': ['WorkflowDataRequirements']} })
     library_layout: Optional[str] = Field(default=None, description="""The library layout that is required for this parameter (e.g., 'PAIRED', 'SINGLE').""", json_schema_extra = { "linkml_meta": {'alias': 'library_layout', 'domain_of': ['WorkflowDataRequirements']} })
+    library_source: Optional[List[str]] = Field(default=None, description="""The library source values that are acceptable for this parameter (e.g., 'GENOMIC', 'TRANSCRIPTOMIC SINGLE CELL').""", json_schema_extra = { "linkml_meta": {'alias': 'library_source', 'domain_of': ['WorkflowDataRequirements']} })
+    description: Optional[str] = Field(default=None, description="""A descriptive text to provide additional context about the data requirements, useful for non-standard library strategies like 'OTHER'.""", json_schema_extra = { "linkml_meta": {'alias': 'description',
+         'domain_of': ['Outbreak', 'WorkflowCategory', 'WorkflowDataRequirements']} })
 
 
 class WorkflowParameter(ConfiguredBaseModel):

@@ -232,6 +232,10 @@ export interface WorkflowDataRequirements {
     library_strategy?: string[] | null,
     /** The library layout that is required for this parameter (e.g., 'PAIRED', 'SINGLE'). */
     library_layout?: string | null,
+    /** The library source values that are acceptable for this parameter (e.g., 'GENOMIC', 'TRANSCRIPTOMIC SINGLE CELL'). */
+    library_source?: string[] | null,
+    /** A descriptive text to provide additional context about the data requirements, useful for non-standard library strategies like 'OTHER'. */
+    description?: string | null,
 }
 
 
