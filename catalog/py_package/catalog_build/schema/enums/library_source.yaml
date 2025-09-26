@@ -1,0 +1,25 @@
+id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/enums/library_source.yaml#
+name: enums_library_source
+
+enums:
+  LibrarySource:
+    description: Enumeration of possible library sources for sequencing data.
+    permissible_values:
+      GENOMIC:
+        description: Genomic DNA (includes PCR products from genomic DNA)
+      GENOMIC SINGLE CELL:
+        description: Genomic DNA from a single cell
+      TRANSCRIPTOMIC:
+        description: Transcription products or non-genomic DNA (EST, cDNA, RT-PCR, screened libraries)
+      TRANSCRIPTOMIC SINGLE CELL:
+        description: Transcription products from a single cell
+      METAGENOMIC:
+        description: Mixed material from metagenome
+      METATRANSCRIPTOMIC:
+        description: Transcription products from community targets
+      SYNTHETIC:
+        description: Synthetic DNA
+      VIRAL RNA:
+        description: Viral RNA
+      OTHER:
+        description: Other, unspecified, or unknown library source material

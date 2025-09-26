@@ -12,6 +12,79 @@
                 "string"
             ]
         },
+        "LibraryLayout": {
+            "description": "Enumeration of possible library layouts for sequencing data.",
+            "enum": [
+                "PAIRED",
+                "SINGLE"
+            ],
+            "title": "LibraryLayout",
+            "type": "string"
+        },
+        "LibrarySource": {
+            "description": "Enumeration of possible library sources for sequencing data.",
+            "enum": [
+                "GENOMIC",
+                "GENOMIC SINGLE CELL",
+                "TRANSCRIPTOMIC",
+                "TRANSCRIPTOMIC SINGLE CELL",
+                "METAGENOMIC",
+                "METATRANSCRIPTOMIC",
+                "SYNTHETIC",
+                "VIRAL RNA",
+                "OTHER"
+            ],
+            "title": "LibrarySource",
+            "type": "string"
+        },
+        "LibraryStrategy": {
+            "description": "Enumeration of possible library strategies for sequencing data.",
+            "enum": [
+                "WGS",
+                "WGA",
+                "WXS",
+                "RNA-Seq",
+                "snRNA-seq",
+                "ssRNA-seq",
+                "miRNA-Seq",
+                "ncRNA-Seq",
+                "FL-cDNA",
+                "EST",
+                "Hi-C",
+                "ATAC-seq",
+                "WCS",
+                "RAD-Seq",
+                "CLONE",
+                "POOLCLONE",
+                "AMPLICON",
+                "CLONEEND",
+                "FINISHING",
+                "ChIP-Seq",
+                "MNase-Seq",
+                "Ribo-Seq",
+                "DNase-Hypersensitivity",
+                "Bisulfite-Seq",
+                "CTS",
+                "ChM-Seq",
+                "GBS",
+                "MRE-Seq",
+                "MeDIP-Seq",
+                "MBD-Seq",
+                "NOMe-Seq",
+                "Tn-Seq",
+                "VALIDATION",
+                "FAIRE-seq",
+                "SELEX",
+                "RIP-Seq",
+                "ChIA-PET",
+                "Synthetic-Long-Read",
+                "Targeted-Capture",
+                "Tethered Chromatin Conformation Capture",
+                "OTHER"
+            ],
+            "title": "LibraryStrategy",
+            "type": "string"
+        },
         "Workflow": {
             "additionalProperties": false,
             "description": "Definition of a Galaxy workflow with its metadata, parameters, and organism compatibility information.",
@@ -103,16 +176,13 @@
                     ]
                 },
                 "library_layout": {
-                    "description": "The library layout that is required for this parameter (e.g., 'PAIRED', 'SINGLE').",
-                    "type": [
-                        "string",
-                        "null"
-                    ]
+                    "$ref": "#/$defs/LibraryLayout",
+                    "description": "The library layout that is required for this parameter (e.g., 'PAIRED', 'SINGLE')."
                 },
                 "library_source": {
                     "description": "The library source values that are acceptable for this parameter (e.g., 'GENOMIC', 'TRANSCRIPTOMIC SINGLE CELL').",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/$defs/LibrarySource"
                     },
                     "type": [
                         "array",
@@ -122,7 +192,7 @@
                 "library_strategy": {
                     "description": "The library strategy values that are acceptable for this parameter (e.g., 'WGS', 'RNA-Seq').",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/$defs/LibraryStrategy"
                     },
                     "type": [
                         "array",

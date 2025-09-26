@@ -10,6 +10,9 @@ imports:
   - ./enums/workflow_category_id
   - ./enums/workflow_parameter_variable
   - ./enums/workflow_ploidy
+  - ./enums/library_layout
+  - ./enums/library_source
+  - ./enums/library_strategy
 
 classes:
   Any:
@@ -75,16 +78,16 @@ classes:
         description: The library strategy values that are acceptable for this parameter (e.g., 'WGS', 'RNA-Seq').
         required: false
         multivalued: true
-        range: string
+        range: LibraryStrategy
       library_layout:
         description: The library layout that is required for this parameter (e.g., 'PAIRED', 'SINGLE').
         required: false
-        range: string
+        range: LibraryLayout
       library_source:
         description: The library source values that are acceptable for this parameter (e.g., 'GENOMIC', 'TRANSCRIPTOMIC SINGLE CELL').
         required: false
         multivalued: true
-        range: string
+        range: LibrarySource
       description:
         description: A descriptive text to provide additional context about the data requirements, useful for non-standard library strategies like 'OTHER'.
         required: false

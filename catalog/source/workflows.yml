@@ -501,7 +501,6 @@ workflows:
       - key: fastq PE collection GEX
         variable: SANGER_READ_RUN_PAIRED
         data_requirements:
-          library_strategy: ["RNA-Seq"]
           library_source: ["TRANSCRIPTOMIC SINGLE CELL"]
           library_layout: "PAIRED"
         type_guide:
@@ -547,7 +546,6 @@ workflows:
       - key: fastq PE collection
         variable: SANGER_READ_RUN_PAIRED
         data_requirements:
-          library_strategy: ["RNA-Seq"]
           library_source: ["TRANSCRIPTOMIC SINGLE CELL"]
           library_layout: "PAIRED"
         type_guide:
@@ -581,7 +579,7 @@ workflows:
           collection_type: list:paired
         variable: SANGER_READ_RUN_PAIRED
         data_requirements:
-          library_strategy: ["WGS"]
+          library_strategy: ["WGS", "AMPLICON"]
           library_layout: "PAIRED"
       - key: Reference annotation
         type_guide:
