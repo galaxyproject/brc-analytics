@@ -25,9 +25,14 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
   {
     categoryConfigs: [
       CATEGORY_CONFIGS.LIBRARY_STRATEGY,
+      CATEGORY_CONFIGS.LIBRARY_SOURCE,
       CATEGORY_CONFIGS.LIBRARY_LAYOUT,
     ],
     label: "Library",
+  },
+  {
+    categoryConfigs: [CATEGORY_CONFIGS.DESCRIPTION],
+    label: "Metadata",
   },
   {
     categoryConfigs: [CATEGORY_CONFIGS.READ_COUNT, CATEGORY_CONFIGS.BASE_COUNT],

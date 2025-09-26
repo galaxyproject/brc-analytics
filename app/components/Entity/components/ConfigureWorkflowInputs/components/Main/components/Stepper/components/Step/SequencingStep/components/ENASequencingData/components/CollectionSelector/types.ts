@@ -2,6 +2,7 @@ import { ReadRun } from "../../types";
 import { OnConfigure } from "../../../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { Table } from "@tanstack/react-table";
 import { SEQUENCING_DATA_TYPE } from "../../../../types";
+import { WorkflowParameter } from "app/apis/catalog/brc-analytics-catalog/common/entities";
 
 export interface Props {
   onClose: () => void;
@@ -10,4 +11,5 @@ export interface Props {
   selectedCount: number;
   stepKey: SEQUENCING_DATA_TYPE;
   table: Table<ReadRun>;
+  workflowParameter?: WorkflowParameter;
 }
