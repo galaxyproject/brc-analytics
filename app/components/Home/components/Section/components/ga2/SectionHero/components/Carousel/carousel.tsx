@@ -11,6 +11,7 @@ import { useInteractiveCarousel } from "./hooks/useInteractiveCarousel";
 export const Carousel = (): JSX.Element => {
   const {
     activeIndex,
+    interactionEnabled,
     interactiveAction,
     interactiveCards,
     interactiveIndexes,
@@ -19,19 +20,25 @@ export const Carousel = (): JSX.Element => {
   } = useInteractiveCarousel();
   return (
     <CarouselView>
-      <CarouselCards {...interactiveAction}>
+      <CarouselCards
+        interactionEnabled={interactionEnabled}
+        {...interactiveAction}
+      >
         <Arrow
+          interactionEnabled={interactionEnabled}
           onClick={(): void => onSetSwipeAction(SWIPE_ACTION.SWIPE_BACKWARD)}
           swipeAction={SWIPE_ACTION.SWIPE_BACKWARD}
         />
         <Cards activeIndex={activeIndex} cards={interactiveCards} />
         <Arrow
+          interactionEnabled={interactionEnabled}
           onClick={(): void => onSetSwipeAction(SWIPE_ACTION.SWIPE_FORWARD)}
           swipeAction={SWIPE_ACTION.SWIPE_FORWARD}
         />
         <StyledBullets
           activeBullet={activeIndex}
           bullets={interactiveIndexes}
+          interactionEnabled={interactionEnabled}
           onBullet={onSetActiveIndex}
         />
       </CarouselCards>
