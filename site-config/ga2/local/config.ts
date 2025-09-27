@@ -1,4 +1,3 @@
-import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import * as C from "../../../app/components";
 import { ROUTES } from "../../../routes/constants";
@@ -77,11 +76,12 @@ export function makeConfig(
         ],
       },
     },
+    maxReadRunsForBrowseAll: 4000,
     redirectRootToPath: "/",
     themeOptions: {},
   };
 }
 
-const config: SiteConfig = makeConfig(BROWSER_URL);
+const config: AppSiteConfig = makeConfig(BROWSER_URL);
 
 export default config;
