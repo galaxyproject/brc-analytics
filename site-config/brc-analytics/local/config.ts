@@ -17,6 +17,7 @@ import { AppSiteConfig } from "../../common/entities";
 import { APP_KEYS } from "../../common/constants";
 import data from "catalog/output/ncbi-taxa-tree.json";
 import { TaxonomyNode } from "../../../app/components/Home/components/Section/components/SectionViz/data";
+import { THEME_OPTIONS } from "./theme/constants";
 
 const LOCALHOST = "http://localhost:3000";
 const APP_TITLE = "BRC Analytics";
@@ -114,7 +115,7 @@ export function makeConfig(
     maxReadRunsForBrowseAll: 2000,
     redirectRootToPath: "/",
     taxTree: taxTreeData,
-    themeOptions: {},
+    themeOptions: THEME_OPTIONS,
   };
 }
 

@@ -11,6 +11,7 @@ import { AppSiteConfig } from "../../common/entities";
 import { APP_KEYS } from "../../common/constants";
 import data from "catalog/ga2/output/ncbi-taxa-tree.json";
 import { TaxonomyNode } from "../../../app/components/Home/components/Section/components/SectionViz/data";
+import { THEME_OPTIONS } from "./theme/constants";
 
 const ALLOWED_PATHS = [
   ROUTES.ABOUT,
@@ -64,9 +65,9 @@ export function makeConfig(
       header: {
         logo: C.Logo({
           alt: APP_TITLE,
-          height: 26,
+          height: 28,
           link: "/",
-          src: "/logo/galaxy.png",
+          src: "/logo/ga2.svg",
         }),
         navigation: [
           undefined,
@@ -83,7 +84,7 @@ export function makeConfig(
     maxReadRunsForBrowseAll: 4000,
     redirectRootToPath: "/",
     taxTree: taxTreeData,
-    themeOptions: {},
+    themeOptions: THEME_OPTIONS,
   };
 }
 
