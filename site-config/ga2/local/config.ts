@@ -10,6 +10,7 @@ import {
 } from "../../../app/apis/catalog/ga2/entities";
 import { AppSiteConfig } from "../../common/entities";
 import { APP_KEYS } from "../../common/constants";
+import { THEME_OPTIONS } from "./theme/constants";
 
 const ALLOWED_PATHS = [
   ROUTES.ABOUT,
@@ -61,9 +62,9 @@ export function makeConfig(
       header: {
         logo: C.Logo({
           alt: APP_TITLE,
-          height: 26,
+          height: 28,
           link: "/",
-          src: "/logo/galaxy.png",
+          src: "/logo/ga2.svg",
         }),
         navigation: [
           undefined,
@@ -78,7 +79,7 @@ export function makeConfig(
       },
     },
     redirectRootToPath: "/",
-    themeOptions: {},
+    themeOptions: THEME_OPTIONS,
   };
 }
 

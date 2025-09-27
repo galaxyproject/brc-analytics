@@ -9,6 +9,9 @@ import {
   CAROUSEL_HEIGHT_SM,
   MAX_CARD_WIDTH,
 } from "./common/constants";
+import { css } from "@emotion/react";
+import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
+import { UseInteractiveCarousel } from "./hooks/useInteractiveCarousel";
 
 export const CarouselView = styled.div`
   grid-column: 1 / -1;
@@ -22,15 +25,22 @@ export const CarouselView = styled.div`
   }
 `;
 
-export const Carousel = styled.div`
-  cursor: grab;
+export const Carousel = styled("div")<
+  Pick<UseInteractiveCarousel, "interactionEnabled">
+>`
   height: ${CAROUSEL_HEIGHT_SM}px;
   position: relative; /* Positions CardPositioner. */
-  user-select: none;
 
-  &:active {
-    cursor: grabbing;
-  }
+  ${({ interactionEnabled }) =>
+    interactionEnabled &&
+    css`
+      cursor: grab;
+      user-select: none;
+
+      &:active {
+        cursor: grabbing;
+      }
+    `}
 
   ${bpUpSm} {
     height: ${CAROUSEL_HEIGHT}px;
@@ -54,4 +64,10 @@ export const StyledBullets = styled(Bullets)`
   position: absolute;
   transform: translateX(-50%);
   z-index: 100;
+
+  ${({ activeBullet }) => css`
+    .MuiButtonBase-root:nth-of-type(${activeBullet + 1}) span {
+      background-color: ${PALETTE.PRIMARY_MAIN};
+    }
+  `}
 `;

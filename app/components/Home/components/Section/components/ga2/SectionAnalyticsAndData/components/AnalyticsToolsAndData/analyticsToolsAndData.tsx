@@ -55,13 +55,12 @@ export const AnalyticsToolsAndData = (): JSX.Element => {
           </StyledCard>
         ))}
       </Grid>
-      {interactionEnabled && (
-        <StyledBullets
-          activeBullet={activeIndex}
-          bullets={interactiveIndexes}
-          onBullet={onSetActiveIndex}
-        />
-      )}
+      <StyledBullets
+        activeBullet={activeIndex}
+        bullets={interactiveIndexes}
+        interactionEnabled={interactionEnabled}
+        onBullet={onSetActiveIndex}
+      />
     </div>
   );
 };

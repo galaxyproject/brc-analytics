@@ -15,6 +15,7 @@ export const Section = styled.section`
 `;
 
 export const SectionLayout = styled.div`
+  align-items: flex-start;
   display: grid;
   gap: 48px 16px;
   grid-template-columns: 1fr 1fr;
@@ -157,6 +158,7 @@ export const StyledBox = styled(Box)`
 `;
 
 export const TransparentBox = styled.div`
+  align-self: flex-end;
   display: grid;
   grid-column: 1;
   grid-row: 1;
