@@ -15,6 +15,7 @@ import { socialMenuItems, socialMedia } from "./socialMedia";
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 import { AppSiteConfig } from "../../common/entities";
 import { APP_KEYS } from "../../common/constants";
+import { THEME_OPTIONS } from "./theme/constants";
 
 const LOCALHOST = "http://localhost:3000";
 const APP_TITLE = "BRC Analytics";
@@ -108,7 +109,7 @@ export function makeConfig(
       },
     },
     redirectRootToPath: "/",
-    themeOptions: {},
+    themeOptions: THEME_OPTIONS,
   };
 }
 
