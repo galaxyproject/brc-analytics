@@ -1,0 +1,12 @@
+# Ruff configuration for backend
+# This prevents ruff from trying to parse poetry's pyproject.toml
+target-version = "py312"
+line-length = 88
+
+[format]
+quote-style = "double"
+indent-style = "space"
+
+[lint]
+select = ["E", "F", "I", "B"]
+fixable = ["ALL"]
