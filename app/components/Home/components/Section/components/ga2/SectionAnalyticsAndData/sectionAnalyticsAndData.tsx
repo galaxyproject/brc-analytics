@@ -11,12 +11,12 @@ export const SectionAnalyticsAndData = (): JSX.Element => {
     <Section>
       <SectionLayout>
         <Headline>
-          <SectionTitle>What is GenomeArk Analytics?</SectionTitle>
+          <SectionTitle>What is GenomeArk?</SectionTitle>
           <SectionSubtitle>
-            GenomeArk Analytics combines GenomeArk data with official genomic
-            data from the NCBI Datasets and the UCSC Genome Browser, powered by
-            the unlimited analytical capacity of the Galaxy Platform at the
-            Texas Advanced Computing Center (TACC) and Jetstream2.
+            GenomeArk combines GenomeArk data with official genomic data from
+            the NCBI Datasets and the UCSC Genome Browser, powered by the
+            unlimited analytical capacity of the Galaxy Platform at the Texas
+            Advanced Computing Center (TACC) and Jetstream2.
           </SectionSubtitle>
         </Headline>
         <AnalyticsToolsAndData />

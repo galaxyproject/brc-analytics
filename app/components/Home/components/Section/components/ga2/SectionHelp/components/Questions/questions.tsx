@@ -29,14 +29,14 @@ export const Questions = (): JSX.Element => {
         </MAccordionDetails>
       </Accordion>
       <Accordion>
-        <AccordionSummary>How does GenomeArk Analytics work?</AccordionSummary>
+        <AccordionSummary>How does GenomeArk work?</AccordionSummary>
         <MAccordionDetails>
-          GenomeArk Analytics will provide access to genomic data and an
-          analytical environment. The data will be based on the official
-          releases provided by NCBI Datasets and deployed through the UCSC
-          Genome Browser. The analytics will be provided by the Galaxy system
-          supported by powerful computational infrastructure provided by the
-          Texas Advanced Computing Center (
+          GenomeArk will provide access to genomic data and an analytical
+          environment. The data will be based on the official releases provided
+          by NCBI Datasets and deployed through the UCSC Genome Browser. The
+          analytics will be provided by the Galaxy system supported by powerful
+          computational infrastructure provided by the Texas Advanced Computing
+          Center (
           <DXLink label="TACC" url={URLS.TACC} />) and{" "}
           <DXLink label="ACCESS-CI" url={URLS.ACCESS_CONSORTIUM} /> consortium.
         </MAccordionDetails>
