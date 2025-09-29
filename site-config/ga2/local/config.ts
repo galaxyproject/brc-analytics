@@ -10,6 +10,8 @@ import {
 } from "../../../app/apis/catalog/ga2/entities";
 import { AppSiteConfig } from "../../common/entities";
 import { APP_KEYS } from "../../common/constants";
+import data from "catalog/ga2/output/ncbi-taxa-tree.json";
+import { TaxonomyNode } from "../../../app/components/Home/components/Section/components/SectionViz/data";
 
 const ALLOWED_PATHS = [
   ROUTES.ABOUT,
@@ -26,6 +28,7 @@ const GIT_HUB_REPO_URL = "https://github.com/galaxyproject/ga2";
  * Make site config object.
  * @param browserUrl - Browser URL.
  * @param gitHubUrl - GitHub URL.
+ * @param taxTreeData - Taxonomy tree data.
  * @remarks
  * The `genomeEntityConfig` is typecast to `EntityConfig<GA2AssemblyEntity>`
  * because the `SiteConfig` interface from the `@databiosphere/findable-ui` package expects
@@ -39,7 +42,8 @@ const GIT_HUB_REPO_URL = "https://github.com/galaxyproject/ga2";
  */
 export function makeConfig(
   browserUrl: string,
-  gitHubUrl = GIT_HUB_REPO_URL
+  gitHubUrl = GIT_HUB_REPO_URL,
+  taxTreeData = data as TaxonomyNode
 ): AppSiteConfig {
   return {
     allowedPaths: ALLOWED_PATHS,
@@ -78,6 +82,7 @@ export function makeConfig(
       },
     },
     redirectRootToPath: "/",
+    taxTree: taxTreeData,
     themeOptions: {},
   };
 }
