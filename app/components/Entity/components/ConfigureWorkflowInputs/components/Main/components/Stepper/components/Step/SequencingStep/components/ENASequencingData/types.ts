@@ -6,7 +6,7 @@ import { UseENADataByTaxonomyId } from "./hooks/UseENADataByTaxonomyId/types";
 import { Dispatch, SetStateAction } from "react";
 import { ENA_QUERY_METHOD } from "../../types";
 
-export interface ReadRun {
+export interface BaseReadRun {
   base_count: number;
   experiment_accession: string;
   fastq_ftp: string;
@@ -24,11 +24,21 @@ export interface ReadRun {
   tax_id: number;
 }
 
+export interface ReadRun extends BaseReadRun {
+  validation: Validation;
+}
+
+export interface Validation {
+  error: string | undefined;
+  isValid: boolean;
+}
+
 export interface Props {
-  enaAccession: UseENADataByAccession<ReadRun>;
-  enaTaxonomyId: UseENADataByTaxonomyId<ReadRun>;
+  enaAccession: UseENADataByAccession<BaseReadRun>;
+  enaTaxonomyId: UseENADataByTaxonomyId<BaseReadRun>;
   onConfigure: OnConfigure;
   setEnaQueryMethod: Dispatch<SetStateAction<ENA_QUERY_METHOD>>;
   stepKey: SEQUENCING_DATA_TYPE;
   table: Table<ReadRun>;
+  taxonomicLevelSpecies: string;
 }

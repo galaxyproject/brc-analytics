@@ -1,4 +1,4 @@
-import { ColumnDef, ColumnMeta } from "@tanstack/react-table";
+import { ColumnDef, ColumnMeta, SortingColumnDef } from "@tanstack/react-table";
 import { ReadRun } from "../../../../types";
 import { buildFastqFTP, buildStudyAccession } from "./viewBuilders";
 import { COLUMN_DEF } from "@databiosphere/findable-ui/lib/components/Table/common/columnDef";
@@ -14,15 +14,24 @@ const META: ColumnMeta<ReadRun, unknown> = {
   width: { max: "1.2fr", min: "140px" },
 };
 
+const SORTING_COLUMN_DEF: SortingColumnDef<ReadRun> = {
+  enableSorting: true,
+  sortUndefined: 1,
+  sortingFn: "alphanumeric",
+};
+
 const BASE_COUNT: ColumnDef<ReadRun> = {
+  ...SORTING_COLUMN_DEF,
   accessorKey: CATEGORY_CONFIGS.BASE_COUNT.key,
   cell: (ctx) => formatNumber(Number(ctx.getValue())),
   filterFn: RANGE_FILTER_FN,
   header: CATEGORY_CONFIGS.BASE_COUNT.label,
   meta: META,
+  sortDescFirst: true,
 };
 
 const EXPERIMENT_ACCESSION: ColumnDef<ReadRun> = {
+  ...SORTING_COLUMN_DEF,
   accessorKey: CATEGORY_CONFIGS.EXPERIMENT_ACCESSION.key,
   filterFn: SELECT_FILTER_FN,
   header: CATEGORY_CONFIGS.EXPERIMENT_ACCESSION.label,
@@ -30,6 +39,7 @@ const EXPERIMENT_ACCESSION: ColumnDef<ReadRun> = {
 };
 
 const FASTQ_FTP: ColumnDef<ReadRun> = {
+  ...SORTING_COLUMN_DEF,
   accessorKey: CATEGORY_CONFIGS.FASTQ_FTP.key,
   cell: (ctx) => BasicCell(buildFastqFTP(ctx)),
   filterFn: SELECT_FILTER_FN,
@@ -38,6 +48,7 @@ const FASTQ_FTP: ColumnDef<ReadRun> = {
 };
 
 const FIRST_CREATED: ColumnDef<ReadRun> = {
+  ...SORTING_COLUMN_DEF,
   accessorKey: CATEGORY_CONFIGS.FIRST_CREATED.key,
   enableColumnFilter: false,
   header: CATEGORY_CONFIGS.FIRST_CREATED.label,
@@ -45,6 +56,7 @@ const FIRST_CREATED: ColumnDef<ReadRun> = {
 };
 
 const INSTRUMENT_MODEL: ColumnDef<ReadRun> = {
+  ...SORTING_COLUMN_DEF,
   accessorKey: CATEGORY_CONFIGS.INSTRUMENT_MODEL.key,
   filterFn: SELECT_FILTER_FN,
   header: CATEGORY_CONFIGS.INSTRUMENT_MODEL.label,
@@ -52,6 +64,7 @@ const INSTRUMENT_MODEL: ColumnDef<ReadRun> = {
 };
 
 const INSTRUMENT_PLATFORM: ColumnDef<ReadRun> = {
+  ...SORTING_COLUMN_DEF,
   accessorKey: CATEGORY_CONFIGS.INSTRUMENT_PLATFORM.key,
   filterFn: SELECT_FILTER_FN,
   header: CATEGORY_CONFIGS.INSTRUMENT_PLATFORM.label,
@@ -59,6 +72,7 @@ const INSTRUMENT_PLATFORM: ColumnDef<ReadRun> = {
 };
 
 const LIBRARY_LAYOUT: ColumnDef<ReadRun> = {
+  ...SORTING_COLUMN_DEF,
   accessorKey: CATEGORY_CONFIGS.LIBRARY_LAYOUT.key,
   filterFn: SELECT_FILTER_FN,
   header: CATEGORY_CONFIGS.LIBRARY_LAYOUT.label,
@@ -66,6 +80,7 @@ const LIBRARY_LAYOUT: ColumnDef<ReadRun> = {
 };
 
 const LIBRARY_STRATEGY: ColumnDef<ReadRun> = {
+  ...SORTING_COLUMN_DEF,
   accessorKey: CATEGORY_CONFIGS.LIBRARY_STRATEGY.key,
   filterFn: SELECT_FILTER_FN,
   header: CATEGORY_CONFIGS.LIBRARY_STRATEGY.label,
@@ -73,14 +88,17 @@ const LIBRARY_STRATEGY: ColumnDef<ReadRun> = {
 };
 
 const READ_COUNT: ColumnDef<ReadRun> = {
+  ...SORTING_COLUMN_DEF,
   accessorKey: CATEGORY_CONFIGS.READ_COUNT.key,
   cell: (ctx) => formatNumber(Number(ctx.getValue())),
   filterFn: RANGE_FILTER_FN,
   header: CATEGORY_CONFIGS.READ_COUNT.label,
   meta: META,
+  sortDescFirst: true,
 };
 
 const RUN_ACCESSION: ColumnDef<ReadRun> = {
+  ...SORTING_COLUMN_DEF,
   accessorKey: CATEGORY_CONFIGS.RUN_ACCESSION.key,
   filterFn: SELECT_FILTER_FN,
   header: CATEGORY_CONFIGS.RUN_ACCESSION.label,
@@ -88,6 +106,7 @@ const RUN_ACCESSION: ColumnDef<ReadRun> = {
 };
 
 const SAMPLE_ACCESSION: ColumnDef<ReadRun> = {
+  ...SORTING_COLUMN_DEF,
   accessorKey: CATEGORY_CONFIGS.SAMPLE_ACCESSION.key,
   filterFn: SELECT_FILTER_FN,
   header: CATEGORY_CONFIGS.SAMPLE_ACCESSION.label,
@@ -95,6 +114,7 @@ const SAMPLE_ACCESSION: ColumnDef<ReadRun> = {
 };
 
 const SCIENTIFIC_NAME: ColumnDef<ReadRun> = {
+  ...SORTING_COLUMN_DEF,
   accessorKey: CATEGORY_CONFIGS.SCIENTIFIC_NAME.key,
   filterFn: SELECT_FILTER_FN,
   header: CATEGORY_CONFIGS.SCIENTIFIC_NAME.label,
@@ -102,6 +122,7 @@ const SCIENTIFIC_NAME: ColumnDef<ReadRun> = {
 };
 
 const STUDY_ACCESSION: ColumnDef<ReadRun> = {
+  ...SORTING_COLUMN_DEF,
   accessorKey: CATEGORY_CONFIGS.STUDY_ACCESSION.key,
   cell: (ctx) => LinkCell(buildStudyAccession(ctx)),
   filterFn: SELECT_FILTER_FN,

@@ -13,6 +13,7 @@ import { seedDatabase } from "../../../app/utils/seedDatabase";
 import { StyledExploreView } from "../../../app/views/ExploreView/exploreView.styles";
 import { PriorityPathogensView } from "../../../app/views/PriorityPathogensView/priorityPathogensView";
 import { Outbreak } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
+import { GA2Catalog } from "../../../app/apis/catalog/ga2/entities";
 
 interface PageUrl extends ParsedUrlQuery {
   entityListType: string;
@@ -74,7 +75,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
  * @returns static props.
  */
 export const getStaticProps: GetStaticProps<
-  EntitiesPageProps<BRCCatalog>
+  EntitiesPageProps<BRCCatalog | GA2Catalog>
 > = async (context: GetStaticPropsContext) => {
   const appConfig = config();
   const { entityListType } = context.params as PageUrl;
@@ -83,7 +84,9 @@ export const getStaticProps: GetStaticProps<
   const { exploreMode } = entityConfig;
   const { fetchAllEntities } = getEntityService(entityConfig, undefined); // Determine the type of fetch, either from an API endpoint or a TSV.
 
-  const props: EntitiesPageProps<BRCCatalog> = { entityListType };
+  const props: EntitiesPageProps<BRCCatalog | GA2Catalog> = {
+    entityListType,
+  };
 
   // Seed database.
   if (exploreMode === EXPLORE_MODE.CS_FETCH_CS_FILTERING) {

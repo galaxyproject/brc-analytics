@@ -7,7 +7,7 @@ import { ToggleButtonGroup } from "./components/ToggleButtonGroup/toggleButtonGr
 import { VIEW } from "./components/ToggleButtonGroup/types";
 import { ENASequencingData } from "./components/ENASequencingData/enaSequencingData";
 import { useENADataByAccession } from "./components/ENASequencingData/hooks/UseENADataByAccession/hook";
-import { ReadRun } from "./components/ENASequencingData/types";
+import { BaseReadRun } from "./components/ENASequencingData/types";
 import { useTable } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseTable/hook";
 import { UploadMyData } from "./components/UploadMyData/uploadMyData";
 import { ENA_QUERY_METHOD, SEQUENCING_DATA_TYPE } from "./types";
@@ -26,8 +26,8 @@ export const SequencingStep = ({
   const [enaQueryMethod, setEnaQueryMethod] = useState<ENA_QUERY_METHOD>(
     ENA_QUERY_METHOD.ACCESSION
   );
-  const enaAccession = useENADataByAccession<ReadRun>();
-  const enaTaxonomyId = useENADataByTaxonomyId<ReadRun>(genome);
+  const enaAccession = useENADataByAccession<BaseReadRun>();
+  const enaTaxonomyId = useENADataByTaxonomyId<BaseReadRun>(genome);
   const table = useTable(enaQueryMethod, enaAccession, enaTaxonomyId);
   const { onChange, value } = useToggleButtonGroup(VIEW.ENA);
   return (
@@ -43,6 +43,7 @@ export const SequencingStep = ({
             setEnaQueryMethod={setEnaQueryMethod}
             stepKey={stepKey as SEQUENCING_DATA_TYPE}
             table={table}
+            taxonomicLevelSpecies={genome.taxonomicLevelSpecies}
           />
         ) : (
           <UploadMyData

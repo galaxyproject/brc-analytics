@@ -1,5 +1,4 @@
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
-import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import {
   BRCDataCatalogGenome,
@@ -12,7 +11,13 @@ import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organismEntityConfig";
 import { priorityPathogensEntityConfig } from "./index/priorityPathogensEntityConfig";
-import { socialMedia } from "./socialMedia";
+import { socialMenuItems, socialMedia } from "./socialMedia";
+import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
+import { AppSiteConfig } from "../../common/entities";
+import { APP_KEYS } from "../../common/constants";
+import data from "catalog/output/ncbi-taxa-tree.json";
+import { TaxonomyNode } from "../../../app/components/Home/components/Section/components/SectionViz/data";
+import { THEME_OPTIONS } from "./theme/constants";
 
 const LOCALHOST = "http://localhost:3000";
 const APP_TITLE = "BRC Analytics";
@@ -23,11 +28,12 @@ const GIT_HUB_REPO_URL = "https://github.com/galaxyproject/brc-analytics";
  * Make site config object.
  * @param browserUrl - Browser URL.
  * @param gitHubUrl - GitHub URL.
+ * @param taxTreeData - Taxonomy tree data.
  * @remarks
  * The `genomeEntityConfig` is typecast to `EntityConfig<BRCDataCatalogGenome>`
  * because the `SiteConfig` interface from the `@databiosphere/findable-ui` package expects
  * an array of entities typed as `EntityConfig`, but we have modified the EntityConfig
- * locally with a custom `BRCEntityConfig` entity. To avoid rewriting
+ * locally with a custom `AppEntityConfig` entity. To avoid rewriting
  * the associated functions and providers across the codebase due to this modification,
  * we perform a type cast here. This allows us to retain compatibility with the existing
  * `SiteConfig` structure while accommodating the modified entity configuration.
@@ -36,9 +42,11 @@ const GIT_HUB_REPO_URL = "https://github.com/galaxyproject/brc-analytics";
  */
 export function makeConfig(
   browserUrl: string,
-  gitHubUrl = GIT_HUB_REPO_URL
-): SiteConfig {
+  gitHubUrl = GIT_HUB_REPO_URL,
+  taxTreeData = data as TaxonomyNode
+): AppSiteConfig {
   return {
+    appKey: APP_KEYS.BRC_ANALYTICS,
     appTitle: APP_TITLE,
     browserURL: browserUrl,
     dataSource: {
@@ -49,6 +57,7 @@ export function makeConfig(
       genomeEntityConfig as EntityConfig<BRCDataCatalogGenome>,
       priorityPathogensEntityConfig as EntityConfig<Outbreak>,
     ],
+    filterSort: { sortBy: FILTER_SORT.ALPHA },
     gitHubUrl,
     layout: {
       floating,
@@ -83,18 +92,33 @@ export function makeConfig(
             { label: "Organisms", url: ROUTES.ORGANISMS },
             { label: "Assemblies", url: ROUTES.GENOMES },
             { label: "Priority Pathogens", url: ROUTES.PRIORITY_PATHOGENS },
-            { label: "Roadmap", url: ROUTES.ROADMAP },
+            {
+              flatten: { lg: true, md: true, sm: false, xs: true },
+              label: "More",
+              menuItems: [
+                { label: "Roadmap", url: ROUTES.ROADMAP },
+                {
+                  label: "Join Us",
+                  menuItems: socialMenuItems,
+                  url: "",
+                  visible: { lg: false, xs: false },
+                },
+              ],
+              url: "",
+            },
           ],
           undefined,
         ],
         socialMedia: socialMedia,
       },
     },
+    maxReadRunsForBrowseAll: 2000,
     redirectRootToPath: "/",
-    themeOptions: {},
+    taxTree: taxTreeData,
+    themeOptions: THEME_OPTIONS,
   };
 }
 
-const config: SiteConfig = makeConfig(BROWSER_URL);
+const config: AppSiteConfig = makeConfig(BROWSER_URL);
 
 export default config;

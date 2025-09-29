@@ -4,15 +4,17 @@ import { fetchENAData } from "./request";
 import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
 import { shouldFetch } from "./utils";
 import { BRCDataCatalogGenome } from "../../../../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
+import { GA2AssemblyEntity } from "../../../../../../../../../../../../../../../apis/catalog/ga2/entities";
+import { config } from "../../../../../../../../../../../../../../../../app/config/config";
 
 export const useENADataByTaxonomyId = <T>(
-  genome: BRCDataCatalogGenome
+  genome: BRCDataCatalogGenome | GA2AssemblyEntity
 ): UseENADataByTaxonomyId<T> => {
   const { data, run } = useAsync<T[] | undefined>();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState<boolean>(true);
   const { ncbiTaxonomyId: taxonomyId } = genome;
-
+  const { maxReadRunsForBrowseAll } = config();
   const onRequestData = useCallback(async (): Promise<void> => {
     run(
       fetchENAData({
@@ -31,7 +33,7 @@ export const useENADataByTaxonomyId = <T>(
   }, [run, taxonomyId]);
 
   useEffect(() => {
-    if (shouldFetch(taxonomyId)) {
+    if (shouldFetch(taxonomyId, maxReadRunsForBrowseAll)) {
       // Request sequencing data by taxonomy ID and configured filters.
       onRequestData();
     } else {
@@ -39,7 +41,7 @@ export const useENADataByTaxonomyId = <T>(
       // the user should not be able to browse all sequences.
       setLoading(false);
     }
-  }, [onRequestData, taxonomyId]);
+  }, [onRequestData, taxonomyId, maxReadRunsForBrowseAll]);
 
   return { data, status: { errors, loading } };
 };

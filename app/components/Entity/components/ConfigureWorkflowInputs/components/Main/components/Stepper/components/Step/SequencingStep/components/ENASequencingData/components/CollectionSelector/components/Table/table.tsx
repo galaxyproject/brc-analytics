@@ -8,11 +8,13 @@ import { TableContainer } from "@mui/material";
 import { getColumnTrackSizing } from "@databiosphere/findable-ui/lib/components/TableCreator/options/columnTrackSizing/utils";
 import { Props } from "./types";
 import { NoResults } from "@databiosphere/findable-ui/lib/components/NoResults/noResults";
+import { TableToolbar2 } from "@databiosphere/findable-ui/lib/components/Table/components/TableToolbar2/tableToolbar2";
 
 export const Table = ({ table }: Props): JSX.Element => {
   return (
     <StyledGrid container>
       <StyledRoundedPaper elevation={0}>
+        <TableToolbar2 table={table} />
         {table.getRowModel().rows.length === 0 ? (
           <NoResults Paper={null} title="No Results" />
         ) : (
