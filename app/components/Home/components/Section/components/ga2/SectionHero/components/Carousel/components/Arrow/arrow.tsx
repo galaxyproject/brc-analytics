@@ -3,11 +3,17 @@ import { SwipeAction } from "../../../../../../../../../../../hooks/useSwipeInte
 import { IconButton } from "./arrow.styles";
 
 interface ArrowProps {
+  interactionEnabled?: boolean;
   onClick: () => void;
   swipeAction: SwipeAction;
 }
 
-export const Arrow = ({ onClick, swipeAction }: ArrowProps): JSX.Element => {
+export const Arrow = ({
+  interactionEnabled = true,
+  onClick,
+  swipeAction,
+}: ArrowProps): JSX.Element | null => {
+  if (!interactionEnabled) return null;
   return (
     <IconButton
       color="secondary"

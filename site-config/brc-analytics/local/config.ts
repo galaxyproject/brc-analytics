@@ -15,6 +15,9 @@ import { socialMenuItems, socialMedia } from "./socialMedia";
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 import { AppSiteConfig } from "../../common/entities";
 import { APP_KEYS } from "../../common/constants";
+import data from "catalog/output/ncbi-taxa-tree.json";
+import { TaxonomyNode } from "../../../app/components/Home/components/Section/components/SectionViz/data";
+import { THEME_OPTIONS } from "./theme/constants";
 
 const LOCALHOST = "http://localhost:3000";
 const APP_TITLE = "BRC Analytics";
@@ -25,6 +28,7 @@ const GIT_HUB_REPO_URL = "https://github.com/galaxyproject/brc-analytics";
  * Make site config object.
  * @param browserUrl - Browser URL.
  * @param gitHubUrl - GitHub URL.
+ * @param taxTreeData - Taxonomy tree data.
  * @remarks
  * The `genomeEntityConfig` is typecast to `EntityConfig<BRCDataCatalogGenome>`
  * because the `SiteConfig` interface from the `@databiosphere/findable-ui` package expects
@@ -38,7 +42,8 @@ const GIT_HUB_REPO_URL = "https://github.com/galaxyproject/brc-analytics";
  */
 export function makeConfig(
   browserUrl: string,
-  gitHubUrl = GIT_HUB_REPO_URL
+  gitHubUrl = GIT_HUB_REPO_URL,
+  taxTreeData = data as TaxonomyNode
 ): AppSiteConfig {
   return {
     appKey: APP_KEYS.BRC_ANALYTICS,
@@ -107,8 +112,10 @@ export function makeConfig(
         socialMedia: socialMedia,
       },
     },
+    maxReadRunsForBrowseAll: 2000,
     redirectRootToPath: "/",
-    themeOptions: {},
+    taxTree: taxTreeData,
+    themeOptions: THEME_OPTIONS,
   };
 }
 
