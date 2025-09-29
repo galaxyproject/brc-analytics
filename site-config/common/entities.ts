@@ -26,5 +26,6 @@ export interface AppEntityConfig<R>
 export interface AppSiteConfig extends BaseSiteConfig {
   allowedPaths?: string[];
   appKey?: (typeof APP_KEYS)[keyof typeof APP_KEYS];
+  maxReadRunsForBrowseAll: number;
   taxTree?: TaxonomyNode;
 }

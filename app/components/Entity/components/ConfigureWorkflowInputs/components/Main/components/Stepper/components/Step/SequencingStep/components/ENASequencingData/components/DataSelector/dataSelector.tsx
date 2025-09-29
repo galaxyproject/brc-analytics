@@ -6,19 +6,22 @@ import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/B
 import { LoadingIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/LoadingIcon/loadingIcon";
 import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
 import { Props } from "./types";
-import { MAX_READ_RUNS_FOR_BROWSE_ALL } from "../../hooks/UseENADataByTaxonomyId/constants";
 import { ENA_QUERY_METHOD } from "../../../../types";
 import { Fragment } from "react";
+import { config } from "../../../../../../../../../../../../../../../../app/config/config";
 
 export const DataSelector = ({
   loading,
   onContinue,
   onOpen,
-  readCount = MAX_READ_RUNS_FOR_BROWSE_ALL,
+  readCount,
   selectedCount,
   setEnaQueryMethod,
   taxonomicLevelSpecies,
 }: Props): JSX.Element | null => {
+  const { maxReadRunsForBrowseAll } = config();
+  const readCountValue =
+    readCount === undefined ? maxReadRunsForBrowseAll : readCount;
   if (selectedCount > 0) return null;
   return (
     <StyledPaper {...PAPER_PROPS}>
@@ -43,7 +46,7 @@ export const DataSelector = ({
         />
       ) : (
         <StyledGrid {...GRID_PROPS}>
-          {readCount < MAX_READ_RUNS_FOR_BROWSE_ALL && (
+          {readCountValue < maxReadRunsForBrowseAll && (
             <Fragment>
               <Stack alignItems="center" spacing={1}>
                 <Button
@@ -53,7 +56,7 @@ export const DataSelector = ({
                     onContinue();
                   }}
                 >
-                  {renderButtonText(readCount)}
+                  {renderButtonText(readCountValue)}
                 </Button>
                 <Typography
                   color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
