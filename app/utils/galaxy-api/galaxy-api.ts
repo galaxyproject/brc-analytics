@@ -13,6 +13,11 @@ import {
 const DOCKSTORE_API_URL = "https://dockstore.org/api/ga4gh/trs/v2/tools";
 
 const galaxyInstanceUrl = process.env.NEXT_PUBLIC_GALAXY_INSTANCE_URL;
+
+if (!galaxyInstanceUrl) {
+  throw new Error("NEXT_PUBLIC_GALAXY_INSTANCE_URL is not set");
+}
+
 const workflowLandingsApiUrl = `${galaxyInstanceUrl}/api/workflow_landings`;
 const workflowLandingUrl = `${galaxyInstanceUrl}/workflow_landings`;
 
