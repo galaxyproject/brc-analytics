@@ -1,5 +1,11 @@
 import Document, { Head, Html, Main, NextScript } from "next/document";
 
+const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN;
+
+if (!plausibleDomain) {
+  throw new Error("NEXT_PUBLIC_PLAUSIBLE_DOMAIN is not defined");
+}
+
 class MyDocument extends Document {
   render(): JSX.Element {
     return (
@@ -14,7 +20,7 @@ class MyDocument extends Document {
             rel="stylesheet"
           />
           <script
-            data-domain="brc-analytics.org"
+            data-domain={plausibleDomain}
             defer
             src="https://plausible.galaxyproject.eu/js/script.js"
           />
