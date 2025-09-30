@@ -44,7 +44,7 @@ export const StyledImage = styled(Image)`
   width: auto !important;
 
   ${bpUpSm} {
-    display: block; // TODO(cc): check rendering of both images between mobile and iPad mini
+    display: block;
   }
 `;
 
