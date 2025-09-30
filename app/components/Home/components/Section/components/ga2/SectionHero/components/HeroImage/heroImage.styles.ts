@@ -1,6 +1,5 @@
 import {
   bpUpLg,
-  bpUpMd,
   bpUpSm,
 } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
@@ -57,7 +56,7 @@ export const StyledImageXSmall = styled(Image)`
     display: block;
   }
 
-  ${bpUpMd} {
+  ${bpUpLg} {
     top: 52px !important;
   }
 `;

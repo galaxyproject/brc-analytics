@@ -34,23 +34,23 @@ export const Headline = styled.div`
   gap: 8px 0;
   grid-column: 1 / -1;
   grid-row: 1;
-  max-width: 408px; // review when h1 font-family is updated
+  max-width: 404px;
   padding: 56px 0 12px;
   text-align: left;
 
   ${bpUpSm} {
-    grid-column: 1 / span 7; // review when h1 font-family is updated
+    margin-left: 24px;
     padding: 126px 0 0;
   }
 
   ${bpUp1024} {
-    grid-column: 1 / span 7; // change to span 6 when h1 font-family is updated
-    margin-left: 24px;
-    max-width: 480px; // review when h1 font-family is updated
+    grid-column: 1 / span 6;
+    max-width: 464px;
   }
 
   ${bpUpLg} {
-    grid-column: 1 / span 6; // change to span 5 when h1 font-family is updated
+    grid-column: 1 / span 5;
+    margin-left: unset;
     padding: 152px 0 0;
   }
 `;
