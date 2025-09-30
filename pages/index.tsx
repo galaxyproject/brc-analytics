@@ -6,8 +6,6 @@ import { config } from "../app/config/config";
 import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
 import { AppSiteConfig } from "../site-config/common/entities";
 import { APP_KEYS } from "../site-config/common/constants";
-import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
-import { PALETTE_BRAND } from "../app/styles/common/constants/palette";
 
 export const Home = (): JSX.Element => {
   const { config } = useConfig();
@@ -21,14 +19,13 @@ export const Home = (): JSX.Element => {
 export const getStaticProps: GetStaticProps = async () => {
   const { appKey, appTitle } = config();
 
-  const backgroundColor =
-    appKey === APP_KEYS.GA2 ? PALETTE_BRAND.SURFACE : PALETTE.SMOKE_LIGHTEST;
+  const backgroundColor = appKey === APP_KEYS.GA2 ? "#FAEDDC" : "#FAFBFB;";
 
   return {
     props: {
       pageTitle: appTitle,
       themeOptions: {
-        palette: { background: { default: backgroundColor } }, // SMOKE_LIGHTEST
+        palette: { background: { default: backgroundColor } },
       },
     },
   };
