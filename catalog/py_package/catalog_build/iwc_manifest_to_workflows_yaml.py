@@ -8,6 +8,7 @@ from typing import Dict, List, Optional, Tuple
 
 import requests
 import yaml
+from .qc_utils import format_list_section, join_report, write_markdown
 
 from .generated_schema.schema import (
     Workflow,
@@ -397,22 +398,6 @@ def to_workflows_yaml(
         )
 
 
-def _section_header(title: str) -> List[str]:
-    return [
-        title,
-        "",
-    ]
-
-
-def _format_list_section(title: str, items: List[str]) -> List[str]:
-    lines = _section_header(title)
-    if not items:
-        lines += ["None", ""]
-    else:
-        lines += [f"- {item}" for item in items] + [""]
-    return lines
-
-
 def _format_version_mismatch_items(version_qc_items: List[Dict[str, str]]) -> List[str]:
     if not version_qc_items:
         return []
@@ -434,25 +419,17 @@ def write_workflows_qc_report(
     unknown_category_workflows: List[str],
     out_path: str,
 ):
-    """Write a modular Markdown QC report for workflows."""
+    """Write a modular Markdown QC report for workflows using shared qc_utils."""
     report_lines: List[str] = ["# Catalog Workflows QC report", ""]
-
-    # Section: Version mismatches or unavailable versions
     version_items = _format_version_mismatch_items(version_qc_items)
-    report_lines += _format_list_section(
+    report_lines += format_list_section(
         "## Workflows not using newest IWC version", version_items
     )
-
-    # Section: Unknown categories (active only)
     unknown_items = sorted(set(unknown_category_workflows))
-    report_lines += _format_list_section(
+    report_lines += format_list_section(
         "## Workflows with unknown categories", unknown_items
     )
-
-    report = "\n".join(report_lines)
-    os.makedirs(os.path.dirname(out_path), exist_ok=True)
-    with open(out_path, "w") as fh:
-        fh.write(report)
+    write_markdown(out_path, join_report(report_lines))
 
 
 if __name__ == "__main__":
