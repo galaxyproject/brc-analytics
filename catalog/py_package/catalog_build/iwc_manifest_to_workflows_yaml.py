@@ -297,15 +297,19 @@ def to_workflows_yaml(
     workflows_with_other_and_valid: List[Tuple[str, List[str]]] = []
     workflows_excluded_other_only: List[str] = []
     workflows_multiple_valid: List[Tuple[str, List[str]]] = []
-    
+
     for w in sorted_workflows:
         if not getattr(w, "active", False):
             continue
         trs_base = w.trs_id.rsplit("/versions/v", 1)[0]
-        category_names = [cat.value if hasattr(cat, 'value') else cat for cat in w.categories]
+        category_names = [
+            cat.value if hasattr(cat, "value") else cat for cat in w.categories
+        ]
         has_other = WorkflowCategoryId.OTHER in w.categories
-        valid_categories = [cat for cat in w.categories if cat != WorkflowCategoryId.OTHER]
-        
+        valid_categories = [
+            cat for cat in w.categories if cat != WorkflowCategoryId.OTHER
+        ]
+
         if has_other and len(valid_categories) == 1:
             # Case 1: Has OTHER + exactly one valid category
             workflows_with_other_and_valid.append((trs_base, category_names))
@@ -443,13 +447,13 @@ def write_workflows_qc_report(
 ):
     """Write a modular Markdown QC report for workflows using shared qc_utils."""
     report_lines: List[str] = ["# Catalog Workflows QC report", ""]
-    
+
     # Section 1: Version mismatches
     version_items = _format_version_mismatch_items(version_qc_items)
     report_lines += format_list_section(
         "## Workflows not using newest IWC version", version_items
     )
-    
+
     # Section 2: Workflows with OTHER + one valid category (kept)
     other_and_valid_items = [
         f"{trs_base} (categories: {', '.join(cats)})"
@@ -459,13 +463,13 @@ def write_workflows_qc_report(
         "## Workflows with unknown category and one valid category (kept)",
         other_and_valid_items,
     )
-    
+
     # Section 3: Workflows with ONLY OTHER (excluded)
     excluded_items = sorted(set(workflows_excluded_other_only))
     report_lines += format_list_section(
         "## Workflows with only unknown category (excluded)", excluded_items
     )
-    
+
     # Section 4: Workflows with multiple valid categories
     multiple_valid_items = [
         f"{trs_base} (categories: {', '.join(cats)})"
@@ -474,7 +478,7 @@ def write_workflows_qc_report(
     report_lines += format_list_section(
         "## Workflows with multiple valid categories", multiple_valid_items
     )
-    
+
     write_markdown(out_path, join_report(report_lines))
 
 
