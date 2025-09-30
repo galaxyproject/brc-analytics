@@ -57,7 +57,7 @@ export const Headline = styled.div`
 
 export const Head = styled.h1`
   color: ${PALETTE_BRAND.DARK_SIENNA};
-  font-family: "Inter", sans-serif;
+  font-family: "Basis Grotesque", sans-serif;
   font-size: 48px;
   font-weight: 500;
   letter-spacing: -1.4px;
