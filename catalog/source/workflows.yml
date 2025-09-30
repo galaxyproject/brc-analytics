@@ -2,7 +2,7 @@ workflows:
   - trs_id: "#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.6"
     categories:
       - ANNOTATION
-    workflow_name: amr_gene_detection
+    workflow_name: AMR gene detection
     workflow_description:
       Antimicrobial resistance gene detection from assembled bacterial
       genomes
@@ -215,7 +215,7 @@ workflows:
   - trs_id: "#workflow/github.com/iwc-workflows/bacterial_genome_annotation/main/versions/v1.1.11"
     categories:
       - ANNOTATION
-    workflow_name: bacterial_genome_annotation
+    workflow_name: Bacterial genome annotation
     workflow_description:
       Annotation of an assembled bacterial genomes to detect genes,
       potential plasmids, integrons and Insertion sequence (IS) elements.
@@ -613,7 +613,7 @@ workflows:
     workflow_description:
       Variant calling and consensus sequence generation for batches
       of Illumina PE sequenced viruses with uncomplicated and stable genome structure
-      (like e.g. Morbilliviruses).
+      (like e.g. Morbilliviruses). It can handle both ampliconic and non-ampliconic data.
     ploidy: ANY
     taxonomy_id: 11158
     parameters:
