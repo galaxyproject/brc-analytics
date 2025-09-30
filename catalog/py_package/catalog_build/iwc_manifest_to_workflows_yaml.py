@@ -335,10 +335,16 @@ def to_workflows_yaml(
 
             # Case 1: Active workflow version not on Dockstore (covers new active entries too)
             if not verify_trs_version_exists(used_trs_id, skip_validation=False):
-                iwc_trs_id = iwc_current.get(trs_base).trs_id if trs_base in iwc_current else None
+                iwc_trs_id = (
+                    iwc_current.get(trs_base).trs_id
+                    if trs_base in iwc_current
+                    else None
+                )
                 try:
                     iwc_version = (
-                        iwc_trs_id.rsplit("/versions/v", 1)[1] if iwc_trs_id else "unknown"
+                        iwc_trs_id.rsplit("/versions/v", 1)[1]
+                        if iwc_trs_id
+                        else "unknown"
                     )
                 except Exception:
                     iwc_version = "unknown"
@@ -360,7 +366,9 @@ def to_workflows_yaml(
                     iwc_version2 = iwc_trs_id2.rsplit("/versions/v", 1)[1]
                 except Exception:
                     iwc_version2 = "unknown"
-                if iwc_version2 != used_version and not verify_trs_version_exists(iwc_trs_id2, skip_validation=False):
+                if iwc_version2 != used_version and not verify_trs_version_exists(
+                    iwc_trs_id2, skip_validation=False
+                ):
                     version_qc_items.append(
                         {
                             "trs_base": trs_base,
@@ -378,15 +386,22 @@ def to_workflows_yaml(
         for wf in final_workflows
         if getattr(wf, "active", False)
     }
-    version_qc_items = [e for e in version_qc_items if e.get("trs_base") in final_active_bases]
+    version_qc_items = [
+        e for e in version_qc_items if e.get("trs_base") in final_active_bases
+    ]
 
     # Optionally write QC report
     if qc_report_path:
-        write_workflows_qc_report(version_qc_items, unknown_category_workflows, qc_report_path)
+        write_workflows_qc_report(
+            version_qc_items, unknown_category_workflows, qc_report_path
+        )
 
 
 def _section_header(title: str) -> List[str]:
-    return [title, "",]
+    return [
+        title,
+        "",
+    ]
 
 
 def _format_list_section(title: str, items: List[str]) -> List[str]:
@@ -415,18 +430,24 @@ def _format_version_mismatch_items(version_qc_items: List[Dict[str, str]]) -> Li
 
 
 def write_workflows_qc_report(
-    version_qc_items: List[Dict[str, str]], unknown_category_workflows: List[str], out_path: str
+    version_qc_items: List[Dict[str, str]],
+    unknown_category_workflows: List[str],
+    out_path: str,
 ):
     """Write a modular Markdown QC report for workflows."""
     report_lines: List[str] = ["# Catalog Workflows QC report", ""]
 
     # Section: Version mismatches or unavailable versions
     version_items = _format_version_mismatch_items(version_qc_items)
-    report_lines += _format_list_section("## Workflows not using newest IWC version", version_items)
+    report_lines += _format_list_section(
+        "## Workflows not using newest IWC version", version_items
+    )
 
     # Section: Unknown categories (active only)
     unknown_items = sorted(set(unknown_category_workflows))
-    report_lines += _format_list_section("## Workflows with unknown categories", unknown_items)
+    report_lines += _format_list_section(
+        "## Workflows with unknown categories", unknown_items
+    )
 
     report = "\n".join(report_lines)
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
