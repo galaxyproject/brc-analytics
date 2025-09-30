@@ -16,10 +16,7 @@ export const SectionHero = (): JSX.Element => {
     <StyledSection>
       <SectionLayout>
         <Headline>
-          <Head>
-            <span>Mapping life&apos;s code, </span>
-            <span>one genome at a time</span>
-          </Head>
+          <Head>Mapping life&apos;s code, one genome at a time</Head>
           <SubHeadline>
             <Subhead>
               Access expertly curated sequencing and assembly data from the

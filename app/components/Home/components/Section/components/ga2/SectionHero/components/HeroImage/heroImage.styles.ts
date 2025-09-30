@@ -1,9 +1,11 @@
 import {
   bpUpLg,
+  bpUpMd,
   bpUpSm,
 } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
 import { Container } from "@mui/material";
+import Image from "next/image";
 
 export const StyledContainer = styled(Container)`
   grid-column: 1 / -1;
@@ -32,5 +34,30 @@ export const StyledContainer = styled(Container)`
     img {
       height: 624px;
     }
+  }
+`;
+
+export const StyledImage = styled(Image)`
+  display: none;
+  height: 98px !important;
+  top: unset !important;
+  width: auto !important;
+
+  ${bpUpSm} {
+    display: block; // TODO(cc): check rendering of both images between mobile and iPad mini
+  }
+`;
+
+export const StyledImageXSmall = styled(Image)`
+  display: none;
+  height: 148px !important;
+  width: auto !important;
+
+  ${bpUpSm} {
+    display: block;
+  }
+
+  ${bpUpMd} {
+    top: 52px !important;
   }
 `;
