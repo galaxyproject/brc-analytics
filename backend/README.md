@@ -1,6 +1,6 @@
 # BRC Analytics Backend
 
-FastAPI backend infrastructure for BRC Analytics.
+FastAPI backend infrastructure for BRC Analytics with Galaxy integration.
 
 ## Features
 
@@ -9,6 +9,7 @@ FastAPI backend infrastructure for BRC Analytics.
 - Health check endpoints
 - Docker deployment with nginx reverse proxy
 - uv for dependency management
+- Galaxy workflow execution via BioBLEND
 
 ## Quick Start
 
