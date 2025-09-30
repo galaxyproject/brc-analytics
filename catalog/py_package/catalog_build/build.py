@@ -9,6 +9,7 @@ import pandas as pd
 import requests
 import yaml
 from bs4 import BeautifulSoup
+
 from .qc_utils import format_list_section, format_raw_section, join_report
 
 MAX_NCBI_URL_LENGTH = 2000  # The actual limit seems to be a bit over 4000
@@ -1143,22 +1144,32 @@ def make_qc_report(
     paired_accessions=None,
 ):
     # Convert simple lists to items for format_list_section
-    ncbi_assemblies_items = list(missing_ncbi_assemblies) if missing_ncbi_assemblies else []
-    ucsc_assemblies_items = list(missing_ucsc_assemblies) if missing_ucsc_assemblies else []
+    ncbi_assemblies_items = (
+        list(missing_ncbi_assemblies) if missing_ncbi_assemblies else []
+    )
+    ucsc_assemblies_items = (
+        list(missing_ucsc_assemblies) if missing_ucsc_assemblies else []
+    )
     gene_model_urls_items = (
         list(missing_gene_model_urls) if missing_gene_model_urls else None
     )
-    taxonomy_ids_items = [
-        f"{taxon}: {ids}" for taxon, ids in inconsistent_taxonomy_ids
-    ] if inconsistent_taxonomy_ids else []
+    taxonomy_ids_items = (
+        [f"{taxon}: {ids}" for taxon, ids in inconsistent_taxonomy_ids]
+        if inconsistent_taxonomy_ids
+        else []
+    )
     ploidy_assemblies_items = (
-        [f"{accession} (speciesTaxonomyId: {tax_id})" 
-         for accession, tax_id in missing_ploidy_assemblies]
-        if missing_ploidy_assemblies else None
+        [
+            f"{accession} (speciesTaxonomyId: {tax_id})"
+            for accession, tax_id in missing_ploidy_assemblies
+        ]
+        if missing_ploidy_assemblies
+        else None
     )
     outbreak_descendants_items = (
         [str(tax_id) for tax_id in missing_outbreak_descendants]
-        if missing_outbreak_descendants else []
+        if missing_outbreak_descendants
+        else []
     )
     if tree_checks is None:
         tree_checks_text = "No checks done"
@@ -1191,25 +1202,36 @@ def make_qc_report(
 
     outdated_accessions_items = (
         [f"{acc} (current: {curr_acc})" for acc, curr_acc in outdated_accessions]
-        if outdated_accessions else []
+        if outdated_accessions
+        else []
     )
     suppressed_genomes_items = (
         [f"{acc} (status: {status})" for acc, status in suppressed_genomes]
-        if suppressed_genomes else []
+        if suppressed_genomes
+        else []
     )
     paired_accessions_items = (
         [f"{gca} (paired RefSeq: {gcf})" for gca, gcf in paired_accessions]
-        if paired_accessions else []
+        if paired_accessions
+        else []
     )
     # Compose report modularly using shared QC utils
     lines = ["# Catalog Data QC report", ""]
-    lines += format_list_section("## Assemblies not found on NCBI", ncbi_assemblies_items)
-    lines += format_list_section("## Assemblies not found in UCSC list", ucsc_assemblies_items)
+    lines += format_list_section(
+        "## Assemblies not found on NCBI", ncbi_assemblies_items
+    )
+    lines += format_list_section(
+        "## Assemblies not found in UCSC list", ucsc_assemblies_items
+    )
     # Gene model URLs can be None (N/A case)
     if gene_model_urls_items is None:
-        lines += format_raw_section("## Assemblies with gene model URLs not found", "N/A")
+        lines += format_raw_section(
+            "## Assemblies with gene model URLs not found", "N/A"
+        )
     else:
-        lines += format_list_section("## Assemblies with gene model URLs not found", gene_model_urls_items)
+        lines += format_list_section(
+            "## Assemblies with gene model URLs not found", gene_model_urls_items
+        )
     lines += format_list_section(
         "## Species and strain combinations with multiple taxonomy IDs",
         taxonomy_ids_items,
@@ -1218,13 +1240,19 @@ def make_qc_report(
     if ploidy_assemblies_items is None:
         lines += format_raw_section("## Assemblies without ploidy information", "N/A")
     else:
-        lines += format_list_section("## Assemblies without ploidy information", ploidy_assemblies_items)
+        lines += format_list_section(
+            "## Assemblies without ploidy information", ploidy_assemblies_items
+        )
     lines += format_list_section(
         "## Outbreak descendant taxonomy IDs not found in genomes data",
         outbreak_descendants_items,
     )
-    lines += format_list_section("## Outdated assembly accessions", outdated_accessions_items)
-    lines += format_list_section("## Suppressed or retired genomes", suppressed_genomes_items)
+    lines += format_list_section(
+        "## Outdated assembly accessions", outdated_accessions_items
+    )
+    lines += format_list_section(
+        "## Suppressed or retired genomes", suppressed_genomes_items
+    )
     lines += format_list_section(
         "## GenBank assemblies with paired RefSeq accessions",
         paired_accessions_items,
