@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1 import cache, health, links, version
+from app.api.v1 import cache, ena, health, links, llm, version
 from app.core.config import get_settings
 from app.core.dependencies import get_cache_service, reset_cache_service
 
@@ -47,6 +47,8 @@ app.include_router(health.router, prefix="/api/v1", tags=["health"])
 app.include_router(cache.router, prefix="/api/v1/cache", tags=["cache"])
 app.include_router(version.router, prefix="/api/v1/version", tags=["version"])
 app.include_router(links.router, prefix="/api/v1", tags=["links"])
+app.include_router(llm.router, prefix="/api/v1/llm", tags=["llm"])
+app.include_router(ena.router, prefix="/api/v1/ena", tags=["ena"])
 
 
 @app.get("/")

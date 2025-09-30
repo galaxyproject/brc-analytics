@@ -2,6 +2,11 @@ import os
 from functools import lru_cache
 from typing import List
 
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
 
 class Settings:
     """Application settings loaded from environment variables"""
@@ -12,8 +17,28 @@ class Settings:
     # Redis settings
     REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
+    # AI/LLM settings (OpenAI or compatible APIs)
+    AI_API_KEY: str = os.getenv(
+        "AI_API_KEY", os.getenv("OPENAI_API_KEY", "")
+    )  # Fallback to OPENAI_API_KEY for backwards compatibility
+    AI_MODEL: str = os.getenv("AI_MODEL", "gpt-4-turbo-preview")
+    AI_REASONING_MODEL: str = os.getenv(
+        "AI_REASONING_MODEL", os.getenv("AI_MODEL", "gpt-4-turbo-preview")
+    )
+    AI_FORMATTING_MODEL: str = os.getenv(
+        "AI_FORMATTING_MODEL", os.getenv("AI_MODEL", "gpt-4-turbo-preview")
+    )
+    AI_API_BASE_URL: str = os.getenv(
+        "AI_API_BASE_URL", ""
+    )  # Empty means use OpenAI default; set for custom endpoints
+
     # Database settings (for future use)
     DATABASE_URL: str = os.getenv("DATABASE_URL", "")
+
+    # ENA API settings
+    ENA_API_BASE: str = os.getenv(
+        "ENA_API_BASE", "https://www.ebi.ac.uk/ena/portal/api"
+    )
 
     # CORS settings
     CORS_ORIGINS: List[str] = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(
