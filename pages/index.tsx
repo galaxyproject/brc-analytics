@@ -19,7 +19,7 @@ export const Home = (): JSX.Element => {
 export const getStaticProps: GetStaticProps = async () => {
   const { appKey, appTitle } = config();
 
-  const backgroundColor = appKey === APP_KEYS.GA2 ? "#FAEDDC" : "#FAFBFB;";
+  const backgroundColor = appKey === APP_KEYS.GA2 ? "#FAEDDC" : "#FAFBFB";
 
   return {
     props: {
