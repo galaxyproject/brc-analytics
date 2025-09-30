@@ -16,11 +16,10 @@ export const SectionHero = (): JSX.Element => {
     <StyledSection>
       <SectionLayout>
         <Headline>
-          <Head>Mapping life&rsquo;s code, one genome at a time</Head>
+          <Head>VGP Phase I genomes ready for analysis</Head>
           <SubHeadline>
             <Subhead>
-              Access expertly curated sequencing and assembly data from the
-              world&apos;s leading genome projects.
+              Select assembly, view it, and analyze without leaving the browser.
             </Subhead>
             <Button {...BUTTON_PROPS} href={ROUTES.ORGANISMS}>
               Get started

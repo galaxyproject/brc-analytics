@@ -13,7 +13,7 @@ export const SectionAnalyticsAndData = (): JSX.Element => {
         <Headline>
           <SectionTitle>What is GenomeArk?</SectionTitle>
           <SectionSubtitle>
-            GenomeArk combines GenomeArk data with official genomic data from
+            GenomeArk combines VGP Phase I data with official genomic data from
             the NCBI Datasets and the UCSC Genome Browser, powered by the
             unlimited analytical capacity of the Galaxy Platform at the Texas
             Advanced Computing Center (TACC) and Jetstream2.
