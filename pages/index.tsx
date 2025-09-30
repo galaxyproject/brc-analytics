@@ -17,13 +17,15 @@ export const Home = (): JSX.Element => {
 };
 
 export const getStaticProps: GetStaticProps = async () => {
-  const { appTitle } = config();
+  const { appKey, appTitle } = config();
+
+  const backgroundColor = appKey === APP_KEYS.GA2 ? "#FAEDDC" : "#FAFBFB";
 
   return {
     props: {
       pageTitle: appTitle,
       themeOptions: {
-        palette: { background: { default: "#FAFBFB" } }, // SMOKE_LIGHTEST
+        palette: { background: { default: backgroundColor } },
       },
     },
   };

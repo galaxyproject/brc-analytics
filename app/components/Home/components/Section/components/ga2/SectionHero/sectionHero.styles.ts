@@ -1,51 +1,62 @@
-import { bpUpMd } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
+import {
+  bpUpLg,
+  bpUpSm,
+} from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
-import { Section } from "../../../../../../common/Section/section";
 import {
   section,
   sectionGrid,
   sectionLayout,
 } from "../../../../../../Layout/components/AppLayout/components/Section/section.styles";
-import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
+import { PALETTE_BRAND } from "../../../../../../../styles/common/constants/palette";
 import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
+import { bpUp1024 } from "../../../../../../../styles/mixins/breakpoints";
 
-export const StyledSection = styled(Section)`
+export const StyledSection = styled("section")`
   ${section};
-  background-color: ${PALETTE.SMOKE_LIGHTEST};
+  background-color: ${PALETTE_BRAND.SURFACE};
   overflow: hidden;
-  position: relative; /* positions svg */
-  z-index: 0; /* section content above svg */
+  position: relative; // required; positions smaller hero images.
 `;
 
 export const SectionLayout = styled.div`
   ${sectionLayout};
   ${sectionGrid};
   align-content: flex-start;
-  gap: 56px 16px;
-  justify-items: center;
-  padding: 112px 16px;
-
-  ${bpUpMd} {
-    gap: 8px 16px;
-    justify-items: unset;
-  }
+  gap: 0 16px;
+  padding: 0 16px;
 `;
 
 export const Headline = styled.div`
+  align-items: flex-start;
+  align-self: flex-start;
   display: grid;
   gap: 8px 0;
   grid-column: 1 / -1;
-  text-align: center;
-  max-width: 560px;
+  grid-row: 1;
+  max-width: 408px; // review when h1 font-family is updated
+  padding: 56px 0 12px;
+  text-align: left;
 
-  ${bpUpMd} {
-    grid-column: 1 / span 6;
-    text-align: left;
+  ${bpUpSm} {
+    grid-column: 1 / span 7; // review when h1 font-family is updated
+    padding: 126px 0 0;
+  }
+
+  ${bpUp1024} {
+    grid-column: 1 / span 7; // change to span 6 when h1 font-family is updated
+    margin-left: 24px;
+    max-width: 480px; // review when h1 font-family is updated
+  }
+
+  ${bpUpLg} {
+    grid-column: 1 / span 6; // change to span 5 when h1 font-family is updated
+    padding: 152px 0 0;
   }
 `;
 
 export const Head = styled.h1`
-  color: ${PALETTE.COMMON_BLACK};
+  color: ${PALETTE_BRAND.DARK_SIENNA};
   font-family: "Inter", sans-serif;
   font-size: 48px;
   font-weight: 500;
@@ -57,19 +68,16 @@ export const Head = styled.h1`
 export const SubHeadline = styled.div`
   display: grid;
   gap: 16px;
-  justify-items: center;
+  justify-items: flex-start;
 
   .MuiButton-root {
     text-transform: none;
   }
-
-  ${bpUpMd} {
-    justify-items: flex-start;
-  }
 `;
 
 export const Subhead = styled.h2`
-  color: ${PALETTE.INK_LIGHT};
+  color: ${PALETTE_BRAND.DARK_SIENNA};
   font: ${FONT.BODY_LARGE_400_2_LINES};
   margin: 0;
+  opacity: 0.8;
 `;
