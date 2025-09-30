@@ -4,7 +4,7 @@ import os
 import re
 import subprocess
 import time
-from typing import Dict, List
+from typing import Dict, List, Optional, Tuple
 
 import requests
 import yaml
@@ -179,11 +179,6 @@ def generate_current_workflows(skip_validation: bool = False) -> Dict[str, Workf
             )
             by_trs_id[workflow["trsID"]] = workflow_input
 
-    if version_warnings and not skip_validation:
-        print("\nVersion status notes:")
-        for warning in version_warnings:
-            print(f"  {warning}")
-
     return by_trs_id
 
 
@@ -217,7 +212,7 @@ def add_missing_parameters(
 
 def merge_into_existing(
     workflows_path: str, skip_validation: bool = False
-) -> Dict[str, Workflow]:
+) -> Tuple[Dict[str, Workflow], List[Dict[str, str]]]:
     existing = read_existing_yaml(workflows_path)
     current = generate_current_workflows(skip_validation)
     merged: Dict[str, Workflow] = {}
@@ -284,15 +279,25 @@ def merge_into_existing(
     if invalid_versions:
         print(f"\nFixed {len(invalid_versions)} invalid versions in workflows.yml")
 
-    return merged
+    # QC entries are now computed centrally in to_workflows_yaml
+    return merged, []
 
 
 def to_workflows_yaml(
-    workflows_path: str, exclude_other: bool, skip_validation: bool = False
+    workflows_path: str,
+    exclude_other: bool,
+    skip_validation: bool = False,
+    qc_report_path: Optional[str] = None,
 ):
-    by_trs_id = merge_into_existing(workflows_path, skip_validation)
+    by_trs_id, _ = merge_into_existing(workflows_path, skip_validation)
     # sort by trs id, should play nicer with git diffs
     sorted_workflows = list(dict(sorted(by_trs_id.items())).values())
+    # Collect unknown category workflows BEFORE any exclusion or category mutation
+    unknown_category_workflows: List[str] = []
+    for w in sorted_workflows:
+        if getattr(w, "active", False) and WorkflowCategoryId.OTHER in w.categories:
+            # Report versionless TRS base for readability
+            unknown_category_workflows.append(w.trs_id.rsplit("/versions/v", 1)[0])
     if exclude_other:
         print("excluding!")
         final_workflows = []
@@ -300,7 +305,6 @@ def to_workflows_yaml(
             if WorkflowCategoryId.OTHER in workflow.categories:
                 workflow.categories.remove(WorkflowCategoryId.OTHER)
                 if not workflow.categories:
-                    print(f"Excluding workflow {workflow.trs_id}, category unknown")
                     continue
             final_workflows.append(workflow)
         sorted_workflows = final_workflows
@@ -314,6 +318,120 @@ def to_workflows_yaml(
         )
     # Turns out the YAML style prettier likes is really hard to create in python ...
     subprocess.run(["npx", "prettier", "--write", workflows_path])
+
+    # Compute version-related QC entries centrally based on the final written workflows
+    version_qc_items: List[Dict[str, str]] = []
+    if not skip_validation:
+        iwc_current = generate_current_workflows(skip_validation)
+        for w in final_workflows:
+            if not getattr(w, "active", False):
+                continue
+            used_trs_id = w.trs_id
+            trs_base = used_trs_id.rsplit("/versions/v", 1)[0]
+            try:
+                used_version = used_trs_id.rsplit("/versions/v", 1)[1]
+            except Exception:
+                used_version = "unknown"
+
+            # Case 1: Active workflow version not on Dockstore (covers new active entries too)
+            if not verify_trs_version_exists(used_trs_id, skip_validation=False):
+                iwc_trs_id = iwc_current.get(trs_base).trs_id if trs_base in iwc_current else None
+                try:
+                    iwc_version = (
+                        iwc_trs_id.rsplit("/versions/v", 1)[1] if iwc_trs_id else "unknown"
+                    )
+                except Exception:
+                    iwc_version = "unknown"
+                version_qc_items.append(
+                    {
+                        "trs_base": trs_base,
+                        "iwc_trs_id": iwc_trs_id or "",
+                        "used_trs_id": used_trs_id,
+                        "iwc_version": iwc_version,
+                        "used_version": used_version,
+                        "reason": "Active workflow version not on Dockstore",
+                    }
+                )
+
+            # Case 2: We are not using IWC newest because it isn't on Dockstore (kept existing)
+            if trs_base in iwc_current:
+                iwc_trs_id2 = iwc_current[trs_base].trs_id
+                try:
+                    iwc_version2 = iwc_trs_id2.rsplit("/versions/v", 1)[1]
+                except Exception:
+                    iwc_version2 = "unknown"
+                if iwc_version2 != used_version and not verify_trs_version_exists(iwc_trs_id2, skip_validation=False):
+                    version_qc_items.append(
+                        {
+                            "trs_base": trs_base,
+                            "iwc_trs_id": iwc_trs_id2,
+                            "used_trs_id": used_trs_id,
+                            "iwc_version": iwc_version2,
+                            "used_version": used_version,
+                            "reason": "IWC has newer version not on Dockstore yet",
+                        }
+                    )
+
+    # Filter QC entries to only those that correspond to workflows we actually keep and are active
+    final_active_bases = {
+        wf.trs_id.rsplit("/versions/v", 1)[0]
+        for wf in final_workflows
+        if getattr(wf, "active", False)
+    }
+    version_qc_items = [e for e in version_qc_items if e.get("trs_base") in final_active_bases]
+
+    # Optionally write QC report
+    if qc_report_path:
+        write_workflows_qc_report(version_qc_items, unknown_category_workflows, qc_report_path)
+
+
+def _section_header(title: str) -> List[str]:
+    return [title, "",]
+
+
+def _format_list_section(title: str, items: List[str]) -> List[str]:
+    lines = _section_header(title)
+    if not items:
+        lines += ["None", ""]
+    else:
+        lines += [f"- {item}" for item in items] + [""]
+    return lines
+
+
+def _format_version_mismatch_items(version_qc_items: List[Dict[str, str]]) -> List[str]:
+    if not version_qc_items:
+        return []
+    items: List[str] = []
+    for e in sorted(version_qc_items, key=lambda x: x.get("trs_base", "")):
+        items.append(
+            "{trs_base} used v{used_version} vs IWC v{iwc_version} ({reason})".format(
+                trs_base=e.get("trs_base", "unknown"),
+                used_version=e.get("used_version", "unknown"),
+                iwc_version=e.get("iwc_version", "unknown"),
+                reason=e.get("reason", ""),
+            )
+        )
+    return items
+
+
+def write_workflows_qc_report(
+    version_qc_items: List[Dict[str, str]], unknown_category_workflows: List[str], out_path: str
+):
+    """Write a modular Markdown QC report for workflows."""
+    report_lines: List[str] = ["# Catalog Workflows QC report", ""]
+
+    # Section: Version mismatches or unavailable versions
+    version_items = _format_version_mismatch_items(version_qc_items)
+    report_lines += _format_list_section("## Workflows not using newest IWC version", version_items)
+
+    # Section: Unknown categories (active only)
+    unknown_items = sorted(set(unknown_category_workflows))
+    report_lines += _format_list_section("## Workflows with unknown categories", unknown_items)
+
+    report = "\n".join(report_lines)
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    with open(out_path, "w") as fh:
+        fh.write(report)
 
 
 if __name__ == "__main__":
@@ -333,9 +451,18 @@ if __name__ == "__main__":
         action="store_true",
         help="Skip validation of workflow versions against TRS API.",
     )
+    parser.add_argument(
+        "--qc-report-path",
+        dest="qc_report_path",
+        default="catalog/output/qc-report.workflows.md",
+        help=(
+            "Optional path to write workflows QC report (default: catalog/output/qc-report.workflows.md)."
+        ),
+    )
     args = parser.parse_args()
     to_workflows_yaml(
         args.workflows_path,
         exclude_other=args.exclude_other,
         skip_validation=args.skip_validation,
+        qc_report_path=args.qc_report_path,
     )

@@ -1240,7 +1240,7 @@ def make_qc_report(
         )
     )
     return (
-        f"# Catalog QC report\n\n"
+        f"# Catalog Data QC report\n\n"
         f"## Assemblies not found on NCBI\n\n{ncbi_assemblies_text}\n\n"
         f"## Assemblies not found in UCSC list\n\n{ucsc_assemblies_text}\n\n"
         f"## Assemblies with gene model URLs not found\n\n{gene_model_urls_text}\n\n"

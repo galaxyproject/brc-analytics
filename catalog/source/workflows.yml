@@ -1,5 +1,5 @@
 workflows:
-  - trs_id: "#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.5"
+  - trs_id: "#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.6"
     categories:
       - ANNOTATION
     workflow_name: amr_gene_detection
@@ -18,6 +18,12 @@ workflows:
         type_guide:
           class: text
       - key: Select a virulence genes detection database
+        type_guide:
+          class: text
+      - key: Select a StarmAMR database
+        type_guide:
+          class: text
+      - key: Select species for point mutation analysis using PointFinder
         type_guide:
           class: text
     active: true
@@ -162,7 +168,7 @@ workflows:
             - fastqsanger.gz
     active: false
     iwc_id: bacterial-genome-assembly-main
-  - trs_id: "#workflow/github.com/iwc-workflows/bacterial-quality-and-contamination-control-post-assembly/main/versions/v1.0"
+  - trs_id: "#workflow/github.com/iwc-workflows/bacterial-quality-and-contamination-control-post-assembly/main/versions/v1.0.1"
     categories: []
     workflow_name:
       Post-Assembly Quality Control and Contamination Check for Bacterial
@@ -510,7 +516,7 @@ workflows:
           class: boolean
     active: true
     iwc_id: cutandrun-main
-  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.2"
+  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.3"
     categories:
       - TRANSCRIPTOMICS
     workflow_name:
@@ -553,7 +559,7 @@ workflows:
           class: integer
     active: true
     iwc_id: fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-cellplex
-  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.2"
+  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.3"
     categories:
       - TRANSCRIPTOMICS
     workflow_name:
