@@ -15,6 +15,14 @@ class Settings:
     # Database settings (for future use)
     DATABASE_URL: str = os.getenv("DATABASE_URL", "")
 
+    # Galaxy API settings
+    GALAXY_API_URL: str = os.getenv("GALAXY_API_URL", "https://test.galaxyproject.org/api")
+    GALAXY_API_KEY: str = os.getenv("GALAXY_API_KEY", "")
+
+    # Galaxy Tool IDs
+    GALAXY_UPLOAD_TOOL_ID: str = os.getenv("GALAXY_UPLOAD_TOOL_ID", "upload1")
+    GALAXY_RANDOM_LINES_TOOL_ID: str = os.getenv("GALAXY_RANDOM_LINES_TOOL_ID", "random_lines1")
+
     # CORS settings
     CORS_ORIGINS: List[str] = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(
         ","
