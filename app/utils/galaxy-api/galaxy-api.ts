@@ -1,7 +1,6 @@
 import { WORKFLOW_PARAMETER_VARIABLE } from "../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { WorkflowParameter } from "../../apis/catalog/brc-analytics-catalog/common/entities";
 import ky from "ky";
-import { GALAXY_ENVIRONMENT } from "site-config/common/galaxy";
 import {
   EnaFileInfo,
   EnaSequencingReads,
@@ -13,9 +12,9 @@ import {
 
 const DOCKSTORE_API_URL = "https://dockstore.org/api/ga4gh/trs/v2/tools";
 
-const { galaxyInstanceUrl } = GALAXY_ENVIRONMENT;
-const workflowLandingsApiUrl = `${galaxyInstanceUrl}api/workflow_landings`;
-const workflowLandingUrl = `${galaxyInstanceUrl}workflow_landings`;
+const galaxyInstanceUrl = process.env.NEXT_PUBLIC_GALAXY_INSTANCE_URL;
+const workflowLandingsApiUrl = `${galaxyInstanceUrl}/api/workflow_landings`;
+const workflowLandingUrl = `${galaxyInstanceUrl}/workflow_landings`;
 
 /**
  * Get the URL of the workflow landing page for the given genome workflow.
