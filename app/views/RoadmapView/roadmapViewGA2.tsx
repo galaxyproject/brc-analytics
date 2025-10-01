@@ -13,8 +13,8 @@ export const RoadmapViewGA2 = (): JSX.Element => {
         head="Roadmap"
         subHead={
           <>
-            GenomeArk Analytics lets you combine VGP Phase 1, official NCBI, and
-            your own data using Galaxy Platform. It simplifies large-scale
+            GenomeArk lets you combine VGP Phase 1, official NCBI, and your own
+            data using Galaxy Platform. It simplifies large-scale
             bioinformatics, ensures reproducibility, and makes results easy to
             share with other researchers. Our goal is to create a{" "}
             <Typography
