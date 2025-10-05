@@ -7,7 +7,6 @@ None
 ## Assemblies not found in UCSC list
 
 - GCF_000001405.40
-- GCF_018416015.1
 
 ## Assemblies with gene model URLs not found
 
@@ -19,43 +18,46 @@ None
 ## Species and strain combinations with multiple taxonomy IDs
 
 - Acanthamoeba castellanii strain Neff: 5755, 1257118
-- Alphapapillomavirus 12: 990303, 10570
-- Alphapapillomavirus 14: 333769, 120686
-- Alphapapillomavirus 6: 333765, 10611
-- Asfivirus haemorrhagiae: 443878, 443876, 10497
+- Alphapapillomavirus 12: 10570, 990303
+- Alphapapillomavirus 14: 120686, 333769
+- Alphapapillomavirus 6: 10611, 333765
+- Asfivirus haemorrhagiae: 443876, 10497, 443878
 - Betacoronavirus pandemicum: 2697049, 227984
-- Betapapillomavirus 1: 889813, 333923
-- Blumeria graminis: 62690, 1689686
-- Candida tropicalis strain MYA-3404: 5482, 294747
-- Cryptococcus neoformans strain H99: 235443, 5207
-- Cryptosporidium parvum: 5807, 353152
+- Betapapillomavirus 1: 333923, 889813
+- Blumeria graminis: 1689686, 62690
+- Candida tropicalis strain MYA-3404: 294747, 5482
+- Cryptococcus neoformans strain H99: 5207, 235443
+- Cryptosporidium parvum: 353152, 5807
 - Deltaretrovirus priTlym1: 11908, 194440
 - Dependoparvovirus mammalian1: 82300, 256548
-- Dependoparvovirus primate1: 202812, 85106, 10804, 57579, 202813
+- Dependoparvovirus primate1: 202813, 85106, 10804, 57579, 202812
 - Enterovirus alphacoxsackie: 156647, 150846
-- Enterovirus betarhino: 12131, 44130
+- Enterovirus betarhino: 44130, 12131
 - Gammapapillomavirus 11: 1070413, 1070409, 1195796
-- Gammapapillomavirus 12: 746832, 909331
-- Gammapapillomavirus 15: 1472342, 1070408
-- Gammapapillomavirus 19: 1315264, 1315259
-- Gemykibivirus humas1: 1519409, 1516081
-- Glossina fuscipes: 7396, 201502
-- Hepacivirus hominis: 356114, 33745, 1544901
+- Gammapapillomavirus 12: 909331, 746832
+- Gammapapillomavirus 15: 1070408, 1472342
+- Gammapapillomavirus 19: 1315259, 1315264
+- Gemykibivirus humas1: 1516081, 1519409
+- Glossina fuscipes: 201502, 7396
+- Hepacivirus hominis: 1544901, 33745, 356114
 - Neospora caninum strain Liverpool: 572307, 29176
-- Norovirus norwalkense: 1529909, 490039, 122928, 1529924, 122929, 1246677, 1529918
-- Orthoflavivirus denguei: 11069, 11070, 11053
-- Orthomarburgvirus marburgense: 3052505, 448086
+- Norovirus norwalkense: 122928, 1246677, 122929, 490039, 1529924, 1529918, 1529909
+- Orthoflavivirus denguei: 11069, 11053, 11070
+- Orthomarburgvirus marburgense: 448086, 3052505
 - Pegivirus columbiaense: 1704090, 1729141
-- Plasmodium falciparum: 36329, 5833
-- Plasmodium vinckei: 138297, 54757, 5860, 138298, 119398
+- Plasmodium falciparum: 5833, 36329
+- Plasmodium vinckei: 138298, 54757, 119398, 138297, 5860
 - Small anellovirus: 289366, 289367
-- Torbevirus brisa: 2571075, 2571078, 2571077, 3116878
-- Trypanosoma cruzi strain Dm28c: 5693, 1416333, 85057
+- Torbevirus brisa: 3116878, 2571078, 2571077, 2571075
+- Trypanosoma cruzi strain Dm28c: 1416333, 85057, 5693
 - Vesivirus exanthema: 35612, 146073
 
 ## Assemblies without ploidy information
 
-None
+- GCA_000313815.1 (speciesTaxonomyId: 67680)
+- GCA_000385855.2 (speciesTaxonomyId: 67680)
+- GCA_000385875.2 (speciesTaxonomyId: 67680)
+- GCF_048819275.1 (speciesTaxonomyId: 244366)
 
 ## Outbreak descendant taxonomy IDs not found in genomes data
 
@@ -111,6 +113,7 @@ None
 - GCF_000209485.1 (status: suppressed)
 - GCF_000258005.1 (status: suppressed)
 - GCF_000709005.1 (status: suppressed)
+- GCF_048819275.1 (status: suppressed)
 
 ## GenBank assemblies with paired RefSeq accessions
 
