@@ -20,6 +20,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      args:
+        APP_VERSION: ${APP_VERSION:-0.15.0}
     ports:
       - "8000:8000"
     env_file:
