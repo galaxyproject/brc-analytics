@@ -29,6 +29,9 @@ API documentation: http://localhost:8000/api/docs
 cp backend/.env.example backend/.env
 # Edit backend/.env if needed (defaults work for local development)
 
+# Build with version from package.json
+./scripts/docker-build.sh
+
 # Start all services (nginx + backend + redis)
 docker compose up -d
 
