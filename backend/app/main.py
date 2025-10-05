@@ -8,7 +8,7 @@ settings = get_settings()
 
 app = FastAPI(
     title="BRC Analytics API",
-    version="1.0.0",
+    version=settings.APP_VERSION,
     docs_url="/api/docs",
     redoc_url="/api/redoc",
 )
@@ -29,4 +29,4 @@ app.include_router(version.router, prefix="/api/v1/version", tags=["version"])
 
 @app.get("/")
 async def root():
-    return {"message": "BRC Analytics API", "version": "1.0.0"}
+    return {"message": "BRC Analytics API", "version": settings.APP_VERSION}
