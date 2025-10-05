@@ -25,6 +25,18 @@ test.describe("BRC Analytics - API Infrastructure", () => {
     console.log("Cache health:", health);
   });
 
+  test("version endpoint should return version info", async ({ request }) => {
+    // Check version endpoint
+    const response = await request.get("http://localhost:8000/api/v1/version");
+    expect(response.ok()).toBeTruthy();
+
+    const version = await response.json();
+    expect(version.version).toBeTruthy();
+    expect(version.environment).toBeTruthy();
+    expect(version.service).toBe("BRC Analytics API");
+    console.log("API version:", version);
+  });
+
   test("API documentation should be accessible", async ({ page }) => {
     // Navigate to API docs
     await page.goto("http://localhost:8000/api/docs");
