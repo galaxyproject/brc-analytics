@@ -58,6 +58,7 @@ Services:
 
 - `GET /api/v1/health` - Overall service health status
 - `GET /api/v1/cache/health` - Redis cache connectivity check
+- `GET /api/v1/version` - API version and environment information
 
 ### Documentation
 
