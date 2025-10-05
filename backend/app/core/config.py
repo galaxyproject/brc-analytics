@@ -6,6 +6,9 @@ from typing import List
 class Settings:
     """Application settings loaded from environment variables"""
 
+    # Application
+    APP_VERSION: str = os.getenv("APP_VERSION", "1.0.0")
+
     # Redis settings
     REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
