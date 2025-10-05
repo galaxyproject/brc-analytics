@@ -1834,20 +1834,13 @@
                                                             "assembly_count": 5,
                                                             "children": [
                                                                 {
-                                                                    "assembly_count": 5,
+                                                                    "assembly_count": 4,
                                                                     "children": [
                                                                         {
                                                                             "assembly_count": 1,
                                                                             "children": [],
                                                                             "name": "Klebsiella pneumoniae subsp. pneumoniae NTUH-K2044",
                                                                             "ncbi_tax_id": "484021",
-                                                                            "rank": "strain"
-                                                                        },
-                                                                        {
-                                                                            "assembly_count": 1,
-                                                                            "children": [],
-                                                                            "name": "Klebsiella pneumoniae 342",
-                                                                            "ncbi_tax_id": "507522",
                                                                             "rank": "strain"
                                                                         },
                                                                         {
@@ -1874,6 +1867,21 @@
                                                                     ],
                                                                     "name": "Klebsiella pneumoniae",
                                                                     "ncbi_tax_id": "573",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Klebsiella variicola 342",
+                                                                            "ncbi_tax_id": "507522",
+                                                                            "rank": "strain"
+                                                                        }
+                                                                    ],
+                                                                    "name": "Klebsiella variicola",
+                                                                    "ncbi_tax_id": "244366",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -10036,7 +10044,7 @@
                                                         }
                                                     ],
                                                     "name": "Anncaliia algerae",
-                                                    "ncbi_tax_id": "723287",
+                                                    "ncbi_tax_id": "67680",
                                                     "rank": "species"
                                                 }
                                             ],
@@ -15061,20 +15069,28 @@
                                                     "children": [
                                                         {
                                                             "assembly_count": 1,
-                                                            "children": [],
-                                                            "name": "Pediculus humanus",
-                                                            "ncbi_tax_id": "121225",
-                                                            "rank": "species"
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Pediculus humanus",
+                                                                    "ncbi_tax_id": "121225",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Pediculus",
+                                                            "ncbi_tax_id": "121222",
+                                                            "rank": "genus"
                                                         }
                                                     ],
-                                                    "name": "Pediculus",
-                                                    "ncbi_tax_id": "121222",
-                                                    "rank": "genus"
+                                                    "name": "Pediculidae",
+                                                    "ncbi_tax_id": "121221",
+                                                    "rank": "family"
                                                 }
                                             ],
-                                            "name": "Pediculidae",
-                                            "ncbi_tax_id": "121221",
-                                            "rank": "family"
+                                            "name": "Psocodea",
+                                            "ncbi_tax_id": "1930602",
+                                            "rank": "order"
                                         }
                                     ],
                                     "name": "Insecta",
