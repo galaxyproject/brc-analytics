@@ -3,6 +3,7 @@ import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/c
 import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { Brands, FooterText, LargeBrand, SmallBrand } from "./branding.styles";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
+import { VersionDisplay } from "./components/VersionDisplay/versionDisplay";
 
 export const Branding = (): JSX.Element => {
   return (
@@ -54,6 +55,7 @@ export const Branding = (): JSX.Element => {
           url="https://www.niaid.nih.gov/research/bioinformatics-resource-centers"
         />
       </FooterText>
+      <VersionDisplay />
     </Brands>
   );
 };
