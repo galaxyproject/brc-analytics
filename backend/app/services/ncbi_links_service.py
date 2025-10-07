@@ -5,14 +5,17 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, List
 
+from app.core.config import get_settings
+
 logger = logging.getLogger(__name__)
 
 
 class NCBILinksService:
     """Service to generate link files for NCBI cross-referencing."""
 
-    def __init__(self, catalog_path: str = "/catalog/output"):
-        self.catalog_path = Path(catalog_path)
+    def __init__(self, catalog_path: str | None = None):
+        settings = get_settings()
+        self.catalog_path = Path(catalog_path or settings.CATALOG_PATH)
         self.base_url = "https://brc-analytics.org"
 
     def _load_json_file(self, filename: str) -> List[Dict[str, Any]]:

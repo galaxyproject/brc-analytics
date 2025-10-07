@@ -30,6 +30,9 @@ class Settings:
     RATE_LIMIT_REQUESTS: int = int(os.getenv("RATE_LIMIT_REQUESTS", "100"))
     RATE_LIMIT_WINDOW: int = int(os.getenv("RATE_LIMIT_WINDOW", "60"))  # seconds
 
+    # Catalog path
+    CATALOG_PATH: str = os.getenv("CATALOG_PATH", "/catalog/output")
+
 
 @lru_cache()
 def get_settings() -> Settings:
