@@ -172,9 +172,15 @@ class LLMService:
         cached_result = await self.cache.get(cache_key)
         if cached_result:
             logger.info(f"Cache hit for LLM interpretation: {user_query[:50]}...")
+            # Handle cached data which might be a string (JSON) or dict
+            cached_data = cached_result["data"]
+            if isinstance(cached_data, str):
+                import json
+
+                cached_data = json.loads(cached_data)
             return LLMResponse(
                 success=True,
-                data=DatasetQuery(**cached_result["data"]),
+                data=DatasetQuery(**cached_data),
                 raw_response=cached_result.get("raw_response"),
                 tokens_used=cached_result.get("tokens_used"),
                 model_used=cached_result.get("model_used"),
