@@ -11,7 +11,7 @@ OUTBREAK_TAXONOMY_MAPPING_PATH = (
     "catalog/build/intermediate/outbreak-taxonomy-mapping.tsv"
 )
 
-QC_REPORT_PATH = "catalog/output/qc-report.md"
+QC_REPORT_PATH = "catalog/output/qc-report.data.md"
 TREE_OUTPUT_PATH = "catalog/output/ncbi-taxa-tree.json"
 
 TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
