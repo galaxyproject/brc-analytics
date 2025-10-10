@@ -144,7 +144,6 @@ def verify_trs_version_exists(trs_id: str, skip_validation: bool = False) -> boo
 def generate_current_workflows(skip_validation: bool = False) -> Dict[str, Workflow]:
     manifest_data = requests.get(URL).json()
     by_trs_id: Dict[str, Workflow] = {}
-    version_warnings = []
 
     for repo in manifest_data:
         for workflow in repo["workflows"]:
@@ -157,12 +156,8 @@ def generate_current_workflows(skip_validation: bool = False) -> Dict[str, Workf
                 f"{workflow['trsID']}/versions/v{workflow['definition']['release']}"
             )
 
-            if not verify_trs_version_exists(trs_id, skip_validation):
-                # This is just informational - we'll keep the workflow with whatever
-                # version is already in workflows.yml (handled in merge_into_existing)
-                version_warnings.append(
-                    f"Info: IWC manifest has v{workflow['definition']['release']} for {workflow['trsID']} but it's not on Dockstore yet"
-                )
+            # Version existence checks and mismatches are handled later
+            # in merge_into_existing and the QC reporting system
 
             workflow_input = Workflow(
                 active=False,
@@ -213,7 +208,7 @@ def add_missing_parameters(
 
 def merge_into_existing(
     workflows_path: str, skip_validation: bool = False
-) -> Tuple[Dict[str, Workflow], List[Dict[str, str]]]:
+) -> Dict[str, Workflow]:
     existing = read_existing_yaml(workflows_path)
     current = generate_current_workflows(skip_validation)
     merged: Dict[str, Workflow] = {}
@@ -281,7 +276,7 @@ def merge_into_existing(
         print(f"\nFixed {len(invalid_versions)} invalid versions in workflows.yml")
 
     # QC entries are now computed centrally in to_workflows_yaml
-    return merged, []
+    return merged
 
 
 def to_workflows_yaml(
@@ -290,7 +285,7 @@ def to_workflows_yaml(
     skip_validation: bool = False,
     qc_report_path: Optional[str] = None,
 ):
-    by_trs_id, _ = merge_into_existing(workflows_path, skip_validation)
+    by_trs_id = merge_into_existing(workflows_path, skip_validation)
     # sort by trs id, should play nicer with git diffs
     sorted_workflows = list(dict(sorted(by_trs_id.items())).values())
     # Collect category information BEFORE any exclusion or category mutation
