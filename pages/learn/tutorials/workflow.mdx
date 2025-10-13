@@ -1,0 +1,125 @@
+import { DocLayout } from "../../../app/components/Learn/DocLayout";
+
+export const meta = {
+  title: "Running a Workflow",
+  description: "Learn how to run analytical workflows on genomic data.",
+};
+
+export default ({ children }) => (
+  <DocLayout title={meta.title} description={meta.description}>
+    {children}
+  </DocLayout>
+);
+
+# Running a Workflow
+
+This tutorial will guide you through the process of running a workflow in BRC Analytics.
+
+## Overview
+
+Workflows in BRC Analytics are pre-configured analysis pipelines that can be run on genomic data. They typically consist of several steps including:
+
+1. Data preparation
+2. Quality control
+3. Analysis
+4. Results visualization
+
+## Selecting an Organism and Assembly
+
+Before running a workflow, you'll need to select an organism and assembly to work with:
+
+1. Navigate to the [Organisms](/data/organisms) page
+2. Browse or search for your organism of interest
+3. Select the organism to view available assemblies
+4. Choose the assembly you want to work with
+
+## Choosing a Workflow
+
+Once you've selected an assembly:
+
+1. Click on "Analyze" to view available workflows
+2. Browse the available workflows for your assembly
+3. Select a workflow that matches your analysis goals
+
+## Configuring Workflow Inputs
+
+After selecting a workflow, you'll need to configure the inputs:
+
+```javascript
+// Example of how workflow parameters might be configured
+const workflowParams = {
+  referenceGenome: "GRCh38",
+  reads: ["sample1_R1.fastq", "sample1_R2.fastq"],
+  threadCount: 4,
+  minQuality: 20,
+};
+```
+
+Basic steps include:
+
+1. Upload or select input data files
+2. Configure parameters specific to your analysis
+3. Review all settings before launching
+
+## Launching the Workflow
+
+Once your workflow is configured:
+
+1. Click "Run in Galaxy" to launch the workflow
+2. You'll be redirected to Galaxy with your workflow pre-configured
+3. Confirm the launch in the Galaxy interface
+
+## Monitoring Progress
+
+After launching:
+
+1. Your workflow will be added to the Galaxy queue
+2. You can monitor progress in the Galaxy interface
+3. Each step will show its status (queued, running, completed)
+
+## Viewing Results
+
+When the workflow completes:
+
+1. Results will be available in your Galaxy history
+2. You can download results for local analysis
+3. Many results can be visualized directly in Galaxy
+4. Some results can be sent to the UCSC Genome Browser for further visualization
+
+## Common Issues and Solutions
+
+### Workflow Fails to Start
+
+If your workflow doesn't start, check:
+
+- That all required inputs are provided
+- Your Galaxy account has sufficient quota
+- The Galaxy server is operational
+
+### Data Format Issues
+
+If you encounter errors related to data formats:
+
+- Ensure your input files match the expected format
+- Check for common format issues like incorrect line endings
+- Use Galaxy's format conversion tools if needed
+
+## Next Steps
+
+Now that you've run a basic workflow, you might want to:
+
+- Learn about [working with data](/learn/tutorials/data) in more depth
+- Explore more advanced workflows for specific analyses
+- Share your results with collaborators
+
+export async function getStaticProps() {
+  return {
+    props: {
+      pageTitle: meta.title + " - Learn BRC Analytics",
+      themeOptions: {
+        palette: { background: { default: "#FAFBFB" } }, // SMOKE_LIGHTEST
+      },
+    },
+  };
+
+}

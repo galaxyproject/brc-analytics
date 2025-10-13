@@ -1,0 +1,281 @@
+export const meta = {
+  title: "API Documentation",
+  description: "Reference documentation for BRC Analytics APIs.",
+};
+
+<DocLayout title={meta.title} description={meta.description}>
+
+# API Documentation
+
+This reference documentation covers the APIs available for programmatic interaction with BRC Analytics.
+
+## Overview
+
+BRC Analytics provides several APIs to access genomic data, run workflows, and manage resources programmatically. These APIs allow developers and bioinformaticians to:
+
+- Query available organisms and assemblies
+- Retrieve genomic annotations
+- Launch and monitor workflows
+- Access analysis results
+
+## Authentication
+
+Most API requests require authentication:
+
+```typescript
+// Example authentication
+const token = await getAuthToken({
+  username: "your-username",
+  password: "your-password",
+});
+
+// Use token in requests
+const headers = {
+  Authorization: `Bearer ${token}`,
+};
+```
+
+### Obtaining an API Key
+
+1. Log in to your Galaxy account
+2. Navigate to User → Preferences → Manage API key
+3. Generate a new API key if you don't have one
+
+## Core APIs
+
+### Organisms API
+
+Retrieve information about available organisms:
+
+**Endpoint:** `/api/organisms`
+
+**Example request:**
+
+```typescript
+// Get all organisms
+const organisms = await fetch("/api/organisms").then((response) =>
+  response.json()
+);
+
+// Filter organisms by taxonomy
+const bacteria = await fetch("/api/organisms?taxonomy=Bacteria").then(
+  (response) => response.json()
+);
+```
+
+**Example response:**
+
+```json
+{
+  "organisms": [
+    {
+      "id": "9606",
+      "name": "Homo sapiens",
+      "commonName": "Human",
+      "taxonomy": "Eukaryota; Metazoa; Chordata; Craniata; Vertebrata; Euteleostomi; Mammalia; Eutheria; Euarchontoglires; Primates; Haplorrhini; Catarrhini; Hominidae; Homo",
+      "assemblies": ["GRCh38", "T2T-CHM13v2.0"]
+    },
+    ...
+  ]
+}
+```
+
+### Assemblies API
+
+Retrieve information about genome assemblies:
+
+**Endpoint:** `/api/assemblies`
+
+**Example request:**
+
+```typescript
+// Get all assemblies
+const assemblies = await fetch("/api/assemblies").then((response) =>
+  response.json()
+);
+
+// Get assemblies for a specific organism
+const humanAssemblies = await fetch("/api/assemblies?organism=9606").then(
+  (response) => response.json()
+);
+
+// Get a specific assembly
+const grch38 = await fetch("/api/assemblies/GCF_000001405.39").then(
+  (response) => response.json()
+);
+```
+
+### Workflows API
+
+Access and launch workflows:
+
+**Endpoint:** `/api/workflows`
+
+**Example request:**
+
+```typescript
+// Get available workflows
+const workflows = await fetch("/api/workflows").then((response) =>
+  response.json()
+);
+
+// Get workflows for a specific assembly
+const workflows = await fetch("/api/workflows?assembly=GCF_000001405.39").then(
+  (response) => response.json()
+);
+
+// Launch a workflow
+const result = await fetch("/api/workflows/run", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  },
+  body: JSON.stringify({
+    workflow_id: "f2db41e1fa331b3e",
+    assembly: "GCF_000001405.39",
+    inputs: {
+      // Workflow-specific inputs
+    },
+  }),
+}).then((response) => response.json());
+```
+
+## Galaxy Integration
+
+BRC Analytics integrates with the Galaxy API:
+
+### Launching Galaxy Workflows
+
+```typescript
+// Launch a workflow in Galaxy
+const result = await fetch("/api/galaxy/workflows/run", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  },
+  body: JSON.stringify({
+    workflow_id: "f2db41e1fa331b3e",
+    inputs: {
+      // Workflow inputs
+    },
+  }),
+}).then((response) => response.json());
+```
+
+### Monitoring Galaxy Jobs
+
+```typescript
+// Check status of a Galaxy job
+const status = await fetch(`/api/galaxy/jobs/${jobId}`, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+}).then((response) => response.json());
+```
+
+## Error Handling
+
+API errors follow a standard format:
+
+```json
+{
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "The requested resource was not found",
+    "details": {
+      // Additional error details
+    }
+  }
+}
+```
+
+Common error codes:
+
+- `UNAUTHORIZED`: Authentication is required
+- `FORBIDDEN`: User lacks permission
+- `NOT_FOUND`: Resource does not exist
+- `BAD_REQUEST`: Invalid request parameters
+- `INTERNAL_ERROR`: Server-side error
+
+## Rate Limits
+
+API requests are subject to rate limits:
+
+- 100 requests per minute per user
+- 1000 requests per day per user
+
+Responses include rate limit headers:
+
+- `X-RateLimit-Limit`: Total requests allowed in the period
+- `X-RateLimit-Remaining`: Requests remaining in the period
+- `X-RateLimit-Reset`: Time when the limit will reset (Unix timestamp)
+
+## Webhooks
+
+Set up webhooks to receive notifications about long-running processes:
+
+```typescript
+// Register a webhook
+const webhook = await fetch("/api/webhooks", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  },
+  body: JSON.stringify({
+    url: "https://your-server.com/webhook",
+    events: ["workflow.completed", "job.failed"],
+  }),
+}).then((response) => response.json());
+```
+
+## SDK Libraries
+
+Official client libraries are available for:
+
+- JavaScript/TypeScript: `@brc-analytics/sdk`
+- Python: `brc-analytics-python`
+- R: `BRCAnalytics`
+
+Example using the TypeScript SDK:
+
+```typescript
+import { BRCAnalytics } from "@brc-analytics/sdk";
+
+const client = new BRCAnalytics({
+  apiKey: "your-api-key",
+});
+
+// Get available organisms
+const organisms = await client.getOrganisms();
+
+// Launch a workflow
+const job = await client.launchWorkflow({
+  workflowId: "f2db41e1fa331b3e",
+  assemblyId: "GCF_000001405.39",
+  inputs: {
+    // Workflow inputs
+  },
+});
+
+// Monitor job status
+const status = await client.getJobStatus(job.id);
+```
+
+</DocLayout>
+
+export default ({ children }) => <>{children}</>;
+
+export async function getStaticProps() {
+  return {
+    props: {
+      pageTitle: meta.title + " - Learn BRC Analytics",
+      themeOptions: {
+        palette: { background: { default: "#FAFBFB" } }, // SMOKE_LIGHTEST
+      },
+    },
+  };
+
+}

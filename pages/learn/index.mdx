@@ -1,0 +1,67 @@
+import { DocLayout } from "../../app/components/Learn/DocLayout";
+
+export const meta = {
+  title: "Learn BRC Analytics",
+  description:
+    "Documentation, tutorials, and resources to help you get the most out of BRC Analytics.",
+};
+
+export default ({ children }) => (
+  <DocLayout title={meta.title} description={meta.description}>
+    {children}
+  </DocLayout>
+);
+
+# Welcome to BRC Analytics Documentation
+
+BRC Analytics is a collaborative effort to provide powerful analytics tools for bioinformatics research. This documentation will help you get started and make the most of our platform.
+
+## What is BRC Analytics?
+
+BRC Analytics integrates several mature bioinformatics projects to provide a comprehensive platform for analyzing genomic data:
+
+- **Galaxy** - A platform for accessible, reproducible, and transparent computational research
+- **UCSC Genome Browser** - A powerful tool for visualizing and exploring genomic information
+- **HyPhy** - A platform for hypothesis testing using phylogenies
+- **TACC** - Texas Advanced Computing Center providing high-performance computing resources
+
+## Getting Started
+
+The BRC Analytics platform allows you to:
+
+1. Browse organisms and their genome assemblies
+2. Run analytical workflows on genomic data
+3. Visualize results using integrated tools
+
+### Quick Start Guide
+
+To begin using BRC Analytics:
+
+1. **Browse Organisms** - Explore our catalog of organisms on the [Organisms](/data/organisms) page
+2. **Select an Assembly** - Choose a genome assembly of interest
+3. **Launch a Workflow** - Configure and run analytical workflows on your selected assembly
+
+## Next Steps
+
+- Check out our [Setup Guide](/learn/setup) for information on creating an account and configuring your environment
+- Explore our [Tutorials](/learn/tutorials/workflow) for step-by-step guides on common tasks
+- Browse the [Reference](/learn/reference/faq) section for detailed information on APIs and features
+
+## Need Help?
+
+If you have questions or need assistance, please visit our support channels:
+
+- **Community Forum**: [https://help.galaxyproject.org](https://help.galaxyproject.org)
+- **GitHub Issues**: [https://github.com/galaxyproject/brc-analytics/issues](https://github.com/galaxyproject/brc-analytics/issues)
+
+export async function getStaticProps() {
+  return {
+    props: {
+      pageTitle: meta.title,
+      themeOptions: {
+        palette: { background: { default: "#FAFBFB" } }, // SMOKE_LIGHTEST
+      },
+    },
+  };
+
+}

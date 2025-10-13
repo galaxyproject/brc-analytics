@@ -16,7 +16,9 @@ import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { NextPage } from "next";
 import type { AppProps } from "next/app";
+import { useRouter } from "next/router";
 import { StyledFooter } from "../app/components/Layout/components/Footer/footer.styles";
+import { StyledPagesMain } from "../app/components/Layout/components/Main/main.styles";
 import { config } from "../app/config/config";
 import { mergeAppTheme } from "../app/theme/theme";
 import { GoogleSignInAuthenticationProvider } from "@databiosphere/findable-ui/lib/providers/googleSignInAuthentication/provider";
@@ -54,7 +56,10 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
   } = pageProps;
   const appTheme = mergeAppTheme(baseThemeOptions, themeOptions);
   const AppLayout = Component.AppLayout || DXAppLayout;
-  const Main = Component.Main || DXMain;
+  const router = useRouter();
+  const Main =
+    Component.Main ||
+    (router.pathname.startsWith("/learn") ? StyledPagesMain : DXMain);
   return (
     <EmotionThemeProvider theme={appTheme}>
       <ThemeProvider theme={appTheme}>
