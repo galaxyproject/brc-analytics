@@ -8,7 +8,7 @@ import { BRCDataCatalogOrganism } from "../../../../app/apis/catalog/brc-analyti
 import { getOrganismId } from "../../../../app/apis/catalog/brc-analytics-catalog/common/utils";
 import * as C from "../../../../app/components";
 import * as V from "../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { BRCEntityConfig } from "../../../common/entities";
+import { AppEntityConfig } from "../../../common/entities";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
@@ -21,7 +21,7 @@ import { COLUMN_REGISTRY } from "./common/column/columnRegistry";
 /**
  * Entity config object responsible to config anything related to the /genomes route.
  */
-export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
+export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
   categoryGroupConfig: {
     categoryGroups: [
       {
@@ -261,6 +261,8 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
       COLUMN_REGISTRY.PRIORITY,
     ],
     tableOptions: {
+      downloadFilename: "organisms",
+      enableTableDownload: true,
       initialState: {
         columnVisibility: {
           [BRC_DATA_CATALOG_CATEGORY_KEY.PRIORITY]: false,
@@ -288,7 +290,6 @@ export const organismEntityConfig: BRCEntityConfig<BRCDataCatalogOrganism> = {
   } as ListConfig<BRCDataCatalogOrganism>,
   listView: {
     disablePagination: true,
-    enableDownload: true,
   },
   route: "organisms",
   staticLoadFile: "catalog/output/organisms.json",

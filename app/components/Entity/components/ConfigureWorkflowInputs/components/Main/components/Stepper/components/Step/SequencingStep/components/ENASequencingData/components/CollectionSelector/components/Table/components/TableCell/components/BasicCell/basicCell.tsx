@@ -6,7 +6,7 @@ import { ReadRun } from "../../../../../../../../types";
 
 export const BasicCell = ({
   getValue,
-}: CellContext<ReadRun, ReadRun[keyof ReadRun]>): JSX.Element => {
+}: CellContext<ReadRun, string>): JSX.Element => {
   return (
     <Typography variant={TYPOGRAPHY_PROPS.VARIANT.INHERIT}>
       {getValue()}

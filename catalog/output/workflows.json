@@ -358,7 +358,7 @@
         ],
         "ploidy": "HAPLOID",
         "taxonomyId": "2",
-        "trsId": "#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.5",
+        "trsId": "#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.6",
         "workflowDescription": "Antimicrobial resistance gene detection from assembled bacterial genomes",
         "workflowName": "AMR gene detection"
       },

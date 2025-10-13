@@ -13,7 +13,12 @@ export const ColumnFilters = ({ table }: Props): JSX.Element => {
       <ColumnFiltersAdapter
         renderSurface={(props: SurfaceProps) => (
           <>
-            <Controls onFilter={props.onFilter} />
+            <Controls
+              filterSort={props.filterSort}
+              filterSortEnabled={props.filterSortEnabled}
+              onFilter={props.onFilter}
+              onFilterSortChange={props.onFilterSortChange}
+            />
             <StyledSearchAllFilters
               categoryViews={getCategoryViews(props.categoryFilters)}
               onFilter={props.onFilter}

@@ -1,6 +1,6 @@
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
 import { Outbreak } from "../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
-import { BRCEntityConfig } from "../../../common/entities";
+import { AppEntityConfig } from "../../../common/entities";
 import { priorityPathogenMainColumn } from "../entity/priorityPathogen/priorityPathogenMainColumn";
 import { priorityPathogenTop } from "../entity/priorityPathogen/priorityPathogenTop";
 import slugify from "slugify";
@@ -10,7 +10,7 @@ import { priorityPathogenSideColumn } from "../entity/priorityPathogen/priorityP
 /**
  * Entity config object responsible to config anything related to the /priority-pathogens route.
  */
-export const priorityPathogensEntityConfig: BRCEntityConfig<Outbreak> = {
+export const priorityPathogensEntityConfig: AppEntityConfig<Outbreak> = {
   categoryGroupConfig: undefined,
   detail: {
     detailOverviews: [],

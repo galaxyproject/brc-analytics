@@ -22,6 +22,7 @@ import { mergeAppTheme } from "../app/theme/theme";
 import { GoogleSignInAuthenticationProvider } from "@databiosphere/findable-ui/lib/providers/googleSignInAuthentication/provider";
 import { ServicesProvider } from "@databiosphere/findable-ui/lib/providers/services/provider";
 const DEFAULT_ENTITY_LIST_TYPE = "organisms";
+import "../app/styles/fonts/fonts.css";
 
 export interface PageProps extends AzulEntitiesStaticResponse {
   pageTitle?: string;

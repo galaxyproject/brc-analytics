@@ -10,6 +10,7 @@ import {
 } from "../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { Status, OnLaunchGalaxy } from "./hooks/UseLaunchGalaxy/types";
 import { OnContinue, OnEdit } from "../../hooks/UseStepper/types";
+import { GA2AssemblyEntity } from "../../../../../../../../../../apis/catalog/ga2/entities";
 
 export interface StepConfig {
   description?: ReactNode;
@@ -25,7 +26,7 @@ export interface StepProps
     Pick<MStepProps, "completed" | "last">,
     Required<Pick<MStepProps, "index" | "active">> {
   entryLabel: string;
-  genome: BRCDataCatalogGenome;
+  genome: BRCDataCatalogGenome | GA2AssemblyEntity;
   onConfigure: OnConfigure;
   onContinue: OnContinue;
   onEdit: OnEdit;

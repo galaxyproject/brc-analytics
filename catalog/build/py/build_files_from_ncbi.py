@@ -11,7 +11,7 @@ OUTBREAK_TAXONOMY_MAPPING_PATH = (
     "catalog/build/intermediate/outbreak-taxonomy-mapping.tsv"
 )
 
-QC_REPORT_PATH = "catalog/output/qc-report.md"
+QC_REPORT_PATH = "catalog/output/qc-report.data.md"
 TREE_OUTPUT_PATH = "catalog/output/ncbi-taxa-tree.json"
 
 TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
@@ -29,6 +29,9 @@ TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
     5204: "Basidiomycota",
     4761: "Chytridiomycota",
     1913637: "Mucoromycota",
+    6157: "Platyhelminthes",
+    6231: "Nematoda",
+    2157: "Archaea",
 }
 
 # TAXONOMIC_LEVELS_FOR_TREE should be listed in order, as the order is used in building the taxonomy tree;

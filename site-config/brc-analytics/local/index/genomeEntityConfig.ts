@@ -11,7 +11,7 @@ import {
 } from "../../../../app/apis/catalog/brc-analytics-catalog/common/utils";
 import * as C from "../../../../app/components";
 import * as V from "../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { BRCEntityConfig } from "../../../common/entities";
+import { AppEntityConfig } from "../../../common/entities";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
@@ -25,7 +25,7 @@ import { COLUMN_REGISTRY } from "./common/column/columnRegistry";
 /**
  * Entity config object responsible to config anything related to the /assemblies route.
  */
-export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
+export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
   categoryGroupConfig: {
     categoryGroups: [
       {
@@ -148,6 +148,7 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
           viewBuilder: V.buildAnalyzeGenome,
         } as ComponentConfig<typeof C.AnalyzeGenome, BRCDataCatalogGenome>,
         enableSorting: false,
+        enableTableDownload: false,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANALYZE_GENOME,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.ANALYZE_GENOME,
         width: "auto",
@@ -405,6 +406,8 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
       COLUMN_REGISTRY.PRIORITY,
     ],
     tableOptions: {
+      downloadFilename: "assemblies",
+      enableTableDownload: true,
       initialState: {
         columnVisibility: {
           [BRC_DATA_CATALOG_CATEGORY_KEY.PRIORITY]: false,
@@ -429,7 +432,6 @@ export const genomeEntityConfig: BRCEntityConfig<BRCDataCatalogGenome> = {
   } as ListConfig<BRCDataCatalogGenome>,
   listView: {
     disablePagination: true,
-    enableDownload: true,
   },
   route: "assemblies",
   staticLoadFile: "catalog/output/assemblies.json",
