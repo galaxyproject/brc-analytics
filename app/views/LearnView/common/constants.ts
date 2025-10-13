@@ -44,6 +44,18 @@ export const DOCUMENTATION_CATEGORIES = [
     title: "Tutorials",
   },
   {
+    id: "case-studies",
+    items: [
+      {
+        icon: "article",
+        id: "measles",
+        path: "/learn/case-studies/measles",
+        title: "Measles Virus Analysis",
+      },
+    ],
+    title: "Case Studies",
+  },
+  {
     id: "reference",
     items: [
       {
