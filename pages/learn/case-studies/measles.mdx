@@ -19,13 +19,17 @@ export default ({ children }) => (
 
 Anton Nekrutenko<sup>1</sup>, Danielle Callan<sup>2</sup>, Marius Van Den Beek<sup>1</sup>, Dannon Baker<sup>3</sup>, David Rogers<sup>4</sup>, Wolfgang Maier<sup>5</sup>, Aysam Guerler<sup>3</sup>, Hiram Clawson<sup>6</sup>, Scott Cain<sup>1</sup>, Michael Schatz<sup>3</sup>, Kelsey Beavers<sup>7</sup>, Maximilah Haeussler<sup>6</sup>, Bjorn Gruning<sup>5</sup>, and Sergei Kosakowsky Pond<sup>2</sup>
 
-<sup>1</sup> Dept. of Biochemistry and Molecular Biology, The Pennsylvania State University, University Park, PA, USA
+<sup>1</sup> Dept. of Biochemistry and Molecular Biology, The Pennsylvania State
+University, University Park, PA, USA
 <sup>2</sup> Dept. of Biology, Temple University, Philadelphia, PA, USA
 <sup>3</sup> Dept. of Biology, Johns Hopkins University, Baltimore, MD, USA
 <sup>4</sup> Clever Canary, LLC, Santa Cruz, CA, USA
-<sup>5</sup> Dept. of Bioinformatics, Albert-Ludwigs-University Freiburg, Freiburg, Baden-Württemberg, Germany
-<sup>6</sup> Baskin School of Engineering, University of California, Santa Cruz, USA
-<sup>7</sup> Texas Advanced Computing Center, The University of Texas, Austin, TX, USA
+<sup>5</sup> Dept. of Bioinformatics, Albert-Ludwigs-University Freiburg,
+Freiburg, Baden-Württemberg, Germany
+<sup>6</sup> Baskin School of Engineering, University of California, Santa Cruz,
+USA
+<sup>7</sup> Texas Advanced Computing Center, The University of Texas, Austin,
+TX, USA
 
 ## Abstract
 
@@ -55,15 +59,15 @@ Outside of BRC-analytics all of these steps are performed separately. Suppose a 
   width={1428}
   caption={
     <>
-      <strong>Figure 1.</strong> Schematic representation of overlapping
-      reading frames within the P/V/C locus of measles virus (upper pane). C
-      (middle pane) and V (lower pane) are shifted +1 and +2 relative to the P
-      frame, respectively. The P protein is translated from the primary mRNA
+      <strong>Figure 1.</strong> Schematic representation of overlapping reading
+      frames within the P/V/C locus of measles virus (upper pane). C (middle
+      pane) and V (lower pane) are shifted +1 and +2 relative to the P frame,
+      respectively. The P protein is translated from the primary mRNA
       transcript, while the V and C proteins are produced from the same locus
       through different mechanisms. The C protein, a small basic protein, is
       expressed by an alternative translational initiation mechanism. It is
-      translated from an overlapping open reading frame (in +1 phase relative
-      to P) that begins 19 nucleotides downstream of the P/V start codon. This
+      translated from an overlapping open reading frame (in +1 phase relative to
+      P) that begins 19 nucleotides downstream of the P/V start codon. This
       strategy allows for the independent expression of the C protein from the
       same mRNA transcript that codes for P and V. The V protein is produced
       through cotranscriptional RNA editing. This process involves the viral
@@ -150,8 +154,8 @@ The workflow produces several types of outputs: a summary of variants found in e
   width={1412}
   caption={
     <>
-      <strong>Figure 4.</strong> Schematics of the variant calling workflow
-      used in this study (the workflow is available from{" "}
+      <strong>Figure 4.</strong> Schematics of the variant calling workflow used
+      in this study (the workflow is available from{" "}
       <a href="https://iwc.galaxyproject.org/workflow/generic-non-segmented-viral-variant-calling-main/">
         IWC
       </a>
@@ -201,11 +205,8 @@ The entire analysis including the notebook can be accessed through the links pro
 
 First we looked for general patterns of substitutions within P/C and P/V overlaps by simply plotting aggregate data for each substitutions (e.g., the number of samples a substitution occurs at, median, min, and max alternative allele frequencies and its effect, synonymous or non-synonymous, on each reading frame). One can see that in both cases the P reading frame appears to be more permissive—most substitutions are non-synonymous in P and synonymous in C or V.
 
-<Figure
-  src="/learn/case-studies/measles/figure-6.png"
-  alt="Nucleotide changes within P/C and P/V overlaps"
-  height={359}
-  width={1412}
+<VegaEmbed
+  spec="https://gist.githubusercontent.com/nekrut/604d0886724301acaa0c96c0df00f7a3/raw/7e5227634895bbaea6dd781a024a7b2bb518aaae/vars.json"
   caption={
     <>
       <strong>Figure 6.</strong> Nucleotide changes within P/C (top) and P/V
@@ -214,18 +215,11 @@ First we looked for general patterns of substitutions within P/C and P/V overlap
       Red = non-synonymous for that frame; length of each tick represents the
       alternative allele frequency spread = the difference between min and max
       values. The opacity is the number of samples (from min = 2 to max = 225)
-      the change is found in.
+      the change is found in. This is an interactive visualization - hover over
+      data points for details and use the controls to zoom and pan.
     </>
   }
 />
-
-<Alert severity="info">
-  <AlertTitle>Interactive Visualization</AlertTitle>
-  You can view the interactive version of the above image at{" "}
-  <a href="https://usegalaxy.org/visualizations/display?visualization=jupyterlite&dataset_id=f9cad7b01a47213516812bfc3ef85974">
-    Galaxy JupyterLite
-  </a>
-</Alert>
 
 Nucleotide substitutions in the C-protein and the V-protein region downstream of the editing site appear to affect C and V protein function less than they affect protein P. Variants in the C–P overlap are mostly synonymous in C but nonsynonymous in P. This suggests strong purifying selection on C (which contains nuclear localization, export, and SHCBP1-binding signals), while P tolerates or favors amino-acid changes in this region. Substitutions in the P–V overlap frequently show synonymous changes in V but nonsynonymous in P, pointing to P-directed adaptation. However, some sites show the opposite pattern (nonsynonymous in V, synonymous in P), possibly corresponding to residues that mediate STAT1 and Jak1 binding. These variants could represent V-specific adaptive evolution affecting interferon antagonism.
 
@@ -244,8 +238,8 @@ Next we analyzed the substitution patterns in the context of sampling locations 
       sample. Samples (X-axis) are sorted by collection time from 01/22/2018
       (left) to 05/07/2024 (right). The rightmost blue sample had no collection
       date associated with it. Genomic coordinates of variants are on the
-      Y-axis. Blue = Canada; Red = USA; Orange = Romania. Size of this circle
-      is proportional for alternative allele frequency at that site.
+      Y-axis. Blue = Canada; Red = USA; Orange = Romania. Size of this circle is
+      proportional for alternative allele frequency at that site.
     </>
   }
 />
@@ -266,10 +260,10 @@ Two sites stand out as potentially showing evidence of diversifying selection: c
   caption={
     <>
       <strong>Figure 8.</strong> Tracing substitutions within codons 105 (left)
-      and 111 (right) of the P/V reading frames through the phylogenetic tree
-      of the analyzed samples. Derived states at internal nodes are also shown.
-      The number of samples shown here is smaller than the total number of
-      samples in our analysis because identical sequences were excluded from the
+      and 111 (right) of the P/V reading frames through the phylogenetic tree of
+      the analyzed samples. Derived states at internal nodes are also shown. The
+      number of samples shown here is smaller than the total number of samples
+      in our analysis because identical sequences were excluded from the
       analysis. Sequences with an excessive number of N-characters were also
       excluded.
     </>

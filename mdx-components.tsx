@@ -8,6 +8,7 @@ import { CardActions } from "./app/components/Home/components/Section/components
 import { Accordion } from "./app/components/common/Accordion/accordion";
 import { AccordionSummary } from "./app/components/common/Accordion/components/AccordionSummary/accordionSummary";
 import { Figure } from "./app/components/common/Figure/figure";
+import { VegaEmbed } from "./app/components/common/VegaEmbed/vegaEmbed";
 import { CodeBlock } from "./app/components/Learn/components/CodeBlock/codeBlock";
 import { DocLayout } from "./app/components/Learn/DocLayout";
 import {
@@ -38,6 +39,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     SectionHeadline,
     SectionLayout,
     SubHeadline,
+    VegaEmbed,
     a: ({ children, href }): JSX.Element =>
       C.Link({ label: children, url: href ?? "" }),
     // Handle code blocks with language classes
