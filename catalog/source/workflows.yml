@@ -642,7 +642,6 @@ workflows:
         type_guide:
           class: Collection
           collection_type: list:paired
-        variable: SANGER_READ_RUN_PAIRED
         data_requirements:
           library_strategy: ["WGS", "AMPLICON"]
           library_layout: "PAIRED"
