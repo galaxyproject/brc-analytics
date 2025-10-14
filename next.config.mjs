@@ -1,6 +1,7 @@
 import nextMDX from "@next/mdx";
 import withPlugins from "next-compose-plugins";
 import path from "path";
+import remarkGfm from "remark-gfm";
 
 const ESM_PACKAGES = [
   "axios",
@@ -12,6 +13,10 @@ const ESM_PACKAGES = [
 
 const withMDX = nextMDX({
   extension: /\.mdx?$/,
+  options: {
+    rehypePlugins: [],
+    remarkPlugins: [remarkGfm],
+  },
 });
 export default withPlugins(
   [[withMDX, { pageExtensions: ["md", "mdx", "ts", "tsx"] }]],
