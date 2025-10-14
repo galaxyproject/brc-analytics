@@ -1,4 +1,7 @@
 import { DocLayout } from "../../../app/components/Learn/DocLayout";
+import { Figure } from "../../../app/components/common/Figure/figure";
+import { Alert } from "@databiosphere/findable-ui/lib/components/common/Alert/alert";
+import { AlertTitle } from "@mui/material";
 
 export const meta = {
   title: "Measles Virus Analysis - Case Study",
@@ -14,20 +17,15 @@ export default ({ children }) => (
 
 # From data to publication in a browser with BRC-Analytics: Evolutionary dynamics of coding overlaps in measles virus
 
-Anton Nekrutenko<sup>1</sup>, Danielle Callan<sup>2</sup>, Marius Van Den Beek<sup>1</sup>, Dannon Baker<sup>3</sup>, David Rogers<sup>4</sup>, Wolfgang Maier<sup>5</sup>, Aysam Guerler<sup>3</sup>, Hiram Clawson<sup>6</sup>, Scott Cain<sup>1</sup>, Kelsey Beavers<sup>8</sup>, Maximilah Haeussler<sup>6</sup>, Bjorn Gruning<sup>5</sup>, and Sergei Kosakowsky Pond<sup>2</sup>
+Anton Nekrutenko<sup>1</sup>, Danielle Callan<sup>2</sup>, Marius Van Den Beek<sup>1</sup>, Dannon Baker<sup>3</sup>, David Rogers<sup>4</sup>, Wolfgang Maier<sup>5</sup>, Aysam Guerler<sup>3</sup>, Hiram Clawson<sup>6</sup>, Scott Cain<sup>1</sup>, Michael Schatz<sup>3</sup>, Kelsey Beavers<sup>7</sup>, Maximilah Haeussler<sup>6</sup>, Bjorn Gruning<sup>5</sup>, and Sergei Kosakowsky Pond<sup>2</sup>
 
-<sup>1</sup> Dept. of Biochemistry and Molecular Biology, The Pennsylvania State
-University, University Park, PA, USA
+<sup>1</sup> Dept. of Biochemistry and Molecular Biology, The Pennsylvania State University, University Park, PA, USA
 <sup>2</sup> Dept. of Biology, Temple University, Philadelphia, PA, USA
 <sup>3</sup> Dept. of Biology, Johns Hopkins University, Baltimore, MD, USA
 <sup>4</sup> Clever Canary, LLC, Santa Cruz, CA, USA
-<sup>5</sup> Dept. of Bioinformatics, Albert-Ludwigs-University Freiburg,
-Freiburg, Baden-Württemberg, Germany
-<sup>6</sup> Baskin School of Engineering, University of California, Santa Cruz,
-USA
-<sup>7</sup> NCBI Datasets, National Library of Medicine, NIH, Bethesda, MD, USA
-<sup>8</sup> Texas Advanced Computing Center, The University of Texas, Austin,
-TX, USA
+<sup>5</sup> Dept. of Bioinformatics, Albert-Ludwigs-University Freiburg, Freiburg, Baden-Württemberg, Germany
+<sup>6</sup> Baskin School of Engineering, University of California, Santa Cruz, USA
+<sup>7</sup> Texas Advanced Computing Center, The University of Texas, Austin, TX, USA
 
 ## Abstract
 
@@ -50,6 +48,52 @@ BRC-analytics encompasses the entire data-to-publication trajectory by providing
 
 Outside of BRC-analytics all of these steps are performed separately. Suppose a student in a lab performs re-analysis of published surveillance datasets. These datasets—fastq files from the sequence read archive (SRA) such as NCBI or EBI—are first downloaded onto local infrastructure. Next, these data need to be mapped against a reference genome for the pathogen in question. For this the reference also needs to be located and downloaded. At this point using a combination of tools or workflows, read data is reduced to a list of variants. Depending on how (individual tool or Snakemake, Nextflow, or Galaxy workflows) and where (one's laptop, an institutional cluster, a cloud, a Galaxy instance) this is done, the results may be more or less reproducible. The interpretation stage involves filtering, reshaping and summarizing the list of variants. It is done using "analytical frameworks" such as spreadsheets applications or notebooks (Jupyter, RStudio). This is the least reproducible stage of the analysis because spreadsheet formulas and/or custom code created in notebooks is rarely versioned or documented. The entire process is usually condensed into a sentence "the data was analyzed using a collection of in-house python scripts" found in too many methods sections of numerous manuscripts. Because BRC-analytics integrates all these steps into a single environment it tracks provenance implicitly saving all parameters, intermediate datasets, or code snippets in notebooks addressing most reproducibility concerns.
 
+<Figure
+  src="/learn/case-studies/measles/figure-1.png"
+  alt="Schematic representation of overlapping reading frames"
+  height={687}
+  width={1428}
+  caption={
+    <>
+      <strong>Figure 1.</strong> Schematic representation of overlapping
+      reading frames within the P/V/C locus of measles virus (upper pane). C
+      (middle pane) and V (lower pane) are shifted +1 and +2 relative to the P
+      frame, respectively. The P protein is translated from the primary mRNA
+      transcript, while the V and C proteins are produced from the same locus
+      through different mechanisms. The C protein, a small basic protein, is
+      expressed by an alternative translational initiation mechanism. It is
+      translated from an overlapping open reading frame (in +1 phase relative
+      to P) that begins 19 nucleotides downstream of the P/V start codon. This
+      strategy allows for the independent expression of the C protein from the
+      same mRNA transcript that codes for P and V. The V protein is produced
+      through cotranscriptional RNA editing. This process involves the viral
+      polymerase inserting a non-templated G residue at a specific site within
+      the P/V mRNA transcript. This pseudo-templated insertion triggers a +2
+      ribosomal frameshift, leading to the translation of a new V ORF. The
+      mechanism, often referred to as "polymerase stuttering," occurs when the
+      vRdRp repeatedly reads a single template cytosine within a short G run
+      that is part of a larger polypurine tract.
+    </>
+  }
+/>
+
+As a biological system for highlighting BRC-analytics functionality we selected the measles virus for two reasons. First, there are a number of recent surveillance datasets available for this pathogen. These datasets are not very large mimicking output of a typical small-to-medium research lab, which represents the majority of single PI groups in the US (based on the analysis of R01-equivalent awards for 2024 found at [RePORT](https://reporter.nih.gov/). RO1-equivalent are DP1, DP2, DP5, R01, R37, R56, RF1, RL1, U01, R35). Thus we can show how BRC-analytics benefits the majority of biomedical researchers. Second, measles virus contains the P/V/C-locus with two sets of overlapping reading frames (Fig. 1). Analysis of genetic variants within overlapping coding regions is challenging in practice and allows us to highlight impromptu analytical capabilities of the BRC-analytics environment. A mutation occurring in protein coding regions changes the nucleotide sequence of underlying codons. Due to redundancy of the genetic code such change may or may not alter the amino acid encoded by the codon. If a mutation does change amino acid, such mutation is called non-synonymous. Conversely, a mutation that does not lead to amino acid change is called synonymous. But what if a given gene codes for multiple proteins via overlapping reading frames (Fig. 2)? In this case the concept of "synonymous" or "non-synonymous" becomes relative to a frame. For example, due to the organization of the standard genetic code most changes in the third codon position are synonymous. However, a third codon position corresponds to the second codon position in +1 overlap and any change in the second codon position is always nonsynonymous. In other words a synonymous change in one frame will most often be non-synonymous in the other creating interesting scenarios for the evolution of proteins encoded by overlapping reading frames.
+
+<Figure
+  src="/learn/case-studies/measles/figure-2.png"
+  alt="Correspondence of codon positions"
+  height={400}
+  width={1437}
+  caption={
+    <>
+      <strong>Figure 2.</strong> Correspondence of codon positions in +1 and +2
+      overlaps
+    </>
+  }
+/>
+
+In this manuscript we demonstrate how a routine surveillance analysis can be performed entirely using the BRC-analytics environment. We begin by obtaining all necessary data and applying a best-practice variant analysis workflow to create the initials list of variants. We then demonstrate how BRC-analytics allows custom analyses using a built-in JupyterLite functionality to perform non-standard analyses of overlapping coding regions and tracing evolutionary dynamics of nucleotide substitutions. This approach ensures transparency and reproducibility by implicitly tracking provenance, ultimately enabling researchers to conduct sophisticated evolutionary and functional analyses without local installations or manual data transfers.
+
 ## Results and Discussion
 
 ### What is BRC-analytics?
@@ -57,6 +101,18 @@ Outside of BRC-analytics all of these steps are performed separately. Suppose a 
 BRC-Analytics is a browser-based analysis environment developed within the NIAID-funded Bioinformatics Resource Centers (BRCs) program to enable comprehensive, reproducible genomic and metagenomic analyses of infectious disease agents entirely online. Powered by the Galaxy workflow system, it integrates reference data from NCBI Datasets and curated community workflows for quality control, read mapping, variant identification, and annotation. Users can start with raw sequencing reads and obtain publication-ready results without installing software or transferring data between tools. By combining cloud-based computation, versioned workflows, and interactive visualizations, BRC-Analytics provides a seamless interface that unites the data and analytical capabilities making advanced pathogen genomics accessible to the wider research community.
 
 At the moment of writing BRC-analytics listed 1,601 genome assemblies corresponding to 1,149 distinct pathogen, host, and vector taxa. Our plan is to steadily increase the number of species until all NCBI Datasets taxa are included. We use UCSC Genome Browser platform as a source of genome annotations (coordinates of genes, regulatory element, etc). This involves ensuring that for each NCBI genome assembly we have a corresponding UCSC Genome Browser instance populated with annotations. Using UCSC Genome Browser as a distribution platform for genome annotation allows us to be more flexible and include community annotations in addition to reference tracks provided by NCBI datasets. Finally, for accessing all public sequence read archive (SRA) data we rely on EBI ENA by locally caching all SRA metadata for quick search and accessing read-level data via ENA API. Best practice workflows are retrieved from the community curated Galaxy's IWC consortium repository. BRC-analytics uses Galaxy for launching and running workflows as well as individual analysis tools. Galaxy is also used as an environment for interpretive analyses by relying on its interactive environment and visualization functionality powered by Jupyter, RStudio, and JupyterLite. The substantial computational and storage capacities required to make this system work and scale are provided by the ACCESS-CI infrastructure in the US. BRC-analytics and Galaxy are hosted on servers provided by the Texas Advanced Computing Center (TACC)—an integral part of ACCESS-CI.
+
+<Figure
+  src="/learn/case-studies/measles/figure-3.png"
+  alt="Main components of BRC-analytics"
+  height={521}
+  width={1422}
+  caption={
+    <>
+      <strong>Figure 3.</strong> Main components of BRC-analytics.
+    </>
+  }
+/>
 
 ### Selecting genome: Using NCBI Datasets for reference data
 
@@ -87,6 +143,23 @@ Detailed information about the workflow can be found at:
 
 The workflow produces several types of outputs: a summary of variants found in each sample, consensus sequence for each sample as well as auxiliary outputs such as QC summary for all samples.
 
+<Figure
+  src="/learn/case-studies/measles/figure-4.png"
+  alt="Schematics of the variant calling workflow"
+  height={620}
+  width={1412}
+  caption={
+    <>
+      <strong>Figure 4.</strong> Schematics of the variant calling workflow
+      used in this study (the workflow is available from{" "}
+      <a href="https://iwc.galaxyproject.org/workflow/generic-non-segmented-viral-variant-calling-main/">
+        IWC
+      </a>
+      ).
+    </>
+  }
+/>
+
 [Watch Videos 1 & 2: Selecting and launching workflows](https://www.youtube.com/playlist?list=PLNFLKDpdM3B-YdpZjoCxtFNUztnmkMu9l)
 
 ### Selecting SRA data and launching workflow
@@ -103,6 +176,19 @@ After selecting the reference genome and workflow for variant identification ana
 
 The workflow outputs two datasets that would help us gain insights into the evolution of overlapping coding regions in the measles virus. The first dataset provides information about each variant within each sample: it shows its position, alternative allele frequency, strand-specific read counts, functional impact and other data. The second dataset contains consensus sequences produced for each sample by incorporating all variants present in that sample. We will use it to assess adaptive significance of substitutions.
 
+<Figure
+  src="/learn/case-studies/measles/figure-5.png"
+  alt="Analysis setup for post-processing"
+  height={598}
+  width={1424}
+  caption={
+    <>
+      <strong>Figure 5.</strong> Analysis setup for post-processing of variant
+      calls.
+    </>
+  }
+/>
+
 ### Making sense of variants: Combining LLMs and JupyterLite
 
 The workflow described above produced a list of variants observed in each sample. Such a list by itself does not provide any valuable biological insights. It needs to be reshaped, summarized, and visualized to give us any ideas on the biological significance of variants we just identified. Additional complication is that there are no "off-the-shelf" tools for analysis of genetic variants in overlapping coding regions. Fortunately, BRC-analytics and Galaxy it utilizes as the analysis platform provide ability to construct analyses in an _ad-hoc_ way. For this we will use an environment called JupyterLite that is integrated into the Galaxy platform.
@@ -111,17 +197,86 @@ The workflow described above produced a list of variants observed in each sample
 
 The entire analysis including the notebook can be accessed through the links provided above. All steps of this analysis described in the notebook were generated with the help of ChatGPT using a setup in which we used two open browser windows: one with Galaxy workspace and another with ChatGPT, Microsoft CoPilot, Claude, or any other LLM agent capable of writing python code. Video 3 also details safety checks we used when using LLM-generated code—such code should ALWAYS be treated with extreme caution and made publicly available.
 
-### Key findings
+### P reading frame is more permissive than C and V
 
-The analysis revealed asymmetric evolution of the P/V/C locus's reading frames under distinct selective pressures:
+First we looked for general patterns of substitutions within P/C and P/V overlaps by simply plotting aggregate data for each substitutions (e.g., the number of samples a substitution occurs at, median, min, and max alternative allele frequencies and its effect, synonymous or non-synonymous, on each reading frame). One can see that in both cases the P reading frame appears to be more permissive—most substitutions are non-synonymous in P and synonymous in C or V.
 
-1. **P reading frame is more permissive than C and V**: Most substitutions are non-synonymous in P and synonymous in C or V, suggesting the P reading frame appears to be more permissive.
+<Figure
+  src="/learn/case-studies/measles/figure-6.png"
+  alt="Nucleotide changes within P/C and P/V overlaps"
+  height={359}
+  width={1412}
+  caption={
+    <>
+      <strong>Figure 6.</strong> Nucleotide changes within P/C (top) and P/V
+      (bottom) overlaps. Each substitution is represented by two ticks
+      corresponding to each reading frame. Green = synonymous for that frame;
+      Red = non-synonymous for that frame; length of each tick represents the
+      alternative allele frequency spread = the difference between min and max
+      values. The opacity is the number of samples (from min = 2 to max = 225)
+      the change is found in.
+    </>
+  }
+/>
 
-2. **Strong purifying selection on C protein**: Variants in the C–P overlap are mostly synonymous in C but nonsynonymous in P. This suggests strong purifying selection on C (which contains nuclear localization, export, and SHCBP1-binding signals), while P tolerates or favors amino-acid changes in this region.
+<Alert severity="info">
+  <AlertTitle>Interactive Visualization</AlertTitle>
+  You can view the interactive version of the above image at{" "}
+  <a href="https://usegalaxy.org/visualizations/display?visualization=jupyterlite&dataset_id=f9cad7b01a47213516812bfc3ef85974">
+    Galaxy JupyterLite
+  </a>
+</Alert>
 
-3. **P-directed adaptation**: Substitutions in the P–V overlap frequently show synonymous changes in V but nonsynonymous in P, pointing to P-directed adaptation.
+Nucleotide substitutions in the C-protein and the V-protein region downstream of the editing site appear to affect C and V protein function less than they affect protein P. Variants in the C–P overlap are mostly synonymous in C but nonsynonymous in P. This suggests strong purifying selection on C (which contains nuclear localization, export, and SHCBP1-binding signals), while P tolerates or favors amino-acid changes in this region. Substitutions in the P–V overlap frequently show synonymous changes in V but nonsynonymous in P, pointing to P-directed adaptation. However, some sites show the opposite pattern (nonsynonymous in V, synonymous in P), possibly corresponding to residues that mediate STAT1 and Jak1 binding. These variants could represent V-specific adaptive evolution affecting interferon antagonism.
 
-4. **V-specific adaptive evolution**: Some sites show the opposite pattern (nonsynonymous in V, synonymous in P), possibly corresponding to residues that mediate STAT1 and Jak1 binding. These variants could represent V-specific adaptive evolution affecting interferon antagonism.
+### Substitutions have distinct geographic and temporal patterns
+
+Next we analyzed the substitution patterns in the context of sampling locations and collection times. Results of this analysis are shown in Figure 7. While most samples show strain-specific patterns there is a number of interesting sites such as linked co-occurring substitutions at position 2,576 and 2,683 within five US samples. These two sites are within the P/V overlap. The first change is non-synonomous in P and synonymous in V, while the second is non-synonymous for both reading frames.
+
+<Figure
+  src="/learn/case-studies/measles/figure-7.png"
+  alt="Substitutions within P/V/C locus in each sample"
+  height={900}
+  width={1416}
+  caption={
+    <>
+      <strong>Figure 7.</strong> Substitutions within P/V/C locus in each
+      sample. Samples (X-axis) are sorted by collection time from 01/22/2018
+      (left) to 05/07/2024 (right). The rightmost blue sample had no collection
+      date associated with it. Genomic coordinates of variants are on the
+      Y-axis. Blue = Canada; Red = USA; Orange = Romania. Size of this circle
+      is proportional for alternative allele frequency at that site.
+    </>
+  }
+/>
+
+### Comparative analysis of substitution effects
+
+Our final analysis aimed to identify potentially adaptive substitutions, particularly within the P/C and P/V overlaps. Traditional codon-based models, which assume a constant nonsynonymous to synonymous substitution rate (ω = dN/dS) across all lineages at a given site, are not well-suited for detecting transient or lineage-specific instances of positive selection. To address this limitation, we employed the Mixed Effects Model of Evolution (MEME) method. MEME is specifically designed to detect episodic diversifying selection at individual sites within a multiple sequence alignment.
+
+To apply MEME directly to the output of our workflow we use consensus sequences generated by the variant caller for each processed sample. However, MEME requires exact codon alignments of the coding sequences to perform the detection of sites under selection. Thus before we can use MEME we need to post-process sequences generated by the workflow to extract regions corresponding to P, V, and C proteins. This was done using a JupyterLite notebook generated with ChatGPT.
+
+Two sites stand out as potentially showing evidence of diversifying selection: codons 105 and 111 of the P/V proteins (corresponding to codons 97 and 103 of the C proteins). These are located before the RNA editing site within the P/V reading frame and have identical effects on the P and V products. Both substitutions are non-synonymous on the P/V frame and synonymous in the C-frame.
+
+<Figure
+  src="/learn/case-studies/measles/figure-8.png"
+  alt="Tracing substitutions through phylogenetic tree"
+  height={646}
+  width={1415}
+  caption={
+    <>
+      <strong>Figure 8.</strong> Tracing substitutions within codons 105 (left)
+      and 111 (right) of the P/V reading frames through the phylogenetic tree
+      of the analyzed samples. Derived states at internal nodes are also shown.
+      The number of samples shown here is smaller than the total number of
+      samples in our analysis because identical sequences were excluded from the
+      analysis. Sequences with an excessive number of N-characters were also
+      excluded.
+    </>
+  }
+/>
+
+Both sites are within the V/P "anti-STAT1" hot zone (codons 110 - 115). Residue 105 lies upstream of that motif in the same PNT (P-N-terminal) domain that mediates interactions with STAT1/Jak1. Changes here could allosterically affect the 110–120 epitope (local secondary structure/loop positioning) and thus tune antagonism strength. Residue 111 is embedded in the P/V common N-terminal STAT1-binding segment (~110–120 aa). This segment contains the proven triad Y110, V112, H115—mutating any of those disrupts STAT1 antagonism and attenuates virus in vivo. Variation at 111 is immediately adjacent to V112 and within the same interface; it could modulate binding geometry/affinity to STAT1 (and also Jak1), shifting the potency of IFN-α/β and IFN-γ blockade.
 
 ## Conclusion
 
@@ -132,7 +287,7 @@ This case study demonstrates how BRC-analytics enables sophisticated evolutionar
 - **Interpretation** with JupyterLite notebooks and LLM assistance
 - **Publication** with complete provenance tracking
 
-All analysis steps can be reproduced through the provided Galaxy history and workflows, ensuring transparency and reproducibility in pathogen genomics research.
+All analysis steps can be reproduced through the provided Galaxy history and workflows, ensuring transparency and reproducibility in pathogen genomics research. BRC-Analytics unifies reference selection, workflow execution, data retrieval, and post-analysis in one browser, eliminating local installations and manual data transfers for reproducible and interactive evolutionary and functional analyses.
 
 ## Related Resources
 
