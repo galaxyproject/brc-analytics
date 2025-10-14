@@ -27,7 +27,9 @@ export const useLaunchGalaxy = ({
       )
     );
 
-    if (!landingUrl) return;
+    if (!landingUrl) {
+      throw new Error("Failed to retrieve Galaxy workflow launch URL.");
+    }
 
     // Launch the Galaxy workflow.
     launchGalaxy(landingUrl);
