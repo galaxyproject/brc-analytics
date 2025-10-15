@@ -9,6 +9,7 @@ export const ENA_ACCESSION_REGEX_PATTERN: Record<string, RegExp> = {
 
 export const ENA_FIELDS = [
   "base_count",
+  "description",
   "experiment_accession",
   "fastq_ftp",
   "fastq_md5",
@@ -17,6 +18,7 @@ export const ENA_FIELDS = [
   "instrument_model",
   "instrument_platform",
   "library_layout",
+  "library_source",
   "library_strategy",
   "read_count",
   "run_accession",

@@ -67,6 +67,128 @@ export enum WorkflowPloidy {
     HAPLOID = "HAPLOID",
     POLYPLOID = "POLYPLOID",
 };
+/**
+* Enumeration of possible library layouts for sequencing data.
+*/
+export enum LibraryLayout {
+    
+    /** Paired-end sequencing reads */
+    PAIRED = "PAIRED",
+    /** Single-end sequencing reads */
+    SINGLE = "SINGLE",
+};
+/**
+* Enumeration of possible library sources for sequencing data.
+*/
+export enum LibrarySource {
+    
+    /** Genomic DNA (includes PCR products from genomic DNA) */
+    GENOMIC = "GENOMIC",
+    /** Genomic DNA from a single cell */
+    GENOMIC_SINGLE_CELL = "GENOMIC SINGLE CELL",
+    /** Transcription products or non-genomic DNA (EST, cDNA, RT-PCR, screened libraries) */
+    TRANSCRIPTOMIC = "TRANSCRIPTOMIC",
+    /** Transcription products from a single cell */
+    TRANSCRIPTOMIC_SINGLE_CELL = "TRANSCRIPTOMIC SINGLE CELL",
+    /** Mixed material from metagenome */
+    METAGENOMIC = "METAGENOMIC",
+    /** Transcription products from community targets */
+    METATRANSCRIPTOMIC = "METATRANSCRIPTOMIC",
+    /** Synthetic DNA */
+    SYNTHETIC = "SYNTHETIC",
+    /** Viral RNA */
+    VIRAL_RNA = "VIRAL RNA",
+    /** Other, unspecified, or unknown library source material */
+    OTHER = "OTHER",
+};
+/**
+* Enumeration of possible library strategies for sequencing data.
+*/
+export enum LibraryStrategy {
+    
+    /** Whole genome sequencing */
+    WGS = "WGS",
+    /** Whole genome amplification */
+    WGA = "WGA",
+    /** Whole exome sequencing */
+    WXS = "WXS",
+    /** RNA sequencing */
+    RNA_Seq = "RNA-Seq",
+    /** Small nuclear RNA sequencing */
+    snRNA_seq = "snRNA-seq",
+    /** Single-stranded RNA sequencing */
+    ssRNA_seq = "ssRNA-seq",
+    /** microRNA sequencing */
+    miRNA_Seq = "miRNA-Seq",
+    /** Non-coding RNA sequencing */
+    ncRNA_Seq = "ncRNA-Seq",
+    /** Full-length cDNA sequencing */
+    FL_cDNA = "FL-cDNA",
+    /** Expressed sequence tag */
+    EST = "EST",
+    /** Chromosome conformation capture */
+    Hi_C = "Hi-C",
+    /** Assay for transposase-accessible chromatin sequencing */
+    ATAC_seq = "ATAC-seq",
+    /** Whole chromosome sequencing */
+    WCS = "WCS",
+    /** Restriction site associated DNA sequencing */
+    RAD_Seq = "RAD-Seq",
+    /** Clone sequencing */
+    CLONE = "CLONE",
+    /** Pooled clone sequencing */
+    POOLCLONE = "POOLCLONE",
+    /** Amplicon sequencing */
+    AMPLICON = "AMPLICON",
+    /** Clone end sequencing */
+    CLONEEND = "CLONEEND",
+    /** Sequencing intended to close gaps in a genome assembly */
+    FINISHING = "FINISHING",
+    /** Chromatin immunoprecipitation sequencing */
+    ChIP_Seq = "ChIP-Seq",
+    /** Micrococcal nuclease sequencing */
+    MNase_Seq = "MNase-Seq",
+    /** Ribosome profiling */
+    Ribo_Seq = "Ribo-Seq",
+    /** DNase hypersensitivity sequencing */
+    DNase_Hypersensitivity = "DNase-Hypersensitivity",
+    /** Bisulfite sequencing */
+    Bisulfite_Seq = "Bisulfite-Seq",
+    /** Concatenated tag sequencing */
+    CTS = "CTS",
+    /** ChIPmentation combines chromatin immunoprecipitation with sequencing library preparation by Tn5 transposase */
+    ChM_Seq = "ChM-Seq",
+    /** Genotyping by sequencing */
+    GBS = "GBS",
+    /** Methylation-sensitive restriction enzyme sequencing */
+    MRE_Seq = "MRE-Seq",
+    /** Methylated DNA immunoprecipitation sequencing */
+    MeDIP_Seq = "MeDIP-Seq",
+    /** Methyl-CpG binding domain sequencing */
+    MBD_Seq = "MBD-Seq",
+    /** Nucleosome occupancy and methylome sequencing */
+    NOMe_Seq = "NOMe-Seq",
+    /** Quantitatively determine fitness of bacterial genes based on how many times a purposely seeded transposon gets inserted into each gene of a colony after some time. */
+    Tn_Seq = "Tn-Seq",
+    /** Independent experiment to re-evaluate putative variants */
+    VALIDATION = "VALIDATION",
+    /** Formaldehyde-assisted isolation of regulatory elements sequencing */
+    FAIRE_seq = "FAIRE-seq",
+    /** Systematic evolution of ligands by exponential enrichment sequencing */
+    SELEX = "SELEX",
+    /** RNA immunoprecipitation sequencing */
+    RIP_Seq = "RIP-Seq",
+    /** Direct sequencing of proximity-ligated chromatin immunoprecipitates */
+    ChIA_PET = "ChIA-PET",
+    /** Binning and barcoding of large DNA fragments to facilitate assembly of the fragment */
+    Synthetic_Long_Read = "Synthetic-Long-Read",
+    /** Enrichment of a targeted subset of loci */
+    Targeted_Capture = "Targeted-Capture",
+    /** Tethered chromosome conformation capture */
+    Tethered_Chromatin_Conformation_Capture = "Tethered Chromatin Conformation Capture",
+    /** Other, unspecified, or unknown library strategy */
+    OTHER = "OTHER",
+};
 
 
 /**
@@ -225,6 +347,21 @@ export interface Workflow {
 
 
 /**
+ * Specification of data requirements for a workflow parameter, such as library strategy and layout.
+ */
+export interface WorkflowDataRequirements {
+    /** The library strategy values that are acceptable for this parameter (e.g., 'WGS', 'RNA-Seq'). */
+    library_strategy?: LibraryStrategy[] | null,
+    /** The library layout that is required for this parameter (e.g., 'PAIRED', 'SINGLE'). */
+    library_layout?: LibraryLayout | null,
+    /** The library source values that are acceptable for this parameter (e.g., 'GENOMIC', 'TRANSCRIPTOMIC SINGLE CELL'). */
+    library_source?: LibrarySource[] | null,
+    /** A descriptive text to provide additional context about the data requirements, useful for non-standard library strategies like 'OTHER'. */
+    description?: string | null,
+}
+
+
+/**
  * Definition of an input parameter for a Galaxy workflow, specifying how the parameter value should be determined when the workflow is executed.
  */
 export interface WorkflowParameter {
@@ -234,6 +371,8 @@ export interface WorkflowParameter {
     variable?: WorkflowParameterVariable | null,
     /** A direct URL specification for the parameter, allowing for external data sources to be provided to the workflow. */
     url_spec?: WorkflowUrlSpec | null,
+    /** Specifications for the data requirements of this parameter, such as library strategy and layout. */
+    data_requirements?: WorkflowDataRequirements | null,
     /** Arbitrary data describing the expected type and format of the parameter, intended as a reference for catalog maintainers and not used in workflow execution. */
     type_guide?: Any | null,
 }

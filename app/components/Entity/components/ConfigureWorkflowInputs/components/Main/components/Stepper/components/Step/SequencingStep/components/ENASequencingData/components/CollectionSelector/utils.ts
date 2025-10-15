@@ -1,7 +1,8 @@
 import { ENA_QUERY_METHOD, SEQUENCING_DATA_TYPE } from "../../../../types";
 import { ColumnFiltersState, Table } from "@tanstack/react-table";
 import { ReadRun } from "../../types";
-import { PRESELECTED_COLUMN_FILTERS } from "./constants";
+import { CATEGORY_CONFIGS } from "./hooks/UseTable/categoryConfigs";
+import { WorkflowParameter } from "app/apis/catalog/brc-analytics-catalog/common/entities";
 
 /**
  * Builds column filters from preselected values only if they are valid for the current data.
@@ -77,20 +78,126 @@ function isENAQueryMethodByTaxonomyId(table: Table<ReadRun>): boolean {
 }
 
 /**
+ * Gets library strategy requirements from a workflow parameter.
+ * @param parameter - The workflow parameter.
+ * @returns Array of library strategy values or null if not specified.
+ */
+export function getLibraryStrategyRequirements(
+  parameter?: WorkflowParameter
+): string[] | null {
+  if (
+    !parameter ||
+    !parameter.data_requirements ||
+    !parameter.data_requirements.library_strategy
+  ) {
+    return null;
+  }
+  return parameter.data_requirements.library_strategy;
+}
+
+/**
+ * Gets library source requirements from a workflow parameter.
+ * @param parameter - The workflow parameter.
+ * @returns Array of library source values or null if not specified.
+ */
+export function getLibrarySourceRequirements(
+  parameter?: WorkflowParameter
+): string[] | null {
+  if (
+    !parameter ||
+    !parameter.data_requirements ||
+    !parameter.data_requirements.library_source
+  ) {
+    return null;
+  }
+  return parameter.data_requirements.library_source;
+}
+
+/**
+ * Gets description from a workflow parameter's data requirements.
+ * @param parameter - The workflow parameter.
+ * @returns Description string or null if not specified.
+ */
+export function getDescriptionRequirement(
+  parameter?: WorkflowParameter
+): string | null {
+  if (
+    !parameter ||
+    !parameter.data_requirements ||
+    !parameter.data_requirements.description
+  ) {
+    return null;
+  }
+  return parameter.data_requirements.description;
+}
+
+/**
+ * Builds filters based on step key and workflow parameter requirements.
+ * @param stepKey - The sequencing data type (paired or single).
+ * @param workflowParameter - Optional workflow parameter with data requirements.
+ * @returns Filters with layout, strategy, source, and other requirements.
+ */
+export function buildFilters(
+  stepKey: SEQUENCING_DATA_TYPE,
+  workflowParameter?: WorkflowParameter
+): Record<string, string[]> {
+  const filters: Record<string, string[]> = {};
+
+  // Set library layout based on step key or data requirements
+  if (workflowParameter?.data_requirements?.library_layout) {
+    // Use the layout from data requirements if specified
+    filters[CATEGORY_CONFIGS.LIBRARY_LAYOUT.key] = [
+      workflowParameter.data_requirements.library_layout,
+    ];
+  } else if (stepKey === SEQUENCING_DATA_TYPE.READ_RUNS_PAIRED) {
+    filters[CATEGORY_CONFIGS.LIBRARY_LAYOUT.key] = ["PAIRED"];
+  } else if (stepKey === SEQUENCING_DATA_TYPE.READ_RUNS_SINGLE) {
+    filters[CATEGORY_CONFIGS.LIBRARY_LAYOUT.key] = ["SINGLE"];
+  }
+
+  // Add library strategy requirements if specified in the workflow parameter
+  const libraryStrategyRequirements =
+    getLibraryStrategyRequirements(workflowParameter);
+
+  if (libraryStrategyRequirements && libraryStrategyRequirements.length > 0) {
+    filters[CATEGORY_CONFIGS.LIBRARY_STRATEGY.key] =
+      libraryStrategyRequirements;
+  } else {
+    // Default to WGS if no specific requirements are provided
+    filters[CATEGORY_CONFIGS.LIBRARY_STRATEGY.key] = ["WGS"];
+  }
+
+  // Add library source requirements if specified
+  const librarySourceRequirements =
+    getLibrarySourceRequirements(workflowParameter);
+  if (librarySourceRequirements && librarySourceRequirements.length > 0) {
+    filters[CATEGORY_CONFIGS.LIBRARY_SOURCE.key] = librarySourceRequirements;
+  }
+
+  // Handle description field for any library strategy that needs additional context
+  const description = getDescriptionRequirement(workflowParameter);
+  if (description && CATEGORY_CONFIGS.DESCRIPTION) {
+    // Add description filter if available
+    filters[CATEGORY_CONFIGS.DESCRIPTION.key] = [description];
+  }
+
+  return filters;
+}
+
+/**
  * Pre-selects column filters based on the given step key for ENA query method by taxonomy ID.
  * @param table - Table instance.
  * @param stepKey - Step key.
+ * @param workflowParameter - Optional workflow parameter with data requirements.
  */
 export function preSelectColumnFilters(
   table: Table<ReadRun>,
-  stepKey: SEQUENCING_DATA_TYPE
+  stepKey: SEQUENCING_DATA_TYPE,
+  workflowParameter?: WorkflowParameter
 ): void {
   if (isENAQueryMethodByTaxonomyId(table)) {
-    const preselectedFilters = PRESELECTED_COLUMN_FILTERS[stepKey];
-    const columnFiltersState = buildValidatedColumnFilters(
-      table,
-      preselectedFilters
-    );
+    const filters = buildFilters(stepKey, workflowParameter);
+    const columnFiltersState = buildValidatedColumnFilters(table, filters);
     table.setColumnFilters(columnFiltersState);
   }
 }
