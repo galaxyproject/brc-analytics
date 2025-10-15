@@ -12,7 +12,6 @@ import {
   Workflow,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "../../../../components";
-import { STEPS as WORKFLOW_STEPS } from "../../../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/constants";
 import {
   GENOME_BROWSER,
   NCBI_ASSEMBLY,
@@ -47,6 +46,7 @@ import {
   GA2OrganismEntity,
 } from "../../../../apis/catalog/ga2/entities";
 import { sanitizeEntityId } from "../../../../apis/catalog/common/utils";
+import { StepConfig } from "../../../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 
 /**
  * Build props for the accession cell.
@@ -923,13 +923,15 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
 /**
  * Build props for the workflow configuration KeyValuePairs component.
  * @param configuredInput - Configured inputs.
+ * @param configuredSteps - Configured steps.
  * @returns Props to be used for the KeyValuePairs component.
  */
 export const buildWorkflowConfiguration = (
-  configuredInput: ConfiguredInput
+  configuredInput: ConfiguredInput,
+  configuredSteps: StepConfig[]
 ): ComponentProps<typeof C.KeyValuePairs> => {
   const keyValuePairs = new Map<Key, Value>();
-  for (const stepConfig of WORKFLOW_STEPS) {
+  for (const stepConfig of configuredSteps) {
     const value = stepConfig.renderValue(configuredInput);
     if (value === undefined) continue;
     keyValuePairs.set(stepConfig.label, value);
