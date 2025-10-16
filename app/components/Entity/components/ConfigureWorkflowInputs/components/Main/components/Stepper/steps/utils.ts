@@ -11,7 +11,9 @@ import { STEP } from "./constants";
 export function buildSteps(workflow: Workflow): StepConfig[] {
   // Return steps for custom workflow
   if (workflow.trsId === "custom-workflow") {
-    return [STEP.ASSEMBLY_ID, STEP.GENE_MODEL_URL].filter(isStepConfigured);
+    return [STEP.ASSEMBLY_ID, STEP.GENE_MODEL_URL, STEP.READ_RUN_ANY].filter(
+      isStepConfigured
+    );
   }
 
   // Get workflow variables from the workflow.

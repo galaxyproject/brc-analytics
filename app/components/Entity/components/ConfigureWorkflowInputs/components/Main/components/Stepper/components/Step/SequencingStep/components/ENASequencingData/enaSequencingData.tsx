@@ -37,7 +37,6 @@ export const ENASequencingData = ({
         selectedCount={selectedCount}
         setEnaQueryMethod={setEnaQueryMethod}
         taxonomicLevelSpecies={taxonomicLevelSpecies}
-        workflowParameter={workflowParameter}
       />
       <AccessionSelector
         clearErrors={enaAccession.clearErrors}

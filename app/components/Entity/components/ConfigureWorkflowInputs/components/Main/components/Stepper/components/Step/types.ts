@@ -15,7 +15,7 @@ import { GA2AssemblyEntity } from "../../../../../../../../../../apis/catalog/ga
 export interface StepConfig {
   description?: ReactNode;
   disabled?: boolean;
-  key: keyof ConfiguredInput;
+  key: keyof ConfiguredInput | "readRunsAny";
   label: string;
   renderValue?: (ci: ConfiguredInput) => string | undefined;
   Step: ComponentType<StepProps>;
@@ -32,6 +32,6 @@ export interface StepProps
   onEdit: OnEdit;
   onLaunchGalaxy: OnLaunchGalaxy;
   status: Status;
-  stepKey: keyof ConfiguredInput;
+  stepKey: keyof ConfiguredInput | "readRunsAny";
   workflow: Workflow;
 }
