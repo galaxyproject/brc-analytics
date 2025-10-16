@@ -936,7 +936,7 @@ export const buildWorkflowConfiguration = (
     const stepConfig = configuredSteps.find((step) => step.key === key);
     if (!stepConfig) continue;
     // Get the value for the configured input.
-    const value = stepConfig.renderValue(configuredInput);
+    const value = stepConfig.renderValue?.(configuredInput);
     if (value === undefined) continue;
     keyValuePairs.set(stepConfig.label, value);
   }

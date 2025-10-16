@@ -17,7 +17,7 @@ export interface StepConfig {
   disabled?: boolean;
   key: keyof ConfiguredInput;
   label: string;
-  renderValue: (ci: ConfiguredInput) => string | undefined;
+  renderValue?: (ci: ConfiguredInput) => string | undefined;
   Step: ComponentType<StepProps>;
 }
 
