@@ -50,7 +50,7 @@ export const CollectionSelector = ({
           {...BUTTON_PROPS.PRIMARY_CONTAINED}
           disabled={selectedCount === 0}
           onClick={() => {
-            onConfigure(stepKey, buildEnaSequencingReads(table));
+            onConfigure({ [stepKey]: buildEnaSequencingReads(table) });
             onClose();
           }}
         >

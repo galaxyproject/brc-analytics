@@ -23,7 +23,7 @@ export const ENASequencingData = ({
 
   useEffect(() => {
     const pairedReads = buildEnaSequencingReads(table);
-    onConfigure(stepKey, pairedReads.length > 0 ? pairedReads : null);
+    onConfigure({ [stepKey]: pairedReads.length > 0 ? pairedReads : null });
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Intended behavior to only run on mount.
   }, []);
 
@@ -58,7 +58,7 @@ export const ENASequencingData = ({
       />
       <CollectionSummary
         onClear={() => {
-          onConfigure(stepKey, null);
+          onConfigure({ [stepKey]: null });
           table.resetRowSelection();
           table.resetColumnFilters();
         }}

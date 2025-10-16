@@ -7,7 +7,7 @@ import { StyledAlert } from "./uploadMyData.styles";
 
 export const UploadMyData = ({ onConfigure, stepKey }: Props): JSX.Element => {
   useEffect(() => {
-    onConfigure(stepKey, []);
+    onConfigure({ [stepKey]: [] });
   }, [onConfigure, stepKey]);
   return (
     <StyledAlert {...ALERT_PROPS.STANDARD_INFO}>
