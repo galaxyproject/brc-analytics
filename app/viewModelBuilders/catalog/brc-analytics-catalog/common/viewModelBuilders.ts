@@ -931,7 +931,11 @@ export const buildWorkflowConfiguration = (
   configuredSteps: StepConfig[]
 ): ComponentProps<typeof C.KeyValuePairs> => {
   const keyValuePairs = new Map<Key, Value>();
-  for (const stepConfig of configuredSteps) {
+  for (const key of Object.keys(configuredInput)) {
+    // Find the step config, for the configured input.
+    const stepConfig = configuredSteps.find((step) => step.key === key);
+    if (!stepConfig) continue;
+    // Get the value for the configured input.
     const value = stepConfig.renderValue(configuredInput);
     if (value === undefined) continue;
     keyValuePairs.set(stepConfig.label, value);
