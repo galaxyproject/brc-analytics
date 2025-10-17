@@ -8,8 +8,10 @@ import {
   OnLaunchGalaxy,
 } from "./components/Step/hooks/UseLaunchGalaxy/types";
 import { GA2AssemblyEntity } from "../../../../../../../../apis/catalog/ga2/entities";
+import { StepConfig } from "./components/Step/types";
 
 export interface Props {
+  configuredSteps: StepConfig[];
   genome: BRCDataCatalogGenome | GA2AssemblyEntity;
   onConfigure: OnConfigure;
   onLaunchGalaxy: OnLaunchGalaxy;

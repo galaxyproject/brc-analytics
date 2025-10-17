@@ -9,6 +9,7 @@ import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/B
 
 export const Main = ({
   configuredInput,
+  configuredSteps,
   genome,
   onConfigure,
   workflow,
@@ -21,6 +22,7 @@ export const Main = ({
     <StyledMainContainer>
       <Loading loading={status.loading} panelStyle={PAPER_PANEL_STYLE.FLUID} />
       <Stepper
+        configuredSteps={configuredSteps}
         genome={genome}
         onConfigure={onConfigure}
         onLaunchGalaxy={onLaunchGalaxy}

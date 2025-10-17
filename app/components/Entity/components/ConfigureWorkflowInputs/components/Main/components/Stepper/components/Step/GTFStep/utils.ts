@@ -18,7 +18,7 @@ export const configureGTFStep = (
 
   // Gene model URLs are not available for this workflow.
   if (geneModelUrls.length === 0) {
-    onConfigure(STEP.key, null);
+    onConfigure({ [STEP.key]: null });
     return;
   }
 
@@ -32,7 +32,7 @@ export const configureGTFStep = (
   if (!value) return;
 
   // Otherwise, use the gene model to configure the step.
-  onConfigure(STEP.key, value);
+  onConfigure({ [STEP.key]: value });
 };
 
 /**

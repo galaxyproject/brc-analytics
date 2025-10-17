@@ -8,10 +8,6 @@ export const CUSTOM_WORKFLOW: Workflow = {
   iwcId: "",
   parameters: [
     {
-      key: "Paired collection of sequencing data",
-      variable: WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_PAIRED,
-    },
-    {
       key: "Reference annotation",
       variable: WORKFLOW_PARAMETER_VARIABLE.GENE_MODEL_URL,
     },
