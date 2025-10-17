@@ -4,10 +4,11 @@ import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/m
 import { ALERT_PROPS } from "@databiosphere/findable-ui/lib/components/common/Alert/constants";
 import { useEffect } from "react";
 import { StyledAlert } from "./uploadMyData.styles";
+import { getUploadMyOwnSequencingData } from "../ENASequencingData/utils";
 
 export const UploadMyData = ({ onConfigure, stepKey }: Props): JSX.Element => {
   useEffect(() => {
-    onConfigure({ [stepKey]: [] });
+    onConfigure(getUploadMyOwnSequencingData(stepKey));
   }, [onConfigure, stepKey]);
   return (
     <StyledAlert {...ALERT_PROPS.STANDARD_INFO}>
