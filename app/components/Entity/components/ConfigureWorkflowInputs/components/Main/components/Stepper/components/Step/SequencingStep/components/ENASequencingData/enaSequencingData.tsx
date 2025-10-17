@@ -5,7 +5,7 @@ import { useDialog } from "@databiosphere/findable-ui/lib/components/common/Dial
 import { Props } from "./types";
 import { CollectionSummary } from "./components/CollectionSummary/collectionSummary";
 import { AccessionSelector } from "./components/AccessionSelector/accessionSelector";
-import { buildEnaSequencingReads } from "./utils";
+import { getSequencingData, clearSequencingData } from "./utils";
 
 export const ENASequencingData = ({
   enaAccession,
@@ -22,8 +22,7 @@ export const ENASequencingData = ({
   const selectedCount = Object.values(table.getState().rowSelection).length;
 
   useEffect(() => {
-    const pairedReads = buildEnaSequencingReads(table);
-    onConfigure(stepKey, pairedReads.length > 0 ? pairedReads : null);
+    onConfigure(getSequencingData(table, stepKey));
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Intended behavior to only run on mount.
   }, []);
 
@@ -37,7 +36,6 @@ export const ENASequencingData = ({
         selectedCount={selectedCount}
         setEnaQueryMethod={setEnaQueryMethod}
         taxonomicLevelSpecies={taxonomicLevelSpecies}
-        workflowParameter={workflowParameter}
       />
       <AccessionSelector
         clearErrors={enaAccession.clearErrors}
@@ -59,7 +57,7 @@ export const ENASequencingData = ({
       />
       <CollectionSummary
         onClear={() => {
-          onConfigure(stepKey, null);
+          onConfigure(clearSequencingData(stepKey));
           table.resetRowSelection();
           table.resetColumnFilters();
         }}

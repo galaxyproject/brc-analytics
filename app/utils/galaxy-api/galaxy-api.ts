@@ -4,10 +4,19 @@ import ky from "ky";
 import {
   EnaFileInfo,
   EnaSequencingReads,
-  WorkflowLanding,
+  GalaxyCollection,
+  GalaxyListCollection,
+  GalaxyPairedCollection,
+  WorkflowCollectionParameter,
+  GalaxyLandingResponseData,
   WorkflowLandingsBody,
   WorkflowLandingsBodyRequestState,
   WorkflowParameterValue,
+  GalaxyUrlData,
+  DataLandingsBody,
+  DataLandingsBodyRequestState,
+  DataLandingsDatasetTarget,
+  DataLandingsCollectionTarget,
 } from "./entities";
 
 const DOCKSTORE_API_URL = "https://dockstore.org/api/ga4gh/trs/v2/tools";
@@ -20,6 +29,8 @@ if (!galaxyInstanceUrl) {
 
 const workflowLandingsApiUrl = `${galaxyInstanceUrl}/api/workflow_landings`;
 const workflowLandingUrl = `${galaxyInstanceUrl}/workflow_landings`;
+const dataLandingsApiUrl = `${galaxyInstanceUrl}/api/data_landings`;
+const dataLandingUrl = `${galaxyInstanceUrl}/data_landings`;
 
 /**
  * Get the URL of the workflow landing page for the given genome workflow.
@@ -51,24 +62,48 @@ export async function getWorkflowLandingUrl(
     workflow_id: `${DOCKSTORE_API_URL}/${workflowId}`,
     workflow_target_type: "trs_url",
   };
-  const res = await ky.post<WorkflowLanding>(workflowLandingsApiUrl, {
+  return getGalaxyLandingUrl(body, workflowLandingsApiUrl, workflowLandingUrl);
+}
+
+/**
+ * Get the URL of the no-workflow data landing page for the given assembly.
+ * @param referenceGenome - Genome version/assembly ID.
+ * @param geneModelUrl - URL for gene model parameter sent to the API.
+ * @param readRunsSingle - Single read runs parameter sent to the API.
+ * @param readRunsPaired - Paired read runs parameter sent to the API.
+ * @returns data landing URL.
+ */
+export async function getDataLandingUrl(
+  referenceGenome: string,
+  geneModelUrl: string | null,
+  readRunsSingle: EnaSequencingReads[] | null,
+  readRunsPaired: EnaSequencingReads[] | null
+): Promise<string> {
+  const body: DataLandingsBody = {
+    public: true,
+    request_state: getDataLandingsRequestState(
+      referenceGenome,
+      geneModelUrl,
+      readRunsSingle,
+      readRunsPaired
+    ),
+  };
+  return getGalaxyLandingUrl(body, dataLandingsApiUrl, dataLandingUrl);
+}
+
+async function getGalaxyLandingUrl(
+  body: WorkflowLandingsBody | DataLandingsBody,
+  apiUrl: string,
+  landingUrlBase: string
+): Promise<string> {
+  const res = await ky.post<GalaxyLandingResponseData>(apiUrl, {
     json: body,
     retry: {
       methods: ["post"],
     },
   });
   const id = (await res.json()).uuid;
-  return `${workflowLandingUrl}/${encodeURIComponent(id)}?public=true`;
-}
-
-function buildFastaUrl(identifier: string): string {
-  const baseUrl = "https://hgdownload.soe.ucsc.edu/hubs/";
-  const parts = identifier.split("_");
-  const formattedPath = `${parts[0]}/${parts[1].slice(0, 3)}/${parts[1].slice(
-    3,
-    6
-  )}/${parts[1].slice(6, 9)}/${identifier}/${identifier}.fa.gz`;
-  return `${baseUrl}${formattedPath}`;
+  return `${landingUrlBase}/${encodeURIComponent(id)}?public=true`;
 }
 
 function paramVariableToRequestValue(
@@ -84,77 +119,199 @@ function paramVariableToRequestValue(
     case WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_ID:
       return referenceGenome;
     case WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_FASTA_URL:
-      return {
-        dbkey: referenceGenome,
-        ext: "fasta.gz",
-        src: "url",
-        url: buildFastaUrl(referenceGenome),
-      };
+      return buildAssemblyFastaRequestValue(referenceGenome);
     case WORKFLOW_PARAMETER_VARIABLE.GENE_MODEL_URL:
-      return geneModelUrl
-        ? {
-            dbkey: referenceGenome,
-            ext: "gtf.gz",
-            src: "url",
-            url: geneModelUrl,
-          }
-        : null;
+      return buildGeneModelUrlRequestValue(geneModelUrl, referenceGenome);
     case WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE:
-      if (!readRunsSingle?.length) return null;
+      return buildWorkflowCollectionParameter(
+        buildSingleReadRunsRequestValue(readRunsSingle)
+      );
+    case WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_PAIRED: {
+      return buildWorkflowCollectionParameter(
+        buildPairedReadRunsRequestValue(readRunsPaired)
+      );
+    }
+  }
+}
+
+function buildWorkflowCollectionParameter<T extends GalaxyCollection>(
+  collection: T | null
+): WorkflowCollectionParameter<T> | null {
+  return collection && { class: "Collection", ...collection };
+}
+
+/**
+ * Get the appropriate `request_state` object for the given workflow ID and reference genome.
+ * @param referenceGenome - Reference genome.
+ * @param geneModelUrl - URL for gene model parameter.
+ * @param readRunsSingle - Single read runs parameter.
+ * @param readRunsPaired - Paired read runs parameter.
+ * @param parameters - Parameters for this workflow.
+ * @returns `request_state` value for the workflow landings request body.
+ */
+function getWorkflowLandingsRequestState(
+  referenceGenome: string,
+  geneModelUrl: string | null,
+  readRunsSingle: EnaSequencingReads[] | null,
+  readRunsPaired: EnaSequencingReads[] | null,
+  parameters: WorkflowParameter[]
+): WorkflowLandingsBodyRequestState {
+  const result: WorkflowLandingsBodyRequestState = {};
+  for (const { key, url_spec, variable } of parameters) {
+    if (url_spec) {
+      // If url_spec is provided, use it directly
+      result[key] = url_spec;
+    } else if (variable) {
+      // Otherwise, use the variable to determine the value
+      const value = paramVariableToRequestValue(
+        variable,
+        geneModelUrl,
+        readRunsSingle,
+        readRunsPaired,
+        referenceGenome
+      );
+      if (value !== null) result[key] = value;
+    }
+  }
+  return result;
+}
+
+function buildDataLandingsDatasetTarget(
+  sourceItems: (GalaxyUrlData | null)[]
+): DataLandingsDatasetTarget | null {
+  const items = sourceItems.filter((item) => item !== null);
+  if (items.length === 0) return null;
+  return {
+    destination: { type: "hdas" },
+    items,
+  };
+}
+
+function buildDataLandingsCollectionTarget<T extends GalaxyCollection>(
+  collection: T | null
+): DataLandingsCollectionTarget<T> | null {
+  return (
+    collection && {
+      destination: { type: "hdca" },
+      ...collection,
+    }
+  );
+}
+
+function getDataLandingsRequestState(
+  referenceGenome: string,
+  geneModelUrl: string | null,
+  readRunsSingle: EnaSequencingReads[] | null,
+  readRunsPaired: EnaSequencingReads[] | null
+): DataLandingsBodyRequestState {
+  return {
+    targets: [
+      buildDataLandingsDatasetTarget([
+        buildAssemblyFastaRequestValue(referenceGenome),
+      ]),
+      buildDataLandingsDatasetTarget([
+        buildGeneModelUrlRequestValue(geneModelUrl, referenceGenome),
+      ]),
+      buildDataLandingsCollectionTarget(
+        buildSingleReadRunsRequestValue(readRunsSingle)
+      ),
+      buildDataLandingsCollectionTarget(
+        buildPairedReadRunsRequestValue(readRunsPaired)
+      ),
+    ].filter((target) => target !== null),
+  };
+}
+
+function buildAssemblyFastaRequestValue(
+  referenceGenome: string
+): GalaxyUrlData {
+  return {
+    dbkey: referenceGenome,
+    ext: "fasta.gz",
+    src: "url",
+    url: buildFastaUrl(referenceGenome),
+  };
+}
+
+function buildGeneModelUrlRequestValue(
+  geneModelUrl: string | null,
+  referenceGenome: string
+): GalaxyUrlData | null {
+  return geneModelUrl
+    ? {
+        dbkey: referenceGenome,
+        ext: "gtf.gz",
+        src: "url",
+        url: geneModelUrl,
+      }
+    : null;
+}
+
+function buildSingleReadRunsRequestValue(
+  readRunsSingle: EnaSequencingReads[] | null
+): GalaxyListCollection | null {
+  if (!readRunsSingle?.length) return null;
+  return {
+    collection_type: "list",
+    elements: readRunsSingle.map((runInfo) => {
+      const runAccession = runInfo.runAccession;
+      const { forward } = getSingleRunUrlsInfo(runInfo.urls, runInfo.md5Hashes);
+      return {
+        class: "File",
+        filetype: "fastqsanger.gz",
+        hashes: [{ hash_function: "MD5", hash_value: forward.md5 }],
+        identifier: runAccession,
+        location: forward.url,
+      };
+    }),
+  };
+}
+
+function buildPairedReadRunsRequestValue(
+  readRunsPaired: EnaSequencingReads[] | null
+): GalaxyPairedCollection | null {
+  if (!readRunsPaired?.length) return null;
+  return {
+    collection_type: "list:paired",
+    elements: readRunsPaired.map((pairInfo) => {
+      const runAccession = pairInfo.runAccession;
+      const { forward, reverse } = getPairedRunUrlsInfo(
+        pairInfo.urls,
+        pairInfo.md5Hashes
+      );
       return {
         class: "Collection",
-        collection_type: "list",
-        elements: readRunsSingle.map((runInfo) => {
-          const runAccession = runInfo.runAccession;
-          const { forward } = getSingleRunUrlsInfo(
-            runInfo.urls,
-            runInfo.md5Hashes
-          );
-          return {
+        elements: [
+          {
             class: "File",
             filetype: "fastqsanger.gz",
             hashes: [{ hash_function: "MD5", hash_value: forward.md5 }],
-            identifier: runAccession,
+            identifier: "forward",
             location: forward.url,
-          };
-        }),
+          },
+          {
+            class: "File",
+            filetype: "fastqsanger.gz",
+            hashes: [{ hash_function: "MD5", hash_value: reverse.md5 }],
+            identifier: "reverse",
+            location: reverse.url,
+          },
+        ],
+        identifier: runAccession,
+        type: "paired",
       };
-    case WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_PAIRED: {
-      if (!readRunsPaired?.length) return null;
-      return {
-        class: "Collection",
-        collection_type: "list:paired",
-        elements: readRunsPaired.map((pairInfo) => {
-          const runAccession = pairInfo.runAccession;
-          const { forward, reverse } = getPairedRunUrlsInfo(
-            pairInfo.urls,
-            pairInfo.md5Hashes
-          );
-          return {
-            class: "Collection",
-            elements: [
-              {
-                class: "File",
-                filetype: "fastqsanger.gz",
-                hashes: [{ hash_function: "MD5", hash_value: forward.md5 }],
-                identifier: "forward",
-                location: forward.url,
-              },
-              {
-                class: "File",
-                filetype: "fastqsanger.gz",
-                hashes: [{ hash_function: "MD5", hash_value: reverse.md5 }],
-                identifier: "reverse",
-                location: reverse.url,
-              },
-            ],
-            identifier: runAccession,
-            type: "paired",
-          };
-        }),
-      };
-    }
-  }
+    }),
+  };
+}
+
+function buildFastaUrl(identifier: string): string {
+  const baseUrl = "https://hgdownload.soe.ucsc.edu/hubs/";
+  const parts = identifier.split("_");
+  const formattedPath = `${parts[0]}/${parts[1].slice(0, 3)}/${parts[1].slice(
+    3,
+    6
+  )}/${parts[1].slice(6, 9)}/${identifier}/${identifier}.fa.gz`;
+  return `${baseUrl}${formattedPath}`;
 }
 
 /**
@@ -231,40 +388,4 @@ function getRunUrlsInfo(
   }
   if (forward === null) throw new Error("No URL for forward read found");
   return { forward, reverse };
-}
-
-/**
- * Get the appropriate `request_state` object for the given workflow ID and reference genome.
- * @param referenceGenome - Reference genome.
- * @param geneModelUrl - URL for gene model parameter.
- * @param readRunsSingle - Single read runs parameter.
- * @param readRunsPaired - Paired read runs parameter.
- * @param parameters - Parameters for this workflow.
- * @returns `request_state` value for the workflow landings request body.
- */
-function getWorkflowLandingsRequestState(
-  referenceGenome: string,
-  geneModelUrl: string | null,
-  readRunsSingle: EnaSequencingReads[] | null,
-  readRunsPaired: EnaSequencingReads[] | null,
-  parameters: WorkflowParameter[]
-): WorkflowLandingsBodyRequestState {
-  const result: WorkflowLandingsBodyRequestState = {};
-  for (const { key, url_spec, variable } of parameters) {
-    if (url_spec) {
-      // If url_spec is provided, use it directly
-      result[key] = url_spec;
-    } else if (variable) {
-      // Otherwise, use the variable to determine the value
-      const value = paramVariableToRequestValue(
-        variable,
-        geneModelUrl,
-        readRunsSingle,
-        readRunsPaired,
-        referenceGenome
-      );
-      if (value !== null) result[key] = value;
-    }
-  }
-  return result;
 }

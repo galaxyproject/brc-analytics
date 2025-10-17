@@ -143,6 +143,11 @@ export function buildFilters(
 ): Record<string, string[]> {
   const filters: Record<string, string[]> = {};
 
+  // if (stepKey === SEQUENCING_DATA_TYPE.READ_RUNS_ANY) {
+  // Do not apply any filters for step key READ_RUNS_ANY.
+  // return filters;
+  // }
+
   // Set library layout based on step key or data requirements
   if (workflowParameter?.data_requirements?.library_layout) {
     // Use the layout from data requirements if specified
@@ -195,6 +200,8 @@ export function preSelectColumnFilters(
   stepKey: SEQUENCING_DATA_TYPE,
   workflowParameter?: WorkflowParameter
 ): void {
+  // Do not apply any filters for step key READ_RUNS_ANY.
+  if (stepKey === SEQUENCING_DATA_TYPE.READ_RUNS_ANY) return;
   if (isENAQueryMethodByTaxonomyId(table)) {
     const filters = buildFilters(stepKey, workflowParameter);
     const columnFiltersState = buildValidatedColumnFilters(table, filters);

@@ -1,5 +1,5 @@
 import { MDXRemoteSerializeResult } from "next-mdx-remote";
-import { WorkflowUrlParameter } from "../../../../utils/galaxy-api/entities";
+import { GalaxyUrlData } from "../../../../utils/galaxy-api/entities";
 import {
   ORGANISM_PLOIDY,
   OUTBREAK_PRIORITY,
@@ -133,6 +133,6 @@ export interface WorkflowDataRequirements {
 export interface WorkflowParameter {
   data_requirements?: WorkflowDataRequirements;
   key: string;
-  url_spec?: WorkflowUrlParameter;
+  url_spec?: GalaxyUrlData;
   variable?: WORKFLOW_PARAMETER_VARIABLE;
 }

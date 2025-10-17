@@ -13,6 +13,7 @@ import {
 
 export const SideColumn = ({
   configuredInput,
+  configuredSteps,
   genome,
   workflow,
 }: Props): JSX.Element => {
@@ -20,7 +21,9 @@ export const SideColumn = ({
     <FluidPaper>
       <GridPaper>
         <CollapsableSection title="Configuration">
-          <KeyValuePairs {...buildWorkflowConfiguration(configuredInput)} />
+          <KeyValuePairs
+            {...buildWorkflowConfiguration(configuredInput, configuredSteps)}
+          />
         </CollapsableSection>
         <CollapsableSection title="Workflow Details">
           <KeyValuePairs {...buildWorkflowDetails(workflow)} />
