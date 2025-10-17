@@ -1,6 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
 import { ENA_QUERY_METHOD } from "../../../../types";
-import { WorkflowParameter } from "app/apis/catalog/brc-analytics-catalog/common/entities";
 
 export interface Props {
   loading: boolean;
@@ -10,5 +9,4 @@ export interface Props {
   selectedCount: number;
   setEnaQueryMethod: Dispatch<SetStateAction<ENA_QUERY_METHOD>>;
   taxonomicLevelSpecies: string;
-  workflowParameter?: WorkflowParameter;
 }
