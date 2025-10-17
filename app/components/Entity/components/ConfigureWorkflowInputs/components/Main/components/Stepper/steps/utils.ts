@@ -2,6 +2,27 @@ import { Workflow } from "../../../../../../../../../apis/catalog/brc-analytics-
 import { WORKFLOW_PARAMETER_VARIABLE } from "../../../../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { StepConfig } from "../components/Step/types";
 import { STEP } from "./constants";
+import {
+  SINGLE_END_STEP,
+  PAIRED_END_STEP,
+} from "../components/Step/SequencingStep/step";
+
+/**
+ * Augment the configured steps with two additional sequencing steps "READ_RUNS_PAIRED" and "READ_RUNS_SINGLE"
+ * if "READ_RUNS_ANY" is configured.
+ * Allows the user to configure both single and paired end reads in the same step and render those values
+ * in the summary.
+ * @param configuredSteps - The configured steps.
+ * @returns The augmented steps.
+ */
+export function augmentConfiguredSteps(
+  configuredSteps: StepConfig[]
+): StepConfig[] {
+  if (configuredSteps.some((step) => step.key === "readRunsAny")) {
+    return [...configuredSteps, PAIRED_END_STEP, SINGLE_END_STEP];
+  }
+  return configuredSteps;
+}
 
 /**
  * Builds the steps for the stepper based on the workflow and workflow parameters.

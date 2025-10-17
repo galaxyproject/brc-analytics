@@ -5,6 +5,7 @@ import { SideColumn } from "../../components/Entity/components/ConfigureWorkflow
 import { Main } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/main";
 import { useConfigureInputs } from "./hooks/UseConfigureInputs/useConfigureInputs";
 import { useConfiguredSteps } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/hook";
+import { augmentConfiguredSteps } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/utils";
 
 export const WorkflowInputsView = (props: Props): JSX.Element => {
   const { workflow } = props;
@@ -23,7 +24,7 @@ export const WorkflowInputsView = (props: Props): JSX.Element => {
       sideColumn={
         <SideColumn
           configuredInput={configuredInput}
-          configuredSteps={configuredSteps}
+          configuredSteps={augmentConfiguredSteps(configuredSteps)}
           {...props}
         />
       }

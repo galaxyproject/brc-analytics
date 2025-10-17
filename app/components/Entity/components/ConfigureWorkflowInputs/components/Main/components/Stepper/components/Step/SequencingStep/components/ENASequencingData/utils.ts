@@ -35,10 +35,13 @@ export function getSequencingData(
   stepKey: SEQUENCING_DATA_TYPE
 ): Partial<ConfiguredInput> {
   const sequencingDataByType = getSequencingDataByType(table);
-  const configuredInput: Partial<ConfiguredInput> = {};
+  const configuredInput: Partial<ConfiguredInput> = {
+    readRunsPaired: null,
+    readRunsSingle: null,
+  };
   for (const [key, value] of sequencingDataByType.entries()) {
     // If the key is the selected step or READ_RUNS_ANY, add the sequencing data to the configured input.
-    if (key === stepKey || key === SEQUENCING_DATA_TYPE.READ_RUNS_ANY) {
+    if (stepKey === key || stepKey === SEQUENCING_DATA_TYPE.READ_RUNS_ANY) {
       // Guard to satisfy Partial<ConfiguredInput>: only assign when key is a ConfiguredInput field ("readRunsPaired" | "readRunsSingle").
       if (key === "readRunsPaired" || key === "readRunsSingle") {
         const sequencingData = value.length > 0 ? value : null;
