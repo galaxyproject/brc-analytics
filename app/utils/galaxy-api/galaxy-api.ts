@@ -4,19 +4,23 @@ import ky from "ky";
 import {
   EnaFileInfo,
   EnaSequencingReads,
-  GalaxyCollection,
-  GalaxyListCollection,
-  GalaxyPairedCollection,
-  WorkflowCollectionParameter,
   GalaxyLandingResponseData,
   WorkflowLandingsBody,
   WorkflowLandingsBodyRequestState,
   WorkflowParameterValue,
-  GalaxyUrlData,
   DataLandingsBody,
   DataLandingsBodyRequestState,
-  DataLandingsDatasetTarget,
+  GalaxyPairedCollection,
+  GalaxyListCollection,
+  GalaxyUrlData,
+  GalaxyCollection,
   DataLandingsCollectionTarget,
+  DataLandingsCollection,
+  DataLandingsDatasetTarget,
+  WorkflowCollectionParameter,
+  GalaxyCollectionElement,
+  WorkflowCollectionElement,
+  GalaxyApiCommonUrlData,
 } from "./entities";
 
 const DOCKSTORE_API_URL = "https://dockstore.org/api/ga4gh/trs/v2/tools";
@@ -106,6 +110,17 @@ async function getGalaxyLandingUrl(
   return `${landingUrlBase}/${encodeURIComponent(id)}?public=true`;
 }
 
+function galaxyUrlDataToCommonApi(data: GalaxyUrlData): GalaxyApiCommonUrlData {
+  return {
+    dbkey: data.dbKey,
+    ext: data.ext,
+    hashes: data.hashes,
+    name: data.identifier,
+    src: "url",
+    url: data.url,
+  };
+}
+
 function paramVariableToRequestValue(
   variable: WORKFLOW_PARAMETER_VARIABLE,
   geneModelUrl: string | null,
@@ -119,25 +134,65 @@ function paramVariableToRequestValue(
     case WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_ID:
       return referenceGenome;
     case WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_FASTA_URL:
-      return buildAssemblyFastaRequestValue(referenceGenome);
-    case WORKFLOW_PARAMETER_VARIABLE.GENE_MODEL_URL:
-      return buildGeneModelUrlRequestValue(geneModelUrl, referenceGenome);
+      return galaxyUrlDataToCommonApi(
+        buildAssemblyFastaRequestValue(referenceGenome)
+      );
+    case WORKFLOW_PARAMETER_VARIABLE.GENE_MODEL_URL: {
+      const urlData = buildGeneModelUrlRequestValue(
+        geneModelUrl,
+        referenceGenome
+      );
+      if (urlData === null) return null;
+      return galaxyUrlDataToCommonApi(urlData);
+    }
     case WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE:
-      return buildWorkflowCollectionParameter(
+      return galaxyCollectionToWorkflowParameter(
         buildSingleReadRunsRequestValue(readRunsSingle)
       );
     case WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_PAIRED: {
-      return buildWorkflowCollectionParameter(
+      return galaxyCollectionToWorkflowParameter(
         buildPairedReadRunsRequestValue(readRunsPaired)
       );
     }
   }
 }
 
-function buildWorkflowCollectionParameter<T extends GalaxyCollection>(
-  collection: T | null
-): WorkflowCollectionParameter<T> | null {
-  return collection && { class: "Collection", ...collection };
+function galaxyCollectionToWorkflowParameter(
+  collection: GalaxyCollection | null
+): WorkflowCollectionParameter | null {
+  if (collection === null) return null;
+  return {
+    class: "Collection",
+    collection_type: collection.collectionType,
+    elements: collection.elements.map((elem) =>
+      galaxyCollectionElementToWorkflowLandings(elem)
+    ),
+    name: collection.identifier,
+  };
+}
+
+function galaxyCollectionElementToWorkflowLandings(
+  elem: GalaxyCollectionElement
+): WorkflowCollectionElement {
+  if ("collectionType" in elem) {
+    return {
+      class: "Collection",
+      collection_type: elem.collectionType,
+      elements: elem.elements.map((elem) =>
+        galaxyCollectionElementToWorkflowLandings(elem)
+      ),
+      identifier: elem.identifier,
+    };
+  } else {
+    return {
+      class: "File",
+      dbkey: elem.dbKey,
+      filetype: elem.ext,
+      hashes: elem.hashes,
+      identifier: elem.identifier,
+      location: elem.url,
+    };
+  }
 }
 
 /**
@@ -177,25 +232,42 @@ function getWorkflowLandingsRequestState(
 }
 
 function buildDataLandingsDatasetTarget(
-  sourceItems: (GalaxyUrlData | null)[]
+  sourceElements: (GalaxyUrlData | null)[]
 ): DataLandingsDatasetTarget | null {
-  const items = sourceItems.filter((item) => item !== null);
-  if (items.length === 0) return null;
+  const elements = sourceElements
+    .filter((elem) => elem !== null)
+    .map((elem) => galaxyUrlDataToCommonApi(elem));
+  if (elements.length === 0) return null;
   return {
     destination: { type: "hdas" },
-    items,
+    elements,
   };
 }
 
-function buildDataLandingsCollectionTarget<T extends GalaxyCollection>(
-  collection: T | null
-): DataLandingsCollectionTarget<T> | null {
-  return (
-    collection && {
-      destination: { type: "hdca" },
-      ...collection,
-    }
-  );
+function galaxyCollectionToDataLandingsTarget(
+  collection: GalaxyCollection | null
+): DataLandingsCollectionTarget | null {
+  if (collection === null) return null;
+  return {
+    destination: { type: "hdca" },
+    ...galaxyCollectionToDataLandings(collection),
+  };
+}
+
+function galaxyCollectionToDataLandings(
+  collection: GalaxyCollection
+): DataLandingsCollection {
+  return {
+    collection_type: collection.collectionType,
+    elements: collection.elements.map((elem) => {
+      if ("collectionType" in elem) {
+        return galaxyCollectionToDataLandings(elem);
+      } else {
+        return galaxyUrlDataToCommonApi(elem);
+      }
+    }),
+    name: collection.identifier,
+  };
 }
 
 function getDataLandingsRequestState(
@@ -212,10 +284,10 @@ function getDataLandingsRequestState(
       buildDataLandingsDatasetTarget([
         buildGeneModelUrlRequestValue(geneModelUrl, referenceGenome),
       ]),
-      buildDataLandingsCollectionTarget(
+      galaxyCollectionToDataLandingsTarget(
         buildSingleReadRunsRequestValue(readRunsSingle)
       ),
-      buildDataLandingsCollectionTarget(
+      galaxyCollectionToDataLandingsTarget(
         buildPairedReadRunsRequestValue(readRunsPaired)
       ),
     ].filter((target) => target !== null),
@@ -226,9 +298,8 @@ function buildAssemblyFastaRequestValue(
   referenceGenome: string
 ): GalaxyUrlData {
   return {
-    dbkey: referenceGenome,
+    dbKey: referenceGenome,
     ext: "fasta.gz",
-    src: "url",
     url: buildFastaUrl(referenceGenome),
   };
 }
@@ -239,9 +310,8 @@ function buildGeneModelUrlRequestValue(
 ): GalaxyUrlData | null {
   return geneModelUrl
     ? {
-        dbkey: referenceGenome,
+        dbKey: referenceGenome,
         ext: "gtf.gz",
-        src: "url",
         url: geneModelUrl,
       }
     : null;
@@ -252,16 +322,15 @@ function buildSingleReadRunsRequestValue(
 ): GalaxyListCollection | null {
   if (!readRunsSingle?.length) return null;
   return {
-    collection_type: "list",
+    collectionType: "list",
     elements: readRunsSingle.map((runInfo) => {
       const runAccession = runInfo.runAccession;
       const { forward } = getSingleRunUrlsInfo(runInfo.urls, runInfo.md5Hashes);
       return {
-        class: "File",
-        filetype: "fastqsanger.gz",
+        ext: "fastqsanger.gz",
         hashes: [{ hash_function: "MD5", hash_value: forward.md5 }],
         identifier: runAccession,
-        location: forward.url,
+        url: forward.url,
       };
     }),
   };
@@ -272,7 +341,7 @@ function buildPairedReadRunsRequestValue(
 ): GalaxyPairedCollection | null {
   if (!readRunsPaired?.length) return null;
   return {
-    collection_type: "list:paired",
+    collectionType: "list:paired",
     elements: readRunsPaired.map((pairInfo) => {
       const runAccession = pairInfo.runAccession;
       const { forward, reverse } = getPairedRunUrlsInfo(
@@ -280,25 +349,22 @@ function buildPairedReadRunsRequestValue(
         pairInfo.md5Hashes
       );
       return {
-        class: "Collection",
+        collectionType: "paired",
         elements: [
           {
-            class: "File",
-            filetype: "fastqsanger.gz",
+            ext: "fastqsanger.gz",
             hashes: [{ hash_function: "MD5", hash_value: forward.md5 }],
             identifier: "forward",
-            location: forward.url,
+            url: forward.url,
           },
           {
-            class: "File",
-            filetype: "fastqsanger.gz",
+            ext: "fastqsanger.gz",
             hashes: [{ hash_function: "MD5", hash_value: reverse.md5 }],
             identifier: "reverse",
-            location: reverse.url,
+            url: reverse.url,
           },
         ],
         identifier: runAccession,
-        type: "paired",
       };
     }),
   };

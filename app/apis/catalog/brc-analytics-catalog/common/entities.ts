@@ -1,11 +1,11 @@
 import { MDXRemoteSerializeResult } from "next-mdx-remote";
-import { GalaxyUrlData } from "../../../../utils/galaxy-api/entities";
 import {
   ORGANISM_PLOIDY,
   OUTBREAK_PRIORITY,
   OUTBREAK_RESOURCE_TYPE,
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_PLOIDY,
+  WorkflowUrlSpec,
 } from "./schema-entities";
 
 export type BRCCatalog =
@@ -133,6 +133,6 @@ export interface WorkflowDataRequirements {
 export interface WorkflowParameter {
   data_requirements?: WorkflowDataRequirements;
   key: string;
-  url_spec?: GalaxyUrlData;
+  url_spec?: WorkflowUrlSpec;
   variable?: WORKFLOW_PARAMETER_VARIABLE;
 }
