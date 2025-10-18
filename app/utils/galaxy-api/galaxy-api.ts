@@ -34,7 +34,7 @@ if (!galaxyInstanceUrl) {
 const workflowLandingsApiUrl = `${galaxyInstanceUrl}/api/workflow_landings`;
 const workflowLandingUrl = `${galaxyInstanceUrl}/workflow_landings`;
 const dataLandingsApiUrl = `${galaxyInstanceUrl}/api/data_landings`;
-const dataLandingUrl = `${galaxyInstanceUrl}/data_landings`;
+const dataLandingUrl = `${galaxyInstanceUrl}/tool_landings`;
 
 /**
  * Get the URL of the workflow landing page for the given genome workflow.
