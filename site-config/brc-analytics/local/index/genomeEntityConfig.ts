@@ -57,7 +57,6 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
         ],
         label: "Organism",
       },
-      CATEGORY_GROUPS.PRIORITY_PATHOGENS,
       {
         categoryConfigs: [
           {
@@ -95,6 +94,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
         ],
         label: "Taxonomic Lineage",
       },
+      CATEGORY_GROUPS.PRIORITY_PATHOGENS,
       {
         categoryConfigs: [
           {
