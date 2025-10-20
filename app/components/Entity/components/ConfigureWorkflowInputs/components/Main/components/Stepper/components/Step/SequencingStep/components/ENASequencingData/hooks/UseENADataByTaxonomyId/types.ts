@@ -1,6 +1,8 @@
-export type OnRequestData = (
+import { ColumnFiltersState } from "@tanstack/react-table";
+
+export type OnRequestData<T> = (
   taxonomyId: string,
-  submitOptions?: SubmitOptions
+  submitOptions?: SubmitOptions<T>
 ) => Promise<void>;
 
 export interface Status {
@@ -8,12 +10,13 @@ export interface Status {
   loading: boolean;
 }
 
-export interface SubmitOptions {
+export interface SubmitOptions<T> {
   onError?: (error: Error) => void;
-  onSuccess?: () => void;
+  onSuccess?: (data: T[]) => void;
 }
 
 export interface UseENADataByTaxonomyId<T> {
+  columnFilters: ColumnFiltersState;
   data?: T[];
   status: Status;
 }

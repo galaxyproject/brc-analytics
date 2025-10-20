@@ -5,7 +5,6 @@ import { SEQUENCING_DATA_TYPE } from "../../types";
 import { UseENADataByTaxonomyId } from "./hooks/UseENADataByTaxonomyId/types";
 import { Dispatch, SetStateAction } from "react";
 import { ENA_QUERY_METHOD } from "../../types";
-import { WorkflowParameter } from "app/apis/catalog/brc-analytics-catalog/common/entities";
 
 export interface BaseReadRun {
   base_count: number;
@@ -44,5 +43,4 @@ export interface Props {
   stepKey: SEQUENCING_DATA_TYPE;
   table: Table<ReadRun>;
   taxonomicLevelSpecies: string;
-  workflowParameter?: WorkflowParameter;
 }

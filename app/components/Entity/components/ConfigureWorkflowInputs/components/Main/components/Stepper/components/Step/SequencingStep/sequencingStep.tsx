@@ -28,24 +28,13 @@ export const SequencingStep = ({
     ENA_QUERY_METHOD.ACCESSION
   );
   const enaAccession = useENADataByAccession<BaseReadRun>();
-  const enaTaxonomyId = useENADataByTaxonomyId<BaseReadRun>(genome);
+  const enaTaxonomyId = useENADataByTaxonomyId<BaseReadRun>(
+    workflow,
+    genome,
+    stepKey as SEQUENCING_DATA_TYPE
+  );
   const table = useTable(enaQueryMethod, enaAccession, enaTaxonomyId);
   const { onChange, value } = useToggleButtonGroup(VIEW.ENA);
-
-  // Map step keys to workflow parameter variables
-  const stepKeyToVariableMap = {
-    geneModelUrl: "GENE_MODEL_URL",
-    readRunsPaired: "SANGER_READ_RUN_PAIRED",
-    readRunsSingle: "SANGER_READ_RUN_SINGLE",
-    referenceAssembly: "ASSEMBLY_ID",
-  };
-
-  // Find the workflow parameter that corresponds to this step key
-  const mappedVariable =
-    stepKeyToVariableMap[stepKey as keyof typeof stepKeyToVariableMap];
-  const workflowParameter = workflow.parameters.find(
-    (param) => param.variable === mappedVariable
-  );
   return (
     <Step active={active} completed={completed} index={index}>
       <StepLabel>{entryLabel}</StepLabel>
@@ -60,7 +49,6 @@ export const SequencingStep = ({
             stepKey={stepKey as SEQUENCING_DATA_TYPE}
             table={table}
             taxonomicLevelSpecies={genome.taxonomicLevelSpecies}
-            workflowParameter={workflowParameter}
           />
         ) : (
           <UploadMyData

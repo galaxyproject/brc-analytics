@@ -13,7 +13,7 @@ export async function fetchENAData<T>({
   submitOptions,
   taxonomyId,
 }: {
-  submitOptions: Required<SubmitOptions>;
+  submitOptions: Required<SubmitOptions<T>>;
   taxonomyId: string;
 }): Promise<T[] | undefined> {
   try {
@@ -36,7 +36,7 @@ export async function fetchENAData<T>({
       return;
     }
 
-    submitOptions.onSuccess?.();
+    submitOptions.onSuccess?.(data);
 
     return data;
   } catch (error) {
