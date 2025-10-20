@@ -418,25 +418,30 @@ Return ONLY valid JSON, no markdown or explanations."""
                 # Try to parse as JSON if it's a string
                 import json
 
-                try:
-                    logger.info(
-                        f"Workflow output is string, attempting JSON parse: {result.output[:100]}..."
-                    )
-                    parsed = json.loads(result.output)
-                    # Create WorkflowRecommendation models from parsed JSON
-                    data = [WorkflowRecommendation(**rec) for rec in parsed]
-                    logger.info(
-                        f"Successfully parsed {len(data)} workflow recommendations from JSON"
-                    )
-                except (json.JSONDecodeError, ValueError) as e:
-                    logger.error(f"Failed to parse workflow JSON: {e}")
-                    return LLMResponse(
-                        success=False,
-                        error=f"LLM returned invalid JSON: {result.output[:200]}",
-                    )
-            else:
-                # It's already a list of models
-                data = result.output
+            try:
+                logger.info(f"Workflow output: {result.output[:200]}...")
+                # Clean up the output in case it has markdown formatting
+                json_str = result.output.strip()
+                if json_str.startswith("```"):
+                    # Remove markdown code blocks
+                    json_str = json_str.split("```")[1]
+                    if json_str.startswith("json"):
+                        json_str = json_str[4:]
+                    json_str = json_str.strip()
+
+                parsed = json.loads(json_str)
+                # Create WorkflowRecommendation models from parsed JSON
+                data = [WorkflowRecommendation(**rec) for rec in parsed]
+                logger.info(
+                    f"Successfully parsed {len(data)} workflow recommendations from JSON"
+                )
+            except (json.JSONDecodeError, ValueError) as e:
+                logger.error(f"Failed to parse workflow JSON: {e}")
+                logger.error(f"Raw output: {result.output}")
+                return LLMResponse(
+                    success=False,
+                    error=f"LLM returned invalid JSON: {result.output[:200]}",
+                )
 
             response = LLMResponse(
                 success=True,
