@@ -56,10 +56,16 @@ async def natural_language_search(
             request.query
         )
 
+        logger.info(f"LLM response success: {interpretation_response.success}")
+        logger.info(f"LLM response data type: {type(interpretation_response.data)}")
+        logger.info(f"LLM response data: {interpretation_response.data}")
+
         if not interpretation_response.success:
             raise HTTPException(status_code=400, detail=interpretation_response.error)
 
         interpretation = interpretation_response.data
+        logger.info(f"Interpretation type: {type(interpretation)}")
+        logger.info(f"Interpretation value: {interpretation}")
 
         # Additional validation: reject queries with very low confidence
         if interpretation.confidence < 0.3:
@@ -185,6 +191,7 @@ async def natural_language_search(
         print(f"===== END ERROR =====", file=sys.stderr)
 
         logger.error(f"Unexpected error in dataset search: {e}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
 
 

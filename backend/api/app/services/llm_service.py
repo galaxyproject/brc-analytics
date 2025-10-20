@@ -107,42 +107,43 @@ class LLMService:
                 """,
             )
 
-            # Initialize workflow recommendation agent
-            self.workflow_agent = Agent[List[WorkflowRecommendation]](
+            # Initialize workflow recommendation agent - use simple string agent for better control
+            self.workflow_agent = Agent[str](
                 self.model,
-                system_prompt="""
-                You are a bioinformatics workflow expert helping researchers choose appropriate analysis pipelines.
-                
-                Based on dataset characteristics and analysis goals, recommend suitable workflows from common bioinformatics pipelines.
-                
-                You MUST respond with ONLY a valid JSON array of workflow recommendations, with no additional text:
-                [
-                    {
-                        "workflow_name": "workflow name",
-                        "reason": "why this workflow is suitable",
-                        "confidence": 0.0 to 1.0,
-                        "parameters": {"param1": "value1"} or {}
-                    }
-                ]
-                
-                Consider:
-                - Data type (RNA-seq, DNA-seq, ChIP-seq, ATAC-seq, etc.)
-                - Organism type (prokaryotic vs eukaryotic, model vs non-model)
-                - Analysis goals (differential expression, variant calling, peak calling, etc.)
-                - Data format and quality
-                - Computational requirements
-                
-                Common workflow types:
-                - RNA-seq: salmon, kallisto, HISAT2-StringTie, STAR-RSEM
-                - DNA-seq: BWA-GATK, Bowtie2, minimap2
-                - ChIP-seq: MACS2, SICER, HOMER
-                - ATAC-seq: MACS2, genrich
-                - Variant calling: GATK, FreeBayes, bcftools
-                
-                Provide 1-3 recommendations ranked by confidence, with clear reasoning.
-                
-                CRITICAL: Return ONLY the JSON array, no explanations or additional text.
-                """,
+                system_prompt="""You are a bioinformatics workflow expert helping researchers choose appropriate analysis pipelines.
+
+Based on dataset characteristics and analysis goals, recommend suitable workflows from common bioinformatics pipelines.
+
+You MUST respond with ONLY a valid JSON array matching this EXACT structure:
+[
+    {
+        "workflow_id": "salmon-deseq2",
+        "workflow_name": "Salmon Quantification with DESeq2",
+        "confidence": 0.95,
+        "reasoning": "Detailed explanation of why this workflow is suitable for the specific dataset and analysis goals",
+        "parameters": {"bootstrap_samples": "30", "bias_correction": "true"},
+        "compatibility_notes": "Works well with paired-end RNA-seq data from eukaryotic organisms"
+    }
+]
+
+CRITICAL FIELD REQUIREMENTS:
+- workflow_id: lowercase with hyphens (required)
+- workflow_name: human-readable name (required)
+- confidence: number between 0.0 and 1.0 (required)
+- reasoning: detailed explanation (required, not "reason")
+- parameters: object with key-value pairs or null (optional)
+- compatibility_notes: string or null (optional)
+
+Common workflows by data type:
+- RNA-seq: salmon-deseq2, kallisto-sleuth, hisat2-stringtie, star-rsem
+- DNA-seq/WGS: bwa-gatk, bowtie2-freebayes, minimap2-bcftools
+- ChIP-seq: macs2-chipseq, sicer-chipseq, homer-chipseq
+- ATAC-seq: macs2-atacseq, genrich-atacseq
+- Variant calling: gatk-haplotypecaller, freebayes-vcf, bcftools-call
+
+Provide 1-3 recommendations ranked by confidence.
+
+Return ONLY the JSON array. No markdown code blocks, no explanations, no extra text.""",
             )
 
             logger.info("LLM service initialized successfully")
@@ -274,7 +275,7 @@ Create a JSON object with this EXACT structure:
 
 CONFIDENCE SCORING:
 - Set confidence to 0.0-0.2 if the query is nonsense, gibberish, or completely unrelated to bioinformatics
-- Set confidence to 0.3-0.5 if the query is vague or ambiguous 
+- Set confidence to 0.3-0.5 if the query is vague or ambiguous
 - Set confidence to 0.6-0.8 if the query has some clear bioinformatics terms but missing details
 - Set confidence to 0.9-1.0 if the query is specific and clearly describes a bioinformatics search
 
@@ -285,12 +286,12 @@ Return ONLY valid JSON, no markdown or explanations."""
             # Use plain Agent[str] and parse JSON manually
             formatting_agent = Agent[str](
                 self.formatting_model,
-                system_prompt="""You are a JSON formatting assistant. 
+                system_prompt="""You are a JSON formatting assistant.
                 Convert the analysis into a structured DatasetQuery JSON object.
-                
+
                 Return a JSON object with these exact fields:
                 - organism: scientific name or null
-                - taxonomy_id: NCBI taxonomy ID or null  
+                - taxonomy_id: NCBI taxonomy ID or null
                 - experiment_type: RNA-seq, DNA-seq, ChIP-seq, ATAC-seq, or null
                 - library_strategy: WGS, WXS, RNA-Seq, ChIP-Seq, or null
                 - library_source: GENOMIC, TRANSCRIPTOMIC, or null
@@ -301,7 +302,7 @@ Return ONLY valid JSON, no markdown or explanations."""
                 - assembly_level: Complete Genome, Chromosome, Scaffold, Contig, or null
                 - assembly_completeness: complete, draft, incomplete, or null
                 - confidence: 0.0 to 1.0
-                
+
                 Output ONLY the JSON object, no markdown, no backticks, no explanations.""",
             )
 
@@ -399,12 +400,12 @@ Return ONLY valid JSON, no markdown or explanations."""
             prompt = f"""
             Dataset Description: {request.dataset_description}
             Analysis Goal: {request.analysis_goal}
-            
+
             Additional Context:
             - Organism Taxonomy ID: {request.organism_taxonomy_id or "Not specified"}
             - Experiment Type: {request.experiment_type or "Not specified"}
             - Data Format: {request.data_format or "Not specified"}
-            
+
             Please recommend 1-3 appropriate bioinformatics workflows for this analysis, ranked by suitability.
             """
 
@@ -413,10 +414,8 @@ Return ONLY valid JSON, no markdown or explanations."""
             )
             result = await self.workflow_agent.run(prompt)
 
-            # Handle string vs model output
-            if isinstance(result.output, str):
-                # Try to parse as JSON if it's a string
-                import json
+            # Parse the JSON string output
+            import json
 
             try:
                 logger.info(f"Workflow output: {result.output[:200]}...")
@@ -445,7 +444,7 @@ Return ONLY valid JSON, no markdown or explanations."""
 
             response = LLMResponse(
                 success=True,
-                data=data,  # Use the parsed/extracted data
+                data=data,
                 raw_response=str(result.output),
                 tokens_used=result.usage().total_tokens
                 if hasattr(result, "usage")
