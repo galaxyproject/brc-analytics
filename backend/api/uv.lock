@@ -186,6 +186,7 @@ dependencies = [
     { name = "pydantic-ai" },
     { name = "python-dotenv" },
     { name = "redis" },
+    { name = "tenacity" },
     { name = "uvicorn" },
 ]
 
@@ -207,6 +208,7 @@ requires-dist = [
     { name = "python-dotenv", specifier = ">=1.1.1" },
     { name = "redis", specifier = ">=6.4.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.13.0" },
+    { name = "tenacity", specifier = ">=8.2.0" },
     { name = "uvicorn", specifier = ">=0.35.0" },
 ]
 provides-extras = ["dev"]

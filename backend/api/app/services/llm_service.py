@@ -1,10 +1,20 @@
+import asyncio
 import logging
 import os
 from typing import Any, Dict, List, Optional
 
 from pydantic_ai import Agent
 from pydantic_ai.exceptions import AgentRunError
+from pydantic_ai.models.anthropic import AnthropicModel
 from pydantic_ai.models.openai import OpenAIChatModel
+from pydantic_ai.providers.anthropic import AnthropicProvider
+from pydantic_ai.providers.openai import OpenAIProvider
+from tenacity import (
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from app.core.cache import CacheService, CacheTTL
 from app.core.config import get_settings
@@ -15,9 +25,6 @@ from app.models.llm import (
     WorkflowSuggestionRequest,
 )
 from app.services.sambanova_patch import patch_sambanova_compatibility
-
-# Apply SambaNova compatibility patch
-patch_sambanova_compatibility()
 
 logger = logging.getLogger(__name__)
 
@@ -34,80 +41,123 @@ class LLMService:
             self.reasoning_model = None
             self.formatting_model = None
             self.model = None
-            self.search_agent = None
+            self.reasoning_agent = None
+            self.formatting_agent = None
             self.workflow_agent = None
             return
 
         try:
-            # Initialize AI models using environment variables
-            # Set OpenAI-compatible environment variables for pydantic-ai
-            os.environ["OPENAI_API_KEY"] = self.settings.AI_API_KEY
+            # Detect which model provider to use based on API base URL
+            is_anthropic = (
+                self.settings.AI_API_BASE_URL
+                and "anthropic.com" in self.settings.AI_API_BASE_URL
+            )
+            is_sambanova = self.settings.AI_API_BASE_URL and (
+                "sambanova" in self.settings.AI_API_BASE_URL.lower()
+                or "tacc.utexas.edu" in self.settings.AI_API_BASE_URL.lower()
+            )
 
-            # Configure base URL if provided (for LiteLLM proxy or custom endpoints)
-            if self.settings.AI_API_BASE_URL:
-                os.environ["OPENAI_BASE_URL"] = self.settings.AI_API_BASE_URL
-                logger.info(
-                    f"Using custom AI API base URL: {self.settings.AI_API_BASE_URL}"
+            # Apply SambaNova compatibility patch only when using SambaNova endpoints
+            if is_sambanova:
+                logger.info("Applying SambaNova compatibility patch")
+                patch_sambanova_compatibility()
+
+            if is_anthropic:
+                # Use Anthropic's native API with provider
+                logger.info("Using Anthropic API")
+                anthropic_provider = AnthropicProvider(api_key=self.settings.AI_API_KEY)
+                self.reasoning_model = AnthropicModel(
+                    self.settings.AI_REASONING_MODEL, provider=anthropic_provider
+                )
+                self.formatting_model = AnthropicModel(
+                    self.settings.AI_FORMATTING_MODEL, provider=anthropic_provider
+                )
+            else:
+                # Use OpenAI-compatible API (OpenAI, LiteLLM, etc.) with provider
+                if self.settings.AI_API_BASE_URL:
+                    logger.info(
+                        f"Using custom OpenAI-compatible API: {self.settings.AI_API_BASE_URL}"
+                    )
+                else:
+                    logger.info("Using OpenAI API")
+
+                openai_provider = OpenAIProvider(
+                    api_key=self.settings.AI_API_KEY,
+                    base_url=self.settings.AI_API_BASE_URL,
+                )
+                self.reasoning_model = OpenAIChatModel(
+                    self.settings.AI_REASONING_MODEL, provider=openai_provider
+                )
+                self.formatting_model = OpenAIChatModel(
+                    self.settings.AI_FORMATTING_MODEL, provider=openai_provider
                 )
 
-            # Initialize models for hybrid approach
-            self.reasoning_model = OpenAIChatModel(self.settings.AI_REASONING_MODEL)
-            self.formatting_model = OpenAIChatModel(self.settings.AI_FORMATTING_MODEL)
             self.model = self.formatting_model  # Default to formatting model
 
             logger.info(f"Initialized hybrid models:")
             logger.info(f"  Reasoning: {self.settings.AI_REASONING_MODEL}")
             logger.info(f"  Formatting: {self.settings.AI_FORMATTING_MODEL}")
 
-            # Initialize search interpretation agent
-            self.search_agent = Agent[DatasetQuery](
-                self.model,
-                system_prompt="""
-                You are a bioinformatics assistant that helps researchers find sequencing datasets. 
-                
-                Parse natural language queries and extract structured search parameters for the European Nucleotide Archive (ENA).
-                
-                You MUST respond with ONLY a valid JSON object matching this exact structure, with no additional text:
-                {
-                    "organism": "scientific name or null",
-                    "taxonomy_id": "NCBI taxonomy ID or null",
-                    "experiment_type": "RNA-seq/DNA-seq/ChIP-seq/ATAC-seq or null",
-                    "library_strategy": "WGS/WXS/RNA-Seq/ChIP-Seq or null",
-                    "sequencing_platform": "Illumina/PacBio/Oxford Nanopore/Ion Torrent or null",
-                    "date_range": {"start": "YYYY-MM-DD or null", "end": "YYYY-MM-DD or null"} or null,
-                    "keywords": ["keyword1", "keyword2"] or [],
-                    "assembly_level": "Complete Genome/Chromosome/Scaffold/Contig or null",
-                    "assembly_completeness": "complete/draft/incomplete or null",
-                    "confidence": 0.0 to 1.0
-                }
-                
-                Guidelines:
-                - Extract organism names and convert to scientific names when possible
-                - Identify experiment types (RNA-seq, DNA-seq, ChIP-seq, ATAC-seq, WGS, WXS, etc.)
-                - Recognize library strategies (WGS, WXS, RNA-Seq, ChIP-Seq, etc.) 
-                - Identify sequencing platforms/technologies (Illumina, PacBio, Oxford Nanopore, Ion Torrent, 454, SOLiD)
-                - Identify assembly level queries (Complete Genome, Chromosome, Scaffold, Contig)
-                - Parse date ranges from natural language (e.g., "from 2023" = {"start": "2023-01-01", "end": "2023-12-31"})
-                - Extract relevant keywords including technology terms, strain names, conditions, assembly completeness
-                - Set confidence based on how well you understand the query (0.0 to 1.0)
-                
-                Common organism mappings:
-                - "malaria", "malaria parasite" → "Plasmodium falciparum" (taxonomy_id: "5833")
-                - "tuberculosis", "TB" → "Mycobacterium tuberculosis" (taxonomy_id: "1773")
-                - "E. coli" → "Escherichia coli" (taxonomy_id: "562")
-                - "yeast" → "Saccharomyces cerevisiae" (taxonomy_id: "4932")
-                - "Candida" → "Candida albicans" (taxonomy_id: "5476") or "Candida auris" (taxonomy_id: "498019")
-                - "Aspergillus" → "Aspergillus fumigatus" (taxonomy_id: "746128")
-                - "Cryptococcus" → "Cryptococcus neoformans" (taxonomy_id: "5207")
-                
-                IMPORTANT: For malaria/Plasmodium, default to "Plasmodium falciparum" not "Plasmodium spp."
-                Include taxonomy IDs when you know them, as they provide more accurate searches.
-                
-                CRITICAL: Return ONLY the JSON object, no explanations or additional text.
-                """,
+            # Initialize reasoning agent for query understanding (phase 1 of hybrid approach)
+            self.reasoning_agent = Agent[str](
+                self.reasoning_model,
+                system_prompt="""You are a bioinformatics data search expert. Analyze the user's query and identify:
+- Organism/species (use scientific names, be specific - e.g., "Plasmodium falciparum" not "Plasmodium spp.")
+- Experiment type (RNA-seq, WGS, ChIP-seq, etc.)
+- Library strategy (RNA-Seq, WGS, WXS, ChIP-Seq)
+- Sequencing platform/technology (Illumina, PacBio, Oxford Nanopore, Ion Torrent, etc.)
+- Date ranges (e.g., "from 2023" means start: 2023-01-01, end: 2023-12-31)
+- Assembly level or completeness (Complete Genome, Chromosome, Scaffold, Contig, draft, complete)
+- Other keywords or constraints (strain names, drug resistance, conditions)
+
+IMPORTANT: If the query appears to be nonsense, gibberish, random characters, or completely unrelated to bioinformatics/genomics, clearly state "INVALID_QUERY: This query does not appear to be a valid bioinformatics search request."
+
+Known organisms and their taxonomy IDs:
+- Plasmodium falciparum (malaria): 5833
+- Mycobacterium tuberculosis (TB): 1773
+- Escherichia coli: 562
+- Candida albicans: 5476
+- Candida auris: 498019
+
+Sequencing platforms:
+- Illumina (MiSeq, HiSeq, NextSeq, NovaSeq)
+- PacBio (Pacific Biosciences, SMRT sequencing)
+- Oxford Nanopore (MinION, GridION, PromethION)
+- Ion Torrent (Ion PGM, Ion Proton)
+
+Provide a clear, structured analysis. If the query is invalid or nonsense, clearly indicate this.""",
             )
 
-            # Initialize workflow recommendation agent - use simple string agent for better control
+            # Initialize formatting agent for JSON conversion (phase 2 of hybrid approach)
+            self.formatting_agent = Agent[str](
+                self.formatting_model,
+                system_prompt="""You are a JSON formatting assistant.
+Convert the analysis into a structured DatasetQuery JSON object.
+
+Return a JSON object with these exact fields:
+- organism: scientific name or null
+- taxonomy_id: NCBI taxonomy ID or null (as string, e.g., "5833")
+- experiment_type: RNA-seq, DNA-seq, ChIP-seq, ATAC-seq, or null
+- library_strategy: WGS, WXS, RNA-Seq, ChIP-Seq, or null
+- library_source: GENOMIC, TRANSCRIPTOMIC, or null
+- sequencing_platform: Illumina, PacBio, Oxford Nanopore, or null
+- date_range: {"start": "YYYY-MM-DD", "end": "YYYY-MM-DD"} or null
+- keywords: array of search keywords
+- study_type: type of study or null
+- assembly_level: Complete Genome, Chromosome, Scaffold, Contig, or null
+- assembly_completeness: complete, draft, incomplete, or null
+- confidence: 0.0 to 1.0
+
+CONFIDENCE SCORING:
+- 0.0-0.2: nonsense, gibberish, or completely unrelated to bioinformatics
+- 0.3-0.5: vague or ambiguous query
+- 0.6-0.8: some clear bioinformatics terms but missing details
+- 0.9-1.0: specific and clearly describes a bioinformatics search
+
+Output ONLY the JSON object, no markdown, no backticks, no explanations.""",
+            )
+
+            # Initialize workflow recommendation agent
             self.workflow_agent = Agent[str](
                 self.model,
                 system_prompt="""You are a bioinformatics workflow expert helping researchers choose appropriate analysis pipelines.
@@ -153,20 +203,84 @@ Return ONLY the JSON array. No markdown code blocks, no explanations, no extra t
             self.reasoning_model = None
             self.formatting_model = None
             self.model = None
-            self.search_agent = None
+            self.reasoning_agent = None
+            self.formatting_agent = None
             self.workflow_agent = None
 
     def is_available(self) -> bool:
         """Check if LLM service is available"""
         return self.reasoning_model is not None and self.formatting_model is not None
 
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=2, max=10),
+        retry=retry_if_exception_type((Exception,)),
+        reraise=True,
+    )
+    async def _call_agent_with_retry(
+        self, agent: Agent, prompt: str, timeout: float = 30.0
+    ):
+        """
+        Call an LLM agent with automatic retry on transient failures and timeout.
+
+        Args:
+            agent: The pydantic-ai Agent to call
+            prompt: The prompt to send to the agent
+            timeout: Maximum time in seconds to wait for a response (default: 30s)
+
+        Retries up to 3 times with exponential backoff (2s, 4s, 8s max).
+        Only retries on exceptions (network errors, timeouts, etc).
+        Re-raises the exception after all retries are exhausted.
+        """
+        logger.debug(f"Calling agent with prompt: {prompt[:100]}...")
+        try:
+            result = await asyncio.wait_for(agent.run(prompt), timeout=timeout)
+            return result
+        except asyncio.TimeoutError as e:
+            logger.error(f"LLM call timed out after {timeout}s")
+            raise Exception(f"LLM request timed out after {timeout} seconds") from e
+
+    def _clean_json_response(self, raw_output: str) -> str:
+        """
+        Remove markdown formatting from LLM JSON responses.
+
+        LLMs often wrap JSON in markdown code blocks like:
+        ```json
+        {"key": "value"}
+        ```
+
+        This method strips the markdown formatting and returns clean JSON.
+        """
+        json_str = raw_output.strip()
+        if json_str.startswith("```"):
+            # Remove markdown code blocks
+            json_str = json_str.split("```")[1]
+            if json_str.startswith("json"):
+                json_str = json_str[4:]
+            json_str = json_str.strip()
+        return json_str
+
     async def interpret_search_query(self, user_query: str) -> LLMResponse:
         """Interpret a natural language search query into structured parameters using hybrid approach"""
         if not self.is_available():
             return LLMResponse(
                 success=False,
-                error="LLM service not available - check OpenAI API key configuration",
+                error="LLM service not available - check API key configuration",
             )
+
+        # Input validation
+        if not user_query or not user_query.strip():
+            return LLMResponse(success=False, error="Query cannot be empty")
+
+        # Sanitize and validate length
+        user_query = user_query.strip()
+        if len(user_query) > 1000:
+            return LLMResponse(
+                success=False, error="Query too long (maximum 1000 characters)"
+            )
+
+        # Remove null bytes and other potentially problematic characters
+        user_query = user_query.replace("\x00", "")
 
         # Check cache first
         cache_key = self.cache.make_key("llm:interpret", {"query": user_query})
@@ -192,37 +306,10 @@ Return ONLY the JSON array. No markdown code blocks, no explanations, no extra t
                 f"Starting hybrid interpretation of query: {user_query[:100]}..."
             )
 
-            # PHASE 1: Use reasoning model for understanding
-            reasoning_agent = Agent[str](
-                self.reasoning_model,
-                system_prompt="""You are a bioinformatics data search expert. Analyze the user's query and identify:
-- Organism/species (use scientific names, be specific - e.g., "Plasmodium falciparum" not "Plasmodium spp.")
-- Experiment type (RNA-seq, WGS, ChIP-seq, etc.)
-- Library strategy (RNA-Seq, WGS, WXS, ChIP-Seq)
-- Sequencing platform/technology (Illumina, PacBio, Oxford Nanopore, Ion Torrent, etc.)
-- Date ranges (e.g., "from 2023" means start: 2023-01-01, end: 2023-12-31)
-- Assembly level or completeness (Complete Genome, Chromosome, Scaffold, Contig, draft, complete)
-- Other keywords or constraints (strain names, drug resistance, conditions)
-
-IMPORTANT: If the query appears to be nonsense, gibberish, random characters, or completely unrelated to bioinformatics/genomics, clearly state "INVALID_QUERY: This query does not appear to be a valid bioinformatics search request."
-
-Known organisms and their taxonomy IDs:
-- Plasmodium falciparum (malaria): 5833
-- Mycobacterium tuberculosis (TB): 1773
-- Escherichia coli: 562
-- Candida albicans: 5476
-- Candida auris: 498019
-
-Sequencing platforms:
-- Illumina (MiSeq, HiSeq, NextSeq, NovaSeq)
-- PacBio (Pacific Biosciences, SMRT sequencing)
-- Oxford Nanopore (MinION, GridION, PromethION)
-- Ion Torrent (Ion PGM, Ion Proton)
-
-Provide a clear, structured analysis. If the query is invalid or nonsense, clearly indicate this.""",
+            # PHASE 1: Use pre-initialized reasoning agent for understanding (with retry)
+            reasoning_result = await self._call_agent_with_retry(
+                self.reasoning_agent, user_query
             )
-
-            reasoning_result = await reasoning_agent.run(user_query)
             logger.info(f"Reasoning output: {reasoning_result.output[:200]}...")
 
             # Check if the reasoning agent detected an invalid query
@@ -254,7 +341,7 @@ Provide a clear, structured analysis. If the query is invalid or nonsense, clear
                     model_used=self.settings.AI_REASONING_MODEL,
                 )
 
-            # PHASE 2: Use formatting model to create structured JSON
+            # PHASE 2: Use pre-initialized formatting agent to create structured JSON
             formatting_prompt = f"""Based on this analysis: {reasoning_result.output}
 
 Create a JSON object with this EXACT structure:
@@ -273,40 +360,13 @@ Create a JSON object with this EXACT structure:
     "confidence": 0.9
 }}
 
-CONFIDENCE SCORING:
-- Set confidence to 0.0-0.2 if the query is nonsense, gibberish, or completely unrelated to bioinformatics
-- Set confidence to 0.3-0.5 if the query is vague or ambiguous
-- Set confidence to 0.6-0.8 if the query has some clear bioinformatics terms but missing details
-- Set confidence to 0.9-1.0 if the query is specific and clearly describes a bioinformatics search
-
 IMPORTANT: taxonomy_id must be a string (e.g., "5833") not a number
 
 Return ONLY valid JSON, no markdown or explanations."""
 
-            # Use plain Agent[str] and parse JSON manually
-            formatting_agent = Agent[str](
-                self.formatting_model,
-                system_prompt="""You are a JSON formatting assistant.
-                Convert the analysis into a structured DatasetQuery JSON object.
-
-                Return a JSON object with these exact fields:
-                - organism: scientific name or null
-                - taxonomy_id: NCBI taxonomy ID or null
-                - experiment_type: RNA-seq, DNA-seq, ChIP-seq, ATAC-seq, or null
-                - library_strategy: WGS, WXS, RNA-Seq, ChIP-Seq, or null
-                - library_source: GENOMIC, TRANSCRIPTOMIC, or null
-                - sequencing_platform: Illumina, PacBio, Oxford Nanopore, or null
-                - date_range: {"start": "YYYY-MM-DD", "end": "YYYY-MM-DD"} or null
-                - keywords: array of search keywords
-                - study_type: type of study or null
-                - assembly_level: Complete Genome, Chromosome, Scaffold, Contig, or null
-                - assembly_completeness: complete, draft, incomplete, or null
-                - confidence: 0.0 to 1.0
-
-                Output ONLY the JSON object, no markdown, no backticks, no explanations.""",
+            result = await self._call_agent_with_retry(
+                self.formatting_agent, formatting_prompt
             )
-
-            result = await formatting_agent.run(formatting_prompt)
 
             # Parse the JSON string output
             import json
@@ -314,13 +374,7 @@ Return ONLY valid JSON, no markdown or explanations."""
             try:
                 logger.info(f"Formatting agent output: {result.output[:200]}...")
                 # Clean up the output in case it has markdown formatting
-                json_str = result.output.strip()
-                if json_str.startswith("```"):
-                    # Remove markdown code blocks
-                    json_str = json_str.split("```")[1]
-                    if json_str.startswith("json"):
-                        json_str = json_str[4:]
-                    json_str = json_str.strip()
+                json_str = self._clean_json_response(result.output)
 
                 parsed_json = json.loads(json_str)
                 data = DatasetQuery(**parsed_json)
@@ -374,7 +428,7 @@ Return ONLY valid JSON, no markdown or explanations."""
         if not self.is_available():
             return LLMResponse(
                 success=False,
-                error="LLM service not available - check OpenAI API key configuration",
+                error="LLM service not available - check API key configuration",
             )
 
         # Create cache key from request parameters
@@ -412,7 +466,7 @@ Return ONLY valid JSON, no markdown or explanations."""
             logger.info(
                 f"Requesting workflow suggestions for: {request.dataset_description[:100]}..."
             )
-            result = await self.workflow_agent.run(prompt)
+            result = await self._call_agent_with_retry(self.workflow_agent, prompt)
 
             # Parse the JSON string output
             import json
@@ -420,13 +474,7 @@ Return ONLY valid JSON, no markdown or explanations."""
             try:
                 logger.info(f"Workflow output: {result.output[:200]}...")
                 # Clean up the output in case it has markdown formatting
-                json_str = result.output.strip()
-                if json_str.startswith("```"):
-                    # Remove markdown code blocks
-                    json_str = json_str.split("```")[1]
-                    if json_str.startswith("json"):
-                        json_str = json_str[4:]
-                    json_str = json_str.strip()
+                json_str = self._clean_json_response(result.output)
 
                 parsed = json.loads(json_str)
                 # Create WorkflowRecommendation models from parsed JSON
