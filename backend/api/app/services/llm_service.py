@@ -30,7 +30,18 @@ logger = logging.getLogger(__name__)
 
 
 class LLMService:
-    """Service for handling LLM interactions using pydantic-ai"""
+    """
+    Service for handling LLM interactions using pydantic-ai.
+
+    Supports two configuration approaches:
+    1. SINGLE MODEL: Set only AI_MODEL - uses same model for reasoning and formatting
+    2. HYBRID: Set AI_REASONING_MODEL + AI_FORMATTING_MODEL for cost optimization
+       (expensive model for reasoning, cheap model for formatting)
+
+    The hybrid approach uses a two-phase process:
+    - Phase 1: Reasoning model analyzes the query and extracts intent
+    - Phase 2: Formatting model converts analysis to structured JSON
+    """
 
     def __init__(self, cache: CacheService):
         self.cache = cache
@@ -94,9 +105,15 @@ class LLMService:
 
             self.model = self.formatting_model  # Default to formatting model
 
-            logger.info(f"Initialized hybrid models:")
-            logger.info(f"  Reasoning: {self.settings.AI_REASONING_MODEL}")
-            logger.info(f"  Formatting: {self.settings.AI_FORMATTING_MODEL}")
+            # Log configuration approach
+            if self.settings.AI_REASONING_MODEL == self.settings.AI_FORMATTING_MODEL:
+                logger.info(
+                    f"Initialized LLM service (SINGLE MODEL): {self.settings.AI_REASONING_MODEL}"
+                )
+            else:
+                logger.info("Initialized LLM service (HYBRID):")
+                logger.info(f"  Reasoning: {self.settings.AI_REASONING_MODEL}")
+                logger.info(f"  Formatting: {self.settings.AI_FORMATTING_MODEL}")
 
             # Initialize reasoning agent for query understanding (phase 1 of hybrid approach)
             self.reasoning_agent = Agent[str](
