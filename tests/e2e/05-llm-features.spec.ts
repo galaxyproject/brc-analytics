@@ -12,9 +12,12 @@ test.describe("BRC Analytics - LLM/AI Features", () => {
 
     expect(health.status).toBe("healthy");
     expect(health.llm_available).toBe(true);
-    expect(health.model_configured).toBe(true);
-    expect(health.agents_initialized.search_agent).toBe(true);
+    expect(health.models_configured.primary).toBe(true);
+    expect(health.agents_initialized.reasoning_agent).toBe(true);
+    expect(health.agents_initialized.formatting_agent).toBe(true);
     expect(health.agents_initialized.workflow_agent).toBe(true);
+    expect(health.workflow_catalog_loaded).toBe(true);
+    expect(health.workflow_count).toBeGreaterThan(0);
   });
 
   test("should interpret simple organism search query", async ({ request }) => {

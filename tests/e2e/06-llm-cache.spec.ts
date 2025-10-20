@@ -62,7 +62,7 @@ test.describe("BRC Analytics - LLM Caching Behavior", () => {
     if (finalData.data.hits > initialData.data.hits) {
       console.log("✅ Cache hit detected!");
       // If cache hit, results should be identical
-      expect(result2.cached).toBe(true);
+      expect(result2.metadata?.interpretation_cached).toBe(true);
     } else {
       console.log("⚠️ No cache hit - might be due to LLM response format");
       // Without cache, at least check both have similar structure

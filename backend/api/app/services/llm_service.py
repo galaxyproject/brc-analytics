@@ -480,7 +480,11 @@ Return ONLY valid JSON, no markdown or explanations."""
                 available_workflows = []
 
             # Create detailed prompt for workflow recommendation
-            workflows_context = json.dumps(available_workflows, indent=2) if available_workflows else "No workflows available"
+            workflows_context = (
+                json.dumps(available_workflows, indent=2)
+                if available_workflows
+                else "No workflows available"
+            )
 
             prompt = f"""
             Available workflows in our catalog:
