@@ -256,4 +256,8 @@ async def llm_health_check(llm_service: LLMService = Depends(get_llm_service)):
             "search_agent": llm_service.search_agent is not None,
             "workflow_agent": llm_service.workflow_agent is not None,
         },
+        "workflow_catalog_loaded": llm_service.workflow_catalog is not None,
+        "workflow_count": (
+            llm_service.workflow_catalog.count() if llm_service.workflow_catalog else 0
+        ),
     }
