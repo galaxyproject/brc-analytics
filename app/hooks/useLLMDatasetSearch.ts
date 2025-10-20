@@ -96,6 +96,15 @@ function handleSearchError(error: unknown): string {
   const err = error as { message?: string; name?: string };
   if (err.name === "TimeoutError") {
     return "Search timed out. Please try again.";
+  } else if (err.message?.includes("400")) {
+    // Check for low confidence / invalid query error
+    if (
+      err.message?.includes("confidence") ||
+      err.message?.includes("specific")
+    ) {
+      return "Your query couldn't be interpreted. Try providing more specific bioinformatics terms (organism name, experiment type, etc.).";
+    }
+    return "Invalid search query. Please provide more details.";
   } else if (err.message?.includes("503")) {
     return "AI service temporarily unavailable. Please try the traditional search.";
   } else if (err.message?.includes("429")) {

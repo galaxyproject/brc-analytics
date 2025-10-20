@@ -88,4 +88,7 @@ class LLMResponse(BaseModel):
     raw_response: Optional[str] = Field(None, description="Raw text response from LLM")
     tokens_used: Optional[int] = Field(None, description="Number of tokens consumed")
     model_used: Optional[str] = Field(None, description="Which model was used")
+    cached: bool = Field(
+        default=False, description="Whether this response came from cache"
+    )
     error: Optional[str] = Field(None, description="Error message if unsuccessful")

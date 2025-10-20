@@ -167,7 +167,7 @@ async def natural_language_search(
         if request.include_metadata:
             response_data["metadata"] = {
                 "model_used": interpretation_response.model_used,
-                "interpretation_cached": ena_results["cached"],
+                "interpretation_cached": interpretation_response.cached,
                 "search_cached": ena_results["cached"],
             }
 

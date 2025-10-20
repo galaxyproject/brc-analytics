@@ -15,10 +15,25 @@ interface SearchResultsProps {
   response: DatasetSearchResponse;
 }
 
+/**
+ * Maps technical search method values to user-friendly display names
+ * @param method - Technical search method from backend
+ * @returns User-friendly display name
+ */
+function getSearchMethodDisplay(method: string): string {
+  const methodMap: Record<string, string> = {
+    failed: "Search encountered an error",
+    keywords: "Keyword-based search",
+    none: "No search performed",
+    taxonomy: "Taxonomy-based search",
+  };
+  return methodMap[method] || method;
+}
+
 export const SearchResults = ({
   response,
 }: SearchResultsProps): JSX.Element => {
-  const { cached, count, interpretation, llm_tokens_used, results } = response;
+  const { count, interpretation, metadata, results } = response;
 
   return (
     <ResultsContainer>
@@ -80,27 +95,38 @@ export const SearchResults = ({
             </Box>
           )}
 
-          <Box
-            display="flex"
-            alignItems="center"
-            justifyContent="space-between"
-          >
+          <Box display="flex" flexDirection="column" gap={1}>
             <Typography variant="body2" color="text.secondary">
               <strong>Confidence:</strong>{" "}
               {Math.round(interpretation.confidence * 100)}%
             </Typography>
-            <Box display="flex" alignItems="center" gap={1}>
-              {cached && (
+
+            {metadata?.model_used && (
+              <Typography variant="body2" color="text.secondary">
+                <strong>AI Models:</strong> {metadata.model_used}
+              </Typography>
+            )}
+
+            <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
+              {metadata?.interpretation_cached && (
                 <Chip
-                  label="Cached Result"
+                  label="Interpretation Cached"
                   size="small"
                   color="success"
                   variant="outlined"
                 />
               )}
-              {llm_tokens_used && (
+              {metadata?.search_cached && (
+                <Chip
+                  label="Search Cached"
+                  size="small"
+                  color="success"
+                  variant="outlined"
+                />
+              )}
+              {response.llm_tokens_used && (
                 <Typography variant="caption" color="text.secondary">
-                  Tokens: {llm_tokens_used.toLocaleString()}
+                  Tokens: {response.llm_tokens_used.toLocaleString()}
                 </Typography>
               )}
             </Box>
@@ -115,7 +141,7 @@ export const SearchResults = ({
             Found {count.toLocaleString()} dataset{count !== 1 ? "s" : ""}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Search method: {response.search_method}
+            Search method: {getSearchMethodDisplay(response.search_method)}
           </Typography>
         </ResultStats>
 

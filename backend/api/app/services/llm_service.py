@@ -25,6 +25,7 @@ from app.models.llm import (
     WorkflowSuggestionRequest,
 )
 from app.services.sambanova_patch import patch_sambanova_compatibility
+from app.services.workflow_catalog import WorkflowCatalog
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +55,7 @@ class LLMService:
             self.reasoning_agent = None
             self.formatting_agent = None
             self.workflow_agent = None
+            self.workflow_catalog = None
             return
 
         try:
@@ -191,24 +193,28 @@ You MUST respond with ONLY a valid JSON array matching this EXACT structure:
 ]
 
 CRITICAL FIELD REQUIREMENTS:
-- workflow_id: lowercase with hyphens (required)
+- workflow_id: exact ID from the provided catalog (required)
 - workflow_name: human-readable name (required)
 - confidence: number between 0.0 and 1.0 (required)
-- reasoning: detailed explanation (required, not "reason")
+- reasoning: detailed explanation of why this workflow matches the request (required, not "reason")
 - parameters: object with key-value pairs or null (optional)
 - compatibility_notes: string or null (optional)
 
-Common workflows by data type:
-- RNA-seq: salmon-deseq2, kallisto-sleuth, hisat2-stringtie, star-rsem
-- DNA-seq/WGS: bwa-gatk, bowtie2-freebayes, minimap2-bcftools
-- ChIP-seq: macs2-chipseq, sicer-chipseq, homer-chipseq
-- ATAC-seq: macs2-atacseq, genrich-atacseq
-- Variant calling: gatk-haplotypecaller, freebayes-vcf, bcftools-call
-
 Provide 1-3 recommendations ranked by confidence.
+The workflow catalog will be provided in each request - select only from that catalog.
 
 Return ONLY the JSON array. No markdown code blocks, no explanations, no extra text.""",
             )
+
+            # Load workflow catalog for recommendations
+            try:
+                self.workflow_catalog = WorkflowCatalog(self.settings.CATALOG_PATH)
+                logger.info(
+                    f"Loaded {self.workflow_catalog.count()} workflows from catalog"
+                )
+            except Exception as catalog_error:
+                logger.warning(f"Failed to load workflow catalog: {catalog_error}")
+                self.workflow_catalog = None
 
             logger.info("LLM service initialized successfully")
 
@@ -219,6 +225,7 @@ Return ONLY the JSON array. No markdown code blocks, no explanations, no extra t
             self.reasoning_agent = None
             self.formatting_agent = None
             self.workflow_agent = None
+            self.workflow_catalog = None
 
     def is_available(self) -> bool:
         """Check if LLM service is available"""
@@ -311,6 +318,7 @@ Return ONLY the JSON array. No markdown code blocks, no explanations, no extra t
                 raw_response=cached_result.get("raw_response"),
                 tokens_used=cached_result.get("tokens_used"),
                 model_used=cached_result.get("model_used"),
+                cached=True,
             )
 
         try:
@@ -457,11 +465,27 @@ Return ONLY valid JSON, no markdown or explanations."""
                 raw_response=cached_result.get("raw_response"),
                 tokens_used=cached_result.get("tokens_used"),
                 model_used=cached_result.get("model_used"),
+                cached=True,
             )
 
         try:
+            # Get available workflows (filter by organism if specified)
+            if self.workflow_catalog and request.organism_taxonomy_id:
+                available_workflows = self.workflow_catalog.get_workflows_for_organism(
+                    request.organism_taxonomy_id
+                )
+            elif self.workflow_catalog:
+                available_workflows = self.workflow_catalog.workflows
+            else:
+                available_workflows = []
+
             # Create detailed prompt for workflow recommendation
+            workflows_context = json.dumps(available_workflows, indent=2) if available_workflows else "No workflows available"
+
             prompt = f"""
+            Available workflows in our catalog:
+            {workflows_context}
+
             Dataset Description: {request.dataset_description}
             Analysis Goal: {request.analysis_goal}
 
@@ -470,7 +494,8 @@ Return ONLY valid JSON, no markdown or explanations."""
             - Experiment Type: {request.experiment_type or "Not specified"}
             - Data Format: {request.data_format or "Not specified"}
 
-            Please recommend 1-3 appropriate bioinformatics workflows for this analysis, ranked by suitability.
+            Please recommend 1-3 workflows from the above catalog that best match this analysis.
+            IMPORTANT: You must ONLY recommend workflows that exist in the catalog above. Use the exact "id" value from the catalog as the workflow_id.
             """
 
             logger.info(

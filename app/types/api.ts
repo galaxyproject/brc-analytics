@@ -41,6 +41,7 @@ export interface ENAResult {
 export interface DatasetSearchResponse {
   cached: boolean;
   count: number;
+  ena_error?: string;
   interpretation: DatasetInterpretation;
   llm_tokens_used?: number;
   metadata?: {
@@ -51,7 +52,7 @@ export interface DatasetSearchResponse {
   query: string;
   results: ENAResult[];
   search_method: string;
-  status: string;
+  status: "success" | "partial" | "invalid_query";
 }
 
 export interface WorkflowSuggestionRequest {
