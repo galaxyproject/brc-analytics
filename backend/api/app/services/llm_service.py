@@ -1,6 +1,6 @@
 import asyncio
+import json
 import logging
-import os
 from typing import Any, Dict, List, Optional
 
 from pydantic_ai import Agent
@@ -33,14 +33,14 @@ class LLMService:
     """
     Service for handling LLM interactions using pydantic-ai.
 
-    Supports two configuration approaches:
-    1. SINGLE MODEL: Set only AI_MODEL - uses same model for reasoning and formatting
-    2. HYBRID: Set AI_REASONING_MODEL + AI_FORMATTING_MODEL for cost optimization
-       (expensive model for reasoning, cheap model for formatting)
+    Configuration:
+    - AI_PRIMARY_MODEL (required): Used for reasoning and critical tasks
+    - AI_SECONDARY_MODEL (optional): Used for formatting/simple tasks
+      If not set, falls back to AI_PRIMARY_MODEL (single-model mode)
 
-    The hybrid approach uses a two-phase process:
-    - Phase 1: Reasoning model analyzes the query and extracts intent
-    - Phase 2: Formatting model converts analysis to structured JSON
+    Two-phase process:
+    - Phase 1: Primary model analyzes the query and extracts intent
+    - Phase 2: Secondary model converts analysis to structured JSON
     """
 
     def __init__(self, cache: CacheService):
@@ -49,9 +49,8 @@ class LLMService:
 
         if not self.settings.AI_API_KEY:
             logger.warning("AI API key not configured - LLM features will be disabled")
-            self.reasoning_model = None
-            self.formatting_model = None
-            self.model = None
+            self.primary_model = None
+            self.secondary_model = None
             self.reasoning_agent = None
             self.formatting_agent = None
             self.workflow_agent = None
@@ -77,11 +76,11 @@ class LLMService:
                 # Use Anthropic's native API with provider
                 logger.info("Using Anthropic API")
                 anthropic_provider = AnthropicProvider(api_key=self.settings.AI_API_KEY)
-                self.reasoning_model = AnthropicModel(
-                    self.settings.AI_REASONING_MODEL, provider=anthropic_provider
+                self.primary_model = AnthropicModel(
+                    self.settings.AI_PRIMARY_MODEL, provider=anthropic_provider
                 )
-                self.formatting_model = AnthropicModel(
-                    self.settings.AI_FORMATTING_MODEL, provider=anthropic_provider
+                self.secondary_model = AnthropicModel(
+                    self.settings.AI_SECONDARY_MODEL, provider=anthropic_provider
                 )
             else:
                 # Use OpenAI-compatible API (OpenAI, LiteLLM, etc.) with provider
@@ -96,28 +95,26 @@ class LLMService:
                     api_key=self.settings.AI_API_KEY,
                     base_url=self.settings.AI_API_BASE_URL,
                 )
-                self.reasoning_model = OpenAIChatModel(
-                    self.settings.AI_REASONING_MODEL, provider=openai_provider
+                self.primary_model = OpenAIChatModel(
+                    self.settings.AI_PRIMARY_MODEL, provider=openai_provider
                 )
-                self.formatting_model = OpenAIChatModel(
-                    self.settings.AI_FORMATTING_MODEL, provider=openai_provider
+                self.secondary_model = OpenAIChatModel(
+                    self.settings.AI_SECONDARY_MODEL, provider=openai_provider
                 )
-
-            self.model = self.formatting_model  # Default to formatting model
 
             # Log configuration approach
-            if self.settings.AI_REASONING_MODEL == self.settings.AI_FORMATTING_MODEL:
+            if self.settings.AI_PRIMARY_MODEL == self.settings.AI_SECONDARY_MODEL:
                 logger.info(
-                    f"Initialized LLM service (SINGLE MODEL): {self.settings.AI_REASONING_MODEL}"
+                    f"Initialized LLM service (SINGLE MODEL): {self.settings.AI_PRIMARY_MODEL}"
                 )
             else:
-                logger.info("Initialized LLM service (HYBRID):")
-                logger.info(f"  Reasoning: {self.settings.AI_REASONING_MODEL}")
-                logger.info(f"  Formatting: {self.settings.AI_FORMATTING_MODEL}")
+                logger.info("Initialized LLM service (DUAL MODEL):")
+                logger.info(f"  Primary: {self.settings.AI_PRIMARY_MODEL}")
+                logger.info(f"  Secondary: {self.settings.AI_SECONDARY_MODEL}")
 
-            # Initialize reasoning agent for query understanding (phase 1 of hybrid approach)
+            # Initialize reasoning agent for query understanding (uses primary model)
             self.reasoning_agent = Agent[str](
-                self.reasoning_model,
+                self.primary_model,
                 system_prompt="""You are a bioinformatics data search expert. Analyze the user's query and identify:
 - Organism/species (use scientific names, be specific - e.g., "Plasmodium falciparum" not "Plasmodium spp.")
 - Experiment type (RNA-seq, WGS, ChIP-seq, etc.)
@@ -145,9 +142,9 @@ Sequencing platforms:
 Provide a clear, structured analysis. If the query is invalid or nonsense, clearly indicate this.""",
             )
 
-            # Initialize formatting agent for JSON conversion (phase 2 of hybrid approach)
+            # Initialize formatting agent for JSON conversion (uses secondary model)
             self.formatting_agent = Agent[str](
-                self.formatting_model,
+                self.secondary_model,
                 system_prompt="""You are a JSON formatting assistant.
 Convert the analysis into a structured DatasetQuery JSON object.
 
@@ -174,9 +171,9 @@ CONFIDENCE SCORING:
 Output ONLY the JSON object, no markdown, no backticks, no explanations.""",
             )
 
-            # Initialize workflow recommendation agent
+            # Initialize workflow recommendation agent (uses secondary model)
             self.workflow_agent = Agent[str](
-                self.model,
+                self.secondary_model,
                 system_prompt="""You are a bioinformatics workflow expert helping researchers choose appropriate analysis pipelines.
 
 Based on dataset characteristics and analysis goals, recommend suitable workflows from common bioinformatics pipelines.
@@ -217,16 +214,15 @@ Return ONLY the JSON array. No markdown code blocks, no explanations, no extra t
 
         except Exception as e:
             logger.error(f"Failed to initialize LLM service: {e}")
-            self.reasoning_model = None
-            self.formatting_model = None
-            self.model = None
+            self.primary_model = None
+            self.secondary_model = None
             self.reasoning_agent = None
             self.formatting_agent = None
             self.workflow_agent = None
 
     def is_available(self) -> bool:
         """Check if LLM service is available"""
-        return self.reasoning_model is not None and self.formatting_model is not None
+        return self.primary_model is not None and self.secondary_model is not None
 
     @retry(
         stop=stop_after_attempt(3),
@@ -305,10 +301,9 @@ Return ONLY the JSON array. No markdown code blocks, no explanations, no extra t
         if cached_result:
             logger.info(f"Cache hit for LLM interpretation: {user_query[:50]}...")
             # Handle cached data which might be a string (JSON) or dict
+            # TODO: Fix root cause of double-serialization in cache.py (see LLM_SERVICE_REVIEW.md #3)
             cached_data = cached_result["data"]
             if isinstance(cached_data, str):
-                import json
-
                 cached_data = json.loads(cached_data)
             return LLMResponse(
                 success=True,
@@ -355,7 +350,7 @@ Return ONLY the JSON array. No markdown code blocks, no explanations, no extra t
                     tokens_used=reasoning_result.usage().total_tokens
                     if hasattr(reasoning_result, "usage")
                     else 0,
-                    model_used=self.settings.AI_REASONING_MODEL,
+                    model_used=self.settings.AI_PRIMARY_MODEL,
                 )
 
             # PHASE 2: Use pre-initialized formatting agent to create structured JSON
@@ -386,8 +381,6 @@ Return ONLY valid JSON, no markdown or explanations."""
             )
 
             # Parse the JSON string output
-            import json
-
             try:
                 logger.info(f"Formatting agent output: {result.output[:200]}...")
                 # Clean up the output in case it has markdown formatting
@@ -414,7 +407,7 @@ Return ONLY valid JSON, no markdown or explanations."""
                     else 0
                 )
                 + (result.usage().total_tokens if hasattr(result, "usage") else 0),
-                model_used=f"{self.settings.AI_REASONING_MODEL} + {self.settings.AI_FORMATTING_MODEL}",
+                model_used=f"{self.settings.AI_PRIMARY_MODEL} + {self.settings.AI_SECONDARY_MODEL}",
             )
 
             # Cache the result
@@ -486,8 +479,6 @@ Return ONLY valid JSON, no markdown or explanations."""
             result = await self._call_agent_with_retry(self.workflow_agent, prompt)
 
             # Parse the JSON string output
-            import json
-
             try:
                 logger.info(f"Workflow output: {result.output[:200]}...")
                 # Clean up the output in case it has markdown formatting
@@ -514,7 +505,7 @@ Return ONLY valid JSON, no markdown or explanations."""
                 tokens_used=result.usage().total_tokens
                 if hasattr(result, "usage")
                 else None,
-                model_used=self.settings.AI_MODEL,
+                model_used=self.settings.AI_SECONDARY_MODEL,
             )
 
             # Cache the result

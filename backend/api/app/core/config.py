@@ -21,13 +21,10 @@ class Settings:
     AI_API_KEY: str = os.getenv(
         "AI_API_KEY", os.getenv("OPENAI_API_KEY", "")
     )  # Fallback to OPENAI_API_KEY for backwards compatibility
-    AI_MODEL: str = os.getenv("AI_MODEL", "gpt-4-turbo-preview")
-    AI_REASONING_MODEL: str = os.getenv(
-        "AI_REASONING_MODEL", os.getenv("AI_MODEL", "gpt-4-turbo-preview")
-    )
-    AI_FORMATTING_MODEL: str = os.getenv(
-        "AI_FORMATTING_MODEL", os.getenv("AI_MODEL", "gpt-4-turbo-preview")
-    )
+    AI_PRIMARY_MODEL: str = os.getenv("AI_PRIMARY_MODEL", "gpt-4-turbo-preview")
+    AI_SECONDARY_MODEL: str = os.getenv(
+        "AI_SECONDARY_MODEL", os.getenv("AI_PRIMARY_MODEL", "gpt-4-turbo-preview")
+    )  # Falls back to primary if not set
     AI_API_BASE_URL: str = os.getenv(
         "AI_API_BASE_URL", ""
     )  # Empty means use OpenAI default; set for custom endpoints
