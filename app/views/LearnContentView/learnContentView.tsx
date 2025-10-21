@@ -1,16 +1,19 @@
 import { Fragment } from "react";
 import { StaticProps } from "../../docs/common/staticGeneration/types";
 import { SectionHero } from "../../components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
+import { MDXRemote } from "next-mdx-remote";
+import { MDX_COMPONENTS } from "../../docs/common/mdx/constants";
 
 export const LearnContentView = (props: StaticProps): JSX.Element => {
+  const { frontmatter, mdxSource } = props;
   return (
     <Fragment>
       <SectionHero
-        breadcrumbs={props.frontmatter.breadcrumbs || []}
-        head={props.frontmatter.title}
-        subHead={props.frontmatter.subtitle}
+        breadcrumbs={frontmatter.breadcrumbs || []}
+        head={frontmatter.title}
+        subHead={frontmatter.subtitle}
       />
-      <h1>{props.frontmatter.description}</h1>
+      <MDXRemote {...mdxSource} components={MDX_COMPONENTS} />
     </Fragment>
   );
 };
