@@ -8,6 +8,7 @@ const MAX_ROWS = 3;
  * @returns section overview links, evenly split into two arrays.
  */
 export function splitLinks(links: LinkProps[]): LinkProps[][] {
-  const sliceIndex = Math.max(MAX_ROWS, Math.ceil(links.length / 2));
+  if (links.length <= MAX_ROWS) return [links];
+  const sliceIndex = Math.ceil(links.length / 2);
   return [links.slice(0, sliceIndex), links.slice(sliceIndex)];
 }
