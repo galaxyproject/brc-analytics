@@ -5,4 +5,5 @@ export interface StaticProps {
   frontmatter: Frontmatter;
   mdxSource: MDXRemoteSerializeResult;
   pageTitle: string;
+  slug: string[];
 }

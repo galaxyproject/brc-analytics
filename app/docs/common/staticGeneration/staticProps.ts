@@ -44,11 +44,9 @@ export async function buildStaticProps(
     scope: { ...serializeOptions.scope, frontmatter },
   });
 
+  const { title: pageTitle } = frontmatter;
+
   return {
-    props: {
-      frontmatter,
-      mdxSource,
-      pageTitle: frontmatter.title,
-    },
+    props: { frontmatter, mdxSource, pageTitle, slug },
   };
 }
