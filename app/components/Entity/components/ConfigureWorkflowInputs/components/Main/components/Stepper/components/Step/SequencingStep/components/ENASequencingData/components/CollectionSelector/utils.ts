@@ -128,7 +128,9 @@ export function getDescriptionRequirement(
  */
 export function getWorkflowParameter(
   workflow: Workflow,
-  stepKey: SEQUENCING_DATA_TYPE
+  stepKey:
+    | SEQUENCING_DATA_TYPE.READ_RUNS_PAIRED
+    | SEQUENCING_DATA_TYPE.READ_RUNS_SINGLE
 ): WorkflowParameter | undefined {
   return workflow.parameters.find(
     ({ variable }) => variable === WORKFLOW_PARAMETER_BY_STEP_KEY[stepKey]
@@ -142,7 +144,9 @@ export function getWorkflowParameter(
  * @returns Filters with layout, strategy, source, and other requirements.
  */
 export function buildFilters(
-  stepKey: SEQUENCING_DATA_TYPE,
+  stepKey:
+    | SEQUENCING_DATA_TYPE.READ_RUNS_PAIRED
+    | SEQUENCING_DATA_TYPE.READ_RUNS_SINGLE,
   workflowParameter?: WorkflowParameter
 ): Record<string, string[]> {
   const filters: Record<string, string[]> = {};
@@ -198,7 +202,9 @@ export function buildFilters(
 export function preSelectColumnFilters<T>(
   workflow: Workflow,
   rows: T[],
-  stepKey: SEQUENCING_DATA_TYPE
+  stepKey:
+    | SEQUENCING_DATA_TYPE.READ_RUNS_PAIRED
+    | SEQUENCING_DATA_TYPE.READ_RUNS_SINGLE
 ): ColumnFiltersState {
   const workflowParameter = getWorkflowParameter(workflow, stepKey);
   const filters = buildFilters(stepKey, workflowParameter);
