@@ -1,6 +1,9 @@
 import { GetStaticPaths, GetStaticProps } from "next";
 import { StyledPagesMain } from "../../app/components/Layout/components/Main/main.styles";
 import { LearnContentView } from "../../app/views/LearnContentView/learnContentView";
+import { buildStaticPaths } from "../../app/docs/common/staticGeneration/staticPaths";
+
+const SECTION = "learn";
 
 const Page = (): JSX.Element => {
   return <LearnContentView />;
@@ -13,10 +16,7 @@ export const getStaticProps: GetStaticProps = async () => {
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  return {
-    fallback: false,
-    paths: [{ params: { slug: ["featured-analyses"] } }],
-  };
+  return { fallback: false, paths: buildStaticPaths([SECTION]) };
 };
 
 export default Page;
