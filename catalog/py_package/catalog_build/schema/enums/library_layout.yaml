@@ -1,0 +1,11 @@
+id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/enums/library_layout.yaml#
+name: enums_library_layout
+
+enums:
+  LibraryLayout:
+    description: Enumeration of possible library layouts for sequencing data.
+    permissible_values:
+      PAIRED:
+        description: Paired-end sequencing reads
+      SINGLE:
+        description: Single-end sequencing reads

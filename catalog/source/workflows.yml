@@ -1,5 +1,5 @@
 workflows:
-  - trs_id: "#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.5"
+  - trs_id: "#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.6"
     categories:
       - ANNOTATION
     workflow_name: AMR gene detection
@@ -18,6 +18,12 @@ workflows:
         type_guide:
           class: text
       - key: Select a virulence genes detection database
+        type_guide:
+          class: text
+      - key: Select a StarmAMR database
+        type_guide:
+          class: text
+      - key: Select species for point mutation analysis using PointFinder
         type_guide:
           class: text
     active: true
@@ -105,6 +111,9 @@ workflows:
         variable: ASSEMBLY_ID
       - key: PE fastq input
         variable: SANGER_READ_RUN_PAIRED
+        data_requirements:
+          library_strategy: ["ATAC-seq"]
+          library_layout: "PAIRED"
         type_guide:
           class: Collection
           collection_type: list:paired
@@ -162,10 +171,54 @@ workflows:
             - fastqsanger.gz
     active: false
     iwc_id: bacterial-genome-assembly-main
+  - trs_id: "#workflow/github.com/iwc-workflows/bacterial-quality-and-contamination-control-post-assembly/main/versions/v1.0.1"
+    categories: []
+    workflow_name:
+      Post-Assembly Quality Control and Contamination Check for Bacterial
+      Genomes
+    workflow_description:
+      This workflow performs quality and contamination control analysis
+      on assembled contigs to assess bacterial genome quality and taxonomic assignment
+    ploidy: ANY
+    parameters:
+      - key: Input sequence reads (forward)
+        type_guide:
+          class: File
+          ext:
+            - fastq
+            - fastq.gz
+            - fastqsanger
+            - fastqsanger.gz
+      - key: Input sequence reads (reverse)
+        type_guide:
+          class: File
+          ext:
+            - fastq
+            - fastq.gz
+            - fastqsanger
+            - fastqsanger.gz
+      - key: Fastq boolean
+        type_guide:
+          class: boolean
+      - key: Fasta boolean
+        type_guide:
+          class: boolean
+      - key: Input sequence contigs FASTA
+        type_guide:
+          class: File
+          ext: fasta
+      - key: Select a taxonomy database
+        type_guide:
+          class: text
+      - key: Select a NCBI taxonomy database
+        type_guide:
+          class: text
+    active: false
+    iwc_id: bacterial-quality-and-contamination-control-post-assembly-main
   - trs_id: "#workflow/github.com/iwc-workflows/bacterial_genome_annotation/main/versions/v1.1.11"
     categories:
       - ANNOTATION
-    workflow_name: Bacterial Genome Annotation
+    workflow_name: Bacterial genome annotation
     workflow_description:
       Annotation of an assembled bacterial genomes to detect genes,
       potential plasmids, integrons and Insertion sequence (IS) elements.
@@ -297,6 +350,9 @@ workflows:
         variable: ASSEMBLY_ID
       - key: PE fastq input
         variable: SANGER_READ_RUN_PAIRED
+        data_requirements:
+          library_strategy: ["ChIP-Seq"]
+          library_layout: "PAIRED"
         type_guide:
           class: Collection
           collection_type: list:paired
@@ -331,6 +387,9 @@ workflows:
         variable: ASSEMBLY_ID
       - key: SR fastq input
         variable: SANGER_READ_RUN_SINGLE
+        data_requirements:
+          library_strategy: ["ChIP-Seq"]
+          library_layout: "SINGLE"
         type_guide:
           class: Collection
           collection_type: list
@@ -449,6 +508,10 @@ workflows:
         variable: ASSEMBLY_ID
       - key: PE fastq input
         variable: SANGER_READ_RUN_PAIRED
+        data_requirements:
+          library_strategy: ["OTHER"]
+          library_layout: "PAIRED"
+          description: "CUT&RUN"
         type_guide:
           class: Collection
           collection_type: list:paired
@@ -466,7 +529,7 @@ workflows:
           class: boolean
     active: true
     iwc_id: cutandrun-main
-  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.2"
+  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.3"
     categories:
       - TRANSCRIPTOMICS
     workflow_name:
@@ -486,6 +549,10 @@ workflows:
       - key: gtf
         variable: GENE_MODEL_URL
       - key: fastq PE collection GEX
+        variable: SANGER_READ_RUN_PAIRED
+        data_requirements:
+          library_source: ["TRANSCRIPTOMIC SINGLE CELL"]
+          library_layout: "PAIRED"
         type_guide:
           class: Collection
           collection_type: list:paired
@@ -509,7 +576,7 @@ workflows:
           class: integer
     active: true
     iwc_id: fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-cellplex
-  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.2"
+  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.3"
     categories:
       - TRANSCRIPTOMICS
     workflow_name:
@@ -528,6 +595,9 @@ workflows:
         variable: GENE_MODEL_URL
       - key: fastq PE collection
         variable: SANGER_READ_RUN_PAIRED
+        data_requirements:
+          library_source: ["TRANSCRIPTOMIC SINGLE CELL"]
+          library_layout: "PAIRED"
         type_guide:
           class: Collection
           collection_type: list:paired
@@ -539,6 +609,20 @@ workflows:
           class: boolean
     active: true
     iwc_id: fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-v3
+  - trs_id: "#workflow/github.com/iwc-workflows/functional-annotation-protein-sequences/main/versions/v0.1"
+    categories:
+      - ANNOTATION
+    workflow_name: Functional annotation of protein sequences
+    workflow_description:
+      This workflow uses eggNOG mapper and InterProScan for functional
+      annotation of protein sequences.
+    ploidy: ANY
+    parameters:
+      - key: input
+        type_guide:
+          class: File
+    active: false
+    iwc_id: functional-annotation-protein-sequences-main
   - trs_id: "#workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main/versions/v0.1"
     categories:
       - CONSENSUS_SEQUENCES
@@ -554,18 +638,21 @@ workflows:
     taxonomy_id: 11158
     parameters:
       - key: Paired collection of sequencing data
+        variable: SANGER_READ_RUN_PAIRED
         type_guide:
           class: Collection
           collection_type: list:paired
-        variable: SANGER_READ_RUN_PAIRED
+        data_requirements:
+          library_strategy: ["WGS", "AMPLICON"]
+          library_layout: "PAIRED"
       - key: Reference annotation
-        type_guide:
-          class: File
         variable: GENE_MODEL_URL
-      - key: Fasta reference genome
         type_guide:
           class: File
+      - key: Fasta reference genome
         variable: ASSEMBLY_FASTA_URL
+        type_guide:
+          class: File
       - key: Primer scheme (optional)
         type_guide:
           class: File
@@ -577,20 +664,6 @@ workflows:
           class: integer
     active: true
     iwc_id: generic-non-segmented-viral-variant-calling-main
-  - trs_id: "#workflow/github.com/iwc-workflows/functional-annotation-protein-sequences/main/versions/v0.1"
-    categories:
-      - ANNOTATION
-    workflow_name: Functional annotation of protein sequences
-    workflow_description:
-      This workflow uses eggNOG mapper and InterProScan for functional
-      annotation of protein sequences.
-    ploidy: ANY
-    parameters:
-      - key: input
-        type_guide:
-          class: File
-    active: false
-    iwc_id: functional-annotation-protein-sequences-main
   - trs_id: "#workflow/github.com/iwc-workflows/generic-variant-calling-wgs-pe/main/versions/v0.1.1"
     categories:
       - VARIANT_CALLING
@@ -602,6 +675,9 @@ workflows:
     parameters:
       - key: Paired Collection
         variable: SANGER_READ_RUN_PAIRED
+        data_requirements:
+          library_strategy: ["WGS"]
+          library_layout: "PAIRED"
         type_guide:
           class: Collection
           ext:
@@ -661,6 +737,9 @@ workflows:
     parameters:
       - key: Paired Collection
         variable: SANGER_READ_RUN_PAIRED
+        data_requirements:
+          library_strategy: ["WGS"]
+          library_layout: "PAIRED"
         type_guide:
           class: Collection
           ext:
@@ -964,13 +1043,12 @@ workflows:
           class: text
     active: false
     iwc_id: pseudobulk-worflow-decoupler-edger-main
-  - trs_id: "#workflow/github.com/iwc-workflows/quality-and-contamination-control/main/versions/v1.1.9"
-    categories:
-      - ASSEMBLY
-    workflow_name: Quality and Contamination Control For Genome Assembly
+  - trs_id: "#workflow/github.com/iwc-workflows/quality-and-contamination-control-raw-reads/main/versions/v1.1.10"
+    categories: []
+    workflow_name: Raw Read Quality and Contamination Control For Genome Assembly
     workflow_description:
       Short paired-end read analysis to provide quality analysis,
-      read cleaning and taxonomy assignation
+      read cleaning and taxonomy assignation directly from raw reads
     ploidy: ANY
     parameters:
       - key: Input sequence reads (forward)
@@ -996,7 +1074,7 @@ workflows:
         type_guide:
           class: text
     active: false
-    iwc_id: quality-and-contamination-control-main
+    iwc_id: quality-and-contamination-control-raw-reads-main
   - trs_id: "#workflow/github.com/iwc-workflows/repeatmasking/main/versions/v0.1"
     categories:
       - ANNOTATION
@@ -1063,6 +1141,9 @@ workflows:
         variable: GENE_MODEL_URL
       - key: Collection paired FASTQ files
         variable: SANGER_READ_RUN_PAIRED
+        data_requirements:
+          library_strategy: ["RNA-Seq"]
+          library_layout: "PAIRED"
         type_guide:
           class: Collection
           collection_type: list:paired
@@ -1112,6 +1193,9 @@ workflows:
         variable: GENE_MODEL_URL
       - key: Collection of FASTQ files
         variable: SANGER_READ_RUN_SINGLE
+        data_requirements:
+          library_strategy: ["RNA-Seq"]
+          library_layout: "SINGLE"
         type_guide:
           class: Collection
           collection_type: list
@@ -1219,6 +1303,9 @@ workflows:
     parameters:
       - key: Paired Collection
         variable: SANGER_READ_RUN_PAIRED
+        data_requirements:
+          library_strategy: ["WGS"]
+          library_layout: "PAIRED"
         type_guide:
           class: Collection
           ext:
@@ -1262,6 +1349,9 @@ workflows:
     parameters:
       - key: Paired Collection
         variable: SANGER_READ_RUN_PAIRED
+        data_requirements:
+          library_strategy: ["WGS"]
+          library_layout: "PAIRED"
         type_guide:
           class: Collection
           ext:
@@ -1287,7 +1377,10 @@ workflows:
           ext:
             - fastqsanger
             - fastqsanger.gz
-          variable: SANGER_READ_RUN_SINGLE
+        variable: SANGER_READ_RUN_SINGLE
+        data_requirements:
+          library_strategy: ["WGS"]
+          library_layout: "SINGLE"
       - key: NC_045512.2 FASTA sequence of SARS-CoV-2
         variable: ASSEMBLY_FASTA_URL
     active: true

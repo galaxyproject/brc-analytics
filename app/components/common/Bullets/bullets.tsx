@@ -4,6 +4,7 @@ interface BulletsProps {
   activeBullet: number;
   bullets: number[];
   className?: string;
+  interactionEnabled?: boolean;
   onBullet: (index: number) => void;
 }
 
@@ -11,8 +12,10 @@ export const Bullets = ({
   activeBullet,
   bullets,
   className,
+  interactionEnabled = true,
   onBullet,
-}: BulletsProps): JSX.Element => {
+}: BulletsProps): JSX.Element | null => {
+  if (!interactionEnabled) return null;
   return (
     <SectionBullets className={className}>
       {bullets.map((bullet) => (

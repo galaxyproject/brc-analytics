@@ -12,7 +12,6 @@ import {
   Workflow,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "../../../../components";
-import { STEPS as WORKFLOW_STEPS } from "../../../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/constants";
 import {
   GENOME_BROWSER,
   NCBI_ASSEMBLY,
@@ -47,6 +46,7 @@ import {
   GA2OrganismEntity,
 } from "../../../../apis/catalog/ga2/entities";
 import { sanitizeEntityId } from "../../../../apis/catalog/common/utils";
+import { StepConfig } from "../../../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 
 /**
  * Build props for the accession cell.
@@ -552,12 +552,14 @@ export const buildPriorityPathogenResources = (
  * @param entity - Entity with a taxonomicGroup property.
  * @returns Props for the NTagCell component.
  */
+type TaxonomicGroupEntity =
+  | BRCDataCatalogOrganism
+  | BRCDataCatalogGenome
+  | GA2AssemblyEntity
+  | GA2OrganismEntity;
+
 export const buildTaxonomicGroup = (
-  entity:
-    | BRCDataCatalogOrganism
-    | BRCDataCatalogGenome
-    | GA2AssemblyEntity
-    | GA2OrganismEntity
+  entity: TaxonomicGroupEntity
 ): ComponentProps<typeof C.NTagCell> => {
   return {
     label: "taxonomic groups",
@@ -571,7 +573,7 @@ export const buildTaxonomicGroup = (
  * @returns Props to be used for the cell.
  */
 export const buildTaxonomicLevelClass = (
-  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
+  entity: TaxonomicGroupEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.taxonomicLevelClass,
@@ -584,7 +586,7 @@ export const buildTaxonomicLevelClass = (
  * @returns Props to be used for the cell.
  */
 export const buildTaxonomicLevelDomain = (
-  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
+  entity: TaxonomicGroupEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.taxonomicLevelDomain,
@@ -597,7 +599,7 @@ export const buildTaxonomicLevelDomain = (
  * @returns Props to be used for the cell.
  */
 export const buildTaxonomicLevelFamily = (
-  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
+  entity: TaxonomicGroupEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.taxonomicLevelFamily,
@@ -610,7 +612,7 @@ export const buildTaxonomicLevelFamily = (
  * @returns Props to be used for the cell.
  */
 export const buildTaxonomicLevelGenus = (
-  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
+  entity: TaxonomicGroupEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.taxonomicLevelGenus,
@@ -623,7 +625,7 @@ export const buildTaxonomicLevelGenus = (
  * @returns Props to be used for the cell.
  */
 export const buildTaxonomicLevelKingdom = (
-  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
+  entity: TaxonomicGroupEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.taxonomicLevelKingdom,
@@ -636,7 +638,7 @@ export const buildTaxonomicLevelKingdom = (
  * @returns Props to be used for the cell.
  */
 export const buildTaxonomicLevelOrder = (
-  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
+  entity: TaxonomicGroupEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.taxonomicLevelOrder,
@@ -649,7 +651,7 @@ export const buildTaxonomicLevelOrder = (
  * @returns Props to be used for the cell.
  */
 export const buildTaxonomicLevelPhylum = (
-  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
+  entity: TaxonomicGroupEntity
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.taxonomicLevelPhylum,
@@ -921,14 +923,20 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
 /**
  * Build props for the workflow configuration KeyValuePairs component.
  * @param configuredInput - Configured inputs.
+ * @param configuredSteps - Configured steps.
  * @returns Props to be used for the KeyValuePairs component.
  */
 export const buildWorkflowConfiguration = (
-  configuredInput: ConfiguredInput
+  configuredInput: ConfiguredInput,
+  configuredSteps: StepConfig[]
 ): ComponentProps<typeof C.KeyValuePairs> => {
   const keyValuePairs = new Map<Key, Value>();
-  for (const stepConfig of WORKFLOW_STEPS) {
-    const value = stepConfig.renderValue(configuredInput);
+  for (const key of Object.keys(configuredInput)) {
+    // Find the step config, for the configured input.
+    const stepConfig = configuredSteps.find((step) => step.key === key);
+    if (!stepConfig) continue;
+    // Get the value for the configured input.
+    const value = stepConfig.renderValue?.(configuredInput);
     if (value === undefined) continue;
     keyValuePairs.set(stepConfig.label, value);
   }

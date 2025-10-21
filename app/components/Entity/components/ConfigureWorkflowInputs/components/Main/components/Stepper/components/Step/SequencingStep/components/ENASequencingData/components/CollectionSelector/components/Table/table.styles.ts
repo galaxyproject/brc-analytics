@@ -14,7 +14,9 @@ export const StyledGrid = styled(Grid)`
 
 export const StyledRoundedPaper = styled(RoundedPaper)`
   background-color: ${PALETTE.SMOKE_MAIN};
+  display: grid;
   flex: 1;
+  gap: 1px;
   max-height: 100%;
 
   .MuiTableContainer-root {

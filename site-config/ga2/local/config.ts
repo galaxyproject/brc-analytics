@@ -1,4 +1,3 @@
-import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import * as C from "../../../app/components";
 import { ROUTES } from "../../../routes/constants";
@@ -10,8 +9,16 @@ import {
 } from "../../../app/apis/catalog/ga2/entities";
 import { AppSiteConfig } from "../../common/entities";
 import { APP_KEYS } from "../../common/constants";
+import data from "catalog/ga2/output/ncbi-taxa-tree.json";
+import { TaxonomyNode } from "../../../app/components/Home/components/Section/components/SectionViz/data";
+import { THEME_OPTIONS } from "./theme/constants";
 
-const ALLOWED_PATHS = [ROUTES.ORGANISMS, ROUTES.GENOMES];
+const ALLOWED_PATHS = [
+  ROUTES.ABOUT,
+  ROUTES.ORGANISMS,
+  ROUTES.GENOMES,
+  // ROUTES.ROADMAP,
+];
 const LOCALHOST = "http://localhost:3000";
 const APP_TITLE = "Genome Ark 2";
 const BROWSER_URL = LOCALHOST;
@@ -21,6 +28,7 @@ const GIT_HUB_REPO_URL = "https://github.com/galaxyproject/ga2";
  * Make site config object.
  * @param browserUrl - Browser URL.
  * @param gitHubUrl - GitHub URL.
+ * @param taxTreeData - Taxonomy tree data.
  * @remarks
  * The `genomeEntityConfig` is typecast to `EntityConfig<GA2AssemblyEntity>`
  * because the `SiteConfig` interface from the `@databiosphere/findable-ui` package expects
@@ -34,7 +42,8 @@ const GIT_HUB_REPO_URL = "https://github.com/galaxyproject/ga2";
  */
 export function makeConfig(
   browserUrl: string,
-  gitHubUrl = GIT_HUB_REPO_URL
+  gitHubUrl = GIT_HUB_REPO_URL,
+  taxTreeData = data as TaxonomyNode
 ): AppSiteConfig {
   return {
     allowedPaths: ALLOWED_PATHS,
@@ -56,25 +65,29 @@ export function makeConfig(
       header: {
         logo: C.Logo({
           alt: APP_TITLE,
-          height: 26,
+          height: 28,
           link: "/",
-          src: "/logo/galaxy.png",
+          src: "/logo/ga2.svg",
         }),
         navigation: [
           undefined,
           [
+            { label: "About", url: ROUTES.ABOUT },
             { label: "Organisms", url: ROUTES.ORGANISMS },
             { label: "Assemblies", url: ROUTES.GENOMES },
+            // { label: "Roadmap", url: ROUTES.ROADMAP },
           ],
           undefined,
         ],
       },
     },
+    maxReadRunsForBrowseAll: 4000,
     redirectRootToPath: "/",
-    themeOptions: {},
+    taxTree: taxTreeData,
+    themeOptions: THEME_OPTIONS,
   };
 }
 
-const config: SiteConfig = makeConfig(BROWSER_URL);
+const config: AppSiteConfig = makeConfig(BROWSER_URL);
 
 export default config;

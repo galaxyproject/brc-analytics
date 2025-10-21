@@ -1,16 +1,10 @@
+import { WORKFLOW_PARAMETER_VARIABLE } from "../../../../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { SEQUENCING_DATA_TYPE } from "../../../../types";
-import { CATEGORY_CONFIGS } from "./hooks/UseTable/categoryConfigs";
 
-export const PRESELECTED_COLUMN_FILTERS: Record<
-  SEQUENCING_DATA_TYPE,
-  Record<string, string[]>
+export const WORKFLOW_PARAMETER_BY_STEP_KEY: Record<
+  SEQUENCING_DATA_TYPE.READ_RUNS_PAIRED | SEQUENCING_DATA_TYPE.READ_RUNS_SINGLE,
+  WORKFLOW_PARAMETER_VARIABLE
 > = {
-  [SEQUENCING_DATA_TYPE.READ_RUNS_PAIRED]: {
-    [CATEGORY_CONFIGS.LIBRARY_LAYOUT.key]: ["PAIRED"],
-    [CATEGORY_CONFIGS.LIBRARY_STRATEGY.key]: ["WGS"],
-  },
-  [SEQUENCING_DATA_TYPE.READ_RUNS_SINGLE]: {
-    [CATEGORY_CONFIGS.LIBRARY_LAYOUT.key]: ["SINGLE"],
-    [CATEGORY_CONFIGS.LIBRARY_STRATEGY.key]: ["WGS"],
-  },
+  readRunsPaired: WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_PAIRED,
+  readRunsSingle: WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE,
 };

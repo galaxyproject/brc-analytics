@@ -1,15 +1,16 @@
 import { Fragment } from "react";
-import { Typography, Container } from "@mui/material";
-import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
+import { SectionHero } from "../../../components/Home/components/Section/components/ga2/SectionHero/sectionHero";
+import { SectionAssemblies } from "../../../components/Home/components/Section/components/ga2/SectionAssemblies/sectionAssemblies";
+import { SectionSubHero } from "../../../components/Home/components/Section/components/ga2/SectionSubHero/sectionSubHero";
+import { SectionAnalyticsAndData } from "../../../components/Home/components/Section/components/ga2/SectionAnalyticsAndData/sectionAnalyticsAndData";
 
 export const HomeView = (): JSX.Element => {
   return (
     <Fragment>
-      <Container>
-        <Typography variant={TYPOGRAPHY_PROPS.VARIANT.HEADING_XLARGE}>
-          Genome Ark 2
-        </Typography>
-      </Container>
+      <SectionHero />
+      <SectionSubHero />
+      <SectionAssemblies />
+      <SectionAnalyticsAndData />
     </Fragment>
   );
 };

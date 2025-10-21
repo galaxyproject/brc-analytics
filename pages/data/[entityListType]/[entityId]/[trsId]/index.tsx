@@ -21,6 +21,9 @@ import {
 import { getEntityConfig } from "@databiosphere/findable-ui/lib/config/utils";
 import { WorkflowInputsView } from "../../../../../app/views/WorkflowInputsView/workflowInputsView";
 import { GA2AssemblyEntity } from "../../../../../app/apis/catalog/ga2/entities";
+import { CUSTOM_WORKFLOW } from "../../../../../app/components/Entity/components/AnalysisMethod/components/CustomWorkflow/constants";
+import Error from "next/error";
+import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 
 interface StaticPath {
   params: PageUrlParams;
@@ -86,6 +89,17 @@ export const getStaticProps = async (
     .flatMap((w) => w.workflows)
     .find((workflow) => formatTrsId(workflow.trsId) === trsId);
 
+  // Custom workflow.
+  if (trsId === CUSTOM_WORKFLOW.trsId) {
+    return {
+      props: {
+        entityId,
+        genome,
+        workflow: CUSTOM_WORKFLOW,
+      },
+    };
+  }
+
   if (!workflow) return { notFound: true };
 
   return {
@@ -98,6 +112,9 @@ export const getStaticProps = async (
 };
 
 const ConfigureWorkflowInputs = (props: Props): JSX.Element => {
+  const isFeatureEnabled = useFeatureFlag("custom-workflow");
+  if (props.workflow.trsId === CUSTOM_WORKFLOW.trsId && !isFeatureEnabled)
+    return <Error statusCode={404} />;
   return <WorkflowInputsView {...props} />;
 };
 
@@ -127,6 +144,15 @@ function processEntityPaths(
     const compatibleWorkflows = workflows
       .flatMap(({ workflows }) => workflows)
       .filter((workflow) => workflowIsCompatibleWithAssembly(workflow, entity));
+
+    // Create custom-workflow path.
+    paths.push({
+      params: {
+        entityId,
+        entityListType,
+        trsId: CUSTOM_WORKFLOW.trsId,
+      },
+    });
 
     // Create paths for each compatible workflow.
     compatibleWorkflows.forEach((workflow) => {

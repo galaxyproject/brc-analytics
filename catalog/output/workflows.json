@@ -10,7 +10,13 @@
         "parameters": [
           {
             "key": "Paired collection of sequencing data",
-            "variable": "SANGER_READ_RUN_PAIRED"
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "library_layout": "PAIRED",
+              "library_strategy": [
+                "WGS"
+              ]
+            }
           },
           {
             "key": "Reference annotation",
@@ -32,7 +38,13 @@
         "parameters": [
           {
             "key": "Paired Collection",
-            "variable": "SANGER_READ_RUN_PAIRED"
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "library_layout": "PAIRED",
+              "library_strategy": [
+                "WGS"
+              ]
+            }
           },
           {
             "key": "Annotation GTF",
@@ -54,7 +66,13 @@
         "parameters": [
           {
             "key": "Paired Collection",
-            "variable": "SANGER_READ_RUN_PAIRED"
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "library_layout": "PAIRED",
+              "library_strategy": [
+                "WGS"
+              ]
+            }
           },
           {
             "key": "NC_045512.2 FASTA sequence of SARS-CoV-2",
@@ -88,7 +106,13 @@
         "parameters": [
           {
             "key": "Paired Collection",
-            "variable": "SANGER_READ_RUN_PAIRED"
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "library_layout": "PAIRED",
+              "library_strategy": [
+                "WGS"
+              ]
+            }
           },
           {
             "key": "NC_045512.2 FASTA sequence of SARS-CoV-2",
@@ -104,6 +128,16 @@
       {
         "iwcId": "sars-cov-2-se-illumina-wgs-variant-calling-covid-19-se-wgs-illumina",
         "parameters": [
+          {
+            "key": "Single End Collection",
+            "variable": "SANGER_READ_RUN_SINGLE",
+            "data_requirements": {
+              "library_layout": "SINGLE",
+              "library_strategy": [
+                "WGS"
+              ]
+            }
+          },
           {
             "key": "NC_045512.2 FASTA sequence of SARS-CoV-2",
             "variable": "ASSEMBLY_FASTA_URL"
@@ -133,11 +167,24 @@
           {
             "key": "gtf",
             "variable": "GENE_MODEL_URL"
+          },
+          {
+            "key": "fastq PE collection GEX",
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "library_layout": "PAIRED",
+              "library_source": [
+                "TRANSCRIPTOMIC SINGLE CELL"
+              ],
+              "library_strategy": [
+                "RNA-Seq"
+              ]
+            }
           }
         ],
         "ploidy": "ANY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.2",
+        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.3",
         "workflowDescription": "Comprehensive preprocessing for 10X Genomics CellPlex multiplexed single-cell RNA-seq data. Processes Cell Multiplexing Oligo (CMO) FASTQ files with CITE-seq-Count including required CellPlex-specific translation steps. Simultaneously processes gene expression FASTQ files with STARsolo and DropletUtils for alignment and cell filtering, and formats outputs for seamless import into Seurat/Scanpy (Read10X function).",
         "workflowName": "Single-Cell RNA-seq Preprocessing: 10X Genomics CellPlex Multiplexed Samples"
       },
@@ -154,12 +201,21 @@
           },
           {
             "key": "fastq PE collection",
-            "variable": "SANGER_READ_RUN_PAIRED"
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "library_layout": "PAIRED",
+              "library_source": [
+                "TRANSCRIPTOMIC SINGLE CELL"
+              ],
+              "library_strategy": [
+                "RNA-Seq"
+              ]
+            }
           }
         ],
         "ploidy": "ANY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.2",
+        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.3",
         "workflowDescription": "Complete preprocessing pipeline for 10X Genomics v3 single-cell RNA-seq data. Aligns raw FASTQ files using STARsolo, performs cell calling and quality filtering with DropletUtils, and formats outputs for seamless import into Seurat/Scanpy (Read10X function).",
         "workflowName": "Single-Cell RNA-seq Preprocessing: 10X Genomics v3 to Seurat and Scanpy Compatible Format"
       },
@@ -176,7 +232,13 @@
           },
           {
             "key": "Collection paired FASTQ files",
-            "variable": "SANGER_READ_RUN_PAIRED"
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "library_layout": "PAIRED",
+              "library_strategy": [
+                "RNA-Seq"
+              ]
+            }
           }
         ],
         "ploidy": "ANY",
@@ -198,7 +260,13 @@
           },
           {
             "key": "Collection of FASTQ files",
-            "variable": "SANGER_READ_RUN_SINGLE"
+            "variable": "SANGER_READ_RUN_SINGLE",
+            "data_requirements": {
+              "library_layout": "SINGLE",
+              "library_strategy": [
+                "RNA-Seq"
+              ]
+            }
           }
         ],
         "ploidy": "ANY",
@@ -224,7 +292,13 @@
           },
           {
             "key": "PE fastq input",
-            "variable": "SANGER_READ_RUN_PAIRED"
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "library_layout": "PAIRED",
+              "library_strategy": [
+                "ATAC-seq"
+              ]
+            }
           }
         ],
         "ploidy": "ANY",
@@ -242,7 +316,13 @@
           },
           {
             "key": "PE fastq input",
-            "variable": "SANGER_READ_RUN_PAIRED"
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "library_layout": "PAIRED",
+              "library_strategy": [
+                "ChIP-Seq"
+              ]
+            }
           }
         ],
         "ploidy": "ANY",
@@ -260,7 +340,13 @@
           },
           {
             "key": "SR fastq input",
-            "variable": "SANGER_READ_RUN_SINGLE"
+            "variable": "SANGER_READ_RUN_SINGLE",
+            "data_requirements": {
+              "library_layout": "SINGLE",
+              "library_strategy": [
+                "ChIP-Seq"
+              ]
+            }
           }
         ],
         "ploidy": "ANY",
@@ -287,7 +373,14 @@
           },
           {
             "key": "PE fastq input",
-            "variable": "SANGER_READ_RUN_PAIRED"
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "description": "CUT&RUN",
+              "library_layout": "PAIRED",
+              "library_strategy": [
+                "OTHER"
+              ]
+            }
           }
         ],
         "ploidy": "ANY",
@@ -309,7 +402,13 @@
         "parameters": [
           {
             "key": "Paired collection of sequencing data",
-            "variable": "SANGER_READ_RUN_PAIRED"
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "library_layout": "PAIRED",
+              "library_strategy": [
+                "WGS"
+              ]
+            }
           },
           {
             "key": "Reference annotation",
@@ -358,7 +457,7 @@
         ],
         "ploidy": "HAPLOID",
         "taxonomyId": "2",
-        "trsId": "#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.5",
+        "trsId": "#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.6",
         "workflowDescription": "Antimicrobial resistance gene detection from assembled bacterial genomes",
         "workflowName": "AMR gene detection"
       },
