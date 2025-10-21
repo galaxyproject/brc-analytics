@@ -18,6 +18,7 @@
     "format:python": "./scripts/format-python.sh",
     "prepare": "husky",
     "test": "jest --runInBand",
+    "find-ga2-organism-images": "python3 -m catalog.ga2.build.py.fetch_images_for_organism",
     "build-brc-db": "esrun catalog/build/ts/build-catalog.ts",
     "build-ga2-db": "esrun catalog/ga2/build/ts/build-catalog.ts",
     "build-brc-from-ncbi": "python3 -m catalog.build.py.build_files_from_ncbi",

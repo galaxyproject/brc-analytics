@@ -43,3 +43,4 @@ export { Tooltip } from "./common/Tooltip/tooltip";
 export { AppLink } from "./common/AppLink/appLink";
 export { CalendarIcon } from "./common/CustomIcon/components/CalendarIcon/calendarIcon";
 export { Sections } from "./Entity/components/Sections/sections";
+export { OrganismAvatar } from "./Entity/components/OrganismAvatar/organismAvatar";

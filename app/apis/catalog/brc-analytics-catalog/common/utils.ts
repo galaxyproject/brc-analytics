@@ -1,17 +1,24 @@
 import { sanitizeEntityId } from "../../common/utils";
 import { BRCDataCatalogGenome, BRCDataCatalogOrganism } from "./entities";
+import { GA2AssemblyEntity, GA2OrganismEntity } from "../../ga2/entities";
 import { ORGANISM_PLOIDY, WORKFLOW_PLOIDY } from "./schema-entities";
 
-export function getGenomeId(genome: BRCDataCatalogGenome): string {
+export function getGenomeId(
+  genome: BRCDataCatalogGenome | GA2AssemblyEntity
+): string {
   return sanitizeEntityId(genome.accession);
 }
 
-export function getGenomeTitle(genome?: BRCDataCatalogGenome): string {
+export function getGenomeTitle(
+  genome?: BRCDataCatalogGenome | GA2AssemblyEntity
+): string {
   if (!genome) return "";
   return `${genome.taxonomicLevelSpecies}`;
 }
 
-export function getOrganismId(organism: BRCDataCatalogOrganism): string {
+export function getOrganismId(
+  organism: BRCDataCatalogOrganism | GA2OrganismEntity
+): string {
   return sanitizeEntityId(organism.ncbiTaxonomyId);
 }
 
@@ -20,7 +27,9 @@ export function getOrganismId(organism: BRCDataCatalogOrganism): string {
  * @param genome - Genome.
  * @returns organism ID.
  */
-export function getGenomeOrganismId(genome: BRCDataCatalogGenome): string {
+export function getGenomeOrganismId(
+  genome: BRCDataCatalogGenome | GA2AssemblyEntity
+): string {
   return sanitizeEntityId(genome.speciesTaxonomyId);
 }
 
