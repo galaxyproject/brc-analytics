@@ -24,6 +24,7 @@ export const useENADataByTaxonomyId = <T>(
   const [loading, setLoading] = useState<boolean>(true);
   const { ncbiTaxonomyId: taxonomyId } = genome;
   const { maxReadRunsForBrowseAll } = config();
+
   const onRequestData = useCallback(async (): Promise<void> => {
     run(
       fetchENAData({
