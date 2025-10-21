@@ -7,6 +7,7 @@ import {
 import { Props, UseLaunchGalaxy } from "./types";
 import { getConfiguredValues } from "./utils";
 import { launchGalaxy } from "./utils";
+import { CUSTOM_WORKFLOW } from "../../../../../../../../../../../../components/Entity/components/AnalysisMethod/components/CustomWorkflow/constants";
 
 export const useLaunchGalaxy = ({
   configuredInput,
@@ -20,7 +21,7 @@ export const useLaunchGalaxy = ({
     if (!configuredValue) return;
 
     const landingUrl =
-      workflow.trsId === "custom-workflow"
+      workflow.trsId === CUSTOM_WORKFLOW.trsId
         ? await run(
             getDataLandingUrl(
               configuredValue.referenceAssembly,

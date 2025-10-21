@@ -6,6 +6,7 @@ import {
   SINGLE_END_STEP,
   PAIRED_END_STEP,
 } from "../components/Step/SequencingStep/step";
+import { CUSTOM_WORKFLOW } from "../../../../../../../../../components/Entity/components/AnalysisMethod/components/CustomWorkflow/constants";
 
 /**
  * Augment the configured steps with two additional sequencing steps "READ_RUNS_PAIRED" and "READ_RUNS_SINGLE"
@@ -31,7 +32,7 @@ export function augmentConfiguredSteps(
  */
 export function buildSteps(workflow: Workflow): StepConfig[] {
   // Return steps for custom workflow
-  if (workflow.trsId === "custom-workflow") {
+  if (workflow.trsId === CUSTOM_WORKFLOW.trsId) {
     return [STEP.ASSEMBLY_ID, STEP.GENE_MODEL_URL, STEP.READ_RUN_ANY].filter(
       isStepConfigured
     );
