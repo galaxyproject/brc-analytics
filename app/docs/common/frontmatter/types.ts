@@ -8,6 +8,7 @@ export type Frontmatter = FrontmatterBase &
 interface FrontmatterBase {
   description: string;
   hidden?: boolean;
+  subtitle?: string;
   title: string;
 }
 
