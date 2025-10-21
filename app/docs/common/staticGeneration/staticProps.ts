@@ -47,6 +47,14 @@ export async function buildStaticProps(
   const { title: pageTitle } = frontmatter;
 
   return {
-    props: { frontmatter, mdxSource, pageTitle, slug },
+    props: {
+      frontmatter,
+      mdxSource,
+      pageTitle,
+      slug,
+      themeOptions: {
+        palette: { background: { default: "#FAFBFB" } }, // SMOKE_LIGHTEST
+      },
+    },
   };
 }
