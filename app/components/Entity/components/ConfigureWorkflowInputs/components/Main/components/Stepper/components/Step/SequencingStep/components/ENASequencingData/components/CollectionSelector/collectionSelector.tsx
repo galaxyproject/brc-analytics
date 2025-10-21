@@ -8,7 +8,6 @@ import { Table } from "./components/Table/table";
 import { RowSelectionState } from "@tanstack/table-core";
 import { getSequencingData } from "../../utils";
 import { ColumnFilters } from "./components/ColumnFilters/columnFilters";
-import { preSelectColumnFilters } from "./utils";
 
 export const CollectionSelector = ({
   onClose,
@@ -17,7 +16,6 @@ export const CollectionSelector = ({
   selectedCount,
   stepKey,
   table,
-  workflowParameter,
 }: Props): JSX.Element => {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   return (
@@ -25,7 +23,6 @@ export const CollectionSelector = ({
       onTransitionEnter={() => {
         setRowSelection(table.getState().rowSelection);
         if (selectedCount > 0) return;
-        preSelectColumnFilters(table, stepKey, workflowParameter);
         table.resetSorting(); // Reset sorting to default.
       }}
       onClose={onClose}

@@ -1,27 +1,28 @@
-import { ENA_QUERY_METHOD, SEQUENCING_DATA_TYPE } from "../../../../types";
-import { ColumnFiltersState, Table } from "@tanstack/react-table";
-import { ReadRun } from "../../types";
+import { SEQUENCING_DATA_TYPE } from "../../../../types";
+import { ColumnFiltersState } from "@tanstack/react-table";
 import { CATEGORY_CONFIGS } from "./hooks/UseTable/categoryConfigs";
-import { WorkflowParameter } from "app/apis/catalog/brc-analytics-catalog/common/entities";
+import {
+  Workflow,
+  WorkflowParameter,
+} from "../../../../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
+import { WORKFLOW_PARAMETER_BY_STEP_KEY } from "./constants";
 
 /**
  * Builds column filters from preselected values only if they are valid for the current data.
- * A set of preselected filters is considered valid if at least one row in the table satisfies all column filters (AND across columns),
+ * A set of preselected filters is considered valid if at least one row of data satisfies all column filters (AND across columns),
  * where each column filter matches if the row contains at least one of the desired values for that column (OR within a column).
  * If no rows satisfy the filters, an empty list is returned.
  *
  * Note: This does not mutate or filter out individual values; it validates the combination overall.
  *
- * @param table - Table instance.
+ * @param rows - Rows (read runs).
  * @param preselectedFilters - Record of column IDs to arrays of desired filter values.
  * @returns Column filters state.
  */
-function buildValidatedColumnFilters(
-  table: Table<ReadRun>,
+function buildValidatedColumnFilters<T>(
+  rows: T[],
   preselectedFilters: Record<string, string[]>
 ): ColumnFiltersState {
-  const { rows } = table.getRowModel();
-
   // We need to ensure that the combined column filters are valid for the given data.
   // A row must have at least one of the desired values (OR-join) for each column filter (AND-join).
   for (const row of rows) {
@@ -32,7 +33,7 @@ function buildValidatedColumnFilters(
       const filterValueSet = new Set(value as string[]);
 
       // Determine the column values.
-      const columnValues = toStringArray(row.getValue(id));
+      const columnValues = toStringArray(row[id as keyof T]);
 
       // At least one of the desired values must be present in the column "OR".
       let hasAny = false;
@@ -54,7 +55,7 @@ function buildValidatedColumnFilters(
     if (!isRowValid) continue;
 
     // Found a valid row i.e. we know the pre-selected column filters will be a valid
-    // combination for the table data. There is no need to continue checking the rest of the rows.
+    // combination for the data. There is no need to continue checking the rest of the rows.
     return Object.entries(preselectedFilters).map(([id, value]) => ({
       id,
       value,
@@ -63,18 +64,6 @@ function buildValidatedColumnFilters(
 
   // No valid rows found, return empty column filters.
   return [];
-}
-
-/**
- * Returns true if the table is using data from ENA query method by taxonomy ID.
- * @param table - The table.
- * @returns True if the table is using data from ENA query method by taxonomy ID.
- */
-function isENAQueryMethodByTaxonomyId(table: Table<ReadRun>): boolean {
-  if (!table.options.meta) return false;
-  if (!("enaQueryMethod" in table.options.meta)) return false;
-
-  return table.options.meta.enaQueryMethod === ENA_QUERY_METHOD.TAXONOMY_ID;
 }
 
 /**
@@ -132,13 +121,32 @@ export function getDescriptionRequirement(
 }
 
 /**
+ * Returns the workflow parameter for the given step key.
+ * @param workflow - Workflow.
+ * @param stepKey - Step key.
+ * @returns Workflow parameter for the given step key.
+ */
+export function getWorkflowParameter(
+  workflow: Workflow,
+  stepKey:
+    | SEQUENCING_DATA_TYPE.READ_RUNS_PAIRED
+    | SEQUENCING_DATA_TYPE.READ_RUNS_SINGLE
+): WorkflowParameter | undefined {
+  return workflow.parameters.find(
+    ({ variable }) => variable === WORKFLOW_PARAMETER_BY_STEP_KEY[stepKey]
+  );
+}
+
+/**
  * Builds filters based on step key and workflow parameter requirements.
  * @param stepKey - The sequencing data type (paired or single).
  * @param workflowParameter - Optional workflow parameter with data requirements.
  * @returns Filters with layout, strategy, source, and other requirements.
  */
 export function buildFilters(
-  stepKey: SEQUENCING_DATA_TYPE,
+  stepKey:
+    | SEQUENCING_DATA_TYPE.READ_RUNS_PAIRED
+    | SEQUENCING_DATA_TYPE.READ_RUNS_SINGLE,
   workflowParameter?: WorkflowParameter
 ): Record<string, string[]> {
   const filters: Record<string, string[]> = {};
@@ -186,22 +194,21 @@ export function buildFilters(
 
 /**
  * Pre-selects column filters based on the given step key for ENA query method by taxonomy ID.
- * @param table - Table instance.
+ * @param workflow - Workflow.
+ * @param rows - Rows (read runs).
  * @param stepKey - Step key.
- * @param workflowParameter - Optional workflow parameter with data requirements.
+ * @returns Column filters for the given ENA data.
  */
-export function preSelectColumnFilters(
-  table: Table<ReadRun>,
-  stepKey: SEQUENCING_DATA_TYPE,
-  workflowParameter?: WorkflowParameter
-): void {
-  // Do not apply any filters for step key READ_RUNS_ANY.
-  if (stepKey === SEQUENCING_DATA_TYPE.READ_RUNS_ANY) return;
-  if (isENAQueryMethodByTaxonomyId(table)) {
-    const filters = buildFilters(stepKey, workflowParameter);
-    const columnFiltersState = buildValidatedColumnFilters(table, filters);
-    table.setColumnFilters(columnFiltersState);
-  }
+export function preSelectColumnFilters<T>(
+  workflow: Workflow,
+  rows: T[],
+  stepKey:
+    | SEQUENCING_DATA_TYPE.READ_RUNS_PAIRED
+    | SEQUENCING_DATA_TYPE.READ_RUNS_SINGLE
+): ColumnFiltersState {
+  const workflowParameter = getWorkflowParameter(workflow, stepKey);
+  const filters = buildFilters(stepKey, workflowParameter);
+  return buildValidatedColumnFilters(rows, filters);
 }
 
 /**

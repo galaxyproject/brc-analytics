@@ -10,7 +10,7 @@ import { BaseReadRun, ReadRun } from "../../../../types";
 import { ROW_POSITION } from "@databiosphere/findable-ui/lib/components/Table/features/RowPosition/constants";
 import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/features/RowPreview/constants";
 import { columns } from "./columnDef";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { getFacetedUniqueValuesWithArrayValues } from "@databiosphere/findable-ui/lib/components/Table/common/utils";
 import { arrIncludesSome } from "@databiosphere/findable-ui/lib/components/Table/columnDef/columnFilters/filterFn";
 import { ColumnFiltersState, Updater } from "@tanstack/react-table";
@@ -42,6 +42,17 @@ export const useTable = (
     [ENA_QUERY_METHOD.ACCESSION]: [],
     [ENA_QUERY_METHOD.TAXONOMY_ID]: [],
   });
+
+  // Grab the column filters for ENA by taxonomy ID.
+  const { columnFilters } = enaTaxonomyId;
+
+  useEffect(() => {
+    if (columnFilters.length === 0) return;
+    // Pre-filter the table data for ENA by taxonomy ID.
+    setColumnFiltersByMethod(
+      updateColumnFilters(ENA_QUERY_METHOD.TAXONOMY_ID, columnFilters)
+    );
+  }, [columnFilters]);
 
   const onColumnFiltersChange = useCallback(
     (updaterOrValue: Updater<ColumnFiltersState>): void =>

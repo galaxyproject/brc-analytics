@@ -15,7 +15,6 @@ export const ENASequencingData = ({
   stepKey,
   table,
   taxonomicLevelSpecies,
-  workflowParameter,
 }: Props): JSX.Element => {
   const accessionDialog = useDialog();
   const collectionDialog = useDialog();
@@ -53,7 +52,6 @@ export const ENASequencingData = ({
         selectedCount={selectedCount}
         table={table}
         stepKey={stepKey}
-        workflowParameter={workflowParameter}
       />
       <CollectionSummary
         onClear={() => {
