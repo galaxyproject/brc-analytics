@@ -1360,7 +1360,9 @@ assemblies:
   - accession: GCF_000001215.4
   # organism: Homo sapiens
   # common_name: Human - Dec. 2013 (GRCh38/hg38)
-  - accession: GCF_000001405.40
+  # # organism: Homo sapiens
+  # # common_name: Human - Dec. 2013 (GRCh38/hg38)
+  # - accession: GCF_000001405.40
   # organism: Mus musculus
   # common_name: Mouse - Jun. 2020 (GRCm39/mm39)
   - accession: GCF_000001635.27
@@ -3685,7 +3687,9 @@ assemblies:
   - accession: GCA_020449115.1
   # organism: Strongyloides venezuelensis
   # project: PRJEB530
-  - accession: GCA_001028725.1
+  # # organism: Strongyloides venezuelensis
+  # # project: PRJEB530
+  # - accession: GCA_001028725.1
   # organism: Taenia saginata
   # project: PRJNA71493
   - accession: GCA_001693075.2
@@ -3700,7 +3704,9 @@ assemblies:
   - accession: GCA_001555675.1
   # organism: Strongyloides stercoralis
   # project: PRJEB528
-  - accession: GCA_000947215.1
+  # # organism: Strongyloides stercoralis
+  # # project: PRJEB528
+  # - accession: GCA_000947215.1
   # organism: Ancylostoma caninum
   # project: PRJNA72585
   - accession: GCA_003336725.1
@@ -3715,7 +3721,9 @@ assemblies:
   - accession: GCA_025215515.1
   # organism: Spirometra erinaceieuropaei
   # project: PRJEB1202
-  - accession: GCA_000951995.1
+  # # organism: Spirometra erinaceieuropaei
+  # # project: PRJEB1202
+  # - accession: GCA_000951995.1
   # organism: Caenorhabditis remanei
   # project: PRJNA577507
   - accession: GCA_010183535.1
@@ -3835,7 +3843,9 @@ assemblies:
   - accession: GCA_000402015.1
   # organism: Ditylenchus destructor
   # project: PRJNA800207
-  - accession: GCA_022814885.1
+  # # organism: Ditylenchus destructor
+  # # project: PRJNA800207
+  # - accession: GCA_022814885.1
   # organism: Bursaphelenchus okinawaensis
   # project: PRJEB40023
   - accession: GCA_904066225.2
@@ -3874,7 +3884,9 @@ assemblies:
   - accession: GCA_021556725.1
   # organism: Rhabditophanes sp. KR3021
   # project: PRJEB1297
-  - accession: GCA_000944355.1
+  # # organism: Rhabditophanes sp. KR3021
+  # # project: PRJEB1297
+  # - accession: GCA_000944355.1
   # organism: Brugia timori
   # project: PRJEB4663
   - accession: GCA_900618025.1
@@ -4371,7 +4383,7 @@ assemblies:
   - accession: GCA_000875815.1
   - accession: GCA_000875855.1
   - accession: GCA_000876485.1
-  - accession: GCA_000945115.1
+  # - accession: GCA_000945115.1
   - accession: GCA_000950595.1
   - accession: GCA_000965245.1
   - accession: GCA_000966645.2
@@ -4386,7 +4398,7 @@ assemblies:
   - accession: GCA_001023045.1
   - accession: GCA_001023065.1
   - accession: GCA_001029325.1
-  - accession: GCA_001049375.1
+  # - accession: GCA_001049375.1
   - accession: GCA_001191645.1
   - accession: GCA_001243155.1
   - accession: GCA_001262555.1
@@ -4423,8 +4435,8 @@ assemblies:
   - accession: GCA_001642395.1
   - accession: GCA_001643655.1
   - accession: GCA_001643665.1
-  - accession: GCA_001651435.1
-  - accession: GCA_001651445.1
+  # - accession: GCA_001651435.1
+  # - accession: GCA_001651445.1
   - accession: GCA_001652425.1
   - accession: GCA_001654535.1
   - accession: GCA_001654545.1
@@ -4507,7 +4519,7 @@ assemblies:
   - accession: GCA_002025285.2
   - accession: GCA_002083735.1
   - accession: GCA_002092935.1
-  - accession: GCA_002093825.1
+  # - accession: GCA_002093825.1
   - accession: GCA_002093855.1
   - accession: GCA_002105255.2
   - accession: GCA_002117355.1
@@ -4519,7 +4531,7 @@ assemblies:
   - accession: GCA_002157005.1
   - accession: GCA_002157015.1
   - accession: GCA_002157025.1
-  - accession: GCA_002157035.1
+  # - accession: GCA_002157035.1
   - accession: GCA_002157085.1
   - accession: GCA_002157105.1
   - accession: GCA_002158515.1
@@ -4540,7 +4552,7 @@ assemblies:
   - accession: GCA_002215885.1
   - accession: GCA_002215905.1
   - accession: GCA_002217545.1
-  - accession: GCA_002219195.1
+  # - accession: GCA_002219195.1
   - accession: GCA_002220045.1
   - accession: GCA_002221985.1
   - accession: GCA_002222015.1
@@ -4611,13 +4623,13 @@ assemblies:
   - accession: GCA_002711385.1
   - accession: GCA_002711405.2
   - accession: GCA_002749855.1
-  - accession: GCA_002751075.1
+  # - accession: GCA_002751075.1
   - accession: GCA_002760635.1
   - accession: GCA_002762355.2
   - accession: GCA_002794665.1
   - accession: GCA_002798095.1
-  - accession: GCA_002835845.1
-  - accession: GCA_002837675.1
+  # - accession: GCA_002835845.1
+  # - accession: GCA_002837675.1
   - accession: GCA_002847045.1
   - accession: GCA_002864075.1
   - accession: GCA_002864135.1
@@ -4803,7 +4815,7 @@ assemblies:
   - accession: GCA_003693205.1
   - accession: GCA_003693225.1
   - accession: GCA_003693245.1
-  - accession: GCA_003693705.1
+  # - accession: GCA_003693705.1
   - accession: GCA_003698175.1
   - accession: GCA_003705515.2
   - accession: GCA_003709025.1
@@ -4816,7 +4828,7 @@ assemblies:
   - accession: GCA_003724095.1
   - accession: GCA_003813185.1
   - accession: GCA_003813205.1
-  - accession: GCA_003833335.1
+  # - accession: GCA_003833335.1
   - accession: GCA_003944945.1
   - accession: GCA_003944955.1
   - accession: GCA_003944965.1
@@ -4867,7 +4879,7 @@ assemblies:
   - accession: GCA_003967775.1
   - accession: GCA_003967795.1
   - accession: GCA_003977725.1
-  - accession: GCA_003992685.1
+  # - accession: GCA_003992685.1
   - accession: GCA_003999685.1
   - accession: GCA_004026285.1
   - accession: GCA_004026335.1
@@ -4875,9 +4887,9 @@ assemblies:
   - accession: GCA_004026445.1
   - accession: GCA_004125235.1
   - accession: GCA_004141715.1
-  - accession: GCA_004156335.1
-  - accession: GCA_004194325.1
-  - accession: GCA_004195245.1
+  # - accession: GCA_004156335.1
+  # - accession: GCA_004194325.1
+  # - accession: GCA_004195245.1
   - accession: GCA_004291455.1
   - accession: GCA_004292535.1
   - accession: GCA_004307905.1
@@ -5049,49 +5061,49 @@ assemblies:
   - accession: GCA_009687705.1
   - accession: GCA_009687725.1
   - accession: GCA_009687745.1
-  - accession: GCA_009726225.1
-  - accession: GCA_009726235.1
-  - accession: GCA_009726245.1
-  - accession: GCA_009726255.1
-  - accession: GCA_009726265.1
-  - accession: GCA_009726325.1
-  - accession: GCA_009726335.1
-  - accession: GCA_009726345.1
-  - accession: GCA_009726355.1
-  - accession: GCA_009726365.1
-  - accession: GCA_009726425.1
-  - accession: GCA_009726435.1
-  - accession: GCA_009726445.1
-  - accession: GCA_009726455.1
-  - accession: GCA_009726465.1
-  - accession: GCA_009726525.1
-  - accession: GCA_009726535.1
-  - accession: GCA_009726545.1
-  - accession: GCA_009726555.1
-  - accession: GCA_009726565.1
-  - accession: GCA_009726625.1
-  - accession: GCA_009726635.1
-  - accession: GCA_009726645.1
-  - accession: GCA_009726655.1
-  - accession: GCA_009726665.1
-  - accession: GCA_009726725.1
-  - accession: GCA_009726735.1
-  - accession: GCA_009726745.1
-  - accession: GCA_009726755.1
-  - accession: GCA_009726765.1
-  - accession: GCA_009726825.1
-  - accession: GCA_009726835.1
-  - accession: GCA_009726845.1
-  - accession: GCA_009726855.1
-  - accession: GCA_009726865.1
-  - accession: GCA_009726925.1
-  - accession: GCA_009726935.1
-  - accession: GCA_009726945.1
-  - accession: GCA_009726955.1
-  - accession: GCA_009726965.1
-  - accession: GCA_009727025.1
-  - accession: GCA_009727035.1
-  - accession: GCA_009727045.1
+  # - accession: GCA_009726225.1
+  # - accession: GCA_009726235.1
+  # - accession: GCA_009726245.1
+  # - accession: GCA_009726255.1
+  # - accession: GCA_009726265.1
+  # - accession: GCA_009726325.1
+  # - accession: GCA_009726335.1
+  # - accession: GCA_009726345.1
+  # - accession: GCA_009726355.1
+  # - accession: GCA_009726365.1
+  # - accession: GCA_009726425.1
+  # - accession: GCA_009726435.1
+  # - accession: GCA_009726445.1
+  # - accession: GCA_009726455.1
+  # - accession: GCA_009726465.1
+  # - accession: GCA_009726525.1
+  # - accession: GCA_009726535.1
+  # - accession: GCA_009726545.1
+  # - accession: GCA_009726555.1
+  # - accession: GCA_009726565.1
+  # - accession: GCA_009726625.1
+  # - accession: GCA_009726635.1
+  # - accession: GCA_009726645.1
+  # - accession: GCA_009726655.1
+  # - accession: GCA_009726665.1
+  # - accession: GCA_009726725.1
+  # - accession: GCA_009726735.1
+  # - accession: GCA_009726745.1
+  # - accession: GCA_009726755.1
+  # - accession: GCA_009726765.1
+  # - accession: GCA_009726825.1
+  # - accession: GCA_009726835.1
+  # - accession: GCA_009726845.1
+  # - accession: GCA_009726855.1
+  # - accession: GCA_009726865.1
+  # - accession: GCA_009726925.1
+  # - accession: GCA_009726935.1
+  # - accession: GCA_009726945.1
+  # - accession: GCA_009726955.1
+  # - accession: GCA_009726965.1
+  # - accession: GCA_009727025.1
+  # - accession: GCA_009727035.1
+  # - accession: GCA_009727045.1
   - accession: GCA_009755825.1
   - accession: GCA_009761105.1
   - accession: GCA_009769405.1
@@ -5100,15 +5112,15 @@ assemblies:
   - accession: GCA_009856665.1
   - accession: GCA_009932835.1
   - accession: GCA_010015875.1
-  - accession: GCA_010065285.1
-  - accession: GCA_010065295.1
-  - accession: GCA_010065305.1
-  - accession: GCA_010065315.1
-  - accession: GCA_010065385.1
-  - accession: GCA_010065405.1
+  # - accession: GCA_010065285.1
+  # - accession: GCA_010065295.1
+  # - accession: GCA_010065305.1
+  # - accession: GCA_010065315.1
+  # - accession: GCA_010065385.1
+  # - accession: GCA_010065405.1
   - accession: GCA_010111755.1
-  - accession: GCA_010233705.1
-  - accession: GCA_010233735.1
+  # - accession: GCA_010233705.1
+  # - accession: GCA_010233735.1
   - accession: GCA_011032855.1
   - accession: GCA_011032875.1
   - accession: GCA_011032885.1
@@ -5196,7 +5208,7 @@ assemblies:
   - accession: GCA_011035075.1
   - accession: GCA_011035135.1
   - accession: GCA_011035185.1
-  - accession: GCA_011035205.1
+  # - accession: GCA_011035205.1
   - accession: GCA_011035235.1
   - accession: GCA_011035245.1
   - accession: GCA_011035255.1
@@ -5341,33 +5353,33 @@ assemblies:
   - accession: GCA_011764185.1
   - accession: GCA_011764225.1
   - accession: GCA_011764265.1
-  - accession: GCA_011800955.2
-  - accession: GCA_011800985.2
-  - accession: GCA_011801035.2
-  - accession: GCA_011801055.2
+  # - accession: GCA_011800955.2
+  # - accession: GCA_011800985.2
+  # - accession: GCA_011801035.2
+  # - accession: GCA_011801055.2
   - accession: GCA_011801205.1
-  - accession: GCA_011801305.2
-  - accession: GCA_011801335.2
-  - accession: GCA_011801385.2
+  # - accession: GCA_011801305.2
+  # - accession: GCA_011801335.2
+  # - accession: GCA_011801385.2
   - accession: GCA_011801495.1
-  - accession: GCA_011801505.2
-  - accession: GCA_011801555.2
-  - accession: GCA_011801575.2
-  - accession: GCA_011801605.2
-  - accession: GCA_011801645.2
-  - accession: GCA_011801675.2
-  - accession: GCA_011801705.2
-  - accession: GCA_011801725.2
-  - accession: GCA_011801785.2
-  - accession: GCA_011801815.2
-  - accession: GCA_011950945.2
-  - accession: GCA_011950985.2
-  - accession: GCA_011951285.2
-  - accession: GCA_011951295.2
-  - accession: GCA_011952045.2
-  - accession: GCA_011952115.2
-  - accession: GCA_011952145.2
-  - accession: GCA_011952175.2
+  # - accession: GCA_011801505.2
+  # - accession: GCA_011801555.2
+  # - accession: GCA_011801575.2
+  # - accession: GCA_011801605.2
+  # - accession: GCA_011801645.2
+  # - accession: GCA_011801675.2
+  # - accession: GCA_011801705.2
+  # - accession: GCA_011801725.2
+  # - accession: GCA_011801785.2
+  # - accession: GCA_011801815.2
+  # - accession: GCA_011950945.2
+  # - accession: GCA_011950985.2
+  # - accession: GCA_011951285.2
+  # - accession: GCA_011951295.2
+  # - accession: GCA_011952045.2
+  # - accession: GCA_011952115.2
+  # - accession: GCA_011952145.2
+  # - accession: GCA_011952175.2
   - accession: GCA_012070365.1
   - accession: GCA_012070385.1
   - accession: GCA_012071885.1
@@ -5511,7 +5523,7 @@ assemblies:
   - accession: GCA_013618485.1
   - accession: GCA_013618495.1
   - accession: GCA_013623335.1
-  - accession: GCA_013623345.1
+  # - accession: GCA_013623345.1
   - accession: GCA_013623355.1
   - accession: GCA_013623515.1
   - accession: GCA_013623525.1
@@ -5583,7 +5595,7 @@ assemblies:
   - accession: GCA_014325015.1
   - accession: GCA_014325035.1
   - accession: GCA_014325045.1
-  - accession: GCA_014325065.1
+  # - accession: GCA_014325065.1
   - accession: GCA_014325095.1
   - accession: GCA_014325125.1
   - accession: GCA_014325135.1
@@ -5750,7 +5762,7 @@ assemblies:
   - accession: GCA_015586375.1
   - accession: GCA_015832375.1
   - accession: GCA_015951145.1
-  - accession: GCA_016068325.1
+  # - accession: GCA_016068325.1
   - accession: GCA_016097715.1
   - accession: GCA_016097735.1
   - accession: GCA_016097755.1
@@ -6111,7 +6123,7 @@ assemblies:
   - accession: GCA_020975645.1
   - accession: GCA_020975665.1
   - accession: GCA_020975675.1
-  - accession: GCA_020975705.1
+  # - accession: GCA_020975705.1
   - accession: GCA_020975805.1
   - accession: GCA_020975825.1
   - accession: GCA_020975845.1
@@ -6147,7 +6159,7 @@ assemblies:
   - accession: GCA_020976505.1
   - accession: GCA_020976525.1
   - accession: GCA_020976545.1
-  - accession: GCA_020976685.1
+  # - accession: GCA_020976685.1
   - accession: GCA_020976715.1
   - accession: GCA_020976725.1
   - accession: GCA_020991245.1
@@ -6600,8 +6612,8 @@ assemblies:
   - accession: GCA_026261755.1
   - accession: GCA_026262505.1
   - accession: GCA_026284195.1
-  - accession: GCA_026319385.1
-  - accession: GCA_026319405.1
+  # - accession: GCA_026319385.1
+  # - accession: GCA_026319405.1
   - accession: GCA_026743815.1
   - accession: GCA_026743835.1
   - accession: GCA_026743845.1
@@ -6719,8 +6731,8 @@ assemblies:
   - accession: GCA_029405315.1
   - accession: GCA_029405325.1
   - accession: GCA_029405515.1
-  - accession: GCA_029449215.1
-  - accession: GCA_029449265.1
+  # - accession: GCA_029449215.1
+  # - accession: GCA_029449265.1
   - accession: GCA_029603225.1
   - accession: GCA_029618165.1
   - accession: GCA_029618175.1
@@ -6745,9 +6757,9 @@ assemblies:
   - accession: GCA_029962655.1
   - accession: GCA_030015405.1
   - accession: GCA_030020275.1
-  - accession: GCA_030180075.1
+  # - accession: GCA_030180075.1
   - accession: GCA_030272305.1
-  - accession: GCA_030280995.1
+  # - accession: GCA_030280995.1
   - accession: GCA_030345115.2
   - accession: GCA_030378345.1
   - accession: GCA_030515275.1
@@ -6849,7 +6861,7 @@ assemblies:
   - accession: GCA_036630325.1
   - accession: GCA_036780745.1
   - accession: GCA_036783925.1
-  - accession: GCA_036867785.1
+  # - accession: GCA_036867785.1
   - accession: GCA_037039665.1
   - accession: GCA_037039805.1
   - accession: GCA_037040325.1
@@ -6907,7 +6919,7 @@ assemblies:
   - accession: GCA_039519205.1
   - accession: GCA_039519225.1
   - accession: GCA_039545395.1
-  - accession: GCA_039583845.1
+  # - accession: GCA_039583845.1
   - accession: GCA_039906145.1
   - accession: GCA_040085025.1
   - accession: GCA_040112765.1
@@ -6966,7 +6978,7 @@ assemblies:
   - accession: GCA_040285555.1
   - accession: GCA_040285575.1
   - accession: GCA_040333235.1
-  - accession: GCA_040357525.1
+  # - accession: GCA_040357525.1
   - accession: GCA_040365765.1
   - accession: GCA_040807105.1
   - accession: GCA_040807145.1
@@ -7106,7 +7118,7 @@ assemblies:
   - accession: GCA_045529095.1
   - accession: GCA_045529305.1
   - accession: GCA_045529425.1
-  - accession: GCA_045786735.1
+  # - accession: GCA_045786735.1
   - accession: GCA_045786885.1
   - accession: GCA_045786925.1
   - accession: GCA_045786945.1
@@ -7155,7 +7167,7 @@ assemblies:
   - accession: GCA_049639345.1
   - accession: GCA_049639365.1
   - accession: GCA_049639405.1
-  - accession: GCA_049724395.1
+  # - accession: GCA_049724395.1
   - accession: GCA_049803905.1
   - accession: GCA_049862575.1
   - accession: GCA_049863895.1
@@ -7294,7 +7306,7 @@ assemblies:
   - accession: GCA_052058435.1
   - accession: GCA_052058495.1
   - accession: GCA_900000135.1
-  - accession: GCA_900002365.1
+  # - accession: GCA_900002365.1
   - accession: GCA_900004165.1
   - accession: GCA_900007375.1
   - accession: GCA_900044065.1
@@ -7327,14 +7339,14 @@ assemblies:
   - accession: GCA_900177225.1
   - accession: GCA_900239735.1
   - accession: GCA_900312805.1
-  - accession: GCA_900404475.1
+  # - accession: GCA_900404475.1
   - accession: GCA_900476405.1
   - accession: GCA_900519155.1
   - accession: GCA_901446245.1
   - accession: GCA_901677955.1
   - accession: GCA_901677965.1
   - accession: GCA_902506015.1
-  - accession: GCA_902702905.1
+  # - accession: GCA_902702905.1
   - accession: GCA_902702945.1
   - accession: GCA_902703645.1
   - accession: GCA_905178155.1
@@ -7343,7 +7355,7 @@ assemblies:
   - accession: GCA_905359455.1
   - accession: GCA_905359475.1
   - accession: GCA_905359485.1
-  - accession: GCA_910393935.1
+  # - accession: GCA_910393935.1
   - accession: GCA_910591595.1
   - accession: GCA_910591615.1
   - accession: GCA_910591655.1
