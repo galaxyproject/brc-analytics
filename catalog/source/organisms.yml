@@ -4999,7 +4999,8 @@ organisms:
       - HAPLOID
   - taxonomy_id: 37360
     ploidy:
-      -
+      - HAPLOID
+      - DIPLOID
   - taxonomy_id: 38802
     ploidy:
       - HAPLOID
@@ -5023,7 +5024,7 @@ organisms:
       - DIPLOID
   - taxonomy_id: 41456
     ploidy:
-      -
+      - HAPLOID
   - taxonomy_id: 41984
     ploidy:
       - HAPLOID
@@ -5138,7 +5139,7 @@ organisms:
       - HAPLOID
   - taxonomy_id: 65659
     ploidy:
-      -
+      - POLYPLOID
   - taxonomy_id: 69891
     ploidy:
       - HAPLOID
@@ -5274,20 +5275,22 @@ organisms:
       - HAPLOID
   - taxonomy_id: 195010
     ploidy:
-      -
+      - HAPLOID
   - taxonomy_id: 195108
     ploidy:
       - HAPLOID
   - taxonomy_id: 202919
     ploidy:
-      -
+      - HAPLOID
+      - DIPLOID
+      - POLYPLOID
   - taxonomy_id: 203535
     ploidy:
       - HAPLOID
       - DIPLOID
   - taxonomy_id: 215448
     ploidy:
-      -
+      - HAPLOID
   - taxonomy_id: 221167
     ploidy:
       - HAPLOID
@@ -5306,7 +5309,7 @@ organisms:
       - DIPLOID
   - taxonomy_id: 244366
     ploidy:
-      -
+      - HAPLOID
   - taxonomy_id: 246404
     ploidy:
       - HAPLOID
@@ -5352,7 +5355,8 @@ organisms:
       - DIPLOID
   - taxonomy_id: 330153
     ploidy:
-      -
+      - DIPLOID
+      - POLYPLOID
   - taxonomy_id: 349360
     ploidy:
       - HAPLOID
@@ -5397,7 +5401,9 @@ organisms:
       - HAPLOID
   - taxonomy_id: 575411
     ploidy:
-      -
+      - HAPLOID
+      - DIPLOID
+      - POLYPLOID
   - taxonomy_id: 575983
     ploidy:
       - HAPLOID
@@ -5456,7 +5462,9 @@ organisms:
       - HAPLOID
   - taxonomy_id: 1134596
     ploidy:
-      -
+      - HAPLOID
+      - DIPLOID
+      - POLYPLOID
   - taxonomy_id: 1142505
     ploidy:
       - HAPLOID
@@ -5504,7 +5512,8 @@ organisms:
       - HAPLOID
   - taxonomy_id: 1410381
     ploidy:
-      -
+      - HAPLOID
+      - DIPLOID
   - taxonomy_id: 1435070
     ploidy:
       - HAPLOID
@@ -5596,10 +5605,13 @@ organisms:
       - HAPLOID
   - taxonomy_id: 2184066
     ploidy:
-      -
+      - HAPLOID
+      - DIPLOID
+      - POLYPLOID
   - taxonomy_id: 2202890
     ploidy:
-      -
+      - HAPLOID
+      - DIPLOID
   - taxonomy_id: 2211609
     ploidy:
       - HAPLOID
@@ -5860,7 +5872,7 @@ organisms:
       - HAPLOID
   - taxonomy_id: 126728
     ploidy:
-      -
+      - HAPLOID
   - taxonomy_id: 1284706
     ploidy:
       - HAPLOID
@@ -5946,7 +5958,7 @@ organisms:
       - HAPLOID
   - taxonomy_id: 180228
     ploidy:
-      -
+      - POLYPLOID
   - taxonomy_id: 1806994
     ploidy:
       - HAPLOID
@@ -5982,7 +5994,9 @@ organisms:
       - DIPLOID
   - taxonomy_id: 1973153
     ploidy:
-      -
+      - HAPLOID
+      - DIPLOID
+      - POLYPLOID
   - taxonomy_id: 2043490
     ploidy:
       - HAPLOID
@@ -6100,7 +6114,9 @@ organisms:
       - HAPLOID
   - taxonomy_id: 269814
     ploidy:
-      -
+      - HAPLOID
+      - DIPLOID
+      - POLYPLOID
   - taxonomy_id: 2699242
     ploidy:
       - HAPLOID
@@ -6241,7 +6257,8 @@ organisms:
       - HAPLOID
   - taxonomy_id: 31276
     ploidy:
-      -
+      - DIPLOID
+      - POLYPLOID
   - taxonomy_id: 3132711
     ploidy:
       - HAPLOID
@@ -6288,7 +6305,7 @@ organisms:
       - HAPLOID
   - taxonomy_id: 39843
     ploidy:
-      -
+      - HAPLOID
   - taxonomy_id: 40199
     ploidy:
       - HAPLOID
@@ -6505,7 +6522,8 @@ organisms:
       - HAPLOID
   - taxonomy_id: 70186
     ploidy:
-      -
+      - DIPLOID
+      - POLYPLOID
   - taxonomy_id: 713888
     ploidy:
       - HAPLOID
