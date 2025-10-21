@@ -1,9 +1,13 @@
 import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
 import { useCallback } from "react";
-import { getWorkflowLandingUrl } from "../../../../../../../../../../../../utils/galaxy-api/galaxy-api";
+import {
+  getDataLandingUrl,
+  getWorkflowLandingUrl,
+} from "../../../../../../../../../../../../utils/galaxy-api/galaxy-api";
 import { Props, UseLaunchGalaxy } from "./types";
 import { getConfiguredValues } from "./utils";
 import { launchGalaxy } from "./utils";
+import { CUSTOM_WORKFLOW } from "../../../../../../../../../../../../components/Entity/components/AnalysisMethod/components/CustomWorkflow/constants";
 
 export const useLaunchGalaxy = ({
   configuredInput,
@@ -16,16 +20,26 @@ export const useLaunchGalaxy = ({
   const onLaunchGalaxy = useCallback(async (): Promise<void> => {
     if (!configuredValue) return;
 
-    const landingUrl = await run(
-      getWorkflowLandingUrl(
-        workflow.trsId,
-        configuredValue.referenceAssembly,
-        configuredValue.geneModelUrl,
-        configuredValue.readRunsSingle,
-        configuredValue.readRunsPaired,
-        workflow.parameters
-      )
-    );
+    const landingUrl =
+      workflow.trsId === CUSTOM_WORKFLOW.trsId
+        ? await run(
+            getDataLandingUrl(
+              configuredValue.referenceAssembly,
+              configuredValue.geneModelUrl,
+              configuredValue.readRunsSingle,
+              configuredValue.readRunsPaired
+            )
+          )
+        : await run(
+            getWorkflowLandingUrl(
+              workflow.trsId,
+              configuredValue.referenceAssembly,
+              configuredValue.geneModelUrl,
+              configuredValue.readRunsSingle,
+              configuredValue.readRunsPaired,
+              workflow.parameters
+            )
+          );
 
     if (!landingUrl) {
       throw new Error("Failed to retrieve Galaxy workflow launch URL.");

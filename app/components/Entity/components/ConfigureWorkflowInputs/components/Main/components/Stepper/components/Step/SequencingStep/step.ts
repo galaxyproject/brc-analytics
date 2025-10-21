@@ -2,6 +2,13 @@ import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities"
 import { StepConfig } from "../types";
 import { SequencingStep } from "./sequencingStep";
 
+export const ANY_END_STEP = {
+  Step: SequencingStep,
+  disabled: false,
+  key: "readRunsAny",
+  label: "Sequencing Data",
+} satisfies StepConfig;
+
 export const PAIRED_END_STEP = {
   Step: SequencingStep,
   disabled: false,
