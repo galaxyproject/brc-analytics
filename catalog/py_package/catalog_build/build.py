@@ -1145,13 +1145,15 @@ def make_qc_report(
 ):
     # Convert simple lists to items for format_list_section
     ncbi_assemblies_items = (
-        list(missing_ncbi_assemblies) if missing_ncbi_assemblies else []
+        list(missing_ncbi_assemblies) if len(missing_ncbi_assemblies) > 0 else []
     )
     ucsc_assemblies_items = (
-        list(missing_ucsc_assemblies) if missing_ucsc_assemblies else []
+        list(missing_ucsc_assemblies) if len(missing_ucsc_assemblies) > 0 else []
     )
     gene_model_urls_items = (
-        list(missing_gene_model_urls) if missing_gene_model_urls else None
+        list(missing_gene_model_urls)
+        if missing_gene_model_urls is not None and len(missing_gene_model_urls) > 0
+        else None
     )
     taxonomy_ids_items = (
         [f"{taxon}: {ids}" for taxon, ids in inconsistent_taxonomy_ids]

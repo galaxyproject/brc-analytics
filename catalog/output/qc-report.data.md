@@ -1,4 +1,4 @@
-# Catalog QC report
+# Catalog Data QC report
 
 ## Assemblies not found on NCBI
 
@@ -17,62 +17,62 @@ None
 ## Species and strain combinations with multiple taxonomy IDs
 
 - Acanthamoeba castellanii strain Neff: 5755, 1257118
-- Alphapapillomavirus 12: 10570, 990303
+- Alphapapillomavirus 12: 990303, 10570
 - Alphapapillomavirus 14: 120686, 333769
-- Alphapapillomavirus 6: 10611, 333765
-- Asfivirus haemorrhagiae: 443876, 443878, 10497
-- Batrachochytrium dendrobatidis strain JEL423: 109871, 403673
-- Betacoronavirus pandemicum: 227984, 2697049
-- Betapapillomavirus 1: 333923, 889813
-- Blumeria graminis: 1689686, 62690
+- Alphapapillomavirus 6: 333765, 10611
+- Asfivirus haemorrhagiae: 443878, 443876, 10497
+- Batrachochytrium dendrobatidis strain JEL423: 403673, 109871
+- Betacoronavirus pandemicum: 2697049, 227984
+- Betapapillomavirus 1: 889813, 333923
+- Blumeria graminis: 62690, 1689686
 - Candida albicans strain SC5314: 237561, 5476
 - Candida tropicalis strain MYA-3404: 5482, 294747
 - Cryptococcus gattii strain WM276: 367775, 37769
-- Cryptococcus neoformans strain A5-35-17: 1230080, 5207
-- Cryptococcus neoformans strain C23: 5207, 1295831
-- Cryptococcus neoformans strain H99: 235443, 5207
+- Cryptococcus neoformans strain A5-35-17: 5207, 1230080
+- Cryptococcus neoformans strain C23: 1295831, 5207
+- Cryptococcus neoformans strain H99: 5207, 235443
 - Cryptosporidium parvum: 353152, 5807
-- Deltaretrovirus priTlym1: 11908, 194440
+- Deltaretrovirus priTlym1: 194440, 11908
 - Dependoparvovirus mammalian1: 82300, 256548
 - Dependoparvovirus primate1: 202812, 202813, 10804, 85106, 57579
-- Encephalitozoon intestinalis strain ATCC 50506: 876142, 58839
+- Encephalitozoon intestinalis strain ATCC 50506: 58839, 876142
 - Enterovirus alphacoxsackie: 150846, 156647
-- Enterovirus betarhino: 44130, 12131
-- Fusarium fujikuroi strain B14: 5127, 1215603
-- Fusarium oxysporum: 396575, 1229664, 224912, 5507, 654392, 299031, 61374, 1940294, 330941, 61366
+- Enterovirus betarhino: 12131, 44130
+- Fusarium fujikuroi strain B14: 1215603, 5127
+- Fusarium oxysporum: 5507, 1229664, 654392, 61366, 396575, 299031, 224912, 1940294, 61374, 330941
 - Fusarium oxysporum strain Fo5176: 5507, 100902
-- Fusarium vanettenii: 2747968, 660122
-- Fusarium verticillioides strain 7600: 334819, 117187
-- Gammapapillomavirus 11: 1195796, 1070409, 1070413
-- Gammapapillomavirus 12: 746832, 909331
-- Gammapapillomavirus 15: 1472342, 1070408
-- Gammapapillomavirus 19: 1315259, 1315264
+- Fusarium vanettenii: 660122, 2747968
+- Fusarium verticillioides strain 7600: 117187, 334819
+- Gammapapillomavirus 11: 1070409, 1070413, 1195796
+- Gammapapillomavirus 12: 909331, 746832
+- Gammapapillomavirus 15: 1070408, 1472342
+- Gammapapillomavirus 19: 1315264, 1315259
 - Gemykibivirus humas1: 1519409, 1516081
 - Glossina fuscipes: 7396, 201502
-- Heligmosomoides polygyrus: 375939, 6339
-- Hemileia vastatrix: 1291517, 203904
-- Hepacivirus hominis: 1544901, 356114, 33745
+- Heligmosomoides polygyrus: 6339, 375939
+- Hemileia vastatrix: 203904, 1291517
+- Hepacivirus hominis: 1544901, 33745, 356114
 - Meyerozyma guilliermondii strain ATCC 6260: 294746, 4929
-- Microsporum canis strain CBS 113480: 63405, 554155
+- Microsporum canis strain CBS 113480: 554155, 63405
 - Mucor lusitanicus strain CBS 277.49: 29924, 747725
 - Neospora caninum strain Liverpool: 572307, 29176
-- Norovirus norwalkense: 1246677, 1529918, 490039, 122928, 1529924, 1529909, 122929
+- Norovirus norwalkense: 122929, 1529924, 1529909, 490039, 1246677, 1529918, 122928
 - Orthoflavivirus denguei: 11069, 11070, 11053
-- Orthomarburgvirus marburgense: 3052505, 448086
-- Pegivirus columbiaense: 1729141, 1704090
-- Plasmodium falciparum: 36329, 5833
-- Plasmodium vinckei: 138297, 54757, 5860, 119398, 138298
-- Puccinia striiformis strain 93-210: 168172, 27350
+- Orthomarburgvirus marburgense: 448086, 3052505
+- Pegivirus columbiaense: 1704090, 1729141
+- Plasmodium falciparum: 5833, 36329
+- Plasmodium vinckei: 138298, 5860, 138297, 54757, 119398
+- Puccinia striiformis strain 93-210: 27350, 168172
 - Small anellovirus: 289367, 289366
-- Torbevirus brisa: 2571075, 2571077, 2571078, 3116878
+- Torbevirus brisa: 2571078, 2571075, 3116878, 2571077
 - Trichophyton rubrum strain CBS 289.86: 1215329, 5551
-- Trichophyton rubrum strain CBS 735.88: 5551, 1215332
-- Trypanosoma cruzi strain Dm28c: 85057, 5693, 1416333
-- Vesivirus exanthema: 146073, 35612
+- Trichophyton rubrum strain CBS 735.88: 1215332, 5551
+- Trypanosoma cruzi strain Dm28c: 1416333, 5693, 85057
+- Vesivirus exanthema: 35612, 146073
 
 ## Assemblies without ploidy information
 
-None
+N/A
 
 ## Outbreak descendant taxonomy IDs not found in genomes data
 
