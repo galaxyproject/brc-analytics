@@ -112,9 +112,7 @@ BRC-Analytics is a browser-based analysis environment developed within the NIAID
   src="/learn/featured-analyses/evolutionary-dynamics-of-coding-overlaps-in-measles/brc-analytics-main-components.png"
 />
 
-### Selecting genome: Using NCBI Datasets for reference Data
-
-<Video src="https://www.youtube.com/embed/24xJmywy_Nk" />
+### Selecting genome: Using NCBI Datasets for reference Data ([Video 1](https://youtu.be/24xJmywy_Nk))
 
 The analysis begins at [https://brc-analytics.org](https://brc-analytics.org) where we search for _Morbillivirus hominis_—a binary name for measles virus (a new standard for official scientific names implemented by the international committee on taxonomy of viruses; https://ictv.global/). The search yields a single assembly, GCF_000854845.1, corresponding to the only RefSeq genome for measles. In the remainder of this document we refer to the measles virus as MeV.
 
@@ -132,9 +130,7 @@ Everything described in this manuscript can be re-examined and replicated. Table
 
 Clicking the history link will allow you to import that history in your own workspace and re-examine or re-run every step.
 
-### Selecting analysis: Using community-curated workflows
-
-<Video src="https://www.youtube.com/embed/24xJmywy_Nk?start=66" />
+### Selecting analysis: Using community-curated workflows ([Video 1](https://youtu.be/24xJmywy_Nk?si=lX71_uw7DdQ6JrE-&t=66))
 
 Our goal is to perform a variant identification analysis: sequence data (reads) are mapped against a reference genome and mismatches between the reads and the genome are evaluated to identify likely changes. Such an analysis requires multiple tools for evaluation of data quality, read mapping, and variant identification along with auxiliary utilities. The most optimal way to run an analysis like this is to assemble tools into a workflow. There are already community developed and maintained collections of workflows covering the absolute majority of sequence analysis scenarios. BRC-Analytics tries to match an assembly to a list of potential workflows that are applicable to it. For example, in the case of the measles virus BRC-analytics offers two variant calling workflows. For this study we are using a workflow called “Variant calling and consensus construction from paired end short read data of non-segmented viral genomes” (Fig. 4). This workflow was specifically designed for non-segmented viruses with a low-to-medium evolutionary rate such as MeV. Detailed information about the workflow can be found at [IWC](https://iwc.galaxyproject.org/workflow/generic-non-segmented-viral-variant-calling-main/)—Galaxy’s workflow repository and at [Dockstore](https://dockstore.org/workflows/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main:main?tab=info). The workflow produces several types of outputs: a summary of variants found in each sample, consensus sequence for each sample as well as auxiliary outputs such as QC summary for all samples (see _Making sense of variants_ section below).
 
@@ -157,21 +153,17 @@ Our goal is to perform a variant identification analysis: sequence data (reads) 
 
 For a detailed workflow description see Methods. Briefly, the workflow processes paired-end short-read sequencing data from viral samples using a provided reference genome (FASTA) and annotation (GenBank/GFF), optionally incorporating an amplicon primer BED file. Reads are first quality- and adapter-trimmed with fastp, and primer sequences are removed with iVar trim when applicable. Cleaned reads are aligned to the reference using BWA-MEM, with BAM filtering, statistics, and alignment quality assessment performed via samtools and QualiMap BamQC. Alignments are realigned around indels using the LoFreq Viterbi realigner to improve variant detection. Variants are then called with iVar variants under user-defined thresholds for base quality and allele frequency, and consensus genomes are generated with iVar consensus, introducing IUPAC ambiguity codes where mixed alleles occur. Variants are functionally annotated with SnpEff using a database built from the supplied reference, and results are parsed into tabular form with SnpSift. Quality metrics from all stages are summarized with MultiQC, while standard Galaxy collection and text utilities handle dataset organization and parameter mapping. The workflow outputs include trimmed reads, mapped and realigned BAMs, annotated VCFs with summary tables, per-sample consensus FASTA files, and integrated QC reports.
 
-### Selecting SRA data and launching workflow
-
-<Video src="https://www.youtube.com/embed/24xJmywy_Nk?start=144" />
-
-<Video src="https://www.youtube.com/embed/xdmyzoXTGkc" />
+### Selecting SRA data and launching workflow (Video [1](https://youtu.be/24xJmywy_Nk?si=tadOGwVwK3L1l_1t&t=144) & [2](https://youtu.be/xdmyzoXTGkc))
 
 After selecting the reference genome and workflow for variant identification analysis, we chose public surveillance data for the virus. BRC-analytics' SRA search wizard initially showed 466 individual datasets. These were automatically pre-filtered to 225 samples across nine studies, based on the workflow's requirements for "paired end" (Illumina or Element) and "WGS" (whole genome sequencing) data; these filters can be adjusted as needed. Among these nine studies were the three largest measles surveillance datasets (Table 3), which we selected to launch the previously described workflow.
 
 **Table 3.** Three MeV surveillance datasets selected for this study.
 
 | Study        | Description                                                                                      | \# samples | Reference                                        |
-| :----------- | :----------------------------------------------------------------------------------------------- | ---------- | :----------------------------------------------- |
-| PRJNA1145141 | Analysis of measles outbreak in Romania.                                                         | 124        | [[5]](https://pubmed.ncbi.nlm.nih.gov/39813269/) |
-| PRJNA1017431 | Canadian measles surveillance data.                                                              | 61         | [[6]](https://pubmed.ncbi.nlm.nih.gov/38038439/) |
-| PRJNA869081  | Measles virus transmission patterns and public health responses during Operation Allies Welcome. | 42         | [[7]](https://pubmed.ncbi.nlm.nih.gov/37516478/) |
+| :----------- | :----------------------------------------------------------------------------------------------- | ---------: | :----------------------------------------------- |
+| PRJNA1145141 | Analysis of measles outbreak in Romania.                                                         |        124 | [[5]](https://pubmed.ncbi.nlm.nih.gov/39813269/) |
+| PRJNA1017431 | Canadian measles surveillance data.                                                              |         61 | [[6]](https://pubmed.ncbi.nlm.nih.gov/38038439/) |
+| PRJNA869081  | Measles virus transmission patterns and public health responses during Operation Allies Welcome. |         42 | [[7]](https://pubmed.ncbi.nlm.nih.gov/37516478/) |
 
 The workflow outputs two datasets that would help us gain insights into the evolution of overlapping coding regions in the measles virus. The first dataset provides information about each variant within each sample: it shows its position, alternative allele frequency, strand-specific read counts, functional impact and other data (Supplementary Table 1). The second dataset contains consensus sequences produced for each sample by incorporating all variants present in that sample. We will use it to assess adaptive significance of substitutions.
 
@@ -187,15 +179,11 @@ The workflow outputs two datasets that would help us gain insights into the evol
   src="/learn/featured-analyses/evolutionary-dynamics-of-coding-overlaps-in-measles/variant-calls-post-processing.png"
 />
 
-### Making sense of variants: Combining LLMs and JupyterLite
-
-<Video src="https://www.youtube.com/embed/plwNw_PcUgE" />
+### Making sense of variants: Combining LLMs and JupyterLite ([Video 3](https://youtu.be/plwNw_PcUgE?si=mMe4IpCFIG9_WYkZ))
 
 The workflow described above produced a list of variants observed in each sample. Such a list by itself does not provide any valuable biological insights. It needs to be reshaped, summarized, and visualized to give us any ideas on the biological significance of variants we just identified. Additional complication is that there are no “off-the-shelf” tools for analysis of genetic variants in overlapping coding regions. Fortunately, BRC-analytics and Galaxy it utilizes as the analysis platform (Fig. 5) provide ability to construct analyses in an _ad-hoc_ way. For this we will use an environment called JupyterLite that is integrated into the Galaxy platform. The entire analysis including the notebook can be accessed as described in Methods (also see the [Video 3](https://youtu.be/plwNw_PcUgE?si=mMe4IpCFIG9_WYkZ)). Below we go through major stages of this analysis. All steps of this analysis described in the notebook were generated with the help of ChatGPT using a setup shown in Fig. 5 in which we used two open browser windows: one with Galaxy workspace and another with ChatGPT, Microsoft CoPilot, Claude, or any other LLM agent capable of writing python code (the [Video 3](https://youtu.be/plwNw_PcUgE?si=mMe4IpCFIG9_WYkZ) also details safety checks we used when using LLM-generated code—such code should ALWAYS be treated with extreme caution and made publicly available).
 
-### P reading frame is more permissive than C and V
-
-<Video src="https://www.youtube.com/embed/plwNw_PcUgE?start=514" />
+### P reading frame is more permissive than C and V ([Video 3](https://youtu.be/plwNw_PcUgE?si=oQtcBzj13rnXRbAK&t=514))
 
 First we looked for general patterns of substitutions within P/C and P/V overlaps by simply plotting aggregate data for each substitutions (e.g., the number of samples a substitution occurs at, median, min, and max alternative allele frequencies and its effect, synonymous or non-synonymous, on each reading frame). This is presented in Fig. 5. One can see that in both cases the P reading frame appears to be more permissive—most substitutions are non-synonymous (“red”) in P and synonymous (“green”) in C or V.
 
@@ -227,7 +215,7 @@ Nucleotide substitutions in the C-protein and the V-protein region downstream of
 **Table 4.** Nucleotide substitutions within P/C and P/V overlaps. Samples = number of samples this variant is observed in
 
 | **Site ID** |       **Products**        |          **Effect**          | **Ref codons** | **Alt codons** | **Samples** |
-| ----------- | :-----------------------: | :--------------------------: | :------------: | :------------: | :---------: |
+| :---------- | :-----------------------: | :--------------------------: | :------------: | :------------: | :---------: |
 | 1836-G      | C protein, phosphoprotein |  nonsynonymous, synonymous   |    AAA, AAA    |    AGA, AAG    |     16      |
 | 1847-G      | C protein, phosphoprotein | nonsynonymous, nonsynonymous |    AAT, GAA    |    GAT, GGA    |      6      |
 | 1866-A      | C protein, phosphoprotein |  nonsynonymous, synonymous   |    AGG, AAG    |    AAG, AAA    |     53      |
@@ -276,15 +264,11 @@ Nucleotide substitutions in the C-protein and the V-protein region downstream of
 | 2693-T      | V protein, phosphoprotein | nonsynonymous, nonsynonymous |    GAG, AGA    |    GAT, ATA    |      3      |
 | 2704-G      | V protein, phosphoprotein |  synonymous, nonsynonymous   |    TAA, AAT    |    TGA, GAT    |      1      |
 
-### Substitutions have distinct geographic and temporal patterns
-
-<Video src="https://www.youtube.com/embed/plwNw_PcUgE?start=748" />
+### Substitutions have distinct geographic and temporal patterns ([Video 3](https://youtu.be/plwNw_PcUgE?si=gq2w5QJriFkz2O0h&t=748))
 
 Next we analyzed the substitution patterns in the context of sampling locations and collection times. For this we had to rely on the sample metadata downloaded from SRA. Results of this analysis are shown in Fig. 6. While most samples show strain-specific patterns there is a number if interesting sites such as, for example linked co-occurring substitutions at position 2,576 and 2,683 within five US samples (SRR25426258, SRR25426259, SRR25426260, SRR25426262, SRR25426264). These two sites are within the P/V overlap. The first change is non-synonomous in P and synonymous in V, while the second is non-synonymous for both reading frames.
 
-### Comparative analysis of substitution effects
-
-<Video src="https://www.youtube.com/embed/opPVkPxU25c" />
+### Comparative analysis of substitution effects ([Video 4](https://youtu.be/opPVkPxU25c))
 
 Our final analysis aimed to identify potentially adaptive substitutions, particularly within the P/C and P/V overlaps. Traditional codon-based models, which assume a constant nonsynonymous to synonymous substitution rate (ω = dN/dS) across all lineages at a given site, are not well-suited for detecting transient or lineage-specific instances of positive selection. To address this limitation, we employed the Mixed Effects Model of Evolution (MEME) method [[10]](https://pubmed.ncbi.nlm.nih.gov/22807683/). MEME is specifically designed to detect episodic diversifying selection at individual sites within a multiple sequence alignment. It achieves this by integrating fixed effects (allowing ω to vary across sites) with random effects (allowing ω to vary across branches). For each site, MEME fits a mixture model. This model accounts for the possibility that some branches may be subject to purifying or neutral selection (ω ≤ 1), while others may experience positive selection (ω > 1). The probabilities of these scenarios are estimated using maximum likelihood. This approach enables MEME to pinpoint sites where positive selection has occurred in only a subset of lineages, rather than uniformly across the entire phylogeny.
 
