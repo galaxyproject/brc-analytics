@@ -1,4 +1,6 @@
-import { GetStaticPropsContext } from "next/types";
+import { GetStaticPropsContext, GetStaticPropsResult } from "next/types";
+import { StaticProps } from "./types";
+import { sanitizeOutline } from "./outline";
 
 /**
  * Returns the page slug for the given static props context and section.
@@ -14,4 +16,23 @@ export function buildSlug(
   if (!slug || typeof slug === "string") return;
   if (section) return [section, ...slug];
   return slug;
+}
+
+/**
+ * Processes the static props for the given static props context.
+ * @param props - Static props context.
+ * @returns Processed static props.
+ */
+export function sanitizeStaticProps(
+  props: GetStaticPropsResult<StaticProps>
+): GetStaticPropsResult<StaticProps> {
+  if ("props" in props) {
+    return {
+      props: {
+        ...props.props,
+        outline: sanitizeOutline(props.props),
+      },
+    };
+  }
+  return props;
 }

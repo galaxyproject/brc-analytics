@@ -3,7 +3,10 @@ import { StyledPagesMain } from "../../app/components/Layout/components/Main/mai
 import { LearnContentView } from "../../app/views/LearnContentView/learnContentView";
 import { buildStaticPaths } from "../../app/docs/common/staticGeneration/staticPaths";
 import { buildStaticProps } from "../../app/docs/common/staticGeneration/staticProps";
-import { buildSlug } from "../../app/docs/common/staticGeneration/utils";
+import {
+  buildSlug,
+  sanitizeStaticProps,
+} from "../../app/docs/common/staticGeneration/utils";
 import { StaticProps } from "../../app/docs/common/staticGeneration/types";
 
 const SECTION = "learn";
@@ -12,17 +15,21 @@ const Page = (props: StaticProps): JSX.Element => {
   return <LearnContentView {...props} />;
 };
 
-export const getStaticProps: GetStaticProps = async (
+export const getStaticProps: GetStaticProps<StaticProps> = async (
   props: GetStaticPropsContext
 ) => {
   // Build the static props for the page.
-  const staticProps = await buildStaticProps(buildSlug(props, SECTION));
+  const staticProps = await buildStaticProps(
+    buildSlug(props, SECTION),
+    undefined,
+    undefined
+  );
 
   // If the static props are not found, return not found.
   if (!staticProps) return { notFound: true };
 
   // Return the static props.
-  return staticProps;
+  return sanitizeStaticProps(staticProps);
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {

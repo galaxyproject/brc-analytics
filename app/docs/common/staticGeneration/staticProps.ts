@@ -50,6 +50,7 @@ export async function buildStaticProps(
     props: {
       frontmatter,
       mdxSource,
+      outline,
       pageTitle,
       slug,
       themeOptions: {
