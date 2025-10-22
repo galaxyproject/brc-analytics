@@ -1,5 +1,17 @@
 import { SectionContent } from "../../../content/content.styles";
 import styled from "@emotion/styled";
+import { css } from "@emotion/react";
+
+const iframe = css`
+  iframe {
+    aspect-ratio: 16/ 9;
+    border: none;
+    display: block;
+    height: auto;
+    margin: 16px 0;
+    width: 100%;
+  }
+`;
 
 // See https://github.com/emotion-js/emotion/issues/1105.
 // See https://github.com/emotion-js/emotion/releases/tag/%40emotion%2Fcache%4011.10.2.
@@ -24,4 +36,6 @@ export const StyledSectionContent = styled(SectionContent)`
       }
     }
   }
+
+  ${iframe}
 `;
