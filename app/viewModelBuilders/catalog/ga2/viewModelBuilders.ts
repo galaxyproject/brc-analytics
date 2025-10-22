@@ -181,3 +181,24 @@ export const buildTaxonomicLevelSpecies = (
     url: `${ROUTES.ORGANISMS}/${sanitizeEntityId(entity.speciesTaxonomyId)}`,
   };
 };
+
+/**
+ * Build props for the genome AnalysisResources component.
+ * @param entity - Entity with an accession, ucscBrowserUrl and ncbiTaxonomyId property.
+ * @returns Props to be used for the AnalysisResources component.
+ */
+export const buildAssemblyResources = (
+  entity: GA2AssemblyEntity
+): ComponentProps<typeof C.AnalysisResources> => {
+  if (!entity.assemblyResources || entity.assemblyResources.length === 0) {
+    return {
+      resources: [],
+    };
+  } else {
+    return {
+      resources: entity.assemblyResources.map((resourceUrl) => ({
+        url: resourceUrl,
+      })),
+    };
+  }
+};

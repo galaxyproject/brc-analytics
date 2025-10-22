@@ -6,6 +6,8 @@ from ....py_package.catalog_build import build_files, generate_taxon_read_run_co
 
 ASSEMBLIES_PATH = "catalog/ga2/source/assemblies.yml"
 
+EXTRA_ASSEMBLY_RESOURES_PATH = "catalog/ga2/source/genomeark_assembly_resources.json"
+
 UCSC_ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/VGP/assemblyList.json"
 
 GENOMES_OUTPUT_PATH = "catalog/ga2/build/intermediate/genomes-from-ncbi.tsv"
@@ -104,6 +106,7 @@ def build_ncbi_data():
         do_gene_model_urls=False,
         primary_output_path=PRIMARYDATA_OUTPUT_PATH,
         extract_primary_data=True,
+        extra_assembly_resources=EXTRA_ASSEMBLY_RESOURES_PATH,
     )
     create_taxonomy_read_run_count(
         GENOMES_OUTPUT_PATH, TAXONOMY_READ_RUN_COUNTS_OUTPUT_PATH

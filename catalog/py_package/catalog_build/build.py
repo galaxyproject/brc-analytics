@@ -1340,6 +1340,7 @@ def build_files(
     organisms_path=None,
     outbreaks_path=None,
     outbreak_taxonomy_mapping_path=None,
+    extra_assembly_resources=None,
 ):
     """
     Build catalog-related data files based on specified input data and data from services such as the NCBI API.
@@ -1358,6 +1359,7 @@ def build_files(
       organisms_path: Path of input organisms YAML, used to perform checks
       outbreaks_path: Path of input outbreaks YAML
       outbreak_taxonomy_mapping_path: Path to save taxonomic information for outbreaks at
+      extra_assembly_resources: json file with extra assembly resources to merge into genomes
     """
     if taxonomic_group_sets is None:
         taxonomic_group_sets = {}
@@ -1531,6 +1533,16 @@ def build_files(
         qc_report_params["outdated_accessions"] = find_outdated_accessions(genomes_df)
         qc_report_params["suppressed_genomes"] = find_suppressed_genomes(genomes_df)
         qc_report_params["paired_accessions"] = find_gca_with_paired_gcf(genomes_df)
+
+    # If extra assembly resources are provided, merge them into genomes_df
+    if extra_assembly_resources:
+        with open(extra_assembly_resources) as f:
+            extra_resources = json.load(f)
+        genomes_df["assemblyResources"] = genomes_df["accession"].apply(
+            lambda acc: ",".join(
+                [file for file in extra_resources.get(acc, {}).values()]
+            )
+        )
 
     # Drop any duplicate rows based on accession before writing to file
     genomes_df = genomes_df.drop_duplicates(subset=["accession"])

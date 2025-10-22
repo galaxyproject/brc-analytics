@@ -5,6 +5,7 @@ export type GA2Catalog = GA2AssemblyEntity | GA2OrganismEntity;
 export interface GA2AssemblyEntity {
   accession: string;
   annotationStatus: string | null;
+  assemblyResources: string[];
   chromosomes: number | null;
   coverage: string | null;
   gcPercent: number | null;

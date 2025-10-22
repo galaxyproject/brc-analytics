@@ -33,6 +33,7 @@ export { AnalysisMethod } from "./Entity/components/AnalysisMethod/analysisMetho
 export { AnalysisMethodsCatalog } from "./Entity/components/AnalysisMethodsCatalog/analysisMethodsCatalog";
 export { AnalysisMethodsTitle } from "./Entity/components/AnalysisMethodsTitle/analysisMethodsTitle";
 export { AnalysisPortals } from "./Entity/components/AnalysisPortals/analysisPortals";
+export { AnalysisResources } from "./Entity/components/AnalysisResources/analysisResources";
 export { GridPaperSection } from "./Layout/components/Detail/components/Section/section.styles";
 export { Branding } from "./Layout/components/Footer/components/Branding/branding";
 export { AnalyzeGenome } from "./Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";

@@ -103,6 +103,7 @@ async function buildAssemblies(
     mappedRows.push({
       accession: row.accession,
       annotationStatus: parseStringOrNull(row.annotationStatus),
+      assemblyResources: parseList(row.assemblyResources),
       chromosomes: parseNumberOrNull(row.chromosomeCount),
       coverage: parseStringOrNull(row.coverage),
       gcPercent: parseNumberOrNull(row.gcPercent),
