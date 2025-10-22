@@ -7,7 +7,7 @@ import {
   Section,
   SectionLayout,
 } from "../../components/content/content.styles";
-import { StyledSectionContent } from "../../components/Docs/components/Content/content.styles";
+import { Content } from "../../components/Docs/components/Content/content";
 
 export const LearnContentView = (props: StaticProps): JSX.Element => {
   const { frontmatter, mdxSource } = props;
@@ -20,9 +20,9 @@ export const LearnContentView = (props: StaticProps): JSX.Element => {
       />
       <Section border>
         <SectionLayout>
-          <StyledSectionContent>
+          <Content>
             <MDXRemote {...mdxSource} components={MDX_COMPONENTS} />
-          </StyledSectionContent>
+          </Content>
         </SectionLayout>
       </Section>
     </Fragment>

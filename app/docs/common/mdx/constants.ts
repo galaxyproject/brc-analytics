@@ -5,6 +5,7 @@ import { Figure } from "../../../components/common/Figure/figure";
 import { Link } from "../../../components/Docs/components/common/Link/link";
 import { Alert } from "@databiosphere/findable-ui/lib/components/common/Alert/alert";
 import { Video } from "../../../components/Docs/components/common/Video/video";
+import { Table } from "../../../components/Docs/components/common/Table/table";
 
 export const MDX_COMPONENTS: MDXComponents = {
   Alert,
@@ -13,4 +14,5 @@ export const MDX_COMPONENTS: MDXComponents = {
   SectionOverview,
   Video,
   a: Link,
+  table: Table,
 };
