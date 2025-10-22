@@ -22,6 +22,7 @@ export const StyledContentLayout = styled(ContentLayout)`
 
 export const StyledContentGrid = styled(ContentGrid)`
   ${sectionLayout}
+  display: grid;
   padding: 64px 16px;
 `;
 

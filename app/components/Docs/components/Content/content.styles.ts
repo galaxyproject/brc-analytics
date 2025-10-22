@@ -100,8 +100,11 @@ const muiAlert = css`
 // See https://github.com/emotion-js/emotion/releases/tag/%40emotion%2Fcache%4011.10.2.
 const ignoreSsrWarning =
   "/* emotion-disable-server-rendering-unsafe-selector-warning-please-do-not-use-this-the-warning-exists-for-a-reason */";
-export const StyledSectionContent = styled(SectionContent)<Props>`
+export const StyledSectionContent = styled(SectionContent, {
+  shouldForwardProp: (prop) => prop !== "offset",
+})<Props>`
   margin-top: 0;
+  min-width: 0;
 
   ${heading}
   ${iframe}
