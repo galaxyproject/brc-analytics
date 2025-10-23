@@ -57,3 +57,29 @@ export const Branding = (): JSX.Element => {
     </Brands>
   );
 };
+
+export const GA2Branding = (): JSX.Element => {
+  return (
+    <Brands>
+      <SmallBrand>
+        <Logo
+          alt="NSF"
+          height={32}
+          link="https://www.nsf.gov/"
+          src="/footer/nsf.png"
+          target={ANCHOR_TARGET.BLANK}
+        />
+      </SmallBrand>
+      <FooterText
+        color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
+        variant={TYPOGRAPHY_PROPS.VARIANT.BODY_SMALL_400}
+      >
+        U.S National Science Foundation Award
+        <Link
+          label=" #2419522"
+          url="https://www.nsf.gov/awardsearch/showAward?AWD_ID=2419522&HistoricalAwards=false"
+        />
+      </FooterText>
+    </Brands>
+  );
+};
