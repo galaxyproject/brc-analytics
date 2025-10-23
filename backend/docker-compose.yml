@@ -5,7 +5,7 @@ services:
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./out:/usr/share/nginx/html
+      - ../out:/usr/share/nginx/html
     depends_on:
       backend:
         condition: service_healthy
@@ -18,14 +18,14 @@ services:
 
   backend:
     build:
-      context: ./backend
+      context: .
       dockerfile: Dockerfile
       args:
         APP_VERSION: ${APP_VERSION:-0.15.0}
     ports:
       - "8000:8000"
     env_file:
-      - ./backend/.env
+      - .env
     environment:
       # Only override what needs Docker networking
       REDIS_URL: redis://redis:6379/0
