@@ -26,11 +26,11 @@ API documentation: http://localhost:8000/api/docs
 
 ```bash
 # Create environment file
-cp backend/.env.example backend/.env
-# Edit backend/.env if needed (defaults work for local development)
+cp .env.example .env
+# Edit .env if needed (defaults work for local development)
 
 # Build with version from package.json
-./scripts/docker-build.sh
+./docker-build.sh
 
 # Start all services (nginx + backend + redis)
 docker compose up -d
