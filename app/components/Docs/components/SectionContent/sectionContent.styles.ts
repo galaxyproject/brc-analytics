@@ -24,7 +24,7 @@ export const StyledContentGrid = styled(ContentGrid)`
   ${sectionLayout}
   display: grid;
   padding: 64px 16px;
-  width: 100%;
+  width: calc(100% - 32px);
 `;
 
 export const StyledOutlineGrid = styled(OutlineGrid)`
