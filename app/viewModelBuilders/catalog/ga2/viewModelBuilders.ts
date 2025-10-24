@@ -56,6 +56,42 @@ export const buildOrganismHero = (
 };
 
 /**
+ * Build props for the organism BackPageHero component.
+ * @param entity - Entity.
+ * @returns Props to be used for the BackPageHero component.
+ */
+export const buildOrganismImage = (
+  entity: GA2OrganismEntity | GA2AssemblyEntity
+): ComponentProps<typeof C.OrganismAvatar> => {
+  return {
+    credit: entity.imageCredit,
+    imagePath: entity.imageUrl,
+    isThumbnail: false,
+    license: entity.imageLicense,
+    pageSource: entity.imageSourceName,
+    sourceLink: entity.imageSourceUrl,
+  };
+};
+
+/**
+ * Build props for the organism BackPageHero component.
+ * @param entity - Entity.
+ * @returns Props to be used for the BackPageHero component.
+ */
+export const buildOrganismImageThumbnail = (
+  entity: GA2OrganismEntity | GA2AssemblyEntity
+): ComponentProps<typeof C.OrganismAvatar> => {
+  return {
+    credit: entity.imageCredit,
+    imagePath: entity.thumbnailUrl,
+    isThumbnail: true,
+    license: entity.imageLicense,
+    pageSource: entity.imageSourceName,
+    sourceLink: entity.imageSourceUrl,
+  };
+};
+
+/**
  * Build props for the genomes table for the given organism.
  * @param entity - Entity.
  * @returns props to be used for the table.

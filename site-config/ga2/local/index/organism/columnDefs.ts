@@ -129,3 +129,14 @@ export const TAXONOMIC_LEVEL_SPECIES: ColumnConfig<GA2OrganismEntity> = {
   meta: { columnPinned: true },
   width: { max: "1fr", min: "auto" },
 };
+
+export const ORGANISM_IMAGE: ColumnConfig<GA2OrganismEntity> = {
+  componentConfig: {
+    component: C.OrganismAvatar,
+    viewBuilder: V.buildOrganismImageThumbnail,
+  } as ComponentConfig<typeof C.OrganismAvatar, GA2OrganismEntity>,
+  header: GA2_CATEGORY_LABEL.ORGANISM_AVATAR,
+  id: GA2_CATEGORY_KEY.ORAGNISM_AVATAR,
+  meta: { columnPinned: true },
+  width: { max: "100px", min: "100px" },
+};

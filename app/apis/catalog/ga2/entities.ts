@@ -9,6 +9,11 @@ export interface GA2AssemblyEntity {
   coverage: string | null;
   gcPercent: number | null;
   geneModelUrl: string | null;
+  imageCredit: string | null;
+  imageLicense: string | null;
+  imageSourceName: string | null;
+  imageSourceUrl: string | null;
+  imageUrl: string;
   isRef: "No" | "Yes";
   length: number;
   level: string;
@@ -31,6 +36,7 @@ export interface GA2AssemblyEntity {
   taxonomicLevelPhylum: string;
   taxonomicLevelSpecies: string;
   taxonomicLevelStrain: string;
+  thumbnailUrl: string;
   tolId: string;
   ucscBrowserUrl: string | null;
 }
@@ -39,6 +45,11 @@ export interface GA2OrganismEntity {
   assemblyCount: number;
   assemblyTaxonomyIds: string[];
   genomes: GA2AssemblyEntity[];
+  imageCredit: string | null;
+  imageLicense: string | null;
+  imageSourceName: string | null;
+  imageSourceUrl: string | null;
+  imageUrl: string;
   maxScaffoldN50: number | null;
   ncbiTaxonomyId: string;
   taxonomicGroup: string[];
@@ -50,6 +61,7 @@ export interface GA2OrganismEntity {
   taxonomicLevelOrder: string;
   taxonomicLevelPhylum: string;
   taxonomicLevelSpecies: string;
+  thumbnailUrl: string;
   tolId: string;
 }
 

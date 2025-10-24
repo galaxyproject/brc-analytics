@@ -24,9 +24,11 @@ import {
   COVERAGE,
   GC_PERCENT,
   ANNOTATION_STATUS,
+  ORGANISM_IMAGE,
 } from "./columnDefs";
 
 export const COLUMNS: ColumnConfig<GA2AssemblyEntity>[] = [
+  ORGANISM_IMAGE,
   ANALYZE_GENOME,
   ACCESSION,
   TAXONOMIC_LEVEL_DOMAIN,
