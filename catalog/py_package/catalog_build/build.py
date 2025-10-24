@@ -1340,6 +1340,7 @@ def build_files(
     organisms_path=None,
     outbreaks_path=None,
     outbreak_taxonomy_mapping_path=None,
+    extra_assembly_resources=None,
 ):
     """
     Build catalog-related data files based on specified input data and data from services such as the NCBI API.
@@ -1358,6 +1359,7 @@ def build_files(
       organisms_path: Path of input organisms YAML, used to perform checks
       outbreaks_path: Path of input outbreaks YAML
       outbreak_taxonomy_mapping_path: Path to save taxonomic information for outbreaks at
+      extra_assembly_resources: json file with extra assembly resources to merge into genomes
     """
     if taxonomic_group_sets is None:
         taxonomic_group_sets = {}

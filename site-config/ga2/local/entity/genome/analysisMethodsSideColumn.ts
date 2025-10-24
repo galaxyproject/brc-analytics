@@ -4,6 +4,7 @@ import {
 } from "@databiosphere/findable-ui/lib/config/entities";
 import * as C from "../../../../../app/components";
 import * as V from "../../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import * as V_GA2 from "../../../../../app/viewModelBuilders/catalog/ga2/viewModelBuilders";
 import { GA2AssemblyEntity } from "../../../../../app/apis/catalog/ga2/entities";
 
 export const sideColumn: ComponentsConfig = [
@@ -52,6 +53,24 @@ export const sideColumn: ComponentsConfig = [
                     viewBuilder: V.buildGenomeAnalysisPortals,
                   } as ComponentConfig<
                     typeof C.AnalysisPortals,
+                    GA2AssemblyEntity
+                  >,
+                ],
+                component: C.GridPaperSection,
+              },
+              {
+                children: [
+                  {
+                    component: C.SectionTitle,
+                    props: {
+                      title: "Bioinformatics Resources",
+                    },
+                  } as ComponentConfig<typeof C.SectionTitle>,
+                  {
+                    component: C.AnalysisResources,
+                    viewBuilder: V_GA2.buildAssemblyResources,
+                  } as ComponentConfig<
+                    typeof C.AnalysisResources,
                     GA2AssemblyEntity
                   >,
                 ],
