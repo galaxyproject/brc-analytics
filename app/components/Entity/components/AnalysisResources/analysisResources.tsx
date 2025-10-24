@@ -2,33 +2,35 @@ import { Typography, Link } from "@mui/material";
 import { Fragment } from "react";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 
-export interface AnalysisResource {
-  url: string;
-}
-
 export interface AnalysisResourcesProps {
-  resources: AnalysisResource[];
+  resources: Record<string, Array<{ name: string; url: string }>>;
 }
 
 export const AnalysisResources = ({
   resources,
 }: AnalysisResourcesProps): JSX.Element => {
-  if (resources.length === 0) return <span>None</span>;
-
+  if (Object.keys(resources).length === 0) return <Fragment></Fragment>;
   return (
-    <Fragment>
-      {resources.map(({ url }) => (
-        <Typography key={url} variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}>
-          <Link
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            underline="hover"
+    <>
+      {Object.keys(resources).map((resourceType) => (
+        <Fragment key={resourceType}>
+          <Typography
+            color={TYPOGRAPHY_PROPS.COLOR.INK_MAIN}
+            component="h3"
+            variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
           >
-            {url.split("/").pop()}
-          </Link>
-        </Typography>
+            {resourceType}
+          </Typography>
+          {resources[resourceType].map((resource) => (
+            <Typography
+              key={resource.name}
+              variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
+            >
+              <Link href={resource.url}>{resource.name}</Link>
+            </Typography>
+          ))}
+        </Fragment>
       ))}
-    </Fragment>
+    </>
   );
 };

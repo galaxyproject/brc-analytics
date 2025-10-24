@@ -63,7 +63,7 @@ export const sideColumn: ComponentsConfig = [
                   {
                     component: C.SectionTitle,
                     props: {
-                      title: "Files",
+                      title: "Bioinformatics Resources",
                     },
                   } as ComponentConfig<typeof C.SectionTitle>,
                   {

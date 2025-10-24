@@ -190,15 +190,16 @@ export const buildTaxonomicLevelSpecies = (
 export const buildAssemblyResources = (
   entity: GA2AssemblyEntity
 ): ComponentProps<typeof C.AnalysisResources> => {
-  if (!entity.assemblyResources || entity.assemblyResources.length === 0) {
+  if (
+    !entity.assemblyResources ||
+    Object.keys(entity.assemblyResources).length === 0
+  ) {
     return {
-      resources: [],
+      resources: {},
     };
   } else {
     return {
-      resources: entity.assemblyResources.map((resourceUrl) => ({
-        url: resourceUrl,
-      })),
+      resources: entity.assemblyResources,
     };
   }
 };

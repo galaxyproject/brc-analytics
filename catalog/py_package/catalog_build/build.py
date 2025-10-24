@@ -1534,16 +1534,6 @@ def build_files(
         qc_report_params["suppressed_genomes"] = find_suppressed_genomes(genomes_df)
         qc_report_params["paired_accessions"] = find_gca_with_paired_gcf(genomes_df)
 
-    # If extra assembly resources are provided, merge them into genomes_df
-    if extra_assembly_resources:
-        with open(extra_assembly_resources) as f:
-            extra_resources = json.load(f)
-        genomes_df["assemblyResources"] = genomes_df["accession"].apply(
-            lambda acc: ",".join(
-                [file for file in extra_resources.get(acc, {}).values()]
-            )
-        )
-
     # Drop any duplicate rows based on accession before writing to file
     genomes_df = genomes_df.drop_duplicates(subset=["accession"])
 
