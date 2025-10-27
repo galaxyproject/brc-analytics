@@ -1,4 +1,9 @@
-import { UcscTrack, UcscTrackComposite, UcscTrackGroup } from "./entities";
+import {
+  UcscTrack,
+  UcscTrackComposite,
+  UcscTrackGroup,
+  UcscTrackNode,
+} from "./entities";
 import { UcscApiResponseTrack, ucscApiResponseTrackSchema } from "./schema";
 
 const TRACKS_API_URL = "https://api.genome.ucsc.edu/list/tracks";
@@ -36,21 +41,19 @@ export async function getAssemblyTracks(
 }
 
 async function buildTrackGroup(
-  id: string | undefined,
+  groupId: string | undefined,
   responseTracks: UcscApiResponseTrack[]
 ): Promise<UcscTrackGroup> {
-  const composites: UcscTrackComposite[] = [];
-  const tracks: UcscTrack[] = [];
+  const tracks: UcscTrackNode[] = [];
   for (const responseTrack of responseTracks) {
     if (responseTrack.compositeContainer === "TRUE") {
-      composites.push(await buildTrackComposite(responseTrack));
+      tracks.push(await buildTrackComposite(responseTrack));
     } else {
       tracks.push(buildTrack(responseTrack));
     }
   }
   return {
-    composites,
-    id,
+    groupId,
     tracks,
   };
 }
@@ -67,6 +70,7 @@ async function buildTrackComposite(
     }
   }
   return {
+    isComposite: true,
     longLabel: responseTrack.longLabel,
     shortLabel: responseTrack.shortLabel,
     tracks,
@@ -77,6 +81,7 @@ async function buildTrackComposite(
 function buildTrack(responseTrack: UcscApiResponseTrack): UcscTrack {
   return {
     bigDataUrl: responseTrack.bigDataUrl,
+    isComposite: false,
     longLabel: responseTrack.longLabel,
     shortLabel: responseTrack.shortLabel,
     type: responseTrack.type,
