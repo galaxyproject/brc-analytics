@@ -1,0 +1,145 @@
+import { DocLayout } from "../../../app/components/Learn/DocLayout";
+
+export const meta = {
+  title: "Working with Data",
+  description: "Learn how to manage and analyze genomic data in BRC Analytics.",
+};
+
+export default ({ children }) => (
+  <DocLayout title={meta.title} description={meta.description}>
+    {children}
+  </DocLayout>
+);
+
+# Working with Data
+
+This tutorial covers how to work with genomic data in BRC Analytics.
+
+## Data Types
+
+BRC Analytics supports several types of genomic data:
+
+- **Reference Genomes** - Full genome sequences for organisms
+- **Annotations** - Gene locations, transcripts, and other features
+- **Sequencing Data** - Raw reads from sequencing experiments (FASTQ)
+- **Alignments** - Mapped reads to reference genomes (BAM/SAM)
+- **Variants** - Genetic variations (VCF)
+
+## Accessing Reference Data
+
+BRC Analytics provides pre-loaded reference data for many organisms:
+
+1. Browse to the [Organisms](/data/organisms) page
+2. Select an organism of interest
+3. View the available assemblies and annotations
+
+Example of accessing an assembly in code:
+
+```typescript
+import { fetchAssembly } from "@brc-analytics/api";
+
+// Fetch a specific assembly by accession
+const assembly = await fetchAssembly("GCF_000001405.39");
+
+// Access assembly metadata
+console.log(`Organism: ${assembly.organism.name}`);
+console.log(`Version: ${assembly.version}`);
+console.log(`Source: ${assembly.source}`);
+```
+
+## Importing External Data
+
+You can import your own data to use with BRC Analytics:
+
+### Importing from ENA
+
+1. Go to the workflow configuration page
+2. Select "Import from ENA" option
+3. Enter accession numbers for your samples
+4. Select the files to import
+
+### Uploading Local Files
+
+1. Select the "Upload Files" option in the workflow configuration
+2. Use the file browser to select local files
+3. Or provide URLs to download files from external sources
+
+## Data Preparation
+
+Before analysis, you may need to prepare your data:
+
+### Quality Control
+
+Checking the quality of sequencing data:
+
+1. Use FastQC to assess read quality
+2. Trim low-quality bases and adapters
+3. Filter out low-quality reads
+
+### Format Conversion
+
+Converting between data formats:
+
+1. Use Galaxy tools for format conversion
+2. Common conversions include BAM to BED, GTF to BED, etc.
+
+## Working with Large Datasets
+
+Tips for handling large genomic datasets:
+
+1. Use streaming tools when possible to reduce memory usage
+2. Split large analyses into smaller batches
+3. Consider downsampling for initial analysis
+
+## Data Visualization
+
+BRC Analytics offers several ways to visualize your data:
+
+### UCSC Genome Browser
+
+1. Select "View in Genome Browser" option for compatible data
+2. Browse genomic regions with annotations
+3. Add custom tracks for your analysis results
+
+### Galaxy Visualization
+
+1. Use built-in Galaxy visualization tools
+2. Create interactive plots and charts
+3. Generate genome browser views within Galaxy
+
+## Data Sharing
+
+Sharing your data with collaborators:
+
+1. Create shared histories in Galaxy
+2. Generate public links to specific datasets
+3. Export data in standard formats for external sharing
+
+## Data Security
+
+BRC Analytics takes data security seriously:
+
+1. All data transfers use encrypted connections
+2. Account authentication protects your data
+3. Data access controls determine who can view your data
+
+## Best Practices
+
+Recommendations for effective data management:
+
+1. Document your data sources and processing steps
+2. Use consistent naming conventions
+3. Regularly back up important datasets
+4. Clean up temporary files to free storage quota
+
+export async function getStaticProps() {
+  return {
+    props: {
+      pageTitle: meta.title + " - Learn BRC Analytics",
+      themeOptions: {
+        palette: { background: { default: "#FAFBFB" } }, // SMOKE_LIGHTEST
+      },
+    },
+  };
+
+}

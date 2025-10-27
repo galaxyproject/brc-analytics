@@ -1,0 +1,88 @@
+import { DocLayout } from "../../app/components/Learn/DocLayout";
+
+export const meta = {
+  title: "Setup & Installation",
+  description: "Set up your environment to work with BRC Analytics.",
+};
+
+export default ({ children }) => (
+  <DocLayout title={meta.title} description={meta.description}>
+    {children}
+  </DocLayout>
+);
+
+# Setup Guide
+
+This guide will help you set up your environment to work with BRC Analytics.
+
+## Creating an Account
+
+To use all features of BRC Analytics, you'll need a Galaxy account. This account will allow you to save workflows, histories, and share your work with collaborators.
+
+### Sign Up Process
+
+1. Visit [https://brc.usegalaxy.org](https://brc.usegalaxy.org)
+2. Click on "Login or Register" in the upper right corner
+3. Click on "Register here" to create a new account
+4. Fill out the registration form with your email address and password
+5. Verify your account through the confirmation email
+
+## Setting Up Your Environment
+
+BRC Analytics works best with:
+
+- A modern web browser (Chrome, Firefox, Safari, or Edge)
+- A stable internet connection
+- Sufficient screen resolution (1280x720 or higher recommended)
+
+### Storage Quotas
+
+Your Galaxy account comes with a default storage quota. If you need additional storage for large analyses, you have several options:
+
+- Request a quota increase through your profile settings
+- Use external storage for large datasets
+- Clean up old histories to free up space
+
+## Connecting to External Resources
+
+BRC Analytics integrates with several external resources:
+
+### Connecting to Galaxy
+
+Galaxy is tightly integrated with BRC Analytics. When you select an assembly and workflow, you'll be directed to Galaxy automatically with the appropriate reference data pre-configured.
+
+### Connecting to UCSC Genome Browser
+
+The UCSC Genome Browser is used for visualizing genomic data. You can:
+
+1. View existing tracks on reference genomes
+2. Upload your own data as custom tracks
+3. Share sessions with collaborators
+
+## Getting Support
+
+If you encounter issues during setup, there are several support options available:
+
+- **Documentation**: This documentation contains solutions to common problems
+- **Community Forum**: Post questions to the [Galaxy help forum](https://help.galaxyproject.org)
+- **GitHub Issues**: Report bugs on the [BRC Analytics GitHub repository](https://github.com/galaxyproject/brc-analytics/issues)
+
+## Next Steps
+
+Once you've completed setup, you might want to:
+
+- Try a [basic workflow tutorial](/learn/tutorials/workflow)
+- Learn about [working with data](/learn/tutorials/data)
+- Explore the [available organisms](/data/organisms)
+
+export async function getStaticProps() {
+  return {
+    props: {
+      pageTitle: meta.title + " - Learn BRC Analytics",
+      themeOptions: {
+        palette: { background: { default: "#FAFBFB" } }, // SMOKE_LIGHTEST
+      },
+    },
+  };
+
+}

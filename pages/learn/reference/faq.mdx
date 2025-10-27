@@ -1,0 +1,133 @@
+import { DocLayout } from "../../../app/components/Learn/DocLayout";
+
+export const meta = {
+  title: "Frequently Asked Questions",
+  description: "Common questions and answers about BRC Analytics.",
+};
+
+export default ({ children }) => (
+  <DocLayout title={meta.title} description={meta.description}>
+    {children}
+  </DocLayout>
+);
+
+# Frequently Asked Questions
+
+## General Questions
+
+### What is BRC Analytics?
+
+BRC Analytics is a collaborative effort of four mature software and infrastructure projects—Galaxy, HyPhy, UCSC Genome Browser, and TACC—providing a platform for bioinformatics research.
+
+### Who can use BRC Analytics?
+
+BRC Analytics is freely available to researchers worldwide. It's designed for bioinformaticians, computational biologists, and researchers working with genomic data.
+
+### Is BRC Analytics open source?
+
+Yes, BRC Analytics is open source. The code is available on [GitHub](https://github.com/galaxyproject/brc-analytics) and contributions are welcome.
+
+### How do I cite BRC Analytics?
+
+When citing BRC Analytics in your research, please use the following format:
+
+> BRC Analytics Team (2025). BRC Analytics: A platform for bioinformatics research. Available at: https://brc-analytics.org
+
+## Account Management
+
+### Do I need an account to use BRC Analytics?
+
+Basic browsing of organisms and assemblies does not require an account. However, to run workflows and save results, you'll need a Galaxy account.
+
+### How do I create an account?
+
+You can create an account by visiting [https://brc.usegalaxy.org](https://brc.usegalaxy.org) and clicking on "Login or Register" in the upper right corner.
+
+### I forgot my password. How do I reset it?
+
+You can reset your password by clicking on "Login or Register" and then selecting "Forgot password?" on the login page.
+
+## Data & Analysis
+
+### What organisms are available in BRC Analytics?
+
+BRC Analytics includes a wide range of organisms, with a focus on pathogens and their hosts. You can browse the complete list on the [Organisms](/data/organisms) page.
+
+### Can I upload my own data?
+
+Yes, you can upload your own data to use with BRC Analytics workflows. This can be done during the workflow configuration process.
+
+### Is my data private?
+
+Yes, data you upload to Galaxy through BRC Analytics is private by default and only accessible to you unless you explicitly share it.
+
+### What's the maximum file size I can upload?
+
+The default file size limit is 5GB. If you need to work with larger files, consider:
+
+1. Splitting the files into smaller chunks
+2. Requesting a quota increase
+3. Using the FTP upload option for very large files
+
+## Workflows
+
+### What types of analyses can I run?
+
+BRC Analytics provides workflows for various analyses including:
+
+- Variant discovery
+- Transcriptomics
+- Genome assembly
+- Phylogenetic analysis
+- Protein structure prediction
+
+### How long do workflows take to run?
+
+Workflow run times vary depending on:
+
+- The complexity of the workflow
+- The size of your input data
+- Current server load
+- Resource allocation
+
+Simple workflows may complete in minutes, while complex analyses on large datasets can take hours or days.
+
+### Can I create custom workflows?
+
+Yes, you can create custom workflows in Galaxy after launching from BRC Analytics. These workflows can be saved for future use.
+
+### Can I share my workflows with others?
+
+Yes, workflows created in Galaxy can be shared with collaborators or published to the Galaxy workflow repository.
+
+## Troubleshooting
+
+### A workflow failed. What should I do?
+
+If your workflow fails:
+
+1. Check the error message in the Galaxy history
+2. Verify that your input data is in the correct format
+3. Ensure you have sufficient disk quota
+4. For complex issues, consult the Galaxy Help Forum
+
+### How do I report a bug?
+
+Bugs can be reported on the [BRC Analytics GitHub Issues](https://github.com/galaxyproject/brc-analytics/issues) page. Please include:
+
+- A detailed description of the issue
+- Steps to reproduce the problem
+- Any error messages
+- Browser and OS information
+
+export async function getStaticProps() {
+  return {
+    props: {
+      pageTitle: meta.title + " - Learn BRC Analytics",
+      themeOptions: {
+        palette: { background: { default: "#FAFBFB" } }, // SMOKE_LIGHTEST
+      },
+    },
+  };
+
+}
