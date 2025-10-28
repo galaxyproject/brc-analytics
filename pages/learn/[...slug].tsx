@@ -29,7 +29,7 @@ export const getStaticProps: GetStaticProps<StaticProps> = async (
     buildMDXFilePath([APPS_DIR, DOCS_DIR], slug),
     slug,
     sanitizeFrontmatter,
-    undefined,
+    { mdxOptions: { development: process.env.NODE_ENV !== "production" } },
     { themeOptions: { palette: { background: { default: "#FAFBFB" } } } }
   );
 
