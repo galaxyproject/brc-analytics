@@ -6,6 +6,9 @@ export const CAROUSEL_CARDS: Pick<CardProps, "text">[] = [
     text: MDX.Codeathon2025({}),
   },
   {
+    text: MDX.EvolutionaryDynamicsOfCodingOverlapsInMeaslesVirus({}),
+  },
+  {
     text: MDX.WebinarSeries({}),
   },
   {
