@@ -8,10 +8,6 @@ const ignoreSsrWarning =
 export const StyledSectionContent = styled(SectionContent)`
   margin-top: 0;
 
-  > *:first-child:not(style) ${ignoreSsrWarning} {
-    margin-top: 0;
-  }
-
   h1,
   h2,
   h3,
@@ -23,5 +19,9 @@ export const StyledSectionContent = styled(SectionContent)`
         opacity: 1;
       }
     }
+  }
+
+  > *:first-child:not(style) ${ignoreSsrWarning} {
+    margin-top: 0;
   }
 `;
