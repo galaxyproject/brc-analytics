@@ -89,7 +89,7 @@ export function makeConfig(
           undefined,
           [
             { label: "About", url: ROUTES.ABOUT },
-            // { label: "Learn", url: ROUTES.LEARN },
+            { label: "Learn", url: ROUTES.LEARN },
             { label: "Organisms", url: ROUTES.ORGANISMS },
             { label: "Assemblies", url: ROUTES.GENOMES },
             { label: "Priority Pathogens", url: ROUTES.PRIORITY_PATHOGENS },

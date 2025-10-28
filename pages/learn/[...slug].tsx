@@ -3,6 +3,7 @@ import { StyledPagesMain } from "../../app/components/Layout/components/Main/mai
 import { LearnContentView } from "../../app/views/LearnContentView/learnContentView";
 import { buildStaticPaths } from "@databiosphere/findable-ui/lib/utils/mdx/staticGeneration/staticPaths";
 import { buildStaticProps } from "@databiosphere/findable-ui/lib/utils/mdx/staticGeneration/staticProps";
+import { sanitizeStaticProps } from "../../app/docs/common/staticGeneration/utils";
 import { StaticProps } from "../../app/docs/common/staticGeneration/types";
 import { sanitizeFrontmatter } from "../../app/docs/common/frontmatter/utils";
 import {
@@ -37,7 +38,7 @@ export const getStaticProps: GetStaticProps<StaticProps> = async (
   if (!staticProps) return { notFound: true };
 
   // Return the static props.
-  return staticProps;
+  return sanitizeStaticProps(staticProps);
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
