@@ -1,11 +1,9 @@
 import { ThemeOptions } from "@mui/material";
-import { Frontmatter } from "../frontmatter/types";
-import { MDXRemoteSerializeResult } from "next-mdx-remote";
+import { StaticProps as BaseStaticProps } from "@databiosphere/findable-ui/lib/utils/mdx/staticGeneration/types";
+import { FrontmatterProps } from "../frontmatter/types";
 
-export interface StaticProps {
-  frontmatter: Frontmatter;
-  mdxSource: MDXRemoteSerializeResult;
-  pageTitle: string;
-  slug: string[];
-  themeOptions: ThemeOptions;
+export type StaticProps = BaseStaticProps<FrontmatterProps, PageStaticProps>;
+
+export interface PageStaticProps {
+  themeOptions?: ThemeOptions;
 }

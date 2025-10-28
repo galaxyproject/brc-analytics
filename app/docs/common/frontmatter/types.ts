@@ -1,27 +1,21 @@
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
-import { OutlineItem } from "@databiosphere/findable-ui/lib/components/Layout/components/Outline/types";
 import { Overview } from "../../../components/Docs/components/SectionOverview/types";
+import { FrontmatterProps as BaseFrontmatterProps } from "@databiosphere/findable-ui/lib/utils/mdx/frontmatter/types";
 
-export type Frontmatter = FrontmatterBase &
-  FrontmatterBreadcrumb &
-  FrontmatterOutline;
+export type FrontmatterProps = BaseFrontmatterProps<
+  FrontmatterBreadcrumbProps &
+    FrontmatterOutlineProps &
+    FrontmatterOverviewProps
+>;
 
-interface FrontmatterBase {
-  description: string;
-  hidden?: boolean;
-  subtitle?: string;
-  title: string;
-}
-
-interface FrontmatterBreadcrumb {
+interface FrontmatterBreadcrumbProps {
   breadcrumbs?: Breadcrumb[];
 }
 
-export interface FrontmatterOutline {
+export interface FrontmatterOutlineProps {
   enableOutline?: boolean;
-  outline?: OutlineItem[];
 }
 
-export interface FrontmatterOverview {
+export interface FrontmatterOverviewProps {
   overview?: Overview[];
 }

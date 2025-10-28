@@ -22,9 +22,10 @@ export const SectionOverview = ({ overview }: Props): JSX.Element | null => {
               {groupIndex > 0 && <Divider />}
               <Heading
                 component="h2"
-                headingValue={label}
                 variant={TYPOGRAPHY_PROPS.VARIANT.HEADING}
-              />
+              >
+                {label}
+              </Heading>
               <GroupLinks>
                 {splitLinks(links).map(
                   (links, linksIndex) =>

@@ -1,22 +1,37 @@
 import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
 import { StyledPagesMain } from "../../app/components/Layout/components/Main/main.styles";
 import { LearnContentView } from "../../app/views/LearnContentView/learnContentView";
-import { buildStaticPaths } from "../../app/docs/common/staticGeneration/staticPaths";
-import { buildStaticProps } from "../../app/docs/common/staticGeneration/staticProps";
-import { buildSlug } from "../../app/docs/common/staticGeneration/utils";
+import { buildStaticPaths } from "@databiosphere/findable-ui/lib/utils/mdx/staticGeneration/staticPaths";
+import { buildStaticProps } from "@databiosphere/findable-ui/lib/utils/mdx/staticGeneration/staticProps";
 import { StaticProps } from "../../app/docs/common/staticGeneration/types";
+import { sanitizeFrontmatter } from "../../app/docs/common/frontmatter/utils";
+import {
+  buildMDXFilePath,
+  buildMDXSlug,
+} from "@databiosphere/findable-ui/lib/utils/mdx/staticGeneration/utils";
 
-const SECTION = "learn";
+const APPS_DIR = "app";
+const DOCS_DIR = "docs";
+const LEARN_DIR = "learn";
 
 const Page = (props: StaticProps): JSX.Element => {
   return <LearnContentView {...props} />;
 };
 
-export const getStaticProps: GetStaticProps = async (
+export const getStaticProps: GetStaticProps<StaticProps> = async (
   props: GetStaticPropsContext
 ) => {
+  // Build the slug.
+  const slug = buildMDXSlug(props, LEARN_DIR);
+
   // Build the static props for the page.
-  const staticProps = await buildStaticProps(buildSlug(props, SECTION));
+  const staticProps = await buildStaticProps(
+    buildMDXFilePath([APPS_DIR, DOCS_DIR], slug),
+    slug,
+    sanitizeFrontmatter,
+    undefined,
+    { themeOptions: { palette: { background: { default: "#FAFBFB" } } } }
+  );
 
   // If the static props are not found, return not found.
   if (!staticProps) return { notFound: true };
@@ -26,7 +41,10 @@ export const getStaticProps: GetStaticProps = async (
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  return { fallback: false, paths: buildStaticPaths([SECTION]) };
+  return {
+    fallback: false,
+    paths: buildStaticPaths([APPS_DIR, DOCS_DIR, LEARN_DIR]),
+  };
 };
 
 export default Page;

@@ -9,14 +9,19 @@ import {
 } from "../../components/content/content.styles";
 import { StyledSectionContent } from "../../components/Docs/components/Content/content.styles";
 
-export const LearnContentView = (props: StaticProps): JSX.Element => {
+export const LearnContentView = (props: StaticProps): JSX.Element | null => {
   const { frontmatter, mdxSource } = props;
+
+  if (!mdxSource) return null;
+
+  const { breadcrumbs, title } = frontmatter || {};
+
   return (
     <Fragment>
       <SectionHero
-        breadcrumbs={frontmatter.breadcrumbs || []}
-        head={frontmatter.title}
-        subHead={frontmatter.subtitle}
+        breadcrumbs={breadcrumbs || []}
+        head={title}
+        subHead={null}
       />
       <Section border>
         <SectionLayout>

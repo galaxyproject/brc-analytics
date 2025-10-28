@@ -1,34 +1,28 @@
 import { AnchorLink } from "@databiosphere/findable-ui/lib/components/common/AnchorLink/anchorLink";
-import { Typography, TypographyProps } from "@mui/material";
+import { TypographyProps } from "@mui/material";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
-import { slugifyHeading } from "../../../../../../../plugins/utils";
+import { slugifyHeading } from "@databiosphere/findable-ui/lib/utils/mdx/plugins/utils";
+import { StyledTypography } from "./heading.styles";
 
-export interface HeadingProps {
-  component?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+export interface HeadingProps extends TypographyProps {
   enableAnchor?: boolean;
-  headingValue: string;
-  headingValueSlug?: string;
-  sx?: TypographyProps["sx"];
-  variant?: TypographyProps["variant"];
 }
 
 export const Heading = ({
-  component = "h1",
+  children,
   enableAnchor = true,
-  headingValue,
-  headingValueSlug = slugifyHeading(headingValue),
-  sx = { mb: 2 },
-  variant = TYPOGRAPHY_PROPS.VARIANT.HEADING_LARGE,
+  ...props
 }: HeadingProps): JSX.Element => {
+  const id = slugifyHeading(String(children));
   return (
-    <Typography
-      component={component}
-      id={headingValueSlug}
-      sx={{ ...sx, position: "relative" }}
-      variant={variant}
+    <StyledTypography
+      component="h1"
+      id={id}
+      variant={TYPOGRAPHY_PROPS.VARIANT.HEADING_LARGE}
+      {...props}
     >
-      {headingValue}
-      {enableAnchor && <AnchorLink anchorLink={headingValueSlug} />}
-    </Typography>
+      {children}
+      {enableAnchor && <AnchorLink anchorLink={id} />}
+    </StyledTypography>
   );
 };
