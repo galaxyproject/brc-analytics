@@ -29,7 +29,9 @@ export const LearnContentView = (props: StaticProps): JSX.Element | null => {
           </Content>
         }
         frontmatter={frontmatter}
-        outline={<Outline outline={outline} Contents={ContentsTab} />}
+        outline={
+          outline && <Outline outline={outline} Contents={ContentsTab} />
+        }
         {...contentProps}
       />
     </Fragment>
