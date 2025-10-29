@@ -2,7 +2,6 @@ import { InitialTableState, Table, useReactTable } from "@tanstack/react-table";
 import { BaseReadRun, ReadRun } from "../../../../types";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ColumnFiltersState, Updater } from "@tanstack/react-table";
-import { UseENADataByAccession } from "../../../../hooks/UseENADataByAccession/types";
 import { UseENADataByTaxonomyId } from "../../../../hooks/UseENADataByTaxonomyId/types";
 import { ENA_QUERY_METHOD } from "../../../../../../types";
 import { updateColumnFilters } from "./utils";
@@ -12,42 +11,26 @@ import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/
 import { mapReadRuns, sanitizeReadRuns } from "./dataTransforms";
 import { TABLE_OPTIONS } from "./tableOptions";
 
-export const useTable = (
+export const useENAByTaxonomyIdTable = (
   enaQueryMethod: ENA_QUERY_METHOD,
-  enaAccession: UseENADataByAccession<BaseReadRun>,
   enaTaxonomyId: UseENADataByTaxonomyId<BaseReadRun>
 ): Table<ReadRun> => {
-  const [columnFiltersByMethod, setColumnFiltersByMethod] = useState<
-    Record<ENA_QUERY_METHOD, ColumnFiltersState>
-  >({
-    [ENA_QUERY_METHOD.ACCESSION]: [],
-    [ENA_QUERY_METHOD.TAXONOMY_ID]: [],
-  });
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
   // Grab the column filters for ENA by taxonomy ID.
-  const { columnFilters } = enaTaxonomyId;
+  const { columnFilters: initialColumnFilters, data: readRuns } = enaTaxonomyId;
 
   useEffect(() => {
-    if (columnFilters.length === 0) return;
+    if (initialColumnFilters.length === 0) return;
     // Pre-filter the table data for ENA by taxonomy ID.
-    setColumnFiltersByMethod(
-      updateColumnFilters(ENA_QUERY_METHOD.TAXONOMY_ID, columnFilters)
-    );
-  }, [columnFilters]);
+    setColumnFilters(updateColumnFilters(initialColumnFilters));
+  }, [initialColumnFilters]);
 
   const onColumnFiltersChange = useCallback(
     (updaterOrValue: Updater<ColumnFiltersState>): void =>
-      setColumnFiltersByMethod(
-        updateColumnFilters(enaQueryMethod, updaterOrValue)
-      ),
-    [enaQueryMethod]
+      setColumnFilters(updateColumnFilters(updaterOrValue)),
+    []
   );
-
-  // Get the data for the ENA query method (by accession or by taxonomy ID).
-  const { data: readRuns } =
-    enaQueryMethod === ENA_QUERY_METHOD.ACCESSION
-      ? enaAccession
-      : enaTaxonomyId;
 
   const data = useMemo(
     () => sanitizeReadRuns(mapReadRuns(readRuns)),
@@ -62,7 +45,7 @@ export const useTable = (
     filterSort: FILTER_SORT.COUNT,
   };
 
-  const state = { columnFilters: columnFiltersByMethod[enaQueryMethod] };
+  const state = { columnFilters };
 
   return useReactTable<ReadRun>({
     ...TABLE_OPTIONS,
