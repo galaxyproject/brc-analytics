@@ -116,7 +116,7 @@ export const buildAssemblyBackPageHero = (
 ): ComponentProps<typeof C.BackPageHero> => {
   return {
     breadcrumbs: getAssemblyBreadcrumbs(assembly),
-    title: "Select a Workflow",
+    title: "Analyze in Galaxy",
   };
 };
 
@@ -976,7 +976,7 @@ function getAssemblyBreadcrumbs(assembly: BRCDataCatalogGenome): Breadcrumb[] {
   return [
     { path: ROUTES.GENOMES, text: "Assemblies" },
     { path: "", text: assembly.accession },
-    { path: "", text: "Select a Workflow" },
+    { path: "", text: "Analyze in Galaxy" },
   ];
 }
 
