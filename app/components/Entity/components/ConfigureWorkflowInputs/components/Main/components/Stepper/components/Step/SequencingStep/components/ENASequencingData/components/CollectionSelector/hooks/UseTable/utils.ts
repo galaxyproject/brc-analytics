@@ -1,9 +1,4 @@
-import {
-  ColumnFiltersState,
-  Row,
-  Updater,
-  functionalUpdate,
-} from "@tanstack/react-table";
+import { Row } from "@tanstack/react-table";
 import { ReadRun } from "../../../../types";
 
 /**
@@ -24,17 +19,4 @@ export function getRowSelectionValidation(
   row: Row<ReadRun>
 ): string | undefined {
   return row.original.validation.error;
-}
-
-/**
- * Updates the column filters for the specified ENA query method.
- * @param updaterOrValue - Updater or value.
- * @returns Updated column filter state for the specified ENA query method.
- */
-export function updateColumnFilters(
-  updaterOrValue: Updater<ColumnFiltersState>
-): (old: ColumnFiltersState) => ColumnFiltersState {
-  return (old: ColumnFiltersState) => {
-    return functionalUpdate(updaterOrValue, old);
-  };
 }
