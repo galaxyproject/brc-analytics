@@ -107,6 +107,11 @@ async function buildAssemblies(
       coverage: parseStringOrNull(row.coverage),
       gcPercent: parseNumberOrNull(row.gcPercent),
       geneModelUrl: parseStringOrNull(row.geneModelUrl),
+      imageCredit: row.organismImageCredit,
+      imageLicense: row.organismImageLicense,
+      imageSourceName: row.organismImageSourceName,
+      imageSourceUrl: row.organismImageSourceUrl,
+      imageUrl: row.organismImageUrl.replace("public/", "/"),
       isRef: parseBoolean(row.isRef),
       length: parseNumber(row.length),
       level: row.level,
@@ -133,10 +138,12 @@ async function buildAssemblies(
         row.taxonomicLevelStrain,
         row.strain
       ),
+      thumbnailUrl: row.organismThumbnailUrl.replace("public/", "/"),
       tolId: tolIds[0] ?? null,
       ucscBrowserUrl: parseStringOrNull(row.ucscBrowser),
     });
   }
+
   const sortedRows = mappedRows.sort((a, b) =>
     a.accession.localeCompare(b.accession)
   );
@@ -169,6 +176,11 @@ function buildOrganism(
       new Set([...(organism?.assemblyTaxonomyIds ?? []), genome.ncbiTaxonomyId])
     ),
     genomes: [...(organism?.genomes ?? []), genome],
+    imageCredit: genome.imageCredit,
+    imageLicense: genome.imageLicense,
+    imageSourceName: genome.imageSourceName,
+    imageSourceUrl: genome.imageSourceUrl,
+    imageUrl: genome.imageUrl,
     maxScaffoldN50: getMaxDefined(organism?.maxScaffoldN50, genome.scaffoldN50),
     ncbiTaxonomyId: genome.speciesTaxonomyId,
     taxonomicGroup: genome.taxonomicGroup,
@@ -180,6 +192,7 @@ function buildOrganism(
     taxonomicLevelOrder: defaultStringToNone(genome.taxonomicLevelOrder),
     taxonomicLevelPhylum: defaultStringToNone(genome.taxonomicLevelPhylum),
     taxonomicLevelSpecies: genome.taxonomicLevelSpecies,
+    thumbnailUrl: genome.thumbnailUrl,
     tolId: genome.tolId,
   };
 }

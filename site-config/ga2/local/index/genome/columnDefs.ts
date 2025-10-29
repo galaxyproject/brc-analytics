@@ -261,3 +261,14 @@ export const TAXONOMY_ID: ColumnConfig<GA2AssemblyEntity> = {
   id: GA2_CATEGORY_KEY.TAXONOMY_ID,
   width: { max: "0.5fr", min: "144px" },
 };
+
+export const ORGANISM_IMAGE: ColumnConfig<GA2AssemblyEntity> = {
+  componentConfig: {
+    component: C.OrganismAvatar,
+    viewBuilder: V.buildOrganismImageThumbnail,
+  } as ComponentConfig<typeof C.OrganismAvatar, GA2AssemblyEntity>,
+  header: GA2_CATEGORY_LABEL.ORGANISM_AVATAR,
+  id: GA2_CATEGORY_KEY.ORAGNISM_AVATAR,
+  meta: { columnPinned: true },
+  width: { max: "1fr", min: "auto" },
+};

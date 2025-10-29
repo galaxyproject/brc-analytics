@@ -1,3 +1,6 @@
+# images
+/public/organism_image/
+
 # dependencies
 /node_modules
 

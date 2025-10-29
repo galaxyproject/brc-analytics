@@ -10,6 +10,10 @@ UCSC_ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/VGP/assemblyList.jso
 
 GENOMES_OUTPUT_PATH = "catalog/ga2/build/intermediate/genomes-from-ncbi.tsv"
 
+ORGANISM_IMAGE_PATH = "public/organism_image"
+
+ORGANISM_IMAGE_INFO_PATH = "catalog/ga2/source/organism_image_data.json"
+
 PRIMARYDATA_OUTPUT_PATH = "catalog/ga2/build/intermediate/primary-data-ncbi.tsv"
 
 TREE_OUTPUT_PATH = "catalog/ga2/output/ncbi-taxa-tree.json"
@@ -104,6 +108,8 @@ def build_ncbi_data():
         do_gene_model_urls=False,
         primary_output_path=PRIMARYDATA_OUTPUT_PATH,
         extract_primary_data=True,
+        organism_image_path=ORGANISM_IMAGE_PATH,
+        organism_image_source_information_path=ORGANISM_IMAGE_INFO_PATH,
     )
     create_taxonomy_read_run_count(
         GENOMES_OUTPUT_PATH, TAXONOMY_READ_RUN_COUNTS_OUTPUT_PATH
