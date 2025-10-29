@@ -14,6 +14,7 @@ import { ENA_QUERY_METHOD, SEQUENCING_DATA_TYPE } from "./types";
 import { useENADataByTaxonomyId } from "./components/ENASequencingData/hooks/UseENADataByTaxonomyId/hook";
 import { useState } from "react";
 import { useENAByTaxonomyIdTable } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseTable/useENAByTaxonomyIdTable";
+import { useTable } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseTable/useTable";
 
 export const SequencingStep = ({
   active,
@@ -34,19 +35,13 @@ export const SequencingStep = ({
     genome,
     stepKey as SEQUENCING_DATA_TYPE
   );
-  const enaByAccessionTable = useENAByAccessionTable(
+  const enaByAccessionTable = useENAByAccessionTable(enaAccession);
+  const enaByTaxonomyIdTable = useENAByTaxonomyIdTable(enaTaxonomyId);
+  const table = useTable(
     enaQueryMethod,
-    enaAccession
+    enaByAccessionTable,
+    enaByTaxonomyIdTable
   );
-  const enaByTaxonomyIdTable = useENAByTaxonomyIdTable(
-    enaQueryMethod,
-    enaTaxonomyId
-  );
-  const table =
-    enaQueryMethod === ENA_QUERY_METHOD.ACCESSION
-      ? enaByAccessionTable
-      : enaByTaxonomyIdTable;
-
   const { onChange, value } = useToggleButtonGroup(VIEW.ENA);
   return (
     <Step active={active} completed={completed} index={index}>

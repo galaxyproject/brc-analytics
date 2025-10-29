@@ -3,7 +3,6 @@ import { BaseReadRun, ReadRun } from "../../../../types";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ColumnFiltersState, Updater } from "@tanstack/react-table";
 import { UseENADataByTaxonomyId } from "../../../../hooks/UseENADataByTaxonomyId/types";
-import { ENA_QUERY_METHOD } from "../../../../../../types";
 import { updateColumnFilters } from "./utils";
 import { SORTING } from "./constants";
 import { CATEGORY_GROUPS } from "./categoryGroups";
@@ -12,7 +11,6 @@ import { mapReadRuns, sanitizeReadRuns } from "./dataTransforms";
 import { TABLE_OPTIONS } from "./tableOptions";
 
 export const useENAByTaxonomyIdTable = (
-  enaQueryMethod: ENA_QUERY_METHOD,
   enaTaxonomyId: UseENADataByTaxonomyId<BaseReadRun>
 ): Table<ReadRun> => {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -41,7 +39,6 @@ export const useENAByTaxonomyIdTable = (
 
   const meta = {
     categoryGroups: CATEGORY_GROUPS,
-    enaQueryMethod,
     filterSort: FILTER_SORT.COUNT,
   };
 
