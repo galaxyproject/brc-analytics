@@ -1,15 +1,15 @@
-import workflows from "../../../../../catalog/output/workflows.json";
 import { AnalysisMethod } from "../AnalysisMethod/analysisMethod";
 import { Props } from "./types";
-import { workflowIsCompatibleWithAssembly } from "./utils";
 import { useRouter } from "next/router";
 import { Fragment } from "react";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import { CustomWorkflow } from "../AnalysisMethod/components/CustomWorkflow/customWorkflow";
 import { AnalysisTypeHeader } from "./components/AnalysisTypeHeader/analysisTypeHeader";
 import { Stack } from "@mui/material";
+import { buildAssemblyWorkflows } from "./utils";
 
 export const AnalysisMethodsCatalog = ({ assembly }: Props): JSX.Element => {
+  const workflows = buildAssemblyWorkflows(assembly);
   const isFeatureEnabled = useFeatureFlag("custom-workflow");
 
   const {
@@ -50,24 +50,15 @@ export const AnalysisMethodsCatalog = ({ assembly }: Props): JSX.Element => {
           title="Select a Workflow"
         />
         {workflows.map((workflowCategory, i) => {
-          const compatibleWorkflows = workflowCategory.workflows.filter(
-            (workflow) => workflowIsCompatibleWithAssembly(workflow, assembly)
-          );
-          if (
-            compatibleWorkflows.length === 0 &&
-            !workflowCategory.showComingSoon
-          ) {
-            return null;
-          }
           return (
             <AnalysisMethod
-              defaultExpanded={i === 0}
-              disabled={compatibleWorkflows.length === 0}
+              defaultExpanded={i === 0 && workflowCategory.workflows.length > 0}
+              disabled={workflowCategory.workflows.length === 0}
               entityId={entityId as string}
               geneModelUrl={assembly.geneModelUrl}
               genomeVersionAssemblyId={assembly.accession}
               key={workflowCategory.category}
-              workflows={compatibleWorkflows}
+              workflows={workflowCategory.workflows}
               workflowCategory={workflowCategory}
             />
           );
