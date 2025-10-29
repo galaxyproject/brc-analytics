@@ -22,8 +22,8 @@ export function buildAssemblyWorkflows(
     const { workflows: categoryWorkflows } = workflowCategory;
 
     // Filter workflows to only include those that are compatible with the given assembly.
-    const compatibleWorkflows = categoryWorkflows.filter(
-      filterCategoryWorkflows(assembly)
+    const compatibleWorkflows = categoryWorkflows.filter((workflow) =>
+      workflowIsCompatibleWithAssembly(workflow, assembly)
     );
 
     // If no workflows are compatible with the assembly and the category is not marked as "showComingSoon", skip it.
@@ -39,18 +39,6 @@ export function buildAssemblyWorkflows(
 
   // Sort workflow categories (coming soon categories last).
   return workflowCategories.sort(sortWorkflowCategories);
-}
-
-/**
- * Filters workflows to only include those that are compatible with the given assembly.
- * @param assembly - Assembly.
- * @returns A function that takes a workflow and returns true if it is compatible with the assembly.
- */
-function filterCategoryWorkflows(
-  assembly: BRCDataCatalogGenome | GA2AssemblyEntity
-): (workflow: Workflow) => boolean {
-  return (workflow: Workflow) =>
-    workflowIsCompatibleWithAssembly(workflow, assembly);
 }
 
 /**
