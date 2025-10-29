@@ -7,9 +7,13 @@ import { CustomWorkflow } from "../AnalysisMethod/components/CustomWorkflow/cust
 import { AnalysisTypeHeader } from "./components/AnalysisTypeHeader/analysisTypeHeader";
 import { Stack } from "@mui/material";
 import { buildAssemblyWorkflows } from "./utils";
+import WORKFLOW_CATEGORIES from "../../../../../catalog/output/workflows.json";
 
 export const AnalysisMethodsCatalog = ({ assembly }: Props): JSX.Element => {
-  const workflows = buildAssemblyWorkflows(assembly);
+  const workflowCategories = buildAssemblyWorkflows(
+    assembly,
+    WORKFLOW_CATEGORIES
+  );
   const isFeatureEnabled = useFeatureFlag("custom-workflow");
 
   const {
@@ -49,7 +53,7 @@ export const AnalysisMethodsCatalog = ({ assembly }: Props): JSX.Element => {
           }
           title="Select a Workflow"
         />
-        {workflows.map((workflowCategory, i) => {
+        {workflowCategories.map((workflowCategory, i) => {
           return (
             <AnalysisMethod
               defaultExpanded={i === 0 && workflowCategory.workflows.length > 0}

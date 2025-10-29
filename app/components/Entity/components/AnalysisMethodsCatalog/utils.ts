@@ -5,33 +5,36 @@ import {
   WorkflowCategory,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import { GA2AssemblyEntity } from "../../../../apis/catalog/ga2/entities";
-import rawWorkflowCategories from "../../../../../catalog/output/workflows.json";
-
-const WORKFLOW_CATEGORIES = rawWorkflowCategories;
 
 /**
  * Builds workflow categories for the given assembly.
  * @param assembly - Assembly.
+ * @param allWorkflowCategories - Workflow categories.
  * @returns Workflow categories compatible with the given assembly.
  */
 export function buildAssemblyWorkflows(
-  assembly: BRCDataCatalogGenome | GA2AssemblyEntity
+  assembly: BRCDataCatalogGenome | GA2AssemblyEntity,
+  allWorkflowCategories: WorkflowCategory[]
 ): WorkflowCategory[] {
   const workflowCategories: WorkflowCategory[] = [];
 
-  for (const workflowCategory of WORKFLOW_CATEGORIES) {
+  for (const workflowCategory of allWorkflowCategories) {
     const { workflows: categoryWorkflows } = workflowCategory;
 
     // Filter workflows to only include those that are compatible with the given assembly.
-    const workflows = categoryWorkflows.filter(
+    const compatibleWorkflows = categoryWorkflows.filter(
       filterCategoryWorkflows(assembly)
     );
 
     // If no workflows are compatible with the assembly and the category is not marked as "showComingSoon", skip it.
-    if (workflows.length === 0 && !workflowCategory.showComingSoon) continue;
+    if (compatibleWorkflows.length === 0 && !workflowCategory.showComingSoon)
+      continue;
 
     // Add workflow category to workflows array with updated compatible workflows.
-    workflowCategories.push({ ...workflowCategory, workflows });
+    workflowCategories.push({
+      ...workflowCategory,
+      workflows: compatibleWorkflows,
+    });
   }
 
   // Sort workflow categories (coming soon categories last).
