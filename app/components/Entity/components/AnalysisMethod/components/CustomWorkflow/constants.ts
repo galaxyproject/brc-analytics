@@ -16,6 +16,6 @@ export const CUSTOM_WORKFLOW: Workflow = {
   taxonomyId: null,
   trsId: "custom-workflow",
   workflowDescription:
-    "Analyze selected data in the context of this assembly in your own Galaxy workflow.",
-  workflowName: "Custom / No Workflow",
+    "Select reads and tracks to send to a new Galaxy history with this assembly to analyze with your own tools or workflows.",
+  workflowName: "Custom Analysis",
 };

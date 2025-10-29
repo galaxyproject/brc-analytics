@@ -17,7 +17,10 @@ export const CustomWorkflow = ({ entityId }: Props): JSX.Element => {
     <FluidPaper>
       <StyledGrid {...GRID_PROPS}>
         <Stack spacing={1}>
-          <Typography variant={TYPOGRAPHY_PROPS.VARIANT.HEADING_XSMALL}>
+          <Typography
+            component="h3"
+            variant={TYPOGRAPHY_PROPS.VARIANT.HEADING_XSMALL}
+          >
             {workflowName}
           </Typography>
           <Typography {...COMPONENT_TYPOGRAPHY_PROPS}>
