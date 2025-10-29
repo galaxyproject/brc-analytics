@@ -1,35 +1,16 @@
-import {
-  getCoreRowModel,
-  getFacetedRowModel,
-  getFilteredRowModel,
-  InitialTableState,
-  Table,
-  useReactTable,
-} from "@tanstack/react-table";
+import { InitialTableState, Table, useReactTable } from "@tanstack/react-table";
 import { BaseReadRun, ReadRun } from "../../../../types";
-import { ROW_POSITION } from "@databiosphere/findable-ui/lib/components/Table/features/RowPosition/constants";
-import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/features/RowPreview/constants";
-import { columns } from "./columnDef";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { getFacetedUniqueValuesWithArrayValues } from "@databiosphere/findable-ui/lib/components/Table/common/utils";
-import { arrIncludesSome } from "@databiosphere/findable-ui/lib/components/Table/columnDef/columnFilters/filterFn";
 import { ColumnFiltersState, Updater } from "@tanstack/react-table";
 import { UseENADataByAccession } from "../../../../hooks/UseENADataByAccession/types";
 import { UseENADataByTaxonomyId } from "../../../../hooks/UseENADataByTaxonomyId/types";
 import { ENA_QUERY_METHOD } from "../../../../../../types";
-import {
-  enableRowSelection,
-  getRowSelectionValidation,
-  updateColumnFilters,
-} from "./utils";
+import { updateColumnFilters } from "./utils";
 import { SORTING } from "./constants";
-import { getSortedRowModel } from "@tanstack/react-table";
 import { CATEGORY_GROUPS } from "./categoryGroups";
-import { getFacetedMinMaxValues } from "@databiosphere/findable-ui/lib/components/Table/featureOptions/facetedColumn/getFacetedMinMaxValues";
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
-import { ROW_SELECTION_VALIDATION } from "@databiosphere/findable-ui/lib/components/Table/features/RowSelectionValidation/constants";
-import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/features/TableDownload/constants";
 import { mapReadRuns, sanitizeReadRuns } from "./dataTransforms";
+import { TABLE_OPTIONS } from "./tableOptions";
 
 export const useTable = (
   enaQueryMethod: ENA_QUERY_METHOD,
@@ -84,33 +65,8 @@ export const useTable = (
   const state = { columnFilters: columnFiltersByMethod[enaQueryMethod] };
 
   return useReactTable<ReadRun>({
-    _features: [
-      ROW_POSITION,
-      ROW_PREVIEW,
-      ROW_SELECTION_VALIDATION,
-      TABLE_DOWNLOAD,
-    ],
-    columns,
+    ...TABLE_OPTIONS,
     data,
-    downloadFilename: "read-runs",
-    enableColumnFilters: true,
-    enableFilters: true,
-    enableMultiSort: true,
-    enableRowSelection,
-    enableRowSelectionValidation: true,
-    enableSorting: true,
-    enableSortingInteraction: true,
-    enableSortingRemoval: false,
-    enableTableDownload: true,
-    filterFns: { arrIncludesSome },
-    getCoreRowModel: getCoreRowModel(),
-    getFacetedMinMaxValues: getFacetedMinMaxValues(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValuesWithArrayValues(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getRowId: (row) => row.run_accession,
-    getRowSelectionValidation,
-    getSortedRowModel: getSortedRowModel(),
     initialState,
     meta,
     onColumnFiltersChange,
