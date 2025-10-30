@@ -3,7 +3,7 @@ import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/c
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { StepProps } from "../types";
 import { useToggleButtonGroup } from "../hooks/UseToggleButtonGroup/useToggleButtonGroup";
-import { ToggleButtonGroup } from "./components/ToggleButtonGroup/toggleButtonGroup";
+import { ToggleButtonGroup } from "../components/ToggleButtonGroup/toggleButtonGroup";
 import { VIEW } from "./components/ToggleButtonGroup/types";
 import { ENASequencingData } from "./components/ENASequencingData/enaSequencingData";
 import { useENADataByAccession } from "./components/ENASequencingData/hooks/UseENADataByAccession/hook";
@@ -13,6 +13,7 @@ import { UploadMyData } from "./components/UploadMyData/uploadMyData";
 import { ENA_QUERY_METHOD, SEQUENCING_DATA_TYPE } from "./types";
 import { useENADataByTaxonomyId } from "./components/ENASequencingData/hooks/UseENADataByTaxonomyId/hook";
 import { useState } from "react";
+import { TOGGLE_BUTTONS } from "./components/ToggleButtonGroup/toggleButtons";
 
 export const SequencingStep = ({
   active,
@@ -39,7 +40,11 @@ export const SequencingStep = ({
     <Step active={active} completed={completed} index={index}>
       <StepLabel>{entryLabel}</StepLabel>
       <StepContent>
-        <ToggleButtonGroup onChange={onChange} value={value} />
+        <ToggleButtonGroup
+          onChange={onChange}
+          toggleButtons={TOGGLE_BUTTONS}
+          value={value}
+        />
         {value === VIEW.ENA ? (
           <ENASequencingData
             enaAccession={enaAccession}

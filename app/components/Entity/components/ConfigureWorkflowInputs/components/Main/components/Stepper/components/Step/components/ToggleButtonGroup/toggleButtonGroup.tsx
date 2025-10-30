@@ -1,14 +1,13 @@
-import { ToggleButton, ToggleButtonGroupProps } from "@mui/material";
-import { TOGGLE_BUTTONS } from "./toggleButtons";
+import { ToggleButton } from "@mui/material";
 import { StyledToggleButtonGroup } from "./toggleButtonGroup.styles";
 import { TOGGLE_BUTTON_GROUP_PROPS } from "./constants";
-
-const toggleButtons = TOGGLE_BUTTONS;
+import { Props } from "./types";
 
 export const ToggleButtonGroup = ({
   onChange,
+  toggleButtons,
   value,
-}: ToggleButtonGroupProps): JSX.Element => {
+}: Props): JSX.Element => {
   return (
     <StyledToggleButtonGroup
       {...TOGGLE_BUTTON_GROUP_PROPS}

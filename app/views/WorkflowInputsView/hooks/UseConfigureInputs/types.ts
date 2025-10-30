@@ -7,6 +7,7 @@ export interface ConfiguredInput {
   readRunsPaired?: EnaSequencingReads[] | null;
   readRunsSingle?: EnaSequencingReads[] | null;
   referenceAssembly?: string;
+  tracks?: string[] | null;
 }
 
 export interface UseConfigureInputs {
