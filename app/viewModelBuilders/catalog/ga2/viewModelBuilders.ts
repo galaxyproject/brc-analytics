@@ -64,12 +64,8 @@ export const buildOrganismImage = (
   entity: GA2OrganismEntity | GA2AssemblyEntity
 ): ComponentProps<typeof C.OrganismAvatar> => {
   return {
-    credit: entity.imageCredit,
-    imagePath: entity.imageUrl,
+    image: entity.image,
     isThumbnail: false,
-    license: entity.imageLicense,
-    pageSource: entity.imageSourceName,
-    sourceLink: entity.imageSourceUrl,
   };
 };
 
@@ -82,12 +78,8 @@ export const buildOrganismImageThumbnail = (
   entity: GA2OrganismEntity | GA2AssemblyEntity
 ): ComponentProps<typeof C.OrganismAvatar> => {
   return {
-    credit: entity.imageCredit,
-    imagePath: entity.thumbnailUrl,
+    image: entity.image,
     isThumbnail: true,
-    license: entity.imageLicense,
-    pageSource: entity.imageSourceName,
-    sourceLink: entity.imageSourceUrl,
   };
 };
 

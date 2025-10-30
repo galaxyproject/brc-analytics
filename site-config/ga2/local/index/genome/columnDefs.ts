@@ -269,6 +269,5 @@ export const ORGANISM_IMAGE: ColumnConfig<GA2AssemblyEntity> = {
   } as ComponentConfig<typeof C.OrganismAvatar, GA2AssemblyEntity>,
   header: GA2_CATEGORY_LABEL.ORGANISM_AVATAR,
   id: GA2_CATEGORY_KEY.ORAGNISM_AVATAR,
-  meta: { columnPinned: true },
   width: { max: "1fr", min: "auto" },
 };

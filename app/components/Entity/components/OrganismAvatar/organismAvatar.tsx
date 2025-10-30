@@ -10,51 +10,37 @@ import {
   SourceLink,
   Thumbnail,
 } from "./organismAvatar.styles";
-
+import { ImageData } from "app/apis/catalog/ga2/entities";
 interface OrganismAvatarProps {
-  credit: string | null;
-  imagePath: string;
+  image: ImageData;
   isThumbnail?: boolean;
-  license?: string | null;
-  pageSource?: string | null;
-  sourceLink?: string | null;
 }
 
-const AttributionDetails: React.FC<
-  Pick<OrganismAvatarProps, "credit" | "license" | "pageSource" | "sourceLink">
-> = ({ credit, license, pageSource, sourceLink }) => (
+const AttributionDetails: React.FC<Pick<OrganismAvatarProps, "image">> = ({
+  image,
+}) => (
   <>
-    {credit && <Detail>By: {credit}</Detail>}
-    {license && <Detail>License: {license}</Detail>}
-    {pageSource && sourceLink && (
-      <SourceLink href={sourceLink}>Source: {pageSource}</SourceLink>
+    {image.credit && <Detail>By: {image.credit}</Detail>}
+    {image.license && <Detail>License: {image.license}</Detail>}
+    {image.sourceName && image.sourceUrl && (
+      <SourceLink href={image.sourceUrl}>Source: {image.sourceName}</SourceLink>
     )}
   </>
 );
 
 export const OrganismAvatar: React.FC<OrganismAvatarProps> = ({
-  credit,
-  imagePath,
+  image,
   isThumbnail = false,
-  license,
-  pageSource,
-  sourceLink,
 }) => {
   if (isThumbnail) {
-    return <Thumbnail src={imagePath} alt="Organism thumbnail" />;
+    return <Thumbnail src={image.url} alt="Organism thumbnail" />;
   }
   return (
     <Card>
-      <CardMedia image={imagePath} title="Organism" />
-      {license && credit && pageSource && sourceLink && (
+      <CardMedia image={image.url} title="Organism" />
+      {image.license && image.credit && image.sourceName && image.sourceUrl && (
         <Details>
-          <Tooltip
-            title={
-              <AttributionDetails
-                {...{ credit, license, pageSource, sourceLink }}
-              />
-            }
-          >
+          <Tooltip title={<AttributionDetails {...{ image }} />}>
             <IconButton>
               <InfoIcon />
             </IconButton>

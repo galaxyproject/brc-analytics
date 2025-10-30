@@ -137,6 +137,5 @@ export const ORGANISM_IMAGE: ColumnConfig<GA2OrganismEntity> = {
   } as ComponentConfig<typeof C.OrganismAvatar, GA2OrganismEntity>,
   header: GA2_CATEGORY_LABEL.ORGANISM_AVATAR,
   id: GA2_CATEGORY_KEY.ORAGNISM_AVATAR,
-  meta: { columnPinned: true },
   width: { max: "100px", min: "100px" },
 };
