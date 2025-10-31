@@ -21,17 +21,14 @@ import { getFacetedMinMaxValues } from "@databiosphere/findable-ui/lib/component
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/features/TableDownload/constants";
 import { UseUCSCTracks } from "../../../../../../hooks/UseUCSCTracks/types";
-import { mapTrackGroups, sanitizeTracks } from "./dataTransforms";
+import { mapTrackGroups } from "./dataTransforms";
 import { Track } from "./types";
 
 export const useTable = (ucscTracks: UseUCSCTracks): Table<Track> => {
   const { data: trackGroups } = ucscTracks;
   console.log("ORIGIANL", trackGroups?.map((t) => t.tracks).flat());
 
-  const data = useMemo(
-    () => sanitizeTracks(mapTrackGroups(trackGroups)) || [],
-    [trackGroups]
-  );
+  const data = useMemo(() => mapTrackGroups(trackGroups), [trackGroups]);
 
   const initialState: InitialTableState = {
     columnVisibility: COLUMN_VISIBILITY,
@@ -54,11 +51,11 @@ export const useTable = (ucscTracks: UseUCSCTracks): Table<Track> => {
     enableGrouping: true,
     enableHiding: true,
     enableMultiRowSelection: true,
-    enableRowSelection: true,
+    enableRowSelection: (row) => !!row.original.bigDataUrl,
     enableSorting: false,
     enableSortingInteraction: false,
-    enableSubRowSelection: true,
     filterFns: { arrIncludesSome },
+    filterFromLeafRows: true,
     getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
     getFacetedMinMaxValues: getFacetedMinMaxValues(),
@@ -66,8 +63,6 @@ export const useTable = (ucscTracks: UseUCSCTracks): Table<Track> => {
     getFacetedUniqueValues: getFacetedUniqueValuesWithArrayValues(),
     getFilteredRowModel: getFilteredRowModel(),
     getGroupedRowModel: getGroupedRowModel(),
-    // getRowCanExpand: (row) => row.original.isComposite,
-    getRowId: (row) => row.bigDataUrl,
     getSortedRowModel: getSortedRowModel(),
     initialState,
     meta,

@@ -15,17 +15,17 @@ import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/m
 import { ACCORDION_PROPS, GROUP_ID_LABEL } from "./constants";
 import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
 
-export const Table = ({ row, table }: Props): JSX.Element => {
+export const Table = ({ defaultExpanded, row, table }: Props): JSX.Element => {
   const groupId = row.getValue("groupId") as string;
   return (
-    <StyledAccordion {...ACCORDION_PROPS}>
+    <StyledAccordion {...ACCORDION_PROPS} defaultExpanded={defaultExpanded}>
       <AccordionSummary
         expandIcon={
           <ChevronRightRounded fontSize={SVG_ICON_PROPS.FONT_SIZE.SMALL} />
         }
       >
         <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_LARGE_500}>
-          {GROUP_ID_LABEL[groupId] || groupId} ({row.getLeafRows().length})
+          {GROUP_ID_LABEL[groupId] || groupId} (2)
         </Typography>
       </AccordionSummary>
       <AccordionDetails>

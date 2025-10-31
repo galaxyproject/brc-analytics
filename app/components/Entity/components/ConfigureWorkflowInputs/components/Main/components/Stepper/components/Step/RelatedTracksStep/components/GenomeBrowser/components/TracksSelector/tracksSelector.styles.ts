@@ -1,6 +1,6 @@
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import styled from "@emotion/styled";
-import { Stack, Dialog } from "@mui/material";
+import { Dialog } from "@mui/material";
 
 export const StyledDialog = styled(Dialog)`
   .MuiDialog-paper {

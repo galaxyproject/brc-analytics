@@ -17,8 +17,8 @@ export const Tables = ({ table }: Props): JSX.Element => {
 
   return (
     <StyledStack spacing={4} useFlexGap>
-      {rows.map((row) => (
-        <Table key={row.id} row={row} table={table} />
+      {rows.map((row, i) => (
+        <Table key={row.id} defaultExpanded={i === 0} row={row} table={table} />
       ))}
     </StyledStack>
   );

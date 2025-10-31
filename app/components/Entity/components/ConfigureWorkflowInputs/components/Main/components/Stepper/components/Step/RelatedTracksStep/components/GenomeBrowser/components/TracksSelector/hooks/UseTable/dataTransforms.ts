@@ -1,4 +1,5 @@
 import {
+  UcscTrackComposite,
   UcscTrackGroup,
   UcscTrackNode,
 } from "../../../../../../../../../../../../../../../../../utils/ucsc-tracks-api/entities";
@@ -27,19 +28,33 @@ export function mapTrackGroups(trackGroups?: UcscTrackGroup[]): Track[] {
     .filter(filterTrackGroup)
     .reduce((acc: Track[], trackGroup) => {
       const { groupId } = trackGroup;
+      // Create the "leaf rows" for the track group.
       const tracks: Track[] = [];
-      trackGroup.tracks.forEach((trackNode) => {
-        if (trackNode.isComposite) {
-          trackNode.tracks.forEach((track) => {
-            tracks.push({ ...track, groupId });
-          });
-        } else {
-          tracks.push({ ...trackNode, groupId });
-        }
-      });
+      for (const trackNode of trackGroup.tracks) {
+        processTrackNode(trackNode, groupId, tracks);
+      }
       acc.push(...tracks);
       return acc;
     }, []);
+}
+
+function processTrackNode(
+  trackNode: UcscTrackNode,
+  groupId: string,
+  tracks: Track[]
+): void {
+  // Destructure shared properties (composite vs non-composite).
+  const { longLabel, shortLabel, type } = trackNode;
+  // Determine the bigDataUrl value.
+  const bigDataUrl = trackNode.isComposite ? undefined : trackNode.bigDataUrl;
+  // Create the track object.
+  tracks.push({ bigDataUrl, groupId, longLabel, shortLabel, type });
+  if (trackNode.isComposite) {
+    // Handle composite node tracks (recursively).
+    for (const track of trackNode.tracks) {
+      processTrackNode(track, groupId, tracks);
+    }
+  }
 }
 
 export function sanitizeTracks(tracks: Track[]): Track[] {
