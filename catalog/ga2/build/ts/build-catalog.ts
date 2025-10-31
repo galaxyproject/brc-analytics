@@ -8,6 +8,7 @@ import {
 import {
   GA2AssemblyEntity,
   GA2OrganismEntity,
+  ResourceItem,
   SRAData,
 } from "../../../../app/apis/catalog/ga2/entities";
 import {
@@ -73,7 +74,7 @@ type AssemblyExtraResources = Record<
   Record<string, Record<string, { files: string[]; resource_url: string }>>
 >;
 
-type AssemblyResource = Record<string, Array<{ name: string; url: string }>>;
+type AssemblyResource = Record<string, Array<ResourceItem>>;
 
 async function loadAssemblyExtraResources(): Promise<AssemblyExtraResources> {
   const filePath = path.resolve(SOURCE_PATH_ASSEMBLY_EXTRA);
@@ -97,10 +98,22 @@ function getAssemblyExtraResources(
         data[assemblyAccession][resource_type][resource_name].resource_url;
       resources[formatted_resource_type] =
         resources[formatted_resource_type] ?? [];
-      resources[formatted_resource_type].push({
-        name: resource_name,
-        url: url,
-      });
+      const files =
+        data[assemblyAccession][resource_type][resource_name].files ?? [];
+      if (files.length > 1) {
+        resources[formatted_resource_type].push({
+          files,
+          name: resource_name,
+          type: "folder",
+          url,
+        });
+      } else {
+        resources[formatted_resource_type].push({
+          name: resource_name,
+          type: "file",
+          url,
+        });
+      }
     }
     if (resources[formatted_resource_type]) {
       resources[formatted_resource_type].sort((a, b) =>
