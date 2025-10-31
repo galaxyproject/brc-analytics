@@ -17,7 +17,7 @@ function filterTrackGroup(
 }
 
 /**
- * Maps track groups to tracks (tracks, with group identifier).
+ * Maps track groups to hierarchical tracks (parents with children) with group identifier.
  * @param trackGroups - Track groups.
  * @returns Tracks.
  */
@@ -28,35 +28,42 @@ export function mapTrackGroups(trackGroups?: UcscTrackGroup[]): Track[] {
     .filter(filterTrackGroup)
     .reduce((acc: Track[], trackGroup) => {
       const { groupId } = trackGroup;
-      // Create the "leaf rows" for the track group.
-      const tracks: Track[] = [];
-      for (const trackNode of trackGroup.tracks) {
-        processTrackNode(trackNode, groupId, tracks);
+      const groupTracks: Track[] = [];
+      for (const node of trackGroup.tracks) {
+        groupTracks.push(mapNodeToTrack(node, groupId));
       }
-      acc.push(...tracks);
+      acc.push(...groupTracks);
       return acc;
     }, []);
 }
 
-function processTrackNode(
-  trackNode: UcscTrackNode,
-  groupId: string,
-  tracks: Track[]
-): void {
-  // Destructure shared properties (composite vs non-composite).
-  const { longLabel, shortLabel, type } = trackNode;
-  // Determine the bigDataUrl value.
-  const bigDataUrl = trackNode.isComposite ? undefined : trackNode.bigDataUrl;
-  // Create the track object.
-  tracks.push({ bigDataUrl, groupId, longLabel, shortLabel, type });
-  if (trackNode.isComposite) {
-    // Handle composite node tracks (recursively).
-    for (const track of trackNode.tracks) {
-      processTrackNode(track, groupId, tracks);
-    }
+function mapNodeToTrack(node: UcscTrackNode, groupId: string): Track {
+  const { longLabel, shortLabel, type } = node;
+  if ((node as UcscTrackComposite).isComposite) {
+    const children: Track[] = node.tracks.map((child) =>
+      mapNodeToTrack(child, groupId)
+    );
+    return {
+      bigDataUrl: undefined,
+      groupId,
+      longLabel,
+      shortLabel,
+      type,
+      tracks: children,
+    };
   }
+  return {
+    bigDataUrl: node.bigDataUrl,
+    groupId,
+    longLabel,
+    shortLabel,
+    tracks: [],
+    type,
+  };
 }
 
 export function sanitizeTracks(tracks: Track[]): Track[] {
-  return tracks.filter((track) => !!track.bigDataUrl);
+  return tracks.filter(
+    (track) => !!track.bigDataUrl || (track.tracks && track.tracks.length > 0)
+  );
 }

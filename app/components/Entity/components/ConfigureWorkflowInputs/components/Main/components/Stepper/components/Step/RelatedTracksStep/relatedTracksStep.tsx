@@ -28,6 +28,7 @@ export const RelatedTracksStep = ({
 }: StepProps): JSX.Element => {
   const ucscTracks = useUCSCTracks(genome.accession);
   const table = useTable(ucscTracks);
+  console.log("table", table.getRowModel());
   const { onChange, value } = useToggleButtonGroup(VIEW.UCSC_GENOME_BROWSER);
   return (
     <Step active={active} completed={completed} index={index}>

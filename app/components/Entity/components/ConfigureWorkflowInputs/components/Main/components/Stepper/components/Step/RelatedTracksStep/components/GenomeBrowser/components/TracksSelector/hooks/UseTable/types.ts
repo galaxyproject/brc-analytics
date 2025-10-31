@@ -2,5 +2,5 @@ import { UcscTrack } from "../../../../../../../../../../../../../../../../../ut
 
 export type Track = Omit<UcscTrack, "isComposite"> & {
   groupId: string;
-  tracks?: Track[];
+  tracks: Track[];
 };

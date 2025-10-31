@@ -26,7 +26,6 @@ import { Track } from "./types";
 
 export const useTable = (ucscTracks: UseUCSCTracks): Table<Track> => {
   const { data: trackGroups } = ucscTracks;
-  console.log("ORIGIANL", trackGroups?.map((t) => t.tracks).flat());
 
   const data = useMemo(() => mapTrackGroups(trackGroups), [trackGroups]);
 
@@ -63,7 +62,9 @@ export const useTable = (ucscTracks: UseUCSCTracks): Table<Track> => {
     getFacetedUniqueValues: getFacetedUniqueValuesWithArrayValues(),
     getFilteredRowModel: getFilteredRowModel(),
     getGroupedRowModel: getGroupedRowModel(),
+    getRowCanExpand: (row) => row.original.tracks.length > 0,
     getSortedRowModel: getSortedRowModel(),
+    getSubRows: (row) => row.tracks,
     initialState,
     meta,
   });
