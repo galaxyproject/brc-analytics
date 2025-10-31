@@ -5,6 +5,7 @@ export type GA2Catalog = GA2AssemblyEntity | GA2OrganismEntity;
 export interface GA2AssemblyEntity {
   accession: string;
   annotationStatus: string | null;
+  assemblyResources: Record<string, Array<ResourceItem>>;
   chromosomes: number | null;
   coverage: string | null;
   gcPercent: number | null;
@@ -51,6 +52,13 @@ export interface GA2OrganismEntity {
   taxonomicLevelPhylum: string;
   taxonomicLevelSpecies: string;
   tolId: string;
+}
+
+export interface ResourceItem {
+  files?: string[];
+  name: string;
+  type: "file" | "folder";
+  url?: string;
 }
 
 export interface SRAData {
