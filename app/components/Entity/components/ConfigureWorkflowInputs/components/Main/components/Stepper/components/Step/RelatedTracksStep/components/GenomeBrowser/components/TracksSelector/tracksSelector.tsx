@@ -6,7 +6,8 @@ import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/B
 import { useState } from "react";
 import { RowSelectionState } from "@tanstack/table-core";
 import { ColumnFilters } from "./components/ColumnFilters/columnFilters";
-import { Tables } from "./components/Tables/tables";
+import { TracksSelectionPanel } from "./components/TracksSelectionPanel/tracksSelectionPanel";
+import { getTracksData } from "./utils";
 
 export const TracksSelector = ({
   onClose,
@@ -28,7 +29,7 @@ export const TracksSelector = ({
       <DialogTitle onClose={onClose} title="Select Tracks" />
       <DialogContent>
         <ColumnFilters table={table} />
-        <Tables table={table} />
+        <TracksSelectionPanel table={table} />
       </DialogContent>
       <DialogActions>
         <Button
@@ -44,7 +45,7 @@ export const TracksSelector = ({
           {...BUTTON_PROPS.PRIMARY_CONTAINED}
           disabled={selectedCount === 0}
           onClick={() => {
-            // onConfigure(getSequencingData(table, stepKey));
+            onConfigure(getTracksData(table, stepKey));
             onClose();
           }}
         >

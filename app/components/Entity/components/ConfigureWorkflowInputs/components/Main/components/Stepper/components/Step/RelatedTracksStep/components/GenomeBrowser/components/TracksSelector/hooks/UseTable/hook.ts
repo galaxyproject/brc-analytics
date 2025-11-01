@@ -23,6 +23,7 @@ import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/
 import { UseUCSCTracks } from "../../../../../../hooks/UseUCSCTracks/types";
 import { mapTrackGroups } from "./dataTransforms";
 import { Track } from "./types";
+import { CATEGORY_CONFIGS } from "./categoryConfigs";
 
 export const useTable = (ucscTracks: UseUCSCTracks): Table<Track> => {
   const { data: trackGroups } = ucscTracks;
@@ -54,7 +55,6 @@ export const useTable = (ucscTracks: UseUCSCTracks): Table<Track> => {
     enableSorting: false,
     enableSortingInteraction: false,
     filterFns: { arrIncludesSome },
-    filterFromLeafRows: true,
     getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
     getFacetedMinMaxValues: getFacetedMinMaxValues(),
@@ -62,7 +62,7 @@ export const useTable = (ucscTracks: UseUCSCTracks): Table<Track> => {
     getFacetedUniqueValues: getFacetedUniqueValuesWithArrayValues(),
     getFilteredRowModel: getFilteredRowModel(),
     getGroupedRowModel: getGroupedRowModel(),
-    getRowCanExpand: (row) => row.original.tracks.length > 0,
+    getRowId: (row) => row.bigDataUrl || row.longLabel!,
     getSortedRowModel: getSortedRowModel(),
     getSubRows: (row) => row.tracks,
     initialState,

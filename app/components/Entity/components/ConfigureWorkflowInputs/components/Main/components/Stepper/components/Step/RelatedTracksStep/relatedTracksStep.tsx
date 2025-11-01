@@ -14,10 +14,12 @@ import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/comp
 import { GenomeBrowser } from "./components/GenomeBrowser/genomeBrowser";
 import { useUCSCTracks } from "./hooks/UseUCSCTracks/hook";
 import { useTable } from "./components/GenomeBrowser/components/TracksSelector/hooks/UseTable/hook";
+import { getSelectedTracks, renderValue } from "./utils";
 
 export const RelatedTracksStep = ({
   active,
   completed,
+  configuredInput,
   entryLabel,
   genome,
   index,
@@ -28,7 +30,6 @@ export const RelatedTracksStep = ({
 }: StepProps): JSX.Element => {
   const ucscTracks = useUCSCTracks(genome.accession);
   const table = useTable(ucscTracks);
-  console.log("table", table.getRowModel());
   const { onChange, value } = useToggleButtonGroup(VIEW.UCSC_GENOME_BROWSER);
   return (
     <Step active={active} completed={completed} index={index}>
@@ -36,7 +37,9 @@ export const RelatedTracksStep = ({
         optional={
           completed && (
             <Fragment>
-              <Optional noWrap>{value}</Optional>
+              <Optional noWrap>
+                {renderValue(configuredInput.tracks)} selected
+              </Optional>
               <Button onClick={() => onEdit(index)}>Edit</Button>
             </Fragment>
           )

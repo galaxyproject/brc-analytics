@@ -63,7 +63,5 @@ function mapNodeToTrack(node: UcscTrackNode, groupId: string): Track {
 }
 
 export function sanitizeTracks(tracks: Track[]): Track[] {
-  return tracks.filter(
-    (track) => !!track.bigDataUrl || (track.tracks && track.tracks.length > 0)
-  );
+  return tracks.filter((track) => !!track.bigDataUrl);
 }
