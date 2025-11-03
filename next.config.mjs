@@ -18,6 +18,7 @@ export default withPlugins(
   {
     basePath: "",
     // distDir: "out/data",
+    compiler: { emotion: true },
     experimental: {
       instrumentationHook: true,
     },
