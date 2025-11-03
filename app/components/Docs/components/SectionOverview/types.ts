@@ -1,8 +1,10 @@
-import { LinkProps } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
+import { ComponentProps } from "react";
 
 export interface Overview {
-  label: string;
-  links: LinkProps[];
+  date: string;
+  href: string;
+  image: ComponentProps<"img">;
+  title: string;
 }
 
 export interface Props {
