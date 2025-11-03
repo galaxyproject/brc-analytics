@@ -69,6 +69,7 @@ export const StyledContainer = styled(Container, {
       isSubRow &&
       css`
         background-color: ${PALETTE.SMOKE_LIGHTEST};
+        padding: 14px 44px;
       `}
 
     ${({ isLastRow }) =>

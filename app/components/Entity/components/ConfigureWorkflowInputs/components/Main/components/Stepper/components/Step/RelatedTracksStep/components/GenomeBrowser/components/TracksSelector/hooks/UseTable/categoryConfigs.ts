@@ -10,5 +10,5 @@ export const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
       (label) => GROUP_ID_LABEL[label] || label
     ),
   },
-  LONG_LABEL: { key: "longLabel", label: "Track Type" },
+  SHORT_LABEL: { key: "shortLabel", label: "Track Type" },
 } as const;

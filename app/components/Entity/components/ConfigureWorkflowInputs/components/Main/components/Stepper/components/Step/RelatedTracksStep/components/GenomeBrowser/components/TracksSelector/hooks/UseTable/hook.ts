@@ -59,7 +59,7 @@ export const useTable = (ucscTracks: UseUCSCTracks): Table<Track> => {
     getFacetedUniqueValues: getFacetedUniqueValuesWithArrayValues(),
     getFilteredRowModel: getFilteredRowModel(),
     getGroupedRowModel: getGroupedRowModel(),
-    getRowId: (row, i) => row.bigDataUrl || row.longLabel || String(i),
+    getRowId: (row, i) => row.bigDataUrl || row.shortLabel || String(i),
     getSubRows: (row) => row.tracks,
     initialState,
     meta,

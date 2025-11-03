@@ -31,6 +31,7 @@ export const TracksSelectionPanel = ({ table }: Props): JSX.Element => {
             isLastRow={getIsLastRowInGroup(rows, row, i)}
             isSelected={row.getIsSelected()}
             isSubRow={row.depth >= 2}
+            maxWidth={false}
             onClick={() => {
               if (!row.getCanExpand()) return;
               row.toggleExpanded();

@@ -14,14 +14,6 @@ const GROUP_ID: ColumnDef<Track> = {
   header: "",
 };
 
-const LONG_LABEL: ColumnDef<Track> = {
-  accessorKey: CATEGORY_CONFIGS.LONG_LABEL.key,
-  cell: (ctx) => ctx.getValue() || LABEL.UNSPECIFIED,
-  enableGrouping: false,
-  filterFn: SELECT_FILTER_FN,
-  header: "",
-};
-
 const ROW_SELECT_OR_EXPAND: ColumnDef<Track> = {
   cell: RowSelectOrExpand,
   enableColumnFilter: false,
@@ -30,8 +22,16 @@ const ROW_SELECT_OR_EXPAND: ColumnDef<Track> = {
   id: COLUMN_IDENTIFIER.ROW_SELECTION,
 };
 
+const SHORT_LABEL: ColumnDef<Track> = {
+  accessorKey: CATEGORY_CONFIGS.SHORT_LABEL.key,
+  cell: (ctx) => ctx.getValue() || LABEL.UNSPECIFIED,
+  enableGrouping: false,
+  filterFn: SELECT_FILTER_FN,
+  header: "",
+};
+
 export const columns: ColumnDef<Track>[] = [
   ROW_SELECT_OR_EXPAND,
   GROUP_ID,
-  LONG_LABEL,
+  SHORT_LABEL,
 ];
