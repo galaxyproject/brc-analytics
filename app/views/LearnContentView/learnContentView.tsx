@@ -25,10 +25,12 @@ export const LearnContentView = (props: StaticProps): JSX.Element | null => {
       />
       <SectionContent
         content={
-          <Content>
+          <Fragment>
             <HeroImage heroImage={heroImage} />
-            <MDXRemote {...mdxSource} components={MDX_COMPONENTS} />
-          </Content>
+            <Content>
+              <MDXRemote {...mdxSource} components={MDX_COMPONENTS} />
+            </Content>
+          </Fragment>
         }
         frontmatter={frontmatter}
         outline={

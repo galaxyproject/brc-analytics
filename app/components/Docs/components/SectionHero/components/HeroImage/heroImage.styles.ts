@@ -9,10 +9,10 @@ const MARGIN_TOP =
 
 export const StyledImage = styled("img")`
   && {
-    border: none;
-    margin: -${MARGIN_TOP}px 0 0 0 !important;
+    margin: -${MARGIN_TOP}px 0 0 0;
     padding: ${PADDING_Y}px 0;
     position: relative;
+    width: 100%;
     z-index: 2;
 
     + h1,
