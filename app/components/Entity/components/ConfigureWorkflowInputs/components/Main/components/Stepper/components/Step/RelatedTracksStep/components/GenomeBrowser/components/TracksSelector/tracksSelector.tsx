@@ -5,9 +5,9 @@ import { DialogTitle } from "@databiosphere/findable-ui/lib/components/common/Di
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { useState } from "react";
 import { RowSelectionState } from "@tanstack/table-core";
-import { ColumnFilters } from "./components/ColumnFilters/columnFilters";
 import { TracksSelectionPanel } from "./components/TracksSelectionPanel/tracksSelectionPanel";
 import { getTracksData } from "./utils";
+import { ColumnFilters } from "../../../../../components/ColumnFilters/columnFilters";
 
 export const TracksSelector = ({
   onClose,
