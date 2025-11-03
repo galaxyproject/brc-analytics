@@ -1,4 +1,3 @@
-import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import {
   UcscTrackGroup,
   UcscTrackNode,
@@ -44,7 +43,7 @@ export function mapTrackGroups(trackGroups?: UcscTrackGroup[]): Track[] {
  * @returns Track.
  */
 function mapNodeToTrack(node: UcscTrackNode, groupId: string): Track {
-  const { isComposite, longLabel = LABEL.UNSPECIFIED, shortLabel, type } = node;
+  const { isComposite, longLabel, shortLabel, type } = node;
 
   // Initialize bigDataUrl and tracks.
   let bigDataUrl: Track["bigDataUrl"] = undefined;
