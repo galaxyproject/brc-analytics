@@ -37,7 +37,7 @@ export const AnalysisMethod = ({
       >
         <Typography
           component="h3"
-          variant={TYPOGRAPHY_PROPS.VARIANT.HEADING_XSMALL}
+          variant={TYPOGRAPHY_PROPS.VARIANT.HEADING_SMALL}
         >
           {workflowCategory.name}
         </Typography>
