@@ -27,6 +27,7 @@ export const Main = ({
     <StyledMainContainer>
       <Loading loading={status.loading} panelStyle={PAPER_PANEL_STYLE.FLUID} />
       <Stepper
+        configuredInput={configuredInput}
         configuredSteps={configuredSteps}
         genome={genome}
         onConfigure={onConfigure}
