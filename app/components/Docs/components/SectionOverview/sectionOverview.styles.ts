@@ -1,47 +1,39 @@
 import styled from "@emotion/styled";
-import { bpUpSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
-import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
+import { bpDownSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
+import { Card, Stack } from "@mui/material";
 
-export const GroupOverview = styled.div`
-  .MuiDivider-root,
-  .MuiTypography-heading {
-    grid-column: 1 / -1;
-  }
+export const StyledStack = styled(Stack)`
+  display: grid;
+  gap: 40px 16px;
+  grid-template-columns: 1fr 1fr;
 
-  .MuiDivider-root {
-    margin: 32px 0;
-  }
-`;
-
-export const GroupLinks = styled.div`
-  margin-top: 8px;
-
-  ${bpUpSm} {
-    display: grid;
-    gap: 0 64px;
-    grid-auto-columns: 1fr;
-
-    ul + ul {
-      grid-column: 2;
-    }
+  ${bpDownSm} {
+    grid-template-columns: 1fr;
   }
 `;
 
-export const StyledUnorderedList = styled("ul")`
-  list-style-position: inside;
-  padding-left: 0 !important;
+export const StyledCard = styled(Card)`
+  .MuiCardActionArea-root {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 
-  li {
-    margin: 4px 0;
-    padding-left: 24px; // required for list-style-position: inside; allows for market to be positioned inside the list item.
-    text-indent: -15px; // required for list-style-position: inside; centering marker; half of the 24px width and half marker width @ 6px.
-
-    > * {
-      margin-left: -6px; // required for list-style-position: inside; assists with vertical alignment of list item; difference between indent and padding adjustments and half of the marker width.
+    .MuiCardActionArea-focusHighlight {
+      background-color: transparent;
     }
+  }
 
-    &::marker {
-      color: ${PALETTE.PRIMARY_MAIN};
-    }
+  .MuiCardMedia-root {
+    aspect-ratio: 280/157;
+    border: none;
+    border-radius: 8px;
+    margin: 0;
+  }
+
+  .MuiTypography-body-large-500 {
+    font-size: 20px;
+    line-height: 28px;
+    margin: 0;
+    padding-right: 56px;
   }
 `;

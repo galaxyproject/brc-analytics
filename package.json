@@ -44,6 +44,7 @@
     "@tanstack/react-virtual": "^3.13.12",
     "copy-to-clipboard": "^3.3.1",
     "d3": "^7.9.0",
+    "date-fns": "^4.1.0",
     "isomorphic-dompurify": "^2.22.0",
     "ky": "^1.7.2",
     "next": "^14.2.30",
