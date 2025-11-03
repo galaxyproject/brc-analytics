@@ -7,7 +7,7 @@ import { useState } from "react";
 import { Table } from "./components/Table/table";
 import { RowSelectionState } from "@tanstack/table-core";
 import { getSequencingData } from "../../utils";
-import { ColumnFilters } from "./components/ColumnFilters/columnFilters";
+import { ColumnFilters } from "../../../../../components/ColumnFilters/columnFilters";
 
 export const CollectionSelector = ({
   onClose,
