@@ -53,10 +53,9 @@ export const AnalysisMethodsCatalog = ({ assembly }: Props): JSX.Element => {
           }
           title="Select a Workflow"
         />
-        {workflowCategories.map((workflowCategory, i) => {
+        {workflowCategories.map((workflowCategory) => {
           return (
             <AnalysisMethod
-              defaultExpanded={i === 0 && workflowCategory.workflows.length > 0}
               disabled={workflowCategory.workflows.length === 0}
               entityId={entityId as string}
               geneModelUrl={assembly.geneModelUrl}

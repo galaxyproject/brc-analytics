@@ -4,8 +4,7 @@ import {
   WorkflowCategory,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
 
-export interface Props
-  extends Pick<AccordionProps, "defaultExpanded" | "disabled"> {
+export interface Props extends Pick<AccordionProps, "disabled"> {
   entityId: string;
   geneModelUrl: string | null;
   genomeVersionAssemblyId: string;
