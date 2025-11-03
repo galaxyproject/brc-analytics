@@ -25,7 +25,7 @@ export function sanitizeFrontmatter(
 ): FrontmatterProps | undefined {
   if (!frontmatter) return;
 
-  const { enableOutline = true, overview } = frontmatter || {};
+  const { enableOutline = true, overview } = frontmatter;
 
   return {
     ...frontmatter,
