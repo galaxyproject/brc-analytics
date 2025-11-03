@@ -14,12 +14,13 @@ export const LearnContentView = (props: StaticProps): JSX.Element | null => {
 
   if (!mdxSource) return null;
 
-  const { breadcrumbs, heroImage, title } = frontmatter || {};
+  const { breadcrumbs, contentType, heroImage, title } = frontmatter || {};
 
   return (
     <Fragment>
       <StyledSectionHero
         breadcrumbs={breadcrumbs || []}
+        contentType={contentType}
         head={title}
         subHead={null}
       />

@@ -4,14 +4,19 @@ import { FrontmatterProps as BaseFrontmatterProps } from "@databiosphere/findabl
 import { ComponentProps } from "react";
 
 export type FrontmatterProps = BaseFrontmatterProps<
-  AppFrontmatterProps &
+  ArticleFrontmatterProps &
     FrontmatterBreadcrumbProps &
     FrontmatterOutlineProps &
     FrontmatterOverviewProps
 >;
 
-interface AppFrontmatterProps {
+interface ArticleFrontmatterProps {
+  contentType?: CONTENT_TYPE;
   heroImage?: Pick<ComponentProps<"img">, "alt" | "src">;
+}
+
+export enum CONTENT_TYPE {
+  ARTICLE = "ARTICLE",
 }
 
 interface FrontmatterBreadcrumbProps {
