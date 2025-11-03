@@ -19,18 +19,13 @@ import { ChevronRightRounded } from "@mui/icons-material";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 
 export const AnalysisMethod = ({
-  defaultExpanded,
   disabled,
   entityId,
   workflowCategory,
   workflows,
 }: Props): JSX.Element => {
   return (
-    <StyledAccordion
-      component={FluidPaper}
-      defaultExpanded={defaultExpanded}
-      disabled={disabled}
-    >
+    <StyledAccordion component={FluidPaper} disabled={disabled}>
       <AccordionSummary
         expandIcon={
           disabled ? (

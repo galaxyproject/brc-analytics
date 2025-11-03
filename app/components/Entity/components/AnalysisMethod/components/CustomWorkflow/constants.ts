@@ -16,6 +16,6 @@ export const CUSTOM_WORKFLOW: Workflow = {
   taxonomyId: null,
   trsId: "custom-workflow",
   workflowDescription:
-    "Send this assembly, its tracks, and ENA read runs to a new Galaxy history for analysis with your workflow.",
+    "Send this assembly, related UCSC Browser tracks, and selected ENA read runs to a new Galaxy history for analysis with your workflow.",
   workflowName: "Send Data to a Galaxy History",
 };
