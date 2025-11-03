@@ -8,6 +8,8 @@ import styled from "@emotion/styled";
 import { sectionLayout } from "../../../Layout/components/AppLayout/components/Section/section.styles";
 import { ContentLayout } from "@databiosphere/findable-ui/lib/components/Layout/components/ContentLayout/contentLayout.styles";
 
+export const PADDING_Y = 64;
+
 export const StyledContentLayout = styled(ContentLayout)`
   ${bpUp1366} {
     grid-template-areas: "content";
@@ -23,12 +25,12 @@ export const StyledContentLayout = styled(ContentLayout)`
 export const StyledContentGrid = styled(ContentGrid)`
   ${sectionLayout}
   display: grid;
-  padding: 64px 16px;
+  padding: ${PADDING_Y}px 16px;
   width: calc(100% - 32px);
 `;
 
 export const StyledOutlineGrid = styled(OutlineGrid)`
-  padding: 64px 0;
+  padding: ${PADDING_Y}px 0;
 
   ${bpUp1366} {
     display: none;

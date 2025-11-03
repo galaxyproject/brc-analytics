@@ -1,23 +1,24 @@
 import { Fragment } from "react";
 import { StaticProps } from "../../docs/common/staticGeneration/types";
-import { SectionHero } from "../../components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import { MDXRemote } from "next-mdx-remote";
 import { MDX_COMPONENTS } from "../../docs/common/mdx/constants";
 import { Content } from "../../components/Docs/components/Content/content";
 import { Outline } from "@databiosphere/findable-ui/lib/components/Layout/components/Outline/outline";
 import { ContentsTab } from "@databiosphere/findable-ui/lib/components/Layout/components/Outline/components/ContentsTab/contentsTab";
 import { SectionContent } from "../../components/Docs/components/SectionContent/sectionContent";
+import { StyledSectionHero } from "../../components/Docs/components/SectionHero/sectionHero.styles";
+import { HeroImage } from "../../components/Docs/components/SectionHero/components/HeroImage/heroImage";
 
 export const LearnContentView = (props: StaticProps): JSX.Element | null => {
   const { frontmatter, mdxSource, outline, ...contentProps } = props;
 
   if (!mdxSource) return null;
 
-  const { breadcrumbs, title } = frontmatter || {};
+  const { breadcrumbs, heroImage, title } = frontmatter || {};
 
   return (
     <Fragment>
-      <SectionHero
+      <StyledSectionHero
         breadcrumbs={breadcrumbs || []}
         head={title}
         subHead={null}
@@ -25,6 +26,7 @@ export const LearnContentView = (props: StaticProps): JSX.Element | null => {
       <SectionContent
         content={
           <Content>
+            <HeroImage heroImage={heroImage} />
             <MDXRemote {...mdxSource} components={MDX_COMPONENTS} />
           </Content>
         }
