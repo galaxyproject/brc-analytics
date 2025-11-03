@@ -18,14 +18,14 @@ services:
 
   backend:
     build:
-      context: .
+      context: ./api
       dockerfile: Dockerfile
       args:
         APP_VERSION: ${APP_VERSION:-0.15.0}
     # Port mapping removed - only accessible via nginx within Docker network
     # For direct backend access during development, use: docker compose exec backend curl http://localhost:8000
     env_file:
-      - .env
+      - ./api/.env
     environment:
       # Only override what needs Docker networking
       REDIS_URL: redis://redis:6379/0

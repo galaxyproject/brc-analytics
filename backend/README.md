@@ -1,103 +1,57 @@
 # BRC Analytics Backend
 
-FastAPI backend infrastructure for BRC Analytics.
+Backend infrastructure for BRC Analytics, organized as a collection of services.
 
-## Features
+## Structure
 
-- FastAPI REST API
-- Redis caching with TTL support
-- Health check endpoints
-- Docker deployment with nginx reverse proxy
-- uv for dependency management
+```
+backend/
+├── docker-compose.yml     # Service orchestration
+├── nginx.conf            # Reverse proxy configuration
+├── docker-build.sh       # Build script with version sync
+│
+└── api/                  # FastAPI REST API service
+    ├── app/              # Application code
+    ├── Dockerfile        # API service container
+    ├── pyproject.toml    # Python dependencies
+    └── README.md         # API-specific documentation
+```
 
 ## Quick Start
 
-### Development (Local)
-
 ```bash
 cd backend
-uv sync
-uv run uvicorn app.main:app --reload
-```
 
-API documentation: http://localhost:8000/api/docs
-
-### Production (Docker)
-
-```bash
 # Create environment file
-cp .env.example .env
-# Edit .env if needed (defaults work for local development)
+cp api/.env.example api/.env
 
 # Build with version from package.json
 ./docker-build.sh
 
-# Start all services (nginx + backend + redis)
+# Start all services
 docker compose up -d
 
-# Check service health
-curl http://localhost/api/v1/health
+# Check health
+curl http://localhost:8080/api/v1/health
 
 # View logs
-docker compose logs -f backend
+docker compose logs -f
 
-# Rebuild after code changes
-docker compose up -d --build
-
-# Stop all services
+# Stop services
 docker compose down
 ```
 
-Services:
+## Services
 
-- nginx: http://localhost (reverse proxy)
-- backend API: http://localhost:8000 (direct access)
-- API docs: http://localhost/api/docs
-- redis: localhost:6379
+- **nginx** (port 8080): Reverse proxy, public-facing entry point
+- **api**: FastAPI REST API (internal, accessed via nginx)
+- **redis**: Cache layer (internal)
 
-## API Endpoints
+See `api/README.md` for API-specific documentation.
 
-### Health & Monitoring
+## Port Configuration
 
-- `GET /api/v1/health` - Overall service health status
-- `GET /api/v1/cache/health` - Redis cache connectivity check
-- `GET /api/v1/version` - API version and environment information
+For security, only nginx is exposed externally. Backend services (API, Redis) are only accessible within the Docker network.
 
-### Documentation
-
-- `GET /api/docs` - Interactive Swagger UI
-- `GET /api/redoc` - ReDoc API documentation
-
-## Configuration
-
-Environment variables (see `.env.example`):
-
-```bash
-# Redis
-REDIS_URL=redis://localhost:6379/0
-
-# Application
-CORS_ORIGINS=http://localhost:3000,http://localhost
-LOG_LEVEL=INFO
-```
-
-## Testing
-
-```bash
-# Run e2e tests
-npm run test:e2e
-
-# Or with Playwright directly
-npx playwright test tests/e2e/03-api-health.spec.ts
-```
-
-## Architecture
-
-```
-nginx (port 80)
-  ├── /api/* → FastAPI backend (port 8000)
-  └── /* → Next.js static files
-
-FastAPI backend
-  └── Redis cache (port 6379)
-```
+- External access: `http://localhost:8080` → nginx → routes to services
+- Direct backend access (dev only): `docker compose exec backend curl http://localhost:8000`
