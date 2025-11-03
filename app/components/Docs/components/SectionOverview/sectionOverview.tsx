@@ -13,7 +13,7 @@ export const SectionOverview = ({ overview }: Props): JSX.Element | null => {
         return (
           <StyledCard key={String(title)} elevation={0}>
             <CardActionArea cardUrl={href}>
-              <CardMedia component="img" src={image?.src} />
+              <CardMedia alt={title} component="img" src={image?.src} />
               <Stack gap={3} useFlexGap>
                 <CardTitle>{title}</CardTitle>
                 <Typography
