@@ -17,13 +17,14 @@ export const StyledSectionHero = styled(SectionHero, {
 })<Pick<FrontmatterProps, "contentType">>`
   ${SectionLayout} {
     min-height: unset;
-    padding: 56px 0 72px;
+    padding: 56px 16px 72px;
   }
 
   ${(props) =>
     props.contentType === CONTENT_TYPE.ARTICLE &&
     css`
       ${SectionLayout} {
+        max-width: 756px;
         padding: 80px 16px ${PADDING_Y_BOTTOM}px;
       }
 
