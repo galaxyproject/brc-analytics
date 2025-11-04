@@ -14,7 +14,7 @@ PRIMARYDATA_OUTPUT_PATH = "catalog/ga2/build/intermediate/primary-data-ncbi.tsv"
 
 TREE_OUTPUT_PATH = "catalog/ga2/output/ncbi-taxa-tree.json"
 
-TAXONOMY_READ_RUN_COUNTS_OUTPUT_PATH = "catalog/ga2/build/intermediate/taxId.json"
+TAXONOMY_READ_RUN_COUNTS_OUTPUT_PATH = "catalog/ga2/build/intermediate/taxIdReadCount.json"
 
 TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
     40674: "Mammalia",
@@ -81,12 +81,9 @@ def create_taxonomy_read_run_count(genomes_tsv_path: str, output_path: str):
     df = pd.read_csv(genomes_tsv_path, sep="\t")
     unique_taxonomy_ids = df["taxonomyId"].drop_duplicates()
     print("Creating taxonomy read run counts")
+    read_counts = generate_taxon_read_run_count(unique_taxonomy_ids.tolist())
     with open(output_path, "w") as writer:
-        writer.write(
-            json.dumps(
-                generate_taxon_read_run_count(unique_taxonomy_ids.tolist()), indent=2
-            )
-        )
+        writer.write(json.dumps(read_counts, indent=2))
     print("Taxonomy read run counts created")
 
 

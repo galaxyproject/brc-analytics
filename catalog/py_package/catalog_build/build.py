@@ -1587,8 +1587,11 @@ def generate_taxon_read_run_count(taxonomy_ids):
     taxon_counter = {}
     url = "https://www.ebi.ac.uk/ena/portal/api/search"
     counter = 0
+    num_taxids = len(taxonomy_ids)
     for tId in taxonomy_ids:
-        processing = f"Processed {counter} taxonomy IDs, processing tx id: {tId}"
+        processing = (
+            f"Processed {counter} taxonomy IDs of {num_taxids}, processing tx id: {tId}"
+        )
         print(f"{processing:<120}", end="\r")
         params = {
             "result": "read_run",
@@ -1596,9 +1599,15 @@ def generate_taxon_read_run_count(taxonomy_ids):
             "fields": "experiment_accession,study_accession",
             "format": "json",
         }
-        resp = requests.get(url, params=params)
-        resp.raise_for_status()
+        try:
+            resp = requests.get(url, params=params)
+            resp.raise_for_status()
+        except ConnectTimeout:
+            print("Timeout, sleeping 10s")
+            time.sleep(10)
+            resp = requests.get(url, params=params)
+            resp.raise_for_status()
         taxon_counter[tId] = len(resp.json())
         counter += 1
     print(f"Processed {counter} taxonomy IDs", end="\n")
-    return taxon_counter
+    return dict(sorted(taxon_counter.items(), key=lambda x: x[1], reverse=True))
