@@ -72,7 +72,13 @@ export const RelatedTracksStep = ({
         )}
         <Button
           {...BUTTON_PROPS.PRIMARY_CONTAINED}
-          onClick={() => onContinue()}
+          onClick={() => {
+            if (configuredInput.tracks === undefined) {
+              // No selection has been made, before continuing configure for "None" selected.
+              onConfigure({ [stepKey]: null });
+            }
+            onContinue();
+          }}
         >
           Continue
         </Button>
