@@ -131,7 +131,7 @@ function getApiResponseTracksContainer(
   // the value associated with that key should be an object, which holds the tracks
   if (responseData && typeof responseData === "object") {
     const tracks = getPropertyIfHasOwn(responseData, assembly);
-    if (tracks && typeof responseData === "object") {
+    if (tracks && typeof tracks === "object") {
       return tracks;
     } else {
       throw new Error(
