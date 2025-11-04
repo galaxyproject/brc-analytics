@@ -1629,4 +1629,3 @@ def generate_taxon_read_run_count(taxonomy_ids):
         counter += 1
     print(f"Processed {counter} taxonomy IDs", end="\n")
     return dict(sorted(taxon_counter.items(), key=lambda x: x[1], reverse=True))
-

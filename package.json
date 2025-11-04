@@ -22,7 +22,7 @@
     "build-ga2-db": "esrun catalog/ga2/build/ts/build-catalog.ts",
     "build-brc-from-ncbi": "python3 -m catalog.build.py.build_files_from_ncbi",
     "build-ga2-from-ncbi": "python3 -m catalog.ga2.build.py.build_files_from_ncbi",
-    "merge-taxonomy-read-counts": "python3 -c \"import json, sys; f1=json.load(open('catalog/build/intermediate/taxIdReadCount.json')); f2=json.load(open('catalog/ga2/build/intermediate/taxIdReadCount.json')); dups=set(f1.keys())&set(f2.keys()); (print(f'Warning: Duplicate taxonomy IDs found: {sorted(dups)} (ga2 values will be used)', file=sys.stderr) if dups else None); json.dump({**f1,**f2}, open('app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/hooks/UseENADataByTaxonomyId/taxonomy_read_counts.json','w'), indent=2)\"",
+    "merge-taxonomy-read-counts": "python3 -m catalog.build.py.mergeBRCandGA2ReadCounts",
     "update-ga2-assemblies": "python3 -m catalog.ga2.build.py.update_assemblies",
     "iwc-manifest-to-workflows-yaml": "python3 -m catalog.py_package.catalog_build.iwc_manifest_to_workflows_yaml ./catalog/source/workflows.yml --exclude-other",
     "lint-schema": "linkml-lint ./catalog/py_package/catalog_build/schema --validate --verbose",
