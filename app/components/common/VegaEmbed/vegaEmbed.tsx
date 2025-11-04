@@ -39,13 +39,19 @@ export const VegaEmbed = ({ caption, spec }: VegaEmbedProps): JSX.Element => {
           vegaSpec = spec;
         }
 
-        // Embed the visualization
+        // Embed the visualization with responsive sizing
         await embed(containerRef.current, vegaSpec, {
           actions: {
             compiled: false,
             editor: false,
             export: true,
             source: false,
+          },
+          config: {
+            autosize: {
+              contains: "padding",
+              type: "fit-x",
+            },
           },
         });
         setError(null);
