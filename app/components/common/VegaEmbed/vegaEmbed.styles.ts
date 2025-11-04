@@ -8,6 +8,8 @@ export const VegaEmbedContainer = styled.figure`
 
   .vega-container {
     margin: 0 auto;
+    max-width: 100%;
+    overflow-x: auto;
     width: 100%;
   }
 
@@ -21,13 +23,13 @@ export const VegaEmbedContainer = styled.figure`
     color: ${PALETTE.INK_LIGHT};
     display: block;
     font: ${FONT.BODY_LARGE_400_2_LINES};
-    margin-top: 32px;
+    margin-top: 16px;
     text-align: justify;
 
     ${bpUpSm} {
       display: flex;
       gap: 0 64px;
-      margin-top: 52px;
+      margin-top: 16px;
       text-align: unset;
 
       span {
