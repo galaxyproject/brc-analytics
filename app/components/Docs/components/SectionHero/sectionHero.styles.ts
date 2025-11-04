@@ -24,6 +24,7 @@ export const StyledSectionHero = styled(SectionHero, {
     props.contentType === CONTENT_TYPE.ARTICLE &&
     css`
       ${SectionLayout} {
+        max-width: 756px;
         padding: 80px 16px ${PADDING_Y_BOTTOM}px;
       }
 
