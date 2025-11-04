@@ -17,7 +17,7 @@ export const StyledSectionHero = styled(SectionHero, {
 })<Pick<FrontmatterProps, "contentType">>`
   ${SectionLayout} {
     min-height: unset;
-    padding: 56px 0 72px;
+    padding: 56px 16px 72px;
   }
 
   ${(props) =>
