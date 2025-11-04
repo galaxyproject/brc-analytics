@@ -20,7 +20,10 @@ import { Outline } from "@databiosphere/findable-ui/lib/components/Layout/compon
 export const PADDING_Y = 64;
 
 export const StyledContentLayout = styled(ContentLayout, {
-  shouldForwardProp: (propName) => propName !== "contentType",
+  shouldForwardProp: (propName) =>
+    propName !== "contentType" &&
+    propName !== "hasNavigation" &&
+    propName !== "panelColor",
 })<Pick<FrontmatterProps, "contentType">>`
   ${(props) =>
     props.contentType !== CONTENT_TYPE.ARTICLE &&
@@ -59,7 +62,10 @@ export const StyledContent = styled(Content, {
 `;
 
 export const StyledOutlineGrid = styled(OutlineGrid, {
-  shouldForwardProp: (propName) => propName !== "contentType",
+  shouldForwardProp: (propName) =>
+    propName !== "contentType" &&
+    propName !== "headerHeight" &&
+    propName !== "panelColor",
 })<Pick<FrontmatterProps, "contentType">>`
   ${(props) =>
     props.contentType !== CONTENT_TYPE.ARTICLE &&
