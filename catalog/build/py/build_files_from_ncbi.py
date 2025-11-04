@@ -2,7 +2,7 @@ import json
 
 import pandas as pd
 
-from ...py_package.catalog_build import build_files, generate_taxon_read_run_count
+from ...py_package.catalog_build import build_files, create_taxonomy_read_run_count
 
 ASSEMBLIES_PATH = "catalog/source/assemblies.yml"
 ORGANISMS_PATH = "catalog/source/organisms.yml"
@@ -57,25 +57,6 @@ TAXANOMIC_LEVELS_FOR_TREE = [
     "serotype",
     "isolate",
 ]
-
-
-def create_taxonomy_read_run_count(genomes_tsv_path: str, output_path: str):
-    """Create taxonomy read run count JSON file from genomes TSV.
-
-    Args:
-        genomes_tsv_path: Path to the genomes TSV file
-        output_path: Path where the taxonomy read run count JSON will be written
-    """
-    df = pd.read_csv(genomes_tsv_path, sep="\t")
-    unique_taxonomy_ids = df["taxonomyId"].drop_duplicates()
-    print("Creating taxonomy read run counts")
-    with open(output_path, "w") as writer:
-        writer.write(
-            json.dumps(
-                generate_taxon_read_run_count(unique_taxonomy_ids.tolist()), indent=2
-            )
-        )
-    print("Taxonomy read run counts created")
 
 
 if __name__ == "__main__":

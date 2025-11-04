@@ -1583,6 +1583,24 @@ def build_files(
         )
 
 
+def create_taxonomy_read_run_count(genomes_tsv_path: str, output_path: str):
+    """Create taxonomy read run count JSON file from genomes TSV.
+    Args:
+        genomes_tsv_path: Path to the genomes TSV file
+        output_path: Path where the taxonomy read run count JSON will be written
+    """
+    df = pd.read_csv(genomes_tsv_path, sep="\t")
+    unique_taxonomy_ids = df["taxonomyId"].drop_duplicates()
+    print("Creating taxonomy read run counts")
+    with open(output_path, "w") as writer:
+        writer.write(
+            json.dumps(
+                generate_taxon_read_run_count(unique_taxonomy_ids.tolist()), indent=2
+            )
+        )
+    print("Taxonomy read run counts created")
+
+
 def generate_taxon_read_run_count(taxonomy_ids):
     taxon_counter = {}
     url = "https://www.ebi.ac.uk/ena/portal/api/search"
@@ -1611,3 +1629,4 @@ def generate_taxon_read_run_count(taxonomy_ids):
         counter += 1
     print(f"Processed {counter} taxonomy IDs", end="\n")
     return dict(sorted(taxon_counter.items(), key=lambda x: x[1], reverse=True))
+
