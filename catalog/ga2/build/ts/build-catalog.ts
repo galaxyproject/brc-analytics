@@ -1,3 +1,6 @@
+import fs from "fs";
+import path from "path";
+
 import {
   getAssemblyId,
   getOrganismId,
@@ -5,6 +8,7 @@ import {
 import {
   GA2AssemblyEntity,
   GA2OrganismEntity,
+  ResourceItem,
   SRAData,
 } from "../../../../app/apis/catalog/ga2/entities";
 import {
@@ -28,6 +32,9 @@ import { SourceGenome, SourceRawData } from "./entities";
 
 const SOURCE_PATH_ORGANISMS = "catalog/ga2/source/organisms.yml";
 
+const SOURCE_PATH_ASSEMBLY_EXTRA =
+  "catalog/ga2/source/genomeark_assembly_resources.json";
+
 const SOURCE_PATH_GENOMES =
   "catalog/ga2/build/intermediate/genomes-from-ncbi.tsv";
 
@@ -42,12 +49,79 @@ async function buildCatalog(): Promise<void> {
   const organisms = buildOrganisms(genomes);
 
   console.log("Assemblies:", genomes.length);
-  await saveJson("catalog/ga2/output/assemblies.json", genomes);
+  await saveJson(
+    "catalog/ga2/output/assemblies.json",
+    genomes.sort((a, b) => a.accession.localeCompare(b.accession))
+  );
+
+  for (const organism of organisms) {
+    organism.genomes = organism.genomes.sort((a, b) =>
+      a.accession.localeCompare(b.accession)
+    );
+  }
 
   console.log("Organisms:", organisms.length);
-  await saveJson("catalog/ga2/output/organisms.json", organisms);
+  await saveJson(
+    "catalog/ga2/output/organisms.json",
+    organisms.sort((a, b) => a.ncbiTaxonomyId.localeCompare(b.ncbiTaxonomyId))
+  );
 
   console.log("Done");
+}
+
+type AssemblyExtraResources = Record<
+  string,
+  Record<string, Record<string, { files: string[]; resource_url: string }>>
+>;
+
+type AssemblyResource = Record<string, Array<ResourceItem>>;
+
+async function loadAssemblyExtraResources(): Promise<AssemblyExtraResources> {
+  const filePath = path.resolve(SOURCE_PATH_ASSEMBLY_EXTRA);
+  const fileContent = fs.readFileSync(filePath, "utf8");
+  return JSON.parse(fileContent);
+}
+
+function getAssemblyExtraResources(
+  data: AssemblyExtraResources,
+  assemblyAccession: string
+): AssemblyResource {
+  const resources: AssemblyResource = {};
+  if (!data[assemblyAccession]) {
+    return resources;
+  }
+  for (const resource_type in data[assemblyAccession]) {
+    const formatted_resource_type =
+      resource_type.charAt(0).toUpperCase() + resource_type.slice(1);
+    for (const resource_name in data[assemblyAccession][resource_type]) {
+      const url =
+        data[assemblyAccession][resource_type][resource_name].resource_url;
+      resources[formatted_resource_type] =
+        resources[formatted_resource_type] ?? [];
+      const files =
+        data[assemblyAccession][resource_type][resource_name].files ?? [];
+      if (files.length > 1) {
+        resources[formatted_resource_type].push({
+          files,
+          name: resource_name,
+          type: "folder",
+          url,
+        });
+      } else {
+        resources[formatted_resource_type].push({
+          name: resource_name,
+          type: "file",
+          url,
+        });
+      }
+    }
+    if (resources[formatted_resource_type]) {
+      resources[formatted_resource_type].sort((a, b) =>
+        a.name.localeCompare(b.name)
+      );
+    }
+  }
+  return resources;
 }
 
 async function buildSraData(): Promise<SRAData[]> {
@@ -86,6 +160,8 @@ async function buildAssemblies(
     SOURCE_PATH_ORGANISMS
   );
 
+  const assemblyExtraFilesData = await loadAssemblyExtraResources();
+
   const mappedRows: GA2AssemblyEntity[] = [];
   for (const row of sourceRows) {
     const ploidy = getPloidyForAssembly(
@@ -103,6 +179,10 @@ async function buildAssemblies(
     mappedRows.push({
       accession: row.accession,
       annotationStatus: parseStringOrNull(row.annotationStatus),
+      assemblyResources: getAssemblyExtraResources(
+        assemblyExtraFilesData,
+        row.accession
+      ),
       chromosomes: parseNumberOrNull(row.chromosomeCount),
       coverage: parseStringOrNull(row.coverage),
       gcPercent: parseNumberOrNull(row.gcPercent),
