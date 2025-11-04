@@ -33,13 +33,11 @@ export const useENADataByTaxonomyId = <T>(
             setErrors({ taxonomyId: e.message });
             setLoading(false);
           },
-          onSuccess: (readRuns) => {
+          onSuccess: () => {
             setLoading(false);
             // If the step key is READ_RUNS_ANY, do not pre-select column filters.
             if (stepKey === SEQUENCING_DATA_TYPE.READ_RUNS_ANY) return;
-            setColumnFilters(
-              preSelectColumnFilters(workflow, readRuns, stepKey)
-            );
+            setColumnFilters(preSelectColumnFilters(workflow, stepKey));
           },
         },
         taxonomyId,
