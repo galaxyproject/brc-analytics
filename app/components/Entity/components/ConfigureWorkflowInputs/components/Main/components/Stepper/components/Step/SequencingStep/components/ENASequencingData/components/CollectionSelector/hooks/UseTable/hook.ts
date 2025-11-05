@@ -10,18 +10,14 @@ import { BaseReadRun, ReadRun } from "../../../../types";
 import { ROW_POSITION } from "@databiosphere/findable-ui/lib/components/Table/features/RowPosition/constants";
 import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/features/RowPreview/constants";
 import { columns } from "./columnDef";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { getFacetedUniqueValuesWithArrayValues } from "@databiosphere/findable-ui/lib/components/Table/common/utils";
 import { arrIncludesSome } from "@databiosphere/findable-ui/lib/components/Table/columnDef/columnFilters/filterFn";
-import { ColumnFiltersState, Updater } from "@tanstack/react-table";
+import { ColumnFiltersState } from "@tanstack/react-table";
 import { UseENADataByAccession } from "../../../../hooks/UseENADataByAccession/types";
 import { UseENADataByTaxonomyId } from "../../../../hooks/UseENADataByTaxonomyId/types";
 import { ENA_QUERY_METHOD } from "../../../../../../types";
-import {
-  enableRowSelection,
-  getRowSelectionValidation,
-  updateColumnFilters,
-} from "./utils";
+import { enableRowSelection, getRowSelectionValidation } from "./utils";
 import { SORTING } from "./constants";
 import { getSortedRowModel } from "@tanstack/react-table";
 import { CATEGORY_GROUPS } from "./categoryGroups";
@@ -30,6 +26,7 @@ import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/
 import { ROW_SELECTION_VALIDATION } from "@databiosphere/findable-ui/lib/components/Table/features/RowSelectionValidation/constants";
 import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/features/TableDownload/constants";
 import { mapReadRuns, sanitizeReadRuns } from "./dataTransforms";
+import { TableMeta } from "./types";
 
 export const useTable = (
   enaQueryMethod: ENA_QUERY_METHOD,
@@ -37,21 +34,6 @@ export const useTable = (
   enaTaxonomyId: UseENADataByTaxonomyId<BaseReadRun>,
   columnFilters: ColumnFiltersState
 ): Table<ReadRun> => {
-  const [columnFiltersByMethod, setColumnFiltersByMethod] = useState<
-    Record<ENA_QUERY_METHOD, ColumnFiltersState>
-  >({
-    [ENA_QUERY_METHOD.ACCESSION]: columnFilters,
-    [ENA_QUERY_METHOD.TAXONOMY_ID]: columnFilters,
-  });
-
-  const onColumnFiltersChange = useCallback(
-    (updaterOrValue: Updater<ColumnFiltersState>): void =>
-      setColumnFiltersByMethod(
-        updateColumnFilters(enaQueryMethod, updaterOrValue)
-      ),
-    [enaQueryMethod]
-  );
-
   // Get the data for the ENA query method (by accession or by taxonomy ID).
   const { data: readRuns } =
     enaQueryMethod === ENA_QUERY_METHOD.ACCESSION
@@ -65,13 +47,11 @@ export const useTable = (
 
   const initialState: InitialTableState = { columnFilters, sorting: SORTING };
 
-  const meta = {
+  const meta: TableMeta = {
     categoryGroups: CATEGORY_GROUPS,
     enaQueryMethod,
     filterSort: FILTER_SORT.COUNT,
   };
-
-  const state = { columnFilters: columnFiltersByMethod[enaQueryMethod] };
 
   return useReactTable<ReadRun>({
     _features: [
@@ -103,7 +83,5 @@ export const useTable = (
     getSortedRowModel: getSortedRowModel(),
     initialState,
     meta,
-    onColumnFiltersChange,
-    state,
   });
 };

@@ -8,6 +8,7 @@ import { Table } from "./components/Table/table";
 import { RowSelectionState } from "@tanstack/table-core";
 import { getSequencingData } from "../../utils";
 import { ColumnFilters } from "../../../../../components/ColumnFilters/columnFilters";
+import { resetColumnFilters } from "./utils";
 
 export const CollectionSelector = ({
   onClose,
@@ -21,6 +22,7 @@ export const CollectionSelector = ({
   return (
     <StyledDialog
       onTransitionEnter={() => {
+        // Snapshot current row selection on open so it can be restored if the dialog is canceled.
         setRowSelection(table.getState().rowSelection);
         if (selectedCount > 0) return;
         table.resetSorting(); // Reset sorting to default.
@@ -37,7 +39,9 @@ export const CollectionSelector = ({
         <Button
           {...BUTTON_PROPS.SECONDARY_CONTAINED}
           onClick={() => {
+            // Restore previous selection and reset column filters on cancel.
             table.setRowSelection(rowSelection);
+            resetColumnFilters(table, rowSelection);
             onClose();
           }}
         >
