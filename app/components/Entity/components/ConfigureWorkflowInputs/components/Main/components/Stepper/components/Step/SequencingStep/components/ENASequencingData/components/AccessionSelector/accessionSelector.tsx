@@ -19,11 +19,11 @@ import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/m
 
 export const AccessionSelector = ({
   clearErrors,
+  enaAccessionStatus: status,
   onClose,
   onContinue,
   onRequestData,
   open,
-  status,
   table,
 }: Props): JSX.Element => {
   return (

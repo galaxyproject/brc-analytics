@@ -4,10 +4,10 @@ import { ReadRun } from "../../types";
 
 export interface Props {
   clearErrors: () => void;
+  enaAccessionStatus: Status;
   onClose: () => void;
   onContinue: () => void;
   onRequestData: OnRequestData;
   open: boolean;
-  status: Status;
   table: Table<ReadRun>;
 }

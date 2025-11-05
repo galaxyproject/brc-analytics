@@ -28,7 +28,7 @@ export const ENASequencingData = ({
   return (
     <Fragment>
       <DataSelector
-        loading={enaTaxonomyId.status.loading}
+        enaTaxonomyIdStatus={enaTaxonomyId.status}
         onContinue={collectionDialog.onOpen}
         onOpen={accessionDialog.onOpen}
         readCount={enaTaxonomyId.data?.length}
@@ -38,11 +38,11 @@ export const ENASequencingData = ({
       />
       <AccessionSelector
         clearErrors={enaAccession.clearErrors}
+        enaAccessionStatus={enaAccession.status}
         onClose={accessionDialog.onClose}
         onContinue={collectionDialog.onOpen}
         onRequestData={enaAccession.onRequestData}
         open={accessionDialog.open}
-        status={enaAccession.status}
         table={table}
       />
       <CollectionSelector

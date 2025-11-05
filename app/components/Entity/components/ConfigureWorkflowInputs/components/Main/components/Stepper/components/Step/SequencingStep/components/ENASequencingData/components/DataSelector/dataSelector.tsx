@@ -8,10 +8,9 @@ import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui
 import { Props } from "./types";
 import { ENA_QUERY_METHOD } from "../../../../types";
 import { Fragment } from "react";
-import { config } from "../../../../../../../../../../../../../../../../app/config/config";
 
 export const DataSelector = ({
-  loading,
+  enaTaxonomyIdStatus,
   onContinue,
   onOpen,
   readCount,
@@ -19,9 +18,6 @@ export const DataSelector = ({
   setEnaQueryMethod,
   taxonomicLevelSpecies,
 }: Props): JSX.Element | null => {
-  const { maxReadRunsForBrowseAll } = config();
-  const readCountValue =
-    readCount === undefined ? maxReadRunsForBrowseAll : readCount;
   if (selectedCount > 0) return null;
   return (
     <StyledPaper {...PAPER_PROPS}>
@@ -39,14 +35,14 @@ export const DataSelector = ({
           Browse ENA to find and select sequences
         </Typography>
       </Stack>
-      {loading ? (
+      {enaTaxonomyIdStatus.loading ? (
         <LoadingIcon
           color={SVG_ICON_PROPS.COLOR.PRIMARY}
           fontSize={SVG_ICON_PROPS.FONT_SIZE.SMALL}
         />
       ) : (
         <StyledGrid {...GRID_PROPS}>
-          {readCountValue < maxReadRunsForBrowseAll && (
+          {enaTaxonomyIdStatus.eligible && (
             <Fragment>
               <Stack alignItems="center" spacing={1}>
                 <Button
@@ -56,7 +52,7 @@ export const DataSelector = ({
                     onContinue();
                   }}
                 >
-                  {renderButtonText(readCountValue)}
+                  {renderButtonText(readCount)}
                 </Button>
                 <Typography
                   color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
@@ -106,7 +102,8 @@ export const DataSelector = ({
  * @param readCount - The number of reads.
  * @returns The button text.
  */
-function renderButtonText(readCount: number): string {
+function renderButtonText(readCount: number | undefined): string {
+  if (!readCount) return "No Sequences";
   if (readCount === 1) return "Browse 1 Sequence";
   return `Browse ${readCount} Sequences`;
 }

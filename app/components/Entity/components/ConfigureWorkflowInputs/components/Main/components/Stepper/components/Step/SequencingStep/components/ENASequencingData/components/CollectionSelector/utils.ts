@@ -134,17 +134,18 @@ export function buildFilters(
 }
 
 /**
- * Pre-selects column filters based on the given step key for ENA query method by taxonomy ID.
+ * Pre-selects column filters based on the step key and workflow parameters.
  * @param workflow - Workflow.
  * @param stepKey - Step key.
- * @returns Column filters for the given ENA data.
+ * @returns Column filters.
  */
 export function preSelectColumnFilters(
   workflow: Workflow,
-  stepKey:
-    | SEQUENCING_DATA_TYPE.READ_RUNS_PAIRED
-    | SEQUENCING_DATA_TYPE.READ_RUNS_SINGLE
+  stepKey: SEQUENCING_DATA_TYPE
 ): ColumnFiltersState {
+  // Return empty array for READ_RUNS_ANY as it does not pre-filter its data.
+  if (stepKey === SEQUENCING_DATA_TYPE.READ_RUNS_ANY) return [];
+
   const workflowParameter = getWorkflowParameter(workflow, stepKey);
   const filters = buildFilters(stepKey, workflowParameter);
   return Object.entries(filters).map(([id, value]) => ({ id, value }));

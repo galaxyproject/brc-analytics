@@ -6,6 +6,7 @@ export type OnRequestData<T> = (
 ) => Promise<void>;
 
 export interface Status {
+  eligible: boolean;
   errors: Record<string, string>;
   loading: boolean;
 }
