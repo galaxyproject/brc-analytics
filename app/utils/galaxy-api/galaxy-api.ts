@@ -472,10 +472,8 @@ function buildUcscTracksRequestValues(
   const values: GalaxyUrlData[] = [];
   for (const track of tracks) {
     if (!track.bigDataUrl) continue;
-    // Assume that the extension consists of everything following the rightmost `.` in the filename
-    const extMatch = /\.([^./]+)$/.exec(track.bigDataUrl);
     values.push({
-      ext: extMatch?.[1] ?? "auto",
+      ext: "auto",
       identifier: track.shortLabel,
       url: getFullBigDataUrl(track.bigDataUrl),
     });
