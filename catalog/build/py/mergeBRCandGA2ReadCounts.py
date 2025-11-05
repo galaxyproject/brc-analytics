@@ -1,6 +1,4 @@
 import json
-import sys
-import time
 
 BRC_READ_COUNT_PATH = "catalog/build/intermediate/taxIdReadCount.json"
 GA2_READ_COUNT_PATH = "catalog/ga2/build/intermediate/taxIdReadCount.json"
@@ -51,7 +49,7 @@ def merge_read_counts():
                     f"  Tax ID {tax_id}: brc={brc_val}, ga2={ga2_val} -> using {source} value ({max(brc_val, ga2_val)})",
                 )
             print(
-                "\033[31mEither the intermediate file for GA2 or BRC have to be update, please run `npm run build-brc-from-ncbi` or `npm run build-ga2-from-ncbi`!\033[0m",
+                "\033[31mEither the intermediate file for GA2 or BRC have to be updated, please run `npm run build-brc-from-ncbi` or `npm run build-ga2-from-ncbi`!\033[0m",
             )
 
     # Merge dictionaries (ga2 values override brc for duplicates)
