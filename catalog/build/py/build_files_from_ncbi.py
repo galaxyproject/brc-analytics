@@ -1,4 +1,3 @@
-
 from ...py_package.catalog_build import build_files, create_taxonomy_read_run_count
 
 ASSEMBLIES_PATH = "catalog/source/assemblies.yml"

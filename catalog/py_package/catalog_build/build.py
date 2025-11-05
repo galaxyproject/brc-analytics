@@ -9,6 +9,7 @@ import pandas as pd
 import requests
 import yaml
 from bs4 import BeautifulSoup
+from requests.exceptions import ConnectTimeout
 
 from .qc_utils import format_list_section, format_raw_section, join_report
 

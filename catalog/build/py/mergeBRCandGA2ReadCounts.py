@@ -29,15 +29,11 @@ def merge_read_counts():
                 # Values differ - use the largest
                 if ga2_value > brc_value:
                     brc_read_counts[tax_id] = ga2_value
-                    conflicting_duplicates.append(
-                        (tax_id, brc_value, ga2_value, "ga2")
-                    )
+                    conflicting_duplicates.append((tax_id, brc_value, ga2_value, "ga2"))
                 else:
                     # BRC value is already in merged_read_counts and is larger
                     ga2_read_counts[tax_id] = brc_value
-                    conflicting_duplicates.append(
-                        (tax_id, brc_value, ga2_value, "brc")
-                    )
+                    conflicting_duplicates.append((tax_id, brc_value, ga2_value, "brc"))
             # If equal, no action needed (already in merged_read_counts)
 
         if conflicting_duplicates:
