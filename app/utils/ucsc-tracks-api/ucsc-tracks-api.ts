@@ -172,3 +172,19 @@ function getPropertyIfHasOwn(obj: object, key: string): unknown {
     return obj[key as keyof typeof obj];
   }
 }
+
+/**
+ * Convert a file path from a `bigDataUrl` field to a useable URL.
+ * @param bigDataUrl - File path from the tracks API.
+ * @returns file URL.
+ */
+export function getFullBigDataUrl(bigDataUrl: string): string {
+  const match = /^\/gbdb\/genark\/(.*)$/.exec(bigDataUrl);
+  if (match === null) {
+    throw new Error(
+      `bigDataUrl not in expected format: ${JSON.stringify(bigDataUrl)}`
+    );
+  }
+  const filePath = match[1];
+  return `https://hgdownload.soe.ucsc.edu/hubs/${filePath}`;
+}

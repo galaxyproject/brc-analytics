@@ -27,7 +27,8 @@ export const useLaunchGalaxy = ({
               configuredValue.referenceAssembly,
               configuredValue.geneModelUrl,
               configuredValue.readRunsSingle,
-              configuredValue.readRunsPaired
+              configuredValue.readRunsPaired,
+              null
             )
           )
         : await run(
