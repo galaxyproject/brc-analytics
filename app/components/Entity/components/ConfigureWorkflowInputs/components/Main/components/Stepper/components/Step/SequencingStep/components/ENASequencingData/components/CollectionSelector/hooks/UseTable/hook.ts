@@ -10,7 +10,7 @@ import { BaseReadRun, ReadRun } from "../../../../types";
 import { ROW_POSITION } from "@databiosphere/findable-ui/lib/components/Table/features/RowPosition/constants";
 import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/features/RowPreview/constants";
 import { columns } from "./columnDef";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { getFacetedUniqueValuesWithArrayValues } from "@databiosphere/findable-ui/lib/components/Table/common/utils";
 import { arrIncludesSome } from "@databiosphere/findable-ui/lib/components/Table/columnDef/columnFilters/filterFn";
 import { ColumnFiltersState, Updater } from "@tanstack/react-table";
@@ -34,25 +34,15 @@ import { mapReadRuns, sanitizeReadRuns } from "./dataTransforms";
 export const useTable = (
   enaQueryMethod: ENA_QUERY_METHOD,
   enaAccession: UseENADataByAccession<BaseReadRun>,
-  enaTaxonomyId: UseENADataByTaxonomyId<BaseReadRun>
+  enaTaxonomyId: UseENADataByTaxonomyId<BaseReadRun>,
+  columnFilters: ColumnFiltersState
 ): Table<ReadRun> => {
   const [columnFiltersByMethod, setColumnFiltersByMethod] = useState<
     Record<ENA_QUERY_METHOD, ColumnFiltersState>
   >({
-    [ENA_QUERY_METHOD.ACCESSION]: [],
-    [ENA_QUERY_METHOD.TAXONOMY_ID]: [],
+    [ENA_QUERY_METHOD.ACCESSION]: columnFilters,
+    [ENA_QUERY_METHOD.TAXONOMY_ID]: columnFilters,
   });
-
-  // Grab the column filters for ENA by taxonomy ID.
-  const { columnFilters } = enaTaxonomyId;
-
-  useEffect(() => {
-    if (columnFilters.length === 0) return;
-    // Pre-filter the table data for ENA by taxonomy ID.
-    setColumnFiltersByMethod(
-      updateColumnFilters(ENA_QUERY_METHOD.TAXONOMY_ID, columnFilters)
-    );
-  }, [columnFilters]);
 
   const onColumnFiltersChange = useCallback(
     (updaterOrValue: Updater<ColumnFiltersState>): void =>
@@ -73,7 +63,7 @@ export const useTable = (
     [readRuns]
   );
 
-  const initialState: InitialTableState = { sorting: SORTING };
+  const initialState: InitialTableState = { columnFilters, sorting: SORTING };
 
   const meta = {
     categoryGroups: CATEGORY_GROUPS,
