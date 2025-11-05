@@ -2767,7 +2767,7 @@
                                             "rank": "order"
                                         },
                                         {
-                                            "assembly_count": 5,
+                                            "assembly_count": 4,
                                             "children": [
                                                 {
                                                     "assembly_count": 1,
@@ -2836,29 +2836,6 @@
                                                     ],
                                                     "name": "Caprimulgidae",
                                                     "ncbi_tax_id": "48283",
-                                                    "rank": "family"
-                                                },
-                                                {
-                                                    "assembly_count": 1,
-                                                    "children": [
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Nyctibius grandis",
-                                                                    "ncbi_tax_id": "48427",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Nyctibius",
-                                                            "ncbi_tax_id": "48424",
-                                                            "rank": "genus"
-                                                        }
-                                                    ],
-                                                    "name": "Nyctibiidae",
-                                                    "ncbi_tax_id": "48423",
                                                     "rank": "family"
                                                 }
                                             ],
@@ -3170,7 +3147,7 @@
                                             "rank": "order"
                                         },
                                         {
-                                            "assembly_count": 3,
+                                            "assembly_count": 1,
                                             "children": [
                                                 {
                                                     "assembly_count": 1,
@@ -3193,29 +3170,6 @@
                                                     ],
                                                     "name": "Meropidae",
                                                     "ncbi_tax_id": "57386",
-                                                    "rank": "family"
-                                                },
-                                                {
-                                                    "assembly_count": 2,
-                                                    "children": [
-                                                        {
-                                                            "assembly_count": 2,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 2,
-                                                                    "children": [],
-                                                                    "name": "Leptosomus discolor",
-                                                                    "ncbi_tax_id": "188344",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Leptosomus",
-                                                            "ncbi_tax_id": "188343",
-                                                            "rank": "genus"
-                                                        }
-                                                    ],
-                                                    "name": "Leptosomidae",
-                                                    "ncbi_tax_id": "188342",
                                                     "rank": "family"
                                                 }
                                             ],
@@ -5052,6 +5006,68 @@
                                             ],
                                             "name": "Suliformes",
                                             "ncbi_tax_id": "3073854",
+                                            "rank": "order"
+                                        },
+                                        {
+                                            "assembly_count": 2,
+                                            "children": [
+                                                {
+                                                    "assembly_count": 2,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 2,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 2,
+                                                                    "children": [],
+                                                                    "name": "Leptosomus discolor",
+                                                                    "ncbi_tax_id": "188344",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Leptosomus",
+                                                            "ncbi_tax_id": "188343",
+                                                            "rank": "genus"
+                                                        }
+                                                    ],
+                                                    "name": "Leptosomidae",
+                                                    "ncbi_tax_id": "188342",
+                                                    "rank": "family"
+                                                }
+                                            ],
+                                            "name": "Leptosomiformes",
+                                            "ncbi_tax_id": "3466517",
+                                            "rank": "order"
+                                        },
+                                        {
+                                            "assembly_count": 1,
+                                            "children": [
+                                                {
+                                                    "assembly_count": 1,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Nyctibius grandis",
+                                                                    "ncbi_tax_id": "48427",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Nyctibius",
+                                                            "ncbi_tax_id": "48424",
+                                                            "rank": "genus"
+                                                        }
+                                                    ],
+                                                    "name": "Nyctibiidae",
+                                                    "ncbi_tax_id": "48423",
+                                                    "rank": "family"
+                                                }
+                                            ],
+                                            "name": "Nyctibiiformes",
+                                            "ncbi_tax_id": "3466518",
                                             "rank": "order"
                                         }
                                     ],
@@ -8254,14 +8270,7 @@
                                                             "assembly_count": 2,
                                                             "children": [
                                                                 {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Amia calva",
-                                                                    "ncbi_tax_id": "7924",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
+                                                                    "assembly_count": 2,
                                                                     "children": [],
                                                                     "name": "Amia ocellicauda",
                                                                     "ncbi_tax_id": "2972642",
