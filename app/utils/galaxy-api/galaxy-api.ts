@@ -77,7 +77,7 @@ export async function getWorkflowLandingUrl(
  * @param geneModelUrl - URL for gene model parameter sent to the API.
  * @param readRunsSingle - Single read runs parameter sent to the API.
  * @param readRunsPaired - Paired read runs parameter sent to the API.
- * @param tracks - UCSC tracks sent to the API.
+ * @param tracks - UCSC tracks sent to the API. Should all have defined `bigDataUrl` values.
  * @returns data landing URL.
  */
 export async function getDataLandingUrl(
@@ -471,7 +471,8 @@ function buildUcscTracksRequestValues(
   if (!tracks?.length) return [];
   const values: GalaxyUrlData[] = [];
   for (const track of tracks) {
-    if (!track.bigDataUrl) continue;
+    if (!track.bigDataUrl)
+      throw new Error("Missing bigDataUrl in provided track");
     values.push({
       ext: "auto",
       identifier: track.shortLabel,
