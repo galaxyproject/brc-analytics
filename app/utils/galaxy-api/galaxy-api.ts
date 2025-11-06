@@ -471,8 +471,6 @@ function buildUcscTracksRequestValues(
   if (!tracks?.length) return [];
   const values: GalaxyUrlData[] = [];
   for (const track of tracks) {
-    if (!track.bigDataUrl)
-      throw new Error("Missing bigDataUrl in provided track");
     values.push({
       ext: "auto",
       identifier: track.shortLabel,

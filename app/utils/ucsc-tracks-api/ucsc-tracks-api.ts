@@ -1,9 +1,4 @@
-import {
-  UcscTrack,
-  UcscTrackComposite,
-  UcscTrackGroup,
-  UcscTrackNode,
-} from "./entities";
+import { UcscTrack, UcscTrackComposite, UcscTrackNode } from "./entities";
 import { UcscApiResponseTrack, ucscApiResponseTrackSchema } from "./schema";
 
 const TRACKS_API_URL = "https://api.genome.ucsc.edu/list/tracks";
@@ -11,11 +6,11 @@ const TRACKS_API_URL = "https://api.genome.ucsc.edu/list/tracks";
 /**
  * Get tracks for the given assembly from the UCSC API, transformed for use in BRC Analytics.
  * @param assembly - Assembly accession.
- * @returns UCSC tracks, organized by group.
+ * @returns UCSC tracks.
  */
 export async function getAssemblyTracks(
   assembly: string
-): Promise<UcscTrackGroup[]> {
+): Promise<UcscTrackNode[]> {
   // Get object containing tracks from API
 
   const responseData = await getTracksApiResponse(assembly);
@@ -24,76 +19,55 @@ export async function getAssemblyTracks(
     assembly
   );
 
-  // Aggregate root tracks into groups
+  // Return transformed tracks
 
-  const responseTracksByGroup = new Map<
-    string | undefined,
-    UcscApiResponseTrack[]
-  >();
-
-  for (const value of Object.values(responseTracksContainer)) {
-    const responseTrack = await ucscApiResponseTrackSchema.validate(value);
-    const group = responseTrack.group;
-    let groupTracks = responseTracksByGroup.get(group);
-    if (groupTracks === undefined) {
-      groupTracks = [];
-      responseTracksByGroup.set(group, groupTracks);
-    }
-    groupTracks.push(responseTrack);
-  }
-
-  // Return transformed tracks per-group
-
-  return await Promise.all(
-    Array.from(responseTracksByGroup.entries(), ([group, responseTracks]) =>
-      buildTrackGroup(group, responseTracks)
+  return (
+    await Promise.all(
+      Object.values(responseTracksContainer).map(
+        async (sourceResponseTrack) => {
+          const responseTrack =
+            await ucscApiResponseTrackSchema.validate(sourceResponseTrack);
+          if (responseTrack.compositeContainer === "TRUE") {
+            return await buildTrackComposite(responseTrack);
+          } else {
+            return buildTrack(responseTrack);
+          }
+        }
+      )
     )
-  );
-}
-
-/**
- * Transform a list of tracks obtained from the API, and create a track group object for the given group ID.
- * @param groupId - Group ID.
- * @param responseTracks - Tracks (individual and composite) from the API.
- * @returns track group.
- */
-async function buildTrackGroup(
-  groupId: string | undefined,
-  responseTracks: UcscApiResponseTrack[]
-): Promise<UcscTrackGroup> {
-  const tracks: UcscTrackNode[] = [];
-  for (const responseTrack of responseTracks) {
-    if (responseTrack.compositeContainer === "TRUE") {
-      tracks.push(await buildTrackComposite(responseTrack));
-    } else {
-      tracks.push(buildTrack(responseTrack));
-    }
-  }
-  return {
-    groupId,
-    tracks,
-  };
+  ).filter((v) => v !== null);
 }
 
 /**
  * Transform a composite track from the API into an object to be used in BRC Analytics.
  * @param responseTrack - Composite track from the API.
- * @returns transformed composite track.
+ * @returns transformed composite track, or null if the track is missing required properties.
  */
 async function buildTrackComposite(
   responseTrack: UcscApiResponseTrack
-): Promise<UcscTrackComposite> {
-  const tracks: UcscTrack[] = [];
+): Promise<UcscTrackComposite | null> {
+  // Group is expected to exist and is required downstream, so skip the composite track if it for some reason lacks a group.
+  const groupId = responseTrack.group;
+  if (groupId === undefined) return null;
+
+  // Determine which values in the API track object represent sub-tracks, and add them to `responseSubTracks`
   const responseTrackValues: unknown[] = Object.values(responseTrack);
-  // Determine which values in the API track object represent sub-tracks, and transform them
+  const responseSubTracks: UcscApiResponseTrack[] = [];
   for (const value of responseTrackValues) {
-    // Assumed that if a value is an object with a `parent` property, it's a sub-track
+    // Assume that if a value is an object with a `parent` property, it's a sub-track
     if (value && typeof value === "object" && Object.hasOwn(value, "parent")) {
-      const responseSubTrack = await ucscApiResponseTrackSchema.validate(value);
-      tracks.push(buildTrack(responseSubTrack));
+      responseSubTracks.push(await ucscApiResponseTrackSchema.validate(value));
     }
   }
+
+  // Transform sub-tracks
+  const tracks = responseSubTracks
+    .map((rst) => buildTrack(rst, groupId))
+    .filter((v) => v !== null);
+
+  // Return composite track
   return {
+    groupId,
     isComposite: true,
     longLabel: responseTrack.longLabel,
     shortLabel: responseTrack.shortLabel,
@@ -105,11 +79,19 @@ async function buildTrackComposite(
 /**
  * Transform an individual track from the API into an object to be used in BRC Analytics.
  * @param responseTrack - Track from the API.
- * @returns transformed track.
+ * @param parentGroupId - Group of the parent track, if any.
+ * @returns transformed track, or null if the track is missing required properties.
  */
-function buildTrack(responseTrack: UcscApiResponseTrack): UcscTrack {
+function buildTrack(
+  responseTrack: UcscApiResponseTrack,
+  parentGroupId?: string
+): UcscTrack | null {
+  const groupId = responseTrack.group ?? parentGroupId;
+  if (groupId === undefined || responseTrack.bigDataUrl === undefined)
+    return null;
   return {
     bigDataUrl: responseTrack.bigDataUrl,
+    groupId,
     isComposite: false,
     longLabel: responseTrack.longLabel,
     shortLabel: responseTrack.shortLabel,

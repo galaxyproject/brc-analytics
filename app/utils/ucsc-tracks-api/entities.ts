@@ -1,11 +1,7 @@
-export interface UcscTrackGroup {
-  groupId: string | undefined;
-  tracks: UcscTrackNode[];
-}
-
 export type UcscTrackNode = UcscTrack | UcscTrackComposite;
 
 export interface UcscTrackComposite {
+  groupId: string;
   isComposite: true;
   longLabel: string | undefined;
   shortLabel: string | undefined;
@@ -14,7 +10,8 @@ export interface UcscTrackComposite {
 }
 
 export interface UcscTrack {
-  bigDataUrl: string | undefined;
+  bigDataUrl: string;
+  groupId: string;
   isComposite: false;
   longLabel: string | undefined;
   shortLabel: string | undefined;
