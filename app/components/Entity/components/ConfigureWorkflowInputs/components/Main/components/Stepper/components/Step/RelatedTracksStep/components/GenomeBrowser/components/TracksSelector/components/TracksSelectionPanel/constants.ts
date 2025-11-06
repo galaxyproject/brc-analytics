@@ -1,6 +1,6 @@
-import { Track } from "../../hooks/UseTable/types";
+import { UcscTrackNode } from "../../../../../../../../../../../../../../../../../utils/ucsc-tracks-api/entities";
 
-export const GROUP_ID_LABEL: Record<Track["groupId"], string> = {
+export const GROUP_ID_LABEL: Record<UcscTrackNode["groupId"], string> = {
   genes: "Genes and Gene Predictions",
   map: "Mapping and Sequencing",
   regulation: "Expression and Regulation",

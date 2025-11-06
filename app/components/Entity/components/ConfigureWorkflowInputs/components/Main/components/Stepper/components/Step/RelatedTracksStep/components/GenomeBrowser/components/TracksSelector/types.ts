@@ -1,10 +1,10 @@
 import { Table } from "@tanstack/react-table";
 import { StepProps } from "../../../../../types";
-import { Track } from "./hooks/UseTable/types";
+import { UcscTrackNode } from "../../../../../../../../../../../../../../../utils/ucsc-tracks-api/entities";
 
 export interface Props extends Pick<StepProps, "onConfigure" | "stepKey"> {
   onClose: () => void;
   open: boolean;
   selectedCount: number;
-  table: Table<Track>;
+  table: Table<UcscTrackNode>;
 }

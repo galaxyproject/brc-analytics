@@ -12,7 +12,6 @@ import { arrIncludesSome } from "@databiosphere/findable-ui/lib/components/Table
 import { ROW_POSITION } from "@databiosphere/findable-ui/lib/components/Table/features/RowPosition/constants";
 import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/features/RowPreview/constants";
 import { columns } from "./columnDef";
-import { useMemo } from "react";
 import { getFacetedUniqueValuesWithArrayValues } from "@databiosphere/findable-ui/lib/components/Table/common/utils";
 import { GROUPING, COLUMN_VISIBILITY } from "./constants";
 import { CATEGORY_GROUPS } from "./categoryGroups";
@@ -20,13 +19,10 @@ import { getFacetedMinMaxValues } from "@databiosphere/findable-ui/lib/component
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/features/TableDownload/constants";
 import { UseUCSCTracks } from "../../../../../../hooks/UseUCSCTracks/types";
-import { mapTrackGroups } from "./dataTransforms";
-import { Track } from "./types";
+import { UcscTrackNode } from "../../../../../../../../../../../../../../../../../utils/ucsc-tracks-api/entities";
 
-export const useTable = (ucscTracks: UseUCSCTracks): Table<Track> => {
-  const { data: trackGroups } = ucscTracks;
-
-  const data = useMemo(() => mapTrackGroups(trackGroups), [trackGroups]);
+export const useTable = (ucscTracks: UseUCSCTracks): Table<UcscTrackNode> => {
+  const data = ucscTracks.data ?? [];
 
   const initialState: InitialTableState = {
     columnVisibility: COLUMN_VISIBILITY,
@@ -38,7 +34,7 @@ export const useTable = (ucscTracks: UseUCSCTracks): Table<Track> => {
     filterSort: FILTER_SORT.COUNT,
   };
 
-  return useReactTable<Track>({
+  return useReactTable<UcscTrackNode>({
     _features: [ROW_POSITION, ROW_PREVIEW, TABLE_DOWNLOAD],
     columns,
     data,
@@ -48,7 +44,7 @@ export const useTable = (ucscTracks: UseUCSCTracks): Table<Track> => {
     enableGrouping: true,
     enableHiding: true,
     enableMultiRowSelection: true,
-    enableRowSelection: (row) => !!row.original.bigDataUrl,
+    enableRowSelection: (row) => !row.original.isComposite,
     enableSorting: false,
     enableSortingInteraction: false,
     filterFns: { arrIncludesSome },
@@ -59,8 +55,9 @@ export const useTable = (ucscTracks: UseUCSCTracks): Table<Track> => {
     getFacetedUniqueValues: getFacetedUniqueValuesWithArrayValues(),
     getFilteredRowModel: getFilteredRowModel(),
     getGroupedRowModel: getGroupedRowModel(),
-    getRowId: (row, i) => row.bigDataUrl || row.shortLabel || String(i),
-    getSubRows: (row) => row.tracks,
+    getRowId: (row, i) =>
+      row.isComposite ? row.shortLabel || String(i) : row.bigDataUrl,
+    getSubRows: (row) => (row.isComposite ? row.tracks : []),
     initialState,
     meta,
   });

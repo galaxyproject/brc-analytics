@@ -2,10 +2,10 @@ import { getAssemblyTracks } from "../../../../../../../../../../../../../utils/
 import { UseUCSCTracks } from "./types";
 import { useCallback, useEffect } from "react";
 import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
-import { UcscTrackGroup } from "../../../../../../../../../../../../../utils/ucsc-tracks-api/entities";
+import { UcscTrackNode } from "../../../../../../../../../../../../../utils/ucsc-tracks-api/entities";
 
 export const useUCSCTracks = (assembly: string): UseUCSCTracks => {
-  const { data, run } = useAsync<UcscTrackGroup[] | undefined>();
+  const { data, run } = useAsync<UcscTrackNode[] | undefined>();
 
   const onRequestData = useCallback(async (): Promise<void> => {
     run(getAssemblyTracks(assembly));

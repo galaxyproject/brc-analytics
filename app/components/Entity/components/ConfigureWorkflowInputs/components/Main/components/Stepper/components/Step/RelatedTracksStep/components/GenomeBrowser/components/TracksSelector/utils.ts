@@ -1,7 +1,7 @@
 import { Table } from "@tanstack/react-table";
-import { Track } from "./hooks/UseTable/types";
 import { ConfiguredInput } from "../../../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { getSelectedTracks } from "../../../../utils";
+import { UcscTrackNode } from "../../../../../../../../../../../../../../../utils/ucsc-tracks-api/entities";
 
 /**
  * Clears the tracks data.
@@ -19,7 +19,7 @@ export function clearTracksData(stepKey: string): Partial<ConfiguredInput> {
  * @returns Partial configured input.
  */
 export function getTracksData(
-  table: Table<Track>,
+  table: Table<UcscTrackNode>,
   stepKey: string
 ): Partial<ConfiguredInput> {
   const value = getSelectedTracks(table);

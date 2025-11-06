@@ -1,13 +1,13 @@
 import { GROUP_ID_LABEL } from "./constants";
 import { Row } from "@tanstack/react-table";
-import { Track } from "../../hooks/UseTable/types";
+import { UcscTrackNode } from "../../../../../../../../../../../../../../../../../utils/ucsc-tracks-api/entities";
 
 /**
  * Returns the count of available (selectable) tracks in a group.
  * @param row - Row.
  * @returns Count of tracks in the group.
  */
-export function getGroupCount(row: Row<Track>): number {
+export function getGroupCount(row: Row<UcscTrackNode>): number {
   return row.getLeafRows().filter((r) => r.getCanSelect()).length;
 }
 
@@ -16,7 +16,7 @@ export function getGroupCount(row: Row<Track>): number {
  * @param row - Row.
  * @returns Group label and count.
  */
-export function getGroupLabel(row: Row<Track>): string {
+export function getGroupLabel(row: Row<UcscTrackNode>): string {
   const groupId = row.getValue("groupId") as string;
   const count = getGroupCount(row);
   return `${GROUP_ID_LABEL[groupId] || groupId} (${count})`;
@@ -32,8 +32,8 @@ export function getGroupLabel(row: Row<Track>): string {
  * @returns Whether the row is the last row in the group.
  */
 export function getIsLastRowInGroup(
-  rows: Row<Track>[],
-  row: Row<Track>,
+  rows: Row<UcscTrackNode>[],
+  row: Row<UcscTrackNode>,
   index: number
 ): boolean {
   const isLastRow = index === rows.length - 1;

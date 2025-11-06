@@ -1,13 +1,15 @@
 import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import { Table } from "@tanstack/react-table";
-import { Track } from "./components/GenomeBrowser/components/TracksSelector/hooks/UseTable/types";
+import { UcscTrackNode } from "../../../../../../../../../../../utils/ucsc-tracks-api/entities";
 
 /**
  * Returns the selected tracks.
  * @param table - Table.
  * @returns Selected tracks.
  */
-export function getSelectedTracks(table: Table<Track>): string[] | null {
+export function getSelectedTracks(
+  table: Table<UcscTrackNode>
+): string[] | null {
   const tracks = Object.keys(table.getState().rowSelection);
   return tracks.length > 0 ? tracks : null;
 }
