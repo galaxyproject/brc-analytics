@@ -22,6 +22,7 @@ import {
   WorkflowCollectionElement,
   GalaxyApiCommonUrlData,
 } from "./entities";
+import { UcscTrack } from "../ucsc-tracks-api/entities";
 
 const DOCKSTORE_API_URL = "https://dockstore.org/api/ga4gh/trs/v2/tools";
 
@@ -75,13 +76,15 @@ export async function getWorkflowLandingUrl(
  * @param geneModelUrl - URL for gene model parameter sent to the API.
  * @param readRunsSingle - Single read runs parameter sent to the API.
  * @param readRunsPaired - Paired read runs parameter sent to the API.
+ * @param tracks - UCSC tracks sent to the API. Should all have defined `bigDataUrl` values.
  * @returns data landing URL.
  */
 export async function getDataLandingUrl(
   referenceGenome: string,
   geneModelUrl: string | null,
   readRunsSingle: EnaSequencingReads[] | null,
-  readRunsPaired: EnaSequencingReads[] | null
+  readRunsPaired: EnaSequencingReads[] | null,
+  tracks: UcscTrack[] | null
 ): Promise<string> {
   const body: DataLandingsBody = {
     public: true,
@@ -89,7 +92,8 @@ export async function getDataLandingUrl(
       referenceGenome,
       geneModelUrl,
       readRunsSingle,
-      readRunsPaired
+      readRunsPaired,
+      tracks
     ),
   };
   return getGalaxyLandingUrl(body, dataLandingsApiUrl, dataLandingUrl);
@@ -274,7 +278,8 @@ function getDataLandingsRequestState(
   referenceGenome: string,
   geneModelUrl: string | null,
   readRunsSingle: EnaSequencingReads[] | null,
-  readRunsPaired: EnaSequencingReads[] | null
+  readRunsPaired: EnaSequencingReads[] | null,
+  tracks: UcscTrack[] | null
 ): DataLandingsBodyRequestState {
   return {
     targets: [
@@ -289,6 +294,9 @@ function getDataLandingsRequestState(
       ),
       galaxyCollectionToDataLandingsTarget(
         buildPairedReadRunsRequestValue(readRunsPaired)
+      ),
+      ...buildUcscTracksRequestValues(tracks).map((d) =>
+        buildDataLandingsDatasetTarget([d])
       ),
     ].filter((target) => target !== null),
   };
@@ -454,4 +462,19 @@ function getRunUrlsInfo(
   }
   if (forward === null) throw new Error("No URL for forward read found");
   return { forward, reverse };
+}
+
+function buildUcscTracksRequestValues(
+  tracks: UcscTrack[] | null
+): GalaxyUrlData[] {
+  if (!tracks?.length) return [];
+  const values: GalaxyUrlData[] = [];
+  for (const track of tracks) {
+    values.push({
+      ext: "auto",
+      identifier: track.shortLabel,
+      url: track.bigDataUrl,
+    });
+  }
+  return values;
 }
