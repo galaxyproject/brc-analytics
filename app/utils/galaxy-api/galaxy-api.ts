@@ -23,7 +23,6 @@ import {
   GalaxyApiCommonUrlData,
 } from "./entities";
 import { UcscTrack } from "../ucsc-tracks-api/entities";
-import { getFullBigDataUrl } from "../ucsc-tracks-api/ucsc-tracks-api";
 
 const DOCKSTORE_API_URL = "https://dockstore.org/api/ga4gh/trs/v2/tools";
 
@@ -474,7 +473,7 @@ function buildUcscTracksRequestValues(
     values.push({
       ext: "auto",
       identifier: track.shortLabel,
-      url: getFullBigDataUrl(track.bigDataUrl),
+      url: track.bigDataUrl,
     });
   }
   return values;

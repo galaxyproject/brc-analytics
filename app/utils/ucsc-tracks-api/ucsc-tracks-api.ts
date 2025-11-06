@@ -90,7 +90,7 @@ function buildTrack(
   if (groupId === undefined || responseTrack.bigDataUrl === undefined)
     return null;
   return {
-    bigDataUrl: responseTrack.bigDataUrl,
+    bigDataUrl: getFullBigDataUrl(responseTrack.bigDataUrl),
     groupId,
     isComposite: false,
     longLabel: responseTrack.longLabel,
@@ -144,18 +144,6 @@ async function getTracksApiResponse(assembly: string): Promise<unknown> {
 }
 
 /**
- * If the given object has the given key as a direct property (as determined by `Object.hasOwn`), return that property's value.
- * @param obj - Object to get value from.
- * @param key - Key of the property to get value from.
- * @returns property value, or undefined if the property doesn't exist.
- */
-function getPropertyIfHasOwn(obj: object, key: string): unknown {
-  if (Object.hasOwn(obj, key)) {
-    return obj[key as keyof typeof obj];
-  }
-}
-
-/**
  * Convert a file path from a `bigDataUrl` field to a useable URL.
  * @param bigDataUrl - File path from the tracks API.
  * @returns file URL.
@@ -169,4 +157,16 @@ export function getFullBigDataUrl(bigDataUrl: string): string {
   }
   const filePath = match[1];
   return `https://hgdownload.soe.ucsc.edu/hubs/${filePath}`;
+}
+
+/**
+ * If the given object has the given key as a direct property (as determined by `Object.hasOwn`), return that property's value.
+ * @param obj - Object to get value from.
+ * @param key - Key of the property to get value from.
+ * @returns property value, or undefined if the property doesn't exist.
+ */
+function getPropertyIfHasOwn(obj: object, key: string): unknown {
+  if (Object.hasOwn(obj, key)) {
+    return obj[key as keyof typeof obj];
+  }
 }
