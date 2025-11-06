@@ -1,6 +1,9 @@
 import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import { Table } from "@tanstack/react-table";
-import { UcscTrackNode } from "../../../../../../../../../../../utils/ucsc-tracks-api/entities";
+import {
+  UcscTrack,
+  UcscTrackNode,
+} from "../../../../../../../../../../../utils/ucsc-tracks-api/entities";
 
 /**
  * Returns the selected tracks.
@@ -9,8 +12,12 @@ import { UcscTrackNode } from "../../../../../../../../../../../utils/ucsc-track
  */
 export function getSelectedTracks(
   table: Table<UcscTrackNode>
-): string[] | null {
-  const tracks = Object.keys(table.getState().rowSelection);
+): UcscTrack[] | null {
+  // In theory, only individual tracks should be selectable, but we filter out composite tracks to narrow the type
+  const tracks = table
+    .getSelectedRowModel()
+    .flatRows.map((row) => row.original)
+    .filter((track) => !track.isComposite);
   return tracks.length > 0 ? tracks : null;
 }
 
@@ -20,7 +27,7 @@ export function getSelectedTracks(
  * @returns The value for the tracks step.
  */
 export function renderValue(
-  tracks: string[] | null | undefined
+  tracks: UcscTrack[] | null | undefined
 ): string | undefined {
   if (tracks === null) return LABEL.NONE;
   if (tracks === undefined) return undefined;
