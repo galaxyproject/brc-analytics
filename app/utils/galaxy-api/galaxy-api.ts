@@ -471,10 +471,16 @@ function buildUcscTracksRequestValues(
   const values: GalaxyUrlData[] = [];
   for (const track of tracks) {
     values.push({
-      ext: "auto",
+      ext: getUcscBigDataExt(track.bigDataUrl),
       identifier: track.shortLabel,
       url: track.bigDataUrl,
     });
   }
   return values;
+}
+
+function getUcscBigDataExt(bigDataUrl: string): string {
+  if (bigDataUrl.endsWith(".bb")) return "bigbed";
+  else if (bigDataUrl.endsWith(".bw")) return "bigwig";
+  return "auto";
 }
