@@ -3,7 +3,7 @@ import { StyledDialog } from "./tracksSelector.styles";
 import { Props } from "./types";
 import { DialogTitle } from "@databiosphere/findable-ui/lib/components/common/Dialog/components/DialogTitle/dialogTitle";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { RowSelectionState } from "@tanstack/table-core";
 import { TracksSelectionPanel } from "./components/TracksSelectionPanel/tracksSelectionPanel";
 import { getTracksData } from "./utils";
@@ -18,27 +18,29 @@ export const TracksSelector = ({
   table,
 }: Props): JSX.Element => {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+
+  const onCancel = useCallback(() => {
+    table.setRowSelection(rowSelection);
+    onClose();
+  }, [onClose, rowSelection, table]);
+
+  const onTransitionEnter = useCallback(() => {
+    setRowSelection(table.getState().rowSelection);
+  }, [table]);
+
   return (
     <StyledDialog
-      onTransitionEnter={() => {
-        setRowSelection(table.getState().rowSelection);
-      }}
-      onClose={onClose}
+      onTransitionEnter={onTransitionEnter}
+      onClose={onCancel}
       open={open}
     >
-      <DialogTitle onClose={onClose} title="Select Tracks" />
+      <DialogTitle onClose={onCancel} title="Select Tracks" />
       <DialogContent>
         <ColumnFilters table={table} />
         <TracksSelectionPanel table={table} />
       </DialogContent>
       <DialogActions>
-        <Button
-          {...BUTTON_PROPS.SECONDARY_CONTAINED}
-          onClick={() => {
-            table.setRowSelection(rowSelection);
-            onClose();
-          }}
-        >
+        <Button {...BUTTON_PROPS.SECONDARY_CONTAINED} onClick={onCancel}>
           Cancel
         </Button>
         <Button
