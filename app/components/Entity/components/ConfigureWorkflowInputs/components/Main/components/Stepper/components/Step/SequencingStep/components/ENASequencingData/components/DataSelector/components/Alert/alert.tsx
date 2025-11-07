@@ -2,7 +2,7 @@ import { Props } from "./types";
 import { AlertTitle } from "@mui/material";
 import { ALERT_PROPS } from "@databiosphere/findable-ui/lib/components/common/Alert/constants";
 import { StyledAlert } from "./alert.styles";
-import { SIZE } from "@databiosphere/findable-ui/src/styles/common/constants/size";
+import { SIZE } from "@databiosphere/findable-ui/lib/styles/common/constants/size";
 
 export const Alert = ({
   enaTaxonomyIdStatus,
