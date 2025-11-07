@@ -7,4 +7,5 @@ export interface Props {
   readCount?: number;
   selectedCount: number;
   taxonomicLevelSpecies: string;
+  taxonomyMatches: number;
 }

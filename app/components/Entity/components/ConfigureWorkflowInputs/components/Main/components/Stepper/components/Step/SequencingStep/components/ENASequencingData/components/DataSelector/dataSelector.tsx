@@ -7,6 +7,7 @@ import { LoadingIcon } from "@databiosphere/findable-ui/lib/components/common/Cu
 import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
 import { Props } from "./types";
 import { Fragment } from "react";
+import { Alert } from "./components/Alert/alert";
 
 export const DataSelector = ({
   enaTaxonomyIdStatus,
@@ -15,74 +16,81 @@ export const DataSelector = ({
   readCount,
   selectedCount,
   taxonomicLevelSpecies,
+  taxonomyMatches,
 }: Props): JSX.Element | null => {
   if (selectedCount > 0) return null;
   return (
-    <StyledPaper {...PAPER_PROPS}>
-      <Stack spacing={2}>
-        <Typography
-          component="div"
-          variant={TYPOGRAPHY_PROPS.VARIANT.HEADING_XSMALL}
-        >
-          Select sequences from ENA
-        </Typography>
-        <Typography
-          color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
-          variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
-        >
-          Browse ENA to find and select sequences
-        </Typography>
-      </Stack>
-      {enaTaxonomyIdStatus.loading ? (
-        <LoadingIcon
-          color={SVG_ICON_PROPS.COLOR.PRIMARY}
-          fontSize={SVG_ICON_PROPS.FONT_SIZE.SMALL}
-        />
-      ) : (
-        <StyledGrid {...GRID_PROPS}>
-          {enaTaxonomyIdStatus.eligible && (
-            <Fragment>
-              <Stack alignItems="center" spacing={1}>
-                <Button
-                  {...BUTTON_PROPS.PRIMARY_CONTAINED}
-                  onClick={onContinue}
-                >
-                  {renderButtonText(readCount)}
-                </Button>
-                <Typography
-                  color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
-                  noWrap
-                  maxWidth={200}
-                  variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
-                >
-                  {taxonomicLevelSpecies}
-                </Typography>
-              </Stack>
-              <Divider flexItem orientation="vertical">
-                <Typography
-                  component="div"
-                  color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
-                  variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
-                >
-                  <i>OR</i>
-                </Typography>
-              </Divider>
-            </Fragment>
-          )}
-          <Stack alignItems="center" spacing={1}>
-            <Button {...BUTTON_PROPS.PRIMARY_CONTAINED} onClick={onOpen}>
-              Enter Accession(s)
-            </Button>
-            <Typography
-              color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
-              variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
-            >
-              Any organism
-            </Typography>
-          </Stack>
-        </StyledGrid>
-      )}
-    </StyledPaper>
+    <Fragment>
+      <Alert
+        enaTaxonomyIdStatus={enaTaxonomyIdStatus}
+        taxonomyMatches={taxonomyMatches}
+      />
+      <StyledPaper {...PAPER_PROPS}>
+        <Stack spacing={2}>
+          <Typography
+            component="div"
+            variant={TYPOGRAPHY_PROPS.VARIANT.HEADING_XSMALL}
+          >
+            Select sequences from ENA
+          </Typography>
+          <Typography
+            color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
+            variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
+          >
+            Browse ENA to find and select sequences
+          </Typography>
+        </Stack>
+        {enaTaxonomyIdStatus.loading ? (
+          <LoadingIcon
+            color={SVG_ICON_PROPS.COLOR.PRIMARY}
+            fontSize={SVG_ICON_PROPS.FONT_SIZE.SMALL}
+          />
+        ) : (
+          <StyledGrid {...GRID_PROPS}>
+            {enaTaxonomyIdStatus.eligible && (
+              <Fragment>
+                <Stack alignItems="center" spacing={1}>
+                  <Button
+                    {...BUTTON_PROPS.PRIMARY_CONTAINED}
+                    onClick={onContinue}
+                  >
+                    {renderButtonText(readCount)}
+                  </Button>
+                  <Typography
+                    color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
+                    noWrap
+                    maxWidth={200}
+                    variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
+                  >
+                    {taxonomicLevelSpecies}
+                  </Typography>
+                </Stack>
+                <Divider flexItem orientation="vertical">
+                  <Typography
+                    component="div"
+                    color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
+                    variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
+                  >
+                    <i>OR</i>
+                  </Typography>
+                </Divider>
+              </Fragment>
+            )}
+            <Stack alignItems="center" spacing={1}>
+              <Button {...BUTTON_PROPS.PRIMARY_CONTAINED} onClick={onOpen}>
+                Enter Accession(s)
+              </Button>
+              <Typography
+                color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
+                variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
+              >
+                Any organism
+              </Typography>
+            </Stack>
+          </StyledGrid>
+        )}
+      </StyledPaper>
+    </Fragment>
   );
 };
 
