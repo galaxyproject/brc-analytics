@@ -36,7 +36,7 @@ export interface Validation {
 }
 
 export interface Props {
-  enaAccessionActions: Actions;
+  enaAccessionActions: Actions<BaseReadRun>;
   enaAccessionStatus: Status;
   enaTaxonomyId: UseENADataByTaxonomyId<BaseReadRun>;
   onConfigure: OnConfigure;

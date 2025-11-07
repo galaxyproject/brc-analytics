@@ -15,7 +15,10 @@ export const useENADataByAccession = <T>(): UseENADataByAccession<T> => {
   }, []);
 
   const onRequestData = useCallback(
-    async (event: FormEvent, submitOptions: SubmitOptions): Promise<void> => {
+    async (
+      event: FormEvent,
+      submitOptions: SubmitOptions<T>
+    ): Promise<void> => {
       event.preventDefault();
       const form = event.target as HTMLFormElement;
       const formData = new FormData(form);
@@ -43,9 +46,9 @@ export const useENADataByAccession = <T>(): UseENADataByAccession<T> => {
                   setErrors({ accession: e.message });
                   submitOptions.onError?.(e);
                 },
-                onSuccess: () => {
+                onSuccess: (data: T[]) => {
                   setErrors({});
-                  submitOptions.onSuccess?.();
+                  submitOptions.onSuccess?.(data);
                 },
               },
             })

@@ -17,7 +17,7 @@ export async function fetchENAData<T>({
   submitOptions,
 }: {
   accessionsInfo: AccessionInfo[];
-  submitOptions: SubmitOptions;
+  submitOptions: SubmitOptions<T>;
 }): Promise<T[] | undefined> {
   const accessionsByType: Record<string, string[]> = {};
   for (const { accession, accessionType } of accessionsInfo) {
@@ -44,7 +44,7 @@ export async function fetchENAData<T>({
     return;
   }
 
-  submitOptions.onSuccess?.();
+  submitOptions.onSuccess?.(data);
 
   return data;
 }
