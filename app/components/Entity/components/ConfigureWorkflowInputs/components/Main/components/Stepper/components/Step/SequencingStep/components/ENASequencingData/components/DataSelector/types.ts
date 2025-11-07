@@ -4,8 +4,8 @@ export interface Props {
   enaTaxonomyIdStatus: Status;
   onContinue: () => void;
   onOpen: () => void;
-  readCount?: number;
   selectedCount: number;
   taxonomicLevelSpecies: string;
+  taxonomyCount?: number;
   taxonomyMatches: number;
 }

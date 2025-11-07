@@ -37,9 +37,9 @@ export const ENASequencingData = ({
         enaTaxonomyIdStatus={enaTaxonomyId.status}
         onContinue={collectionDialog.onOpen}
         onOpen={accessionDialog.onOpen}
-        readCount={enaTaxonomyId.data?.length}
         selectedCount={selectedCount}
         taxonomicLevelSpecies={taxonomicLevelSpecies}
+        taxonomyCount={enaTaxonomyId.data?.length}
         taxonomyMatches={taxonomyMatches}
       />
       <AccessionSelector

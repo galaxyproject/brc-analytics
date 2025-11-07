@@ -13,9 +13,9 @@ export const DataSelector = ({
   enaTaxonomyIdStatus,
   onContinue,
   onOpen,
-  readCount,
   selectedCount,
   taxonomicLevelSpecies,
+  taxonomyCount,
   taxonomyMatches,
 }: Props): JSX.Element | null => {
   if (selectedCount > 0) return null;
@@ -54,7 +54,7 @@ export const DataSelector = ({
                     {...BUTTON_PROPS.PRIMARY_CONTAINED}
                     onClick={onContinue}
                   >
-                    {renderButtonText(readCount)}
+                    {renderButtonText(taxonomyCount)}
                   </Button>
                   <Typography
                     color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
@@ -95,12 +95,12 @@ export const DataSelector = ({
 };
 
 /**
- * Renders the button text based on the read count.
- * @param readCount - The number of reads.
+ * Renders the button text based on the taxonomy Id read count.
+ * @param taxonomyCount - Taxonomy data count.
  * @returns The button text.
  */
-function renderButtonText(readCount: number | undefined): string {
-  if (!readCount) return "No Sequences";
-  if (readCount === 1) return "Browse 1 Sequence";
-  return `Browse ${readCount} Sequences`;
+function renderButtonText(taxonomyCount: number | undefined): string {
+  if (!taxonomyCount) return "No Sequences";
+  if (taxonomyCount === 1) return "Browse 1 Sequence";
+  return `Browse ${taxonomyCount} Sequences`;
 }
