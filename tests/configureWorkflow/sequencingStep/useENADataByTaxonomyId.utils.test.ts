@@ -1,4 +1,4 @@
-import { isEligible } from "../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/hooks/UseENADataByTaxonomyId/utils";
+import { isEligible } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/hooks/UseENADataByTaxonomyId/utils";
 
 describe("isEligible", () => {
   test("returns false when taxonomyId is empty", () => {

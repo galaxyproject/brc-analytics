@@ -6,12 +6,12 @@ import {
   getSequencingDataByType,
   getUploadMyOwnSequencingData,
   mapSequencingDataToConfiguredValue,
-} from "../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/utils";
-import { SEQUENCING_DATA_TYPE } from "../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/types";
-import type { ReadRun } from "../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
+} from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/utils";
+import { SEQUENCING_DATA_TYPE } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/types";
+import type { ReadRun } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
 import type { Table } from "@tanstack/react-table";
-import type { ConfiguredInput } from "../app/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import type { EnaSequencingReads } from "../app/utils/galaxy-api/entities";
+import type { ConfiguredInput } from "../../../app/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import type { EnaSequencingReads } from "../../../app/utils/galaxy-api/entities";
 
 const CONFIGURED_INPUT: Record<string, EnaSequencingReads[]> = {
   PAIRED: [
