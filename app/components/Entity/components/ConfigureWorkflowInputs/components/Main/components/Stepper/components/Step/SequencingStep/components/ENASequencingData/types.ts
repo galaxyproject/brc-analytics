@@ -42,6 +42,7 @@ export interface Props {
   onConfigure: OnConfigure;
   setEnaQueryMethod: Dispatch<SetStateAction<ENA_QUERY_METHOD>>;
   stepKey: SEQUENCING_DATA_TYPE;
+  switchToAccession: (data: BaseReadRun[]) => void;
   table: Table<ReadRun>;
   taxonomicLevelSpecies: string;
 }

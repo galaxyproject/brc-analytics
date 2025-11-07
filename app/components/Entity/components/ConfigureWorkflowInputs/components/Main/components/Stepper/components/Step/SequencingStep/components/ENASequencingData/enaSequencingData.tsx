@@ -14,6 +14,7 @@ export const ENASequencingData = ({
   onConfigure,
   setEnaQueryMethod,
   stepKey,
+  switchToAccession,
   table,
   taxonomicLevelSpecies,
 }: Props): JSX.Element => {
@@ -44,6 +45,7 @@ export const ENASequencingData = ({
         onContinue={collectionDialog.onOpen}
         onRequestData={enaAccessionActions.onRequestData}
         open={accessionDialog.open}
+        switchToAccession={switchToAccession}
         table={table}
       />
       <CollectionSelector

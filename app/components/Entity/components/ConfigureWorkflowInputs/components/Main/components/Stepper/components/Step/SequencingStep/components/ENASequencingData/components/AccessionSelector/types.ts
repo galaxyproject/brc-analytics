@@ -9,5 +9,6 @@ export interface Props {
   onContinue: () => void;
   onRequestData: OnRequestData<BaseReadRun>;
   open: boolean;
+  switchToAccession: (data: BaseReadRun[]) => void;
   table: Table<ReadRun>;
 }

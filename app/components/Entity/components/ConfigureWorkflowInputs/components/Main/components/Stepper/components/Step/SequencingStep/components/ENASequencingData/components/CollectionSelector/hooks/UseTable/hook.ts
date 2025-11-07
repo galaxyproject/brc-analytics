@@ -3,14 +3,13 @@ import {
   getFacetedRowModel,
   getFilteredRowModel,
   InitialTableState,
-  Table,
   useReactTable,
 } from "@tanstack/react-table";
 import { BaseReadRun, ReadRun } from "../../../../types";
 import { ROW_POSITION } from "@databiosphere/findable-ui/lib/components/Table/features/RowPosition/constants";
 import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/features/RowPreview/constants";
 import { columns } from "./columnDef";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { getFacetedUniqueValuesWithArrayValues } from "@databiosphere/findable-ui/lib/components/Table/common/utils";
 import { arrIncludesSome } from "@databiosphere/findable-ui/lib/components/Table/columnDef/columnFilters/filterFn";
 import { ColumnFiltersState } from "@tanstack/react-table";
@@ -26,14 +25,14 @@ import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/
 import { ROW_SELECTION_VALIDATION } from "@databiosphere/findable-ui/lib/components/Table/features/RowSelectionValidation/constants";
 import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/features/TableDownload/constants";
 import { mapReadRuns, sanitizeReadRuns } from "./dataTransforms";
-import { TableMeta } from "./types";
+import { TableMeta, UseTable } from "./types";
 
 export const useTable = (
   enaQueryMethod: ENA_QUERY_METHOD,
   enaAccession: UseENADataByAccession<BaseReadRun>,
   enaTaxonomyId: UseENADataByTaxonomyId<BaseReadRun>,
   columnFilters: ColumnFiltersState
-): Table<ReadRun> => {
+): UseTable => {
   // Get the data for the ENA query method (by accession or by taxonomy ID).
   const { data: readRuns } =
     enaQueryMethod === ENA_QUERY_METHOD.ACCESSION
@@ -53,7 +52,7 @@ export const useTable = (
     filterSort: FILTER_SORT.COUNT,
   };
 
-  return useReactTable<ReadRun>({
+  const table = useReactTable<ReadRun>({
     _features: [
       ROW_POSITION,
       ROW_PREVIEW,
@@ -84,4 +83,10 @@ export const useTable = (
     initialState,
     meta,
   });
+
+  const switchToAccession = useCallback((data: BaseReadRun[]) => {
+    console.log("switch to accession", data);
+  }, []);
+
+  return { actions: { switchToAccession }, table };
 };

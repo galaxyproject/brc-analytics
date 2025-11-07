@@ -24,6 +24,7 @@ export const AccessionSelector = ({
   onContinue,
   onRequestData,
   open,
+  switchToAccession,
   table,
 }: Props): JSX.Element => {
   return (
@@ -36,7 +37,8 @@ export const AccessionSelector = ({
           component: "form",
           onSubmit: (event: FormEvent<HTMLFormElement>) =>
             onRequestData(event, {
-              onSuccess: () => {
+              onSuccess: (data) => {
+                switchToAccession(data);
                 table.resetColumnFilters(); // Clear column filters from previous query.
                 onContinue();
                 onClose();

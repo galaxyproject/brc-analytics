@@ -32,7 +32,7 @@ export const SequencingStep = ({
   const enaAccession = useENADataByAccession<BaseReadRun>();
   const enaTaxonomyId = useENADataByTaxonomyId<BaseReadRun>(genome);
   const columnFilters = useColumnFilters(workflow, stepKey);
-  const table = useTable(
+  const { actions, table } = useTable(
     enaQueryMethod,
     enaAccession,
     enaTaxonomyId,
@@ -56,6 +56,7 @@ export const SequencingStep = ({
             onConfigure={onConfigure}
             setEnaQueryMethod={setEnaQueryMethod}
             stepKey={stepKey as SEQUENCING_DATA_TYPE}
+            switchToAccession={actions.switchToAccession}
             table={table}
             taxonomicLevelSpecies={genome.taxonomicLevelSpecies}
           />
