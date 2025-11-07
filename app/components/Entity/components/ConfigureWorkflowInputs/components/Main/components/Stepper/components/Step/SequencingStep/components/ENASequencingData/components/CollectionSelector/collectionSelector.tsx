@@ -3,16 +3,14 @@ import { StyledDialog } from "./collectionSelector.styles";
 import { Props } from "./types";
 import { DialogTitle } from "@databiosphere/findable-ui/lib/components/common/Dialog/components/DialogTitle/dialogTitle";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
-import { useCallback } from "react";
 import { Table } from "./components/Table/table";
 import { getSequencingData } from "../../utils";
 import { ColumnFilters } from "../../../../../components/ColumnFilters/columnFilters";
 import { Table as TanStackTable } from "@tanstack/react-table";
 import { ReadRun } from "../../types";
-import { getRowSelectionState } from "../../utils";
 
 export const CollectionSelector = ({
-  configuredInput,
+  onCancel,
   onClose,
   onConfigure,
   onTransitionExited,
@@ -20,12 +18,6 @@ export const CollectionSelector = ({
   table,
 }: Props): JSX.Element => {
   const count = getRowSelectionCount(table);
-
-  const onCancel = useCallback(() => {
-    table.setRowSelection(getRowSelectionState(configuredInput)); // Restore previous selection.
-    onClose();
-  }, [configuredInput, onClose, table]);
-
   return (
     <StyledDialog
       onClose={onCancel}

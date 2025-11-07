@@ -8,6 +8,7 @@ import { DialogProps } from "@mui/material";
 
 export interface Props extends Pick<DialogProps, "onTransitionExited"> {
   configuredInput: ConfiguredInput;
+  onCancel: () => void;
   onClose: () => void;
   onConfigure: OnConfigure;
   open: boolean;

@@ -5,7 +5,11 @@ import { useDialog } from "@databiosphere/findable-ui/lib/components/common/Dial
 import { Props } from "./types";
 import { CollectionSummary } from "./components/CollectionSummary/collectionSummary";
 import { AccessionSelector } from "./components/AccessionSelector/accessionSelector";
-import { getSequencingData, clearSequencingData } from "./utils";
+import {
+  getSequencingData,
+  clearSequencingData,
+  getRowSelectionState,
+} from "./utils";
 
 export const ENASequencingData = ({
   configuredInput,
@@ -47,6 +51,11 @@ export const ENASequencingData = ({
       />
       <CollectionSelector
         configuredInput={configuredInput}
+        onCancel={() => {
+          // Restore previous selection.
+          table.setRowSelection(getRowSelectionState(configuredInput));
+          collectionDialog.onClose();
+        }}
         onClose={collectionDialog.onClose}
         onConfigure={onConfigure}
         onTransitionExited={() => {
@@ -58,6 +67,7 @@ export const ENASequencingData = ({
       />
       <CollectionSummary
         onClear={() => {
+          // Clear selections and revert to taxonomyId browse method.
           onConfigure(clearSequencingData());
           switchBrowseMethod();
         }}
