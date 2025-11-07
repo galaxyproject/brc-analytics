@@ -22,6 +22,7 @@ export interface BRCDataCatalogGenome {
   gcPercent: number | null;
   geneModelUrl: string | null;
   isRef: string;
+  jbrowseConfigUrl: string | null;
   length: number;
   level: string;
   lineageTaxonomyIds: string[];

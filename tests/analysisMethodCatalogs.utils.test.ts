@@ -81,6 +81,7 @@ describe("buildAssemblyWorkflows", () => {
     gcPercent: null,
     geneModelUrl: null,
     isRef: "Yes",
+    jbrowseConfigUrl: null,
     length: 0,
     level: "scaffold",
     lineageTaxonomyIds: ["999"],

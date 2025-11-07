@@ -108,6 +108,7 @@ async function buildAssemblies(
       gcPercent: parseNumberOrNull(row.gcPercent),
       geneModelUrl: parseStringOrNull(row.geneModelUrl),
       isRef: parseBoolean(row.isRef),
+      jbrowseConfigUrl: null,
       length: parseNumber(row.length),
       level: row.level,
       lineageTaxonomyIds: parseList(row.lineageTaxonomyIds),

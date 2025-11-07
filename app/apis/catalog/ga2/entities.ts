@@ -10,6 +10,7 @@ export interface GA2AssemblyEntity {
   gcPercent: number | null;
   geneModelUrl: string | null;
   isRef: "No" | "Yes";
+  jbrowseConfigUrl: string | null;
   length: number;
   level: string;
   lineageTaxonomyIds: string[];

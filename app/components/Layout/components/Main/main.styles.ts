@@ -10,3 +10,15 @@ export const StyledPagesMain = styled(DXMain)`
   background-color: ${PALETTE.COMMON_WHITE};
   flex-direction: column;
 `;
+
+/**
+ * Full-width main container for browser pages.
+ * Removes max-width constraints and padding to allow full viewport usage.
+ */
+export const StyledBrowserMain = styled(DXMain)`
+  background-color: ${PALETTE.COMMON_WHITE};
+  flex-direction: column;
+  max-width: 100% !important;
+  padding: 0 !important;
+  width: 100% !important;
+`;

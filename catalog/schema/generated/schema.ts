@@ -206,6 +206,8 @@ export interface Assemblies {
 export interface Assembly {
     /** The unique accession identifier for the assembly (e.g., GCA_000001405.28 for GRCh38), used to retrieve the assembly data from public repositories. */
     accession: string,
+    /** URL or path to the JBrowse 2 configuration file for this assembly. Can be a local path (e.g., /jbrowse-config/GCA_000001405.28/config.json) or a remote URL (e.g., https://example.com/jbrowse/config.json). Optional field used to enable genome browser functionality. */
+    jbrowse_config_url?: string | null,
 }
 
 

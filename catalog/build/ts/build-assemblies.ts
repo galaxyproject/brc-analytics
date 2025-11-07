@@ -58,6 +58,7 @@ export async function buildAssemblies(
       gcPercent: parseNumberOrNull(row.gcPercent),
       geneModelUrl: parseStringOrNull(row.geneModelUrl),
       isRef: parseBoolean(row.isRef),
+      jbrowseConfigUrl: `/jbrowse-config/${row.accession}_config.json`,
       length: parseNumber(row.length),
       level: row.level,
       lineageTaxonomyIds,

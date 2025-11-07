@@ -2,9 +2,11 @@ assemblies:
   # organism: Trichomonas vaginalis G3
   # common_name: trichomonads (G3 2022 genbank)
   - accession: GCA_000002825.3
+    jbrowseConfigUrl: /jbrowse-config/GCA_000002825.3/config.json
   # organism: Aspergillus flavus NRRL3357
   # common_name: ascomycetes A.flavus (NRRL3357 2020)
   - accession: GCA_000006275.3
+    jbrowseConfigUrl: /jbrowse-config/GCA_000006275.3/config.json
   # organism: Globisporangium ultimum DAOM BR144
   # common_name: oomycetes (DAOM BR144 2010)
   - accession: GCA_000143045.1

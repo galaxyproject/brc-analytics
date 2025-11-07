@@ -305,6 +305,13 @@ class Assembly(ConfiguredBaseModel):
             "linkml_meta": {"alias": "accession", "domain_of": ["Assembly"]}
         },
     )
+    jbrowse_config_url: Optional[str] = Field(
+        default=None,
+        description="""URL or path to the JBrowse 2 configuration file for this assembly. Can be a local path (e.g., /jbrowse-config/GCA_000001405.28/config.json) or a remote URL (e.g., https://example.com/jbrowse/config.json). Optional field used to enable genome browser functionality.""",
+        json_schema_extra={
+            "linkml_meta": {"alias": "jbrowse_config_url", "domain_of": ["Assembly"]}
+        },
+    )
 
 
 class Organisms(ConfiguredBaseModel):

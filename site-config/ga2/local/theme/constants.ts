@@ -1,4 +1,5 @@
-import { PaletteColorOptions, ThemeOptions, Palette } from "@mui/material";
+import { PaletteColorOptions, ThemeOptions } from "@mui/material";
+import { Palette } from "@mui/material/styles";
 
 /**
  * Custom Palette "Brand"
@@ -35,5 +36,5 @@ export const THEME_OPTIONS: ThemeOptions = {
   palette: {
     brand,
     primary,
-  },
+  } as ThemeOptions["palette"],
 };
