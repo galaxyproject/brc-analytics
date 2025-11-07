@@ -43,6 +43,6 @@ export function getIsLastRowInGroup(
   // If the row is the last row, it is the last row.
   if (isLastRow) return true;
 
-  // If the next row is a grouped row, it is not the last row of the current group.
+  // If the next row is a grouped row, then the current row is the last row of the current group.
   return rows[index + 1]?.getIsGrouped();
 }
