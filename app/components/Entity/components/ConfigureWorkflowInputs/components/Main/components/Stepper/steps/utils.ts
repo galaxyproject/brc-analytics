@@ -33,7 +33,7 @@ export function augmentConfiguredSteps(
 export function buildSteps(workflow: Workflow): StepConfig[] {
   // Return steps for custom workflow
   if (workflow.trsId === CUSTOM_WORKFLOW.trsId) {
-    return [STEP.ASSEMBLY_ID, STEP.GENE_MODEL_URL, STEP.READ_RUN_ANY].filter(
+    return [STEP.ASSEMBLY_ID, STEP.RELATED_TRACKS, STEP.READ_RUN_ANY].filter(
       isStepConfigured
     );
   }

@@ -6,8 +6,11 @@ import { StyledContainer } from "./columnFilters.styles";
 import { Controls } from "@databiosphere/findable-ui/lib/components/Filter/components/controls/Controls/controls";
 import { StyledSearchAllFilters } from "./columnFilters.styles";
 import { getCategoryViews } from "./utils";
+import { RowData } from "@tanstack/react-table";
 
-export const ColumnFilters = ({ table }: Props): JSX.Element => {
+export const ColumnFilters = <T extends RowData>({
+  table,
+}: Props<T>): JSX.Element => {
   return (
     <StyledContainer>
       <ColumnFiltersAdapter

@@ -61,7 +61,6 @@ export const ENASequencingData = ({
         }}
         onEdit={collectionDialog.onOpen}
         selectedCount={selectedCount}
-        table={table}
       />
     </Fragment>
   );

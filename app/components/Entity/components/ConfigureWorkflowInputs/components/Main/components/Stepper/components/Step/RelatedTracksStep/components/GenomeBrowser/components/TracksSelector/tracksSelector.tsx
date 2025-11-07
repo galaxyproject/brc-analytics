@@ -1,15 +1,15 @@
 import { Button, DialogActions, DialogContent } from "@mui/material";
-import { StyledDialog } from "./collectionSelector.styles";
+import { StyledDialog } from "./tracksSelector.styles";
 import { Props } from "./types";
 import { DialogTitle } from "@databiosphere/findable-ui/lib/components/common/Dialog/components/DialogTitle/dialogTitle";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
-import { useState } from "react";
-import { Table } from "./components/Table/table";
+import { useCallback, useState } from "react";
 import { RowSelectionState } from "@tanstack/table-core";
-import { getSequencingData } from "../../utils";
+import { TracksSelectionPanel } from "./components/TracksSelectionPanel/tracksSelectionPanel";
+import { getTracksData } from "./utils";
 import { ColumnFilters } from "../../../../../components/ColumnFilters/columnFilters";
 
-export const CollectionSelector = ({
+export const TracksSelector = ({
   onClose,
   onConfigure,
   open,
@@ -18,36 +18,36 @@ export const CollectionSelector = ({
   table,
 }: Props): JSX.Element => {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+
+  const onCancel = useCallback(() => {
+    table.setRowSelection(rowSelection);
+    onClose();
+  }, [onClose, rowSelection, table]);
+
+  const onTransitionEnter = useCallback(() => {
+    setRowSelection(table.getState().rowSelection);
+  }, [table]);
+
   return (
     <StyledDialog
-      onTransitionEnter={() => {
-        setRowSelection(table.getState().rowSelection);
-        if (selectedCount > 0) return;
-        table.resetSorting(); // Reset sorting to default.
-      }}
-      onClose={onClose}
+      onTransitionEnter={onTransitionEnter}
+      onClose={onCancel}
       open={open}
     >
-      <DialogTitle onClose={onClose} title="Select Sequencing Runs" />
+      <DialogTitle onClose={onCancel} title="Select Tracks" />
       <DialogContent>
         <ColumnFilters table={table} />
-        <Table table={table} />
+        <TracksSelectionPanel table={table} />
       </DialogContent>
       <DialogActions>
-        <Button
-          {...BUTTON_PROPS.SECONDARY_CONTAINED}
-          onClick={() => {
-            table.setRowSelection(rowSelection);
-            onClose();
-          }}
-        >
+        <Button {...BUTTON_PROPS.SECONDARY_CONTAINED} onClick={onCancel}>
           Cancel
         </Button>
         <Button
           {...BUTTON_PROPS.PRIMARY_CONTAINED}
           disabled={selectedCount === 0}
           onClick={() => {
-            onConfigure(getSequencingData(table, stepKey));
+            onConfigure(getTracksData(table, stepKey));
             onClose();
           }}
         >
@@ -64,6 +64,6 @@ export const CollectionSelector = ({
  * @returns The button text.
  */
 function renderButtonText(selectedCount: number): string {
-  if (selectedCount === 1) return "Add 1 Sequencing Run";
-  return `Add ${selectedCount} Sequencing Runs`;
+  if (selectedCount === 1) return "Add 1 Track";
+  return `Add ${selectedCount} Tracks`;
 }

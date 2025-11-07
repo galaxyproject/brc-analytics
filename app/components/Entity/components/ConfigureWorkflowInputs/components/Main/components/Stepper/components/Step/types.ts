@@ -25,6 +25,7 @@ export interface StepProps
   extends Pick<StepConfig, "description" | "disabled">,
     Pick<MStepProps, "completed" | "last">,
     Required<Pick<MStepProps, "index" | "active">> {
+  configuredInput: ConfiguredInput;
   entryLabel: string;
   genome: BRCDataCatalogGenome | GA2AssemblyEntity;
   onConfigure: OnConfigure;
