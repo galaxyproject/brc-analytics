@@ -8,7 +8,8 @@ import { AccessionSelector } from "./components/AccessionSelector/accessionSelec
 import { getSequencingData, clearSequencingData } from "./utils";
 
 export const ENASequencingData = ({
-  enaAccession,
+  enaAccessionActions,
+  enaAccessionStatus,
   enaTaxonomyId,
   onConfigure,
   setEnaQueryMethod,
@@ -37,11 +38,11 @@ export const ENASequencingData = ({
         taxonomicLevelSpecies={taxonomicLevelSpecies}
       />
       <AccessionSelector
-        clearErrors={enaAccession.clearErrors}
-        enaAccessionStatus={enaAccession.status}
+        clearErrors={enaAccessionActions.clearErrors}
+        enaAccessionStatus={enaAccessionStatus}
         onClose={accessionDialog.onClose}
         onContinue={collectionDialog.onOpen}
-        onRequestData={enaAccession.onRequestData}
+        onRequestData={enaAccessionActions.onRequestData}
         open={accessionDialog.open}
         table={table}
       />

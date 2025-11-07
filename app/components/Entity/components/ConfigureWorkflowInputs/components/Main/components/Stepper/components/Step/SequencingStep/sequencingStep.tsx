@@ -50,7 +50,8 @@ export const SequencingStep = ({
         />
         {value === VIEW.ENA ? (
           <ENASequencingData
-            enaAccession={enaAccession}
+            enaAccessionActions={enaAccession.actions}
+            enaAccessionStatus={enaAccession.status}
             enaTaxonomyId={enaTaxonomyId}
             onConfigure={onConfigure}
             setEnaQueryMethod={setEnaQueryMethod}

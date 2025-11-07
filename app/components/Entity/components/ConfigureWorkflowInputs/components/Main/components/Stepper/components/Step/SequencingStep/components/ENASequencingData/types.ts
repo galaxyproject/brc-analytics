@@ -1,5 +1,5 @@
 import { OnConfigure } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { UseENADataByAccession } from "./hooks/UseENADataByAccession/types";
+import { Actions, Status } from "./hooks/UseENADataByAccession/types";
 import { Table } from "@tanstack/react-table";
 import { SEQUENCING_DATA_TYPE } from "../../types";
 import { UseENADataByTaxonomyId } from "./hooks/UseENADataByTaxonomyId/types";
@@ -36,7 +36,8 @@ export interface Validation {
 }
 
 export interface Props {
-  enaAccession: UseENADataByAccession<BaseReadRun>;
+  enaAccessionActions: Actions;
+  enaAccessionStatus: Status;
   enaTaxonomyId: UseENADataByTaxonomyId<BaseReadRun>;
   onConfigure: OnConfigure;
   setEnaQueryMethod: Dispatch<SetStateAction<ENA_QUERY_METHOD>>;

@@ -66,9 +66,8 @@ export const useENADataByAccession = <T>(): UseENADataByAccession<T> => {
   );
 
   return {
-    clearErrors,
+    actions: { clearErrors, onRequestData },
     data,
-    onRequestData,
     status: { errors, loading },
   };
 };

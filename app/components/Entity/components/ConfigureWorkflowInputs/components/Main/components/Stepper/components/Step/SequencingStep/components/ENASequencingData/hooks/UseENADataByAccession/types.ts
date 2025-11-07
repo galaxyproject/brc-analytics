@@ -1,5 +1,10 @@
 import { FormEvent } from "react";
 
+export interface Actions {
+  clearErrors: () => void;
+  onRequestData: OnRequestData;
+}
+
 export type OnRequestData = (
   event: FormEvent,
   submitOptions: SubmitOptions
@@ -16,8 +21,7 @@ export interface SubmitOptions {
 }
 
 export interface UseENADataByAccession<T> {
-  clearErrors: () => void;
+  actions: Actions;
   data?: T[];
-  onRequestData: OnRequestData;
   status: Status;
 }
