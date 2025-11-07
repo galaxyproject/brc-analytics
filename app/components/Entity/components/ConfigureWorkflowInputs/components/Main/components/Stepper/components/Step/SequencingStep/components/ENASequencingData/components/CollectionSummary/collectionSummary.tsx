@@ -8,14 +8,12 @@ export const CollectionSummary = ({
   onClear,
   onEdit,
   selectedCount,
-  table,
 }: Props): JSX.Element | null => {
-  const count = Object.keys(table.getState().rowSelection).length;
   if (selectedCount === 0) return null;
   return (
     <StyledRoundedPaper elevation={0}>
       <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}>
-        {count} Collection{count > 1 ? "s" : ""} Selected
+        {selectedCount} Collection{selectedCount > 1 ? "s" : ""} Selected
       </Typography>
       <Grid container gap={2}>
         <Button {...BUTTON_PROPS.SECONDARY_CONTAINED} onClick={onEdit}>
