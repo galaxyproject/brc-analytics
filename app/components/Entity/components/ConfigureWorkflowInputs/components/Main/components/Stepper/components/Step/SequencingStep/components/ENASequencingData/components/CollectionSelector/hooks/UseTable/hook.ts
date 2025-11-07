@@ -9,13 +9,11 @@ import { BaseReadRun, ReadRun } from "../../../../types";
 import { ROW_POSITION } from "@databiosphere/findable-ui/lib/components/Table/features/RowPosition/constants";
 import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/features/RowPreview/constants";
 import { columns } from "./columnDef";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { getFacetedUniqueValuesWithArrayValues } from "@databiosphere/findable-ui/lib/components/Table/common/utils";
 import { arrIncludesSome } from "@databiosphere/findable-ui/lib/components/Table/columnDef/columnFilters/filterFn";
 import { ColumnFiltersState } from "@tanstack/react-table";
-import { UseENADataByAccession } from "../../../../hooks/UseENADataByAccession/types";
 import { UseENADataByTaxonomyId } from "../../../../hooks/UseENADataByTaxonomyId/types";
-import { ENA_QUERY_METHOD } from "../../../../../../types";
 import { enableRowSelection, getRowSelectionValidation } from "./utils";
 import { SORTING } from "./constants";
 import { getSortedRowModel } from "@tanstack/react-table";
@@ -25,30 +23,29 @@ import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/
 import { ROW_SELECTION_VALIDATION } from "@databiosphere/findable-ui/lib/components/Table/features/RowSelectionValidation/constants";
 import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/features/TableDownload/constants";
 import { mapReadRuns, sanitizeReadRuns } from "./dataTransforms";
-import { TableMeta, UseTable } from "./types";
+import { UseTable } from "./types";
 
 export const useTable = (
-  enaQueryMethod: ENA_QUERY_METHOD,
-  enaAccession: UseENADataByAccession<BaseReadRun>,
   enaTaxonomyId: UseENADataByTaxonomyId<BaseReadRun>,
   columnFilters: ColumnFiltersState
 ): UseTable => {
-  // Get the data for the ENA query method (by accession or by taxonomy ID).
-  const { data: readRuns } =
-    enaQueryMethod === ENA_QUERY_METHOD.ACCESSION
-      ? enaAccession
-      : enaTaxonomyId;
+  const [data, setData] = useState<ReadRun[]>([]);
 
-  const data = useMemo(
-    () => sanitizeReadRuns(mapReadRuns(readRuns)),
-    [readRuns]
+  // TaxonomyId ena read runs; store for easy switching between data sources.
+  const taxonomyData = useMemo(
+    () => sanitizeReadRuns(mapReadRuns(enaTaxonomyId.data)),
+    [enaTaxonomyId.data]
   );
+
+  // Initialize table with taxonomyId ena data.
+  useEffect(() => {
+    setData(taxonomyData);
+  }, [taxonomyData]);
 
   const initialState: InitialTableState = { columnFilters, sorting: SORTING };
 
-  const meta: TableMeta = {
+  const meta = {
     categoryGroups: CATEGORY_GROUPS,
-    enaQueryMethod,
     filterSort: FILTER_SORT.COUNT,
   };
 
@@ -84,9 +81,23 @@ export const useTable = (
     meta,
   });
 
-  const switchToAccession = useCallback((data: BaseReadRun[]) => {
-    console.log("switch to accession", data);
-  }, []);
+  /**
+   * Callback to switch table data.
+   * Table state is reset (column filters, sorting, row selection) when the browsing method has changed.
+   */
+  const switchBrowseMethod = useCallback(
+    (data?: BaseReadRun[]) => {
+      // Handle switching table data.
+      if (data) setData(sanitizeReadRuns(mapReadRuns(data)));
+      else setData(taxonomyData);
 
-  return { actions: { switchToAccession }, table };
+      // Reset table state.
+      table.resetColumnFilters();
+      table.resetSorting();
+      table.resetRowSelection();
+    },
+    [table, taxonomyData]
+  );
+
+  return { actions: { switchBrowseMethod }, table };
 };

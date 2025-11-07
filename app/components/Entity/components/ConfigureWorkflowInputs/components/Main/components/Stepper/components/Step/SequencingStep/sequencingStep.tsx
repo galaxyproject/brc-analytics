@@ -10,15 +10,15 @@ import { useENADataByAccession } from "./components/ENASequencingData/hooks/UseE
 import { BaseReadRun } from "./components/ENASequencingData/types";
 import { useTable } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseTable/hook";
 import { UploadMyData } from "./components/UploadMyData/uploadMyData";
-import { ENA_QUERY_METHOD, SEQUENCING_DATA_TYPE } from "./types";
 import { useENADataByTaxonomyId } from "./components/ENASequencingData/hooks/UseENADataByTaxonomyId/hook";
-import { useState } from "react";
 import { TOGGLE_BUTTONS } from "./components/ToggleButtonGroup/toggleButtons";
 import { useColumnFilters } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseColumnFilters/hook";
+import { getSelectedCount } from "./components/ENASequencingData/utils";
 
 export const SequencingStep = ({
   active,
   completed,
+  configuredInput,
   entryLabel,
   genome,
   index,
@@ -26,18 +26,10 @@ export const SequencingStep = ({
   stepKey,
   workflow,
 }: StepProps): JSX.Element => {
-  const [enaQueryMethod, setEnaQueryMethod] = useState<ENA_QUERY_METHOD>(
-    ENA_QUERY_METHOD.ACCESSION
-  );
   const enaAccession = useENADataByAccession<BaseReadRun>();
   const enaTaxonomyId = useENADataByTaxonomyId<BaseReadRun>(genome);
   const columnFilters = useColumnFilters(workflow, stepKey);
-  const { actions, table } = useTable(
-    enaQueryMethod,
-    enaAccession,
-    enaTaxonomyId,
-    columnFilters
-  );
+  const { actions, table } = useTable(enaTaxonomyId, columnFilters);
   const { onChange, value } = useToggleButtonGroup(VIEW.ENA);
   return (
     <Step active={active} completed={completed} index={index}>
@@ -50,21 +42,18 @@ export const SequencingStep = ({
         />
         {value === VIEW.ENA ? (
           <ENASequencingData
+            configuredInput={configuredInput}
             enaAccessionActions={enaAccession.actions}
             enaAccessionStatus={enaAccession.status}
             enaTaxonomyId={enaTaxonomyId}
             onConfigure={onConfigure}
-            setEnaQueryMethod={setEnaQueryMethod}
-            stepKey={stepKey as SEQUENCING_DATA_TYPE}
-            switchToAccession={actions.switchToAccession}
+            selectedCount={getSelectedCount(configuredInput)}
+            switchBrowseMethod={actions.switchBrowseMethod}
             table={table}
             taxonomicLevelSpecies={genome.taxonomicLevelSpecies}
           />
         ) : (
-          <UploadMyData
-            onConfigure={onConfigure}
-            stepKey={stepKey as SEQUENCING_DATA_TYPE}
-          />
+          <UploadMyData onConfigure={onConfigure} />
         )}
       </StepContent>
     </Step>

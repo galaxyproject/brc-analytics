@@ -8,22 +8,21 @@ import { AccessionSelector } from "./components/AccessionSelector/accessionSelec
 import { getSequencingData, clearSequencingData } from "./utils";
 
 export const ENASequencingData = ({
+  configuredInput,
   enaAccessionActions,
   enaAccessionStatus,
   enaTaxonomyId,
   onConfigure,
-  setEnaQueryMethod,
-  stepKey,
-  switchToAccession,
+  selectedCount,
+  switchBrowseMethod,
   table,
   taxonomicLevelSpecies,
 }: Props): JSX.Element => {
   const accessionDialog = useDialog();
   const collectionDialog = useDialog();
-  const selectedCount = Object.values(table.getState().rowSelection).length;
 
   useEffect(() => {
-    onConfigure(getSequencingData(table, stepKey));
+    onConfigure(getSequencingData(table));
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Intended behavior to only run on mount.
   }, []);
 
@@ -35,7 +34,6 @@ export const ENASequencingData = ({
         onOpen={accessionDialog.onOpen}
         readCount={enaTaxonomyId.data?.length}
         selectedCount={selectedCount}
-        setEnaQueryMethod={setEnaQueryMethod}
         taxonomicLevelSpecies={taxonomicLevelSpecies}
       />
       <AccessionSelector
@@ -45,22 +43,23 @@ export const ENASequencingData = ({
         onContinue={collectionDialog.onOpen}
         onRequestData={enaAccessionActions.onRequestData}
         open={accessionDialog.open}
-        switchToAccession={switchToAccession}
-        table={table}
+        switchBrowseMethod={switchBrowseMethod}
       />
       <CollectionSelector
+        configuredInput={configuredInput}
         onClose={collectionDialog.onClose}
         onConfigure={onConfigure}
+        onTransitionExited={() => {
+          if (selectedCount) return;
+          switchBrowseMethod();
+        }}
         open={collectionDialog.open}
-        selectedCount={selectedCount}
         table={table}
-        stepKey={stepKey}
       />
       <CollectionSummary
         onClear={() => {
-          onConfigure(clearSequencingData(stepKey));
-          table.resetRowSelection();
-          table.resetColumnFilters();
+          onConfigure(clearSequencingData());
+          switchBrowseMethod();
         }}
         onEdit={collectionDialog.onOpen}
         selectedCount={selectedCount}

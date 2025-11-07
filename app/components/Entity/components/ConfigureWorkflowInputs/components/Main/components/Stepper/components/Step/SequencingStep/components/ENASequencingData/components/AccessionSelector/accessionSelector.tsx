@@ -24,8 +24,7 @@ export const AccessionSelector = ({
   onContinue,
   onRequestData,
   open,
-  switchToAccession,
-  table,
+  switchBrowseMethod,
 }: Props): JSX.Element => {
   return (
     <StyledDialog
@@ -38,8 +37,7 @@ export const AccessionSelector = ({
           onSubmit: (event: FormEvent<HTMLFormElement>) =>
             onRequestData(event, {
               onSuccess: (data) => {
-                switchToAccession(data);
-                table.resetColumnFilters(); // Clear column filters from previous query.
+                switchBrowseMethod(data);
                 onContinue();
                 onClose();
               },

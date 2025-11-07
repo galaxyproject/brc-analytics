@@ -6,7 +6,6 @@ import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/B
 import { LoadingIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/LoadingIcon/loadingIcon";
 import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
 import { Props } from "./types";
-import { ENA_QUERY_METHOD } from "../../../../types";
 import { Fragment } from "react";
 
 export const DataSelector = ({
@@ -15,7 +14,6 @@ export const DataSelector = ({
   onOpen,
   readCount,
   selectedCount,
-  setEnaQueryMethod,
   taxonomicLevelSpecies,
 }: Props): JSX.Element | null => {
   if (selectedCount > 0) return null;
@@ -47,10 +45,7 @@ export const DataSelector = ({
               <Stack alignItems="center" spacing={1}>
                 <Button
                   {...BUTTON_PROPS.PRIMARY_CONTAINED}
-                  onClick={() => {
-                    setEnaQueryMethod(ENA_QUERY_METHOD.TAXONOMY_ID);
-                    onContinue();
-                  }}
+                  onClick={onContinue}
                 >
                   {renderButtonText(readCount)}
                 </Button>
@@ -75,13 +70,7 @@ export const DataSelector = ({
             </Fragment>
           )}
           <Stack alignItems="center" spacing={1}>
-            <Button
-              {...BUTTON_PROPS.PRIMARY_CONTAINED}
-              onClick={() => {
-                setEnaQueryMethod(ENA_QUERY_METHOD.ACCESSION);
-                onOpen();
-              }}
-            >
+            <Button {...BUTTON_PROPS.PRIMARY_CONTAINED} onClick={onOpen}>
               Enter Accession(s)
             </Button>
             <Typography

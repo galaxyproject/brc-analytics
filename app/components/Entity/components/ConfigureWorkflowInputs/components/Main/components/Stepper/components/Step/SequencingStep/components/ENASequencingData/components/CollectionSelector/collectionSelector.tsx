@@ -3,59 +3,53 @@ import { StyledDialog } from "./collectionSelector.styles";
 import { Props } from "./types";
 import { DialogTitle } from "@databiosphere/findable-ui/lib/components/common/Dialog/components/DialogTitle/dialogTitle";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
-import { useState } from "react";
+import { useCallback } from "react";
 import { Table } from "./components/Table/table";
-import { RowSelectionState } from "@tanstack/table-core";
 import { getSequencingData } from "../../utils";
 import { ColumnFilters } from "../../../../../components/ColumnFilters/columnFilters";
-import { resetColumnFilters } from "./utils";
+import { Table as TanStackTable } from "@tanstack/react-table";
+import { ReadRun } from "../../types";
+import { getRowSelectionState } from "../../utils";
 
 export const CollectionSelector = ({
+  configuredInput,
   onClose,
   onConfigure,
+  onTransitionExited,
   open,
-  selectedCount,
-  stepKey,
   table,
 }: Props): JSX.Element => {
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const count = getRowSelectionCount(table);
+
+  const onCancel = useCallback(() => {
+    table.setRowSelection(getRowSelectionState(configuredInput)); // Restore previous selection.
+    onClose();
+  }, [configuredInput, onClose, table]);
+
   return (
     <StyledDialog
-      onTransitionEnter={() => {
-        // Snapshot current row selection on open so it can be restored if the dialog is canceled.
-        setRowSelection(table.getState().rowSelection);
-        if (selectedCount > 0) return;
-        table.resetSorting(); // Reset sorting to default.
-      }}
-      onClose={onClose}
+      onClose={onCancel}
+      onTransitionExited={onTransitionExited}
       open={open}
     >
-      <DialogTitle onClose={onClose} title="Select Sequencing Runs" />
+      <DialogTitle onClose={onCancel} title="Select Sequencing Runs" />
       <DialogContent>
         <ColumnFilters table={table} />
         <Table table={table} />
       </DialogContent>
       <DialogActions>
-        <Button
-          {...BUTTON_PROPS.SECONDARY_CONTAINED}
-          onClick={() => {
-            // Restore previous selection and reset column filters on cancel.
-            table.setRowSelection(rowSelection);
-            resetColumnFilters(table, rowSelection);
-            onClose();
-          }}
-        >
+        <Button {...BUTTON_PROPS.SECONDARY_CONTAINED} onClick={onCancel}>
           Cancel
         </Button>
         <Button
           {...BUTTON_PROPS.PRIMARY_CONTAINED}
-          disabled={selectedCount === 0}
+          disabled={count === 0}
           onClick={() => {
-            onConfigure(getSequencingData(table, stepKey));
+            onConfigure(getSequencingData(table));
             onClose();
           }}
         >
-          {renderButtonText(selectedCount)}
+          {renderButtonText(count)}
         </Button>
       </DialogActions>
     </StyledDialog>
@@ -63,11 +57,20 @@ export const CollectionSelector = ({
 };
 
 /**
+ * Returns the count of selected rows.
+ * @param table - The TanStack Table instance.
+ * @returns The count of selected rows.
+ */
+function getRowSelectionCount(table: TanStackTable<ReadRun>): number {
+  return Object.values(table.getState().rowSelection).length;
+}
+
+/**
  * Renders the button text based on the selected count.
- * @param selectedCount - The number of selected rows.
+ * @param count - Count of selected rows.
  * @returns The button text.
  */
-function renderButtonText(selectedCount: number): string {
-  if (selectedCount === 1) return "Add 1 Sequencing Run";
-  return `Add ${selectedCount} Sequencing Runs`;
+function renderButtonText(count: number): string {
+  if (count === 1) return "Add 1 Sequencing Run";
+  return `Add ${count} Sequencing Runs`;
 }
