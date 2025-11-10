@@ -34,7 +34,7 @@ export const SequencingStep = ({
   const { actions, table } = useTable(enaTaxonomyId, columnFilters);
   const { onChange, value } = useToggleButtonGroup(VIEW.ENA);
   const { taxonomyMatches } = useTaxonomyMatches(table);
-  const { requirementsMatches } = useRequirementsMatches(table);
+  const { requirementsMatches } = useRequirementsMatches(table, genome);
   return (
     <Step active={active} completed={completed} index={index}>
       <StepLabel>{entryLabel}</StepLabel>

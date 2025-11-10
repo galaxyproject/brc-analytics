@@ -1,18 +1,22 @@
 import { ColumnFiltersState, Row } from "@tanstack/react-table";
 import { ReadRun } from "../../../../../../types";
 import { COLUMN_KEY_TO_LABEL } from "./constants";
+import { BRCDataCatalogGenome } from "../../../../../../../../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
+import { GA2AssemblyEntity } from "../../../../../../../../../../../../../../../../../../../apis/catalog/ga2/entities";
+import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 
 /**
- * Builds a list of messages for column filter mismatches.
+ * Builds warnings for column filter mismatches.
  * @param initialColumnFilters - Pre-selected column filters.
  * @param rows - Selected rows.
- * @returns Array of messages.
+ * @returns Array of warning messages.
  */
-export function buildRequirementsMatches(
+function buildDataWarnings(
   initialColumnFilters: ColumnFiltersState,
   rows: Row<ReadRun>[]
 ): string[] {
-  const messages = [];
+  const warnings = [];
+
   // Iterate over column filters to find row data that does not match the expected pre-filter value.
   for (const { id, value } of initialColumnFilters) {
     if (!Array.isArray(value)) continue; // Type check; value is always an array.
@@ -34,24 +38,67 @@ export function buildRequirementsMatches(
 
     if (unmatchedSet.size === 0) continue;
 
-    // If there are unmatched values, add a message.
-    messages.push(getMessage(key, value, unmatchedSet));
+    const expected = value.join(" OR ");
+    const actual = [...unmatchedSet].join(", ");
+
+    // If there are unmatched values, add the warning.
+    warnings.push(
+      `${COLUMN_KEY_TO_LABEL[key] ?? key} mismatch: expected ${expected}, but ${actual} selected`
+    );
   }
 
-  return messages;
+  return warnings;
 }
 
 /**
- * Builds a message for a column filter mismatch.
- * @param key - Column key.
- * @param value - Expected values.
- * @param unmatchedSet - Set of unmatched values.
- * @returns A message string.
+ * Builds requirement warnings for the currently selected rows.
+ * Aggregates species mismatch warnings and data (column filter) mismatch warnings.
+ * @param initialColumnFilters - Pre-selected column filters.
+ * @param rows - Selected table rows.
+ * @param genome - Target genome entity used to validate selection.
+ * @returns Array of warning messages.
  */
-function getMessage(
-  key: keyof ReadRun,
-  value: ReadRun[keyof ReadRun][],
-  unmatchedSet: Set<ReadRun[keyof ReadRun]>
-): string {
-  return `${COLUMN_KEY_TO_LABEL[key]} mismatch: expected ${value.join(" OR ")}, but ${[...unmatchedSet].join(", ")} selected`;
+export function buildRequirementWarnings(
+  initialColumnFilters: ColumnFiltersState,
+  rows: Row<ReadRun>[],
+  genome: BRCDataCatalogGenome | GA2AssemblyEntity
+): string[] {
+  if (rows.length === 0) return [];
+  const speciesWarnings = buildSpeciesWarnings(rows, genome);
+  const dataWarnings = buildDataWarnings(initialColumnFilters, rows);
+  return speciesWarnings.concat(dataWarnings);
+}
+
+/**
+ * Builds warnings for species mismatches.
+ * @param rows - Selected rows.
+ * @param genome - Genome entity.
+ * @returns Array of warning messages.
+ */
+function buildSpeciesWarnings(
+  rows: Row<ReadRun>[],
+  genome: BRCDataCatalogGenome | GA2AssemblyEntity
+): string[] {
+  const { ncbiTaxonomyId, taxonomicLevelSpecies } = genome;
+
+  // Build a set of unmatched values.
+  const unmatchedSet = new Set();
+  for (const { original } of rows) {
+    const { scientific_name = LABEL.UNSPECIFIED, tax_id } = original;
+    // Compare the row value to the expected value.
+    if (ncbiTaxonomyId === tax_id) continue;
+
+    // Add the unmatched value to the set.
+    unmatchedSet.add(`${tax_id} (${scientific_name})`);
+  }
+
+  if (unmatchedSet.size === 0) return [];
+
+  const expected = `${ncbiTaxonomyId} (${taxonomicLevelSpecies})`;
+  const actual = [...unmatchedSet].join(", ");
+
+  // If there are unmatched values, return the warning.
+  return [
+    `Species mismatch: data is not from the selected taxonomy ID expected ${expected} but ${actual} selected`,
+  ];
 }
