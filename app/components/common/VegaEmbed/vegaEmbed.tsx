@@ -22,6 +22,8 @@ export const VegaEmbed = ({ caption, spec }: VegaEmbedProps): JSX.Element => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let result: Awaited<ReturnType<typeof embed>> | null = null;
+
     const loadSpec = async (): Promise<void> => {
       if (!containerRef.current) return;
 
@@ -40,7 +42,7 @@ export const VegaEmbed = ({ caption, spec }: VegaEmbedProps): JSX.Element => {
         }
 
         // Embed the visualization with responsive sizing
-        await embed(containerRef.current, vegaSpec, {
+        result = await embed(containerRef.current, vegaSpec, {
           actions: {
             compiled: false,
             editor: false,
@@ -64,6 +66,12 @@ export const VegaEmbed = ({ caption, spec }: VegaEmbedProps): JSX.Element => {
     };
 
     loadSpec();
+
+    return (): void => {
+      if (result) {
+        result.finalize();
+      }
+    };
   }, [spec]);
 
   return (
