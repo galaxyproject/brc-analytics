@@ -146,9 +146,23 @@ describe("getSequencingData", () => {
 
 describe("getUploadMyOwnSequencingData", () => {
   test("returns empty arrays for both types", () => {
-    expect(getUploadMyOwnSequencingData()).toEqual({
+    expect(getUploadMyOwnSequencingData("readRunsAny")).toEqual({
       readRunsPaired: [],
       readRunsSingle: [],
+    });
+  });
+
+  test("returns empty array for single type", () => {
+    expect(getUploadMyOwnSequencingData("readRunsSingle")).toEqual({
+      readRunsPaired: null,
+      readRunsSingle: [],
+    });
+  });
+
+  test("returns empty array for paired type", () => {
+    expect(getUploadMyOwnSequencingData("readRunsPaired")).toEqual({
+      readRunsPaired: [],
+      readRunsSingle: null,
     });
   });
 });

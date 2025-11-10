@@ -15,6 +15,7 @@ import { TOGGLE_BUTTONS } from "./components/ToggleButtonGroup/toggleButtons";
 import { useColumnFilters } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseColumnFilters/hook";
 import { getSelectedCount } from "./components/ENASequencingData/utils";
 import { useTaxonomyMatches } from "./components/ENASequencingData/components/DataSelector/components/Alert/hooks/UseTaxonomyMatches/hook";
+import { useRequirementsMatches } from "./components/ENASequencingData/components/CollectionSummary/components/Alert/hooks/UseRequirementsMatches/hook";
 
 export const SequencingStep = ({
   active,
@@ -33,6 +34,7 @@ export const SequencingStep = ({
   const { actions, table } = useTable(enaTaxonomyId, columnFilters);
   const { onChange, value } = useToggleButtonGroup(VIEW.ENA);
   const { taxonomyMatches } = useTaxonomyMatches(table);
+  const { requirementsMatches } = useRequirementsMatches(table);
   return (
     <Step active={active} completed={completed} index={index}>
       <StepLabel>{entryLabel}</StepLabel>
@@ -49,6 +51,7 @@ export const SequencingStep = ({
             enaAccessionStatus={enaAccession.status}
             enaTaxonomyId={enaTaxonomyId}
             onConfigure={onConfigure}
+            requirementsMatches={requirementsMatches}
             selectedCount={getSelectedCount(configuredInput)}
             switchBrowseMethod={actions.switchBrowseMethod}
             table={table}
@@ -56,7 +59,7 @@ export const SequencingStep = ({
             taxonomyMatches={taxonomyMatches ?? 0}
           />
         ) : (
-          <UploadMyData onConfigure={onConfigure} />
+          <UploadMyData onConfigure={onConfigure} stepKey={stepKey} />
         )}
       </StepContent>
     </Step>

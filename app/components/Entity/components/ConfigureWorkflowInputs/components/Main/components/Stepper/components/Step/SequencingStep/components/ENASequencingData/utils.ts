@@ -4,6 +4,7 @@ import { ReadRun } from "./types";
 import { SEQUENCING_DATA_TYPE } from "../../types";
 import { ConfiguredInput } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { LIBRARY_LAYOUT_TO_CONFIGURE_INPUT_KEY } from "./constants";
+import { StepProps } from "../../../types";
 
 /**
  * Clears the selected step.
@@ -95,10 +96,15 @@ export function getSequencingDataByType(
 
 /**
  * Returns sequencing data that represents "uploading my own data" i.e. an empty list.
+ * @param stepKey - Step key.
  * @returns Partial configured input.
  */
-export function getUploadMyOwnSequencingData(): Partial<ConfiguredInput> {
-  return clearSequencingData([]);
+export function getUploadMyOwnSequencingData(
+  stepKey: StepProps["stepKey"]
+): Partial<ConfiguredInput> {
+  if (stepKey === SEQUENCING_DATA_TYPE.READ_RUNS_ANY)
+    return clearSequencingData([]);
+  return { readRunsPaired: null, readRunsSingle: null, [stepKey]: [] };
 }
 
 /**
