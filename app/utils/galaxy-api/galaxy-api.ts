@@ -341,6 +341,7 @@ function buildSingleReadRunsRequestValue(
         url: forward.url,
       };
     }),
+    identifier: "Single reads",
     name: "Single End Reads",
   };
 }
@@ -376,6 +377,7 @@ function buildPairedReadRunsRequestValue(
         identifier: runAccession,
       };
     }),
+    identifier: "Paired reads",
     name: "Paired End Reads",
   };
 }
