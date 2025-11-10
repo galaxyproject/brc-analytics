@@ -1,20 +1,34 @@
 import { ColumnFiltersState, Row } from "@tanstack/react-table";
 import { ReadRun } from "../../../../../../types";
 import { COLUMN_KEY_TO_LABEL } from "./constants";
+import { BRCDataCatalogGenome } from "../../../../../../../../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
+import { GA2AssemblyEntity } from "../../../../../../../../../../../../../../../../../../../apis/catalog/ga2/entities";
+import { CATEGORY_CONFIGS } from "../../../../../../components/CollectionSelector/hooks/UseTable/categoryConfigs";
 
 /**
  * Builds a list of messages for column filter mismatches.
  * @param initialColumnFilters - Pre-selected column filters.
  * @param rows - Selected rows.
+ * @param genome - Genome entity.
  * @returns Array of messages.
  */
 export function buildRequirementsMatches(
   initialColumnFilters: ColumnFiltersState,
-  rows: Row<ReadRun>[]
+  rows: Row<ReadRun>[],
+  genome: BRCDataCatalogGenome | GA2AssemblyEntity
 ): string[] {
   const messages = [];
+  const { ncbiTaxonomyId } = genome;
+
+  // Add taxonomyID to column filters.
+  const filters: ColumnFiltersState = [...initialColumnFilters];
+  filters.unshift({
+    id: CATEGORY_CONFIGS.TAX_ID.key,
+    value: [ncbiTaxonomyId],
+  });
+
   // Iterate over column filters to find row data that does not match the expected pre-filter value.
-  for (const { id, value } of initialColumnFilters) {
+  for (const { id, value } of filters) {
     if (!Array.isArray(value)) continue; // Type check; value is always an array.
 
     const key = id as keyof ReadRun;
@@ -53,5 +67,7 @@ function getMessage(
   value: ReadRun[keyof ReadRun][],
   unmatchedSet: Set<ReadRun[keyof ReadRun]>
 ): string {
+  if (key === CATEGORY_CONFIGS.TAX_ID.key)
+    return "Species mismatch: data is not from the selected taxonomy ID";
   return `${COLUMN_KEY_TO_LABEL[key]} mismatch: expected ${value.join(" OR ")}, but ${[...unmatchedSet].join(", ")} selected`;
 }

@@ -15,7 +15,7 @@ import { arrIncludesSome } from "@databiosphere/findable-ui/lib/components/Table
 import { ColumnFiltersState } from "@tanstack/react-table";
 import { UseENADataByTaxonomyId } from "../../../../hooks/UseENADataByTaxonomyId/types";
 import { enableRowSelection, getRowSelectionValidation } from "./utils";
-import { SORTING } from "./constants";
+import { SORTING, COLUMN_VISIBILITY } from "./constants";
 import { getSortedRowModel } from "@tanstack/react-table";
 import { CATEGORY_GROUPS } from "./categoryGroups";
 import { getFacetedMinMaxValues } from "@databiosphere/findable-ui/lib/components/Table/featureOptions/facetedColumn/getFacetedMinMaxValues";
@@ -42,7 +42,11 @@ export const useTable = (
     setData(taxonomyData);
   }, [taxonomyData]);
 
-  const initialState: InitialTableState = { columnFilters, sorting: SORTING };
+  const initialState: InitialTableState = {
+    columnFilters,
+    columnVisibility: COLUMN_VISIBILITY,
+    sorting: SORTING,
+  };
 
   const meta = {
     categoryGroups: CATEGORY_GROUPS,

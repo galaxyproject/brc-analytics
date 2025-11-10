@@ -6,4 +6,5 @@ export const COLUMN_KEY_TO_LABEL: Partial<Record<keyof ReadRun, string>> = {
   [CATEGORY_CONFIGS.LIBRARY_LAYOUT.key]: "Library layout",
   [CATEGORY_CONFIGS.LIBRARY_SOURCE.key]: "Library source",
   [CATEGORY_CONFIGS.LIBRARY_STRATEGY.key]: "Library strategy",
+  [CATEGORY_CONFIGS.TAX_ID.key]: "Species",
 };
