@@ -49,7 +49,7 @@ describe("buildRequirementsMatches", () => {
     );
 
     expect(buildRequirementsMatches(filters, rows)).toEqual([
-      "Data type mismatch: expected RNA-Seq OR ChIP-Seq, but WGS, Metagenome selected",
+      "Library strategy mismatch: expected RNA-Seq OR ChIP-Seq, but WGS, Metagenome selected",
     ]);
   });
 
@@ -77,7 +77,7 @@ describe("buildRequirementsMatches", () => {
 
     expect(buildRequirementsMatches(filters, rows)).toEqual([
       "Library layout mismatch: expected SINGLE, but PAIRED selected",
-      "Data type mismatch: expected RNA-Seq, but WGS selected",
+      "Library strategy mismatch: expected RNA-Seq, but WGS selected",
     ]);
   });
 });

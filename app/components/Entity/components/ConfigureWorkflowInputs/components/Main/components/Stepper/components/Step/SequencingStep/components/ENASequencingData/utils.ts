@@ -104,7 +104,7 @@ export function getUploadMyOwnSequencingData(
 ): Partial<ConfiguredInput> {
   if (stepKey === SEQUENCING_DATA_TYPE.READ_RUNS_ANY)
     return clearSequencingData([]);
-  return { [stepKey]: [] };
+  return { readRunsPaired: null, readRunsSingle: null, [stepKey]: [] };
 }
 
 /**

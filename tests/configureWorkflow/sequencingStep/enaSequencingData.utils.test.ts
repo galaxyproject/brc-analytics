@@ -154,6 +154,7 @@ describe("getUploadMyOwnSequencingData", () => {
 
   test("returns empty array for single type", () => {
     expect(getUploadMyOwnSequencingData("readRunsSingle")).toEqual({
+      readRunsPaired: null,
       readRunsSingle: [],
     });
   });
@@ -161,6 +162,7 @@ describe("getUploadMyOwnSequencingData", () => {
   test("returns empty array for paired type", () => {
     expect(getUploadMyOwnSequencingData("readRunsPaired")).toEqual({
       readRunsPaired: [],
+      readRunsSingle: null,
     });
   });
 });
