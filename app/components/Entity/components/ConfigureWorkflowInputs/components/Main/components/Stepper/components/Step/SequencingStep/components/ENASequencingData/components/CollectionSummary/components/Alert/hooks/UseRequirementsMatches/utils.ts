@@ -45,13 +45,13 @@ export function buildRequirementsMatches(
  * Builds a message for a column filter mismatch.
  * @param key - Column key.
  * @param value - Expected values.
- * @param ummatchedSet - Set of unmatched values.
+ * @param unmatchedSet - Set of unmatched values.
  * @returns A message string.
  */
 function getMessage(
   key: keyof ReadRun,
   value: ReadRun[keyof ReadRun][],
-  ummatchedSet: Set<ReadRun[keyof ReadRun]>
+  unmatchedSet: Set<ReadRun[keyof ReadRun]>
 ): string {
-  return `${COLUMN_KEY_TO_LABEL[key]} mismatch: expected ${value.join(" OR ")}, but ${[...ummatchedSet].join(", ")} selected`;
+  return `${COLUMN_KEY_TO_LABEL[key]} mismatch: expected ${value.join(" OR ")}, but ${[...unmatchedSet].join(", ")} selected`;
 }
