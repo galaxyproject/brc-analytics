@@ -1,4 +1,4 @@
-import { Table } from "@tanstack/react-table";
+import { RowSelectionState, Table } from "@tanstack/react-table";
 import { EnaSequencingReads } from "../../../../../../../../../../../../../utils/galaxy-api/entities";
 import { ReadRun } from "./types";
 import { SEQUENCING_DATA_TYPE } from "../../types";
@@ -6,33 +6,50 @@ import { ConfiguredInput } from "../../../../../../../../../../../../../views/Wo
 import { LIBRARY_LAYOUT_TO_CONFIGURE_INPUT_KEY } from "./constants";
 
 /**
- * Returns null or an empty array for the selected step i.e. clears the selected step.
- * @param stepKey - Step key.
+ * Clears the selected step.
  * @param value - Null or `[]`.
  * @returns Partial configured input.
  */
 export function clearSequencingData(
-  stepKey: SEQUENCING_DATA_TYPE,
   value: EnaSequencingReads[] | null = null
 ): Partial<ConfiguredInput> {
-  // Clear the selected step for READ_RUNS_ANY.
-  if (stepKey === SEQUENCING_DATA_TYPE.READ_RUNS_ANY) {
-    return { readRunsPaired: value, readRunsSingle: value };
-  }
+  return { readRunsPaired: value, readRunsSingle: value };
+}
 
-  // Clear the selected step for READ_RUNS_PAIRED or READ_RUNS_SINGLE.
-  return { [stepKey]: value };
+/**
+ * Returns the row selection state for the configured input.
+ * @param configuredInput - Configured input.
+ * @returns Row selection state.
+ */
+export function getRowSelectionState(
+  configuredInput: ConfiguredInput
+): RowSelectionState {
+  return [
+    ...(configuredInput.readRunsPaired ?? []),
+    ...(configuredInput.readRunsSingle ?? []),
+  ].reduce<RowSelectionState>((acc, run) => {
+    if (run) acc[run.runAccession] = true;
+    return acc;
+  }, {});
+}
+
+/**
+ * Returns the number of selected sequencing runs.
+ * @param configuredInput - Configured input.
+ * @returns Number of selected sequencing runs.
+ */
+export function getSelectedCount(configuredInput: ConfiguredInput): number {
+  const { readRunsPaired, readRunsSingle } = configuredInput;
+  return (readRunsPaired?.length ?? 0) + (readRunsSingle?.length ?? 0);
 }
 
 /**
  * Returns the sequencing data for the selected rows.
  * @param table - Table.
- * @param stepKey - Step key.
  * @returns Partial configured input.
  */
 export function getSequencingData(
-  table: Table<ReadRun>,
-  stepKey: SEQUENCING_DATA_TYPE
+  table: Table<ReadRun>
 ): Partial<ConfiguredInput> {
   const sequencingDataByType = getSequencingDataByType(table);
   const configuredInput: Partial<ConfiguredInput> = {
@@ -40,13 +57,10 @@ export function getSequencingData(
     readRunsSingle: null,
   };
   for (const [key, value] of sequencingDataByType.entries()) {
-    // If the key is the selected step or READ_RUNS_ANY, add the sequencing data to the configured input.
-    if (stepKey === key || stepKey === SEQUENCING_DATA_TYPE.READ_RUNS_ANY) {
-      // Guard to satisfy Partial<ConfiguredInput>: only assign when key is a ConfiguredInput field ("readRunsPaired" | "readRunsSingle").
-      if (key === "readRunsPaired" || key === "readRunsSingle") {
-        const sequencingData = value.length > 0 ? value : null;
-        configuredInput[key] = sequencingData;
-      }
+    // Guard to satisfy Partial<ConfiguredInput>: only assign when key is a ConfiguredInput field ("readRunsPaired" | "readRunsSingle").
+    if (key === "readRunsPaired" || key === "readRunsSingle") {
+      const sequencingData = value.length > 0 ? value : null;
+      configuredInput[key] = sequencingData;
     }
   }
   return configuredInput;
@@ -81,13 +95,10 @@ export function getSequencingDataByType(
 
 /**
  * Returns sequencing data that represents "uploading my own data" i.e. an empty list.
- * @param stepKey - Step key.
  * @returns Partial configured input.
  */
-export function getUploadMyOwnSequencingData(
-  stepKey: SEQUENCING_DATA_TYPE
-): Partial<ConfiguredInput> {
-  return clearSequencingData(stepKey, []);
+export function getUploadMyOwnSequencingData(): Partial<ConfiguredInput> {
+  return clearSequencingData([]);
 }
 
 /**

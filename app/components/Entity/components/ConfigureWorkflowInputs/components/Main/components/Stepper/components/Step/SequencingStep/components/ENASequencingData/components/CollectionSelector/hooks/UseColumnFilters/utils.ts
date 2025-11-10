@@ -1,11 +1,13 @@
-import { SEQUENCING_DATA_TYPE } from "../../../../types";
+import { SEQUENCING_DATA_TYPE } from "../../../../../../types";
 import { ColumnFiltersState } from "@tanstack/react-table";
-import { CATEGORY_CONFIGS } from "./hooks/UseTable/categoryConfigs";
+import { CATEGORY_CONFIGS } from "../UseTable/categoryConfigs";
 import {
   Workflow,
   WorkflowParameter,
-} from "../../../../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
-import { WORKFLOW_PARAMETER_BY_STEP_KEY } from "./constants";
+} from "../../../../../../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
+import { WORKFLOW_PARAMETER_BY_STEP_KEY } from "../../constants";
+import { StepProps } from "../../../../../../../types";
+import { isSequencingDataType } from "./typeGuards";
 
 /**
  * Gets library strategy requirements from a workflow parameter.
@@ -68,7 +70,7 @@ export function getDescriptionRequirement(
  * @returns Workflow parameter for the given step key.
  */
 export function getWorkflowParameter(
-  workflow: Workflow,
+  workflow: Pick<Workflow, "parameters">,
   stepKey:
     | SEQUENCING_DATA_TYPE.READ_RUNS_PAIRED
     | SEQUENCING_DATA_TYPE.READ_RUNS_SINGLE
@@ -134,17 +136,21 @@ export function buildFilters(
 }
 
 /**
- * Pre-selects column filters based on the given step key for ENA query method by taxonomy ID.
+ * Pre-selects column filters based on the step key and workflow parameters.
  * @param workflow - Workflow.
  * @param stepKey - Step key.
- * @returns Column filters for the given ENA data.
+ * @returns Column filters.
  */
 export function preSelectColumnFilters(
-  workflow: Workflow,
-  stepKey:
-    | SEQUENCING_DATA_TYPE.READ_RUNS_PAIRED
-    | SEQUENCING_DATA_TYPE.READ_RUNS_SINGLE
+  workflow: Pick<Workflow, "parameters">,
+  stepKey: StepProps["stepKey"]
 ): ColumnFiltersState {
+  // Type guard required; stepKey expected to be SEQUENCING_DATA_TYPE.
+  if (!isSequencingDataType(stepKey)) return [];
+
+  // Return empty array for READ_RUNS_ANY as it does not pre-filter its data.
+  if (stepKey === SEQUENCING_DATA_TYPE.READ_RUNS_ANY) return [];
+
   const workflowParameter = getWorkflowParameter(workflow, stepKey);
   const filters = buildFilters(stepKey, workflowParameter);
   return Object.entries(filters).map(([id, value]) => ({ id, value }));

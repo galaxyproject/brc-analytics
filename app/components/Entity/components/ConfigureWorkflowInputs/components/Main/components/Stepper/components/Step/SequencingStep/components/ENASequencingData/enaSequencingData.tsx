@@ -5,59 +5,73 @@ import { useDialog } from "@databiosphere/findable-ui/lib/components/common/Dial
 import { Props } from "./types";
 import { CollectionSummary } from "./components/CollectionSummary/collectionSummary";
 import { AccessionSelector } from "./components/AccessionSelector/accessionSelector";
-import { getSequencingData, clearSequencingData } from "./utils";
+import {
+  getSequencingData,
+  clearSequencingData,
+  getRowSelectionState,
+} from "./utils";
 
 export const ENASequencingData = ({
-  enaAccession,
+  configuredInput,
+  enaAccessionActions,
+  enaAccessionStatus,
   enaTaxonomyId,
   onConfigure,
-  setEnaQueryMethod,
-  stepKey,
+  selectedCount,
+  switchBrowseMethod,
   table,
   taxonomicLevelSpecies,
+  taxonomyMatches,
 }: Props): JSX.Element => {
   const accessionDialog = useDialog();
   const collectionDialog = useDialog();
-  const selectedCount = Object.values(table.getState().rowSelection).length;
 
   useEffect(() => {
-    onConfigure(getSequencingData(table, stepKey));
+    onConfigure(getSequencingData(table));
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Intended behavior to only run on mount.
   }, []);
 
   return (
     <Fragment>
       <DataSelector
-        loading={enaTaxonomyId.status.loading}
+        enaTaxonomyIdStatus={enaTaxonomyId.status}
         onContinue={collectionDialog.onOpen}
         onOpen={accessionDialog.onOpen}
-        readCount={enaTaxonomyId.data?.length}
         selectedCount={selectedCount}
-        setEnaQueryMethod={setEnaQueryMethod}
         taxonomicLevelSpecies={taxonomicLevelSpecies}
+        taxonomyCount={enaTaxonomyId.data?.length}
+        taxonomyMatches={taxonomyMatches}
       />
       <AccessionSelector
-        clearErrors={enaAccession.clearErrors}
+        clearErrors={enaAccessionActions.clearErrors}
+        enaAccessionStatus={enaAccessionStatus}
         onClose={accessionDialog.onClose}
         onContinue={collectionDialog.onOpen}
-        onRequestData={enaAccession.onRequestData}
+        onRequestData={enaAccessionActions.onRequestData}
         open={accessionDialog.open}
-        status={enaAccession.status}
-        table={table}
+        switchBrowseMethod={switchBrowseMethod}
       />
       <CollectionSelector
+        configuredInput={configuredInput}
+        onCancel={() => {
+          // Restore previous selection.
+          table.setRowSelection(getRowSelectionState(configuredInput));
+          collectionDialog.onClose();
+        }}
         onClose={collectionDialog.onClose}
         onConfigure={onConfigure}
+        onTransitionExited={() => {
+          if (selectedCount) return;
+          switchBrowseMethod();
+        }}
         open={collectionDialog.open}
-        selectedCount={selectedCount}
         table={table}
-        stepKey={stepKey}
       />
       <CollectionSummary
         onClear={() => {
-          onConfigure(clearSequencingData(stepKey));
-          table.resetRowSelection();
-          table.resetColumnFilters();
+          // Clear selections and revert to taxonomyId browse method.
+          onConfigure(clearSequencingData());
+          switchBrowseMethod();
         }}
         onEdit={collectionDialog.onOpen}
         selectedCount={selectedCount}

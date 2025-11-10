@@ -1,13 +1,12 @@
 import { OnRequestData, Status } from "../../hooks/UseENADataByAccession/types";
-import { Table } from "@tanstack/react-table";
-import { ReadRun } from "../../types";
+import { BaseReadRun } from "../../types";
 
 export interface Props {
   clearErrors: () => void;
+  enaAccessionStatus: Status;
   onClose: () => void;
   onContinue: () => void;
-  onRequestData: OnRequestData;
+  onRequestData: OnRequestData<BaseReadRun>;
   open: boolean;
-  status: Status;
-  table: Table<ReadRun>;
+  switchBrowseMethod: (data?: BaseReadRun[]) => void;
 }

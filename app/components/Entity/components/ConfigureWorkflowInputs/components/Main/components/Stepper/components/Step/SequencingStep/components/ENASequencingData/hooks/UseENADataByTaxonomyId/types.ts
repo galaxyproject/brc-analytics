@@ -1,11 +1,10 @@
-import { ColumnFiltersState } from "@tanstack/react-table";
-
 export type OnRequestData<T> = (
   taxonomyId: string,
   submitOptions?: SubmitOptions<T>
 ) => Promise<void>;
 
 export interface Status {
+  eligible: boolean;
   errors: Record<string, string>;
   loading: boolean;
 }
@@ -16,7 +15,6 @@ export interface SubmitOptions<T> {
 }
 
 export interface UseENADataByTaxonomyId<T> {
-  columnFilters: ColumnFiltersState;
   data?: T[];
   status: Status;
 }
