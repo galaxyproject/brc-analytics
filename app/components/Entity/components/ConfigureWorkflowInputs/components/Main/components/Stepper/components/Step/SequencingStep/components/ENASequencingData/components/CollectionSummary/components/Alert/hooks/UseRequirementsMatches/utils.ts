@@ -20,7 +20,7 @@ export function buildRequirementsMatches(
     const key = id as keyof ReadRun;
 
     // Build a set of unmatched values.
-    const ummatchedSet: Set<ReadRun[keyof ReadRun]> = new Set();
+    const unmatchedSet: Set<ReadRun[keyof ReadRun]> = new Set();
     for (const row of rows) {
       // Get the value of the column for the row.
       const rowValue = row.original[key];
@@ -29,13 +29,13 @@ export function buildRequirementsMatches(
       if (value.includes(rowValue)) continue;
 
       // Add the unmatched value to the set.
-      ummatchedSet.add(rowValue);
+      unmatchedSet.add(rowValue);
     }
 
-    if (ummatchedSet.size === 0) continue;
+    if (unmatchedSet.size === 0) continue;
 
     // If there are unmatched values, add a message.
-    messages.push(getMessage(key, value, ummatchedSet));
+    messages.push(getMessage(key, value, unmatchedSet));
   }
 
   return messages;
