@@ -2,22 +2,31 @@ import { Workflow } from "../../../../../../../../../apis/catalog/brc-analytics-
 import { WORKFLOW_PARAMETER_VARIABLE } from "../../../../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { StepConfig } from "../components/Step/types";
 import { STEP } from "./constants";
-import {
-  SINGLE_END_STEP,
-  PAIRED_END_STEP,
-} from "../components/Step/SequencingStep/step";
 import { CUSTOM_WORKFLOW } from "../../../../../../../../../components/Entity/components/AnalysisMethod/components/CustomWorkflow/constants";
+import { ConfiguredInput } from "../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 
 /**
  * Augment the configured steps with two additional sequencing steps "READ_RUNS_PAIRED" and "READ_RUNS_SINGLE".
  * Allows the user to configure both single and paired end reads and render those values in the summary.
- * @param configuredSteps - The configured steps.
- * @returns The augmented steps.
+ * @param configuredSteps - Configured steps.
+ * @param configuredInput - Configured input.
+ * @param sequencingSteps - Sequencing steps.
+ * @returns Augmented steps.
  */
 export function augmentConfiguredSteps(
-  configuredSteps: StepConfig[]
+  configuredSteps: StepConfig[],
+  configuredInput: ConfiguredInput,
+  sequencingSteps: Record<string, StepConfig>
 ): StepConfig[] {
-  return [...configuredSteps, PAIRED_END_STEP, SINGLE_END_STEP];
+  const steps = [...configuredSteps];
+  const stepKeys: Set<string> = new Set(configuredSteps.map((s) => s.key));
+  for (const [key, step] of Object.entries(sequencingSteps)) {
+    if (stepKeys.has(key)) continue;
+    if (configuredInput[key as keyof ConfiguredInput]) {
+      steps.push(step);
+    }
+  }
+  return steps;
 }
 
 /**

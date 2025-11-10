@@ -6,9 +6,9 @@ import { useEffect } from "react";
 import { StyledAlert } from "./uploadMyData.styles";
 import { getUploadMyOwnSequencingData } from "../ENASequencingData/utils";
 
-export const UploadMyData = ({ onConfigure }: Props): JSX.Element => {
+export const UploadMyData = ({ onConfigure, stepKey }: Props): JSX.Element => {
   useEffect(() => {
-    onConfigure(getUploadMyOwnSequencingData());
+    onConfigure(getUploadMyOwnSequencingData(stepKey));
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Intended behavior to only run on mount.
   }, []);
   return (

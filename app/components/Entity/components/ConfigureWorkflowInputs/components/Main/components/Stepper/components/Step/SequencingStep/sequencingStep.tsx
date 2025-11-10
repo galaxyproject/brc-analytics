@@ -59,7 +59,7 @@ export const SequencingStep = ({
             taxonomyMatches={taxonomyMatches ?? 0}
           />
         ) : (
-          <UploadMyData onConfigure={onConfigure} />
+          <UploadMyData onConfigure={onConfigure} stepKey={stepKey} />
         )}
       </StepContent>
     </Step>
