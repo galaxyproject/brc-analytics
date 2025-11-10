@@ -41,6 +41,7 @@ export interface Props {
   enaAccessionStatus: Status;
   enaTaxonomyId: UseENADataByTaxonomyId<BaseReadRun>;
   onConfigure: OnConfigure;
+  requirementsMatches: string[];
   selectedCount: number;
   switchBrowseMethod: (data?: BaseReadRun[]) => void;
   table: Table<ReadRun>;

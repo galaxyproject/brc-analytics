@@ -17,6 +17,7 @@ export const ENASequencingData = ({
   enaAccessionStatus,
   enaTaxonomyId,
   onConfigure,
+  requirementsMatches,
   selectedCount,
   switchBrowseMethod,
   table,
@@ -74,6 +75,7 @@ export const ENASequencingData = ({
           switchBrowseMethod();
         }}
         onEdit={collectionDialog.onOpen}
+        requirementsMatches={requirementsMatches}
         selectedCount={selectedCount}
       />
     </Fragment>
