@@ -23,7 +23,7 @@ export interface BaseReadRun {
   scientific_name: string;
   study_accession: string;
   submitted_ftp: string;
-  tax_id: number;
+  tax_id: string;
 }
 
 export interface ReadRun extends BaseReadRun {
