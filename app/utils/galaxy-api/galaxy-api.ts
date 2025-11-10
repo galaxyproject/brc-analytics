@@ -171,7 +171,7 @@ function galaxyCollectionToWorkflowParameter(
     elements: collection.elements.map((elem) =>
       galaxyCollectionElementToWorkflowLandings(elem)
     ),
-    name: collection.identifier,
+    ...(collection.name ? { name: collection.name } : {}),
   };
 }
 
@@ -270,7 +270,7 @@ function galaxyCollectionToDataLandings(
         return galaxyUrlDataToCommonApi(elem);
       }
     }),
-    name: collection.identifier,
+    ...(collection.name ? { name: collection.name } : {}),
   };
 }
 
@@ -341,6 +341,7 @@ function buildSingleReadRunsRequestValue(
         url: forward.url,
       };
     }),
+    name: "Single End Reads",
   };
 }
 
@@ -375,6 +376,7 @@ function buildPairedReadRunsRequestValue(
         identifier: runAccession,
       };
     }),
+    name: "Paired End Reads",
   };
 }
 

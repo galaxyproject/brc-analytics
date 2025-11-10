@@ -139,6 +139,7 @@ export interface GalaxyCollection {
   collectionType: string;
   elements: GalaxyCollectionElement[];
   identifier?: string;
+  name?: string;
 }
 
 export interface GalaxyUrlData {
