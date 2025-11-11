@@ -1,9 +1,19 @@
 {
-  "config": { "view": { "continuousWidth": 300, "continuousHeight": 300 } },
+  "config": {
+    "view": {
+      "continuousWidth": 300,
+      "continuousHeight": 300
+    }
+  },
   "vconcat": [
     {
-      "data": { "name": "data-a1ad66d96417cbab667365597f608ba0" },
-      "mark": { "type": "tick", "thickness": 4 },
+      "data": {
+        "name": "data-a1ad66d96417cbab667365597f608ba0"
+      },
+      "mark": {
+        "type": "tick",
+        "thickness": 4
+      },
       "encoding": {
         "color": {
           "field": "effect_bin",
@@ -16,33 +26,85 @@
         },
         "opacity": {
           "field": "samples",
-          "scale": { "range": [0.35, 1] },
+          "scale": {
+            "range": [0.35, 1]
+          },
           "title": "Samples",
           "type": "quantitative"
         },
         "size": {
           "field": "af_range",
-          "scale": { "range": [6, 28] },
+          "scale": {
+            "range": [6, 28]
+          },
           "title": "AF range (max-min)",
           "type": "quantitative"
         },
         "tooltip": [
-          { "field": "var_id", "type": "nominal" },
-          { "field": "chr", "type": "nominal" },
-          { "field": "genome_pos", "type": "quantitative" },
-          { "field": "ref", "type": "nominal" },
-          { "field": "alt", "type": "nominal" },
-          { "field": "product", "type": "nominal" },
-          { "field": "gene", "type": "nominal" },
-          { "field": "effect_bin", "type": "nominal" },
-          { "field": "samples", "type": "quantitative" },
-          { "field": "af", "type": "quantitative" },
-          { "field": "af_min", "type": "quantitative" },
-          { "field": "af_max", "type": "quantitative" },
-          { "field": "ref_codon", "type": "nominal" },
-          { "field": "new_codon", "type": "nominal" },
-          { "field": "ref_aa", "type": "nominal" },
-          { "field": "new_aa", "type": "nominal" }
+          {
+            "field": "var_id",
+            "type": "nominal"
+          },
+          {
+            "field": "chr",
+            "type": "nominal"
+          },
+          {
+            "field": "genome_pos",
+            "type": "quantitative"
+          },
+          {
+            "field": "ref",
+            "type": "nominal"
+          },
+          {
+            "field": "alt",
+            "type": "nominal"
+          },
+          {
+            "field": "product",
+            "type": "nominal"
+          },
+          {
+            "field": "gene",
+            "type": "nominal"
+          },
+          {
+            "field": "effect_bin",
+            "type": "nominal"
+          },
+          {
+            "field": "samples",
+            "type": "quantitative"
+          },
+          {
+            "field": "af",
+            "type": "quantitative"
+          },
+          {
+            "field": "af_min",
+            "type": "quantitative"
+          },
+          {
+            "field": "af_max",
+            "type": "quantitative"
+          },
+          {
+            "field": "ref_codon",
+            "type": "nominal"
+          },
+          {
+            "field": "new_codon",
+            "type": "nominal"
+          },
+          {
+            "field": "ref_aa",
+            "type": "nominal"
+          },
+          {
+            "field": "new_aa",
+            "type": "nominal"
+          }
         ],
         "x": {
           "field": "genome_pos",
@@ -64,7 +126,9 @@
     {
       "layer": [
         {
-          "mark": { "type": "rect" },
+          "mark": {
+            "type": "rect"
+          },
           "encoding": {
             "color": {
               "field": "aa_label",
@@ -72,23 +136,55 @@
               "type": "nominal"
             },
             "tooltip": [
-              { "field": "CHROM", "type": "nominal" },
-              { "field": "product", "type": "nominal" },
-              { "field": "gene", "type": "nominal" },
-              { "field": "genome_pos", "type": "quantitative" },
-              { "field": "cds_nt_index", "type": "quantitative" },
-              { "field": "codon_index", "type": "quantitative" },
-              { "field": "codon_pos", "type": "quantitative" },
-              { "field": "codon", "type": "nominal" },
-              { "field": "aa_label", "type": "nominal" },
-              { "field": "base", "type": "nominal" }
+              {
+                "field": "CHROM",
+                "type": "nominal"
+              },
+              {
+                "field": "product",
+                "type": "nominal"
+              },
+              {
+                "field": "gene",
+                "type": "nominal"
+              },
+              {
+                "field": "genome_pos",
+                "type": "quantitative"
+              },
+              {
+                "field": "cds_nt_index",
+                "type": "quantitative"
+              },
+              {
+                "field": "codon_index",
+                "type": "quantitative"
+              },
+              {
+                "field": "codon_pos",
+                "type": "quantitative"
+              },
+              {
+                "field": "codon",
+                "type": "nominal"
+              },
+              {
+                "field": "aa_label",
+                "type": "nominal"
+              },
+              {
+                "field": "base",
+                "type": "nominal"
+              }
             ],
             "x": {
               "field": "genome_pos",
               "title": "Genome position (1-based)",
               "type": "quantitative"
             },
-            "x2": { "field": "x2" },
+            "x2": {
+              "field": "x2"
+            },
             "y": {
               "field": "product",
               "sort": [
@@ -117,8 +213,14 @@
             "strokeWidth": 1
           },
           "encoding": {
-            "text": { "field": "base", "type": "nominal" },
-            "x": { "field": "x_mid", "type": "quantitative" },
+            "text": {
+              "field": "base",
+              "type": "nominal"
+            },
+            "x": {
+              "field": "x_mid",
+              "type": "quantitative"
+            },
             "y": {
               "field": "product",
               "sort": [
@@ -136,7 +238,9 @@
           }
         }
       ],
-      "data": { "name": "data-8fb1d001c9584e6ee761d2bf63274f5c" },
+      "data": {
+        "name": "data-8fb1d001c9584e6ee761d2bf63274f5c"
+      },
       "height": 144,
       "title": "Per-nucleotide amino acid context by product (centered nucleotide labels)",
       "width": 756
@@ -145,20 +249,31 @@
   "params": [
     {
       "name": "param_2",
-      "select": { "type": "interval", "encodings": ["x", "y"] },
+      "select": {
+        "type": "interval",
+        "encodings": ["x", "y"]
+      },
       "bind": "scales",
       "views": ["view_6"]
     },
     {
       "name": "xzoom",
-      "select": { "type": "interval", "encodings": ["x"] },
+      "select": {
+        "type": "interval",
+        "encodings": ["x"]
+      },
       "bind": "scales",
       "views": ["view_5", "view_6"]
     }
   ],
-  "resolve": { "scale": { "color": "independent", "x": "shared" } },
+  "resolve": {
+    "scale": {
+      "color": "independent",
+      "x": "shared"
+    }
+  },
   "spacing": 6,
-  "$schema": "https://vega.github.io/schema/vega-lite/v5.20.1.json",
+  "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
   "datasets": {
     "data-a1ad66d96417cbab667365597f608ba0": [
       {
