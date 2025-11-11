@@ -59,7 +59,7 @@
       "height": 120,
       "name": "view_6",
       "title": "Variants by product (tick length ~ AF range; opacity ~ samples)",
-      "width": 800
+      "width": 756
     },
     {
       "layer": [
@@ -139,7 +139,7 @@
       "data": { "name": "data-8fb1d001c9584e6ee761d2bf63274f5c" },
       "height": 144,
       "title": "Per-nucleotide amino acid context by product (centered nucleotide labels)",
-      "width": 900
+      "width": 756
     }
   ],
   "params": [
