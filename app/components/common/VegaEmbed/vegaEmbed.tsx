@@ -11,6 +11,102 @@ export interface VegaEmbedProps {
 }
 
 /**
+ * Extract genome_pos extent from a single dataset array.
+ * @param dataset - Array of data points.
+ * @returns The min and max values found in this dataset.
+ */
+function getDatasetExtent(dataset: unknown[]): {
+  max: number;
+  min: number;
+} {
+  let min = Infinity;
+  let max = -Infinity;
+
+  for (const dataPoint of dataset) {
+    const point = dataPoint as Record<string, unknown>;
+    if (
+      point.genome_pos !== undefined &&
+      typeof point.genome_pos === "number"
+    ) {
+      min = Math.min(min, point.genome_pos);
+      max = Math.max(max, point.genome_pos);
+    }
+  }
+
+  return { max, min };
+}
+
+/**
+ * Calculate the data extent for genome_pos field in datasets.
+ * @param vegaSpec - The Vega specification.
+ * @returns The min and max values, or null if no data found.
+ */
+function calculateGenomePosExtent(
+  vegaSpec: VisualizationSpec
+): [number, number] | null {
+  let xMin = Infinity;
+  let xMax = -Infinity;
+
+  if (vegaSpec.datasets) {
+    const datasets = Object.values(
+      vegaSpec.datasets as Record<string, unknown>
+    );
+    for (const dataset of datasets) {
+      if (Array.isArray(dataset)) {
+        const { max, min } = getDatasetExtent(dataset);
+        xMin = Math.min(xMin, min);
+        xMax = Math.max(xMax, max);
+      }
+    }
+  }
+
+  return xMin !== Infinity && xMax !== -Infinity ? [xMin, xMax] : null;
+}
+
+/**
+ * Set explicit x-axis domain on a Vega spec to ensure proper centering.
+ * @param vegaSpec - The Vega specification to modify.
+ * @param domain - The domain to set [min, max].
+ */
+function setXAxisDomain(
+  vegaSpec: VisualizationSpec,
+  domain: [number, number]
+): void {
+  const spec = vegaSpec as Record<string, unknown>;
+
+  if (spec.vconcat && Array.isArray(spec.vconcat)) {
+    for (const view of spec.vconcat) {
+      const v = view as Record<string, unknown>;
+      const encoding = v.encoding as Record<string, unknown> | undefined;
+      if (encoding?.x) {
+        const x = encoding.x as Record<string, unknown>;
+        encoding.x = {
+          ...x,
+          scale: {
+            ...(x.scale as Record<string, unknown> | undefined),
+            domain,
+            nice: false,
+          },
+        };
+      }
+    }
+  } else if (spec.encoding) {
+    const encoding = spec.encoding as Record<string, unknown>;
+    if (encoding.x) {
+      const x = encoding.x as Record<string, unknown>;
+      encoding.x = {
+        ...x,
+        scale: {
+          ...(x.scale as Record<string, unknown> | undefined),
+          domain,
+          nice: false,
+        },
+      };
+    }
+  }
+}
+
+/**
  * VegaEmbed component for rendering Vega-Lite visualizations.
  * @param props - Component props.
  * @param props.caption - Optional caption to display below the visualization.
@@ -41,6 +137,16 @@ export const VegaEmbed = ({ caption, spec }: VegaEmbedProps): JSX.Element => {
           vegaSpec = spec;
         }
 
+        // Calculate and set x-axis domain for proper centering
+        const extent = calculateGenomePosExtent(vegaSpec);
+        if (extent) {
+          const [min, max] = extent;
+          const range = max - min;
+          const padding = range * 0.05;
+          const paddedExtent: [number, number] = [min - padding, max + padding];
+          setXAxisDomain(vegaSpec, paddedExtent);
+        }
+
         // Embed the visualization with responsive sizing
         result = await embed(containerRef.current, vegaSpec, {
           actions: {
@@ -51,8 +157,11 @@ export const VegaEmbed = ({ caption, spec }: VegaEmbedProps): JSX.Element => {
           },
           config: {
             autosize: {
-              contains: "padding",
+              resize: true,
               type: "fit-x",
+            },
+            scale: {
+              nice: false,
             },
           },
         });
