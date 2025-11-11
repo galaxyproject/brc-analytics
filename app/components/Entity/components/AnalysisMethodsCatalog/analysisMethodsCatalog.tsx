@@ -2,7 +2,6 @@ import { AnalysisMethod } from "../AnalysisMethod/analysisMethod";
 import { Props } from "./types";
 import { useRouter } from "next/router";
 import { Fragment } from "react";
-import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import { CustomWorkflow } from "../AnalysisMethod/components/CustomWorkflow/customWorkflow";
 import { AnalysisTypeHeader } from "./components/AnalysisTypeHeader/analysisTypeHeader";
 import { Stack } from "@mui/material";
@@ -14,7 +13,6 @@ export const AnalysisMethodsCatalog = ({ assembly }: Props): JSX.Element => {
     assembly,
     WORKFLOW_CATEGORIES
   );
-  const isFeatureEnabled = useFeatureFlag("custom-workflow");
 
   const {
     query: { entityId },
@@ -23,15 +21,13 @@ export const AnalysisMethodsCatalog = ({ assembly }: Props): JSX.Element => {
   return (
     <Stack gap={8} useFlexGap>
       {/* Custom Analysis */}
-      {isFeatureEnabled && (
-        <Stack gap={4} useFlexGap>
-          <AnalysisTypeHeader
-            description="Prefer to explore the data without a predefined workflow?"
-            title="Custom Analysis"
-          />
-          <CustomWorkflow entityId={entityId as string} />
-        </Stack>
-      )}
+      <Stack gap={4} useFlexGap>
+        <AnalysisTypeHeader
+          description="Prefer to explore the data without a predefined workflow?"
+          title="Custom Analysis"
+        />
+        <CustomWorkflow entityId={entityId as string} />
+      </Stack>
       <Stack gap={4} useFlexGap>
         {/* Workflow Analysis */}
         <AnalysisTypeHeader
