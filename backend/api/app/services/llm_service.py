@@ -97,6 +97,8 @@ class LLMService:
                     api_key=self.settings.AI_API_KEY,
                     base_url=self.settings.AI_API_BASE_URL,
                 )
+                logger.info(f"Primary model: {self.settings.AI_PRIMARY_MODEL}")
+                logger.info(f"Secondary model: {self.settings.AI_SECONDARY_MODEL}")
                 self.primary_model = OpenAIChatModel(
                     self.settings.AI_PRIMARY_MODEL, provider=openai_provider
                 )
@@ -238,7 +240,7 @@ Return ONLY the JSON array. No markdown code blocks, no explanations, no extra t
         reraise=True,
     )
     async def _call_agent_with_retry(
-        self, agent: Agent, prompt: str, timeout: float = 30.0
+        self, agent: Agent, prompt: str, timeout: float = 60.0
     ):
         """
         Call an LLM agent with automatic retry on transient failures and timeout.
@@ -246,18 +248,29 @@ Return ONLY the JSON array. No markdown code blocks, no explanations, no extra t
         Args:
             agent: The pydantic-ai Agent to call
             prompt: The prompt to send to the agent
-            timeout: Maximum time in seconds to wait for a response (default: 30s)
+            timeout: Maximum time in seconds to wait for a response (default: 60s)
 
         Retries up to 3 times with exponential backoff (2s, 4s, 8s max).
         Only retries on exceptions (network errors, timeouts, etc).
         Re-raises the exception after all retries are exhausted.
         """
-        logger.debug(f"Calling agent with prompt: {prompt[:100]}...")
+        import time
+
+        start_time = time.time()
+        logger.info(f"=== LLM CALL START ===")
+        logger.info(f"Timeout: {timeout}s")
+        logger.info(f"Prompt length: {len(prompt)} chars")
+        logger.info(f"Prompt preview: {prompt[:200]}...")
         try:
             result = await asyncio.wait_for(agent.run(prompt), timeout=timeout)
+            elapsed = time.time() - start_time
+            logger.info(f"=== LLM CALL SUCCESS === Took {elapsed:.2f}s")
             return result
         except asyncio.TimeoutError as e:
-            logger.error(f"LLM call timed out after {timeout}s")
+            elapsed = time.time() - start_time
+            logger.error(
+                f"=== LLM CALL TIMEOUT === After {elapsed:.2f}s (limit: {timeout}s)"
+            )
             raise Exception(f"LLM request timed out after {timeout} seconds") from e
 
     def _clean_json_response(self, raw_output: str) -> str:
