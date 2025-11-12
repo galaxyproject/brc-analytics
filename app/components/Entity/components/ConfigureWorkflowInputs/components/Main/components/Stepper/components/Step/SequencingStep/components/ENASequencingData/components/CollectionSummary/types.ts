@@ -1,9 +1,6 @@
-import { ReadRun } from "../../types";
-import { Table } from "@tanstack/react-table";
-
 export interface Props {
   onClear: () => void;
   onEdit: () => void;
+  requirementsMatches: string[];
   selectedCount: number;
-  table: Table<ReadRun>;
 }

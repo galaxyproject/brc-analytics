@@ -8,8 +8,12 @@ import {
   OnLaunchGalaxy,
 } from "./components/Step/hooks/UseLaunchGalaxy/types";
 import { GA2AssemblyEntity } from "../../../../../../../../apis/catalog/ga2/entities";
+import { StepConfig } from "./components/Step/types";
+import { ConfiguredInput } from "../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 
 export interface Props {
+  configuredInput: ConfiguredInput;
+  configuredSteps: StepConfig[];
   genome: BRCDataCatalogGenome | GA2AssemblyEntity;
   onConfigure: OnConfigure;
   onLaunchGalaxy: OnLaunchGalaxy;

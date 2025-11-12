@@ -2,6 +2,10 @@ import { ConfiguredInput } from "../../../../../../../../../../../../views/Workf
 import { Workflow } from "../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import { WORKFLOW_PARAMETER_VARIABLE } from "../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { ConfiguredValue } from "./types";
+import {
+  ANCHOR_TARGET,
+  REL_ATTRIBUTE,
+} from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 
 export function getRequiredParameterTypes(
   workflow: Workflow
@@ -27,8 +31,13 @@ export function getConfiguredValues(
   configuredInput: ConfiguredInput,
   workflow: Workflow
 ): ConfiguredValue | undefined {
-  const { geneModelUrl, readRunsPaired, readRunsSingle, referenceAssembly } =
-    configuredInput;
+  const {
+    geneModelUrl,
+    readRunsPaired,
+    readRunsSingle,
+    referenceAssembly,
+    tracks,
+  } = configuredInput;
 
   // If workflow is not available yet, return undefined
   if (!workflow?.parameters) return undefined;
@@ -49,5 +58,21 @@ export function getConfiguredValues(
     // referenceAssembly is currently always set, but there are workflows that don't require referenceAssembly.
     // xref https://github.com/galaxyproject/brc-analytics/issues/652
     referenceAssembly: referenceAssembly!,
+    tracks: tracks ?? null,
   };
+}
+
+/**
+ * Launches the Galaxy workflow.
+ * Creates a hidden anchor element and clicks it to launch the workflow.
+ * @param url - Galaxy URL.
+ */
+export function launchGalaxy(url: string): void {
+  const el = document.createElement("a");
+  el.href = url;
+  el.rel = REL_ATTRIBUTE.NO_OPENER_NO_REFERRER;
+  el.target = ANCHOR_TARGET.BLANK;
+  document.body.appendChild(el);
+  el.click();
+  document.body.removeChild(el);
 }

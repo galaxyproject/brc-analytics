@@ -87,6 +87,22 @@ const LIBRARY_STRATEGY: ColumnDef<ReadRun> = {
   meta: META,
 };
 
+const LIBRARY_SOURCE: ColumnDef<ReadRun> = {
+  ...SORTING_COLUMN_DEF,
+  accessorKey: CATEGORY_CONFIGS.LIBRARY_SOURCE.key,
+  filterFn: SELECT_FILTER_FN,
+  header: CATEGORY_CONFIGS.LIBRARY_SOURCE.label,
+  meta: META,
+};
+
+const DESCRIPTION: ColumnDef<ReadRun> = {
+  ...SORTING_COLUMN_DEF,
+  accessorKey: CATEGORY_CONFIGS.DESCRIPTION.key,
+  filterFn: SELECT_FILTER_FN,
+  header: CATEGORY_CONFIGS.DESCRIPTION.label,
+  meta: { width: { max: "2fr", min: "200px" } },
+};
+
 const READ_COUNT: ColumnDef<ReadRun> = {
   ...SORTING_COLUMN_DEF,
   accessorKey: CATEGORY_CONFIGS.READ_COUNT.key,
@@ -130,6 +146,10 @@ const STUDY_ACCESSION: ColumnDef<ReadRun> = {
   meta: META,
 };
 
+const TAX_ID: ColumnDef<ReadRun> = {
+  accessorKey: CATEGORY_CONFIGS.TAX_ID.key,
+};
+
 export const columns: ColumnDef<ReadRun>[] = [
   COLUMN_DEF.ROW_SELECTION as ColumnDef<ReadRun>,
   RUN_ACCESSION,
@@ -142,7 +162,10 @@ export const columns: ColumnDef<ReadRun>[] = [
   INSTRUMENT_PLATFORM,
   INSTRUMENT_MODEL,
   LIBRARY_STRATEGY,
+  LIBRARY_SOURCE,
   LIBRARY_LAYOUT,
+  DESCRIPTION,
   READ_COUNT,
   BASE_COUNT,
+  TAX_ID,
 ];

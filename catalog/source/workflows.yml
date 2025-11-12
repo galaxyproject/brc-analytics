@@ -111,6 +111,9 @@ workflows:
         variable: ASSEMBLY_ID
       - key: PE fastq input
         variable: SANGER_READ_RUN_PAIRED
+        data_requirements:
+          library_strategy: ["ATAC-seq"]
+          library_layout: "PAIRED"
         type_guide:
           class: Collection
           collection_type: list:paired
@@ -347,6 +350,9 @@ workflows:
         variable: ASSEMBLY_ID
       - key: PE fastq input
         variable: SANGER_READ_RUN_PAIRED
+        data_requirements:
+          library_strategy: ["ChIP-Seq"]
+          library_layout: "PAIRED"
         type_guide:
           class: Collection
           collection_type: list:paired
@@ -381,6 +387,9 @@ workflows:
         variable: ASSEMBLY_ID
       - key: SR fastq input
         variable: SANGER_READ_RUN_SINGLE
+        data_requirements:
+          library_strategy: ["ChIP-Seq"]
+          library_layout: "SINGLE"
         type_guide:
           class: Collection
           collection_type: list
@@ -499,6 +508,10 @@ workflows:
         variable: ASSEMBLY_ID
       - key: PE fastq input
         variable: SANGER_READ_RUN_PAIRED
+        data_requirements:
+          library_strategy: ["OTHER"]
+          library_layout: "PAIRED"
+          description: "CUT&RUN"
         type_guide:
           class: Collection
           collection_type: list:paired
@@ -536,6 +549,10 @@ workflows:
       - key: gtf
         variable: GENE_MODEL_URL
       - key: fastq PE collection GEX
+        variable: SANGER_READ_RUN_PAIRED
+        data_requirements:
+          library_source: ["TRANSCRIPTOMIC SINGLE CELL"]
+          library_layout: "PAIRED"
         type_guide:
           class: Collection
           collection_type: list:paired
@@ -578,6 +595,9 @@ workflows:
         variable: GENE_MODEL_URL
       - key: fastq PE collection
         variable: SANGER_READ_RUN_PAIRED
+        data_requirements:
+          library_source: ["TRANSCRIPTOMIC SINGLE CELL"]
+          library_layout: "PAIRED"
         type_guide:
           class: Collection
           collection_type: list:paired
@@ -622,6 +642,9 @@ workflows:
         type_guide:
           class: Collection
           collection_type: list:paired
+        data_requirements:
+          library_strategy: ["WGS", "AMPLICON"]
+          library_layout: "PAIRED"
       - key: Reference annotation
         variable: GENE_MODEL_URL
         type_guide:
@@ -652,6 +675,9 @@ workflows:
     parameters:
       - key: Paired Collection
         variable: SANGER_READ_RUN_PAIRED
+        data_requirements:
+          library_strategy: ["WGS"]
+          library_layout: "PAIRED"
         type_guide:
           class: Collection
           ext:
@@ -711,6 +737,9 @@ workflows:
     parameters:
       - key: Paired Collection
         variable: SANGER_READ_RUN_PAIRED
+        data_requirements:
+          library_strategy: ["WGS"]
+          library_layout: "PAIRED"
         type_guide:
           class: Collection
           ext:
@@ -1112,6 +1141,9 @@ workflows:
         variable: GENE_MODEL_URL
       - key: Collection paired FASTQ files
         variable: SANGER_READ_RUN_PAIRED
+        data_requirements:
+          library_strategy: ["RNA-Seq"]
+          library_layout: "PAIRED"
         type_guide:
           class: Collection
           collection_type: list:paired
@@ -1161,6 +1193,9 @@ workflows:
         variable: GENE_MODEL_URL
       - key: Collection of FASTQ files
         variable: SANGER_READ_RUN_SINGLE
+        data_requirements:
+          library_strategy: ["RNA-Seq"]
+          library_layout: "SINGLE"
         type_guide:
           class: Collection
           collection_type: list
@@ -1268,6 +1303,9 @@ workflows:
     parameters:
       - key: Paired Collection
         variable: SANGER_READ_RUN_PAIRED
+        data_requirements:
+          library_strategy: ["WGS"]
+          library_layout: "PAIRED"
         type_guide:
           class: Collection
           ext:
@@ -1311,6 +1349,9 @@ workflows:
     parameters:
       - key: Paired Collection
         variable: SANGER_READ_RUN_PAIRED
+        data_requirements:
+          library_strategy: ["WGS"]
+          library_layout: "PAIRED"
         type_guide:
           class: Collection
           ext:
@@ -1336,7 +1377,10 @@ workflows:
           ext:
             - fastqsanger
             - fastqsanger.gz
-          variable: SANGER_READ_RUN_SINGLE
+        variable: SANGER_READ_RUN_SINGLE
+        data_requirements:
+          library_strategy: ["WGS"]
+          library_layout: "SINGLE"
       - key: NC_045512.2 FASTA sequence of SARS-CoV-2
         variable: ASSEMBLY_FASTA_URL
     active: true

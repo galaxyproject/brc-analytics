@@ -7,6 +7,7 @@ export const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
     label: "Base Count",
     viewKind: VIEW_KIND.RANGE,
   },
+  DESCRIPTION: { key: "description", label: "Description" },
   EXPERIMENT_ACCESSION: {
     key: "experiment_accession",
     label: "Experiment Accession",
@@ -19,6 +20,7 @@ export const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
     label: "Instrument Platform",
   },
   LIBRARY_LAYOUT: { key: "library_layout", label: "Library Layout" },
+  LIBRARY_SOURCE: { key: "library_source", label: "Library Source" },
   LIBRARY_STRATEGY: { key: "library_strategy", label: "Library Strategy" },
   READ_COUNT: {
     key: "read_count",
@@ -29,4 +31,5 @@ export const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
   SAMPLE_ACCESSION: { key: "sample_accession", label: "Sample Accession" },
   SCIENTIFIC_NAME: { key: "scientific_name", label: "Scientific Name" },
   STUDY_ACCESSION: { key: "study_accession", label: "Study Accession" },
+  TAX_ID: { key: "tax_id", label: "Taxonomy ID" },
 } as const;

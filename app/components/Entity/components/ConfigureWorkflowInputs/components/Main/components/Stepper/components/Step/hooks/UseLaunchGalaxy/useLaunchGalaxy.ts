@@ -1,49 +1,54 @@
 import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
-import { useCallback, useEffect } from "react";
-import { getWorkflowLandingUrl } from "../../../../../../../../../../../../utils/galaxy-api/galaxy-api";
+import { useCallback } from "react";
 import {
-  ANCHOR_TARGET,
-  REL_ATTRIBUTE,
-} from "@databiosphere/findable-ui/lib/components/Links/common/entities";
+  getDataLandingUrl,
+  getWorkflowLandingUrl,
+} from "../../../../../../../../../../../../utils/galaxy-api/galaxy-api";
 import { Props, UseLaunchGalaxy } from "./types";
 import { getConfiguredValues } from "./utils";
+import { launchGalaxy } from "./utils";
+import { CUSTOM_WORKFLOW } from "../../../../../../../../../../../../components/Entity/components/AnalysisMethod/components/CustomWorkflow/constants";
 
 export const useLaunchGalaxy = ({
   configuredInput,
   workflow,
 }: Props): UseLaunchGalaxy => {
-  const {
-    data: landingUrl,
-    error,
-    isLoading: loading,
-    run,
-  } = useAsync<string>();
+  const { error, isLoading: loading, run } = useAsync<string>();
   const configuredValue = getConfiguredValues(configuredInput, workflow);
   const disabled = !configuredValue;
 
   const onLaunchGalaxy = useCallback(async (): Promise<void> => {
     if (!configuredValue) return;
 
-    await run(
-      getWorkflowLandingUrl(
-        workflow.trsId,
-        configuredValue.referenceAssembly,
-        configuredValue.geneModelUrl,
-        configuredValue.readRunsSingle,
-        configuredValue.readRunsPaired,
-        workflow.parameters
-      )
-    );
-  }, [configuredValue, run, workflow]);
+    const landingUrl =
+      workflow.trsId === CUSTOM_WORKFLOW.trsId
+        ? await run(
+            getDataLandingUrl(
+              configuredValue.referenceAssembly,
+              configuredValue.geneModelUrl,
+              configuredValue.readRunsSingle,
+              configuredValue.readRunsPaired,
+              configuredValue.tracks
+            )
+          )
+        : await run(
+            getWorkflowLandingUrl(
+              workflow.trsId,
+              configuredValue.referenceAssembly,
+              configuredValue.geneModelUrl,
+              configuredValue.readRunsSingle,
+              configuredValue.readRunsPaired,
+              workflow.parameters
+            )
+          );
 
-  useEffect(() => {
-    if (!landingUrl) return;
-    window.open(
-      landingUrl,
-      ANCHOR_TARGET.BLANK,
-      REL_ATTRIBUTE.NO_OPENER_NO_REFERRER
-    );
-  }, [landingUrl]);
+    if (!landingUrl) {
+      throw new Error("Failed to retrieve Galaxy workflow launch URL.");
+    }
+
+    // Launch the Galaxy workflow.
+    launchGalaxy(landingUrl);
+  }, [configuredValue, run, workflow]);
 
   let errorMessage: string | null = null;
   if (error) {

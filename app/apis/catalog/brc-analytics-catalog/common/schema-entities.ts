@@ -4,4 +4,5 @@ export {
   OutbreakResourceType as OUTBREAK_RESOURCE_TYPE,
   WorkflowParameterVariable as WORKFLOW_PARAMETER_VARIABLE,
   WorkflowPloidy as WORKFLOW_PLOIDY,
+  type WorkflowUrlSpec,
 } from "../../../../../catalog/schema/generated/schema";

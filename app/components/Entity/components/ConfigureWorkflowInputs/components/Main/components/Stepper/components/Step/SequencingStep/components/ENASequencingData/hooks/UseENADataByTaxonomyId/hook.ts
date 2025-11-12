@@ -2,19 +2,23 @@ import { useCallback, useEffect, useState } from "react";
 import { UseENADataByTaxonomyId } from "./types";
 import { fetchENAData } from "./request";
 import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
-import { shouldFetch } from "./utils";
+import { isEligible } from "./utils";
 import { BRCDataCatalogGenome } from "../../../../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import { GA2AssemblyEntity } from "../../../../../../../../../../../../../../../apis/catalog/ga2/entities";
-import { config } from "../../../../../../../../../../../../../../../../app/config/config";
+import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
+import { AppSiteConfig } from "../../../../../../../../../../../../../../../../site-config/common/entities";
 
 export const useENADataByTaxonomyId = <T>(
   genome: BRCDataCatalogGenome | GA2AssemblyEntity
 ): UseENADataByTaxonomyId<T> => {
+  const { ncbiTaxonomyId: taxonomyId } = genome;
+  const { config } = useConfig();
+  const { maxReadRunsForBrowseAll: maxReadRuns } = config as AppSiteConfig;
   const { data, run } = useAsync<T[] | undefined>();
+  const [eligible] = useState<boolean>(isEligible(taxonomyId, maxReadRuns));
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState<boolean>(true);
-  const { ncbiTaxonomyId: taxonomyId } = genome;
-  const { maxReadRunsForBrowseAll } = config();
+
   const onRequestData = useCallback(async (): Promise<void> => {
     run(
       fetchENAData({
@@ -33,15 +37,15 @@ export const useENADataByTaxonomyId = <T>(
   }, [run, taxonomyId]);
 
   useEffect(() => {
-    if (shouldFetch(taxonomyId, maxReadRunsForBrowseAll)) {
+    if (eligible) {
       // Request sequencing data by taxonomy ID and configured filters.
       onRequestData();
     } else {
       // When the read count is not found, is 0, or greater than the maximum allowable count,
-      // the user should not be able to browse all sequences.
+      // the user should not be able to browse sequences by taxonomy ID.
       setLoading(false);
     }
-  }, [onRequestData, taxonomyId, maxReadRunsForBrowseAll]);
+  }, [eligible, onRequestData]);
 
-  return { data, status: { errors, loading } };
+  return { data, status: { eligible, errors, loading } };
 };

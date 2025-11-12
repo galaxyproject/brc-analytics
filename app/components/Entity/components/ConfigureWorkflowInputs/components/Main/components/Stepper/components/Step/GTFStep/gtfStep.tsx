@@ -50,7 +50,7 @@ export const GTFStep = ({
   // Empty string represents "user will provide in Galaxy" similar to how sequencing steps use empty arrays
   useEffect(() => {
     if (error && active) {
-      onConfigure(STEP.key, ""); // Use empty string instead of null
+      onConfigure({ [STEP.key]: "" }); // Use empty string instead of null
     }
   }, [error, active, onConfigure]);
 
@@ -91,7 +91,7 @@ export const GTFStep = ({
                 <FormControlLabel
                   control={<Radio />}
                   key={i}
-                  onChange={() => onConfigure(STEP.key, value)}
+                  onChange={() => onConfigure({ [STEP.key]: value })}
                   label={label}
                   value={value}
                 />

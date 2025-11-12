@@ -1,0 +1,89 @@
+id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/enums/library_strategy.yaml#
+name: enums_library_strategy
+
+enums:
+  LibraryStrategy:
+    description: Enumeration of possible library strategies for sequencing data.
+    permissible_values:
+      WGS:
+        description: Whole genome sequencing
+      WGA:
+        description: Whole genome amplification
+      WXS:
+        description: Whole exome sequencing
+      RNA-Seq:
+        description: RNA sequencing
+      snRNA-seq:
+        description: Small nuclear RNA sequencing
+      ssRNA-seq:
+        description: Single-stranded RNA sequencing
+      miRNA-Seq:
+        description: microRNA sequencing
+      ncRNA-Seq:
+        description: Non-coding RNA sequencing
+      FL-cDNA:
+        description: Full-length cDNA sequencing
+      EST:
+        description: Expressed sequence tag
+      Hi-C:
+        description: Chromosome conformation capture
+      ATAC-seq:
+        description: Assay for transposase-accessible chromatin sequencing
+      WCS:
+        description: Whole chromosome sequencing
+      RAD-Seq:
+        description: Restriction site associated DNA sequencing
+      CLONE:
+        description: Clone sequencing
+      POOLCLONE:
+        description: Pooled clone sequencing
+      AMPLICON:
+        description: Amplicon sequencing
+      CLONEEND:
+        description: Clone end sequencing
+      FINISHING:
+        description: Sequencing intended to close gaps in a genome assembly
+      ChIP-Seq:
+        description: Chromatin immunoprecipitation sequencing
+      MNase-Seq:
+        description: Micrococcal nuclease sequencing
+      Ribo-Seq:
+        description: Ribosome profiling
+      DNase-Hypersensitivity:
+        description: DNase hypersensitivity sequencing
+      Bisulfite-Seq:
+        description: Bisulfite sequencing
+      CTS:
+        description: Concatenated tag sequencing
+      ChM-Seq:
+        description: ChIPmentation combines chromatin immunoprecipitation with sequencing library preparation by Tn5 transposase
+      GBS:
+        description: Genotyping by sequencing
+      MRE-Seq:
+        description: Methylation-sensitive restriction enzyme sequencing
+      MeDIP-Seq:
+        description: Methylated DNA immunoprecipitation sequencing
+      MBD-Seq:
+        description: Methyl-CpG binding domain sequencing
+      NOMe-Seq:
+        description: Nucleosome occupancy and methylome sequencing
+      Tn-Seq:
+        description: Quantitatively determine fitness of bacterial genes based on how many times a purposely seeded transposon gets inserted into each gene of a colony after some time.
+      VALIDATION:
+        description: Independent experiment to re-evaluate putative variants
+      FAIRE-seq:
+        description: Formaldehyde-assisted isolation of regulatory elements sequencing
+      SELEX:
+        description: Systematic evolution of ligands by exponential enrichment sequencing
+      RIP-Seq:
+        description: RNA immunoprecipitation sequencing
+      ChIA-PET:
+        description: Direct sequencing of proximity-ligated chromatin immunoprecipitates
+      Synthetic-Long-Read:
+        description: Binning and barcoding of large DNA fragments to facilitate assembly of the fragment
+      Targeted-Capture:
+        description: Enrichment of a targeted subset of loci
+      Tethered Chromatin Conformation Capture:
+        description: Tethered chromosome conformation capture
+      OTHER:
+        description: Other, unspecified, or unknown library strategy

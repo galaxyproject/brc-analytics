@@ -9,6 +9,7 @@ import pandas as pd
 import requests
 import yaml
 from bs4 import BeautifulSoup
+from requests.exceptions import ConnectTimeout
 
 from .qc_utils import format_list_section, format_raw_section, join_report
 
@@ -1145,13 +1146,15 @@ def make_qc_report(
 ):
     # Convert simple lists to items for format_list_section
     ncbi_assemblies_items = (
-        list(missing_ncbi_assemblies) if missing_ncbi_assemblies else []
+        list(missing_ncbi_assemblies) if len(missing_ncbi_assemblies) > 0 else []
     )
     ucsc_assemblies_items = (
-        list(missing_ucsc_assemblies) if missing_ucsc_assemblies else []
+        list(missing_ucsc_assemblies) if len(missing_ucsc_assemblies) > 0 else []
     )
     gene_model_urls_items = (
-        list(missing_gene_model_urls) if missing_gene_model_urls else None
+        list(missing_gene_model_urls)
+        if missing_gene_model_urls is not None and len(missing_gene_model_urls) > 0
+        else None
     )
     taxonomy_ids_items = (
         [f"{taxon}: {ids}" for taxon, ids in inconsistent_taxonomy_ids]
@@ -1581,12 +1584,33 @@ def build_files(
         )
 
 
+def create_taxonomy_read_run_count(genomes_tsv_path: str, output_path: str):
+    """Create taxonomy read run count JSON file from genomes TSV.
+    Args:
+        genomes_tsv_path: Path to the genomes TSV file
+        output_path: Path where the taxonomy read run count JSON will be written
+    """
+    df = pd.read_csv(genomes_tsv_path, sep="\t")
+    unique_taxonomy_ids = df["taxonomyId"].drop_duplicates()
+    print("Creating taxonomy read run counts")
+    with open(output_path, "w") as writer:
+        writer.write(
+            json.dumps(
+                generate_taxon_read_run_count(unique_taxonomy_ids.tolist()), indent=2
+            )
+        )
+    print("Taxonomy read run counts created")
+
+
 def generate_taxon_read_run_count(taxonomy_ids):
     taxon_counter = {}
     url = "https://www.ebi.ac.uk/ena/portal/api/search"
     counter = 0
+    num_taxids = len(taxonomy_ids)
     for tId in taxonomy_ids:
-        processing = f"Processed {counter} taxonomy IDs, processing tx id: {tId}"
+        processing = (
+            f"Processed {counter} taxonomy IDs of {num_taxids}, processing tx id: {tId}"
+        )
         print(f"{processing:<120}", end="\r")
         params = {
             "result": "read_run",
@@ -1594,9 +1618,15 @@ def generate_taxon_read_run_count(taxonomy_ids):
             "fields": "experiment_accession,study_accession",
             "format": "json",
         }
-        resp = requests.get(url, params=params)
-        resp.raise_for_status()
+        try:
+            resp = requests.get(url, params=params)
+            resp.raise_for_status()
+        except ConnectTimeout:
+            print("Timeout, sleeping 10s")
+            time.sleep(10)
+            resp = requests.get(url, params=params)
+            resp.raise_for_status()
         taxon_counter[tId] = len(resp.json())
         counter += 1
     print(f"Processed {counter} taxonomy IDs", end="\n")
-    return taxon_counter
+    return dict(sorted(taxon_counter.items(), key=lambda x: x[1], reverse=True))

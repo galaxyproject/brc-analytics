@@ -15,9 +15,9 @@ import { GA2AssemblyEntity } from "../../../../../../../../../../apis/catalog/ga
 export interface StepConfig {
   description?: ReactNode;
   disabled?: boolean;
-  key: keyof ConfiguredInput;
+  key: keyof ConfiguredInput | "readRunsAny";
   label: string;
-  renderValue: (ci: ConfiguredInput) => string | undefined;
+  renderValue?: (ci: ConfiguredInput) => string | undefined;
   Step: ComponentType<StepProps>;
 }
 
@@ -25,6 +25,7 @@ export interface StepProps
   extends Pick<StepConfig, "description" | "disabled">,
     Pick<MStepProps, "completed" | "last">,
     Required<Pick<MStepProps, "index" | "active">> {
+  configuredInput: ConfiguredInput;
   entryLabel: string;
   genome: BRCDataCatalogGenome | GA2AssemblyEntity;
   onConfigure: OnConfigure;
@@ -32,6 +33,6 @@ export interface StepProps
   onEdit: OnEdit;
   onLaunchGalaxy: OnLaunchGalaxy;
   status: Status;
-  stepKey: keyof ConfiguredInput;
+  stepKey: keyof ConfiguredInput | "readRunsAny";
   workflow: Workflow;
 }

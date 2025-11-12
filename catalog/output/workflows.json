@@ -10,7 +10,14 @@
         "parameters": [
           {
             "key": "Paired collection of sequencing data",
-            "variable": "SANGER_READ_RUN_PAIRED"
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "library_layout": "PAIRED",
+              "library_strategy": [
+                "WGS",
+                "AMPLICON"
+              ]
+            }
           },
           {
             "key": "Reference annotation",
@@ -32,7 +39,13 @@
         "parameters": [
           {
             "key": "Paired Collection",
-            "variable": "SANGER_READ_RUN_PAIRED"
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "library_layout": "PAIRED",
+              "library_strategy": [
+                "WGS"
+              ]
+            }
           },
           {
             "key": "Annotation GTF",
@@ -54,7 +67,13 @@
         "parameters": [
           {
             "key": "Paired Collection",
-            "variable": "SANGER_READ_RUN_PAIRED"
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "library_layout": "PAIRED",
+              "library_strategy": [
+                "WGS"
+              ]
+            }
           },
           {
             "key": "NC_045512.2 FASTA sequence of SARS-CoV-2",
@@ -88,7 +107,13 @@
         "parameters": [
           {
             "key": "Paired Collection",
-            "variable": "SANGER_READ_RUN_PAIRED"
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "library_layout": "PAIRED",
+              "library_strategy": [
+                "WGS"
+              ]
+            }
           },
           {
             "key": "NC_045512.2 FASTA sequence of SARS-CoV-2",
@@ -104,6 +129,16 @@
       {
         "iwcId": "sars-cov-2-se-illumina-wgs-variant-calling-covid-19-se-wgs-illumina",
         "parameters": [
+          {
+            "key": "Single End Collection",
+            "variable": "SANGER_READ_RUN_SINGLE",
+            "data_requirements": {
+              "library_layout": "SINGLE",
+              "library_strategy": [
+                "WGS"
+              ]
+            }
+          },
           {
             "key": "NC_045512.2 FASTA sequence of SARS-CoV-2",
             "variable": "ASSEMBLY_FASTA_URL"
@@ -133,6 +168,16 @@
           {
             "key": "gtf",
             "variable": "GENE_MODEL_URL"
+          },
+          {
+            "key": "fastq PE collection GEX",
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "library_layout": "PAIRED",
+              "library_source": [
+                "TRANSCRIPTOMIC SINGLE CELL"
+              ]
+            }
           }
         ],
         "ploidy": "ANY",
@@ -154,7 +199,13 @@
           },
           {
             "key": "fastq PE collection",
-            "variable": "SANGER_READ_RUN_PAIRED"
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "library_layout": "PAIRED",
+              "library_source": [
+                "TRANSCRIPTOMIC SINGLE CELL"
+              ]
+            }
           }
         ],
         "ploidy": "ANY",
@@ -176,7 +227,13 @@
           },
           {
             "key": "Collection paired FASTQ files",
-            "variable": "SANGER_READ_RUN_PAIRED"
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "library_layout": "PAIRED",
+              "library_strategy": [
+                "RNA-Seq"
+              ]
+            }
           }
         ],
         "ploidy": "ANY",
@@ -198,7 +255,13 @@
           },
           {
             "key": "Collection of FASTQ files",
-            "variable": "SANGER_READ_RUN_SINGLE"
+            "variable": "SANGER_READ_RUN_SINGLE",
+            "data_requirements": {
+              "library_layout": "SINGLE",
+              "library_strategy": [
+                "RNA-Seq"
+              ]
+            }
           }
         ],
         "ploidy": "ANY",
@@ -224,7 +287,13 @@
           },
           {
             "key": "PE fastq input",
-            "variable": "SANGER_READ_RUN_PAIRED"
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "library_layout": "PAIRED",
+              "library_strategy": [
+                "ATAC-seq"
+              ]
+            }
           }
         ],
         "ploidy": "ANY",
@@ -242,7 +311,13 @@
           },
           {
             "key": "PE fastq input",
-            "variable": "SANGER_READ_RUN_PAIRED"
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "library_layout": "PAIRED",
+              "library_strategy": [
+                "ChIP-Seq"
+              ]
+            }
           }
         ],
         "ploidy": "ANY",
@@ -260,7 +335,13 @@
           },
           {
             "key": "SR fastq input",
-            "variable": "SANGER_READ_RUN_SINGLE"
+            "variable": "SANGER_READ_RUN_SINGLE",
+            "data_requirements": {
+              "library_layout": "SINGLE",
+              "library_strategy": [
+                "ChIP-Seq"
+              ]
+            }
           }
         ],
         "ploidy": "ANY",
@@ -287,7 +368,14 @@
           },
           {
             "key": "PE fastq input",
-            "variable": "SANGER_READ_RUN_PAIRED"
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "description": "CUT&RUN",
+              "library_layout": "PAIRED",
+              "library_strategy": [
+                "OTHER"
+              ]
+            }
           }
         ],
         "ploidy": "ANY",
@@ -309,7 +397,14 @@
         "parameters": [
           {
             "key": "Paired collection of sequencing data",
-            "variable": "SANGER_READ_RUN_PAIRED"
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "library_layout": "PAIRED",
+              "library_strategy": [
+                "WGS",
+                "AMPLICON"
+              ]
+            }
           },
           {
             "key": "Reference annotation",

@@ -1,5 +1,7 @@
-import { SortingState } from "@tanstack/react-table";
+import { SortingState, VisibilityState } from "@tanstack/react-table";
 import { CATEGORY_CONFIGS } from "./categoryConfigs";
+
+export const COLUMN_VISIBILITY: VisibilityState = { tax_id: false };
 
 export const SORTING: SortingState = [
   {
