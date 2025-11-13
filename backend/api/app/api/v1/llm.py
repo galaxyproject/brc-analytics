@@ -268,42 +268,7 @@ async def unified_search(
                 detail="LLM service is not available. Please check API configuration.",
             )
 
-        # Interpret the query to determine intent
-        interpretation_response = await llm_service.interpret_search_query(
-            request.query
-        )
-
-        if not interpretation_response.success:
-            raise HTTPException(status_code=400, detail=interpretation_response.error)
-
-        interpretation = interpretation_response.data
-
-        # Initialize response structure
-        response_data = {
-            "status": "success",
-            "query": request.query,
-            "interpretation": {
-                "organism": interpretation.organism,
-                "taxonomy_id": interpretation.taxonomy_id,
-                "experiment_type": interpretation.experiment_type,
-                "library_strategy": interpretation.library_strategy,
-                "library_source": interpretation.library_source,
-                "sequencing_platform": interpretation.sequencing_platform,
-                "date_range": interpretation.date_range,
-                "keywords": interpretation.keywords,
-                "study_type": interpretation.study_type,
-                "assembly_level": interpretation.assembly_level,
-                "assembly_completeness": interpretation.assembly_completeness,
-                "confidence": interpretation.confidence,
-            },
-            "datasets": None,
-            "workflows": None,
-            "llm_tokens_used": interpretation_response.tokens_used,
-            "model_used": interpretation_response.model_used,
-        }
-
-        # Determine if query is asking for data, workflows, or both
-        # Check if query contains workflow-related terms
+        # Check for workflow intent first
         workflow_keywords = [
             "workflow",
             "pipeline",
@@ -317,12 +282,50 @@ async def unified_search(
         query_lower = request.query.lower()
         has_workflow_intent = any(kw in query_lower for kw in workflow_keywords)
 
-        # Always search for datasets if we have taxonomy or other search criteria
+        # Interpret the query to determine data search criteria
+        interpretation_response = await llm_service.interpret_search_query(
+            request.query
+        )
+
+        # If interpretation fails and there's no workflow intent, return error
+        if not interpretation_response.success and not has_workflow_intent:
+            raise HTTPException(status_code=400, detail=interpretation_response.error)
+
+        # Get interpretation data if successful, otherwise use empty values
+        interpretation = interpretation_response.data if interpretation_response.success else None
+
+        # Initialize response structure
+        response_data = {
+            "status": "success",
+            "query": request.query,
+            "interpretation": {
+                "organism": interpretation.organism if interpretation else None,
+                "taxonomy_id": interpretation.taxonomy_id if interpretation else None,
+                "experiment_type": interpretation.experiment_type if interpretation else None,
+                "library_strategy": interpretation.library_strategy if interpretation else None,
+                "library_source": interpretation.library_source if interpretation else None,
+                "sequencing_platform": interpretation.sequencing_platform if interpretation else None,
+                "date_range": interpretation.date_range if interpretation else None,
+                "keywords": interpretation.keywords if interpretation else [],
+                "study_type": interpretation.study_type if interpretation else None,
+                "assembly_level": interpretation.assembly_level if interpretation else None,
+                "assembly_completeness": interpretation.assembly_completeness if interpretation else None,
+                "confidence": interpretation.confidence if interpretation else 0.0,
+            },
+            "datasets": None,
+            "workflows": None,
+            "llm_tokens_used": interpretation_response.tokens_used if interpretation_response.success else 0,
+            "model_used": interpretation_response.model_used if interpretation_response.success else None,
+        }
+
+        # Check if we have data search criteria
         has_data_criteria = (
-            interpretation.taxonomy_id
-            or interpretation.organism
-            or interpretation.experiment_type
-            or interpretation.keywords
+            interpretation and (
+                interpretation.taxonomy_id
+                or interpretation.organism
+                or interpretation.experiment_type
+                or interpretation.keywords
+            )
         )
 
         # Search for datasets if we have data criteria
@@ -386,7 +389,11 @@ async def unified_search(
         if has_workflow_intent:
             try:
                 # Create a workflow suggestion request based on interpretation
-                dataset_description = f"{interpretation.organism or 'organism'} {interpretation.experiment_type or interpretation.library_strategy or 'sequencing'} data"
+                if interpretation:
+                    dataset_description = f"{interpretation.organism or 'organism'} {interpretation.experiment_type or interpretation.library_strategy or 'sequencing'} data"
+                else:
+                    # No interpretation available, use generic description
+                    dataset_description = "sequencing data"
                 analysis_goal = request.query
 
                 workflow_request = WorkflowSuggestionRequest(

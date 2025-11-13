@@ -119,33 +119,6 @@ export const UnifiedSearch = (): JSX.Element => {
 
       {data && (
         <Box sx={{ mt: 4 }}>
-          {hasDatasets && data.datasets && (
-            <Box sx={{ mb: 4 }}>
-              <Typography variant="h6" gutterBottom>
-                Datasets ({data.datasets.count})
-              </Typography>
-              <SearchResults
-                response={{
-                  cached: data.datasets.cached,
-                  count: data.datasets.count,
-                  interpretation: data.interpretation,
-                  llm_tokens_used: data.llm_tokens_used,
-                  metadata: {
-                    interpretation_cached: data.datasets.cached,
-                    model_used: data.model_used,
-                    search_cached: data.datasets.cached,
-                  },
-                  query: data.query,
-                  results: data.datasets.results,
-                  search_method: data.datasets.search_method,
-                  status: data.status,
-                }}
-              />
-            </Box>
-          )}
-
-          {hasDatasets && hasWorkflows && <Divider sx={{ my: 4 }} />}
-
           {hasWorkflows && data.workflows && (
             <ResultsContainer>
               <Box>
@@ -198,6 +171,33 @@ export const UnifiedSearch = (): JSX.Element => {
                 </Typography>
               )}
             </ResultsContainer>
+          )}
+
+          {hasWorkflows && hasDatasets && <Divider sx={{ my: 4 }} />}
+
+          {hasDatasets && data.datasets && (
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="h6" gutterBottom>
+                Datasets ({data.datasets.count})
+              </Typography>
+              <SearchResults
+                response={{
+                  cached: data.datasets.cached,
+                  count: data.datasets.count,
+                  interpretation: data.interpretation,
+                  llm_tokens_used: data.llm_tokens_used,
+                  metadata: {
+                    interpretation_cached: data.datasets.cached,
+                    model_used: data.model_used,
+                    search_cached: data.datasets.cached,
+                  },
+                  query: data.query,
+                  results: data.datasets.results,
+                  search_method: data.datasets.search_method,
+                  status: data.status,
+                }}
+              />
+            </Box>
           )}
 
           {!hasDatasets && !hasWorkflows && (
