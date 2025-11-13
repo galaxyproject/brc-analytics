@@ -292,7 +292,9 @@ async def unified_search(
             raise HTTPException(status_code=400, detail=interpretation_response.error)
 
         # Get interpretation data if successful, otherwise use empty values
-        interpretation = interpretation_response.data if interpretation_response.success else None
+        interpretation = (
+            interpretation_response.data if interpretation_response.success else None
+        )
 
         # Initialize response structure
         response_data = {
@@ -301,31 +303,45 @@ async def unified_search(
             "interpretation": {
                 "organism": interpretation.organism if interpretation else None,
                 "taxonomy_id": interpretation.taxonomy_id if interpretation else None,
-                "experiment_type": interpretation.experiment_type if interpretation else None,
-                "library_strategy": interpretation.library_strategy if interpretation else None,
-                "library_source": interpretation.library_source if interpretation else None,
-                "sequencing_platform": interpretation.sequencing_platform if interpretation else None,
+                "experiment_type": interpretation.experiment_type
+                if interpretation
+                else None,
+                "library_strategy": interpretation.library_strategy
+                if interpretation
+                else None,
+                "library_source": interpretation.library_source
+                if interpretation
+                else None,
+                "sequencing_platform": interpretation.sequencing_platform
+                if interpretation
+                else None,
                 "date_range": interpretation.date_range if interpretation else None,
                 "keywords": interpretation.keywords if interpretation else [],
                 "study_type": interpretation.study_type if interpretation else None,
-                "assembly_level": interpretation.assembly_level if interpretation else None,
-                "assembly_completeness": interpretation.assembly_completeness if interpretation else None,
+                "assembly_level": interpretation.assembly_level
+                if interpretation
+                else None,
+                "assembly_completeness": interpretation.assembly_completeness
+                if interpretation
+                else None,
                 "confidence": interpretation.confidence if interpretation else 0.0,
             },
             "datasets": None,
             "workflows": None,
-            "llm_tokens_used": interpretation_response.tokens_used if interpretation_response.success else 0,
-            "model_used": interpretation_response.model_used if interpretation_response.success else None,
+            "llm_tokens_used": interpretation_response.tokens_used
+            if interpretation_response.success
+            else 0,
+            "model_used": interpretation_response.model_used
+            if interpretation_response.success
+            else None,
         }
 
         # Check if we have data search criteria
-        has_data_criteria = (
-            interpretation and (
-                interpretation.taxonomy_id
-                or interpretation.organism
-                or interpretation.experiment_type
-                or interpretation.keywords
-            )
+        has_data_criteria = interpretation and (
+            interpretation.taxonomy_id
+            or interpretation.organism
+            or interpretation.experiment_type
+            or interpretation.keywords
         )
 
         # Search for datasets if we have data criteria
