@@ -2,6 +2,8 @@ import ky, { HTTPError } from "ky";
 import {
   DatasetSearchRequest,
   DatasetSearchResponse,
+  UnifiedSearchRequest,
+  UnifiedSearchResponse,
   WorkflowSuggestionRequest,
   WorkflowSuggestionResponse,
 } from "../types/api";
@@ -75,5 +77,16 @@ export const llmAPIClient = {
     request: WorkflowSuggestionRequest
   ): Promise<WorkflowSuggestionResponse> => {
     return apiClient.post("llm/workflow-suggest", { json: request }).json();
+  },
+
+  /**
+   * Unified search that intelligently returns both datasets and workflow suggestions
+   * @param request - Unified search parameters
+   * @returns Promise resolving to datasets and/or workflow recommendations
+   */
+  unifiedSearch: async (
+    request: UnifiedSearchRequest
+  ): Promise<UnifiedSearchResponse> => {
+    return apiClient.post("llm/unified-search", { json: request }).json();
   },
 };

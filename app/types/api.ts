@@ -81,3 +81,29 @@ export interface WorkflowSuggestionResponse {
   recommended_workflows: WorkflowRecommendation[];
   status: string;
 }
+
+export interface UnifiedSearchRequest {
+  max_results?: number;
+  query: string;
+}
+
+export interface UnifiedSearchResponse {
+  datasets?: {
+    cached: boolean;
+    count: number;
+    error?: string;
+    results: ENAResult[];
+    search_method: string;
+  } | null;
+  interpretation: DatasetInterpretation;
+  llm_tokens_used: number;
+  model_used: string;
+  query: string;
+  status: "success" | "partial" | "invalid_query";
+  workflows?: {
+    count: number;
+    error?: string;
+    llm_tokens_used: number;
+    recommended_workflows: WorkflowRecommendation[];
+  } | null;
+}
