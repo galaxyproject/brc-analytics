@@ -30,7 +30,7 @@ const apiClient = ky.create({
     methods: ["get", "post"],
     statusCodes: [408, 413, 429, 500, 502, 503, 504],
   },
-  timeout: 30000,
+  timeout: 90000,
 });
 
 export const llmAPIClient = {
