@@ -33,7 +33,6 @@ async function performUnifiedSearch({
 }): Promise<UnifiedSearchResponse | undefined> {
   try {
     const result = await llmAPIClient.unifiedSearch({
-      max_results: 50,
       query,
     });
     submitOptions.onSuccess();
