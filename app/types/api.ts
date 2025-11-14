@@ -26,6 +26,7 @@ export interface ENAResult {
   collection_date?: string;
   description?: string;
   experiment_accession?: string;
+  experiment_title?: string;
   first_public?: string;
   instrument_model?: string;
   library_layout?: string;
@@ -34,8 +35,17 @@ export interface ENAResult {
   read_count?: number;
   run_accession?: string;
   sample_accession?: string;
+  sample_title?: string;
   scientific_name?: string;
+  study_accession?: string;
   study_title?: string;
+}
+
+export interface ENAStudyGroup {
+  run_count: number;
+  runs: ENAResult[];
+  study_accession: string;
+  study_title: string;
 }
 
 export interface DatasetSearchResponse {
@@ -92,8 +102,10 @@ export interface UnifiedSearchResponse {
     cached: boolean;
     count: number;
     error?: string;
+    grouped_studies?: ENAStudyGroup[];
     results: ENAResult[];
     search_method: string;
+    study_count?: number;
   } | null;
   interpretation: DatasetInterpretation;
   llm_tokens_used: number;

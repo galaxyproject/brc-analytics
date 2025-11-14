@@ -13,9 +13,41 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
+def group_results_by_study(results: list) -> list:
+    """Group ENA results by study_accession"""
+    from collections import defaultdict
+
+    if not results:
+        return []
+
+    # Group by study_accession
+    studies = defaultdict(list)
+    for result in results:
+        study_accession = result.get("study_accession", "unknown")
+        study_title = result.get("study_title", "Unknown Study")
+        studies[study_accession].append(result)
+
+    # Convert to list of study groups
+    grouped = []
+    for study_accession, runs in studies.items():
+        grouped.append(
+            {
+                "study_accession": study_accession,
+                "study_title": runs[0].get("study_title", "Unknown Study"),
+                "run_count": len(runs),
+                "runs": runs,
+            }
+        )
+
+    # Sort by run count (descending) then by study accession
+    grouped.sort(key=lambda x: (-x["run_count"], x["study_accession"]))
+
+    return grouped
+
+
 class DatasetSearchRequest(BaseModel):
     query: str
-    max_results: int = 100
+    max_results: int = 300
     include_metadata: bool = True
 
 
@@ -247,7 +279,7 @@ async def suggest_workflow(
 
 class UnifiedSearchRequest(BaseModel):
     query: str
-    max_results: int = 100
+    max_results: int = 300
 
 
 @router.post("/unified-search")
@@ -383,22 +415,29 @@ async def unified_search(
                         ena_results = {"data": [], "cached": False}
                         search_method = "none"
 
+                # Group results by study
+                grouped_studies = group_results_by_study(ena_results["data"])
+
                 response_data["datasets"] = {
-                    "search_method": search_method,
-                    "results": ena_results["data"],
                     "cached": ena_results["cached"],
                     "count": len(ena_results["data"])
                     if isinstance(ena_results["data"], list)
                     else 0,
+                    "grouped_studies": grouped_studies,
+                    "results": ena_results["data"],
+                    "search_method": search_method,
+                    "study_count": len(grouped_studies),
                 }
             except Exception as e:
                 logger.warning(f"Dataset search failed: {e}")
                 response_data["datasets"] = {
-                    "search_method": "failed",
-                    "results": [],
                     "cached": False,
                     "count": 0,
                     "error": str(e),
+                    "grouped_studies": [],
+                    "results": [],
+                    "search_method": "failed",
+                    "study_count": 0,
                 }
 
         # Suggest workflows if user intent includes workflow-related terms

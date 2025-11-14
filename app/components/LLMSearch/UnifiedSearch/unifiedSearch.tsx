@@ -178,9 +178,11 @@ export const UnifiedSearch = (): JSX.Element => {
           {hasDatasets && data.datasets && (
             <Box sx={{ mb: 4 }}>
               <Typography variant="h6" gutterBottom>
-                Datasets ({data.datasets.count})
+                Datasets ({data.datasets.study_count || 0} studies,{" "}
+                {data.datasets.count} runs)
               </Typography>
               <SearchResults
+                groupedStudies={data.datasets.grouped_studies}
                 response={{
                   cached: data.datasets.cached,
                   count: data.datasets.count,

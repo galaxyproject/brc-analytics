@@ -19,7 +19,7 @@ class ENAService:
         self.timeout = httpx.Timeout(30.0)  # 30 second timeout
 
     async def search_by_taxonomy(
-        self, taxonomy_id: str, limit: int = 100, use_cache: bool = True
+        self, taxonomy_id: str, limit: int = 300, use_cache: bool = True
     ) -> Dict[str, Any]:
         """Search for sequencing data by taxonomy ID with caching"""
         cache_key = f"ena:taxonomy:{taxonomy_id}:limit:{limit}"
@@ -39,7 +39,7 @@ class ENAService:
                     "query": f"tax_tree({taxonomy_id})",
                     "format": "json",
                     "limit": limit,
-                    "fields": "accession,study_accession,sample_accession,experiment_accession,run_accession,tax_id,scientific_name,library_strategy,library_source,library_selection,read_count,base_count,first_public,last_updated,collection_date,study_title,experiment_title,instrument_model,instrument_platform,fastq_bytes,fastq_ftp,library_layout",
+                    "fields": "accession,study_accession,sample_accession,experiment_accession,run_accession,tax_id,scientific_name,library_strategy,library_source,library_selection,read_count,base_count,first_public,last_updated,collection_date,study_title,sample_title,experiment_title,instrument_model,instrument_platform,fastq_bytes,fastq_ftp,library_layout",
                 }
 
                 logger.info(f"Making ENA API request for taxonomy: {taxonomy_id}")
@@ -82,7 +82,7 @@ class ENAService:
                     "result": result_type,
                     "query": f"accession={accession}",
                     "format": "json",
-                    "fields": "accession,study_accession,sample_accession,experiment_accession,run_accession,tax_id,scientific_name,library_strategy,library_source,library_selection,read_count,base_count,study_title,experiment_title,first_public,last_updated,collection_date,instrument_model,instrument_platform,fastq_bytes,fastq_ftp,library_layout",
+                    "fields": "accession,study_accession,sample_accession,experiment_accession,run_accession,tax_id,scientific_name,library_strategy,library_source,library_selection,read_count,base_count,study_title,sample_title,experiment_title,first_public,last_updated,collection_date,instrument_model,instrument_platform,fastq_bytes,fastq_ftp,library_layout",
                 }
 
                 logger.info(f"Making ENA API request for accession: {accession}")
@@ -106,7 +106,7 @@ class ENAService:
             raise
 
     async def search_by_keywords(
-        self, keywords: List[str], limit: int = 100, use_cache: bool = True
+        self, keywords: List[str], limit: int = 300, use_cache: bool = True
     ) -> Dict[str, Any]:
         """Search for sequencing data by keywords"""
         # Create query string from keywords
@@ -231,7 +231,7 @@ class ENAService:
                     "query": query_string,  # Remove extra parentheses
                     "format": "json",
                     "limit": limit,
-                    "fields": "accession,study_accession,sample_accession,experiment_accession,run_accession,tax_id,scientific_name,library_strategy,library_source,library_selection,read_count,base_count,study_title,experiment_title,first_public,last_updated,collection_date,instrument_model,instrument_platform,fastq_bytes,fastq_ftp,library_layout",
+                    "fields": "accession,study_accession,sample_accession,experiment_accession,run_accession,tax_id,scientific_name,library_strategy,library_source,library_selection,read_count,base_count,study_title,sample_title,experiment_title,first_public,last_updated,collection_date,instrument_model,instrument_platform,fastq_bytes,fastq_ftp,library_layout",
                 }
 
                 logger.info(f"Making ENA API request for keywords: {keywords}")
