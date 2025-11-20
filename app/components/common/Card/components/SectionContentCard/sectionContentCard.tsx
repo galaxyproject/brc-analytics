@@ -33,7 +33,9 @@ export const SectionContentCard = ({
         <EndIcon {...SVG_ICON_PROPS} />
         <StyledStack {...STACK_PROPS}>
           <CardTitle component="span">{title}</CardTitle>
-          <Typography {...TYPOGRAPHY_PROPS}>{secondaryText}</Typography>
+          {secondaryText && (
+            <Typography {...TYPOGRAPHY_PROPS}>{secondaryText}</Typography>
+          )}
         </StyledStack>
       </CardActionArea>
     </StyledCard>
