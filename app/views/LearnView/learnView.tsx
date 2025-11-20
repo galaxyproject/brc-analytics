@@ -11,9 +11,9 @@ export const LearnView = (): JSX.Element => {
       <StyledSectionHero
         breadcrumbs={[
           { path: "/", text: "Home" },
-          { path: "", text: "Learn About BRC" },
+          { path: "", text: "Learn About BRC Analytics" },
         ]}
-        head="Learn About BRC"
+        head="Learn About BRC Analytics"
         subHead={null}
       />
       <SectionContent
@@ -25,7 +25,7 @@ export const LearnView = (): JSX.Element => {
           </StyledStack>
         }
         frontmatter={null}
-        pageTitle="Learn About BRC"
+        pageTitle="Learn About BRC Analytics"
         slug={[]}
       />
     </Fragment>
