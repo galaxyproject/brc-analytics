@@ -8,27 +8,26 @@ import { GalaxyIcon } from "./components/icon/GalaxyIcon/galaxyIcon";
 export const CARDS: ComponentProps<typeof SectionContentCard>[] = [
   {
     StartIcon: RocketLaunchIcon,
-    cardUrl: "/learn",
-    secondaryText: "Learn how to get started with BRC",
+    cardUrl: "/learn/getting-started",
+    secondaryText: "",
     title: "Get Started",
   },
   {
     StartIcon: GalaxyIcon,
-    cardUrl: "/learn",
-    secondaryText: "The following is a guided walk-through of using Galaxy",
+    cardUrl: "/learn/using-galaxy",
+    secondaryText: "",
     title: "Using Galaxy",
   },
   {
     StartIcon: BookmarkStarIcon,
     cardUrl: "/learn/featured-analyses",
-    secondaryText: "Discover and access BRC datasets",
+    secondaryText: "",
     title: "Featured Analyses",
   },
   {
     StartIcon: LiveHelpIcon,
-    cardUrl: "/learn",
-    secondaryText:
-      "The following is a guided walk-through of the BRC documentation",
+    cardUrl: "/learn/faqs",
+    secondaryText: "",
     title: "FAQs",
   },
 ];
