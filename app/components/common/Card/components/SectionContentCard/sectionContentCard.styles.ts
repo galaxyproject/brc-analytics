@@ -25,5 +25,5 @@ export const StyledCard = styled(Card)`
 ` as typeof Card;
 
 export const StyledStack = styled(Stack)`
-  grid-column: 1 / span all;
+  grid-column: 1 / -1;
 `;
