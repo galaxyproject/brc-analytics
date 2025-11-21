@@ -113,7 +113,7 @@ export function makeConfig(
         socialMedia: socialMedia,
       },
     },
-    maxReadRunsForBrowseAll: 2000,
+    maxReadRunsForBrowseAll: 60000,
     redirectRootToPath: "/",
     taxTree: taxTreeData,
     themeOptions: THEME_OPTIONS,
