@@ -31,7 +31,7 @@ interface PageUrlParams extends ParsedUrlQuery {
   trsId: string;
 }
 
-export interface Props {
+interface Props {
   entityId: string;
   entityListType: string;
   trsId: string;
