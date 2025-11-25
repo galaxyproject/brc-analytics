@@ -1,5 +1,5 @@
 import { Detail } from "@databiosphere/findable-ui/lib/components/Detail/detail";
-import { Assembly } from "./types";
+import { Assembly, Props } from "./types";
 import { Top } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Top/top";
 import { SideColumn } from "../../components/Entity/components/ConfigureWorkflowInputs/components/SideColumn/sideColumn";
 import { Main } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/main";
@@ -7,7 +7,6 @@ import { useConfigureInputs } from "./hooks/UseConfigureInputs/useConfigureInput
 import { useConfiguredSteps } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/hook";
 import { augmentConfiguredSteps } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/utils";
 import { SEQUENCING_STEPS } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/constants";
-import { Props } from "../../../pages/data/[entityListType]/[entityId]/[trsId]";
 import { getAssembly } from "../../services/workflows/entities";
 import { getWorkflow } from "../../services/workflows/entities";
 
