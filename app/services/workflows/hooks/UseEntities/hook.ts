@@ -13,7 +13,7 @@ export function useEntities(): boolean {
     ensureEntitiesLoaded(config)
       .then(() => setIsLoaded(true))
       .catch((err) => {
-        throw new Error("Failed to load entities", err);
+        throw new Error(`Failed to load entities: ${err}`);
       });
   }, [config]);
 
