@@ -36,8 +36,12 @@ backend/**/.env
 # Playwright test artifacts
 /test-results
 /tests/screenshots
+/playwright-report
 
 # python
 venv
 __pycache__
-playwright-report/
+
+
+## public api
+/public/api
