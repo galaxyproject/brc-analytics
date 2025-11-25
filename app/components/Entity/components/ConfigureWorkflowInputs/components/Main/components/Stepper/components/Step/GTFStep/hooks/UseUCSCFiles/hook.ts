@@ -1,17 +1,14 @@
 import { useEffect, useState } from "react";
-import { BRCDataCatalogGenome } from "../../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import { parseUCSCFilesResult } from "./utils";
 import { UCSC_FILES_ENDPOINT } from "./constants";
 import { UseUCSCFiles } from "./types";
-import { GA2AssemblyEntity } from "../../../../../../../../../../../../../apis/catalog/ga2/entities";
+import { Assembly } from "../../../../../../../../../../../../../views/WorkflowInputsView/types";
 
 const SPECIAL_CASE_ASSEMBLY_LOOKUP: Record<string, string> = {
   "GCF_000001405.40": "hg38",
 } as const;
 
-export const useUCSCFiles = (
-  genome: BRCDataCatalogGenome | GA2AssemblyEntity
-): UseUCSCFiles => {
+export const useUCSCFiles = (genome: Assembly): UseUCSCFiles => {
   const assemblyId =
     SPECIAL_CASE_ASSEMBLY_LOOKUP[genome.accession] ?? genome.accession;
   const [geneModelUrls, setGeneModelUrls] = useState<string[] | undefined>();

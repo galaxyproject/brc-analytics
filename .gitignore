@@ -35,3 +35,6 @@ npm-debug.log*
 # python
 venv
 __pycache__
+
+## public api
+/public/api
