@@ -9,6 +9,8 @@ mkdir -p "$API_DIR"
 
 PER_APP_JSONS=("assemblies")
 
+rm -f "$API_DIR"/*.json
+
 for name in "${PER_APP_JSONS[@]}"; do
   src="$SRC_ROOT/${name}.json"
   dst="$API_DIR/${name}.json"
