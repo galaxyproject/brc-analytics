@@ -64,6 +64,8 @@ export async function loadEntities(config: SiteConfig): Promise<void> {
  * Loads the workflows store with workflows from the API.
  */
 export async function loadWorkflows(): Promise<void> {
+  if (getEntitiesById().has("workflows")) return;
+
   const workflowCategories = (await fetchEntities(
     API.workflows
   )) as WorkflowCategory[];
