@@ -192,8 +192,7 @@ The workflow described above produced a list of variants observed in each sample
 
 First we looked for general patterns of substitutions within P/C and P/V overlaps by simply plotting aggregate data for each substitutions (e.g., the number of samples a substitution occurs at, median, min, and max alternative allele frequencies and its effect, synonymous or non-synonymous, on each reading frame). This is presented in Fig. 5. One can see that in both cases the P reading frame appears to be more permissive—most substitutions are non-synonymous (“red”) in P and synonymous (“green”) in C or V.
 
-<Figure
-  alt="Nucleotide changes within P/C (top) and P/V (bottom) overlaps"
+<VegaEmbed
   caption={
     <figcaption>
       <span>
@@ -203,17 +202,13 @@ First we looked for general patterns of substitutions within P/C and P/V overlap
         for that frame; length of each tick represents the alternative allele
         frequency spread = the difference between min and max values. The
         opacity is the number of samples (from min = 2 to max = 225) the change
-        is found in.
+        is found in. This is an interactive visualization - hover over data
+        points for details and use the controls to zoom and pan.
       </span>
     </figcaption>
   }
-  src="/learn/featured-analyses/evolutionary-dynamics-of-coding-overlaps-in-measles/nucleotide-changes.png"
+  spec="/learn/featured-analyses/evolutionary-dynamics-of-coding-overlaps-in-measles/nucleotide-changes-vega-spec.json"
 />
-
-<Alert icon={false} severity="info">
-  You can view the interactive view of the above image
-  [here](https://usegalaxy.org/visualizations/display?visualization=jupyterlite&dataset_id=f9cad7b01a47213516812bfc3ef85974)
-</Alert>
 
 Nucleotide substitutions in the C-protein and the V-protein region downstream of the editing site appear to affect C and V protein function less than they affect protein P (Table 4). Variants in the C–P overlap (nucleotides ~1,836–2,370) are mostly synonymous in C but nonsynonymous in P. This suggests strong purifying selection on C (which contains nuclear localization, export, and SHCBP1-binding signals), while P tolerates or favors amino-acid changes in this region, indicating adaptive fine-tuning of P’s polymerase cofactor and regulatory functions while C’s integrity is maintained. Substitutions in the P–V overlap (nucleotides ~2,514–2,704) frequently show synonymous changes in V but nonsynonymous in P, again pointing to P-directed adaptation. However, some sites (e.g., 2514-A, 2580-G) show the opposite pattern (nonsynonymous in V, synonymous in P), possibly corresponding to residues within or adjacent to V/P amino-acid positions 100–120, a region known to mediate STAT1 and Jak1 binding [[8]](https://pubmed.ncbi.nlm.nih.gov/18385234/) [[9]](https://pubmed.ncbi.nlm.nih.gov/20980517/). These variants could represent V-specific adaptive evolution affecting interferon antagonism, while the broader pattern reflects the evolutionary compromise needed to maintain two overlapping reading frames with distinct but interdependent functions (see more on this in the evolutionary analysis section below).
 

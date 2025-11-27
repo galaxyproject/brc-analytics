@@ -6,6 +6,11 @@ on:
 permissions:
   id-token: write
   contents: read
+
+concurrency:
+  group: dev-deploy
+  cancel-in-progress: false
+
 jobs:
   build-and-deploy:
     if: github.repository == 'galaxyproject/brc-analytics'

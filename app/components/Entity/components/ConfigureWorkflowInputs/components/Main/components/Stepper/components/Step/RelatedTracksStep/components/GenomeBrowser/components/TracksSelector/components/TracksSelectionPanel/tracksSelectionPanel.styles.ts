@@ -7,6 +7,7 @@ import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/P
 
 interface Props {
   canExpand?: boolean;
+  canSelect?: boolean;
   isExpanded?: boolean;
   isGrouped?: boolean;
   isLastRow?: boolean;
@@ -27,6 +28,7 @@ export const StyledRoundedPaper = styled(RoundedPaper)`
 export const StyledContainer = styled(Container, {
   shouldForwardProp: (prop) =>
     prop !== "canExpand" &&
+    prop !== "canSelect" &&
     prop !== "isExpanded" &&
     prop !== "isGrouped" &&
     prop !== "isLastRow" &&
@@ -95,6 +97,12 @@ export const StyledContainer = styled(Container, {
           border-bottom-left-radius: 0;
           border-bottom-right-radius: 0;
         `}
+      `}
+
+    ${({ canSelect }) =>
+      canSelect &&
+      css`
+        cursor: pointer;
       `}
 
     ${({ isSelected }) =>
