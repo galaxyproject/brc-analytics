@@ -1,6 +1,6 @@
 {
   "name": "brc-analytics",
-  "version": "0.17.0",
+  "version": "0.18.0",
   "private": true,
   "scripts": {
     "dev": "./scripts/dev.sh brc-analytics && ./scripts/set-version.sh dev && next dev",
