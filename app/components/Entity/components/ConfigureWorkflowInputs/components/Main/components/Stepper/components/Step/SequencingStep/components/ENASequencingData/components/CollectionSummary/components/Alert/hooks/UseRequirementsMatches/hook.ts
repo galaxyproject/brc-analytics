@@ -3,12 +3,11 @@ import { ReadRun } from "../../../../../../types";
 import { UseRequirementsMatches } from "./types";
 import { useMemo } from "react";
 import { buildRequirementWarnings } from "./utils";
-import { BRCDataCatalogGenome } from "../../../../../../../../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
-import { GA2AssemblyEntity } from "../../../../../../../../../../../../../../../../../../../apis/catalog/ga2/entities";
+import { Assembly } from "../../../../../../../../../../../../../../../../../../../views/WorkflowInputsView/types";
 
 export const useRequirementsMatches = (
   table: Table<ReadRun>,
-  genome: BRCDataCatalogGenome | GA2AssemblyEntity
+  genome: Assembly
 ): UseRequirementsMatches => {
   const { getSelectedRowModel, initialState } = table;
   const { columnFilters } = initialState;

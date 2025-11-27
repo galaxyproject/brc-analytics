@@ -1,7 +1,7 @@
-import { ROUTES } from "routes/constants";
-import { Props } from "../../../../../../views/WorkflowInputsView/types";
+import { ROUTES } from "../../../../../../../routes/constants";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
+import { Props } from "./types";
 
 /**
  * Returns breadcrumbs for the workflow input view.
