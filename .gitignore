@@ -15,7 +15,7 @@ npm-debug.log*
 /.env*.local
 /.env.development
 /.env.production
-backend/.env
+backend/**/.env
 
 # typescript
 *.tsbuildinfo
