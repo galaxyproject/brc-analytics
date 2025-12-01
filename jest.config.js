@@ -9,7 +9,8 @@ const createJestConfig = nextJest({
 const customJestConfig = {
   moduleDirectories: ["node_modules", "<rootDir>/"],
   testEnvironment: "jest-environment-jsdom",
-  testPathIgnorePatterns: ["/node_modules/", "/catalog/"],
+  // Excludes Playwright e2e tests which Jest cannot parse
+  testPathIgnorePatterns: ["/node_modules/", "/catalog/", "/tests/e2e/"],
 };
 
 module.exports = createJestConfig(customJestConfig);

@@ -1,0 +1,107 @@
+# BRC Analytics API Service
+
+FastAPI REST API service for BRC Analytics.
+
+## Features
+
+- FastAPI REST API
+- Redis caching with TTL support
+- Health check endpoints
+- Docker deployment with nginx reverse proxy
+- uv for dependency management
+
+## Quick Start
+
+### Development (Local)
+
+```bash
+cd backend/api
+uv sync
+uv run uvicorn app.main:app --reload
+```
+
+API documentation: http://localhost:8000/api/docs
+
+### Production (Docker)
+
+Docker Compose orchestration is managed from the parent `/backend` directory.
+
+```bash
+cd backend
+
+# Create environment file
+cp api/.env.example api/.env
+# Edit api/.env if needed (defaults work for local development)
+
+# Build with version from package.json
+./docker-build.sh
+
+# Start all services (nginx + api + redis)
+docker compose up -d
+
+# Check service health
+curl http://localhost:8080/api/v1/health
+
+# View logs
+docker compose logs -f backend
+
+# Rebuild after code changes
+docker compose up -d --build
+
+# Stop all services
+docker compose down
+```
+
+Services:
+
+- nginx: http://localhost:8080 (reverse proxy, public-facing)
+- API service: internal only, accessible via nginx
+- API docs: http://localhost:8080/api/docs
+- redis: internal only
+
+## API Endpoints
+
+### Health & Monitoring
+
+- `GET /api/v1/health` - Overall service health status
+- `GET /api/v1/cache/health` - Redis cache connectivity check
+- `GET /api/v1/version` - API version and environment information
+
+### Documentation
+
+- `GET /api/docs` - Interactive Swagger UI
+- `GET /api/redoc` - ReDoc API documentation
+
+## Configuration
+
+Environment variables (see `.env.example`):
+
+```bash
+# Redis
+REDIS_URL=redis://localhost:6379/0
+
+# Application
+CORS_ORIGINS=http://localhost:3000,http://localhost
+LOG_LEVEL=INFO
+```
+
+## Testing
+
+```bash
+# Run e2e tests
+npm run test:e2e
+
+# Or with Playwright directly
+npx playwright test tests/e2e/03-api-health.spec.ts
+```
+
+## Architecture
+
+```
+nginx (port 80)
+  ├── /api/* → FastAPI backend (port 8000)
+  └── /* → Next.js static files
+
+FastAPI backend
+  └── Redis cache (port 6379)
+```
