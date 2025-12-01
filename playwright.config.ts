@@ -1,7 +1,10 @@
 import { defineConfig, devices } from "@playwright/test";
 
 /**
- * Playwright configuration for BRC Analytics tests
+ * Playwright configuration for UI tests (no backend required).
+ *
+ * For API tests that require the backend, use:
+ *   npx playwright test --config=playwright.api.config.ts
  */
 export default defineConfig({
   forbidOnly: !!process.env.CI,
@@ -14,26 +17,18 @@ export default defineConfig({
   ],
   reporter: "html",
   retries: process.env.CI ? 2 : 0,
-  testDir: "./tests/e2e",
+  testDir: "./tests/e2e/ui",
   use: {
     baseURL: "http://localhost:3000",
     screenshot: "only-on-failure",
     trace: "on-first-retry",
     video: "retain-on-failure",
   },
-  webServer: [
-    {
-      command: "npm run dev",
-      reuseExistingServer: true,
-      timeout: 120 * 1000,
-      url: "http://localhost:3000",
-    },
-    {
-      command: "docker-compose up",
-      reuseExistingServer: true,
-      timeout: 120 * 1000,
-      url: "http://localhost:8000/api/v1/health",
-    },
-  ],
+  webServer: {
+    command: "npm run dev",
+    reuseExistingServer: !process.env.CI,
+    timeout: 120 * 1000,
+    url: "http://localhost:3000",
+  },
   workers: 1,
 });
