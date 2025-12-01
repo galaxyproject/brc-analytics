@@ -18,6 +18,8 @@
     "format:python": "./scripts/format-python.sh",
     "prepare": "husky",
     "test": "jest --runInBand --passWithNoTests",
+    "test:e2e": "npx playwright test",
+    "test:e2e:api": "npx playwright test --config=playwright.api.config.ts",
     "build-brc-db": "esrun catalog/build/ts/build-catalog.ts",
     "build-ga2-db": "esrun catalog/ga2/build/ts/build-catalog.ts",
     "build-brc-from-ncbi": "python3 -m catalog.build.py.build_files_from_ncbi && python3 -m catalog.build.py.mergeBRCandGA2ReadCounts",
