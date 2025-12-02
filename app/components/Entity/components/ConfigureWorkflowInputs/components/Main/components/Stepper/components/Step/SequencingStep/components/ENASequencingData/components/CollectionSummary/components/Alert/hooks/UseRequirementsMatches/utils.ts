@@ -1,9 +1,8 @@
 import { ColumnFiltersState, Row } from "@tanstack/react-table";
 import { ReadRun } from "../../../../../../types";
 import { COLUMN_KEY_TO_LABEL } from "./constants";
-import { BRCDataCatalogGenome } from "../../../../../../../../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
-import { GA2AssemblyEntity } from "../../../../../../../../../../../../../../../../../../../apis/catalog/ga2/entities";
 import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
+import { Assembly } from "../../../../../../../../../../../../../../../../../../../views/WorkflowInputsView/types";
 
 /**
  * Builds warnings for column filter mismatches.
@@ -61,7 +60,7 @@ function buildDataWarnings(
 export function buildRequirementWarnings(
   initialColumnFilters: ColumnFiltersState,
   rows: Row<ReadRun>[],
-  genome: BRCDataCatalogGenome | GA2AssemblyEntity
+  genome: Assembly
 ): string[] {
   if (rows.length === 0) return [];
   const speciesWarnings = buildSpeciesWarnings(rows, genome);
@@ -77,7 +76,7 @@ export function buildRequirementWarnings(
  */
 function buildSpeciesWarnings(
   rows: Row<ReadRun>[],
-  genome: BRCDataCatalogGenome | GA2AssemblyEntity
+  genome: Assembly
 ): string[] {
   const { ncbiTaxonomyId, taxonomicLevelSpecies } = genome;
 

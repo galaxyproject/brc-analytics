@@ -21,9 +21,10 @@ import { config } from "../app/config/config";
 import { mergeAppTheme } from "../app/theme/theme";
 import { GoogleSignInAuthenticationProvider } from "@databiosphere/findable-ui/lib/providers/googleSignInAuthentication/provider";
 import { ServicesProvider } from "@databiosphere/findable-ui/lib/providers/services/provider";
+import "../app/styles/fonts/fonts.css";
+import { useEntities } from "../app/services/workflows/hooks/UseEntities/hook";
 
 const DEFAULT_ENTITY_LIST_TYPE = "organisms";
-import "../app/styles/fonts/fonts.css";
 
 export interface PageProps extends AzulEntitiesStaticResponse {
   pageTitle?: string;
@@ -42,6 +43,8 @@ export type AppPropsWithComponent = AppProps & {
 function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
   // Set up the site configuration, layout and theme.
   const appConfig = config();
+  // Load entities into the in-memory cache.
+  const isEntitiesLoaded = useEntities();
   const {
     layout,
     redirectRootToPath,
@@ -56,6 +59,9 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
   const appTheme = mergeAppTheme(baseThemeOptions, themeOptions);
   const AppLayout = Component.AppLayout || DXAppLayout;
   const Main = Component.Main || DXMain;
+
+  if (!isEntitiesLoaded) return <></>;
+
   return (
     <EmotionThemeProvider theme={appTheme}>
       <ThemeProvider theme={appTheme}>

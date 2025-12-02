@@ -3,13 +3,12 @@ import { UseENADataByTaxonomyId } from "./types";
 import { fetchENAData } from "./request";
 import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
 import { isEligible } from "./utils";
-import { BRCDataCatalogGenome } from "../../../../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
-import { GA2AssemblyEntity } from "../../../../../../../../../../../../../../../apis/catalog/ga2/entities";
 import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
 import { AppSiteConfig } from "../../../../../../../../../../../../../../../../site-config/common/entities";
+import { Assembly } from "../../../../../../../../../../../../../../../views/WorkflowInputsView/types";
 
 export const useENADataByTaxonomyId = <T>(
-  genome: BRCDataCatalogGenome | GA2AssemblyEntity
+  genome: Assembly
 ): UseENADataByTaxonomyId<T> => {
   const { ncbiTaxonomyId: taxonomyId } = genome;
   const { config } = useConfig();
