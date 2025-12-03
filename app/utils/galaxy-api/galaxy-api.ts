@@ -25,6 +25,8 @@ import {
 import { UcscTrack } from "../ucsc-tracks-api/entities";
 
 const DOCKSTORE_API_URL = "https://dockstore.org/api/ga4gh/trs/v2/tools";
+const FTP_HOST = "ftp.sra.ebi.ac.uk";
+const ASCP_HOST = "fasp.sra.ebi.ac.uk";
 
 const galaxyInstanceUrl = process.env.NEXT_PUBLIC_GALAXY_INSTANCE_URL;
 
@@ -444,7 +446,7 @@ function getRunUrlsInfo(
   if (splitUrls.length === 1) {
     // Single read case
     return {
-      forward: { md5: splitMd5Hashes[0], url: `ftp://${splitUrls[0]}` },
+      forward: { md5: splitMd5Hashes[0], url: ftpToAscp(splitUrls[0]) },
       reverse: null,
     };
   }
@@ -457,13 +459,18 @@ function getRunUrlsInfo(
     const [, , readIndex] = urlMatch;
     const fileInfo: EnaFileInfo = {
       md5: splitMd5Hashes[i],
-      url: `ftp://${url}`,
+      url: ftpToAscp(url),
     };
     if (readIndex === "1") forward = fileInfo;
     else reverse = fileInfo;
   }
   if (forward === null) throw new Error("No URL for forward read found");
   return { forward, reverse };
+}
+
+function ftpToAscp(ftpUrl: string): string {
+  // should be more reliable than FTP download
+  return `ascp://${ftpUrl.replace(FTP_HOST, ASCP_HOST)}`;
 }
 
 function buildUcscTracksRequestValues(
