@@ -8,11 +8,21 @@ import { defineConfig, devices } from "@playwright/test";
  */
 export default defineConfig({
   forbidOnly: !!process.env.CI,
-  fullyParallel: false,
+  fullyParallel: true,
   projects: [
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "firefox",
+      use: {
+        ...devices["Desktop Firefox"],
+      },
+    },
+    {
+      name: "webkit",
+      use: { ...devices["Desktop Safari"] },
     },
   ],
   reporter: "html",
@@ -25,10 +35,10 @@ export default defineConfig({
     video: "retain-on-failure",
   },
   webServer: {
-    command: "npm run dev",
+    command: "npm run build:dev && npm start",
     reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
+    timeout: 240 * 1000,
     url: "http://localhost:3000",
   },
-  workers: 1,
+  workers: 3,
 });

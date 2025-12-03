@@ -37,6 +37,7 @@ backend/**/.env
 /test-results
 /tests/screenshots
 /playwright-report
+/playwright/.cache
 
 # python
 venv
@@ -44,7 +45,7 @@ __pycache__
 
 playwright-report/
 
-## public api
+# public api
 /public/api
 
 # Sentry Config File
