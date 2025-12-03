@@ -42,6 +42,10 @@ backend/**/.env
 venv
 __pycache__
 
+playwright-report/
 
 ## public api
 /public/api
+
+# Sentry Config File
+.env.sentry-build-plugin

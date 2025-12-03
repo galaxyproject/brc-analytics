@@ -1,3 +1,4 @@
+import { withSentryConfig } from "@sentry/nextjs";
 import nextMDX from "@next/mdx";
 import withPlugins from "next-compose-plugins";
 import path from "path";
@@ -13,7 +14,8 @@ const ESM_PACKAGES = [
 const withMDX = nextMDX({
   extension: /\.mdx?$/,
 });
-export default withPlugins(
+
+const nextConfig = withPlugins(
   [[withMDX, { pageExtensions: ["md", "mdx", "ts", "tsx"] }]],
   {
     basePath: "",
@@ -86,3 +88,15 @@ export default withPlugins(
     },
   }
 );
+
+export default withSentryConfig(nextConfig, {
+  disableLogger: true,
+  org: "galaxy",
+  project: "brc-analytics-dev",
+  sentryUrl: "https://sentry.galaxyproject.org/",
+  silent: true,
+  sourcemaps: {
+    disable: true,
+  },
+  suppressGlobalErrorHandlerFileWarning: true,
+});
