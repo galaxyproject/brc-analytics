@@ -8,7 +8,7 @@ import { test as base } from "@playwright/test";
 export const test = base.extend({
   context: async ({ context }, use) => {
     await context.route(
-      "**plausible.galaxyproject.eu/**",
+      "**//*plausible.galaxyproject.eu/**",
       (route) => route.fulfill({ status: 204 }) // fulfill analytics requests to avoid slow TLS handshake
     );
     await use(context);
