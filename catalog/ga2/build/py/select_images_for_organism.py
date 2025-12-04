@@ -4,7 +4,6 @@ import tkinter as tk
 from io import BytesIO
 from tkinter import messagebox
 
-import google.generativeai as genai
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
@@ -215,7 +214,6 @@ def select_image_from_options(images_info, scientific_name):
     root.mainloop()
 
     if result["selected_image"]:
-        img = result["image_obj"]
         return result["selected_image"]
     return None
 

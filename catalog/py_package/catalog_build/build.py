@@ -1567,9 +1567,6 @@ def build_files(
             species_image_license[species] = image_info.get(species, {}).get(
                 "license", None
             )
-            species_image_license[species] = image_info.get(species, {}).get(
-                "license", None
-            )
             species_image_source[species] = image_info.get(species, {}).get(
                 "image_source_name", None
             )
@@ -1594,7 +1591,6 @@ def build_files(
         genomes_df["organismImageSourceUrl"] = genomes_df["species"].map(
             species_image_source_link
         )
-        unique_species = primarydata_df["organism_name"].dropna().unique()
 
         # Map the image paths back to the organism_name
         primarydata_df["organismImageUrl"] = primarydata_df["organism_name"].map(
@@ -1692,8 +1688,8 @@ def get_image_path(
     Args:
         folder_path (str): The directory where the images are stored.
         species_name (str): The name of the species.
-        suffix (str, optional): The suffix to append to the formatted species name.
-                                     Defaults to "_1024x1024.png".
+        file_suffix (str, optional): The suffix to append to the formatted species name.
+                                     Defaults to "_1024x1024.jpg".
 
     Returns:
         str: The full path to the image file.

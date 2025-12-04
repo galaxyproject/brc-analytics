@@ -268,6 +268,6 @@ export const ORGANISM_IMAGE: ColumnConfig<GA2AssemblyEntity> = {
     viewBuilder: V.buildOrganismImageThumbnail,
   } as ComponentConfig<typeof C.OrganismAvatar, GA2AssemblyEntity>,
   header: GA2_CATEGORY_LABEL.ORGANISM_AVATAR,
-  id: GA2_CATEGORY_KEY.ORAGNISM_AVATAR,
+  id: GA2_CATEGORY_KEY.ORGANISM_AVATAR,
   width: { max: "1fr", min: "auto" },
 };

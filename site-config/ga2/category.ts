@@ -10,7 +10,7 @@ export const GA2_CATEGORY_KEY = {
   IS_REF: "isRef",
   LENGTH: "length",
   LEVEL: "level",
-  ORAGNISM_AVATAR: "organismAvatar",
+  ORGANISM_AVATAR: "organismAvatar",
   SCAFFOLD_COUNT: "scaffoldCount",
   SCAFFOLD_L50: "scaffoldL50",
   SCAFFOLD_N50: "scaffoldN50",
