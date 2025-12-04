@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../utils/fixtures";
 import { ROUTES } from "../../../routes/constants";
 
 const PAGES = [
@@ -12,13 +12,6 @@ const PAGES = [
 ];
 
 test.describe("BRC Analytics - UI Smoke Tests", () => {
-  test.beforeEach(async ({ page }) => {
-    // Block analytics requests - Firefox has slow TLS handshake to plausible.galaxyproject.eu
-    await page.route("**/plausible.galaxyproject.eu/**", (route) =>
-      route.abort()
-    );
-  });
-
   test("homepage should load", async ({ page }) => {
     await page.goto("/");
 
@@ -38,7 +31,7 @@ test.describe("BRC Analytics - UI Smoke Tests", () => {
     await expect(navigation).toBeVisible();
   });
 
-  PAGES.forEach(({ name, url }) => {
+  for (const { name, url } of PAGES) {
     test(`${name} page should load`, async ({ page }) => {
       await page.goto(url);
 
@@ -48,5 +41,5 @@ test.describe("BRC Analytics - UI Smoke Tests", () => {
       // Page should have content
       await expect(page.locator("main")).toBeVisible();
     });
-  });
+  }
 });
