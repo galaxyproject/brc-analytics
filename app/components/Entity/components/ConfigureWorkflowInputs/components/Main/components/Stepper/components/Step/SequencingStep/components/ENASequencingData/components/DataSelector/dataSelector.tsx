@@ -6,107 +6,101 @@ import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/B
 import { LoadingIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/LoadingIcon/loadingIcon";
 import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
 import { Props } from "./types";
-import { ENA_QUERY_METHOD } from "../../../../types";
 import { Fragment } from "react";
-import { config } from "../../../../../../../../../../../../../../../../app/config/config";
+import { Alert } from "./components/Alert/alert";
 
 export const DataSelector = ({
-  loading,
+  enaTaxonomyIdStatus,
   onContinue,
   onOpen,
-  readCount,
   selectedCount,
-  setEnaQueryMethod,
   taxonomicLevelSpecies,
+  taxonomyCount,
+  taxonomyMatches,
 }: Props): JSX.Element | null => {
-  const { maxReadRunsForBrowseAll } = config();
-  const readCountValue =
-    readCount === undefined ? maxReadRunsForBrowseAll : readCount;
   if (selectedCount > 0) return null;
   return (
-    <StyledPaper {...PAPER_PROPS}>
-      <Stack spacing={2}>
-        <Typography
-          component="div"
-          variant={TYPOGRAPHY_PROPS.VARIANT.HEADING_XSMALL}
-        >
-          Select sequences from ENA
-        </Typography>
-        <Typography
-          color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
-          variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
-        >
-          Browse ENA to find and select sequences
-        </Typography>
-      </Stack>
-      {loading ? (
-        <LoadingIcon
-          color={SVG_ICON_PROPS.COLOR.PRIMARY}
-          fontSize={SVG_ICON_PROPS.FONT_SIZE.SMALL}
-        />
-      ) : (
-        <StyledGrid {...GRID_PROPS}>
-          {readCountValue < maxReadRunsForBrowseAll && (
-            <Fragment>
-              <Stack alignItems="center" spacing={1}>
-                <Button
-                  {...BUTTON_PROPS.PRIMARY_CONTAINED}
-                  onClick={() => {
-                    setEnaQueryMethod(ENA_QUERY_METHOD.TAXONOMY_ID);
-                    onContinue();
-                  }}
-                >
-                  {renderButtonText(readCountValue)}
-                </Button>
-                <Typography
-                  color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
-                  noWrap
-                  maxWidth={200}
-                  variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
-                >
-                  {taxonomicLevelSpecies}
-                </Typography>
-              </Stack>
-              <Divider flexItem orientation="vertical">
-                <Typography
-                  component="div"
-                  color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
-                  variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
-                >
-                  <i>OR</i>
-                </Typography>
-              </Divider>
-            </Fragment>
-          )}
-          <Stack alignItems="center" spacing={1}>
-            <Button
-              {...BUTTON_PROPS.PRIMARY_CONTAINED}
-              onClick={() => {
-                setEnaQueryMethod(ENA_QUERY_METHOD.ACCESSION);
-                onOpen();
-              }}
-            >
-              Enter Accession(s)
-            </Button>
-            <Typography
-              color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
-              variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
-            >
-              Any organism
-            </Typography>
-          </Stack>
-        </StyledGrid>
-      )}
-    </StyledPaper>
+    <Fragment>
+      <Alert
+        enaTaxonomyIdStatus={enaTaxonomyIdStatus}
+        taxonomyMatches={taxonomyMatches}
+      />
+      <StyledPaper {...PAPER_PROPS}>
+        <Stack spacing={2}>
+          <Typography
+            component="div"
+            variant={TYPOGRAPHY_PROPS.VARIANT.HEADING_XSMALL}
+          >
+            Select sequences from ENA
+          </Typography>
+          <Typography
+            color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
+            variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
+          >
+            Browse ENA to find and select sequences
+          </Typography>
+        </Stack>
+        {enaTaxonomyIdStatus.loading ? (
+          <LoadingIcon
+            color={SVG_ICON_PROPS.COLOR.PRIMARY}
+            fontSize={SVG_ICON_PROPS.FONT_SIZE.SMALL}
+          />
+        ) : (
+          <StyledGrid {...GRID_PROPS}>
+            {enaTaxonomyIdStatus.eligible && (
+              <Fragment>
+                <Stack alignItems="center" spacing={1}>
+                  <Button
+                    {...BUTTON_PROPS.PRIMARY_CONTAINED}
+                    onClick={onContinue}
+                  >
+                    {renderButtonText(taxonomyCount)}
+                  </Button>
+                  <Typography
+                    color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
+                    noWrap
+                    maxWidth={200}
+                    variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
+                  >
+                    {taxonomicLevelSpecies}
+                  </Typography>
+                </Stack>
+                <Divider flexItem orientation="vertical">
+                  <Typography
+                    component="div"
+                    color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
+                    variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
+                  >
+                    <i>OR</i>
+                  </Typography>
+                </Divider>
+              </Fragment>
+            )}
+            <Stack alignItems="center" spacing={1}>
+              <Button {...BUTTON_PROPS.PRIMARY_CONTAINED} onClick={onOpen}>
+                Enter Accession(s)
+              </Button>
+              <Typography
+                color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
+                variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
+              >
+                Any organism
+              </Typography>
+            </Stack>
+          </StyledGrid>
+        )}
+      </StyledPaper>
+    </Fragment>
   );
 };
 
 /**
- * Renders the button text based on the read count.
- * @param readCount - The number of reads.
+ * Renders the button text based on the taxonomy Id read count.
+ * @param taxonomyCount - Taxonomy data count.
  * @returns The button text.
  */
-function renderButtonText(readCount: number): string {
-  if (readCount === 1) return "Browse 1 Sequence";
-  return `Browse ${readCount} Sequences`;
+function renderButtonText(taxonomyCount: number | undefined): string {
+  if (!taxonomyCount) return "No Sequences";
+  if (taxonomyCount === 1) return "Browse 1 Sequence";
+  return `Browse ${taxonomyCount} Sequences`;
 }

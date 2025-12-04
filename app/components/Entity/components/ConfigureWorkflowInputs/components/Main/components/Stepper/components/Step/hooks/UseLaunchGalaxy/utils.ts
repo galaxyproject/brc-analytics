@@ -31,8 +31,13 @@ export function getConfiguredValues(
   configuredInput: ConfiguredInput,
   workflow: Workflow
 ): ConfiguredValue | undefined {
-  const { geneModelUrl, readRunsPaired, readRunsSingle, referenceAssembly } =
-    configuredInput;
+  const {
+    geneModelUrl,
+    readRunsPaired,
+    readRunsSingle,
+    referenceAssembly,
+    tracks,
+  } = configuredInput;
 
   // If workflow is not available yet, return undefined
   if (!workflow?.parameters) return undefined;
@@ -53,6 +58,7 @@ export function getConfiguredValues(
     // referenceAssembly is currently always set, but there are workflows that don't require referenceAssembly.
     // xref https://github.com/galaxyproject/brc-analytics/issues/652
     referenceAssembly: referenceAssembly!,
+    tracks: tracks ?? null,
   };
 }
 

@@ -1,14 +1,11 @@
-import { Dispatch, SetStateAction } from "react";
-import { ENA_QUERY_METHOD } from "../../../../types";
-import { WorkflowParameter } from "app/apis/catalog/brc-analytics-catalog/common/entities";
+import { Status } from "../../hooks/UseENADataByTaxonomyId/types";
 
 export interface Props {
-  loading: boolean;
+  enaTaxonomyIdStatus: Status;
   onContinue: () => void;
   onOpen: () => void;
-  readCount?: number;
   selectedCount: number;
-  setEnaQueryMethod: Dispatch<SetStateAction<ENA_QUERY_METHOD>>;
   taxonomicLevelSpecies: string;
-  workflowParameter?: WorkflowParameter;
+  taxonomyCount?: number;
+  taxonomyMatches: number;
 }

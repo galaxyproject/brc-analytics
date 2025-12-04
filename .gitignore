@@ -18,6 +18,7 @@ npm-debug.log*
 /.env*.local
 /.env.development
 /.env.production
+backend/**/.env
 
 # typescript
 *.tsbuildinfo
@@ -35,6 +36,20 @@ npm-debug.log*
 # Build Dir
 /out
 
+# Playwright test artifacts
+/test-results
+/tests/screenshots
+/playwright-report
+/playwright/.cache
+
 # python
 venv
 __pycache__
+
+playwright-report/
+
+# public api
+/public/api
+
+# Sentry Config File
+.env.sentry-build-plugin

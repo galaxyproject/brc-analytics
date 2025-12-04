@@ -3,26 +3,19 @@ import {
   getFacetedRowModel,
   getFilteredRowModel,
   InitialTableState,
-  Table,
   useReactTable,
 } from "@tanstack/react-table";
 import { BaseReadRun, ReadRun } from "../../../../types";
 import { ROW_POSITION } from "@databiosphere/findable-ui/lib/components/Table/features/RowPosition/constants";
 import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/features/RowPreview/constants";
 import { columns } from "./columnDef";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { getFacetedUniqueValuesWithArrayValues } from "@databiosphere/findable-ui/lib/components/Table/common/utils";
 import { arrIncludesSome } from "@databiosphere/findable-ui/lib/components/Table/columnDef/columnFilters/filterFn";
-import { ColumnFiltersState, Updater } from "@tanstack/react-table";
-import { UseENADataByAccession } from "../../../../hooks/UseENADataByAccession/types";
+import { ColumnFiltersState } from "@tanstack/react-table";
 import { UseENADataByTaxonomyId } from "../../../../hooks/UseENADataByTaxonomyId/types";
-import { ENA_QUERY_METHOD } from "../../../../../../types";
-import {
-  enableRowSelection,
-  getRowSelectionValidation,
-  updateColumnFilters,
-} from "./utils";
-import { SORTING } from "./constants";
+import { enableRowSelection, getRowSelectionValidation } from "./utils";
+import { SORTING, COLUMN_VISIBILITY } from "./constants";
 import { getSortedRowModel } from "@tanstack/react-table";
 import { CATEGORY_GROUPS } from "./categoryGroups";
 import { getFacetedMinMaxValues } from "@databiosphere/findable-ui/lib/components/Table/featureOptions/facetedColumn/getFacetedMinMaxValues";
@@ -30,49 +23,37 @@ import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/
 import { ROW_SELECTION_VALIDATION } from "@databiosphere/findable-ui/lib/components/Table/features/RowSelectionValidation/constants";
 import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/features/TableDownload/constants";
 import { mapReadRuns, sanitizeReadRuns } from "./dataTransforms";
+import { UseTable } from "./types";
 
 export const useTable = (
-  enaQueryMethod: ENA_QUERY_METHOD,
-  enaAccession: UseENADataByAccession<BaseReadRun>,
-  enaTaxonomyId: UseENADataByTaxonomyId<BaseReadRun>
-): Table<ReadRun> => {
-  const [columnFiltersByMethod, setColumnFiltersByMethod] = useState<
-    Record<ENA_QUERY_METHOD, ColumnFiltersState>
-  >({
-    [ENA_QUERY_METHOD.ACCESSION]: [],
-    [ENA_QUERY_METHOD.TAXONOMY_ID]: [],
-  });
+  enaTaxonomyId: UseENADataByTaxonomyId<BaseReadRun>,
+  columnFilters: ColumnFiltersState
+): UseTable => {
+  const [data, setData] = useState<ReadRun[]>([]);
 
-  const onColumnFiltersChange = useCallback(
-    (updaterOrValue: Updater<ColumnFiltersState>): void =>
-      setColumnFiltersByMethod(
-        updateColumnFilters(enaQueryMethod, updaterOrValue)
-      ),
-    [enaQueryMethod]
+  // TaxonomyId ena read runs; store for easy switching between data sources.
+  const taxonomyData = useMemo(
+    () => sanitizeReadRuns(mapReadRuns(enaTaxonomyId.data)),
+    [enaTaxonomyId.data]
   );
 
-  // Get the data for the ENA query method (by accession or by taxonomy ID).
-  const { data: readRuns } =
-    enaQueryMethod === ENA_QUERY_METHOD.ACCESSION
-      ? enaAccession
-      : enaTaxonomyId;
+  // Initialize table with taxonomyId ena data.
+  useEffect(() => {
+    setData(taxonomyData);
+  }, [taxonomyData]);
 
-  const data = useMemo(
-    () => sanitizeReadRuns(mapReadRuns(readRuns)),
-    [readRuns]
-  );
-
-  const initialState: InitialTableState = { sorting: SORTING };
+  const initialState: InitialTableState = {
+    columnFilters,
+    columnVisibility: COLUMN_VISIBILITY,
+    sorting: SORTING,
+  };
 
   const meta = {
     categoryGroups: CATEGORY_GROUPS,
-    enaQueryMethod,
     filterSort: FILTER_SORT.COUNT,
   };
 
-  const state = { columnFilters: columnFiltersByMethod[enaQueryMethod] };
-
-  return useReactTable<ReadRun>({
+  const table = useReactTable<ReadRun>({
     _features: [
       ROW_POSITION,
       ROW_PREVIEW,
@@ -102,7 +83,25 @@ export const useTable = (
     getSortedRowModel: getSortedRowModel(),
     initialState,
     meta,
-    onColumnFiltersChange,
-    state,
   });
+
+  /**
+   * Callback to switch table data.
+   * Table state is reset (column filters, sorting, row selection) when the browsing method has changed.
+   */
+  const switchBrowseMethod = useCallback(
+    (data?: BaseReadRun[]) => {
+      // Handle switching table data.
+      if (data) setData(sanitizeReadRuns(mapReadRuns(data)));
+      else setData(taxonomyData);
+
+      // Reset table state.
+      table.resetColumnFilters();
+      table.resetSorting();
+      table.resetRowSelection();
+    },
+    [table, taxonomyData]
+  );
+
+  return { actions: { switchBrowseMethod }, table };
 };

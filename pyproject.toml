@@ -2,6 +2,7 @@
 target-version = "py38"
 line-length = 88
 indent-width = 4
+extend-exclude = ["backend/pyproject.toml", "backend/poetry.lock"]
 
 [tool.ruff.format]
 quote-style = "double"

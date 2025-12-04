@@ -17,6 +17,7 @@ import {
   buildAnalyzeGenome,
   buildGenomeTaxonomicLevelStrain,
   buildIsRef,
+  formatNumber,
 } from "../brc-analytics-catalog/common/viewModelBuilders";
 
 /**
@@ -153,18 +154,22 @@ function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
     },
     {
       accessorKey: GA2_CATEGORY_KEY.LENGTH,
+      cell: ({ getValue }) => formatNumber(getValue()),
       header: GA2_CATEGORY_LABEL.LENGTH,
     },
     {
       accessorKey: GA2_CATEGORY_KEY.SCAFFOLD_COUNT,
+      cell: ({ getValue }) => formatNumber(getValue()),
       header: GA2_CATEGORY_LABEL.SCAFFOLD_COUNT,
     },
     {
       accessorKey: GA2_CATEGORY_KEY.SCAFFOLD_N50,
+      cell: ({ getValue }) => formatNumber(getValue()),
       header: GA2_CATEGORY_LABEL.SCAFFOLD_N50,
     },
     {
       accessorKey: GA2_CATEGORY_KEY.SCAFFOLD_L50,
+      cell: ({ getValue }) => formatNumber(getValue()),
       header: GA2_CATEGORY_LABEL.SCAFFOLD_L50,
     },
     {

@@ -34,7 +34,10 @@ export { AnalysisMethodsCatalog } from "./Entity/components/AnalysisMethodsCatal
 export { AnalysisMethodsTitle } from "./Entity/components/AnalysisMethodsTitle/analysisMethodsTitle";
 export { AnalysisPortals } from "./Entity/components/AnalysisPortals/analysisPortals";
 export { GridPaperSection } from "./Layout/components/Detail/components/Section/section.styles";
-export { Branding } from "./Layout/components/Footer/components/Branding/branding";
+export {
+  Branding,
+  GA2Branding,
+} from "./Layout/components/Footer/components/Branding/branding";
 export { AnalyzeGenome } from "./Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 export { TypographyWordBreak } from "@databiosphere/findable-ui/lib/components/common/Typography/TypographyWordBreak/TypographyWordBreak";
 export { MDXSection } from "./Entity/components/Section/MDXSection/mdxSection";

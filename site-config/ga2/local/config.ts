@@ -10,6 +10,7 @@ import {
 import { AppSiteConfig } from "../../common/entities";
 import { APP_KEYS } from "../../common/constants";
 import data from "catalog/ga2/output/ncbi-taxa-tree.json";
+import { socialMedia } from "./socialMedia";
 import { TaxonomyNode } from "../../../app/components/Home/components/Section/components/SectionViz/data";
 import { THEME_OPTIONS } from "./theme/constants";
 
@@ -60,6 +61,8 @@ export function makeConfig(
     gitHubUrl,
     layout: {
       footer: {
+        Branding: C.GA2Branding(),
+        socials: socialMedia.socials,
         versionInfo: true,
       },
       header: {
@@ -81,7 +84,7 @@ export function makeConfig(
         ],
       },
     },
-    maxReadRunsForBrowseAll: 4000,
+    maxReadRunsForBrowseAll: 60000,
     redirectRootToPath: "/",
     taxTree: taxTreeData,
     themeOptions: THEME_OPTIONS,

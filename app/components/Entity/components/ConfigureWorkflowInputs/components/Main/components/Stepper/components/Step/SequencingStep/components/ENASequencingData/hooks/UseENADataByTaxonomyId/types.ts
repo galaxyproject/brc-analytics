@@ -1,16 +1,17 @@
-export type OnRequestData = (
+export type OnRequestData<T> = (
   taxonomyId: string,
-  submitOptions?: SubmitOptions
+  submitOptions?: SubmitOptions<T>
 ) => Promise<void>;
 
 export interface Status {
+  eligible: boolean;
   errors: Record<string, string>;
   loading: boolean;
 }
 
-export interface SubmitOptions {
+export interface SubmitOptions<T> {
   onError?: (error: Error) => void;
-  onSuccess?: () => void;
+  onSuccess?: (data: T[]) => void;
 }
 
 export interface UseENADataByTaxonomyId<T> {

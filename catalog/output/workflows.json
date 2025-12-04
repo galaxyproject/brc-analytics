@@ -14,7 +14,8 @@
             "data_requirements": {
               "library_layout": "PAIRED",
               "library_strategy": [
-                "WGS"
+                "WGS",
+                "AMPLICON"
               ]
             }
           },
@@ -175,9 +176,6 @@
               "library_layout": "PAIRED",
               "library_source": [
                 "TRANSCRIPTOMIC SINGLE CELL"
-              ],
-              "library_strategy": [
-                "RNA-Seq"
               ]
             }
           }
@@ -206,9 +204,6 @@
               "library_layout": "PAIRED",
               "library_source": [
                 "TRANSCRIPTOMIC SINGLE CELL"
-              ],
-              "library_strategy": [
-                "RNA-Seq"
               ]
             }
           }
@@ -406,7 +401,8 @@
             "data_requirements": {
               "library_layout": "PAIRED",
               "library_strategy": [
-                "WGS"
+                "WGS",
+                "AMPLICON"
               ]
             }
           },

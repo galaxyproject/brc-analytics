@@ -8,7 +8,7 @@ import taxonomyReadCounts from "./taxonomy_read_counts.json";
  * @param maxReadRuns - Maximum allowable read runs for pre-fetching (default is 2000).
  * @returns True if ENA data by taxonomy ID should be pre-fetched.
  */
-export function shouldFetch(
+export function isEligible(
   taxonomyId: string,
   maxReadRuns: number = 2000
 ): boolean {

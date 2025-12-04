@@ -1,4 +1,4 @@
-from ...py_package.catalog_build import build_files
+from ...py_package.catalog_build import build_files, create_taxonomy_read_run_count
 
 ASSEMBLIES_PATH = "catalog/source/assemblies.yml"
 ORGANISMS_PATH = "catalog/source/organisms.yml"
@@ -13,6 +13,8 @@ OUTBREAK_TAXONOMY_MAPPING_PATH = (
 
 QC_REPORT_PATH = "catalog/output/qc-report.data.md"
 TREE_OUTPUT_PATH = "catalog/output/ncbi-taxa-tree.json"
+
+TAXONOMY_READ_RUN_COUNTS_OUTPUT_PATH = "catalog/build/intermediate/taxIdReadCount.json"
 
 TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
     2: "Bacteria",
@@ -52,6 +54,7 @@ TAXANOMIC_LEVELS_FOR_TREE = [
     "isolate",
 ]
 
+
 if __name__ == "__main__":
     build_files(
         ASSEMBLIES_PATH,
@@ -64,4 +67,7 @@ if __name__ == "__main__":
         organisms_path=ORGANISMS_PATH,
         outbreaks_path=OUTBREAKS_PATH,
         outbreak_taxonomy_mapping_path=OUTBREAK_TAXONOMY_MAPPING_PATH,
+    )
+    create_taxonomy_read_run_count(
+        GENOMES_OUTPUT_PATH, TAXONOMY_READ_RUN_COUNTS_OUTPUT_PATH
     )

@@ -11,16 +11,6 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
   },
   {
     categoryConfigs: [
-      CATEGORY_REGISTRY.ACCESSION,
-      CATEGORY_REGISTRY.IS_REF,
-      CATEGORY_REGISTRY.LEVEL,
-      CATEGORY_REGISTRY.COVERAGE,
-      CATEGORY_REGISTRY.ANNOTATION_STATUS,
-    ],
-    label: "Assembly",
-  },
-  {
-    categoryConfigs: [
       CATEGORY_REGISTRY.TAXONOMIC_LEVEL_DOMAIN,
       CATEGORY_REGISTRY.TAXONOMIC_LEVEL_KINGDOM,
       CATEGORY_REGISTRY.TAXONOMIC_LEVEL_PHYLUM,
@@ -30,5 +20,15 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
       CATEGORY_REGISTRY.TAXONOMIC_LEVEL_GENUS,
     ],
     label: "Taxonomic Lineage",
+  },
+  {
+    categoryConfigs: [
+      CATEGORY_REGISTRY.ACCESSION,
+      CATEGORY_REGISTRY.IS_REF,
+      CATEGORY_REGISTRY.LEVEL,
+      CATEGORY_REGISTRY.COVERAGE,
+      CATEGORY_REGISTRY.ANNOTATION_STATUS,
+    ],
+    label: "Assembly",
   },
 ];

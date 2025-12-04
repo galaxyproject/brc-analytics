@@ -13,8 +13,9 @@ import {
   Subhead,
   SubHeadline,
 } from "./sectionHero.styles";
+import { BaseComponentProps } from "@databiosphere/findable-ui/lib/components/types";
 
-export interface SectionHeroProps {
+export interface SectionHeroProps extends BaseComponentProps {
   breadcrumbs: Breadcrumb[];
   head: ReactNode;
   subHead: ReactNode;
@@ -22,11 +23,12 @@ export interface SectionHeroProps {
 
 export const SectionHero = ({
   breadcrumbs,
+  className,
   head,
   subHead,
 }: SectionHeroProps): JSX.Element => {
   return (
-    <StyledSection>
+    <StyledSection className={className}>
       {(height, width): JSX.Element => (
         <Fragment>
           <Hero
