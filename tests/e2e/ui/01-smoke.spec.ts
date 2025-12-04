@@ -1,11 +1,22 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../utils/fixtures";
+import { ROUTES } from "../../../routes/constants";
+
+const PAGES = [
+  { name: "About", url: ROUTES.ABOUT },
+  { name: "Learn", url: ROUTES.LEARN },
+  { name: "Organisms", url: ROUTES.ORGANISMS },
+  { name: "Assemblies", url: ROUTES.GENOMES },
+  { name: "Priority Pathogens", url: ROUTES.PRIORITY_PATHOGENS },
+  { name: "Roadmap", url: ROUTES.ROADMAP },
+  { name: "Calendar", url: ROUTES.CALENDAR },
+];
 
 test.describe("BRC Analytics - UI Smoke Tests", () => {
   test("homepage should load", async ({ page }) => {
     await page.goto("/");
 
     // Page should have a title
-    await expect(page).toHaveTitle(/BRC Analytics|Genome Ark/);
+    await expect(page).toHaveTitle(/BRC Analytics$/);
   });
 
   test("navigation should be present", async ({ page }) => {
@@ -14,23 +25,21 @@ test.describe("BRC Analytics - UI Smoke Tests", () => {
     // Header should be visible
     const header = page.locator("header");
     await expect(header).toBeVisible();
+
+    // Navigation should be visible
+    const navigation = page.getByTestId("navigation");
+    await expect(navigation).toBeVisible();
   });
 
-  test("organisms page should load", async ({ page }) => {
-    await page.goto("/data/organisms");
+  for (const { name, url } of PAGES) {
+    test(`${name} page should load`, async ({ page }) => {
+      await page.goto(url);
 
-    // Page should load and show content
-    await expect(page).toHaveTitle(/BRC Analytics|Genome Ark/);
-    // Table or content area should be present
-    await expect(page.locator("main")).toBeVisible();
-  });
+      // Page should have title
+      await expect(page).toHaveTitle(/BRC Analytics$/);
 
-  // Skipped: pre-existing bug on upstream/main - _react.cache error on /data/genomes
-  test.skip("assemblies page should load", async ({ page }) => {
-    await page.goto("/data/genomes");
-
-    // Page should load and show content
-    await expect(page).toHaveTitle(/BRC Analytics|Genome Ark/);
-    await expect(page.locator("main")).toBeVisible();
-  });
+      // Page should have content
+      await expect(page.locator("main")).toBeVisible();
+    });
+  }
 });

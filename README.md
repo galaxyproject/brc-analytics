@@ -169,3 +169,21 @@ Production deployment happens automatically when changes are merged to the `prod
 1. Merge the release version bump PR to `main`
 2. Create a PR from `main` to `production` (or merge directly)
 3. Once merged to `production`, the deployment workflow automatically builds and deploys to production
+
+## E2E Testing
+
+This project uses Playwright for E2E testing to ensure reliability across different browsers and devices.
+
+### Running Tests
+
+To run FE E2E tests:
+
+```
+npm run test:e2e
+```
+
+To run BE E2E tests:
+
+```
+npm run test:e2e:api
+```
