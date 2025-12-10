@@ -299,17 +299,32 @@ def merge_into_existing(
         for key in MANIFEST_SOURCE_OF_TRUTH:
             existing_dict[key] = new_dict[key]
 
-        # Find stale parameters (kept for manual review, not removed)
+        # Find stale parameters
         is_active = getattr(existing_workflow_input, "active", False)
         trs_base = current_workflow_input.trs_id.rsplit("/versions/v", 1)[0]
 
         stale_params = find_stale_parameters(
             current_workflow_input, existing_workflow_input
         )
-        for param_key in stale_params:
-            stale_param_qc_items.append(
-                {"trs_base": trs_base, "param_key": param_key, "active": is_active}
-            )
+
+        if is_active:
+            # For active workflows, keep stale params but report them for manual review
+            for param_key in stale_params:
+                stale_param_qc_items.append(
+                    {
+                        "trs_base": trs_base,
+                        "param_key": param_key,
+                        "active": True,
+                    }
+                )
+        else:
+            # For inactive workflows, automatically drop stale params from the merged YAML
+            if stale_params and "parameters" in existing_dict:
+                existing_dict["parameters"] = [
+                    p
+                    for p in existing_dict["parameters"]
+                    if p.get("key") not in set(stale_params)
+                ]
 
         updated_existing_workflow = Workflow(**existing_dict)
 
