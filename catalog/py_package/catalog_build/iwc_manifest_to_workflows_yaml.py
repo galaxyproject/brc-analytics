@@ -50,6 +50,11 @@ def read_existing_yaml(workflows_path: str) -> Dict[str, Workflow]:
 def get_workflow_categories_from_collections(
     collections: List[str],
 ) -> List[WorkflowCategoryId]:
+    # If no Dockstore collections are defined, treat as OTHER so behavior
+    # is consistent with unmapped collections (which also become OTHER).
+    if not collections:
+        return [WorkflowCategoryId.OTHER]
+
     return sorted(
         list(
             set(
@@ -473,7 +478,10 @@ def to_workflows_yaml(
                         }
                     )
 
-    # Filter QC entries to only those that correspond to workflows we actually keep and are active
+    # Filter QC entries to only those that correspond to workflows we actually keep
+    final_workflow_bases = {
+        wf.trs_id.rsplit("/versions/v", 1)[0] for wf in final_workflows
+    }
     final_active_bases = {
         wf.trs_id.rsplit("/versions/v", 1)[0]
         for wf in final_workflows
@@ -482,6 +490,26 @@ def to_workflows_yaml(
     version_qc_items = [
         e for e in version_qc_items if e.get("trs_base") in final_active_bases
     ]
+    # Filter new_workflow_qc_items to only include workflows actually written to YAML
+    # (excludes OTHER-only workflows when --exclude-other is used)
+    new_workflow_qc_items = [
+        e for e in new_workflow_qc_items if e.get("trs_base") in final_workflow_bases
+    ]
+
+    # Collect IWC workflows not in the final YAML (excluded due to category filtering)
+    iwc_current = generate_current_workflows(skip_validation=True)
+    excluded_iwc_workflows: List[Dict[str, str]] = []
+    for trs_base, wf in iwc_current.items():
+        if trs_base not in final_workflow_bases:
+            categories = [
+                c.value if hasattr(c, "value") else c for c in wf.categories
+            ]
+            excluded_iwc_workflows.append(
+                {
+                    "name": wf.workflow_name,
+                    "categories": ", ".join(categories) if categories else "none",
+                }
+            )
 
     # Optionally write QC report
     if qc_report_path:
@@ -493,6 +521,7 @@ def to_workflows_yaml(
             stale_param_qc_items,
             new_param_qc_items,
             new_workflow_qc_items,
+            excluded_iwc_workflows,
             qc_report_path,
         )
 
@@ -579,20 +608,31 @@ def write_workflows_qc_report(
     stale_param_qc_items: List[Dict[str, str]],
     new_param_qc_items: List[Dict[str, str]],
     new_workflow_qc_items: List[Dict[str, str]],
+    excluded_iwc_workflows: List[Dict[str, str]],
     out_path: str,
 ):
     """Write a modular Markdown QC report for workflows using shared qc_utils."""
     report_lines: List[str] = ["# Catalog Workflows QC report", ""]
 
-    # Section 1: Newly added workflows (could be configured and activated)
+    # Section 1: Newly added workflows (ephemeral - only shows on first run)
+    report_lines.append("## Newly added workflows this run")
+    report_lines.append("")
+    report_lines.append(
+        "> **Note:** This section shows workflows added to workflows.yml in this "
+        "script run. On subsequent runs, these will no longer appear here. "
+        "Commit or save this report if you need to track what was added."
+    )
+    report_lines.append("")
     new_workflow_items = [
         f"{e.get('name', 'unknown')} ({e.get('categories', 'none')})"
         for e in sorted(new_workflow_qc_items, key=lambda x: x.get("name", ""))
     ]
-    report_lines += format_list_section(
-        "## Newly added workflows (could be configured and set active)",
-        new_workflow_items,
-    )
+    if new_workflow_items:
+        report_lines += [f"- {item}" for item in new_workflow_items]
+        report_lines.append("")
+    else:
+        report_lines.append("None")
+        report_lines.append("")
 
     # Section 2: Active workflows with invalid Dockstore version (critical)
     invalid_version_items, version_mismatch_items = _split_version_qc_items(
@@ -652,6 +692,16 @@ def write_workflows_qc_report(
     else:
         report_lines.append("None")
         report_lines.append("")
+
+    # Section: IWC workflows not in workflows.yml (excluded due to category filtering)
+    excluded_items = [
+        f"{e.get('name', 'unknown')} ({e.get('categories', 'none')})"
+        for e in sorted(excluded_iwc_workflows, key=lambda x: x.get("name", ""))
+    ]
+    report_lines += format_list_section(
+        "## IWC workflows not in workflows.yml (excluded by category filter)",
+        excluded_items,
+    )
 
     write_markdown(out_path, join_report(report_lines))
 

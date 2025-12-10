@@ -30,8 +30,8 @@
         ],
         "ploidy": "ANY",
         "taxonomyId": "11158",
-        "trsId": "#workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main/versions/v0.1",
-        "workflowDescription": "Variant calling and consensus sequence generation for batches of Illumina PE sequenced viruses with uncomplicated and stable genome structure (like e.g. Morbilliviruses). It can handle both ampliconic and non-ampliconic data.",
+        "trsId": "#workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main/versions/v0.2",
+        "workflowDescription": "Variant calling and consensus sequence generation for batches of Illumina PE sequenced viruses with uncomplicated and stable genome structure (like e.g. Morbilliviruses).",
         "workflowName": "Variant calling and consensus construction from paired end short read data of non-segmented viral genomes"
       },
       {
@@ -306,7 +306,7 @@
         "iwcId": "chipseq-pe-main",
         "parameters": [
           {
-            "key": "reference_genome",
+            "key": "Reference genome",
             "variable": "ASSEMBLY_ID"
           },
           {
@@ -322,15 +322,15 @@
         ],
         "ploidy": "ANY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.15",
-        "workflowDescription": "Complete ChIP-seq analysis for paired-end sequencing data. Processes raw FASTQ files through adapter removal (cutadapt), alignment to reference genome (Bowtie2), and stringent quality filtering (MAPQ &gt;= 30, concordant pairs only). Peak calling with MACS2 optimized for paired-end reads identifies protein-DNA binding sites. Generates alignment files, peak calls, and quality metrics for downstream analysis.",
+        "trsId": "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v1.0",
+        "workflowDescription": "Complete ChIP-seq analysis for paired-end sequencing data. Processes raw FASTQ files through adapter removal (fastp), alignment to reference genome (Bowtie2), and stringent quality filtering (MAPQ greater than 30, concordant pairs only). Peak calling with MACS2 optimized for paired-end reads identifies protein-DNA binding sites. Generates alignment files, coverage, peak calls, and quality metrics for downstream analysis.",
         "workflowName": "ChIP-seq Analysis: Paired-End Read Processing"
       },
       {
         "iwcId": "chipseq-sr-main",
         "parameters": [
           {
-            "key": "reference_genome",
+            "key": "Reference genome",
             "variable": "ASSEMBLY_ID"
           },
           {
@@ -346,8 +346,8 @@
         ],
         "ploidy": "ANY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.15",
-        "workflowDescription": "Complete ChIP-seq analysis for single-end sequencing data. Processes raw FASTQ files through adapter removal (cutadapt), alignment to reference genome (Bowtie2), and quality filtering (MAPQ &gt;= 30). Peak calling with MACS2 uses either a fixed extension parameter or built-in model to identify protein-DNA binding sites. Generates alignment files, peak calls, and quality metrics for downstream analysis.",
+        "trsId": "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v1.0",
+        "workflowDescription": "Complete ChIP-seq analysis for single-end sequencing data. Processes raw FASTQ files through adapter removal (fastp), alignment to reference genome (Bowtie2), and quality filtering (MAPQ greater than 30). Peak calling with MACS2 uses a fixed extension of 200bp to identify protein-DNA binding sites. Generates alignment files, coverage, peak calls, and quality metrics for downstream analysis.",
         "workflowName": "ChIP-seq Analysis: Single-End Read Processing"
       },
       {
@@ -417,8 +417,8 @@
         ],
         "ploidy": "ANY",
         "taxonomyId": "11158",
-        "trsId": "#workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main/versions/v0.1",
-        "workflowDescription": "Variant calling and consensus sequence generation for batches of Illumina PE sequenced viruses with uncomplicated and stable genome structure (like e.g. Morbilliviruses). It can handle both ampliconic and non-ampliconic data.",
+        "trsId": "#workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main/versions/v0.2",
+        "workflowDescription": "Variant calling and consensus sequence generation for batches of Illumina PE sequenced viruses with uncomplicated and stable genome structure (like e.g. Morbilliviruses).",
         "workflowName": "Variant calling and consensus construction from paired end short read data of non-segmented viral genomes"
       },
       {
@@ -431,7 +431,7 @@
         ],
         "ploidy": "HAPLOID",
         "taxonomyId": "10244",
-        "trsId": "#workflow/github.com/iwc-workflows/pox-virus-amplicon/main/versions/v0.3",
+        "trsId": "#workflow/github.com/iwc-workflows/pox-virus-amplicon/main/versions/v0.4",
         "workflowDescription": "A workflow for the analysis of pox virus genomes sequenced as half-genomes (for ITR resolution) in a tiled-amplicon approach",
         "workflowName": "Pox Virus Illumina Amplicon Workflow from half-genomes"
       }
@@ -453,9 +453,23 @@
         ],
         "ploidy": "HAPLOID",
         "taxonomyId": "2",
-        "trsId": "#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.6",
+        "trsId": "#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.7",
         "workflowDescription": "Antimicrobial resistance gene detection from assembled bacterial genomes",
-        "workflowName": "AMR gene detection"
+        "workflowName": "AMR Gene Detection"
+      },
+      {
+        "iwcId": "annotation-maker-main",
+        "parameters": [
+          {
+            "key": "Genome sequence",
+            "variable": "ASSEMBLY_FASTA_URL"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": "2759",
+        "trsId": "#workflow/github.com/iwc-workflows/annotation-maker/main/versions/v0.1",
+        "workflowDescription": "This workflow allows for genome annotation using Maker and evaluates the quality of the annotation.",
+        "workflowName": "Genome annotation with Maker"
       },
       {
         "iwcId": "lncrnas-annotation-main",

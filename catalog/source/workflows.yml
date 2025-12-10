@@ -28,40 +28,6 @@ workflows:
           class: text
     active: true
     iwc_id: amr_gene_detection-main
-  - trs_id: "#workflow/github.com/iwc-workflows/annotation-braker3/main/versions/v0.1"
-    categories: []
-    workflow_name: Genome annotation with Braker3
-    workflow_description:
-      This workflow performs genome annotation using Braker3 and
-      evaluates the quality of the annotation with BUSCO and genome annotation statistics.
-    ploidy: ANY
-    parameters:
-      - key: BUSCO database
-        type_guide:
-          class: text
-      - key: Include BUSCO
-        type_guide:
-          class: boolean
-      - key: BUSCO lineage
-        type_guide:
-          class: text
-      - key: Soft masked Genome sequence
-        type_guide:
-          class: File
-          ext: fasta
-      - key: Alignments from RNA-seq
-        type_guide:
-          class: File
-          ext: bam
-      - key: Protein sequences
-        type_guide:
-          class: File
-          ext: fasta
-      - key: Fungus genome
-        type_guide:
-          class: boolean
-    active: false
-    iwc_id: annotation-braker3-main
   - trs_id: "#workflow/github.com/iwc-workflows/annotation-maker/main/versions/v0.1"
     categories:
       - ANNOTATION
@@ -873,47 +839,6 @@ workflows:
           class: text
     active: false
     iwc_id: hic-hicup-cooler-hic-juicermediumtabix-to-cool-cooler
-  - trs_id: "#workflow/github.com/iwc-workflows/host-contamination-removal-long-reads/main/versions/v0.2"
-    categories: []
-    workflow_name: Host or Contamination Removal on Long-Reads
-    workflow_description:
-      This workflow takes Nanopore fastq(.gz) files and runs Minimap2
-      to map the reads against a reference genome (human, by default). It filters the
-      output to keep only the unmapped reads and generates mapping statistics that are
-      aggregated into a MultiQC report.
-    ploidy: ANY
-    parameters:
-      - key: Host/Contaminant Reference Genome (long-reads)
-        type_guide:
-          class: text
-      - key: Long-reads
-        type_guide:
-          class: Collection
-          collection_type: list
-      - key: Profile of preset options for the mapping (long-read)
-        type_guide:
-          class: text
-    active: false
-    iwc_id: host-contamination-removal-long-reads-main
-  - trs_id: "#workflow/github.com/iwc-workflows/host-contamination-removal-short-reads/main/versions/v0.2"
-    categories: []
-    workflow_name: Host or Contamination Removal on Short-Reads
-    workflow_description:
-      This workflow takes paired-end Illumina fastq(.gz) files and
-      runs Bowtie to map the reads against a reference genome (human, by default) and
-      keep only the reads that do not align. MultiQC is used to aggregate the mapping
-      reports.
-    ploidy: ANY
-    parameters:
-      - key: Short-reads
-        type_guide:
-          class: Collection
-          collection_type: list:paired
-      - key: Host/Contaminant Reference Genome
-        type_guide:
-          class: text
-    active: false
-    iwc_id: host-contamination-removal-short-reads-main
   - trs_id: "#workflow/github.com/iwc-workflows/influenza-isolates-consensus-and-subtyping/main/versions/v0.2"
     categories:
       - CONSENSUS_SEQUENCES
@@ -1085,35 +1010,6 @@ workflows:
           class: text
     active: false
     iwc_id: pseudobulk-worflow-decoupler-edger-main
-  - trs_id: "#workflow/github.com/iwc-workflows/quality-and-contamination-control-raw-reads/main/versions/v1.1.11"
-    categories: []
-    workflow_name: Raw Read Quality and Contamination Control For Genome Assembly
-    workflow_description:
-      Short paired-end read analysis to provide quality analysis,
-      read cleaning and taxonomy assignation directly from raw reads
-    ploidy: ANY
-    parameters:
-      - key: Input sequence reads (forward)
-        type_guide:
-          class: File
-          ext:
-            - fastq
-            - fastq.gz
-            - fastqsanger
-            - fastqsanger.gz
-      - key: Input sequence reads (reverse)
-        type_guide:
-          class: File
-          ext:
-            - fastq
-            - fastq.gz
-            - fastqsanger
-            - fastqsanger.gz
-      - key: Taxonomy database for Kraken and Bracken
-        type_guide:
-          class: text
-    active: false
-    iwc_id: quality-and-contamination-control-raw-reads-main
   - trs_id: "#workflow/github.com/iwc-workflows/repeatmasking/main/versions/v0.1"
     categories:
       - ANNOTATION
@@ -1126,7 +1022,7 @@ workflows:
           class: File
     active: false
     iwc_id: repeatmasking-main
-  - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-de/main/versions/v0.4"
+  - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-de/main/versions/v0.5"
     categories:
       - TRANSCRIPTOMICS
     workflow_name: RNA-Seq Differential Expression Analysis with Visualization
@@ -1464,33 +1360,6 @@ workflows:
           class: integer
     active: false
     iwc_id: sars-cov-2-variation-reporting-covid-19-variation-reporting
-  - trs_id: "#workflow/github.com/iwc-workflows/short-read-qc-trimming/main/versions/v0.2"
-    categories: []
-    workflow_name: Short-read quality control and trimming
-    workflow_description:
-      This workflow performs quality control and trimming on paired-end
-      Illumina fastq(.gz) files using fastp and aggregates the quality control reports
-      with MultiQC
-    ploidy: ANY
-    parameters:
-      - key: Raw reads
-        type_guide:
-          class: Collection
-          collection_type: list:paired
-      - key: Adapter to remove on forward reads
-        type_guide:
-          class: text
-      - key: Adapter to remove on reverse reads
-        type_guide:
-          class: text
-      - key: Qualified quality score
-        type_guide:
-          class: integer
-      - key: Minimal read length
-        type_guide:
-          class: integer
-    active: false
-    iwc_id: short-read-qc-trimming-main
   - trs_id: "#workflow/github.com/iwc-workflows/variation-reporting/main/versions/v0.1.1"
     categories:
       - VARIANT_CALLING

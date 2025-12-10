@@ -1,6 +1,42 @@
 # Catalog Workflows QC report
 
-## Newly added workflows (could be configured and set active)
+## Newly added workflows this run
+
+> **Note:** This section shows workflows added to workflows.yml in this script run. On subsequent runs, these will no longer appear here. Commit or save this report if you need to track what was added.
+
+None
+
+## Active workflows with version not on Dockstore
+
+None
+
+## Workflows not using newest IWC version (newer not on Dockstore yet)
+
+None
+
+## Workflows with unknown category and one valid category (kept)
+
+- #workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex (categories: OTHER, TRANSCRIPTOMICS)
+- #workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3 (categories: OTHER, TRANSCRIPTOMICS)
+- #workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-variant-calling/COVID-19-PE-ARTIC-ILLUMINA (categories: OTHER, VARIANT_CALLING)
+- #workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-wgs-variant-calling/COVID-19-PE-WGS-ILLUMINA (categories: OTHER, VARIANT_CALLING)
+- #workflow/github.com/iwc-workflows/sars-cov-2-se-illumina-wgs-variant-calling/COVID-19-SE-WGS-ILLUMINA (categories: OTHER, VARIANT_CALLING)
+
+## Workflows with only unknown category (excluded)
+
+None
+
+## Workflows with multiple valid categories
+
+- #workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main (categories: CONSENSUS_SEQUENCES, VARIANT_CALLING)
+
+## Parameter changes by workflow
+
+> **Note:** New parameters are added to workflows.yml on each run. On subsequent runs, they will no longer appear as 'new' even if stale parameters haven't been addressed yet. If you see both stale and new params for a workflow, commit or save this report before re-running so you don't lose the pairing info (useful for identifying renames).
+
+None
+
+## IWC workflows not in workflows.yml (excluded by category filter)
 
 - Allele-based Pathogen Identification (OTHER)
 - Assembly decontamination VGP9  (OTHER)
@@ -18,6 +54,9 @@
 - Genome Assembly from Hifi reads - VGP3 (OTHER)
 - Genome Assembly from Hifi reads with HiC phasing - VGP4 (OTHER)
 - Genome Assembly with Pacbio Hifi reads and Trio data for phasing - VGP5 (OTHER)
+- Genome annotation with Braker3 (OTHER)
+- Host or Contamination Removal on Long-Reads (OTHER)
+- Host or Contamination Removal on Short-Reads (OTHER)
 - K-mer profiling and reads statistics VGP1 (OTHER)
 - MAPseq to ampvis2 (OTHER)
 - MGnify amplicon summary tables (OTHER)
@@ -52,9 +91,11 @@
 - QIIME2-III-V-Phylogeny-Rarefaction-Taxonomic-Analysis (OTHER)
 - RNA Velocity Analysis: Velocyto for 10X Data from Bundled Output (OTHER)
 - RNA Velocity Analysis: Velocyto for 10X Data with Filtered Barcodes (OTHER)
+- Raw Read Quality and Contamination Control For Genome Assembly (OTHER)
 - Scaffolding with Hi-C data VGP8 (OTHER)
 - Scaffolding-BioNano-VGP7 (OTHER)
 - Segmentation and counting of cell nuclei in fluorescence microscopy images (OTHER)
+- Short-read quality control and trimming (OTHER)
 - Single-Cell RNA-seq Analysis: Scanpy Preprocessing and Clustering (OTHER)
 - Taxonomic abundance summary tables for a specified taxonomic rank (OTHER)
 - Taxonomy Profiling and Visualization with Krona (OTHER)
@@ -62,33 +103,3 @@
 - dcTMD calculations with GROMACS (OTHER)
 - kmer-profiling-hifi-trio-VGP2 (OTHER)
 - sra_manifest_to_concatenated_fastqs_parallel (OTHER)
-
-## Active workflows with version not on Dockstore
-
-None
-
-## Workflows not using newest IWC version (newer not on Dockstore yet)
-
-None
-
-## Workflows with unknown category and one valid category (kept)
-
-- #workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex (categories: OTHER, TRANSCRIPTOMICS)
-- #workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3 (categories: OTHER, TRANSCRIPTOMICS)
-- #workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-variant-calling/COVID-19-PE-ARTIC-ILLUMINA (categories: OTHER, VARIANT_CALLING)
-- #workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-wgs-variant-calling/COVID-19-PE-WGS-ILLUMINA (categories: OTHER, VARIANT_CALLING)
-- #workflow/github.com/iwc-workflows/sars-cov-2-se-illumina-wgs-variant-calling/COVID-19-SE-WGS-ILLUMINA (categories: OTHER, VARIANT_CALLING)
-
-## Workflows with only unknown category (excluded)
-
-None
-
-## Workflows with multiple valid categories
-
-- #workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main (categories: CONSENSUS_SEQUENCES, VARIANT_CALLING)
-
-## Parameter changes by workflow
-
-> **Note:** New parameters are added to workflows.yml on each run. On subsequent runs, they will no longer appear as 'new' even if stale parameters haven't been addressed yet. If you see both stale and new params for a workflow, commit or save this report before re-running so you don't lose the pairing info (useful for identifying renames).
-
-None
