@@ -11,27 +11,6 @@ workflows:
     parameters:
       - key: Input sequence fasta
         variable: ASSEMBLY_FASTA_URL
-      - key: Select a taxonomy group point mutation
-        type_guide:
-          class: text
-      - key: Select a AMR genes detection database
-        type_guide:
-          class: text
-      - key: Select a virulence genes detection database
-        type_guide:
-          class: text
-      - key: Select a StarmAMR database
-        type_guide:
-          class: text
-      - key: Select species for point mutation analysis using PointFinder
-        type_guide:
-          class: text
-      - key: StarAMR database
-        type_guide:
-          class: text
-      - key: Species for point mutation analysis using PointFinder
-        type_guide:
-          class: text
       - key: Taxonomy group point mutation
         type_guide:
           class: text
@@ -39,6 +18,12 @@ workflows:
         type_guide:
           class: text
       - key: Virulence genes detection database
+        type_guide:
+          class: text
+      - key: StarAMR database
+        type_guide:
+          class: text
+      - key: Species for point mutation analysis using PointFinder
         type_guide:
           class: text
     active: true
@@ -212,15 +197,6 @@ workflows:
     parameters:
       - key: Input sequence fasta
         variable: ASSEMBLY_FASTA_URL
-      - key: Select a plasmid detection database
-        type_guide:
-          class: text
-      - key: Select a bacterial genome annotation database
-        type_guide:
-          class: text
-      - key: Select a AMRFinderPlus database
-        type_guide:
-          class: text
       - key: Plasmid detection database
         type_guide:
           class: text
@@ -343,7 +319,7 @@ workflows:
       quality metrics for downstream analysis.
     ploidy: ANY
     parameters:
-      - key: reference_genome
+      - key: Reference genome
         variable: ASSEMBLY_ID
       - key: PE fastq input
         variable: SANGER_READ_RUN_PAIRED
@@ -354,30 +330,15 @@ workflows:
         type_guide:
           class: Collection
           collection_type: list:paired
-      - key: adapter_forward
-        type_guide:
-          class: text
-      - key: adapter_reverse
-        type_guide:
-          class: text
-      - key: effective_genome_size
-        type_guide:
-          class: integer
-      - key: normalize_profile
-        type_guide:
-          class: boolean
-      - key: Percentage of bad quality bases per read
-        type_guide:
-          class: integer
-      - key: Reference genome
-        type_guide:
-          class: text
       - key: Effective genome size
         type_guide:
           class: integer
       - key: Normalize profile
         type_guide:
           class: boolean
+      - key: Percentage of bad quality bases per read
+        type_guide:
+          class: integer
     active: true
     iwc_id: chipseq-pe-main
   - trs_id: "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v1.0"
@@ -392,7 +353,7 @@ workflows:
       alignment files, coverage, peak calls, and quality metrics for downstream analysis.
     ploidy: ANY
     parameters:
-      - key: reference_genome
+      - key: Reference genome
         variable: ASSEMBLY_ID
       - key: SR fastq input
         variable: SANGER_READ_RUN_SINGLE
@@ -403,22 +364,7 @@ workflows:
         type_guide:
           class: Collection
           collection_type: list
-      - key: adapter_forward
-        type_guide:
-          class: text
-      - key: effective_genome_size
-        type_guide:
-          class: integer
-      - key: normalize_profile
-        type_guide:
-          class: boolean
       - key: Adapter sequence
-        type_guide:
-          class: text
-      - key: Percentage of bad quality bases per read
-        type_guide:
-          class: integer
-      - key: Reference genome
         type_guide:
           class: text
       - key: Effective genome size
@@ -427,6 +373,9 @@ workflows:
       - key: Normalize profile
         type_guide:
           class: boolean
+      - key: Percentage of bad quality bases per read
+        type_guide:
+          class: integer
     active: true
     iwc_id: chipseq-sr-main
   - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.3"
@@ -1160,12 +1109,6 @@ workflows:
             - fastq.gz
             - fastqsanger
             - fastqsanger.gz
-      - key: Select a taxonomy database
-        type_guide:
-          class: text
-      - key: Select a NCBI taxonomy database
-        type_guide:
-          class: text
       - key: Taxonomy database for Kraken and Bracken
         type_guide:
           class: text
