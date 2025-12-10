@@ -178,47 +178,84 @@ def generate_current_workflows(skip_validation: bool = False) -> Dict[str, Workf
     return by_trs_id
 
 
-def ensure_parameters_exist(
+def find_stale_parameters(
     current_workflow_input: Workflow, existing_workflow_input: Workflow
-):
-    # check that specified parameters still exist
+) -> List[str]:
+    """Find parameters in existing workflow that no longer exist in IWC.
+
+    Returns a list of stale parameter keys for QC reporting.
+    Does NOT remove them - they are kept for manual review.
+    """
     current_workflow_parameter_keys = {
         param.key for param in current_workflow_input.parameters
     }
+    stale_params: List[str] = []
     for param in existing_workflow_input.parameters:
         if param.key not in current_workflow_parameter_keys:
-            # Should be rare, but can happen.
-            raise Exception(
-                f"{param.key} specified but is not part of updated workflow {current_workflow_input.trs_id}! Review and fix manually"
-            )
+            stale_params.append(param.key)
+    return stale_params
 
 
 def add_missing_parameters(
     current_workflow_input: Workflow, existing_workflow_input: Workflow
-):
-    # check for missing parameters in the existing workflow
+) -> List[str]:
+    """Add parameters from IWC that don't exist in existing workflow.
+
+    Returns a list of newly added parameter keys for QC reporting.
+    """
     existing_parameter_keys = {
         param.key for param in existing_workflow_input.parameters
     }
+    new_params: List[str] = []
     for param in current_workflow_input.parameters:
         if param.key not in existing_parameter_keys:
-            # If a parameter is missing in the existing workflow, add it
             existing_workflow_input.parameters.append(param)
+            new_params.append(param.key)
+    return new_params
 
 
 def merge_into_existing(
     workflows_path: str, skip_validation: bool = False
-) -> Dict[str, Workflow]:
+) -> Tuple[
+    Dict[str, Workflow],
+    List[Dict[str, str]],
+    List[Dict[str, str]],
+    List[Dict[str, str]],
+]:
+    """Merge IWC manifest workflows into existing workflows.
+
+    Returns a tuple of:
+        - merged workflows dict
+        - stale parameter QC items (params in existing but not in IWC)
+        - new parameter QC items (params in IWC but not in existing)
+        - newly added workflow QC items (workflows not previously in YAML)
+    """
     existing = read_existing_yaml(workflows_path)
     current = generate_current_workflows(skip_validation)
     merged: Dict[str, Workflow] = {}
     invalid_versions = []
     versions_kept = []
+    stale_param_qc_items: List[Dict[str, str]] = []
+    new_param_qc_items: List[Dict[str, str]] = []
+    new_workflow_qc_items: List[Dict[str, str]] = []
 
     for versionless_trs_id, current_workflow_input in current.items():
         existing_workflow_input = existing.get(versionless_trs_id)
         if not existing_workflow_input:
+            # This is a newly added workflow from IWC
             merged[versionless_trs_id] = current_workflow_input
+            trs_base = current_workflow_input.trs_id.rsplit("/versions/v", 1)[0]
+            categories = [
+                c.value if hasattr(c, "value") else c
+                for c in current_workflow_input.categories
+            ]
+            new_workflow_qc_items.append(
+                {
+                    "trs_base": trs_base,
+                    "name": current_workflow_input.workflow_name,
+                    "categories": ", ".join(categories) if categories else "none",
+                }
+            )
             continue
 
         iwc_version_valid = verify_trs_version_exists(
@@ -245,9 +282,12 @@ def merge_into_existing(
                 invalid_versions.append(existing_workflow_input.trs_id)
             else:
                 # Both versions are invalid - this shouldn't happen often
-                print(
-                    f"Error: Neither existing nor IWC version exists on Dockstore for {versionless_trs_id}"
-                )
+                is_active = getattr(existing_workflow_input, "active", False)
+                if is_active:
+                    print(
+                        f"Warning: Neither existing nor IWC version exists on "
+                        f"Dockstore for ACTIVE workflow {versionless_trs_id}"
+                    )
                 # Keep what we have
                 current_workflow_input.trs_id = existing_workflow_input.trs_id
 
@@ -259,9 +299,29 @@ def merge_into_existing(
         for key in MANIFEST_SOURCE_OF_TRUTH:
             existing_dict[key] = new_dict[key]
 
-        ensure_parameters_exist(current_workflow_input, existing_workflow_input)
+        # Find stale parameters (kept for manual review, not removed)
+        is_active = getattr(existing_workflow_input, "active", False)
+        trs_base = current_workflow_input.trs_id.rsplit("/versions/v", 1)[0]
+
+        stale_params = find_stale_parameters(
+            current_workflow_input, existing_workflow_input
+        )
+        for param_key in stale_params:
+            stale_param_qc_items.append(
+                {"trs_base": trs_base, "param_key": param_key, "active": is_active}
+            )
+
         updated_existing_workflow = Workflow(**existing_dict)
-        add_missing_parameters(current_workflow_input, updated_existing_workflow)
+
+        # Add new parameters from IWC
+        new_params = add_missing_parameters(
+            current_workflow_input, updated_existing_workflow
+        )
+        for param_key in new_params:
+            new_param_qc_items.append(
+                {"trs_base": trs_base, "param_key": param_key, "active": is_active}
+            )
+
         current_workflow_input = updated_existing_workflow
         merged[versionless_trs_id] = current_workflow_input
 
@@ -276,7 +336,7 @@ def merge_into_existing(
         print(f"\nFixed {len(invalid_versions)} invalid versions in workflows.yml")
 
     # QC entries are now computed centrally in to_workflows_yaml
-    return merged
+    return merged, stale_param_qc_items, new_param_qc_items, new_workflow_qc_items
 
 
 def to_workflows_yaml(
@@ -285,7 +345,9 @@ def to_workflows_yaml(
     skip_validation: bool = False,
     qc_report_path: Optional[str] = None,
 ):
-    by_trs_id = merge_into_existing(workflows_path, skip_validation)
+    by_trs_id, stale_param_qc_items, new_param_qc_items, new_workflow_qc_items = (
+        merge_into_existing(workflows_path, skip_validation)
+    )
     # sort by trs id, should play nicer with git diffs
     sorted_workflows = list(dict(sorted(by_trs_id.items())).values())
     # Collect category information BEFORE any exclusion or category mutation
@@ -413,24 +475,85 @@ def to_workflows_yaml(
             workflows_with_other_and_valid,
             workflows_excluded_other_only,
             workflows_multiple_valid,
+            stale_param_qc_items,
+            new_param_qc_items,
+            new_workflow_qc_items,
             qc_report_path,
         )
 
 
-def _format_version_mismatch_items(version_qc_items: List[Dict[str, str]]) -> List[str]:
-    if not version_qc_items:
-        return []
-    items: List[str] = []
+def _split_version_qc_items(
+    version_qc_items: List[Dict[str, str]],
+) -> Tuple[List[str], List[str]]:
+    """Split version QC items into invalid versions and version mismatches.
+
+    Returns:
+        - invalid_items: Active workflows with version not on Dockstore
+        - mismatch_items: Workflows not using newest IWC version
+    """
+    invalid_items: List[str] = []
+    mismatch_items: List[str] = []
+
     for e in sorted(version_qc_items, key=lambda x: x.get("trs_base", "")):
-        items.append(
-            "{trs_base} used v{used_version} vs IWC v{iwc_version} ({reason})".format(
-                trs_base=e.get("trs_base", "unknown"),
-                used_version=e.get("used_version", "unknown"),
-                iwc_version=e.get("iwc_version", "unknown"),
-                reason=e.get("reason", ""),
+        trs_base = e.get("trs_base", "unknown")
+        used_version = e.get("used_version", "unknown")
+        iwc_version = e.get("iwc_version", "unknown")
+        reason = e.get("reason", "")
+
+        if reason == "Active workflow version not on Dockstore":
+            invalid_items.append(f"{trs_base} (v{used_version})")
+        else:
+            mismatch_items.append(
+                f"{trs_base}: using v{used_version}, IWC has v{iwc_version}"
             )
-        )
-    return items
+
+    return invalid_items, mismatch_items
+
+
+def _format_param_changes_by_workflow(
+    stale_param_qc_items: List[Dict[str, str]],
+    new_param_qc_items: List[Dict[str, str]],
+) -> List[str]:
+    """Format parameter changes grouped by workflow for easier review."""
+    # Group by workflow
+    from collections import defaultdict
+
+    by_workflow: Dict[str, Dict[str, List[str]]] = defaultdict(
+        lambda: {"stale": [], "new": [], "active": False}
+    )
+
+    for e in stale_param_qc_items:
+        trs_base = e.get("trs_base", "unknown")
+        by_workflow[trs_base]["stale"].append(e.get("param_key", "unknown"))
+        if e.get("active"):
+            by_workflow[trs_base]["active"] = True
+
+    for e in new_param_qc_items:
+        trs_base = e.get("trs_base", "unknown")
+        by_workflow[trs_base]["new"].append(e.get("param_key", "unknown"))
+        if e.get("active"):
+            by_workflow[trs_base]["active"] = True
+
+    if not by_workflow:
+        return []
+
+    lines: List[str] = []
+    for trs_base in sorted(by_workflow.keys()):
+        data = by_workflow[trs_base]
+        status = "ACTIVE" if data["active"] else "inactive"
+        lines.append(f"### {trs_base} ({status})")
+        lines.append("")
+        if data["stale"]:
+            lines.append("**Stale (not in IWC, kept for review):**")
+            for param in sorted(data["stale"]):
+                lines.append(f"- {param}")
+            lines.append("")
+        if data["new"]:
+            lines.append("**New (added from IWC):**")
+            for param in sorted(data["new"]):
+                lines.append(f"- {param}")
+            lines.append("")
+    return lines
 
 
 def write_workflows_qc_report(
@@ -438,18 +561,39 @@ def write_workflows_qc_report(
     workflows_with_other_and_valid: List[Tuple[str, List[str]]],
     workflows_excluded_other_only: List[str],
     workflows_multiple_valid: List[Tuple[str, List[str]]],
+    stale_param_qc_items: List[Dict[str, str]],
+    new_param_qc_items: List[Dict[str, str]],
+    new_workflow_qc_items: List[Dict[str, str]],
     out_path: str,
 ):
     """Write a modular Markdown QC report for workflows using shared qc_utils."""
     report_lines: List[str] = ["# Catalog Workflows QC report", ""]
 
-    # Section 1: Version mismatches
-    version_items = _format_version_mismatch_items(version_qc_items)
+    # Section 1: Newly added workflows (could be configured and activated)
+    new_workflow_items = [
+        f"{e.get('name', 'unknown')} ({e.get('categories', 'none')})"
+        for e in sorted(new_workflow_qc_items, key=lambda x: x.get("name", ""))
+    ]
     report_lines += format_list_section(
-        "## Workflows not using newest IWC version", version_items
+        "## Newly added workflows (could be configured and set active)",
+        new_workflow_items,
     )
 
-    # Section 2: Workflows with OTHER + one valid category (kept)
+    # Section 2: Active workflows with invalid Dockstore version (critical)
+    invalid_version_items, version_mismatch_items = _split_version_qc_items(
+        version_qc_items
+    )
+    report_lines += format_list_section(
+        "## Active workflows with version not on Dockstore", invalid_version_items
+    )
+
+    # Section 3: Workflows not using newest IWC version (informational)
+    report_lines += format_list_section(
+        "## Workflows not using newest IWC version (newer not on Dockstore yet)",
+        version_mismatch_items,
+    )
+
+    # Section 4: Workflows with OTHER + one valid category (kept)
     other_and_valid_items = [
         f"{trs_base} (categories: {', '.join(cats)})"
         for trs_base, cats in sorted(workflows_with_other_and_valid)
@@ -473,6 +617,26 @@ def write_workflows_qc_report(
     report_lines += format_list_section(
         "## Workflows with multiple valid categories", multiple_valid_items
     )
+
+    # Section 5: Parameter changes (stale and new, grouped by workflow)
+    report_lines.append("## Parameter changes by workflow")
+    report_lines.append("")
+    report_lines.append(
+        "> **Note:** New parameters are added to workflows.yml on each run. "
+        "On subsequent runs, they will no longer appear as 'new' even if "
+        "stale parameters haven't been addressed yet. If you see both stale "
+        "and new params for a workflow, commit or save this report before "
+        "re-running so you don't lose the pairing info (useful for identifying "
+        "renames)."
+    )
+    report_lines.append("")
+    if stale_param_qc_items or new_param_qc_items:
+        report_lines += _format_param_changes_by_workflow(
+            stale_param_qc_items, new_param_qc_items
+        )
+    else:
+        report_lines.append("None")
+        report_lines.append("")
 
     write_markdown(out_path, join_report(report_lines))
 

@@ -1,8 +1,8 @@
 workflows:
-  - trs_id: "#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.6"
+  - trs_id: "#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.7"
     categories:
       - ANNOTATION
-    workflow_name: AMR gene detection
+    workflow_name: AMR Gene Detection
     workflow_description:
       Antimicrobial resistance gene detection from assembled bacterial
       genomes
@@ -26,32 +26,60 @@ workflows:
       - key: Select species for point mutation analysis using PointFinder
         type_guide:
           class: text
-    active: true
-    iwc_id: amr_gene_detection-main
-  - trs_id: "#workflow/github.com/iwc-workflows/annotation-helixer/main/versions/v0.3"
-    categories:
-      - ANNOTATION
-    workflow_name: Genome annotation with Helixer
-    workflow_description:
-      "This workflow allows you to annotate a genome with Helixer
-      and evaluate the quality of the annotation using BUSCO and Genome Annotation statistics.
-      GFFRead is also used to predict protein sequences derived from this annotation,
-      and BUSCO and OMArk are used to assess proteome quality. "
-    ploidy: ANY
-    taxonomy_id: 2759
-    parameters:
-      - key: Helixer lineage
+      - key: StarAMR database
         type_guide:
           class: text
-      - key: Genome sequence masked
-        variable: ASSEMBLY_FASTA_URL
+      - key: Species for point mutation analysis using PointFinder
+        type_guide:
+          class: text
+      - key: Taxonomy group point mutation
+        type_guide:
+          class: text
+      - key: AMR genes detection database
+        type_guide:
+          class: text
+      - key: Virulence genes detection database
+        type_guide:
+          class: text
+    active: true
+    iwc_id: amr_gene_detection-main
+  - trs_id: "#workflow/github.com/iwc-workflows/annotation-braker3/main/versions/v0.1"
+    categories: []
+    workflow_name: Genome annotation with Braker3
+    workflow_description:
+      This workflow performs genome annotation using Braker3 and
+      evaluates the quality of the annotation with BUSCO and genome annotation statistics.
+    ploidy: ANY
+    parameters:
+      - key: BUSCO database
+        type_guide:
+          class: text
+      - key: Include BUSCO
+        type_guide:
+          class: boolean
       - key: BUSCO lineage
         type_guide:
           class: text
+      - key: Soft masked Genome sequence
+        type_guide:
+          class: File
+          ext: fasta
+      - key: Alignments from RNA-seq
+        type_guide:
+          class: File
+          ext: bam
+      - key: Protein sequences
+        type_guide:
+          class: File
+          ext: fasta
+      - key: Fungus genome
+        type_guide:
+          class: boolean
     active: false
-    iwc_id: annotation-helixer-main
+    iwc_id: annotation-braker3-main
   - trs_id: "#workflow/github.com/iwc-workflows/annotation-maker/main/versions/v0.1"
-    categories: []
+    categories:
+      - ANNOTATION
     workflow_name: Genome annotation with Maker
     workflow_description:
       This workflow allows for genome annotation using Maker and
@@ -112,8 +140,9 @@ workflows:
       - key: PE fastq input
         variable: SANGER_READ_RUN_PAIRED
         data_requirements:
-          library_strategy: ["ATAC-seq"]
-          library_layout: "PAIRED"
+          library_strategy:
+            - ATAC-seq
+          library_layout: PAIRED
         type_guide:
           class: Collection
           collection_type: list:paired
@@ -146,7 +175,7 @@ workflows:
           class: integer
     active: false
     iwc_id: average-bigwig-between-replicates-main
-  - trs_id: "#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v2.0"
+  - trs_id: "#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v2.0.1"
     categories:
       - ASSEMBLY
     workflow_name: Bacterial Genome Assembly using Shovill
@@ -171,54 +200,10 @@ workflows:
             - fastqsanger.gz
     active: false
     iwc_id: bacterial-genome-assembly-main
-  - trs_id: "#workflow/github.com/iwc-workflows/bacterial-quality-and-contamination-control-post-assembly/main/versions/v1.0.1"
-    categories: []
-    workflow_name:
-      Post-Assembly Quality Control and Contamination Check for Bacterial
-      Genomes
-    workflow_description:
-      This workflow performs quality and contamination control analysis
-      on assembled contigs to assess bacterial genome quality and taxonomic assignment
-    ploidy: ANY
-    parameters:
-      - key: Input sequence reads (forward)
-        type_guide:
-          class: File
-          ext:
-            - fastq
-            - fastq.gz
-            - fastqsanger
-            - fastqsanger.gz
-      - key: Input sequence reads (reverse)
-        type_guide:
-          class: File
-          ext:
-            - fastq
-            - fastq.gz
-            - fastqsanger
-            - fastqsanger.gz
-      - key: Fastq boolean
-        type_guide:
-          class: boolean
-      - key: Fasta boolean
-        type_guide:
-          class: boolean
-      - key: Input sequence contigs FASTA
-        type_guide:
-          class: File
-          ext: fasta
-      - key: Select a taxonomy database
-        type_guide:
-          class: text
-      - key: Select a NCBI taxonomy database
-        type_guide:
-          class: text
-    active: false
-    iwc_id: bacterial-quality-and-contamination-control-post-assembly-main
-  - trs_id: "#workflow/github.com/iwc-workflows/bacterial_genome_annotation/main/versions/v1.1.11"
+  - trs_id: "#workflow/github.com/iwc-workflows/bacterial_genome_annotation/main/versions/v1.2.0"
     categories:
       - ANNOTATION
-    workflow_name: Bacterial genome annotation
+    workflow_name: Bacterial Genome Annotation
     workflow_description:
       Annotation of an assembled bacterial genomes to detect genes,
       potential plasmids, integrons and Insertion sequence (IS) elements.
@@ -236,6 +221,18 @@ workflows:
       - key: Select a AMRFinderPlus database
         type_guide:
           class: text
+      - key: Plasmid detection database
+        type_guide:
+          class: text
+      - key: Bacterial genome annotation database
+        type_guide:
+          class: text
+      - key: AMRFinderPlus database
+        type_guide:
+          class: text
+      - key: Run Bakta
+        type_guide:
+          class: boolean
     active: false
     iwc_id: bacterial_genome_annotation-main
   - trs_id: "#workflow/github.com/iwc-workflows/baredsc/baredSC-1d-logNorm/versions/v0.6"
@@ -333,17 +330,17 @@ workflows:
           class: float
     active: false
     iwc_id: brew3r-main
-  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.15"
+  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v1.0"
     categories:
       - REGULATION
     workflow_name: "ChIP-seq Analysis: Paired-End Read Processing"
     workflow_description:
       Complete ChIP-seq analysis for paired-end sequencing data.
-      Processes raw FASTQ files through adapter removal (cutadapt), alignment to reference
-      genome (Bowtie2), and stringent quality filtering (MAPQ &gt;= 30, concordant pairs
-      only). Peak calling with MACS2 optimized for paired-end reads identifies protein-DNA
-      binding sites. Generates alignment files, peak calls, and quality metrics for
-      downstream analysis.
+      Processes raw FASTQ files through adapter removal (fastp), alignment to reference
+      genome (Bowtie2), and stringent quality filtering (MAPQ greater than 30, concordant
+      pairs only). Peak calling with MACS2 optimized for paired-end reads identifies
+      protein-DNA binding sites. Generates alignment files, coverage, peak calls, and
+      quality metrics for downstream analysis.
     ploidy: ANY
     parameters:
       - key: reference_genome
@@ -351,8 +348,9 @@ workflows:
       - key: PE fastq input
         variable: SANGER_READ_RUN_PAIRED
         data_requirements:
-          library_strategy: ["ChIP-Seq"]
-          library_layout: "PAIRED"
+          library_strategy:
+            - ChIP-Seq
+          library_layout: PAIRED
         type_guide:
           class: Collection
           collection_type: list:paired
@@ -368,19 +366,30 @@ workflows:
       - key: normalize_profile
         type_guide:
           class: boolean
+      - key: Percentage of bad quality bases per read
+        type_guide:
+          class: integer
+      - key: Reference genome
+        type_guide:
+          class: text
+      - key: Effective genome size
+        type_guide:
+          class: integer
+      - key: Normalize profile
+        type_guide:
+          class: boolean
     active: true
     iwc_id: chipseq-pe-main
-  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.15"
+  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v1.0"
     categories:
       - REGULATION
     workflow_name: "ChIP-seq Analysis: Single-End Read Processing"
     workflow_description:
       Complete ChIP-seq analysis for single-end sequencing data.
-      Processes raw FASTQ files through adapter removal (cutadapt), alignment to reference
-      genome (Bowtie2), and quality filtering (MAPQ &gt;= 30). Peak calling with MACS2
-      uses either a fixed extension parameter or built-in model to identify protein-DNA
-      binding sites. Generates alignment files, peak calls, and quality metrics for
-      downstream analysis.
+      Processes raw FASTQ files through adapter removal (fastp), alignment to reference
+      genome (Bowtie2), and quality filtering (MAPQ greater than 30). Peak calling with
+      MACS2 uses a fixed extension of 200bp to identify protein-DNA binding sites. Generates
+      alignment files, coverage, peak calls, and quality metrics for downstream analysis.
     ploidy: ANY
     parameters:
       - key: reference_genome
@@ -388,8 +397,9 @@ workflows:
       - key: SR fastq input
         variable: SANGER_READ_RUN_SINGLE
         data_requirements:
-          library_strategy: ["ChIP-Seq"]
-          library_layout: "SINGLE"
+          library_strategy:
+            - ChIP-Seq
+          library_layout: SINGLE
         type_guide:
           class: Collection
           collection_type: list
@@ -400,6 +410,21 @@ workflows:
         type_guide:
           class: integer
       - key: normalize_profile
+        type_guide:
+          class: boolean
+      - key: Adapter sequence
+        type_guide:
+          class: text
+      - key: Percentage of bad quality bases per read
+        type_guide:
+          class: integer
+      - key: Reference genome
+        type_guide:
+          class: text
+      - key: Effective genome size
+        type_guide:
+          class: integer
+      - key: Normalize profile
         type_guide:
           class: boolean
     active: true
@@ -509,9 +534,10 @@ workflows:
       - key: PE fastq input
         variable: SANGER_READ_RUN_PAIRED
         data_requirements:
-          library_strategy: ["OTHER"]
-          library_layout: "PAIRED"
-          description: "CUT&RUN"
+          library_strategy:
+            - OTHER
+          library_layout: PAIRED
+          description: CUT&RUN
         type_guide:
           class: Collection
           collection_type: list:paired
@@ -551,8 +577,9 @@ workflows:
       - key: fastq PE collection GEX
         variable: SANGER_READ_RUN_PAIRED
         data_requirements:
-          library_source: ["TRANSCRIPTOMIC SINGLE CELL"]
-          library_layout: "PAIRED"
+          library_layout: PAIRED
+          library_source:
+            - TRANSCRIPTOMIC SINGLE CELL
         type_guide:
           class: Collection
           collection_type: list:paired
@@ -596,8 +623,9 @@ workflows:
       - key: fastq PE collection
         variable: SANGER_READ_RUN_PAIRED
         data_requirements:
-          library_source: ["TRANSCRIPTOMIC SINGLE CELL"]
-          library_layout: "PAIRED"
+          library_layout: PAIRED
+          library_source:
+            - TRANSCRIPTOMIC SINGLE CELL
         type_guide:
           class: Collection
           collection_type: list:paired
@@ -623,7 +651,7 @@ workflows:
           class: File
     active: false
     iwc_id: functional-annotation-protein-sequences-main
-  - trs_id: "#workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main/versions/v0.1"
+  - trs_id: "#workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main/versions/v0.2"
     categories:
       - CONSENSUS_SEQUENCES
       - VARIANT_CALLING
@@ -633,18 +661,20 @@ workflows:
     workflow_description:
       Variant calling and consensus sequence generation for batches
       of Illumina PE sequenced viruses with uncomplicated and stable genome structure
-      (like e.g. Morbilliviruses). It can handle both ampliconic and non-ampliconic data.
+      (like e.g. Morbilliviruses).
     ploidy: ANY
     taxonomy_id: 11158
     parameters:
       - key: Paired collection of sequencing data
         variable: SANGER_READ_RUN_PAIRED
+        data_requirements:
+          library_strategy:
+            - WGS
+            - AMPLICON
+          library_layout: PAIRED
         type_guide:
           class: Collection
           collection_type: list:paired
-        data_requirements:
-          library_strategy: ["WGS", "AMPLICON"]
-          library_layout: "PAIRED"
       - key: Reference annotation
         variable: GENE_MODEL_URL
         type_guide:
@@ -676,8 +706,9 @@ workflows:
       - key: Paired Collection
         variable: SANGER_READ_RUN_PAIRED
         data_requirements:
-          library_strategy: ["WGS"]
-          library_layout: "PAIRED"
+          library_strategy:
+            - WGS
+          library_layout: PAIRED
         type_guide:
           class: Collection
           ext:
@@ -738,8 +769,9 @@ workflows:
       - key: Paired Collection
         variable: SANGER_READ_RUN_PAIRED
         data_requirements:
-          library_strategy: ["WGS"]
-          library_layout: "PAIRED"
+          library_strategy:
+            - WGS
+          library_layout: PAIRED
         type_guide:
           class: Collection
           ext:
@@ -892,6 +924,47 @@ workflows:
           class: text
     active: false
     iwc_id: hic-hicup-cooler-hic-juicermediumtabix-to-cool-cooler
+  - trs_id: "#workflow/github.com/iwc-workflows/host-contamination-removal-long-reads/main/versions/v0.2"
+    categories: []
+    workflow_name: Host or Contamination Removal on Long-Reads
+    workflow_description:
+      This workflow takes Nanopore fastq(.gz) files and runs Minimap2
+      to map the reads against a reference genome (human, by default). It filters the
+      output to keep only the unmapped reads and generates mapping statistics that are
+      aggregated into a MultiQC report.
+    ploidy: ANY
+    parameters:
+      - key: Host/Contaminant Reference Genome (long-reads)
+        type_guide:
+          class: text
+      - key: Long-reads
+        type_guide:
+          class: Collection
+          collection_type: list
+      - key: Profile of preset options for the mapping (long-read)
+        type_guide:
+          class: text
+    active: false
+    iwc_id: host-contamination-removal-long-reads-main
+  - trs_id: "#workflow/github.com/iwc-workflows/host-contamination-removal-short-reads/main/versions/v0.2"
+    categories: []
+    workflow_name: Host or Contamination Removal on Short-Reads
+    workflow_description:
+      This workflow takes paired-end Illumina fastq(.gz) files and
+      runs Bowtie to map the reads against a reference genome (human, by default) and
+      keep only the reads that do not align. MultiQC is used to aggregate the mapping
+      reports.
+    ploidy: ANY
+    parameters:
+      - key: Short-reads
+        type_guide:
+          class: Collection
+          collection_type: list:paired
+      - key: Host/Contaminant Reference Genome
+        type_guide:
+          class: text
+    active: false
+    iwc_id: host-contamination-removal-short-reads-main
   - trs_id: "#workflow/github.com/iwc-workflows/influenza-isolates-consensus-and-subtyping/main/versions/v0.2"
     categories:
       - CONSENSUS_SEQUENCES
@@ -934,23 +1007,43 @@ workflows:
           ext: bam
     active: true
     iwc_id: lncrnas-annotation-main
-  - trs_id: "#workflow/github.com/iwc-workflows/mapseq-to-ampvis2/main/versions/v0.2"
-    categories: []
-    workflow_name: MAPseq to ampvis2
+  - trs_id: "#workflow/github.com/iwc-workflows/metagenomic-genes-catalogue/main/versions/v1.1"
+    categories:
+      - ANNOTATION
+    workflow_name: Metagenomic Genes Catalogue Analysis
     workflow_description:
-      The MAPseq to Ampvis workflow processes MAPseq OTU tables
-      and associated metadata for analysis in Ampvis2. This workflow involves reformatting
-      MAPseq output datasets to produce structured output files suitable for Ampvis2.
+      Metagenomic analysis, from raw reads to gene catalog. Uses
+      Megahit to assemble contigs and Prodgial to predict CDSs on contigs to provide
+      the gene catalog. Finally, functional, taxonomic, and antimicrobial resistance
+      information is provided.
     ploidy: ANY
     parameters:
-      - key: MAPseq OTU tables
+      - key: Metagenomics Trimmed reads
         type_guide:
           class: Collection
-      - key: OTU table metadata
+          ext:
+            - fastq
+            - fastq.gz
+            - fastqsanger
+            - fastqsanger.gz
+          collection_type: list:paired
+      - key: AMR genes detection database
         type_guide:
-          class: File
+          class: text
+      - key: Virulence genes detection database
+        type_guide:
+          class: text
+      - key: starAMR database
+        type_guide:
+          class: text
+      - key: mmseqs2 taxonomy DB
+        type_guide:
+          class: text
+      - key: eggNOG database
+        type_guide:
+          class: text
     active: false
-    iwc_id: mapseq-to-ampvis2-main
+    iwc_id: metagenomic-genes-catalogue-main
   - trs_id: "#workflow/github.com/iwc-workflows/polish-with-long-reads/main/versions/v0.1"
     categories:
       - ASSEMBLY
@@ -969,7 +1062,7 @@ workflows:
           class: text
     active: false
     iwc_id: polish-with-long-reads-main
-  - trs_id: "#workflow/github.com/iwc-workflows/pox-virus-amplicon/main/versions/v0.3"
+  - trs_id: "#workflow/github.com/iwc-workflows/pox-virus-amplicon/main/versions/v0.4"
     categories:
       - CONSENSUS_SEQUENCES
     workflow_name: Pox Virus Illumina Amplicon Workflow from half-genomes
@@ -1043,7 +1136,7 @@ workflows:
           class: text
     active: false
     iwc_id: pseudobulk-worflow-decoupler-edger-main
-  - trs_id: "#workflow/github.com/iwc-workflows/quality-and-contamination-control-raw-reads/main/versions/v1.1.10"
+  - trs_id: "#workflow/github.com/iwc-workflows/quality-and-contamination-control-raw-reads/main/versions/v1.1.11"
     categories: []
     workflow_name: Raw Read Quality and Contamination Control For Genome Assembly
     workflow_description:
@@ -1071,6 +1164,9 @@ workflows:
         type_guide:
           class: text
       - key: Select a NCBI taxonomy database
+        type_guide:
+          class: text
+      - key: Taxonomy database for Kraken and Bracken
         type_guide:
           class: text
     active: false
@@ -1142,8 +1238,9 @@ workflows:
       - key: Collection paired FASTQ files
         variable: SANGER_READ_RUN_PAIRED
         data_requirements:
-          library_strategy: ["RNA-Seq"]
-          library_layout: "PAIRED"
+          library_strategy:
+            - RNA-Seq
+          library_layout: PAIRED
         type_guide:
           class: Collection
           collection_type: list:paired
@@ -1194,8 +1291,9 @@ workflows:
       - key: Collection of FASTQ files
         variable: SANGER_READ_RUN_SINGLE
         data_requirements:
-          library_strategy: ["RNA-Seq"]
-          library_layout: "SINGLE"
+          library_strategy:
+            - RNA-Seq
+          library_layout: SINGLE
         type_guide:
           class: Collection
           collection_type: list
@@ -1304,8 +1402,9 @@ workflows:
       - key: Paired Collection
         variable: SANGER_READ_RUN_PAIRED
         data_requirements:
-          library_strategy: ["WGS"]
-          library_layout: "PAIRED"
+          library_strategy:
+            - WGS
+          library_layout: PAIRED
         type_guide:
           class: Collection
           ext:
@@ -1350,8 +1449,9 @@ workflows:
       - key: Paired Collection
         variable: SANGER_READ_RUN_PAIRED
         data_requirements:
-          library_strategy: ["WGS"]
-          library_layout: "PAIRED"
+          library_strategy:
+            - WGS
+          library_layout: PAIRED
         type_guide:
           class: Collection
           ext:
@@ -1372,15 +1472,16 @@ workflows:
     taxonomy_id: 694009
     parameters:
       - key: Single End Collection
+        variable: SANGER_READ_RUN_SINGLE
+        data_requirements:
+          library_strategy:
+            - WGS
+          library_layout: SINGLE
         type_guide:
           class: Collection
           ext:
             - fastqsanger
             - fastqsanger.gz
-        variable: SANGER_READ_RUN_SINGLE
-        data_requirements:
-          library_strategy: ["WGS"]
-          library_layout: "SINGLE"
       - key: NC_045512.2 FASTA sequence of SARS-CoV-2
         variable: ASSEMBLY_FASTA_URL
     active: true
@@ -1420,6 +1521,33 @@ workflows:
           class: integer
     active: false
     iwc_id: sars-cov-2-variation-reporting-covid-19-variation-reporting
+  - trs_id: "#workflow/github.com/iwc-workflows/short-read-qc-trimming/main/versions/v0.2"
+    categories: []
+    workflow_name: Short-read quality control and trimming
+    workflow_description:
+      This workflow performs quality control and trimming on paired-end
+      Illumina fastq(.gz) files using fastp and aggregates the quality control reports
+      with MultiQC
+    ploidy: ANY
+    parameters:
+      - key: Raw reads
+        type_guide:
+          class: Collection
+          collection_type: list:paired
+      - key: Adapter to remove on forward reads
+        type_guide:
+          class: text
+      - key: Adapter to remove on reverse reads
+        type_guide:
+          class: text
+      - key: Qualified quality score
+        type_guide:
+          class: integer
+      - key: Minimal read length
+        type_guide:
+          class: integer
+    active: false
+    iwc_id: short-read-qc-trimming-main
   - trs_id: "#workflow/github.com/iwc-workflows/variation-reporting/main/versions/v0.1.1"
     categories:
       - VARIANT_CALLING
