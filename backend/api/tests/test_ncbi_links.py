@@ -73,4 +73,6 @@ def test_assembly_url_format(client):
         accession = item["accession"]
         url = item["url"]
         expected_url_accession = accession.replace(".", "_")
-        assert expected_url_accession in url, f"URL {url} should contain {expected_url_accession}"
+        assert expected_url_accession in url, (
+            f"URL {url} should contain {expected_url_accession}"
+        )

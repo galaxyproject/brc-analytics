@@ -55,3 +55,31 @@ For security, only nginx is exposed externally. Backend services (API, Redis) ar
 
 - External access: `http://localhost:8080` → nginx → routes to services
 - Direct backend access (dev only): `docker compose exec backend curl http://localhost:8000`
+
+## Running Tests
+
+API smoke tests verify the backend endpoints are working correctly.
+
+```bash
+# Start services first (if not already running)
+cd backend
+cp api/.env.example api/.env
+docker compose up -d --build
+
+# Wait for healthy status
+curl http://localhost:8080/api/v1/health
+
+# Run smoke tests
+cd api
+uv run --extra dev pytest tests/ -v
+
+# Stop services when done
+cd ..
+docker compose down -v
+```
+
+Tests can also target a different endpoint via environment variable:
+
+```bash
+API_BASE_URL=https://staging.example.com uv run --extra dev pytest tests/ -v
+```
