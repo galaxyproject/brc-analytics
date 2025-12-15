@@ -6,11 +6,10 @@ import {
 import { ParsedUrlQuery } from "querystring";
 import { config } from "../../../../../app/config/config";
 import { seedDatabase } from "../../../../../app/utils/seedDatabase";
-import { getEntities, getEntity } from "../../../../../app/utils/entityUtils";
+import { getEntities } from "../../../../../app/utils/entityUtils";
 import {
   BRCDataCatalogGenome,
   EntitiesResponse,
-  Workflow,
 } from "../../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import workflows from "../../../../../catalog/output/workflows.json";
@@ -18,7 +17,6 @@ import {
   formatTrsId,
   workflowIsCompatibleWithAssembly,
 } from "../../../../../app/components/Entity/components/AnalysisMethodsCatalog/utils";
-import { getEntityConfig } from "@databiosphere/findable-ui/lib/config/utils";
 import { WorkflowInputsView } from "../../../../../app/views/WorkflowInputsView/workflowInputsView";
 import { GA2AssemblyEntity } from "../../../../../app/apis/catalog/ga2/entities";
 import { CUSTOM_WORKFLOW } from "../../../../../app/components/Entity/components/AnalysisMethod/components/CustomWorkflow/constants";
@@ -35,8 +33,8 @@ interface PageUrlParams extends ParsedUrlQuery {
 
 interface Props {
   entityId: string;
-  genome: BRCDataCatalogGenome | GA2AssemblyEntity;
-  workflow: Workflow;
+  entityListType: string;
+  trsId: string;
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -64,49 +62,12 @@ export const getStaticPaths: GetStaticPaths = async () => {
 export const getStaticProps = async (
   context: GetStaticPropsContext<PageUrlParams>
 ): Promise<GetStaticPropsResult<Props>> => {
-  const appConfig = config();
-  const { entities } = appConfig;
   const { entityId, entityListType, trsId } = context.params as PageUrlParams;
 
   if (!entityListType || !entityId || !trsId) return { notFound: true };
   if (entityListType !== "assemblies") return { notFound: true };
 
-  const entityConfig = getEntityConfig(entities, entityListType);
-
-  if (!entityConfig) return { notFound: true };
-
-  // Seed database.
-  await seedDatabase(entityConfig.route, entityConfig);
-  const genome = await getEntity<BRCDataCatalogGenome | GA2AssemblyEntity>(
-    entityConfig,
-    entityId
-  );
-
-  // Find workflow.
-  const workflow = workflows
-    .flatMap((w) => w.workflows)
-    .find((workflow) => formatTrsId(workflow.trsId) === trsId);
-
-  // Custom workflow.
-  if (trsId === CUSTOM_WORKFLOW.trsId) {
-    return {
-      props: {
-        entityId,
-        genome,
-        workflow: CUSTOM_WORKFLOW,
-      },
-    };
-  }
-
-  if (!workflow) return { notFound: true };
-
-  return {
-    props: {
-      entityId,
-      genome,
-      workflow,
-    },
-  };
+  return { props: { entityId, entityListType, trsId } };
 };
 
 const ConfigureWorkflowInputs = (props: Props): JSX.Element => {

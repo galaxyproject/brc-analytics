@@ -4,6 +4,7 @@ import {
 } from "@databiosphere/findable-ui/lib/config/entities";
 import * as C from "../../../../../app/components";
 import * as V from "../../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import * as V_GA2 from "../../../../../app/viewModelBuilders/catalog/ga2/viewModelBuilders";
 import { GA2AssemblyEntity } from "../../../../../app/apis/catalog/ga2/entities";
 
 export const sideColumn: ComponentsConfig = [
@@ -23,6 +24,13 @@ export const sideColumn: ComponentsConfig = [
                           title: "Assembly Details",
                         },
                       } as ComponentConfig<typeof C.SectionTitle>,
+                      {
+                        component: C.OrganismAvatar,
+                        viewBuilder: V_GA2.buildOrganismImage,
+                      } as ComponentConfig<
+                        typeof C.OrganismAvatar,
+                        GA2AssemblyEntity
+                      >,
                       {
                         component: C.KeyValuePairs,
                         viewBuilder: V.buildAssemblyDetails,
