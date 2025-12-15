@@ -29,6 +29,8 @@ services:
     environment:
       # Only override what needs Docker networking
       REDIS_URL: redis://redis:6379/0
+    volumes:
+      - ../catalog:/catalog:ro
     depends_on:
       redis:
         condition: service_healthy
