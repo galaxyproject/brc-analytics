@@ -9,7 +9,6 @@ from app.services.links_service import LinksService
 router = APIRouter()
 
 
-
 @router.get("/assemblies/links")
 async def get_assemblies_links(cache: CacheService = Depends(get_cache_service)):
     """Get all assembly links for cross-referencing."""

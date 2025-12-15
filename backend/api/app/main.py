@@ -9,6 +9,7 @@ settings = get_settings()
 app = FastAPI(
     title="BRC Analytics API",
     version=settings.APP_VERSION,
+    openapi_url="/api/openapi.json",
     docs_url="/api/docs",
     redoc_url="/api/redoc",
 )
