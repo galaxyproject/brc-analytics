@@ -56,7 +56,7 @@ workflows:
       - key: SNAP training
         type_guide:
           class: File
-    active: true
+    active: false
     iwc_id: annotation-maker-main
   - trs_id: "#workflow/github.com/iwc-workflows/assembly-with-flye/main/versions/v0.3"
     categories:
@@ -175,7 +175,7 @@ workflows:
       - key: Run Bakta
         type_guide:
           class: boolean
-    active: false
+    active: true
     iwc_id: bacterial_genome_annotation-main
   - trs_id: "#workflow/github.com/iwc-workflows/baredsc/baredSC-1d-logNorm/versions/v0.6"
     categories:

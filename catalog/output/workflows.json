@@ -458,18 +458,18 @@
         "workflowName": "AMR Gene Detection"
       },
       {
-        "iwcId": "annotation-maker-main",
+        "iwcId": "bacterial_genome_annotation-main",
         "parameters": [
           {
-            "key": "Genome sequence",
+            "key": "Input sequence fasta",
             "variable": "ASSEMBLY_FASTA_URL"
           }
         ],
-        "ploidy": "ANY",
-        "taxonomyId": "2759",
-        "trsId": "#workflow/github.com/iwc-workflows/annotation-maker/main/versions/v0.1",
-        "workflowDescription": "This workflow allows for genome annotation using Maker and evaluates the quality of the annotation.",
-        "workflowName": "Genome annotation with Maker"
+        "ploidy": "HAPLOID",
+        "taxonomyId": "2",
+        "trsId": "#workflow/github.com/iwc-workflows/bacterial_genome_annotation/main/versions/v1.2.0",
+        "workflowDescription": "Annotation of an assembled bacterial genomes to detect genes, potential plasmids, integrons and Insertion sequence (IS) elements.",
+        "workflowName": "Bacterial Genome Annotation"
       },
       {
         "iwcId": "lncrnas-annotation-main",

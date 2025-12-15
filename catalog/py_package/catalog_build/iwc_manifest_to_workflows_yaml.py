@@ -501,9 +501,7 @@ def to_workflows_yaml(
     excluded_iwc_workflows: List[Dict[str, str]] = []
     for trs_base, wf in iwc_current.items():
         if trs_base not in final_workflow_bases:
-            categories = [
-                c.value if hasattr(c, "value") else c for c in wf.categories
-            ]
+            categories = [c.value if hasattr(c, "value") else c for c in wf.categories]
             excluded_iwc_workflows.append(
                 {
                     "name": wf.workflow_name,
