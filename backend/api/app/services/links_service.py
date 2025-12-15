@@ -29,6 +29,21 @@ class LinksService:
             logger.error(f"Error parsing JSON from {file_path}: {e}")
             return []
 
+    def _build_assembly_link(self, accession: str) -> Dict[str, str]:
+        """Build a single assembly link dict."""
+        url_accession = accession.replace(".", "_")
+        return {
+            "assemblyAccession": accession,
+            "relativePath": f"/data/assemblies/{url_accession}",
+        }
+
+    def _build_organism_link(self, taxonomy_id: int) -> Dict[str, Any]:
+        """Build a single organism link dict."""
+        return {
+            "ncbiTaxonomyId": taxonomy_id,
+            "relativePath": f"/data/organisms/{taxonomy_id}",
+        }
+
     def get_assemblies_links(self) -> Dict[str, Any]:
         """Get all assembly links in v1 format."""
         assemblies = self._load_json_file("assemblies.json")
@@ -38,14 +53,7 @@ class LinksService:
             accession = assembly.get("accession")
             if not accession:
                 continue
-
-            url_accession = accession.replace(".", "_")
-            links.append(
-                {
-                    "assemblyAccession": accession,
-                    "relativePath": f"/data/assemblies/{url_accession}",
-                }
-            )
+            links.append(self._build_assembly_link(accession))
 
         logger.info(f"Generated {len(links)} assembly links")
         return {
@@ -57,13 +65,8 @@ class LinksService:
         assemblies = self._load_json_file("assemblies.json")
 
         for assembly in assemblies:
-            assembly_accession = assembly.get("accession")
-            if assembly_accession == accession:
-                url_accession = accession.replace(".", "_")
-                return {
-                    "assemblyAccession": accession,
-                    "relativePath": f"/data/assemblies/{url_accession}",
-                }
+            if assembly.get("accession") == accession:
+                return self._build_assembly_link(accession)
 
         return None
 
@@ -76,13 +79,7 @@ class LinksService:
             taxonomy_id = org.get("ncbiTaxonomyId")
             if not taxonomy_id:
                 continue
-
-            links.append(
-                {
-                    "ncbiTaxonomyId": int(taxonomy_id),
-                    "relativePath": f"/data/organisms/{taxonomy_id}",
-                }
-            )
+            links.append(self._build_organism_link(int(taxonomy_id)))
 
         logger.info(f"Generated {len(links)} organism links")
         return {
@@ -95,11 +92,7 @@ class LinksService:
 
         for org in organisms:
             taxonomy_id = org.get("ncbiTaxonomyId")
-            # Handle both string and int taxonomy IDs from JSON
             if taxonomy_id is not None and int(taxonomy_id) == taxon_id:
-                return {
-                    "ncbiTaxonomyId": int(taxonomy_id),
-                    "relativePath": f"/data/organisms/{taxonomy_id}",
-                }
+                return self._build_organism_link(taxon_id)
 
         return None
