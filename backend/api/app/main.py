@@ -25,7 +25,7 @@ app.add_middleware(
 app.include_router(health.router, prefix="/api/v1", tags=["health"])
 app.include_router(cache.router, prefix="/api/v1/cache", tags=["cache"])
 app.include_router(version.router, prefix="/api/v1/version", tags=["version"])
-app.include_router(links.router, prefix="/api/v1/links", tags=["links"])
+app.include_router(links.router, prefix="/api/v1", tags=["links"])
 
 
 @app.get("/")

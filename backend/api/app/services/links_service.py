@@ -1,22 +1,21 @@
-"""Service for generating NCBI link data from BRC Analytics catalog."""
+"""Service for generating link data from BRC Analytics catalog."""
 
 import json
 import logging
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from app.core.config import get_settings
 
 logger = logging.getLogger(__name__)
 
 
-class NCBILinksService:
-    """Service to generate link files for NCBI cross-referencing."""
+class LinksService:
+    """Service to generate link files for cross-referencing."""
 
     def __init__(self, catalog_path: str | None = None):
         settings = get_settings()
         self.catalog_path = Path(catalog_path or settings.CATALOG_PATH)
-        self.base_url = "https://brc-analytics.org"
 
     def _load_json_file(self, filename: str) -> List[Dict[str, Any]]:
         file_path = self.catalog_path / filename
@@ -30,28 +29,8 @@ class NCBILinksService:
             logger.error(f"Error parsing JSON from {file_path}: {e}")
             return []
 
-    def get_organism_links(self) -> List[Dict[str, str]]:
-        organisms = self._load_json_file("organisms.json")
-        links = []
-
-        for org in organisms:
-            taxonomy_id = org.get("ncbiTaxonomyId")
-            if not taxonomy_id:
-                continue
-
-            links.append(
-                {
-                    "ncbiTaxonomyId": taxonomy_id,
-                    "url": f"{self.base_url}/data/organisms/{taxonomy_id}",
-                    "scientificName": org.get("taxonomicLevelSpecies"),
-                    "commonName": org.get("commonName"),
-                }
-            )
-
-        logger.info(f"Generated {len(links)} organism links")
-        return links
-
-    def get_assembly_links(self) -> List[Dict[str, str]]:
+    def get_assemblies_links(self) -> Dict[str, Any]:
+        """Get all assembly links in v1 format."""
         assemblies = self._load_json_file("assemblies.json")
         links = []
 
@@ -63,12 +42,64 @@ class NCBILinksService:
             url_accession = accession.replace(".", "_")
             links.append(
                 {
-                    "accession": accession,
-                    "url": f"{self.base_url}/data/assemblies/{url_accession}",
-                    "ncbiTaxonomyId": assembly.get("ncbiTaxonomyId"),
-                    "scientificName": assembly.get("taxonomicLevelSpecies"),
+                    "assemblyAccession": accession,
+                    "relativePath": f"/data/assemblies/{url_accession}",
                 }
             )
 
         logger.info(f"Generated {len(links)} assembly links")
-        return links
+        return {
+            "assemblies": links,
+        }
+
+    def get_assembly_link(self, accession: str) -> Optional[Dict[str, str]]:
+        """Get a single assembly link by accession."""
+        assemblies = self._load_json_file("assemblies.json")
+
+        for assembly in assemblies:
+            assembly_accession = assembly.get("accession")
+            if assembly_accession == accession:
+                url_accession = accession.replace(".", "_")
+                return {
+                    "assemblyAccession": accession,
+                    "relativePath": f"/data/assemblies/{url_accession}",
+                }
+
+        return None
+
+    def get_organisms_links(self) -> Dict[str, Any]:
+        """Get all organism links in v1 format."""
+        organisms = self._load_json_file("organisms.json")
+        links = []
+
+        for org in organisms:
+            taxonomy_id = org.get("ncbiTaxonomyId")
+            if not taxonomy_id:
+                continue
+
+            links.append(
+                {
+                    "ncbiTaxonomyId": int(taxonomy_id),
+                    "relativePath": f"/data/organisms/{taxonomy_id}",
+                }
+            )
+
+        logger.info(f"Generated {len(links)} organism links")
+        return {
+            "organisms": links,
+        }
+
+    def get_organism_link(self, taxon_id: int) -> Optional[Dict[str, Any]]:
+        """Get a single organism link by NCBI taxonomy ID."""
+        organisms = self._load_json_file("organisms.json")
+
+        for org in organisms:
+            taxonomy_id = org.get("ncbiTaxonomyId")
+            # Handle both string and int taxonomy IDs from JSON
+            if taxonomy_id is not None and int(taxonomy_id) == taxon_id:
+                return {
+                    "ncbiTaxonomyId": int(taxonomy_id),
+                    "relativePath": f"/data/organisms/{taxonomy_id}",
+                }
+
+        return None
