@@ -1,4 +1,5 @@
 import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
+import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
 import { useCallback } from "react";
 import {
   getDataLandingUrl,
@@ -14,6 +15,7 @@ export const useLaunchGalaxy = ({
   workflow,
 }: Props): UseLaunchGalaxy => {
   const { error, isLoading: loading, run } = useAsync<string>();
+  const { config } = useConfig();
   const configuredValue = getConfiguredValues(configuredInput, workflow);
   const disabled = !configuredValue;
 
@@ -28,7 +30,8 @@ export const useLaunchGalaxy = ({
               configuredValue.geneModelUrl,
               configuredValue.readRunsSingle,
               configuredValue.readRunsPaired,
-              configuredValue.tracks
+              configuredValue.tracks,
+              config?.browserURL
             )
           )
         : await run(
@@ -38,7 +41,8 @@ export const useLaunchGalaxy = ({
               configuredValue.geneModelUrl,
               configuredValue.readRunsSingle,
               configuredValue.readRunsPaired,
-              workflow.parameters
+              workflow.parameters,
+              config?.browserURL
             )
           );
 
@@ -48,7 +52,7 @@ export const useLaunchGalaxy = ({
 
     // Launch the Galaxy workflow.
     launchGalaxy(landingUrl);
-  }, [configuredValue, run, workflow]);
+  }, [config, configuredValue, run, workflow]);
 
   let errorMessage: string | null = null;
   if (error) {
