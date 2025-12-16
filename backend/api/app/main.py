@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1 import cache, health, ncbi_links, version
+from app.api.v1 import cache, health, links, version
 from app.core.config import get_settings
 
 settings = get_settings()
@@ -25,7 +25,7 @@ app.add_middleware(
 app.include_router(health.router, prefix="/api/v1", tags=["health"])
 app.include_router(cache.router, prefix="/api/v1/cache", tags=["cache"])
 app.include_router(version.router, prefix="/api/v1/version", tags=["version"])
-app.include_router(ncbi_links.router, prefix="/api/v1/links", tags=["ncbi-links"])
+app.include_router(links.router, prefix="/api/v1/links", tags=["links"])
 
 
 @app.get("/")
