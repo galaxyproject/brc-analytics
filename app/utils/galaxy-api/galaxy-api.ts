@@ -47,6 +47,7 @@ const dataLandingUrl = `${galaxyInstanceUrl}/tool_landings`;
  * @param readRunsSingle - Single read runs parameter sent to the API.
  * @param readRunsPaired - Paired read runs parameter sent to the API.
  * @param parameters - Parameters for this workflow.
+ * @param origin - Origin URL of the site making the request.
  * @returns workflow landing URL.
  */
 export async function getWorkflowLandingUrl(
@@ -55,9 +56,11 @@ export async function getWorkflowLandingUrl(
   geneModelUrl: string | null,
   readRunsSingle: EnaSequencingReads[] | null,
   readRunsPaired: EnaSequencingReads[] | null,
-  parameters: WorkflowParameter[]
+  parameters: WorkflowParameter[],
+  origin: string
 ): Promise<string> {
   const body: WorkflowLandingsBody = {
+    origin,
     public: true,
     request_state: getWorkflowLandingsRequestState(
       referenceGenome,
@@ -79,6 +82,7 @@ export async function getWorkflowLandingUrl(
  * @param readRunsSingle - Single read runs parameter sent to the API.
  * @param readRunsPaired - Paired read runs parameter sent to the API.
  * @param tracks - UCSC tracks sent to the API. Should all have defined `bigDataUrl` values.
+ * @param origin - Origin URL of the site making the request.
  * @returns data landing URL.
  */
 export async function getDataLandingUrl(
@@ -86,9 +90,11 @@ export async function getDataLandingUrl(
   geneModelUrl: string | null,
   readRunsSingle: EnaSequencingReads[] | null,
   readRunsPaired: EnaSequencingReads[] | null,
-  tracks: UcscTrack[] | null
+  tracks: UcscTrack[] | null,
+  origin: string
 ): Promise<string> {
   const body: DataLandingsBody = {
+    origin,
     public: true,
     request_state: getDataLandingsRequestState(
       referenceGenome,

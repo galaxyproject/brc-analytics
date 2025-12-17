@@ -16,6 +16,7 @@ export interface EnaFileInfo {
 //// Workflow landing types
 
 export interface WorkflowLandingsBody {
+  origin: string;
   public: true;
   request_state: WorkflowLandingsBodyRequestState;
   workflow_id: string;
@@ -62,6 +63,7 @@ interface WorkflowCollectionUrlData {
 //// Data landing types
 
 export interface DataLandingsBody {
+  origin: string;
   public: true;
   request_state: DataLandingsBodyRequestState;
 }
