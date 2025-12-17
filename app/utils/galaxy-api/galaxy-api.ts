@@ -57,7 +57,7 @@ export async function getWorkflowLandingUrl(
   readRunsSingle: EnaSequencingReads[] | null,
   readRunsPaired: EnaSequencingReads[] | null,
   parameters: WorkflowParameter[],
-  origin?: string
+  origin: string
 ): Promise<string> {
   const body: WorkflowLandingsBody = {
     origin,
@@ -91,7 +91,7 @@ export async function getDataLandingUrl(
   readRunsSingle: EnaSequencingReads[] | null,
   readRunsPaired: EnaSequencingReads[] | null,
   tracks: UcscTrack[] | null,
-  origin?: string
+  origin: string
 ): Promise<string> {
   const body: DataLandingsBody = {
     origin,

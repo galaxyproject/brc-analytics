@@ -21,6 +21,7 @@ export const useLaunchGalaxy = ({
 
   const onLaunchGalaxy = useCallback(async (): Promise<void> => {
     if (!configuredValue) return;
+    const origin = config.browserURL || window.location.origin;
 
     const landingUrl =
       workflow.trsId === CUSTOM_WORKFLOW.trsId
@@ -31,7 +32,7 @@ export const useLaunchGalaxy = ({
               configuredValue.readRunsSingle,
               configuredValue.readRunsPaired,
               configuredValue.tracks,
-              config?.browserURL
+              origin
             )
           )
         : await run(
@@ -42,7 +43,7 @@ export const useLaunchGalaxy = ({
               configuredValue.readRunsSingle,
               configuredValue.readRunsPaired,
               workflow.parameters,
-              config?.browserURL
+              origin
             )
           );
 
