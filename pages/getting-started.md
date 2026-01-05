@@ -7,7 +7,7 @@ BRC Analytics is a browser-based bioinformatics platform that makes advanced pat
 ### Key Features
 - **No installation required** - Everything runs in your browser
 - **Free public computational resources** - No additional investment needed
-- **1,600+ genome assemblies** covering 1,149+ pathogen, host, and vector taxa
+- **5,000+ genome assemblies** covering nearly 2,000 pathogen, host, and vector taxa
 - **Integrated reference data** from authoritative sources like NCBI and UCSC
 - **Community-curated workflows** for quality control, read mapping, variant identification, and annotation
 - **Built-in analysis tools** including JupyterLite notebooks for custom analyses
