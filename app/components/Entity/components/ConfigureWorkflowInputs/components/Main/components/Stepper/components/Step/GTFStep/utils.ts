@@ -48,6 +48,7 @@ export const getGeneModelLabel = (url: string): string => {
     [/\.ncbiRefSeq\./, "NCBI RefSeq"],
     [/\.ncbiGene\./, "NCBI Gene"],
     [/\.xenoRefGene\./, "UCSC Xeno RefGene"],
+    [/veupathGenes\./i, "VEuPathDB"],
   ];
 
   for (const [pattern, label] of labelPatterns) {

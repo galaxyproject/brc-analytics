@@ -20,5 +20,5 @@ export function parseUCSCFilesResult(response: Result): string[] {
  * @returns True if the URL ends with ".gtf.gz".
  */
 function filterGFTFile(url: string): boolean {
-  return url.endsWith(".gtf.gz");
+  return url.includes("/genes/") && url.endsWith(".gtf.gz");
 }
