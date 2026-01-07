@@ -2,11 +2,14 @@ import { AnalysisMethod } from "../AnalysisMethod/analysisMethod";
 import { Props } from "./types";
 import { useRouter } from "next/router";
 import { Fragment } from "react";
-import { CustomWorkflow } from "../AnalysisMethod/components/CustomWorkflow/customWorkflow";
+import { WorkflowAccordion } from "../AnalysisMethod/components/WorkflowAccordion/workflowAccordion";
+import { CUSTOM_WORKFLOW } from "../AnalysisMethod/components/CustomWorkflow/constants";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../AnalysisMethod/components/DifferentialExpressionAnalysis/constants";
 import { AnalysisTypeHeader } from "./components/AnalysisTypeHeader/analysisTypeHeader";
 import { Stack } from "@mui/material";
 import { buildAssemblyWorkflows } from "./utils";
 import WORKFLOW_CATEGORIES from "../../../../../catalog/output/workflows.json";
+import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 
 export const AnalysisMethodsCatalog = ({ assembly }: Props): JSX.Element => {
   const workflowCategories = buildAssemblyWorkflows(
@@ -18,6 +21,8 @@ export const AnalysisMethodsCatalog = ({ assembly }: Props): JSX.Element => {
     query: { entityId },
   } = useRouter();
 
+  const isDEEnabled = useFeatureFlag("de");
+
   return (
     <Stack gap={8} useFlexGap>
       {/* Custom Analysis */}
@@ -26,7 +31,10 @@ export const AnalysisMethodsCatalog = ({ assembly }: Props): JSX.Element => {
           description="Prefer to explore the data without a predefined workflow?"
           title="Custom Analysis"
         />
-        <CustomWorkflow entityId={entityId as string} />
+        <WorkflowAccordion
+          entityId={entityId as string}
+          workflow={CUSTOM_WORKFLOW}
+        />
       </Stack>
       <Stack gap={4} useFlexGap>
         {/* Workflow Analysis */}
@@ -49,6 +57,13 @@ export const AnalysisMethodsCatalog = ({ assembly }: Props): JSX.Element => {
           }
           title="Select a Workflow"
         />
+        {isDEEnabled && (
+          <WorkflowAccordion
+            buttonText="Configure Inputs"
+            entityId={entityId as string}
+            workflow={DIFFERENTIAL_EXPRESSION_ANALYSIS}
+          />
+        )}
         {workflowCategories.map((workflowCategory) => {
           return (
             <AnalysisMethod

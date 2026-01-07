@@ -20,6 +20,7 @@ import {
 import { WorkflowInputsView } from "../../../../../app/views/WorkflowInputsView/workflowInputsView";
 import { GA2AssemblyEntity } from "../../../../../app/apis/catalog/ga2/entities";
 import { CUSTOM_WORKFLOW } from "../../../../../app/components/Entity/components/AnalysisMethod/components/CustomWorkflow/constants";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../app/components/Entity/components/AnalysisMethod/components/DifferentialExpressionAnalysis/constants";
 
 interface StaticPath {
   params: PageUrlParams;
@@ -107,6 +108,15 @@ function processEntityPaths(
         entityId,
         entityListType,
         trsId: CUSTOM_WORKFLOW.trsId,
+      },
+    });
+
+    // Create differential expression analysis path.
+    paths.push({
+      params: {
+        entityId,
+        entityListType,
+        trsId: DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId,
       },
     });
 
