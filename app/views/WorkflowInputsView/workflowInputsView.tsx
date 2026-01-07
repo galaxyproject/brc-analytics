@@ -9,6 +9,8 @@ import { augmentConfiguredSteps } from "../../components/Entity/components/Confi
 import { SEQUENCING_STEPS } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/constants";
 import { getAssembly } from "../../services/workflows/entities";
 import { getWorkflow } from "../../services/workflows/entities";
+import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
+import Error from "next/error";
 
 export const WorkflowInputsView = ({ entityId, trsId }: Props): JSX.Element => {
   const genome = getAssembly<Assembly>(entityId);
@@ -16,6 +18,10 @@ export const WorkflowInputsView = ({ entityId, trsId }: Props): JSX.Element => {
 
   const { configuredInput, onConfigure } = useConfigureInputs();
   const { configuredSteps } = useConfiguredSteps(workflow);
+
+  const isDEEnabled = useFeatureFlag("de");
+
+  if (!isDEEnabled) return <Error statusCode={404} />;
 
   return (
     <Detail

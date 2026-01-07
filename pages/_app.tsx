@@ -23,6 +23,7 @@ import { GoogleSignInAuthenticationProvider } from "@databiosphere/findable-ui/l
 import { ServicesProvider } from "@databiosphere/findable-ui/lib/providers/services/provider";
 import "../app/styles/fonts/fonts.css";
 import { useEntities } from "../app/services/workflows/hooks/UseEntities/hook";
+import { setFeatureFlags } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/common/utils";
 
 const DEFAULT_ENTITY_LIST_TYPE = "organisms";
 
@@ -39,6 +40,8 @@ export type AppPropsWithComponent = AppProps & {
   Component: NextPageWithComponent;
   pageProps: PageProps;
 };
+
+setFeatureFlags(["de"]);
 
 function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
   // Set up the site configuration, layout and theme.
