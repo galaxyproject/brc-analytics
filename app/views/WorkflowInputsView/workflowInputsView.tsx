@@ -11,6 +11,7 @@ import { getAssembly } from "../../services/workflows/entities";
 import { getWorkflow } from "../../services/workflows/entities";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import Error from "next/error";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "app/components/Entity/components/AnalysisMethod/components/DifferentialExpressionAnalysis/constants";
 
 export const WorkflowInputsView = ({ entityId, trsId }: Props): JSX.Element => {
   const genome = getAssembly<Assembly>(entityId);
@@ -21,7 +22,8 @@ export const WorkflowInputsView = ({ entityId, trsId }: Props): JSX.Element => {
 
   const isDEEnabled = useFeatureFlag("de");
 
-  if (!isDEEnabled) return <Error statusCode={404} />;
+  if (!isDEEnabled && workflow.trsId === DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId)
+    return <Error statusCode={404} />;
 
   return (
     <Detail
