@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1 import cache, health, ncbi_links, version
 from app.core.config import get_settings
-from app.core.dependencies import get_cache_service
+from app.core.dependencies import get_cache_service, reset_cache_service
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
@@ -20,8 +20,9 @@ async def lifespan(app: FastAPI):
     await cache_service.flush_all()
     logger.info("Cache cleared on startup")
     yield
-    # Shutdown: close cache connection
+    # Shutdown: close cache connection and reset singleton
     await cache_service.close()
+    reset_cache_service()
 
 
 app = FastAPI(
