@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { Fragment } from "react";
 import { WorkflowAccordion } from "../AnalysisMethod/components/WorkflowAccordion/workflowAccordion";
 import { CUSTOM_WORKFLOW } from "../AnalysisMethod/components/CustomWorkflow/constants";
-import { DIFFERENTIAL_EXPRESSION_WORKFLOW } from "../AnalysisMethod/components/DifferentialExpressionWorkflow/constants";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../AnalysisMethod/components/DifferentialExpressionAnalysis/constants";
 import { AnalysisTypeHeader } from "./components/AnalysisTypeHeader/analysisTypeHeader";
 import { Stack } from "@mui/material";
 import { buildAssemblyWorkflows } from "./utils";
@@ -61,7 +61,7 @@ export const AnalysisMethodsCatalog = ({ assembly }: Props): JSX.Element => {
           <WorkflowAccordion
             buttonText="Configure Inputs"
             entityId={entityId as string}
-            workflow={DIFFERENTIAL_EXPRESSION_WORKFLOW}
+            workflow={DIFFERENTIAL_EXPRESSION_ANALYSIS}
           />
         )}
         {workflowCategories.map((workflowCategory) => {

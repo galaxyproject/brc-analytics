@@ -8,7 +8,7 @@ import {
 } from "../../apis/catalog/brc-analytics-catalog/common/entities";
 import { formatTrsId } from "../../components/Entity/components/AnalysisMethodsCatalog/utils";
 import { CUSTOM_WORKFLOW } from "../../components/Entity/components/AnalysisMethod/components/CustomWorkflow/constants";
-import { DIFFERENTIAL_EXPRESSION_WORKFLOW } from "../../components/Entity/components/AnalysisMethod/components/DifferentialExpressionWorkflow/constants";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../components/Entity/components/AnalysisMethod/components/DifferentialExpressionAnalysis/constants";
 
 /**
  * Fetches entities from the API.
@@ -82,10 +82,10 @@ export async function loadWorkflows(): Promise<void> {
   // Add custom workflow.
   workflowById.set(CUSTOM_WORKFLOW.trsId, CUSTOM_WORKFLOW);
 
-  // Add differential expression workflow.
+  // Add differential expression analysis.
   workflowById.set(
-    DIFFERENTIAL_EXPRESSION_WORKFLOW.trsId,
-    DIFFERENTIAL_EXPRESSION_WORKFLOW
+    DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId,
+    DIFFERENTIAL_EXPRESSION_ANALYSIS
   );
 
   setEntitiesById("workflows", workflowById);
