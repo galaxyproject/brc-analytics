@@ -8,6 +8,14 @@ interface Props {
   offset: number;
 }
 
+const code = css`
+  code {
+    background-color: ${PALETTE.SMOKE_LIGHT};
+    font-size: inherit;
+    padding: 0 2px;
+  }
+`;
+
 const heading = ({ offset }: Props) => css`
   h1,
   h2,
@@ -106,6 +114,7 @@ export const StyledSectionContent = styled(SectionContent, {
   margin-top: 0;
   min-width: 0;
 
+  ${code}
   ${heading}
   ${iframe}
   ${image}
