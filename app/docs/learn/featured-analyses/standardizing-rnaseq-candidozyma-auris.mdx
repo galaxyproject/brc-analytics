@@ -1,0 +1,593 @@
+---
+breadcrumbs:
+  - path: ""
+    text: "Learn"
+  - path: "/learn/featured-analyses"
+    text: "Featured Analyses"
+contentType: "ARTICLE"
+description: ""
+heroImage:
+  alt: "Standardizing RNA-seq Analysis of Fungal Pathogens Using BRC-Analytics"
+  src: "/learn/featured-analyses/expression-analysis-scatter.webp"
+title: "Standardizing RNA-seq Analysis of Fungal Pathogens Using BRC-Analytics and Agentic AI: A Candidozyma auris Case Study"
+---
+
+Anton Nekrutenko<sup>1</sup>, Danielle Callan<sup>2</sup>, Marius Van Den Beek<sup>1</sup>, Dannon Baker<sup>3</sup>, David Rogers<sup>4</sup>, Aysam Guerler<sup>3</sup>, John Chilton<sup>1</sup>, Hiram Clawson<sup>5</sup>, Scott Cain<sup>1</sup>, Teresa O'Meara<sup>6</sup>, Kelsey Beavers<sup>7</sup>, Michael Schatz<sup>3</sup>, Maximilian Haeussler<sup>5</sup>, Bjorn Gruning<sup>8</sup>, Jeremy Goecks<sup>9</sup>, and Sergei Kosakovsky Pond<sup>2</sup>
+
+<sup>1</sup> Dept. of Biochemistry and Molecular Biology, The Pennsylvania State
+University, University Park, PA, USA\
+<sup>2</sup> Dept. of Biology, Temple University, Philadelphia, PA, USA\
+<sup>3</sup> Dept. of Biology, Johns Hopkins University, Baltimore, MD, USA\
+<sup>4</sup> Clever Canary, LLC, Santa Cruz, CA, USA\
+<sup>5</sup> Baskin School of Engineering, University of California, Santa Cruz,
+USA\
+<sup>6</sup> Dept. of Microbiology and Immunology, University of Michigan, Ann
+Arbor, MI, USA\
+<sup>7</sup> Texas Advanced Computing Center, The University of Texas, Austin,
+TX, USA\
+<sup>8</sup> Dept. of Bioinformatics, Albert-Ludwigs-University Freiburg,
+Freiburg, Baden-Württemberg, Germany\
+<sup>9</sup> Moffitt Cancer Center, Tampa, FL, USA
+
+Correspondence should be addressed to AN and SKP: aun1@psu.edu, spond@temple.edu
+
+## Abstract
+
+_Candidozyma auris_ has emerged as a critical global health threat due to multidrug resistance and healthcare-associated transmission. While RNA-seq has become the primary tool for studying _C. auris_ pathogenesis, inconsistent use of reference genomes and bioinformatics tools complicate cross-study comparisons. Here we demonstrate how BRC-Analytics, a platform for pathogen genomics, combined with an agentic AI assistant, enables reproducible RNA-seq analysis. By re-analyzing data from two publications we achieved near-perfect correlation with published results despite annotation version differences. We addressed provenance challenges associated with using AI agents with Galaxy by forcing them to invoke Galaxy's native tools rather than manipulating data directly. For custom analyses outside Galaxy's toolset, we provide standalone JupyterLite notebooks that reproduce our analysis without AI involvement. This framework---combining AI-assisted automation with rigorous provenance tracking---establishes a template for standardized, reproducible fungal pathogen genomics. To the best of our knowledge, this is the first example of integration between public data repositories, reproducible analysis workflows, and agentic AI tools. Our subsequent efforts will focus on improving the seamlessness of this integration.
+
+## Introduction
+
+_Candidozyma auris_ (formerly _Candida auris_; NCBI:txid498019) represents one of the most urgent antimicrobial resistance threats facing global health systems. First isolated from external ear canal of Japanese hospital patient in 2009 ([Satoh et al., 2009](#3-satoh-et-al-2009-first-isolation)), this fungal pathogen has since spread worldwide. CDC classifies _C. auris_ as an urgent threat---the first fungal pathogen to receive this designation---due to multidrug resistance (often to all major antifungal classes), healthcare-associated transmission, and 30-60% mortality rates ([CDC, 2023](#4-cdc-candida-auris-resources); [Bhargava et al., 2025](https://pmc.ncbi.nlm.nih.gov/articles/PMC11946832)). _C. auris_ persists on surfaces, colonizes skin, and forms biofilms on medical devices, enabling difficult-to-control nosocomial outbreaks ([Bhargava et al., 2025](https://pmc.ncbi.nlm.nih.gov/articles/PMC11946832)). WHO designates _C. auris_ as critical-priority fungal pathogen ([WHO, 2024](#6-who-critical-priority-fungal-pathogen)), and NIAID has prioritized development of new therapeutics ([NIAID, 2024](#5-niaid-fungal-pathogen-priority)).
+
+Compared to other key human pathogens (such as a SARS-CoV-2 or HIV, for example) the amount of publicly available sequence data for _C. auris_ is modest (Table 1). Two categories of projects account for 98% of all data: whole genome sequencing efforts (WGS) and RNA-seq projects. The WGS data are mostly derived from outbreak surveillance efforts conducted by various state public health agencies (Supp. Table 1). The majority of RNA-seq data on the other hand are produced by academic research labs. This reflects the importance of transcriptomic analyses to understanding the fundamental biology of this pathogen. While whole-genome sequencing dominates by run count (26,201 WGS vs 812 RNA-seq runs; 96.3% vs 3.0%), 64 of 237 _C. auris_ BioProjects (27%) are RNA-seq studies. This disparity reflects study design: WGS projects sequence many isolates for outbreak surveillance (average 156 runs/project), whereas RNA-seq examines specific biological conditions (average 13 runs/project). Given RNA-seq accounts for over one-quarter of _C. auris_ research projects, standardizing analysis is a critical priority.
+
+**Table 1**: Summary of _C. auris_ sequencing data in NCBI SRA (December 2025). BioProject is an NCBI database entry grouping related sequencing runs from a single study. Assay types: WGS = whole genome sequencing; RNA-Seq = transcriptome sequencing; AMPLICON = targeted amplicon sequencing; WGA = whole genome amplification; miRNA-Seq = microRNA sequencing; ChIP-Seq = chromatin immunoprecipitation sequencing; Tn-Seq = transposon insertion sequencing; Targeted-Capture = hybridization capture sequencing; WCS = whole chromosome sequencing; Bisulfite-Seq = DNA methylation sequencing.
+
+| Assay Type       | BioProjects | Total Runs | Total Bases | Avg Runs/Project |
+| :--------------- | ----------: | ---------: | ----------: | ---------------: |
+| WGS              |         168 |     26,201 |     45.6 Tb |            156.0 |
+| RNA-Seq          |          64 |        812 |      4.7 Tb |             12.7 |
+| AMPLICON         |           4 |         87 |     17.2 Gb |             21.8 |
+| WGA              |           2 |         38 |     34.3 Gb |             19.0 |
+| miRNA-Seq        |           1 |         24 |      4.7 Gb |             24.0 |
+| ChIP-Seq         |           2 |         14 |    112.5 Gb |              7.0 |
+| OTHER            |           2 |         13 |     40.0 Gb |              6.5 |
+| Tn-Seq           |           1 |          6 |     19.7 Gb |              6.0 |
+| Targeted-Capture |           1 |          5 |      2.8 Gb |              5.0 |
+| WCS              |           1 |          1 |      2.1 Gb |              1.0 |
+| Bisulfite-Seq    |           1 |          1 |    383.6 Mb |              1.0 |
+| **TOTAL**        |     **237** | **27,202** | **50.5 Tb** |                  |
+
+To understand the analytical landscape of _C. auris_ transcriptomic studies we surveyed all available RNA-seq data associated with that species. Specifically, for all 64 RNA-seq BioProjects listed in Table 1 we attempted to retrieve associated publications. Of 64 BioProjects, 20 (31%) had linked manuscripts (21 papers total, 2018-2025) while 44 remained unpublished or in pre-print stage. For papers with available full text (17/20), we extracted reference genome and analysis tool information (Table 2; also see Supp. Table 2).
+
+**Table 2**: RNA-seq methodology across 20 published _C. auris_ studies with linked BioProjects. Numbers in parentheses indicate study count; bracketed numbers are citation references.
+
+| Category              | Finding                                                                                                                                                                                                                                                                                                                                                                                                           |
+| :-------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Reference Genome**  | B8441/GCA_002759435.x (12/20, 60%); multiple clades (5/20); not specified (2/20)                                                                                                                                                                                                                                                                                                                                  |
+| **Alignment Tool**    | `HISAT2` ([Kim et al., 2019](https://doi.org/10.1038/s41587-019-0201-4)) (7), `STAR` ([Dobin et al., 2013](https://doi.org/10.1093/bioinformatics/bts635)) (5), `Bowtie2` ([Langmead et al., 2012](https://doi.org/10.1038/nmeth.1923)) (4), `BWA` ([Li et al., 2009](https://doi.org/10.1093/bioinformatics/btp324)) (3), `TopHat2` ([Trapnell et al., 2009](https://doi.org/10.1093/bioinformatics/btp120)) (1) |
+| **Quantification**    | `featureCounts` ([Liao et al., 2014](https://doi.org/10.1093/bioinformatics/btt656)) (5), `HTSeq` ([Anders et al., 2015](https://doi.org/10.1093/bioinformatics/btu638)) (4), `StringTie` ([Pertea et al., 2015](https://doi.org/10.1038/nbt.3122)) (2), `Kallisto` ([Bray et al., 2016](https://doi.org/10.1038/nbt.3519)) (2), `RSEM` ([Li & Dewey, 2011](https://doi.org/10.1186/1471-2105-12-323)) (1)        |
+| **DE Analysis**       | `DESeq2` ([Love et al., 2014](https://doi.org/10.1186/s13059-014-0550-8)) (12), `edgeR` ([Robinson et al., 2010](https://doi.org/10.1093/bioinformatics/btp616)) (4), `Cufflinks` ([Trapnell et al., 2010](https://doi.org/10.1038/nbt.1621)) (1)                                                                                                                                                                 |
+| **Publication Years** | 2018 (2), 2021 (4), 2022 (4), 2023 (2), 2024 (5), 2025 (4)                                                                                                                                                                                                                                                                                                                                                        |
+
+Despite tool convergence, reference genome usage remains inconsistent. While 60% of published studies use B8441 (GCA_002759435 family), annotation versions vary---some cite only "B8441" without version, others specify GCA_002759435.2 or GCA_002759435.3. This creates reproducibility challenges (e.g., gene identifiers differ between versions) and complicates interpretation of published data in context of new genomes and vice versa. Similarly, tool version reporting is frequently incomplete or absent---papers cite "HISAT2" or "DESeq2" without specifying version numbers, yet algorithm behavior and output can differ substantially between releases. Without precise version information, reproducing published results becomes guesswork. These findings underscore need for standardized platforms specifying precise genome versions, tool versions, and parameters.
+
+Here, we demonstrate how a new environment for the analysis of pathogen, host, and vector data---BRC-Analytics ([https://brc-analytics.org](https://brc-analytics.org))---can be used for standardizing and simplifying RNA-seq analyses using two recent _C. auris_ studies as an example. Our approach makes cutting edge tools and powerful computational infrastructure freely accessible to any biologist. Importantly, the combination of BRC-Analytics, the Galaxy platform ([Galaxy Community, 2024](https://doi.org/10.1093/nar/gkae410)), and Agentic AI tools built on Large Language Models (LLM) tools described here automatically keeps provenance and ensures analytical reproducibility: any analysis conducted within our system can be understood and replicated by others.
+
+## Results
+
+### BRC-Analytics
+
+BRC-Analytics (https://brc-analytics.org) is a browser-based analysis environment designed to make comprehensive and reproducible genomic analyses of infectious diseases accessible to everyone. Developed under the NIAID-funded Bioinformatics Resource Centers (BRCs) program, it leverages the Galaxy platform to enable users to begin with raw sequencing reads and achieve publication-ready results without the need for local software installations or manual data transfers between tools. The platform integrates authoritative genomic data from multiple sources: NCBI Datasets provides reference genomes (currently 5,060 assemblies for 1,920 pathogen, host, and vector taxa, with continuous expansion planned), UCSC Genome Browser supplies genome annotations including gene coordinates and regulatory elements, and EBI ENA facilitates access to public sequence read archive data through local caching for quick searches. BRC-Analytics pairs these data sources with community-curated best-practice analysis workflows covering essential steps like quality control, read mapping, variant identification, and annotation. Galaxy serves not only for launching and running workflows but also as an environment for interpretive analyses through interactive tools like Jupyter. The platform utilizes free cloud-based computation, versioned workflows, and interactive visualizations to create a seamless, reproducible interface. The substantial computational and storage resources required are provided by ACCESS-CI infrastructure in the US, with BRC-Analytics and Galaxy hosted on servers at the Texas Advanced Computing Center (TACC). This approach unifies data and analytical capabilities, making advanced pathogen genomics available to a wider research community.
+
+### Two representative studies
+
+The _Introduction_ section above described a survey of all publicly available _C. auris_ sequence data with a particular focus on RNA-seq studies and associated publications (Supp. Table 2). From these publications we selected two studies. The first, Santana et al. (2023), identified _SCF1_ gene as _C. auris_-specific adhesin essential for biofilm formation and virulence (PRJNA904261) ([Santana et al., 2023](#1-santana-et-al-2023-science)). The second, Wang et al. (2024), showed that glycan-lectin interactions modulate colonization and fungemia (PRJNA1086003) ([Wang et al., 2024](#2-wang-et-al-2024-nature-communications)). These two studies are good representatives of _C. auris_ RNA-seq methodology. Both use B8441 (Clade I) reference genome, which dominates the field (14/20 published studies). Wang employs `HISAT2`/`STAR` + `DESeq2`, the most common pipeline (`DESeq2` in 13/20, `HISAT2` in 6/20 studies). Sample sizes of 13 and 6 runs bracket the typical range (median ~13-15). As 2023-2024 publications, they reflect current practices unlike older studies using outdated tools (`TopHat2`, `Cufflinks`). Both study adhesion/biofilm phenotypes, the dominant research theme alongside drug resistance.
+
+### The use of Agentic AI
+
+Two aspects of our analysis resist automation: understanding the relationship between datasets deposited to NCBI and actual results described in the two papers and comparison of results produced by us against results in the two manuscripts. Let us look at these challenges in more detail.
+
+The RNA-seq analysis described in this paper is deliberately generic: standard differential expression between two conditions. It can be divided into two parts. The first part produces counts of reads falling within genomic coordinates of each gene. This part is straightforward and is conducted in exactly the same way for all samples. The second part requires reorganizing samples into higher level hierarchy in which they are grouped by conditions that, in turn, contain replicates and so on. When replicating published results, the second part often becomes quite challenging as it requires mapping results described in a paper to actual read-level datasets from NCBI: exactly how samples shown in figure X correspond to dataset Y?
+
+The second challenge is that published data are often analyzed in a context of older (or different) genomic reference. This implies that neither genomic coordinates nor gene ids are matching. Untangling this may be quite complex and may require different approaches depending what specific organism the analysis is performed on.
+
+Both of these challenges may be solved by agentic AI tools powered by LLMs. However, using LLMs through familiar web interfaces—ChatGPT, Claude, or Gemini in a browser—is unsuitable for research problems because artifacts generated during these "chats" are difficult to track, version, or reproduce. Instead, tools like Claude Code (from Anthropic) or Gemini Code Assist (from Google) that operate on a researcher's own machine are ideal: they keep all artifacts local where they can be preserved and versioned. Crucially, these agents can interact with powerful platforms like Galaxy to execute analyses on robust infrastructure while preserving artifacts necessary for maintaining provenance.
+
+For this analysis we used Claude Code Agent (CCA) produced by Anthropic, configured to interact with the Galaxy platform via an API key that allows CCA to take actions on behalf of the user (see Methods). CCA ran on the local computer used to prepare this manuscript and communicated with Galaxy via Internet (Figure 1A). We are working on integrating agentic AI tools directly into our web platform to avoid managing credentials, eliminating the need to pay for these services, and to improve provenance and reproducibility (Figure 1B; also see Discussion). Before describing our computational setup, we emphasize that any results produced by LLMs must always be verified. For each analysis we first ask CCA to produce a plan of action, review and modify it as necessary, then allow the agent to proceed.
+
+<Figure
+  alt="Analysis Flow"
+  caption={
+    <figcaption>
+      Figure 1: Analysis flow in this manuscript (A) and with integrated AI
+      agents that will be available in future releases (B).
+    </figcaption>
+  }
+  src="/learn/featured-analyses/standardizing-rnaseq-candidozyma-auris/flow.webp"
+/>
+
+### Organizing data
+
+Authors of the two papers we re-analyze here have deposited sequencing data into NCBI SRA and were given a BioProject identifier---an entity grouping related sequencing runs from a single study. Before performing the differential expression analyses we need to understand how samples deposited to SRA correspond to experimental conditions described in each manuscript. To begin we deposited PDFs of each manuscript along with all available supplemental data into a separate folder on a local computer. We then provided the following instructions to the CCA (we also provide CCA with API key for Galaxy that allows it to access the data and perform operations; for setup see AI agent integration setup within Materials and Methods):
+
+_I need to split Galaxy dataset collection #244 into several collections corresponding to experimental conditions described in the manuscript (check manuscript pdf and supplemental materials xlsx files in this directory). In order to do this you need to download metadata for sequencing runs for bioproject PRJNA904261 to obtain accessions and metadata. You should then figure out how SRA accessions correspond to experimental conditions described in the paper. You should then present these finding to me, so that I can tell you what to do next._
+
+This query asks CCA to look at Galaxy dateset collection #244 in history https://usegalaxy.org/u/cartman/h/prjna904261-perm and create a plan for splitting it into three collections corresponding to three strains (conditions) used by Santana et al.: AR0382_WT, AR0387_WT, and tnSWI1. It is important to note that we are not asking for an action. We are asking for a plan that we can review and then decide whether it can be enacted or needs to be modified (see Supplement 1).
+
+In the above prompt we specifically mentioned "Collection #244"---a Galaxy artifact containing read counts for all samples described in this study (can be viewed at https://usegalaxy.org/u/cartman/h/prjna904261-perm). The CCA correctly identified the relationship between datasets and experimental conditions described in the manuscript (Table 3; Supplement 1). After reviewing the plan we instructed CCA to enact it:
+
+_Go ahead and execute the plan. Once you are done please add name tags to dataset collection containing data we need to used for DeSeq2 analysis. E.g., label collections with names tags such as AR0382_WT, AR0387_WT, and tnSWI1._
+
+<Figure
+  alt="Collection Split"
+  caption={
+    <figcaption>
+      Figure 2: CCA splits collection containing counts into three collections
+      corresponding to three different strains (conditions).
+    </figcaption>
+  }
+  src="/learn/featured-analyses/standardizing-rnaseq-candidozyma-auris/collection-split.webp"
+/>
+
+This step generated three dataset collections in Galaxy history corresponding to the three conditions described in the paper: AR0382_WT, AR0387_WT, and tnSWI1 (Fig. 2). We then repeated this procedure in a separate Galaxy history containing read count derived from Wang et al. 2024 ([Wang et al., 2024](#2-wang-et-al-2024-nature-communications)).
+
+**Table 3**: Breakdown of datasets for `DESeq2` analysis. For Santana et al. AR0382_WT/tnSWI1 and AR0382_WT/AR0387_WT comparisons were performed. For Wang et al. AR0382 in vitro/AR0387 in vitro and AR0382 in vivo/AR0387 in vivo comparisons were performed.
+
+| Study          | Condition       | SRR Accessions                                     | Description            |
+| :------------- | :-------------- | :------------------------------------------------- | :--------------------- |
+| Santana et al. | AR0382_WT       | SRR22376031, SRR22376032                           | Wild-type reference    |
+|                | AR0387_WT       | SRR22376029, SRR22376030                           | Poorly adhesive strain |
+|                | tnSWI1          | SRR22376027, SRR22376028                           | SWI1 mutant            |
+| Wang et al.    | AR0382 in vitro | SRR28790270, SRR28790272, SRR28790274              | In vitro culture       |
+|                | AR0387 in vitro | SRR28790276, SRR28790278, SRR28790280              | In vitro culture       |
+|                | AR0382 in vivo  | SRR28791430, SRR28791431, SRR28791432              | In vivo infection      |
+|                | AR0387 in vivo  | SRR28791433, SRR28791434, SRR28791437, SRR28791438 | In vivo infection      |
+
+### Expression analysis and interpretation
+
+In the previous section we have configured our data so we can perform differential expression. We then re-ran differential expression with `DESeq2` on data from both manuscripts as described in Table 3 and performed a systematic comparison of log2 fold changes against published supplementary data using the following prompt (here, using Santana et al. as an example):
+
+_Datasets #521 and #523 in https://usegalaxy.org/u/cartman/h/prjna904261-perm represent DeSeq2 results for AR0382_WT/tnSWI1 and AR0382_WT/AR0387_WT comparisons, respectively. Compare them with the results reported in Santana et al. using paper PDF and supplementary files. Use NCBI old_locus_tag attribute for gene ID mapping between annotation versions._
+
+A technical challenge arose from differences in genome annotation versions. Both published studies used an older _C. auris_ annotation with 6-digit gene ID suffixes (e.g., B9J08_001458), while we relied on the latest assembly (GCA_002759435.3) that uses 5-digit suffixes (e.g., B9J08_03708). To reconcile gene identities between versions, we used the official NCBI `old_locus_tag` attribute present in the GCA_002759435.3 GTF annotation file (this was, in fact, suggested by CCA). This attribute provides authoritative correspondence between old (v2) and new (v3) gene identifiers. We validated this mapping by comparing protein sequences encoded by mapped gene pairs---all pairs s
+howed 100% sequence identity, confirming correct correspondence.
+
+### Comparison with Santana et al. (2023) results
+
+The study compared three strains (Table 3): AR0382_WT, a wild-type highly adhesive Clade I isolate; AR0387_WT, a poorly adhesive clinical isolate; and tnSWI1, a transposon-insertion mutant of AR0382 with disrupted SWI1, a chromatin remodeling factor. Each strain was sequenced in duplicate. The first comparison (Santana et al. Fig. 1D) examined the tnSWI1 mutant versus wild-type AR0382 to identify genes affected by SWI1 disruption. The second comparison (Santana et al. Fig. S5A) contrasted AR0387 against AR0382 to characterize expression differences between adhesive and non-adhesive strains. Both comparisons yielded strong validation metrics. For the first (tnSWI1/AR0382_WT) comparison, we successfully mapped 203 differentially expressed genes and obtained R² = 0.94 with 99% direction agreement. The second comparison (AR0382_WT/AR0387_WT) mapped 165 genes with R² = 0.89 and 97% direction agreement. SCF1, the central finding of the Santana study, was the most strongly downregulated gene in both comparisons. The published analysis reported SCF1 (B9J08_001458) with log2 fold changes of -6.68 (Santana et al. Fig. 1D) and -7.25 (Santana et al. Fig. S5A). Our reanalysis identified the corresponding gene (B9J08_03708) with log2 fold changes of -6.82 and -7.35, respectively, confirming the paper's key finding with minimal deviation.
+
+<Figure
+  alt="Santana Validation"
+  caption={
+    <figcaption>
+      <span>
+        Figure 3: Validation of Santana et al. <code>DESeq2</code> results using
+        official NCBI gene ID mapping. Left: tnSWI1 vs AR0382 comparison (n=203
+        genes, R²=0.94). Right: AR0387 vs AR0382 comparison (n=165 genes,
+        R²=0.89). Red dashed line indicates perfect correlation (y=x). Key gene
+        SCF1 is labeled.
+      </span>
+    </figcaption>
+  }
+  src="/learn/featured-analyses/standardizing-rnaseq-candidozyma-auris/santana_combined_sidebyside.webp"
+/>
+
+### Comparison with Wang et al. (2024) results
+
+This study compared two strains with distinct aggregation phenotypes: AR0382 (B11109), a highly aggregative biofilm-forming strain, and AR0387 (B8441), a non-aggregative strain. RNA-seq was performed under two conditions: in vitro biofilm growth (3 replicates per strain) and in vivo colonization of mouse jugular vein catheters (3 replicates for AR0382, 4 for AR0387). The authors reported 76 differentially expressed genes (DEGs) in the in vitro comparison and 259 DEGs in the in vivo comparison, using thresholds of FDR < 0.01 and |LFC| >= 1.0. Our reanalysis achieved strong correlation with the published results. For the in vitro condition, we matched 76 genes with R² = 0.98 and 100% direction agreement. The in vivo analysis matched all 259 DEGs with R² = 0.9998 and 100% direction agreement. The key adhesin genes highlighted in the paper showed excellent concordance. SCF1 exhibited LFC of 8.61 (paper) versus 8.67 (our analysis) in vitro, and 4.47 versus 4.53 in vivo. ALS4112 showed similarly close agreement: 5.07 versus 5.08 in vitro, and 2.56 versus 2.56 in vivo.
+
+<Figure
+  alt="Wang Validation"
+  caption={
+    <figcaption>
+      <span>
+        Figure 4: Validation of Wang et al. <code>DESeq2</code> results using
+        official NCBI gene ID mapping. Left: In vitro biofilm comparison (n=76
+        genes, R²=0.98). Right: In vivo mouse catheter model (n=259 genes,
+        R²=0.9998). Red dashed line indicates perfect correlation (y=x). Key
+        adhesin genes SCF1 and ALS4112 are labeled.
+      </span>
+    </figcaption>
+  }
+  src="/learn/featured-analyses/standardizing-rnaseq-candidozyma-auris/wang-validation-scatter.webp"
+/>
+
+### Maintaining provenance
+
+Integrating AI agents with analytical platforms like Galaxy presents a provenance challenge. When analysis alternates between Galaxy and external AI-generated scripts, the chain of reproducibility breaks---Galaxy cannot track code executed outside its environment, and AI agents generate numerous artifacts (Python scripts, intermediate files) that are difficult to document systematically. To preserve provenance, we configured our AI agent to invoke Galaxy's native tools through the API rather than manipulating data directly (this was done via CCA "command" concept; see [the following rule](https://github.com/jmchilton/galaxy-agentic-collection-transform/blob/main/artifacts/command/galaxy-transform-collection.md)). When a CCA interacts with Galaxy via API, it can directly manipulate datasets and collections---but this bypasses Galaxy's tool framework, losing reproducibility and workflow compatibility. By constraining the agent to use Galaxy tools (e.g., Apply Rules, Filter, `DESeq2`), all operations remain tracked in Galaxy histories, can be extracted into reusable workflows, and produce identical results on re-execution. However, some operations---such as comparing our results against published data---require custom code that Galaxy does not natively support. To address this gap, we developed a standalone JupyterLite notebook (with the help of the same CCA) that reproduces the validation figures shown here without any AI involvement (notebooks can be accessed in Galaxy histories: [Santana et al. history](https://usegalaxy.org/u/cartman/h/prjna904261-perm); [Wang et al. history](https://usegalaxy.org/histories/view?id=bbd44e69cb8906b59f131af7b542c1b1)). The notebook requires two inputs: (1) `DESeq2` output from Galaxy (TSV with Gene_ID, log2FoldChange, padj columns) and (2) publication data reformatted as CSV with gene_id and log2fc columns. In our workflow, the AI agent's role was limited to extracting and reformatting data from Excel supplementary files into this simple CSV structure---a step that becomes unnecessary when published supplementary data already conforms to standard formats. Ideally, the CCA functionality should be tightly integrated with BRC-Analytics and Galaxy---a current development priority for us (see below).
+
+## Discussion
+
+### Toward standardization of fungal genomics
+
+Both studies achieved strong validation status, with Santana et al. showing R² = 0.89-0.94 across comparisons and Wang et al. achieving R² = 0.98-0.9998 in both conditions. These results demonstrate that Galaxy-based reanalysis using standard workflows produces results highly consistent with published analyses, and that differential expression patterns are reproducible when using the same statistical methods and significance thresholds.
+
+### AI mistakes and the importance of validation
+
+Our analysis provides a cautionary tale about AI-assisted research. Initially, Claude Code Agent proposed an alternative approach to gene ID mapping: matching genes between annotation versions by finding those with the most similar log2 fold-change values. To the untrained eye this suggestion sounded "scientific". This LFC correlation method appeared remarkably successful---when we plotted published versus our fold changes, we obtained R² = 0.9996, suggesting near-perfect correspondence. However, subsequent comparison against the official NCBI `old_locus_tag` mapping revealed that only 1% (2 of 203) of LFC-matched gene pairs were correct. The high R² was an artifact: genes with coincidentally similar fold changes were matched, not the same genes. This example illustrates a fundamental limitation of AI systems: they can propose plausible methods that produce convincing-looking results while being fundamentally flawed. The error was undetectable from the output alone---only independent validation against authoritative sources (NCBI official mappings, confirmed by protein sequence identity) revealed the problem. We recommend that researchers using AI assistants always validate outputs against independent sources, treat high statistical agreement with appropriate skepticism when methodology is novel, and prioritize authoritative reference data over heuristic approximations.
+
+### Importance of LLMs and their responsible use
+
+For reproducibility, LLM-assisted analyses should be conducted through agentic coding tools such as Claude Code or Gemini Code Assist rather than chat-based interfaces. These tools automatically track all generated artifacts---scripts, intermediate files, and analysis outputs---within version-controlled repositories (e.g., GitHub), creating a complete audit trail. While this workflow may currently seem complex for bench biologists unfamiliar with command-line interfaces and version control, it represents the future of data analytics in biology. The interfaces will evolve: emerging tools like Claude Code Web promise to deliver agentic capabilities through browser-based environments, lowering the barrier to entry while maintaining full provenance tracking. As these tools mature, the combination of natural language interaction and automatic versioning will make reproducible AI-assisted analysis accessible to researchers regardless of their computational background.
+
+All results produced with agentic AI tools require independent validation. In this study, we had the advantage of known expected outcomes---published results against which to benchmark our AI-assisted reanalysis. This "ground truth" allowed us to confirm that the AI-directed workflow produced biologically accurate results. However, for novel research where expected outcomes are unknown, researchers must exercise heightened scrutiny. AI agents can confidently produce plausible but incorrect interpretations, and without validation benchmarks, such errors may go undetected. We recommend orthogonal validation approaches: qRT-PCR confirmation of key findings, biological replication, functional studies, and cross-referencing with independent datasets. The provenance tracking enabled by agentic tools becomes especially valuable here---complete audit trails allow retrospective verification when questions arise about specific analytical decisions.
+
+### Why BRC-Analytics/Galaxy for AI-assisted analysis
+
+The choice of workflow platform significantly impacts the feasibility of AI agent integration. For example, Galaxy's architecture offers distinct advantages over code-first systems like Nextflow for agentic AI workflows. Galaxy provides structured tool metadata through repositories like IUC (github.com/galaxyproject/tools-iuc), where each tool's parameters, input/output types, and documentation are defined in machine-readable XML. This allows AI agents to query available tools, understand valid parameter options, and make informed decisions---capabilities that require parsing documentation or source code in Nextflow. Galaxy's stateful API enables agents to inspect histories, monitor job status, and retrieve results through structured endpoints, whereas Nextflow requires log parsing and manual file path management. Perhaps most importantly, Galaxy's integration with ACCESS-CI provides free, zero-configuration access to high-performance computing, eliminating the infrastructure barriers (container configuration, HPC authentication, resource allocation) that Nextflow imposes on users. Additionally, ACCESS-CI provides access to open LLMs, which would enable functionality similar to the shown here but at no cost to the user.
+
+These architectural differences have practical implications for democratizing AI-assisted genomics. Galaxy's web-based interface means users need only a browser, while AI agents handle the complexity of tool selection and parameter configuration through the API. Nextflow's code-generation paradigm, while flexible, requires users to review generated DSL2 scripts, configure execution environments, and debug failures---skills that remain barriers for bench biologists. As AI agents become integral to computational biology, platforms that provide structured metadata, stateful APIs, and accessible infrastructure will enable broader adoption than those requiring programming expertise to operate.
+
+However, capable AI agents partially flatten these distinctions. Tool discovery, parameter selection, log parsing, and error diagnosis---tasks that once separated user-friendly platforms from code-centric ones---become the agent's responsibility regardless of backend. Once researchers adopt CLI-based AI tools, the barrier to Nextflow drops as well. The more substantial advantages emerge when AI is integrated directly into the platform (see below).
+
+### Agentic AI on-board
+
+We envision tighter integration between BRC-Analytics, Galaxy, and agentic AI systems. Currently, our workflow requires manual coordination: launching analyses through BRC-Analytics, managing data in Galaxy histories, and directing AI agents via API calls. Future development will embed AI agents directly within the Galaxy interface, enabling researchers to describe analyses in natural language while the system automatically selects appropriate workflows, configures parameters, and interprets results. This approach carries higher implementation risk but offers distinct advantages unavailable to external agents. Users require no model setup, API credentials, or payment—the AI is simply part of the browser interface. Agent actions become first-class objects tied to histories, datasets, and provenance records, making AI decisions auditable and inspectable. Combined with Galaxy's existing reproducibility infrastructure and ACCESS-CI compute, this achieves near-maximal practical reproducibility for LLM-assisted analysis: every prompt, tool invocation, and result lives within a single traceable environment. For researchers without programming backgrounds, integrated AI removes the external tooling barrier entirely—no terminal, no configuration, no credential management. This integration path represents our development priority (Figure 1B).
+
+## Materials and Methods
+
+### Literature Survey and Data Source Identification
+
+To quantify _C. auris_ sequencing data, we analyzed complete NCBI SRA database for taxonomy ID 498019 (_Candidozyma auris_) accessed December 3, 2025. SRA metadata (Cauris_SRA.csv) contained 27,201 total runs across 237 BioProjects. RNA-seq represents 812 runs (3.0%) and 64 BioProjects (27.0%), with WGS dominating run counts (26,201 runs, 96.3%) but representing 168 BioProjects (70.9%). Average runs per project: RNA-seq 12.7, WGS 156.0.
+
+To characterize methodology across published RNA-seq studies, we linked all 64 RNA-seq BioProjects to associated publications. For each BioProject, we queried EuropePMC REST API (https://www.ebi.ac.uk/europepmc/webservices/rest/) for papers mentioning BioProject accession in full text, and NCBI E-utilities (elink.fcgi) for direct BioProject-to-PubMed links. This identified 21 papers linked to 20 of 64 BioProjects (31%); 44 BioProjects had no linked publications (unpublished or preprint). For papers with PMC IDs (17/20), we retrieved full-text XML and extracted reference genome information by pattern matching (GenBank/RefSeq accessions, strain names, clade designations) and RNA-seq tools (aligners, quantification tools, DE packages). Results in Supplementary Table 2.
+
+For re-analysis validation, we selected Santana et al. (2023) _Science_ (PRJNA904261) ([Santana et al., 2023](#1-santana-et-al-2023-science)) and Wang et al. (2024) _Nature Communications_ (PRJNA1086003) ([Wang et al., 2024](#2-wang-et-al-2024-nature-communications)).
+
+### WGS Data Contributor Analysis
+
+To characterize sources of _C. auris_ WGS data, we analyzed the "Center Name" field from SRA metadata for all 26,201 WGS runs. Organization names were extracted and aggregated by run count and unique BioProjects. Abbreviated center names were expanded using geographic location metadata (geo_loc_name field) to disambiguate state-level public health laboratories (e.g., "MDH_CSL" mapped to Maryland via "USA:Mid-Atlantic" region; "NSPHL" mapped to Nevada via "USA:Nevada" location). Organizations were categorized into: US State/Local Public Health Laboratories, CDC, International Public Health agencies, Academic/Research institutions, and Other. Results presented in Supplementary Table 1.
+
+### Counting Workflow
+
+All analyses used _Candidozyma auris_ B8441 reference genome GCA_002759435.3 obtained BRC-Analytics (which mirrors NCBI Datasets). We then use an RNA-seq analysis workflow for obtaining gene counts ([Delisle et al., 2023](https://doi.org/10.5281/zenodo.8354569)) (Figure 5). For paired-end data, the workflow begins with `fastp` for adapter removal and quality filtering, discarding reads shorter than 15 bp. Filtered reads are aligned to the reference genome using `STAR` with ENCODE-standard parameters, which simultaneously generates gene-level counts. Quality metrics from all steps are aggregated by `MultiQC` into a comprehensive report. The workflow also generates strand-specific coverage tracks (bigWig format) for genome browser visualization. All tools, versions, and parameters are locked within the workflow definition, ensuring identical results across executions.
+
+<Figure
+  alt="IWC RNA-seq Workflow"
+  caption={
+    <figcaption>
+      <span>
+        Figure 5: IWC paired-end RNA-seq workflow. The pipeline processes FASTQ
+        files through quality filtering (<code>fastp</code>), alignment (
+        <code>STAR</code>), and quantification, with optional coverage track
+        generation and QC aggregation via <code>MultiQC</code>.
+      </span>
+    </figcaption>
+  }
+  src="/learn/featured-analyses/standardizing-rnaseq-candidozyma-auris/rnaseq-workflow.webp"
+/>
+
+### Differential Expression Analysis
+
+Gene count matrices from `STAR` were analyzed using `DESeq2` (v2.11.40.8+galaxy0) through Galaxy interface. For **Santana et al. dataset**: Samples organized into three collections (AR0382 n=2, AR0387 n=2, tnSWI1 n=2). Two pairwise comparisons performed: (1) AR0382 vs tnSWI1, (2) AR0382 vs AR0387. For **Wang et al. dataset**: Samples split into four collections by strain and condition (AR0382 _in vitro_ n=3, AR0387 _in vitro_ n=3, AR0382 _in vivo_ n=3, AR0387 _in vivo_ n=4). Two pairwise comparisons performed: AR0382 vs AR0387 in (1) _in vitro_ and (2) _in vivo_ conditions. `DESeq2` parameters: size factor normalization, Benjamini-Hochberg FDR correction, significance threshold FDR less than 0.01, fold change absolute value of log2FC greater than or equal to 1 for Wang dataset. Default parameters used for Santana dataset to match published analysis.
+
+### Gene Annotation Mapping
+
+Published papers used older B8441 annotation versions (GCA_002759435.2) with 6-digit gene ID suffixes (e.g., B9J08_001458) while our analysis used GCA_002759435.3 with 5-digit suffixes (e.g., B9J08_03708). To reconcile gene identities, we used the official NCBI `old_locus_tag` attribute present in the GCA_002759435.3 GTF annotation file, which provides authoritative correspondence between annotation versions. We validated this mapping by extracting protein sequences for mapped gene pairs from both annotation versions and confirming 100% sequence identity. Mapping quality assessed using Pearson correlation, R², direction agreement percentage, and mean LFC difference. An initial AI-proposed approach using LFC correlation (matching genes by similar fold-change values) was abandoned after validation showed only 1% accuracy despite apparent R² = 0.9996 (see Discussion). This analysis is saved as a JupyterLite notebook in Galaxy history associated with each paper (see below).
+
+### AI agent integration setup
+
+Claude Code Agent (CCA) interacts with Galaxy through its REST API using an API key stored as an environment variable (`GALAXY_API_KEY`). The key grants CCA permission to create histories, upload data, execute tools, and retrieve results on behalf of the user. API keys are generated through Galaxy's user preferences and never committed to version control.
+
+To ensure reproducibility, we configured CCA to prefer Galaxy's native tools over direct API manipulation. While CCA can programmatically create or modify Galaxy collections via API calls, such operations bypass Galaxy's tool framework---losing provenance tracking and preventing workflow extraction. Instead, project-level instructions direct CCA to use Galaxy's built-in collection tools (e.g., `__FILTER_FROM_FILE__`, `__RELABEL_FROM_FILE__`, `__APPLY_RULES__`) for all data transformations. A custom slash command (`/galaxy-transform-collection`; https://github.com/jmchilton/galaxy-agentic-collection-transform) provides CCA with detailed documentation of 26+ collection manipulation tools and decision frameworks for selecting appropriate operations. This approach ensures every analytical step appears in Galaxy's history as a tool invocation with full parameter capture, enabling complete workflow reconstruction.
+
+### Galaxy Workflows and Reproducibility
+
+All analyses performed on Galaxy Main server (https://usegalaxy.org). Galaxy histories containing complete analysis workflows, intermediate files, and final results are publicly accessible:
+
+- Santana et al.: https://usegalaxy.org/u/cartman/h/prjna904261-perm
+- Wang et al. (Analysis): https://usegalaxy.org/u/cartman/h/prjna1086003-perm
+
+These histories also contain the JupyterLite notebooks used for validation analysis and figure generation.
+
+IWC workflows used are available at https://iwc.galaxyproject.org and are version-controlled in GitHub repository at https://github.com/galaxyproject/iwc. Workflow diagrams and analysis reports available in supplementary materials.
+
+## Acknowledgements
+
+We would like to express our immense gratitude to Dan Stanzione and David Hancock for essential computational resources provided by the Advanced Cyberinfrastructure Coordination Ecosystem (ACCESS-CI), Texas Advanced Computing Center, and the JetStream2 scientific cloud. This work is funded by the NIH Grant U24AI183870.
+
+## References
+
+### Primary Publications (Re-analyzed Studies)
+
+#### 1. Santana et al. (2023) - _Science_
+
+**Citation**: Santana DJ et al. "A _Candida auris_-specific adhesin, Scf1, governs surface association, colonization, and virulence." _Science_. 2023;381(6665):1461-1467. PMID: [37769084](https://pubmed.ncbi.nlm.nih.gov/37769084). BioProject: PRJNA904261.
+
+**Summary**: This landmark study identifies Surface Colonization Factor 1 (Scf1) as a previously uncharacterized adhesin specific to _Candida auris_ that is critical for the pathogen's ability to colonize medical devices and host tissues. Unlike typical fungal adhesins that rely on hydrophobic interactions, Scf1 functions through exposed cationic residues for surface association. The study demonstrates that SCF1 is required for biofilm formation, skin colonization, systemic infection severity, and colonization of implanted medical devices like central venous catheters. Among clinical isolates from all five _C. auris_ clades, SCF1 expression levels directly correlate with adhesion capacity, indicating this protein governs the pathogen's surface-binding variability and represents an evolutionary adaptation contributing to its emergence as a healthcare threat.
+
+#### 2. Wang et al. (2024) - _Nature Communications_
+
+**Citation**: Wang Y et al. "Cell surface glycan-lectin interactions modulate _Candida auris_ colonization and fungemia." _Nat Commun_. 2024;15:6490. DOI: 10.1038/s41467-024-50434-4. PMID: [38562758](https://pubmed.ncbi.nlm.nih.gov/38562758). BioProject: PRJNA1086003.
+
+**Summary**: This study examines how _C. auris_ employs surface proteins to facilitate cell-to-cell bonding and biofilm development, comparing aggregative (AR0382) and non-aggregative (AR0387) strains. Researchers identified two adhesin proteins---Als5 and Scf1---that are significantly elevated in aggregative strains during biofilm formation both in laboratory and animal infection models. The study revealed functional redundancy: when either adhesin was individually removed, cells failed to clump together, but when both were absent simultaneously, cells regained adhesion through complementary interactions. This demonstrates that multiple cell wall proteins work interchangeably, allowing the pathogen to maintain virulence and persistence despite environmental pressures. The RNA-seq data comparing _in vitro_ and _in vivo_ conditions provides insights into transcriptional programs driving colonization and fungemia.
+
+### First Description of _C. auris_
+
+#### 3. Satoh et al. (2009) - First Isolation
+
+**Citation**: Satoh K et al. "_Candida auris_ sp. nov., a novel ascomycetous yeast isolated from the external ear canal of an inpatient in a Japanese hospital." _Microbiol Immunol_. 2009;53(1):41-44. PMID: [19161556](https://pubmed.ncbi.nlm.nih.gov/19161556).
+
+**Summary**: This paper represents the foundational taxonomic description of _Candida auris_ as a new species. A single strain was isolated from the external ear canal of a hospitalized patient in Japan, marking the first documented clinical isolation of this fungal pathogen. Molecular analyses of ribosomal DNA sequences revealed phylogenetic proximity to _Candida ruelliae_ and _Candida haemulonii_, placing it in the Metschnikowiaceae family. The strain demonstrated temperature-dependent growth patterns, growing well at 40°C but showing slow and weak growth at 42°C. The researchers formally proposed the species name _Candida auris_ (Latin "auris" = ear), with the type strain designated as JCM15448. This discovery preceded by nearly a decade the pathogen's emergence as a global healthcare threat.
+
+### Public Health Authority Resources
+
+#### 4. CDC - _Candida auris_ Resources
+
+**Sources**: CDC Media Release (March 2023), Clinical Overview (PMC11946832), Fact Sheet.
+
+**Summary**: The U.S. Centers for Disease Control and Prevention has designated _C. auris_ as an "urgent" antimicrobial resistance threat---the first and only fungal pathogen to receive this highest-level designation. CDC surveillance data shows dramatic case increases: from 52 cases in 2016 to over 4,500 in 2023, more than doubling annually. The pathogen is now present in all but 12 U.S. states. Key clinical concerns include: multidrug resistance (often to all three major antifungal classes: azoles, echinocandins, and polyenes), rapid healthcare-associated transmission, environmental persistence on surfaces for weeks, and high mortality rates (30-60%). CDC recommends enhanced infection control measures including contact precautions, environmental disinfection with EPA-registered products, and laboratory notification protocols.
+
+#### 5. NIAID - Fungal Pathogen Priority
+
+**Sources**: NIAID News (2024), BAA2025-1 Funding Announcement.
+
+**Summary**: The National Institute of Allergy and Infectious Diseases has prioritized _C. auris_ research through its antimicrobial resistance initiative. NIAID characterizes _C. auris_ as a "mysterious and tenacious enemy" due to its rapid global emergence, unclear origins, and remarkable drug resistance. The 2025 funding priorities (HHS-NIH-NIAID-BAA2025-1) specifically solicit applications for: new therapeutics targeting resistant fungi including _C. auris_, rapid diagnostic technologies for clinical identification, and vaccine development strategies. Topic C of the announcement focuses on diagnostics for _C. auris_, _Cryptococcus_, _Aspergillus_, and _Mucorales_. This federal investment reflects recognition that current antifungal options are inadequate for addressing the _C. auris_ threat.
+
+#### 6. WHO - Critical Priority Fungal Pathogen
+
+**Citation**: WHO Fungal Priority Pathogens List systematic review. PMID: [38935900](https://pubmed.ncbi.nlm.nih.gov/38935900). PMC11210622.
+
+**Summary**: The World Health Organization included _C. auris_ in its first-ever Fungal Priority Pathogens List (FPPL), designating it as a critical-priority pathogen requiring urgent research and development investment. The systematic review supporting this designation evaluated _C. auris_ against criteria including: mortality and morbidity burden, antifungal resistance trends, treatability with existing drugs, preventability, annual incidence, and diagnostic/surveillance challenges. WHO emphasizes that unlike other priority fungal pathogens that primarily affect immunocompromised individuals, _C. auris_ causes outbreaks in healthcare settings affecting patients with various underlying conditions. The designation aims to guide global research priorities and public health preparedness for invasive fungal diseases.
+
+### Intergalactic Workflow Commission (IWC)
+
+#### 7. IWC - Galaxy Workflows
+
+**Sources**: https://iwc.galaxyproject.org/, GitHub: galaxyproject/iwc, WorkflowHub Project 33.
+
+**Summary**: The Intergalactic Workflow Commission (IWC) maintains a collection of community-curated, tested, and versioned Galaxy workflows for reproducible bioinformatics analyses. All IWC workflows undergo rigorous review including automated testing, human code review, and validation with example datasets. Workflows are automatically installed on all usegalaxy.\* servers (Galaxy Main, Galaxy Europe, Galaxy Australia) with each Galaxy release, ensuring global accessibility and version consistency. The RNA-seq workflows used in this study include modules for quality control (FastQC), read trimming (fastp), alignment (STAR), quantification (featureCounts), and differential expression (DESeq2). IWC workflows are version-controlled through GitHub, enabling precise reproducibility by specifying exact workflow versions and tool dependencies.
+
+### RNA-seq Best Practices and Validation
+
+#### 8. Zenodo - RNA-seq Analysis Best Practices
+
+**Citation**: DOI: 10.5281/zenodo.3985047 (2020).
+
+**Summary**: This Zenodo resource provides community-established best practices for RNA-seq experimental design, analysis, and interpretation. Key recommendations include: minimum of 3 biological replicates per condition for statistical power, paired-end sequencing with adequate depth (>20M reads for differential expression), appropriate normalization methods (TMM, DESeq2 median-of-ratios), multiple testing correction (Benjamini-Hochberg FDR), and fold-change thresholds for biological significance. The guide emphasizes validation strategies: qRT-PCR confirmation of key differentially expressed genes, functional validation through genetic or pharmacological perturbation, and integration with orthogonal data types (proteomics, metabolomics). These practices informed our validation approach for the BRC-Analytics re-analyses.
+
+#### 9. PMC - Global Threat Review
+
+**Citation**: "Act Now: The Global Threat of Candida Auris and the Urgent Need for Effective Countermeasures." PMC11221456 (2024).
+
+**Summary**: This comprehensive review synthesizes the current state of _C. auris_ research and clinical management, emphasizing the urgent need for new countermeasures. The review covers: epidemiology and global spread patterns across five phylogenetic clades, molecular mechanisms of antifungal resistance (ERG11 mutations, efflux pump overexpression, FKS1 mutations), virulence factors enabling colonization and infection, challenges in clinical diagnosis and species identification, and current treatment options with their limitations. The authors argue that the combination of multidrug resistance, healthcare transmission, environmental persistence, and limited therapeutic options creates a "perfect storm" requiring coordinated global action including enhanced surveillance, infection control, and accelerated drug development.
+
+### NCBI Resources
+
+#### 10. NCBI Taxonomy Browser
+
+**Source**: NCBI Taxonomy ID 498019 (_Candidozyma auris_).
+
+**Summary**: The NCBI Taxonomy Browser entry for _C. auris_ (txid498019) provides the authoritative taxonomic classification and nomenclature for this species. Notably, the species has undergone taxonomic revision: formerly classified as _Candida auris_, it is now officially _Candidozyma auris_ following phylogenetic reclassification of the Metschnikowiaceae family. The taxonomy entry links to all associated sequence data in GenBank, SRA, and other NCBI databases, including 27,201 SRA runs across 237 BioProjects. The entry documents synonyms, type strain information, and the complete taxonomic lineage from Fungi kingdom through Saccharomycetes class to the species level.
+
+#### 11. Reference Genome - GCA_002759435.3
+
+**Source**: NCBI Assembly GCA*002759435.3 (\_Candidozyma auris* B8441 V3).
+
+**Summary**: The B8441 reference genome assembly (GCA*002759435.3) represents the standard reference for \_C. auris* genomic analyses. This third version assembly provides chromosome-level scaffolds with 5,593 annotated genes across approximately 12.4 Mb. The B8441 strain belongs to Clade I (South Asian) and was isolated from a patient in Pakistan. This assembly is used by BRC-Analytics and most recent _C. auris_ studies, though annotation version differences (6-digit vs 5-digit gene ID suffixes) between assembly versions create challenges for cross-study comparisons. The assembly includes coding sequences, gene annotations in GTF/GFF format, and protein sequences essential for RNA-seq alignment and quantification.
+
+#### 12. NCBI SRA and BioProject
+
+**Sources**: BioProject PRJNA904261 (Santana), PRJNA1086003 (Wang).
+
+**Summary**: The NCBI Sequence Read Archive (SRA) and BioProject databases contain all raw sequencing data for the two studies re-analyzed in this work. PRJNA904261 (Santana et al.) contains 6 RNA-seq runs representing 3 conditions (AR0382 wild-type, AR0387 poor adhesion, tnSWI1 mutant) with 2 biological replicates each. PRJNA1086003 (Wang et al.) contains 13 RNA-seq runs: 6 _in vitro_ samples (3 AR0382 + 3 AR0387) and 7 _in vivo_ infection samples (3 AR0382 + 4 AR0387). Both BioProjects include sample metadata enabling experimental design reconstruction. SRA data is directly accessible through BRC-Analytics for streamlined workflow execution.
+
+### Literature Survey Methodology
+
+#### 13. Comprehensive _C. auris_ RNA-seq Survey
+
+**Source**: https://github.com/nekrut/claude-projects/tree/main/rnaseq/Cauris_rna_seq_survey
+
+**Summary**: This survey compiled 32 unique _C. auris_ RNA-seq publications (2018-2025) using three independent search strategies: NCBI GEO database mining, Claude-assisted PubMed/Europe PMC searches, and ChatGPT-assisted searches. The survey revealed important patterns: 75% of studies use the B8441 reference genome (GCA_002759435 family) but with varying annotation versions; a consensus bioinformatics pipeline has emerged (HISAT2 62.5%, DESeq2 68.8%, HTSeq 37.5%); research focuses primarily on drug resistance (34.4%), stress responses (18.8%), and biofilm formation (12.5%). Peak publication year was 2021 with 11 papers. The survey also revealed that independent AI-assisted searches had 0% overlap despite querying identical databases on the same date, highlighting how search strategy impacts literature discovery.
+
+#### 14. Finding _C. auris_ in Metagenomic Repositories
+
+**Citation**: "Finding Candida auris in public metagenomic repositories." PMC10798454 (2024).
+
+**Summary**: This collaborative study between CDC, NCBI, and GridRepublic developed MetaNISH (Metagenomic Needles In Sequence Hay), a pipeline for identifying _C. auris_ in public metagenomic datasets. Scanning approximately 300,000 metagenomic samples from 2010-2022, researchers identified five datasets containing _C. auris_ sequences: wastewater drains and urban river samples from Delhi, India; skin swabs from U.S. healthcare facility residents; human stool samples from Hong Kong (unexpected finding); and laboratory enrichment cultures. The pipeline uses SRPRISM alignment with optimized score thresholds to separate positive and negative samples. A prospective monitoring system now screens approximately 925 new SRA submissions daily. These findings support environmental reservoir hypotheses and suggest community transmission pathways beyond healthcare settings.
+
+### Genome Sequencing and Phylogenomics
+
+#### 15. Benchmark Genome Dataset
+
+**Citation**: "_Candida auris_ Whole-Genome Sequence Benchmark Dataset for Phylogenomic Pipelines." PMID: 33809682 (2021).
+
+**Summary**: Researchers from CDC's Mycotic Diseases Branch created a benchmark dataset of 23 _C. auris_ whole genomes to standardize phylogenomic analyses across international surveillance networks. The dataset represents a polyclonal phylogeny with three distinct subclades, supported by genomic, phylogenetic, and epidemiological data. This benchmark enables laboratories worldwide to validate their genomic analysis methods and ensure consistent results across different analytical approaches. The standardized reference facilitates trustworthy communication between national and international surveillance partners tracking _C. auris_ outbreaks, addressing a critical need for consistent genomic surveillance of this multidrug-resistant pathogen.
+
+#### 16. Complete Genome Assemblies
+
+**Citation**: "Complete genome assembly of Candida auris representative strains of three geographical clades." _Microbiology Resource Announcements_ (2023).
+
+**Summary**: This resource announcement describes complete, chromosome-level genome assemblies for representative _C. auris_ strains from three major geographical clades: B11103 (Clade I, South Asian), B11221 (Clade III, South African), and B11244 (Clade IV, South American). These high-quality assemblies used long-read sequencing technologies to resolve repetitive regions and provide complete chromosome structures. The assemblies serve as clade-specific references for comparative genomics, enabling researchers to study clade-specific genomic features, structural variations, and evolutionary relationships. Complete assemblies are essential for accurate variant calling and understanding the genomic basis of phenotypic differences between clades.
+
+#### 17. Fifth Clade Discovery
+
+**Citation**: "Confirmation of fifth Candida auris clade by whole genome sequencing." PMID: 36154919. PMC9586689 (2022).
+
+**Summary**: This study confirmed the existence of a fifth phylogenetic clade of _C. auris_ through comprehensive whole-genome sequencing analysis. While four clades (I-IV) were previously established corresponding to South Asian, East Asian, South African, and South American origins, isolates from Iran showed distinct genomic signatures warranting designation as Clade V. The fifth clade demonstrates unique patterns of antifungal susceptibility and virulence factor expression. This discovery has implications for epidemiological surveillance, as clade identification helps track transmission patterns and predict resistance profiles. The study emphasizes that _C. auris_ continues to diversify, potentially through independent emergence events from environmental reservoirs.
+
+### Additional High-Impact Publications (from Survey)
+
+#### 18. Nature Microbiology - Host Immune Response (2020)
+
+**Citation**: Host PBMC response study. PMID: 32839538. GEO: GSE154911.
+
+**Summary**: This study employed QuantSeq 3' mRNA-seq to characterize the human peripheral blood mononuclear cell (PBMC) response to _C. auris_ infection. Researchers compared transcriptional responses to _C. auris_ versus other Candida species including _C. albicans_ and _C. glabrata_. The analysis revealed both conserved antifungal responses and _C. auris_-specific immune evasion mechanisms. Key findings include altered cytokine profiles, modified inflammasome activation patterns, and differential recognition by pattern recognition receptors. The study provides insights into why _C. auris_ infections may be particularly difficult to clear and identifies potential immunotherapeutic targets. The GEO dataset enables reanalysis of host-pathogen interactions at the transcriptional level.
+
+#### 19. Nature Microbiology - LncRNA DINOR (2021)
+
+**Citation**: LncRNA DINOR virulence study. PMID: 34083769. GEO: GSE171261.
+
+**Summary**: This pioneering study identified the first functional long non-coding RNA (lncRNA) in _C. auris_, designated DINOR (Drug-Induced NOn-coding RNA). DINOR expression is induced by antifungal drug exposure and contributes to drug tolerance and virulence. The study demonstrates that DINOR regulates genes involved in drug efflux, cell wall integrity, and stress responses. Deletion of DINOR increased susceptibility to azole antifungals and reduced virulence in animal infection models. This discovery expands understanding of _C. auris_ gene regulatory networks beyond protein-coding genes and suggests lncRNAs as potential therapeutic targets. The work represents a methodological advance in applying lncRNA analysis to fungal pathogens.
+
+#### 20. Nature Communications - Multidrug Resistance (2018)
+
+**Citation**: Muñoz JF et al. Multidrug resistance across clades. PMID: 30559369. BioProject: PRJNA445471.
+
+**Summary**: This comprehensive genomic study examined _C. auris_ across four clades and related species to understand multidrug resistance mechanisms. Key findings include: expanded families of drug transporters and lipase enzymes, mutations and copy number variations in ERG11 (azole resistance), and lineage-specific expansions in oligopeptide and siderophore iron transporters. Tandem duplications of eight transporter genes on chromosome 6 suggest mechanisms for nutrient acquisition and drug efflux. The study revealed that most mating and meiosis genes are conserved, indicating potential for sexual reproduction and genetic exchange. Notably, _C. auris_ clusters phylogenetically with _C. haemulonii_ clade species rather than _C. albicans_ or _C. glabrata_, yet all demonstrate multidrug resistance, suggesting convergent evolution of resistance mechanisms.
+
+#### 21. PLOS Pathogens - Single-cell RNA-seq (2024)
+
+**Citation**: First scRNA-seq in _C. auris_. PMID: 38745637.
+
+**Summary**: This study represents the first application of single-cell RNA sequencing (scRNA-seq) to _C. auris_, revealing unprecedented cellular heterogeneity within fungal populations. The analysis identified distinct transcriptional states including drug-tolerant persister cells, biofilm-forming subpopulations, and cells with enhanced invasive potential. Key findings include characterization of IL-1R-mediated immune evasion mechanisms and identification of cell subpopulations that differentially evade host immune responses. The scRNA-seq approach revealed that bulk RNA-seq masks important biological variation, as rare cell populations with distinct phenotypes would be averaged out in conventional analyses. This methodological advance enables study of fungal population dynamics during infection.
+
+#### 22. Cell Reports - White-Brown Switching (2025)
+
+**Citation**: Phenotypic switching study. PMID: 37925028.
+
+**Summary**: This study investigates the white-brown phenotypic switching phenomenon in _C. auris_, analogous to white-opaque switching in _C. albicans_. Researchers identified transcriptional regulators controlling the switch between smooth (white) and aggregative (brown) colony morphologies. Brown-phase cells showed enhanced biofilm formation, drug tolerance, and skin colonization capacity. RNA-seq analysis revealed hundreds of differentially expressed genes between phases, including cell wall proteins, adhesins, and metabolic enzymes. The study demonstrates that phenotypic switching represents an adaptive strategy enabling _C. auris_ to optimize fitness for different environmental niches---smooth cells for bloodstream dissemination, aggregative cells for surface colonization. Understanding switching mechanisms may reveal targets for preventing persistent colonization.
+
+### Galaxy Platform
+
+#### 23. Galaxy Main
+
+**Source**: https://usegalaxy.org
+
+**Summary**: Galaxy Main (usegalaxy.org) is the primary public Galaxy server hosted by the Galaxy Project at Penn State and Johns Hopkins Universities. It provides free access to over 8,000 bioinformatics tools and workflows for researchers worldwide. Galaxy's web-based interface enables reproducible analyses without command-line expertise, while maintaining full provenance tracking through analysis histories. For this study, Galaxy histories containing complete analysis workflows are publicly accessible: Santana et al. analysis at https://usegalaxy.org/u/cartman/h/prjna904261-final. Galaxy histories capture all tool versions, parameters, and intermediate files, enabling exact reproduction of published analyses. The platform supports data import directly from NCBI SRA, facilitating seamless workflow execution on public datasets.
+
+#### 24. BRC-Analytics Platform
+
+**Source**: https://brc-analytics.org
+
+**Summary**: BRC-Analytics (Bacterial and Viral Bioinformatics Resource Center - Analytics) provides standardized bioinformatics workflows for pathogen genomics research. Built on the Galaxy platform, BRC-Analytics offers curated reference genomes with explicit version control, pre-configured analysis workflows from the Intergalactic Workflow Commission, and direct data import from public repositories. For fungal pathogens like _C. auris_, BRC-Analytics provides the B8441 reference genome (GCA_002759435.3) and RNA-seq workflows enabling differential expression analysis with defined tool versions. The platform addresses reproducibility challenges in pathogen genomics by specifying exact references, tools, and parameters, enabling researchers to compare results across studies with confidence in methodological consistency.
+
+### Software and Tools
+
+#### 25. DESeq2
+
+**Version**: 2.11.40.8+galaxy0
+
+**Summary**: DESeq2 is the predominant differential expression analysis tool for RNA-seq count data, used in 68.8% of surveyed _C. auris_ studies. The method uses a negative binomial generalized linear model with shrinkage estimation for dispersions and fold changes. Key features include: size factor normalization to account for sequencing depth differences, independent filtering to increase detection power, and Benjamini-Hochberg FDR correction for multiple testing. DESeq2's approach of sharing information across genes through empirical Bayes shrinkage is particularly valuable for experiments with few replicates, common in pathogen studies. The Galaxy-wrapped version provides identical results to command-line R execution while enabling GUI-based analysis with full reproducibility.
+
+#### 26. STAR Aligner
+
+**Summary**: STAR (Spliced Transcripts Alignment to a Reference) is a splice-aware aligner used in 25-31% of _C. auris_ RNA-seq studies. STAR uses a two-pass mapping approach: the first pass identifies novel splice junctions, which are then used in the second pass for more accurate alignment. Key advantages include exceptional speed (often 10-100x faster than alternatives), high sensitivity for detecting novel transcripts, and accurate handling of reads spanning multiple exons. For fungal genomes with fewer introns than mammalian genomes, STAR's splice-awareness remains valuable for accurate gene-level quantification. STAR generates alignment files (BAM) compatible with downstream quantification tools like featureCounts.
+
+#### 27. HISAT2
+
+**Summary**: HISAT2 (Hierarchical Indexing for Spliced Alignment of Transcripts 2) is the dominant aligner for _C. auris_ RNA-seq, used in 62.5% of surveyed studies. HISAT2 uses a hierarchical indexing scheme combining a global FM index with many local indexes, enabling efficient alignment with low memory requirements. The algorithm excels at aligning reads across splice junctions while maintaining computational efficiency. Compared to STAR, HISAT2 typically requires less RAM, making it accessible on standard workstations. The tool is maintained as part of the Johns Hopkins computational biology suite and integrates well with downstream analysis pipelines including StringTie for transcript assembly and featureCounts/HTSeq for quantification.
+
+#### 28. HTSeq / featureCounts
+
+**Summary**: HTSeq-count and featureCounts are gene-level quantification tools that count aligned reads overlapping genomic features. HTSeq-count, used in 37.5% of surveyed studies, provides strict handling of ambiguously mapped reads with multiple counting modes (union, intersection-strict, intersection-nonempty). featureCounts, used in 12.5% of studies, offers faster performance through multithreading and built-in support for paired-end reads. Both tools require gene annotation files (GTF/GFF) matching the reference genome version used for alignment. Output count matrices serve as input for differential expression analysis with DESeq2 or edgeR. Consistent use of quantification tools and annotation versions is critical for reproducible results across studies.
+
+#### 29. FastQC
+
+**Summary**: FastQC provides comprehensive quality assessment of high-throughput sequencing data, used in 73% of surveyed _C. auris_ studies for quality control. The tool evaluates multiple quality metrics: per-base sequence quality scores, GC content distribution, sequence duplication levels, adapter contamination, and overrepresented sequences. FastQC reports enable identification of problematic samples before downstream analysis, preventing propagation of quality issues through the pipeline. Common issues detected include adapter sequences requiring trimming, quality score drops at read ends, and GC content anomalies indicating contamination. FastQC runs quickly on large datasets and produces HTML reports for easy interpretation.
+
+### Analysis Scripts and Repositories
+
+#### 30. Local Analysis Repositories
+
+**Source**: https://github.com/nekrut/claude-projects/tree/main/rnaseq/
+
+**Summary**: The analysis repositories contain all code, intermediate files, and documentation for the _C. auris_ literature survey and validation re-analyses. The Cauris_rna_seq_survey directory includes Python scripts for data combination (analyze_combined_data.py), visualization (visualize_combined.py), and the complete literature survey with 32 papers. The santana24_PRJNA904261 and wang24_PRJNA1086003 directories contain analysis reports (ANALYSIS_REPORT.md), gene mapping tables reconciling annotation versions, validation plots comparing published and re-analyzed results, and Galaxy workflow diagrams. All repositories use version control enabling exact reproduction of analyses. The LFC-based correlation mapping scripts demonstrate the approach used to reconcile gene identifiers between annotation versions, achieving R² > 0.98 correlation with published results.
+
+### Summary Statistics from Literature Survey
+
+- **Total unique papers**: 32
+- **Date range**: 2018-2025
+- **Peak year**: 2021 (11 papers, 34.4%)
+- **B8441 genome usage**: 75% of studies
+- **Tool consensus**: HISAT2 (62.5%), DESeq2 (68.8%), HTSeq (37.5%)
+- **Research focus**: Drug resistance (34.4%), Stress response (18.8%), Biofilm (12.5%)
+
+## Supplementary Materials
+
+**Supplementary Table 1**: _C. auris_ WGS data contributors by organization category and top sequencing centers.
+
+_Panel A: Summary by Organization Category_
+
+| Category                          | Organizations |       Runs | % of Total |
+| :-------------------------------- | ------------: | ---------: | ---------: |
+| US State/Local Public Health Labs |            26 |     20,552 |      78.4% |
+| CDC                               |             2 |      2,626 |      10.0% |
+| Academic/Research                 |            46 |      1,365 |       5.2% |
+| Other                             |            41 |      1,345 |       5.1% |
+| International Public Health       |             5 |        313 |       1.2% |
+| **TOTAL**                         |       **120** | **26,201** |   **100%** |
+
+_Panel B: Top 15 Contributing Organizations_
+
+| Organization   | Full Name                                     |  Runs |     % |
+| :------------- | :-------------------------------------------- | ----: | ----: |
+| UPHL_ID        | Utah Public Health Laboratory                 | 4,447 | 17.0% |
+| NVSPHL         | Nevada State Public Health Laboratory         | 4,363 | 16.7% |
+| CDC-NCEZID-MDB | CDC Mycotic Diseases Branch                   | 2,406 |  9.2% |
+| MDH_CSL        | Maryland Dept of Health, Central Services Lab | 2,309 |  8.8% |
+| TXDSHS         | Texas Dept of State Health Services           | 1,487 |  5.7% |
+| MDHHS-GS       | Michigan Dept of Health & Human Services      | 1,289 |  4.9% |
+| -              | Wisconsin State Laboratory of Hygiene         | 1,211 |  4.6% |
+| RIPHL          | Rhode Island Public Health Laboratory         | 1,197 |  4.6% |
+| NSPHL          | Nevada State Public Health Laboratory         | 1,031 |  3.9% |
+| -              | Wadsworth Center (New York)                   |   705 |  2.7% |
+| -              | Minnesota Dept of Health                      |   688 |  2.6% |
+| OCPHL_CA       | Orange County Public Health Lab (California)  |   659 |  2.5% |
+| -              | Washington State Dept of Health               |   583 |  2.2% |
+| UNLV NPM       | Univ of Nevada Las Vegas, Pathogen Monitoring |   443 |  1.7% |
+| -              | Fudan University                              |   264 |  1.0% |
+
+_US public health laboratories (state/local + CDC) account for 88.4% of all C. auris WGS data, reflecting outbreak surveillance priorities. Nevada appears twice (NVSPHL + NSPHL = 5,394 runs, 20.6%), indicating major outbreak focus._
+
+**Supplementary Table 2**: RNA-seq methodology across 20 published _C. auris_ BioProjects with linked publications (2018-2025).
+
+| BioProject   | PMID     | Authors                 | Year | Runs | Reference Genome                                  | RNA-seq Tools                                           |
+| :----------- | :------- | :---------------------- | :--- | ---: | :------------------------------------------------ | :------------------------------------------------------ |
+| PRJNA445471  | 30559369 | Muñoz JF et al.         | 2018 |   24 | B8441, B11220, B11243                             | Bowtie2, TopHat2, RSEM, Trinity, edgeR                  |
+| PRJNA477447  | 29997121 | Kean R et al.           | 2018 |   22 | B8441 (de novo)                                   | Trinity, HISAT2, Kallisto, DESeq2                       |
+| PRJNA682185  | 34630944 | Zamith-Miranda D et al. | 2021 |   36 | B8441 (GCA_002759435.2)                           | DESeq2, edgeR                                           |
+| PRJNA682422  | 34180774 | Lara-Aguilar V et al.   | 2021 |    6 | B8441 (GCA_002759435.2)                           | FastQC, Trimmomatic, fastp, STAR, featureCounts, DESeq2 |
+| PRJNA735406  | 34354695 | Zhou W et al.           | 2021 |    6 | B11221 (Clades I-V)                               | Trimmomatic, HISAT2, Cufflinks, HTSeq, DESeq2           |
+| PRJNA801628  | 35473297 | Biermann AR et al.      | 2022 |   24 | B8441, B11221, B11243 (Clades I, III, IV)         | HISAT2, featureCounts, edgeR                            |
+| PRJNA830685  | 36445083 | Narayanan A et al.      | 2022 |   16 | B8441, CBS10913 (Clade II)                        | FastQC, fastp, BWA, Bowtie2, HTSeq, DESeq2              |
+| PRJNA788930  | 35652307 | Shivarathri R et al.    | 2022 |   12 | NS                                                | RNA-seq                                                 |
+| PRJNA792028  | 36913408 | Bing J et al.           | 2023 |   15 | GCA_002759435.2, GCF_002775015.1                  | HiSat2, StringTie, DESeq2, BWA                          |
+| PRJNA904261  | 37769084 | Santana DJ et al.       | 2023 |    6 | B8441 (Clade I)                                   | RNA-seq                                                 |
+| PRJNA1015296 | 38493178 | Bing J et al.           | 2024 |  141 | B8441 (GCA_002759435.2)                           | HiSat2, StringTie, DESeq2, BWA                          |
+| PRJNA902676  | 38722168 | Yang B et al.           | 2024 |   40 | B11220, B11221 (Clades II, III)                   | Kallisto, DESeq2                                        |
+| PRJNA1036037 | 39480072 | Li J et al.             | 2024 |   22 | Clade IV                                          | RNA-seq                                                 |
+| PRJNA1086003 | 39455573 | Wang TW et al.          | 2024 |   13 | B8441 (Clade I)                                   | HISAT2, STAR, DESeq2                                    |
+| PRJEB57846   | 39297640 | Rhodes J et al.         | 2024 |   12 | NS                                                | WGS, RNA-seq                                            |
+| PRJNA1012821 | 40468551 | Chauhan A et al.        | 2025 |   16 | B8441, B11220 (CGD)                               | FastQC, fastp, Bowtie2, HTSeq, DESeq2                   |
+| PRJNA1139166 | 40099908 | Phan-Canh T et al.      | 2025 |   15 | B8441 (GCA_002759435.2)                           | FastQC, fastp, cutadapt, STAR, featureCounts            |
+| PRJNA1208975 | 40530673 | Yang G et al.           | 2025 |    9 | Clade I                                           | RNA-seq                                                 |
+| PRJNA1232830 | 40066990 | Chauhan M et al.        | 2025 |    6 | Clade I                                           | RNA-seq                                                 |
+| PRJNA1291775 | 40863525 | Vidal-Montiel A et al.  | 2025 |    6 | GCA_003014415.1, GCA_034640365.1 (Clades III, IV) | FastQC, Trimmomatic, STAR, featureCounts, DESeq2        |
+
+_NS = Not specified in available text. Data extracted from PMC full text via EuropePMC and NCBI E-utilities APIs. 44 additional BioProjects had no linked publications._
+
+**Supplement 1**
+
+A "plan" generated by Claude Code:
+
+Goal: Split collection #244 into 3 condition-specific collections for DESeq2.
+
+Experimental conditions (from paper):
+
+| Condition | Description                                     | Replicates |
+| :-------- | :---------------------------------------------- | :--------- |
+| AR0382_WT | Clade I reference, highly adhesive              | 2 (A, B)   |
+| AR0387_WT | Clade I, poorly adhesive (206 SNPs from AR0382) | 2 (A, B)   |
+| tnSWI1    | SWI1 insertional mutant of AR0382               | 2 (A, B)   |
+
+Expected SRR mapping (to verify):
+
+- AR0382_WT: SRR22376031, SRR22376032
+- AR0387_WT: SRR22376029, SRR22376030
+- tnSWI1: SRR22376027, SRR22376028
+
+Approach (from galaxy-agentic-collection-transform):
+
+1. Fetch SRA metadata → confirm mapping
+2. Check collection #244 element naming
+3. Create identifier files for each condition
+4. Use **FILTER_FROM_FILE** Galaxy tool to split
+5. Rename output collections
+
+Next steps before execution:
+
+1. Verify SRA metadata
+2. Check collection #244 element names
+3. Present findings for your approval
