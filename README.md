@@ -126,17 +126,19 @@ gh release view v<VERSION> --json body,name,tagName,targetCommitish
 #### 2. Publish the Release
 
 ```bash
-# Get the release ID from the list above
+# Identify the draft release tag from the list above (e.g., v0.17.0)
 gh release list | grep "Draft"
 
 # Publish using the workflow (recommended)
-gh workflow run publish-release.yml -f release_id=<RELEASE_ID>
+# Note: release_id expects the tag name, not a numeric ID
+gh workflow run publish-release.yml -f release_id=v0.17.0
 ```
 
 **OR** publish directly:
 
 ```bash
-gh release edit <RELEASE_ID> --draft=false
+# Use the tag name (e.g., v0.17.0), not the numeric release ID
+gh release edit v0.17.0 --draft=false
 ```
 
 #### 3. Handle Version Bump PR
@@ -162,8 +164,26 @@ git tag --points-at HEAD  # Should show the new version tag
 
 ### Deployment
 
-Production deployment happens automatically when changes are merged to the `prod` branch. To deploy a release:
+Production deployment happens automatically when changes are merged to the `production` branch. To deploy a release:
 
 1. Merge the release version bump PR to `main`
-2. Create a PR from `main` to `prod`
-3. Once merged to `prod`, the deployment workflow automatically builds and deploys to production
+2. Create a PR from `main` to `production` (or merge directly)
+3. Once merged to `production`, the deployment workflow automatically builds and deploys to production
+
+## E2E Testing
+
+This project uses Playwright for E2E testing to ensure reliability across different browsers and devices.
+
+### Running Tests
+
+To run FE E2E tests:
+
+```
+npm run test:e2e
+```
+
+To run BE E2E tests:
+
+```
+npm run test:e2e:api
+```

@@ -89,6 +89,7 @@ export function makeConfig(
           undefined,
           [
             { label: "About", url: ROUTES.ABOUT },
+            { label: "Learn", url: ROUTES.LEARN },
             { label: "Organisms", url: ROUTES.ORGANISMS },
             { label: "Assemblies", url: ROUTES.GENOMES },
             { label: "Priority Pathogens", url: ROUTES.PRIORITY_PATHOGENS },
@@ -112,7 +113,7 @@ export function makeConfig(
         socialMedia: socialMedia,
       },
     },
-    maxReadRunsForBrowseAll: 2000,
+    maxReadRunsForBrowseAll: 60000,
     redirectRootToPath: "/",
     taxTree: taxTreeData,
     themeOptions: THEME_OPTIONS,

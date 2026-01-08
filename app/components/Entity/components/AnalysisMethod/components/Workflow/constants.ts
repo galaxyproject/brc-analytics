@@ -12,11 +12,3 @@ export const BUTTON_PROPS = {
   color: MUI_BUTTON_PROPS.COLOR.PRIMARY,
   variant: MUI_BUTTON_PROPS.VARIANT.CONTAINED,
 } satisfies ButtonProps;
-
-export const OUTLINED_BUTTON_PROPS = {
-  color: MUI_BUTTON_PROPS.COLOR.PRIMARY,
-  sx: {
-    padding: "7px 15px", // Reduced by 1px on each side to compensate for border
-  },
-  variant: MUI_BUTTON_PROPS.VARIANT.OUTLINED,
-} satisfies ButtonProps;

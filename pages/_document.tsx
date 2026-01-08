@@ -1,9 +1,19 @@
 import Document, { Head, Html, Main, NextScript } from "next/document";
 
+const siteConfig = process.env.NEXT_PUBLIC_SITE_CONFIG;
 const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN;
+const isProd = Boolean(siteConfig && siteConfig.endsWith("-prod"));
 
-if (!plausibleDomain) {
-  throw new Error("NEXT_PUBLIC_PLAUSIBLE_DOMAIN is not defined");
+if (isProd && !plausibleDomain) {
+  throw new Error(
+    `NEXT_PUBLIC_PLAUSIBLE_DOMAIN is not defined in production environment for ${siteConfig}`
+  );
+}
+
+if (!isProd && plausibleDomain) {
+  console.warn(
+    `Plausible is enabled (domain='${plausibleDomain}') while NEXT_PUBLIC_SITE_CONFIG='${siteConfig}'.`
+  );
 }
 
 class MyDocument extends Document {
@@ -19,11 +29,13 @@ class MyDocument extends Document {
             href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500&display=swap"
             rel="stylesheet"
           />
-          <script
-            data-domain={plausibleDomain}
-            defer
-            src="https://plausible.galaxyproject.eu/js/script.js"
-          />
+          {plausibleDomain && (
+            <script
+              data-domain={plausibleDomain}
+              defer
+              src="https://plausible.galaxyproject.eu/js/script.js"
+            />
+          )}
         </Head>
         <body>
           <Main />

@@ -2,6 +2,7 @@ import gzip
 import io
 import json
 import logging
+import os
 import time
 import urllib
 
@@ -9,6 +10,7 @@ import pandas as pd
 import requests
 import yaml
 from bs4 import BeautifulSoup
+from requests.exceptions import ConnectTimeout
 
 from .qc_utils import format_list_section, format_raw_section, join_report
 
@@ -1342,6 +1344,8 @@ def build_files(
     organisms_path=None,
     outbreaks_path=None,
     outbreak_taxonomy_mapping_path=None,
+    organism_image_path=None,
+    organism_image_source_information_path=None,
 ):
     """
     Build catalog-related data files based on specified input data and data from services such as the NCBI API.
@@ -1360,6 +1364,8 @@ def build_files(
       organisms_path: Path of input organisms YAML, used to perform checks
       outbreaks_path: Path of input outbreaks YAML
       outbreak_taxonomy_mapping_path: Path to save taxonomic information for outbreaks at
+      organism_image_path: path to folder containing organism images
+      organism_image_source_information_path: path to json file with information about the image source
     """
     if taxonomic_group_sets is None:
         taxonomic_group_sets = {}
@@ -1537,6 +1543,78 @@ def build_files(
     # Drop any duplicate rows based on accession before writing to file
     genomes_df = genomes_df.drop_duplicates(subset=["accession"])
 
+    # If organism_image path is set we will try to find a image for each species using get_image_path
+    if organism_image_path is not None:
+        if organism_image_source_information_path is not None:
+            with open(organism_image_source_information_path, "r") as reader:
+                image_info = json.load(reader)
+        else:
+            image_info = {}
+        # Get unique species names from genomes_df
+        unique_species = genomes_df["taxonomicLevelSpecies"].unique()
+        # Create a dictionary to store image paths for each species
+        species_image_paths = {}
+        species_thumbnail_paths = {}
+        species_image_credit = {}
+        species_image_license = {}
+        species_image_source = {}
+        species_image_source_link = {}
+        for species in unique_species:
+            species_image_paths[species] = get_image_path(organism_image_path, species)
+            species_thumbnail_paths[species] = get_image_path(
+                organism_image_path, species, file_suffix="_300x300.jpg"
+            )
+            species_image_credit[species] = image_info.get(species, {}).get(
+                "author", None
+            )
+            species_image_license[species] = image_info.get(species, {}).get(
+                "license", None
+            )
+            species_image_source[species] = image_info.get(species, {}).get(
+                "image_source_name", None
+            )
+            species_image_source_link[species] = image_info.get(species, {}).get(
+                "image_url", None
+            )
+
+        # Map the image paths back to the genomes_df
+        genomes_df["organismImageUrl"] = genomes_df["species"].map(species_image_paths)
+        genomes_df["organismThumbnailUrl"] = genomes_df["species"].map(
+            species_thumbnail_paths
+        )
+        genomes_df["organismImageCredit"] = genomes_df["species"].map(
+            species_image_credit
+        )
+        genomes_df["organismImageLicense"] = genomes_df["species"].map(
+            species_image_license
+        )
+        genomes_df["organismImageSourceName"] = genomes_df["species"].map(
+            species_image_source
+        )
+        genomes_df["organismImageSourceUrl"] = genomes_df["species"].map(
+            species_image_source_link
+        )
+
+        # Map the image paths back to the organism_name
+        primarydata_df["organismImageUrl"] = primarydata_df["organism_name"].map(
+            species_image_paths
+        )
+        primarydata_df["organismThumbnailUrl"] = primarydata_df["organism_name"].map(
+            species_thumbnail_paths
+        )
+        primarydata_df["organismImageCredit"] = primarydata_df["organism_name"].map(
+            species_image_credit
+        )
+        primarydata_df["organismImageLicense"] = primarydata_df["organism_name"].map(
+            species_image_license
+        )
+        primarydata_df["organismImageSourceName"] = primarydata_df["organism_name"].map(
+            species_image_source
+        )
+        primarydata_df["organismImageSourceUrl"] = primarydata_df["organism_name"].map(
+            species_image_source_link
+        )
+
     # Sort by accession for consistent output
     genomes_df = genomes_df.sort_values("accession")
 
@@ -1583,12 +1661,33 @@ def build_files(
         )
 
 
+def create_taxonomy_read_run_count(genomes_tsv_path: str, output_path: str):
+    """Create taxonomy read run count JSON file from genomes TSV.
+    Args:
+        genomes_tsv_path: Path to the genomes TSV file
+        output_path: Path where the taxonomy read run count JSON will be written
+    """
+    df = pd.read_csv(genomes_tsv_path, sep="\t")
+    unique_taxonomy_ids = df["taxonomyId"].drop_duplicates()
+    print("Creating taxonomy read run counts")
+    with open(output_path, "w") as writer:
+        writer.write(
+            json.dumps(
+                generate_taxon_read_run_count(unique_taxonomy_ids.tolist()), indent=2
+            )
+        )
+    print("Taxonomy read run counts created")
+
+
 def generate_taxon_read_run_count(taxonomy_ids):
     taxon_counter = {}
     url = "https://www.ebi.ac.uk/ena/portal/api/search"
     counter = 0
+    num_taxids = len(taxonomy_ids)
     for tId in taxonomy_ids:
-        processing = f"Processed {counter} taxonomy IDs, processing tx id: {tId}"
+        processing = (
+            f"Processed {counter} taxonomy IDs of {num_taxids}, processing tx id: {tId}"
+        )
         print(f"{processing:<120}", end="\r")
         params = {
             "result": "read_run",
@@ -1596,9 +1695,51 @@ def generate_taxon_read_run_count(taxonomy_ids):
             "fields": "experiment_accession,study_accession",
             "format": "json",
         }
-        resp = requests.get(url, params=params)
-        resp.raise_for_status()
+        try:
+            resp = requests.get(url, params=params)
+            resp.raise_for_status()
+        except ConnectTimeout:
+            print("Timeout, sleeping 10s")
+            time.sleep(10)
+            resp = requests.get(url, params=params)
+            resp.raise_for_status()
         taxon_counter[tId] = len(resp.json())
         counter += 1
     print(f"Processed {counter} taxonomy IDs", end="\n")
-    return taxon_counter
+    return dict(sorted(taxon_counter.items(), key=lambda x: x[1], reverse=True))
+
+
+def get_image_path(
+    folder_path: str, species_name: str, file_suffix: str = "_1024x1024.jpg"
+) -> str:
+    """
+    Constructs a path to an image file for a given species, with a fallback to a default image.
+
+    Args:
+        folder_path (str): The directory where the images are stored.
+        species_name (str): The name of the species.
+        file_suffix (str, optional): The suffix to append to the formatted species name.
+                                     Defaults to "_1024x1024.jpg".
+
+    Returns:
+        str: The full path to the image file.
+    """
+    # Format the species name: Capitalize first letter, rest lowercase, spaces to underscores
+    formatted_name = species_name.lower().capitalize().replace(" ", "_")
+
+    # Construct the potential image file path
+    potential_path = os.path.join(folder_path, f"{formatted_name}{file_suffix}")
+
+    # Check if the file exists
+    if os.path.exists(potential_path):
+        return potential_path
+    else:
+        # Return the path to the default missing image
+        print(f"No image found for {potential_path}.")
+        missing_file_path = os.path.join(folder_path, "missing_image" + file_suffix)
+        if os.path.exists(missing_file_path):
+            return missing_file_path
+        else:
+            raise FileNotFoundError(
+                f"No species image found, or missing_image{file_suffix} in {folder_path}"
+            )

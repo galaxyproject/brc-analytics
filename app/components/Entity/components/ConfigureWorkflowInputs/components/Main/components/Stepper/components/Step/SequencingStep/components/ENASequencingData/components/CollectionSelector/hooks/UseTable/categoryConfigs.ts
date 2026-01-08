@@ -31,4 +31,5 @@ export const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
   SAMPLE_ACCESSION: { key: "sample_accession", label: "Sample Accession" },
   SCIENTIFIC_NAME: { key: "scientific_name", label: "Scientific Name" },
   STUDY_ACCESSION: { key: "study_accession", label: "Study Accession" },
+  TAX_ID: { key: "tax_id", label: "Taxonomy ID" },
 } as const;

@@ -17,6 +17,7 @@ import {
   buildAnalyzeGenome,
   buildGenomeTaxonomicLevelStrain,
   buildIsRef,
+  formatNumber,
 } from "../brc-analytics-catalog/common/viewModelBuilders";
 
 /**
@@ -52,6 +53,34 @@ export const buildOrganismHero = (
       { path: "", text: "Assemblies" },
     ],
     title: entity.taxonomicLevelSpecies,
+  };
+};
+
+/**
+ * Build props for the organism BackPageHero component.
+ * @param entity - Entity.
+ * @returns Props to be used for the BackPageHero component.
+ */
+export const buildOrganismImage = (
+  entity: GA2OrganismEntity | GA2AssemblyEntity
+): ComponentProps<typeof C.OrganismAvatar> => {
+  return {
+    image: entity.image,
+    isThumbnail: false,
+  };
+};
+
+/**
+ * Build props for the organism BackPageHero component.
+ * @param entity - Entity.
+ * @returns Props to be used for the BackPageHero component.
+ */
+export const buildOrganismImageThumbnail = (
+  entity: GA2OrganismEntity | GA2AssemblyEntity
+): ComponentProps<typeof C.OrganismAvatar> => {
+  return {
+    image: entity.image,
+    isThumbnail: true,
   };
 };
 
@@ -125,18 +154,22 @@ function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
     },
     {
       accessorKey: GA2_CATEGORY_KEY.LENGTH,
+      cell: ({ getValue }) => formatNumber(getValue()),
       header: GA2_CATEGORY_LABEL.LENGTH,
     },
     {
       accessorKey: GA2_CATEGORY_KEY.SCAFFOLD_COUNT,
+      cell: ({ getValue }) => formatNumber(getValue()),
       header: GA2_CATEGORY_LABEL.SCAFFOLD_COUNT,
     },
     {
       accessorKey: GA2_CATEGORY_KEY.SCAFFOLD_N50,
+      cell: ({ getValue }) => formatNumber(getValue()),
       header: GA2_CATEGORY_LABEL.SCAFFOLD_N50,
     },
     {
       accessorKey: GA2_CATEGORY_KEY.SCAFFOLD_L50,
+      cell: ({ getValue }) => formatNumber(getValue()),
       header: GA2_CATEGORY_LABEL.SCAFFOLD_L50,
     },
     {

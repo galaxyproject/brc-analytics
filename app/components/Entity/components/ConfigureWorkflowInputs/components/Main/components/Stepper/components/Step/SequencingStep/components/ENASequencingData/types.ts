@@ -1,10 +1,10 @@
-import { OnConfigure } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { UseENADataByAccession } from "./hooks/UseENADataByAccession/types";
+import {
+  ConfiguredInput,
+  OnConfigure,
+} from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { Actions, Status } from "./hooks/UseENADataByAccession/types";
 import { Table } from "@tanstack/react-table";
-import { SEQUENCING_DATA_TYPE } from "../../types";
 import { UseENADataByTaxonomyId } from "./hooks/UseENADataByTaxonomyId/types";
-import { Dispatch, SetStateAction } from "react";
-import { ENA_QUERY_METHOD } from "../../types";
 
 export interface BaseReadRun {
   base_count: number;
@@ -23,7 +23,7 @@ export interface BaseReadRun {
   scientific_name: string;
   study_accession: string;
   submitted_ftp: string;
-  tax_id: number;
+  tax_id: string;
 }
 
 export interface ReadRun extends BaseReadRun {
@@ -36,11 +36,15 @@ export interface Validation {
 }
 
 export interface Props {
-  enaAccession: UseENADataByAccession<BaseReadRun>;
+  configuredInput: ConfiguredInput;
+  enaAccessionActions: Actions<BaseReadRun>;
+  enaAccessionStatus: Status;
   enaTaxonomyId: UseENADataByTaxonomyId<BaseReadRun>;
   onConfigure: OnConfigure;
-  setEnaQueryMethod: Dispatch<SetStateAction<ENA_QUERY_METHOD>>;
-  stepKey: SEQUENCING_DATA_TYPE;
+  requirementsMatches: string[];
+  selectedCount: number;
+  switchBrowseMethod: (data?: BaseReadRun[]) => void;
   table: Table<ReadRun>;
   taxonomicLevelSpecies: string;
+  taxonomyMatches: number;
 }

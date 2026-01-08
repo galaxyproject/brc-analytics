@@ -2,7 +2,7 @@ import json
 
 import pandas as pd
 
-from ....py_package.catalog_build import build_files, generate_taxon_read_run_count
+from ....py_package.catalog_build import build_files, create_taxonomy_read_run_count
 
 ASSEMBLIES_PATH = "catalog/ga2/source/assemblies.yml"
 
@@ -10,11 +10,17 @@ UCSC_ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/VGP/assemblyList.jso
 
 GENOMES_OUTPUT_PATH = "catalog/ga2/build/intermediate/genomes-from-ncbi.tsv"
 
+ORGANISM_IMAGE_PATH = "public/organism_image"
+
+ORGANISM_IMAGE_INFO_PATH = "catalog/ga2/source/organism_image_data.json"
+
 PRIMARYDATA_OUTPUT_PATH = "catalog/ga2/build/intermediate/primary-data-ncbi.tsv"
 
 TREE_OUTPUT_PATH = "catalog/ga2/output/ncbi-taxa-tree.json"
 
-TAXONOMY_READ_RUN_COUNTS_OUTPUT_PATH = "catalog/ga2/build/intermediate/taxId.json"
+TAXONOMY_READ_RUN_COUNTS_OUTPUT_PATH = (
+    "catalog/ga2/build/intermediate/taxIdReadCount.json"
+)
 
 TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
     40674: "Mammalia",
@@ -77,19 +83,6 @@ TOLIDS_BY_TAXONOMY_ID = {
 }
 
 
-def create_taxonomy_read_run_count(genomes_tsv_path: str, output_path: str):
-    df = pd.read_csv(genomes_tsv_path, sep="\t")
-    unique_taxonomy_ids = df["taxonomyId"].drop_duplicates()
-    print("Creating taxonomy read run counts")
-    with open(output_path, "w") as writer:
-        writer.write(
-            json.dumps(
-                generate_taxon_read_run_count(unique_taxonomy_ids.tolist()), indent=2
-            )
-        )
-    print("Taxonomy read run counts created")
-
-
 def build_ncbi_data():
     build_files(
         ASSEMBLIES_PATH,
@@ -104,6 +97,8 @@ def build_ncbi_data():
         do_gene_model_urls=False,
         primary_output_path=PRIMARYDATA_OUTPUT_PATH,
         extract_primary_data=True,
+        organism_image_path=ORGANISM_IMAGE_PATH,
+        organism_image_source_information_path=ORGANISM_IMAGE_INFO_PATH,
     )
     create_taxonomy_read_run_count(
         GENOMES_OUTPUT_PATH, TAXONOMY_READ_RUN_COUNTS_OUTPUT_PATH

@@ -2,6 +2,32 @@ name: Run checks
 on: [pull_request]
 
 jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.10.0"
+      - name: Cache npm cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+      - name: Run e2e tests
+        run: npm run test:e2e
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
   run-checks:
     runs-on: ubuntu-latest
     steps:
@@ -46,3 +72,51 @@ jobs:
       - name: poetry lint
         # Validate the GA2 catalog source files.
         run: poetry check -P catalog/py_package/
+
+  api-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Create backend .env file
+        run: cp backend/api/.env.example backend/api/.env
+
+      - name: Build catalog data
+        run: |
+          npm ci
+          npm run build-brc-db
+
+      - name: Start backend services
+        run: |
+          cd backend
+          docker compose up -d --build
+          docker compose logs
+
+      - name: Wait for services to be healthy
+        run: |
+          timeout 60 bash -c 'until curl -s http://localhost:8080/api/v1/health | grep -q healthy; do sleep 2; done'
+
+      - name: Run API smoke tests
+        run: |
+          cd backend/api
+          uv run --extra dev pytest tests/ -v
+
+      - name: Show logs on failure
+        if: failure()
+        run: |
+          cd backend
+          docker compose logs
+
+      - name: Stop backend services
+        if: always()
+        run: |
+          cd backend
+          docker compose down -v

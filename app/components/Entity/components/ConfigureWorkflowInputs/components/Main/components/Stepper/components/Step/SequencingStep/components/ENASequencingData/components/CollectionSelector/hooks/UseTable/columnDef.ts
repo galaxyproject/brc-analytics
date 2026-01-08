@@ -146,6 +146,10 @@ const STUDY_ACCESSION: ColumnDef<ReadRun> = {
   meta: META,
 };
 
+const TAX_ID: ColumnDef<ReadRun> = {
+  accessorKey: CATEGORY_CONFIGS.TAX_ID.key,
+};
+
 export const columns: ColumnDef<ReadRun>[] = [
   COLUMN_DEF.ROW_SELECTION as ColumnDef<ReadRun>,
   RUN_ACCESSION,
@@ -163,4 +167,5 @@ export const columns: ColumnDef<ReadRun>[] = [
   DESCRIPTION,
   READ_COUNT,
   BASE_COUNT,
+  TAX_ID,
 ];

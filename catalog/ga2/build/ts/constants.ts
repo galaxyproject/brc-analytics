@@ -13,6 +13,12 @@ export const SOURCE_GENOME_KEYS = [
   "taxonomicLevelSpecies",
   "taxonomicLevelStrain",
   "tolId",
+  "organismImageUrl",
+  "organismThumbnailUrl",
+  "organismImageCredit",
+  "organismImageSourceName",
+  "organismImageSourceUrl",
+  "organismImageLicense",
 ] as const;
 
 export const SOURCE_RAWDATA_KEYS = [

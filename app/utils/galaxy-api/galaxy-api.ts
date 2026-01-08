@@ -22,8 +22,11 @@ import {
   WorkflowCollectionElement,
   GalaxyApiCommonUrlData,
 } from "./entities";
+import { UcscTrack } from "../ucsc-tracks-api/entities";
 
 const DOCKSTORE_API_URL = "https://dockstore.org/api/ga4gh/trs/v2/tools";
+const FTP_HOST = "ftp.sra.ebi.ac.uk";
+const ASCP_HOST = "fasp.sra.ebi.ac.uk";
 
 const galaxyInstanceUrl = process.env.NEXT_PUBLIC_GALAXY_INSTANCE_URL;
 
@@ -44,6 +47,7 @@ const dataLandingUrl = `${galaxyInstanceUrl}/tool_landings`;
  * @param readRunsSingle - Single read runs parameter sent to the API.
  * @param readRunsPaired - Paired read runs parameter sent to the API.
  * @param parameters - Parameters for this workflow.
+ * @param origin - Origin URL of the site making the request.
  * @returns workflow landing URL.
  */
 export async function getWorkflowLandingUrl(
@@ -52,9 +56,11 @@ export async function getWorkflowLandingUrl(
   geneModelUrl: string | null,
   readRunsSingle: EnaSequencingReads[] | null,
   readRunsPaired: EnaSequencingReads[] | null,
-  parameters: WorkflowParameter[]
+  parameters: WorkflowParameter[],
+  origin: string
 ): Promise<string> {
   const body: WorkflowLandingsBody = {
+    origin,
     public: true,
     request_state: getWorkflowLandingsRequestState(
       referenceGenome,
@@ -75,21 +81,27 @@ export async function getWorkflowLandingUrl(
  * @param geneModelUrl - URL for gene model parameter sent to the API.
  * @param readRunsSingle - Single read runs parameter sent to the API.
  * @param readRunsPaired - Paired read runs parameter sent to the API.
+ * @param tracks - UCSC tracks sent to the API. Should all have defined `bigDataUrl` values.
+ * @param origin - Origin URL of the site making the request.
  * @returns data landing URL.
  */
 export async function getDataLandingUrl(
   referenceGenome: string,
   geneModelUrl: string | null,
   readRunsSingle: EnaSequencingReads[] | null,
-  readRunsPaired: EnaSequencingReads[] | null
+  readRunsPaired: EnaSequencingReads[] | null,
+  tracks: UcscTrack[] | null,
+  origin: string
 ): Promise<string> {
   const body: DataLandingsBody = {
+    origin,
     public: true,
     request_state: getDataLandingsRequestState(
       referenceGenome,
       geneModelUrl,
       readRunsSingle,
-      readRunsPaired
+      readRunsPaired,
+      tracks
     ),
   };
   return getGalaxyLandingUrl(body, dataLandingsApiUrl, dataLandingUrl);
@@ -274,7 +286,8 @@ function getDataLandingsRequestState(
   referenceGenome: string,
   geneModelUrl: string | null,
   readRunsSingle: EnaSequencingReads[] | null,
-  readRunsPaired: EnaSequencingReads[] | null
+  readRunsPaired: EnaSequencingReads[] | null,
+  tracks: UcscTrack[] | null
 ): DataLandingsBodyRequestState {
   return {
     targets: [
@@ -289,6 +302,9 @@ function getDataLandingsRequestState(
       ),
       galaxyCollectionToDataLandingsTarget(
         buildPairedReadRunsRequestValue(readRunsPaired)
+      ),
+      ...buildUcscTracksRequestValues(tracks).map((d) =>
+        buildDataLandingsDatasetTarget([d])
       ),
     ].filter((target) => target !== null),
   };
@@ -333,6 +349,7 @@ function buildSingleReadRunsRequestValue(
         url: forward.url,
       };
     }),
+    identifier: "Single End Reads",
   };
 }
 
@@ -367,6 +384,7 @@ function buildPairedReadRunsRequestValue(
         identifier: runAccession,
       };
     }),
+    identifier: "Paired End Reads",
   };
 }
 
@@ -434,7 +452,7 @@ function getRunUrlsInfo(
   if (splitUrls.length === 1) {
     // Single read case
     return {
-      forward: { md5: splitMd5Hashes[0], url: `ftp://${splitUrls[0]}` },
+      forward: { md5: splitMd5Hashes[0], url: ftpToAscp(splitUrls[0]) },
       reverse: null,
     };
   }
@@ -447,11 +465,37 @@ function getRunUrlsInfo(
     const [, , readIndex] = urlMatch;
     const fileInfo: EnaFileInfo = {
       md5: splitMd5Hashes[i],
-      url: `ftp://${url}`,
+      url: ftpToAscp(url),
     };
     if (readIndex === "1") forward = fileInfo;
     else reverse = fileInfo;
   }
   if (forward === null) throw new Error("No URL for forward read found");
   return { forward, reverse };
+}
+
+function ftpToAscp(ftpUrl: string): string {
+  // should be more reliable than FTP download
+  return `ascp://${ftpUrl.replace(FTP_HOST, ASCP_HOST)}`;
+}
+
+function buildUcscTracksRequestValues(
+  tracks: UcscTrack[] | null
+): GalaxyUrlData[] {
+  if (!tracks?.length) return [];
+  const values: GalaxyUrlData[] = [];
+  for (const track of tracks) {
+    values.push({
+      ext: getUcscBigDataExt(track.bigDataUrl),
+      identifier: track.shortLabel,
+      url: track.bigDataUrl,
+    });
+  }
+  return values;
+}
+
+function getUcscBigDataExt(bigDataUrl: string): string {
+  if (bigDataUrl.endsWith(".bb")) return "bigbed";
+  else if (bigDataUrl.endsWith(".bw")) return "bigwig";
+  return "auto";
 }

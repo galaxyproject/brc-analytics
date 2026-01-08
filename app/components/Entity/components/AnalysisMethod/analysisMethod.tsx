@@ -19,23 +19,26 @@ import { ChevronRightRounded } from "@mui/icons-material";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 
 export const AnalysisMethod = ({
+  disabled,
   entityId,
   workflowCategory,
   workflows,
 }: Props): JSX.Element => {
-  const isDisabled = workflows.length === 0;
   return (
-    <StyledAccordion component={FluidPaper} disabled={isDisabled}>
+    <StyledAccordion component={FluidPaper} disabled={disabled}>
       <AccordionSummary
         expandIcon={
-          isDisabled ? (
+          disabled ? (
             <Chip {...CHIP_PROPS} />
           ) : (
             <ChevronRightRounded {...SVG_ICON_PROPS} />
           )
         }
       >
-        <Typography variant={TYPOGRAPHY_PROPS.VARIANT.HEADING_SMALL}>
+        <Typography
+          component="h3"
+          variant={TYPOGRAPHY_PROPS.VARIANT.HEADING_SMALL}
+        >
           {workflowCategory.name}
         </Typography>
         <Typography {...COMPONENT_TYPOGRAPHY_PROPS}>

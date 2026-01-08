@@ -19,12 +19,12 @@ import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/m
 
 export const AccessionSelector = ({
   clearErrors,
+  enaAccessionStatus: status,
   onClose,
   onContinue,
   onRequestData,
   open,
-  status,
-  table,
+  switchBrowseMethod,
 }: Props): JSX.Element => {
   return (
     <StyledDialog
@@ -36,8 +36,8 @@ export const AccessionSelector = ({
           component: "form",
           onSubmit: (event: FormEvent<HTMLFormElement>) =>
             onRequestData(event, {
-              onSuccess: () => {
-                table.resetColumnFilters(); // Clear column filters from previous query.
+              onSuccess: (data) => {
+                switchBrowseMethod(data);
                 onContinue();
                 onClose();
               },
