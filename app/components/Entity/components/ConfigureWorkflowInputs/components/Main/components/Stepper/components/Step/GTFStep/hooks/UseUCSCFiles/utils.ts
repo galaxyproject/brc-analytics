@@ -17,8 +17,8 @@ export function parseUCSCFilesResult(response: Result): string[] {
 /**
  * Filters the GTF file URLs from the UCSC files API response.
  * @param url - URL.
- * @returns True if the URL ends with ".gtf.gz".
+ * @returns True if the URL lives under the UCSC genes directory and ends with ".gtf.gz".
  */
 function filterGFTFile(url: string): boolean {
-  return url.endsWith(".gtf.gz");
+  return url.includes("/genes/") && url.endsWith(".gtf.gz");
 }
