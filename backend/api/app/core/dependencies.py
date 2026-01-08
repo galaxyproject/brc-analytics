@@ -14,3 +14,9 @@ async def get_cache_service() -> CacheService:
         settings = get_settings()
         _cache_service = CacheService(settings.REDIS_URL)
     return _cache_service
+
+
+def reset_cache_service() -> None:
+    """Reset the global cache service instance (used during shutdown)"""
+    global _cache_service
+    _cache_service = None
