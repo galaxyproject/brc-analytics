@@ -15,7 +15,8 @@ export const CARDS: ComponentProps<typeof SectionContentCard>[] = [
   {
     StartIcon: GalaxyIcon,
     cardUrl: "/learn/using-galaxy",
-    secondaryText: "",
+    secondaryText:
+      "Learn about Galaxy, the open-source platform powering BRC-Analytics computations.",
     title: "Using Galaxy",
   },
   {
