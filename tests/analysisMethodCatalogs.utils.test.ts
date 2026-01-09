@@ -7,6 +7,8 @@ import type {
   WorkflowCategory,
 } from "../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { buildAssemblyWorkflows } from "../app/components/Entity/components/AnalysisMethodsCatalog/utils";
+import { WorkflowCategoryId } from "../catalog/schema/generated/schema";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../app/components/Entity/components/AnalysisMethod/components/DifferentialExpressionAnalysis/constants";
 
 describe("buildAssemblyWorkflows", () => {
   const WORKFLOW_CATEGORIES: WorkflowCategory[] = [
@@ -70,6 +72,23 @@ describe("buildAssemblyWorkflows", () => {
         },
       ],
     },
+    {
+      category: "TRANSCRIPTOMICS",
+      description: "desc",
+      name: "transcriptomics",
+      showComingSoon: false,
+      workflows: [
+        {
+          iwcId: "iwc-transcriptomics-any",
+          parameters: [],
+          ploidy: WORKFLOW_PLOIDY.ANY,
+          taxonomyId: null,
+          trsId: "#trs-transcriptomics",
+          workflowDescription: "transcriptomics workflow",
+          workflowName: "RNA-seq Workflow",
+        },
+      ],
+    },
   ];
 
   const DIPLOID_ASSEMBLY: BRCDataCatalogGenome = {
@@ -113,16 +132,57 @@ describe("buildAssemblyWorkflows", () => {
   test("filters and sorts workflow categories", () => {
     const result = buildAssemblyWorkflows(
       DIPLOID_ASSEMBLY,
-      WORKFLOW_CATEGORIES
+      WORKFLOW_CATEGORIES,
+      false
     );
 
     expect(result.map((c) => c.category)).toEqual([
       "Mapped Reads",
+      "TRANSCRIPTOMICS",
       "Variant Analysis",
     ]);
 
     expect(result[0].workflows.map((w) => w.iwcId)).toEqual(["iwc-any"]);
-    expect(result[1].workflows).toHaveLength(0);
+    expect(result[2].workflows).toHaveLength(0);
     expect(result.find((c) => c.category === "Omit Me")).toBeUndefined();
+  });
+
+  test("excludes differential expression workflow when isDEEnabled is false", () => {
+    const result = buildAssemblyWorkflows(
+      DIPLOID_ASSEMBLY,
+      WORKFLOW_CATEGORIES,
+      false
+    );
+
+    const transcriptomics = result.find(
+      ({ category }) => category === WorkflowCategoryId.TRANSCRIPTOMICS
+    );
+
+    expect(transcriptomics).toBeDefined();
+    expect(
+      transcriptomics?.workflows.find(
+        ({ trsId }) => trsId === DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId
+      )
+    ).toBeUndefined();
+  });
+
+  test("includes differential expression workflow as first in transcriptomics when isDEEnabled is true", () => {
+    const result = buildAssemblyWorkflows(
+      DIPLOID_ASSEMBLY,
+      WORKFLOW_CATEGORIES,
+      true
+    );
+
+    const transcriptomics = result.find(
+      ({ category }) => category === WorkflowCategoryId.TRANSCRIPTOMICS
+    );
+
+    expect(transcriptomics).toBeDefined();
+    expect(transcriptomics?.workflows[0].trsId).toBe(
+      DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId
+    );
+    expect(transcriptomics?.workflows[0].workflowName).toBe(
+      DIFFERENTIAL_EXPRESSION_ANALYSIS.workflowName
+    );
   });
 });

@@ -4,7 +4,6 @@ import { useRouter } from "next/router";
 import { Fragment } from "react";
 import { WorkflowAccordion } from "../AnalysisMethod/components/WorkflowAccordion/workflowAccordion";
 import { CUSTOM_WORKFLOW } from "../AnalysisMethod/components/CustomWorkflow/constants";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../AnalysisMethod/components/DifferentialExpressionAnalysis/constants";
 import { AnalysisTypeHeader } from "./components/AnalysisTypeHeader/analysisTypeHeader";
 import { Stack } from "@mui/material";
 import { buildAssemblyWorkflows } from "./utils";
@@ -12,16 +11,16 @@ import WORKFLOW_CATEGORIES from "../../../../../catalog/output/workflows.json";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 
 export const AnalysisMethodsCatalog = ({ assembly }: Props): JSX.Element => {
+  const isDEEnabled = useFeatureFlag("de");
   const workflowCategories = buildAssemblyWorkflows(
     assembly,
-    WORKFLOW_CATEGORIES
+    WORKFLOW_CATEGORIES,
+    isDEEnabled
   );
 
   const {
     query: { entityId },
   } = useRouter();
-
-  const isDEEnabled = useFeatureFlag("de");
 
   return (
     <Stack gap={8} useFlexGap>
@@ -57,13 +56,6 @@ export const AnalysisMethodsCatalog = ({ assembly }: Props): JSX.Element => {
           }
           title="Select a Workflow"
         />
-        {isDEEnabled && (
-          <WorkflowAccordion
-            buttonText="Configure Inputs"
-            entityId={entityId as string}
-            workflow={DIFFERENTIAL_EXPRESSION_ANALYSIS}
-          />
-        )}
         {workflowCategories.map((workflowCategory) => {
           return (
             <AnalysisMethod
