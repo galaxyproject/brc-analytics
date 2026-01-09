@@ -20,7 +20,7 @@ export const LearnView = (): JSX.Element => {
         content={
           <StyledStack>
             {CARDS.map((card, index) => (
-              <SectionContentCard key={index} {...card} />
+              <SectionContentCard key={card.title} {...card} />
             ))}
           </StyledStack>
         }
