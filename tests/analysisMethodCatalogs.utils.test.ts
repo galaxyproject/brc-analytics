@@ -8,7 +8,7 @@ import type {
 } from "../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { buildAssemblyWorkflows } from "../app/components/Entity/components/AnalysisMethodsCatalog/utils";
 import { WorkflowCategoryId } from "../catalog/schema/generated/schema";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "app/components/Entity/components/AnalysisMethod/components/DifferentialExpressionAnalysis/constants";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../app/components/Entity/components/AnalysisMethod/components/DifferentialExpressionAnalysis/constants";
 
 describe("buildAssemblyWorkflows", () => {
   const WORKFLOW_CATEGORIES: WorkflowCategory[] = [
