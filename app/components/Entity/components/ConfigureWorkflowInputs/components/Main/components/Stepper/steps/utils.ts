@@ -45,7 +45,9 @@ export function buildSteps(workflow: Workflow): StepConfig[] {
 
   // Return steps for differential expression analysis
   if (workflow.trsId === DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId) {
-    return [STEP.ASSEMBLY_ID, STEP.GENE_MODEL_URL].filter(isStepConfigured);
+    return [STEP.ASSEMBLY_ID, STEP.GENE_MODEL_URL, STEP.SAMPLE_SHEET].filter(
+      isStepConfigured
+    );
   }
 
   // Get workflow variables from the workflow.
