@@ -11,7 +11,7 @@ export const CARDS: ComponentProps<typeof SectionContentCard>[] = [
     cardUrl: "/learn/getting-started",
     secondaryText:
       "Set up your account and run your first genomic analysis with BRC Analytics.",
-    title: "Get Started",
+    title: "Getting Started",
   },
   {
     StartIcon: GalaxyIcon,
@@ -29,9 +29,9 @@ export const CARDS: ComponentProps<typeof SectionContentCard>[] = [
   },
   {
     StartIcon: LiveHelpIcon,
-    cardUrl: "/learn/faqs",
+    cardUrl: "/learn/faq",
     secondaryText:
       "Find answers to common questions about using BRC Analytics.",
-    title: "FAQs",
+    title: "FAQ",
   },
 ];
