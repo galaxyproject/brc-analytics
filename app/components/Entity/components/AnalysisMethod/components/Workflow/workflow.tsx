@@ -16,7 +16,7 @@ export const Workflow = ({ entityId, workflow }: Props): JSX.Element => {
   const { iwcId, workflowDescription, workflowName } = workflow;
   return (
     <StyledGrid {...GRID_PROPS}>
-      <Grid container flexDirection="column" spacing={1}>
+      <Grid container spacing={1}>
         <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_500}>
           {workflowName}
         </Typography>
