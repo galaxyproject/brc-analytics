@@ -1,0 +1,118 @@
+---
+breadcrumbs:
+  - path: "/learn"
+    text: "Learn"
+  - path: "/learn/getting-started"
+    text: "Getting Started"
+  - path: ""
+    text: "Workflows and Tools"
+description: ""
+enableOutline: true
+title: "Common Workflows and Advanced Features"
+---
+
+## Common Workflows
+
+### Quality Control Workflow
+
+**Purpose**: Assess sequencing data quality before analysis
+
+**Steps:**
+
+1. Select organism and assembly
+2. Choose "QC Workflow"
+3. Upload or select FASTQ files
+4. Run workflow
+5. Review MultiQC report for:
+   - Read quality scores
+   - Adapter content
+   - Sequence duplication
+   - GC content
+
+### Read Mapping Workflow
+
+**Purpose**: Align sequencing reads to reference genome
+
+**Key parameters:**
+
+- Choose aligner (BWA-MEM, Bowtie2, HISAT2, STAR)
+- Set mapping quality thresholds
+- Configure paired-end vs single-end
+
+### Variant Discovery Pipeline
+
+**Purpose**: Complete variant identification from raw reads
+
+**Includes:**
+
+1. Quality control
+2. Read mapping
+3. Variant calling
+4. Annotation
+5. Summary reports
+
+## Advanced Features
+
+### Using JupyterLite for Custom Analyses
+
+BRC Analytics includes integrated JupyterLite notebooks for advanced analysis:
+
+1. From your Galaxy history, locate the dataset you want to analyze
+2. Click on the dataset and select **"Visualize"**
+3. Choose **"JupyterLite Notebook"**
+4. Write Python code to perform custom analyses
+5. Example analyses include:
+   - Statistical testing
+   - Data visualization
+   - Custom filtering
+   - Evolutionary analysis
+
+### Creating and Sharing Workflows
+
+You can extract your analysis as a reusable workflow:
+
+1. In Galaxy, click the **history options** menu (gear icon)
+2. Select **"Extract Workflow"**
+3. Choose which steps to include
+4. Name your workflow
+5. Save and share with collaborators
+
+### Visualizing Results in UCSC Genome Browser
+
+1. From Galaxy, select your BAM or VCF file
+2. Click **"Visualize"** and choose **"UCSC Genome Browser"**
+3. Your data will load as a custom track
+4. Explore alongside reference annotations
+5. Zoom, scroll, and configure display settings
+
+## Example Use Cases
+
+### Outbreak Surveillance
+
+Monitor pathogen evolution by:
+
+1. Downloading recent SRA surveillance data
+2. Running variant calling workflow
+3. Comparing variants across samples
+4. Identifying emerging mutations
+5. Visualizing on genome browser
+
+### Comparative Genomics (available soon!)
+
+Compare strains or species:
+
+1. Select multiple genome assemblies
+2. Run alignment workflows
+3. Identify conserved regions
+4. Analyze variant patterns
+5. Perform evolutionary analysis in JupyterLite
+
+### Transcriptome Analysis
+
+Analyze gene expression:
+
+1. Upload RNA-seq data
+2. Run transcriptomics workflow
+3. Quantify gene expression
+4. Identify differentially expressed genes
+5. Visualize results

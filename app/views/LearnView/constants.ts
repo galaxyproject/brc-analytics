@@ -2,7 +2,6 @@ import { SectionContentCard } from "../../components/common/Card/components/Sect
 import { ComponentProps } from "react";
 import { RocketLaunchIcon } from "./components/icon/RocketLaunchIcon/rocketLaunchIcon";
 import { BookmarkStarIcon } from "./components/icon/BookmarkStarIcon/bookmarkStarIcon";
-import { LiveHelpIcon } from "./components/icon/LiveHelpIcon/liveHelpIcon";
 import { GalaxyIcon } from "./components/icon/GalaxyIcon/galaxyIcon";
 
 export const CARDS: ComponentProps<typeof SectionContentCard>[] = [
@@ -27,11 +26,11 @@ export const CARDS: ComponentProps<typeof SectionContentCard>[] = [
       "Explore real-world research examples demonstrating BRC Analytics workflows.",
     title: "Featured Analyses",
   },
-  {
-    StartIcon: LiveHelpIcon,
-    cardUrl: "/learn/faqs",
-    secondaryText:
-      "Find answers to common questions about using BRC Analytics.",
-    title: "FAQs",
-  },
+  // {
+  //   StartIcon: LiveHelpIcon,
+  //   cardUrl: "/learn/faqs",
+  //   secondaryText:
+  //     "Find answers to common questions about using BRC Analytics.",
+  //   title: "FAQs",
+  // },
 ];
