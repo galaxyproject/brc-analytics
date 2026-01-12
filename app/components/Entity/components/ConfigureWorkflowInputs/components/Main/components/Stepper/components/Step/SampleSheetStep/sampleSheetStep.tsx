@@ -52,8 +52,12 @@ export const SampleSheetStep = ({
             disabled={!file}
             onClick={async () => {
               if (!file) return;
-              onConfigure({ [STEP.key]: (await parseFile(file)).rows });
-              onContinue();
+              try {
+                onConfigure({ [STEP.key]: (await parseFile(file)).rows });
+                onContinue();
+              } catch (error) {
+                console.error("Failed to parse file:", error);
+              }
             }}
           >
             Continue
