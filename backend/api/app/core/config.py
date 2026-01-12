@@ -28,9 +28,9 @@ class Settings:
     AI_API_BASE_URL: str = os.getenv(
         "AI_API_BASE_URL", ""
     )  # Empty means use OpenAI default; set for custom endpoints
-    AI_SKIP_SSL_VERIFY: bool = os.getenv(
-        "AI_SKIP_SSL_VERIFY", "false"
-    ).lower() == "true"  # Skip SSL verification for self-signed certs
+    AI_SKIP_SSL_VERIFY: bool = (
+        os.getenv("AI_SKIP_SSL_VERIFY", "false").lower() == "true"
+    )  # Skip SSL verification for self-signed certs
 
     # Database settings (for future use)
     DATABASE_URL: str = os.getenv("DATABASE_URL", "")
