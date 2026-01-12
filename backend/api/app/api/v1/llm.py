@@ -190,19 +190,7 @@ async def natural_language_search(
     except HTTPException:
         raise
     except Exception as e:
-        import sys
         import traceback
-
-        exc_type, exc_value, exc_traceback = sys.exc_info()
-        tb_lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
-        tb_text = "".join(tb_lines)
-
-        print(f"===== DATASET SEARCH ERROR =====", file=sys.stderr)
-        print(f"Error: {e}", file=sys.stderr)
-        print(f"Error type: {type(e)}", file=sys.stderr)
-        print(f"Traceback:", file=sys.stderr)
-        print(tb_text, file=sys.stderr)
-        print(f"===== END ERROR =====", file=sys.stderr)
 
         logger.error(f"Unexpected error in dataset search: {e}")
         logger.error(f"Traceback: {traceback.format_exc()}")
@@ -474,19 +462,7 @@ async def unified_search(
     except HTTPException:
         raise
     except Exception as e:
-        import sys
         import traceback
-
-        exc_type, exc_value, exc_traceback = sys.exc_info()
-        tb_lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
-        tb_text = "".join(tb_lines)
-
-        print(f"===== UNIFIED SEARCH ERROR =====", file=sys.stderr)
-        print(f"Error: {e}", file=sys.stderr)
-        print(f"Error type: {type(e)}", file=sys.stderr)
-        print(f"Traceback:", file=sys.stderr)
-        print(tb_text, file=sys.stderr)
-        print(f"===== END ERROR =====", file=sys.stderr)
 
         logger.error(f"Unexpected error in unified search: {e}")
         logger.error(f"Traceback: {traceback.format_exc()}")
