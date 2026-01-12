@@ -1,6 +1,5 @@
 import { EnaSequencingReads } from "app/utils/galaxy-api/entities";
 import { UcscTrack } from "../../../../utils/ucsc-tracks-api/entities";
-import { RowData } from "@tanstack/react-table";
 
 export type OnConfigure = (configuredInput: Partial<ConfiguredInput>) => void;
 
@@ -9,7 +8,7 @@ export interface ConfiguredInput {
   readRunsPaired?: EnaSequencingReads[] | null;
   readRunsSingle?: EnaSequencingReads[] | null;
   referenceAssembly?: string;
-  sampleSheet?: RowData[];
+  sampleSheet?: Record<string, string>[];
   tracks?: UcscTrack[] | null;
 }
 
