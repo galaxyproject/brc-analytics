@@ -12,7 +12,7 @@ import { Assembly } from "../../../../../../../../../../views/WorkflowInputsView
 export interface StepConfig {
   description?: ReactNode;
   disabled?: boolean;
-  key: keyof ConfiguredInput | "readRunsAny";
+  key: keyof ConfiguredInput | "readRunsAny" | "sampleSheet";
   label: string;
   renderValue?: (ci: ConfiguredInput) => string | undefined;
   Step: ComponentType<StepProps>;
@@ -30,6 +30,6 @@ export interface StepProps
   onEdit: OnEdit;
   onLaunchGalaxy: OnLaunchGalaxy;
   status: Status;
-  stepKey: keyof ConfiguredInput | "readRunsAny";
+  stepKey: keyof ConfiguredInput | "readRunsAny" | "sampleSheet";
   workflow: Workflow;
 }

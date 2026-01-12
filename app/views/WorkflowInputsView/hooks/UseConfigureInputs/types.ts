@@ -8,6 +8,7 @@ export interface ConfiguredInput {
   readRunsPaired?: EnaSequencingReads[] | null;
   readRunsSingle?: EnaSequencingReads[] | null;
   referenceAssembly?: string;
+  sampleSheet?: Record<string, string>[];
   tracks?: UcscTrack[] | null;
 }
 
