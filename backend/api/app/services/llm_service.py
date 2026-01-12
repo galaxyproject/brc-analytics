@@ -3,6 +3,7 @@ import json
 import logging
 import time
 
+import httpx
 from pydantic_ai import Agent
 from pydantic_ai.exceptions import AgentRunError
 from pydantic_ai.models.anthropic import AnthropicModel
@@ -93,9 +94,18 @@ class LLMService:
                 else:
                     logger.info("Using OpenAI API")
 
+                # Create custom httpx client if SSL verification should be skipped
+                http_client = None
+                if self.settings.AI_SKIP_SSL_VERIFY:
+                    logger.warning(
+                        "SSL verification disabled for LLM API - use only for trusted internal APIs"
+                    )
+                    http_client = httpx.AsyncClient(verify=False)
+
                 openai_provider = OpenAIProvider(
                     api_key=self.settings.AI_API_KEY,
                     base_url=self.settings.AI_API_BASE_URL,
+                    http_client=http_client,
                 )
                 logger.info(f"Primary model: {self.settings.AI_PRIMARY_MODEL}")
                 logger.info(f"Secondary model: {self.settings.AI_SECONDARY_MODEL}")
