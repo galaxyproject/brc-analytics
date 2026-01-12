@@ -62,7 +62,7 @@ async def natural_language_search(
         if not llm_service.is_available():
             raise HTTPException(
                 status_code=503,
-                detail="LLM service is not available. Please check OpenAI API key configuration.",
+                detail="LLM service is not available. Please check inference service API key configuration.",
             )
 
         # Interpret the natural language query
@@ -220,7 +220,7 @@ async def suggest_workflow(
         if not llm_service.is_available():
             raise HTTPException(
                 status_code=503,
-                detail="LLM service is not available. Please check OpenAI API key configuration.",
+                detail="LLM service is not available. Please check inference service API key configuration.",
             )
 
         # Get workflow recommendations
