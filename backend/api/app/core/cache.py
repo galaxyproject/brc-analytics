@@ -72,6 +72,16 @@ class CacheService:
             logger.error(f"Cache clear pattern error for {pattern}: {e}")
             return 0
 
+    async def flush_all(self) -> bool:
+        """Flush all keys from the current database"""
+        try:
+            await self.redis.flushdb()
+            logger.info("Cache flushed successfully")
+            return True
+        except redis.RedisError as e:
+            logger.error(f"Cache flush error: {e}")
+            return False
+
     async def get_stats(self) -> Dict[str, Any]:
         """Get cache statistics"""
         try:

@@ -1,0 +1,111 @@
+---
+breadcrumbs:
+  - path: "/learn"
+    text: "Learn"
+  - path: "/learn/getting-started"
+    text: "Getting Started"
+  - path: ""
+    text: "Tips and Troubleshooting"
+contentType: "ARTICLE"
+description: ""
+enableOutline: true
+title: "Tips and Troubleshooting"
+---
+
+## Data Management Tips
+
+### Organizing Your Histories
+
+- **Create separate histories** for different projects or experiments
+- **Name histories descriptively** (e.g., "Measles_Surveillance_2024")
+- **Add tags** to datasets for easy filtering
+- **Delete unnecessary files** to manage storage
+
+### Saving and Exporting Data
+
+- **Download results** by clicking the download icon on any dataset
+- **Export workflows** for reproducibility
+- **Share histories** with collaborators via Galaxy's sharing features
+- **Publish analyses** to make them publicly accessible
+
+## Understanding Galaxy Basics
+
+Since BRC Analytics runs on Galaxy, understanding these fundamentals is helpful:
+
+### The Three-Panel Interface
+
+1. **Left panel (Tools)**: Available analysis tools and workflows
+2. **Middle panel (Main)**: Tool forms, visualizations, and documentation
+3. **Right panel (History)**: Your datasets and analysis outputs
+
+### Datasets
+
+- Each file in your history is a dataset
+- Color coding indicates status:
+  - **Gray**: Waiting to run
+  - **Yellow**: Running
+  - **Green**: Successfully completed
+  - **Red**: Failed (click for error details)
+
+### Collections
+
+- Group related datasets together
+- Useful for batch processing multiple samples
+- Created automatically for paired-end reads or can be manually created for grouping
+
+## Troubleshooting Common Issues
+
+### Analysis Failed (Red Dataset)
+
+1. Click on the red dataset
+2. Review the error message
+3. Common causes:
+   - Incorrect file format
+   - Invalid parameter values
+   - Insufficient computational resources
+4. Adjust settings and re-run
+
+### Dataset Stuck in Gray/Yellow
+
+- Jobs are queued - be patient
+- Check the Galaxy status page for system issues
+- If stuck >24 hours, report to support
+
+### Can't Find My Data
+
+- Check you're viewing the correct history
+- Use the search function in the history panel
+- Datasets may be hidden - click "Include hidden datasets"
+
+### Results Don't Look Right
+
+- Verify input data quality
+- Check parameter settings
+- Compare with expected reference
+- Review QC reports for issues
+
+## Best Practices
+
+### For Reproducible Research
+
+1. **Document parameters**: Note all settings used
+2. **Extract workflows**: Save your analysis pipeline
+3. **Record provenance**: Galaxy automatically tracks this
+4. **Share complete histories**: Include all inputs and parameters
+5. **Publish workflows**: Make methods available to others
+
+### For Efficient Analysis
+
+1. **Start small**: Test with a subset of data
+2. **Use collections**: Process multiple samples together
+3. **Delete intermediate files**: Keep only essential outputs
+4. **Monitor job status**: Check for errors early
+5. **Save important results**: Download completed analyses
+
+### For Quality Results
+
+1. **Always run QC first**: Assess data quality
+2. **Use appropriate references**: Match your organism
+3. **Validate results**: Check consistency across samples
+4. **Review annotations carefully**: Understand variant impacts
+5. **Consult documentation**: Each tool has specific requirements
