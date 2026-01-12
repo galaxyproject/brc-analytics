@@ -298,7 +298,7 @@ Return ONLY the JSON array. No markdown code blocks, no explanations, no extra t
         if not self.is_available():
             return LLMResponse(
                 success=False,
-                error="LLM service not available - check API key configuration",
+                error="LLM service not available - check inference service API key configuration",
             )
 
         # Input validation
@@ -468,7 +468,7 @@ Return ONLY valid JSON, no markdown or explanations."""
         if not self.is_available():
             return LLMResponse(
                 success=False,
-                error="LLM service not available - check API key configuration",
+                error="LLM service not available - check inference service API key configuration",
             )
 
         # Create cache key from request parameters
