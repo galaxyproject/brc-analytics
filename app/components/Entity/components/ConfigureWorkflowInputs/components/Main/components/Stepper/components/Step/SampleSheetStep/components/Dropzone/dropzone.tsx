@@ -16,7 +16,7 @@ export const Dropzone = ({ onClick }: Props): JSX.Element => {
             component="div"
             variant={TYPOGRAPHY_PROPS.VARIANT.HEADING_XSMALL}
           >
-            Upload a sample sheet
+            Upload a Sample Sheet
           </Typography>
           <Typography
             color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
