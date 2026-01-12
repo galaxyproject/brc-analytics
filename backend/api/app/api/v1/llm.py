@@ -3,8 +3,7 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from app.core.cache import CacheService
-from app.core.dependencies import get_cache_service
+from app.core.dependencies import get_ena_service, get_llm_service
 from app.models.llm import WorkflowSuggestionRequest
 from app.services.ena_service import ENAService
 from app.services.llm_service import LLMService
@@ -49,23 +48,6 @@ class DatasetSearchRequest(BaseModel):
     query: str
     max_results: int = 300
     include_metadata: bool = True
-
-
-async def get_llm_service(
-    cache: CacheService = Depends(get_cache_service),
-) -> LLMService:
-    """Dependency to get LLM service instance"""
-    logger.info("Creating LLM service instance...")
-    service = LLMService(cache)
-    logger.info(f"LLM service created, available: {service.is_available()}")
-    return service
-
-
-async def get_ena_service(
-    cache: CacheService = Depends(get_cache_service),
-) -> ENAService:
-    """Dependency to get ENA service instance"""
-    return ENAService(cache)
 
 
 @router.post("/dataset-search")
