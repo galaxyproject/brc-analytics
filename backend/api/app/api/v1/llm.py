@@ -3,7 +3,7 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from app.core.dependencies import get_ena_service, get_llm_service
+from app.core.dependencies import check_rate_limit, get_ena_service, get_llm_service
 from app.models.llm import WorkflowSuggestionRequest
 from app.services.ena_service import ENAService
 from app.services.llm_service import LLMService
@@ -55,6 +55,7 @@ async def natural_language_search(
     request: DatasetSearchRequest,
     llm_service: LLMService = Depends(get_llm_service),
     ena_service: ENAService = Depends(get_ena_service),
+    _rate_limit: dict = Depends(check_rate_limit),
 ):
     """Search for datasets using natural language queries"""
     try:
@@ -201,6 +202,7 @@ async def natural_language_search(
 async def suggest_workflow(
     request: WorkflowSuggestionRequest,
     llm_service: LLMService = Depends(get_llm_service),
+    _rate_limit: dict = Depends(check_rate_limit),
 ):
     """Get workflow recommendations based on dataset description and analysis goals"""
     try:
@@ -257,6 +259,7 @@ async def unified_search(
     request: UnifiedSearchRequest,
     llm_service: LLMService = Depends(get_llm_service),
     ena_service: ENAService = Depends(get_ena_service),
+    _rate_limit: dict = Depends(check_rate_limit),
 ):
     """
     Unified search endpoint that intelligently handles both data search and workflow suggestions.

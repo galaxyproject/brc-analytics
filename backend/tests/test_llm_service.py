@@ -3,10 +3,9 @@
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
-from conftest import BORDERLINE_QUERIES, INVALID_QUERIES, VALID_QUERIES
-
 from app.models.llm import DatasetQuery, LLMResponse
 from app.services.llm_service import LLMService
+from conftest import BORDERLINE_QUERIES, INVALID_QUERIES, VALID_QUERIES
 
 
 class TestLLMService:
