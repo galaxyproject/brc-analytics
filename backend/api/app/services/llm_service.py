@@ -1,7 +1,6 @@
 import asyncio
 import json
 import logging
-from typing import Any, Dict, List, Optional
 
 from pydantic_ai import Agent
 from pydantic_ai.exceptions import AgentRunError
@@ -257,7 +256,7 @@ Return ONLY the JSON array. No markdown code blocks, no explanations, no extra t
         import time
 
         start_time = time.time()
-        logger.info(f"=== LLM CALL START ===")
+        logger.info("=== LLM CALL START ===")
         logger.info(f"Timeout: {timeout}s")
         logger.info(f"Prompt length: {len(prompt)} chars")
         logger.info(f"Prompt preview: {prompt[:200]}...")

@@ -1,4 +1,5 @@
 """Rate limiting using Redis for FastAPI endpoints"""
+
 import logging
 from typing import Optional
 

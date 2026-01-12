@@ -23,7 +23,6 @@ def group_results_by_study(results: list) -> list:
     studies = defaultdict(list)
     for result in results:
         study_accession = result.get("study_accession", "unknown")
-        study_title = result.get("study_title", "Unknown Study")
         studies[study_accession].append(result)
 
     # Convert to list of study groups
