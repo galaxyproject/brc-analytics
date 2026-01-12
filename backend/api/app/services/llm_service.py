@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import time
 
 from pydantic_ai import Agent
 from pydantic_ai.exceptions import AgentRunError
@@ -253,8 +254,6 @@ Return ONLY the JSON array. No markdown code blocks, no explanations, no extra t
         Only retries on exceptions (network errors, timeouts, etc).
         Re-raises the exception after all retries are exhausted.
         """
-        import time
-
         start_time = time.time()
         logger.info("=== LLM CALL START ===")
         logger.info(f"Timeout: {timeout}s")

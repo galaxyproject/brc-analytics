@@ -1,4 +1,6 @@
 import logging
+import traceback
+from collections import defaultdict
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -14,8 +16,6 @@ router = APIRouter()
 
 def group_results_by_study(results: list) -> list:
     """Group ENA results by study_accession"""
-    from collections import defaultdict
-
     if not results:
         return []
 
@@ -190,11 +190,11 @@ async def natural_language_search(
     except HTTPException:
         raise
     except Exception as e:
-        import traceback
-
         logger.error(f"Unexpected error in dataset search: {e}")
         logger.error(f"Traceback: {traceback.format_exc()}")
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}") from e
+        raise HTTPException(
+            status_code=500, detail=f"Unexpected error: {str(e)}"
+        ) from e
 
 
 @router.post("/workflow-suggest")
@@ -464,11 +464,11 @@ async def unified_search(
     except HTTPException:
         raise
     except Exception as e:
-        import traceback
-
         logger.error(f"Unexpected error in unified search: {e}")
         logger.error(f"Traceback: {traceback.format_exc()}")
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}") from e
+        raise HTTPException(
+            status_code=500, detail=f"Unexpected error: {str(e)}"
+        ) from e
 
 
 @router.get("/health")
