@@ -57,7 +57,7 @@ class ENAService:
 
         except httpx.HTTPError as e:
             logger.error(f"ENA API error for taxonomy {taxonomy_id}: {e}")
-            raise Exception(f"Failed to fetch data from ENA: {str(e)}")
+            raise Exception(f"Failed to fetch data from ENA: {str(e)}") from e
         except Exception as e:
             logger.error(f"Unexpected error in taxonomy search: {e}")
             raise
@@ -100,7 +100,7 @@ class ENAService:
 
         except httpx.HTTPError as e:
             logger.error(f"ENA API error for accession {accession}: {e}")
-            raise Exception(f"Failed to fetch data from ENA: {str(e)}")
+            raise Exception(f"Failed to fetch data from ENA: {str(e)}") from e
         except Exception as e:
             logger.error(f"Unexpected error in accession lookup: {e}")
             raise
@@ -249,7 +249,7 @@ class ENAService:
 
         except httpx.HTTPError as e:
             logger.error(f"ENA API error for keywords {keywords}: {e}")
-            raise Exception(f"Failed to fetch data from ENA: {str(e)}")
+            raise Exception(f"Failed to fetch data from ENA: {str(e)}") from e
         except Exception as e:
             logger.error(f"Unexpected error in keyword search: {e}")
             raise
@@ -292,7 +292,7 @@ class ENAService:
 
         except httpx.HTTPError as e:
             logger.error(f"ENA API error for study {study_accession}: {e}")
-            raise Exception(f"Failed to fetch study data from ENA: {str(e)}")
+            raise Exception(f"Failed to fetch study data from ENA: {str(e)}") from e
         except Exception as e:
             logger.error(f"Unexpected error in study lookup: {e}")
             raise

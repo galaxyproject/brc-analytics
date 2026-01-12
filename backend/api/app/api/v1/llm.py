@@ -194,7 +194,7 @@ async def natural_language_search(
 
         logger.error(f"Unexpected error in dataset search: {e}")
         logger.error(f"Traceback: {traceback.format_exc()}")
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}") from e
 
 
 @router.post("/workflow-suggest")
@@ -245,7 +245,7 @@ async def suggest_workflow(
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Workflow suggestion failed: {str(e)}"
-        )
+        ) from e
 
 
 class UnifiedSearchRequest(BaseModel):
@@ -468,7 +468,7 @@ async def unified_search(
 
         logger.error(f"Unexpected error in unified search: {e}")
         logger.error(f"Traceback: {traceback.format_exc()}")
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}") from e
 
 
 @router.get("/health")

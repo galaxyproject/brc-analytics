@@ -28,4 +28,4 @@ async def cache_health(cache: CacheService = Depends(get_cache_service)):
     except Exception as e:
         raise HTTPException(
             status_code=503, detail=f"Cache service unhealthy: {str(e)}"
-        )
+        ) from e
