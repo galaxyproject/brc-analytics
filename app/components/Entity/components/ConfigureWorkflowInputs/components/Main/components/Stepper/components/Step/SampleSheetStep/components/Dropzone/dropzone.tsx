@@ -4,7 +4,10 @@ import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/m
 import { Dot } from "@databiosphere/findable-ui/lib/components/common/Dot/dot";
 import { FileUploadIcon } from "../../../../../../../../../../../../common/CustomIcon/components/FileUploadIcon/fileUploadIcon";
 import { Props } from "./types";
-import { STACK_PROPS } from "./constants";
+import {
+  STACK_PROPS,
+  TYPOGRAPHY_PROPS as COMPONENT_TYPOGRAPHY_PROPS,
+} from "./constants";
 
 export const Dropzone = ({ onClick }: Props): JSX.Element => {
   return (
@@ -18,16 +21,15 @@ export const Dropzone = ({ onClick }: Props): JSX.Element => {
           >
             Upload a Sample Sheet
           </Typography>
-          <Typography
-            color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
-            variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
-          >
-            <Stack direction="row" gap={1} useFlexGap>
-              <span>Click to browse files</span>
-              <Dot />
-              <span>CSV, TSV supported</span>
-            </Stack>
-          </Typography>
+          <Stack direction="row" gap={1} useFlexGap>
+            <Typography {...COMPONENT_TYPOGRAPHY_PROPS}>
+              Click to browse files
+            </Typography>
+            <Dot />
+            <Typography {...COMPONENT_TYPOGRAPHY_PROPS}>
+              CSV, TSV supported
+            </Typography>
+          </Stack>
         </Stack>
       </StyledButtonBase>
     </StyledPaper>

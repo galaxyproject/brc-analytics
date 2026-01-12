@@ -13,13 +13,14 @@ export const UploadedFile = ({ file, onClear }: Props): JSX.Element | null => {
   return (
     <StyledRoundedPaper elevation={0}>
       <FolderZipRounded />
-      <Stack flex={1} gap={1} useFlexGap>
+      <Stack flex={1} gap={1} useFlexGap sx={{ minWidth: 0 }}>
         <Stack direction="row" gap={2} alignItems="center">
           <Typography noWrap variant={TYPOGRAPHY_PROPS.VARIANT.BODY_500}>
             {file.name}
           </Typography>
           <Typography
             color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
+            noWrap
             variant={TYPOGRAPHY_PROPS.VARIANT.BODY_SMALL_400}
           >
             {formatFileSize(file.size)}

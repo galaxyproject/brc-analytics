@@ -18,4 +18,9 @@ export const StyledButtonBase = styled(ButtonBase)`
   .MuiSvgIcon-root {
     font-size: 72px;
   }
+
+  .MuiStack-root {
+    min-width: 0;
+    width: 100%;
+  }
 `;
