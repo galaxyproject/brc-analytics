@@ -320,19 +320,28 @@ Return ONLY the JSON array. No markdown code blocks, no explanations, no extra t
         cached_result = await self.cache.get(cache_key)
         if cached_result:
             logger.info(f"Cache hit for LLM interpretation: {user_query[:50]}...")
-            # Handle cached data which might be a string (JSON) or dict
-            # TODO: Fix root cause of double-serialization in cache.py (see LLM_SERVICE_REVIEW.md #3)
             cached_data = cached_result["data"]
+            # Defensive check: if cached data is somehow a string, try to parse it
+            # This should not happen with proper cache serialization
             if isinstance(cached_data, str):
-                cached_data = json.loads(cached_data)
-            return LLMResponse(
-                success=True,
-                data=DatasetQuery(**cached_data),
-                raw_response=cached_result.get("raw_response"),
-                tokens_used=cached_result.get("tokens_used"),
-                model_used=cached_result.get("model_used"),
-                cached=True,
-            )
+                logger.warning(
+                    "Unexpected string in cache data - attempting JSON parse"
+                )
+                try:
+                    cached_data = json.loads(cached_data)
+                except json.JSONDecodeError:
+                    logger.error("Failed to parse cached data string as JSON")
+                    # Treat as cache miss
+                    cached_result = None
+            if cached_result:
+                return LLMResponse(
+                    success=True,
+                    data=DatasetQuery(**cached_data),
+                    raw_response=cached_result.get("raw_response"),
+                    tokens_used=cached_result.get("tokens_used"),
+                    model_used=cached_result.get("model_used"),
+                    cached=True,
+                )
 
         try:
             logger.info(
