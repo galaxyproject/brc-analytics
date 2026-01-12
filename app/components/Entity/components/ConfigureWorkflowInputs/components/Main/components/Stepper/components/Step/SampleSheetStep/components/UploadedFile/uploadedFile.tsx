@@ -33,7 +33,11 @@ export const UploadedFile = ({ file, onClear }: Props): JSX.Element | null => {
           Completed
         </Typography>
       </Stack>
-      <IconButton onClick={onClear} size={ICON_BUTTON_PROPS.SIZE.SMALL}>
+      <IconButton
+        aria-label="Remove uploaded file"
+        onClick={onClear}
+        size={ICON_BUTTON_PROPS.SIZE.SMALL}
+      >
         <DeleteRoundedIcon fontSize={SVG_ICON_PROPS.FONT_SIZE.SMALL} />
       </IconButton>
     </StyledRoundedPaper>
