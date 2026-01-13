@@ -12,6 +12,7 @@ export const SELECT_PROPS: SelectProps = {
     },
   },
   fullWidth: true,
+  name: "classification",
   size: "small",
 };
 

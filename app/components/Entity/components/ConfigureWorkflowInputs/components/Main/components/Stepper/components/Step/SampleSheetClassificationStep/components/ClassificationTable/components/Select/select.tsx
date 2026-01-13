@@ -14,7 +14,6 @@ export const Select = ({
   columnType,
   onClassify,
 }: Props): JSX.Element => {
-  console.log(columnName, columnType);
   return (
     <StyledSelect
       {...SELECT_PROPS}
