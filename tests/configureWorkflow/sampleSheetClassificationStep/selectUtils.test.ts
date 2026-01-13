@@ -100,12 +100,12 @@ describe("isOptionDisabled", () => {
 
     test("does not disable TECHNICAL_BLOCKING even when already used", () => {
       const classifications = new Map<string, COLUMN_TYPE | null>([
-        ["col1", COLUMN_TYPE.TECHNICAL_BLOCKING],
+        ["col1", COLUMN_TYPE.TECHNICAL_BLOCKING_FACTOR],
         ["col2", null],
       ]);
 
       const result = isOptionDisabled(
-        COLUMN_TYPE.TECHNICAL_BLOCKING,
+        COLUMN_TYPE.TECHNICAL_BLOCKING_FACTOR,
         null,
         classifications
       );

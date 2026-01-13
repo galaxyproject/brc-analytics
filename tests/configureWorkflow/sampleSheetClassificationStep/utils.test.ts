@@ -40,7 +40,7 @@ describe("validateClassifications", () => {
       ["forward_path", COLUMN_TYPE.FORWARD_FILE_PATH],
       ["reverse_path", COLUMN_TYPE.REVERSE_FILE_PATH],
       ["treatment", COLUMN_TYPE.BIOLOGICAL_FACTOR],
-      ["batch", COLUMN_TYPE.TECHNICAL_BLOCKING],
+      ["batch", COLUMN_TYPE.TECHNICAL_BLOCKING_FACTOR],
       ["covariate", COLUMN_TYPE.OTHER_COVARIATE],
       ["qc_metric", COLUMN_TYPE.QC_ONLY],
       ["notes", COLUMN_TYPE.IGNORED],
