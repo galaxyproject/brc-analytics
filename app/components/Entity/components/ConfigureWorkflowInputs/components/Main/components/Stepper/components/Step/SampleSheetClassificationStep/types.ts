@@ -1,0 +1,17 @@
+export interface ColumnClassification {
+  columnName: string;
+  columnType: COLUMN_TYPE | null;
+}
+
+export type ColumnClassifications = Map<string, COLUMN_TYPE | null>;
+
+export enum COLUMN_TYPE {
+  BIOLOGICAL_FACTOR = "BIOLOGICAL_FACTOR",
+  FORWARD_FILE_PATH = "FORWARD_FILE_PATH",
+  IDENTIFIER = "IDENTIFIER",
+  IGNORED = "IGNORED",
+  OTHER_COVARIATE = "OTHER_COVARIATE",
+  QC_ONLY = "QC_ONLY",
+  REVERSE_FILE_PATH = "REVERSE_FILE_PATH",
+  TECHNICAL_BLOCKING = "TECHNICAL_BLOCKING",
+}

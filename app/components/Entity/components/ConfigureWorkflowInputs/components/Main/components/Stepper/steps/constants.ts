@@ -9,6 +9,7 @@ import {
 import { WORKFLOW_PARAMETER_VARIABLE } from "../../../../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { RELATED_TRACKS_STEP } from "../components/Step/RelatedTracksStep/step";
 import { STEP as SAMPLE_SHEET_STEP } from "../components/Step/SampleSheetStep/step";
+import { STEP as SAMPLE_SHEET_CLASSIFICATION_STEP } from "../components/Step/SampleSheetClassificationStep/step";
 
 export const SEQUENCING_STEPS: Record<string, StepConfig> = {
   readRunsPaired: PAIRED_END_STEP,
@@ -19,7 +20,8 @@ export const STEP: Record<
   | WORKFLOW_PARAMETER_VARIABLE
   | "READ_RUN_ANY"
   | "RELATED_TRACKS"
-  | "SAMPLE_SHEET",
+  | "SAMPLE_SHEET"
+  | "SAMPLE_SHEET_CLASSIFICATION",
   StepConfig | null
 > = {
   [WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_FASTA_URL]: null,
@@ -30,4 +32,5 @@ export const STEP: Record<
   READ_RUN_ANY: ANY_END_STEP,
   RELATED_TRACKS: RELATED_TRACKS_STEP,
   SAMPLE_SHEET: SAMPLE_SHEET_STEP,
+  SAMPLE_SHEET_CLASSIFICATION: SAMPLE_SHEET_CLASSIFICATION_STEP,
 };
