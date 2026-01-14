@@ -1,5 +1,5 @@
 import { ChangeEvent, useCallback, useRef, useState } from "react";
-import { UseFilePicker } from "./types";
+import { OnFileChangeOptions, UseFilePicker } from "./types";
 import { hasFileChanged } from "./utils";
 
 export const useFilePicker = (): UseFilePicker => {
@@ -24,7 +24,7 @@ export const useFilePicker = (): UseFilePicker => {
   const onFileChange = useCallback(
     (
       event: ChangeEvent<HTMLInputElement>,
-      options: { onSuccess?: () => void }
+      options: OnFileChangeOptions
     ): void => {
       // Access the first file from the FileList.
       const selectedFile = event.target.files?.[0];
@@ -32,7 +32,7 @@ export const useFilePicker = (): UseFilePicker => {
 
       // Check if the file has changed.
       if (hasFileChanged(fileRef.current, selectedFile)) {
-        options.onSuccess?.();
+        options.onSuccess?.(selectedFile);
       }
 
       // Update the file reference.

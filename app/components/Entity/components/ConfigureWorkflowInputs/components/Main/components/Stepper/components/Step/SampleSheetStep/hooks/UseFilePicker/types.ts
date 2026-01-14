@@ -1,6 +1,8 @@
 import { ChangeEvent, RefObject } from "react";
 
-export type OnFileChangeSuccess = () => void;
+export interface OnFileChangeOptions {
+  onSuccess?: (file: File) => Promise<void> | void;
+}
 
 export interface UseFilePicker {
   actions: {
@@ -8,7 +10,7 @@ export interface UseFilePicker {
     onClick: () => void;
     onFileChange: (
       event: ChangeEvent<HTMLInputElement>,
-      options: { onSuccess?: () => void }
+      options: OnFileChangeOptions
     ) => void;
   };
   file: File | null;

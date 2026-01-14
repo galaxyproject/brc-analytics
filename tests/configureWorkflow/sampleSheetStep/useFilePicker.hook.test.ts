@@ -147,7 +147,7 @@ describe("useFilePicker", () => {
     }).not.toThrow();
   });
 
-  test("onFileChange calls onSuccess when first file is selected", () => {
+  test("onFileChange calls onSuccess with file when first file is selected", () => {
     const { result } = renderHook(() => useFilePicker());
     const mockFile = createMockFile("test.csv");
     const onSuccess = jest.fn();
@@ -159,9 +159,10 @@ describe("useFilePicker", () => {
     });
 
     expect(onSuccess).toHaveBeenCalledTimes(1);
+    expect(onSuccess).toHaveBeenCalledWith(mockFile);
   });
 
-  test("onFileChange calls onSuccess when file changes", () => {
+  test("onFileChange calls onSuccess with file when file changes", () => {
     const { result } = renderHook(() => useFilePicker());
     const firstFile = createMockFile("first.csv");
     const secondFile = createMockFile("second.csv");
@@ -175,6 +176,7 @@ describe("useFilePicker", () => {
     });
 
     expect(onSuccess).toHaveBeenCalledTimes(1);
+    expect(onSuccess).toHaveBeenLastCalledWith(firstFile);
 
     act(() => {
       result.current.actions.onFileChange(
@@ -184,6 +186,7 @@ describe("useFilePicker", () => {
     });
 
     expect(onSuccess).toHaveBeenCalledTimes(2);
+    expect(onSuccess).toHaveBeenLastCalledWith(secondFile);
   });
 
   test("onFileChange does not call onSuccess when same file is re-selected", () => {
@@ -210,7 +213,7 @@ describe("useFilePicker", () => {
     expect(onSuccess).toHaveBeenCalledTimes(1);
   });
 
-  test("onFileChange calls onSuccess after onClear and re-select", () => {
+  test("onFileChange calls onSuccess with file after onClear and re-select", () => {
     const { result } = renderHook(() => useFilePicker());
     const mockFile = createMockFile("test.csv");
     const onSuccess = jest.fn();
@@ -223,6 +226,7 @@ describe("useFilePicker", () => {
     });
 
     expect(onSuccess).toHaveBeenCalledTimes(1);
+    expect(onSuccess).toHaveBeenCalledWith(mockFile);
 
     // Clear file
     act(() => {
@@ -237,5 +241,6 @@ describe("useFilePicker", () => {
     });
 
     expect(onSuccess).toHaveBeenCalledTimes(2);
+    expect(onSuccess).toHaveBeenLastCalledWith(mockFile);
   });
 });
