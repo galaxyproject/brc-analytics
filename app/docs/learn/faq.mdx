@@ -10,61 +10,63 @@ enableOutline: true
 title: "FAQ"
 ---
 
-## What if my organism/assembly isn't available?
+## How do I request a new organism, assembly, or workflow?
 
-If your organism or assembly isn't currently available in BRC-Analytics,
-you have several options. First, check if an
-alternate assembly version is available that might meet your needs.
-If not, you can contact our support team to request that your organism
-be added to our database. We regularly update our collection based on
-user requests and emerging research priorities.
+Email [help@brc-analytics.org](mailto:help@brc-analytics.org) with as much detail as possible (NCBI accessions, workflow name, desired analysis, etc.). That inbox is the fastest way to reach the team that curates the catalog and workflows, and we triage additions directly from there.
 
-## What analyses are available through BRC-Analytics?
+## What analyses are available today?
 
-BRC-Analytics provides a comprehensive suite of genomic analysis tools,
-including:
+BRC Analytics currently ships a curated set of Galaxy workflows. Highlights include:
 
-- Gene annotation and functional characterization
-- Variant calling and analysis
-- RNA-seq differential expression analysis
-- Regulation and epigenetic analysis
+- Viral variant calling (generic non-segmented viruses, poxvirus amplicon, COVID-19 ARTIC and WGS pipelines)
+- RNA-seq expression analyses (single-end and paired-end)
+- Chromatin accessibility and regulation workflows (ATAC-seq, CUT&RUN/CUT&Tag, ChIP-seq, consensus peak calling)
+- AMR gene detection from assembled genomes
+- lncRNA annotation workflow
 
-In addition, analyses that will be added in the near future include these
-topics:
+Each workflow page in the UI lists the required inputs; assemblies, indices (BWA, Bowtie2, etc.), and RefSeq/VEuPathDB annotations are pre-provisioned when available so you can focus on selecting reads or uploading your own data.
 
-- Phylogenetic and evolutionary analysis
-- Protein structure prediction
-  Our platform is continuously expanding with new
-  analysis capabilities based on the latest bioinformatics methods
-  and user feedback.
+## What if I need something different?
 
-## What if I want to do some other analysis?
+Many users launch a workflow from BRC Analytics and then continue custom analyses directly inside Galaxy. You can always:
 
-We understand that research needs are diverse and constantly evolving.
-If you need an analysis that isn't currently available in BRC-Analytics,
-we encourage you to reach out to our team through our feedback system.
-We actively prioritize new feature development based on community
-requests. In the meantime, BRC-Analytics has the concept of a
-"Custom Analysis", where, after you've selected your organism
-and assembly of interest and any supporting data (like gene annotations
-from UCSC or RNA-Seq reads from ENA), BRC-Analytics will transfer all
-of that information to Galaxy where you can run any analysis you like.
+1. Launch the closest matching workflow from BRC Analytics.
+2. Once you land in Galaxy, open the resulting history, rerun tools with different parameters, or chain additional steps.
+3. If the workflow itself needs to change, email [help@brc-analytics.org](mailto:help@brc-analytics.org) explaining the gap—we prioritize updates based on those requests.
 
-## Can I do pangenomes or other types of comparative genomics?
+## What features are coming next?
 
-In the near future, yes. BRC-Analytics will include robust comparative
-genomics capabilities, including pangenome analysis. You will be able
-to compare multiple genomes to identify core and accessory genes,
-perform whole-genome alignments, and visualize synteny relationships.
-Our pangenome tools will allow you to analyze gene presence/absence
-patterns, identify lineage-specific genes, and explore genomic diversity
-across populations or species. We will also support phylogenomic analysis,
-ortholog identification, and comparative pathway analysis to help you
-understand evolutionary relationships and functional differences
-between genomes.
+We are actively developing support for:
+- **AI Chat Assistant**: An intelligent interface powered by open-source LLMs hosted at TACC. It will assist with site navigation, identifying supported organisms, selecting appropriate workflows for your analysis goals, and searching external databases (like NCBI) to help you find the best reference assemblies and public datasets.
+- **Comparative Genomics & Pangenomics**: Analyze variation across multiple strains or species.
+- **Host-Pathogen Interactions**: Integrated workflows for dual-organism analysis.
+- **Genome Assembly**: De novo assembly pipelines for various sequencing technologies.
+
+Check our [Roadmap](/roadmap) for the latest status, or email us if you have a specific use case you'd like to see prioritized.
+
+## Is BRC Analytics free to use?
+
+Yes. BRC Analytics is funded by NIAID and provides free computational resources to the research community. There are no fees for accessing the platform, running workflows, or storing data within standard allocation limits.
+
+## Do I need an account?
+
+You can browse the site without an account, but you will need a free **UseGalaxy.org** account to run analyses. This account allows you to track your jobs, save your history, and manage your data securely.
+
+## How do BRC Analytics and Galaxy split responsibilities?
+
+- BRC Analytics (this site) is where you browse organisms, pick assemblies, choose workflows, and configure parameters.
+- Galaxy (UseGalaxy.org) is where every job executes. When BRC Analytics hands off a workflow you will see it in your current Galaxy session/history, and you can switch histories or rerun tools once you arrive there.
+
+## How can I contribute?
+
+We aspire to be a community-driven platform and welcome your involvement! BRC Analytics is built on open-source software, and there are several ways to contribute:
+
+- **Join the conversation**: Come say hello in our [Matrix chat channel](https://matrix.to/#/#brc-analytics:matrix.org) to discuss ideas, suggest new assemblies, or share feature requests.
+- **Submit workflows**: All our workflows are sourced from the [Intergalactic Workflow Commission (IWC)](https://iwc.galaxyproject.org). If you have a workflow you'd like to see integrated, contributing it to the IWC is the most effective way to get it added.
+- **Contribute to Galaxy**: We rely heavily on the [Galaxy Project](https://galaxyproject.org) ecosystem. Contributing tool wrappers, bug fixes, or features to the core project directly improves BRC Analytics.
 
 ## Still have questions?
 
-If you need further assistance, feel free to reach out to us at
-help@brc-analytics.org or join discussions on the
-[Discourse forum](https://help.brc-analytics.org/). We're here to help!
+- Email: [help@brc-analytics.org](mailto:help@brc-analytics.org) — fastest way to reach us for support or feature requests.
+- Discourse forum: [https://help.brc-analytics.org/](https://help.brc-analytics.org/) (community Q&A and announcements).
+- Matrix chat: [#brc-analytics:matrix.org](https://matrix.to/#/#brc-analytics:matrix.org) for informal discussions.

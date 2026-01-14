@@ -21,4 +21,60 @@ Galaxy is a free, open-source system for analyzing data, authoring workflows, tr
 If you've looked at the [Getting Started](/learn/getting-started) guides, you probably noticed that the way BRC Analytics works is to allow you to pick the parameters of your analysis here (things like organism, assembly, workflow, starting data), and then that information is sent to UseGalaxy.org to begin processing.
 As noted in [Creating an Account](/learn/getting-started/overview#creating-an-account) section, the main thing you'll want to do with Galaxy before you get started is create an account on the [UseGalaxy.org](https://usegalaxy.org) site for your information to be sent to.
 
+When you run analyses, BRC Analytics will use whatever UseGalaxy.org account you are currently logged into, and your jobs will run in your most recently active Galaxy history.
+
 After creating an account, you will also likely want learn a little bit about how Galaxy works. The best place to start with that is the [Get Started](https://galaxyproject.org/get-started) document on the Galaxy website, and then you can also checkout the [The Galaxy Training Network](https://training.galaxyproject.org) (GTN) that has MANY tutorials with example data and videos to help you get started and more.
+
+## Understanding Galaxy Basics
+
+Since BRC Analytics runs on Galaxy, understanding these fundamentals is helpful:
+
+### The Three-Panel Interface
+
+1. **Left panel (Tools)**: Available analysis tools and workflows
+2. **Middle panel (Main)**: Tool forms, visualizations, and documentation
+3. **Right panel (History)**: Your datasets and analysis outputs
+
+### Galaxy Vocabulary
+
+- **History**: Your current workspace. It stores all your input files, intermediate results, and final outputs.
+- **Dataset**: An individual file (like a set of reads or a variant list) stored in your history.
+- **Collection**: A group of datasets (like paired forward/reverse reads or multiple samples) processed as a single unit.
+- **Tool**: A single software package (like fastp or STAR) that performs a specific analysis step.
+- **Job**: A scheduled task that runs a tool on your data.
+- **Workflow**: A pre-configured chain of tools that runs automatically from start to finish.
+
+### Datasets
+
+- Each file in your history is a dataset
+- Color coding indicates status:
+  - **Gray**: Waiting to run
+  - **Yellow**: Running
+  - **Green**: Successfully completed
+  - **Red**: Failed (click for error details)
+
+### Collections
+
+- Group related datasets together
+- Useful for batch processing multiple samples
+- Created automatically for paired-end reads or can be manually created for grouping
+
+## Advanced Galaxy Features
+
+These capabilities are available once your data and workflows are staged in Galaxy.
+
+### Using JupyterLite for Custom Analyses
+
+Galaxy includes integrated JupyterLite notebooks for advanced post-processing. This allows you to write Python code for statistical testing, customized visualization, or evolutionary analysis directly within the Galaxy interface—without needing to download large datasets to your local machine.
+
+### Creating and Sharing Workflows
+
+This feature is particularly high-value when using the **Custom Analysis** route in BRC Analytics. Because your entire analysis history—every tool version and parameter—is preserved, you can:
+
+1.  **Extract** your history into a reusable workflow.
+2.  **Reproduce** the exact same analysis on new data.
+3.  **Share** your workflow with collaborators or publish it alongside your research.
+
+### Visualizing Results in UCSC Genome Browser
+
+Galaxy offers seamless integration with external visualization tools. You can select BAM, VCF, or coverage track files in your history and send them directly to the **UCSC Genome Browser** to view them in context with reference annotations.
