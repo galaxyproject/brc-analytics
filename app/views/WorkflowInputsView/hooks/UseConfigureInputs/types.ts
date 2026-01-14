@@ -5,6 +5,7 @@ import { COLUMN_TYPE } from "../../../../components/Entity/components/ConfigureW
 export type OnConfigure = (configuredInput: Partial<ConfiguredInput>) => void;
 
 export interface ConfiguredInput {
+  designFormula?: string | null;
   geneModelUrl?: string | null;
   readRunsPaired?: EnaSequencingReads[] | null;
   readRunsSingle?: EnaSequencingReads[] | null;

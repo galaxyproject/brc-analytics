@@ -50,6 +50,7 @@ export function buildSteps(workflow: Workflow): StepConfig[] {
       STEP.GENE_MODEL_URL,
       STEP.SAMPLE_SHEET,
       STEP.SAMPLE_SHEET_CLASSIFICATION,
+      STEP.DESEQ2_FORMULA,
     ].filter(isStepConfigured);
   }
 
