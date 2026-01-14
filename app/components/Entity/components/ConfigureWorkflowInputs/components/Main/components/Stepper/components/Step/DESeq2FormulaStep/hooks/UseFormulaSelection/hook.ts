@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { DEFAULT_SELECTION } from "./constants";
 import { FormulaSelection, UseFormulaSelection } from "./types";
 import { ConfiguredInput } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import {
@@ -17,8 +16,10 @@ import {
 export function useFormulaSelection(
   sampleSheetClassification: ConfiguredInput["sampleSheetClassification"]
 ): UseFormulaSelection {
-  const [selection, setSelection] =
-    useState<FormulaSelection>(DEFAULT_SELECTION);
+  const [selection, setSelection] = useState<FormulaSelection>({
+    covariates: new Set(),
+    primary: null,
+  });
 
   // Grab the columns that are relevant to the formula.
   const columns = useMemo(
@@ -41,7 +42,7 @@ export function useFormulaSelection(
 
   // Reset selection when classification changes.
   useEffect(() => {
-    setSelection(DEFAULT_SELECTION);
+    setSelection({ covariates: new Set(), primary: null });
   }, [sampleSheetClassification]);
 
   return {
