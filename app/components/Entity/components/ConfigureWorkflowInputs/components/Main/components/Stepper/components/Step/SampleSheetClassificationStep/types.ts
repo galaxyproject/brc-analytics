@@ -1,9 +1,6 @@
-export interface ColumnClassification {
-  columnName: string;
-  columnType: COLUMN_TYPE | null;
-}
+export type ClassificationMap = Map<string, COLUMN_TYPE | null>;
 
-export type ColumnClassifications = Map<string, COLUMN_TYPE | null>;
+export type ColumnClassifications = Record<string, COLUMN_TYPE | null>;
 
 export enum COLUMN_TYPE {
   BIOLOGICAL_FACTOR = "BIOLOGICAL_FACTOR",
@@ -13,5 +10,5 @@ export enum COLUMN_TYPE {
   OTHER_COVARIATE = "OTHER_COVARIATE",
   QC_ONLY = "QC_ONLY",
   REVERSE_FILE_PATH = "REVERSE_FILE_PATH",
-  TECHNICAL_BLOCKING = "TECHNICAL_BLOCKING",
+  TECHNICAL_BLOCKING_FACTOR = "TECHNICAL_BLOCKING_FACTOR",
 }

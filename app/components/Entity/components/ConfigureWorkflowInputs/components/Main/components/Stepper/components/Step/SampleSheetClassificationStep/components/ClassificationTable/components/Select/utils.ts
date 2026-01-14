@@ -10,9 +10,9 @@ const getUsedSingleSelectTypes = (
   classifications: ColumnClassifications
 ): Set<COLUMN_TYPE> =>
   new Set(
-    Array.from(classifications.values()).filter(
-      (type): type is COLUMN_TYPE =>
-        type !== null && SINGLE_SELECT_TYPES.has(type)
+    Object.values(classifications).filter(
+      (columnType): columnType is COLUMN_TYPE =>
+        columnType !== null && SINGLE_SELECT_TYPES.has(columnType)
     )
   );
 

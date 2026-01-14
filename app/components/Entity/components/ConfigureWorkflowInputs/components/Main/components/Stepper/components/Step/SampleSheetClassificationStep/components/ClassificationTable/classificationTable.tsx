@@ -7,6 +7,7 @@ import { Select } from "./components/Select/select";
 export const ClassificationTable = ({
   classifications,
   onClassify,
+  onConfigure,
 }: Props): JSX.Element => {
   return (
     <StyledTableContainer>
@@ -18,21 +19,20 @@ export const ClassificationTable = ({
           </TableRow>
         </TableHead>
         <TableBody>
-          {Array.from(classifications.entries()).map(
-            ([columnName, columnType]) => (
-              <TableRow key={columnName}>
-                <TableCell>{columnName}</TableCell>
-                <TableCell>
-                  <Select
-                    classifications={classifications}
-                    columnName={columnName}
-                    columnType={columnType}
-                    onClassify={onClassify}
-                  />
-                </TableCell>
-              </TableRow>
-            )
-          )}
+          {Object.entries(classifications).map(([columnName, columnType]) => (
+            <TableRow key={columnName}>
+              <TableCell>{columnName}</TableCell>
+              <TableCell>
+                <Select
+                  classifications={classifications}
+                  columnName={columnName}
+                  columnType={columnType}
+                  onClassify={onClassify}
+                  onConfigure={onConfigure}
+                />
+              </TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </GridTable>
     </StyledTableContainer>

@@ -4,10 +4,10 @@ import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/componen
 import { Button, Typography } from "@mui/material";
 import { StyledStepContent } from "./sampleSheetClassificationStep.styles";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
-import { STEP } from "./step";
 import { useColumnClassification } from "./hooks/UseColumnClassification/hook";
 import { ClassificationTable } from "./components/ClassificationTable/classificationTable";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
+import { STEP } from "./step";
 
 export const SampleSheetClassificationStep = ({
   active,
@@ -40,12 +40,13 @@ export const SampleSheetClassificationStep = ({
         <ClassificationTable
           classifications={classifications}
           onClassify={onClassify}
+          onConfigure={onConfigure}
         />
         <Button
           {...BUTTON_PROPS.PRIMARY_CONTAINED}
           disabled={!validation.valid}
           onClick={() => {
-            onConfigure({ [STEP.key]: Object.fromEntries(classifications) });
+            onConfigure({ [STEP.key]: classifications });
             onContinue();
           }}
         >

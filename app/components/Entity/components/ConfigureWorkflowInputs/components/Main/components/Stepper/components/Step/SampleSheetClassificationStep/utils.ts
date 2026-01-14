@@ -1,4 +1,4 @@
-import { ColumnClassifications, COLUMN_TYPE } from "./types";
+import { COLUMN_TYPE, ColumnClassifications } from "./types";
 
 export interface ValidationResult {
   errors: string[];
@@ -14,7 +14,7 @@ export function validateClassifications(
   classifications: ColumnClassifications
 ): ValidationResult {
   const errors: string[] = [];
-  const values = Array.from(classifications.values());
+  const values = Object.values(classifications);
 
   // Check all columns are classified
   const unclassifiedCount = values.filter((v) => v === null).length;
