@@ -19,7 +19,8 @@ export interface StepConfig {
 }
 
 export interface StepProps
-  extends Pick<StepConfig, "description" | "disabled">,
+  extends
+    Pick<StepConfig, "description" | "disabled">,
     Pick<MStepProps, "completed" | "last">,
     Required<Pick<MStepProps, "index" | "active">> {
   configuredInput: ConfiguredInput;
