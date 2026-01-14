@@ -43,11 +43,13 @@ export const SampleSheetStep = ({
           <input
             {...INPUT_PROPS}
             onChange={(e) => {
-              actions.onFileChange(e);
-              // File has changed, clear downstream values.
-              onConfigure({
-                designFormula: null,
-                sampleSheetClassification: undefined,
+              actions.onFileChange(e, {
+                onSuccess: () => {
+                  onConfigure({
+                    designFormula: null,
+                    sampleSheetClassification: undefined,
+                  });
+                },
               });
             }}
             ref={inputRef}

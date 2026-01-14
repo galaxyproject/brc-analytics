@@ -48,7 +48,7 @@ describe("useFilePicker", () => {
     const event = createMockFileChangeEvent(mockFile);
 
     act(() => {
-      result.current.actions.onFileChange(event);
+      result.current.actions.onFileChange(event, {});
     });
 
     expect(result.current.file).toBe(mockFile);
@@ -60,12 +60,15 @@ describe("useFilePicker", () => {
 
     // First set a file
     act(() => {
-      result.current.actions.onFileChange(createMockFileChangeEvent(mockFile));
+      result.current.actions.onFileChange(
+        createMockFileChangeEvent(mockFile),
+        {}
+      );
     });
 
     // Then trigger change with no file
     act(() => {
-      result.current.actions.onFileChange(createMockFileChangeEvent(null));
+      result.current.actions.onFileChange(createMockFileChangeEvent(null), {});
     });
 
     // File should remain unchanged
@@ -78,7 +81,10 @@ describe("useFilePicker", () => {
 
     // Set a file first
     act(() => {
-      result.current.actions.onFileChange(createMockFileChangeEvent(mockFile));
+      result.current.actions.onFileChange(
+        createMockFileChangeEvent(mockFile),
+        {}
+      );
     });
 
     expect(result.current.file).toBe(mockFile);
@@ -139,5 +145,97 @@ describe("useFilePicker", () => {
         result.current.actions.onClick();
       });
     }).not.toThrow();
+  });
+
+  test("onFileChange calls onSuccess when first file is selected", () => {
+    const { result } = renderHook(() => useFilePicker());
+    const mockFile = createMockFile("test.csv");
+    const onSuccess = jest.fn();
+
+    act(() => {
+      result.current.actions.onFileChange(createMockFileChangeEvent(mockFile), {
+        onSuccess,
+      });
+    });
+
+    expect(onSuccess).toHaveBeenCalledTimes(1);
+  });
+
+  test("onFileChange calls onSuccess when file changes", () => {
+    const { result } = renderHook(() => useFilePicker());
+    const firstFile = createMockFile("first.csv");
+    const secondFile = createMockFile("second.csv");
+    const onSuccess = jest.fn();
+
+    act(() => {
+      result.current.actions.onFileChange(
+        createMockFileChangeEvent(firstFile),
+        { onSuccess }
+      );
+    });
+
+    expect(onSuccess).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      result.current.actions.onFileChange(
+        createMockFileChangeEvent(secondFile),
+        { onSuccess }
+      );
+    });
+
+    expect(onSuccess).toHaveBeenCalledTimes(2);
+  });
+
+  test("onFileChange does not call onSuccess when same file is re-selected", () => {
+    const { result } = renderHook(() => useFilePicker());
+    const mockFile = createMockFile("test.csv");
+    const onSuccess = jest.fn();
+
+    act(() => {
+      result.current.actions.onFileChange(createMockFileChangeEvent(mockFile), {
+        onSuccess,
+      });
+    });
+
+    expect(onSuccess).toHaveBeenCalledTimes(1);
+
+    // Re-select the same file (same name, size, lastModified)
+    act(() => {
+      result.current.actions.onFileChange(createMockFileChangeEvent(mockFile), {
+        onSuccess,
+      });
+    });
+
+    // onSuccess should NOT be called again
+    expect(onSuccess).toHaveBeenCalledTimes(1);
+  });
+
+  test("onFileChange calls onSuccess after onClear and re-select", () => {
+    const { result } = renderHook(() => useFilePicker());
+    const mockFile = createMockFile("test.csv");
+    const onSuccess = jest.fn();
+
+    // Select file
+    act(() => {
+      result.current.actions.onFileChange(createMockFileChangeEvent(mockFile), {
+        onSuccess,
+      });
+    });
+
+    expect(onSuccess).toHaveBeenCalledTimes(1);
+
+    // Clear file
+    act(() => {
+      result.current.actions.onClear();
+    });
+
+    // Re-select the same file - should call onSuccess since we cleared
+    act(() => {
+      result.current.actions.onFileChange(createMockFileChangeEvent(mockFile), {
+        onSuccess,
+      });
+    });
+
+    expect(onSuccess).toHaveBeenCalledTimes(2);
   });
 });
