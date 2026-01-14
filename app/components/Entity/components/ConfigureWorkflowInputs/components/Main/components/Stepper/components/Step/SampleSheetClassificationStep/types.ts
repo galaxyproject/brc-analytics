@@ -1,9 +1,6 @@
-export interface ColumnClassification {
-  columnName: string;
-  columnType: COLUMN_TYPE | null;
-}
+export type ClassificationMap = Map<string, COLUMN_TYPE | null>;
 
-export type ColumnClassifications = Map<string, COLUMN_TYPE | null>;
+export type ColumnClassifications = Record<string, COLUMN_TYPE | null>;
 
 export enum COLUMN_TYPE {
   BIOLOGICAL_FACTOR = "BIOLOGICAL_FACTOR",

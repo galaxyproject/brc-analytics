@@ -1,14 +1,11 @@
-import { ColumnClassifications } from "../../types";
-import { COLUMN_TYPE } from "../../types";
+import { ClassificationMap, COLUMN_TYPE } from "../../types";
 
 /**
  * Creates initial classifications map with all columns set to null.
  * @param columnNames - Array of column names.
  * @returns Map of column names to null classifications.
  */
-export function initClassifications(
-  columnNames: string[]
-): ColumnClassifications {
+export function initClassifications(columnNames: string[]): ClassificationMap {
   return new Map(columnNames.map((name) => [name, null]));
 }
 
@@ -21,7 +18,7 @@ export function initClassifications(
 export function updateClassification(
   columnName: string,
   columnType: COLUMN_TYPE | null
-): (classifications: ColumnClassifications) => ColumnClassifications {
+): (classifications: ClassificationMap) => ClassificationMap {
   return (classifications) => {
     const next = new Map(classifications);
     next.set(columnName, columnType);

@@ -4,29 +4,29 @@ import { COLUMN_TYPE } from "../../../app/components/Entity/components/Configure
 
 describe("useColumnClassification", () => {
   describe("initialization", () => {
-    test("initializes with empty map when sampleSheet is undefined", () => {
+    test("initializes with empty object when sampleSheet is undefined", () => {
       const { result } = renderHook(() => useColumnClassification(undefined));
 
-      expect(result.current.classifications.size).toBe(0);
+      expect(Object.keys(result.current.classifications).length).toBe(0);
     });
 
-    test("initializes with empty map when sampleSheet is empty", () => {
+    test("initializes with empty object when sampleSheet is empty", () => {
       const { result } = renderHook(() => useColumnClassification([]));
 
-      expect(result.current.classifications.size).toBe(0);
+      expect(Object.keys(result.current.classifications).length).toBe(0);
     });
 
-    test("initializes classifications map from column names", () => {
+    test("initializes classifications from column names", () => {
       const sampleSheet = [
         { forward: "f1.fastq", sample_id: "S1", treatment: "control" },
       ];
 
       const { result } = renderHook(() => useColumnClassification(sampleSheet));
 
-      expect(result.current.classifications.size).toBe(3);
-      expect(result.current.classifications.get("sample_id")).toBeNull();
-      expect(result.current.classifications.get("treatment")).toBeNull();
-      expect(result.current.classifications.get("forward")).toBeNull();
+      expect(Object.keys(result.current.classifications).length).toBe(3);
+      expect(result.current.classifications.sample_id).toBeNull();
+      expect(result.current.classifications.treatment).toBeNull();
+      expect(result.current.classifications.forward).toBeNull();
     });
 
     test("all initial classifications are null", () => {
@@ -34,7 +34,7 @@ describe("useColumnClassification", () => {
 
       const { result } = renderHook(() => useColumnClassification(sampleSheet));
 
-      result.current.classifications.forEach((value) => {
+      Object.values(result.current.classifications).forEach((value) => {
         expect(value).toBeNull();
       });
     });
@@ -50,10 +50,10 @@ describe("useColumnClassification", () => {
         result.current.onClassify("sample_id", COLUMN_TYPE.IDENTIFIER);
       });
 
-      expect(result.current.classifications.get("sample_id")).toBe(
+      expect(result.current.classifications.sample_id).toBe(
         COLUMN_TYPE.IDENTIFIER
       );
-      expect(result.current.classifications.get("treatment")).toBeNull();
+      expect(result.current.classifications.treatment).toBeNull();
     });
 
     test("updates multiple classifications independently", () => {
@@ -73,13 +73,13 @@ describe("useColumnClassification", () => {
         result.current.onClassify("forward", COLUMN_TYPE.FORWARD_FILE_PATH);
       });
 
-      expect(result.current.classifications.get("sample_id")).toBe(
+      expect(result.current.classifications.sample_id).toBe(
         COLUMN_TYPE.IDENTIFIER
       );
-      expect(result.current.classifications.get("treatment")).toBe(
+      expect(result.current.classifications.treatment).toBe(
         COLUMN_TYPE.BIOLOGICAL_FACTOR
       );
-      expect(result.current.classifications.get("forward")).toBe(
+      expect(result.current.classifications.forward).toBe(
         COLUMN_TYPE.FORWARD_FILE_PATH
       );
     });
@@ -92,14 +92,14 @@ describe("useColumnClassification", () => {
       act(() => {
         result.current.onClassify("sample_id", COLUMN_TYPE.IDENTIFIER);
       });
-      expect(result.current.classifications.get("sample_id")).toBe(
+      expect(result.current.classifications.sample_id).toBe(
         COLUMN_TYPE.IDENTIFIER
       );
 
       act(() => {
         result.current.onClassify("sample_id", COLUMN_TYPE.IGNORED);
       });
-      expect(result.current.classifications.get("sample_id")).toBe(
+      expect(result.current.classifications.sample_id).toBe(
         COLUMN_TYPE.IGNORED
       );
     });
@@ -196,29 +196,27 @@ describe("useColumnClassification", () => {
       );
 
       // Initially has 2 columns
-      expect(result.current.classifications.size).toBe(2);
-      expect(result.current.classifications.has("col1")).toBe(true);
-      expect(result.current.classifications.has("col2")).toBe(true);
+      expect(Object.keys(result.current.classifications).length).toBe(2);
+      expect("col1" in result.current.classifications).toBe(true);
+      expect("col2" in result.current.classifications).toBe(true);
 
       // Classify a column
       act(() => {
         result.current.onClassify("col1", COLUMN_TYPE.IDENTIFIER);
       });
-      expect(result.current.classifications.get("col1")).toBe(
-        COLUMN_TYPE.IDENTIFIER
-      );
+      expect(result.current.classifications.col1).toBe(COLUMN_TYPE.IDENTIFIER);
 
       // Change sample sheet
       rerender({ sampleSheet: newSampleSheet });
 
       // Should have new columns, all null
-      expect(result.current.classifications.size).toBe(3);
-      expect(result.current.classifications.has("col3")).toBe(true);
-      expect(result.current.classifications.has("col4")).toBe(true);
-      expect(result.current.classifications.has("col5")).toBe(true);
-      expect(result.current.classifications.get("col3")).toBeNull();
-      expect(result.current.classifications.get("col4")).toBeNull();
-      expect(result.current.classifications.get("col5")).toBeNull();
+      expect(Object.keys(result.current.classifications).length).toBe(3);
+      expect("col3" in result.current.classifications).toBe(true);
+      expect("col4" in result.current.classifications).toBe(true);
+      expect("col5" in result.current.classifications).toBe(true);
+      expect(result.current.classifications.col3).toBeNull();
+      expect(result.current.classifications.col4).toBeNull();
+      expect(result.current.classifications.col5).toBeNull();
     });
   });
 });

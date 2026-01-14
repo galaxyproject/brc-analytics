@@ -13,12 +13,17 @@ export const Select = ({
   columnName,
   columnType,
   onClassify,
+  onConfigure,
 }: Props): JSX.Element => {
   return (
     <StyledSelect
       {...SELECT_PROPS}
       displayEmpty
-      onChange={(e) => onClassify(columnName, e.target.value as COLUMN_TYPE)}
+      onChange={(e) => {
+        onClassify(columnName, e.target.value as COLUMN_TYPE);
+        // Any change in classification should result in the design formula being cleared.
+        onConfigure({ designFormula: null });
+      }}
       renderValue={renderValue}
       value={columnType ?? ""}
     >

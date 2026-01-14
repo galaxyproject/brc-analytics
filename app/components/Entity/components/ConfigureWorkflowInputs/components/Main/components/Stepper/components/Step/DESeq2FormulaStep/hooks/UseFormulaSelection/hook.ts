@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { DEFAULT_SELECTION } from "./constants";
 import { FormulaSelection, UseFormulaSelection } from "./types";
 import { ConfiguredInput } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
@@ -38,6 +38,11 @@ export function useFormulaSelection(
   const onToggleCovariate = useCallback((columnName: string): void => {
     setSelection(toggleCovariate(columnName));
   }, []);
+
+  // Reset selection when classification changes.
+  useEffect(() => {
+    setSelection(DEFAULT_SELECTION);
+  }, [sampleSheetClassification]);
 
   return {
     columns,

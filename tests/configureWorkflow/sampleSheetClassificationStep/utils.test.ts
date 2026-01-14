@@ -2,16 +2,19 @@ import {
   getColumnNames,
   validateClassifications,
 } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/utils";
-import { COLUMN_TYPE } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
+import {
+  COLUMN_TYPE,
+  ColumnClassifications,
+} from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 
 describe("validateClassifications", () => {
   test("returns valid when all requirements are met", () => {
-    const classifications = new Map<string, COLUMN_TYPE | null>([
-      ["sample_id", COLUMN_TYPE.IDENTIFIER],
-      ["forward_path", COLUMN_TYPE.FORWARD_FILE_PATH],
-      ["reverse_path", COLUMN_TYPE.REVERSE_FILE_PATH],
-      ["treatment", COLUMN_TYPE.BIOLOGICAL_FACTOR],
-    ]);
+    const classifications: ColumnClassifications = {
+      forward_path: COLUMN_TYPE.FORWARD_FILE_PATH,
+      reverse_path: COLUMN_TYPE.REVERSE_FILE_PATH,
+      sample_id: COLUMN_TYPE.IDENTIFIER,
+      treatment: COLUMN_TYPE.BIOLOGICAL_FACTOR,
+    };
 
     const result = validateClassifications(classifications);
 
@@ -20,13 +23,13 @@ describe("validateClassifications", () => {
   });
 
   test("returns valid with multiple biological factors", () => {
-    const classifications = new Map<string, COLUMN_TYPE | null>([
-      ["sample_id", COLUMN_TYPE.IDENTIFIER],
-      ["forward_path", COLUMN_TYPE.FORWARD_FILE_PATH],
-      ["reverse_path", COLUMN_TYPE.REVERSE_FILE_PATH],
-      ["treatment", COLUMN_TYPE.BIOLOGICAL_FACTOR],
-      ["condition", COLUMN_TYPE.BIOLOGICAL_FACTOR],
-    ]);
+    const classifications: ColumnClassifications = {
+      condition: COLUMN_TYPE.BIOLOGICAL_FACTOR,
+      forward_path: COLUMN_TYPE.FORWARD_FILE_PATH,
+      reverse_path: COLUMN_TYPE.REVERSE_FILE_PATH,
+      sample_id: COLUMN_TYPE.IDENTIFIER,
+      treatment: COLUMN_TYPE.BIOLOGICAL_FACTOR,
+    };
 
     const result = validateClassifications(classifications);
 
@@ -35,16 +38,16 @@ describe("validateClassifications", () => {
   });
 
   test("returns valid with optional column types", () => {
-    const classifications = new Map<string, COLUMN_TYPE | null>([
-      ["sample_id", COLUMN_TYPE.IDENTIFIER],
-      ["forward_path", COLUMN_TYPE.FORWARD_FILE_PATH],
-      ["reverse_path", COLUMN_TYPE.REVERSE_FILE_PATH],
-      ["treatment", COLUMN_TYPE.BIOLOGICAL_FACTOR],
-      ["batch", COLUMN_TYPE.TECHNICAL_BLOCKING_FACTOR],
-      ["covariate", COLUMN_TYPE.OTHER_COVARIATE],
-      ["qc_metric", COLUMN_TYPE.QC_ONLY],
-      ["notes", COLUMN_TYPE.IGNORED],
-    ]);
+    const classifications: ColumnClassifications = {
+      batch: COLUMN_TYPE.TECHNICAL_BLOCKING_FACTOR,
+      covariate: COLUMN_TYPE.OTHER_COVARIATE,
+      forward_path: COLUMN_TYPE.FORWARD_FILE_PATH,
+      notes: COLUMN_TYPE.IGNORED,
+      qc_metric: COLUMN_TYPE.QC_ONLY,
+      reverse_path: COLUMN_TYPE.REVERSE_FILE_PATH,
+      sample_id: COLUMN_TYPE.IDENTIFIER,
+      treatment: COLUMN_TYPE.BIOLOGICAL_FACTOR,
+    };
 
     const result = validateClassifications(classifications);
 
@@ -53,12 +56,12 @@ describe("validateClassifications", () => {
   });
 
   test("returns error when columns are not classified", () => {
-    const classifications = new Map<string, COLUMN_TYPE | null>([
-      ["sample_id", COLUMN_TYPE.IDENTIFIER],
-      ["forward_path", COLUMN_TYPE.FORWARD_FILE_PATH],
-      ["reverse_path", COLUMN_TYPE.REVERSE_FILE_PATH],
-      ["treatment", null],
-    ]);
+    const classifications: ColumnClassifications = {
+      forward_path: COLUMN_TYPE.FORWARD_FILE_PATH,
+      reverse_path: COLUMN_TYPE.REVERSE_FILE_PATH,
+      sample_id: COLUMN_TYPE.IDENTIFIER,
+      treatment: null,
+    };
 
     const result = validateClassifications(classifications);
 
@@ -67,12 +70,12 @@ describe("validateClassifications", () => {
   });
 
   test("returns error when multiple columns are not classified", () => {
-    const classifications = new Map<string, COLUMN_TYPE | null>([
-      ["sample_id", null],
-      ["forward_path", null],
-      ["reverse_path", null],
-      ["treatment", null],
-    ]);
+    const classifications: ColumnClassifications = {
+      forward_path: null,
+      reverse_path: null,
+      sample_id: null,
+      treatment: null,
+    };
 
     const result = validateClassifications(classifications);
 
@@ -81,12 +84,12 @@ describe("validateClassifications", () => {
   });
 
   test("returns error when no identifier is specified", () => {
-    const classifications = new Map<string, COLUMN_TYPE | null>([
-      ["sample_id", COLUMN_TYPE.IGNORED],
-      ["forward_path", COLUMN_TYPE.FORWARD_FILE_PATH],
-      ["reverse_path", COLUMN_TYPE.REVERSE_FILE_PATH],
-      ["treatment", COLUMN_TYPE.BIOLOGICAL_FACTOR],
-    ]);
+    const classifications: ColumnClassifications = {
+      forward_path: COLUMN_TYPE.FORWARD_FILE_PATH,
+      reverse_path: COLUMN_TYPE.REVERSE_FILE_PATH,
+      sample_id: COLUMN_TYPE.IGNORED,
+      treatment: COLUMN_TYPE.BIOLOGICAL_FACTOR,
+    };
 
     const result = validateClassifications(classifications);
 
@@ -95,13 +98,13 @@ describe("validateClassifications", () => {
   });
 
   test("returns error when multiple identifiers are specified", () => {
-    const classifications = new Map<string, COLUMN_TYPE | null>([
-      ["sample_id", COLUMN_TYPE.IDENTIFIER],
-      ["other_id", COLUMN_TYPE.IDENTIFIER],
-      ["forward_path", COLUMN_TYPE.FORWARD_FILE_PATH],
-      ["reverse_path", COLUMN_TYPE.REVERSE_FILE_PATH],
-      ["treatment", COLUMN_TYPE.BIOLOGICAL_FACTOR],
-    ]);
+    const classifications: ColumnClassifications = {
+      forward_path: COLUMN_TYPE.FORWARD_FILE_PATH,
+      other_id: COLUMN_TYPE.IDENTIFIER,
+      reverse_path: COLUMN_TYPE.REVERSE_FILE_PATH,
+      sample_id: COLUMN_TYPE.IDENTIFIER,
+      treatment: COLUMN_TYPE.BIOLOGICAL_FACTOR,
+    };
 
     const result = validateClassifications(classifications);
 
@@ -110,12 +113,12 @@ describe("validateClassifications", () => {
   });
 
   test("returns error when no forward file path is specified", () => {
-    const classifications = new Map<string, COLUMN_TYPE | null>([
-      ["sample_id", COLUMN_TYPE.IDENTIFIER],
-      ["forward_path", COLUMN_TYPE.IGNORED],
-      ["reverse_path", COLUMN_TYPE.REVERSE_FILE_PATH],
-      ["treatment", COLUMN_TYPE.BIOLOGICAL_FACTOR],
-    ]);
+    const classifications: ColumnClassifications = {
+      forward_path: COLUMN_TYPE.IGNORED,
+      reverse_path: COLUMN_TYPE.REVERSE_FILE_PATH,
+      sample_id: COLUMN_TYPE.IDENTIFIER,
+      treatment: COLUMN_TYPE.BIOLOGICAL_FACTOR,
+    };
 
     const result = validateClassifications(classifications);
 
@@ -124,13 +127,13 @@ describe("validateClassifications", () => {
   });
 
   test("returns error when multiple forward file paths are specified", () => {
-    const classifications = new Map<string, COLUMN_TYPE | null>([
-      ["sample_id", COLUMN_TYPE.IDENTIFIER],
-      ["forward_path1", COLUMN_TYPE.FORWARD_FILE_PATH],
-      ["forward_path2", COLUMN_TYPE.FORWARD_FILE_PATH],
-      ["reverse_path", COLUMN_TYPE.REVERSE_FILE_PATH],
-      ["treatment", COLUMN_TYPE.BIOLOGICAL_FACTOR],
-    ]);
+    const classifications: ColumnClassifications = {
+      forward_path1: COLUMN_TYPE.FORWARD_FILE_PATH,
+      forward_path2: COLUMN_TYPE.FORWARD_FILE_PATH,
+      reverse_path: COLUMN_TYPE.REVERSE_FILE_PATH,
+      sample_id: COLUMN_TYPE.IDENTIFIER,
+      treatment: COLUMN_TYPE.BIOLOGICAL_FACTOR,
+    };
 
     const result = validateClassifications(classifications);
 
@@ -141,12 +144,12 @@ describe("validateClassifications", () => {
   });
 
   test("returns error when no reverse file path is specified", () => {
-    const classifications = new Map<string, COLUMN_TYPE | null>([
-      ["sample_id", COLUMN_TYPE.IDENTIFIER],
-      ["forward_path", COLUMN_TYPE.FORWARD_FILE_PATH],
-      ["reverse_path", COLUMN_TYPE.IGNORED],
-      ["treatment", COLUMN_TYPE.BIOLOGICAL_FACTOR],
-    ]);
+    const classifications: ColumnClassifications = {
+      forward_path: COLUMN_TYPE.FORWARD_FILE_PATH,
+      reverse_path: COLUMN_TYPE.IGNORED,
+      sample_id: COLUMN_TYPE.IDENTIFIER,
+      treatment: COLUMN_TYPE.BIOLOGICAL_FACTOR,
+    };
 
     const result = validateClassifications(classifications);
 
@@ -155,13 +158,13 @@ describe("validateClassifications", () => {
   });
 
   test("returns error when multiple reverse file paths are specified", () => {
-    const classifications = new Map<string, COLUMN_TYPE | null>([
-      ["sample_id", COLUMN_TYPE.IDENTIFIER],
-      ["forward_path", COLUMN_TYPE.FORWARD_FILE_PATH],
-      ["reverse_path1", COLUMN_TYPE.REVERSE_FILE_PATH],
-      ["reverse_path2", COLUMN_TYPE.REVERSE_FILE_PATH],
-      ["treatment", COLUMN_TYPE.BIOLOGICAL_FACTOR],
-    ]);
+    const classifications: ColumnClassifications = {
+      forward_path: COLUMN_TYPE.FORWARD_FILE_PATH,
+      reverse_path1: COLUMN_TYPE.REVERSE_FILE_PATH,
+      reverse_path2: COLUMN_TYPE.REVERSE_FILE_PATH,
+      sample_id: COLUMN_TYPE.IDENTIFIER,
+      treatment: COLUMN_TYPE.BIOLOGICAL_FACTOR,
+    };
 
     const result = validateClassifications(classifications);
 
@@ -172,12 +175,12 @@ describe("validateClassifications", () => {
   });
 
   test("returns error when no biological factor is specified", () => {
-    const classifications = new Map<string, COLUMN_TYPE | null>([
-      ["sample_id", COLUMN_TYPE.IDENTIFIER],
-      ["forward_path", COLUMN_TYPE.FORWARD_FILE_PATH],
-      ["reverse_path", COLUMN_TYPE.REVERSE_FILE_PATH],
-      ["treatment", COLUMN_TYPE.IGNORED],
-    ]);
+    const classifications: ColumnClassifications = {
+      forward_path: COLUMN_TYPE.FORWARD_FILE_PATH,
+      reverse_path: COLUMN_TYPE.REVERSE_FILE_PATH,
+      sample_id: COLUMN_TYPE.IDENTIFIER,
+      treatment: COLUMN_TYPE.IGNORED,
+    };
 
     const result = validateClassifications(classifications);
 
@@ -188,12 +191,12 @@ describe("validateClassifications", () => {
   });
 
   test("returns multiple errors when multiple requirements are not met", () => {
-    const classifications = new Map<string, COLUMN_TYPE | null>([
-      ["sample_id", null],
-      ["forward_path", null],
-      ["reverse_path", null],
-      ["treatment", null],
-    ]);
+    const classifications: ColumnClassifications = {
+      forward_path: null,
+      reverse_path: null,
+      sample_id: null,
+      treatment: null,
+    };
 
     const result = validateClassifications(classifications);
 
@@ -209,7 +212,7 @@ describe("validateClassifications", () => {
   });
 
   test("returns errors for empty classifications", () => {
-    const classifications = new Map<string, COLUMN_TYPE | null>();
+    const classifications: ColumnClassifications = {};
 
     const result = validateClassifications(classifications);
 
