@@ -1,7 +1,9 @@
 import { useCallback, useMemo, useState } from "react";
 import { COLUMN_TYPE } from "../../../SampleSheetClassificationStep/types";
-import { DEFAULT_SELECTION, FORMULA_COLUMN_TYPES } from "./constants";
-import { FormulaColumn, FormulaSelection, UseFormulaSelection } from "./types";
+import { DEFAULT_SELECTION } from "./constants";
+import { FormulaSelection, UseFormulaSelection } from "./types";
+import { ConfiguredInput } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { getFormulaColumns } from "./utils";
 
 /**
  * Hook for managing DESeq2 formula selection.
@@ -9,24 +11,16 @@ import { FormulaColumn, FormulaSelection, UseFormulaSelection } from "./types";
  * @returns Formula selection state and handlers.
  */
 export function useFormulaSelection(
-  sampleSheetClassification: Record<string, COLUMN_TYPE | null> | undefined
+  sampleSheetClassification: ConfiguredInput["sampleSheetClassification"]
 ): UseFormulaSelection {
   const [selection, setSelection] =
     useState<FormulaSelection>(DEFAULT_SELECTION);
 
   // Filter columns to only those relevant for the formula
-  const columns = useMemo((): FormulaColumn[] => {
-    if (!sampleSheetClassification) return [];
-    return Object.entries(sampleSheetClassification)
-      .filter(
-        (entry): entry is [string, COLUMN_TYPE] =>
-          entry[1] !== null && FORMULA_COLUMN_TYPES.has(entry[1])
-      )
-      .map(([columnName, columnType]) => ({
-        columnName,
-        columnType,
-      }));
-  }, [sampleSheetClassification]);
+  const columns = useMemo(
+    () => getFormulaColumns(sampleSheetClassification),
+    [sampleSheetClassification]
+  );
 
   // Handle primary selection (radio button)
   const onSelectPrimary = useCallback((columnName: string): void => {
