@@ -43,6 +43,7 @@ export const Table = ({
                 <TableCell>{COLUMN_TYPE_LABEL.get(columnType)}</TableCell>
                 <TableCell>
                   <Radio
+                    aria-label={`Select ${columnName} as primary factor`}
                     checked={isPrimary}
                     checkedIcon={<RadioCheckedIcon />}
                     icon={<RadioUncheckedIcon />}
@@ -51,6 +52,7 @@ export const Table = ({
                 </TableCell>
                 <TableCell>
                   <Checkbox
+                    aria-label={`Include ${columnName} as covariate`}
                     checked={isCovariate}
                     checkedIcon={<CheckedIcon />}
                     disabled={isPrimary}
