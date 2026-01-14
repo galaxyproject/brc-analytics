@@ -1,5 +1,11 @@
 import { COLUMN_TYPE } from "../../../SampleSheetClassificationStep/types";
 
+export interface CategorizedCovariates {
+  biologicalFactors: string[];
+  otherCovariates: string[];
+  technicalBlocking: string[];
+}
+
 export interface FormulaColumn {
   columnName: string;
   columnType: COLUMN_TYPE;
