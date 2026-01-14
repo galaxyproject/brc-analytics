@@ -42,7 +42,14 @@ export const SampleSheetStep = ({
         <StyledGrid>
           <input
             {...INPUT_PROPS}
-            onChange={actions.onFileChange}
+            onChange={(e) => {
+              actions.onFileChange(e);
+              // File has changed, clear downstream values.
+              onConfigure({
+                designFormula: null,
+                sampleSheetClassification: undefined,
+              });
+            }}
             ref={inputRef}
           />
           <Dropzone onClick={actions.onClick} />
