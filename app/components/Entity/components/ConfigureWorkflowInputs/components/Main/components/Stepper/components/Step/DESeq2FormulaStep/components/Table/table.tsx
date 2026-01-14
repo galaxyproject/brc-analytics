@@ -28,7 +28,7 @@ export const Table = ({
         <TableHead>
           <TableRow>
             <TableCell>Column name</TableCell>
-            <TableCell>Type</TableCell>
+            <TableCell>Factor Type</TableCell>
             <TableCell>Primary</TableCell>
             <TableCell>Covariate</TableCell>
           </TableRow>
