@@ -87,5 +87,5 @@ export function updatePairUpdater(
  * @returns True if at least one valid pair exists.
  */
 export function validatePairs(pairs: ContrastPairs): boolean {
-  return [...pairs.values()].some(([a, b]) => a && b && a !== b);
+  return getValidPairs(pairs).length > 0;
 }
