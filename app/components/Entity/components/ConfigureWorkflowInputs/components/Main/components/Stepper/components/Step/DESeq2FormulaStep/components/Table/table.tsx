@@ -18,6 +18,7 @@ import { UncheckedDisabledIcon } from "@databiosphere/findable-ui/lib/components
 
 export const Table = ({
   columns,
+  onConfigure,
   onSelectPrimary,
   onToggleCovariate,
   selection,
@@ -47,7 +48,13 @@ export const Table = ({
                     checked={isPrimary}
                     checkedIcon={<RadioCheckedIcon />}
                     icon={<RadioUncheckedIcon />}
-                    onChange={() => onSelectPrimary(columnName)}
+                    onChange={() => {
+                      onSelectPrimary(columnName);
+                      onConfigure({
+                        primaryContrasts: null,
+                        primaryFactor: columnName,
+                      });
+                    }}
                   />
                 </TableCell>
                 <TableCell>

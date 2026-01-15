@@ -11,6 +11,7 @@ import { RELATED_TRACKS_STEP } from "../components/Step/RelatedTracksStep/step";
 import { STEP as SAMPLE_SHEET_STEP } from "../components/Step/SampleSheetStep/step";
 import { STEP as SAMPLE_SHEET_CLASSIFICATION_STEP } from "../components/Step/SampleSheetClassificationStep/step";
 import { STEP as DESEQ2_FORMULA_STEP } from "../components/Step/DESeq2FormulaStep/step";
+import { STEP as PRIMARY_CONTRASTS_STEP } from "../components/Step/PrimaryContrastsStep/step";
 
 export const SEQUENCING_STEPS: Record<string, StepConfig> = {
   readRunsPaired: PAIRED_END_STEP,
@@ -20,6 +21,7 @@ export const SEQUENCING_STEPS: Record<string, StepConfig> = {
 export const STEP: Record<
   | WORKFLOW_PARAMETER_VARIABLE
   | "DESEQ2_FORMULA"
+  | "PRIMARY_CONTRASTS"
   | "READ_RUN_ANY"
   | "RELATED_TRACKS"
   | "SAMPLE_SHEET"
@@ -32,6 +34,7 @@ export const STEP: Record<
   [WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE]: SINGLE_END_STEP,
   [WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_PAIRED]: PAIRED_END_STEP,
   DESEQ2_FORMULA: DESEQ2_FORMULA_STEP,
+  PRIMARY_CONTRASTS: PRIMARY_CONTRASTS_STEP,
   READ_RUN_ANY: ANY_END_STEP,
   RELATED_TRACKS: RELATED_TRACKS_STEP,
   SAMPLE_SHEET: SAMPLE_SHEET_STEP,

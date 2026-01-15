@@ -7,6 +7,10 @@ export const StyledStepContent = styled(StepContent)`
       > .MuiGrid-root {
         gap: 0;
         padding: 0;
+
+        .MuiDivider-root {
+          width: 100%;
+        }
       }
     }
   }
