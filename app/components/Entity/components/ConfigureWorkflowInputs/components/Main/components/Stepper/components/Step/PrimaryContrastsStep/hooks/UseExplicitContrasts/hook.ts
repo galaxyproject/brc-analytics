@@ -3,6 +3,7 @@ import { ConfiguredInput } from "../../../../../../../../../../../../../views/Wo
 import { ContrastPairs, UseExplicitContrasts } from "./types";
 import {
   addPairUpdater,
+  buildExplicitContrasts,
   createInitialPairs,
   getNextId,
   removePairUpdater,
@@ -20,6 +21,11 @@ export function useExplicitContrasts(
   primaryFactor: ConfiguredInput["primaryFactor"]
 ): UseExplicitContrasts {
   const [pairs, setPairs] = useState<ContrastPairs>(createInitialPairs);
+
+  const primaryContrasts = useMemo(
+    () => buildExplicitContrasts(pairs),
+    [pairs]
+  );
 
   const valid = useMemo(() => validatePairs(pairs), [pairs]);
 
@@ -47,6 +53,7 @@ export function useExplicitContrasts(
     onRemovePair,
     onUpdatePair,
     pairs,
+    primaryContrasts,
     valid,
   };
 }

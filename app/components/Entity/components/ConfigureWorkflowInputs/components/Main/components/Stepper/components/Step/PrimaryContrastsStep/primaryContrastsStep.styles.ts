@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepContent/stepContent";
+import { Stack } from "@mui/material";
 
 export const StyledStepContent = styled(StepContent)`
   && {
@@ -14,4 +15,9 @@ export const StyledStepContent = styled(StepContent)`
       }
     }
   }
+`;
+
+export const StyledStack = styled(Stack)`
+  align-items: flex-start;
+  width: 100%;
 `;
