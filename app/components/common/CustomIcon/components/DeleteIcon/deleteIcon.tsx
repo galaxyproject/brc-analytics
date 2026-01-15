@@ -1,7 +1,7 @@
 import { SvgIcon, SvgIconProps } from "@mui/material";
 
 /**
- * Custom file upload icon.
+ * Custom delete icon.
  */
 
 export const DeleteIcon = ({
