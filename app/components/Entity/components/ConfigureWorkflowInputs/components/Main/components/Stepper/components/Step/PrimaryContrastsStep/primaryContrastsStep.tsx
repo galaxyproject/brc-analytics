@@ -50,6 +50,7 @@ export const PrimaryContrastsStep = ({
           <RadioGroup {...radioGroup} />
           <ExplicitPairs
             factorValues={factorValues}
+            mode={radioGroup.value}
             onAddPair={onAddPair}
             onRemovePair={onRemovePair}
             onUpdatePair={onUpdatePair}

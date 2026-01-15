@@ -6,14 +6,17 @@ import { PairRow } from "./components/PairRow/pairRow";
 import { Button, Typography } from "@mui/material";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
+import { CONTRAST_MODE } from "../../hooks/UseRadioGroup/types";
 
 export const ExplicitPairs = ({
   factorValues,
+  mode,
   onAddPair,
   onRemovePair,
   onUpdatePair,
   pairs,
-}: Props): JSX.Element => {
+}: Props): JSX.Element | null => {
+  if (mode !== CONTRAST_MODE.EXPLICIT) return null;
   return (
     <StyledStack gap={4} useFlexGap>
       <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_500}>
