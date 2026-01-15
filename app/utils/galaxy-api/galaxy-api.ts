@@ -337,7 +337,7 @@ function buildAssemblyFastaRequestValue(
   return {
     dbKey: referenceGenome,
     ext: "fasta.gz",
-    hashes: hashes || undefined,
+    hashes,
     url,
   };
 }
@@ -352,7 +352,7 @@ function buildGeneModelUrlRequestValue(
   return {
     dbKey: referenceGenome,
     ext: "gtf.gz",
-    hashes: hashes || undefined,
+    hashes,
     url: geneModelUrl,
   };
 }

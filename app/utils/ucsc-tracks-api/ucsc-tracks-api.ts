@@ -119,11 +119,7 @@ async function getMd5SumUrl(assembly: string): Promise<string | undefined> {
     if (!filesData) return undefined;
 
     // Check if the response contains urlList (the UCSC API format)
-    if (
-      !filesData ||
-      typeof filesData !== "object" ||
-      !("urlList" in filesData)
-    ) {
+    if (typeof filesData !== "object" || !("urlList" in filesData)) {
       console.warn(
         `Unexpected response format from files API for assembly ${assembly}`
       );
