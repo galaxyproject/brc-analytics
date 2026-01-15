@@ -7,7 +7,6 @@ import { StyledGrid } from "./sampleSheetStep.styles";
 import { Fragment } from "react";
 import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Optional/optional";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
-import { STEP } from "./step";
 import { useFilePicker } from "./hooks/UseFilePicker/hook";
 import { INPUT_PROPS } from "./constants";
 import { Dropzone } from "./components/Dropzone/dropzone";
@@ -42,7 +41,21 @@ export const SampleSheetStep = ({
         <StyledGrid>
           <input
             {...INPUT_PROPS}
-            onChange={actions.onFileChange}
+            onChange={(e) => {
+              actions.onFileChange(e, {
+                onSuccess: async (selectedFile) => {
+                  try {
+                    onConfigure({
+                      designFormula: null,
+                      sampleSheet: (await parseFile(selectedFile)).rows,
+                      sampleSheetClassification: undefined,
+                    });
+                  } catch (error) {
+                    console.error("Failed to parse file:", error);
+                  }
+                },
+              });
+            }}
             ref={inputRef}
           />
           <Dropzone onClick={actions.onClick} />
@@ -50,15 +63,7 @@ export const SampleSheetStep = ({
           <Button
             {...BUTTON_PROPS.PRIMARY_CONTAINED}
             disabled={!file}
-            onClick={async () => {
-              if (!file) return;
-              try {
-                onConfigure({ [STEP.key]: (await parseFile(file)).rows });
-                onContinue();
-              } catch (error) {
-                console.error("Failed to parse file:", error);
-              }
-            }}
+            onClick={onContinue}
           >
             Continue
           </Button>
