@@ -11,6 +11,7 @@ import { Table } from "./components/Table/table";
 import { Alert } from "./components/Alert/alert";
 import { useFormulaSelection } from "./hooks/UseFormulaSelection/hook";
 import { Fragment } from "react";
+import { StyledStack } from "../step.styles";
 
 export const DESeq2FormulaStep = ({
   active,
@@ -45,26 +46,34 @@ export const DESeq2FormulaStep = ({
         {entryLabel}
       </StepLabel>
       <StyledStepContent>
-        <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400_2_LINES}>
-          Select one primary factor and zero or more covariates.
-        </Typography>
+        <StyledStack>
+          <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400_2_LINES}>
+            Select one primary factor and zero or more covariates.
+          </Typography>
+        </StyledStack>
         <Table
           columns={columns}
           onSelectPrimary={onSelectPrimary}
           onToggleCovariate={onToggleCovariate}
           selection={selection}
         />
-        <Alert formula={formula} />
-        <Button
-          {...BUTTON_PROPS.PRIMARY_CONTAINED}
-          disabled={!valid}
-          onClick={() => {
-            onConfigure({ [STEP.key]: formula });
-            onContinue();
-          }}
-        >
-          Continue
-        </Button>
+        <StyledStack gap={6} useFlexGap>
+          <Alert formula={formula} />
+          <Button
+            {...BUTTON_PROPS.PRIMARY_CONTAINED}
+            disabled={!valid}
+            onClick={() => {
+              onConfigure({
+                [STEP.key]: formula,
+                primaryContrasts: null,
+                primaryFactor: selection.primary,
+              });
+              onContinue();
+            }}
+          >
+            Continue
+          </Button>
+        </StyledStack>
       </StyledStepContent>
     </Step>
   );
