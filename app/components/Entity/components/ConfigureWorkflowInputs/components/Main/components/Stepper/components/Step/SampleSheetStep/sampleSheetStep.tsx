@@ -47,6 +47,8 @@ export const SampleSheetStep = ({
                   try {
                     onConfigure({
                       designFormula: null,
+                      primaryContrasts: null,
+                      primaryFactor: null,
                       sampleSheet: (await parseFile(selectedFile)).rows,
                       sampleSheetClassification: undefined,
                     });
