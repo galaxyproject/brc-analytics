@@ -521,11 +521,11 @@ function buildUcscTracksRequestValues(
   for (const track of tracks) {
     values.push({
       ext: getUcscBigDataExt(track.bigDataUrl),
-      identifier: track.shortLabel,
-      url: track.bigDataUrl,
       hashes: track.md5Hash
         ? [{ hash_function: "MD5", hash_value: track.md5Hash }]
         : undefined,
+      identifier: track.shortLabel,
+      url: track.bigDataUrl,
     });
   }
   return values;
