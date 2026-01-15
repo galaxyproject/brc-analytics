@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { Button, Divider } from "@mui/material";
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
@@ -26,10 +26,6 @@ export const PrimaryContrastsStep = ({
   onEdit,
 }: StepProps): JSX.Element => {
   const radioGroup = useRadioGroup(CONTRAST_MODE.EXPLICIT);
-
-  useEffect(() => {
-    console.log(configuredInput);
-  }, [configuredInput]);
 
   const factorValues = useMemo(
     () => getUniqueFactorValues(configuredInput),
