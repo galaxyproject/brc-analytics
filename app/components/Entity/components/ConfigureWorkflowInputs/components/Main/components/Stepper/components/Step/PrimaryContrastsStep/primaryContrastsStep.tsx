@@ -9,7 +9,11 @@ import { STEP } from "./step";
 import { RadioGroup } from "./components/RadioGroup/radioGroup";
 import { ExplicitPairs } from "./components/ExplicitPairs/explicitPairs";
 import { useExplicitContrasts } from "./hooks/UseExplicitContrasts/hook";
-import { getUniqueFactorValues } from "./utils";
+import {
+  buildPrimaryContrasts,
+  getUniqueFactorValues,
+  isDisabled,
+} from "./utils";
 import { getValidPairs } from "./hooks/UseExplicitContrasts/utils";
 import { useRadioGroup } from "../hooks/UseRadioGroup/hook";
 import { CONTRAST_MODE } from "./hooks/UseRadioGroup/types";
@@ -25,7 +29,7 @@ export const PrimaryContrastsStep = ({
   onContinue,
   onEdit,
 }: StepProps): JSX.Element => {
-  const radioGroup = useRadioGroup(CONTRAST_MODE.EXPLICIT);
+  const radioGroup = useRadioGroup(CONTRAST_MODE.ALL_AGAINST_ALL);
 
   const factorValues = useMemo(
     () => getUniqueFactorValues(configuredInput),
@@ -61,13 +65,13 @@ export const PrimaryContrastsStep = ({
         <StyledStack>
           <Button
             {...BUTTON_PROPS.PRIMARY_CONTAINED}
-            disabled={!valid}
+            disabled={isDisabled(radioGroup.value, valid)}
             onClick={() => {
               onConfigure({
-                [STEP.key]: {
-                  pairs: getValidPairs(pairs),
-                  type: radioGroup.value,
-                },
+                [STEP.key]: buildPrimaryContrasts(
+                  radioGroup.value,
+                  getValidPairs(pairs)
+                ),
               });
               onContinue();
             }}
