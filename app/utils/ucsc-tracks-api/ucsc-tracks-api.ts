@@ -11,9 +11,12 @@ const TRACKS_API_URL = "https://api.genome.ucsc.edu/list/tracks";
 export async function getAssemblyTracks(
   assembly: string
 ): Promise<UcscTrackNode[]> {
-  // Get object containing tracks from API
+  // Get object containing tracks from API and MD5 checksums
+  const [responseData, md5Checksums] = await Promise.all([
+    getTracksApiResponse(assembly),
+    fetchUcscMd5Checksums(assembly),
+  ]);
 
-  const responseData = await getTracksApiResponse(assembly);
   const responseTracksContainer = getApiResponseTracksContainer(
     responseData,
     assembly
@@ -28,9 +31,13 @@ export async function getAssemblyTracks(
           const responseTrack =
             await ucscApiResponseTrackSchema.validate(sourceResponseTrack);
           if (responseTrack.compositeContainer === "TRUE") {
-            return await buildTrackComposite(responseTrack);
+            return await buildTrackComposite(
+              responseTrack,
+              assembly,
+              md5Checksums
+            );
           } else {
-            return buildTrack(responseTrack);
+            return buildTrack(responseTrack, assembly, md5Checksums);
           }
         }
       )
@@ -39,12 +46,108 @@ export async function getAssemblyTracks(
 }
 
 /**
+ * Fetch MD5 checksums for the given assembly.
+ *
+ * This function is designed to be fault-tolerant and will not throw errors if checksums
+ * cannot be fetched. Checksums are entirely optional and the application will continue
+ * to function normally without them. If checksums are unavailable (due to network issues,
+ * timeouts, or missing files), an empty Map will be returned.
+ *
+ * @param assembly - Assembly accession.
+ * @returns Map of filename to MD5 hash, or empty Map if checksums are unavailable.
+ */
+export async function fetchUcscMd5Checksums(
+  assembly: string
+): Promise<Map<string, string>> {
+  const url = buildMd5Url(assembly);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
+
+    if (!res.ok) {
+      // It is expected that some assemblies might not have md5sum.txt, so we just warn and continue.
+      console.warn(
+        `Optional MD5 checksums not found for assembly ${assembly} at ${url}: ${res.status} ${res.statusText}`
+      );
+      return new Map();
+    }
+    const text = await res.text();
+    const checksums = parseMd5File(text);
+    console.info(
+      `Successfully loaded ${checksums.size} MD5 checksums for assembly ${assembly}`
+    );
+    return checksums;
+  } catch (e) {
+    clearTimeout(timeoutId);
+    // Network errors or timeouts shouldn't break the application, just warn.
+    const errorType = e instanceof Error ? e.name : "Unknown";
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    console.warn(
+      `Could not fetch optional MD5 checksums for assembly ${assembly}: ${errorType} - ${errorMessage}`
+    );
+    return new Map();
+  }
+}
+
+/**
+ * Build the URL for the md5sum.txt file for the given assembly.
+ * @param assembly - Assembly accession.
+ * @returns URL for md5sum.txt.
+ */
+function buildMd5Url(assembly: string): string {
+  const baseUrl = "https://hgdownload.soe.ucsc.edu/hubs/";
+  const parts = assembly.split("_");
+  // Expected format: GCF_000000000.1
+  if (parts.length < 2) return "";
+
+  const prefix = parts[0];
+  const accession = parts[1];
+
+  // Construct path similar to how UCSC organizes hubs
+  // GCF/900/681/995/GCF_900681995.1/md5sum.txt
+  return `${baseUrl}${prefix}/${accession.slice(0, 3)}/${accession.slice(
+    3,
+    6
+  )}/${accession.slice(6, 9)}/${assembly}/md5sum.txt`;
+}
+
+/**
+ * Parse the content of an md5sum.txt file.
+ * @param text - Content of the file.
+ * @returns Map of filename to MD5 hash.
+ */
+function parseMd5File(text: string): Map<string, string> {
+  const map = new Map<string, string>();
+  const lines = text.split("\n");
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    // Format: <md5>  <filename>
+    const parts = trimmed.split(/\s+/);
+    if (parts.length >= 2) {
+      const md5 = parts[0];
+      // Join rest of parts to reconstruct filename (handling potential spaces)
+      const filename = parts.slice(1).join(" ");
+      map.set(filename, md5);
+    }
+  }
+  return map;
+}
+
+/**
  * Transform a composite track from the API into an object to be used in BRC Analytics.
  * @param responseTrack - Composite track from the API.
+ * @param assembly - Assembly accession.
+ * @param md5Checksums - Map of filename to MD5 hash.
  * @returns transformed composite track, or null if the track is missing required properties.
  */
 async function buildTrackComposite(
-  responseTrack: UcscApiResponseTrack
+  responseTrack: UcscApiResponseTrack,
+  assembly: string,
+  md5Checksums: Map<string, string>
 ): Promise<UcscTrackComposite | null> {
   // Group is expected to exist and is required downstream, so skip the composite track if it for some reason lacks a group.
   const groupId = responseTrack.group;
@@ -62,7 +165,7 @@ async function buildTrackComposite(
 
   // Transform sub-tracks
   const tracks = responseSubTracks
-    .map((rst) => buildTrack(rst, groupId))
+    .map((rst) => buildTrack(rst, assembly, md5Checksums, groupId))
     .filter((v) => v !== null);
 
   // Return composite track
@@ -79,24 +182,101 @@ async function buildTrackComposite(
 /**
  * Transform an individual track from the API into an object to be used in BRC Analytics.
  * @param responseTrack - Track from the API.
+ * @param assembly - Assembly accession.
+ * @param md5Checksums - Map of filename to MD5 hash.
  * @param parentGroupId - Group of the parent track, if any.
  * @returns transformed track, or null if the track is missing required properties.
  */
 function buildTrack(
   responseTrack: UcscApiResponseTrack,
+  assembly: string,
+  md5Checksums: Map<string, string>,
   parentGroupId?: string
 ): UcscTrack | null {
   const groupId = responseTrack.group ?? parentGroupId;
   if (groupId === undefined || responseTrack.bigDataUrl === undefined)
     return null;
+
+  const bigDataUrl = getFullBigDataUrl(responseTrack.bigDataUrl);
+  const md5Hash = getMd5ForTrack(bigDataUrl, assembly, md5Checksums);
+
   return {
-    bigDataUrl: getFullBigDataUrl(responseTrack.bigDataUrl),
+    bigDataUrl,
     groupId,
     isComposite: false,
     longLabel: responseTrack.longLabel,
+    md5Hash,
     shortLabel: responseTrack.shortLabel,
     type: responseTrack.type,
   };
+}
+
+/**
+ * Extract a relative path from a URL based on the assembly ID and retrieve its MD5 checksum.
+ * This is a shared utility function used for checksum extraction across the application.
+ *
+ * The function is designed to be fault-tolerant and will return undefined if:
+ * - The checksums map is empty (which happens when checksums couldn't be fetched)
+ * - The URL doesn't contain the assembly ID in the expected format
+ * - No matching checksum is found for the extracted path
+ *
+ * This ensures that checksum verification remains optional and won't break functionality
+ * when checksums are unavailable.
+ *
+ * @param url - The URL to extract the relative path from.
+ * @param assembly - Assembly accession.
+ * @param md5Checksums - Map of filename to MD5 hash.
+ * @returns MD5 hash if found, undefined otherwise.
+ */
+export function getChecksumForPath(
+  url: string,
+  assembly: string,
+  md5Checksums: Map<string, string>
+): string | undefined {
+  if (md5Checksums.size === 0) return undefined;
+
+  // URL is like https://hgdownload.soe.ucsc.edu/hubs/GCF/900/681/995/GCF_900681995.1/tracks/someTrack.bb
+  // We want to extract the part relative to the hub root (which is where md5sum.txt usually is)
+  // The hub root ends with the assembly ID.
+
+  // Simple heuristic: split by assembly ID
+  const parts = url.split(`${assembly}/`);
+  if (parts.length < 2) return undefined;
+
+  // The relative path is everything after the first occurrence of the assembly ID + slash
+  const relativePath = parts.slice(1).join(`${assembly}/`);
+
+  // Check direct match
+  if (md5Checksums.has(relativePath)) {
+    return md5Checksums.get(relativePath);
+  }
+
+  // Sometimes md5sum.txt might have ./ prefix
+  if (md5Checksums.has(`./${relativePath}`)) {
+    return md5Checksums.get(`./${relativePath}`);
+  }
+
+  return undefined;
+}
+
+/**
+ * Get the MD5 hash for a track based on its URL.
+ * This function uses the shared getChecksumForPath utility.
+ *
+ * The checksum is optional and may be undefined if checksums couldn't be fetched
+ * or if no matching checksum was found for this track's URL.
+ *
+ * @param bigDataUrl - Full URL of the track.
+ * @param assembly - Assembly accession.
+ * @param md5Checksums - Map of filename to MD5 hash.
+ * @returns MD5 hash if found, undefined otherwise.
+ */
+function getMd5ForTrack(
+  bigDataUrl: string,
+  assembly: string,
+  md5Checksums: Map<string, string>
+): string | undefined {
+  return getChecksumForPath(bigDataUrl, assembly, md5Checksums);
 }
 
 /**
