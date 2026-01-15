@@ -8,6 +8,7 @@ import { useColumnClassification } from "./hooks/UseColumnClassification/hook";
 import { ClassificationTable } from "./components/ClassificationTable/classificationTable";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { STEP } from "./step";
+import { StyledStack } from "../step.styles";
 
 export const SampleSheetClassificationStep = ({
   active,
@@ -32,26 +33,30 @@ export const SampleSheetClassificationStep = ({
         {entryLabel}
       </StepLabel>
       <StyledStepContent>
-        <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400_2_LINES}>
-          Please assign a column type for all columns and specify one
-          identifier, a forward and reverse file path and at least one
-          biological factor.
-        </Typography>
+        <StyledStack>
+          <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400_2_LINES}>
+            Please assign a column type for all columns and specify one
+            identifier, a forward and reverse file path and at least one
+            biological factor.
+          </Typography>
+        </StyledStack>
         <ClassificationTable
           classifications={classifications}
           onClassify={onClassify}
           onConfigure={onConfigure}
         />
-        <Button
-          {...BUTTON_PROPS.PRIMARY_CONTAINED}
-          disabled={!validation.valid}
-          onClick={() => {
-            onConfigure({ [STEP.key]: classifications });
-            onContinue();
-          }}
-        >
-          Continue
-        </Button>
+        <StyledStack>
+          <Button
+            {...BUTTON_PROPS.PRIMARY_CONTAINED}
+            disabled={!validation.valid}
+            onClick={() => {
+              onConfigure({ [STEP.key]: classifications });
+              onContinue();
+            }}
+          >
+            Continue
+          </Button>
+        </StyledStack>
       </StyledStepContent>
     </Step>
   );

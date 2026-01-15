@@ -51,6 +51,7 @@ export function buildSteps(workflow: Workflow): StepConfig[] {
       STEP.SAMPLE_SHEET,
       STEP.SAMPLE_SHEET_CLASSIFICATION,
       STEP.DESEQ2_FORMULA,
+      STEP.PRIMARY_CONTRASTS,
     ].filter(isStepConfigured);
   }
 

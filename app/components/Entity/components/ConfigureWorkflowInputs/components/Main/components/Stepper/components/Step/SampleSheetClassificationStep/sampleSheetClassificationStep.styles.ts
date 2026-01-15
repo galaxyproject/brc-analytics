@@ -7,14 +7,6 @@ export const StyledStepContent = styled(StepContent)`
       > .MuiGrid-root {
         gap: 0;
         padding: 0;
-
-        > .MuiTypography-root {
-          padding: 20px;
-        }
-
-        > .MuiButton-root {
-          margin: 20px;
-        }
       }
     }
   }
