@@ -3,7 +3,7 @@ import { Props } from "./types";
 import { StyledStack, StyledSelect } from "./pairRow.styles";
 import { DeleteIcon } from "../../../../../../../../../../../../../../common/CustomIcon/components/DeleteIcon/deleteIcon";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
-import { ICON_BUTTON_PROPS, SELECT_PROPS, SVG_ICON_PROPS } from "./contants";
+import { ICON_BUTTON_PROPS, SELECT_PROPS, SVG_ICON_PROPS } from "./constants";
 
 export const PairRow = ({
   factorValues,
