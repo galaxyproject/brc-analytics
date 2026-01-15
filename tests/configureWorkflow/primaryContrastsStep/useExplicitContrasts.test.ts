@@ -71,7 +71,7 @@ describe("useExplicitContrasts", () => {
       expect(result.current.pairs.get(secondId)).toEqual(["treated", ""]);
     });
 
-    test("can remove all pairs", () => {
+    test("resets to initial state when removing last pair", () => {
       const { result } = renderHook(() => useExplicitContrasts("condition"));
 
       const [firstId] = [...result.current.pairs.keys()];
@@ -80,7 +80,8 @@ describe("useExplicitContrasts", () => {
         result.current.onRemovePair(firstId);
       });
 
-      expect(result.current.pairs.size).toBe(0);
+      expect(result.current.pairs.size).toBe(1);
+      expect([...result.current.pairs.values()]).toEqual([["", ""]]);
     });
   });
 

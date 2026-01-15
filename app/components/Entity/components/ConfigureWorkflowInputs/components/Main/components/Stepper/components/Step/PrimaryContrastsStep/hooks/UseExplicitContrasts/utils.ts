@@ -41,6 +41,7 @@ export function getValidPairs(pairs: ContrastPairs): ContrastPair[] {
 
 /**
  * Creates an updater function to remove a pair by ID.
+ * If only one pair remains, resets to initial state to ensure at least one row.
  * @param id - ID of the pair to remove.
  * @returns Updater function.
  */
@@ -48,6 +49,10 @@ export function removePairUpdater(
   id: string
 ): (prev: ContrastPairs) => ContrastPairs {
   return (prev) => {
+    // If there is only one pair, reset to initial state.
+    if (prev.size <= 1) return createInitialPairs();
+
+    // Otherwise, remove the pair.
     const next = new Map(prev);
     next.delete(id);
     return next;

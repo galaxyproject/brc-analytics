@@ -256,12 +256,13 @@ describe("removePairUpdater", () => {
     expect(result.size).toBe(2);
   });
 
-  test("returns empty map when removing the only pair", () => {
+  test("resets to initial state when removing the only pair", () => {
     const prev: ContrastPairs = new Map([["1", ["control", "treated"]]]);
 
     const result = removePairUpdater("1")(prev);
 
-    expect(result.size).toBe(0);
+    expect(result.size).toBe(1);
+    expect([...result.values()]).toEqual([["", ""]]);
   });
 
   test("does not mutate the original map", () => {
