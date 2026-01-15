@@ -2,6 +2,10 @@ import { EnaSequencingReads } from "app/utils/galaxy-api/entities";
 import { UcscTrack } from "../../../../utils/ucsc-tracks-api/entities";
 import { COLUMN_TYPE } from "../../../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 
+export interface AllVAllContrasts {
+  type: "ALL_AGAINST_ALL";
+}
+
 export interface ConfiguredInput {
   designFormula?: string | null;
   geneModelUrl?: string | null;
@@ -22,7 +26,7 @@ export interface ExplicitContrasts {
 
 export type OnConfigure = (configuredInput: Partial<ConfiguredInput>) => void;
 
-export type PrimaryContrasts = ExplicitContrasts;
+export type PrimaryContrasts = AllVAllContrasts | ExplicitContrasts;
 
 export interface UseConfigureInputs {
   configuredInput: ConfiguredInput;

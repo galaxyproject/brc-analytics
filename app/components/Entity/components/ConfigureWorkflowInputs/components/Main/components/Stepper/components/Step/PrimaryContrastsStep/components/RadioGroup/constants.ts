@@ -4,7 +4,7 @@ import { RadioGroupOption } from "./types";
 export const OPTIONS: RadioGroupOption[] = [
   {
     description: "Generate all pairwise comparisons between levels",
-    disabled: true,
+    disabled: false,
     label: "Compare All Against All",
     value: CONTRAST_MODE.ALL_AGAINST_ALL,
   },
