@@ -53,6 +53,7 @@ export const DESeq2FormulaStep = ({
         </StyledStack>
         <Table
           columns={columns}
+          onConfigure={onConfigure}
           onSelectPrimary={onSelectPrimary}
           onToggleCovariate={onToggleCovariate}
           selection={selection}
@@ -63,11 +64,7 @@ export const DESeq2FormulaStep = ({
             {...BUTTON_PROPS.PRIMARY_CONTAINED}
             disabled={!valid}
             onClick={() => {
-              onConfigure({
-                [STEP.key]: formula,
-                primaryContrasts: null,
-                primaryFactor: selection.primary,
-              });
+              onConfigure({ [STEP.key]: formula });
               onContinue();
             }}
           >

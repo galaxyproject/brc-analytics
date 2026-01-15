@@ -21,8 +21,12 @@ export const Select = ({
       displayEmpty
       onChange={(e) => {
         onClassify(columnName, e.target.value as COLUMN_TYPE);
-        // Any change in classification should result in the design formula being cleared.
-        onConfigure({ designFormula: null });
+        // Any change in classification should result in the design formula, primary factor, and primary contrasts being cleared.
+        onConfigure({
+          designFormula: null,
+          primaryContrasts: null,
+          primaryFactor: null,
+        });
       }}
       renderValue={renderValue}
       value={columnType ?? ""}
