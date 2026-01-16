@@ -4,20 +4,17 @@ import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/com
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { StepProps } from "../types";
-import { StyledStepContent } from "./primaryContrastsStep.styles";
-import { STEP } from "./step";
-import { RadioGroup } from "./components/RadioGroup/radioGroup";
+import { StyledStack, StyledStepContent } from "./primaryContrastsStep.styles";
+import { CompareBaseline } from "./components/CompareBaseline/compareBaseline";
 import { ExplicitPairs } from "./components/ExplicitPairs/explicitPairs";
+import { RadioGroup } from "./components/RadioGroup/radioGroup";
+import { useBaselineContrasts } from "./hooks/UseBaselineContrasts/hook";
 import { useExplicitContrasts } from "./hooks/UseExplicitContrasts/hook";
-import {
-  buildPrimaryContrasts,
-  getUniqueFactorValues,
-  isDisabled,
-} from "./utils";
-import { getValidPairs } from "./hooks/UseExplicitContrasts/utils";
-import { useRadioGroup } from "../hooks/UseRadioGroup/hook";
+import { usePrimaryContrasts } from "./hooks/UsePrimaryContrasts/hook";
 import { CONTRAST_MODE } from "./hooks/UseRadioGroup/types";
-import { StyledStack } from "../step.styles";
+import { useRadioGroup } from "../hooks/UseRadioGroup/hook";
+import { getUniqueFactorValues } from "./utils";
+import { StyledStack as CommonStyledStack } from "../step.styles";
 
 export const PrimaryContrastsStep = ({
   active,
@@ -29,15 +26,22 @@ export const PrimaryContrastsStep = ({
   onContinue,
   onEdit,
 }: StepProps): JSX.Element => {
+  const baselineContrasts = useBaselineContrasts(configuredInput.primaryFactor);
+  const explicitContrasts = useExplicitContrasts(configuredInput.primaryFactor);
   const radioGroup = useRadioGroup(CONTRAST_MODE.ALL_AGAINST_ALL);
+
+  const mode = radioGroup.value;
+
+  const { disabled, primaryContrasts } = usePrimaryContrasts(
+    mode,
+    baselineContrasts,
+    explicitContrasts
+  );
 
   const factorValues = useMemo(
     () => getUniqueFactorValues(configuredInput),
     [configuredInput]
   );
-
-  const { onAddPair, onRemovePair, onUpdatePair, pairs, valid } =
-    useExplicitContrasts(configuredInput.primaryFactor);
 
   return (
     <Step active={active} completed={completed} index={index}>
@@ -49,36 +53,32 @@ export const PrimaryContrastsStep = ({
         {entryLabel}
       </StepLabel>
       <StyledStepContent>
-        <StyledStack gap={6} useFlexGap>
-          {/* Contrast Mode Selector */}
+        <StyledStack gap={1} useFlexGap>
           <RadioGroup {...radioGroup} />
-          <ExplicitPairs
+          <CompareBaseline
+            {...baselineContrasts}
             factorValues={factorValues}
-            mode={radioGroup.value}
-            onAddPair={onAddPair}
-            onRemovePair={onRemovePair}
-            onUpdatePair={onUpdatePair}
-            pairs={pairs}
+            mode={mode}
+          />
+          <ExplicitPairs
+            {...explicitContrasts}
+            factorValues={factorValues}
+            mode={mode}
           />
         </StyledStack>
         <Divider flexItem />
-        <StyledStack>
+        <CommonStyledStack>
           <Button
             {...BUTTON_PROPS.PRIMARY_CONTAINED}
-            disabled={isDisabled(radioGroup.value, valid)}
+            disabled={disabled}
             onClick={() => {
-              onConfigure({
-                [STEP.key]: buildPrimaryContrasts(
-                  radioGroup.value,
-                  getValidPairs(pairs)
-                ),
-              });
+              onConfigure({ primaryContrasts });
               onContinue();
             }}
           >
             Continue
           </Button>
-        </StyledStack>
+        </CommonStyledStack>
       </StyledStepContent>
     </Step>
   );

@@ -1,3 +1,5 @@
+import { ExplicitContrasts } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { CONTRAST_MODE } from "../UseRadioGroup/types";
 import { ContrastPair, ContrastPairs } from "./types";
 
 /**
@@ -9,6 +11,21 @@ export function addPairUpdater(
   id: string
 ): (prev: ContrastPairs) => ContrastPairs {
   return (prev) => new Map(prev).set(id, ["", ""]);
+}
+
+/**
+ * Builds the primary contrasts for EXPLICIT mode.
+ * @param pairs - Map of contrast pairs.
+ * @returns ExplicitContrasts object or null if no valid pairs.
+ */
+export function buildExplicitContrasts(
+  pairs: ContrastPairs
+): ExplicitContrasts | null {
+  const validPairs = getValidPairs(pairs);
+
+  if (validPairs.length === 0) return null;
+
+  return { pairs: validPairs, type: CONTRAST_MODE.EXPLICIT };
 }
 
 /**

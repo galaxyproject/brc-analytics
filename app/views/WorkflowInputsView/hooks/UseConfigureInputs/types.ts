@@ -6,6 +6,12 @@ export interface AllVAllContrasts {
   type: "ALL_AGAINST_ALL";
 }
 
+export interface BaselineContrasts {
+  baseline: string;
+  compare: string[];
+  type: "BASELINE";
+}
+
 export interface ConfiguredInput {
   designFormula?: string | null;
   geneModelUrl?: string | null;
@@ -26,7 +32,10 @@ export interface ExplicitContrasts {
 
 export type OnConfigure = (configuredInput: Partial<ConfiguredInput>) => void;
 
-export type PrimaryContrasts = AllVAllContrasts | ExplicitContrasts;
+export type PrimaryContrasts =
+  | AllVAllContrasts
+  | BaselineContrasts
+  | ExplicitContrasts;
 
 export interface UseConfigureInputs {
   configuredInput: ConfiguredInput;
