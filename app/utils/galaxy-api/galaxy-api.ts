@@ -23,6 +23,10 @@ import {
   GalaxyApiCommonUrlData,
 } from "./entities";
 import { UcscTrack } from "../ucsc-tracks-api/entities";
+import {
+  fetchUcscMd5Checksums,
+  getChecksumForPath,
+} from "../ucsc-tracks-api/ucsc-tracks-api";
 
 const DOCKSTORE_API_URL = "https://dockstore.org/api/ga4gh/trs/v2/tools";
 const FTP_HOST = "ftp.sra.ebi.ac.uk";
@@ -59,6 +63,7 @@ export async function getWorkflowLandingUrl(
   parameters: WorkflowParameter[],
   origin: string
 ): Promise<string> {
+  const md5Checksums = await fetchUcscMd5Checksums(referenceGenome);
   const body: WorkflowLandingsBody = {
     origin,
     public: true,
@@ -67,7 +72,8 @@ export async function getWorkflowLandingUrl(
       geneModelUrl,
       readRunsSingle,
       readRunsPaired,
-      parameters
+      parameters,
+      md5Checksums
     ),
     workflow_id: `${DOCKSTORE_API_URL}/${workflowId}`,
     workflow_target_type: "trs_url",
@@ -93,6 +99,7 @@ export async function getDataLandingUrl(
   tracks: UcscTrack[] | null,
   origin: string
 ): Promise<string> {
+  const md5Checksums = await fetchUcscMd5Checksums(referenceGenome);
   const body: DataLandingsBody = {
     origin,
     public: true,
@@ -101,7 +108,8 @@ export async function getDataLandingUrl(
       geneModelUrl,
       readRunsSingle,
       readRunsPaired,
-      tracks
+      tracks,
+      md5Checksums
     ),
   };
   return getGalaxyLandingUrl(body, dataLandingsApiUrl, dataLandingUrl);
@@ -138,7 +146,8 @@ function paramVariableToRequestValue(
   geneModelUrl: string | null,
   readRunsSingle: EnaSequencingReads[] | null,
   readRunsPaired: EnaSequencingReads[] | null,
-  referenceGenome: string
+  referenceGenome: string,
+  md5Checksums: Map<string, string>
 ): WorkflowParameterValue | null {
   // Because this `switch` has no default case, and the function doesn't allow `undefined` as a return type,
   // we ensure through TypeScript that all possible variables are handled.
@@ -147,12 +156,13 @@ function paramVariableToRequestValue(
       return referenceGenome;
     case WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_FASTA_URL:
       return galaxyUrlDataToCommonApi(
-        buildAssemblyFastaRequestValue(referenceGenome)
+        buildAssemblyFastaRequestValue(referenceGenome, md5Checksums)
       );
     case WORKFLOW_PARAMETER_VARIABLE.GENE_MODEL_URL: {
       const urlData = buildGeneModelUrlRequestValue(
         geneModelUrl,
-        referenceGenome
+        referenceGenome,
+        md5Checksums
       );
       if (urlData === null) return null;
       return galaxyUrlDataToCommonApi(urlData);
@@ -214,6 +224,7 @@ function galaxyCollectionElementToWorkflowLandings(
  * @param readRunsSingle - Single read runs parameter.
  * @param readRunsPaired - Paired read runs parameter.
  * @param parameters - Parameters for this workflow.
+ * @param md5Checksums - Map of filename to MD5 hash.
  * @returns `request_state` value for the workflow landings request body.
  */
 function getWorkflowLandingsRequestState(
@@ -221,7 +232,8 @@ function getWorkflowLandingsRequestState(
   geneModelUrl: string | null,
   readRunsSingle: EnaSequencingReads[] | null,
   readRunsPaired: EnaSequencingReads[] | null,
-  parameters: WorkflowParameter[]
+  parameters: WorkflowParameter[],
+  md5Checksums: Map<string, string>
 ): WorkflowLandingsBodyRequestState {
   const result: WorkflowLandingsBodyRequestState = {};
   for (const { key, url_spec, variable } of parameters) {
@@ -235,7 +247,8 @@ function getWorkflowLandingsRequestState(
         geneModelUrl,
         readRunsSingle,
         readRunsPaired,
-        referenceGenome
+        referenceGenome,
+        md5Checksums
       );
       if (value !== null) result[key] = value;
     }
@@ -287,15 +300,20 @@ function getDataLandingsRequestState(
   geneModelUrl: string | null,
   readRunsSingle: EnaSequencingReads[] | null,
   readRunsPaired: EnaSequencingReads[] | null,
-  tracks: UcscTrack[] | null
+  tracks: UcscTrack[] | null,
+  md5Checksums: Map<string, string>
 ): DataLandingsBodyRequestState {
   return {
     targets: [
       buildDataLandingsDatasetTarget([
-        buildAssemblyFastaRequestValue(referenceGenome),
+        buildAssemblyFastaRequestValue(referenceGenome, md5Checksums),
       ]),
       buildDataLandingsDatasetTarget([
-        buildGeneModelUrlRequestValue(geneModelUrl, referenceGenome),
+        buildGeneModelUrlRequestValue(
+          geneModelUrl,
+          referenceGenome,
+          md5Checksums
+        ),
       ]),
       galaxyCollectionToDataLandingsTarget(
         buildSingleReadRunsRequestValue(readRunsSingle)
@@ -311,26 +329,32 @@ function getDataLandingsRequestState(
 }
 
 function buildAssemblyFastaRequestValue(
-  referenceGenome: string
+  referenceGenome: string,
+  md5Checksums: Map<string, string>
 ): GalaxyUrlData {
+  const url = buildFastaUrl(referenceGenome);
+  const hashes = getHashesForUrl(url, referenceGenome, md5Checksums);
   return {
     dbKey: referenceGenome,
     ext: "fasta.gz",
-    url: buildFastaUrl(referenceGenome),
+    hashes,
+    url,
   };
 }
 
 function buildGeneModelUrlRequestValue(
   geneModelUrl: string | null,
-  referenceGenome: string
+  referenceGenome: string,
+  md5Checksums: Map<string, string>
 ): GalaxyUrlData | null {
-  return geneModelUrl
-    ? {
-        dbKey: referenceGenome,
-        ext: "gtf.gz",
-        url: geneModelUrl,
-      }
-    : null;
+  if (!geneModelUrl) return null;
+  const hashes = getHashesForUrl(geneModelUrl, referenceGenome, md5Checksums);
+  return {
+    dbKey: referenceGenome,
+    ext: "gtf.gz",
+    hashes,
+    url: geneModelUrl,
+  };
 }
 
 function buildSingleReadRunsRequestValue(
@@ -479,6 +503,16 @@ function ftpToAscp(ftpUrl: string): string {
   return `ascp://${ftpUrl.replace(FTP_HOST, ASCP_HOST)}`;
 }
 
+/**
+ * Build Galaxy URL data objects for UCSC tracks, including optional MD5 checksums when available.
+ *
+ * This function handles the optional nature of MD5 checksums by only including them when they
+ * are available in the track data. If a track doesn't have an MD5 hash, the hashes field will
+ * be undefined in the resulting Galaxy URL data object.
+ *
+ * @param tracks - UCSC tracks to build request values for.
+ * @returns Array of Galaxy URL data objects for the tracks.
+ */
 function buildUcscTracksRequestValues(
   tracks: UcscTrack[] | null
 ): GalaxyUrlData[] {
@@ -487,6 +521,9 @@ function buildUcscTracksRequestValues(
   for (const track of tracks) {
     values.push({
       ext: getUcscBigDataExt(track.bigDataUrl),
+      hashes: track.md5Hash
+        ? [{ hash_function: "MD5", hash_value: track.md5Hash }]
+        : undefined,
       identifier: track.shortLabel,
       url: track.bigDataUrl,
     });
@@ -498,4 +535,30 @@ function getUcscBigDataExt(bigDataUrl: string): string {
   if (bigDataUrl.endsWith(".bb")) return "bigbed";
   else if (bigDataUrl.endsWith(".bw")) return "bigwig";
   return "auto";
+}
+
+/**
+ * Convert a checksum to the Galaxy API hash format.
+ * Uses the shared getChecksumForPath utility to extract checksums.
+ *
+ * This function is designed to be fault-tolerant and will return undefined
+ * if no checksum is available, ensuring that checksum verification remains optional.
+ *
+ * @param url - URL to get checksums for.
+ * @param assembly - Assembly accession.
+ * @param md5Checksums - Map of filename to MD5 hash.
+ * @returns Galaxy API formatted hashes or undefined if no checksum is available.
+ */
+function getHashesForUrl(
+  url: string,
+  assembly: string,
+  md5Checksums: Map<string, string>
+): GalaxyUrlData["hashes"] {
+  const md5 = getChecksumForPath(url, assembly, md5Checksums);
+
+  if (md5) {
+    return [{ hash_function: "MD5", hash_value: md5 }];
+  }
+
+  return undefined;
 }
