@@ -40,7 +40,8 @@ BRC Analytics is a browser-based bioinformatics platform that makes advanced pat
 2. Click "Login or Register" in the top menu
 3. Choose "Register" to create a new account
 4. Fill in your information and submit
-5. Your account will be shared between BRC Analytics and Galaxy
+5. When you launch an analysis from BRC Analytics, your existing UseGalaxy.org login session (if any) will be used
+6. Analyses will run in your most recently active Galaxy history
 
 <Alert icon={false} severity="info">
   Creating an account allows you to save your work, access your analysis
@@ -49,50 +50,32 @@ BRC Analytics is a browser-based bioinformatics platform that makes advanced pat
 
 ## Understanding the Interface
 
-BRC Analytics consists of three main components:
+### Analysis Flow at a Glance
 
-### 1. BRC Analytics Website
+1. **Select context in BRC Analytics** – choose organism/assembly, workflow, and data source.
+2. **Review required inputs** – confirm any reads or metadata the workflow needs (the UI surfaces what’s already pre-provisioned).
+3. **Launch the workflow** – BRC Analytics hands the configuration to UseGalaxy.org.
+4. **Galaxy executes the jobs** – they run in your active Galaxy history; monitor progress or adjust parameters there.
+5. **Review and share results** – download outputs from Galaxy or open linked UCSC Genome Browser tracks.
 
-- Browse organisms and assemblies
-- Select reference genomes
-- Configure workflow parameters
-- Launch analyses
+### Where Each Step Happens
 
-### 2. Galaxy Workflow System
-
-- Execute computational analyses
-- Manage datasets and histories
-- Run tools and workflows
-- View results
-
-### 3. UCSC Genome Browser
-
-- Visualize genomic data
-- Explore annotations
-- Compare sequences
-- View custom tracks
+- **BRC Analytics website** – Browse organisms and assemblies, inspect metadata, select reference genomes, configure workflow parameters, and launch analyses.
+- **Galaxy (UseGalaxy.org)** – Executes every workflow you launch. Jobs run in your currently active Galaxy history (you can switch histories after landing), and Galaxy is where you manage datasets, rerun tools, and monitor progress.
+- **UCSC Genome Browser** – Visualize genomic data linked from BRC Analytics, explore annotations, compare sequences, and review custom tracks tied to each assembly.
 
 ## Quick Reference
+
+### Key Concepts
+
+- **Organism**: In BRC Analytics, an organism corresponds to a specific NCBI Taxononomy ID, at the species level. This serves as the entry point for finding relevant data and workflows.
+- **Assembly**: A specific version of the reference genome sequence and annotations (e.g., GCF_000854845.1). Analyses are always anchored to a specific assembly to ensure coordinate compatibility.
+- **Workflow**: An automated, community-curated analysis pipeline that connects multiple tools to process your data from raw inputs to final results.
+- **Analysis**: The combination of a specific organism, reference assembly, workflow, and input data configured to answer a biological question.
 
 ### Essential URLs
 
 - **BRC Analytics**: https://brc-analytics.org
-- **Galaxy Interface**: https://brc.usegalaxy.org
+- **Galaxy Interface**: https://usegalaxy.org
 - **Help Forum**: https://help.brc-analytics.org
 - **Training**: https://training.galaxyproject.org
-
-### Key Concepts
-
-- **Assembly**: Reference genome build
-- **Workflow**: Automated analysis pipeline
-- **History**: Your analysis workspace
-- **Dataset**: Individual file in your history
-- **Collection**: Group of related datasets
-
-### Common File Formats
-
-- **FASTQ**: Raw sequencing reads
-- **BAM/SAM**: Aligned sequence reads
-- **VCF**: Variant call format
-- **FASTA**: Sequence data
-- **GFF/GTF**: Genome annotations

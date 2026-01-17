@@ -1,0 +1,73 @@
+---
+breadcrumbs:
+  - path: "/learn"
+    text: "Learn"
+  - path: "/learn/getting-started"
+    text: "Getting Started"
+  - path: ""
+    text: "Common Workflows"
+contentType: "ARTICLE"
+description: ""
+enableOutline: true
+title: "Common Workflows"
+---
+
+## Common Workflows
+
+BRC Analytics highlights a curated set of community-reviewed workflows from the [Intergalactic Workflow Commission (IWC)](https://iwc.galaxyproject.org). Every workflow form tells you exactly which inputs are required, while the platform pre-loads:
+
+- **Reference assets:** Reference FASTA, BWA/Bowtie2 indices, RefSeq/VEuPathDB annotations, and other organism-specific files.
+- **Data sourcing options:** Upload your own reads, paste specific run/Project accessions, or browse the auto-filtered public read picker (layout/strategy filters match the workflow requirements, but you can relax them).
+- **Galaxy handoff:** After you click **Launch in Galaxy**, the workflow, tools, and histories are staged for you—no manual imports required.
+
+Below are the workflows most BRC users run today.
+
+### Haploid variant calling (paired-end short reads)
+
+- **Use it for:** Any haploid organism with reliable gene annotations. LoFreq shines when you need sensitive SNP/INDEL calls down to a few percent allele frequency, but it is not designed for polyploid genomes or large structural variation.
+- **Inputs:** A Galaxy paired collection of FASTQ files, a GTF with gene annotations for the selected haploid genome, and the reference FASTA used for variant calling.
+- **Primary tools:** fastp for adapter/quality trimming, BWA-MEM for alignment, samtools for filtering (proper pairs only) and duplicate removal, LoFreq's Viterbi realignment + `lofreq call` for variant detection, and SnpEff for annotation—plus MultiQC for aggregated QC.
+- **Outputs:** Tab-delimited summaries of annotated variants and quality reports covering read QC + mapping performance (aligned reads, duplication rate, coverage, etc.).
+- **Source workflow:** [haploid-variant-calling-wgs-pe-main](https://iwc.galaxyproject.org/workflow/haploid-variant-calling-wgs-pe-main/).
+
+### RNA-Seq analysis (paired-end)
+
+- **Use it for:** Bulk RNA-seq experiments where you need fully QC'd coverage tracks (ENCODE-style long RNA-seq, but works for short libraries too).
+- **Inputs:** Galaxy paired FASTQ collections (`fastqsanger`), the organism GTF, optional GTF mask for regions to exclude from FPKM normalization (e.g., chrM), optional adapter sequences, and the reference genome build configured for STAR.
+- **Primary tools:** fastp for trimming (< 15bp dropped), STAR for alignment (ENCODE parameters) and gene counting, and MultiQC for aggregation. Unique-mapped BAMs feed Cufflinks/StringTie for FPKM/TPM, and bedtools generates coverage tracks.
+- **Outputs:** Gene-level count tables, optional featureCounts tables, Cufflinks FPKM, StringTie FPKM/TPM, multiQC summaries, per-chromosome stats, stranded/unstranded bigWigs, and filtered BAMs.
+- **Source workflow:** [rnaseq-pe-main](https://iwc.galaxyproject.org/workflow/rnaseq-pe-main/).
+
+### Single-cell RNA-seq preprocessing (10x Genomics)
+
+- **Use it for:** Converting raw 10x Genomics FASTQs into analysis-ready matrices (similar to Cell Ranger output). Use the **v3 workflow** for regular 10x libraries (one library per sample) and the **CellPlex workflow** for multiplexed samples using Cell Multiplexing Oligos (CMOs).
+- **Inputs:** Paired-end gene expression FASTQs, gene annotations (GTF), and 10x barcode whitelist. CellPlex additionally requires CMO FASTQs and a sample-to-CMO mapping CSV.
+- **Primary tools:** STARsolo for alignment/assignment/deduplication, DropletUtils for filtering empty drops, and CITE-seq-Count (for CellPlex) to process CMO tags.
+- **Outputs:** A 'bundle' compatible with Seurat/Scanpy containing matrix, genes, and barcodes files. Available as either aggregated collections or nested per-sample collections.
+- **Source workflows:** [fastq-to-matrix-10x-v3](https://iwc.galaxyproject.org/workflow/fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-v3/) and [fastq-to-matrix-10x-cellplex](https://iwc.galaxyproject.org/workflow/fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-cellplex/).
+
+### CUT&RUN / CUT&Tag peak calling
+
+- **Use it for:** Chromatin profiling experiments that map protein-DNA contacts with low background.
+- **Inputs:** Paired-end FASTQ collection, adapter sequences (TruSeq/Nextera), reference genome (Bowtie2), and effective genome size for MACS2.
+- **Primary tools:** cutadapt (filters < 15bp), Bowtie2 (allows dovetail, up to 1kb fragments), samtools (MAPQ >= 30, concordant only), Picard (duplicate removal), and MACS2 for peak calling and coverage generation.
+- **Outputs:** Peak files (BED), normalized or raw coverage bigWigs, and MultiQC reports.
+- **Source workflow:** [cutandrun-main](https://iwc.galaxyproject.org/workflow/cutandrun-main/).
+
+### Explore additional workflows
+
+BRC Analytics supports both general-purpose workflows (like the ones above) and highly specialized organism-specific workflows. Our platform allows workflows to be attached to specific NCBI taxon IDs at any taxonomic rank (from Kingdom down to Strain) or to specific biological properties like ploidy. We encourage you to explore your specific organism of interest to find tailored workflows that might not be listed in the "Common" section.
+
+**Current Workflow Categories:**
+
+- **Annotation:** Gene prediction, lncRNA annotation, functional annotation.
+- **Consensus Sequences:** Viral consensus generation (SARS-CoV-2, Influenza, Pox virus).
+- **Regulation:** ChIP-seq, ATAC-seq, CUT&RUN/CUT&Tag, Hi-C.
+- **Transcriptomics:** RNA-seq (bulk & single-cell), differential expression, enrichment analysis.
+- **Variant Calling:** Germline/Somatic calling, viral variant calling.
+
+**Coming Soon:** Comparative genomics, Assembly, Metagenomics, and Proteomics.
+
+**Can't find what you need?**
+
+Browse the full [Intergalactic Workflow Commission (IWC)](https://iwc.galaxyproject.org) catalog. If you find a workflow there that isn't in BRC Analytics yet, or if you have a Galaxy workflow you'd like to see integrated, please reach out to us at [help@brc-analytics.org](mailto:help@brc-analytics.org) or via our [Help Forum](https://help.brc-analytics.org/).
