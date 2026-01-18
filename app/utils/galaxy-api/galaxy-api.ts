@@ -21,7 +21,12 @@ import {
   GalaxyCollectionElement,
   WorkflowCollectionElement,
   GalaxyApiCommonUrlData,
+  DeSeq2WorkflowLandingsBody,
+  DeSeq2ColumnDefinition,
+  DeSeq2PairedSample,
+  DeSeq2SampleSheetCollection,
 } from "./entities";
+import { COLUMN_TYPE } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 import { UcscTrack } from "../ucsc-tracks-api/entities";
 
 const DOCKSTORE_API_URL = "https://dockstore.org/api/ga4gh/trs/v2/tools";
@@ -108,7 +113,7 @@ export async function getDataLandingUrl(
 }
 
 async function getGalaxyLandingUrl(
-  body: WorkflowLandingsBody | DataLandingsBody,
+  body: WorkflowLandingsBody | DataLandingsBody | DeSeq2WorkflowLandingsBody,
   apiUrl: string,
   landingUrlBase: string
 ): Promise<string> {
@@ -498,4 +503,244 @@ function getUcscBigDataExt(bigDataUrl: string): string {
   if (bigDataUrl.endsWith(".bb")) return "bigbed";
   else if (bigDataUrl.endsWith(".bw")) return "bigwig";
   return "auto";
+}
+
+//// DESeq2 Landing URL Functions
+
+/**
+ * Column types that should be included in the column definitions for Galaxy.
+ */
+const METADATA_COLUMN_TYPES = new Set<COLUMN_TYPE>([
+  COLUMN_TYPE.BIOLOGICAL_FACTOR,
+  COLUMN_TYPE.TECHNICAL_BLOCKING_FACTOR,
+  COLUMN_TYPE.OTHER_COVARIATE,
+  COLUMN_TYPE.QC_ONLY,
+]);
+
+/**
+ * Map COLUMN_TYPE to Galaxy column type.
+ * Currently all metadata columns are strings.
+ * @returns Galaxy column type.
+ */
+function columnTypeToGalaxyType(): "string" | "int" | "float" {
+  // For now, all metadata columns are strings
+  return "string";
+}
+
+/**
+ * Build column definitions from sample sheet classification.
+ * Only includes metadata columns (BIOLOGICAL_FACTOR, TECHNICAL_BLOCKING_FACTOR, OTHER_COVARIATE, QC_ONLY).
+ * @param sampleSheetClassification - Classification of sample sheet columns.
+ * @returns Array of column definitions.
+ */
+function buildColumnDefinitions(
+  sampleSheetClassification: Record<string, COLUMN_TYPE | null>
+): DeSeq2ColumnDefinition[] {
+  const definitions: DeSeq2ColumnDefinition[] = [];
+  for (const [columnName, columnType] of Object.entries(
+    sampleSheetClassification
+  )) {
+    if (columnType && METADATA_COLUMN_TYPES.has(columnType)) {
+      definitions.push({
+        name: columnName,
+        optional: columnType === COLUMN_TYPE.QC_ONLY,
+        type: columnTypeToGalaxyType(),
+      });
+    }
+  }
+  return definitions;
+}
+
+/**
+ * Find columns with specific classification types.
+ * @param sampleSheetClassification - Classification of sample sheet columns.
+ * @param columnType - Column type to find.
+ * @returns Column name or undefined if not found.
+ */
+function findColumnByType(
+  sampleSheetClassification: Record<string, COLUMN_TYPE | null>,
+  columnType: COLUMN_TYPE
+): string | undefined {
+  return Object.entries(sampleSheetClassification).find(
+    ([, type]) => type === columnType
+  )?.[0];
+}
+
+/**
+ * Build paired sample elements from sample sheet.
+ * @param sampleSheet - Sample sheet data as array of records.
+ * @param sampleSheetClassification - Classification of sample sheet columns.
+ * @returns Array of paired sample elements.
+ */
+function buildSampleElements(
+  sampleSheet: Record<string, string>[],
+  sampleSheetClassification: Record<string, COLUMN_TYPE | null>
+): DeSeq2PairedSample[] {
+  const identifierColumn = findColumnByType(
+    sampleSheetClassification,
+    COLUMN_TYPE.IDENTIFIER
+  );
+  const forwardColumn = findColumnByType(
+    sampleSheetClassification,
+    COLUMN_TYPE.FORWARD_FILE_PATH
+  );
+  const reverseColumn = findColumnByType(
+    sampleSheetClassification,
+    COLUMN_TYPE.REVERSE_FILE_PATH
+  );
+
+  if (!identifierColumn || !forwardColumn || !reverseColumn) {
+    throw new Error(
+      "Sample sheet must have IDENTIFIER, FORWARD_FILE_PATH, and REVERSE_FILE_PATH columns"
+    );
+  }
+
+  return sampleSheet.map((row) => {
+    const identifier = row[identifierColumn];
+    const forwardUrl = ftpToAscp(row[forwardColumn]);
+    const reverseUrl = ftpToAscp(row[reverseColumn]);
+
+    return {
+      class: "Collection" as const,
+      collection_type: "paired" as const,
+      elements: [
+        {
+          class: "File" as const,
+          ext: "fastqsanger.gz",
+          location: forwardUrl,
+          name: "forward" as const,
+        },
+        {
+          class: "File" as const,
+          ext: "fastqsanger.gz",
+          location: reverseUrl,
+          name: "reverse" as const,
+        },
+      ],
+      name: identifier,
+    };
+  });
+}
+
+/**
+ * Build rows metadata mapping from sample sheet.
+ * Maps sample identifier to array of metadata values in column_definitions order.
+ * @param sampleSheet - Sample sheet data as array of records.
+ * @param sampleSheetClassification - Classification of sample sheet columns.
+ * @param columnDefinitions - Column definitions to determine value order.
+ * @returns Object mapping sample identifiers to arrays of metadata values.
+ */
+function buildRows(
+  sampleSheet: Record<string, string>[],
+  sampleSheetClassification: Record<string, COLUMN_TYPE | null>,
+  columnDefinitions: DeSeq2ColumnDefinition[]
+): Record<string, (string | number)[]> {
+  const identifierColumn = findColumnByType(
+    sampleSheetClassification,
+    COLUMN_TYPE.IDENTIFIER
+  );
+
+  if (!identifierColumn) {
+    throw new Error("Sample sheet must have IDENTIFIER column");
+  }
+
+  const rows: Record<string, (string | number)[]> = {};
+
+  for (const row of sampleSheet) {
+    const identifier = row[identifierColumn];
+    const values: (string | number)[] = [];
+
+    for (const colDef of columnDefinitions) {
+      const value = row[colDef.name];
+      // Parse value based on column type
+      if (colDef.type === "int") {
+        values.push(parseInt(value, 10) || 0);
+      } else if (colDef.type === "float") {
+        values.push(parseFloat(value) || 0);
+      } else {
+        values.push(value ?? "");
+      }
+    }
+
+    rows[identifier] = values;
+  }
+
+  return rows;
+}
+
+/**
+ * Build the sample sheet collection for DESeq2 workflow.
+ * @param sampleSheet - Sample sheet data as array of records.
+ * @param sampleSheetClassification - Classification of sample sheet columns.
+ * @returns Sample sheet collection object.
+ */
+function buildSampleSheetCollection(
+  sampleSheet: Record<string, string>[],
+  sampleSheetClassification: Record<string, COLUMN_TYPE | null>
+): DeSeq2SampleSheetCollection {
+  const columnDefinitions = buildColumnDefinitions(sampleSheetClassification);
+  const elements = buildSampleElements(sampleSheet, sampleSheetClassification);
+  const rows = buildRows(
+    sampleSheet,
+    sampleSheetClassification,
+    columnDefinitions
+  );
+
+  return {
+    class: "Collection",
+    collection_type: "sample_sheet:paired",
+    column_definitions: columnDefinitions,
+    elements,
+    name: "Sample Sheet",
+    rows,
+  };
+}
+
+/**
+ * Get the URL of the DESeq2 workflow landing page.
+ * @param workflowId - Galaxy stored workflow ID.
+ * @param referenceAssembly - Genome version/assembly ID.
+ * @param geneModelUrl - URL for gene model (GTF) file.
+ * @param sampleSheet - Sample sheet data as array of records.
+ * @param sampleSheetClassification - Classification of sample sheet columns.
+ * @param designFormula - DESeq2 design formula.
+ * @param origin - Origin URL of the site making the request.
+ * @returns DESeq2 workflow landing URL.
+ */
+export async function getDeSeq2LandingUrl(
+  workflowId: string,
+  referenceAssembly: string,
+  geneModelUrl: string,
+  sampleSheet: Record<string, string>[],
+  sampleSheetClassification: Record<string, COLUMN_TYPE | null>,
+  designFormula: string,
+  origin: string
+): Promise<string> {
+  const sampleSheetCollection = buildSampleSheetCollection(
+    sampleSheet,
+    sampleSheetClassification
+  );
+
+  const body: DeSeq2WorkflowLandingsBody = {
+    origin,
+    public: true,
+    /* eslint-disable sort-keys -- key order matches DeSeq2RequestState interface */
+    request_state: {
+      "DESeq2 Design Formula": designFormula,
+      "Generate additional QC reports": true,
+      "GTF File of annotation": {
+        class: "File",
+        ext: "gtf.gz",
+        url: geneModelUrl,
+      },
+      "Reference genome": referenceAssembly,
+      "Sample sheet of sequencing reads": sampleSheetCollection,
+      "Use featurecounts for generating count tables": true,
+    },
+    /* eslint-enable sort-keys -- re-enable sort-keys rule */
+    workflow_id: workflowId,
+    workflow_target_type: "stored_workflow",
+  };
+
+  return getGalaxyLandingUrl(body, workflowLandingsApiUrl, workflowLandingUrl);
 }
