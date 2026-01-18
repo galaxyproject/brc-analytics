@@ -9,5 +9,6 @@ export const DIFFERENTIAL_EXPRESSION_ANALYSIS: Workflow = {
   trsId: "differential-expression-analysis",
   workflowDescription:
     "Run end-to-end differential expression analysis by combining RNA-seq quantification with DESeq2. Upload your sample sheet, configure the experimental design, and launch the workflow in Galaxy.",
+  workflowId: "8cd7bdc8d3cf35cd", // Galaxy stored workflow ID
   workflowName: "Differential Expression Analysis",
 };

@@ -120,6 +120,7 @@ export interface Workflow {
   taxonomyId: string | null;
   trsId: string;
   workflowDescription: string;
+  workflowId?: string; // Galaxy stored workflow ID for non-TRS workflows
   workflowName: string;
 }
 
