@@ -9,6 +9,8 @@ import { ClassificationTable } from "./components/ClassificationTable/classifica
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { STEP } from "./step";
 import { StyledStack } from "../step.styles";
+import { Fragment } from "react";
+import { ClassificationValidation } from "./components/ClassificationValidation/classificationValidation";
 
 export const SampleSheetClassificationStep = ({
   active,
@@ -24,40 +26,46 @@ export const SampleSheetClassificationStep = ({
     configuredInput.sampleSheet
   );
   return (
-    <Step active={active} completed={completed} index={index}>
-      <StepLabel
-        optional={
-          completed && <Button onClick={() => onEdit(index)}>Edit</Button>
-        }
-      >
-        {entryLabel}
-      </StepLabel>
-      <StyledStepContent>
-        <StyledStack>
-          <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400_2_LINES}>
-            Please assign a column type for all columns and specify one
-            identifier, a forward and reverse file path and at least one
-            biological factor.
-          </Typography>
-        </StyledStack>
-        <ClassificationTable
-          classifications={classifications}
-          onClassify={onClassify}
-          onConfigure={onConfigure}
-        />
-        <StyledStack>
-          <Button
-            {...BUTTON_PROPS.PRIMARY_CONTAINED}
-            disabled={!validation.valid}
-            onClick={() => {
-              onConfigure({ [STEP.key]: classifications });
-              onContinue();
-            }}
-          >
-            Continue
-          </Button>
-        </StyledStack>
-      </StyledStepContent>
-    </Step>
+    <Fragment>
+      <Step active={active} completed={completed} index={index}>
+        <StepLabel
+          optional={
+            completed && <Button onClick={() => onEdit(index)}>Edit</Button>
+          }
+        >
+          {entryLabel}
+        </StepLabel>
+        <StyledStepContent>
+          <StyledStack>
+            <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400_2_LINES}>
+              Please assign a column type for all columns and specify one
+              identifier, a forward and reverse file path and at least one
+              biological factor.
+            </Typography>
+          </StyledStack>
+          <ClassificationTable
+            classifications={classifications}
+            onClassify={onClassify}
+            onConfigure={onConfigure}
+          />
+          <StyledStack>
+            <Button
+              {...BUTTON_PROPS.PRIMARY_CONTAINED}
+              disabled={!validation.valid}
+              onClick={() => {
+                onConfigure({ [STEP.key]: classifications });
+                onContinue();
+              }}
+            >
+              Continue
+            </Button>
+          </StyledStack>
+        </StyledStepContent>
+      </Step>
+      <ClassificationValidation
+        active={active}
+        classifications={classifications}
+      />
+    </Fragment>
   );
 };
