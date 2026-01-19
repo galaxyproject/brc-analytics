@@ -16,12 +16,12 @@ export function mapValidation(
       VALIDATION_LABELS.IDENTIFIER,
     ],
     [
-      classificationSet.has(COLUMN_TYPE.FORWARD_FILE_PATH),
-      VALIDATION_LABELS.FORWARD_FILE_PATH,
+      classificationSet.has(COLUMN_TYPE.FORWARD_FILE_URL),
+      VALIDATION_LABELS.FORWARD_FILE_URL,
     ],
     [
-      classificationSet.has(COLUMN_TYPE.REVERSE_FILE_PATH),
-      VALIDATION_LABELS.REVERSE_FILE_PATH,
+      classificationSet.has(COLUMN_TYPE.REVERSE_FILE_URL),
+      VALIDATION_LABELS.REVERSE_FILE_URL,
     ],
     [
       classificationSet.has(COLUMN_TYPE.BIOLOGICAL_FACTOR),

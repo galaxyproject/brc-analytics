@@ -103,15 +103,15 @@ describe("updateClassification", () => {
   test("preserves other column classifications", () => {
     const initial = new Map<string, COLUMN_TYPE | null>([
       ["col1", COLUMN_TYPE.IDENTIFIER],
-      ["col2", COLUMN_TYPE.FORWARD_FILE_PATH],
+      ["col2", COLUMN_TYPE.FORWARD_FILE_URL],
       ["col3", COLUMN_TYPE.BIOLOGICAL_FACTOR],
     ]);
 
-    const updater = updateClassification("col2", COLUMN_TYPE.REVERSE_FILE_PATH);
+    const updater = updateClassification("col2", COLUMN_TYPE.REVERSE_FILE_URL);
     const result = updater(initial);
 
     expect(result.get("col1")).toBe(COLUMN_TYPE.IDENTIFIER);
-    expect(result.get("col2")).toBe(COLUMN_TYPE.REVERSE_FILE_PATH);
+    expect(result.get("col2")).toBe(COLUMN_TYPE.REVERSE_FILE_URL);
     expect(result.get("col3")).toBe(COLUMN_TYPE.BIOLOGICAL_FACTOR);
   });
 
@@ -130,8 +130,8 @@ describe("updateClassification", () => {
 
     const allTypes = [
       COLUMN_TYPE.IDENTIFIER,
-      COLUMN_TYPE.FORWARD_FILE_PATH,
-      COLUMN_TYPE.REVERSE_FILE_PATH,
+      COLUMN_TYPE.FORWARD_FILE_URL,
+      COLUMN_TYPE.REVERSE_FILE_URL,
       COLUMN_TYPE.BIOLOGICAL_FACTOR,
       COLUMN_TYPE.TECHNICAL_BLOCKING_FACTOR,
       COLUMN_TYPE.OTHER_COVARIATE,

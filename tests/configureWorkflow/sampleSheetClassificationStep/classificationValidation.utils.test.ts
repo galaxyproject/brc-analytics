@@ -8,8 +8,8 @@ import {
 describe("mapValidation", () => {
   test("returns all validations as true when all requirements are met", () => {
     const classifications: ColumnClassifications = {
-      forward_path: COLUMN_TYPE.FORWARD_FILE_PATH,
-      reverse_path: COLUMN_TYPE.REVERSE_FILE_PATH,
+      forward_path: COLUMN_TYPE.FORWARD_FILE_URL,
+      reverse_path: COLUMN_TYPE.REVERSE_FILE_URL,
       sample_id: COLUMN_TYPE.IDENTIFIER,
       treatment: COLUMN_TYPE.BIOLOGICAL_FACTOR,
     };
@@ -18,8 +18,8 @@ describe("mapValidation", () => {
 
     expect(result).toEqual([
       [true, VALIDATION_LABELS.IDENTIFIER],
-      [true, VALIDATION_LABELS.FORWARD_FILE_PATH],
-      [true, VALIDATION_LABELS.REVERSE_FILE_PATH],
+      [true, VALIDATION_LABELS.FORWARD_FILE_URL],
+      [true, VALIDATION_LABELS.REVERSE_FILE_URL],
       [true, VALIDATION_LABELS.BIOLOGICAL_FACTOR],
       [true, "All columns classified"],
     ]);
@@ -27,8 +27,8 @@ describe("mapValidation", () => {
 
   test("returns identifier validation as false when no identifier specified", () => {
     const classifications: ColumnClassifications = {
-      forward_path: COLUMN_TYPE.FORWARD_FILE_PATH,
-      reverse_path: COLUMN_TYPE.REVERSE_FILE_PATH,
+      forward_path: COLUMN_TYPE.FORWARD_FILE_URL,
+      reverse_path: COLUMN_TYPE.REVERSE_FILE_URL,
       sample_id: COLUMN_TYPE.IGNORED,
       treatment: COLUMN_TYPE.BIOLOGICAL_FACTOR,
     };
@@ -38,22 +38,22 @@ describe("mapValidation", () => {
     expect(result[0]).toEqual([false, VALIDATION_LABELS.IDENTIFIER]);
   });
 
-  test("returns forward file path validation as false when not specified", () => {
+  test("returns forward file URL validation as false when not specified", () => {
     const classifications: ColumnClassifications = {
       forward_path: COLUMN_TYPE.IGNORED,
-      reverse_path: COLUMN_TYPE.REVERSE_FILE_PATH,
+      reverse_path: COLUMN_TYPE.REVERSE_FILE_URL,
       sample_id: COLUMN_TYPE.IDENTIFIER,
       treatment: COLUMN_TYPE.BIOLOGICAL_FACTOR,
     };
 
     const result = mapValidation(classifications);
 
-    expect(result[1]).toEqual([false, VALIDATION_LABELS.FORWARD_FILE_PATH]);
+    expect(result[1]).toEqual([false, VALIDATION_LABELS.FORWARD_FILE_URL]);
   });
 
-  test("returns reverse file path validation as false when not specified", () => {
+  test("returns reverse file URL validation as false when not specified", () => {
     const classifications: ColumnClassifications = {
-      forward_path: COLUMN_TYPE.FORWARD_FILE_PATH,
+      forward_path: COLUMN_TYPE.FORWARD_FILE_URL,
       reverse_path: COLUMN_TYPE.IGNORED,
       sample_id: COLUMN_TYPE.IDENTIFIER,
       treatment: COLUMN_TYPE.BIOLOGICAL_FACTOR,
@@ -61,13 +61,13 @@ describe("mapValidation", () => {
 
     const result = mapValidation(classifications);
 
-    expect(result[2]).toEqual([false, VALIDATION_LABELS.REVERSE_FILE_PATH]);
+    expect(result[2]).toEqual([false, VALIDATION_LABELS.REVERSE_FILE_URL]);
   });
 
   test("returns biological factor validation as false when not specified", () => {
     const classifications: ColumnClassifications = {
-      forward_path: COLUMN_TYPE.FORWARD_FILE_PATH,
-      reverse_path: COLUMN_TYPE.REVERSE_FILE_PATH,
+      forward_path: COLUMN_TYPE.FORWARD_FILE_URL,
+      reverse_path: COLUMN_TYPE.REVERSE_FILE_URL,
       sample_id: COLUMN_TYPE.IDENTIFIER,
       treatment: COLUMN_TYPE.IGNORED,
     };
@@ -79,8 +79,8 @@ describe("mapValidation", () => {
 
   test("returns all columns classified as false when null values present", () => {
     const classifications: ColumnClassifications = {
-      forward_path: COLUMN_TYPE.FORWARD_FILE_PATH,
-      reverse_path: COLUMN_TYPE.REVERSE_FILE_PATH,
+      forward_path: COLUMN_TYPE.FORWARD_FILE_URL,
+      reverse_path: COLUMN_TYPE.REVERSE_FILE_URL,
       sample_id: COLUMN_TYPE.IDENTIFIER,
       treatment: null,
     };
@@ -102,8 +102,8 @@ describe("mapValidation", () => {
 
     expect(result).toEqual([
       [false, VALIDATION_LABELS.IDENTIFIER],
-      [false, VALIDATION_LABELS.FORWARD_FILE_PATH],
-      [false, VALIDATION_LABELS.REVERSE_FILE_PATH],
+      [false, VALIDATION_LABELS.FORWARD_FILE_URL],
+      [false, VALIDATION_LABELS.REVERSE_FILE_URL],
       [false, VALIDATION_LABELS.BIOLOGICAL_FACTOR],
       [false, "All columns classified"],
     ]);
@@ -116,8 +116,8 @@ describe("mapValidation", () => {
 
     expect(result).toEqual([
       [false, VALIDATION_LABELS.IDENTIFIER],
-      [false, VALIDATION_LABELS.FORWARD_FILE_PATH],
-      [false, VALIDATION_LABELS.REVERSE_FILE_PATH],
+      [false, VALIDATION_LABELS.FORWARD_FILE_URL],
+      [false, VALIDATION_LABELS.REVERSE_FILE_URL],
       [false, VALIDATION_LABELS.BIOLOGICAL_FACTOR],
       [true, "All columns classified"],
     ]);
@@ -126,8 +126,8 @@ describe("mapValidation", () => {
   test("returns correct validation with multiple biological factors", () => {
     const classifications: ColumnClassifications = {
       condition: COLUMN_TYPE.BIOLOGICAL_FACTOR,
-      forward_path: COLUMN_TYPE.FORWARD_FILE_PATH,
-      reverse_path: COLUMN_TYPE.REVERSE_FILE_PATH,
+      forward_path: COLUMN_TYPE.FORWARD_FILE_URL,
+      reverse_path: COLUMN_TYPE.REVERSE_FILE_URL,
       sample_id: COLUMN_TYPE.IDENTIFIER,
       treatment: COLUMN_TYPE.BIOLOGICAL_FACTOR,
     };
@@ -141,10 +141,10 @@ describe("mapValidation", () => {
     const classifications: ColumnClassifications = {
       batch: COLUMN_TYPE.TECHNICAL_BLOCKING_FACTOR,
       covariate: COLUMN_TYPE.OTHER_COVARIATE,
-      forward_path: COLUMN_TYPE.FORWARD_FILE_PATH,
+      forward_path: COLUMN_TYPE.FORWARD_FILE_URL,
       notes: COLUMN_TYPE.IGNORED,
       qc_metric: COLUMN_TYPE.QC_ONLY,
-      reverse_path: COLUMN_TYPE.REVERSE_FILE_PATH,
+      reverse_path: COLUMN_TYPE.REVERSE_FILE_URL,
       sample_id: COLUMN_TYPE.IDENTIFIER,
       treatment: COLUMN_TYPE.BIOLOGICAL_FACTOR,
     };
@@ -153,8 +153,8 @@ describe("mapValidation", () => {
 
     expect(result).toEqual([
       [true, VALIDATION_LABELS.IDENTIFIER],
-      [true, VALIDATION_LABELS.FORWARD_FILE_PATH],
-      [true, VALIDATION_LABELS.REVERSE_FILE_PATH],
+      [true, VALIDATION_LABELS.FORWARD_FILE_URL],
+      [true, VALIDATION_LABELS.REVERSE_FILE_URL],
       [true, VALIDATION_LABELS.BIOLOGICAL_FACTOR],
       [true, "All columns classified"],
     ]);

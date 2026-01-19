@@ -27,10 +27,10 @@ describe("useFormulaSelection", () => {
 
     test("filters out non-formula column types", () => {
       const sampleSheetClassification: Record<string, COLUMN_TYPE | null> = {
-        forward: COLUMN_TYPE.FORWARD_FILE_PATH,
+        forward: COLUMN_TYPE.FORWARD_FILE_URL,
         notes: COLUMN_TYPE.IGNORED,
         qc_metric: COLUMN_TYPE.QC_ONLY,
-        reverse: COLUMN_TYPE.REVERSE_FILE_PATH,
+        reverse: COLUMN_TYPE.REVERSE_FILE_URL,
         sample_id: COLUMN_TYPE.IDENTIFIER,
         treatment: COLUMN_TYPE.BIOLOGICAL_FACTOR,
       };

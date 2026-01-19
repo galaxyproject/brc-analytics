@@ -32,24 +32,24 @@ export function validateClassifications(
     errors.push("Only one identifier column is allowed");
   }
 
-  // Check exactly one forward file path
-  const forwardFilePathCount = values.filter(
-    (v) => v === COLUMN_TYPE.FORWARD_FILE_PATH
+  // Check exactly one forward file URL
+  const forwardFileUrlCount = values.filter(
+    (v) => v === COLUMN_TYPE.FORWARD_FILE_URL
   ).length;
-  if (forwardFilePathCount === 0) {
-    errors.push("One forward file path column is required");
-  } else if (forwardFilePathCount > 1) {
-    errors.push("Only one forward file path column is allowed");
+  if (forwardFileUrlCount === 0) {
+    errors.push("One forward file URL column is required");
+  } else if (forwardFileUrlCount > 1) {
+    errors.push("Only one forward file URL column is allowed");
   }
 
-  // Check exactly one reverse file path
-  const reverseFilePathCount = values.filter(
-    (v) => v === COLUMN_TYPE.REVERSE_FILE_PATH
+  // Check exactly one reverse file URL
+  const reverseFileUrlCount = values.filter(
+    (v) => v === COLUMN_TYPE.REVERSE_FILE_URL
   ).length;
-  if (reverseFilePathCount === 0) {
-    errors.push("One reverse file path column is required");
-  } else if (reverseFilePathCount > 1) {
-    errors.push("Only one reverse file path column is allowed");
+  if (reverseFileUrlCount === 0) {
+    errors.push("One reverse file URL column is required");
+  } else if (reverseFileUrlCount > 1) {
+    errors.push("Only one reverse file URL column is allowed");
   }
 
   // Check at least one biological factor
