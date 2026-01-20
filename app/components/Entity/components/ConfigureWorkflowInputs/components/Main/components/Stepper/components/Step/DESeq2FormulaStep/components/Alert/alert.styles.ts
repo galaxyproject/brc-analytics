@@ -4,7 +4,7 @@ import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/fon
 
 export const StyledAlert = styled(Alert)`
   &.MuiAlert-root {
-    justify-self: stretch;
+    width: 100%;
 
     .MuiAlert-message {
       font: ${FONT.BODY_400_2_LINES};

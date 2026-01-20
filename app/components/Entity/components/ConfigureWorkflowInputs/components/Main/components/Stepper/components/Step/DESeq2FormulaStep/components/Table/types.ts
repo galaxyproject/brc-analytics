@@ -1,3 +1,4 @@
+import { OnConfigure } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import {
   FormulaColumn,
   FormulaSelection,
@@ -7,6 +8,7 @@ import {
 
 export interface Props {
   columns: FormulaColumn[];
+  onConfigure: OnConfigure;
   onSelectPrimary: OnSelectPrimary;
   onToggleCovariate: OnToggleCovariate;
   selection: FormulaSelection;
