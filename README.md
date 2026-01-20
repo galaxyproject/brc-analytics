@@ -14,19 +14,18 @@ Run `npm run build:local` to build. The built app can be run using `npm start`, 
 
 ## Running the full stack with Docker
 
-To run the complete application stack (frontend, backend API, and Redis) without installing Node.js locally:
+To run the complete application stack (frontend, backend API, and Redis):
 
 ```shell
-cd backend
-docker compose up --build -d
+./backend/docker-build.sh
 ```
 
-This builds the Next.js frontend inside a container and serves it via nginx at `http://localhost:8080`. The backend API is available at `/api/v1/`.
+This extracts the version from package.json, builds the Next.js frontend inside a container, and serves it via nginx at `http://localhost:8080`. The backend API is available at `/api/v1/`.
 
 To stop the stack:
 
 ```shell
-docker compose down
+cd backend && docker compose down
 ```
 
 Note: The backend requires a `.env` file at `backend/api/.env` with LLM configuration for the catalog search feature. See `backend/api/.env.example` for required variables.
