@@ -147,100 +147,60 @@ describe("useFilePicker", () => {
     }).not.toThrow();
   });
 
-  test("onFileChange calls onSuccess with file when first file is selected", () => {
+  test("onFileChange does not call onComplete when same file is re-selected", async () => {
     const { result } = renderHook(() => useFilePicker());
-    const mockFile = createMockFile("test.csv");
-    const onSuccess = jest.fn();
+    // Create a valid CSV file with 4 columns and 2 data rows
+    const validContent = "a,b,c,d\n1,2,3,4\n5,6,7,8";
+    const mockFile = new File([validContent], "test.csv", { type: "text/csv" });
+    const onComplete = jest.fn();
 
-    act(() => {
-      result.current.actions.onFileChange(createMockFileChangeEvent(mockFile), {
-        onSuccess,
-      });
-    });
-
-    expect(onSuccess).toHaveBeenCalledTimes(1);
-    expect(onSuccess).toHaveBeenCalledWith(mockFile);
-  });
-
-  test("onFileChange calls onSuccess with file when file changes", () => {
-    const { result } = renderHook(() => useFilePicker());
-    const firstFile = createMockFile("first.csv");
-    const secondFile = createMockFile("second.csv");
-    const onSuccess = jest.fn();
-
-    act(() => {
-      result.current.actions.onFileChange(
-        createMockFileChangeEvent(firstFile),
-        { onSuccess }
+    await act(async () => {
+      await result.current.actions.onFileChange(
+        createMockFileChangeEvent(mockFile),
+        { onComplete }
       );
     });
-
-    expect(onSuccess).toHaveBeenCalledTimes(1);
-    expect(onSuccess).toHaveBeenLastCalledWith(firstFile);
-
-    act(() => {
-      result.current.actions.onFileChange(
-        createMockFileChangeEvent(secondFile),
-        { onSuccess }
-      );
-    });
-
-    expect(onSuccess).toHaveBeenCalledTimes(2);
-    expect(onSuccess).toHaveBeenLastCalledWith(secondFile);
-  });
-
-  test("onFileChange does not call onSuccess when same file is re-selected", () => {
-    const { result } = renderHook(() => useFilePicker());
-    const mockFile = createMockFile("test.csv");
-    const onSuccess = jest.fn();
-
-    act(() => {
-      result.current.actions.onFileChange(createMockFileChangeEvent(mockFile), {
-        onSuccess,
-      });
-    });
-
-    expect(onSuccess).toHaveBeenCalledTimes(1);
 
     // Re-select the same file (same name, size, lastModified)
-    act(() => {
-      result.current.actions.onFileChange(createMockFileChangeEvent(mockFile), {
-        onSuccess,
-      });
+    await act(async () => {
+      await result.current.actions.onFileChange(
+        createMockFileChangeEvent(mockFile),
+        { onComplete }
+      );
     });
 
-    // onSuccess should NOT be called again
-    expect(onSuccess).toHaveBeenCalledTimes(1);
+    // onComplete should NOT be called again for the same file
+    expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
-  test("onFileChange calls onSuccess with file after onClear and re-select", () => {
+  test("initializes with empty validation errors", () => {
     const { result } = renderHook(() => useFilePicker());
-    const mockFile = createMockFile("test.csv");
-    const onSuccess = jest.fn();
 
-    // Select file
-    act(() => {
-      result.current.actions.onFileChange(createMockFileChangeEvent(mockFile), {
-        onSuccess,
-      });
+    expect(result.current.validation.errors).toEqual([]);
+    expect(result.current.validation.isValid).toBe(false);
+  });
+
+  test("onClear resets validation errors", async () => {
+    const { result } = renderHook(() => useFilePicker());
+    // Create a file that will fail validation (less than 4 columns)
+    const invalidContent = "a,b\n1,2\n3,4";
+    const invalidFile = new File([invalidContent], "invalid.csv", {
+      type: "text/csv",
     });
 
-    expect(onSuccess).toHaveBeenCalledTimes(1);
-    expect(onSuccess).toHaveBeenCalledWith(mockFile);
+    await act(async () => {
+      await result.current.actions.onFileChange(
+        createMockFileChangeEvent(invalidFile),
+        {}
+      );
+    });
 
-    // Clear file
+    expect(result.current.validation.errors.length).toBeGreaterThan(0);
+
     act(() => {
       result.current.actions.onClear();
     });
 
-    // Re-select the same file - should call onSuccess since we cleared
-    act(() => {
-      result.current.actions.onFileChange(createMockFileChangeEvent(mockFile), {
-        onSuccess,
-      });
-    });
-
-    expect(onSuccess).toHaveBeenCalledTimes(2);
-    expect(onSuccess).toHaveBeenLastCalledWith(mockFile);
+    expect(result.current.validation.errors).toEqual([]);
   });
 });

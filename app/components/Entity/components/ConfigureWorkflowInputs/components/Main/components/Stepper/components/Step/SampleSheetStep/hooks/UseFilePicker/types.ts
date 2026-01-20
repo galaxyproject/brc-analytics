@@ -1,7 +1,7 @@
 import { ChangeEvent, RefObject } from "react";
 
 export interface OnFileChangeOptions {
-  onSuccess?: (file: File) => Promise<void> | void;
+  onComplete?: (rows: Record<string, string>[]) => void;
 }
 
 export interface UseFilePicker {
@@ -15,4 +15,10 @@ export interface UseFilePicker {
   };
   file: File | null;
   inputRef: RefObject<HTMLInputElement>;
+  validation: Validation;
+}
+
+export interface Validation {
+  errors: string[];
+  isValid: boolean;
 }
