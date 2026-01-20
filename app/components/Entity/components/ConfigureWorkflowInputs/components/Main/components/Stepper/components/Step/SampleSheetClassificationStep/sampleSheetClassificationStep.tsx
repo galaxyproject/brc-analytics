@@ -39,7 +39,7 @@ export const SampleSheetClassificationStep = ({
           <StyledStack>
             <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400_2_LINES}>
               Please assign a column type for all columns and specify one
-              identifier, a forward and reverse file path and at least one
+              identifier, a forward and reverse file URL and at least one
               biological factor.
             </Typography>
           </StyledStack>
