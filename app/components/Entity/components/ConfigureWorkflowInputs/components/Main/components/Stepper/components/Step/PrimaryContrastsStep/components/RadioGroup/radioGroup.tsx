@@ -23,11 +23,9 @@ export const RadioGroup = ({
           control={
             <Radio
               checkedIcon={<RadioCheckedIcon />}
-              disabled={option.disabled}
               icon={<RadioUncheckedIcon />}
             />
           }
-          disabled={option.disabled}
           label={
             <Stack gap={1} useFlexGap>
               <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_500}>

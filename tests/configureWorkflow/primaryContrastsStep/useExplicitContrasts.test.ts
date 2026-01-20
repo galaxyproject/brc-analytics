@@ -1,5 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { useExplicitContrasts } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseExplicitContrasts/hook";
+import { buildExplicitContrasts } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseExplicitContrasts/utils";
+import { ContrastPairs } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseExplicitContrasts/types";
 
 describe("useExplicitContrasts", () => {
   describe("initialization", () => {
@@ -200,6 +202,86 @@ describe("useExplicitContrasts", () => {
       expect(result.current.pairs.size).toBe(1);
       expect([...result.current.pairs.values()]).toEqual([["", ""]]);
       expect(result.current.valid).toBe(false);
+    });
+  });
+});
+
+describe("buildExplicitContrasts", () => {
+  test("returns null when pairs map is empty", () => {
+    const pairs: ContrastPairs = new Map();
+    const result = buildExplicitContrasts(pairs);
+
+    expect(result).toBeNull();
+  });
+
+  test("returns null when all pairs are empty", () => {
+    const pairs: ContrastPairs = new Map([
+      ["0", ["", ""]],
+      ["1", ["", ""]],
+    ]);
+    const result = buildExplicitContrasts(pairs);
+
+    expect(result).toBeNull();
+  });
+
+  test("returns null when pairs have only one value filled", () => {
+    const pairs: ContrastPairs = new Map([
+      ["0", ["control", ""]],
+      ["1", ["", "treated"]],
+    ]);
+    const result = buildExplicitContrasts(pairs);
+
+    expect(result).toBeNull();
+  });
+
+  test("returns null when pairs have same value on both sides", () => {
+    const pairs: ContrastPairs = new Map([["0", ["control", "control"]]]);
+    const result = buildExplicitContrasts(pairs);
+
+    expect(result).toBeNull();
+  });
+
+  test("returns ExplicitContrasts with valid pairs", () => {
+    const pairs: ContrastPairs = new Map([
+      ["0", ["control", "treated"]],
+      ["1", ["baseline", "experiment"]],
+    ]);
+    const result = buildExplicitContrasts(pairs);
+
+    expect(result).toEqual({
+      pairs: [
+        ["control", "treated"],
+        ["baseline", "experiment"],
+      ],
+      type: "EXPLICIT",
+    });
+  });
+
+  test("filters out invalid pairs and returns only valid ones", () => {
+    const pairs: ContrastPairs = new Map([
+      ["0", ["control", "treated"]],
+      ["1", ["", ""]],
+      ["2", ["a", "a"]],
+      ["3", ["baseline", "experiment"]],
+    ]);
+    const result = buildExplicitContrasts(pairs);
+
+    expect(result).toEqual({
+      pairs: [
+        ["control", "treated"],
+        ["baseline", "experiment"],
+      ],
+      type: "EXPLICIT",
+    });
+  });
+
+  test("returns ExplicitContrasts with single valid pair", () => {
+    const pairs: ContrastPairs = new Map([["0", ["control", "treated"]]]);
+    const result = buildExplicitContrasts(pairs);
+
+    expect(result).toEqual({
+      pairs: [["control", "treated"]],
+      type: "EXPLICIT",
     });
   });
 });

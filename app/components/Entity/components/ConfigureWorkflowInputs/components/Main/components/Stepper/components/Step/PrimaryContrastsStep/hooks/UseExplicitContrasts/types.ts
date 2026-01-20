@@ -1,3 +1,5 @@
+import { ExplicitContrasts } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+
 export type ContrastPair = [string, string];
 
 export type ContrastPairs = Map<string, ContrastPair>;
@@ -13,5 +15,6 @@ export interface UseExplicitContrasts {
   onRemovePair: OnRemovePair;
   onUpdatePair: OnUpdatePair;
   pairs: ContrastPairs;
+  primaryContrasts: ExplicitContrasts | null;
   valid: boolean;
 }
