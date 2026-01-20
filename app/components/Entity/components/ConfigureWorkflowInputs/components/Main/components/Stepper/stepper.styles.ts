@@ -10,7 +10,7 @@ export const StyledStepper = styled(Stepper)`
 
   .MuiStep-root {
     align-self: flex-start;
-    grid-column: 1/ 9;
+    grid-column: 1 / 9;
 
     .MuiStepLabel-labelContainer {
       display: grid;
