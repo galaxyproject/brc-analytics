@@ -30,17 +30,18 @@ export const PrimaryContrastsStep = ({
   const explicitContrasts = useExplicitContrasts(configuredInput.primaryFactor);
   const radioGroup = useRadioGroup(CONTRAST_MODE.ALL_AGAINST_ALL);
 
+  const factorValues = useMemo(
+    () => getUniqueFactorValues(configuredInput),
+    [configuredInput]
+  );
+
   const mode = radioGroup.value;
 
   const { disabled, primaryContrasts } = usePrimaryContrasts(
     mode,
     baselineContrasts,
-    explicitContrasts
-  );
-
-  const factorValues = useMemo(
-    () => getUniqueFactorValues(configuredInput),
-    [configuredInput]
+    explicitContrasts,
+    factorValues.length
   );
 
   return (

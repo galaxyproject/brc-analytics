@@ -33,13 +33,17 @@ export function getPrimaryContrasts(
  * @param mode - Mode.
  * @param isBaselineValid - Whether baseline is valid.
  * @param isExplicitValid - Whether explicit pairs are valid.
+ * @param factorValuesCount - Number of unique factor values.
  * @returns True if the button should be disabled.
  */
 export function isDisabled(
   mode: CONTRAST_MODE,
   isBaselineValid: boolean,
-  isExplicitValid: boolean
+  isExplicitValid: boolean,
+  factorValuesCount: number
 ): boolean {
+  // Need at least 2 factor values to create any pairs.
+  if (factorValuesCount < 2) return true;
   if (mode === CONTRAST_MODE.BASELINE) return !isBaselineValid;
   if (mode === CONTRAST_MODE.EXPLICIT) return !isExplicitValid;
   return false;
