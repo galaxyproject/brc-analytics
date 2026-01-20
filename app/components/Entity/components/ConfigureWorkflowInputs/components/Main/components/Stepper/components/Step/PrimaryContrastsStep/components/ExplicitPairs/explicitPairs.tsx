@@ -18,6 +18,7 @@ export const ExplicitPairs = ({
   pairs,
 }: Props): JSX.Element | null => {
   if (mode !== CONTRAST_MODE.EXPLICIT) return null;
+  if (factorValues.length < 2) return null;
   return (
     <StyledStack gap={4} useFlexGap>
       <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_500}>

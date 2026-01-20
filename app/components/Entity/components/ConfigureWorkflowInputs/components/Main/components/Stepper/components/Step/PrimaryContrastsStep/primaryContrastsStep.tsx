@@ -15,6 +15,7 @@ import { CONTRAST_MODE } from "./hooks/UseRadioGroup/types";
 import { useRadioGroup } from "../hooks/UseRadioGroup/hook";
 import { getUniqueFactorValues } from "./utils";
 import { StyledStack as CommonStyledStack } from "../step.styles";
+import { Alert } from "./components/Alert/alert";
 
 export const PrimaryContrastsStep = ({
   active,
@@ -55,7 +56,7 @@ export const PrimaryContrastsStep = ({
       </StepLabel>
       <StyledStepContent>
         <StyledStack gap={1} useFlexGap>
-          <RadioGroup {...radioGroup} />
+          <RadioGroup {...radioGroup} disabled={factorValues.length < 2} />
           <CompareBaseline
             {...baselineContrasts}
             factorValues={factorValues}
@@ -65,6 +66,10 @@ export const PrimaryContrastsStep = ({
             {...explicitContrasts}
             factorValues={factorValues}
             mode={mode}
+          />
+          <Alert
+            factorValues={factorValues}
+            primaryFactor={configuredInput.primaryFactor}
           />
         </StyledStack>
         <Divider flexItem />

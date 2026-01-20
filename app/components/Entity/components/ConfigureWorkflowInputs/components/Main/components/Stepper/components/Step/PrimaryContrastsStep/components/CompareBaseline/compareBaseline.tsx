@@ -28,6 +28,7 @@ export const CompareBaseline = ({
   onToggleCompare,
 }: Props): JSX.Element | null => {
   if (mode !== CONTRAST_MODE.BASELINE) return null;
+  if (factorValues.length < 2) return null;
   return (
     <StyledStack gap={5} useFlexGap>
       <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_500}>
