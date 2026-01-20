@@ -7,6 +7,7 @@ import { CONTRAST_MODE } from "../../hooks/UseRadioGroup/types";
 import { AddRounded } from "@mui/icons-material";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
+import { isAllPairsUsed } from "../../hooks/UseExplicitContrasts/utils";
 
 export const ExplicitPairs = ({
   factorValues,
@@ -29,10 +30,13 @@ export const ExplicitPairs = ({
           onRemove={() => onRemovePair(id)}
           onUpdate={(position, value) => onUpdatePair(id, position, value)}
           pair={pair}
+          pairId={id}
+          pairs={pairs}
         />
       ))}
       <Button
         {...BUTTON_PROPS.SECONDARY_CONTAINED}
+        disabled={isAllPairsUsed(factorValues, pairs)}
         onClick={onAddPair}
         startIcon={<AddRounded color={SVG_ICON_PROPS.COLOR.INK_LIGHT} />}
       >

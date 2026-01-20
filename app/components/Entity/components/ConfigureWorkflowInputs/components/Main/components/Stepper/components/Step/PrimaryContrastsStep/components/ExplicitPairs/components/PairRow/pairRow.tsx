@@ -4,14 +4,19 @@ import { StyledStack, StyledSelect } from "./pairRow.styles";
 import { DeleteIcon } from "../../../../../../../../../../../../../../common/CustomIcon/components/DeleteIcon/deleteIcon";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { ICON_BUTTON_PROPS, SELECT_PROPS, SVG_ICON_PROPS } from "./constants";
+import { getDisabledValues } from "../../../../hooks/UseExplicitContrasts/utils";
 
 export const PairRow = ({
   factorValues,
   onRemove,
   onUpdate,
   pair,
+  pairId,
+  pairs,
 }: Props): JSX.Element => {
   const [valueA, valueB] = pair;
+  const disabledA = getDisabledValues(factorValues, pairs, pairId, valueB);
+  const disabledB = getDisabledValues(factorValues, pairs, pairId, valueA);
   return (
     <Stack direction="row" gap={5} useFlexGap>
       <StyledStack direction="row" gap={4} useFlexGap>
@@ -23,7 +28,7 @@ export const PairRow = ({
           value={valueA}
         >
           {factorValues.map((value) => (
-            <MenuItem key={value} value={value}>
+            <MenuItem disabled={disabledA.has(value)} key={value} value={value}>
               {value}
             </MenuItem>
           ))}
@@ -42,7 +47,7 @@ export const PairRow = ({
           value={valueB}
         >
           {factorValues.map((value) => (
-            <MenuItem key={value} value={value}>
+            <MenuItem disabled={disabledB.has(value)} key={value} value={value}>
               {value}
             </MenuItem>
           ))}
