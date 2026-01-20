@@ -275,25 +275,24 @@ export function getChecksumForPath(
 ): string | undefined {
   if (md5Checksums.size === 0) return undefined;
 
-  // URL is like https://hgdownload.soe.ucsc.edu/hubs/GCF/900/681/995/GCF_900681995.1/tracks/someTrack.bb
-  // We want to extract the part relative to the hub root (which is where md5sum.txt usually is)
-  // The hub root ends with the assembly ID.
+  // Extract the filename from the URL, handling URL encoding
+  const urlParts = decodeURIComponent(url).split("/");
+  const filename = urlParts[urlParts.length - 1];
 
-  // Simple heuristic: split by assembly ID
-  const parts = url.split(`${assembly}/`);
-  if (parts.length < 2) return undefined;
+  // Look for the file by its filename (after the last slash)
+  // This handles both formats:
+  // - "0acca9c7b13d7231adac67a4c6e544b3  GCF_900681995.1.fa.gz"
+  // - "84adf5fc228278369f6cc70e9d6080fe  /mirrordata/hubs/GCF/045/689/255/GCF_045689255.1/GCF_045689255.1.fa.gz"
+  for (const [path, hash] of md5Checksums.entries()) {
+    // Extract the filename from the md5sum entry, handling arbitrary path depths
+    const pathParts = path.split("/");
+    const pathFilename = pathParts[pathParts.length - 1];
 
-  // The relative path is everything after the first occurrence of the assembly ID + slash
-  const relativePath = parts.slice(1).join(`${assembly}/`);
-
-  // Check direct match
-  if (md5Checksums.has(relativePath)) {
-    return md5Checksums.get(relativePath);
-  }
-
-  // Sometimes md5sum.txt might have ./ prefix
-  if (md5Checksums.has(`./${relativePath}`)) {
-    return md5Checksums.get(`./${relativePath}`);
+    // If the filenames match (case-sensitive), use this hash
+    // This works regardless of path depth or spaces in filenames
+    if (pathFilename === filename) {
+      return hash;
+    }
   }
 
   return undefined;
