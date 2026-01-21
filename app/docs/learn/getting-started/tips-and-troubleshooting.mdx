@@ -12,14 +12,22 @@ enableOutline: true
 title: "Tips and Troubleshooting"
 ---
 
+## Overview
+
+This guide focuses on troubleshooting issues specifically related to the **BRC Analytics to Galaxy handoff** and common reasons why a Galaxy workflow launched from BRC Analytics might fail.
+
+> **New to Galaxy?**
+> If you are new to the Galaxy platform, please visit the [Using Galaxy](/learn/using-galaxy) page first to learn about the interface, datasets, and where to find tutorials.
+
 ## Data Management Tips
 
-### Organizing Your Histories
+### Organizing Your Galaxy Histories
 
-- **Create separate histories** for different projects or experiments
+- When you land in Galaxy, **Create separate histories** for different projects or experiments
 - **Name histories descriptively** (e.g., "Measles_Surveillance_2024")
 - **Add tags** to datasets for easy filtering
-- **Delete unnecessary files** to manage storage
+- **Delete unnecessary files** to manage storage (contact Galaxy support if you need a quota increase)
+- **Use collections** to group datasets. **Note:** If you upload your own reads, you must typically organize them into a "Collection" (e.g., a Paired List) for BRC workflows to recognize and process them correctly.
 
 ### Saving and Exporting Data
 
@@ -28,41 +36,22 @@ title: "Tips and Troubleshooting"
 - **Share histories** with collaborators via Galaxy's sharing features
 - **Publish analyses** to make them publicly accessible
 
-## Understanding Galaxy Basics
-
-Since BRC Analytics runs on Galaxy, understanding these fundamentals is helpful:
-
-### The Three-Panel Interface
-
-1. **Left panel (Tools)**: Available analysis tools and workflows
-2. **Middle panel (Main)**: Tool forms, visualizations, and documentation
-3. **Right panel (History)**: Your datasets and analysis outputs
-
-### Datasets
-
-- Each file in your history is a dataset
-- Color coding indicates status:
-  - **Gray**: Waiting to run
-  - **Yellow**: Running
-  - **Green**: Successfully completed
-  - **Red**: Failed (click for error details)
-
-### Collections
-
-- Group related datasets together
-- Useful for batch processing multiple samples
-- Created automatically for paired-end reads or can be manually created for grouping
-
 ## Troubleshooting Common Issues
+
+### When launching from BRC Analytics
+
+- **"Nothing is happening"**: After clicking Launch, it may look like the workflow is idle. Usually, this means Galaxy is downloading large datasets (like reference genomes or SRA reads). Check the history panel—if datasets are grey or yellow, the process is active.
+- **Not logged into UseGalaxy.org**: If the handoff redirects you to a login screen, sign in and then relaunch the workflow from BRC Analytics so the configuration is sent with your authenticated session.
+- **Jobs appear in a different history**: Galaxy runs workflows in whichever history was most recently active. Open the history panel and switch to the newest history to review datasets.
 
 ### Analysis Failed (Red Dataset)
 
 1. Click on the red dataset
 2. Review the error message
 3. Common causes:
-   - Incorrect file format
-   - Invalid parameter values
-   - Insufficient computational resources
+   - **Incompatible Input Data**: While BRC filters inputs to match workflows (e.g., enforcing paired-end reads for paired-end workflows), users can manually override these filters when selecting SRA runs. If you force single-end data into a paired-end workflow, it will fail.
+   - **Missing Galaxy Configuration**: Some workflows have runtime parameters that must be set inside Galaxy after launch. If these are left as defaults, the tool may fail.
+   - **Resource limits**: Extremely large datasets might exceed default memory or time allocations.
 4. Adjust settings and re-run
 
 ### Dataset Stuck in Gray/Yellow
@@ -76,13 +65,6 @@ Since BRC Analytics runs on Galaxy, understanding these fundamentals is helpful:
 - Check you're viewing the correct history
 - Use the search function in the history panel
 - Datasets may be hidden - click "Include hidden datasets"
-
-### Results Don't Look Right
-
-- Verify input data quality
-- Check parameter settings
-- Compare with expected reference
-- Review QC reports for issues
 
 ## Best Practices
 
@@ -101,11 +83,3 @@ Since BRC Analytics runs on Galaxy, understanding these fundamentals is helpful:
 3. **Delete intermediate files**: Keep only essential outputs
 4. **Monitor job status**: Check for errors early
 5. **Save important results**: Download completed analyses
-
-### For Quality Results
-
-1. **Always run QC first**: Assess data quality
-2. **Use appropriate references**: Match your organism
-3. **Validate results**: Check consistency across samples
-4. **Review annotations carefully**: Understand variant impacts
-5. **Consult documentation**: Each tool has specific requirements

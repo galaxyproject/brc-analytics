@@ -21,14 +21,14 @@ describe("isOptionDisabled", () => {
       expect(result).toBe(true);
     });
 
-    test("disables FORWARD_FILE_PATH when already used by another column", () => {
+    test("disables FORWARD_FILE_URL when already used by another column", () => {
       const classifications: ColumnClassifications = {
-        col1: COLUMN_TYPE.FORWARD_FILE_PATH,
+        col1: COLUMN_TYPE.FORWARD_FILE_URL,
         col2: null,
       };
 
       const result = isOptionDisabled(
-        COLUMN_TYPE.FORWARD_FILE_PATH,
+        COLUMN_TYPE.FORWARD_FILE_URL,
         null,
         classifications
       );
@@ -36,14 +36,14 @@ describe("isOptionDisabled", () => {
       expect(result).toBe(true);
     });
 
-    test("disables REVERSE_FILE_PATH when already used by another column", () => {
+    test("disables REVERSE_FILE_URL when already used by another column", () => {
       const classifications: ColumnClassifications = {
-        col1: COLUMN_TYPE.REVERSE_FILE_PATH,
+        col1: COLUMN_TYPE.REVERSE_FILE_URL,
         col2: null,
       };
 
       const result = isOptionDisabled(
-        COLUMN_TYPE.REVERSE_FILE_PATH,
+        COLUMN_TYPE.REVERSE_FILE_URL,
         null,
         classifications
       );
@@ -76,10 +76,10 @@ describe("isOptionDisabled", () => {
         isOptionDisabled(COLUMN_TYPE.IDENTIFIER, null, classifications)
       ).toBe(false);
       expect(
-        isOptionDisabled(COLUMN_TYPE.FORWARD_FILE_PATH, null, classifications)
+        isOptionDisabled(COLUMN_TYPE.FORWARD_FILE_URL, null, classifications)
       ).toBe(false);
       expect(
-        isOptionDisabled(COLUMN_TYPE.REVERSE_FILE_PATH, null, classifications)
+        isOptionDisabled(COLUMN_TYPE.REVERSE_FILE_URL, null, classifications)
       ).toBe(false);
     });
   });
@@ -169,10 +169,10 @@ describe("isOptionDisabled", () => {
         isOptionDisabled(COLUMN_TYPE.IDENTIFIER, null, classifications)
       ).toBe(false);
       expect(
-        isOptionDisabled(COLUMN_TYPE.FORWARD_FILE_PATH, null, classifications)
+        isOptionDisabled(COLUMN_TYPE.FORWARD_FILE_URL, null, classifications)
       ).toBe(false);
       expect(
-        isOptionDisabled(COLUMN_TYPE.REVERSE_FILE_PATH, null, classifications)
+        isOptionDisabled(COLUMN_TYPE.REVERSE_FILE_URL, null, classifications)
       ).toBe(false);
       expect(
         isOptionDisabled(COLUMN_TYPE.BIOLOGICAL_FACTOR, null, classifications)
@@ -190,15 +190,15 @@ describe("isOptionDisabled", () => {
         isOptionDisabled(COLUMN_TYPE.IDENTIFIER, null, classifications)
       ).toBe(false);
       expect(
-        isOptionDisabled(COLUMN_TYPE.FORWARD_FILE_PATH, null, classifications)
+        isOptionDisabled(COLUMN_TYPE.FORWARD_FILE_URL, null, classifications)
       ).toBe(false);
     });
 
     test("handles all single-select types being used", () => {
       const classifications: ColumnClassifications = {
         col1: COLUMN_TYPE.IDENTIFIER,
-        col2: COLUMN_TYPE.FORWARD_FILE_PATH,
-        col3: COLUMN_TYPE.REVERSE_FILE_PATH,
+        col2: COLUMN_TYPE.FORWARD_FILE_URL,
+        col3: COLUMN_TYPE.REVERSE_FILE_URL,
         col4: null,
       };
 
@@ -206,10 +206,10 @@ describe("isOptionDisabled", () => {
         isOptionDisabled(COLUMN_TYPE.IDENTIFIER, null, classifications)
       ).toBe(true);
       expect(
-        isOptionDisabled(COLUMN_TYPE.FORWARD_FILE_PATH, null, classifications)
+        isOptionDisabled(COLUMN_TYPE.FORWARD_FILE_URL, null, classifications)
       ).toBe(true);
       expect(
-        isOptionDisabled(COLUMN_TYPE.REVERSE_FILE_PATH, null, classifications)
+        isOptionDisabled(COLUMN_TYPE.REVERSE_FILE_URL, null, classifications)
       ).toBe(true);
 
       expect(
@@ -227,7 +227,7 @@ describe("isOptionDisabled", () => {
       };
 
       const result = isOptionDisabled(
-        COLUMN_TYPE.FORWARD_FILE_PATH,
+        COLUMN_TYPE.FORWARD_FILE_URL,
         COLUMN_TYPE.IDENTIFIER,
         classifications
       );

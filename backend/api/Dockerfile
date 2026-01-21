@@ -16,7 +16,7 @@ RUN uv sync --frozen --no-install-project
 FROM python:3.12-slim as runtime
 
 # Accept version as build argument
-ARG APP_VERSION=0.15.0
+ARG APP_VERSION=0.19.0
 ENV APP_VERSION=${APP_VERSION}
 
 # Install system dependencies

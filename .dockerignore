@@ -1,0 +1,51 @@
+# Dependencies (will be installed fresh in container)
+node_modules
+.pnp
+.pnp.js
+
+# Build outputs
+out
+.next
+
+# Testing
+coverage
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git (keep .git for version info in build)
+.gitignore
+
+# Environment files (use docker-specific config)
+.env
+.env.local
+.env.development
+.env.production.local
+
+# Python
+__pycache__
+*.pyc
+venv
+.venv
+*.egg-info
+
+# Logs
+*.log
+npm-debug.log*
+
+# Backend (built separately)
+backend/api/.venv
+backend/api/venv
+backend/api/.pytest_cache
+backend/api/__pycache__
+
+# Documentation
+*.md
+!README.md

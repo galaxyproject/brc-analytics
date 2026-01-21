@@ -1,18 +1,24 @@
 import { Props } from "./types";
 import { StyledStack } from "./explicitPairs.styles";
 import { PairRow } from "./components/PairRow/pairRow";
-import { Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { CONTRAST_MODE } from "../../hooks/UseRadioGroup/types";
+import { AddRounded } from "@mui/icons-material";
+import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
+import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
+import { isAllPairsUsed } from "../../hooks/UseExplicitContrasts/utils";
 
 export const ExplicitPairs = ({
   factorValues,
   mode,
+  onAddPair,
   onRemovePair,
   onUpdatePair,
   pairs,
 }: Props): JSX.Element | null => {
   if (mode !== CONTRAST_MODE.EXPLICIT) return null;
+  if (factorValues.length < 2) return null;
   return (
     <StyledStack gap={4} useFlexGap>
       <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_500}>
@@ -25,8 +31,18 @@ export const ExplicitPairs = ({
           onRemove={() => onRemovePair(id)}
           onUpdate={(position, value) => onUpdatePair(id, position, value)}
           pair={pair}
+          pairId={id}
+          pairs={pairs}
         />
       ))}
+      <Button
+        {...BUTTON_PROPS.SECONDARY_CONTAINED}
+        disabled={isAllPairsUsed(factorValues, pairs)}
+        onClick={onAddPair}
+        startIcon={<AddRounded color={SVG_ICON_PROPS.COLOR.INK_LIGHT} />}
+      >
+        Add pair
+      </Button>
     </StyledStack>
   );
 };

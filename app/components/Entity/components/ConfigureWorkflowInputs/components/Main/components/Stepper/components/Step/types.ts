@@ -12,6 +12,7 @@ import { Assembly } from "../../../../../../../../../../views/WorkflowInputsView
 export interface StepConfig {
   description?: ReactNode;
   disabled?: boolean;
+  hasSidePanel?: boolean;
   key: keyof ConfiguredInput | "readRunsAny" | "sampleSheet";
   label: string;
   renderValue?: (ci: ConfiguredInput) => string | undefined;
