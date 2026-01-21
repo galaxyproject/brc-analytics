@@ -3,6 +3,7 @@ import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
 import { useCallback } from "react";
 import {
   getDataLandingUrl,
+  getDeSeq2LandingUrl,
   getWorkflowLandingUrl,
 } from "../../../../../../../../../../../../utils/galaxy-api/galaxy-api";
 import { Props, UseLaunchGalaxy } from "./types";
@@ -38,15 +39,26 @@ export const useLaunchGalaxy = ({
         )
       );
     } else if (workflow.trsId === DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId) {
-      // landingUrl = await run(
-      //   getDeSeq2LandingUrl(
-      //     configuredValue.referenceAssembly,
-      //     configuredValue.geneModelUrl,
-      //     configuredValue.sampleSheet,
-      //     configuredValue.sampleSheetClassification,
-      //     configuredValue.designFormula
-      //   )
-      // );
+      if (
+        !workflow.workflowId ||
+        !configuredValue.geneModelUrl ||
+        !configuredValue.sampleSheet ||
+        !configuredValue.sampleSheetClassification ||
+        !configuredValue.designFormula
+      ) {
+        throw new Error("Missing required values for DE workflow");
+      }
+      landingUrl = await run(
+        getDeSeq2LandingUrl(
+          workflow.workflowId,
+          configuredValue.referenceAssembly,
+          configuredValue.geneModelUrl,
+          configuredValue.sampleSheet,
+          configuredValue.sampleSheetClassification,
+          configuredValue.designFormula,
+          origin
+        )
+      );
     } else {
       landingUrl = await run(
         getWorkflowLandingUrl(
