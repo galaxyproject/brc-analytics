@@ -79,7 +79,11 @@ export function parseFile(
 
     // Validate file size.
     if (file.size > MAX_FILE_SIZE_BYTES) {
-      errors.push(VALIDATION_ERROR.FILE_TOO_LARGE);
+      resolve({
+        errors: [VALIDATION_ERROR.FILE_TOO_LARGE],
+        rows: [],
+      });
+      return;
     }
 
     Papa.parse<Record<string, string>>(file, {

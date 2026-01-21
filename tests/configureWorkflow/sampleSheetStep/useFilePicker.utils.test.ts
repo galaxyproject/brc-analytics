@@ -107,12 +107,13 @@ describe("parseFile", () => {
       expect(result.errors).toEqual([]);
     });
 
-    test("returns error when file size exceeds maximum", async () => {
+    test("returns error and empty rows when file size exceeds maximum", async () => {
       const file = createMockFileWithSize("large.csv", MAX_FILE_SIZE_BYTES + 1);
 
       const result = await parseFile(file);
 
-      expect(result.errors).toContain(VALIDATION_ERROR.FILE_TOO_LARGE);
+      expect(result.errors).toEqual([VALIDATION_ERROR.FILE_TOO_LARGE]);
+      expect(result.rows).toEqual([]);
     });
 
     test("returns error when file has fewer than 4 columns", async () => {
