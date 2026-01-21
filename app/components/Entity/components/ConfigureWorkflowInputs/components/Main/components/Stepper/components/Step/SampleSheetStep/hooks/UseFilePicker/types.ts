@@ -20,5 +20,5 @@ export interface UseFilePicker {
 
 export interface Validation {
   errors: string[];
-  isValid: boolean;
+  valid: boolean;
 }

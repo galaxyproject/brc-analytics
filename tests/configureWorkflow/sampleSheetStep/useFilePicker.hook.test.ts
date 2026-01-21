@@ -199,7 +199,7 @@ describe("useFilePicker", () => {
     const { result } = renderHook(() => useFilePicker());
 
     expect(result.current.validation.errors).toEqual([]);
-    expect(result.current.validation.isValid).toBe(false);
+    expect(result.current.validation.valid).toBe(false);
   });
 
   test("onClear resets validation errors", async () => {

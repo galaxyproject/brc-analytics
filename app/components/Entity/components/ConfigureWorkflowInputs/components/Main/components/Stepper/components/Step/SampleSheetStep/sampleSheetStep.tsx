@@ -63,7 +63,7 @@ export const SampleSheetStep = ({
           />
           <Button
             {...BUTTON_PROPS.PRIMARY_CONTAINED}
-            disabled={!validation.isValid}
+            disabled={!validation.valid}
             onClick={onContinue}
           >
             Continue

@@ -1,12 +1,13 @@
-import { ChangeEvent, useCallback, useRef, useState } from "react";
+import { ChangeEvent, useCallback, useMemo, useRef, useState } from "react";
 import { VALIDATION_ERROR } from "./constants";
 import { OnFileChangeOptions, UseFilePicker } from "./types";
-import { hasFileChanged, parseFile } from "./utils";
+import { hasFileChanged, isValid, parseFile } from "./utils";
 
 export const useFilePicker = (): UseFilePicker => {
   const [errors, setErrors] = useState<string[]>([]);
   const [file, setFile] = useState<File | null>(null);
-  const isValid = file !== null && errors.length === 0;
+
+  const valid = useMemo(() => isValid(file, errors), [file, errors]);
 
   const fileRef = useRef<File | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -63,6 +64,6 @@ export const useFilePicker = (): UseFilePicker => {
     },
     file,
     inputRef,
-    validation: { errors, isValid },
+    validation: { errors, valid },
   };
 };

@@ -57,6 +57,16 @@ export function hasFileChanged(prevFile: File | null, newFile: File): boolean {
 }
 
 /**
+ * Checks if the file picker state is valid.
+ * @param file - The selected file.
+ * @param errors - The validation errors.
+ * @returns True if a file is selected and there are no errors.
+ */
+export function isValid(file: File | null, errors: string[]): boolean {
+  return file !== null && errors.length === 0;
+}
+
+/**
  * Parses and validates a CSV or TSV file.
  * @param file - The file to parse.
  * @returns Promise resolving to parsed rows and validation errors.
