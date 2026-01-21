@@ -3,6 +3,8 @@ export const MIN_DATA_ROWS = 2;
 export const MIN_COLUMNS = 4;
 
 export const VALIDATION_ERROR = {
+  DUPLICATE_HEADERS: "Column headers must be unique",
+  EMPTY_HEADERS: "Column headers cannot be empty",
   FILE_TOO_LARGE: "File size must be under 2MB",
   INSUFFICIENT_COLUMNS: "Must have at least 4 columns",
   INSUFFICIENT_ROWS: "Must have at least 2 data rows",

@@ -7,28 +7,12 @@ import {
 } from "./constants";
 
 /**
- * Calculates unique non-empty column names from PapaParse meta.
- * Handles empty headers and renamed headers (when PapaParse renames duplicates).
- * @param fields - Array of field names from meta.fields.
- * @param renamedHeaders - Map of original to renamed headers from meta.renamedHeaders.
- * @returns Set of unique non-empty column names.
+ * Extracts unique column names from the provided fields.
+ * @param fields - The array of field names.
+ * @returns A set of unique column names.
  */
-export function getColumnNames(
-  fields?: string[],
-  renamedHeaders?: Record<string, string>
-): Set<string> {
-  // Start with non-empty fields.
-  const columnNames = new Set((fields ?? []).filter((field) => !!field));
-
-  // Process renamed headers: remove original key, add renamed value if non-empty.
-  for (const [key, value] of Object.entries(renamedHeaders ?? {})) {
-    columnNames.delete(key);
-    if (value) {
-      columnNames.add(value);
-    }
-  }
-
-  return columnNames;
+export function getColumnNames(fields?: string[]): Set<string> {
+  return new Set(fields ?? []);
 }
 
 /**
@@ -88,7 +72,25 @@ export function parseFile(
 
     Papa.parse<Record<string, string>>(file, {
       complete: ({ data: rows, meta }) => {
-        const columnNames = getColumnNames(meta.fields, meta.renamedHeaders);
+        const columnNames = getColumnNames(meta.fields);
+
+        // Check for empty headers.
+        if (columnNames.has("")) {
+          resolve({
+            errors: [VALIDATION_ERROR.EMPTY_HEADERS],
+            rows: [],
+          });
+          return;
+        }
+
+        // Check for duplicate headers.
+        if (meta.renamedHeaders) {
+          resolve({
+            errors: [VALIDATION_ERROR.DUPLICATE_HEADERS],
+            rows: [],
+          });
+          return;
+        }
 
         // Validate column count.
         if (columnNames.size < MIN_COLUMNS) {

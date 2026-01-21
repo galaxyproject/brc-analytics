@@ -1,8 +1,8 @@
-import { parseFile } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/utils";
 import {
   MAX_FILE_SIZE_BYTES,
   VALIDATION_ERROR,
 } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/constants";
+import { parseFile } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/utils";
 
 /**
  * Creates a mock File object with the given content and name.
@@ -173,15 +173,24 @@ describe("parseFile", () => {
       expect(result.errors).not.toContain(VALIDATION_ERROR.INSUFFICIENT_ROWS);
     });
 
-    test("filters out empty column headers from count", async () => {
-      // File with empty headers should not count those columns
-      const csvContent = "a,b,,\n1,2,3,4\n5,6,7,8";
+    test("returns error and empty rows when headers contain empty values", async () => {
+      const csvContent = "a,b,,d\n1,2,3,4\n5,6,7,8";
       const file = createMockFile(csvContent, "test.csv");
 
       const result = await parseFile(file);
 
-      // Only 2 valid columns (a, b), so should have insufficient columns error
-      expect(result.errors).toContain(VALIDATION_ERROR.INSUFFICIENT_COLUMNS);
+      expect(result.errors).toEqual([VALIDATION_ERROR.EMPTY_HEADERS]);
+      expect(result.rows).toEqual([]);
+    });
+
+    test("returns error and empty rows when headers are duplicated", async () => {
+      const csvContent = "a,b,a,d\n1,2,3,4\n5,6,7,8";
+      const file = createMockFile(csvContent, "test.csv");
+
+      const result = await parseFile(file);
+
+      expect(result.errors).toEqual([VALIDATION_ERROR.DUPLICATE_HEADERS]);
+      expect(result.rows).toEqual([]);
     });
   });
 });
