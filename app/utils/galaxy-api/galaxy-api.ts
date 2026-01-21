@@ -619,16 +619,16 @@ function buildSampleElements(
   );
   const forwardColumn = findColumnByType(
     sampleSheetClassification,
-    COLUMN_TYPE.FORWARD_FILE_PATH
+    COLUMN_TYPE.FORWARD_FILE_URL
   );
   const reverseColumn = findColumnByType(
     sampleSheetClassification,
-    COLUMN_TYPE.REVERSE_FILE_PATH
+    COLUMN_TYPE.REVERSE_FILE_URL
   );
 
   if (!identifierColumn || !forwardColumn || !reverseColumn) {
     throw new Error(
-      "Sample sheet must have IDENTIFIER, FORWARD_FILE_PATH, and REVERSE_FILE_PATH columns"
+      "Sample sheet must have IDENTIFIER, FORWARD_FILE_URL, and REVERSE_FILE_URL columns"
     );
   }
 
@@ -780,8 +780,8 @@ export async function getDeSeq2LandingUrl(
   };
 
   return getGalaxyLandingUrl(body, workflowLandingsApiUrl, workflowLandingUrl);
-}  
-  
+}
+
 /**
  * Convert a checksum to the Galaxy API hash format.
  * Uses the shared getChecksumForPath utility to extract checksums.
