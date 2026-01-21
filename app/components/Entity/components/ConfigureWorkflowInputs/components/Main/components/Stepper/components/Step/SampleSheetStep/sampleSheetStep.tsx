@@ -11,7 +11,6 @@ import { useFilePicker } from "./hooks/UseFilePicker/hook";
 import { INPUT_PROPS } from "./constants";
 import { Dropzone } from "./components/Dropzone/dropzone";
 import { UploadedFile } from "./components/UploadedFile/uploadedFile";
-import { parseFile } from "./utils";
 
 export const SampleSheetStep = ({
   active,
@@ -22,7 +21,7 @@ export const SampleSheetStep = ({
   onContinue,
   onEdit,
 }: StepProps): JSX.Element => {
-  const { actions, file, inputRef } = useFilePicker();
+  const { actions, file, inputRef, validation } = useFilePicker();
   return (
     <Step active={active} completed={completed} index={index}>
       <StepLabel
@@ -43,28 +42,28 @@ export const SampleSheetStep = ({
             {...INPUT_PROPS}
             onChange={(e) => {
               actions.onFileChange(e, {
-                onSuccess: async (selectedFile) => {
-                  try {
-                    onConfigure({
-                      designFormula: null,
-                      primaryContrasts: null,
-                      primaryFactor: null,
-                      sampleSheet: (await parseFile(selectedFile)).rows,
-                      sampleSheetClassification: undefined,
-                    });
-                  } catch (error) {
-                    console.error("Failed to parse file:", error);
-                  }
+                onComplete: (rows) => {
+                  onConfigure({
+                    designFormula: null,
+                    primaryContrasts: null,
+                    primaryFactor: null,
+                    sampleSheet: rows,
+                    sampleSheetClassification: undefined,
+                  });
                 },
               });
             }}
             ref={inputRef}
           />
           <Dropzone onClick={actions.onClick} />
-          <UploadedFile file={file} onClear={actions.onClear} />
+          <UploadedFile
+            errors={validation.errors}
+            file={file}
+            onClear={actions.onClear}
+          />
           <Button
             {...BUTTON_PROPS.PRIMARY_CONTAINED}
-            disabled={!file}
+            disabled={!validation.valid}
             onClick={onContinue}
           >
             Continue

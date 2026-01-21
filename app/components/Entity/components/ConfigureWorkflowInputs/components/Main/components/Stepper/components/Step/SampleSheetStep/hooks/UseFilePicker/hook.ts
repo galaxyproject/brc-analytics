@@ -1,9 +1,13 @@
-import { ChangeEvent, useCallback, useRef, useState } from "react";
+import { ChangeEvent, useCallback, useMemo, useRef, useState } from "react";
+import { VALIDATION_ERROR } from "./constants";
 import { OnFileChangeOptions, UseFilePicker } from "./types";
-import { hasFileChanged } from "./utils";
+import { hasFileChanged, isValid, parseFile } from "./utils";
 
 export const useFilePicker = (): UseFilePicker => {
+  const [errors, setErrors] = useState<string[]>([]);
   const [file, setFile] = useState<File | null>(null);
+
+  const valid = useMemo(() => isValid(file, errors), [file, errors]);
 
   const fileRef = useRef<File | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -11,10 +15,10 @@ export const useFilePicker = (): UseFilePicker => {
   const onClear = useCallback((): void => {
     fileRef.current = null;
     setFile(null);
+    setErrors([]);
+
     // Reset the input value to allow re-selecting the same file.
-    if (inputRef.current) {
-      inputRef.current.value = "";
-    }
+    if (inputRef.current) inputRef.current.value = "";
   }, []);
 
   const onClick = useCallback((): void => {
@@ -22,24 +26,32 @@ export const useFilePicker = (): UseFilePicker => {
   }, []);
 
   const onFileChange = useCallback(
-    (
+    async (
       event: ChangeEvent<HTMLInputElement>,
       options: OnFileChangeOptions
-    ): void => {
+    ): Promise<void> => {
       // Access the first file from the FileList.
       const selectedFile = event.target.files?.[0];
       if (!selectedFile) return;
 
       // Check if the file has changed.
-      if (hasFileChanged(fileRef.current, selectedFile)) {
-        options.onSuccess?.(selectedFile);
-      }
+      const fileChanged = hasFileChanged(fileRef.current, selectedFile);
 
-      // Update the file reference.
+      // Update the file reference and state.
       fileRef.current = selectedFile;
-
-      // Update the file state.
       setFile(selectedFile);
+
+      if (!fileChanged) return;
+
+      try {
+        const { errors, rows } = await parseFile(selectedFile);
+
+        setErrors(errors);
+
+        if (errors.length === 0) options.onComplete?.(rows);
+      } catch {
+        setErrors([VALIDATION_ERROR.PARSE_FAILED]);
+      }
     },
     []
   );
@@ -52,5 +64,6 @@ export const useFilePicker = (): UseFilePicker => {
     },
     file,
     inputRef,
+    validation: { errors, valid },
   };
 };
