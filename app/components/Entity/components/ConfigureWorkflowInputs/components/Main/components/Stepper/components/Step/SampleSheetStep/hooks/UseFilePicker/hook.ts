@@ -1,4 +1,5 @@
 import { ChangeEvent, useCallback, useRef, useState } from "react";
+import { VALIDATION_ERROR } from "./constants";
 import { OnFileChangeOptions, UseFilePicker } from "./types";
 import { hasFileChanged, parseFile } from "./utils";
 
@@ -47,8 +48,8 @@ export const useFilePicker = (): UseFilePicker => {
         setErrors(errors);
 
         if (errors.length === 0) options.onComplete?.(rows);
-      } catch (error) {
-        console.error("Failed to parse file:", error);
+      } catch {
+        setErrors([VALIDATION_ERROR.PARSE_FAILED]);
       }
     },
     []

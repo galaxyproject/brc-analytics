@@ -1,6 +1,24 @@
 import { act, renderHook } from "@testing-library/react";
 import { ChangeEvent } from "react";
+import { VALIDATION_ERROR } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/constants";
 import { useFilePicker } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/hook";
+import { parseFile } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/utils";
+
+jest.mock(
+  "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/utils",
+  () => ({
+    ...jest.requireActual(
+      "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/utils"
+    ),
+    parseFile: jest.fn(),
+  })
+);
+
+const mockParseFile = parseFile as jest.MockedFunction<typeof parseFile>;
+
+const actualUtils = jest.requireActual(
+  "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/utils"
+);
 
 /**
  * Creates a mock ChangeEvent for file input.
@@ -29,6 +47,10 @@ function createMockFile(name: string, size = 1024): File {
 }
 
 describe("useFilePicker", () => {
+  beforeEach(() => {
+    mockParseFile.mockImplementation(actualUtils.parseFile);
+  });
+
   test("initializes with null file", () => {
     const { result } = renderHook(() => useFilePicker());
 
@@ -202,5 +224,23 @@ describe("useFilePicker", () => {
     });
 
     expect(result.current.validation.errors).toEqual([]);
+  });
+
+  test("onFileChange sets parse error when parsing fails", async () => {
+    const { result } = renderHook(() => useFilePicker());
+    const mockFile = createMockFile("test.csv");
+
+    mockParseFile.mockRejectedValueOnce(new Error("Parse error"));
+
+    await act(async () => {
+      await result.current.actions.onFileChange(
+        createMockFileChangeEvent(mockFile),
+        {}
+      );
+    });
+
+    expect(result.current.validation.errors).toEqual([
+      VALIDATION_ERROR.PARSE_FAILED,
+    ]);
   });
 });

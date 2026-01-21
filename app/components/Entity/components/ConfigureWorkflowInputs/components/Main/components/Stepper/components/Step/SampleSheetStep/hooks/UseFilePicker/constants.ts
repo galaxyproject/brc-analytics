@@ -6,4 +6,5 @@ export const VALIDATION_ERROR = {
   FILE_TOO_LARGE: "File size must be under 2MB",
   INSUFFICIENT_COLUMNS: "Must have at least 4 columns",
   INSUFFICIENT_ROWS: "Must have at least 2 data rows",
+  PARSE_FAILED: "Failed to parse file",
 } as const;
