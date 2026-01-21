@@ -1,16 +1,16 @@
 import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepContent/stepContent";
-import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
-import { StepProps } from "../types";
-import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
-import { Button } from "@mui/material";
-import { StyledGrid } from "./sampleSheetStep.styles";
-import { Fragment } from "react";
 import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Optional/optional";
+import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
+import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
-import { useFilePicker } from "./hooks/UseFilePicker/hook";
-import { INPUT_PROPS } from "./constants";
+import { Button } from "@mui/material";
+import { Fragment } from "react";
+import { StepProps } from "../types";
 import { Dropzone } from "./components/Dropzone/dropzone";
 import { UploadedFile } from "./components/UploadedFile/uploadedFile";
+import { INPUT_PROPS } from "./constants";
+import { useFilePicker } from "./hooks/UseFilePicker/hook";
+import { StyledGrid } from "./sampleSheetStep.styles";
 
 export const SampleSheetStep = ({
   active,
@@ -50,6 +50,7 @@ export const SampleSheetStep = ({
                     sampleSheet: rows,
                     sampleSheetClassification: undefined,
                   });
+                  onContinue();
                 },
               });
             }}
