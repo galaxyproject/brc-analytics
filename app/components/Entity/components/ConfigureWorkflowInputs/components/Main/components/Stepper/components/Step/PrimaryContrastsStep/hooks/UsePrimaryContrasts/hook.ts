@@ -10,12 +10,14 @@ import { getPrimaryContrasts, isDisabled } from "./utils";
  * @param mode - The contrast mode.
  * @param baselineContrasts - Baseline contrasts.
  * @param explicitContrasts - Explicit contrasts.
+ * @param factorValuesCount - Number of unique factor values.
  * @returns Primary contrasts state.
  */
 export function usePrimaryContrasts(
   mode: CONTRAST_MODE,
   baselineContrasts: UseBaselineContrasts,
-  explicitContrasts: UseExplicitContrasts
+  explicitContrasts: UseExplicitContrasts,
+  factorValuesCount: number
 ): UsePrimaryContrasts {
   const { primaryContrasts: baselinePC, valid: isBaselineValid } =
     baselineContrasts;
@@ -23,8 +25,8 @@ export function usePrimaryContrasts(
     explicitContrasts;
 
   const disabled = useMemo(
-    () => isDisabled(mode, isBaselineValid, isExplicitValid),
-    [mode, isBaselineValid, isExplicitValid]
+    () => isDisabled(mode, isBaselineValid, isExplicitValid, factorValuesCount),
+    [factorValuesCount, isBaselineValid, isExplicitValid, mode]
   );
 
   const primaryContrasts = useMemo(

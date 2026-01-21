@@ -4,6 +4,8 @@ import { UseBaselineContrasts } from "../../../app/components/Entity/components/
 import { UseExplicitContrasts } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseExplicitContrasts/types";
 import { CONTRAST_MODE } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseRadioGroup/types";
 
+const FACTOR_VALUES_COUNT = 2;
+
 const createMockBaselineContrasts = (
   overrides: Partial<UseBaselineContrasts> = {}
 ): UseBaselineContrasts => ({
@@ -35,7 +37,8 @@ describe("usePrimaryContrasts", () => {
         usePrimaryContrasts(
           CONTRAST_MODE.ALL_AGAINST_ALL,
           createMockBaselineContrasts(),
-          createMockExplicitContrasts()
+          createMockExplicitContrasts(),
+          FACTOR_VALUES_COUNT
         )
       );
 
@@ -47,7 +50,8 @@ describe("usePrimaryContrasts", () => {
         usePrimaryContrasts(
           CONTRAST_MODE.BASELINE,
           createMockBaselineContrasts({ valid: false }),
-          createMockExplicitContrasts()
+          createMockExplicitContrasts(),
+          FACTOR_VALUES_COUNT
         )
       );
 
@@ -59,7 +63,8 @@ describe("usePrimaryContrasts", () => {
         usePrimaryContrasts(
           CONTRAST_MODE.BASELINE,
           createMockBaselineContrasts({ valid: true }),
-          createMockExplicitContrasts()
+          createMockExplicitContrasts(),
+          FACTOR_VALUES_COUNT
         )
       );
 
@@ -71,7 +76,8 @@ describe("usePrimaryContrasts", () => {
         usePrimaryContrasts(
           CONTRAST_MODE.EXPLICIT,
           createMockBaselineContrasts(),
-          createMockExplicitContrasts({ valid: false })
+          createMockExplicitContrasts({ valid: false }),
+          FACTOR_VALUES_COUNT
         )
       );
 
@@ -83,7 +89,8 @@ describe("usePrimaryContrasts", () => {
         usePrimaryContrasts(
           CONTRAST_MODE.EXPLICIT,
           createMockBaselineContrasts(),
-          createMockExplicitContrasts({ valid: true })
+          createMockExplicitContrasts({ valid: true }),
+          FACTOR_VALUES_COUNT
         )
       );
 
@@ -97,7 +104,8 @@ describe("usePrimaryContrasts", () => {
         usePrimaryContrasts(
           CONTRAST_MODE.ALL_AGAINST_ALL,
           createMockBaselineContrasts(),
-          createMockExplicitContrasts()
+          createMockExplicitContrasts(),
+          FACTOR_VALUES_COUNT
         )
       );
 
@@ -117,7 +125,8 @@ describe("usePrimaryContrasts", () => {
         usePrimaryContrasts(
           CONTRAST_MODE.BASELINE,
           createMockBaselineContrasts({ primaryContrasts: baselineContrasts }),
-          createMockExplicitContrasts()
+          createMockExplicitContrasts(),
+          FACTOR_VALUES_COUNT
         )
       );
 
@@ -129,7 +138,8 @@ describe("usePrimaryContrasts", () => {
         usePrimaryContrasts(
           CONTRAST_MODE.BASELINE,
           createMockBaselineContrasts({ primaryContrasts: null }),
-          createMockExplicitContrasts()
+          createMockExplicitContrasts(),
+          FACTOR_VALUES_COUNT
         )
       );
 
@@ -146,7 +156,8 @@ describe("usePrimaryContrasts", () => {
         usePrimaryContrasts(
           CONTRAST_MODE.EXPLICIT,
           createMockBaselineContrasts(),
-          createMockExplicitContrasts({ primaryContrasts: explicitContrasts })
+          createMockExplicitContrasts({ primaryContrasts: explicitContrasts }),
+          FACTOR_VALUES_COUNT
         )
       );
 
@@ -158,7 +169,8 @@ describe("usePrimaryContrasts", () => {
         usePrimaryContrasts(
           CONTRAST_MODE.EXPLICIT,
           createMockBaselineContrasts(),
-          createMockExplicitContrasts({ primaryContrasts: null })
+          createMockExplicitContrasts({ primaryContrasts: null }),
+          FACTOR_VALUES_COUNT
         )
       );
 
@@ -173,7 +185,12 @@ describe("usePrimaryContrasts", () => {
 
       const { rerender, result } = renderHook(
         ({ mode }) =>
-          usePrimaryContrasts(mode, baselineContrasts, explicitContrasts),
+          usePrimaryContrasts(
+            mode,
+            baselineContrasts,
+            explicitContrasts,
+            FACTOR_VALUES_COUNT
+          ),
         { initialProps: { mode: CONTRAST_MODE.BASELINE } }
       );
 
@@ -204,7 +221,12 @@ describe("usePrimaryContrasts", () => {
 
       const { rerender, result } = renderHook(
         ({ mode }) =>
-          usePrimaryContrasts(mode, baselineContrasts, explicitContrasts),
+          usePrimaryContrasts(
+            mode,
+            baselineContrasts,
+            explicitContrasts,
+            FACTOR_VALUES_COUNT
+          ),
         { initialProps: { mode: CONTRAST_MODE.BASELINE } }
       );
 

@@ -63,18 +63,29 @@ describe("getPrimaryContrasts", () => {
 });
 
 describe("isDisabled", () => {
-  test("returns false for ALL_AGAINST_ALL mode regardless of validation", () => {
-    expect(isDisabled(CONTRAST_MODE.ALL_AGAINST_ALL, false, false)).toBe(false);
-    expect(isDisabled(CONTRAST_MODE.ALL_AGAINST_ALL, true, true)).toBe(false);
+  test("returns true when factorValuesCount is less than 2", () => {
+    expect(isDisabled(CONTRAST_MODE.ALL_AGAINST_ALL, true, true, 0)).toBe(true);
+    expect(isDisabled(CONTRAST_MODE.ALL_AGAINST_ALL, true, true, 1)).toBe(true);
+    expect(isDisabled(CONTRAST_MODE.BASELINE, true, true, 1)).toBe(true);
+    expect(isDisabled(CONTRAST_MODE.EXPLICIT, true, true, 1)).toBe(true);
+  });
+
+  test("returns false for ALL_AGAINST_ALL mode with sufficient factor values", () => {
+    expect(isDisabled(CONTRAST_MODE.ALL_AGAINST_ALL, false, false, 2)).toBe(
+      false
+    );
+    expect(isDisabled(CONTRAST_MODE.ALL_AGAINST_ALL, true, true, 3)).toBe(
+      false
+    );
   });
 
   test("returns inverse of validation state for EXPLICIT mode", () => {
-    expect(isDisabled(CONTRAST_MODE.EXPLICIT, false, false)).toBe(true);
-    expect(isDisabled(CONTRAST_MODE.EXPLICIT, false, true)).toBe(false);
+    expect(isDisabled(CONTRAST_MODE.EXPLICIT, false, false, 2)).toBe(true);
+    expect(isDisabled(CONTRAST_MODE.EXPLICIT, false, true, 2)).toBe(false);
   });
 
   test("returns inverse of validation state for BASELINE mode", () => {
-    expect(isDisabled(CONTRAST_MODE.BASELINE, false, false)).toBe(true);
-    expect(isDisabled(CONTRAST_MODE.BASELINE, true, false)).toBe(false);
+    expect(isDisabled(CONTRAST_MODE.BASELINE, false, false, 2)).toBe(true);
+    expect(isDisabled(CONTRAST_MODE.BASELINE, true, false, 2)).toBe(false);
   });
 });
