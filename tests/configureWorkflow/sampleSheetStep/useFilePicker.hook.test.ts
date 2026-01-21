@@ -177,18 +177,16 @@ describe("useFilePicker", () => {
     const onComplete = jest.fn();
 
     await act(async () => {
-      await result.current.actions.onFileChange(
-        createMockFileChangeEvent(mockFile),
-        { onComplete }
-      );
+      result.current.actions.onFileChange(createMockFileChangeEvent(mockFile), {
+        onComplete,
+      });
     });
 
     // Re-select the same file (same name, size, lastModified)
     await act(async () => {
-      await result.current.actions.onFileChange(
-        createMockFileChangeEvent(mockFile),
-        { onComplete }
-      );
+      result.current.actions.onFileChange(createMockFileChangeEvent(mockFile), {
+        onComplete,
+      });
     });
 
     // onComplete should NOT be called again for the same file
@@ -242,5 +240,25 @@ describe("useFilePicker", () => {
     expect(result.current.validation.errors).toEqual([
       VALIDATION_ERROR.PARSE_FAILED,
     ]);
+  });
+
+  test("onFileChange does not call onComplete when validation errors occur", async () => {
+    const { result } = renderHook(() => useFilePicker());
+    // Create an invalid file (fewer than 4 columns)
+    const invalidContent = "a,b\n1,2\n3,4";
+    const invalidFile = new File([invalidContent], "invalid.csv", {
+      type: "text/csv",
+    });
+    const onComplete = jest.fn();
+
+    await act(async () => {
+      await result.current.actions.onFileChange(
+        createMockFileChangeEvent(invalidFile),
+        { onComplete }
+      );
+    });
+
+    expect(result.current.validation.errors.length).toBeGreaterThan(0);
+    expect(onComplete).not.toHaveBeenCalled();
   });
 });
