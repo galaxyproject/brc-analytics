@@ -18,8 +18,8 @@ describe("normalizePairKey", () => {
   });
 
   test("handles numeric strings", () => {
-    expect(normalizePairKey("1", "2")).toBe(`1\0${2}`);
-    expect(normalizePairKey("2", "1")).toBe(`1\0${2}`);
+    expect(normalizePairKey("1", "2")).toBe("1\x002");
+    expect(normalizePairKey("2", "1")).toBe("1\x002");
   });
 });
 

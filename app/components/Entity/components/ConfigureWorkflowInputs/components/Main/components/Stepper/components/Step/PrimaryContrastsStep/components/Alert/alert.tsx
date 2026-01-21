@@ -10,8 +10,8 @@ export const Alert = ({
   if (factorValues.length > 1) return null;
   return (
     <StyledAlert {...ALERT_PROPS.STANDARD_ERROR} icon={false}>
-      The primary factor &quot;{primaryFactor}&quot; does not have enough unique values. At
-      least 2 unique values are required to define contrasts.
+      The primary factor &quot;{primaryFactor}&quot; does not have enough unique
+      values. At least 2 unique values are required to define contrasts.
     </StyledAlert>
   );
 };
