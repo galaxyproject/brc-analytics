@@ -10,8 +10,8 @@ import {
 describe("validateClassifications", () => {
   test("returns valid when all requirements are met", () => {
     const classifications: ColumnClassifications = {
-      forward_path: COLUMN_TYPE.FORWARD_FILE_PATH,
-      reverse_path: COLUMN_TYPE.REVERSE_FILE_PATH,
+      forward_path: COLUMN_TYPE.FORWARD_FILE_URL,
+      reverse_path: COLUMN_TYPE.REVERSE_FILE_URL,
       sample_id: COLUMN_TYPE.IDENTIFIER,
       treatment: COLUMN_TYPE.BIOLOGICAL_FACTOR,
     };
@@ -25,8 +25,8 @@ describe("validateClassifications", () => {
   test("returns valid with multiple biological factors", () => {
     const classifications: ColumnClassifications = {
       condition: COLUMN_TYPE.BIOLOGICAL_FACTOR,
-      forward_path: COLUMN_TYPE.FORWARD_FILE_PATH,
-      reverse_path: COLUMN_TYPE.REVERSE_FILE_PATH,
+      forward_path: COLUMN_TYPE.FORWARD_FILE_URL,
+      reverse_path: COLUMN_TYPE.REVERSE_FILE_URL,
       sample_id: COLUMN_TYPE.IDENTIFIER,
       treatment: COLUMN_TYPE.BIOLOGICAL_FACTOR,
     };
@@ -41,10 +41,10 @@ describe("validateClassifications", () => {
     const classifications: ColumnClassifications = {
       batch: COLUMN_TYPE.TECHNICAL_BLOCKING_FACTOR,
       covariate: COLUMN_TYPE.OTHER_COVARIATE,
-      forward_path: COLUMN_TYPE.FORWARD_FILE_PATH,
+      forward_path: COLUMN_TYPE.FORWARD_FILE_URL,
       notes: COLUMN_TYPE.IGNORED,
       qc_metric: COLUMN_TYPE.QC_ONLY,
-      reverse_path: COLUMN_TYPE.REVERSE_FILE_PATH,
+      reverse_path: COLUMN_TYPE.REVERSE_FILE_URL,
       sample_id: COLUMN_TYPE.IDENTIFIER,
       treatment: COLUMN_TYPE.BIOLOGICAL_FACTOR,
     };
@@ -57,8 +57,8 @@ describe("validateClassifications", () => {
 
   test("returns error when columns are not classified", () => {
     const classifications: ColumnClassifications = {
-      forward_path: COLUMN_TYPE.FORWARD_FILE_PATH,
-      reverse_path: COLUMN_TYPE.REVERSE_FILE_PATH,
+      forward_path: COLUMN_TYPE.FORWARD_FILE_URL,
+      reverse_path: COLUMN_TYPE.REVERSE_FILE_URL,
       sample_id: COLUMN_TYPE.IDENTIFIER,
       treatment: null,
     };
@@ -85,8 +85,8 @@ describe("validateClassifications", () => {
 
   test("returns error when no identifier is specified", () => {
     const classifications: ColumnClassifications = {
-      forward_path: COLUMN_TYPE.FORWARD_FILE_PATH,
-      reverse_path: COLUMN_TYPE.REVERSE_FILE_PATH,
+      forward_path: COLUMN_TYPE.FORWARD_FILE_URL,
+      reverse_path: COLUMN_TYPE.REVERSE_FILE_URL,
       sample_id: COLUMN_TYPE.IGNORED,
       treatment: COLUMN_TYPE.BIOLOGICAL_FACTOR,
     };
@@ -99,9 +99,9 @@ describe("validateClassifications", () => {
 
   test("returns error when multiple identifiers are specified", () => {
     const classifications: ColumnClassifications = {
-      forward_path: COLUMN_TYPE.FORWARD_FILE_PATH,
+      forward_path: COLUMN_TYPE.FORWARD_FILE_URL,
       other_id: COLUMN_TYPE.IDENTIFIER,
-      reverse_path: COLUMN_TYPE.REVERSE_FILE_PATH,
+      reverse_path: COLUMN_TYPE.REVERSE_FILE_URL,
       sample_id: COLUMN_TYPE.IDENTIFIER,
       treatment: COLUMN_TYPE.BIOLOGICAL_FACTOR,
     };
@@ -112,10 +112,10 @@ describe("validateClassifications", () => {
     expect(result.errors).toContain("Only one identifier column is allowed");
   });
 
-  test("returns error when no forward file path is specified", () => {
+  test("returns error when no forward file URL is specified", () => {
     const classifications: ColumnClassifications = {
       forward_path: COLUMN_TYPE.IGNORED,
-      reverse_path: COLUMN_TYPE.REVERSE_FILE_PATH,
+      reverse_path: COLUMN_TYPE.REVERSE_FILE_URL,
       sample_id: COLUMN_TYPE.IDENTIFIER,
       treatment: COLUMN_TYPE.BIOLOGICAL_FACTOR,
     };
@@ -123,14 +123,14 @@ describe("validateClassifications", () => {
     const result = validateClassifications(classifications);
 
     expect(result.valid).toBe(false);
-    expect(result.errors).toContain("One forward file path column is required");
+    expect(result.errors).toContain("One forward file URL column is required");
   });
 
-  test("returns error when multiple forward file paths are specified", () => {
+  test("returns error when multiple forward file URLs are specified", () => {
     const classifications: ColumnClassifications = {
-      forward_path1: COLUMN_TYPE.FORWARD_FILE_PATH,
-      forward_path2: COLUMN_TYPE.FORWARD_FILE_PATH,
-      reverse_path: COLUMN_TYPE.REVERSE_FILE_PATH,
+      forward_path1: COLUMN_TYPE.FORWARD_FILE_URL,
+      forward_path2: COLUMN_TYPE.FORWARD_FILE_URL,
+      reverse_path: COLUMN_TYPE.REVERSE_FILE_URL,
       sample_id: COLUMN_TYPE.IDENTIFIER,
       treatment: COLUMN_TYPE.BIOLOGICAL_FACTOR,
     };
@@ -139,13 +139,13 @@ describe("validateClassifications", () => {
 
     expect(result.valid).toBe(false);
     expect(result.errors).toContain(
-      "Only one forward file path column is allowed"
+      "Only one forward file URL column is allowed"
     );
   });
 
-  test("returns error when no reverse file path is specified", () => {
+  test("returns error when no reverse file URL is specified", () => {
     const classifications: ColumnClassifications = {
-      forward_path: COLUMN_TYPE.FORWARD_FILE_PATH,
+      forward_path: COLUMN_TYPE.FORWARD_FILE_URL,
       reverse_path: COLUMN_TYPE.IGNORED,
       sample_id: COLUMN_TYPE.IDENTIFIER,
       treatment: COLUMN_TYPE.BIOLOGICAL_FACTOR,
@@ -154,14 +154,14 @@ describe("validateClassifications", () => {
     const result = validateClassifications(classifications);
 
     expect(result.valid).toBe(false);
-    expect(result.errors).toContain("One reverse file path column is required");
+    expect(result.errors).toContain("One reverse file URL column is required");
   });
 
-  test("returns error when multiple reverse file paths are specified", () => {
+  test("returns error when multiple reverse file URLs are specified", () => {
     const classifications: ColumnClassifications = {
-      forward_path: COLUMN_TYPE.FORWARD_FILE_PATH,
-      reverse_path1: COLUMN_TYPE.REVERSE_FILE_PATH,
-      reverse_path2: COLUMN_TYPE.REVERSE_FILE_PATH,
+      forward_path: COLUMN_TYPE.FORWARD_FILE_URL,
+      reverse_path1: COLUMN_TYPE.REVERSE_FILE_URL,
+      reverse_path2: COLUMN_TYPE.REVERSE_FILE_URL,
       sample_id: COLUMN_TYPE.IDENTIFIER,
       treatment: COLUMN_TYPE.BIOLOGICAL_FACTOR,
     };
@@ -170,14 +170,14 @@ describe("validateClassifications", () => {
 
     expect(result.valid).toBe(false);
     expect(result.errors).toContain(
-      "Only one reverse file path column is allowed"
+      "Only one reverse file URL column is allowed"
     );
   });
 
   test("returns error when no biological factor is specified", () => {
     const classifications: ColumnClassifications = {
-      forward_path: COLUMN_TYPE.FORWARD_FILE_PATH,
-      reverse_path: COLUMN_TYPE.REVERSE_FILE_PATH,
+      forward_path: COLUMN_TYPE.FORWARD_FILE_URL,
+      reverse_path: COLUMN_TYPE.REVERSE_FILE_URL,
       sample_id: COLUMN_TYPE.IDENTIFIER,
       treatment: COLUMN_TYPE.IGNORED,
     };
@@ -204,8 +204,8 @@ describe("validateClassifications", () => {
     expect(result.errors).toHaveLength(5);
     expect(result.errors).toContain("4 column(s) are not classified");
     expect(result.errors).toContain("One identifier column is required");
-    expect(result.errors).toContain("One forward file path column is required");
-    expect(result.errors).toContain("One reverse file path column is required");
+    expect(result.errors).toContain("One forward file URL column is required");
+    expect(result.errors).toContain("One reverse file URL column is required");
     expect(result.errors).toContain(
       "At least one biological factor column is required"
     );
@@ -218,8 +218,8 @@ describe("validateClassifications", () => {
 
     expect(result.valid).toBe(false);
     expect(result.errors).toContain("One identifier column is required");
-    expect(result.errors).toContain("One forward file path column is required");
-    expect(result.errors).toContain("One reverse file path column is required");
+    expect(result.errors).toContain("One forward file URL column is required");
+    expect(result.errors).toContain("One reverse file URL column is required");
     expect(result.errors).toContain(
       "At least one biological factor column is required"
     );

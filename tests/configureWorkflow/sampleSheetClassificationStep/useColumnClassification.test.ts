@@ -70,7 +70,7 @@ describe("useColumnClassification", () => {
         result.current.onClassify("treatment", COLUMN_TYPE.BIOLOGICAL_FACTOR);
       });
       act(() => {
-        result.current.onClassify("forward", COLUMN_TYPE.FORWARD_FILE_PATH);
+        result.current.onClassify("forward", COLUMN_TYPE.FORWARD_FILE_URL);
       });
 
       expect(result.current.classifications.sample_id).toBe(
@@ -80,7 +80,7 @@ describe("useColumnClassification", () => {
         COLUMN_TYPE.BIOLOGICAL_FACTOR
       );
       expect(result.current.classifications.forward).toBe(
-        COLUMN_TYPE.FORWARD_FILE_PATH
+        COLUMN_TYPE.FORWARD_FILE_URL
       );
     });
 
@@ -131,10 +131,10 @@ describe("useColumnClassification", () => {
         result.current.onClassify("sample_id", COLUMN_TYPE.IDENTIFIER);
       });
       act(() => {
-        result.current.onClassify("forward", COLUMN_TYPE.FORWARD_FILE_PATH);
+        result.current.onClassify("forward", COLUMN_TYPE.FORWARD_FILE_URL);
       });
       act(() => {
-        result.current.onClassify("reverse", COLUMN_TYPE.REVERSE_FILE_PATH);
+        result.current.onClassify("reverse", COLUMN_TYPE.REVERSE_FILE_URL);
       });
       act(() => {
         result.current.onClassify("treatment", COLUMN_TYPE.BIOLOGICAL_FACTOR);
@@ -167,10 +167,10 @@ describe("useColumnClassification", () => {
 
       // Fully classify
       act(() => {
-        result.current.onClassify("forward", COLUMN_TYPE.FORWARD_FILE_PATH);
+        result.current.onClassify("forward", COLUMN_TYPE.FORWARD_FILE_URL);
       });
       act(() => {
-        result.current.onClassify("reverse", COLUMN_TYPE.REVERSE_FILE_PATH);
+        result.current.onClassify("reverse", COLUMN_TYPE.REVERSE_FILE_URL);
       });
       act(() => {
         result.current.onClassify("treatment", COLUMN_TYPE.BIOLOGICAL_FACTOR);
