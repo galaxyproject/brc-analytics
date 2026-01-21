@@ -32,10 +32,9 @@ import {
   fetchUcscMd5Checksums,
   getChecksumForPath,
 } from "../ucsc-tracks-api/ucsc-tracks-api";
+import { ftpToAscp } from "./url-utils";
 
 const DOCKSTORE_API_URL = "https://dockstore.org/api/ga4gh/trs/v2/tools";
-const FTP_HOST = "ftp.sra.ebi.ac.uk";
-const ASCP_HOST = "fasp.sra.ebi.ac.uk";
 
 const galaxyInstanceUrl = process.env.NEXT_PUBLIC_GALAXY_INSTANCE_URL;
 
@@ -501,11 +500,6 @@ function getRunUrlsInfo(
   }
   if (forward === null) throw new Error("No URL for forward read found");
   return { forward, reverse };
-}
-
-function ftpToAscp(ftpUrl: string): string {
-  // should be more reliable than FTP download
-  return `ascp://${ftpUrl.replace(FTP_HOST, ASCP_HOST)}`;
 }
 
 /**
