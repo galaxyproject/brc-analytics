@@ -619,6 +619,14 @@ function buildSampleElements(
     sampleSheetClassification,
     COLUMN_TYPE.REVERSE_FILE_URL
   );
+  const forwardMd5Column = findColumnByType(
+    sampleSheetClassification,
+    COLUMN_TYPE.FORWARD_FILE_MD5
+  );
+  const reverseMd5Column = findColumnByType(
+    sampleSheetClassification,
+    COLUMN_TYPE.REVERSE_FILE_MD5
+  );
 
   if (!identifierColumn || !forwardColumn || !reverseColumn) {
     throw new Error(
@@ -630,6 +638,8 @@ function buildSampleElements(
     const identifier = row[identifierColumn];
     const forwardUrl = ftpToAscp(row[forwardColumn]);
     const reverseUrl = ftpToAscp(row[reverseColumn]);
+    const forwardMd5 = forwardMd5Column ? row[forwardMd5Column] : undefined;
+    const reverseMd5 = reverseMd5Column ? row[reverseMd5Column] : undefined;
 
     return {
       class: "Collection" as const,
@@ -638,12 +648,18 @@ function buildSampleElements(
         {
           class: "File" as const,
           ext: "fastqsanger.gz",
+          hashes: forwardMd5
+            ? [{ hash_function: "MD5" as const, hash_value: forwardMd5 }]
+            : undefined,
           location: forwardUrl,
           name: "forward" as const,
         },
         {
           class: "File" as const,
           ext: "fastqsanger.gz",
+          hashes: reverseMd5
+            ? [{ hash_function: "MD5" as const, hash_value: reverseMd5 }]
+            : undefined,
           location: reverseUrl,
           name: "reverse" as const,
         },
