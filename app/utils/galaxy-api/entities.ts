@@ -173,6 +173,7 @@ export interface DeSeq2RequestState {
 export interface DeSeq2GtfFile {
   class: "File";
   ext: string;
+  hashes?: WorkflowDatasetHash[];
   url: string;
 }
 
