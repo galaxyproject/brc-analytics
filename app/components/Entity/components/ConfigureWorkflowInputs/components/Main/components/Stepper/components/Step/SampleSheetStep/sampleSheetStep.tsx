@@ -56,7 +56,23 @@ export const SampleSheetStep = ({
             }}
             ref={inputRef}
           />
-          <Dropzone onClick={actions.onClick} />
+          <Dropzone
+            onClick={actions.onClick}
+            onDrop={(e) => {
+              actions.onDrop(e, {
+                onComplete: (rows) => {
+                  onConfigure({
+                    designFormula: null,
+                    primaryContrasts: null,
+                    primaryFactor: null,
+                    sampleSheet: rows,
+                    sampleSheetClassification: undefined,
+                  });
+                  onContinue();
+                },
+              });
+            }}
+          />
           <UploadedFile
             errors={validation.errors}
             file={file}

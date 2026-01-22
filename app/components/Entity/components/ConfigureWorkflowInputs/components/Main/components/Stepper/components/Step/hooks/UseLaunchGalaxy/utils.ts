@@ -33,6 +33,7 @@ function getDEConfiguredValues(
   const {
     designFormula,
     geneModelUrl,
+    primaryContrasts,
     referenceAssembly,
     sampleSheet,
     sampleSheetClassification,
@@ -52,6 +53,7 @@ function getDEConfiguredValues(
   return {
     designFormula,
     geneModelUrl,
+    primaryContrasts: primaryContrasts ?? null,
     readRunsPaired: null,
     readRunsSingle: null,
     referenceAssembly,
@@ -89,6 +91,7 @@ function getStandardConfiguredValues(
   return {
     designFormula: null,
     geneModelUrl: geneModelUrl ?? null,
+    primaryContrasts: null,
     readRunsPaired: readRunsPaired ?? null,
     readRunsSingle: readRunsSingle ?? null,
     // referenceAssembly is currently always set, but there are workflows that don't require referenceAssembly.

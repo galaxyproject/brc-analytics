@@ -166,6 +166,7 @@ export interface DeSeq2RequestState {
   "Generate additional QC reports": boolean;
   "GTF File of annotation": DeSeq2GtfFile;
   "Reference genome": string;
+  "Reference level"?: string;
   "Sample sheet of sequencing reads": DeSeq2SampleSheetCollection;
   "Use featurecounts for generating count tables": boolean;
 }
@@ -173,6 +174,7 @@ export interface DeSeq2RequestState {
 export interface DeSeq2GtfFile {
   class: "File";
   ext: string;
+  hashes?: WorkflowDatasetHash[];
   url: string;
 }
 
@@ -201,6 +203,7 @@ export interface DeSeq2PairedSample {
 export interface DeSeq2FileElement {
   class: "File";
   ext: string;
+  hashes?: WorkflowDatasetHash[];
   location: string;
   name: "forward" | "reverse";
 }

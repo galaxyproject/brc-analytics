@@ -2,9 +2,19 @@ import { ButtonBase, Paper } from "@mui/material";
 import styled from "@emotion/styled";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 
-export const StyledPaper = styled(Paper)`
-  background-color: ${PALETTE.SMOKE_LIGHTEST};
-  border: 1px dashed ${PALETTE.SMOKE_MAIN};
+interface StyledPaperProps {
+  isDragActive?: boolean;
+}
+
+export const StyledPaper = styled(Paper)<StyledPaperProps>`
+  background-color: ${({ isDragActive }) =>
+    isDragActive ? PALETTE.PRIMARY_LIGHTEST : PALETTE.SMOKE_LIGHTEST};
+  border: 1px dashed
+    ${({ isDragActive }) =>
+      isDragActive ? PALETTE.PRIMARY_MAIN : PALETTE.SMOKE_MAIN};
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
 `;
 
 export const StyledButtonBase = styled(ButtonBase)`
