@@ -201,6 +201,7 @@ export interface DeSeq2PairedSample {
 export interface DeSeq2FileElement {
   class: "File";
   ext: string;
+  hashes?: WorkflowDatasetHash[];
   location: string;
   name: "forward" | "reverse";
 }

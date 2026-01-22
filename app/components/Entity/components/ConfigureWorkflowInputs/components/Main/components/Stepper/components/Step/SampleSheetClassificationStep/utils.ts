@@ -52,6 +52,22 @@ export function validateClassifications(
     errors.push("Only one reverse file URL column is allowed");
   }
 
+  // Check at most one forward file MD5 (optional)
+  const forwardFileMd5Count = values.filter(
+    (v) => v === COLUMN_TYPE.FORWARD_FILE_MD5
+  ).length;
+  if (forwardFileMd5Count > 1) {
+    errors.push("Only one forward file MD5 column is allowed");
+  }
+
+  // Check at most one reverse file MD5 (optional)
+  const reverseFileMd5Count = values.filter(
+    (v) => v === COLUMN_TYPE.REVERSE_FILE_MD5
+  ).length;
+  if (reverseFileMd5Count > 1) {
+    errors.push("Only one reverse file MD5 column is allowed");
+  }
+
   // Check at least one biological factor
   const biologicalFactorCount = values.filter(
     (v) => v === COLUMN_TYPE.BIOLOGICAL_FACTOR
