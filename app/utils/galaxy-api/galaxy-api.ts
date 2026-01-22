@@ -27,6 +27,7 @@ import {
   DeSeq2SampleSheetCollection,
 } from "./entities";
 import { COLUMN_TYPE } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
+import { PrimaryContrasts } from "../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { UcscTrack } from "../ucsc-tracks-api/entities";
 import {
   fetchUcscMd5Checksums,
@@ -751,6 +752,7 @@ function buildSampleSheetCollection(
  * @param sampleSheet - Sample sheet data as array of records.
  * @param sampleSheetClassification - Classification of sample sheet columns.
  * @param designFormula - DESeq2 design formula.
+ * @param primaryContrasts - Primary contrasts configuration (baseline, explicit pairs, or all-vs-all).
  * @param origin - Origin URL of the site making the request.
  * @returns DESeq2 workflow landing URL.
  */
@@ -761,15 +763,26 @@ export async function getDeSeq2LandingUrl(
   sampleSheet: Record<string, string>[],
   sampleSheetClassification: Record<string, COLUMN_TYPE | null>,
   designFormula: string,
+  primaryContrasts: PrimaryContrasts | null,
   origin: string
 ): Promise<string> {
   const md5Checksums = await fetchUcscMd5Checksums(referenceAssembly);
-  const gtfHashes = getHashesForUrl(geneModelUrl, referenceAssembly, md5Checksums);
+  const gtfHashes = getHashesForUrl(
+    geneModelUrl,
+    referenceAssembly,
+    md5Checksums
+  );
 
   const sampleSheetCollection = buildSampleSheetCollection(
     sampleSheet,
     sampleSheetClassification
   );
+
+  // Extract reference level from baseline contrasts
+  const referenceLevel =
+    primaryContrasts?.type === "BASELINE"
+      ? primaryContrasts.baseline
+      : undefined;
 
   const body: DeSeq2WorkflowLandingsBody = {
     origin,
@@ -785,6 +798,7 @@ export async function getDeSeq2LandingUrl(
         url: geneModelUrl,
       },
       "Reference genome": referenceAssembly,
+      ...(referenceLevel && { "Reference level": referenceLevel }),
       "Sample sheet of sequencing reads": sampleSheetCollection,
       "Use featurecounts for generating count tables": true,
     },

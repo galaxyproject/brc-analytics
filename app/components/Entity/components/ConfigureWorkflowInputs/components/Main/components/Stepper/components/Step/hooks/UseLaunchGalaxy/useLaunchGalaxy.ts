@@ -56,6 +56,7 @@ export const useLaunchGalaxy = ({
           configuredValue.sampleSheet,
           configuredValue.sampleSheetClassification,
           configuredValue.designFormula,
+          configuredValue.primaryContrasts,
           origin
         )
       );

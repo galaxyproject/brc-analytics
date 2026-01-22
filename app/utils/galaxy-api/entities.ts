@@ -166,6 +166,7 @@ export interface DeSeq2RequestState {
   "Generate additional QC reports": boolean;
   "GTF File of annotation": DeSeq2GtfFile;
   "Reference genome": string;
+  "Reference level"?: string;
   "Sample sheet of sequencing reads": DeSeq2SampleSheetCollection;
   "Use featurecounts for generating count tables": boolean;
 }
