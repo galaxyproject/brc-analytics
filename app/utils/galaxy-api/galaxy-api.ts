@@ -763,6 +763,9 @@ export async function getDeSeq2LandingUrl(
   designFormula: string,
   origin: string
 ): Promise<string> {
+  const md5Checksums = await fetchUcscMd5Checksums(referenceAssembly);
+  const gtfHashes = getHashesForUrl(geneModelUrl, referenceAssembly, md5Checksums);
+
   const sampleSheetCollection = buildSampleSheetCollection(
     sampleSheet,
     sampleSheetClassification
@@ -778,6 +781,7 @@ export async function getDeSeq2LandingUrl(
       "GTF File of annotation": {
         class: "File",
         ext: "gtf.gz",
+        hashes: gtfHashes,
         url: geneModelUrl,
       },
       "Reference genome": referenceAssembly,
