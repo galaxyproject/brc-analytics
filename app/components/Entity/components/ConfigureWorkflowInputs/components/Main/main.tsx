@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Props } from "./types";
 import { Stepper } from "./components/Stepper/stepper";
 import { Loading } from "@databiosphere/findable-ui/lib/components/Loading/loading";

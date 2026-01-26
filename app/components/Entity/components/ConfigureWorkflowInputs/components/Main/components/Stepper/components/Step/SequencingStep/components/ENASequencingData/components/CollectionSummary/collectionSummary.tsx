@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Button, Typography, Grid } from "@mui/material";
 import { StyledRoundedPaper } from "./collectionSummary.styles";
 import { Props } from "./types";

@@ -1,6 +1,6 @@
 # Multi-stage build for Next.js static export
 # Stage 1: Build the application
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 # Install bash and git for build scripts
 RUN apk add --no-cache bash git

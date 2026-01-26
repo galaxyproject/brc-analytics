@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Fragment } from "react";
 import { StaticProps } from "../../docs/common/staticGeneration/types";
 import { MDXRemote } from "next-mdx-remote";

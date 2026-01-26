@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { SvgIcon, SvgIconProps } from "@mui/material";
 

@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { ReactNode } from "react";
 import { StyledSectionContent } from "./content.styles";
 import { useLayoutDimensions } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/hook";

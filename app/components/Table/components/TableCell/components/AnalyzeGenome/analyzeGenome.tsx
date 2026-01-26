@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { DropdownButton } from "@databiosphere/findable-ui/lib/components/common/Button/components/DropdownButton/dropdownButton";
 import { DropdownMenuButtonProps } from "@databiosphere/findable-ui/lib/components/common/DropdownMenu/common/entities";
 import { DropdownMenu } from "@databiosphere/findable-ui/lib/components/common/DropdownMenu/dropdownMenu";

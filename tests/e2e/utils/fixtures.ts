@@ -11,6 +11,7 @@ export const test = base.extend({
       "**//*plausible.galaxyproject.eu/**",
       (route) => route.fulfill({ status: 204 }) // fulfill analytics requests to avoid slow TLS handshake
     );
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- use is Playwright's fixture API, not React's hook
     await use(context);
   },
 });

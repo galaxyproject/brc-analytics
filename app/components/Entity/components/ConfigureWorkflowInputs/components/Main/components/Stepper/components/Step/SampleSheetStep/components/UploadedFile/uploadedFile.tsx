@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { IconButton, Stack, Typography } from "@mui/material";
 import { StyledRoundedPaper } from "./uploadedFile.styles";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";

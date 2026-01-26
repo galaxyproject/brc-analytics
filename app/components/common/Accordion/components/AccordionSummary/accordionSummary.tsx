@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { AddIcon as DXAddIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/AddIcon/addIcon";
 import {
   AccordionSummary as MAccordionSummary,

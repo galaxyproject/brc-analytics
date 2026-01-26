@@ -4,6 +4,7 @@ import { VALIDATION_ERROR } from "../../../app/components/Entity/components/Conf
 import { useFilePicker } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/hook";
 import { parseFile } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/utils";
 
+/* eslint-disable sonarjs/no-duplicate-string -- jest.mock is hoisted, so the path must be literal */
 jest.mock(
   "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/utils",
   () => ({
@@ -19,6 +20,7 @@ const mockParseFile = parseFile as jest.MockedFunction<typeof parseFile>;
 const actualUtils = jest.requireActual(
   "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/utils"
 );
+/* eslint-enable sonarjs/no-duplicate-string -- re-enable rule */
 
 /**
  * Creates a mock ChangeEvent for file input.

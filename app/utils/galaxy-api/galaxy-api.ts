@@ -1,5 +1,10 @@
 import { WORKFLOW_PARAMETER_VARIABLE } from "../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { WorkflowParameter } from "../../apis/catalog/brc-analytics-catalog/common/entities";
+
+const FILE_EXT = {
+  FASTQ_SANGER_GZ: "fastqsanger.gz",
+} as const;
+
 import ky from "ky";
 import {
   EnaFileInfo,
@@ -372,7 +377,7 @@ function buildSingleReadRunsRequestValue(
       const runAccession = runInfo.runAccession;
       const { forward } = getSingleRunUrlsInfo(runInfo.urls, runInfo.md5Hashes);
       return {
-        ext: "fastqsanger.gz",
+        ext: FILE_EXT.FASTQ_SANGER_GZ,
         hashes: [{ hash_function: "MD5", hash_value: forward.md5 }],
         identifier: runAccession,
         url: forward.url,
@@ -398,13 +403,13 @@ function buildPairedReadRunsRequestValue(
         collectionType: "paired",
         elements: [
           {
-            ext: "fastqsanger.gz",
+            ext: FILE_EXT.FASTQ_SANGER_GZ,
             hashes: [{ hash_function: "MD5", hash_value: forward.md5 }],
             identifier: "forward",
             url: forward.url,
           },
           {
-            ext: "fastqsanger.gz",
+            ext: FILE_EXT.FASTQ_SANGER_GZ,
             hashes: [{ hash_function: "MD5", hash_value: reverse.md5 }],
             identifier: "reverse",
             url: reverse.url,
@@ -648,7 +653,7 @@ function buildSampleElements(
       elements: [
         {
           class: "File" as const,
-          ext: "fastqsanger.gz",
+          ext: FILE_EXT.FASTQ_SANGER_GZ,
           hashes: forwardMd5
             ? [{ hash_function: "MD5" as const, hash_value: forwardMd5 }]
             : undefined,
@@ -657,7 +662,7 @@ function buildSampleElements(
         },
         {
           class: "File" as const,
-          ext: "fastqsanger.gz",
+          ext: FILE_EXT.FASTQ_SANGER_GZ,
           hashes: reverseMd5
             ? [{ hash_function: "MD5" as const, hash_value: reverseMd5 }]
             : undefined,

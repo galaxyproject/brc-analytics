@@ -42,6 +42,7 @@ export async function buildWorkflows(): Promise<WorkflowCategory[]> {
   return workflowCategories;
 }
 
+/* eslint-disable-next-line sonarjs/cognitive-complexity -- function handles multiple optional fields */
 function buildWorkflow(
   workflowCategories: WorkflowCategory[],
   sourceWorkflow: SourceWorkflow

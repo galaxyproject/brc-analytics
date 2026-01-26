@@ -3,6 +3,15 @@ import {
   fetchUcscMd5Checksums,
 } from "../app/utils/ucsc-tracks-api/ucsc-tracks-api";
 
+const TEST_DATA = {
+  ASSEMBLY_ID: "GCF_045689255.1",
+  CHECKSUM: "84adf5fc228278369f6cc70e9d6080fe",
+} as const;
+
+const EXPECTED = {
+  CHECKSUM: TEST_DATA.CHECKSUM,
+} as const;
+
 // Mock fetch for testing
 global.fetch = jest.fn();
 
@@ -49,14 +58,14 @@ describe("UCSC Tracks API - Checksum Functions", () => {
         return Promise.reject(new Error("Unexpected URL"));
       });
 
-      const result = await fetchUcscMd5Checksums("GCF_045689255.1");
+      const result = await fetchUcscMd5Checksums(TEST_DATA.ASSEMBLY_ID);
 
       expect(result.size).toBe(2);
       expect(
         result.get(
-          "/mirrordata/hubs/GCF/045/689/255/GCF_045689255.1/GCF_045689255.1.fa.gz"
+          `/mirrordata/hubs/GCF/045/689/255/${TEST_DATA.ASSEMBLY_ID}/${TEST_DATA.ASSEMBLY_ID}.fa.gz`
         )
-      ).toBe("84adf5fc228278369f6cc70e9d6080fe");
+      ).toBe(EXPECTED.CHECKSUM);
       expect(console.info).toHaveBeenCalledWith(
         expect.stringContaining("Successfully loaded 2 MD5 checksums")
       );
@@ -75,7 +84,7 @@ describe("UCSC Tracks API - Checksum Functions", () => {
 
       (global.fetch as jest.Mock).mockResolvedValue(filesApiResponse);
 
-      const result = await fetchUcscMd5Checksums("GCF_045689255.1");
+      const result = await fetchUcscMd5Checksums(TEST_DATA.ASSEMBLY_ID);
 
       expect(result.size).toBe(0);
       expect(console.warn).toHaveBeenCalledWith(
@@ -87,7 +96,7 @@ describe("UCSC Tracks API - Checksum Functions", () => {
       // Mock fetch to throw an error
       (global.fetch as jest.Mock).mockRejectedValue(new Error("Network error"));
 
-      const result = await fetchUcscMd5Checksums("GCF_045689255.1");
+      const result = await fetchUcscMd5Checksums(TEST_DATA.ASSEMBLY_ID);
 
       expect(result.size).toBe(0);
       // The actual error message is different than what we expected
@@ -100,8 +109,8 @@ describe("UCSC Tracks API - Checksum Functions", () => {
   describe("getChecksumForPath", () => {
     it("should return undefined when checksums map is empty", () => {
       const result = getChecksumForPath(
-        "https://hgdownload.soe.ucsc.edu/hubs/GCF/045/689/255/GCF_045689255.1/GCF_045689255.1.fa.gz",
-        "GCF_045689255.1",
+        `https://hgdownload.soe.ucsc.edu/hubs/GCF/045/689/255/${TEST_DATA.ASSEMBLY_ID}/${TEST_DATA.ASSEMBLY_ID}.fa.gz`,
+        TEST_DATA.ASSEMBLY_ID,
         new Map()
       );
 
@@ -110,30 +119,30 @@ describe("UCSC Tracks API - Checksum Functions", () => {
 
     it("should find checksum for a direct path match", () => {
       const checksums = new Map([
-        ["GCF_045689255.1.fa.gz", "84adf5fc228278369f6cc70e9d6080fe"],
+        [`${TEST_DATA.ASSEMBLY_ID}.fa.gz`, TEST_DATA.CHECKSUM],
       ]);
 
       const result = getChecksumForPath(
-        "https://hgdownload.soe.ucsc.edu/hubs/GCF/045/689/255/GCF_045689255.1/GCF_045689255.1.fa.gz",
-        "GCF_045689255.1",
+        `https://hgdownload.soe.ucsc.edu/hubs/GCF/045/689/255/${TEST_DATA.ASSEMBLY_ID}/${TEST_DATA.ASSEMBLY_ID}.fa.gz`,
+        TEST_DATA.ASSEMBLY_ID,
         checksums
       );
 
-      expect(result).toBe("84adf5fc228278369f6cc70e9d6080fe");
+      expect(result).toBe(EXPECTED.CHECKSUM);
     });
 
     it("should find checksum for a path with ./ prefix", () => {
       const checksums = new Map([
-        ["./GCF_045689255.1.fa.gz", "84adf5fc228278369f6cc70e9d6080fe"],
+        [`./${TEST_DATA.ASSEMBLY_ID}.fa.gz`, TEST_DATA.CHECKSUM],
       ]);
 
       const result = getChecksumForPath(
-        "https://hgdownload.soe.ucsc.edu/hubs/GCF/045/689/255/GCF_045689255.1/GCF_045689255.1.fa.gz",
-        "GCF_045689255.1",
+        `https://hgdownload.soe.ucsc.edu/hubs/GCF/045/689/255/${TEST_DATA.ASSEMBLY_ID}/${TEST_DATA.ASSEMBLY_ID}.fa.gz`,
+        TEST_DATA.ASSEMBLY_ID,
         checksums
       );
 
-      expect(result).toBe("84adf5fc228278369f6cc70e9d6080fe");
+      expect(result).toBe(EXPECTED.CHECKSUM);
     });
 
     it("should find checksum by matching filename when full path doesn't match", () => {
@@ -141,18 +150,18 @@ describe("UCSC Tracks API - Checksum Functions", () => {
       // "84adf5fc228278369f6cc70e9d6080fe  /mirrordata/hubs/GCF/045/689/255/GCF_045689255.1/GCF_045689255.1.fa.gz"
       const checksums = new Map([
         [
-          "/mirrordata/hubs/GCF/045/689/255/GCF_045689255.1/GCF_045689255.1.fa.gz",
-          "84adf5fc228278369f6cc70e9d6080fe",
+          `/mirrordata/hubs/GCF/045/689/255/${TEST_DATA.ASSEMBLY_ID}/${TEST_DATA.ASSEMBLY_ID}.fa.gz`,
+          TEST_DATA.CHECKSUM,
         ],
       ]);
 
       const result = getChecksumForPath(
-        "https://hgdownload.soe.ucsc.edu/hubs/GCF/045/689/255/GCF_045689255.1/GCF_045689255.1.fa.gz",
-        "GCF_045689255.1",
+        `https://hgdownload.soe.ucsc.edu/hubs/GCF/045/689/255/${TEST_DATA.ASSEMBLY_ID}/${TEST_DATA.ASSEMBLY_ID}.fa.gz`,
+        TEST_DATA.ASSEMBLY_ID,
         checksums
       );
 
-      expect(result).toBe("84adf5fc228278369f6cc70e9d6080fe");
+      expect(result).toBe(EXPECTED.CHECKSUM);
     });
 
     it("should find checksum by matching filename when path has no directory structure", () => {
@@ -173,12 +182,12 @@ describe("UCSC Tracks API - Checksum Functions", () => {
 
     it("should return undefined when assembly ID is not in URL and filename doesn't match", () => {
       const checksums = new Map([
-        ["GCF_045689255.1.fa.gz", "84adf5fc228278369f6cc70e9d6080fe"],
+        [`${TEST_DATA.ASSEMBLY_ID}.fa.gz`, TEST_DATA.CHECKSUM],
       ]);
 
       const result = getChecksumForPath(
         "https://hgdownload.soe.ucsc.edu/hubs/some/other/path/file.fa.gz",
-        "GCF_045689255.1",
+        TEST_DATA.ASSEMBLY_ID,
         checksums
       );
 
@@ -191,8 +200,8 @@ describe("UCSC Tracks API - Checksum Functions", () => {
       ]);
 
       const result = getChecksumForPath(
-        "https://hgdownload.soe.ucsc.edu/hubs/GCF/045/689/255/GCF_045689255.1/tracks/genes/refGene.bb",
-        "GCF_045689255.1",
+        `https://hgdownload.soe.ucsc.edu/hubs/GCF/045/689/255/${TEST_DATA.ASSEMBLY_ID}/tracks/genes/refGene.bb`,
+        TEST_DATA.ASSEMBLY_ID,
         checksums
       );
 

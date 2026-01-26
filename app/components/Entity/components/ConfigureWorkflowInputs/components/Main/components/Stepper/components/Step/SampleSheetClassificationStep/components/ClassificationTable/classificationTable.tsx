@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { TableBody, TableCell, TableHead, TableRow } from "@mui/material";
 import { StyledTableContainer } from "./classificationTable.styles";
 import { Props } from "./types";

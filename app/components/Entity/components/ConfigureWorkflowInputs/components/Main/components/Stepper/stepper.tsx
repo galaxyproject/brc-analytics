@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { STEPPER_PROPS } from "./constants";
 import { StyledStepper } from "./stepper.styles";
 import { Props } from "./types";

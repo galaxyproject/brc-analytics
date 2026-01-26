@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Fragment } from "react";
 import { StyledStack } from "./learnView.styles";
 import { SectionContentCard } from "../../components/common/Card/components/SectionContentCard/sectionContentCard";

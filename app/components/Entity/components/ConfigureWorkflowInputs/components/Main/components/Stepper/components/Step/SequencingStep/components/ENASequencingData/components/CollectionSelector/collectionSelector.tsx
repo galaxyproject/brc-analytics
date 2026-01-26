@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Button, DialogActions, DialogContent } from "@mui/material";
 import { StyledDialog } from "./collectionSelector.styles";
 import { Props } from "./types";

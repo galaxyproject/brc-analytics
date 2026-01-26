@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { StyledContainer } from "./heroImage.styles";
 import {
   IMAGE_PROPS,

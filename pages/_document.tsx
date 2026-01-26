@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import Document, { Head, Html, Main, NextScript } from "next/document";
 
 const siteConfig = process.env.NEXT_PUBLIC_SITE_CONFIG;
