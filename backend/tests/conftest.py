@@ -24,7 +24,7 @@ def event_loop():
 
 
 @pytest.fixture
-async def mock_cache_service():
+def mock_cache_service():
     """Create a mock cache service for testing."""
     cache = Mock(spec=CacheService)
     cache.get = AsyncMock(return_value=None)
@@ -35,12 +35,19 @@ async def mock_cache_service():
 
 
 @pytest.fixture
-async def mock_llm_service(mock_cache_service):
+def mock_llm_service(mock_cache_service):
     """Create a mock LLM service for testing."""
     service = LLMService(mock_cache_service)
 
     # Mock the availability check
     service.is_available = Mock(return_value=True)
+
+    # Mock the agents since they're None without an API key
+    # These need proper async mock setup - tests will configure .run() as needed
+    service.reasoning_agent = Mock()
+    service.reasoning_agent.run = AsyncMock()
+    service.formatting_agent = Mock()
+    service.formatting_agent.run = AsyncMock()
 
     return service
 
@@ -103,13 +110,13 @@ def low_confidence_dataset_query():
 
 
 # Test data constants
+# Note: empty strings ("", "   ") are handled separately as they fail input validation
+# before reaching the LLM with "Query cannot be empty"
 INVALID_QUERIES = [
     "sdfsdfs",
     "xyzabc123",
     "@#$%^&*",
     "12345",
-    "",
-    "   ",
     "weather forecast",
     "stock prices",
     "random nonsense gibberish",

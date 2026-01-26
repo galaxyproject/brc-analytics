@@ -1,6 +1,5 @@
 """Tests for confidence scoring and validation."""
 
-import pytest
 from app.models.llm import DatasetQuery
 
 
