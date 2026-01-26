@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { JSX, useState } from "react";
 import { Button, CircularProgress, TextField, Typography } from "@mui/material";
 import { useLLMDatasetSearch } from "../../../hooks/useLLMDatasetSearch";
 import { SearchResults } from "../SearchResults/searchResults";

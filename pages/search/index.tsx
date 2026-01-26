@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { GetStaticProps } from "next";
 import { StyledPagesMain } from "../../app/components/Layout/components/Main/main.styles";
 import { SearchView } from "../../app/views/SearchView/searchView";

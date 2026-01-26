@@ -1,7 +1,7 @@
 "use client";
 
 import { Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 
 const CLIENT_VERSION = process.env.NEXT_PUBLIC_VERSION || "0.15.0";

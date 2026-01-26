@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, JSX } from "react";
 import { UnifiedSearch } from "../../components/LLMSearch";
 import { SectionHero } from "../../components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import { BREADCRUMBS } from "./common/constants";

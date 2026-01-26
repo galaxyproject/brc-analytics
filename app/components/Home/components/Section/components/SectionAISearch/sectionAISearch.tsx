@@ -1,6 +1,7 @@
+import { JSX } from "react";
 import { SectionSubtitle, SectionTitle } from "../../section.styles";
 import { NaturalLanguageSearch } from "../../../../../LLMSearch";
-import { Section, SectionLayout, Headline } from "./sectionAISearch.styles";
+import { Headline, Section, SectionLayout } from "./sectionAISearch.styles";
 
 export const SectionAISearch = (): JSX.Element => {
   return (
