@@ -21,7 +21,6 @@ test.describe("BRC Analytics - LLM Caching Behavior", () => {
       }
     );
     const result1 = await response1.json();
-    // const time1Start = Date.now();
 
     // Wait a moment
     await new Promise((resolve) => setTimeout(resolve, 1000));
