@@ -34,7 +34,7 @@
     "prettier",
     "plugin:prettier/recommended",
     "next",
-    "plugin:sonarjs/recommended",
+    "plugin:sonarjs/recommended-legacy",
     "plugin:eslint-comments/recommended"
   ],
   "rules": {
@@ -89,7 +89,14 @@
     {
       "files": "sunburst.tsx",
       "rules": {
-        "@typescript-eslint/ban-ts-comment": "off"
+        "@typescript-eslint/ban-ts-comment": "off",
+        "sonarjs/no-nested-functions": "off"
+      }
+    },
+    {
+      "files": ["tests/**"],
+      "rules": {
+        "sonarjs/no-clear-text-protocols": "off"
       }
     }
   ]

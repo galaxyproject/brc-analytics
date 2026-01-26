@@ -108,7 +108,7 @@
     "eslint-plugin-jsdoc": "^61.5.0",
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-sonarjs": "^0.25.1",
+    "eslint-plugin-sonarjs": "^3.0.1",
     "eslint-plugin-sort-destructure-keys": "^2.0.0",
     "eslint-plugin-typescript-sort-keys": "^3.3.0",
     "esrun": "^3.2.26",
