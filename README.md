@@ -2,7 +2,7 @@
 
 ## Setup
 
-Using Node.js version `20.10.0`, run `npm install` in the root directory of the repository to install dependencies.
+Using Node.js version `22.12.0`, run `npm install` in the root directory of the repository to install dependencies.
 
 ## Using the development server
 
