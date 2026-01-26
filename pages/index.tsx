@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { GetStaticProps } from "next";
 import { StyledMain } from "../app/components/Layout/components/Main/main.styles";
 import { HomeView } from "../app/views/HomeView/homeView";

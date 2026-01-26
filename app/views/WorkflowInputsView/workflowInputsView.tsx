@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Assembly, Props } from "./types";
 import { Top } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Top/top";
 import { SideColumn } from "../../components/Entity/components/ConfigureWorkflowInputs/components/SideColumn/sideColumn";

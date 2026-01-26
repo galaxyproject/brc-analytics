@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { MenuItem } from "@mui/material";
 import { StyledSelect } from "./select.styles";
 import { Props } from "./types";

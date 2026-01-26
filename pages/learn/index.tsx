@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { LearnView } from "../../app/views/LearnView/learnView";
 import { GetStaticProps } from "next";
 import { StyledPagesMain } from "../../app/components/Layout/components/Main/main.styles";

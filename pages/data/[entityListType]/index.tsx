@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main.styles";
 import { getEntityConfig } from "@databiosphere/findable-ui/lib/config/utils";
 import { getEntityService } from "@databiosphere/findable-ui/lib/hooks/useEntityService";

@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Props } from "./types";
 import { PriorityPathogens } from "./components/PriorityPathogens/priorityPathogens";
 import { sortPriorityPathogen } from "./utils";

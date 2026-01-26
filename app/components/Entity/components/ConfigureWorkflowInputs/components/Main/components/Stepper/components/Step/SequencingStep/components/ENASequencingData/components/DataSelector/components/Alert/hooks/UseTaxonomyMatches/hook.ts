@@ -14,11 +14,10 @@ export const useTaxonomyMatches = (
   const filteredCount = filteredRows.length;
 
   useEffect(() => {
-    if (taxonomyMatches === null) {
-      if (coreCount) {
-        // The table data is ready, set the taxonomy matches to the number of filtered rows.
-        setTaxonomyMatches(filteredCount);
-      }
+    if (taxonomyMatches !== null) return;
+    if (coreCount) {
+      // The table data is ready, set the taxonomy matches to the number of filtered rows.
+      setTaxonomyMatches(filteredCount);
     }
   }, [coreCount, filteredCount, taxonomyMatches]);
 

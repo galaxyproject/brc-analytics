@@ -2,6 +2,10 @@ import { generateFormula } from "../../../app/components/Entity/components/Confi
 import { COLUMN_TYPE } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 import { FormulaColumn } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/DESeq2FormulaStep/hooks/UseFormulaSelection/types";
 
+const EXPECTED = {
+  TREATMENT_ONLY: "~ treatment",
+} as const;
+
 describe("generateFormula", () => {
   test("returns null when no primary is selected", () => {
     const columns: FormulaColumn[] = [
@@ -18,7 +22,7 @@ describe("generateFormula", () => {
     ];
     const selection = { covariates: new Set<string>(), primary: "treatment" };
 
-    expect(generateFormula(columns, selection)).toBe("~ treatment");
+    expect(generateFormula(columns, selection)).toBe(EXPECTED.TREATMENT_ONLY);
   });
 
   test("includes covariates before primary", () => {
@@ -124,7 +128,7 @@ describe("generateFormula", () => {
       primary: "treatment",
     };
 
-    expect(generateFormula(columns, selection)).toBe("~ treatment");
+    expect(generateFormula(columns, selection)).toBe(EXPECTED.TREATMENT_ONLY);
   });
 
   test("handles empty columns array with primary", () => {
@@ -134,7 +138,7 @@ describe("generateFormula", () => {
       primary: "treatment",
     };
 
-    expect(generateFormula(columns, selection)).toBe("~ treatment");
+    expect(generateFormula(columns, selection)).toBe(EXPECTED.TREATMENT_ONLY);
   });
 
   test("handles all three covariate types in correct order", () => {

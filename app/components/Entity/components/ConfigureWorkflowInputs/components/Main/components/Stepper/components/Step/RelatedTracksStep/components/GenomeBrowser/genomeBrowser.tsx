@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Fragment } from "react";
 import { DataSelector } from "./components/DataSelector/dataSelector";
 import { useDialog } from "@databiosphere/findable-ui/lib/components/common/Dialog/hooks/useDialog";

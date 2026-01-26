@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { CheckCircleRounded } from "@mui/icons-material";
 import { Props } from "./types";
 import { StyledFluidPaper } from "./classificationValidation.styles";

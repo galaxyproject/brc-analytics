@@ -18,7 +18,7 @@ export interface UseFilePicker {
     ) => void;
   };
   file: File | null;
-  inputRef: RefObject<HTMLInputElement>;
+  inputRef: RefObject<HTMLInputElement | null>;
   validation: Validation;
 }
 

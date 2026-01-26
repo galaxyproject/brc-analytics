@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Typography } from "@mui/material";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { StyledStack } from "./analysisTypeHeader.styles";

@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { PANEL_BACKGROUND_COLOR } from "@databiosphere/findable-ui/lib/components/Layout/components/ContentLayout/common/entities";
 import { ContentViewProps } from "@databiosphere/findable-ui/lib/views/ContentView/contentView";
 import {

@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { ChildrenProps } from "@databiosphere/findable-ui/lib/components/types";
 import { Chip as MChip, ChipProps } from "@mui/material";
 

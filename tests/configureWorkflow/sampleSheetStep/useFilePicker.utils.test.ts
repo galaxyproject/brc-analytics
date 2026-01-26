@@ -4,6 +4,10 @@ import {
 } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/constants";
 import { parseFile } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/utils";
 
+const TEST_DATA = {
+  VALID_CSV: "a,b,c,d\n1,2,3,4\n5,6,7,8",
+} as const;
+
 /**
  * Creates a mock File object with the given content and name.
  * @param content - The file content.
@@ -99,7 +103,7 @@ describe("parseFile", () => {
 
   describe("validation", () => {
     test("returns no errors for valid file", async () => {
-      const csvContent = "a,b,c,d\n1,2,3,4\n5,6,7,8";
+      const csvContent = TEST_DATA.VALID_CSV;
       const file = createMockFile(csvContent, "test.csv");
 
       const result = await parseFile(file);
@@ -154,7 +158,7 @@ describe("parseFile", () => {
     });
 
     test("does not return column error when exactly 4 columns", async () => {
-      const csvContent = "a,b,c,d\n1,2,3,4\n5,6,7,8";
+      const csvContent = TEST_DATA.VALID_CSV;
       const file = createMockFile(csvContent, "test.csv");
 
       const result = await parseFile(file);
@@ -165,7 +169,7 @@ describe("parseFile", () => {
     });
 
     test("does not return row error when exactly 2 data rows", async () => {
-      const csvContent = "a,b,c,d\n1,2,3,4\n5,6,7,8";
+      const csvContent = TEST_DATA.VALID_CSV;
       const file = createMockFile(csvContent, "test.csv");
 
       const result = await parseFile(file);

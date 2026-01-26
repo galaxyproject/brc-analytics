@@ -12,7 +12,7 @@ import { UseInteractiveAnalyticsAndData } from "./common/entities";
  * @returns analytics cards ordered by the active index, interactive indexes, and interactive actions.
  */
 export function useInteractiveAnalyticsAndData(
-  ref: RefObject<HTMLElement>
+  ref: RefObject<HTMLElement | null>
 ): UseInteractiveAnalyticsAndData {
   // Intersection observer for analytics cards intersecting the viewport.
   const { isIntersecting } = useIntersectionObserver(ref);
