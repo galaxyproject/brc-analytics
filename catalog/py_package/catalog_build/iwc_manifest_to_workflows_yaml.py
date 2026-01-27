@@ -35,6 +35,28 @@ MANIFEST_SOURCE_OF_TRUTH = (
     "iwc_id",
 )
 
+# QC report reason constants
+REASON_ACTIVE_VERSION_MISSING = "Active workflow version not on Dockstore"
+REASON_NEWER_VERSION_UNRELEASED = "IWC has newer version not on Dockstore yet"
+
+
+def parse_trs_version(trs_id: str) -> Tuple[str, str]:
+    """Parse TRS ID into base and version.
+
+    Args:
+        trs_id: Full TRS ID like '#workflow/github.com/org/repo/name/versions/v1'
+
+    Returns:
+        Tuple of (base_id, version) e.g. ('#workflow/github.com/org/repo/name', '1')
+
+    Raises:
+        IndexError: If TRS ID doesn't contain '/versions/v' separator
+    """
+    parts = trs_id.rsplit("/versions/v", 1)
+    if len(parts) != 2:
+        raise IndexError(f"Invalid TRS ID format: {trs_id}")
+    return parts[0], parts[1]
+
 
 def read_existing_yaml(workflows_path: str) -> Dict[str, Workflow]:
     if os.path.exists(workflows_path):
@@ -165,8 +187,10 @@ def generate_current_workflows(skip_validation: bool = False) -> Dict[str, Workf
             # in merge_into_existing and the QC reporting system
 
             # Store original collections for QC reporting
-            original_collections = workflow["collections"] if workflow["collections"] else []
-            
+            original_collections = (
+                workflow["collections"] if workflow["collections"] else []
+            )
+
             workflow_input = Workflow(
                 active=False,
                 trs_id=trs_id,
@@ -244,7 +268,11 @@ def merge_into_existing(
         - newly added workflow QC items (workflows not previously in YAML)
     """
     existing = read_existing_yaml(workflows_path)
-    current = iwc_current if iwc_current is not None else generate_current_workflows(skip_validation)
+    current = (
+        iwc_current
+        if iwc_current is not None
+        else generate_current_workflows(skip_validation)
+    )
     if version_cache is None:
         version_cache = {}
     merged: Dict[str, Workflow] = {}
@@ -276,12 +304,16 @@ def merge_into_existing(
         # Use cached version validation
         iwc_trs_id = current_workflow_input.trs_id
         existing_trs_id = existing_workflow_input.trs_id
-        
+
         if iwc_trs_id not in version_cache:
-            version_cache[iwc_trs_id] = verify_trs_version_exists(iwc_trs_id, skip_validation)
+            version_cache[iwc_trs_id] = verify_trs_version_exists(
+                iwc_trs_id, skip_validation
+            )
         if existing_trs_id not in version_cache:
-            version_cache[existing_trs_id] = verify_trs_version_exists(existing_trs_id, skip_validation)
-        
+            version_cache[existing_trs_id] = verify_trs_version_exists(
+                existing_trs_id, skip_validation
+            )
+
         iwc_version_valid = version_cache[iwc_trs_id]
         existing_version_valid = version_cache[existing_trs_id]
 
@@ -383,7 +415,7 @@ def to_workflows_yaml(
     # Generate IWC workflows once and create version cache
     iwc_current = generate_current_workflows(skip_validation)
     version_cache: Dict[str, bool] = {}
-    
+
     by_trs_id, stale_param_qc_items, new_param_qc_items, new_workflow_qc_items = (
         merge_into_existing(workflows_path, skip_validation, iwc_current, version_cache)
     )
@@ -424,8 +456,9 @@ def to_workflows_yaml(
                 if not workflow.categories:
                     continue
             final_workflows.append(workflow)
-        sorted_workflows = final_workflows
-    final_workflows = sorted_workflows
+    else:
+        final_workflows = sorted_workflows
+    
     with open(workflows_path, "w") as out:
         yaml.safe_dump(
             Workflows(workflows=final_workflows).model_dump(exclude_none=True),
@@ -443,28 +476,29 @@ def to_workflows_yaml(
             if not getattr(w, "active", False):
                 continue
             used_trs_id = w.trs_id
-            trs_base = used_trs_id.rsplit("/versions/v", 1)[0]
             try:
-                used_version = used_trs_id.rsplit("/versions/v", 1)[1]
+                trs_base, used_version = parse_trs_version(used_trs_id)
             except IndexError:
+                trs_base = used_trs_id.rsplit("/versions/v", 1)[0]
                 used_version = "unknown"
 
             # Case 1: Active workflow version not on Dockstore (covers new active entries too)
             if used_trs_id not in version_cache:
-                version_cache[used_trs_id] = verify_trs_version_exists(used_trs_id, skip_validation=False)
+                version_cache[used_trs_id] = verify_trs_version_exists(
+                    used_trs_id, skip_validation=False
+                )
             if not version_cache[used_trs_id]:
                 iwc_trs_id = (
                     iwc_current.get(trs_base).trs_id
                     if trs_base in iwc_current
                     else None
                 )
-                try:
-                    iwc_version = (
-                        iwc_trs_id.rsplit("/versions/v", 1)[1]
-                        if iwc_trs_id
-                        else "unknown"
-                    )
-                except IndexError:
+                if iwc_trs_id:
+                    try:
+                        _, iwc_version = parse_trs_version(iwc_trs_id)
+                    except IndexError:
+                        iwc_version = "unknown"
+                else:
                     iwc_version = "unknown"
                 version_qc_items.append(
                     {
@@ -473,7 +507,7 @@ def to_workflows_yaml(
                         "used_trs_id": used_trs_id,
                         "iwc_version": iwc_version,
                         "used_version": used_version,
-                        "reason": "Active workflow version not on Dockstore",
+                        "reason": REASON_ACTIVE_VERSION_MISSING,
                     }
                 )
 
@@ -481,13 +515,15 @@ def to_workflows_yaml(
             if trs_base in iwc_current:
                 iwc_trs_id2 = iwc_current[trs_base].trs_id
                 try:
-                    iwc_version2 = iwc_trs_id2.rsplit("/versions/v", 1)[1]
+                    _, iwc_version2 = parse_trs_version(iwc_trs_id2)
                 except IndexError:
                     iwc_version2 = "unknown"
-                
+
                 if iwc_trs_id2 not in version_cache:
-                    version_cache[iwc_trs_id2] = verify_trs_version_exists(iwc_trs_id2, skip_validation=False)
-                
+                    version_cache[iwc_trs_id2] = verify_trs_version_exists(
+                        iwc_trs_id2, skip_validation=False
+                    )
+
                 if iwc_version2 != used_version and not version_cache[iwc_trs_id2]:
                     version_qc_items.append(
                         {
@@ -496,7 +532,7 @@ def to_workflows_yaml(
                             "used_trs_id": used_trs_id,
                             "iwc_version": iwc_version2,
                             "used_version": used_version,
-                            "reason": "IWC has newer version not on Dockstore yet",
+                            "reason": REASON_NEWER_VERSION_UNRELEASED,
                         }
                     )
 
@@ -531,16 +567,18 @@ def to_workflows_yaml(
                     category_strs.append(c)
                 else:
                     category_strs.append(str(c))
-            
+
             # Get original Dockstore collections to show why it was excluded
             original_collections = getattr(wf, "_original_collections", [])
             if original_collections:
                 collections_display = f"{', '.join(category_strs)} (from Dockstore: {', '.join(original_collections)})"
             elif category_strs:
-                collections_display = f"{', '.join(category_strs)} (no Dockstore collections)"
+                collections_display = (
+                    f"{', '.join(category_strs)} (no Dockstore collections)"
+                )
             else:
                 collections_display = "none"
-            
+
             excluded_iwc_workflows.append(
                 {
                     "name": wf.workflow_name,
@@ -581,7 +619,7 @@ def _split_version_qc_items(
         iwc_version = e.get("iwc_version", "unknown")
         reason = e.get("reason", "")
 
-        if reason == "Active workflow version not on Dockstore":
+        if reason == REASON_ACTIVE_VERSION_MISSING:
             invalid_items.append(f"{trs_base} (v{used_version})")
         else:
             mismatch_items.append(
