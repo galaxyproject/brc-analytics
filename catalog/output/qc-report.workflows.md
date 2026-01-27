@@ -36,6 +36,205 @@ None
 
 None
 
+## Inactive workflows in workflows.yml
+
+> **Note:** These workflows are in workflows.yml but not marked active. Parameter counts can help assess complexity for potential activation.
+
+### Genome assembly with Flye - ASSEMBLY (1 parameters)
+
+- Input sequence reads
+
+### Functional annotation of protein sequences - ANNOTATION (1 parameters)
+
+- input
+
+### Repeat masking with RepeatModeler and RepeatMasker - ANNOTATION (1 parameters)
+
+- input
+
+### BigWig Replicates Averaging Workflow - REGULATION, TRANSCRIPTOMICS (2 parameters)
+
+- Bigwig to average
+- bin_size
+
+### Bacterial Genome Assembly using Shovill - ASSEMBLY (2 parameters)
+
+- Input adapter trimmed sequence reads (forward)
+- Input adapter trimmed sequence reads (reverse)
+
+### Influenza A isolate subtyping and consensus sequence generation - CONSENSUS_SEQUENCES (2 parameters)
+
+- References per segment collection
+- Sequenced paired-end data
+
+### Generic variation analysis on WGS PE data - VARIANT_CALLING (3 parameters)
+
+- Paired Collection
+- GenBank genome
+- Name for genome database
+
+### Assembly polishing with long reads - ASSEMBLY (3 parameters)
+
+- Assembly to be polished
+- long reads
+- minimap setting (for long reads) 
+
+### Single-Cell Mixture Analysis: baredSC 1D Log-Normalized Models - TRANSCRIPTOMICS (4 parameters)
+
+- Tabular with raw expression values
+- Gene name
+- Maximum value in logNorm
+- Maximum number of Gaussians to study
+
+### Consensus Peak Calling for ChIP-seq Paired-End Replicates - REGULATION (4 parameters)
+
+- n rmDup BAMPE
+- Minimum number of overlap
+- effective_genome_size
+- bin_size
+
+### Consensus Peak Calling for ChIP-seq Single-End Replicates - REGULATION (4 parameters)
+
+- n rmDup BAMSR
+- Minimum number of overlap
+- effective_genome_size
+- bin_size
+
+### Hi-C Format Conversion: Juicer Medium to Cooler Files - REGULATION (4 parameters)
+
+- Bin size in bp
+- genome name
+- Juicer Medium Tabix with validPairs
+- Interactions to consider to calculate weights in normalization step
+
+### Generic variation analysis reporting - VARIANT_CALLING (4 parameters)
+
+- Variation data to report
+- AF Filter
+- DP Filter
+- DP_ALT Filter
+
+### BREW3R - TRANSCRIPTOMICS (5 parameters)
+
+- Input gtf
+- BAM collection
+- strandedness
+- minimum coverage
+- minimum FPKM for merge
+
+### Gene Ontology and KEGG Pathway Enrichment Analysis - TRANSCRIPTOMICS (5 parameters)
+
+- Select genome to use
+- Differential expression result
+- Select gene ID format
+- gene length
+- KEGG pathways
+
+### Hi-C Data Processing: FASTQ to Valid Interaction Pairs - REGULATION (5 parameters)
+
+- PE fastq input
+- genome name
+- Restriction enzyme
+- No fill-in
+- minimum MAPQ
+
+### COVID-19: variation analysis of ARTIC ONT data - VARIANT_CALLING (5 parameters)
+
+- ONT-sequenced reads
+- Minimum read length
+- Maximum read length
+- NC_045512.2 FASTA sequence of SARS-CoV-2
+- Primer binding sites info in BED format
+
+### SARS-CoV-2 Illumina Amplicon pipeline - iVar based - VARIANT_CALLING (5 parameters)
+
+- Paired read collection for samples
+- Reference FASTA
+- Primer BED
+- Read fraction to call variant
+- Minimum quality score to call base
+
+### Genome annotation with Maker - ANNOTATION (6 parameters)
+
+- BUSCO lineage
+- Genome sequence
+- Genome assembly
+- Protein sequences
+- Augustus training
+- SNAP training
+
+### Metagenomic Genes Catalogue Analysis - ANNOTATION (6 parameters)
+
+- Metagenomics Trimmed reads
+- AMR genes detection database
+- Virulence genes detection database
+- starAMR database
+- mmseqs2 taxonomy DB
+- eggNOG database
+
+### RNA-Seq Differential Expression Analysis with Visualization - TRANSCRIPTOMICS (6 parameters)
+
+- Counts from changed condition
+- Counts from reference condition
+- Count files have header
+- Gene Annotaton
+- Adjusted p-value threshold
+- log2 fold change threshold
+
+### COVID-19: variation analysis reporting - VARIANT_CALLING (6 parameters)
+
+- Variation data to report
+- AF Filter
+- DP Filter
+- DP_ALT Filter
+- gene products translations
+- Number of Clusters
+
+### Single-Cell Mixture Analysis: baredSC 2D Log-Normalized Models - TRANSCRIPTOMICS (7 parameters)
+
+- Tabular with raw expression values
+- Gene name for x axis
+- maximum value in logNorm for x-axis
+- Gene name for y axis
+- maximum value in logNorm for y-axis
+- Maximum number of Gaussians to study
+- compute p-value
+
+### Hi-C Processing: FASTQ to Balanced Cool Files - REGULATION (8 parameters)
+
+- PE fastq input
+- genome name
+- Restriction enzyme
+- No fill-in
+- minimum MAPQ
+- Bin size in bp
+- Interactions to consider to calculate weights in normalization step
+- region for matrix plotting
+
+### Single-Cell Pseudobulk Differential Expression Analysis with edgeR - TRANSCRIPTOMICS (8 parameters)
+
+- Source AnnData file
+- Pseudo-bulk: Fields to merge
+- Group by column
+- Sample key column
+- Name Your Raw Counts Layer
+- Factor fields
+- Formula
+- Gene symbol column
+
+### Capture Hi-C Processing: FASTQ to Balanced Cool Files - REGULATION (10 parameters)
+
+- PE fastq input
+- genome name
+- Restriction enzyme
+- No fill-in
+- minimum MAPQ
+- Bin size in bp
+- Interactions to consider to calculate weights in normalization step
+- capture region (chromosome)
+- capture region (start)
+- capture region (end)
+
 ## IWC workflows not in workflows.yml (excluded by category filter)
 
 - Allele-based Pathogen Identification ( (from Dockstore: Microbiome))

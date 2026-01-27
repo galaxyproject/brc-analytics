@@ -458,7 +458,7 @@ def to_workflows_yaml(
             final_workflows.append(workflow)
     else:
         final_workflows = sorted_workflows
-    
+
     with open(workflows_path, "w") as out:
         yaml.safe_dump(
             Workflows(workflows=final_workflows).model_dump(exclude_none=True),
@@ -554,6 +554,24 @@ def to_workflows_yaml(
         e for e in new_workflow_qc_items if e.get("trs_base") in final_workflow_bases
     ]
 
+    # Collect inactive workflows in YAML with their parameters
+    inactive_workflows: List[Dict[str, any]] = []
+    for wf in final_workflows:
+        if not getattr(wf, "active", False):
+            param_keys = [p.key for p in wf.parameters] if wf.parameters else []
+            category_strs = [
+                c.value if hasattr(c, "value") else str(c) for c in wf.categories
+            ]
+            inactive_workflows.append(
+                {
+                    "name": wf.workflow_name,
+                    "trs_id": wf.trs_id,
+                    "categories": ", ".join(category_strs) if category_strs else "none",
+                    "param_count": len(param_keys),
+                    "param_keys": param_keys,
+                }
+            )
+
     # Collect IWC workflows not in the final YAML (excluded due to category filtering)
     excluded_iwc_workflows: List[Dict[str, str]] = []
     for trs_base, wf in iwc_current.items():
@@ -596,6 +614,7 @@ def to_workflows_yaml(
             stale_param_qc_items,
             new_param_qc_items,
             new_workflow_qc_items,
+            inactive_workflows,
             excluded_iwc_workflows,
             qc_report_path,
         )
@@ -683,6 +702,7 @@ def write_workflows_qc_report(
     stale_param_qc_items: List[Dict[str, str]],
     new_param_qc_items: List[Dict[str, str]],
     new_workflow_qc_items: List[Dict[str, str]],
+    inactive_workflows: List[Dict[str, any]],
     excluded_iwc_workflows: List[Dict[str, str]],
     out_path: str,
 ):
@@ -765,6 +785,35 @@ def write_workflows_qc_report(
         report_lines += _format_param_changes_by_workflow(
             stale_param_qc_items, new_param_qc_items
         )
+    else:
+        report_lines.append("None")
+        report_lines.append("")
+
+    # Section: Inactive workflows in YAML with their parameters
+    report_lines.append("## Inactive workflows in workflows.yml")
+    report_lines.append("")
+    report_lines.append(
+        "> **Note:** These workflows are in workflows.yml but not marked active. "
+        "Parameter counts can help assess complexity for potential activation."
+    )
+    report_lines.append("")
+    if inactive_workflows:
+        # Sort by parameter count (ascending) to show simpler workflows first
+        sorted_inactive = sorted(inactive_workflows, key=lambda x: x.get("param_count", 0))
+        for wf in sorted_inactive:
+            name = wf.get("name", "unknown")
+            categories = wf.get("categories", "none")
+            param_count = wf.get("param_count", 0)
+            param_keys = wf.get("param_keys", [])
+            report_lines.append(f"### {name} - {categories} ({param_count} parameters)")
+            report_lines.append("")
+            if param_keys:
+                for key in param_keys:
+                    report_lines.append(f"- {key}")
+                report_lines.append("")
+            else:
+                report_lines.append("No parameters")
+                report_lines.append("")
     else:
         report_lines.append("None")
         report_lines.append("")
