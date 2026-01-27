@@ -28,7 +28,7 @@ To stop the stack:
 cd backend && docker compose down
 ```
 
-Note: The backend requires a `.env` file at `backend/api/.env` with LLM configuration for the catalog search feature. See `backend/api/.env.example` for required variables.
+Note: The backend uses `backend/api/.env.example` for default configuration. To customize settings, create `backend/api/.env` which will override the defaults.
 
 # BRC Analytics Data Catalog
 
