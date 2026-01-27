@@ -2,7 +2,7 @@
 
 ## Setup
 
-Using Node.js version `20.10.0`, run `npm install` in the root directory of the repository to install dependencies.
+Using Node.js version `22.12.0`, run `npm install` in the root directory of the repository to install dependencies.
 
 ## Using the development server
 
@@ -11,6 +11,24 @@ The app can be run for development using `npm run dev`, and accessed at `http://
 ## Building the app locally
 
 Run `npm run build:local` to build. The built app can be run using `npm start`, and accessed at `http://localhost:3000`.
+
+## Running the full stack with Docker
+
+To run the complete application stack (frontend, backend API, and Redis):
+
+```shell
+./backend/docker-build.sh
+```
+
+This extracts the version from package.json, builds the Next.js frontend inside a container, and serves it via nginx at `http://localhost:8080`. The backend API is available at `/api/v1/`.
+
+To stop the stack:
+
+```shell
+cd backend && docker compose down
+```
+
+Note: The backend requires a `.env` file at `backend/api/.env` with LLM configuration for the catalog search feature. See `backend/api/.env.example` for required variables.
 
 # BRC Analytics Data Catalog
 

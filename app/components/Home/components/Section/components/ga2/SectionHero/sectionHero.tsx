@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Button } from "@mui/material";
 import { ROUTES } from "../../../../../../../../routes/constants";
 import { BUTTON_PROPS } from "../../SectionHero/constants";

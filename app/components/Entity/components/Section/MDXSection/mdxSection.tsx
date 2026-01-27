@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Props } from "./types";
 import { COMPONENTS } from "./constants";
 import { MDXRemote } from "next-mdx-remote";

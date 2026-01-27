@@ -6,6 +6,7 @@ import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,
 } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../../../../../../../../components/Entity/components/AnalysisMethod/components/DifferentialExpressionAnalysis/constants";
 
 export function getRequiredParameterTypes(
   workflow: Workflow
@@ -22,25 +23,61 @@ export function getRequiredParameterTypes(
 }
 
 /**
- * Returns the configured values from the configured input.
+ * Validates and returns configured values for DE workflow.
+ * @param configuredInput - Configured input.
+ * @returns Configured values for DE workflow or undefined if invalid.
+ */
+function getDEConfiguredValues(
+  configuredInput: ConfiguredInput
+): ConfiguredValue | undefined {
+  const {
+    designFormula,
+    geneModelUrl,
+    primaryContrasts,
+    referenceAssembly,
+    sampleSheet,
+    sampleSheetClassification,
+  } = configuredInput;
+
+  // Validate required fields for DE workflow
+  if (
+    !referenceAssembly ||
+    !geneModelUrl ||
+    !sampleSheet?.length ||
+    !sampleSheetClassification ||
+    !designFormula
+  ) {
+    return;
+  }
+
+  return {
+    designFormula,
+    geneModelUrl,
+    primaryContrasts: primaryContrasts ?? null,
+    readRunsPaired: null,
+    readRunsSingle: null,
+    referenceAssembly,
+    sampleSheet,
+    sampleSheetClassification,
+    tracks: null,
+  };
+}
+
+/**
+ * Validates and returns configured values for standard workflows.
  * @param configuredInput - Configured input.
  * @param workflow - Workflow to check required parameters.
- * @returns Configured values.
+ * @returns Configured values for standard workflow or undefined if invalid.
  */
-export function getConfiguredValues(
+function getStandardConfiguredValues(
   configuredInput: ConfiguredInput,
   workflow: Workflow
 ): ConfiguredValue | undefined {
-  const {
-    geneModelUrl,
-    readRunsPaired,
-    readRunsSingle,
-    referenceAssembly,
-    tracks,
-  } = configuredInput;
+  const { geneModelUrl, readRunsPaired, readRunsSingle, referenceAssembly } =
+    configuredInput;
 
   // If workflow is not available yet, return undefined
-  if (!workflow?.parameters) return undefined;
+  if (!workflow?.parameters) return;
   // Check which parameters are required by the workflow
   const requiredParams = getRequiredParameterTypes(workflow);
 
@@ -52,14 +89,36 @@ export function getConfiguredValues(
   if (requiredParams.SANGER_READ_RUN_PAIRED && !readRunsPaired) return;
 
   return {
+    designFormula: null,
     geneModelUrl: geneModelUrl ?? null,
+    primaryContrasts: null,
     readRunsPaired: readRunsPaired ?? null,
     readRunsSingle: readRunsSingle ?? null,
     // referenceAssembly is currently always set, but there are workflows that don't require referenceAssembly.
     // xref https://github.com/galaxyproject/brc-analytics/issues/652
     referenceAssembly: referenceAssembly!,
-    tracks: tracks ?? null,
+    sampleSheet: null,
+    sampleSheetClassification: null,
+    tracks: configuredInput.tracks ?? null,
   };
+}
+
+/**
+ * Returns the configured values from the configured input.
+ * @param configuredInput - Configured input.
+ * @param workflow - Workflow to check required parameters.
+ * @returns Configured values.
+ */
+export function getConfiguredValues(
+  configuredInput: ConfiguredInput,
+  workflow: Workflow
+): ConfiguredValue | undefined {
+  // Handle Differential Expression Analysis workflow separately
+  if (workflow.trsId === DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId) {
+    return getDEConfiguredValues(configuredInput);
+  }
+
+  return getStandardConfiguredValues(configuredInput, workflow);
 }
 
 /**

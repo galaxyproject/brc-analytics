@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Link as DXLink } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import {
   AccordionDetails as MAccordionDetails,

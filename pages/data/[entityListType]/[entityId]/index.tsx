@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { getEntityConfig } from "@databiosphere/findable-ui/lib/config/utils";
 import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";

@@ -1,0 +1,81 @@
+---
+breadcrumbs:
+  - path: "/learn"
+    text: "Learn"
+  - path: "/learn/getting-started"
+    text: "Getting Started"
+  - path: ""
+    text: "Overview"
+contentType: "ARTICLE"
+description: ""
+enableOutline: true
+title: "Introduction"
+---
+
+## What is BRC Analytics?
+
+BRC Analytics is a browser-based bioinformatics platform that makes advanced pathogen genomics accessible to researchers without requiring programming experience or local software installation. Built on the Galaxy workflow system and funded by NIAID as part of the Bioinformatics Resource Centers for Infectious Diseases Program, it unifies reference data from NCBI Datasets with curated community workflows, allowing you to analyze genomic data entirely in your web browser.
+
+### Key Features
+
+- **No installation required** - Everything runs in your browser
+- **Free public computational resources** - No additional investment needed
+- **5,000+ genome assemblies** covering nearly 2,000 pathogen, host, and vector taxa
+- **Integrated reference data** from authoritative sources like NCBI and UCSC
+- **Community-curated workflows** for quality control, read mapping, variant identification, and annotation
+- **Built-in analysis tools** including JupyterLite notebooks for custom analyses
+- **Reproducible research** with automatic provenance tracking
+
+## Before You Begin
+
+### System Requirements
+
+- A modern web browser (Firefox, Chrome, Safari, or Edge)
+- Stable internet connection
+- No special hardware or software needed
+
+### Creating an Account
+
+1. Visit [UseGalaxy.org](https://usegalaxy.org)
+2. Click "Login or Register" in the top menu
+3. Choose "Register" to create a new account
+4. Fill in your information and submit
+5. When you launch an analysis from BRC Analytics, your existing UseGalaxy.org login session (if any) will be used
+6. Analyses will run in your most recently active Galaxy history
+
+<Alert icon={false} severity="info">
+  Creating an account allows you to save your work, access your analysis
+  history, and share results.
+</Alert>
+
+## Understanding the Interface
+
+### Analysis Flow at a Glance
+
+1. **Select context in BRC Analytics** – choose organism/assembly, workflow, and data source.
+2. **Review required inputs** – confirm any reads or metadata the workflow needs (the UI surfaces what’s already pre-provisioned).
+3. **Launch the workflow** – BRC Analytics hands the configuration to UseGalaxy.org.
+4. **Galaxy executes the jobs** – they run in your active Galaxy history; monitor progress or adjust parameters there.
+5. **Review and share results** – download outputs from Galaxy or open linked UCSC Genome Browser tracks.
+
+### Where Each Step Happens
+
+- **BRC Analytics website** – Browse organisms and assemblies, inspect metadata, select reference genomes, configure workflow parameters, and launch analyses.
+- **Galaxy (UseGalaxy.org)** – Executes every workflow you launch. Jobs run in your currently active Galaxy history (you can switch histories after landing), and Galaxy is where you manage datasets, rerun tools, and monitor progress.
+- **UCSC Genome Browser** – Visualize genomic data linked from BRC Analytics, explore annotations, compare sequences, and review custom tracks tied to each assembly.
+
+## Quick Reference
+
+### Key Concepts
+
+- **Organism**: In BRC Analytics, an organism corresponds to a specific NCBI Taxononomy ID, at the species level. This serves as the entry point for finding relevant data and workflows.
+- **Assembly**: A specific version of the reference genome sequence and annotations (e.g., GCF_000854845.1). Analyses are always anchored to a specific assembly to ensure coordinate compatibility.
+- **Workflow**: An automated, community-curated analysis pipeline that connects multiple tools to process your data from raw inputs to final results.
+- **Analysis**: The combination of a specific organism, reference assembly, workflow, and input data configured to answer a biological question.
+
+### Essential URLs
+
+- **BRC Analytics**: https://brc-analytics.org
+- **Galaxy Interface**: https://usegalaxy.org
+- **Help Forum**: https://help.brc-analytics.org
+- **Training**: https://training.galaxyproject.org

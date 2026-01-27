@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { CardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
 import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import { Fragment } from "react";

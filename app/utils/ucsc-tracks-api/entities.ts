@@ -14,6 +14,7 @@ export interface UcscTrack {
   groupId: string;
   isComposite: false;
   longLabel: string | undefined;
+  md5Hash?: string;
   shortLabel: string | undefined;
   type: string | undefined;
 }

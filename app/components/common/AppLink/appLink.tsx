@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { ChildrenProps } from "@databiosphere/findable-ui/lib/components/types";
 import { Link as MLink } from "@mui/material";
 import Link from "next/link";

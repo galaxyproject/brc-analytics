@@ -7,7 +7,7 @@ class Settings:
     """Application settings loaded from environment variables"""
 
     # Application
-    APP_VERSION: str = os.getenv("APP_VERSION", "0.15.0")
+    APP_VERSION: str = os.getenv("APP_VERSION", "0.19.0")
 
     # Redis settings
     REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
@@ -29,6 +29,9 @@ class Settings:
     # Rate limiting
     RATE_LIMIT_REQUESTS: int = int(os.getenv("RATE_LIMIT_REQUESTS", "100"))
     RATE_LIMIT_WINDOW: int = int(os.getenv("RATE_LIMIT_WINDOW", "60"))  # seconds
+
+    # Catalog path
+    CATALOG_PATH: str = os.getenv("CATALOG_PATH", "/catalog/output")
 
 
 @lru_cache()

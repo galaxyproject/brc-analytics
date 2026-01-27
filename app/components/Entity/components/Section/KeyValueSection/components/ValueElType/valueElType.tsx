@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { ChildrenProps } from "@databiosphere/findable-ui/lib/components/types";
 import { TypographyProps } from "@mui/material";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";

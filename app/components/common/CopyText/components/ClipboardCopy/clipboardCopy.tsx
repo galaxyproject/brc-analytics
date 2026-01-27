@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import ContentCopyRoundedIcon from "@mui/icons-material/ContentCopyRounded";
 import { IconButton, Tooltip, TooltipProps } from "@mui/material";
 import copy from "copy-to-clipboard";

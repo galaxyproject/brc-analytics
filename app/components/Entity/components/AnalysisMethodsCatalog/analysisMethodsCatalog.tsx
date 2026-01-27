@@ -1,17 +1,22 @@
+import { JSX } from "react";
 import { AnalysisMethod } from "../AnalysisMethod/analysisMethod";
 import { Props } from "./types";
 import { useRouter } from "next/router";
 import { Fragment } from "react";
-import { CustomWorkflow } from "../AnalysisMethod/components/CustomWorkflow/customWorkflow";
+import { WorkflowAccordion } from "../AnalysisMethod/components/WorkflowAccordion/workflowAccordion";
+import { CUSTOM_WORKFLOW } from "../AnalysisMethod/components/CustomWorkflow/constants";
 import { AnalysisTypeHeader } from "./components/AnalysisTypeHeader/analysisTypeHeader";
 import { Stack } from "@mui/material";
 import { buildAssemblyWorkflows } from "./utils";
 import WORKFLOW_CATEGORIES from "../../../../../catalog/output/workflows.json";
+import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 
 export const AnalysisMethodsCatalog = ({ assembly }: Props): JSX.Element => {
+  const isDEEnabled = useFeatureFlag("de");
   const workflowCategories = buildAssemblyWorkflows(
     assembly,
-    WORKFLOW_CATEGORIES
+    WORKFLOW_CATEGORIES,
+    isDEEnabled
   );
 
   const {
@@ -26,7 +31,10 @@ export const AnalysisMethodsCatalog = ({ assembly }: Props): JSX.Element => {
           description="Prefer to explore the data without a predefined workflow?"
           title="Custom Analysis"
         />
-        <CustomWorkflow entityId={entityId as string} />
+        <WorkflowAccordion
+          entityId={entityId as string}
+          workflow={CUSTOM_WORKFLOW}
+        />
       </Stack>
       <Stack gap={4} useFlexGap>
         {/* Workflow Analysis */}

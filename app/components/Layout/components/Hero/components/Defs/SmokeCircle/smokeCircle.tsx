@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { FILL } from "../../../common/constants";
 import { ELEMENT_ID, PATTERN_UNIT } from "../../../common/entities";
 import { getElementHref } from "../../../common/utils";
