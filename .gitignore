@@ -45,7 +45,6 @@ backend/**/.env
 # python
 venv
 __pycache__
-
 playwright-report/
 
 # public api
