@@ -799,7 +799,9 @@ def write_workflows_qc_report(
     report_lines.append("")
     if inactive_workflows:
         # Sort by parameter count (ascending) to show simpler workflows first
-        sorted_inactive = sorted(inactive_workflows, key=lambda x: x.get("param_count", 0))
+        sorted_inactive = sorted(
+            inactive_workflows, key=lambda x: x.get("param_count", 0)
+        )
         for wf in sorted_inactive:
             name = wf.get("name", "unknown")
             categories = wf.get("categories", "none")
