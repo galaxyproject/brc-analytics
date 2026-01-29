@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       release_id:
-        description: "Tag name of the draft release to publish (e.g., v0.13.0)"
+        description: "Tag name of the draft release to publish (e.g., v0.19.0)"
         required: true
 
 permissions:
@@ -18,6 +18,43 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.12.0"
+
+      - name: Configure git
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+
+      - name: Get release info
+        id: get_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_ID: ${{ github.event.inputs.release_id }}
+        run: |
+          RELEASE_TAG=$(gh release view $RELEASE_ID --json tagName -q '.tagName')
+          VERSION=${RELEASE_TAG#v}
+          echo "tag=$RELEASE_TAG" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Merge main to production
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Fetch all branches
+          git fetch origin main production
+
+          # Checkout production and merge main
+          git checkout production
+          git merge origin/main -m "Release ${{ steps.get_release.outputs.tag }}: merge main to production"
+
+          # Push production (this triggers the deploy workflow)
+          git push origin production
 
       - name: Publish release
         env:
@@ -26,43 +63,43 @@ jobs:
         run: |
           gh release edit "$RELEASE_ID" --draft=false
 
-      - name: Get release tag
-        id: get_release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_ID: ${{ github.event.inputs.release_id }}
-        run: |
-          RELEASE_TAG=$(gh release view $RELEASE_ID --json tagName -q '.tagName')
-          echo "tag=$RELEASE_TAG" >> $GITHUB_OUTPUT
-
-      - name: Update package version
+      - name: Bump main to next development version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          VERSION="${{ steps.get_release.outputs.tag }}"
-          VERSION=${VERSION#v} # Remove 'v' prefix
-          BRANCH_NAME="release/update-version-$VERSION"
+          CURRENT_VERSION="${{ steps.get_release.outputs.version }}"
 
-          # Create and switch to new branch
+          # Parse version components
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+
+          # Always do minor bump: 0.19.0 → 0.20.0
+          NEXT_VERSION="${MAJOR}.$((MINOR + 1)).0"
+
+          echo "Bumping from $CURRENT_VERSION to $NEXT_VERSION"
+
+          BRANCH_NAME="release/bump-to-$NEXT_VERSION"
+
+          # Create branch from main
+          git checkout main
+          git pull origin main
           git checkout -b "$BRANCH_NAME"
 
           # Update version
-          npm version $VERSION --no-git-tag-version
-
-          # Configure git
-          git config user.name github-actions
-          git config user.email github-actions@github.com
+          npm version $NEXT_VERSION --no-git-tag-version
 
           # Commit changes
           git add package.json package-lock.json
-          git commit -m "chore: update version to $VERSION [skip ci]"
+          git commit -m "chore: bump version to $NEXT_VERSION for next development cycle [skip ci]"
 
           # Push branch
           git push -u origin "$BRANCH_NAME"
 
           # Create PR
           gh pr create \
-            --title "chore: update version to $VERSION" \
-            --body "Automated version bump for release ${{ steps.get_release.outputs.tag }}" \
+            --title "chore: bump version to $NEXT_VERSION" \
+            --body "Automated version bump after release ${{ steps.get_release.outputs.tag }}.
+
+          - \`production\` branch = ${{ steps.get_release.outputs.version }} (stable)
+          - \`main\` branch = $NEXT_VERSION (development)" \
             --head "$BRANCH_NAME" \
             --base main
