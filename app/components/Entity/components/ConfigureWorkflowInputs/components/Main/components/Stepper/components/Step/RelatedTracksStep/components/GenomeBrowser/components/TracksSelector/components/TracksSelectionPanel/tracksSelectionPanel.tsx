@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Props } from "./types";
 import { ChevronRightRounded } from "@mui/icons-material";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";

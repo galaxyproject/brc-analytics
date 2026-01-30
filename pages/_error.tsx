@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import * as Sentry from "@sentry/nextjs";
 import { NextPageContext } from "next";
 import Error, { ErrorProps } from "next/error";

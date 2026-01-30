@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { ANIMATE_MOTION, FILL, SHAPE_HEIGHT } from "../../../common/constants";
 import { ELEMENT_ID } from "../../../common/entities";
 import {

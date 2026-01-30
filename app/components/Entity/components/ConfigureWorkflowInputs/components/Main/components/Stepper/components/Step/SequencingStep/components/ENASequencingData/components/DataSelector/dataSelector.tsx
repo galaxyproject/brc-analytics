@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Button, Divider, Stack, Typography } from "@mui/material";
 import { StyledPaper, StyledGrid } from "./dataSelector.styles";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";

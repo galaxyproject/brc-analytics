@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import {
   AccordionSummary,
   AccordionDetails,
@@ -17,12 +18,15 @@ import { ROUTES } from "../../../../../../../routes/constants";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/components/FluidPaper/fluidPaper";
-import { CUSTOM_WORKFLOW } from "./constants";
-import { StyledAccordion } from "./customWorkflow.styles";
+import { StyledAccordion } from "./workflowAccordion.styles";
 import { ChevronRightRounded } from "@mui/icons-material";
 
-export const CustomWorkflow = ({ entityId }: Props): JSX.Element => {
-  const { trsId, workflowDescription, workflowName } = CUSTOM_WORKFLOW;
+export const WorkflowAccordion = ({
+  buttonText = "Select Data",
+  entityId,
+  workflow,
+}: Props): JSX.Element => {
+  const { trsId, workflowDescription, workflowName } = workflow;
   return (
     <StyledAccordion component={FluidPaper}>
       <AccordionSummary
@@ -50,7 +54,7 @@ export const CustomWorkflow = ({ entityId }: Props): JSX.Element => {
           })}
           rel={REL_ATTRIBUTE.NO_OPENER}
         >
-          Select Data
+          {buttonText}
         </Button>
       </AccordionDetails>
     </StyledAccordion>

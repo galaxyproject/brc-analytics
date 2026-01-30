@@ -1,14 +1,16 @@
+import { JSX } from "react";
 import { STEPPER_PROPS } from "./constants";
 import { StyledStepper } from "./stepper.styles";
 import { Props } from "./types";
-import { useStepper } from "./hooks/UseStepper/hook";
 
 export const Stepper = ({
+  activeStep,
   configuredSteps,
+  onContinue,
+  onEdit,
   workflow,
   ...props
 }: Props): JSX.Element => {
-  const { activeStep, onContinue, onEdit } = useStepper(configuredSteps);
   return (
     <StyledStepper activeStep={activeStep} {...STEPPER_PROPS}>
       {configuredSteps.map(({ description, disabled, key, label, Step }, i) => {

@@ -14,7 +14,4 @@ export const CAROUSEL_CARDS: Pick<CardProps, "text">[] = [
   {
     text: MDX.Webinar20250326({}),
   },
-  {
-    text: MDX.ShareUsageAndJoinAdvisoryPanel({}),
-  },
 ];

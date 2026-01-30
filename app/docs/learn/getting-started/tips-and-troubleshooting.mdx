@@ -1,0 +1,85 @@
+---
+breadcrumbs:
+  - path: "/learn"
+    text: "Learn"
+  - path: "/learn/getting-started"
+    text: "Getting Started"
+  - path: ""
+    text: "Tips and Troubleshooting"
+contentType: "ARTICLE"
+description: ""
+enableOutline: true
+title: "Tips and Troubleshooting"
+---
+
+## Overview
+
+This guide focuses on troubleshooting issues specifically related to the **BRC Analytics to Galaxy handoff** and common reasons why a Galaxy workflow launched from BRC Analytics might fail.
+
+> **New to Galaxy?**
+> If you are new to the Galaxy platform, please visit the [Using Galaxy](/learn/using-galaxy) page first to learn about the interface, datasets, and where to find tutorials.
+
+## Data Management Tips
+
+### Organizing Your Galaxy Histories
+
+- When you land in Galaxy, **Create separate histories** for different projects or experiments
+- **Name histories descriptively** (e.g., "Measles_Surveillance_2024")
+- **Add tags** to datasets for easy filtering
+- **Delete unnecessary files** to manage storage (contact Galaxy support if you need a quota increase)
+- **Use collections** to group datasets. **Note:** If you upload your own reads, you must typically organize them into a "Collection" (e.g., a Paired List) for BRC workflows to recognize and process them correctly.
+
+### Saving and Exporting Data
+
+- **Download results** by clicking the download icon on any dataset
+- **Export workflows** for reproducibility
+- **Share histories** with collaborators via Galaxy's sharing features
+- **Publish analyses** to make them publicly accessible
+
+## Troubleshooting Common Issues
+
+### When launching from BRC Analytics
+
+- **"Nothing is happening"**: After clicking Launch, it may look like the workflow is idle. Usually, this means Galaxy is downloading large datasets (like reference genomes or SRA reads). Check the history panel—if datasets are grey or yellow, the process is active.
+- **Not logged into UseGalaxy.org**: If the handoff redirects you to a login screen, sign in and then relaunch the workflow from BRC Analytics so the configuration is sent with your authenticated session.
+- **Jobs appear in a different history**: Galaxy runs workflows in whichever history was most recently active. Open the history panel and switch to the newest history to review datasets.
+
+### Analysis Failed (Red Dataset)
+
+1. Click on the red dataset
+2. Review the error message
+3. Common causes:
+   - **Incompatible Input Data**: While BRC filters inputs to match workflows (e.g., enforcing paired-end reads for paired-end workflows), users can manually override these filters when selecting SRA runs. If you force single-end data into a paired-end workflow, it will fail.
+   - **Missing Galaxy Configuration**: Some workflows have runtime parameters that must be set inside Galaxy after launch. If these are left as defaults, the tool may fail.
+   - **Resource limits**: Extremely large datasets might exceed default memory or time allocations.
+4. Adjust settings and re-run
+
+### Dataset Stuck in Gray/Yellow
+
+- Jobs are queued - be patient
+- Check the Galaxy status page for system issues
+- If stuck >24 hours, report to support
+
+### Can't Find My Data
+
+- Check you're viewing the correct history
+- Use the search function in the history panel
+- Datasets may be hidden - click "Include hidden datasets"
+
+## Best Practices
+
+### For Reproducible Research
+
+1. **Document parameters**: Note all settings used
+2. **Extract workflows**: Save your analysis pipeline
+3. **Record provenance**: Galaxy automatically tracks this
+4. **Share complete histories**: Include all inputs and parameters
+5. **Publish workflows**: Make methods available to others
+
+### For Efficient Analysis
+
+1. **Start small**: Test with a subset of data
+2. **Use collections**: Process multiple samples together
+3. **Delete intermediate files**: Keep only essential outputs
+4. **Monitor job status**: Check for errors early
+5. **Save important results**: Download completed analyses

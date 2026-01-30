@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { SubHeroContentGA2 } from "../../../../../content";
 import {
   AccordionBox,

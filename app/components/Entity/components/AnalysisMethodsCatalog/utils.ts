@@ -5,16 +5,22 @@ import {
   WorkflowCategory,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import { GA2AssemblyEntity } from "../../../../apis/catalog/ga2/entities";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../AnalysisMethod/components/DifferentialExpressionAnalysis/constants";
+import { WorkflowCategoryId } from "../../../../../catalog/schema/generated/schema";
 
 /**
  * Builds workflow categories for the given assembly.
+ * Differential Expression Analysis is added to the Transcriptomics category if DE is enabled.
+ *
  * @param assembly - Assembly.
  * @param allWorkflowCategories - Workflow categories.
+ * @param isDEEnabled - Whether Differential Expression is enabled.
  * @returns Workflow categories compatible with the given assembly.
  */
 export function buildAssemblyWorkflows(
   assembly: BRCDataCatalogGenome | GA2AssemblyEntity,
-  allWorkflowCategories: WorkflowCategory[]
+  allWorkflowCategories: WorkflowCategory[],
+  isDEEnabled: boolean
 ): WorkflowCategory[] {
   const workflowCategories: WorkflowCategory[] = [];
 
@@ -25,6 +31,13 @@ export function buildAssemblyWorkflows(
     const compatibleWorkflows = categoryWorkflows.filter((workflow) =>
       workflowIsCompatibleWithAssembly(workflow, assembly)
     );
+
+    if (
+      isDEEnabled &&
+      workflowCategory.category === WorkflowCategoryId.TRANSCRIPTOMICS
+    ) {
+      compatibleWorkflows.unshift(DIFFERENTIAL_EXPRESSION_ANALYSIS);
+    }
 
     // If no workflows are compatible with the assembly and the category is not marked as "showComingSoon", skip it.
     if (compatibleWorkflows.length === 0 && !workflowCategory.showComingSoon)

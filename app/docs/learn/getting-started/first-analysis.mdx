@@ -1,0 +1,124 @@
+---
+breadcrumbs:
+  - path: "/learn"
+    text: "Learn"
+  - path: "/learn/getting-started"
+    text: "Getting Started"
+  - path: ""
+    text: "First Analysis"
+contentType: "ARTICLE"
+description: ""
+enableOutline: true
+title: "Your First Analysis"
+---
+
+## Variant Calling from Sequencing Data
+
+This walkthrough demonstrates how to perform pathogen surveillance analysis using the measles virus example from the featured analysis.
+
+### Step 1: Select Your Organism
+
+1. From the BRC Analytics homepage, navigate to **"Organisms"**
+2. Use the search or browse function to find your organism of interest
+   - Example: Search for "Measles morbillivirus"
+3. Click on the organism to view available assemblies
+
+### Step 2: Choose a Reference Assembly
+
+1. Review the available genome assemblies from NCBI.
+2. For _Measles morbillivirus_, there is a single RefSeq assembly (GCF_000854845.1). Select that assembly and review the metadata (assembly level, genome size, annotations).
+3. Click **"View"**, select **"UCSC Genome Browser"** to explore the genome visually (optional).
+4. Click **"Analyze"** to load the workflow selection screen.
+
+### Step 3: Select a Workflow
+
+The workflow page shows a “Custom Analysis” option plus a **Select a workflow** section with categories (Variant calling, Transcriptomics, Regulation, Consensus sequences, and additional “coming soon” groups).
+
+1. In **Select a workflow**, choose the **Variant calling** category.
+2. Pick the **"Variant calling and consensus construction from paired end short read data of non-segmented viral genomes"** workflow.
+
+### Step 4: Get Your Data
+
+The workflow form will automatically select the reference FASTA and/or compatible indices based on the assembly you chose. You will still pick the annotation set— for this measles example choose **“NCBI Gene”** (the only option provided).
+
+BRC Analytics offers three ways to supply sequencing reads:
+
+1. **Browse public reads** available via **ENA** (auto-filtered to match the workflow’s layout/strategy, but you can adjust filters).
+2. **Enter known accessions** (paste BioProject IDs or individual SRRs).
+3. **Upload your own FASTQ files** directly into Galaxy.
+
+For this walkthrough, use the same public surveillance data highlighted in the featured analysis:
+
+1. Click **"Browse [N] Sequences"**.
+2. Search for each of the following BioProjects and add their paired-end runs:
+   - **PRJNA1145141** (Romania outbreak, 124 samples)
+   - **PRJNA1017431** (Canada surveillance, 61 samples)
+   - **PRJNA869081** (Operation Allies Welcome dataset, 42 samples)
+3. Keep the default workflow filters (paired-end, whole-genome sequencing) so results stay compatible.
+4. Select the desired runs and continue; the platform will queue downloads automatically.
+
+### Step 5: Launch in Galaxy and Monitor the Run
+
+1. Click **"Launch in Galaxy"**; you will land in your most recently active Galaxy history (create a new history if you want to keep this analysis separate).
+2. In Galaxy, review the workflow form before starting the run. Common parameters include:
+   - **Base quality threshold** - Minimum quality score for variant calling (typically 20-30)
+   - **Allele frequency threshold** - Minimum frequency to call a variant (e.g., 0.05 for 5%)
+   - **Read depth** - Minimum coverage required
+   - **Trimming options** - Adapter removal and quality trimming settings
+3. When ready, click **"Run workflow"** and monitor progress in the Galaxy history panel (right side). Each dataset tile shows status; expand tiles to inspect logs if needed.
+
+**For the measles virus variant workflow:**
+
+1. Review default parameters (optimized for viral genomes)
+2. Adjust thresholds if desired. The default settings are appropriate for this analysis.
+3. The workflow will automatically:
+   - Trim adapter sequences
+   - Map reads to the reference genome
+   - Call variants with iVar
+   - Generate consensus sequences
+   - Annotate variants with SnpEff
+   - Produce quality control reports with MultiQC
+
+### Step 6: View Results
+
+Analysis outputs include:
+
+**Primary Results:**
+
+- **Trimmed reads** - Quality-filtered sequencing data
+- **BAM files** - Mapped and aligned reads
+- **VCF files** - Annotated variant calls with summary tables
+- **Consensus FASTA** - Per-sample consensus sequences
+- **QC reports** - Integrated quality metrics
+
+**Accessing results:**
+
+1. Click on any dataset in your history to expand details
+2. Click the eye icon to view data
+3. Click the download icon to save locally
+4. Click the info icon for provenance and parameters
+
+## Next Steps
+
+### Beginner Path
+
+1. Complete the [Getting Started guides](/learn/getting-started)
+2. Try the [Galaxy 101 tutorial](https://training.galaxyproject.org/training-material/topics/introduction/tutorials/galaxy-intro-101/tutorial.html)
+3. Run the [measles virus featured analysis](/learn/featured-analyses/evolutionary-dynamics-of-coding-overlaps-in-measles) to see how the workflow outputs feed into downstream evolutionary interpretation
+4. Find your organism and assembly of interest in the [Organisms explorer](/organisms) and review the available metadata
+5. Explore the workflow inputs available for that assembly and use the **Custom analysis** route to inspect them directly in Galaxy
+
+### Intermediate Path
+
+1. Explore additional features in [Common Workflows](/learn/getting-started/common-workflows)
+2. Use [JupyterLite for custom analyses](/learn/using-galaxy#using-jupyterlite-for-custom-analyses)
+3. Upload your own data as [Galaxy collections](https://training.galaxyproject.org/training-material/topics/galaxy-interface/tutorials/collections/tutorial.html) for batch runs
+4. Visualize results via [UCSC Genome Browser integration](/learn/using-galaxy#visualizing-results-in-ucsc-genome-browser)
+5. Share or re-run workflows using the [Galaxy workflow sharing tips](/learn/using-galaxy#creating-and-sharing-workflows)
+
+### Advanced Path
+
+1. Develop custom workflows using the **Custom analysis** route and contribute to the [Intergalactic Workflow Commission](https://iwc.galaxyproject.org)
+2. Integrate multiple data types with the [multi-omics GSEA tutorial](https://training.galaxyproject.org/training-material/topics/proteomics/tutorials/multiGSEA-tutorial/tutorial.html)
+3. Fork and refine workflows in the [Galaxy workflow editor](https://training.galaxyproject.org/training-material/topics/galaxy-interface/tutorials/workflow-editor/tutorial.html) to capture advanced logic without scripting
+4. Publish reproducible research by sharing histories or Galaxy Pages via the [history sharing guide](https://training.galaxyproject.org/training-material/faqs/galaxy/histories_sharing.html)

@@ -4,6 +4,7 @@ import { StepConfig } from "../components/Step/types";
 import { STEP } from "./constants";
 import { CUSTOM_WORKFLOW } from "../../../../../../../../../components/Entity/components/AnalysisMethod/components/CustomWorkflow/constants";
 import { ConfiguredInput } from "../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../../AnalysisMethod/components/DifferentialExpressionAnalysis/constants";
 
 /**
  * Augment the configured steps with two additional sequencing steps "READ_RUNS_PAIRED" and "READ_RUNS_SINGLE".
@@ -40,6 +41,18 @@ export function buildSteps(workflow: Workflow): StepConfig[] {
     return [STEP.ASSEMBLY_ID, STEP.RELATED_TRACKS, STEP.READ_RUN_ANY].filter(
       isStepConfigured
     );
+  }
+
+  // Return steps for differential expression analysis
+  if (workflow.trsId === DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId) {
+    return [
+      STEP.ASSEMBLY_ID,
+      STEP.GENE_MODEL_URL,
+      STEP.SAMPLE_SHEET,
+      STEP.SAMPLE_SHEET_CLASSIFICATION,
+      STEP.DESEQ2_FORMULA,
+      STEP.PRIMARY_CONTRASTS,
+    ].filter(isStepConfigured);
   }
 
   // Get workflow variables from the workflow.

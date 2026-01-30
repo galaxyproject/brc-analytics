@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Props } from "./types";
 import { Stepper } from "./components/Stepper/stepper";
 import { Loading } from "@databiosphere/findable-ui/lib/components/Loading/loading";
@@ -9,10 +10,13 @@ import { useState } from "react";
 import { Workflow } from "../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
 
 export const Main = ({
+  activeStep,
   configuredInput,
   configuredSteps,
   genome,
   onConfigure,
+  onContinue,
+  onEdit,
   workflow: initWorkflow,
 }: Props): JSX.Element => {
   /**
@@ -27,10 +31,13 @@ export const Main = ({
     <StyledMainContainer>
       <Loading loading={status.loading} panelStyle={PAPER_PANEL_STYLE.FLUID} />
       <Stepper
+        activeStep={activeStep}
         configuredInput={configuredInput}
         configuredSteps={configuredSteps}
         genome={genome}
         onConfigure={onConfigure}
+        onContinue={onContinue}
+        onEdit={onEdit}
         onLaunchGalaxy={onLaunchGalaxy}
         status={status}
         workflow={workflow}

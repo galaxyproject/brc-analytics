@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Table as MTable } from "@mui/material";
 import { StyledTableContainer } from "./table.styles";
 

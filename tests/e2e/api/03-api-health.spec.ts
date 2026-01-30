@@ -1,5 +1,9 @@
 import { test, expect } from "@playwright/test";
 
+const EXPECTED = {
+  SERVICE_NAME: "BRC Analytics API",
+} as const;
+
 test.describe("BRC Analytics - API Infrastructure", () => {
   test("backend API should be healthy", async ({ request }) => {
     // Check backend health endpoint
@@ -8,7 +12,7 @@ test.describe("BRC Analytics - API Infrastructure", () => {
 
     const health = await response.json();
     expect(health.status).toBe("healthy");
-    expect(health.service).toBe("BRC Analytics API");
+    expect(health.service).toBe(EXPECTED.SERVICE_NAME);
     console.log("Backend health:", health);
   });
 
@@ -33,7 +37,7 @@ test.describe("BRC Analytics - API Infrastructure", () => {
     const version = await response.json();
     expect(version.version).toBeTruthy();
     expect(version.environment).toBeTruthy();
-    expect(version.service).toBe("BRC Analytics API");
+    expect(version.service).toBe(EXPECTED.SERVICE_NAME);
     console.log("API version:", version);
   });
 
@@ -46,7 +50,7 @@ test.describe("BRC Analytics - API Infrastructure", () => {
 
     // Check for API title
     const title = page.locator(".title");
-    await expect(title).toContainText("BRC Analytics API");
+    await expect(title).toContainText(EXPECTED.SERVICE_NAME);
 
     // Screenshot the API docs
     await page.screenshot({

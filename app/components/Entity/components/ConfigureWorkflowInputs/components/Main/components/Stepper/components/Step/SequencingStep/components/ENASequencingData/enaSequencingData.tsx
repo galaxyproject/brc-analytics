@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Fragment, useEffect } from "react";
 import { DataSelector } from "./components/DataSelector/dataSelector";
 import { CollectionSelector } from "./components/CollectionSelector/collectionSelector";

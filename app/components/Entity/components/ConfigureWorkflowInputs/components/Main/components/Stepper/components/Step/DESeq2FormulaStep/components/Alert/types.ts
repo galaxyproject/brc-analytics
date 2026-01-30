@@ -1,3 +1,3 @@
 export interface Props {
-  entityId: string;
+  formula: string | null;
 }
