@@ -106,7 +106,7 @@ export interface GalaxyApiCommonUrlData {
   url: string;
 }
 
-interface WorkflowDatasetHash {
+export interface WorkflowDatasetHash {
   hash_function: "MD5" | "SHA-1" | "SHA-256" | "SHA-512";
   hash_value: string;
 }
