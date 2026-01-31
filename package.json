@@ -16,6 +16,7 @@
     "check-format": "prettier --check .",
     "format": "prettier --write . --cache",
     "format:python": "./scripts/format-python.sh",
+    "lint:python": "./scripts/lint-python.sh",
     "prepare": "husky",
     "test": "jest --runInBand --passWithNoTests",
     "test:e2e": "npx playwright test",

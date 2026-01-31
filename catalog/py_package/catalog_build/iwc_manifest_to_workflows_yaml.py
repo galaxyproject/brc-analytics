@@ -4,7 +4,8 @@ import os
 import re
 import subprocess
 import time
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
+from urllib.parse import quote
 
 import requests
 import yaml
@@ -144,8 +145,8 @@ def verify_trs_version_exists(trs_id: str, skip_validation: bool = False) -> boo
     # The workflow ID format for Dockstore is the full TRS ID without the version part
     workflow_id = f"#workflow/github.com/iwc-workflows/{repo}/{workflow_name}"
     # URL encode the workflow ID and version
-    encoded_id = requests.utils.quote(workflow_id, safe="")
-    encoded_version = requests.utils.quote(f"v{version}", safe="")
+    encoded_id = quote(workflow_id, safe="")
+    encoded_version = quote(f"v{version}", safe="")
 
     dockstore_url = f"https://dockstore.org/api/ga4gh/trs/v2/tools/{encoded_id}/versions/{encoded_version}"
 
@@ -205,8 +206,8 @@ def generate_current_workflows(skip_validation: bool = False) -> Dict[str, Workf
                 # shortcut so we don't need to parse out the whole inputs section
                 parameters=get_input_types(workflow["definition"]),
             )
-            # Attach original collections as a custom attribute for QC reporting
-            workflow_input._original_collections = original_collections
+            # Attach for QC reporting (not part of schema, not serialized)
+            workflow_input._original_collections = original_collections  # type: ignore[attr-defined]
             by_trs_id[workflow["trsID"]] = workflow_input
 
     return by_trs_id
@@ -555,7 +556,7 @@ def to_workflows_yaml(
     ]
 
     # Collect inactive workflows in YAML with their parameters
-    inactive_workflows: List[Dict[str, any]] = []
+    inactive_workflows: List[Dict[str, Any]] = []
     for wf in final_workflows:
         if not getattr(wf, "active", False):
             param_keys = [p.key for p in wf.parameters] if wf.parameters else []
@@ -586,8 +587,8 @@ def to_workflows_yaml(
                 else:
                     category_strs.append(str(c))
 
-            # Get original Dockstore collections to show why it was excluded
-            original_collections = getattr(wf, "_original_collections", [])
+            # Get original Dockstore collections (temporarily attached in generate_current_workflows)
+            original_collections: List[str] = getattr(wf, "_original_collections", [])
             if original_collections:
                 collections_display = f"{', '.join(category_strs)} (from Dockstore: {', '.join(original_collections)})"
             elif category_strs:
@@ -702,7 +703,7 @@ def write_workflows_qc_report(
     stale_param_qc_items: List[Dict[str, str]],
     new_param_qc_items: List[Dict[str, str]],
     new_workflow_qc_items: List[Dict[str, str]],
-    inactive_workflows: List[Dict[str, any]],
+    inactive_workflows: List[Dict[str, Any]],
     excluded_iwc_workflows: List[Dict[str, str]],
     out_path: str,
 ):
