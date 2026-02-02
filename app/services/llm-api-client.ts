@@ -8,6 +8,8 @@ import {
   WorkflowSuggestionResponse,
 } from "../types/api";
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "";
+
 const apiClient = ky.create({
   hooks: {
     beforeError: [
@@ -21,10 +23,7 @@ const apiClient = ky.create({
       },
     ],
   },
-  prefixUrl:
-    process.env.NODE_ENV === "development"
-      ? "http://localhost/api/v1"
-      : "/api/v1",
+  prefixUrl: `${BACKEND_URL}/api/v1`,
   retry: {
     limit: 2,
     methods: ["get", "post"],
