@@ -3,20 +3,19 @@
 import { Typography } from "@mui/material";
 import { JSX, useEffect, useState } from "react";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
+import { API_BASE_URL, BACKEND_URL } from "../../../../../../../../config/api";
 
 const CLIENT_VERSION = process.env.NEXT_PUBLIC_VERSION || "0.15.0";
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "";
 
 export const VersionDisplay = (): JSX.Element => {
   const [backendVersion, setBackendVersion] = useState<string | null>(null);
 
   useEffect(() => {
     if (!BACKEND_URL) {
-      // No backend URL configured, skip fetching
       return;
     }
 
-    fetch(`${BACKEND_URL}/api/v1/version`)
+    fetch(`${API_BASE_URL}/version`)
       .then((res) => res.json())
       .then((data) => setBackendVersion(data.version))
       .catch(() => setBackendVersion(null)); // Gracefully handle backend unavailable
