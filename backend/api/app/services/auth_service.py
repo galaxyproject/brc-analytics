@@ -48,6 +48,14 @@ class AuthService:
     def _redirect_uri(self) -> str:
         return self._settings.KEYCLOAK_REDIRECT_URI
 
+    def _to_browser_url(self, url: str) -> str:
+        """Rewrite an internal Keycloak URL to be browser-reachable."""
+        browser_url = self._settings.KEYCLOAK_BROWSER_URL
+        issuer_url = self._settings.KEYCLOAK_ISSUER_URL
+        if browser_url != issuer_url:
+            return url.replace(issuer_url, browser_url, 1)
+        return url
+
     async def get_oidc_config(self) -> Dict[str, Any]:
         """Fetch and cache the OIDC discovery document."""
         if self._oidc_config is not None:
@@ -74,7 +82,7 @@ class AuthService:
         stored temporarily for the callback.
         """
         oidc = await self.get_oidc_config()
-        auth_endpoint = oidc["authorization_endpoint"]
+        auth_endpoint = self._to_browser_url(oidc["authorization_endpoint"])
         verifier, challenge = self.generate_pkce()
 
         state = secrets.token_urlsafe(32)
