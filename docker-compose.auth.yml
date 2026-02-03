@@ -53,6 +53,7 @@ services:
       KEYCLOAK_CLIENT_ID: brc-analytics
       KEYCLOAK_CLIENT_SECRET: brc-analytics-dev-secret
       KEYCLOAK_REDIRECT_URI: http://localhost:8000/api/v1/auth/callback
+      FRONTEND_URL: http://localhost:3000
       CORS_ORIGINS: "http://localhost:3000,http://localhost:8000"
       LOG_LEVEL: DEBUG
     volumes:

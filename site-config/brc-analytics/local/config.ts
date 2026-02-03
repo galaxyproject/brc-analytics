@@ -80,6 +80,7 @@ export function makeConfig(
         versionInfo: createElement(C.VersionInfoWithServerStatus),
       },
       header: {
+        actions: createElement(C.AuthButton),
         logo: C.Logo({
           alt: APP_TITLE,
           height: 26,
