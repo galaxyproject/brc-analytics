@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import APIRouter, Cookie, Request, Response
+from fastapi import APIRouter, Cookie, Response
 from fastapi.responses import JSONResponse, RedirectResponse
 
 from app.core.config import get_settings
@@ -36,8 +36,6 @@ async def login() -> RedirectResponse:
 
 @router.get("/callback")
 async def callback(
-    request: Request,
-    response: Response,
     code: str = "",
     state: str = "",
     error: str = "",
@@ -83,13 +81,8 @@ async def callback(
 
     session_id = await auth.create_session(token_response)
 
-    # Return a simple HTML page that confirms login and shows a link to /me
-    resp = JSONResponse(
-        content={
-            "message": "Login successful",
-            "user_info_url": "/api/v1/auth/me",
-        }
-    )
+    settings = get_settings()
+    resp = RedirectResponse(url=settings.FRONTEND_URL, status_code=302)
     resp.set_cookie(
         key=COOKIE_NAME,
         value=session_id,
