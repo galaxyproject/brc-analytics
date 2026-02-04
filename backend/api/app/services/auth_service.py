@@ -161,7 +161,11 @@ class AuthService:
             resp.raise_for_status()
             return resp.json()
         except httpx.HTTPStatusError as e:
-            logger.warning("Token refresh failed: %s", e.response.status_code)
+            logger.warning(
+                "Token refresh failed: %s - %s",
+                e.response.status_code,
+                e.response.text,
+            )
             return None
 
     async def create_session(self, token_response: Dict[str, Any]) -> str:
