@@ -1,35 +1,27 @@
 import logging
 
-from fastapi import APIRouter, Cookie, Response
+from fastapi import APIRouter, Cookie, Depends, Response
 from fastapi.responses import JSONResponse, RedirectResponse
 
 from app.core.config import get_settings
+from app.core.dependencies import get_auth_service
 from app.services.auth_service import COOKIE_NAME, AuthService
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-_auth_service: AuthService | None = None
-
-
-def _get_auth_service() -> AuthService:
-    global _auth_service
-    if _auth_service is None:
-        settings = get_settings()
-        _auth_service = AuthService(settings.REDIS_URL)
-    return _auth_service
-
 
 @router.get("/login")
-async def login() -> RedirectResponse:
+async def login(
+    auth: AuthService = Depends(get_auth_service),
+) -> RedirectResponse:
     """Initiate the OIDC login flow.
 
     Redirects the browser to Keycloak's authorization endpoint with
     PKCE parameters. The code verifier is stored in Redis, keyed by the
     state parameter.
     """
-    auth = _get_auth_service()
     authorization_url, _state = await auth.build_authorization_url()
     return RedirectResponse(url=authorization_url, status_code=302)
 
@@ -40,6 +32,7 @@ async def callback(
     state: str = "",
     error: str = "",
     error_description: str = "",
+    auth: AuthService = Depends(get_auth_service),
 ) -> Response:
     """Handle the OIDC callback from Keycloak.
 
@@ -61,8 +54,6 @@ async def callback(
             status_code=400,
             content={"error": "Missing code or state parameter"},
         )
-
-    auth = _get_auth_service()
 
     try:
         token_response = await auth.exchange_code(code, state)
@@ -99,6 +90,7 @@ async def callback(
 @router.get("/me")
 async def me(
     brc_session: str | None = Cookie(default=None, alias=COOKIE_NAME),
+    auth: AuthService = Depends(get_auth_service),
 ) -> JSONResponse:
     """Return the current user's info from their session.
 
@@ -111,7 +103,6 @@ async def me(
             content={"error": "Not authenticated"},
         )
 
-    auth = _get_auth_service()
     user_info = await auth.get_user_info(brc_session)
 
     if not user_info:
@@ -128,10 +119,10 @@ async def me(
 @router.post("/logout")
 async def logout(
     brc_session: str | None = Cookie(default=None, alias=COOKIE_NAME),
+    auth: AuthService = Depends(get_auth_service),
 ) -> JSONResponse:
     """Clear the user's session from Redis and remove the cookie."""
     if brc_session:
-        auth = _get_auth_service()
         await auth.delete_session(brc_session)
 
     resp = JSONResponse(content={"message": "Logged out"})
