@@ -83,12 +83,13 @@ async def callback(
 
     settings = get_settings()
     resp = RedirectResponse(url=settings.FRONTEND_URL, status_code=302)
+    secure_cookie = settings.ENVIRONMENT != "development"
     resp.set_cookie(
         key=COOKIE_NAME,
         value=session_id,
         httponly=True,
         samesite="lax",
-        secure=False,  # dev mode, no HTTPS
+        secure=secure_cookie,
         max_age=3600,
         path="/",
     )
