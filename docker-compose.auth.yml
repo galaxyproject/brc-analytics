@@ -41,6 +41,15 @@ services:
       timeout: 5s
       retries: 5
 
+  keycloak-init:
+    image: quay.io/keycloak/keycloak:26.0
+    entrypoint: ["bash", "/scripts/init-galaxy-scope.sh"]
+    volumes:
+      - ./backend/keycloak/init-galaxy-scope.sh:/scripts/init-galaxy-scope.sh:ro
+    depends_on:
+      keycloak:
+        condition: service_healthy
+
   backend:
     build:
       context: ./backend/api
@@ -81,6 +90,23 @@ services:
       retries: 3
       start_period: 10s
 
+  galaxy:
+    image: quay.io/bgruening/galaxy:24.1
+    ports:
+      - "8080:80"
+    environment:
+      GALAXY_CONFIG_ENABLE_OIDC: "true"
+      GALAXY_CONFIG_OIDC_CONFIG_FILE: /export/galaxy/config/oidc_config.xml
+      GALAXY_CONFIG_OIDC_BACKENDS_CONFIG_FILE: /export/galaxy/config/oidc_backends_config.xml
+    volumes:
+      - galaxy_data:/export
+      - ./backend/galaxy/oidc_config.xml:/export/galaxy/config/oidc_config.xml:ro
+      - ./backend/galaxy/oidc_backends_config.xml:/export/galaxy/config/oidc_backends_config.xml:ro
+    depends_on:
+      keycloak:
+        condition: service_healthy
+
 volumes:
   keycloak_db_data:
   redis_data:
+  galaxy_data:

@@ -52,11 +52,32 @@ else
     -s 'config."access.token.claim"=true'
 fi
 
-# Find brc-analytics client UUID
+# Create the Galaxy API scope that Galaxy checks for in bearer tokens.
+# Galaxy's default oidc_scope_prefix is "https://galaxyproject.org/api",
+# and it requires "<prefix>:*" in the token's scope claim.
+API_SCOPE_NAME="https://galaxyproject.org/api:*"
+API_SCOPE_ID=$($KCADM get client-scopes -r "$REALM" --fields id,name --format csv --noquotes 2>/dev/null \
+  | grep ",${API_SCOPE_NAME}\$" | sed 's/,.*//' || true)
+
+if [ -n "$API_SCOPE_ID" ]; then
+  echo "$API_SCOPE_NAME scope already exists (id=$API_SCOPE_ID)."
+else
+  echo "Creating $API_SCOPE_NAME client scope..."
+  API_SCOPE_ID=$($KCADM create client-scopes -r "$REALM" \
+    -s "name=$API_SCOPE_NAME" \
+    -s protocol=openid-connect \
+    -s 'attributes."include.in.token.scope"=true' \
+    -s 'attributes."display.on.consent.screen"=false' \
+    -i)
+  echo "Created scope id=$API_SCOPE_ID"
+fi
+
+# Find brc-analytics client UUID and assign both scopes as defaults
 CLIENT_UUID=$($KCADM get clients -r "$REALM" --fields id,clientId --format csv --noquotes 2>/dev/null \
   | grep ',brc-analytics$' | sed 's/,.*//')
 
-echo "Assigning galaxy-api-access as default scope to brc-analytics (uuid=$CLIENT_UUID)..."
+echo "Assigning scopes as defaults to brc-analytics (uuid=$CLIENT_UUID)..."
 $KCADM update "clients/$CLIENT_UUID/default-client-scopes/$SCOPE_ID" -r "$REALM"
+$KCADM update "clients/$CLIENT_UUID/default-client-scopes/$API_SCOPE_ID" -r "$REALM"
 
 echo "Done."
