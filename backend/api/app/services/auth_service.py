@@ -49,12 +49,17 @@ class AuthService:
     def _redirect_uri(self) -> str:
         return self._settings.KEYCLOAK_REDIRECT_URI
 
-    def _to_browser_url(self, url: str) -> str:
-        """Rewrite an internal Keycloak URL to be browser-reachable."""
+    def _to_internal_url(self, url: str) -> str:
+        """Rewrite a browser-facing Keycloak URL to be reachable from this server.
+
+        When KC_HOSTNAME_URL is set, Keycloak's OIDC discovery doc returns
+        browser-facing URLs (localhost:8180). The backend can't reach those
+        from inside Docker, so we rewrite to the internal hostname.
+        """
         browser_url = self._settings.KEYCLOAK_BROWSER_URL
         issuer_url = self._settings.KEYCLOAK_ISSUER_URL
         if browser_url != issuer_url:
-            return url.replace(issuer_url, browser_url, 1)
+            return url.replace(browser_url, issuer_url, 1)
         return url
 
     async def get_oidc_config(self) -> Dict[str, Any]:
@@ -79,11 +84,12 @@ class AuthService:
     async def build_authorization_url(self) -> tuple[str, str]:
         """Build the Keycloak authorization URL with PKCE.
 
-        Returns (authorization_url, code_verifier) so the verifier can be
-        stored temporarily for the callback.
+        Returns (authorization_url, state). The browser-facing URL from the
+        OIDC config is used directly since KC_HOSTNAME_URL ensures it's
+        already reachable from the browser.
         """
         oidc = await self.get_oidc_config()
-        auth_endpoint = self._to_browser_url(oidc["authorization_endpoint"])
+        auth_endpoint = oidc["authorization_endpoint"]
         verifier, challenge = self.generate_pkce()
 
         state = secrets.token_urlsafe(32)
@@ -123,7 +129,7 @@ class AuthService:
         code_verifier = pkce_data["code_verifier"]
 
         oidc = await self.get_oidc_config()
-        token_endpoint = oidc["token_endpoint"]
+        token_endpoint = self._to_internal_url(oidc["token_endpoint"])
 
         data = {
             "grant_type": "authorization_code",
@@ -142,7 +148,7 @@ class AuthService:
         """Use a refresh token to get new access/refresh tokens."""
         try:
             oidc = await self.get_oidc_config()
-            token_endpoint = oidc["token_endpoint"]
+            token_endpoint = self._to_internal_url(oidc["token_endpoint"])
 
             data = {
                 "grant_type": "refresh_token",
