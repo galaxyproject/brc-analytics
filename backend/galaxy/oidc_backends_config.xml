@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OIDC>
+    <provider name="keycloak">
+        <url>http://keycloak:8180/realms/galaxy/</url>
+        <client_id>galaxy-api</client_id>
+        <client_secret>galaxy-api-dev-secret</client_secret>
+        <redirect_uri>http://localhost:8080/authnz/keycloak/callback</redirect_uri>
+        <accepted_audiences>galaxy-api</accepted_audiences>
+        <enable_idp_logout>true</enable_idp_logout>
+    </provider>
+</OIDC>
