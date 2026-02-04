@@ -72,12 +72,6 @@ class Settings:
         "http://localhost:8000/api/v1/auth/callback",
     )
 
-    # Browser-facing Keycloak URL (may differ from KEYCLOAK_ISSUER_URL in Docker)
-    KEYCLOAK_BROWSER_URL: str = os.getenv(
-        "KEYCLOAK_BROWSER_URL",
-        "http://localhost:8180/realms/galaxy",
-    )
-
     # Frontend URL for post-auth redirect
     FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
