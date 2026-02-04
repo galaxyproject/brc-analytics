@@ -5,6 +5,7 @@ import logging
 import secrets
 import time
 from typing import Any, Dict, Optional
+from urllib.parse import urlencode
 
 import httpx
 import jwt
@@ -104,8 +105,7 @@ class AuthService:
             json.dumps({"code_verifier": verifier}),
         )
 
-        query = "&".join(f"{k}={v}" for k, v in params.items())
-        return f"{auth_endpoint}?{query}", state
+        return f"{auth_endpoint}?{urlencode(params)}", state
 
     async def exchange_code(self, code: str, state: str) -> Dict[str, Any]:
         """Exchange an authorization code for tokens.
