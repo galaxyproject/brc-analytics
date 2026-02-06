@@ -96,12 +96,7 @@ def reset_cache_service() -> None:
 
 def reset_all_services() -> None:
     """Reset all global service instances (used during shutdown)"""
-    global \
-        _assistant_agent, \
-        _cache_service, \
-        _llm_service, \
-        _ena_service, \
-        _rate_limiter
+    global _assistant_agent, _cache_service, _llm_service, _ena_service, _rate_limiter
     _assistant_agent = None
     _cache_service = None
     _llm_service = None
