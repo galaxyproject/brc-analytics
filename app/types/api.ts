@@ -97,6 +97,45 @@ export interface UnifiedSearchRequest {
   query: string;
 }
 
+// Analysis Assistant types
+
+export type FieldStatus = "empty" | "filled" | "needs_attention";
+
+export interface SchemaFieldState {
+  detail: string | null;
+  status: FieldStatus;
+  value: string | null;
+}
+
+export interface AnalysisSchema {
+  analysis_type: SchemaFieldState;
+  assembly: SchemaFieldState;
+  data_characteristics: SchemaFieldState;
+  data_source: SchemaFieldState;
+  gene_annotation: SchemaFieldState;
+  organism: SchemaFieldState;
+  workflow: SchemaFieldState;
+}
+
+export interface SuggestionChip {
+  label: string;
+  message: string;
+}
+
+export interface AssistantChatRequest {
+  message: string;
+  session_id?: string;
+}
+
+export interface AssistantChatResponse {
+  handoff_url: string | null;
+  is_complete: boolean;
+  reply: string;
+  schema_state: AnalysisSchema;
+  session_id: string;
+  suggestions: SuggestionChip[];
+}
+
 export interface UnifiedSearchResponse {
   datasets?: {
     cached: boolean;
