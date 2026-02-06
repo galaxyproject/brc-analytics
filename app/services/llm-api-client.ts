@@ -1,4 +1,5 @@
 import ky, { HTTPError } from "ky";
+import { API_BASE_URL } from "../config/api";
 import {
   DatasetSearchRequest,
   DatasetSearchResponse,
@@ -21,10 +22,7 @@ const apiClient = ky.create({
       },
     ],
   },
-  prefixUrl:
-    process.env.NODE_ENV === "development"
-      ? "http://localhost/api/v1"
-      : "/api/v1",
+  prefixUrl: API_BASE_URL,
   retry: {
     limit: 2,
     methods: ["get", "post"],
