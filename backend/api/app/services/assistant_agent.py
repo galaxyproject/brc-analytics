@@ -327,13 +327,13 @@ class AssistantAgent:
         schema_updates: Dict[str, str] = {}
         reply_lines = []
 
-        # Match SUGGESTIONS or SCHEMA_UPDATE with optional markdown bold/italic
+        # Match SUGGESTIONS or SCHEMA_UPDATE with optional markdown bold/italic.
+        # The colon may be inside or outside the bold markers:
+        #   SUGGESTIONS: ...  |  **SUGGESTIONS:** ...  |  **SUGGESTIONS**: ...
         suggestions_re = re.compile(
-            r"^\s*(?:\*{1,2})?suggestions(?:\*{1,2})?:\s*", re.IGNORECASE
+            r"^\s*\*{0,2}suggestions:?\*{0,2}:?\s*", re.IGNORECASE
         )
-        schema_re = re.compile(
-            r"^\s*(?:\*{1,2})?schema_update(?:\*{1,2})?:\s*", re.IGNORECASE
-        )
+        schema_re = re.compile(r"^\s*\*{0,2}schema_update:?\*{0,2}:?\s*", re.IGNORECASE)
 
         for line in raw_reply.rstrip().split("\n"):
             s_match = suggestions_re.match(line)
