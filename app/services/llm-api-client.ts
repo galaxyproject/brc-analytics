@@ -1,6 +1,8 @@
 import ky, { HTTPError } from "ky";
 import { API_BASE_URL } from "../config/api";
 import {
+  AssistantChatRequest,
+  AssistantChatResponse,
   DatasetSearchRequest,
   DatasetSearchResponse,
   UnifiedSearchRequest,
@@ -32,6 +34,19 @@ const apiClient = ky.create({
 });
 
 export const llmAPIClient = {
+  /**
+   * Send a message to the analysis assistant
+   * @param request - Chat message and optional session ID
+   * @returns Promise resolving to assistant reply with schema state
+   */
+  assistantChat: async (
+    request: AssistantChatRequest
+  ): Promise<AssistantChatResponse> => {
+    return apiClient
+      .post("assistant/chat", { json: request, timeout: 120000 })
+      .json();
+  },
+
   /**
    * Check health status of LLM service
    * @returns Promise resolving to health status
