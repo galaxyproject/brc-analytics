@@ -53,8 +53,20 @@ jobs:
           git checkout production
           git merge origin/main -m "Release ${{ steps.get_release.outputs.tag }}: merge main to production"
 
-          # Push production (this triggers the deploy workflow)
+          # Move the release tag to point to this merge commit so git describe
+          # shows the correct version (e.g., "v0.21.0" not "v0.21.0-1-gXXX")
+          git tag -f ${{ steps.get_release.outputs.tag }}
+
+          # Push production branch and updated tag
           git push origin production
+          git push origin ${{ steps.get_release.outputs.tag }} --force
+
+      - name: Trigger production deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # GITHUB_TOKEN pushes don't trigger workflows, so we manually trigger the deploy
+          gh workflow run publish.yml --ref production
 
       - name: Publish release
         env:
