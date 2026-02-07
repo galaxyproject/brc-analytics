@@ -21,3 +21,6 @@ venv
 /catalog/output
 /catalog/ga2/output
 /catalog/schema/generated
+
+# claude code config
+.claude
