@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Props } from "./types";
 import { ColumnFiltersAdapter } from "@databiosphere/findable-ui/lib/components/Filter/components/adapters/tanstack/ColumnFiltersAdapter/columnFiltersAdapter";
 import { SurfaceProps } from "@databiosphere/findable-ui/lib/components/Filter/components/surfaces/types";

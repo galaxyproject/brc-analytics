@@ -10,7 +10,6 @@ import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/fon
 
 export const Section = styled.section`
   background-color: ${PALETTE.COMMON_WHITE};
-  border-top: 1px solid ${PALETTE.SMOKE_MAIN};
   width: 100%;
 `;
 
@@ -18,7 +17,7 @@ export const SectionLayout = styled.div`
   display: grid;
   gap: 48px 16px;
   grid-template-columns: 1fr 1fr;
-  padding: 72px 0 104px;
+  padding: 80px 0 104px;
 
   ${bpDownSm} {
     grid-template-columns: repeat(12, 1fr);

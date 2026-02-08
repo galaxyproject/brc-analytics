@@ -8,8 +8,10 @@ import { SiteConfig as BaseSiteConfig } from "@databiosphere/findable-ui/lib/con
 import { APP_KEYS } from "./constants";
 import { TaxonomyNode } from "../../app/components/Home/components/Section/components/SectionViz/data";
 
-export interface AppBackPageConfig
-  extends Omit<BaseBackPageConfig, "tabs" | "top"> {
+export interface AppBackPageConfig extends Omit<
+  BaseBackPageConfig,
+  "tabs" | "top"
+> {
   tabs: AppBackPageTabConfig[];
   top?: ComponentsConfig;
 }
@@ -18,8 +20,10 @@ export interface AppBackPageTabConfig extends BaseBackPageTabConfig {
   top?: ComponentsConfig;
 }
 
-export interface AppEntityConfig<R>
-  extends Omit<BaseEntityConfig<R>, "detail"> {
+export interface AppEntityConfig<R> extends Omit<
+  BaseEntityConfig<R>,
+  "detail"
+> {
   detail: AppBackPageConfig;
 }
 

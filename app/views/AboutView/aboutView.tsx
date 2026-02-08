@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Fragment } from "react";
 import { SectionAbout } from "../../components/content";
 import { SectionHero } from "../../components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";

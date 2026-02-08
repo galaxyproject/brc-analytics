@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { ComponentCreator } from "@databiosphere/findable-ui/lib/components/ComponentCreator/ComponentCreator";
 import { Detail } from "@databiosphere/findable-ui/lib/components/Detail/detail";
 import { useCurrentDetailTab } from "@databiosphere/findable-ui/lib/hooks/useCurrentDetailTab";

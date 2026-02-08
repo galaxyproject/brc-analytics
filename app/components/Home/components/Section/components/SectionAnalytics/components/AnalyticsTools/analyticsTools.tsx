@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { CardAction as DXCardAction } from "@databiosphere/findable-ui/lib/components/common/Card/components/CardAction/cardAction";
 import { CardSecondaryText as DXCardSecondaryText } from "@databiosphere/findable-ui/lib/components/common/Card/components/CardSecondaryText/cardSecondaryText";
 import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";

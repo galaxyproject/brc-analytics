@@ -1,32 +1,47 @@
 import { WORKFLOW_PARAMETER_VARIABLE } from "../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { WorkflowParameter } from "../../apis/catalog/brc-analytics-catalog/common/entities";
+
+const FILE_EXT = {
+  FASTQ_SANGER_GZ: "fastqsanger.gz",
+} as const;
+
 import ky from "ky";
 import {
+  DataLandingsBody,
+  DataLandingsBodyRequestState,
+  DataLandingsCollection,
+  DataLandingsCollectionTarget,
+  DataLandingsDatasetTarget,
+  DeSeq2ColumnDefinition,
+  DeSeq2PairedSample,
+  DeSeq2SampleSheetCollection,
+  DeSeq2WorkflowLandingsBody,
   EnaFileInfo,
   EnaSequencingReads,
+  GalaxyApiCommonUrlData,
+  GalaxyCollection,
+  GalaxyCollectionElement,
   GalaxyLandingResponseData,
+  GalaxyListCollection,
+  GalaxyPairedCollection,
+  GalaxyUrlData,
+  WorkflowCollectionElement,
+  WorkflowCollectionParameter,
+  WorkflowDatasetHash,
   WorkflowLandingsBody,
   WorkflowLandingsBodyRequestState,
   WorkflowParameterValue,
-  DataLandingsBody,
-  DataLandingsBodyRequestState,
-  GalaxyPairedCollection,
-  GalaxyListCollection,
-  GalaxyUrlData,
-  GalaxyCollection,
-  DataLandingsCollectionTarget,
-  DataLandingsCollection,
-  DataLandingsDatasetTarget,
-  WorkflowCollectionParameter,
-  GalaxyCollectionElement,
-  WorkflowCollectionElement,
-  GalaxyApiCommonUrlData,
 } from "./entities";
+import { COLUMN_TYPE } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
+import { PrimaryContrasts } from "../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { UcscTrack } from "../ucsc-tracks-api/entities";
+import {
+  fetchUcscMd5Checksums,
+  getChecksumForPath,
+} from "../ucsc-tracks-api/ucsc-tracks-api";
+import { ftpToAscp } from "./url-utils";
 
 const DOCKSTORE_API_URL = "https://dockstore.org/api/ga4gh/trs/v2/tools";
-const FTP_HOST = "ftp.sra.ebi.ac.uk";
-const ASCP_HOST = "fasp.sra.ebi.ac.uk";
 
 const galaxyInstanceUrl = process.env.NEXT_PUBLIC_GALAXY_INSTANCE_URL;
 
@@ -59,6 +74,7 @@ export async function getWorkflowLandingUrl(
   parameters: WorkflowParameter[],
   origin: string
 ): Promise<string> {
+  const md5Checksums = await fetchUcscMd5Checksums(referenceGenome);
   const body: WorkflowLandingsBody = {
     origin,
     public: true,
@@ -67,7 +83,8 @@ export async function getWorkflowLandingUrl(
       geneModelUrl,
       readRunsSingle,
       readRunsPaired,
-      parameters
+      parameters,
+      md5Checksums
     ),
     workflow_id: `${DOCKSTORE_API_URL}/${workflowId}`,
     workflow_target_type: "trs_url",
@@ -93,6 +110,7 @@ export async function getDataLandingUrl(
   tracks: UcscTrack[] | null,
   origin: string
 ): Promise<string> {
+  const md5Checksums = await fetchUcscMd5Checksums(referenceGenome);
   const body: DataLandingsBody = {
     origin,
     public: true,
@@ -101,14 +119,15 @@ export async function getDataLandingUrl(
       geneModelUrl,
       readRunsSingle,
       readRunsPaired,
-      tracks
+      tracks,
+      md5Checksums
     ),
   };
   return getGalaxyLandingUrl(body, dataLandingsApiUrl, dataLandingUrl);
 }
 
 async function getGalaxyLandingUrl(
-  body: WorkflowLandingsBody | DataLandingsBody,
+  body: WorkflowLandingsBody | DataLandingsBody | DeSeq2WorkflowLandingsBody,
   apiUrl: string,
   landingUrlBase: string
 ): Promise<string> {
@@ -138,7 +157,8 @@ function paramVariableToRequestValue(
   geneModelUrl: string | null,
   readRunsSingle: EnaSequencingReads[] | null,
   readRunsPaired: EnaSequencingReads[] | null,
-  referenceGenome: string
+  referenceGenome: string,
+  md5Checksums: Map<string, string>
 ): WorkflowParameterValue | null {
   // Because this `switch` has no default case, and the function doesn't allow `undefined` as a return type,
   // we ensure through TypeScript that all possible variables are handled.
@@ -147,12 +167,13 @@ function paramVariableToRequestValue(
       return referenceGenome;
     case WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_FASTA_URL:
       return galaxyUrlDataToCommonApi(
-        buildAssemblyFastaRequestValue(referenceGenome)
+        buildAssemblyFastaRequestValue(referenceGenome, md5Checksums)
       );
     case WORKFLOW_PARAMETER_VARIABLE.GENE_MODEL_URL: {
       const urlData = buildGeneModelUrlRequestValue(
         geneModelUrl,
-        referenceGenome
+        referenceGenome,
+        md5Checksums
       );
       if (urlData === null) return null;
       return galaxyUrlDataToCommonApi(urlData);
@@ -214,6 +235,7 @@ function galaxyCollectionElementToWorkflowLandings(
  * @param readRunsSingle - Single read runs parameter.
  * @param readRunsPaired - Paired read runs parameter.
  * @param parameters - Parameters for this workflow.
+ * @param md5Checksums - Map of filename to MD5 hash.
  * @returns `request_state` value for the workflow landings request body.
  */
 function getWorkflowLandingsRequestState(
@@ -221,7 +243,8 @@ function getWorkflowLandingsRequestState(
   geneModelUrl: string | null,
   readRunsSingle: EnaSequencingReads[] | null,
   readRunsPaired: EnaSequencingReads[] | null,
-  parameters: WorkflowParameter[]
+  parameters: WorkflowParameter[],
+  md5Checksums: Map<string, string>
 ): WorkflowLandingsBodyRequestState {
   const result: WorkflowLandingsBodyRequestState = {};
   for (const { key, url_spec, variable } of parameters) {
@@ -235,7 +258,8 @@ function getWorkflowLandingsRequestState(
         geneModelUrl,
         readRunsSingle,
         readRunsPaired,
-        referenceGenome
+        referenceGenome,
+        md5Checksums
       );
       if (value !== null) result[key] = value;
     }
@@ -287,15 +311,20 @@ function getDataLandingsRequestState(
   geneModelUrl: string | null,
   readRunsSingle: EnaSequencingReads[] | null,
   readRunsPaired: EnaSequencingReads[] | null,
-  tracks: UcscTrack[] | null
+  tracks: UcscTrack[] | null,
+  md5Checksums: Map<string, string>
 ): DataLandingsBodyRequestState {
   return {
     targets: [
       buildDataLandingsDatasetTarget([
-        buildAssemblyFastaRequestValue(referenceGenome),
+        buildAssemblyFastaRequestValue(referenceGenome, md5Checksums),
       ]),
       buildDataLandingsDatasetTarget([
-        buildGeneModelUrlRequestValue(geneModelUrl, referenceGenome),
+        buildGeneModelUrlRequestValue(
+          geneModelUrl,
+          referenceGenome,
+          md5Checksums
+        ),
       ]),
       galaxyCollectionToDataLandingsTarget(
         buildSingleReadRunsRequestValue(readRunsSingle)
@@ -311,26 +340,32 @@ function getDataLandingsRequestState(
 }
 
 function buildAssemblyFastaRequestValue(
-  referenceGenome: string
+  referenceGenome: string,
+  md5Checksums: Map<string, string>
 ): GalaxyUrlData {
+  const url = buildFastaUrl(referenceGenome);
+  const hashes = getHashesForUrl(url, referenceGenome, md5Checksums);
   return {
     dbKey: referenceGenome,
     ext: "fasta.gz",
-    url: buildFastaUrl(referenceGenome),
+    hashes,
+    url,
   };
 }
 
 function buildGeneModelUrlRequestValue(
   geneModelUrl: string | null,
-  referenceGenome: string
+  referenceGenome: string,
+  md5Checksums: Map<string, string>
 ): GalaxyUrlData | null {
-  return geneModelUrl
-    ? {
-        dbKey: referenceGenome,
-        ext: "gtf.gz",
-        url: geneModelUrl,
-      }
-    : null;
+  if (!geneModelUrl) return null;
+  const hashes = getHashesForUrl(geneModelUrl, referenceGenome, md5Checksums);
+  return {
+    dbKey: referenceGenome,
+    ext: "gtf.gz",
+    hashes,
+    url: geneModelUrl,
+  };
 }
 
 function buildSingleReadRunsRequestValue(
@@ -343,8 +378,8 @@ function buildSingleReadRunsRequestValue(
       const runAccession = runInfo.runAccession;
       const { forward } = getSingleRunUrlsInfo(runInfo.urls, runInfo.md5Hashes);
       return {
-        ext: "fastqsanger.gz",
-        hashes: [{ hash_function: "MD5", hash_value: forward.md5 }],
+        ext: FILE_EXT.FASTQ_SANGER_GZ,
+        hashes: createMd5Hash(forward.md5),
         identifier: runAccession,
         url: forward.url,
       };
@@ -369,14 +404,14 @@ function buildPairedReadRunsRequestValue(
         collectionType: "paired",
         elements: [
           {
-            ext: "fastqsanger.gz",
-            hashes: [{ hash_function: "MD5", hash_value: forward.md5 }],
+            ext: FILE_EXT.FASTQ_SANGER_GZ,
+            hashes: createMd5Hash(forward.md5),
             identifier: "forward",
             url: forward.url,
           },
           {
-            ext: "fastqsanger.gz",
-            hashes: [{ hash_function: "MD5", hash_value: reverse.md5 }],
+            ext: FILE_EXT.FASTQ_SANGER_GZ,
+            hashes: createMd5Hash(reverse.md5),
             identifier: "reverse",
             url: reverse.url,
           },
@@ -474,11 +509,16 @@ function getRunUrlsInfo(
   return { forward, reverse };
 }
 
-function ftpToAscp(ftpUrl: string): string {
-  // should be more reliable than FTP download
-  return `ascp://${ftpUrl.replace(FTP_HOST, ASCP_HOST)}`;
-}
-
+/**
+ * Build Galaxy URL data objects for UCSC tracks, including optional MD5 checksums when available.
+ *
+ * This function handles the optional nature of MD5 checksums by only including them when they
+ * are available in the track data. If a track doesn't have an MD5 hash, the hashes field will
+ * be undefined in the resulting Galaxy URL data object.
+ *
+ * @param tracks - UCSC tracks to build request values for.
+ * @returns Array of Galaxy URL data objects for the tracks.
+ */
 function buildUcscTracksRequestValues(
   tracks: UcscTrack[] | null
 ): GalaxyUrlData[] {
@@ -487,6 +527,7 @@ function buildUcscTracksRequestValues(
   for (const track of tracks) {
     values.push({
       ext: getUcscBigDataExt(track.bigDataUrl),
+      hashes: createMd5Hash(track.md5Hash),
       identifier: track.shortLabel,
       url: track.bigDataUrl,
     });
@@ -498,4 +539,310 @@ function getUcscBigDataExt(bigDataUrl: string): string {
   if (bigDataUrl.endsWith(".bb")) return "bigbed";
   else if (bigDataUrl.endsWith(".bw")) return "bigwig";
   return "auto";
+}
+
+//// DESeq2 Landing URL Functions
+
+/**
+ * Column types that should be included in the column definitions for Galaxy.
+ */
+const METADATA_COLUMN_TYPES = new Set<COLUMN_TYPE>([
+  COLUMN_TYPE.BIOLOGICAL_FACTOR,
+  COLUMN_TYPE.TECHNICAL_BLOCKING_FACTOR,
+  COLUMN_TYPE.OTHER_COVARIATE,
+  COLUMN_TYPE.QC_ONLY,
+]);
+
+/**
+ * Map COLUMN_TYPE to Galaxy column type.
+ * Currently all metadata columns are strings.
+ * @returns Galaxy column type.
+ */
+function columnTypeToGalaxyType(): "string" | "int" | "float" {
+  // For now, all metadata columns are strings
+  return "string";
+}
+
+/**
+ * Build column definitions from sample sheet classification.
+ * Only includes metadata columns (BIOLOGICAL_FACTOR, TECHNICAL_BLOCKING_FACTOR, OTHER_COVARIATE, QC_ONLY).
+ * @param sampleSheetClassification - Classification of sample sheet columns.
+ * @returns Array of column definitions.
+ */
+function buildColumnDefinitions(
+  sampleSheetClassification: Record<string, COLUMN_TYPE | null>
+): DeSeq2ColumnDefinition[] {
+  const definitions: DeSeq2ColumnDefinition[] = [];
+  for (const [columnName, columnType] of Object.entries(
+    sampleSheetClassification
+  )) {
+    if (columnType && METADATA_COLUMN_TYPES.has(columnType)) {
+      definitions.push({
+        name: columnName,
+        optional: columnType === COLUMN_TYPE.QC_ONLY,
+        type: columnTypeToGalaxyType(),
+      });
+    }
+  }
+  return definitions;
+}
+
+/**
+ * Find columns with specific classification types.
+ * @param sampleSheetClassification - Classification of sample sheet columns.
+ * @param columnType - Column type to find.
+ * @returns Column name or undefined if not found.
+ */
+function findColumnByType(
+  sampleSheetClassification: Record<string, COLUMN_TYPE | null>,
+  columnType: COLUMN_TYPE
+): string | undefined {
+  return Object.entries(sampleSheetClassification).find(
+    ([, type]) => type === columnType
+  )?.[0];
+}
+
+/**
+ * Build paired sample elements from sample sheet.
+ * @param sampleSheet - Sample sheet data as array of records.
+ * @param sampleSheetClassification - Classification of sample sheet columns.
+ * @returns Array of paired sample elements.
+ */
+function buildSampleElements(
+  sampleSheet: Record<string, string>[],
+  sampleSheetClassification: Record<string, COLUMN_TYPE | null>
+): DeSeq2PairedSample[] {
+  const identifierColumn = findColumnByType(
+    sampleSheetClassification,
+    COLUMN_TYPE.IDENTIFIER
+  );
+  const forwardColumn = findColumnByType(
+    sampleSheetClassification,
+    COLUMN_TYPE.FORWARD_FILE_URL
+  );
+  const reverseColumn = findColumnByType(
+    sampleSheetClassification,
+    COLUMN_TYPE.REVERSE_FILE_URL
+  );
+  const forwardMd5Column = findColumnByType(
+    sampleSheetClassification,
+    COLUMN_TYPE.FORWARD_FILE_MD5
+  );
+  const reverseMd5Column = findColumnByType(
+    sampleSheetClassification,
+    COLUMN_TYPE.REVERSE_FILE_MD5
+  );
+
+  if (!identifierColumn || !forwardColumn || !reverseColumn) {
+    throw new Error(
+      "Sample sheet must have IDENTIFIER, FORWARD_FILE_URL, and REVERSE_FILE_URL columns"
+    );
+  }
+
+  return sampleSheet.map((row) => {
+    const identifier = row[identifierColumn];
+    const forwardUrl = ftpToAscp(row[forwardColumn]);
+    const reverseUrl = ftpToAscp(row[reverseColumn]);
+    const forwardMd5 = forwardMd5Column
+      ? row[forwardMd5Column]?.trim() || undefined
+      : undefined;
+    const reverseMd5 = reverseMd5Column
+      ? row[reverseMd5Column]?.trim() || undefined
+      : undefined;
+
+    return {
+      class: "Collection" as const,
+      collection_type: "paired" as const,
+      elements: [
+        {
+          class: "File" as const,
+          ext: FILE_EXT.FASTQ_SANGER_GZ,
+          hashes: createMd5Hash(forwardMd5),
+          location: forwardUrl,
+          name: "forward" as const,
+        },
+        {
+          class: "File" as const,
+          ext: FILE_EXT.FASTQ_SANGER_GZ,
+          hashes: createMd5Hash(reverseMd5),
+          location: reverseUrl,
+          name: "reverse" as const,
+        },
+      ],
+      name: identifier,
+    };
+  });
+}
+
+/**
+ * Build rows metadata mapping from sample sheet.
+ * Maps sample identifier to array of metadata values in column_definitions order.
+ * @param sampleSheet - Sample sheet data as array of records.
+ * @param sampleSheetClassification - Classification of sample sheet columns.
+ * @param columnDefinitions - Column definitions to determine value order.
+ * @returns Object mapping sample identifiers to arrays of metadata values.
+ */
+function buildRows(
+  sampleSheet: Record<string, string>[],
+  sampleSheetClassification: Record<string, COLUMN_TYPE | null>,
+  columnDefinitions: DeSeq2ColumnDefinition[]
+): Record<string, (string | number)[]> {
+  const identifierColumn = findColumnByType(
+    sampleSheetClassification,
+    COLUMN_TYPE.IDENTIFIER
+  );
+
+  if (!identifierColumn) {
+    throw new Error("Sample sheet must have IDENTIFIER column");
+  }
+
+  const rows: Record<string, (string | number)[]> = {};
+
+  for (const row of sampleSheet) {
+    const identifier = row[identifierColumn];
+    const values: (string | number)[] = [];
+
+    for (const colDef of columnDefinitions) {
+      const value = row[colDef.name];
+      // Parse value based on column type
+      if (colDef.type === "int") {
+        values.push(parseInt(value, 10) || 0);
+      } else if (colDef.type === "float") {
+        values.push(parseFloat(value) || 0);
+      } else {
+        values.push(value ?? "");
+      }
+    }
+
+    rows[identifier] = values;
+  }
+
+  return rows;
+}
+
+/**
+ * Build the sample sheet collection for DESeq2 workflow.
+ * @param sampleSheet - Sample sheet data as array of records.
+ * @param sampleSheetClassification - Classification of sample sheet columns.
+ * @returns Sample sheet collection object.
+ */
+function buildSampleSheetCollection(
+  sampleSheet: Record<string, string>[],
+  sampleSheetClassification: Record<string, COLUMN_TYPE | null>
+): DeSeq2SampleSheetCollection {
+  const columnDefinitions = buildColumnDefinitions(sampleSheetClassification);
+  const elements = buildSampleElements(sampleSheet, sampleSheetClassification);
+  const rows = buildRows(
+    sampleSheet,
+    sampleSheetClassification,
+    columnDefinitions
+  );
+
+  return {
+    class: "Collection",
+    collection_type: "sample_sheet:paired",
+    column_definitions: columnDefinitions,
+    elements,
+    name: "Sample Sheet",
+    rows,
+  };
+}
+
+/**
+ * Get the URL of the DESeq2 workflow landing page.
+ * @param workflowId - Galaxy stored workflow ID.
+ * @param referenceAssembly - Genome version/assembly ID.
+ * @param geneModelUrl - URL for gene model (GTF) file.
+ * @param sampleSheet - Sample sheet data as array of records.
+ * @param sampleSheetClassification - Classification of sample sheet columns.
+ * @param designFormula - DESeq2 design formula.
+ * @param primaryContrasts - Primary contrasts configuration (baseline, explicit pairs, or all-vs-all).
+ * @param origin - Origin URL of the site making the request.
+ * @returns DESeq2 workflow landing URL.
+ */
+export async function getDeSeq2LandingUrl(
+  workflowId: string,
+  referenceAssembly: string,
+  geneModelUrl: string,
+  sampleSheet: Record<string, string>[],
+  sampleSheetClassification: Record<string, COLUMN_TYPE | null>,
+  designFormula: string,
+  primaryContrasts: PrimaryContrasts | null,
+  origin: string
+): Promise<string> {
+  const md5Checksums = await fetchUcscMd5Checksums(referenceAssembly);
+  const gtfHashes = getHashesForUrl(
+    geneModelUrl,
+    referenceAssembly,
+    md5Checksums
+  );
+
+  const sampleSheetCollection = buildSampleSheetCollection(
+    sampleSheet,
+    sampleSheetClassification
+  );
+
+  // Extract reference level from baseline contrasts
+  const referenceLevel =
+    primaryContrasts?.type === "BASELINE" && primaryContrasts.baseline
+      ? primaryContrasts.baseline
+      : undefined;
+
+  const body: DeSeq2WorkflowLandingsBody = {
+    origin,
+    public: true,
+    /* eslint-disable sort-keys -- key order matches DeSeq2RequestState interface */
+    request_state: {
+      "DESeq2 Design Formula": designFormula,
+      "Generate additional QC reports": true,
+      "GTF File of annotation": {
+        class: "File",
+        ext: "gtf.gz",
+        hashes: gtfHashes,
+        url: geneModelUrl,
+      },
+      "Reference genome": referenceAssembly,
+      ...(referenceLevel && { "Reference level": referenceLevel }),
+      "Sample sheet of sequencing reads": sampleSheetCollection,
+      "Use featurecounts for generating count tables": true,
+    },
+    /* eslint-enable sort-keys -- re-enable sort-keys rule */
+    workflow_id: workflowId,
+    workflow_target_type: "stored_workflow",
+  };
+
+  return getGalaxyLandingUrl(body, workflowLandingsApiUrl, workflowLandingUrl);
+}
+
+/**
+ * Create a hash object for MD5 checksum.
+ * @param md5 - MD5 checksum value.
+ * @returns Hash object array or undefined if no checksum provided.
+ */
+function createMd5Hash(
+  md5: string | undefined
+): WorkflowDatasetHash[] | undefined {
+  if (!md5) return undefined;
+  return [{ hash_function: "MD5", hash_value: md5 }];
+}
+
+/**
+ * Convert a checksum to the Galaxy API hash format.
+ * Uses the shared getChecksumForPath utility to extract checksums.
+ *
+ * This function is designed to be fault-tolerant and will return undefined
+ * if no checksum is available, ensuring that checksum verification remains optional.
+ *
+ * @param url - URL to get checksums for.
+ * @param assembly - Assembly accession.
+ * @param md5Checksums - Map of filename to MD5 hash.
+ * @returns Galaxy API formatted hashes or undefined if no checksum is available.
+ */
+function getHashesForUrl(
+  url: string,
+  assembly: string,
+  md5Checksums: Map<string, string>
+): GalaxyUrlData["hashes"] {
+  const md5 = getChecksumForPath(url, assembly, md5Checksums);
+  return createMd5Hash(md5);
 }

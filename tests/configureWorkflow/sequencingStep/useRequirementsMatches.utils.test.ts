@@ -4,6 +4,13 @@ import type { ReadRun } from "../../../app/components/Entity/components/Configur
 import { BRCDataCatalogGenome } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { GA2AssemblyEntity } from "../../../app/apis/catalog/ga2/entities";
 
+const EXPECTED = {
+  LIBRARY_LAYOUT_MISMATCH:
+    "Library layout mismatch: expected SINGLE, but PAIRED selected",
+  SPECIES_MISMATCH:
+    "Species mismatch: data is not from the selected taxonomy ID",
+} as const;
+
 describe("buildRequirementWarnings", () => {
   const GENOME = makeGenome("123");
 
@@ -65,10 +72,8 @@ describe("buildRequirementWarnings", () => {
     );
 
     expect(buildRequirementWarnings(filters, rows, GENOME)).toEqual([
-      expect.stringContaining(
-        "Species mismatch: data is not from the selected taxonomy ID"
-      ),
-      "Library layout mismatch: expected SINGLE, but PAIRED selected",
+      expect.stringContaining(EXPECTED.SPECIES_MISMATCH),
+      EXPECTED.LIBRARY_LAYOUT_MISMATCH,
     ]);
   });
 
@@ -94,7 +99,7 @@ describe("buildRequirementWarnings", () => {
     );
 
     expect(buildRequirementWarnings(filters, rows, GENOME)).toEqual([
-      "Library layout mismatch: expected SINGLE, but PAIRED selected",
+      EXPECTED.LIBRARY_LAYOUT_MISMATCH,
     ]);
   });
 
@@ -135,7 +140,7 @@ describe("buildRequirementWarnings", () => {
     );
 
     expect(buildRequirementWarnings(filters, rows, GENOME)).toEqual([
-      "Library layout mismatch: expected SINGLE, but PAIRED selected",
+      EXPECTED.LIBRARY_LAYOUT_MISMATCH,
       "Library strategy mismatch: expected RNA-Seq, but WGS selected",
     ]);
   });
@@ -148,9 +153,7 @@ describe("buildRequirementWarnings", () => {
     );
 
     expect(buildRequirementWarnings(filters, rows, makeGenome("999"))).toEqual([
-      expect.stringContaining(
-        "Species mismatch: data is not from the selected taxonomy ID"
-      ),
+      expect.stringContaining(EXPECTED.SPECIES_MISMATCH),
     ]);
   });
 
@@ -162,9 +165,7 @@ describe("buildRequirementWarnings", () => {
     );
 
     expect(buildRequirementWarnings(filters, rows, GENOME)).toEqual([
-      expect.stringContaining(
-        "Species mismatch: data is not from the selected taxonomy ID"
-      ),
+      expect.stringContaining(EXPECTED.SPECIES_MISMATCH),
     ]);
   });
 });

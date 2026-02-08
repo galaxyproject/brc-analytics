@@ -5,8 +5,8 @@ set -e
 echo \"Deleting ./out/\"
 rm -rf ./out
 
-# install node version 20.10.0
-n 20.10.0
+# install node version 22.12.0
+n 22.12.0
 npm ci
 export NEXT_PUBLIC_BASE_PATH=""
 

@@ -1,6 +1,7 @@
 {
   "parser": "@typescript-eslint/parser",
   "ignorePatterns": [
+    "next-env.d.ts",
     "node_modules",
     ".next/",
     ".DS_Store",
@@ -75,9 +76,7 @@
     "jsdoc/require-returns": "error",
     "jsdoc/require-returns-description": "error",
     "jsdoc/check-alignment": "error",
-    "jsdoc/check-param-names": "error",
-    "sonarjs/redundant-type-aliases": "warn",
-    "sonarjs/todo-tag": "warn"
+    "jsdoc/check-param-names": "error"
   },
   "overrides": [
     {
@@ -90,7 +89,14 @@
     {
       "files": "sunburst.tsx",
       "rules": {
-        "@typescript-eslint/ban-ts-comment": "off"
+        "@typescript-eslint/ban-ts-comment": "off",
+        "sonarjs/no-nested-functions": "off"
+      }
+    },
+    {
+      "files": ["tests/**"],
+      "rules": {
+        "sonarjs/no-clear-text-protocols": "off"
       }
     }
   ]

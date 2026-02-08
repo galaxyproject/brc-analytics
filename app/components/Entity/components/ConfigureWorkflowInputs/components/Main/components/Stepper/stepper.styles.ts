@@ -3,9 +3,15 @@ import { Stepper } from "@mui/material";
 import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 
 export const StyledStepper = styled(Stepper)`
+  display: grid;
   gap: 16px;
+  grid-column: 1 / -1;
+  grid-template-columns: inherit;
 
   .MuiStep-root {
+    align-self: flex-start;
+    grid-column: 1 / 9;
+
     .MuiStepLabel-labelContainer {
       display: grid;
       gap: 4px 24px;

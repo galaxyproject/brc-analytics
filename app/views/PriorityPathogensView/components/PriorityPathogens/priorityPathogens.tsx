@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Props } from "./types";
 import {
   Section,

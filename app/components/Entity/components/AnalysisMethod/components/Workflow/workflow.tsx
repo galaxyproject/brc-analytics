@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Button, Grid, Typography } from "@mui/material";
 import { Props } from "./types";
 import { Link as DXLink } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
@@ -16,7 +17,7 @@ export const Workflow = ({ entityId, workflow }: Props): JSX.Element => {
   const { iwcId, workflowDescription, workflowName } = workflow;
   return (
     <StyledGrid {...GRID_PROPS}>
-      <Grid container spacing={1}>
+      <Grid container direction="column" spacing={1}>
         <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_500}>
           {workflowName}
         </Typography>

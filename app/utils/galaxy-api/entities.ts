@@ -106,7 +106,7 @@ export interface GalaxyApiCommonUrlData {
   url: string;
 }
 
-interface WorkflowDatasetHash {
+export interface WorkflowDatasetHash {
   hash_function: "MD5" | "SHA-1" | "SHA-256" | "SHA-512";
   hash_value: string;
 }
@@ -149,4 +149,61 @@ export interface GalaxyUrlData {
   hashes?: WorkflowDatasetHash[];
   identifier?: string;
   url: string;
+}
+
+//// DESeq2 Workflow Landing types
+
+export interface DeSeq2WorkflowLandingsBody {
+  origin: string;
+  public: true;
+  request_state: DeSeq2RequestState;
+  workflow_id: string;
+  workflow_target_type: "stored_workflow";
+}
+
+export interface DeSeq2RequestState {
+  "DESeq2 Design Formula": string;
+  "Generate additional QC reports": boolean;
+  "GTF File of annotation": DeSeq2GtfFile;
+  "Reference genome": string;
+  "Reference level"?: string;
+  "Sample sheet of sequencing reads": DeSeq2SampleSheetCollection;
+  "Use featurecounts for generating count tables": boolean;
+}
+
+export interface DeSeq2GtfFile {
+  class: "File";
+  ext: string;
+  hashes?: WorkflowDatasetHash[];
+  url: string;
+}
+
+export interface DeSeq2SampleSheetCollection {
+  class: "Collection";
+  collection_type: "sample_sheet:paired";
+  column_definitions: DeSeq2ColumnDefinition[];
+  elements: DeSeq2PairedSample[];
+  name: string;
+  rows: Record<string, (string | number)[]>;
+}
+
+export interface DeSeq2ColumnDefinition {
+  name: string;
+  optional: boolean;
+  type: "string" | "int" | "float";
+}
+
+export interface DeSeq2PairedSample {
+  class: "Collection";
+  collection_type: "paired";
+  elements: [DeSeq2FileElement, DeSeq2FileElement];
+  name: string;
+}
+
+export interface DeSeq2FileElement {
+  class: "File";
+  ext: string;
+  hashes?: WorkflowDatasetHash[];
+  location: string;
+  name: "forward" | "reverse";
 }

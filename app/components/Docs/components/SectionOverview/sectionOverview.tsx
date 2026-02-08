@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Props } from "./types";
 import { StyledStack, StyledCard } from "./sectionOverview.styles";
 import { CardTitle } from "@databiosphere/findable-ui/lib/components/common/Card/components/CardTitle/cardTitle";
@@ -13,7 +14,9 @@ export const SectionOverview = ({ overview }: Props): JSX.Element | null => {
         return (
           <StyledCard key={String(title)} elevation={0}>
             <CardActionArea cardUrl={href}>
-              <CardMedia alt={title} component="img" src={image?.src} />
+              {typeof image?.src === "string" && (
+                <CardMedia alt={title} component="img" src={image.src} />
+              )}
               <Stack gap={3} useFlexGap>
                 <CardTitle>{title}</CardTitle>
                 <Typography

@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Props } from "./types";
 import { AlertTitle } from "@mui/material";
 import { ALERT_PROPS } from "@databiosphere/findable-ui/lib/components/common/Alert/constants";
