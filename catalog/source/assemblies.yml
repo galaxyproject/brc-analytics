@@ -94,7 +94,7 @@ assemblies:
   - accession: GCA_000173235.2
   # organism: Rhodnius prolixus
   # common_name: bugs R.prolixus (2015)
-  - accession: GCA_000181055.3
+  - accession: GCF_049639745.1
   # organism: Giardia intestinalis ATCC 50581
   # common_name: diplomonads (GS/M clone H7 2009)
   - accession: GCA_000182405.1
@@ -491,6 +491,7 @@ assemblies:
   # organism: Sarcoptes scabiei
   # common_name: mite/tick S.scabiei (Arlian Lab 2015)
   - accession: GCA_000828355.1
+  - accession: GCA_020844145.1
   # organism: Cryptosporidium sp. chipmunk LX-2015
   # common_name: apicomplexans C.sp. (chipmunk LX-2015 2015)
   - accession: GCA_000831705.1
@@ -512,6 +513,7 @@ assemblies:
   # organism: Ixodes ricinus
   # common_name: castor bean tick (Charles River 2016)
   - accession: GCA_000973045.2
+  - accession: GCA_964417485.1
   # organism: Emmonsia crescens UAMH 3008
   # common_name: ascomycetes E.crescens (UAMH 3008 2015)
   - accession: GCA_001008285.1
@@ -934,7 +936,7 @@ assemblies:
   - accession: GCA_008728235.1
   # organism: Aspergillus flavus
   # common_name: ascomycetes A.flavus (NRRL 3357 2019)
-  - accession: GCA_009017415.1
+  - accession: GCF_009017415.1
   # organism: Aspergillus parasiticus
   # common_name: ascomycetes A.parasiticus (CBS 117618 2019)
   - accession: GCA_009176385.1
@@ -962,6 +964,16 @@ assemblies:
   # organism: Triatoma infestans
   # common_name: bugs T.infestans (FIOC_28 2020)
   - accession: GCA_011037195.1
+  - accession: GCA_965641795.1
+  # organism: Triatoma dimidiata
+  # common_name: kissing bug T.dimidiata (isolate 2024)
+  - accession: GCA_964198125.1
+  # organism: Triatoma sanguisuga
+  # common_name: bloodsucking conenose T.sanguisuga (JP-2024a)
+  - accession: GCA_041753995.1
+  # organism: Panstrongylus geniculatus
+  # common_name: cone-nose bug P.geniculatus (2024)
+  - accession: GCA_964188295.1
   # organism: Giardia intestinalis
   # common_name: diplomonads (WB 2020)
   - accession: GCA_011634545.1
@@ -1123,7 +1135,7 @@ assemblies:
   - accession: GCA_020716745.1
   # organism: Phytophthora ramorum
   # common_name: sudden oak death agent (14567 PR-15-019 primary hap 2021)
-  - accession: GCA_020800235.1
+  - accession: GCA_020800235.2
   # organism: Plasmodium yoelii yoelii
   # common_name: apicomplexans P.yoelii yoelii (17XNL clone 1.1 2023)
   - accession: GCA_020844765.3
@@ -1360,9 +1372,9 @@ assemblies:
   - accession: GCF_000001215.4
   # organism: Homo sapiens
   # common_name: Human - Dec. 2013 (GRCh38/hg38)
-  # # organism: Homo sapiens
-  # # common_name: Human - Dec. 2013 (GRCh38/hg38)
-  # - accession: GCF_000001405.40
+  # organism: Homo sapiens
+  # common_name: Human - Dec. 2013 (GRCh38/hg38)
+  - accession: GCF_000001405.40
   # organism: Mus musculus
   # common_name: Mouse - Jun. 2020 (GRCm39/mm39)
   - accession: GCF_000001635.27
@@ -1401,7 +1413,7 @@ assemblies:
   - accession: GCF_000002725.2
   # organism: Plasmodium falciparum 3D7
   # common_name: malaria parasite P. falciparum (3D7 2016 refseq)
-  - accession: GCF_000002765.5
+  - accession: GCF_000002765.6
   # organism: Plasmodium falciparum 3D7
   # common_name: malaria parasite P. falciparum (3D7 2016)
   - accession: GCF_000002765.6
@@ -1425,7 +1437,6 @@ assemblies:
   - accession: GCF_000003125.1
   # organism: Theileria annulata
   # common_name: apicomplexans T.annulata (Ankara isolate clone C9 2005)
-  - accession: GCA_000003225.1
   # organism: Uncinocarpus reesii 1704
   # common_name: ascomycetes U.reesii 1704
   - accession: GCF_000003515.1
@@ -1779,7 +1790,7 @@ assemblies:
   - accession: GCF_000499425.1
   # organism: Eimeria tenella
   # common_name: apicomplexans E.tenella (Houghton 2013)
-  - accession: GCF_000499545.1
+  - accession: GCF_000499545.2
   # organism: Eimeria maxima
   # common_name: apicomplexans E.maxima (Weybridge 2013)
   - accession: GCF_000499605.1
@@ -2194,7 +2205,7 @@ assemblies:
   - accession: GCF_017918235.1
   # organism: Coccidioides posadasii str. Silveira
   # common_name: ascomycetes C.posadasii str. (Silveira 2022)
-  - accession: GCF_018416015.1
+  - accession: GCF_018416015.2
   # organism: Coccidioides posadasii str. Silveira
   # common_name: ascomycetes C.posadasii str. (Silveira 2022)
   - accession: GCF_018416015.2
@@ -2227,7 +2238,263 @@ assemblies:
   - accession: GCF_022059095.1
   # organism: Dermacentor andersoni
   # common_name: mites & ticks D.andersoni (primary hap 2022)
-  - accession: GCF_023375885.1
+  - accession: GCF_023375885.2
+  - accession: GCF_023375885.2
+  # organism: Dermacentor variabilis
+  # common_name: mites & ticks D.variabilis (primary hap 2024)
+  - accession: GCF_050947875.1
+  # organism: Dermacentor albipictus
+  # common_name: mites & ticks D.albipictus (primary hap 2023)
+  - accession: GCF_038994185.2
+  # organism: Dermacentor reticulatus
+  # common_name: mites & ticks D.reticulatus (primary hap 2024)
+  - accession: GCA_051549955.1
+  # organism: Dermacentor niveus
+  # common_name: mites & ticks D.niveus (primary hap 2024)
+  - accession: GCA_965286785.1
+  # organism: Amblyomma americanum
+  # common_name: lone star tick (ASM5285725v1 2024)
+  - accession: GCF_052857255.1
+  # organism: Amblyomma maculatum
+  # common_name: Gulf Coast tick (ASM2396939v1 2022)
+  - accession: GCA_023969395.1
+  # organism: Amblyomma javanense
+  # common_name: tick A.javanense (ZWH2_Genome 2024)
+  - accession: GCA_965286815.2
+  # organism: Amblyomma testudinarium
+  # common_name: tick A.testudinarium (GXH_Genome 2024)
+  - accession: GCA_965286825.1
+  # organism: Rhipicephalus sanguineus
+  # common_name: brown dog tick (BIME_Rsan_1.4 2020)
+  - accession: GCF_013339695.2
+  # organism: Rhipicephalus appendiculatus
+  # common_name: brown ear tick (ASM3052246v2 2024)
+  - accession: GCA_030522465.2
+  # organism: Rhipicephalus turanicus
+  # common_name: tick R.turanicus (TLS_Genome 2024)
+  - accession: GCA_965286665.1
+  # organism: Ornithodoros turicata
+  # common_name: tick O.turicata (ASM3712646v1 2023)
+  - accession: GCF_037126465.1
+  # organism: Ornithodoros moubata
+  # common_name: tick O.moubata (ASM2953267v1 2023)
+  - accession: GCA_029532675.1
+  # organism: Borrelia miyamotoi
+  # common_name: Borrelia miyamotoi (strain HT31)
+  - accession: GCF_019668505.1
+  # organism: Borrelia turicatae
+  # common_name: Borrelia turicatae (strain 91E135)
+  - accession: GCF_000012085.2
+  # organism: Borrelia duttonii
+  # common_name: Borrelia duttonii (strain Ly)
+  - accession: GCF_000019685.1
+  # organism: Borrelia anserina
+  # common_name: Borrelia anserina (strain Es)
+  - accession: GCF_001936255.1
+  # organism: Borrelia recurrentis
+  # common_name: Borrelia recurrentis (strain A1)
+  - accession: GCF_000019705.1
+  # organism: Borrelia hermsii
+  # common_name: Borrelia hermsii (strain ML2)
+  - accession: GCF_020422925.2
+  # organism: Borrelia parkeri
+  # common_name: Borrelia parkeri (strain HR1)
+  - accession: GCF_000512145.1
+  # organism: Borrelia crocidurae
+  # common_name: Borrelia crocidurae (strain 03-02)
+  - accession: GCF_000825665.2
+  # organism: Borrelia hispanica
+  # common_name: Borrelia hispanica (strain CRI)
+  - accession: GCF_000500065.1
+  # organism: Borrelia persica
+  # common_name: Borrelia persica (strain No12)
+  - accession: GCF_000500045.1
+  # organism: Candidatus Borrelia fainii
+  # common_name: Candidatus Borrelia fainii (strain Qtaro)
+  - accession: GCF_027925085.1
+  # organism: Rickettsia conorii
+  # common_name: Rickettsia conorii (strain Malish 7)
+  - accession: GCF_000007025.1
+  # organism: Rickettsia japonica
+  # common_name: Rickettsia japonica (strain YH)
+  - accession: GCF_000283595.1
+  # organism: Rickettsia sibirica
+  # common_name: Rickettsia sibirica (strain 246)
+  - accession: GCF_000166935.1
+  # organism: Rickettsia monacensis
+  # common_name: Rickettsia monacensis (strain IrR/Munich)
+  - accession: GCF_000499665.2
+  # organism: Rickettsia slovaca
+  # common_name: Rickettsia slovaca (strain 13-B)
+  - accession: GCF_000237845.1
+  # organism: Rickettsia rickettsii
+  # common_name: Rickettsia rickettsii (strain Sheila Smith)
+  - accession: GCF_000018225.1
+  # organism: Rickettsia prowazekii
+  # common_name: Rickettsia prowazekii (strain Chernikova)
+  - accession: GCF_000277165.1
+  # organism: Rickettsia australis
+  # common_name: Rickettsia australis (strain Cutlack)
+  - accession: GCF_000284155.1
+  # organism: Rickettsia helvetica
+  # common_name: Rickettsia helvetica (isolate OB144)
+  - accession: GCF_963970025.1
+  # organism: Rickettsia canadensis
+  # common_name: Rickettsia canadensis (strain CA410)
+  - accession: GCF_000283915.1
+  # organism: Rickettsia akari
+  # common_name: Rickettsia akari (strain Hartford)
+  - accession: GCF_000018205.1
+  # organism: Rickettsia oklahomensis
+  # common_name: Rickettsia oklahomensis (strain Oklahoma 10)
+  - accession: GCF_039954865.1
+  # organism: Rickettsia typhi
+  # common_name: Rickettsia typhi (strain Wilmington)
+  - accession: GCF_000008045.1
+  # organism: Anaplasma centrale
+  # common_name: Anaplasma centrale (strain Israel)
+  - accession: GCF_000024505.1
+  # organism: Anaplasma marginale
+  # common_name: Anaplasma marginale (strain Florida)
+  - accession: GCF_000020305.1
+  # organism: Anaplasma ovis
+  # common_name: Anaplasma ovis (strain Haibei)
+  - accession: GCF_002214625.1
+  # organism: Anaplasma platys
+  # common_name: Anaplasma platys (strain S3)
+  - accession: GCF_012790675.1
+  # organism: Anaplasma phagocytophilum
+  # common_name: Anaplasma phagocytophilum (strain Webster)
+  - accession: GCF_000964685.1
+  # organism: Anaplasma capra
+  # common_name: Anaplasma capra (strain BIME2)
+  - accession: GCF_025628805.1
+  # organism: Anaplasma bovis
+  # common_name: Anaplasma bovis
+  - accession: GCF_036903315.1
+  # organism: Ehrlichia ruminantium
+  # common_name: Ehrlichia ruminantium (strain Welgevonden)
+  - accession: GCF_000026005.1
+  # organism: Ehrlichia chaffeensis
+  # common_name: Ehrlichia chaffeensis (strain Arkansas)
+  - accession: GCF_000013145.1
+  # organism: Ehrlichia muris subsp. eauclairensis
+  # common_name: Ehrlichia muris subsp. eauclairensis (strain Wisconsin)
+  - accession: GCF_051097115.1
+  # organism: Ehrlichia sennetsu
+  # common_name: Ehrlichia sennetsu (strain Miyayama)
+  - accession: GCF_000013165.1
+  # organism: Ehrlichia japonica
+  # common_name: Ehrlichia japonica (strain HF)
+  - accession: GCF_000632845.1
+  # organism: Ehrlichia canis
+  # common_name: Ehrlichia canis (strain Jake)
+  - accession: GCF_000012565.1
+  # organism: Ehrlichia minasensis
+  # common_name: Ehrlichia minasensis (strain B11)
+  - accession: GCF_004181775.1
+  # organism: Francisella tularensis subsp. novicida
+  # common_name: Francisella tularensis subsp. novicida (strain D9876)
+  - accession: GCF_000833355.1
+  # organism: Coxiella burnetii
+  # common_name: Coxiella burnetii (strain RSA 493)
+  - accession: GCF_000007765.2
+  # organism: Neoehrlichia mikurensis
+  # common_name: Neoehrlichia mikurensis (isolate 18-2804)
+  - accession: GCF_024299005.1
+  # organism: Babesia gibsoni
+  # common_name: Babesia gibsoni (strain WH58)
+  - accession: GCA_035575875.1
+  # organism: Babesia microti
+  # common_name: Babesia microti (strain RI)
+  - accession: GCF_000691945.2
+  # organism: Babesia bovis
+  # common_name: Babesia bovis (strain T2Bo)
+  - accession: GCF_000165395.2
+  # organism: Babesia bigemina
+  # common_name: Babesia bigemina (strain Bond)
+  - accession: GCF_000981445.1
+  # organism: Babesia duncani
+  # common_name: Babesia duncani (strain WA1)
+  - accession: GCF_028658345.1
+  # organism: Babesia canis rossi
+  # common_name: Babesia canis rossi (strain PMB)
+  - accession: GCA_045269395.1
+  # organism: Babesia ovis
+  # common_name: Babesia ovis (strain Israeli)
+  - accession: GCA_051529585.1
+  # organism: Babesia ovata
+  # common_name: Babesia ovata (strain Miyake)
+  - accession: GCF_002897235.1
+  # organism: Theileria orientalis
+  # common_name: Theileria orientalis (strain Shintoku)
+  - accession: GCF_000740895.1
+  # organism: Theileria parva
+  # common_name: Theileria parva (strain Muguga)
+  - accession: GCF_000165365.1
+  # organism: Theileria annulata
+  # common_name: Theileria annulata (strain Ankara C9)
+  - accession: GCF_000003225.4
+  # organism: Theileria equi
+  # common_name: Theileria equi (strain WA)
+  - accession: GCF_000342415.1
+  # organism: Theileria haneyi
+  # common_name: Theileria haneyi (strain Ho-208)
+  - accession: GCA_050329265.1
+  # organism: Theileria luwenshuni
+  # common_name: Theileria luwenshuni (strain cheeloo)
+  - accession: GCA_029379255.1
+  # organism: Tick-borne encephalitis virus
+  # common_name: Tick-borne encephalitis virus
+  - accession: GCF_000863125.1
+  # organism: Powassan virus
+  # common_name: Powassan virus (strain LB)
+  - accession: GCF_000860485.1
+  # organism: Deer tick virus
+  # common_name: Deer tick virus
+  - accession: GCA_004786555.1
+  # organism: Omsk hemorrhagic fever virus
+  # common_name: Omsk hemorrhagic fever virus
+  - accession: GCF_000855505.1
+  # organism: Kyasanur Forest disease virus
+  # common_name: Kyasanur Forest disease virus
+  - accession: GCF_002820625.1
+  # organism: Alkhumra hemorrhagic fever virus
+  # common_name: Alkhumra hemorrhagic fever virus (strain Zaki #2)
+  - accession: GCA_031116565.1
+  # organism: Louping ill virus
+  # common_name: Louping ill virus
+  - accession: GCF_000863165.1
+  # organism: Orthonairovirus haemorrhagiae
+  # common_name: Orthonairovirus haemorrhagiae
+  - accession: GCF_000854165.1
+  # organism: Severe fever with thrombocytopenia syndrome virus
+  # common_name: Severe fever with thrombocytopenia syndrome virus
+  - accession: GCF_003087855.1
+  # organism: Bourbon virus
+  # common_name: Bourbon virus
+  - accession: GCF_023156645.1
+  # organism: Heartland virus
+  # common_name: Heartland virus
+  - accession: GCF_000922255.1
+  # organism: Thogoto virus
+  # common_name: Thogoto virus
+  - accession: GCF_000854245.1
+  # organism: Oz virus
+  # common_name: Oz virus
+  - accession: GCF_004117175.1
+  # organism: Upolu virus
+  # common_name: Upolu virus
+  - accession: GCF_023156825.1
+  # organism: Sinu virus
+  # common_name: Sinu virus
+  - accession: GCF_023157055.1
+  # organism: Jos virus
+  # common_name: Jos virus
+  - accession: GCF_023156725.1
+  # organism: African swine fever virus
+  # common_name: African swine fever virus
+  - accession: GCF_000858485.1
   # organism: Plasmodium brasilianum
   # common_name: apicomplexans P.brasilianum (Bolivian I 2022)
   - accession: GCF_023973825.1
@@ -2418,8 +2685,8 @@ assemblies:
   - accession: GCF_000866625.1
   - accession: GCF_000865065.1
   - accession: GCF_000862125.1
-  - accession: GCA_004786575.1
-  - accession: GCA_004788295.1
+  - accession: GCF_004786575.1
+  - accession: GCF_004788295.1
   # Eastern equine encephalitis virus
   - accession: GCF_000862705.1
   # ebola
@@ -2474,7 +2741,7 @@ assemblies:
   # hepatitis a
   - accession: GCF_000860505.1
   - accession: GCF_001502175.1
-  - accession: GCA_008776015.1
+  - accession: GCF_008776015.1
   # Japanese encephalitis
   - accession: GCF_000862145.1
   # junin virus
@@ -2489,20 +2756,17 @@ assemblies:
   - accession: GCA_031319335.1
   # lassa virus
   - accession: GCF_000851705.1
-  - accession: GCA_900094045.1
   - accession: GCF_000855745.1
   # lujo virus
   - accession: GCF_000885555.1
   # Lymphocytic choriomeningitis virus
   - accession: GCF_004789475.1
-  - accession: GCA_031580275.1
   - accession: GCF_000851025.1
   # Machupo virus
   - accession: GCF_000853725.1
   # marburg virus
   - accession: GCF_000943645.1
-  - accession: GCF_000857325.2
-  - accession: GCA_000857325.3
+  - accession: GCF_000857325.3
   - accession: GCA_031121245.1
   - accession: GCA_031121255.1
   - accession: GCA_031129775.1
@@ -2520,9 +2784,9 @@ assemblies:
   # Oropouche virus
   - accession: GCF_000853785.1
   # Poliovirus
-  - accession: GCA_008766755.1
-  - accession: GCA_008766715.1
-  - accession: GCA_003108605.1
+  - accession: GCF_008766755.1
+  - accession: GCF_008766715.1
+  - accession: GCF_003108605.1
   # Powassan (deer tick) virus
   - accession: GCF_000860485.1
   - accession: GCA_004786555.1
@@ -2540,7 +2804,7 @@ assemblies:
   - accession: GCF_003087855.1
   # Tickborne encephalitis virus
   - accession: GCF_000863125.1
-  - accession: GCA_004788235.1
+  - accession: GCF_004788235.1
   # variola (smallpox)
   - accession: GCF_000859885.1
   # Venezuelan equine encephalitis
@@ -2549,7 +2813,7 @@ assemblies:
   # west nile virus
   - accession: GCF_000875385.1
   - accession: GCF_000861085.1
-  - accession: GCA_004786635.1
+  - accession: GCF_004786635.1
   # Western equine encephalitis virus
   - accession: GCF_002889215.1
   - accession: GCF_000850885.1
@@ -3151,10 +3415,10 @@ assemblies:
   - accession: GCF_000973195.1
   - accession: GCF_000930855.1
   # lung-associated brisavirus
-  - accession: GCA_014883705.1
-  - accession: GCA_014883685.1
-  - accession: GCA_014883715.1
-  - accession: GCA_014883695.1
+  - accession: GCF_014883705.1
+  - accession: GCF_014883685.1
+  - accession: GCF_014883715.1
+  - accession: GCF_014883695.1
   # torque teno
   - accession: GCF_000857545.1
   - accession: GCF_000887255.1
@@ -3317,8 +3581,7 @@ assemblies:
   - accession: GCF_014883305.1
   - accession: GCF_018595155.1
   - accession: GCF_000850985.1
-  - accession: GCA_014883335.1
-  - accession: GCA_001629985.1
+  - accession: GCF_001629985.1
   - accession: GCF_000854165.1
   # Phlebovirus
   - accession: GCF_001019855.1
@@ -3345,7 +3608,7 @@ assemblies:
   - accession: GCA_900618435.1
   # organism: Schistosoma mansoni
   # project: PRJEA36577
-  - accession: GCA_000237925.2
+  - accession: GCA_000237925.5
   # organism: Caenorhabditis tropicalis
   # project: PRJNA53597
   - accession: GCA_000186765.1
@@ -3678,7 +3941,6 @@ assemblies:
   - accession: GCA_900406225.1
   # organism: Caenorhabditis elegans
   # project: PRJNA13758
-  - accession: GCA_000002985.3
   # organism: Parascaris univalens
   # project: PRJNA386823
   - accession: GCA_002259205.1
@@ -3687,9 +3949,9 @@ assemblies:
   - accession: GCA_020449115.1
   # organism: Strongyloides venezuelensis
   # project: PRJEB530
-  # # organism: Strongyloides venezuelensis
-  # # project: PRJEB530
-  # - accession: GCA_001028725.1
+  # organism: Strongyloides venezuelensis
+  # project: PRJEB530
+  - accession: GCA_001028725.1
   # organism: Taenia saginata
   # project: PRJNA71493
   - accession: GCA_001693075.2
@@ -3704,15 +3966,15 @@ assemblies:
   - accession: GCA_001555675.1
   # organism: Strongyloides stercoralis
   # project: PRJEB528
-  # # organism: Strongyloides stercoralis
-  # # project: PRJEB528
-  # - accession: GCA_000947215.1
+  # organism: Strongyloides stercoralis
+  # project: PRJEB528
+  - accession: GCA_000947215.1
   # organism: Ancylostoma caninum
   # project: PRJNA72585
   - accession: GCA_003336725.1
   # organism: Necator americanus
   # project: PRJNA72135
-  - accession: GCA_000507365.1
+  - accession: GCF_000507365.1
   # organism: Caenorhabditis auriculariae
   # project: PRJEB40642
   - accession: GCA_904845305.1
@@ -3721,12 +3983,12 @@ assemblies:
   - accession: GCA_025215515.1
   # organism: Spirometra erinaceieuropaei
   # project: PRJEB1202
-  # # organism: Spirometra erinaceieuropaei
-  # # project: PRJEB1202
-  # - accession: GCA_000951995.1
+  # organism: Spirometra erinaceieuropaei
+  # project: PRJEB1202
+  - accession: GCA_000951995.1
   # organism: Caenorhabditis remanei
   # project: PRJNA577507
-  - accession: GCA_010183535.1
+  - accession: GCF_010183535.1
   # organism: Echinococcus multilocularis
   # project: PRJEB122
   - accession: GCA_000469725.3
@@ -3763,6 +4025,7 @@ assemblies:
   # organism: Loa loa
   # project: PRJNA246086
   - accession: GCA_000733445.1
+  - accession: GCA_039623295.1
   # organism: Pristionchus exspectatus
   # project: PRJEB46690
   - accession: GCA_911812115.1
@@ -3843,9 +4106,9 @@ assemblies:
   - accession: GCA_000402015.1
   # organism: Ditylenchus destructor
   # project: PRJNA800207
-  # # organism: Ditylenchus destructor
-  # # project: PRJNA800207
-  # - accession: GCA_022814885.1
+  # organism: Ditylenchus destructor
+  # project: PRJNA800207
+  - accession: GCA_022814885.1
   # organism: Bursaphelenchus okinawaensis
   # project: PRJEB40023
   - accession: GCA_904066225.2
@@ -3884,9 +4147,9 @@ assemblies:
   - accession: GCA_021556725.1
   # organism: Rhabditophanes sp. KR3021
   # project: PRJEB1297
-  # # organism: Rhabditophanes sp. KR3021
-  # # project: PRJEB1297
-  # - accession: GCA_000944355.1
+  # organism: Rhabditophanes sp. KR3021
+  # project: PRJEB1297
+  - accession: GCA_000944355.1
   # organism: Brugia timori
   # project: PRJEB4663
   - accession: GCA_900618025.1
@@ -4062,7 +4325,6 @@ assemblies:
   - accession: GCF_900475905.1
   # organism: Klebsiella pneumoniae
   - accession: GCF_000240185.1
-  - accession: GCA_022305115.1
   - accession: GCF_000009885.1
   - accession: GCF_000163455.1
   - accession: GCF_048819275.1
@@ -4199,84 +4461,33 @@ assemblies:
   # organism: zombie ant fungus
   - accession: GCA_001272575.2
   ## god help us thats a lot of fungi
-  - accession: GCA_000002545.2
-  - accession: GCA_000002655.1
-  - accession: GCA_000002855.2
-  - accession: GCA_000003525.2
-  - accession: GCA_000003855.2
-  - accession: GCA_000004985.1
-  - accession: GCA_000006255.1
-  - accession: GCA_000006335.3
-  - accession: GCA_000006405.1
-  - accession: GCA_000011425.1
-  - accession: GCA_000091045.1
-  - accession: GCA_000091225.2
-  - accession: GCA_000143185.2
-  - accession: GCA_000146465.1
-  - accession: GCA_000149205.2
-  - accession: GCA_000149245.3
-  - accession: GCA_000149305.1
-  - accession: GCA_000149335.2
-  - accession: GCA_000149385.1
-  - accession: GCA_000149425.1
-  - accession: GCA_000149555.1
-  - accession: GCA_000149585.1
-  - accession: GCA_000149615.1
-  - accession: GCA_000149925.1
-  - accession: GCA_000149955.2
-  - accession: GCA_000150115.1
-  - accession: GCA_000150975.2
+  - accession: GCF_000006255.1
+  - accession: GCF_000006405.1
   - accession: GCA_000151005.2
-  - accession: GCA_000151065.3
-  - accession: GCA_000151145.1
-  - accession: GCA_000151355.1
-  - accession: GCA_000151425.1
-  - accession: GCA_000151505.1
+  - accession: GCF_000151505.1
   - accession: GCA_000151595.1
-  - accession: GCA_000182565.2
-  - accession: GCA_000182965.3
-  - accession: GCA_000184455.3
-  - accession: GCA_000185945.1
-  - accession: GCA_000192795.1
-  - accession: GCA_000193105.1
-  - accession: GCA_000203795.2
-  - accession: GCA_000204055.1
-  - accession: GCA_000209485.1
-  - accession: GCA_000231115.1
-  - accession: GCA_000235945.1
-  - accession: GCA_000240135.3
-  - accession: GCA_000250985.1
+  - accession: GCF_000203795.2
+  - accession: GCF_000240135.3
   - accession: GCA_000259975.2
   - accession: GCA_000260075.2
   - accession: GCA_000260155.3
   - accession: GCA_000260175.2
-  - accession: GCA_000260195.2
   - accession: GCA_000260215.2
   - accession: GCA_000260235.2
   - accession: GCA_000262775.1
-  - accession: GCA_000271565.1
-  - accession: GCA_000271585.1
-  - accession: GCA_000271745.2
-  - accession: GCA_000275845.1
-  - accession: GCA_000277815.3
-  - accession: GCA_000280035.2
-  - accession: GCA_000286035.1
-  - accession: GCA_000300595.1
-  - accession: GCA_000301155.1
-  - accession: GCA_000303195.2
-  - accession: GCA_000313135.1
-  - accession: GCA_000313525.1
+  - accession: GCF_000271585.1
+  - accession: GCF_000275845.1
+  - accession: GCF_000300595.1
+  - accession: GCF_000303195.2
+  - accession: GCF_000313525.1
   - accession: GCA_000315255.1
   - accession: GCA_000317715.1
   - accession: GCA_000320605.2
-  - accession: GCA_000328475.2
   - accession: GCA_000334475.1
   - accession: GCA_000344635.1
-  - accession: GCA_000344655.2
-  - accession: GCA_000403515.1
+  - accession: GCF_000403515.1
   - accession: GCA_000417025.1
-  - accession: GCA_000417865.1
-  - accession: GCA_000417875.1
+  - accession: GCF_000417875.1
   - accession: GCA_000418435.1
   - accession: GCA_000441875.1
   - accession: GCA_000447455.1
@@ -4292,8 +4503,7 @@ assemblies:
   - accession: GCA_000464645.1
   - accession: GCA_000464975.1
   - accession: GCA_000469055.2
-  - accession: GCA_000474995.1
-  - accession: GCA_000497045.1
+  - accession: GCF_000497045.1
   - accession: GCA_000497105.2
   - accession: GCA_000497325.4
   - accession: GCA_000499585.1
@@ -4319,19 +4529,15 @@ assemblies:
   - accession: GCA_000697605.1
   - accession: GCA_000697725.1
   - accession: GCA_000731615.1
-  - accession: GCA_000732125.1
   - accession: GCA_000738585.1
   - accession: GCA_000738595.1
   - accession: GCA_000738605.1
   - accession: GCA_000738655.1
   - accession: GCA_000738825.1
-  - accession: GCA_000738915.1
-  - accession: GCA_000743315.1
-  - accession: GCA_000747765.1
+  - accession: GCF_000747765.1
   - accession: GCA_000764455.1
   - accession: GCA_000765035.1
   - accession: GCA_000766995.1
-  - accession: GCA_000769155.2
   - accession: GCA_000769215.1
   - accession: GCA_000769295.1
   - accession: GCA_000769305.1
@@ -4371,11 +4577,9 @@ assemblies:
   - accession: GCA_000825725.1
   - accession: GCA_000826405.1
   - accession: GCA_000832265.1
-  - accession: GCA_000835755.2
   - accession: GCA_000835765.1
   - accession: GCA_000835815.1
-  - accession: GCA_000836315.1
-  - accession: GCA_000836335.2
+  - accession: GCF_000836335.1
   - accession: GCA_000836355.1
   - accession: GCA_000836375.1
   - accession: GCA_000836455.1
@@ -4383,7 +4587,7 @@ assemblies:
   - accession: GCA_000875815.1
   - accession: GCA_000875855.1
   - accession: GCA_000876485.1
-  # - accession: GCA_000945115.1
+  - accession: GCA_000945115.1
   - accession: GCA_000950595.1
   - accession: GCA_000965245.1
   - accession: GCA_000966645.2
@@ -4398,7 +4602,7 @@ assemblies:
   - accession: GCA_001023045.1
   - accession: GCA_001023065.1
   - accession: GCA_001029325.1
-  # - accession: GCA_001049375.1
+  - accession: GCA_001049375.1
   - accession: GCA_001191645.1
   - accession: GCA_001243155.1
   - accession: GCA_001262555.1
@@ -4429,14 +4633,12 @@ assemblies:
   - accession: GCA_001599575.1
   - accession: GCA_001600275.1
   - accession: GCA_001630395.1
-  - accession: GCA_001632345.1
-  - accession: GCA_001632365.1
+  - accession: GCF_001632365.1
   - accession: GCA_001633045.1
-  - accession: GCA_001642395.1
   - accession: GCA_001643655.1
   - accession: GCA_001643665.1
-  # - accession: GCA_001651435.1
-  # - accession: GCA_001651445.1
+  - accession: GCA_001651435.1
+  - accession: GCA_001651445.1
   - accession: GCA_001652425.1
   - accession: GCA_001654535.1
   - accession: GCA_001654545.1
@@ -4500,17 +4702,13 @@ assemblies:
   - accession: GCA_001757345.1
   - accession: GCA_001857725.1
   - accession: GCA_001888865.1
-  - accession: GCA_001890125.1
-  - accession: GCA_001890705.1
-  - accession: GCA_001890905.1
   - accession: GCA_001895945.1
   - accession: GCA_001901625.1
   - accession: GCA_001931775.1
   - accession: GCA_001931795.1
   - accession: GCA_001931975.2
   - accession: GCA_001936605.2
-  - accession: GCA_001939255.1
-  - accession: GCA_001983325.1
+  - accession: GCF_001983325.1
   - accession: GCA_001990985.1
   - accession: GCA_002019455.1
   - accession: GCA_002019465.1
@@ -4519,10 +4717,9 @@ assemblies:
   - accession: GCA_002025285.2
   - accession: GCA_002083735.1
   - accession: GCA_002092935.1
-  # - accession: GCA_002093825.1
+  - accession: GCA_002093825.1
   - accession: GCA_002093855.1
-  - accession: GCA_002105255.2
-  - accession: GCA_002117355.1
+  - accession: GCF_002117355.1
   - accession: GCA_002148275.1
   - accession: GCA_002148295.1
   - accession: GCA_002148305.1
@@ -4531,7 +4728,7 @@ assemblies:
   - accession: GCA_002157005.1
   - accession: GCA_002157015.1
   - accession: GCA_002157025.1
-  # - accession: GCA_002157035.1
+  - accession: GCA_002157035.1
   - accession: GCA_002157085.1
   - accession: GCA_002157105.1
   - accession: GCA_002158515.1
@@ -4552,7 +4749,7 @@ assemblies:
   - accession: GCA_002215885.1
   - accession: GCA_002215905.1
   - accession: GCA_002217545.1
-  # - accession: GCA_002219195.1
+  - accession: GCA_002219195.1
   - accession: GCA_002220045.1
   - accession: GCA_002221985.1
   - accession: GCA_002222015.1
@@ -4617,20 +4814,17 @@ assemblies:
   - accession: GCA_002443215.2
   - accession: GCA_002456175.2
   - accession: GCA_002572885.1
-  - accession: GCA_002600585.1
   - accession: GCA_002607745.1
-  - accession: GCA_002708625.1
   - accession: GCA_002711385.1
   - accession: GCA_002711405.2
   - accession: GCA_002749855.1
-  # - accession: GCA_002751075.1
+  - accession: GCA_002751075.1
   - accession: GCA_002760635.1
   - accession: GCA_002762355.2
   - accession: GCA_002794665.1
   - accession: GCA_002798095.1
-  # - accession: GCA_002835845.1
-  # - accession: GCA_002837675.1
-  - accession: GCA_002847045.1
+  - accession: GCA_002835845.1
+  - accession: GCF_002847045.1
   - accession: GCA_002864075.1
   - accession: GCA_002864135.1
   - accession: GCA_002864195.1
@@ -4651,7 +4845,6 @@ assemblies:
   - accession: GCA_002900995.3
   - accession: GCA_002917055.1
   - accession: GCA_002918395.1
-  - accession: GCA_002954075.1
   - accession: GCA_002964805.2
   - accession: GCA_002980475.2
   - accession: GCA_002980515.1
@@ -4666,15 +4859,13 @@ assemblies:
   - accession: GCA_003025205.1
   - accession: GCA_003025235.1
   - accession: GCA_003033855.1
-  - accession: GCA_003054445.1
   - accession: GCA_003054855.1
   - accession: GCA_003057275.1
   - accession: GCA_003057635.1
   - accession: GCA_003057935.1
   - accession: GCA_003116565.1
   - accession: GCA_003123625.1
-  - accession: GCA_003144125.1
-  - accession: GCA_003184595.1
+  - accession: GCF_003184595.1
   - accession: GCA_003206195.1
   - accession: GCA_003206205.1
   - accession: GCA_003206215.1
@@ -4702,10 +4893,8 @@ assemblies:
   - accession: GCA_003316975.2
   - accession: GCA_003316995.2
   - accession: GCA_003317015.2
-  - accession: GCA_003324165.2
   - accession: GCA_003325415.1
-  - accession: GCA_003325435.1
-  - accession: GCA_003344945.1
+  - accession: GCF_003344945.1
   - accession: GCA_003353625.1
   - accession: GCA_003367725.1
   - accession: GCA_003413585.1
@@ -4815,7 +5004,7 @@ assemblies:
   - accession: GCA_003693205.1
   - accession: GCA_003693225.1
   - accession: GCA_003693245.1
-  # - accession: GCA_003693705.1
+  - accession: GCA_003693705.1
   - accession: GCA_003698175.1
   - accession: GCA_003705515.2
   - accession: GCA_003709025.1
@@ -4826,9 +5015,8 @@ assemblies:
   - accession: GCA_003711355.1
   - accession: GCA_003711385.1
   - accession: GCA_003724095.1
-  - accession: GCA_003813185.1
   - accession: GCA_003813205.1
-  # - accession: GCA_003833335.1
+  - accession: GCA_003833335.1
   - accession: GCA_003944945.1
   - accession: GCA_003944955.1
   - accession: GCA_003944965.1
@@ -4879,7 +5067,7 @@ assemblies:
   - accession: GCA_003967775.1
   - accession: GCA_003967795.1
   - accession: GCA_003977725.1
-  # - accession: GCA_003992685.1
+  - accession: GCA_003992685.1
   - accession: GCA_003999685.1
   - accession: GCA_004026285.1
   - accession: GCA_004026335.1
@@ -4887,9 +5075,9 @@ assemblies:
   - accession: GCA_004026445.1
   - accession: GCA_004125235.1
   - accession: GCA_004141715.1
-  # - accession: GCA_004156335.1
-  # - accession: GCA_004194325.1
-  # - accession: GCA_004195245.1
+  - accession: GCA_004156335.1
+  - accession: GCA_004194325.1
+  - accession: GCA_004195245.1
   - accession: GCA_004291455.1
   - accession: GCA_004292535.1
   - accession: GCA_004307905.1
@@ -4921,9 +5109,8 @@ assemblies:
   - accession: GCA_004802565.1
   - accession: GCA_004802665.1
   - accession: GCA_004802725.1
-  - accession: GCA_004849945.1
-  - accession: GCA_005221285.1
-  - accession: GCA_005498985.1
+  - accession: GCF_005221285.1
+  - accession: GCF_005498985.1
   - accession: GCA_005890745.1
   - accession: GCA_005890765.1
   - accession: GCA_005890775.1
@@ -4931,8 +5118,7 @@ assemblies:
   - accession: GCA_006503525.1
   - accession: GCA_006518225.1
   - accession: GCA_006535965.1
-  - accession: GCA_006535975.1
-  - accession: GCA_006535985.1
+  - accession: GCF_006535985.1
   - accession: GCA_006536005.1
   - accession: GCA_006912115.1
   - accession: GCA_006942295.1
@@ -4940,7 +5126,6 @@ assemblies:
   - accession: GCA_008032055.1
   - accession: GCA_008032255.1
   - accession: GCA_008062615.2
-  - accession: GCA_008403515.1
   - accession: GCA_008522505.1
   - accession: GCA_008694245.1
   - accession: GCA_008711575.1
@@ -5061,49 +5246,49 @@ assemblies:
   - accession: GCA_009687705.1
   - accession: GCA_009687725.1
   - accession: GCA_009687745.1
-  # - accession: GCA_009726225.1
-  # - accession: GCA_009726235.1
-  # - accession: GCA_009726245.1
-  # - accession: GCA_009726255.1
-  # - accession: GCA_009726265.1
-  # - accession: GCA_009726325.1
-  # - accession: GCA_009726335.1
-  # - accession: GCA_009726345.1
-  # - accession: GCA_009726355.1
-  # - accession: GCA_009726365.1
-  # - accession: GCA_009726425.1
-  # - accession: GCA_009726435.1
-  # - accession: GCA_009726445.1
-  # - accession: GCA_009726455.1
-  # - accession: GCA_009726465.1
-  # - accession: GCA_009726525.1
-  # - accession: GCA_009726535.1
-  # - accession: GCA_009726545.1
-  # - accession: GCA_009726555.1
-  # - accession: GCA_009726565.1
-  # - accession: GCA_009726625.1
-  # - accession: GCA_009726635.1
-  # - accession: GCA_009726645.1
-  # - accession: GCA_009726655.1
-  # - accession: GCA_009726665.1
-  # - accession: GCA_009726725.1
-  # - accession: GCA_009726735.1
-  # - accession: GCA_009726745.1
-  # - accession: GCA_009726755.1
-  # - accession: GCA_009726765.1
-  # - accession: GCA_009726825.1
-  # - accession: GCA_009726835.1
-  # - accession: GCA_009726845.1
-  # - accession: GCA_009726855.1
-  # - accession: GCA_009726865.1
-  # - accession: GCA_009726925.1
-  # - accession: GCA_009726935.1
-  # - accession: GCA_009726945.1
-  # - accession: GCA_009726955.1
-  # - accession: GCA_009726965.1
-  # - accession: GCA_009727025.1
-  # - accession: GCA_009727035.1
-  # - accession: GCA_009727045.1
+  - accession: GCA_009726225.1
+  - accession: GCA_009726235.1
+  - accession: GCA_009726245.1
+  - accession: GCA_009726255.1
+  - accession: GCA_009726265.1
+  - accession: GCA_009726325.1
+  - accession: GCA_009726335.1
+  - accession: GCA_009726345.1
+  - accession: GCA_009726355.1
+  - accession: GCA_009726365.1
+  - accession: GCA_009726425.1
+  - accession: GCA_009726435.1
+  - accession: GCA_009726445.1
+  - accession: GCA_009726455.1
+  - accession: GCA_009726465.1
+  - accession: GCA_009726525.1
+  - accession: GCA_009726535.1
+  - accession: GCA_009726545.1
+  - accession: GCA_009726555.1
+  - accession: GCA_009726565.1
+  - accession: GCA_009726625.1
+  - accession: GCA_009726635.1
+  - accession: GCA_009726645.1
+  - accession: GCA_009726655.1
+  - accession: GCA_009726665.1
+  - accession: GCA_009726725.1
+  - accession: GCA_009726735.1
+  - accession: GCA_009726745.1
+  - accession: GCA_009726755.1
+  - accession: GCA_009726765.1
+  - accession: GCA_009726825.1
+  - accession: GCA_009726835.1
+  - accession: GCA_009726845.1
+  - accession: GCA_009726855.1
+  - accession: GCA_009726865.1
+  - accession: GCA_009726925.1
+  - accession: GCA_009726935.1
+  - accession: GCA_009726945.1
+  - accession: GCA_009726955.1
+  - accession: GCA_009726965.1
+  - accession: GCA_009727025.1
+  - accession: GCA_009727035.1
+  - accession: GCA_009727045.1
   - accession: GCA_009755825.1
   - accession: GCA_009761105.1
   - accession: GCA_009769405.1
@@ -5112,15 +5297,14 @@ assemblies:
   - accession: GCA_009856665.1
   - accession: GCA_009932835.1
   - accession: GCA_010015875.1
-  # - accession: GCA_010065285.1
-  # - accession: GCA_010065295.1
-  # - accession: GCA_010065305.1
-  # - accession: GCA_010065315.1
-  # - accession: GCA_010065385.1
-  # - accession: GCA_010065405.1
-  - accession: GCA_010111755.1
-  # - accession: GCA_010233705.1
-  # - accession: GCA_010233735.1
+  - accession: GCA_010065285.1
+  - accession: GCA_010065295.1
+  - accession: GCA_010065305.1
+  - accession: GCA_010065315.1
+  - accession: GCA_010065385.1
+  - accession: GCA_010065405.1
+  - accession: GCA_010233705.1
+  - accession: GCA_010233735.1
   - accession: GCA_011032855.1
   - accession: GCA_011032875.1
   - accession: GCA_011032885.1
@@ -5208,7 +5392,7 @@ assemblies:
   - accession: GCA_011035075.1
   - accession: GCA_011035135.1
   - accession: GCA_011035185.1
-  # - accession: GCA_011035205.1
+  - accession: GCA_011035205.1
   - accession: GCA_011035235.1
   - accession: GCA_011035245.1
   - accession: GCA_011035255.1
@@ -5320,8 +5504,7 @@ assemblies:
   - accession: GCA_011424625.1
   - accession: GCA_011426335.1
   - accession: GCA_011426355.1
-  - accession: GCA_011428085.1
-  - accession: GCA_011745365.1
+  - accession: GCF_011745365.1
   - accession: GCA_011762625.1
   - accession: GCA_011762635.1
   - accession: GCA_011763475.1
@@ -5353,33 +5536,33 @@ assemblies:
   - accession: GCA_011764185.1
   - accession: GCA_011764225.1
   - accession: GCA_011764265.1
-  # - accession: GCA_011800955.2
-  # - accession: GCA_011800985.2
-  # - accession: GCA_011801035.2
-  # - accession: GCA_011801055.2
+  - accession: GCA_011800955.2
+  - accession: GCA_011800985.2
+  - accession: GCA_011801035.2
+  - accession: GCA_011801055.2
   - accession: GCA_011801205.1
-  # - accession: GCA_011801305.2
-  # - accession: GCA_011801335.2
-  # - accession: GCA_011801385.2
+  - accession: GCA_011801305.2
+  - accession: GCA_011801335.2
+  - accession: GCA_011801385.2
   - accession: GCA_011801495.1
-  # - accession: GCA_011801505.2
-  # - accession: GCA_011801555.2
-  # - accession: GCA_011801575.2
-  # - accession: GCA_011801605.2
-  # - accession: GCA_011801645.2
-  # - accession: GCA_011801675.2
-  # - accession: GCA_011801705.2
-  # - accession: GCA_011801725.2
-  # - accession: GCA_011801785.2
-  # - accession: GCA_011801815.2
-  # - accession: GCA_011950945.2
-  # - accession: GCA_011950985.2
-  # - accession: GCA_011951285.2
-  # - accession: GCA_011951295.2
-  # - accession: GCA_011952045.2
-  # - accession: GCA_011952115.2
-  # - accession: GCA_011952145.2
-  # - accession: GCA_011952175.2
+  - accession: GCA_011801505.2
+  - accession: GCA_011801555.2
+  - accession: GCA_011801575.2
+  - accession: GCA_011801605.2
+  - accession: GCA_011801645.2
+  - accession: GCA_011801675.2
+  - accession: GCA_011801705.2
+  - accession: GCA_011801725.2
+  - accession: GCA_011801785.2
+  - accession: GCA_011801815.2
+  - accession: GCA_011950945.2
+  - accession: GCA_011950985.2
+  - accession: GCA_011951285.2
+  - accession: GCA_011951295.2
+  - accession: GCA_011952045.2
+  - accession: GCA_011952115.2
+  - accession: GCA_011952145.2
+  - accession: GCA_011952175.2
   - accession: GCA_012070365.1
   - accession: GCA_012070385.1
   - accession: GCA_012071885.1
@@ -5420,8 +5603,7 @@ assemblies:
   - accession: GCA_012977755.1
   - accession: GCA_012977765.1
   - accession: GCA_012978555.1
-  - accession: GCA_013010345.1
-  - accession: GCA_013085055.1
+  - accession: GCF_013085055.1
   - accession: GCA_013115115.1
   - accession: GCA_013115125.1
   - accession: GCA_013115135.1
@@ -5469,8 +5651,7 @@ assemblies:
   - accession: GCA_013266185.1
   - accession: GCA_013266195.1
   - accession: GCA_013266205.1
-  - accession: GCA_013266265.1
-  - accession: GCA_013340325.1
+  - accession: GCF_013340325.1
   - accession: GCA_013347345.2
   - accession: GCA_013347355.2
   - accession: GCA_013347365.1
@@ -5499,8 +5680,7 @@ assemblies:
   - accession: GCA_013396025.1
   - accession: GCA_013396035.1
   - accession: GCA_013396165.1
-  - accession: GCA_013396175.1
-  - accession: GCA_013396195.1
+  - accession: GCF_013396195.1
   - accession: GCA_013396205.1
   - accession: GCA_013396255.1
   - accession: GCA_013396295.1
@@ -5558,7 +5738,6 @@ assemblies:
   - accession: GCA_013759125.1
   - accession: GCA_013759275.1
   - accession: GCA_013781345.1
-  - accession: GCA_014117465.1
   - accession: GCA_014117485.1
   - accession: GCA_014281895.1
   - accession: GCA_014281915.1
@@ -5989,7 +6168,6 @@ assemblies:
   - accession: GCA_018398735.1
   - accession: GCA_018408605.1
   - accession: GCA_018408615.1
-  - accession: GCA_018416015.2
   - accession: GCA_018466975.1
   - accession: GCA_018804105.1
   - accession: GCA_018886245.1
@@ -6041,7 +6219,6 @@ assemblies:
   - accession: GCA_019426095.1
   - accession: GCA_019455505.1
   - accession: GCA_019455665.1
-  - accession: GCA_019609905.1
   - accession: GCA_019670925.1
   - accession: GCA_019670985.1
   - accession: GCA_019671045.1
@@ -6061,8 +6238,7 @@ assemblies:
   - accession: GCA_019843635.1
   - accession: GCA_019843785.1
   - accession: GCA_019843925.1
-  - accession: GCA_019880445.1
-  - accession: GCA_019915245.1
+  - accession: GCF_019915245.1
   - accession: GCA_019925425.1
   - accession: GCA_019925475.1
   - accession: GCA_019925495.1
@@ -6175,7 +6351,6 @@ assemblies:
   - accession: GCA_021498435.1
   - accession: GCA_021513745.1
   - accession: GCA_021513755.1
-  - accession: GCA_021653875.1
   - accession: GCA_021655865.1
   - accession: GCA_021655875.1
   - accession: GCA_021655885.1
@@ -6189,8 +6364,7 @@ assemblies:
   - accession: GCA_021853515.1
   - accession: GCA_021853525.1
   - accession: GCA_021854105.1
-  - accession: GCA_021901655.1
-  - accession: GCA_021901695.1
+  - accession: GCF_021901695.1
   - accession: GCA_022160315.1
   - accession: GCA_022160335.1
   - accession: GCA_022180325.1
@@ -6417,9 +6591,8 @@ assemblies:
   - accession: GCA_024244025.1
   - accession: GCA_024244035.1
   - accession: GCA_024244045.1
-  - accession: GCA_024244055.1
-  - accession: GCA_024244095.1
-  - accession: GCA_024244105.1
+  - accession: GCF_024244095.1
+  - accession: GCF_024244105.1
   - accession: GCA_024244115.1
   - accession: GCA_024271935.1
   - accession: GCA_024321985.1
@@ -6512,7 +6685,6 @@ assemblies:
   - accession: GCA_025428825.1
   - accession: GCA_025428875.1
   - accession: GCA_025433535.2
-  - accession: GCA_025433545.1
   - accession: GCA_025433555.1
   - accession: GCA_025433565.1
   - accession: GCA_025433615.1
@@ -6610,15 +6782,12 @@ assemblies:
   - accession: GCA_026229875.1
   - accession: GCA_026259865.1
   - accession: GCA_026261755.1
-  - accession: GCA_026262505.1
   - accession: GCA_026284195.1
   # - accession: GCA_026319385.1
   # - accession: GCA_026319405.1
   - accession: GCA_026743815.1
   - accession: GCA_026743835.1
-  - accession: GCA_026743845.1
-  - accession: GCA_026873545.1
-  - accession: GCA_026914185.1
+  - accession: GCF_026914185.1
   - accession: GCA_026914245.1
   - accession: GCA_026954515.1
   - accession: GCA_026955015.1
@@ -6752,8 +6921,7 @@ assemblies:
   - accession: GCA_029704095.1
   - accession: GCA_029747595.1
   - accession: GCA_029783905.1
-  - accession: GCA_029783925.1
-  - accession: GCA_029851405.1
+  - accession: GCF_029851405.1
   - accession: GCA_029962655.1
   - accession: GCA_030015405.1
   - accession: GCA_030020275.1
@@ -6855,10 +7023,8 @@ assemblies:
   - accession: GCA_035658335.1
   - accession: GCA_036288945.1
   - accession: GCA_036288975.1
-  - accession: GCA_036289345.1
-  - accession: GCA_036417295.1
+  - accession: GCF_036417295.1
   - accession: GCA_036428525.1
-  - accession: GCA_036630325.1
   - accession: GCA_036780745.1
   - accession: GCA_036783925.1
   # - accession: GCA_036867785.1
@@ -7307,13 +7473,9 @@ assemblies:
   - accession: GCA_052058495.1
   - accession: GCA_900000135.1
   # - accession: GCA_900002365.1
-  - accession: GCA_900004165.1
-  - accession: GCA_900007375.1
-  - accession: GCA_900044065.1
-  - accession: GCA_900067095.1
+  - accession: GCF_900007375.1
   - accession: GCA_900073075.1
   - accession: GCA_900074845.1
-  - accession: GCA_900079805.1
   - accession: GCA_900080155.1
   - accession: GCA_900096505.1
   - accession: GCA_900096615.1
@@ -8467,3 +8629,275 @@ assemblies:
   - accession: GCA_051170875.1
   #   assembly_name: TcSylvioHIFI_genome_1.0
   #   assembly_level: Chromosome
+  # Ixodes persulcatus
+  - accession: GCA_964199295.2
+  - accession: GCA_965286795.1
+  # Ixodes pacificus
+  - accession: GCA_964199305.2
+  # Ixodes hexagonus
+  - accession: GCA_964199285.2
+  # Aedes notoscriptus
+  - accession: GCA_040801935.1
+  # Aedes koreicus
+  - accession: GCA_024533555.2
+  - accession: GCA_034211335.2
+  # Aedes japonicus
+  - accession: GCA_052815935.1
+  - accession: GCA_034211315.2
+  # Aedes polynesiensis
+  - accession: GCA_051529985.1
+  # Uranotaenia lowii
+  - accession: GCF_029784155.1
+  # Ctenocephalides felis
+  - accession: GCF_003426905.1
+  # Xenopsylla cheopis
+  - accession: GCA_049309425.1
+  # Phlebotomus perniciosus
+  # common_name: sand fly P.perniciosus (2024)
+  - accession: GCA_918844115.2
+  # Liposcelis bostrychophila
+  - accession: GCA_037577465.1
+  # Liposcelis tricolor
+  - accession: GCA_042257085.1
+  # Menopon gallinae
+  - accession: GCA_040285465.1
+  # Mesopsocus fuscifrons
+  - accession: GCA_950004255.1
+  # Amphigerontia contaminata
+  - accession: GCA_977845675.1
+  # Loensia variegata
+  - accession: GCA_964261705.1
+  # Columbicola columbae
+  - accession: GCA_016920875.1
+  # Brueelia nebulosa
+  - accession: GCA_028293925.1
+  # Ricinus arcuatus
+  - accession: GCA_027475445.1
+  # Ricinus marginatus
+  - accession: GCA_028565995.1
+  # Polyplax serrata
+  - accession: GCA_037055365.1
+  # organism: Alternaria alternata
+  - accession: GCA_029891365.1
+  # organism: Alternaria alternata
+  - accession: GCA_020085065.1
+  # organism: Anopheles bellator
+  # organism: Anopheles coluzzii
+  # organism: Anopheles coluzzii
+  # organism: Anopheles coustani
+  # organism: Anopheles cruzii
+  # organism: Anopheles darlingi
+  # organism: Anopheles funestus
+  - accession: GCA_964033645.1
+  # organism: Anopheles funestus
+  # organism: Anopheles gambiae
+  # organism: Anopheles maculipalpis
+  # organism: Anopheles merus
+  # organism: Anopheles moucheti
+  # organism: Aspergillus cristatus
+  - accession: GCA_054825215.1
+  # organism: Aspergillus cristatus
+  - accession: GCA_044706195.1
+  # organism: Babesia caballi
+  - accession: GCA_053477425.1
+  # organism: Botrytis cinerea
+  - accession: GCA_039644125.1
+  # organism: Botrytis cinerea
+  - accession: GCA_022560135.1
+  # organism: Bremia lactucae
+  # organism: Caenorhabditis angaria
+  - accession: GCA_964213925.1
+  # organism: Caenorhabditis brenneri
+  - accession: GCA_964036135.1
+  # organism: Caenorhabditis briggsae
+  - accession: GCA_029581135.1
+  # organism: Caenorhabditis briggsae
+  - accession: GCA_022453885.1
+  # organism: Cordyceps militaris
+  - accession: GCA_049913855.1
+  # organism: Cryptococcus neoformans
+  - accession: GCA_052625715.1
+  # organism: Cryptococcus neoformans
+  - accession: GCA_020975705.1
+  # organism: Cryptococcus neoformans RSA-MW-1186
+  - accession: GCA_053525195.1
+  # organism: Cryptococcus neoformans RSA-MW-3179
+  - accession: GCA_053525155.1
+  # organism: Cryptococcus neoformans RSA-MW-3316
+  - accession: GCA_053525145.1
+  # organism: Cryptococcus neoformans RSA-MW-3335
+  - accession: GCA_053525215.1
+  # organism: Cryptococcus neoformans RSA-MW-36
+  - accession: GCA_053525205.1
+  # organism: Cryptococcus neoformans RSA-MW-3877
+  - accession: GCA_053525095.1
+  # organism: Cryptococcus neoformans RSA-MW-4119
+  - accession: GCA_053525135.1
+  # organism: Cryptococcus neoformans RSA-MW-506
+  - accession: GCA_053525075.1
+  # organism: Cryptococcus neoformans RSA-MW-5465
+  - accession: GCA_053525085.1
+  # organism: Cryptosporidium meleagridis
+  - accession: GCA_039657295.1
+  # organism: Culex pipiens pallens
+  # organism: Debaryomyces hansenii
+  - accession: GCA_036689635.1
+  # organism: Debaryomyces hansenii
+  - accession: GCA_028609645.1
+  # organism: Debaryomyces hansenii
+  - accession: GCA_028412075.1
+  # organism: Dermacentor andersoni
+  # organism: Dictyocaulus viviparus
+  - accession: GCA_964187775.1
+  # organism: Echinococcus canadensis
+  - accession: GCA_052523225.1
+  # organism: Echinococcus multilocularis
+  - accession: GCA_052522705.1
+  # organism: Eimeria praecox
+  - accession: GCA_963920595.1
+  # organism: Fusarium falciforme
+  - accession: GCF_026873545.1
+  # organism: Fusarium keratoplasticum
+  - accession: GCF_025433545.1
+  # organism: Fusarium luffae
+  - accession: GCA_054821325.1
+  # organism: Fusarium oxysporum
+  - accession: GCA_054643155.1
+  # organism: Fusarium oxysporum f. sp. cubense
+  - accession: GCA_053754955.1
+  # organism: Fusarium oxysporum f. sp. cubense
+  - accession: GCA_053754965.1
+  # organism: Fusarium oxysporum f. sp. phaseoli
+  - accession: GCA_054643655.1
+  # organism: Fusarium oxysporum f. sp. phaseoli
+  - accession: GCA_054130785.1
+  # organism: Fusarium poae
+  - accession: GCF_019609905.1
+  # organism: Fusarium verticillioides
+  - accession: GCA_053843395.1
+  # organism: Haemonchus contortus
+  - accession: GCA_041937105.1
+  # organism: Heterodera glycines
+  - accession: GCA_052402725.1
+  # organism: Heterodera glycines
+  - accession: GCA_049307805.1
+  # organism: Heterodera glycines
+  - accession: GCA_046862005.1
+  # organism: Heterodera glycines
+  - accession: GCA_046862275.1
+  # organism: Heterodera glycines
+  - accession: GCA_046862185.1
+  # organism: Heterodera glycines
+  - accession: GCA_046862775.1
+  # organism: Heterodera glycines
+  - accession: GCA_040805705.1
+  # organism: Heterodera glycines
+  - accession: GCA_040805935.1
+  # organism: Kwoniella bestiolae CBS 10118
+  # organism: Kwoniella dejecticola CBS 10117
+  # organism: Kwoniella mangroviensis CBS 8507
+  # organism: Leishmania orientalis
+  # organism: Leishmania panamensis
+  - accession: GCA_000755165.2
+  # organism: Leishmania panamensis
+  - accession: GCA_041682215.1
+  # organism: Leishmania panamensis
+  - accession: GCA_041682195.1
+  # organism: Leishmania sp. Ghana 2012 LV757
+  # organism: Litomosoides sigmodontis
+  - accession: GCA_963070105.1
+  # organism: Lutzomyia longipalpis
+  # organism: Malassezia pachydermatis
+  - accession: GCA_047368035.1
+  # organism: Nakaseomyces glabratus
+  - accession: GCA_052692795.1
+  # organism: Necator americanus
+  # organism: Opisthorchis viverrini
+  - accession: GCA_964213165.1
+  # organism: Panagrolaimus sp. JU765
+  - accession: GCA_964245515.1
+  # organism: Parascaris univalens
+  - accession: GCA_037576465.1
+  # organism: Phlebotomus papatasi
+  # organism: Phytophthora infestans
+  - accession: GCA_026225685.1
+  # organism: Phytophthora sojae
+  - accession: GCA_039619315.1
+  # organism: Phytophthora sojae
+  - accession: GCA_030279015.1
+  # organism: Phytophthora sojae
+  - accession: GCA_030279065.1
+  # organism: Phytophthora sojae
+  - accession: GCA_030279045.1
+  # organism: Phytophthora sojae
+  - accession: GCA_030279085.1
+  # organism: Phytophthora sojae
+  - accession: GCA_030278985.1
+  # organism: Phytophthora sojae
+  - accession: GCA_030279125.1
+  # organism: Phytophthora sojae
+  - accession: GCA_030279095.1
+  # organism: Phytophthora sojae
+  - accession: GCA_030279005.1
+  # organism: Plasmodium brasilianum
+  # organism: Plasmodium falciparum
+  - accession: GCA_977926795.1
+  # organism: Plasmodium falciparum
+  - accession: GCA_977926835.1
+  # organism: Plasmodium falciparum
+  - accession: GCA_977926805.1
+  # organism: Plasmodium falciparum
+  - accession: GCA_032712205.1
+  # organism: Plasmodium falciparum
+  - accession: GCA_019802425.2
+  # organism: Plasmodium falciparum
+  - accession: GCA_019802405.2
+  # organism: Plasmodium falciparum
+  - accession: GCA_019802415.2
+  # organism: Plasmodium falciparum
+  - accession: GCA_019802515.2
+  # organism: Plasmodium falciparum
+  - accession: GCA_024442135.1
+  # organism: Plasmodium malariae
+  - accession: GCA_977926885.1
+  # organism: Saccharomycodes ludwigii
+  # organism: Saccharomycodes ludwigii
+  - accession: GCF_020623625.1
+  # organism: Saccharomycodes ludwigii
+  - accession: GCA_020623615.1
+  # organism: Saccharomycodes ludwigii
+  - accession: GCA_020623605.1
+  # organism: Schistosoma bovis
+  - accession: GCA_944470425.2
+  # organism: Schistosoma bovis
+  - accession: GCA_944470445.2
+  # organism: Schistosoma curassoni
+  - accession: GCA_944474815.3
+  # organism: Schistosoma japonicum
+  - accession: GCA_021461655.1
+  # organism: Sporisorium scitamineum
+  - accession: GCA_053455765.1
+  # organism: Sporisorium scitamineum
+  - accession: GCA_052862845.1
+  # organism: Sporisorium scitamineum
+  - accession: GCA_052862935.1
+  # organism: Stomoxys calcitrans
+  # organism: Stomoxys calcitrans
+  - accession: GCF_963082655.1
+  # organism: Thelazia callipaeda
+  - accession: GCA_965194785.1
+  # organism: Trichoderma atroviride
+  - accession: GCA_041380925.1
+  # organism: Trichoderma atroviride
+  - accession: GCA_041053265.1
+  # organism: Trichoderma atroviride
+  # organism: Trichoderma atroviride
+  - accession: GCF_020647795.1
+  # organism: Trichoderma virens
+  - accession: GCA_020647635.1
+  # organism: Trichoderma virens FT-333
+  - accession: GCA_020647705.1
+  # organism: Vairimorpha necatrix
+  - accession: GCF_036630325.1
+  # organism: Verticillium dahliae
+  - accession: GCA_030450075.1
