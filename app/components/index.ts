@@ -38,6 +38,7 @@ export {
   Branding,
   GA2Branding,
 } from "./Layout/components/Footer/components/Branding/branding";
+export { VersionInfoWithServerStatus } from "./Layout/components/Footer/components/VersionInfoWithServerStatus/versionInfoWithServerStatus";
 export { AnalyzeGenome } from "./Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 export { TypographyWordBreak } from "@databiosphere/findable-ui/lib/components/common/Typography/TypographyWordBreak/TypographyWordBreak";
 export { MDXSection } from "./Entity/components/Section/MDXSection/mdxSection";

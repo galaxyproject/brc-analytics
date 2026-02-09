@@ -1,5 +1,4 @@
-import { JSX } from "react";
-import { Fragment } from "react";
+import { Fragment, JSX } from "react";
 import { SectionAnalytics } from "../../components/Home/components/Section/components/SectionAnalytics/sectionAnalytics";
 import { SectionAssemblies } from "../../components/Home/components/Section/components/SectionAssemblies/sectionAssemblies";
 import { SectionHelp } from "../../components/Home/components/Section/components/SectionHelp/sectionHelp";

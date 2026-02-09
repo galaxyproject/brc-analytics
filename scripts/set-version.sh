@@ -12,13 +12,9 @@ GIT_HASH=$(git rev-parse HEAD)
 # Get the current date and time in PST
 BUILD_DATE=$(TZ="America/Los_Angeles" date +"%Y-%m-%d %H:%M:%S %Z")
 
-# Get the current code version from git
-# Using git describe to handle commits after tags gracefully
-# This will show:
-# - "v0.13.0" when HEAD is exactly on a tag
-# - "v0.13.0-2-g1234567" when HEAD is 2 commits after v0.13.0
-# - Just the commit hash if no tags exist
-VERSION=$(git describe --tags --always 2>/dev/null || git rev-parse --short HEAD)
+# Read version from package.json rather than git tags, since the next
+# release version is set there before the tag exists.
+VERSION="v$(node -p "require('./package.json').version")"
 
 # Append newline to ensure following lines are separated from existing content
 echo "" >> "$TARGET_ENV_FILE"
