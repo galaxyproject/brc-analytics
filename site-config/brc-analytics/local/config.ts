@@ -1,3 +1,4 @@
+import { createElement } from "react";
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import {
@@ -76,7 +77,7 @@ export function makeConfig(
           },
         ],
         socials: socialMedia.socials,
-        versionInfo: true,
+        versionInfo: createElement(C.VersionInfoWithServerStatus),
       },
       header: {
         logo: C.Logo({
