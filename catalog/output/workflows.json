@@ -383,6 +383,78 @@
         "trsId": "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.14",
         "workflowDescription": "Complete CUT&RUN/CUT&TAG analysis workflow for paired-end sequencing data. Processes raw FASTQ files through adapter removal (cutadapt) and alignment (Bowtie2 with dovetail option enabled). Applies quality filtering (MAPQ ≥ 30, concordant pairs only), converts BAM to BED format, and performs peak calling using MACS2 with parameters optimized for the punctate signal profile characteristic of CUT&RUN/CUT&TAG experiments.",
         "workflowName": "CUT&RUN/CUT&TAG Analysis: Protein-DNA Interaction Mapping"
+      },
+      {
+        "iwcId": "hic-hicup-cooler-chic-fastq-to-cool-hicup-cooler",
+        "parameters": [
+          {
+            "key": "PE fastq input",
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "library_layout": "PAIRED",
+              "library_strategy": [
+                "Hi-C"
+              ]
+            }
+          },
+          {
+            "key": "genome name",
+            "variable": "ASSEMBLY_ID"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": "131567",
+        "trsId": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/chic-fastq-to-cool-hicup-cooler/versions/v0.3",
+        "workflowDescription": "End-to-end processing of Capture Hi-C paired-end sequencing data. Transforms raw FASTQ files into balanced contact matrices using HiCUP for processing Hi-C reads (adapter trimming, mapping, filtering for valid pairs) with additional filtering for MAPQ and captured regions. The workflow generates sorted tabix files via cooler and produces balanced cool files at user-specified resolution for downstream analysis and visualization.",
+        "workflowName": "Capture Hi-C Processing: FASTQ to Balanced Cool Files"
+      },
+      {
+        "iwcId": "hic-hicup-cooler-hic-fastq-to-cool-hicup-cooler",
+        "parameters": [
+          {
+            "key": "PE fastq input",
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "library_layout": "PAIRED",
+              "library_strategy": [
+                "Hi-C"
+              ]
+            }
+          },
+          {
+            "key": "genome name",
+            "variable": "ASSEMBLY_ID"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": "131567",
+        "trsId": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-cool-hicup-cooler/versions/v0.3",
+        "workflowDescription": "Comprehensive Hi-C data processing workflow that converts paired-end FASTQ files to balanced contact matrices. Uses HiCUP for pre-processing (adapter trimming, mapping, filtering) with fragment midpoint coordinate assignment, filters reads by mapping quality, and generates sorted tabix files. The final output is a balanced cool file at user-specified resolution created with cooler, ready for multi-resolution contact matrix analysis.",
+        "workflowName": "Hi-C Processing: FASTQ to Balanced Cool Files"
+      },
+      {
+        "iwcId": "hic-hicup-cooler-hic-fastq-to-pairs-hicup",
+        "parameters": [
+          {
+            "key": "PE fastq input",
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "library_layout": "PAIRED",
+              "library_strategy": [
+                "Hi-C"
+              ]
+            }
+          },
+          {
+            "key": "genome name",
+            "variable": "ASSEMBLY_ID"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": "131567",
+        "trsId": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-pairs-hicup/versions/v0.3",
+        "workflowDescription": "Processes Hi-C paired-end FASTQ files to generate validated interaction pairs using HiCUP. The workflow truncates reads at ligation junctions, maps to reference genome, assigns to restriction fragments, and filters out experimental artifacts (self-ligated, dangling ends, internal fragments, and size outliers). Removes duplicates and converts outputs to formats compatible with Juicebox/cooler using fragment midpoints as coordinates. Final filtering by mapping quality ensures high-confidence interaction data.",
+        "workflowName": "Hi-C Data Processing: FASTQ to Valid Interaction Pairs"
       }
     ]
   },
