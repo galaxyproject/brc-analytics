@@ -4,7 +4,7 @@ import json
 import logging
 import secrets
 import time
-from typing import Any, Dict, Optional
+from typing import Any
 from urllib.parse import urlencode
 
 import httpx
@@ -29,7 +29,7 @@ class AuthService:
 
     def __init__(self, redis_url: str):
         self._redis = redis.from_url(redis_url, decode_responses=True)
-        self._oidc_config: Optional[Dict[str, Any]] = None
+        self._oidc_config: dict[str, Any] | None = None
         self._http_client = httpx.AsyncClient(timeout=10.0)
         self._settings = get_settings()
 
@@ -49,7 +49,7 @@ class AuthService:
     def _redirect_uri(self) -> str:
         return self._settings.KEYCLOAK_REDIRECT_URI
 
-    async def get_oidc_config(self) -> Dict[str, Any]:
+    async def get_oidc_config(self) -> dict[str, Any]:
         """Fetch and cache the OIDC discovery document."""
         if self._oidc_config is not None:
             return self._oidc_config
@@ -100,7 +100,7 @@ class AuthService:
 
         return f"{auth_endpoint}?{urlencode(params)}", state
 
-    async def exchange_code(self, code: str, state: str) -> Dict[str, Any]:
+    async def exchange_code(self, code: str, state: str) -> dict[str, Any]:
         """Exchange an authorization code for tokens.
 
         Validates the state parameter and uses the stored PKCE verifier.
@@ -131,7 +131,7 @@ class AuthService:
         resp.raise_for_status()
         return resp.json()
 
-    async def refresh_tokens(self, refresh_token: str) -> Optional[Dict[str, Any]]:
+    async def refresh_tokens(self, refresh_token: str) -> dict[str, Any] | None:
         """Use a refresh token to get new access/refresh tokens."""
         try:
             oidc = await self.get_oidc_config()
@@ -155,7 +155,7 @@ class AuthService:
             )
             return None
 
-    async def create_session(self, token_response: Dict[str, Any]) -> str:
+    async def create_session(self, token_response: dict[str, Any]) -> str:
         """Store tokens in Redis and return an opaque session ID."""
         session_id = secrets.token_urlsafe(32)
         session_data = {
@@ -173,7 +173,7 @@ class AuthService:
         )
         return session_id
 
-    async def get_session(self, session_id: str) -> Optional[Dict[str, Any]]:
+    async def get_session(self, session_id: str) -> dict[str, Any] | None:
         """Retrieve session data from Redis."""
         raw = await self._redis.get(f"{SESSION_PREFIX}{session_id}")
         if not raw:
@@ -185,7 +185,7 @@ class AuthService:
         result = await self._redis.delete(f"{SESSION_PREFIX}{session_id}")
         return result > 0
 
-    def decode_token_claims(self, token: str) -> Dict[str, Any]:
+    def decode_token_claims(self, token: str) -> dict[str, Any]:
         """Decode a JWT without signature verification.
 
         We skip verification here because the token was obtained directly
@@ -203,7 +203,7 @@ class AuthService:
             logger.error("Failed to decode token: %s", e)
             return {}
 
-    async def get_user_info(self, session_id: str) -> Optional[Dict[str, Any]]:
+    async def get_user_info(self, session_id: str) -> dict[str, Any] | None:
         """Extract user info from the session's access token.
 
         If the access token is expired, attempts a refresh first.
