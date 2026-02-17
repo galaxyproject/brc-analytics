@@ -8,6 +8,7 @@ import { ParsedUrlQuery } from "querystring";
 import {
   BRCCatalog,
   EntitiesResponse,
+  WorkflowCategory,
 } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { config } from "../../../app/config/config";
 import { seedDatabase } from "../../../app/utils/seedDatabase";
@@ -15,6 +16,7 @@ import { StyledExploreView } from "../../../app/views/ExploreView/exploreView.st
 import { PriorityPathogensView } from "../../../app/views/PriorityPathogensView/priorityPathogensView";
 import { Outbreak } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { GA2Catalog } from "../../../app/apis/catalog/ga2/entities";
+import { WorkflowsView } from "app/views/WorkflowsView/workflowsView";
 
 interface PageUrl extends ParsedUrlQuery {
   entityListType: string;
@@ -45,6 +47,15 @@ const IndexPage = <R,>({
     // Return the PriorityPathogensView component.
     return (
       <PriorityPathogensView data={props.data as EntitiesResponse<Outbreak>} />
+    );
+  }
+
+  // Return the WorkflowsView component for the workflows route.
+  if (entityListType === "workflows") {
+    // Throw an error if no workflow data is provided.
+    if (!props.data) throw new Error("No workflow data provided");
+    return (
+      <WorkflowsView data={props.data as EntitiesResponse<WorkflowCategory>} />
     );
   }
 
