@@ -19,6 +19,7 @@ interface BrcUser {
 
 interface AuthContextValue {
   isAuthenticated: boolean;
+  isConfigured: boolean;
   isLoading: boolean;
   login: () => void;
   logout: () => Promise<void>;
@@ -27,6 +28,7 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue>({
   isAuthenticated: false,
+  isConfigured: false,
   isLoading: true,
   login: () => {},
   logout: async () => {},
@@ -37,12 +39,15 @@ const AuthContext = createContext<AuthContextValue>({
  * Provides authentication state via the BFF auth endpoints.
  * @param props - Component props.
  * @param props.children - Child components.
+ * @param props.loginEnabled - Whether login UI should be shown.
  * @returns auth context provider wrapping children.
  */
 export function BrcAuthProvider({
   children,
+  loginEnabled = false,
 }: {
   children: ReactNode;
+  loginEnabled?: boolean;
 }): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<BrcUser | null>(null);
@@ -88,6 +93,7 @@ export function BrcAuthProvider({
     <AuthContext.Provider
       value={{
         isAuthenticated: !!user,
+        isConfigured: loginEnabled && !!BACKEND_URL,
         isLoading,
         login,
         logout,

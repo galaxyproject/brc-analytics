@@ -8,9 +8,10 @@ import { AuthButtonWrapper } from "./authButton.styles";
  * @returns auth button element, or null while loading.
  */
 export function AuthButton(): JSX.Element | null {
-  const { isAuthenticated, isLoading, login, logout, user } = useAuth();
+  const { isAuthenticated, isConfigured, isLoading, login, logout, user } =
+    useAuth();
 
-  if (isLoading) return null;
+  if (!isConfigured || isLoading) return null;
 
   if (!isAuthenticated) {
     return (

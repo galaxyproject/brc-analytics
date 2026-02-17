@@ -91,7 +91,7 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
           <ServicesProvider>
             <SystemStatusProvider>
               <GoogleSignInAuthenticationProvider>
-                <BrcAuthProvider>
+                <BrcAuthProvider loginEnabled={appConfig.loginEnabled}>
                   <LayoutDimensionsProvider>
                     <AppLayout>
                       <DXHeader {...filteredHeader} />
