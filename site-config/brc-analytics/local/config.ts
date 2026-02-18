@@ -94,7 +94,7 @@ export function makeConfig(
             { label: "Organisms", url: ROUTES.ORGANISMS },
             { label: "Assemblies", url: ROUTES.GENOMES },
             { label: "Priority Pathogens", url: ROUTES.PRIORITY_PATHOGENS },
-            { label: "Assistant", url: ROUTES.ASSISTANT },
+
             {
               flatten: { lg: true, md: true, sm: false, xs: true },
               label: "More",
