@@ -50,6 +50,7 @@ export const useTable = <T>(
     getFilteredRowModel: getFilteredRowModel(),
     getRowId,
     getSortedRowModel: getSortedRowModel(),
+    manualPagination: true,
     meta,
     ...tableOptions,
   });
