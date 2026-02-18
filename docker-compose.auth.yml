@@ -1,6 +1,8 @@
 services:
   keycloak:
-    image: quay.io/keycloak/keycloak:26.0
+    build:
+      context: ./backend
+      dockerfile: keycloak/Dockerfile
     command:
       - start-dev
       - --import-realm
@@ -44,6 +46,10 @@ services:
   keycloak-init:
     image: quay.io/keycloak/keycloak:26.0
     entrypoint: ["bash", "/scripts/init-galaxy-scope.sh"]
+    environment:
+      GALAXY_DB_URL: "${GALAXY_DB_URL:-jdbc:postgresql://galaxy-postgres:5432/galaxy}"
+      GALAXY_DB_USER: "${GALAXY_DB_USER:-galaxy}"
+      GALAXY_DB_PASSWORD: "${GALAXY_DB_PASSWORD:-}"
     volumes:
       - ./backend/keycloak/init-galaxy-scope.sh:/scripts/init-galaxy-scope.sh:ro
     depends_on:
@@ -90,14 +96,31 @@ services:
       retries: 3
       start_period: 10s
 
+  galaxy-postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: galaxy
+      POSTGRES_USER: galaxy
+      POSTGRES_PASSWORD: galaxy
+    volumes:
+      - galaxy_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U galaxy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   galaxy:
     image: quay.io/bgruening/galaxy:24.1
     ports:
       - "8080:80"
     environment:
+      GALAXY_CONFIG_ADMIN_USERS: admin@galaxy.org
+      GALAXY_DEFAULT_ADMIN_KEY: admin
       GALAXY_CONFIG_ENABLE_OIDC: "true"
       GALAXY_CONFIG_OIDC_CONFIG_FILE: /export/galaxy/config/oidc_config.xml
       GALAXY_CONFIG_OIDC_BACKENDS_CONFIG_FILE: /export/galaxy/config/oidc_backends_config.xml
+      GALAXY_CONFIG_DATABASE_CONNECTION: "postgresql://galaxy:galaxy@galaxy-postgres:5432/galaxy"
     volumes:
       - galaxy_data:/export
       - ./backend/galaxy/oidc_config.xml:/export/galaxy/config/oidc_config.xml:ro
@@ -105,8 +128,23 @@ services:
     depends_on:
       keycloak:
         condition: service_healthy
+      galaxy-postgres:
+        condition: service_healthy
+
+  galaxy-seed:
+    image: curlimages/curl:latest
+    entrypoint: ["sh", "/scripts/seed-test-user.sh"]
+    environment:
+      GALAXY_URL: http://galaxy:80
+      GALAXY_DEFAULT_ADMIN_KEY: admin
+    volumes:
+      - ./backend/galaxy/seed-test-user.sh:/scripts/seed-test-user.sh:ro
+    depends_on:
+      galaxy:
+        condition: service_started
 
 volumes:
   keycloak_db_data:
   redis_data:
+  galaxy_pg_data:
   galaxy_data:

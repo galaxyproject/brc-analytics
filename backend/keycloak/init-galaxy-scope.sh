@@ -57,7 +57,7 @@ fi
 # and it requires "<prefix>:*" in the token's scope claim.
 API_SCOPE_NAME="https://galaxyproject.org/api:*"
 API_SCOPE_ID=$($KCADM get client-scopes -r "$REALM" --fields id,name --format csv --noquotes 2>/dev/null \
-  | grep ",${API_SCOPE_NAME}\$" | sed 's/,.*//' || true)
+  | grep -F ",${API_SCOPE_NAME}" | sed 's/,.*//' || true)
 
 if [ -n "$API_SCOPE_ID" ]; then
   echo "$API_SCOPE_NAME scope already exists (id=$API_SCOPE_ID)."
@@ -79,5 +79,40 @@ CLIENT_UUID=$($KCADM get clients -r "$REALM" --fields id,clientId --format csv -
 echo "Assigning scopes as defaults to brc-analytics (uuid=$CLIENT_UUID)..."
 $KCADM update "clients/$CLIENT_UUID/default-client-scopes/$SCOPE_ID" -r "$REALM"
 $KCADM update "clients/$CLIENT_UUID/default-client-scopes/$API_SCOPE_ID" -r "$REALM"
+
+# --- Galaxy User Federation Provider ---
+# Configure the Galaxy User Storage SPI so Keycloak authenticates users
+# against Galaxy's galaxy_user table (PBKDF2-SHA256 password hashes).
+
+# Keycloak 26 enables VERIFY_PROFILE by default, which forces users to
+# complete their profile (first/last name) on first login. Federated
+# Galaxy users don't have these fields, so disable it.
+echo "Disabling VERIFY_PROFILE required action..."
+$KCADM update "authentication/required-actions/VERIFY_PROFILE" -r "$REALM" -s enabled=false
+
+GALAXY_DB_URL="${GALAXY_DB_URL:-jdbc:postgresql://galaxy-postgres:5432/galaxy}"
+GALAXY_DB_USER="${GALAXY_DB_USER:-galaxy}"
+GALAXY_DB_PASSWORD="${GALAXY_DB_PASSWORD:-}"
+
+# Check if federation provider already exists
+FED_ID=$($KCADM get components -r "$REALM" --fields id,name --format csv --noquotes 2>/dev/null \
+  | grep ',galaxy-users$' | sed 's/,.*//' || true)
+
+if [ -n "$FED_ID" ]; then
+  echo "Galaxy user federation provider already exists (id=$FED_ID)."
+else
+  echo "Creating Galaxy user federation provider..."
+  FED_ID=$($KCADM create components -r "$REALM" \
+    -s name=galaxy-users \
+    -s providerId=galaxy-user-provider \
+    -s providerType=org.keycloak.storage.UserStorageProvider \
+    -s 'config.jdbcUrl=["'"$GALAXY_DB_URL"'"]' \
+    -s 'config.dbUser=["'"$GALAXY_DB_USER"'"]' \
+    -s 'config.dbPassword=["'"$GALAXY_DB_PASSWORD"'"]' \
+    -s 'config.priority=["0"]' \
+    -s 'config.cachePolicy=["NO_CACHE"]' \
+    -i)
+  echo "Created Galaxy user federation provider (id=$FED_ID)."
+fi
 
 echo "Done."
