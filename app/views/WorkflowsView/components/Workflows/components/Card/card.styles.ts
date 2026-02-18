@@ -1,7 +1,4 @@
-import {
-  bpDownMd,
-  bpDownSm,
-} from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
+import { bpDownSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
 import { Card } from "@mui/material";
 
@@ -23,8 +20,8 @@ export const StyledCard = styled(Card)`
     flex: 1;
   }
 
-  ${bpDownMd} {
-    grid-column: auto / span 6;
+  ${({ theme }) => theme.breakpoints.up(1920)} {
+    grid-column: auto / span 4;
   }
 
   ${bpDownSm} {

@@ -7,7 +7,8 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import React, { JSX } from "react";
+import { JSX } from "react";
+import { TruncatedText } from "app/components/common/TruncatedText/truncatedText";
 import { StyledCard } from "./card.styles";
 import { Props } from "./types";
 import Link from "next/link";
@@ -40,7 +41,7 @@ export const Card = ({ row }: Props): JSX.Element => {
             color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
             variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
           >
-            {row.original.workflowDescription}
+            <TruncatedText>{row.original.workflowDescription}</TruncatedText>
           </Typography>
         </Stack>
       </CardContent>
