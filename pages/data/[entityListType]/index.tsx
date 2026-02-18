@@ -8,7 +8,6 @@ import { ParsedUrlQuery } from "querystring";
 import {
   BRCCatalog,
   EntitiesResponse,
-  WorkflowCategory,
 } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { config } from "../../../app/config/config";
 import { seedDatabase } from "../../../app/utils/seedDatabase";
@@ -16,9 +15,6 @@ import { StyledExploreView } from "../../../app/views/ExploreView/exploreView.st
 import { PriorityPathogensView } from "../../../app/views/PriorityPathogensView/priorityPathogensView";
 import { Outbreak } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { GA2Catalog } from "../../../app/apis/catalog/ga2/entities";
-import { WorkflowsView } from "app/views/WorkflowsView/workflowsView";
-import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
-import NextError from "next/error";
 
 interface PageUrl extends ParsedUrlQuery {
   entityListType: string;
@@ -39,8 +35,6 @@ const IndexPage = <R,>({
   entityListType,
   ...props
 }: EntitiesPageProps<R>): JSX.Element => {
-  const isWorkflowsEnabled = useFeatureFlag("workflows");
-
   if (!entityListType) return <></>;
 
   // Return the PriorityPathogensView component for the priority pathogens route.
@@ -51,19 +45,6 @@ const IndexPage = <R,>({
     // Return the PriorityPathogensView component.
     return (
       <PriorityPathogensView data={props.data as EntitiesResponse<Outbreak>} />
-    );
-  }
-
-  // Return the WorkflowsView component for the workflows route.
-  if (entityListType === "workflows") {
-    // Throw an error if the workflows feature is not enabled.
-    if (!isWorkflowsEnabled) return <NextError statusCode={404} />;
-
-    // Throw an error if no workflow data is provided.
-    if (!props.data) throw new Error("No workflow data provided");
-
-    return (
-      <WorkflowsView data={props.data as EntitiesResponse<WorkflowCategory>} />
     );
   }
 
