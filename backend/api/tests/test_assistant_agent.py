@@ -3,6 +3,14 @@
 from unittest.mock import MagicMock
 
 import pytest
+from pydantic_ai.messages import (
+    ModelRequest,
+    ModelResponse,
+    TextPart,
+    ToolCallPart,
+    ToolReturnPart,
+    UserPromptPart,
+)
 
 from app.models.assistant import (
     AnalysisSchema,
@@ -10,7 +18,7 @@ from app.models.assistant import (
     SchemaField,
     SuggestionChip,
 )
-from app.services.assistant_agent import AssistantAgent
+from app.services.assistant_agent import MAX_HISTORY_MESSAGES, AssistantAgent
 
 
 @pytest.fixture()
@@ -227,3 +235,87 @@ class TestApplySchemaUpdates:
         result = agent._apply_schema_updates(schema, {"assembly": "GCF_000146045.2"})
         assert result.organism.value == "Existing"
         assert result.assembly.detail == "GCF_000146045.2"
+
+
+# ---------- _truncate_history ----------
+
+
+def _make_user_msg(text: str) -> ModelRequest:
+    return ModelRequest(parts=[UserPromptPart(content=text)])
+
+
+def _make_assistant_msg(text: str) -> ModelResponse:
+    return ModelResponse(parts=[TextPart(content=text)])
+
+
+def _make_tool_turn() -> list:
+    """Simulate a tool-heavy turn: request with tool call, response with tool return,
+    follow-up request, and final assistant response — 4 messages total."""
+    return [
+        ModelRequest(parts=[UserPromptPart(content="run tool")]),
+        ModelResponse(
+            parts=[
+                ToolCallPart(
+                    tool_name="search", args={"q": "yeast"}, tool_call_id="tc1"
+                )
+            ]
+        ),
+        ModelRequest(
+            parts=[
+                ToolReturnPart(
+                    tool_name="search", content="results", tool_call_id="tc1"
+                )
+            ]
+        ),
+        ModelResponse(parts=[TextPart(content="Here are the results.")]),
+    ]
+
+
+class TestTruncateHistory:
+    def test_short_history_unchanged(self, agent):
+        msgs = [_make_user_msg("hi"), _make_assistant_msg("hello")]
+        result = AssistantAgent._truncate_history(msgs)
+        assert result == msgs
+        assert result is msgs  # same list object, no copy
+
+    def test_long_history_truncated(self, agent):
+        first = _make_user_msg("original question")
+        rest = [
+            _make_user_msg(f"msg-{i}")
+            if i % 2 == 0
+            else _make_assistant_msg(f"reply-{i}")
+            for i in range(MAX_HISTORY_MESSAGES + 10)
+        ]
+        history = [first] + rest
+        result = AssistantAgent._truncate_history(history)
+
+        assert len(result) == MAX_HISTORY_MESSAGES + 1
+        assert result[0] is first
+        assert result[1:] == rest[-MAX_HISTORY_MESSAGES:]
+
+    def test_tool_heavy_turns(self, agent):
+        first = _make_user_msg("start")
+        turns = []
+        while len(turns) < MAX_HISTORY_MESSAGES + 8:
+            turns.extend(_make_tool_turn())
+        history = [first] + turns
+        result = AssistantAgent._truncate_history(history)
+
+        assert len(result) == MAX_HISTORY_MESSAGES + 1
+        assert result[0] is first
+
+    def test_exact_boundary_no_truncation(self, agent):
+        msgs = [_make_user_msg(f"msg-{i}") for i in range(MAX_HISTORY_MESSAGES)]
+        result = AssistantAgent._truncate_history(msgs)
+        assert result is msgs
+
+    def test_one_over_boundary_triggers_truncation(self, agent):
+        msgs = [_make_user_msg(f"msg-{i}") for i in range(MAX_HISTORY_MESSAGES + 1)]
+        result = AssistantAgent._truncate_history(msgs)
+        assert len(result) == MAX_HISTORY_MESSAGES + 1
+        assert result[0] is msgs[0]
+        assert result[-1] is msgs[-1]
+
+    def test_empty_history(self, agent):
+        result = AssistantAgent._truncate_history([])
+        assert result == []
