@@ -1,8 +1,4 @@
-"""Pydantic-ai tool functions for the analysis assistant.
-
-These are registered on the Agent and called by the LLM during conversations.
-Each tool receives the RunContext which carries CatalogData as a dependency.
-"""
+"""Tool functions for the assistant agent."""
 
 from __future__ import annotations
 
@@ -15,15 +11,7 @@ from app.services.tools.catalog_data import CatalogData
 
 @dataclass
 class AssistantDeps:
-    """Dependencies injected into every tool call via RunContext."""
-
     catalog: CatalogData
-
-
-# ------------------------------------------------------------------
-# Tool functions — plain functions (no RunContext) where possible,
-# context-aware when they need deps.
-# ------------------------------------------------------------------
 
 
 def search_organisms(deps: AssistantDeps, query: str) -> str:

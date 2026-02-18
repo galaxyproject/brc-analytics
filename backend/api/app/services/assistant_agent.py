@@ -1,12 +1,9 @@
-"""Analysis assistant agent — orchestrates multi-turn conversations.
+"""Analysis assistant agent using pydantic-ai."""
 
-Uses pydantic-ai to manage the LLM, tools, and message history.
-The agent's system prompt defines its persona and analysis-guidance behavior.
-Session state (conversation history, analysis schema) lives in Redis via SessionService.
-"""
-
+import inspect
 import json
 import logging
+import re
 from typing import Any, Dict, List, Optional
 
 from pydantic_ai import Agent, RunContext, Tool
@@ -55,8 +52,7 @@ through the decisions needed to configure a workflow: which organism, which \
 reference assembly, which workflow, what kind of data they have. Keep track of \
 their choices and let them know what's still needed.
 
-These aren't separate modes — they're a natural spectrum. A conversation may \
-start exploratory and organically move toward setting up a specific analysis.
+Conversations may shift between exploration and guided setup naturally.
 
 ## Tools at your disposal
 
@@ -129,9 +125,6 @@ def _wrap_tool(fn):
 
     wrapper.__name__ = fn.__name__
     wrapper.__doc__ = fn.__doc__
-    # Copy annotations for parameter schemas (skip 'deps')
-    import inspect
-
     sig = inspect.signature(fn)
     params = {k: v for k, v in sig.parameters.items() if k != "deps"}
     wrapper.__signature__ = sig.replace(
@@ -194,7 +187,10 @@ class AssistantAgent:
         logger.info("Assistant agent initialized")
 
     def _build_model(self, model_name: str):
-        """Build a pydantic-ai model from the configured provider."""
+        """Build a pydantic-ai model from the configured provider.
+
+        TODO: Shares logic with LLMService.__init__; extract a shared utility.
+        """
         settings = self.settings
         base_url = settings.AI_API_BASE_URL
 
@@ -321,8 +317,6 @@ class AssistantAgent:
         Handles common LLM formatting variations: bold markdown wrapping,
         mixed case, extra whitespace around the prefix.
         """
-        import re
-
         suggestions: List[SuggestionChip] = []
         schema_updates: Dict[str, str] = {}
         reply_lines = []
@@ -384,8 +378,6 @@ class AssistantAgent:
 
             # For assembly, try to look up extra detail (accession)
             if key == "assembly":
-                import re
-
                 acc_match = re.search(r"(GC[AF]_\d{9}\.\d+)", str(value))
                 if acc_match:
                     field.detail = acc_match.group(1)

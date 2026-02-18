@@ -3,14 +3,10 @@ import logging
 import uuid
 from typing import Optional
 
-from pydantic_core import to_json, to_jsonable_python
+from pydantic_core import to_json
 
 from app.core.cache import CacheService
-from app.models.assistant import (
-    AnalysisSchema,
-    ChatMessage,
-    SessionState,
-)
+from app.models.assistant import SessionState
 
 logger = logging.getLogger(__name__)
 
@@ -46,37 +42,6 @@ class SessionService:
 
     async def save_session(self, state: SessionState) -> None:
         await self._save(state)
-
-    async def add_message(
-        self, session_id: str, message: ChatMessage
-    ) -> Optional[SessionState]:
-        state = await self.get_session(session_id)
-        if state is None:
-            return None
-        state.messages.append(message)
-        await self._save(state)
-        return state
-
-    async def update_schema(
-        self, session_id: str, schema_state: AnalysisSchema
-    ) -> Optional[SessionState]:
-        state = await self.get_session(session_id)
-        if state is None:
-            return None
-        state.schema_state = schema_state
-        await self._save(state)
-        return state
-
-    async def update_agent_history(
-        self, session_id: str, agent_messages: list
-    ) -> Optional[SessionState]:
-        """Store the raw pydantic-ai message list (serialised to dicts)."""
-        state = await self.get_session(session_id)
-        if state is None:
-            return None
-        state.agent_message_history = to_jsonable_python(agent_messages)
-        await self._save(state)
-        return state
 
     async def delete_session(self, session_id: str) -> bool:
         return await self.cache.delete(self._key(session_id))
