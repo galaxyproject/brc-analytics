@@ -26,11 +26,11 @@ export const SuggestionChips = ({
 
   return (
     <ChipsContainer>
-      {chips.map((chip, index) => (
+      {chips.map((chip) => (
         <Chip
           clickable
           disabled={disabled}
-          key={index}
+          key={chip.label}
           label={chip.label}
           onClick={(): void => onSelect(chip.message)}
           size="small"
