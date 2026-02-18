@@ -1,8 +1,7 @@
 services:
   keycloak:
     build:
-      context: ./backend
-      dockerfile: keycloak/Dockerfile
+      context: ./backend/keycloak
     command:
       - start-dev
       - --import-realm
