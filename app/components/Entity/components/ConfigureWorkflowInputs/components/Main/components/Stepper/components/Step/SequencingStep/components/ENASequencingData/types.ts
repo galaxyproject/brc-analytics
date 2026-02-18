@@ -45,6 +45,6 @@ export interface Props {
   selectedCount: number;
   switchBrowseMethod: (data?: BaseReadRun[]) => void;
   table: Table<ReadRun>;
-  taxonomicLevelSpecies: string;
+  taxonomicLevelSpecies?: string;
   taxonomyMatches: number;
 }

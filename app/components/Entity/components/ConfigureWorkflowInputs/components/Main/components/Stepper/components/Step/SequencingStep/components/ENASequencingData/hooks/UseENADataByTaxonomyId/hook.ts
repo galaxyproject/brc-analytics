@@ -8,9 +8,9 @@ import { AppSiteConfig } from "../../../../../../../../../../../../../../../../s
 import { Assembly } from "../../../../../../../../../../../../../../../views/WorkflowInputsView/types";
 
 export const useENADataByTaxonomyId = <T>(
-  genome: Assembly
+  genome?: Assembly
 ): UseENADataByTaxonomyId<T> => {
-  const { ncbiTaxonomyId: taxonomyId } = genome;
+  const { ncbiTaxonomyId: taxonomyId } = genome || {};
   const { config } = useConfig();
   const { maxReadRunsForBrowseAll: maxReadRuns } = config as AppSiteConfig;
   const { data, run } = useAsync<T[] | undefined>();
@@ -19,6 +19,7 @@ export const useENADataByTaxonomyId = <T>(
   const [loading, setLoading] = useState<boolean>(true);
 
   const onRequestData = useCallback(async (): Promise<void> => {
+    if (!taxonomyId) return;
     run(
       fetchENAData({
         submitOptions: {
