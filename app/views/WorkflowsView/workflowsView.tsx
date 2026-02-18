@@ -14,7 +14,7 @@ import { getWorkflows } from "./utils";
 export const WorkflowsView = (props: Props): JSX.Element => {
   const { data } = props;
 
-  const workflows = useMemo(() => getWorkflows(data.hits), [data]);
+  const workflows = useMemo(() => getWorkflows(data.hits), [data.hits]);
 
   return <ExploreView data={workflows} Component={Workflows} />;
 };
