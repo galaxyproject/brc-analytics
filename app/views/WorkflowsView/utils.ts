@@ -1,5 +1,7 @@
+import { Navigation } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/common/entities";
 import { WorkflowEntity } from "../../../site-config/brc-analytics/local/index/workflow/types";
 import { WorkflowCategory } from "../../apis/catalog/brc-analytics-catalog/common/entities";
+import { ROUTES } from "routes/constants";
 
 /**
  * Utility function to transform workflow categories into a flat list of workflows.
@@ -25,4 +27,33 @@ export function getWorkflows(
   }
 
   return workflows;
+}
+
+/**
+ * Utility function to filter out the workflows navigation item from the header navigation based on the feature flag.
+ * If the workflows feature is enabled, the original navigation is returned. Otherwise, the navigation is filtered to exclude the workflows item.
+ * @param configuredNavigation - The original header navigation structure.
+ * @param isWorkflowsEnabled - A boolean indicating whether the workflows feature is enabled.
+ * @returns The filtered navigation structure based on the workflows feature flag.
+ */
+export function filterWorkflowsFromNavigation(
+  configuredNavigation: Navigation | undefined,
+  isWorkflowsEnabled: boolean
+): Navigation | undefined {
+  if (isWorkflowsEnabled) return configuredNavigation;
+
+  return configuredNavigation?.reduce(
+    (acc, navigation, i) => {
+      if (!navigation) return acc;
+
+      const filteredNav = navigation.filter(
+        ({ url }) => url !== ROUTES.WORKFLOWS
+      );
+
+      if (filteredNav.length > 0) (acc ?? [])[i] = filteredNav;
+
+      return acc;
+    },
+    [undefined, undefined, undefined] as Navigation
+  );
 }

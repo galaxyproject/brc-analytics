@@ -25,6 +25,8 @@ import { ServicesProvider } from "@databiosphere/findable-ui/lib/providers/servi
 import "../app/styles/fonts/fonts.css";
 import { useEntities } from "../app/services/workflows/hooks/UseEntities/hook";
 import { setFeatureFlags } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/common/utils";
+import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
+import { filterWorkflowsFromNavigation } from "../app/views/WorkflowsView/utils";
 
 const DEFAULT_ENTITY_LIST_TYPE = "organisms";
 
@@ -42,7 +44,7 @@ export type AppPropsWithComponent = AppProps & {
   pageProps: PageProps;
 };
 
-setFeatureFlags(["de"]);
+setFeatureFlags(["de", "workflows"]);
 
 function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
   // Set up the site configuration, layout and theme.
@@ -63,6 +65,7 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
   const appTheme = mergeAppTheme(baseThemeOptions, themeOptions);
   const AppLayout = Component.AppLayout || DXAppLayout;
   const Main = Component.Main || DXMain;
+  const isWorkflowsEnabled = useFeatureFlag("workflows");
 
   if (!isEntitiesLoaded) return <></>;
 
@@ -77,7 +80,13 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
               <GoogleSignInAuthenticationProvider>
                 <LayoutDimensionsProvider>
                   <AppLayout>
-                    <DXHeader {...header} />
+                    <DXHeader
+                      {...header}
+                      navigation={filterWorkflowsFromNavigation(
+                        header.navigation,
+                        isWorkflowsEnabled
+                      )}
+                    />
                     <ExploreStateProvider entityListType={entityListType}>
                       <Main>
                         <ErrorBoundary
