@@ -1,14 +1,22 @@
 """Analysis assistant agent using pydantic-ai."""
 
+import asyncio
 import inspect
 import json
 import logging
 import re
+import time
 from typing import Any, Dict, List, Optional
 
 from pydantic_ai import Agent, RunContext, Tool
 from pydantic_ai.messages import ModelMessagesTypeAdapter
 from pydantic_core import to_jsonable_python
+from tenacity import (
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from app.core.cache import CacheService
 from app.core.config import get_settings
@@ -230,6 +238,48 @@ class AssistantAgent:
     def is_available(self) -> bool:
         return self.agent is not None
 
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=2, max=8),
+        retry=retry_if_exception_type((Exception,)),
+        reraise=True,
+    )
+    async def _run_agent_with_retry(
+        self,
+        message: str,
+        deps: AssistantDeps,
+        message_history: Optional[list] = None,
+        timeout: float = 120.0,
+    ):
+        """Run the pydantic-ai agent with timeout and automatic retry.
+
+        Args:
+            message: User message to send.
+            deps: Agent dependencies (catalog data).
+            message_history: Prior pydantic-ai messages to restore context.
+            timeout: Maximum seconds to wait (default 120s, matches frontend).
+
+        Retries up to 3 times with exponential backoff (2s, 4s, 8s).
+        """
+        start_time = time.time()
+        logger.info("Agent run starting (timeout=%ss)", timeout)
+        try:
+            result = await asyncio.wait_for(
+                self.agent.run(message, deps=deps, message_history=message_history),
+                timeout=timeout,
+            )
+            elapsed = time.time() - start_time
+            logger.info("Agent run completed in %.2fs", elapsed)
+            return result
+        except asyncio.TimeoutError as e:
+            elapsed = time.time() - start_time
+            logger.error(
+                "Agent run timed out after %.2fs (limit: %ss)", elapsed, timeout
+            )
+            raise RuntimeError(
+                f"Assistant request timed out after {timeout} seconds"
+            ) from e
+
     async def chat(
         self, message: str, session_id: Optional[str] = None
     ) -> ChatResponse:
@@ -263,12 +313,10 @@ class AssistantAgent:
                 )
                 agent_history = None
 
-        # Run the agent
+        # Run the agent (with timeout + retry)
         deps = AssistantDeps(catalog=self.catalog)
-        result = await self.agent.run(
-            message,
-            deps=deps,
-            message_history=agent_history,
+        result = await self._run_agent_with_retry(
+            message, deps=deps, message_history=agent_history
         )
 
         raw_reply = result.output
