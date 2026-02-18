@@ -28,6 +28,7 @@ from app.models.assistant import (
     MessageRole,
     SchemaField,
     SuggestionChip,
+    TokenUsage,
 )
 from app.services.session_service import SessionService
 from app.services.tools.catalog_data import CatalogData
@@ -321,6 +322,24 @@ class AssistantAgent:
 
         raw_reply = result.output
 
+        # Extract token usage
+        usage = result.usage()
+        token_usage = TokenUsage(
+            input_tokens=usage.input_tokens or 0,
+            output_tokens=usage.output_tokens or 0,
+            requests=usage.requests,
+            tool_calls=usage.tool_calls,
+            total_tokens=usage.total_tokens or 0,
+        )
+        logger.info(
+            "Token usage: %d in / %d out / %d total (%d requests, %d tool calls)",
+            token_usage.input_tokens,
+            token_usage.output_tokens,
+            token_usage.total_tokens,
+            token_usage.requests,
+            token_usage.tool_calls,
+        )
+
         # Parse structured lines from the end of the reply
         reply_text, suggestions, schema_updates = self._parse_structured_output(
             raw_reply
@@ -355,6 +374,7 @@ class AssistantAgent:
             suggestions=suggestions,
             is_complete=is_complete,
             handoff_url=handoff_url,
+            token_usage=token_usage,
         )
 
     def _parse_structured_output(

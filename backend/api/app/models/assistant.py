@@ -89,6 +89,16 @@ class ChatRequest(BaseModel):
     )
 
 
+class TokenUsage(BaseModel):
+    """Token usage statistics from a single agent run."""
+
+    input_tokens: int = 0
+    output_tokens: int = 0
+    requests: int = 0
+    tool_calls: int = 0
+    total_tokens: int = 0
+
+
 class ChatResponse(BaseModel):
     """Response from the assistant chat endpoint."""
 
@@ -103,6 +113,7 @@ class ChatResponse(BaseModel):
         None,
         description="URL to the workflow stepper, set when is_complete is True",
     )
+    token_usage: Optional[TokenUsage] = None
 
 
 class SessionState(BaseModel):
