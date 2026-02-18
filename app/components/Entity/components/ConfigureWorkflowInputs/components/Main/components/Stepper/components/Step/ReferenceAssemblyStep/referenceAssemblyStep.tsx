@@ -15,9 +15,10 @@ export const ReferenceAssemblyStep = ({
   index,
   onConfigure,
 }: StepProps): JSX.Element => {
-  const { accession } = genome;
+  const { accession } = genome || {};
 
   useEffect(() => {
+    if (!accession) return;
     onConfigure({ [STEP.key]: accession });
   }, [accession, entryLabel, onConfigure]);
 

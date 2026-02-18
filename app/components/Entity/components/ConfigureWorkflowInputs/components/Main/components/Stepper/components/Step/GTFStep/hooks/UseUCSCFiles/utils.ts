@@ -1,5 +1,18 @@
 import { Result } from "./types";
 import { DOWNLOAD_BASE_URL } from "./constants";
+import { SPECIAL_CASE_ASSEMBLY_LOOKUP } from "./constants";
+import { Assembly } from "../../../../../../../../../../../../../views/WorkflowInputsView/types";
+
+/**
+ * Gets the assembly ID from the genome assembly information, applying any necessary special case lookups.
+ * @param genome - Assembly entity.
+ * @returns Assembly ID.
+ */
+export function getAssemblyId(genome?: Assembly): string | undefined {
+  if (!genome) return undefined;
+
+  return SPECIAL_CASE_ASSEMBLY_LOOKUP[genome.accession] ?? genome.accession;
+}
 
 /**
  * Parses the result from the UCSC files API to extract GTF file URLs.

@@ -26,7 +26,7 @@ export interface StepProps
     Required<Pick<MStepProps, "index" | "active">> {
   configuredInput: ConfiguredInput;
   entryLabel: string;
-  genome: Assembly;
+  genome?: Assembly;
   onConfigure: OnConfigure;
   onContinue: OnContinue;
   onEdit: OnEdit;

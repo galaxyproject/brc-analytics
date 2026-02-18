@@ -7,7 +7,7 @@ import { Assembly } from "../../../../../../../../../../../../../../../../../../
 
 export const useRequirementsMatches = (
   table: Table<ReadRun>,
-  genome: Assembly
+  genome?: Assembly
 ): UseRequirementsMatches => {
   const { getSelectedRowModel, initialState } = table;
   const { columnFilters } = initialState;
