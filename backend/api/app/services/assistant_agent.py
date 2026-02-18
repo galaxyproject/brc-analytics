@@ -9,7 +9,7 @@ import time
 from typing import Any, Dict, List, Optional
 
 from pydantic_ai import Agent, RunContext, Tool
-from pydantic_ai.messages import ModelMessagesTypeAdapter
+from pydantic_ai.messages import ModelMessage, ModelMessagesTypeAdapter
 from pydantic_core import to_jsonable_python
 from tenacity import (
     retry,
@@ -45,6 +45,10 @@ from app.services.tools.catalog_tools import (
 )
 
 logger = logging.getLogger(__name__)
+
+# ~20 turn-pairs; tool-heavy turns produce 3-5 messages each, so this
+# bounds total context while preserving good conversational continuity.
+MAX_HISTORY_MESSAGES = 40
 
 SYSTEM_PROMPT = """\
 You are the BRC Analytics Analysis Assistant, an expert in bioinformatics \
@@ -239,6 +243,23 @@ class AssistantAgent:
     def is_available(self) -> bool:
         return self.agent is not None
 
+    @staticmethod
+    def _truncate_history(messages: list[ModelMessage]) -> list[ModelMessage]:
+        """Keep history within MAX_HISTORY_MESSAGES.
+
+        Preserves the first message (original user intent) plus the most
+        recent MAX_HISTORY_MESSAGES messages so the agent retains enough
+        context without blowing up the token budget.
+        """
+        if len(messages) <= MAX_HISTORY_MESSAGES:
+            return messages
+        logger.info(
+            "Truncating agent history from %d to %d messages",
+            len(messages),
+            MAX_HISTORY_MESSAGES + 1,
+        )
+        return messages[:1] + messages[-MAX_HISTORY_MESSAGES:]
+
     @retry(
         stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=1, min=2, max=8),
@@ -308,6 +329,7 @@ class AssistantAgent:
                 agent_history = ModelMessagesTypeAdapter.validate_python(
                     state.agent_message_history
                 )
+                agent_history = self._truncate_history(agent_history)
             except Exception:
                 logger.warning(
                     "Failed to restore agent message history, starting fresh"
