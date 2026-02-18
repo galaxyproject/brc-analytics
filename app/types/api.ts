@@ -127,6 +127,14 @@ export interface AssistantChatRequest {
   session_id?: string;
 }
 
+export interface TokenUsage {
+  input_tokens: number;
+  output_tokens: number;
+  requests: number;
+  tool_calls: number;
+  total_tokens: number;
+}
+
 export interface AssistantChatResponse {
   handoff_url: string | null;
   is_complete: boolean;
@@ -134,6 +142,7 @@ export interface AssistantChatResponse {
   schema_state: AnalysisSchema;
   session_id: string;
   suggestions: SuggestionChip[];
+  token_usage?: TokenUsage;
 }
 
 export interface UnifiedSearchResponse {
