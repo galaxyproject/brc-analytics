@@ -18,6 +18,13 @@ export const StyledCard = styled(Card)`
 
   .MuiCardContent-root {
     flex: 1;
+
+    .MuiLink-root {
+      color: inherit;
+      font: inherit;
+      letter-spacing: inherit;
+      margin-left: 4px;
+    }
   }
 
   ${({ theme }) => theme.breakpoints.up(1920)} {

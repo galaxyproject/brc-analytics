@@ -40,7 +40,7 @@ export function getGenomeOrganismId(
  * @returns workflow ID.
  */
 export function getWorkflowId(workflow: WorkflowEntity): string {
-  return sanitizeEntityId(`${workflow.category}-${workflow.trsId}`);
+  return sanitizeEntityId(workflow.trsId);
 }
 
 /**
