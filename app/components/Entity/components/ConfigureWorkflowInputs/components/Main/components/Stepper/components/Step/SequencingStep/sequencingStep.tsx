@@ -56,7 +56,7 @@ export const SequencingStep = ({
             selectedCount={getSelectedCount(configuredInput)}
             switchBrowseMethod={actions.switchBrowseMethod}
             table={table}
-            taxonomicLevelSpecies={genome.taxonomicLevelSpecies}
+            taxonomicLevelSpecies={genome?.taxonomicLevelSpecies}
             taxonomyMatches={taxonomyMatches ?? 0}
           />
         ) : (

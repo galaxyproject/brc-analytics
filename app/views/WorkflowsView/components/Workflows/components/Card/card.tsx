@@ -9,18 +9,20 @@ import {
   Link as MLink,
   Chip,
 } from "@mui/material";
+import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { JSX } from "react";
-import { TruncatedText } from "app/components/common/TruncatedText/truncatedText";
+import { TruncatedText } from "../../../../../../components/common/TruncatedText/truncatedText";
 import { StyledCard } from "./card.styles";
 import { Props } from "./types";
 import Link from "next/link";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
-import { ROUTES } from "routes/constants";
+import { ROUTES } from "../../../../../../../routes/constants";
 import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,
 } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
-import { CHIP_PROPS } from "app/components/Entity/components/AnalysisMethod/constants";
+import { CHIP_PROPS } from "../../../../../../components/Entity/components/AnalysisMethod/constants";
+import { formatTrsId } from "../../../../../../components/Entity/components/AnalysisMethodsCatalog/utils";
 
 /**
  * Renders a card with workflow information and a configure button.
@@ -71,7 +73,9 @@ export const Card = ({ row }: Props): JSX.Element => {
           <Button
             color={BUTTON_PROPS.COLOR.PRIMARY}
             component={Link}
-            href={ROUTES.WORKFLOWS}
+            href={replaceParameters(ROUTES.WORKFLOW, {
+              trsId: formatTrsId(row.original.trsId),
+            })}
             variant={BUTTON_PROPS.VARIANT.CONTAINED}
           >
             Configure
