@@ -22,8 +22,8 @@ export const Workflows = ({ table }: Props): JSX.Element => {
         <Title />
         <FilterButton />
       </StyledStack>
-      {rows.map((row) => (
-        <Card key={row.id} row={row} />
+      {rows.map((row, i) => (
+        <Card key={`${row.id}-${i}`} row={row} />
       ))}
     </StyledContainer>
   );

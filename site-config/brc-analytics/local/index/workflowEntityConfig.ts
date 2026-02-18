@@ -33,6 +33,8 @@ export const workflowEntityConfig: AppEntityConfig<WorkflowEntity> = {
       initialState: {
         columnVisibility: {
           [CATEGORY_CONFIG.CATEGORY.key]: false,
+          [CATEGORY_CONFIG.PLOIDY.key]: false,
+          [CATEGORY_CONFIG.TAXONOMY_ID.key]: false,
         },
         sorting: [
           {

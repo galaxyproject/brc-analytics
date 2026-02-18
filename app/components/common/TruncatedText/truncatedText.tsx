@@ -17,11 +17,13 @@ import { StyledButtonBase, StyledSpan } from "./truncatedText.styles";
  * @param props - Component props.
  * @param props.children - Text to display and potentially truncate.
  * @param props.maxLines - Maximum number of lines to display before truncation.
+ * @param props.suffix - Optional content to display after text when expanded or not truncated.
  * @returns Truncated text component.
  */
 export const TruncatedText = ({
   children: text,
   maxLines = MAX_LINES,
+  suffix,
 }: Props): JSX.Element => {
   const containerRef = useRef<HTMLSpanElement>(null);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -29,6 +31,7 @@ export const TruncatedText = ({
   const [truncatedText, setTruncatedText] = useState<string | null>(null);
 
   const shouldTruncate = truncatedText !== null;
+  const showSuffix = isExpanded || !shouldTruncate;
 
   // Observe container width changes.
   const { width } = useResizeObserver(containerRef, getBorderBoxSize) || {};
@@ -47,6 +50,7 @@ export const TruncatedText = ({
   return (
     <StyledSpan ref={containerRef} clamp={isReady ? 0 : maxLines}>
       {renderText(text, truncatedText, isExpanded)}
+      {showSuffix && suffix}
       {shouldTruncate && (
         <StyledButtonBase onClick={() => setIsExpanded((prev) => !prev)}>
           {isExpanded ? READ_LESS_TEXT : READ_MORE_TEXT}

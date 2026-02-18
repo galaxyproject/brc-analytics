@@ -15,7 +15,12 @@ export function getWorkflows(
   for (const category of workflowCategories) {
     if (!category.workflows) continue;
     for (const workflow of category.workflows) {
-      workflows.push({ ...workflow, category: category.name });
+      workflows.push({
+        ...workflow,
+        category: category.name,
+        disabled: category.showComingSoon === false,
+        taxonomyId: workflow.taxonomyId ?? "Unspecified",
+      });
     }
   }
 
