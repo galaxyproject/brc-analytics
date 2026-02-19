@@ -30,6 +30,7 @@ export interface AppEntityConfig<R> extends Omit<
 export interface AppSiteConfig extends BaseSiteConfig {
   allowedPaths?: string[];
   appKey?: (typeof APP_KEYS)[keyof typeof APP_KEYS];
+  loginEnabled?: boolean;
   maxReadRunsForBrowseAll: number;
   taxTree?: TaxonomyNode;
 }

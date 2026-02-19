@@ -1,0 +1,149 @@
+services:
+  keycloak:
+    build:
+      context: ./backend/keycloak
+    command:
+      - start-dev
+      - --import-realm
+      - --health-enabled=true
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HTTP_PORT: "8180"
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+    ports:
+      - "8180:8180"
+    volumes:
+      - ./backend/keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "cat < /dev/null > /dev/tcp/localhost/8180"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 15s
+
+  keycloak-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    volumes:
+      - keycloak_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  keycloak-init:
+    image: quay.io/keycloak/keycloak:26.0
+    entrypoint: ["bash", "/scripts/init-galaxy-scope.sh"]
+    environment:
+      GALAXY_DB_URL: "${GALAXY_DB_URL:-jdbc:postgresql://galaxy-postgres:5432/galaxy}"
+      GALAXY_DB_USER: "${GALAXY_DB_USER:-galaxy}"
+      GALAXY_DB_PASSWORD: "${GALAXY_DB_PASSWORD:-}"
+    volumes:
+      - ./backend/keycloak/init-galaxy-scope.sh:/scripts/init-galaxy-scope.sh:ro
+    depends_on:
+      keycloak:
+        condition: service_healthy
+
+  backend:
+    build:
+      context: ./backend/api
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      KEYCLOAK_ISSUER_URL: http://keycloak:8180/realms/galaxy
+      KEYCLOAK_CLIENT_ID: brc-analytics
+      KEYCLOAK_CLIENT_SECRET: brc-analytics-dev-secret
+      KEYCLOAK_REDIRECT_URI: http://localhost:8000/api/v1/auth/callback
+      FRONTEND_URL: http://localhost:3000
+      CORS_ORIGINS: "http://localhost:3000,http://localhost:8000"
+      LOG_LEVEL: DEBUG
+    volumes:
+      - ./catalog:/catalog:ro
+    depends_on:
+      redis:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  galaxy-postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: galaxy
+      POSTGRES_USER: galaxy
+      POSTGRES_PASSWORD: galaxy
+    volumes:
+      - galaxy_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U galaxy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  galaxy:
+    image: quay.io/bgruening/galaxy:24.1
+    ports:
+      - "8080:80"
+    environment:
+      GALAXY_CONFIG_ADMIN_USERS: admin@galaxy.org
+      GALAXY_DEFAULT_ADMIN_KEY: admin
+      GALAXY_CONFIG_ENABLE_OIDC: "true"
+      GALAXY_CONFIG_OIDC_CONFIG_FILE: /export/galaxy/config/oidc_config.xml
+      GALAXY_CONFIG_OIDC_BACKENDS_CONFIG_FILE: /export/galaxy/config/oidc_backends_config.xml
+      GALAXY_CONFIG_DATABASE_CONNECTION: "postgresql://galaxy:galaxy@galaxy-postgres:5432/galaxy"
+    volumes:
+      - galaxy_data:/export
+      - ./backend/galaxy/oidc_config.xml:/export/galaxy/config/oidc_config.xml:ro
+      - ./backend/galaxy/oidc_backends_config.xml:/export/galaxy/config/oidc_backends_config.xml:ro
+    depends_on:
+      keycloak:
+        condition: service_healthy
+      galaxy-postgres:
+        condition: service_healthy
+
+  galaxy-seed:
+    image: curlimages/curl:latest
+    entrypoint: ["sh", "/scripts/seed-test-user.sh"]
+    environment:
+      GALAXY_URL: http://galaxy:80
+      GALAXY_DEFAULT_ADMIN_KEY: admin
+    volumes:
+      - ./backend/galaxy/seed-test-user.sh:/scripts/seed-test-user.sh:ro
+    depends_on:
+      galaxy:
+        condition: service_started
+
+volumes:
+  keycloak_db_data:
+  redis_data:
+  galaxy_pg_data:
+  galaxy_data:

@@ -23,6 +23,7 @@ import { mergeAppTheme } from "../app/theme/theme";
 import { GoogleSignInAuthenticationProvider } from "@databiosphere/findable-ui/lib/providers/googleSignInAuthentication/provider";
 import { ServicesProvider } from "@databiosphere/findable-ui/lib/providers/services/provider";
 import "../app/styles/fonts/fonts.css";
+import { BrcAuthProvider } from "../app/providers/authentication";
 import { useEntities } from "../app/services/workflows/hooks/UseEntities/hook";
 import { setFeatureFlags } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/common/utils";
 
@@ -75,35 +76,37 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
           <ServicesProvider>
             <SystemStatusProvider>
               <GoogleSignInAuthenticationProvider>
-                <LayoutDimensionsProvider>
-                  <AppLayout>
-                    <DXHeader {...header} />
-                    <ExploreStateProvider entityListType={entityListType}>
-                      <Main>
-                        <ErrorBoundary
-                          fallbackRender={({
-                            error,
-                            reset,
-                          }: {
-                            error: DataExplorerError;
-                            reset: () => void;
-                          }): JSX.Element => (
-                            <Error
-                              errorMessage={error.message}
-                              requestUrlMessage={error.requestUrlMessage}
-                              rootPath={redirectRootToPath}
-                              onReset={reset}
-                            />
-                          )}
-                        >
-                          <Component {...pageProps} />
-                          <Floating {...floating} />
-                        </ErrorBoundary>
-                      </Main>
-                    </ExploreStateProvider>
-                    <StyledFooter {...footer} />
-                  </AppLayout>
-                </LayoutDimensionsProvider>
+                <BrcAuthProvider loginEnabled={appConfig.loginEnabled}>
+                  <LayoutDimensionsProvider>
+                    <AppLayout>
+                      <DXHeader {...header} />
+                      <ExploreStateProvider entityListType={entityListType}>
+                        <Main>
+                          <ErrorBoundary
+                            fallbackRender={({
+                              error,
+                              reset,
+                            }: {
+                              error: DataExplorerError;
+                              reset: () => void;
+                            }): JSX.Element => (
+                              <Error
+                                errorMessage={error.message}
+                                requestUrlMessage={error.requestUrlMessage}
+                                rootPath={redirectRootToPath}
+                                onReset={reset}
+                              />
+                            )}
+                          >
+                            <Component {...pageProps} />
+                            <Floating {...floating} />
+                          </ErrorBoundary>
+                        </Main>
+                      </ExploreStateProvider>
+                      <StyledFooter {...footer} />
+                    </AppLayout>
+                  </LayoutDimensionsProvider>
+                </BrcAuthProvider>
               </GoogleSignInAuthenticationProvider>
             </SystemStatusProvider>
           </ServicesProvider>

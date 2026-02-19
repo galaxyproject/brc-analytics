@@ -58,6 +58,23 @@ class Settings:
     # Catalog path
     CATALOG_PATH: str = os.getenv("CATALOG_PATH", "/catalog/output")
 
+    # Keycloak / OIDC settings
+    KEYCLOAK_ISSUER_URL: str = os.getenv(
+        "KEYCLOAK_ISSUER_URL",
+        "http://localhost:8180/realms/galaxy",
+    )
+    KEYCLOAK_CLIENT_ID: str = os.getenv("KEYCLOAK_CLIENT_ID", "brc-analytics")
+    KEYCLOAK_CLIENT_SECRET: str = os.getenv(
+        "KEYCLOAK_CLIENT_SECRET", "brc-analytics-dev-secret"
+    )
+    KEYCLOAK_REDIRECT_URI: str = os.getenv(
+        "KEYCLOAK_REDIRECT_URI",
+        "http://localhost:8000/api/v1/auth/callback",
+    )
+
+    # Frontend URL for post-auth redirect
+    FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:3000")
+
 
 @lru_cache()
 def get_settings() -> Settings:

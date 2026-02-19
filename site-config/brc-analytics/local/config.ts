@@ -30,6 +30,7 @@ const GIT_HUB_REPO_URL = "https://github.com/galaxyproject/brc-analytics";
  * @param browserUrl - Browser URL.
  * @param gitHubUrl - GitHub URL.
  * @param taxTreeData - Taxonomy tree data.
+ * @param loginEnabled - Whether to show the login button.
  * @remarks
  * The `genomeEntityConfig` is typecast to `EntityConfig<BRCDataCatalogGenome>`
  * because the `SiteConfig` interface from the `@databiosphere/findable-ui` package expects
@@ -44,7 +45,8 @@ const GIT_HUB_REPO_URL = "https://github.com/galaxyproject/brc-analytics";
 export function makeConfig(
   browserUrl: string,
   gitHubUrl = GIT_HUB_REPO_URL,
-  taxTreeData = data as TaxonomyNode
+  taxTreeData = data as TaxonomyNode,
+  loginEnabled = false
 ): AppSiteConfig {
   return {
     appKey: APP_KEYS.BRC_ANALYTICS,
@@ -80,6 +82,7 @@ export function makeConfig(
         versionInfo: createElement(C.VersionInfoWithServerStatus),
       },
       header: {
+        actions: createElement(C.AuthButton),
         logo: C.Logo({
           alt: APP_TITLE,
           height: 26,
@@ -114,6 +117,7 @@ export function makeConfig(
         socialMedia: socialMedia,
       },
     },
+    loginEnabled,
     maxReadRunsForBrowseAll: 60000,
     redirectRootToPath: "/",
     taxTree: taxTreeData,
@@ -121,6 +125,11 @@ export function makeConfig(
   };
 }
 
-const config: AppSiteConfig = makeConfig(BROWSER_URL);
+const config: AppSiteConfig = makeConfig(
+  BROWSER_URL,
+  GIT_HUB_REPO_URL,
+  data as TaxonomyNode,
+  true
+);
 
 export default config;
