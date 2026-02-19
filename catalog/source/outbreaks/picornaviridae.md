@@ -8,5 +8,5 @@ Picornaviridae has been designated as a prototype pathogen family for pandemic p
 
 - **Human Health**: Causes a wide range of diseases from mild respiratory infections to severe neurological conditions
 - **Agriculture**: Foot-and-mouth disease has devastating impacts on livestock industries
-- **Public Health**: Several members require ongoing surveillance and vaccination programs
+- **Public Health**: Several members require ongoing surveillance and immunization programs
 - **Neurological Disease**: Some enteroviruses cause paralysis, meningitis, and encephalitis
