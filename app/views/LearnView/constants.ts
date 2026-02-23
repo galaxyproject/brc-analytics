@@ -4,6 +4,7 @@ import { RocketLaunchIcon } from "./components/icon/RocketLaunchIcon/rocketLaunc
 import { BookmarkStarIcon } from "./components/icon/BookmarkStarIcon/bookmarkStarIcon";
 import { GalaxyIcon } from "./components/icon/GalaxyIcon/galaxyIcon";
 import { LiveHelpIcon } from "./components/icon/LiveHelpIcon/liveHelpIcon";
+import { YouTubeIcon } from "./components/icon/YouTubeIcon/youTubeIcon";
 
 export const CARDS: ComponentProps<typeof SectionContentCard>[] = [
   {
@@ -33,5 +34,12 @@ export const CARDS: ComponentProps<typeof SectionContentCard>[] = [
     secondaryText:
       "Find answers to common questions about using BRC Analytics.",
     title: "FAQ",
+  },
+  {
+    StartIcon: YouTubeIcon,
+    cardUrl: "/learn/youtube-channels",
+    secondaryText:
+      "Watch video tutorials, walkthroughs, and presentations on BRC Analytics and Galaxy.",
+    title: "YouTube Channels",
   },
 ];
