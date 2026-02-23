@@ -59,11 +59,13 @@ const IndexPage = <R,>({
 export const getStaticPaths: GetStaticPaths = async () => {
   const appConfig = config();
   const entities = appConfig.entities;
-  const paths = entities.map((entity) => ({
-    params: {
-      entityListType: entity.route,
-    },
-  }));
+  const paths = entities
+    .filter((entity) => entity.route !== "workflows")
+    .map((entity) => ({
+      params: {
+        entityListType: entity.route,
+      },
+    }));
   return {
     fallback: false,
     paths,
