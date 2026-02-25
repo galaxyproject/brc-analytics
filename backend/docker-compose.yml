@@ -24,7 +24,10 @@ services:
     env_file:
       - ./api/.env
     environment:
+      CATALOG_PATH: /catalog/output
       REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8000:8000"
     volumes:
       - ../catalog:/catalog:ro
     depends_on:
