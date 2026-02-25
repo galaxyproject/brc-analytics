@@ -1,4 +1,4 @@
-import { JSX } from "react";
+import { JSX, useMemo } from "react";
 import "@databiosphere/findable-ui";
 import { AzulEntitiesStaticResponse } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import { Error } from "@databiosphere/findable-ui/lib/components/Error/error";
@@ -25,6 +25,8 @@ import { ServicesProvider } from "@databiosphere/findable-ui/lib/providers/servi
 import "../app/styles/fonts/fonts.css";
 import { useEntities } from "../app/services/workflows/hooks/UseEntities/hook";
 import { setFeatureFlags } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/common/utils";
+import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
+import { ROUTES } from "../routes/constants";
 
 const DEFAULT_ENTITY_LIST_TYPE = "organisms";
 
@@ -42,7 +44,7 @@ export type AppPropsWithComponent = AppProps & {
   pageProps: PageProps;
 };
 
-setFeatureFlags(["de"]);
+setFeatureFlags(["assistant", "de"]);
 
 function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
   // Set up the site configuration, layout and theme.
@@ -63,6 +65,19 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
   const appTheme = mergeAppTheme(baseThemeOptions, themeOptions);
   const AppLayout = Component.AppLayout || DXAppLayout;
   const Main = Component.Main || DXMain;
+  const isAssistantEnabled = useFeatureFlag("assistant");
+  const filteredHeader = useMemo(() => {
+    if (!header) return header;
+    if (isAssistantEnabled) return header;
+    const { navigation, ...rest } = header;
+    if (!navigation) return header;
+    return {
+      ...rest,
+      navigation: navigation.map((group) =>
+        group?.filter((item) => item.url !== ROUTES.ASSISTANT)
+      ) as typeof navigation,
+    };
+  }, [header, isAssistantEnabled]);
 
   if (!isEntitiesLoaded) return <></>;
 
@@ -77,7 +92,7 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
               <GoogleSignInAuthenticationProvider>
                 <LayoutDimensionsProvider>
                   <AppLayout>
-                    <DXHeader {...header} />
+                    <DXHeader {...filteredHeader} />
                     <ExploreStateProvider entityListType={entityListType}>
                       <Main>
                         <ErrorBoundary

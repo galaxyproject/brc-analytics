@@ -1,4 +1,6 @@
 import { Fragment, JSX } from "react";
+import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
+import Error from "next/error";
 import { SectionHero } from "../../components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import { ChatPanel, SchemaPanel } from "../../components/Assistant";
 import { useAssistantChat } from "../../hooks/useAssistantChat";
@@ -11,6 +13,7 @@ import {
 } from "./assistantView.styles";
 
 export const AssistantView = (): JSX.Element => {
+  const isAssistantEnabled = useFeatureFlag("assistant");
   const {
     error,
     handoffUrl,
@@ -21,6 +24,8 @@ export const AssistantView = (): JSX.Element => {
     sendMessage,
     suggestions,
   } = useAssistantChat();
+
+  if (!isAssistantEnabled) return <Error statusCode={404} />;
 
   return (
     <Fragment>
