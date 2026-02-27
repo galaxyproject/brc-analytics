@@ -180,7 +180,11 @@ class CatalogData:
                 wf_ploidy = wf.get("ploidy")
                 wf_tax = wf.get("taxonomyId")
                 # Ploidy must match (None/ANY = universal)
-                if wf_ploidy is not None and wf_ploidy != "ANY" and wf_ploidy not in ploidies:
+                if (
+                    wf_ploidy is not None
+                    and wf_ploidy != "ANY"
+                    and wf_ploidy not in ploidies
+                ):
                     continue
                 # Taxonomy must match if specified on both sides
                 if (
