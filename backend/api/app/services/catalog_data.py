@@ -210,11 +210,17 @@ class CatalogData:
 
         issues = []
         wf_ploidy = wf.get("ploidy")
-        asm_ploidy = asm.get("ploidy")
-        if wf_ploidy is not None and asm_ploidy != wf_ploidy:
+        asm_ploidies = asm.get("ploidy", [])
+        if isinstance(asm_ploidies, str):
+            asm_ploidies = [asm_ploidies]
+        if (
+            wf_ploidy is not None
+            and wf_ploidy != "ANY"
+            and wf_ploidy not in asm_ploidies
+        ):
             issues.append(
                 f"Ploidy mismatch: workflow requires "
-                f"'{wf_ploidy}', assembly is '{asm_ploidy}'"
+                f"'{wf_ploidy}', assembly is {asm_ploidies}"
             )
 
         wf_tax = wf.get("taxonomyId")
@@ -233,6 +239,97 @@ class CatalogData:
             "assembly": accession,
         }
 
+    # -- Input resolution --
+
+    def resolve_workflow_inputs(self, iwc_id: str, accession: str) -> Dict[str, Any]:
+        """Resolve deterministic workflow inputs from catalog data.
+
+        For each workflow parameter, resolves values that can be
+        computed from the assembly record (reference genome URL,
+        gene model URL, accession) and flags user-supplied inputs
+        (sequencing data) as unresolved.
+        """
+        wf = self._workflows_by_iwc_id.get(iwc_id)
+        if not wf:
+            raise ValueError(f"Workflow '{iwc_id}' not found")
+        asm = self._assemblies_by_accession.get(accession)
+        if not asm:
+            raise ValueError(f"Assembly '{accession}' not found")
+
+        resolved: Dict[str, Any] = {}
+        unresolved: List[Dict[str, Any]] = []
+
+        for param in wf.get("parameters", []):
+            key = param.get("key", "")
+            variable = param.get("variable")
+            url_spec = param.get("url_spec")
+
+            if url_spec:
+                resolved[key] = url_spec.get("url")
+            elif variable == "ASSEMBLY_ID":
+                resolved[key] = accession
+            elif variable == "ASSEMBLY_FASTA_URL":
+                resolved[key] = self._build_fasta_url(accession)
+            elif variable == "GENE_MODEL_URL":
+                gene_url = asm.get("geneModelUrl")
+                if gene_url and gene_url != "None":
+                    resolved[key] = gene_url
+                else:
+                    unresolved.append(
+                        {
+                            "key": key,
+                            "variable": variable,
+                            "reason": "No gene model available for this assembly",
+                        }
+                    )
+            elif variable in (
+                "SANGER_READ_RUN_PAIRED",
+                "SANGER_READ_RUN_SINGLE",
+            ):
+                entry: Dict[str, Any] = {
+                    "key": key,
+                    "variable": variable,
+                }
+                data_req = param.get("data_requirements")
+                if data_req:
+                    entry["data_requirements"] = data_req
+                unresolved.append(entry)
+            else:
+                unresolved.append(
+                    {
+                        "key": key,
+                        "variable": variable,
+                        "reason": "Unknown parameter type",
+                    }
+                )
+
+        compat = self.check_workflow_assembly_compatibility(iwc_id, accession)
+
+        return {
+            "workflow_name": wf.get("workflowName"),
+            "trs_id": wf.get("trsId"),
+            "resolved": resolved,
+            "unresolved": unresolved,
+            "compatible": compat.get("compatible", False),
+            "compatibility_issues": (
+                [compat["reason"]]
+                if not compat.get("compatible") and "reason" in compat
+                else []
+            ),
+        }
+
+    def _build_fasta_url(self, accession: str) -> str:
+        parts = accession.split("_", 1)
+        if len(parts) != 2 or len(parts[1]) < 9:
+            raise ValueError(f"Invalid accession format: '{accession}'")
+        prefix, suffix = parts
+        return (
+            "https://hgdownload.soe.ucsc.edu/hubs/"
+            f"{prefix}/"
+            f"{suffix[:3]}/{suffix[3:6]}/{suffix[6:9]}/"
+            f"{accession}/{accession}.fa.gz"
+        )
+
     def _condense_workflow(self, wf: Dict[str, Any]) -> Dict[str, Any]:
         return {
             "iwcId": wf.get("iwcId"),
@@ -242,4 +339,5 @@ class CatalogData:
             "ploidy": wf.get("ploidy"),
             "taxonomyId": wf.get("taxonomyId"),
             "trsId": wf.get("trsId"),
+            "parameters": wf.get("parameters"),
         }

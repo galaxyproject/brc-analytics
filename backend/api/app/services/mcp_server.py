@@ -103,6 +103,14 @@ def create_mcp_server(catalog_data: CatalogData, ena_service: ENAService) -> Fas
         Returns compatibility status and any issues (ploidy/taxonomy mismatches)."""
         return catalog_data.check_workflow_assembly_compatibility(iwc_id, accession)
 
+    @mcp.tool()
+    def resolve_workflow_inputs(iwc_id: str, accession: str) -> dict:
+        """Resolve deterministic workflow inputs for a workflow + assembly pair.
+        Returns resolved values (reference genome URL, gene model, accession)
+        and unresolved inputs the researcher must provide (sequencing data).
+        Also includes compatibility check results."""
+        return catalog_data.resolve_workflow_inputs(iwc_id, accession)
+
     # -- ENA tools (async, HTTP) --
 
     @mcp.tool()
