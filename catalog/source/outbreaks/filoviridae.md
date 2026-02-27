@@ -10,5 +10,5 @@ Filoviridae has been designated as a prototype pathogen family for pandemic prep
 - **Outbreaks**: Multiple outbreaks in Africa with the largest occurring in West Africa (2014-2016)
 - **Healthcare Systems**: Outbreaks can overwhelm local healthcare systems and require international response
 - **Biosecurity**: Classified as biosafety level 4 pathogens requiring maximum containment
-- **Research**: Significant focus on vaccine and therapeutic development
+- **Research**: Significant focus on therapeutic and countermeasure development
 - **Zoonotic Potential**: Natural reservoir believed to be certain bat species
