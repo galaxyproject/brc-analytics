@@ -1,7 +1,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +23,7 @@ class CatalogData:
         self._assemblies_by_accession: Dict[str, Dict[str, Any]] = {}
         self._assemblies_by_tax_id: Dict[str, List[Dict[str, Any]]] = {}
         self._workflows_by_iwc_id: Dict[str, Dict[str, Any]] = {}
+        self._lineage_by_tax_id: Dict[str, Set[str]] = {}
 
         self._load()
 
@@ -64,6 +65,16 @@ class CatalogData:
             species_tax_id = str(asm.get("speciesTaxonomyId", ""))
             if species_tax_id and species_tax_id != tax_id:
                 self._assemblies_by_tax_id.setdefault(species_tax_id, []).append(asm)
+            # Build lineage index so taxonomy matching can walk up the tree
+            lineage = asm.get("lineageTaxonomyIds", [])
+            if lineage:
+                lineage_set = {str(t) for t in lineage}
+                for tid in lineage_set:
+                    existing = self._lineage_by_tax_id.get(tid)
+                    if existing is None:
+                        self._lineage_by_tax_id[tid] = lineage_set
+                    else:
+                        existing.update(lineage_set)
 
         for cat in self.workflow_categories:
             for wf in cat.get("workflows", []):
@@ -186,13 +197,13 @@ class CatalogData:
                     and wf_ploidy not in ploidies
                 ):
                     continue
-                # Taxonomy must match if specified on both sides
-                if (
-                    taxonomy_id
-                    and wf_tax is not None
-                    and str(wf_tax) != str(taxonomy_id)
-                ):
-                    continue
+                # Taxonomy must match if specified on both sides;
+                # check against the full lineage so a workflow targeting
+                # e.g. Bacteria (2) matches E. coli (562)
+                if taxonomy_id and wf_tax is not None:
+                    lineage = self._lineage_by_tax_id.get(str(taxonomy_id), set())
+                    if str(wf_tax) not in lineage:
+                        continue
                 results.append(self._condense_workflow(wf))
         return results
 
