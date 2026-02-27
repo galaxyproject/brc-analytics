@@ -42,8 +42,7 @@ async def get_llm_service():
         from app.services.llm_service import LLMService
 
         cache = await get_cache_service()
-        catalog = await get_catalog_data()
-        _llm_service = LLMService(cache, catalog)
+        _llm_service = LLMService(cache)
         available = _llm_service.is_available()
         logger.info(f"LLM service initialized (singleton), available: {available}")
     return _llm_service
