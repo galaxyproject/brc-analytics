@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Props } from "./types";
 import { Typography, AlertTitle } from "@mui/material";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";

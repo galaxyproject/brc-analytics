@@ -2,7 +2,7 @@
 
 ## Setup
 
-Using Node.js version `20.10.0`, run `npm install` in the root directory of the repository to install dependencies.
+Using Node.js version `22.12.0`, run `npm install` in the root directory of the repository to install dependencies.
 
 ## Using the development server
 
@@ -118,18 +118,17 @@ This repository uses [Release Drafter](https://github.com/release-drafter/releas
 The release process involves three main components:
 
 1. **Release Drafter**: Automatically creates/updates draft releases based on merged PRs
-2. **Publish Release Workflow**: Publishes the draft and creates a version bump PR
+2. **Publish Release Workflow**: Publishes the draft, deploys to production, and bumps main to the next version
 3. **Version Display**: Shows build info in the UI footer using environment variables set at build time
 
-### Automated Version Determination
+### Branch Strategy
 
-PRs are categorized based on their titles using conventional commit format:
+- **`main`**: Development branch, always contains the next version (e.g., `0.20.0`)
+- **`production`**: Stable release branch, contains the current release (e.g., `0.19.0`)
 
-- `breaking!` or `major` labels → **major** version bump (e.g., 1.0.0 → 2.0.0)
-- `feat:`, `feature:`, `enhancement:`, `minor` labels → **minor** version bump (e.g., 1.0.0 → 1.1.0)
-- `fix:`, `docs:`, `chore:`, etc. → **patch** version bump (e.g., 1.0.0 → 1.0.1)
+This allows you to identify which environment you're looking at via the API version endpoint.
 
-### Manual Release Steps
+### Release Steps
 
 #### 1. Verify Draft Release
 
@@ -144,49 +143,30 @@ gh release view v<VERSION> --json body,name,tagName,targetCommitish
 #### 2. Publish the Release
 
 ```bash
-# Identify the draft release tag from the list above (e.g., v0.17.0)
+# Identify the draft release tag from the list above (e.g., v0.19.0)
 gh release list | grep "Draft"
 
-# Publish using the workflow (recommended)
-# Note: release_id expects the tag name, not a numeric ID
-gh workflow run publish-release.yml -f release_id=v0.17.0
+# Publish using the workflow
+gh workflow run publish-release.yml -f release_id=v0.19.0
 ```
 
-**OR** publish directly:
+The workflow automatically:
+
+1. Merges `main` → `production` (triggers production deployment)
+2. Publishes the release tag
+3. Creates a PR to bump `main` to the next minor version (e.g., `0.19.0` → `0.20.0`)
+
+#### 3. Merge Version Bump PR
+
+After the workflow completes, merge the auto-created PR to update `main` to the next development version.
+
+#### 4. Verify
 
 ```bash
-# Use the tag name (e.g., v0.17.0), not the numeric release ID
-gh release edit v0.17.0 --draft=false
+# Check versions on deployed environments
+curl -s https://platform-staging.brc-analytics.org/api/v1/health | jq .version  # Next version (main)
+curl -s https://platform-beta.brc-analytics.org/api/v1/health | jq .version     # Released version (production)
 ```
-
-#### 3. Handle Version Bump PR
-
-The `publish-release` workflow will automatically:
-
-- Create a branch `release/update-version-<VERSION>`
-- Update `package.json` and `package-lock.json`
-- Create a PR with the version changes
-
-**You must manually merge this PR** to complete the release process.
-
-#### 4. Verify Release Success
-
-```bash
-# Check that tag points to correct commit
-git fetch --tags
-git log --oneline --decorate | head -5
-
-# Verify version display will work
-git tag --points-at HEAD  # Should show the new version tag
-```
-
-### Deployment
-
-Production deployment happens automatically when changes are merged to the `production` branch. To deploy a release:
-
-1. Merge the release version bump PR to `main`
-2. Create a PR from `main` to `production` (or merge directly)
-3. Once merged to `production`, the deployment workflow automatically builds and deploys to production
 
 ## E2E Testing
 

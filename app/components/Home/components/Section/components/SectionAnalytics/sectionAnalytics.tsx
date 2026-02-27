@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { SectionSubtitle, SectionTitle } from "../../section.styles";
 import { AnalyticsTools } from "./components/AnalyticsTools/analyticsTools";
 import { Headline, Section, SectionLayout } from "./sectionAnalytics.styles";

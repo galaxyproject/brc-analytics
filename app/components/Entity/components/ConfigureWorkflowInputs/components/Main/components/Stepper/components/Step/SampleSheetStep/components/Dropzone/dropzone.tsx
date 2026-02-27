@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Stack, Typography } from "@mui/material";
 import { DragEvent, useCallback, useState } from "react";
 import { StyledButtonBase, StyledPaper } from "./dropzone.styles";

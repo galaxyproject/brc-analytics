@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Fragment } from "react";
 import { SectionHero } from "../../../components/Home/components/Section/components/ga2/SectionHero/sectionHero";
 import { SectionAssemblies } from "../../../components/Home/components/Section/components/ga2/SectionAssemblies/sectionAssemblies";

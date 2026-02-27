@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { SectionSubtitle, SectionTitle } from "../../../section.styles";
 import { SectionViz as Sunburst } from "../../SectionViz/sunburst";
 import { Headline, Section, SectionLayout } from "./sectionAssemblies.styles";

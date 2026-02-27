@@ -12,6 +12,10 @@ import {
   ContrastPairs,
 } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseExplicitContrasts/types";
 
+const TEST_DESCRIPTION = {
+  NO_MUTATE: "does not mutate the original map",
+} as const;
+
 describe("validatePairs", () => {
   test("returns true when at least one complete pair exists", () => {
     const pairs: ContrastPairs = new Map([["1", ["control", "treated"]]]);
@@ -152,7 +156,7 @@ describe("addPairUpdater", () => {
     expect(result.size).toBe(2);
   });
 
-  test("does not mutate the original map", () => {
+  test(TEST_DESCRIPTION.NO_MUTATE, () => {
     const prev: ContrastPairs = new Map([["1", ["control", "treated"]]]);
 
     addPairUpdater("2")(prev);
@@ -265,7 +269,7 @@ describe("removePairUpdater", () => {
     expect([...result.values()]).toEqual([["", ""]]);
   });
 
-  test("does not mutate the original map", () => {
+  test(TEST_DESCRIPTION.NO_MUTATE, () => {
     const prev: ContrastPairs = new Map([
       ["1", ["control", "treated"]],
       ["2", ["baseline", "experiment"]],
@@ -325,7 +329,7 @@ describe("updatePairUpdater", () => {
     expect(result).toBe(prev);
   });
 
-  test("does not mutate the original map", () => {
+  test(TEST_DESCRIPTION.NO_MUTATE, () => {
     const prev: ContrastPairs = new Map([["1", ["control", "treated"]]]);
 
     updatePairUpdater("1", 0, "baseline")(prev);

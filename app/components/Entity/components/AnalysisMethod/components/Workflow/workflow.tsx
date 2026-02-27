@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { Button, Grid, Typography } from "@mui/material";
 import { Props } from "./types";
 import { Link as DXLink } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";

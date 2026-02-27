@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { AnalysisMethod } from "../AnalysisMethod/analysisMethod";
 import { Props } from "./types";
 import { useRouter } from "next/router";

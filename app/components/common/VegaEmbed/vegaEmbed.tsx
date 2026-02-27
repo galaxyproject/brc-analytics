@@ -1,4 +1,5 @@
 "use client";
+import { JSX } from "react";
 
 import { ReactNode, useEffect, useRef, useState } from "react";
 import embed from "vega-embed";

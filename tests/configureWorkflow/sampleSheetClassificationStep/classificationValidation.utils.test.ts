@@ -5,6 +5,10 @@ import {
   ColumnClassifications,
 } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 
+const EXPECTED = {
+  ALL_COLUMNS_CLASSIFIED: "All columns classified",
+} as const;
+
 describe("mapValidation", () => {
   test("returns all validations as true when all requirements are met", () => {
     const classifications: ColumnClassifications = {
@@ -21,7 +25,7 @@ describe("mapValidation", () => {
       [true, VALIDATION_LABELS.FORWARD_FILE_URL],
       [true, VALIDATION_LABELS.REVERSE_FILE_URL],
       [true, VALIDATION_LABELS.BIOLOGICAL_FACTOR],
-      [true, "All columns classified"],
+      [true, EXPECTED.ALL_COLUMNS_CLASSIFIED],
     ]);
   });
 
@@ -87,7 +91,7 @@ describe("mapValidation", () => {
 
     const result = mapValidation(classifications);
 
-    expect(result[4]).toEqual([false, "All columns classified"]);
+    expect(result[4]).toEqual([false, EXPECTED.ALL_COLUMNS_CLASSIFIED]);
   });
 
   test("returns multiple validations as false when multiple requirements not met", () => {
@@ -105,7 +109,7 @@ describe("mapValidation", () => {
       [false, VALIDATION_LABELS.FORWARD_FILE_URL],
       [false, VALIDATION_LABELS.REVERSE_FILE_URL],
       [false, VALIDATION_LABELS.BIOLOGICAL_FACTOR],
-      [false, "All columns classified"],
+      [false, EXPECTED.ALL_COLUMNS_CLASSIFIED],
     ]);
   });
 
@@ -119,7 +123,7 @@ describe("mapValidation", () => {
       [false, VALIDATION_LABELS.FORWARD_FILE_URL],
       [false, VALIDATION_LABELS.REVERSE_FILE_URL],
       [false, VALIDATION_LABELS.BIOLOGICAL_FACTOR],
-      [true, "All columns classified"],
+      [true, EXPECTED.ALL_COLUMNS_CLASSIFIED],
     ]);
   });
 
@@ -156,7 +160,7 @@ describe("mapValidation", () => {
       [true, VALIDATION_LABELS.FORWARD_FILE_URL],
       [true, VALIDATION_LABELS.REVERSE_FILE_URL],
       [true, VALIDATION_LABELS.BIOLOGICAL_FACTOR],
-      [true, "All columns classified"],
+      [true, EXPECTED.ALL_COLUMNS_CLASSIFIED],
     ]);
   });
 });

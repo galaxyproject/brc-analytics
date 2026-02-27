@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { IconButton, Stack, MenuItem, Typography } from "@mui/material";
 import { Props } from "./types";
 import { StyledStack, StyledSelect } from "./pairRow.styles";

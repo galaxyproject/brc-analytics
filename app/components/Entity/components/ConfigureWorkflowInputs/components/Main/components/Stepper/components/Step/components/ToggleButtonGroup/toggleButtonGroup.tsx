@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { ToggleButton } from "@mui/material";
 import { StyledToggleButtonGroup } from "./toggleButtonGroup.styles";
 import { TOGGLE_BUTTON_GROUP_PROPS } from "./constants";

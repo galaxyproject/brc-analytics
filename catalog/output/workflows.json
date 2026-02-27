@@ -30,8 +30,8 @@
         ],
         "ploidy": "ANY",
         "taxonomyId": "11158",
-        "trsId": "#workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main/versions/v0.1",
-        "workflowDescription": "Variant calling and consensus sequence generation for batches of Illumina PE sequenced viruses with uncomplicated and stable genome structure (like e.g. Morbilliviruses). It can handle both ampliconic and non-ampliconic data.",
+        "trsId": "#workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main/versions/v0.2",
+        "workflowDescription": "Variant calling and consensus sequence generation for batches of Illumina PE sequenced viruses with uncomplicated and stable genome structure (like e.g. Morbilliviruses).",
         "workflowName": "Variant calling and consensus construction from paired end short read data of non-segmented viral genomes"
       },
       {
@@ -306,7 +306,7 @@
         "iwcId": "chipseq-pe-main",
         "parameters": [
           {
-            "key": "reference_genome",
+            "key": "Reference genome",
             "variable": "ASSEMBLY_ID"
           },
           {
@@ -322,15 +322,15 @@
         ],
         "ploidy": "ANY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v0.15",
-        "workflowDescription": "Complete ChIP-seq analysis for paired-end sequencing data. Processes raw FASTQ files through adapter removal (cutadapt), alignment to reference genome (Bowtie2), and stringent quality filtering (MAPQ &gt;= 30, concordant pairs only). Peak calling with MACS2 optimized for paired-end reads identifies protein-DNA binding sites. Generates alignment files, peak calls, and quality metrics for downstream analysis.",
+        "trsId": "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v1.0",
+        "workflowDescription": "Complete ChIP-seq analysis for paired-end sequencing data. Processes raw FASTQ files through adapter removal (fastp), alignment to reference genome (Bowtie2), and stringent quality filtering (MAPQ greater than 30, concordant pairs only). Peak calling with MACS2 optimized for paired-end reads identifies protein-DNA binding sites. Generates alignment files, coverage, peak calls, and quality metrics for downstream analysis.",
         "workflowName": "ChIP-seq Analysis: Paired-End Read Processing"
       },
       {
         "iwcId": "chipseq-sr-main",
         "parameters": [
           {
-            "key": "reference_genome",
+            "key": "Reference genome",
             "variable": "ASSEMBLY_ID"
           },
           {
@@ -346,8 +346,8 @@
         ],
         "ploidy": "ANY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v0.15",
-        "workflowDescription": "Complete ChIP-seq analysis for single-end sequencing data. Processes raw FASTQ files through adapter removal (cutadapt), alignment to reference genome (Bowtie2), and quality filtering (MAPQ &gt;= 30). Peak calling with MACS2 uses either a fixed extension parameter or built-in model to identify protein-DNA binding sites. Generates alignment files, peak calls, and quality metrics for downstream analysis.",
+        "trsId": "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v1.0",
+        "workflowDescription": "Complete ChIP-seq analysis for single-end sequencing data. Processes raw FASTQ files through adapter removal (fastp), alignment to reference genome (Bowtie2), and quality filtering (MAPQ greater than 30). Peak calling with MACS2 uses a fixed extension of 200bp to identify protein-DNA binding sites. Generates alignment files, coverage, peak calls, and quality metrics for downstream analysis.",
         "workflowName": "ChIP-seq Analysis: Single-End Read Processing"
       },
       {
@@ -383,6 +383,78 @@
         "trsId": "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.14",
         "workflowDescription": "Complete CUT&RUN/CUT&TAG analysis workflow for paired-end sequencing data. Processes raw FASTQ files through adapter removal (cutadapt) and alignment (Bowtie2 with dovetail option enabled). Applies quality filtering (MAPQ ≥ 30, concordant pairs only), converts BAM to BED format, and performs peak calling using MACS2 with parameters optimized for the punctate signal profile characteristic of CUT&RUN/CUT&TAG experiments.",
         "workflowName": "CUT&RUN/CUT&TAG Analysis: Protein-DNA Interaction Mapping"
+      },
+      {
+        "iwcId": "hic-hicup-cooler-chic-fastq-to-cool-hicup-cooler",
+        "parameters": [
+          {
+            "key": "PE fastq input",
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "library_layout": "PAIRED",
+              "library_strategy": [
+                "Hi-C"
+              ]
+            }
+          },
+          {
+            "key": "genome name",
+            "variable": "ASSEMBLY_ID"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": "131567",
+        "trsId": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/chic-fastq-to-cool-hicup-cooler/versions/v0.3",
+        "workflowDescription": "End-to-end processing of Capture Hi-C paired-end sequencing data. Transforms raw FASTQ files into balanced contact matrices using HiCUP for processing Hi-C reads (adapter trimming, mapping, filtering for valid pairs) with additional filtering for MAPQ and captured regions. The workflow generates sorted tabix files via cooler and produces balanced cool files at user-specified resolution for downstream analysis and visualization.",
+        "workflowName": "Capture Hi-C Processing: FASTQ to Balanced Cool Files"
+      },
+      {
+        "iwcId": "hic-hicup-cooler-hic-fastq-to-cool-hicup-cooler",
+        "parameters": [
+          {
+            "key": "PE fastq input",
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "library_layout": "PAIRED",
+              "library_strategy": [
+                "Hi-C"
+              ]
+            }
+          },
+          {
+            "key": "genome name",
+            "variable": "ASSEMBLY_ID"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": "131567",
+        "trsId": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-cool-hicup-cooler/versions/v0.3",
+        "workflowDescription": "Comprehensive Hi-C data processing workflow that converts paired-end FASTQ files to balanced contact matrices. Uses HiCUP for pre-processing (adapter trimming, mapping, filtering) with fragment midpoint coordinate assignment, filters reads by mapping quality, and generates sorted tabix files. The final output is a balanced cool file at user-specified resolution created with cooler, ready for multi-resolution contact matrix analysis.",
+        "workflowName": "Hi-C Processing: FASTQ to Balanced Cool Files"
+      },
+      {
+        "iwcId": "hic-hicup-cooler-hic-fastq-to-pairs-hicup",
+        "parameters": [
+          {
+            "key": "PE fastq input",
+            "variable": "SANGER_READ_RUN_PAIRED",
+            "data_requirements": {
+              "library_layout": "PAIRED",
+              "library_strategy": [
+                "Hi-C"
+              ]
+            }
+          },
+          {
+            "key": "genome name",
+            "variable": "ASSEMBLY_ID"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": "131567",
+        "trsId": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-pairs-hicup/versions/v0.3",
+        "workflowDescription": "Processes Hi-C paired-end FASTQ files to generate validated interaction pairs using HiCUP. The workflow truncates reads at ligation junctions, maps to reference genome, assigns to restriction fragments, and filters out experimental artifacts (self-ligated, dangling ends, internal fragments, and size outliers). Removes duplicates and converts outputs to formats compatible with Juicebox/cooler using fragment midpoints as coordinates. Final filtering by mapping quality ensures high-confidence interaction data.",
+        "workflowName": "Hi-C Data Processing: FASTQ to Valid Interaction Pairs"
       }
     ]
   },
@@ -417,8 +489,8 @@
         ],
         "ploidy": "ANY",
         "taxonomyId": "11158",
-        "trsId": "#workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main/versions/v0.1",
-        "workflowDescription": "Variant calling and consensus sequence generation for batches of Illumina PE sequenced viruses with uncomplicated and stable genome structure (like e.g. Morbilliviruses). It can handle both ampliconic and non-ampliconic data.",
+        "trsId": "#workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main/versions/v0.2",
+        "workflowDescription": "Variant calling and consensus sequence generation for batches of Illumina PE sequenced viruses with uncomplicated and stable genome structure (like e.g. Morbilliviruses).",
         "workflowName": "Variant calling and consensus construction from paired end short read data of non-segmented viral genomes"
       },
       {
@@ -431,7 +503,7 @@
         ],
         "ploidy": "HAPLOID",
         "taxonomyId": "10244",
-        "trsId": "#workflow/github.com/iwc-workflows/pox-virus-amplicon/main/versions/v0.3",
+        "trsId": "#workflow/github.com/iwc-workflows/pox-virus-amplicon/main/versions/v0.4",
         "workflowDescription": "A workflow for the analysis of pox virus genomes sequenced as half-genomes (for ITR resolution) in a tiled-amplicon approach",
         "workflowName": "Pox Virus Illumina Amplicon Workflow from half-genomes"
       }
@@ -453,9 +525,23 @@
         ],
         "ploidy": "HAPLOID",
         "taxonomyId": "2",
-        "trsId": "#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.6",
+        "trsId": "#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.7",
         "workflowDescription": "Antimicrobial resistance gene detection from assembled bacterial genomes",
-        "workflowName": "AMR gene detection"
+        "workflowName": "AMR Gene Detection"
+      },
+      {
+        "iwcId": "bacterial_genome_annotation-main",
+        "parameters": [
+          {
+            "key": "Input sequence fasta",
+            "variable": "ASSEMBLY_FASTA_URL"
+          }
+        ],
+        "ploidy": "HAPLOID",
+        "taxonomyId": "2",
+        "trsId": "#workflow/github.com/iwc-workflows/bacterial_genome_annotation/main/versions/v1.2.0",
+        "workflowDescription": "Annotation of an assembled bacterial genomes to detect genes, potential plasmids, integrons and Insertion sequence (IS) elements.",
+        "workflowName": "Bacterial Genome Annotation"
       },
       {
         "iwcId": "lncrnas-annotation-main",

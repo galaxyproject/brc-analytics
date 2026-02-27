@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import * as d3 from "d3";
 import { useRef, useEffect, useState } from "react";
 import { getData, TaxonomyNode } from "./data";
@@ -6,6 +7,17 @@ import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/
 import { roma_cyclic } from "../../../../../../theme/color-maps/crameri";
 
 const data = getData();
+
+const ATTR = {
+  FILL_OPACITY: "fill-opacity",
+  STROKE_OPACITY: "stroke-opacity",
+  TRANSFORM: "transform",
+} as const;
+
+const STYLE = {
+  POINTER_EVENTS: "pointer-events",
+  STROKE_WIDTH: "stroke-width",
+} as const;
 
 type SectionVizProps = {
   depth?: number;
@@ -25,7 +37,7 @@ export const SectionViz = ({
 
   // Add a reference to the clicked function so it can be called from NodeDetails
   const clickedRef =
-    useRef<(event: React.MouseEvent | null, p: TreeNode) => void>();
+    useRef<(event: React.MouseEvent | null, p: TreeNode) => void>(null);
 
   useEffect(() => {
     if (!svgRef.current) return;
@@ -150,7 +162,7 @@ export const SectionViz = ({
       .style("background", PALETTE.SMOKE_LIGHTEST)
       .style("border", "0px")
       .style("border-radius", "8px")
-      .style("pointer-events", "none");
+      .style(STYLE.POINTER_EVENTS, "none");
 
     // Create a hierarchy from the sample data.
     const hierarchyData = d3
@@ -263,15 +275,15 @@ export const SectionViz = ({
       .join("path")
       .attr("fill", (d) => getNodeColor(d, root))
       // Show only nodes with relative depth <= DEPTH.
-      .attr("fill-opacity", (d) => (isVisible(d, root, 0) ? 1 : 0))
-      .attr("stroke-opacity", (d) => (isVisible(d, root, 0) ? 1 : 0))
+      .attr(ATTR.FILL_OPACITY, (d) => (isVisible(d, root, 0) ? 1 : 0))
+      .attr(ATTR.STROKE_OPACITY, (d) => (isVisible(d, root, 0) ? 1 : 0))
       .attr("d", (d) => arc(d.current))
       .style("cursor", "pointer")
       .style("stroke", "#333")
-      .style("stroke-width", "1px")
+      .style(STYLE.STROKE_WIDTH, "1px")
       .on("mouseover", function (event, d) {
         // Hghlight the arc, and display the node name and value in the tooltip.
-        d3.select(this).style("stroke-width", "2px");
+        d3.select(this).style(STYLE.STROKE_WIDTH, "2px");
         tooltip.transition().duration(200).style("opacity", 0.9);
         tooltip
           .html(`<strong>${d.data.name}</strong>`)
@@ -280,7 +292,7 @@ export const SectionViz = ({
       })
       .on("mouseout", function () {
         // Restore the original stroke color and width
-        d3.select(this).style("stroke-width", "1px");
+        d3.select(this).style(STYLE.STROKE_WIDTH, "1px");
         tooltip.transition().duration(500).style("opacity", 0);
       })
       .on("click", clicked);
@@ -305,23 +317,23 @@ export const SectionViz = ({
     // We hide the label for the current center node (using centerLabel instead).
     const label = svg
       .append("g")
-      .attr("pointer-events", "none")
+      .attr(STYLE.POINTER_EVENTS, "none")
       .attr("text-anchor", "middle")
       .selectAll("text")
       .data(root.descendants().slice(1))
       .join("text")
-      .attr("fill-opacity", (d) => {
+      .attr(ATTR.FILL_OPACITY, (d) => {
         // Use the consolidated visibility function for consistent behavior
         return isLabelVisible(d, root, 0) ? 1 : 0;
       })
       .attr("dy", "0.35em")
-      .attr("transform", labelTransform)
+      .attr(ATTR.TRANSFORM, labelTransform)
       .text((d) => d.data.name);
 
     const centerGroup = svg
       .append("g")
       .attr("class", "center-group")
-      .style("pointer-events", "none");
+      .style(STYLE.POINTER_EVENTS, "none");
 
     const LOGO_WIDTH = 140;
     const LOGO_HEIGHT = 140;
@@ -424,18 +436,16 @@ export const SectionViz = ({
         .duration(750)
         .tween("data", (d) => {
           const i = d3.interpolate(d.current, d.target);
-          // eslint-disable-next-line sonarjs/no-nested-functions -- cleaner in d3 to keep this inlined
           return (transition_duration: number): void => {
             d.current = i(transition_duration);
           };
         })
-        // eslint-disable-next-line sonarjs/no-nested-functions -- cleaner in d3 to keep this inlined
         .attrTween("d", (d) => (): string => arc(d.current) || "")
         .attr("fill", (d) => getNodeColor(d, p)) // Update colors based on new root
-        .attr("fill-opacity", (d): number =>
+        .attr(ATTR.FILL_OPACITY, (d): number =>
           isVisible(d, currentRoot, p.depth) ? 1 : 0
         )
-        .attr("stroke-opacity", (d) =>
+        .attr(ATTR.STROKE_OPACITY, (d) =>
           isVisible(d, currentRoot, p.depth) ? 1 : 0
         );
 
@@ -445,17 +455,12 @@ export const SectionViz = ({
         .duration(750)
         .tween("data", (d) => {
           const i = d3.interpolate(d.current, d.target);
-          // eslint-disable-next-line sonarjs/no-nested-functions -- cleaner in d3 to keep this inlined
           return (transition_duration: number): void => {
             d.current = i(transition_duration);
           };
         })
-        .attrTween(
-          "transform",
-          // eslint-disable-next-line sonarjs/no-nested-functions -- cleaner in d3 to keep this inlined
-          (d) => (): string => labelTransform(d)
-        )
-        .attrTween("fill-opacity", (d) =>
+        .attrTween(ATTR.TRANSFORM, (d) => (): string => labelTransform(d))
+        .attrTween(ATTR.FILL_OPACITY, (d) =>
           createOpacityTween(d, currentRoot, p.depth)
         );
     }

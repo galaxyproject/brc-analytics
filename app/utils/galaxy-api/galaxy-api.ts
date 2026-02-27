@@ -1,30 +1,36 @@
 import { WORKFLOW_PARAMETER_VARIABLE } from "../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { WorkflowParameter } from "../../apis/catalog/brc-analytics-catalog/common/entities";
+
+const FILE_EXT = {
+  FASTQ_SANGER_GZ: "fastqsanger.gz",
+} as const;
+
 import ky from "ky";
 import {
-  EnaFileInfo,
-  EnaSequencingReads,
-  GalaxyLandingResponseData,
-  WorkflowLandingsBody,
-  WorkflowLandingsBodyRequestState,
-  WorkflowParameterValue,
   DataLandingsBody,
   DataLandingsBodyRequestState,
-  GalaxyPairedCollection,
-  GalaxyListCollection,
-  GalaxyUrlData,
-  GalaxyCollection,
-  DataLandingsCollectionTarget,
   DataLandingsCollection,
+  DataLandingsCollectionTarget,
   DataLandingsDatasetTarget,
-  WorkflowCollectionParameter,
-  GalaxyCollectionElement,
-  WorkflowCollectionElement,
-  GalaxyApiCommonUrlData,
-  DeSeq2WorkflowLandingsBody,
   DeSeq2ColumnDefinition,
   DeSeq2PairedSample,
   DeSeq2SampleSheetCollection,
+  DeSeq2WorkflowLandingsBody,
+  EnaFileInfo,
+  EnaSequencingReads,
+  GalaxyApiCommonUrlData,
+  GalaxyCollection,
+  GalaxyCollectionElement,
+  GalaxyLandingResponseData,
+  GalaxyListCollection,
+  GalaxyPairedCollection,
+  GalaxyUrlData,
+  WorkflowCollectionElement,
+  WorkflowCollectionParameter,
+  WorkflowDatasetHash,
+  WorkflowLandingsBody,
+  WorkflowLandingsBodyRequestState,
+  WorkflowParameterValue,
 } from "./entities";
 import { COLUMN_TYPE } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 import { PrimaryContrasts } from "../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
@@ -372,8 +378,8 @@ function buildSingleReadRunsRequestValue(
       const runAccession = runInfo.runAccession;
       const { forward } = getSingleRunUrlsInfo(runInfo.urls, runInfo.md5Hashes);
       return {
-        ext: "fastqsanger.gz",
-        hashes: [{ hash_function: "MD5", hash_value: forward.md5 }],
+        ext: FILE_EXT.FASTQ_SANGER_GZ,
+        hashes: createMd5Hash(forward.md5),
         identifier: runAccession,
         url: forward.url,
       };
@@ -398,14 +404,14 @@ function buildPairedReadRunsRequestValue(
         collectionType: "paired",
         elements: [
           {
-            ext: "fastqsanger.gz",
-            hashes: [{ hash_function: "MD5", hash_value: forward.md5 }],
+            ext: FILE_EXT.FASTQ_SANGER_GZ,
+            hashes: createMd5Hash(forward.md5),
             identifier: "forward",
             url: forward.url,
           },
           {
-            ext: "fastqsanger.gz",
-            hashes: [{ hash_function: "MD5", hash_value: reverse.md5 }],
+            ext: FILE_EXT.FASTQ_SANGER_GZ,
+            hashes: createMd5Hash(reverse.md5),
             identifier: "reverse",
             url: reverse.url,
           },
@@ -521,9 +527,7 @@ function buildUcscTracksRequestValues(
   for (const track of tracks) {
     values.push({
       ext: getUcscBigDataExt(track.bigDataUrl),
-      hashes: track.md5Hash
-        ? [{ hash_function: "MD5", hash_value: track.md5Hash }]
-        : undefined,
+      hashes: createMd5Hash(track.md5Hash),
       identifier: track.shortLabel,
       url: track.bigDataUrl,
     });
@@ -639,8 +643,12 @@ function buildSampleElements(
     const identifier = row[identifierColumn];
     const forwardUrl = ftpToAscp(row[forwardColumn]);
     const reverseUrl = ftpToAscp(row[reverseColumn]);
-    const forwardMd5 = forwardMd5Column ? row[forwardMd5Column] : undefined;
-    const reverseMd5 = reverseMd5Column ? row[reverseMd5Column] : undefined;
+    const forwardMd5 = forwardMd5Column
+      ? row[forwardMd5Column]?.trim() || undefined
+      : undefined;
+    const reverseMd5 = reverseMd5Column
+      ? row[reverseMd5Column]?.trim() || undefined
+      : undefined;
 
     return {
       class: "Collection" as const,
@@ -648,19 +656,15 @@ function buildSampleElements(
       elements: [
         {
           class: "File" as const,
-          ext: "fastqsanger.gz",
-          hashes: forwardMd5
-            ? [{ hash_function: "MD5" as const, hash_value: forwardMd5 }]
-            : undefined,
+          ext: FILE_EXT.FASTQ_SANGER_GZ,
+          hashes: createMd5Hash(forwardMd5),
           location: forwardUrl,
           name: "forward" as const,
         },
         {
           class: "File" as const,
-          ext: "fastqsanger.gz",
-          hashes: reverseMd5
-            ? [{ hash_function: "MD5" as const, hash_value: reverseMd5 }]
-            : undefined,
+          ext: FILE_EXT.FASTQ_SANGER_GZ,
+          hashes: createMd5Hash(reverseMd5),
           location: reverseUrl,
           name: "reverse" as const,
         },
@@ -780,7 +784,7 @@ export async function getDeSeq2LandingUrl(
 
   // Extract reference level from baseline contrasts
   const referenceLevel =
-    primaryContrasts?.type === "BASELINE"
+    primaryContrasts?.type === "BASELINE" && primaryContrasts.baseline
       ? primaryContrasts.baseline
       : undefined;
 
@@ -811,6 +815,18 @@ export async function getDeSeq2LandingUrl(
 }
 
 /**
+ * Create a hash object for MD5 checksum.
+ * @param md5 - MD5 checksum value.
+ * @returns Hash object array or undefined if no checksum provided.
+ */
+function createMd5Hash(
+  md5: string | undefined
+): WorkflowDatasetHash[] | undefined {
+  if (!md5) return undefined;
+  return [{ hash_function: "MD5", hash_value: md5 }];
+}
+
+/**
  * Convert a checksum to the Galaxy API hash format.
  * Uses the shared getChecksumForPath utility to extract checksums.
  *
@@ -828,10 +844,5 @@ function getHashesForUrl(
   md5Checksums: Map<string, string>
 ): GalaxyUrlData["hashes"] {
   const md5 = getChecksumForPath(url, assembly, md5Checksums);
-
-  if (md5) {
-    return [{ hash_function: "MD5", hash_value: md5 }];
-  }
-
-  return undefined;
+  return createMd5Hash(md5);
 }

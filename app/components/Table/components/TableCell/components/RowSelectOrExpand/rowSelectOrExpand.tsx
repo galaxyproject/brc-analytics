@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { CellContext, RowData } from "@tanstack/react-table";
 import { RowSelectionCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/RowSelectionCell/rowSelectionCell";
 import { ChevronRightRounded } from "@mui/icons-material";

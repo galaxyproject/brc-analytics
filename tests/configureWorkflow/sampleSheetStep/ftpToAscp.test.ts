@@ -1,5 +1,14 @@
 import { ftpToAscp } from "../../../app/utils/galaxy-api/url-utils";
 
+const TEST_DATA = {
+  ASCP_URL:
+    "ascp://fasp.sra.ebi.ac.uk/vol1/fastq/SRR292/094/SRR29244694/SRR29244694_1.fastq.gz",
+};
+
+const EXPECTED = {
+  ASCP_URL: TEST_DATA.ASCP_URL,
+} as const;
+
 /**
  * Tests for FTP to ASCP URL conversion logic.
  * These tests verify the URL normalization behavior for ENA file URLs.
@@ -10,26 +19,21 @@ describe("ftpToAscp URL conversion", () => {
     it("converts ftp:// prefixed URL to ascp://", () => {
       const input =
         "ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR292/094/SRR29244694/SRR29244694_1.fastq.gz";
-      const expected =
-        "ascp://fasp.sra.ebi.ac.uk/vol1/fastq/SRR292/094/SRR29244694/SRR29244694_1.fastq.gz";
 
-      expect(ftpToAscp(input)).toBe(expected);
+      expect(ftpToAscp(input)).toBe(EXPECTED.ASCP_URL);
     });
 
     it("converts bare ftp.sra host to ascp:// with fasp.sra host", () => {
       const input =
         "ftp.sra.ebi.ac.uk/vol1/fastq/SRR292/094/SRR29244694/SRR29244694_1.fastq.gz";
-      const expected =
-        "ascp://fasp.sra.ebi.ac.uk/vol1/fastq/SRR292/094/SRR29244694/SRR29244694_1.fastq.gz";
 
-      expect(ftpToAscp(input)).toBe(expected);
+      expect(ftpToAscp(input)).toBe(EXPECTED.ASCP_URL);
     });
   });
 
   describe("ENA ASCP URL formats", () => {
     it("returns properly formatted ascp:// URL unchanged", () => {
-      const input =
-        "ascp://fasp.sra.ebi.ac.uk/vol1/fastq/SRR292/094/SRR29244694/SRR29244694_1.fastq.gz";
+      const input = TEST_DATA.ASCP_URL;
 
       expect(ftpToAscp(input)).toBe(input);
     });
@@ -37,19 +41,15 @@ describe("ftpToAscp URL conversion", () => {
     it("converts bare fasp.sra host to ascp:// prefixed URL", () => {
       const input =
         "fasp.sra.ebi.ac.uk/vol1/fastq/SRR292/094/SRR29244694/SRR29244694_1.fastq.gz";
-      const expected =
-        "ascp://fasp.sra.ebi.ac.uk/vol1/fastq/SRR292/094/SRR29244694/SRR29244694_1.fastq.gz";
 
-      expect(ftpToAscp(input)).toBe(expected);
+      expect(ftpToAscp(input)).toBe(EXPECTED.ASCP_URL);
     });
 
     it("normalizes ascp:// URL with ftp.sra host to fasp.sra host", () => {
       const input =
         "ascp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR292/094/SRR29244694/SRR29244694_1.fastq.gz";
-      const expected =
-        "ascp://fasp.sra.ebi.ac.uk/vol1/fastq/SRR292/094/SRR29244694/SRR29244694_1.fastq.gz";
 
-      expect(ftpToAscp(input)).toBe(expected);
+      expect(ftpToAscp(input)).toBe(EXPECTED.ASCP_URL);
     });
   });
 

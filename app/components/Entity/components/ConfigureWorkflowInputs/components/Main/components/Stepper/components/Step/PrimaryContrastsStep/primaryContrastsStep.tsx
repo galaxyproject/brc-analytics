@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { useMemo } from "react";
 import { Button, Divider } from "@mui/material";
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";

@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { SectionProps } from "./types";
 import { Fragment } from "react";
 import { Divider } from "@mui/material";

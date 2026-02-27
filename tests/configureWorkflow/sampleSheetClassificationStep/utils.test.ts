@@ -7,6 +7,14 @@ import {
   ColumnClassifications,
 } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 
+const EXPECTED = {
+  BIOLOGICAL_FACTOR_REQUIRED:
+    "At least one biological factor column is required",
+  FORWARD_URL_REQUIRED: "One forward file URL column is required",
+  IDENTIFIER_REQUIRED: "One identifier column is required",
+  REVERSE_URL_REQUIRED: "One reverse file URL column is required",
+} as const;
+
 describe("validateClassifications", () => {
   test("returns valid when all requirements are met", () => {
     const classifications: ColumnClassifications = {
@@ -94,7 +102,7 @@ describe("validateClassifications", () => {
     const result = validateClassifications(classifications);
 
     expect(result.valid).toBe(false);
-    expect(result.errors).toContain("One identifier column is required");
+    expect(result.errors).toContain(EXPECTED.IDENTIFIER_REQUIRED);
   });
 
   test("returns error when multiple identifiers are specified", () => {
@@ -123,7 +131,7 @@ describe("validateClassifications", () => {
     const result = validateClassifications(classifications);
 
     expect(result.valid).toBe(false);
-    expect(result.errors).toContain("One forward file URL column is required");
+    expect(result.errors).toContain(EXPECTED.FORWARD_URL_REQUIRED);
   });
 
   test("returns error when multiple forward file URLs are specified", () => {
@@ -154,7 +162,7 @@ describe("validateClassifications", () => {
     const result = validateClassifications(classifications);
 
     expect(result.valid).toBe(false);
-    expect(result.errors).toContain("One reverse file URL column is required");
+    expect(result.errors).toContain(EXPECTED.REVERSE_URL_REQUIRED);
   });
 
   test("returns error when multiple reverse file URLs are specified", () => {
@@ -185,9 +193,7 @@ describe("validateClassifications", () => {
     const result = validateClassifications(classifications);
 
     expect(result.valid).toBe(false);
-    expect(result.errors).toContain(
-      "At least one biological factor column is required"
-    );
+    expect(result.errors).toContain(EXPECTED.BIOLOGICAL_FACTOR_REQUIRED);
   });
 
   test("returns multiple errors when multiple requirements are not met", () => {
@@ -203,12 +209,10 @@ describe("validateClassifications", () => {
     expect(result.valid).toBe(false);
     expect(result.errors).toHaveLength(5);
     expect(result.errors).toContain("4 column(s) are not classified");
-    expect(result.errors).toContain("One identifier column is required");
-    expect(result.errors).toContain("One forward file URL column is required");
-    expect(result.errors).toContain("One reverse file URL column is required");
-    expect(result.errors).toContain(
-      "At least one biological factor column is required"
-    );
+    expect(result.errors).toContain(EXPECTED.IDENTIFIER_REQUIRED);
+    expect(result.errors).toContain(EXPECTED.FORWARD_URL_REQUIRED);
+    expect(result.errors).toContain(EXPECTED.REVERSE_URL_REQUIRED);
+    expect(result.errors).toContain(EXPECTED.BIOLOGICAL_FACTOR_REQUIRED);
   });
 
   test("returns errors for empty classifications", () => {
@@ -217,12 +221,10 @@ describe("validateClassifications", () => {
     const result = validateClassifications(classifications);
 
     expect(result.valid).toBe(false);
-    expect(result.errors).toContain("One identifier column is required");
-    expect(result.errors).toContain("One forward file URL column is required");
-    expect(result.errors).toContain("One reverse file URL column is required");
-    expect(result.errors).toContain(
-      "At least one biological factor column is required"
-    );
+    expect(result.errors).toContain(EXPECTED.IDENTIFIER_REQUIRED);
+    expect(result.errors).toContain(EXPECTED.FORWARD_URL_REQUIRED);
+    expect(result.errors).toContain(EXPECTED.REVERSE_URL_REQUIRED);
+    expect(result.errors).toContain(EXPECTED.BIOLOGICAL_FACTOR_REQUIRED);
   });
 });
 

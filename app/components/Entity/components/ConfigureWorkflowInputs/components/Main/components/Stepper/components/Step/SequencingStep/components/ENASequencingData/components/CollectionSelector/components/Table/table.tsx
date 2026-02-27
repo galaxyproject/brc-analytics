@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { GridTable } from "@databiosphere/findable-ui/lib/components/Table/table.styles";
 import { TableHead } from "@databiosphere/findable-ui/lib/components/Table/components/TableHead/tableHead";
 import { ROW_DIRECTION } from "@databiosphere/findable-ui/lib/components/Table/common/entities";

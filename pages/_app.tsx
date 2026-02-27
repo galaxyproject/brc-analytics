@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import "@databiosphere/findable-ui";
 import { AzulEntitiesStaticResponse } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import { Error } from "@databiosphere/findable-ui/lib/components/Error/error";

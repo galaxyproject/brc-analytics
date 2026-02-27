@@ -7,8 +7,8 @@ Paramyxoviridae has been designated as a prototype pathogen family for pandemic 
 ## Impact
 
 - **Human Health**: Causes widespread respiratory illnesses, childhood diseases, and emerging zoonotic infections
-- **Vaccination**: Several members are targets of routine childhood vaccination programs
-- **Mortality**: Measles remains a leading cause of vaccine-preventable childhood mortality globally
+- **Immunization**: Several members are targets of routine childhood immunization programs
+- **Mortality**: Measles remains a leading cause of preventable childhood mortality globally
 - **Emerging Threats**: Nipah and Hendra viruses have high mortality rates and pandemic potential
 - **Economic**: Significant healthcare costs associated with respiratory infections
-- **Public Health**: Requires ongoing surveillance and vaccination campaigns
+- **Public Health**: Requires ongoing surveillance and immunization campaigns
