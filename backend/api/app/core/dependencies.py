@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 # Global service instances (singletons)
 _cache_service = None
+_catalog_data = None
 _llm_service = None
 _ena_service = None
 _rate_limiter = None
@@ -21,6 +22,17 @@ async def get_cache_service() -> CacheService:
         settings = get_settings()
         _cache_service = CacheService(settings.REDIS_URL)
     return _cache_service
+
+
+async def get_catalog_data():
+    """Dependency to get shared catalog data singleton"""
+    global _catalog_data
+    if _catalog_data is None:
+        from app.services.catalog_data import CatalogData
+
+        settings = get_settings()
+        _catalog_data = CatalogData(settings.CATALOG_PATH)
+    return _catalog_data
 
 
 async def get_llm_service():
@@ -82,8 +94,9 @@ def reset_cache_service() -> None:
 
 def reset_all_services() -> None:
     """Reset all global service instances (used during shutdown)"""
-    global _cache_service, _llm_service, _ena_service, _rate_limiter
+    global _cache_service, _catalog_data, _llm_service, _ena_service, _rate_limiter
     _cache_service = None
+    _catalog_data = None
     _llm_service = None
     _ena_service = None
     _rate_limiter = None

@@ -9,6 +9,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.116.1",
+    "fastmcp>=3.0.0",
     "httpx>=0.28.1",
     "pydantic>=2.11.7",
     "pydantic-ai>=0.8.0",

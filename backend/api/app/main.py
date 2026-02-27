@@ -8,10 +8,12 @@ from app.api.v1 import cache, ena, health, links, llm, version
 from app.core.config import get_settings
 from app.core.dependencies import (
     get_cache_service,
+    get_catalog_data,
     get_ena_service,
     get_llm_service,
     reset_all_services,
 )
+from app.services.mcp_server import create_mcp_server
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
@@ -25,9 +27,17 @@ async def lifespan(app: FastAPI):
     await cache_service.flush_all()
     logger.info("Cache cleared on startup")
 
-    # Pre-initialize LLM and ENA services (singletons)
+    # Pre-initialize services (singletons)
+    catalog_data = await get_catalog_data()
+    ena_service = await get_ena_service()
     await get_llm_service()
-    await get_ena_service()
+
+    # Mount MCP server for AI tool access to the catalog
+    mcp = create_mcp_server(catalog_data, ena_service)
+    mcp_app = mcp.http_app(path="/", stateless_http=True)
+    app.mount("/api/v1/mcp", mcp_app)
+    logger.info("MCP server mounted at /api/v1/mcp")
+
     logger.info("All services initialized")
 
     yield
