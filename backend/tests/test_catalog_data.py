@@ -181,9 +181,16 @@ class TestGetCompatibleWorkflows:
         # taxonomy 2 = Bacteria; AMR workflow targets taxonomy 2
         results = catalog.get_compatible_workflows(["HAPLOID"], taxonomy_id="2")
         assert len(results) > 0
-        # All taxonomy-specific results should match or be None (universal)
-        for r in results:
-            assert r["taxonomyId"] is None or str(r["taxonomyId"]) == "2"
+        # AMR workflow (targets Bacteria=2) should be in results
+        amr = [r for r in results if r["iwcId"] == "amr_gene_detection-main"]
+        assert len(amr) == 1
+
+    def test_lineage_based_taxonomy_matching(self, catalog):
+        # E. coli species tax ID is 562; AMR workflow targets Bacteria (2).
+        # 2 is in E. coli's lineage, so the AMR workflow should be returned.
+        results = catalog.get_compatible_workflows(["HAPLOID"], taxonomy_id="562")
+        amr = [r for r in results if r["iwcId"] == "amr_gene_detection-main"]
+        assert len(amr) == 1
 
 
 class TestResolveWorkflowInputs:
