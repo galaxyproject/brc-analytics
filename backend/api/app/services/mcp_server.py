@@ -8,23 +8,24 @@ from app.services.ena_service import ENAService
 
 logger = logging.getLogger(__name__)
 
-# TODO: these counts are hardcoded — update when the catalog grows significantly,
-# or generate this blurb from the loaded CatalogData at server creation time
-MCP_INSTRUCTIONS = """\
-BRC Analytics provides curated genomic data for infectious disease and \
-eukaryotic pathogen research. This server exposes the full catalog \
-(1,900+ organisms, 5,000+ assemblies, 22 analysis workflows) and \
-sequencing data search via the European Nucleotide Archive (ENA).
-
-Use the catalog tools to explore organisms, assemblies, and workflows. \
-Use the ENA tools to find raw sequencing data for a given organism.
-"""
-
 ENA_RESULT_CAP = 50
 
 
 def create_mcp_server(catalog_data: CatalogData, ena_service: ENAService) -> FastMCP:
-    mcp = FastMCP("BRC Analytics", instructions=MCP_INSTRUCTIONS)
+    wf_count = sum(
+        len(c.get("workflows", [])) for c in catalog_data.workflow_categories
+    )
+    instructions = (
+        "BRC Analytics provides curated genomic data for infectious disease and "
+        "eukaryotic pathogen research. This server exposes the full catalog "
+        f"({len(catalog_data.organisms):,} organisms, "
+        f"{len(catalog_data.assemblies):,} assemblies, "
+        f"{wf_count} analysis workflows) and "
+        "sequencing data search via the European Nucleotide Archive (ENA).\n\n"
+        "Use the catalog tools to explore organisms, assemblies, and workflows. "
+        "Use the ENA tools to find raw sequencing data for a given organism."
+    )
+    mcp = FastMCP("BRC Analytics", instructions=instructions)
 
     # -- Catalog tools (sync, in-memory) --
 
@@ -33,8 +34,6 @@ def create_mcp_server(catalog_data: CatalogData, ena_service: ENAService) -> Fas
         """Search BRC organisms by name, taxonomy ID, or taxonomic group.
         Returns matching organisms with taxonomy, assembly count, and priority info."""
         results = catalog_data.search_organisms(query, limit=limit)
-        if not results:
-            raise ValueError(f"No organisms found matching '{query}'")
         return {"count": len(results), "organisms": results}
 
     @mcp.tool()
@@ -50,8 +49,6 @@ def create_mcp_server(catalog_data: CatalogData, ena_service: ENAService) -> Fas
         """List genome assemblies for an organism (by NCBI taxonomy ID).
         Returns accession, level, ploidy, coverage, and annotation status."""
         results = catalog_data.get_assemblies_for_organism(taxonomy_id)
-        if not results:
-            raise ValueError(f"No assemblies found for taxonomy ID '{taxonomy_id}'")
         return {"count": len(results), "assemblies": results}
 
     @mcp.tool()
@@ -75,8 +72,6 @@ def create_mcp_server(catalog_data: CatalogData, ena_service: ENAService) -> Fas
         """Get all workflows in a category. Use the category key (e.g. VARIANT_CALLING)
         or display name (e.g. 'Variant calling')."""
         results = catalog_data.get_workflows_in_category(category)
-        if not results:
-            raise ValueError(f"No workflows found in category '{category}'")
         return {"count": len(results), "workflows": results}
 
     @mcp.tool()
@@ -84,11 +79,6 @@ def create_mcp_server(catalog_data: CatalogData, ena_service: ENAService) -> Fas
         """Find workflows compatible with given ploidy values and optional taxonomy ID.
         Ploidy values are e.g. 'haploid', 'diploid'."""
         results = catalog_data.get_compatible_workflows(ploidies, taxonomy_id)
-        if not results:
-            raise ValueError(
-                "No compatible workflows for "
-                f"ploidies={ploidies}, taxonomy={taxonomy_id}"
-            )
         return {"count": len(results), "workflows": results}
 
     @mcp.tool()
@@ -126,8 +116,6 @@ def create_mcp_server(catalog_data: CatalogData, ena_service: ENAService) -> Fas
         except Exception as e:
             raise ValueError(f"ENA search failed: {e}") from e
         data = result.get("data", [])
-        if not data:
-            raise ValueError(f"No ENA records found for taxonomy ID '{taxonomy_id}'")
         return {"count": len(data), "records": data[:ENA_RESULT_CAP]}
 
     @mcp.tool()
@@ -142,8 +130,6 @@ def create_mcp_server(catalog_data: CatalogData, ena_service: ENAService) -> Fas
         except Exception as e:
             raise ValueError(f"ENA keyword search failed: {e}") from e
         data = result.get("data", [])
-        if not data:
-            raise ValueError(f"No ENA records found for keywords {keywords}")
         return {"count": len(data), "records": data[:ENA_RESULT_CAP]}
 
     logger.info("MCP server created")

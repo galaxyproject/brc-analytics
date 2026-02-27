@@ -92,8 +92,9 @@ class TestMCPCatalogTools:
 
     @pytest.mark.asyncio
     async def test_search_organisms_no_results(self, mcp):
-        with pytest.raises(ValueError, match="No organisms found"):
-            await call_tool(mcp, "search_organisms", {"query": "zzzznonexistent"})
+        result = await call_tool(mcp, "search_organisms", {"query": "zzzznonexistent"})
+        assert result["count"] == 0
+        assert result["organisms"] == []
 
     @pytest.mark.asyncio
     async def test_get_organism(self, mcp):
@@ -173,8 +174,9 @@ class TestMCPENATools:
     @pytest.mark.asyncio
     async def test_search_ena_no_results(self, mcp, mock_ena_service):
         mock_ena_service.search_by_taxonomy = AsyncMock(return_value={"data": []})
-        with pytest.raises(ValueError, match="No ENA records"):
-            await call_tool(mcp, "search_ena", {"taxonomy_id": "0000000"})
+        result = await call_tool(mcp, "search_ena", {"taxonomy_id": "0000000"})
+        assert result["count"] == 0
+        assert result["records"] == []
 
     @pytest.mark.asyncio
     async def test_search_ena_keywords(self, mcp, mock_ena_service):
