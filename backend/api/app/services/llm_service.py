@@ -220,8 +220,7 @@ The workflow catalog will be provided in each request - select only from that ca
 Return ONLY the JSON array. No markdown code blocks, no explanations, no extra text.""",
             )
 
-            # Load workflow catalog for recommendations — reuse shared
-            # CatalogData if provided, otherwise load standalone
+            # Load workflow catalog for recommendations
             try:
                 self.workflow_catalog = WorkflowCatalog(self.settings.CATALOG_PATH)
                 logger.info(
