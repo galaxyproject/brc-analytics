@@ -25,6 +25,7 @@ from app.models.llm import (
     WorkflowRecommendation,
     WorkflowSuggestionRequest,
 )
+from app.services.catalog_data import CatalogData
 from app.services.sambanova_patch import patch_sambanova_compatibility
 from app.services.workflow_catalog import WorkflowCatalog
 
@@ -45,8 +46,9 @@ class LLMService:
     - Phase 2: Secondary model converts analysis to structured JSON
     """
 
-    def __init__(self, cache: CacheService):
+    def __init__(self, cache: CacheService, catalog: CatalogData | None = None):
         self.cache = cache
+        self.catalog = catalog
         self.settings = get_settings()
 
         if not self.settings.AI_API_KEY:
@@ -218,7 +220,8 @@ The workflow catalog will be provided in each request - select only from that ca
 Return ONLY the JSON array. No markdown code blocks, no explanations, no extra text.""",
             )
 
-            # Load workflow catalog for recommendations
+            # Load workflow catalog for recommendations — reuse shared
+            # CatalogData if provided, otherwise load standalone
             try:
                 self.workflow_catalog = WorkflowCatalog(self.settings.CATALOG_PATH)
                 logger.info(
