@@ -8,6 +8,8 @@ from app.services.ena_service import ENAService
 
 logger = logging.getLogger(__name__)
 
+# TODO: these counts are hardcoded — update when the catalog grows significantly,
+# or generate this blurb from the loaded CatalogData at server creation time
 MCP_INSTRUCTIONS = """\
 BRC Analytics provides curated genomic data for infectious disease and \
 eukaryotic pathogen research. This server exposes the full catalog \
