@@ -82,7 +82,7 @@ export function makeConfig(
         versionInfo: createElement(C.VersionInfoWithServerStatus),
       },
       header: {
-        actions: createElement(C.AuthButton),
+        actions: loginEnabled ? createElement(C.AuthButton) : undefined,
         logo: C.Logo({
           alt: APP_TITLE,
           height: 26,

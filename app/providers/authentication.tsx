@@ -53,7 +53,7 @@ export function BrcAuthProvider({
   const [user, setUser] = useState<BrcUser | null>(null);
 
   useEffect(() => {
-    if (!BACKEND_URL) {
+    if (!loginEnabled || !BACKEND_URL) {
       setIsLoading(false);
       return;
     }
@@ -71,7 +71,7 @@ export function BrcAuthProvider({
         // Not authenticated or backend unavailable — both fine.
       })
       .finally(() => setIsLoading(false));
-  }, []);
+  }, [loginEnabled]);
 
   const login = useCallback(() => {
     window.location.href = `${BACKEND_URL}/api/v1/auth/login`;

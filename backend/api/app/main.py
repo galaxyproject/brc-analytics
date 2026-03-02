@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1 import assistant, auth, cache, ena, health, links, llm, version
 from app.core.config import get_settings
 from app.core.dependencies import (
+    get_auth_service,
     get_cache_service,
     get_ena_service,
     get_llm_service,
@@ -32,7 +33,9 @@ async def lifespan(app: FastAPI):
 
     yield
 
-    # Shutdown: close cache connection and reset all service singletons
+    # Shutdown: close connections and reset all service singletons
+    auth_service = await get_auth_service()
+    await auth_service.close()
     await cache_service.close()
     reset_all_services()
     logger.info("All services shut down")
