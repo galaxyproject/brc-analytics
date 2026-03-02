@@ -123,7 +123,7 @@ async def logout(
 ) -> JSONResponse:
     """Clear the user's session from Redis and remove the cookie."""
     if brc_session:
-        await auth.delete_session(brc_session)
+        await auth.revoke_session_tokens(brc_session)
 
     resp = JSONResponse(content={"message": "Logged out"})
     resp.delete_cookie(COOKIE_NAME, path="/")

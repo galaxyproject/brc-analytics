@@ -235,9 +235,15 @@ class AuthService:
                 )
                 claims = self.decode_token_claims(refreshed["access_token"])
             else:
-                # Refresh failed, session is effectively dead
-                await self.delete_session(session_id)
-                return None
+                # Refresh failed — possibly because a concurrent request
+                # already used the refresh token (Keycloak rotates them).
+                # Re-read the session; if it was updated, use the new tokens.
+                session = await self.get_session(session_id)
+                if not session:
+                    return None
+                claims = self.decode_token_claims(session["access_token"])
+                if claims.get("exp", 0) < time.time():
+                    return None
 
         return {
             "sub": claims.get("sub"),
@@ -249,6 +255,35 @@ class AuthService:
             "email_verified": claims.get("email_verified"),
             "realm_roles": claims.get("realm_access", {}).get("roles", []),
         }
+
+    async def revoke_session_tokens(self, session_id: str) -> None:
+        """Revoke tokens at Keycloak before deleting the local session."""
+        session = await self.get_session(session_id)
+        if not session:
+            return
+
+        try:
+            oidc = await self.get_oidc_config()
+            revocation_endpoint = oidc.get("revocation_endpoint")
+            if not revocation_endpoint:
+                logger.debug("No revocation_endpoint in OIDC config, skipping")
+                return
+
+            # Revoking the refresh token implicitly revokes the access token
+            if session.get("refresh_token"):
+                await self._http_client.post(
+                    revocation_endpoint,
+                    data={
+                        "client_id": self._client_id,
+                        "client_secret": self._client_secret,
+                        "token": session["refresh_token"],
+                        "token_type_hint": "refresh_token",
+                    },
+                )
+        except Exception as e:
+            logger.warning("Token revocation failed (best-effort): %s", e)
+
+        await self.delete_session(session_id)
 
     async def close(self):
         """Clean up connections."""
