@@ -380,14 +380,14 @@ class AssistantAgent:
         state.agent_message_history = to_jsonable_python(result.all_messages())
         await self.session_service.save_session(state)
 
-        is_complete = schema_state.is_complete()
+        # Only mark complete when we can actually build a handoff URL
         handoff_url = None
-        if is_complete:
-            # Build URL to the workflow stepper with pre-populated params
+        if schema_state.is_complete():
             accession = schema_state.assembly.detail or ""
             trs_id = schema_state.workflow.detail or ""
             if accession and trs_id:
                 handoff_url = f"/data/assemblies/{accession}/{trs_id}"
+        is_complete = handoff_url is not None
 
         return ChatResponse(
             session_id=state.session_id,
@@ -426,13 +426,27 @@ class AssistantAgent:
                 try:
                     json_str = line[s_match.end() :].strip()
                     items = json.loads(json_str)
-                    suggestions = [SuggestionChip(label=s, message=s) for s in items]
+                    if isinstance(items, list) and all(
+                        isinstance(s, str) for s in items
+                    ):
+                        suggestions = [
+                            SuggestionChip(label=s, message=s) for s in items
+                        ]
+                    else:
+                        reply_lines.append(line)
                 except (json.JSONDecodeError, TypeError):
                     reply_lines.append(line)
             elif u_match:
                 try:
                     json_str = line[u_match.end() :].strip()
-                    schema_updates = json.loads(json_str)
+                    data = json.loads(json_str)
+                    if isinstance(data, dict) and all(
+                        isinstance(k, str) and isinstance(v, str)
+                        for k, v in data.items()
+                    ):
+                        schema_updates = data
+                    else:
+                        reply_lines.append(line)
                 except (json.JSONDecodeError, TypeError):
                     reply_lines.append(line)
             else:
@@ -474,11 +488,15 @@ class AssistantAgent:
 
             # For workflow, try to look up the trs_id
             if key == "workflow":
+                workflow_value = str(value)
                 for cat in self.catalog.workflows_by_category:
                     for wf in cat.get("workflows", []):
-                        if wf.get("iwcId") and wf["iwcId"] in str(value):
-                            field.detail = wf.get("trsId", wf["iwcId"])
+                        iwc_id = wf.get("iwcId")
+                        if iwc_id and iwc_id in workflow_value:
+                            field.detail = wf.get("trsId", iwc_id)
                             break
+                    if field.detail:
+                        break
 
             setattr(schema, key, field)
 

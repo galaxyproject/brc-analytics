@@ -79,7 +79,7 @@ def get_compatible_workflows(
         organism_ploidies: comma-separated ploidy values, e.g. "HAPLOID" or "HAPLOID,DIPLOID"
         taxonomy_id: optional NCBI taxonomy ID to also filter by organism-specific workflows
     """
-    ploidies = [p.strip() for p in organism_ploidies.split(",")]
+    ploidies = [p.strip().upper() for p in organism_ploidies.split(",") if p.strip()]
     workflows = deps.catalog.get_compatible_workflows(ploidies, taxonomy_id)
     if not workflows:
         return "No compatible workflows found."

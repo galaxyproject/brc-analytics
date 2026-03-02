@@ -17,7 +17,6 @@ export const AssistantView = (): JSX.Element => {
   const {
     error,
     handoffUrl,
-    isComplete,
     loading,
     messages,
     schema,
@@ -46,11 +45,7 @@ export const AssistantView = (): JSX.Element => {
             />
           </ChatColumn>
           <SchemaColumn>
-            <SchemaPanel
-              handoffUrl={handoffUrl}
-              isComplete={isComplete}
-              schema={schema}
-            />
+            <SchemaPanel handoffUrl={handoffUrl} schema={schema} />
           </SchemaColumn>
         </TwoPanelLayout>
       </AssistantSection>

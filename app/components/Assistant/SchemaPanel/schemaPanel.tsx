@@ -14,7 +14,6 @@ import {
 
 interface SchemaPanelProps {
   handoffUrl: string | null;
-  isComplete: boolean;
   schema: AnalysisSchema | null;
 }
 
@@ -28,14 +27,20 @@ const FIELD_LABELS: Record<keyof AnalysisSchema, string> = {
   workflow: "Workflow",
 };
 
-const FIELD_ORDER: (keyof AnalysisSchema)[] = [
+const REQUIRED_FIELDS: (keyof AnalysisSchema)[] = [
   "organism",
   "assembly",
   "analysis_type",
   "workflow",
   "data_source",
   "data_characteristics",
-  "gene_annotation",
+];
+
+const OPTIONAL_FIELDS: (keyof AnalysisSchema)[] = ["gene_annotation"];
+
+const FIELD_ORDER: (keyof AnalysisSchema)[] = [
+  ...REQUIRED_FIELDS,
+  ...OPTIONAL_FIELDS,
 ];
 
 /**
@@ -58,13 +63,11 @@ function StatusIndicator({ status }: { status: FieldStatus }): JSX.Element {
  * Displays the analysis schema as a live progress panel.
  * @param props - Component props
  * @param props.handoffUrl - URL for workflow handoff
- * @param props.isComplete - Whether the analysis config is complete
  * @param props.schema - Current analysis schema state
  * @returns Schema panel element
  */
 export const SchemaPanel = ({
   handoffUrl,
-  isComplete,
   schema,
 }: SchemaPanelProps): JSX.Element => {
   if (!schema) {
@@ -83,7 +86,7 @@ export const SchemaPanel = ({
     );
   }
 
-  const filledCount = FIELD_ORDER.filter(
+  const filledCount = REQUIRED_FIELDS.filter(
     (key) => schema[key].status === "filled"
   ).length;
 
@@ -92,7 +95,7 @@ export const SchemaPanel = ({
       <PanelHeader>
         <Typography variant="subtitle1">Analysis Setup</Typography>
         <Typography color="text.secondary" variant="caption">
-          {filledCount} / {FIELD_ORDER.length} configured
+          {filledCount} / {REQUIRED_FIELDS.length} configured
         </Typography>
       </PanelHeader>
 
@@ -121,14 +124,9 @@ export const SchemaPanel = ({
         })}
       </Box>
 
-      {isComplete && (
+      {handoffUrl && (
         <Box sx={{ p: 2 }}>
-          <Button
-            fullWidth
-            href={handoffUrl || "#"}
-            size="large"
-            variant="contained"
-          >
+          <Button fullWidth href={handoffUrl} size="large" variant="contained">
             Continue to Workflow Setup
           </Button>
         </Box>
