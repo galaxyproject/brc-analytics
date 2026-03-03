@@ -19,6 +19,8 @@ import { APP_KEYS } from "../../common/constants";
 import data from "catalog/output/ncbi-taxa-tree.json";
 import { TaxonomyNode } from "../../../app/components/Home/components/Section/components/SectionViz/data";
 import { THEME_OPTIONS } from "./theme/constants";
+import { workflowEntityConfig } from "./index/workflowEntityConfig";
+import { WorkflowEntity } from "./index/workflow/types";
 
 const LOCALHOST = "http://localhost:3000";
 const APP_TITLE = "BRC Analytics";
@@ -57,6 +59,7 @@ export function makeConfig(
       organismEntityConfig as EntityConfig<BRCDataCatalogOrganism>,
       genomeEntityConfig as EntityConfig<BRCDataCatalogGenome>,
       priorityPathogensEntityConfig as EntityConfig<Outbreak>,
+      workflowEntityConfig as EntityConfig<WorkflowEntity>,
     ],
     filterSort: { sortBy: FILTER_SORT.ALPHA },
     gitHubUrl,
@@ -93,6 +96,7 @@ export function makeConfig(
             { label: "Learn", url: ROUTES.LEARN },
             { label: "Organisms", url: ROUTES.ORGANISMS },
             { label: "Assemblies", url: ROUTES.GENOMES },
+            { label: "Workflows", url: ROUTES.WORKFLOWS },
             { label: "Priority Pathogens", url: ROUTES.PRIORITY_PATHOGENS },
             {
               flatten: { lg: true, md: true, sm: false, xs: true },

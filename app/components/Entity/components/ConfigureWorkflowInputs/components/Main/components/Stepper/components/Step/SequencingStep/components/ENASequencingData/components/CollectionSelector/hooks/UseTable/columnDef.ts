@@ -1,11 +1,11 @@
-import { ColumnDef, ColumnMeta, SortingColumnDef } from "@tanstack/react-table";
-import { ReadRun } from "../../../../types";
-import { buildFastqFTP, buildStudyAccession } from "./viewBuilders";
 import { COLUMN_DEF } from "@databiosphere/findable-ui/lib/components/Table/common/columnDef";
-import { BasicCell } from "../../components/Table/components/TableCell/components/BasicCell/basicCell";
 import { LinkCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/LinkCell/linkCell";
-import { CATEGORY_CONFIGS } from "./categoryConfigs";
+import { ColumnDef, ColumnMeta, SortingColumnDef } from "@tanstack/react-table";
 import { formatNumber } from "../../../../../../../../../../../../../../../../../viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import { BasicCell } from "../../../../../../../components/Table/components/TableCell/components/BasicCell/basicCell";
+import { ReadRun } from "../../../../types";
+import { CATEGORY_CONFIGS } from "./categoryConfigs";
+import { buildFastqFTP, buildStudyAccession } from "./viewBuilders";
 
 const RANGE_FILTER_FN = "inNumberRange";
 const SELECT_FILTER_FN = "arrIncludesSome";
