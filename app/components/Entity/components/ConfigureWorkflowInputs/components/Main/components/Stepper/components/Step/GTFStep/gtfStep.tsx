@@ -1,9 +1,14 @@
-import { JSX } from "react";
+import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
+import {
+  Loading,
+  LOADING_PANEL_STYLE,
+} from "@databiosphere/findable-ui/lib/components/Loading/loading";
 import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepContent/stepContent";
-import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Icon } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Label/components/Icon/icon";
-import { StepProps } from "../types";
+import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Optional/optional";
+import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
+import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import {
   Button,
   FormControlLabel,
@@ -11,22 +16,15 @@ import {
   RadioGroup,
   Typography,
 } from "@mui/material";
-import { StyledGrid } from "./gtfStep.styles";
-import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
-import { configureGTFStep } from "./utils";
-import { useUCSCFiles } from "./hooks/UseUCSCFiles/hook";
-import { useRadioGroup } from "./hooks/UseRadioGroup/hook";
-import { Fragment, useEffect } from "react";
-import {
-  Loading,
-  LOADING_PANEL_STYLE,
-} from "@databiosphere/findable-ui/lib/components/Loading/loading";
-import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Optional/optional";
-import { getGeneModelLabel } from "./utils";
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
-import { STEP } from "./step";
+import { Fragment, JSX, useEffect } from "react";
 import { StepWarning } from "../components/StepWarning/stepWarning";
-import { getStepActiveState, getButtonDisabledState } from "../utils/stepUtils";
+import { StepProps } from "../types";
+import { getButtonDisabledState, getStepActiveState } from "../utils/stepUtils";
+import { StyledGrid } from "./gtfStep.styles";
+import { useRadioGroup } from "./hooks/UseRadioGroup/hook";
+import { useUCSCFiles } from "./hooks/UseUCSCFiles/hook";
+import { STEP } from "./step";
+import { configureGTFStep, getGeneModelLabel } from "./utils";
 
 export const GTFStep = ({
   active,
@@ -35,6 +33,7 @@ export const GTFStep = ({
   entryLabel,
   genome,
   index,
+  last,
   onConfigure,
   onContinue,
   onEdit,
@@ -105,13 +104,15 @@ export const GTFStep = ({
               </Typography>
             )
           )}
-          <Button
-            {...BUTTON_PROPS.PRIMARY_CONTAINED}
-            disabled={getButtonDisabledState(!value && !error, isLoading)}
-            onClick={() => onContinue()}
-          >
-            {error ? "Skip This Step" : "Continue"}
-          </Button>
+          {!last && (
+            <Button
+              {...BUTTON_PROPS.PRIMARY_CONTAINED}
+              disabled={getButtonDisabledState(!value && !error, isLoading)}
+              onClick={() => onContinue()}
+            >
+              {error ? "Skip This Step" : "Continue"}
+            </Button>
+          )}
         </StyledGrid>
       </StepContent>
     </Step>
