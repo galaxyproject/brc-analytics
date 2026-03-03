@@ -8,10 +8,10 @@ import { JSX, useMemo } from "react";
 import { sanitizeEntityId } from "../../apis/catalog/common/utils";
 import { useStepper } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/hook";
 import { Main } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/main";
+import { SideColumn } from "../../components/Entity/components/ConfigureWorkflowInputs/components/SideColumn/sideColumn";
 import { getAssembly, getWorkflow } from "../../services/workflows/entities";
 import { useConfigureInputs } from "../WorkflowInputsView/hooks/UseConfigureInputs/useConfigureInputs";
 import { Assembly } from "../WorkflowInputsView/types";
-import { SideColumn } from "./components/SideColumn/sideColumn";
 import { Top } from "./components/Top/top";
 import { useConfiguredSteps } from "./steps/hook";
 import { Props } from "./types";
@@ -59,7 +59,12 @@ export const WorkflowView = ({ trsId }: Props): JSX.Element => {
         </StyledBackPageContentMainColumn>
         {!hasSidePanel && (
           <BackPageContentSideColumn>
-            <SideColumn workflow={workflow} />
+            <SideColumn
+              configuredInput={configuredInput}
+              configuredSteps={configuredSteps}
+              genome={genome}
+              workflow={workflow}
+            />
           </BackPageContentSideColumn>
         )}
       </BackPageContent>
