@@ -7,7 +7,6 @@ import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/fea
 import { ROW_SELECTION_VALIDATION } from "@databiosphere/findable-ui/lib/components/Table/features/RowSelectionValidation/constants";
 import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/features/TableDownload/constants";
 import {
-  ColumnFiltersState,
   getCoreRowModel,
   getFacetedRowModel,
   getFilteredRowModel,
@@ -15,40 +14,36 @@ import {
   InitialTableState,
   useReactTable,
 } from "@tanstack/react-table";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { UseENADataByTaxonomyId } from "../../../../hooks/UseENADataByTaxonomyId/types";
-import { BaseReadRun, ReadRun } from "../../../../types";
+import { useMemo } from "react";
+import { Workflow } from "../../../../../../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
+import { getEntities } from "../../../../../../../../../../../../../../../../../services/workflows/query";
 import { CATEGORY_GROUPS } from "./categoryGroups";
 import { columns } from "./columnDef";
-import { COLUMN_VISIBILITY, SORTING } from "./constants";
-import { mapReadRuns, sanitizeReadRuns } from "./dataTransforms";
-import { UseTable } from "./types";
+import { SORTING } from "./constants";
+import { mapAssembly } from "./dataTransforms";
+import { Assembly, UseTable } from "./types";
 import {
   enableRowSelection,
+  getInitialColumnFilters,
   getRowSelectionValidation,
   renderSummary,
 } from "./utils";
 
-export const useTable = (
-  enaTaxonomyId: UseENADataByTaxonomyId<BaseReadRun>,
-  columnFilters: ColumnFiltersState
-): UseTable => {
-  const [data, setData] = useState<ReadRun[]>([]);
-
-  // TaxonomyId ena read runs; store for easy switching between data sources.
-  const taxonomyData = useMemo(
-    () => sanitizeReadRuns(mapReadRuns(enaTaxonomyId.data)),
-    [enaTaxonomyId.data]
+export const useTable = (workflow: Workflow): UseTable => {
+  const assemblies = useMemo(
+    () => mapAssembly(getEntities<Assembly>("assemblies"), workflow),
+    [workflow]
   );
 
-  // Initialize table with taxonomyId ena data.
-  useEffect(() => {
-    setData(taxonomyData);
-  }, [taxonomyData]);
+  const data = useMemo(() => assemblies, [assemblies]);
+
+  const columnFilters = useMemo(
+    () => getInitialColumnFilters(workflow),
+    [workflow]
+  );
 
   const initialState: InitialTableState = {
     columnFilters,
-    columnVisibility: COLUMN_VISIBILITY,
     sorting: SORTING,
   };
 
@@ -58,7 +53,7 @@ export const useTable = (
     summaryFn: renderSummary,
   };
 
-  const table = useReactTable<ReadRun>({
+  const table = useReactTable<Assembly>({
     _features: [
       ROW_POSITION,
       ROW_PREVIEW,
@@ -67,9 +62,10 @@ export const useTable = (
     ],
     columns,
     data,
-    downloadFilename: "read-runs",
+    downloadFilename: "assemblies",
     enableColumnFilters: true,
     enableFilters: true,
+    enableMultiRowSelection: false,
     enableMultiSort: true,
     enableRowSelection,
     enableRowSelectionValidation: true,
@@ -83,30 +79,12 @@ export const useTable = (
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValuesWithArrayValues(),
     getFilteredRowModel: getFilteredRowModel(),
-    getRowId: (row) => row.run_accession,
+    getRowId: (row) => row.accession,
     getRowSelectionValidation,
     getSortedRowModel: getSortedRowModel(),
     initialState,
     meta,
   });
 
-  /**
-   * Callback to switch table data.
-   * Table state is reset (column filters, sorting, row selection) when the browsing method has changed.
-   */
-  const switchBrowseMethod = useCallback(
-    (data?: BaseReadRun[]) => {
-      // Handle switching table data.
-      if (data) setData(sanitizeReadRuns(mapReadRuns(data)));
-      else setData(taxonomyData);
-
-      // Reset table state.
-      table.resetColumnFilters();
-      table.resetSorting();
-      table.resetRowSelection();
-    },
-    [table, taxonomyData]
-  );
-
-  return { actions: { switchBrowseMethod }, table };
+  return { table };
 };

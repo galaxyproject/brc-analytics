@@ -1,7 +1,7 @@
 import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/components/RoundedPaper/roundedPaper";
+import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import styled from "@emotion/styled";
 import { Grid } from "@mui/material";
-import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 
 export const StyledGrid = styled(Grid)`
   align-content: flex-start;
@@ -13,17 +13,18 @@ export const StyledGrid = styled(Grid)`
 `;
 
 export const StyledRoundedPaper = styled(RoundedPaper)`
-  background-color: ${PALETTE.SMOKE_MAIN};
   display: grid;
   flex: 1;
-  gap: 1px;
   max-height: 100%;
 
   .MuiTableContainer-root {
+    background-color: ${PALETTE.SMOKE_MAIN};
     height: 100%;
 
-    .MuiTableCell-root {
-      word-break: break-word;
+    .MuiTable-root {
+      .MuiTableCell-root {
+        word-break: break-word;
+      }
     }
   }
 `;

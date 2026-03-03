@@ -1,20 +1,21 @@
-import React, { JSX, useMemo } from "react";
-import { Props } from "./types";
-import { getAssembly, getWorkflow } from "../../services/workflows/entities";
 import {
-  BackPageContentSideColumn,
   BackPageContent,
-  BackPageView,
+  BackPageContentSideColumn,
   BackPageHero,
+  BackPageView,
 } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
-import { StyledBackPageContentMainColumn } from "./workflowView.styles";
-import { Top } from "./components/Top/top";
-import { SideColumn } from "./components/SideColumn/sideColumn";
-import { useConfigureInputs } from "../WorkflowInputsView/hooks/UseConfigureInputs/useConfigureInputs";
-import { useConfiguredSteps } from "./steps/hook";
+import { JSX, useMemo } from "react";
+import { sanitizeEntityId } from "../../apis/catalog/common/utils";
 import { useStepper } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/hook";
 import { Main } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/main";
+import { getAssembly, getWorkflow } from "../../services/workflows/entities";
+import { useConfigureInputs } from "../WorkflowInputsView/hooks/UseConfigureInputs/useConfigureInputs";
 import { Assembly } from "../WorkflowInputsView/types";
+import { SideColumn } from "./components/SideColumn/sideColumn";
+import { Top } from "./components/Top/top";
+import { useConfiguredSteps } from "./steps/hook";
+import { Props } from "./types";
+import { StyledBackPageContentMainColumn } from "./workflowView.styles";
 
 /**
  * WorkflowView renders the main view for configuring a workflow.
@@ -26,10 +27,12 @@ export const WorkflowView = ({ trsId }: Props): JSX.Element => {
   const workflow = getWorkflow(trsId);
 
   const { configuredInput, onConfigure } = useConfigureInputs();
-  const { referenceAssembly: assemblyId = "" } = configuredInput;
+  const { referenceAssembly } = configuredInput;
   const { configuredSteps } = useConfiguredSteps(workflow);
   const { activeStep, onContinue, onEdit } = useStepper(configuredSteps);
   const { hasSidePanel } = configuredSteps[activeStep] || {};
+
+  const assemblyId = sanitizeEntityId(referenceAssembly);
 
   const genome = useMemo(
     () => (assemblyId ? getAssembly<Assembly>(assemblyId) : undefined),

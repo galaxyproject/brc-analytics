@@ -1,18 +1,24 @@
-import { JSX } from "react";
-import { GridTable } from "@databiosphere/findable-ui/lib/components/Table/table.styles";
-import { TableHead } from "@databiosphere/findable-ui/lib/components/Table/components/TableHead/tableHead";
+import { NoResults } from "@databiosphere/findable-ui/lib/components/NoResults/noResults";
 import { ROW_DIRECTION } from "@databiosphere/findable-ui/lib/components/Table/common/entities";
 import { TableBody } from "@databiosphere/findable-ui/lib/components/Table/components/TableBody/tableBody";
-import { StyledGrid } from "./table.styles";
-import { StyledRoundedPaper } from "./table.styles";
-import { TableContainer } from "@mui/material";
-import { getColumnTrackSizing } from "@databiosphere/findable-ui/lib/components/TableCreator/options/columnTrackSizing/utils";
-import { Props } from "./types";
-import { NoResults } from "@databiosphere/findable-ui/lib/components/NoResults/noResults";
+import { TableHead } from "@databiosphere/findable-ui/lib/components/Table/components/TableHead/tableHead";
 import { useVirtualization } from "@databiosphere/findable-ui/lib/components/Table/hooks/UseVirtualization/hook";
+import { GridTable } from "@databiosphere/findable-ui/lib/components/Table/table.styles";
+import { getColumnTrackSizing } from "@databiosphere/findable-ui/lib/components/TableCreator/options/columnTrackSizing/utils";
+import { TableContainer } from "@mui/material";
+import { RowData } from "@tanstack/react-table";
+import { JSX } from "react";
 import { TableToolbar } from "./components/TableToolbar/tableToolbar";
+import { StyledGrid, StyledRoundedPaper } from "./table.styles";
+import { Props } from "./types";
 
-export const Table = ({ table }: Props): JSX.Element => {
+/**
+ * Table component used to display tables in the workflow configuration steps.
+ * @param props - Component props.
+ * @param props.table - Table instance.
+ * @returns Table component.
+ */
+export const Table = <T extends RowData>({ table }: Props<T>): JSX.Element => {
   const { rows, scrollElementRef, virtualizer } = useVirtualization({
     rowDirection: ROW_DIRECTION.DEFAULT,
     table,
