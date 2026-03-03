@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 class CatalogData:
     """
     Loads the full BRC catalog (organisms, assemblies, workflows) into memory
-    and exposes search/lookup methods used by the MCP server and assistant agent.
+    and exposes search/lookup methods used by the MCP server.
     """
 
     def __init__(self, catalog_path: str):
@@ -65,7 +65,9 @@ class CatalogData:
             species_tax_id = str(asm.get("speciesTaxonomyId", ""))
             if species_tax_id and species_tax_id != tax_id:
                 self._assemblies_by_tax_id.setdefault(species_tax_id, []).append(asm)
-            # Build lineage index so taxonomy matching can walk up the tree
+            # Build lineage index: maps each taxonomy ID to the full set of
+            # IDs in its lineage, merging across assemblies so ancestor
+            # lookups work (e.g. "is 2 (Bacteria) an ancestor of 562 (E. coli)?")
             lineage = asm.get("lineageTaxonomyIds", [])
             if lineage:
                 lineage_set = {str(t) for t in lineage}
@@ -80,7 +82,7 @@ class CatalogData:
             for wf in cat.get("workflows", []):
                 iwc_id = wf.get("iwcId", "")
                 if iwc_id:
-                    self._workflows_by_iwc_id[iwc_id] = {**wf, "_category": cat["name"]}
+                    self._workflows_by_iwc_id[iwc_id] = {**wf, "_category": cat.get("name", "")}
 
     # -- Organism methods --
 
@@ -286,6 +288,7 @@ class CatalogData:
             elif variable == "ASSEMBLY_FASTA_URL":
                 resolved[key] = self._build_fasta_url(accession)
             elif variable == "GENE_MODEL_URL":
+                # Catalog JSON uses the string "None" (not null) for missing gene models
                 gene_url = asm.get("geneModelUrl")
                 if gene_url and gene_url != "None":
                     resolved[key] = gene_url
