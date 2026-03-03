@@ -4,10 +4,11 @@ import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/comp
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
 import { Button } from "@mui/material";
-import { Fragment, JSX, useEffect } from "react";
+import { Fragment, JSX, useEffect, useMemo } from "react";
 import { StepProps } from "../types";
 import { AssemblyData } from "./components/AssemblyData/assemblyData";
 import { useTable } from "./components/AssemblyData/components/AssemblySelector/hooks/UseTable/hook";
+import { StepContext } from "./provider/context";
 
 /**
  * Reference assembly step component for workflow configuration.
@@ -45,6 +46,11 @@ export const ReferenceAssemblyStep = ({
   const { accession } = genome || {};
   const { table } = useTable(workflow);
 
+  const contextValue = useMemo(
+    () => ({ onConfigure, onContinue, stepKey }),
+    [onConfigure, onContinue, stepKey]
+  );
+
   useEffect(() => {
     if (!accession) return;
     // Some workflows may have a reference assembly pre-configured.
@@ -54,36 +60,35 @@ export const ReferenceAssemblyStep = ({
   }, [onConfigure]);
 
   return (
-    <Step active={active} completed={completed} index={index}>
-      <StepLabel
-        optional={
-          completed && (
-            <Fragment>
-              <Optional>{configuredInput.referenceAssembly}</Optional>
-              {!disabled && <Button onClick={() => onEdit(index)}>Edit</Button>}
-            </Fragment>
-          )
-        }
-      >
-        {entryLabel}
-      </StepLabel>
-      <StepContent>
-        <AssemblyData
-          configuredInput={configuredInput}
-          onConfigure={onConfigure}
-          stepKey={stepKey}
-          table={table}
-        />
-        {!last && (
-          <Button
-            {...BUTTON_PROPS.PRIMARY_CONTAINED}
-            disabled={!configuredInput.referenceAssembly}
-            onClick={() => onContinue()}
-          >
-            Continue
-          </Button>
-        )}
-      </StepContent>
-    </Step>
+    <StepContext.Provider value={contextValue}>
+      <Step active={active} completed={completed} index={index}>
+        <StepLabel
+          optional={
+            completed && (
+              <Fragment>
+                <Optional>{configuredInput.referenceAssembly}</Optional>
+                {!disabled && (
+                  <Button onClick={() => onEdit(index)}>Edit</Button>
+                )}
+              </Fragment>
+            )
+          }
+        >
+          {entryLabel}
+        </StepLabel>
+        <StepContent>
+          <AssemblyData configuredInput={configuredInput} table={table} />
+          {!last && (
+            <Button
+              {...BUTTON_PROPS.PRIMARY_CONTAINED}
+              disabled={!configuredInput.referenceAssembly}
+              onClick={() => onContinue()}
+            >
+              Continue
+            </Button>
+          )}
+        </StepContent>
+      </Step>
+    </StepContext.Provider>
   );
 };
