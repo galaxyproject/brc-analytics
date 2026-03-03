@@ -19,6 +19,7 @@ import { useTable } from "./components/AssemblyData/components/AssemblySelector/
  * @param props.entryLabel - Step label.
  * @param props.genome - Pre-configured genome assembly.
  * @param props.index - Step index.
+ * @param props.last - Whether this is the last step.
  * @param props.onConfigure - Callback to configure workflow input.
  * @param props.onContinue - Callback to continue to the next step.
  * @param props.onEdit - Callback to edit a completed step.
@@ -34,6 +35,7 @@ export const ReferenceAssemblyStep = ({
   entryLabel,
   genome,
   index,
+  last,
   onConfigure,
   onContinue,
   onEdit,
@@ -72,13 +74,15 @@ export const ReferenceAssemblyStep = ({
           stepKey={stepKey}
           table={table}
         />
-        <Button
-          {...BUTTON_PROPS.PRIMARY_CONTAINED}
-          disabled={!configuredInput.referenceAssembly}
-          onClick={() => onContinue()}
-        >
-          Continue
-        </Button>
+        {!last && (
+          <Button
+            {...BUTTON_PROPS.PRIMARY_CONTAINED}
+            disabled={!configuredInput.referenceAssembly}
+            onClick={() => onContinue()}
+          >
+            Continue
+          </Button>
+        )}
       </StepContent>
     </Step>
   );
