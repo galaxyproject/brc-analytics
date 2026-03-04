@@ -82,7 +82,10 @@ class CatalogData:
             for wf in cat.get("workflows", []):
                 iwc_id = wf.get("iwcId", "")
                 if iwc_id:
-                    self._workflows_by_iwc_id[iwc_id] = {**wf, "_category": cat.get("name", "")}
+                    self._workflows_by_iwc_id[iwc_id] = {
+                        **wf,
+                        "_category": cat.get("name", ""),
+                    }
 
     # -- Organism methods --
 
