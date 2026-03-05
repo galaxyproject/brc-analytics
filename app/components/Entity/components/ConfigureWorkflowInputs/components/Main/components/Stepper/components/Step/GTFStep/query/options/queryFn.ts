@@ -4,9 +4,9 @@ import { QueryKey } from "../types";
 import { UCSC_FILES_ENDPOINT } from "./constants";
 
 /**
- * Fetches data from the Azul API using React Query.
+ * Fetches data from the UCSC files API using React Query.
  *
- * @returns Data from the Azul endpoint.
+ * @returns Data from the UCSC endpoint.
  */
 export function queryFn<T = unknown>(): (
   context: QueryFunctionContext<QueryKey>

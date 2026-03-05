@@ -2,7 +2,7 @@ import json
 
 BRC_READ_COUNT_PATH = "catalog/build/intermediate/taxIdReadCount.json"
 GA2_READ_COUNT_PATH = "catalog/ga2/build/intermediate/taxIdReadCount.json"
-OUTPUT_PATH = "app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/hooks/UseENADataByTaxonomyId/taxonomy_read_counts.json"
+OUTPUT_PATH = "app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/query/taxonomy_read_counts.json"
 
 
 def merge_read_counts():
