@@ -1,15 +1,14 @@
-import { JSX } from "react";
-import { Fragment, useEffect } from "react";
-import { DataSelector } from "./components/DataSelector/dataSelector";
-import { CollectionSelector } from "./components/CollectionSelector/collectionSelector";
 import { useDialog } from "@databiosphere/findable-ui/lib/components/common/Dialog/hooks/useDialog";
-import { Props } from "./types";
-import { CollectionSummary } from "./components/CollectionSummary/collectionSummary";
+import { Fragment, JSX, useEffect } from "react";
 import { AccessionSelector } from "./components/AccessionSelector/accessionSelector";
+import { CollectionSelector } from "./components/CollectionSelector/collectionSelector";
+import { CollectionSummary } from "./components/CollectionSummary/collectionSummary";
+import { DataSelector } from "./components/DataSelector/dataSelector";
+import { Props } from "./types";
 import {
-  getSequencingData,
   clearSequencingData,
   getRowSelectionState,
+  getSequencingData,
 } from "./utils";
 
 export const ENASequencingData = ({
@@ -36,7 +35,7 @@ export const ENASequencingData = ({
   return (
     <Fragment>
       <DataSelector
-        enaTaxonomyIdStatus={enaTaxonomyId.status}
+        enaTaxonomyId={enaTaxonomyId}
         onContinue={collectionDialog.onOpen}
         onOpen={accessionDialog.onOpen}
         selectedCount={selectedCount}

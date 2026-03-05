@@ -1,10 +1,10 @@
+import { UseQueryResult } from "@tanstack/react-query";
+import { Table } from "@tanstack/react-table";
 import {
   ConfiguredInput,
   OnConfigure,
 } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { Actions, Status } from "./hooks/UseENADataByAccession/types";
-import { Table } from "@tanstack/react-table";
-import { UseENADataByTaxonomyId } from "./hooks/UseENADataByTaxonomyId/types";
 
 export interface BaseReadRun {
   base_count: number;
@@ -39,7 +39,7 @@ export interface Props {
   configuredInput: ConfiguredInput;
   enaAccessionActions: Actions<BaseReadRun>;
   enaAccessionStatus: Status;
-  enaTaxonomyId: UseENADataByTaxonomyId<BaseReadRun>;
+  enaTaxonomyId: UseQueryResult<BaseReadRun[]>;
   onConfigure: OnConfigure;
   requirementsMatches: string[];
   selectedCount: number;

@@ -1,1 +1,1 @@
-export type QueryKey = ["gtf", string | undefined];
+export type QueryKey = ["GTF", string | undefined];

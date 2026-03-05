@@ -17,6 +17,7 @@ import { getAssemblyId } from "./utils";
  */
 export const useQuery = (genome?: Assembly): UseQueryResult<string[]> => {
   const assemblyId = getAssemblyId(genome);
+  const enabled = Boolean(assemblyId);
 
   const query = useReactQuery<
     { urlList: { url: string }[] },
@@ -24,9 +25,9 @@ export const useQuery = (genome?: Assembly): UseQueryResult<string[]> => {
     string[],
     QueryKey
   >({
-    enabled: Boolean(assemblyId),
+    enabled,
     queryFn: queryFn(),
-    queryKey: ["gtf", assemblyId],
+    queryKey: ["GTF", assemblyId],
     select,
   });
 
