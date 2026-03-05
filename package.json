@@ -46,6 +46,7 @@
     "@observablehq/plot": "^0",
     "@sentry/nextjs": "^10.27.0",
     "@tanstack/match-sorter-utils": "^8",
+    "@tanstack/react-query": "^5.90.21",
     "@tanstack/react-table": "^8",
     "@tanstack/react-virtual": "^3",
     "copy-to-clipboard": "^3",
