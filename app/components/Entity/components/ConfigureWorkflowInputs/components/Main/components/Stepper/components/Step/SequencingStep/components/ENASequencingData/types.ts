@@ -1,9 +1,6 @@
 import { UseQueryResult } from "@tanstack/react-query";
 import { Table } from "@tanstack/react-table";
-import {
-  ConfiguredInput,
-  OnConfigure,
-} from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { OnConfigure } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { Actions, Status } from "./hooks/UseENADataByAccession/types";
 
 export interface BaseReadRun {
@@ -36,7 +33,6 @@ export interface Validation {
 }
 
 export interface Props {
-  configuredInput: ConfiguredInput;
   enaAccessionActions: Actions<BaseReadRun>;
   enaAccessionStatus: Status;
   enaTaxonomyId: UseQueryResult<BaseReadRun[]>;

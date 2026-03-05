@@ -60,7 +60,7 @@ export const GTFStep = ({
       index={index}
     >
       {/* Step component `children` should be subcomponents such as `StepLabel`, `StepContent`. */}
-      {/* We ignore this; the loading UI is in the DOM while `geneModelUrls` is `undefined` and the Step is not `active`. */}
+      {/* We ignore this; the loading UI is in the DOM while `data` is `undefined` and the Step is not `active`. */}
       <Loading loading={isLoading} panelStyle={LOADING_PANEL_STYLE.INHERIT} />
       <StepLabel
         optional={

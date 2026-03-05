@@ -1,18 +1,14 @@
 import { useDialog } from "@databiosphere/findable-ui/lib/components/common/Dialog/hooks/useDialog";
-import { Fragment, JSX, useEffect } from "react";
+import { RowSelectionState } from "@tanstack/react-table";
+import { Fragment, JSX, useRef } from "react";
 import { AccessionSelector } from "./components/AccessionSelector/accessionSelector";
 import { CollectionSelector } from "./components/CollectionSelector/collectionSelector";
 import { CollectionSummary } from "./components/CollectionSummary/collectionSummary";
 import { DataSelector } from "./components/DataSelector/dataSelector";
 import { Props } from "./types";
-import {
-  clearSequencingData,
-  getRowSelectionState,
-  getSequencingData,
-} from "./utils";
+import { clearSequencingData } from "./utils";
 
 export const ENASequencingData = ({
-  configuredInput,
   enaAccessionActions,
   enaAccessionStatus,
   enaTaxonomyId,
@@ -26,12 +22,7 @@ export const ENASequencingData = ({
 }: Props): JSX.Element => {
   const accessionDialog = useDialog();
   const collectionDialog = useDialog();
-
-  useEffect(() => {
-    onConfigure(getSequencingData(table));
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- Intended behavior to only run on mount.
-  }, []);
-
+  const rowSelectionRef = useRef<RowSelectionState>({});
   return (
     <Fragment>
       <DataSelector
@@ -53,14 +44,16 @@ export const ENASequencingData = ({
         switchBrowseMethod={switchBrowseMethod}
       />
       <CollectionSelector
-        configuredInput={configuredInput}
         onCancel={() => {
-          // Restore previous selection.
-          table.setRowSelection(getRowSelectionState(configuredInput));
+          // Revert to previous row selection and close dialog.
+          table.setRowSelection(rowSelectionRef.current);
           collectionDialog.onClose();
         }}
         onClose={collectionDialog.onClose}
-        onConfigure={onConfigure}
+        onTransitionEnter={() => {
+          // Store the current row selection so we can revert to it if the user cancels out of the dialog.
+          rowSelectionRef.current = table.getState().rowSelection;
+        }}
         onTransitionExited={() => {
           if (selectedCount) return;
           switchBrowseMethod();
