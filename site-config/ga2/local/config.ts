@@ -1,6 +1,7 @@
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import * as C from "../../../app/components";
 import { ROUTES } from "../../../routes/constants";
+import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genome/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organism/organismEntityConfig";
 import {
@@ -60,6 +61,7 @@ export function makeConfig(
     ],
     gitHubUrl,
     layout: {
+      floating,
       footer: {
         Branding: C.GA2Branding(),
         socials: socialMedia.socials,
