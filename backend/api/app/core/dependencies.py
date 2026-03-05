@@ -9,10 +9,23 @@ logger = logging.getLogger(__name__)
 
 # Global service instances (singletons)
 _assistant_agent = None
+_auth_service = None
 _cache_service = None
 _llm_service = None
 _ena_service = None
 _rate_limiter = None
+
+
+async def get_auth_service():
+    """Dependency to get auth service singleton instance."""
+    global _auth_service
+    if _auth_service is None:
+        from app.services.auth_service import AuthService
+
+        settings = get_settings()
+        _auth_service = AuthService(settings.REDIS_URL)
+        logger.info("Auth service initialized (singleton)")
+    return _auth_service
 
 
 async def get_cache_service() -> CacheService:
@@ -96,8 +109,9 @@ def reset_cache_service() -> None:
 
 def reset_all_services() -> None:
     """Reset all global service instances (used during shutdown)"""
-    global _assistant_agent, _cache_service, _llm_service, _ena_service, _rate_limiter
+    global _assistant_agent, _auth_service, _cache_service, _llm_service, _ena_service, _rate_limiter
     _assistant_agent = None
+    _auth_service = None
     _cache_service = None
     _llm_service = None
     _ena_service = None
