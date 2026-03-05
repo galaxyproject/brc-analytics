@@ -21,8 +21,8 @@ import { StepWarning } from "../components/StepWarning/stepWarning";
 import { StepProps } from "../types";
 import { getButtonDisabledState, getStepActiveState } from "../utils/stepUtils";
 import { StyledGrid } from "./gtfStep.styles";
-import { useQuery } from "./hooks/UseQuery/hook";
 import { useRadioGroup } from "./hooks/UseRadioGroup/hook";
+import { useQuery } from "./query/hook";
 import { STEP } from "./step";
 import { configureGTFStep, getGeneModelLabel } from "./utils";
 
