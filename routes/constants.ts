@@ -10,4 +10,5 @@ export const ROUTES = {
   PRIORITY_PATHOGEN: "/data/[entityListType]/[entityId]",
   PRIORITY_PATHOGENS: "/data/priority-pathogens",
   ROADMAP: "/roadmap",
+  WORKFLOWS: "/data/workflows",
 };
