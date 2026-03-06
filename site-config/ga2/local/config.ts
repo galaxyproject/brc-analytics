@@ -1,3 +1,4 @@
+import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import * as C from "../../../app/components";
 import { ROUTES } from "../../../routes/constants";
@@ -62,6 +63,13 @@ export function makeConfig(
     layout: {
       footer: {
         Branding: C.GA2Branding(),
+        navLinks: [
+          {
+            label: "BRC Analytics",
+            target: ANCHOR_TARGET.BLANK,
+            url: "https://brc-analytics.org/",
+          },
+        ],
         socials: socialMedia.socials,
         versionInfo: true,
       },
