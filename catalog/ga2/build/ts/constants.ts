@@ -2,6 +2,12 @@ import { CORE_SOURCE_GENOME_KEYS } from "../../../build/ts/constants";
 
 export const SOURCE_GENOME_KEYS = [
   ...CORE_SOURCE_GENOME_KEYS,
+  "organismImageCredit",
+  "organismImageLicense",
+  "organismImageSourceName",
+  "organismImageSourceUrl",
+  "organismImageUrl",
+  "organismThumbnailUrl",
   "taxonomicGroup",
   "taxonomicLevelClass",
   "taxonomicLevelDomain",
@@ -13,12 +19,6 @@ export const SOURCE_GENOME_KEYS = [
   "taxonomicLevelSpecies",
   "taxonomicLevelStrain",
   "tolId",
-  "organismImageUrl",
-  "organismThumbnailUrl",
-  "organismImageCredit",
-  "organismImageSourceName",
-  "organismImageSourceUrl",
-  "organismImageLicense",
 ] as const;
 
 export const SOURCE_RAWDATA_KEYS = [

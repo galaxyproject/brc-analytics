@@ -411,23 +411,8 @@
                                             "assembly_count": 3,
                                             "children": [
                                                 {
-                                                    "assembly_count": 3,
+                                                    "assembly_count": 2,
                                                     "children": [
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Carcharodon carcharias",
-                                                                    "ncbi_tax_id": "13397",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Carcharodon",
-                                                            "ncbi_tax_id": "13396",
-                                                            "rank": "genus"
-                                                        },
                                                         {
                                                             "assembly_count": 2,
                                                             "children": [
@@ -444,8 +429,31 @@
                                                             "rank": "genus"
                                                         }
                                                     ],
-                                                    "name": "Alopiidae",
-                                                    "ncbi_tax_id": "7850",
+                                                    "name": "Cetorhinidae",
+                                                    "ncbi_tax_id": "3681279",
+                                                    "rank": "family"
+                                                },
+                                                {
+                                                    "assembly_count": 1,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Carcharodon carcharias",
+                                                                    "ncbi_tax_id": "13397",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Carcharodon",
+                                                            "ncbi_tax_id": "13396",
+                                                            "rank": "genus"
+                                                        }
+                                                    ],
+                                                    "name": "Lamnidae",
+                                                    "ncbi_tax_id": "3681280",
                                                     "rank": "family"
                                                 }
                                             ],
@@ -3749,23 +3757,8 @@
                                                     "rank": "family"
                                                 },
                                                 {
-                                                    "assembly_count": 8,
+                                                    "assembly_count": 7,
                                                     "children": [
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Vidua chalybeata",
-                                                                    "ncbi_tax_id": "81927",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Vidua",
-                                                            "ncbi_tax_id": "37613",
-                                                            "rank": "genus"
-                                                        },
                                                         {
                                                             "assembly_count": 2,
                                                             "children": [
@@ -4064,6 +4057,29 @@
                                                     ],
                                                     "name": "Passerellidae",
                                                     "ncbi_tax_id": "1729112",
+                                                    "rank": "family"
+                                                },
+                                                {
+                                                    "assembly_count": 1,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Vidua chalybeata",
+                                                                    "ncbi_tax_id": "81927",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Vidua",
+                                                            "ncbi_tax_id": "37613",
+                                                            "rank": "genus"
+                                                        }
+                                                    ],
+                                                    "name": "Viduidae",
+                                                    "ncbi_tax_id": "3502743",
                                                     "rank": "family"
                                                 }
                                             ],
@@ -11868,18 +11884,18 @@
                                                         {
                                                             "assembly_count": 2,
                                                             "children": [],
-                                                            "name": "Saccoglossus sp. HW-2024a",
-                                                            "ncbi_tax_id": "3154068",
+                                                            "name": "Balanoglossus misakiensis",
+                                                            "ncbi_tax_id": "509136",
                                                             "rank": "species"
                                                         }
                                                     ],
-                                                    "name": "Saccoglossus",
-                                                    "ncbi_tax_id": "10222",
+                                                    "name": "Balanoglossus",
+                                                    "ncbi_tax_id": "35079",
                                                     "rank": "genus"
                                                 }
                                             ],
-                                            "name": "Harrimaniidae",
-                                            "ncbi_tax_id": "10221",
+                                            "name": "Ptychoderidae",
+                                            "ncbi_tax_id": "35078",
                                             "rank": "family"
                                         }
                                     ],

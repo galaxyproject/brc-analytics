@@ -16,6 +16,8 @@ ORGANISM_IMAGE_INFO_PATH = "catalog/ga2/source/organism_image_data.json"
 
 PRIMARYDATA_OUTPUT_PATH = "catalog/ga2/build/intermediate/primary-data-ncbi.tsv"
 
+QC_REPORT_PATH = "catalog/ga2/output/qc-report.data.md"
+
 TREE_OUTPUT_PATH = "catalog/ga2/output/ncbi-taxa-tree.json"
 
 TAXONOMY_READ_RUN_COUNTS_OUTPUT_PATH = (
@@ -96,9 +98,11 @@ def build_ncbi_data():
         },
         do_gene_model_urls=False,
         primary_output_path=PRIMARYDATA_OUTPUT_PATH,
-        extract_primary_data=True,
+        qc_report_path=QC_REPORT_PATH,
+        extract_primary_data=False,
         organism_image_path=ORGANISM_IMAGE_PATH,
         organism_image_source_information_path=ORGANISM_IMAGE_INFO_PATH,
+        datacache_base_url="http://datacache.galaxyproject.org/vgp/data/genomes",
     )
     create_taxonomy_read_run_count(
         GENOMES_OUTPUT_PATH, TAXONOMY_READ_RUN_COUNTS_OUTPUT_PATH
