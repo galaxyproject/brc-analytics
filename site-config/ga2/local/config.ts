@@ -20,7 +20,7 @@ const ALLOWED_PATHS = [
   ROUTES.ABOUT,
   ROUTES.ORGANISMS,
   ROUTES.GENOMES,
-  // ROUTES.ROADMAP,
+  ROUTES.ROADMAP,
 ];
 const LOCALHOST = "http://localhost:3000";
 const APP_TITLE = "Genome Ark 2";
@@ -88,7 +88,7 @@ export function makeConfig(
             { label: "About", url: ROUTES.ABOUT },
             { label: "Organisms", url: ROUTES.ORGANISMS },
             { label: "Assemblies", url: ROUTES.GENOMES },
-            // { label: "Roadmap", url: ROUTES.ROADMAP },
+            { label: "Roadmap", url: ROUTES.ROADMAP },
           ],
           undefined,
         ],
