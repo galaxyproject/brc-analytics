@@ -68,6 +68,11 @@ export function makeConfig(
         Branding: C.Branding(),
         navLinks: [
           {
+            label: "GenomeArk2",
+            target: ANCHOR_TARGET.BLANK,
+            url: "https://genomeark2.org/",
+          },
+          {
             label: "BV-BRC",
             target: ANCHOR_TARGET.BLANK,
             url: "https://www.bv-brc.org/",
