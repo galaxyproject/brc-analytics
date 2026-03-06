@@ -2,7 +2,7 @@
     "assembly_count": 5060,
     "children": [
         {
-            "assembly_count": 380,
+            "assembly_count": 379,
             "children": [
                 {
                     "assembly_count": 65,
@@ -1220,7 +1220,7 @@
                     "rank": "kingdom"
                 },
                 {
-                    "assembly_count": 313,
+                    "assembly_count": 312,
                     "children": [
                         {
                             "assembly_count": 10,
@@ -1455,7 +1455,7 @@
                                                                             "rank": "strain"
                                                                         }
                                                                     ],
-                                                                    "name": "Dysgonomonas gadei",
+                                                                    "name": "Dysgonomonas gade",
                                                                     "ncbi_tax_id": "156974",
                                                                     "rank": "species"
                                                                 }
@@ -1485,10 +1485,10 @@
                             "rank": "phylum"
                         },
                         {
-                            "assembly_count": 220,
+                            "assembly_count": 219,
                             "children": [
                                 {
-                                    "assembly_count": 94,
+                                    "assembly_count": 93,
                                     "children": [
                                         {
                                             "assembly_count": 1,
@@ -1576,10 +1576,10 @@
                                             "rank": "order"
                                         },
                                         {
-                                            "assembly_count": 52,
+                                            "assembly_count": 51,
                                             "children": [
                                                 {
-                                                    "assembly_count": 43,
+                                                    "assembly_count": 42,
                                                     "children": [
                                                         {
                                                             "assembly_count": 1,
@@ -1831,10 +1831,10 @@
                                                             "rank": "genus"
                                                         },
                                                         {
-                                                            "assembly_count": 5,
+                                                            "assembly_count": 4,
                                                             "children": [
                                                                 {
-                                                                    "assembly_count": 4,
+                                                                    "assembly_count": 3,
                                                                     "children": [
                                                                         {
                                                                             "assembly_count": 1,
@@ -1855,13 +1855,6 @@
                                                                             "children": [],
                                                                             "name": "Klebsiella pneumoniae subsp. pneumoniae HS11286",
                                                                             "ncbi_tax_id": "1125630",
-                                                                            "rank": "strain"
-                                                                        },
-                                                                        {
-                                                                            "assembly_count": 1,
-                                                                            "children": [],
-                                                                            "name": "Klebsiella pneumoniae MGH 78578",
-                                                                            "ncbi_tax_id": "1328388",
                                                                             "rank": "strain"
                                                                         }
                                                                     ],
@@ -7618,14 +7611,14 @@
                                                                 {
                                                                     "assembly_count": 2,
                                                                     "children": [],
-                                                                    "name": "Histoplasma mississippiense (nom. inval.)",
+                                                                    "name": "Histoplasma mississippiense",
                                                                     "ncbi_tax_id": "2059318",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 3,
                                                                     "children": [],
-                                                                    "name": "Histoplasma ohiense (nom. inval.)",
+                                                                    "name": "Histoplasma ohiense",
                                                                     "ncbi_tax_id": "2902605",
                                                                     "rank": "species"
                                                                 }
@@ -12102,7 +12095,7 @@
                                             "assembly_count": 71,
                                             "children": [
                                                 {
-                                                    "assembly_count": 70,
+                                                    "assembly_count": 41,
                                                     "children": [
                                                         {
                                                             "assembly_count": 19,
@@ -12338,44 +12331,6 @@
                                                             "name": "Anthracocystis",
                                                             "ncbi_tax_id": "1392992",
                                                             "rank": "genus"
-                                                        },
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [
-                                                                        {
-                                                                            "assembly_count": 1,
-                                                                            "children": [],
-                                                                            "name": "Kalmanozyma brasiliensis GHG001",
-                                                                            "ncbi_tax_id": "1365824",
-                                                                            "rank": "strain"
-                                                                        }
-                                                                    ],
-                                                                    "name": "Kalmanozyma brasiliensis",
-                                                                    "ncbi_tax_id": "1392244",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Kalmanozyma",
-                                                            "ncbi_tax_id": "1804794",
-                                                            "rank": "genus"
-                                                        },
-                                                        {
-                                                            "assembly_count": 28,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 28,
-                                                                    "children": [],
-                                                                    "name": "Mycosarcoma maydis",
-                                                                    "ncbi_tax_id": "5270",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Mycosarcoma",
-                                                            "ncbi_tax_id": "2689624",
-                                                            "rank": "genus"
                                                         }
                                                     ],
                                                     "name": "Ustilaginaceae",
@@ -12404,6 +12359,44 @@
                                                     "name": "Anthracoideaceae",
                                                     "ncbi_tax_id": "251612",
                                                     "rank": "family"
+                                                },
+                                                {
+                                                    "assembly_count": 1,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Kalmanozyma brasiliensis GHG001",
+                                                                    "ncbi_tax_id": "1365824",
+                                                                    "rank": "strain"
+                                                                }
+                                                            ],
+                                                            "name": "Kalmanozyma brasiliensis",
+                                                            "ncbi_tax_id": "1392244",
+                                                            "rank": "species"
+                                                        }
+                                                    ],
+                                                    "name": "Kalmanozyma",
+                                                    "ncbi_tax_id": "1804794",
+                                                    "rank": "genus"
+                                                },
+                                                {
+                                                    "assembly_count": 28,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 28,
+                                                            "children": [],
+                                                            "name": "Mycosarcoma maydis",
+                                                            "ncbi_tax_id": "5270",
+                                                            "rank": "species"
+                                                        }
+                                                    ],
+                                                    "name": "Mycosarcoma",
+                                                    "ncbi_tax_id": "2689624",
+                                                    "rank": "genus"
                                                 }
                                             ],
                                             "name": "Ustilaginales",
@@ -16773,35 +16766,51 @@
                                     "assembly_count": 17,
                                     "children": [
                                         {
-                                            "assembly_count": 2,
-                                            "children": [],
-                                            "name": "Naegleria gruberi",
-                                            "ncbi_tax_id": "5762",
-                                            "rank": "species"
-                                        },
-                                        {
-                                            "assembly_count": 9,
-                                            "children": [],
-                                            "name": "Naegleria fowleri",
-                                            "ncbi_tax_id": "5763",
-                                            "rank": "species"
-                                        },
-                                        {
-                                            "assembly_count": 6,
-                                            "children": [],
-                                            "name": "Naegleria lovaniensis",
-                                            "ncbi_tax_id": "51637",
-                                            "rank": "species"
+                                            "assembly_count": 17,
+                                            "children": [
+                                                {
+                                                    "assembly_count": 17,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 2,
+                                                            "children": [],
+                                                            "name": "Naegleria gruberi",
+                                                            "ncbi_tax_id": "5762",
+                                                            "rank": "species"
+                                                        },
+                                                        {
+                                                            "assembly_count": 9,
+                                                            "children": [],
+                                                            "name": "Naegleria fowleri",
+                                                            "ncbi_tax_id": "5763",
+                                                            "rank": "species"
+                                                        },
+                                                        {
+                                                            "assembly_count": 6,
+                                                            "children": [],
+                                                            "name": "Naegleria lovaniensis",
+                                                            "ncbi_tax_id": "51637",
+                                                            "rank": "species"
+                                                        }
+                                                    ],
+                                                    "name": "Naegleria",
+                                                    "ncbi_tax_id": "5761",
+                                                    "rank": "genus"
+                                                }
+                                            ],
+                                            "name": "Naegleriidae",
+                                            "ncbi_tax_id": "3691768",
+                                            "rank": "family"
                                         }
                                     ],
-                                    "name": "Naegleria",
-                                    "ncbi_tax_id": "5761",
-                                    "rank": "genus"
+                                    "name": "Acrasida",
+                                    "ncbi_tax_id": "43693",
+                                    "rank": "order"
                                 }
                             ],
-                            "name": "Vahlkampfiidae",
-                            "ncbi_tax_id": "5765",
-                            "rank": "family"
+                            "name": "Eutetramitea",
+                            "ncbi_tax_id": "2601530",
+                            "rank": "class"
                         }
                     ],
                     "name": "Heterolobosea",
@@ -17007,21 +17016,21 @@
                                                         {
                                                             "assembly_count": 1,
                                                             "children": [],
-                                                            "name": "Plasmodium sp. gorilla clade G1",
+                                                            "name": "Plasmodium praefalciparum (nom. ined.)",
                                                             "ncbi_tax_id": "880534",
                                                             "rank": "species"
                                                         },
                                                         {
                                                             "assembly_count": 1,
                                                             "children": [],
-                                                            "name": "Plasmodium sp. gorilla clade G2",
+                                                            "name": "Plasmodium adleri (nom. inval.)",
                                                             "ncbi_tax_id": "880535",
                                                             "rank": "species"
                                                         },
                                                         {
                                                             "assembly_count": 1,
                                                             "children": [],
-                                                            "name": "Plasmodium sp. gorilla clade G3",
+                                                            "name": "Plasmodium blacklocki (nom. inval.)",
                                                             "ncbi_tax_id": "880536",
                                                             "rank": "species"
                                                         }
@@ -22446,15 +22455,7 @@
                             "children": [
                                 {
                                     "assembly_count": 1,
-                                    "children": [
-                                        {
-                                            "assembly_count": 1,
-                                            "children": [],
-                                            "name": "Chromera velia CCMP2878",
-                                            "ncbi_tax_id": "1169474",
-                                            "rank": "strain"
-                                        }
-                                    ],
+                                    "children": [],
                                     "name": "Chromera velia",
                                     "ncbi_tax_id": "505693",
                                     "rank": "species"
@@ -27404,13 +27405,6 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Betatorquevirus homini32",
-                                                                    "ncbi_tax_id": "3048399",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
                                                                     "name": "Betatorquevirus homini2",
                                                                     "ncbi_tax_id": "3048400",
                                                                     "rank": "species"
@@ -27462,6 +27456,13 @@
                                                                     "children": [],
                                                                     "name": "Betatorquevirus homini9",
                                                                     "ncbi_tax_id": "3048407",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Betatorquevirus homini18",
+                                                                    "ncbi_tax_id": "3050361",
                                                                     "rank": "species"
                                                                 },
                                                                 {

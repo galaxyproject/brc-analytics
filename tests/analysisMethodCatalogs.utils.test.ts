@@ -97,6 +97,7 @@ describe("buildAssemblyWorkflows", () => {
     chromosomes: null,
     commonName: null,
     coverage: null,
+    galaxyDatacacheUrl: null,
     gcPercent: null,
     geneModelUrl: null,
     isRef: "Yes",
