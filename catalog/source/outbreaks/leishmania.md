@@ -1,6 +1,6 @@
 ## Overview
 
-Leishmania donovani complex causes visceral leishmaniasis (VL), the most severe form of leishmaniasis. Transmitted by sandfly bites, it affects poor, rural populations in South Asia, East Africa, and Brazil. WHO and NIAID prioritize VL as a neglected tropical disease, focusing on developing better drugs and vaccines. Despite being geographically limited, VL remains a deadly disease of poverty with high untreated fatality rates.
+Leishmania donovani complex causes visceral leishmaniasis (VL), the most severe form of leishmaniasis. Transmitted by sandfly bites, it affects poor, rural populations in South Asia, East Africa, and Brazil. NIAID prioritizes VL as a neglected tropical disease, focusing on developing better drugs and therapeutics. Despite being geographically limited, VL remains a deadly disease of poverty with high untreated fatality rates.
 
 ## Impact
 

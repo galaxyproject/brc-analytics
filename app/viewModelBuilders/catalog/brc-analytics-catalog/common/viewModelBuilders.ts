@@ -13,6 +13,7 @@ import {
 } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "../../../../components";
 import {
+  GALAXY_DATACACHE,
   GENOME_BROWSER,
   NCBI_ASSEMBLY,
   NCBI_DATASETS_URL,
@@ -746,6 +747,19 @@ export const buildGenomeAnalysisPortals = (
 ): ComponentProps<typeof C.AnalysisPortals> => {
   return {
     portals: [
+      ...(entity.galaxyDatacacheUrl
+        ? [
+            {
+              imageProps: {
+                alt: GALAXY_DATACACHE,
+                src: "/analysis-portals/galaxy.svg",
+                width: 20,
+              },
+              label: GALAXY_DATACACHE,
+              url: entity.galaxyDatacacheUrl,
+            },
+          ]
+        : []),
       ...(entity.ucscBrowserUrl
         ? [
             {

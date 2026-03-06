@@ -710,13 +710,19 @@ workflows:
       tabix files via cooler and produces balanced cool files at user-specified resolution
       for downstream analysis and visualization.
     ploidy: ANY
+    taxonomy_id: 131567
     parameters:
       - key: PE fastq input
+        variable: SANGER_READ_RUN_PAIRED
+        data_requirements:
+          library_strategy:
+            - Hi-C
+          library_layout: PAIRED
         type_guide:
           class: Collection
+          collection_type: list:paired
       - key: genome name
-        type_guide:
-          class: text
+        variable: ASSEMBLY_ID
       - key: Restriction enzyme
         type_guide:
           class: text
@@ -741,7 +747,7 @@ workflows:
       - key: capture region (end)
         type_guide:
           class: integer
-    active: false
+    active: true
     iwc_id: hic-hicup-cooler-chic-fastq-to-cool-hicup-cooler
   - trs_id: "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-cool-hicup-cooler/versions/v0.3"
     categories:
@@ -755,13 +761,19 @@ workflows:
       output is a balanced cool file at user-specified resolution created with cooler,
       ready for multi-resolution contact matrix analysis.
     ploidy: ANY
+    taxonomy_id: 131567
     parameters:
       - key: PE fastq input
+        variable: SANGER_READ_RUN_PAIRED
+        data_requirements:
+          library_strategy:
+            - Hi-C
+          library_layout: PAIRED
         type_guide:
           class: Collection
+          collection_type: list:paired
       - key: genome name
-        type_guide:
-          class: text
+        variable: ASSEMBLY_ID
       - key: Restriction enzyme
         type_guide:
           class: text
@@ -780,7 +792,7 @@ workflows:
       - key: region for matrix plotting
         type_guide:
           class: text
-    active: false
+    active: true
     iwc_id: hic-hicup-cooler-hic-fastq-to-cool-hicup-cooler
   - trs_id: "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-pairs-hicup/versions/v0.3"
     categories:
@@ -795,13 +807,19 @@ workflows:
       using fragment midpoints as coordinates. Final filtering by mapping quality ensures
       high-confidence interaction data.
     ploidy: ANY
+    taxonomy_id: 131567
     parameters:
       - key: PE fastq input
+        variable: SANGER_READ_RUN_PAIRED
+        data_requirements:
+          library_strategy:
+            - Hi-C
+          library_layout: PAIRED
         type_guide:
           class: Collection
+          collection_type: list:paired
       - key: genome name
-        type_guide:
-          class: text
+        variable: ASSEMBLY_ID
       - key: Restriction enzyme
         type_guide:
           class: text
@@ -811,7 +829,7 @@ workflows:
       - key: minimum MAPQ
         type_guide:
           class: integer
-    active: false
+    active: true
     iwc_id: hic-hicup-cooler-hic-fastq-to-pairs-hicup
   - trs_id: "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-juicermediumtabix-to-cool-cooler/versions/v0.3"
     categories:

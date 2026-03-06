@@ -38,12 +38,6 @@ outbreaks:
     description:
       path: outbreaks/covid19.md
     resources:
-      - title: "WHO: Coronavirus disease (COVID-19) situation reports"
-        url: "https://www.who.int/emergencies/diseases/novel-coronavirus-2019/situation-reports"
-        type: REFERENCE
-      - title: "WHO COVID-19 Fact Sheet"
-        url: "https://www.who.int/news-room/fact-sheets/detail/coronavirus-disease-(covid-19)"
-        type: REFERENCE
       - title: "BV-BRC: SARS-CoV-2 variants and lineages information"
         url: "https://www.bv-brc.org/outbreaks/SARSCoV2/"
         type: REFERENCE
@@ -70,9 +64,6 @@ outbreaks:
     description:
       path: outbreaks/mpox.md
     resources:
-      - title: "WHO | Mpox outbreak: global trends"
-        url: "https://worldhealthorg.shinyapps.io/mpx_global/"
-        type: REFERENCE
       - title: "NIH Mpox Research Agenda"
         url: "https://www.niaid.nih.gov/news-events/nih-releases-mpox-research-agenda"
         type: REFERENCE
@@ -99,17 +90,11 @@ outbreaks:
     description:
       path: outbreaks/tuberculosis.md
     resources:
-      - title: "WHO | Tuberculosis Fact Sheet"
-        url: "https://www.who.int/news-room/fact-sheets/detail/tuberculosis"
-        type: REFERENCE
       - title: "BV-BRC: Mycobacterium tuberculosis"
         url: "https://www.bv-brc.org/view/Taxonomy/1773"
         type: REFERENCE
       - title: "NIH | TB Research Information"
         url: "https://www.niaid.nih.gov/diseases-conditions/tuberculosis"
-        type: REFERENCE
-      - title: "WHO | Tuberculosis Deaths and Disease Increase During the COVID-19 Pandemic"
-        url: "https://www.who.int/news/item/27-10-2022-tuberculosis-deaths-and-disease-increase-during-the-covid-19-pandemic"
         type: REFERENCE
       - title: "hgPhyloPlace: Place your sequences in a global phylogenetic tree"
         url: "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?hgpp_org=hub_3070967_GCF_000195955.2"
@@ -122,9 +107,6 @@ outbreaks:
     description:
       path: outbreaks/plasmodium_falciparum.md
     resources:
-      - title: "WHO | Malaria Fact Sheet"
-        url: "https://www.who.int/news-room/fact-sheets/detail/malaria"
-        type: REFERENCE
       - title: "NIH | Malaria Research Information"
         url: "https://www.niaid.nih.gov/diseases-conditions/malaria"
         type: REFERENCE
@@ -164,9 +146,6 @@ outbreaks:
         type: OTHER
       - title: "Cryptococcal meningitis causes 15% of AIDS-related deaths globally"
         url: "https://www.healio.com/news/infectious-disease/20170512/cryptococcal-meningitis-causes-15-of-aidsrelated-deaths-globally"
-        type: OTHER
-      - title: "The WHO fungal priority pathogens list as a game-changer"
-        url: "https://www.cidrap.umn.edu/antimicrobial-stewardship/who-fungal-priority-pathogens-list-game-changer"
         type: OTHER
       - title: "FungiDB | Genome Info and Stats"
         url: "https://fungidb.org/fungidb/app/search/organism/GenomeDataTypes/result?filterTerm=Cryptococcus%20neoformans"
@@ -264,9 +243,6 @@ outbreaks:
       - 5661
       - 5671
     resources:
-      - title: "WHO | Leishmaniasis Information"
-        url: "https://www.who.int/news-room/fact-sheets/detail/leishmaniasis"
-        type: REFERENCE
       - title: "NIAID | Leishmaniasis Research"
         url: "https://www.niaid.nih.gov/diseases-conditions/leishmaniasis"
         type: REFERENCE
@@ -286,9 +262,6 @@ outbreaks:
       - 58291
       - 936053
     resources:
-      - title: "WHO | COVID-19 associated mucormycosis"
-        url: "https://www.who.int/india/home/emergencies/coronavirus-disease-(covid-19)/mucormycosis"
-        type: REFERENCE
       - title: "PubMed | Epidemiology and Pathophysiology of COVID-19-Associated Mucormycosis"
         url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC8375614/"
         type: PUBLICATION
@@ -436,9 +409,6 @@ outbreaks:
       - title: "hgPhyloPlace | Place you sequences in a global phylogenetic tree (Measles)"
         url: "https://genome.ucsc.edu/cgi-bin/hgPhyloPlace?hgpp_org=hub_3526175_GCF_000854845.1"
         type: HGPHYLOPLACE
-      - title: "WHO | Measles"
-        url: "https://www.who.int/news-room/fact-sheets/detail/measles"
-        type: REFERENCE
       - title: "ICTV | Family: Paramyxoviridae"
         url: "https://ictv.global/report/chapter/paramyxoviridae/paramyxoviridae"
         type: REFERENCE
@@ -523,9 +493,6 @@ outbreaks:
       - 3428506
       - 3428504
     resources:
-      - title: "WHO | Poliomyelitis"
-        url: "https://www.who.int/news-room/fact-sheets/detail/poliomyelitis"
-        type: REFERENCE
       - title: "ICTV | Family: Picornaviridae"
         url: "https://ictv.global/report/chapter/picornaviridae/picornaviridae"
         type: REFERENCE

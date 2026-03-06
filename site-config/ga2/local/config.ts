@@ -1,6 +1,8 @@
+import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import * as C from "../../../app/components";
 import { ROUTES } from "../../../routes/constants";
+import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genome/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organism/organismEntityConfig";
 import {
@@ -18,7 +20,7 @@ const ALLOWED_PATHS = [
   ROUTES.ABOUT,
   ROUTES.ORGANISMS,
   ROUTES.GENOMES,
-  // ROUTES.ROADMAP,
+  ROUTES.ROADMAP,
 ];
 const LOCALHOST = "http://localhost:3000";
 const APP_TITLE = "Genome Ark 2";
@@ -60,8 +62,16 @@ export function makeConfig(
     ],
     gitHubUrl,
     layout: {
+      floating,
       footer: {
         Branding: C.GA2Branding(),
+        navLinks: [
+          {
+            label: "BRC Analytics",
+            target: ANCHOR_TARGET.BLANK,
+            url: "https://brc-analytics.org/",
+          },
+        ],
         socials: socialMedia.socials,
         versionInfo: true,
       },
@@ -78,7 +88,7 @@ export function makeConfig(
             { label: "About", url: ROUTES.ABOUT },
             { label: "Organisms", url: ROUTES.ORGANISMS },
             { label: "Assemblies", url: ROUTES.GENOMES },
-            // { label: "Roadmap", url: ROUTES.ROADMAP },
+            { label: "Roadmap", url: ROUTES.ROADMAP },
           ],
           undefined,
         ],
