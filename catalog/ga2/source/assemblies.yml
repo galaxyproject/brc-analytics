@@ -2,21 +2,29 @@ assemblies:
   # Abramis brama
   - accession: GCA_963993115.1
   # Acanthisitta chloris
+  - accession: GCA_016880875.1
+  # Acanthisitta chloris
   - accession: GCA_016904835.1
+  # Acanthopagrus latus
+  - accession: GCA_904848175.1
   # Acanthopagrus latus
   - accession: GCF_904848185.1
   # Acanthopagrus schlegelii
   - accession: GCA_041753875.1
-  # Accipiter gentilis
-  - accession: GCF_929443795.1
+  # Acipenser ruthenus
+  - accession: GCA_902713425.1
+  # Acipenser ruthenus
+  - accession: GCA_902713435.2
   # Acipenser ruthenus
   - accession: GCF_902713425.1
   # Acipenser ruthenus
-  - accession: GCA_902713435.2
+  - accession: GCF_902713435.1
   # Acomys minous
   - accession: GCA_964271855.1
   # Acomys russatus
   - accession: GCF_903995435.1
+  # Acridotheres tristis
+  - accession: GCA_027559525.1
   # Acridotheres tristis
   - accession: GCA_027559615.1
   # Aegotheles albertisi
@@ -26,11 +34,15 @@ assemblies:
   # Agelaius phoeniceus
   - accession: GCF_020745825.1
   # Alca torda
+  - accession: GCA_008658355.1
+  # Alca torda
   - accession: GCA_008658365.1
   # Alligator mississippiensis
   - accession: GCA_030867065.1
   # Alligator mississippiensis
   - accession: GCF_030867095.1
+  # Alosa sapidissima
+  - accession: GCA_018492705.1
   # Alosa sapidissima
   - accession: GCF_018492685.1
   # Amazona ochrocephala
@@ -42,41 +54,57 @@ assemblies:
   # Amblyopsis spelaea
   - accession: GCA_046255725.1
   # Amblyraja radiata
+  - accession: GCA_010909745.1
+  # Amblyraja radiata
+  - accession: GCF_010909765.1
+  # Amblyraja radiata
   - accession: GCF_010909765.2
   # Ambystoma mexicanum
-  - accession: GCF_040938575.1
-  # Ambystoma mexicanum
   - accession: GCA_002915635.3
+  # Ambystoma mexicanum
+  - accession: GCF_040938575.1
   # Amia calva
   - accession: GCA_036365475.1
   # Amia calva
   - accession: GCF_036373705.1
   # Ammodytes marinus
   - accession: GCA_949987685.1
+  # Ammodytes marinus
+  - accession: GCA_950004245.1
+  # Ammospiza caudacuta
+  - accession: GCA_027887135.1
   # Ammospiza caudacuta
   - accession: GCF_027887145.1
   # Ammospiza maritima maritima
   - accession: GCA_036010785.1
   # Ammospiza nelsoni
+  - accession: GCA_027579665.1
+  # Ammospiza nelsoni
   - accession: GCF_027579445.1
+  # Anabas testudineus
+  - accession: GCA_900324465.3
+  # Anabas testudineus
+  - accession: GCA_900650485.1
   # Anabas testudineus
   - accession: GCF_900324465.2
   # Anableps anableps
   - accession: GCA_014839685.1
+  # Anableps anableps
+  - accession: GCA_014839705.1
   # Anas acuta
   - accession: GCF_963932015.1
   # Anas platyrhynchos
-  - accession: GCF_015476345.1
+  - accession: GCA_964188335.1
   # Anas platyrhynchos
   - accession: GCA_964188345.1
   # Anas platyrhynchos
-  - accession: GCA_964188335.1
+  - accession: GCF_015476345.1
   # Anguilla anguilla
   - accession: GCF_013347855.1
   # Anniella stebbinsi
-  - accession: GCA_029215795.1
-  # Anniella stebbinsi
   - accession: GCA_029215775.1
+  # Anniella stebbinsi
+  - accession: GCA_029215795.1
   # Anolis sagrei
   - accession: GCA_037176775.1
   # Anolis sagrei
@@ -85,14 +113,18 @@ assemblies:
   - accession: GCA_048569465.1
   # Anomaloglossus baeobatrachus
   - accession: GCA_048569485.1
-  # Anser anser
-  - accession: GCA_964211835.1
+  # Anomaloglossus baeobatrachus
+  - accession: GCF_048569485.1
   # Anser anser
   - accession: GCA_964211785.1
+  # Anser anser
+  - accession: GCA_964211835.1
   # Anser brachyrhynchus
   - accession: GCA_964034855.1
   # Anser cygnoides
   - accession: GCF_040182565.1
+  # Antennarius maculatus
+  - accession: GCA_013347815.1
   # Antennarius maculatus
   - accession: GCA_013358685.1
   # Antrozous pallidus
@@ -101,44 +133,80 @@ assemblies:
   - accession: GCA_918807975.1
   # Aplochiton taeniatus
   - accession: GCA_017639675.1
+  # Aplochiton taeniatus
+  - accession: GCA_017639685.1
+  # Apodemus sylvaticus
+  - accession: GCA_947179525.1
   # Apodemus sylvaticus
   - accession: GCF_947179515.1
   # Apteryx mantelli
-  - accession: GCF_036417845.1
-  # Apteryx mantelli
   - accession: GCA_036417975.1
+  # Apteryx mantelli
+  - accession: GCF_036417845.1
+  # Apus apus
+  - accession: GCA_020740585.1
   # Apus apus
   - accession: GCF_020740795.1
   # Aquila chrysaetos chrysaetos
+  - accession: GCA_902153765.1
+  # Aquila chrysaetos chrysaetos
+  - accession: GCA_902153765.2
+  # Aquila chrysaetos chrysaetos
+  - accession: GCF_900496995.1
+  # Aquila chrysaetos chrysaetos
   - accession: GCF_900496995.4
   # Ara ararauna
-  - accession: GCA_028858755.1
-  # Ara ararauna
   - accession: GCA_028858555.1
+  # Ara ararauna
+  - accession: GCA_028858755.1
+  # Archocentrus centrarchus
+  - accession: GCA_007364235.1
   # Archocentrus centrarchus
   - accession: GCF_007364275.1
   # Argentina silus
   - accession: GCA_951799395.1
-  # Arripis georgiana
-  - accession: GCA_042242135.1
+  # Argentina silus
+  - accession: GCA_951799415.1
+  # Aricia agestis
+  - accession: GCF_905147365.1
   # Arripis georgiana
   - accession: GCA_042242115.1
+  # Arripis georgiana
+  - accession: GCA_042242135.1
   # Artibeus intermedius
   - accession: GCA_038363145.1
   # Artibeus intermedius
   - accession: GCA_038363225.1
   # Artibeus lituratus
-  - accession: GCA_038363175.2
+  - accession: GCA_038363095.1
   # Artibeus lituratus
   - accession: GCA_038363095.2
+  # Artibeus lituratus
+  - accession: GCA_038363175.2
+  # Arvicanthis niloticus
+  - accession: GCA_011750645.1
+  # Arvicanthis niloticus
+  - accession: GCA_011762505.2
   # Arvicanthis niloticus
   - accession: GCA_011762505.3
+  # Arvicanthis niloticus
+  - accession: GCA_011762545.1
+  # Arvicanthis niloticus
+  - accession: GCF_011762505.1
+  # Arvicanthis niloticus
+  - accession: GCF_011762505.2
+  # Arvicola amphibius
+  - accession: GCA_903992525.1
+  # Arvicola amphibius
+  - accession: GCF_903992535.1
   # Arvicola amphibius
   - accession: GCF_903992535.2
   # Ascaphus truei
   - accession: GCA_040206675.1
   # Ascaphus truei
   - accession: GCA_040206685.1
+  # Ascaphus truei
+  - accession: GCF_040206685.1
   # Ascidia mentula
   - accession: GCA_947561715.1
   # Ascidiella aspersa
@@ -146,67 +214,111 @@ assemblies:
   # Aselliscus stoliczkanus
   - accession: GCA_043727835.1
   # Aspidoscelis tigris stejnegeri
+  - accession: GCA_023333525.1
+  # Aspidoscelis tigris stejnegeri
   - accession: GCA_023333525.2
   # Astatotilapia calliptera
   - accession: GCA_900246225.5
   # Astatotilapia calliptera
   - accession: GCA_964374335.1
+  # Astatotilapia calliptera
+  - accession: GCF_900246225.1
+  # Asterias rubens
+  - accession: GCA_902459445.1
   # Asterias rubens
   - accession: GCF_902459465.1
+  # Astur gentilis
+  - accession: GCA_929443795.2
+  # Astur gentilis
+  - accession: GCA_929447715.1
+  # Accipiter gentilis
+  - accession: GCF_929443795.1
   # Astyanax mexicanus
   - accession: GCF_023375975.1
   # Athene noctua
+  - accession: GCA_965140185.1
+  # Athene noctua
   - accession: GCA_965140245.1
   # Athene noctua
-  - accession: GCA_965140185.1
+  - accession: GCF_965140245.1
   # Aulonocara stuartgranti
   - accession: GCA_965226115.1
   # Aulostomus maculatus
-  - accession: GCA_048301475.1
-  # Aulostomus maculatus
   - accession: GCA_048301465.1
+  # Aulostomus maculatus
+  - accession: GCA_048301475.1
   # Aythya ferina
   - accession: GCA_964211795.1
   # Aythya ferina
   - accession: GCA_964211825.1
   # Aythya fuligula
+  - accession: GCA_009819845.1
+  # Aythya fuligula
   - accession: GCF_009819795.1
   # Aythya marila
-  - accession: GCA_965140925.1
-  # Aythya marila
   - accession: GCA_965140915.1
+  # Aythya marila
+  - accession: GCA_965140925.1
+  # Balaenoptera acutorostrata
+  - accession: GCA_950005055.1
   # Balaenoptera acutorostrata
   - accession: GCF_949987535.1
   # Balaenoptera borealis
-  - accession: GCA_965194805.1
-  # Balaenoptera borealis
   - accession: GCA_965194725.1
+  # Balaenoptera borealis
+  - accession: GCA_965194805.1
+  # Balaenoptera musculus
+  - accession: GCA_008658375.1
+  # Balaenoptera musculus
+  - accession: GCA_008658375.2
+  # Balaenoptera musculus
+  - accession: GCA_009873245.2
   # Balaenoptera musculus
   - accession: GCF_009873245.2
   # Balaenoptera physalus
-  - accession: GCA_965194825.1
-  # Balaenoptera physalus
   - accession: GCA_965194765.1
+  # Balaenoptera physalus
+  - accession: GCA_965194825.1
   # Balaenoptera ricei
   - accession: GCA_028017805.1
   # Balaenoptera ricei
   - accession: GCF_028023285.1
   # Balearica regulorum gibbericeps
+  - accession: GCA_011004865.1
+  # Balearica regulorum gibbericeps
   - accession: GCA_011004875.1
+  # Balearica regulorum gibbericeps
+  - accession: GCF_011004875.1
   # Barbatula barbatula
   - accession: GCA_947034865.1
+  # Barbatula barbatula
+  - accession: GCA_947034905.1
   # Barbus barbus
   - accession: GCA_936440315.1
+  # Barbus barbus
+  - accession: GCA_936446605.1
+  # Betta splendens
+  - accession: GCA_900651605.1
+  # Betta splendens
+  - accession: GCA_900651605.2
+  # Betta splendens
+  - accession: GCF_900634795.2
+  # Betta splendens
+  - accession: GCF_900634795.3
   # Betta splendens
   - accession: GCF_900634795.4
   # Blennius ocellaris
   - accession: GCA_963422515.1
   # Bombina bombina
+  - accession: GCA_027579415.1
+  # Bombina bombina
   - accession: GCF_027579735.1
   # Bombina variegata
-  - accession: GCA_964205305.1
-  # Bombina variegata
   - accession: GCA_964205295.1
+  # Bombina variegata
+  - accession: GCA_964205305.1
+  # Borostomias antarcticus
+  - accession: GCA_949987545.1
   # Borostomias antarcticus
   - accession: GCA_949987555.1
   # Bos indicus x Bos taurus
@@ -214,9 +326,13 @@ assemblies:
   # Bos indicus x Bos taurus
   - accession: GCF_003369695.1
   # Bradypodion pumilum
+  - accession: GCA_035047305.1
+  # Bradypodion pumilum
   - accession: GCA_047715955.1
   # Bradypodion pumilum
   - accession: GCA_047715975.1
+  # Bradypodion ventrale
+  - accession: GCA_035047345.1
   # Branchiostoma floridae x Branchiostoma belcheri
   - accession: GCA_019207075.1
   # Branchiostoma floridae x Branchiostoma japonicum
@@ -227,80 +343,128 @@ assemblies:
   - accession: GCA_035149815.1
   # Branchiostoma lanceolatum
   - accession: GCA_964187965.1
+  # Branchiostoma lanceolatum
+  - accession: GCF_035083965.1
   # Branta canadensis
   - accession: GCA_965231335.1
   # Bucephala clangula
   - accession: GCA_964059595.1
   # Bucorvus abyssinicus
+  - accession: GCA_009769595.1
+  # Bucorvus abyssinicus
   - accession: GCA_009769605.1
+  # Bufo bufo
+  - accession: GCA_905171715.1
   # Bufo bufo
   - accession: GCF_905171765.1
   # Buteo buteo
   - accession: GCA_964188355.1
   # Buteo buteo
   - accession: GCA_964188375.1
-  # Caesio teres
-  - accession: GCA_048129055.1
+  # Buteo buteo
+  - accession: GCF_964188355.1
   # Caesio teres
   - accession: GCA_048129025.1
-  # Callithrix jacchus
-  - accession: GCA_049354655.1
+  # Caesio teres
+  - accession: GCA_048129055.1
   # Callithrix jacchus
   - accession: GCA_011078405.1
   # Callithrix jacchus
-  - accession: GCA_049354715.1
+  - accession: GCA_011100535.1
+  # Callithrix jacchus
+  - accession: GCA_011100535.2
+  # Callithrix jacchus
+  - accession: GCA_011100555.1
   # Callithrix jacchus
   - accession: GCA_011100555.2
+  # Callithrix jacchus
+  - accession: GCA_049354655.1
+  # Callithrix jacchus
+  - accession: GCA_049354715.1
+  # Callithrix jacchus
+  - accession: GCF_011100555.1
   # Callospermophilus lateralis
   - accession: GCA_048772815.1
   # Callospermophilus lateralis
   - accession: GCA_048772825.1
-  # Caloenas nicobarica
-  - accession: GCF_036013445.1
+  # Callospermophilus lateralis
+  - accession: GCF_048772815.1
+  # Callospermophilus lateralis
+  - accession: GCF_048772825.1
   # Caloenas nicobarica
   - accession: GCA_036010745.1
+  # Caloenas nicobarica
+  - accession: GCF_036013445.1
+  # Calonectris borealis
+  - accession: GCA_964195595.1
+  # Calonectris borealis
+  - accession: GCA_964195595.2
+  # Calonectris borealis
+  - accession: GCA_964196065.1
   # Calonectris borealis
   - accession: GCA_964196065.2
   # Calonectris borealis
-  - accession: GCA_964195595.2
+  - accession: GCF_964195595.1
+  # Calypte anna
+  - accession: GCA_003957575.1
   # Calypte anna
   - accession: GCF_003957555.1
   # Camelus dromedarius
-  - accession: GCF_036321535.1
-  # Camelus dromedarius
   - accession: GCA_036321565.1
-  # Candoia aspera
-  - accession: GCF_035149785.1
+  # Camelus dromedarius
+  - accession: GCF_036321535.1
   # Candoia aspera
   - accession: GCA_035125265.1
+  # Candoia aspera
+  - accession: GCF_035149785.1
+  # Canis lupus
+  - accession: GCA_905319845.1
   # Canis lupus
   - accession: GCA_905319855.2
   # Canis lupus baileyi
-  - accession: GCF_048164855.1
-  # Canis lupus baileyi
   - accession: GCA_048164845.1
+  # Canis lupus baileyi
+  - accession: GCF_048164855.1
   # Canis lupus familiaris
   - accession: GCF_011100685.1
   # Capra hircus
   - accession: GCA_041735815.1
   # Caprimulgus europaeus
   - accession: GCA_907165065.1
+  # Caprimulgus europaeus
+  - accession: GCA_907165095.1
+  # Carassius carassius
+  - accession: GCA_963082795.1
   # Carassius carassius
   - accession: GCF_963082965.1
   # Carcharodon carcharias
+  - accession: GCA_017639455.1
+  # Carcharodon carcharias
   - accession: GCF_017639515.1
+  # Caretta caretta
+  - accession: GCA_965140235.1
   # Caretta caretta
   - accession: GCA_965140275.1
   # Caretta caretta
-  - accession: GCA_965140235.1
+  - accession: GCF_965140235.1
   # Carettochelys insculpta
   - accession: GCA_033958435.1
+  # Carettochelys insculpta
+  - accession: GCF_033958435.1
+  # Cariama cristata
+  - accession: GCA_009819485.1
   # Cariama cristata
   - accession: GCA_009819825.1
   # Castor canadensis
-  - accession: GCA_047511655.1
-  # Castor canadensis
   - accession: GCA_047511605.1
+  # Castor canadensis
+  - accession: GCA_047511655.1
+  # Catharus ustulatus
+  - accession: GCA_009819505.1
+  # Catharus ustulatus
+  - accession: GCA_009819505.2
+  # Catharus ustulatus
+  - accession: GCF_009819885.1
   # Catharus ustulatus
   - accession: GCF_009819885.2
   # Centroberyx gerrardi
@@ -308,69 +472,101 @@ assemblies:
   # Centroberyx gerrardi
   - accession: GCA_048129085.1
   # Cervus elaphus
+  - accession: GCA_910593805.1
+  # Cervus elaphus
   - accession: GCF_910594005.1
   # Cetorhinus maximus
-  - accession: GCA_964194165.1
-  # Cetorhinus maximus
   - accession: GCA_964194155.1
+  # Cetorhinus maximus
+  - accession: GCA_964194165.1
   # Chaetodon trifascialis
   - accession: GCA_039877575.1
   # Chaetodon trifascialis
   - accession: GCF_039877785.1
   # Chanos chanos
+  - accession: GCA_902362175.1
+  # Chanos chanos
   - accession: GCF_902362185.1
+  # Chelmon rostratus
+  - accession: GCA_017976315.1
   # Chelmon rostratus
   - accession: GCF_017976325.1
   # Chelon labrosus
   - accession: GCA_963514085.1
   # Chelonia mydas
+  - accession: GCA_015220195.2
+  # Chelonia mydas
+  - accession: GCF_015237465.1
+  # Chelonia mydas
   - accession: GCF_015237465.2
+  # Chionomys nivalis
+  - accession: GCA_950005115.1
   # Chionomys nivalis
   - accession: GCF_950005125.1
   # Chiroxiphia lanceolata
+  - accession: GCA_009829205.1
+  # Chiroxiphia lanceolata
   - accession: GCF_009829145.1
   # Chlamydotis macqueenii
-  - accession: GCA_036418225.1
-  # Chlamydotis macqueenii
   - accession: GCA_036417535.1
+  # Chlamydotis macqueenii
+  - accession: GCA_036418225.1
   # Choerodon schoenleinii
   - accession: GCA_047301625.1
   # Choloepus didactylus
+  - accession: GCA_015220265.1
+  # Choloepus didactylus
   - accession: GCF_015220235.1
   # Chroicocephalus ridibundus
-  - accession: GCF_963924245.1
-  # Chroicocephalus ridibundus
   - accession: GCA_030820635.1
+  # Chroicocephalus ridibundus
+  - accession: GCF_963924245.1
   # Ciconia maguari
   - accession: GCA_017639555.1
+  # Ciconia maguari
+  - accession: GCA_017639665.1
   # Cinclus cinclus
   - accession: GCF_963662255.1
   # Clangula hyemalis
   - accession: GCA_963989345.1
   # Clarias gariepinus
-  - accession: GCA_024256465.1
-  # Clarias gariepinus
   - accession: GCA_024256435.1
+  # Clarias gariepinus
+  - accession: GCA_024256465.1
   # Clavelina lepadiformis
   - accession: GCA_947623445.1
+  # Clavelina lepadiformis
+  - accession: GCF_947623445.1
+  # Eptesicus nilssonii
+  - accession: GCA_951640355.1
+  # Cnephaeus nilssonii
+  - accession: GCA_951640545.1
   # Coilia mystus
   - accession: GCA_048544215.1
   # Coilia mystus
   - accession: GCA_048544225.1
   # Colius striatus
-  - accession: GCF_028858725.1
+  - accession: GCA_028858625.1
   # Colius striatus
   - accession: GCA_028858625.2
-  # Coloeus monedula
-  - accession: GCA_965178545.1
+  # Colius striatus
+  - accession: GCA_028858725.1
+  # Colius striatus
+  - accession: GCF_028858725.1
   # Coloeus monedula
   - accession: GCA_965178535.1
-  # Columba livia
-  - accession: GCF_036013475.1
+  # Coloeus monedula
+  - accession: GCA_965178545.1
   # Columba livia
   - accession: GCA_032719375.1
   # Columba livia
+  - accession: GCA_036010775.1
+  # Columba livia
   - accession: GCA_036010775.2
+  # Columba livia
+  - accession: GCA_036013475.1
+  # Columba livia
+  - accession: GCF_036013475.1
   # Conger conger
   - accession: GCF_963514075.1
   # Coregonus lavaretus
@@ -378,9 +574,15 @@ assemblies:
   # Coregonus lavaretus
   - accession: GCA_964263955.1
   # Corella eumyota
+  - accession: GCA_963082865.1
+  # Corella eumyota
   - accession: GCA_963082875.1
   # Corvus hawaiiensis
+  - accession: GCA_020740675.1
+  # Corvus hawaiiensis
   - accession: GCF_020740725.1
+  # Corvus moneduloides
+  - accession: GCA_009651025.1
   # Corvus moneduloides
   - accession: GCF_009650955.1
   # Corynorhinus townsendii
@@ -388,15 +590,19 @@ assemblies:
   # Corynorhinus townsendii
   - accession: GCA_026230055.1
   # Cottoperca gobio
+  - accession: GCA_900634435.1
+  # Cottoperca gobio
   - accession: GCF_900634415.1
   # Cristiceps australis
-  - accession: GCA_049082185.1
-  # Cristiceps australis
   - accession: GCA_049082045.1
+  # Cristiceps australis
+  - accession: GCA_049082185.1
   # Ctenodactylus gundi
   - accession: GCA_048771865.1
   # Ctenodactylus gundi
   - accession: GCA_048771875.1
+  # Cuculus canorus
+  - accession: GCA_017976305.1
   # Cuculus canorus
   - accession: GCF_017976375.1
   # Cyanocitta cristata
@@ -404,41 +610,61 @@ assemblies:
   # Cyanocitta cristata
   - accession: GCA_046129655.1
   # Cyclopterus lumpus
-  - accession: GCF_009769545.1
+  - accession: GCA_009769515.1
   # Cyclopterus lumpus
   - accession: GCA_963457625.1
-  # Cyclura pinguis
-  - accession: GCA_030412105.1
+  # Cyclopterus lumpus
+  - accession: GCF_009769545.1
   # Cyclura pinguis
   - accession: GCA_030412085.1
+  # Cyclura pinguis
+  - accession: GCA_030412105.1
   # Cygnus columbianus
   - accession: GCA_965151615.1
   # Cygnus olor
+  - accession: GCA_009769485.1
+  # Cygnus olor
+  - accession: GCA_009769485.2
+  # Cygnus olor
+  - accession: GCA_009769625.1
+  # Cygnus olor
   - accession: GCF_009769625.2
+  # Cynocephalus volans
+  - accession: GCA_027409165.1
   # Cynocephalus volans
   - accession: GCF_027409185.1
   # Cyprinella venusta
-  - accession: GCA_038024135.1
-  # Cyprinella venusta
   - accession: GCA_038021265.1
-  # Dama dama
-  - accession: GCA_048127045.1
+  # Cyprinella venusta
+  - accession: GCA_038024135.1
   # Dama dama
   - accession: GCA_048126745.1
+  # Dama dama
+  - accession: GCA_048127045.1
   # Danio rerio
   - accession: GCA_903684855.2
   # Danio rerio
-  - accession: GCA_944039275.1
-  # Danio rerio
   - accession: GCA_903684865.1
+  # Danio rerio
+  - accession: GCA_944039255.1
+  # Danio rerio
+  - accession: GCA_944039275.1
   # Dasypus novemcinctus
-  - accession: GCF_030445035.2
+  - accession: GCA_030445055.1
   # Dasypus novemcinctus
   - accession: GCA_030445055.2
-  # Dasyurus maculatus
-  - accession: GCA_048593285.1
+  # Dasypus novemcinctus
+  - accession: GCF_030445035.1
+  # Dasypus novemcinctus
+  - accession: GCF_030445035.2
   # Dasyurus maculatus
   - accession: GCA_048593245.1
+  # Dasyurus maculatus
+  - accession: GCA_048593285.1
+  # Delphinus delphis
+  - accession: GCA_949987525.1
+  # Delphinus delphis
+  - accession: GCF_949987515.1
   # Delphinus delphis
   - accession: GCF_949987515.2
   # Dendropsophus ebraccatus
@@ -446,35 +672,63 @@ assemblies:
   # Dendropsophus ebraccatus
   - accession: GCF_027789765.1
   # Denticeps clupeoides
+  - accession: GCA_900700345.2
+  # Denticeps clupeoides
+  - accession: GCA_900700375.2
+  # Denticeps clupeoides
   - accession: GCF_900700375.1
+  # Dermochelys coriacea
+  - accession: GCA_009762595.1
+  # Dermochelys coriacea
+  - accession: GCA_009762595.2
+  # Dermochelys coriacea
+  - accession: GCA_009764565.1
+  # Dermochelys coriacea
+  - accession: GCF_009764565.2
   # Dermochelys coriacea
   - accession: GCF_009764565.3
   # Desmodus rotundus
-  - accession: GCA_022682495.2
+  - accession: GCA_022682395.1
   # Desmodus rotundus
   - accession: GCA_022682395.2
+  # Desmodus rotundus
+  - accession: GCA_022682495.2
+  # Desmodus rotundus
+  - accession: GCF_022682495.1
+  # Desmodus rotundus
+  - accession: GCF_022682495.2
   # Dibamus cf. smithi
   - accession: GCA_046126795.1
   # Dibamus cf. smithi
   - accession: GCA_046126825.1
   # Diceros bicornis minor
-  - accession: GCF_020826845.1
-  # Diceros bicornis minor
   - accession: GCA_020826835.1
+  # Diceros bicornis minor
+  - accession: GCF_020826845.1
   # Diretmus argenteus
   - accession: GCA_048569125.1
   # Diretmus argenteus
   - accession: GCA_048569135.1
   # Discoglossus pictus
   - accession: GCA_027410445.1
+  # Discoglossus pictus
+  - accession: GCA_027410455.1
   # Doryrhina cyclops
   - accession: GCA_043880285.1
+  # Dromaius novaehollandiae
+  - accession: GCA_016128335.1
+  # Dromaius novaehollandiae
+  - accession: GCA_016128335.2
   # Dromaius novaehollandiae
   - accession: GCA_036417515.1
   # Dromaius novaehollandiae
   - accession: GCF_036370855.1
   # Dromiciops gliroides
+  - accession: GCA_019395325.1
+  # Dromiciops gliroides
   - accession: GCF_019393635.1
+  # Dryobates pubescens
+  - accession: GCA_014839825.1
   # Dryobates pubescens
   - accession: GCF_014839835.1
   # Dugong dugon
@@ -482,21 +736,35 @@ assemblies:
   # Dugong dugon
   - accession: GCA_030035585.1
   # Echeneis naucrates
+  - accession: GCA_900963305.2
+  # Echeneis naucrates
+  - accession: GCA_900963505.1
+  # Echeneis naucrates
   - accession: GCF_900963305.1
   # Echiichthys vipera
   - accession: GCA_963691815.1
   # Electrona antarctica
+  - accession: GCA_951214905.1
+  # Electrona antarctica
   - accession: GCA_951216825.1
+  # Electrophorus electricus
+  - accession: GCA_013347915.1
+  # Electrophorus electricus
+  - accession: GCA_013358815.1
   # Electrophorus electricus
   - accession: GCA_041902795.1
   # Electrophorus electricus
-  - accession: GCA_013358815.1
+  - accession: GCF_013358815.1
+  # Elephas maximus indicus
+  - accession: GCA_024166345.1
   # Elephas maximus indicus
   - accession: GCF_024166365.1
   # Eleutherodactylus coqui
   - accession: GCA_035609135.1
   # Eleutherodactylus coqui
   - accession: GCF_035609145.1
+  # Elgaria multicarinata webbii
+  - accession: GCA_023053635.1
   # Elgaria multicarinata webbii
   - accession: GCF_023053635.1
   # Emys orbicularis
@@ -508,9 +776,9 @@ assemblies:
   # Engystomops pustulosus
   - accession: GCF_040894005.1
   # Enoplosus armatus
-  - accession: GCF_043641665.1
-  # Enoplosus armatus
   - accession: GCA_043640875.1
+  # Enoplosus armatus
+  - accession: GCF_043641665.1
   # Epinephelus lanceolatus
   - accession: GCA_041903045.1
   # Epinephelus rankini
@@ -519,34 +787,50 @@ assemblies:
   - accession: GCA_048129235.1
   # Eptesicus fuscus
   - accession: GCF_027574615.1
-  # Eptesicus nilssonii
-  - accession: GCA_951640355.1
-  # Equus caballus
-  - accession: GCA_036426135.1
   # Equus caballus
   - accession: GCA_036418255.1
+  # Equus caballus
+  - accession: GCA_036426135.1
   # Erethizon dorsatum
   - accession: GCA_028451465.1
-  # Eretmochelys imbricata
-  - accession: GCA_965152285.1
+  # Erethizon dorsatum
+  - accession: GCA_028500835.1
   # Eretmochelys imbricata
   - accession: GCA_965152235.1
+  # Eretmochelys imbricata
+  - accession: GCA_965152285.1
+  # Erinaceus europaeus
+  - accession: GCA_950295305.1
   # Erinaceus europaeus
   - accession: GCF_950295315.1
   # Erithacus rubecula
+  - accession: GCA_903797565.2
+  # Erithacus rubecula
   - accession: GCA_903797595.2
+  # Erpetoichthys calabaricus
+  - accession: GCA_900700845.2
+  # Erpetoichthys calabaricus
+  - accession: GCA_900700845.3
+  # Erpetoichthys calabaricus
+  - accession: GCF_900747795.1
   # Erpetoichthys calabaricus
   - accession: GCF_900747795.2
   # Erythrolamprus reginae
-  - accession: GCF_031021105.1
+  - accession: GCA_031001685.1
   # Erythrolamprus reginae
   - accession: GCA_031021085.1
   # Erythrolamprus reginae
-  - accession: GCA_031001685.1
+  - accession: GCF_031021105.1
+  # Eschrichtius robustus
+  - accession: GCA_028021475.1
   # Eschrichtius robustus
   - accession: GCF_028021215.1
   # Esox lucius
+  - accession: GCA_011004835.1
+  # Esox lucius
   - accession: GCF_011004845.1
+  # Eubalaena glacialis
+  - accession: GCA_028564815.1
   # Eubalaena glacialis
   - accession: GCA_028571275.1
   # Eubalaena glacialis
@@ -554,9 +838,9 @@ assemblies:
   # Eublepharis macularius
   - accession: GCF_028583425.1
   # Eudromia elegans
-  - accession: GCA_047922985.1
-  # Eudromia elegans
   - accession: GCA_047922975.1
+  # Eudromia elegans
+  - accession: GCA_047922985.1
   # Euleptes europaea
   - accession: GCA_029931755.1
   # Euleptes europaea
@@ -567,18 +851,32 @@ assemblies:
   - accession: GCA_039878515.1
   # Excalfactoria chinensis
   - accession: GCA_039878825.1
+  # Excalfactoria chinensis
+  - accession: GCF_039878825.1
+  # Falco biarmicus
+  - accession: GCA_023634305.1
   # Falco biarmicus
   - accession: GCF_023638135.1
+  # Falco cherrug
+  - accession: GCA_023634115.1
   # Falco cherrug
   - accession: GCF_023634085.1
   # Falco naumanni
   - accession: GCA_017639645.1
   # Falco naumanni
+  - accession: GCF_017639655.1
+  # Falco naumanni
   - accession: GCF_017639655.2
+  # Falco peregrinus
+  - accession: GCA_023634185.1
   # Falco peregrinus
   - accession: GCF_023634155.1
   # Falco punctatus
+  - accession: GCA_963210275.1
+  # Falco punctatus
   - accession: GCA_963210335.1
+  # Falco rusticolus
+  - accession: GCA_015220155.1
   # Falco rusticolus
   - accession: GCF_015220075.1
   # Fringilla coelebs
@@ -590,25 +888,33 @@ assemblies:
   # Furcifer pardalis
   - accession: GCA_030440675.1
   # Gadus morhua
+  - accession: GCA_902167395.1
+  # Gadus morhua
   - accession: GCF_902167405.1
   # Gallinula chloropus
   - accession: GCA_964237395.1
   # Gallinula chloropus
   - accession: GCA_964237585.1
   # Gallus gallus
-  - accession: GCF_016699485.2
-  # Gallus gallus
-  - accession: GCA_027557775.1
-  # Gallus gallus
   - accession: GCA_024206055.2
+  # Gallus gallus
+  - accession: GCA_027408205.1
   # Gallus gallus
   - accession: GCA_027408225.1
   # Gallus gallus
+  - accession: GCA_027408255.1
+  # Gallus gallus
+  - accession: GCA_027557775.1
+  # Gallus gallus
+  - accession: GCF_016699485.2
+  # Gallus gallus
+  - accession: GCF_016700215.1
+  # Gallus gallus
   - accession: GCF_016700215.2
   # Gasterosteus aculeatus
-  - accession: GCA_964276395.1
-  # Gasterosteus aculeatus
   - accession: GCA_964276385.1
+  # Gasterosteus aculeatus
+  - accession: GCA_964276395.1
   # Gastrophryne carolinensis
   - accession: GCA_027917415.1
   # Gastrophryne carolinensis
@@ -622,21 +928,33 @@ assemblies:
   # Gavialis gangeticus
   - accession: GCA_030020385.1
   # Geothlypis trichas
+  - accession: GCA_009764545.1
+  # Geothlypis trichas
   - accession: GCA_009764595.1
+  # Geotrypetes seraphini
+  - accession: GCA_902459495.1
+  # Geotrypetes seraphini
+  - accession: GCA_902459505.2
   # Geotrypetes seraphini
   - accession: GCF_902459505.1
   # Girardinichthys multiradiatus
   - accession: GCF_021462225.1
   # Globicephala melas
+  - accession: GCF_963455315.1
+  # Globicephala melas
   - accession: GCF_963455315.2
   # Glossophaga mutica
-  - accession: GCA_039656995.1
-  # Glossophaga mutica
   - accession: GCA_039655065.1
+  # Glossophaga mutica
+  - accession: GCA_039656995.1
   # Gobio gobio
   - accession: GCA_949357685.1
+  # Gobio gobio
+  - accession: GCA_949357705.1
   # Gobius niger
   - accession: GCA_951799975.1
+  # Gopherus evgoodei
+  - accession: GCA_007399395.1
   # Gopherus evgoodei
   - accession: GCF_007399415.2
   # Gopherus flavomarginatus
@@ -644,7 +962,15 @@ assemblies:
   # Gopherus flavomarginatus
   - accession: GCF_025201925.1
   # Gorilla gorilla gorilla
+  - accession: GCA_028885475.2
+  # Gorilla gorilla gorilla
+  - accession: GCF_029281585.1
+  # Gorilla gorilla gorilla
   - accession: GCF_029281585.2
+  # Gouania willdenowi
+  - accession: GCA_900634775.2
+  # Gouania willdenowi
+  - accession: GCA_900650505.1
   # Gouania willdenowi
   - accession: GCF_900634775.1
   # Grampus griseus
@@ -652,9 +978,9 @@ assemblies:
   # Grampus griseus
   - accession: GCA_964374185.1
   # Grus americana
-  - accession: GCF_028858705.1
-  # Grus americana
   - accession: GCA_028858595.1
+  # Grus americana
+  - accession: GCF_028858705.1
   # Grus grus
   - accession: GCA_964106855.1
   # Guaruba guarouba
@@ -663,18 +989,28 @@ assemblies:
   - accession: GCA_045519325.1
   # Gymnoscopelus braueri
   - accession: GCA_963280865.1
+  # Gymnoscopelus braueri
+  - accession: GCA_963281105.1
   # Gymnoscopelus microlampas
   - accession: GCA_963454915.1
   # Gypaetus barbatus
+  - accession: GCA_028017155.1
+  # Gypaetus barbatus
   - accession: GCA_028022735.1
+  # Haemorhous mexicanus
+  - accession: GCA_027406555.1
   # Haemorhous mexicanus
   - accession: GCF_027477595.1
   # Haliaeetus albicilla
+  - accession: GCA_947461935.1
+  # Haliaeetus albicilla
   - accession: GCF_947461875.1
   # Halichoerus grypus
-  - accession: GCA_964656465.1
-  # Halichoerus grypus
   - accession: GCA_964656455.1
+  # Halichoerus grypus
+  - accession: GCA_964656465.1
+  # Harpia harpyja
+  - accession: GCA_026419925.1
   # Harpia harpyja
   - accession: GCF_026419915.1
   # Heliangelus exortis
@@ -682,41 +1018,55 @@ assemblies:
   # Heliangelus exortis
   - accession: GCF_036169615.1
   # Hemiprocne comata
+  - accession: GCA_020745695.1
+  # Hemiprocne comata
   - accession: GCA_020745705.1
   # Hemiscyllium ocellatum
   - accession: GCA_020745765.1
   # Hemiscyllium ocellatum
   - accession: GCF_020745735.1
   # Heptranchias perlo
-  - accession: GCF_035084215.1
-  # Heptranchias perlo
   - accession: GCA_035084135.1
+  # Heptranchias perlo
+  - accession: GCF_035084215.1
   # Heterodontus francisci
   - accession: GCA_036365495.1
   # Heterodontus francisci
   - accession: GCF_036365525.1
   # Heterohyrax brucei
+  - accession: GCA_028571665.1
+  # Heterohyrax brucei
   - accession: GCA_028571685.1
+  # Hippoglossus hippoglossus
+  - accession: GCA_009819745.1
   # Hippoglossus hippoglossus
   - accession: GCF_009819705.1
   # Hippopotamus amphibius kiboko
-  - accession: GCF_030028045.1
-  # Hippopotamus amphibius kiboko
   - accession: GCA_030028035.1
+  # Hippopotamus amphibius kiboko
+  - accession: GCF_030028045.1
   # Hipposideros larvatus
   - accession: GCA_031876335.1
   # Hipposideros larvatus
   - accession: GCA_043727955.1
   # Hirundo rustica
+  - accession: GCA_015227815.3
+  # Hirundo rustica
   - accession: GCF_015227805.1
-  # Homo sapiens
-  - accession: GCA_016695395.2
+  # Hirundo rustica
+  - accession: GCF_015227805.2
   # Homo sapiens
   - accession: GCA_009914755.4
+  # Homo sapiens
+  - accession: GCA_016695395.2
   # Homo sapiens
   - accession: GCA_016700455.2
   # Homo sapiens
   - accession: GCF_000001405.40
+  # Hoplias malabaricus
+  - accession: GCA_029633855.1
+  # Hoplias malabaricus
+  - accession: GCA_029633875.1
   # Hoplias malabaricus
   - accession: GCA_029633875.2
   # Hoplias malabaricus
@@ -730,15 +1080,21 @@ assemblies:
   # Hyla sarda
   - accession: GCF_029499605.1
   # Hypanus sabinus
-  - accession: GCF_030144855.1
-  # Hypanus sabinus
   - accession: GCA_030144785.1
+  # Hypanus sabinus
+  - accession: GCF_030144855.1
+  # Hyperolius riggenbachi
+  - accession: GCA_040937895.1
   # Hyperolius riggenbachi
   - accession: GCF_040937935.1
   # Hyperoodon ampullatus
   - accession: GCA_949752795.1
+  # Hyperoodon ampullatus
+  - accession: GCA_949752845.1
   # Hyperoplus immaculatus
   - accession: GCA_949357725.1
+  # Hyperoplus immaculatus
+  - accession: GCA_949358355.1
   # Inia geoffrensis
   - accession: GCA_036417435.1
   # Inia geoffrensis
@@ -748,21 +1104,23 @@ assemblies:
   # Jaculus jaculus
   - accession: GCF_020740685.1
   # Kogia breviceps
-  - accession: GCF_026419965.1
-  # Kogia breviceps
   - accession: GCA_026419985.1
+  # Kogia breviceps
+  - accession: GCF_026419965.1
   # Labrus bergylta
   - accession: GCF_963930695.1
   # Labrus mixtus
   - accession: GCF_963584025.1
   # Lacerta agilis
+  - accession: GCA_009819545.1
+  # Lacerta agilis
   - accession: GCF_009819535.1
-  # Lagenorhynchus acutus
-  - accession: GCA_964270935.1
-  # Lagenorhynchus acutus
-  - accession: GCA_964270905.1
+  # Lagenorhynchus albirostris
+  - accession: GCA_949774935.1
   # Lagenorhynchus albirostris
   - accession: GCF_949774975.1
+  # Lagopus muta
+  - accession: GCA_023344045.1
   # Lagopus muta
   - accession: GCF_023343835.1
   # Lampetra fluviatilis
@@ -778,7 +1136,11 @@ assemblies:
   # Larus fuscus
   - accession: GCA_963932225.1
   # Larus michahellis
+  - accession: GCA_964199725.1
+  # Larus michahellis
   - accession: GCA_964199755.1
+  # Larus michahellis
+  - accession: GCF_964199755.1
   # Lateolabrax maculatus
   - accession: GCA_031216445.1
   # Lathamus discolor
@@ -788,11 +1150,15 @@ assemblies:
   # Latimeria chalumnae
   - accession: GCF_037176945.1
   # Lemur catta
+  - accession: GCA_020740595.1
+  # Lemur catta
   - accession: GCF_020740605.2
+  # Lepidochelys kempii
+  - accession: GCA_965140265.1
   # Lepidochelys kempii
   - accession: GCA_965140285.1
   # Lepidochelys kempii
-  - accession: GCA_965140265.1
+  - accession: GCF_965140265.1
   # Lepidochelys olivacea
   - accession: GCA_965140255.1
   # Lepidochelys olivacea
@@ -802,25 +1168,31 @@ assemblies:
   # Lepidogalaxias salamandroides
   - accession: GCA_049190665.1
   # Lepisosteus oculatus
-  - accession: GCF_040954835.1
-  # Lepisosteus oculatus
   - accession: GCA_040954845.1
+  # Lepisosteus oculatus
+  - accession: GCF_040954835.1
   # Leptodactylus fuscus
   - accession: GCA_031893025.1
   # Leptodactylus fuscus
   - accession: GCA_031893055.1
+  # Leptodactylus fuscus
+  - accession: GCF_031893055.1
   # Leptosomus discolor
   - accession: GCA_034619455.1
   # Leptosomus discolor
   - accession: GCA_034619465.1
   # Lethrinus nebulosus
-  - accession: GCA_045362495.1
-  # Lethrinus nebulosus
   - accession: GCA_045362485.1
+  # Lethrinus nebulosus
+  - accession: GCA_045362495.1
   # Leuciscus leuciscus
   - accession: GCA_965113295.1
   # Leuciscus leuciscus
   - accession: GCA_965113325.1
+  # Lagenorhynchus acutus
+  - accession: GCA_964270905.1
+  # Lagenorhynchus acutus
+  - accession: GCA_964270935.1
   # Liasis olivaceus
   - accession: GCA_030867085.1
   # Liasis olivaceus
@@ -829,6 +1201,8 @@ assemblies:
   - accession: GCF_963576545.1
   # Lipophrys pholis
   - accession: GCA_963383615.1
+  # Lipophrys pholis
+  - accession: GCA_963383635.1
   # Lissotriton helveticus
   - accession: GCA_964261635.1
   # Lissotriton vulgaris
@@ -842,39 +1216,49 @@ assemblies:
   # Loxodonta africana
   - accession: GCF_030014295.1
   # Lutra lutra
+  - accession: GCA_902653095.1
+  # Lutra lutra
   - accession: GCF_902655055.1
   # Lycaon pictus
-  - accession: GCA_040955705.1
-  # Lycaon pictus
   - accession: GCA_040955645.1
+  # Lycaon pictus
+  - accession: GCA_040955705.1
   # Lycocorax pyrrhopterus obiensis
   - accession: GCA_014706295.1
   # Lycodopsis pacificus
-  - accession: GCA_028022725.1
-  # Lycodopsis pacificus
   - accession: GCA_028021495.1
+  # Lycodopsis pacificus
+  - accession: GCA_028022725.1
+  # Lynx canadensis
+  - accession: GCA_007474575.1
+  # Lynx canadensis
+  - accession: GCA_007474575.2
+  # Lynx canadensis
+  - accession: GCF_007474595.1
   # Lynx canadensis
   - accession: GCF_007474595.2
   # Macaca fascicularis
   - accession: GCF_037993035.1
   # Macaca nemestrina
-  - accession: GCF_043159975.1
-  # Macaca nemestrina
   - accession: GCA_043161795.1
-  # Macrochelys suwanniensis
-  - accession: GCA_033349115.1
+  # Macaca nemestrina
+  - accession: GCF_043159975.1
   # Macrochelys suwanniensis
   - accession: GCA_033296515.1
+  # Macrochelys suwanniensis
+  - accession: GCA_033349115.1
   # Macrotis lagotis
   - accession: GCA_037893015.1
+  # Macrotis lagotis
+  - accession: GCF_037893015.1
   # Malaclemys terrapin pileata
   - accession: GCA_027887205.1
   # Malaclemys terrapin pileata
   - accession: GCF_027887155.1
   # Manis pentadactyla
-  - accession: GCF_030020395.1
-  # Manis pentadactyla
   - accession: GCA_030020945.1
+  # Manis pentadactyla
+  - accession: GCF_030020395.1
   # Mantella aurantiaca
   - accession: GCA_048565335.1
   # Mantella aurantiaca
@@ -886,37 +1270,55 @@ assemblies:
   # Martes martes
   - accession: GCA_963455335.1
   # Mastacembelus armatus
+  - accession: GCA_900324485.3
+  # Mastacembelus armatus
+  - accession: GCA_900700395.1
+  # Mastacembelus armatus
   - accession: GCF_900324485.2
   # Megaderma spasma
   - accession: GCA_043880595.1
+  # Megalops cyprinoides
+  - accession: GCA_013368575.1
   # Megalops cyprinoides
   - accession: GCF_013368585.1
   # Megaptera novaeangliae
   - accession: GCA_041834305.1
   # Melanostigma gelatinosum
+  - accession: GCA_949748265.1
+  # Melanostigma gelatinosum
   - accession: GCA_949748355.1
   # Melanotaenia boesemani
+  - accession: GCA_017639755.1
+  # Melanotaenia boesemani
   - accession: GCF_017639745.1
+  # Meles meles
+  - accession: GCA_922984935.2
   # Meles meles
   - accession: GCA_922990625.1
   # Meles meles
   - accession: GCF_922984935.1
   # Melopsittacus undulatus
-  - accession: GCF_012275295.1
+  - accession: GCA_012275265.1
   # Melopsittacus undulatus
   - accession: GCA_012275275.1
+  # Melopsittacus undulatus
+  - accession: GCF_012275295.1
+  # Melospiza georgiana
+  - accession: GCA_028019105.1
   # Melospiza georgiana
   - accession: GCF_028018845.1
   # Melospiza melodia melodia
   - accession: GCF_035770615.1
   # Menidia menidia
-  - accession: GCA_048628825.1
-  # Menidia menidia
   - accession: GCA_048544195.1
-  # Mergus octosetaceus
-  - accession: GCA_036873955.1
+  # Menidia menidia
+  - accession: GCA_048628825.1
   # Mergus octosetaceus
   - accession: GCA_036850655.1
+  # Mergus octosetaceus
+  - accession: GCA_036873955.1
+  # Merops nubicus
+  - accession: GCA_009819585.1
   # Merops nubicus
   - accession: GCA_009819595.1
   # Mesoplodon bidens
@@ -924,13 +1326,19 @@ assemblies:
   # Mesoplodon bidens
   - accession: GCA_964165515.1
   # Mesoplodon densirostris
+  - accession: GCA_025094165.1
+  # Mesoplodon densirostris
   - accession: GCF_025265405.1
   # Mesoplodon mirus
-  - accession: GCA_964341485.1
-  # Mesoplodon mirus
   - accession: GCA_964341445.1
+  # Mesoplodon mirus
+  - accession: GCA_964341485.1
   # Microcaecilia unicolor
   - accession: GCA_901765095.2
+  # Microcaecilia unicolor
+  - accession: GCA_901765105.1
+  # Microcaecilia unicolor
+  - accession: GCF_901765095.1
   # Microchirus variegatus
   - accession: GCA_963457635.1
   # Micromesistius poutassou
@@ -942,21 +1350,31 @@ assemblies:
   # Microstomus kitt
   - accession: GCA_964266715.1
   # Microtus pennsylvanicus
+  - accession: GCA_037038515.1
+  # Microtus pennsylvanicus
   - accession: GCA_037039175.1
   # Microtus pennsylvanicus
-  - accession: GCA_037038515.1
+  - accession: GCF_037038515.1
   # Miniopterus schreibersii
-  - accession: GCA_964146895.2
+  - accession: GCA_964145185.1
   # Miniopterus schreibersii
   - accession: GCA_964145185.2
+  # Miniopterus schreibersii
+  - accession: GCA_964146895.1
+  # Miniopterus schreibersii
+  - accession: GCA_964146895.2
   # Mixophyes fleayi
   - accession: GCA_038048845.1
   # Mixophyes fleayi
   - accession: GCA_038048865.1
+  # Mixophyes fleayi
+  - accession: GCF_038048845.1
   # Mobula birostris
   - accession: GCA_030035685.1
   # Mobula birostris
   - accession: GCF_030028105.1
+  # Molossus alvarezi
+  - accession: GCA_031001765.1
   # Molossus alvarezi
   - accession: GCA_037157525.1
   # Molossus alvarezi
@@ -964,9 +1382,13 @@ assemblies:
   # Molossus molossus
   - accession: GCF_014108415.1
   # Molossus nigricans
+  - accession: GCA_026936385.1
+  # Molossus nigricans
   - accession: GCA_039880925.1
   # Molossus nigricans
   - accession: GCA_039880945.1
+  # Monodelphis domestica
+  - accession: GCA_027917375.1
   # Monodelphis domestica
   - accession: GCF_027887165.1
   # Monodon monoceros
@@ -974,31 +1396,43 @@ assemblies:
   # Mops condylurus
   - accession: GCA_043748645.1
   # Morphnus guianensis
-  - accession: GCA_045345515.1
-  # Morphnus guianensis
   - accession: GCA_045345505.1
-  # Morus bassanus
-  - accession: GCA_031468815.1
+  # Morphnus guianensis
+  - accession: GCA_045345515.1
   # Morus bassanus
   - accession: GCA_031468805.1
+  # Morus bassanus
+  - accession: GCA_031468815.1
+  # Muntiacus reevesi
+  - accession: GCA_963930665.1
   # Muntiacus reevesi
   - accession: GCF_963930625.1
+  # Mus musculus
+  - accession: GCA_949316305.1
   # Mus musculus
   - accession: GCA_949316315.1
   # Muscardinus avellanarius
   - accession: GCA_963383645.1
+  # Muscardinus avellanarius
+  - accession: GCA_963383665.1
+  # Mustela erminea
+  - accession: GCA_009829165.1
   # Mustela erminea
   - accession: GCF_009829155.1
   # Mustela lutreola
+  - accession: GCA_030435785.1
+  # Mustela lutreola
   - accession: GCF_030435805.1
   # Mustela nivalis
-  - accession: GCA_964662115.1
-  # Mustela nivalis
   - accession: GCA_964662095.1
-  # Mustelus asterias
-  - accession: GCA_964214025.1
+  # Mustela nivalis
+  - accession: GCA_964662115.1
   # Mustelus asterias
   - accession: GCA_964213995.1
+  # Mustelus asterias
+  - accession: GCA_964214025.1
+  # Myotis daubentonii
+  - accession: GCA_963242275.1
   # Myotis daubentonii
   - accession: GCF_963259705.1
   # Myotis emarginatus
@@ -1008,15 +1442,23 @@ assemblies:
   # Myotis myotis
   - accession: GCF_014108235.1
   # Myotis mystacinus
-  - accession: GCA_964195625.1
-  # Myotis mystacinus
   - accession: GCA_964094495.2
+  # Myotis mystacinus
+  - accession: GCA_964195625.1
   # Myotis nattereri
-  - accession: GCA_964212035.2
+  - accession: GCA_964212025.1
   # Myotis nattereri
   - accession: GCA_964212025.2
+  # Myotis nattereri
+  - accession: GCA_964212035.1
+  # Myotis nattereri
+  - accession: GCA_964212035.2
+  # Myripristis murdjan
+  - accession: GCA_902148815.1
   # Myripristis murdjan
   - accession: GCF_902150065.1
+  # Myuchelys georgesi
+  - accession: GCA_040894355.1
   # Myuchelys georgesi
   - accession: GCA_040894355.2
   # Myxine glutinosa
@@ -1028,39 +1470,53 @@ assemblies:
   # Nansenia antarctica
   - accession: GCA_963989245.1
   # Narcine bancroftii
-  - accession: GCF_036971445.1
-  # Narcine bancroftii
   - accession: GCA_036971175.1
+  # Narcine bancroftii
+  - accession: GCF_036971445.1
   # Natator depressus
   - accession: GCA_965152195.1
   # Natator depressus
   - accession: GCA_965152275.1
+  # Natator depressus
+  - accession: GCF_965152275.1
   # Natrix helvetica
   - accession: GCA_964273705.1
   # Natrix helvetica
   - accession: GCA_964273795.1
   # Neoarius graeffei
+  - accession: GCA_027579805.1
+  # Neoarius graeffei
   - accession: GCF_027579695.1
+  # Neofelis nebulosa
+  - accession: GCA_028018655.1
   # Neofelis nebulosa
   - accession: GCF_028018385.1
   # Neogale vison
-  - accession: GCA_964106545.1
-  # Neogale vison
   - accession: GCA_964106205.1
+  # Neogale vison
+  - accession: GCA_964106545.1
   # Neosynchiropus ocellatus
   - accession: GCA_044231645.1
   # Neosynchiropus ocellatus
   - accession: GCA_044231665.1
   # Nesoenas mayeri
+  - accession: GCA_963082445.1
+  # Nesoenas mayeri
   - accession: GCA_963082525.1
   # Netta rufina
   - accession: GCA_964035555.1
   # Notamacropus eugenii
-  - accession: GCF_028372415.1
+  - accession: GCA_028372415.1
+  # Notamacropus eugenii
+  - accession: GCA_028389975.1
+  # Notamacropus eugenii
+  - accession: GCA_048593335.1
   # Notamacropus eugenii
   - accession: GCA_048593345.1
   # Notamacropus eugenii
-  - accession: GCA_048593335.1
+  - accession: GCF_028372415.1
+  # Notolabrus celidotus
+  - accession: GCA_009762545.1
   # Notolabrus celidotus
   - accession: GCF_009762535.1
   # Notolepis coatsorum
@@ -1068,17 +1524,29 @@ assemblies:
   # Notoryctes typhlops
   - accession: GCA_048126345.1
   # Notothenia rossii
+  - accession: GCA_949606865.1
+  # Notothenia rossii
   - accession: GCA_949606895.1
+  # Numenius arquata
+  - accession: GCA_964059295.1
   # Numenius arquata
   - accession: GCA_964106895.1
   # Numenius arquata
-  - accession: GCA_964059295.1
+  - accession: GCF_964106895.1
+  # Nyctalus leisleri
+  - accession: GCA_964264875.1
   # Nyctalus leisleri
   - accession: GCA_964264875.2
   # Nyctalus leisleri
+  - accession: GCA_964264895.1
+  # Nyctalus leisleri
   - accession: GCA_964264895.2
   # Nyctibius grandis
+  - accession: GCA_013368595.1
+  # Nyctibius grandis
   - accession: GCF_013368605.1
+  # Nycticebus coucang
+  - accession: GCA_027406535.1
   # Nycticebus coucang
   - accession: GCF_027406575.1
   # Ochotona princeps
@@ -1089,6 +1557,8 @@ assemblies:
   - accession: GCA_027942865.1
   # Odontesthes bonariensis
   - accession: GCA_027942885.1
+  # Odontesthes bonariensis
+  - accession: GCF_027942865.1
   # Oenanthe melanoleuca
   - accession: GCF_029582105.1
   # Onychomys torridus
@@ -1097,8 +1567,16 @@ assemblies:
   - accession: GCA_030867145.1
   # Opisthocomus hoazin
   - accession: GCA_030867165.1
+  # Opisthocomus hoazin
+  - accession: GCF_030867145.1
+  # Orcinus orca
+  - accession: GCA_937001455.1
   # Orcinus orca
   - accession: GCF_937001465.1
+  # Ornithorhynchus anatinus
+  - accession: GCA_004115175.2
+  # Ornithorhynchus anatinus
+  - accession: GCA_004115215.3
   # Ornithorhynchus anatinus
   - accession: GCF_004115215.2
   # Oryctolagus cuniculus
@@ -1107,20 +1585,32 @@ assemblies:
   - accession: GCF_963692335.1
   # Osmerus mordax
   - accession: GCA_038355195.1
+  # Osmerus mordax
+  - accession: GCF_038355195.1
   # Ovis aries
   - accession: GCA_040805955.1
   # Ovis canadensis
   - accession: GCF_042477335.2
   # Pagrus pagrus
-  - accession: GCA_965226575.1
-  # Pagrus pagrus
   - accession: GCA_965225695.1
+  # Pagrus pagrus
+  - accession: GCA_965226575.1
+  # Pan paniscus
+  - accession: GCA_028858825.2
+  # Pan paniscus
+  - accession: GCF_029289425.1
   # Pan paniscus
   - accession: GCF_029289425.2
   # Pan troglodytes
-  - accession: GCF_028858775.2
+  - accession: GCA_028858805.1
   # Pan troglodytes
   - accession: GCA_028858805.2
+  # Pan troglodytes
+  - accession: GCF_028858775.1
+  # Pan troglodytes
+  - accession: GCF_028858775.2
+  # Pangasianodon hypophthalmus
+  - accession: GCA_027382375.1
   # Pangasianodon hypophthalmus
   - accession: GCF_027358585.1
   # Pangshura tecta
@@ -1132,7 +1622,13 @@ assemblies:
   # Panthera onca
   - accession: GCA_046562885.1
   # Parambassis ranga
+  - accession: GCA_900634625.2
+  # Parambassis ranga
+  - accession: GCA_900651595.1
+  # Parambassis ranga
   - accession: GCF_900634625.1
+  # Pararge aegeria
+  - accession: GCF_905163445.1
   # Passer domesticus
   - accession: GCA_036417895.1
   # Passer domesticus
@@ -1140,39 +1636,65 @@ assemblies:
   # Passerculus sandwichensis
   - accession: GCA_031885435.1
   # Patagioenas fasciata
-  - accession: GCF_037038585.1
-  # Patagioenas fasciata
   - accession: GCA_036971685.2
+  # Patagioenas fasciata
+  - accession: GCF_036971685.1
+  # Patagioenas fasciata
+  - accession: GCF_037038585.1
+  # Pecten maximus
+  - accession: GCF_902652985.1
+  # Pelecanus crispus
+  - accession: GCA_030449815.1
   # Pelecanus crispus
   - accession: GCA_030463565.1
+  # Pelecanus crispus
+  - accession: GCF_030463565.1
   # Pelobates fuscus
   - accession: GCF_036172605.1
   # Pelodytes ibericus
   - accession: GCA_036172795.1
   # Pelophylax lessonae
-  - accession: GCA_965119315.1
-  # Pelophylax lessonae
   - accession: GCA_965119305.1
-  # Pempheris klunzingeri
-  - accession: GCF_042242105.1
+  # Pelophylax lessonae
+  - accession: GCA_965119315.1
   # Pempheris klunzingeri
   - accession: GCA_042242125.1
+  # Pempheris klunzingeri
+  - accession: GCF_042242105.1
+  # Periophthalmus magnuspinnatus
+  - accession: GCA_009829135.1
+  # Periophthalmus magnuspinnatus
+  - accession: GCF_009829125.1
   # Periophthalmus magnuspinnatus
   - accession: GCF_009829125.3
   # Peromyscus maniculatus sonoriensis
   - accession: GCA_026229955.1
   # Petromyzon marinus
+  - accession: GCA_010993595.1
+  # Petromyzon marinus
   - accession: GCA_048934315.1
   # Petromyzon marinus
+  - accession: GCA_048941845.1
+  # Petromyzon marinus
   - accession: GCF_010993605.1
+  # Petromyzon marinus
+  - accession: GCF_048934315.1
   # Phaethon aethereus
   - accession: GCA_964289735.1
   # Phaethon aethereus
   - accession: GCA_964289755.1
   # Phaethornis superciliosus
+  - accession: GCA_023637925.1
+  # Phaethornis superciliosus
+  - accession: GCA_023637945.1
+  # Phaethornis superciliosus
   - accession: GCA_023637945.2
   # Phalacrocorax aristotelis
+  - accession: GCA_949628205.1
+  # Phalacrocorax aristotelis
   - accession: GCA_949628215.1
+  # Phalacrocorax aristotelis
+  - accession: GCF_949628215.1
   # Phalacrocorax carbo
   - accession: GCF_963921805.1
   # Phascolarctos cinereus
@@ -1180,15 +1702,31 @@ assemblies:
   # Phocoena phocoena
   - accession: GCF_963924675.1
   # Phocoena sinus
+  - accession: GCA_008692045.1
+  # Phocoena sinus
   - accession: GCF_008692025.1
   # Phoenicopterus ruber ruber
   - accession: GCA_009819775.1
+  # Phoenicopterus ruber ruber
+  - accession: GCA_009819805.1
+  # Pholidichthys leucotaenia
+  - accession: GCA_020510965.1
   # Pholidichthys leucotaenia
   - accession: GCA_020510985.1
   # Pholis gunnellus
   - accession: GCA_910591455.2
+  # Pholis gunnellus
+  - accession: GCA_910591705.2
   # Phoxinus phoxinus
   - accession: GCA_949152265.1
+  # Phoxinus phoxinus
+  - accession: GCA_949152275.1
+  # Phyllostomus discolor
+  - accession: GCA_004115245.1
+  # Phyllostomus discolor
+  - accession: GCA_004115245.2
+  # Phyllostomus discolor
+  - accession: GCF_004126475.1
   # Phyllostomus discolor
   - accession: GCF_004126475.2
   # Pipistrellus hanaki
@@ -1196,23 +1734,29 @@ assemblies:
   # Pipistrellus kuhlii
   - accession: GCF_014108245.1
   # Pipistrellus nathusii
-  - accession: GCA_964656225.1
-  # Pipistrellus nathusii
   - accession: GCA_963693515.1
   # Pipistrellus nathusii
   - accession: GCA_964656075.1
+  # Pipistrellus nathusii
+  - accession: GCA_964656225.1
   # Pipistrellus pipistrellus
-  - accession: GCA_965204225.1
+  - accession: GCA_903992515.1
+  # Pipistrellus pipistrellus
+  - accession: GCA_903992545.1
   # Pipistrellus pipistrellus
   - accession: GCA_965203405.1
   # Pipistrellus pipistrellus
-  - accession: GCA_903992545.1
+  - accession: GCA_965204225.1
   # Pipistrellus pygmaeus
   - accession: GCA_949987585.1
+  # Pipistrellus pygmaeus
+  - accession: GCA_949987765.1
   # Platalea leucorodia
   - accession: GCA_965183785.1
   # Platalea leucorodia
   - accession: GCA_965183815.1
+  # Platichthys flesus
+  - accession: GCA_949316195.1
   # Platichthys flesus
   - accession: GCF_949316205.1
   # Plecotus auritus
@@ -1220,7 +1764,11 @@ assemblies:
   # Pleurodeles waltl
   - accession: GCA_026652325.1
   # Pleuronectes platessa
+  - accession: GCA_947347695.1
+  # Pleuronectes platessa
   - accession: GCF_947347685.1
+  # Pluvialis apricaria
+  - accession: GCA_017639475.1
   # Pluvialis apricaria
   - accession: GCA_017639485.1
   # Podarcis bocagei
@@ -1229,16 +1777,20 @@ assemblies:
   - accession: GCA_964188325.1
   # Podarcis cretensis
   - accession: GCA_951804945.1
+  # Podarcis cretensis
+  - accession: GCA_951804955.1
   # Podarcis erhardii
   - accession: GCA_964251985.1
   # Podarcis erhardii
   - accession: GCA_964252035.1
   # Podarcis filfolensis
-  - accession: GCA_964270895.1
-  # Podarcis filfolensis
   - accession: GCA_964270875.1
+  # Podarcis filfolensis
+  - accession: GCA_964270895.1
   # Podarcis gaigeae
   - accession: GCA_964106785.1
+  # Podarcis gaigeae
+  - accession: GCA_964106915.1
   # Podarcis gaigeae
   - accession: GCA_964106915.2
   # Podarcis liolepis
@@ -1246,17 +1798,19 @@ assemblies:
   # Podarcis liolepis
   - accession: GCA_965178375.1
   # Podarcis melisellensis
-  - accession: GCA_964234825.1
-  # Podarcis melisellensis
   - accession: GCA_964234715.1
+  # Podarcis melisellensis
+  - accession: GCA_964234825.1
   # Podarcis muralis
   - accession: GCA_964188315.1
   # Podarcis muralis
   - accession: GCA_964188365.1
   # Podarcis pityusensis
-  - accession: GCA_964106645.2
-  # Podarcis pityusensis
   - accession: GCA_964106635.2
+  # Podarcis pityusensis
+  - accession: GCA_964106645.2
+  # Podarcis raffonei
+  - accession: GCA_027172095.1
   # Podarcis raffonei
   - accession: GCF_027172205.1
   # Podarcis siculus
@@ -1264,13 +1818,15 @@ assemblies:
   # Podarcis siculus
   - accession: GCA_964188395.1
   # Podarcis tiliguerta
-  - accession: GCA_965153305.1
-  # Podarcis tiliguerta
   - accession: GCA_965153285.1
-  # Podarcis vaucheri
-  - accession: GCA_965113315.1
+  # Podarcis tiliguerta
+  - accession: GCA_965153305.1
   # Podarcis vaucheri
   - accession: GCA_965113305.1
+  # Podarcis vaucheri
+  - accession: GCA_965113315.1
+  # Podargus strigoides
+  - accession: GCA_028020675.1
   # Podargus strigoides
   - accession: GCA_028020825.1
   # Podocnemis expansa
@@ -1278,11 +1834,15 @@ assemblies:
   # Podocnemis expansa
   - accession: GCA_045364815.1
   # Poecile atricapillus
-  - accession: GCF_030490865.1
-  # Poecile atricapillus
   - accession: GCA_030490855.1
+  # Poecile atricapillus
+  - accession: GCF_030490865.1
+  # Pogoniulus pusillus
+  - accession: GCA_015220175.1
   # Pogoniulus pusillus
   - accession: GCF_015220805.1
+  # Pollachius pollachius
+  - accession: GCA_949987605.1
   # Pollachius pollachius
   - accession: GCA_949987615.1
   # Polymixia cf. hollisterae
@@ -1290,15 +1850,21 @@ assemblies:
   # Polymixia cf. hollisterae
   - accession: GCA_048537235.1
   # Polymixia lowei
-  - accession: GCA_047511595.1
-  # Polymixia lowei
   - accession: GCA_047511565.1
+  # Polymixia lowei
+  - accession: GCA_047511595.1
   # Pongo abelii
   - accession: GCA_028885685.2
   # Pongo abelii
+  - accession: GCF_028885655.1
+  # Pongo abelii
   - accession: GCF_028885655.2
   # Pongo pygmaeus
+  - accession: GCA_028885525.1
+  # Pongo pygmaeus
   - accession: GCA_028885525.2
+  # Pongo pygmaeus
+  - accession: GCF_028885625.1
   # Pongo pygmaeus
   - accession: GCF_028885625.2
   # Poromitra crassiceps
@@ -1318,6 +1884,10 @@ assemblies:
   # Pristipomoides typus
   - accession: GCA_045363895.1
   # Pristis pectinata
+  - accession: GCA_009764475.1
+  # Pristis pectinata
+  - accession: GCA_009764485.1
+  # Pristis pectinata
   - accession: GCF_009764475.1
   # Protomyctophum bolini
   - accession: GCA_963924005.1
@@ -1328,37 +1898,55 @@ assemblies:
   # Protopterus annectens
   - accession: GCA_040939525.1
   # Pseudophryne corroboree
-  - accession: GCF_028390025.1
-  # Pseudophryne corroboree
   - accession: GCA_028390055.1
-  # Pseudopipra pipra
-  - accession: GCF_036250125.1
+  # Pseudophryne corroboree
+  - accession: GCF_028390025.1
   # Pseudopipra pipra
   - accession: GCA_036250135.1
+  # Pseudopipra pipra
+  - accession: GCF_036250125.1
   # Pseudorca crassidens
   - accession: GCA_039906525.1
   # Pseudorca crassidens
   - accession: GCF_039906515.1
   # Psittacula echo
+  - accession: GCA_963243765.1
+  # Psittacula echo
   - accession: GCA_963264785.1
+  # Pterocles gutturalis
+  - accession: GCA_009769505.1
   # Pterocles gutturalis
   - accession: GCA_009769525.1
   # Pungitius pungitius
+  - accession: GCA_949316245.1
+  # Pungitius pungitius
   - accession: GCF_949316345.1
+  # Pygocentrus nattereri
+  - accession: GCA_015220065.1
   # Pygocentrus nattereri
   - accession: GCF_015220715.1
   # Raja brachyura
   - accession: GCA_963514005.1
   # Rana temporaria
+  - accession: GCA_905171725.1
+  # Rana temporaria
   - accession: GCF_905171775.1
   # Ranitomeya imitator
   - accession: GCF_032444005.1
+  # Rattus norvegicus
+  - accession: GCA_015244455.1
   # Rattus norvegicus
   - accession: GCF_015227675.2
   # Rhamphochromis sp. 'chilingali'
   - accession: GCA_963969265.1
   # Rhea pennata
+  - accession: GCA_028389885.1
+  # Rhea pennata
   - accession: GCF_028389875.1
+  # Rhinatrema bivittatum
+  - accession: GCA_901001135.2
+  # Rhinatrema bivittatum
+  - accession: GCA_901001175.1
   # Rhinatrema bivittatum
   - accession: GCF_901001135.1
   # Rhineura floridana
@@ -1369,6 +1957,12 @@ assemblies:
   - accession: GCA_048301585.1
   # Rhinolophus affinis
   - accession: GCA_043728065.1
+  # Rhinolophus ferrumequinum
+  - accession: GCA_004115295.1
+  # Rhinolophus ferrumequinum
+  - accession: GCA_014108255.1
+  # Rhinolophus ferrumequinum
+  - accession: GCF_004115265.1
   # Rhinolophus ferrumequinum
   - accession: GCF_004115265.2
   # Rhinolophus hipposideros
@@ -1382,9 +1976,9 @@ assemblies:
   # Rhinolophus yonghoiseni
   - accession: GCA_043880425.1
   # Rhinophrynus dorsalis
-  - accession: GCA_037306015.1
-  # Rhinophrynus dorsalis
   - accession: GCA_037306005.1
+  # Rhinophrynus dorsalis
+  - accession: GCA_037306015.1
   # Rhinopoma microphyllum
   - accession: GCA_043880545.1
   # Rhynchocyon petersi
@@ -1397,24 +1991,36 @@ assemblies:
   - accession: GCA_037038555.1
   # Rhynochetos jubatus
   - accession: GCA_027574665.1
-  # Rissa tridactyla
-  - accession: GCF_028500815.1
+  # Rhynochetos jubatus
+  - accession: GCA_027595965.1
   # Rissa tridactyla
   - accession: GCA_028501385.1
+  # Rissa tridactyla
+  - accession: GCF_028500815.1
   # Rousettus aegyptiacus
   - accession: GCF_014176215.1
   # Rutilus rutilus
+  - accession: GCA_951802655.1
+  # Rutilus rutilus
   - accession: GCA_951802725.1
   # Saccoglossus sp. HW-2024a
-  - accession: GCA_040954625.2
+  - accession: GCA_040954595.1
   # Saccoglossus sp. HW-2024a
   - accession: GCA_040954595.2
+  # Saccoglossus sp. HW-2024a
+  - accession: GCA_040954625.1
+  # Saccoglossus sp. HW-2024a
+  - accession: GCA_040954625.2
   # Saccopteryx bilineata
   - accession: GCF_036850765.1
   # Saccopteryx leptura
   - accession: GCF_036850995.1
   # Saimiri boliviensis
   - accession: GCA_048565385.1
+  # Saimiri boliviensis
+  - accession: GCF_048565385.1
+  # Salarias fasciatus
+  - accession: GCA_902148835.1
   # Salarias fasciatus
   - accession: GCF_902148845.1
   # Salminus brasiliensis
@@ -1423,12 +2029,16 @@ assemblies:
   - accession: GCF_030463535.1
   # Salmo trutta
   - accession: GCA_901001165.2
+  # Salmo trutta
+  - accession: GCF_901001165.1
   # Salvelinus alpinus oquassa
   - accession: GCA_036784965.1
   # Sarcophilus harrisii
+  - accession: GCA_048593225.1
+  # Sarcophilus harrisii
   - accession: GCA_048593325.1
   # Sarcophilus harrisii
-  - accession: GCA_048593225.1
+  - accession: GCF_902635505.1
   # Sarcoramphus papa
   - accession: GCA_037950955.1
   # Sarcoramphus papa
@@ -1436,17 +2046,29 @@ assemblies:
   # Sardina pilchardus
   - accession: GCF_963854185.1
   # Scardinius erythrophthalmus
-  - accession: GCA_964197995.1
-  # Scardinius erythrophthalmus
   - accession: GCA_024453875.1
+  # Scardinius erythrophthalmus
+  - accession: GCA_964197995.1
+  # Scatophagus argus
+  - accession: GCA_020382915.1
   # Scatophagus argus
   - accession: GCF_020382885.2
   # Sciurus carolinensis
+  - accession: GCA_902685475.1
+  # Sciurus carolinensis
   - accession: GCF_902686445.1
+  # Sciurus vulgaris
+  - accession: GCA_902685485.1
+  # Sciurus vulgaris
+  - accession: GCA_902686455.1
   # Sciurus vulgaris
   - accession: GCA_902686455.2
   # Scleropages formosus
+  - accession: GCA_900964985.2
+  # Scleropages formosus
   - accession: GCF_900964775.1
+  # Scomber japonicus
+  - accession: GCA_027409835.1
   # Scomber japonicus
   - accession: GCF_027409825.1
   # Scomber scombrus
@@ -1454,49 +2076,81 @@ assemblies:
   # Scophthalmus maximus
   - accession: GCA_963854745.1
   # Scyliorhinus canicula
+  - accession: GCA_902713615.2
+  # Scyliorhinus canicula
+  - accession: GCA_902713625.2
+  # Scyliorhinus canicula
   - accession: GCF_902713615.1
   # Sebastes fasciatus
   - accession: GCA_043250625.1
+  # Sebastes fasciatus
+  - accession: GCF_043250625.1
+  # Sebastes umbrosus
+  - accession: GCA_015220095.1
   # Sebastes umbrosus
   - accession: GCF_015220745.1
   # Shinisaurus crocodilurus
   - accession: GCA_021292165.1
+  # Silurus aristotelis
+  - accession: GCA_946807865.1
   # Silurus aristotelis
   - accession: GCA_946808225.1
   # Sminthopsis crassicaudata
   - accession: GCA_048593235.1
   # Sminthopsis crassicaudata
   - accession: GCA_048593295.1
+  # Sminthopsis crassicaudata
+  - accession: GCF_048593235.1
+  # Solea solea
+  - accession: GCA_958295035.1
   # Solea solea
   - accession: GCF_958295425.1
   # Sorex araneus
+  - accession: GCA_027595995.1
+  # Sorex araneus
   - accession: GCF_027595985.1
   # Sparus aurata
+  - accession: GCA_900880675.2
+  # Sparus aurata
+  - accession: GCA_900880695.1
+  # Sparus aurata
   - accession: GCF_900880675.1
+  # Spea bombifrons
+  - accession: GCA_027382365.2
   # Spea bombifrons
   - accession: GCF_027358695.1
   # Spermophilus citellus
   - accession: GCA_964194105.1
   # Sphaeramia orbicularis
+  - accession: GCA_902148825.1
+  # Sphaeramia orbicularis
   - accession: GCF_902148855.1
   # Spheniscus humboldti
   - accession: GCA_027474245.1
-  # Spinachia spinachia
-  - accession: GCA_048127205.1
+  # Spheniscus humboldti
+  - accession: GCA_027474345.1
   # Spinachia spinachia
   - accession: GCA_048126635.1
+  # Spinachia spinachia
+  - accession: GCA_048127205.1
   # Sprattus sprattus
   - accession: GCA_963457725.1
   # Squalius cephalus
   - accession: GCA_949319135.1
-  # Stegostoma tigrinum
-  - accession: GCF_030684315.1
+  # Squalius cephalus
+  - accession: GCA_949319155.1
   # Stegostoma tigrinum
   - accession: GCA_030684295.1
+  # Stegostoma tigrinum
+  - accession: GCF_030684315.1
   # Stenella coeruleoalba
   - accession: GCA_951394435.1
+  # Stenella coeruleoalba
+  - accession: GCA_951394445.1
   # Sterna hirundo
   - accession: GCA_009819605.1
+  # Sterna hirundo
+  - accession: GCA_009819645.1
   # Sternotherus odoratus
   - accession: GCA_032164245.1
   # Streptopelia decaocto
@@ -1504,67 +2158,121 @@ assemblies:
   # Streptopelia decaocto
   - accession: GCA_964273585.1
   # Streptopelia turtur
+  - accession: GCA_901699155.1
+  # Streptopelia turtur
   - accession: GCA_901699155.2
+  # Streptopelia turtur
+  - accession: GCA_901699165.1
+  # Streptopelia turtur
+  - accession: GCA_901699165.2
+  # Strigops habroptila
+  - accession: GCA_004011185.1
   # Strigops habroptila
   - accession: GCF_004027225.2
   # Strix aluco
   - accession: GCA_031877785.1
   # Strix aluco
   - accession: GCA_031877795.1
-  # Struthio camelus
-  - accession: GCF_040807025.1
+  # Strix aluco
+  - accession: GCF_031877795.1
   # Struthio camelus
   - accession: GCA_040807015.1
+  # Struthio camelus
+  - accession: GCF_040807025.1
   # Styela clava
   - accession: GCA_964204865.1
   # Styela clava
   - accession: GCA_964204955.1
   # Suncus etruscus
+  - accession: GCA_024140225.1
+  # Suncus etruscus
   - accession: GCF_024139225.1
   # Sus scrofa
-  - accession: GCA_963921485.1
+  - accession: GCA_030704935.1
   # Sus scrofa
   - accession: GCA_048338725.1
+  # Sus scrofa
+  - accession: GCA_963921485.1
+  # Sylvia atricapilla
+  - accession: GCA_009819715.1
   # Sylvia atricapilla
   - accession: GCF_009819655.1
   # Sylvia borin
   - accession: GCA_014839755.1
+  # Sylvia borin
+  - accession: GCA_014839765.1
+  # Sylvilagus floridanus
+  - accession: GCA_949820135.1
+  # Symphalangus syndactylus
+  - accession: GCA_028878085.2
   # Symphalangus syndactylus
   - accession: GCA_028878085.3
+  # Symphalangus syndactylus
+  - accession: GCF_028878055.1
+  # Symphalangus syndactylus
+  - accession: GCF_028878055.2
   # Symphalangus syndactylus
   - accession: GCF_028878055.3
   # Symphodus melops
   - accession: GCA_947650265.1
   # Symphorus nematophorus
-  - accession: GCA_048128725.1
-  # Symphorus nematophorus
   - accession: GCA_048128715.1
-  # Synchiropus picturatus
-  - accession: GCA_044231685.1
+  # Symphorus nematophorus
+  - accession: GCA_048128725.1
   # Synchiropus picturatus
   - accession: GCA_044231675.1
+  # Synchiropus picturatus
+  - accession: GCA_044231685.1
   # Syngnathus acus
-  - accession: GCF_901709675.1
+  - accession: GCA_901709675.1
+  # Syngnathus acus
+  - accession: GCA_901709685.1
+  # Syngnathus acus
+  - accession: GCA_948146095.1
   # Syngnathus acus
   - accession: GCA_948146105.1
+  # Syngnathus acus
+  - accession: GCF_901709675.1
   # Syngnathus typhle
   - accession: GCA_048301445.1
   # Syngnathus typhle
   - accession: GCA_048301605.1
   # Tachyglossus aculeatus
+  - accession: GCA_015852515.1
+  # Tachyglossus aculeatus
   - accession: GCF_015852505.1
   # Tadarida brasiliensis
   - accession: GCA_030848825.1
   # Taeniopygia guttata
-  - accession: GCF_008822105.2
+  - accession: GCA_003957525.1
   # Taeniopygia guttata
-  - accession: GCA_048772025.1
+  - accession: GCA_003957525.2
   # Taeniopygia guttata
   - accession: GCA_003957565.4
   # Taeniopygia guttata
+  - accession: GCA_008822115.3
+  # Taeniopygia guttata
+  - accession: GCA_008822125.1
+  # Taeniopygia guttata
+  - accession: GCA_009859025.1
+  # Taeniopygia guttata
+  - accession: GCA_009859065.2
+  # Taeniopygia guttata
   - accession: GCA_048771995.1
   # Taeniopygia guttata
-  - accession: GCA_008822115.3
+  - accession: GCA_048772025.1
+  # Taeniopygia guttata
+  - accession: GCF_003957565.1
+  # Taeniopygia guttata
+  - accession: GCF_003957565.2
+  # Taeniopygia guttata
+  - accession: GCF_008822105.2
+  # Taeniopygia guttata
+  - accession: GCF_048771995.1
+  # Takifugu rubripes
+  - accession: GCA_901000725.3
+  # Takifugu rubripes
+  - accession: GCA_901000745.3
   # Takifugu rubripes
   - accession: GCF_901000725.2
   # Talpa europaea
@@ -1573,30 +2281,50 @@ assemblies:
   - accession: GCA_964194205.1
   # Tamandua tetradactyla
   - accession: GCA_023851605.1
+  # Tamandua tetradactyla
+  - accession: GCA_023853755.1
+  # Tamandua tetradactyla
+  - accession: GCF_023851605.1
   # Tapirus indicus
   - accession: GCA_031878655.1
   # Tapirus indicus
   - accession: GCA_031878705.1
   # Tauraco erythrolophus
+  - accession: GCA_009764505.1
+  # Tauraco erythrolophus
   - accession: GCA_009769465.1
   # Taurulus bubalis
+  - accession: GCA_910589325.1
+  # Taurulus bubalis
   - accession: GCA_910589615.1
+  # Tautogolabrus adspersus
+  - accession: GCA_020745675.1
   # Tautogolabrus adspersus
   - accession: GCA_020745685.1
   # Telmatherina bonti
   - accession: GCA_933228915.1
+  # Telmatherina bonti
+  - accession: GCA_933228925.1
+  # Tetrao urogallus
+  - accession: GCA_951394355.1
   # Tetrao urogallus
   - accession: GCA_951394365.1
   # Thalassophryne amazonica
+  - accession: GCA_902500245.1
+  # Thalassophryne amazonica
   - accession: GCF_902500255.1
   # Thalia democratica
-  - accession: GCA_965202585.1
-  # Thalia democratica
   - accession: GCA_965202575.1
+  # Thalia democratica
+  - accession: GCA_965202585.1
+  # Thamnophis elegans
+  - accession: GCA_009769695.1
   # Thamnophis elegans
   - accession: GCF_009769535.1
   # Theristicus caerulescens
   - accession: GCA_020745775.1
+  # Theristicus caerulescens
+  - accession: GCA_020745805.1
   # Thomomys bottae
   - accession: GCA_024803745.1
   # Thomomys bottae
@@ -1604,7 +2332,11 @@ assemblies:
   # Thomomys bottae
   - accession: GCA_031878675.1
   # Thunnus albacares
+  - accession: GCA_914744365.1
+  # Thunnus albacares
   - accession: GCF_914725855.1
+  # Thunnus maccoyii
+  - accession: GCA_910596085.1
   # Thunnus maccoyii
   - accession: GCF_910596095.1
   # Thunnus thynnus
@@ -1613,8 +2345,14 @@ assemblies:
   - accession: GCA_035046495.1
   # Tiliqua scincoides
   - accession: GCA_035046505.1
+  # Tiliqua scincoides
+  - accession: GCF_035046505.1
+  # Toxotes jaculatrix
+  - accession: GCA_017976295.1
   # Toxotes jaculatrix
   - accession: GCF_017976425.1
+  # Trachurus trachurus
+  - accession: GCA_905171655.2
   # Trachurus trachurus
   - accession: GCA_905171665.2
   # Trichechus inunguis
@@ -1622,9 +2360,11 @@ assemblies:
   # Trichechus inunguis
   - accession: GCA_046562985.1
   # Trichomycterus rosablanca
-  - accession: GCF_030014385.1
-  # Trichomycterus rosablanca
   - accession: GCA_030015355.1
+  # Trichomycterus rosablanca
+  - accession: GCF_030014385.1
+  # Trichosurus vulpecula
+  - accession: GCA_011100645.1
   # Trichosurus vulpecula
   - accession: GCF_011100635.1
   # Trididemnum clinides
@@ -1632,39 +2372,51 @@ assemblies:
   # Triturus cristatus
   - accession: GCA_964204655.1
   # Trogon surrucura
+  - accession: GCA_020746095.1
+  # Trogon surrucura
   - accession: GCA_020746105.1
   # Tupaia tana
   - accession: GCA_026018925.1
   # Tursiops truncatus
   - accession: GCA_011762515.1
   # Tursiops truncatus
+  - accession: GCA_011762535.1
+  # Tursiops truncatus
   - accession: GCF_011762595.1
   # Urocitellus parryii
-  - accession: GCA_045843805.1
-  # Urocitellus parryii
   - accession: GCA_045843765.1
+  # Urocitellus parryii
+  - accession: GCA_045843805.1
   # Vanellus vanellus
   - accession: GCA_965231255.1
   # Vespertilio murinus
   - accession: GCA_963924515.1
   # Vidua chalybeata
+  - accession: GCA_026979555.1
+  # Vidua chalybeata
   - accession: GCF_026979565.1
   # Vipera berus
-  - accession: GCA_964194415.1
-  # Vipera berus
   - accession: GCA_964194405.1
+  # Vipera berus
+  - accession: GCA_964194415.1
   # Vipera latastei
   - accession: GCA_024294585.1
+  # Vipera latastei
+  - accession: GCA_024294605.1
+  # Vipera ursinii
+  - accession: GCA_947247025.1
   # Vipera ursinii
   - accession: GCA_947247035.1
   # Vulpes vulpes
-  - accession: GCA_964106925.2
-  # Vulpes vulpes
   - accession: GCA_964106825.2
+  # Vulpes vulpes
+  - accession: GCA_964106925.2
   # Willisornis vidua
   - accession: GCA_045364795.1
   # Willisornis vidua
   - accession: GCA_045364805.1
+  # Xenentodon cancila
+  - accession: GCA_014839645.1
   # Xenentodon cancila
   - accession: GCA_014839995.1
   # Xenopus petersii
@@ -1672,20 +2424,30 @@ assemblies:
   # Xenopus petersii
   - accession: GCA_038501925.1
   # Zalophus californianus
+  - accession: GCA_009762295.1
+  # Zalophus californianus
+  - accession: GCA_009762295.2
+  # Zalophus californianus
+  - accession: GCA_009762305.1
+  # Zalophus californianus
   - accession: GCF_009762305.2
+  # Zeus faber
+  - accession: GCA_960530785.1
   # Zeus faber
   - accession: GCA_960531495.1
   # Zonotrichia albicollis
   - accession: GCA_047774235.1
   # Zonotrichia albicollis
   - accession: GCA_047830755.1
+  # Zonotrichia albicollis
+  - accession: GCF_047830755.1
   # Zootoca vivipara
-  - accession: GCF_963506605.1
+  - accession: GCA_965207765.1
   # Zootoca vivipara
   - accession: GCA_965208345.1
   # Zootoca vivipara
-  - accession: GCA_965207765.1
-  # Zosterops lateralis
-  - accession: GCA_965231275.1
+  - accession: GCF_963506605.1
   # Zosterops lateralis
   - accession: GCA_965231245.1
+  # Zosterops lateralis
+  - accession: GCA_965231275.1
