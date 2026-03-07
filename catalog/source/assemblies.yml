@@ -936,7 +936,7 @@ assemblies:
   - accession: GCA_008728235.1
   # organism: Aspergillus flavus
   # common_name: ascomycetes A.flavus (NRRL 3357 2019)
-  - accession: GCF_009017415.1
+  # - accession: GCF_009017415.1  # temporarily disabled: missing from UCSC (2026-03)
   # organism: Aspergillus parasiticus
   # common_name: ascomycetes A.parasiticus (CBS 117618 2019)
   - accession: GCA_009176385.1
@@ -964,7 +964,7 @@ assemblies:
   # organism: Triatoma infestans
   # common_name: bugs T.infestans (FIOC_28 2020)
   - accession: GCA_011037195.1
-  - accession: GCA_965641795.1
+  # - accession: GCA_965641795.1  # temporarily disabled: missing from UCSC (2026-03)
   # organism: Triatoma dimidiata
   # common_name: kissing bug T.dimidiata (isolate 2024)
   - accession: GCA_964198125.1
@@ -1374,7 +1374,7 @@ assemblies:
   # common_name: Human - Dec. 2013 (GRCh38/hg38)
   # organism: Homo sapiens
   # common_name: Human - Dec. 2013 (GRCh38/hg38)
-  - accession: GCF_000001405.40
+  # - accession: GCF_000001405.40  # temporarily disabled: missing from UCSC (2026-03)
   # organism: Mus musculus
   # common_name: Mouse - Jun. 2020 (GRCm39/mm39)
   - accession: GCF_000001635.27
@@ -4587,7 +4587,7 @@ assemblies:
   - accession: GCA_000875815.1
   - accession: GCA_000875855.1
   - accession: GCA_000876485.1
-  - accession: GCA_000945115.1
+  # - accession: GCA_000945115.1  # temporarily disabled: missing from UCSC (2026-03)
   - accession: GCA_000950595.1
   - accession: GCA_000965245.1
   - accession: GCA_000966645.2
@@ -4823,7 +4823,7 @@ assemblies:
   - accession: GCA_002762355.2
   - accession: GCA_002794665.1
   - accession: GCA_002798095.1
-  - accession: GCA_002835845.1
+  # - accession: GCA_002835845.1  # temporarily disabled: missing from UCSC (2026-03)
   - accession: GCF_002847045.1
   - accession: GCA_002864075.1
   - accession: GCA_002864135.1
@@ -5076,7 +5076,7 @@ assemblies:
   - accession: GCA_004125235.1
   - accession: GCA_004141715.1
   - accession: GCA_004156335.1
-  - accession: GCA_004194325.1
+  # - accession: GCA_004194325.1  # temporarily disabled: missing from UCSC (2026-03)
   - accession: GCA_004195245.1
   - accession: GCA_004291455.1
   - accession: GCA_004292535.1
@@ -5297,14 +5297,14 @@ assemblies:
   - accession: GCA_009856665.1
   - accession: GCA_009932835.1
   - accession: GCA_010015875.1
-  - accession: GCA_010065285.1
-  - accession: GCA_010065295.1
-  - accession: GCA_010065305.1
-  - accession: GCA_010065315.1
-  - accession: GCA_010065385.1
-  - accession: GCA_010065405.1
-  - accession: GCA_010233705.1
-  - accession: GCA_010233735.1
+  # - accession: GCA_010065285.1  # temporarily disabled: missing from UCSC (2026-03)
+  # - accession: GCA_010065295.1  # temporarily disabled: missing from UCSC (2026-03)
+  # - accession: GCA_010065305.1  # temporarily disabled: missing from UCSC (2026-03)
+  # - accession: GCA_010065315.1  # temporarily disabled: missing from UCSC (2026-03)
+  # - accession: GCA_010065385.1  # temporarily disabled: missing from UCSC (2026-03)
+  # - accession: GCA_010065405.1  # temporarily disabled: missing from UCSC (2026-03)
+  # - accession: GCA_010233705.1  # temporarily disabled: missing from UCSC (2026-03)
+  # - accession: GCA_010233735.1  # temporarily disabled: missing from UCSC (2026-03)
   - accession: GCA_011032855.1
   - accession: GCA_011032875.1
   - accession: GCA_011032885.1
@@ -5392,7 +5392,7 @@ assemblies:
   - accession: GCA_011035075.1
   - accession: GCA_011035135.1
   - accession: GCA_011035185.1
-  - accession: GCA_011035205.1
+  # - accession: GCA_011035205.1  # temporarily disabled: missing from UCSC (2026-03)
   - accession: GCA_011035235.1
   - accession: GCA_011035245.1
   - accession: GCA_011035255.1
@@ -5536,25 +5536,25 @@ assemblies:
   - accession: GCA_011764185.1
   - accession: GCA_011764225.1
   - accession: GCA_011764265.1
-  - accession: GCA_011800955.2
-  - accession: GCA_011800985.2
-  - accession: GCA_011801035.2
-  - accession: GCA_011801055.2
+  # - accession: GCA_011800955.2  # temporarily disabled: missing from UCSC (2026-03)
+  # - accession: GCA_011800985.2  # temporarily disabled: missing from UCSC (2026-03)
+  # - accession: GCA_011801035.2  # temporarily disabled: missing from UCSC (2026-03)
+  # - accession: GCA_011801055.2  # temporarily disabled: missing from UCSC (2026-03)
   - accession: GCA_011801205.1
-  - accession: GCA_011801305.2
-  - accession: GCA_011801335.2
-  - accession: GCA_011801385.2
+  # - accession: GCA_011801305.2  # temporarily disabled: missing from UCSC (2026-03)
+  # - accession: GCA_011801335.2  # temporarily disabled: missing from UCSC (2026-03)
+  # - accession: GCA_011801385.2  # temporarily disabled: missing from UCSC (2026-03)
   - accession: GCA_011801495.1
-  - accession: GCA_011801505.2
-  - accession: GCA_011801555.2
-  - accession: GCA_011801575.2
-  - accession: GCA_011801605.2
-  - accession: GCA_011801645.2
+  # - accession: GCA_011801505.2  # temporarily disabled: missing from UCSC (2026-03)
+  # - accession: GCA_011801555.2  # temporarily disabled: missing from UCSC (2026-03)
+  # - accession: GCA_011801575.2  # temporarily disabled: missing from UCSC (2026-03)
+  # - accession: GCA_011801605.2  # temporarily disabled: missing from UCSC (2026-03)
+  # - accession: GCA_011801645.2  # temporarily disabled: missing from UCSC (2026-03)
   - accession: GCA_011801675.2
   - accession: GCA_011801705.2
   - accession: GCA_011801725.2
   - accession: GCA_011801785.2
-  - accession: GCA_011801815.2
+  # - accession: GCA_011801815.2  # temporarily disabled: missing from UCSC (2026-03)
   - accession: GCA_011950945.2
   - accession: GCA_011950985.2
   - accession: GCA_011951285.2
@@ -7848,7 +7848,7 @@ assemblies:
   #   assembly_name: OSU_BgBS90_FRS11
   #   assembly_level: Scaffold
   # organism: Caenorhabditis elegans | community: Helminths | total: 32 | new: 32
-  - accession: GCA_000939815.1
+  # - accession: GCA_000939815.1  # temporarily disabled: missing from UCSC (2026-03)
   #   assembly_name: C_elegans_Bristol_N2_v1_5_4
   #   assembly_level: Scaffold
   - accession: GCA_000975215.1
@@ -8010,10 +8010,10 @@ assemblies:
   #   assembly_name: ASM5065560v1
   #   assembly_level: Chromosome
   # organism: Cryptosporidium parvum | community: Protists | total: 28 | new: 25
-  - accession: GCA_000209695.1
+  # - accession: GCA_000209695.1  # temporarily disabled: missing from UCSC (2026-03)
   #   assembly_name: ASM20969v1
   #   assembly_level: Chromosome
-  - accession: GCA_001305335.1
+  # - accession: GCA_001305335.1  # temporarily disabled: missing from UCSC (2026-03)
   #   assembly_name: ASM130533v1
   #   assembly_level: Scaffold
   - accession: GCA_001305415.1
@@ -8073,7 +8073,7 @@ assemblies:
   - accession: GCA_035232765.1
   #   assembly_name: ASM3523276v1
   #   assembly_level: Complete Genome
-  - accession: GCA_040285075.1
+  # - accession: GCA_040285075.1  # temporarily disabled: missing from UCSC (2026-03)
   #   assembly_name: ASM4028507v1
   #   assembly_level: Complete Genome
   - accession: GCA_045166965.1
@@ -8229,7 +8229,7 @@ assemblies:
   #   assembly_name: ASM15011v1
   #   assembly_level: Scaffold
   # organism: Homo sapiens | community: Hosts | total: 2 | new: 1
-  - accession: GCF_009914755.1
+  # - accession: GCF_009914755.1  # temporarily disabled: missing from UCSC (2026-03)
   #   assembly_name: T2T-CHM13v2.0
   #   assembly_level: Complete Genome
   # organism: Leishmania braziliensis | total: 13 | new: 11
@@ -8296,7 +8296,7 @@ assemblies:
   - accession: GCA_020705095.1
   #   assembly_name: ASM2070509v1
   #   assembly_level: Scaffold
-  - accession: GCA_902369335.1
+  # - accession: GCA_902369335.1  # temporarily disabled: missing from UCSC (2026-03)
   #   assembly_name: Linf
   #   assembly_level: Chromosome
   - accession: GCF_000002875.2
@@ -8505,10 +8505,10 @@ assemblies:
   - accession: GCA_000505035.1
   #   assembly_name: Plas_yoel_17X_V2
   #   assembly_level: Scaffold
-  - accession: GCA_043381365.1
+  # - accession: GCA_043381365.1  # temporarily disabled: missing from UCSC (2026-03)
   #   assembly_name: ASM4338136v1
   #   assembly_level: Chromosome
-  - accession: GCA_043381415.1
+  # - accession: GCA_043381415.1  # temporarily disabled: missing from UCSC (2026-03)
   #   assembly_name: ASM4338141v1
   #   assembly_level: Chromosome
   - accession: GCA_900617825.1
@@ -8633,7 +8633,7 @@ assemblies:
   - accession: GCA_964199295.2
   - accession: GCA_965286795.1
   # Ixodes pacificus
-  - accession: GCA_964199305.2
+  # - accession: GCA_964199305.2  # temporarily disabled: missing from UCSC (2026-03)
   # Ixodes hexagonus
   - accession: GCA_964199285.2
   # Aedes notoscriptus
@@ -8664,7 +8664,7 @@ assemblies:
   # Mesopsocus fuscifrons
   - accession: GCA_950004255.1
   # Amphigerontia contaminata
-  - accession: GCA_977845675.1
+  # - accession: GCA_977845675.1  # temporarily disabled: missing from UCSC (2026-03)
   # Loensia variegata
   - accession: GCA_964261705.1
   # Columbicola columbae
@@ -8695,7 +8695,7 @@ assemblies:
   # organism: Anopheles merus
   # organism: Anopheles moucheti
   # organism: Aspergillus cristatus
-  - accession: GCA_054825215.1
+  # - accession: GCA_054825215.1  # temporarily disabled: missing from UCSC (2026-03)
   # organism: Aspergillus cristatus
   - accession: GCA_044706195.1
   # organism: Babesia caballi
@@ -8758,19 +8758,19 @@ assemblies:
   # organism: Fusarium falciforme
   - accession: GCF_026873545.1
   # organism: Fusarium keratoplasticum
-  - accession: GCF_025433545.1
+  # - accession: GCF_025433545.1  # temporarily disabled: missing from UCSC (2026-03)
   # organism: Fusarium luffae
-  - accession: GCA_054821325.1
+  # - accession: GCA_054821325.1  # temporarily disabled: missing from UCSC (2026-03)
   # organism: Fusarium oxysporum
-  - accession: GCA_054643155.1
+  # - accession: GCA_054643155.1  # temporarily disabled: missing from UCSC (2026-03)
   # organism: Fusarium oxysporum f. sp. cubense
-  - accession: GCA_053754955.1
+  # - accession: GCA_053754955.1  # temporarily disabled: missing from UCSC (2026-03)
   # organism: Fusarium oxysporum f. sp. cubense
-  - accession: GCA_053754965.1
+  # - accession: GCA_053754965.1  # temporarily disabled: missing from UCSC (2026-03)
   # organism: Fusarium oxysporum f. sp. phaseoli
-  - accession: GCA_054643655.1
+  # - accession: GCA_054643655.1  # temporarily disabled: missing from UCSC (2026-03)
   # organism: Fusarium oxysporum f. sp. phaseoli
-  - accession: GCA_054130785.1
+  # - accession: GCA_054130785.1  # temporarily disabled: missing from UCSC (2026-03)
   # organism: Fusarium poae
   - accession: GCF_019609905.1
   # organism: Fusarium verticillioides
@@ -8841,11 +8841,11 @@ assemblies:
   - accession: GCA_030279005.1
   # organism: Plasmodium brasilianum
   # organism: Plasmodium falciparum
-  - accession: GCA_977926795.1
+  # - accession: GCA_977926795.1  # temporarily disabled: missing from UCSC (2026-03)
   # organism: Plasmodium falciparum
-  - accession: GCA_977926835.1
+  # - accession: GCA_977926835.1  # temporarily disabled: missing from UCSC (2026-03)
   # organism: Plasmodium falciparum
-  - accession: GCA_977926805.1
+  # - accession: GCA_977926805.1  # temporarily disabled: missing from UCSC (2026-03)
   # organism: Plasmodium falciparum
   - accession: GCA_032712205.1
   # organism: Plasmodium falciparum
@@ -8859,7 +8859,7 @@ assemblies:
   # organism: Plasmodium falciparum
   - accession: GCA_024442135.1
   # organism: Plasmodium malariae
-  - accession: GCA_977926885.1
+  # - accession: GCA_977926885.1  # temporarily disabled: missing from UCSC (2026-03)
   # organism: Saccharomycodes ludwigii
   # organism: Saccharomycodes ludwigii
   - accession: GCF_020623625.1
