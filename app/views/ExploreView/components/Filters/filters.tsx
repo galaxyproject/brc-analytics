@@ -8,11 +8,10 @@ import {
 import { Sidebar } from "@databiosphere/findable-ui/lib/components/Layout/components/Sidebar/sidebar";
 import { useBreakpoint } from "@databiosphere/findable-ui/lib/hooks/useBreakpoint";
 import { RowData } from "@tanstack/react-table";
-import React, { JSX } from "react";
-import { StyledSearchAllFilters } from "./filters.styles";
-import { StyledBox } from "./filters.styles";
-import type { Props } from "./types";
+import { JSX } from "react";
 import { getCategoryViews } from "../../utils";
+import { StyledBox, StyledSearchAllFilters } from "./filters.styles";
+import type { Props } from "./types";
 
 /**
  * Renders the Filters component, which provides UI controls for filtering table data.
