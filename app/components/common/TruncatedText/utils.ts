@@ -70,6 +70,8 @@ export function calculateTruncation(
 
   if (!ctx) return null;
   ctx.font = font;
+  ctx.letterSpacing = computed.letterSpacing;
+  ctx.wordSpacing = computed.wordSpacing;
 
   // Measure the "... Read more" suffix width.
   const suffixText = `... ${READ_MORE_TEXT}`;

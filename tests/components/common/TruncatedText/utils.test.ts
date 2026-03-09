@@ -7,7 +7,9 @@ import {
 const mockMeasureText = jest.fn();
 const mockCanvasContext = {
   font: "",
+  letterSpacing: "",
   measureText: mockMeasureText,
+  wordSpacing: "",
 } as unknown as CanvasRenderingContext2D;
 
 // Mock document.createElement to return our mock canvas.
@@ -65,6 +67,8 @@ describe("TruncatedText utils", () => {
         fontFamily: "Arial",
         fontSize: "16px",
         fontWeight: "400",
+        letterSpacing: "normal",
+        wordSpacing: "normal",
       } as CSSStyleDeclaration);
     });
 
@@ -110,6 +114,8 @@ describe("TruncatedText utils", () => {
       calculateTruncation("Test", mockContainer, 300, 2);
 
       expect(mockCanvasContext.font).toBe("400 16px Arial");
+      expect(mockCanvasContext.letterSpacing).toBe("normal");
+      expect(mockCanvasContext.wordSpacing).toBe("normal");
     });
   });
 });
