@@ -27,7 +27,6 @@ import { BrcAuthProvider } from "../app/providers/authentication";
 import { useEntities } from "../app/services/workflows/hooks/UseEntities/hook";
 import "../app/styles/fonts/fonts.css";
 import { mergeAppTheme } from "../app/theme/theme";
-import { filterWorkflowsFromNavigation } from "../app/views/WorkflowsView/utils";
 import { ROUTES } from "../routes/constants";
 
 const DEFAULT_ENTITY_LIST_TYPE = "organisms";
@@ -46,7 +45,7 @@ export type AppPropsWithComponent = AppProps & {
   pageProps: PageProps;
 };
 
-setFeatureFlags(["assistant", "de", "workflows"]);
+setFeatureFlags(["assistant", "de"]);
 
 function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
   // Set up the site configuration, layout and theme.
@@ -68,7 +67,6 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
   const AppLayout = Component.AppLayout || DXAppLayout;
   const Main = Component.Main || DXMain;
   const isAssistantEnabled = useFeatureFlag("assistant");
-  const isWorkflowsEnabled = useFeatureFlag("workflows");
   const filteredHeader = useMemo(() => {
     if (!header) return header;
     if (isAssistantEnabled) return header;
@@ -96,13 +94,7 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
                 <BrcAuthProvider loginEnabled={appConfig.loginEnabled}>
                   <LayoutDimensionsProvider>
                     <AppLayout>
-                      <DXHeader
-                        {...filteredHeader}
-                        navigation={filterWorkflowsFromNavigation(
-                          filteredHeader.navigation,
-                          isWorkflowsEnabled
-                        )}
-                      />
+                      <DXHeader {...filteredHeader} />
                       <ExploreStateProvider entityListType={entityListType}>
                         <Main>
                           <ErrorBoundary
