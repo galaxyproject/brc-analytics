@@ -4,7 +4,6 @@ import { getFacetedUniqueValuesWithArrayValues } from "@databiosphere/findable-u
 import { getFacetedMinMaxValues } from "@databiosphere/findable-ui/lib/components/Table/featureOptions/facetedColumn/getFacetedMinMaxValues";
 import { ROW_POSITION } from "@databiosphere/findable-ui/lib/components/Table/features/RowPosition/constants";
 import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/features/RowPreview/constants";
-import { ROW_SELECTION_VALIDATION } from "@databiosphere/findable-ui/lib/components/Table/features/RowSelectionValidation/constants";
 import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/features/TableDownload/constants";
 import {
   getCoreRowModel,
@@ -20,20 +19,11 @@ import { getEntities } from "../../../../../../../../../../../../../../../../../
 import { CATEGORY_GROUPS } from "./categoryGroups";
 import { columns } from "./columnDef";
 import { SORTING } from "./constants";
-import { mapAssembly } from "./dataTransforms";
 import { Assembly, UseTable } from "./types";
-import {
-  enableRowSelection,
-  getInitialColumnFilters,
-  getRowSelectionValidation,
-  renderSummary,
-} from "./utils";
+import { getInitialColumnFilters, renderSummary } from "./utils";
 
 export const useTable = (workflow: Workflow): UseTable => {
-  const assemblies = useMemo(
-    () => mapAssembly(getEntities<Assembly>("assemblies"), workflow),
-    [workflow]
-  );
+  const assemblies = getEntities<Assembly>("assemblies");
 
   const data = useMemo(() => assemblies, [assemblies]);
 
@@ -54,12 +44,7 @@ export const useTable = (workflow: Workflow): UseTable => {
   };
 
   const table = useReactTable<Assembly>({
-    _features: [
-      ROW_POSITION,
-      ROW_PREVIEW,
-      ROW_SELECTION_VALIDATION,
-      TABLE_DOWNLOAD,
-    ],
+    _features: [ROW_POSITION, ROW_PREVIEW, TABLE_DOWNLOAD],
     columns,
     data,
     downloadFilename: "assemblies",
@@ -67,8 +52,7 @@ export const useTable = (workflow: Workflow): UseTable => {
     enableFilters: true,
     enableMultiRowSelection: false,
     enableMultiSort: true,
-    enableRowSelection,
-    enableRowSelectionValidation: true,
+    enableRowSelection: true,
     enableSorting: true,
     enableSortingInteraction: true,
     enableSortingRemoval: false,
@@ -80,7 +64,6 @@ export const useTable = (workflow: Workflow): UseTable => {
     getFacetedUniqueValues: getFacetedUniqueValuesWithArrayValues(),
     getFilteredRowModel: getFilteredRowModel(),
     getRowId: (row) => row.accession,
-    getRowSelectionValidation,
     getSortedRowModel: getSortedRowModel(),
     initialState,
     meta,
