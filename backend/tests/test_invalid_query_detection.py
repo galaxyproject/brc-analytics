@@ -3,6 +3,7 @@
 from unittest.mock import AsyncMock, Mock
 
 import pytest
+
 from app.models.llm import DatasetQuery
 
 
