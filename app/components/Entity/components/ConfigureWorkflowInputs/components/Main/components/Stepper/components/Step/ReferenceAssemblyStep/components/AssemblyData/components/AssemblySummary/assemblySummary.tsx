@@ -38,7 +38,7 @@ export const AssemblySummary = ({
             1 Assembly Selected
           </Typography>
           <Button {...BUTTON_PROPS.SECONDARY_CONTAINED} onClick={onEdit}>
-            Edit list
+            Edit
           </Button>
         </StyledStack>
         <Divider />

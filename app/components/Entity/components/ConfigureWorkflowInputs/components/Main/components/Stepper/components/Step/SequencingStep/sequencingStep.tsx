@@ -1,22 +1,27 @@
-import { JSX } from "react";
-import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
 import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepContent/stepContent";
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
-import { StepProps } from "../types";
-import { useToggleButtonGroup } from "../hooks/UseToggleButtonGroup/useToggleButtonGroup";
+import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
+import { JSX } from "react";
 import { ToggleButtonGroup } from "../components/ToggleButtonGroup/toggleButtonGroup";
-import { VIEW } from "./components/ToggleButtonGroup/types";
+import { useToggleButtonGroup } from "../hooks/UseToggleButtonGroup/useToggleButtonGroup";
+import { StepProps } from "../types";
+import { useColumnFilters } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseColumnFilters/hook";
+import { useRowSelection } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseRowSelection/hook";
+import { useTable } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseTable/hook";
+import { useRequirementsMatches } from "./components/ENASequencingData/components/CollectionSummary/components/Alert/hooks/UseRequirementsMatches/hook";
+import { useTaxonomyMatches } from "./components/ENASequencingData/components/DataSelector/components/Alert/hooks/UseTaxonomyMatches/hook";
 import { ENASequencingData } from "./components/ENASequencingData/enaSequencingData";
 import { useENADataByAccession } from "./components/ENASequencingData/hooks/UseENADataByAccession/hook";
+import { useQuery } from "./components/ENASequencingData/query/hook";
 import { BaseReadRun } from "./components/ENASequencingData/types";
-import { useTable } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseTable/hook";
-import { UploadMyData } from "./components/UploadMyData/uploadMyData";
-import { useENADataByTaxonomyId } from "./components/ENASequencingData/hooks/UseENADataByTaxonomyId/hook";
+import {
+  clearSequencingData,
+  getSelectedCount,
+  getUploadMyOwnSequencingData,
+} from "./components/ENASequencingData/utils";
 import { TOGGLE_BUTTONS } from "./components/ToggleButtonGroup/toggleButtons";
-import { useColumnFilters } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseColumnFilters/hook";
-import { getSelectedCount } from "./components/ENASequencingData/utils";
-import { useTaxonomyMatches } from "./components/ENASequencingData/components/DataSelector/components/Alert/hooks/UseTaxonomyMatches/hook";
-import { useRequirementsMatches } from "./components/ENASequencingData/components/CollectionSummary/components/Alert/hooks/UseRequirementsMatches/hook";
+import { VIEW } from "./components/ToggleButtonGroup/types";
+import { UploadMyData } from "./components/UploadMyData/uploadMyData";
 
 export const SequencingStep = ({
   active,
@@ -30,9 +35,11 @@ export const SequencingStep = ({
   workflow,
 }: StepProps): JSX.Element => {
   const enaAccession = useENADataByAccession<BaseReadRun>();
-  const enaTaxonomyId = useENADataByTaxonomyId<BaseReadRun>(genome);
+  const enaTaxonomyId = useQuery(genome);
   const columnFilters = useColumnFilters(workflow, stepKey);
-  const { actions, table } = useTable(enaTaxonomyId, columnFilters);
+  const rowSelection = useRowSelection(configuredInput);
+  const state = { columnFilters, rowSelection };
+  const { actions, table } = useTable(enaTaxonomyId, state, onConfigure);
   const { onChange, value } = useToggleButtonGroup(VIEW.ENA);
   const { taxonomyMatches } = useTaxonomyMatches(table);
   const { requirementsMatches } = useRequirementsMatches(table, genome);
@@ -41,13 +48,18 @@ export const SequencingStep = ({
       <StepLabel>{entryLabel}</StepLabel>
       <StepContent>
         <ToggleButtonGroup
-          onChange={onChange}
+          onChange={(e, v) => {
+            onConfigure(clearSequencingData());
+            if (v === VIEW.UPLOAD_MY_DATA) {
+              onConfigure(getUploadMyOwnSequencingData(stepKey));
+            }
+            onChange?.(e, v);
+          }}
           toggleButtons={TOGGLE_BUTTONS}
           value={value}
         />
         {value === VIEW.ENA ? (
           <ENASequencingData
-            configuredInput={configuredInput}
             enaAccessionActions={enaAccession.actions}
             enaAccessionStatus={enaAccession.status}
             enaTaxonomyId={enaTaxonomyId}
@@ -60,7 +72,7 @@ export const SequencingStep = ({
             taxonomyMatches={taxonomyMatches ?? 0}
           />
         ) : (
-          <UploadMyData onConfigure={onConfigure} stepKey={stepKey} />
+          <UploadMyData />
         )}
       </StepContent>
     </Step>

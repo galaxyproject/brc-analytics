@@ -6,18 +6,21 @@ import { ROW_POSITION } from "@databiosphere/findable-ui/lib/components/Table/fe
 import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/features/RowPreview/constants";
 import { ROW_SELECTION_VALIDATION } from "@databiosphere/findable-ui/lib/components/Table/features/RowSelectionValidation/constants";
 import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/features/TableDownload/constants";
+import { UseQueryResult } from "@tanstack/react-query";
 import {
-  ColumnFiltersState,
+  functionalUpdate,
   getCoreRowModel,
   getFacetedRowModel,
   getFilteredRowModel,
   getSortedRowModel,
   InitialTableState,
+  TableState,
   useReactTable,
 } from "@tanstack/react-table";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { UseENADataByTaxonomyId } from "../../../../hooks/UseENADataByTaxonomyId/types";
+import { OnConfigure } from "../../../../../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { BaseReadRun, ReadRun } from "../../../../types";
+import { getSequencingData } from "../../../../utils";
 import { CATEGORY_GROUPS } from "./categoryGroups";
 import { columns } from "./columnDef";
 import { COLUMN_VISIBILITY, SORTING } from "./constants";
@@ -26,12 +29,17 @@ import { UseTable } from "./types";
 import {
   enableRowSelection,
   getRowSelectionValidation,
+  getSelectedRows,
   renderSummary,
 } from "./utils";
 
 export const useTable = (
-  enaTaxonomyId: UseENADataByTaxonomyId<BaseReadRun>,
-  columnFilters: ColumnFiltersState
+  enaTaxonomyId: UseQueryResult<BaseReadRun[]>,
+  {
+    columnFilters,
+    rowSelection,
+  }: Pick<TableState, "columnFilters" | "rowSelection">,
+  onConfigure: OnConfigure
 ): UseTable => {
   const [data, setData] = useState<ReadRun[]>([]);
 
@@ -57,6 +65,8 @@ export const useTable = (
     filterSort: FILTER_SORT.COUNT,
     summaryFn: renderSummary,
   };
+
+  const state: Partial<TableState> = { rowSelection };
 
   const table = useReactTable<ReadRun>({
     _features: [
@@ -88,6 +98,11 @@ export const useTable = (
     getSortedRowModel: getSortedRowModel(),
     initialState,
     meta,
+    onRowSelectionChange: (updater) => {
+      const nextRowSelection = functionalUpdate(updater, rowSelection);
+      onConfigure(getSequencingData(getSelectedRows(data, nextRowSelection)));
+    },
+    state,
   });
 
   /**
