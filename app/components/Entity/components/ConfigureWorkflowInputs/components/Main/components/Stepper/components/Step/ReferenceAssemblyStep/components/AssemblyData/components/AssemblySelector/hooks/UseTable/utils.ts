@@ -23,10 +23,10 @@ export function getInitialColumnFilters(
     });
   }
 
-  // If the workflow has a specific taxonomy requirement, pre-select that taxonomy in the filters.
+  // If the workflow has a specific taxonomy requirement, pre-select the lineage taxonomy in the filters.
   if (workflow.taxonomyId) {
     columnFilterState.push({
-      id: CATEGORY_CONFIGS.TAXONOMY_ID.key,
+      id: CATEGORY_CONFIGS.LINEAGE_TAXONOMY_IDS.key,
       value: [workflow.taxonomyId],
     });
   }
