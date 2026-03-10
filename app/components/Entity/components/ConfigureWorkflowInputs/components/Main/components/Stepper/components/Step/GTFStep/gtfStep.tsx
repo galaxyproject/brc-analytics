@@ -22,7 +22,7 @@ import { StepProps } from "../types";
 import { getButtonDisabledState, getStepActiveState } from "../utils/stepUtils";
 import { StyledGrid } from "./gtfStep.styles";
 import { useRadioGroup } from "./hooks/UseRadioGroup/hook";
-import { useUCSCFiles } from "./hooks/UseUCSCFiles/hook";
+import { useQuery } from "./query/hook";
 import { STEP } from "./step";
 import { configureGTFStep, getGeneModelLabel } from "./utils";
 
@@ -38,13 +38,12 @@ export const GTFStep = ({
   onContinue,
   onEdit,
 }: StepProps): JSX.Element => {
-  const { error, geneModelUrls, isLoading } = useUCSCFiles(genome);
-  const { controls, onChange, onValueChange, value } =
-    useRadioGroup(geneModelUrls);
+  const { data, error, isLoading } = useQuery(genome);
+  const { controls, onChange, onValueChange, value } = useRadioGroup(data);
 
   useEffect(() => {
-    configureGTFStep(geneModelUrls, onConfigure, onValueChange);
-  }, [geneModelUrls, onConfigure, onValueChange]);
+    configureGTFStep(data, onConfigure, onValueChange);
+  }, [data, onConfigure, onValueChange]);
 
   // Auto-configure step with empty string if there's an error
   // Empty string represents "user will provide in Galaxy" similar to how sequencing steps use empty arrays
@@ -61,7 +60,7 @@ export const GTFStep = ({
       index={index}
     >
       {/* Step component `children` should be subcomponents such as `StepLabel`, `StepContent`. */}
-      {/* We ignore this; the loading UI is in the DOM while `geneModelUrls` is `undefined` and the Step is not `active`. */}
+      {/* We ignore this; the loading UI is in the DOM while `data` is `undefined` and the Step is not `active`. */}
       <Loading loading={isLoading} panelStyle={LOADING_PANEL_STYLE.INHERIT} />
       <StepLabel
         optional={

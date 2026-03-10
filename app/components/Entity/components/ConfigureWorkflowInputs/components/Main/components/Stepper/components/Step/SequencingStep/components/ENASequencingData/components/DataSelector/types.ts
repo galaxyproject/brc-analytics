@@ -1,7 +1,8 @@
-import { Status } from "../../hooks/UseENADataByTaxonomyId/types";
+import { UseQueryResult } from "@tanstack/react-query";
+import { BaseReadRun } from "../../types";
 
 export interface Props {
-  enaTaxonomyIdStatus: Status;
+  enaTaxonomyId: UseQueryResult<BaseReadRun[]>;
   onContinue: () => void;
   onOpen: () => void;
   selectedCount: number;
