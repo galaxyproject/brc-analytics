@@ -1,0 +1,1208 @@
+{
+  "GCF_000001635.27": {
+    "2bit": "alignment/auxiliary/mammals/GCF_000001635.27.2bit",
+    "fa": "alignment/auxiliary/mammals/GCF_000001635.27.fa.gz"
+  },
+  "GCF_027358695.1": {
+    "2bit": "alignment/primary/amphibians/GCF_027358695.1.2bit",
+    "fa": "alignment/primary/amphibians/GCF_027358695.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/amphibians/GCF_027358695.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_027579735.1": {
+    "2bit": "alignment/primary/amphibians/GCF_027579735.1.2bit",
+    "fa": "alignment/primary/amphibians/GCF_027579735.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/amphibians/GCF_027579735.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_027789765.1": {
+    "2bit": "alignment/primary/amphibians/GCF_027789765.1.2bit",
+    "fa": "alignment/primary/amphibians/GCF_027789765.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/amphibians/GCF_027789765.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_028390025.1": {
+    "2bit": "alignment/primary/amphibians/GCF_028390025.1.2bit",
+    "fa": "alignment/primary/amphibians/GCF_028390025.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/amphibians/GCF_028390025.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_029499605.1": {
+    "2bit": "alignment/primary/amphibians/GCF_029499605.1.2bit",
+    "fa": "alignment/primary/amphibians/GCF_029499605.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/amphibians/GCF_029499605.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_032444005.1": {
+    "2bit": "alignment/primary/amphibians/GCF_032444005.1.2bit",
+    "fa": "alignment/primary/amphibians/GCF_032444005.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/amphibians/GCF_032444005.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_035609145.1": {
+    "2bit": "alignment/primary/amphibians/GCF_035609145.1.2bit",
+    "fa": "alignment/primary/amphibians/GCF_035609145.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/amphibians/GCF_035609145.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_036172605.1": {
+    "2bit": "alignment/primary/amphibians/GCF_036172605.1.2bit",
+    "fa": "alignment/primary/amphibians/GCF_036172605.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/amphibians/GCF_036172605.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_040894005.1": {
+    "2bit": "alignment/primary/amphibians/GCF_040894005.1.2bit",
+    "fa": "alignment/primary/amphibians/GCF_040894005.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/amphibians/GCF_040894005.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_040937935.1": {
+    "2bit": "alignment/primary/amphibians/GCF_040937935.1.2bit",
+    "fa": "alignment/primary/amphibians/GCF_040937935.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/amphibians/GCF_040937935.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_040938575.1": {
+    "2bit": "alignment/primary/amphibians/GCF_040938575.1.2bit",
+    "fa": "alignment/primary/amphibians/GCF_040938575.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/amphibians/GCF_040938575.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_901001135.1": {
+    "2bit": "alignment/primary/amphibians/GCF_901001135.1.2bit",
+    "fa": "alignment/primary/amphibians/GCF_901001135.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/amphibians/GCF_901001135.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_902459505.1": {
+    "2bit": "alignment/primary/amphibians/GCF_902459505.1.2bit",
+    "fa": "alignment/primary/amphibians/GCF_902459505.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/amphibians/GCF_902459505.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_905171765.1": {
+    "2bit": "alignment/primary/amphibians/GCF_905171765.1.2bit",
+    "fa": "alignment/primary/amphibians/GCF_905171765.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/amphibians/GCF_905171765.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_905171775.1": {
+    "2bit": "alignment/primary/amphibians/GCF_905171775.1.2bit",
+    "fa": "alignment/primary/amphibians/GCF_905171775.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/amphibians/GCF_905171775.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_003957555.1": {
+    "2bit": "alignment/primary/birds/GCF_003957555.1.2bit",
+    "fa": "alignment/primary/birds/GCF_003957555.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_003957555.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_004027225.2": {
+    "2bit": "alignment/primary/birds/GCF_004027225.2.2bit",
+    "fa": "alignment/primary/birds/GCF_004027225.2.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_004027225.2.repeatModeler.families.fa.gz"
+  },
+  "GCF_009650955.1": {
+    "2bit": "alignment/primary/birds/GCF_009650955.1.2bit",
+    "fa": "alignment/primary/birds/GCF_009650955.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_009650955.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_009769625.2": {
+    "2bit": "alignment/primary/birds/GCF_009769625.2.2bit",
+    "fa": "alignment/primary/birds/GCF_009769625.2.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_009769625.2.repeatModeler.families.fa.gz"
+  },
+  "GCF_009819655.1": {
+    "2bit": "alignment/primary/birds/GCF_009819655.1.2bit",
+    "fa": "alignment/primary/birds/GCF_009819655.1.fa.gz"
+  },
+  "GCF_009819795.1": {
+    "2bit": "alignment/primary/birds/GCF_009819795.1.2bit",
+    "fa": "alignment/primary/birds/GCF_009819795.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_009819795.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_009819885.2": {
+    "2bit": "alignment/primary/birds/GCF_009819885.2.2bit",
+    "fa": "alignment/primary/birds/GCF_009819885.2.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_009819885.2.repeatModeler.families.fa.gz"
+  },
+  "GCF_009829145.1": {
+    "2bit": "alignment/primary/birds/GCF_009829145.1.2bit",
+    "fa": "alignment/primary/birds/GCF_009829145.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_009829145.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_012275295.1": {
+    "2bit": "alignment/primary/birds/GCF_012275295.1.2bit",
+    "fa": "alignment/primary/birds/GCF_012275295.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_012275295.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_013368605.1": {
+    "2bit": "alignment/primary/birds/GCF_013368605.1.2bit",
+    "fa": "alignment/primary/birds/GCF_013368605.1.fa.gz"
+  },
+  "GCF_014839835.1": {
+    "2bit": "alignment/primary/birds/GCF_014839835.1.2bit",
+    "fa": "alignment/primary/birds/GCF_014839835.1.fa.gz"
+  },
+  "GCF_015220075.1": {
+    "2bit": "alignment/primary/birds/GCF_015220075.1.2bit",
+    "fa": "alignment/primary/birds/GCF_015220075.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_015220075.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_015220805.1": {
+    "2bit": "alignment/primary/birds/GCF_015220805.1.2bit",
+    "fa": "alignment/primary/birds/GCF_015220805.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_015220805.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_015227805.1": {
+    "2bit": "alignment/primary/birds/GCF_015227805.1.2bit",
+    "fa": "alignment/primary/birds/GCF_015227805.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_015227805.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_016700215.2": {
+    "2bit": "alignment/primary/birds/GCF_016700215.2.2bit",
+    "fa": "alignment/primary/birds/GCF_016700215.2.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_016700215.2.repeatModeler.families.fa.gz"
+  },
+  "GCF_017639655.2": {
+    "2bit": "alignment/primary/birds/GCF_017639655.2.2bit",
+    "fa": "alignment/primary/birds/GCF_017639655.2.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_017639655.2.repeatModeler.families.fa.gz"
+  },
+  "GCF_017976375.1": {
+    "2bit": "alignment/primary/birds/GCF_017976375.1.2bit",
+    "fa": "alignment/primary/birds/GCF_017976375.1.fa.gz"
+  },
+  "GCF_020740725.1": {
+    "2bit": "alignment/primary/birds/GCF_020740725.1.2bit",
+    "fa": "alignment/primary/birds/GCF_020740725.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_020740725.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_020740795.1": {
+    "2bit": "alignment/primary/birds/GCF_020740795.1.2bit",
+    "fa": "alignment/primary/birds/GCF_020740795.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_020740795.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_020745825.1": {
+    "2bit": "alignment/primary/birds/GCF_020745825.1.2bit",
+    "fa": "alignment/primary/birds/GCF_020745825.1.fa.gz"
+  },
+  "GCF_023343835.1": {
+    "2bit": "alignment/primary/birds/GCF_023343835.1.2bit",
+    "fa": "alignment/primary/birds/GCF_023343835.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_023343835.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_023634085.1": {
+    "2bit": "alignment/primary/birds/GCF_023634085.1.2bit",
+    "fa": "alignment/primary/birds/GCF_023634085.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_023634085.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_023634155.1": {
+    "2bit": "alignment/primary/birds/GCF_023634155.1.2bit",
+    "fa": "alignment/primary/birds/GCF_023634155.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_023634155.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_023638135.1": {
+    "2bit": "alignment/primary/birds/GCF_023638135.1.2bit",
+    "fa": "alignment/primary/birds/GCF_023638135.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_023638135.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_026419915.1": {
+    "2bit": "alignment/primary/birds/GCF_026419915.1.2bit",
+    "fa": "alignment/primary/birds/GCF_026419915.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_026419915.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_026979565.1": {
+    "2bit": "alignment/primary/birds/GCF_026979565.1.2bit",
+    "fa": "alignment/primary/birds/GCF_026979565.1.fa.gz"
+  },
+  "GCF_027477595.1": {
+    "2bit": "alignment/primary/birds/GCF_027477595.1.2bit",
+    "fa": "alignment/primary/birds/GCF_027477595.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_027477595.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_027579445.1": {
+    "2bit": "alignment/primary/birds/GCF_027579445.1.2bit",
+    "fa": "alignment/primary/birds/GCF_027579445.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_027579445.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_027887145.1": {
+    "2bit": "alignment/primary/birds/GCF_027887145.1.2bit",
+    "fa": "alignment/primary/birds/GCF_027887145.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_027887145.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_028018845.1": {
+    "2bit": "alignment/primary/birds/GCF_028018845.1.2bit",
+    "fa": "alignment/primary/birds/GCF_028018845.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_028018845.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_028389875.1": {
+    "2bit": "alignment/primary/birds/GCF_028389875.1.2bit",
+    "fa": "alignment/primary/birds/GCF_028389875.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_028389875.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_028500815.1": {
+    "2bit": "alignment/primary/birds/GCF_028500815.1.2bit",
+    "fa": "alignment/primary/birds/GCF_028500815.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_028500815.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_028858705.1": {
+    "2bit": "alignment/primary/birds/GCF_028858705.1.2bit",
+    "fa": "alignment/primary/birds/GCF_028858705.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_028858705.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_028858725.1": {
+    "2bit": "alignment/primary/birds/GCF_028858725.1.2bit",
+    "fa": "alignment/primary/birds/GCF_028858725.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_028858725.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_029582105.1": {
+    "2bit": "alignment/primary/birds/GCF_029582105.1.2bit",
+    "fa": "alignment/primary/birds/GCF_029582105.1.fa.gz"
+  },
+  "GCF_030490865.1": {
+    "2bit": "alignment/primary/birds/GCF_030490865.1.2bit",
+    "fa": "alignment/primary/birds/GCF_030490865.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_030490865.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_030936135.1": {
+    "2bit": "alignment/primary/birds/GCF_030936135.1.2bit",
+    "fa": "alignment/primary/birds/GCF_030936135.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_030936135.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_035770615.1": {
+    "2bit": "alignment/primary/birds/GCF_035770615.1.2bit",
+    "fa": "alignment/primary/birds/GCF_035770615.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_035770615.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_036013445.1": {
+    "2bit": "alignment/primary/birds/GCF_036013445.1.2bit",
+    "fa": "alignment/primary/birds/GCF_036013445.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_036013445.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_036013475.1": {
+    "2bit": "alignment/primary/birds/GCF_036013475.1.2bit",
+    "fa": "alignment/primary/birds/GCF_036013475.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_036013475.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_036169615.1": {
+    "2bit": "alignment/primary/birds/GCF_036169615.1.2bit",
+    "fa": "alignment/primary/birds/GCF_036169615.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_036169615.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_036250125.1": {
+    "2bit": "alignment/primary/birds/GCF_036250125.1.2bit",
+    "fa": "alignment/primary/birds/GCF_036250125.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_036250125.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_036370855.1": {
+    "2bit": "alignment/primary/birds/GCF_036370855.1.2bit",
+    "fa": "alignment/primary/birds/GCF_036370855.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_036370855.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_036417665.1": {
+    "2bit": "alignment/primary/birds/GCF_036417665.1.2bit",
+    "fa": "alignment/primary/birds/GCF_036417665.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_036417665.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_036417845.1": {
+    "2bit": "alignment/primary/birds/GCF_036417845.1.2bit",
+    "fa": "alignment/primary/birds/GCF_036417845.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_036417845.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_037038585.1": {
+    "2bit": "alignment/secondary/birds/GCF_037038585.1.2bit",
+    "fa": "alignment/secondary/birds/GCF_037038585.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/secondary/birds/GCF_037038585.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_037157495.1": {
+    "2bit": "alignment/primary/birds/GCF_037157495.1.2bit",
+    "fa": "alignment/primary/birds/GCF_037157495.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_037157495.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_040182565.1": {
+    "2bit": "alignment/primary/birds/GCF_040182565.1.2bit",
+    "fa": "alignment/primary/birds/GCF_040182565.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_040182565.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_040807025.1": {
+    "2bit": "alignment/primary/birds/GCF_040807025.1.2bit",
+    "fa": "alignment/primary/birds/GCF_040807025.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_040807025.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_900496995.4": {
+    "2bit": "alignment/primary/birds/GCF_900496995.4.2bit",
+    "fa": "alignment/primary/birds/GCF_900496995.4.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_900496995.4.repeatModeler.families.fa.gz"
+  },
+  "GCF_929443795.1": {
+    "2bit": "alignment/primary/birds/GCF_929443795.1.2bit",
+    "fa": "alignment/primary/birds/GCF_929443795.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_929443795.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_947461875.1": {
+    "2bit": "alignment/primary/birds/GCF_947461875.1.2bit",
+    "fa": "alignment/primary/birds/GCF_947461875.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_947461875.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_963662255.1": {
+    "2bit": "alignment/primary/birds/GCF_963662255.1.2bit",
+    "fa": "alignment/primary/birds/GCF_963662255.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_963662255.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_963921805.1": {
+    "2bit": "alignment/primary/birds/GCF_963921805.1.2bit",
+    "fa": "alignment/primary/birds/GCF_963921805.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_963921805.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_963924245.1": {
+    "2bit": "alignment/primary/birds/GCF_963924245.1.2bit",
+    "fa": "alignment/primary/birds/GCF_963924245.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_963924245.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_963932015.1": {
+    "2bit": "alignment/primary/birds/GCF_963932015.1.2bit",
+    "fa": "alignment/primary/birds/GCF_963932015.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/birds/GCF_963932015.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_902459465.1": {
+    "2bit": "alignment/primary/echinoderm/GCF_902459465.1.2bit",
+    "fa": "alignment/primary/echinoderm/GCF_902459465.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/echinoderm/GCF_902459465.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_007364275.1": {
+    "2bit": "alignment/primary/fish/GCF_007364275.1.2bit",
+    "fa": "alignment/primary/fish/GCF_007364275.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_007364275.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_009762535.1": {
+    "2bit": "alignment/primary/fish/GCF_009762535.1.2bit",
+    "fa": "alignment/primary/fish/GCF_009762535.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_009762535.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_009769545.1": {
+    "2bit": "alignment/primary/fish/GCF_009769545.1.2bit",
+    "fa": "alignment/primary/fish/GCF_009769545.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_009769545.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_009819705.1": {
+    "2bit": "alignment/primary/fish/GCF_009819705.1.2bit",
+    "fa": "alignment/primary/fish/GCF_009819705.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_009819705.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_009829125.3": {
+    "2bit": "alignment/primary/fish/GCF_009829125.3.2bit",
+    "fa": "alignment/primary/fish/GCF_009829125.3.fa.gz"
+  },
+  "GCF_011004845.1": {
+    "2bit": "alignment/primary/fish/GCF_011004845.1.2bit",
+    "fa": "alignment/primary/fish/GCF_011004845.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_011004845.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_013347855.1": {
+    "2bit": "alignment/primary/fish/GCF_013347855.1.2bit",
+    "fa": "alignment/primary/fish/GCF_013347855.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_013347855.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_013368585.1": {
+    "2bit": "alignment/primary/fish/GCF_013368585.1.2bit",
+    "fa": "alignment/primary/fish/GCF_013368585.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_013368585.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_015220715.1": {
+    "2bit": "alignment/primary/fish/GCF_015220715.1.2bit",
+    "fa": "alignment/primary/fish/GCF_015220715.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_015220715.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_015220745.1": {
+    "2bit": "alignment/primary/fish/GCF_015220745.1.2bit",
+    "fa": "alignment/primary/fish/GCF_015220745.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_015220745.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_017639745.1": {
+    "2bit": "alignment/primary/fish/GCF_017639745.1.2bit",
+    "fa": "alignment/primary/fish/GCF_017639745.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_017639745.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_017976325.1": {
+    "2bit": "alignment/primary/fish/GCF_017976325.1.2bit",
+    "fa": "alignment/primary/fish/GCF_017976325.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_017976325.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_017976425.1": {
+    "2bit": "alignment/primary/fish/GCF_017976425.1.2bit",
+    "fa": "alignment/primary/fish/GCF_017976425.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_017976425.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_018492685.1": {
+    "2bit": "alignment/primary/fish/GCF_018492685.1.2bit",
+    "fa": "alignment/primary/fish/GCF_018492685.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_018492685.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_020382885.2": {
+    "2bit": "alignment/primary/fish/GCF_020382885.2.2bit",
+    "fa": "alignment/primary/fish/GCF_020382885.2.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_020382885.2.repeatModeler.families.fa.gz"
+  },
+  "GCF_021462225.1": {
+    "2bit": "alignment/primary/fish/GCF_021462225.1.2bit",
+    "fa": "alignment/primary/fish/GCF_021462225.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_021462225.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_023375975.1": {
+    "2bit": "alignment/primary/fish/GCF_023375975.1.2bit",
+    "fa": "alignment/primary/fish/GCF_023375975.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_023375975.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_027358585.1": {
+    "2bit": "alignment/primary/fish/GCF_027358585.1.2bit",
+    "fa": "alignment/primary/fish/GCF_027358585.1.fa.gz"
+  },
+  "GCF_027409825.1": {
+    "2bit": "alignment/primary/fish/GCF_027409825.1.2bit",
+    "fa": "alignment/primary/fish/GCF_027409825.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_027409825.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_027579695.1": {
+    "2bit": "alignment/primary/fish/GCF_027579695.1.2bit",
+    "fa": "alignment/primary/fish/GCF_027579695.1.fa.gz"
+  },
+  "GCF_029633855.1": {
+    "2bit": "alignment/primary/fish/GCF_029633855.1.2bit",
+    "fa": "alignment/primary/fish/GCF_029633855.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_029633855.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_029633865.1": {
+    "2bit": "alignment/primary/fish/GCF_029633865.1.2bit",
+    "fa": "alignment/primary/fish/GCF_029633865.1.fa.gz"
+  },
+  "GCF_030014385.1": {
+    "2bit": "alignment/primary/fish/GCF_030014385.1.2bit",
+    "fa": "alignment/primary/fish/GCF_030014385.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_030014385.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_030463535.1": {
+    "2bit": "alignment/primary/fish/GCF_030463535.1.2bit",
+    "fa": "alignment/primary/fish/GCF_030463535.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_030463535.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_036373705.1": {
+    "2bit": "alignment/primary/fish/GCF_036373705.1.2bit",
+    "fa": "alignment/primary/fish/GCF_036373705.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_036373705.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_037176945.1": {
+    "2bit": "alignment/primary/fish/GCF_037176945.1.2bit",
+    "fa": "alignment/primary/fish/GCF_037176945.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_037176945.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_039877785.1": {
+    "2bit": "alignment/primary/fish/GCF_039877785.1.2bit",
+    "fa": "alignment/primary/fish/GCF_039877785.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_039877785.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_040954835.1": {
+    "2bit": "alignment/primary/fish/GCF_040954835.1.2bit",
+    "fa": "alignment/primary/fish/GCF_040954835.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_040954835.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_042242105.1": {
+    "2bit": "alignment/primary/fish/GCF_042242105.1.2bit",
+    "fa": "alignment/primary/fish/GCF_042242105.1.fa.gz"
+  },
+  "GCF_043641665.1": {
+    "2bit": "alignment/primary/fish/GCF_043641665.1.2bit",
+    "fa": "alignment/primary/fish/GCF_043641665.1.fa.gz"
+  },
+  "GCF_900324465.2": {
+    "2bit": "alignment/primary/fish/GCF_900324465.2.2bit",
+    "fa": "alignment/primary/fish/GCF_900324465.2.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_900324465.2.repeatModeler.families.fa.gz"
+  },
+  "GCF_900324485.2": {
+    "2bit": "alignment/primary/fish/GCF_900324485.2.2bit",
+    "fa": "alignment/primary/fish/GCF_900324485.2.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_900324485.2.repeatModeler.families.fa.gz"
+  },
+  "GCF_900634415.1": {
+    "2bit": "alignment/primary/fish/GCF_900634415.1.2bit",
+    "fa": "alignment/primary/fish/GCF_900634415.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_900634415.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_900634625.1": {
+    "2bit": "alignment/primary/fish/GCF_900634625.1.2bit",
+    "fa": "alignment/primary/fish/GCF_900634625.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_900634625.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_900634775.1": {
+    "2bit": "alignment/primary/fish/GCF_900634775.1.2bit",
+    "fa": "alignment/primary/fish/GCF_900634775.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_900634775.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_900634795.4": {
+    "2bit": "alignment/primary/fish/GCF_900634795.4.2bit",
+    "fa": "alignment/primary/fish/GCF_900634795.4.fa.gz"
+  },
+  "GCF_900700375.1": {
+    "2bit": "alignment/primary/fish/GCF_900700375.1.2bit",
+    "fa": "alignment/primary/fish/GCF_900700375.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_900700375.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_900747795.2": {
+    "2bit": "alignment/primary/fish/GCF_900747795.2.2bit",
+    "fa": "alignment/primary/fish/GCF_900747795.2.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_900747795.2.repeatModeler.families.fa.gz"
+  },
+  "GCF_900880675.1": {
+    "2bit": "alignment/primary/fish/GCF_900880675.1.2bit",
+    "fa": "alignment/primary/fish/GCF_900880675.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_900880675.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_900963305.1": {
+    "2bit": "alignment/primary/fish/GCF_900963305.1.2bit",
+    "fa": "alignment/primary/fish/GCF_900963305.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_900963305.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_900964775.1": {
+    "2bit": "alignment/primary/fish/GCF_900964775.1.2bit",
+    "fa": "alignment/primary/fish/GCF_900964775.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_900964775.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_901000725.2": {
+    "2bit": "alignment/primary/fish/GCF_901000725.2.2bit",
+    "fa": "alignment/primary/fish/GCF_901000725.2.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_901000725.2.repeatModeler.families.fa.gz"
+  },
+  "GCF_901709675.1": {
+    "2bit": "alignment/primary/fish/GCF_901709675.1.2bit",
+    "fa": "alignment/primary/fish/GCF_901709675.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_901709675.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_902148845.1": {
+    "2bit": "alignment/primary/fish/GCF_902148845.1.2bit",
+    "fa": "alignment/primary/fish/GCF_902148845.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_902148845.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_902148855.1": {
+    "2bit": "alignment/primary/fish/GCF_902148855.1.2bit",
+    "fa": "alignment/primary/fish/GCF_902148855.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_902148855.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_902150065.1": {
+    "2bit": "alignment/primary/fish/GCF_902150065.1.2bit",
+    "fa": "alignment/primary/fish/GCF_902150065.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_902150065.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_902167405.1": {
+    "2bit": "alignment/primary/fish/GCF_902167405.1.2bit",
+    "fa": "alignment/primary/fish/GCF_902167405.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_902167405.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_902362185.1": {
+    "2bit": "alignment/primary/fish/GCF_902362185.1.2bit",
+    "fa": "alignment/primary/fish/GCF_902362185.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_902362185.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_902500255.1": {
+    "2bit": "alignment/primary/fish/GCF_902500255.1.2bit",
+    "fa": "alignment/primary/fish/GCF_902500255.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_902500255.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_902713425.1": {
+    "2bit": "alignment/primary/fish/GCF_902713425.1.2bit",
+    "fa": "alignment/primary/fish/GCF_902713425.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_902713425.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_904848185.1": {
+    "2bit": "alignment/primary/fish/GCF_904848185.1.2bit",
+    "fa": "alignment/primary/fish/GCF_904848185.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_904848185.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_910596095.1": {
+    "2bit": "alignment/primary/fish/GCF_910596095.1.2bit",
+    "fa": "alignment/primary/fish/GCF_910596095.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_910596095.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_914725855.1": {
+    "2bit": "alignment/primary/fish/GCF_914725855.1.2bit",
+    "fa": "alignment/primary/fish/GCF_914725855.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_914725855.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_947347685.1": {
+    "2bit": "alignment/primary/fish/GCF_947347685.1.2bit",
+    "fa": "alignment/primary/fish/GCF_947347685.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_947347685.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_949316205.1": {
+    "2bit": "alignment/primary/fish/GCF_949316205.1.2bit",
+    "fa": "alignment/primary/fish/GCF_949316205.1.fa.gz"
+  },
+  "GCF_949316345.1": {
+    "2bit": "alignment/primary/fish/GCF_949316345.1.2bit",
+    "fa": "alignment/primary/fish/GCF_949316345.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_949316345.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_958295425.1": {
+    "2bit": "alignment/primary/fish/GCF_958295425.1.2bit",
+    "fa": "alignment/primary/fish/GCF_958295425.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_958295425.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_963082965.1": {
+    "2bit": "alignment/primary/fish/GCF_963082965.1.2bit",
+    "fa": "alignment/primary/fish/GCF_963082965.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_963082965.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_963514075.1": {
+    "2bit": "alignment/primary/fish/GCF_963514075.1.2bit",
+    "fa": "alignment/primary/fish/GCF_963514075.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_963514075.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_963576545.1": {
+    "2bit": "alignment/primary/fish/GCF_963576545.1.2bit",
+    "fa": "alignment/primary/fish/GCF_963576545.1.fa.gz"
+  },
+  "GCF_963584025.1": {
+    "2bit": "alignment/primary/fish/GCF_963584025.1.2bit",
+    "fa": "alignment/primary/fish/GCF_963584025.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_963584025.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_963691925.1": {
+    "2bit": "alignment/primary/fish/GCF_963691925.1.2bit",
+    "fa": "alignment/primary/fish/GCF_963691925.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_963691925.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_963692335.1": {
+    "2bit": "alignment/primary/fish/GCF_963692335.1.2bit",
+    "fa": "alignment/primary/fish/GCF_963692335.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_963692335.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_963854185.1": {
+    "2bit": "alignment/primary/fish/GCF_963854185.1.2bit",
+    "fa": "alignment/primary/fish/GCF_963854185.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/fish/GCF_963854185.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_963924715.1": {
+    "2bit": "alignment/primary/fish/GCF_963924715.1.2bit",
+    "fa": "alignment/primary/fish/GCF_963924715.1.fa.gz"
+  },
+  "GCF_963930695.1": {
+    "2bit": "alignment/primary/fish/GCF_963930695.1.2bit",
+    "fa": "alignment/primary/fish/GCF_963930695.1.fa.gz"
+  },
+  "GCF_003369695.1": {
+    "2bit": "alignment/primary/mammals/GCF_003369695.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_003369695.1.fa.gz"
+  },
+  "GCF_004115215.2": {
+    "2bit": "alignment/primary/mammals/GCF_004115215.2.2bit",
+    "fa": "alignment/primary/mammals/GCF_004115215.2.fa.gz"
+  },
+  "GCF_004115265.2": {
+    "2bit": "alignment/primary/mammals/GCF_004115265.2.2bit",
+    "fa": "alignment/primary/mammals/GCF_004115265.2.fa.gz"
+  },
+  "GCF_004126475.2": {
+    "2bit": "alignment/primary/mammals/GCF_004126475.2.2bit",
+    "fa": "alignment/primary/mammals/GCF_004126475.2.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_004126475.2.repeatModeler.families.fa.gz"
+  },
+  "GCF_007474595.2": {
+    "2bit": "alignment/primary/mammals/GCF_007474595.2.2bit",
+    "fa": "alignment/primary/mammals/GCF_007474595.2.fa.gz"
+  },
+  "GCF_008692025.1": {
+    "2bit": "alignment/primary/mammals/GCF_008692025.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_008692025.1.fa.gz"
+  },
+  "GCF_009762305.2": {
+    "2bit": "alignment/primary/mammals/GCF_009762305.2.2bit",
+    "fa": "alignment/primary/mammals/GCF_009762305.2.fa.gz"
+  },
+  "GCF_009829155.1": {
+    "2bit": "alignment/primary/mammals/GCF_009829155.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_009829155.1.fa.gz"
+  },
+  "GCF_009873245.2": {
+    "2bit": "alignment/primary/mammals/GCF_009873245.2.2bit",
+    "fa": "alignment/primary/mammals/GCF_009873245.2.fa.gz"
+  },
+  "GCF_011100635.1": {
+    "2bit": "alignment/primary/mammals/GCF_011100635.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_011100635.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_011100635.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_011100685.1": {
+    "2bit": "alignment/primary/mammals/GCF_011100685.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_011100685.1.fa.gz"
+  },
+  "GCF_011762595.1": {
+    "2bit": "alignment/primary/mammals/GCF_011762595.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_011762595.1.fa.gz"
+  },
+  "GCF_014108235.1": {
+    "2bit": "alignment/primary/mammals/GCF_014108235.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_014108235.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_014108235.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_014108245.1": {
+    "2bit": "alignment/primary/mammals/GCF_014108245.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_014108245.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_014108245.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_014108415.1": {
+    "2bit": "alignment/primary/mammals/GCF_014108415.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_014108415.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_014108415.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_014176215.1": {
+    "2bit": "alignment/primary/mammals/GCF_014176215.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_014176215.1.fa.gz"
+  },
+  "GCF_015220235.1": {
+    "2bit": "alignment/primary/mammals/GCF_015220235.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_015220235.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_015220235.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_015227675.2": {
+    "2bit": "alignment/primary/mammals/GCF_015227675.2.2bit",
+    "fa": "alignment/primary/mammals/GCF_015227675.2.fa.gz"
+  },
+  "GCF_015852505.1": {
+    "2bit": "alignment/primary/mammals/GCF_015852505.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_015852505.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_015852505.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_019393635.1": {
+    "2bit": "alignment/primary/mammals/GCF_019393635.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_019393635.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_019393635.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_020740685.1": {
+    "2bit": "alignment/primary/mammals/GCF_020740685.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_020740685.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_020740685.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_020826845.1": {
+    "2bit": "alignment/primary/mammals/GCF_020826845.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_020826845.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_020826845.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_024139225.1": {
+    "2bit": "alignment/primary/mammals/GCF_024139225.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_024139225.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_024139225.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_024166365.1": {
+    "2bit": "alignment/primary/mammals/GCF_024166365.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_024166365.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_024166365.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_025265405.1": {
+    "2bit": "alignment/primary/mammals/GCF_025265405.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_025265405.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_025265405.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_026419965.1": {
+    "2bit": "alignment/primary/mammals/GCF_026419965.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_026419965.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_026419965.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_027409185.1": {
+    "2bit": "alignment/primary/mammals/GCF_027409185.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_027409185.1.fa.gz"
+  },
+  "GCF_027574615.1": {
+    "2bit": "alignment/primary/mammals/GCF_027574615.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_027574615.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_027574615.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_027595985.1": {
+    "2bit": "alignment/primary/mammals/GCF_027595985.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_027595985.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_027595985.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_027887165.1": {
+    "2bit": "alignment/primary/mammals/GCF_027887165.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_027887165.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_027887165.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_028018385.1": {
+    "2bit": "alignment/primary/mammals/GCF_028018385.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_028018385.1.fa.gz"
+  },
+  "GCF_028021215.1": {
+    "2bit": "alignment/primary/mammals/GCF_028021215.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_028021215.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_028021215.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_028023285.1": {
+    "2bit": "alignment/primary/mammals/GCF_028023285.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_028023285.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_028023285.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_028372415.1": {
+    "2bit": "alignment/primary/mammals/GCF_028372415.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_028372415.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_028372415.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_028564815.1": {
+    "2bit": "alignment/primary/mammals/GCF_028564815.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_028564815.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_028564815.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_030014295.1": {
+    "2bit": "alignment/primary/mammals/GCF_030014295.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_030014295.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_030014295.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_030020395.1": {
+    "2bit": "alignment/primary/mammals/GCF_030020395.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_030020395.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_030020395.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_030028045.1": {
+    "2bit": "alignment/primary/mammals/GCF_030028045.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_030028045.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_030028045.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_030435755.1": {
+    "2bit": "alignment/primary/mammals/GCF_030435755.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_030435755.1.fa.gz"
+  },
+  "GCF_030435805.1": {
+    "2bit": "alignment/primary/mammals/GCF_030435805.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_030435805.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_030435805.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_030445035.2": {
+    "2bit": "alignment/primary/mammals/GCF_030445035.2.2bit",
+    "fa": "alignment/primary/mammals/GCF_030445035.2.fa.gz"
+  },
+  "GCF_036321535.1": {
+    "2bit": "alignment/primary/mammals/GCF_036321535.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_036321535.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_036321535.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_036850765.1": {
+    "2bit": "alignment/primary/mammals/GCF_036850765.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_036850765.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_036850765.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_036850995.1": {
+    "2bit": "alignment/primary/mammals/GCF_036850995.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_036850995.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_036850995.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_039906515.1": {
+    "2bit": "alignment/primary/mammals/GCF_039906515.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_039906515.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_039906515.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_042477335.2": {
+    "2bit": "alignment/primary/mammals/GCF_042477335.2.2bit",
+    "fa": "alignment/primary/mammals/GCF_042477335.2.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_042477335.2.repeatModeler.families.fa.gz"
+  },
+  "GCF_043159975.1": {
+    "2bit": "alignment/primary/mammals/GCF_043159975.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_043159975.1.fa.gz"
+  },
+  "GCF_047511675.1": {
+    "2bit": "alignment/primary/mammals/GCF_047511675.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_047511675.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_047511675.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_048164855.1": {
+    "2bit": "alignment/primary/mammals/GCF_048164855.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_048164855.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_048164855.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_902655055.1": {
+    "2bit": "alignment/primary/mammals/GCF_902655055.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_902655055.1.fa.gz"
+  },
+  "GCF_902686445.1": {
+    "2bit": "alignment/primary/mammals/GCF_902686445.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_902686445.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_902686445.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_903992535.2": {
+    "2bit": "alignment/primary/mammals/GCF_903992535.2.2bit",
+    "fa": "alignment/primary/mammals/GCF_903992535.2.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_903992535.2.repeatModeler.families.fa.gz"
+  },
+  "GCF_903995425.1": {
+    "2bit": "alignment/primary/mammals/GCF_903995425.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_903995425.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_903995425.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_903995435.1": {
+    "2bit": "alignment/primary/mammals/GCF_903995435.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_903995435.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_903995435.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_910594005.1": {
+    "2bit": "alignment/primary/mammals/GCF_910594005.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_910594005.1.fa.gz"
+  },
+  "GCF_922984935.1": {
+    "2bit": "alignment/primary/mammals/GCF_922984935.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_922984935.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_922984935.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_937001465.1": {
+    "2bit": "alignment/primary/mammals/GCF_937001465.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_937001465.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_937001465.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_947179515.1": {
+    "2bit": "alignment/primary/mammals/GCF_947179515.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_947179515.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_947179515.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_949774975.1": {
+    "2bit": "alignment/primary/mammals/GCF_949774975.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_949774975.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_949774975.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_949987515.2": {
+    "2bit": "alignment/primary/mammals/GCF_949987515.2.2bit",
+    "fa": "alignment/primary/mammals/GCF_949987515.2.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_949987515.2.repeatModeler.families.fa.gz"
+  },
+  "GCF_949987535.1": {
+    "2bit": "alignment/primary/mammals/GCF_949987535.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_949987535.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_949987535.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_950005125.1": {
+    "2bit": "alignment/primary/mammals/GCF_950005125.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_950005125.1.fa.gz"
+  },
+  "GCF_950295315.1": {
+    "2bit": "alignment/primary/mammals/GCF_950295315.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_950295315.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_950295315.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_963259705.1": {
+    "2bit": "alignment/primary/mammals/GCF_963259705.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_963259705.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_963259705.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_963455315.2": {
+    "2bit": "alignment/primary/mammals/GCF_963455315.2.2bit",
+    "fa": "alignment/primary/mammals/GCF_963455315.2.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_963455315.2.repeatModeler.families.fa.gz"
+  },
+  "GCF_963924675.1": {
+    "2bit": "alignment/primary/mammals/GCF_963924675.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_963924675.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_963924675.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_963930625.1": {
+    "2bit": "alignment/primary/mammals/GCF_963930625.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_963930625.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_963930625.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_964237555.1": {
+    "2bit": "alignment/primary/mammals/GCF_964237555.1.2bit",
+    "fa": "alignment/primary/mammals/GCF_964237555.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/mammals/GCF_964237555.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_020740605.2": {
+    "2bit": "alignment/primary/primates/GCF_020740605.2.2bit",
+    "fa": "alignment/primary/primates/GCF_020740605.2.fa.gz"
+  },
+  "GCF_027406575.1": {
+    "2bit": "alignment/primary/primates/GCF_027406575.1.2bit",
+    "fa": "alignment/primary/primates/GCF_027406575.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/primates/GCF_027406575.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_028858775.2": {
+    "2bit": "alignment/primary/primates/GCF_028858775.2.2bit",
+    "fa": "alignment/primary/primates/GCF_028858775.2.fa.gz"
+  },
+  "GCF_028878055.3": {
+    "2bit": "alignment/primary/primates/GCF_028878055.3.2bit",
+    "fa": "alignment/primary/primates/GCF_028878055.3.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/primates/GCF_028878055.3.repeatModeler.families.fa.gz"
+  },
+  "GCF_028885625.2": {
+    "2bit": "alignment/primary/primates/GCF_028885625.2.2bit",
+    "fa": "alignment/primary/primates/GCF_028885625.2.fa.gz"
+  },
+  "GCF_028885655.2": {
+    "2bit": "alignment/primary/primates/GCF_028885655.2.2bit",
+    "fa": "alignment/primary/primates/GCF_028885655.2.fa.gz"
+  },
+  "GCF_029281585.2": {
+    "2bit": "alignment/primary/primates/GCF_029281585.2.2bit",
+    "fa": "alignment/primary/primates/GCF_029281585.2.fa.gz"
+  },
+  "GCF_029289425.2": {
+    "2bit": "alignment/primary/primates/GCF_029289425.2.2bit",
+    "fa": "alignment/primary/primates/GCF_029289425.2.fa.gz"
+  },
+  "GCF_037993035.1": {
+    "2bit": "alignment/primary/primates/GCF_037993035.1.2bit",
+    "fa": "alignment/primary/primates/GCF_037993035.1.fa.gz"
+  },
+  "GCF_007399415.2": {
+    "2bit": "alignment/primary/reptiles/GCF_007399415.2.2bit",
+    "fa": "alignment/primary/reptiles/GCF_007399415.2.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/reptiles/GCF_007399415.2.repeatModeler.families.fa.gz"
+  },
+  "GCF_009764565.3": {
+    "2bit": "alignment/primary/reptiles/GCF_009764565.3.2bit",
+    "fa": "alignment/primary/reptiles/GCF_009764565.3.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/reptiles/GCF_009764565.3.repeatModeler.families.fa.gz"
+  },
+  "GCF_009769535.1": {
+    "2bit": "alignment/primary/reptiles/GCF_009769535.1.2bit",
+    "fa": "alignment/primary/reptiles/GCF_009769535.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/reptiles/GCF_009769535.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_009819535.1": {
+    "2bit": "alignment/primary/reptiles/GCF_009819535.1.2bit",
+    "fa": "alignment/primary/reptiles/GCF_009819535.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/reptiles/GCF_009819535.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_015237465.2": {
+    "2bit": "alignment/primary/reptiles/GCF_015237465.2.2bit",
+    "fa": "alignment/primary/reptiles/GCF_015237465.2.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/reptiles/GCF_015237465.2.repeatModeler.families.fa.gz"
+  },
+  "GCF_023053635.1": {
+    "2bit": "alignment/primary/reptiles/GCF_023053635.1.2bit",
+    "fa": "alignment/primary/reptiles/GCF_023053635.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/reptiles/GCF_023053635.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_025201925.1": {
+    "2bit": "alignment/primary/reptiles/GCF_025201925.1.2bit",
+    "fa": "alignment/primary/reptiles/GCF_025201925.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/reptiles/GCF_025201925.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_027172205.1": {
+    "2bit": "alignment/primary/reptiles/GCF_027172205.1.2bit",
+    "fa": "alignment/primary/reptiles/GCF_027172205.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/reptiles/GCF_027172205.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_027887155.1": {
+    "2bit": "alignment/primary/reptiles/GCF_027887155.1.2bit",
+    "fa": "alignment/primary/reptiles/GCF_027887155.1.fa.gz"
+  },
+  "GCF_028017835.1": {
+    "2bit": "alignment/primary/reptiles/GCF_028017835.1.2bit",
+    "fa": "alignment/primary/reptiles/GCF_028017835.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/reptiles/GCF_028017835.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_028583425.1": {
+    "2bit": "alignment/primary/reptiles/GCF_028583425.1.2bit",
+    "fa": "alignment/primary/reptiles/GCF_028583425.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/reptiles/GCF_028583425.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_029931775.1": {
+    "2bit": "alignment/primary/reptiles/GCF_029931775.1.2bit",
+    "fa": "alignment/primary/reptiles/GCF_029931775.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/reptiles/GCF_029931775.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_030035675.1": {
+    "2bit": "alignment/primary/reptiles/GCF_030035675.1.2bit",
+    "fa": "alignment/primary/reptiles/GCF_030035675.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/reptiles/GCF_030035675.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_030867095.1": {
+    "2bit": "alignment/primary/reptiles/GCF_030867095.1.2bit",
+    "fa": "alignment/primary/reptiles/GCF_030867095.1.fa.gz"
+  },
+  "GCF_031021105.1": {
+    "2bit": "alignment/primary/reptiles/GCF_031021105.1.2bit",
+    "fa": "alignment/primary/reptiles/GCF_031021105.1.fa.gz"
+  },
+  "GCF_035149785.1": {
+    "2bit": "alignment/primary/reptiles/GCF_035149785.1.2bit",
+    "fa": "alignment/primary/reptiles/GCF_035149785.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/reptiles/GCF_035149785.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_037176765.1": {
+    "2bit": "alignment/primary/reptiles/GCF_037176765.1.2bit",
+    "fa": "alignment/primary/reptiles/GCF_037176765.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/reptiles/GCF_037176765.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_963506605.1": {
+    "2bit": "alignment/primary/reptiles/GCF_963506605.1.2bit",
+    "fa": "alignment/primary/reptiles/GCF_963506605.1.fa.gz"
+  },
+  "GCF_009764475.1": {
+    "2bit": "alignment/primary/sharks/GCF_009764475.1.2bit",
+    "fa": "alignment/primary/sharks/GCF_009764475.1.fa.gz"
+  },
+  "GCF_010909765.2": {
+    "2bit": "alignment/primary/sharks/GCF_010909765.2.2bit",
+    "fa": "alignment/primary/sharks/GCF_010909765.2.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/sharks/GCF_010909765.2.repeatModeler.families.fa.gz"
+  },
+  "GCF_017639515.1": {
+    "2bit": "alignment/primary/sharks/GCF_017639515.1.2bit",
+    "fa": "alignment/primary/sharks/GCF_017639515.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/sharks/GCF_017639515.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_020745735.1": {
+    "2bit": "alignment/primary/sharks/GCF_020745735.1.2bit",
+    "fa": "alignment/primary/sharks/GCF_020745735.1.fa.gz"
+  },
+  "GCF_030028105.1": {
+    "2bit": "alignment/primary/sharks/GCF_030028105.1.2bit",
+    "fa": "alignment/primary/sharks/GCF_030028105.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/sharks/GCF_030028105.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_030144855.1": {
+    "2bit": "alignment/primary/sharks/GCF_030144855.1.2bit",
+    "fa": "alignment/primary/sharks/GCF_030144855.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/sharks/GCF_030144855.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_030684315.1": {
+    "2bit": "alignment/primary/sharks/GCF_030684315.1.2bit",
+    "fa": "alignment/primary/sharks/GCF_030684315.1.fa.gz"
+  },
+  "GCF_035084215.1": {
+    "2bit": "alignment/primary/sharks/GCF_035084215.1.2bit",
+    "fa": "alignment/primary/sharks/GCF_035084215.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/sharks/GCF_035084215.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_036365525.1": {
+    "2bit": "alignment/primary/sharks/GCF_036365525.1.2bit",
+    "fa": "alignment/primary/sharks/GCF_036365525.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/sharks/GCF_036365525.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_036971445.1": {
+    "2bit": "alignment/primary/sharks/GCF_036971445.1.2bit",
+    "fa": "alignment/primary/sharks/GCF_036971445.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/sharks/GCF_036971445.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_044704955.1": {
+    "2bit": "alignment/primary/sharks/GCF_044704955.1.2bit",
+    "fa": "alignment/primary/sharks/GCF_044704955.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/sharks/GCF_044704955.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_902713615.1": {
+    "2bit": "alignment/primary/sharks/GCF_902713615.1.2bit",
+    "fa": "alignment/primary/sharks/GCF_902713615.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/primary/sharks/GCF_902713615.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_008822105.2": {
+    "2bit": "alignment/secondary/birds/GCF_008822105.2.2bit",
+    "fa": "alignment/secondary/birds/GCF_008822105.2.fa.gz",
+    "repeatModeler.families.fa": "alignment/secondary/birds/GCF_008822105.2.repeatModeler.families.fa.gz"
+  },
+  "GCF_015476345.1": {
+    "2bit": "alignment/secondary/birds/GCF_015476345.1.2bit",
+    "fa": "alignment/secondary/birds/GCF_015476345.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/secondary/birds/GCF_015476345.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_016699485.2": {
+    "2bit": "alignment/secondary/birds/GCF_016699485.2.2bit",
+    "fa": "alignment/secondary/birds/GCF_016699485.2.fa.gz",
+    "repeatModeler.families.fa": "alignment/secondary/birds/GCF_016699485.2.repeatModeler.families.fa.gz"
+  },
+  "GCF_010993605.1": {
+    "2bit": "alignment/secondary/otherChordates/GCF_010993605.1.2bit",
+    "fa": "alignment/secondary/otherChordates/GCF_010993605.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/secondary/otherChordates/GCF_010993605.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_040869285.1": {
+    "2bit": "alignment/secondary/otherChordates/GCF_040869285.1.2bit",
+    "fa": "alignment/secondary/otherChordates/GCF_040869285.1.fa.gz",
+    "repeatModeler.families.fa": "alignment/secondary/otherChordates/GCF_040869285.1.repeatModeler.families.fa.gz"
+  },
+  "GCF_000001405.40": {
+    "2bit": "alignment/secondary/primates/GCF_000001405.40.2bit",
+    "fa": "alignment/secondary/primates/GCF_000001405.40.fa.gz"
+  }
+}
