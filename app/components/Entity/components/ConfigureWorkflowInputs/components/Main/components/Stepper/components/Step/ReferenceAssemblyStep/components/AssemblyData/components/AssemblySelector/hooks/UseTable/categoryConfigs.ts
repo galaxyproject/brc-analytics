@@ -33,6 +33,10 @@ export const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
     key: "level",
     label: "Level",
   },
+  LINEAGE_TAXONOMY_IDS: {
+    key: "lineageTaxonomyIds",
+    label: "Lineage Taxonomy Ids",
+  },
   PLOIDY: {
     key: "ploidy",
     label: "Ploidy",

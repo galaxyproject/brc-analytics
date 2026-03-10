@@ -18,7 +18,7 @@ import { Workflow } from "../../../../../../../../../../../../../../../../../api
 import { getEntities } from "../../../../../../../../../../../../../../../../../services/workflows/query";
 import { CATEGORY_GROUPS } from "./categoryGroups";
 import { columns } from "./columnDef";
-import { SORTING } from "./constants";
+import { COLUMN_VISIBILITY, SORTING } from "./constants";
 import { Assembly, UseTable } from "./types";
 import { getInitialColumnFilters, renderSummary } from "./utils";
 
@@ -34,6 +34,7 @@ export const useTable = (workflow: Workflow): UseTable => {
 
   const initialState: InitialTableState = {
     columnFilters,
+    columnVisibility: COLUMN_VISIBILITY,
     sorting: SORTING,
   };
 
