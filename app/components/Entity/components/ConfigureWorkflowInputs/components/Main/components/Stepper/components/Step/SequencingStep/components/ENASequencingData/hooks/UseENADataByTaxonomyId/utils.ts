@@ -9,7 +9,7 @@ import taxonomyReadCounts from "./taxonomy_read_counts.json";
  * @returns True if ENA data by taxonomy ID should be pre-fetched.
  */
 export function isEligible(
-  taxonomyId: string,
+  taxonomyId: string | undefined,
   maxReadRuns: number = 2000
 ): boolean {
   if (!taxonomyId) return false;

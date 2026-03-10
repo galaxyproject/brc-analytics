@@ -30,7 +30,7 @@ export const RelatedTracksStep = ({
   onEdit,
   stepKey,
 }: StepProps): JSX.Element => {
-  const ucscTracks = useUCSCTracks(genome.accession);
+  const ucscTracks = useUCSCTracks(genome?.accession);
   const table = useTable(ucscTracks);
   const { onChange, value } = useToggleButtonGroup(VIEW.UCSC_GENOME_BROWSER);
   return (
