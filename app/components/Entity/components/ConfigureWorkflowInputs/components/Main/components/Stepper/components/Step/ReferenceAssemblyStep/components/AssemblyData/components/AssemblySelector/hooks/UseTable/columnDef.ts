@@ -101,6 +101,14 @@ const LEVEL: ColumnDef<Assembly> = {
   meta: { width: { max: "0.5fr", min: "142px" } },
 };
 
+const LINEAGE_TAXONOMY_IDS: ColumnDef<Assembly> = {
+  accessorKey: CATEGORY_CONFIGS.LINEAGE_TAXONOMY_IDS.key,
+  filterFn: SELECT_FILTER_FN,
+  header: CATEGORY_CONFIGS.LINEAGE_TAXONOMY_IDS.label,
+  id: CATEGORY_CONFIGS.LINEAGE_TAXONOMY_IDS.key,
+  meta: { width: { max: "0.5fr", min: "120px" } },
+};
+
 const PLOIDY: ColumnDef<Assembly> = {
   accessorKey: CATEGORY_CONFIGS.PLOIDY.key,
   cell: renderPloidy,
@@ -196,4 +204,5 @@ export const columns: ColumnDef<Assembly>[] = [
   COVERAGE,
   GC_PERCENT,
   ANNOTATION_STATUS,
+  LINEAGE_TAXONOMY_IDS,
 ];
