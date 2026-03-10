@@ -1,11 +1,9 @@
-import { JSX } from "react";
 import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
 import { ParsedUrlQuery } from "querystring";
-import workflowCategories from "../../../../catalog/output/workflows.json";
+import { JSX } from "react";
 import { formatTrsId } from "../../../../app/components/Entity/components/AnalysisMethodsCatalog/utils";
 import { WorkflowView } from "../../../../app/views/WorkflowView/workflowView";
-import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
-import Error from "next/error";
+import workflowCategories from "../../../../catalog/output/workflows.json";
 
 interface Params extends ParsedUrlQuery {
   trsId: string;
@@ -47,11 +45,6 @@ export const getStaticProps: GetStaticProps<Props> = async ({
  * @returns Workflow view component.
  */
 const Page = (props: Props): JSX.Element => {
-  const isWorkflowsEnabled = useFeatureFlag("workflows");
-
-  // Throw an error if the workflows feature is not enabled.
-  if (!isWorkflowsEnabled) return <Error statusCode={404} />;
-
   return <WorkflowView {...props} />;
 };
 
