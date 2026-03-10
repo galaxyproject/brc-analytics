@@ -7,6 +7,7 @@ export interface GA2AssemblyEntity {
   annotationStatus: string | null;
   chromosomes: number | null;
   coverage: string | null;
+  galaxyDatacacheUrl: string | null;
   gcPercent: number | null;
   geneModelUrl: string | null;
   image: ImageData;

@@ -55,6 +55,7 @@ export async function buildAssemblies(
       chromosomes: parseNumberOrNull(row.chromosomeCount),
       commonName: parseStringOrNull(row.commonName),
       coverage: parseStringOrNull(row.coverage),
+      galaxyDatacacheUrl: parseStringOrNull(row.galaxyDatacacheUrl),
       gcPercent: parseNumberOrNull(row.gcPercent),
       geneModelUrl: parseStringOrNull(row.geneModelUrl),
       isRef: parseBoolean(row.isRef),

@@ -1138,6 +1138,7 @@ def make_qc_report(
     inconsistent_taxonomy_ids,
     missing_ucsc_assemblies,
     missing_gene_model_urls=None,
+    missing_datacache_urls=None,
     missing_ploidy_assemblies=None,
     missing_outbreak_descendants=None,
     tree_checks=None,
@@ -1156,6 +1157,11 @@ def make_qc_report(
         list(missing_gene_model_urls)
         if missing_gene_model_urls is not None and len(missing_gene_model_urls) > 0
         else None
+    )
+    datacache_urls_items = (
+        list(missing_datacache_urls)
+        if missing_datacache_urls is not None and len(missing_datacache_urls) > 0
+        else []
     )
     taxonomy_ids_items = (
         [f"{taxon}: {ids}" for taxon, ids in inconsistent_taxonomy_ids]
@@ -1236,6 +1242,9 @@ def make_qc_report(
         lines += format_list_section(
             "## Assemblies with gene model URLs not found", gene_model_urls_items
         )
+    lines += format_list_section(
+        "## Assemblies with datacache URLs not found", datacache_urls_items
+    )
     lines += format_list_section(
         "## Species and strain combinations with multiple taxonomy IDs",
         taxonomy_ids_items,
@@ -1330,6 +1339,67 @@ def save_taxonomy_mapping(taxonomy_ids, taxon_name_map, taxon_rank_map, output_p
         print(f"Wrote taxonomy mapping to {output_path}")
 
 
+def add_galaxy_datacache_url(genomes_df, base_url, batch_size=20, timeout=5):
+    """
+    Add Galaxy Datacache URLs to genomes dataframe after validating they exist.
+
+    Args:
+        genomes_df: DataFrame containing genome information with 'accession' column
+        base_url: Base URL used to construct the datacache link per accession
+        batch_size: Number of URLs to validate concurrently (default: 20)
+        timeout: Timeout in seconds for each request (default: 5)
+
+    Returns:
+        tuple: (updated genomes_df with galaxyDatacacheUrl column, list of missing accessions)
+    """
+    genomes_df = genomes_df.copy()
+
+    if not base_url:
+        genomes_df["galaxyDatacacheUrl"] = ""
+        return genomes_df, []
+
+    normalized_base_url = base_url if base_url.endswith("/") else f"{base_url}/"
+
+    print("Validating Galaxy Datacache URLs...")
+    missing_accessions = []
+    datacache_urls = []
+
+    total_genomes = len(genomes_df)
+    processed = 0
+
+    for i in range(0, total_genomes, batch_size):
+        batch_df = genomes_df.iloc[i : i + batch_size]
+
+        for _, row in batch_df.iterrows():
+            accession = row["accession"]
+            url = f"{normalized_base_url}{accession}/"
+
+            try:
+                response = requests.get(url, timeout=timeout)
+                if response.status_code == 200:
+                    datacache_urls.append(url)
+                else:
+                    datacache_urls.append("")
+                    missing_accessions.append(accession)
+            except (requests.RequestException, requests.Timeout) as e:
+                log.debug(f"Failed to validate datacache URL for {accession}: {e}")
+                datacache_urls.append("")
+                missing_accessions.append(accession)
+
+            processed += 1
+            print(f"Validated {processed} of {total_genomes} datacache URLs", end="\r")
+
+        time.sleep(0.1)
+
+    print(
+        f"\nValidated {total_genomes} datacache URLs, {len(missing_accessions)} not found"
+    )
+
+    genomes_df["galaxyDatacacheUrl"] = datacache_urls
+
+    return genomes_df, missing_accessions
+
+
 def build_files(
     assemblies_path,
     genomes_output_path,
@@ -1346,6 +1416,7 @@ def build_files(
     outbreak_taxonomy_mapping_path=None,
     organism_image_path=None,
     organism_image_source_information_path=None,
+    datacache_base_url=None,
 ):
     """
     Build catalog-related data files based on specified input data and data from services such as the NCBI API.
@@ -1534,6 +1605,18 @@ def build_files(
     else:
         genomes_df["geneModelUrl"] = ""
 
+    if datacache_base_url:
+        genomes_df, missing_datacache_urls = add_galaxy_datacache_url(
+            genomes_df, datacache_base_url
+        )
+        qc_report_params["missing_datacache_urls"] = missing_datacache_urls
+    else:
+        print(
+            "No Galaxy Datacache base URL provided; skipping datacache link generation."
+        )
+        genomes_df["galaxyDatacacheUrl"] = ""
+        qc_report_params["missing_datacache_urls"] = []
+
     # Find outdated accessions (where accession != currentAccession)
     if qc_report_path:
         qc_report_params["outdated_accessions"] = find_outdated_accessions(genomes_df)
@@ -1595,25 +1678,31 @@ def build_files(
             species_image_source_link
         )
 
-        # Map the image paths back to the organism_name
-        primarydata_df["organismImageUrl"] = primarydata_df["organism_name"].map(
-            species_image_paths
-        )
-        primarydata_df["organismThumbnailUrl"] = primarydata_df["organism_name"].map(
-            species_thumbnail_paths
-        )
-        primarydata_df["organismImageCredit"] = primarydata_df["organism_name"].map(
-            species_image_credit
-        )
-        primarydata_df["organismImageLicense"] = primarydata_df["organism_name"].map(
-            species_image_license
-        )
-        primarydata_df["organismImageSourceName"] = primarydata_df["organism_name"].map(
-            species_image_source
-        )
-        primarydata_df["organismImageSourceUrl"] = primarydata_df["organism_name"].map(
-            species_image_source_link
-        )
+        if extract_primary_data and primarydata_df is not None:
+            if "organism_name" in primarydata_df.columns:
+                # Map the image paths back to the organism_name
+                primarydata_df["organismImageUrl"] = primarydata_df[
+                    "organism_name"
+                ].map(species_image_paths)
+                primarydata_df["organismThumbnailUrl"] = primarydata_df[
+                    "organism_name"
+                ].map(species_thumbnail_paths)
+                primarydata_df["organismImageCredit"] = primarydata_df[
+                    "organism_name"
+                ].map(species_image_credit)
+                primarydata_df["organismImageLicense"] = primarydata_df[
+                    "organism_name"
+                ].map(species_image_license)
+                primarydata_df["organismImageSourceName"] = primarydata_df[
+                    "organism_name"
+                ].map(species_image_source)
+                primarydata_df["organismImageSourceUrl"] = primarydata_df[
+                    "organism_name"
+                ].map(species_image_source_link)
+            else:
+                print(
+                    "Primary data frame missing 'organism_name' column; skipping image metadata enrichment."
+                )
 
     # Sort by accession for consistent output
     genomes_df = genomes_df.sort_values("accession")

@@ -7,6 +7,7 @@ export const CORE_SOURCE_GENOME_KEYS = [
   "chromosomeCount",
   "commonName",
   "coverage",
+  "galaxyDatacacheUrl",
   "gcPercent",
   "geneModelUrl",
   "isRef",
