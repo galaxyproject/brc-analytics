@@ -3,7 +3,7 @@ import {
   SORT_DIRECTION,
 } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
-import { getWorkflowId } from "../../../../../app/apis/catalog/brc-analytics-catalog/common/utils";
+import { getWorkflowId } from "../../../../../app/apis/catalog/ga2/utils";
 import { AppEntityConfig } from "../../../../common/entities";
 import { CATEGORY_CONFIG, CATEGORY_GROUP_CONFIG } from "./categoryGroupConfig";
 import { COLUMNS } from "./columns";
