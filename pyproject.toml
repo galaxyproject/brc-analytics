@@ -15,3 +15,19 @@ select = ["E", "F", "I", "B"]
 ignore = []
 fixable = ["ALL"]
 unfixable = []
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_ignores = true
+ignore_missing_imports = true
+exclude = [
+    "^backend/",  # backend has its own type checking setup
+    "venv/",
+]
+
+# Gradually enable stricter checks as we fix existing issues
+[[tool.mypy.overrides]]
+module = "catalog_build.*"
+check_untyped_defs = false  # TODO: enable once existing issues are fixed
+disable_error_code = ["union-attr", "dict-item", "assignment"]  # TODO: fix these
