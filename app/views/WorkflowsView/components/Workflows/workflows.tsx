@@ -1,10 +1,21 @@
+import { SearchOffIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/SearchOffIcon/searchOffIcon";
+import {
+  PRIORITY,
+  StatusIcon,
+} from "@databiosphere/findable-ui/lib/components/common/StatusIcon/statusIcon";
 import { FilterButton } from "@databiosphere/findable-ui/lib/components/Index/components/EntityView/components/controls/FilterButton/filterButton";
 import { Title } from "@databiosphere/findable-ui/lib/components/Index/components/EntityView/components/layout/Title/title";
 import { useLayoutSpacing } from "@databiosphere/findable-ui/lib/hooks/UseLayoutSpacing/hook";
-import React, { JSX } from "react";
+import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
+import { Typography } from "@mui/material";
+import { JSX } from "react";
 import { Card } from "./components/Card/card";
 import { Props } from "./types";
-import { StyledContainer, StyledStack } from "./workflows.styles";
+import {
+  StyledContainer,
+  StyledRoundedPaper,
+  StyledStack,
+} from "./workflows.styles";
 
 /**
  * Component rendering the workflow grid view.
@@ -22,9 +33,24 @@ export const Workflows = ({ table }: Props): JSX.Element => {
         <Title />
         <FilterButton />
       </StyledStack>
-      {rows.map((row, i) => (
-        <Card key={`${row.id}-${i}`} row={row} />
-      ))}
+      {rows.length === 0 ? (
+        <StyledRoundedPaper elevation={0}>
+          <StatusIcon priority={PRIORITY.LOW} StatusIcon={SearchOffIcon} />
+          <Typography
+            color={TYPOGRAPHY_PROPS.COLOR.INK_MAIN}
+            variant={TYPOGRAPHY_PROPS.VARIANT.BODY_LARGE_500}
+          >
+            No results found
+          </Typography>
+        </StyledRoundedPaper>
+      ) : (
+        rows.map((row) => (
+          <Card
+            key={`${row.original.category}-${row.original.workflowName}`}
+            row={row}
+          />
+        ))
+      )}
     </StyledContainer>
   );
 };
