@@ -1,4 +1,4 @@
-import { Row } from "@tanstack/react-table";
+import { Row, Table } from "@tanstack/react-table";
 import { ReadRun } from "../../../../types";
 
 /**
@@ -19,4 +19,16 @@ export function getRowSelectionValidation(
   row: Row<ReadRun>
 ): string | undefined {
   return row.original.validation.error;
+}
+
+/** Renders the summary row counts for the table.
+ * @param table - Table instance.
+ * @returns The summary row counts for the table.
+ */
+export function renderSummary(table: Table<ReadRun>): string {
+  const { getPreFilteredRowModel, getRowCount } = table;
+  const { rows } = getPreFilteredRowModel();
+  const rowCount = getRowCount();
+
+  return `${rowCount} matching run${rowCount === 1 ? "" : "s"} of ${rows.length}`;
 }

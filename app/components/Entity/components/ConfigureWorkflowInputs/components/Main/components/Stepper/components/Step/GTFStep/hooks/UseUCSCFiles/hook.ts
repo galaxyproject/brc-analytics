@@ -1,19 +1,15 @@
 import { useEffect, useState } from "react";
-import { parseUCSCFilesResult } from "./utils";
+import { getAssemblyId, parseUCSCFilesResult } from "./utils";
 import { UCSC_FILES_ENDPOINT } from "./constants";
 import { UseUCSCFiles } from "./types";
 import { Assembly } from "../../../../../../../../../../../../../views/WorkflowInputsView/types";
 
-const SPECIAL_CASE_ASSEMBLY_LOOKUP: Record<string, string> = {
-  "GCF_000001405.40": "hg38",
-} as const;
-
-export const useUCSCFiles = (genome: Assembly): UseUCSCFiles => {
-  const assemblyId =
-    SPECIAL_CASE_ASSEMBLY_LOOKUP[genome.accession] ?? genome.accession;
+export const useUCSCFiles = (genome?: Assembly): UseUCSCFiles => {
   const [geneModelUrls, setGeneModelUrls] = useState<string[] | undefined>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  const assemblyId = getAssemblyId(genome);
 
   useEffect(() => {
     if (!assemblyId) {
