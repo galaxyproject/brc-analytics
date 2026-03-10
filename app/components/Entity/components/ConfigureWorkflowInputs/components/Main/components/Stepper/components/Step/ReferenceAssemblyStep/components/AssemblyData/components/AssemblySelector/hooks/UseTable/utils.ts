@@ -63,5 +63,5 @@ export function renderSummary(table: Table<Assembly>): string {
   const { rows } = getPreFilteredRowModel();
   const rowCount = getRowCount();
 
-  return `${rowCount} matching assemblies of ${rows.length}`;
+  return `${rowCount} matching ${rowCount === 1 ? "assembly" : "assemblies"} of ${rows.length}`;
 }
