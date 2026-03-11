@@ -1,5 +1,6 @@
 export const ROUTES = {
   ABOUT: "/about",
+  ASSISTANT: "/assistant",
   CALENDAR: "/calendar",
   CONFIGURE_WORKFLOW: "/data/assemblies/{entityId}/{trsId}",
   GENOME: "/data/assemblies/{entityId}",
@@ -9,4 +10,6 @@ export const ROUTES = {
   PRIORITY_PATHOGEN: "/data/[entityListType]/[entityId]",
   PRIORITY_PATHOGENS: "/data/priority-pathogens",
   ROADMAP: "/roadmap",
+  WORKFLOW: "/data/workflows/{trsId}",
+  WORKFLOWS: "/data/workflows",
 };

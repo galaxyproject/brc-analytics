@@ -6,12 +6,12 @@ export const CAROUSEL_CARDS: Pick<CardProps, "text">[] = [
     text: MDX.EvolutionaryDynamicsOfCodingOverlapsInMeaslesVirus({}),
   },
   {
-    text: MDX.WebinarSeries({}),
+    text: MDX.GenomeArk2({}),
   },
   {
     text: MDX.Roadmap({}),
   },
   {
-    text: MDX.Webinar20250326({}),
+    text: MDX.WebinarSeries({}),
   },
 ];

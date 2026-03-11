@@ -3,12 +3,12 @@ import fsp from "fs/promises";
 import { MDXRemoteSerializeResult } from "next-mdx-remote";
 import { serialize } from "next-mdx-remote/serialize";
 import YAML from "yaml";
+import { Outbreak } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   OrganismPloidy,
   Organism as SourceOrganism,
   Organisms as SourceOrganisms,
 } from "../../schema/generated/schema";
-import { Outbreak } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 
 export async function getSourceOrganismsByTaxonomyId(
   sourceOrganismsPath: string
@@ -102,6 +102,12 @@ export async function readYamlFile<T>(filePath: string): Promise<T> {
   return YAML.parse(content);
 }
 
+// Note: next-mdx-remote's serialize unconditionally overrides `mdxOptions.development`
+// with `process.env.NODE_ENV !== 'production'`, ignoring any user-provided value.
+// To ensure MDX is compiled with the production JSX runtime (jsx instead of jsxDEV),
+// the build-brc-db script must be run with NODE_ENV=production.
+// See: https://github.com/hashicorp/next-mdx-remote/issues/495
+// Source: https://github.com/hashicorp/next-mdx-remote/blob/main/src/serialize.ts#L43
 export async function readMdxFile(
   filePath: string
 ): Promise<MDXRemoteSerializeResult> {

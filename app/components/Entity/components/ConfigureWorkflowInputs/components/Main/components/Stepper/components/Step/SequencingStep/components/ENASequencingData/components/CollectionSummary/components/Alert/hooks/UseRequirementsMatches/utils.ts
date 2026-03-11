@@ -60,7 +60,7 @@ function buildDataWarnings(
 export function buildRequirementWarnings(
   initialColumnFilters: ColumnFiltersState,
   rows: Row<ReadRun>[],
-  genome: Assembly
+  genome?: Assembly
 ): string[] {
   if (rows.length === 0) return [];
   const speciesWarnings = buildSpeciesWarnings(rows, genome);
@@ -76,8 +76,10 @@ export function buildRequirementWarnings(
  */
 function buildSpeciesWarnings(
   rows: Row<ReadRun>[],
-  genome: Assembly
+  genome?: Assembly
 ): string[] {
+  if (!genome) return [];
+
   const { ncbiTaxonomyId, taxonomicLevelSpecies } = genome;
 
   // Build a set of unmatched values.

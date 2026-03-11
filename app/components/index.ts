@@ -33,6 +33,7 @@ export { AnalysisMethod } from "./Entity/components/AnalysisMethod/analysisMetho
 export { AnalysisMethodsCatalog } from "./Entity/components/AnalysisMethodsCatalog/analysisMethodsCatalog";
 export { AnalysisMethodsTitle } from "./Entity/components/AnalysisMethodsTitle/analysisMethodsTitle";
 export { AnalysisPortals } from "./Entity/components/AnalysisPortals/analysisPortals";
+export { AuthButton } from "./Layout/components/Header/components/AuthButton/authButton";
 export { GridPaperSection } from "./Layout/components/Detail/components/Section/section.styles";
 export {
   Branding,

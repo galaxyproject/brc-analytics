@@ -1,19 +1,14 @@
-import { JSX } from "react";
-import { Fragment, useEffect } from "react";
-import { DataSelector } from "./components/DataSelector/dataSelector";
-import { CollectionSelector } from "./components/CollectionSelector/collectionSelector";
 import { useDialog } from "@databiosphere/findable-ui/lib/components/common/Dialog/hooks/useDialog";
-import { Props } from "./types";
-import { CollectionSummary } from "./components/CollectionSummary/collectionSummary";
+import { RowSelectionState } from "@tanstack/react-table";
+import { Fragment, JSX, useRef } from "react";
 import { AccessionSelector } from "./components/AccessionSelector/accessionSelector";
-import {
-  getSequencingData,
-  clearSequencingData,
-  getRowSelectionState,
-} from "./utils";
+import { CollectionSelector } from "./components/CollectionSelector/collectionSelector";
+import { CollectionSummary } from "./components/CollectionSummary/collectionSummary";
+import { DataSelector } from "./components/DataSelector/dataSelector";
+import { Props } from "./types";
+import { clearSequencingData } from "./utils";
 
 export const ENASequencingData = ({
-  configuredInput,
   enaAccessionActions,
   enaAccessionStatus,
   enaTaxonomyId,
@@ -27,16 +22,11 @@ export const ENASequencingData = ({
 }: Props): JSX.Element => {
   const accessionDialog = useDialog();
   const collectionDialog = useDialog();
-
-  useEffect(() => {
-    onConfigure(getSequencingData(table));
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- Intended behavior to only run on mount.
-  }, []);
-
+  const rowSelectionRef = useRef<RowSelectionState>({});
   return (
     <Fragment>
       <DataSelector
-        enaTaxonomyIdStatus={enaTaxonomyId.status}
+        enaTaxonomyId={enaTaxonomyId}
         onContinue={collectionDialog.onOpen}
         onOpen={accessionDialog.onOpen}
         selectedCount={selectedCount}
@@ -54,14 +44,16 @@ export const ENASequencingData = ({
         switchBrowseMethod={switchBrowseMethod}
       />
       <CollectionSelector
-        configuredInput={configuredInput}
         onCancel={() => {
-          // Restore previous selection.
-          table.setRowSelection(getRowSelectionState(configuredInput));
+          // Revert to previous row selection and close dialog.
+          table.setRowSelection(rowSelectionRef.current);
           collectionDialog.onClose();
         }}
         onClose={collectionDialog.onClose}
-        onConfigure={onConfigure}
+        onTransitionEnter={() => {
+          // Store the current row selection so we can revert to it if the user cancels out of the dialog.
+          rowSelectionRef.current = table.getState().rowSelection;
+        }}
         onTransitionExited={() => {
           if (selectedCount) return;
           switchBrowseMethod();

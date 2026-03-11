@@ -19,6 +19,8 @@ import { APP_KEYS } from "../../common/constants";
 import data from "catalog/output/ncbi-taxa-tree.json";
 import { TaxonomyNode } from "../../../app/components/Home/components/Section/components/SectionViz/data";
 import { THEME_OPTIONS } from "./theme/constants";
+import { workflowEntityConfig } from "./index/workflowEntityConfig";
+import { WorkflowEntity } from "./index/workflow/types";
 
 const LOCALHOST = "http://localhost:3000";
 const APP_TITLE = "BRC Analytics";
@@ -30,6 +32,7 @@ const GIT_HUB_REPO_URL = "https://github.com/galaxyproject/brc-analytics";
  * @param browserUrl - Browser URL.
  * @param gitHubUrl - GitHub URL.
  * @param taxTreeData - Taxonomy tree data.
+ * @param loginEnabled - Whether to show the login button.
  * @remarks
  * The `genomeEntityConfig` is typecast to `EntityConfig<BRCDataCatalogGenome>`
  * because the `SiteConfig` interface from the `@databiosphere/findable-ui` package expects
@@ -44,7 +47,8 @@ const GIT_HUB_REPO_URL = "https://github.com/galaxyproject/brc-analytics";
 export function makeConfig(
   browserUrl: string,
   gitHubUrl = GIT_HUB_REPO_URL,
-  taxTreeData = data as TaxonomyNode
+  taxTreeData = data as TaxonomyNode,
+  loginEnabled = false
 ): AppSiteConfig {
   return {
     appKey: APP_KEYS.BRC_ANALYTICS,
@@ -57,6 +61,7 @@ export function makeConfig(
       organismEntityConfig as EntityConfig<BRCDataCatalogOrganism>,
       genomeEntityConfig as EntityConfig<BRCDataCatalogGenome>,
       priorityPathogensEntityConfig as EntityConfig<Outbreak>,
+      workflowEntityConfig as EntityConfig<WorkflowEntity>,
     ],
     filterSort: { sortBy: FILTER_SORT.ALPHA },
     gitHubUrl,
@@ -65,6 +70,11 @@ export function makeConfig(
       footer: {
         Branding: C.Branding(),
         navLinks: [
+          {
+            label: "GenomeArk2",
+            target: ANCHOR_TARGET.BLANK,
+            url: "https://genomeark2.org/",
+          },
           {
             label: "BV-BRC",
             target: ANCHOR_TARGET.BLANK,
@@ -80,6 +90,7 @@ export function makeConfig(
         versionInfo: createElement(C.VersionInfoWithServerStatus),
       },
       header: {
+        actions: loginEnabled ? createElement(C.AuthButton) : undefined,
         logo: C.Logo({
           alt: APP_TITLE,
           height: 26,
@@ -93,7 +104,9 @@ export function makeConfig(
             { label: "Learn", url: ROUTES.LEARN },
             { label: "Organisms", url: ROUTES.ORGANISMS },
             { label: "Assemblies", url: ROUTES.GENOMES },
+            { label: "Workflows", url: ROUTES.WORKFLOWS },
             { label: "Priority Pathogens", url: ROUTES.PRIORITY_PATHOGENS },
+            { label: "Assistant", url: ROUTES.ASSISTANT },
             {
               flatten: { lg: true, md: true, sm: false, xs: true },
               label: "More",
@@ -114,6 +127,7 @@ export function makeConfig(
         socialMedia: socialMedia,
       },
     },
+    loginEnabled,
     maxReadRunsForBrowseAll: 60000,
     redirectRootToPath: "/",
     taxTree: taxTreeData,
@@ -121,6 +135,11 @@ export function makeConfig(
   };
 }
 
-const config: AppSiteConfig = makeConfig(BROWSER_URL);
+const config: AppSiteConfig = makeConfig(
+  BROWSER_URL,
+  GIT_HUB_REPO_URL,
+  data as TaxonomyNode,
+  true
+);
 
 export default config;

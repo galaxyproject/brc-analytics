@@ -1,16 +1,13 @@
-import { ReadRun } from "../../types";
-import {
-  ConfiguredInput,
-  OnConfigure,
-} from "../../../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { Table } from "@tanstack/react-table";
 import { DialogProps } from "@mui/material";
+import { Table } from "@tanstack/react-table";
+import { ReadRun } from "../../types";
 
-export interface Props extends Pick<DialogProps, "onTransitionExited"> {
-  configuredInput: ConfiguredInput;
+export interface Props extends Pick<
+  DialogProps,
+  "onTransitionEnter" | "onTransitionExited"
+> {
   onCancel: () => void;
   onClose: () => void;
-  onConfigure: OnConfigure;
   open: boolean;
   table: Table<ReadRun>;
 }
