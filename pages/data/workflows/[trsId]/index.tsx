@@ -2,10 +2,8 @@ import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
 import { formatTrsId } from "../../../../app/components/Entity/components/AnalysisMethodsCatalog/utils";
-import { config } from "../../../../app/config/config";
 import { WorkflowView } from "../../../../app/views/WorkflowView/workflowView";
 import workflowCategories from "../../../../catalog/output/workflows.json";
-import { APP_KEYS } from "../../../../site-config/common/constants";
 
 interface Params extends ParsedUrlQuery {
   trsId: string;
@@ -34,8 +32,6 @@ export const getStaticPaths: GetStaticPaths<Params> = async () => {
 export const getStaticProps: GetStaticProps<Props> = async ({
   params,
 }: GetStaticPropsContext) => {
-  if (config().appKey === APP_KEYS.GA2) return { notFound: true };
-
   const { trsId } = params as Params;
 
   if (!trsId) return { notFound: true };
