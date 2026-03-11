@@ -67,6 +67,22 @@ class TestSearchOrganisms:
         assert results == []
 
 
+class TestCondensation:
+    def test_search_organisms_strips_internal_fields(self, catalog):
+        """Condensed organism records should not leak raw catalog fields."""
+        results = catalog.search_organisms("Plasmodium", limit=1)
+        assert len(results) == 1
+        org = results[0]
+        # These are internal catalog fields that _condense_organism should strip
+        for field in ("genomes", "lineageTaxonomyIds", "taxonomicLevelSpecies"):
+            assert field not in org, (
+                f"internal field '{field}' leaked into condensed result"
+            )
+        # Condensed keys should be present
+        assert "species" in org
+        assert "ncbiTaxonomyId" in org
+
+
 class TestGetOrganism:
     def test_get_existing_organism(self, catalog):
         org = catalog.get_organism_by_taxonomy_id("5833")
@@ -191,6 +207,14 @@ class TestGetCompatibleWorkflows:
         results = catalog.get_compatible_workflows(["HAPLOID"], taxonomy_id="562")
         amr = [r for r in results if r["iwcId"] == "amr_gene_detection-main"]
         assert len(amr) == 1
+
+    def test_taxonomy_id_not_in_lineage(self, catalog):
+        # Use a taxonomy ID that exists in the catalog but has no lineage
+        # overlap with Bacteria-targeted workflows. Saccharomyces (4932)
+        # is a fungus — AMR workflow (targets Bacteria=2) should NOT appear.
+        results = catalog.get_compatible_workflows(["HAPLOID"], taxonomy_id="4932")
+        amr = [r for r in results if r["iwcId"] == "amr_gene_detection-main"]
+        assert len(amr) == 0
 
 
 class TestResolveWorkflowInputs:
