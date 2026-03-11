@@ -69,10 +69,6 @@
   },
   {
     "compatibleAssemblyCount": 0,
-    "workflowTrsId": "#workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main/versions/v0.2"
-  },
-  {
-    "compatibleAssemblyCount": 0,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/pox-virus-amplicon/main/versions/v0.4"
   },
   {

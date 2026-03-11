@@ -10,17 +10,11 @@ mkdir -p "$API_DIR"
 PER_APP_JSONS=("assemblies" "workflow-assembly-mappings")
 
 rm -f "$API_DIR"/*.json
-rm -f "$API_DIR"/*.d.ts
 
 for name in "${PER_APP_JSONS[@]}"; do
   src="$SRC_ROOT/${name}.json"
   dst="$API_DIR/${name}.json"
   cp "$src" "$dst"
-  
-  # Copy type declaration file if it exists
-  if [ -f "$SRC_ROOT/${name}.json.d.ts" ]; then
-    cp "$SRC_ROOT/${name}.json.d.ts" "$API_DIR/${name}.json.d.ts"
-  fi
 done
 
 cp "catalog/output/workflows.json" "$API_DIR/workflows.json"
