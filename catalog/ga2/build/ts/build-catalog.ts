@@ -65,7 +65,10 @@ async function buildCatalog(): Promise<void> {
   // Compute and save workflow-assembly mappings (using shared utility)
   const mappings = buildWorkflowAssemblyMappings(workflowCategories, genomes);
   console.log("Workflow-Assembly Mappings:", mappings.length);
-  await saveJson("catalog/ga2/output/workflow-assembly-mappings.json", mappings);
+  await saveJson(
+    "catalog/ga2/output/workflow-assembly-mappings.json",
+    mappings
+  );
 
   // Generate workflow mappings QC report (pass "GA2" as site name)
   const qcReport = generateWorkflowMappingsQC(
@@ -73,7 +76,10 @@ async function buildCatalog(): Promise<void> {
     workflowCategories,
     "GA2"
   );
-  await fsp.writeFile("catalog/ga2/output/qc-report.workflow-mappings.md", qcReport);
+  await fsp.writeFile(
+    "catalog/ga2/output/qc-report.workflow-mappings.md",
+    qcReport
+  );
 
   console.log("Done");
 }

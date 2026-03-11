@@ -65,7 +65,9 @@ export function buildWorkflowAssemblyMappings<
 
   for (const workflow of workflows) {
     const compatibleAssemblyAccessions = assemblies
-      .filter((assembly) => workflowIsCompatibleWithAssembly(workflow, assembly))
+      .filter((assembly) =>
+        workflowIsCompatibleWithAssembly(workflow, assembly)
+      )
       .map((assembly) => assembly.accession);
 
     mappings.push({
@@ -84,12 +86,12 @@ export function generateWorkflowMappingsQC(
   siteName: string
 ): string {
   const workflows = workflowCategories.flatMap((cat) => cat.workflows);
-  
+
   // Create a lookup map for quick access
   const mappingsByTrsId = new Map(
     mappings.map((m) => [m.workflowTrsId, m.compatibleAssemblyAccessions])
   );
-  
+
   const workflowsWithNoAssemblies = workflows.filter(
     (wf) => (mappingsByTrsId.get(wf.trsId)?.length ?? 0) === 0
   );

@@ -41,7 +41,10 @@ async function buildCatalog(): Promise<void> {
 
     // Generate workflow mappings QC report (pass "BRC" as site name)
     const qcReport = generateWorkflowMappingsQC(mappings, workflows, "BRC");
-    await fsp.writeFile("catalog/output/qc-report.workflow-mappings.md", qcReport);
+    await fsp.writeFile(
+      "catalog/output/qc-report.workflow-mappings.md",
+      qcReport
+    );
   } catch (error) {
     console.error("Build failed:", error);
     process.exit(1);
