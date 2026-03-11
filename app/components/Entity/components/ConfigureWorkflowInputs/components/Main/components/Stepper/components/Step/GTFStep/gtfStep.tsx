@@ -1,4 +1,6 @@
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
+import { RadioCheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioCheckedIcon/radioCheckedIcon";
+import { RadioUncheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioUncheckedIcon/radioUncheckedIcon";
 import {
   Loading,
   LOADING_PANEL_STYLE,
@@ -8,6 +10,7 @@ import { Icon } from "@databiosphere/findable-ui/lib/components/Stepper/componen
 import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Optional/optional";
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
+import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import {
   Button,
@@ -88,7 +91,21 @@ export const GTFStep = ({
             <RadioGroup onChange={onChange} value={value}>
               {controls.map(({ label, value }, i) => (
                 <FormControlLabel
-                  control={<Radio />}
+                  control={
+                    <Radio
+                      checkedIcon={
+                        <RadioCheckedIcon
+                          fontSize={SVG_ICON_PROPS.FONT_SIZE.XSMALL}
+                        />
+                      }
+                      icon={
+                        <RadioUncheckedIcon
+                          fontSize={SVG_ICON_PROPS.FONT_SIZE.XSMALL}
+                        />
+                      }
+                      size="small"
+                    />
+                  }
                   key={i}
                   onChange={() => onConfigure({ [STEP.key]: value })}
                   label={label}
