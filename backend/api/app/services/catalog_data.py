@@ -68,6 +68,14 @@ class CatalogData:
             # Build lineage index: maps each taxonomy ID to the full set of
             # IDs in its lineage, merging across assemblies so ancestor
             # lookups work (e.g. "is 2 (Bacteria) an ancestor of 562 (E. coli)?")
+            #
+            # Note: the first taxonomy ID that creates a set becomes the
+            # canonical object; later IDs in the same lineage point to it
+            # via aliasing (no copy). When a *different* assembly's lineage
+            # partially overlaps, its new IDs are merged into whatever set
+            # already exists for the overlapping ID. This is correct because
+            # we only need "is X an ancestor of Y?" — i.e. membership tests
+            # on the set for Y — and merging strictly grows each set.
             lineage = asm.get("lineageTaxonomyIds", [])
             if lineage:
                 lineage_set = {str(t) for t in lineage}
