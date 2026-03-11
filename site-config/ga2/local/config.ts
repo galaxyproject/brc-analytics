@@ -13,8 +13,6 @@ import { AppSiteConfig } from "../../common/entities";
 import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genome/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organism/organismEntityConfig";
-import { WorkflowEntity } from "./index/workflow/types";
-import { workflowEntityConfig } from "./index/workflow/workflowEntityConfig";
 import { socialMedia } from "./socialMedia";
 import { THEME_OPTIONS } from "./theme/constants";
 
@@ -61,7 +59,6 @@ export function makeConfig(
     entities: [
       organismEntityConfig as EntityConfig<GA2OrganismEntity>,
       genomeEntityConfig as EntityConfig<GA2AssemblyEntity>,
-      workflowEntityConfig as EntityConfig<WorkflowEntity>,
     ],
     gitHubUrl,
     layout: {
@@ -91,7 +88,6 @@ export function makeConfig(
             { label: "About", url: ROUTES.ABOUT },
             { label: "Organisms", url: ROUTES.ORGANISMS },
             { label: "Assemblies", url: ROUTES.GENOMES },
-            { label: "Workflows", url: ROUTES.WORKFLOWS },
             { label: "Roadmap", url: ROUTES.ROADMAP },
           ],
           undefined,
