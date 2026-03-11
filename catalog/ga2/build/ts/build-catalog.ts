@@ -1,3 +1,4 @@
+import fsp from "fs/promises";
 import {
   getAssemblyId,
   getOrganismId,
@@ -23,6 +24,11 @@ import {
   saveJson,
   verifyUniqueIds,
 } from "../../../build/ts/utils";
+import {
+  buildWorkflowAssemblyMappings,
+  generateWorkflowMappingsQC,
+} from "../../../build/ts/build-workflow-mappings";
+import { WorkflowCategory } from "../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { SOURCE_GENOME_KEYS, SOURCE_RAWDATA_KEYS } from "./constants";
 import { SourceGenome, SourceRawData } from "./entities";
 
@@ -46,6 +52,28 @@ async function buildCatalog(): Promise<void> {
 
   console.log("Organisms:", organisms.length);
   await saveJson("catalog/ga2/output/organisms.json", organisms);
+
+  // Read workflows JSON at runtime to avoid E2BIG error
+  const workflowCategoriesJson = await fsp.readFile(
+    "catalog/output/workflows.json",
+    "utf8"
+  );
+  const workflowCategories: WorkflowCategory[] = JSON.parse(
+    workflowCategoriesJson
+  );
+
+  // Compute and save workflow-assembly mappings (using shared utility)
+  const mappings = buildWorkflowAssemblyMappings(workflowCategories, genomes);
+  console.log("Workflow-Assembly Mappings:", mappings.length);
+  await saveJson("catalog/ga2/output/workflow-assembly-mappings.json", mappings);
+
+  // Generate workflow mappings QC report (pass "GA2" as site name)
+  const qcReport = generateWorkflowMappingsQC(
+    mappings,
+    workflowCategories,
+    "GA2"
+  );
+  await fsp.writeFile("catalog/ga2/output/qc-report.workflow-mappings.md", qcReport);
 
   console.log("Done");
 }

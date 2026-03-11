@@ -1,6 +1,11 @@
+import fsp from "fs/promises";
 import { buildAssemblies } from "./build-assemblies";
 import { buildOrganisms } from "./build-organisms";
 import { buildOutbreaks } from "./build-outbreaks";
+import {
+  buildWorkflowAssemblyMappings,
+  generateWorkflowMappingsQC,
+} from "./build-workflow-mappings";
 import { buildWorkflows } from "./build-workflows";
 import { saveJson } from "./utils";
 
@@ -28,6 +33,15 @@ async function buildCatalog(): Promise<void> {
 
     console.log("Workflows:", workflows.length);
     await saveJson("catalog/output/workflows.json", workflows);
+
+    // Compute and save workflow-assembly mappings
+    const mappings = buildWorkflowAssemblyMappings(workflows, genomes);
+    console.log("Workflow-Assembly Mappings:", Object.keys(mappings).length);
+    await saveJson("catalog/output/workflow-assembly-mappings.json", mappings);
+
+    // Generate workflow mappings QC report (pass "BRC" as site name)
+    const qcReport = generateWorkflowMappingsQC(mappings, workflows, "BRC");
+    await fsp.writeFile("catalog/output/qc-report.workflow-mappings.md", qcReport);
   } catch (error) {
     console.error("Build failed:", error);
     process.exit(1);
