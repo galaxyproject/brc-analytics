@@ -10,6 +10,7 @@ mkdir -p "$API_DIR"
 PER_APP_JSONS=("assemblies" "workflows" "workflow-assembly-mappings")
 
 rm -f "$API_DIR"/*.json
+rm -f "$API_DIR"/*.d.ts
 
 for name in "${PER_APP_JSONS[@]}"; do
   src="$SRC_ROOT/${name}.json"

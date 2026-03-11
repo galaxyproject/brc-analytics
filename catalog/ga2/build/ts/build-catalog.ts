@@ -54,6 +54,9 @@ async function buildCatalog(): Promise<void> {
   await saveJson("catalog/ga2/output/organisms.json", organisms);
 
   // Read workflows JSON at runtime to avoid E2BIG error
+  // NOTE: This creates a build ordering dependency - BRC catalog must be built
+  // before GA2 catalog since GA2 reads catalog/output/workflows.json (a BRC artifact).
+  // Do not rearrange build steps without ensuring workflows.json exists first.
   const workflowCategoriesJson = await fsp.readFile(
     "catalog/output/workflows.json",
     "utf8"

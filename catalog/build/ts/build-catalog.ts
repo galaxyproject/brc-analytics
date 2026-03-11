@@ -36,7 +36,7 @@ async function buildCatalog(): Promise<void> {
 
     // Compute and save workflow-assembly mappings
     const mappings = buildWorkflowAssemblyMappings(workflows, genomes);
-    console.log("Workflow-Assembly Mappings:", Object.keys(mappings).length);
+    console.log("Workflow-Assembly Mappings:", mappings.length);
     await saveJson("catalog/output/workflow-assembly-mappings.json", mappings);
 
     // Generate workflow mappings QC report (pass "BRC" as site name)

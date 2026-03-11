@@ -140,6 +140,6 @@ export interface WorkflowParameter {
 }
 
 export interface WorkflowAssemblyMapping {
-  compatibleAssemblyAccessions: string[];
+  compatibleAssemblyCount: number;
   workflowTrsId: string;
 }

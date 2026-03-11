@@ -21,7 +21,7 @@ export function getWorkflows(
   const mappings = WORKFLOW_ASSEMBLY_MAPPINGS as WorkflowAssemblyMapping[];
   const workflowsWithAssemblies = new Set(
     mappings
-      .filter((m) => m.compatibleAssemblyAccessions.length > 0)
+      .filter((m) => m.compatibleAssemblyCount > 0)
       .map((m) => m.workflowTrsId)
   );
 

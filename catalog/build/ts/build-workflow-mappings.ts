@@ -1,5 +1,4 @@
 import {
-  Workflow,
   WorkflowAssemblyMapping,
   WorkflowCategory,
 } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
@@ -15,7 +14,18 @@ type AssemblyForCompatibility = {
   ploidy: ORGANISM_PLOIDY[];
 };
 
-// Port from app/apis/catalog/brc-analytics-catalog/common/utils.ts:42-56
+/**
+ * NOTE: The compatibility functions below are intentionally duplicated from:
+ * - app/apis/catalog/brc-analytics-catalog/common/utils.ts (workflowPloidyMatchesOrganismPloidy)
+ * - app/components/Entity/components/AnalysisMethodsCatalog/utils.ts (workflowIsCompatibleWithAssembly)
+ *
+ * They cannot be imported directly because this build script uses generics to work with both
+ * BRC and GA2 assembly types, while the app functions have concrete type signatures.
+ * If you modify the compatibility logic, update BOTH locations to keep them in sync.
+ * Consider creating a shared utility module to avoid duplication.
+ */
+
+// Helper function to check ploidy compatibility
 function workflowPloidyMatchesOrganismPloidy(
   workflowPloidy: WORKFLOW_PLOIDY,
   organismPloidy: ORGANISM_PLOIDY
@@ -29,29 +39,28 @@ function workflowPloidyMatchesOrganismPloidy(
       return organismPloidy === ORGANISM_PLOIDY.HAPLOID;
     case WORKFLOW_PLOIDY.POLYPLOID:
       return organismPloidy === ORGANISM_PLOIDY.POLYPLOID;
+    default:
+      return false;
   }
 }
 
-// Port from app/components/Entity/components/AnalysisMethodsCatalog/utils.ts:88-101
-// Generic version that works with both BRC and GA2 assemblies
+// Helper function to check workflow-assembly compatibility
 function workflowIsCompatibleWithAssembly<T extends AssemblyForCompatibility>(
-  workflow: Workflow,
+  workflow: { ploidy: WORKFLOW_PLOIDY; taxonomyId: string | null },
   assembly: T
 ): boolean {
-  // Check taxonomy compatibility
   if (
     workflow.taxonomyId !== null &&
     !assembly.lineageTaxonomyIds.includes(workflow.taxonomyId)
   ) {
     return false;
   }
-  // Check ploidy compatibility
   return assembly.ploidy.some((assemblyPloidy) =>
     workflowPloidyMatchesOrganismPloidy(workflow.ploidy, assemblyPloidy)
   );
 }
 
-// Generic mapping builder - works for both BRC and GA2
+// Generic workflow-assembly mapping builder - works for both BRC and GA2
 export function buildWorkflowAssemblyMappings<
   T extends AssemblyForCompatibility,
 >(
@@ -60,18 +69,21 @@ export function buildWorkflowAssemblyMappings<
 ): WorkflowAssemblyMapping[] {
   const mappings: WorkflowAssemblyMapping[] = [];
 
-  // Flatten workflows from all categories
-  const workflows = workflowCategories.flatMap((cat) => cat.workflows);
+  // Flatten workflows from all categories and deduplicate by trsId
+  // (workflows can appear in multiple categories)
+  const workflowsByTrsId = new Map(
+    workflowCategories
+      .flatMap((cat) => cat.workflows)
+      .map((workflow) => [workflow.trsId, workflow])
+  );
 
-  for (const workflow of workflows) {
-    const compatibleAssemblyAccessions = assemblies
-      .filter((assembly) =>
-        workflowIsCompatibleWithAssembly(workflow, assembly)
-      )
-      .map((assembly) => assembly.accession);
+  for (const workflow of workflowsByTrsId.values()) {
+    const compatibleAssemblyCount = assemblies.filter((assembly) =>
+      workflowIsCompatibleWithAssembly(workflow, assembly)
+    ).length;
 
     mappings.push({
-      compatibleAssemblyAccessions,
+      compatibleAssemblyCount,
       workflowTrsId: workflow.trsId,
     });
   }
@@ -89,11 +101,11 @@ export function generateWorkflowMappingsQC(
 
   // Create a lookup map for quick access
   const mappingsByTrsId = new Map(
-    mappings.map((m) => [m.workflowTrsId, m.compatibleAssemblyAccessions])
+    mappings.map((m) => [m.workflowTrsId, m.compatibleAssemblyCount])
   );
 
   const workflowsWithNoAssemblies = workflows.filter(
-    (wf) => (mappingsByTrsId.get(wf.trsId)?.length ?? 0) === 0
+    (wf) => (mappingsByTrsId.get(wf.trsId) ?? 0) === 0
   );
 
   const lines: string[] = [
@@ -123,7 +135,7 @@ export function generateWorkflowMappingsQC(
   );
 
   for (const wf of workflows) {
-    const count = mappingsByTrsId.get(wf.trsId)?.length ?? 0;
+    const count = mappingsByTrsId.get(wf.trsId) ?? 0;
     lines.push(`| ${wf.workflowName} | ${count} |`);
   }
 
