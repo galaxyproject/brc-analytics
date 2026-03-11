@@ -1,5 +1,5 @@
-import { UseRadioGroup } from "../hooks/UseRadioGroup/types";
 import { OnConfigure } from "../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { UseRadioGroup } from "../hooks/UseRadioGroup/types";
 import { STEP } from "./step";
 
 /**
@@ -14,7 +14,10 @@ export const configureGTFStep = (
   onValueChange: UseRadioGroup["onValueChange"]
 ): void => {
   // Gene model URLs are not yet loaded.
-  if (!geneModelUrls) return;
+  if (geneModelUrls === undefined) {
+    onConfigure({ [STEP.key]: undefined }); // Use undefined to indicate "not configured" state
+    return;
+  }
 
   // Gene model URLs are not available for this workflow.
   if (geneModelUrls.length === 0) {

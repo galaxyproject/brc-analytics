@@ -1,17 +1,17 @@
-import { JSX } from "react";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { getEntityConfig } from "@databiosphere/findable-ui/lib/config/utils";
 import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
 import { ParsedUrlQuery } from "querystring";
+import { JSX } from "react";
 import {
   BRCCatalog,
   EntitiesResponse,
 } from "../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
-import { config } from "../../../../app/config/config";
-import { seedDatabase } from "../../../../app/utils/seedDatabase";
-import { getEntities, getEntity } from "../../../../app/utils/entityUtils";
-import { EntityDetailView } from "../../../../app/views/EntityView/entityView";
 import { GA2Catalog } from "../../../../app/apis/catalog/ga2/entities";
+import { config } from "../../../../app/config/config";
+import { getEntities, getEntity } from "../../../../app/utils/entityUtils";
+import { seedDatabase } from "../../../../app/utils/seedDatabase";
+import { EntityDetailView } from "../../../../app/views/EntityView/entityView";
 
 interface StaticPath {
   params: PageUrl;
@@ -48,6 +48,9 @@ export const getStaticPaths: GetStaticPaths<PageUrl> = async () => {
 
   for (const entityConfig of entities) {
     const { route: entityListType } = entityConfig;
+
+    if (entityListType === "workflows") continue;
+
     await seedDatabase(entityListType, entityConfig);
     const entitiesResponse: EntitiesResponse<BRCCatalog | GA2Catalog> =
       await getEntities(entityConfig);

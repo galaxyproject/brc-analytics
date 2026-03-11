@@ -1,6 +1,8 @@
+import { WorkflowEntity } from "../../../../../site-config/brc-analytics/local/index/workflow/types";
+import { formatTrsId } from "../../../../components/Entity/components/AnalysisMethodsCatalog/utils";
 import { sanitizeEntityId } from "../../common/utils";
-import { BRCDataCatalogGenome, BRCDataCatalogOrganism } from "./entities";
 import { GA2AssemblyEntity, GA2OrganismEntity } from "../../ga2/entities";
+import { BRCDataCatalogGenome, BRCDataCatalogOrganism } from "./entities";
 import { ORGANISM_PLOIDY, WORKFLOW_PLOIDY } from "./schema-entities";
 
 export function getGenomeId(
@@ -31,6 +33,15 @@ export function getGenomeOrganismId(
   genome: BRCDataCatalogGenome | GA2AssemblyEntity
 ): string {
   return sanitizeEntityId(genome.speciesTaxonomyId);
+}
+
+/**
+ * Get the ID of the workflow entity.
+ * @param workflow - Workflow.
+ * @returns workflow ID.
+ */
+export function getWorkflowId(workflow: WorkflowEntity): string {
+  return formatTrsId(workflow.trsId);
 }
 
 /**

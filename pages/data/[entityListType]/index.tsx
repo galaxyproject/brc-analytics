@@ -1,20 +1,20 @@
-import { JSX } from "react";
 import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main.styles";
 import { getEntityConfig } from "@databiosphere/findable-ui/lib/config/utils";
 import { getEntityService } from "@databiosphere/findable-ui/lib/hooks/useEntityService";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
 import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
 import { ParsedUrlQuery } from "querystring";
+import { JSX } from "react";
 import {
   BRCCatalog,
   EntitiesResponse,
+  Outbreak,
 } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
+import { GA2Catalog } from "../../../app/apis/catalog/ga2/entities";
 import { config } from "../../../app/config/config";
 import { seedDatabase } from "../../../app/utils/seedDatabase";
 import { StyledExploreView } from "../../../app/views/ExploreView/exploreView.styles";
 import { PriorityPathogensView } from "../../../app/views/PriorityPathogensView/priorityPathogensView";
-import { Outbreak } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
-import { GA2Catalog } from "../../../app/apis/catalog/ga2/entities";
 
 interface PageUrl extends ParsedUrlQuery {
   entityListType: string;
@@ -59,11 +59,13 @@ const IndexPage = <R,>({
 export const getStaticPaths: GetStaticPaths = async () => {
   const appConfig = config();
   const entities = appConfig.entities;
-  const paths = entities.map((entity) => ({
-    params: {
-      entityListType: entity.route,
-    },
-  }));
+  const paths = entities
+    .filter((entity) => entity.route !== "workflows")
+    .map((entity) => ({
+      params: {
+        entityListType: entity.route,
+      },
+    }));
   return {
     fallback: false,
     paths,

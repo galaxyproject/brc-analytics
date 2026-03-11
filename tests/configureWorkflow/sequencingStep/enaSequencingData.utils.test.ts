@@ -1,6 +1,8 @@
+import { getRowSelectionState } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/CollectionSelector/hooks/UseRowSelection/utils";
+import { getSelectedRows } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/CollectionSelector/hooks/UseTable/utils";
+import type { ReadRun } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
 import {
   clearSequencingData,
-  getRowSelectionState,
   getSelectedCount,
   getSequencingData,
   getSequencingDataByType,
@@ -8,10 +10,8 @@ import {
   mapSequencingDataToConfiguredValue,
 } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/utils";
 import { SEQUENCING_DATA_TYPE } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/types";
-import type { ReadRun } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
-import type { Table } from "@tanstack/react-table";
-import type { ConfiguredInput } from "../../../app/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import type { EnaSequencingReads } from "../../../app/utils/galaxy-api/entities";
+import type { ConfiguredInput } from "../../../app/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 
 const CONFIGURED_INPUT: Record<string, EnaSequencingReads[]> = {
   PAIRED: [
@@ -74,6 +74,29 @@ describe("getRowSelectionState", () => {
   });
 });
 
+describe("getSelectedRows", () => {
+  test("returns empty array when no rows selected", () => {
+    expect(getSelectedRows([READ_RUNS.SINGLE, READ_RUNS.PAIRED], {})).toEqual(
+      []
+    );
+  });
+
+  test("returns matching rows for selected accessions", () => {
+    expect(
+      getSelectedRows([READ_RUNS.SINGLE, READ_RUNS.PAIRED], {
+        P1: true,
+        S1: true,
+      })
+    ).toEqual([READ_RUNS.SINGLE, READ_RUNS.PAIRED]);
+  });
+
+  test("returns only rows that are selected", () => {
+    expect(
+      getSelectedRows([READ_RUNS.SINGLE, READ_RUNS.PAIRED], { S1: true })
+    ).toEqual([READ_RUNS.SINGLE]);
+  });
+});
+
 describe("getSelectedCount", () => {
   test("sums lengths and handles null/undefined", () => {
     expect(
@@ -109,9 +132,10 @@ describe("mapSequencingDataToConfiguredValue", () => {
 
 describe("getSequencingDataByType", () => {
   test("groups selection by library_layout and maps values", () => {
-    const sequencingDataByType = getSequencingDataByType(
-      makeTable([READ_RUNS.SINGLE, READ_RUNS.PAIRED])
-    );
+    const sequencingDataByType = getSequencingDataByType([
+      READ_RUNS.SINGLE,
+      READ_RUNS.PAIRED,
+    ]);
     expect(
       sequencingDataByType.get(SEQUENCING_DATA_TYPE.READ_RUNS_SINGLE)
     ).toEqual(CONFIGURED_INPUT.SINGLE);
@@ -123,21 +147,19 @@ describe("getSequencingDataByType", () => {
 
 describe("getSequencingData", () => {
   test("returns partial configured input with arrays per layout", () => {
-    expect(
-      getSequencingData(makeTable([READ_RUNS.SINGLE, READ_RUNS.PAIRED]))
-    ).toEqual({
+    expect(getSequencingData([READ_RUNS.SINGLE, READ_RUNS.PAIRED])).toEqual({
       readRunsPaired: CONFIGURED_INPUT.PAIRED,
       readRunsSingle: CONFIGURED_INPUT.SINGLE,
     });
   });
 
   test("sets null for empty groups and when no selection", () => {
-    expect(getSequencingData(makeTable([READ_RUNS.SINGLE]))).toEqual({
+    expect(getSequencingData([READ_RUNS.SINGLE])).toEqual({
       readRunsPaired: null,
       readRunsSingle: CONFIGURED_INPUT.SINGLE,
     });
 
-    expect(getSequencingData(makeTable([]))).toEqual({
+    expect(getSequencingData([])).toEqual({
       readRunsPaired: null,
       readRunsSingle: null,
     });
@@ -166,16 +188,3 @@ describe("getUploadMyOwnSequencingData", () => {
     });
   });
 });
-
-/**
- * Creates a table with the given selected rows.
- * @param selected - Selected rows.
- * @returns Table.
- */
-function makeTable(selected: ReadRun[]): Table<ReadRun> {
-  return {
-    getSelectedRowModel: () => ({
-      rows: selected.map((original) => ({ original })),
-    }),
-  } as unknown as Table<ReadRun>;
-}

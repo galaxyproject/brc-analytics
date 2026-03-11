@@ -13,7 +13,7 @@ export interface Props {
   activeStep: number;
   configuredInput: ConfiguredInput;
   configuredSteps: StepConfig[];
-  genome: Assembly;
+  genome?: Assembly;
   onConfigure: OnConfigure;
   onContinue: OnContinue;
   onEdit: OnEdit;
