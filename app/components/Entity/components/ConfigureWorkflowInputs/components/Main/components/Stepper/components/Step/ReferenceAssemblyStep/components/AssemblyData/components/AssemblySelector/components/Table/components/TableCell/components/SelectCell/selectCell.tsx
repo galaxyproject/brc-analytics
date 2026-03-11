@@ -9,10 +9,12 @@ import { Assembly } from "../../../../../../hooks/UseTable/types";
  * Select cell component rendering a select button for an assembly row.
  * @param props - Component props.
  * @param props.row - Table row instance.
+ * @param props.table - Table instance.
  * @returns Select cell component.
  */
 export const SelectCell = ({
   row,
+  table,
 }: CellContext<Assembly, unknown>): JSX.Element => {
   const { onConfigure, onContinue, stepKey } = useStepContext();
   return (
@@ -28,6 +30,9 @@ export const SelectCell = ({
         row.toggleSelected(true);
         onConfigure({ [stepKey]: row.id });
         onContinue();
+        // Resets filters to initial state after a selection is made and the dialog is closed, ensuring the next time the dialog is opened, it shows the pre-filtered list of assemblies.
+        // The timeout ensures this runs after the dialog close animation completes.
+        setTimeout(() => table.resetColumnFilters(), 1000);
       }}
       variant={BUTTON_PROPS.VARIANT.CONTAINED}
     >

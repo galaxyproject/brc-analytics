@@ -20,7 +20,12 @@ export const AssemblySelector = ({
   table,
 }: Props): JSX.Element => {
   return (
-    <StyledDialog onClose={onClose} open={open}>
+    <StyledDialog
+      onClose={onClose}
+      // Resets filters to initial state after the dialog close animation completes, ensuring the next time the dialog is opened, it shows the pre-filtered list of assemblies.
+      onTransitionExited={() => table.resetColumnFilters()}
+      open={open}
+    >
       <DialogTitle onClose={onClose} title="Reference Assembly" />
       <DialogContent>
         <ColumnFilters table={table} />
