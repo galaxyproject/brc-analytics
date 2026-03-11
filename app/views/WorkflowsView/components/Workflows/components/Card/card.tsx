@@ -20,7 +20,6 @@ import { JSX } from "react";
 import { ROUTES } from "../../../../../../../routes/constants";
 import { TruncatedText } from "../../../../../../components/common/TruncatedText/truncatedText";
 import { CHIP_PROPS } from "../../../../../../components/Entity/components/AnalysisMethod/constants";
-import { formatTrsId } from "../../../../../../components/Entity/components/AnalysisMethodsCatalog/utils";
 import { StyledCard } from "./card.styles";
 import { Props } from "./types";
 
@@ -74,7 +73,7 @@ export const Card = ({ row }: Props): JSX.Element => {
             color={BUTTON_PROPS.COLOR.PRIMARY}
             component={Link}
             href={replaceParameters(ROUTES.WORKFLOW, {
-              trsId: formatTrsId(row.original.trsId),
+              trsId: row.id,
             })}
             variant={BUTTON_PROPS.VARIANT.CONTAINED}
           >

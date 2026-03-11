@@ -1,4 +1,5 @@
 import { WorkflowEntity } from "../../../../site-config/ga2/local/index/workflow/types";
+import { formatTrsId } from "../../../components/Entity/components/AnalysisMethodsCatalog/utils";
 import { sanitizeEntityId } from "../common/utils";
 import { GA2AssemblyEntity, GA2OrganismEntity } from "./entities";
 
@@ -35,5 +36,5 @@ export function getOrganismId(entity?: GA2OrganismEntity): string {
  * @returns workflow ID.
  */
 export function getWorkflowId(workflow: WorkflowEntity): string {
-  return sanitizeEntityId(workflow.trsId);
+  return formatTrsId(workflow.trsId);
 }

@@ -1,8 +1,9 @@
-import { sanitizeEntityId } from "../../common/utils";
-import { BRCDataCatalogGenome, BRCDataCatalogOrganism } from "./entities";
-import { GA2AssemblyEntity, GA2OrganismEntity } from "../../ga2/entities";
-import { ORGANISM_PLOIDY, WORKFLOW_PLOIDY } from "./schema-entities";
 import { WorkflowEntity } from "../../../../../site-config/brc-analytics/local/index/workflow/types";
+import { formatTrsId } from "../../../../components/Entity/components/AnalysisMethodsCatalog/utils";
+import { sanitizeEntityId } from "../../common/utils";
+import { GA2AssemblyEntity, GA2OrganismEntity } from "../../ga2/entities";
+import { BRCDataCatalogGenome, BRCDataCatalogOrganism } from "./entities";
+import { ORGANISM_PLOIDY, WORKFLOW_PLOIDY } from "./schema-entities";
 
 export function getGenomeId(
   genome: BRCDataCatalogGenome | GA2AssemblyEntity
@@ -40,7 +41,7 @@ export function getGenomeOrganismId(
  * @returns workflow ID.
  */
 export function getWorkflowId(workflow: WorkflowEntity): string {
-  return sanitizeEntityId(workflow.trsId);
+  return formatTrsId(workflow.trsId);
 }
 
 /**
