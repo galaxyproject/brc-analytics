@@ -1,5 +1,5 @@
-import { WorkflowEntity } from "../../../site-config/brc-analytics/local/index/workflow/types";
-import { WorkflowCategory } from "../../apis/catalog/brc-analytics-catalog/common/entities";
+import type { WorkflowEntity } from "../../../site-config/brc-analytics/local/index/workflow/types";
+import type { WorkflowCategory } from "../../apis/catalog/brc-analytics-catalog/common/entities";
 
 /**
  * Utility function to transform workflow categories into a flat list of workflows.
