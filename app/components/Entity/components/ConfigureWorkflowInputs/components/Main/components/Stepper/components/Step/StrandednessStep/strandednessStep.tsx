@@ -59,7 +59,7 @@ export const StrandednessStep = ({
       </StepLabel>
       <StyledStepContent>
         <RadioGroup onChange={onChange} value={value}>
-          {CONTROLS.map(({ description, label, value }, i) => (
+          {CONTROLS.map((control, i) => (
             <FormControlLabel
               control={
                 <Radio
@@ -79,16 +79,16 @@ export const StrandednessStep = ({
               key={i}
               label={
                 <Stack useFlexGap>
-                  <span>{label}</span>
+                  <span>{control.label}</span>
                   <Typography
                     color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
                     variant={TYPOGRAPHY_PROPS.VARIANT.BODY_SMALL_400}
                   >
-                    {description}
+                    {control.description}
                   </Typography>
                 </Stack>
               }
-              value={value}
+              value={control.value}
             />
           ))}
         </RadioGroup>
