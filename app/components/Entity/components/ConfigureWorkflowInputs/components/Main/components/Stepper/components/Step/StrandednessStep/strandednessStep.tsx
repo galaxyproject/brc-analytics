@@ -14,7 +14,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { Fragment, JSX, useEffect } from "react";
+import { Fragment, JSX, useEffect, useRef } from "react";
 import { useRadioGroup } from "../hooks/UseRadioGroup/hook";
 import { StepProps } from "../types";
 import { CONTROLS } from "./constants";
@@ -34,14 +34,18 @@ export const StrandednessStep = ({
   stepKey,
 }: StepProps): JSX.Element => {
   const { strandedness } = configuredInput;
-  const { onChange, value } = useRadioGroup(
-    strandedness ?? STRANDEDNESS.UNSTRANDED
-  );
+
+  const initialValue = useRef<STRANDEDNESS>(STRANDEDNESS.UNSTRANDED);
+
+  const { onChange, value } = useRadioGroup(initialValue.current);
 
   useEffect(() => {
+    // Wait until step is active to pre-configure the initial value.
     if (!active) return;
-    onConfigure({ [stepKey]: value });
-  }, [active, onConfigure, stepKey, value]);
+    // Don't overwrite existing configuration. This allows users to navigate back to the step without losing their selection.
+    if (strandedness) return;
+    onConfigure({ [stepKey]: initialValue.current });
+  }, [active, onConfigure, strandedness, stepKey]);
 
   return (
     <Step active={active} completed={completed} index={index}>
@@ -58,7 +62,13 @@ export const StrandednessStep = ({
         {entryLabel}
       </StepLabel>
       <StyledStepContent>
-        <RadioGroup onChange={onChange} value={value}>
+        <RadioGroup
+          onChange={(e, v) => {
+            onChange?.(e, v);
+            onConfigure({ [stepKey]: v });
+          }}
+          value={value}
+        >
           {CONTROLS.map((control, i) => (
             <FormControlLabel
               control={
@@ -92,7 +102,11 @@ export const StrandednessStep = ({
             />
           ))}
         </RadioGroup>
-        <Button {...BUTTON_PROPS.PRIMARY_CONTAINED} onClick={onContinue}>
+        <Button
+          {...BUTTON_PROPS.PRIMARY_CONTAINED}
+          disabled={!strandedness}
+          onClick={onContinue}
+        >
           Continue
         </Button>
       </StyledStepContent>
