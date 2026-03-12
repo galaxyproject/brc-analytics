@@ -1,7 +1,9 @@
-import React, { JSX, useMemo } from "react";
+import React, { JSX, useEffect, useMemo, useState } from "react";
 import { ExploreView } from "../ExploreView/exploreView";
 import { Workflows } from "./components/Workflows/workflows";
 import { getWorkflows as getWorkflowCategories } from "../../../app/services/workflows/entities";
+import { WorkflowAssemblyMapping } from "../../apis/catalog/brc-analytics-catalog/common/entities";
+import { API } from "../../services/workflows/routes";
 import { getWorkflows } from "./utils";
 
 /**
@@ -11,10 +13,26 @@ import { getWorkflows } from "./utils";
  */
 export const WorkflowsView = (): JSX.Element => {
   const workflowCategories = getWorkflowCategories();
+  const [mappings, setMappings] = useState<WorkflowAssemblyMapping[] | null>(
+    null
+  );
+
+  useEffect(() => {
+    fetch(API.workflowAssemblyMappings)
+      .then((res) => {
+        if (!res.ok)
+          throw new Error(`Failed to fetch: ${API.workflowAssemblyMappings}`);
+        return res.json();
+      })
+      .then((data: WorkflowAssemblyMapping[]) => setMappings(data))
+      .catch((error) =>
+        console.error("Failed to load workflow-assembly mappings:", error)
+      );
+  }, []);
 
   const workflows = useMemo(
-    () => getWorkflows(workflowCategories),
-    [workflowCategories]
+    () => (mappings ? getWorkflows(workflowCategories, mappings) : []),
+    [workflowCategories, mappings]
   );
 
   return <ExploreView data={workflows} Component={Workflows} />;

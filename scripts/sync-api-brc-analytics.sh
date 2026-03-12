@@ -7,7 +7,7 @@ SRC_ROOT="catalog/output"
 API_DIR="public/api"
 mkdir -p "$API_DIR"
 
-PER_APP_JSONS=("assemblies" "workflows")
+PER_APP_JSONS=("assemblies" "workflows" "workflow-assembly-mappings")
 
 rm -f "$API_DIR"/*.json
 
