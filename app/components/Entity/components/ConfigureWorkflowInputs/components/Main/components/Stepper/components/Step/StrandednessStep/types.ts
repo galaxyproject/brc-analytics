@@ -4,4 +4,4 @@ export enum STRANDEDNESS {
   UNSTRANDED = "unstranded",
 }
 
-export type Strandedness = STRANDEDNESS | null;
+export type Strandedness = STRANDEDNESS;
