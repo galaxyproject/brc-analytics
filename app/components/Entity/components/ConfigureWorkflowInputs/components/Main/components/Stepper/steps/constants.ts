@@ -1,17 +1,18 @@
-import { StepConfig } from "../components/Step/types";
-import { STEP as REFERENCE_ASSEMBLY_STEP } from "../components/Step/ReferenceAssemblyStep/step";
+import { WORKFLOW_PARAMETER_VARIABLE } from "../../../../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { STEP as DESEQ2_FORMULA_STEP } from "../components/Step/DESeq2FormulaStep/step";
 import { STEP as GTF_STEP } from "../components/Step/GTFStep/step";
+import { STEP as PRIMARY_CONTRASTS_STEP } from "../components/Step/PrimaryContrastsStep/step";
+import { STEP as REFERENCE_ASSEMBLY_STEP } from "../components/Step/ReferenceAssemblyStep/step";
+import { RELATED_TRACKS_STEP } from "../components/Step/RelatedTracksStep/step";
+import { STEP as SAMPLE_SHEET_CLASSIFICATION_STEP } from "../components/Step/SampleSheetClassificationStep/step";
+import { STEP as SAMPLE_SHEET_STEP } from "../components/Step/SampleSheetStep/step";
 import {
   ANY_END_STEP,
   PAIRED_END_STEP,
   SINGLE_END_STEP,
 } from "../components/Step/SequencingStep/step";
-import { WORKFLOW_PARAMETER_VARIABLE } from "../../../../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { RELATED_TRACKS_STEP } from "../components/Step/RelatedTracksStep/step";
-import { STEP as SAMPLE_SHEET_STEP } from "../components/Step/SampleSheetStep/step";
-import { STEP as SAMPLE_SHEET_CLASSIFICATION_STEP } from "../components/Step/SampleSheetClassificationStep/step";
-import { STEP as DESEQ2_FORMULA_STEP } from "../components/Step/DESeq2FormulaStep/step";
-import { STEP as PRIMARY_CONTRASTS_STEP } from "../components/Step/PrimaryContrastsStep/step";
+import { STEP as STRANDEDNESS_STEP } from "../components/Step/StrandednessStep/step";
+import { StepConfig } from "../components/Step/types";
 
 export const SEQUENCING_STEPS: Record<string, StepConfig> = {
   readRunsPaired: PAIRED_END_STEP,
@@ -25,7 +26,8 @@ export const STEP: Record<
   | "READ_RUN_ANY"
   | "RELATED_TRACKS"
   | "SAMPLE_SHEET"
-  | "SAMPLE_SHEET_CLASSIFICATION",
+  | "SAMPLE_SHEET_CLASSIFICATION"
+  | "STRANDEDNESS",
   StepConfig | null
 > = {
   [WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_FASTA_URL]: null,
@@ -39,4 +41,5 @@ export const STEP: Record<
   RELATED_TRACKS: RELATED_TRACKS_STEP,
   SAMPLE_SHEET: SAMPLE_SHEET_STEP,
   SAMPLE_SHEET_CLASSIFICATION: SAMPLE_SHEET_CLASSIFICATION_STEP,
+  STRANDEDNESS: STRANDEDNESS_STEP,
 };
