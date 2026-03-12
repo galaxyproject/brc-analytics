@@ -39,8 +39,6 @@ function workflowPloidyMatchesOrganismPloidy(
       return organismPloidy === ORGANISM_PLOIDY.HAPLOID;
     case WORKFLOW_PLOIDY.POLYPLOID:
       return organismPloidy === ORGANISM_PLOIDY.POLYPLOID;
-    default:
-      return false;
   }
 }
 

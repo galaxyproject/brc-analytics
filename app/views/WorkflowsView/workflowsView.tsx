@@ -19,7 +19,11 @@ export const WorkflowsView = (): JSX.Element => {
 
   useEffect(() => {
     fetch(API.workflowAssemblyMappings)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok)
+          throw new Error(`Failed to fetch: ${API.workflowAssemblyMappings}`);
+        return res.json();
+      })
       .then((data: WorkflowAssemblyMapping[]) => setMappings(data))
       .catch((error) =>
         console.error("Failed to load workflow-assembly mappings:", error)
