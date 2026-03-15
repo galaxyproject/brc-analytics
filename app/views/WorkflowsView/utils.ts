@@ -36,7 +36,6 @@ export function getWorkflows(
       workflows.push({
         ...workflow,
         category: category.name,
-        disabled: category.showComingSoon === false,
         taxonomyId: workflow.taxonomyId ?? "Unspecified",
       });
     }
