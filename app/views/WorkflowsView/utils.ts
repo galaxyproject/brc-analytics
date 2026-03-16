@@ -1,9 +1,9 @@
-import type { WorkflowEntity } from "../../../site-config/brc-analytics/local/index/workflow/types";
 import type {
   WorkflowAssemblyMapping,
   WorkflowCategory,
 } from "../../apis/catalog/brc-analytics-catalog/common/entities";
 import { Assembly } from "../WorkflowInputsView/types";
+import type { WorkflowAssembly, WorkflowEntity } from "./types";
 import { Organism } from "./types";
 
 /**
@@ -111,14 +111,14 @@ function hasCommonName(
 }
 
 /**
- * Maps an Assembly to the assembly property of a WorkflowEntity.
+ * Maps an Assembly to the workflow assembly fields.
+ * Includes all taxonomy fields plus site-specific fields (commonName, taxonomicLevelRealm)
+ * which are present at runtime for all sites but only typed on site-specific WorkflowEntity extensions.
  * If the assembly is undefined, returns default values for the properties.
  * @param assembly - The assembly to map.
  * @returns Assembly object for the WorkflowEntity.
  */
-function mapAssembly(
-  assembly: Assembly | undefined
-): WorkflowEntity["assembly"] {
+function mapAssembly(assembly: Assembly | undefined): WorkflowAssembly {
   return {
     commonName: getCommonName(assembly),
     taxonomicLevelClass: assembly?.taxonomicLevelClass ?? "Unspecified",
