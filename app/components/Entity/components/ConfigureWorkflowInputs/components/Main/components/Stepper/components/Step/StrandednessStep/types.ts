@@ -1,6 +1,6 @@
 export enum STRANDEDNESS {
-  FORWARD = "forward",
-  REVERSE = "reverse",
+  FORWARD = "stranded - forward",
+  REVERSE = "stranded - reverse",
   UNSTRANDED = "unstranded",
 }
 
