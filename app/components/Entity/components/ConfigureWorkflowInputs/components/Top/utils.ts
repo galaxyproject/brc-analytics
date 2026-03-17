@@ -1,6 +1,6 @@
-import { ROUTES } from "../../../../../../../routes/constants";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
+import { ROUTES } from "../../../../../../../routes/constants";
 import { Props } from "./types";
 
 /**
@@ -19,7 +19,7 @@ export function getBreadcrumbs({
   return [
     { path: ROUTES.GENOMES, text: "Assemblies" },
     {
-      path: replaceParameters(ROUTES.GENOME, { entityId }),
+      path: replaceParameters(ROUTES.ANALYZE, { entityId }),
       text: genome.accession,
     },
     { path: "", text: workflow.workflowName },

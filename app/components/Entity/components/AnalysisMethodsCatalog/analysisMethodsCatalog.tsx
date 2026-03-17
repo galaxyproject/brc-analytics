@@ -1,16 +1,22 @@
-import { JSX } from "react";
-import { AnalysisMethod } from "../AnalysisMethod/analysisMethod";
-import { Props } from "./types";
-import { useRouter } from "next/router";
-import { Fragment } from "react";
-import { WorkflowAccordion } from "../AnalysisMethod/components/WorkflowAccordion/workflowAccordion";
-import { CUSTOM_WORKFLOW } from "../AnalysisMethod/components/CustomWorkflow/constants";
-import { AnalysisTypeHeader } from "./components/AnalysisTypeHeader/analysisTypeHeader";
-import { Stack } from "@mui/material";
-import { buildAssemblyWorkflows } from "./utils";
-import WORKFLOW_CATEGORIES from "../../../../../catalog/output/workflows.json";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
+import { Stack } from "@mui/material";
+import { useRouter } from "next/router";
+import { Fragment, JSX } from "react";
+import WORKFLOW_CATEGORIES from "../../../../../catalog/output/workflows.json";
+import { AnalysisMethod } from "../AnalysisMethod/analysisMethod";
+import { CUSTOM_WORKFLOW } from "../AnalysisMethod/components/CustomWorkflow/constants";
+import { WorkflowAccordion } from "../AnalysisMethod/components/WorkflowAccordion/workflowAccordion";
+import { AnalysisTypeHeader } from "./components/AnalysisTypeHeader/analysisTypeHeader";
+import { Props } from "./types";
+import { buildAssemblyWorkflows } from "./utils";
 
+/**
+ * AnalysisMethodsCatalog component - displays the available analysis methods for a given assembly.
+ * @deprecated - Separate out custom workflow from predefined workflows.
+ * @param props - Props for the AnalysisMethodsCatalog component.
+ * @param props.assembly - Assembly.
+ * @returns JSX.Element - The rendered AnalysisMethodsCatalog component.
+ */
 export const AnalysisMethodsCatalog = ({ assembly }: Props): JSX.Element => {
   const isDEEnabled = useFeatureFlag("de");
   const workflowCategories = buildAssemblyWorkflows(

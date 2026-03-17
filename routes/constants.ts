@@ -1,9 +1,9 @@
 export const ROUTES = {
   ABOUT: "/about",
+  ANALYZE: "/data/assemblies/{entityId}/analyze",
   ASSISTANT: "/assistant",
   CALENDAR: "/calendar",
   CONFIGURE_WORKFLOW: "/data/assemblies/{entityId}/{trsId}",
-  GENOME: "/data/assemblies/{entityId}",
   GENOMES: "/data/assemblies",
   LEARN: "/learn",
   ORGANISMS: "/data/organisms",

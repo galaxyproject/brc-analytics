@@ -3,18 +3,15 @@ import {
   SORT_DIRECTION,
 } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
-import { AppEntityConfig } from "../../../../common/entities";
-import { CATEGORY_GROUPS } from "./categoryGroups";
-import { mainColumn as analysisMethodsMainColumn } from "../../entity/genome/analysisMethodMainColumn";
-import { sideColumn as analysisMethodsSideColumn } from "../../entity/genome/analysisMethodsSideColumn";
-import { top as analysisMethodsTop } from "../../entity/genome/analysisMethodsTop";
 import { GA2AssemblyEntity } from "../../../../../app/apis/catalog/ga2/entities";
 import {
   getAssemblyId,
   getAssemblyTitle,
 } from "../../../../../app/apis/catalog/ga2/utils";
-import { COLUMNS } from "./columns";
+import { AppEntityConfig } from "../../../../common/entities";
 import { GA2_CATEGORY_KEY } from "../../../category";
+import { CATEGORY_GROUPS } from "./categoryGroups";
+import { COLUMNS } from "./columns";
 
 /**
  * Entity config object responsible to config anything related to the /assemblies route.
@@ -27,15 +24,7 @@ export const genomeEntityConfig: AppEntityConfig<GA2AssemblyEntity> = {
   detail: {
     detailOverviews: [],
     staticLoad: true,
-    tabs: [
-      {
-        label: "Choose Analysis Method",
-        mainColumn: analysisMethodsMainColumn,
-        route: "",
-        sideColumn: analysisMethodsSideColumn,
-        top: analysisMethodsTop,
-      },
-    ],
+    tabs: [],
   },
   exploreMode: EXPLORE_MODE.CS_FETCH_CS_FILTERING,
   getId: getAssemblyId,

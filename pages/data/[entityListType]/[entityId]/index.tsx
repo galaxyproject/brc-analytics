@@ -50,6 +50,8 @@ export const getStaticPaths: GetStaticPaths<PageUrl> = async () => {
     const { route: entityListType } = entityConfig;
 
     if (entityListType === "workflows") continue;
+    // Skip static generation for assemblies; the route will be /data/[entityListType]/[entityId]/analyze, and the analyze page will be statically generated instead.
+    if (entityListType === "assemblies") continue;
 
     await seedDatabase(entityListType, entityConfig);
     const entitiesResponse: EntitiesResponse<BRCCatalog | GA2Catalog> =
