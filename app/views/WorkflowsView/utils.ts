@@ -21,31 +21,31 @@ function findAssemblyByTaxonomyId(
 }
 
 /**
- * Returns the common name of the assembly, or "Unspecified" if the assembly is undefined.
- * `commonName` is only present on BRC assemblies; GA2 assemblies will return "Unspecified".
+ * Returns the common name of the assembly, or "Any" if the assembly is undefined.
+ * `commonName` is only present on BRC assemblies; GA2 assemblies will return "Any".
  * Returns "null" as a string when the assembly exists but commonName is null.
  * @param assembly - Assembly.
- * @returns The common name, "null", or "Unspecified".
+ * @returns The common name, "null", or "Any".
  */
 function getCommonName(assembly: Assembly | undefined): string {
   if (hasCommonName(assembly)) {
     return assembly.commonName ?? "null";
   }
 
-  return "Unspecified";
+  return "Any";
 }
 
 /**
- * Returns the taxonomic level realm of the assembly, or "Unspecified" if the assembly is undefined.
- * `taxonomicLevelRealm` is only present on BRC assemblies; GA2 assemblies will return "Unspecified".
+ * Returns the taxonomic level realm of the assembly, or "Any" if the assembly is undefined.
+ * `taxonomicLevelRealm` is only present on BRC assemblies; GA2 assemblies will return "Any".
  * @param assembly - Assembly.
- * @returns The taxonomic level realm, or "Unspecified".
+ * @returns The taxonomic level realm, or "Any".
  */
 function getTaxonomicLevelRealm(assembly: Assembly | undefined): string {
   if (assembly && "taxonomicLevelRealm" in assembly)
     return assembly.taxonomicLevelRealm;
 
-  return "Unspecified";
+  return "Any";
 }
 
 /**
@@ -87,7 +87,7 @@ export function getWorkflows(
           findAssemblyByTaxonomyId(assemblyByTaxonomyId, workflow.taxonomyId)
         ),
         category: category.name,
-        taxonomyId: workflow.taxonomyId ?? "Unspecified",
+        taxonomyId: workflow.taxonomyId ?? "Any",
       });
     }
   }
@@ -139,14 +139,14 @@ function indexAssemblyByTaxonomyId(
 function mapAssembly(assembly: Assembly | undefined): WorkflowAssembly {
   return {
     commonName: getCommonName(assembly),
-    taxonomicLevelClass: assembly?.taxonomicLevelClass ?? "Unspecified",
-    taxonomicLevelDomain: assembly?.taxonomicLevelDomain ?? "Unspecified",
-    taxonomicLevelFamily: assembly?.taxonomicLevelFamily ?? "Unspecified",
-    taxonomicLevelGenus: assembly?.taxonomicLevelGenus ?? "Unspecified",
-    taxonomicLevelKingdom: assembly?.taxonomicLevelKingdom ?? "Unspecified",
-    taxonomicLevelOrder: assembly?.taxonomicLevelOrder ?? "Unspecified",
-    taxonomicLevelPhylum: assembly?.taxonomicLevelPhylum ?? "Unspecified",
+    taxonomicLevelClass: assembly?.taxonomicLevelClass ?? "Any",
+    taxonomicLevelDomain: assembly?.taxonomicLevelDomain ?? "Any",
+    taxonomicLevelFamily: assembly?.taxonomicLevelFamily ?? "Any",
+    taxonomicLevelGenus: assembly?.taxonomicLevelGenus ?? "Any",
+    taxonomicLevelKingdom: assembly?.taxonomicLevelKingdom ?? "Any",
+    taxonomicLevelOrder: assembly?.taxonomicLevelOrder ?? "Any",
+    taxonomicLevelPhylum: assembly?.taxonomicLevelPhylum ?? "Any",
     taxonomicLevelRealm: getTaxonomicLevelRealm(assembly),
-    taxonomicLevelSpecies: assembly?.taxonomicLevelSpecies ?? "Unspecified",
+    taxonomicLevelSpecies: assembly?.taxonomicLevelSpecies ?? "Any",
   };
 }
