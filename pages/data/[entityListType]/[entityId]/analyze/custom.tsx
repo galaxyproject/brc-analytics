@@ -14,6 +14,7 @@ import { WorkflowInputsView } from "../../../../../app/views/WorkflowInputsView/
 
 interface Params extends ParsedUrlQuery {
   entityId: string;
+  entityListType: string;
 }
 
 export interface Props {

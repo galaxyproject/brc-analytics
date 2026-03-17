@@ -20,7 +20,10 @@ export const Main = ({ entityId }: Props): JSX.Element => {
   return (
     <BackPageContentMainColumn>
       <StyledCard component={FluidPaper}>
-        <CardActionArea component={Link} href="/workflows">
+        <CardActionArea
+          component={Link}
+          href={replaceParameters(ROUTES.ANALYZE_WORKFLOWS, { entityId })}
+        >
           <CardContent>
             <Typography variant={TYPOGRAPHY_PROPS.VARIANT.HEADING_XSMALL}>
               Select a Workflow
