@@ -7,6 +7,20 @@ import type { WorkflowAssembly, WorkflowEntity } from "./types";
 import { Organism } from "./types";
 
 /**
+ * Finds the first assembly matching the given taxonomy ID from a pre-built index.
+ * @param assemblyByTaxonomyId - Map of lineage taxonomy IDs to assemblies.
+ * @param taxonomyId - Workflow taxonomy ID.
+ * @returns Assembly matching the taxonomy ID, or undefined.
+ */
+function findAssemblyByTaxonomyId(
+  assemblyByTaxonomyId: Map<string, Assembly>,
+  taxonomyId: string | null
+): Assembly | undefined {
+  if (!taxonomyId) return undefined;
+  return assemblyByTaxonomyId.get(taxonomyId);
+}
+
+/**
  * Returns the common name of the assembly, or "Unspecified" if the assembly is undefined.
  * `commonName` is only present on BRC assemblies; GA2 assemblies will return "Unspecified".
  * Returns "null" as a string when the assembly exists but commonName is null.
@@ -50,10 +64,9 @@ export function getWorkflows(
 ): WorkflowEntity[] {
   const workflows: WorkflowEntity[] = [];
 
-  // Flatten organism genomes for easy lookup of assemblies with matching lineage taxonomy IDs.
-  const assemblies = organisms.flatMap((o) => (o.genomes || []) as Assembly[]);
+  const assemblyByTaxonomyId = indexAssemblyByTaxonomyId(organisms);
 
-  // Create a lookup map for workflows with compatible assemblies
+  // Create a lookup set for workflows with compatible assemblies.
   const workflowsWithAssemblies = new Set(
     mappings
       .filter((m) => m.compatibleAssemblyCount > 0)
@@ -63,14 +76,16 @@ export function getWorkflows(
   for (const category of workflowCategories) {
     if (!category.workflows) continue;
     for (const workflow of category.workflows) {
-      // Skip workflows with no compatible assemblies
+      // Skip workflows with no compatible assemblies.
       if (!workflowsWithAssemblies.has(workflow.trsId)) {
         continue;
       }
 
       workflows.push({
         ...workflow,
-        assembly: mapAssembly(findAssembly(assemblies, workflow.taxonomyId)),
+        assembly: mapAssembly(
+          findAssemblyByTaxonomyId(assemblyByTaxonomyId, workflow.taxonomyId)
+        ),
         category: category.name,
         taxonomyId: workflow.taxonomyId ?? "Unspecified",
       });
@@ -78,25 +93,6 @@ export function getWorkflows(
   }
 
   return workflows;
-}
-
-/**
- * Finds the first assembly in the list that is compatible with the given workflow taxonomy ID i.e. the assembly's lineage includes the workflow taxonomy ID.
- * If no compatible assembly is found, returns undefined.
- * If the workflow taxonomy ID is null, returns undefined.
- * @param assemblies - Assemblies.
- * @param taxonomyId - Workflow taxonomy ID.
- * @returns Assembly compatible with the workflow taxonomy ID, or undefined if no compatible assembly is found or if the taxonomy ID is null.
- */
-function findAssembly(
-  assemblies: Assembly[],
-  taxonomyId: string | null
-): Assembly | undefined {
-  if (!taxonomyId) return undefined;
-
-  return assemblies.find((assembly) =>
-    assembly.lineageTaxonomyIds.includes(taxonomyId)
-  );
 }
 
 /**
@@ -108,6 +104,28 @@ function hasCommonName(
   assembly: Assembly | undefined
 ): assembly is Assembly & { commonName: string | null } {
   return assembly !== undefined && "commonName" in assembly;
+}
+
+/**
+ * Indexes assemblies by their lineage taxonomy IDs for O(1) lookups.
+ * Each lineage taxonomy ID maps to the first assembly that contains it.
+ * @param organisms - Organisms.
+ * @returns Map of lineage taxonomy ID to assembly.
+ */
+function indexAssemblyByTaxonomyId(
+  organisms: Organism[]
+): Map<string, Assembly> {
+  const assemblyByTaxonomyId = new Map<string, Assembly>();
+  for (const organism of organisms) {
+    for (const genome of (organism.genomes || []) as Assembly[]) {
+      for (const taxId of genome.lineageTaxonomyIds) {
+        if (!assemblyByTaxonomyId.has(taxId)) {
+          assemblyByTaxonomyId.set(taxId, genome);
+        }
+      }
+    }
+  }
+  return assemblyByTaxonomyId;
 }
 
 /**
