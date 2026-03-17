@@ -6,10 +6,10 @@ import {
 } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
-import { config } from "../../../../app/config/config";
-import { getEntities } from "../../../../app/utils/entityUtils";
-import { seedDatabase } from "../../../../app/utils/seedDatabase";
-import { AnalyzeView } from "../../../../app/views/AnalyzeView/analyzeView";
+import { config } from "../../../../../app/config/config";
+import { getEntities } from "../../../../../app/utils/entityUtils";
+import { seedDatabase } from "../../../../../app/utils/seedDatabase";
+import { AnalyzeView } from "../../../../../app/views/AnalyzeView/analyzeView";
 
 interface Params extends ParsedUrlQuery {
   entityId: string;
