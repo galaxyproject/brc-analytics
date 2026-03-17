@@ -14,12 +14,11 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { Fragment, JSX, useEffect, useRef } from "react";
+import { Fragment, JSX } from "react";
 import { useRadioGroup } from "../hooks/UseRadioGroup/hook";
 import { StepProps } from "../types";
 import { CONTROLS } from "./constants";
 import { StyledStepContent } from "./strandednessStep.styles";
-import { STRANDEDNESS } from "./types";
 import { getStepLabel } from "./utils";
 
 export const StrandednessStep = ({
@@ -34,19 +33,7 @@ export const StrandednessStep = ({
   stepKey,
 }: StepProps): JSX.Element => {
   const { strandedness } = configuredInput;
-
-  const initialValue = useRef<STRANDEDNESS>(STRANDEDNESS.UNSTRANDED);
-
-  const { onChange, value } = useRadioGroup(initialValue.current);
-
-  useEffect(() => {
-    // Wait until step is active to pre-configure the initial value.
-    if (!active) return;
-    // Don't overwrite existing configuration. This allows users to navigate back to the step without losing their selection.
-    if (strandedness) return;
-    onConfigure({ [stepKey]: initialValue.current });
-  }, [active, onConfigure, strandedness, stepKey]);
-
+  const { onChange, value } = useRadioGroup(strandedness ?? "");
   return (
     <Step active={active} completed={completed} index={index}>
       <StepLabel
