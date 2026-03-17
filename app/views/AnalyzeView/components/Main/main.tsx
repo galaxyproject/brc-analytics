@@ -1,5 +1,6 @@
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/components/FluidPaper/fluidPaper";
 import { BackPageContentMainColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
+import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/src/styles/common/mui/typography";
 import { ChevronRightRounded } from "@mui/icons-material";
 import {
@@ -11,9 +12,11 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 import { JSX } from "react";
+import { ROUTES } from "../../../../../routes/constants";
+import { Props } from "../../types";
 import { StyledCard } from "./main.styles";
 
-export const Main = (): JSX.Element => {
+export const Main = ({ entityId }: Props): JSX.Element => {
   return (
     <BackPageContentMainColumn>
       <StyledCard component={FluidPaper}>
@@ -40,7 +43,10 @@ export const Main = (): JSX.Element => {
         </CardActionArea>
       </StyledCard>
       <StyledCard component={FluidPaper}>
-        <CardActionArea component={Link} href="/custom-analysis">
+        <CardActionArea
+          component={Link}
+          href={replaceParameters(ROUTES.ANALYZE_CUSTOM_WORKFLOW, { entityId })}
+        >
           <CardContent>
             <Typography variant={TYPOGRAPHY_PROPS.VARIANT.HEADING_XSMALL}>
               Custom Analysis

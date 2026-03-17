@@ -25,7 +25,7 @@ export const AnalyzeView = ({ entityId }: Props): JSX.Element => {
         <Top assembly={assembly} />
       </BackPageHero>
       <BackPageContent>
-        <Main />
+        <Main entityId={entityId} />
         <Side assembly={assembly} />
       </BackPageContent>
     </BackPageView>

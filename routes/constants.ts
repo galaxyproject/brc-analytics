@@ -1,6 +1,8 @@
 export const ROUTES = {
   ABOUT: "/about",
   ANALYZE: "/data/assemblies/{entityId}/analyze",
+  ANALYZE_CUSTOM_WORKFLOW:
+    "/data/assemblies/{entityId}/analyze/custom-workflow",
   ASSISTANT: "/assistant",
   CALENDAR: "/calendar",
   CONFIGURE_WORKFLOW: "/data/assemblies/{entityId}/{trsId}",

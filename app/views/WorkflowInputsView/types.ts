@@ -5,6 +5,6 @@ export type Assembly = BRCDataCatalogGenome | GA2AssemblyEntity;
 
 export interface Props {
   entityId: string;
-  entityListType: string;
+  entityListType?: string;
   trsId: string;
 }

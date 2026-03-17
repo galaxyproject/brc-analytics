@@ -18,9 +18,10 @@ export function getBreadcrumbs({
 }: Props): Breadcrumb[] {
   return [
     { path: ROUTES.GENOMES, text: "Assemblies" },
+    { path: "", text: genome.accession },
     {
       path: replaceParameters(ROUTES.ANALYZE, { entityId }),
-      text: genome.accession,
+      text: "Analyze in Galaxy",
     },
     { path: "", text: workflow.workflowName },
     { path: "", text: "Configure Inputs" },
