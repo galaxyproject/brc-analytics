@@ -37,6 +37,7 @@ function getDEConfiguredValues(
     referenceAssembly,
     sampleSheet,
     sampleSheetClassification,
+    strandedness,
   } = configuredInput;
 
   // Validate required fields for DE workflow
@@ -59,6 +60,7 @@ function getDEConfiguredValues(
     referenceAssembly,
     sampleSheet,
     sampleSheetClassification,
+    strandedness,
     tracks: null,
   };
 }
@@ -99,6 +101,7 @@ function getStandardConfiguredValues(
     referenceAssembly: referenceAssembly!,
     sampleSheet: null,
     sampleSheetClassification: null,
+    strandedness: undefined,
     tracks: configuredInput.tracks ?? null,
   };
 }

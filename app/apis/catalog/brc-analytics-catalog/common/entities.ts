@@ -138,3 +138,8 @@ export interface WorkflowParameter {
   url_spec?: WorkflowUrlSpec;
   variable?: WORKFLOW_PARAMETER_VARIABLE;
 }
+
+export interface WorkflowAssemblyMapping {
+  compatibleAssemblyCount: number;
+  workflowTrsId: string;
+}

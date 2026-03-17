@@ -168,6 +168,7 @@ export interface DeSeq2RequestState {
   "Reference genome": string;
   "Reference level"?: string;
   "Sample sheet of sequencing reads": DeSeq2SampleSheetCollection;
+  Strandedness?: string;
   "Use featurecounts for generating count tables": boolean;
 }
 

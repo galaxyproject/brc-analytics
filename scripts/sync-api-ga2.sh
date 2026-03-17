@@ -7,7 +7,7 @@ SRC_ROOT="catalog/ga2/output"
 API_DIR="public/api"
 mkdir -p "$API_DIR"
 
-PER_APP_JSONS=("assemblies")
+PER_APP_JSONS=("assemblies" "workflow-assembly-mappings")
 
 rm -f "$API_DIR"/*.json
 
