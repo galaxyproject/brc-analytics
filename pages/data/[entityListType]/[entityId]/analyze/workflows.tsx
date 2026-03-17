@@ -55,12 +55,12 @@ export const getStaticProps: GetStaticProps<Props> = async ({
 };
 
 /**
- * Workflows overview view page.
+ * Analyze Workflows view page.
  * @param props - Page props.
- * @returns Workflows overview view component.
+ * @returns Analyze Workflows view component.
  */
 const Page = (props: Props): JSX.Element => {
-  return <div>workflows</div>;
+  return <div>workflows {props.entityId}</div>;
 };
 
 export default Page;
