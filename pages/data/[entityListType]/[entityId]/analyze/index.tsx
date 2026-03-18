@@ -13,6 +13,7 @@ import { AnalyzeView } from "../../../../../app/views/AnalyzeView/analyzeView";
 
 interface Params extends ParsedUrlQuery {
   entityId: string;
+  entityListType: string;
 }
 
 export interface Props {
