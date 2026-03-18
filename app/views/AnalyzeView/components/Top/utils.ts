@@ -1,13 +1,14 @@
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import { ROUTES } from "../../../../../routes/constants";
-import { Assembly } from "../../../WorkflowInputsView/types";
+import { Props } from "./types";
 
 /**
- * Get the assembly breadcrumbs.
- * @param assembly - Assembly entity.
+ * Returns breadcrumbs for the AnalyzeView component.
+ * @param props - Component props.
+ * @param props.assembly - Assembly.
  * @returns Breadcrumbs.
  */
-export function getBreadcrumbs(assembly: Assembly): Breadcrumb[] {
+export function getBreadcrumbs({ assembly }: Props): Breadcrumb[] {
   return [
     { path: ROUTES.GENOMES, text: "Assemblies" },
     { path: "", text: assembly.accession },

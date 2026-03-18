@@ -9,6 +9,7 @@ import { JSX } from "react";
 import { config } from "../../../../../app/config/config";
 import { getEntities } from "../../../../../app/utils/entityUtils";
 import { seedDatabase } from "../../../../../app/utils/seedDatabase";
+import { AnalyzeWorkflowsView } from "../../../../../app/views/AnalyzeWorkflowsView/analyzeWorkflowsView";
 
 interface Params extends ParsedUrlQuery {
   entityId: string;
@@ -60,7 +61,7 @@ export const getStaticProps: GetStaticProps<Props> = async ({
  * @returns Analyze Workflows view component.
  */
 const Page = (props: Props): JSX.Element => {
-  return <div>workflows {props.entityId}</div>;
+  return <AnalyzeWorkflowsView entityId={props.entityId} />;
 };
 
 export default Page;

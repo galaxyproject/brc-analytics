@@ -1,8 +1,8 @@
+import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
+import { SHADOWS } from "@databiosphere/findable-ui/lib/styles/common/constants/shadows";
+import { bpDownSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
 import { Accordion } from "@mui/material";
-import { bpDownSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
-import { SHADOWS } from "@databiosphere/findable-ui/lib/styles/common/constants/shadows";
-import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 
 export const StyledAccordion = styled(Accordion)`
   &.MuiAccordion-root {

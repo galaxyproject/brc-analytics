@@ -1,7 +1,7 @@
 import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
-import { formatTrsId } from "../../../../app/components/Entity/components/AnalysisMethodsCatalog/utils";
+import { formatTrsId } from "../../../../app/views/AnalyzeWorkflowsView/components/Main/utils";
 import { WorkflowView } from "../../../../app/views/WorkflowView/workflowView";
 import workflowCategories from "../../../../catalog/output/workflows.json";
 

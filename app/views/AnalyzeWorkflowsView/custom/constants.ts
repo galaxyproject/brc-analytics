@@ -1,8 +1,8 @@
+import { Workflow } from "../../../apis/catalog/brc-analytics-catalog/common/entities";
 import {
-  WORKFLOW_PLOIDY,
   WORKFLOW_PARAMETER_VARIABLE,
-} from "../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { Workflow } from "../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
+  WORKFLOW_PLOIDY,
+} from "../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 
 export const CUSTOM_WORKFLOW: Workflow = {
   iwcId: "",

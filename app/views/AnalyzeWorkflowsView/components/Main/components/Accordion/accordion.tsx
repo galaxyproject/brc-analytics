@@ -1,4 +1,6 @@
-import { JSX } from "react";
+import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
+import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
+import { ChevronRightRounded } from "@mui/icons-material";
 import {
   AccordionDetails,
   AccordionSummary,
@@ -6,20 +8,26 @@ import {
   Divider,
   Typography,
 } from "@mui/material";
-import { StyledAccordion } from "./analysisMethod.styles";
+import { Fragment, JSX } from "react";
+import { StyledAccordion } from "./accordion.styles";
+import { Workflow } from "./components/Workflow/workflow";
 import {
   CHIP_PROPS,
-  SVG_ICON_PROPS,
   TYPOGRAPHY_PROPS as COMPONENT_TYPOGRAPHY_PROPS,
+  SVG_ICON_PROPS,
 } from "./constants";
 import { Props } from "./types";
-import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
-import { Fragment } from "react";
-import { Workflow } from "./components/Workflow/workflow";
-import { ChevronRightRounded } from "@mui/icons-material";
-import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 
-export const AnalysisMethod = ({
+/**
+ * Accordion component that displays a category of workflows and its compatible workflows.
+ * @param props - Component props.
+ * @param props.disabled - Whether the accordion is disabled.
+ * @param props.entityId - Assembly Entity ID.
+ * @param props.workflowCategory - Workflow category.
+ * @param props.workflows - Compatible workflows for the assembly and workflow category.
+ * @returns A JSX element representing an accordion for a workflow category.
+ */
+export const Accordion = ({
   disabled,
   entityId,
   workflowCategory,

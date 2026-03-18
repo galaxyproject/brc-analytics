@@ -6,10 +6,10 @@ import {
 } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
-import { CUSTOM_WORKFLOW } from "../../../../../app/components/Entity/components/AnalysisMethod/components/CustomWorkflow/constants";
 import { config } from "../../../../../app/config/config";
 import { getEntities } from "../../../../../app/utils/entityUtils";
 import { seedDatabase } from "../../../../../app/utils/seedDatabase";
+import { CUSTOM_WORKFLOW } from "../../../../../app/views/AnalyzeWorkflowsView/custom/constants";
 import { WorkflowInputsView } from "../../../../../app/views/WorkflowInputsView/workflowInputsView";
 
 interface Params extends ParsedUrlQuery {

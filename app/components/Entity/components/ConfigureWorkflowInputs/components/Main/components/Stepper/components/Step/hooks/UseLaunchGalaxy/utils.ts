@@ -1,12 +1,12 @@
-import { ConfiguredInput } from "../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { Workflow } from "../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
-import { WORKFLOW_PARAMETER_VARIABLE } from "../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { ConfiguredValue } from "./types";
 import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,
 } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../../../../../../../../components/Entity/components/AnalysisMethod/components/DifferentialExpressionAnalysis/constants";
+import { Workflow } from "../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
+import { WORKFLOW_PARAMETER_VARIABLE } from "../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
+import { ConfiguredInput } from "../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { ConfiguredValue } from "./types";
 
 export function getRequiredParameterTypes(
   workflow: Workflow

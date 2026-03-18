@@ -1,17 +1,16 @@
-import { workflowPloidyMatchesOrganismPloidy } from "../../../../apis/catalog/brc-analytics-catalog/common/utils";
+import { WorkflowCategoryId } from "../../../../../catalog/schema/generated/schema";
 import {
   BRCDataCatalogGenome,
   Workflow,
   WorkflowCategory,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
+import { workflowPloidyMatchesOrganismPloidy } from "../../../../apis/catalog/brc-analytics-catalog/common/utils";
 import { GA2AssemblyEntity } from "../../../../apis/catalog/ga2/entities";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../AnalysisMethod/components/DifferentialExpressionAnalysis/constants";
-import { WorkflowCategoryId } from "../../../../../catalog/schema/generated/schema";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../differentialExpressionAnalysis/constants";
 
 /**
  * Builds workflow categories for the given assembly.
  * Differential Expression Analysis is added to the Transcriptomics category if DE is enabled.
- *
  * @param assembly - Assembly.
  * @param allWorkflowCategories - Workflow categories.
  * @param isDEEnabled - Whether Differential Expression is enabled.

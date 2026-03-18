@@ -1,18 +1,25 @@
-import { JSX } from "react";
-import { Button, Grid, Typography } from "@mui/material";
-import { Props } from "./types";
-import { Link as DXLink } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
-import { StyledGrid } from "./workflow.styles";
-import { TYPOGRAPHY_PROPS as COMPONENT_TYPOGRAPHY_PROPS } from "../../constants";
-import { BUTTON_PROPS, GRID_PROPS } from "./constants";
 import { REL_ATTRIBUTE } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
-import Link from "next/link";
-import { ROUTES } from "../../../../../../../routes/constants";
-import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
-import { formatTrsId } from "../../../AnalysisMethodsCatalog/utils";
+import { Link as DXLink } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
+import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
-import { Fragment } from "react";
+import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
+import { Button, Grid, Typography } from "@mui/material";
+import Link from "next/link";
+import { Fragment, JSX } from "react";
+import { ROUTES } from "../../../../../../../../../routes/constants";
+import { formatTrsId } from "../../../../utils";
+import { TYPOGRAPHY_PROPS as COMPONENT_TYPOGRAPHY_PROPS } from "../../constants";
+import { GRID_PROPS } from "./constants";
+import { Props } from "./types";
+import { StyledGrid } from "./workflow.styles";
 
+/**
+ * Workflow component that displays a compatible workflow for the assembly and workflow category, and a link to configure the workflow inputs.
+ * @param props - Component props.
+ * @param props.entityId - Assembly Entity ID.
+ * @param props.workflow - Compatible workflow for the assembly and workflow category.
+ * @returns A JSX element representing a compatible workflow and a link to configure the workflow inputs.
+ */
 export const Workflow = ({ entityId, workflow }: Props): JSX.Element => {
   const { iwcId, workflowDescription, workflowName } = workflow;
   return (
@@ -38,7 +45,7 @@ export const Workflow = ({ entityId, workflow }: Props): JSX.Element => {
       <Grid container spacing={1}>
         <Grid>
           <Button
-            {...BUTTON_PROPS}
+            color={BUTTON_PROPS.COLOR.PRIMARY}
             component={Link}
             disabled={!workflow.trsId}
             href={replaceParameters(ROUTES.CONFIGURE_WORKFLOW, {
@@ -46,6 +53,7 @@ export const Workflow = ({ entityId, workflow }: Props): JSX.Element => {
               trsId: formatTrsId(workflow.trsId),
             })}
             rel={REL_ATTRIBUTE.NO_OPENER}
+            variant={BUTTON_PROPS.VARIANT.CONTAINED}
           >
             Configure Inputs
           </Button>

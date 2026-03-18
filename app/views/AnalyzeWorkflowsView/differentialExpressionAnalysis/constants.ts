@@ -1,5 +1,5 @@
-import { WORKFLOW_PLOIDY } from "../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { Workflow } from "../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
+import { Workflow } from "../../../apis/catalog/brc-analytics-catalog/common/entities";
+import { WORKFLOW_PLOIDY } from "../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 
 export const DIFFERENTIAL_EXPRESSION_ANALYSIS: Workflow = {
   iwcId: "",

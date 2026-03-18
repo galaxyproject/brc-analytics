@@ -1,27 +1,27 @@
-import { JSX } from "react";
+import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import {
   GetStaticPaths,
   GetStaticPropsContext,
   GetStaticPropsResult,
 } from "next";
 import { ParsedUrlQuery } from "querystring";
-import { config } from "../../../../../app/config/config";
-import { seedDatabase } from "../../../../../app/utils/seedDatabase";
-import { getEntities } from "../../../../../app/utils/entityUtils";
+import { JSX } from "react";
 import {
   BRCDataCatalogGenome,
   EntitiesResponse,
 } from "../../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
-import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
-import workflows from "../../../../../catalog/output/workflows.json";
+import { GA2AssemblyEntity } from "../../../../../app/apis/catalog/ga2/entities";
+import { config } from "../../../../../app/config/config";
+import { getEntities } from "../../../../../app/utils/entityUtils";
+import { seedDatabase } from "../../../../../app/utils/seedDatabase";
 import {
   formatTrsId,
   workflowIsCompatibleWithAssembly,
-} from "../../../../../app/components/Entity/components/AnalysisMethodsCatalog/utils";
+} from "../../../../../app/views/AnalyzeWorkflowsView/components/Main/utils";
+import { CUSTOM_WORKFLOW } from "../../../../../app/views/AnalyzeWorkflowsView/custom/constants";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../app/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { WorkflowInputsView } from "../../../../../app/views/WorkflowInputsView/workflowInputsView";
-import { GA2AssemblyEntity } from "../../../../../app/apis/catalog/ga2/entities";
-import { CUSTOM_WORKFLOW } from "../../../../../app/components/Entity/components/AnalysisMethod/components/CustomWorkflow/constants";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../app/components/Entity/components/AnalysisMethod/components/DifferentialExpressionAnalysis/constants";
+import workflows from "../../../../../catalog/output/workflows.json";
 
 interface StaticPath {
   params: PageUrlParams;
