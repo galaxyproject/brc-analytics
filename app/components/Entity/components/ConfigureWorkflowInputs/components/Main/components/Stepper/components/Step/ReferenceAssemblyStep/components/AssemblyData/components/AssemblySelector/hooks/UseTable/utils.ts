@@ -1,9 +1,7 @@
 import { ColumnFiltersState, Table } from "@tanstack/react-table";
 import { Workflow } from "../../../../../../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
-import {
-  WORKFLOW_PARAMETER_VARIABLE,
-  WORKFLOW_PLOIDY,
-} from "../../../../../../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { WORKFLOW_PLOIDY } from "../../../../../../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { workflowRequiresAssemblyId } from "../../../../../../../../../../../../../../../../../views/AnalyzeWorkflowsView/components/Main/utils";
 import { CATEGORY_CONFIGS } from "./categoryConfigs";
 import { Assembly } from "./types";
 
@@ -37,10 +35,7 @@ export function getInitialColumnFilters(
 
   // If the workflow requires ASSEMBLY_ID, filter to only show assemblies with Galaxy datacache URLs.
   // ASSEMBLY_ID workflows need pre-built indexes (Bowtie2, BWA, etc.) accessible via datacache.
-  const requiresAssemblyId = workflow.parameters.some(
-    (param) => param.variable === WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_ID
-  );
-  if (requiresAssemblyId) {
+  if (workflowRequiresAssemblyId(workflow)) {
     columnFilterState.push({
       id: CATEGORY_CONFIGS.GALAXY_DATACACHE_URL.key,
       value: ["Yes"],
