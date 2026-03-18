@@ -5,7 +5,7 @@ import {
 } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { JSX } from "react";
 import { getEntity } from "../../services/workflows/query";
-import { Side } from "../AnalyzeView/components/Side/side";
+import { Side } from "../EntityView/assembly/components/Side/side";
 import { Assembly } from "../WorkflowInputsView/types";
 import { Main } from "./components/Main/main";
 import { Top } from "./components/Top/top";
