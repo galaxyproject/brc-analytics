@@ -1,7 +1,7 @@
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/components/FluidPaper/fluidPaper";
 import { BackPageContentMainColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
+import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
-import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/src/styles/common/mui/typography";
 import { ChevronRightRounded } from "@mui/icons-material";
 import {
   CardActionArea,
