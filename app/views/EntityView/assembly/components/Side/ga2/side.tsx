@@ -2,7 +2,7 @@ import { BackPageContentSideColumn } from "@databiosphere/findable-ui/lib/compon
 import { JSX } from "react";
 import { AnalysisPortals } from "../../../../../../components/Entity/components/AnalysisPortals/analysisPortals";
 import { buildAssemblyResources } from "../../../../../../viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { AssemblyDetails } from "../../../../components/KeyValueSection/Side/ga2/AssemblyDetails/AssemblyDetails";
+import { AssemblyDetails } from "../../../../assembly/components/Side/ga2/components/AssemblyDetails/AssemblyDetails";
 import { StyledFluidPaper } from "../side.styles";
 import { Props } from "./types";
 
