@@ -4,6 +4,7 @@ import {
   Workflow,
   WorkflowCategory,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
+import { WORKFLOW_PARAMETER_VARIABLE } from "../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { workflowPloidyMatchesOrganismPloidy } from "../../../../apis/catalog/brc-analytics-catalog/common/utils";
 import { GA2AssemblyEntity } from "../../../../apis/catalog/ga2/entities";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../differentialExpressionAnalysis/constants";
@@ -79,6 +80,18 @@ function sortWorkflowCategories(
 }
 
 /**
+ * Checks if a workflow requires the ASSEMBLY_ID parameter.
+ * Workflows with ASSEMBLY_ID depend on Galaxy having pre-built indexes (dbkey) for the assembly.
+ * @param workflow - The workflow to check.
+ * @returns True if the workflow has a parameter with ASSEMBLY_ID variable, false otherwise.
+ */
+export function workflowRequiresAssemblyId(workflow: Workflow): boolean {
+  return workflow.parameters.some(
+    (param) => param.variable === WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_ID
+  );
+}
+
+/**
  * Determines if a workflow is compatible with a given assembly.
  * @param workflow - The workflow to check compatibility for.
  * @param assembly - The assembly to check compatibility against.
@@ -94,7 +107,17 @@ export function workflowIsCompatibleWithAssembly(
   ) {
     return false;
   }
-  return assembly.ploidy.some((assemblyPloidy) =>
-    workflowPloidyMatchesOrganismPloidy(workflow.ploidy, assemblyPloidy)
-  );
+  if (
+    !assembly.ploidy.some((assemblyPloidy) =>
+      workflowPloidyMatchesOrganismPloidy(workflow.ploidy, assemblyPloidy)
+    )
+  ) {
+    return false;
+  }
+  // Filter out workflows requiring ASSEMBLY_ID when assembly lacks Galaxy datacache URL.
+  // ASSEMBLY_ID workflows need pre-built indexes (Bowtie2, BWA, etc.) accessible via datacache.
+  if (workflowRequiresAssemblyId(workflow) && !assembly.galaxyDatacacheUrl) {
+    return false;
+  }
+  return true;
 }
