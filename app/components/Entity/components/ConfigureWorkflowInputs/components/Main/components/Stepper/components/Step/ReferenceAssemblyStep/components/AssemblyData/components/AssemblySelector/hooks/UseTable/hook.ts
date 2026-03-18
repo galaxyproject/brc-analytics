@@ -6,6 +6,7 @@ import { ROW_POSITION } from "@databiosphere/findable-ui/lib/components/Table/fe
 import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/features/RowPreview/constants";
 import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/features/TableDownload/constants";
 import {
+  FilterFn,
   getCoreRowModel,
   getFacetedRowModel,
   getFilteredRowModel,
@@ -21,6 +22,12 @@ import { columns } from "./columnDef";
 import { COLUMN_VISIBILITY, SORTING } from "./constants";
 import { Assembly, UseTable } from "./types";
 import { getInitialColumnFilters, renderSummary } from "./utils";
+
+// Custom filter function to check if a value is not null
+const isNotNull: FilterFn<Assembly> = (row, columnId, filterValue) => {
+  const value = row.getValue(columnId);
+  return filterValue === true ? value !== null : true;
+};
 
 export const useTable = (workflow: Workflow): UseTable => {
   const assemblies = getEntities<Assembly>("assemblies");
@@ -58,7 +65,7 @@ export const useTable = (workflow: Workflow): UseTable => {
     enableSortingInteraction: true,
     enableSortingRemoval: false,
     enableTableDownload: true,
-    filterFns: { arrIncludesSome },
+    filterFns: { arrIncludesSome, isNotNull },
     getCoreRowModel: getCoreRowModel(),
     getFacetedMinMaxValues: getFacetedMinMaxValues(),
     getFacetedRowModel: getFacetedRowModel(),
