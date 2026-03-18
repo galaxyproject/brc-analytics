@@ -48,7 +48,9 @@ export const Main = ({ entityId }: Props): JSX.Element => {
       <StyledCard component={FluidPaper}>
         <CardActionArea
           component={Link}
-          href={replaceParameters(ROUTES.ANALYZE_CUSTOM_WORKFLOW, { entityId })}
+          href={replaceParameters(ROUTES.CONFIGURE_CUSTOM_WORKFLOW, {
+            entityId,
+          })}
         >
           <CardContent>
             <Typography variant={TYPOGRAPHY_PROPS.VARIANT.HEADING_XSMALL}>
