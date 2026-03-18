@@ -20,7 +20,7 @@ export function getBreadcrumbs({
     { path: ROUTES.GENOMES, text: "Assemblies" },
     { path: "", text: genome.accession },
     {
-      path: replaceParameters(ROUTES.ANALYZE, { entityId }),
+      path: replaceParameters(ROUTES.GENOME, { entityId }),
       text: "Analyze in Galaxy",
     },
     { path: "", text: workflow.workflowName },

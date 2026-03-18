@@ -11,6 +11,7 @@ import { GA2Catalog } from "../../../../app/apis/catalog/ga2/entities";
 import { config } from "../../../../app/config/config";
 import { getEntities, getEntity } from "../../../../app/utils/entityUtils";
 import { seedDatabase } from "../../../../app/utils/seedDatabase";
+import { AnalyzeView } from "../../../../app/views/AnalyzeView/analyzeView";
 import { EntityDetailView } from "../../../../app/views/EntityView/entityView";
 
 interface StaticPath {
@@ -24,6 +25,7 @@ interface PageUrl extends ParsedUrlQuery {
 
 export interface EntityPageProps<R> {
   data?: R;
+  entityId: string;
   entityListType: string;
 }
 
@@ -33,6 +35,8 @@ export interface EntityPageProps<R> {
  * @returns Entity detail view component.
  */
 const EntityDetailPage = <R,>(props: EntityPageProps<R>): JSX.Element => {
+  if (props.entityListType === "assemblies")
+    return <AnalyzeView entityId={props.entityId} />;
   return <EntityDetailView {...props} />;
 };
 
@@ -50,8 +54,6 @@ export const getStaticPaths: GetStaticPaths<PageUrl> = async () => {
     const { route: entityListType } = entityConfig;
 
     if (entityListType === "workflows") continue;
-    // Skip static generation for assemblies; the route will be /data/[entityListType]/[entityId]/analyze, and the analyze page will be statically generated instead.
-    if (entityListType === "assemblies") continue;
 
     await seedDatabase(entityListType, entityConfig);
     const entitiesResponse: EntitiesResponse<BRCCatalog | GA2Catalog> =
@@ -89,6 +91,7 @@ export const getStaticProps: GetStaticProps<
   const entityConfig = getEntityConfig(entities, entityListType);
 
   const props: EntityPageProps<BRCCatalog | GA2Catalog> = {
+    entityId,
     entityListType,
   };
 

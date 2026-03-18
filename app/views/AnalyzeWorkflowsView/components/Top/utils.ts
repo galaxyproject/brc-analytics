@@ -15,7 +15,7 @@ export function getBreadcrumbs({ assembly, entityId }: Props): Breadcrumb[] {
     { path: ROUTES.GENOMES, text: "Assemblies" },
     { path: "", text: assembly.accession },
     {
-      path: replaceParameters(ROUTES.ANALYZE, { entityId }),
+      path: replaceParameters(ROUTES.GENOME, { entityId }),
       text: "Analyze in Galaxy",
     },
     { path: "", text: "Select a Workflow" },

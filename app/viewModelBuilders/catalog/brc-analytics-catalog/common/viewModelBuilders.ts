@@ -75,7 +75,7 @@ export const buildAnalyzeGenome = (
   return {
     analyze: {
       label: "Analyze",
-      url: replaceParameters(ROUTES.ANALYZE, {
+      url: replaceParameters(ROUTES.GENOME, {
         entityId: sanitizeEntityId(accession),
       }),
     },
