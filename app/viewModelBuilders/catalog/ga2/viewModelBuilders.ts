@@ -1,42 +1,24 @@
-import {
-  GA2AssemblyEntity,
-  GA2OrganismEntity,
-} from "../../../apis/catalog/ga2/entities";
-import { ComponentProps } from "react";
-import * as C from "../../../components";
-import { ROUTES } from "../../../../routes/constants";
-import { sanitizeEntityId } from "../../../apis/catalog/common/utils";
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
+import { ColumnDef, getSortedRowModel } from "@tanstack/react-table";
+import { ComponentProps } from "react";
+import { ROUTES } from "../../../../routes/constants";
 import {
   GA2_CATEGORY_KEY,
   GA2_CATEGORY_LABEL,
 } from "../../../../site-config/ga2/category";
-import { ColumnDef, getSortedRowModel } from "@tanstack/react-table";
+import { sanitizeEntityId } from "../../../apis/catalog/common/utils";
+import {
+  GA2AssemblyEntity,
+  GA2OrganismEntity,
+} from "../../../apis/catalog/ga2/entities";
+import * as C from "../../../components";
 import {
   buildAnalyzeGenome,
   buildGenomeTaxonomicLevelStrain,
   buildIsRef,
   formatNumber,
 } from "../brc-analytics-catalog/common/viewModelBuilders";
-
-/**
- * Build props for the assembly BackPageHero component.
- * @param entity - Entity.
- * @returns Props to be used for the BackPageHero component.
- */
-export const buildAssemblyHero = (
-  entity: GA2AssemblyEntity
-): ComponentProps<typeof C.BackPageHero> => {
-  return {
-    breadcrumbs: [
-      { path: ROUTES.GENOMES, text: "Assemblies" },
-      { path: "", text: entity.accession },
-      { path: "", text: "Select a Workflow" },
-    ],
-    title: "Select a Workflow",
-  };
-};
 
 /**
  * Build props for the organism BackPageHero component.
@@ -53,20 +35,6 @@ export const buildOrganismHero = (
       { path: "", text: "Assemblies" },
     ],
     title: entity.taxonomicLevelSpecies,
-  };
-};
-
-/**
- * Build props for the organism BackPageHero component.
- * @param entity - Entity.
- * @returns Props to be used for the BackPageHero component.
- */
-export const buildOrganismImage = (
-  entity: GA2OrganismEntity | GA2AssemblyEntity
-): ComponentProps<typeof C.OrganismAvatar> => {
-  return {
-    image: entity.image,
-    isThumbnail: false,
   };
 };
 

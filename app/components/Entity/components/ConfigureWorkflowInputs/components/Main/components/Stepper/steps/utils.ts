@@ -1,8 +1,8 @@
 import { Workflow } from "../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import { WORKFLOW_PARAMETER_VARIABLE } from "../../../../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { CUSTOM_WORKFLOW } from "../../../../../../../../../components/Entity/components/AnalysisMethod/components/CustomWorkflow/constants";
+import { CUSTOM_WORKFLOW } from "../../../../../../../../../views/AnalyzeWorkflowsView/custom/constants";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../../../../../views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { ConfiguredInput } from "../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../../AnalysisMethod/components/DifferentialExpressionAnalysis/constants";
 import { StepConfig } from "../components/Step/types";
 import { STEP } from "./constants";
 

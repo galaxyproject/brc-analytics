@@ -1,5 +1,5 @@
 import { WorkflowEntity } from "../../../../../site-config/brc-analytics/local/index/workflow/types";
-import { formatTrsId } from "../../../../components/Entity/components/AnalysisMethodsCatalog/utils";
+import { formatTrsId } from "../../../../views/AnalyzeWorkflowsView/components/Main/utils";
 import { sanitizeEntityId } from "../../common/utils";
 import { GA2AssemblyEntity, GA2OrganismEntity } from "../../ga2/entities";
 import { BRCDataCatalogGenome, BRCDataCatalogOrganism } from "./entities";
