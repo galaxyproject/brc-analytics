@@ -1,15 +1,10 @@
-import {
-  EntityConfig,
-  SORT_DIRECTION,
-} from "@databiosphere/findable-ui/lib/config/entities";
+import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
 import { getWorkflowId } from "../../../../app/apis/catalog/brc-analytics-catalog/common/utils";
 import { AppEntityConfig } from "../../../common/entities";
+import { CATEGORY_GROUP_CONFIG } from "./workflow/categoryGroupConfig";
 import { COLUMNS } from "./workflow/columns";
-import {
-  CATEGORY_CONFIG,
-  CATEGORY_GROUP_CONFIG,
-} from "./workflow/categoryGroupConfig";
+import { TABLE_OPTIONS } from "./workflow/tableOptions";
 import { WorkflowEntity } from "./workflow/types";
 
 /**
@@ -29,25 +24,7 @@ export const workflowEntityConfig: AppEntityConfig<WorkflowEntity> = {
     // Type cast to EntityConfig["list"]["columns"] as we are using TanStack table
     // columns instead of Findable UI table columns.
     columns: COLUMNS as EntityConfig<WorkflowEntity>["list"]["columns"],
-    tableOptions: {
-      initialState: {
-        columnVisibility: {
-          [CATEGORY_CONFIG.CATEGORY.key]: false,
-          [CATEGORY_CONFIG.PLOIDY.key]: false,
-          [CATEGORY_CONFIG.TAXONOMY_ID.key]: false,
-        },
-        sorting: [
-          {
-            desc: SORT_DIRECTION.DESCENDING,
-            id: CATEGORY_CONFIG.CATEGORY.key,
-          },
-          {
-            desc: SORT_DIRECTION.ASCENDING,
-            id: CATEGORY_CONFIG.WORKFLOW_NAME.key,
-          },
-        ],
-      },
-    },
+    tableOptions: TABLE_OPTIONS,
   },
   listView: {
     disablePagination: true,
