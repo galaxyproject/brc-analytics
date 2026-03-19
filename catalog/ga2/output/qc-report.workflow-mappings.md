@@ -21,23 +21,23 @@
 | COVID-19: variation analysis on ARTIC PE data | 0 |
 | COVID-19: variation analysis on WGS PE data | 0 |
 | COVID-19: variation analysis on WGS SE data | 0 |
-| Single-Cell RNA-seq Preprocessing: 10X Genomics CellPlex Multiplexed Samples | 368 |
-| Single-Cell RNA-seq Preprocessing: 10X Genomics v3 to Seurat and Scanpy Compatible Format | 368 |
-| RNA-Seq Analysis: Paired-End Read Processing and Quantification | 368 |
-| RNA-Seq Analysis: Single-End Read Processing and Quantification | 368 |
-| ATAC-seq Analysis: Chromatin Accessibility Profiling | 368 |
-| ChIP-seq Analysis: Paired-End Read Processing | 368 |
-| ChIP-seq Analysis: Single-End Read Processing | 368 |
-| Consensus Peak Calling for ATAC-seq and CUT&RUN Replicates | 841 |
-| CUT&RUN/CUT&TAG Analysis: Protein-DNA Interaction Mapping | 368 |
-| Capture Hi-C Processing: FASTQ to Balanced Cool Files | 368 |
-| Hi-C Processing: FASTQ to Balanced Cool Files | 368 |
-| Hi-C Data Processing: FASTQ to Valid Interaction Pairs | 368 |
+| Single-Cell RNA-seq Preprocessing: 10X Genomics CellPlex Multiplexed Samples | 616 |
+| Single-Cell RNA-seq Preprocessing: 10X Genomics v3 to Seurat and Scanpy Compatible Format | 616 |
+| RNA-Seq Analysis: Paired-End Read Processing and Quantification | 616 |
+| RNA-Seq Analysis: Single-End Read Processing and Quantification | 616 |
+| ATAC-seq Analysis: Chromatin Accessibility Profiling | 616 |
+| ChIP-seq Analysis: Paired-End Read Processing | 616 |
+| ChIP-seq Analysis: Single-End Read Processing | 616 |
+| Consensus Peak Calling for ATAC-seq and CUT&RUN Replicates | 1217 |
+| CUT&RUN/CUT&TAG Analysis: Protein-DNA Interaction Mapping | 616 |
+| Capture Hi-C Processing: FASTQ to Balanced Cool Files | 616 |
+| Hi-C Processing: FASTQ to Balanced Cool Files | 616 |
+| Hi-C Data Processing: FASTQ to Valid Interaction Pairs | 616 |
 | Variant calling and consensus construction from paired end short read data of non-segmented viral genomes | 0 |
 | Pox Virus Illumina Amplicon Workflow from half-genomes | 0 |
 | AMR Gene Detection | 0 |
 | Bacterial Genome Annotation | 0 |
-| lncRNAs annotation workflow | 841 |
+| lncRNAs annotation workflow | 1217 |
 
 ## Summary Statistics
 
