@@ -1,8 +1,10 @@
 export const ROUTES = {
   ABOUT: "/about",
+  ANALYZE_WORKFLOWS: "/data/assemblies/{entityId}/analyze/workflows",
   ASSISTANT: "/assistant",
   CALENDAR: "/calendar",
-  CONFIGURE_WORKFLOW: "/data/assemblies/{entityId}/{trsId}",
+  CONFIGURE_CUSTOM_WORKFLOW: "/data/assemblies/{entityId}/analyze/custom",
+  CONFIGURE_WORKFLOW: "/data/assemblies/{entityId}/analyze/workflows/{trsId}",
   GENOME: "/data/assemblies/{entityId}",
   GENOMES: "/data/assemblies",
   LEARN: "/learn",
@@ -10,4 +12,6 @@ export const ROUTES = {
   PRIORITY_PATHOGEN: "/data/[entityListType]/[entityId]",
   PRIORITY_PATHOGENS: "/data/priority-pathogens",
   ROADMAP: "/roadmap",
+  WORKFLOW: "/data/workflows/{trsId}",
+  WORKFLOWS: "/data/workflows",
 };

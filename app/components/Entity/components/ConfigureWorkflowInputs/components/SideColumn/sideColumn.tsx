@@ -1,16 +1,16 @@
-import { JSX } from "react";
+import { KeyValuePairs } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/keyValuePairs";
 import {
   FluidPaper,
   GridPaper,
 } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import { CollapsableSection } from "@databiosphere/findable-ui/lib/components/common/Section/components/CollapsableSection/collapsableSection";
-import { KeyValuePairs } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/keyValuePairs";
-import { Props } from "./types";
+import { JSX } from "react";
 import {
   buildAssemblyDetails,
   buildWorkflowConfiguration,
   buildWorkflowDetails,
 } from "../../../../../../viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import { Props } from "./types";
 
 export const SideColumn = ({
   configuredInput,
@@ -29,9 +29,11 @@ export const SideColumn = ({
         <CollapsableSection title="Workflow Details">
           <KeyValuePairs {...buildWorkflowDetails(workflow)} />
         </CollapsableSection>
-        <CollapsableSection title="Assembly Details">
-          <KeyValuePairs {...buildAssemblyDetails(genome)} />
-        </CollapsableSection>
+        {genome && (
+          <CollapsableSection title="Assembly Details">
+            <KeyValuePairs {...buildAssemblyDetails(genome)} />
+          </CollapsableSection>
+        )}
       </GridPaper>
     </FluidPaper>
   );

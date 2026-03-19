@@ -1,33 +1,45 @@
+import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
+import { arrIncludesSome } from "@databiosphere/findable-ui/lib/components/Table/columnDef/columnFilters/filterFn";
+import { getFacetedUniqueValuesWithArrayValues } from "@databiosphere/findable-ui/lib/components/Table/common/utils";
+import { getFacetedMinMaxValues } from "@databiosphere/findable-ui/lib/components/Table/featureOptions/facetedColumn/getFacetedMinMaxValues";
+import { ROW_POSITION } from "@databiosphere/findable-ui/lib/components/Table/features/RowPosition/constants";
+import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/features/RowPreview/constants";
+import { ROW_SELECTION_VALIDATION } from "@databiosphere/findable-ui/lib/components/Table/features/RowSelectionValidation/constants";
+import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/features/TableDownload/constants";
+import { UseQueryResult } from "@tanstack/react-query";
 import {
+  functionalUpdate,
   getCoreRowModel,
   getFacetedRowModel,
   getFilteredRowModel,
+  getSortedRowModel,
   InitialTableState,
+  TableState,
   useReactTable,
 } from "@tanstack/react-table";
-import { BaseReadRun, ReadRun } from "../../../../types";
-import { ROW_POSITION } from "@databiosphere/findable-ui/lib/components/Table/features/RowPosition/constants";
-import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/features/RowPreview/constants";
-import { columns } from "./columnDef";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { getFacetedUniqueValuesWithArrayValues } from "@databiosphere/findable-ui/lib/components/Table/common/utils";
-import { arrIncludesSome } from "@databiosphere/findable-ui/lib/components/Table/columnDef/columnFilters/filterFn";
-import { ColumnFiltersState } from "@tanstack/react-table";
-import { UseENADataByTaxonomyId } from "../../../../hooks/UseENADataByTaxonomyId/types";
-import { enableRowSelection, getRowSelectionValidation } from "./utils";
-import { SORTING, COLUMN_VISIBILITY } from "./constants";
-import { getSortedRowModel } from "@tanstack/react-table";
+import { OnConfigure } from "../../../../../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { BaseReadRun, ReadRun } from "../../../../types";
+import { getSequencingData } from "../../../../utils";
 import { CATEGORY_GROUPS } from "./categoryGroups";
-import { getFacetedMinMaxValues } from "@databiosphere/findable-ui/lib/components/Table/featureOptions/facetedColumn/getFacetedMinMaxValues";
-import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
-import { ROW_SELECTION_VALIDATION } from "@databiosphere/findable-ui/lib/components/Table/features/RowSelectionValidation/constants";
-import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/features/TableDownload/constants";
+import { columns } from "./columnDef";
+import { COLUMN_VISIBILITY, SORTING } from "./constants";
 import { mapReadRuns, sanitizeReadRuns } from "./dataTransforms";
 import { UseTable } from "./types";
+import {
+  enableRowSelection,
+  getRowSelectionValidation,
+  getSelectedRows,
+  renderSummary,
+} from "./utils";
 
 export const useTable = (
-  enaTaxonomyId: UseENADataByTaxonomyId<BaseReadRun>,
-  columnFilters: ColumnFiltersState
+  enaTaxonomyId: UseQueryResult<BaseReadRun[]>,
+  {
+    columnFilters,
+    rowSelection,
+  }: Pick<TableState, "columnFilters" | "rowSelection">,
+  onConfigure: OnConfigure
 ): UseTable => {
   const [data, setData] = useState<ReadRun[]>([]);
 
@@ -51,7 +63,10 @@ export const useTable = (
   const meta = {
     categoryGroups: CATEGORY_GROUPS,
     filterSort: FILTER_SORT.COUNT,
+    summaryFn: renderSummary,
   };
+
+  const state: Partial<TableState> = { rowSelection };
 
   const table = useReactTable<ReadRun>({
     _features: [
@@ -83,6 +98,11 @@ export const useTable = (
     getSortedRowModel: getSortedRowModel(),
     initialState,
     meta,
+    onRowSelectionChange: (updater) => {
+      const nextRowSelection = functionalUpdate(updater, rowSelection);
+      onConfigure(getSequencingData(getSelectedRows(data, nextRowSelection)));
+    },
+    state,
   });
 
   /**

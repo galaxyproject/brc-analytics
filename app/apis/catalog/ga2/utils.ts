@@ -1,3 +1,5 @@
+import { WorkflowEntity } from "../../../../site-config/ga2/local/index/workflow/types";
+import { formatTrsId } from "../../../views/AnalyzeWorkflowsView/components/Main/utils";
 import { sanitizeEntityId } from "../common/utils";
 import { GA2AssemblyEntity, GA2OrganismEntity } from "./entities";
 
@@ -26,4 +28,13 @@ export function getAssemblyTitle(entity?: GA2AssemblyEntity): string {
  */
 export function getOrganismId(entity?: GA2OrganismEntity): string {
   return entity?.ncbiTaxonomyId || "";
+}
+
+/**
+ * Get the ID of the workflow entity.
+ * @param workflow - Workflow.
+ * @returns workflow ID.
+ */
+export function getWorkflowId(workflow: WorkflowEntity): string {
+  return formatTrsId(workflow.trsId);
 }

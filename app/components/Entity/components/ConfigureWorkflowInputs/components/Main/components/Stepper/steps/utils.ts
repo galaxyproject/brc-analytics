@@ -1,10 +1,10 @@
 import { Workflow } from "../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import { WORKFLOW_PARAMETER_VARIABLE } from "../../../../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { CUSTOM_WORKFLOW } from "../../../../../../../../../views/AnalyzeWorkflowsView/custom/constants";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../../../../../views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
+import { ConfiguredInput } from "../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { StepConfig } from "../components/Step/types";
 import { STEP } from "./constants";
-import { CUSTOM_WORKFLOW } from "../../../../../../../../../components/Entity/components/AnalysisMethod/components/CustomWorkflow/constants";
-import { ConfiguredInput } from "../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../../AnalysisMethod/components/DifferentialExpressionAnalysis/constants";
 
 /**
  * Augment the configured steps with two additional sequencing steps "READ_RUNS_PAIRED" and "READ_RUNS_SINGLE".
@@ -49,6 +49,7 @@ export function buildSteps(workflow: Workflow): StepConfig[] {
       STEP.ASSEMBLY_ID,
       STEP.GENE_MODEL_URL,
       STEP.SAMPLE_SHEET,
+      STEP.STRANDEDNESS,
       STEP.SAMPLE_SHEET_CLASSIFICATION,
       STEP.DESEQ2_FORMULA,
       STEP.PRIMARY_CONTRASTS,

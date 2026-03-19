@@ -1,6 +1,7 @@
-import { EnaSequencingReads } from "app/utils/galaxy-api/entities";
-import { UcscTrack } from "../../../../utils/ucsc-tracks-api/entities";
 import { COLUMN_TYPE } from "../../../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
+import { Strandedness } from "../../../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/StrandednessStep/types";
+import { EnaSequencingReads } from "../../../../utils/galaxy-api/entities";
+import { UcscTrack } from "../../../../utils/ucsc-tracks-api/entities";
 
 export interface AllVAllContrasts {
   type: "ALL_AGAINST_ALL";
@@ -22,6 +23,7 @@ export interface ConfiguredInput {
   referenceAssembly?: string;
   sampleSheet?: Record<string, string>[];
   sampleSheetClassification?: Record<string, COLUMN_TYPE | null>;
+  strandedness?: Strandedness;
   tracks?: UcscTrack[] | null;
 }
 

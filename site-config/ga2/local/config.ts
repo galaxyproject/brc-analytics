@@ -1,25 +1,28 @@
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
-import * as C from "../../../app/components";
-import { ROUTES } from "../../../routes/constants";
-import { floating } from "./floating/floating";
-import { genomeEntityConfig } from "./index/genome/genomeEntityConfig";
-import { organismEntityConfig } from "./index/organism/organismEntityConfig";
+import data from "catalog/ga2/output/ncbi-taxa-tree.json";
 import {
   GA2AssemblyEntity,
   GA2OrganismEntity,
 } from "../../../app/apis/catalog/ga2/entities";
-import { AppSiteConfig } from "../../common/entities";
-import { APP_KEYS } from "../../common/constants";
-import data from "catalog/ga2/output/ncbi-taxa-tree.json";
-import { socialMedia } from "./socialMedia";
+import * as C from "../../../app/components";
 import { TaxonomyNode } from "../../../app/components/Home/components/Section/components/SectionViz/data";
+import { ROUTES } from "../../../routes/constants";
+import { APP_KEYS } from "../../common/constants";
+import { AppSiteConfig } from "../../common/entities";
+import { floating } from "./floating/floating";
+import { genomeEntityConfig } from "./index/genome/genomeEntityConfig";
+import { organismEntityConfig } from "./index/organism/organismEntityConfig";
+import { workflowEntityConfig } from "./index/workflow/workflowEntityConfig";
+import { WorkflowEntity } from "./index/workflow/types";
+import { socialMedia } from "./socialMedia";
 import { THEME_OPTIONS } from "./theme/constants";
 
 const ALLOWED_PATHS = [
   ROUTES.ABOUT,
   ROUTES.ORGANISMS,
   ROUTES.GENOMES,
+  ROUTES.WORKFLOWS,
   ROUTES.ROADMAP,
 ];
 const LOCALHOST = "http://localhost:3000";
@@ -59,6 +62,7 @@ export function makeConfig(
     entities: [
       organismEntityConfig as EntityConfig<GA2OrganismEntity>,
       genomeEntityConfig as EntityConfig<GA2AssemblyEntity>,
+      workflowEntityConfig as EntityConfig<WorkflowEntity>,
     ],
     gitHubUrl,
     layout: {
@@ -88,6 +92,7 @@ export function makeConfig(
             { label: "About", url: ROUTES.ABOUT },
             { label: "Organisms", url: ROUTES.ORGANISMS },
             { label: "Assemblies", url: ROUTES.GENOMES },
+            { label: "Workflows", url: ROUTES.WORKFLOWS },
             { label: "Roadmap", url: ROUTES.ROADMAP },
           ],
           undefined,

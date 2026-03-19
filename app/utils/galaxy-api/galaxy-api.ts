@@ -757,6 +757,7 @@ function buildSampleSheetCollection(
  * @param sampleSheetClassification - Classification of sample sheet columns.
  * @param designFormula - DESeq2 design formula.
  * @param primaryContrasts - Primary contrasts configuration (baseline, explicit pairs, or all-vs-all).
+ * @param strandedness - Library strandedness value.
  * @param origin - Origin URL of the site making the request.
  * @returns DESeq2 workflow landing URL.
  */
@@ -768,6 +769,7 @@ export async function getDeSeq2LandingUrl(
   sampleSheetClassification: Record<string, COLUMN_TYPE | null>,
   designFormula: string,
   primaryContrasts: PrimaryContrasts | null,
+  strandedness: string | undefined,
   origin: string
 ): Promise<string> {
   const md5Checksums = await fetchUcscMd5Checksums(referenceAssembly);
@@ -803,6 +805,7 @@ export async function getDeSeq2LandingUrl(
       },
       "Reference genome": referenceAssembly,
       ...(referenceLevel && { "Reference level": referenceLevel }),
+      ...(strandedness && { Strandedness: strandedness }),
       "Sample sheet of sequencing reads": sampleSheetCollection,
       "Use featurecounts for generating count tables": true,
     },

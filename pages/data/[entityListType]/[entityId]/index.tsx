@@ -1,17 +1,18 @@
-import { JSX } from "react";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { getEntityConfig } from "@databiosphere/findable-ui/lib/config/utils";
 import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
 import { ParsedUrlQuery } from "querystring";
+import { JSX } from "react";
 import {
   BRCCatalog,
   EntitiesResponse,
 } from "../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
-import { config } from "../../../../app/config/config";
-import { seedDatabase } from "../../../../app/utils/seedDatabase";
-import { getEntities, getEntity } from "../../../../app/utils/entityUtils";
-import { EntityDetailView } from "../../../../app/views/EntityView/entityView";
 import { GA2Catalog } from "../../../../app/apis/catalog/ga2/entities";
+import { config } from "../../../../app/config/config";
+import { getEntities, getEntity } from "../../../../app/utils/entityUtils";
+import { seedDatabase } from "../../../../app/utils/seedDatabase";
+import { AnalyzeView } from "../../../../app/views/AnalyzeView/analyzeView";
+import { EntityDetailView } from "../../../../app/views/EntityView/entityView";
 
 interface StaticPath {
   params: PageUrl;
@@ -24,6 +25,7 @@ interface PageUrl extends ParsedUrlQuery {
 
 export interface EntityPageProps<R> {
   data?: R;
+  entityId: string;
   entityListType: string;
 }
 
@@ -33,6 +35,8 @@ export interface EntityPageProps<R> {
  * @returns Entity detail view component.
  */
 const EntityDetailPage = <R,>(props: EntityPageProps<R>): JSX.Element => {
+  if (props.entityListType === "assemblies")
+    return <AnalyzeView entityId={props.entityId} />;
   return <EntityDetailView {...props} />;
 };
 
@@ -48,6 +52,9 @@ export const getStaticPaths: GetStaticPaths<PageUrl> = async () => {
 
   for (const entityConfig of entities) {
     const { route: entityListType } = entityConfig;
+
+    if (entityListType === "workflows") continue;
+
     await seedDatabase(entityListType, entityConfig);
     const entitiesResponse: EntitiesResponse<BRCCatalog | GA2Catalog> =
       await getEntities(entityConfig);
@@ -84,6 +91,7 @@ export const getStaticProps: GetStaticProps<
   const entityConfig = getEntityConfig(entities, entityListType);
 
   const props: EntityPageProps<BRCCatalog | GA2Catalog> = {
+    entityId,
     entityListType,
   };
 

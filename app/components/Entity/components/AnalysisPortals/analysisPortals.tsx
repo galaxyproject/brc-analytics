@@ -1,4 +1,3 @@
-import { JSX } from "react";
 import {
   StaticImage,
   StaticImageProps,
@@ -7,10 +6,12 @@ import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,
 } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
-import { Typography } from "@mui/material";
-import { Fragment } from "react";
-import { StyledButtonBase } from "./analysisPortals.styles";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
+import { Typography } from "@mui/material";
+import { JSX } from "react";
+import { Section } from "../../../../views/EntityView/ui/Section/section";
+import { SectionTitle } from "../../../../views/EntityView/ui/SectionTitle/sectionTitle";
+import { StyledButtonBase } from "./analysisPortals.styles";
 
 export interface AnalysisPortals {
   imageProps: StaticImageProps;
@@ -20,14 +21,17 @@ export interface AnalysisPortals {
 
 interface AnalysisPortalsProps {
   portals: AnalysisPortals[];
+  title: string;
 }
 
 export const AnalysisPortals = ({
   portals,
+  title,
 }: AnalysisPortalsProps): JSX.Element => {
   if (portals.length === 0) return <span>None</span>;
   return (
-    <Fragment>
+    <Section>
+      <SectionTitle>{title}</SectionTitle>
       {portals.map(({ imageProps, label, url }) => (
         <StyledButtonBase
           key={label}
@@ -45,6 +49,6 @@ export const AnalysisPortals = ({
           </Typography>
         </StyledButtonBase>
       ))}
-    </Fragment>
+    </Section>
   );
 };

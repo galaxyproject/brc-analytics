@@ -6,6 +6,7 @@ import {
 } from "../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { UcscTrack } from "../../../../../../../../../../../../utils/ucsc-tracks-api/entities";
 import { COLUMN_TYPE } from "../../SampleSheetClassificationStep/types";
+import { Strandedness } from "../../StrandednessStep/types";
 
 export interface ConfiguredValue {
   designFormula: string | null;
@@ -16,6 +17,7 @@ export interface ConfiguredValue {
   referenceAssembly: string;
   sampleSheet: Record<string, string>[] | null;
   sampleSheetClassification: Record<string, COLUMN_TYPE | null> | null;
+  strandedness: Strandedness | undefined;
   tracks: UcscTrack[] | null;
 }
 

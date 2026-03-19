@@ -16,9 +16,6 @@ import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
 } from "../../category";
-import { mainColumn as analysisMethodsMainColumn } from "../entity/genome/analysisMethodMainColumn";
-import { sideColumn as analysisMethodsSideColumn } from "../entity/genome/analysisMethodsSideColumn";
-import { top as analysisMethodsTop } from "../entity/genome/analysisMethodsTop";
 import { CATEGORY_GROUPS } from "./common/category/categories";
 import { COLUMN_REGISTRY } from "./common/column/columnRegistry";
 
@@ -126,15 +123,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
   detail: {
     detailOverviews: [],
     staticLoad: true,
-    tabs: [
-      {
-        label: "Choose Analysis Method",
-        mainColumn: analysisMethodsMainColumn,
-        route: "",
-        sideColumn: analysisMethodsSideColumn,
-        top: analysisMethodsTop,
-      },
-    ],
+    tabs: [],
   },
   exploreMode: EXPLORE_MODE.CS_FETCH_CS_FILTERING,
   getId: getGenomeId,
