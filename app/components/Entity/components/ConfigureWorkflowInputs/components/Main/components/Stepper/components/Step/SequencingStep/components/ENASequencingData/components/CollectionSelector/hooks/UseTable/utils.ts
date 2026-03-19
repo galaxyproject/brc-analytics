@@ -1,4 +1,4 @@
-import { Row } from "@tanstack/react-table";
+import { Row, RowSelectionState, Table } from "@tanstack/react-table";
 import { ReadRun } from "../../../../types";
 
 /**
@@ -19,4 +19,29 @@ export function getRowSelectionValidation(
   row: Row<ReadRun>
 ): string | undefined {
   return row.original.validation.error;
+}
+
+/**
+ * Returns the selected rows from the data based on the row selection state.
+ * @param data - Table data.
+ * @param rowSelection - Row selection state.
+ * @returns Selected rows.
+ */
+export function getSelectedRows(
+  data: ReadRun[],
+  rowSelection: RowSelectionState
+): ReadRun[] {
+  return data.filter((row) => rowSelection?.[row.run_accession]);
+}
+
+/** Renders the summary row counts for the table.
+ * @param table - Table instance.
+ * @returns The summary row counts for the table.
+ */
+export function renderSummary(table: Table<ReadRun>): string {
+  const { getPreFilteredRowModel, getRowCount } = table;
+  const { rows } = getPreFilteredRowModel();
+  const rowCount = getRowCount();
+
+  return `${rowCount} matching run${rowCount === 1 ? "" : "s"} of ${rows.length}`;
 }

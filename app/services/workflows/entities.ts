@@ -1,10 +1,14 @@
 import {
   BRCDataCatalogGenome,
+  BRCDataCatalogOrganism,
   Workflow,
   WorkflowCategory,
 } from "../../apis/catalog/brc-analytics-catalog/common/entities";
+import {
+  GA2AssemblyEntity,
+  GA2OrganismEntity,
+} from "../../apis/catalog/ga2/entities";
 import { getEntities, getEntity } from "./query";
-import { GA2AssemblyEntity } from "../../apis/catalog/ga2/entities";
 
 /**
  * Gets assemblies.
@@ -25,6 +29,27 @@ export function getAssembly<T extends BRCDataCatalogGenome | GA2AssemblyEntity>(
   entityId: string
 ): T {
   return getEntity<T>("assemblies", entityId);
+}
+
+/**
+ * Gets organism by entity id.
+ * @param entityId - Entity id.
+ * @returns Organism.
+ */
+export function getOrganism<
+  T extends BRCDataCatalogOrganism | GA2OrganismEntity,
+>(entityId: string): T {
+  return getEntity<T>("organisms", entityId);
+}
+
+/**
+ * Gets organisms.
+ * @returns Organisms.
+ */
+export function getOrganisms<
+  T extends BRCDataCatalogOrganism | GA2OrganismEntity,
+>(): T[] {
+  return getEntities<T>("organisms");
 }
 
 /**

@@ -1,14 +1,14 @@
-import { API } from "./routes";
 import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
-import { getEntitiesById, setEntitiesById, setEntitiesByType } from "./store";
-import { EntityRoute } from "./types";
 import {
   Workflow,
   WorkflowCategory,
 } from "../../apis/catalog/brc-analytics-catalog/common/entities";
-import { formatTrsId } from "../../components/Entity/components/AnalysisMethodsCatalog/utils";
-import { CUSTOM_WORKFLOW } from "../../components/Entity/components/AnalysisMethod/components/CustomWorkflow/constants";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../components/Entity/components/AnalysisMethod/components/DifferentialExpressionAnalysis/constants";
+import { formatTrsId } from "../../views/AnalyzeWorkflowsView/components/Main/utils";
+import { CUSTOM_WORKFLOW } from "../../views/AnalyzeWorkflowsView/custom/constants";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
+import { API } from "./routes";
+import { getEntitiesById, setEntitiesById, setEntitiesByType } from "./store";
+import { EntityRoute } from "./types";
 
 /**
  * Fetches entities from the API.

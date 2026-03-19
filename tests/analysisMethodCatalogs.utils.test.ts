@@ -1,14 +1,14 @@
-import {
-  ORGANISM_PLOIDY,
-  WORKFLOW_PLOIDY,
-} from "../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
 import type {
   BRCDataCatalogGenome,
   WorkflowCategory,
 } from "../app/apis/catalog/brc-analytics-catalog/common/entities";
-import { buildAssemblyWorkflows } from "../app/components/Entity/components/AnalysisMethodsCatalog/utils";
+import {
+  ORGANISM_PLOIDY,
+  WORKFLOW_PLOIDY,
+} from "../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { buildAssemblyWorkflows } from "../app/views/AnalyzeWorkflowsView/components/Main/utils";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../app/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { WorkflowCategoryId } from "../catalog/schema/generated/schema";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../app/components/Entity/components/AnalysisMethod/components/DifferentialExpressionAnalysis/constants";
 
 describe("buildAssemblyWorkflows", () => {
   const WORKFLOW_CATEGORIES: WorkflowCategory[] = [

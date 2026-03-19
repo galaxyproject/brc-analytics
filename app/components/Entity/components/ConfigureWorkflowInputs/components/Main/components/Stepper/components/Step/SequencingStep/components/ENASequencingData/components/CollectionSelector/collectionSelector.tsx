@@ -1,19 +1,29 @@
-import { JSX } from "react";
+import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
+import { DialogTitle } from "@databiosphere/findable-ui/lib/components/common/Dialog/components/DialogTitle/dialogTitle";
 import { Button, DialogActions, DialogContent } from "@mui/material";
+import { Table as TanStackTable } from "@tanstack/react-table";
+import { JSX } from "react";
+import { ColumnFilters } from "../../../../../components/ColumnFilters/columnFilters";
+import { Table } from "../../../../../components/Table/table";
+import { ReadRun } from "../../types";
 import { StyledDialog } from "./collectionSelector.styles";
 import { Props } from "./types";
-import { DialogTitle } from "@databiosphere/findable-ui/lib/components/common/Dialog/components/DialogTitle/dialogTitle";
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
-import { Table } from "./components/Table/table";
-import { getSequencingData } from "../../utils";
-import { ColumnFilters } from "../../../../../components/ColumnFilters/columnFilters";
-import { Table as TanStackTable } from "@tanstack/react-table";
-import { ReadRun } from "../../types";
 
+/**
+ * Collection selector dialog for browsing and selecting sequencing runs.
+ * @param props - Component props.
+ * @param props.onCancel - Callback to cancel and close the dialog.
+ * @param props.onClose - Callback to close the dialog.
+ * @param props.onTransitionEnter - Callback fired when the dialog enter transition starts.
+ * @param props.onTransitionExited - Callback fired after the dialog exit transition.
+ * @param props.open - Whether the dialog is open.
+ * @param props.table - Sequencing runs table instance.
+ * @returns Collection selector dialog component.
+ */
 export const CollectionSelector = ({
   onCancel,
   onClose,
-  onConfigure,
+  onTransitionEnter,
   onTransitionExited,
   open,
   table,
@@ -22,6 +32,7 @@ export const CollectionSelector = ({
   return (
     <StyledDialog
       onClose={onCancel}
+      onTransitionEnter={onTransitionEnter}
       onTransitionExited={onTransitionExited}
       open={open}
     >
@@ -37,10 +48,7 @@ export const CollectionSelector = ({
         <Button
           {...BUTTON_PROPS.PRIMARY_CONTAINED}
           disabled={count === 0}
-          onClick={() => {
-            onConfigure(getSequencingData(table));
-            onClose();
-          }}
+          onClick={onClose}
         >
           {renderButtonText(count)}
         </Button>

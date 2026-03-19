@@ -6,11 +6,10 @@ import {
   getDeSeq2LandingUrl,
   getWorkflowLandingUrl,
 } from "../../../../../../../../../../../../utils/galaxy-api/galaxy-api";
+import { CUSTOM_WORKFLOW } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/custom/constants";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { Props, UseLaunchGalaxy } from "./types";
-import { getConfiguredValues } from "./utils";
-import { launchGalaxy } from "./utils";
-import { CUSTOM_WORKFLOW } from "../../../../../../../../../../../../components/Entity/components/AnalysisMethod/components/CustomWorkflow/constants";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../../../../../../../../components/Entity/components/AnalysisMethod/components/DifferentialExpressionAnalysis/constants";
+import { getConfiguredValues, launchGalaxy } from "./utils";
 
 export const useLaunchGalaxy = ({
   configuredInput,
@@ -57,6 +56,7 @@ export const useLaunchGalaxy = ({
           configuredValue.sampleSheetClassification,
           configuredValue.designFormula,
           configuredValue.primaryContrasts,
+          configuredValue.strandedness,
           origin
         )
       );

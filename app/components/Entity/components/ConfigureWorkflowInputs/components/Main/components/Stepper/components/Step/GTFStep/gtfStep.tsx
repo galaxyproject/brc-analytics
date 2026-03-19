@@ -1,9 +1,17 @@
-import { JSX } from "react";
+import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
+import { RadioCheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioCheckedIcon/radioCheckedIcon";
+import { RadioUncheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioUncheckedIcon/radioUncheckedIcon";
+import {
+  Loading,
+  LOADING_PANEL_STYLE,
+} from "@databiosphere/findable-ui/lib/components/Loading/loading";
 import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepContent/stepContent";
-import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Icon } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Label/components/Icon/icon";
-import { StepProps } from "../types";
+import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Optional/optional";
+import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
+import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
+import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import {
   Button,
   FormControlLabel,
@@ -11,22 +19,15 @@ import {
   RadioGroup,
   Typography,
 } from "@mui/material";
-import { StyledGrid } from "./gtfStep.styles";
-import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
-import { configureGTFStep } from "./utils";
-import { useUCSCFiles } from "./hooks/UseUCSCFiles/hook";
-import { useRadioGroup } from "./hooks/UseRadioGroup/hook";
-import { Fragment, useEffect } from "react";
-import {
-  Loading,
-  LOADING_PANEL_STYLE,
-} from "@databiosphere/findable-ui/lib/components/Loading/loading";
-import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Optional/optional";
-import { getGeneModelLabel } from "./utils";
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
-import { STEP } from "./step";
+import { Fragment, JSX, useEffect } from "react";
 import { StepWarning } from "../components/StepWarning/stepWarning";
-import { getStepActiveState, getButtonDisabledState } from "../utils/stepUtils";
+import { StepProps } from "../types";
+import { getButtonDisabledState, getStepActiveState } from "../utils/stepUtils";
+import { StyledGrid } from "./gtfStep.styles";
+import { useRadioGroup } from "./hooks/UseRadioGroup/hook";
+import { useQuery } from "./query/hook";
+import { STEP } from "./step";
+import { configureGTFStep, getGeneModelLabel } from "./utils";
 
 export const GTFStep = ({
   active,
@@ -35,17 +36,17 @@ export const GTFStep = ({
   entryLabel,
   genome,
   index,
+  last,
   onConfigure,
   onContinue,
   onEdit,
 }: StepProps): JSX.Element => {
-  const { error, geneModelUrls, isLoading } = useUCSCFiles(genome);
-  const { controls, onChange, onValueChange, value } =
-    useRadioGroup(geneModelUrls);
+  const { data, error, isLoading } = useQuery(genome);
+  const { controls, onChange, onValueChange, value } = useRadioGroup(data);
 
   useEffect(() => {
-    configureGTFStep(geneModelUrls, onConfigure, onValueChange);
-  }, [geneModelUrls, onConfigure, onValueChange]);
+    configureGTFStep(data, onConfigure, onValueChange);
+  }, [data, onConfigure, onValueChange]);
 
   // Auto-configure step with empty string if there's an error
   // Empty string represents "user will provide in Galaxy" similar to how sequencing steps use empty arrays
@@ -62,7 +63,7 @@ export const GTFStep = ({
       index={index}
     >
       {/* Step component `children` should be subcomponents such as `StepLabel`, `StepContent`. */}
-      {/* We ignore this; the loading UI is in the DOM while `geneModelUrls` is `undefined` and the Step is not `active`. */}
+      {/* We ignore this; the loading UI is in the DOM while `data` is `undefined` and the Step is not `active`. */}
       <Loading loading={isLoading} panelStyle={LOADING_PANEL_STYLE.INHERIT} />
       <StepLabel
         optional={
@@ -90,7 +91,21 @@ export const GTFStep = ({
             <RadioGroup onChange={onChange} value={value}>
               {controls.map(({ label, value }, i) => (
                 <FormControlLabel
-                  control={<Radio />}
+                  control={
+                    <Radio
+                      checkedIcon={
+                        <RadioCheckedIcon
+                          fontSize={SVG_ICON_PROPS.FONT_SIZE.XSMALL}
+                        />
+                      }
+                      icon={
+                        <RadioUncheckedIcon
+                          fontSize={SVG_ICON_PROPS.FONT_SIZE.XSMALL}
+                        />
+                      }
+                      size="small"
+                    />
+                  }
                   key={i}
                   onChange={() => onConfigure({ [STEP.key]: value })}
                   label={label}
@@ -105,13 +120,15 @@ export const GTFStep = ({
               </Typography>
             )
           )}
-          <Button
-            {...BUTTON_PROPS.PRIMARY_CONTAINED}
-            disabled={getButtonDisabledState(!value && !error, isLoading)}
-            onClick={() => onContinue()}
-          >
-            {error ? "Skip This Step" : "Continue"}
-          </Button>
+          {!last && (
+            <Button
+              {...BUTTON_PROPS.PRIMARY_CONTAINED}
+              disabled={getButtonDisabledState(!value && !error, isLoading)}
+              onClick={() => onContinue()}
+            >
+              {error ? "Skip This Step" : "Continue"}
+            </Button>
+          )}
         </StyledGrid>
       </StepContent>
     </Step>
