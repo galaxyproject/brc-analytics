@@ -20,31 +20,31 @@
     "workflowTrsId": "#workflow/github.com/iwc-workflows/sars-cov-2-se-illumina-wgs-variant-calling/COVID-19-SE-WGS-ILLUMINA/versions/v0.1.6"
   },
   {
-    "compatibleAssemblyCount": 841,
+    "compatibleAssemblyCount": 368,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.3"
   },
   {
-    "compatibleAssemblyCount": 841,
+    "compatibleAssemblyCount": 368,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.3"
   },
   {
-    "compatibleAssemblyCount": 841,
+    "compatibleAssemblyCount": 368,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.2"
   },
   {
-    "compatibleAssemblyCount": 841,
+    "compatibleAssemblyCount": 368,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.2"
   },
   {
-    "compatibleAssemblyCount": 841,
+    "compatibleAssemblyCount": 368,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/atacseq/main/versions/v1.0"
   },
   {
-    "compatibleAssemblyCount": 841,
+    "compatibleAssemblyCount": 368,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v1.0"
   },
   {
-    "compatibleAssemblyCount": 841,
+    "compatibleAssemblyCount": 368,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v1.0"
   },
   {
@@ -52,19 +52,19 @@
     "workflowTrsId": "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.3"
   },
   {
-    "compatibleAssemblyCount": 841,
+    "compatibleAssemblyCount": 368,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.14"
   },
   {
-    "compatibleAssemblyCount": 841,
+    "compatibleAssemblyCount": 368,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/chic-fastq-to-cool-hicup-cooler/versions/v0.3"
   },
   {
-    "compatibleAssemblyCount": 841,
+    "compatibleAssemblyCount": 368,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-cool-hicup-cooler/versions/v0.3"
   },
   {
-    "compatibleAssemblyCount": 841,
+    "compatibleAssemblyCount": 368,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-pairs-hicup/versions/v0.3"
   },
   {

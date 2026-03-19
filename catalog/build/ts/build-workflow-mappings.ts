@@ -4,12 +4,14 @@ import {
 } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   ORGANISM_PLOIDY,
+  WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_PLOIDY,
 } from "../../../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
 
 // Type constraint: both BRC and GA2 assemblies have these fields
 type AssemblyForCompatibility = {
   accession: string;
+  galaxyDatacacheUrl: string | null;
   lineageTaxonomyIds: string[];
   ploidy: ORGANISM_PLOIDY[];
 };
@@ -17,13 +19,22 @@ type AssemblyForCompatibility = {
 /**
  * NOTE: The compatibility functions below are intentionally duplicated from:
  * - app/apis/catalog/brc-analytics-catalog/common/utils.ts (workflowPloidyMatchesOrganismPloidy)
- * - app/components/Entity/components/AnalysisMethodsCatalog/utils.ts (workflowIsCompatibleWithAssembly)
+ * - app/views/AnalyzeWorkflowsView/components/Main/utils.ts (workflowIsCompatibleWithAssembly, workflowRequiresAssemblyId)
  *
  * They cannot be imported directly because this build script uses generics to work with both
  * BRC and GA2 assembly types, while the app functions have concrete type signatures.
  * If you modify the compatibility logic, update BOTH locations to keep them in sync.
  * Consider creating a shared utility module to avoid duplication.
  */
+
+// Helper function to check if workflow requires ASSEMBLY_ID parameter
+function workflowRequiresAssemblyId(workflow: {
+  parameters: Array<{ variable?: string }>;
+}): boolean {
+  return workflow.parameters.some(
+    (param) => param.variable === WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_ID
+  );
+}
 
 // Helper function to check ploidy compatibility
 function workflowPloidyMatchesOrganismPloidy(
@@ -44,7 +55,11 @@ function workflowPloidyMatchesOrganismPloidy(
 
 // Helper function to check workflow-assembly compatibility
 function workflowIsCompatibleWithAssembly<T extends AssemblyForCompatibility>(
-  workflow: { ploidy: WORKFLOW_PLOIDY; taxonomyId: string | null },
+  workflow: {
+    parameters: Array<{ variable?: string }>;
+    ploidy: WORKFLOW_PLOIDY;
+    taxonomyId: string | null;
+  },
   assembly: T
 ): boolean {
   if (
@@ -53,9 +68,19 @@ function workflowIsCompatibleWithAssembly<T extends AssemblyForCompatibility>(
   ) {
     return false;
   }
-  return assembly.ploidy.some((assemblyPloidy) =>
-    workflowPloidyMatchesOrganismPloidy(workflow.ploidy, assemblyPloidy)
-  );
+  if (
+    !assembly.ploidy.some((assemblyPloidy) =>
+      workflowPloidyMatchesOrganismPloidy(workflow.ploidy, assemblyPloidy)
+    )
+  ) {
+    return false;
+  }
+  // Filter out workflows requiring ASSEMBLY_ID when assembly lacks Galaxy datacache URL.
+  // ASSEMBLY_ID workflows need pre-built indexes (Bowtie2, BWA, etc.) accessible via datacache.
+  if (workflowRequiresAssemblyId(workflow) && !assembly.galaxyDatacacheUrl) {
+    return false;
+  }
+  return true;
 }
 
 // Generic workflow-assembly mapping builder - works for both BRC and GA2
