@@ -8,6 +8,10 @@
     "workflowTrsId": "#workflow/github.com/iwc-workflows/haploid-variant-calling-wgs-pe/main/versions/v0.1"
   },
   {
+    "compatibleAssemblyCount": 5499,
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/ploidy-aware-genotype-calling/main/versions/v0.1.1"
+  },
+  {
     "compatibleAssemblyCount": 1,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-variant-calling/COVID-19-PE-ARTIC-ILLUMINA/versions/v0.5.4"
   },
@@ -21,19 +25,19 @@
   },
   {
     "compatibleAssemblyCount": 4937,
-    "workflowTrsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.3"
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.4"
   },
   {
     "compatibleAssemblyCount": 4937,
-    "workflowTrsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.3"
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.4"
   },
   {
     "compatibleAssemblyCount": 4937,
-    "workflowTrsId": "#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.2"
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.3"
   },
   {
     "compatibleAssemblyCount": 4937,
-    "workflowTrsId": "#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.2"
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.3"
   },
   {
     "compatibleAssemblyCount": 4937,
@@ -49,11 +53,11 @@
   },
   {
     "compatibleAssemblyCount": 5499,
-    "workflowTrsId": "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.3"
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.4"
   },
   {
     "compatibleAssemblyCount": 4937,
-    "workflowTrsId": "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.14"
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.17"
   },
   {
     "compatibleAssemblyCount": 4326,
@@ -74,6 +78,10 @@
   {
     "compatibleAssemblyCount": 393,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.7"
+  },
+  {
+    "compatibleAssemblyCount": 4475,
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/annotation-braker3/main/versions/v0.1"
   },
   {
     "compatibleAssemblyCount": 393,

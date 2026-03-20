@@ -63,6 +63,28 @@
         "workflowName": "Paired end variant calling in haploid system"
       },
       {
+        "iwcId": "ploidy-aware-genotype-calling-main",
+        "parameters": [
+          {
+            "key": "Paired Collection",
+            "variable": "SANGER_READ_RUN_PAIRED"
+          },
+          {
+            "key": "Reference Genome fasta",
+            "variable": "ASSEMBLY_FASTA_URL"
+          },
+          {
+            "key": "Annotation GTF",
+            "variable": "GENE_MODEL_URL"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": null,
+        "trsId": "#workflow/github.com/iwc-workflows/ploidy-aware-genotype-calling/main/versions/v0.1.1",
+        "workflowDescription": "This workflow performs variant and genotype calling on whole-genome paired-end sequencing data from organisms of any ploidy to produce annotated VCF and TSV files",
+        "workflowName": "Paired end variant and ploidy-aware genotype calling"
+      },
+      {
         "iwcId": "sars-cov-2-pe-illumina-artic-variant-calling-covid-19-pe-artic-illumina",
         "parameters": [
           {
@@ -182,7 +204,7 @@
         ],
         "ploidy": "ANY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.3",
+        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.4",
         "workflowDescription": "Comprehensive preprocessing for 10X Genomics CellPlex multiplexed single-cell RNA-seq data. Processes Cell Multiplexing Oligo (CMO) FASTQ files with CITE-seq-Count including required CellPlex-specific translation steps. Simultaneously processes gene expression FASTQ files with STARsolo and DropletUtils for alignment and cell filtering, and formats outputs for seamless import into Seurat/Scanpy (Read10X function).",
         "workflowName": "Single-Cell RNA-seq Preprocessing: 10X Genomics CellPlex Multiplexed Samples"
       },
@@ -210,7 +232,7 @@
         ],
         "ploidy": "ANY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.3",
+        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.4",
         "workflowDescription": "Complete preprocessing pipeline for 10X Genomics v3 single-cell RNA-seq data. Aligns raw FASTQ files using STARsolo, performs cell calling and quality filtering with DropletUtils, and formats outputs for seamless import into Seurat/Scanpy (Read10X function).",
         "workflowName": "Single-Cell RNA-seq Preprocessing: 10X Genomics v3 to Seurat and Scanpy Compatible Format"
       },
@@ -238,7 +260,7 @@
         ],
         "ploidy": "ANY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.2",
+        "trsId": "#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.3",
         "workflowDescription": "Complete RNA-Seq analysis for paired-end data: Processes raw FASTQ data through adapter and bad quality removal (fastp), alignment with STAR using ENCODE parameters, gene quantification via multiple methods (STAR and featureCounts), and expression calculation (FPKM with Cufflinks/StringTie, normalized coverage with bedtools). Produces count tables, normalized expression values, and genomic coverage tracks. Supports stranded and unstranded libraries, generating both HTSeq-compatible counts and normalized measures for downstream analysis.",
         "workflowName": "RNA-Seq Analysis: Paired-End Read Processing and Quantification"
       },
@@ -266,7 +288,7 @@
         ],
         "ploidy": "ANY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.2",
+        "trsId": "#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.3",
         "workflowDescription": "Complete RNA-Seq analysis for single-end data:  Processes raw FASTQ data through adapter and bad quality removal (fastp), alignment with STAR using ENCODE parameters, gene quantification via multiple methods (STAR and featureCounts), and expression calculation (FPKM with Cufflinks/StringTie, normalized coverage with bedtools). Produces count tables, normalized expression values, and genomic coverage tracks. Supports stranded and unstranded libraries, generating both HTSeq-compatible counts and normalized measures for downstream analysis.",
         "workflowName": "RNA-Seq Analysis: Single-End Read Processing and Quantification"
       }
@@ -355,7 +377,7 @@
         "parameters": [],
         "ploidy": "ANY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.3",
+        "trsId": "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.4",
         "workflowDescription": "Identifies high-confidence consensus peaks from ATAC-seq or CUT&RUN replicate experiments. The workflow calls peaks on individual replicates and identifies their intersection. To control for sequencing depth differences, it subsamples all replicates to the smallest library size, performs peak calling on the combined normalized data, and retains only peaks whose summits overlap with intersections from a user-defined minimum number of replicates.",
         "workflowName": "Consensus Peak Calling for ATAC-seq and CUT&RUN Replicates"
       },
@@ -380,9 +402,9 @@
         ],
         "ploidy": "ANY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.14",
-        "workflowDescription": "Complete CUT&RUN/CUT&TAG analysis workflow for paired-end sequencing data. Processes raw FASTQ files through adapter removal (cutadapt) and alignment (Bowtie2 with dovetail option enabled). Applies quality filtering (MAPQ ≥ 30, concordant pairs only), converts BAM to BED format, and performs peak calling using MACS2 with parameters optimized for the punctate signal profile characteristic of CUT&RUN/CUT&TAG experiments.",
-        "workflowName": "CUT&RUN/CUT&TAG Analysis: Protein-DNA Interaction Mapping"
+        "trsId": "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.17",
+        "workflowDescription": "Complete CUT&amp;RUN/CUT&amp;TAG analysis workflow for paired-end sequencing data. Processes raw FASTQ files through adapter removal (cutadapt) and alignment (Bowtie2 with dovetail option enabled). Applies quality filtering (MAPQ ≥ 30, concordant pairs only), converts BAM to BED format, and performs peak calling using MACS2 with parameters optimized for the punctate signal profile characteristic of CUT&amp;RUN/CUT&amp;TAG experiments.",
+        "workflowName": "CUT&amp;RUN/CUT&amp;TAG Analysis: Protein-DNA Interaction Mapping"
       },
       {
         "iwcId": "hic-hicup-cooler-chic-fastq-to-cool-hicup-cooler",
@@ -528,6 +550,20 @@
         "trsId": "#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.7",
         "workflowDescription": "Antimicrobial resistance gene detection from assembled bacterial genomes",
         "workflowName": "AMR Gene Detection"
+      },
+      {
+        "iwcId": "annotation-braker3-main",
+        "parameters": [
+          {
+            "key": "Soft masked Genome sequence",
+            "variable": "ASSEMBLY_FASTA_URL"
+          }
+        ],
+        "ploidy": "ANY",
+        "taxonomyId": "2759",
+        "trsId": "#workflow/github.com/iwc-workflows/annotation-braker3/main/versions/v0.1",
+        "workflowDescription": "This workflow performs genome annotation using Braker3 and evaluates the quality of the annotation with BUSCO and genome annotation statistics.",
+        "workflowName": "Genome annotation with Braker3"
       },
       {
         "iwcId": "bacterial_genome_annotation-main",

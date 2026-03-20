@@ -4,7 +4,8 @@
 
 > **Note:** This section shows workflows added to workflows.yml in this script run. On subsequent runs, these will no longer appear here. Commit or save this report if you need to track what was added.
 
-None
+- Genome annotation with Braker3 (ANNOTATION)
+- Paired end variant and ploidy-aware genotype calling (VARIANT_CALLING)
 
 ## Active workflows with version not on Dockstore
 
@@ -107,6 +108,13 @@ None
 - Juicer Medium Tabix with validPairs
 - Interactions to consider to calculate weights in normalization step
 
+### Paired end variant and ploidy-aware genotype calling - VARIANT_CALLING (4 parameters)
+
+- Paired Collection
+- Reference Genome fasta
+- Set Ploidy for FreeBayes Variant Calling
+- Annotation GTF
+
 ### Generic variation analysis reporting - VARIANT_CALLING (4 parameters)
 
 - Variation data to report
@@ -130,14 +138,6 @@ None
 - gene length
 - KEGG pathways
 
-### Hi-C Data Processing: FASTQ to Valid Interaction Pairs - REGULATION (5 parameters)
-
-- PE fastq input
-- genome name
-- Restriction enzyme
-- No fill-in
-- minimum MAPQ
-
 ### COVID-19: variation analysis of ARTIC ONT data - VARIANT_CALLING (5 parameters)
 
 - ONT-sequenced reads
@@ -145,14 +145,6 @@ None
 - Maximum read length
 - NC_045512.2 FASTA sequence of SARS-CoV-2
 - Primer binding sites info in BED format
-
-### SARS-CoV-2 Illumina Amplicon pipeline - iVar based - VARIANT_CALLING (5 parameters)
-
-- Paired read collection for samples
-- Reference FASTA
-- Primer BED
-- Read fraction to call variant
-- Minimum quality score to call base
 
 ### Genome annotation with Maker - ANNOTATION (6 parameters)
 
@@ -163,15 +155,6 @@ None
 - Augustus training
 - SNAP training
 
-### Metagenomic Genes Catalogue Analysis - ANNOTATION (6 parameters)
-
-- Metagenomics Trimmed reads
-- AMR genes detection database
-- Virulence genes detection database
-- starAMR database
-- mmseqs2 taxonomy DB
-- eggNOG database
-
 ### RNA-Seq Differential Expression Analysis with Visualization - TRANSCRIPTOMICS (6 parameters)
 
 - Counts from changed condition
@@ -181,6 +164,15 @@ None
 - Adjusted p-value threshold
 - log2 fold change threshold
 
+### SARS-CoV-2 Illumina Amplicon pipeline - iVar based - VARIANT_CALLING (6 parameters)
+
+- Paired read collection for samples
+- Reference FASTA
+- Primer BED
+- Read fraction to call variant
+- Minimum quality score to call base
+- Version of pangolin-data to use
+
 ### COVID-19: variation analysis reporting - VARIANT_CALLING (6 parameters)
 
 - Variation data to report
@@ -189,6 +181,16 @@ None
 - DP_ALT Filter
 - gene products translations
 - Number of Clusters
+
+### Genome annotation with Braker3 - ANNOTATION (7 parameters)
+
+- BUSCO database
+- Include BUSCO
+- BUSCO lineage
+- Soft masked Genome sequence
+- Alignments from RNA-seq
+- Protein sequences
+- Fungus genome
 
 ### Single-Cell Mixture Analysis: baredSC 2D Log-Normalized Models - TRANSCRIPTOMICS (7 parameters)
 
@@ -200,16 +202,15 @@ None
 - Maximum number of Gaussians to study
 - compute p-value
 
-### Hi-C Processing: FASTQ to Balanced Cool Files - REGULATION (8 parameters)
+### Metagenomic Genes Catalogue Analysis - ANNOTATION (7 parameters)
 
-- PE fastq input
-- genome name
-- Restriction enzyme
-- No fill-in
-- minimum MAPQ
-- Bin size in bp
-- Interactions to consider to calculate weights in normalization step
-- region for matrix plotting
+- Metagenomics Trimmed reads
+- AMR genes detection database
+- Virulence genes detection database
+- starAMR database
+- mmseqs2 taxonomy DB
+- eggNOG database
+- Full genes catalogue
 
 ### Single-Cell Pseudobulk Differential Expression Analysis with edgeR - TRANSCRIPTOMICS (8 parameters)
 
@@ -222,23 +223,11 @@ None
 - Formula
 - Gene symbol column
 
-### Capture Hi-C Processing: FASTQ to Balanced Cool Files - REGULATION (10 parameters)
-
-- PE fastq input
-- genome name
-- Restriction enzyme
-- No fill-in
-- minimum MAPQ
-- Bin size in bp
-- Interactions to consider to calculate weights in normalization step
-- capture region (chromosome)
-- capture region (start)
-- capture region (end)
-
 ## IWC workflows not in workflows.yml (excluded by category filter)
 
 - Allele-based Pathogen Identification ( (from Dockstore: Microbiome))
 - Assembly decontamination VGP9  ( (from Dockstore: Vertebrate Genome Project))
+- CAPHEINE: Combined HyPhy Core and Compare ( (from Dockstore: Comparative Genomics))
 - COVID-19: consensus construction ( (from Dockstore: SARS-COV-2))
 - Clinical Metaproteomics Data Interpretation ( (from Dockstore: Proteomics, Metaproteomics))
 - Clinical Metaproteomics Discovery Workflow ( (from Dockstore: Proteomics, Metaproteomics))
@@ -253,10 +242,15 @@ None
 - Genome Assembly from Hifi reads - VGP3 ( (from Dockstore: Vertebrate Genome Project))
 - Genome Assembly from Hifi reads with HiC phasing - VGP4 ( (from Dockstore: Vertebrate Genome Project))
 - Genome Assembly with Pacbio Hifi reads and Trio data for phasing - VGP5 ( (from Dockstore: Vertebrate Genome Project))
-- Genome annotation with Braker3 (none)
-- Host or Contamination Removal on Long-Reads (none)
-- Host or Contamination Removal on Short-Reads (none)
+- Host or Contamination Removal on Long-Reads ( (from Dockstore: Metagenomics, Microbiome))
+- Host or Contamination Removal on Short-Reads ( (from Dockstore: Metagenomics, Microbiome))
+- HyPhy: Compare ( (from Dockstore: Comparative Genomics))
+- HyPhy: Core ( (from Dockstore: Comparative Genomics))
+- HyPhy: Preprocessing  ( (from Dockstore: Comparative Genomics))
 - K-mer profiling and reads statistics VGP1 ( (from Dockstore: Vertebrate Genome Project))
+- MAG Genome Annotation Parallel ( (from Dockstore: Microbiome))
+- MAGs binning evaluation ( (from Dockstore: Microbiome))
+- MAGs taxonomy annotation ( (from Dockstore: Microbiome))
 - MAPseq to ampvis2 ( (from Dockstore: Microbiome))
 - MGnify amplicon summary tables ( (from Dockstore: Microbiome))
 - MGnify's amplicon pipeline v5.0 ( (from Dockstore: Microbiome))
@@ -269,14 +263,14 @@ None
 - Mass spectrometry: LC-MS preprocessing with XCMS ( (from Dockstore: Computational Chemistry, Metabolomics))
 - MetaProSIP OpenMS 2.8 ( (from Dockstore: Proteomics))
 - Metagenome-Assembled Genomes (MAGs) generation ( (from Dockstore: Microbiome))
-- Metagenomics Taxonomic and Antibiotic Resistance Gene (ARG) Profiling (none)
+- Metagenomics Taxonomic and Antibiotic Resistance Gene (ARG) Profiling ( (from Dockstore: Metagenomics))
 - Mitogenome Assembly VGP0 ( (from Dockstore: Vertebrate Genome Project))
 - Molecular formula assignment and recalibration with MFAssignR package. ( (from Dockstore: Metabolomics))
 - Multiplex Tissue Microarray Analysis ( (from Dockstore: Imaging))
 - Nanopore Preprocessing ( (from Dockstore: Microbiome))
 - Parallel Accession Download ( (from Dockstore: Data Fetching))
 - Pathogen Detection PathoGFAIR Samples Aggregation and Visualisation ( (from Dockstore: Microbiome))
-- Post-Assembly Quality Control and Contamination Check for Bacterial Genomes ( (from Dockstore: Metagenomics, Microbiome))
+- Post-Assembly Quality Control and Contamination Check for Bacterial Genomes ( (from Dockstore: Metagenomics, Microbiome, Bacterial Genomics))
 - PretextMap Generation from 1 or 2 haplotypes ( (from Dockstore: Vertebrate Genome Project))
 - Purge duplicate contigs from a diploid assembly VGP6 ( (from Dockstore: Vertebrate Genome Project))
 - Purging duplicates in one haplotype VGP6b ( (from Dockstore: Vertebrate Genome Project))
@@ -291,15 +285,15 @@ None
 - QIIME2-III-V-Phylogeny-Rarefaction-Taxonomic-Analysis ( (from Dockstore: Metabarcoding))
 - RNA Velocity Analysis: Velocyto for 10X Data from Bundled Output ( (from Dockstore: Single Cell))
 - RNA Velocity Analysis: Velocyto for 10X Data with Filtered Barcodes ( (from Dockstore: Single Cell))
-- Raw Read Quality and Contamination Control For Genome Assembly (none)
+- Raw Read Quality and Contamination Control For Genome Assembly ( (from Dockstore: Bacterial Genomics))
 - Scaffolding with Hi-C data VGP8 ( (from Dockstore: Vertebrate Genome Project))
 - Scaffolding-BioNano-VGP7 ( (from Dockstore: Vertebrate Genome Project))
 - Segmentation and counting of cell nuclei in fluorescence microscopy images ( (from Dockstore: Imaging))
-- Short-read quality control and trimming (none)
+- Short-read quality control and trimming ( (from Dockstore: Quality Control and Pre-processing))
 - Single-Cell RNA-seq Analysis: Scanpy Preprocessing and Clustering ( (from Dockstore: Single Cell))
 - Taxonomic abundance summary tables for a specified taxonomic rank ( (from Dockstore: Microbiome))
 - Taxonomy Profiling and Visualization with Krona ( (from Dockstore: Microbiome))
-- core genome Multilocus Sequence Typing (cgMLST) of bacterial genome (none)
+- core genome Multilocus Sequence Typing (cgMLST) of bacterial genome ( (from Dockstore: Bacterial Genomics))
 - dada2 amplicon analysis pipeline - for paired end data ( (from Dockstore: Metabarcoding))
 - dcTMD calculations with GROMACS ( (from Dockstore: Computational Chemistry))
 - kmer-profiling-hifi-trio-VGP2 ( (from Dockstore: Vertebrate Genome Project))

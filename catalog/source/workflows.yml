@@ -28,6 +28,43 @@ workflows:
           class: text
     active: true
     iwc_id: amr_gene_detection-main
+  - trs_id: "#workflow/github.com/iwc-workflows/annotation-braker3/main/versions/v0.1"
+    categories:
+      - ANNOTATION
+    workflow_name: Genome annotation with Braker3
+    workflow_description:
+      This workflow performs genome annotation using Braker3 and
+      evaluates the quality of the annotation with BUSCO and genome annotation statistics.
+    ploidy: ANY
+    taxonomy_id: 2759
+    parameters:
+      - key: BUSCO database
+        type_guide:
+          class: text
+      - key: Include BUSCO
+        type_guide:
+          class: boolean
+      - key: BUSCO lineage
+        type_guide:
+          class: text
+      - key: Soft masked Genome sequence
+        variable: ASSEMBLY_FASTA_URL
+        type_guide:
+          class: File
+          ext: fasta
+      - key: Alignments from RNA-seq
+        type_guide:
+          class: File
+          ext: bam
+      - key: Protein sequences
+        type_guide:
+          class: File
+          ext: fasta
+      - key: Fungus genome
+        type_guide:
+          class: boolean
+    active: true
+    iwc_id: annotation-braker3-main
   - trs_id: "#workflow/github.com/iwc-workflows/annotation-maker/main/versions/v0.1"
     categories:
       - ANNOTATION
@@ -58,7 +95,7 @@ workflows:
           class: File
     active: false
     iwc_id: annotation-maker-main
-  - trs_id: "#workflow/github.com/iwc-workflows/assembly-with-flye/main/versions/v0.3"
+  - trs_id: "#workflow/github.com/iwc-workflows/assembly-with-flye/main/versions/v0.4"
     categories:
       - ASSEMBLY
     workflow_name: Genome assembly with Flye
@@ -344,7 +381,7 @@ workflows:
           class: integer
     active: true
     iwc_id: chipseq-sr-main
-  - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.3"
+  - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.4"
     categories:
       - REGULATION
     workflow_name: Consensus Peak Calling for ATAC-seq and CUT&RUN Replicates
@@ -373,7 +410,7 @@ workflows:
           class: integer
     active: true
     iwc_id: consensus-peaks-consensus-peaks-atac-cutandrun
-  - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-pe/versions/v1.3"
+  - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-pe/versions/v1.4"
     categories:
       - REGULATION
     workflow_name: Consensus Peak Calling for ChIP-seq Paired-End Replicates
@@ -402,7 +439,7 @@ workflows:
           class: integer
     active: false
     iwc_id: consensus-peaks-consensus-peaks-chip-pe
-  - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-sr/versions/v1.3"
+  - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-sr/versions/v1.4"
     categories:
       - REGULATION
     workflow_name: Consensus Peak Calling for ChIP-seq Single-End Replicates
@@ -431,17 +468,17 @@ workflows:
           class: integer
     active: false
     iwc_id: consensus-peaks-consensus-peaks-chip-sr
-  - trs_id: "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.14"
+  - trs_id: "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.17"
     categories:
       - REGULATION
-    workflow_name: "CUT&RUN/CUT&TAG Analysis: Protein-DNA Interaction Mapping"
+    workflow_name: "CUT&amp;RUN/CUT&amp;TAG Analysis: Protein-DNA Interaction Mapping"
     workflow_description:
-      Complete CUT&RUN/CUT&TAG analysis workflow for paired-end
+      Complete CUT&amp;RUN/CUT&amp;TAG analysis workflow for paired-end
       sequencing data. Processes raw FASTQ files through adapter removal (cutadapt)
       and alignment (Bowtie2 with dovetail option enabled). Applies quality filtering
       (MAPQ ≥ 30, concordant pairs only), converts BAM to BED format, and performs peak
       calling using MACS2 with parameters optimized for the punctate signal profile
-      characteristic of CUT&RUN/CUT&TAG experiments.
+      characteristic of CUT&amp;RUN/CUT&amp;TAG experiments.
     ploidy: ANY
     parameters:
       - key: reference_genome
@@ -470,7 +507,7 @@ workflows:
           class: boolean
     active: true
     iwc_id: cutandrun-main
-  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.3"
+  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.4"
     categories:
       - TRANSCRIPTOMICS
     workflow_name:
@@ -518,7 +555,7 @@ workflows:
           class: integer
     active: true
     iwc_id: fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-cellplex
-  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.3"
+  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.4"
     categories:
       - TRANSCRIPTOMICS
     workflow_name:
@@ -857,7 +894,7 @@ workflows:
           class: text
     active: false
     iwc_id: hic-hicup-cooler-hic-juicermediumtabix-to-cool-cooler
-  - trs_id: "#workflow/github.com/iwc-workflows/influenza-isolates-consensus-and-subtyping/main/versions/v0.2"
+  - trs_id: "#workflow/github.com/iwc-workflows/influenza-isolates-consensus-and-subtyping/main/versions/v0.3"
     categories:
       - CONSENSUS_SEQUENCES
     workflow_name: Influenza A isolate subtyping and consensus sequence generation
@@ -899,7 +936,7 @@ workflows:
           ext: bam
     active: true
     iwc_id: lncrnas-annotation-main
-  - trs_id: "#workflow/github.com/iwc-workflows/metagenomic-genes-catalogue/main/versions/v1.1"
+  - trs_id: "#workflow/github.com/iwc-workflows/metagenomic-genes-catalogue/main/versions/v1.2.1"
     categories:
       - ANNOTATION
     workflow_name: Metagenomic Genes Catalogue Analysis
@@ -934,8 +971,42 @@ workflows:
       - key: eggNOG database
         type_guide:
           class: text
+      - key: Full genes catalogue
+        type_guide:
+          class: boolean
     active: false
     iwc_id: metagenomic-genes-catalogue-main
+  - trs_id: "#workflow/github.com/iwc-workflows/ploidy-aware-genotype-calling/main/versions/v0.1.1"
+    categories:
+      - VARIANT_CALLING
+    workflow_name: Paired end variant and ploidy-aware genotype calling
+    workflow_description:
+      This workflow performs variant and genotype calling on whole-genome
+      paired-end sequencing data from organisms of any ploidy to produce annotated VCF
+      and TSV files
+    ploidy: ANY
+    parameters:
+      - key: Paired Collection
+        variable: SANGER_READ_RUN_PAIRED
+        type_guide:
+          class: Collection
+          ext:
+            - fastqsanger
+            - fastqsanger.gz
+          collection_type: list:paired
+      - key: Reference Genome fasta
+        variable: ASSEMBLY_FASTA_URL
+        type_guide:
+          class: File
+      - key: Set Ploidy for FreeBayes Variant Calling
+        type_guide:
+          class: integer
+      - key: Annotation GTF
+        variable: GENE_MODEL_URL
+        type_guide:
+          class: File
+    active: true
+    iwc_id: ploidy-aware-genotype-calling-main
   - trs_id: "#workflow/github.com/iwc-workflows/polish-with-long-reads/main/versions/v0.1"
     categories:
       - ASSEMBLY
@@ -1040,7 +1111,7 @@ workflows:
           class: File
     active: false
     iwc_id: repeatmasking-main
-  - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-de/main/versions/v0.5"
+  - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-de/main/versions/v0.8"
     categories:
       - TRANSCRIPTOMICS
     workflow_name: RNA-Seq Differential Expression Analysis with Visualization
@@ -1074,7 +1145,7 @@ workflows:
           class: float
     active: false
     iwc_id: rnaseq-de-main
-  - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.2"
+  - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.3"
     categories:
       - TRANSCRIPTOMICS
     workflow_name: "RNA-Seq Analysis: Paired-End Read Processing and Quantification"
@@ -1127,7 +1198,7 @@ workflows:
           class: boolean
     active: true
     iwc_id: rnaseq-pe-main
-  - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.2"
+  - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.3"
     categories:
       - TRANSCRIPTOMICS
     workflow_name: "RNA-Seq Analysis: Single-End Read Processing and Quantification"
@@ -1216,7 +1287,7 @@ workflows:
           ext: bed
     active: false
     iwc_id: sars-cov-2-ont-artic-variant-calling-covid-19-artic-ont
-  - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-ivar-analysis/SARS-COV-2-ILLUMINA-AMPLICON-IVAR-PANGOLIN-NEXTCLADE/versions/v0.3.1"
+  - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-ivar-analysis/SARS-COV-2-ILLUMINA-AMPLICON-IVAR-PANGOLIN-NEXTCLADE/versions/v0.4"
     categories:
       - VARIANT_CALLING
     workflow_name: SARS-CoV-2 Illumina Amplicon pipeline - iVar based
@@ -1240,6 +1311,9 @@ workflows:
       - key: Minimum quality score to call base
         type_guide:
           class: integer
+      - key: Version of pangolin-data to use
+        type_guide:
+          class: text
     active: false
     iwc_id: sars-cov-2-pe-illumina-artic-ivar-analysis-sars-cov-2-illumina-amplicon-ivar-pangolin-nextclade
   - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-variant-calling/COVID-19-PE-ARTIC-ILLUMINA/versions/v0.5.4"
