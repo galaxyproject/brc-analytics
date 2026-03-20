@@ -1736,3 +1736,24 @@ organisms:
   - ploidy:
       - DIPLOID
     taxonomy_id: 446457
+  - ploidy:
+      - DIPLOID
+    taxonomy_id: 179890
+  - ploidy:
+      - DIPLOID
+    taxonomy_id: 2972642
+  - ploidy:
+      - DIPLOID
+    taxonomy_id: 509136
+  - ploidy:
+      - DIPLOID
+    taxonomy_id: 9988
+  - ploidy:
+      - DIPLOID
+    taxonomy_id: 6579
+  - ploidy:
+      - DIPLOID
+    taxonomy_id: 91739
+  - ploidy:
+      - DIPLOID
+    taxonomy_id: 116150
