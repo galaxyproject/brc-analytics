@@ -2,6 +2,7 @@ export { default as EvolutionaryDynamicsOfCodingOverlapsInMeaslesVirus } from ".
 export { default as GenomeArk2 } from "./genomeArk2.mdx";
 export { default as Roadmap } from "./roadmap.mdx";
 export { default as ShareUsageAndJoinAdvisoryPanel } from "./shareUsageAndJoinAdvisoryPanel.mdx";
+export { default as UserSurvey } from "./userSurvey.mdx";
 export { default as Webinar20250326 } from "./webinar20250326.mdx";
 export { default as Webinars } from "./webinars.mdx";
 export { default as WebinarSeries } from "./webinarSeries.mdx";
