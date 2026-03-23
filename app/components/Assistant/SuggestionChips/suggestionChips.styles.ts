@@ -8,7 +8,7 @@ export const ChipsContainer = styled(Box)({
   padding: "8px 12px",
 });
 
-export const SuggestionChip = styled(Chip)({
+export const StyledSuggestionChip = styled(Chip)({
   "&:hover": {
     backgroundColor: "#e3f2fd",
     borderColor: "#90caf9",

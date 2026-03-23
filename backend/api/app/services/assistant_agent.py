@@ -567,7 +567,7 @@ class AssistantAgent:
     ) -> Optional[str]:
         """Fallback: search the catalog for an assembly matching the LLM value."""
         val_lower = value.lower()
-        # If we already know the organism, search its genomes first
+        # If we already know the organism, narrow the search
         tax_id = None
         if schema.organism.detail:
             tax_id = schema.organism.detail
@@ -578,21 +578,33 @@ class AssistantAgent:
                     tax_id = str(org.get("ncbiTaxonomyId"))
                     break
 
+        candidates: list[dict] = []
         for org in self.catalog.organisms:
             org_tax = str(org.get("ncbiTaxonomyId", ""))
             if tax_id and org_tax != tax_id:
                 continue
             for g in org.get("genomes", []):
-                strain = (g.get("strainName") or "").lower()
-                species = (g.get("taxonomicLevelSpecies") or "").lower()
+                strain = (g.get("strainName") or "").strip().lower()
                 if strain and strain in val_lower:
-                    logger.info("Assembly fallback matched strain '%s'", strain)
-                    return g.get("accession")
-                if species and species in val_lower:
-                    logger.info("Assembly fallback matched species '%s'", species)
-                    return g.get("accession")
-        logger.warning("Assembly fallback found no match for '%s'", value)
-        return None
+                    candidates.append(g)
+
+        # If no strain match, don't guess from species alone -- too ambiguous
+        # when an organism has many assemblies.
+        if not candidates:
+            logger.warning("Assembly fallback found no match for '%s'", value)
+            return None
+
+        # Prefer reference assemblies when multiple candidates match
+        for c in candidates:
+            if c.get("isRef") == "Yes":
+                logger.info(
+                    "Assembly fallback matched reference '%s'", c.get("accession")
+                )
+                return c.get("accession")
+
+        accession = candidates[0].get("accession")
+        logger.info("Assembly fallback matched '%s'", accession)
+        return accession
 
     def _find_workflow_trs_id(self, value: str) -> Optional[str]:
         """Fallback: match a workflow by name when iwcId isn't in the value."""

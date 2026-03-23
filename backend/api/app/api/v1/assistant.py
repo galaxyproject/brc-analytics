@@ -43,7 +43,11 @@ async def restore_session(
     agent=Depends(get_assistant_agent),
 ):
     """Restore a previous assistant session (messages, schema, suggestions)."""
-    state = await agent.session_service.get_session(session_id)
+    try:
+        state = await agent.session_service.get_session(session_id)
+    except Exception:
+        logger.exception("Failed to restore session %s", session_id)
+        raise HTTPException(status_code=500, detail="Failed to restore session")
     if state is None:
         raise HTTPException(status_code=404, detail="Session not found or expired")
 
@@ -64,5 +68,8 @@ async def delete_session(
     agent=Depends(get_assistant_agent),
 ):
     """Delete an assistant session."""
-    await agent.session_service.delete_session(session_id)
+    try:
+        await agent.session_service.delete_session(session_id)
+    except Exception:
+        logger.exception("Failed to delete session %s", session_id)
     return Response(status_code=204)
