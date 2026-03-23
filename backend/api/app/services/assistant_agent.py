@@ -100,6 +100,9 @@ especially if it has a gene annotation (GTF) available.
 - Don't hallucinate data — if a tool returns no results, say so.
 - If the user asks about something outside bioinformatics/BRC Analytics, \
   politely redirect.
+- Each message includes the current analysis state in brackets. Use this to \
+  know what's already filled and what still needs to be decided. Don't re-ask \
+  about filled fields unless the user wants to change something.
 
 ## Schema updates
 
@@ -244,6 +247,28 @@ class AssistantAgent:
         return self.agent is not None
 
     @staticmethod
+    def _build_context_prefix(schema: AnalysisSchema) -> str:
+        """Serialize current schema state so the LLM knows what's been decided."""
+        parts = []
+        for name in (
+            "organism",
+            "assembly",
+            "analysis_type",
+            "workflow",
+            "data_source",
+            "data_characteristics",
+            "gene_annotation",
+        ):
+            field = getattr(schema, name)
+            if field.status == FieldStatus.FILLED:
+                parts.append(f"{name}={field.value} (filled)")
+            elif field.status == FieldStatus.NEEDS_ATTENTION:
+                parts.append(f"{name}={field.value} (needs attention)")
+            else:
+                parts.append(f"{name}=pending")
+        return f"[Analysis progress: {', '.join(parts)}]"
+
+    @staticmethod
     def _truncate_history(messages: list[ModelMessage]) -> list[ModelMessage]:
         """Keep history within MAX_HISTORY_MESSAGES.
 
@@ -336,10 +361,14 @@ class AssistantAgent:
                 )
                 agent_history = None
 
+        # Prepend current schema state so the LLM knows what's been decided
+        context_prefix = self._build_context_prefix(state.schema_state)
+        augmented_message = f"{context_prefix}\n\n{message}"
+
         # Run the agent (with timeout + retry)
         deps = AssistantDeps(catalog=self.catalog)
         result = await self._run_agent_with_retry(
-            message, deps=deps, message_history=agent_history
+            augmented_message, deps=deps, message_history=agent_history
         )
 
         raw_reply = result.output
