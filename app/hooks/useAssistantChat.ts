@@ -116,14 +116,20 @@ export const useAssistantChat = (): UseAssistantChatReturn => {
     }
   }, []);
 
+  const retryingRef = useRef(false);
   const retry = useCallback(async (): Promise<void> => {
-    if (!lastFailedMessage) return;
+    if (!lastFailedMessage || retryingRef.current) return;
+    retryingRef.current = true;
     const msg = lastFailedMessage;
     setLastFailedMessage(null);
     setError(null);
     // Remove the failed user message -- sendMessage will re-add it
     setMessages((prev) => prev.slice(0, -1));
-    await sendMessage(msg);
+    try {
+      await sendMessage(msg);
+    } finally {
+      retryingRef.current = false;
+    }
   }, [lastFailedMessage, sendMessage]);
 
   const resetSession = useCallback((): void => {

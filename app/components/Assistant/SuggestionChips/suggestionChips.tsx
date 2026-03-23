@@ -1,9 +1,9 @@
 import { JSX } from "react";
-import { SuggestionChip as SuggestionChipType } from "../../../types/api";
-import { ChipsContainer, SuggestionChip } from "./suggestionChips.styles";
+import { SuggestionChip } from "../../../types/api";
+import { ChipsContainer, StyledSuggestionChip } from "./suggestionChips.styles";
 
 interface SuggestionChipsProps {
-  chips: SuggestionChipType[];
+  chips: SuggestionChip[];
   disabled?: boolean;
   onSelect: (message: string) => void;
 }
@@ -18,7 +18,7 @@ export const SuggestionChips = ({
   return (
     <ChipsContainer>
       {chips.map((chip) => (
-        <SuggestionChip
+        <StyledSuggestionChip
           clickable
           disabled={disabled}
           key={chip.label}
