@@ -10,6 +10,7 @@ import {
   AssistantSection,
   ChatColumn,
   SchemaColumn,
+  SectionContent,
   TwoPanelLayout,
 } from "./assistantView.styles";
 import { BREADCRUMBS } from "./common/constants";
@@ -41,34 +42,36 @@ export const AssistantView = (): JSX.Element => {
         subHead="Explore data and configure analyses with AI guidance"
       />
       <AssistantSection>
-        {showReset && (
-          <Box sx={{ display: "flex", justifyContent: "flex-end", pb: 1 }}>
-            <Button
-              onClick={resetSession}
-              size="small"
-              startIcon={<RestartAltIcon />}
-              variant="text"
-            >
-              New Conversation
-            </Button>
-          </Box>
-        )}
-        <TwoPanelLayout>
-          <ChatColumn>
-            <ChatPanel
-              error={error}
-              isRestoring={isRestoring}
-              loading={loading}
-              messages={messages}
-              onRetry={onRetry}
-              onSend={sendMessage}
-              suggestions={suggestions}
-            />
-          </ChatColumn>
-          <SchemaColumn>
-            <SchemaPanel handoffUrl={handoffUrl} schema={schema} />
-          </SchemaColumn>
-        </TwoPanelLayout>
+        <SectionContent>
+          {showReset && (
+            <Box sx={{ display: "flex", justifyContent: "flex-end", pb: 1 }}>
+              <Button
+                onClick={resetSession}
+                size="small"
+                startIcon={<RestartAltIcon />}
+                variant="text"
+              >
+                New Conversation
+              </Button>
+            </Box>
+          )}
+          <TwoPanelLayout>
+            <ChatColumn>
+              <ChatPanel
+                error={error}
+                isRestoring={isRestoring}
+                loading={loading}
+                messages={messages}
+                onRetry={onRetry}
+                onSend={sendMessage}
+                suggestions={suggestions}
+              />
+            </ChatColumn>
+            <SchemaColumn>
+              <SchemaPanel handoffUrl={handoffUrl} schema={schema} />
+            </SchemaColumn>
+          </TwoPanelLayout>
+        </SectionContent>
       </AssistantSection>
     </Fragment>
   );
