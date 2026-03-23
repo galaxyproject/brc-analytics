@@ -5,6 +5,7 @@ import {
   AssistantChatResponse,
   DatasetSearchRequest,
   DatasetSearchResponse,
+  SessionRestoreResponse,
   UnifiedSearchRequest,
   UnifiedSearchResponse,
   WorkflowSuggestionRequest,
@@ -45,6 +46,25 @@ export const llmAPIClient = {
     return apiClient
       .post("assistant/chat", { json: request, timeout: 120000 })
       .json();
+  },
+
+  /**
+   * Delete an assistant session
+   * @param sessionId - Session to delete
+   */
+  assistantDeleteSession: async (sessionId: string): Promise<void> => {
+    await apiClient.delete(`assistant/session/${sessionId}`);
+  },
+
+  /**
+   * Restore a previous assistant session
+   * @param sessionId - Session to restore
+   * @returns Promise resolving to session state (messages, schema, suggestions)
+   */
+  assistantRestore: async (
+    sessionId: string
+  ): Promise<SessionRestoreResponse> => {
+    return apiClient.get(`assistant/session/${sessionId}`).json();
   },
 
   /**

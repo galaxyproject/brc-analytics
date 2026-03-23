@@ -122,7 +122,19 @@ class SessionState(BaseModel):
     session_id: str
     schema_state: AnalysisSchema = Field(default_factory=AnalysisSchema)
     messages: List[ChatMessage] = Field(default_factory=list)
+    suggestions: List[SuggestionChip] = Field(default_factory=list)
     # Raw pydantic-ai message history, serialised as JSON-safe dicts
     agent_message_history: List[Dict[str, Any]] = Field(default_factory=list)
     # Metadata accumulated during conversation (taxonomy_id, accession, etc.)
     metadata: Dict[str, Any] = Field(default_factory=dict)
+
+
+class SessionRestoreResponse(BaseModel):
+    """Response from the session restore endpoint."""
+
+    session_id: str
+    messages: List[ChatMessage]
+    schema_state: AnalysisSchema
+    suggestions: List[SuggestionChip] = Field(default_factory=list)
+    is_complete: bool = False
+    handoff_url: Optional[str] = None

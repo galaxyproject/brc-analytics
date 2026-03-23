@@ -1,10 +1,12 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { llmAPIClient } from "../services/llm-api-client";
 import {
   AnalysisSchema,
   AssistantChatResponse,
   SuggestionChip,
 } from "../types/api";
+
+const SESSION_KEY = "brc-assistant-session-id";
 
 interface ChatMessageDisplay {
   content: string;
@@ -15,8 +17,11 @@ interface UseAssistantChatReturn {
   error: string | null;
   handoffUrl: string | null;
   isComplete: boolean;
+  isRestoring: boolean;
   loading: boolean;
   messages: ChatMessageDisplay[];
+  onRetry: (() => Promise<void>) | null;
+  resetSession: () => void;
   schema: AnalysisSchema | null;
   sendMessage: (message: string) => Promise<void>;
   suggestions: SuggestionChip[];
@@ -24,7 +29,8 @@ interface UseAssistantChatReturn {
 
 /**
  * Manages assistant chat state: messages, session, schema, and suggestions.
- * @returns Chat state and a sendMessage function
+ * Persists session_id to localStorage and restores on mount.
+ * @returns Chat state, sendMessage, resetSession, and retry functions
  */
 export const useAssistantChat = (): UseAssistantChatReturn => {
   const [messages, setMessages] = useState<ChatMessageDisplay[]>([]);
@@ -33,14 +39,51 @@ export const useAssistantChat = (): UseAssistantChatReturn => {
   const [isComplete, setIsComplete] = useState(false);
   const [handoffUrl, setHandoffUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isRestoring, setIsRestoring] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastFailedMessage, setLastFailedMessage] = useState<string | null>(
+    null
+  );
   const sessionIdRef = useRef<string | null>(null);
+
+  // Restore session from localStorage on mount
+  useEffect(() => {
+    const storedId = localStorage.getItem(SESSION_KEY);
+    if (!storedId) return;
+
+    let cancelled = false;
+    setIsRestoring(true);
+
+    llmAPIClient
+      .assistantRestore(storedId)
+      .then((restored) => {
+        if (cancelled) return;
+        sessionIdRef.current = restored.session_id;
+        setMessages(restored.messages);
+        setSchema(restored.schema_state);
+        setSuggestions(restored.suggestions);
+        setIsComplete(restored.is_complete);
+        setHandoffUrl(restored.handoff_url);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        localStorage.removeItem(SESSION_KEY);
+      })
+      .finally(() => {
+        if (!cancelled) setIsRestoring(false);
+      });
+
+    return (): void => {
+      cancelled = true;
+    };
+  }, []);
 
   const sendMessage = useCallback(async (message: string): Promise<void> => {
     if (!message.trim()) return;
 
     setLoading(true);
     setError(null);
+    setLastFailedMessage(null);
 
     // Add user message immediately for responsiveness
     setMessages((prev) => [...prev, { content: message, role: "user" }]);
@@ -52,6 +95,7 @@ export const useAssistantChat = (): UseAssistantChatReturn => {
       });
 
       sessionIdRef.current = response.session_id;
+      localStorage.setItem(SESSION_KEY, response.session_id);
 
       // Add assistant reply
       setMessages((prev) => [
@@ -66,19 +110,47 @@ export const useAssistantChat = (): UseAssistantChatReturn => {
     } catch (err) {
       const errorMessage = handleChatError(err);
       setError(errorMessage);
-      // Remove the user message if the request failed entirely
-      setMessages((prev) => prev.slice(0, -1));
+      setLastFailedMessage(message);
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  const retry = useCallback(async (): Promise<void> => {
+    if (!lastFailedMessage) return;
+    const msg = lastFailedMessage;
+    setLastFailedMessage(null);
+    setError(null);
+    // Remove the failed user message -- sendMessage will re-add it
+    setMessages((prev) => prev.slice(0, -1));
+    await sendMessage(msg);
+  }, [lastFailedMessage, sendMessage]);
+
+  const resetSession = useCallback((): void => {
+    const oldId = sessionIdRef.current;
+    if (oldId) {
+      llmAPIClient.assistantDeleteSession(oldId).catch(() => {});
+    }
+    sessionIdRef.current = null;
+    localStorage.removeItem(SESSION_KEY);
+    setMessages([]);
+    setSchema(null);
+    setSuggestions([]);
+    setIsComplete(false);
+    setHandoffUrl(null);
+    setError(null);
+    setLastFailedMessage(null);
   }, []);
 
   return {
     error,
     handoffUrl,
     isComplete,
+    isRestoring,
     loading,
     messages,
+    onRetry: lastFailedMessage ? retry : null,
+    resetSession,
     schema,
     sendMessage,
     suggestions,

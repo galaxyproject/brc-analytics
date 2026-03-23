@@ -19,26 +19,20 @@ interface ChatMessageDisplay {
 
 interface ChatPanelProps {
   error: string | null;
+  isRestoring?: boolean;
   loading: boolean;
   messages: ChatMessageDisplay[];
+  onRetry?: (() => Promise<void>) | null;
   onSend: (message: string) => void;
   suggestions: SuggestionChip[];
 }
 
-/**
- * The main chat interface with message list, input, and suggestion chips.
- * @param props - Component props
- * @param props.error - Error message to display
- * @param props.loading - Whether the assistant is processing
- * @param props.messages - Chat message history
- * @param props.onSend - Callback to send a message
- * @param props.suggestions - Suggestion chips to display
- * @returns Chat panel element
- */
 export const ChatPanel = ({
   error,
+  isRestoring,
   loading,
   messages,
+  onRetry,
   onSend,
   suggestions,
 }: ChatPanelProps): JSX.Element => {
@@ -70,10 +64,21 @@ export const ChatPanel = ({
     }
   };
 
+  const inputDisabled = loading || !!isRestoring;
+
   return (
     <ChatContainer>
       <MessagesContainer>
-        {messages.length === 0 && (
+        {isRestoring && (
+          <Box sx={{ alignItems: "center", display: "flex", gap: 1, p: 4 }}>
+            <CircularProgress size={20} />
+            <Typography color="text.secondary" variant="body2">
+              Restoring conversation...
+            </Typography>
+          </Box>
+        )}
+
+        {!isRestoring && messages.length === 0 && (
           <Box sx={{ p: 4, textAlign: "center" }}>
             <Typography color="text.secondary" variant="body1">
               Welcome! I can help you explore BRC Analytics data and set up
@@ -96,7 +101,17 @@ export const ChatPanel = ({
         )}
 
         {error && (
-          <Alert severity="error" sx={{ mx: 1 }}>
+          <Alert
+            action={
+              onRetry && (
+                <Button onClick={onRetry} size="small">
+                  Retry
+                </Button>
+              )
+            }
+            severity="error"
+            sx={{ mx: 1 }}
+          >
             {error}
           </Alert>
         )}
@@ -106,13 +121,13 @@ export const ChatPanel = ({
 
       <SuggestionChips
         chips={suggestions}
-        disabled={loading}
+        disabled={inputDisabled}
         onSelect={handleChipSelect}
       />
 
       <InputRow>
         <TextField
-          disabled={loading}
+          disabled={inputDisabled}
           fullWidth
           maxRows={4}
           multiline
@@ -123,7 +138,7 @@ export const ChatPanel = ({
           value={input}
         />
         <Button
-          disabled={loading || !input.trim()}
+          disabled={inputDisabled || !input.trim()}
           onClick={handleSend}
           variant="contained"
         >

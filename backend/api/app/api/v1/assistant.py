@@ -1,9 +1,9 @@
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 
 from app.core.dependencies import check_rate_limit, get_assistant_agent
-from app.models.assistant import ChatRequest, ChatResponse
+from app.models.assistant import ChatRequest, ChatResponse, SessionRestoreResponse
 
 logger = logging.getLogger(__name__)
 
@@ -35,3 +35,34 @@ async def assistant_chat(
     except Exception:
         logger.exception("Assistant chat error")
         raise HTTPException(status_code=500, detail="Internal assistant error")
+
+
+@router.get("/session/{session_id}", response_model=SessionRestoreResponse)
+async def restore_session(
+    session_id: str,
+    agent=Depends(get_assistant_agent),
+):
+    """Restore a previous assistant session (messages, schema, suggestions)."""
+    state = await agent.session_service.get_session(session_id)
+    if state is None:
+        raise HTTPException(status_code=404, detail="Session not found or expired")
+
+    is_complete, handoff_url = agent.compute_handoff(state.schema_state)
+    return SessionRestoreResponse(
+        session_id=state.session_id,
+        messages=state.messages,
+        schema_state=state.schema_state,
+        suggestions=state.suggestions,
+        is_complete=is_complete,
+        handoff_url=handoff_url,
+    )
+
+
+@router.delete("/session/{session_id}", status_code=204)
+async def delete_session(
+    session_id: str,
+    agent=Depends(get_assistant_agent),
+):
+    """Delete an assistant session."""
+    await agent.session_service.delete_session(session_id)
+    return Response(status_code=204)
