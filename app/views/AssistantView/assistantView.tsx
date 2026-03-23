@@ -17,8 +17,10 @@ export const AssistantView = (): JSX.Element => {
   const {
     error,
     handoffUrl,
+    isRestoring,
     loading,
     messages,
+    onRetry,
     schema,
     sendMessage,
     suggestions,
@@ -38,8 +40,10 @@ export const AssistantView = (): JSX.Element => {
           <ChatColumn>
             <ChatPanel
               error={error}
+              isRestoring={isRestoring}
               loading={loading}
               messages={messages}
+              onRetry={onRetry}
               onSend={sendMessage}
               suggestions={suggestions}
             />

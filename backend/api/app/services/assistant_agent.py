@@ -258,6 +258,17 @@ class AssistantAgent:
         return self.agent is not None
 
     @staticmethod
+    def compute_handoff(schema_state: AnalysisSchema) -> tuple[bool, Optional[str]]:
+        """Compute is_complete and handoff_url from schema state."""
+        handoff_url = None
+        if schema_state.is_complete():
+            accession = schema_state.assembly.detail or ""
+            trs_id = schema_state.workflow.detail or ""
+            if accession and trs_id:
+                handoff_url = f"/data/assemblies/{accession}/{trs_id}"
+        return handoff_url is not None, handoff_url
+
+    @staticmethod
     def _build_context_prefix(schema: AnalysisSchema) -> str:
         """Serialize current schema state so the LLM knows what's been decided."""
         parts = []
@@ -417,17 +428,11 @@ class AssistantAgent:
 
         # Persist updated state
         state.schema_state = schema_state
+        state.suggestions = suggestions
         state.agent_message_history = to_jsonable_python(result.all_messages())
         await self.session_service.save_session(state)
 
-        # Only mark complete when we can actually build a handoff URL
-        handoff_url = None
-        if schema_state.is_complete():
-            accession = schema_state.assembly.detail or ""
-            trs_id = schema_state.workflow.detail or ""
-            if accession and trs_id:
-                handoff_url = f"/data/assemblies/{accession}/{trs_id}"
-        is_complete = handoff_url is not None
+        is_complete, handoff_url = self.compute_handoff(schema_state)
 
         return ChatResponse(
             session_id=state.session_id,
