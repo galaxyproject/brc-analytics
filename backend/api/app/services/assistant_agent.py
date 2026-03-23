@@ -114,13 +114,24 @@ committed to a choice — do NOT set fields just because you listed options.
 Format: a JSON object on its own line prefixed with "SCHEMA_UPDATE:". \
 Valid keys: organism, assembly, analysis_type, workflow, data_source, \
 data_characteristics, gene_annotation. Each value is a string (the display \
-label). For assembly, include the accession. For workflow, include the IWC ID.
+label) or null to clear a field. For assembly, include the accession. \
+For workflow, include the IWC ID.
+
+To clear a field (e.g., the user changed their mind), set its value to null. \
+When a user changes a high-level choice like organism or analysis_type, also \
+clear dependent downstream fields that may no longer be valid. The dependency \
+chain is: organism -> assembly -> analysis_type -> workflow -> \
+data_characteristics, gene_annotation. The data_source field is independent.
 
 Example — user said "I want to work with yeast RNA-seq":
 SCHEMA_UPDATE: {"organism": "Saccharomyces cerevisiae", "analysis_type": "Transcriptomics"}
 
-Only emit this when the user has actually chosen something. If the conversation \
-is purely exploratory (listing options, answering questions), do NOT emit it.
+Example — user switches from RNA-seq to variant calling:
+SCHEMA_UPDATE: {"analysis_type": "Variant Calling", "workflow": null, "data_characteristics": null, "gene_annotation": null}
+
+Only emit this when the user has actually chosen or changed something. If the \
+conversation is purely exploratory (listing options, answering questions), do \
+NOT emit it.
 
 ## Suggestion chips
 
@@ -430,14 +441,14 @@ class AssistantAgent:
 
     def _parse_structured_output(
         self, raw_reply: str
-    ) -> tuple[str, List[SuggestionChip], Dict[str, str]]:
+    ) -> tuple[str, List[SuggestionChip], Dict[str, Optional[str]]]:
         """Extract SCHEMA_UPDATE and SUGGESTIONS lines from the reply.
 
         Handles common LLM formatting variations: bold markdown wrapping,
         mixed case, extra whitespace around the prefix.
         """
         suggestions: List[SuggestionChip] = []
-        schema_updates: Dict[str, str] = {}
+        schema_updates: Dict[str, Optional[str]] = {}
         reply_lines = []
 
         # Match SUGGESTIONS or SCHEMA_UPDATE with optional markdown bold/italic.
@@ -470,7 +481,7 @@ class AssistantAgent:
                     json_str = line[u_match.end() :].strip()
                     data = json.loads(json_str)
                     if isinstance(data, dict) and all(
-                        isinstance(k, str) and isinstance(v, str)
+                        isinstance(k, str) and (isinstance(v, str) or v is None)
                         for k, v in data.items()
                     ):
                         schema_updates = data
@@ -486,9 +497,13 @@ class AssistantAgent:
     def _apply_schema_updates(
         self,
         current: AnalysisSchema,
-        updates: Dict[str, str],
+        updates: Dict[str, Optional[str]],
     ) -> AnalysisSchema:
-        """Apply LLM-emitted schema updates to the current schema."""
+        """Apply LLM-emitted schema updates to the current schema.
+
+        Values of None clear the field back to EMPTY (supports mid-conversation
+        corrections when the user changes their mind).
+        """
         if not updates:
             return current
 
@@ -504,7 +519,12 @@ class AssistantAgent:
         }
 
         for key, value in updates.items():
-            if key not in valid_fields or not value:
+            if key not in valid_fields:
+                continue
+            if value is None:
+                setattr(schema, key, SchemaField())
+                continue
+            if not value:
                 continue
 
             field = SchemaField(value=str(value), status=FieldStatus.FILLED)
@@ -516,9 +536,7 @@ class AssistantAgent:
                 if acc_match:
                     field.detail = acc_match.group(1)
                 else:
-                    field.detail = self._find_assembly_accession(
-                        str(value), schema
-                    )
+                    field.detail = self._find_assembly_accession(str(value), schema)
 
             # For workflow, try to match iwcId in the value string, falling
             # back to a case-insensitive name match against the catalog.
@@ -566,9 +584,7 @@ class AssistantAgent:
                     logger.info("Assembly fallback matched strain '%s'", strain)
                     return g.get("accession")
                 if species and species in val_lower:
-                    logger.info(
-                        "Assembly fallback matched species '%s'", species
-                    )
+                    logger.info("Assembly fallback matched species '%s'", species)
                     return g.get("accession")
         logger.warning("Assembly fallback found no match for '%s'", value)
         return None
@@ -580,14 +596,10 @@ class AssistantAgent:
             for wf in cat.get("workflows", []):
                 wf_name = (wf.get("workflowName") or "").lower()
                 if wf_name and wf_name in val_lower:
-                    logger.info(
-                        "Workflow fallback matched name '%s'", wf_name
-                    )
+                    logger.info("Workflow fallback matched name '%s'", wf_name)
                     return wf.get("trsId", wf.get("iwcId"))
                 if wf_name and val_lower in wf_name:
-                    logger.info(
-                        "Workflow fallback matched name '%s'", wf_name
-                    )
+                    logger.info("Workflow fallback matched name '%s'", wf_name)
                     return wf.get("trsId", wf.get("iwcId"))
         logger.warning("Workflow fallback found no match for '%s'", value)
         return None
