@@ -509,13 +509,19 @@ class AssistantAgent:
 
             field = SchemaField(value=str(value), status=FieldStatus.FILLED)
 
-            # For assembly, try to look up extra detail (accession)
+            # For assembly, try to extract accession from the value string,
+            # falling back to a catalog search by name if the regex misses.
             if key == "assembly":
                 acc_match = re.search(r"(GC[AF]_\d{9}\.\d+)", str(value))
                 if acc_match:
                     field.detail = acc_match.group(1)
+                else:
+                    field.detail = self._find_assembly_accession(
+                        str(value), schema
+                    )
 
-            # For workflow, try to look up the trs_id
+            # For workflow, try to match iwcId in the value string, falling
+            # back to a case-insensitive name match against the catalog.
             if key == "workflow":
                 workflow_value = str(value)
                 for cat in self.catalog.workflows_by_category:
@@ -526,7 +532,62 @@ class AssistantAgent:
                             break
                     if field.detail:
                         break
+                if not field.detail:
+                    field.detail = self._find_workflow_trs_id(workflow_value)
 
             setattr(schema, key, field)
 
         return schema
+
+    def _find_assembly_accession(
+        self, value: str, schema: AnalysisSchema
+    ) -> Optional[str]:
+        """Fallback: search the catalog for an assembly matching the LLM value."""
+        val_lower = value.lower()
+        # If we already know the organism, search its genomes first
+        tax_id = None
+        if schema.organism.detail:
+            tax_id = schema.organism.detail
+        elif schema.organism.status == FieldStatus.FILLED and schema.organism.value:
+            for org in self.catalog.organisms:
+                species = (org.get("taxonomicLevelSpecies") or "").lower()
+                if species and species in schema.organism.value.lower():
+                    tax_id = str(org.get("ncbiTaxonomyId"))
+                    break
+
+        for org in self.catalog.organisms:
+            org_tax = str(org.get("ncbiTaxonomyId", ""))
+            if tax_id and org_tax != tax_id:
+                continue
+            for g in org.get("genomes", []):
+                strain = (g.get("strainName") or "").lower()
+                species = (g.get("taxonomicLevelSpecies") or "").lower()
+                if strain and strain in val_lower:
+                    logger.info("Assembly fallback matched strain '%s'", strain)
+                    return g.get("accession")
+                if species and species in val_lower:
+                    logger.info(
+                        "Assembly fallback matched species '%s'", species
+                    )
+                    return g.get("accession")
+        logger.warning("Assembly fallback found no match for '%s'", value)
+        return None
+
+    def _find_workflow_trs_id(self, value: str) -> Optional[str]:
+        """Fallback: match a workflow by name when iwcId isn't in the value."""
+        val_lower = value.lower()
+        for cat in self.catalog.workflows_by_category:
+            for wf in cat.get("workflows", []):
+                wf_name = (wf.get("workflowName") or "").lower()
+                if wf_name and wf_name in val_lower:
+                    logger.info(
+                        "Workflow fallback matched name '%s'", wf_name
+                    )
+                    return wf.get("trsId", wf.get("iwcId"))
+                if wf_name and val_lower in wf_name:
+                    logger.info(
+                        "Workflow fallback matched name '%s'", wf_name
+                    )
+                    return wf.get("trsId", wf.get("iwcId"))
+        logger.warning("Workflow fallback found no match for '%s'", value)
+        return None
