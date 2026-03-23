@@ -1,4 +1,6 @@
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
+import { Box, Button } from "@mui/material";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import Error from "next/error";
 import { Fragment, JSX } from "react";
 import { ChatPanel, SchemaPanel } from "../../components/Assistant";
@@ -21,12 +23,15 @@ export const AssistantView = (): JSX.Element => {
     loading,
     messages,
     onRetry,
+    resetSession,
     schema,
     sendMessage,
     suggestions,
   } = useAssistantChat();
 
   if (!isAssistantEnabled) return <Error statusCode={404} />;
+
+  const showReset = messages.length > 0 || schema !== null;
 
   return (
     <Fragment>
@@ -36,6 +41,18 @@ export const AssistantView = (): JSX.Element => {
         subHead="Explore data and configure analyses with AI guidance"
       />
       <AssistantSection>
+        {showReset && (
+          <Box sx={{ display: "flex", justifyContent: "flex-end", pb: 1 }}>
+            <Button
+              onClick={resetSession}
+              size="small"
+              startIcon={<RestartAltIcon />}
+              variant="text"
+            >
+              New Conversation
+            </Button>
+          </Box>
+        )}
         <TwoPanelLayout>
           <ChatColumn>
             <ChatPanel
