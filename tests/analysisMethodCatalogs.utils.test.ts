@@ -133,8 +133,7 @@ describe("buildAssemblyWorkflows", () => {
   test("filters and sorts workflow categories", () => {
     const result = buildAssemblyWorkflows(
       DIPLOID_ASSEMBLY,
-      WORKFLOW_CATEGORIES,
-      false
+      WORKFLOW_CATEGORIES
     );
 
     expect(result.map((c) => c.category)).toEqual([
@@ -148,30 +147,10 @@ describe("buildAssemblyWorkflows", () => {
     expect(result.find((c) => c.category === "Omit Me")).toBeUndefined();
   });
 
-  test("excludes differential expression workflow when isDEEnabled is false", () => {
+  test("includes differential expression workflow as first in transcriptomics", () => {
     const result = buildAssemblyWorkflows(
       DIPLOID_ASSEMBLY,
-      WORKFLOW_CATEGORIES,
-      false
-    );
-
-    const transcriptomics = result.find(
-      ({ category }) => category === WorkflowCategoryId.TRANSCRIPTOMICS
-    );
-
-    expect(transcriptomics).toBeDefined();
-    expect(
-      transcriptomics?.workflows.find(
-        ({ trsId }) => trsId === DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId
-      )
-    ).toBeUndefined();
-  });
-
-  test("includes differential expression workflow as first in transcriptomics when isDEEnabled is true", () => {
-    const result = buildAssemblyWorkflows(
-      DIPLOID_ASSEMBLY,
-      WORKFLOW_CATEGORIES,
-      true
+      WORKFLOW_CATEGORIES
     );
 
     const transcriptomics = result.find(

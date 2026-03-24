@@ -1,5 +1,4 @@
 import { BackPageContentMainColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
-import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import { JSX } from "react";
 import WORKFLOW_CATEGORIES from "../../../../../catalog/output/workflows.json";
 import { Accordion } from "./components/Accordion/accordion";
@@ -14,11 +13,9 @@ import { buildAssemblyWorkflows } from "./utils";
  * @returns A JSX element representing the main content of the AnalyzeWorkflowsView.
  */
 export const Main = ({ assembly, entityId }: Props): JSX.Element => {
-  const isDEEnabled = useFeatureFlag("de");
   const workflowCategories = buildAssemblyWorkflows(
     assembly,
-    WORKFLOW_CATEGORIES,
-    isDEEnabled
+    WORKFLOW_CATEGORIES
   );
   return (
     <BackPageContentMainColumn>
