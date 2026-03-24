@@ -35,9 +35,11 @@ export default defineConfig({
     video: "retain-on-failure",
   },
   webServer: {
-    command: "npm run dev",
+    command: process.env.CI
+      ? "npm run start"
+      : "npm run build:local && npm run start",
     reuseExistingServer: !process.env.CI,
-    timeout: 240 * 1000,
+    timeout: process.env.CI ? 120 * 1000 : 600 * 1000,
     url: "http://localhost:3000",
   },
   workers: 3,
