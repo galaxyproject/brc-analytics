@@ -16,6 +16,7 @@ export interface Props {
   configuredInput: ConfiguredInput;
   configuredSteps: StepConfig[];
   genome?: Assembly;
+  initialDataSourceView?: string;
   onConfigure: OnConfigure;
   onContinue: OnContinue;
   onEdit: OnEdit;

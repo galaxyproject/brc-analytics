@@ -27,6 +27,7 @@ export interface StepProps
   configuredInput: ConfiguredInput;
   entryLabel: string;
   genome?: Assembly;
+  initialDataSourceView?: string;
   onConfigure: OnConfigure;
   onContinue: OnContinue;
   onEdit: OnEdit;
