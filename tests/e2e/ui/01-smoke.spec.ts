@@ -40,6 +40,9 @@ test.describe("BRC Analytics - UI Smoke Tests", () => {
 
       // Page should have content
       await expect(page.locator("main")).toBeVisible();
+
+      // Page heading should be visible
+      await expect(page.locator("h1").first()).toBeVisible();
     });
   }
 });
