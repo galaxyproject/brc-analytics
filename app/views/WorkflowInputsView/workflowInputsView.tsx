@@ -4,8 +4,6 @@ import {
   BackPageHero,
   BackPageView,
 } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
-import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
-import Error from "next/error";
 import { JSX } from "react";
 import { useStepper } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/hook";
 import { SEQUENCING_STEPS } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/constants";
@@ -15,7 +13,6 @@ import { Main } from "../../components/Entity/components/ConfigureWorkflowInputs
 import { SideColumn } from "../../components/Entity/components/ConfigureWorkflowInputs/components/SideColumn/sideColumn";
 import { Top } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Top/top";
 import { getAssembly, getWorkflow } from "../../services/workflows/entities";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { useConfigureInputs } from "./hooks/UseConfigureInputs/useConfigureInputs";
 import { Assembly, Props } from "./types";
 import { StyledBackPageContentMainColumn } from "./workflowInputsView.styles";
@@ -28,11 +25,6 @@ export const WorkflowInputsView = ({ entityId, trsId }: Props): JSX.Element => {
   const { configuredSteps } = useConfiguredSteps(workflow);
   const { activeStep, onContinue, onEdit } = useStepper(configuredSteps);
   const { hasSidePanel } = configuredSteps[activeStep] || {};
-
-  const isDEEnabled = useFeatureFlag("de");
-
-  if (!isDEEnabled && workflow.trsId === DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId)
-    return <Error statusCode={404} />;
 
   return (
     <BackPageView>

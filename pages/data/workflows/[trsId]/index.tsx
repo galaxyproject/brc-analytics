@@ -2,6 +2,7 @@ import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
 import { formatTrsId } from "../../../../app/views/AnalyzeWorkflowsView/components/Main/utils";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../app/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { WorkflowView } from "../../../../app/views/WorkflowView/workflowView";
 import workflowCategories from "../../../../catalog/output/workflows.json";
 
@@ -25,6 +26,11 @@ export const getStaticPaths: GetStaticPaths<Params> = async () => {
     },
     [] as { params: Params }[]
   );
+
+  // Add Differential Expression Analysis workflow (interim measure).
+  paths.push({
+    params: { trsId: formatTrsId(DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId) },
+  });
 
   return { fallback: false, paths };
 };

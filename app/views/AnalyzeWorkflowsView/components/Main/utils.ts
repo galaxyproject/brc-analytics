@@ -11,16 +11,14 @@ import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../differentialExpressionAn
 
 /**
  * Builds workflow categories for the given assembly.
- * Differential Expression Analysis is added to the Transcriptomics category if DE is enabled.
+ * Differential Expression Analysis is added to the Transcriptomics category.
  * @param assembly - Assembly.
  * @param allWorkflowCategories - Workflow categories.
- * @param isDEEnabled - Whether Differential Expression is enabled.
  * @returns Workflow categories compatible with the given assembly.
  */
 export function buildAssemblyWorkflows(
   assembly: BRCDataCatalogGenome | GA2AssemblyEntity,
-  allWorkflowCategories: WorkflowCategory[],
-  isDEEnabled: boolean
+  allWorkflowCategories: WorkflowCategory[]
 ): WorkflowCategory[] {
   const workflowCategories: WorkflowCategory[] = [];
 
@@ -32,10 +30,7 @@ export function buildAssemblyWorkflows(
       workflowIsCompatibleWithAssembly(workflow, assembly)
     );
 
-    if (
-      isDEEnabled &&
-      workflowCategory.category === WorkflowCategoryId.TRANSCRIPTOMICS
-    ) {
+    if (workflowCategory.category === WorkflowCategoryId.TRANSCRIPTOMICS) {
       compatibleWorkflows.unshift(DIFFERENTIAL_EXPRESSION_ANALYSIS);
     }
 

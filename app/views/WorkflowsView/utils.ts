@@ -2,6 +2,7 @@ import type {
   WorkflowAssemblyMapping,
   WorkflowCategory,
 } from "../../apis/catalog/brc-analytics-catalog/common/entities";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { Assembly } from "../WorkflowInputsView/types";
 import type { WorkflowAssembly, WorkflowEntity } from "./types";
 import { Organism } from "./types";
@@ -51,6 +52,7 @@ function getTaxonomicLevelRealm(assembly: Assembly | undefined): string {
 /**
  * Utility function to transform workflow categories into a flat list of workflows.
  * Filters out workflows that have no compatible assemblies for the current site.
+ * Differential Expression Analysis is always included as an interim measure.
  * Each workflow includes the properties of the workflow itself along with the name of its category and the compatible assembly (if any).
  * @param workflowCategories - An array of workflow categories, each containing an array of workflows.
  * @param mappings - Workflow-assembly mappings for the current site.
@@ -91,6 +93,14 @@ export function getWorkflows(
       });
     }
   }
+
+  // Add Differential Expression Analysis workflow (interim measure).
+  workflows.push({
+    ...DIFFERENTIAL_EXPRESSION_ANALYSIS,
+    assembly: mapAssembly(undefined),
+    category: "Transcriptomics",
+    taxonomyId: "Any",
+  });
 
   return workflows;
 }
