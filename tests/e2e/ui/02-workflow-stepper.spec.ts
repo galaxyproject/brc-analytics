@@ -1,5 +1,5 @@
-import { Page, Locator } from "@playwright/test";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
+import { Locator, Page } from "@playwright/test";
 import { sanitizeEntityId } from "../../../app/apis/catalog/common/utils";
 import { ROUTES } from "../../../routes/constants";
 import { expect, test } from "../utils/fixtures";
