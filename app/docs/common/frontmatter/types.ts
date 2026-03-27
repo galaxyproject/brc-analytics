@@ -1,4 +1,5 @@
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
+import { CardItem } from "../../../components/Docs/components/SectionContentCards/types";
 import { Overview } from "../../../components/Docs/components/SectionOverview/types";
 import { FrontmatterProps as BaseFrontmatterProps } from "@databiosphere/findable-ui/lib/utils/mdx/frontmatter/types";
 import { ComponentProps } from "react";
@@ -6,6 +7,7 @@ import { ComponentProps } from "react";
 export type FrontmatterProps = BaseFrontmatterProps<
   ArticleFrontmatterProps &
     FrontmatterBreadcrumbProps &
+    FrontmatterCardsProps &
     FrontmatterOutlineProps &
     FrontmatterOverviewProps
 >;
@@ -21,6 +23,10 @@ export enum CONTENT_TYPE {
 
 interface FrontmatterBreadcrumbProps {
   breadcrumbs?: Breadcrumb[];
+}
+
+export interface FrontmatterCardsProps {
+  cards?: CardItem[];
 }
 
 export interface FrontmatterOutlineProps {

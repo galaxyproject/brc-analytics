@@ -4,27 +4,31 @@ breadcrumbs:
     text: "Learn"
   - path: ""
     text: "Getting Started"
+cards:
+  - href: "/learn/getting-started/introduction"
+    secondaryText: "Browser-based platform for pathogen genomics"
+    title: "Introduction"
+  - href: "/learn/getting-started/what-are-organisms"
+    secondaryText: "Species and taxa served by BRC Analytics"
+    title: "What Are Organisms"
+  - href: "/learn/getting-started/what-are-assemblies"
+    secondaryText: "Genomic sequences available for a given species"
+    title: "What Are Assemblies"
+  - href: "/learn/getting-started/first-analysis"
+    secondaryText: "Step-by-step guide to running your first genomic analysis."
+    title: "Your First Analysis"
+  - href: "/learn/getting-started/common-workflows"
+    secondaryText: "Explore frequently used analysis workflows and tools."
+    title: "Common Workflows"
+  - href: "/learn/getting-started/tips-and-troubleshooting"
+    secondaryText: "Practical advice for using the platform effectively."
+    title: "Tips and Troubleshooting"
+  - href: "/learn/getting-started/getting-help"
+    secondaryText: "Find support resources and community channels."
+    title: "Getting Help"
 description: ""
 enableOutline: false
 title: "Getting Started"
 ---
 
-## Overview
-
-- [Introduction](/learn/getting-started/overview)
-
-## Step-by-Step Guide
-
-- [Your First Analysis](/learn/getting-started/first-analysis)
-
-## Workflows and Tools
-
-- [Common Workflows](/learn/getting-started/common-workflows)
-
-## Using the Platform
-
-- [Tips and Troubleshooting](/learn/getting-started/tips-and-troubleshooting)
-
-## Support
-
-- [Getting Help](/learn/getting-started/getting-help)
+<SectionContentCards cards={frontmatter.cards} />

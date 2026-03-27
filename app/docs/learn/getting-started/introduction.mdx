@@ -1,0 +1,74 @@
+---
+breadcrumbs:
+  - path: "/learn"
+    text: "Learn"
+  - path: "/learn/getting-started"
+    text: "Getting Started"
+  - path: ""
+    text: "Introduction"
+contentType: "ARTICLE"
+description: ""
+enableOutline: true
+title: "Introduction"
+---
+
+<Figure
+  src="/learn/getting-started/introduction/brc-overview.svg"
+  alt="BRC Analytics overview"
+  caption="BRC integrates genomes, annotations, and sequencing data in one resource, allowing you to configure and run complex analyses within the Galaxy system."
+/>
+
+## Overview
+
+Most biomedical researchers still analyze data the traditional way: locate datasets in repositories like NCBI, download them locally, and re-upload them to HPC or cloud systems for analysis. This persists despite years of standardization efforts to enable programmatic access to data, tools, and workflows.
+
+BRC Analytics eliminates this cycle. It is a browser-based platform that unifies access to reference genomic data for pathogens, hosts, and vectors. Instead of juggling downloads and uploads, you explore organisms and assemblies directly, combine public datasets with your own data, and launch analysis workflows — all from your browser, with no software installation or programming required.
+
+BRC Analytics is funded by NIAID as part of the [Bioinformatics Resource Centers for Infectious Diseases](https://www.niaid.nih.gov/research/bioinformatics-resource-centers) program and is free to use.
+
+## What can you analyze?
+
+BRC Analytics provides access to over 5,000 genome assemblies covering nearly 2,000 pathogen, host, and vector taxa — including key eukaryotic, bacterial, and viral pathogens. The platform supports a growing collection of curated workflows:
+
+- **Variant calling** — identify genomic variants from short-read sequencing data
+- **RNA-seq** — quantify gene expression from bulk RNA sequencing
+- **Single-cell RNA-seq** — preprocess 10x Genomics single-cell data
+- **Chromatin accessibility** — analyze ATAC-seq, CUT&RUN, CUT&Tag, and ChIP-seq experiments
+- **AMR gene detection** — screen for antimicrobial resistance genes
+- **lncRNA annotation** — annotate long non-coding RNAs
+
+Reference data comes from [NCBI Datasets](https://www.ncbi.nlm.nih.gov/datasets/), supplemented with annotations from the [UCSC Table Browser](https://genome.ucsc.edu/cgi-bin/hgTables).
+
+## How does it work?
+
+The analysis flow follows three steps:
+
+1. **Select context** — choose an organism and genome assembly on BRC Analytics
+2. **Configure analysis** — pick a curated workflow or start a custom analysis, and specify your data sources (public reads from ENA, accession numbers, or your own uploads)
+3. **Launch** — BRC Analytics hands the workflow to [Galaxy](https://usegalaxy.org) for execution on [TACC](https://www.tacc.utexas.edu/) infrastructure
+
+Results are available in Galaxy and can be visualized in the [UCSC Genome Browser](https://genome.ucsc.edu/) or interactive viewers. Every analysis is automatically tracked for full reproducibility.
+
+## Core technologies
+
+BRC Analytics brings together four major platforms:
+
+- **[Galaxy](https://galaxyproject.org)** — open-source analysis platform with over 8,500 tools, supporting tens of thousands of users and managing 4+ petabytes of data. Galaxy has powered accessible, reproducible computational analysis for over two decades.
+- **[HyPhy](https://www.hyphy.org/)** — open-source platform for comparative sequence analysis and molecular evolution, with over 7,000 citations and 20+ years of development.
+- **[UCSC Genome Browser](https://genome.ucsc.edu/)** — genomic data visualization platform maintained by UC Santa Cruz, serving over 150,000 monthly users across 200 countries.
+- **[TACC](https://www.tacc.utexas.edu/)** — the Texas Advanced Computing Center at UT Austin provides the computational infrastructure that powers all BRC Analytics workflows.
+
+## Who builds it?
+
+The platform is community-driven and built entirely on open-source software. Researchers can contribute workflows through the [Intergalactic Workflow Commission](https://github.com/galaxyproject/iwc), participate in discussions on the [community forum](https://help.brc-analytics.org), or join the [Matrix chat](https://matrix.to/#/#brc-analytics:matrix.org).
+
+## What's next?
+
+BRC Analytics is under active development. Upcoming features include:
+
+- Natural language query interface for discovering public datasets
+- Gene pages with integrated annotations
+- Enhanced comparative genomics workflows
+- Priority pathogens and outbreaks dashboard
+- Deeper integration with Galaxy and UCSC Genome Browser
+- Community-contributed workflow library
