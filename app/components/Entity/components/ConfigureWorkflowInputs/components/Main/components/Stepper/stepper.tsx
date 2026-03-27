@@ -12,7 +12,11 @@ export const Stepper = ({
   ...props
 }: Props): JSX.Element => {
   return (
-    <StyledStepper activeStep={activeStep} {...STEPPER_PROPS}>
+    <StyledStepper
+      activeStep={activeStep}
+      {...STEPPER_PROPS}
+      data-testid="workflow-stepper"
+    >
       {configuredSteps.map(({ description, disabled, key, label, Step }, i) => {
         const active = activeStep === i;
         const completed = activeStep > i;
