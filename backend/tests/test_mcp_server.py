@@ -74,13 +74,13 @@ async def call_tool(mcp, name, args=None):
 class TestMCPToolRegistration:
     @pytest.mark.asyncio
     async def test_has_expected_tool_count(self, mcp):
-        tools = await mcp.get_tools()
+        tools = await mcp.list_tools()
         assert len(tools) == len(EXPECTED_TOOLS)
 
     @pytest.mark.asyncio
     async def test_tool_names(self, mcp):
-        tools = await mcp.get_tools()
-        assert set(tools.keys()) == EXPECTED_TOOLS
+        tools = await mcp.list_tools()
+        assert {t.name for t in tools} == EXPECTED_TOOLS
 
 
 class TestMCPCatalogTools:

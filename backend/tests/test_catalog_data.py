@@ -1,7 +1,7 @@
 """Unit tests for CatalogData class.
 
 Tests run against the real catalog JSON in catalog/output/, so no mocking
-needed — CatalogData is pure in-memory lookups.
+needed -- CatalogData is pure in-memory lookups.
 """
 
 import os
@@ -159,7 +159,7 @@ class TestCompatibility:
     def test_ploidy_mismatch(self, catalog):
         # Haploid-only workflow + diploid assembly
         result = catalog.check_workflow_assembly_compatibility(
-            "haploid-variant-calling-wgs-pe-main", "GCA_000002985.3"
+            "haploid-variant-calling-wgs-pe-main", "GCA_000143925.2"
         )
         assert result["compatible"] is False
         assert "Ploidy mismatch" in result["reason"]
@@ -167,7 +167,7 @@ class TestCompatibility:
     def test_any_ploidy_matches_all(self, catalog):
         # atacseq (ANY ploidy) should be compatible with any assembly
         result = catalog.check_workflow_assembly_compatibility(
-            "atacseq-main", "GCA_000002985.3"
+            "atacseq-main", "GCA_000143925.2"
         )
         assert result["compatible"] is True
 
@@ -177,6 +177,15 @@ class TestCompatibility:
         )
         assert result["compatible"] is False
         assert "not found" in result["reason"]
+
+    def test_taxonomy_mismatch(self, catalog):
+        # AMR workflow targets Bacteria (taxonomy 2); use a fungal assembly
+        # (S. cerevisiae) which is not in Bacteria's lineage
+        result = catalog.check_workflow_assembly_compatibility(
+            "amr_gene_detection-main", "GCA_022626425.2"
+        )
+        assert result["compatible"] is False
+        assert "Taxonomy mismatch" in result["reason"]
 
     def test_assembly_not_found(self, catalog):
         result = catalog.check_workflow_assembly_compatibility(
@@ -211,7 +220,7 @@ class TestGetCompatibleWorkflows:
     def test_taxonomy_id_not_in_lineage(self, catalog):
         # Use a taxonomy ID that exists in the catalog but has no lineage
         # overlap with Bacteria-targeted workflows. Saccharomyces (4932)
-        # is a fungus — AMR workflow (targets Bacteria=2) should NOT appear.
+        # is a fungus -- AMR workflow (targets Bacteria=2) should NOT appear.
         results = catalog.get_compatible_workflows(["HAPLOID"], taxonomy_id="4932")
         amr = [r for r in results if r["iwcId"] == "amr_gene_detection-main"]
         assert len(amr) == 0
@@ -258,7 +267,7 @@ class TestResolveWorkflowInputs:
         artic_id = (
             "sars-cov-2-pe-illumina-artic-variant-calling-covid-19-pe-artic-illumina"
         )
-        # Need an assembly that won't cause taxonomy mismatch — use any since we just
+        # Need an assembly that won't cause taxonomy mismatch -- use any since we just
         # want to verify url_spec resolution works
         result = catalog.resolve_workflow_inputs(artic_id, "GCF_000005845.2")
         assert "ARTIC primer BED" in result["resolved"]

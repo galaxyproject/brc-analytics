@@ -74,8 +74,8 @@ class CatalogData:
             # via aliasing (no copy). When a *different* assembly's lineage
             # partially overlaps, its new IDs are merged into whatever set
             # already exists for the overlapping ID. This is correct because
-            # we only need "is X an ancestor of Y?" — i.e. membership tests
-            # on the set for Y — and merging strictly grows each set.
+            # we only need "is X an ancestor of Y?" -- i.e. membership tests
+            # on the set for Y -- and merging strictly grows each set.
             lineage = asm.get("lineageTaxonomyIds", [])
             if lineage:
                 lineage_set = {str(t) for t in lineage}
