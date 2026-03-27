@@ -9,9 +9,6 @@ export const CAROUSEL_CARDS: Pick<CardProps, "text">[] = [
     text: MDX.EvolutionaryDynamicsOfCodingOverlapsInMeaslesVirus({}),
   },
   {
-    text: MDX.GenomeArk2({}),
-  },
-  {
     text: MDX.Roadmap({}),
   },
   {
