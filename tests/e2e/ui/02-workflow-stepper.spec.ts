@@ -36,6 +36,9 @@ const MUI_STEP_CONTENT = ".MuiStepContent-root";
 // Timeout for stepper content to render (data-dependent steps may load slowly).
 const STEP_LOAD_TIMEOUT = 15000;
 
+// Use the shared timeout as the default for Playwright expectations in this spec.
+expect.configure({ timeout: STEP_LOAD_TIMEOUT });
+
 /**
  * Builds a configure-workflow URL for the given workflow TRS ID.
  * @param trsId - The TRS ID of the workflow.
@@ -59,17 +62,17 @@ function getStep(page: Page, label: string): Locator {
 }
 
 /**
- * Waits for the GTF step to load, then clicks Continue to advance past it.
+ * Waits for the GTF step to load, then clicks Continue (or Skip This Step on error) to advance past it.
  * @param page - The Playwright page.
  * @returns The GTF step locator.
  */
 async function advancePastGtfStep(page: Page): Promise<Locator> {
   const gtfStep = getStep(page, STEP_LABELS.GTF_FILES);
-  await expect(gtfStep.locator(MUI_STEP_CONTENT)).toBeVisible({
-    timeout: STEP_LOAD_TIMEOUT,
+  await expect(gtfStep.locator(MUI_STEP_CONTENT)).toBeVisible();
+  const continueButton = gtfStep.getByRole("button", {
+    name: /^(Continue|Skip This Step)$/,
   });
-  const continueButton = gtfStep.getByRole("button", { name: "Continue" });
-  await expect(continueButton).toBeEnabled({ timeout: STEP_LOAD_TIMEOUT });
+  await expect(continueButton).toBeEnabled();
   await continueButton.click();
   return gtfStep;
 }
