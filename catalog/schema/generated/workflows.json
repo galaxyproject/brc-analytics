@@ -115,6 +115,10 @@
                     "$ref": "#/$defs/WorkflowPloidy",
                     "description": "The ploidy state (number of chromosome sets) that this workflow is designed to work with, ensuring compatibility with organism data."
                 },
+                "scope": {
+                    "$ref": "#/$defs/WorkflowScope",
+                    "description": "The scope level at which this workflow operates, determining where it is displayed in the UI and what the first configuration step should be. Defaults to ASSEMBLY for backward compatibility."
+                },
                 "taxonomy_id": {
                     "description": "The NCBI Taxonomy ID of the organism this workflow is designed for. If specified, the workflow will be available for all assemblies with this ID in their taxonomic lineage.",
                     "type": [
@@ -276,6 +280,16 @@
                 "POLYPLOID"
             ],
             "title": "WorkflowPloidy",
+            "type": "string"
+        },
+        "WorkflowScope": {
+            "description": "The scope level at which a workflow operates, determining its display context and required inputs.",
+            "enum": [
+                "ASSEMBLY",
+                "ORGANISM",
+                "SEQUENCE"
+            ],
+            "title": "WorkflowScope",
             "type": "string"
         },
         "WorkflowUrlSpec": {
