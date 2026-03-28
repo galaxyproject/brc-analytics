@@ -23,6 +23,13 @@ const PLOIDY: ColumnDef<WorkflowEntity> = {
   id: CATEGORY_CONFIG.PLOIDY.key,
 };
 
+const SCOPE: ColumnDef<WorkflowEntity> = {
+  accessorKey: CATEGORY_CONFIG.SCOPE.key,
+  filterFn: "arrIncludesSome",
+  header: CATEGORY_CONFIG.SCOPE.label,
+  id: CATEGORY_CONFIG.SCOPE.key,
+};
+
 const TAXONOMIC_LEVEL_CLASS: ColumnDef<WorkflowEntity> = {
   accessorKey: CATEGORY_CONFIG.TAXONOMIC_LEVEL_CLASS.key,
   filterFn: "arrIncludesSome",
@@ -106,6 +113,7 @@ export const COLUMNS: ColumnDef<WorkflowEntity>[] = [
   CATEGORY,
   COMMON_NAME,
   PLOIDY,
+  SCOPE,
   TAXONOMIC_LEVEL_CLASS,
   TAXONOMIC_LEVEL_DOMAIN,
   TAXONOMIC_LEVEL_FAMILY,

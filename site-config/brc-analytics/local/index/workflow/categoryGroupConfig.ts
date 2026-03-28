@@ -4,6 +4,7 @@ export const CATEGORY_CONFIG = {
   CATEGORY: { key: "category", label: "Category" },
   COMMON_NAME: { key: "assembly.commonName", label: "Common Name" },
   PLOIDY: { key: "ploidy", label: "Ploidy" },
+  SCOPE: { key: "scope", label: "Biological Context" },
   TAXONOMIC_LEVEL_CLASS: {
     key: "assembly.taxonomicLevelClass",
     label: "Class",
@@ -54,6 +55,7 @@ export const CATEGORY_GROUP_CONFIG: CategoryGroupConfig = {
         CATEGORY_CONFIG.WORKFLOW_NAME,
         CATEGORY_CONFIG.CATEGORY,
         CATEGORY_CONFIG.PLOIDY,
+        CATEGORY_CONFIG.SCOPE,
       ],
     },
     {

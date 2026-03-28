@@ -1,5 +1,8 @@
 import { Workflow } from "../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
-import { WORKFLOW_PARAMETER_VARIABLE } from "../../../../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
+import {
+  WORKFLOW_PARAMETER_VARIABLE,
+  WORKFLOW_SCOPE,
+} from "../../../../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { CUSTOM_WORKFLOW } from "../../../../../../../../../views/AnalyzeWorkflowsView/custom/constants";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../../../../../views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { ConfiguredInput } from "../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
@@ -32,6 +35,10 @@ export function augmentConfiguredSteps(
 
 /**
  * Builds the steps for the stepper based on the workflow and workflow parameters.
+ * Scope-aware: Different workflow scopes determine the first step:
+ * - ASSEMBLY (default): First step is assembly selection (ASSEMBLY_ID)
+ * - ORGANISM: First step would be organism selection/confirmation (not yet implemented)
+ * - SEQUENCE: First step would be sequence FASTA upload (not yet implemented)
  * @param workflow - Workflow.
  * @returns Steps.
  */
@@ -61,25 +68,47 @@ export function buildSteps(workflow: Workflow): StepConfig[] {
     .map((param) => param.variable)
     .filter((param) => !!param);
 
-  // Return the steps, ordered by workflow variable.
-  return (
-    [
-      WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_ID,
-      WORKFLOW_PARAMETER_VARIABLE.GENE_MODEL_URL,
-      WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE,
-      WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_PAIRED,
-    ]
-      .filter(
-        (variable) =>
-          // For now, ASSEMBLY_ID is always required.
-          variable === WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_ID ||
-          // Only include variables that the workflow has.
-          variables.includes(variable)
-      )
-      .map((variable) => STEP[variable])
-      // Only include variables that a step is configured for.
-      .filter(isStepConfigured)
-  );
+  // Scope-aware step building:
+  const workflowScope = workflow.scope ?? WORKFLOW_SCOPE.ASSEMBLY;
+
+  // Handle different workflow scopes
+  switch (workflowScope) {
+    case WORKFLOW_SCOPE.ASSEMBLY:
+      // ASSEMBLY scope: Include assembly selection as first step
+      return [
+        WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_ID,
+        WORKFLOW_PARAMETER_VARIABLE.GENE_MODEL_URL,
+        WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE,
+        WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_PAIRED,
+      ]
+        .filter(
+          (variable) =>
+            // ASSEMBLY_ID is always included for ASSEMBLY scope
+            variable === WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_ID ||
+            // Include other variables that the workflow has
+            variables.includes(variable)
+        )
+        .map((variable) => STEP[variable])
+        .filter(isStepConfigured);
+
+    case WORKFLOW_SCOPE.ORGANISM:
+      // Implement organism selection/confirmation step
+      console.warn(
+        `ORGANISM scope workflows not yet implemented for workflow: ${workflow.workflowName}`
+      );
+      return [];
+
+    case WORKFLOW_SCOPE.SEQUENCE:
+      // Implement sequence FASTA upload step
+      console.warn(
+        `SEQUENCE scope workflows not yet implemented for workflow: ${workflow.workflowName}`
+      );
+      return [];
+
+    default:
+      console.error(`Unknown workflow scope: ${workflowScope}`);
+      return [];
+  }
 }
 
 /**
