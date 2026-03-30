@@ -10,10 +10,12 @@ from app.core.config import get_settings
 from app.core.dependencies import (
     get_auth_service,
     get_cache_service,
+    get_catalog_data,
     get_ena_service,
     get_llm_service,
     reset_all_services,
 )
+from app.services.mcp_server import create_mcp_server
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
@@ -31,19 +33,27 @@ if settings.SENTRY_DSN:
 async def lifespan(app: FastAPI):
     """Startup and shutdown events for the application"""
     # Startup: initialize services and flush cache
-    cache_service = await get_cache_service()
+    cache_service = get_cache_service()
     await cache_service.flush_all()
     logger.info("Cache cleared on startup")
 
-    # Pre-initialize LLM and ENA services (singletons)
-    await get_llm_service()
-    await get_ena_service()
+    # Pre-initialize services (singletons)
+    catalog_data = get_catalog_data()
+    ena_service = get_ena_service()
+    get_llm_service()
+
+    # Mount MCP server for AI tool access to the catalog
+    mcp = create_mcp_server(catalog_data, ena_service)
+    mcp_app = mcp.http_app(path="/", stateless_http=True)
+    app.mount("/api/v1/mcp", mcp_app)
+    logger.info("MCP server mounted at /api/v1/mcp")
+
     logger.info("All services initialized")
 
     yield
 
     # Shutdown: close connections and reset all service singletons
-    auth_service = await get_auth_service()
+    auth_service = get_auth_service()
     await auth_service.close()
     await cache_service.close()
     reset_all_services()
