@@ -16,6 +16,7 @@ dependencies = [
     "redis>=6.4.0",
     "tenacity>=8.2.0",
     "pyjwt>=2.9.0",
+    "sentry-sdk[fastapi]>=2.0.0",
     "uvicorn>=0.35.0"
 ]
 
