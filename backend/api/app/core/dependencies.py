@@ -39,7 +39,9 @@ def get_catalog_data() -> CatalogData:
 def get_llm_service() -> LLMService:
     cache = get_cache_service()
     service = LLMService(cache)
-    logger.info(f"LLM service initialized (singleton), available: {service.is_available()}")
+    logger.info(
+        f"LLM service initialized (singleton), available: {service.is_available()}"
+    )
     return service
 
 
