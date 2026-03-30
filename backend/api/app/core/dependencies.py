@@ -4,6 +4,12 @@ from fastapi import Request
 
 from app.core.cache import CacheService
 from app.core.config import get_settings
+from app.core.rate_limit import RateLimiter
+from app.services.assistant_agent import AssistantAgent
+from app.services.auth_service import AuthService
+from app.services.catalog_data import CatalogData
+from app.services.ena_service import ENAService
+from app.services.llm_service import LLMService
 
 logger = logging.getLogger(__name__)
 
@@ -21,8 +27,6 @@ async def get_auth_service():
     """Dependency to get auth service singleton instance."""
     global _auth_service
     if _auth_service is None:
-        from app.services.auth_service import AuthService
-
         settings = get_settings()
         _auth_service = AuthService(settings.REDIS_URL)
         logger.info("Auth service initialized (singleton)")
@@ -42,8 +46,6 @@ async def get_catalog_data():
     """Dependency to get shared catalog data singleton"""
     global _catalog_data
     if _catalog_data is None:
-        from app.services.catalog_data import CatalogData
-
         settings = get_settings()
         _catalog_data = CatalogData(settings.CATALOG_PATH)
     return _catalog_data
@@ -53,8 +55,6 @@ async def get_llm_service():
     """Dependency to get LLM service singleton instance"""
     global _llm_service
     if _llm_service is None:
-        from app.services.llm_service import LLMService
-
         cache = await get_cache_service()
         _llm_service = LLMService(cache)
         available = _llm_service.is_available()
@@ -66,8 +66,6 @@ async def get_ena_service():
     """Dependency to get ENA service singleton instance"""
     global _ena_service
     if _ena_service is None:
-        from app.services.ena_service import ENAService
-
         cache = await get_cache_service()
         _ena_service = ENAService(cache)
         logger.info("ENA service initialized (singleton)")
@@ -78,8 +76,6 @@ async def get_assistant_agent():
     """Dependency to get assistant agent singleton instance"""
     global _assistant_agent
     if _assistant_agent is None:
-        from app.services.assistant_agent import AssistantAgent
-
         cache = await get_cache_service()
         _assistant_agent = AssistantAgent(cache)
         available = _assistant_agent.is_available()
@@ -91,8 +87,6 @@ async def get_rate_limiter():
     """Get rate limiter singleton instance"""
     global _rate_limiter
     if _rate_limiter is None:
-        from app.core.rate_limit import RateLimiter
-
         cache = await get_cache_service()
         settings = get_settings()
         _rate_limiter = RateLimiter(
