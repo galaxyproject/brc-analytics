@@ -293,6 +293,8 @@ class CatalogData:
             elif variable == "ASSEMBLY_ID":
                 resolved[key] = accession
             elif variable == "ASSEMBLY_FASTA_URL":
+                # URL is constructed from UCSC's directory convention --
+                # not all assemblies may be hosted there
                 resolved[key] = self._build_fasta_url(accession)
             elif variable == "GENE_MODEL_URL":
                 # Catalog JSON uses the string "None" (not null) for missing gene models

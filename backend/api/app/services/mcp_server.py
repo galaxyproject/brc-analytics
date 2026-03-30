@@ -27,6 +27,14 @@ def create_mcp_server(catalog_data: CatalogData, ena_service: ENAService) -> Fas
     )
     mcp = FastMCP("BRC Analytics", instructions=instructions)
 
+    # Catalog tools use two error conventions:
+    # - Single-entity lookups (get_organism, get_assembly_details, etc.) raise
+    #   ValueError when the entity doesn't exist, since there's no meaningful
+    #   empty response for a specific ID lookup.
+    # - Multi-result searches (search_organisms, get_assemblies, etc.) return
+    #   {"count": 0, ...} with an empty list, since zero results is a valid
+    #   search outcome.
+
     # -- Catalog tools (sync, in-memory) --
 
     @mcp.tool()
@@ -108,29 +116,35 @@ def create_mcp_server(catalog_data: CatalogData, ena_service: ENAService) -> Fas
     @mcp.tool()
     async def search_ena(taxonomy_id: str) -> dict:
         """Search ENA for sequencing runs by taxonomy ID.
-        Returns up to 50 read run records."""
+        Returns up to 50 read run records. Check has_more to see if
+        additional results exist beyond the cap."""
         try:
             result = await ena_service.search_by_taxonomy(
-                taxonomy_id, limit=ENA_RESULT_CAP
+                taxonomy_id, limit=ENA_RESULT_CAP + 1
             )
         except Exception as e:
             raise ValueError(f"ENA search failed: {e}") from e
         data = result.get("data", [])
-        return {"count": len(data), "records": data[:ENA_RESULT_CAP]}
+        has_more = len(data) > ENA_RESULT_CAP
+        capped = data[:ENA_RESULT_CAP]
+        return {"count": len(capped), "has_more": has_more, "records": capped}
 
     @mcp.tool()
     async def search_ena_keywords(keywords: List[str]) -> dict:
         """Search the European Nucleotide Archive by keywords (organism names,
         library strategies like RNA-Seq/WGS, platforms like Illumina/PacBio).
-        Returns up to 50 read run records."""
+        Returns up to 50 read run records. Check has_more to see if
+        additional results exist beyond the cap."""
         try:
             result = await ena_service.search_by_keywords(
-                keywords, limit=ENA_RESULT_CAP
+                keywords, limit=ENA_RESULT_CAP + 1
             )
         except Exception as e:
             raise ValueError(f"ENA keyword search failed: {e}") from e
         data = result.get("data", [])
-        return {"count": len(data), "records": data[:ENA_RESULT_CAP]}
+        has_more = len(data) > ENA_RESULT_CAP
+        capped = data[:ENA_RESULT_CAP]
+        return {"count": len(capped), "has_more": has_more, "records": capped}
 
     logger.info("MCP server created")
     return mcp

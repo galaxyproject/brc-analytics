@@ -169,6 +169,7 @@ class TestMCPENATools:
         result = await call_tool(mcp, "search_ena", {"taxonomy_id": "562"})
         assert result["count"] == 2
         assert len(result["records"]) == 2
+        assert result["has_more"] is False
         mock_ena_service.search_by_taxonomy.assert_awaited_once()
 
     @pytest.mark.asyncio
@@ -177,6 +178,18 @@ class TestMCPENATools:
         result = await call_tool(mcp, "search_ena", {"taxonomy_id": "0000000"})
         assert result["count"] == 0
         assert result["records"] == []
+        assert result["has_more"] is False
+
+    @pytest.mark.asyncio
+    async def test_search_ena_has_more(self, mcp, mock_ena_service):
+        many_records = [{"run_accession": f"SRR{i:06d}"} for i in range(51)]
+        mock_ena_service.search_by_taxonomy = AsyncMock(
+            return_value={"data": many_records}
+        )
+        result = await call_tool(mcp, "search_ena", {"taxonomy_id": "562"})
+        assert result["count"] == 50
+        assert result["has_more"] is True
+        assert len(result["records"]) == 50
 
     @pytest.mark.asyncio
     async def test_search_ena_keywords(self, mcp, mock_ena_service):
@@ -184,6 +197,7 @@ class TestMCPENATools:
             mcp, "search_ena_keywords", {"keywords": ["E. coli", "RNA-Seq"]}
         )
         assert result["count"] == 2
+        assert result["has_more"] is False
         mock_ena_service.search_by_keywords.assert_awaited_once()
 
     @pytest.mark.asyncio
