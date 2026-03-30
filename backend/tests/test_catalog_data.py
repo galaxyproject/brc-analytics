@@ -62,6 +62,14 @@ class TestSearchOrganisms:
         results = catalog.search_organisms("Plasmodium", limit=2)
         assert len(results) <= 2
 
+    def test_search_empty_query(self, catalog):
+        results = catalog.search_organisms("")
+        assert results == []
+
+    def test_search_whitespace_query(self, catalog):
+        results = catalog.search_organisms("   ")
+        assert results == []
+
     def test_search_no_results(self, catalog):
         results = catalog.search_organisms("zzzznonexistent")
         assert results == []
@@ -224,6 +232,13 @@ class TestGetCompatibleWorkflows:
         results = catalog.get_compatible_workflows(["HAPLOID"], taxonomy_id="4932")
         amr = [r for r in results if r["iwcId"] == "amr_gene_detection-main"]
         assert len(amr) == 0
+
+    def test_lineage_index_no_cross_contamination(self, catalog):
+        # E. coli (562) is in Bacteria (2) lineage but NOT in Fungi (4751).
+        # Verify the per-ID lineage sets don't leak across unrelated branches.
+        ecoli_lineage = catalog._lineage_by_tax_id.get("562", set())
+        assert "2" in ecoli_lineage, "Bacteria should be in E. coli lineage"
+        assert "4751" not in ecoli_lineage, "Fungi should not be in E. coli lineage"
 
 
 class TestResolveWorkflowInputs:

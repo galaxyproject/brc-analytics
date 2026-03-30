@@ -185,3 +185,11 @@ class TestMCPENATools:
         )
         assert result["count"] == 2
         mock_ena_service.search_by_keywords.assert_awaited_once()
+
+    @pytest.mark.asyncio
+    async def test_search_ena_error(self, mcp, mock_ena_service):
+        mock_ena_service.search_by_taxonomy = AsyncMock(
+            side_effect=Exception("connection timeout")
+        )
+        with pytest.raises(ValueError, match="ENA search failed"):
+            await call_tool(mcp, "search_ena", {"taxonomy_id": "562"})

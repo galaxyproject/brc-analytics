@@ -65,26 +65,20 @@ class CatalogData:
             species_tax_id = str(asm.get("speciesTaxonomyId", ""))
             if species_tax_id and species_tax_id != tax_id:
                 self._assemblies_by_tax_id.setdefault(species_tax_id, []).append(asm)
-            # Build lineage index: maps each taxonomy ID to the full set of
-            # IDs in its lineage, merging across assemblies so ancestor
-            # lookups work (e.g. "is 2 (Bacteria) an ancestor of 562 (E. coli)?")
-            #
-            # Note: the first taxonomy ID that creates a set becomes the
-            # canonical object; later IDs in the same lineage point to it
-            # via aliasing (no copy). When a *different* assembly's lineage
-            # partially overlaps, its new IDs are merged into whatever set
-            # already exists for the overlapping ID. This is correct because
-            # we only need "is X an ancestor of Y?" -- i.e. membership tests
-            # on the set for Y -- and merging strictly grows each set.
+            # Build lineage index: maps each taxonomy ID to the set of IDs
+            # in its lineage so ancestor lookups work (e.g. "is 2 (Bacteria)
+            # an ancestor of 562 (E. coli)?"). Each tax ID gets its own set
+            # copy; when multiple assemblies share a tax ID, their lineages
+            # are merged into that ID's set.
             lineage = asm.get("lineageTaxonomyIds", [])
             if lineage:
-                lineage_set = {str(t) for t in lineage}
-                for tid in lineage_set:
+                lineage_strs = [str(t) for t in lineage]
+                for tid in lineage_strs:
                     existing = self._lineage_by_tax_id.get(tid)
                     if existing is None:
-                        self._lineage_by_tax_id[tid] = lineage_set
+                        self._lineage_by_tax_id[tid] = set(lineage_strs)
                     else:
-                        existing.update(lineage_set)
+                        existing.update(lineage_strs)
 
         for cat in self.workflow_categories:
             for wf in cat.get("workflows", []):
@@ -102,6 +96,8 @@ class CatalogData:
         Search organisms by name, taxonomy ID, or taxonomic group.
         Returns condensed records suitable for MCP responses.
         """
+        if not query.strip():
+            return []
         q = query.lower()
         results = []
         for org in self.organisms:
