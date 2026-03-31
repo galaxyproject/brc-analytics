@@ -89,7 +89,7 @@ export function getWorkflows(
           findAssemblyByTaxonomyId(assemblyByTaxonomyId, workflow.taxonomyId)
         ),
         category: category.name,
-        scope: String(workflow.scope ?? "ASSEMBLY"),
+        scope: String(workflow.scope),
         taxonomyId: workflow.taxonomyId ?? "Any",
       } as WorkflowEntity);
     }
@@ -100,7 +100,7 @@ export function getWorkflows(
     ...DIFFERENTIAL_EXPRESSION_ANALYSIS,
     assembly: mapAssembly(undefined),
     category: "Transcriptomics",
-    scope: String(DIFFERENTIAL_EXPRESSION_ANALYSIS.scope ?? "ASSEMBLY"),
+    scope: String(DIFFERENTIAL_EXPRESSION_ANALYSIS.scope),
     taxonomyId: "Any",
   } as WorkflowEntity);
 

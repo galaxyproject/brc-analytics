@@ -33,7 +33,7 @@ export function buildAssemblyWorkflows(
     const compatibleWorkflows = categoryWorkflows.filter(
       (workflow) =>
         workflowIsCompatibleWithAssembly(workflow, assembly) &&
-        (!workflow.scope || workflow.scope === WORKFLOW_SCOPE.ASSEMBLY)
+        workflow.scope === WORKFLOW_SCOPE.ASSEMBLY
     );
 
     if (workflowCategory.category === WorkflowCategoryId.TRANSCRIPTOMICS) {

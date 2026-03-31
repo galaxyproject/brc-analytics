@@ -69,7 +69,7 @@ export function buildSteps(workflow: Workflow): StepConfig[] {
     .filter((param) => !!param);
 
   // Scope-aware step building:
-  const workflowScope = workflow.scope ?? WORKFLOW_SCOPE.ASSEMBLY;
+  const workflowScope = workflow.scope;
 
   // Handle different workflow scopes
   switch (workflowScope) {

@@ -119,7 +119,7 @@ export interface Workflow {
   iwcId: string;
   parameters: WorkflowParameter[];
   ploidy: WORKFLOW_PLOIDY;
-  scope?: WORKFLOW_SCOPE;
+  scope: WORKFLOW_SCOPE;
   taxonomyId: string | null;
   trsId: string;
   workflowDescription: string;
