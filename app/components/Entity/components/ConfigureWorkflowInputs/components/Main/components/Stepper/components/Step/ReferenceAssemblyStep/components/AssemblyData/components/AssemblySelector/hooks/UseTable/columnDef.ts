@@ -63,6 +63,15 @@ const COVERAGE: ColumnDef<Assembly> = {
   meta: { width: { max: "0.5fr", min: "120px" } },
 };
 
+const GALAXY_DATACACHE_URL: ColumnDef<Assembly> = {
+  accessorFn: (row) => (row.galaxyDatacacheUrl ? "Yes" : "No"),
+  enableSorting: false,
+  filterFn: SELECT_FILTER_FN,
+  header: CATEGORY_CONFIGS.GALAXY_DATACACHE_URL.label,
+  id: CATEGORY_CONFIGS.GALAXY_DATACACHE_URL.key,
+  meta: { width: { max: "0.5fr", min: "120px" } },
+};
+
 const GC_PERCENT: ColumnDef<Assembly> = {
   ...SORTING_COLUMN_DEF,
   accessorKey: CATEGORY_CONFIGS.GC_PERCENT.key,
@@ -205,4 +214,5 @@ export const columns: ColumnDef<Assembly>[] = [
   GC_PERCENT,
   ANNOTATION_STATUS,
   LINEAGE_TAXONOMY_IDS,
+  GALAXY_DATACACHE_URL,
 ];

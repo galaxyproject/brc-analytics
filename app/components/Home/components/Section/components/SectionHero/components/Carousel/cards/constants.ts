@@ -3,10 +3,10 @@ import * as MDX from "../content";
 
 export const CAROUSEL_CARDS: Pick<CardProps, "text">[] = [
   {
-    text: MDX.EvolutionaryDynamicsOfCodingOverlapsInMeaslesVirus({}),
+    text: MDX.UserSurvey({}),
   },
   {
-    text: MDX.GenomeArk2({}),
+    text: MDX.EvolutionaryDynamicsOfCodingOverlapsInMeaslesVirus({}),
   },
   {
     text: MDX.Roadmap({}),

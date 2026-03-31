@@ -46,7 +46,7 @@ export type AppPropsWithComponent = AppProps & {
   pageProps: PageProps;
 };
 
-setFeatureFlags(["assistant", "de"]);
+setFeatureFlags(["assistant"]);
 
 const queryClient = new QueryClient();
 

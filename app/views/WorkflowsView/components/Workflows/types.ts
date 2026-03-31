@@ -1,5 +1,5 @@
 import { Table } from "@tanstack/react-table";
-import type { WorkflowEntity } from "../../../../../site-config/brc-analytics/local/index/workflow/types";
+import type { WorkflowEntity } from "../../types";
 
 export interface Props {
   table: Table<WorkflowEntity>;

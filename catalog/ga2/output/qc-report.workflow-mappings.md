@@ -18,29 +18,31 @@
 |----------|----------------------|
 | Variant calling and consensus construction from paired end short read data of non-segmented viral genomes | 0 |
 | Paired end variant calling in haploid system | 0 |
+| Paired end variant and ploidy-aware genotype calling | 1226 |
 | COVID-19: variation analysis on ARTIC PE data | 0 |
 | COVID-19: variation analysis on WGS PE data | 0 |
 | COVID-19: variation analysis on WGS SE data | 0 |
-| Single-Cell RNA-seq Preprocessing: 10X Genomics CellPlex Multiplexed Samples | 841 |
-| Single-Cell RNA-seq Preprocessing: 10X Genomics v3 to Seurat and Scanpy Compatible Format | 841 |
-| RNA-Seq Analysis: Paired-End Read Processing and Quantification | 841 |
-| RNA-Seq Analysis: Single-End Read Processing and Quantification | 841 |
-| ATAC-seq Analysis: Chromatin Accessibility Profiling | 841 |
-| ChIP-seq Analysis: Paired-End Read Processing | 841 |
-| ChIP-seq Analysis: Single-End Read Processing | 841 |
-| Consensus Peak Calling for ATAC-seq and CUT&RUN Replicates | 841 |
-| CUT&RUN/CUT&TAG Analysis: Protein-DNA Interaction Mapping | 841 |
-| Capture Hi-C Processing: FASTQ to Balanced Cool Files | 841 |
-| Hi-C Processing: FASTQ to Balanced Cool Files | 841 |
-| Hi-C Data Processing: FASTQ to Valid Interaction Pairs | 841 |
+| Single-Cell RNA-seq Preprocessing: 10X Genomics CellPlex Multiplexed Samples | 617 |
+| Single-Cell RNA-seq Preprocessing: 10X Genomics v3 to Seurat and Scanpy Compatible Format | 617 |
+| RNA-Seq Analysis: Paired-End Read Processing and Quantification | 617 |
+| RNA-Seq Analysis: Single-End Read Processing and Quantification | 617 |
+| ATAC-seq Analysis: Chromatin Accessibility Profiling | 617 |
+| ChIP-seq Analysis: Paired-End Read Processing | 617 |
+| ChIP-seq Analysis: Single-End Read Processing | 617 |
+| Consensus Peak Calling for ATAC-seq and CUT&RUN Replicates | 1226 |
+| CUT&amp;RUN/CUT&amp;TAG Analysis: Protein-DNA Interaction Mapping | 617 |
+| Capture Hi-C Processing: FASTQ to Balanced Cool Files | 617 |
+| Hi-C Processing: FASTQ to Balanced Cool Files | 617 |
+| Hi-C Data Processing: FASTQ to Valid Interaction Pairs | 617 |
 | Variant calling and consensus construction from paired end short read data of non-segmented viral genomes | 0 |
 | Pox Virus Illumina Amplicon Workflow from half-genomes | 0 |
 | AMR Gene Detection | 0 |
+| Genome annotation with Braker3 | 1226 |
 | Bacterial Genome Annotation | 0 |
-| lncRNAs annotation workflow | 841 |
+| lncRNAs annotation workflow | 1226 |
 
 ## Summary Statistics
 
-- Total active workflows: 22
-- Workflows with ≥1 compatible assembly: 13
+- Total active workflows: 24
+- Workflows with ≥1 compatible assembly: 15
 - Workflows with 0 compatible assemblies: 9

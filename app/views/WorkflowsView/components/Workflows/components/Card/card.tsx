@@ -19,7 +19,7 @@ import Link from "next/link";
 import { JSX } from "react";
 import { ROUTES } from "../../../../../../../routes/constants";
 import { TruncatedText } from "../../../../../../components/common/TruncatedText/truncatedText";
-import { CHIP_PROPS } from "../../../../../../components/Entity/components/AnalysisMethod/constants";
+import { CHIP_PROPS } from "../../../../../AnalyzeWorkflowsView/components/Main/components/Accordion/constants";
 import { StyledCard } from "./card.styles";
 import { Props } from "./types";
 

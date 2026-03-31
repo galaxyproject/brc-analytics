@@ -17,6 +17,10 @@ export const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
     key: "coverage",
     label: "Coverage",
   },
+  GALAXY_DATACACHE_URL: {
+    key: "galaxyDatacacheUrl",
+    label: "Galaxy Data Cache Available",
+  },
   GC_PERCENT: {
     key: "gcPercent",
     label: "GC%",

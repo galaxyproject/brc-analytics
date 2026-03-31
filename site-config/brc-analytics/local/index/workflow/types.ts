@@ -1,9 +1,8 @@
 import {
-  Workflow,
-  WorkflowCategory,
-} from "../../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
+  WorkflowEntity as BaseWorkflowEntity,
+  WorkflowAssembly,
+} from "../../../../../app/views/WorkflowsView/types";
 
-export type WorkflowEntity = Workflow &
-  Pick<WorkflowCategory, "category"> & {
-    disabled?: boolean;
-  };
+export type WorkflowEntity = Omit<BaseWorkflowEntity, "assembly"> & {
+  assembly: WorkflowAssembly;
+};

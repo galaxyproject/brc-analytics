@@ -6,6 +6,7 @@ import {
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
+import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { ColumnDef, getSortedRowModel } from "@tanstack/react-table";
 import { LinkProps } from "next/link";
 import Router from "next/router";
@@ -74,7 +75,9 @@ export const buildAnalyzeGenome = (
   return {
     analyze: {
       label: "Analyze",
-      url: `${ROUTES.GENOMES}/${encodeURIComponent(sanitizeEntityId(accession))}`,
+      url: replaceParameters(ROUTES.GENOME, {
+        entityId: sanitizeEntityId(accession),
+      }),
     },
     views: [
       ...(ucscBrowserUrl
@@ -104,20 +107,6 @@ export const buildAnnotationStatus = (
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.annotationStatus,
-  };
-};
-
-/**
- * Build props for the assembly BackPageHero component.
- * @param assembly - Assembly entity.
- * @returns Props to be used for the BackPageHero component.
- */
-export const buildAssemblyBackPageHero = (
-  assembly: BRCDataCatalogGenome
-): ComponentProps<typeof C.BackPageHero> => {
-  return {
-    breadcrumbs: getAssemblyBreadcrumbs(assembly),
-    title: "Analyze in Galaxy",
   };
 };
 
@@ -725,26 +714,13 @@ export const buildTaxonomyId = (
 };
 
 /**
- * Build props for the genome AnalysisMethodsCatalog component.
- * @param genome - Genome entity.
- * @returns Props to be used for the AnalysisMethodsCatalog component.
- */
-export const buildGenomeAnalysisMethods = (
-  genome: BRCDataCatalogGenome
-): ComponentProps<typeof C.AnalysisMethodsCatalog> => {
-  return {
-    assembly: genome,
-  };
-};
-
-/**
- * Build props for the genome AnalysisPortals component.
+ * Build props for the assembly AnalysisPortals component.
  * @param entity - Entity with an accession, ucscBrowserUrl and ncbiTaxonomyId property.
  * @returns Props to be used for the AnalysisPortals component.
  */
-export const buildGenomeAnalysisPortals = (
+export const buildAssemblyResources = (
   entity: BRCDataCatalogGenome | GA2AssemblyEntity
-): ComponentProps<typeof C.AnalysisPortals> => {
+): Pick<ComponentProps<typeof C.AnalysisPortals>, "portals"> => {
   return {
     portals: [
       ...(entity.galaxyDatacacheUrl
@@ -984,19 +960,6 @@ export const buildWorkflowDetails = (
     keyValuePairs,
   };
 };
-
-/**
- * Get the assembly breadcrumbs.
- * @param assembly - Assembly entity.
- * @returns Breadcrumbs.
- */
-function getAssemblyBreadcrumbs(assembly: BRCDataCatalogGenome): Breadcrumb[] {
-  return [
-    { path: ROUTES.GENOMES, text: "Assemblies" },
-    { path: "", text: assembly.accession },
-    { path: "", text: "Analyze in Galaxy" },
-  ];
-}
 
 /**
  * Returns an entity list link with a priority pathogen filter.

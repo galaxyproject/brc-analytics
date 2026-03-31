@@ -8,6 +8,10 @@
     "workflowTrsId": "#workflow/github.com/iwc-workflows/haploid-variant-calling-wgs-pe/main/versions/v0.1"
   },
   {
+    "compatibleAssemblyCount": 1226,
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/ploidy-aware-genotype-calling/main/versions/v0.1.1"
+  },
+  {
     "compatibleAssemblyCount": 0,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-variant-calling/COVID-19-PE-ARTIC-ILLUMINA/versions/v0.5.4"
   },
@@ -20,51 +24,51 @@
     "workflowTrsId": "#workflow/github.com/iwc-workflows/sars-cov-2-se-illumina-wgs-variant-calling/COVID-19-SE-WGS-ILLUMINA/versions/v0.1.6"
   },
   {
-    "compatibleAssemblyCount": 841,
-    "workflowTrsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.3"
+    "compatibleAssemblyCount": 617,
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.4"
   },
   {
-    "compatibleAssemblyCount": 841,
-    "workflowTrsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.3"
+    "compatibleAssemblyCount": 617,
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.4"
   },
   {
-    "compatibleAssemblyCount": 841,
-    "workflowTrsId": "#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.2"
+    "compatibleAssemblyCount": 617,
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.3"
   },
   {
-    "compatibleAssemblyCount": 841,
-    "workflowTrsId": "#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.2"
+    "compatibleAssemblyCount": 617,
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.3"
   },
   {
-    "compatibleAssemblyCount": 841,
+    "compatibleAssemblyCount": 617,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/atacseq/main/versions/v1.0"
   },
   {
-    "compatibleAssemblyCount": 841,
+    "compatibleAssemblyCount": 617,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v1.0"
   },
   {
-    "compatibleAssemblyCount": 841,
+    "compatibleAssemblyCount": 617,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v1.0"
   },
   {
-    "compatibleAssemblyCount": 841,
-    "workflowTrsId": "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.3"
+    "compatibleAssemblyCount": 1226,
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.4"
   },
   {
-    "compatibleAssemblyCount": 841,
-    "workflowTrsId": "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.14"
+    "compatibleAssemblyCount": 617,
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.17"
   },
   {
-    "compatibleAssemblyCount": 841,
+    "compatibleAssemblyCount": 617,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/chic-fastq-to-cool-hicup-cooler/versions/v0.3"
   },
   {
-    "compatibleAssemblyCount": 841,
+    "compatibleAssemblyCount": 617,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-cool-hicup-cooler/versions/v0.3"
   },
   {
-    "compatibleAssemblyCount": 841,
+    "compatibleAssemblyCount": 617,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-pairs-hicup/versions/v0.3"
   },
   {
@@ -76,11 +80,15 @@
     "workflowTrsId": "#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.7"
   },
   {
+    "compatibleAssemblyCount": 1226,
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/annotation-braker3/main/versions/v0.1"
+  },
+  {
     "compatibleAssemblyCount": 0,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/bacterial_genome_annotation/main/versions/v1.2.0"
   },
   {
-    "compatibleAssemblyCount": 841,
+    "compatibleAssemblyCount": 1226,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/lncRNAs-annotation/main/versions/v0.1"
   }
 ]

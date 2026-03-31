@@ -1,0 +1,140 @@
+---
+breadcrumbs:
+  - path: "/learn"
+    text: "Learn"
+  - path: "/learn/getting-started"
+    text: "Getting Started"
+  - path: ""
+    text: "What Are Assemblies"
+contentType: "ARTICLE"
+description: ""
+enableOutline: true
+title: "What Are Assemblies?"
+---
+
+## Overview
+
+Assemblies are genome sequences associated with each species. Each organism on BRC Analytics may have one or more assemblies representing different sequencing and assembly efforts. To find assemblies for a specific species, start by clicking "Organisms" in the top navigation bar.
+
+<Figure
+  alt="Click on Organisms in the navigation"
+  src="/learn/getting-started/what-are-assemblies/click-organisms.webp"
+/>
+
+## Filtering by species
+
+Type a species name into the filter box to narrow the list. Here we search for _Plasmodium_.
+
+<Figure
+  alt="Filtering organisms by typing Plasmodium"
+  src="/learn/getting-started/what-are-assemblies/filter-plasmodium.webp"
+/>
+
+## Selecting a species
+
+The filtered list now shows matching species. Select _Plasmodium falciparum_.
+
+<Figure
+  alt="Selecting Plasmodium falciparum from the list"
+  src="/learn/getting-started/what-are-assemblies/select-falciparum.webp"
+/>
+
+## Opening the species page
+
+Click on the species name to view its details.
+
+<Figure
+  alt="Click on the species name"
+  src="/learn/getting-started/what-are-assemblies/click-species.webp"
+/>
+
+## Viewing available assemblies
+
+The species page lists all assemblies. In this case, _Plasmodium falciparum_ has 27 assemblies.
+
+<Figure
+  alt="List of 27 assemblies for Plasmodium falciparum"
+  src="/learn/getting-started/what-are-assemblies/assemblies-list.webp"
+/>
+
+## Assessing assembly quality
+
+Each assembly includes quality metrics such as the [number of scaffolds](#scaffolds) (lower is better) and [scaffold N50](#n50) (higher is better). These help you choose the best assembly for your analysis. See [glossary](#glossary) below for details.
+
+<Figure
+  alt="Assembly quality metrics columns"
+  src="/learn/getting-started/what-are-assemblies/assembly-quality.webp"
+/>
+
+## Reference assemblies
+
+One assembly is typically designated as the "Reference" by NCBI. This is usually the most complete and well-annotated assembly for the species.
+
+<Figure
+  alt="Reference assembly designation"
+  src="/learn/getting-started/what-are-assemblies/reference-assembly.webp"
+/>
+
+## Analyze and View buttons
+
+Each assembly has two action buttons: "Analyze" lets you run workflows against the assembly, and "View" shows external resources.
+
+<Figure
+  alt="Analyze and View buttons for an assembly"
+  src="/learn/getting-started/what-are-assemblies/analyze-view-buttons.webp"
+/>
+
+## Viewing external resources
+
+Clicking "View" opens links to external databases and resources with additional information about the assembly.
+
+<Figure
+  alt="External resource links for an assembly"
+  src="/learn/getting-started/what-are-assemblies/view-external.webp"
+/>
+
+## Starting an analysis
+
+Clicking "Analyze" opens a page where you can run analyses in the context of the selected assembly.
+
+<Figure
+  alt="Analysis options for an assembly"
+  src="/learn/getting-started/what-are-assemblies/analyze-option.webp"
+/>
+
+## Selecting a workflow
+
+Click "Select a workflow" to browse curated workflows. These are organized into categories specific to the species.
+
+<Figure
+  alt="Selecting a workflow for analysis"
+  src="/learn/getting-started/what-are-assemblies/workflow-selection.webp"
+/>
+
+## Workflow categories
+
+The workflow page shows all available categories for the selected species, such as variant calling, RNA-seq, and more.
+
+<Figure
+  alt="Workflow categories available for the species"
+  src="/learn/getting-started/what-are-assemblies/workflow-categories.webp"
+/>
+
+## Custom analysis
+
+You can also choose custom analysis to upload your own data and run ad hoc analyses using Galaxy.
+
+<Figure
+  alt="Custom analysis option using Galaxy"
+  src="/learn/getting-started/what-are-assemblies/custom-analysis.webp"
+/>
+
+## Glossary
+
+### Scaffolds
+
+A [scaffold](<https://en.wikipedia.org/wiki/Scaffold_(genetics)>) is a portion of a genome assembly consisting of contiguous sequences (contigs) joined together with gaps of estimated size. The **number of scaffolds** indicates how fragmented an assembly is — fewer scaffolds means the genome has been assembled into larger, more continuous pieces. An ideal assembly would have one scaffold per chromosome.
+
+### N50
+
+[N50](https://en.wikipedia.org/wiki/N50,_L50,_and_related_statistics) is a standard metric for evaluating assembly contiguity. It is defined as the length of the shortest scaffold such that scaffolds of that length or longer cover at least 50% of the total assembly. A **higher N50** means the assembly contains longer contiguous sequences, indicating better overall quality. For example, an N50 of 10 Mb means that half of the assembled genome is in scaffolds of 10 Mb or longer.

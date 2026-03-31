@@ -1,27 +1,25 @@
+import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import {
+  loadEntities,
+  loadWorkflows,
+} from "../../app/services/workflows/loader";
 import { API } from "../../app/services/workflows/routes";
 import {
   getEntitiesById,
   getEntitiesByType,
 } from "../../app/services/workflows/store";
-import {
-  loadEntities,
-  loadWorkflows,
-} from "../../app/services/workflows/loader";
-import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 
 const CONFIG = {
   entities: [{ getId, route: "assemblies" }],
 } as SiteConfig;
 
-jest.mock(
-  "../../app/components/Entity/components/AnalysisMethodsCatalog/utils",
-  () => ({ formatTrsId: (trsId: string): string => trsId })
-);
+jest.mock("../../app/views/AnalyzeWorkflowsView/components/Main/utils", () => ({
+  formatTrsId: (trsId: string): string => trsId,
+}));
 
-jest.mock(
-  "../../app/components/Entity/components/AnalysisMethod/components/CustomWorkflow/constants",
-  () => ({ CUSTOM_WORKFLOW: { trsId: "custom-workflow" } })
-);
+jest.mock("../../app/views/AnalyzeWorkflowsView/custom/constants", () => ({
+  CUSTOM_WORKFLOW: { trsId: "custom-workflow" },
+}));
 
 describe("workflows loader", () => {
   let fetchMock: jest.MockedFunction<typeof fetch>;
