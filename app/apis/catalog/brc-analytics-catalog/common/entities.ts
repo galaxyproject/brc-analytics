@@ -5,6 +5,7 @@ import {
   OUTBREAK_RESOURCE_TYPE,
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_PLOIDY,
+  WorkflowCollectionSpec,
   WorkflowUrlSpec,
 } from "./schema-entities";
 
@@ -133,6 +134,7 @@ export interface WorkflowDataRequirements {
 }
 
 export interface WorkflowParameter {
+  collection_spec?: WorkflowCollectionSpec;
   data_requirements?: WorkflowDataRequirements;
   key: string;
   url_spec?: WorkflowUrlSpec;
