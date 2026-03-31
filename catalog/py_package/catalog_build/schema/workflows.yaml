@@ -94,19 +94,36 @@ classes:
         range: string
 
   WorkflowCollectionSpec:
-    description: Definition of a collection-based data source for a workflow parameter, allowing multiple files to be grouped into a Galaxy collection.
+    description: |-
+      Definition of a collection-based data source for a workflow parameter, allowing multiple files to be grouped into a Galaxy collection.
+
+      Example usage for hard-coded FASTA references:
+      ```yaml
+      collection_spec:
+        collection_type: list
+        name: Influenza Segment References
+        elements:
+          - ext: fasta
+            src: url
+            url: https://zenodo.org/record/123/files/segment1.fasta
+            md5: abc123...
+          - ext: fasta
+            src: url
+            url: https://zenodo.org/record/123/files/segment2.fasta
+            md5: def456...
+      ```
     attributes:
       collection_type:
-        description: The type of Galaxy collection to create (e.g., 'list', 'list:paired'). Determines the structure of the collection.
+        description: The type of Galaxy collection to create. Currently only 'list' is supported. Determines the structure of the collection.
         required: true
         range: string
       elements:
-        description: Array of URL specifications that will become elements in the collection. Each element represents a file to include in the collection.
+        description: Array of URL specifications that will become elements in the collection. Each element represents a file to include in the collection. Must contain at least one element.
         required: true
         multivalued: true
         range: WorkflowUrlSpec
       name:
-        description: Optional identifier for the collection, used as the collection name in Galaxy.
+        description: Optional identifier for the collection, used as the collection name in Galaxy. If not provided, defaults to 'Collection'.
         required: false
         range: string
 
@@ -152,4 +169,12 @@ classes:
       url:
         description: The complete URL (including http/https protocol) to the external resource that will be used as input to the workflow.
         required: true
+        range: string
+      db_key:
+        description: Optional database key (genome build) to associate with this file, used by Galaxy to link the file to a specific reference genome.
+        required: false
+        range: string
+      md5:
+        description: Optional MD5 checksum hash for file integrity verification.
+        required: false
         range: string

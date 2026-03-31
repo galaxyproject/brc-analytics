@@ -404,6 +404,10 @@ export interface WorkflowUrlSpec {
     src: string,
     /** The complete URL (including http/https protocol) to the external resource that will be used as input to the workflow. */
     url: string,
+    /** Optional database key (genome build) to associate with this file, used by Galaxy to link the file to a specific reference genome. */
+    db_key?: string | null,
+    /** Optional MD5 checksum hash for file integrity verification. */
+    md5?: string | null,
 }
 
 

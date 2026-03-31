@@ -398,13 +398,24 @@ function buildGeneModelUrlRequestValue(
 
 function buildCollectionFromSpec(
   collectionSpec: WorkflowCollectionSpec
-): GalaxyListCollection {
+): GalaxyListCollection | null {
+  // Validate collection is not empty
+  if (!collectionSpec.elements?.length) return null;
+
+  // Validate collection_type - only support "list" for now
+  if (collectionSpec.collection_type !== "list") {
+    throw new Error(
+      `Unsupported collection_type: ${collectionSpec.collection_type}. Only "list" is currently supported.`
+    );
+  }
+
   return {
-    collectionType: collectionSpec.collection_type as "list",
+    collectionType: "list",
     elements: collectionSpec.elements.map(
       (urlSpec: WorkflowUrlSpec, index: number) => ({
+        dbKey: urlSpec.db_key || undefined, // Convert null to undefined
         ext: urlSpec.ext,
-        hashes: undefined, // Could add MD5 support later if needed
+        hashes: urlSpec.md5 ? createMd5Hash(urlSpec.md5) : undefined,
         identifier: urlSpec.url.split("/").pop() || `element_${index}`,
         url: urlSpec.url,
       })
@@ -414,9 +425,10 @@ function buildCollectionFromSpec(
 }
 
 function buildFastaCollectionFromAccessions(
-  accessions: string[],
+  accessions: string[] | null,
   md5Checksums: Map<string, string>
-): GalaxyListCollection {
+): GalaxyListCollection | null {
+  if (!accessions?.length) return null;
   return {
     collectionType: "list",
     elements: accessions.map((accession) => {

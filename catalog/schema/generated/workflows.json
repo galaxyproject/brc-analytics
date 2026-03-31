@@ -324,9 +324,23 @@
             "additionalProperties": false,
             "description": "Definition of a URL-based data source for a workflow parameter, typically used for reference data or external resources.",
             "properties": {
+                "db_key": {
+                    "description": "Optional database key (genome build) to associate with this file, used by Galaxy to link the file to a specific reference genome.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
                 "ext": {
                     "description": "The file extension of the resource at the URL, which determines how Galaxy will interpret the data (e.g., 'fasta', 'gff', 'tabular').",
                     "type": "string"
+                },
+                "md5": {
+                    "description": "Optional MD5 checksum hash for file integrity verification.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "src": {
                     "description": "The source type for the parameter, typically 'url' to indicate an external URL source rather than a Galaxy dataset or other source type.",
