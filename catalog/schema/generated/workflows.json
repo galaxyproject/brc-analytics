@@ -164,6 +164,36 @@
             "title": "WorkflowCategoryId",
             "type": "string"
         },
+        "WorkflowCollectionSpec": {
+            "additionalProperties": false,
+            "description": "Definition of a collection-based data source for a workflow parameter, allowing multiple files to be grouped into a Galaxy collection.",
+            "properties": {
+                "collection_type": {
+                    "description": "The type of Galaxy collection to create (e.g., 'list', 'list:paired'). Determines the structure of the collection.",
+                    "type": "string"
+                },
+                "elements": {
+                    "description": "Array of URL specifications that will become elements in the collection. Each element represents a file to include in the collection.",
+                    "items": {
+                        "$ref": "#/$defs/WorkflowUrlSpec"
+                    },
+                    "type": "array"
+                },
+                "name": {
+                    "description": "Optional identifier for the collection, used as the collection name in Galaxy.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "collection_type",
+                "elements"
+            ],
+            "title": "WorkflowCollectionSpec",
+            "type": "object"
+        },
         "WorkflowDataRequirements": {
             "additionalProperties": false,
             "description": "Specification of data requirements for a workflow parameter, such as library strategy and layout.",
@@ -207,6 +237,17 @@
             "additionalProperties": false,
             "description": "Definition of an input parameter for a Galaxy workflow, specifying how the parameter value should be determined when the workflow is executed.",
             "properties": {
+                "collection_spec": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/WorkflowCollectionSpec"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "A collection specification for the parameter, allowing multiple files from external sources to be provided as a Galaxy collection."
+                },
                 "data_requirements": {
                     "anyOf": [
                         {
@@ -260,6 +301,7 @@
             "enum": [
                 "ASSEMBLY_ID",
                 "ASSEMBLY_FASTA_URL",
+                "FASTA_COLLECTION",
                 "GENE_MODEL_URL",
                 "SANGER_READ_RUN_PAIRED",
                 "SANGER_READ_RUN_SINGLE"

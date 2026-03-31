@@ -93,6 +93,23 @@ classes:
         required: false
         range: string
 
+  WorkflowCollectionSpec:
+    description: Definition of a collection-based data source for a workflow parameter, allowing multiple files to be grouped into a Galaxy collection.
+    attributes:
+      collection_type:
+        description: The type of Galaxy collection to create (e.g., 'list', 'list:paired'). Determines the structure of the collection.
+        required: true
+        range: string
+      elements:
+        description: Array of URL specifications that will become elements in the collection. Each element represents a file to include in the collection.
+        required: true
+        multivalued: true
+        range: WorkflowUrlSpec
+      name:
+        description: Optional identifier for the collection, used as the collection name in Galaxy.
+        required: false
+        range: string
+
   WorkflowParameter:
     description: Definition of an input parameter for a Galaxy workflow, specifying how the parameter value should be determined when the workflow is executed.
     attributes:
@@ -104,6 +121,10 @@ classes:
         description: A predefined variable that will be substituted as the value of the parameter at runtime, such as assembly information.
         required: false
         range: WorkflowParameterVariable
+      collection_spec:
+        description: A collection specification for the parameter, allowing multiple files from external sources to be provided as a Galaxy collection.
+        required: false
+        range: WorkflowCollectionSpec
       url_spec:
         description: A direct URL specification for the parameter, allowing for external data sources to be provided to the workflow.
         required: false

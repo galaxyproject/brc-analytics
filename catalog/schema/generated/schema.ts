@@ -53,6 +53,7 @@ export enum WorkflowParameterVariable {
     
     ASSEMBLY_ID = "ASSEMBLY_ID",
     ASSEMBLY_FASTA_URL = "ASSEMBLY_FASTA_URL",
+    FASTA_COLLECTION = "FASTA_COLLECTION",
     GENE_MODEL_URL = "GENE_MODEL_URL",
     SANGER_READ_RUN_PAIRED = "SANGER_READ_RUN_PAIRED",
     SANGER_READ_RUN_SINGLE = "SANGER_READ_RUN_SINGLE",
@@ -362,6 +363,19 @@ export interface WorkflowDataRequirements {
 
 
 /**
+ * Definition of a collection-based data source for a workflow parameter, allowing multiple files to be grouped into a Galaxy collection.
+ */
+export interface WorkflowCollectionSpec {
+    /** The type of Galaxy collection to create (e.g., 'list', 'list:paired'). Determines the structure of the collection. */
+    collection_type: string,
+    /** Array of URL specifications that will become elements in the collection. Each element represents a file to include in the collection. */
+    elements: WorkflowUrlSpec[],
+    /** Optional identifier for the collection, used as the collection name in Galaxy. */
+    name?: string | null,
+}
+
+
+/**
  * Definition of an input parameter for a Galaxy workflow, specifying how the parameter value should be determined when the workflow is executed.
  */
 export interface WorkflowParameter {
@@ -369,6 +383,8 @@ export interface WorkflowParameter {
     key: string,
     /** A predefined variable that will be substituted as the value of the parameter at runtime, such as assembly information. */
     variable?: WorkflowParameterVariable | null,
+    /** A collection specification for the parameter, allowing multiple files from external sources to be provided as a Galaxy collection. */
+    collection_spec?: WorkflowCollectionSpec | null,
     /** A direct URL specification for the parameter, allowing for external data sources to be provided to the workflow. */
     url_spec?: WorkflowUrlSpec | null,
     /** Specifications for the data requirements of this parameter, such as library strategy and layout. */

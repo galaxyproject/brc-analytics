@@ -61,7 +61,7 @@ linkml_meta = LinkMLMeta(
                 "prefix_reference": "https://w3id.org/linkml/",
             }
         },
-        "source_file": "/home/dcallan-adm/Documents/brc-analytics/brc-analytics/catalog/py_package/catalog_build/schema_utils/../schema/schema.yaml",
+        "source_file": "/home/danielle/Documents/brc-analytics/brc-analytics/catalog/py_package/catalog_build/schema_utils/../schema/schema.yaml",
     }
 )
 
@@ -125,6 +125,7 @@ class WorkflowParameterVariable(str, Enum):
 
     ASSEMBLY_ID = "ASSEMBLY_ID"
     ASSEMBLY_FASTA_URL = "ASSEMBLY_FASTA_URL"
+    FASTA_COLLECTION = "FASTA_COLLECTION"
     GENE_MODEL_URL = "GENE_MODEL_URL"
     SANGER_READ_RUN_PAIRED = "SANGER_READ_RUN_PAIRED"
     SANGER_READ_RUN_SINGLE = "SANGER_READ_RUN_SINGLE"
@@ -396,7 +397,7 @@ class Outbreak(ConfiguredBaseModel):
         json_schema_extra={
             "linkml_meta": {
                 "alias": "name",
-                "domain_of": ["Outbreak", "WorkflowCategory"],
+                "domain_of": ["Outbreak", "WorkflowCategory", "WorkflowCollectionSpec"],
             }
         },
     )
@@ -574,7 +575,7 @@ class WorkflowCategory(ConfiguredBaseModel):
         json_schema_extra={
             "linkml_meta": {
                 "alias": "name",
-                "domain_of": ["Outbreak", "WorkflowCategory"],
+                "domain_of": ["Outbreak", "WorkflowCategory", "WorkflowCollectionSpec"],
             }
         },
     )
@@ -761,6 +762,49 @@ class WorkflowDataRequirements(ConfiguredBaseModel):
     )
 
 
+class WorkflowCollectionSpec(ConfiguredBaseModel):
+    """
+    Definition of a collection-based data source for a workflow parameter, allowing multiple files to be grouped into a Galaxy collection.
+    """
+
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
+        {
+            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/workflows.yaml#"
+        }
+    )
+
+    collection_type: str = Field(
+        default=...,
+        description="""The type of Galaxy collection to create (e.g., 'list', 'list:paired'). Determines the structure of the collection.""",
+        json_schema_extra={
+            "linkml_meta": {
+                "alias": "collection_type",
+                "domain_of": ["WorkflowCollectionSpec"],
+            }
+        },
+    )
+    elements: List[WorkflowUrlSpec] = Field(
+        default=...,
+        description="""Array of URL specifications that will become elements in the collection. Each element represents a file to include in the collection.""",
+        json_schema_extra={
+            "linkml_meta": {
+                "alias": "elements",
+                "domain_of": ["WorkflowCollectionSpec"],
+            }
+        },
+    )
+    name: Optional[str] = Field(
+        default=None,
+        description="""Optional identifier for the collection, used as the collection name in Galaxy.""",
+        json_schema_extra={
+            "linkml_meta": {
+                "alias": "name",
+                "domain_of": ["Outbreak", "WorkflowCategory", "WorkflowCollectionSpec"],
+            }
+        },
+    )
+
+
 class WorkflowParameter(ConfiguredBaseModel):
     """
     Definition of an input parameter for a Galaxy workflow, specifying how the parameter value should be determined when the workflow is executed.
@@ -784,6 +828,16 @@ class WorkflowParameter(ConfiguredBaseModel):
         description="""A predefined variable that will be substituted as the value of the parameter at runtime, such as assembly information.""",
         json_schema_extra={
             "linkml_meta": {"alias": "variable", "domain_of": ["WorkflowParameter"]}
+        },
+    )
+    collection_spec: Optional[WorkflowCollectionSpec] = Field(
+        default=None,
+        description="""A collection specification for the parameter, allowing multiple files from external sources to be provided as a Galaxy collection.""",
+        json_schema_extra={
+            "linkml_meta": {
+                "alias": "collection_spec",
+                "domain_of": ["WorkflowParameter"],
+            }
         },
     )
     url_spec: Optional[WorkflowUrlSpec] = Field(
@@ -864,5 +918,6 @@ WorkflowCategory.model_rebuild()
 Workflows.model_rebuild()
 Workflow.model_rebuild()
 WorkflowDataRequirements.model_rebuild()
+WorkflowCollectionSpec.model_rebuild()
 WorkflowParameter.model_rebuild()
 WorkflowUrlSpec.model_rebuild()
