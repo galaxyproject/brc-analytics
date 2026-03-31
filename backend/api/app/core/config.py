@@ -45,6 +45,9 @@ class Settings:
         ","
     )
 
+    # Sentry
+    SENTRY_DSN: str = os.getenv("SENTRY_DSN", "")
+
     # Logging
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
 
