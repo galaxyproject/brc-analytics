@@ -29,6 +29,7 @@ describe("buildSteps - scope handling", () => {
       },
     ],
     ploidy: WORKFLOW_PLOIDY.ANY,
+    scope: WORKFLOW_SCOPE.ASSEMBLY,
     taxonomyId: null,
     trsId: "#trs-test",
     workflowDescription: "test workflow",
@@ -40,17 +41,6 @@ describe("buildSteps - scope handling", () => {
       const workflow: Workflow = {
         ...BASE_WORKFLOW,
         scope: WORKFLOW_SCOPE.ASSEMBLY,
-      };
-
-      const steps = buildSteps(workflow);
-
-      expect(steps.map((s) => s.key)).toContain("ASSEMBLY_ID");
-    });
-
-    test("includes ASSEMBLY_ID step when scope is undefined (defaults to ASSEMBLY)", () => {
-      const workflow: Workflow = {
-        ...BASE_WORKFLOW,
-        scope: undefined,
       };
 
       const steps = buildSteps(workflow);

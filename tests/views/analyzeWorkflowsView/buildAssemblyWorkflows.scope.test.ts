@@ -92,6 +92,7 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
             iwcId: "iwc-no-scope",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
+            scope: WORKFLOW_SCOPE.ASSEMBLY,
             taxonomyId: null,
             trsId: "#trs-no-scope",
             workflowDescription: "workflow without scope",

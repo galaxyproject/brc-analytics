@@ -5,6 +5,7 @@ import type {
 import {
   ORGANISM_PLOIDY,
   WORKFLOW_PLOIDY,
+  WORKFLOW_SCOPE,
 } from "../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { buildAssemblyWorkflows } from "../app/views/AnalyzeWorkflowsView/components/Main/utils";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../app/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
@@ -22,6 +23,7 @@ describe("buildAssemblyWorkflows", () => {
           iwcId: "iwc-any",
           parameters: [],
           ploidy: WORKFLOW_PLOIDY.ANY,
+          scope: WORKFLOW_SCOPE.ASSEMBLY,
           taxonomyId: null,
           trsId: "#trs-any",
           workflowDescription: "any compatible",
@@ -31,6 +33,7 @@ describe("buildAssemblyWorkflows", () => {
           iwcId: "iwc-haploid-999",
           parameters: [],
           ploidy: WORKFLOW_PLOIDY.HAPLOID,
+          scope: WORKFLOW_SCOPE.ASSEMBLY,
           taxonomyId: "999",
           trsId: "#trs-haploid",
           workflowDescription: "haploid",
@@ -48,6 +51,7 @@ describe("buildAssemblyWorkflows", () => {
           iwcId: "iwc-diploid-not-lineage",
           parameters: [],
           ploidy: WORKFLOW_PLOIDY.DIPLOID,
+          scope: WORKFLOW_SCOPE.ASSEMBLY,
           taxonomyId: "not-in-lineage",
           trsId: "#trs-diploid",
           workflowDescription: "diploid",
@@ -65,6 +69,7 @@ describe("buildAssemblyWorkflows", () => {
           iwcId: "iwc-haploid-other",
           parameters: [],
           ploidy: WORKFLOW_PLOIDY.HAPLOID,
+          scope: WORKFLOW_SCOPE.ASSEMBLY,
           taxonomyId: "other",
           trsId: "#trs-other",
           workflowDescription: "incompatible haploid",
@@ -82,6 +87,7 @@ describe("buildAssemblyWorkflows", () => {
           iwcId: "iwc-transcriptomics-any",
           parameters: [],
           ploidy: WORKFLOW_PLOIDY.ANY,
+          scope: WORKFLOW_SCOPE.ASSEMBLY,
           taxonomyId: null,
           trsId: "#trs-transcriptomics",
           workflowDescription: "transcriptomics workflow",
