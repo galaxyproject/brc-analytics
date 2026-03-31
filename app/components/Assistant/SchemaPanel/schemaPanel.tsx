@@ -5,6 +5,7 @@ import {
   FieldStatus,
   SchemaFieldState,
 } from "../../../types/api";
+import { ASSISTANT_HANDOFF_KEY } from "../../../views/WorkflowInputsView/hooks/UseAssistantHandoff/types";
 import {
   FieldRow,
   FieldValue,
@@ -42,8 +43,6 @@ const FIELD_ORDER: (keyof AnalysisSchema)[] = [
   ...REQUIRED_FIELDS,
   ...OPTIONAL_FIELDS,
 ];
-
-const ASSISTANT_HANDOFF_KEY = "brc-assistant-handoff";
 
 function resolveDataSource(value: string | null | undefined): "ena" | "upload" {
   if (!value) return "ena";

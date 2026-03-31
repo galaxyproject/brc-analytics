@@ -1,7 +1,5 @@
 import { useState } from "react";
-import { AssistantHandoff } from "./types";
-
-const ASSISTANT_HANDOFF_KEY = "brc-assistant-handoff";
+import { ASSISTANT_HANDOFF_KEY, AssistantHandoff } from "./types";
 const MAX_AGE_MS = 30 * 60 * 1000; // 30 minutes
 
 function readAndConsumeHandoff(): AssistantHandoff | null {
