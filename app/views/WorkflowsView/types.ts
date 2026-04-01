@@ -33,4 +33,5 @@ export type WorkflowEntity = Workflow &
   Pick<WorkflowCategory, "category"> & {
     assembly: BaseWorkflowAssembly;
     disabled?: boolean;
+    scope: string;
   };

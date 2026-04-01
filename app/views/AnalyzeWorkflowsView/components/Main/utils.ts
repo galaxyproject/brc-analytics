@@ -4,7 +4,10 @@ import {
   Workflow,
   WorkflowCategory,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
-import { WORKFLOW_PARAMETER_VARIABLE } from "../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
+import {
+  WORKFLOW_PARAMETER_VARIABLE,
+  WORKFLOW_SCOPE,
+} from "../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { workflowPloidyMatchesOrganismPloidy } from "../../../../apis/catalog/brc-analytics-catalog/common/utils";
 import { GA2AssemblyEntity } from "../../../../apis/catalog/ga2/entities";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../differentialExpressionAnalysis/constants";
@@ -25,9 +28,12 @@ export function buildAssemblyWorkflows(
   for (const workflowCategory of allWorkflowCategories) {
     const { workflows: categoryWorkflows } = workflowCategory;
 
-    // Filter workflows to only include those that are compatible with the given assembly.
-    const compatibleWorkflows = categoryWorkflows.filter((workflow) =>
-      workflowIsCompatibleWithAssembly(workflow, assembly)
+    // Filter workflows to only include those that are compatible with the given assembly
+    // and have ASSEMBLY scope (or no scope specified, which defaults to ASSEMBLY).
+    const compatibleWorkflows = categoryWorkflows.filter(
+      (workflow) =>
+        workflowIsCompatibleWithAssembly(workflow, assembly) &&
+        workflow.scope === WORKFLOW_SCOPE.ASSEMBLY
     );
 
     if (workflowCategory.category === WorkflowCategoryId.TRANSCRIPTOMICS) {

@@ -68,6 +68,18 @@ export enum WorkflowPloidy {
     POLYPLOID = "POLYPLOID",
 };
 /**
+* The scope level at which a workflow operates, determining its display context and required inputs.
+*/
+export enum WorkflowScope {
+    
+    /** Workflow operates on a specific genome assembly and requires assembly selection as the first step. */
+    ASSEMBLY = "ASSEMBLY",
+    /** Workflow operates at the organism level, either requiring no specific assembly or working across multiple assemblies. */
+    ORGANISM = "ORGANISM",
+    /** Workflow operates on a user-provided sequence (e.g., single gene) rather than a full genome assembly. */
+    SEQUENCE = "SEQUENCE",
+};
+/**
 * Enumeration of possible library layouts for sequencing data.
 */
 export enum LibraryLayout {
@@ -335,6 +347,8 @@ export interface Workflow {
     workflow_description: string,
     /** The ploidy state (number of chromosome sets) that this workflow is designed to work with, ensuring compatibility with organism data. */
     ploidy: WorkflowPloidy,
+    /** The scope level at which this workflow operates, determining where it is displayed in the UI and what the first configuration step should be. Defaults to ASSEMBLY for backward compatibility. */
+    scope?: WorkflowScope | null,
     /** The NCBI Taxonomy ID of the organism this workflow is designed for. If specified, the workflow will be available for all assemblies with this ID in their taxonomic lineage. */
     taxonomy_id?: number | null,
     /** Collection of input parameters that will be passed to the workflow when it is executed, including data sources and configuration options. */

@@ -61,7 +61,7 @@ linkml_meta = LinkMLMeta(
                 "prefix_reference": "https://w3id.org/linkml/",
             }
         },
-        "source_file": "/home/dcallan-adm/Documents/brc-analytics/brc-analytics/catalog/py_package/catalog_build/schema_utils/../schema/schema.yaml",
+        "source_file": "/home/danielle/Documents/brc-analytics/brc-analytics/catalog/py_package/catalog_build/schema_utils/../schema/schema.yaml",
     }
 )
 
@@ -139,6 +139,19 @@ class WorkflowPloidy(str, Enum):
     DIPLOID = "DIPLOID"
     HAPLOID = "HAPLOID"
     POLYPLOID = "POLYPLOID"
+
+
+class WorkflowScope(str, Enum):
+    """
+    The scope level at which a workflow operates, determining its display context and required inputs.
+    """
+
+    # Workflow operates on a specific genome assembly and requires assembly selection as the first step.
+    ASSEMBLY = "ASSEMBLY"
+    # Workflow operates at the organism level, either requiring no specific assembly or working across multiple assemblies.
+    ORGANISM = "ORGANISM"
+    # Workflow operates on a user-provided sequence (e.g., single gene) rather than a full genome assembly.
+    SEQUENCE = "SEQUENCE"
 
 
 class LibraryLayout(str, Enum):
@@ -669,6 +682,13 @@ class Workflow(ConfiguredBaseModel):
         description="""The ploidy state (number of chromosome sets) that this workflow is designed to work with, ensuring compatibility with organism data.""",
         json_schema_extra={
             "linkml_meta": {"alias": "ploidy", "domain_of": ["Organism", "Workflow"]}
+        },
+    )
+    scope: Optional[WorkflowScope] = Field(
+        default=None,
+        description="""The scope level at which this workflow operates, determining where it is displayed in the UI and what the first configuration step should be. Defaults to ASSEMBLY for backward compatibility.""",
+        json_schema_extra={
+            "linkml_meta": {"alias": "scope", "domain_of": ["Workflow"]}
         },
     )
     taxonomy_id: Optional[int] = Field(
