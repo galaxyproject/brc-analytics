@@ -44,6 +44,7 @@ export const Main = ({
       />
       <StyledButton
         {...BUTTON_PROPS.PRIMARY_CONTAINED}
+        data-testid="launch-galaxy-button"
         disabled={status.disabled || status.loading}
         onClick={onLaunchGalaxy}
       >
