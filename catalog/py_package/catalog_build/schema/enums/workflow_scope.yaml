@@ -1,0 +1,20 @@
+id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/enums/workflow_scope.yaml#
+name: workflow_scope
+description: Enumeration of workflow scope levels that determine where workflows are displayed and what inputs they require.
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+
+imports:
+  - linkml:types
+
+enums:
+  WorkflowScope:
+    description: The scope level at which a workflow operates, determining its display context and required inputs.
+    permissible_values:
+      ASSEMBLY:
+        description: Workflow operates on a specific genome assembly and requires assembly selection as the first step.
+      ORGANISM:
+        description: Workflow operates at the organism level, either requiring no specific assembly or working across multiple assemblies.
+      SEQUENCE:
+        description: Workflow operates on a user-provided sequence (e.g., single gene) rather than a full genome assembly.

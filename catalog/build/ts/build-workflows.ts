@@ -7,6 +7,7 @@ import {
   Workflow as SourceWorkflow,
   WorkflowCategories as SourceWorkflowCategories,
   Workflows as SourceWorkflows,
+  WorkflowScope,
 } from "../../schema/generated/schema";
 import { readYamlFile } from "./utils";
 
@@ -97,6 +98,7 @@ function buildWorkflow(
     iwc_id: iwcId,
     parameters: sourceParameters,
     ploidy,
+    scope,
     taxonomy_id: taxonomyId,
     trs_id: trsId,
     workflow_description: workflowDescription,
@@ -176,6 +178,7 @@ function buildWorkflow(
     iwcId,
     parameters,
     ploidy,
+    scope: scope ?? WorkflowScope.ASSEMBLY,
     taxonomyId: typeof taxonomyId === "number" ? String(taxonomyId) : null,
     trsId,
     workflowDescription,
