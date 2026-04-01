@@ -12,6 +12,14 @@
                 "string"
             ]
         },
+        "CollectionType": {
+            "description": "Galaxy collection types supported for workflow parameters.\nCurrently only 'list' collections are supported, which represent a simple ordered list of datasets.",
+            "enum": [
+                "list"
+            ],
+            "title": "CollectionType",
+            "type": "string"
+        },
         "LibraryLayout": {
             "description": "Enumeration of possible library layouts for sequencing data.",
             "enum": [
@@ -166,21 +174,22 @@
         },
         "WorkflowCollectionSpec": {
             "additionalProperties": false,
-            "description": "Definition of a collection-based data source for a workflow parameter, allowing multiple files to be grouped into a Galaxy collection.",
+            "description": "Definition of a collection-based data source for a workflow parameter, allowing multiple files to be grouped into a Galaxy collection.\n\nExample usage for hard-coded FASTA references:\n```yaml\ncollection_spec:\n  collection_type: list\n  name: Influenza Segment References\n  elements:\n    - ext: fasta\n      src: url\n      url: https://zenodo.org/record/123/files/segment1.fasta\n      md5: abc123...\n    - ext: fasta\n      src: url\n      url: https://zenodo.org/record/123/files/segment2.fasta\n      md5: def456...\n```",
             "properties": {
                 "collection_type": {
-                    "description": "The type of Galaxy collection to create (e.g., 'list', 'list:paired'). Determines the structure of the collection.",
-                    "type": "string"
+                    "$ref": "#/$defs/CollectionType",
+                    "description": "The type of Galaxy collection to create. Currently only 'list' is supported. Determines the structure of the collection."
                 },
                 "elements": {
-                    "description": "Array of URL specifications that will become elements in the collection. Each element represents a file to include in the collection.",
+                    "description": "Array of URL specifications that will become elements in the collection. Each element represents a file to include in the collection. Must contain at least one element.",
                     "items": {
                         "$ref": "#/$defs/WorkflowUrlSpec"
                     },
+                    "minItems": 1,
                     "type": "array"
                 },
                 "name": {
-                    "description": "Optional identifier for the collection, used as the collection name in Galaxy.",
+                    "description": "Optional identifier for the collection, used as the collection name in Galaxy. If not provided, defaults to 'Collection'.",
                     "type": [
                         "string",
                         "null"

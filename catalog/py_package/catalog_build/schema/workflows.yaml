@@ -7,6 +7,7 @@ prefixes:
 
 imports:
   - linkml:types
+  - ./enums/collection_type
   - ./enums/workflow_category_id
   - ./enums/workflow_parameter_variable
   - ./enums/workflow_ploidy
@@ -116,12 +117,13 @@ classes:
       collection_type:
         description: The type of Galaxy collection to create. Currently only 'list' is supported. Determines the structure of the collection.
         required: true
-        range: string
+        range: CollectionType
       elements:
         description: Array of URL specifications that will become elements in the collection. Each element represents a file to include in the collection. Must contain at least one element.
         required: true
         multivalued: true
         range: WorkflowUrlSpec
+        minimum_cardinality: 1
       name:
         description: Optional identifier for the collection, used as the collection name in Galaxy. If not provided, defaults to 'Collection'.
         required: false

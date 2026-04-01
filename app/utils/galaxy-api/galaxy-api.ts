@@ -267,8 +267,7 @@ function getWorkflowLandingsRequestState(
     if (collection_spec) {
       // If collection_spec is provided, build collection from spec
       const collection = buildCollectionFromSpec(collection_spec);
-      const workflowParam = galaxyCollectionToWorkflowParameter(collection);
-      if (workflowParam !== null) result[key] = workflowParam;
+      result[key] = galaxyCollectionToWorkflowParameter(collection)!; // Non-null assertion safe since buildCollectionFromSpec throws on empty
     } else if (url_spec) {
       // If url_spec is provided, use it directly
       result[key] = url_spec;
@@ -398,9 +397,13 @@ function buildGeneModelUrlRequestValue(
 
 function buildCollectionFromSpec(
   collectionSpec: WorkflowCollectionSpec
-): GalaxyListCollection | null {
+): GalaxyListCollection {
   // Validate collection is not empty
-  if (!collectionSpec.elements?.length) return null;
+  if (!collectionSpec.elements?.length) {
+    throw new Error(
+      `Collection spec must have at least one element. Empty collections are not allowed.`
+    );
+  }
 
   // Validate collection_type - only support "list" for now
   if (collectionSpec.collection_type !== "list") {
@@ -412,13 +415,35 @@ function buildCollectionFromSpec(
   return {
     collectionType: "list",
     elements: collectionSpec.elements.map(
-      (urlSpec: WorkflowUrlSpec, index: number) => ({
-        dbKey: urlSpec.db_key || undefined, // Convert null to undefined
-        ext: urlSpec.ext,
-        hashes: urlSpec.md5 ? createMd5Hash(urlSpec.md5) : undefined,
-        identifier: urlSpec.url.split("/").pop() || `element_${index}`,
-        url: urlSpec.url,
-      })
+      (urlSpec: WorkflowUrlSpec, index: number) => {
+        // Extract filename from URL pathname, handling query strings and fragments
+        let identifier = `element_${index}`;
+        try {
+          const url = new URL(urlSpec.url);
+          const pathSegments = url.pathname.split("/").filter(Boolean);
+          if (pathSegments.length > 0) {
+            identifier = decodeURIComponent(
+              pathSegments[pathSegments.length - 1]
+            );
+          }
+        } catch {
+          // If URL parsing fails, fall back to simple string splitting
+          const fallback = urlSpec.url.split("/").pop();
+          if (fallback) {
+            identifier = decodeURIComponent(
+              fallback.split("?")[0].split("#")[0]
+            );
+          }
+        }
+
+        return {
+          dbKey: urlSpec.db_key || undefined, // Convert null to undefined
+          ext: urlSpec.ext,
+          hashes: urlSpec.md5 ? createMd5Hash(urlSpec.md5) : undefined,
+          identifier,
+          url: urlSpec.url,
+        };
+      }
     ),
     identifier: collectionSpec.name || "Collection",
   };

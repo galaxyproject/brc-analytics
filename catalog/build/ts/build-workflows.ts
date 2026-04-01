@@ -63,9 +63,16 @@ function validateUrl(url: string, context: string): void {
     );
   }
 
-  // Ensure URL has scheme and host
-  if (!parsedUrl.protocol || !parsedUrl.hostname) {
-    throw new Error(`${context}: URL "${url}" is missing protocol or hostname`);
+  // Ensure URL has valid protocol (http or https only)
+  if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+    throw new Error(
+      `${context}: URL "${url}" must use http or https protocol, got "${parsedUrl.protocol}"`
+    );
+  }
+
+  // Ensure URL has hostname
+  if (!parsedUrl.hostname) {
+    throw new Error(`${context}: URL "${url}" is missing hostname`);
   }
 
   // Extract filename from URL path
@@ -103,6 +110,19 @@ function buildWorkflow(
     url_spec,
     variable,
   } of sourceParameters) {
+    // Validate that only one parameter source is defined
+    const definedSources = [
+      variable ? "variable" : null,
+      url_spec ? "url_spec" : null,
+      collection_spec ? "collection_spec" : null,
+    ].filter(Boolean);
+
+    if (definedSources.length > 1) {
+      throw new Error(
+        `Workflow "${workflowName}", parameter "${key}": Only one of variable, url_spec, or collection_spec can be defined. Found: ${definedSources.join(", ")}`
+      );
+    }
+
     // Create parameter object with all available properties
     const parameter: WorkflowParameter = { key };
 

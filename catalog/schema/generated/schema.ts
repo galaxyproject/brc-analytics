@@ -47,6 +47,15 @@ export enum WorkflowCategoryId {
     OTHER = "OTHER",
 };
 /**
+* Galaxy collection types supported for workflow parameters.
+Currently only 'list' collections are supported, which represent a simple ordered list of datasets.
+*/
+export enum CollectionType {
+    
+    /** A simple ordered list of datasets. Each element in the collection is a separate dataset. */
+    list = "list",
+};
+/**
 * Possible variables that can be inserted into workflow parameters.
 */
 export enum WorkflowParameterVariable {
@@ -364,13 +373,29 @@ export interface WorkflowDataRequirements {
 
 /**
  * Definition of a collection-based data source for a workflow parameter, allowing multiple files to be grouped into a Galaxy collection.
+
+Example usage for hard-coded FASTA references:
+```yaml
+collection_spec:
+  collection_type: list
+  name: Influenza Segment References
+  elements:
+    - ext: fasta
+      src: url
+      url: https://zenodo.org/record/123/files/segment1.fasta
+      md5: abc123...
+    - ext: fasta
+      src: url
+      url: https://zenodo.org/record/123/files/segment2.fasta
+      md5: def456...
+```
  */
 export interface WorkflowCollectionSpec {
-    /** The type of Galaxy collection to create (e.g., 'list', 'list:paired'). Determines the structure of the collection. */
-    collection_type: string,
-    /** Array of URL specifications that will become elements in the collection. Each element represents a file to include in the collection. */
+    /** The type of Galaxy collection to create. Currently only 'list' is supported. Determines the structure of the collection. */
+    collection_type: CollectionType,
+    /** Array of URL specifications that will become elements in the collection. Each element represents a file to include in the collection. Must contain at least one element. */
     elements: WorkflowUrlSpec[],
-    /** Optional identifier for the collection, used as the collection name in Galaxy. */
+    /** Optional identifier for the collection, used as the collection name in Galaxy. If not provided, defaults to 'Collection'. */
     name?: string | null,
 }
 
