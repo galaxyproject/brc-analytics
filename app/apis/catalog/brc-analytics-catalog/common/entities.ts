@@ -6,6 +6,7 @@ import {
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
+  WorkflowCollectionSpec,
   WorkflowUrlSpec,
 } from "./schema-entities";
 
@@ -135,6 +136,7 @@ export interface WorkflowDataRequirements {
 }
 
 export interface WorkflowParameter {
+  collection_spec?: WorkflowCollectionSpec;
   data_requirements?: WorkflowDataRequirements;
   key: string;
   url_spec?: WorkflowUrlSpec;

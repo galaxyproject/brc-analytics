@@ -47,12 +47,22 @@ export enum WorkflowCategoryId {
     OTHER = "OTHER",
 };
 /**
+* Galaxy collection types supported for workflow parameters.
+Currently only 'list' collections are supported, which represent a simple ordered list of datasets.
+*/
+export enum CollectionType {
+    
+    /** A simple ordered list of datasets. Each element in the collection is a separate dataset. */
+    list = "list",
+};
+/**
 * Possible variables that can be inserted into workflow parameters.
 */
 export enum WorkflowParameterVariable {
     
     ASSEMBLY_ID = "ASSEMBLY_ID",
     ASSEMBLY_FASTA_URL = "ASSEMBLY_FASTA_URL",
+    FASTA_COLLECTION = "FASTA_COLLECTION",
     GENE_MODEL_URL = "GENE_MODEL_URL",
     SANGER_READ_RUN_PAIRED = "SANGER_READ_RUN_PAIRED",
     SANGER_READ_RUN_SINGLE = "SANGER_READ_RUN_SINGLE",
@@ -376,6 +386,35 @@ export interface WorkflowDataRequirements {
 
 
 /**
+ * Definition of a collection-based data source for a workflow parameter, allowing multiple files to be grouped into a Galaxy collection.
+
+Example usage for hard-coded FASTA references:
+```yaml
+collection_spec:
+  collection_type: list
+  name: Influenza Segment References
+  elements:
+    - ext: fasta
+      src: url
+      url: https://zenodo.org/record/123/files/segment1.fasta
+      md5: abc123...
+    - ext: fasta
+      src: url
+      url: https://zenodo.org/record/123/files/segment2.fasta
+      md5: def456...
+```
+ */
+export interface WorkflowCollectionSpec {
+    /** The type of Galaxy collection to create. Currently only 'list' is supported. Determines the structure of the collection. */
+    collection_type: CollectionType,
+    /** Array of URL specifications that will become elements in the collection. Each element represents a file to include in the collection. Must contain at least one element. */
+    elements: WorkflowUrlSpec[],
+    /** Optional identifier for the collection, used as the collection name in Galaxy. If not provided, defaults to 'Collection'. */
+    name?: string | null,
+}
+
+
+/**
  * Definition of an input parameter for a Galaxy workflow, specifying how the parameter value should be determined when the workflow is executed.
  */
 export interface WorkflowParameter {
@@ -383,6 +422,8 @@ export interface WorkflowParameter {
     key: string,
     /** A predefined variable that will be substituted as the value of the parameter at runtime, such as assembly information. */
     variable?: WorkflowParameterVariable | null,
+    /** A collection specification for the parameter, allowing multiple files from external sources to be provided as a Galaxy collection. */
+    collection_spec?: WorkflowCollectionSpec | null,
     /** A direct URL specification for the parameter, allowing for external data sources to be provided to the workflow. */
     url_spec?: WorkflowUrlSpec | null,
     /** Specifications for the data requirements of this parameter, such as library strategy and layout. */
@@ -402,6 +443,10 @@ export interface WorkflowUrlSpec {
     src: string,
     /** The complete URL (including http/https protocol) to the external resource that will be used as input to the workflow. */
     url: string,
+    /** Optional database key (genome build) to associate with this file, used by Galaxy to link the file to a specific reference genome. */
+    db_key?: string | null,
+    /** Optional MD5 checksum hash for file integrity verification. */
+    md5?: string | null,
 }
 
 

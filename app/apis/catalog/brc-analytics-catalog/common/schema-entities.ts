@@ -5,5 +5,6 @@ export {
   WorkflowParameterVariable as WORKFLOW_PARAMETER_VARIABLE,
   WorkflowPloidy as WORKFLOW_PLOIDY,
   WorkflowScope as WORKFLOW_SCOPE,
+  type WorkflowCollectionSpec,
   type WorkflowUrlSpec,
 } from "../../../../../catalog/schema/generated/schema";

@@ -36,6 +36,7 @@ export const useLaunchGalaxy = ({
           configuredValue.geneModelUrl,
           configuredValue.readRunsSingle,
           configuredValue.readRunsPaired,
+          null, // fastaCollection - not yet supported in UI
           configuredValue.tracks,
           origin
         )
@@ -80,6 +81,7 @@ export const useLaunchGalaxy = ({
           configuredValue.geneModelUrl,
           configuredValue.readRunsSingle,
           configuredValue.readRunsPaired,
+          null, // fastaCollection - not yet supported in UI
           workflow.parameters,
           origin
         )

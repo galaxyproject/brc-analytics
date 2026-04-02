@@ -12,6 +12,14 @@
                 "string"
             ]
         },
+        "CollectionType": {
+            "description": "Galaxy collection types supported for workflow parameters.\nCurrently only 'list' collections are supported, which represent a simple ordered list of datasets.",
+            "enum": [
+                "list"
+            ],
+            "title": "CollectionType",
+            "type": "string"
+        },
         "LibraryLayout": {
             "description": "Enumeration of possible library layouts for sequencing data.",
             "enum": [
@@ -168,6 +176,37 @@
             "title": "WorkflowCategoryId",
             "type": "string"
         },
+        "WorkflowCollectionSpec": {
+            "additionalProperties": false,
+            "description": "Definition of a collection-based data source for a workflow parameter, allowing multiple files to be grouped into a Galaxy collection.\n\nExample usage for hard-coded FASTA references:\n```yaml\ncollection_spec:\n  collection_type: list\n  name: Influenza Segment References\n  elements:\n    - ext: fasta\n      src: url\n      url: https://zenodo.org/record/123/files/segment1.fasta\n      md5: abc123...\n    - ext: fasta\n      src: url\n      url: https://zenodo.org/record/123/files/segment2.fasta\n      md5: def456...\n```",
+            "properties": {
+                "collection_type": {
+                    "$ref": "#/$defs/CollectionType",
+                    "description": "The type of Galaxy collection to create. Currently only 'list' is supported. Determines the structure of the collection."
+                },
+                "elements": {
+                    "description": "Array of URL specifications that will become elements in the collection. Each element represents a file to include in the collection. Must contain at least one element.",
+                    "items": {
+                        "$ref": "#/$defs/WorkflowUrlSpec"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                },
+                "name": {
+                    "description": "Optional identifier for the collection, used as the collection name in Galaxy. If not provided, defaults to 'Collection'.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "collection_type",
+                "elements"
+            ],
+            "title": "WorkflowCollectionSpec",
+            "type": "object"
+        },
         "WorkflowDataRequirements": {
             "additionalProperties": false,
             "description": "Specification of data requirements for a workflow parameter, such as library strategy and layout.",
@@ -211,6 +250,17 @@
             "additionalProperties": false,
             "description": "Definition of an input parameter for a Galaxy workflow, specifying how the parameter value should be determined when the workflow is executed.",
             "properties": {
+                "collection_spec": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/WorkflowCollectionSpec"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "A collection specification for the parameter, allowing multiple files from external sources to be provided as a Galaxy collection."
+                },
                 "data_requirements": {
                     "anyOf": [
                         {
@@ -264,6 +314,7 @@
             "enum": [
                 "ASSEMBLY_ID",
                 "ASSEMBLY_FASTA_URL",
+                "FASTA_COLLECTION",
                 "GENE_MODEL_URL",
                 "SANGER_READ_RUN_PAIRED",
                 "SANGER_READ_RUN_SINGLE"
@@ -296,9 +347,23 @@
             "additionalProperties": false,
             "description": "Definition of a URL-based data source for a workflow parameter, typically used for reference data or external resources.",
             "properties": {
+                "db_key": {
+                    "description": "Optional database key (genome build) to associate with this file, used by Galaxy to link the file to a specific reference genome.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
                 "ext": {
                     "description": "The file extension of the resource at the URL, which determines how Galaxy will interpret the data (e.g., 'fasta', 'gff', 'tabular').",
                     "type": "string"
+                },
+                "md5": {
+                    "description": "Optional MD5 checksum hash for file integrity verification.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "src": {
                     "description": "The source type for the parameter, typically 'url' to indicate an external URL source rather than a Galaxy dataset or other source type.",

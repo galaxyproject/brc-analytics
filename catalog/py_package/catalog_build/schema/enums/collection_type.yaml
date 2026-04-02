@@ -1,0 +1,12 @@
+id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/enums/collection_type.yaml#
+name: collection_type
+description: Galaxy collection types supported for collection_spec in workflow parameters.
+
+enums:
+  CollectionType:
+    description: |-
+      Galaxy collection types supported for collection_spec in workflow parameters.
+      Currently only 'list' collections are supported, which represent a simple ordered list of datasets.
+    permissible_values:
+      list:
+        description: A simple ordered list of datasets. Each element in the collection is a separate dataset.

@@ -7,6 +7,7 @@ enums:
     permissible_values:
       ASSEMBLY_ID:
       ASSEMBLY_FASTA_URL:
+      FASTA_COLLECTION:
       GENE_MODEL_URL:
       SANGER_READ_RUN_PAIRED:
       SANGER_READ_RUN_SINGLE:

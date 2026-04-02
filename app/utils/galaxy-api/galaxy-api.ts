@@ -1,5 +1,7 @@
 import { WORKFLOW_PARAMETER_VARIABLE } from "../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { WorkflowParameter } from "../../apis/catalog/brc-analytics-catalog/common/entities";
+import { WorkflowCollectionSpec } from "../../apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { WorkflowUrlSpec } from "../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 
 const FILE_EXT = {
   FASTQ_SANGER_GZ: "fastqsanger.gz",
@@ -62,6 +64,7 @@ const dataLandingUrl = `${galaxyInstanceUrl}/tool_landings`;
  * @param geneModelUrl - URL for gene model parameter sent to the API.
  * @param readRunsSingle - Single read runs parameter sent to the API.
  * @param readRunsPaired - Paired read runs parameter sent to the API.
+ * @param fastaCollection - Array of assembly accessions for FASTA collection.
  * @param parameters - Parameters for this workflow.
  * @param origin - Origin URL of the site making the request.
  * @returns workflow landing URL.
@@ -72,6 +75,7 @@ export async function getWorkflowLandingUrl(
   geneModelUrl: string | null,
   readRunsSingle: EnaSequencingReads[] | null,
   readRunsPaired: EnaSequencingReads[] | null,
+  fastaCollection: string[] | null,
   parameters: WorkflowParameter[],
   origin: string
 ): Promise<string> {
@@ -84,6 +88,7 @@ export async function getWorkflowLandingUrl(
       geneModelUrl,
       readRunsSingle,
       readRunsPaired,
+      fastaCollection,
       parameters,
       md5Checksums
     ),
@@ -99,6 +104,7 @@ export async function getWorkflowLandingUrl(
  * @param geneModelUrl - URL for gene model parameter sent to the API.
  * @param readRunsSingle - Single read runs parameter sent to the API.
  * @param readRunsPaired - Paired read runs parameter sent to the API.
+ * @param fastaCollection - Array of assembly accessions for FASTA collection.
  * @param tracks - UCSC tracks sent to the API. Should all have defined `bigDataUrl` values.
  * @param origin - Origin URL of the site making the request.
  * @returns data landing URL.
@@ -108,6 +114,7 @@ export async function getDataLandingUrl(
   geneModelUrl: string | null,
   readRunsSingle: EnaSequencingReads[] | null,
   readRunsPaired: EnaSequencingReads[] | null,
+  fastaCollection: string[] | null,
   tracks: UcscTrack[] | null,
   origin: string
 ): Promise<string> {
@@ -120,6 +127,7 @@ export async function getDataLandingUrl(
       geneModelUrl,
       readRunsSingle,
       readRunsPaired,
+      fastaCollection,
       tracks,
       md5Checksums
     ),
@@ -162,6 +170,7 @@ function paramVariableToRequestValue(
   geneModelUrl: string | null,
   readRunsSingle: EnaSequencingReads[] | null,
   readRunsPaired: EnaSequencingReads[] | null,
+  fastaCollection: string[] | null,
   referenceGenome: string,
   md5Checksums: Map<string, string>
 ): WorkflowParameterValue | null {
@@ -192,6 +201,11 @@ function paramVariableToRequestValue(
         buildPairedReadRunsRequestValue(readRunsPaired)
       );
     }
+    case WORKFLOW_PARAMETER_VARIABLE.FASTA_COLLECTION:
+      if (!fastaCollection?.length) return null;
+      return galaxyCollectionToWorkflowParameter(
+        buildFastaCollectionFromAccessions(fastaCollection, md5Checksums)
+      );
   }
 }
 
@@ -234,11 +248,12 @@ function galaxyCollectionElementToWorkflowLandings(
 }
 
 /**
- * Get the appropriate `request_state` object for the given workflow ID and reference genome.
- * @param referenceGenome - Reference genome.
- * @param geneModelUrl - URL for gene model parameter.
- * @param readRunsSingle - Single read runs parameter.
- * @param readRunsPaired - Paired read runs parameter.
+ * Get the `request_state` value for the workflow landings request body.
+ * @param referenceGenome - Genome version/assembly ID.
+ * @param geneModelUrl - URL for gene model parameter sent to the API.
+ * @param readRunsSingle - Single read runs parameter sent to the API.
+ * @param readRunsPaired - Paired read runs parameter sent to the API.
+ * @param fastaCollection - Array of assembly accessions for FASTA collection.
  * @param parameters - Parameters for this workflow.
  * @param md5Checksums - Map of filename to MD5 hash.
  * @returns `request_state` value for the workflow landings request body.
@@ -248,12 +263,17 @@ function getWorkflowLandingsRequestState(
   geneModelUrl: string | null,
   readRunsSingle: EnaSequencingReads[] | null,
   readRunsPaired: EnaSequencingReads[] | null,
+  fastaCollection: string[] | null,
   parameters: WorkflowParameter[],
   md5Checksums: Map<string, string>
 ): WorkflowLandingsBodyRequestState {
   const result: WorkflowLandingsBodyRequestState = {};
-  for (const { key, url_spec, variable } of parameters) {
-    if (url_spec) {
+  for (const { collection_spec, key, url_spec, variable } of parameters) {
+    if (collection_spec) {
+      // If collection_spec is provided, build collection from spec
+      const collection = buildCollectionFromSpec(collection_spec);
+      result[key] = galaxyCollectionToWorkflowParameter(collection)!; // Non-null assertion safe since buildCollectionFromSpec throws on empty
+    } else if (url_spec) {
       // If url_spec is provided, use it directly
       result[key] = url_spec;
     } else if (variable) {
@@ -263,6 +283,7 @@ function getWorkflowLandingsRequestState(
         geneModelUrl,
         readRunsSingle,
         readRunsPaired,
+        fastaCollection,
         referenceGenome,
         md5Checksums
       );
@@ -316,6 +337,7 @@ function getDataLandingsRequestState(
   geneModelUrl: string | null,
   readRunsSingle: EnaSequencingReads[] | null,
   readRunsPaired: EnaSequencingReads[] | null,
+  fastaCollection: string[] | null,
   tracks: UcscTrack[] | null,
   md5Checksums: Map<string, string>
 ): DataLandingsBodyRequestState {
@@ -336,6 +358,11 @@ function getDataLandingsRequestState(
       ),
       galaxyCollectionToDataLandingsTarget(
         buildPairedReadRunsRequestValue(readRunsPaired)
+      ),
+      galaxyCollectionToDataLandingsTarget(
+        fastaCollection?.length
+          ? buildFastaCollectionFromAccessions(fastaCollection, md5Checksums)
+          : null
       ),
       ...buildUcscTracksRequestValues(tracks).map((d) =>
         buildDataLandingsDatasetTarget([d])
@@ -370,6 +397,82 @@ function buildGeneModelUrlRequestValue(
     ext: "gtf.gz",
     hashes,
     url: geneModelUrl,
+  };
+}
+
+function buildCollectionFromSpec(
+  collectionSpec: WorkflowCollectionSpec
+): GalaxyListCollection {
+  // Validate collection is not empty
+  if (!collectionSpec.elements?.length) {
+    throw new Error(
+      `Collection spec must have at least one element. Empty collections are not allowed.`
+    );
+  }
+
+  // Validate collection_type - only support "list" for now
+  if (collectionSpec.collection_type !== "list") {
+    throw new Error(
+      `Unsupported collection_type: ${collectionSpec.collection_type}. Only "list" is currently supported.`
+    );
+  }
+
+  return {
+    collectionType: "list",
+    elements: collectionSpec.elements.map(
+      (urlSpec: WorkflowUrlSpec, index: number) => {
+        // Extract filename from URL pathname, handling query strings and fragments
+        let identifier = `element_${index}`;
+        try {
+          const url = new URL(urlSpec.url);
+          const pathSegments = url.pathname.split("/").filter(Boolean);
+          if (pathSegments.length > 0) {
+            identifier = decodeURIComponent(
+              pathSegments[pathSegments.length - 1]
+            );
+          }
+        } catch {
+          // If URL parsing fails, fall back to simple string splitting
+          const fallback = urlSpec.url.split("/").pop();
+          if (fallback) {
+            identifier = decodeURIComponent(
+              fallback.split("?")[0].split("#")[0]
+            );
+          }
+        }
+
+        return {
+          dbKey: urlSpec.db_key || undefined, // Convert null to undefined
+          ext: urlSpec.ext,
+          hashes: urlSpec.md5 ? createMd5Hash(urlSpec.md5) : undefined,
+          identifier,
+          url: urlSpec.url,
+        };
+      }
+    ),
+    identifier: collectionSpec.name || "Collection",
+  };
+}
+
+function buildFastaCollectionFromAccessions(
+  accessions: string[] | null,
+  md5Checksums: Map<string, string>
+): GalaxyListCollection | null {
+  if (!accessions?.length) return null;
+  return {
+    collectionType: "list",
+    elements: accessions.map((accession) => {
+      const url = buildFastaUrl(accession);
+      const hashes = getHashesForUrl(url, accession, md5Checksums);
+      return {
+        dbKey: accession,
+        ext: "fasta.gz",
+        hashes,
+        identifier: accession,
+        url,
+      };
+    }),
+    identifier: "FASTA Collection",
   };
 }
 
