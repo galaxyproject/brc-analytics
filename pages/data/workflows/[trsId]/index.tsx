@@ -3,6 +3,8 @@ import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
 import { formatTrsId } from "../../../../app/views/AnalyzeWorkflowsView/components/Main/utils";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../app/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
+import { LEXICMAP } from "../../../../app/views/AnalyzeWorkflowsView/lexicmap/constants";
+import { LOGAN_SEARCH } from "../../../../app/views/AnalyzeWorkflowsView/loganSearch/constants";
 import { WorkflowView } from "../../../../app/views/WorkflowView/workflowView";
 import workflowCategories from "../../../../catalog/output/workflows.json";
 
@@ -30,6 +32,14 @@ export const getStaticPaths: GetStaticPaths<Params> = async () => {
   // Add Differential Expression Analysis workflow (interim measure).
   paths.push({
     params: { trsId: formatTrsId(DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId) },
+  });
+
+  // Add LMLS workflows (Logan Search and Lexicmap).
+  paths.push({
+    params: { trsId: formatTrsId(LOGAN_SEARCH.trsId) },
+  });
+  paths.push({
+    params: { trsId: formatTrsId(LEXICMAP.trsId) },
   });
 
   return { fallback: false, paths };

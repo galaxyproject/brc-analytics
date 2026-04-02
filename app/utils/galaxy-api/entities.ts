@@ -208,3 +208,13 @@ export interface DeSeq2FileElement {
   location: string;
   name: "forward" | "reverse";
 }
+
+//// LMLS Workflow Landing types
+
+export interface LMLSWorkflowLandingsBody {
+  origin: string;
+  public: true;
+  request_state: Record<string, never>;
+  workflow_id: string;
+  workflow_target_type: "stored_workflow";
+}

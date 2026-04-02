@@ -276,4 +276,54 @@ describe("getWorkflows - scope handling", () => {
     expect(result).toHaveLength(1);
     expect(result[0].trsId).toBe("differential-expression-analysis");
   });
+
+  test("does not include LMLS workflows when feature flag is disabled", () => {
+    const categories: WorkflowCategory[] = [];
+
+    const result = getWorkflows(categories, MAPPINGS, ORGANISMS, false);
+
+    // Should only include DEA
+    expect(result).toHaveLength(1);
+    expect(result[0].trsId).toBe("differential-expression-analysis");
+    expect(result.find((w) => w.trsId === "logan-search")).toBeUndefined();
+    expect(result.find((w) => w.trsId === "lexicmap")).toBeUndefined();
+  });
+
+  test("includes LMLS workflows when feature flag is enabled", () => {
+    const categories: WorkflowCategory[] = [];
+
+    const result = getWorkflows(categories, MAPPINGS, ORGANISMS, true);
+
+    // Should include DEA + Logan Search + Lexicmap
+    expect(result).toHaveLength(3);
+    expect(
+      result.find((w) => w.trsId === "differential-expression-analysis")
+    ).toBeDefined();
+    expect(result.find((w) => w.trsId === "logan-search")).toBeDefined();
+    expect(result.find((w) => w.trsId === "lexicmap")).toBeDefined();
+  });
+
+  test("LMLS workflows have SEQUENCE scope when feature flag is enabled", () => {
+    const categories: WorkflowCategory[] = [];
+
+    const result = getWorkflows(categories, MAPPINGS, ORGANISMS, true);
+
+    const loganSearch = result.find((w) => w.trsId === "logan-search");
+    const lexicmap = result.find((w) => w.trsId === "lexicmap");
+
+    expect(loganSearch?.scope).toBe("SEQUENCE");
+    expect(lexicmap?.scope).toBe("SEQUENCE");
+  });
+
+  test("LMLS workflows have correct category when feature flag is enabled", () => {
+    const categories: WorkflowCategory[] = [];
+
+    const result = getWorkflows(categories, MAPPINGS, ORGANISMS, true);
+
+    const loganSearch = result.find((w) => w.trsId === "logan-search");
+    const lexicmap = result.find((w) => w.trsId === "lexicmap");
+
+    expect(loganSearch?.category).toBe("Sequence Analysis");
+    expect(lexicmap?.category).toBe("Sequence Analysis");
+  });
 });

@@ -25,6 +25,7 @@ import {
   GalaxyListCollection,
   GalaxyPairedCollection,
   GalaxyUrlData,
+  LMLSWorkflowLandingsBody,
   WorkflowCollectionElement,
   WorkflowCollectionParameter,
   WorkflowDatasetHash,
@@ -127,7 +128,11 @@ export async function getDataLandingUrl(
 }
 
 async function getGalaxyLandingUrl(
-  body: WorkflowLandingsBody | DataLandingsBody | DeSeq2WorkflowLandingsBody,
+  body:
+    | WorkflowLandingsBody
+    | DataLandingsBody
+    | DeSeq2WorkflowLandingsBody
+    | LMLSWorkflowLandingsBody,
   apiUrl: string,
   landingUrlBase: string
 ): Promise<string> {
@@ -810,6 +815,29 @@ export async function getDeSeq2LandingUrl(
       "Use featurecounts for generating count tables": true,
     },
     /* eslint-enable sort-keys -- re-enable sort-keys rule */
+    workflow_id: workflowId,
+    workflow_target_type: "stored_workflow",
+  };
+
+  return getGalaxyLandingUrl(body, workflowLandingsApiUrl, workflowLandingUrl);
+}
+
+/**
+ * Get the URL of the LMLS workflow landing page.
+ * LMLS workflows (Logan Search/kmindex and Lexicmap) use stored workflow IDs
+ * and don't require any parameters initially.
+ * @param workflowId - Galaxy stored workflow ID.
+ * @param origin - Origin URL of the site making the request.
+ * @returns LMLS workflow landing URL.
+ */
+export async function getLMLSLandingUrl(
+  workflowId: string,
+  origin: string
+): Promise<string> {
+  const body: LMLSWorkflowLandingsBody = {
+    origin,
+    public: true,
+    request_state: {},
     workflow_id: workflowId,
     workflow_target_type: "stored_workflow",
   };

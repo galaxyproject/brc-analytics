@@ -11,12 +11,14 @@ import { Strandedness } from "../../StrandednessStep/types";
 export interface ConfiguredValue {
   designFormula: string | null;
   geneModelUrl: string | null;
+  numberOfHits?: number;
   primaryContrasts: PrimaryContrasts | null;
   readRunsPaired: EnaSequencingReads[] | null;
   readRunsSingle: EnaSequencingReads[] | null;
   referenceAssembly: string;
   sampleSheet: Record<string, string>[] | null;
   sampleSheetClassification: Record<string, COLUMN_TYPE | null> | null;
+  sequence?: string;
   strandedness: Strandedness | undefined;
   tracks: UcscTrack[] | null;
 }

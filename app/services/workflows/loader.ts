@@ -6,6 +6,8 @@ import {
 import { formatTrsId } from "../../views/AnalyzeWorkflowsView/components/Main/utils";
 import { CUSTOM_WORKFLOW } from "../../views/AnalyzeWorkflowsView/custom/constants";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
+import { LEXICMAP } from "../../views/AnalyzeWorkflowsView/lexicmap/constants";
+import { LOGAN_SEARCH } from "../../views/AnalyzeWorkflowsView/loganSearch/constants";
 import { API } from "./routes";
 import { getEntitiesById, setEntitiesById, setEntitiesByType } from "./store";
 import { EntityRoute } from "./types";
@@ -87,6 +89,10 @@ export async function loadWorkflows(): Promise<void> {
     DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId,
     DIFFERENTIAL_EXPRESSION_ANALYSIS
   );
+
+  // Add LMLS workflows (Logan Search and Lexicmap).
+  workflowById.set(LOGAN_SEARCH.trsId, LOGAN_SEARCH);
+  workflowById.set(LEXICMAP.trsId, LEXICMAP);
 
   setEntitiesById("workflows", workflowById);
   setEntitiesByType("workflows", workflowCategories);

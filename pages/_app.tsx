@@ -46,7 +46,7 @@ export type AppPropsWithComponent = AppProps & {
   pageProps: PageProps;
 };
 
-setFeatureFlags(["assistant"]);
+setFeatureFlags(["assistant", "lmls"]);
 
 const queryClient = new QueryClient();
 
