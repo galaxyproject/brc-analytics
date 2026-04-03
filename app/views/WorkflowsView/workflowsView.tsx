@@ -19,6 +19,7 @@ import { Organism } from "./types";
 export const WorkflowsView = (): JSX.Element => {
   const workflowCategories = getWorkflowCategories();
   const organisms = getOrganisms<Organism>();
+  const isFluEnabled = useFeatureFlag("flu");
   const isLmlsEnabled = useFeatureFlag("lmls");
   const [mappings, setMappings] = useState<WorkflowAssemblyMapping[] | null>(
     null
@@ -40,9 +41,15 @@ export const WorkflowsView = (): JSX.Element => {
   const workflows = useMemo(
     () =>
       mappings
-        ? getWorkflows(workflowCategories, mappings, organisms, isLmlsEnabled)
+        ? getWorkflows(
+            workflowCategories,
+            mappings,
+            organisms,
+            isLmlsEnabled,
+            isFluEnabled
+          )
         : [],
-    [isLmlsEnabled, mappings, organisms, workflowCategories]
+    [isFluEnabled, isLmlsEnabled, mappings, organisms, workflowCategories]
   );
 
   return <ExploreView data={workflows} Component={Workflows} />;
