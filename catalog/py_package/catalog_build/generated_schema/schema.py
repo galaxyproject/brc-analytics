@@ -61,7 +61,7 @@ linkml_meta = LinkMLMeta(
                 "prefix_reference": "https://w3id.org/linkml/",
             }
         },
-        "source_file": "/home/dcallan-adm/Documents/brc-analytics/brc-analytics/catalog/py_package/catalog_build/schema_utils/../schema/schema.yaml",
+        "source_file": "/home/danielle/Documents/brc-analytics/brc-analytics/catalog/py_package/catalog_build/schema_utils/../schema/schema.yaml",
     }
 )
 
@@ -118,6 +118,16 @@ class WorkflowCategoryId(str, Enum):
     OTHER = "OTHER"
 
 
+class CollectionType(str, Enum):
+    """
+        Galaxy collection types supported for workflow parameters.
+    Currently only 'list' collections are supported, which represent a simple ordered list of datasets.
+    """
+
+    # A simple ordered list of datasets. Each element in the collection is a separate dataset.
+    list = "list"
+
+
 class WorkflowParameterVariable(str, Enum):
     """
     Possible variables that can be inserted into workflow parameters.
@@ -125,6 +135,7 @@ class WorkflowParameterVariable(str, Enum):
 
     ASSEMBLY_ID = "ASSEMBLY_ID"
     ASSEMBLY_FASTA_URL = "ASSEMBLY_FASTA_URL"
+    FASTA_COLLECTION = "FASTA_COLLECTION"
     GENE_MODEL_URL = "GENE_MODEL_URL"
     SANGER_READ_RUN_PAIRED = "SANGER_READ_RUN_PAIRED"
     SANGER_READ_RUN_SINGLE = "SANGER_READ_RUN_SINGLE"
@@ -139,6 +150,19 @@ class WorkflowPloidy(str, Enum):
     DIPLOID = "DIPLOID"
     HAPLOID = "HAPLOID"
     POLYPLOID = "POLYPLOID"
+
+
+class WorkflowScope(str, Enum):
+    """
+    The scope level at which a workflow operates, determining its display context and required inputs.
+    """
+
+    # Workflow operates on a specific genome assembly and requires assembly selection as the first step.
+    ASSEMBLY = "ASSEMBLY"
+    # Workflow operates at the organism level, either requiring no specific assembly or working across multiple assemblies.
+    ORGANISM = "ORGANISM"
+    # Workflow operates on a user-provided sequence (e.g., single gene) rather than a full genome assembly.
+    SEQUENCE = "SEQUENCE"
 
 
 class LibraryLayout(str, Enum):
@@ -396,7 +420,7 @@ class Outbreak(ConfiguredBaseModel):
         json_schema_extra={
             "linkml_meta": {
                 "alias": "name",
-                "domain_of": ["Outbreak", "WorkflowCategory"],
+                "domain_of": ["Outbreak", "WorkflowCategory", "WorkflowCollectionSpec"],
             }
         },
     )
@@ -574,7 +598,7 @@ class WorkflowCategory(ConfiguredBaseModel):
         json_schema_extra={
             "linkml_meta": {
                 "alias": "name",
-                "domain_of": ["Outbreak", "WorkflowCategory"],
+                "domain_of": ["Outbreak", "WorkflowCategory", "WorkflowCollectionSpec"],
             }
         },
     )
@@ -671,6 +695,13 @@ class Workflow(ConfiguredBaseModel):
             "linkml_meta": {"alias": "ploidy", "domain_of": ["Organism", "Workflow"]}
         },
     )
+    scope: Optional[WorkflowScope] = Field(
+        default=None,
+        description="""The scope level at which this workflow operates, determining where it is displayed in the UI and what the first configuration step should be. Defaults to ASSEMBLY for backward compatibility.""",
+        json_schema_extra={
+            "linkml_meta": {"alias": "scope", "domain_of": ["Workflow"]}
+        },
+    )
     taxonomy_id: Optional[int] = Field(
         default=None,
         description="""The NCBI Taxonomy ID of the organism this workflow is designed for. If specified, the workflow will be available for all assemblies with this ID in their taxonomic lineage.""",
@@ -761,6 +792,66 @@ class WorkflowDataRequirements(ConfiguredBaseModel):
     )
 
 
+class WorkflowCollectionSpec(ConfiguredBaseModel):
+    """
+    Definition of a collection-based data source for a workflow parameter, allowing multiple files to be grouped into a Galaxy collection.
+
+    Example usage for hard-coded FASTA references:
+    ```yaml
+    collection_spec:
+      collection_type: list
+      name: Influenza Segment References
+      elements:
+        - ext: fasta
+          src: url
+          url: https://zenodo.org/record/123/files/segment1.fasta
+          md5: abc123...
+        - ext: fasta
+          src: url
+          url: https://zenodo.org/record/123/files/segment2.fasta
+          md5: def456...
+    ```
+    """
+
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
+        {
+            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/workflows.yaml#"
+        }
+    )
+
+    collection_type: CollectionType = Field(
+        default=...,
+        description="""The type of Galaxy collection to create. Currently only 'list' is supported. Determines the structure of the collection.""",
+        json_schema_extra={
+            "linkml_meta": {
+                "alias": "collection_type",
+                "domain_of": ["WorkflowCollectionSpec"],
+            }
+        },
+    )
+    elements: List[WorkflowUrlSpec] = Field(
+        default=...,
+        description="""Array of URL specifications that will become elements in the collection. Each element represents a file to include in the collection. Must contain at least one element.""",
+        min_length=1,
+        json_schema_extra={
+            "linkml_meta": {
+                "alias": "elements",
+                "domain_of": ["WorkflowCollectionSpec"],
+            }
+        },
+    )
+    name: Optional[str] = Field(
+        default=None,
+        description="""Optional identifier for the collection, used as the collection name in Galaxy. If not provided, defaults to 'Collection'.""",
+        json_schema_extra={
+            "linkml_meta": {
+                "alias": "name",
+                "domain_of": ["Outbreak", "WorkflowCategory", "WorkflowCollectionSpec"],
+            }
+        },
+    )
+
+
 class WorkflowParameter(ConfiguredBaseModel):
     """
     Definition of an input parameter for a Galaxy workflow, specifying how the parameter value should be determined when the workflow is executed.
@@ -784,6 +875,16 @@ class WorkflowParameter(ConfiguredBaseModel):
         description="""A predefined variable that will be substituted as the value of the parameter at runtime, such as assembly information.""",
         json_schema_extra={
             "linkml_meta": {"alias": "variable", "domain_of": ["WorkflowParameter"]}
+        },
+    )
+    collection_spec: Optional[WorkflowCollectionSpec] = Field(
+        default=None,
+        description="""A collection specification for the parameter, allowing multiple files from external sources to be provided as a Galaxy collection.""",
+        json_schema_extra={
+            "linkml_meta": {
+                "alias": "collection_spec",
+                "domain_of": ["WorkflowParameter"],
+            }
         },
     )
     url_spec: Optional[WorkflowUrlSpec] = Field(
@@ -847,6 +948,20 @@ class WorkflowUrlSpec(ConfiguredBaseModel):
             }
         },
     )
+    db_key: Optional[str] = Field(
+        default=None,
+        description="""Optional database key (genome build) to associate with this file, used by Galaxy to link the file to a specific reference genome.""",
+        json_schema_extra={
+            "linkml_meta": {"alias": "db_key", "domain_of": ["WorkflowUrlSpec"]}
+        },
+    )
+    md5: Optional[str] = Field(
+        default=None,
+        description="""Optional MD5 checksum hash for file integrity verification.""",
+        json_schema_extra={
+            "linkml_meta": {"alias": "md5", "domain_of": ["WorkflowUrlSpec"]}
+        },
+    )
 
 
 # Model rebuild
@@ -864,5 +979,6 @@ WorkflowCategory.model_rebuild()
 Workflows.model_rebuild()
 Workflow.model_rebuild()
 WorkflowDataRequirements.model_rebuild()
+WorkflowCollectionSpec.model_rebuild()
 WorkflowParameter.model_rebuild()
 WorkflowUrlSpec.model_rebuild()

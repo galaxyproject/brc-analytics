@@ -4,10 +4,13 @@ import { useCallback } from "react";
 import {
   getDataLandingUrl,
   getDeSeq2LandingUrl,
+  getLMLSLandingUrl,
   getWorkflowLandingUrl,
 } from "../../../../../../../../../../../../utils/galaxy-api/galaxy-api";
 import { CUSTOM_WORKFLOW } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/custom/constants";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
+import { LEXICMAP } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/lexicmap/constants";
+import { LOGAN_SEARCH } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/loganSearch/constants";
 import { Props, UseLaunchGalaxy } from "./types";
 import { getConfiguredValues, launchGalaxy } from "./utils";
 
@@ -33,10 +36,20 @@ export const useLaunchGalaxy = ({
           configuredValue.geneModelUrl,
           configuredValue.readRunsSingle,
           configuredValue.readRunsPaired,
+          null, // fastaCollection - not yet supported in UI
           configuredValue.tracks,
           origin
         )
       );
+    } else if (
+      workflow.trsId === LOGAN_SEARCH.trsId ||
+      workflow.trsId === LEXICMAP.trsId
+    ) {
+      // LMLS workflows use stored workflow IDs with no parameters
+      if (!workflow.workflowId) {
+        throw new Error("Missing workflow ID for LMLS workflow");
+      }
+      landingUrl = await run(getLMLSLandingUrl(workflow.workflowId, origin));
     } else if (workflow.trsId === DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId) {
       if (
         !workflow.workflowId ||
@@ -68,6 +81,7 @@ export const useLaunchGalaxy = ({
           configuredValue.geneModelUrl,
           configuredValue.readRunsSingle,
           configuredValue.readRunsPaired,
+          null, // fastaCollection - not yet supported in UI
           workflow.parameters,
           origin
         )

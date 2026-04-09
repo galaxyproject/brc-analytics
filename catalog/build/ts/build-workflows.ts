@@ -7,6 +7,7 @@ import {
   Workflow as SourceWorkflow,
   WorkflowCategories as SourceWorkflowCategories,
   Workflows as SourceWorkflows,
+  WorkflowScope,
 } from "../../schema/generated/schema";
 import { readYamlFile } from "./utils";
 
@@ -42,6 +43,51 @@ export async function buildWorkflows(): Promise<WorkflowCategory[]> {
   return workflowCategories;
 }
 
+/**
+ * Validates that a URL is well-formed and can produce a valid identifier.
+ * Throws an error if validation fails.
+ * @param url - The URL to validate.
+ * @param context - Context string for error messages (e.g., workflow and parameter name).
+ */
+function validateUrl(url: string, context: string): void {
+  if (!url) {
+    throw new Error(`${context}: URL is empty or undefined`);
+  }
+
+  // Parse URL to validate structure
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(url);
+  } catch (error) {
+    throw new Error(
+      `${context}: Invalid URL "${url}" - ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+
+  // Ensure URL has valid protocol (http or https only)
+  if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+    throw new Error(
+      `${context}: URL "${url}" must use http or https protocol, got "${parsedUrl.protocol}"`
+    );
+  }
+
+  // Ensure URL has hostname
+  if (!parsedUrl.hostname) {
+    throw new Error(`${context}: URL "${url}" is missing hostname`);
+  }
+
+  // Extract filename from URL path
+  const pathParts = parsedUrl.pathname.split("/").filter(Boolean);
+  const filename = pathParts[pathParts.length - 1];
+
+  if (!filename || filename.trim() === "") {
+    throw new Error(
+      `${context}: Cannot extract filename from URL "${url}". ` +
+        `URL path must end with a filename (e.g., /path/to/file.ext), not a directory or trailing slash.`
+    );
+  }
+}
+
 /* eslint-disable-next-line sonarjs/cognitive-complexity -- function handles multiple optional fields */
 function buildWorkflow(
   workflowCategories: WorkflowCategory[],
@@ -52,6 +98,7 @@ function buildWorkflow(
     iwc_id: iwcId,
     parameters: sourceParameters,
     ploidy,
+    scope,
     taxonomy_id: taxonomyId,
     trs_id: trsId,
     workflow_description: workflowDescription,
@@ -59,19 +106,57 @@ function buildWorkflow(
   } = sourceWorkflow;
   const parameters = [];
   for (const {
+    collection_spec,
     data_requirements,
     key,
     url_spec,
     variable,
   } of sourceParameters) {
+    // Validate that only one parameter source is defined
+    const definedSources = [
+      variable ? "variable" : null,
+      url_spec ? "url_spec" : null,
+      collection_spec ? "collection_spec" : null,
+    ].filter(Boolean);
+
+    if (definedSources.length > 1) {
+      throw new Error(
+        `Workflow "${workflowName}", parameter "${key}": Only one of variable, url_spec, or collection_spec can be defined. Found: ${definedSources.join(", ")}`
+      );
+    }
+
     // Create parameter object with all available properties
     const parameter: WorkflowParameter = { key };
 
     // Add variable if defined
     if (variable) parameter.variable = variable;
 
-    // Add url_spec if defined
-    if (url_spec) parameter.url_spec = url_spec;
+    // Add url_spec if defined and validate URL
+    if (url_spec) {
+      validateUrl(
+        url_spec.url,
+        `Workflow "${workflowName}", parameter "${key}"`
+      );
+      parameter.url_spec = url_spec;
+    }
+
+    // Add collection_spec if defined and validate all URLs
+    if (collection_spec) {
+      if (!collection_spec.elements || collection_spec.elements.length === 0) {
+        throw new Error(
+          `Workflow "${workflowName}", parameter "${key}": collection_spec must have at least one element`
+        );
+      }
+
+      collection_spec.elements.forEach((element, index) => {
+        validateUrl(
+          element.url,
+          `Workflow "${workflowName}", parameter "${key}", collection element ${index}`
+        );
+      });
+
+      parameter.collection_spec = collection_spec;
+    }
 
     // Add data_requirements if defined
     if (data_requirements) {
@@ -86,13 +171,14 @@ function buildWorkflow(
       parameter.data_requirements = sanitizedDataRequirements;
     }
 
-    // Add parameter if it has either variable or url_spec
-    if (variable || url_spec) parameters.push(parameter);
+    // Add parameter if it has variable, url_spec, or collection_spec
+    if (variable || url_spec || collection_spec) parameters.push(parameter);
   }
   const workflow: Workflow = {
     iwcId,
     parameters,
     ploidy,
+    scope: scope ?? WorkflowScope.ASSEMBLY,
     taxonomyId: typeof taxonomyId === "number" ? String(taxonomyId) : null,
     trsId,
     workflowDescription,

@@ -2,6 +2,7 @@ import { Workflow } from "../../../apis/catalog/brc-analytics-catalog/common/ent
 import {
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_PLOIDY,
+  WORKFLOW_SCOPE,
 } from "../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 
 export const CUSTOM_WORKFLOW: Workflow = {
@@ -13,6 +14,7 @@ export const CUSTOM_WORKFLOW: Workflow = {
     },
   ],
   ploidy: WORKFLOW_PLOIDY.ANY,
+  scope: WORKFLOW_SCOPE.ASSEMBLY,
   taxonomyId: null,
   trsId: "custom-workflow",
   workflowDescription:

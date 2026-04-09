@@ -3,6 +3,8 @@ import type {
   WorkflowCategory,
 } from "../../apis/catalog/brc-analytics-catalog/common/entities";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
+import { LEXICMAP } from "../AnalyzeWorkflowsView/lexicmap/constants";
+import { LOGAN_SEARCH } from "../AnalyzeWorkflowsView/loganSearch/constants";
 import { Assembly } from "../WorkflowInputsView/types";
 import type { WorkflowAssembly, WorkflowEntity } from "./types";
 import { Organism } from "./types";
@@ -53,16 +55,19 @@ function getTaxonomicLevelRealm(assembly: Assembly | undefined): string {
  * Utility function to transform workflow categories into a flat list of workflows.
  * Filters out workflows that have no compatible assemblies for the current site.
  * Differential Expression Analysis is always included as an interim measure.
+ * LMLS workflows (Logan Search and Lexicmap) are included when the 'lmls' feature flag is enabled.
  * Each workflow includes the properties of the workflow itself along with the name of its category and the compatible assembly (if any).
  * @param workflowCategories - An array of workflow categories, each containing an array of workflows.
  * @param mappings - Workflow-assembly mappings for the current site.
  * @param organisms - Organisms.
+ * @param isLmlsEnabled - Whether the 'lmls' feature flag is enabled.
  * @returns An array of workflows, where each workflow is a combination of a workflow and its category name.
  */
 export function getWorkflows(
   workflowCategories: WorkflowCategory[],
   mappings: WorkflowAssemblyMapping[],
-  organisms: Organism[]
+  organisms: Organism[],
+  isLmlsEnabled = false
 ): WorkflowEntity[] {
   const workflows: WorkflowEntity[] = [];
 
@@ -89,8 +94,9 @@ export function getWorkflows(
           findAssemblyByTaxonomyId(assemblyByTaxonomyId, workflow.taxonomyId)
         ),
         category: category.name,
+        scope: String(workflow.scope),
         taxonomyId: workflow.taxonomyId ?? "Any",
-      });
+      } as WorkflowEntity);
     }
   }
 
@@ -99,8 +105,28 @@ export function getWorkflows(
     ...DIFFERENTIAL_EXPRESSION_ANALYSIS,
     assembly: mapAssembly(undefined),
     category: "Transcriptomics",
+    scope: String(DIFFERENTIAL_EXPRESSION_ANALYSIS.scope),
     taxonomyId: "Any",
-  });
+  } as WorkflowEntity);
+
+  // Add LMLS workflows if feature flag is enabled.
+  if (isLmlsEnabled) {
+    workflows.push({
+      ...LOGAN_SEARCH,
+      assembly: mapAssembly(undefined),
+      category: "Sequence Analysis",
+      scope: String(LOGAN_SEARCH.scope),
+      taxonomyId: "Any",
+    } as WorkflowEntity);
+
+    workflows.push({
+      ...LEXICMAP,
+      assembly: mapAssembly(undefined),
+      category: "Sequence Analysis",
+      scope: String(LEXICMAP.scope),
+      taxonomyId: "Any",
+    } as WorkflowEntity);
+  }
 
   return workflows;
 }

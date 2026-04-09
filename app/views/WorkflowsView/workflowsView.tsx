@@ -1,3 +1,4 @@
+import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import { JSX, useEffect, useMemo, useState } from "react";
 import {
   getOrganisms,
@@ -18,6 +19,7 @@ import { Organism } from "./types";
 export const WorkflowsView = (): JSX.Element => {
   const workflowCategories = getWorkflowCategories();
   const organisms = getOrganisms<Organism>();
+  const isLmlsEnabled = useFeatureFlag("lmls");
   const [mappings, setMappings] = useState<WorkflowAssemblyMapping[] | null>(
     null
   );
@@ -37,8 +39,10 @@ export const WorkflowsView = (): JSX.Element => {
 
   const workflows = useMemo(
     () =>
-      mappings ? getWorkflows(workflowCategories, mappings, organisms) : [],
-    [mappings, organisms, workflowCategories]
+      mappings
+        ? getWorkflows(workflowCategories, mappings, organisms, isLmlsEnabled)
+        : [],
+    [isLmlsEnabled, mappings, organisms, workflowCategories]
   );
 
   return <ExploreView data={workflows} Component={Workflows} />;

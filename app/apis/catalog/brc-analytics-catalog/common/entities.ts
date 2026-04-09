@@ -5,6 +5,8 @@ import {
   OUTBREAK_RESOURCE_TYPE,
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_PLOIDY,
+  WORKFLOW_SCOPE,
+  WorkflowCollectionSpec,
   WorkflowUrlSpec,
 } from "./schema-entities";
 
@@ -118,6 +120,7 @@ export interface Workflow {
   iwcId: string;
   parameters: WorkflowParameter[];
   ploidy: WORKFLOW_PLOIDY;
+  scope: WORKFLOW_SCOPE;
   taxonomyId: string | null;
   trsId: string;
   workflowDescription: string;
@@ -133,6 +136,7 @@ export interface WorkflowDataRequirements {
 }
 
 export interface WorkflowParameter {
+  collection_spec?: WorkflowCollectionSpec;
   data_requirements?: WorkflowDataRequirements;
   key: string;
   url_spec?: WorkflowUrlSpec;

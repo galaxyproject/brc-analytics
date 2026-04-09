@@ -5,6 +5,8 @@ import {
 import { Workflow } from "../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import { WORKFLOW_PARAMETER_VARIABLE } from "../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
+import { LEXICMAP } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/lexicmap/constants";
+import { LOGAN_SEARCH } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/loganSearch/constants";
 import { ConfiguredInput } from "../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { ConfiguredValue } from "./types";
 
@@ -66,6 +68,30 @@ function getDEConfiguredValues(
 }
 
 /**
+ * Validates and returns configured values for SEQUENCE scope workflows.
+ * SEQUENCE scope workflows (like LMLS) have parameters for input sequence FASTA and number of hits.
+ * For now, return default/empty values to allow launching directly in Galaxy.
+ * The stepper UI will eventually populate these values from user input.
+ * @returns Configured values for SEQUENCE workflow.
+ */
+function getLMLSConfiguredValues(): ConfiguredValue {
+  return {
+    designFormula: null,
+    geneModelUrl: null,
+    numberOfHits: 10,
+    primaryContrasts: null,
+    readRunsPaired: null,
+    readRunsSingle: null,
+    referenceAssembly: "",
+    sampleSheet: null,
+    sampleSheetClassification: null,
+    sequence: "",
+    strandedness: undefined,
+    tracks: null,
+  };
+}
+
+/**
  * Validates and returns configured values for standard workflows.
  * @param configuredInput - Configured input.
  * @param workflow - Workflow to check required parameters.
@@ -119,6 +145,14 @@ export function getConfiguredValues(
   // Handle Differential Expression Analysis workflow separately
   if (workflow.trsId === DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId) {
     return getDEConfiguredValues(configuredInput);
+  }
+
+  // Handle LMLS workflows (SEQUENCE scope with no parameters)
+  if (
+    workflow.trsId === LOGAN_SEARCH.trsId ||
+    workflow.trsId === LEXICMAP.trsId
+  ) {
+    return getLMLSConfiguredValues();
   }
 
   return getStandardConfiguredValues(configuredInput, workflow);
