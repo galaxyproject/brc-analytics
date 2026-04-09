@@ -20,6 +20,7 @@ import { StyledStack } from "./sequenceStep.styles";
  * @param props - Component props.
  * @param props.active - Whether this step is currently active.
  * @param props.completed - Whether this step has been completed.
+ * @param props.configuredInput - The current configured input values, used to read the sequence file name.
  * @param props.entryLabel - Label for the step entry.
  * @param props.index - Index of the step in the stepper.
  * @param props.onConfigure - Callback invoked with the sequence and file name when configuration is complete.
@@ -30,6 +31,7 @@ import { StyledStack } from "./sequenceStep.styles";
 export const SequenceStep = ({
   active,
   completed,
+  configuredInput,
   entryLabel,
   index,
   onConfigure,
@@ -52,7 +54,7 @@ export const SequenceStep = ({
         optional={
           completed && (
             <Fragment>
-              <Optional noWrap>{file?.name}</Optional>
+              <Optional noWrap>{configuredInput.sequenceFileName}</Optional>
               <Button onClick={() => onEdit(index)}>Edit</Button>
             </Fragment>
           )

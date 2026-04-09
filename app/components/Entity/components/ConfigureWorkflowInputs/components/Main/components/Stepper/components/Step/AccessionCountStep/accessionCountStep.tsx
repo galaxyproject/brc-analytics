@@ -52,6 +52,7 @@ export const AccessionCountStep = ({
       <StepContent>
         <StyledStack>
           <OutlinedInput
+            inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
             onChange={onChange}
             placeholder="Number of accessions"
             value={inputValue}

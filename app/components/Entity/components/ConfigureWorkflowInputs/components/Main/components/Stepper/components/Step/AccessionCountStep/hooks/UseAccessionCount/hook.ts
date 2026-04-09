@@ -25,7 +25,7 @@ export function useAccessionCount(
   }, []);
 
   return {
-    disabled: !isValid(numberOfHits),
+    disabled: !isValid(inputValue),
     inputValue,
     numberOfHits,
     onChange,

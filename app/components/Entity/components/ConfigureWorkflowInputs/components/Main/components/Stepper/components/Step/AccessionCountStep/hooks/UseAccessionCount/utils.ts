@@ -1,10 +1,12 @@
 import { MIN_ACCESSION_COUNT } from "../../constants";
 
 /**
- * Checks if a parsed accession count value is valid.
- * @param value - The parsed numeric value.
- * @returns True if the value is a number and meets the minimum threshold.
+ * Checks if a raw input string represents a valid accession count.
+ * Requires a positive integer string (no decimals, no trailing characters).
+ * @param input - The raw input string.
+ * @returns True if the input is a valid positive integer meeting the minimum threshold.
  */
-export function isValid(value: number): boolean {
-  return !isNaN(value) && value >= MIN_ACCESSION_COUNT;
+export function isValid(input: string): boolean {
+  if (!/^\d+$/.test(input)) return false;
+  return parseInt(input, 10) >= MIN_ACCESSION_COUNT;
 }
