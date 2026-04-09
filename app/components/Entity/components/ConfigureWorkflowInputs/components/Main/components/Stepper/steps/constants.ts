@@ -6,6 +6,7 @@ import { STEP as REFERENCE_ASSEMBLY_STEP } from "../components/Step/ReferenceAss
 import { RELATED_TRACKS_STEP } from "../components/Step/RelatedTracksStep/step";
 import { STEP as SAMPLE_SHEET_CLASSIFICATION_STEP } from "../components/Step/SampleSheetClassificationStep/step";
 import { STEP as SAMPLE_SHEET_STEP } from "../components/Step/SampleSheetStep/step";
+import { STEP as SEQUENCE_STEP } from "../components/Step/SequenceStep/step";
 import {
   ANY_END_STEP,
   PAIRED_END_STEP,
@@ -27,6 +28,7 @@ export const STEP: Record<
   | "RELATED_TRACKS"
   | "SAMPLE_SHEET"
   | "SAMPLE_SHEET_CLASSIFICATION"
+  | "SEQUENCE"
   | "STRANDEDNESS",
   StepConfig | null
 > = {
@@ -42,5 +44,6 @@ export const STEP: Record<
   RELATED_TRACKS: RELATED_TRACKS_STEP,
   SAMPLE_SHEET: SAMPLE_SHEET_STEP,
   SAMPLE_SHEET_CLASSIFICATION: SAMPLE_SHEET_CLASSIFICATION_STEP,
+  SEQUENCE: SEQUENCE_STEP,
   STRANDEDNESS: STRANDEDNESS_STEP,
 };

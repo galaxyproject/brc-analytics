@@ -1,6 +1,6 @@
-import { DragEvent } from "react";
+import { DragEvent, ReactNode } from "react";
 
 export interface Props {
-  onClick: () => void;
+  children: ReactNode;
   onDrop: (event: DragEvent<HTMLElement>) => void;
 }

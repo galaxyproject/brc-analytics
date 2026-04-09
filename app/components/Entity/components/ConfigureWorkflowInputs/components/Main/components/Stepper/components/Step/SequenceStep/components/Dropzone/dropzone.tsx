@@ -4,24 +4,31 @@ import { Stack, Typography } from "@mui/material";
 import { JSX } from "react";
 import { FileUploadIcon } from "../../../../../../../../../../../../common/CustomIcon/components/FileUploadIcon/fileUploadIcon";
 import {
-  STACK_PROPS,
   TYPOGRAPHY_PROPS as COMPONENT_TYPOGRAPHY_PROPS,
+  STACK_PROPS,
 } from "../../../components/Dropzone/constants";
-import { Dropzone as DropzoneBase } from "../../../components/Dropzone/dropzone";
 import { StyledButtonBase } from "../../../components/Dropzone/components/FileUploadButton/fileUploadButton.styles";
+import { Dropzone as DropzoneBase } from "../../../components/Dropzone/dropzone";
 import { Props } from "./types";
 
+/**
+ * FASTA file dropzone with click-to-upload support.
+ * @param props - Component props.
+ * @param props.onClick - Opens the native file picker dialog.
+ * @param props.onDrop - Callback invoked with the drop event when a file is dropped.
+ * @returns Dropzone element.
+ */
 export const Dropzone = ({ onClick, onDrop }: Props): JSX.Element => {
   return (
     <DropzoneBase onDrop={onDrop}>
-      <StyledButtonBase aria-label="Upload a sample sheet" onClick={onClick}>
+      <StyledButtonBase aria-label="Upload a FASTA file" onClick={onClick}>
         <FileUploadIcon />
         <Stack {...STACK_PROPS}>
           <Typography
             component="div"
             variant={TYPOGRAPHY_PROPS.VARIANT.HEADING_XSMALL}
           >
-            Upload a Sample Sheet
+            Upload a FASTA File
           </Typography>
           <Stack direction="row" gap={1} useFlexGap>
             <Typography {...COMPONENT_TYPOGRAPHY_PROPS}>
@@ -29,7 +36,7 @@ export const Dropzone = ({ onClick, onDrop }: Props): JSX.Element => {
             </Typography>
             <Dot />
             <Typography {...COMPONENT_TYPOGRAPHY_PROPS}>
-              CSV, TSV supported
+              FASTA supported
             </Typography>
           </Stack>
         </Stack>

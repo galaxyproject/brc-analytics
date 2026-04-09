@@ -7,6 +7,7 @@ jest.mock(
       GENE_MODEL_URL: { key: "GENE_MODEL_URL" },
       SANGER_READ_RUN_PAIRED: { key: "SANGER_READ_RUN_PAIRED" },
       SANGER_READ_RUN_SINGLE: { key: "SANGER_READ_RUN_SINGLE" },
+      SEQUENCE: { key: "sequence", label: "Sequence" },
     },
   })
 );
@@ -125,40 +126,17 @@ describe("buildSteps - scope handling", () => {
   });
 
   describe("SEQUENCE scope", () => {
-    test("returns empty array for SEQUENCE scope workflow", () => {
+    test("returns sequence step for SEQUENCE scope workflow", () => {
       const workflow: Workflow = {
         ...BASE_WORKFLOW,
         scope: WORKFLOW_SCOPE.SEQUENCE,
       };
-
-      const warnSpy = jest.spyOn(console, "warn").mockImplementation();
 
       const steps = buildSteps(workflow);
 
-      expect(steps).toEqual([]);
-      expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining("SEQUENCE scope workflows not yet implemented")
-      );
-
-      warnSpy.mockRestore();
-    });
-
-    test("logs warning with workflow name for SEQUENCE scope", () => {
-      const workflow: Workflow = {
-        ...BASE_WORKFLOW,
-        scope: WORKFLOW_SCOPE.SEQUENCE,
-        workflowName: "My Sequence Workflow",
-      };
-
-      const warnSpy = jest.spyOn(console, "warn").mockImplementation();
-
-      buildSteps(workflow);
-
-      expect(warnSpy).toHaveBeenCalledWith(
-        "SEQUENCE scope workflows not yet implemented for workflow: My Sequence Workflow"
-      );
-
-      warnSpy.mockRestore();
+      expect(steps).toHaveLength(1);
+      expect(steps[0].key).toBe("sequence");
+      expect(steps[0].label).toBe("Sequence");
     });
   });
 

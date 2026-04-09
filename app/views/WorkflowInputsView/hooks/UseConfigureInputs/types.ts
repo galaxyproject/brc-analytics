@@ -23,6 +23,8 @@ export interface ConfiguredInput {
   referenceAssembly?: string;
   sampleSheet?: Record<string, string>[];
   sampleSheetClassification?: Record<string, COLUMN_TYPE | null>;
+  sequence?: string;
+  sequenceFileName?: string;
   strandedness?: Strandedness;
   tracks?: UcscTrack[] | null;
 }
