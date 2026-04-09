@@ -3,6 +3,7 @@ jest.mock(
   "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/constants",
   (): Record<string, unknown> => ({
     STEP: {
+      ACCESSION_COUNT: { key: "numberOfHits", label: "Accessions to Download" },
       ASSEMBLY_ID: { key: "ASSEMBLY_ID" },
       GENE_MODEL_URL: { key: "GENE_MODEL_URL" },
       SANGER_READ_RUN_PAIRED: { key: "SANGER_READ_RUN_PAIRED" },
@@ -12,13 +13,13 @@ jest.mock(
   })
 );
 
-import { buildSteps } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/utils";
 import type { Workflow } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
 } from "../../../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { buildSteps } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/utils";
 
 describe("buildSteps - scope handling", () => {
   const BASE_WORKFLOW: Workflow = {
@@ -126,7 +127,7 @@ describe("buildSteps - scope handling", () => {
   });
 
   describe("SEQUENCE scope", () => {
-    test("returns sequence step for SEQUENCE scope workflow", () => {
+    test("returns sequence and accession count steps for SEQUENCE scope workflow", () => {
       const workflow: Workflow = {
         ...BASE_WORKFLOW,
         scope: WORKFLOW_SCOPE.SEQUENCE,
@@ -134,9 +135,11 @@ describe("buildSteps - scope handling", () => {
 
       const steps = buildSteps(workflow);
 
-      expect(steps).toHaveLength(1);
+      expect(steps).toHaveLength(2);
       expect(steps[0].key).toBe("sequence");
       expect(steps[0].label).toBe("Sequence");
+      expect(steps[1].key).toBe("numberOfHits");
+      expect(steps[1].label).toBe("Accessions to Download");
     });
   });
 

@@ -99,7 +99,7 @@ export function buildSteps(workflow: Workflow): StepConfig[] {
       return [];
 
     case WORKFLOW_SCOPE.SEQUENCE:
-      return [STEP.SEQUENCE].filter(isStepConfigured);
+      return [STEP.SEQUENCE, STEP.ACCESSION_COUNT].filter(isStepConfigured);
 
     default:
       console.error(`Unknown workflow scope: ${workflowScope}`);

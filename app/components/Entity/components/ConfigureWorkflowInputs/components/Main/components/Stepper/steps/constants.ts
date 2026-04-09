@@ -1,4 +1,5 @@
 import { WORKFLOW_PARAMETER_VARIABLE } from "../../../../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { STEP as ACCESSION_COUNT_STEP } from "../components/Step/AccessionCountStep/step";
 import { STEP as DESEQ2_FORMULA_STEP } from "../components/Step/DESeq2FormulaStep/step";
 import { STEP as GTF_STEP } from "../components/Step/GTFStep/step";
 import { STEP as PRIMARY_CONTRASTS_STEP } from "../components/Step/PrimaryContrastsStep/step";
@@ -22,6 +23,7 @@ export const SEQUENCING_STEPS: Record<string, StepConfig> = {
 
 export const STEP: Record<
   | WORKFLOW_PARAMETER_VARIABLE
+  | "ACCESSION_COUNT"
   | "DESEQ2_FORMULA"
   | "PRIMARY_CONTRASTS"
   | "READ_RUN_ANY"
@@ -38,6 +40,7 @@ export const STEP: Record<
   [WORKFLOW_PARAMETER_VARIABLE.GENE_MODEL_URL]: GTF_STEP,
   [WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE]: SINGLE_END_STEP,
   [WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_PAIRED]: PAIRED_END_STEP,
+  ACCESSION_COUNT: ACCESSION_COUNT_STEP,
   DESEQ2_FORMULA: DESEQ2_FORMULA_STEP,
   PRIMARY_CONTRASTS: PRIMARY_CONTRASTS_STEP,
   READ_RUN_ANY: ANY_END_STEP,
