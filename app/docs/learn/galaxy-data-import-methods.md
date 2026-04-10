@@ -80,7 +80,7 @@ These are Galaxy tools that act as query interfaces to external databases, depos
 
 ## 3. Data Libraries
 
-Galaxy Data Libraries are server-side shared data stores curated by administrators (or by users with appropriate permissions). You can import datasets from a library directly into your history without re-uploading, making them useful for shared reference files (genomes, annotation sets, test datasets). In the current usegalaxy.org interface, access Libraries via the **Libraries** button in the activity bar on the left side of the window. See the [Data Libraries documentation](https://galaxyproject.org/data-libraries/) for more details.
+Galaxy Data Libraries are server-side shared data stores curated by administrators (or by users with appropriate permissions). You can import datasets from a library directly into your history without re-uploading, making them useful for shared reference files (genomes, annotation sets, test datasets). In the current usegalaxy.org interface, access Libraries via the **Libraries** button in the activity bar on the left side of the window. See the [Data Libraries documentation](https://galaxyproject.org/data-libraries/) (TODO: note that the UI screenshots at this link a very out of date) for more details.
 
 ---
 
@@ -104,7 +104,7 @@ Access all history views via the **Histories** button in the activity bar on the
 
 **[BioBlend (Python library)](https://training.galaxyproject.org/training-material/topics/dev/tutorials/bioblend-api/tutorial.html)** — A Python wrapper around the Galaxy API. Key methods include `gi.tools.upload_file()` for local files, `gi.tools.put_url()` for remote URLs, and dataset copying between histories. Enables scripted, reproducible data ingest as part of larger pipelines.
 
-**galaxy-upload CLI** *(TODO: find documentation link)* — A command-line utility (`galaxy-upload`) for uploading files to a Galaxy server from the terminal, using your API key.
+**[galaxy-upload CLI](https://github.com/galaxyproject/galaxy-upload/blob/main/README.rst)** — A command-line utility (`galaxy-upload`) for uploading files to a Galaxy server from the terminal, using your API key.
 
 ---
 
