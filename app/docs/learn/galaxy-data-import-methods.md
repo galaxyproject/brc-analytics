@@ -1,6 +1,6 @@
 # Getting your data into Galaxy
 
-During the course of using BRC-Analytics and working through workflow configurations for many of the workflows, you will be presented with a step that looks like this:
+During the course of using BRC-Analytics and working through configurations for many of the workflows, you will be presented with a step that looks like this:
 
 ![Select from ENA dialog box](./select_from_ENA.png)
 
