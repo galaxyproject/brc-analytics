@@ -4,7 +4,7 @@ During the course of using BRC-Analytics and working through configurations for 
 
 ![Select from ENA dialog box](./select_from_ENA.png)
 
-which makes it really easy to fetch public data from SRA/ENA. But what if your data is sitting on your laptop, or on your local network shared drive, or on another web site, or in a cloud storage service?  You can click the "Upload my data" option in this dialog, which puts of dealing with data until you arrive at Galaxy:
+which makes it really easy to fetch public data from SRA/ENA. But what if your data is sitting on your laptop, or on your local network shared drive, or on another web site, or in a cloud storage service?  You can click the "Upload my data" option in this dialog, which puts off dealing with data until you arrive at Galaxy:
 
 ![Upload in Galaxy history message](upload_data_in_galaxy.png)
 
