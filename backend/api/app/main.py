@@ -41,7 +41,6 @@ def create_app() -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
-        """Startup and shutdown events for the application."""
         async with mcp_app.lifespan(app):
             cache_service = get_cache_service()
             await cache_service.flush_all()
