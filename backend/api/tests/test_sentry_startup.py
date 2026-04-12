@@ -1,20 +1,15 @@
 """Regression tests for Sentry startup wiring."""
 
-import importlib
-import sys
+from app.core.config import get_settings
+from app.main import create_app
 
 
-def _reload_app_main():
-    sys.modules.pop("app.main", None)
-    sys.modules.pop("app.core.config", None)
-    return importlib.import_module("app.main")
-
-
-def test_import_app_main_with_sentry_dsn(monkeypatch):
+def test_create_app_with_sentry_dsn(monkeypatch):
     monkeypatch.setenv(
         "SENTRY_DSN", "https://examplePublicKey@example.ingest.sentry.io/1"
     )
+    get_settings.cache_clear()
 
-    module = _reload_app_main()
+    app = create_app()
 
-    assert module.app.title == "BRC Analytics API"
+    assert app.title == "BRC Analytics API"
