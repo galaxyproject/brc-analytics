@@ -28,36 +28,36 @@ if settings.SENTRY_DSN:
         traces_sample_rate=1.0,
     )
 
+# Build the MCP ASGI app at module scope so its lifespan can be chained into
+# the parent FastAPI lifespan below. Mounting a FastMCP http_app without
+# running its lifespan leaves the StreamableHTTPSessionManager task group
+# uninitialized, which causes every MCP request to 500.
+mcp = create_mcp_server(get_catalog_data(), get_ena_service())
+mcp_app = mcp.http_app(path="/", stateless_http=True)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup and shutdown events for the application"""
-    # Startup: initialize services and flush cache
-    cache_service = get_cache_service()
-    await cache_service.flush_all()
-    logger.info("Cache cleared on startup")
+    async with mcp_app.lifespan(app):
+        # Startup: initialize services and flush cache
+        cache_service = get_cache_service()
+        await cache_service.flush_all()
+        logger.info("Cache cleared on startup")
 
-    # Pre-initialize services (singletons)
-    catalog_data = get_catalog_data()
-    ena_service = get_ena_service()
-    get_llm_service()
+        # Warm remaining singletons
+        get_llm_service()
 
-    # Mount MCP server for AI tool access to the catalog
-    mcp = create_mcp_server(catalog_data, ena_service)
-    mcp_app = mcp.http_app(path="/", stateless_http=True)
-    app.mount("/api/v1/mcp", mcp_app)
-    logger.info("MCP server mounted at /api/v1/mcp")
+        logger.info("All services initialized")
 
-    logger.info("All services initialized")
+        yield
 
-    yield
-
-    # Shutdown: close connections and reset all service singletons
-    auth_service = get_auth_service()
-    await auth_service.close()
-    await cache_service.close()
-    reset_all_services()
-    logger.info("All services shut down")
+        # Shutdown: close connections and reset all service singletons
+        auth_service = get_auth_service()
+        await auth_service.close()
+        await cache_service.close()
+        reset_all_services()
+        logger.info("All services shut down")
 
 
 app = FastAPI(
@@ -86,6 +86,8 @@ app.include_router(llm.router, prefix="/api/v1/llm", tags=["llm"])
 app.include_router(ena.router, prefix="/api/v1/ena", tags=["ena"])
 app.include_router(assistant.router, prefix="/api/v1/assistant", tags=["assistant"])
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
+
+app.mount("/api/v1/mcp", mcp_app)
 
 
 @app.get("/")
