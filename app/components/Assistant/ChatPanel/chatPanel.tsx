@@ -22,7 +22,7 @@ interface ChatPanelProps {
   isRestoring?: boolean;
   loading: boolean;
   messages: ChatMessageDisplay[];
-  onRetry?: (() => Promise<void>) | null;
+  onRetry?: () => Promise<void>;
   onSend: (message: string) => void;
   suggestions: SuggestionChip[];
 }

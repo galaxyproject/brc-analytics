@@ -5,8 +5,9 @@ import {
   BackPageView,
 } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { JSX } from "react";
-import { useStepper } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/hook";
+import { VIEW } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ToggleButtonGroup/types";
 import { StepConfig } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
+import { useStepper } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/hook";
 import { SEQUENCING_STEPS } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/constants";
 import { useConfiguredSteps } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/hook";
 import { augmentConfiguredSteps } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/utils";
@@ -43,7 +44,7 @@ export const WorkflowInputsView = ({ entityId, trsId }: Props): JSX.Element => {
     ? findFirstDataStep(configuredSteps)
     : undefined;
   const initialDataSourceView =
-    handoff?.dataSource === "upload" ? "upload-my-data" : undefined;
+    handoff?.dataSource === "upload" ? VIEW.UPLOAD_MY_DATA : undefined;
 
   const { activeStep, onContinue, onEdit } = useStepper(
     configuredSteps,
