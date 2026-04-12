@@ -1,6 +1,6 @@
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
-import { Box, Button } from "@mui/material";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import { Box, Button } from "@mui/material";
 import Error from "next/error";
 import { Fragment, JSX } from "react";
 import { ChatPanel, SchemaPanel } from "../../components/Assistant";

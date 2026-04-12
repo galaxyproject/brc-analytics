@@ -612,10 +612,7 @@ class AssistantAgent:
         for cat in self.catalog.workflows_by_category:
             for wf in cat.get("workflows", []):
                 wf_name = (wf.get("workflowName") or "").lower()
-                if wf_name and wf_name in val_lower:
-                    logger.info("Workflow fallback matched name '%s'", wf_name)
-                    return wf.get("trsId", wf.get("iwcId"))
-                if wf_name and val_lower in wf_name:
+                if wf_name and (wf_name in val_lower or val_lower in wf_name):
                     logger.info("Workflow fallback matched name '%s'", wf_name)
                     return wf.get("trsId", wf.get("iwcId"))
         logger.warning("Workflow fallback found no match for '%s'", value)

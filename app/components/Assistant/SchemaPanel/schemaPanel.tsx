@@ -93,6 +93,7 @@ export const SchemaPanel = ({
     localStorage.setItem(ASSISTANT_HANDOFF_KEY, JSON.stringify(handoff));
     window.location.href = handoffUrl;
   }, [handoffUrl, schema]);
+
   if (!schema) {
     return (
       <PanelContainer>

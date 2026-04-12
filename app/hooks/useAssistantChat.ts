@@ -20,7 +20,7 @@ interface UseAssistantChatReturn {
   isRestoring: boolean;
   loading: boolean;
   messages: ChatMessageDisplay[];
-  onRetry: (() => Promise<void>) | null;
+  onRetry?: () => Promise<void>;
   resetSession: () => void;
   schema: AnalysisSchema | null;
   sendMessage: (message: string) => Promise<void>;
@@ -45,6 +45,7 @@ export const useAssistantChat = (): UseAssistantChatReturn => {
     null
   );
   const sessionIdRef = useRef<string | null>(null);
+  const sendingRef = useRef(false);
 
   // Restore session from localStorage on mount
   useEffect(() => {
@@ -79,7 +80,8 @@ export const useAssistantChat = (): UseAssistantChatReturn => {
   }, []);
 
   const sendMessage = useCallback(async (message: string): Promise<void> => {
-    if (!message.trim()) return;
+    if (!message.trim() || sendingRef.current) return;
+    sendingRef.current = true;
 
     setLoading(true);
     setError(null);
@@ -113,23 +115,17 @@ export const useAssistantChat = (): UseAssistantChatReturn => {
       setLastFailedMessage(message);
     } finally {
       setLoading(false);
+      sendingRef.current = false;
     }
   }, []);
 
-  const retryingRef = useRef(false);
   const retry = useCallback(async (): Promise<void> => {
-    if (!lastFailedMessage || retryingRef.current) return;
-    retryingRef.current = true;
+    if (!lastFailedMessage) return;
     const msg = lastFailedMessage;
     setLastFailedMessage(null);
     setError(null);
-    // Remove the failed user message -- sendMessage will re-add it
     setMessages((prev) => prev.slice(0, -1));
-    try {
-      await sendMessage(msg);
-    } finally {
-      retryingRef.current = false;
-    }
+    await sendMessage(msg);
   }, [lastFailedMessage, sendMessage]);
 
   const resetSession = useCallback((): void => {
@@ -155,7 +151,7 @@ export const useAssistantChat = (): UseAssistantChatReturn => {
     isRestoring,
     loading,
     messages,
-    onRetry: lastFailedMessage ? retry : null,
+    onRetry: lastFailedMessage ? retry : undefined,
     resetSession,
     schema,
     sendMessage,

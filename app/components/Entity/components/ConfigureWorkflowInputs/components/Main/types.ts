@@ -4,6 +4,7 @@ import {
   OnConfigure,
 } from "../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { Assembly } from "../../../../../../views/WorkflowInputsView/types";
+import { VIEW } from "./components/Stepper/components/Step/SequencingStep/components/ToggleButtonGroup/types";
 import { StepConfig } from "./components/Stepper/components/Step/types";
 import {
   OnContinue,
@@ -15,7 +16,7 @@ export interface Props {
   configuredInput: ConfiguredInput;
   configuredSteps: StepConfig[];
   genome?: Assembly;
-  initialDataSourceView?: string;
+  initialDataSourceView?: VIEW;
   onConfigure: OnConfigure;
   onContinue: OnContinue;
   onEdit: OnEdit;

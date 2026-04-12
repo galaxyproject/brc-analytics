@@ -1,7 +1,7 @@
 import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepContent/stepContent";
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
-import { JSX, useEffect } from "react";
+import { JSX, useEffect, useRef } from "react";
 import { ToggleButtonGroup } from "../components/ToggleButtonGroup/toggleButtonGroup";
 import { useToggleButtonGroup } from "../hooks/UseToggleButtonGroup/useToggleButtonGroup";
 import { StepProps } from "../types";
@@ -49,13 +49,14 @@ export const SequencingStep = ({
   const { taxonomyMatches } = useTaxonomyMatches(table);
   const { requirementsMatches } = useRequirementsMatches(table, genome);
 
-  // Pre-configure upload mode when coming from the assistant with "upload" preference
+  const didInitRef = useRef(false);
   useEffect(() => {
-    if (initialDataSourceView !== VIEW.UPLOAD_MY_DATA) return;
+    if (didInitRef.current || initialDataSourceView !== VIEW.UPLOAD_MY_DATA)
+      return;
+    didInitRef.current = true;
     onConfigure(clearSequencingData());
     onConfigure(getUploadMyOwnSequencingData(stepKey));
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- Only on mount
-  }, []);
+  }, [initialDataSourceView, onConfigure, stepKey]);
   return (
     <Step active={active} completed={completed} index={index}>
       <StepLabel>{entryLabel}</StepLabel>
