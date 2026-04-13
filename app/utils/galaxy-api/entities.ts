@@ -211,10 +211,23 @@ export interface DeSeq2FileElement {
 
 //// LMLS Workflow Landing types
 
+export interface LMLSDataInput {
+  class: "File";
+  ext: string;
+  name: string;
+  url: string;
+}
+
+export interface LMLSRequestState {
+  [key: string]: unknown;
+  "How many accessions to keep": number;
+  "Query Sequence": LMLSDataInput;
+}
+
 export interface LMLSWorkflowLandingsBody {
   origin: string;
   public: true;
-  request_state: Record<string, never>;
+  request_state: LMLSRequestState;
   workflow_id: string;
   workflow_target_type: "stored_workflow";
 }

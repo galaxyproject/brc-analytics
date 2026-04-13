@@ -928,19 +928,31 @@ export async function getDeSeq2LandingUrl(
 /**
  * Get the URL of the LMLS workflow landing page.
  * LMLS workflows (Logan Search/kmindex and Lexicmap) use stored workflow IDs
- * and don't require any parameters initially.
+ * with sequence and numberOfHits parameters.
  * @param workflowId - Galaxy stored workflow ID.
+ * @param numberOfHits - Number of accessions to download.
+ * @param sequence - FASTA sequence content.
  * @param origin - Origin URL of the site making the request.
  * @returns LMLS workflow landing URL.
  */
 export async function getLMLSLandingUrl(
   workflowId: string,
+  numberOfHits: number,
+  sequence: string,
   origin: string
 ): Promise<string> {
   const body: LMLSWorkflowLandingsBody = {
     origin,
     public: true,
-    request_state: {},
+    request_state: {
+      "How many accessions to keep": numberOfHits,
+      "Query Sequence": {
+        class: "File",
+        ext: "fasta",
+        name: "Query Sequence",
+        url: `base64://${btoa(sequence)}`,
+      },
+    },
     workflow_id: workflowId,
     workflow_target_type: "stored_workflow",
   };

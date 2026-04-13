@@ -45,11 +45,18 @@ export const useLaunchGalaxy = ({
       workflow.trsId === LOGAN_SEARCH.trsId ||
       workflow.trsId === LEXICMAP.trsId
     ) {
-      // LMLS workflows use stored workflow IDs with no parameters
+      // LMLS workflows use stored workflow IDs with sequence and numberOfHits parameters
       if (!workflow.workflowId) {
         throw new Error("Missing workflow ID for LMLS workflow");
       }
-      landingUrl = await run(getLMLSLandingUrl(workflow.workflowId, origin));
+      landingUrl = await run(
+        getLMLSLandingUrl(
+          workflow.workflowId,
+          configuredValue.numberOfHits!,
+          configuredValue.sequence!,
+          origin
+        )
+      );
     } else if (workflow.trsId === DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId) {
       if (
         !workflow.workflowId ||
