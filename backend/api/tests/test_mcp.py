@@ -7,9 +7,7 @@ group never starts and every request to /api/v1/mcp/ returns 500 with
 RuntimeError("Task group is not initialized. Make sure to use run().").
 """
 
-import importlib
 import json
-import sys
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -20,12 +18,8 @@ from tests.test_catalog_data import SAMPLE_ORGANISMS, SAMPLE_WORKFLOWS
 
 @pytest.fixture()
 def mcp_app(tmp_path, monkeypatch):
-    """Reload app.main with a sample catalog and stubbed Redis-backed services.
-
-    The MCP server is constructed at module scope using get_catalog_data() and
-    get_ena_service(), so CATALOG_PATH must be set and any service that would
-    hit Redis must be patched before importing the module.
-    """
+    """Build a fresh app via create_app() with a sample catalog and stubbed
+    Redis-backed services."""
     (tmp_path / "organisms.json").write_text(json.dumps(SAMPLE_ORGANISMS))
     (tmp_path / "workflows.json").write_text(json.dumps(SAMPLE_WORKFLOWS))
     monkeypatch.setenv("CATALOG_PATH", str(tmp_path))
@@ -36,13 +30,12 @@ def mcp_app(tmp_path, monkeypatch):
     fake_auth = MagicMock()
     fake_auth.close = AsyncMock()
 
-    sys.modules.pop("app.main", None)
-    sys.modules.pop("app.core.config", None)
-
     from app.core import dependencies
+    from app.core.config import get_settings
 
-    # MagicMock auto-creates attributes like .cache_clear, which
-    # reset_all_services() calls on every dependency getter during shutdown.
+    get_settings.cache_clear()
+    dependencies.reset_all_services()
+
     monkeypatch.setattr(
         dependencies, "get_cache_service", MagicMock(return_value=fake_cache)
     )
@@ -53,10 +46,9 @@ def mcp_app(tmp_path, monkeypatch):
         dependencies, "get_llm_service", MagicMock(return_value=MagicMock())
     )
 
-    main_module = importlib.import_module("app.main")
-    yield main_module.app
+    from app.main import create_app
 
-    sys.modules.pop("app.main", None)
+    yield create_app()
 
 
 def _parse_sse(body: str) -> dict:
