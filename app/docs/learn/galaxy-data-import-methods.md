@@ -10,7 +10,17 @@ which makes it really easy to fetch public data from SRA/ENA. But what if your d
 
 So, the question is, how do you get your data into Galaxy once you get there. Galaxy has a plethora of ways to get your data into Galaxy so that you can carry on with your analysis workflows. Here's a comprehensive list:
 
-## 1. The Upload Tool
+## 1. Uploading Data Directly in a Workflow Run
+
+When you launch a workflow from BRC-Analytics, you will land on a workflow run page where each dataset input has a **+ Create** button. Clicking it opens a section with two tabs:
+
+**Create collection** — Select and organize datasets already in your current history into a collection to pass to the workflow.
+
+**Upload Files to Add to Collection** — Upload new files directly into the workflow input. This opens an upload interface similar to the standalone Upload Tool (see section 2), but without the tabs across the top. A hint above the buttons indicates the file type(s) the workflow expects (e.g., *fastqsanger.gz or fastqsanger*). The same buttons are available along the bottom: **Choose Local File**, **Choose from Repository**, and **Paste/Fetch Data**.
+
+---
+
+## 2. The Upload Tool
 
 ![Galaxy upload dialog](./galaxy-upload-dialog.png)
 
@@ -38,7 +48,7 @@ The Upload tool is accessible via the activity bar on the left side of the page 
 
 ---
 
-## 2. "Get Data" Toolbox — Built-in Data Source Connectors
+## 3. "Get Data" Toolbox — Built-in Data Source Connectors
 
 ![Galaxy "Get Data" tool set](./galaxy-get-data-tools.png)
 
@@ -78,13 +88,13 @@ These are Galaxy tools that act as query interfaces to external databases, depos
 
 ---
 
-## 3. Data Libraries
+## 4. Data Libraries
 
 Galaxy Data Libraries are server-side shared data stores curated by administrators (or by users with appropriate permissions). You can import datasets from a library directly into your history without re-uploading, making them useful for shared reference files (genomes, annotation sets, test datasets). In the current usegalaxy.org interface, access Libraries via the **Libraries** button in the activity bar on the left side of the window. See the [Data Libraries documentation](https://galaxyproject.org/data-libraries/) (TODO: note that the UI screenshots at this link a very out of date) for more details.
 
 ---
 
-## 4. Shared & Imported Histories
+## 5. Shared & Imported Histories
 
 Access all history views via the **Histories** button in the activity bar on the left side of the page. The panel has four tabs:
 
@@ -98,7 +108,7 @@ Access all history views via the **Histories** button in the activity bar on the
 
 ---
 
-## 5. Programmatic / API Access
+## 6. Programmatic / API Access
 
 **[Galaxy REST API](https://docs.galaxyproject.org/en/latest/api_doc.html)** — Galaxy exposes a full REST API. You can upload files (multipart POST to `/api/tools` using the upload tool), fetch URLs, create histories, and populate them with datasets entirely programmatically using any HTTP client.
 
@@ -108,7 +118,7 @@ Access all history views via the **Histories** button in the activity bar on the
 
 ---
 
-## 6. Workflow-Based Import
+## 7. Workflow-Based Import
 
 **[Workflow Inputs](https://training.galaxyproject.org/training-material/topics/galaxy-interface/tutorials/workflow-editor/tutorial.html)** — When you invoke a workflow, you map its input slots to existing datasets or dataset collections in your history. While not "uploading" new data per se, this is a key pathway for directing data through automated multi-step analyses.
 
@@ -116,7 +126,7 @@ Access all history views via the **Histories** button in the activity bar on the
 
 ---
 
-## 7. Cross-Server and External Transfers
+## 8. Cross-Server and External Transfers
 
 **Export/Import Between Galaxy Servers** — Histories and individual datasets can be exported from one Galaxy server and imported into usegalaxy.org via a URL or downloaded archive, enabling transfer between Galaxy instances.
 
@@ -128,12 +138,13 @@ Access all history views via the **Histories** button in the activity bar on the
 
 | Category | Method |
 |---|---|
-| Upload Tool | Local file, Paste/Fetch URL, Remote Files (cloud/WebDAV/S3/Dropbox/GDrive), Deferred, Rule-Based Bulk Import |
-| Get Data Tools | UCSC, EBI SRA, NCBI SRA, BioMart, InterMine family, NCBI Datasets, NCBI Accession, ENA, IEDB |
-| Shared Data | Data Libraries, Published Histories |
-| History Management | Copy datasets between histories |
+| Workflow Run Page | Upload inline via + Create button (local file, repository, paste/fetch) |
+| Upload Tool | Local file, Paste/Fetch URL, Choose from Repository, Rule-Based Bulk Import |
+| Get Data Tools | UCSC, EBI SRA, NCBI SRA, EBI Search, EBI Metagenomics, EGA, NCBI Datasets, NCBI Accession, UniProt, Unipept, IEDB, fastq-dl, pysradb |
+| Data Libraries | Server-side shared reference datasets |
+| Shared Histories | Histories shared with me, Public histories |
 | API / Programmatic | REST API, BioBlend (Python), galaxy-upload CLI |
-| Workflows | Workflow input mapping, chained workflow outputs |
+| Workflows | Chained workflow outputs |
 | Cross-Server | History import/export, Onedata |
 
 ---
