@@ -99,11 +99,7 @@ export function buildSteps(workflow: Workflow): StepConfig[] {
       return [];
 
     case WORKFLOW_SCOPE.SEQUENCE:
-      // Implement sequence FASTA upload step
-      console.warn(
-        `SEQUENCE scope workflows not yet implemented for workflow: ${workflow.workflowName}`
-      );
-      return [];
+      return [STEP.SEQUENCE, STEP.ACCESSION_COUNT].filter(isStepConfigured);
 
     default:
       console.error(`Unknown workflow scope: ${workflowScope}`);

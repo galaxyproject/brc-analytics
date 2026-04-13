@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { ChangeEvent } from "react";
-import { VALIDATION_ERROR } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/constants";
-import { useFilePicker } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/hook";
+import { FALLBACK_ERROR } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseFilePicker/constants";
+import { useFilePicker } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseFilePicker/hook";
 import { parseFile } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/utils";
 
 /* eslint-disable sonarjs/no-duplicate-string -- jest.mock is hoisted, so the path must be literal */
@@ -54,20 +54,20 @@ describe("useFilePicker", () => {
   });
 
   test("initializes with null file", () => {
-    const { result } = renderHook(() => useFilePicker());
+    const { result } = renderHook(() => useFilePicker(parseFile));
 
     expect(result.current.file).toBeNull();
   });
 
   test("initializes with inputRef", () => {
-    const { result } = renderHook(() => useFilePicker());
+    const { result } = renderHook(() => useFilePicker(parseFile));
 
     expect(result.current.inputRef).toBeDefined();
     expect(result.current.inputRef.current).toBeNull();
   });
 
   test("onFileChange sets file when file is selected", () => {
-    const { result } = renderHook(() => useFilePicker());
+    const { result } = renderHook(() => useFilePicker(parseFile));
     const mockFile = createMockFile("test.csv");
     const event = createMockFileChangeEvent(mockFile);
 
@@ -79,7 +79,7 @@ describe("useFilePicker", () => {
   });
 
   test("onFileChange does not update file when no file is selected", () => {
-    const { result } = renderHook(() => useFilePicker());
+    const { result } = renderHook(() => useFilePicker(parseFile));
     const mockFile = createMockFile("test.csv");
 
     // First set a file
@@ -100,7 +100,7 @@ describe("useFilePicker", () => {
   });
 
   test("onClear resets file to null", () => {
-    const { result } = renderHook(() => useFilePicker());
+    const { result } = renderHook(() => useFilePicker(parseFile));
     const mockFile = createMockFile("test.csv");
 
     // Set a file first
@@ -122,7 +122,7 @@ describe("useFilePicker", () => {
   });
 
   test("onClear resets input value when inputRef is set", () => {
-    const { result } = renderHook(() => useFilePicker());
+    const { result } = renderHook(() => useFilePicker(parseFile));
 
     // Create a mock input element
     const mockInput = document.createElement("input");
@@ -142,7 +142,7 @@ describe("useFilePicker", () => {
   });
 
   test("onClick triggers click on input element", () => {
-    const { result } = renderHook(() => useFilePicker());
+    const { result } = renderHook(() => useFilePicker(parseFile));
 
     // Create a mock input element with a click spy
     const mockInput = document.createElement("input");
@@ -162,7 +162,7 @@ describe("useFilePicker", () => {
   });
 
   test("onClick does not throw when inputRef is null", () => {
-    const { result } = renderHook(() => useFilePicker());
+    const { result } = renderHook(() => useFilePicker(parseFile));
 
     expect(() => {
       act(() => {
@@ -172,7 +172,7 @@ describe("useFilePicker", () => {
   });
 
   test("onFileChange does not call onComplete when same file is re-selected", async () => {
-    const { result } = renderHook(() => useFilePicker());
+    const { result } = renderHook(() => useFilePicker(parseFile));
     // Create a valid CSV file with 4 columns and 2 data rows
     const validContent = "a,b,c,d\n1,2,3,4\n5,6,7,8";
     const mockFile = new File([validContent], "test.csv", { type: "text/csv" });
@@ -196,14 +196,14 @@ describe("useFilePicker", () => {
   });
 
   test("initializes with empty validation errors", () => {
-    const { result } = renderHook(() => useFilePicker());
+    const { result } = renderHook(() => useFilePicker(parseFile));
 
     expect(result.current.validation.errors).toEqual([]);
     expect(result.current.validation.valid).toBe(false);
   });
 
   test("onClear resets validation errors", async () => {
-    const { result } = renderHook(() => useFilePicker());
+    const { result } = renderHook(() => useFilePicker(parseFile));
     // Create a file that will fail validation (less than 4 columns)
     const invalidContent = "a,b\n1,2\n3,4";
     const invalidFile = new File([invalidContent], "invalid.csv", {
@@ -227,7 +227,7 @@ describe("useFilePicker", () => {
   });
 
   test("onFileChange sets parse error when parsing fails", async () => {
-    const { result } = renderHook(() => useFilePicker());
+    const { result } = renderHook(() => useFilePicker(parseFile));
     const mockFile = createMockFile("test.csv");
 
     mockParseFile.mockRejectedValueOnce(new Error("Parse error"));
@@ -239,13 +239,11 @@ describe("useFilePicker", () => {
       );
     });
 
-    expect(result.current.validation.errors).toEqual([
-      VALIDATION_ERROR.PARSE_FAILED,
-    ]);
+    expect(result.current.validation.errors).toEqual([FALLBACK_ERROR]);
   });
 
   test("onFileChange does not call onComplete when validation errors occur", async () => {
-    const { result } = renderHook(() => useFilePicker());
+    const { result } = renderHook(() => useFilePicker(parseFile));
     // Create an invalid file (fewer than 4 columns)
     const invalidContent = "a,b\n1,2\n3,4";
     const invalidFile = new File([invalidContent], "invalid.csv", {

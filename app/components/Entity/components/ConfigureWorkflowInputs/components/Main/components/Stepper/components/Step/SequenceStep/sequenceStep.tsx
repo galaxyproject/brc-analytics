@@ -4,32 +4,57 @@ import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/com
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { Button } from "@mui/material";
-import { Fragment, JSX } from "react";
-import { useFilePicker } from "../hooks/UseFilePicker/hook";
+import { Fragment, JSX, useCallback } from "react";
+import { UploadedFile } from "../SampleSheetStep/components/UploadedFile/uploadedFile";
 import { StepProps } from "../types";
 import { Dropzone } from "./components/Dropzone/dropzone";
-import { UploadedFile } from "./components/UploadedFile/uploadedFile";
 import { INPUT_PROPS } from "./constants";
-import { parseFile } from "./hooks/UseFilePicker/utils";
-import { StyledGrid } from "./sampleSheetStep.styles";
+import { useFilePicker } from "../hooks/UseFilePicker/hook";
+import { readFastaFile } from "./hooks/UseFilePicker/utils";
+import { StyledStack } from "./sequenceStep.styles";
 
-export const SampleSheetStep = ({
+/**
+ * Stepper step for uploading a FASTA sequence file.
+ * Provides a file picker (click or drag-and-drop), validates the file as FASTA,
+ * and configures the sequence and file name on the workflow input.
+ * @param props - Component props.
+ * @param props.active - Whether this step is currently active.
+ * @param props.completed - Whether this step has been completed.
+ * @param props.configuredInput - The current configured input values, used to read the sequence file name.
+ * @param props.entryLabel - Label for the step entry.
+ * @param props.index - Index of the step in the stepper.
+ * @param props.onConfigure - Callback invoked with the sequence and file name when configuration is complete.
+ * @param props.onContinue - Callback to proceed to the next step after successful configuration.
+ * @param props.onEdit - Callback to edit the step after completion.
+ * @returns Sequence step element.
+ */
+export const SequenceStep = ({
   active,
   completed,
+  configuredInput,
   entryLabel,
   index,
   onConfigure,
   onContinue,
   onEdit,
 }: StepProps): JSX.Element => {
-  const { actions, file, inputRef, validation } = useFilePicker(parseFile);
+  const { actions, file, inputRef, validation } = useFilePicker(readFastaFile);
+
+  const onComplete = useCallback(
+    (sequence: string, file: File): void => {
+      onConfigure({ sequence, sequenceFileName: file.name });
+      onContinue();
+    },
+    [onConfigure, onContinue]
+  );
+
   return (
     <Step active={active} completed={completed} index={index}>
       <StepLabel
         optional={
           completed && (
             <Fragment>
-              <Optional noWrap>{file?.name}</Optional>
+              <Optional noWrap>{configuredInput.sequenceFileName}</Optional>
               <Button onClick={() => onEdit(index)}>Edit</Button>
             </Fragment>
           )
@@ -38,40 +63,18 @@ export const SampleSheetStep = ({
         {entryLabel}
       </StepLabel>
       <StepContent>
-        <StyledGrid>
+        <StyledStack>
           <input
             {...INPUT_PROPS}
             onChange={(e) => {
-              actions.onFileChange(e, {
-                onComplete: (rows) => {
-                  onConfigure({
-                    designFormula: null,
-                    primaryContrasts: null,
-                    primaryFactor: null,
-                    sampleSheet: rows,
-                    sampleSheetClassification: undefined,
-                  });
-                  onContinue();
-                },
-              });
+              actions.onFileChange(e, { onComplete });
             }}
             ref={inputRef}
           />
           <Dropzone
             onClick={actions.onClick}
             onDrop={(e) => {
-              actions.onDrop(e, {
-                onComplete: (rows) => {
-                  onConfigure({
-                    designFormula: null,
-                    primaryContrasts: null,
-                    primaryFactor: null,
-                    sampleSheet: rows,
-                    sampleSheetClassification: undefined,
-                  });
-                  onContinue();
-                },
-              });
+              actions.onDrop(e, { onComplete });
             }}
           />
           <UploadedFile
@@ -86,7 +89,7 @@ export const SampleSheetStep = ({
           >
             Continue
           </Button>
-        </StyledGrid>
+        </StyledStack>
       </StepContent>
     </Step>
   );

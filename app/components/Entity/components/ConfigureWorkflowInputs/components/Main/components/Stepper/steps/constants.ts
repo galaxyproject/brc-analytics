@@ -1,4 +1,5 @@
 import { WORKFLOW_PARAMETER_VARIABLE } from "../../../../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { STEP as ACCESSION_COUNT_STEP } from "../components/Step/AccessionCountStep/step";
 import { STEP as DESEQ2_FORMULA_STEP } from "../components/Step/DESeq2FormulaStep/step";
 import { STEP as GTF_STEP } from "../components/Step/GTFStep/step";
 import { STEP as PRIMARY_CONTRASTS_STEP } from "../components/Step/PrimaryContrastsStep/step";
@@ -6,6 +7,7 @@ import { STEP as REFERENCE_ASSEMBLY_STEP } from "../components/Step/ReferenceAss
 import { RELATED_TRACKS_STEP } from "../components/Step/RelatedTracksStep/step";
 import { STEP as SAMPLE_SHEET_CLASSIFICATION_STEP } from "../components/Step/SampleSheetClassificationStep/step";
 import { STEP as SAMPLE_SHEET_STEP } from "../components/Step/SampleSheetStep/step";
+import { STEP as SEQUENCE_STEP } from "../components/Step/SequenceStep/step";
 import {
   ANY_END_STEP,
   PAIRED_END_STEP,
@@ -21,12 +23,14 @@ export const SEQUENCING_STEPS: Record<string, StepConfig> = {
 
 export const STEP: Record<
   | WORKFLOW_PARAMETER_VARIABLE
+  | "ACCESSION_COUNT"
   | "DESEQ2_FORMULA"
   | "PRIMARY_CONTRASTS"
   | "READ_RUN_ANY"
   | "RELATED_TRACKS"
   | "SAMPLE_SHEET"
   | "SAMPLE_SHEET_CLASSIFICATION"
+  | "SEQUENCE"
   | "STRANDEDNESS",
   StepConfig | null
 > = {
@@ -36,11 +40,13 @@ export const STEP: Record<
   [WORKFLOW_PARAMETER_VARIABLE.GENE_MODEL_URL]: GTF_STEP,
   [WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE]: SINGLE_END_STEP,
   [WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_PAIRED]: PAIRED_END_STEP,
+  ACCESSION_COUNT: ACCESSION_COUNT_STEP,
   DESEQ2_FORMULA: DESEQ2_FORMULA_STEP,
   PRIMARY_CONTRASTS: PRIMARY_CONTRASTS_STEP,
   READ_RUN_ANY: ANY_END_STEP,
   RELATED_TRACKS: RELATED_TRACKS_STEP,
   SAMPLE_SHEET: SAMPLE_SHEET_STEP,
   SAMPLE_SHEET_CLASSIFICATION: SAMPLE_SHEET_CLASSIFICATION_STEP,
+  SEQUENCE: SEQUENCE_STEP,
   STRANDEDNESS: STRANDEDNESS_STEP,
 };

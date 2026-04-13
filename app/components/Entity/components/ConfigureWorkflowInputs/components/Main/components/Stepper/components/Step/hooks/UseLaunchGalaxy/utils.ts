@@ -69,23 +69,31 @@ function getDEConfiguredValues(
 
 /**
  * Validates and returns configured values for SEQUENCE scope workflows.
- * SEQUENCE scope workflows (like LMLS) have parameters for input sequence FASTA and number of hits.
- * For now, return default/empty values to allow launching directly in Galaxy.
- * The stepper UI will eventually populate these values from user input.
- * @returns Configured values for SEQUENCE workflow.
+ * SEQUENCE scope workflows (like LMLS) require sequence FASTA and numberOfHits from user input.
+ * @param configuredInput - Configured input.
+ * @returns Configured values for SEQUENCE workflow or undefined if invalid.
  */
-function getLMLSConfiguredValues(): ConfiguredValue {
+function getLMLSConfiguredValues(
+  configuredInput: ConfiguredInput
+): ConfiguredValue | undefined {
+  const { numberOfHits, sequence } = configuredInput;
+
+  // Validate required fields for LMLS workflow
+  if (!sequence || numberOfHits === undefined) {
+    return;
+  }
+
   return {
     designFormula: null,
     geneModelUrl: null,
-    numberOfHits: 10,
+    numberOfHits,
     primaryContrasts: null,
     readRunsPaired: null,
     readRunsSingle: null,
     referenceAssembly: "",
     sampleSheet: null,
     sampleSheetClassification: null,
-    sequence: "",
+    sequence,
     strandedness: undefined,
     tracks: null,
   };
@@ -152,7 +160,7 @@ export function getConfiguredValues(
     workflow.trsId === LOGAN_SEARCH.trsId ||
     workflow.trsId === LEXICMAP.trsId
   ) {
-    return getLMLSConfiguredValues();
+    return getLMLSConfiguredValues(configuredInput);
   }
 
   return getStandardConfiguredValues(configuredInput, workflow);
