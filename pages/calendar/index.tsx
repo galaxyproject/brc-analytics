@@ -18,6 +18,7 @@ export const getStaticProps: GetStaticProps = async () => {
 
   return {
     props: {
+      pageDescription: "View upcoming events and workshops for BRC Analytics.",
       pageTitle: "Calendar",
       themeOptions: {
         palette: { background: { default: "#FAFBFB" } }, // SMOKE_LIGHTEST

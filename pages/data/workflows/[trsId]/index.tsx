@@ -13,6 +13,8 @@ interface Params extends ParsedUrlQuery {
 }
 
 export interface Props {
+  pageDescription?: string;
+  pageTitle?: string;
   trsId: string;
 }
 
@@ -52,7 +54,13 @@ export const getStaticProps: GetStaticProps<Props> = async ({
 
   if (!trsId) return { notFound: true };
 
-  return { props: { trsId } };
+  return {
+    props: {
+      pageDescription: "View workflow details on BRC Analytics.",
+      pageTitle: "Workflow",
+      trsId,
+    },
+  };
 };
 
 /**

@@ -29,6 +29,8 @@ interface Params extends ParsedUrlQuery {
 interface Props {
   entityId: string;
   entityListType: string;
+  pageDescription?: string;
+  pageTitle?: string;
   trsId: string;
 }
 
@@ -62,7 +64,16 @@ export const getStaticProps = async (
   if (!entityListType || !entityId || !trsId) return { notFound: true };
   if (entityListType !== "assemblies") return { notFound: true };
 
-  return { props: { entityId, entityListType, trsId } };
+  return {
+    props: {
+      entityId,
+      entityListType,
+      pageDescription:
+        "Configure workflow inputs for genome analysis on BRC Analytics.",
+      pageTitle: "Configure Workflow",
+      trsId,
+    },
+  };
 };
 
 const Page = (props: Props): JSX.Element => {

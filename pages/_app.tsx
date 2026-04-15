@@ -23,6 +23,7 @@ import { NextPage } from "next";
 import type { AppProps } from "next/app";
 import { JSX, useMemo } from "react";
 import { StyledFooter } from "../app/components/Layout/components/Footer/footer.styles";
+import { OgMeta } from "../app/components/common/OgMeta/ogMeta";
 import { config } from "../app/config/config";
 import { BrcAuthProvider } from "../app/providers/authentication";
 import { useEntities } from "../app/services/workflows/hooks/UseEntities/hook";
@@ -33,6 +34,7 @@ import { ROUTES } from "../routes/constants";
 const DEFAULT_ENTITY_LIST_TYPE = "organisms";
 
 export interface PageProps extends AzulEntitiesStaticResponse {
+  pageDescription?: string;
   pageTitle?: string;
 }
 
@@ -63,6 +65,7 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
   const { floating, footer, header } = layout || {};
   const {
     entityListType = DEFAULT_ENTITY_LIST_TYPE,
+    pageDescription,
     pageTitle,
     themeOptions,
   } = pageProps;
@@ -90,6 +93,7 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
       <ThemeProvider theme={appTheme}>
         <DXConfigProvider config={appConfig} entityListType={entityListType}>
           <Head pageTitle={pageTitle} />
+          <OgMeta pageDescription={pageDescription} pageTitle={pageTitle} />
           <CssBaseline />
           <QueryClientProvider client={queryClient}>
             <ServicesProvider>

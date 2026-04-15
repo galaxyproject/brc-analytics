@@ -10,6 +10,8 @@ export const Search = (): JSX.Element => {
 export const getStaticProps: GetStaticProps = async () => {
   return {
     props: {
+      pageDescription:
+        "Search across organisms, assemblies, and workflows on BRC Analytics.",
       pageTitle: "Search",
       themeOptions: {
         palette: { background: { default: "#FAFBFB" } }, // SMOKE_LIGHTEST

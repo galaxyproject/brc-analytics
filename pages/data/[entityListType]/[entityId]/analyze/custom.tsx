@@ -19,6 +19,8 @@ interface Params extends ParsedUrlQuery {
 
 export interface Props {
   entityId: string;
+  pageDescription?: string;
+  pageTitle?: string;
   trsId: string;
 }
 
@@ -55,7 +57,15 @@ export const getStaticProps: GetStaticProps<Props> = async ({
   if (!entityId) return { notFound: true };
 
   // Pass the custom workflow TRS ID as a prop to the page, so that the correct workflow is loaded in the WorkflowInputsView.
-  return { props: { entityId, trsId: CUSTOM_WORKFLOW.trsId } };
+  return {
+    props: {
+      entityId,
+      pageDescription:
+        "Configure a custom workflow for genome analysis on BRC Analytics.",
+      pageTitle: "Custom Workflow",
+      trsId: CUSTOM_WORKFLOW.trsId,
+    },
+  };
 };
 
 /**

@@ -4,7 +4,14 @@ import { JSX } from "react";
 import { WorkflowsView } from "../../../app/views/WorkflowsView/workflowsView";
 
 export const getStaticProps: GetStaticProps = () => {
-  return { props: { entityListType: "workflows", pageTitle: "Workflows" } };
+  return {
+    props: {
+      entityListType: "workflows",
+      pageDescription:
+        "Explore Galaxy workflows available for genomic analysis on BRC Analytics.",
+      pageTitle: "Workflows",
+    },
+  };
 };
 
 const Page = (): JSX.Element => {

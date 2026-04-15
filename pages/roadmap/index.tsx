@@ -25,6 +25,7 @@ export const getStaticProps: GetStaticProps = async () => {
 
   return {
     props: {
+      pageDescription: "View the development roadmap for BRC Analytics.",
       pageTitle: "Roadmap",
       themeOptions: {
         palette: { background: { default: "#FAFBFB" } }, // SMOKE_LIGHTEST

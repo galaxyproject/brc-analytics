@@ -10,6 +10,8 @@ export const Assistant = (): JSX.Element => {
 export const getStaticProps: GetStaticProps = async () => {
   return {
     props: {
+      pageDescription:
+        "Get AI-assisted help with genomic analysis on BRC Analytics.",
       pageTitle: "Analysis Assistant",
       themeOptions: {
         palette: { background: { default: "#FAFBFB" } },

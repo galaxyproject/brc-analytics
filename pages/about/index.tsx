@@ -25,6 +25,8 @@ export const getStaticProps: GetStaticProps = async () => {
 
   return {
     props: {
+      pageDescription:
+        "Learn about BRC Analytics, a platform for genomic analysis across organisms.",
       pageTitle: "About",
       themeOptions: {
         palette: { background: { default: "#FAFBFB" } }, // SMOKE_LIGHTEST

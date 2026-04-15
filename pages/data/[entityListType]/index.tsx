@@ -23,7 +23,30 @@ interface PageUrl extends ParsedUrlQuery {
 interface EntitiesPageProps<R> {
   data?: EntitiesResponse<R>;
   entityListType: string;
+  pageDescription?: string;
+  pageTitle?: string;
 }
+
+const ENTITY_LIST_META: Record<
+  string,
+  { pageDescription: string; pageTitle: string }
+> = {
+  assemblies: {
+    pageDescription:
+      "Browse genome assemblies available for analysis on BRC Analytics.",
+    pageTitle: "Assemblies",
+  },
+  organisms: {
+    pageDescription:
+      "Browse organisms available for genomic analysis on BRC Analytics.",
+    pageTitle: "Organisms",
+  },
+  "priority-pathogens": {
+    pageDescription:
+      "Browse priority pathogens available for analysis on BRC Analytics.",
+    pageTitle: "Priority Pathogens",
+  },
+};
 
 /**
  * Explore view page.
@@ -87,8 +110,12 @@ export const getStaticProps: GetStaticProps<
   const { exploreMode } = entityConfig;
   const { fetchAllEntities } = getEntityService(entityConfig, undefined); // Determine the type of fetch, either from an API endpoint or a TSV.
 
+  const entityMeta = ENTITY_LIST_META[entityListType];
+
   const props: EntitiesPageProps<BRCCatalog | GA2Catalog> = {
     entityListType,
+    pageDescription: entityMeta?.pageDescription,
+    pageTitle: entityMeta?.pageTitle,
   };
 
   // Seed database.

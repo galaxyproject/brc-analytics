@@ -11,7 +11,13 @@ const Page = (): JSX.Element => {
 export const getStaticProps: GetStaticProps<
   Pick<StaticProps, "pageTitle">
 > = async () => {
-  return { props: { pageTitle: "Learn About BRC Analytics" } };
+  return {
+    props: {
+      pageDescription:
+        "Learn about genomic analysis tools, workflows, and best practices on BRC Analytics.",
+      pageTitle: "Learn About BRC Analytics",
+    },
+  };
 };
 
 export default Page;

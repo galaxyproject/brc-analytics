@@ -18,6 +18,8 @@ interface Params extends ParsedUrlQuery {
 
 export interface Props {
   entityId: string;
+  pageDescription?: string;
+  pageTitle?: string;
 }
 
 export const getStaticPaths: GetStaticPaths<Params> = async () => {
@@ -52,7 +54,14 @@ export const getStaticProps: GetStaticProps<Props> = async ({
 
   if (!entityId) return { notFound: true };
 
-  return { props: { entityId } };
+  return {
+    props: {
+      entityId,
+      pageDescription:
+        "Select and configure workflows for genome analysis on BRC Analytics.",
+      pageTitle: "Analyze",
+    },
+  };
 };
 
 /**

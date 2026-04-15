@@ -27,7 +27,29 @@ export interface EntityPageProps<R> {
   data?: R;
   entityId: string;
   entityListType: string;
+  pageDescription?: string;
+  pageTitle?: string;
 }
+
+const ENTITY_DETAIL_META: Record<
+  string,
+  { pageDescription: string; pageTitle: string }
+> = {
+  assemblies: {
+    pageDescription:
+      "Select and configure workflows for genome analysis on BRC Analytics.",
+    pageTitle: "Analyze",
+  },
+  organisms: {
+    pageDescription:
+      "View organism details and available genome assemblies on BRC Analytics.",
+    pageTitle: "Organism",
+  },
+  "priority-pathogens": {
+    pageDescription: "View priority pathogen details on BRC Analytics.",
+    pageTitle: "Priority Pathogen",
+  },
+};
 
 /**
  * Entity detail view page.
@@ -89,10 +111,13 @@ export const getStaticProps: GetStaticProps<
   };
 
   const entityConfig = getEntityConfig(entities, entityListType);
+  const entityMeta = ENTITY_DETAIL_META[entityListType];
 
   const props: EntityPageProps<BRCCatalog | GA2Catalog> = {
     entityId,
     entityListType,
+    pageDescription: entityMeta?.pageDescription,
+    pageTitle: entityMeta?.pageTitle,
   };
 
   // Process entity props.

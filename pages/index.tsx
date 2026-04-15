@@ -29,6 +29,8 @@ export const getStaticProps: GetStaticProps = async () => {
 
   return {
     props: {
+      pageDescription:
+        "BRC Analytics: explore, analyze, and share genomic data across organisms using Galaxy workflows.",
       pageTitle: appTitle,
       themeOptions: {
         palette: { background: { default: backgroundColor } },
