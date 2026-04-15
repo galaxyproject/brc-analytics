@@ -3,7 +3,7 @@ import { LearnView } from "../../app/views/LearnView/learnView";
 import { GetStaticProps } from "next";
 import { BRC_PAGE_META } from "../../app/common/meta/brc/constants";
 import { StyledPagesMain } from "../../app/components/Layout/components/Main/main.styles";
-import { PageProps } from "../_app";
+import type { PageProps } from "../_app";
 
 const Page = (): JSX.Element => {
   return <LearnView />;
