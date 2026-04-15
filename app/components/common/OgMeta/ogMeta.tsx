@@ -1,9 +1,7 @@
 import NextHead from "next/head";
 import { useRouter } from "next/router";
 import { JSX } from "react";
-
-const DEFAULT_DESCRIPTION =
-  "BRC Analytics: explore, analyze, and share genomic data across organisms using Galaxy workflows.";
+import { BRC_PAGE_META } from "../../../common/meta/brc/constants";
 
 interface OgMetaProps {
   appTitle: string;
@@ -23,7 +21,7 @@ export const OgMeta = ({
     pageTitle && pageTitle !== appTitle
       ? `${pageTitle} - ${appTitle}`
       : appTitle;
-  const description = pageDescription || DEFAULT_DESCRIPTION;
+  const description = pageDescription || BRC_PAGE_META.HOME.pageDescription;
   const path = asPath.split(/[?#]/)[0];
   const url = `${browserURL}${path}`;
   const image = `${browserURL}/favicons/android-chrome-512x512.png`;

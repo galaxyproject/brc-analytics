@@ -6,6 +6,7 @@ import {
 } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
+import { BRC_PAGE_META } from "../../../../../../app/common/meta/brc/constants";
 import { config } from "../../../../../../app/config/config";
 import { getEntities } from "../../../../../../app/utils/entityUtils";
 import { seedDatabase } from "../../../../../../app/utils/seedDatabase";
@@ -57,9 +58,7 @@ export const getStaticProps: GetStaticProps<Props> = async ({
   return {
     props: {
       entityId,
-      pageDescription:
-        "Select and configure workflows for genome analysis on BRC Analytics.",
-      pageTitle: "Analyze",
+      ...BRC_PAGE_META.ANALYZE_WORKFLOWS,
     },
   };
 };

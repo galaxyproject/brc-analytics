@@ -8,6 +8,7 @@ import {
   EntitiesResponse,
 } from "../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { GA2Catalog } from "../../../../app/apis/catalog/ga2/entities";
+import { BRC_PAGE_META } from "../../../../app/common/meta/brc/constants";
 import { config } from "../../../../app/config/config";
 import { getEntities, getEntity } from "../../../../app/utils/entityUtils";
 import { seedDatabase } from "../../../../app/utils/seedDatabase";
@@ -35,20 +36,9 @@ const ENTITY_DETAIL_META: Record<
   string,
   { pageDescription: string; pageTitle: string }
 > = {
-  assemblies: {
-    pageDescription:
-      "Select and configure workflows for genome analysis on BRC Analytics.",
-    pageTitle: "Analyze",
-  },
-  organisms: {
-    pageDescription:
-      "View organism details and available genome assemblies on BRC Analytics.",
-    pageTitle: "Organism",
-  },
-  "priority-pathogens": {
-    pageDescription: "View priority pathogen details on BRC Analytics.",
-    pageTitle: "Priority Pathogen",
-  },
+  assemblies: BRC_PAGE_META.ASSEMBLY_DETAIL,
+  organisms: BRC_PAGE_META.ORGANISM_DETAIL,
+  "priority-pathogens": BRC_PAGE_META.PRIORITY_PATHOGEN_DETAIL,
 };
 
 /**

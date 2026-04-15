@@ -2,6 +2,7 @@ import { JSX } from "react";
 import { GetStaticProps } from "next";
 import { StyledPagesMain } from "../../app/components/Layout/components/Main/main.styles";
 import { CalendarView } from "../../app/views/CalendarView/calendarView";
+import { BRC_PAGE_META } from "../../app/common/meta/brc/constants";
 import { config } from "../../app/config/config";
 import { ROUTES } from "../../routes/constants";
 
@@ -18,8 +19,7 @@ export const getStaticProps: GetStaticProps = async () => {
 
   return {
     props: {
-      pageDescription: "View upcoming events and workshops for BRC Analytics.",
-      pageTitle: "Calendar",
+      ...BRC_PAGE_META.CALENDAR,
       themeOptions: {
         palette: { background: { default: "#FAFBFB" } }, // SMOKE_LIGHTEST
       },

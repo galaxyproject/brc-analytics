@@ -8,6 +8,7 @@ import {
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
 import { EntitiesResponse } from "../../../../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
+import { BRC_PAGE_META } from "../../../../../../../app/common/meta/brc/constants";
 import { config } from "../../../../../../../app/config/config";
 import { getEntities } from "../../../../../../../app/utils/entityUtils";
 import { seedDatabase } from "../../../../../../../app/utils/seedDatabase";
@@ -68,9 +69,7 @@ export const getStaticProps = async (
     props: {
       entityId,
       entityListType,
-      pageDescription:
-        "Configure workflow inputs for genome analysis on BRC Analytics.",
-      pageTitle: "Configure Workflow",
+      ...BRC_PAGE_META.CONFIGURE_WORKFLOW,
       trsId,
     },
   };

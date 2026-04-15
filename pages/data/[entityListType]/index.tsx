@@ -11,6 +11,7 @@ import {
   Outbreak,
 } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { GA2Catalog } from "../../../app/apis/catalog/ga2/entities";
+import { BRC_PAGE_META } from "../../../app/common/meta/brc/constants";
 import { config } from "../../../app/config/config";
 import { seedDatabase } from "../../../app/utils/seedDatabase";
 import { StyledExploreView } from "../../../app/views/ExploreView/exploreView.styles";
@@ -31,21 +32,9 @@ const ENTITY_LIST_META: Record<
   string,
   { pageDescription: string; pageTitle: string }
 > = {
-  assemblies: {
-    pageDescription:
-      "Browse genome assemblies available for analysis on BRC Analytics.",
-    pageTitle: "Assemblies",
-  },
-  organisms: {
-    pageDescription:
-      "Browse organisms available for genomic analysis on BRC Analytics.",
-    pageTitle: "Organisms",
-  },
-  "priority-pathogens": {
-    pageDescription:
-      "Browse priority pathogens available for analysis on BRC Analytics.",
-    pageTitle: "Priority Pathogens",
-  },
+  assemblies: BRC_PAGE_META.ASSEMBLIES,
+  organisms: BRC_PAGE_META.ORGANISMS,
+  "priority-pathogens": BRC_PAGE_META.PRIORITY_PATHOGENS,
 };
 
 /**

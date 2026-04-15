@@ -1,5 +1,6 @@
 import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main.styles";
 import { GetStaticProps } from "next";
+import { BRC_PAGE_META } from "../../../app/common/meta/brc/constants";
 import { JSX } from "react";
 import { WorkflowsView } from "../../../app/views/WorkflowsView/workflowsView";
 
@@ -7,9 +8,7 @@ export const getStaticProps: GetStaticProps = () => {
   return {
     props: {
       entityListType: "workflows",
-      pageDescription:
-        "Explore Galaxy workflows available for genomic analysis on BRC Analytics.",
-      pageTitle: "Workflows",
+      ...BRC_PAGE_META.WORKFLOWS,
     },
   };
 };

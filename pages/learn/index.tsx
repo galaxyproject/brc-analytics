@@ -1,6 +1,7 @@
 import { JSX } from "react";
 import { LearnView } from "../../app/views/LearnView/learnView";
 import { GetStaticProps } from "next";
+import { BRC_PAGE_META } from "../../app/common/meta/brc/constants";
 import { StyledPagesMain } from "../../app/components/Layout/components/Main/main.styles";
 import { PageProps } from "../_app";
 
@@ -13,9 +14,7 @@ export const getStaticProps: GetStaticProps<
 > = async () => {
   return {
     props: {
-      pageDescription:
-        "Learn about genomic analysis tools, workflows, and best practices on BRC Analytics.",
-      pageTitle: "Learn About BRC Analytics",
+      ...BRC_PAGE_META.LEARN,
     },
   };
 };

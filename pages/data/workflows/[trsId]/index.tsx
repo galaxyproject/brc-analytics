@@ -1,6 +1,7 @@
 import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
+import { BRC_PAGE_META } from "../../../../app/common/meta/brc/constants";
 import { formatTrsId } from "../../../../app/views/AnalyzeWorkflowsView/components/Main/utils";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../app/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { LEXICMAP } from "../../../../app/views/AnalyzeWorkflowsView/lexicmap/constants";
@@ -56,8 +57,7 @@ export const getStaticProps: GetStaticProps<Props> = async ({
 
   return {
     props: {
-      pageDescription: "View workflow details on BRC Analytics.",
-      pageTitle: "Workflow",
+      ...BRC_PAGE_META.WORKFLOW,
       trsId,
     },
   };
