@@ -2,14 +2,14 @@ import { JSX } from "react";
 import { LearnView } from "../../app/views/LearnView/learnView";
 import { GetStaticProps } from "next";
 import { StyledPagesMain } from "../../app/components/Layout/components/Main/main.styles";
-import { StaticProps } from "../../app/docs/common/staticGeneration/types";
+import { PageProps } from "../_app";
 
 const Page = (): JSX.Element => {
   return <LearnView />;
 };
 
 export const getStaticProps: GetStaticProps<
-  Pick<StaticProps, "pageTitle">
+  Pick<PageProps, "pageDescription" | "pageTitle">
 > = async () => {
   return {
     props: {
