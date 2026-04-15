@@ -1,4 +1,3 @@
-import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
 import NextHead from "next/head";
 import { useRouter } from "next/router";
 import { JSX } from "react";
@@ -7,17 +6,19 @@ const DEFAULT_DESCRIPTION =
   "BRC Analytics: explore, analyze, and share genomic data across organisms using Galaxy workflows.";
 
 interface OgMetaProps {
+  appTitle: string;
+  browserURL: string;
   pageDescription?: string;
   pageTitle?: string;
 }
 
 export const OgMeta = ({
+  appTitle,
+  browserURL,
   pageDescription,
   pageTitle,
 }: OgMetaProps): JSX.Element => {
-  const { config } = useConfig();
   const { asPath } = useRouter();
-  const { appTitle, browserURL } = config;
   const title =
     pageTitle && pageTitle !== appTitle
       ? `${pageTitle} - ${appTitle}`

@@ -86,14 +86,23 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
     };
   }, [header, isAssistantEnabled]);
 
-  if (!isEntitiesLoaded) return <></>;
+  const ogMeta = (
+    <OgMeta
+      appTitle={appConfig.appTitle}
+      browserURL={appConfig.browserURL}
+      pageDescription={pageDescription}
+      pageTitle={pageTitle}
+    />
+  );
+
+  if (!isEntitiesLoaded) return ogMeta;
 
   return (
     <EmotionThemeProvider theme={appTheme}>
       <ThemeProvider theme={appTheme}>
         <DXConfigProvider config={appConfig} entityListType={entityListType}>
           <Head pageTitle={pageTitle} />
-          <OgMeta pageDescription={pageDescription} pageTitle={pageTitle} />
+          {ogMeta}
           <CssBaseline />
           <QueryClientProvider client={queryClient}>
             <ServicesProvider>
