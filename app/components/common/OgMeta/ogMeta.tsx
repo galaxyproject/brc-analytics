@@ -1,11 +1,11 @@
 import NextHead from "next/head";
 import { useRouter } from "next/router";
 import { JSX } from "react";
-import { BRC_PAGE_META } from "../../../common/meta/brc/constants";
 
 interface OgMetaProps {
   appTitle: string;
   browserURL: string;
+  defaultDescription: string;
   pageDescription?: string;
   pageTitle?: string;
 }
@@ -13,6 +13,7 @@ interface OgMetaProps {
 export const OgMeta = ({
   appTitle,
   browserURL,
+  defaultDescription,
   pageDescription,
   pageTitle,
 }: OgMetaProps): JSX.Element => {
@@ -21,7 +22,7 @@ export const OgMeta = ({
     pageTitle && pageTitle !== appTitle
       ? `${pageTitle} - ${appTitle}`
       : appTitle;
-  const description = pageDescription || BRC_PAGE_META.HOME.pageDescription;
+  const description = pageDescription || defaultDescription;
   const path = asPath.split(/[?#]/)[0];
   const url = `${browserURL}${path}`;
   const image = `${browserURL}/favicons/android-chrome-512x512.png`;

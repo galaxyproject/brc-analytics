@@ -22,8 +22,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NextPage } from "next";
 import type { AppProps } from "next/app";
 import { JSX, useMemo } from "react";
-import { StyledFooter } from "../app/components/Layout/components/Footer/footer.styles";
+import { BRC_DEFAULT_DESCRIPTION } from "../app/common/meta/brc/constants";
 import { OgMeta } from "../app/components/common/OgMeta/ogMeta";
+import { StyledFooter } from "../app/components/Layout/components/Footer/footer.styles";
 import { config } from "../app/config/config";
 import { BrcAuthProvider } from "../app/providers/authentication";
 import { useEntities } from "../app/services/workflows/hooks/UseEntities/hook";
@@ -92,6 +93,7 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
     <OgMeta
       appTitle={appConfig.appTitle}
       browserURL={appConfig.browserURL}
+      defaultDescription={BRC_DEFAULT_DESCRIPTION}
       pageDescription={pageDescription}
       pageTitle={pageTitle}
     />

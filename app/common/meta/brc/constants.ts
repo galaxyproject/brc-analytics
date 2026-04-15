@@ -1,7 +1,9 @@
 /**
  * Page metadata for BRC Analytics — titles and descriptions used in OG/Twitter meta tags.
- * GA2 metadata lives in a separate file under meta/ga2/.
  */
+
+export const BRC_DEFAULT_DESCRIPTION =
+  "BRC Analytics: explore, analyze, and share genomic data across organisms using Galaxy workflows.";
 
 export const BRC_PAGE_META = {
   ABOUT: {
@@ -44,8 +46,7 @@ export const BRC_PAGE_META = {
     pageTitle: "Custom Workflow",
   },
   HOME: {
-    pageDescription:
-      "BRC Analytics: explore, analyze, and share genomic data across organisms using Galaxy workflows.",
+    pageDescription: BRC_DEFAULT_DESCRIPTION,
   },
   LEARN: {
     pageDescription:
