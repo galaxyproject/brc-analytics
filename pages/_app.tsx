@@ -30,6 +30,8 @@ import { useEntities } from "../app/services/workflows/hooks/UseEntities/hook";
 import "../app/styles/fonts/fonts.css";
 import { mergeAppTheme } from "../app/theme/theme";
 import { ROUTES } from "../routes/constants";
+import { APP_KEYS } from "../site-config/common/constants";
+import { AppSiteConfig } from "../site-config/common/entities";
 
 const DEFAULT_ENTITY_LIST_TYPE = "organisms";
 
@@ -86,16 +88,17 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
     };
   }, [header, isAssistantEnabled]);
 
-  const ogMeta = (
+  const isBRC = (appConfig as AppSiteConfig).appKey === APP_KEYS.BRC_ANALYTICS;
+  const ogMeta = isBRC ? (
     <OgMeta
       appTitle={appConfig.appTitle}
       browserURL={appConfig.browserURL}
       pageDescription={pageDescription}
       pageTitle={pageTitle}
     />
-  );
+  ) : null;
 
-  if (!isEntitiesLoaded) return ogMeta;
+  if (!isEntitiesLoaded) return <>{ogMeta}</>;
 
   return (
     <EmotionThemeProvider theme={appTheme}>
