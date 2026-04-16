@@ -5,8 +5,6 @@ import {
 import { Workflow } from "../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import { WORKFLOW_PARAMETER_VARIABLE } from "../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
-import { LEXICMAP } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/lexicmap/constants";
-import { LOGAN_SEARCH } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/loganSearch/constants";
 import { ConfiguredInput } from "../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { ConfiguredValue } from "./types";
 
@@ -69,8 +67,7 @@ function getDEConfiguredValues(
 }
 
 /**
- * Returns default configured values for ASSEMBLY scope workflows.
- * ASSEMBLY scope workflows require assembly selection and may have additional parameters.
+ * Validates and returns configured values for standard workflows.
  * @param configuredInput - Configured input.
  * @param workflow - Workflow to check required parameters.
  * @returns Configured values for ASSEMBLY workflow or undefined if invalid.
@@ -130,21 +127,27 @@ function getOrganismScopeConfiguredValues(): ConfiguredValue {
 }
 
 /**
- * Returns default configured values for SEQUENCE scope workflows.
- * SEQUENCE scope workflows operate on user-provided sequences.
- * For Phase 1, return default/empty values to allow launching directly in Galaxy.
- * The stepper UI will eventually populate these values from user input.
- * @returns Configured values for SEQUENCE workflow.
- * (Phase 2): Add validation for required parameters (e.g., check if sequence input is
- * required and return undefined if missing to disable launch button until user provides input).
+ * Validates and returns configured values for SEQUENCE scope workflows.
+ * SEQUENCE scope workflows (like LMLS) require sequence FASTA and numberOfHits from user input.
+ * @param configuredInput - Configured input.
+ * @returns Configured values for SEQUENCE workflow or undefined if invalid.
  */
-function getSequenceScopeConfiguredValues(): ConfiguredValue {
+function getSequenceScopeConfiguredValues(
+  configuredInput: ConfiguredInput
+): ConfiguredValue | undefined {
+  const { numberOfHits, sequence } = configuredInput;
+
+  // Validate required fields for SEQUENCE workflows
+  if (!sequence || numberOfHits === undefined) {
+    return;
+  }
+
   return {
     _scope: "SEQUENCE",
-    numberOfHits: 10,
+    numberOfHits,
     readRunsPaired: null,
     readRunsSingle: null,
-    sequence: "",
+    sequence,
     tracks: null,
   };
 }
@@ -164,14 +167,6 @@ export function getConfiguredValues(
     return getDEConfiguredValues(configuredInput);
   }
 
-  // Handle LMLS workflows separately (special case - not in IWC yet)
-  if (
-    workflow.trsId === LOGAN_SEARCH.trsId ||
-    workflow.trsId === LEXICMAP.trsId
-  ) {
-    return getSequenceScopeConfiguredValues();
-  }
-
   // For all other workflows, use scope-based logic
   switch (workflow.scope) {
     case "ASSEMBLY":
@@ -179,7 +174,7 @@ export function getConfiguredValues(
     case "ORGANISM":
       return getOrganismScopeConfiguredValues();
     case "SEQUENCE":
-      return getSequenceScopeConfiguredValues();
+      return getSequenceScopeConfiguredValues(configuredInput);
   }
 }
 

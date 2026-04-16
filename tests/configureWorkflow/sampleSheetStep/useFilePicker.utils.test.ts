@@ -38,7 +38,7 @@ describe("parseFile", () => {
 
       const result = await parseFile(file);
 
-      expect(result.rows).toEqual([
+      expect(result.data).toEqual([
         { age: "30", city: "Boston", country: "USA", name: "Alice" },
         { age: "25", city: "Seattle", country: "USA", name: "Bob" },
       ]);
@@ -52,7 +52,7 @@ describe("parseFile", () => {
 
       const result = await parseFile(file);
 
-      expect(result.rows).toEqual([
+      expect(result.data).toEqual([
         { age: "30", city: "Boston", country: "USA", name: "Alice" },
         { age: "25", city: "Seattle", country: "USA", name: "Bob" },
       ]);
@@ -65,7 +65,7 @@ describe("parseFile", () => {
 
       const result = await parseFile(file);
 
-      expect(result.rows).toEqual([
+      expect(result.data).toEqual([
         { a: "1", b: "2", c: "3", d: "4" },
         { a: "5", b: "6", c: "7", d: "8" },
       ]);
@@ -77,7 +77,7 @@ describe("parseFile", () => {
 
       const result = await parseFile(file);
 
-      expect(result.rows).toEqual([
+      expect(result.data).toEqual([
         { a: "1", b: "2", c: "3", d: "4" },
         { a: "5", b: "6", c: "7", d: "8" },
       ]);
@@ -90,7 +90,7 @@ describe("parseFile", () => {
 
       const result = await parseFile(file);
 
-      expect(result.rows).toEqual([
+      expect(result.data).toEqual([
         {
           country: "USA",
           location: "New York City",
@@ -117,7 +117,7 @@ describe("parseFile", () => {
       const result = await parseFile(file);
 
       expect(result.errors).toEqual([VALIDATION_ERROR.FILE_TOO_LARGE]);
-      expect(result.rows).toEqual([]);
+      expect(result.data).toEqual([]);
     });
 
     test("returns error when file has fewer than 4 columns", async () => {
@@ -184,7 +184,7 @@ describe("parseFile", () => {
       const result = await parseFile(file);
 
       expect(result.errors).toEqual([VALIDATION_ERROR.EMPTY_HEADERS]);
-      expect(result.rows).toEqual([]);
+      expect(result.data).toEqual([]);
     });
 
     test("returns error and empty rows when headers are duplicated", async () => {
@@ -194,7 +194,7 @@ describe("parseFile", () => {
       const result = await parseFile(file);
 
       expect(result.errors).toEqual([VALIDATION_ERROR.DUPLICATE_HEADERS]);
-      expect(result.rows).toEqual([]);
+      expect(result.data).toEqual([]);
     });
   });
 });

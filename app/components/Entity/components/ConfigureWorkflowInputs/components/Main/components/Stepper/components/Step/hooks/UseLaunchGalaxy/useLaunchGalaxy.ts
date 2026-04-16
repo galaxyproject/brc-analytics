@@ -15,6 +15,7 @@ import { Workflow } from "../../../../../../../../../../../../apis/catalog/brc-a
 import {
   ConfiguredValue,
   isAssemblyConfiguredValue,
+  isSequenceConfiguredValue,
   Props,
   UseLaunchGalaxy,
 } from "./types";
@@ -58,7 +59,21 @@ async function getLandingUrlForWorkflow(
     if (!workflow.workflowId) {
       throw new Error("Missing workflow ID for LMLS workflow");
     }
-    return run(getLMLSLandingUrl(workflow.workflowId, origin));
+    if (
+      !isSequenceConfiguredValue(configuredValue) ||
+      !configuredValue.numberOfHits ||
+      !configuredValue.sequence
+    ) {
+      throw new Error("Missing required values for LMLS workflow");
+    }
+    return run(
+      getLMLSLandingUrl(
+        workflow.workflowId,
+        configuredValue.numberOfHits,
+        configuredValue.sequence,
+        origin
+      )
+    );
   }
 
   if (workflow.trsId === DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId) {
