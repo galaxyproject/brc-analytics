@@ -83,6 +83,60 @@ describe("parseFile", () => {
       ]);
     });
 
+    test("parses CSV file with CRLF line endings", async () => {
+      const csvContent =
+        "name,age,city,country\r\nAlice,30,Boston,USA\r\nBob,25,Seattle,USA\r\n";
+      const file = createMockFile(csvContent, "test.csv");
+
+      const result = await parseFile(file);
+
+      expect(result.data).toEqual([
+        { age: "30", city: "Boston", country: "USA", name: "Alice" },
+        { age: "25", city: "Seattle", country: "USA", name: "Bob" },
+      ]);
+      expect(result.errors).toEqual([]);
+    });
+
+    test("parses TSV file with CRLF line endings", async () => {
+      const tsvContent =
+        "name\tage\tcity\tcountry\r\nAlice\t30\tBoston\tUSA\r\nBob\t25\tSeattle\tUSA\r\n";
+      const file = createMockFile(tsvContent, "test.tsv");
+
+      const result = await parseFile(file);
+
+      expect(result.data).toEqual([
+        { age: "30", city: "Boston", country: "USA", name: "Alice" },
+        { age: "25", city: "Seattle", country: "USA", name: "Bob" },
+      ]);
+      expect(result.errors).toEqual([]);
+    });
+
+    test("skips empty CRLF lines", async () => {
+      const csvContent = "a,b,c,d\r\n1,2,3,4\r\n\r\n5,6,7,8\r\n";
+      const file = createMockFile(csvContent, "test.csv");
+
+      const result = await parseFile(file);
+
+      expect(result.data).toEqual([
+        { a: "1", b: "2", c: "3", d: "4" },
+        { a: "5", b: "6", c: "7", d: "8" },
+      ]);
+      expect(result.errors).toEqual([]);
+    });
+
+    test("parses CSV file with CR-only (classic Mac) line endings", async () => {
+      const csvContent = "a,b,c,d\r1,2,3,4\r5,6,7,8";
+      const file = createMockFile(csvContent, "test.csv");
+
+      const result = await parseFile(file);
+
+      expect(result.data).toEqual([
+        { a: "1", b: "2", c: "3", d: "4" },
+        { a: "5", b: "6", c: "7", d: "8" },
+      ]);
+      expect(result.errors).toEqual([]);
+    });
+
     test("handles values with spaces", async () => {
       const csvContent =
         "name,location,country,notes\nAlice Smith,New York City,USA,test";
