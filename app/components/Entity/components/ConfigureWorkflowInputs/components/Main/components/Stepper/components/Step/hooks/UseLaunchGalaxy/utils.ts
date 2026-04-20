@@ -81,11 +81,12 @@ function getAssemblyScopeConfiguredValues(
 
   // If workflow is not available yet, return undefined
   if (!workflow?.parameters) return;
+  // ASSEMBLY-scope workflows always require referenceAssembly
+  if (!referenceAssembly) return;
+
   // Check which parameters are required by the workflow
   const requiredParams = getRequiredParameterTypes(workflow);
 
-  // Only check for required values
-  if (requiredParams.ASSEMBLY_FASTA_URL && !referenceAssembly) return;
   // For geneModelUrl, treat empty string as valid (user skipped or will upload manually)
   if (requiredParams.GENE_MODEL_URL && geneModelUrl === null) return;
   if (requiredParams.SANGER_READ_RUN_SINGLE && !readRunsSingle) return;
@@ -98,7 +99,7 @@ function getAssemblyScopeConfiguredValues(
     primaryContrasts: null,
     readRunsPaired: readRunsPaired ?? null,
     readRunsSingle: readRunsSingle ?? null,
-    referenceAssembly: referenceAssembly!,
+    referenceAssembly,
     sampleSheet: null,
     sampleSheetClassification: null,
     strandedness: undefined,
