@@ -45,46 +45,55 @@ export function parseFile(
       return;
     }
 
-    Papa.parse<Record<string, string>>(file, {
-      complete: ({ data: rows, meta }) => {
-        const columnNames = getColumnNames(meta.fields);
+    // Normalize line endings (CRLF and lone CR → LF) so parsing is consistent
+    // across OSes — uploads from Windows/Excel otherwise leave trailing \r in
+    // the last cell of each row.
+    const reader = new FileReader();
+    reader.onerror = (): void => reject(reader.error);
+    reader.onload = (): void => {
+      const normalized = (reader.result as string).replace(/\r\n?/g, "\n");
+      Papa.parse<Record<string, string>>(normalized, {
+        complete: ({ data: rows, meta }) => {
+          const columnNames = getColumnNames(meta.fields);
 
-        // Check for empty headers.
-        if (columnNames.has("")) {
-          resolve({
-            data: [],
-            errors: [VALIDATION_ERROR.EMPTY_HEADERS],
-          });
-          return;
-        }
+          // Check for empty headers.
+          if (columnNames.has("")) {
+            resolve({
+              data: [],
+              errors: [VALIDATION_ERROR.EMPTY_HEADERS],
+            });
+            return;
+          }
 
-        // Check for duplicate headers.
-        if (meta.renamedHeaders) {
-          resolve({
-            data: [],
-            errors: [VALIDATION_ERROR.DUPLICATE_HEADERS],
-          });
-          return;
-        }
+          // Check for duplicate headers.
+          if (meta.renamedHeaders) {
+            resolve({
+              data: [],
+              errors: [VALIDATION_ERROR.DUPLICATE_HEADERS],
+            });
+            return;
+          }
 
-        // Validate column count.
-        if (columnNames.size < MIN_COLUMNS) {
-          errors.push(VALIDATION_ERROR.INSUFFICIENT_COLUMNS);
-        }
+          // Validate column count.
+          if (columnNames.size < MIN_COLUMNS) {
+            errors.push(VALIDATION_ERROR.INSUFFICIENT_COLUMNS);
+          }
 
-        // Validate row count.
-        if (rows.length < MIN_DATA_ROWS) {
-          errors.push(VALIDATION_ERROR.INSUFFICIENT_ROWS);
-        }
+          // Validate row count.
+          if (rows.length < MIN_DATA_ROWS) {
+            errors.push(VALIDATION_ERROR.INSUFFICIENT_ROWS);
+          }
 
-        resolve({ data: rows, errors });
-      },
-      delimiter: getDelimiter(file.name),
-      error: (error) => {
-        reject(error);
-      },
-      header: true,
-      skipEmptyLines: true,
-    });
+          resolve({ data: rows, errors });
+        },
+        delimiter: getDelimiter(file.name),
+        error: (error: Error) => {
+          reject(error);
+        },
+        header: true,
+        skipEmptyLines: true,
+      });
+    };
+    reader.readAsText(file);
   });
 }
