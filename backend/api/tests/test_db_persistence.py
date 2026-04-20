@@ -100,7 +100,9 @@ async def test_saved_analysis_crud_round_trip():
             session,
             user,
             title="Saved analysis title",
-            schema={"organism": {"status": "filled", "value": "Influenza A", "detail": None}},
+            schema={
+                "organism": {"status": "filled", "value": "Influenza A", "detail": None}
+            },
             messages=[{"role": "user", "content": "Help me analyze influenza"}],
             source_session="session-123",
         )
