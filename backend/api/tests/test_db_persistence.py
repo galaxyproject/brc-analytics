@@ -2,9 +2,13 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.db.crud import (
+    create_saved_analysis,
     delete_favorite,
+    delete_saved_analysis,
+    get_saved_analysis,
     get_user_by_keycloak_sub,
     list_favorites_for_user,
+    list_saved_analyses_for_user,
     upsert_favorite,
     upsert_user_from_claims,
 )
@@ -78,3 +82,37 @@ async def test_favorite_crud_round_trip():
 
         assert deleted is True
         assert favorites_after_delete == []
+
+
+@pytest.mark.asyncio
+async def test_saved_analysis_crud_round_trip():
+    async with await _create_session() as session:
+        user = await upsert_user_from_claims(
+            session,
+            {
+                "sub": "kc-789",
+                "email": "saved@example.com",
+                "name": "Saved User",
+            },
+        )
+
+        saved_analysis = await create_saved_analysis(
+            session,
+            user,
+            title="Saved analysis title",
+            schema={"organism": {"status": "filled", "value": "Influenza A", "detail": None}},
+            messages=[{"role": "user", "content": "Help me analyze influenza"}],
+            source_session="session-123",
+        )
+        saved_analyses = await list_saved_analyses_for_user(session, user)
+        fetched = await get_saved_analysis(session, user, str(saved_analysis.id))
+
+        assert len(saved_analyses) == 1
+        assert fetched is not None
+        assert fetched.title == "Saved analysis title"
+
+        deleted = await delete_saved_analysis(session, user, str(saved_analysis.id))
+        saved_analyses_after_delete = await list_saved_analyses_for_user(session, user)
+
+        assert deleted is True
+        assert saved_analyses_after_delete == []

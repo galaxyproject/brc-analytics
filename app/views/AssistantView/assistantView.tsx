@@ -17,7 +17,15 @@ import {
 } from "./assistantView.styles";
 import { Headline } from "./components/Headline/headline";
 
-export const AssistantView = (): JSX.Element => {
+interface Props {
+  initialSavedAnalysisId?: string;
+  initialSessionId?: string;
+}
+
+export const AssistantView = ({
+  initialSavedAnalysisId,
+  initialSessionId,
+}: Props): JSX.Element => {
   const isAssistantEnabled = useFeatureFlag("assistant");
   const {
     error,
@@ -27,10 +35,16 @@ export const AssistantView = (): JSX.Element => {
     messages,
     onRetry,
     resetSession,
+    saveAnalysis,
+    saveLoading,
+    saveMessage,
     schema,
     sendMessage,
     suggestions,
-  } = useAssistantChat();
+  } = useAssistantChat({
+    initialSavedAnalysisId,
+    initialSessionId,
+  });
   const [info, setInfo] = useState<AssistantInfoResponse | null>(null);
 
   useEffect(() => {
@@ -75,7 +89,10 @@ export const AssistantView = (): JSX.Element => {
               loading={loading}
               messages={messages}
               onRetry={onRetry}
+              onSave={saveAnalysis}
               onSend={sendMessage}
+              saveLabel={saveMessage}
+              saveLoading={saveLoading}
               suggestions={suggestions}
             />
           </ChatColumn>

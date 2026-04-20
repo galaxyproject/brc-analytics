@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import uuid
 from typing import Any
 
 from sqlalchemy import select
@@ -105,10 +106,15 @@ async def list_saved_analyses_for_user(
 async def get_saved_analysis(
     session: AsyncSession, user: User, saved_analysis_id: str
 ) -> SavedAnalysis | None:
+    try:
+        saved_analysis_uuid = uuid.UUID(saved_analysis_id)
+    except ValueError:
+        return None
+
     result = await session.execute(
         select(SavedAnalysis).where(
             SavedAnalysis.user_id == user.id,
-            SavedAnalysis.id == saved_analysis_id,
+            SavedAnalysis.id == saved_analysis_uuid,
         )
     )
     return result.scalar_one_or_none()

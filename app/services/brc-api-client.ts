@@ -2,6 +2,9 @@ import ky, { HTTPError } from "ky";
 import { API_BASE_URL } from "../config/api";
 import {
   FavoriteResponse,
+  SavedAnalysisDetail,
+  SavedAnalysisRestoreResponse,
+  SavedAnalysisSummary,
   UserMeResponse,
   UserPreferences,
 } from "../types/api";
@@ -41,6 +44,10 @@ export const brcAPIClient = {
     await apiClient.delete(`favorites/${entity_type}/${entity_id}`);
   },
 
+  deleteSavedAnalysis: async (id: string): Promise<void> => {
+    await apiClient.delete(`saved_analyses/${id}`);
+  },
+
   getFavorites: async (
     entity_type = "assembly"
   ): Promise<FavoriteResponse[]> => {
@@ -51,8 +58,31 @@ export const brcAPIClient = {
     return apiClient.get("user/preferences").json();
   },
 
+  getSavedAnalyses: async (): Promise<SavedAnalysisSummary[]> => {
+    return apiClient.get("saved_analyses").json();
+  },
+
+  getSavedAnalysis: async (id: string): Promise<SavedAnalysisDetail> => {
+    return apiClient.get(`saved_analyses/${id}`).json();
+  },
+
   getUser: async (): Promise<UserMeResponse> => {
     return apiClient.get("user/me").json();
+  },
+
+  restoreSavedAnalysis: async (
+    id: string
+  ): Promise<SavedAnalysisRestoreResponse> => {
+    return apiClient.post(`saved_analyses/${id}/restore`).json();
+  },
+
+  saveAnalysis: async (
+    session_id: string,
+    title?: string
+  ): Promise<SavedAnalysisSummary> => {
+    return apiClient
+      .post("saved_analyses", { json: { session_id, title } })
+      .json();
   },
 
   updatePreferences: async (
