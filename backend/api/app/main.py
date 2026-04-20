@@ -5,7 +5,17 @@ import sentry_sdk
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1 import assistant, auth, cache, ena, health, links, user, version
+from app.api.v1 import (
+    assistant,
+    auth,
+    cache,
+    ena,
+    favorites,
+    health,
+    links,
+    user,
+    version,
+)
 from app.core.config import get_settings
 from app.core.dependencies import (
     get_auth_service,
@@ -81,6 +91,7 @@ def create_app() -> FastAPI:
     app.include_router(ena.router, prefix="/api/v1/ena", tags=["ena"])
     app.include_router(assistant.router, prefix="/api/v1/assistant", tags=["assistant"])
     app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
+    app.include_router(favorites.router, prefix="/api/v1/favorites", tags=["favorites"])
     app.include_router(user.router, prefix="/api/v1/user", tags=["user"])
 
     app.mount("/api/v1/mcp", mcp_app)

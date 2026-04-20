@@ -76,3 +76,9 @@ export interface UserMeResponse {
   realm_roles: string[];
   sub: string;
 }
+
+export interface FavoriteResponse {
+  created_at: string;
+  entity_id: string;
+  entity_type: string;
+}

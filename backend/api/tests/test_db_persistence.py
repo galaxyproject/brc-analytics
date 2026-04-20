@@ -1,7 +1,13 @@
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from app.db.crud import get_user_by_keycloak_sub, upsert_user_from_claims
+from app.db.crud import (
+    delete_favorite,
+    get_user_by_keycloak_sub,
+    list_favorites_for_user,
+    upsert_favorite,
+    upsert_user_from_claims,
+)
 from app.db.models import Base
 
 
@@ -47,3 +53,28 @@ async def test_upsert_user_from_claims_creates_and_updates_user():
         assert updated_user.id == user.id
         assert fetched.email == "updated@example.com"
         assert fetched.name == "Updated User"
+
+
+@pytest.mark.asyncio
+async def test_favorite_crud_round_trip():
+    async with await _create_session() as session:
+        user = await upsert_user_from_claims(
+            session,
+            {
+                "sub": "kc-456",
+                "email": "fav@example.com",
+                "name": "Favorite User",
+            },
+        )
+
+        favorite = await upsert_favorite(session, user, "assembly", "GCF_000001405.40")
+        favorites = await list_favorites_for_user(session, user)
+
+        assert favorite.entity_id == "GCF_000001405.40"
+        assert [item.entity_id for item in favorites] == ["GCF_000001405.40"]
+
+        deleted = await delete_favorite(session, user, "assembly", "GCF_000001405.40")
+        favorites_after_delete = await list_favorites_for_user(session, user)
+
+        assert deleted is True
+        assert favorites_after_delete == []

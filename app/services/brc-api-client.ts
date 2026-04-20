@@ -1,6 +1,10 @@
 import ky, { HTTPError } from "ky";
 import { API_BASE_URL } from "../config/api";
-import { UserMeResponse, UserPreferences } from "../types/api";
+import {
+  FavoriteResponse,
+  UserMeResponse,
+  UserPreferences,
+} from "../types/api";
 
 const apiClient = ky.create({
   credentials: "include",
@@ -21,6 +25,28 @@ const apiClient = ky.create({
 });
 
 export const brcAPIClient = {
+  createFavorite: async (
+    entity_id: string,
+    entity_type = "assembly"
+  ): Promise<FavoriteResponse> => {
+    return apiClient
+      .post("favorites", { json: { entity_id, entity_type } })
+      .json();
+  },
+
+  deleteFavorite: async (
+    entity_id: string,
+    entity_type = "assembly"
+  ): Promise<void> => {
+    await apiClient.delete(`favorites/${entity_type}/${entity_id}`);
+  },
+
+  getFavorites: async (
+    entity_type = "assembly"
+  ): Promise<FavoriteResponse[]> => {
+    return apiClient.get("favorites", { searchParams: { entity_type } }).json();
+  },
+
   getPreferences: async (): Promise<UserPreferences> => {
     return apiClient.get("user/preferences").json();
   },
