@@ -173,7 +173,13 @@ describe("getConfiguredValues - scope-based logic", () => {
         scope: WORKFLOW_SCOPE.SEQUENCE,
       };
 
-      const result = getConfiguredValues(BASE_CONFIGURED_INPUT, workflow);
+      const configuredInput: ConfiguredInput = {
+        ...BASE_CONFIGURED_INPUT,
+        numberOfHits: 10,
+        sequence: ">test\nATCG",
+      };
+
+      const result = getConfiguredValues(configuredInput, workflow);
 
       expect(result).toBeDefined();
       expect(result?._scope).toBe("SEQUENCE");
@@ -185,22 +191,51 @@ describe("getConfiguredValues - scope-based logic", () => {
         scope: WORKFLOW_SCOPE.SEQUENCE,
       };
 
-      const result = getConfiguredValues(BASE_CONFIGURED_INPUT, workflow);
+      const configuredInput: ConfiguredInput = {
+        ...BASE_CONFIGURED_INPUT,
+        numberOfHits: 10,
+        sequence: ">test\nATCG",
+      };
+
+      const result = getConfiguredValues(configuredInput, workflow);
 
       expect(result).toBeDefined();
       expect(result).toHaveProperty("numberOfHits", 10);
-      expect(result).toHaveProperty("sequence", "");
+      expect(result).toHaveProperty("sequence", ">test\nATCG");
     });
 
-    test("always returns value regardless of configuredInput (no validation)", () => {
+    test("returns undefined when required sequence is missing", () => {
       const workflow: Workflow = {
         ...BASE_WORKFLOW,
         scope: WORKFLOW_SCOPE.SEQUENCE,
       };
 
-      const result = getConfiguredValues(BASE_CONFIGURED_INPUT, workflow);
+      const configuredInput: ConfiguredInput = {
+        ...BASE_CONFIGURED_INPUT,
+        numberOfHits: 10,
+        // sequence is missing
+      };
 
-      expect(result).toBeDefined();
+      const result = getConfiguredValues(configuredInput, workflow);
+
+      expect(result).toBeUndefined();
+    });
+
+    test("returns undefined when required numberOfHits is missing", () => {
+      const workflow: Workflow = {
+        ...BASE_WORKFLOW,
+        scope: WORKFLOW_SCOPE.SEQUENCE,
+      };
+
+      const configuredInput: ConfiguredInput = {
+        ...BASE_CONFIGURED_INPUT,
+        sequence: ">test\nATCG",
+        // numberOfHits is missing
+      };
+
+      const result = getConfiguredValues(configuredInput, workflow);
+
+      expect(result).toBeUndefined();
     });
   });
 
@@ -246,7 +281,13 @@ describe("getConfiguredValues - scope-based logic", () => {
         scope: WORKFLOW_SCOPE.SEQUENCE,
       };
 
-      const result = getConfiguredValues(BASE_CONFIGURED_INPUT, workflow);
+      const configuredInput: ConfiguredInput = {
+        ...BASE_CONFIGURED_INPUT,
+        numberOfHits: 10,
+        sequence: ">test\nATCG",
+      };
+
+      const result = getConfiguredValues(configuredInput, workflow);
 
       expect(result?._scope).toBe("SEQUENCE");
       // Type guard would narrow to SequenceConfiguredValue
