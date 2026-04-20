@@ -43,6 +43,9 @@ class Settings:
 
         # Database settings (for future use)
         self.DATABASE_URL: str = os.getenv("DATABASE_URL", "")
+        self.DATABASE_ECHO: bool = os.getenv("DATABASE_ECHO", "false").lower() == "true"
+        self.DATABASE_POOL_SIZE: int = int(os.getenv("DATABASE_POOL_SIZE", "5"))
+        self.DATABASE_MAX_OVERFLOW: int = int(os.getenv("DATABASE_MAX_OVERFLOW", "10"))
 
         # ENA API settings
         self.ENA_API_BASE: str = os.getenv(

@@ -2,9 +2,12 @@ import logging
 
 from fastapi import APIRouter, Cookie, Depends, Response
 from fastapi.responses import JSONResponse, RedirectResponse
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
 from app.core.dependencies import get_auth_service
+from app.db.crud import upsert_user_from_claims
+from app.db.session import get_db_session
 from app.services.auth_service import COOKIE_NAME, AuthService
 
 logger = logging.getLogger(__name__)
@@ -33,6 +36,7 @@ async def callback(
     error: str = "",
     error_description: str = "",
     auth: AuthService = Depends(get_auth_service),
+    db_session: AsyncSession = Depends(get_db_session),
 ) -> Response:
     """Handle the OIDC callback from Keycloak.
 
@@ -68,6 +72,18 @@ async def callback(
         return JSONResponse(
             status_code=500,
             content={"error": "Token exchange failed"},
+        )
+
+    try:
+        claims = auth.decode_token_claims(
+            token_response.get("id_token") or token_response["access_token"]
+        )
+        await upsert_user_from_claims(db_session, claims)
+    except ValueError as e:
+        logger.error("User provisioning failed: %s", e)
+        return JSONResponse(
+            status_code=500,
+            content={"error": "User provisioning failed"},
         )
 
     session_id = await auth.create_session(token_response)

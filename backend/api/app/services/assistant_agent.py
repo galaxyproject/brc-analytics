@@ -27,6 +27,7 @@ from app.models.assistant import (
     FieldStatus,
     MessageRole,
     SchemaField,
+    SessionState,
     SuggestionChip,
     TokenUsage,
 )
@@ -506,7 +507,10 @@ class AssistantAgent:
             ) from e
 
     async def chat(
-        self, message: str, session_id: Optional[str] = None
+        self,
+        message: str,
+        session_id: Optional[str] = None,
+        owner_keycloak_sub: Optional[str] = None,
     ) -> ChatResponse:
         """Process one user message and return the assistant's reply.
 
@@ -518,9 +522,20 @@ class AssistantAgent:
         # Get or create session
         state = None
         if session_id:
-            state = await self.session_service.get_session(session_id)
+            try:
+                state = await self.session_service.require_session(
+                    session_id, owner_keycloak_sub
+                )
+            except PermissionError as e:
+                raise RuntimeError(
+                    "Assistant session does not belong to this user"
+                ) from e
+            except KeyError:
+                state = None
         if state is None:
-            state = await self.session_service.create_session()
+            state = await self.session_service.create_session(
+                owner_keycloak_sub=owner_keycloak_sub
+            )
 
         # Record user message
         state.messages.append(ChatMessage(role=MessageRole.USER, content=message))
@@ -600,6 +615,19 @@ class AssistantAgent:
             is_complete=is_complete,
             handoff_url=handoff_url,
             token_usage=token_usage,
+        )
+
+    async def restore_saved_session(
+        self,
+        *,
+        owner_keycloak_sub: str,
+        schema_state: AnalysisSchema,
+        messages: list[ChatMessage],
+    ) -> SessionState:
+        return await self.session_service.create_session(
+            owner_keycloak_sub=owner_keycloak_sub,
+            schema_state=schema_state,
+            messages=messages,
         )
 
     def _parse_structured_output(

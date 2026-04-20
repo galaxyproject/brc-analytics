@@ -4,7 +4,11 @@ from typing import Optional
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
 
 from app.core.config import DEV_ENVIRONMENTS, SESSION_COOKIE_NAME, get_settings
-from app.core.dependencies import check_rate_limit, get_assistant_agent
+from app.core.dependencies import (
+    check_rate_limit,
+    get_assistant_agent,
+    get_optional_current_user,
+)
 from app.core.session_signing import sign_session_id, verify_session_id
 from app.models.assistant import (
     AssistantInfoResponse,
@@ -12,6 +16,7 @@ from app.models.assistant import (
     ChatResponse,
     SessionRestoreResponse,
 )
+from app.models.user_data import UserMeResponse
 from app.services.assistant_agent import AssistantTimeoutError
 
 logger = logging.getLogger(__name__)
@@ -71,6 +76,7 @@ async def assistant_chat(
     response: Response,
     agent=Depends(get_assistant_agent),
     _rate_limit=Depends(check_rate_limit),
+    current_user: UserMeResponse | None = Depends(get_optional_current_user),
 ):
     """Send a message to the analysis assistant and get a reply.
 
@@ -84,7 +90,11 @@ async def assistant_chat(
         )
 
     try:
-        chat_response = await agent.chat(request.message, request.session_id)
+        chat_response = await agent.chat(
+            request.message,
+            request.session_id,
+            current_user.sub if current_user else None,
+        )
     except AssistantTimeoutError as e:
         logger.exception("Assistant chat timed out")
         raise HTTPException(status_code=504, detail=str(e)) from e
