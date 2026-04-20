@@ -60,3 +60,19 @@ export interface AssistantInfoResponse {
   model: string | null;
   provider: string | null;
 }
+
+export interface UserPreferences {
+  [key: string]: unknown;
+}
+
+export interface UserMeResponse {
+  email: string | null;
+  email_verified: boolean | null;
+  family_name: string | null;
+  given_name: string | null;
+  name: string | null;
+  preferences: UserPreferences;
+  preferred_username: string | null;
+  realm_roles: string[];
+  sub: string;
+}
