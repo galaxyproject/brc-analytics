@@ -22,6 +22,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NextPage } from "next";
 import type { AppProps } from "next/app";
 import { JSX, useMemo } from "react";
+import { BRC_DEFAULT_DESCRIPTION } from "../app/common/meta/brc/constants";
+import { OgMeta } from "../app/components/common/OgMeta/ogMeta";
 import { StyledFooter } from "../app/components/Layout/components/Footer/footer.styles";
 import { config } from "../app/config/config";
 import { BrcAuthProvider } from "../app/providers/authentication";
@@ -29,10 +31,12 @@ import { useEntities } from "../app/services/workflows/hooks/UseEntities/hook";
 import "../app/styles/fonts/fonts.css";
 import { mergeAppTheme } from "../app/theme/theme";
 import { ROUTES } from "../routes/constants";
+import { APP_KEYS } from "../site-config/common/constants";
 
 const DEFAULT_ENTITY_LIST_TYPE = "organisms";
 
 export interface PageProps extends AzulEntitiesStaticResponse {
+  pageDescription?: string;
   pageTitle?: string;
 }
 
@@ -63,6 +67,7 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
   const { floating, footer, header } = layout || {};
   const {
     entityListType = DEFAULT_ENTITY_LIST_TYPE,
+    pageDescription,
     pageTitle,
     themeOptions,
   } = pageProps;
@@ -83,13 +88,25 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
     };
   }, [header, isAssistantEnabled]);
 
-  if (!isEntitiesLoaded) return <></>;
+  const isBRC = appConfig.appKey === APP_KEYS.BRC_ANALYTICS;
+  const ogMeta = isBRC ? (
+    <OgMeta
+      appTitle={appConfig.appTitle}
+      browserURL={appConfig.browserURL}
+      defaultDescription={BRC_DEFAULT_DESCRIPTION}
+      pageDescription={pageDescription}
+      pageTitle={pageTitle}
+    />
+  ) : null;
+
+  if (!isEntitiesLoaded) return <>{ogMeta}</>;
 
   return (
     <EmotionThemeProvider theme={appTheme}>
       <ThemeProvider theme={appTheme}>
         <DXConfigProvider config={appConfig} entityListType={entityListType}>
           <Head pageTitle={pageTitle} />
+          {ogMeta}
           <CssBaseline />
           <QueryClientProvider client={queryClient}>
             <ServicesProvider>

@@ -8,6 +8,7 @@ import {
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
 import { EntitiesResponse } from "../../../../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
+import { BRC_PAGE_META } from "../../../../../../../app/common/meta/brc/constants";
 import { config } from "../../../../../../../app/config/config";
 import { getEntities } from "../../../../../../../app/utils/entityUtils";
 import { seedDatabase } from "../../../../../../../app/utils/seedDatabase";
@@ -29,6 +30,8 @@ interface Params extends ParsedUrlQuery {
 interface Props {
   entityId: string;
   entityListType: string;
+  pageDescription?: string;
+  pageTitle?: string;
   trsId: string;
 }
 
@@ -62,7 +65,14 @@ export const getStaticProps = async (
   if (!entityListType || !entityId || !trsId) return { notFound: true };
   if (entityListType !== "assemblies") return { notFound: true };
 
-  return { props: { entityId, entityListType, trsId } };
+  return {
+    props: {
+      entityId,
+      entityListType,
+      ...BRC_PAGE_META.CONFIGURE_WORKFLOW,
+      trsId,
+    },
+  };
 };
 
 const Page = (props: Props): JSX.Element => {

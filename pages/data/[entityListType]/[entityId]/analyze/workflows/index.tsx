@@ -6,6 +6,7 @@ import {
 } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
+import { BRC_PAGE_META } from "../../../../../../app/common/meta/brc/constants";
 import { config } from "../../../../../../app/config/config";
 import { getEntities } from "../../../../../../app/utils/entityUtils";
 import { seedDatabase } from "../../../../../../app/utils/seedDatabase";
@@ -18,6 +19,8 @@ interface Params extends ParsedUrlQuery {
 
 export interface Props {
   entityId: string;
+  pageDescription?: string;
+  pageTitle?: string;
 }
 
 export const getStaticPaths: GetStaticPaths<Params> = async () => {
@@ -52,7 +55,12 @@ export const getStaticProps: GetStaticProps<Props> = async ({
 
   if (!entityId) return { notFound: true };
 
-  return { props: { entityId } };
+  return {
+    props: {
+      entityId,
+      ...BRC_PAGE_META.ANALYZE_WORKFLOWS,
+    },
+  };
 };
 
 /**

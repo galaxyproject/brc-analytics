@@ -4,6 +4,7 @@ import { StyledPagesMain } from "../../app/components/Layout/components/Main/mai
 import { AboutView } from "../../app/views/AboutView/aboutView";
 import { AboutViewGA2 } from "../../app/views/AboutView/aboutViewGA2";
 import { APP_KEYS } from "../../site-config/common/constants";
+import { BRC_PAGE_META } from "../../app/common/meta/brc/constants";
 import { config } from "../../app/config/config";
 import { ROUTES } from "../../routes/constants";
 
@@ -25,7 +26,7 @@ export const getStaticProps: GetStaticProps = async () => {
 
   return {
     props: {
-      pageTitle: "About",
+      ...BRC_PAGE_META.ABOUT,
       themeOptions: {
         palette: { background: { default: "#FAFBFB" } }, // SMOKE_LIGHTEST
       },

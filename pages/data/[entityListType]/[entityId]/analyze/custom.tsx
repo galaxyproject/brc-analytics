@@ -6,6 +6,7 @@ import {
 } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
+import { BRC_PAGE_META } from "../../../../../app/common/meta/brc/constants";
 import { config } from "../../../../../app/config/config";
 import { getEntities } from "../../../../../app/utils/entityUtils";
 import { seedDatabase } from "../../../../../app/utils/seedDatabase";
@@ -19,6 +20,8 @@ interface Params extends ParsedUrlQuery {
 
 export interface Props {
   entityId: string;
+  pageDescription?: string;
+  pageTitle?: string;
   trsId: string;
 }
 
@@ -55,7 +58,13 @@ export const getStaticProps: GetStaticProps<Props> = async ({
   if (!entityId) return { notFound: true };
 
   // Pass the custom workflow TRS ID as a prop to the page, so that the correct workflow is loaded in the WorkflowInputsView.
-  return { props: { entityId, trsId: CUSTOM_WORKFLOW.trsId } };
+  return {
+    props: {
+      entityId,
+      ...BRC_PAGE_META.CUSTOM_WORKFLOW,
+      trsId: CUSTOM_WORKFLOW.trsId,
+    },
+  };
 };
 
 /**
