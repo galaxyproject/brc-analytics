@@ -97,15 +97,9 @@ def persistence_app(tmp_path, monkeypatch):
     get_llm_service = MagicMock(return_value=fake_llm)
     get_llm_service.cache_clear = MagicMock()
 
-    monkeypatch.setattr(
-        dependencies, "get_cache_service", get_cache_service
-    )
-    monkeypatch.setattr(
-        dependencies, "get_auth_service", get_auth_service
-    )
-    monkeypatch.setattr(
-        dependencies, "get_llm_service", get_llm_service
-    )
+    monkeypatch.setattr(dependencies, "get_cache_service", get_cache_service)
+    monkeypatch.setattr(dependencies, "get_auth_service", get_auth_service)
+    monkeypatch.setattr(dependencies, "get_llm_service", get_llm_service)
 
     asyncio.run(_create_schema(database_url))
 
