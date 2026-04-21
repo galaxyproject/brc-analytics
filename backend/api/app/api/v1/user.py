@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends
+import json
+
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.dependencies import get_current_user, get_current_user_db
@@ -7,6 +9,8 @@ from app.db.session import get_db_session
 from app.models.user_data import UserMeResponse, UserPreferences
 
 router = APIRouter()
+
+MAX_PREFERENCES_BYTES = 16 * 1024
 
 
 @router.get("/me", response_model=UserMeResponse)
@@ -34,7 +38,12 @@ async def update_preferences(
     current_user_db: User = Depends(get_current_user_db),
     session: AsyncSession = Depends(get_db_session),
 ) -> UserPreferences:
-    current_user_db.preferences = preferences.model_dump(mode="json")
+    payload = preferences.model_dump(mode="json")
+    serialized_payload = json.dumps(payload, separators=(",", ":")).encode("utf-8")
+    if len(serialized_payload) > MAX_PREFERENCES_BYTES:
+        raise HTTPException(status_code=413, detail="Preferences payload too large")
+
+    current_user_db.preferences = payload
     session.add(current_user_db)
     await session.commit()
     await session.refresh(current_user_db)

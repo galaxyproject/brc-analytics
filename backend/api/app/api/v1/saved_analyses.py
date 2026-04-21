@@ -1,11 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.dependencies import (
-    get_assistant_agent,
-    get_current_user,
-    get_current_user_db,
-)
+from app.core.dependencies import get_assistant_agent, get_current_user_db
 from app.db.crud import (
     create_saved_analysis,
     delete_saved_analysis,
@@ -20,7 +16,6 @@ from app.models.user_data import (
     SavedAnalysisDetail,
     SavedAnalysisRestoreResponse,
     SavedAnalysisSummary,
-    UserMeResponse,
 )
 
 router = APIRouter()
@@ -50,14 +45,13 @@ async def get_saved_analysis_list(
 @router.post("", response_model=SavedAnalysisSummary)
 async def save_analysis_snapshot(
     payload: SaveAnalysisRequest,
-    current_user: UserMeResponse = Depends(get_current_user),
     current_user_db: User = Depends(get_current_user_db),
     agent=Depends(get_assistant_agent),
     session: AsyncSession = Depends(get_db_session),
 ) -> SavedAnalysisSummary:
     try:
         state = await agent.session_service.require_session(
-            payload.session_id, current_user.sub
+            payload.session_id, current_user_db.keycloak_sub
         )
     except KeyError as err:
         raise HTTPException(
@@ -109,7 +103,6 @@ async def get_saved_analysis_detail(
 )
 async def restore_saved_analysis(
     saved_analysis_id: str,
-    current_user: UserMeResponse = Depends(get_current_user),
     current_user_db: User = Depends(get_current_user_db),
     agent=Depends(get_assistant_agent),
     session: AsyncSession = Depends(get_db_session),
@@ -121,7 +114,7 @@ async def restore_saved_analysis(
         raise HTTPException(status_code=404, detail="Saved analysis not found")
 
     restored_state = await agent.restore_saved_session(
-        owner_keycloak_sub=current_user.sub,
+        owner_keycloak_sub=current_user_db.keycloak_sub,
         schema_state=AnalysisSchema.model_validate(saved_analysis.schema),
         messages=[
             ChatMessage.model_validate(message) for message in saved_analysis.messages
