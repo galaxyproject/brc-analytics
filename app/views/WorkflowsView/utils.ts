@@ -56,7 +56,7 @@ function getTaxonomicLevelRealm(assembly: Assembly | undefined): string {
  * Filters out workflows that have no compatible assemblies for the current site.
  * Differential Expression Analysis is always included as an interim measure.
  * LMLS workflows (Logan Search and Lexicmap) are included when the 'lmls' feature flag is enabled.
- * Flu workflow is included when the 'flu' feature flag is enabled.
+ * Flu workflow is conditionally included based on the 'flu' feature flag.
  * Each workflow includes the properties of the workflow itself along with the name of its category and the compatible assembly (if any).
  * @param workflowCategories - An array of workflow categories, each containing an array of workflows.
  * @param mappings - Workflow-assembly mappings for the current site.
@@ -86,11 +86,12 @@ export function getWorkflows(
   for (const category of workflowCategories) {
     if (!category.workflows) continue;
     for (const workflow of category.workflows) {
-      // Skip flu workflow - it's handled separately with feature flag below.
-      if (
+      const isFluWorkflow =
         workflow.trsId ===
-        "#workflow/github.com/iwc-workflows/influenza-isolates-consensus-and-subtyping/main/versions/v0.3"
-      ) {
+        "#workflow/github.com/iwc-workflows/influenza-isolates-consensus-and-subtyping/main/versions/v0.3";
+
+      // Skip flu workflow if feature flag is disabled.
+      if (isFluWorkflow && !isFluEnabled) {
         continue;
       }
 
@@ -137,27 +138,6 @@ export function getWorkflows(
       scope: String(LEXICMAP.scope),
       taxonomyId: "Any",
     } as WorkflowEntity);
-  }
-
-  // Add flu workflow if feature flag is enabled.
-  if (isFluEnabled) {
-    const fluWorkflow = workflowCategories
-      .flatMap((c) => c.workflows)
-      .find(
-        (w) =>
-          w.trsId ===
-          "#workflow/github.com/iwc-workflows/influenza-isolates-consensus-and-subtyping/main/versions/v0.3"
-      );
-
-    if (fluWorkflow) {
-      workflows.push({
-        ...fluWorkflow,
-        assembly: mapAssembly(undefined),
-        category: "Consensus sequences",
-        scope: String(fluWorkflow.scope),
-        taxonomyId: fluWorkflow.taxonomyId ?? "Any",
-      } as WorkflowEntity);
-    }
   }
 
   return workflows;

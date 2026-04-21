@@ -26,29 +26,25 @@ import { getConfiguredValues, launchGalaxy } from "./utils";
  * @param workflow - Workflow to launch.
  * @param configuredValue - Configured values for the workflow.
  * @param origin - Origin URL for the Galaxy instance.
- * @param run - Async runner function from useAsync hook.
  * @returns Promise resolving to the Galaxy workflow landing URL.
  */
 async function getLandingUrlForWorkflow(
   workflow: Workflow,
   configuredValue: ConfiguredValue,
-  origin: string,
-  run: (promise: Promise<string>) => Promise<string>
+  origin: string
 ): Promise<string> {
   if (workflow.trsId === CUSTOM_WORKFLOW.trsId) {
     if (!isAssemblyConfiguredValue(configuredValue)) {
       throw new Error("Invalid configured value for CUSTOM workflow");
     }
-    return run(
-      getDataLandingUrl(
-        configuredValue.referenceAssembly,
-        configuredValue.geneModelUrl,
-        configuredValue.readRunsSingle,
-        configuredValue.readRunsPaired,
-        null,
-        configuredValue.tracks,
-        origin
-      )
+    return getDataLandingUrl(
+      configuredValue.referenceAssembly,
+      configuredValue.geneModelUrl,
+      configuredValue.readRunsSingle,
+      configuredValue.readRunsPaired,
+      null,
+      configuredValue.tracks,
+      origin
     );
   }
 
@@ -66,13 +62,11 @@ async function getLandingUrlForWorkflow(
     ) {
       throw new Error("Missing required values for LMLS workflow");
     }
-    return run(
-      getLMLSLandingUrl(
-        workflow.workflowId,
-        configuredValue.numberOfHits,
-        configuredValue.sequence,
-        origin
-      )
+    return getLMLSLandingUrl(
+      workflow.workflowId,
+      configuredValue.numberOfHits,
+      configuredValue.sequence,
+      origin
     );
   }
 
@@ -87,36 +81,32 @@ async function getLandingUrlForWorkflow(
     ) {
       throw new Error("Missing required values for DE workflow");
     }
-    return run(
-      getDeSeq2LandingUrl(
-        workflow.workflowId,
-        configuredValue.referenceAssembly,
-        configuredValue.geneModelUrl,
-        configuredValue.sampleSheet,
-        configuredValue.sampleSheetClassification,
-        configuredValue.designFormula,
-        configuredValue.primaryContrasts,
-        configuredValue.strandedness,
-        origin
-      )
+    return getDeSeq2LandingUrl(
+      workflow.workflowId,
+      configuredValue.referenceAssembly,
+      configuredValue.geneModelUrl,
+      configuredValue.sampleSheet,
+      configuredValue.sampleSheetClassification,
+      configuredValue.designFormula,
+      configuredValue.primaryContrasts,
+      configuredValue.strandedness,
+      origin
     );
   }
 
-  return run(
-    getWorkflowLandingUrl(
-      workflow.trsId,
-      isAssemblyConfiguredValue(configuredValue)
-        ? configuredValue.referenceAssembly
-        : "",
-      isAssemblyConfiguredValue(configuredValue)
-        ? configuredValue.geneModelUrl
-        : null,
-      configuredValue.readRunsSingle,
-      configuredValue.readRunsPaired,
-      null,
-      workflow.parameters,
-      origin
-    )
+  return getWorkflowLandingUrl(
+    workflow.trsId,
+    isAssemblyConfiguredValue(configuredValue)
+      ? configuredValue.referenceAssembly
+      : "",
+    isAssemblyConfiguredValue(configuredValue)
+      ? configuredValue.geneModelUrl
+      : null,
+    configuredValue.readRunsSingle,
+    configuredValue.readRunsPaired,
+    null,
+    workflow.parameters,
+    origin
   );
 }
 
@@ -133,11 +123,8 @@ export const useLaunchGalaxy = ({
     if (!configuredValue) return;
     const origin = config.browserURL || window.location.origin;
 
-    const landingUrl = await getLandingUrlForWorkflow(
-      workflow,
-      configuredValue,
-      origin,
-      run
+    const landingUrl = await run(
+      getLandingUrlForWorkflow(workflow, configuredValue, origin)
     );
 
     if (!landingUrl) {
