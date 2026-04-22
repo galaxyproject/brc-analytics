@@ -7,6 +7,8 @@ import {
   SavedAnalysisSummary,
   UserMeResponse,
   UserPreferences,
+  WorkflowRunCreateRequest,
+  WorkflowRunResponse,
 } from "../types/api";
 
 const apiClient = ky.create({
@@ -35,6 +37,12 @@ export const brcAPIClient = {
     return apiClient
       .post("favorites", { json: { entity_id, entity_type } })
       .json();
+  },
+
+  createWorkflowRun: async (
+    payload: WorkflowRunCreateRequest
+  ): Promise<WorkflowRunResponse> => {
+    return apiClient.post("workflow_runs", { json: payload }).json();
   },
 
   deleteFavorite: async (
@@ -68,6 +76,10 @@ export const brcAPIClient = {
 
   getUser: async (): Promise<UserMeResponse> => {
     return apiClient.get("user/me").json();
+  },
+
+  getWorkflowRuns: async (): Promise<WorkflowRunResponse[]> => {
+    return apiClient.get("workflow_runs").json();
   },
 
   restoreSavedAnalysis: async (

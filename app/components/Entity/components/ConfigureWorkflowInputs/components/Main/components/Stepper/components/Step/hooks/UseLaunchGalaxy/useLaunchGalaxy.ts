@@ -1,5 +1,7 @@
 import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
 import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
+import { brcAPIClient } from "app/services/brc-api-client";
+import { useRouter } from "next/router";
 import { useCallback } from "react";
 import { Workflow } from "../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import {
@@ -19,7 +21,11 @@ import {
   Props,
   UseLaunchGalaxy,
 } from "./types";
-import { getConfiguredValues, launchGalaxy } from "./utils";
+import {
+  buildWorkflowRunPayload,
+  getConfiguredValues,
+  launchGalaxy,
+} from "./utils";
 
 /**
  * Gets the appropriate landing URL based on workflow type.
@@ -118,6 +124,7 @@ export const useLaunchGalaxy = ({
 }: Props): UseLaunchGalaxy => {
   const { error, isLoading: loading, run } = useAsync<string>();
   const { config } = useConfig();
+  const router = useRouter();
   const configuredValue = getConfiguredValues(configuredInput, workflow);
   const disabled = !configuredValue;
 
@@ -133,8 +140,25 @@ export const useLaunchGalaxy = ({
       throw new Error("Failed to retrieve Galaxy workflow launch URL.");
     }
 
+    try {
+      await brcAPIClient.createWorkflowRun(
+        buildWorkflowRunPayload({
+          assistantSessionId:
+            typeof router.query.assistantSessionId === "string"
+              ? router.query.assistantSessionId
+              : null,
+          configuredInput,
+          configuredValue,
+          handoffUrl: landingUrl,
+          workflow,
+        })
+      );
+    } catch (trackingError) {
+      console.warn("Failed to record workflow launch handoff", trackingError);
+    }
+
     launchGalaxy(landingUrl);
-  }, [config, configuredValue, run, workflow]);
+  }, [config, configuredInput, configuredValue, router.query, run, workflow]);
 
   let errorMessage: string | null = null;
   if (error) {

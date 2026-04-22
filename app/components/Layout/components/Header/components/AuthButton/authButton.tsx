@@ -67,6 +67,9 @@ export function AuthButton(): JSX.Element | null {
         <MenuItem onClick={() => navigateTo("/assistant/saved")}>
           Saved Analyses
         </MenuItem>
+        <MenuItem onClick={() => navigateTo("/account/workflow-runs")}>
+          Workflow Runs
+        </MenuItem>
         <MenuItem onClick={() => navigateTo("/account/preferences")}>
           Preferences
         </MenuItem>

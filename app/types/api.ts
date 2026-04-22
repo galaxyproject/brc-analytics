@@ -102,3 +102,31 @@ export interface SavedAnalysisDetail extends SavedAnalysisSummary {
 export interface SavedAnalysisRestoreResponse {
   session_id: string;
 }
+
+export interface WorkflowRunCreateRequest {
+  assembly_accession?: string | null;
+  assistant_session_id?: string | null;
+  galaxy_instance_url?: string | null;
+  handoff_url: string;
+  launch_source: string;
+  parameters?: Record<string, unknown>;
+  workflow_id?: string | null;
+  workflow_trs_id: string;
+}
+
+export interface WorkflowRunResponse {
+  assembly_accession: string | null;
+  assistant_session_id: string | null;
+  completed_at: string | null;
+  created_at: string;
+  galaxy_instance_url: string | null;
+  galaxy_invocation_id: string | null;
+  handoff_url: string;
+  id: string;
+  launch_source: string;
+  parameters: Record<string, unknown>;
+  status: string;
+  updated_at: string;
+  workflow_id: string | null;
+  workflow_trs_id: string;
+}

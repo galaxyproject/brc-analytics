@@ -4,6 +4,7 @@ import {
 } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { Workflow } from "../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import { WORKFLOW_PARAMETER_VARIABLE } from "../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { WorkflowRunCreateRequest } from "../../../../../../../../../../../../types/api";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { ConfiguredInput } from "../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { ConfiguredValue } from "./types";
@@ -241,4 +242,64 @@ export function launchGalaxy(url: string): void {
   document.body.appendChild(el);
   el.click();
   document.body.removeChild(el);
+}
+
+interface BuildWorkflowRunPayloadParams {
+  assistantSessionId: string | null;
+  configuredInput: ConfiguredInput;
+  configuredValue: ConfiguredValue;
+  handoffUrl: string;
+  workflow: Workflow;
+}
+
+export function buildWorkflowRunPayload({
+  assistantSessionId,
+  configuredInput,
+  configuredValue,
+  handoffUrl,
+  workflow,
+}: BuildWorkflowRunPayloadParams): WorkflowRunCreateRequest {
+  let galaxyInstanceUrl: string | null = null;
+
+  try {
+    galaxyInstanceUrl = new URL(handoffUrl).origin;
+  } catch {
+    galaxyInstanceUrl = null;
+  }
+
+  return {
+    assembly_accession: configuredValue.referenceAssembly || null,
+    assistant_session_id: assistantSessionId,
+    galaxy_instance_url: galaxyInstanceUrl,
+    handoff_url: handoffUrl,
+    launch_source: assistantSessionId ? "assistant" : "site",
+    parameters: {
+      design_formula: configuredValue.designFormula ?? null,
+      gene_model_url: configuredValue.geneModelUrl ?? null,
+      number_of_hits: configuredValue.numberOfHits ?? null,
+      primary_contrasts: configuredValue.primaryContrasts ?? null,
+      read_runs_paired:
+        configuredValue.readRunsPaired?.map(
+          ({ runAccession }) => runAccession
+        ) ?? [],
+      read_runs_single:
+        configuredValue.readRunsSingle?.map(
+          ({ runAccession }) => runAccession
+        ) ?? [],
+      sample_sheet_classification:
+        configuredValue.sampleSheetClassification ?? null,
+      sample_sheet_rows: configuredValue.sampleSheet?.length ?? 0,
+      sequence_file_name: configuredInput.sequenceFileName ?? null,
+      sequence_length: configuredValue.sequence?.length ?? null,
+      strandedness: configuredValue.strandedness ?? null,
+      tracks:
+        configuredValue.tracks?.map((track) => ({
+          group_id: track.groupId,
+          name: track.shortLabel ?? track.longLabel ?? track.bigDataUrl,
+          url: track.bigDataUrl,
+        })) ?? [],
+    },
+    workflow_id: workflow.workflowId ?? null,
+    workflow_trs_id: workflow.trsId,
+  };
 }

@@ -7,6 +7,7 @@ import logging
 import re
 import time
 from typing import Any, Dict, List, Optional
+from urllib.parse import urlencode
 
 from pydantic_ai import Agent, RunContext, Tool
 from pydantic_ai.messages import ModelMessage, ModelMessagesTypeAdapter
@@ -70,6 +71,10 @@ class AssistantTimeoutError(RuntimeError):
 def _should_retry_agent_error(exc: BaseException) -> bool:
     return not isinstance(exc, AssistantTimeoutError)
 
+
+
+def _format_trs_id_for_url(trs_id: str) -> str:
+    return re.sub(r"[^a-zA-Z0-9]", "-", trs_id.removeprefix("#"))
 
 SYSTEM_PROMPT = """\
 You are the BRC Analytics Analysis Assistant, an expert in bioinformatics \
@@ -606,6 +611,13 @@ class AssistantAgent:
         await self.session_service.save_session(state)
 
         is_complete, handoff_url = self.compute_handoff(schema_state)
+        # Append assistantSessionId query param so the frontend can correlate
+        # a Galaxy handoff back to the assistant session that produced it.
+        if handoff_url:
+            handoff_url = (
+                f"{handoff_url}?"
+                f"{urlencode({'assistantSessionId': state.session_id})}"
+            )
 
         return ChatResponse(
             session_id=state.session_id,
