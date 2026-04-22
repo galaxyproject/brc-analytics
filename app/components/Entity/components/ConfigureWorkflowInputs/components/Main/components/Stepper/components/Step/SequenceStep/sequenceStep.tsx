@@ -6,10 +6,10 @@ import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/B
 import { Button } from "@mui/material";
 import { Fragment, JSX, useCallback } from "react";
 import { UploadedFile } from "../SampleSheetStep/components/UploadedFile/uploadedFile";
+import { useFilePicker } from "../hooks/UseFilePicker/hook";
 import { StepProps } from "../types";
 import { Dropzone } from "./components/Dropzone/dropzone";
 import { INPUT_PROPS } from "./constants";
-import { useFilePicker } from "../hooks/UseFilePicker/hook";
 import { readFastaFile } from "./hooks/UseFilePicker/utils";
 import { StyledStack } from "./sequenceStep.styles";
 

@@ -1,16 +1,16 @@
+import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 import {
   bpUpLg,
   bpUpSm,
 } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
+import { PALETTE_BRAND } from "../../../../../../../styles/common/constants/palette";
+import { bpUp1024 } from "../../../../../../../styles/mixins/breakpoints";
 import {
   section,
   sectionGrid,
   sectionLayout,
 } from "../../../../../../Layout/components/AppLayout/components/Section/section.styles";
-import { PALETTE_BRAND } from "../../../../../../../styles/common/constants/palette";
-import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
-import { bpUp1024 } from "../../../../../../../styles/mixins/breakpoints";
 
 export const StyledSection = styled("section")`
   ${section};

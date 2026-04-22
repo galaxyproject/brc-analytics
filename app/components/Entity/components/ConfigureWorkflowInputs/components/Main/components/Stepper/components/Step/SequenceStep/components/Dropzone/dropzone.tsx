@@ -3,11 +3,11 @@ import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/m
 import { Stack, Typography } from "@mui/material";
 import { JSX } from "react";
 import { FileUploadIcon } from "../../../../../../../../../../../../common/CustomIcon/components/FileUploadIcon/fileUploadIcon";
+import { StyledButtonBase } from "../../../components/Dropzone/components/FileUploadButton/fileUploadButton.styles";
 import {
   TYPOGRAPHY_PROPS as COMPONENT_TYPOGRAPHY_PROPS,
   STACK_PROPS,
 } from "../../../components/Dropzone/constants";
-import { StyledButtonBase } from "../../../components/Dropzone/components/FileUploadButton/fileUploadButton.styles";
 import { Dropzone as DropzoneBase } from "../../../components/Dropzone/dropzone";
 import { Props } from "./types";
 

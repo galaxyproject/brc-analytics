@@ -1,6 +1,14 @@
-import { JSX } from "react";
+import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
+import {
+  CardActionArea,
+  CardContent,
+  CardMedia,
+  Typography,
+} from "@mui/material";
 import Link from "next/link";
+import { JSX } from "react";
 import { formatDate } from "../../../../../../utils/date-fns";
+import { SectionTitle } from "../../section.styles";
 import { WHITE_PAPERS } from "./constants";
 import {
   Section,
@@ -9,14 +17,6 @@ import {
   StyledDivider,
   StyledGrid,
 } from "./sectionWhitePapers.styles";
-import { SectionTitle } from "../../section.styles";
-import {
-  CardActionArea,
-  CardContent,
-  CardMedia,
-  Typography,
-} from "@mui/material";
-import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 
 export const SectionWhitePapers = (): JSX.Element => {
   return (

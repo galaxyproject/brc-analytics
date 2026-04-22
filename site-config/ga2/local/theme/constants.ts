@@ -1,4 +1,4 @@
-import { PaletteColorOptions, ThemeOptions, Palette } from "@mui/material";
+import { Palette, PaletteColorOptions, ThemeOptions } from "@mui/material";
 
 /**
  * Custom Palette "Brand"

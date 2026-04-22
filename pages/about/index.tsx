@@ -1,12 +1,12 @@
-import { JSX } from "react";
 import { GetStaticProps } from "next";
+import { JSX } from "react";
+import { getPageMeta } from "../../app/common/meta/utils";
 import { StyledPagesMain } from "../../app/components/Layout/components/Main/main.styles";
+import { config } from "../../app/config/config";
 import { AboutView } from "../../app/views/AboutView/aboutView";
 import { AboutViewGA2 } from "../../app/views/AboutView/aboutViewGA2";
-import { APP_KEYS } from "../../site-config/common/constants";
-import { BRC_PAGE_META } from "../../app/common/meta/brc/constants";
-import { config } from "../../app/config/config";
 import { ROUTES } from "../../routes/constants";
+import { APP_KEYS } from "../../site-config/common/constants";
 
 export const About = (): JSX.Element => {
   const { appKey } = config();
@@ -18,7 +18,7 @@ export const About = (): JSX.Element => {
 };
 
 export const getStaticProps: GetStaticProps = async () => {
-  const { allowedPaths } = config();
+  const { allowedPaths, appKey } = config();
 
   if (allowedPaths && !allowedPaths.includes(ROUTES.ABOUT)) {
     return { notFound: true };
@@ -26,7 +26,7 @@ export const getStaticProps: GetStaticProps = async () => {
 
   return {
     props: {
-      ...BRC_PAGE_META.ABOUT,
+      ...getPageMeta(appKey).ABOUT,
       themeOptions: {
         palette: { background: { default: "#FAFBFB" } }, // SMOKE_LIGHTEST
       },

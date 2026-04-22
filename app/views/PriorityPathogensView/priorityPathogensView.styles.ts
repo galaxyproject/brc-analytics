@@ -1,10 +1,10 @@
-import styled from "@emotion/styled";
+import { Title } from "@databiosphere/findable-ui/lib/components/Index/components/EntityView/components/layout/Title/title";
 import { StyledGridEntityView } from "@databiosphere/findable-ui/lib/components/Index/index.styles";
 import {
   bpDownSm,
   bpUpSm,
 } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
-import { Title } from "@databiosphere/findable-ui/lib/components/Index/components/EntityView/components/layout/Title/title";
+import styled from "@emotion/styled";
 
 export const StyledGrid = styled(StyledGridEntityView)`
   grid-template-columns: 1fr;

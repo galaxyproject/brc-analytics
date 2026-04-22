@@ -1,18 +1,17 @@
-import { JSX } from "react";
-import { Props } from "./types";
-import { ChevronRightRounded } from "@mui/icons-material";
-import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
+import { NoResults } from "@databiosphere/findable-ui/lib/components/NoResults/noResults";
 import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
+import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
+import { ChevronRightRounded } from "@mui/icons-material";
+import { Typography } from "@mui/material";
 import { flexRender } from "@tanstack/react-table";
-import React, { Fragment } from "react";
+import { Fragment, JSX } from "react";
 import {
-  StyledStack,
   StyledContainer,
   StyledRoundedPaper,
+  StyledStack,
 } from "./tracksSelectionPanel.styles";
-import { Typography } from "@mui/material";
+import { Props } from "./types";
 import { getGroupLabel, getIsLastRowInGroup } from "./utils";
-import { NoResults } from "@databiosphere/findable-ui/lib/components/NoResults/noResults";
 
 export const TracksSelectionPanel = ({ table }: Props): JSX.Element => {
   const { getRowCount, getRowModel } = table;

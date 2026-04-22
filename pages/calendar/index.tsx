@@ -1,9 +1,9 @@
-import { JSX } from "react";
 import { GetStaticProps } from "next";
-import { StyledPagesMain } from "../../app/components/Layout/components/Main/main.styles";
-import { CalendarView } from "../../app/views/CalendarView/calendarView";
+import { JSX } from "react";
 import { BRC_PAGE_META } from "../../app/common/meta/brc/constants";
+import { StyledPagesMain } from "../../app/components/Layout/components/Main/main.styles";
 import { config } from "../../app/config/config";
+import { CalendarView } from "../../app/views/CalendarView/calendarView";
 import { ROUTES } from "../../routes/constants";
 
 export const Calendar = (): JSX.Element => {

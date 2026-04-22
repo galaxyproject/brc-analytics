@@ -1,5 +1,5 @@
-import { Box, Paper } from "@mui/material";
 import styled from "@emotion/styled";
+import { Box, Paper } from "@mui/material";
 
 export const SearchContainer = styled(Box)({
   margin: "0 auto",

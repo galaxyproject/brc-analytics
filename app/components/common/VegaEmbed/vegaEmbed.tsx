@@ -2,8 +2,8 @@
 import { JSX } from "react";
 
 import { ReactNode, useEffect, useRef, useState } from "react";
-import embed from "vega-embed";
 import type { VisualizationSpec } from "vega-embed";
+import embed from "vega-embed";
 import { VegaEmbedContainer } from "./vegaEmbed.styles";
 
 export interface VegaEmbedProps {

@@ -1,6 +1,5 @@
+import { RadioGroupProps, RadioProps } from "@mui/material";
 import { CONTRAST_MODE } from "../../hooks/UseRadioGroup/types";
-import { RadioGroupProps } from "@mui/material";
-import { RadioProps } from "@mui/material";
 
 export type Props = Pick<RadioGroupProps, "onChange" | "value"> &
   Pick<RadioProps, "disabled">;

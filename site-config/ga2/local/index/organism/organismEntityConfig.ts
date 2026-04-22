@@ -3,12 +3,12 @@ import {
   SORT_DIRECTION,
 } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
+import { GA2OrganismEntity } from "../../../../../app/apis/catalog/ga2/entities";
+import { getOrganismId } from "../../../../../app/apis/catalog/ga2/utils";
 import { AppEntityConfig } from "../../../../common/entities";
 import { GA2_CATEGORY_KEY } from "../../../category";
 import { organismMainColumn } from "../../entity/organism/organismMainColumn";
 import { organismTop } from "../../entity/organism/organismTop";
-import { GA2OrganismEntity } from "../../../../../app/apis/catalog/ga2/entities";
-import { getOrganismId } from "../../../../../app/apis/catalog/ga2/utils";
 import { CATEGORY_GROUPS } from "./categoryGroups";
 import { COLUMNS } from "./columns";
 

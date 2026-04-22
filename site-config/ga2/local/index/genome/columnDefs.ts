@@ -1,33 +1,35 @@
-import { ComponentConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import {
+  ColumnConfig,
+  ComponentConfig,
+} from "@databiosphere/findable-ui/lib/config/entities";
+import { GA2AssemblyEntity } from "../../../../../app/apis/catalog/ga2/entities";
 import * as C from "../../../../../app/components";
 import {
   buildAccession,
-  buildGenomeTaxonomicLevelStrain,
   buildAnalyzeGenome,
   buildAnnotationStatus,
   buildChromosomes,
   buildCoverage,
   buildGcPercent,
+  buildGenomeTaxonomicLevelStrain,
   buildIsRef,
   buildLength,
   buildLevel,
   buildScaffoldCount,
   buildScaffoldL50,
   buildScaffoldN50,
-  buildTaxonomicLevelOrder,
+  buildTaxonomicGroup,
+  buildTaxonomicLevelClass,
+  buildTaxonomicLevelDomain,
   buildTaxonomicLevelFamily,
   buildTaxonomicLevelGenus,
-  buildTaxonomicGroup,
-  buildTaxonomyId,
-  buildTaxonomicLevelClass,
-  buildTaxonomicLevelPhylum,
   buildTaxonomicLevelKingdom,
-  buildTaxonomicLevelDomain,
+  buildTaxonomicLevelOrder,
+  buildTaxonomicLevelPhylum,
+  buildTaxonomyId,
 } from "../../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { GA2AssemblyEntity } from "../../../../../app/apis/catalog/ga2/entities";
 import * as V from "../../../../../app/viewModelBuilders/catalog/ga2/viewModelBuilders";
-import { GA2_CATEGORY_LABEL, GA2_CATEGORY_KEY } from "../../../category";
-import { ColumnConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import { GA2_CATEGORY_KEY, GA2_CATEGORY_LABEL } from "../../../category";
 
 export const ACCESSION: ColumnConfig<GA2AssemblyEntity> = {
   columnPinned: true,
