@@ -1,4 +1,4 @@
-import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
+import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters.js";
 import { Locator, Page } from "@playwright/test";
 import { sanitizeEntityId } from "../../../app/apis/catalog/common/utils";
 import { ROUTES } from "../../../routes/constants";
