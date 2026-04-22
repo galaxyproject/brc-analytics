@@ -25,11 +25,11 @@
   },
   {
     "compatibleAssemblyCount": 4937,
-    "workflowTrsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.4"
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.5"
   },
   {
     "compatibleAssemblyCount": 4937,
-    "workflowTrsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.4"
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.5"
   },
   {
     "compatibleAssemblyCount": 4937,
@@ -41,23 +41,23 @@
   },
   {
     "compatibleAssemblyCount": 4937,
-    "workflowTrsId": "#workflow/github.com/iwc-workflows/atacseq/main/versions/v1.0"
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/atacseq/main/versions/v2.0"
   },
   {
     "compatibleAssemblyCount": 4937,
-    "workflowTrsId": "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v1.0"
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v1.1"
   },
   {
     "compatibleAssemblyCount": 4937,
-    "workflowTrsId": "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v1.0"
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v1.1"
   },
   {
     "compatibleAssemblyCount": 5499,
-    "workflowTrsId": "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.4"
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.5"
   },
   {
     "compatibleAssemblyCount": 4937,
-    "workflowTrsId": "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.17"
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.18"
   },
   {
     "compatibleAssemblyCount": 4326,
@@ -94,5 +94,9 @@
   {
     "compatibleAssemblyCount": 4475,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/lncRNAs-annotation/main/versions/v0.1"
+  },
+  {
+    "compatibleAssemblyCount": 624,
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/hyphy/capheine-core-and-compare/versions/v0.1"
   }
 ]

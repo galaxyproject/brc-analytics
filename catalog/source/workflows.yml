@@ -109,15 +109,15 @@ workflows:
           class: File
     active: false
     iwc_id: assembly-with-flye-main
-  - trs_id: "#workflow/github.com/iwc-workflows/atacseq/main/versions/v1.0"
+  - trs_id: "#workflow/github.com/iwc-workflows/atacseq/main/versions/v2.0"
     categories:
       - REGULATION
     workflow_name: "ATAC-seq Analysis: Chromatin Accessibility Profiling"
     workflow_description:
       Complete ATAC-seq analysis pipeline for paired-end reads.
-      Processes raw FASTQ data through adapter and bad quality removal (cutadapt), alignment
+      Processes raw FASTQ data through adapter and bad quality removal (fastp), alignment
       (Bowtie2 end-to-end), and filtering (removes MT reads, discordant pairs, low mapping
-      quality <30, PCR duplicates). Generates 5' cut site pileups (±100bp), performs
+      quality below 30, PCR duplicates). Generates 5' cut site pileups (±100bp), performs
       peak calling, and quantifies reads in 1kb summit-centered regions. Produces two
       normalized coverage tracks (per million mapped reads and per million reads in
       peaks) and fragment length distribution plots for quality assessment.
@@ -138,6 +138,18 @@ workflows:
         type_guide:
           class: integer
       - key: bin_size
+        type_guide:
+          class: integer
+      - key: Percentage of bad quality bases per read
+        type_guide:
+          class: integer
+      - key: Reference Genome
+        type_guide:
+          class: text
+      - key: Effective genome size
+        type_guide:
+          class: integer
+      - key: Bin size
         type_guide:
           class: integer
     active: true
@@ -309,7 +321,7 @@ workflows:
           class: float
     active: false
     iwc_id: brew3r-main
-  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v1.0"
+  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v1.1"
     categories:
       - REGULATION
     workflow_name: "ChIP-seq Analysis: Paired-End Read Processing"
@@ -344,7 +356,7 @@ workflows:
           class: integer
     active: true
     iwc_id: chipseq-pe-main
-  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v1.0"
+  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v1.1"
     categories:
       - REGULATION
     workflow_name: "ChIP-seq Analysis: Single-End Read Processing"
@@ -381,13 +393,13 @@ workflows:
           class: integer
     active: true
     iwc_id: chipseq-sr-main
-  - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.4"
+  - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.5"
     categories:
       - REGULATION
-    workflow_name: Consensus Peak Calling for ATAC-seq and CUT&RUN Replicates
+    workflow_name: Consensus Peak Calling for ATAC-seq and CUT and RUN Replicates
     workflow_description:
       Identifies high-confidence consensus peaks from ATAC-seq or
-      CUT&RUN replicate experiments. The workflow calls peaks on individual replicates
+      CUT and RUN replicate experiments. The workflow calls peaks on individual replicates
       and identifies their intersection. To control for sequencing depth differences,
       it subsamples all replicates to the smallest library size, performs peak calling
       on the combined normalized data, and retains only peaks whose summits overlap
@@ -410,7 +422,7 @@ workflows:
           class: integer
     active: true
     iwc_id: consensus-peaks-consensus-peaks-atac-cutandrun
-  - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-pe/versions/v1.4"
+  - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-pe/versions/v1.5"
     categories:
       - REGULATION
     workflow_name: Consensus Peak Calling for ChIP-seq Paired-End Replicates
@@ -439,7 +451,7 @@ workflows:
           class: integer
     active: false
     iwc_id: consensus-peaks-consensus-peaks-chip-pe
-  - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-sr/versions/v1.4"
+  - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-sr/versions/v1.5"
     categories:
       - REGULATION
     workflow_name: Consensus Peak Calling for ChIP-seq Single-End Replicates
@@ -468,7 +480,7 @@ workflows:
           class: integer
     active: false
     iwc_id: consensus-peaks-consensus-peaks-chip-sr
-  - trs_id: "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.17"
+  - trs_id: "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.18"
     categories:
       - REGULATION
     workflow_name: "CUT&amp;RUN/CUT&amp;TAG Analysis: Protein-DNA Interaction Mapping"
@@ -507,7 +519,7 @@ workflows:
           class: boolean
     active: true
     iwc_id: cutandrun-main
-  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.4"
+  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.5"
     categories:
       - TRANSCRIPTOMICS
     workflow_name:
@@ -555,7 +567,7 @@ workflows:
           class: integer
     active: true
     iwc_id: fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-cellplex
-  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.4"
+  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.5"
     categories:
       - TRANSCRIPTOMICS
     workflow_name:
@@ -589,20 +601,6 @@ workflows:
           class: boolean
     active: true
     iwc_id: fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-v3
-  - trs_id: "#workflow/github.com/iwc-workflows/functional-annotation-protein-sequences/main/versions/v0.1"
-    categories:
-      - ANNOTATION
-    workflow_name: Functional annotation of protein sequences
-    workflow_description:
-      This workflow uses eggNOG mapper and InterProScan for functional
-      annotation of protein sequences.
-    ploidy: ANY
-    parameters:
-      - key: input
-        type_guide:
-          class: File
-    active: false
-    iwc_id: functional-annotation-protein-sequences-main
   - trs_id: "#workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main/versions/v0.2"
     categories:
       - CONSENSUS_SEQUENCES
@@ -894,6 +892,107 @@ workflows:
           class: text
     active: false
     iwc_id: hic-hicup-cooler-hic-juicermediumtabix-to-cool-cooler
+  - trs_id: "#workflow/github.com/iwc-workflows/hyphy/capheine-core-and-compare/versions/v0.1"
+    categories:
+      - COMPARATIVE_GENOMICS
+    workflow_name: "CAPHEINE: Combined HyPhy Core and Compare"
+    workflow_description:
+      Runs CAPHEINE selection analyses with optional foreground/background
+      branch labeling for branch comparisons.
+    ploidy: ANY
+    scope: ORGANISM
+    taxonomy_id: 10239
+    parameters:
+      - key: reference cds
+        type_guide:
+          class: File
+          ext: fasta
+      - key: unaligned sequences
+        type_guide:
+          class: Collection
+          ext: fasta
+          collection_type: list
+      - key: foreground regexp (optional)
+        type_guide:
+          class: text
+      - key: foreground list (optional)
+        type_guide:
+          class: File
+          ext:
+            - txt
+            - tabular
+    active: true
+    iwc_id: hyphy-capheine-core-and-compare
+  - trs_id: "#workflow/github.com/iwc-workflows/hyphy/hyphy-compare/versions/v0.1"
+    categories:
+      - COMPARATIVE_GENOMICS
+    workflow_name: "HyPhy: Compare"
+    workflow_description:
+      This workflow runs HyPhy analyses Contrast-FEL and RELAX comparing
+      foreground and reference branches. It consumes the per-gene codon-aware alignments
+      and IQ-TREE phylogenies produced by the HyPhy preprocessing workflow.
+    ploidy: ANY
+    parameters:
+      - key: Codon-aware alignment(s)
+        type_guide:
+          class: Collection
+          ext: fasta
+          collection_type: list
+      - key: Phylogenetic tree(s)
+        type_guide:
+          class: Collection
+          ext:
+            - nhx
+            - newick
+          collection_type: list
+      - key: Foreground Sequences List
+        type_guide:
+          class: File
+          ext:
+            - txt
+            - tabular
+    active: false
+    iwc_id: hyphy-hyphy-compare
+  - trs_id: "#workflow/github.com/iwc-workflows/hyphy/hyphy-core/versions/v0.1"
+    categories:
+      - COMPARATIVE_GENOMICS
+    workflow_name: "HyPhy: Core"
+    workflow_description:
+      Runs HyPhy BUSTED, FEL, MEME and PRIME analyses on a collection
+      of fasta.
+    ploidy: ANY
+    parameters:
+      - key: reference cds
+        type_guide:
+          class: File
+          ext: fasta
+      - key: unaligned sequences
+        type_guide:
+          class: Collection
+          ext: fasta
+          collection_type: list
+    active: false
+    iwc_id: hyphy-hyphy-core
+  - trs_id: "#workflow/github.com/iwc-workflows/hyphy/hyphy-preprocessing/versions/v0.1"
+    categories:
+      - COMPARATIVE_GENOMICS
+    workflow_name: "HyPhy: Preprocessing "
+    workflow_description:
+      Generates codon-aware alignments and phylogenetic trees compatible
+      with downstream HyPhy analyses.
+    ploidy: ANY
+    parameters:
+      - key: reference cds
+        type_guide:
+          class: File
+          ext: fasta
+      - key: unaligned sequences
+        type_guide:
+          class: Collection
+          ext: fasta
+          collection_type: list
+    active: false
+    iwc_id: hyphy-hyphy-preprocessing
   - trs_id: "#workflow/github.com/iwc-workflows/influenza-isolates-consensus-and-subtyping/main/versions/v0.3"
     categories:
       - CONSENSUS_SEQUENCES
@@ -908,40 +1007,40 @@ workflows:
       - key: References per segment collection
         collection_spec:
           collection_type: list
-          name: Influenza A Segment References
           elements:
             - ext: fasta
-              md5: 0cc350480c0ef6d2583b4764adaabb5a
               src: url
               url: https://zenodo.org/records/14628364/files/ref_1_pb2.fasta
+              md5: 0cc350480c0ef6d2583b4764adaabb5a
             - ext: fasta
-              md5: a8c9d6aa3c21ec24c42f480750dc4eca
               src: url
               url: https://zenodo.org/records/14628364/files/ref_2_pb1.fasta
+              md5: a8c9d6aa3c21ec24c42f480750dc4eca
             - ext: fasta
-              md5: a5f373e913c0f84ea00cba35ea81c703
               src: url
               url: https://zenodo.org/records/14628364/files/ref_3_pa.fasta
+              md5: a5f373e913c0f84ea00cba35ea81c703
             - ext: fasta
-              md5: 9476d2c02a0429e6b0e5a70ea2a94ef2
               src: url
               url: https://zenodo.org/records/14628364/files/ref_4_ha.fasta
+              md5: 9476d2c02a0429e6b0e5a70ea2a94ef2
             - ext: fasta
-              md5: 3d0e28d72bba2c8b352d64052524473d
               src: url
               url: https://zenodo.org/records/14628364/files/ref_5_np.fasta
+              md5: 3d0e28d72bba2c8b352d64052524473d
             - ext: fasta
-              md5: d8c21026a3defe01e020628e5b76227c
               src: url
               url: https://zenodo.org/records/14628364/files/ref_6_na.fasta
+              md5: d8c21026a3defe01e020628e5b76227c
             - ext: fasta
-              md5: 13b0b6900807d5e557348b0e69dc79ad
               src: url
               url: https://zenodo.org/records/14628364/files/ref_7_mp.fasta
+              md5: 13b0b6900807d5e557348b0e69dc79ad
             - ext: fasta
-              md5: e98fc11ed2c825e54d8d88b295449f41
               src: url
               url: https://zenodo.org/records/14628364/files/ref_8_ns.fasta
+              md5: e98fc11ed2c825e54d8d88b295449f41
+          name: Influenza A Segment References
         type_guide:
           class: Collection
       - key: Sequenced paired-end data

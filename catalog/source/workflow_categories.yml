@@ -29,12 +29,12 @@ workflow_categories:
     description: "Assemble prokaryotic and eukaryotic genomes sequenced with a variety of technologies."
     show_coming_soon: false
 
-  - category: "GENOME_COMPARISONS"
-    name: "Genome comparisons"
-    description: "Workflows for creation of pairwise and multiple genome alignments."
-    show_coming_soon: true
-
   - category: "PROTEIN_FOLDING"
     name: "Protein folding"
     description: "Analysis of protein folding using the ColabFold framework."
     show_coming_soon: true
+
+  - category: "COMPARATIVE_GENOMICS"
+    name: "Comparative genomics"
+    description: "Workflows for comparative genomics analysis."
+    show_coming_soon: false

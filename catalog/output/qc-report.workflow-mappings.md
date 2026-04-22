@@ -21,7 +21,7 @@ None
 | ATAC-seq Analysis: Chromatin Accessibility Profiling | 4937 |
 | ChIP-seq Analysis: Paired-End Read Processing | 4937 |
 | ChIP-seq Analysis: Single-End Read Processing | 4937 |
-| Consensus Peak Calling for ATAC-seq and CUT&RUN Replicates | 5499 |
+| Consensus Peak Calling for ATAC-seq and CUT and RUN Replicates | 5499 |
 | CUT&amp;RUN/CUT&amp;TAG Analysis: Protein-DNA Interaction Mapping | 4937 |
 | Capture Hi-C Processing: FASTQ to Balanced Cool Files | 4326 |
 | Hi-C Processing: FASTQ to Balanced Cool Files | 4326 |
@@ -33,9 +33,10 @@ None
 | Genome annotation with Braker3 | 4475 |
 | Bacterial Genome Annotation | 393 |
 | lncRNAs annotation workflow | 4475 |
+| CAPHEINE: Combined HyPhy Core and Compare | 624 |
 
 ## Summary Statistics
 
-- Total active workflows: 25
-- Workflows with ≥1 compatible assembly: 25
+- Total active workflows: 26
+- Workflows with ≥1 compatible assembly: 26
 - Workflows with 0 compatible assemblies: 0
