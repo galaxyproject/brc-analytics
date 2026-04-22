@@ -3,12 +3,14 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from app.db.crud import (
     create_saved_analysis,
+    create_workflow_run,
     delete_favorite,
     delete_saved_analysis,
     get_saved_analysis,
     get_user_by_keycloak_sub,
     list_favorites_for_user,
     list_saved_analyses_for_user,
+    list_workflow_runs_for_user,
     upsert_favorite,
     upsert_user_from_claims,
 )
@@ -118,3 +120,49 @@ async def test_saved_analysis_crud_round_trip():
 
         assert deleted is True
         assert saved_analyses_after_delete == []
+
+
+@pytest.mark.asyncio
+async def test_workflow_run_round_trip_with_and_without_user():
+    async with await _create_session() as session:
+        user = await upsert_user_from_claims(
+            session,
+            {
+                "sub": "kc-999",
+                "email": "runs@example.com",
+                "name": "Workflow Runner",
+            },
+        )
+
+        anonymous_run = await create_workflow_run(
+            session,
+            None,
+            workflow_trs_id="#workflow/github.com/iwc/rnaseq-pe/main",
+            workflow_id=None,
+            galaxy_instance_url="https://usegalaxy.org",
+            handoff_url="https://usegalaxy.org/workflow_landings/anonymous",
+            assembly_accession="GCF_000001405.40",
+            launch_source="site",
+            assistant_session_id=None,
+            parameters={"reference_assembly": "GCF_000001405.40"},
+        )
+        user_run = await create_workflow_run(
+            session,
+            user,
+            workflow_trs_id="#workflow/github.com/iwc/varcall-haploid/main",
+            workflow_id=None,
+            galaxy_instance_url="https://usegalaxy.org",
+            handoff_url="https://usegalaxy.org/workflow_landings/user",
+            assembly_accession="GCF_000001405.40",
+            launch_source="assistant",
+            assistant_session_id="assistant-session-1",
+            parameters={"read_runs_single": ["SRR000001"]},
+        )
+
+        workflow_runs = await list_workflow_runs_for_user(session, user)
+
+        assert anonymous_run.user_id is None
+        assert user_run.user_id == user.id
+        assert len(workflow_runs) == 1
+        assert workflow_runs[0].assistant_session_id == "assistant-session-1"
+        assert workflow_runs[0].workflow_trs_id.endswith("varcall-haploid/main")

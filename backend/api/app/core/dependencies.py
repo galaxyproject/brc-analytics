@@ -112,6 +112,15 @@ async def get_current_user_db(
     return user
 
 
+async def get_optional_current_user_db(
+    current_user: UserMeResponse | None = Depends(get_optional_current_user),
+    session: AsyncSession = Depends(get_db_session),
+) -> User | None:
+    if current_user is None:
+        return None
+    return await get_user_by_keycloak_sub(session, current_user.sub)
+
+
 def reset_cache_service() -> None:
     get_cache_service.cache_clear()
 

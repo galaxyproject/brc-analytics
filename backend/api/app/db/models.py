@@ -48,6 +48,9 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan",
     )
+    workflow_runs: Mapped[list[WorkflowRun]] = relationship(
+        back_populates="user",
+    )
 
 
 class Favorite(Base):
@@ -99,3 +102,49 @@ class SavedAnalysis(Base):
     )
 
     user: Mapped[User] = relationship(back_populates="saved_analyses")
+
+
+class WorkflowRun(Base):
+    __tablename__ = "workflow_runs"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+    )
+    user_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    workflow_trs_id: Mapped[str] = mapped_column(String(255), nullable=False)
+    workflow_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    galaxy_instance_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    handoff_url: Mapped[str] = mapped_column(Text, nullable=False)
+    assembly_accession: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    launch_source: Mapped[str] = mapped_column(String(64), nullable=False)
+    assistant_session_id: Mapped[str | None] = mapped_column(
+        String(255), nullable=True
+    )
+    galaxy_invocation_id: Mapped[str | None] = mapped_column(
+        String(255), nullable=True
+    )
+    status: Mapped[str] = mapped_column(String(64), nullable=False)
+    parameters: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=utcnow,
+        nullable=False,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=utcnow,
+        onupdate=utcnow,
+        nullable=False,
+    )
+    completed_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+
+    user: Mapped[User | None] = relationship(back_populates="workflow_runs")

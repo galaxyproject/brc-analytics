@@ -6,7 +6,7 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models import Favorite, SavedAnalysis, User
+from app.db.models import Favorite, SavedAnalysis, User, WorkflowRun
 
 
 async def get_user_by_keycloak_sub(
@@ -152,3 +152,46 @@ async def delete_saved_analysis(
     await session.delete(saved_analysis)
     await session.commit()
     return True
+
+
+async def create_workflow_run(
+    session: AsyncSession,
+    user: User | None,
+    *,
+    workflow_trs_id: str,
+    workflow_id: str | None,
+    galaxy_instance_url: str | None,
+    handoff_url: str,
+    assembly_accession: str | None,
+    launch_source: str,
+    assistant_session_id: str | None,
+    parameters: dict[str, Any],
+    status: str = "handoff_created",
+) -> WorkflowRun:
+    workflow_run = WorkflowRun(
+        user_id=user.id if user is not None else None,
+        workflow_trs_id=workflow_trs_id,
+        workflow_id=workflow_id,
+        galaxy_instance_url=galaxy_instance_url,
+        handoff_url=handoff_url,
+        assembly_accession=assembly_accession,
+        launch_source=launch_source,
+        assistant_session_id=assistant_session_id,
+        parameters=parameters,
+        status=status,
+    )
+    session.add(workflow_run)
+    await session.commit()
+    await session.refresh(workflow_run)
+    return workflow_run
+
+
+async def list_workflow_runs_for_user(
+    session: AsyncSession, user: User
+) -> list[WorkflowRun]:
+    result = await session.execute(
+        select(WorkflowRun)
+        .where(WorkflowRun.user_id == user.id)
+        .order_by(WorkflowRun.created_at.desc())
+    )
+    return list(result.scalars().all())

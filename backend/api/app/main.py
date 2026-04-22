@@ -16,6 +16,7 @@ from app.api.v1 import (
     saved_analyses,
     user,
     version,
+    workflow_runs,
 )
 from app.core.config import get_settings
 from app.core.dependencies import (
@@ -99,6 +100,11 @@ def create_app() -> FastAPI:
         tags=["saved_analyses"],
     )
     app.include_router(user.router, prefix="/api/v1/user", tags=["user"])
+    app.include_router(
+        workflow_runs.router,
+        prefix="/api/v1/workflow_runs",
+        tags=["workflow_runs"],
+    )
 
     app.mount("/api/v1/mcp", mcp_app)
 
