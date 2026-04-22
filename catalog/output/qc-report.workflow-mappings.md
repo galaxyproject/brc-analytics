@@ -27,6 +27,7 @@ None
 | Hi-C Processing: FASTQ to Balanced Cool Files | 4326 |
 | Hi-C Data Processing: FASTQ to Valid Interaction Pairs | 4326 |
 | Variant calling and consensus construction from paired end short read data of non-segmented viral genomes | 13 |
+| Influenza A isolate subtyping and consensus sequence generation | 7 |
 | Pox Virus Illumina Amplicon Workflow from half-genomes | 2 |
 | AMR Gene Detection | 393 |
 | Genome annotation with Braker3 | 4475 |
@@ -35,6 +36,6 @@ None
 
 ## Summary Statistics
 
-- Total active workflows: 24
-- Workflows with ≥1 compatible assembly: 24
+- Total active workflows: 25
+- Workflows with ≥1 compatible assembly: 25
 - Workflows with 0 compatible assemblies: 0

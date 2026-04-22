@@ -72,6 +72,10 @@
     "workflowTrsId": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-pairs-hicup/versions/v0.3"
   },
   {
+    "compatibleAssemblyCount": 7,
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/influenza-isolates-consensus-and-subtyping/main/versions/v0.3"
+  },
+  {
     "compatibleAssemblyCount": 2,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/pox-virus-amplicon/main/versions/v0.4"
   },

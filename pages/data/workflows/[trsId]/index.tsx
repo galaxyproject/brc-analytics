@@ -21,9 +21,7 @@ export interface Props {
 
 export const getStaticPaths: GetStaticPaths<Params> = async () => {
   const paths = workflowCategories.reduce(
-    (acc, { showComingSoon, workflows }) => {
-      // Special case, "showComingSoon", when false, should be skipped.
-      if (showComingSoon === false) return acc;
+    (acc, { workflows }) => {
       for (const { trsId } of workflows) {
         acc.push({ params: { trsId: formatTrsId(trsId) } });
       }

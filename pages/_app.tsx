@@ -50,7 +50,7 @@ export type AppPropsWithComponent = AppProps & {
   pageProps: PageProps;
 };
 
-setFeatureFlags(["assistant", "lmls"]);
+setFeatureFlags(["assistant", "flu", "lmls"]);
 
 const queryClient = new QueryClient();
 

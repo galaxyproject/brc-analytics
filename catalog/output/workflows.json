@@ -535,6 +535,78 @@
         "workflowName": "Variant calling and consensus construction from paired end short read data of non-segmented viral genomes"
       },
       {
+        "iwcId": "influenza-isolates-consensus-and-subtyping-main",
+        "parameters": [
+          {
+            "key": "References per segment collection",
+            "collection_spec": {
+              "collection_type": "list",
+              "name": "Influenza A Segment References",
+              "elements": [
+                {
+                  "ext": "fasta",
+                  "md5": "0cc350480c0ef6d2583b4764adaabb5a",
+                  "src": "url",
+                  "url": "https://zenodo.org/records/14628364/files/ref_1_pb2.fasta"
+                },
+                {
+                  "ext": "fasta",
+                  "md5": "a8c9d6aa3c21ec24c42f480750dc4eca",
+                  "src": "url",
+                  "url": "https://zenodo.org/records/14628364/files/ref_2_pb1.fasta"
+                },
+                {
+                  "ext": "fasta",
+                  "md5": "a5f373e913c0f84ea00cba35ea81c703",
+                  "src": "url",
+                  "url": "https://zenodo.org/records/14628364/files/ref_3_pa.fasta"
+                },
+                {
+                  "ext": "fasta",
+                  "md5": "9476d2c02a0429e6b0e5a70ea2a94ef2",
+                  "src": "url",
+                  "url": "https://zenodo.org/records/14628364/files/ref_4_ha.fasta"
+                },
+                {
+                  "ext": "fasta",
+                  "md5": "3d0e28d72bba2c8b352d64052524473d",
+                  "src": "url",
+                  "url": "https://zenodo.org/records/14628364/files/ref_5_np.fasta"
+                },
+                {
+                  "ext": "fasta",
+                  "md5": "d8c21026a3defe01e020628e5b76227c",
+                  "src": "url",
+                  "url": "https://zenodo.org/records/14628364/files/ref_6_na.fasta"
+                },
+                {
+                  "ext": "fasta",
+                  "md5": "13b0b6900807d5e557348b0e69dc79ad",
+                  "src": "url",
+                  "url": "https://zenodo.org/records/14628364/files/ref_7_mp.fasta"
+                },
+                {
+                  "ext": "fasta",
+                  "md5": "e98fc11ed2c825e54d8d88b295449f41",
+                  "src": "url",
+                  "url": "https://zenodo.org/records/14628364/files/ref_8_ns.fasta"
+                }
+              ]
+            }
+          },
+          {
+            "key": "Sequenced paired-end data",
+            "variable": "SANGER_READ_RUN_PAIRED"
+          }
+        ],
+        "ploidy": "ANY",
+        "scope": "ORGANISM",
+        "taxonomyId": "11320",
+        "trsId": "#workflow/github.com/iwc-workflows/influenza-isolates-consensus-and-subtyping/main/versions/v0.3",
+        "workflowDescription": "This workflow performs subtyping and consensus sequence generation for batches of Illumina PE sequenced Influenza A isolates.",
+        "workflowName": "Influenza A isolate subtyping and consensus sequence generation"
+      },
+      {
         "iwcId": "pox-virus-amplicon-main",
         "parameters": [
           {
