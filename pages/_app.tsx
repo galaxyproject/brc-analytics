@@ -11,7 +11,7 @@ import { setFeatureFlags } from "@databiosphere/findable-ui/lib/hooks/useFeature
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import { ConfigProvider as DXConfigProvider } from "@databiosphere/findable-ui/lib/providers/config";
 import { ExploreStateProvider } from "@databiosphere/findable-ui/lib/providers/exploreState";
-import { GoogleSignInAuthenticationProvider } from "@databiosphere/findable-ui/lib/providers/googleSignInAuthentication/provider";
+
 import { LayoutDimensionsProvider } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/provider";
 import { ServicesProvider } from "@databiosphere/findable-ui/lib/providers/services/provider";
 import { SystemStatusProvider } from "@databiosphere/findable-ui/lib/providers/systemStatus";
@@ -111,39 +111,37 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
           <QueryClientProvider client={queryClient}>
             <ServicesProvider>
               <SystemStatusProvider>
-                <GoogleSignInAuthenticationProvider>
-                  <BrcAuthProvider loginEnabled={appConfig.loginEnabled}>
-                    <LayoutDimensionsProvider>
-                      <AppLayout>
-                        <DXHeader {...filteredHeader} />
-                        <ExploreStateProvider entityListType={entityListType}>
-                          <Main>
-                            <ErrorBoundary
-                              fallbackRender={({
-                                error,
-                                reset,
-                              }: {
-                                error: DataExplorerError;
-                                reset: () => void;
-                              }): JSX.Element => (
-                                <Error
-                                  errorMessage={error.message}
-                                  requestUrlMessage={error.requestUrlMessage}
-                                  rootPath={redirectRootToPath}
-                                  onReset={reset}
-                                />
-                              )}
-                            >
-                              <Component {...pageProps} />
-                              <Floating {...floating} />
-                            </ErrorBoundary>
-                          </Main>
-                        </ExploreStateProvider>
-                        <StyledFooter {...footer} />
-                      </AppLayout>
-                    </LayoutDimensionsProvider>
-                  </BrcAuthProvider>
-                </GoogleSignInAuthenticationProvider>
+                <BrcAuthProvider loginEnabled={appConfig.loginEnabled}>
+                  <LayoutDimensionsProvider>
+                    <AppLayout>
+                      <DXHeader {...filteredHeader} />
+                      <ExploreStateProvider entityListType={entityListType}>
+                        <Main>
+                          <ErrorBoundary
+                            fallbackRender={({
+                              error,
+                              reset,
+                            }: {
+                              error: DataExplorerError;
+                              reset: () => void;
+                            }): JSX.Element => (
+                              <Error
+                                errorMessage={error.message}
+                                requestUrlMessage={error.requestUrlMessage}
+                                rootPath={redirectRootToPath}
+                                onReset={reset}
+                              />
+                            )}
+                          >
+                            <Component {...pageProps} />
+                            <Floating {...floating} />
+                          </ErrorBoundary>
+                        </Main>
+                      </ExploreStateProvider>
+                      <StyledFooter {...footer} />
+                    </AppLayout>
+                  </LayoutDimensionsProvider>
+                </BrcAuthProvider>
               </SystemStatusProvider>
             </ServicesProvider>
           </QueryClientProvider>

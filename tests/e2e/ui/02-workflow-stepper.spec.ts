@@ -1,4 +1,6 @@
-import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
+// .js extension required: Playwright uses Node's native module resolution which
+// enforces the package exports field strictly (no auto-resolving extensions).
+import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters.js";
 import { Locator, Page } from "@playwright/test";
 import { sanitizeEntityId } from "../../../app/apis/catalog/common/utils";
 import { ROUTES } from "../../../routes/constants";
