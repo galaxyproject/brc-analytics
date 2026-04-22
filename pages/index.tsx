@@ -4,6 +4,7 @@ import { StyledMain } from "../app/components/Layout/components/Main/main.styles
 import { HomeView } from "../app/views/HomeView/homeView";
 import { HomeView as GA2HomeView } from "../app/views/HomeView/ga2/homeView";
 import { BRC_PAGE_META } from "../app/common/meta/brc/constants";
+import { GA2_PAGE_META } from "../app/common/meta/ga2/constants";
 import { config } from "../app/config/config";
 import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
 import { AppSiteConfig } from "../site-config/common/entities";
@@ -30,7 +31,10 @@ export const getStaticProps: GetStaticProps = async () => {
 
   return {
     props: {
-      pageDescription: BRC_PAGE_META.HOME.pageDescription,
+      pageDescription:
+        appKey === APP_KEYS.GA2
+          ? GA2_PAGE_META.HOME.pageDescription
+          : BRC_PAGE_META.HOME.pageDescription,
       pageTitle: appTitle,
       themeOptions: {
         palette: { background: { default: backgroundColor } },

@@ -9,7 +9,9 @@ import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
 import { EntitiesResponse } from "../../../../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { BRC_PAGE_META } from "../../../../../../../app/common/meta/brc/constants";
+import { GA2_PAGE_META } from "../../../../../../../app/common/meta/ga2/constants";
 import { config } from "../../../../../../../app/config/config";
+import { APP_KEYS } from "../../../../../../../site-config/common/constants";
 import { getEntities } from "../../../../../../../app/utils/entityUtils";
 import { seedDatabase } from "../../../../../../../app/utils/seedDatabase";
 import {
@@ -69,7 +71,9 @@ export const getStaticProps = async (
     props: {
       entityId,
       entityListType,
-      ...BRC_PAGE_META.CONFIGURE_WORKFLOW,
+      ...(config().appKey === APP_KEYS.GA2
+        ? GA2_PAGE_META.CONFIGURE_WORKFLOW
+        : BRC_PAGE_META.CONFIGURE_WORKFLOW),
       trsId,
     },
   };

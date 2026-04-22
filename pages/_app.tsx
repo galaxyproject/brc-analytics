@@ -23,6 +23,7 @@ import { NextPage } from "next";
 import type { AppProps } from "next/app";
 import { JSX, useMemo } from "react";
 import { BRC_DEFAULT_DESCRIPTION } from "../app/common/meta/brc/constants";
+import { GA2_DEFAULT_DESCRIPTION } from "../app/common/meta/ga2/constants";
 import { OgMeta } from "../app/components/common/OgMeta/ogMeta";
 import { StyledFooter } from "../app/components/Layout/components/Footer/footer.styles";
 import { config } from "../app/config/config";
@@ -88,18 +89,21 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
     };
   }, [header, isAssistantEnabled]);
 
-  const isBRC = appConfig.appKey === APP_KEYS.BRC_ANALYTICS;
-  const ogMeta = isBRC ? (
+  const defaultDescription =
+    appConfig.appKey === APP_KEYS.BRC_ANALYTICS
+      ? BRC_DEFAULT_DESCRIPTION
+      : GA2_DEFAULT_DESCRIPTION;
+  const ogMeta = (
     <OgMeta
       appTitle={appConfig.appTitle}
       browserURL={appConfig.browserURL}
-      defaultDescription={BRC_DEFAULT_DESCRIPTION}
+      defaultDescription={defaultDescription}
       pageDescription={pageDescription}
       pageTitle={pageTitle}
     />
-  ) : null;
+  );
 
-  if (!isEntitiesLoaded) return <>{ogMeta}</>;
+  if (!isEntitiesLoaded) return ogMeta;
 
   return (
     <EmotionThemeProvider theme={appTheme}>

@@ -2,6 +2,9 @@ import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
 import { BRC_PAGE_META } from "../../../../app/common/meta/brc/constants";
+import { GA2_PAGE_META } from "../../../../app/common/meta/ga2/constants";
+import { config } from "../../../../app/config/config";
+import { APP_KEYS } from "../../../../site-config/common/constants";
 import { formatTrsId } from "../../../../app/views/AnalyzeWorkflowsView/components/Main/utils";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../app/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { LEXICMAP } from "../../../../app/views/AnalyzeWorkflowsView/lexicmap/constants";
@@ -55,9 +58,12 @@ export const getStaticProps: GetStaticProps<Props> = async ({
 
   if (!trsId) return { notFound: true };
 
+  const { appKey } = config();
+  const meta =
+    appKey === APP_KEYS.GA2 ? GA2_PAGE_META.WORKFLOW : BRC_PAGE_META.WORKFLOW;
   return {
     props: {
-      ...BRC_PAGE_META.WORKFLOW,
+      ...meta,
       trsId,
     },
   };

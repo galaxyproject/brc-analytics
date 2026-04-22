@@ -4,6 +4,7 @@ import { StyledPagesMain } from "../../app/components/Layout/components/Main/mai
 import { RoadmapView } from "../../app/views/RoadmapView/roadmapView";
 import { RoadmapViewGA2 } from "../../app/views/RoadmapView/roadmapViewGA2";
 import { BRC_PAGE_META } from "../../app/common/meta/brc/constants";
+import { GA2_PAGE_META } from "../../app/common/meta/ga2/constants";
 import { config } from "../../app/config/config";
 import { APP_KEYS } from "../../site-config/common/constants";
 import { ROUTES } from "../../routes/constants";
@@ -18,15 +19,18 @@ export const Roadmap = (): JSX.Element => {
 };
 
 export const getStaticProps: GetStaticProps = async () => {
-  const { allowedPaths } = config();
+  const { allowedPaths, appKey } = config();
 
   if (allowedPaths && !allowedPaths.includes(ROUTES.ROADMAP)) {
     return { notFound: true };
   }
 
+  const meta =
+    appKey === APP_KEYS.GA2 ? GA2_PAGE_META.ROADMAP : BRC_PAGE_META.ROADMAP;
+
   return {
     props: {
-      ...BRC_PAGE_META.ROADMAP,
+      ...meta,
       themeOptions: {
         palette: { background: { default: "#FAFBFB" } }, // SMOKE_LIGHTEST
       },

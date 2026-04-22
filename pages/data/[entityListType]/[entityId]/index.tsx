@@ -9,7 +9,9 @@ import {
 } from "../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { GA2Catalog } from "../../../../app/apis/catalog/ga2/entities";
 import { BRC_PAGE_META } from "../../../../app/common/meta/brc/constants";
+import { GA2_PAGE_META } from "../../../../app/common/meta/ga2/constants";
 import { config } from "../../../../app/config/config";
+import { APP_KEYS } from "../../../../site-config/common/constants";
 import { getEntities, getEntity } from "../../../../app/utils/entityUtils";
 import { seedDatabase } from "../../../../app/utils/seedDatabase";
 import { AnalyzeView } from "../../../../app/views/AnalyzeView/analyzeView";
@@ -32,14 +34,18 @@ export interface EntityPageProps<R> {
   pageTitle?: string;
 }
 
-const ENTITY_DETAIL_META: Record<
-  string,
-  { pageDescription: string; pageTitle: string }
-> = {
-  assemblies: BRC_PAGE_META.ASSEMBLY_DETAIL,
-  organisms: BRC_PAGE_META.ORGANISM_DETAIL,
-  "priority-pathogens": BRC_PAGE_META.PRIORITY_PATHOGEN_DETAIL,
-};
+function getEntityDetailMeta(
+  appKey?: string
+): Record<string, { pageDescription: string; pageTitle: string }> {
+  const meta = appKey === APP_KEYS.GA2 ? GA2_PAGE_META : BRC_PAGE_META;
+  return {
+    assemblies: meta.ASSEMBLY_DETAIL,
+    organisms: meta.ORGANISM_DETAIL,
+    ...("PRIORITY_PATHOGEN_DETAIL" in meta
+      ? { "priority-pathogens": meta.PRIORITY_PATHOGEN_DETAIL }
+      : {}),
+  };
+}
 
 /**
  * Entity detail view page.
@@ -101,7 +107,7 @@ export const getStaticProps: GetStaticProps<
   };
 
   const entityConfig = getEntityConfig(entities, entityListType);
-  const entityMeta = ENTITY_DETAIL_META[entityListType];
+  const entityMeta = getEntityDetailMeta(appConfig.appKey)[entityListType];
 
   const props: EntityPageProps<BRCCatalog | GA2Catalog> = {
     entityId,
