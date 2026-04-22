@@ -8,10 +8,8 @@ import {
   EntitiesResponse,
 } from "../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { GA2Catalog } from "../../../../app/apis/catalog/ga2/entities";
-import { BRC_PAGE_META } from "../../../../app/common/meta/brc/constants";
-import { GA2_PAGE_META } from "../../../../app/common/meta/ga2/constants";
+import { getEntityDetailMeta } from "../../../../app/common/meta/utils";
 import { config } from "../../../../app/config/config";
-import { APP_KEYS } from "../../../../site-config/common/constants";
 import { getEntities, getEntity } from "../../../../app/utils/entityUtils";
 import { seedDatabase } from "../../../../app/utils/seedDatabase";
 import { AnalyzeView } from "../../../../app/views/AnalyzeView/analyzeView";
@@ -32,19 +30,6 @@ export interface EntityPageProps<R> {
   entityListType: string;
   pageDescription?: string;
   pageTitle?: string;
-}
-
-function getEntityDetailMeta(
-  appKey?: string
-): Record<string, { pageDescription: string; pageTitle: string }> {
-  const meta = appKey === APP_KEYS.GA2 ? GA2_PAGE_META : BRC_PAGE_META;
-  return {
-    assemblies: meta.ASSEMBLY_DETAIL,
-    organisms: meta.ORGANISM_DETAIL,
-    ...("PRIORITY_PATHOGEN_DETAIL" in meta
-      ? { "priority-pathogens": meta.PRIORITY_PATHOGEN_DETAIL }
-      : {}),
-  };
 }
 
 /**

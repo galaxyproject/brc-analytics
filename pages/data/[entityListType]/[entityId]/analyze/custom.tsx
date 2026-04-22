@@ -6,10 +6,8 @@ import {
 } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
-import { BRC_PAGE_META } from "../../../../../app/common/meta/brc/constants";
-import { GA2_PAGE_META } from "../../../../../app/common/meta/ga2/constants";
+import { getPageMeta } from "../../../../../app/common/meta/utils";
 import { config } from "../../../../../app/config/config";
-import { APP_KEYS } from "../../../../../site-config/common/constants";
 import { getEntities } from "../../../../../app/utils/entityUtils";
 import { seedDatabase } from "../../../../../app/utils/seedDatabase";
 import { CUSTOM_WORKFLOW } from "../../../../../app/views/AnalyzeWorkflowsView/custom/constants";
@@ -63,9 +61,7 @@ export const getStaticProps: GetStaticProps<Props> = async ({
   return {
     props: {
       entityId,
-      ...(config().appKey === APP_KEYS.GA2
-        ? GA2_PAGE_META.CUSTOM_WORKFLOW
-        : BRC_PAGE_META.CUSTOM_WORKFLOW),
+      ...getPageMeta(config().appKey).CUSTOM_WORKFLOW,
       trsId: CUSTOM_WORKFLOW.trsId,
     },
   };

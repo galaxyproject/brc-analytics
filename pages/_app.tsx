@@ -22,8 +22,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NextPage } from "next";
 import type { AppProps } from "next/app";
 import { JSX, useMemo } from "react";
-import { BRC_DEFAULT_DESCRIPTION } from "../app/common/meta/brc/constants";
-import { GA2_DEFAULT_DESCRIPTION } from "../app/common/meta/ga2/constants";
+import { getDefaultDescription } from "../app/common/meta/utils";
 import { OgMeta } from "../app/components/common/OgMeta/ogMeta";
 import { StyledFooter } from "../app/components/Layout/components/Footer/footer.styles";
 import { config } from "../app/config/config";
@@ -32,7 +31,6 @@ import { useEntities } from "../app/services/workflows/hooks/UseEntities/hook";
 import "../app/styles/fonts/fonts.css";
 import { mergeAppTheme } from "../app/theme/theme";
 import { ROUTES } from "../routes/constants";
-import { APP_KEYS } from "../site-config/common/constants";
 
 const DEFAULT_ENTITY_LIST_TYPE = "organisms";
 
@@ -89,15 +87,11 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
     };
   }, [header, isAssistantEnabled]);
 
-  const defaultDescription =
-    appConfig.appKey === APP_KEYS.BRC_ANALYTICS
-      ? BRC_DEFAULT_DESCRIPTION
-      : GA2_DEFAULT_DESCRIPTION;
   const ogMeta = (
     <OgMeta
       appTitle={appConfig.appTitle}
       browserURL={appConfig.browserURL}
-      defaultDescription={defaultDescription}
+      defaultDescription={getDefaultDescription(appConfig.appKey)}
       pageDescription={pageDescription}
       pageTitle={pageTitle}
     />
