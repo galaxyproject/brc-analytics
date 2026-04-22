@@ -76,6 +76,7 @@ def _should_retry_agent_error(exc: BaseException) -> bool:
 def _format_trs_id_for_url(trs_id: str) -> str:
     return re.sub(r"[^a-zA-Z0-9]", "-", trs_id.removeprefix("#"))
 
+
 SYSTEM_PROMPT = """\
 You are the BRC Analytics Analysis Assistant, an expert in bioinformatics \
 who helps researchers discover data and configure analyses for execution in Galaxy.
