@@ -123,12 +123,8 @@ class WorkflowRun(Base):
     handoff_url: Mapped[str] = mapped_column(Text, nullable=False)
     assembly_accession: Mapped[str | None] = mapped_column(String(255), nullable=True)
     launch_source: Mapped[str] = mapped_column(String(64), nullable=False)
-    assistant_session_id: Mapped[str | None] = mapped_column(
-        String(255), nullable=True
-    )
-    galaxy_invocation_id: Mapped[str | None] = mapped_column(
-        String(255), nullable=True
-    )
+    assistant_session_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    galaxy_invocation_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
     status: Mapped[str] = mapped_column(String(64), nullable=False)
     parameters: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
