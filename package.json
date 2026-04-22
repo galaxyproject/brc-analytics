@@ -36,7 +36,7 @@
     "validate-ga2-catalog": "./catalog/ga2/schema/scripts/validate-catalog.sh"
   },
   "dependencies": {
-    "@databiosphere/findable-ui": "^51",
+    "@databiosphere/findable-ui": "^51.0.1",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
     "@mdx-js/loader": "^3.0.1",
@@ -57,7 +57,6 @@
     "isomorphic-dompurify": "^2",
     "ky": "^1",
     "next": "^15",
-
     "next-compose-plugins": "^2.2.1",
     "next-mdx-remote": "^5",
     "papaparse": "^5.5.3",
