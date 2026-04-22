@@ -1,5 +1,5 @@
-import { test, expect } from "../utils/fixtures";
 import { ROUTES } from "../../../routes/constants";
+import { expect, test } from "../utils/fixtures";
 
 const PAGES = [
   { name: "About", url: ROUTES.ABOUT },

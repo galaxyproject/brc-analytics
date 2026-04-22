@@ -1,10 +1,10 @@
+import { getEntities, getEntity } from "../../app/services/workflows/query";
 import {
   getEntitiesById,
   getEntitiesByType,
   setEntitiesById,
   setEntitiesByType,
 } from "../../app/services/workflows/store";
-import { getEntities, getEntity } from "../../app/services/workflows/query";
 
 describe("workflows query", () => {
   beforeEach(() => {

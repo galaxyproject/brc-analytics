@@ -1,5 +1,5 @@
-import { JSX } from "react";
 import { GetStaticProps } from "next";
+import { JSX } from "react";
 import { BRC_PAGE_META } from "../../app/common/meta/brc/constants";
 import { StyledPagesMain } from "../../app/components/Layout/components/Main/main.styles";
 import { AssistantView } from "../../app/views/AssistantView/assistantView";

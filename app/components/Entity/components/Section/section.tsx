@@ -1,9 +1,8 @@
-import { JSX } from "react";
-import { SectionProps } from "./types";
-import { Fragment } from "react";
-import { Divider } from "@mui/material";
-import { Content, StyledTypography } from "./section.styles";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
+import { Divider } from "@mui/material";
+import { Fragment, JSX } from "react";
+import { Content, StyledTypography } from "./section.styles";
+import { SectionProps } from "./types";
 
 export const Section = ({
   children,

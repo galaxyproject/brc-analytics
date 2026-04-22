@@ -1,14 +1,13 @@
-import { JSX } from "react";
+import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
+import { DialogTitle } from "@databiosphere/findable-ui/lib/components/common/Dialog/components/DialogTitle/dialogTitle";
 import { Button, DialogActions, DialogContent } from "@mui/material";
+import { RowSelectionState } from "@tanstack/table-core";
+import { JSX, useCallback, useState } from "react";
+import { ColumnFilters } from "../../../../../components/ColumnFilters/columnFilters";
+import { TracksSelectionPanel } from "./components/TracksSelectionPanel/tracksSelectionPanel";
 import { StyledDialog } from "./tracksSelector.styles";
 import { Props } from "./types";
-import { DialogTitle } from "@databiosphere/findable-ui/lib/components/common/Dialog/components/DialogTitle/dialogTitle";
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
-import { useCallback, useState } from "react";
-import { RowSelectionState } from "@tanstack/table-core";
-import { TracksSelectionPanel } from "./components/TracksSelectionPanel/tracksSelectionPanel";
 import { getTracksData } from "./utils";
-import { ColumnFilters } from "../../../../../components/ColumnFilters/columnFilters";
 
 export const TracksSelector = ({
   onClose,

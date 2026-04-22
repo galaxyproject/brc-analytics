@@ -1,7 +1,7 @@
+import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import styled from "@emotion/styled";
 import { TableContainer } from "@mui/material";
-import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 
 export const StyledTableContainer = styled(TableContainer)`
   margin: 24px 0;

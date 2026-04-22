@@ -1,5 +1,4 @@
-import { JSX } from "react";
-import { Fragment } from "react";
+import { Fragment, JSX } from "react";
 import {
   FILL,
   GRID_SIZE,

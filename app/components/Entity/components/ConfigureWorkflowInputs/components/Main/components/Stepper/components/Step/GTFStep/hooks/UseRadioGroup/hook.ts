@@ -1,5 +1,5 @@
-import { useRadioGroup as useBaseRadioGroup } from "../../../hooks/UseRadioGroup/hook";
 import { useMemo } from "react";
+import { useRadioGroup as useBaseRadioGroup } from "../../../hooks/UseRadioGroup/hook";
 import { UseRadioGroup } from "../../../hooks/UseRadioGroup/types";
 import { mapControl } from "./utils";
 

@@ -1,8 +1,8 @@
+import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import { ColumnFiltersState, Row } from "@tanstack/react-table";
+import { Assembly } from "../../../../../../../../../../../../../../../../../../../views/WorkflowInputsView/types";
 import { ReadRun } from "../../../../../../types";
 import { COLUMN_KEY_TO_LABEL } from "./constants";
-import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
-import { Assembly } from "../../../../../../../../../../../../../../../../../../../views/WorkflowInputsView/types";
 
 /**
  * Builds warnings for column filter mismatches.

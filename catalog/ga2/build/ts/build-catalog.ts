@@ -1,13 +1,18 @@
 import fsp from "fs/promises";
-import {
-  getAssemblyId,
-  getOrganismId,
-} from "../../../../app/apis/catalog/ga2/utils";
+import { WorkflowCategory } from "../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   GA2AssemblyEntity,
   GA2OrganismEntity,
   SRAData,
 } from "../../../../app/apis/catalog/ga2/entities";
+import {
+  getAssemblyId,
+  getOrganismId,
+} from "../../../../app/apis/catalog/ga2/utils";
+import {
+  buildWorkflowAssemblyMappings,
+  generateWorkflowMappingsQC,
+} from "../../../build/ts/build-workflow-mappings";
 import {
   defaultStringToNone,
   getMaxDefined,
@@ -24,11 +29,6 @@ import {
   saveJson,
   verifyUniqueIds,
 } from "../../../build/ts/utils";
-import {
-  buildWorkflowAssemblyMappings,
-  generateWorkflowMappingsQC,
-} from "../../../build/ts/build-workflow-mappings";
-import { WorkflowCategory } from "../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { SOURCE_GENOME_KEYS, SOURCE_RAWDATA_KEYS } from "./constants";
 import { SourceGenome, SourceRawData } from "./entities";
 

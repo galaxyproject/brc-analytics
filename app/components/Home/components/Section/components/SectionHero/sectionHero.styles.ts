@@ -1,3 +1,5 @@
+import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
+import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { bpUpMd } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
 import { Section } from "../../../../../common/Section/section";
@@ -6,8 +8,6 @@ import {
   sectionGrid,
   sectionLayout,
 } from "../../../../../Layout/components/AppLayout/components/Section/section.styles";
-import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
-import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 
 export const StyledSection = styled(Section)`
   ${section};

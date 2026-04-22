@@ -1,7 +1,6 @@
-import { ColumnClassifications } from "../../../../types";
-import { OnClassify } from "../../../../hooks/UseColumnClassification/types";
-import { COLUMN_TYPE } from "../../../../types";
 import { OnConfigure } from "../../../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { OnClassify } from "../../../../hooks/UseColumnClassification/types";
+import { COLUMN_TYPE, ColumnClassifications } from "../../../../types";
 
 export interface Props {
   classifications: ColumnClassifications;

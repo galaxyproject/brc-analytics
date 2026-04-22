@@ -1,10 +1,10 @@
-import { JSX } from "react";
-import { Radio, FormControlLabel, Typography, Stack } from "@mui/material";
 import { RadioCheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioCheckedIcon/radioCheckedIcon";
 import { RadioUncheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioUncheckedIcon/radioUncheckedIcon";
+import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
+import { FormControlLabel, Radio, Stack, Typography } from "@mui/material";
+import { JSX } from "react";
 import { OPTIONS } from "./constants";
 import { StyledRadioGroup } from "./radioGroup.styles";
-import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Props } from "./types";
 
 export const RadioGroup = ({

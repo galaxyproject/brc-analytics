@@ -1,6 +1,6 @@
-import { GROUP_ID_LABEL } from "./constants";
 import { Row } from "@tanstack/react-table";
 import { UcscTrackNode } from "../../../../../../../../../../../../../../../../../utils/ucsc-tracks-api/entities";
+import { GROUP_ID_LABEL } from "./constants";
 
 /**
  * Returns the count of available (selectable) tracks in a group.

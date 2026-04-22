@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
+import { StepConfig } from "../../components/Step/types";
 import { UseStepper } from "./types";
 import { getInitialActiveStep, getNextActiveStep } from "./utils";
-import { StepConfig } from "../../components/Step/types";
 
 export const useStepper = (steps: StepConfig[]): UseStepper => {
   const [activeStep, setActiveStep] = useState<number>(

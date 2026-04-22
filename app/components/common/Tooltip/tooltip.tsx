@@ -1,5 +1,5 @@
-import { JSX } from "react";
 import { Tooltip as MTooltip, TooltipProps } from "@mui/material";
+import { JSX } from "react";
 
 export const Tooltip = ({
   children,

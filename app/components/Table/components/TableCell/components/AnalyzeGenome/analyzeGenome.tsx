@@ -1,4 +1,3 @@
-import { JSX } from "react";
 import { DropdownButton } from "@databiosphere/findable-ui/lib/components/common/Button/components/DropdownButton/dropdownButton";
 import { DropdownMenuButtonProps } from "@databiosphere/findable-ui/lib/components/common/DropdownMenu/common/entities";
 import { DropdownMenu } from "@databiosphere/findable-ui/lib/components/common/DropdownMenu/dropdownMenu";
@@ -8,6 +7,7 @@ import {
 } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { Button, Grid, MenuItem } from "@mui/material";
 import NLink from "next/link";
+import { JSX } from "react";
 import { BUTTON_PROPS, GRID_PROPS, MENU_PROPS } from "./constants";
 import { AnalyzeGenomeProps } from "./types";
 

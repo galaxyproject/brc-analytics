@@ -1,13 +1,13 @@
-import { ComponentType, ReactNode } from "react";
 import { StepProps as MStepProps } from "@mui/material";
+import { ComponentType, ReactNode } from "react";
 import { Workflow } from "../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import {
   ConfiguredInput,
   OnConfigure,
 } from "../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { Status, OnLaunchGalaxy } from "./hooks/UseLaunchGalaxy/types";
-import { OnContinue, OnEdit } from "../../hooks/UseStepper/types";
 import { Assembly } from "../../../../../../../../../../views/WorkflowInputsView/types";
+import { OnContinue, OnEdit } from "../../hooks/UseStepper/types";
+import { OnLaunchGalaxy, Status } from "./hooks/UseLaunchGalaxy/types";
 
 export interface StepConfig {
   description?: ReactNode;
