@@ -8,7 +8,7 @@ import {
   EntitiesResponse,
 } from "../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { GA2Catalog } from "../../../../app/apis/catalog/ga2/entities";
-import { BRC_PAGE_META } from "../../../../app/common/meta/brc/constants";
+import { getEntityDetailMeta } from "../../../../app/common/meta/utils";
 import { config } from "../../../../app/config/config";
 import { getEntities, getEntity } from "../../../../app/utils/entityUtils";
 import { seedDatabase } from "../../../../app/utils/seedDatabase";
@@ -31,15 +31,6 @@ export interface EntityPageProps<R> {
   pageDescription?: string;
   pageTitle?: string;
 }
-
-const ENTITY_DETAIL_META: Record<
-  string,
-  { pageDescription: string; pageTitle: string }
-> = {
-  assemblies: BRC_PAGE_META.ASSEMBLY_DETAIL,
-  organisms: BRC_PAGE_META.ORGANISM_DETAIL,
-  "priority-pathogens": BRC_PAGE_META.PRIORITY_PATHOGEN_DETAIL,
-};
 
 /**
  * Entity detail view page.
@@ -101,7 +92,7 @@ export const getStaticProps: GetStaticProps<
   };
 
   const entityConfig = getEntityConfig(entities, entityListType);
-  const entityMeta = ENTITY_DETAIL_META[entityListType];
+  const entityMeta = getEntityDetailMeta(appConfig.appKey)[entityListType];
 
   const props: EntityPageProps<BRCCatalog | GA2Catalog> = {
     entityId,
