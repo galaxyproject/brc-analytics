@@ -1,12 +1,11 @@
-import { JSX } from "react";
-import { SectionTitle } from "@databiosphere/findable-ui/lib/components/common/Section/components/SectionTitle/sectionTitle";
-import { Props } from "./types";
-import { GridPaperSection } from "@databiosphere/findable-ui/lib/components/common/Section/section.styles";
 import { KeyValuePairs } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/keyValuePairs";
-import { Fragment } from "react";
-import { KeyValueElType } from "./components/KeyValueElType/keyValueElType";
+import { SectionTitle } from "@databiosphere/findable-ui/lib/components/common/Section/components/SectionTitle/sectionTitle";
+import { GridPaperSection } from "@databiosphere/findable-ui/lib/components/common/Section/section.styles";
+import { Fragment, JSX } from "react";
 import { KeyElType } from "./components/KeyElType/keyElType";
+import { KeyValueElType } from "./components/KeyValueElType/keyValueElType";
 import { ValueElType } from "./components/ValueElType/valueElType";
+import { Props } from "./types";
 
 export const KeyValueSection = ({
   title,

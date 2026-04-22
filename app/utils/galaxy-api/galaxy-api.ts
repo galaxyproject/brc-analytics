@@ -1,13 +1,22 @@
-import { WORKFLOW_PARAMETER_VARIABLE } from "../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { WorkflowParameter } from "../../apis/catalog/brc-analytics-catalog/common/entities";
-import { WorkflowCollectionSpec } from "../../apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { WorkflowUrlSpec } from "../../apis/catalog/brc-analytics-catalog/common/schema-entities";
+import {
+  WORKFLOW_PARAMETER_VARIABLE,
+  WorkflowCollectionSpec,
+  WorkflowUrlSpec,
+} from "../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 
 const FILE_EXT = {
   FASTQ_SANGER_GZ: "fastqsanger.gz",
 } as const;
 
 import ky from "ky";
+import { COLUMN_TYPE } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
+import { PrimaryContrasts } from "../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { UcscTrack } from "../ucsc-tracks-api/entities";
+import {
+  fetchUcscMd5Checksums,
+  getChecksumForPath,
+} from "../ucsc-tracks-api/ucsc-tracks-api";
 import {
   DataLandingsBody,
   DataLandingsBodyRequestState,
@@ -35,13 +44,6 @@ import {
   WorkflowLandingsBodyRequestState,
   WorkflowParameterValue,
 } from "./entities";
-import { COLUMN_TYPE } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
-import { PrimaryContrasts } from "../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { UcscTrack } from "../ucsc-tracks-api/entities";
-import {
-  fetchUcscMd5Checksums,
-  getChecksumForPath,
-} from "../ucsc-tracks-api/ucsc-tracks-api";
 import { ftpToAscp } from "./url-utils";
 
 const DOCKSTORE_API_URL = "https://dockstore.org/api/ga4gh/trs/v2/tools";

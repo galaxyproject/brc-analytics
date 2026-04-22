@@ -1,4 +1,3 @@
-import { JSX, useEffect, useRef, useState } from "react";
 import {
   Alert,
   Box,
@@ -7,6 +6,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { JSX, useEffect, useRef, useState } from "react";
 import { SuggestionChip } from "../../../types/api";
 import { ChatMessage } from "../ChatMessage/chatMessage";
 import { SuggestionChips } from "../SuggestionChips/suggestionChips";

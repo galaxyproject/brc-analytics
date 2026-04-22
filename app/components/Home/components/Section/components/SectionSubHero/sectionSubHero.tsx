@@ -1,5 +1,9 @@
+import { AccordionDetails, AccordionSummary, Fade, Slide } from "@mui/material";
 import { JSX } from "react";
 import { SubHeroContent } from "../../../../content";
+import { ACCORDION_PROPS, FADE_PROPS, SLIDE_PROPS } from "./constants";
+import { useAutoCycle } from "./hooks";
+import { ACCORDION, BUTTON, IMAGE } from "./instructions";
 import {
   AccordionBox,
   Section,
@@ -13,10 +17,6 @@ import {
   Subhead,
   TransparentBox,
 } from "./sectionSubHero.styles";
-import { ACCORDION, BUTTON, IMAGE } from "./instructions";
-import { AccordionDetails, AccordionSummary, Fade, Slide } from "@mui/material";
-import { ACCORDION_PROPS, FADE_PROPS, SLIDE_PROPS } from "./constants";
-import { useAutoCycle } from "./hooks";
 
 export const SectionSubHero = (): JSX.Element => {
   const accordionKeys = Object.keys(ACCORDION);

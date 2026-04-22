@@ -1,5 +1,5 @@
-import { MouseEvent, useCallback, useState } from "react";
 import { ToggleButtonGroupProps } from "@mui/material";
+import { MouseEvent, useCallback, useState } from "react";
 
 export const useToggleButtonGroup = (
   initialValue: ToggleButtonGroupProps["value"]

@@ -1,7 +1,7 @@
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
-import { SubmitOptions } from "./types";
-import { AccessionInfo } from "./entities";
 import { ENA_FIELDS } from "./constants";
+import { AccessionInfo } from "./entities";
+import { SubmitOptions } from "./types";
 
 export const ENA_API = `${process.env.NEXT_PUBLIC_ENA_PROXY_DOMAIN}/ena/portal/api/search?result=read_run&query={query}&fields=${ENA_FIELDS.join(",")}&format=json`;
 

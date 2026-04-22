@@ -1,6 +1,7 @@
 import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
 import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
 import { useCallback } from "react";
+import { Workflow } from "../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import {
   getDataLandingUrl,
   getDeSeq2LandingUrl,
@@ -11,7 +12,6 @@ import { CUSTOM_WORKFLOW } from "../../../../../../../../../../../../views/Analy
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { LEXICMAP } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/lexicmap/constants";
 import { LOGAN_SEARCH } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/loganSearch/constants";
-import { Workflow } from "../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import {
   ConfiguredValue,
   isAssemblyConfiguredValue,

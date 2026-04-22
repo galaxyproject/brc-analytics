@@ -1,5 +1,5 @@
-import { isOutbreakPriority } from "./typeGuards";
 import { getPriorityLabel } from "../../../../../../app/views/PriorityPathogensView/components/PriorityPathogens/utils";
+import { isOutbreakPriority } from "./typeGuards";
 
 /**
  * Returns the priority label for the given value.

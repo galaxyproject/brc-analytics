@@ -1,12 +1,12 @@
-import { JSX } from "react";
 import { GetStaticProps } from "next";
+import { JSX } from "react";
+import { getPageMeta } from "../../app/common/meta/utils";
 import { StyledPagesMain } from "../../app/components/Layout/components/Main/main.styles";
+import { config } from "../../app/config/config";
 import { RoadmapView } from "../../app/views/RoadmapView/roadmapView";
 import { RoadmapViewGA2 } from "../../app/views/RoadmapView/roadmapViewGA2";
-import { getPageMeta } from "../../app/common/meta/utils";
-import { config } from "../../app/config/config";
-import { APP_KEYS } from "../../site-config/common/constants";
 import { ROUTES } from "../../routes/constants";
+import { APP_KEYS } from "../../site-config/common/constants";
 
 export const Roadmap = (): JSX.Element => {
   const { appKey } = config();

@@ -1,13 +1,12 @@
-import { JSX } from "react";
-import { Props } from "./types";
-import { Stepper } from "./components/Stepper/stepper";
 import { Loading } from "@databiosphere/findable-ui/lib/components/Loading/loading";
-import { PAPER_PANEL_STYLE } from "@databiosphere/findable-ui/lib/components/common/Paper/paper";
-import { useLaunchGalaxy } from "./components/Stepper/components/Step/hooks/UseLaunchGalaxy/useLaunchGalaxy";
-import { StyledButton, StyledMainContainer } from "./main.styles";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
-import { useState } from "react";
+import { PAPER_PANEL_STYLE } from "@databiosphere/findable-ui/lib/components/common/Paper/paper";
+import { JSX, useState } from "react";
 import { Workflow } from "../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
+import { useLaunchGalaxy } from "./components/Stepper/components/Step/hooks/UseLaunchGalaxy/useLaunchGalaxy";
+import { Stepper } from "./components/Stepper/stepper";
+import { StyledButton, StyledMainContainer } from "./main.styles";
+import { Props } from "./types";
 
 export const Main = ({
   activeStep,

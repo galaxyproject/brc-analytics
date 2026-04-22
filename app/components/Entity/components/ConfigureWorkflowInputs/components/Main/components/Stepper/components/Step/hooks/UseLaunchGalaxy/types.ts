@@ -1,10 +1,10 @@
 import { EnaSequencingReads } from "app/utils/galaxy-api/entities";
 import { Workflow } from "../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
+import { UcscTrack } from "../../../../../../../../../../../../utils/ucsc-tracks-api/entities";
 import {
   ConfiguredInput,
   PrimaryContrasts,
 } from "../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { UcscTrack } from "../../../../../../../../../../../../utils/ucsc-tracks-api/entities";
 import { COLUMN_TYPE } from "../../SampleSheetClassificationStep/types";
 import { Strandedness } from "../../StrandednessStep/types";
 

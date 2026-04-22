@@ -1,7 +1,7 @@
-import styled from "@emotion/styled";
 import { Alert } from "@databiosphere/findable-ui/lib/components/common/Alert/alert";
 import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 import { bpDownSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
+import styled from "@emotion/styled";
 
 export const StyledAlert = styled(Alert)`
   &.MuiAlert-root {

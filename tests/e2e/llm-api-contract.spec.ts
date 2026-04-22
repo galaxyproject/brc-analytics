@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test.describe("BRC Analytics - LLM API Contract Tests", () => {
   test("should validate dataset search response schema for valid queries", async ({

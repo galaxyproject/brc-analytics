@@ -1,5 +1,5 @@
-import { JSX } from "react";
 import { Chip } from "@mui/material";
+import { JSX } from "react";
 import { SuggestionChip } from "../../../types/api";
 import { ChipsContainer } from "./suggestionChips.styles";
 

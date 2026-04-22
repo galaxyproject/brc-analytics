@@ -1,16 +1,16 @@
-import { Fragment, JSX } from "react";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import Error from "next/error";
-import { SectionHero } from "../../components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
+import { Fragment, JSX } from "react";
 import { ChatPanel, SchemaPanel } from "../../components/Assistant";
+import { SectionHero } from "../../components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import { useAssistantChat } from "../../hooks/useAssistantChat";
-import { BREADCRUMBS } from "./common/constants";
 import {
   AssistantSection,
   ChatColumn,
   SchemaColumn,
   TwoPanelLayout,
 } from "./assistantView.styles";
+import { BREADCRUMBS } from "./common/constants";
 
 export const AssistantView = (): JSX.Element => {
   const isAssistantEnabled = useFeatureFlag("assistant");

@@ -1,4 +1,4 @@
-import { JSX, useState } from "react";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   Accordion,
   AccordionDetails,
@@ -9,7 +9,7 @@ import {
   Chip,
   Typography,
 } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { JSX, useState } from "react";
 import { DatasetSearchResponse, ENAStudyGroup } from "../../../types/api";
 import {
   ChipContainer,
