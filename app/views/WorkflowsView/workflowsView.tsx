@@ -20,6 +20,7 @@ export const WorkflowsView = (): JSX.Element => {
   const workflowCategories = getWorkflowCategories();
   const organisms = getOrganisms<Organism>();
   const isFluEnabled = useFeatureFlag("flu");
+  const isHyphyEnabled = useFeatureFlag("hyphy");
   const isLmlsEnabled = useFeatureFlag("lmls");
   const [mappings, setMappings] = useState<WorkflowAssemblyMapping[] | null>(
     null
@@ -46,10 +47,18 @@ export const WorkflowsView = (): JSX.Element => {
             mappings,
             organisms,
             isLmlsEnabled,
-            isFluEnabled
+            isFluEnabled,
+            isHyphyEnabled
           )
         : [],
-    [isFluEnabled, isLmlsEnabled, mappings, organisms, workflowCategories]
+    [
+      isFluEnabled,
+      isHyphyEnabled,
+      isLmlsEnabled,
+      mappings,
+      organisms,
+      workflowCategories,
+    ]
   );
 
   return <ExploreView data={workflows} Component={Workflows} />;

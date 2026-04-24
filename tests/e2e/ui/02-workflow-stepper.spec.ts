@@ -22,7 +22,7 @@ const RNASEQ_PE_TRS_ID =
 
 // ATAC-seq workflow (2 steps: Reference Assembly [disabled], Paired-End Sequencing Data).
 const ATACSEQ_TRS_ID =
-  "workflow-github-com-iwc-workflows-atacseq-main-versions-v1-0";
+  "workflow-github-com-iwc-workflows-atacseq-main-versions-v2-0";
 
 // Step labels.
 const STEP_LABELS = {

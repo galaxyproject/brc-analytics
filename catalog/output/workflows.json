@@ -211,7 +211,7 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.4",
+        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.5",
         "workflowDescription": "Comprehensive preprocessing for 10X Genomics CellPlex multiplexed single-cell RNA-seq data. Processes Cell Multiplexing Oligo (CMO) FASTQ files with CITE-seq-Count including required CellPlex-specific translation steps. Simultaneously processes gene expression FASTQ files with STARsolo and DropletUtils for alignment and cell filtering, and formats outputs for seamless import into Seurat/Scanpy (Read10X function).",
         "workflowName": "Single-Cell RNA-seq Preprocessing: 10X Genomics CellPlex Multiplexed Samples"
       },
@@ -240,7 +240,7 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.4",
+        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.5",
         "workflowDescription": "Complete preprocessing pipeline for 10X Genomics v3 single-cell RNA-seq data. Aligns raw FASTQ files using STARsolo, performs cell calling and quality filtering with DropletUtils, and formats outputs for seamless import into Seurat/Scanpy (Read10X function).",
         "workflowName": "Single-Cell RNA-seq Preprocessing: 10X Genomics v3 to Seurat and Scanpy Compatible Format"
       },
@@ -314,7 +314,7 @@
         "iwcId": "atacseq-main",
         "parameters": [
           {
-            "key": "reference_genome",
+            "key": "Reference Genome",
             "variable": "ASSEMBLY_ID"
           },
           {
@@ -331,8 +331,8 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/atacseq/main/versions/v1.0",
-        "workflowDescription": "Complete ATAC-seq analysis pipeline for paired-end reads. Processes raw FASTQ data through adapter and bad quality removal (cutadapt), alignment (Bowtie2 end-to-end), and filtering (removes MT reads, discordant pairs, low mapping quality <30, PCR duplicates). Generates 5' cut site pileups (±100bp), performs peak calling, and quantifies reads in 1kb summit-centered regions. Produces two normalized coverage tracks (per million mapped reads and per million reads in peaks) and fragment length distribution plots for quality assessment.",
+        "trsId": "#workflow/github.com/iwc-workflows/atacseq/main/versions/v2.0",
+        "workflowDescription": "Complete ATAC-seq analysis pipeline for paired-end reads. Processes raw FASTQ data through adapter and bad quality removal (fastp), alignment (Bowtie2 end-to-end), and filtering (removes MT reads, discordant pairs, low mapping quality below 30, PCR duplicates). Generates 5' cut site pileups (±100bp), performs peak calling, and quantifies reads in 1kb summit-centered regions. Produces two normalized coverage tracks (per million mapped reads and per million reads in peaks) and fragment length distribution plots for quality assessment.",
         "workflowName": "ATAC-seq Analysis: Chromatin Accessibility Profiling"
       },
       {
@@ -356,7 +356,7 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v1.0",
+        "trsId": "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v1.1",
         "workflowDescription": "Complete ChIP-seq analysis for paired-end sequencing data. Processes raw FASTQ files through adapter removal (fastp), alignment to reference genome (Bowtie2), and stringent quality filtering (MAPQ greater than 30, concordant pairs only). Peak calling with MACS2 optimized for paired-end reads identifies protein-DNA binding sites. Generates alignment files, coverage, peak calls, and quality metrics for downstream analysis.",
         "workflowName": "ChIP-seq Analysis: Paired-End Read Processing"
       },
@@ -381,7 +381,7 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v1.0",
+        "trsId": "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v1.1",
         "workflowDescription": "Complete ChIP-seq analysis for single-end sequencing data. Processes raw FASTQ files through adapter removal (fastp), alignment to reference genome (Bowtie2), and quality filtering (MAPQ greater than 30). Peak calling with MACS2 uses a fixed extension of 200bp to identify protein-DNA binding sites. Generates alignment files, coverage, peak calls, and quality metrics for downstream analysis.",
         "workflowName": "ChIP-seq Analysis: Single-End Read Processing"
       },
@@ -391,9 +391,9 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.4",
-        "workflowDescription": "Identifies high-confidence consensus peaks from ATAC-seq or CUT&RUN replicate experiments. The workflow calls peaks on individual replicates and identifies their intersection. To control for sequencing depth differences, it subsamples all replicates to the smallest library size, performs peak calling on the combined normalized data, and retains only peaks whose summits overlap with intersections from a user-defined minimum number of replicates.",
-        "workflowName": "Consensus Peak Calling for ATAC-seq and CUT&RUN Replicates"
+        "trsId": "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.5",
+        "workflowDescription": "Identifies high-confidence consensus peaks from ATAC-seq or CUT and RUN replicate experiments. The workflow calls peaks on individual replicates and identifies their intersection. To control for sequencing depth differences, it subsamples all replicates to the smallest library size, performs peak calling on the combined normalized data, and retains only peaks whose summits overlap with intersections from a user-defined minimum number of replicates.",
+        "workflowName": "Consensus Peak Calling for ATAC-seq and CUT and RUN Replicates"
       },
       {
         "iwcId": "cutandrun-main",
@@ -417,7 +417,7 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.17",
+        "trsId": "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.18",
         "workflowDescription": "Complete CUT&amp;RUN/CUT&amp;TAG analysis workflow for paired-end sequencing data. Processes raw FASTQ files through adapter removal (cutadapt) and alignment (Bowtie2 with dovetail option enabled). Applies quality filtering (MAPQ ≥ 30, concordant pairs only), converts BAM to BED format, and performs peak calling using MACS2 with parameters optimized for the punctate signal profile characteristic of CUT&amp;RUN/CUT&amp;TAG experiments.",
         "workflowName": "CUT&amp;RUN/CUT&amp;TAG Analysis: Protein-DNA Interaction Mapping"
       },
@@ -541,57 +541,57 @@
             "key": "References per segment collection",
             "collection_spec": {
               "collection_type": "list",
-              "name": "Influenza A Segment References",
               "elements": [
                 {
                   "ext": "fasta",
-                  "md5": "0cc350480c0ef6d2583b4764adaabb5a",
                   "src": "url",
-                  "url": "https://zenodo.org/records/14628364/files/ref_1_pb2.fasta"
+                  "url": "https://zenodo.org/records/14628364/files/ref_1_pb2.fasta",
+                  "md5": "0cc350480c0ef6d2583b4764adaabb5a"
                 },
                 {
                   "ext": "fasta",
-                  "md5": "a8c9d6aa3c21ec24c42f480750dc4eca",
                   "src": "url",
-                  "url": "https://zenodo.org/records/14628364/files/ref_2_pb1.fasta"
+                  "url": "https://zenodo.org/records/14628364/files/ref_2_pb1.fasta",
+                  "md5": "a8c9d6aa3c21ec24c42f480750dc4eca"
                 },
                 {
                   "ext": "fasta",
-                  "md5": "a5f373e913c0f84ea00cba35ea81c703",
                   "src": "url",
-                  "url": "https://zenodo.org/records/14628364/files/ref_3_pa.fasta"
+                  "url": "https://zenodo.org/records/14628364/files/ref_3_pa.fasta",
+                  "md5": "a5f373e913c0f84ea00cba35ea81c703"
                 },
                 {
                   "ext": "fasta",
-                  "md5": "9476d2c02a0429e6b0e5a70ea2a94ef2",
                   "src": "url",
-                  "url": "https://zenodo.org/records/14628364/files/ref_4_ha.fasta"
+                  "url": "https://zenodo.org/records/14628364/files/ref_4_ha.fasta",
+                  "md5": "9476d2c02a0429e6b0e5a70ea2a94ef2"
                 },
                 {
                   "ext": "fasta",
-                  "md5": "3d0e28d72bba2c8b352d64052524473d",
                   "src": "url",
-                  "url": "https://zenodo.org/records/14628364/files/ref_5_np.fasta"
+                  "url": "https://zenodo.org/records/14628364/files/ref_5_np.fasta",
+                  "md5": "3d0e28d72bba2c8b352d64052524473d"
                 },
                 {
                   "ext": "fasta",
-                  "md5": "d8c21026a3defe01e020628e5b76227c",
                   "src": "url",
-                  "url": "https://zenodo.org/records/14628364/files/ref_6_na.fasta"
+                  "url": "https://zenodo.org/records/14628364/files/ref_6_na.fasta",
+                  "md5": "d8c21026a3defe01e020628e5b76227c"
                 },
                 {
                   "ext": "fasta",
-                  "md5": "13b0b6900807d5e557348b0e69dc79ad",
                   "src": "url",
-                  "url": "https://zenodo.org/records/14628364/files/ref_7_mp.fasta"
+                  "url": "https://zenodo.org/records/14628364/files/ref_7_mp.fasta",
+                  "md5": "13b0b6900807d5e557348b0e69dc79ad"
                 },
                 {
                   "ext": "fasta",
-                  "md5": "e98fc11ed2c825e54d8d88b295449f41",
                   "src": "url",
-                  "url": "https://zenodo.org/records/14628364/files/ref_8_ns.fasta"
+                  "url": "https://zenodo.org/records/14628364/files/ref_8_ns.fasta",
+                  "md5": "e98fc11ed2c825e54d8d88b295449f41"
                 }
-              ]
+              ],
+              "name": "Influenza A Segment References"
             }
           },
           {
@@ -703,17 +703,28 @@
     "workflows": []
   },
   {
-    "category": "GENOME_COMPARISONS",
-    "description": "Workflows for creation of pairwise and multiple genome alignments.",
-    "name": "Genome comparisons",
-    "showComingSoon": true,
-    "workflows": []
-  },
-  {
     "category": "PROTEIN_FOLDING",
     "description": "Analysis of protein folding using the ColabFold framework.",
     "name": "Protein folding",
     "showComingSoon": true,
     "workflows": []
+  },
+  {
+    "category": "COMPARATIVE_GENOMICS",
+    "description": "Workflows for comparative genomics analysis.",
+    "name": "Comparative genomics",
+    "showComingSoon": false,
+    "workflows": [
+      {
+        "iwcId": "hyphy-capheine-core-and-compare",
+        "parameters": [],
+        "ploidy": "ANY",
+        "scope": "ORGANISM",
+        "taxonomyId": "10239",
+        "trsId": "#workflow/github.com/iwc-workflows/hyphy/capheine-core-and-compare/versions/v0.1",
+        "workflowDescription": "Runs CAPHEINE selection analyses with optional foreground/background branch labeling for branch comparisons.",
+        "workflowName": "CAPHEINE: Combined HyPhy Core and Compare"
+      }
+    ]
   }
 ]

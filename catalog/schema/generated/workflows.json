@@ -171,6 +171,7 @@
                 "PROTEIN_FOLDING",
                 "CONSENSUS_SEQUENCES",
                 "ANNOTATION",
+                "COMPARATIVE_GENOMICS",
                 "OTHER"
             ],
             "title": "WorkflowCategoryId",
