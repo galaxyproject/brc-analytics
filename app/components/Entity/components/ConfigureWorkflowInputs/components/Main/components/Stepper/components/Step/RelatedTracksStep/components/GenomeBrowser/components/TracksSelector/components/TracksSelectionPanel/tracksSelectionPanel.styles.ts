@@ -1,9 +1,9 @@
-import styled from "@emotion/styled";
-import { Container, Stack } from "@mui/material";
+import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
+import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { css } from "@emotion/react";
-import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
-import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
+import styled from "@emotion/styled";
+import { Container, Stack } from "@mui/material";
 
 interface Props {
   canExpand?: boolean;

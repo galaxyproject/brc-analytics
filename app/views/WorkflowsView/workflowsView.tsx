@@ -8,8 +8,8 @@ import { WorkflowAssemblyMapping } from "../../apis/catalog/brc-analytics-catalo
 import { API } from "../../services/workflows/routes";
 import { ExploreView } from "../ExploreView/exploreView";
 import { Workflows } from "./components/Workflows/workflows";
-import { getWorkflows } from "./utils";
 import { Organism } from "./types";
+import { getWorkflows } from "./utils";
 
 /**
  * WorkflowsView renders the main view for exploring workflows,

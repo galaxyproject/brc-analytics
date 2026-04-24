@@ -1,9 +1,9 @@
-import { SectionContentCard } from "../../components/common/Card/components/SectionContentCard/sectionContentCard";
 import { ComponentProps } from "react";
-import { RocketLaunchIcon } from "./components/icon/RocketLaunchIcon/rocketLaunchIcon";
+import { SectionContentCard } from "../../components/common/Card/components/SectionContentCard/sectionContentCard";
 import { BookmarkStarIcon } from "./components/icon/BookmarkStarIcon/bookmarkStarIcon";
 import { GalaxyIcon } from "./components/icon/GalaxyIcon/galaxyIcon";
 import { LiveHelpIcon } from "./components/icon/LiveHelpIcon/liveHelpIcon";
+import { RocketLaunchIcon } from "./components/icon/RocketLaunchIcon/rocketLaunchIcon";
 import { YouTubeIcon } from "./components/icon/YouTubeIcon/youTubeIcon";
 
 export const CARDS: ComponentProps<typeof SectionContentCard>[] = [

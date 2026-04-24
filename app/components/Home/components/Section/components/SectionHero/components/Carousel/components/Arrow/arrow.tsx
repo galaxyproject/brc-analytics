@@ -1,5 +1,5 @@
-import { JSX } from "react";
 import { SouthIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/SouthIcon/southIcon";
+import { JSX } from "react";
 import { SwipeAction } from "../../../../../../../../../../hooks/useSwipeInteraction/common/entities";
 import { IconButton } from "./arrow.styles";
 

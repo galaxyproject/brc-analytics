@@ -1,11 +1,11 @@
-import { JSX } from "react";
-import { IconButton, Stack, MenuItem, Typography } from "@mui/material";
-import { Props } from "./types";
-import { StyledStack, StyledSelect } from "./pairRow.styles";
-import { DeleteIcon } from "../../../../../../../../../../../../../../common/CustomIcon/components/DeleteIcon/deleteIcon";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
-import { ICON_BUTTON_PROPS, SELECT_PROPS, SVG_ICON_PROPS } from "./constants";
+import { IconButton, MenuItem, Stack, Typography } from "@mui/material";
+import { JSX } from "react";
+import { DeleteIcon } from "../../../../../../../../../../../../../../common/CustomIcon/components/DeleteIcon/deleteIcon";
 import { getDisabledValues } from "../../../../hooks/UseExplicitContrasts/utils";
+import { ICON_BUTTON_PROPS, SELECT_PROPS, SVG_ICON_PROPS } from "./constants";
+import { StyledSelect, StyledStack } from "./pairRow.styles";
+import { Props } from "./types";
 
 export const PairRow = ({
   factorValues,

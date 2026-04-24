@@ -1,5 +1,5 @@
-import { JSX } from "react";
 import { Box, Button, Chip, Divider, Typography } from "@mui/material";
+import { JSX } from "react";
 import {
   AnalysisSchema,
   FieldStatus,

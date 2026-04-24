@@ -3,8 +3,8 @@ import {
   ConfiguredInput,
   OnConfigure,
 } from "../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { StepConfig } from "./components/Stepper/components/Step/types";
 import { Assembly } from "../../../../../../views/WorkflowInputsView/types";
+import { StepConfig } from "./components/Stepper/components/Step/types";
 import {
   OnContinue,
   OnEdit,

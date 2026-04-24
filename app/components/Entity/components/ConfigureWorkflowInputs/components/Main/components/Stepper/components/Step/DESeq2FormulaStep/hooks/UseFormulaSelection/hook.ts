@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FormulaSelection, UseFormulaSelection } from "./types";
 import { ConfiguredInput } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { FormulaSelection, UseFormulaSelection } from "./types";
 import {
   generateFormula,
   getFormulaColumns,

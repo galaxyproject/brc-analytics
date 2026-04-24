@@ -1,9 +1,9 @@
+import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
+import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
+import { Button, Grid, Typography } from "@mui/material";
 import { JSX } from "react";
-import { Button, Typography, Grid } from "@mui/material";
 import { StyledRoundedPaper } from "./tracksSummary.styles";
 import { Props } from "./types";
-import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 
 export const TracksSummary = ({
   onClear,

@@ -1,6 +1,6 @@
+import { getConfig } from "@databiosphere/findable-ui/lib/config/config";
 import { useEffect, useState } from "react";
 import { ensureEntitiesLoaded } from "./utils";
-import { getConfig } from "@databiosphere/findable-ui/lib/config/config";
 
 export function useEntities(): boolean {
   const [isLoaded, setIsLoaded] = useState(false);

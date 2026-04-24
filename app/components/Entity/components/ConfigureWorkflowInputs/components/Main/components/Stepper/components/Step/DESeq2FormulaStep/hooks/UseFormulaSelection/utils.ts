@@ -1,11 +1,11 @@
 import { ConfiguredInput } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { COLUMN_TYPE } from "../../../SampleSheetClassificationStep/types";
+import { FORMULA_COLUMN_TYPES } from "./constants";
 import {
   CategorizedCovariates,
   FormulaColumn,
   FormulaSelection,
 } from "./types";
-import { FORMULA_COLUMN_TYPES } from "./constants";
 
 /**
  * Builds a DESeq2 formula string from categorized covariates and primary.

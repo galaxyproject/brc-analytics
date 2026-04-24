@@ -1,5 +1,5 @@
-import { css } from "@emotion/react";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
+import { css } from "@emotion/react";
 
 export const section = css`
   width: 100%;

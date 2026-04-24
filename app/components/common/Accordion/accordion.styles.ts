@@ -1,8 +1,8 @@
+import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
+import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { SHADOWS } from "@databiosphere/findable-ui/lib/styles/common/constants/shadows";
 import styled from "@emotion/styled";
 import { Accordion as MAccordion } from "@mui/material";
-import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
-import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 
 export const StyledAccordion = styled(MAccordion)`
   box-shadow: ${SHADOWS["01"]} !important;

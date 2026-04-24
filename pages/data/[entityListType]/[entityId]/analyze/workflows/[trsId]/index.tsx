@@ -8,7 +8,7 @@ import {
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
 import { EntitiesResponse } from "../../../../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
-import { BRC_PAGE_META } from "../../../../../../../app/common/meta/brc/constants";
+import { getPageMeta } from "../../../../../../../app/common/meta/utils";
 import { config } from "../../../../../../../app/config/config";
 import { getEntities } from "../../../../../../../app/utils/entityUtils";
 import { seedDatabase } from "../../../../../../../app/utils/seedDatabase";
@@ -69,7 +69,7 @@ export const getStaticProps = async (
     props: {
       entityId,
       entityListType,
-      ...BRC_PAGE_META.CONFIGURE_WORKFLOW,
+      ...getPageMeta(config().appKey).CONFIGURE_WORKFLOW,
       trsId,
     },
   };

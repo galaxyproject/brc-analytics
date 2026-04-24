@@ -1,14 +1,14 @@
-import { JSX } from "react";
-import { GetStaticProps } from "next";
-import { StyledMain } from "../app/components/Layout/components/Main/main.styles";
-import { HomeView } from "../app/views/HomeView/homeView";
-import { HomeView as GA2HomeView } from "../app/views/HomeView/ga2/homeView";
-import { BRC_PAGE_META } from "../app/common/meta/brc/constants";
-import { config } from "../app/config/config";
 import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
-import { AppSiteConfig } from "../site-config/common/entities";
-import { APP_KEYS } from "../site-config/common/constants";
 import { useLayoutDimensions } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/hook";
+import { GetStaticProps } from "next";
+import { JSX } from "react";
+import { getPageMeta } from "../app/common/meta/utils";
+import { StyledMain } from "../app/components/Layout/components/Main/main.styles";
+import { config } from "../app/config/config";
+import { HomeView as GA2HomeView } from "../app/views/HomeView/ga2/homeView";
+import { HomeView } from "../app/views/HomeView/homeView";
+import { APP_KEYS } from "../site-config/common/constants";
+import { AppSiteConfig } from "../site-config/common/entities";
 
 export const Home = (): JSX.Element | null => {
   const { config } = useConfig();
@@ -30,7 +30,7 @@ export const getStaticProps: GetStaticProps = async () => {
 
   return {
     props: {
-      pageDescription: BRC_PAGE_META.HOME.pageDescription,
+      pageDescription: getPageMeta(appKey).HOME.pageDescription,
       pageTitle: appTitle,
       themeOptions: {
         palette: { background: { default: backgroundColor } },

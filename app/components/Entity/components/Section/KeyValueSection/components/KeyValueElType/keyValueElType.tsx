@@ -1,7 +1,7 @@
-import { JSX } from "react";
 import { KeyValueElTypeProps } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/KeyValueElType/keyValueElType";
 import { ChildrenProps } from "@databiosphere/findable-ui/lib/components/types";
 import { Grid, GridProps } from "@mui/material";
+import { JSX } from "react";
 
 export const KeyValueElType = ({
   children,

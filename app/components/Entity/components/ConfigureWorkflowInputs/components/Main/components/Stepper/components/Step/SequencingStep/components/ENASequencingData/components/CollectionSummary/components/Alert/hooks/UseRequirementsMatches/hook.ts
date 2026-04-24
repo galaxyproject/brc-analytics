@@ -1,9 +1,9 @@
 import { Table } from "@tanstack/react-table";
+import { useMemo } from "react";
+import { Assembly } from "../../../../../../../../../../../../../../../../../../../views/WorkflowInputsView/types";
 import { ReadRun } from "../../../../../../types";
 import { UseRequirementsMatches } from "./types";
-import { useMemo } from "react";
 import { buildRequirementWarnings } from "./utils";
-import { Assembly } from "../../../../../../../../../../../../../../../../../../../views/WorkflowInputsView/types";
 
 export const useRequirementsMatches = (
   table: Table<ReadRun>,
