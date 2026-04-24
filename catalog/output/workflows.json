@@ -314,7 +314,7 @@
         "iwcId": "atacseq-main",
         "parameters": [
           {
-            "key": "reference_genome",
+            "key": "Reference Genome",
             "variable": "ASSEMBLY_ID"
           },
           {

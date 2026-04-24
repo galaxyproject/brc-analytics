@@ -123,7 +123,7 @@ workflows:
       peaks) and fragment length distribution plots for quality assessment.
     ploidy: ANY
     parameters:
-      - key: reference_genome
+      - key: Reference Genome
         variable: ASSEMBLY_ID
       - key: PE fastq input
         variable: SANGER_READ_RUN_PAIRED
@@ -134,22 +134,13 @@ workflows:
         type_guide:
           class: Collection
           collection_type: list:paired
-      - key: effective_genome_size
-        type_guide:
-          class: integer
-      - key: bin_size
-        type_guide:
-          class: integer
-      - key: Percentage of bad quality bases per read
-        type_guide:
-          class: integer
-      - key: Reference Genome
-        type_guide:
-          class: text
       - key: Effective genome size
         type_guide:
           class: integer
       - key: Bin size
+        type_guide:
+          class: integer
+      - key: Percentage of bad quality bases per read
         type_guide:
           class: integer
     active: true
@@ -976,7 +967,7 @@ workflows:
   - trs_id: "#workflow/github.com/iwc-workflows/hyphy/hyphy-preprocessing/versions/v0.1"
     categories:
       - COMPARATIVE_GENOMICS
-    workflow_name: "HyPhy: Preprocessing "
+    workflow_name: "HyPhy: Preprocessing"
     workflow_description:
       Generates codon-aware alignments and phylogenetic trees compatible
       with downstream HyPhy analyses.
