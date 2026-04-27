@@ -113,29 +113,29 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
                   <LayoutDimensionsProvider>
                     <AppLayout>
                       <DXHeader {...filteredHeader} />
-                      <ExploreStateProvider entityListType={entityListType}>
-                        <Main>
-                          <ErrorBoundary
-                            fallbackRender={({
-                              error,
-                              reset,
-                            }: {
-                              error: DataExplorerError;
-                              reset: () => void;
-                            }): JSX.Element => (
-                              <Error
-                                errorMessage={error.message}
-                                requestUrlMessage={error.requestUrlMessage}
-                                rootPath={redirectRootToPath}
-                                onReset={reset}
-                              />
-                            )}
-                          >
+                      <Main>
+                        <ErrorBoundary
+                          fallbackRender={({
+                            error,
+                            reset,
+                          }: {
+                            error: DataExplorerError;
+                            reset: () => void;
+                          }): JSX.Element => (
+                            <Error
+                              errorMessage={error.message}
+                              requestUrlMessage={error.requestUrlMessage}
+                              rootPath={redirectRootToPath}
+                              onReset={reset}
+                            />
+                          )}
+                        >
+                          <ExploreStateProvider entityListType={entityListType}>
                             <Component {...pageProps} />
                             <Floating {...floating} />
-                          </ErrorBoundary>
-                        </Main>
-                      </ExploreStateProvider>
+                          </ExploreStateProvider>
+                        </ErrorBoundary>
+                      </Main>
                       <StyledFooter {...footer} />
                     </AppLayout>
                   </LayoutDimensionsProvider>
