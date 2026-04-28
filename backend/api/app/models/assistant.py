@@ -138,3 +138,17 @@ class SessionRestoreResponse(BaseModel):
     suggestions: List[SuggestionChip] = Field(default_factory=list)
     is_complete: bool = False
     handoff_url: Optional[str] = None
+
+
+class AssistantInfoResponse(BaseModel):
+    """Response from the assistant info endpoint -- surfaces model attribution to the UI."""
+
+    available: bool = Field(
+        ..., description="Whether the assistant agent is configured"
+    )
+    model: Optional[str] = Field(
+        None, description="Model identifier in use (e.g. 'claude-sonnet-4-5')"
+    )
+    provider: Optional[str] = Field(
+        None, description="Provider hosting the model (e.g. 'anthropic', 'openai')"
+    )

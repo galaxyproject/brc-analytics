@@ -3,11 +3,29 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException, Response
 
 from app.core.dependencies import check_rate_limit, get_assistant_agent
-from app.models.assistant import ChatRequest, ChatResponse, SessionRestoreResponse
+from app.models.assistant import (
+    AssistantInfoResponse,
+    ChatRequest,
+    ChatResponse,
+    SessionRestoreResponse,
+)
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
+
+@router.get("/info", response_model=AssistantInfoResponse)
+async def assistant_info(
+    agent=Depends(get_assistant_agent),
+):
+    """Surface assistant configuration for UI attribution (model + provider)."""
+    available = agent.is_available()
+    return AssistantInfoResponse(
+        available=available,
+        model=agent.settings.AI_PRIMARY_MODEL if available else None,
+        provider=agent.get_provider() if available else None,
+    )
 
 
 @router.post("/chat", response_model=ChatResponse)

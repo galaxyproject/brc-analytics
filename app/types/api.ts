@@ -154,6 +154,12 @@ export interface SessionRestoreResponse {
   suggestions: SuggestionChip[];
 }
 
+export interface AssistantInfoResponse {
+  available: boolean;
+  model: string | null;
+  provider: string | null;
+}
+
 export interface UnifiedSearchResponse {
   datasets?: {
     cached: boolean;
