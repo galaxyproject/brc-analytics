@@ -122,7 +122,33 @@ class SessionState(BaseModel):
     session_id: str
     schema_state: AnalysisSchema = Field(default_factory=AnalysisSchema)
     messages: List[ChatMessage] = Field(default_factory=list)
+    suggestions: List[SuggestionChip] = Field(default_factory=list)
     # Raw pydantic-ai message history, serialised as JSON-safe dicts
     agent_message_history: List[Dict[str, Any]] = Field(default_factory=list)
     # Metadata accumulated during conversation (taxonomy_id, accession, etc.)
     metadata: Dict[str, Any] = Field(default_factory=dict)
+
+
+class SessionRestoreResponse(BaseModel):
+    """Response from the session restore endpoint."""
+
+    session_id: str
+    messages: List[ChatMessage]
+    schema_state: AnalysisSchema
+    suggestions: List[SuggestionChip] = Field(default_factory=list)
+    is_complete: bool = False
+    handoff_url: Optional[str] = None
+
+
+class AssistantInfoResponse(BaseModel):
+    """Response from the assistant info endpoint -- surfaces model attribution to the UI."""
+
+    available: bool = Field(
+        ..., description="Whether the assistant agent is configured"
+    )
+    model: Optional[str] = Field(
+        None, description="Model identifier in use (e.g. 'claude-sonnet-4-5')"
+    )
+    provider: Optional[str] = Field(
+        None, description="Provider hosting the model (e.g. 'anthropic', 'openai')"
+    )

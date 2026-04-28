@@ -1,10 +1,11 @@
 import { Box, Button, Chip, Divider, Typography } from "@mui/material";
-import { JSX } from "react";
+import { JSX, useCallback } from "react";
 import {
   AnalysisSchema,
   FieldStatus,
   SchemaFieldState,
 } from "../../../types/api";
+import { ASSISTANT_HANDOFF_KEY } from "../../../views/WorkflowInputsView/hooks/UseAssistantHandoff/types";
 import {
   FieldRow,
   FieldValue,
@@ -43,6 +44,19 @@ const FIELD_ORDER: (keyof AnalysisSchema)[] = [
   ...OPTIONAL_FIELDS,
 ];
 
+function resolveDataSource(value: string | null | undefined): "ena" | "upload" {
+  if (!value) return "ena";
+  const lower = value.toLowerCase();
+  if (
+    lower.includes("upload") ||
+    lower.includes("own") ||
+    lower.includes("local")
+  ) {
+    return "upload";
+  }
+  return "ena";
+}
+
 /**
  * Get the status indicator for a schema field.
  * @param props - Component props
@@ -70,6 +84,16 @@ export const SchemaPanel = ({
   handoffUrl,
   schema,
 }: SchemaPanelProps): JSX.Element => {
+  const handleContinue = useCallback((): void => {
+    if (!handoffUrl || !schema) return;
+    const handoff = {
+      dataSource: resolveDataSource(schema.data_source.value),
+      timestamp: Date.now(),
+    };
+    localStorage.setItem(ASSISTANT_HANDOFF_KEY, JSON.stringify(handoff));
+    window.location.href = handoffUrl;
+  }, [handoffUrl, schema]);
+
   if (!schema) {
     return (
       <PanelContainer>
@@ -126,7 +150,12 @@ export const SchemaPanel = ({
 
       {handoffUrl && (
         <Box sx={{ p: 2 }}>
-          <Button fullWidth href={handoffUrl} size="large" variant="contained">
+          <Button
+            fullWidth
+            onClick={handleContinue}
+            size="large"
+            variant="contained"
+          >
             Continue to Workflow Setup
           </Button>
         </Box>

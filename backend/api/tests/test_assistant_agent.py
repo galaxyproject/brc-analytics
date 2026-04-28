@@ -319,3 +319,47 @@ class TestTruncateHistory:
     def test_empty_history(self, agent):
         result = AssistantAgent._truncate_history([])
         assert result == []
+
+
+# ---------- get_provider ----------
+
+
+class TestGetProvider:
+    def _agent_with_settings(self, base_url=None, model=None):
+        instance = object.__new__(AssistantAgent)
+        instance.settings = MagicMock()
+        instance.settings.AI_API_BASE_URL = base_url
+        instance.settings.AI_PRIMARY_MODEL = model
+        return instance
+
+    def test_anthropic_base_url_wins(self):
+        agent = self._agent_with_settings(
+            base_url="https://api.anthropic.com/v1", model="claude-sonnet-4-5"
+        )
+        assert agent.get_provider() == "anthropic"
+
+    def test_namespaced_model_uses_prefix(self):
+        agent = self._agent_with_settings(model="openai:gpt-4o")
+        assert agent.get_provider() == "openai"
+
+    def test_claude_model_without_prefix(self):
+        agent = self._agent_with_settings(model="claude-sonnet-4-5")
+        assert agent.get_provider() == "anthropic"
+
+    def test_gpt_model_without_prefix(self):
+        agent = self._agent_with_settings(model="gpt-4o")
+        assert agent.get_provider() == "openai"
+
+    def test_custom_base_url_unknown_model(self):
+        agent = self._agent_with_settings(
+            base_url="https://api.sambanova.ai/v1", model="Meta-Llama-3.1-8B"
+        )
+        assert agent.get_provider() == "custom"
+
+    def test_no_base_url_no_match_returns_none(self):
+        agent = self._agent_with_settings(base_url=None, model="llama-3")
+        assert agent.get_provider() is None
+
+    def test_empty_settings(self):
+        agent = self._agent_with_settings(base_url="", model="")
+        assert agent.get_provider() is None

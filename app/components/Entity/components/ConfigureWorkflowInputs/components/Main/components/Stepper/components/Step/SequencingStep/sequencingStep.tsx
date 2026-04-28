@@ -1,7 +1,7 @@
 import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepContent/stepContent";
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
-import { JSX } from "react";
+import { JSX, useEffect, useRef } from "react";
 import { ToggleButtonGroup } from "../components/ToggleButtonGroup/toggleButtonGroup";
 import { useToggleButtonGroup } from "../hooks/UseToggleButtonGroup/useToggleButtonGroup";
 import { StepProps } from "../types";
@@ -30,6 +30,7 @@ export const SequencingStep = ({
   entryLabel,
   genome,
   index,
+  initialDataSourceView,
   onConfigure,
   stepKey,
   workflow,
@@ -40,9 +41,22 @@ export const SequencingStep = ({
   const rowSelection = useRowSelection(configuredInput);
   const state = { columnFilters, rowSelection };
   const { actions, table } = useTable(enaTaxonomyId, state, onConfigure);
-  const { onChange, value } = useToggleButtonGroup(VIEW.ENA);
+  const initialView =
+    initialDataSourceView === VIEW.UPLOAD_MY_DATA
+      ? VIEW.UPLOAD_MY_DATA
+      : VIEW.ENA;
+  const { onChange, value } = useToggleButtonGroup(initialView);
   const { taxonomyMatches } = useTaxonomyMatches(table);
   const { requirementsMatches } = useRequirementsMatches(table, genome);
+
+  const didInitRef = useRef(false);
+  useEffect(() => {
+    if (didInitRef.current || initialDataSourceView !== VIEW.UPLOAD_MY_DATA)
+      return;
+    didInitRef.current = true;
+    onConfigure(clearSequencingData());
+    onConfigure(getUploadMyOwnSequencingData(stepKey));
+  }, [initialDataSourceView, onConfigure, stepKey]);
   return (
     <Step active={active} completed={completed} index={index}>
       <StepLabel>{entryLabel}</StepLabel>

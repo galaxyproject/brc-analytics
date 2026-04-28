@@ -1,7 +1,6 @@
-import { Chip } from "@mui/material";
 import { JSX } from "react";
 import { SuggestionChip } from "../../../types/api";
-import { ChipsContainer } from "./suggestionChips.styles";
+import { ChipsContainer, StyledSuggestionChip } from "./suggestionChips.styles";
 
 interface SuggestionChipsProps {
   chips: SuggestionChip[];
@@ -9,14 +8,6 @@ interface SuggestionChipsProps {
   onSelect: (message: string) => void;
 }
 
-/**
- * Quick-tap suggestion chips shown below the chat input.
- * @param props - Component props
- * @param props.chips - Available suggestion chips
- * @param props.disabled - Whether chips are disabled
- * @param props.onSelect - Callback when a chip is selected
- * @returns Suggestion chips row
- */
 export const SuggestionChips = ({
   chips,
   disabled,
@@ -27,7 +18,7 @@ export const SuggestionChips = ({
   return (
     <ChipsContainer>
       {chips.map((chip) => (
-        <Chip
+        <StyledSuggestionChip
           clickable
           disabled={disabled}
           key={chip.label}

@@ -100,6 +100,30 @@ especially if it has a gene annotation (GTF) available.
 - Don't hallucinate data — if a tool returns no results, say so.
 - If the user asks about something outside bioinformatics/BRC Analytics, \
   politely redirect.
+- Each message includes the current analysis state in brackets. Use this to \
+  know what's already filled and what still needs to be decided. Don't re-ask \
+  about filled fields unless the user wants to change something.
+
+## When data is missing
+
+Stay focused on the happy path: the data, assemblies, and annotations we \
+already have in the BRC Analytics catalog. If the catalog doesn't have what \
+the user needs (for example, a GTF for an assembly, or a particular workflow \
+input), do NOT instruct them to manually download files from third-party \
+sources (VEuPath, NCBI, Ensembl, etc.) and upload them. Format conversion \
+and provenance for those files is non-trivial and we don't want to send \
+people down that road blind.
+
+Instead:
+- Be honest that the data isn't available in the catalog.
+- Suggest alternatives that ARE available (a different assembly, a different \
+  workflow that doesn't need that input, etc.) when reasonable.
+- Point them to the community forum at https://help.brc-analytics.org or \
+  the GitHub repo at https://github.com/galaxyproject/brc-analytics/issues \
+  to request the missing data.
+
+Do not invent workarounds or suggest external download URLs as a substitute \
+for catalog data.
 
 ## Schema updates
 
@@ -111,13 +135,24 @@ committed to a choice — do NOT set fields just because you listed options.
 Format: a JSON object on its own line prefixed with "SCHEMA_UPDATE:". \
 Valid keys: organism, assembly, analysis_type, workflow, data_source, \
 data_characteristics, gene_annotation. Each value is a string (the display \
-label). For assembly, include the accession. For workflow, include the IWC ID.
+label) or null to clear a field. For assembly, include the accession. \
+For workflow, include the IWC ID.
+
+To clear a field (e.g., the user changed their mind), set its value to null. \
+When a user changes a high-level choice like organism or analysis_type, also \
+clear dependent downstream fields that may no longer be valid. The dependency \
+chain is: organism -> assembly -> analysis_type -> workflow -> \
+data_characteristics, gene_annotation. The data_source field is independent.
 
 Example — user said "I want to work with yeast RNA-seq":
 SCHEMA_UPDATE: {"organism": "Saccharomyces cerevisiae", "analysis_type": "Transcriptomics"}
 
-Only emit this when the user has actually chosen something. If the conversation \
-is purely exploratory (listing options, answering questions), do NOT emit it.
+Example — user switches from RNA-seq to variant calling:
+SCHEMA_UPDATE: {"analysis_type": "Variant Calling", "workflow": null, "data_characteristics": null, "gene_annotation": null}
+
+Only emit this when the user has actually chosen or changed something. If the \
+conversation is purely exploratory (listing options, answering questions), do \
+NOT emit it.
 
 ## Suggestion chips
 
@@ -243,6 +278,55 @@ class AssistantAgent:
     def is_available(self) -> bool:
         return self.agent is not None
 
+    def get_provider(self) -> Optional[str]:
+        """Best-effort identification of the provider for UI attribution."""
+        base_url = (self.settings.AI_API_BASE_URL or "").lower()
+        if "anthropic" in base_url:
+            return "anthropic"
+        model = (self.settings.AI_PRIMARY_MODEL or "").lower()
+        if ":" in model:
+            return model.split(":", 1)[0]
+        if "claude" in model:
+            return "anthropic"
+        if "gpt" in model or "openai" in model:
+            return "openai"
+        if base_url:
+            return "custom"
+        return None
+
+    @staticmethod
+    def compute_handoff(schema_state: AnalysisSchema) -> tuple[bool, Optional[str]]:
+        """Compute is_complete and handoff_url from schema state."""
+        handoff_url = None
+        if schema_state.is_complete():
+            accession = schema_state.assembly.detail or ""
+            trs_id = schema_state.workflow.detail or ""
+            if accession and trs_id:
+                handoff_url = f"/data/assemblies/{accession}/{trs_id}"
+        return handoff_url is not None, handoff_url
+
+    @staticmethod
+    def _build_context_prefix(schema: AnalysisSchema) -> str:
+        """Serialize current schema state so the LLM knows what's been decided."""
+        parts = []
+        for name in (
+            "organism",
+            "assembly",
+            "analysis_type",
+            "workflow",
+            "data_source",
+            "data_characteristics",
+            "gene_annotation",
+        ):
+            field = getattr(schema, name)
+            if field.status == FieldStatus.FILLED:
+                parts.append(f"{name}={field.value} (filled)")
+            elif field.status == FieldStatus.NEEDS_ATTENTION:
+                parts.append(f"{name}={field.value} (needs attention)")
+            else:
+                parts.append(f"{name}=pending")
+        return f"[Analysis progress: {', '.join(parts)}]"
+
     @staticmethod
     def _truncate_history(messages: list[ModelMessage]) -> list[ModelMessage]:
         """Keep history within MAX_HISTORY_MESSAGES.
@@ -336,10 +420,14 @@ class AssistantAgent:
                 )
                 agent_history = None
 
+        # Prepend current schema state so the LLM knows what's been decided
+        context_prefix = self._build_context_prefix(state.schema_state)
+        augmented_message = f"{context_prefix}\n\n{message}"
+
         # Run the agent (with timeout + retry)
         deps = AssistantDeps(catalog=self.catalog)
         result = await self._run_agent_with_retry(
-            message, deps=deps, message_history=agent_history
+            augmented_message, deps=deps, message_history=agent_history
         )
 
         raw_reply = result.output
@@ -377,17 +465,11 @@ class AssistantAgent:
 
         # Persist updated state
         state.schema_state = schema_state
+        state.suggestions = suggestions
         state.agent_message_history = to_jsonable_python(result.all_messages())
         await self.session_service.save_session(state)
 
-        # Only mark complete when we can actually build a handoff URL
-        handoff_url = None
-        if schema_state.is_complete():
-            accession = schema_state.assembly.detail or ""
-            trs_id = schema_state.workflow.detail or ""
-            if accession and trs_id:
-                handoff_url = f"/data/assemblies/{accession}/{trs_id}"
-        is_complete = handoff_url is not None
+        is_complete, handoff_url = self.compute_handoff(schema_state)
 
         return ChatResponse(
             session_id=state.session_id,
@@ -401,14 +483,14 @@ class AssistantAgent:
 
     def _parse_structured_output(
         self, raw_reply: str
-    ) -> tuple[str, List[SuggestionChip], Dict[str, str]]:
+    ) -> tuple[str, List[SuggestionChip], Dict[str, Optional[str]]]:
         """Extract SCHEMA_UPDATE and SUGGESTIONS lines from the reply.
 
         Handles common LLM formatting variations: bold markdown wrapping,
         mixed case, extra whitespace around the prefix.
         """
         suggestions: List[SuggestionChip] = []
-        schema_updates: Dict[str, str] = {}
+        schema_updates: Dict[str, Optional[str]] = {}
         reply_lines = []
 
         # Match SUGGESTIONS or SCHEMA_UPDATE with optional markdown bold/italic.
@@ -441,7 +523,7 @@ class AssistantAgent:
                     json_str = line[u_match.end() :].strip()
                     data = json.loads(json_str)
                     if isinstance(data, dict) and all(
-                        isinstance(k, str) and isinstance(v, str)
+                        isinstance(k, str) and (isinstance(v, str) or v is None)
                         for k, v in data.items()
                     ):
                         schema_updates = data
@@ -457,9 +539,13 @@ class AssistantAgent:
     def _apply_schema_updates(
         self,
         current: AnalysisSchema,
-        updates: Dict[str, str],
+        updates: Dict[str, Optional[str]],
     ) -> AnalysisSchema:
-        """Apply LLM-emitted schema updates to the current schema."""
+        """Apply LLM-emitted schema updates to the current schema.
+
+        Values of None clear the field back to EMPTY (supports mid-conversation
+        corrections when the user changes their mind).
+        """
         if not updates:
             return current
 
@@ -475,18 +561,27 @@ class AssistantAgent:
         }
 
         for key, value in updates.items():
-            if key not in valid_fields or not value:
+            if key not in valid_fields:
+                continue
+            if value is None:
+                setattr(schema, key, SchemaField())
+                continue
+            if not value:
                 continue
 
             field = SchemaField(value=str(value), status=FieldStatus.FILLED)
 
-            # For assembly, try to look up extra detail (accession)
+            # For assembly, try to extract accession from the value string,
+            # falling back to a catalog search by name if the regex misses.
             if key == "assembly":
                 acc_match = re.search(r"(GC[AF]_\d{9}\.\d+)", str(value))
                 if acc_match:
                     field.detail = acc_match.group(1)
+                else:
+                    field.detail = self._find_assembly_accession(str(value), schema)
 
-            # For workflow, try to look up the trs_id
+            # For workflow, try to match iwcId in the value string, falling
+            # back to a case-insensitive name match against the catalog.
             if key == "workflow":
                 workflow_value = str(value)
                 for cat in self.catalog.workflows_by_category:
@@ -497,7 +592,65 @@ class AssistantAgent:
                             break
                     if field.detail:
                         break
+                if not field.detail:
+                    field.detail = self._find_workflow_trs_id(workflow_value)
 
             setattr(schema, key, field)
 
         return schema
+
+    def _find_assembly_accession(
+        self, value: str, schema: AnalysisSchema
+    ) -> Optional[str]:
+        """Fallback: search the catalog for an assembly matching the LLM value."""
+        val_lower = value.lower()
+        # If we already know the organism, narrow the search
+        tax_id = None
+        if schema.organism.detail:
+            tax_id = schema.organism.detail
+        elif schema.organism.status == FieldStatus.FILLED and schema.organism.value:
+            for org in self.catalog.organisms:
+                species = (org.get("taxonomicLevelSpecies") or "").lower()
+                if species and species in schema.organism.value.lower():
+                    tax_id = str(org.get("ncbiTaxonomyId"))
+                    break
+
+        candidates: list[dict] = []
+        for org in self.catalog.organisms:
+            org_tax = str(org.get("ncbiTaxonomyId", ""))
+            if tax_id and org_tax != tax_id:
+                continue
+            for g in org.get("genomes", []):
+                strain = (g.get("strainName") or "").strip().lower()
+                if strain and strain in val_lower:
+                    candidates.append(g)
+
+        # If no strain match, don't guess from species alone -- too ambiguous
+        # when an organism has many assemblies.
+        if not candidates:
+            logger.warning("Assembly fallback found no match for '%s'", value)
+            return None
+
+        # Prefer reference assemblies when multiple candidates match
+        for c in candidates:
+            if c.get("isRef") == "Yes":
+                logger.info(
+                    "Assembly fallback matched reference '%s'", c.get("accession")
+                )
+                return c.get("accession")
+
+        accession = candidates[0].get("accession")
+        logger.info("Assembly fallback matched '%s'", accession)
+        return accession
+
+    def _find_workflow_trs_id(self, value: str) -> Optional[str]:
+        """Fallback: match a workflow by name when iwcId isn't in the value."""
+        val_lower = value.lower()
+        for cat in self.catalog.workflows_by_category:
+            for wf in cat.get("workflows", []):
+                wf_name = (wf.get("workflowName") or "").lower()
+                if wf_name and (wf_name in val_lower or val_lower in wf_name):
+                    logger.info("Workflow fallback matched name '%s'", wf_name)
+                    return wf.get("trsId", wf.get("iwcId"))
+        logger.warning("Workflow fallback found no match for '%s'", value)
+        return None
