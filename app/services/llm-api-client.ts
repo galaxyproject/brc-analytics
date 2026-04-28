@@ -3,6 +3,7 @@ import { API_BASE_URL } from "../config/api";
 import {
   AssistantChatRequest,
   AssistantChatResponse,
+  AssistantInfoResponse,
   DatasetSearchRequest,
   DatasetSearchResponse,
   SessionRestoreResponse,
@@ -54,6 +55,14 @@ export const llmAPIClient = {
    */
   assistantDeleteSession: async (sessionId: string): Promise<void> => {
     await apiClient.delete(`assistant/session/${sessionId}`);
+  },
+
+  /**
+   * Get assistant configuration info (model, provider, availability) for UI attribution.
+   * @returns Promise resolving to assistant info
+   */
+  assistantInfo: async (): Promise<AssistantInfoResponse> => {
+    return apiClient.get("assistant/info").json();
   },
 
   /**

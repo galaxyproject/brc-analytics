@@ -278,6 +278,22 @@ class AssistantAgent:
     def is_available(self) -> bool:
         return self.agent is not None
 
+    def get_provider(self) -> Optional[str]:
+        """Best-effort identification of the provider for UI attribution."""
+        base_url = (self.settings.AI_API_BASE_URL or "").lower()
+        if "anthropic" in base_url:
+            return "anthropic"
+        model = (self.settings.AI_PRIMARY_MODEL or "").lower()
+        if ":" in model:
+            return model.split(":", 1)[0]
+        if "claude" in model:
+            return "anthropic"
+        if "gpt" in model or "openai" in model:
+            return "openai"
+        if base_url:
+            return "custom"
+        return None
+
     @staticmethod
     def compute_handoff(schema_state: AnalysisSchema) -> tuple[bool, Optional[str]]:
         """Compute is_complete and handoff_url from schema state."""

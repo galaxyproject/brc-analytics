@@ -41,3 +41,12 @@ export const SchemaColumn = styled(Box)({
     maxWidth: "380px",
   },
 });
+
+export const AssistantDisclaimer = styled(Box)({
+  color: "#5f6b7c",
+  fontSize: "0.75rem",
+  lineHeight: 1.5,
+  paddingBottom: "16px",
+  paddingTop: "16px",
+  textAlign: "center",
+});
