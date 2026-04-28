@@ -103,7 +103,8 @@ export const AssistantView = (): JSX.Element => {
 };
 
 function formatModelLabel(info: AssistantInfoResponse | null): string {
-  if (!info || !info.available) return "model not available";
+  if (info === null) return "powered by AI";
+  if (!info.available) return "model not available";
   const parts: string[] = [];
   if (info.provider) parts.push(info.provider);
   if (info.model) parts.push(info.model);
