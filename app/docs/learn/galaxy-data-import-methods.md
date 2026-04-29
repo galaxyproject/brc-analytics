@@ -52,7 +52,7 @@ The Upload tool is accessible via the activity bar on the left side of the page 
 
 ![Galaxy "Get Data" tool set](./galaxy-get-data-tools.png)
 
-These are Galaxy tools that act as query interfaces to external databases, depositing results directly into your history. Not that most of these tools have considerable documentation under the configuration section when viewed in the Galaxy interface, and many also list tutorials where the tool used used below that documentation.
+These are Galaxy tools that act as query interfaces to external databases, depositing results directly into your history. Note that most of these tools have considerable documentation under the configuration section when viewed in the Galaxy interface, and many also list tutorials where the tool used used below that documentation.
 
 **[UCSC Main Table Browser](https://training.galaxyproject.org/training-material/topics/introduction/tutorials/galaxy-intro-strands/tutorial.html)** *(TODO: find source specific to UCSC Table Browser tool)* — Query and download genomic intervals, gene annotations, conservation tracks, repeat elements, SNPs, and more from UCSC's databases for dozens of organisms.
 
