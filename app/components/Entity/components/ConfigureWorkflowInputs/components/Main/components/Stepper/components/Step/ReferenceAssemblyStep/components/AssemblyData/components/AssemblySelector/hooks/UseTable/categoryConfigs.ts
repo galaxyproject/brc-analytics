@@ -61,6 +61,14 @@ export const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
     key: "taxonomicGroup",
     label: "Taxonomic Group",
   },
+  TAXONOMIC_LEVEL_ISOLATE: {
+    key: "taxonomicLevelIsolate",
+    label: "Isolate",
+  },
+  TAXONOMIC_LEVEL_SEROTYPE: {
+    key: "taxonomicLevelSerotype",
+    label: "Serotype",
+  },
   TAXONOMIC_LEVEL_SPECIES: {
     key: "taxonomicLevelSpecies",
     label: "Species",

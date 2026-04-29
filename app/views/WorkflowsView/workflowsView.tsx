@@ -8,8 +8,8 @@ import { WorkflowAssemblyMapping } from "../../apis/catalog/brc-analytics-catalo
 import { API } from "../../services/workflows/routes";
 import { ExploreView } from "../ExploreView/exploreView";
 import { Workflows } from "./components/Workflows/workflows";
-import { getWorkflows } from "./utils";
 import { Organism } from "./types";
+import { getWorkflows } from "./utils";
 
 /**
  * WorkflowsView renders the main view for exploring workflows,
@@ -19,6 +19,8 @@ import { Organism } from "./types";
 export const WorkflowsView = (): JSX.Element => {
   const workflowCategories = getWorkflowCategories();
   const organisms = getOrganisms<Organism>();
+  const isFluEnabled = useFeatureFlag("flu");
+  const isHyphyEnabled = useFeatureFlag("hyphy");
   const isLmlsEnabled = useFeatureFlag("lmls");
   const [mappings, setMappings] = useState<WorkflowAssemblyMapping[] | null>(
     null
@@ -40,9 +42,23 @@ export const WorkflowsView = (): JSX.Element => {
   const workflows = useMemo(
     () =>
       mappings
-        ? getWorkflows(workflowCategories, mappings, organisms, isLmlsEnabled)
+        ? getWorkflows(
+            workflowCategories,
+            mappings,
+            organisms,
+            isLmlsEnabled,
+            isFluEnabled,
+            isHyphyEnabled
+          )
         : [],
-    [isLmlsEnabled, mappings, organisms, workflowCategories]
+    [
+      isFluEnabled,
+      isHyphyEnabled,
+      isLmlsEnabled,
+      mappings,
+      organisms,
+      workflowCategories,
+    ]
   );
 
   return <ExploreView data={workflows} Component={Workflows} />;

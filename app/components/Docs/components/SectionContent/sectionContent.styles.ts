@@ -1,4 +1,7 @@
 import {
+  Content,
+  ContentLayout,
+  Outline,
   OutlineGrid,
   Positioner,
 } from "@databiosphere/findable-ui/lib/components/Layout/components/ContentLayout/contentLayout.styles";
@@ -6,16 +9,13 @@ import {
   bpDownSm,
   bpUp1366,
 } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
+import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import { sectionLayout } from "../../../Layout/components/AppLayout/components/Section/section.styles";
-import { ContentLayout } from "@databiosphere/findable-ui/lib/components/Layout/components/ContentLayout/contentLayout.styles";
 import {
   CONTENT_TYPE,
   FrontmatterProps,
 } from "../../../../docs/common/frontmatter/types";
-import { css } from "@emotion/react";
-import { Content } from "@databiosphere/findable-ui/lib/components/Layout/components/ContentLayout/contentLayout.styles";
-import { Outline } from "@databiosphere/findable-ui/lib/components/Layout/components/ContentLayout/contentLayout.styles";
+import { sectionLayout } from "../../../Layout/components/AppLayout/components/Section/section.styles";
 
 export const PADDING_Y = 64;
 

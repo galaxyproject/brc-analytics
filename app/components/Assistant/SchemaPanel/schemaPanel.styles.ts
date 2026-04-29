@@ -1,5 +1,5 @@
-import { Box, Paper, Typography } from "@mui/material";
 import styled from "@emotion/styled";
+import { Box, Paper, Typography } from "@mui/material";
 
 export const PanelContainer = styled(Paper)({
   border: "1px solid #e0e0e0",

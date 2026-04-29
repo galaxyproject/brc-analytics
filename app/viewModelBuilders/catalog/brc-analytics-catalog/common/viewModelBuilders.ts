@@ -133,6 +133,20 @@ export const buildAssemblyDetails = (
       strain
     );
   }
+  const serotype = getGenomeSerotypeText(assembly);
+  if (serotype) {
+    keyValuePairs.set(
+      BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SEROTYPE,
+      serotype
+    );
+  }
+  const isolate = getGenomeIsolateText(assembly);
+  if (isolate) {
+    keyValuePairs.set(
+      BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_ISOLATE,
+      isolate
+    );
+  }
   keyValuePairs.set(
     BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
     C.CopyText({
@@ -1007,10 +1021,13 @@ function getGenomeStrainText(
  * @returns serotype text.
  */
 function getGenomeSerotypeText(
-  genome: BRCDataCatalogGenome,
+  genome: BRCDataCatalogGenome | GA2AssemblyEntity,
   defaultValue = ""
 ): string {
-  if (genome.taxonomicLevelSerotype !== "None")
+  if (
+    "taxonomicLevelSerotype" in genome &&
+    genome.taxonomicLevelSerotype !== "None"
+  )
     return genome.taxonomicLevelSerotype;
   return defaultValue;
 }
@@ -1022,10 +1039,13 @@ function getGenomeSerotypeText(
  * @returns isolate text.
  */
 function getGenomeIsolateText(
-  genome: BRCDataCatalogGenome,
+  genome: BRCDataCatalogGenome | GA2AssemblyEntity,
   defaultValue = ""
 ): string {
-  if (genome.taxonomicLevelIsolate !== "None")
+  if (
+    "taxonomicLevelIsolate" in genome &&
+    genome.taxonomicLevelIsolate !== "None"
+  )
     return genome.taxonomicLevelIsolate;
   return defaultValue;
 }

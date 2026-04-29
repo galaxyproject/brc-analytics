@@ -1,12 +1,14 @@
 import { Workflow } from "../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
-import { OnConfigure } from "../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import {
-  Status,
+  ConfiguredInput,
+  OnConfigure,
+} from "../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { Assembly } from "../../../../../../../../views/WorkflowInputsView/types";
+import {
   OnLaunchGalaxy,
+  Status,
 } from "./components/Step/hooks/UseLaunchGalaxy/types";
 import { StepConfig } from "./components/Step/types";
-import { ConfiguredInput } from "../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { Assembly } from "../../../../../../../../views/WorkflowInputsView/types";
 import { OnContinue, OnEdit } from "./hooks/UseStepper/types";
 
 export interface Props {

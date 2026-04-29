@@ -1,6 +1,6 @@
-import styled from "@emotion/styled";
-import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { SearchAllFilters } from "@databiosphere/findable-ui/lib/components/Filter/components/SearchAllFilters/searchAllFilters";
+import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
+import styled from "@emotion/styled";
 
 export const StyledContainer = styled("div")`
   box-shadow: inset -1px 0 ${PALETTE.SMOKE_MAIN};

@@ -1,5 +1,5 @@
-import { JSX } from "react";
 import { Box, Typography } from "@mui/material";
+import { JSX } from "react";
 import { AssistantBubble, MessageRow, UserBubble } from "./chatMessage.styles";
 import { MarkdownContent } from "./markdownContent";
 

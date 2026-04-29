@@ -1,4 +1,4 @@
-import { hasFileChanged } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/utils";
+import { hasFileChanged } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseFilePicker/utils";
 
 function createMockFile(
   name: string,

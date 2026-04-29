@@ -1,14 +1,14 @@
-import { JSX } from "react";
 import { Link as DXLink } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
+import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import {
   AccordionDetails as MAccordionDetails,
   Typography,
 } from "@mui/material";
+import { JSX } from "react";
 import { Accordion } from "../../../../../../../../common/Accordion/accordion";
 import { AccordionSummary } from "../../../../../../../../common/Accordion/components/AccordionSummary/accordionSummary";
 import { URLS } from "../../../../../../../common/constants";
 import { Grid } from "./questions.styles";
-import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 
 export const Questions = (): JSX.Element => {
   return (

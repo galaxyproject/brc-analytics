@@ -1,12 +1,14 @@
-import { ButtonBase, Paper } from "@mui/material";
-import styled from "@emotion/styled";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
+import styled from "@emotion/styled";
+import { Paper } from "@mui/material";
 
 interface StyledPaperProps {
   isDragActive?: boolean;
 }
 
-export const StyledPaper = styled(Paper)<StyledPaperProps>`
+export const StyledPaper = styled(Paper, {
+  shouldForwardProp: (prop) => prop !== "isDragActive",
+})<StyledPaperProps>`
   background-color: ${({ isDragActive }) =>
     isDragActive ? PALETTE.PRIMARY_LIGHTEST : PALETTE.SMOKE_LIGHTEST};
   border: 1px dashed
@@ -15,22 +17,4 @@ export const StyledPaper = styled(Paper)<StyledPaperProps>`
   transition:
     background-color 0.2s ease,
     border-color 0.2s ease;
-`;
-
-export const StyledButtonBase = styled(ButtonBase)`
-  cursor: pointer;
-  display: grid;
-  gap: 16px;
-  justify-items: center;
-  padding: 24px;
-  width: 100%;
-
-  .MuiSvgIcon-root {
-    font-size: 72px;
-  }
-
-  .MuiStack-root {
-    min-width: 0;
-    width: 100%;
-  }
 `;

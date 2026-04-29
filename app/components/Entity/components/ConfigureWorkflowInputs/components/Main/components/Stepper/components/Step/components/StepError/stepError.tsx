@@ -1,6 +1,6 @@
-import { JSX } from "react";
-import { Typography } from "@mui/material";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
+import { Typography } from "@mui/material";
+import { JSX } from "react";
 
 export interface StepErrorProps {
   error: string | null;

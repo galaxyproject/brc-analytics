@@ -16,6 +16,7 @@ export interface BaselineContrasts {
 export interface ConfiguredInput {
   designFormula?: string | null;
   geneModelUrl?: string | null;
+  numberOfHits?: number;
   primaryContrasts?: PrimaryContrasts | null;
   primaryFactor?: string | null;
   readRunsPaired?: EnaSequencingReads[] | null;
@@ -23,6 +24,8 @@ export interface ConfiguredInput {
   referenceAssembly?: string;
   sampleSheet?: Record<string, string>[];
   sampleSheetClassification?: Record<string, COLUMN_TYPE | null>;
+  sequence?: string;
+  sequenceFileName?: string;
   strandedness?: Strandedness;
   tracks?: UcscTrack[] | null;
 }

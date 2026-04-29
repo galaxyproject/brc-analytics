@@ -1,8 +1,8 @@
 import { Dot } from "@databiosphere/findable-ui/lib/components/common/Dot/dot";
+import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { ButtonBase as MButtonBase } from "@mui/material";
-import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 
 interface Props {
   isActive: boolean;

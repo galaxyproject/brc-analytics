@@ -1,4 +1,5 @@
 import Papa from "papaparse";
+import { ParseResult } from "../../../hooks/UseFilePicker/types";
 import {
   MAX_FILE_SIZE_BYTES,
   MIN_COLUMNS,
@@ -25,91 +26,74 @@ function getDelimiter(fileName: string): string {
 }
 
 /**
- * Checks if a file has changed by comparing metadata.
- * @param prevFile - The previous file.
- * @param newFile - The new file.
- * @returns True if the file has changed, false otherwise.
- */
-export function hasFileChanged(prevFile: File | null, newFile: File): boolean {
-  if (!prevFile) return true;
-
-  return (
-    prevFile.name !== newFile.name ||
-    prevFile.size !== newFile.size ||
-    prevFile.lastModified !== newFile.lastModified
-  );
-}
-
-/**
- * Checks if the file picker state is valid.
- * @param file - The selected file.
- * @param errors - The validation errors.
- * @returns True if a file is selected and there are no errors.
- */
-export function isValid(file: File | null, errors: string[]): boolean {
-  return file !== null && errors.length === 0;
-}
-
-/**
  * Parses and validates a CSV or TSV file.
  * @param file - The file to parse.
  * @returns Promise resolving to parsed rows and validation errors.
  */
 export function parseFile(
   file: File
-): Promise<{ errors: string[]; rows: Record<string, string>[] }> {
+): Promise<ParseResult<Record<string, string>[]>> {
   return new Promise((resolve, reject) => {
     const errors: string[] = [];
 
     // Validate file size.
     if (file.size > MAX_FILE_SIZE_BYTES) {
       resolve({
+        data: [],
         errors: [VALIDATION_ERROR.FILE_TOO_LARGE],
-        rows: [],
       });
       return;
     }
 
-    Papa.parse<Record<string, string>>(file, {
-      complete: ({ data: rows, meta }) => {
-        const columnNames = getColumnNames(meta.fields);
+    // Normalize line endings (CRLF and lone CR → LF) so parsing is consistent
+    // across OSes — uploads from Windows/Excel otherwise leave trailing \r in
+    // the last cell of each row.
+    const reader = new FileReader();
+    reader.onerror = (): void => reject(reader.error);
+    reader.onload = (): void => {
+      const normalized = (reader.result as string).replace(/\r\n?/g, "\n");
+      Papa.parse<Record<string, string>>(normalized, {
+        complete: ({ data: rows, meta }) => {
+          const columnNames = getColumnNames(meta.fields);
 
-        // Check for empty headers.
-        if (columnNames.has("")) {
-          resolve({
-            errors: [VALIDATION_ERROR.EMPTY_HEADERS],
-            rows: [],
-          });
-          return;
-        }
+          // Check for empty headers.
+          if (columnNames.has("")) {
+            resolve({
+              data: [],
+              errors: [VALIDATION_ERROR.EMPTY_HEADERS],
+            });
+            return;
+          }
 
-        // Check for duplicate headers.
-        if (meta.renamedHeaders) {
-          resolve({
-            errors: [VALIDATION_ERROR.DUPLICATE_HEADERS],
-            rows: [],
-          });
-          return;
-        }
+          // Check for duplicate headers.
+          if (meta.renamedHeaders) {
+            resolve({
+              data: [],
+              errors: [VALIDATION_ERROR.DUPLICATE_HEADERS],
+            });
+            return;
+          }
 
-        // Validate column count.
-        if (columnNames.size < MIN_COLUMNS) {
-          errors.push(VALIDATION_ERROR.INSUFFICIENT_COLUMNS);
-        }
+          // Validate column count.
+          if (columnNames.size < MIN_COLUMNS) {
+            errors.push(VALIDATION_ERROR.INSUFFICIENT_COLUMNS);
+          }
 
-        // Validate row count.
-        if (rows.length < MIN_DATA_ROWS) {
-          errors.push(VALIDATION_ERROR.INSUFFICIENT_ROWS);
-        }
+          // Validate row count.
+          if (rows.length < MIN_DATA_ROWS) {
+            errors.push(VALIDATION_ERROR.INSUFFICIENT_ROWS);
+          }
 
-        resolve({ errors, rows });
-      },
-      delimiter: getDelimiter(file.name),
-      error: (error) => {
-        reject(error);
-      },
-      header: true,
-      skipEmptyLines: true,
-    });
+          resolve({ data: rows, errors });
+        },
+        delimiter: getDelimiter(file.name),
+        error: (error: Error) => {
+          reject(error);
+        },
+        header: true,
+        skipEmptyLines: true,
+      });
+    };
+    reader.readAsText(file);
   });
 }

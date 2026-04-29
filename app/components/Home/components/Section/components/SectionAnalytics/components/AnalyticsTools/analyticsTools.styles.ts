@@ -1,8 +1,8 @@
+import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { Card as MCard } from "@mui/material";
 import { Bullets } from "../../../../../../../common/Bullets/bullets";
-import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 
 interface Props {
   interactionEnabled: boolean;

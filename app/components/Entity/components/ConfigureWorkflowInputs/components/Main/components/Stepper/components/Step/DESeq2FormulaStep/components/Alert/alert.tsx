@@ -1,6 +1,6 @@
-import { JSX } from "react";
-import { AlertTitle } from "@mui/material";
 import { ALERT_PROPS } from "@databiosphere/findable-ui/lib/components/common/Alert/constants";
+import { AlertTitle } from "@mui/material";
+import { JSX } from "react";
 import { StyledAlert } from "./alert.styles";
 import { Props } from "./types";
 

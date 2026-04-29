@@ -1,9 +1,9 @@
+import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
+import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { Card as MCard } from "@mui/material";
 import { Bullets } from "../../../../../../../../common/Bullets/bullets";
-import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
-import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 
 interface Props {
   interactionEnabled: boolean;

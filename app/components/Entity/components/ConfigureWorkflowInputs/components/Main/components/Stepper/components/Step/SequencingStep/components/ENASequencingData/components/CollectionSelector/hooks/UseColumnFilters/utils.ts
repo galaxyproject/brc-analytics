@@ -1,12 +1,12 @@
-import { SEQUENCING_DATA_TYPE } from "../../../../../../types";
 import { ColumnFiltersState } from "@tanstack/react-table";
-import { CATEGORY_CONFIGS } from "../UseTable/categoryConfigs";
 import {
   Workflow,
   WorkflowParameter,
 } from "../../../../../../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
-import { WORKFLOW_PARAMETER_BY_STEP_KEY } from "../../constants";
 import { StepProps } from "../../../../../../../types";
+import { SEQUENCING_DATA_TYPE } from "../../../../../../types";
+import { WORKFLOW_PARAMETER_BY_STEP_KEY } from "../../constants";
+import { CATEGORY_CONFIGS } from "../UseTable/categoryConfigs";
 import { isSequencingDataType } from "./typeGuards";
 
 /**

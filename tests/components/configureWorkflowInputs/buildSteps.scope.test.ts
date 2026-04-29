@@ -3,21 +3,23 @@ jest.mock(
   "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/constants",
   (): Record<string, unknown> => ({
     STEP: {
+      ACCESSION_COUNT: { key: "numberOfHits", label: "Accessions to Download" },
       ASSEMBLY_ID: { key: "ASSEMBLY_ID" },
       GENE_MODEL_URL: { key: "GENE_MODEL_URL" },
       SANGER_READ_RUN_PAIRED: { key: "SANGER_READ_RUN_PAIRED" },
       SANGER_READ_RUN_SINGLE: { key: "SANGER_READ_RUN_SINGLE" },
+      SEQUENCE: { key: "sequence", label: "Sequence" },
     },
   })
 );
 
-import { buildSteps } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/utils";
 import type { Workflow } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
 } from "../../../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { buildSteps } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/utils";
 
 describe("buildSteps - scope handling", () => {
   const BASE_WORKFLOW: Workflow = {
@@ -125,40 +127,19 @@ describe("buildSteps - scope handling", () => {
   });
 
   describe("SEQUENCE scope", () => {
-    test("returns empty array for SEQUENCE scope workflow", () => {
+    test("returns sequence and accession count steps for SEQUENCE scope workflow", () => {
       const workflow: Workflow = {
         ...BASE_WORKFLOW,
         scope: WORKFLOW_SCOPE.SEQUENCE,
       };
-
-      const warnSpy = jest.spyOn(console, "warn").mockImplementation();
 
       const steps = buildSteps(workflow);
 
-      expect(steps).toEqual([]);
-      expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining("SEQUENCE scope workflows not yet implemented")
-      );
-
-      warnSpy.mockRestore();
-    });
-
-    test("logs warning with workflow name for SEQUENCE scope", () => {
-      const workflow: Workflow = {
-        ...BASE_WORKFLOW,
-        scope: WORKFLOW_SCOPE.SEQUENCE,
-        workflowName: "My Sequence Workflow",
-      };
-
-      const warnSpy = jest.spyOn(console, "warn").mockImplementation();
-
-      buildSteps(workflow);
-
-      expect(warnSpy).toHaveBeenCalledWith(
-        "SEQUENCE scope workflows not yet implemented for workflow: My Sequence Workflow"
-      );
-
-      warnSpy.mockRestore();
+      expect(steps).toHaveLength(2);
+      expect(steps[0].key).toBe("sequence");
+      expect(steps[0].label).toBe("Sequence");
+      expect(steps[1].key).toBe("numberOfHits");
+      expect(steps[1].label).toBe("Accessions to Download");
     });
   });
 

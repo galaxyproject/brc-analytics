@@ -1,6 +1,6 @@
 import {
-  getChecksumForPath,
   fetchUcscMd5Checksums,
+  getChecksumForPath,
 } from "../app/utils/ucsc-tracks-api/ucsc-tracks-api";
 
 const TEST_DATA = {

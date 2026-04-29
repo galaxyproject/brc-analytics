@@ -4,9 +4,9 @@ import {
 } from "@databiosphere/findable-ui/lib/hooks/useResizeObserver";
 import { JSX, useEffect, useRef, useState } from "react";
 import { MAX_LINES, READ_LESS_TEXT, READ_MORE_TEXT } from "./constants";
+import { StyledButtonBase, StyledSpan } from "./truncatedText.styles";
 import { Props } from "./types";
 import { calculateTruncation, renderText } from "./utils";
-import { StyledButtonBase, StyledSpan } from "./truncatedText.styles";
 
 /**
  * A component that truncates text to a specified number of lines and displays

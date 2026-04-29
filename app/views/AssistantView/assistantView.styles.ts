@@ -1,6 +1,6 @@
-import { Box } from "@mui/material";
-import styled from "@emotion/styled";
 import { GridPaperSection } from "@databiosphere/findable-ui/lib/components/common/Section/section.styles";
+import styled from "@emotion/styled";
+import { Box } from "@mui/material";
 
 export const AssistantSection = styled(GridPaperSection)`
   padding: 24px 0;

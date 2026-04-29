@@ -1,16 +1,16 @@
-import { JSX } from "react";
 import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepContent/stepContent";
 import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Optional/optional";
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { Button } from "@mui/material";
-import { Fragment } from "react";
+import { Fragment, JSX } from "react";
+import { useFilePicker } from "../hooks/UseFilePicker/hook";
 import { StepProps } from "../types";
 import { Dropzone } from "./components/Dropzone/dropzone";
 import { UploadedFile } from "./components/UploadedFile/uploadedFile";
 import { INPUT_PROPS } from "./constants";
-import { useFilePicker } from "./hooks/UseFilePicker/hook";
+import { parseFile } from "./hooks/UseFilePicker/utils";
 import { StyledGrid } from "./sampleSheetStep.styles";
 
 export const SampleSheetStep = ({
@@ -22,7 +22,7 @@ export const SampleSheetStep = ({
   onContinue,
   onEdit,
 }: StepProps): JSX.Element => {
-  const { actions, file, inputRef, validation } = useFilePicker();
+  const { actions, file, inputRef, validation } = useFilePicker(parseFile);
   return (
     <Step active={active} completed={completed} index={index}>
       <StepLabel

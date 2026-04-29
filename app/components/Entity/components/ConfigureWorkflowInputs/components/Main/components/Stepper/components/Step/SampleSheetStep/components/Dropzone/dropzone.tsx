@@ -1,55 +1,19 @@
-import { JSX } from "react";
-import { Stack, Typography } from "@mui/material";
-import { DragEvent, useCallback, useState } from "react";
-import { StyledButtonBase, StyledPaper } from "./dropzone.styles";
-import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Dot } from "@databiosphere/findable-ui/lib/components/common/Dot/dot";
+import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
+import { Stack, Typography } from "@mui/material";
+import { JSX } from "react";
 import { FileUploadIcon } from "../../../../../../../../../../../../common/CustomIcon/components/FileUploadIcon/fileUploadIcon";
-import { Props } from "./types";
+import { StyledButtonBase } from "../../../components/Dropzone/components/FileUploadButton/fileUploadButton.styles";
 import {
-  STACK_PROPS,
   TYPOGRAPHY_PROPS as COMPONENT_TYPOGRAPHY_PROPS,
-} from "./constants";
+  STACK_PROPS,
+} from "../../../components/Dropzone/constants";
+import { Dropzone as DropzoneBase } from "../../../components/Dropzone/dropzone";
+import { Props } from "./types";
 
 export const Dropzone = ({ onClick, onDrop }: Props): JSX.Element => {
-  const [isDragActive, setIsDragActive] = useState(false);
-
-  const handleDragEnter = useCallback((event: DragEvent<HTMLElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setIsDragActive(true);
-  }, []);
-
-  const handleDragLeave = useCallback((event: DragEvent<HTMLElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setIsDragActive(false);
-  }, []);
-
-  const handleDragOver = useCallback((event: DragEvent<HTMLElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-  }, []);
-
-  const handleDrop = useCallback(
-    (event: DragEvent<HTMLElement>) => {
-      event.preventDefault();
-      event.stopPropagation();
-      setIsDragActive(false);
-      onDrop(event);
-    },
-    [onDrop]
-  );
-
   return (
-    <StyledPaper
-      elevation={0}
-      isDragActive={isDragActive}
-      onDragEnter={handleDragEnter}
-      onDragLeave={handleDragLeave}
-      onDragOver={handleDragOver}
-      onDrop={handleDrop}
-    >
+    <DropzoneBase onDrop={onDrop}>
       <StyledButtonBase aria-label="Upload a sample sheet" onClick={onClick}>
         <FileUploadIcon />
         <Stack {...STACK_PROPS}>
@@ -70,6 +34,6 @@ export const Dropzone = ({ onClick, onDrop }: Props): JSX.Element => {
           </Stack>
         </Stack>
       </StyledButtonBase>
-    </StyledPaper>
+    </DropzoneBase>
   );
 };

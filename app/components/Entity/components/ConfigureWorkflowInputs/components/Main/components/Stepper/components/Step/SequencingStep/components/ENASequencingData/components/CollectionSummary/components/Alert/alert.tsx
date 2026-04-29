@@ -1,9 +1,9 @@
-import { JSX } from "react";
-import { Props } from "./types";
-import { AlertTitle } from "@mui/material";
 import { ALERT_PROPS } from "@databiosphere/findable-ui/lib/components/common/Alert/constants";
-import { StyledAlert } from "./alert.styles";
 import { SIZE } from "@databiosphere/findable-ui/lib/styles/common/constants/size";
+import { AlertTitle } from "@mui/material";
+import { JSX } from "react";
+import { StyledAlert } from "./alert.styles";
+import { Props } from "./types";
 
 export const Alert = ({ requirementsMatches }: Props): JSX.Element | null => {
   if (requirementsMatches.length === 0) return null;

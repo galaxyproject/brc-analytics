@@ -1,9 +1,8 @@
-import { JSX } from "react";
 import {
   getBorderBoxSize,
   useResizeObserver,
 } from "@databiosphere/findable-ui/lib/hooks/useResizeObserver";
-import { useRef } from "react";
+import { JSX, useRef } from "react";
 import { StyledSection } from "./section.styles";
 
 export interface SectionProps {

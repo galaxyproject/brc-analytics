@@ -4,8 +4,10 @@
 
 > **Note:** This section shows workflows added to workflows.yml in this script run. On subsequent runs, these will no longer appear here. Commit or save this report if you need to track what was added.
 
-- Genome annotation with Braker3 (ANNOTATION)
-- Paired end variant and ploidy-aware genotype calling (VARIANT_CALLING)
+- CAPHEINE: Combined HyPhy Core and Compare (COMPARATIVE_GENOMICS)
+- HyPhy: Compare (COMPARATIVE_GENOMICS)
+- HyPhy: Core (COMPARATIVE_GENOMICS)
+- HyPhy: Preprocessing  (COMPARATIVE_GENOMICS)
 
 ## Active workflows with version not on Dockstore
 
@@ -35,7 +37,12 @@ None
 
 > **Note:** New parameters are added to workflows.yml on each run. On subsequent runs, they will no longer appear as 'new' even if stale parameters haven't been addressed yet. If you see both stale and new params for a workflow, commit or save this report before re-running so you don't lose the pairing info (useful for identifying renames).
 
-None
+### #workflow/github.com/iwc-workflows/atacseq/main (ACTIVE)
+
+**Stale (not in IWC, kept for review):**
+- bin_size
+- effective_genome_size
+- reference_genome
 
 ## Inactive workflows in workflows.yml
 
@@ -44,10 +51,6 @@ None
 ### Genome assembly with Flye - ASSEMBLY (1 parameters)
 
 - Input sequence reads
-
-### Functional annotation of protein sequences - ANNOTATION (1 parameters)
-
-- input
 
 ### Repeat masking with RepeatModeler and RepeatMasker - ANNOTATION (1 parameters)
 
@@ -63,16 +66,27 @@ None
 - Input adapter trimmed sequence reads (forward)
 - Input adapter trimmed sequence reads (reverse)
 
-### Influenza A isolate subtyping and consensus sequence generation - CONSENSUS_SEQUENCES (2 parameters)
+### HyPhy: Core - COMPARATIVE_GENOMICS (2 parameters)
 
-- References per segment collection
-- Sequenced paired-end data
+- reference cds
+- unaligned sequences
+
+### HyPhy: Preprocessing  - COMPARATIVE_GENOMICS (2 parameters)
+
+- reference cds
+- unaligned sequences
 
 ### Generic variation analysis on WGS PE data - VARIANT_CALLING (3 parameters)
 
 - Paired Collection
 - GenBank genome
 - Name for genome database
+
+### HyPhy: Compare - COMPARATIVE_GENOMICS (3 parameters)
+
+- Codon-aware alignment(s)
+- Phylogenetic tree(s)
+- Foreground Sequences List
 
 ### Assembly polishing with long reads - ASSEMBLY (3 parameters)
 
@@ -108,12 +122,12 @@ None
 - Juicer Medium Tabix with validPairs
 - Interactions to consider to calculate weights in normalization step
 
-### Paired end variant and ploidy-aware genotype calling - VARIANT_CALLING (4 parameters)
+### CAPHEINE: Combined HyPhy Core and Compare - COMPARATIVE_GENOMICS (4 parameters)
 
-- Paired Collection
-- Reference Genome fasta
-- Set Ploidy for FreeBayes Variant Calling
-- Annotation GTF
+- reference cds
+- unaligned sequences
+- foreground regexp (optional)
+- foreground list (optional)
 
 ### Generic variation analysis reporting - VARIANT_CALLING (4 parameters)
 
@@ -182,16 +196,6 @@ None
 - gene products translations
 - Number of Clusters
 
-### Genome annotation with Braker3 - ANNOTATION (7 parameters)
-
-- BUSCO database
-- Include BUSCO
-- BUSCO lineage
-- Soft masked Genome sequence
-- Alignments from RNA-seq
-- Protein sequences
-- Fungus genome
-
 ### Single-Cell Mixture Analysis: baredSC 2D Log-Normalized Models - TRANSCRIPTOMICS (7 parameters)
 
 - Tabular with raw expression values
@@ -227,7 +231,6 @@ None
 
 - Allele-based Pathogen Identification ( (from Dockstore: Microbiome))
 - Assembly decontamination VGP9  ( (from Dockstore: Vertebrate Genome Project))
-- CAPHEINE: Combined HyPhy Core and Compare ( (from Dockstore: Comparative Genomics))
 - COVID-19: consensus construction ( (from Dockstore: SARS-COV-2))
 - Clinical Metaproteomics Data Interpretation ( (from Dockstore: Proteomics, Metaproteomics))
 - Clinical Metaproteomics Discovery Workflow ( (from Dockstore: Proteomics, Metaproteomics))
@@ -236,6 +239,7 @@ None
 - Create GRO and TOP complex files ( (from Dockstore: Computational Chemistry))
 - End-to-End Tissue Microarray Analysis ( (from Dockstore: Imaging))
 - Fragment-based virtual screening using rDock for docking and SuCOS for pose scoring ( (from Dockstore: Computational Chemistry))
+- Functional annotation of sequences (none)
 - Gene-based Pathogen Identification ( (from Dockstore: Microbiome))
 - Generate Nx and Size plots for multiple assemblies ( (from Dockstore: Vertebrate Genome Project))
 - Generate a Clinical Metaproteomics Database ( (from Dockstore: Proteomics, Metaproteomics))
@@ -244,9 +248,6 @@ None
 - Genome Assembly with Pacbio Hifi reads and Trio data for phasing - VGP5 ( (from Dockstore: Vertebrate Genome Project))
 - Host or Contamination Removal on Long-Reads ( (from Dockstore: Metagenomics, Microbiome))
 - Host or Contamination Removal on Short-Reads ( (from Dockstore: Metagenomics, Microbiome))
-- HyPhy: Compare ( (from Dockstore: Comparative Genomics))
-- HyPhy: Core ( (from Dockstore: Comparative Genomics))
-- HyPhy: Preprocessing  ( (from Dockstore: Comparative Genomics))
 - K-mer profiling and reads statistics VGP1 ( (from Dockstore: Vertebrate Genome Project))
 - MAG Genome Annotation Parallel ( (from Dockstore: Microbiome))
 - MAGs binning evaluation ( (from Dockstore: Microbiome))
@@ -261,7 +262,7 @@ None
 - MMGBSA calculations with GROMACS ( (from Dockstore: Computational Chemistry))
 - Mass spectrometry: GCMS with metaMS ( (from Dockstore: Computational Chemistry, Metabolomics))
 - Mass spectrometry: LC-MS preprocessing with XCMS ( (from Dockstore: Computational Chemistry, Metabolomics))
-- MetaProSIP OpenMS 2.8 ( (from Dockstore: Proteomics))
+- MetaProSIP OpenMS ( (from Dockstore: Proteomics))
 - Metagenome-Assembled Genomes (MAGs) generation ( (from Dockstore: Microbiome))
 - Metagenomics Taxonomic and Antibiotic Resistance Gene (ARG) Profiling ( (from Dockstore: Metagenomics))
 - Mitogenome Assembly VGP0 ( (from Dockstore: Vertebrate Genome Project))

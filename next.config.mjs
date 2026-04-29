@@ -1,5 +1,5 @@
-import { withSentryConfig } from "@sentry/nextjs";
 import nextMDX from "@next/mdx";
+import { withSentryConfig } from "@sentry/nextjs";
 import withPlugins from "next-compose-plugins";
 
 const withMDX = nextMDX({

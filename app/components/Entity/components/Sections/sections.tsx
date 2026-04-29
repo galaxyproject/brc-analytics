@@ -1,7 +1,6 @@
-import { JSX } from "react";
-import { SectionsProps } from "./types";
-import { Fragment } from "react";
 import { GridPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
+import { Fragment, JSX } from "react";
+import { SectionsProps } from "./types";
 
 export const Sections = ({
   children,

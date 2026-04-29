@@ -1,4 +1,10 @@
-import { JSX } from "react";
+import { CheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/CheckedIcon/checkedIcon";
+import { RadioCheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioCheckedIcon/radioCheckedIcon";
+import { RadioUncheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioUncheckedIcon/radioUncheckedIcon";
+import { UncheckedDisabledIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/UncheckedDisabledIcon/uncheckedDisabledIcon";
+import { UncheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/UncheckedIcon/uncheckedIcon";
+import { GridTable } from "@databiosphere/findable-ui/lib/components/Table/table.styles";
+import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import {
   Checkbox,
   Radio,
@@ -8,17 +14,10 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { StyledStack, StyledTableContainer } from "./compareBaseline.styles";
-import { GridTable } from "@databiosphere/findable-ui/lib/components/Table/table.styles";
-import { Props } from "./types";
-import { RadioCheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioCheckedIcon/radioCheckedIcon";
-import { RadioUncheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioUncheckedIcon/radioUncheckedIcon";
-import { CheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/CheckedIcon/checkedIcon";
-import { UncheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/UncheckedIcon/uncheckedIcon";
-import { UncheckedDisabledIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/UncheckedDisabledIcon/uncheckedDisabledIcon";
+import { JSX, ReactNode } from "react";
 import { CONTRAST_MODE } from "../../hooks/UseRadioGroup/types";
-import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
-import { ReactNode } from "react";
+import { StyledStack, StyledTableContainer } from "./compareBaseline.styles";
+import { Props } from "./types";
 
 export const CompareBaseline = ({
   baseline,

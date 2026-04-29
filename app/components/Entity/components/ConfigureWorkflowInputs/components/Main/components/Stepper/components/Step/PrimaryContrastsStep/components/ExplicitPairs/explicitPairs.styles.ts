@@ -1,6 +1,6 @@
+import { bpDownSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
 import { Stack } from "@mui/material";
-import { bpDownSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 
 export const StyledStack = styled(Stack)`
   padding: 20px;

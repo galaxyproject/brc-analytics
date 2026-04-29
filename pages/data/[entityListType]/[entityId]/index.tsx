@@ -8,6 +8,7 @@ import {
   EntitiesResponse,
 } from "../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { GA2Catalog } from "../../../../app/apis/catalog/ga2/entities";
+import { getEntityDetailMeta } from "../../../../app/common/meta/utils";
 import { config } from "../../../../app/config/config";
 import { getEntities, getEntity } from "../../../../app/utils/entityUtils";
 import { seedDatabase } from "../../../../app/utils/seedDatabase";
@@ -27,6 +28,8 @@ export interface EntityPageProps<R> {
   data?: R;
   entityId: string;
   entityListType: string;
+  pageDescription?: string;
+  pageTitle?: string;
 }
 
 /**
@@ -89,10 +92,13 @@ export const getStaticProps: GetStaticProps<
   };
 
   const entityConfig = getEntityConfig(entities, entityListType);
+  const entityMeta = getEntityDetailMeta(appConfig.appKey)[entityListType];
 
   const props: EntityPageProps<BRCCatalog | GA2Catalog> = {
     entityId,
     entityListType,
+    pageDescription: entityMeta?.pageDescription,
+    pageTitle: entityMeta?.pageTitle,
   };
 
   // Process entity props.

@@ -1,7 +1,8 @@
-import { JSX } from "react";
 import { Button } from "@mui/material";
+import { JSX } from "react";
 import { ROUTES } from "../../../../../../../../routes/constants";
 import { BUTTON_PROPS } from "../../SectionHero/constants";
+import { HeroImage } from "./components/HeroImage/heroImage";
 import {
   Head,
   Headline,
@@ -10,7 +11,6 @@ import {
   Subhead,
   SubHeadline,
 } from "./sectionHero.styles";
-import { HeroImage } from "./components/HeroImage/heroImage";
 
 export const SectionHero = (): JSX.Element => {
   return (

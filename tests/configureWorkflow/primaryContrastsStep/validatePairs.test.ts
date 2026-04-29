@@ -1,4 +1,8 @@
 import {
+  ContrastPair,
+  ContrastPairs,
+} from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseExplicitContrasts/types";
+import {
   addPairUpdater,
   createInitialPairs,
   getNextId,
@@ -7,10 +11,6 @@ import {
   updatePairUpdater,
   validatePairs,
 } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseExplicitContrasts/utils";
-import {
-  ContrastPair,
-  ContrastPairs,
-} from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseExplicitContrasts/types";
 
 const TEST_DESCRIPTION = {
   NO_MUTATE: "does not mutate the original map",

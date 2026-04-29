@@ -115,12 +115,13 @@ class WorkflowCategoryId(str, Enum):
     PROTEIN_FOLDING = "PROTEIN_FOLDING"
     CONSENSUS_SEQUENCES = "CONSENSUS_SEQUENCES"
     ANNOTATION = "ANNOTATION"
+    COMPARATIVE_GENOMICS = "COMPARATIVE_GENOMICS"
     OTHER = "OTHER"
 
 
 class CollectionType(str, Enum):
     """
-        Galaxy collection types supported for workflow parameters.
+        Galaxy collection types supported for collection_spec in workflow parameters.
     Currently only 'list' collections are supported, which represent a simple ordered list of datasets.
     """
 

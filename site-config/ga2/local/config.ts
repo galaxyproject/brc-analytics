@@ -13,8 +13,8 @@ import { AppSiteConfig } from "../../common/entities";
 import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genome/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organism/organismEntityConfig";
-import { workflowEntityConfig } from "./index/workflow/workflowEntityConfig";
 import { WorkflowEntity } from "./index/workflow/types";
+import { workflowEntityConfig } from "./index/workflow/workflowEntityConfig";
 import { socialMedia } from "./socialMedia";
 import { THEME_OPTIONS } from "./theme/constants";
 

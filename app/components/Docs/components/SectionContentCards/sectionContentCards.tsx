@@ -1,7 +1,7 @@
 import { JSX } from "react";
-import { Props } from "./types";
-import { StyledStack } from "./sectionContentCards.styles";
 import { SectionContentCard } from "../../../common/Card/components/SectionContentCard/sectionContentCard";
+import { StyledStack } from "./sectionContentCards.styles";
+import { Props } from "./types";
 
 export const SectionContentCards = ({ cards }: Props): JSX.Element | null => {
   if (!cards) return null;

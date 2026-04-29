@@ -1,9 +1,9 @@
-import { JSX } from "react";
 import {
   Breadcrumb,
   Breadcrumbs,
 } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
-import { Fragment, ReactNode } from "react";
+import { BaseComponentProps } from "@databiosphere/findable-ui/lib/components/types";
+import { Fragment, JSX, ReactNode } from "react";
 import { calculateGridSize } from "../../../../../Hero/common/utils";
 import { Hero } from "./components/Hero/hero";
 import {
@@ -14,7 +14,6 @@ import {
   Subhead,
   SubHeadline,
 } from "./sectionHero.styles";
-import { BaseComponentProps } from "@databiosphere/findable-ui/lib/components/types";
 
 export interface SectionHeroProps extends BaseComponentProps {
   breadcrumbs: Breadcrumb[];

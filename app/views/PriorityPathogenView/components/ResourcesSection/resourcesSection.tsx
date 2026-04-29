@@ -1,10 +1,10 @@
+import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
+import { ListItem } from "@mui/material";
 import { JSX } from "react";
-import { Props } from "./types";
 import { Section } from "../../../../components/Entity/components/Section/section";
 import { FluidPaper } from "../../../../components/common/Paper/components/FluidPaper/fluidPaper";
-import { ListItem } from "@mui/material";
-import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { StyledList } from "./resourcesSection.styles";
+import { Props } from "./types";
 
 export const ResourcesSection = ({
   resources,

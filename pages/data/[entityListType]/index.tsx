@@ -11,6 +11,7 @@ import {
   Outbreak,
 } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { GA2Catalog } from "../../../app/apis/catalog/ga2/entities";
+import { getEntityListMeta } from "../../../app/common/meta/utils";
 import { config } from "../../../app/config/config";
 import { seedDatabase } from "../../../app/utils/seedDatabase";
 import { StyledExploreView } from "../../../app/views/ExploreView/exploreView.styles";
@@ -23,6 +24,8 @@ interface PageUrl extends ParsedUrlQuery {
 interface EntitiesPageProps<R> {
   data?: EntitiesResponse<R>;
   entityListType: string;
+  pageDescription?: string;
+  pageTitle?: string;
 }
 
 /**
@@ -87,8 +90,12 @@ export const getStaticProps: GetStaticProps<
   const { exploreMode } = entityConfig;
   const { fetchAllEntities } = getEntityService(entityConfig, undefined); // Determine the type of fetch, either from an API endpoint or a TSV.
 
+  const entityMeta = getEntityListMeta(appConfig.appKey)[entityListType];
+
   const props: EntitiesPageProps<BRCCatalog | GA2Catalog> = {
     entityListType,
+    pageDescription: entityMeta?.pageDescription,
+    pageTitle: entityMeta?.pageTitle,
   };
 
   // Seed database.
