@@ -30,7 +30,7 @@ The Upload tool is accessible via the activity bar on the left side of the page 
 
 **Regular** (default) — The standard single-file or multi-file upload interface. Use the buttons along the bottom to add files (see below).
 
-**Composite** *(TODO: add description)* — For uploading composite dataset types that consist of multiple files (e.g. formats that require a data file plus an index file).
+**Composite** — For uploading composite dataset types that consist of multiple files (e.g. formats that require a data file plus an index file). It is unlikely to be needed in the context of BRC-Analytics.
 
 **Collection** *(TODO: add description)* — Upload files and organize them directly into a dataset collection.
 
@@ -40,9 +40,9 @@ The Upload tool is accessible via the activity bar on the left side of the page 
 
 **[Choose Local File](https://help.galaxyproject.org/t/uploading-files/16255)** — Drag and drop or browse to select files directly from your computer. Supports most common bioinformatics formats. You can set the file type and genome build at upload time, or let Galaxy auto-detect them.
 
-**[Choose from Repository](https://docs.galaxyproject.org/en/latest/lib/galaxy.files.sources.html)** *(TODO: find better user-facing source)* — Browse and import from configured remote file sources. On usegalaxy.org this can include cloud storage (Google Drive, Dropbox, AWS S3, WebDAV-based services like Nextcloud/ownCloud/EUDAT B2Drop), InvenioRDM repositories, Dataverse instances, and iRODS. Users can configure their own personal remote file sources under User Preferences → Manage Your Remote File Sources which can be accessed from the "+ Create New" at the bottom of the repository dialog box after clicking the "Choose from repository" button.
+**[Choose from Repository](https://training.galaxyproject.org/training-material/faqs/galaxy/manage_your_repositories.html)** — Browse and import from configured remote file sources. On usegalaxy.org this can include cloud storage (Google Drive, Dropbox, AWS S3, WebDAV-based services like Nextcloud/ownCloud/EUDAT B2Drop), InvenioRDM repositories, Dataverse instances, and iRODS. Users can configure their own personal remote file sources under User Preferences → Manage Your Remote File Sources which can be accessed from the "+ Create New" at the bottom of the repository dialog box after clicking the "Choose from repository" button.
 
-**[Paste/Fetch Data](https://docs.galaxyproject.org/en/latest/_modules/galaxy/schema/fetch_data.html)** *(TODO: find better user-facing source)* — Paste raw text data directly (e.g., a FASTA sequence, a BED interval, a list of IDs), or paste one or more URLs (HTTP, HTTPS, FTP). Galaxy fetches the remote file and deposits it into your history. Supports multiple URLs at once (one per line).
+**[Paste/Fetch Data](https://training.galaxyproject.org/training-material/topics/galaxy-interface/tutorials/get-data/slides-plain.html#directly-enter-text)** — Paste raw text data directly (e.g., a FASTA sequence, a BED interval, a list of IDs), or paste one or more URLs (HTTP, HTTPS, FTP). Galaxy fetches the remote file and deposits it into your history. Supports multiple URLs at once (one per line).
 
 *Note: [FTP upload](https://docs.galaxyproject.org/en/master/admin/special_topics/ftp.html) is **not** currently supported on usegalaxy.org (it is available on usegalaxy.eu and other instances).*
 
@@ -52,7 +52,7 @@ The Upload tool is accessible via the activity bar on the left side of the page 
 
 ![Galaxy "Get Data" tool set](./galaxy-get-data-tools.png)
 
-These are Galaxy tools that act as query interfaces to external databases, depositing results directly into your history:
+These are Galaxy tools that act as query interfaces to external databases, depositing results directly into your history. Not that most of these tools have considerable documentation under the configuration section when viewed in the Galaxy interface, and many also list tutorials where the tool used used below that documentation.
 
 **[UCSC Main Table Browser](https://training.galaxyproject.org/training-material/topics/introduction/tutorials/galaxy-intro-strands/tutorial.html)** *(TODO: find source specific to UCSC Table Browser tool)* — Query and download genomic intervals, gene annotations, conservation tracks, repeat elements, SNPs, and more from UCSC's databases for dozens of organisms.
 
@@ -64,27 +64,27 @@ These are Galaxy tools that act as query interfaces to external databases, depos
 
 **[EBI SRA](https://training.galaxyproject.org/training-material/faqs/galaxy/dataupload_EBI-SRA.html)** — Browse or query the European Bioinformatics Institute's Sequence Read Archive and import datasets directly.
 
-**EBI Search** *(TODO: add description)* — Search and retrieve data from EBI's cross-database search service.
+**EBI Search** — Search and retrieve data from EBI's cross-database search service.
 
-**Download run data from EBI Metagenomics database** *(TODO: add description)* — Retrieve metagenomic run data from the EBI Metagenomics (MGnify) database.
+**Download run data from EBI Metagenomics database** — Retrieve metagenomic run data from the EBI Metagenomics (MGnify) database.
 
-**EGA Download Client** *(TODO: add description)* — Download controlled-access datasets from the European Genome-phenome Archive.
+**EGA Download Client** — Download controlled-access datasets from the European Genome-phenome Archive.
 
 **NCBI Datasets Genomes** — Download genome assemblies, annotation files, and metadata by NCBI accession or taxon.
 
 **NCBI Datasets Gene** — Download gene records and associated sequences by gene ID or symbol.
 
-**UniProt** *(TODO: add description)* — Query and download protein sequence and functional annotation data from UniProt.
+**UniProt** — Query and download protein sequence and functional annotation data from UniProt.
 
-**Unipept** *(TODO: add description)* — Analyze metaproteomics data using the Unipept database.
+**Unipept** — Analyze metaproteomics data using the Unipept database.
 
-**IEDB** *(TODO: add description)* — Fetch immune epitope data from the Immune Epitope Database.
+**IEDB** — Fetch immune epitope data from the Immune Epitope Database.
 
-**Protein Database Downloader** *(TODO: add description)* — Download protein sequences from major databases.
+**Protein Database Downloader** — Download protein sequences from major databases.
 
-**fastq-dl** *(TODO: add description)* — Download FASTQ files from SRA or ENA by accession.
+**fastq-dl** — Download FASTQ files from SRA or ENA by accession.
 
-**pysradb search** *(TODO: add description)* — Search and retrieve metadata and data from NCBI SRA using pysradb.
+**pysradb search** — Search and retrieve metadata and data from NCBI SRA using pysradb.
 
 ---
 
@@ -118,15 +118,7 @@ Access all history views via the **Histories** button in the activity bar on the
 
 ---
 
-## 7. Workflow-Based Import
-
-**[Workflow Inputs](https://training.galaxyproject.org/training-material/topics/galaxy-interface/tutorials/workflow-editor/tutorial.html)** — When you invoke a workflow, you map its input slots to existing datasets or dataset collections in your history. While not "uploading" new data per se, this is a key pathway for directing data through automated multi-step analyses.
-
-**Workflow-Generated Outputs as Inputs to Other Workflows** — Outputs of one workflow run sitting in your history can be fed as inputs to subsequent workflows, enabling chained data flows.
-
----
-
-## 8. Cross-Server and External Transfers
+## 7. Cross-Server and External Transfers
 
 **Export/Import Between Galaxy Servers** — Histories and individual datasets can be exported from one Galaxy server and imported into usegalaxy.org via a URL or downloaded archive, enabling transfer between Galaxy instances.
 
@@ -144,7 +136,6 @@ Access all history views via the **Histories** button in the activity bar on the
 | Data Libraries | Server-side shared reference datasets |
 | Shared Histories | Histories shared with me, Public histories |
 | API / Programmatic | REST API, BioBlend (Python), galaxy-upload CLI |
-| Workflows | Chained workflow outputs |
 | Cross-Server | History import/export, Onedata |
 
 ---
