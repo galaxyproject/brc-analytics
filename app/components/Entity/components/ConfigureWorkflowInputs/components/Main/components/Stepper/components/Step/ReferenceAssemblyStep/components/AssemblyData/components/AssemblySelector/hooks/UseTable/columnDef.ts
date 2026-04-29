@@ -4,6 +4,7 @@ import {
   renderNTagCell,
 } from "../../../../../../../../../../../../../../../../common/Table/components/TableCell/components/NTagCell/utils";
 import { SelectCell } from "../../components/Table/components/TableCell/components/SelectCell/selectCell";
+import { getAssemblyIsolate, getAssemblySerotype } from "./accessorFn";
 import { CATEGORY_CONFIGS } from "./categoryConfigs";
 import { Assembly } from "./types";
 import { renderIsRef, renderNumber, renderPloidy } from "./viewBuilders";
@@ -168,6 +169,24 @@ const TAXONOMIC_GROUP: ColumnDef<Assembly> = {
   meta: { width: { max: "0.5fr", min: "120px" } },
 };
 
+const TAXONOMIC_LEVEL_ISOLATE: ColumnDef<Assembly> = {
+  ...SORTING_COLUMN_DEF,
+  accessorFn: getAssemblyIsolate,
+  filterFn: SELECT_FILTER_FN,
+  header: CATEGORY_CONFIGS.TAXONOMIC_LEVEL_ISOLATE.label,
+  id: CATEGORY_CONFIGS.TAXONOMIC_LEVEL_ISOLATE.key,
+  meta: { width: { max: "0.5fr", min: "160px" } },
+};
+
+const TAXONOMIC_LEVEL_SEROTYPE: ColumnDef<Assembly> = {
+  ...SORTING_COLUMN_DEF,
+  accessorFn: getAssemblySerotype,
+  filterFn: SELECT_FILTER_FN,
+  header: CATEGORY_CONFIGS.TAXONOMIC_LEVEL_SEROTYPE.label,
+  id: CATEGORY_CONFIGS.TAXONOMIC_LEVEL_SEROTYPE.key,
+  meta: { width: { max: "0.5fr", min: "160px" } },
+};
+
 const TAXONOMIC_LEVEL_SPECIES: ColumnDef<Assembly> = {
   ...SORTING_COLUMN_DEF,
   accessorKey: CATEGORY_CONFIGS.TAXONOMIC_LEVEL_SPECIES.key,
@@ -200,6 +219,8 @@ export const columns: ColumnDef<Assembly>[] = [
   ACCESSION,
   TAXONOMIC_LEVEL_SPECIES,
   TAXONOMIC_LEVEL_STRAIN,
+  TAXONOMIC_LEVEL_SEROTYPE,
+  TAXONOMIC_LEVEL_ISOLATE,
   PLOIDY,
   TAXONOMY_ID,
   TAXONOMIC_GROUP,
