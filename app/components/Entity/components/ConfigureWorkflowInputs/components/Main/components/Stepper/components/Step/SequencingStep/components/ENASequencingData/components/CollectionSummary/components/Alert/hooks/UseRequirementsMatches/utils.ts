@@ -80,14 +80,20 @@ function buildSpeciesWarnings(
 ): string[] {
   if (!genome) return [];
 
-  const { ncbiTaxonomyId, taxonomicLevelSpecies } = genome;
+  const { ncbiTaxonomyId, speciesTaxonomyId, taxonomicLevelSpecies } = genome;
 
   // Build a set of unmatched values.
   const unmatchedSet = new Set();
   for (const { original } of rows) {
-    const { scientific_name = LABEL.UNSPECIFIED, tax_id } = original;
+    const {
+      scientific_name = LABEL.UNSPECIFIED,
+      tax_id,
+      tax_lineage = "",
+    } = original;
     // Compare the row value to the expected value.
-    if (ncbiTaxonomyId === tax_id) continue;
+    if (tax_id === ncbiTaxonomyId) continue;
+    if (tax_id === speciesTaxonomyId) continue;
+    if (tax_lineage.split(";").includes(speciesTaxonomyId)) continue;
 
     // Add the unmatched value to the set.
     unmatchedSet.add(`${tax_id} (${scientific_name})`);

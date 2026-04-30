@@ -168,17 +168,48 @@ describe("buildRequirementWarnings", () => {
       expect.stringContaining(EXPECTED.SPECIES_MISMATCH),
     ]);
   });
+
+  test("no species warning when read tax_id matches speciesTaxonomyId", () => {
+    const filters: ColumnFiltersState = [];
+    const genome = makeGenome("330879", "746128");
+    const rows = makeRows({ tax_id: "746128" });
+
+    expect(buildRequirementWarnings(filters, rows, genome)).toEqual([]);
+  });
+
+  test("no species warning when speciesTaxonomyId appears in tax_lineage", () => {
+    const filters: ColumnFiltersState = [];
+    const genome = makeGenome("330879", "746128");
+    const rows = makeRows({
+      tax_id: "41122",
+      tax_lineage: "1;131567;2759;746128;41122",
+    });
+
+    expect(buildRequirementWarnings(filters, rows, genome)).toEqual([]);
+  });
+
+  test("species warning when tax_id and tax_lineage do not match", () => {
+    const filters: ColumnFiltersState = [];
+    const genome = makeGenome("330879", "746128");
+    const rows = makeRows({ scientific_name: "Other sp.", tax_id: "99999" });
+
+    expect(buildRequirementWarnings(filters, rows, genome)).toEqual([
+      expect.stringContaining(EXPECTED.SPECIES_MISMATCH),
+    ]);
+  });
 });
 
 /**
  * Returns partial genome entity for unit tests.
  * @param ncbiTaxonomyId - NCBI Tax ID.
+ * @param speciesTaxonomyId - Species Tax ID.
  * @returns genome entity.
  */
 function makeGenome(
-  ncbiTaxonomyId: string
+  ncbiTaxonomyId: string,
+  speciesTaxonomyId = ncbiTaxonomyId
 ): BRCDataCatalogGenome | GA2AssemblyEntity {
-  return { ncbiTaxonomyId } as unknown as
+  return { ncbiTaxonomyId, speciesTaxonomyId } as unknown as
     | BRCDataCatalogGenome
     | GA2AssemblyEntity;
 }

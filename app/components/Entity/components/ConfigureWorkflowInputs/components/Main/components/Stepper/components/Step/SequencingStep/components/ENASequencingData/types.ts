@@ -21,6 +21,7 @@ export interface BaseReadRun {
   study_accession: string;
   submitted_ftp: string;
   tax_id: string;
+  tax_lineage?: string;
 }
 
 export interface ReadRun extends BaseReadRun {
