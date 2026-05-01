@@ -6,6 +6,7 @@ import {
 import { JSX } from "react";
 import { getEntity } from "../../services/workflows/query";
 import { Main } from "./components/Main/main";
+import { Side } from "./components/Side/side";
 import { Top } from "./components/Top/top";
 import type { Organism, Props } from "./types";
 
@@ -24,6 +25,7 @@ export const OrganismWorkflowsView = ({ entityId }: Props): JSX.Element => {
       </BackPageHero>
       <BackPageContent>
         <Main entityId={entityId} organism={organism} />
+        <Side organism={organism} />
       </BackPageContent>
     </BackPageView>
   );
