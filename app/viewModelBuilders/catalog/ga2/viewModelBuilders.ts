@@ -1,5 +1,6 @@
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
+import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { ColumnDef, getSortedRowModel } from "@tanstack/react-table";
 import { ComponentProps } from "react";
 import { ROUTES } from "../../../../routes/constants";
@@ -34,6 +35,12 @@ export const buildOrganismHero = (
       { path: "", text: entity.taxonomicLevelSpecies },
       { path: "", text: "Assemblies" },
     ],
+    callToAction: {
+      label: "Configure Organism",
+      url: replaceParameters(ROUTES.ORGANISM_ANALYZE_WORKFLOWS, {
+        entityId: sanitizeEntityId(entity.ncbiTaxonomyId),
+      }),
+    },
     title: entity.taxonomicLevelSpecies,
   };
 };
