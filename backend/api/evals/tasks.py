@@ -45,11 +45,22 @@ def _ensure_init_env(skip_env_vars: Optional[set[str]] = None) -> None:
 
 @dataclass
 class EvalDeps:
-    """Shared per-run state -- one instance per CLI invocation."""
+    """Shared per-run state.
+
+    Settings and catalog are reused across the whole CLI invocation; cache is
+    rebuilt per (dataset, model) run via `with_fresh_cache()` so that
+    LLMService's content-keyed cache entries (llm:interpret, llm:workflow)
+    can't leak from one model's output into another model's input.
+    """
 
     settings: Settings
     cache: CacheService
     catalog: CatalogData
+
+    def with_fresh_cache(self) -> "EvalDeps":
+        return EvalDeps(
+            settings=self.settings, cache=_make_cache(), catalog=self.catalog
+        )
 
 
 @dataclass
@@ -96,9 +107,7 @@ class _InMemoryCache:
     async def get(self, key: str) -> Optional[Any]:
         return self._store.get(key)
 
-    async def set(
-        self, key: str, value: Any, ttl: int = 3600
-    ) -> bool:  # noqa: ARG002
+    async def set(self, key: str, value: Any, ttl: int = 3600) -> bool:  # noqa: ARG002
         self._store[key] = value
         return True
 

@@ -103,7 +103,9 @@ def build(deps: EvalDeps, entry: ModelEntry, judge_model: Model, only=None):
             )
         if c.get("expected_low_confidence"):
             evaluators.append(LowConfidence(threshold=0.3))
-        evaluators.append(LLMJudge(rubric=_RUBRIC, model=judge_model, include_input=True))
+        evaluators.append(
+            LLMJudge(rubric=_RUBRIC, model=judge_model, include_input=True)
+        )
         cases.append(
             Case(
                 name=c["name"],

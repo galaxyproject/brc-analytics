@@ -20,7 +20,7 @@ def test_render_report_basic():
                 _StubCase(name="yeast_rnaseq_2023", scores={"FieldEquals": 1.0}),
                 _StubCase(name="malaria_wgs", scores={"FieldEquals": 0.0}),
             ],
-            failures=[("gibberish", "schema validation")],
+            failures=[("gibberish", "schema validation", frozenset({"FieldEquals"}))],
             primary_score="FieldEquals",
             duration_seconds=12.34,
         ),
@@ -31,8 +31,36 @@ def test_render_report_basic():
     assert "search_interpretation" in md
     assert "claude-sonnet-4-6" in md
     assert "yeast_rnaseq_2023" in md
-    # Failures count as wrong: total = 2 cases + 1 failure, score 1/3
+    # Failure declared FieldEquals: total = 2 cases + 1 failure, score 1/3
     assert "1/3" in md
+
+
+def test_failure_only_counts_for_declared_evaluators():
+    """A structural failure must only contribute to denominators of evaluators
+    actually declared on that case. Otherwise partial-coverage scorers like
+    _NoToolCalls (only on off_topic_redirect) get diluted by every unrelated
+    failure."""
+    runs = [
+        RunResult(
+            dataset="tool_selection",
+            model="m",
+            cases=[
+                _StubCase(name="a", scores={"ToolCallMatch": 1.0}),
+                _StubCase(name="b", scores={"_NoToolCalls": 1.0}),
+            ],
+            # Failure on case "c" had ToolCallMatch declared, NOT _NoToolCalls.
+            failures=[("c", "boom", frozenset({"ToolCallMatch"}))],
+            primary_score="ToolCallMatch",
+            duration_seconds=1.0,
+        ),
+    ]
+    r = runs[0]
+    # ToolCallMatch: 1 passing case + 1 failure (declared) = 2; avg = 1/2
+    assert r.evaluator_count("ToolCallMatch") == 2
+    assert r.avg("ToolCallMatch") == 0.5
+    # _NoToolCalls: 1 passing case, failure did NOT declare it = 1; avg = 1/1
+    assert r.evaluator_count("_NoToolCalls") == 1
+    assert r.avg("_NoToolCalls") == 1.0
 
 
 def test_avg_excludes_cases_without_evaluator():

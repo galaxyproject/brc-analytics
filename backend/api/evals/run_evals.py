@@ -70,7 +70,11 @@ async def _run_one(
     repeat: int,
 ) -> RunResult:
     build = SPECS[dataset_name]
-    dataset, task, primary_score = build(deps, entry, judge_model, only)
+    # Fresh cache per run so LLMService's content-keyed entries can't be served
+    # back to a different model. Multi-turn sessions still work because session
+    # ids are minted fresh per case within the run.
+    run_deps = deps.with_fresh_cache()
+    dataset, task, primary_score = build(run_deps, entry, judge_model, only)
 
     started = time.time()
     report = await dataset.evaluate(
@@ -98,8 +102,20 @@ async def _run_one(
         for name, scores in aggregated.items()
     ]
 
+    # Map case name -> declared evaluator class names so structural failures
+    # only count toward denominators of evaluators that were actually in scope.
+    case_evaluators: dict[str, frozenset[str]] = {
+        c.name: frozenset(
+            type(ev).__name__ for ev in (getattr(c, "evaluators", []) or [])
+        )
+        for c in dataset.cases
+    }
     failures = [
-        (_strip_repeat_suffix(f.name), str(f.error_message)[:200])
+        (
+            _strip_repeat_suffix(f.name),
+            str(f.error_message)[:200],
+            case_evaluators.get(_strip_repeat_suffix(f.name), frozenset()),
+        )
         for f in getattr(report, "failures", [])
     ]
     return RunResult(

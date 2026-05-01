@@ -13,7 +13,11 @@ class RunResult:
     dataset: str
     model: str
     cases: list[Any]  # objects with .name and .scores: dict[str, float]
-    failures: list[tuple[str, str]]  # (case_name, error_message)
+    # (case_name, error_message, declared_evaluator_names). The third field is
+    # the set of evaluator class names declared on the case in the dataset, so
+    # we can credit a structural failure as 0/1 only for evaluators that were
+    # actually in scope on that case.
+    failures: list[tuple[str, str, frozenset[str]]]
     primary_score: str
     duration_seconds: float
 
@@ -23,9 +27,10 @@ class RunResult:
 
     def evaluator_count(self, evaluator: str) -> int:
         """Number of cases (incl. structural failures) where this evaluator was
-        in scope. Failures with the evaluator declared still count."""
+        in scope. A failure only counts if the evaluator was declared on it."""
         n_cases = sum(1 for c in self.cases if evaluator in c.scores)
-        return n_cases + len(self.failures)
+        n_failures = sum(1 for _, _, evs in self.failures if evaluator in evs)
+        return n_cases + n_failures
 
     def avg(self, evaluator: str) -> float:
         """Average for cases where the evaluator was in scope.
@@ -36,7 +41,9 @@ class RunResult:
         n = self.evaluator_count(evaluator)
         if n == 0:
             return 0.0
-        s = sum(c.scores.get(evaluator, 0.0) for c in self.cases if evaluator in c.scores)
+        s = sum(
+            c.scores.get(evaluator, 0.0) for c in self.cases if evaluator in c.scores
+        )
         return s / n
 
     def primary_avg(self) -> float:
@@ -94,13 +101,15 @@ def render_report(runs: list[RunResult], sha: str) -> str:
         # This handles cases like off_topic_redirect (uses _NoToolCalls) and
         # exploration_only (lacks FinalSchemaContains) without showing 0.00
         # spuriously for the unused primary_score.
-        out.append("<details><summary>Per-case detail (average across evaluators)</summary>")
+        out.append(
+            "<details><summary>Per-case detail (average across evaluators)</summary>"
+        )
         out.append("")
         # Use a set union so cases that pass for one model and fail for another
         # are listed only once.
         case_names = sorted(
             {c.name for r in ds_runs for c in r.cases}
-            | {n for r in ds_runs for n, _ in r.failures}
+            | {n for r in ds_runs for n, _, _ in r.failures}
         )
         models = sorted({r.model for r in ds_runs})
         out.append("| Case | " + " | ".join(models) + " |")
@@ -111,7 +120,9 @@ def render_report(runs: list[RunResult], sha: str) -> str:
                 run = next((r for r in ds_runs if r.model == m), None)
                 cell = "-"
                 if run:
-                    failure = next((msg for n, msg in run.failures if n == case), None)
+                    failure = next(
+                        (msg for n, msg, _ in run.failures if n == case), None
+                    )
                     if failure:
                         cell = f"FAIL: {failure[:30]}"
                     else:

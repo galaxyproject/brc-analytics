@@ -33,3 +33,24 @@ def test_make_key_is_deterministic():
     b = cache.make_key("p", {"y": 2, "x": 1})
     assert a == b
     assert a.startswith("p:")
+
+
+@pytest.mark.asyncio
+async def test_with_fresh_cache_isolates_runs():
+    """Cross-model isolation: with_fresh_cache() must hand back a deps with an
+    empty cache so LLMService's content-keyed entries can't leak between
+    (dataset, model) runs. Settings/catalog should be reused."""
+    from evals.tasks import EvalDeps, _InMemoryCache
+
+    cache = _InMemoryCache()
+    await cache.set("llm:interpret:abc", {"taxonomy_id": "4932"})
+
+    settings = object()
+    catalog = object()
+    deps = EvalDeps(settings=settings, cache=cache, catalog=catalog)  # type: ignore[arg-type]
+    fresh = deps.with_fresh_cache()
+
+    assert fresh.settings is settings
+    assert fresh.catalog is catalog
+    assert fresh.cache is not deps.cache
+    assert await fresh.cache.get("llm:interpret:abc") is None
