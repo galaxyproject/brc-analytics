@@ -166,7 +166,7 @@ export const useAssistantChat = (): UseAssistantChatReturn => {
  */
 function handleChatError(error: unknown): string {
   const err = error as { message?: string; name?: string };
-  if (err.name === "TimeoutError") {
+  if (err.name === "TimeoutError" || err.message?.includes("504")) {
     return "The assistant took too long to respond. Please try again.";
   } else if (err.message?.includes("503")) {
     return "The analysis assistant is currently unavailable. Please try again later.";

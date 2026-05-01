@@ -6,14 +6,14 @@ import json
 import logging
 import re
 import time
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 
 from pydantic_ai import Agent, RunContext, Tool
 from pydantic_ai.messages import ModelMessage, ModelMessagesTypeAdapter
 from pydantic_core import to_jsonable_python
 from tenacity import (
     retry,
-    retry_if_exception_type,
+    retry_if_exception,
     stop_after_attempt,
     wait_exponential,
 )
@@ -49,6 +49,16 @@ logger = logging.getLogger(__name__)
 # ~20 turn-pairs; tool-heavy turns produce 3-5 messages each, so this
 # bounds total context while preserving good conversational continuity.
 MAX_HISTORY_MESSAGES = 40
+ASSISTANT_RUN_TIMEOUT_SECONDS = 105.0
+
+
+class AssistantTimeoutError(RuntimeError):
+    """Raised when the assistant run exceeds the server-side timeout."""
+
+
+def _should_retry_agent_error(exc: BaseException) -> bool:
+    return not isinstance(exc, AssistantTimeoutError)
+
 
 SYSTEM_PROMPT = """\
 You are the BRC Analytics Analysis Assistant, an expert in bioinformatics \
@@ -145,10 +155,12 @@ chain is: organism -> assembly -> analysis_type -> workflow -> \
 data_characteristics, gene_annotation. The data_source field is independent.
 
 Example — user said "I want to work with yeast RNA-seq":
-SCHEMA_UPDATE: {"organism": "Saccharomyces cerevisiae", "analysis_type": "Transcriptomics"}
+SCHEMA_UPDATE: {"organism": "Saccharomyces cerevisiae", \
+"analysis_type": "Transcriptomics"}
 
 Example — user switches from RNA-seq to variant calling:
-SCHEMA_UPDATE: {"analysis_type": "Variant Calling", "workflow": null, "data_characteristics": null, "gene_annotation": null}
+SCHEMA_UPDATE: {"analysis_type": "Variant Calling", "workflow": null, \
+"data_characteristics": null, "gene_annotation": null}
 
 Only emit this when the user has actually chosen or changed something. If the \
 conversation is purely exploratory (listing options, answering questions), do \
@@ -159,7 +171,8 @@ NOT emit it.
 After each response, suggest 2-4 short phrases the user might want to say next. \
 Format them as a JSON array at the very end of your response, on its own line, \
 prefixed with "SUGGESTIONS:". For example:
-SUGGESTIONS: ["Search ENA for public data", "Use the reference assembly", "Tell me about variant calling"]
+SUGGESTIONS: ["Search ENA for public data", "Use the reference assembly", \
+"Tell me about variant calling"]
 
 If no suggestions are appropriate, omit the SUGGESTIONS line entirely.
 """
@@ -302,8 +315,16 @@ class AssistantAgent:
             accession = schema_state.assembly.detail or ""
             trs_id = schema_state.workflow.detail or ""
             if accession and trs_id:
-                handoff_url = f"/data/assemblies/{accession}/{trs_id}"
+                workflow_id = AssistantAgent._format_trs_id_for_url(trs_id)
+                handoff_url = (
+                    f"/data/assemblies/{accession}/analyze/workflows/{workflow_id}"
+                )
         return handoff_url is not None, handoff_url
+
+    @staticmethod
+    def _format_trs_id_for_url(trs_id: str) -> str:
+        """Match frontend formatTrsId for workflow route params."""
+        return re.sub(r"[^a-zA-Z0-9]", "-", re.sub(r"^#", "", trs_id))
 
     @staticmethod
     def _build_context_prefix(schema: AnalysisSchema) -> str:
@@ -347,7 +368,7 @@ class AssistantAgent:
     @retry(
         stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=1, min=2, max=8),
-        retry=retry_if_exception_type((Exception,)),
+        retry=retry_if_exception(_should_retry_agent_error),
         reraise=True,
     )
     async def _run_agent_with_retry(
@@ -355,7 +376,7 @@ class AssistantAgent:
         message: str,
         deps: AssistantDeps,
         message_history: Optional[list] = None,
-        timeout: float = 120.0,
+        timeout: float = ASSISTANT_RUN_TIMEOUT_SECONDS,
     ):
         """Run the pydantic-ai agent with timeout and automatic retry.
 
@@ -363,9 +384,10 @@ class AssistantAgent:
             message: User message to send.
             deps: Agent dependencies (catalog data).
             message_history: Prior pydantic-ai messages to restore context.
-            timeout: Maximum seconds to wait (default 120s, matches frontend).
+            timeout: Maximum seconds to wait (default leaves room for frontend).
 
-        Retries up to 3 times with exponential backoff (2s, 4s, 8s).
+        Retries transient errors up to 3 times with exponential backoff
+        (2s, 4s, 8s). Timeouts are not retried.
         """
         start_time = time.time()
         logger.info("Agent run starting (timeout=%ss)", timeout)
@@ -382,7 +404,7 @@ class AssistantAgent:
             logger.error(
                 "Agent run timed out after %.2fs (limit: %ss)", elapsed, timeout
             )
-            raise RuntimeError(
+            raise AssistantTimeoutError(
                 f"Assistant request timed out after {timeout} seconds"
             ) from e
 

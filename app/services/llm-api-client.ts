@@ -45,7 +45,11 @@ export const llmAPIClient = {
     request: AssistantChatRequest
   ): Promise<AssistantChatResponse> => {
     return apiClient
-      .post("assistant/chat", { json: request, timeout: 120000 })
+      .post("assistant/chat", {
+        json: request,
+        retry: { limit: 0 },
+        timeout: 120000,
+      })
       .json();
   },
 

@@ -9,6 +9,7 @@ from app.models.assistant import (
     ChatResponse,
     SessionRestoreResponse,
 )
+from app.services.assistant_agent import AssistantTimeoutError
 
 logger = logging.getLogger(__name__)
 
@@ -48,11 +49,13 @@ async def assistant_chat(
     try:
         response = await agent.chat(request.message, request.session_id)
         return response
+    except AssistantTimeoutError as e:
+        raise HTTPException(status_code=504, detail=str(e)) from e
     except RuntimeError as e:
-        raise HTTPException(status_code=503, detail=str(e))
-    except Exception:
+        raise HTTPException(status_code=503, detail=str(e)) from e
+    except Exception as e:
         logger.exception("Assistant chat error")
-        raise HTTPException(status_code=500, detail="Internal assistant error")
+        raise HTTPException(status_code=500, detail="Internal assistant error") from e
 
 
 @router.get("/session/{session_id}", response_model=SessionRestoreResponse)
@@ -63,9 +66,9 @@ async def restore_session(
     """Restore a previous assistant session (messages, schema, suggestions)."""
     try:
         state = await agent.session_service.get_session(session_id)
-    except Exception:
+    except Exception as e:
         logger.exception("Failed to restore session %s", session_id)
-        raise HTTPException(status_code=500, detail="Failed to restore session")
+        raise HTTPException(status_code=500, detail="Failed to restore session") from e
     if state is None:
         raise HTTPException(status_code=404, detail="Session not found or expired")
 

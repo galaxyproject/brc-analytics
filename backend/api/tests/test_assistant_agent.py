@@ -1,5 +1,6 @@
 """Tests for AssistantAgent parsing and schema update logic."""
 
+import asyncio
 from unittest.mock import MagicMock
 
 import pytest
@@ -16,9 +17,12 @@ from app.models.assistant import (
     AnalysisSchema,
     FieldStatus,
     SchemaField,
-    SuggestionChip,
 )
-from app.services.assistant_agent import MAX_HISTORY_MESSAGES, AssistantAgent
+from app.services.assistant_agent import (
+    MAX_HISTORY_MESSAGES,
+    AssistantAgent,
+    AssistantTimeoutError,
+)
 
 
 @pytest.fixture()
@@ -235,6 +239,79 @@ class TestApplySchemaUpdates:
         result = agent._apply_schema_updates(schema, {"assembly": "GCF_000146045.2"})
         assert result.organism.value == "Existing"
         assert result.assembly.detail == "GCF_000146045.2"
+
+
+# ---------- compute_handoff ----------
+
+
+def _filled_field(value: str, detail: str | None = None) -> SchemaField:
+    return SchemaField(value=value, detail=detail, status=FieldStatus.FILLED)
+
+
+class TestComputeHandoff:
+    def test_complete_schema_builds_workflow_configure_url(self):
+        schema = AnalysisSchema(
+            organism=_filled_field("Saccharomyces cerevisiae"),
+            assembly=_filled_field("S288C GCF_000146045.2", "GCF_000146045.2"),
+            analysis_type=_filled_field("Transcriptomics"),
+            workflow=_filled_field(
+                "RNA-Seq PE",
+                "#workflow/github.com/iwc/rnaseq-pe/main",
+            ),
+            data_source=_filled_field("ENA"),
+            data_characteristics=_filled_field("paired-end RNA-seq"),
+        )
+
+        is_complete, handoff_url = AssistantAgent.compute_handoff(schema)
+
+        assert is_complete is True
+        assert handoff_url == (
+            "/data/assemblies/GCF_000146045.2/analyze/workflows/"
+            "workflow-github-com-iwc-rnaseq-pe-main"
+        )
+
+    def test_incomplete_schema_has_no_handoff_url(self):
+        is_complete, handoff_url = AssistantAgent.compute_handoff(AnalysisSchema())
+
+        assert is_complete is False
+        assert handoff_url is None
+
+    def test_complete_schema_without_route_details_has_no_handoff_url(self):
+        schema = AnalysisSchema(
+            organism=_filled_field("Saccharomyces cerevisiae"),
+            assembly=_filled_field("S288C GCF_000146045.2"),
+            analysis_type=_filled_field("Transcriptomics"),
+            workflow=_filled_field("RNA-Seq PE"),
+            data_source=_filled_field("ENA"),
+            data_characteristics=_filled_field("paired-end RNA-seq"),
+        )
+
+        is_complete, handoff_url = AssistantAgent.compute_handoff(schema)
+
+        assert is_complete is False
+        assert handoff_url is None
+
+
+# ---------- _run_agent_with_retry ----------
+
+
+class TestRunAgentWithRetry:
+    @pytest.mark.asyncio
+    async def test_timeout_is_not_retried(self, agent):
+        calls = 0
+
+        async def slow_run(*args, **kwargs):
+            nonlocal calls
+            calls += 1
+            await asyncio.sleep(0.05)
+
+        agent.agent = MagicMock()
+        agent.agent.run = slow_run
+
+        with pytest.raises(AssistantTimeoutError):
+            await agent._run_agent_with_retry("message", MagicMock(), timeout=0.001)
+
+        assert calls == 1
 
 
 # ---------- _truncate_history ----------
