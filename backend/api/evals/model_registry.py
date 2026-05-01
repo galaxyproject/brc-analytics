@@ -31,9 +31,7 @@ class ModelRegistry:
     @property
     def judge(self) -> ModelEntry:
         if self.judge_name not in self.models:
-            raise ModelRegistryError(
-                f"judge '{self.judge_name}' not found in models"
-            )
+            raise ModelRegistryError(f"judge '{self.judge_name}' not found in models")
         return self.models[self.judge_name]
 
     def filter(self, names: Iterable[str]) -> dict[str, ModelEntry]:

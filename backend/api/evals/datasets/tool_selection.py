@@ -49,8 +49,7 @@ _CASES = [
     {
         "name": "lookup_tb_assemblies_by_taxid",
         "message": (
-            "Show me the genome assemblies for Mycobacterium tuberculosis "
-            "(taxid 1773)."
+            "Show me the genome assemblies for Mycobacterium tuberculosis (taxid 1773)."
         ),
         "expected_tool": "get_assemblies",
         "expected_args": {"taxonomy_id": "1773"},

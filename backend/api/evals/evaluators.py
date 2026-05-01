@@ -28,18 +28,18 @@ class FieldEquals(Evaluator):
         out = ctx.output
         if hasattr(out, "model_dump"):
             out = out.model_dump()
-        if not isinstance(out, dict):
-            return 0.0
-        actual = out.get(self.field)
+        if isinstance(out, dict):
+            actual = out.get(self.field)
+        else:
+            # Dataclass / object with attributes
+            actual = getattr(out, self.field, None)
         expected = self.expected
         if expected is None:
             expected = (ctx.metadata or {}).get(f"expected_{self.field}")
         if expected is None:
             return 0.0
         return (
-            1.0
-            if _coerce_str(actual).lower() == _coerce_str(expected).lower()
-            else 0.0
+            1.0 if _coerce_str(actual).lower() == _coerce_str(expected).lower() else 0.0
         )
 
 

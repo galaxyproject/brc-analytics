@@ -21,7 +21,6 @@ from app.services.tools.catalog_tools import AssistantDeps
 from evals.judge import build_pydantic_ai_model
 from evals.model_registry import ModelEntry
 
-
 # AssistantAgent's eager init calls pydantic-ai with a model-name string when
 # no base_url is configured; pydantic-ai then needs ANTHROPIC_API_KEY in the
 # environment. We never use this key for real calls -- _override_model swaps
@@ -126,9 +125,7 @@ def make_search_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
     _ensure_init_env()
     svc = LLMService(deps.cache)
     if not svc.is_available():
-        raise RuntimeError(
-            "LLMService failed to initialize -- check AI_API_KEY in env"
-        )
+        raise RuntimeError("LLMService failed to initialize -- check AI_API_KEY in env")
     _override_model(svc, entry)
 
     async def task(case_input: dict) -> SearchOutput:
@@ -157,9 +154,7 @@ def make_workflow_rec_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
     _ensure_init_env()
     svc = LLMService(deps.cache)
     if not svc.is_available():
-        raise RuntimeError(
-            "LLMService failed to initialize -- check AI_API_KEY in env"
-        )
+        raise RuntimeError("LLMService failed to initialize -- check AI_API_KEY in env")
     _override_model(svc, entry)
 
     async def task(case_input: dict) -> WorkflowRecOutput:

@@ -83,9 +83,7 @@ def render_report(runs: list[RunResult], sha: str) -> str:
                 run = next((r for r in ds_runs if r.model == m), None)
                 cell = "-"
                 if run:
-                    failure = next(
-                        (msg for n, msg in run.failures if n == case), None
-                    )
+                    failure = next((msg for n, msg in run.failures if n == case), None)
                     if failure:
                         cell = f"FAIL: {failure[:30]}"
                     else:

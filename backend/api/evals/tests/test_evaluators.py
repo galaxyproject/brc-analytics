@@ -46,6 +46,15 @@ def test_field_equals_missing_key():
     assert ev.evaluate(_ctx({})) == 0.0
 
 
+def test_field_equals_works_on_dataclass_output():
+    @dataclass
+    class _Out:
+        taxonomy_id: str
+
+    ev = FieldEquals(field="taxonomy_id", expected="4932")
+    assert ev.evaluate(_ctx(_Out(taxonomy_id="4932"))) == 1.0
+
+
 def test_field_equals_pulls_expected_from_metadata_if_omitted():
     ev = FieldEquals(field="taxonomy_id")
     assert (
