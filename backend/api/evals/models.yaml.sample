@@ -1,0 +1,35 @@
+# Copy to evals/models.yaml and fill in real keys. The real file is gitignored.
+#
+# Each model is reachable through its declared proxy URL. The optional `api_key`
+# field can be set inline OR loaded from an env var via `api_key_env`. Pick one.
+#
+# The `judge` key MUST point at one of the named models -- it is used as the
+# LLM-as-judge for rubric-based scorers.
+
+judge: claude-sonnet-4-6
+
+models:
+  claude-sonnet-4-6:
+    provider: anthropic
+    model: claude-sonnet-4-5
+    base_url: https://api.anthropic.com
+    api_key_env: ANTHROPIC_API_KEY
+
+  claude-opus-4-7:
+    provider: anthropic
+    model: claude-opus-4-5
+    base_url: https://api.anthropic.com
+    api_key_env: ANTHROPIC_API_KEY
+
+  gpt-5:
+    provider: openai
+    model: gpt-5
+    base_url: https://api.openai.com/v1
+    api_key_env: OPENAI_API_KEY
+
+  # Example of an OpenAI-compatible proxy (e.g. TACC, SambaNova, LiteLLM):
+  tacc-llama-3-3-70b:
+    provider: openai-compatible
+    model: meta-llama/Llama-3.3-70B-Instruct
+    base_url: https://chat.tacc.utexas.edu/v1
+    api_key_env: TACC_API_KEY
