@@ -62,6 +62,32 @@ class MustMention(Evaluator):
 
 
 @dataclass
+class LowConfidence(Evaluator):
+    """1.0 if the output's `confidence` field is at or below `threshold`.
+
+    Useful for gibberish / off-topic cases where the *correct* behavior is
+    for the model to flag the query as low-confidence rather than confabulate.
+    """
+
+    threshold: float = 0.3
+
+    def evaluate(self, ctx: EvaluatorContext) -> float:
+        out = ctx.output
+        if hasattr(out, "model_dump"):
+            out = out.model_dump()
+        if isinstance(out, dict):
+            conf = out.get("confidence")
+        else:
+            conf = getattr(out, "confidence", None)
+        if conf is None:
+            return 0.0
+        try:
+            return 1.0 if float(conf) <= self.threshold else 0.0
+        except (TypeError, ValueError):
+            return 0.0
+
+
+@dataclass
 class ToolCallMatch(Evaluator):
     """Check the agent invoked a specific tool, optionally with substring args.
 

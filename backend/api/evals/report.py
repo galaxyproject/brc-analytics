@@ -21,19 +21,38 @@ class RunResult:
     def total(self) -> int:
         return len(self.cases) + len(self.failures)
 
+    def evaluator_count(self, evaluator: str) -> int:
+        """Number of cases (incl. structural failures) where this evaluator was
+        in scope. Failures with the evaluator declared still count."""
+        n_cases = sum(1 for c in self.cases if evaluator in c.scores)
+        return n_cases + len(self.failures)
+
     def avg(self, evaluator: str) -> float:
-        if self.total == 0:
+        """Average for cases where the evaluator was in scope.
+
+        Cases lacking this evaluator are excluded from the denominator;
+        structural failures are included as 0 (they can't score).
+        """
+        n = self.evaluator_count(evaluator)
+        if n == 0:
             return 0.0
-        # Failures count as 0
-        s = sum(c.scores.get(evaluator, 0.0) for c in self.cases)
-        return s / self.total
+        s = sum(c.scores.get(evaluator, 0.0) for c in self.cases if evaluator in c.scores)
+        return s / n
 
     def primary_avg(self) -> float:
         return self.avg(self.primary_score)
 
+    def case_avg(self, case) -> float:
+        """Average across all evaluators that ran on a single case."""
+        if not case.scores:
+            return 0.0
+        return sum(case.scores.values()) / len(case.scores)
 
-def _fmt_score(s: float, total: int) -> str:
-    return f"{int(round(s * total))}/{total} ({s:.2f})"
+
+def _fmt_score(s: float, n: int) -> str:
+    if n == 0:
+        return "n/a"
+    return f"{int(round(s * n))}/{n} ({s:.2f})"
 
 
 def render_report(runs: list[RunResult], sha: str) -> str:
@@ -57,22 +76,31 @@ def render_report(runs: list[RunResult], sha: str) -> str:
         out.append(f"## `{dataset_name}`")
         out.append("")
         evaluators = sorted({e for r in ds_runs for c in r.cases for e in c.scores})
-        # Summary table
+        # Summary table -- denominators per evaluator reflect cases where that
+        # evaluator was actually in scope, so partial-coverage scorers (e.g.
+        # _NoToolCalls only on off_topic_redirect) aren't penalized for the
+        # cases they don't apply to.
         out.append("| Model | " + " | ".join(evaluators) + " | n | duration |")
         out.append("|" + "---|" * (len(evaluators) + 3))
         for r in sorted(ds_runs, key=lambda x: x.model):
             row = [r.model]
             for ev in evaluators:
-                row.append(_fmt_score(r.avg(ev), r.total))
+                row.append(_fmt_score(r.avg(ev), r.evaluator_count(ev)))
             row.append(str(r.total))
             row.append(f"{r.duration_seconds:.1f}s")
             out.append("| " + " | ".join(row) + " |")
         out.append("")
-        # Per-case detail
-        out.append("<details><summary>Per-case detail</summary>")
+        # Per-case detail: average across all evaluators that ran on the case.
+        # This handles cases like off_topic_redirect (uses _NoToolCalls) and
+        # exploration_only (lacks FinalSchemaContains) without showing 0.00
+        # spuriously for the unused primary_score.
+        out.append("<details><summary>Per-case detail (average across evaluators)</summary>")
         out.append("")
-        case_names = sorted({c.name for r in ds_runs for c in r.cases}) + sorted(
-            {n for r in ds_runs for n, _ in r.failures}
+        # Use a set union so cases that pass for one model and fail for another
+        # are listed only once.
+        case_names = sorted(
+            {c.name for r in ds_runs for c in r.cases}
+            | {n for r in ds_runs for n, _ in r.failures}
         )
         models = sorted({r.model for r in ds_runs})
         out.append("| Case | " + " | ".join(models) + " |")
@@ -89,7 +117,7 @@ def render_report(runs: list[RunResult], sha: str) -> str:
                     else:
                         c = next((c for c in run.cases if c.name == case), None)
                         if c is not None:
-                            cell = f"{c.scores.get(run.primary_score, 0.0):.2f}"
+                            cell = f"{run.case_avg(c):.2f}"
                 row.append(cell)
             out.append("| " + " | ".join(row) + " |")
         out.append("")

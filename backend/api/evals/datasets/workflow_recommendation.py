@@ -112,7 +112,7 @@ def build(deps: EvalDeps, entry: ModelEntry, judge_model: Model, only=None):
                 metadata=c,
                 evaluators=[
                     IwcIdInSet(accepted=c["accepted_iwc_ids"]),
-                    LLMJudge(rubric=_RUBRIC, model=judge_model),
+                    LLMJudge(rubric=_RUBRIC, model=judge_model, include_input=True),
                 ],
             )
         )

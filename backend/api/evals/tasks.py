@@ -7,10 +7,11 @@ where we instantiate the cache, catalog, etc.
 
 from __future__ import annotations
 
+import hashlib
+import json
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Callable, Optional
-from unittest.mock import AsyncMock
 
 from app.core.cache import CacheService
 from app.core.config import Settings, get_settings
@@ -28,11 +29,18 @@ from evals.model_registry import ModelEntry
 _STUB_INIT_KEY = "sk-stub-for-evals-init-only"
 
 
-def _ensure_init_env() -> None:
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        os.environ["ANTHROPIC_API_KEY"] = _STUB_INIT_KEY
-    if not os.environ.get("OPENAI_API_KEY"):
-        os.environ["OPENAI_API_KEY"] = _STUB_INIT_KEY
+def _ensure_init_env(skip_env_vars: Optional[set[str]] = None) -> None:
+    """Set stub keys so AssistantAgent's eager pydantic-ai init doesn't crash.
+
+    Skip any env var the registry references for a real model -- otherwise
+    the stub would silently masquerade as a real eval key.
+    """
+    skip = skip_env_vars or set()
+    for var in ("ANTHROPIC_API_KEY", "OPENAI_API_KEY"):
+        if var in skip:
+            continue
+        if not os.environ.get(var):
+            os.environ[var] = _STUB_INIT_KEY
 
 
 @dataclass
@@ -76,23 +84,45 @@ class ConversationOutput:
     handoff_url: Optional[str]
 
 
-def _stub_cache() -> CacheService:
-    """Build a no-op cache so evals don't share state between cases."""
-    cache = AsyncMock(spec=CacheService)
-    cache.get.return_value = None
-    cache.set.return_value = None
+@dataclass
+class _InMemoryCache:
+    """Dict-backed cache that satisfies the CacheService surface used by
+    SessionService and LLMService. Persists for the lifetime of the run so
+    multi-turn conversations can actually load their session between turns.
+    Naturally case-isolated because session_ids are minted fresh per case."""
 
-    def make_key(prefix: str, payload: Any) -> str:  # noqa: ARG001
-        return f"{prefix}:{id(payload)}"
+    _store: dict[str, Any] = field(default_factory=dict)
 
-    cache.make_key = make_key
-    return cache
+    async def get(self, key: str) -> Optional[Any]:
+        return self._store.get(key)
+
+    async def set(
+        self, key: str, value: Any, ttl: int = 3600
+    ) -> bool:  # noqa: ARG002
+        self._store[key] = value
+        return True
+
+    async def delete(self, key: str) -> bool:
+        return self._store.pop(key, None) is not None
+
+    async def exists(self, key: str) -> bool:
+        return key in self._store
+
+    def make_key(self, prefix: str, params: Any) -> str:
+        param_str = json.dumps(params, sort_keys=True, default=str)
+        hash_val = hashlib.md5(param_str.encode()).hexdigest()[:16]
+        return f"{prefix}:{hash_val}"
 
 
-def build_deps() -> EvalDeps:
-    _ensure_init_env()
+def _make_cache() -> CacheService:
+    """In-memory cache (typed as CacheService for the rest of the app)."""
+    return _InMemoryCache()  # type: ignore[return-value]
+
+
+def build_deps(skip_env_vars: Optional[set[str]] = None) -> EvalDeps:
+    _ensure_init_env(skip_env_vars)
     settings = get_settings()
-    cache = _stub_cache()
+    cache = _make_cache()
     catalog = CatalogData(settings.CATALOG_PATH)
     return EvalDeps(settings=settings, cache=cache, catalog=catalog)
 
@@ -122,7 +152,6 @@ def _override_model(svc: Any, entry: ModelEntry) -> None:
 
 
 def make_search_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
-    _ensure_init_env()
     svc = LLMService(deps.cache)
     if not svc.is_available():
         raise RuntimeError("LLMService failed to initialize -- check AI_API_KEY in env")
@@ -130,7 +159,11 @@ def make_search_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
 
     async def task(case_input: dict) -> SearchOutput:
         resp = await svc.interpret_search_query(case_input["query"])
-        if not resp.success or resp.data is None:
+        # LLMService returns success=False with low-confidence data for
+        # INVALID_QUERY (gibberish, off-topic). Surface that as a SearchOutput
+        # so evaluators can score "did the model correctly reject this?"
+        # rather than the harness counting it as a structural failure.
+        if resp.data is None:
             raise RuntimeError(resp.error or "LLMService returned failure")
         d = resp.data
         return SearchOutput(
@@ -151,7 +184,6 @@ def make_search_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
 def make_workflow_rec_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
     from app.models.llm import WorkflowSuggestionRequest
 
-    _ensure_init_env()
     svc = LLMService(deps.cache)
     if not svc.is_available():
         raise RuntimeError("LLMService failed to initialize -- check AI_API_KEY in env")
@@ -193,7 +225,6 @@ def _extract_tool_calls(result: Any) -> list[tuple[str, dict]]:
 
 def make_assistant_turn_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
     """Single-turn assistant: takes a user message, returns reply + tool calls."""
-    _ensure_init_env()
     aa = AssistantAgent(deps.cache)
     if not aa.is_available():
         raise RuntimeError(
@@ -224,7 +255,6 @@ def make_assistant_turn_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
 
 def make_assistant_conversation_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
     """Replay a scripted conversation and report the final accumulated state."""
-    _ensure_init_env()
     aa = AssistantAgent(deps.cache)
     if not aa.is_available():
         raise RuntimeError(

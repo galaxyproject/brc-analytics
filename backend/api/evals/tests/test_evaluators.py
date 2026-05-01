@@ -5,7 +5,7 @@ from typing import Any
 
 from pydantic_evals.evaluators import EvaluatorContext
 
-from evals.evaluators import FieldEquals, MustMention, ToolCallMatch
+from evals.evaluators import FieldEquals, LowConfidence, MustMention, ToolCallMatch
 
 
 def _ctx(output: Any, metadata: dict | None = None) -> EvaluatorContext:
@@ -79,6 +79,33 @@ def test_must_mention_partial():
 def test_must_mention_pulls_keywords_from_metadata():
     ev = MustMention()
     assert ev.evaluate(_ctx("yeast", {"expected_keywords": ["yeast"]})) == 1.0
+
+
+# ---------- LowConfidence ----------
+
+
+def test_low_confidence_below_threshold():
+    @dataclass
+    class _Out:
+        confidence: float
+
+    ev = LowConfidence(threshold=0.3)
+    assert ev.evaluate(_ctx(_Out(confidence=0.1))) == 1.0
+    assert ev.evaluate(_ctx(_Out(confidence=0.3))) == 1.0
+
+
+def test_low_confidence_above_threshold():
+    @dataclass
+    class _Out:
+        confidence: float
+
+    ev = LowConfidence(threshold=0.3)
+    assert ev.evaluate(_ctx(_Out(confidence=0.7))) == 0.0
+
+
+def test_low_confidence_missing_field():
+    ev = LowConfidence()
+    assert ev.evaluate(_ctx({})) == 0.0
 
 
 # ---------- ToolCallMatch ----------

@@ -113,8 +113,13 @@ async def _run_one(
 
 
 async def _amain(args) -> int:
-    deps = build_deps()
+    # Load the registry FIRST so its env-var references take precedence over
+    # the stub keys ensure_init_env() sets for AssistantAgent's eager init.
+    # If we did this in the other order, a registry entry with
+    # `api_key_env: ANTHROPIC_API_KEY` could silently pick up the stub key.
     registry = load_registry(Path(args.config))
+    referenced = registry.referenced_env_vars()
+    deps = build_deps(skip_env_vars=referenced)
     judge_model = build_pydantic_ai_model(registry.judge)
 
     dataset_names = (

@@ -6,7 +6,7 @@ from pydantic_ai.models import Model
 from pydantic_evals import Case, Dataset
 from pydantic_evals.evaluators import LLMJudge
 
-from evals.evaluators import FieldEquals
+from evals.evaluators import FieldEquals, LowConfidence
 from evals.model_registry import ModelEntry
 from evals.tasks import EvalDeps, make_search_task
 
@@ -101,7 +101,9 @@ def build(deps: EvalDeps, entry: ModelEntry, judge_model: Model, only=None):
                     expected=c["expected_sequencing_platform"],
                 )
             )
-        evaluators.append(LLMJudge(rubric=_RUBRIC, model=judge_model))
+        if c.get("expected_low_confidence"):
+            evaluators.append(LowConfidence(threshold=0.3))
+        evaluators.append(LLMJudge(rubric=_RUBRIC, model=judge_model, include_input=True))
         cases.append(
             Case(
                 name=c["name"],

@@ -69,26 +69,45 @@ def test_load_registry_falls_back_to_sample(tmp_path):
     assert reg.judge_name == "x"
 
 
-def test_missing_api_key_raises(tmp_path, monkeypatch):
+def test_missing_api_key_raises_only_when_resolved(tmp_path, monkeypatch):
+    """Loading the registry should NOT eagerly resolve keys for every model.
+
+    A user running --models foo shouldn't be blocked by a stale entry whose
+    env var they never set.
+    """
     monkeypatch.delenv("UNSET_KEY", raising=False)
+    monkeypatch.setenv("USED_KEY", "sk-ok")
     p = tmp_path / "models.yaml"
     p.write_text(
         yaml.safe_dump(
             {
-                "judge": "j",
+                "judge": "ok",
                 "models": {
-                    "j": {
+                    "ok": {
+                        "provider": "anthropic",
+                        "model": "c",
+                        "base_url": "https://api.anthropic.com",
+                        "api_key_env": "USED_KEY",
+                    },
+                    "broken": {
                         "provider": "anthropic",
                         "model": "c",
                         "base_url": "https://api.anthropic.com",
                         "api_key_env": "UNSET_KEY",
-                    }
+                    },
                 },
             }
         )
     )
+    # Loading succeeds even though "broken" has an unresolved key.
+    reg = load_registry(p)
+    # Filtering to "ok" only doesn't raise.
+    assert reg.filter(["ok"])["ok"].api_key == "sk-ok"
+    # Asking for "broken" surfaces the missing env var.
     with pytest.raises(ModelRegistryError, match="UNSET_KEY"):
-        load_registry(p)
+        reg.filter(["broken"])
+    # The judge happens to be "ok" so resolution succeeds.
+    assert reg.judge.api_key == "sk-ok"
 
 
 def test_filter_models(yaml_path, monkeypatch):

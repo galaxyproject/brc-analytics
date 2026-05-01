@@ -35,6 +35,44 @@ def test_render_report_basic():
     assert "1/3" in md
 
 
+def test_avg_excludes_cases_without_evaluator():
+    """RunResult.avg() must divide by cases that had the evaluator,
+    not all cases. Otherwise partial-coverage scorers like _NoToolCalls
+    (which only applies to off_topic_redirect) get diluted to ~0."""
+    runs = [
+        RunResult(
+            dataset="x",
+            model="m",
+            cases=[
+                _StubCase(name="a", scores={"Common": 1.0, "Partial": 1.0}),
+                _StubCase(name="b", scores={"Common": 1.0}),  # no Partial
+                _StubCase(name="c", scores={"Common": 1.0}),  # no Partial
+            ],
+            failures=[],
+            primary_score="Common",
+            duration_seconds=1.0,
+        ),
+    ]
+    r = runs[0]
+    assert r.avg("Common") == 1.0
+    # Partial only applied to 1 case; should average over that 1, not all 3.
+    assert r.avg("Partial") == 1.0
+    assert r.evaluator_count("Partial") == 1
+
+
+def test_case_avg_averages_across_evaluators():
+    case = _StubCase(name="x", scores={"a": 1.0, "b": 0.0})
+    run = RunResult(
+        dataset="x",
+        model="m",
+        cases=[case],
+        failures=[],
+        primary_score="a",
+        duration_seconds=1.0,
+    )
+    assert run.case_avg(case) == 0.5
+
+
 def test_render_report_multi_model():
     runs = [
         RunResult(

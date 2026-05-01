@@ -99,7 +99,7 @@ def build(deps: EvalDeps, entry: ModelEntry, judge_model: Model, only=None):
             continue
         evaluators: list[Evaluator] = [
             IsCompleteEquals(expected=c.get("expected_complete", False)),
-            LLMJudge(rubric=_RUBRIC, model=judge_model),
+            LLMJudge(rubric=_RUBRIC, model=judge_model, include_input=True),
         ]
         if c.get("expected_schema"):
             evaluators.insert(0, FinalSchemaContains(expected=c["expected_schema"]))
