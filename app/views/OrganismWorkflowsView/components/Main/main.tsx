@@ -5,6 +5,7 @@ import { JSX } from "react";
 import WORKFLOW_CATEGORIES from "../../../../../catalog/output/workflows.json";
 import { ROUTES } from "../../../../../routes/constants";
 import { Accordion } from "../../../AnalyzeWorkflowsView/components/Main/components/Accordion/accordion";
+import { StyledFluidPaper } from "./main.styles";
 import type { Props } from "./types";
 import { buildOrganismWorkflows } from "./utils";
 
@@ -23,9 +24,11 @@ export const Main = ({ entityId, organism }: Props): JSX.Element => {
   return (
     <BackPageContentMainColumn>
       {workflowCategories.length === 0 ? (
-        <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}>
-          There are no configured workflows for this organism.
-        </Typography>
+        <StyledFluidPaper>
+          <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}>
+            There are no configured workflows for this organism.
+          </Typography>
+        </StyledFluidPaper>
       ) : (
         workflowCategories.map((workflowCategory) => {
           return (
