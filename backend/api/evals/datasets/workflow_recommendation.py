@@ -29,20 +29,19 @@ class IwcIdInSet(Evaluator):
         return 1.0 if ids & accepted else 0.0
 
 
-# Note: keep accepted lists short and curated -- update as new workflows ship.
+# Accepted IDs are real BRC catalog workflow IDs. Re-curate when the
+# catalog changes -- run a quick `python -c "from app.services.workflow_catalog
+# import WorkflowCatalog; ..."` to dump current IDs.
 _CASES = [
     {
-        "name": "yeast_rnaseq",
+        "name": "yeast_rnaseq_pe",
         "request": {
             "dataset_description": "Paired-end Illumina RNA-seq from S. cerevisiae",
             "analysis_goal": "Differential gene expression",
             "organism_taxonomy_id": "4932",
             "experiment_type": "RNA-seq",
         },
-        "accepted_iwc_ids": [
-            "iwc/transcriptomics/rnaseq",
-            "iwc/transcriptomics/rnaseq-hisat2-deseq2",
-        ],
+        "accepted_iwc_ids": ["rnaseq-pe-main", "rnaseq-sr-main"],
     },
     {
         "name": "tb_variant_calling",
@@ -53,21 +52,42 @@ _CASES = [
             "experiment_type": "DNA-seq",
         },
         "accepted_iwc_ids": [
-            "iwc/variant-calling/snippy",
-            "iwc/variant-calling/bcftools",
+            "haploid-variant-calling-wgs-pe-main",
+            "ploidy-aware-genotype-calling-main",
         ],
     },
     {
-        "name": "consensus_assembly",
+        "name": "covid_consensus",
         "request": {
-            "dataset_description": "Nanopore reads from a viral outbreak sample",
-            "analysis_goal": "Generate a consensus sequence",
+            "dataset_description": (
+                "Paired-end Illumina WGS from a SARS-CoV-2 clinical sample"
+            ),
+            "analysis_goal": "Variant calling and consensus sequence",
             "experiment_type": "DNA-seq",
         },
         "accepted_iwc_ids": [
-            "iwc/consensus-sequences/nanopore-consensus",
-            "iwc/assembly/flye",
+            "sars-cov-2-pe-illumina-wgs-variant-calling-covid-19-pe-wgs-illumina",
+            "sars-cov-2-pe-illumina-artic-variant-calling-covid-19-pe-artic-illumina",
+            "generic-non-segmented-viral-variant-calling-main",
         ],
+    },
+    {
+        "name": "atac_seq",
+        "request": {
+            "dataset_description": "Paired-end Illumina ATAC-seq from human cells",
+            "analysis_goal": "Profile chromatin accessibility",
+            "experiment_type": "ATAC-seq",
+        },
+        "accepted_iwc_ids": ["atacseq-main"],
+    },
+    {
+        "name": "flu_consensus",
+        "request": {
+            "dataset_description": "Illumina sequencing from influenza A isolate",
+            "analysis_goal": "Subtyping and consensus sequence",
+            "experiment_type": "DNA-seq",
+        },
+        "accepted_iwc_ids": ["influenza-isolates-consensus-and-subtyping-main"],
     },
 ]
 

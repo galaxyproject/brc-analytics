@@ -16,7 +16,13 @@ models:
   # Anthropic. Reuses the same key the backend already has in .env.
   claude-sonnet-4-6:
     provider: anthropic
-    model: claude-sonnet-4-5
+    model: claude-sonnet-4-6
+    base_url: https://api.anthropic.com
+    api_key_env: AI_API_KEY
+
+  claude-opus-4-7:
+    provider: anthropic
+    model: claude-opus-4-7
     base_url: https://api.anthropic.com
     api_key_env: AI_API_KEY
 
