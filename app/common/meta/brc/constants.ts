@@ -58,6 +58,11 @@ export const BRC_PAGE_META = {
       "Browse organisms available for genomic analysis on BRC Analytics.",
     pageTitle: "Organisms",
   },
+  ORGANISM_ANALYZE_WORKFLOWS: {
+    pageDescription:
+      "Select and configure organism-level workflows on BRC Analytics.",
+    pageTitle: "Organism Workflows",
+  },
   ORGANISM_DETAIL: {
     pageDescription:
       "View organism details and available genome assemblies on BRC Analytics.",

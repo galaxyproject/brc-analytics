@@ -11,6 +11,7 @@ import { config } from "../../../../../../app/config/config";
 import { getEntities } from "../../../../../../app/utils/entityUtils";
 import { seedDatabase } from "../../../../../../app/utils/seedDatabase";
 import { AnalyzeWorkflowsView } from "../../../../../../app/views/AnalyzeWorkflowsView/analyzeWorkflowsView";
+import { OrganismWorkflowsView } from "../../../../../../app/views/OrganismWorkflowsView/organismWorkflowsView";
 
 interface Params extends ParsedUrlQuery {
   entityId: string;
@@ -19,6 +20,7 @@ interface Params extends ParsedUrlQuery {
 
 export interface Props {
   entityId: string;
+  entityListType: string;
   pageDescription?: string;
   pageTitle?: string;
 }
@@ -29,8 +31,9 @@ export const getStaticPaths: GetStaticPaths<Params> = async () => {
   for (const entityConfig of config().entities) {
     const { route: entityListType } = entityConfig;
 
-    // Only statically generate paths for each assembly.
-    if (entityListType !== "assemblies") continue;
+    // Only statically generate paths for assemblies and organisms.
+    if (entityListType !== "assemblies" && entityListType !== "organisms")
+      continue;
 
     await seedDatabase(entityListType, entityConfig);
 
@@ -51,14 +54,20 @@ export const getStaticPaths: GetStaticPaths<Params> = async () => {
 export const getStaticProps: GetStaticProps<Props> = async ({
   params,
 }: GetStaticPropsContext) => {
-  const { entityId } = params as Params;
+  const { entityId, entityListType } = params as Params;
 
-  if (!entityId) return { notFound: true };
+  if (!entityId || !entityListType) return { notFound: true };
+
+  const pageMeta =
+    entityListType === "organisms"
+      ? getPageMeta(config().appKey).ORGANISM_ANALYZE_WORKFLOWS
+      : getPageMeta(config().appKey).ANALYZE_WORKFLOWS;
 
   return {
     props: {
       entityId,
-      ...getPageMeta(config().appKey).ANALYZE_WORKFLOWS,
+      entityListType,
+      ...pageMeta,
     },
   };
 };
@@ -69,6 +78,9 @@ export const getStaticProps: GetStaticProps<Props> = async ({
  * @returns Analyze Workflows view component.
  */
 const Page = (props: Props): JSX.Element => {
+  if (props.entityListType === "organisms") {
+    return <OrganismWorkflowsView entityId={props.entityId} />;
+  }
   return <AnalyzeWorkflowsView entityId={props.entityId} />;
 };
 

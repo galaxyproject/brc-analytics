@@ -21,6 +21,7 @@ import { Props } from "./types";
 /**
  * Accordion component that displays a category of workflows and its compatible workflows.
  * @param props - Component props.
+ * @param props.configureRoute - Route template for the configure workflow page.
  * @param props.disabled - Whether the accordion is disabled.
  * @param props.entityId - Assembly Entity ID.
  * @param props.workflowCategory - Workflow category.
@@ -28,6 +29,7 @@ import { Props } from "./types";
  * @returns A JSX element representing an accordion for a workflow category.
  */
 export const Accordion = ({
+  configureRoute,
   disabled,
   entityId,
   workflowCategory,
@@ -58,7 +60,11 @@ export const Accordion = ({
         {workflows.map((workflow) => (
           <Fragment key={workflow.workflowName}>
             <Divider />
-            <Workflow entityId={entityId} workflow={workflow} />
+            <Workflow
+              configureRoute={configureRoute}
+              entityId={entityId}
+              workflow={workflow}
+            />
           </Fragment>
         ))}
       </AccordionDetails>

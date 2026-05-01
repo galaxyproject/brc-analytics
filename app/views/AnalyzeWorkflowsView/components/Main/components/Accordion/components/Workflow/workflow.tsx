@@ -16,11 +16,16 @@ import { StyledGrid } from "./workflow.styles";
 /**
  * Workflow component that displays a compatible workflow for the assembly and workflow category, and a link to configure the workflow inputs.
  * @param props - Component props.
+ * @param props.configureRoute - Route template for the configure workflow page.
  * @param props.entityId - Assembly Entity ID.
  * @param props.workflow - Compatible workflow for the assembly and workflow category.
  * @returns A JSX element representing a compatible workflow and a link to configure the workflow inputs.
  */
-export const Workflow = ({ entityId, workflow }: Props): JSX.Element => {
+export const Workflow = ({
+  configureRoute = ROUTES.CONFIGURE_WORKFLOW,
+  entityId,
+  workflow,
+}: Props): JSX.Element => {
   const { iwcId, workflowDescription, workflowName } = workflow;
   return (
     <StyledGrid {...GRID_PROPS}>
@@ -48,7 +53,7 @@ export const Workflow = ({ entityId, workflow }: Props): JSX.Element => {
             color={BUTTON_PROPS.COLOR.PRIMARY}
             component={Link}
             disabled={!workflow.trsId}
-            href={replaceParameters(ROUTES.CONFIGURE_WORKFLOW, {
+            href={replaceParameters(configureRoute, {
               entityId,
               trsId: formatTrsId(workflow.trsId),
             })}
