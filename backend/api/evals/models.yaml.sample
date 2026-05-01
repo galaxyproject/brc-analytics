@@ -1,35 +1,55 @@
 # Copy to evals/models.yaml and fill in real keys. The real file is gitignored.
 #
-# Each model is reachable through its declared proxy URL. The optional `api_key`
+# Each model is reachable through its declared base_url. The optional `api_key`
 # field can be set inline OR loaded from an env var via `api_key_env`. Pick one.
 #
 # The `judge` key MUST point at one of the named models -- it is used as the
-# LLM-as-judge for rubric-based scorers.
+# LLM-as-judge for rubric-based scorers. Pick a strong model for the judge;
+# the candidate models can be free / weaker.
+#
+# AI_API_KEY is loaded from backend/api/.env automatically (pydantic-settings
+# pulls it into the process env when build_deps() runs).
 
 judge: claude-sonnet-4-6
 
 models:
+  # Anthropic. Reuses the same key the backend already has in .env.
   claude-sonnet-4-6:
     provider: anthropic
     model: claude-sonnet-4-5
     base_url: https://api.anthropic.com
-    api_key_env: ANTHROPIC_API_KEY
+    api_key_env: AI_API_KEY
 
-  claude-opus-4-7:
+  claude-haiku-4-5:
     provider: anthropic
-    model: claude-opus-4-5
+    model: claude-haiku-4-5
     base_url: https://api.anthropic.com
-    api_key_env: ANTHROPIC_API_KEY
+    api_key_env: AI_API_KEY
 
-  gpt-5:
-    provider: openai
-    model: gpt-5
-    base_url: https://api.openai.com/v1
-    api_key_env: OPENAI_API_KEY
-
-  # Example of an OpenAI-compatible proxy (e.g. TACC, SambaNova, LiteLLM):
-  tacc-llama-3-3-70b:
+  # Free Jetstream-backed model via local LiteLLM proxy.
+  # Start the proxy: see galaxy agent-evals-harness for setup commands.
+  gpt-oss-120b:
     provider: openai-compatible
-    model: meta-llama/Llama-3.3-70B-Instruct
-    base_url: https://chat.tacc.utexas.edu/v1
+    model: gpt-oss-120b
+    base_url: http://localhost:4000/v1
+    api_key: sk-local-test-master-key
+
+  # TACC SambaNova endpoint (shared key with galaxy agent-evals-harness).
+  Llama-4-Maverick-17B-128E-Instruct:
+    provider: openai-compatible
+    model: Llama-4-Maverick-17B-128E-Instruct
+    base_url: https://ai.tejas.tacc.utexas.edu/v1
     api_key_env: TACC_API_KEY
+
+  Meta-Llama-3.3-70B-Instruct:
+    provider: openai-compatible
+    model: Meta-Llama-3.3-70B-Instruct
+    base_url: https://ai.tejas.tacc.utexas.edu/v1
+    api_key_env: TACC_API_KEY
+
+  # OpenAI direct (uncomment if needed).
+  # gpt-5:
+  #   provider: openai
+  #   model: gpt-5
+  #   base_url: https://api.openai.com/v1
+  #   api_key_env: OPENAI_API_KEY
