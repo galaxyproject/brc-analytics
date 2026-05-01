@@ -14,11 +14,11 @@ import { Props } from "./types";
 import { StyledGrid } from "./workflow.styles";
 
 /**
- * Workflow component that displays a compatible workflow for the assembly and workflow category, and a link to configure the workflow inputs.
+ * Workflow component that displays a compatible workflow and a link to configure the workflow inputs.
  * @param props - Component props.
  * @param props.configureRoute - Route template for the configure workflow page.
- * @param props.entityId - Assembly Entity ID.
- * @param props.workflow - Compatible workflow for the assembly and workflow category.
+ * @param props.entityId - Entity ID.
+ * @param props.workflow - Compatible workflow.
  * @returns A JSX element representing a compatible workflow and a link to configure the workflow inputs.
  */
 export const Workflow = ({

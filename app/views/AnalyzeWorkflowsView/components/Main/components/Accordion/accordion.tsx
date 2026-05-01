@@ -23,9 +23,9 @@ import { Props } from "./types";
  * @param props - Component props.
  * @param props.configureRoute - Route template for the configure workflow page.
  * @param props.disabled - Whether the accordion is disabled.
- * @param props.entityId - Assembly Entity ID.
+ * @param props.entityId - Entity ID.
  * @param props.workflowCategory - Workflow category.
- * @param props.workflows - Compatible workflows for the assembly and workflow category.
+ * @param props.workflows - Compatible workflows.
  * @returns A JSX element representing an accordion for a workflow category.
  */
 export const Accordion = ({
