@@ -63,6 +63,47 @@ def test_failure_only_counts_for_declared_evaluators():
     assert r.avg("_NoToolCalls") == 1.0
 
 
+def test_failure_only_evaluators_still_render_summary_columns():
+    runs = [
+        RunResult(
+            dataset="search_interpretation",
+            model="m",
+            cases=[],
+            failures=[("x", "boom", frozenset({"FieldEquals", "LLMJudge"}))],
+            primary_score="FieldEquals",
+            duration_seconds=1.0,
+        ),
+    ]
+
+    md = render_report(runs, sha="abc123")
+
+    assert "| Model | FieldEquals | LLMJudge | n | duration |" in md
+    assert "| m | 0/1 (0.00) | 0/1 (0.00) | 1 | 1.0s |" in md
+
+
+def test_duplicate_evaluator_failures_count_by_suffixed_name():
+    run = RunResult(
+        dataset="search_interpretation",
+        model="m",
+        cases=[
+            _StubCase(
+                name="ok",
+                scores={"FieldEquals": 1.0, "FieldEquals_2": 1.0},
+            )
+        ],
+        failures=[
+            ("fail", "boom", frozenset({"FieldEquals", "FieldEquals_2"})),
+        ],
+        primary_score="FieldEquals",
+        duration_seconds=1.0,
+    )
+
+    assert run.evaluator_count("FieldEquals") == 2
+    assert run.avg("FieldEquals") == 0.5
+    assert run.evaluator_count("FieldEquals_2") == 2
+    assert run.avg("FieldEquals_2") == 0.5
+
+
 def test_avg_excludes_cases_without_evaluator():
     """RunResult.avg() must divide by cases that had the evaluator,
     not all cases. Otherwise partial-coverage scorers like _NoToolCalls

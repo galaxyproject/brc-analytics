@@ -82,7 +82,11 @@ def render_report(runs: list[RunResult], sha: str) -> str:
     for dataset_name, ds_runs in sorted(by_dataset.items()):
         out.append(f"## `{dataset_name}`")
         out.append("")
-        evaluators = sorted({e for r in ds_runs for c in r.cases for e in c.scores})
+        successful_evaluators = {e for r in ds_runs for c in r.cases for e in c.scores}
+        failure_evaluators = {
+            e for r in ds_runs for _, _, evs in r.failures for e in evs
+        }
+        evaluators = sorted(successful_evaluators | failure_evaluators)
         # Summary table -- denominators per evaluator reflect cases where that
         # evaluator was actually in scope, so partial-coverage scorers (e.g.
         # _NoToolCalls only on off_topic_redirect) aren't penalized for the

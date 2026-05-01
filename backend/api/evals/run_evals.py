@@ -60,6 +60,60 @@ def _score_value(scores_obj) -> float:
         return 0.0
 
 
+def _llm_judge_output_names(evaluator) -> list[str] | None:
+    """Return exact output names for pydantic-evals LLMJudge, if applicable."""
+    if type(evaluator).__name__ != "LLMJudge":
+        return None
+
+    evaluation_name = evaluator.get_default_evaluation_name()
+    score = getattr(evaluator, "score", False)
+    assertion = getattr(evaluator, "assertion", False)
+    include_both = score is not False and assertion is not False
+
+    names: list[str] = []
+    if score is not False:
+        default_name = f"{evaluation_name}_score" if include_both else evaluation_name
+        names.append(score.get("evaluation_name") or default_name)
+    if assertion is not False:
+        default_name = f"{evaluation_name}_pass" if include_both else evaluation_name
+        names.append(assertion.get("evaluation_name") or default_name)
+    return names
+
+
+def _dedupe_name(name: str, seen: set[str]) -> str:
+    """Match pydantic-evals duplicate evaluator suffixing."""
+    if name not in seen:
+        seen.add(name)
+        return name
+    suffix = 2
+    while f"{name}_{suffix}" in seen:
+        suffix += 1
+    deduped = f"{name}_{suffix}"
+    seen.add(deduped)
+    return deduped
+
+
+def _declared_evaluator_names(case, dataset_evaluators) -> frozenset[str]:
+    """Names that would be emitted if this case's evaluators had run.
+
+    pydantic-evals appends `_2`, `_3`, ... for duplicate evaluator output names.
+    Structural failures skip evaluator execution, so reproduce that naming here
+    to keep report denominators honest.
+    """
+    seen: set[str] = set()
+    names: list[str] = []
+    evaluators = list(getattr(case, "evaluators", []) or []) + list(
+        dataset_evaluators or []
+    )
+    for evaluator in evaluators:
+        output_names = _llm_judge_output_names(evaluator)
+        if output_names is None:
+            output_names = [evaluator.get_default_evaluation_name()]
+        for name in output_names:
+            names.append(_dedupe_name(name, seen))
+    return frozenset(names)
+
+
 async def _run_one(
     dataset_name: str,
     model_name: str,
@@ -105,10 +159,7 @@ async def _run_one(
     # Map case name -> declared evaluator class names so structural failures
     # only count toward denominators of evaluators that were actually in scope.
     case_evaluators: dict[str, frozenset[str]] = {
-        c.name: frozenset(
-            type(ev).__name__ for ev in (getattr(c, "evaluators", []) or [])
-        )
-        for c in dataset.cases
+        c.name: _declared_evaluator_names(c, dataset.evaluators) for c in dataset.cases
     }
     failures = [
         (
