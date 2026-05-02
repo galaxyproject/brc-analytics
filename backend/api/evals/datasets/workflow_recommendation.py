@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Callable
 
 from pydantic_ai.models import Model
 from pydantic_evals import Case, Dataset
@@ -100,7 +101,9 @@ hallucinated IDs.\
 """
 
 
-def build(deps: EvalDeps, entry: ModelEntry, judge_model: Model, only=None):
+def build(
+    deps: EvalDeps, entry: ModelEntry, judge_model: Model, only: list[str] | None = None
+) -> tuple[Dataset, Callable, str]:
     cases = []
     for c in _CASES:
         if only and c["name"] not in only:
@@ -118,4 +121,4 @@ def build(deps: EvalDeps, entry: ModelEntry, judge_model: Model, only=None):
         )
     dataset = Dataset(cases=cases)
     task = make_workflow_rec_task(deps, entry)
-    return dataset, task, "IwcIdInSet"
+    return dataset, task, IwcIdInSet.__name__

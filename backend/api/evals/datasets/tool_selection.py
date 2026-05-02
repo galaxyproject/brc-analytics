@@ -6,6 +6,7 @@ Each case sends one user message and inspects the resulting tool call trace.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Callable
 
 from pydantic_ai.models import Model
 from pydantic_evals import Case, Dataset
@@ -94,7 +95,9 @@ _CASES = [
 ]
 
 
-def build(deps: EvalDeps, entry: ModelEntry, judge_model: Model, only=None):
+def build(
+    deps: EvalDeps, entry: ModelEntry, judge_model: Model, only: list[str] | None = None
+) -> tuple[Dataset, Callable, str]:
     cases = []
     for c in _CASES:
         if only and c["name"] not in only:
@@ -121,4 +124,4 @@ def build(deps: EvalDeps, entry: ModelEntry, judge_model: Model, only=None):
         )
     dataset = Dataset(cases=cases)
     task = make_assistant_turn_task(deps, entry)
-    return dataset, task, "ToolCallMatch"
+    return dataset, task, ToolCallMatch.__name__

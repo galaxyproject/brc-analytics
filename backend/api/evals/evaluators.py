@@ -26,12 +26,9 @@ class FieldEquals(Evaluator):
 
     def evaluate(self, ctx: EvaluatorContext) -> float:
         out = ctx.output
-        if hasattr(out, "model_dump"):
-            out = out.model_dump()
         if isinstance(out, dict):
             actual = out.get(self.field)
         else:
-            # Dataclass / object with attributes
             actual = getattr(out, self.field, None)
         expected = self.expected
         if expected is None:
@@ -73,8 +70,6 @@ class LowConfidence(Evaluator):
 
     def evaluate(self, ctx: EvaluatorContext) -> float:
         out = ctx.output
-        if hasattr(out, "model_dump"):
-            out = out.model_dump()
         if isinstance(out, dict):
             conf = out.get("confidence")
         else:

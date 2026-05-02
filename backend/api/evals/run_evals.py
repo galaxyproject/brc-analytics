@@ -18,6 +18,8 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
+from pydantic_evals.evaluators import LLMJudge
+
 from evals.judge import build_pydantic_ai_model
 from evals.model_registry import load_registry
 from evals.report import RunResult, render_report
@@ -62,7 +64,7 @@ def _score_value(scores_obj) -> float:
 
 def _llm_judge_output_names(evaluator) -> list[str] | None:
     """Return exact output names for pydantic-evals LLMJudge, if applicable."""
-    if type(evaluator).__name__ != "LLMJudge":
+    if not isinstance(evaluator, LLMJudge):
         return None
 
     evaluation_name = evaluator.get_default_evaluation_name()
@@ -139,7 +141,6 @@ async def _run_one(
     )
     elapsed = time.time() - started
 
-    # Aggregate across repeats: average score per case-name (suffix-stripped).
     aggregated: dict[str, dict[str, list[float]]] = {}
     for case in report.cases:
         key = _strip_repeat_suffix(case.name)

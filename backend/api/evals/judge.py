@@ -1,10 +1,10 @@
-"""Build pydantic-ai model instances and the LLM judge from the registry."""
+"""Build pydantic-ai model instances from the registry."""
 
 from __future__ import annotations
 
 from pydantic_ai.models import Model
 
-from evals.model_registry import ModelEntry, ModelRegistry, ModelRegistryError
+from evals.model_registry import ModelEntry, ModelRegistryError
 
 
 def build_pydantic_ai_model(entry: ModelEntry) -> Model:
@@ -24,8 +24,3 @@ def build_pydantic_ai_model(entry: ModelEntry) -> Model:
         return OpenAIChatModel(entry.model, provider=provider)
 
     raise ModelRegistryError(f"unknown provider: {entry.provider}")
-
-
-def build_judge(registry: ModelRegistry) -> Model:
-    """Build the LLM judge model declared in the registry."""
-    return build_pydantic_ai_model(registry.judge)
