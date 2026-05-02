@@ -54,7 +54,10 @@ the diff between runs is "did this prompt change help?".
 
 - Not run in CI. Real LLM calls are slow, flaky, and cost money.
 - Failures (structural, e.g. schema validation) count as wrong, not as missing.
-- The cache in `EvalDeps` is a no-op stub so cases never share state across runs.
+- `EvalDeps.cache` is a per-run in-memory dict, rebuilt for each `(dataset, model)`
+  pair via `with_fresh_cache()`. Multi-turn sessions persist within a run; nothing
+  leaks across runs (so `LLMService`'s content-keyed entries can't be served back
+  to a different model).
 - `--repeat` aggregates by case-name; pydantic-evals appends `[N/M]` to repeated
   case names, which the runner strips before averaging.
 - Both the candidate model and the judge come from `models.yaml` -- there's no
