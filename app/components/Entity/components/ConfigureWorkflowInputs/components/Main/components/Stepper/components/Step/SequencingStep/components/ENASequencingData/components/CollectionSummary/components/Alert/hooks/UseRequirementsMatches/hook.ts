@@ -12,23 +12,19 @@ export const useRequirementsMatches = (
   const { getSelectedRowModel, initialState } = table;
   const { columnFilters } = initialState;
   const { rows } = getSelectedRowModel();
-  const { ncbiTaxonomyId, taxonomicLevelSpecies } = useWorkflowEntity();
+  const workflowEntity = useWorkflowEntity();
   const genome = useContext(GenomeContext);
 
   const requirementsMatches = useMemo(
     () =>
-      buildRequirementWarnings(columnFilters, rows, {
-        ncbiTaxonomyId,
-        speciesTaxonomyId: genome?.speciesTaxonomyId,
-        taxonomicLevelSpecies,
-      }),
-    [
-      columnFilters,
-      genome?.speciesTaxonomyId,
-      ncbiTaxonomyId,
-      rows,
-      taxonomicLevelSpecies,
-    ]
+      workflowEntity
+        ? buildRequirementWarnings(columnFilters, rows, {
+            ncbiTaxonomyId: workflowEntity.ncbiTaxonomyId,
+            speciesTaxonomyId: genome?.speciesTaxonomyId,
+            taxonomicLevelSpecies: workflowEntity.taxonomicLevelSpecies,
+          })
+        : [],
+    [columnFilters, genome?.speciesTaxonomyId, rows, workflowEntity]
   );
 
   return { requirementsMatches };

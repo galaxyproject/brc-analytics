@@ -12,6 +12,7 @@ import { augmentConfiguredSteps } from "../../components/Entity/components/Confi
 import { Main } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/main";
 import { SideColumn } from "../../components/Entity/components/ConfigureWorkflowInputs/components/SideColumn/sideColumn";
 import { WorkflowEntityContext } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
+import { buildWorkflowEntityValue } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/utils";
 import { getWorkflow } from "../../services/workflows/entities";
 import { getEntity } from "../../services/workflows/query";
 import type { Organism } from "../OrganismWorkflowsView/types";
@@ -40,11 +41,8 @@ export const OrganismWorkflowInputsView = ({
   const { hasSidePanel } = configuredSteps[activeStep] || {};
 
   const workflowEntityValue = useMemo(
-    () => ({
-      ncbiTaxonomyId: organism.ncbiTaxonomyId,
-      taxonomicLevelSpecies: organism.taxonomicLevelSpecies,
-    }),
-    [organism.ncbiTaxonomyId, organism.taxonomicLevelSpecies]
+    () => buildWorkflowEntityValue(organism),
+    [organism]
   );
 
   return (

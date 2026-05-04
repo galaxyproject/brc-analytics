@@ -4,13 +4,8 @@ import type { GenomeContextValue } from "./types";
 
 /**
  * Custom hook to access the GenomeContext.
- * @returns The context value containing the full assembly entity.
- * @throws Error if used outside of a GenomeContext.Provider.
+ * @returns The context value containing the full assembly entity, or undefined if not available.
  */
-export function useGenome(): GenomeContextValue {
-  const context = useContext(GenomeContext);
-  if (!context) {
-    throw new Error("useGenome must be used within a GenomeContext.Provider");
-  }
-  return context;
+export function useGenome(): GenomeContextValue | undefined {
+  return useContext(GenomeContext) ?? undefined;
 }

@@ -4,15 +4,8 @@ import type { WorkflowEntityContextValue } from "./types";
 
 /**
  * Custom hook to access the WorkflowEntityContext.
- * @returns The context value containing taxonomy fields for the workflow entity.
- * @throws Error if used outside of a WorkflowEntityContext.Provider.
+ * @returns The context value containing taxonomy fields, or undefined if not available.
  */
-export function useWorkflowEntity(): WorkflowEntityContextValue {
-  const context = useContext(WorkflowEntityContext);
-  if (!context) {
-    throw new Error(
-      "useWorkflowEntity must be used within a WorkflowEntityContext.Provider"
-    );
-  }
-  return context;
+export function useWorkflowEntity(): WorkflowEntityContextValue | undefined {
+  return useContext(WorkflowEntityContext) ?? undefined;
 }

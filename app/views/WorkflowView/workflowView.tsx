@@ -9,6 +9,9 @@ import { sanitizeEntityId } from "../../apis/catalog/common/utils";
 import { useStepper } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/hook";
 import { Main } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/main";
 import { SideColumn } from "../../components/Entity/components/ConfigureWorkflowInputs/components/SideColumn/sideColumn";
+import { GenomeContext } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/Genome/context";
+import { WorkflowEntityContext } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
+import { buildWorkflowEntityValue } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/utils";
 import { getAssembly, getWorkflow } from "../../services/workflows/entities";
 import { useConfigureInputs } from "../WorkflowInputsView/hooks/UseConfigureInputs/useConfigureInputs";
 import { Assembly } from "../WorkflowInputsView/types";
@@ -39,35 +42,44 @@ export const WorkflowView = ({ trsId }: Props): JSX.Element => {
     [assemblyId]
   );
 
+  const workflowEntityValue = useMemo(
+    () => buildWorkflowEntityValue(genome),
+    [genome]
+  );
+
   return (
-    <BackPageView>
-      <BackPageHero>
-        <Top workflow={workflow} />
-      </BackPageHero>
-      <BackPageContent>
-        <StyledBackPageContentMainColumn hasSidePanel={hasSidePanel}>
-          <Main
-            activeStep={activeStep}
-            configuredInput={configuredInput}
-            configuredSteps={configuredSteps}
-            genome={genome}
-            onConfigure={onConfigure}
-            onContinue={onContinue}
-            onEdit={onEdit}
-            workflow={workflow}
-          />
-        </StyledBackPageContentMainColumn>
-        {!hasSidePanel && (
-          <BackPageContentSideColumn>
-            <SideColumn
-              configuredInput={configuredInput}
-              configuredSteps={configuredSteps}
-              genome={genome}
-              workflow={workflow}
-            />
-          </BackPageContentSideColumn>
-        )}
-      </BackPageContent>
-    </BackPageView>
+    <WorkflowEntityContext.Provider value={workflowEntityValue}>
+      <GenomeContext.Provider value={genome ?? null}>
+        <BackPageView>
+          <BackPageHero>
+            <Top workflow={workflow} />
+          </BackPageHero>
+          <BackPageContent>
+            <StyledBackPageContentMainColumn hasSidePanel={hasSidePanel}>
+              <Main
+                activeStep={activeStep}
+                configuredInput={configuredInput}
+                configuredSteps={configuredSteps}
+                genome={genome}
+                onConfigure={onConfigure}
+                onContinue={onContinue}
+                onEdit={onEdit}
+                workflow={workflow}
+              />
+            </StyledBackPageContentMainColumn>
+            {!hasSidePanel && (
+              <BackPageContentSideColumn>
+                <SideColumn
+                  configuredInput={configuredInput}
+                  configuredSteps={configuredSteps}
+                  genome={genome}
+                  workflow={workflow}
+                />
+              </BackPageContentSideColumn>
+            )}
+          </BackPageContent>
+        </BackPageView>
+      </GenomeContext.Provider>
+    </WorkflowEntityContext.Provider>
   );
 };

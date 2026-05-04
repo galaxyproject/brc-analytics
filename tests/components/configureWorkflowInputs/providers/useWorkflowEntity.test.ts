@@ -4,10 +4,10 @@ import { WorkflowEntityContext } from "../../../../app/components/Entity/compone
 import { useWorkflowEntity } from "../../../../app/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/hook";
 
 describe("useWorkflowEntity", () => {
-  test("throws when used outside of provider", () => {
-    expect(() => renderHook(() => useWorkflowEntity())).toThrow(
-      "useWorkflowEntity must be used within a WorkflowEntityContext.Provider"
-    );
+  test("returns undefined when used outside of provider", () => {
+    const { result } = renderHook(() => useWorkflowEntity());
+
+    expect(result.current).toBeUndefined();
   });
 
   test("returns context value when used within provider", () => {

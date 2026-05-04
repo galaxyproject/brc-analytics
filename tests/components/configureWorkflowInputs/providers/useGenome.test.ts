@@ -5,10 +5,10 @@ import { useGenome } from "../../../../app/components/Entity/components/Configur
 import type { Assembly } from "../../../../app/views/WorkflowInputsView/types";
 
 describe("useGenome", () => {
-  test("throws when used outside of provider", () => {
-    expect(() => renderHook(() => useGenome())).toThrow(
-      "useGenome must be used within a GenomeContext.Provider"
-    );
+  test("returns undefined when used outside of provider", () => {
+    const { result } = renderHook(() => useGenome());
+
+    expect(result.current).toBeUndefined();
   });
 
   test("returns context value when used within provider", () => {
@@ -22,6 +22,6 @@ describe("useGenome", () => {
 
     const { result } = renderHook(() => useGenome(), { wrapper });
 
-    expect(result.current.accession).toBe("GCA_000000000");
+    expect(result.current?.accession).toBe("GCA_000000000");
   });
 });

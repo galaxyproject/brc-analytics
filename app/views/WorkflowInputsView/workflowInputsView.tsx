@@ -16,6 +16,7 @@ import { SideColumn } from "../../components/Entity/components/ConfigureWorkflow
 import { Top } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Top/top";
 import { GenomeContext } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/Genome/context";
 import { WorkflowEntityContext } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
+import { buildWorkflowEntityValue } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/utils";
 import { getAssembly, getWorkflow } from "../../services/workflows/entities";
 import { useAssistantHandoff } from "./hooks/UseAssistantHandoff/useAssistantHandoff";
 import { useConfigureInputs } from "./hooks/UseConfigureInputs/useConfigureInputs";
@@ -55,11 +56,8 @@ export const WorkflowInputsView = ({ entityId, trsId }: Props): JSX.Element => {
   const { hasSidePanel } = configuredSteps[activeStep] || {};
 
   const workflowEntityValue = useMemo(
-    () => ({
-      ncbiTaxonomyId: genome.ncbiTaxonomyId,
-      taxonomicLevelSpecies: genome.taxonomicLevelSpecies,
-    }),
-    [genome.ncbiTaxonomyId, genome.taxonomicLevelSpecies]
+    () => buildWorkflowEntityValue(genome),
+    [genome]
   );
 
   return (
