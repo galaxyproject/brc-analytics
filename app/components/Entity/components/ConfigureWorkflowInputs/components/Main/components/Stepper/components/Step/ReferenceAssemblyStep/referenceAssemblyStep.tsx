@@ -5,6 +5,7 @@ import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/com
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
 import { Button } from "@mui/material";
 import { Fragment, JSX, useEffect, useMemo } from "react";
+import { useGenome } from "../../../../../../../providers/Genome/hook";
 import { StepProps } from "../types";
 import { AssemblyData } from "./components/AssemblyData/assemblyData";
 import { useTable } from "./components/AssemblyData/components/AssemblySelector/hooks/UseTable/hook";
@@ -18,7 +19,6 @@ import { StepContext } from "./provider/context";
  * @param props.configuredInput - Configured workflow inputs.
  * @param props.disabled - Whether the step is disabled.
  * @param props.entryLabel - Step label.
- * @param props.genome - Pre-configured genome assembly.
  * @param props.index - Step index.
  * @param props.last - Whether this is the last step.
  * @param props.onConfigure - Callback to configure workflow input.
@@ -34,7 +34,6 @@ export const ReferenceAssemblyStep = ({
   configuredInput,
   disabled,
   entryLabel,
-  genome,
   index,
   last,
   onConfigure,
@@ -43,6 +42,7 @@ export const ReferenceAssemblyStep = ({
   stepKey,
   workflow,
 }: StepProps): JSX.Element => {
+  const genome = useGenome();
   const { accession } = genome || {};
   const { table } = useTable(workflow);
 

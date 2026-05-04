@@ -2,6 +2,7 @@ import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/c
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
 import { JSX, useEffect } from "react";
+import { useWorkflowEntity } from "../../../../../../../providers/WorkflowEntity/hook";
 import { ToggleButtonGroup } from "../components/ToggleButtonGroup/toggleButtonGroup";
 import { useToggleButtonGroup } from "../hooks/UseToggleButtonGroup/useToggleButtonGroup";
 import { StepProps } from "../types";
@@ -28,15 +29,15 @@ export const SequencingStep = ({
   completed,
   configuredInput,
   entryLabel,
-  genome,
   index,
   initialDataSourceView,
   onConfigure,
   stepKey,
   workflow,
 }: StepProps): JSX.Element => {
+  const { taxonomicLevelSpecies } = useWorkflowEntity();
   const enaAccession = useENADataByAccession<BaseReadRun>();
-  const enaTaxonomyId = useQuery(genome);
+  const enaTaxonomyId = useQuery();
   const columnFilters = useColumnFilters(workflow, stepKey);
   const rowSelection = useRowSelection(configuredInput);
   const state = { columnFilters, rowSelection };
@@ -47,7 +48,7 @@ export const SequencingStep = ({
       : VIEW.ENA;
   const { onChange, value } = useToggleButtonGroup(initialView);
   const { taxonomyMatches } = useTaxonomyMatches(table);
-  const { requirementsMatches } = useRequirementsMatches(table, genome);
+  const { requirementsMatches } = useRequirementsMatches(table);
 
   useEffect(() => {
     if (initialDataSourceView !== VIEW.UPLOAD_MY_DATA) return;
@@ -59,6 +60,7 @@ export const SequencingStep = ({
     onConfigure(clearSequencingData());
     onConfigure(getUploadMyOwnSequencingData(stepKey));
   }, [initialDataSourceView, onConfigure, stepKey]);
+
   return (
     <Step active={active} completed={completed} index={index}>
       <StepLabel>{entryLabel}</StepLabel>
@@ -84,7 +86,7 @@ export const SequencingStep = ({
             selectedCount={getSelectedCount(configuredInput)}
             switchBrowseMethod={actions.switchBrowseMethod}
             table={table}
-            taxonomicLevelSpecies={genome?.taxonomicLevelSpecies}
+            taxonomicLevelSpecies={taxonomicLevelSpecies}
             taxonomyMatches={taxonomyMatches ?? 0}
           />
         ) : (

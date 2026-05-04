@@ -20,6 +20,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Fragment, JSX, useEffect } from "react";
+import { useGenome } from "../../../../../../../providers/Genome/hook";
 import { StepWarning } from "../components/StepWarning/stepWarning";
 import { StepProps } from "../types";
 import { getButtonDisabledState, getStepActiveState } from "../utils/stepUtils";
@@ -34,13 +35,13 @@ export const GTFStep = ({
   completed,
   description,
   entryLabel,
-  genome,
   index,
   last,
   onConfigure,
   onContinue,
   onEdit,
 }: StepProps): JSX.Element => {
+  const genome = useGenome();
   const { data, error, isLoading } = useQuery(genome);
   const { controls, onChange, onValueChange, value } = useRadioGroup(data);
 
