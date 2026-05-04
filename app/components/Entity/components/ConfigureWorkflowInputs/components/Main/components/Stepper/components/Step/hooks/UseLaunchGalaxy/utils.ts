@@ -108,21 +108,29 @@ function getAssemblyScopeConfiguredValues(
 }
 
 /**
- * Returns default configured values for ORGANISM scope workflows.
- * ORGANISM scope workflows may have collection_spec and variables but don't require assembly-specific inputs.
- * For Phase 1, return default/empty values to allow launching directly in Galaxy.
- * The collection_spec will be automatically passed by the Galaxy API.
- * Phase 2 will add stepper UI to populate these values from user input.
- * @returns Configured values for ORGANISM workflow.
- * (Phase 2): Add validation for required parameters (e.g., check if fastaCollection or
- * other organism-specific inputs are required by the workflow and return undefined if missing).
+ * Validates and returns configured values for ORGANISM scope workflows.
+ * @param configuredInput - Configured input.
+ * @param workflow - Workflow to check required parameters.
+ * @returns Configured values for ORGANISM workflow or undefined if invalid.
  */
-function getOrganismScopeConfiguredValues(): ConfiguredValue {
+function getOrganismScopeConfiguredValues(
+  configuredInput: ConfiguredInput,
+  workflow: Workflow
+): ConfiguredValue | undefined {
+  const { readRunsPaired, readRunsSingle } = configuredInput;
+
+  if (!workflow?.parameters) return;
+
+  const requiredParams = getRequiredParameterTypes(workflow);
+
+  if (requiredParams.SANGER_READ_RUN_SINGLE && !readRunsSingle) return;
+  if (requiredParams.SANGER_READ_RUN_PAIRED && !readRunsPaired) return;
+
   return {
     _scope: "ORGANISM",
     fastaCollection: null,
-    readRunsPaired: null,
-    readRunsSingle: null,
+    readRunsPaired: readRunsPaired ?? null,
+    readRunsSingle: readRunsSingle ?? null,
     tracks: null,
   };
 }
@@ -173,7 +181,7 @@ export function getConfiguredValues(
     case "ASSEMBLY":
       return getAssemblyScopeConfiguredValues(configuredInput, workflow);
     case "ORGANISM":
-      return getOrganismScopeConfiguredValues();
+      return getOrganismScopeConfiguredValues(configuredInput, workflow);
     case "SEQUENCE":
       return getSequenceScopeConfiguredValues(configuredInput);
   }

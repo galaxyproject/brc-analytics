@@ -35,10 +35,10 @@ export function augmentConfiguredSteps(
 
 /**
  * Builds the steps for the stepper based on the workflow and workflow parameters.
- * Scope-aware: Different workflow scopes determine the first step:
- * - ASSEMBLY (default): First step is assembly selection (ASSEMBLY_ID)
- * - ORGANISM: First step would be organism selection/confirmation (not yet implemented)
- * - SEQUENCE: First step would be sequence FASTA upload (not yet implemented)
+ * Scope-aware: Different workflow scopes determine the steps:
+ * - ASSEMBLY: Includes assembly selection, GTF, and sequencing steps
+ * - ORGANISM: Includes sequencing steps based on workflow parameters
+ * - SEQUENCE: Includes sequence FASTA upload and accession count
  * @param workflow - Workflow.
  * @returns Steps.
  */
@@ -92,11 +92,13 @@ export function buildSteps(workflow: Workflow): StepConfig[] {
         .filter(isStepConfigured);
 
     case WORKFLOW_SCOPE.ORGANISM:
-      // Implement organism selection/confirmation step
-      console.warn(
-        `ORGANISM scope workflows not yet implemented for workflow: ${workflow.workflowName}`
-      );
-      return [];
+      return [
+        WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE,
+        WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_PAIRED,
+      ]
+        .filter((variable) => variables.includes(variable))
+        .map((variable) => STEP[variable])
+        .filter(isStepConfigured);
 
     case WORKFLOW_SCOPE.SEQUENCE:
       return [STEP.SEQUENCE, STEP.ACCESSION_COUNT].filter(isStepConfigured);
