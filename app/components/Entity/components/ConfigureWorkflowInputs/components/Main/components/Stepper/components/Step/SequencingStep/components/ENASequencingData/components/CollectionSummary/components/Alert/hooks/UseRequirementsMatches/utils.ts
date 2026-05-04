@@ -2,12 +2,7 @@ import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities"
 import { ColumnFiltersState, Row } from "@tanstack/react-table";
 import { ReadRun } from "../../../../../../types";
 import { COLUMN_KEY_TO_LABEL } from "./constants";
-
-interface SpeciesInfo {
-  ncbiTaxonomyId: string;
-  speciesTaxonomyId?: string;
-  taxonomicLevelSpecies: string;
-}
+import type { SpeciesInfo } from "./types";
 
 /**
  * Builds warnings for column filter mismatches.
@@ -83,10 +78,9 @@ function buildSpeciesWarnings(
   rows: Row<ReadRun>[],
   speciesInfo?: SpeciesInfo
 ): string[] {
-  if (!speciesInfo) return [];
-
   const { ncbiTaxonomyId, speciesTaxonomyId, taxonomicLevelSpecies } =
-    speciesInfo;
+    speciesInfo ?? {};
+  if (!ncbiTaxonomyId || !taxonomicLevelSpecies) return [];
 
   // Build a set of unmatched values.
   const unmatchedSet = new Set();

@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { useGenome } from "../../../../../../../../../../../../../../../providers/Genome/hook";
 import { useWorkflowEntity } from "../../../../../../../../../../../../../../../providers/WorkflowEntity/hook";
 import { ReadRun } from "../../../../../../types";
-import { UseRequirementsMatches } from "./types";
+import type { UseRequirementsMatches } from "./types";
 import { buildRequirementWarnings } from "./utils";
 
 export const useRequirementsMatches = (
@@ -13,22 +13,20 @@ export const useRequirementsMatches = (
   const { columnFilters } = initialState;
   const { rows } = getSelectedRowModel();
   const { ncbiTaxonomyId, taxonomicLevelSpecies } = useWorkflowEntity() ?? {};
-  const genome = useGenome();
+  const { speciesTaxonomyId } = useGenome() ?? {};
 
   const requirementsMatches = useMemo(
     () =>
-      ncbiTaxonomyId && taxonomicLevelSpecies
-        ? buildRequirementWarnings(columnFilters, rows, {
-            ncbiTaxonomyId,
-            speciesTaxonomyId: genome?.speciesTaxonomyId,
-            taxonomicLevelSpecies,
-          })
-        : [],
+      buildRequirementWarnings(columnFilters, rows, {
+        ncbiTaxonomyId,
+        speciesTaxonomyId,
+        taxonomicLevelSpecies,
+      }),
     [
       columnFilters,
-      genome?.speciesTaxonomyId,
-      ncbiTaxonomyId,
       rows,
+      ncbiTaxonomyId,
+      speciesTaxonomyId,
       taxonomicLevelSpecies,
     ]
   );
