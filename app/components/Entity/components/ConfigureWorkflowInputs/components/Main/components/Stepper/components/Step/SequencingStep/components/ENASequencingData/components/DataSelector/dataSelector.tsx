@@ -4,6 +4,7 @@ import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Button, Divider, Stack, Typography } from "@mui/material";
 import { Fragment, JSX } from "react";
+import { useWorkflowEntity } from "../../../../../../../../../../../providers/WorkflowEntity/hook";
 import { Alert } from "./components/Alert/alert";
 import { GRID_PROPS, PAPER_PROPS } from "./constants";
 import { StyledGrid, StyledPaper } from "./dataSelector.styles";
@@ -14,10 +15,10 @@ export const DataSelector = ({
   onContinue,
   onOpen,
   selectedCount,
-  taxonomicLevelSpecies,
   taxonomyCount,
   taxonomyMatches,
 }: Props): JSX.Element | null => {
+  const { taxonomicLevelSpecies } = useWorkflowEntity() ?? {};
   if (selectedCount > 0) return null;
   return (
     <Fragment>
