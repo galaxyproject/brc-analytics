@@ -9,7 +9,7 @@ import { sanitizeEntityId } from "../../apis/catalog/common/utils";
 import { useStepper } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/hook";
 import { Main } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/main";
 import { SideColumn } from "../../components/Entity/components/ConfigureWorkflowInputs/components/SideColumn/sideColumn";
-import { GenomeContext } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/Genome/context";
+import { AssemblyContext } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/context";
 import { WorkflowEntityContext } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
 import { buildWorkflowEntityValue } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/utils";
 import { getAssembly, getWorkflow } from "../../services/workflows/entities";
@@ -49,7 +49,7 @@ export const WorkflowView = ({ trsId }: Props): JSX.Element => {
 
   return (
     <WorkflowEntityContext.Provider value={workflowEntityValue}>
-      <GenomeContext.Provider value={genome ?? null}>
+      <AssemblyContext.Provider value={genome ?? null}>
         <BackPageView>
           <BackPageHero>
             <Top workflow={workflow} />
@@ -77,7 +77,7 @@ export const WorkflowView = ({ trsId }: Props): JSX.Element => {
             )}
           </BackPageContent>
         </BackPageView>
-      </GenomeContext.Provider>
+      </AssemblyContext.Provider>
     </WorkflowEntityContext.Provider>
   );
 };

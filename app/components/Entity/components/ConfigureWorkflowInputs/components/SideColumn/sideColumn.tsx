@@ -10,7 +10,7 @@ import {
   buildWorkflowConfiguration,
   buildWorkflowDetails,
 } from "../../../../../../viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { useGenome } from "../../providers/Genome/hook";
+import { useAssembly } from "../../providers/Assembly/hook";
 import { Props } from "./types";
 
 export const SideColumn = ({
@@ -18,7 +18,7 @@ export const SideColumn = ({
   configuredSteps,
   workflow,
 }: Props): JSX.Element => {
-  const assembly = useGenome();
+  const assembly = useAssembly();
   return (
     <FluidPaper>
       <GridPaper>

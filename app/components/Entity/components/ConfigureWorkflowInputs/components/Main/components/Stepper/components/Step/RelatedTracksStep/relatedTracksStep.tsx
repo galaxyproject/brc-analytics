@@ -5,7 +5,7 @@ import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/com
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
 import { Button } from "@mui/material";
 import { Fragment, JSX } from "react";
-import { useGenome } from "../../../../../../../providers/Genome/hook";
+import { useAssembly } from "../../../../../../../providers/Assembly/hook";
 import { ToggleButtonGroup } from "../components/ToggleButtonGroup/toggleButtonGroup";
 import { useToggleButtonGroup } from "../hooks/UseToggleButtonGroup/useToggleButtonGroup";
 import { StepProps } from "../types";
@@ -29,8 +29,8 @@ export const RelatedTracksStep = ({
   onEdit,
   stepKey,
 }: StepProps): JSX.Element => {
-  const genome = useGenome();
-  const ucscTracks = useUCSCTracks(genome?.accession);
+  const assembly = useAssembly();
+  const ucscTracks = useUCSCTracks(assembly?.accession);
   const table = useTable(ucscTracks);
   const { onChange, value } = useToggleButtonGroup(VIEW.UCSC_GENOME_BROWSER);
   return (

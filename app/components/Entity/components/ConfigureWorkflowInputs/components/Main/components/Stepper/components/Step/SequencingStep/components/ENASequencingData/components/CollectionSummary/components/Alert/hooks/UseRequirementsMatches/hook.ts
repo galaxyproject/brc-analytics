@@ -1,6 +1,6 @@
 import { Table } from "@tanstack/react-table";
 import { useMemo } from "react";
-import { useGenome } from "../../../../../../../../../../../../../../../providers/Genome/hook";
+import { useAssembly } from "../../../../../../../../../../../../../../../providers/Assembly/hook";
 import { useWorkflowEntity } from "../../../../../../../../../../../../../../../providers/WorkflowEntity/hook";
 import { ReadRun } from "../../../../../../types";
 import type { UseRequirementsMatches } from "./types";
@@ -13,7 +13,7 @@ export const useRequirementsMatches = (
   const { columnFilters } = initialState;
   const { rows } = getSelectedRowModel();
   const { ncbiTaxonomyId, taxonomicLevelSpecies } = useWorkflowEntity() ?? {};
-  const { speciesTaxonomyId } = useGenome() ?? {};
+  const { speciesTaxonomyId } = useAssembly() ?? {};
 
   const requirementsMatches = useMemo(
     () =>

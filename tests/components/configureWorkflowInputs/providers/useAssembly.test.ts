@@ -1,26 +1,26 @@
 import { renderHook } from "@testing-library/react";
 import { createElement, JSX, ReactNode } from "react";
-import { GenomeContext } from "../../../../app/components/Entity/components/ConfigureWorkflowInputs/providers/Genome/context";
-import { useGenome } from "../../../../app/components/Entity/components/ConfigureWorkflowInputs/providers/Genome/hook";
+import { AssemblyContext } from "../../../../app/components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/context";
+import { useAssembly } from "../../../../app/components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/hook";
 import type { Assembly } from "../../../../app/views/WorkflowInputsView/types";
 
-describe("useGenome", () => {
+describe("useAssembly", () => {
   test("returns undefined when used outside of provider", () => {
-    const { result } = renderHook(() => useGenome());
+    const { result } = renderHook(() => useAssembly());
 
     expect(result.current).toBeUndefined();
   });
 
   test("returns context value when used within provider", () => {
-    const genome = {
+    const assembly = {
       accession: "GCA_000000000",
       ncbiTaxonomyId: "123",
     } as unknown as Assembly;
 
     const wrapper = ({ children }: { children: ReactNode }): JSX.Element =>
-      createElement(GenomeContext.Provider, { value: genome }, children);
+      createElement(AssemblyContext.Provider, { value: assembly }, children);
 
-    const { result } = renderHook(() => useGenome(), { wrapper });
+    const { result } = renderHook(() => useAssembly(), { wrapper });
 
     expect(result.current?.accession).toBe("GCA_000000000");
   });

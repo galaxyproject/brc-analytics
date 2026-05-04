@@ -5,7 +5,7 @@ import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/com
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
 import { Button } from "@mui/material";
 import { Fragment, JSX, useEffect, useMemo } from "react";
-import { useGenome } from "../../../../../../../providers/Genome/hook";
+import { useAssembly } from "../../../../../../../providers/Assembly/hook";
 import { StepProps } from "../types";
 import { AssemblyData } from "./components/AssemblyData/assemblyData";
 import { useTable } from "./components/AssemblyData/components/AssemblySelector/hooks/UseTable/hook";
@@ -42,8 +42,8 @@ export const ReferenceAssemblyStep = ({
   stepKey,
   workflow,
 }: StepProps): JSX.Element => {
-  const genome = useGenome();
-  const { accession } = genome || {};
+  const assembly = useAssembly();
+  const { accession } = assembly || {};
   const { table } = useTable(workflow);
 
   const contextValue = useMemo(

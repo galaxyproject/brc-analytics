@@ -14,7 +14,7 @@ import { augmentConfiguredSteps } from "../../components/Entity/components/Confi
 import { Main } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/main";
 import { SideColumn } from "../../components/Entity/components/ConfigureWorkflowInputs/components/SideColumn/sideColumn";
 import { Top } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Top/top";
-import { GenomeContext } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/Genome/context";
+import { AssemblyContext } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/context";
 import { WorkflowEntityContext } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
 import { buildWorkflowEntityValue } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/utils";
 import { getAssembly, getWorkflow } from "../../services/workflows/entities";
@@ -62,7 +62,7 @@ export const WorkflowInputsView = ({ entityId, trsId }: Props): JSX.Element => {
 
   return (
     <WorkflowEntityContext.Provider value={workflowEntityValue}>
-      <GenomeContext.Provider value={genome}>
+      <AssemblyContext.Provider value={genome}>
         <BackPageView>
           <BackPageHero>
             <Top entityId={entityId} genome={genome} workflow={workflow} />
@@ -94,7 +94,7 @@ export const WorkflowInputsView = ({ entityId, trsId }: Props): JSX.Element => {
             )}
           </BackPageContent>
         </BackPageView>
-      </GenomeContext.Provider>
+      </AssemblyContext.Provider>
     </WorkflowEntityContext.Provider>
   );
 };
