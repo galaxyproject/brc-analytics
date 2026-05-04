@@ -4,13 +4,13 @@ import {
   GridPaper,
 } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import { CollapsableSection } from "@databiosphere/findable-ui/lib/components/common/Section/components/CollapsableSection/collapsableSection";
-import { JSX, useContext } from "react";
+import { JSX } from "react";
 import {
   buildAssemblyDetails,
   buildWorkflowConfiguration,
   buildWorkflowDetails,
 } from "../../../../../../viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { GenomeContext } from "../../providers/Genome/context";
+import { useGenome } from "../../providers/Genome/hook";
 import { Props } from "./types";
 
 export const SideColumn = ({
@@ -18,7 +18,7 @@ export const SideColumn = ({
   configuredSteps,
   workflow,
 }: Props): JSX.Element => {
-  const assembly = useContext(GenomeContext);
+  const assembly = useGenome();
   return (
     <FluidPaper>
       <GridPaper>

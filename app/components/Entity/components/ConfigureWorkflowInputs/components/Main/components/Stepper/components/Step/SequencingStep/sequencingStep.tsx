@@ -35,7 +35,7 @@ export const SequencingStep = ({
   stepKey,
   workflow,
 }: StepProps): JSX.Element => {
-  const workflowEntity = useWorkflowEntity();
+  const { taxonomicLevelSpecies } = useWorkflowEntity() ?? {};
   const enaAccession = useENADataByAccession<BaseReadRun>();
   const enaTaxonomyId = useQuery();
   const columnFilters = useColumnFilters(workflow, stepKey);
@@ -86,7 +86,7 @@ export const SequencingStep = ({
             selectedCount={getSelectedCount(configuredInput)}
             switchBrowseMethod={actions.switchBrowseMethod}
             table={table}
-            taxonomicLevelSpecies={workflowEntity?.taxonomicLevelSpecies}
+            taxonomicLevelSpecies={taxonomicLevelSpecies}
             taxonomyMatches={taxonomyMatches ?? 0}
           />
         ) : (

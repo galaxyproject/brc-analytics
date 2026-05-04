@@ -18,8 +18,7 @@ import { isEligible } from "./utils";
  */
 export const useQuery = (): UseQueryResult<BaseReadRun[]> => {
   const { config } = useConfig();
-  const workflowEntity = useWorkflowEntity();
-  const ncbiTaxonomyId = workflowEntity?.ncbiTaxonomyId;
+  const { ncbiTaxonomyId } = useWorkflowEntity() ?? {};
   const { maxReadRunsForBrowseAll } = config as AppSiteConfig;
 
   const enabled = isEligible(ncbiTaxonomyId, maxReadRunsForBrowseAll);

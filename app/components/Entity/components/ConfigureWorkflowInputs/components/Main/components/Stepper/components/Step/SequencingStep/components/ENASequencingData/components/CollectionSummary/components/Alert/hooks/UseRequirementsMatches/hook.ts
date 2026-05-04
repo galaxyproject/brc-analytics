@@ -1,6 +1,6 @@
 import { Table } from "@tanstack/react-table";
-import { useContext, useMemo } from "react";
-import { GenomeContext } from "../../../../../../../../../../../../../../../providers/Genome/context";
+import { useMemo } from "react";
+import { useGenome } from "../../../../../../../../../../../../../../../providers/Genome/hook";
 import { useWorkflowEntity } from "../../../../../../../../../../../../../../../providers/WorkflowEntity/hook";
 import { ReadRun } from "../../../../../../types";
 import { UseRequirementsMatches } from "./types";
@@ -12,19 +12,25 @@ export const useRequirementsMatches = (
   const { getSelectedRowModel, initialState } = table;
   const { columnFilters } = initialState;
   const { rows } = getSelectedRowModel();
-  const workflowEntity = useWorkflowEntity();
-  const genome = useContext(GenomeContext);
+  const { ncbiTaxonomyId, taxonomicLevelSpecies } = useWorkflowEntity() ?? {};
+  const genome = useGenome();
 
   const requirementsMatches = useMemo(
     () =>
-      workflowEntity
+      ncbiTaxonomyId && taxonomicLevelSpecies
         ? buildRequirementWarnings(columnFilters, rows, {
-            ncbiTaxonomyId: workflowEntity.ncbiTaxonomyId,
+            ncbiTaxonomyId,
             speciesTaxonomyId: genome?.speciesTaxonomyId,
-            taxonomicLevelSpecies: workflowEntity.taxonomicLevelSpecies,
+            taxonomicLevelSpecies,
           })
         : [],
-    [columnFilters, genome?.speciesTaxonomyId, rows, workflowEntity]
+    [
+      columnFilters,
+      genome?.speciesTaxonomyId,
+      ncbiTaxonomyId,
+      rows,
+      taxonomicLevelSpecies,
+    ]
   );
 
   return { requirementsMatches };
