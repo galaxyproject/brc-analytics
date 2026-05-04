@@ -57,7 +57,6 @@ export const OrganismWorkflowInputsView = ({
               activeStep={activeStep}
               configuredInput={configuredInput}
               configuredSteps={configuredSteps}
-              genome={undefined}
               onConfigure={onConfigure}
               onContinue={onContinue}
               onEdit={onEdit}

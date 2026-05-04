@@ -16,11 +16,9 @@ import { Props } from "./types";
 export const SideColumn = ({
   configuredInput,
   configuredSteps,
-  genome,
   workflow,
 }: Props): JSX.Element => {
-  const genomeFromContext = useContext(GenomeContext);
-  const assembly = genome ?? genomeFromContext;
+  const assembly = useContext(GenomeContext);
   return (
     <FluidPaper>
       <GridPaper>

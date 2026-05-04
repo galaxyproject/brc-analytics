@@ -60,7 +60,6 @@ export const WorkflowView = ({ trsId }: Props): JSX.Element => {
                 activeStep={activeStep}
                 configuredInput={configuredInput}
                 configuredSteps={configuredSteps}
-                genome={genome}
                 onConfigure={onConfigure}
                 onContinue={onContinue}
                 onEdit={onEdit}
@@ -72,7 +71,6 @@ export const WorkflowView = ({ trsId }: Props): JSX.Element => {
                 <SideColumn
                   configuredInput={configuredInput}
                   configuredSteps={configuredSteps}
-                  genome={genome}
                   workflow={workflow}
                 />
               </BackPageContentSideColumn>

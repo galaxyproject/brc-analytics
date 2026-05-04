@@ -3,7 +3,6 @@ import {
   ConfiguredInput,
   OnConfigure,
 } from "../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { Assembly } from "../../../../../../../../views/WorkflowInputsView/types";
 import {
   OnLaunchGalaxy,
   Status,
