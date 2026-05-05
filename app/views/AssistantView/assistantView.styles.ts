@@ -5,11 +5,13 @@ import { sectionLayout } from "../../components/Layout/components/AppLayout/comp
 
 export const AssistantSection = styled(GridPaperSection)`
   padding: 24px 0;
+  width: 100%;
 `;
 
 export const SectionContent = styled(Box)`
   ${sectionLayout};
   padding: 0 16px;
+  width: calc(100% - 32px);
 `;
 
 export const TwoPanelLayout = styled(Box)({

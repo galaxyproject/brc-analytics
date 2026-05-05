@@ -64,18 +64,17 @@ export const AssistantView = (): JSX.Element => {
       />
       <AssistantSection>
         <SectionContent>
-          {showReset && (
-            <Box sx={{ display: "flex", justifyContent: "flex-end", pb: 1 }}>
-              <Button
-                onClick={resetSession}
-                size="small"
-                startIcon={<RestartAltIcon />}
-                variant="text"
-              >
-                New Conversation
-              </Button>
-            </Box>
-          )}
+          <Box sx={{ display: "flex", justifyContent: "flex-end", pb: 1 }}>
+            <Button
+              onClick={resetSession}
+              size="small"
+              startIcon={<RestartAltIcon />}
+              sx={{ visibility: showReset ? "visible" : "hidden" }}
+              variant="text"
+            >
+              New Conversation
+            </Button>
+          </Box>
           <TwoPanelLayout>
             <ChatColumn>
               <ChatPanel
