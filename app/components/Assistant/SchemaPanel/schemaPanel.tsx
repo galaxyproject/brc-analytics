@@ -44,6 +44,22 @@ const FIELD_ORDER: (keyof AnalysisSchema)[] = [
   ...OPTIONAL_FIELDS,
 ];
 
+const EMPTY_FIELD: SchemaFieldState = {
+  detail: null,
+  status: "empty",
+  value: null,
+};
+
+const PLACEHOLDER_SCHEMA: AnalysisSchema = {
+  analysis_type: EMPTY_FIELD,
+  assembly: EMPTY_FIELD,
+  data_characteristics: EMPTY_FIELD,
+  data_source: EMPTY_FIELD,
+  gene_annotation: EMPTY_FIELD,
+  organism: EMPTY_FIELD,
+  workflow: EMPTY_FIELD,
+};
+
 function resolveDataSource(value: string | null | undefined): "ena" | "upload" {
   if (!value) return "ena";
   const lower = value.toLowerCase();
@@ -94,24 +110,11 @@ export const SchemaPanel = ({
     window.location.href = handoffUrl;
   }, [handoffUrl, schema]);
 
-  if (!schema) {
-    return (
-      <PanelContainer>
-        <PanelHeader>
-          <Typography variant="subtitle1">Analysis Setup</Typography>
-        </PanelHeader>
-        <Box sx={{ p: 2 }}>
-          <Typography color="text.secondary" variant="body2">
-            Start a conversation to begin configuring your analysis. The
-            assistant will help you choose an organism, assembly, and workflow.
-          </Typography>
-        </Box>
-      </PanelContainer>
-    );
-  }
+  const isEmpty = !schema;
+  const activeSchema = schema ?? PLACEHOLDER_SCHEMA;
 
   const filledCount = REQUIRED_FIELDS.filter(
-    (key) => schema[key].status === "filled"
+    (key) => activeSchema[key].status === "filled"
   ).length;
 
   return (
@@ -123,11 +126,20 @@ export const SchemaPanel = ({
         </Typography>
       </PanelHeader>
 
+      {isEmpty && (
+        <Box sx={{ pb: 1, pt: 2, px: 2 }}>
+          <Typography color="text.secondary" variant="body2">
+            Tell the assistant what you&apos;re working on (an organism, a
+            paper, a kind of analysis) and it&apos;ll help fill these in:
+          </Typography>
+        </Box>
+      )}
+
       <Divider />
 
       <Box sx={{ p: 0 }}>
         {FIELD_ORDER.map((key) => {
-          const field: SchemaFieldState = schema[key];
+          const field: SchemaFieldState = activeSchema[key];
           return (
             <FieldRow key={key}>
               <Box
