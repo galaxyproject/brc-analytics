@@ -1,7 +1,7 @@
 import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepContent/stepContent";
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
-import { JSX, useEffect, useRef } from "react";
+import { JSX, useEffect } from "react";
 import { ToggleButtonGroup } from "../components/ToggleButtonGroup/toggleButtonGroup";
 import { useToggleButtonGroup } from "../hooks/UseToggleButtonGroup/useToggleButtonGroup";
 import { StepProps } from "../types";
@@ -49,11 +49,13 @@ export const SequencingStep = ({
   const { taxonomyMatches } = useTaxonomyMatches(table);
   const { requirementsMatches } = useRequirementsMatches(table, genome);
 
-  const didInitRef = useRef(false);
   useEffect(() => {
-    if (didInitRef.current || initialDataSourceView !== VIEW.UPLOAD_MY_DATA)
-      return;
-    didInitRef.current = true;
+    if (initialDataSourceView !== VIEW.UPLOAD_MY_DATA) return;
+    // The clear + upload pair is idempotent. Running it on every effect
+    // setup matters in dev: React strict-mode runs effect setup twice
+    // per mount, and the first ReferenceAssembly setup REPLACES state
+    // before the second SequencingStep setup gets a chance to re-seed
+    // readRunsPaired from the assistant handoff.
     onConfigure(clearSequencingData());
     onConfigure(getUploadMyOwnSequencingData(stepKey));
   }, [initialDataSourceView, onConfigure, stepKey]);
