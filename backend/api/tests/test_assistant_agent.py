@@ -266,7 +266,7 @@ class TestComputeHandoff:
 
         assert is_complete is True
         assert handoff_url == (
-            "/data/assemblies/GCF_000146045.2/analyze/workflows/"
+            "/data/assemblies/GCF_000146045_2/analyze/workflows/"
             "workflow-github-com-iwc-rnaseq-pe-main"
         )
 

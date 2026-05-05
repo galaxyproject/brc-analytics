@@ -315,11 +315,17 @@ class AssistantAgent:
             accession = schema_state.assembly.detail or ""
             trs_id = schema_state.workflow.detail or ""
             if accession and trs_id:
+                entity_id = AssistantAgent._sanitize_entity_id(accession)
                 workflow_id = AssistantAgent._format_trs_id_for_url(trs_id)
                 handoff_url = (
-                    f"/data/assemblies/{accession}/analyze/workflows/{workflow_id}"
+                    f"/data/assemblies/{entity_id}/analyze/workflows/{workflow_id}"
                 )
         return handoff_url is not None, handoff_url
+
+    @staticmethod
+    def _sanitize_entity_id(entity_id: str) -> str:
+        """Match frontend sanitizeEntityId: '.' -> '_' for use in route params."""
+        return entity_id.replace(".", "_")
 
     @staticmethod
     def _format_trs_id_for_url(trs_id: str) -> str:
