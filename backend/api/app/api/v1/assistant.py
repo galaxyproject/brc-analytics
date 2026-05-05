@@ -50,8 +50,10 @@ async def assistant_chat(
         response = await agent.chat(request.message, request.session_id)
         return response
     except AssistantTimeoutError as e:
+        logger.exception("Assistant chat timed out")
         raise HTTPException(status_code=504, detail=str(e)) from e
     except RuntimeError as e:
+        logger.exception("Assistant chat unavailable (RuntimeError)")
         raise HTTPException(status_code=503, detail=str(e)) from e
     except Exception as e:
         logger.exception("Assistant chat error")
