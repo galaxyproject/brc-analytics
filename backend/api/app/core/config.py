@@ -58,6 +58,13 @@ class Settings:
         self.RATE_LIMIT_REQUESTS: int = int(os.getenv("RATE_LIMIT_REQUESTS", "100"))
         self.RATE_LIMIT_WINDOW: int = int(os.getenv("RATE_LIMIT_WINDOW", "60"))
 
+        # Trust X-Forwarded-For for client identification (rate limiting,
+        # etc.). Only enable when behind a proxy that strips/rewrites the
+        # header itself -- otherwise clients can spoof IPs.
+        self.TRUST_PROXY_HEADERS: bool = (
+            os.getenv("TRUST_PROXY_HEADERS", "false").lower() in ("1", "true", "yes")
+        )
+
         # Assistant session cookie. When SESSION_COOKIE_SECRET is set, /chat
         # issues an httpOnly Same-Site=Strict cookie binding the session_id
         # to the browser; GET/DELETE /session endpoints require the cookie.

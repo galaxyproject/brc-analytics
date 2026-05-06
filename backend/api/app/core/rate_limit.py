@@ -28,11 +28,16 @@ class RateLimiter:
         self.window = window
 
     def _get_client_key(self, request: Request) -> str:
-        """Generate rate limit key for a client based on IP address"""
+        """Generate rate limit key for a client based on IP address.
+
+        Honors X-Forwarded-For only when TRUST_PROXY_HEADERS is set --
+        otherwise XFF is spoofable and breaks per-IP rate limits.
+        """
         client_ip = request.client.host if request.client else "unknown"
-        forwarded = request.headers.get("x-forwarded-for")
-        if forwarded:
-            client_ip = forwarded.split(",")[0].strip()
+        if get_settings().TRUST_PROXY_HEADERS:
+            forwarded = request.headers.get("x-forwarded-for")
+            if forwarded:
+                client_ip = forwarded.split(",")[0].strip()
         return f"ratelimit:{client_ip}"
 
     async def check(self, request: Request) -> dict:
