@@ -44,6 +44,17 @@ class Settings:
         self.CORS_ORIGINS: List[str] = os.getenv(
             "CORS_ORIGINS", "http://localhost:3000"
         ).split(",")
+        # Reject CORS wildcards outside local/dev. With unauthenticated
+        # endpoints, allow_origins=* lets any site initiate chats from a
+        # victim's IP. ENVIRONMENT marks the deployment stage; "local",
+        # "dev", and "development" tolerate wildcards for ergonomics.
+        if any(o.strip() == "*" for o in self.CORS_ORIGINS):
+            env = os.getenv("ENVIRONMENT", "development").lower()
+            if env not in ("local", "dev", "development"):
+                raise ValueError(
+                    f"CORS_ORIGINS=* is not allowed in ENVIRONMENT={env!r}; "
+                    "set explicit origins instead."
+                )
 
         # Sentry
         self.SENTRY_DSN: str = os.getenv("SENTRY_DSN", "")
