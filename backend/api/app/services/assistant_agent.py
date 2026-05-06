@@ -49,6 +49,10 @@ logger = logging.getLogger(__name__)
 # ~20 turn-pairs; tool-heavy turns produce 3-5 messages each, so this
 # bounds total context while preserving good conversational continuity.
 MAX_HISTORY_MESSAGES = 40
+# Cap on the user-facing chat history persisted in Redis. Independent of
+# MAX_HISTORY_MESSAGES (which bounds what we resend to the LLM). Keeps
+# session payload size bounded even if a client carries a session for hours.
+MAX_USER_FACING_MESSAGES = 100
 ASSISTANT_RUN_TIMEOUT_SECONDS = 105.0
 
 
@@ -387,6 +391,12 @@ class AssistantAgent:
         return f"{prefix}\n\n<user_input>\n{safe_body}\n</user_input>"
 
     @staticmethod
+    def _cap_state_messages(state) -> None:
+        """Truncate state.messages to MAX_USER_FACING_MESSAGES (most recent)."""
+        if len(state.messages) > MAX_USER_FACING_MESSAGES:
+            state.messages = state.messages[-MAX_USER_FACING_MESSAGES:]
+
+    @staticmethod
     def _truncate_history(messages: list[ModelMessage]) -> list[ModelMessage]:
         """Keep history within MAX_HISTORY_MESSAGES.
 
@@ -527,6 +537,8 @@ class AssistantAgent:
         state.schema_state = schema_state
         state.suggestions = suggestions
         state.agent_message_history = to_jsonable_python(result.all_messages())
+        # Cap user-facing history to bound Redis payload growth.
+        self._cap_state_messages(state)
         await self.session_service.save_session(state)
 
         is_complete, handoff_url = self.compute_handoff(schema_state)

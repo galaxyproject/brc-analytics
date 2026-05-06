@@ -452,6 +452,37 @@ class TestSystemPromptHardening:
         assert "off-topic" in lower or "redirect" in lower
 
 
+class TestMessageHistoryCap:
+    def test_state_messages_capped(self, agent):
+        from app.models.assistant import ChatMessage, MessageRole, SessionState
+        from app.services.assistant_agent import MAX_USER_FACING_MESSAGES
+
+        state = SessionState(session_id="x")
+        for i in range(MAX_USER_FACING_MESSAGES + 20):
+            state.messages.append(
+                ChatMessage(role=MessageRole.USER, content=f"m{i}")
+            )
+
+        agent._cap_state_messages(state)
+
+        assert len(state.messages) == MAX_USER_FACING_MESSAGES
+        # Most-recent messages preserved; oldest dropped.
+        assert state.messages[-1].content == f"m{MAX_USER_FACING_MESSAGES + 19}"
+        assert state.messages[0].content == "m20"
+
+    def test_short_history_unchanged(self, agent):
+        from app.models.assistant import ChatMessage, MessageRole, SessionState
+
+        state = SessionState(session_id="x")
+        for i in range(5):
+            state.messages.append(
+                ChatMessage(role=MessageRole.USER, content=f"m{i}")
+            )
+
+        agent._cap_state_messages(state)
+        assert len(state.messages) == 5
+
+
 class TestUserInputFencing:
     def test_augmented_message_wraps_user_text(self, agent):
         schema = AnalysisSchema()
