@@ -440,3 +440,13 @@ class TestGetProvider:
     def test_empty_settings(self):
         agent = self._agent_with_settings(base_url="", model="")
         assert agent.get_provider() is None
+
+
+class TestSystemPromptHardening:
+    def test_prompt_calls_out_injection_attempts(self):
+        from app.services.assistant_agent import SYSTEM_PROMPT
+
+        lower = SYSTEM_PROMPT.lower()
+        assert "ignore these rules" in lower or "override your role" in lower or \
+               "ignore the rules above" in lower
+        assert "off-topic" in lower or "redirect" in lower
