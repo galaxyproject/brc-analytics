@@ -2,7 +2,6 @@
 
 from app.core.session_signing import sign_session_id, verify_session_id
 
-
 SECRET = "test-secret-32-bytes-min-aaaaaaaa"
 
 

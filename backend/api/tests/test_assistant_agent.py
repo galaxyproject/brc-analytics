@@ -447,8 +447,11 @@ class TestSystemPromptHardening:
         from app.services.assistant_agent import SYSTEM_PROMPT
 
         lower = SYSTEM_PROMPT.lower()
-        assert "ignore these rules" in lower or "override your role" in lower or \
-               "ignore the rules above" in lower
+        assert (
+            "ignore these rules" in lower
+            or "override your role" in lower
+            or "ignore the rules above" in lower
+        )
         assert "off-topic" in lower or "redirect" in lower
 
 
@@ -459,9 +462,7 @@ class TestMessageHistoryCap:
 
         state = SessionState(session_id="x")
         for i in range(MAX_USER_FACING_MESSAGES + 20):
-            state.messages.append(
-                ChatMessage(role=MessageRole.USER, content=f"m{i}")
-            )
+            state.messages.append(ChatMessage(role=MessageRole.USER, content=f"m{i}"))
 
         agent._cap_state_messages(state)
 
@@ -475,9 +476,7 @@ class TestMessageHistoryCap:
 
         state = SessionState(session_id="x")
         for i in range(5):
-            state.messages.append(
-                ChatMessage(role=MessageRole.USER, content=f"m{i}")
-            )
+            state.messages.append(ChatMessage(role=MessageRole.USER, content=f"m{i}"))
 
         agent._cap_state_messages(state)
         assert len(state.messages) == 5
@@ -505,4 +504,5 @@ class TestUserInputFencing:
 
     def test_system_prompt_documents_fence(self):
         from app.services.assistant_agent import SYSTEM_PROMPT
+
         assert "<user_input>" in SYSTEM_PROMPT

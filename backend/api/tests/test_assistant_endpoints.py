@@ -16,7 +16,6 @@ from app.models.assistant import (
 )
 from tests.test_catalog_data import SAMPLE_ORGANISMS, SAMPLE_WORKFLOWS
 
-
 SECRET = "test-secret-aaaaaaaaaaaaaaaaaaaa"
 
 
@@ -92,9 +91,7 @@ def client(app_with_stubbed_agent):
 
 class TestSessionCookieBinding:
     def test_chat_sets_session_cookie(self, client):
-        resp = client.post(
-            "/api/v1/assistant/chat", json={"message": "hello"}
-        )
+        resp = client.post("/api/v1/assistant/chat", json={"message": "hello"})
         assert resp.status_code == 200, resp.text
         cookie = resp.cookies.get("brc_assistant_session")
         assert cookie, "expected brc_assistant_session cookie to be set"
@@ -106,9 +103,7 @@ class TestSessionCookieBinding:
         assert resp.status_code == 403
 
     def test_get_session_with_valid_cookie_succeeds(self, client):
-        client.cookies.set(
-            "brc_assistant_session", sign_session_id("sess-abc", SECRET)
-        )
+        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
         resp = client.get("/api/v1/assistant/session/sess-abc")
         assert resp.status_code == 200, resp.text
 
@@ -125,8 +120,6 @@ class TestSessionCookieBinding:
         assert resp.status_code == 403
 
     def test_delete_session_with_valid_cookie_succeeds(self, client):
-        client.cookies.set(
-            "brc_assistant_session", sign_session_id("sess-abc", SECRET)
-        )
+        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
         resp = client.delete("/api/v1/assistant/session/sess-abc")
         assert resp.status_code == 204
