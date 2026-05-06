@@ -58,6 +58,15 @@ class Settings:
         self.RATE_LIMIT_REQUESTS: int = int(os.getenv("RATE_LIMIT_REQUESTS", "100"))
         self.RATE_LIMIT_WINDOW: int = int(os.getenv("RATE_LIMIT_WINDOW", "60"))
 
+        # Assistant session cookie. When SESSION_COOKIE_SECRET is set, /chat
+        # issues an httpOnly Same-Site=Strict cookie binding the session_id
+        # to the browser; GET/DELETE /session endpoints require the cookie.
+        # Empty secret = legacy unbound mode (any caller with the session_id
+        # can read/delete) -- fine for local dev, must be set in prod.
+        self.SESSION_COOKIE_SECRET: str = os.getenv("SESSION_COOKIE_SECRET", "")
+        self.SESSION_COOKIE_NAME: str = "brc_assistant_session"
+        self.SESSION_COOKIE_TTL: int = 7200  # match SESSION_TTL in session_service
+
         # Catalog path
         self.CATALOG_PATH: str = os.getenv("CATALOG_PATH", "/catalog/output")
 
