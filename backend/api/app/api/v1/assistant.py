@@ -1,8 +1,11 @@
 import logging
+from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
 
+from app.core.config import get_settings
 from app.core.dependencies import check_rate_limit, get_assistant_agent
+from app.core.session_signing import sign_session_id, verify_session_id
 from app.models.assistant import (
     AssistantInfoResponse,
     ChatRequest,
@@ -14,6 +17,36 @@ from app.services.assistant_agent import AssistantTimeoutError
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
+
+def _verify_session_cookie(session_id: str, cookie_value: Optional[str]) -> None:
+    """Raise 403 unless the cookie's HMAC matches session_id.
+
+    If no SESSION_COOKIE_SECRET is configured (legacy/local-dev mode), all
+    requests are allowed -- the binding is opt-in via env var.
+    """
+    settings = get_settings()
+    if not settings.SESSION_COOKIE_SECRET:
+        return
+    if not verify_session_id(
+        session_id, cookie_value or "", settings.SESSION_COOKIE_SECRET
+    ):
+        raise HTTPException(status_code=403, detail="Invalid session cookie")
+
+
+def _set_session_cookie(response: Response, session_id: str) -> None:
+    """Issue an httpOnly Same-Site=Strict cookie binding the session to this client."""
+    settings = get_settings()
+    if not settings.SESSION_COOKIE_SECRET:
+        return
+    response.set_cookie(
+        key=settings.SESSION_COOKIE_NAME,
+        value=sign_session_id(session_id, settings.SESSION_COOKIE_SECRET),
+        max_age=settings.SESSION_COOKIE_TTL,
+        httponly=True,
+        samesite="strict",
+        secure=False,  # set via reverse proxy / env in prod
+    )
 
 
 @router.get("/info", response_model=AssistantInfoResponse)
@@ -32,6 +65,7 @@ async def assistant_info(
 @router.post("/chat", response_model=ChatResponse)
 async def assistant_chat(
     request: ChatRequest,
+    response: Response,
     agent=Depends(get_assistant_agent),
     _rate_limit=Depends(check_rate_limit),
 ):
@@ -47,8 +81,7 @@ async def assistant_chat(
         )
 
     try:
-        response = await agent.chat(request.message, request.session_id)
-        return response
+        chat_response = await agent.chat(request.message, request.session_id)
     except AssistantTimeoutError as e:
         logger.exception("Assistant chat timed out")
         raise HTTPException(status_code=504, detail=str(e)) from e
@@ -59,13 +92,18 @@ async def assistant_chat(
         logger.exception("Assistant chat error")
         raise HTTPException(status_code=500, detail="Internal assistant error") from e
 
+    _set_session_cookie(response, chat_response.session_id)
+    return chat_response
+
 
 @router.get("/session/{session_id}", response_model=SessionRestoreResponse)
 async def restore_session(
     session_id: str,
+    brc_assistant_session: Optional[str] = Cookie(default=None),
     agent=Depends(get_assistant_agent),
 ):
     """Restore a previous assistant session (messages, schema, suggestions)."""
+    _verify_session_cookie(session_id, brc_assistant_session)
     try:
         state = await agent.session_service.get_session(session_id)
     except Exception as e:
@@ -88,9 +126,11 @@ async def restore_session(
 @router.delete("/session/{session_id}", status_code=204)
 async def delete_session(
     session_id: str,
+    brc_assistant_session: Optional[str] = Cookie(default=None),
     agent=Depends(get_assistant_agent),
 ):
     """Delete an assistant session."""
+    _verify_session_cookie(session_id, brc_assistant_session)
     try:
         await agent.session_service.delete_session(session_id)
     except Exception:
