@@ -223,7 +223,7 @@
                                                     "rank": "family"
                                                 }
                                             ],
-                                            "name": "Bacillales",
+                                            "name": "Caryophanales",
                                             "ncbi_tax_id": "1385",
                                             "rank": "order"
                                         },
@@ -2613,10 +2613,33 @@
                                                     "rank": "family"
                                                 },
                                                 {
-                                                    "assembly_count": 27,
+                                                    "assembly_count": 1,
                                                     "children": [
                                                         {
-                                                            "assembly_count": 27,
+                                                            "assembly_count": 1,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Paramesorhizobium endophyticum",
+                                                                    "ncbi_tax_id": "1963359",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Paramesorhizobium",
+                                                            "ncbi_tax_id": "1759400",
+                                                            "rank": "genus"
+                                                        }
+                                                    ],
+                                                    "name": "Phyllobacteriaceae",
+                                                    "ncbi_tax_id": "69277",
+                                                    "rank": "family"
+                                                },
+                                                {
+                                                    "assembly_count": 26,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 26,
                                                             "children": [
                                                                 {
                                                                     "assembly_count": 1,
@@ -2846,13 +2869,6 @@
                                                                     "children": [],
                                                                     "name": "Brucella inopinata",
                                                                     "ncbi_tax_id": "1218315",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Brucella endophytica",
-                                                                    "ncbi_tax_id": "1963359",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -3924,10 +3940,10 @@
                             "assembly_count": 87,
                             "children": [
                                 {
-                                    "assembly_count": 87,
+                                    "assembly_count": 14,
                                     "children": [
                                         {
-                                            "assembly_count": 14,
+                                            "assembly_count": 13,
                                             "children": [
                                                 {
                                                     "assembly_count": 13,
@@ -4107,7 +4123,15 @@
                                                     "name": "Borreliaceae",
                                                     "ncbi_tax_id": "1643685",
                                                     "rank": "family"
-                                                },
+                                                }
+                                            ],
+                                            "name": "Spirochaetales",
+                                            "ncbi_tax_id": "136",
+                                            "rank": "order"
+                                        },
+                                        {
+                                            "assembly_count": 1,
+                                            "children": [
                                                 {
                                                     "assembly_count": 1,
                                                     "children": [
@@ -4140,10 +4164,18 @@
                                                     "rank": "family"
                                                 }
                                             ],
-                                            "name": "Spirochaetales",
-                                            "ncbi_tax_id": "136",
+                                            "name": "Treponematales",
+                                            "ncbi_tax_id": "3120456",
                                             "rank": "order"
-                                        },
+                                        }
+                                    ],
+                                    "name": "Spirochaetia",
+                                    "ncbi_tax_id": "203692",
+                                    "rank": "class"
+                                },
+                                {
+                                    "assembly_count": 73,
+                                    "children": [
                                         {
                                             "assembly_count": 73,
                                             "children": [
@@ -4784,8 +4816,8 @@
                                             "rank": "order"
                                         }
                                     ],
-                                    "name": "Spirochaetia",
-                                    "ncbi_tax_id": "203692",
+                                    "name": "Leptospiria",
+                                    "ncbi_tax_id": "3118682",
                                     "rank": "class"
                                 }
                             ],
@@ -5083,10 +5115,10 @@
                     "assembly_count": 3433,
                     "children": [
                         {
-                            "assembly_count": 71,
+                            "assembly_count": 49,
                             "children": [
                                 {
-                                    "assembly_count": 49,
+                                    "assembly_count": 47,
                                     "children": [
                                         {
                                             "assembly_count": 10,
@@ -5636,37 +5668,6 @@
                                                             "assembly_count": 2,
                                                             "children": [
                                                                 {
-                                                                    "assembly_count": 2,
-                                                                    "children": [],
-                                                                    "name": "Caulochytrium protostelioides",
-                                                                    "ncbi_tax_id": "1555241",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Caulochytrium",
-                                                            "ncbi_tax_id": "1555240",
-                                                            "rank": "genus"
-                                                        }
-                                                    ],
-                                                    "name": "Caulochytriaceae",
-                                                    "ncbi_tax_id": "1555239",
-                                                    "rank": "family"
-                                                }
-                                            ],
-                                            "name": "Caulochytriales",
-                                            "ncbi_tax_id": "2231168",
-                                            "rank": "order"
-                                        },
-                                        {
-                                            "assembly_count": 2,
-                                            "children": [
-                                                {
-                                                    "assembly_count": 2,
-                                                    "children": [
-                                                        {
-                                                            "assembly_count": 2,
-                                                            "children": [
-                                                                {
                                                                     "assembly_count": 1,
                                                                     "children": [],
                                                                     "name": "Synchytrium endobioticum",
@@ -5724,26 +5725,11 @@
                                     "rank": "class"
                                 },
                                 {
-                                    "assembly_count": 3,
+                                    "assembly_count": 2,
                                     "children": [
                                         {
-                                            "assembly_count": 3,
+                                            "assembly_count": 2,
                                             "children": [
-                                                {
-                                                    "assembly_count": 1,
-                                                    "children": [
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [],
-                                                            "name": "Hyaloraphidium curvatum",
-                                                            "ncbi_tax_id": "82268",
-                                                            "rank": "species"
-                                                        }
-                                                    ],
-                                                    "name": "Hyaloraphidium",
-                                                    "ncbi_tax_id": "82267",
-                                                    "rank": "genus"
-                                                },
                                                 {
                                                     "assembly_count": 2,
                                                     "children": [
@@ -5751,121 +5737,30 @@
                                                             "assembly_count": 2,
                                                             "children": [
                                                                 {
-                                                                    "assembly_count": 1,
-                                                                    "children": [
-                                                                        {
-                                                                            "assembly_count": 1,
-                                                                            "children": [],
-                                                                            "name": "Gonapodya prolifera JEL478",
-                                                                            "ncbi_tax_id": "1344416",
-                                                                            "rank": "strain"
-                                                                        }
-                                                                    ],
-                                                                    "name": "Gonapodya prolifera",
-                                                                    "ncbi_tax_id": "1123529",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
+                                                                    "assembly_count": 2,
                                                                     "children": [],
-                                                                    "name": "Gonapodya sp. JEL0774",
-                                                                    "ncbi_tax_id": "2725673",
+                                                                    "name": "Caulochytrium protostelioides",
+                                                                    "ncbi_tax_id": "1555241",
                                                                     "rank": "species"
                                                                 }
                                                             ],
-                                                            "name": "Gonapodya",
-                                                            "ncbi_tax_id": "109944",
+                                                            "name": "Caulochytrium",
+                                                            "ncbi_tax_id": "1555240",
                                                             "rank": "genus"
                                                         }
                                                     ],
-                                                    "name": "Gonapodyaceae",
-                                                    "ncbi_tax_id": "109943",
+                                                    "name": "Caulochytriaceae",
+                                                    "ncbi_tax_id": "1555239",
                                                     "rank": "family"
                                                 }
                                             ],
-                                            "name": "Monoblepharidales",
-                                            "ncbi_tax_id": "79272",
+                                            "name": "Caulochytriales",
+                                            "ncbi_tax_id": "2231168",
                                             "rank": "order"
                                         }
                                     ],
-                                    "name": "Monoblepharidomycetes",
-                                    "ncbi_tax_id": "451454",
-                                    "rank": "class"
-                                },
-                                {
-                                    "assembly_count": 19,
-                                    "children": [
-                                        {
-                                            "assembly_count": 19,
-                                            "children": [
-                                                {
-                                                    "assembly_count": 19,
-                                                    "children": [
-                                                        {
-                                                            "assembly_count": 12,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 12,
-                                                                    "children": [],
-                                                                    "name": "Neocallimastix californiae",
-                                                                    "ncbi_tax_id": "1754190",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Neocallimastix",
-                                                            "ncbi_tax_id": "4756",
-                                                            "rank": "genus"
-                                                        },
-                                                        {
-                                                            "assembly_count": 6,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 5,
-                                                                    "children": [],
-                                                                    "name": "Piromyces sp.",
-                                                                    "ncbi_tax_id": "45796",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Piromyces sp. E2",
-                                                                    "ncbi_tax_id": "73868",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Piromyces",
-                                                            "ncbi_tax_id": "4821",
-                                                            "rank": "genus"
-                                                        },
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Caecomyces sp.",
-                                                                    "ncbi_tax_id": "2078661",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Caecomyces",
-                                                            "ncbi_tax_id": "4823",
-                                                            "rank": "genus"
-                                                        }
-                                                    ],
-                                                    "name": "Neocallimastigaceae",
-                                                    "ncbi_tax_id": "29007",
-                                                    "rank": "family"
-                                                }
-                                            ],
-                                            "name": "Neocallimastigales",
-                                            "ncbi_tax_id": "29006",
-                                            "rank": "order"
-                                        }
-                                    ],
-                                    "name": "Neocallimastigomycetes",
-                                    "ncbi_tax_id": "451455",
+                                    "name": "Caulochytriomycetes",
+                                    "ncbi_tax_id": "3705877",
                                     "rank": "class"
                                 }
                             ],
@@ -15903,6 +15798,137 @@
                             "rank": "phylum"
                         },
                         {
+                            "assembly_count": 3,
+                            "children": [
+                                {
+                                    "assembly_count": 3,
+                                    "children": [
+                                        {
+                                            "assembly_count": 3,
+                                            "children": [
+                                                {
+                                                    "assembly_count": 3,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 3,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 3,
+                                                                    "children": [],
+                                                                    "name": "Rhizophagus irregularis",
+                                                                    "ncbi_tax_id": "588596",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Rhizophagus",
+                                                            "ncbi_tax_id": "1129544",
+                                                            "rank": "genus"
+                                                        }
+                                                    ],
+                                                    "name": "Glomeraceae",
+                                                    "ncbi_tax_id": "36751",
+                                                    "rank": "family"
+                                                }
+                                            ],
+                                            "name": "Glomerales",
+                                            "ncbi_tax_id": "36750",
+                                            "rank": "order"
+                                        }
+                                    ],
+                                    "name": "Glomeromycetes",
+                                    "ncbi_tax_id": "214506",
+                                    "rank": "class"
+                                }
+                            ],
+                            "name": "Glomeromycota",
+                            "ncbi_tax_id": "214504",
+                            "rank": "phylum"
+                        },
+                        {
+                            "assembly_count": 19,
+                            "children": [
+                                {
+                                    "assembly_count": 19,
+                                    "children": [
+                                        {
+                                            "assembly_count": 19,
+                                            "children": [
+                                                {
+                                                    "assembly_count": 19,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 12,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 12,
+                                                                    "children": [],
+                                                                    "name": "Neocallimastix californiae",
+                                                                    "ncbi_tax_id": "1754190",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Neocallimastix",
+                                                            "ncbi_tax_id": "4756",
+                                                            "rank": "genus"
+                                                        },
+                                                        {
+                                                            "assembly_count": 6,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 5,
+                                                                    "children": [],
+                                                                    "name": "Piromyces sp.",
+                                                                    "ncbi_tax_id": "45796",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Piromyces sp. E2",
+                                                                    "ncbi_tax_id": "73868",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Piromyces",
+                                                            "ncbi_tax_id": "4821",
+                                                            "rank": "genus"
+                                                        },
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Caecomyces sp.",
+                                                                    "ncbi_tax_id": "2078661",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Caecomyces",
+                                                            "ncbi_tax_id": "4823",
+                                                            "rank": "genus"
+                                                        }
+                                                    ],
+                                                    "name": "Neocallimastigaceae",
+                                                    "ncbi_tax_id": "29007",
+                                                    "rank": "family"
+                                                }
+                                            ],
+                                            "name": "Neocallimastigales",
+                                            "ncbi_tax_id": "29006",
+                                            "rank": "order"
+                                        }
+                                    ],
+                                    "name": "Neocallimastigomycetes",
+                                    "ncbi_tax_id": "451455",
+                                    "rank": "class"
+                                }
+                            ],
+                            "name": "Neocallimastigomycota",
+                            "ncbi_tax_id": "451456",
+                            "rank": "phylum"
+                        },
+                        {
                             "assembly_count": 1,
                             "children": [
                                 {
@@ -15958,47 +15984,8 @@
                             "rank": "phylum"
                         },
                         {
-                            "assembly_count": 106,
+                            "assembly_count": 103,
                             "children": [
-                                {
-                                    "assembly_count": 3,
-                                    "children": [
-                                        {
-                                            "assembly_count": 3,
-                                            "children": [
-                                                {
-                                                    "assembly_count": 3,
-                                                    "children": [
-                                                        {
-                                                            "assembly_count": 3,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 3,
-                                                                    "children": [],
-                                                                    "name": "Rhizophagus irregularis",
-                                                                    "ncbi_tax_id": "588596",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Rhizophagus",
-                                                            "ncbi_tax_id": "1129544",
-                                                            "rank": "genus"
-                                                        }
-                                                    ],
-                                                    "name": "Glomeraceae",
-                                                    "ncbi_tax_id": "36751",
-                                                    "rank": "family"
-                                                }
-                                            ],
-                                            "name": "Glomerales",
-                                            "ncbi_tax_id": "36750",
-                                            "rank": "order"
-                                        }
-                                    ],
-                                    "name": "Glomeromycetes",
-                                    "ncbi_tax_id": "214506",
-                                    "rank": "class"
-                                },
                                 {
                                     "assembly_count": 103,
                                     "children": [
@@ -16372,6 +16359,107 @@
                             ],
                             "name": "Mucoromycota",
                             "ncbi_tax_id": "1913637",
+                            "rank": "phylum"
+                        },
+                        {
+                            "assembly_count": 3,
+                            "children": [
+                                {
+                                    "assembly_count": 2,
+                                    "children": [
+                                        {
+                                            "assembly_count": 2,
+                                            "children": [
+                                                {
+                                                    "assembly_count": 2,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 2,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Gonapodya prolifera JEL478",
+                                                                            "ncbi_tax_id": "1344416",
+                                                                            "rank": "strain"
+                                                                        }
+                                                                    ],
+                                                                    "name": "Gonapodya prolifera",
+                                                                    "ncbi_tax_id": "1123529",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Gonapodya sp. JEL0774",
+                                                                    "ncbi_tax_id": "2725673",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Gonapodya",
+                                                            "ncbi_tax_id": "109944",
+                                                            "rank": "genus"
+                                                        }
+                                                    ],
+                                                    "name": "Gonapodyaceae",
+                                                    "ncbi_tax_id": "109943",
+                                                    "rank": "family"
+                                                }
+                                            ],
+                                            "name": "Monoblepharidales",
+                                            "ncbi_tax_id": "79272",
+                                            "rank": "order"
+                                        }
+                                    ],
+                                    "name": "Monoblepharidomycetes",
+                                    "ncbi_tax_id": "451454",
+                                    "rank": "class"
+                                },
+                                {
+                                    "assembly_count": 1,
+                                    "children": [
+                                        {
+                                            "assembly_count": 1,
+                                            "children": [
+                                                {
+                                                    "assembly_count": 1,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Hyaloraphidium curvatum",
+                                                                    "ncbi_tax_id": "82268",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Hyaloraphidium",
+                                                            "ncbi_tax_id": "82267",
+                                                            "rank": "genus"
+                                                        }
+                                                    ],
+                                                    "name": "Hyaloraphidiaceae",
+                                                    "ncbi_tax_id": "3705301",
+                                                    "rank": "family"
+                                                }
+                                            ],
+                                            "name": "Hyaloraphidiales",
+                                            "ncbi_tax_id": "3705300",
+                                            "rank": "order"
+                                        }
+                                    ],
+                                    "name": "Hyaloraphidiomycetes",
+                                    "ncbi_tax_id": "3705298",
+                                    "rank": "class"
+                                }
+                            ],
+                            "name": "Monoblepharomycota",
+                            "ncbi_tax_id": "3705299",
                             "rank": "phylum"
                         }
                     ],
@@ -17191,7 +17279,7 @@
                                                         {
                                                             "assembly_count": 2,
                                                             "children": [],
-                                                            "name": "Plasmodium sp. DRC-Itaito",
+                                                            "name": "Plasmodium billcollinsi",
                                                             "ncbi_tax_id": "720590",
                                                             "rank": "species"
                                                         },
@@ -18143,6 +18231,37 @@
                             "assembly_count": 55,
                             "children": [
                                 {
+                                    "assembly_count": 1,
+                                    "children": [
+                                        {
+                                            "assembly_count": 1,
+                                            "children": [
+                                                {
+                                                    "assembly_count": 1,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [],
+                                                            "name": "Schmidtea mediterranea",
+                                                            "ncbi_tax_id": "79327",
+                                                            "rank": "species"
+                                                        }
+                                                    ],
+                                                    "name": "Schmidtea",
+                                                    "ncbi_tax_id": "55270",
+                                                    "rank": "genus"
+                                                }
+                                            ],
+                                            "name": "Dugesiidae",
+                                            "ncbi_tax_id": "31262",
+                                            "rank": "family"
+                                        }
+                                    ],
+                                    "name": "Tricladida",
+                                    "ncbi_tax_id": "6159",
+                                    "rank": "order"
+                                },
+                                {
                                     "assembly_count": 27,
                                     "children": [
                                         {
@@ -18730,74 +18849,27 @@
                                     "rank": "class"
                                 },
                                 {
-                                    "assembly_count": 3,
+                                    "assembly_count": 2,
                                     "children": [
-                                        {
-                                            "assembly_count": 1,
-                                            "children": [
-                                                {
-                                                    "assembly_count": 1,
-                                                    "children": [
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Schmidtea mediterranea",
-                                                                    "ncbi_tax_id": "79327",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Schmidtea",
-                                                            "ncbi_tax_id": "55270",
-                                                            "rank": "genus"
-                                                        }
-                                                    ],
-                                                    "name": "Dugesiidae",
-                                                    "ncbi_tax_id": "31262",
-                                                    "rank": "family"
-                                                }
-                                            ],
-                                            "name": "Tricladida",
-                                            "ncbi_tax_id": "6159",
-                                            "rank": "order"
-                                        },
                                         {
                                             "assembly_count": 2,
                                             "children": [
                                                 {
                                                     "assembly_count": 2,
-                                                    "children": [
-                                                        {
-                                                            "assembly_count": 2,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 2,
-                                                                    "children": [],
-                                                                    "name": "Macrostomum lignano",
-                                                                    "ncbi_tax_id": "282301",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Macrostomum",
-                                                            "ncbi_tax_id": "39217",
-                                                            "rank": "genus"
-                                                        }
-                                                    ],
-                                                    "name": "Macrostomidae",
-                                                    "ncbi_tax_id": "39216",
-                                                    "rank": "family"
+                                                    "children": [],
+                                                    "name": "Macrostomum lignano",
+                                                    "ncbi_tax_id": "282301",
+                                                    "rank": "species"
                                                 }
                                             ],
-                                            "name": "Macrostomida",
-                                            "ncbi_tax_id": "39215",
-                                            "rank": "order"
+                                            "name": "Macrostomum",
+                                            "ncbi_tax_id": "39217",
+                                            "rank": "genus"
                                         }
                                     ],
-                                    "name": "Rhabditophora",
-                                    "ncbi_tax_id": "147100",
-                                    "rank": "class"
+                                    "name": "Macrostomidae",
+                                    "ncbi_tax_id": "39216",
+                                    "rank": "family"
                                 }
                             ],
                             "name": "Platyhelminthes",
@@ -22570,7 +22642,7 @@
                                             "assembly_count": 33,
                                             "children": [
                                                 {
-                                                    "assembly_count": 32,
+                                                    "assembly_count": 31,
                                                     "children": [
                                                         {
                                                             "assembly_count": 1,
@@ -22596,6 +22668,13 @@
                                                     "children": [],
                                                     "name": "Giardia muris",
                                                     "ncbi_tax_id": "5742",
+                                                    "rank": "species"
+                                                },
+                                                {
+                                                    "assembly_count": 1,
+                                                    "children": [],
+                                                    "name": "Giardia enterica",
+                                                    "ncbi_tax_id": "3697922",
                                                     "rank": "species"
                                                 }
                                             ],
@@ -23203,15 +23282,7 @@
                             "children": [
                                 {
                                     "assembly_count": 1,
-                                    "children": [
-                                        {
-                                            "assembly_count": 1,
-                                            "children": [],
-                                            "name": "Vitrella brassicaformis CCMP3155",
-                                            "ncbi_tax_id": "1169540",
-                                            "rank": "strain"
-                                        }
-                                    ],
+                                    "children": [],
                                     "name": "Vitrella brassicaformis",
                                     "ncbi_tax_id": "1169539",
                                     "rank": "species"
@@ -25085,19 +25156,19 @@
                                                                 {
                                                                     "assembly_count": 4,
                                                                     "children": [],
-                                                                    "name": "Hepacivirus hominis",
+                                                                    "name": "Orthohepacivirus hominis",
                                                                     "ncbi_tax_id": "3052230",
                                                                     "rank": "species"
                                                                 },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Hepacivirus platyrrhini",
+                                                                    "name": "Orthohepacivirus platyrrhini",
                                                                     "ncbi_tax_id": "3052236",
                                                                     "rank": "species"
                                                                 }
                                                             ],
-                                                            "name": "Hepacivirus",
+                                                            "name": "Orthohepacivirus",
                                                             "ncbi_tax_id": "11102",
                                                             "rank": "genus"
                                                         },
@@ -25164,13 +25235,6 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Orthoflavivirus loupingi",
-                                                                    "ncbi_tax_id": "3048184",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
                                                                     "name": "Orthoflavivirus murrayense",
                                                                     "ncbi_tax_id": "3048215",
                                                                     "rank": "species"
@@ -25230,6 +25294,13 @@
                                                                     "name": "Orthoflavivirus louisense",
                                                                     "ncbi_tax_id": "3052468",
                                                                     "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Orthoflavivirus mediterranense",
+                                                                    "ncbi_tax_id": "3703354",
+                                                                    "rank": "species"
                                                                 }
                                                             ],
                                                             "name": "Orthoflavivirus",
@@ -25274,8 +25345,8 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Orthopicobirnavirus hominis",
-                                                                    "ncbi_tax_id": "2956252",
+                                                                    "name": "Orthopicobirnavirus equi",
+                                                                    "ncbi_tax_id": "2956251",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -25721,8 +25792,8 @@
                                                                 {
                                                                     "assembly_count": 2,
                                                                     "children": [],
-                                                                    "name": "Hepatovirus ahepa",
-                                                                    "ncbi_tax_id": "3407641",
+                                                                    "name": "Hepatovirus fejalco",
+                                                                    "ncbi_tax_id": "3429217",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -28147,13 +28218,6 @@
                                                             "assembly_count": 25,
                                                             "children": [
                                                                 {
-                                                                    "assembly_count": 7,
-                                                                    "children": [],
-                                                                    "name": "TTV-like mini virus",
-                                                                    "ncbi_tax_id": "93678",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
                                                                     "assembly_count": 1,
                                                                     "children": [],
                                                                     "name": "Betatorquevirus homini1",
@@ -28179,6 +28243,13 @@
                                                                     "children": [],
                                                                     "name": "Betatorquevirus homini12",
                                                                     "ncbi_tax_id": "3048398",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Betatorquevirus homini32",
+                                                                    "ncbi_tax_id": "3048399",
                                                                     "rank": "species"
                                                                 },
                                                                 {
@@ -28240,13 +28311,6 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Betatorquevirus homini18",
-                                                                    "ncbi_tax_id": "3050361",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
                                                                     "name": "Betatorquevirus homini16",
                                                                     "ncbi_tax_id": "3052004",
                                                                     "rank": "species"
@@ -28263,6 +28327,13 @@
                                                                     "children": [],
                                                                     "name": "Betatorquevirus homini27",
                                                                     "ncbi_tax_id": "3052014",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 7,
+                                                                    "children": [],
+                                                                    "name": "Betatorquevirus homini36",
+                                                                    "ncbi_tax_id": "3052022",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -28409,7 +28480,7 @@
                     "rank": "kingdom"
                 }
             ],
-            "name": "Monodnaviria",
+            "name": "Floreoviria",
             "ncbi_tax_id": "2731342",
             "rank": "realm"
         },
@@ -28617,13 +28688,6 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Mastadenovirus caesari",
-                                                                    "ncbi_tax_id": "3241411",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
                                                                     "name": "Mastadenovirus dominans",
                                                                     "ncbi_tax_id": "3241420",
                                                                     "rank": "species"
@@ -28647,6 +28711,13 @@
                                                                     "children": [],
                                                                     "name": "Mastadenovirus russelli",
                                                                     "ncbi_tax_id": "3241445",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Mastadenovirus hylobatidae",
+                                                                    "ncbi_tax_id": "3703201",
                                                                     "rank": "species"
                                                                 }
                                                             ],

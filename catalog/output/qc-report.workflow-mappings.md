@@ -14,18 +14,18 @@ None
 | COVID-19: variation analysis on ARTIC PE data | 1 |
 | COVID-19: variation analysis on WGS PE data | 1 |
 | COVID-19: variation analysis on WGS SE data | 1 |
-| Single-Cell RNA-seq Preprocessing: 10X Genomics CellPlex Multiplexed Samples | 4937 |
-| Single-Cell RNA-seq Preprocessing: 10X Genomics v3 to Seurat and Scanpy Compatible Format | 4937 |
-| RNA-Seq Analysis: Paired-End Read Processing and Quantification | 4937 |
-| RNA-Seq Analysis: Single-End Read Processing and Quantification | 4937 |
-| ATAC-seq Analysis: Chromatin Accessibility Profiling | 4937 |
-| ChIP-seq Analysis: Paired-End Read Processing | 4937 |
-| ChIP-seq Analysis: Single-End Read Processing | 4937 |
+| Single-Cell RNA-seq Preprocessing: 10X Genomics CellPlex Multiplexed Samples | 5495 |
+| Single-Cell RNA-seq Preprocessing: 10X Genomics v3 to Seurat and Scanpy Compatible Format | 5495 |
+| RNA-Seq Analysis: Paired-End Read Processing and Quantification | 5495 |
+| RNA-Seq Analysis: Single-End Read Processing and Quantification | 5495 |
+| ATAC-seq Analysis: Chromatin Accessibility Profiling | 5495 |
+| ChIP-seq Analysis: Paired-End Read Processing | 5495 |
+| ChIP-seq Analysis: Single-End Read Processing | 5495 |
 | Consensus Peak Calling for ATAC-seq and CUT and RUN Replicates | 5499 |
-| CUT&amp;RUN/CUT&amp;TAG Analysis: Protein-DNA Interaction Mapping | 4937 |
-| Capture Hi-C Processing: FASTQ to Balanced Cool Files | 4326 |
-| Hi-C Processing: FASTQ to Balanced Cool Files | 4326 |
-| Hi-C Data Processing: FASTQ to Valid Interaction Pairs | 4326 |
+| CUT&amp;RUN/CUT&amp;TAG Analysis: Protein-DNA Interaction Mapping | 5495 |
+| Capture Hi-C Processing: FASTQ to Balanced Cool Files | 4871 |
+| Hi-C Processing: FASTQ to Balanced Cool Files | 4871 |
+| Hi-C Data Processing: FASTQ to Valid Interaction Pairs | 4871 |
 | Variant calling and consensus construction from paired end short read data of non-segmented viral genomes | 13 |
 | Influenza A isolate subtyping and consensus sequence generation | 7 |
 | Pox Virus Illumina Amplicon Workflow from half-genomes | 2 |
