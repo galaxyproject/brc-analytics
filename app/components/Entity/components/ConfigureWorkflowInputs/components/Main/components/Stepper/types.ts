@@ -8,6 +8,7 @@ import {
   OnLaunchGalaxy,
   Status,
 } from "./components/Step/hooks/UseLaunchGalaxy/types";
+import { VIEW } from "./components/Step/SequencingStep/components/ToggleButtonGroup/types";
 import { StepConfig } from "./components/Step/types";
 import { OnContinue, OnEdit } from "./hooks/UseStepper/types";
 
@@ -16,6 +17,7 @@ export interface Props {
   configuredInput: ConfiguredInput;
   configuredSteps: StepConfig[];
   genome?: Assembly;
+  initialDataSourceView?: VIEW;
   onConfigure: OnConfigure;
   onContinue: OnContinue;
   onEdit: OnEdit;

@@ -3,8 +3,10 @@ import { API_BASE_URL } from "../config/api";
 import {
   AssistantChatRequest,
   AssistantChatResponse,
+  AssistantInfoResponse,
   DatasetSearchRequest,
   DatasetSearchResponse,
+  SessionRestoreResponse,
   UnifiedSearchRequest,
   UnifiedSearchResponse,
   WorkflowSuggestionRequest,
@@ -43,8 +45,39 @@ export const llmAPIClient = {
     request: AssistantChatRequest
   ): Promise<AssistantChatResponse> => {
     return apiClient
-      .post("assistant/chat", { json: request, timeout: 120000 })
+      .post("assistant/chat", {
+        json: request,
+        retry: { limit: 0 },
+        timeout: 120000,
+      })
       .json();
+  },
+
+  /**
+   * Delete an assistant session
+   * @param sessionId - Session to delete
+   */
+  assistantDeleteSession: async (sessionId: string): Promise<void> => {
+    await apiClient.delete(`assistant/session/${sessionId}`);
+  },
+
+  /**
+   * Get assistant configuration info (model, provider, availability) for UI attribution.
+   * @returns Promise resolving to assistant info
+   */
+  assistantInfo: async (): Promise<AssistantInfoResponse> => {
+    return apiClient.get("assistant/info").json();
+  },
+
+  /**
+   * Restore a previous assistant session
+   * @param sessionId - Session to restore
+   * @returns Promise resolving to session state (messages, schema, suggestions)
+   */
+  assistantRestore: async (
+    sessionId: string
+  ): Promise<SessionRestoreResponse> => {
+    return apiClient.get(`assistant/session/${sessionId}`).json();
   },
 
   /**

@@ -26,22 +26,16 @@ export const ChatMessage = ({
     <MessageRow isUser={isUser}>
       {!isUser && (
         <Box
+          alt="BRC Analytics"
+          component="img"
+          src="/logo/brc.svg"
           sx={{
-            alignItems: "center",
-            backgroundColor: "#1976d2",
-            borderRadius: "50%",
-            color: "white",
-            display: "flex",
             flexShrink: 0,
-            fontSize: "14px",
-            fontWeight: 600,
-            height: 32,
-            justifyContent: "center",
-            width: 32,
+            height: 20,
+            marginTop: "6px",
+            width: "auto",
           }}
-        >
-          AI
-        </Box>
+        />
       )}
       <Bubble>
         {isUser ? (

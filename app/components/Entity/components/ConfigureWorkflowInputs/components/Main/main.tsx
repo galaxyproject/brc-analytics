@@ -13,6 +13,7 @@ export const Main = ({
   configuredInput,
   configuredSteps,
   genome,
+  initialDataSourceView,
   onConfigure,
   onContinue,
   onEdit,
@@ -34,6 +35,7 @@ export const Main = ({
         configuredInput={configuredInput}
         configuredSteps={configuredSteps}
         genome={genome}
+        initialDataSourceView={initialDataSourceView}
         onConfigure={onConfigure}
         onContinue={onContinue}
         onEdit={onEdit}

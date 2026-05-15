@@ -5,6 +5,8 @@ import {
   BackPageView,
 } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { JSX } from "react";
+import { VIEW } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ToggleButtonGroup/types";
+import { StepConfig } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { useStepper } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/hook";
 import { SEQUENCING_STEPS } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/constants";
 import { useConfiguredSteps } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/hook";
@@ -13,17 +15,41 @@ import { Main } from "../../components/Entity/components/ConfigureWorkflowInputs
 import { SideColumn } from "../../components/Entity/components/ConfigureWorkflowInputs/components/SideColumn/sideColumn";
 import { Top } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Top/top";
 import { getAssembly, getWorkflow } from "../../services/workflows/entities";
+import { useAssistantHandoff } from "./hooks/UseAssistantHandoff/useAssistantHandoff";
 import { useConfigureInputs } from "./hooks/UseConfigureInputs/useConfigureInputs";
 import { Assembly, Props } from "./types";
 import { StyledBackPageContentMainColumn } from "./workflowInputsView.styles";
+
+const DATA_STEP_KEYS = new Set([
+  "readRunsPaired",
+  "readRunsSingle",
+  "readRunsAny",
+  "sampleSheet",
+]);
+
+function findFirstDataStep(steps: StepConfig[]): number | undefined {
+  const idx = steps.findIndex((s) => DATA_STEP_KEYS.has(s.key));
+  return idx >= 0 ? idx : undefined;
+}
 
 export const WorkflowInputsView = ({ entityId, trsId }: Props): JSX.Element => {
   const genome = getAssembly<Assembly>(entityId);
   const workflow = getWorkflow(trsId);
 
+  const { handoff } = useAssistantHandoff();
   const { configuredInput, onConfigure } = useConfigureInputs();
   const { configuredSteps } = useConfiguredSteps(workflow);
-  const { activeStep, onContinue, onEdit } = useStepper(configuredSteps);
+
+  const handoffTargetStep = handoff
+    ? findFirstDataStep(configuredSteps)
+    : undefined;
+  const initialDataSourceView =
+    handoff?.dataSource === "upload" ? VIEW.UPLOAD_MY_DATA : undefined;
+
+  const { activeStep, onContinue, onEdit } = useStepper(
+    configuredSteps,
+    handoffTargetStep
+  );
   const { hasSidePanel } = configuredSteps[activeStep] || {};
 
   return (
@@ -38,6 +64,7 @@ export const WorkflowInputsView = ({ entityId, trsId }: Props): JSX.Element => {
             configuredInput={configuredInput}
             configuredSteps={configuredSteps}
             genome={genome}
+            initialDataSourceView={initialDataSourceView}
             onConfigure={onConfigure}
             onContinue={onContinue}
             onEdit={onEdit}

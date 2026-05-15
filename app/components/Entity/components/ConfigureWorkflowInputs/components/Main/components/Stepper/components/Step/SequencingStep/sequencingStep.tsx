@@ -1,7 +1,7 @@
 import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepContent/stepContent";
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
-import { JSX } from "react";
+import { JSX, useEffect } from "react";
 import { ToggleButtonGroup } from "../components/ToggleButtonGroup/toggleButtonGroup";
 import { useToggleButtonGroup } from "../hooks/UseToggleButtonGroup/useToggleButtonGroup";
 import { StepProps } from "../types";
@@ -30,6 +30,7 @@ export const SequencingStep = ({
   entryLabel,
   genome,
   index,
+  initialDataSourceView,
   onConfigure,
   stepKey,
   workflow,
@@ -40,9 +41,24 @@ export const SequencingStep = ({
   const rowSelection = useRowSelection(configuredInput);
   const state = { columnFilters, rowSelection };
   const { actions, table } = useTable(enaTaxonomyId, state, onConfigure);
-  const { onChange, value } = useToggleButtonGroup(VIEW.ENA);
+  const initialView =
+    initialDataSourceView === VIEW.UPLOAD_MY_DATA
+      ? VIEW.UPLOAD_MY_DATA
+      : VIEW.ENA;
+  const { onChange, value } = useToggleButtonGroup(initialView);
   const { taxonomyMatches } = useTaxonomyMatches(table);
   const { requirementsMatches } = useRequirementsMatches(table, genome);
+
+  useEffect(() => {
+    if (initialDataSourceView !== VIEW.UPLOAD_MY_DATA) return;
+    // The clear + upload pair is idempotent. Running it on every effect
+    // setup matters in dev: React strict-mode runs effect setup twice
+    // per mount, and the first ReferenceAssembly setup REPLACES state
+    // before the second SequencingStep setup gets a chance to re-seed
+    // readRunsPaired from the assistant handoff.
+    onConfigure(clearSequencingData());
+    onConfigure(getUploadMyOwnSequencingData(stepKey));
+  }, [initialDataSourceView, onConfigure, stepKey]);
   return (
     <Step active={active} completed={completed} index={index}>
       <StepLabel>{entryLabel}</StepLabel>
