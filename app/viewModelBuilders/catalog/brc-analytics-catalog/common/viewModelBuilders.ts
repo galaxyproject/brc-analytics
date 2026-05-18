@@ -797,6 +797,12 @@ export const buildOrganismAssembliesHero = (
 ): ComponentProps<typeof C.BackPageHero> => {
   return {
     breadcrumbs: getOrganismEntityAssembliesBreadcrumbs(organism),
+    callToAction: {
+      label: "Configure Organism",
+      url: replaceParameters(ROUTES.ORGANISM_ANALYZE_WORKFLOWS, {
+        entityId: getOrganismId(organism),
+      }),
+    },
     title: organism.taxonomicLevelSpecies,
   };
 };
