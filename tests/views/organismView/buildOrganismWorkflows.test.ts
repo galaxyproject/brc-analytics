@@ -3,8 +3,8 @@ import {
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
 } from "../../../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { buildOrganismWorkflows } from "../../../app/views/OrganismWorkflowsView/components/Main/utils";
-import type { Organism } from "../../../app/views/OrganismWorkflowsView/types";
+import { buildOrganismWorkflows } from "../../../app/views/OrganismView/components/Main/utils";
+import type { Organism } from "../../../app/views/OrganismView/types";
 
 describe("buildOrganismWorkflows", () => {
   const ORGANISM: Organism = {

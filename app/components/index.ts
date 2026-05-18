@@ -30,6 +30,7 @@ export { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/compo
 export { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/ChipCell/chipCell";
 export { NTagCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/NTagCell/nTagCell";
 export { Main as AnalysisMethodsCatalog } from "../views/AnalyzeWorkflowsView/components/Main/main";
+export { Main as OrganismViewMain } from "../views/OrganismView/components/Main/main";
 export { AppLink } from "./common/AppLink/appLink";
 export { Chip } from "./common/Chip/chip";
 export { CopyText } from "./common/CopyText/copyText";

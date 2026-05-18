@@ -13,8 +13,8 @@ import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
 } from "../../category";
-import { assembliesMainColumn } from "../entity/organism/assembliesMainColumn";
-import { assembliesTop } from "../entity/organism/assembliesTop";
+import { organismMainColumn } from "../entity/organism/organismMainColumn";
+import { organismTop } from "../entity/organism/organismTop";
 import { CATEGORY_GROUPS } from "./common/category/categories";
 import { COLUMN_REGISTRY } from "./common/column/columnRegistry";
 
@@ -86,10 +86,10 @@ export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
     staticLoad: true,
     tabs: [
       {
-        label: "Assemblies",
-        mainColumn: assembliesMainColumn,
+        label: "Overview",
+        mainColumn: organismMainColumn,
         route: "",
-        top: assembliesTop,
+        top: organismTop,
       },
     ],
   },

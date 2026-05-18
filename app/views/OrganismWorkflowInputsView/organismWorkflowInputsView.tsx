@@ -15,7 +15,7 @@ import { WorkflowEntityContext } from "../../components/Entity/components/Config
 import { buildWorkflowEntityValue } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/utils";
 import { getWorkflow } from "../../services/workflows/entities";
 import { getEntity } from "../../services/workflows/query";
-import type { Organism } from "../OrganismWorkflowsView/types";
+import type { Organism } from "../OrganismView/types";
 import { useConfigureInputs } from "../WorkflowInputsView/hooks/UseConfigureInputs/useConfigureInputs";
 import { StyledBackPageContentMainColumn } from "../WorkflowInputsView/workflowInputsView.styles";
 import { Top } from "./components/Top/top";

@@ -22,10 +22,6 @@ export function getBreadcrumbs({
       path: replaceParameters(ROUTES.ORGANISM, { entityId }),
       text: organism.taxonomicLevelSpecies,
     },
-    {
-      path: replaceParameters(ROUTES.ORGANISM_ANALYZE_WORKFLOWS, { entityId }),
-      text: "Select a Workflow",
-    },
     { path: "", text: workflow.workflowName },
   ];
 }
