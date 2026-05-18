@@ -12,7 +12,6 @@ export const ROUTES = {
   LEARN: "/learn",
   ORGANISM: "/data/organisms/{entityId}",
   ORGANISMS: "/data/organisms",
-  ORGANISM_ANALYZE_WORKFLOWS: "/data/organisms/{entityId}/analyze/workflows",
   PRIORITY_PATHOGEN: "/data/[entityListType]/[entityId]",
   PRIORITY_PATHOGENS: "/data/priority-pathogens",
   ROADMAP: "/roadmap",

@@ -1,6 +1,5 @@
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
-import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { ColumnDef, getSortedRowModel } from "@tanstack/react-table";
 import { ComponentProps } from "react";
 import { ROUTES } from "../../../../routes/constants";
@@ -33,15 +32,23 @@ export const buildOrganismHero = (
     breadcrumbs: [
       { path: ROUTES.ORGANISMS, text: "Organisms" },
       { path: "", text: entity.taxonomicLevelSpecies },
-      { path: "", text: "Assemblies" },
     ],
-    callToAction: {
-      label: "Configure Organism",
-      url: replaceParameters(ROUTES.ORGANISM_ANALYZE_WORKFLOWS, {
-        entityId: sanitizeEntityId(entity.ncbiTaxonomyId),
-      }),
-    },
     title: entity.taxonomicLevelSpecies,
+  };
+};
+
+/**
+ * Build props for the organism detail main content.
+ * @param entity - GA2 organism entity.
+ * @returns Props for the OrganismViewMain component.
+ */
+export const buildOrganismViewMain = (
+  entity: GA2OrganismEntity
+): ComponentProps<typeof C.OrganismViewMain> => {
+  return {
+    entityId: sanitizeEntityId(entity.ncbiTaxonomyId),
+    organism: entity,
+    tableProps: buildOrganismGenomesTable(entity),
   };
 };
 

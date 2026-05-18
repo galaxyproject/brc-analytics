@@ -44,11 +44,6 @@ export const GA2_PAGE_META = {
       "Browse organisms with reference genome assemblies on Genome Ark 2.",
     pageTitle: "Organisms",
   },
-  ORGANISM_ANALYZE_WORKFLOWS: {
-    pageDescription:
-      "Select and configure organism-level workflows on Genome Ark 2.",
-    pageTitle: "Organism Workflows",
-  },
   ORGANISM_DETAIL: {
     pageDescription:
       "View organism details and available genome assemblies on Genome Ark 2.",

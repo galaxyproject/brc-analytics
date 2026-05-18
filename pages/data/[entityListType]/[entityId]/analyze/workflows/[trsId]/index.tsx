@@ -17,9 +17,9 @@ import {
   workflowIsCompatibleWithAssembly,
 } from "../../../../../../../app/views/AnalyzeWorkflowsView/components/Main/utils";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../../../app/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
+import { buildOrganismWorkflows } from "../../../../../../../app/views/OrganismView/components/Main/utils";
+import type { Organism } from "../../../../../../../app/views/OrganismView/types";
 import { OrganismWorkflowInputsView } from "../../../../../../../app/views/OrganismWorkflowInputsView/organismWorkflowInputsView";
-import { buildOrganismWorkflows } from "../../../../../../../app/views/OrganismWorkflowsView/components/Main/utils";
-import type { Organism } from "../../../../../../../app/views/OrganismWorkflowsView/types";
 import { Assembly } from "../../../../../../../app/views/WorkflowInputsView/types";
 import { WorkflowInputsView } from "../../../../../../../app/views/WorkflowInputsView/workflowInputsView";
 import workflows from "../../../../../../../catalog/output/workflows.json";

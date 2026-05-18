@@ -792,18 +792,27 @@ export const buildAssemblyResources = (
  * @param organism - Organism entity.
  * @returns Props to be used for the BackPageHero component.
  */
-export const buildOrganismAssembliesHero = (
+export const buildOrganismHero = (
   organism: BRCDataCatalogOrganism
 ): ComponentProps<typeof C.BackPageHero> => {
   return {
-    breadcrumbs: getOrganismEntityAssembliesBreadcrumbs(organism),
-    callToAction: {
-      label: "Configure Organism",
-      url: replaceParameters(ROUTES.ORGANISM_ANALYZE_WORKFLOWS, {
-        entityId: getOrganismId(organism),
-      }),
-    },
+    breadcrumbs: getOrganismEntityBreadcrumbs(organism),
     title: organism.taxonomicLevelSpecies,
+  };
+};
+
+/**
+ * Build props for the organism detail main content.
+ * @param organism - Organism entity.
+ * @returns Props for the OrganismViewMain component.
+ */
+export const buildOrganismViewMain = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.OrganismViewMain> => {
+  return {
+    entityId: getOrganismId(organism),
+    organism,
+    tableProps: buildOrganismGenomesTable(organism),
   };
 };
 
@@ -1061,13 +1070,12 @@ function getGenomeIsolateText(
  * @param organism - Organism entity.
  * @returns Breadcrumbs.
  */
-function getOrganismEntityAssembliesBreadcrumbs(
+function getOrganismEntityBreadcrumbs(
   organism: BRCDataCatalogOrganism
 ): Breadcrumb[] {
   return [
     { path: ROUTES.ORGANISMS, text: "Organisms" },
     { path: "", text: organism.taxonomicLevelSpecies },
-    { path: "", text: "Assemblies" },
   ];
 }
 

@@ -10,8 +10,8 @@ export const organismMainColumn: ComponentsConfig = [
   {
     children: [
       {
-        component: C.DetailViewTable,
-        viewBuilder: V.buildOrganismGenomesTable,
+        component: C.OrganismViewMain,
+        viewBuilder: V.buildOrganismViewMain,
       },
     ],
     component: C.BackPageContentSingleColumn,

@@ -8,7 +8,3 @@ export interface Organism {
 interface OrganismGenome {
   lineageTaxonomyIds: string[];
 }
-
-export interface Props {
-  entityId: string;
-}
