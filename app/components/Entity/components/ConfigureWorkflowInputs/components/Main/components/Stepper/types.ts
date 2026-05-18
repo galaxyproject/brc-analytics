@@ -3,7 +3,6 @@ import {
   ConfiguredInput,
   OnConfigure,
 } from "../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { Assembly } from "../../../../../../../../views/WorkflowInputsView/types";
 import {
   OnLaunchGalaxy,
   Status,
@@ -16,7 +15,6 @@ export interface Props {
   activeStep: number;
   configuredInput: ConfiguredInput;
   configuredSteps: StepConfig[];
-  genome?: Assembly;
   initialDataSourceView?: VIEW;
   onConfigure: OnConfigure;
   onContinue: OnContinue;

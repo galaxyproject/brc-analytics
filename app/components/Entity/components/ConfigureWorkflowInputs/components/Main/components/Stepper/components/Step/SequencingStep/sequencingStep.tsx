@@ -28,7 +28,6 @@ export const SequencingStep = ({
   completed,
   configuredInput,
   entryLabel,
-  genome,
   index,
   initialDataSourceView,
   onConfigure,
@@ -36,7 +35,7 @@ export const SequencingStep = ({
   workflow,
 }: StepProps): JSX.Element => {
   const enaAccession = useENADataByAccession<BaseReadRun>();
-  const enaTaxonomyId = useQuery(genome);
+  const enaTaxonomyId = useQuery();
   const columnFilters = useColumnFilters(workflow, stepKey);
   const rowSelection = useRowSelection(configuredInput);
   const state = { columnFilters, rowSelection };
@@ -47,7 +46,7 @@ export const SequencingStep = ({
       : VIEW.ENA;
   const { onChange, value } = useToggleButtonGroup(initialView);
   const { taxonomyMatches } = useTaxonomyMatches(table);
-  const { requirementsMatches } = useRequirementsMatches(table, genome);
+  const { requirementsMatches } = useRequirementsMatches(table);
 
   useEffect(() => {
     if (initialDataSourceView !== VIEW.UPLOAD_MY_DATA) return;
@@ -59,6 +58,7 @@ export const SequencingStep = ({
     onConfigure(clearSequencingData());
     onConfigure(getUploadMyOwnSequencingData(stepKey));
   }, [initialDataSourceView, onConfigure, stepKey]);
+
   return (
     <Step active={active} completed={completed} index={index}>
       <StepLabel>{entryLabel}</StepLabel>
@@ -84,7 +84,6 @@ export const SequencingStep = ({
             selectedCount={getSelectedCount(configuredInput)}
             switchBrowseMethod={actions.switchBrowseMethod}
             table={table}
-            taxonomicLevelSpecies={genome?.taxonomicLevelSpecies}
             taxonomyMatches={taxonomyMatches ?? 0}
           />
         ) : (
