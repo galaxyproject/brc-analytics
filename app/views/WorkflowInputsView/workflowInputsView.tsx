@@ -73,6 +73,7 @@ export const WorkflowInputsView = ({ entityId, trsId }: Props): JSX.Element => {
                 activeStep={activeStep}
                 configuredInput={configuredInput}
                 configuredSteps={configuredSteps}
+                initialDataSourceView={initialDataSourceView}
                 onConfigure={onConfigure}
                 onContinue={onContinue}
                 onEdit={onEdit}

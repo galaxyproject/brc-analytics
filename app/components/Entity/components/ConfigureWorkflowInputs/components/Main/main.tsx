@@ -18,7 +18,6 @@ export const Main = ({
   activeStep,
   configuredInput,
   configuredSteps,
-  genome,
   initialDataSourceView,
   onConfigure,
   onContinue,
@@ -48,7 +47,6 @@ export const Main = ({
           activeStep={activeStep}
           configuredInput={configuredInput}
           configuredSteps={configuredSteps}
-          genome={genome}
           initialDataSourceView={initialDataSourceView}
           onConfigure={onConfigure}
           onContinue={onContinue}

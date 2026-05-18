@@ -15,7 +15,6 @@ export interface Props {
   activeStep: number;
   configuredInput: ConfiguredInput;
   configuredSteps: StepConfig[];
-  genome?: Assembly;
   initialDataSourceView?: VIEW;
   onConfigure: OnConfigure;
   onContinue: OnContinue;
