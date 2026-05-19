@@ -44,6 +44,17 @@ class Settings:
         self.CORS_ORIGINS: List[str] = os.getenv(
             "CORS_ORIGINS", "http://localhost:3000"
         ).split(",")
+        # Reject CORS wildcards outside local/dev. With unauthenticated
+        # endpoints, allow_origins=* lets any site initiate chats from a
+        # victim's IP. ENVIRONMENT marks the deployment stage; "local",
+        # "dev", and "development" tolerate wildcards for ergonomics.
+        if any(o.strip() == "*" for o in self.CORS_ORIGINS):
+            env = os.getenv("ENVIRONMENT", "development").lower()
+            if env not in ("local", "dev", "development"):
+                raise ValueError(
+                    f"CORS_ORIGINS=* is not allowed in ENVIRONMENT={env!r}; "
+                    "set explicit origins instead."
+                )
 
         # Sentry
         self.SENTRY_DSN: str = os.getenv("SENTRY_DSN", "")
@@ -57,6 +68,22 @@ class Settings:
         # Rate limiting
         self.RATE_LIMIT_REQUESTS: int = int(os.getenv("RATE_LIMIT_REQUESTS", "100"))
         self.RATE_LIMIT_WINDOW: int = int(os.getenv("RATE_LIMIT_WINDOW", "60"))
+
+        # Trust X-Forwarded-For for client identification (rate limiting,
+        # etc.). Only enable when behind a proxy that strips/rewrites the
+        # header itself -- otherwise clients can spoof IPs.
+        self.TRUST_PROXY_HEADERS: bool = os.getenv(
+            "TRUST_PROXY_HEADERS", "false"
+        ).lower() in ("1", "true", "yes")
+
+        # Assistant session cookie. When SESSION_COOKIE_SECRET is set, /chat
+        # issues an httpOnly Same-Site=Strict cookie binding the session_id
+        # to the browser; GET/DELETE /session endpoints require the cookie.
+        # Empty secret = legacy unbound mode (any caller with the session_id
+        # can read/delete) -- fine for local dev, must be set in prod.
+        self.SESSION_COOKIE_SECRET: str = os.getenv("SESSION_COOKIE_SECRET", "")
+        self.SESSION_COOKIE_NAME: str = "brc_assistant_session"
+        self.SESSION_COOKIE_TTL: int = 7200  # match SESSION_TTL in session_service
 
         # Catalog path
         self.CATALOG_PATH: str = os.getenv("CATALOG_PATH", "/catalog/output")
