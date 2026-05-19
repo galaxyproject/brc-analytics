@@ -1,14 +1,17 @@
 import { ALERT_PROPS } from "@databiosphere/findable-ui/lib/components/common/Alert/constants";
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/components/FluidPaper/fluidPaper";
-import { DetailViewTable } from "@databiosphere/findable-ui/lib/components/Detail/components/DetailViewTable/detailViewTable";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Alert } from "@mui/material";
+import { RowData } from "@tanstack/react-table";
 import { JSX } from "react";
 import WORKFLOW_CATEGORIES from "../../../../../catalog/output/workflows.json";
 import { ROUTES } from "../../../../../routes/constants";
+import { Table } from "../../../../components/common/Table/table";
 import { Accordion } from "../../../AnalyzeWorkflowsView/components/Main/components/Accordion/accordion";
 import { EmptyState } from "./components/EmptyState/emptyState";
 import { StyledSectionTitle } from "./main.styles";
+import { useTable } from "./table/hooks/UseTable/hook";
+import { StyledFluidPaper } from "./table/table.styles";
 import type { Props } from "./types";
 import { buildOrganismWorkflows } from "./utils";
 
@@ -18,14 +21,15 @@ import { buildOrganismWorkflows } from "./utils";
  * @param props - Component props.
  * @param props.entityId - Organism entity ID.
  * @param props.organism - Organism.
- * @param props.tableProps - Props for the assemblies DetailViewTable.
+ * @param props.tableOptions - Options for the assemblies table.
  * @returns A JSX element with the organism detail main content.
  */
-export const Main = ({
+export const Main = <T extends RowData>({
   entityId,
   organism,
-  tableProps,
-}: Props): JSX.Element => {
+  tableOptions,
+}: Props<T>): JSX.Element => {
+  const table = useTable<T>(tableOptions);
   const workflowCategories = buildOrganismWorkflows(
     organism,
     WORKFLOW_CATEGORIES
@@ -63,7 +67,15 @@ export const Main = ({
       <Alert component={FluidPaper} {...ALERT_PROPS.STANDARD_INFO}>
         Perform an analysis in the context of an assembly.
       </Alert>
-      <DetailViewTable {...tableProps} />
+      {table.getRowCount() === 0 ? (
+        <EmptyState>
+          No assemblies are associated with this organism in the catalog.
+        </EmptyState>
+      ) : (
+        <StyledFluidPaper elevation={0}>
+          <Table table={table} />
+        </StyledFluidPaper>
+      )}
     </>
   );
 };
