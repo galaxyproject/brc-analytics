@@ -82,6 +82,11 @@ function buildSpeciesWarnings(
     speciesInfo ?? {};
   if (!ncbiTaxonomyId || !taxonomicLevelSpecies) return [];
 
+  // For organism-scoped workflows speciesTaxonomyId is undefined; fall back to
+  // ncbiTaxonomyId so descendant rows whose tax_lineage contains the selected
+  // organism's taxonomy ID are not flagged as mismatches.
+  const lineageId = speciesTaxonomyId ?? ncbiTaxonomyId;
+
   // Build a set of unmatched values.
   const unmatchedSet = new Set();
   for (const { original } of rows) {
@@ -92,11 +97,8 @@ function buildSpeciesWarnings(
     } = original;
     // Compare the row value to the expected value.
     if (tax_id === ncbiTaxonomyId) continue;
-    // speciesTaxonomyId is only available for assemblies (species vs strain level);
-    // for organisms, only the ncbiTaxonomyId check above applies.
     if (speciesTaxonomyId && tax_id === speciesTaxonomyId) continue;
-    if (speciesTaxonomyId && tax_lineage.split(";").includes(speciesTaxonomyId))
-      continue;
+    if (tax_lineage.split(";").includes(lineageId)) continue;
 
     // Add the unmatched value to the set.
     unmatchedSet.add(`${tax_id} (${scientific_name})`);
