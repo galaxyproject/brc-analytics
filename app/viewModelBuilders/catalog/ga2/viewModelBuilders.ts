@@ -67,9 +67,9 @@ export const buildOrganismImageThumbnail = (
 };
 
 /**
- * Build props for the genomes table for the given organism.
- * @param entity - Entity.
- * @returns props to be used for the table.
+ * Build table options (columns, data, initial state) for the genomes table for the given organism.
+ * @param entity - Organism entity with genomes to be displayed in the table.
+ * @returns table options.
  */
 export function buildOrganismGenomesTable(
   entity: GA2OrganismEntity

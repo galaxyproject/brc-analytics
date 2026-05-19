@@ -816,7 +816,7 @@ export const buildOrganismViewMain = (
 };
 
 /**
- * Build props for the genomes table for the given organism.
+ * Build table options (columns, data, initial state) for the genomes table for the given organism.
  * @param organism - Organism entity with genomes to be displayed in the table.
  * @returns table options.
  */
