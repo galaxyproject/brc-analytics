@@ -88,41 +88,33 @@ describe("buildSteps - scope handling", () => {
   });
 
   describe("ORGANISM scope", () => {
-    test("returns empty array for ORGANISM scope workflow", () => {
+    test("returns sequencing steps for ORGANISM scope workflow with read parameters", () => {
       const workflow: Workflow = {
         ...BASE_WORKFLOW,
+        parameters: [
+          {
+            key: "Sequenced paired-end data",
+            variable: WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_PAIRED,
+          },
+        ],
         scope: WORKFLOW_SCOPE.ORGANISM,
       };
 
-      // Suppress console.warn for this test
-      const warnSpy = jest.spyOn(console, "warn").mockImplementation();
+      const steps = buildSteps(workflow);
+
+      expect(steps.map((s) => s.key)).toEqual(["SANGER_READ_RUN_PAIRED"]);
+    });
+
+    test("returns empty steps for ORGANISM scope workflow with no read parameters", () => {
+      const workflow: Workflow = {
+        ...BASE_WORKFLOW,
+        parameters: [],
+        scope: WORKFLOW_SCOPE.ORGANISM,
+      };
 
       const steps = buildSteps(workflow);
 
       expect(steps).toEqual([]);
-      expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining("ORGANISM scope workflows not yet implemented")
-      );
-
-      warnSpy.mockRestore();
-    });
-
-    test("logs warning with workflow name for ORGANISM scope", () => {
-      const workflow: Workflow = {
-        ...BASE_WORKFLOW,
-        scope: WORKFLOW_SCOPE.ORGANISM,
-        workflowName: "My Organism Workflow",
-      };
-
-      const warnSpy = jest.spyOn(console, "warn").mockImplementation();
-
-      buildSteps(workflow);
-
-      expect(warnSpy).toHaveBeenCalledWith(
-        "ORGANISM scope workflows not yet implemented for workflow: My Organism Workflow"
-      );
-
-      warnSpy.mockRestore();
     });
   });
 
