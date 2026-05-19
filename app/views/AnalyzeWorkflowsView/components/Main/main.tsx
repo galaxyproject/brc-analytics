@@ -24,8 +24,6 @@ export const Main = ({ assembly, entityId }: Props): JSX.Element => {
           <Accordion
             disabled={workflowCategory.workflows.length === 0}
             entityId={entityId as string}
-            geneModelUrl={assembly.geneModelUrl}
-            genomeVersionAssemblyId={assembly.accession}
             key={workflowCategory.category}
             workflowCategory={workflowCategory}
             workflows={workflowCategory.workflows}

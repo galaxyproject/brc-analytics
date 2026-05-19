@@ -5,9 +5,8 @@ import {
 } from "../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
 
 export interface Props extends Pick<AccordionProps, "disabled"> {
+  configureRoute?: string;
   entityId: string;
-  geneModelUrl: string | null;
-  genomeVersionAssemblyId: string;
   workflowCategory: WorkflowCategory;
   workflows: Workflow[];
 }

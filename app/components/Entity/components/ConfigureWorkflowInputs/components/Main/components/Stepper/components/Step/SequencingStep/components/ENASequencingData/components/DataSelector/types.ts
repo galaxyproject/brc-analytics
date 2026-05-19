@@ -6,7 +6,6 @@ export interface Props {
   onContinue: () => void;
   onOpen: () => void;
   selectedCount: number;
-  taxonomicLevelSpecies?: string;
   taxonomyCount?: number;
   taxonomyMatches: number;
 }

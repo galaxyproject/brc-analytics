@@ -4,7 +4,7 @@ import {
   BackPageHero,
   BackPageView,
 } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
-import { JSX } from "react";
+import { JSX, useMemo } from "react";
 import { VIEW } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ToggleButtonGroup/types";
 import { StepConfig } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { useStepper } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/hook";
@@ -14,6 +14,9 @@ import { augmentConfiguredSteps } from "../../components/Entity/components/Confi
 import { Main } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/main";
 import { SideColumn } from "../../components/Entity/components/ConfigureWorkflowInputs/components/SideColumn/sideColumn";
 import { Top } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Top/top";
+import { AssemblyContext } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/context";
+import { WorkflowEntityContext } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
+import { buildWorkflowEntityValue } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/utils";
 import { getAssembly, getWorkflow } from "../../services/workflows/entities";
 import { useAssistantHandoff } from "./hooks/UseAssistantHandoff/useAssistantHandoff";
 import { useConfigureInputs } from "./hooks/UseConfigureInputs/useConfigureInputs";
@@ -52,40 +55,47 @@ export const WorkflowInputsView = ({ entityId, trsId }: Props): JSX.Element => {
   );
   const { hasSidePanel } = configuredSteps[activeStep] || {};
 
+  const workflowEntityValue = useMemo(
+    () => buildWorkflowEntityValue(genome),
+    [genome]
+  );
+
   return (
-    <BackPageView>
-      <BackPageHero>
-        <Top entityId={entityId} genome={genome} workflow={workflow} />
-      </BackPageHero>
-      <BackPageContent>
-        <StyledBackPageContentMainColumn hasSidePanel={hasSidePanel}>
-          <Main
-            activeStep={activeStep}
-            configuredInput={configuredInput}
-            configuredSteps={configuredSteps}
-            genome={genome}
-            initialDataSourceView={initialDataSourceView}
-            onConfigure={onConfigure}
-            onContinue={onContinue}
-            onEdit={onEdit}
-            workflow={workflow}
-          />
-        </StyledBackPageContentMainColumn>
-        {!hasSidePanel && (
-          <BackPageContentSideColumn>
-            <SideColumn
-              configuredInput={configuredInput}
-              configuredSteps={augmentConfiguredSteps(
-                configuredSteps,
-                configuredInput,
-                SEQUENCING_STEPS
-              )}
-              genome={genome}
-              workflow={workflow}
-            />
-          </BackPageContentSideColumn>
-        )}
-      </BackPageContent>
-    </BackPageView>
+    <WorkflowEntityContext.Provider value={workflowEntityValue}>
+      <AssemblyContext.Provider value={genome}>
+        <BackPageView>
+          <BackPageHero>
+            <Top entityId={entityId} genome={genome} workflow={workflow} />
+          </BackPageHero>
+          <BackPageContent>
+            <StyledBackPageContentMainColumn hasSidePanel={hasSidePanel}>
+              <Main
+                activeStep={activeStep}
+                configuredInput={configuredInput}
+                configuredSteps={configuredSteps}
+                initialDataSourceView={initialDataSourceView}
+                onConfigure={onConfigure}
+                onContinue={onContinue}
+                onEdit={onEdit}
+                workflow={workflow}
+              />
+            </StyledBackPageContentMainColumn>
+            {!hasSidePanel && (
+              <BackPageContentSideColumn>
+                <SideColumn
+                  configuredInput={configuredInput}
+                  configuredSteps={augmentConfiguredSteps(
+                    configuredSteps,
+                    configuredInput,
+                    SEQUENCING_STEPS
+                  )}
+                  workflow={workflow}
+                />
+              </BackPageContentSideColumn>
+            )}
+          </BackPageContent>
+        </BackPageView>
+      </AssemblyContext.Provider>
+    </WorkflowEntityContext.Provider>
   );
 };

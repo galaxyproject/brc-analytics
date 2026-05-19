@@ -19,6 +19,7 @@ interface Params extends ParsedUrlQuery {
 
 export interface Props {
   entityId: string;
+  entityListType: string;
   pageDescription?: string;
   pageTitle?: string;
 }
@@ -29,7 +30,7 @@ export const getStaticPaths: GetStaticPaths<Params> = async () => {
   for (const entityConfig of config().entities) {
     const { route: entityListType } = entityConfig;
 
-    // Only statically generate paths for each assembly.
+    // Only statically generate paths for assemblies.
     if (entityListType !== "assemblies") continue;
 
     await seedDatabase(entityListType, entityConfig);
@@ -51,14 +52,17 @@ export const getStaticPaths: GetStaticPaths<Params> = async () => {
 export const getStaticProps: GetStaticProps<Props> = async ({
   params,
 }: GetStaticPropsContext) => {
-  const { entityId } = params as Params;
+  const { entityId, entityListType } = params as Params;
 
-  if (!entityId) return { notFound: true };
+  if (!entityId || !entityListType) return { notFound: true };
+
+  const pageMeta = getPageMeta(config().appKey).ANALYZE_WORKFLOWS;
 
   return {
     props: {
       entityId,
-      ...getPageMeta(config().appKey).ANALYZE_WORKFLOWS,
+      entityListType,
+      ...pageMeta,
     },
   };
 };
