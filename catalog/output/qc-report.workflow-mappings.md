@@ -33,10 +33,13 @@ None
 | Genome annotation with Braker3 | 4475 |
 | Bacterial Genome Annotation | 393 |
 | lncRNAs annotation workflow | 4475 |
+| Genome assembly with Flye | 5499 |
+| Bacterial Genome Assembly using Shovill | 398 |
+| Assembly polishing with long reads | 5499 |
 | CAPHEINE: Combined HyPhy Core and Compare | 624 |
 
 ## Summary Statistics
 
-- Total active workflows: 26
-- Workflows with ≥1 compatible assembly: 26
+- Total active workflows: 29
+- Workflows with ≥1 compatible assembly: 29
 - Workflows with 0 compatible assemblies: 0

@@ -83,7 +83,7 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/ploidy-aware-genotype-calling/main/versions/v0.1.1",
+        "trsId": "#workflow/github.com/iwc-workflows/ploidy-aware-genotype-calling/main/versions/v0.1.2",
         "workflowDescription": "This workflow performs variant and genotype calling on whole-genome paired-end sequencing data from organisms of any ploidy to produce annotated VCF and TSV files",
         "workflowName": "Paired end variant and ploidy-aware genotype calling"
       },
@@ -124,7 +124,7 @@
         "ploidy": "HAPLOID",
         "scope": "ASSEMBLY",
         "taxonomyId": "694009",
-        "trsId": "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-variant-calling/COVID-19-PE-ARTIC-ILLUMINA/versions/v0.5.4",
+        "trsId": "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-variant-calling/COVID-19-PE-ARTIC-ILLUMINA/versions/v0.5.5",
         "workflowDescription": "The workflow for Illumina-sequenced ARTIC data builds on the RNASeq workflow for paired-end data using the same steps for mapping and variant calling, but adds extra logic for trimming ARTIC primer sequences off reads with the ivar package. In addition, this workflow uses ivar also to identify amplicons affected by ARTIC primer-binding site mutations and tries to exclude reads derived from such tainted amplicons when calculating allele-frequencies of other variants.",
         "workflowName": "COVID-19: variation analysis on ARTIC PE data"
       },
@@ -700,7 +700,52 @@
     "description": "Assemble prokaryotic and eukaryotic genomes sequenced with a variety of technologies.",
     "name": "Assembly",
     "showComingSoon": false,
-    "workflows": []
+    "workflows": [
+      {
+        "iwcId": "assembly-with-flye-main",
+        "parameters": [
+          {
+            "key": "Input sequence reads",
+            "variable": "SANGER_READ_RUN_SINGLE"
+          }
+        ],
+        "ploidy": "ANY",
+        "scope": "ORGANISM",
+        "taxonomyId": null,
+        "trsId": "#workflow/github.com/iwc-workflows/assembly-with-flye/main/versions/v0.4",
+        "workflowDescription": "Assemble long reads with Flye, then view assembly statistics and assembly graph",
+        "workflowName": "Genome assembly with Flye"
+      },
+      {
+        "iwcId": "bacterial-genome-assembly-main",
+        "parameters": [],
+        "ploidy": "ANY",
+        "scope": "ORGANISM",
+        "taxonomyId": "2",
+        "trsId": "#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v2.0.1",
+        "workflowDescription": "Assembly of bacterial paired-end short read data",
+        "workflowName": "Bacterial Genome Assembly using Shovill"
+      },
+      {
+        "iwcId": "polish-with-long-reads-main",
+        "parameters": [
+          {
+            "key": "Assembly to be polished",
+            "variable": "ASSEMBLY_FASTA_URL"
+          },
+          {
+            "key": "long reads",
+            "variable": "SANGER_READ_RUN_SINGLE"
+          }
+        ],
+        "ploidy": "ANY",
+        "scope": "ASSEMBLY",
+        "taxonomyId": null,
+        "trsId": "#workflow/github.com/iwc-workflows/polish-with-long-reads/main/versions/v0.1",
+        "workflowDescription": "Racon polish with long reads, x4",
+        "workflowName": "Assembly polishing with long reads"
+      }
+    ]
   },
   {
     "category": "PROTEIN_FOLDING",
