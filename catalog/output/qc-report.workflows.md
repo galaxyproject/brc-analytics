@@ -4,10 +4,7 @@
 
 > **Note:** This section shows workflows added to workflows.yml in this script run. On subsequent runs, these will no longer appear here. Commit or save this report if you need to track what was added.
 
-- CAPHEINE: Combined HyPhy Core and Compare (COMPARATIVE_GENOMICS)
-- HyPhy: Compare (COMPARATIVE_GENOMICS)
-- HyPhy: Core (COMPARATIVE_GENOMICS)
-- HyPhy: Preprocessing  (COMPARATIVE_GENOMICS)
+None
 
 ## Active workflows with version not on Dockstore
 
@@ -37,12 +34,7 @@ None
 
 > **Note:** New parameters are added to workflows.yml on each run. On subsequent runs, they will no longer appear as 'new' even if stale parameters haven't been addressed yet. If you see both stale and new params for a workflow, commit or save this report before re-running so you don't lose the pairing info (useful for identifying renames).
 
-### #workflow/github.com/iwc-workflows/atacseq/main (ACTIVE)
-
-**Stale (not in IWC, kept for review):**
-- bin_size
-- effective_genome_size
-- reference_genome
+None
 
 ## Inactive workflows in workflows.yml
 
@@ -121,13 +113,6 @@ None
 - genome name
 - Juicer Medium Tabix with validPairs
 - Interactions to consider to calculate weights in normalization step
-
-### CAPHEINE: Combined HyPhy Core and Compare - COMPARATIVE_GENOMICS (4 parameters)
-
-- reference cds
-- unaligned sequences
-- foreground regexp (optional)
-- foreground list (optional)
 
 ### Generic variation analysis reporting - VARIANT_CALLING (4 parameters)
 
