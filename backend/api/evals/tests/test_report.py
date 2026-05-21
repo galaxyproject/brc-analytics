@@ -31,8 +31,8 @@ def test_render_report_basic():
     assert "search_interpretation" in md
     assert "claude-sonnet-4-6" in md
     assert "yeast_rnaseq_2023" in md
-    # Failure declared FieldEquals: total = 2 cases + 1 failure, score 1/3
-    assert "1/3" in md
+    # Failure declared FieldEquals: total = 2 cases + 1 failure, score 1.0/3
+    assert "1.0/3" in md
 
 
 def test_failure_only_counts_for_declared_evaluators():
@@ -78,7 +78,7 @@ def test_failure_only_evaluators_still_render_summary_columns():
     md = render_report(runs, sha="abc123")
 
     assert "| Model | FieldEquals | LLMJudge | n | duration |" in md
-    assert "| m | 0/1 (0.00) | 0/1 (0.00) | 1 | 1.0s |" in md
+    assert "| m | 0.0/1 (0.00) | 0.0/1 (0.00) | 1 | 1.0s |" in md
 
 
 def test_duplicate_evaluator_failures_count_by_suffixed_name():

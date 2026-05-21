@@ -59,7 +59,9 @@ class RunResult:
 def _fmt_score(s: float, n: int) -> str:
     if n == 0:
         return "n/a"
-    return f"{int(round(s * n))}/{n} ({s:.2f})"
+    # Don't round to an integer -- fractional evaluators (keyword-fraction,
+    # continuous judge scores) would lose precision and read as a fake count.
+    return f"{s * n:.1f}/{n} ({s:.2f})"
 
 
 def render_report(runs: list[RunResult], sha: str) -> str:
