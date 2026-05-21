@@ -15,6 +15,7 @@ from typing import Any, Callable, Optional
 
 from app.core.cache import CacheService
 from app.core.config import Settings, get_settings
+from app.models.llm import WorkflowSuggestionRequest
 from app.services.assistant_agent import AssistantAgent
 from app.services.llm_service import LLMService
 from app.services.tools.catalog_data import CatalogData
@@ -170,10 +171,10 @@ def make_search_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
 
     async def task(case_input: dict) -> SearchOutput:
         resp = await svc.interpret_search_query(case_input["query"])
-        # LLMService returns success=False with low-confidence data for
-        # INVALID_QUERY (gibberish, off-topic). Surface that as a SearchOutput
-        # so evaluators can score "did the model correctly reject this?"
-        # rather than the harness counting it as a structural failure.
+        # For INVALID_QUERY (gibberish, off-topic) LLMService returns success=False
+        # but still populates data with low-confidence values. Pass that through so
+        # evaluators can score "did the model correctly reject this?" -- only treat
+        # a truly empty data payload as a structural failure.
         if resp.data is None:
             raise RuntimeError(resp.error or "LLMService returned failure")
         d = resp.data
@@ -193,8 +194,6 @@ def make_search_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
 
 
 def make_workflow_rec_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
-    from app.models.llm import WorkflowSuggestionRequest
-
     svc = LLMService(deps.cache)
     if not svc.is_available():
         raise RuntimeError("LLMService failed to initialize -- check AI_API_KEY in env")
