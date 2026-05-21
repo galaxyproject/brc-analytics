@@ -1,5 +1,8 @@
 """Tests for judge / model construction."""
 
+from pydantic_ai.models.anthropic import AnthropicModel
+from pydantic_ai.models.openai import OpenAIChatModel
+
 from evals.judge import build_pydantic_ai_model
 from evals.model_registry import ModelEntry
 
@@ -13,8 +16,6 @@ def test_anthropic_model():
         api_key="sk-fake",
     )
     model = build_pydantic_ai_model(entry)
-    from pydantic_ai.models.anthropic import AnthropicModel
-
     assert isinstance(model, AnthropicModel)
 
 
@@ -27,6 +28,4 @@ def test_openai_compatible_model():
         api_key="sk-fake",
     )
     model = build_pydantic_ai_model(entry)
-    from pydantic_ai.models.openai import OpenAIChatModel
-
     assert isinstance(model, OpenAIChatModel)

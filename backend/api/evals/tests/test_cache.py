@@ -2,7 +2,7 @@
 
 import pytest
 
-from evals.tasks import _InMemoryCache
+from evals.tasks import EvalDeps, _InMemoryCache
 
 
 @pytest.mark.asyncio
@@ -40,8 +40,6 @@ async def test_with_fresh_cache_isolates_runs():
     """Cross-model isolation: with_fresh_cache() must hand back a deps with an
     empty cache so LLMService's content-keyed entries can't leak between
     (dataset, model) runs. Settings/catalog should be reused."""
-    from evals.tasks import EvalDeps, _InMemoryCache
-
     cache = _InMemoryCache()
     await cache.set("llm:interpret:abc", {"taxonomy_id": "4932"})
 
