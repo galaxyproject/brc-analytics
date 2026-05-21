@@ -660,7 +660,10 @@ class AssistantAgent:
                     for wf in cat.get("workflows", []):
                         iwc_id = wf.get("iwcId")
                         if iwc_id and iwc_id in workflow_value:
-                            field.detail = wf.get("trsId", iwc_id)
+                            # `.get("trsId", iwc_id)` would keep a None trsId;
+                            # _condense_workflow stores trsId as None when
+                            # absent, so default to iwc_id on falsy values.
+                            field.detail = wf.get("trsId") or iwc_id
                             break
                     if field.detail:
                         break
@@ -723,6 +726,8 @@ class AssistantAgent:
                 wf_name = (wf.get("workflowName") or "").lower()
                 if wf_name and (wf_name in val_lower or val_lower in wf_name):
                     logger.info("Workflow fallback matched name '%s'", wf_name)
-                    return wf.get("trsId", wf.get("iwcId"))
+                    # `or` (not `get(..., default)`) so a None trsId still
+                    # falls back to iwcId -- see _condense_workflow.
+                    return wf.get("trsId") or wf.get("iwcId")
         logger.warning("Workflow fallback found no match for '%s'", value)
         return None
