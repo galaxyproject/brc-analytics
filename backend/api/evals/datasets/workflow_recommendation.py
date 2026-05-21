@@ -20,9 +20,10 @@ class IwcIdInSet(Evaluator):
     accepted: list[str] = field(default_factory=list)
 
     def evaluate(self, ctx: EvaluatorContext) -> float:
+        meta = ctx.metadata or {}
         accepted = {
             a.lower()
-            for a in (self.accepted or ctx.metadata.get("accepted_iwc_ids", []))
+            for a in (self.accepted or meta.get("accepted_iwc_ids", []))
         }
         if not accepted:
             return 0.0

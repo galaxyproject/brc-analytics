@@ -20,7 +20,8 @@ class FinalSchemaContains(Evaluator):
     expected: dict[str, str] = field(default_factory=dict)
 
     def evaluate(self, ctx: EvaluatorContext) -> float:
-        expected = self.expected or ctx.metadata.get("expected_schema", {})
+        meta = ctx.metadata or {}
+        expected = self.expected or meta.get("expected_schema", {})
         if not expected:
             return 0.0
         schema = ctx.output.final_schema or {}
