@@ -44,11 +44,13 @@ const FIELD_ORDER: (keyof AnalysisSchema)[] = [
   ...OPTIONAL_FIELDS,
 ];
 
-const EMPTY_FIELD: SchemaFieldState = {
+// Frozen so the shared reference across PLACEHOLDER_SCHEMA fields can't
+// be mutated through any one key.
+const EMPTY_FIELD: SchemaFieldState = Object.freeze({
   detail: null,
   status: "empty",
   value: null,
-};
+});
 
 const PLACEHOLDER_SCHEMA: AnalysisSchema = {
   analysis_type: EMPTY_FIELD,
