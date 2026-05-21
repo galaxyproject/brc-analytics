@@ -64,6 +64,17 @@ def _fmt_score(s: float, n: int) -> str:
     return f"{s * n:.1f}/{n} ({s:.2f})"
 
 
+def _case_cell(run: RunResult, case_name: str) -> str:
+    """Render one cell of the per-case detail table for a (run, case)."""
+    failure = next((msg for n, msg, _ in run.failures if n == case_name), None)
+    if failure:
+        return f"FAIL: {failure[:30]}"
+    case = next((c for c in run.cases if c.name == case_name), None)
+    if case is None:
+        return "-"
+    return f"{run.case_avg(case):.2f}"
+
+
 def render_report(runs: list[RunResult], sha: str) -> str:
     by_dataset: dict[str, list[RunResult]] = defaultdict(list)
     for r in runs:
@@ -111,31 +122,21 @@ def render_report(runs: list[RunResult], sha: str) -> str:
             "<details><summary>Per-case detail (average across evaluators)</summary>"
         )
         out.append("")
-        # Use a set union so cases that pass for one model and fail for another
-        # are listed only once.
+        # Set-union so cases that pass for one model and fail for another are
+        # listed only once.
         case_names = sorted(
             {c.name for r in ds_runs for c in r.cases}
             | {n for r in ds_runs for n, _, _ in r.failures}
         )
-        models = sorted({r.model for r in ds_runs})
+        runs_by_model = {r.model: r for r in ds_runs}
+        models = sorted(runs_by_model)
         out.append("| Case | " + " | ".join(models) + " |")
         out.append("|" + "---|" * (len(models) + 1))
         for case in case_names:
             row = [case]
             for m in models:
-                run = next((r for r in ds_runs if r.model == m), None)
-                cell = "-"
-                if run:
-                    failure = next(
-                        (msg for n, msg, _ in run.failures if n == case), None
-                    )
-                    if failure:
-                        cell = f"FAIL: {failure[:30]}"
-                    else:
-                        c = next((c for c in run.cases if c.name == case), None)
-                        if c is not None:
-                            cell = f"{run.case_avg(c):.2f}"
-                row.append(cell)
+                run = runs_by_model.get(m)
+                row.append(_case_cell(run, case) if run else "-")
             out.append("| " + " | ".join(row) + " |")
         out.append("")
         out.append("</details>")
