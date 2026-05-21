@@ -80,6 +80,9 @@ For gibberish queries, a low confidence (<= 0.3) is the correct interpretation.\
 """
 
 
+_FIELD_EQUALS_FIELDS = ("taxonomy_id", "library_strategy", "sequencing_platform")
+
+
 def build(
     deps: EvalDeps, entry: ModelEntry, judge_model: Model, only: list[str] | None = None
 ) -> tuple[Dataset, Callable, str]:
@@ -87,24 +90,11 @@ def build(
     for c in _CASES:
         if only and c["name"] not in only:
             continue
-        evaluators = []
-        if "expected_taxonomy_id" in c:
-            evaluators.append(
-                FieldEquals(field="taxonomy_id", expected=c["expected_taxonomy_id"])
-            )
-        if "expected_library_strategy" in c:
-            evaluators.append(
-                FieldEquals(
-                    field="library_strategy", expected=c["expected_library_strategy"]
-                )
-            )
-        if "expected_sequencing_platform" in c:
-            evaluators.append(
-                FieldEquals(
-                    field="sequencing_platform",
-                    expected=c["expected_sequencing_platform"],
-                )
-            )
+        evaluators = [
+            FieldEquals(field=name, expected=c[f"expected_{name}"])
+            for name in _FIELD_EQUALS_FIELDS
+            if f"expected_{name}" in c
+        ]
         if c.get("expected_low_confidence"):
             evaluators.append(LowConfidence(threshold=0.3))
         evaluators.append(
