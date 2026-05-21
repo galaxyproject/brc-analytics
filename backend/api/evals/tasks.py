@@ -119,7 +119,9 @@ class _InMemoryCache:
 
     def make_key(self, prefix: str, params: Any) -> str:
         param_str = json.dumps(params, sort_keys=True, default=str)
-        hash_val = hashlib.md5(param_str.encode()).hexdigest()[:16]
+        hash_val = hashlib.md5(
+            param_str.encode(), usedforsecurity=False
+        ).hexdigest()[:16]
         return f"{prefix}:{hash_val}"
 
 
