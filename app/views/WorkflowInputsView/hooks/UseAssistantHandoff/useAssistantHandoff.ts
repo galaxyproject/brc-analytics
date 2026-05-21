@@ -28,7 +28,12 @@ function readAndConsumeHandoff(): AssistantHandoff | null {
       return cachedHandoff;
     }
     // No fresh handoff: fall back to whatever the previous read produced so
-    // the strict-mode remount sees the same value as the first mount.
+    // the strict-mode remount sees the same value as the first mount. Still
+    // honor MAX_AGE_MS -- the module cache survives navigations, so without
+    // re-checking we could replay an expired handoff later in the tab.
+    if (cachedHandoff && Date.now() - cachedHandoff.timestamp > MAX_AGE_MS) {
+      cachedHandoff = null;
+    }
     return cachedHandoff ?? null;
   } catch {
     cachedHandoff = null;
