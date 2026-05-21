@@ -160,14 +160,21 @@ def _override_model(svc: Any, entry: ModelEntry) -> None:
         svc.agent._model = new_model
 
 
+def _prepare_service(svc: Any, entry: ModelEntry) -> None:
+    """Verify the service initialized and swap in the eval-target model."""
+    if not svc.is_available():
+        raise RuntimeError(
+            f"{type(svc).__name__} failed to initialize -- check AI_API_KEY in env"
+        )
+    _override_model(svc, entry)
+
+
 # ---------- Search query interpretation ----------
 
 
 def make_search_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
     svc = LLMService(deps.cache)
-    if not svc.is_available():
-        raise RuntimeError("LLMService failed to initialize -- check AI_API_KEY in env")
-    _override_model(svc, entry)
+    _prepare_service(svc, entry)
 
     async def task(case_input: dict) -> SearchOutput:
         resp = await svc.interpret_search_query(case_input["query"])
@@ -195,9 +202,7 @@ def make_search_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
 
 def make_workflow_rec_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
     svc = LLMService(deps.cache)
-    if not svc.is_available():
-        raise RuntimeError("LLMService failed to initialize -- check AI_API_KEY in env")
-    _override_model(svc, entry)
+    _prepare_service(svc, entry)
 
     async def task(case_input: dict) -> WorkflowRecOutput:
         req = WorkflowSuggestionRequest(**case_input)
@@ -236,11 +241,7 @@ def _extract_tool_calls(result: Any) -> list[tuple[str, dict]]:
 def make_assistant_turn_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
     """Single-turn assistant: takes a user message, returns reply + tool calls."""
     aa = AssistantAgent(deps.cache)
-    if not aa.is_available():
-        raise RuntimeError(
-            "AssistantAgent failed to initialize -- check AI_API_KEY in env"
-        )
-    _override_model(aa, entry)
+    _prepare_service(aa, entry)
 
     async def task(case_input: dict) -> AgentTurnOutput:
         agent_deps = AssistantDeps(catalog=aa.catalog)
@@ -266,11 +267,7 @@ def make_assistant_turn_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
 def make_assistant_conversation_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
     """Replay a scripted conversation and report the final accumulated state."""
     aa = AssistantAgent(deps.cache)
-    if not aa.is_available():
-        raise RuntimeError(
-            "AssistantAgent failed to initialize -- check AI_API_KEY in env"
-        )
-    _override_model(aa, entry)
+    _prepare_service(aa, entry)
 
     async def task(case_input: dict) -> ConversationOutput:
         session_id: Optional[str] = None
