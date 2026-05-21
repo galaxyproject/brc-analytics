@@ -24,3 +24,6 @@ venv
 
 # claude code config
 .claude
+
+# playwright mcp debug output
+.playwright-mcp
