@@ -13,6 +13,8 @@ import os
 from dataclasses import dataclass, field
 from typing import Any, Callable, Optional
 
+from pydantic_ai.messages import ModelResponse, ToolCallPart
+
 from app.core.cache import CacheService
 from app.core.config import Settings, get_settings
 from app.models.llm import WorkflowSuggestionRequest
@@ -222,8 +224,6 @@ def make_workflow_rec_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
 
 def _extract_tool_calls(result: Any) -> list[tuple[str, dict]]:
     """Pull tool calls from a pydantic-ai run result."""
-    from pydantic_ai.messages import ModelResponse, ToolCallPart
-
     calls: list[tuple[str, dict]] = []
     for msg in result.all_messages():
         if not isinstance(msg, ModelResponse):
