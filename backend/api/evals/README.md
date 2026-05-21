@@ -18,7 +18,7 @@ Mirrors the Galaxy `agent-evals-harness` shape: a thin runner around
 1. `cp evals/models.yaml.sample evals/models.yaml` and fill in real keys
    (or `api_key_env` references). The `judge:` key must point at one of the
    declared models.
-2. `pip install -e ".[dev]"` from `backend/api/` to pull in `pydantic-evals`.
+2. `uv sync --extra dev` from `backend/api/` to pull in `pydantic-evals`.
 3. `export ANTHROPIC_API_KEY=...` (or whatever `api_key_env` you used).
 
 ## Running
