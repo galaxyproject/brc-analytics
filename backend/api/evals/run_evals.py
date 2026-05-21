@@ -49,6 +49,10 @@ def _strip_repeat_suffix(name: str) -> str:
     return re.sub(r"\s*\[\d+/\d+\]$", "", name)
 
 
+def _split_csv(value: str) -> list[str]:
+    return [x.strip() for x in value.split(",")]
+
+
 def _score_value(scores_obj) -> float:
     """Pull numeric value out of a pydantic-evals score dict entry."""
     if scores_obj is None:
@@ -166,14 +170,16 @@ async def _run_one(
     case_evaluators: dict[str, frozenset[str]] = {
         c.name: _declared_evaluator_names(c, dataset.evaluators) for c in dataset.cases
     }
-    failures = [
-        (
-            _strip_repeat_suffix(f.name),
-            str(f.error_message)[:200],
-            case_evaluators.get(_strip_repeat_suffix(f.name), frozenset()),
+    failures = []
+    for f in getattr(report, "failures", []):
+        case_name = _strip_repeat_suffix(f.name)
+        failures.append(
+            (
+                case_name,
+                str(f.error_message)[:200],
+                case_evaluators.get(case_name, frozenset()),
+            )
         )
-        for f in getattr(report, "failures", [])
-    ]
     return RunResult(
         dataset=dataset_name,
         model=model_name,
@@ -194,21 +200,15 @@ async def _amain(args) -> int:
     deps = build_deps(skip_env_vars=referenced)
     judge_model = build_pydantic_ai_model(registry.judge)
 
-    dataset_names = (
-        list(SPECS)
-        if args.datasets == "all"
-        else [d.strip() for d in args.datasets.split(",")]
-    )
+    dataset_names = list(SPECS) if args.datasets == "all" else _split_csv(args.datasets)
     unknown_ds = [d for d in dataset_names if d not in SPECS]
     if unknown_ds:
         raise SystemExit(f"unknown dataset(s): {unknown_ds}")
 
-    if args.models:
-        wanted = registry.filter([m.strip() for m in args.models.split(",")])
-    else:
-        wanted = registry.models
-
-    only = [s.strip() for s in args.only.split(",")] if args.only else None
+    wanted = (
+        registry.filter(_split_csv(args.models)) if args.models else registry.models
+    )
+    only = _split_csv(args.only) if args.only else None
 
     runs: list[RunResult] = []
     for dataset_name in dataset_names:
