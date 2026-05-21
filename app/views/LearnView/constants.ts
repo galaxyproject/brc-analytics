@@ -4,6 +4,7 @@ import { BookmarkStarIcon } from "./components/icon/BookmarkStarIcon/bookmarkSta
 import { GalaxyIcon } from "./components/icon/GalaxyIcon/galaxyIcon";
 import { LiveHelpIcon } from "./components/icon/LiveHelpIcon/liveHelpIcon";
 import { RocketLaunchIcon } from "./components/icon/RocketLaunchIcon/rocketLaunchIcon";
+import { SmartToyIcon } from "./components/icon/SmartToyIcon/smartToyIcon";
 import { YouTubeIcon } from "./components/icon/YouTubeIcon/youTubeIcon";
 
 export const CARDS: ComponentProps<typeof SectionContentCard>[] = [
@@ -41,5 +42,12 @@ export const CARDS: ComponentProps<typeof SectionContentCard>[] = [
     secondaryText:
       "Watch video tutorials, walkthroughs, and presentations on BRC Analytics and Galaxy.",
     title: "YouTube Channels",
+  },
+  {
+    StartIcon: SmartToyIcon,
+    cardUrl: "/learn/mcp",
+    secondaryText:
+      "Connect AI assistants like Claude to the BRC catalog and ENA search via the Model Context Protocol.",
+    title: "MCP Server",
   },
 ];
