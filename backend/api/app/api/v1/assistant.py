@@ -48,7 +48,7 @@ def _set_session_cookie(response: Response, session_id: str) -> None:
     # (staging, prod, anything that could ever see a non-TLS hop) must
     # mark the cookie Secure so the browser refuses to send it over HTTP.
     response.set_cookie(
-        key=settings.SESSION_COOKIE_NAME,
+        key=SESSION_COOKIE_NAME,
         value=sign_session_id(session_id, settings.SESSION_COOKIE_SECRET),
         max_age=settings.SESSION_COOKIE_TTL,
         httponly=True,
