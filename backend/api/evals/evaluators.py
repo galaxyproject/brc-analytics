@@ -17,6 +17,13 @@ def _coerce_str(v: Any) -> str:
     return "" if v is None else str(v)
 
 
+def _get_field(out: Any, name: str) -> Any:
+    """Look up a field on either a dict-like or attribute-bearing output."""
+    if isinstance(out, dict):
+        return out.get(name)
+    return getattr(out, name, None)
+
+
 @dataclass
 class FieldEquals(Evaluator):
     """Check a single field on a dict-like or pydantic output equals expected."""
@@ -25,11 +32,7 @@ class FieldEquals(Evaluator):
     expected: Any | None = None
 
     def evaluate(self, ctx: EvaluatorContext) -> float:
-        out = ctx.output
-        if isinstance(out, dict):
-            actual = out.get(self.field)
-        else:
-            actual = getattr(out, self.field, None)
+        actual = _get_field(ctx.output, self.field)
         expected = self.expected
         if expected is None:
             expected = (ctx.metadata or {}).get(f"expected_{self.field}")
@@ -69,11 +72,7 @@ class LowConfidence(Evaluator):
     threshold: float = 0.3
 
     def evaluate(self, ctx: EvaluatorContext) -> float:
-        out = ctx.output
-        if isinstance(out, dict):
-            conf = out.get("confidence")
-        else:
-            conf = getattr(out, "confidence", None)
+        conf = _get_field(ctx.output, "confidence")
         if conf is None:
             return 0.0
         try:
