@@ -75,10 +75,14 @@ def _llm_judge_output_names(evaluator) -> list[str] | None:
     names: list[str] = []
     if score is not False:
         default_name = f"{evaluation_name}_score" if include_both else evaluation_name
-        names.append(score.get("evaluation_name") or default_name)
+        override = score.get("evaluation_name") if isinstance(score, dict) else None
+        names.append(override or default_name)
     if assertion is not False:
         default_name = f"{evaluation_name}_pass" if include_both else evaluation_name
-        names.append(assertion.get("evaluation_name") or default_name)
+        override = (
+            assertion.get("evaluation_name") if isinstance(assertion, dict) else None
+        )
+        names.append(override or default_name)
     return names
 
 
