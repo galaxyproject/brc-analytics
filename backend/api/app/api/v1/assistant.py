@@ -3,7 +3,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
 
-from app.core.config import get_settings
+from app.core.config import DEV_ENVIRONMENTS, get_settings
 from app.core.dependencies import check_rate_limit, get_assistant_agent
 from app.core.session_signing import sign_session_id, verify_session_id
 from app.models.assistant import (
@@ -44,17 +44,16 @@ def _set_session_cookie(response: Response, session_id: str) -> None:
     settings = get_settings()
     if not settings.SESSION_COOKIE_SECRET:
         return
-    # Only allow plain-HTTP cookies in local/dev. Anywhere else (staging,
-    # prod, anything that could ever see a non-TLS hop) must mark the
-    # cookie Secure so the browser refuses to send it over HTTP.
-    insecure_ok = settings.ENVIRONMENT.lower() in ("local", "dev", "development")
+    # Only allow plain-HTTP cookies in DEV_ENVIRONMENTS. Anywhere else
+    # (staging, prod, anything that could ever see a non-TLS hop) must
+    # mark the cookie Secure so the browser refuses to send it over HTTP.
     response.set_cookie(
         key=settings.SESSION_COOKIE_NAME,
         value=sign_session_id(session_id, settings.SESSION_COOKIE_SECRET),
         max_age=settings.SESSION_COOKIE_TTL,
         httponly=True,
         samesite="strict",
-        secure=not insecure_ok,
+        secure=settings.ENVIRONMENT.lower() not in DEV_ENVIRONMENTS,
     )
 
 

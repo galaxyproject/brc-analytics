@@ -7,6 +7,11 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+# Environment names that count as "developer machine" -- looser defaults
+# (CORS wildcards allowed, Secure cookie flag off, etc.). Anything else is
+# treated as deployed and must opt into the safe behavior.
+DEV_ENVIRONMENTS = frozenset({"local", "dev", "development"})
+
 
 class Settings:
     """Application settings loaded from environment variables."""
@@ -46,11 +51,10 @@ class Settings:
         ).split(",")
         # Reject CORS wildcards outside local/dev. With unauthenticated
         # endpoints, allow_origins=* lets any site initiate chats from a
-        # victim's IP. ENVIRONMENT marks the deployment stage; "local",
-        # "dev", and "development" tolerate wildcards for ergonomics.
+        # victim's IP. DEV_ENVIRONMENTS tolerates wildcards for ergonomics.
         if any(o.strip() == "*" for o in self.CORS_ORIGINS):
             env = os.getenv("ENVIRONMENT", "development").lower()
-            if env not in ("local", "dev", "development"):
+            if env not in DEV_ENVIRONMENTS:
                 raise ValueError(
                     f"CORS_ORIGINS=* is not allowed in ENVIRONMENT={env!r}; "
                     "set explicit origins instead."

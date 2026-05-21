@@ -385,9 +385,12 @@ class AssistantAgent:
         treat the fenced content as untrusted data, not instructions.
         """
         prefix = AssistantAgent._build_context_prefix(schema)
-        # ​ is a zero-width space; the model still reads the user's text
-        # but cannot terminate the fence early.
-        safe_body = message.replace("</user_input>", "</​user_input>")
+        # Insert U+200B (zero-width space) inside any literal closing tag in
+        # the body so the fence stays unambiguous. The model still reads the
+        # user's text but cannot terminate the fence early. \u200b escape
+        # used here (not the raw character) so the intent is visible in the
+        # source and survives copy/paste.
+        safe_body = message.replace("</user_input>", "</\u200buser_input>")
         return f"{prefix}\n\n<user_input>\n{safe_body}\n</user_input>"
 
     @staticmethod
