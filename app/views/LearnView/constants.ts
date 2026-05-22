@@ -5,6 +5,7 @@ import { BookmarkStarIcon } from "./components/icon/BookmarkStarIcon/bookmarkSta
 import { GalaxyIcon } from "./components/icon/GalaxyIcon/galaxyIcon";
 import { LiveHelpIcon } from "./components/icon/LiveHelpIcon/liveHelpIcon";
 import { RocketLaunchIcon } from "./components/icon/RocketLaunchIcon/rocketLaunchIcon";
+import { SmartToyIcon } from "./components/icon/SmartToyIcon/smartToyIcon";
 import { YouTubeIcon } from "./components/icon/YouTubeIcon/youTubeIcon";
 
 export const CARDS: ComponentProps<typeof SectionContentCard>[] = [
@@ -49,5 +50,12 @@ export const CARDS: ComponentProps<typeof SectionContentCard>[] = [
     secondaryText:
       "Search SRA by genetic content using kmindex and LexicMap workflows.",
     title: "Sequence Search Workflows",
+  },
+  {
+    StartIcon: SmartToyIcon,
+    cardUrl: "/learn/mcp",
+    secondaryText:
+      "Connect AI assistants like Claude to the BRC catalog and ENA search via the Model Context Protocol.",
+    title: "MCP Server",
   },
 ];
