@@ -12,6 +12,10 @@ load_dotenv()
 # treated as deployed and must opt into the safe behavior.
 DEV_ENVIRONMENTS = frozenset({"local", "dev", "development"})
 
+# Assistant session cookie name. Module-level constant (not env-driven)
+# so importing it doesn't drag the full Settings instantiation along.
+SESSION_COOKIE_NAME = "brc_assistant_session"
+
 
 class Settings:
     """Application settings loaded from environment variables."""
@@ -86,7 +90,6 @@ class Settings:
         # Empty secret = legacy unbound mode (any caller with the session_id
         # can read/delete) -- fine for local dev, must be set in prod.
         self.SESSION_COOKIE_SECRET: str = os.getenv("SESSION_COOKIE_SECRET", "")
-        self.SESSION_COOKIE_NAME: str = "brc_assistant_session"
         self.SESSION_COOKIE_TTL: int = 7200  # match SESSION_TTL in session_service
 
         # Refuse to silently boot with session-cookie binding disabled in

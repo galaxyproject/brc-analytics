@@ -3,7 +3,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
 
-from app.core.config import DEV_ENVIRONMENTS, get_settings
+from app.core.config import DEV_ENVIRONMENTS, SESSION_COOKIE_NAME, get_settings
 from app.core.dependencies import check_rate_limit, get_assistant_agent
 from app.core.session_signing import sign_session_id, verify_session_id
 from app.models.assistant import (
@@ -15,11 +15,6 @@ from app.models.assistant import (
 from app.services.assistant_agent import AssistantTimeoutError
 
 logger = logging.getLogger(__name__)
-
-# Read once at import time so the Cookie(alias=...) below stays in lockstep
-# with what _set_session_cookie writes -- avoids the set/read mismatch if
-# SESSION_COOKIE_NAME ever becomes env-driven.
-SESSION_COOKIE_NAME = get_settings().SESSION_COOKIE_NAME
 
 router = APIRouter()
 
