@@ -89,6 +89,19 @@ class Settings:
         self.SESSION_COOKIE_NAME: str = "brc_assistant_session"
         self.SESSION_COOKIE_TTL: int = 7200  # match SESSION_TTL in session_service
 
+        # Refuse to silently boot with session-cookie binding disabled in
+        # deployed environments -- empty secret falls back to legacy unbound
+        # mode where any caller with the session_id can read/delete. Mirrors
+        # the CORS wildcard guard above.
+        if (
+            not self.SESSION_COOKIE_SECRET
+            and self.ENVIRONMENT.lower() not in DEV_ENVIRONMENTS
+        ):
+            raise ValueError(
+                f"SESSION_COOKIE_SECRET must be set when ENVIRONMENT={self.ENVIRONMENT!r}; "
+                "empty secret disables session-cookie binding."
+            )
+
         # Catalog path
         self.CATALOG_PATH: str = os.getenv("CATALOG_PATH", "/catalog/output")
 
