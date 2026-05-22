@@ -19,7 +19,12 @@ Mirrors the Galaxy `agent-evals-harness` shape: a thin runner around
    (or `api_key_env` references). The `judge:` key must point at one of the
    declared models.
 2. `uv sync --extra dev` from `backend/api/` to pull in `pydantic-evals`.
-3. `export ANTHROPIC_API_KEY=...` (or whatever `api_key_env` you used).
+3. Export whichever env vars your `models.yaml` references via `api_key_env`
+   (e.g. `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`). Models with a literal `api_key`
+   in YAML don't need an env var. The harness stubs the unused
+   `ANTHROPIC_API_KEY`/`OPENAI_API_KEY` so backend init (which reads
+   `AI_API_KEY` / `OPENAI_API_KEY` from `Settings`) doesn't crash on startup --
+   `_override_model` swaps in the real model immediately after.
 
 ## Running
 
