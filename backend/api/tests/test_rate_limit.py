@@ -46,3 +46,17 @@ class TestClientKey:
             req.client = None
             req.headers = {}
             assert limiter._get_client_key(req) == "ratelimit:unknown"
+
+    def test_skips_empty_xff_entries(self, limiter):
+        with patch("app.core.rate_limit.get_settings") as gs:
+            gs.return_value.TRUST_PROXY_HEADERS = True
+            # Leading commas / empty entries used to yield "" and collapse
+            # every malformed-header client onto a single rate-limit key.
+            req = _make_request("10.0.0.1", ", , 1.2.3.4")
+            assert limiter._get_client_key(req) == "ratelimit:1.2.3.4"
+
+    def test_falls_back_when_xff_all_empty(self, limiter):
+        with patch("app.core.rate_limit.get_settings") as gs:
+            gs.return_value.TRUST_PROXY_HEADERS = True
+            req = _make_request("10.0.0.1", ", , ,")
+            assert limiter._get_client_key(req) == "ratelimit:10.0.0.1"

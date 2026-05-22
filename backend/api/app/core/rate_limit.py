@@ -37,7 +37,14 @@ class RateLimiter:
         if get_settings().TRUST_PROXY_HEADERS:
             forwarded = request.headers.get("x-forwarded-for")
             if forwarded:
-                client_ip = forwarded.split(",")[0].strip()
+                # Pick the first non-empty entry. Malformed XFF (leading
+                # comma, all empty, etc.) would otherwise yield "" and
+                # collapse every malformed-header client onto one key.
+                for candidate in forwarded.split(","):
+                    candidate = candidate.strip()
+                    if candidate:
+                        client_ip = candidate
+                        break
         return f"ratelimit:{client_ip}"
 
     async def check(self, request: Request) -> dict:
