@@ -1,3 +1,4 @@
+import { SearchIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/SearchIcon/searchIcon";
 import { ComponentProps } from "react";
 import { SectionContentCard } from "../../components/common/Card/components/SectionContentCard/sectionContentCard";
 import { BookmarkStarIcon } from "./components/icon/BookmarkStarIcon/bookmarkStarIcon";
@@ -42,6 +43,13 @@ export const CARDS: ComponentProps<typeof SectionContentCard>[] = [
     secondaryText:
       "Watch video tutorials, walkthroughs, and presentations on BRC Analytics and Galaxy.",
     title: "YouTube Channels",
+  },
+  {
+    StartIcon: SearchIcon,
+    cardUrl: "/learn/sequence-search-workflows",
+    secondaryText:
+      "Search SRA by genetic content using kmindex and LexicMap workflows.",
+    title: "Sequence Search Workflows",
   },
   {
     StartIcon: SmartToyIcon,
