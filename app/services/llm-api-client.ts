@@ -14,6 +14,12 @@ import {
 } from "../types/api";
 
 const apiClient = ky.create({
+  // Send the assistant session-binding cookie cross-origin. Without
+  // this, ky inherits fetch's "same-origin" default and the browser
+  // strips the cookie when NEXT_PUBLIC_BACKEND_URL points off-origin
+  // (which is the deployed shape) -- silently breaking session
+  // restore/delete. Backend already sets CORS allow_credentials=True.
+  credentials: "include",
   hooks: {
     beforeError: [
       (error): HTTPError => {
