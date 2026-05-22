@@ -38,6 +38,26 @@ class TestCorsValidation:
             Settings()
 
 
+class TestCorsOriginNormalization:
+    def test_strips_whitespace_around_entries(self, monkeypatch):
+        monkeypatch.setenv(
+            "CORS_ORIGINS", "https://a.com, https://b.com ,  https://c.com"
+        )
+        monkeypatch.setenv("ENVIRONMENT", "development")
+        s = Settings()
+        assert s.CORS_ORIGINS == [
+            "https://a.com",
+            "https://b.com",
+            "https://c.com",
+        ]
+
+    def test_drops_empty_entries(self, monkeypatch):
+        monkeypatch.setenv("CORS_ORIGINS", "https://a.com,,  ,https://b.com")
+        monkeypatch.setenv("ENVIRONMENT", "development")
+        s = Settings()
+        assert s.CORS_ORIGINS == ["https://a.com", "https://b.com"]
+
+
 class TestSessionCookieSecretValidation:
     def test_empty_secret_in_prod_raises(self, monkeypatch):
         monkeypatch.setenv("ENVIRONMENT", "prod")

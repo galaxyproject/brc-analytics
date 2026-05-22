@@ -49,14 +49,18 @@ class Settings:
             "ENA_API_BASE", "https://www.ebi.ac.uk/ena/portal/api"
         )
 
-        # CORS settings
-        self.CORS_ORIGINS: List[str] = os.getenv(
-            "CORS_ORIGINS", "http://localhost:3000"
-        ).split(",")
+        # CORS settings. Strip per-entry so "https://a.com, https://b.com"
+        # (with a space after the comma) doesn't end up handing CORSMiddleware
+        # " https://b.com", which wouldn't match a real Origin header.
+        self.CORS_ORIGINS: List[str] = [
+            o.strip()
+            for o in os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
+            if o.strip()
+        ]
         # Reject CORS wildcards outside local/dev. With unauthenticated
         # endpoints, allow_origins=* lets any site initiate chats from a
         # victim's IP. DEV_ENVIRONMENTS tolerates wildcards for ergonomics.
-        if any(o.strip() == "*" for o in self.CORS_ORIGINS):
+        if any(o == "*" for o in self.CORS_ORIGINS):
             env = os.getenv("ENVIRONMENT", "development").lower()
             if env not in DEV_ENVIRONMENTS:
                 raise ValueError(
