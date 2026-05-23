@@ -1,3 +1,4 @@
+import { HTTPError } from "ky";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { llmAPIClient } from "../services/llm-api-client";
 import {
@@ -165,12 +166,14 @@ export const useAssistantChat = (): UseAssistantChatReturn => {
  * @returns A user-facing error string
  */
 function handleChatError(error: unknown): string {
-  const err = error as { message?: string; name?: string };
-  if (err.name === "TimeoutError" || err.message?.includes("504")) {
+  const status =
+    error instanceof HTTPError ? error.response?.status : undefined;
+  const name = (error as { name?: string }).name;
+  if (name === "TimeoutError" || status === 504) {
     return "The assistant took too long to respond. Please try again.";
-  } else if (err.message?.includes("503")) {
+  } else if (status === 503) {
     return "The analysis assistant is currently unavailable. Please try again later.";
-  } else if (err.message?.includes("429")) {
+  } else if (status === 429) {
     return "Too many requests. Please wait a moment and try again.";
   }
   return "Something went wrong. Please try again.";
