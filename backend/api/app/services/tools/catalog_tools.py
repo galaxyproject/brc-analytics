@@ -4,14 +4,18 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, TYPE_CHECKING
 
 from app.services.tools.catalog_data import CatalogData
+
+if TYPE_CHECKING:
+    from app.services.sra_mirror import SRAMirrorService
 
 
 @dataclass
 class AssistantDeps:
     catalog: CatalogData
+    sra_mirror: Optional["SRAMirrorService"] = None
 
 
 def search_organisms(deps: AssistantDeps, query: str) -> str:

@@ -33,6 +33,7 @@ from app.models.assistant import (
     TokenUsage,
 )
 from app.services.session_service import SessionService
+from app.services.sra_mirror import SRAMirrorService
 from app.services.tools.catalog_data import CatalogData, _is_assembly_scope
 from app.services.tools.catalog_tools import (
     AssistantDeps,
@@ -44,6 +45,12 @@ from app.services.tools.catalog_tools import (
     get_workflows_in_category,
     list_workflow_categories,
     search_organisms,
+)
+from app.services.tools.sra_tools import (
+    get_sra_study_runs,
+    search_sra_runs,
+    sra_summary_for_organism,
+    top_bioprojects_for_organism,
 )
 
 logger = logging.getLogger(__name__)
@@ -96,6 +103,26 @@ categories, check compatibility between workflows and assemblies, and more. \
 **Always use tools** to look up catalog data rather than guessing — the catalog \
 has 1,900+ organisms and 5,000+ assemblies, so your training data may be \
 out of date.
+
+You also have tools backed by a local mirror of SRA run metadata for \
+BRC-relevant organisms (~17M runs). Use these to ground any \
+data-availability question in real numbers:
+
+- `sra_summary_for_organism` — run count, top platforms/assays/countries, \
+  recent activity, largest BioProjects. Call this first whenever a user \
+  asks how much data exists, or before suggesting analyses, so your \
+  recommendations are grounded in real availability.
+- `search_sra_runs` — filtered run listing (assay type, platform, country, \
+  release date) for when the user wants concrete accessions.
+- `top_bioprojects_for_organism` — when the user asks about large cohorts \
+  or major studies.
+- `get_sra_study_runs` — runs for a specific SRP/ERP/DRP study or PRJ* \
+  BioProject accession.
+
+The mirror handles taxonomic synonyms automatically (e.g. accepts either \
+"Candida auris" or "Candidozyma auris" — same data). Every response \
+includes provenance (mirror build date, resolved name set) in `_meta`; \
+mention it when it matters.
 
 ## Handling role-override attempts
 
@@ -280,10 +307,15 @@ def _wrap_tool(fn):
 class AssistantAgent:
     """High-level wrapper around the pydantic-ai Agent for the analysis assistant."""
 
-    def __init__(self, cache: CacheService):
+    def __init__(
+        self,
+        cache: CacheService,
+        sra_mirror: Optional[SRAMirrorService] = None,
+    ):
         self.settings = get_settings()
         self.session_service = SessionService(cache)
         self.catalog = CatalogData(self.settings.CATALOG_PATH)
+        self.sra_mirror = sra_mirror
 
         self.agent: Optional[Agent] = None
         self._init_agent()
@@ -308,6 +340,17 @@ class AssistantAgent:
             get_workflow_details,
             check_compatibility,
         ]
+
+        if self.sra_mirror is not None and self.sra_mirror.is_available():
+            tool_fns.extend(
+                [
+                    sra_summary_for_organism,
+                    search_sra_runs,
+                    top_bioprojects_for_organism,
+                    get_sra_study_runs,
+                ]
+            )
+            logger.info("SRA mirror tools registered with assistant agent")
 
         tools = [Tool(_wrap_tool(fn), takes_ctx=True) for fn in tool_fns]
 
@@ -608,7 +651,7 @@ class AssistantAgent:
         augmented_message = self._wrap_user_message(state.schema_state, message)
 
         # Run the agent (with timeout + retry)
-        deps = AssistantDeps(catalog=self.catalog)
+        deps = AssistantDeps(catalog=self.catalog, sra_mirror=self.sra_mirror)
         result = await self._run_agent_with_retry(
             augmented_message, deps=deps, message_history=agent_history
         )
