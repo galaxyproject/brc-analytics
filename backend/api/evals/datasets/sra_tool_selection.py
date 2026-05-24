@@ -57,6 +57,35 @@ class _AnyOfTheseTools(Evaluator):
         return 1.0 if any(t in called for t in self.tools) else 0.0
 
 
+# All four SRA tools -- used by negative cases to assert "none of these
+# were called". Kept here so a future renamed/added SRA tool fails loudly
+# rather than silently being allowed in catalog-only contexts.
+_ALL_SRA_TOOLS = (
+    "sra_summary_for_organism",
+    "search_sra_runs",
+    "top_bioprojects_for_organism",
+    "get_sra_study_runs",
+)
+
+
+@dataclass
+class _NoneOfTheseTools(Evaluator):
+    """1.0 if none of the named tools were called.
+
+    Negative tool-selection check: locks in that adding SRA tools doesn't
+    poach catalog-only queries (e.g. asking about workflow categories or
+    assembly compatibility should not trigger an SRA tool call)."""
+
+    tools: list[str] = field(default_factory=list)
+
+    def evaluate(self, ctx: EvaluatorContext) -> float:
+        out = ctx.output
+        if not hasattr(out, "tool_calls"):
+            return 1.0  # nothing called == nothing poached
+        called = {name for name, _ in out.tool_calls}
+        return 0.0 if any(t in called for t in self.tools) else 1.0
+
+
 _CASES = [
     {
         # Most basic case: "how much data" -> summary tool.
@@ -112,9 +141,10 @@ _CASES = [
         "expected_keywords": ["Kenya"],
     },
     {
-        # Platform filter -- "nanopore reads for X".
+        # Platform filter -- explicit "list" phrasing forces search_sra_runs
+        # over summary (summary alone would answer a yes/no but not a list).
         "name": "platform_filter_nanopore",
-        "message": "Are there any Oxford Nanopore reads for Candida auris?",
+        "message": "List a few Oxford Nanopore runs for Candida auris with their accession numbers.",
         "expected_tool": "search_sra_runs",
         "expected_args": {"organism": "auris", "platform": "OXFORD_NANOPORE"},
     },
@@ -126,7 +156,45 @@ _CASES = [
         "message": "How much data is there for SARS-CoV-2 (severe acute respiratory syndrome coronavirus 2)?",
         "expected_tool": "sra_summary_for_organism",
         "expected_args": {"organism": "coronavirus"},
-        "expected_keywords": ["million", "7"],  # 7.57M runs
+        # 7,567,240 runs -- match either the bare comma form or millions phrasing
+        "expected_keywords": ["7,5"],
+    },
+    # ----------- Negative cases: SRA tools must NOT be called -----------
+    # These lock in that the new tools don't poach catalog-only queries.
+    # Each asserts (a) the right catalog tool was called, (b) zero SRA
+    # tools were called.
+    {
+        "name": "negative_workflow_categories",
+        "message": "What analysis workflow categories are available?",
+        "expected_tool": "list_workflow_categories",
+        "no_sra_tools": True,
+    },
+    {
+        "name": "negative_assembly_details",
+        "message": "Tell me about assembly GCF_000005845.2.",
+        "expected_tool": "get_assembly_details",
+        "expected_args": {"accession": "GCF_000005845.2"},
+        "no_sra_tools": True,
+    },
+    {
+        "name": "negative_workflow_compatibility",
+        "message": "Is the variant-calling workflow compatible with assembly GCF_000146045.2?",
+        "any_of_tools": ["check_compatibility", "get_compatible_workflows"],
+        "no_sra_tools": True,
+    },
+    {
+        "name": "negative_transcriptomics_workflows",
+        "message": "Show me the available transcriptomics workflows.",
+        "expected_tool": "get_workflows_in_category",
+        "expected_args": {"category": "TRANSCRIPTOMICS"},
+        "no_sra_tools": True,
+    },
+    {
+        "name": "negative_organism_search",
+        "message": "What yeast organisms are in the catalog?",
+        "expected_tool": "search_organisms",
+        "expected_args": {"query": "yeast"},
+        "no_sra_tools": True,
     },
 ]
 
@@ -151,6 +219,8 @@ def build(
                     arg_substrings=c.get("expected_args", {}),
                 )
             )
+        if c.get("no_sra_tools"):
+            evaluators.append(_NoneOfTheseTools(tools=list(_ALL_SRA_TOOLS)))
         if "expected_keywords" in c:
             evaluators.append(_ReplyMustMention(keywords=c["expected_keywords"]))
         cases.append(
