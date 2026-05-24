@@ -1,3 +1,4 @@
+import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
   Box,
   Button,
@@ -5,7 +6,6 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import Link from "next/link";
 import { JSX } from "react";
 import { sanitizeEntityId } from "../../app/apis/catalog/common/utils";

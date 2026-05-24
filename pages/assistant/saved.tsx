@@ -1,3 +1,4 @@
+import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
   Box,
   Button,
@@ -5,7 +6,6 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import { useRouter } from "next/router";
 import { JSX, useEffect, useState } from "react";
 import { SectionHero } from "../../app/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";

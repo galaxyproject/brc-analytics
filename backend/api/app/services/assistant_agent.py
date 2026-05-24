@@ -72,7 +72,6 @@ def _should_retry_agent_error(exc: BaseException) -> bool:
     return not isinstance(exc, AssistantTimeoutError)
 
 
-
 def _format_trs_id_for_url(trs_id: str) -> str:
     return re.sub(r"[^a-zA-Z0-9]", "-", trs_id.removeprefix("#"))
 
@@ -616,8 +615,7 @@ class AssistantAgent:
         # a Galaxy handoff back to the assistant session that produced it.
         if handoff_url:
             handoff_url = (
-                f"{handoff_url}?"
-                f"{urlencode({'assistantSessionId': state.session_id})}"
+                f"{handoff_url}?{urlencode({'assistantSessionId': state.session_id})}"
             )
 
         return ChatResponse(

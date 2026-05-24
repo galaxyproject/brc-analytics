@@ -1,5 +1,5 @@
-import { Box } from "@mui/material";
 import { BackPageContentSideColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
+import { Box } from "@mui/material";
 import { JSX } from "react";
 import { AnalysisPortals } from "../../../../../../components/Entity/components/AnalysisPortals/analysisPortals";
 import { AssemblyFavoriteButton } from "../../../../../../components/Favorites/AssemblyFavoriteButton/assemblyFavoriteButton";
