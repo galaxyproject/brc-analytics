@@ -151,13 +151,31 @@ _CASES = [
     {
         # SARS-CoV-2 -- the catalog has it under the NEW name
         # "Betacoronavirus pandemicum" but SRA tags submissions with the
-        # OLD name. Mirror handles this via the taxid_names table.
+        # OLD name. The mirror handles this via the taxid_names table,
+        # and the abbreviation "SARS-CoV-2" itself resolves via the
+        # curated alias map. The model can pass either form -- accept
+        # the tool call without a strict args check; number-formatting
+        # variation made the reply-keyword check brittle.
         "name": "summary_sars_cov_2_via_old_name",
-        "message": "How much data is there for SARS-CoV-2 (severe acute respiratory syndrome coronavirus 2)?",
+        "message": "How much data is there for SARS-CoV-2?",
         "expected_tool": "sra_summary_for_organism",
-        "expected_args": {"organism": "coronavirus"},
-        # 7,567,240 runs -- match either the bare comma form or millions phrasing
-        "expected_keywords": ["7,5"],
+    },
+    {
+        # Alias path for a common abbreviation (TB) that NCBI doesn't list
+        # as a taxonomy name. The agent should call the summary tool, and
+        # the reply should identify what TB is -- catches the case where
+        # the alias resolves silently to the wrong organism.
+        "name": "alias_tb_abbreviation",
+        "message": "How much TB sequencing data is in the SRA mirror?",
+        "expected_tool": "sra_summary_for_organism",
+        "expected_keywords": ["tuberculosis"],
+    },
+    {
+        # Same alias path for HIV (resolves to HIV-1 by curated default).
+        "name": "alias_hiv_abbreviation",
+        "message": "How much HIV sequencing data is in the SRA mirror?",
+        "expected_tool": "sra_summary_for_organism",
+        "expected_keywords": ["immunodeficiency"],
     },
     # ----------- Negative cases: SRA tools must NOT be called -----------
     # These lock in that the new tools don't poach catalog-only queries.

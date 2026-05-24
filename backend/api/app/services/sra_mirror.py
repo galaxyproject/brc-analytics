@@ -26,6 +26,71 @@ logger = logging.getLogger(__name__)
 _CACHE_TTL_SECONDS = 300
 
 
+# Curated abbreviations and colloquial names. NCBI's taxonomy `names.dmp`
+# has scientific names and a thicket of historical synonyms, but it
+# generally does not list lay abbreviations like "SARS-CoV-2" or "TB" --
+# so the model passes those through unchanged and our taxid_names lookup
+# misses. Each alias here maps to the BRC catalog organism taxid; the
+# full SRA name union is expanded from taxid_names as usual at resolve
+# time, so a single alias entry transparently covers every SRA name
+# variant attached to that taxid. Keys are stored lowercase; the lookup
+# lower-cases the user term.
+#
+# Verified 2026-05-24: every taxid here resolves to a catalog organism
+# with non-zero runs in the mirror. NCBI's 2024 ICTV-aligned virus
+# renames produced new species-level taxids (HIV-1 = 3418650, not the
+# old 11676, etc.) -- using the new ones.
+_ORGANISM_ALIASES: Dict[str, int] = {
+    # Viruses
+    "sars-cov-2": 3418604,
+    "sars cov 2": 3418604,
+    "sarscov2": 3418604,
+    "covid": 3418604,
+    "covid-19": 3418604,
+    "hiv": 3418650,  # default to HIV-1, the dominant case in SRA
+    "hiv-1": 3418650,
+    "hiv1": 3418650,
+    "hiv-2": 3418651,
+    "hbv": 3431302,
+    "hcv": 3052230,
+    "ebv": 3050299,
+    "wnv": 3048448,
+    "zikv": 3048459,
+    "mpxv": 3431483,
+    "mpox": 3431483,
+    "ebola": 3052462,
+    "ebov": 3052462,
+    # Bacteria
+    "tb": 1773,
+    "mtb": 1773,
+    "m. tuberculosis": 1773,
+    "m.tuberculosis": 1773,
+    "k. pneumoniae": 573,
+    "k.pneumoniae": 573,
+    "s. aureus": 1280,
+    "s.aureus": 1280,
+    "e. coli": 562,
+    "e.coli": 562,
+    # Apicomplexa
+    "p. falciparum": 5833,
+    "p.falciparum": 5833,
+    "p. vivax": 5855,
+    "p.vivax": 5855,
+    # Fungi
+    "c. auris": 498019,
+    "c.auris": 498019,
+    "c. albicans": 5476,
+    "c.albicans": 5476,
+    "a. fumigatus": 746128,
+    "a.fumigatus": 746128,
+    # Model organisms also present as BRC catalog entries
+    "s. cerevisiae": 4932,
+    "s.cerevisiae": 4932,
+    "d. melanogaster": 7227,
+    "d.melanogaster": 7227,
+}
+
+
 class SRAMirrorService:
     """Read-only access to the local SRA-DuckDB mirror."""
 
@@ -110,6 +175,18 @@ class SRAMirrorService:
             if rows:
                 return taxid, [r[0] for r in rows]
             return taxid, [term]
+
+        # Curated abbreviation alias check (case-insensitive, whitespace-
+        # tolerant). NCBI's name table doesn't list lay abbreviations like
+        # "SARS-CoV-2" or "TB", so these would otherwise miss.
+        alias_taxid = _ORGANISM_ALIASES.get(" ".join(term.lower().split()))
+        if alias_taxid is not None:
+            rows = self._con.execute(
+                "SELECT name FROM taxid_names WHERE taxid = ?", [alias_taxid]
+            ).fetchall()
+            if rows:
+                return alias_taxid, [r[0] for r in rows]
+            return alias_taxid, [term]
 
         rows = self._con.execute(
             """
