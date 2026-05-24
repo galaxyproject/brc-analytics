@@ -613,7 +613,6 @@ class TestTruncateHistory:
         assert result == []
 
 
-<<<<<<< HEAD
 # ---------- get_provider ----------
 
 
