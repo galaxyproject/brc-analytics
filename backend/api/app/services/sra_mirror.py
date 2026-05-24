@@ -9,12 +9,21 @@ plus a `mirror_meta` table for provenance metadata.
 from __future__ import annotations
 
 import logging
+import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import duckdb
 
 logger = logging.getLogger(__name__)
+
+# In-process per-call TTL for repeated reads (e.g. the assistant chatting
+# about the same organism across turns). DuckDB queries are already fast
+# but `summary_for_organism` runs ~6 aggregates -- caching collapses that
+# to a hashmap hit for the second-and-later asks in a session. Tool calls
+# are sync and run in the asyncio event loop's thread, so a plain dict is
+# safe without locks.
+_CACHE_TTL_SECONDS = 300
 
 
 class SRAMirrorService:
@@ -25,7 +34,20 @@ class SRAMirrorService:
         self._con: Optional[duckdb.DuckDBPyConnection] = None
         self._meta: Dict[str, str] = {}
         self._total_runs: Optional[int] = None
+        self._cache: Dict[Tuple, Tuple[float, Any]] = {}
         self._initialize()
+
+    def _cache_get(self, key: Tuple) -> Optional[Any]:
+        entry = self._cache.get(key)
+        if entry is None:
+            return None
+        ts, value = entry
+        if time.monotonic() - ts >= _CACHE_TTL_SECONDS:
+            return None
+        return value
+
+    def _cache_put(self, key: Tuple, value: Any) -> None:
+        self._cache[key] = (time.monotonic(), value)
 
     def _initialize(self) -> None:
         path = Path(self.mirror_path)
@@ -114,6 +136,10 @@ class SRAMirrorService:
         if not self._con:
             return {"error": "SRA mirror not available"}
 
+        cache_key = ("summary", organism)
+        if (cached := self._cache_get(cache_key)) is not None:
+            return cached
+
         taxid, names = self._resolve_organism(organism)
         con = self._con
 
@@ -131,7 +157,7 @@ class SRAMirrorService:
         ).fetchone()
 
         if not n_runs:
-            return {
+            empty = {
                 "input": organism,
                 "resolved_taxid": taxid,
                 "n_runs": 0,
@@ -142,6 +168,8 @@ class SRAMirrorService:
                 ),
                 "_meta": self._provenance(names),
             }
+            self._cache_put(cache_key, empty)
+            return empty
 
         platforms = con.execute(
             """
@@ -191,7 +219,7 @@ class SRAMirrorService:
             [names],
         ).fetchone()[0]
 
-        return {
+        result = {
             "input": organism,
             "resolved_taxid": taxid,
             "n_runs": n_runs,
@@ -214,6 +242,8 @@ class SRAMirrorService:
             ],
             "_meta": self._provenance(names),
         }
+        self._cache_put(cache_key, result)
+        return result
 
     def search_runs(
         self,
@@ -227,6 +257,10 @@ class SRAMirrorService:
         """Search for runs by organism + filters."""
         if not self._con:
             return {"error": "SRA mirror not available"}
+
+        cache_key = ("search", organism, assay_type, platform, country, since, limit)
+        if (cached := self._cache_get(cache_key)) is not None:
+            return cached
 
         taxid, names = self._resolve_organism(organism)
         clauses = ["organism IN (SELECT UNNEST(?))"]
@@ -275,7 +309,7 @@ class SRAMirrorService:
             for r in rows
         ]
 
-        return {
+        result = {
             "input": organism,
             "resolved_taxid": taxid,
             "filters_applied": {
@@ -293,6 +327,8 @@ class SRAMirrorService:
             "runs": results,
             "_meta": self._provenance(names),
         }
+        self._cache_put(cache_key, result)
+        return result
 
     def top_bioprojects_for_organism(
         self, organism: str, limit: int = 20
@@ -301,6 +337,10 @@ class SRAMirrorService:
         and earliest/latest release dates."""
         if not self._con:
             return {"error": "SRA mirror not available"}
+
+        cache_key = ("top_bioprojects", organism, limit)
+        if (cached := self._cache_get(cache_key)) is not None:
+            return cached
 
         taxid, names = self._resolve_organism(organism)
         rows = self._con.execute(
@@ -319,7 +359,7 @@ class SRAMirrorService:
             [names, limit],
         ).fetchall()
 
-        return {
+        result = {
             "input": organism,
             "resolved_taxid": taxid,
             "n_returned": len(rows),
@@ -335,11 +375,17 @@ class SRAMirrorService:
             ],
             "_meta": self._provenance(names),
         }
+        self._cache_put(cache_key, result)
+        return result
 
     def get_study_runs(self, accession: str, limit: int = 200) -> Dict[str, Any]:
         """Get runs by SRA study (SRP*/ERP*/DRP*) or BioProject (PRJ*) accession."""
         if not self._con:
             return {"error": "SRA mirror not available"}
+
+        cache_key = ("study_runs", accession, limit)
+        if (cached := self._cache_get(cache_key)) is not None:
+            return cached
 
         column = "bioproject" if accession.startswith("PRJ") else "sra_study"
         rows = self._con.execute(
@@ -355,7 +401,7 @@ class SRAMirrorService:
             [accession, limit],
         ).fetchall()
 
-        return {
+        result = {
             "accession": accession,
             "matched_column": column,
             "n_returned": len(rows),
@@ -378,3 +424,5 @@ class SRAMirrorService:
             ],
             "_meta": self._provenance([]),
         }
+        self._cache_put(cache_key, result)
+        return result
