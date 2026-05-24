@@ -11,6 +11,7 @@ dependencies = [
     "aiosqlite>=0.21.0",
     "alembic>=1.13.2",
     "asyncpg>=0.29.0",
+    "duckdb>=1.5.0",
     "fastapi>=0.116.1",
     "fastmcp>=3.0.0",
     "httpx>=0.28.1",

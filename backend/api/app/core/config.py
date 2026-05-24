@@ -122,6 +122,9 @@ class Settings:
         # Catalog path
         self.CATALOG_PATH: str = os.getenv("CATALOG_PATH", "/catalog/output")
 
+        # SRA-DuckDB mirror. Empty path disables the assistant's SRA tools.
+        self.SRA_MIRROR_PATH: str = os.getenv("SRA_MIRROR_PATH", "")
+
         # Keycloak / OIDC settings
         self.KEYCLOAK_ISSUER_URL: str = os.getenv(
             "KEYCLOAK_ISSUER_URL",

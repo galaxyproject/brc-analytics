@@ -1,0 +1,380 @@
+"""SRA-DuckDB mirror service.
+
+Wraps a read-only DuckDB connection to a local mirror of SRA run metadata
+filtered to BRC-relevant organisms. The mirror is built externally (see
+the sra-poc plan in ~/work/brain/plans/brc-analytics-sra-duckdb-metadata)
+and includes a `taxid_names` table for taxid-anchored name resolution
+plus a `mirror_meta` table for provenance metadata.
+"""
+from __future__ import annotations
+
+import logging
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import duckdb
+
+logger = logging.getLogger(__name__)
+
+
+class SRAMirrorService:
+    """Read-only access to the local SRA-DuckDB mirror."""
+
+    def __init__(self, mirror_path: str):
+        self.mirror_path = mirror_path
+        self._con: Optional[duckdb.DuckDBPyConnection] = None
+        self._meta: Dict[str, str] = {}
+        self._total_runs: Optional[int] = None
+        self._initialize()
+
+    def _initialize(self) -> None:
+        path = Path(self.mirror_path)
+        if not path.exists():
+            logger.warning(
+                "SRA mirror not found at %s -- service will report unavailable",
+                self.mirror_path,
+            )
+            return
+        try:
+            self._con = duckdb.connect(self.mirror_path, read_only=True)
+            self._meta = dict(
+                self._con.execute("SELECT key, value FROM mirror_meta").fetchall()
+            )
+            self._total_runs = self._con.execute(
+                "SELECT COUNT(*) FROM runs"
+            ).fetchone()[0]
+            logger.info(
+                "SRA mirror loaded: %s rows, built %s",
+                f"{self._total_runs:,}",
+                self._meta.get("mirror_built_at", "unknown"),
+            )
+        except Exception:
+            logger.exception("Failed to open SRA mirror at %s", self.mirror_path)
+            self._con = None
+
+    def is_available(self) -> bool:
+        return self._con is not None
+
+    def _provenance(self, resolved_names: List[str]) -> Dict[str, Any]:
+        return {
+            "mirror_built_at": self._meta.get("mirror_built_at"),
+            "taxdump_version": self._meta.get("taxdump_version"),
+            "total_runs_in_mirror": self._total_runs,
+            "resolved_names_for_query": resolved_names,
+        }
+
+    def _resolve_organism(self, organism: str) -> tuple[Optional[int], List[str]]:
+        """Resolve a user-supplied organism term to (taxid, names_in_mirror).
+
+        Accepts either an NCBI taxonomy id ("5833") or a scientific name
+        ("Plasmodium falciparum", or any known synonym such as "Candida
+        auris"). Returns (taxid, list_of_names) -- the list is what to
+        match against the `runs.organism` column.
+
+        If the term doesn't match any known taxid or name, falls back to
+        a single-element list with the literal input so the caller still
+        gets a chance to find something via exact match.
+        """
+        if not self._con:
+            return None, [organism]
+
+        term = organism.strip()
+
+        if term.isdigit():
+            taxid = int(term)
+            rows = self._con.execute(
+                "SELECT name FROM taxid_names WHERE taxid = ?", [taxid]
+            ).fetchall()
+            if rows:
+                return taxid, [r[0] for r in rows]
+            return taxid, [term]
+
+        rows = self._con.execute(
+            """
+            SELECT DISTINCT taxid FROM taxid_names
+            WHERE LOWER(name) = LOWER(?)
+            """,
+            [term],
+        ).fetchall()
+        if rows:
+            taxid = rows[0][0]
+            names = self._con.execute(
+                "SELECT name FROM taxid_names WHERE taxid = ?", [taxid]
+            ).fetchall()
+            return taxid, [r[0] for r in names]
+
+        return None, [term]
+
+    def summary_for_organism(self, organism: str) -> Dict[str, Any]:
+        """High-leverage one-call snapshot for an organism.
+
+        Returns total run count, top platforms/assays/countries, recent
+        activity, top BioProjects, plus provenance metadata.
+        """
+        if not self._con:
+            return {"error": "SRA mirror not available"}
+
+        taxid, names = self._resolve_organism(organism)
+        con = self._con
+
+        n_runs, n_projects, n_studies, earliest, latest = con.execute(
+            """
+            SELECT
+                COUNT(*),
+                COUNT(DISTINCT bioproject),
+                COUNT(DISTINCT sra_study),
+                MIN(releasedate),
+                MAX(releasedate)
+            FROM runs WHERE organism IN (SELECT UNNEST(?))
+            """,
+            [names],
+        ).fetchone()
+
+        if not n_runs:
+            return {
+                "input": organism,
+                "resolved_taxid": taxid,
+                "n_runs": 0,
+                "message": (
+                    f"No runs found in the SRA mirror for '{organism}'. "
+                    "The organism may not be in the BRC catalog or there is "
+                    "no public SRA data."
+                ),
+                "_meta": self._provenance(names),
+            }
+
+        platforms = con.execute(
+            """
+            SELECT platform, COUNT(*) AS n FROM runs
+            WHERE organism IN (SELECT UNNEST(?)) AND platform IS NOT NULL
+            GROUP BY platform ORDER BY n DESC LIMIT 5
+            """,
+            [names],
+        ).fetchall()
+
+        assays = con.execute(
+            """
+            SELECT assay_type, COUNT(*) AS n FROM runs
+            WHERE organism IN (SELECT UNNEST(?)) AND assay_type IS NOT NULL
+            GROUP BY assay_type ORDER BY n DESC LIMIT 10
+            """,
+            [names],
+        ).fetchall()
+
+        countries = con.execute(
+            """
+            SELECT geo_loc_name_country_calc AS country, COUNT(*) AS n FROM runs
+            WHERE organism IN (SELECT UNNEST(?))
+              AND geo_loc_name_country_calc IS NOT NULL
+              AND geo_loc_name_country_calc != 'uncalculated'
+            GROUP BY country ORDER BY n DESC LIMIT 10
+            """,
+            [names],
+        ).fetchall()
+
+        top_projects = con.execute(
+            """
+            SELECT bioproject, COUNT(*) AS n_runs, MIN(releasedate) AS earliest, MAX(releasedate) AS latest
+            FROM runs
+            WHERE organism IN (SELECT UNNEST(?)) AND bioproject IS NOT NULL
+            GROUP BY bioproject ORDER BY n_runs DESC LIMIT 10
+            """,
+            [names],
+        ).fetchall()
+
+        recent_count = con.execute(
+            """
+            SELECT COUNT(*) FROM runs
+            WHERE organism IN (SELECT UNNEST(?))
+              AND releasedate >= CURRENT_DATE - INTERVAL 90 DAY
+            """,
+            [names],
+        ).fetchone()[0]
+
+        return {
+            "input": organism,
+            "resolved_taxid": taxid,
+            "n_runs": n_runs,
+            "n_bioprojects": n_projects,
+            "n_studies": n_studies,
+            "earliest_release": str(earliest) if earliest else None,
+            "latest_release": str(latest) if latest else None,
+            "runs_last_90_days": recent_count,
+            "top_platforms": [{"platform": p, "n_runs": n} for p, n in platforms],
+            "top_assay_types": [{"assay_type": a, "n_runs": n} for a, n in assays],
+            "top_countries": [{"country": c, "n_runs": n} for c, n in countries],
+            "top_bioprojects": [
+                {
+                    "bioproject": bp,
+                    "n_runs": n,
+                    "earliest_release": str(e) if e else None,
+                    "latest_release": str(la) if la else None,
+                }
+                for bp, n, e, la in top_projects
+            ],
+            "_meta": self._provenance(names),
+        }
+
+    def search_runs(
+        self,
+        organism: str,
+        assay_type: Optional[str] = None,
+        platform: Optional[str] = None,
+        country: Optional[str] = None,
+        since: Optional[str] = None,
+        limit: int = 50,
+    ) -> Dict[str, Any]:
+        """Search for runs by organism + filters."""
+        if not self._con:
+            return {"error": "SRA mirror not available"}
+
+        taxid, names = self._resolve_organism(organism)
+        clauses = ["organism IN (SELECT UNNEST(?))"]
+        params: List[Any] = [names]
+
+        if assay_type:
+            clauses.append("assay_type = ?")
+            params.append(assay_type)
+        if platform:
+            clauses.append("platform = ?")
+            params.append(platform)
+        if country:
+            clauses.append("geo_loc_name_country_calc = ?")
+            params.append(country)
+        if since:
+            clauses.append("releasedate >= ?")
+            params.append(since)
+
+        where = " AND ".join(clauses)
+        rows = self._con.execute(
+            f"""
+            SELECT acc, sra_study, bioproject, organism, assay_type, platform,
+                   instrument, librarylayout, releasedate,
+                   geo_loc_name_country_calc, mbases
+            FROM runs WHERE {where}
+            ORDER BY releasedate DESC
+            LIMIT ?
+            """,
+            params + [limit],
+        ).fetchall()
+
+        results = [
+            {
+                "accession": r[0],
+                "study": r[1],
+                "bioproject": r[2],
+                "organism": r[3],
+                "assay_type": r[4],
+                "platform": r[5],
+                "instrument": r[6],
+                "library_layout": r[7],
+                "release_date": str(r[8]) if r[8] else None,
+                "country": r[9],
+                "mbases": r[10],
+            }
+            for r in rows
+        ]
+
+        return {
+            "input": organism,
+            "resolved_taxid": taxid,
+            "filters_applied": {
+                k: v
+                for k, v in {
+                    "assay_type": assay_type,
+                    "platform": platform,
+                    "country": country,
+                    "since": since,
+                }.items()
+                if v
+            },
+            "n_returned": len(results),
+            "limit": limit,
+            "runs": results,
+            "_meta": self._provenance(names),
+        }
+
+    def top_bioprojects_for_organism(
+        self, organism: str, limit: int = 20
+    ) -> Dict[str, Any]:
+        """Per Anton #723: rank BioProjects by run count, include study count
+        and earliest/latest release dates."""
+        if not self._con:
+            return {"error": "SRA mirror not available"}
+
+        taxid, names = self._resolve_organism(organism)
+        rows = self._con.execute(
+            """
+            SELECT bioproject,
+                   COUNT(*) AS n_runs,
+                   COUNT(DISTINCT sra_study) AS n_studies,
+                   MIN(releasedate) AS earliest,
+                   MAX(releasedate) AS latest
+            FROM runs
+            WHERE organism IN (SELECT UNNEST(?)) AND bioproject IS NOT NULL
+            GROUP BY bioproject
+            ORDER BY n_runs DESC
+            LIMIT ?
+            """,
+            [names, limit],
+        ).fetchall()
+
+        return {
+            "input": organism,
+            "resolved_taxid": taxid,
+            "n_returned": len(rows),
+            "bioprojects": [
+                {
+                    "bioproject": bp,
+                    "n_runs": n_runs,
+                    "n_studies": n_studies,
+                    "earliest_release": str(e) if e else None,
+                    "latest_release": str(la) if la else None,
+                }
+                for bp, n_runs, n_studies, e, la in rows
+            ],
+            "_meta": self._provenance(names),
+        }
+
+    def get_study_runs(self, accession: str, limit: int = 200) -> Dict[str, Any]:
+        """Get runs by SRA study (SRP*/ERP*/DRP*) or BioProject (PRJ*) accession."""
+        if not self._con:
+            return {"error": "SRA mirror not available"}
+
+        column = "bioproject" if accession.startswith("PRJ") else "sra_study"
+        rows = self._con.execute(
+            f"""
+            SELECT acc, sra_study, bioproject, organism, assay_type, platform,
+                   instrument, librarylayout, releasedate,
+                   geo_loc_name_country_calc, mbases
+            FROM runs
+            WHERE {column} = ?
+            ORDER BY releasedate DESC
+            LIMIT ?
+            """,
+            [accession, limit],
+        ).fetchall()
+
+        return {
+            "accession": accession,
+            "matched_column": column,
+            "n_returned": len(rows),
+            "limit": limit,
+            "runs": [
+                {
+                    "accession": r[0],
+                    "study": r[1],
+                    "bioproject": r[2],
+                    "organism": r[3],
+                    "assay_type": r[4],
+                    "platform": r[5],
+                    "instrument": r[6],
+                    "library_layout": r[7],
+                    "release_date": str(r[8]) if r[8] else None,
+                    "country": r[9],
+                    "mbases": r[10],
+                }
+                for r in rows
+            ],
+            "_meta": self._provenance([]),
+        }
