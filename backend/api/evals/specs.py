@@ -10,10 +10,14 @@ from typing import Callable
 
 from evals.datasets import (
     assistant_multiturn,
+    sra_assistant_multiturn,
+    sra_tool_selection,
     tool_selection,
 )
 
 SPECS: dict[str, Callable] = {
     "tool_selection": tool_selection.build,
     "assistant_multiturn": assistant_multiturn.build,
+    "sra_tool_selection": sra_tool_selection.build,
+    "sra_assistant_multiturn": sra_assistant_multiturn.build,
 }
