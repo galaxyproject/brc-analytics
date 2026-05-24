@@ -7,7 +7,11 @@ import { WORKFLOW_PARAMETER_VARIABLE } from "../../../../../../../../../../../..
 import { WorkflowRunCreateRequest } from "../../../../../../../../../../../../types/api";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { ConfiguredInput } from "../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { ConfiguredValue } from "./types";
+import {
+  ConfiguredValue,
+  isAssemblyConfiguredValue,
+  isSequenceConfiguredValue,
+} from "./types";
 
 export function getRequiredParameterTypes(
   workflow: Workflow
@@ -267,17 +271,30 @@ export function buildWorkflowRunPayload({
     galaxyInstanceUrl = null;
   }
 
+  // Assembly-scope and sequence-scope variants carry distinct fields; narrow
+  // before reading so the tracking payload tolerates any scope.
+  const isAssembly = isAssemblyConfiguredValue(configuredValue);
+  const isSequence = isSequenceConfiguredValue(configuredValue);
+
   return {
-    assembly_accession: configuredValue.referenceAssembly || null,
+    assembly_accession: isAssembly ? configuredValue.referenceAssembly : null,
     assistant_session_id: assistantSessionId,
     galaxy_instance_url: galaxyInstanceUrl,
     handoff_url: handoffUrl,
     launch_source: assistantSessionId ? "assistant" : "site",
     parameters: {
-      design_formula: configuredValue.designFormula ?? null,
-      gene_model_url: configuredValue.geneModelUrl ?? null,
-      number_of_hits: configuredValue.numberOfHits ?? null,
-      primary_contrasts: configuredValue.primaryContrasts ?? null,
+      design_formula: isAssembly
+        ? (configuredValue.designFormula ?? null)
+        : null,
+      gene_model_url: isAssembly
+        ? (configuredValue.geneModelUrl ?? null)
+        : null,
+      number_of_hits: isSequence
+        ? (configuredValue.numberOfHits ?? null)
+        : null,
+      primary_contrasts: isAssembly
+        ? (configuredValue.primaryContrasts ?? null)
+        : null,
       read_runs_paired:
         configuredValue.readRunsPaired?.map(
           ({ runAccession }) => runAccession
@@ -286,12 +303,17 @@ export function buildWorkflowRunPayload({
         configuredValue.readRunsSingle?.map(
           ({ runAccession }) => runAccession
         ) ?? [],
-      sample_sheet_classification:
-        configuredValue.sampleSheetClassification ?? null,
-      sample_sheet_rows: configuredValue.sampleSheet?.length ?? 0,
+      sample_sheet_classification: isAssembly
+        ? (configuredValue.sampleSheetClassification ?? null)
+        : null,
+      sample_sheet_rows: isAssembly
+        ? (configuredValue.sampleSheet?.length ?? 0)
+        : 0,
       sequence_file_name: configuredInput.sequenceFileName ?? null,
-      sequence_length: configuredValue.sequence?.length ?? null,
-      strandedness: configuredValue.strandedness ?? null,
+      sequence_length: isSequence
+        ? (configuredValue.sequence?.length ?? null)
+        : null,
+      strandedness: isAssembly ? (configuredValue.strandedness ?? null) : null,
       tracks:
         configuredValue.tracks?.map((track) => ({
           group_id: track.groupId,
