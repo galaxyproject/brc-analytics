@@ -112,6 +112,11 @@ class WorkflowRun(Base):
         primary_key=True,
         default=uuid.uuid4,
     )
+    # Intentional: workflow_runs is mixed authenticated + anonymous tracking.
+    # SET NULL on user deletion converts the row to an anonymous record (same
+    # state it would have had if the user wasn't logged in at launch time).
+    # The account history page filters on user_id and won't show the orphan,
+    # but the analytics record is preserved.
     user_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("users.id", ondelete="SET NULL"),

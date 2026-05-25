@@ -41,11 +41,18 @@ class Settings:
             os.getenv("AI_SKIP_SSL_VERIFY", "false").lower() == "true"
         )
 
-        # Database settings (for future use)
+        # Database settings -- required for persistent user data (favorites,
+        # saved analyses, workflow runs). Anonymous / non-persistent flows
+        # don't touch the DB.
         self.DATABASE_URL: str = os.getenv("DATABASE_URL", "")
         self.DATABASE_ECHO: bool = os.getenv("DATABASE_ECHO", "false").lower() == "true"
         self.DATABASE_POOL_SIZE: int = int(os.getenv("DATABASE_POOL_SIZE", "5"))
         self.DATABASE_MAX_OVERFLOW: int = int(os.getenv("DATABASE_MAX_OVERFLOW", "10"))
+        # Off by default so prod deploys retain explicit migration control.
+        # Enable for local/dev/CI where a one-shot upgrade-on-startup is convenient.
+        self.RUN_MIGRATIONS_ON_STARTUP: bool = (
+            os.getenv("RUN_MIGRATIONS_ON_STARTUP", "false").lower() == "true"
+        )
 
         # ENA API settings
         self.ENA_API_BASE: str = os.getenv(

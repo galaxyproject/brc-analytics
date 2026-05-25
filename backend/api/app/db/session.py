@@ -1,5 +1,9 @@
+import logging
 from collections.abc import AsyncIterator
+from pathlib import Path
 
+from alembic import command
+from alembic.config import Config
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -8,6 +12,8 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from app.core.config import get_settings
+
+logger = logging.getLogger(__name__)
 
 _engine: AsyncEngine | None = None
 _session_factory: async_sessionmaker[AsyncSession] | None = None
@@ -60,10 +66,31 @@ async def get_db_session() -> AsyncIterator[AsyncSession]:
         yield session
 
 
+def _alembic_ini_path() -> Path:
+    # alembic.ini lives at the package root (backend/api/alembic.ini),
+    # two levels above this file (app/db/session.py).
+    return Path(__file__).resolve().parents[2] / "alembic.ini"
+
+
+def _run_migrations_sync(database_url: str) -> None:
+    cfg = Config(str(_alembic_ini_path()))
+    cfg.set_main_option("sqlalchemy.url", database_url)
+    command.upgrade(cfg, "head")
+
+
 async def init_db() -> None:
     settings = get_settings()
-    if settings.DATABASE_URL:
-        get_engine()
+    if not settings.DATABASE_URL:
+        return
+    get_engine()
+    if settings.RUN_MIGRATIONS_ON_STARTUP:
+        # Run alembic in a thread so the sync command doesn't block the
+        # event loop. Idempotent: alembic no-ops when already at head.
+        import asyncio
+
+        logger.info("Running alembic upgrade head on startup")
+        await asyncio.to_thread(_run_migrations_sync, settings.DATABASE_URL)
+        logger.info("Migrations applied")
 
 
 async def close_db() -> None:
