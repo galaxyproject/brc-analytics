@@ -57,6 +57,14 @@ def workflow_runs_client(tmp_path, monkeypatch):
     monkeypatch.setattr(dependencies, "get_auth_service", get_auth_service)
     monkeypatch.setattr(dependencies, "get_llm_service", get_llm_service)
 
+    # Mock the agent so the workflow_runs endpoint's assistant-session
+    # validation has a controllable session_service. Each test reconfigures
+    # fake_session_service.get_session as needed.
+    fake_session_service = MagicMock()
+    fake_session_service.get_session = AsyncMock(return_value=None)
+    fake_agent = MagicMock()
+    fake_agent.session_service = fake_session_service
+
     asyncio.run(_create_schema(database_url))
 
     from app.db.session import get_session_factory
@@ -91,6 +99,7 @@ def workflow_runs_client(tmp_path, monkeypatch):
     app.dependency_overrides[dependencies.get_optional_current_user_db] = (
         override_get_optional_current_user_db
     )
+    app.dependency_overrides[dependencies.get_assistant_agent] = lambda: fake_agent
 
     async def seed_users() -> None:
         async with session_factory() as session:
@@ -106,11 +115,17 @@ def workflow_runs_client(tmp_path, monkeypatch):
     asyncio.run(seed_users())
 
     with TestClient(app) as client:
-        yield client, current_sub
+        yield client, current_sub, fake_session_service
+
+
+def _make_session_state(session_id: str, owner_sub: str | None):
+    from app.models.assistant import SessionState
+
+    return SessionState(session_id=session_id, owner_keycloak_sub=owner_sub)
 
 
 def test_workflow_run_creation_allows_anonymous_tracking(workflow_runs_client):
-    client, current_sub = workflow_runs_client
+    client, current_sub, _session_service = workflow_runs_client
     current_sub["value"] = None
 
     response = client.post(
@@ -133,7 +148,7 @@ def test_workflow_run_creation_allows_anonymous_tracking(workflow_runs_client):
 
 
 def test_workflow_runs_are_scoped_to_current_user(workflow_runs_client):
-    client, current_sub = workflow_runs_client
+    client, current_sub, _session_service = workflow_runs_client
 
     current_sub["value"] = "user-a"
     create_response = client.post(
@@ -143,8 +158,7 @@ def test_workflow_runs_are_scoped_to_current_user(workflow_runs_client):
             "galaxy_instance_url": "https://usegalaxy.org",
             "handoff_url": "https://usegalaxy.org/workflow_landings/user-a",
             "assembly_accession": "GCF_000001405.40",
-            "launch_source": "assistant",
-            "assistant_session_id": "assistant-session-a",
+            "launch_source": "site",
             "parameters": {"reference_assembly": "GCF_000001405.40"},
         },
     )
@@ -155,3 +169,76 @@ def test_workflow_runs_are_scoped_to_current_user(workflow_runs_client):
 
     assert list_response.status_code == 200
     assert list_response.json() == []
+
+
+def test_workflow_run_rejects_unknown_assistant_session(workflow_runs_client):
+    client, current_sub, session_service = workflow_runs_client
+    current_sub["value"] = "user-a"
+    session_service.get_session = AsyncMock(return_value=None)
+
+    response = client.post(
+        "/api/v1/workflow_runs",
+        json={
+            "workflow_trs_id": "#workflow/github.com/iwc/rnaseq-pe/main",
+            "galaxy_instance_url": "https://usegalaxy.org",
+            "handoff_url": "https://usegalaxy.org/workflow_landings/abc",
+            "assembly_accession": "GCF_000001405.40",
+            "launch_source": "assistant",
+            "assistant_session_id": "no-such-session",
+            "parameters": {},
+        },
+    )
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Assistant session not found"
+
+
+def test_workflow_run_rejects_session_owned_by_other_user(workflow_runs_client):
+    client, current_sub, session_service = workflow_runs_client
+    current_sub["value"] = "user-b"
+    session_service.get_session = AsyncMock(
+        return_value=_make_session_state("session-x", owner_sub="user-a")
+    )
+
+    response = client.post(
+        "/api/v1/workflow_runs",
+        json={
+            "workflow_trs_id": "#workflow/github.com/iwc/rnaseq-pe/main",
+            "galaxy_instance_url": "https://usegalaxy.org",
+            "handoff_url": "https://usegalaxy.org/workflow_landings/abc",
+            "assembly_accession": "GCF_000001405.40",
+            "launch_source": "assistant",
+            "assistant_session_id": "session-x",
+            "parameters": {},
+        },
+    )
+
+    assert response.status_code == 403
+    assert "another user" in response.json()["detail"]
+
+
+def test_workflow_run_accepts_anonymous_assistant_session(workflow_runs_client):
+    client, current_sub, session_service = workflow_runs_client
+    current_sub["value"] = "user-a"
+    # Anonymous assistant session (owner_keycloak_sub is None) is allowed
+    # to be claimed by any authenticated user -- mirrors the chat flow
+    # where an unauth user starts a session, then logs in mid-conversation.
+    session_service.get_session = AsyncMock(
+        return_value=_make_session_state("session-anon", owner_sub=None)
+    )
+
+    response = client.post(
+        "/api/v1/workflow_runs",
+        json={
+            "workflow_trs_id": "#workflow/github.com/iwc/rnaseq-pe/main",
+            "galaxy_instance_url": "https://usegalaxy.org",
+            "handoff_url": "https://usegalaxy.org/workflow_landings/abc",
+            "assembly_accession": "GCF_000001405.40",
+            "launch_source": "assistant",
+            "assistant_session_id": "session-anon",
+            "parameters": {},
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["assistant_session_id"] == "session-anon"
