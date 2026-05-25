@@ -381,8 +381,18 @@ class AssistantAgent:
         return None
 
     @staticmethod
-    def compute_handoff(schema_state: AnalysisSchema) -> tuple[bool, Optional[str]]:
-        """Compute is_complete and handoff_url from schema state."""
+    def compute_handoff(
+        schema_state: AnalysisSchema,
+        session_id: Optional[str] = None,
+    ) -> tuple[bool, Optional[str]]:
+        """Compute is_complete and handoff_url from schema state.
+
+        When a session_id is supplied, append it as an `assistantSessionId`
+        query param so the Galaxy launch tracker can correlate the run
+        with the assistant session that produced it. Callers that have a
+        session in hand (chat, restore_session) should always pass it;
+        callers that don't (e.g. ad-hoc compute) can leave it unset.
+        """
         handoff_url = None
         if schema_state.is_complete():
             accession = schema_state.assembly.detail or ""
@@ -393,6 +403,11 @@ class AssistantAgent:
                 handoff_url = (
                     f"/data/assemblies/{entity_id}/analyze/workflows/{workflow_id}"
                 )
+                if session_id:
+                    handoff_url = (
+                        f"{handoff_url}?"
+                        f"{urlencode({'assistantSessionId': session_id})}"
+                    )
         return handoff_url is not None, handoff_url
 
     @staticmethod
@@ -610,13 +625,9 @@ class AssistantAgent:
         self._cap_state_messages(state)
         await self.session_service.save_session(state)
 
-        is_complete, handoff_url = self.compute_handoff(schema_state)
-        # Append assistantSessionId query param so the frontend can correlate
-        # a Galaxy handoff back to the assistant session that produced it.
-        if handoff_url:
-            handoff_url = (
-                f"{handoff_url}?{urlencode({'assistantSessionId': state.session_id})}"
-            )
+        is_complete, handoff_url = self.compute_handoff(
+            schema_state, session_id=state.session_id
+        )
 
         return ChatResponse(
             session_id=state.session_id,

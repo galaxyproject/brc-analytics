@@ -125,7 +125,9 @@ async def restore_session(
     if state is None:
         raise HTTPException(status_code=404, detail="Session not found or expired")
 
-    is_complete, handoff_url = agent.compute_handoff(state.schema_state)
+    is_complete, handoff_url = agent.compute_handoff(
+        state.schema_state, session_id=state.session_id
+    )
     return SessionRestoreResponse(
         session_id=state.session_id,
         messages=state.messages,
