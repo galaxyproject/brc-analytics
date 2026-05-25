@@ -1,5 +1,6 @@
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
+  Alert,
   Box,
   Button,
   CircularProgress,
@@ -33,22 +34,33 @@ export default function WorkflowRunsPage(): JSX.Element {
   } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [workflowRuns, setWorkflowRuns] = useState<WorkflowRunResponse[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated || !isConfigured) {
       setWorkflowRuns([]);
+      setError(null);
       setIsLoading(false);
       return;
     }
 
     let isMounted = true;
     setIsLoading(true);
+    setError(null);
 
     brcAPIClient
       .getWorkflowRuns()
       .then((response) => {
         if (!isMounted) return;
         setWorkflowRuns(response);
+      })
+      .catch((err) => {
+        if (!isMounted) return;
+        // Surface load failures so the empty-state copy doesn't
+        // falsely claim there are no runs.
+        setError(
+          err instanceof Error ? err.message : "Failed to load workflow runs."
+        );
       })
       .finally(() => {
         if (!isMounted) return;
@@ -84,6 +96,10 @@ export default function WorkflowRunsPage(): JSX.Element {
           </Box>
         </Stack>
       );
+    }
+
+    if (error) {
+      return <Alert severity="error">{error}</Alert>;
     }
 
     if (workflowRuns.length === 0) {

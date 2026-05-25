@@ -1,5 +1,6 @@
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
+  Alert,
   Box,
   Button,
   CircularProgress,
@@ -33,7 +34,7 @@ export default function FavoritesPage(): JSX.Element {
     isLoading: isAuthLoading,
     login,
   } = useAuth();
-  const { favorites, isLoading } = useAssemblyFavorites();
+  const { error, favorites, isLoading } = useAssemblyFavorites();
 
   function getAssembly(accession: string): Assembly | null {
     try {
@@ -65,6 +66,14 @@ export default function FavoritesPage(): JSX.Element {
             </Button>
           </Box>
         </Stack>
+      );
+    }
+
+    if (error) {
+      return (
+        <Alert severity="error">
+          Failed to load favorites: {error.message}
+        </Alert>
       );
     }
 

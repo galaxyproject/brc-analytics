@@ -1,5 +1,6 @@
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
+  Alert,
   Box,
   Button,
   CircularProgress,
@@ -40,22 +41,33 @@ export default function SavedAnalysesPage(): JSX.Element {
   const [savedAnalyses, setSavedAnalyses] = useState<SavedAnalysisSummary[]>(
     []
   );
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated || !isConfigured) {
       setSavedAnalyses([]);
+      setError(null);
       setIsLoading(false);
       return;
     }
 
     let isMounted = true;
     setIsLoading(true);
+    setError(null);
 
     brcAPIClient
       .getSavedAnalyses()
       .then((response) => {
         if (!isMounted) return;
         setSavedAnalyses(response);
+      })
+      .catch((err) => {
+        if (!isMounted) return;
+        // Surface load failures so the empty-state copy doesn't
+        // falsely claim "you have not saved any analyses yet."
+        setError(
+          err instanceof Error ? err.message : "Failed to load saved analyses."
+        );
       })
       .finally(() => {
         if (!isMounted) return;
@@ -68,19 +80,33 @@ export default function SavedAnalysesPage(): JSX.Element {
   }, [isAuthenticated, isConfigured]);
 
   async function handleDelete(id: string): Promise<void> {
-    await brcAPIClient.deleteSavedAnalysis(id);
-    setSavedAnalyses((current) => current.filter((item) => item.id !== id));
+    setError(null);
+    try {
+      await brcAPIClient.deleteSavedAnalysis(id);
+      setSavedAnalyses((current) => current.filter((item) => item.id !== id));
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to delete saved analysis."
+      );
+    }
   }
 
   async function handleRestore(id: string): Promise<void> {
-    const restored = await brcAPIClient.restoreSavedAnalysis(id);
-    await router.push({
-      pathname: "/assistant",
-      query: {
-        savedAnalysisId: id,
-        sessionId: restored.session_id,
-      },
-    });
+    setError(null);
+    try {
+      const restored = await brcAPIClient.restoreSavedAnalysis(id);
+      await router.push({
+        pathname: "/assistant",
+        query: {
+          savedAnalysisId: id,
+          sessionId: restored.session_id,
+        },
+      });
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to restore saved analysis."
+      );
+    }
   }
 
   function renderContent(): JSX.Element {
@@ -108,6 +134,10 @@ export default function SavedAnalysesPage(): JSX.Element {
       );
     }
 
+    if (error && savedAnalyses.length === 0) {
+      return <Alert severity="error">{error}</Alert>;
+    }
+
     if (savedAnalyses.length === 0) {
       return (
         <Typography variant="body1">
@@ -118,6 +148,7 @@ export default function SavedAnalysesPage(): JSX.Element {
 
     return (
       <Stack spacing={2}>
+        {error && <Alert severity="error">{error}</Alert>}
         {savedAnalyses.map((savedAnalysis) => (
           <Box
             key={savedAnalysis.id}
