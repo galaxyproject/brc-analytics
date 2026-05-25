@@ -16,11 +16,12 @@ async def get_favorites(
     current_user_db: User = Depends(get_current_user_db),
     session: AsyncSession = Depends(get_db_session),
 ) -> list[FavoriteResponse]:
-    favorites = await list_favorites_for_user(session, current_user_db)
+    favorites = await list_favorites_for_user(
+        session, current_user_db, entity_type=entity_type
+    )
     return [
         FavoriteResponse.model_validate(favorite, from_attributes=True)
         for favorite in favorites
-        if favorite.entity_type == entity_type
     ]
 
 

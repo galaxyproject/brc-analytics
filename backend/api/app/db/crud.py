@@ -4,6 +4,7 @@ import uuid
 from typing import Any
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import Favorite, SavedAnalysis, User, WorkflowRun
@@ -42,12 +43,16 @@ async def upsert_user_from_claims(
     return user
 
 
-async def list_favorites_for_user(session: AsyncSession, user: User) -> list[Favorite]:
-    result = await session.execute(
-        select(Favorite)
-        .where(Favorite.user_id == user.id)
-        .order_by(Favorite.created_at.desc())
-    )
+async def list_favorites_for_user(
+    session: AsyncSession,
+    user: User,
+    entity_type: str | None = None,
+) -> list[Favorite]:
+    stmt = select(Favorite).where(Favorite.user_id == user.id)
+    if entity_type is not None:
+        stmt = stmt.where(Favorite.entity_type == entity_type)
+    stmt = stmt.order_by(Favorite.created_at.desc())
+    result = await session.execute(stmt)
     return list(result.scalars().all())
 
 
@@ -67,16 +72,28 @@ async def get_favorite(
 async def upsert_favorite(
     session: AsyncSession, user: User, entity_type: str, entity_id: str
 ) -> Favorite:
-    favorite = await get_favorite(session, user, entity_type, entity_id)
-    if favorite is None:
-        favorite = Favorite(
-            user_id=user.id,
-            entity_type=entity_type,
-            entity_id=entity_id,
-        )
-        session.add(favorite)
+    existing = await get_favorite(session, user, entity_type, entity_id)
+    if existing is not None:
+        return existing
+
+    # Race window: two concurrent POSTs both pass the SELECT, both INSERT,
+    # one trips the PK. Catching IntegrityError + re-fetching keeps the
+    # endpoint clean (and portable across postgres + sqlite-in-tests).
+    favorite = Favorite(
+        user_id=user.id,
+        entity_type=entity_type,
+        entity_id=entity_id,
+    )
+    session.add(favorite)
+    try:
         await session.commit()
-        await session.refresh(favorite)
+    except IntegrityError:
+        await session.rollback()
+        existing = await get_favorite(session, user, entity_type, entity_id)
+        if existing is not None:
+            return existing
+        raise
+    await session.refresh(favorite)
     return favorite
 
 

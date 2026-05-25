@@ -1,6 +1,6 @@
 import json
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.dependencies import get_current_user, get_current_user_db
@@ -34,10 +34,25 @@ async def get_preferences(
 
 @router.put("/preferences", response_model=UserPreferences)
 async def update_preferences(
+    request: Request,
     preferences: UserPreferences,
     current_user_db: User = Depends(get_current_user_db),
     session: AsyncSession = Depends(get_db_session),
 ) -> UserPreferences:
+    # Reject obviously-oversized payloads before they're parsed. The
+    # serialized check below is still authoritative for cases where
+    # Content-Length is missing or lies, but this saves Pydantic from
+    # parsing a pathological 100MB blob in the common case.
+    content_length = request.headers.get("content-length")
+    if content_length is not None:
+        try:
+            if int(content_length) > MAX_PREFERENCES_BYTES:
+                raise HTTPException(
+                    status_code=413, detail="Preferences payload too large"
+                )
+        except ValueError:
+            pass
+
     payload = preferences.model_dump(mode="json")
     serialized_payload = json.dumps(payload, separators=(",", ":")).encode("utf-8")
     if len(serialized_payload) > MAX_PREFERENCES_BYTES:
