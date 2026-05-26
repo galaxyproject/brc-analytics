@@ -1,3 +1,4 @@
+import { WorkflowCategoryId } from "../../../../../catalog/schema/generated/schema";
 import type {
   Workflow,
   WorkflowCategory,
@@ -10,15 +11,23 @@ import type { Organism } from "../../types";
  * Filters workflows to include only ORGANISM-scoped workflows compatible with the organism's taxonomy.
  * @param organism - Organism.
  * @param allWorkflowCategories - Workflow categories.
+ * @param isAssemblyWorkflowsEnabled - Whether the 'assembly-workflows' feature flag is enabled.
  * @returns Workflow categories compatible with the given organism.
  */
 export function buildOrganismWorkflows(
   organism: Organism,
-  allWorkflowCategories: WorkflowCategory[]
+  allWorkflowCategories: WorkflowCategory[],
+  isAssemblyWorkflowsEnabled = false
 ): WorkflowCategory[] {
   const workflowCategories: WorkflowCategory[] = [];
 
   for (const workflowCategory of allWorkflowCategories) {
+    if (
+      workflowCategory.category === WorkflowCategoryId.ASSEMBLY &&
+      !isAssemblyWorkflowsEnabled
+    )
+      continue;
+
     const { workflows: categoryWorkflows } = workflowCategory;
 
     const compatibleWorkflows = categoryWorkflows.filter(

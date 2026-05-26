@@ -17,15 +17,23 @@ import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../differentialExpressionAn
  * Differential Expression Analysis is added to the Transcriptomics category.
  * @param assembly - Assembly.
  * @param allWorkflowCategories - Workflow categories.
+ * @param isAssemblyWorkflowsEnabled - Whether the 'assembly-workflows' feature flag is enabled.
  * @returns Workflow categories compatible with the given assembly.
  */
 export function buildAssemblyWorkflows(
   assembly: BRCDataCatalogGenome | GA2AssemblyEntity,
-  allWorkflowCategories: WorkflowCategory[]
+  allWorkflowCategories: WorkflowCategory[],
+  isAssemblyWorkflowsEnabled = false
 ): WorkflowCategory[] {
   const workflowCategories: WorkflowCategory[] = [];
 
   for (const workflowCategory of allWorkflowCategories) {
+    if (
+      workflowCategory.category === WorkflowCategoryId.ASSEMBLY &&
+      !isAssemblyWorkflowsEnabled
+    )
+      continue;
+
     const { workflows: categoryWorkflows } = workflowCategory;
 
     // Filter workflows to only include those that are compatible with the given assembly

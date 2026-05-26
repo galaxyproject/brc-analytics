@@ -1,5 +1,6 @@
 import { ALERT_PROPS } from "@databiosphere/findable-ui/lib/components/common/Alert/constants";
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/components/FluidPaper/fluidPaper";
+import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Alert } from "@mui/material";
 import { RowData } from "@tanstack/react-table";
@@ -30,9 +31,11 @@ export const Main = <T extends RowData>({
   tableOptions,
 }: Props<T>): JSX.Element => {
   const table = useTable<T>(tableOptions);
+  const isAssemblyWorkflowsEnabled = useFeatureFlag("assembly-workflows");
   const workflowCategories = buildOrganismWorkflows(
     organism,
-    WORKFLOW_CATEGORIES
+    WORKFLOW_CATEGORIES,
+    isAssemblyWorkflowsEnabled
   );
   return (
     <>
