@@ -22,15 +22,15 @@ export const SideColumn = ({
   return (
     <FluidPaper>
       <GridPaper>
-        <CollapsableSection title="Workflow Details">
+        <CollapsableSection key="workflow-details" title="Workflow Details">
           <KeyValuePairs {...buildWorkflowDetails(workflow)} />
         </CollapsableSection>
         {assembly && (
-          <CollapsableSection title="Assembly Details">
+          <CollapsableSection key="assembly-details" title="Assembly Details">
             <KeyValuePairs {...buildAssemblyDetails(assembly)} />
           </CollapsableSection>
         )}
-        <CollapsableSection title="Configuration">
+        <CollapsableSection key="configuration" title="Configuration">
           <KeyValuePairs
             {...buildWorkflowConfiguration(configuredInput, configuredSteps)}
           />
