@@ -52,22 +52,54 @@ function getTaxonomicLevelRealm(assembly: Assembly | undefined): string {
 }
 
 /**
+ * Checks if a workflow should be included based on feature flags.
+ * @param workflow - Workflow to check.
+ * @param workflow.trsId - TRS ID of the workflow.
+ * @param isFluEnabled - Whether the 'flu' feature flag is enabled.
+ * @param isHyphyEnabled - Whether the 'hyphy' feature flag is enabled.
+ * @returns True if the workflow should be included, false otherwise.
+ */
+function shouldIncludeWorkflow(
+  workflow: { trsId: string },
+  isFluEnabled: boolean,
+  isHyphyEnabled: boolean
+): boolean {
+  const isFluWorkflow =
+    workflow.trsId ===
+    "#workflow/github.com/iwc-workflows/influenza-isolates-consensus-and-subtyping/main/versions/v0.3";
+  const isHyphyWorkflow =
+    workflow.trsId ===
+    "#workflow/github.com/iwc-workflows/hyphy/capheine-core-and-compare/versions/v0.1";
+
+  if (isFluWorkflow && !isFluEnabled) return false;
+  if (isHyphyWorkflow && !isHyphyEnabled) return false;
+
+  return true;
+}
+
+/**
  * Utility function to transform workflow categories into a flat list of workflows.
  * Filters out workflows that have no compatible assemblies for the current site.
  * Differential Expression Analysis is always included as an interim measure.
  * LMLS workflows (Logan Search and Lexicmap) are included when the 'lmls' feature flag is enabled.
+ * Flu workflow is conditionally included based on the 'flu' feature flag.
+ * Hyphy workflow is conditionally included based on the 'hyphy' feature flag.
  * Each workflow includes the properties of the workflow itself along with the name of its category and the compatible assembly (if any).
  * @param workflowCategories - An array of workflow categories, each containing an array of workflows.
  * @param mappings - Workflow-assembly mappings for the current site.
  * @param organisms - Organisms.
  * @param isLmlsEnabled - Whether the 'lmls' feature flag is enabled.
+ * @param isFluEnabled - Whether the 'flu' feature flag is enabled.
+ * @param isHyphyEnabled - Whether the 'hyphy' feature flag is enabled.
  * @returns An array of workflows, where each workflow is a combination of a workflow and its category name.
  */
 export function getWorkflows(
   workflowCategories: WorkflowCategory[],
   mappings: WorkflowAssemblyMapping[],
   organisms: Organism[],
-  isLmlsEnabled = false
+  isLmlsEnabled = false,
+  isFluEnabled = false,
+  isHyphyEnabled = false
 ): WorkflowEntity[] {
   const workflows: WorkflowEntity[] = [];
 
@@ -83,6 +115,11 @@ export function getWorkflows(
   for (const category of workflowCategories) {
     if (!category.workflows) continue;
     for (const workflow of category.workflows) {
+      // Skip workflows based on feature flags.
+      if (!shouldIncludeWorkflow(workflow, isFluEnabled, isHyphyEnabled)) {
+        continue;
+      }
+
       // Skip workflows with no compatible assemblies.
       if (!workflowsWithAssemblies.has(workflow.trsId)) {
         continue;

@@ -1,20 +1,20 @@
-import { JSX } from "react";
-import { Props } from "./types";
+import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import {
   Section,
   SectionContent,
 } from "@databiosphere/findable-ui/lib/components/common/Section/section.styles";
-import { CardActionArea, Chip, Typography } from "@mui/material";
-import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
+import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
+import { CardActionArea, Chip, Typography } from "@mui/material";
 import { MDXRemote } from "next-mdx-remote";
-import { StyledGrid, StyledSectionText } from "./priorityPathogens.styles";
-import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
-import { getPriorityColor, getPriorityLabel } from "./utils";
 import { useRouter } from "next/router";
-import { ROUTES } from "../../../../../routes/constants";
+import { JSX } from "react";
 import slugify from "slugify";
+import { ROUTES } from "../../../../../routes/constants";
 import { SLUGIFY_OPTIONS } from "../../../../common/constants";
+import { StyledGrid, StyledSectionText } from "./priorityPathogens.styles";
+import { Props } from "./types";
+import { getPriorityColor, getPriorityLabel } from "./utils";
 
 export const PriorityPathogens = ({
   priorityPathogens,

@@ -1,13 +1,15 @@
-import { JSX } from "react";
-import { Props } from "./types";
 import { ColumnFiltersAdapter } from "@databiosphere/findable-ui/lib/components/Filter/components/adapters/tanstack/ColumnFiltersAdapter/columnFiltersAdapter";
-import { SurfaceProps } from "@databiosphere/findable-ui/lib/components/Filter/components/surfaces/types";
-import { Filters } from "@databiosphere/findable-ui/lib/components/Filter/components/Filters/filters";
-import { StyledContainer } from "./columnFilters.styles";
 import { Controls } from "@databiosphere/findable-ui/lib/components/Filter/components/controls/Controls/controls";
-import { StyledSearchAllFilters } from "./columnFilters.styles";
-import { getCategoryViews } from "./utils";
+import { Filters } from "@databiosphere/findable-ui/lib/components/Filter/components/Filters/filters";
+import { SurfaceProps } from "@databiosphere/findable-ui/lib/components/Filter/components/surfaces/types";
 import { RowData } from "@tanstack/react-table";
+import { JSX } from "react";
+import {
+  StyledContainer,
+  StyledSearchAllFilters,
+} from "./columnFilters.styles";
+import { Props } from "./types";
+import { getCategoryViews } from "./utils";
 
 export const ColumnFilters = <T extends RowData>({
   table,

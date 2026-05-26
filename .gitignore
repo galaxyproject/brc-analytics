@@ -42,6 +42,9 @@ backend/**/.env
 /playwright-report
 /playwright/.cache
 
+# Playwright MCP server debug output
+/.playwright-mcp/
+
 # python
 venv
 __pycache__

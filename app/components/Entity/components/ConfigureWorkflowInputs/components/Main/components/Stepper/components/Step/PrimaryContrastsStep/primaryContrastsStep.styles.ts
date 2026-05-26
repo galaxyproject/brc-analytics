@@ -1,5 +1,5 @@
-import styled from "@emotion/styled";
 import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepContent/stepContent";
+import styled from "@emotion/styled";
 import { Stack } from "@mui/material";
 
 export const StyledStepContent = styled(StepContent)`

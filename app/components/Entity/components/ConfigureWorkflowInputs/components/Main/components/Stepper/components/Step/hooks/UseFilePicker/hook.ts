@@ -6,11 +6,16 @@ import {
   useRef,
   useState,
 } from "react";
-import { VALIDATION_ERROR } from "./constants";
-import { OnFileChangeOptions, UseFilePicker } from "./types";
-import { hasFileChanged, isValid, parseFile } from "./utils";
+import { FALLBACK_ERROR } from "./constants";
+import { OnFileChangeOptions, ParseFn, UseFilePicker } from "./types";
+import { hasFileChanged, isValid } from "./utils";
 
-export const useFilePicker = (): UseFilePicker => {
+/**
+ * Generic file picker hook that manages file selection state, validation, and parsing.
+ * @param parseFn - Function that parses the selected file and returns data with validation errors.
+ * @returns File picker actions, file state, input ref, and validation state.
+ */
+export const useFilePicker = <T>(parseFn: ParseFn<T>): UseFilePicker<T> => {
   const [errors, setErrors] = useState<string[]>([]);
   const [file, setFile] = useState<File | null>(null);
 
@@ -35,18 +40,15 @@ export const useFilePicker = (): UseFilePicker => {
   const onDrop = useCallback(
     async (
       event: DragEvent<HTMLElement>,
-      options: OnFileChangeOptions
+      options: OnFileChangeOptions<T>
     ): Promise<void> => {
       event.preventDefault();
 
-      // Access the first file from the DataTransfer.
       const droppedFile = event.dataTransfer.files?.[0];
       if (!droppedFile) return;
 
-      // Check if the file has changed.
       const fileChanged = hasFileChanged(fileRef.current, droppedFile);
 
-      // Update the file reference and state.
       fileRef.current = droppedFile;
       setFile(droppedFile);
 
@@ -56,47 +58,44 @@ export const useFilePicker = (): UseFilePicker => {
       if (!fileChanged) return;
 
       try {
-        const { errors, rows } = await parseFile(droppedFile);
+        const { data, errors } = await parseFn(droppedFile);
 
         setErrors(errors);
 
-        if (errors.length === 0) options.onComplete?.(rows);
+        if (errors.length === 0) options.onComplete?.(data, droppedFile);
       } catch {
-        setErrors([VALIDATION_ERROR.PARSE_FAILED]);
+        setErrors([FALLBACK_ERROR]);
       }
     },
-    []
+    [parseFn]
   );
 
   const onFileChange = useCallback(
     async (
       event: ChangeEvent<HTMLInputElement>,
-      options: OnFileChangeOptions
+      options: OnFileChangeOptions<T>
     ): Promise<void> => {
-      // Access the first file from the FileList.
       const selectedFile = event.target.files?.[0];
       if (!selectedFile) return;
 
-      // Check if the file has changed.
       const fileChanged = hasFileChanged(fileRef.current, selectedFile);
 
-      // Update the file reference and state.
       fileRef.current = selectedFile;
       setFile(selectedFile);
 
       if (!fileChanged) return;
 
       try {
-        const { errors, rows } = await parseFile(selectedFile);
+        const { data, errors } = await parseFn(selectedFile);
 
         setErrors(errors);
 
-        if (errors.length === 0) options.onComplete?.(rows);
+        if (errors.length === 0) options.onComplete?.(data, selectedFile);
       } catch {
-        setErrors([VALIDATION_ERROR.PARSE_FAILED]);
+        setErrors([FALLBACK_ERROR]);
       }
     },
-    []
+    [parseFn]
   );
 
   return {

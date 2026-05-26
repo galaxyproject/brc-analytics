@@ -1,9 +1,9 @@
-import { JSX } from "react";
 import { Logo } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/components/Content/components/Logo/logo";
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
-import { Brands, FooterText, LargeBrand, SmallBrand } from "./branding.styles";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
+import { JSX } from "react";
+import { Brands, FooterText, LargeBrand, SmallBrand } from "./branding.styles";
 
 export const Branding = (): JSX.Element => {
   return (

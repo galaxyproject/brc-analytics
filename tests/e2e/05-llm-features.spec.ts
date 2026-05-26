@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test.describe("BRC Analytics - LLM/AI Features", () => {
   test("LLM service should be configured and healthy", async ({ request }) => {

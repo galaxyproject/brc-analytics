@@ -1,0 +1,92 @@
+---
+breadcrumbs:
+  - path: "/learn"
+    text: "Learn"
+  - path: ""
+    text: "MCP Server"
+contentType: "ARTICLE"
+description: ""
+enableOutline: true
+title: "MCP Server"
+---
+
+## What is MCP?
+
+The [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) is an open standard that lets AI assistants -- like Claude Desktop, Claude Code, and other MCP-aware clients -- connect to external data sources and tools. BRC Analytics runs a public MCP server that exposes our full catalog (organisms, assemblies, workflows) and ENA sequencing-data search as a set of tools your assistant can call directly.
+
+Once connected, you can ask questions like _"What assemblies do you have for Plasmodium falciparum?"_ or _"Find me Illumina RNA-seq runs for taxonomy ID 5833"_ in plain language, and the assistant will pull live answers from BRC Analytics instead of guessing.
+
+This is an experimental feature -- the tool surface and connection details may change.
+
+## Connecting
+
+The MCP endpoint is:
+
+```
+https://brc-analytics.org/api/v1/mcp
+```
+
+### Claude Desktop
+
+Edit your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS, `%APPDATA%\Claude\claude_desktop_config.json` on Windows) and add:
+
+```json
+{
+  "mcpServers": {
+    "brc-analytics": {
+      "url": "https://brc-analytics.org/api/v1/mcp"
+    }
+  }
+}
+```
+
+Restart Claude Desktop. You should see the `brc-analytics` server listed in the tools panel.
+
+### Other clients
+
+Any MCP-compliant client that supports HTTP transport can connect using the same URL. Consult your client's documentation for the exact config format.
+
+### Running locally
+
+If you're running the BRC Analytics backend yourself (see the project README), swap the URL for `http://localhost:8000/api/v1/mcp` (or `http://localhost:8080/api/v1/mcp` when using the Docker stack).
+
+## What you can do with it
+
+The server provides two groups of tools:
+
+**Catalog tools** -- explore curated BRC content:
+
+- Search organisms by name, taxonomy ID, or taxonomic group
+- List and inspect genome assemblies, including ploidy and annotation status
+- Browse workflow categories and individual workflow details
+- Check whether a given workflow is compatible with a given assembly
+- Resolve the inputs (reference genome URL, gene model) that a workflow needs for a particular assembly
+
+**ENA tools** -- search the European Nucleotide Archive for raw sequencing data:
+
+- Find sequencing runs by NCBI taxonomy ID
+- Search by keywords (organism names, library strategies like RNA-Seq or WGS, platforms like Illumina or PacBio)
+
+Results from ENA searches are capped at 50 records per call, with a `has_more` flag if additional results exist.
+
+## Things to try
+
+Once connected, try prompts like:
+
+- _"Which BRC organisms are in the Apicomplexa group?"_
+- _"Show me the diploid assemblies you have, and tell me which variant-calling workflows are compatible with them."_
+- _"For assembly GCF_000002765.6, resolve the inputs for the variant-calling workflow. What still needs to be provided?"_
+- _"Find paired-end Illumina runs in ENA for taxonomy ID 5833."_
+- _"What's in the Transcriptomics workflow category?"_
+
+The assistant will chain tool calls together as needed -- e.g., look up an organism, list its assemblies, check compatibility, and resolve inputs in a single conversation.
+
+## Limitations
+
+- **Read-only.** The server exposes catalog and ENA data but cannot launch workflows on Galaxy. Use the BRC Analytics web interface to actually start an analysis.
+- **Snapshot of the catalog.** Catalog data is the same as what powers the website -- it updates when we publish a new build, not in real time.
+- **ENA is a live external API.** ENA searches go directly to the European Nucleotide Archive and can fail or rate-limit independently of BRC.
+
+## Feedback
+
+The MCP server is new and we're actively iterating on the tool surface. If something is missing, broken, or confusing, email [help@brc-analytics.org](mailto:help@brc-analytics.org).

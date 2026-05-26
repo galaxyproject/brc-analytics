@@ -1,11 +1,12 @@
-import { JSX } from "react";
-import { useMemo } from "react";
-import { Button, Divider } from "@mui/material";
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
+import { Button, Divider } from "@mui/material";
+import { JSX, useMemo } from "react";
+import { useRadioGroup } from "../hooks/UseRadioGroup/hook";
+import { StyledStack as CommonStyledStack } from "../step.styles";
 import { StepProps } from "../types";
-import { StyledStack, StyledStepContent } from "./primaryContrastsStep.styles";
+import { Alert } from "./components/Alert/alert";
 import { CompareBaseline } from "./components/CompareBaseline/compareBaseline";
 import { ExplicitPairs } from "./components/ExplicitPairs/explicitPairs";
 import { RadioGroup } from "./components/RadioGroup/radioGroup";
@@ -13,10 +14,8 @@ import { useBaselineContrasts } from "./hooks/UseBaselineContrasts/hook";
 import { useExplicitContrasts } from "./hooks/UseExplicitContrasts/hook";
 import { usePrimaryContrasts } from "./hooks/UsePrimaryContrasts/hook";
 import { CONTRAST_MODE } from "./hooks/UseRadioGroup/types";
-import { useRadioGroup } from "../hooks/UseRadioGroup/hook";
+import { StyledStack, StyledStepContent } from "./primaryContrastsStep.styles";
 import { getUniqueFactorValues } from "./utils";
-import { StyledStack as CommonStyledStack } from "../step.styles";
-import { Alert } from "./components/Alert/alert";
 
 export const PrimaryContrastsStep = ({
   active,

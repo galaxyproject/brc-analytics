@@ -1,12 +1,18 @@
-import { JSX } from "react";
-import { Fragment } from "react";
-import { StyledStack } from "./learnView.styles";
+import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
+import { Fragment, JSX } from "react";
 import { SectionContentCard } from "../../components/common/Card/components/SectionContentCard/sectionContentCard";
-import { CARDS } from "./constants";
-import { StyledSectionHero } from "../../components/Docs/components/SectionHero/sectionHero.styles";
 import { SectionContent } from "../../components/Docs/components/SectionContent/sectionContent";
+import { StyledSectionHero } from "../../components/Docs/components/SectionHero/sectionHero.styles";
+import { CARDS } from "./constants";
+import { StyledStack } from "./learnView.styles";
 
 export const LearnView = (): JSX.Element => {
+  const isLmlsEnabled = useFeatureFlag("lmls");
+  const filteredCards = CARDS.filter(
+    (card) =>
+      card.cardUrl !== "/learn/sequence-search-workflows" || isLmlsEnabled
+  );
+
   return (
     <Fragment>
       <StyledSectionHero
@@ -20,7 +26,7 @@ export const LearnView = (): JSX.Element => {
       <SectionContent
         content={
           <StyledStack>
-            {CARDS.map((card, index) => (
+            {filteredCards.map((card, index) => (
               <SectionContentCard key={index} {...card} />
             ))}
           </StyledStack>

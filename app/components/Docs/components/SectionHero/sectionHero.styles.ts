@@ -1,14 +1,14 @@
+import { css } from "@emotion/react";
 import styled from "@emotion/styled";
+import {
+  CONTENT_TYPE,
+  FrontmatterProps,
+} from "../../../../docs/common/frontmatter/types";
 import { SectionHero } from "../../../Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import {
   Head,
   SectionLayout,
 } from "../../../Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero.styles";
-import {
-  CONTENT_TYPE,
-  FrontmatterProps,
-} from "../../../../docs/common/frontmatter/types";
-import { css } from "@emotion/react";
 
 export const PADDING_Y_BOTTOM = 90;
 

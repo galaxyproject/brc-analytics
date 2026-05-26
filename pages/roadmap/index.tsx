@@ -1,11 +1,12 @@
-import { JSX } from "react";
 import { GetStaticProps } from "next";
+import { JSX } from "react";
+import { getPageMeta } from "../../app/common/meta/utils";
 import { StyledPagesMain } from "../../app/components/Layout/components/Main/main.styles";
+import { config } from "../../app/config/config";
 import { RoadmapView } from "../../app/views/RoadmapView/roadmapView";
 import { RoadmapViewGA2 } from "../../app/views/RoadmapView/roadmapViewGA2";
-import { config } from "../../app/config/config";
-import { APP_KEYS } from "../../site-config/common/constants";
 import { ROUTES } from "../../routes/constants";
+import { APP_KEYS } from "../../site-config/common/constants";
 
 export const Roadmap = (): JSX.Element => {
   const { appKey } = config();
@@ -17,7 +18,7 @@ export const Roadmap = (): JSX.Element => {
 };
 
 export const getStaticProps: GetStaticProps = async () => {
-  const { allowedPaths } = config();
+  const { allowedPaths, appKey } = config();
 
   if (allowedPaths && !allowedPaths.includes(ROUTES.ROADMAP)) {
     return { notFound: true };
@@ -25,7 +26,7 @@ export const getStaticProps: GetStaticProps = async () => {
 
   return {
     props: {
-      pageTitle: "Roadmap",
+      ...getPageMeta(appKey).ROADMAP,
       themeOptions: {
         palette: { background: { default: "#FAFBFB" } }, // SMOKE_LIGHTEST
       },

@@ -1,4 +1,9 @@
-import { JSX } from "react";
+import { CheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/CheckedIcon/checkedIcon";
+import { RadioCheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioCheckedIcon/radioCheckedIcon";
+import { RadioUncheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioUncheckedIcon/radioUncheckedIcon";
+import { UncheckedDisabledIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/UncheckedDisabledIcon/uncheckedDisabledIcon";
+import { UncheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/UncheckedIcon/uncheckedIcon";
+import { GridTable } from "@databiosphere/findable-ui/lib/components/Table/table.styles";
 import {
   Checkbox,
   Radio,
@@ -7,15 +12,10 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import { StyledTableContainer } from "./table.styles";
-import { GridTable } from "@databiosphere/findable-ui/lib/components/Table/table.styles";
-import { Props } from "./types";
+import { JSX } from "react";
 import { COLUMN_TYPE_LABEL } from "./constants";
-import { RadioCheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioCheckedIcon/radioCheckedIcon";
-import { RadioUncheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioUncheckedIcon/radioUncheckedIcon";
-import { CheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/CheckedIcon/checkedIcon";
-import { UncheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/UncheckedIcon/uncheckedIcon";
-import { UncheckedDisabledIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/UncheckedDisabledIcon/uncheckedDisabledIcon";
+import { StyledTableContainer } from "./table.styles";
+import { Props } from "./types";
 
 export const Table = ({
   columns,

@@ -1,10 +1,10 @@
-import { JSX } from "react";
 import { MenuItem } from "@mui/material";
-import { StyledSelect } from "./select.styles";
-import { Props } from "./types";
+import { JSX } from "react";
 import { COLUMN_TYPE } from "../../../../types";
 import { SELECT_PROPS } from "./constants";
 import { OPTIONS } from "./options";
+import { StyledSelect } from "./select.styles";
+import { Props } from "./types";
 import { isOptionDisabled } from "./utils";
 
 const optionsMap = new Map(OPTIONS);

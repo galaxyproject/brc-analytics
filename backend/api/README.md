@@ -17,7 +17,7 @@ FastAPI REST API service for BRC Analytics.
 ```bash
 cd backend/api
 uv sync
-uv run uvicorn app.main:app --reload
+uv run uvicorn app.main:create_app --factory --reload
 ```
 
 API documentation: http://localhost:8000/api/docs

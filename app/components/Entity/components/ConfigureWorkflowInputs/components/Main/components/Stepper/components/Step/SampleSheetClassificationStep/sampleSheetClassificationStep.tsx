@@ -1,17 +1,16 @@
-import { JSX } from "react";
-import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
-import { StepProps } from "../types";
-import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
-import { Button, Typography } from "@mui/material";
-import { StyledStepContent } from "./sampleSheetClassificationStep.styles";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
-import { useColumnClassification } from "./hooks/UseColumnClassification/hook";
-import { ClassificationTable } from "./components/ClassificationTable/classificationTable";
+import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
+import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
-import { STEP } from "./step";
+import { Button, Typography } from "@mui/material";
+import { Fragment, JSX } from "react";
 import { StyledStack } from "../step.styles";
-import { Fragment } from "react";
+import { StepProps } from "../types";
+import { ClassificationTable } from "./components/ClassificationTable/classificationTable";
 import { ClassificationValidation } from "./components/ClassificationValidation/classificationValidation";
+import { useColumnClassification } from "./hooks/UseColumnClassification/hook";
+import { StyledStepContent } from "./sampleSheetClassificationStep.styles";
+import { STEP } from "./step";
 
 export const SampleSheetClassificationStep = ({
   active,

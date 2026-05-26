@@ -13,7 +13,7 @@
             ]
         },
         "CollectionType": {
-            "description": "Galaxy collection types supported for workflow parameters.\nCurrently only 'list' collections are supported, which represent a simple ordered list of datasets.",
+            "description": "Galaxy collection types supported for collection_spec in workflow parameters.\nCurrently only 'list' collections are supported, which represent a simple ordered list of datasets.",
             "enum": [
                 "list"
             ],
@@ -171,6 +171,7 @@
                 "PROTEIN_FOLDING",
                 "CONSENSUS_SEQUENCES",
                 "ANNOTATION",
+                "COMPARATIVE_GENOMICS",
                 "OTHER"
             ],
             "title": "WorkflowCategoryId",

@@ -1,9 +1,9 @@
-import { JSX } from "react";
-import { Props } from "./types";
-import { COMPONENTS } from "./constants";
 import { MDXRemote } from "next-mdx-remote";
-import { Section } from "../section";
+import { JSX } from "react";
 import { FluidPaper } from "../../../../../components/common/Paper/components/FluidPaper/fluidPaper";
+import { Section } from "../section";
+import { COMPONENTS } from "./constants";
+import { Props } from "./types";
 
 export const MDXSection = ({
   components,

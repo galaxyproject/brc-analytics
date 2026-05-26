@@ -1,6 +1,6 @@
-import { IconButtonProps, SelectProps, SvgIconProps } from "@mui/material";
-import { SVG_ICON_PROPS as MUI_SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
 import { ICON_BUTTON_PROPS as MUI_ICON_BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/iconButton";
+import { SVG_ICON_PROPS as MUI_SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
+import { IconButtonProps, SelectProps, SvgIconProps } from "@mui/material";
 
 export const ICON_BUTTON_PROPS: IconButtonProps = {
   "aria-label": "Remove selection",

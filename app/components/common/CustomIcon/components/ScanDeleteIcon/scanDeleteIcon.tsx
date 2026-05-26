@@ -1,5 +1,5 @@
-import { JSX } from "react";
 import { SvgIcon, SvgIconProps } from "@mui/material";
+import { JSX } from "react";
 
 /**
  * Custom scan delete icon.

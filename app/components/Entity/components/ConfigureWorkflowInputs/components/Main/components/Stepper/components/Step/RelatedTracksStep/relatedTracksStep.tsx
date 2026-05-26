@@ -1,36 +1,36 @@
-import { JSX } from "react";
-import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
-import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepContent/stepContent";
-import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
-import { StepProps } from "../types";
-import { useToggleButtonGroup } from "../hooks/UseToggleButtonGroup/useToggleButtonGroup";
-import { ToggleButtonGroup } from "../components/ToggleButtonGroup/toggleButtonGroup";
-import { UploadMyData } from "./components/UploadMyData/uploadMyData";
-import { VIEW } from "./components/ToggleButtonGroup/types";
-import { TOGGLE_BUTTONS } from "./components/ToggleButtonGroup/toggleButtons";
-import { Button } from "@mui/material";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
-import { Fragment } from "react";
+import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepContent/stepContent";
 import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Optional/optional";
-import { GenomeBrowser } from "./components/GenomeBrowser/genomeBrowser";
-import { useUCSCTracks } from "./hooks/UseUCSCTracks/hook";
+import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
+import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
+import { Button } from "@mui/material";
+import { Fragment, JSX } from "react";
+import { useAssembly } from "../../../../../../../providers/Assembly/hook";
+import { ToggleButtonGroup } from "../components/ToggleButtonGroup/toggleButtonGroup";
+import { useToggleButtonGroup } from "../hooks/UseToggleButtonGroup/useToggleButtonGroup";
+import { StepProps } from "../types";
 import { useTable } from "./components/GenomeBrowser/components/TracksSelector/hooks/UseTable/hook";
-import { renderValue } from "./utils";
 import { getTracksData } from "./components/GenomeBrowser/components/TracksSelector/utils";
+import { GenomeBrowser } from "./components/GenomeBrowser/genomeBrowser";
+import { TOGGLE_BUTTONS } from "./components/ToggleButtonGroup/toggleButtons";
+import { VIEW } from "./components/ToggleButtonGroup/types";
+import { UploadMyData } from "./components/UploadMyData/uploadMyData";
+import { useUCSCTracks } from "./hooks/UseUCSCTracks/hook";
+import { renderValue } from "./utils";
 
 export const RelatedTracksStep = ({
   active,
   completed,
   configuredInput,
   entryLabel,
-  genome,
   index,
   onConfigure,
   onContinue,
   onEdit,
   stepKey,
 }: StepProps): JSX.Element => {
-  const ucscTracks = useUCSCTracks(genome?.accession);
+  const assembly = useAssembly();
+  const ucscTracks = useUCSCTracks(assembly?.accession);
   const table = useTable(ucscTracks);
   const { onChange, value } = useToggleButtonGroup(VIEW.UCSC_GENOME_BROWSER);
   return (

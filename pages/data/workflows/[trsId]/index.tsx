@@ -1,6 +1,8 @@
 import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
+import { getPageMeta } from "../../../../app/common/meta/utils";
+import { config } from "../../../../app/config/config";
 import { formatTrsId } from "../../../../app/views/AnalyzeWorkflowsView/components/Main/utils";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../app/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { LEXICMAP } from "../../../../app/views/AnalyzeWorkflowsView/lexicmap/constants";
@@ -13,14 +15,14 @@ interface Params extends ParsedUrlQuery {
 }
 
 export interface Props {
+  pageDescription?: string;
+  pageTitle?: string;
   trsId: string;
 }
 
 export const getStaticPaths: GetStaticPaths<Params> = async () => {
   const paths = workflowCategories.reduce(
-    (acc, { showComingSoon, workflows }) => {
-      // Special case, "showComingSoon", when false, should be skipped.
-      if (showComingSoon === false) return acc;
+    (acc, { workflows }) => {
       for (const { trsId } of workflows) {
         acc.push({ params: { trsId: formatTrsId(trsId) } });
       }
@@ -52,7 +54,12 @@ export const getStaticProps: GetStaticProps<Props> = async ({
 
   if (!trsId) return { notFound: true };
 
-  return { props: { trsId } };
+  return {
+    props: {
+      ...getPageMeta(config().appKey).WORKFLOW,
+      trsId,
+    },
+  };
 };
 
 /**

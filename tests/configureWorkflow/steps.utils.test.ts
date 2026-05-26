@@ -6,9 +6,9 @@ jest.mock(
   })
 );
 
+import type { StepConfig } from "../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { augmentConfiguredSteps } from "../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/utils";
 import type { ConfiguredInput } from "../../app/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import type { StepConfig } from "../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 
 const SEQUENCING_STEPS: Record<string, StepConfig> = {
   readRunsPaired: { key: "readRunsPaired" } as StepConfig,

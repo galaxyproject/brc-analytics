@@ -1,7 +1,7 @@
-import styled from "@emotion/styled";
-import { RadioGroup } from "@mui/material";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { bpDownSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
+import styled from "@emotion/styled";
+import { RadioGroup } from "@mui/material";
 
 export const StyledRadioGroup = styled(RadioGroup)`
   align-items: stretch;

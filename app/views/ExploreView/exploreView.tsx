@@ -1,5 +1,5 @@
 import { DrawerProvider } from "@databiosphere/findable-ui/lib/components/common/Drawer/provider/provider";
-import React, { JSX } from "react";
+import { JSX } from "react";
 import { Filters } from "./components/Filters/filters";
 import { useTable } from "./hooks/UseTable/hook";
 import type { Props } from "./types";

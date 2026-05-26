@@ -1,8 +1,9 @@
-import { JSX } from "react";
 import { GetStaticProps } from "next";
+import { JSX } from "react";
+import { BRC_PAGE_META } from "../../app/common/meta/brc/constants";
 import { StyledPagesMain } from "../../app/components/Layout/components/Main/main.styles";
-import { CalendarView } from "../../app/views/CalendarView/calendarView";
 import { config } from "../../app/config/config";
+import { CalendarView } from "../../app/views/CalendarView/calendarView";
 import { ROUTES } from "../../routes/constants";
 
 export const Calendar = (): JSX.Element => {
@@ -18,7 +19,7 @@ export const getStaticProps: GetStaticProps = async () => {
 
   return {
     props: {
-      pageTitle: "Calendar",
+      ...BRC_PAGE_META.CALENDAR,
       themeOptions: {
         palette: { background: { default: "#FAFBFB" } }, // SMOKE_LIGHTEST
       },

@@ -1,0 +1,2 @@
+export const DEFAULT_ACCESSION_COUNT = 10;
+export const MIN_ACCESSION_COUNT = 1;

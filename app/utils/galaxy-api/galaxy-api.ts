@@ -1,13 +1,22 @@
-import { WORKFLOW_PARAMETER_VARIABLE } from "../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { WorkflowParameter } from "../../apis/catalog/brc-analytics-catalog/common/entities";
-import { WorkflowCollectionSpec } from "../../apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { WorkflowUrlSpec } from "../../apis/catalog/brc-analytics-catalog/common/schema-entities";
+import {
+  WORKFLOW_PARAMETER_VARIABLE,
+  WorkflowCollectionSpec,
+  WorkflowUrlSpec,
+} from "../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 
 const FILE_EXT = {
   FASTQ_SANGER_GZ: "fastqsanger.gz",
 } as const;
 
 import ky from "ky";
+import { COLUMN_TYPE } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
+import { PrimaryContrasts } from "../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { UcscTrack } from "../ucsc-tracks-api/entities";
+import {
+  fetchUcscMd5Checksums,
+  getChecksumForPath,
+} from "../ucsc-tracks-api/ucsc-tracks-api";
 import {
   DataLandingsBody,
   DataLandingsBodyRequestState,
@@ -35,13 +44,6 @@ import {
   WorkflowLandingsBodyRequestState,
   WorkflowParameterValue,
 } from "./entities";
-import { COLUMN_TYPE } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
-import { PrimaryContrasts } from "../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { UcscTrack } from "../ucsc-tracks-api/entities";
-import {
-  fetchUcscMd5Checksums,
-  getChecksumForPath,
-} from "../ucsc-tracks-api/ucsc-tracks-api";
 import { ftpToAscp } from "./url-utils";
 
 const DOCKSTORE_API_URL = "https://dockstore.org/api/ga4gh/trs/v2/tools";
@@ -928,19 +930,31 @@ export async function getDeSeq2LandingUrl(
 /**
  * Get the URL of the LMLS workflow landing page.
  * LMLS workflows (Logan Search/kmindex and Lexicmap) use stored workflow IDs
- * and don't require any parameters initially.
+ * with sequence and numberOfHits parameters.
  * @param workflowId - Galaxy stored workflow ID.
+ * @param numberOfHits - Number of accessions to download.
+ * @param sequence - FASTA sequence content.
  * @param origin - Origin URL of the site making the request.
  * @returns LMLS workflow landing URL.
  */
 export async function getLMLSLandingUrl(
   workflowId: string,
+  numberOfHits: number,
+  sequence: string,
   origin: string
 ): Promise<string> {
   const body: LMLSWorkflowLandingsBody = {
     origin,
     public: true,
-    request_state: {},
+    request_state: {
+      "How many accessions to keep": numberOfHits,
+      "Query Sequence": {
+        class: "File",
+        ext: "fasta",
+        name: "Query Sequence",
+        url: `base64://${btoa(sequence)}`,
+      },
+    },
     workflow_id: workflowId,
     workflow_target_type: "stored_workflow",
   };

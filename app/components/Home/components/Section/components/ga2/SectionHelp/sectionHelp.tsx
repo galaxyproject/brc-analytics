@@ -1,5 +1,5 @@
-import { JSX } from "react";
 import { Link as DXLink } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
+import { JSX } from "react";
 import { Questions } from "./components/Questions/questions";
 import {
   Headline,

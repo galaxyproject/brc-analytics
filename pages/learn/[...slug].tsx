@@ -1,16 +1,16 @@
-import { JSX } from "react";
-import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
-import { StyledPagesMain } from "../../app/components/Layout/components/Main/main.styles";
-import { LearnContentView } from "../../app/views/LearnContentView/learnContentView";
 import { buildStaticPaths } from "@databiosphere/findable-ui/lib/utils/mdx/staticGeneration/staticPaths";
 import { buildStaticProps } from "@databiosphere/findable-ui/lib/utils/mdx/staticGeneration/staticProps";
-import { sanitizeStaticProps } from "../../app/docs/common/staticGeneration/utils";
-import { StaticProps } from "../../app/docs/common/staticGeneration/types";
-import { sanitizeFrontmatter } from "../../app/docs/common/frontmatter/utils";
 import {
   buildMDXFilePath,
   buildMDXSlug,
 } from "@databiosphere/findable-ui/lib/utils/mdx/staticGeneration/utils";
+import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
+import { JSX } from "react";
+import { StyledPagesMain } from "../../app/components/Layout/components/Main/main.styles";
+import { sanitizeFrontmatter } from "../../app/docs/common/frontmatter/utils";
+import { StaticProps } from "../../app/docs/common/staticGeneration/types";
+import { sanitizeStaticProps } from "../../app/docs/common/staticGeneration/utils";
+import { LearnContentView } from "../../app/views/LearnContentView/learnContentView";
 
 const APPS_DIR = "app";
 const DOCS_DIR = "docs";

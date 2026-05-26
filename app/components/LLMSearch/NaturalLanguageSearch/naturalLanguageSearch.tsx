@@ -1,12 +1,12 @@
-import { JSX, useState } from "react";
 import { Button, CircularProgress, TextField, Typography } from "@mui/material";
+import { JSX, useState } from "react";
 import { useLLMDatasetSearch } from "../../../hooks/useLLMDatasetSearch";
 import { SearchResults } from "../SearchResults/searchResults";
 import {
   SearchContainer,
   SearchForm,
-  SearchHelperText,
   SearchFormContainer,
+  SearchHelperText,
 } from "./naturalLanguageSearch.styles";
 
 export const NaturalLanguageSearch = (): JSX.Element => {

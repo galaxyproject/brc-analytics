@@ -1,8 +1,6 @@
-import { buildRequirementWarnings } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/CollectionSummary/components/Alert/hooks/UseRequirementsMatches/utils";
 import type { ColumnFiltersState, Row } from "@tanstack/react-table";
+import { buildRequirementWarnings } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/CollectionSummary/components/Alert/hooks/UseRequirementsMatches/utils";
 import type { ReadRun } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
-import { BRCDataCatalogGenome } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
-import { GA2AssemblyEntity } from "../../../app/apis/catalog/ga2/entities";
 
 const EXPECTED = {
   LIBRARY_LAYOUT_MISMATCH:
@@ -12,7 +10,7 @@ const EXPECTED = {
 } as const;
 
 describe("buildRequirementWarnings", () => {
-  const GENOME = makeGenome("123");
+  const SPECIES_INFO = makeSpeciesInfo("123");
 
   test("returns empty array when no column filters", () => {
     const filters: ColumnFiltersState = [];
@@ -21,7 +19,7 @@ describe("buildRequirementWarnings", () => {
       { library_layout: "PAIRED" }
     );
 
-    expect(buildRequirementWarnings(filters, rows, GENOME)).toEqual([]);
+    expect(buildRequirementWarnings(filters, rows, SPECIES_INFO)).toEqual([]);
   });
 
   test("returns empty array when there are filters but no selected rows", () => {
@@ -30,7 +28,7 @@ describe("buildRequirementWarnings", () => {
     ];
     const rows: Row<ReadRun>[] = [];
 
-    expect(buildRequirementWarnings(filters, rows, GENOME)).toEqual([]);
+    expect(buildRequirementWarnings(filters, rows, SPECIES_INFO)).toEqual([]);
   });
 
   test("falls back to raw key when label mapping is missing", () => {
@@ -42,7 +40,7 @@ describe("buildRequirementWarnings", () => {
       { instrument_model: "Oxford" }
     );
 
-    expect(buildRequirementWarnings(filters, rows, GENOME)).toEqual([
+    expect(buildRequirementWarnings(filters, rows, SPECIES_INFO)).toEqual([
       "instrument_model mismatch: expected Illumina, but Oxford selected",
     ]);
   });
@@ -57,7 +55,7 @@ describe("buildRequirementWarnings", () => {
       { library_strategy: "WGS" }
     );
 
-    expect(buildRequirementWarnings(filters, rows, GENOME)).toEqual([
+    expect(buildRequirementWarnings(filters, rows, SPECIES_INFO)).toEqual([
       "Library strategy mismatch: expected RNA-Seq, but WGS selected",
     ]);
   });
@@ -71,7 +69,7 @@ describe("buildRequirementWarnings", () => {
       { library_layout: "PAIRED", scientific_name: "Y", tax_id: "999" }
     );
 
-    expect(buildRequirementWarnings(filters, rows, GENOME)).toEqual([
+    expect(buildRequirementWarnings(filters, rows, SPECIES_INFO)).toEqual([
       expect.stringContaining(EXPECTED.SPECIES_MISMATCH),
       EXPECTED.LIBRARY_LAYOUT_MISMATCH,
     ]);
@@ -86,7 +84,7 @@ describe("buildRequirementWarnings", () => {
       { library_layout: "SINGLE" }
     );
 
-    expect(buildRequirementWarnings(filters, rows, GENOME)).toEqual([]);
+    expect(buildRequirementWarnings(filters, rows, SPECIES_INFO)).toEqual([]);
   });
 
   test("returns a message when there is a mismatch for a single filter", () => {
@@ -98,7 +96,7 @@ describe("buildRequirementWarnings", () => {
       { library_layout: "PAIRED" }
     );
 
-    expect(buildRequirementWarnings(filters, rows, GENOME)).toEqual([
+    expect(buildRequirementWarnings(filters, rows, SPECIES_INFO)).toEqual([
       EXPECTED.LIBRARY_LAYOUT_MISMATCH,
     ]);
   });
@@ -112,7 +110,7 @@ describe("buildRequirementWarnings", () => {
       { library_strategy: "Metagenome" }
     );
 
-    expect(buildRequirementWarnings(filters, rows, GENOME)).toEqual([
+    expect(buildRequirementWarnings(filters, rows, SPECIES_INFO)).toEqual([
       "Library strategy mismatch: expected RNA-Seq OR ChIP-Seq, but WGS, Metagenome selected",
     ]);
   });
@@ -126,7 +124,7 @@ describe("buildRequirementWarnings", () => {
       { description: "other" }
     );
 
-    expect(buildRequirementWarnings(filters, rows, GENOME)).toEqual([]);
+    expect(buildRequirementWarnings(filters, rows, SPECIES_INFO)).toEqual([]);
   });
 
   test("returns multiple messages for multiple mismatched filters in given order", () => {
@@ -139,7 +137,7 @@ describe("buildRequirementWarnings", () => {
       { library_layout: "SINGLE", library_strategy: "WGS" }
     );
 
-    expect(buildRequirementWarnings(filters, rows, GENOME)).toEqual([
+    expect(buildRequirementWarnings(filters, rows, SPECIES_INFO)).toEqual([
       EXPECTED.LIBRARY_LAYOUT_MISMATCH,
       "Library strategy mismatch: expected RNA-Seq, but WGS selected",
     ]);
@@ -152,9 +150,9 @@ describe("buildRequirementWarnings", () => {
       { library_layout: "PAIRED" }
     );
 
-    expect(buildRequirementWarnings(filters, rows, makeGenome("999"))).toEqual([
-      expect.stringContaining(EXPECTED.SPECIES_MISMATCH),
-    ]);
+    expect(
+      buildRequirementWarnings(filters, rows, makeSpeciesInfo("999"))
+    ).toEqual([expect.stringContaining(EXPECTED.SPECIES_MISMATCH)]);
   });
 
   test("adds a species mismatch message when some selected rows have a different tax ID", () => {
@@ -164,23 +162,60 @@ describe("buildRequirementWarnings", () => {
       { library_layout: "PAIRED", tax_id: "123" }
     );
 
-    expect(buildRequirementWarnings(filters, rows, GENOME)).toEqual([
+    expect(buildRequirementWarnings(filters, rows, SPECIES_INFO)).toEqual([
+      expect.stringContaining(EXPECTED.SPECIES_MISMATCH),
+    ]);
+  });
+
+  test("no species warning when read tax_id matches speciesTaxonomyId", () => {
+    const filters: ColumnFiltersState = [];
+    const genome = makeSpeciesInfo("330879", "746128");
+    const rows = makeRows({ tax_id: "746128" });
+
+    expect(buildRequirementWarnings(filters, rows, genome)).toEqual([]);
+  });
+
+  test("no species warning when speciesTaxonomyId appears in tax_lineage", () => {
+    const filters: ColumnFiltersState = [];
+    const genome = makeSpeciesInfo("330879", "746128");
+    const rows = makeRows({
+      tax_id: "41122",
+      tax_lineage: "1;131567;2759;746128;41122",
+    });
+
+    expect(buildRequirementWarnings(filters, rows, genome)).toEqual([]);
+  });
+
+  test("species warning when tax_id and tax_lineage do not match", () => {
+    const filters: ColumnFiltersState = [];
+    const genome = makeSpeciesInfo("330879", "746128");
+    const rows = makeRows({ scientific_name: "Other sp.", tax_id: "99999" });
+
+    expect(buildRequirementWarnings(filters, rows, genome)).toEqual([
       expect.stringContaining(EXPECTED.SPECIES_MISMATCH),
     ]);
   });
 });
 
 /**
- * Returns partial genome entity for unit tests.
+ * Returns species info for unit tests.
  * @param ncbiTaxonomyId - NCBI Tax ID.
- * @returns genome entity.
+ * @param speciesTaxonomyId - Species Tax ID.
+ * @returns Species info.
  */
-function makeGenome(
-  ncbiTaxonomyId: string
-): BRCDataCatalogGenome | GA2AssemblyEntity {
-  return { ncbiTaxonomyId } as unknown as
-    | BRCDataCatalogGenome
-    | GA2AssemblyEntity;
+function makeSpeciesInfo(
+  ncbiTaxonomyId: string,
+  speciesTaxonomyId = ncbiTaxonomyId
+): {
+  ncbiTaxonomyId: string;
+  speciesTaxonomyId: string;
+  taxonomicLevelSpecies: string;
+} {
+  return {
+    ncbiTaxonomyId,
+    speciesTaxonomyId,
+    taxonomicLevelSpecies: "Test species",
+  };
 }
 
 /**

@@ -1,3 +1,4 @@
+import { ContrastPairs } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseExplicitContrasts/types";
 import {
   getDisabledValues,
   getMaxPairCount,
@@ -5,7 +6,6 @@ import {
   isAllPairsUsed,
   normalizePairKey,
 } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseExplicitContrasts/utils";
-import { ContrastPairs } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseExplicitContrasts/types";
 
 describe("normalizePairKey", () => {
   test("returns same key for A,B and B,A", () => {

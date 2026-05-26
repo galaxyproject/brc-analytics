@@ -1,6 +1,6 @@
 {
   "name": "brc-analytics",
-  "version": "0.26.0",
+  "version": "0.27.0",
   "private": true,
   "scripts": {
     "dev": "./scripts/dev.sh brc-analytics && ./scripts/set-version.sh dev && ./scripts/sync-api-brc-analytics.sh && next dev",
@@ -36,7 +36,7 @@
     "validate-ga2-catalog": "./catalog/ga2/schema/scripts/validate-catalog.sh"
   },
   "dependencies": {
-    "@databiosphere/findable-ui": "^48",
+    "@databiosphere/findable-ui": "^51.1.0",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
     "@mdx-js/loader": "^3.0.1",
@@ -57,7 +57,6 @@
     "isomorphic-dompurify": "^2",
     "ky": "^1",
     "next": "^15",
-    "next-auth": "^4",
     "next-compose-plugins": "^2.2.1",
     "next-mdx-remote": "^5",
     "papaparse": "^5.5.3",

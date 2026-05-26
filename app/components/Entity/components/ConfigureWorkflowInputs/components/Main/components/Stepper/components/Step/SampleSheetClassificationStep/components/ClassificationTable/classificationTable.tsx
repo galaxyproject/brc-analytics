@@ -1,10 +1,10 @@
-import { JSX } from "react";
-import { TableBody, TableCell, TableHead, TableRow } from "@mui/material";
-import { StyledTableContainer } from "./classificationTable.styles";
-import { Props } from "./types";
 import { GridTable } from "@databiosphere/findable-ui/lib/components/Table/table.styles";
-import { Select } from "./components/Select/select";
+import { TableBody, TableCell, TableHead, TableRow } from "@mui/material";
+import { JSX } from "react";
 import { COLUMN_TYPE } from "../../types";
+import { StyledTableContainer } from "./classificationTable.styles";
+import { Select } from "./components/Select/select";
+import { Props } from "./types";
 
 /**
  * Labels for auto-detected column types that don't appear in the dropdown.

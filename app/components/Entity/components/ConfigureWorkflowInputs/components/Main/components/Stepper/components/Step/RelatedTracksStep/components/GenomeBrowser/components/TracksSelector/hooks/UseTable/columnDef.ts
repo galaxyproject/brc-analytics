@@ -1,9 +1,9 @@
-import { ColumnDef } from "@tanstack/react-table";
-import { CATEGORY_CONFIGS } from "./categoryConfigs";
-import { RowSelectOrExpand } from "../../../../../../../../../../../../../../../../Table/components/TableCell/components/RowSelectOrExpand/rowSelectOrExpand";
-import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
 import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
+import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
+import { ColumnDef } from "@tanstack/react-table";
 import { UcscTrackNode } from "../../../../../../../../../../../../../../../../../utils/ucsc-tracks-api/entities";
+import { RowSelectOrExpand } from "../../../../../../../../../../../../../../../../Table/components/TableCell/components/RowSelectOrExpand/rowSelectOrExpand";
+import { CATEGORY_CONFIGS } from "./categoryConfigs";
 
 const SELECT_FILTER_FN = "arrIncludesSome";
 

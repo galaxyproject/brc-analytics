@@ -1,11 +1,10 @@
-import { JSX } from "react";
-import { Button, Typography, Grid } from "@mui/material";
-import { StyledRoundedPaper } from "./collectionSummary.styles";
-import { Props } from "./types";
-import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
+import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
+import { Button, Grid, Typography } from "@mui/material";
+import { Fragment, JSX } from "react";
+import { StyledRoundedPaper } from "./collectionSummary.styles";
 import { Alert } from "./components/Alert/alert";
-import { Fragment } from "react";
+import { Props } from "./types";
 
 export const CollectionSummary = ({
   onClear,

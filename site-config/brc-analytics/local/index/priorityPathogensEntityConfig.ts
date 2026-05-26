@@ -1,11 +1,11 @@
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
+import slugify from "slugify";
 import { Outbreak } from "../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
+import { SLUGIFY_OPTIONS } from "../../../../app/common/constants";
 import { AppEntityConfig } from "../../../common/entities";
 import { priorityPathogenMainColumn } from "../entity/priorityPathogen/priorityPathogenMainColumn";
-import { priorityPathogenTop } from "../entity/priorityPathogen/priorityPathogenTop";
-import slugify from "slugify";
-import { SLUGIFY_OPTIONS } from "../../../../app/common/constants";
 import { priorityPathogenSideColumn } from "../entity/priorityPathogen/priorityPathogenSideColumn";
+import { priorityPathogenTop } from "../entity/priorityPathogen/priorityPathogenTop";
 
 /**
  * Entity config object responsible to config anything related to the /priority-pathogens route.

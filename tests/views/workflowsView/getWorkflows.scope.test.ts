@@ -6,8 +6,8 @@ import {
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
 } from "../../../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { getWorkflows } from "../../../app/views/WorkflowsView/utils";
 import type { Organism } from "../../../app/views/WorkflowsView/types";
+import { getWorkflows } from "../../../app/views/WorkflowsView/utils";
 
 jest.mock(
   "../../../app/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants",

@@ -1,20 +1,27 @@
 import { ChangeEvent, DragEvent, RefObject } from "react";
 
-export interface OnFileChangeOptions {
-  onComplete?: (rows: Record<string, string>[]) => void;
+export interface OnFileChangeOptions<T> {
+  onComplete?: (data: T, file: File) => void;
 }
 
-export interface UseFilePicker {
+export type ParseFn<T> = (file: File) => Promise<ParseResult<T>>;
+
+export interface ParseResult<T> {
+  data: T;
+  errors: string[];
+}
+
+export interface UseFilePicker<T> {
   actions: {
     onClear: () => void;
     onClick: () => void;
     onDrop: (
       event: DragEvent<HTMLElement>,
-      options: OnFileChangeOptions
+      options: OnFileChangeOptions<T>
     ) => void;
     onFileChange: (
       event: ChangeEvent<HTMLInputElement>,
-      options: OnFileChangeOptions
+      options: OnFileChangeOptions<T>
     ) => void;
   };
   file: File | null;

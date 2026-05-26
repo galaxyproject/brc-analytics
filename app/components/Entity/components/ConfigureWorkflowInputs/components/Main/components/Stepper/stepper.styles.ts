@@ -1,6 +1,6 @@
+import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 import styled from "@emotion/styled";
 import { Stepper } from "@mui/material";
-import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 
 export const StyledStepper = styled(Stepper)`
   display: grid;

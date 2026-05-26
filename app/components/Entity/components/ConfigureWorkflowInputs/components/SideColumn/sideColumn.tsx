@@ -10,30 +10,31 @@ import {
   buildWorkflowConfiguration,
   buildWorkflowDetails,
 } from "../../../../../../viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import { useAssembly } from "../../providers/Assembly/hook";
 import { Props } from "./types";
 
 export const SideColumn = ({
   configuredInput,
   configuredSteps,
-  genome,
   workflow,
 }: Props): JSX.Element => {
+  const assembly = useAssembly();
   return (
     <FluidPaper>
       <GridPaper>
-        <CollapsableSection title="Configuration">
+        <CollapsableSection key="workflow-details" title="Workflow Details">
+          <KeyValuePairs {...buildWorkflowDetails(workflow)} />
+        </CollapsableSection>
+        {assembly && (
+          <CollapsableSection key="assembly-details" title="Assembly Details">
+            <KeyValuePairs {...buildAssemblyDetails(assembly)} />
+          </CollapsableSection>
+        )}
+        <CollapsableSection key="configuration" title="Configuration">
           <KeyValuePairs
             {...buildWorkflowConfiguration(configuredInput, configuredSteps)}
           />
         </CollapsableSection>
-        <CollapsableSection title="Workflow Details">
-          <KeyValuePairs {...buildWorkflowDetails(workflow)} />
-        </CollapsableSection>
-        {genome && (
-          <CollapsableSection title="Assembly Details">
-            <KeyValuePairs {...buildAssemblyDetails(genome)} />
-          </CollapsableSection>
-        )}
       </GridPaper>
     </FluidPaper>
   );

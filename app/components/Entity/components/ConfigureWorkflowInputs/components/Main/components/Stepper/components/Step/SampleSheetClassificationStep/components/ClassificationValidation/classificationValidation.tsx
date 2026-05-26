@@ -1,12 +1,12 @@
-import { JSX } from "react";
-import { CheckCircleRounded } from "@mui/icons-material";
-import { Props } from "./types";
-import { StyledFluidPaper } from "./classificationValidation.styles";
-import { mapValidation } from "./utils";
-import { Stack, Typography } from "@mui/material";
-import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
-import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
 import { ErrorIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/ErrorIcon/errorIcon";
+import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
+import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
+import { CheckCircleRounded } from "@mui/icons-material";
+import { Stack, Typography } from "@mui/material";
+import { JSX } from "react";
+import { StyledFluidPaper } from "./classificationValidation.styles";
+import { Props } from "./types";
+import { mapValidation } from "./utils";
 
 export const ClassificationValidation = ({
   active,

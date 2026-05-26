@@ -1,3 +1,10 @@
+import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
+import { arrIncludesSome } from "@databiosphere/findable-ui/lib/components/Table/columnDef/columnFilters/filterFn";
+import { getFacetedUniqueValuesWithArrayValues } from "@databiosphere/findable-ui/lib/components/Table/common/utils";
+import { getFacetedMinMaxValues } from "@databiosphere/findable-ui/lib/components/Table/featureOptions/facetedColumn/getFacetedMinMaxValues";
+import { ROW_POSITION } from "@databiosphere/findable-ui/lib/components/Table/features/RowPosition/constants";
+import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/features/RowPreview/constants";
+import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/features/TableDownload/constants";
 import {
   getCoreRowModel,
   getExpandedRowModel,
@@ -8,18 +15,11 @@ import {
   Table,
   useReactTable,
 } from "@tanstack/react-table";
-import { arrIncludesSome } from "@databiosphere/findable-ui/lib/components/Table/columnDef/columnFilters/filterFn";
-import { ROW_POSITION } from "@databiosphere/findable-ui/lib/components/Table/features/RowPosition/constants";
-import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/features/RowPreview/constants";
-import { columns } from "./columnDef";
-import { getFacetedUniqueValuesWithArrayValues } from "@databiosphere/findable-ui/lib/components/Table/common/utils";
-import { GROUPING, COLUMN_VISIBILITY } from "./constants";
-import { CATEGORY_GROUPS } from "./categoryGroups";
-import { getFacetedMinMaxValues } from "@databiosphere/findable-ui/lib/components/Table/featureOptions/facetedColumn/getFacetedMinMaxValues";
-import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
-import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/features/TableDownload/constants";
-import { UseUCSCTracks } from "../../../../../../hooks/UseUCSCTracks/types";
 import { UcscTrackNode } from "../../../../../../../../../../../../../../../../../utils/ucsc-tracks-api/entities";
+import { UseUCSCTracks } from "../../../../../../hooks/UseUCSCTracks/types";
+import { CATEGORY_GROUPS } from "./categoryGroups";
+import { columns } from "./columnDef";
+import { COLUMN_VISIBILITY, GROUPING } from "./constants";
 
 export const useTable = (ucscTracks: UseUCSCTracks): Table<UcscTrackNode> => {
   const data = ucscTracks.data ?? [];

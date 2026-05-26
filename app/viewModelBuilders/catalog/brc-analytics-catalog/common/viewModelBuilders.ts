@@ -3,11 +3,10 @@ import {
   Key,
   Value,
 } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/keyValuePairs";
-import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
-import { ColumnDef, getSortedRowModel } from "@tanstack/react-table";
+import { ColumnDef, RowData } from "@tanstack/react-table";
 import { LinkProps } from "next/link";
 import Router from "next/router";
 import { ComponentProps } from "react";
@@ -131,6 +130,20 @@ export const buildAssemblyDetails = (
     keyValuePairs.set(
       BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
       strain
+    );
+  }
+  const serotype = getGenomeSerotypeText(assembly);
+  if (serotype) {
+    keyValuePairs.set(
+      BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SEROTYPE,
+      serotype
+    );
+  }
+  const isolate = getGenomeIsolateText(assembly);
+  if (isolate) {
+    keyValuePairs.set(
+      BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_ISOLATE,
+      isolate
     );
   }
   keyValuePairs.set(
@@ -778,41 +791,49 @@ export const buildAssemblyResources = (
  * @param organism - Organism entity.
  * @returns Props to be used for the BackPageHero component.
  */
-export const buildOrganismAssembliesHero = (
+export const buildOrganismHero = (
   organism: BRCDataCatalogOrganism
 ): ComponentProps<typeof C.BackPageHero> => {
   return {
-    breadcrumbs: getOrganismEntityAssembliesBreadcrumbs(organism),
+    breadcrumbs: getOrganismEntityBreadcrumbs(organism),
     title: organism.taxonomicLevelSpecies,
   };
 };
 
 /**
- * Build props for the genomes table for the given organism.
+ * Build props for the organism detail main content.
  * @param organism - Organism entity.
- * @returns props to be used for the table.
+ * @returns Props for the OrganismViewMain component.
+ */
+export const buildOrganismViewMain = (
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof C.OrganismViewMain> => {
+  return {
+    entityId: getOrganismId(organism),
+    organism,
+    tableOptions: buildOrganismGenomesTable(organism),
+  };
+};
+
+/**
+ * Build table options (columns, data, initial state) for the genomes table for the given organism.
+ * @param organism - Organism entity with genomes to be displayed in the table.
+ * @returns table options.
  */
 export function buildOrganismGenomesTable(
   organism: BRCDataCatalogOrganism
-): ComponentProps<typeof C.DetailViewTable<BRCDataCatalogGenome>> {
+): ComponentProps<typeof C.OrganismViewMain>["tableOptions"] {
   return {
-    Paper: FluidPaper,
-    columns: buildOrganismGenomesTableColumns(),
-    gridTemplateColumns:
-      "auto minmax(164px, 1fr) minmax(180px, 0.5fr) minmax(180px, 0.5fr) minmax(180px, 0.5fr) minmax(144px, 0.5fr) minmax(100px, 0.5fr) repeat(2, minmax(142px, 0.5fr)) minmax(132px, 0.5fr) minmax(120px, 0.5fr) minmax(120px, 0.5fr) repeat(3, minmax(120px, 0.5fr)) minmax(180px, 0.5fr)",
-    items: organism.genomes,
-    noResultsTitle: "No Assemblies",
-    tableOptions: {
-      enableRowPosition: false,
-      enableSorting: true,
-      getSortedRowModel: getSortedRowModel(),
-      initialState: {
-        columnVisibility: { [COLUMN_IDENTIFIER.ROW_POSITION]: false },
-        sorting: [
-          { desc: true, id: BRC_DATA_CATALOG_CATEGORY_KEY.IS_REF },
-          { desc: false, id: BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION },
-        ],
-      },
+    // Cast: ColumnDef<T> is invariant in T, so the catalog-specific row type
+    // cannot widen to RowData even though BRCDataCatalogGenome extends it.
+    columns: buildOrganismGenomesTableColumns() as ColumnDef<RowData>[],
+    data: organism.genomes,
+    initialState: {
+      columnVisibility: { [COLUMN_IDENTIFIER.ROW_POSITION]: false },
+      sorting: [
+        { desc: true, id: BRC_DATA_CATALOG_CATEGORY_KEY.IS_REF },
+        { desc: false, id: BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION },
+      ],
     },
   };
 }
@@ -826,86 +847,105 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.ANALYZE_GENOME,
       cell: ({ row }) => C.AnalyzeGenome(buildAnalyzeGenome(row.original)),
+      enableSorting: false,
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANALYZE_GENOME,
+      meta: { width: "auto" },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION,
       cell: ({ row }) => C.BasicCell(buildAccession(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
-      meta: { columnPinned: true },
+      meta: { columnPinned: true, width: { max: "1fr", min: "164px" } },
     },
     {
-      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,
+      accessorFn: (row) => getGenomeStrainText(row),
       cell: ({ row }) =>
         C.BasicCell(buildGenomeTaxonomicLevelStrain(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
+      id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,
+      meta: { width: { max: "0.5fr", min: "180px" } },
     },
     {
-      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SEROTYPE,
+      accessorFn: (row) => getGenomeSerotypeText(row),
       cell: ({ row }) =>
         C.BasicCell(buildGenomeTaxonomicLevelSerotype(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SEROTYPE,
+      id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SEROTYPE,
+      meta: { width: { max: "0.5fr", min: "180px" } },
     },
     {
-      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ISOLATE,
+      accessorFn: (row) => getGenomeIsolateText(row),
       cell: ({ row }) =>
         C.BasicCell(buildGenomeTaxonomicLevelIsolate(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_ISOLATE,
+      id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ISOLATE,
+      meta: { width: { max: "0.5fr", min: "180px" } },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMY_ID,
       cell: ({ row }) => C.BasicCell(buildTaxonomyId(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMY_ID,
+      meta: { width: { max: "0.5fr", min: "144px" } },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.IS_REF,
       cell: ({ row }) => C.ChipCell(buildIsRef(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.IS_REF,
+      meta: { width: { max: "0.5fr", min: "100px" } },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.LEVEL,
       cell: ({ row }) => C.BasicCell(buildLevel(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.LEVEL,
+      meta: { width: { max: "0.5fr", min: "142px" } },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.CHROMOSOMES,
       cell: ({ row }) => C.BasicCell(buildChromosomes(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.CHROMOSOMES,
+      meta: { width: { max: "0.5fr", min: "142px" } },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.LENGTH,
       cell: ({ row }) => C.BasicCell(buildLength(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.LENGTH,
+      meta: { width: { max: "0.5fr", min: "132px" } },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_COUNT,
       cell: ({ row }) => C.BasicCell(buildScaffoldCount(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_COUNT,
+      meta: { width: { max: "0.5fr", min: "120px" } },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_N50,
       cell: ({ row }) => C.BasicCell(buildScaffoldN50(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_N50,
+      meta: { width: { max: "0.5fr", min: "120px" } },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_L50,
       cell: ({ row }) => C.BasicCell(buildScaffoldL50(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_L50,
+      meta: { width: { max: "0.5fr", min: "120px" } },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.COVERAGE,
       cell: ({ row }) => C.BasicCell(buildCoverage(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.COVERAGE,
+      meta: { width: { max: "0.5fr", min: "120px" } },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.GC_PERCENT,
       cell: ({ row }) => C.BasicCell(buildGcPercent(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.GC_PERCENT,
+      meta: { width: { max: "0.5fr", min: "120px" } },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.ANNOTATION_STATUS,
       cell: ({ row }) => C.BasicCell(buildAnnotationStatus(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANNOTATION_STATUS,
+      meta: { width: { max: "0.5fr", min: "180px" } },
     },
   ];
 }
@@ -990,7 +1030,7 @@ function getEntityLinkWithPriorityPathogenFilter(
  * @param defaultValue - Default value to use if there's no strain.
  * @returns strain text.
  */
-function getGenomeStrainText(
+export function getGenomeStrainText(
   entity: BRCDataCatalogGenome | GA2AssemblyEntity,
   defaultValue = ""
 ): string {
@@ -1006,11 +1046,14 @@ function getGenomeStrainText(
  * @param defaultValue - Default value if no serotype is found.
  * @returns serotype text.
  */
-function getGenomeSerotypeText(
-  genome: BRCDataCatalogGenome,
+export function getGenomeSerotypeText(
+  genome: BRCDataCatalogGenome | GA2AssemblyEntity,
   defaultValue = ""
 ): string {
-  if (genome.taxonomicLevelSerotype !== "None")
+  if (
+    "taxonomicLevelSerotype" in genome &&
+    genome.taxonomicLevelSerotype !== "None"
+  )
     return genome.taxonomicLevelSerotype;
   return defaultValue;
 }
@@ -1021,11 +1064,14 @@ function getGenomeSerotypeText(
  * @param defaultValue - Default value if no isolate is found.
  * @returns isolate text.
  */
-function getGenomeIsolateText(
-  genome: BRCDataCatalogGenome,
+export function getGenomeIsolateText(
+  genome: BRCDataCatalogGenome | GA2AssemblyEntity,
   defaultValue = ""
 ): string {
-  if (genome.taxonomicLevelIsolate !== "None")
+  if (
+    "taxonomicLevelIsolate" in genome &&
+    genome.taxonomicLevelIsolate !== "None"
+  )
     return genome.taxonomicLevelIsolate;
   return defaultValue;
 }
@@ -1035,13 +1081,12 @@ function getGenomeIsolateText(
  * @param organism - Organism entity.
  * @returns Breadcrumbs.
  */
-function getOrganismEntityAssembliesBreadcrumbs(
+function getOrganismEntityBreadcrumbs(
   organism: BRCDataCatalogOrganism
 ): Breadcrumb[] {
   return [
     { path: ROUTES.ORGANISMS, text: "Organisms" },
     { path: "", text: organism.taxonomicLevelSpecies },
-    { path: "", text: "Assemblies" },
   ];
 }
 
