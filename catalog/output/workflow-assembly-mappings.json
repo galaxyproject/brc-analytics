@@ -9,11 +9,11 @@
   },
   {
     "compatibleAssemblyCount": 5499,
-    "workflowTrsId": "#workflow/github.com/iwc-workflows/ploidy-aware-genotype-calling/main/versions/v0.1.1"
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/ploidy-aware-genotype-calling/main/versions/v0.1.2"
   },
   {
     "compatibleAssemblyCount": 1,
-    "workflowTrsId": "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-variant-calling/COVID-19-PE-ARTIC-ILLUMINA/versions/v0.5.4"
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-variant-calling/COVID-19-PE-ARTIC-ILLUMINA/versions/v0.5.5"
   },
   {
     "compatibleAssemblyCount": 1,
@@ -94,6 +94,18 @@
   {
     "compatibleAssemblyCount": 4475,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/lncRNAs-annotation/main/versions/v0.1"
+  },
+  {
+    "compatibleAssemblyCount": 5499,
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/assembly-with-flye/main/versions/v0.4"
+  },
+  {
+    "compatibleAssemblyCount": 398,
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v2.0.1"
+  },
+  {
+    "compatibleAssemblyCount": 5499,
+    "workflowTrsId": "#workflow/github.com/iwc-workflows/polish-with-long-reads/main/versions/v0.1"
   },
   {
     "compatibleAssemblyCount": 624,

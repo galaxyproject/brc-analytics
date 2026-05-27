@@ -1,3 +1,4 @@
+import { WorkflowCategoryId } from "../../../catalog/schema/generated/schema";
 import type {
   WorkflowAssemblyMapping,
   WorkflowCategory,
@@ -84,10 +85,12 @@ function shouldIncludeWorkflow(
  * LMLS workflows (Logan Search and Lexicmap) are included when the 'lmls' feature flag is enabled.
  * Flu workflow is conditionally included based on the 'flu' feature flag.
  * Hyphy workflow is conditionally included based on the 'hyphy' feature flag.
+ * Assembly workflows are conditionally included based on the 'assembly-workflows' feature flag.
  * Each workflow includes the properties of the workflow itself along with the name of its category and the compatible assembly (if any).
  * @param workflowCategories - An array of workflow categories, each containing an array of workflows.
  * @param mappings - Workflow-assembly mappings for the current site.
  * @param organisms - Organisms.
+ * @param isAssemblyWorkflowsEnabled - Whether the 'assembly-workflows' feature flag is enabled.
  * @param isLmlsEnabled - Whether the 'lmls' feature flag is enabled.
  * @param isFluEnabled - Whether the 'flu' feature flag is enabled.
  * @param isHyphyEnabled - Whether the 'hyphy' feature flag is enabled.
@@ -97,6 +100,7 @@ export function getWorkflows(
   workflowCategories: WorkflowCategory[],
   mappings: WorkflowAssemblyMapping[],
   organisms: Organism[],
+  isAssemblyWorkflowsEnabled = false,
   isLmlsEnabled = false,
   isFluEnabled = false,
   isHyphyEnabled = false
@@ -114,6 +118,11 @@ export function getWorkflows(
 
   for (const category of workflowCategories) {
     if (!category.workflows) continue;
+    if (
+      category.category === WorkflowCategoryId.ASSEMBLY &&
+      !isAssemblyWorkflowsEnabled
+    )
+      continue;
     for (const workflow of category.workflows) {
       // Skip workflows based on feature flags.
       if (!shouldIncludeWorkflow(workflow, isFluEnabled, isHyphyEnabled)) {

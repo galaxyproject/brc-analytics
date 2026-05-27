@@ -19,6 +19,7 @@ import { getWorkflows } from "./utils";
 export const WorkflowsView = (): JSX.Element => {
   const workflowCategories = getWorkflowCategories();
   const organisms = getOrganisms<Organism>();
+  const isAssemblyWorkflowsEnabled = useFeatureFlag("assembly-workflows");
   const isFluEnabled = useFeatureFlag("flu");
   const isHyphyEnabled = useFeatureFlag("hyphy");
   const isLmlsEnabled = useFeatureFlag("lmls");
@@ -46,12 +47,14 @@ export const WorkflowsView = (): JSX.Element => {
             workflowCategories,
             mappings,
             organisms,
+            isAssemblyWorkflowsEnabled,
             isLmlsEnabled,
             isFluEnabled,
             isHyphyEnabled
           )
         : [],
     [
+      isAssemblyWorkflowsEnabled,
       isFluEnabled,
       isHyphyEnabled,
       isLmlsEnabled,
