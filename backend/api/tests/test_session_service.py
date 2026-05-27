@@ -36,3 +36,48 @@ async def test_require_session_rejects_wrong_owner():
     loaded = await service.require_session(state.session_id, "user-a")
 
     assert loaded.owner_keycloak_sub == "user-a"
+
+
+@pytest.mark.asyncio
+async def test_claim_session_stamps_owner_on_anonymous_session():
+    cache = FakeCache()
+    service = SessionService(cache)
+
+    state = await service.create_session()
+    assert state.owner_keycloak_sub is None
+
+    claimed = await service.claim_session(state.session_id, "user-a")
+    assert claimed.owner_keycloak_sub == "user-a"
+
+    # Round-trip through cache: ownership must persist.
+    reloaded = await service.get_session(state.session_id)
+    assert reloaded.owner_keycloak_sub == "user-a"
+
+
+@pytest.mark.asyncio
+async def test_claim_session_is_noop_when_already_owned_by_caller():
+    cache = FakeCache()
+    service = SessionService(cache)
+
+    state = await service.create_session(owner_keycloak_sub="user-a")
+    claimed = await service.claim_session(state.session_id, "user-a")
+    assert claimed.owner_keycloak_sub == "user-a"
+
+
+@pytest.mark.asyncio
+async def test_claim_session_rejects_when_owned_by_other_user():
+    cache = FakeCache()
+    service = SessionService(cache)
+
+    state = await service.create_session(owner_keycloak_sub="user-a")
+    with pytest.raises(PermissionError):
+        await service.claim_session(state.session_id, "user-b")
+
+
+@pytest.mark.asyncio
+async def test_claim_session_raises_keyerror_for_missing_session():
+    cache = FakeCache()
+    service = SessionService(cache)
+
+    with pytest.raises(KeyError):
+        await service.claim_session("does-not-exist", "user-a")

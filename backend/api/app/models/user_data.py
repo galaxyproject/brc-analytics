@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.models.assistant import AnalysisSchema, ChatMessage
 
@@ -41,6 +41,11 @@ class SavedAnalysisSummary(BaseModel):
     source_session: str | None = None
     title: str | None = None
     updated_at: datetime
+
+    @field_validator("id", mode="before")
+    @classmethod
+    def _coerce_id_to_str(cls, value):
+        return str(value)
 
 
 class SavedAnalysisDetail(SavedAnalysisSummary):

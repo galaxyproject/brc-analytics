@@ -35,6 +35,18 @@ class FakeSessionService:
             raise PermissionError(session_id)
         return state
 
+    async def claim_session(
+        self, session_id: str, owner_keycloak_sub: str
+    ) -> SessionState:
+        state = self.sessions.get(session_id)
+        if state is None:
+            raise KeyError(session_id)
+        if state.owner_keycloak_sub is None:
+            state.owner_keycloak_sub = owner_keycloak_sub
+        elif state.owner_keycloak_sub != owner_keycloak_sub:
+            raise PermissionError(session_id)
+        return state
+
 
 class FakeAssistantAgent:
     def __init__(self):
@@ -226,6 +238,32 @@ def test_saved_analysis_snapshot_rejects_cross_user_session(persistence_client):
     )
 
     assert response.status_code == 403
+
+
+def test_saved_analysis_snapshot_claims_anonymous_session(persistence_client):
+    """An authenticated user can save an anonymous session they started.
+
+    Mirrors the chat flow where someone starts a session logged out, then
+    signs in before saving. The save endpoint claims the session for them.
+    """
+    client, _session_factory, current_sub, agent = persistence_client
+
+    agent.session_service.sessions["session-anon"] = SessionState(
+        session_id="session-anon",
+        owner_keycloak_sub=None,
+        messages=[ChatMessage(role=MessageRole.USER, content="hello")],
+        schema_state=AnalysisSchema(),
+    )
+
+    current_sub["value"] = "user-a"
+    response = client.post(
+        "/api/v1/saved_analyses",
+        json={"session_id": "session-anon"},
+    )
+
+    assert response.status_code == 200
+    # Session should now be owned by user-a.
+    assert agent.session_service.sessions["session-anon"].owner_keycloak_sub == "user-a"
 
 
 def test_preferences_payload_is_bounded(persistence_client):

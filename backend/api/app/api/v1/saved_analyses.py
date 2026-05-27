@@ -1,7 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException
+from typing import Optional
+
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import SESSION_COOKIE_NAME
 from app.core.dependencies import get_assistant_agent, get_current_user_db
+from app.core.session_signing import require_session_cookie, set_session_cookie
 from app.db.crud import (
     create_saved_analysis,
     delete_saved_analysis,
@@ -48,9 +52,14 @@ async def save_analysis_snapshot(
     current_user_db: User = Depends(get_current_user_db),
     agent=Depends(get_assistant_agent),
     session: AsyncSession = Depends(get_db_session),
+    session_cookie: Optional[str] = Cookie(default=None, alias=SESSION_COOKIE_NAME),
 ) -> SavedAnalysisSummary:
+    # Anonymous-then-authenticated flow: the user started a chat logged
+    # out, then signed in to save it. Cookie possession proves it's the
+    # same browser, so claim the session for them before saving.
+    require_session_cookie(payload.session_id, session_cookie)
     try:
-        state = await agent.session_service.require_session(
+        state = await agent.session_service.claim_session(
             payload.session_id, current_user_db.keycloak_sub
         )
     except KeyError as err:
@@ -103,6 +112,7 @@ async def get_saved_analysis_detail(
 )
 async def restore_saved_analysis(
     saved_analysis_id: str,
+    response: Response,
     current_user_db: User = Depends(get_current_user_db),
     agent=Depends(get_assistant_agent),
     session: AsyncSession = Depends(get_db_session),
@@ -120,6 +130,10 @@ async def restore_saved_analysis(
             ChatMessage.model_validate(message) for message in saved_analysis.messages
         ],
     )
+    # Bind the restored session to this browser so the frontend can
+    # immediately call GET /assistant/session/{id} to hydrate computed
+    # handoff state (is_complete, handoff_url, suggestions).
+    set_session_cookie(response, restored_state.session_id)
     return SavedAnalysisRestoreResponse(session_id=restored_state.session_id)
 
 
