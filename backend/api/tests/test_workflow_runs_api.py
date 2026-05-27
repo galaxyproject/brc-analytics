@@ -217,6 +217,25 @@ def test_workflow_run_rejects_session_owned_by_other_user(workflow_runs_client):
     assert "another user" in response.json()["detail"]
 
 
+def test_workflow_run_rejects_oversized_parameters(workflow_runs_client):
+    """An unauthenticated client can POST workflow runs, so we cap the
+    parameters dict to keep one request from forcing a huge JSON parse +
+    DB write."""
+    client, _current_sub, _session_service = workflow_runs_client
+    # ~100KB of junk inside parameters; cap is 64KB.
+    blob = "x" * (100 * 1024)
+    response = client.post(
+        "/api/v1/workflow_runs",
+        json={
+            "workflow_trs_id": "#workflow/github.com/iwc/rnaseq-pe/main",
+            "handoff_url": "https://usegalaxy.org/workflow_landings/abc",
+            "launch_source": "site",
+            "parameters": {"blob": blob},
+        },
+    )
+    assert response.status_code == 413
+
+
 def test_workflow_run_accepts_anonymous_assistant_session(workflow_runs_client):
     client, current_sub, session_service = workflow_runs_client
     current_sub["value"] = "user-a"

@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException
+import json
+
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.dependencies import (
@@ -14,14 +16,39 @@ from app.services.assistant_agent import AssistantAgent
 
 router = APIRouter()
 
+# Bound the request body. Anonymous POSTs are allowed (workflow tracking
+# fires from unauthenticated browse flows too), so we don't want a single
+# request to push arbitrarily large JSON through pydantic and into the DB.
+MAX_WORKFLOW_RUN_BYTES = 64 * 1024
+
 
 @router.post("", response_model=WorkflowRunResponse)
 async def create_tracked_workflow_run(
     payload: WorkflowRunCreateRequest,
+    request: Request,
     current_user_db: User | None = Depends(get_optional_current_user_db),
     agent: AssistantAgent = Depends(get_assistant_agent),
     session: AsyncSession = Depends(get_db_session),
 ) -> WorkflowRunResponse:
+    # Reject obviously-oversized payloads early. The serialized check
+    # below is still authoritative (Content-Length can be missing or lie),
+    # but this gives a clearer 413 in the common case.
+    content_length = request.headers.get("content-length")
+    if content_length is not None:
+        try:
+            if int(content_length) > MAX_WORKFLOW_RUN_BYTES:
+                raise HTTPException(
+                    status_code=413, detail="Workflow run payload too large"
+                )
+        except ValueError:
+            pass
+
+    serialized_parameters = json.dumps(payload.parameters, separators=(",", ":"))
+    if len(serialized_parameters.encode("utf-8")) > MAX_WORKFLOW_RUN_BYTES:
+        raise HTTPException(
+            status_code=413, detail="Workflow run parameters payload too large"
+        )
+
     # If the caller claims this run came from an assistant session, the
     # session must actually exist and either be anonymous or owned by them.
     # Without this check, a logged-in caller can fabricate runs citing
