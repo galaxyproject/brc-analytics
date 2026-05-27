@@ -18,14 +18,10 @@ import {
 import { Headline } from "./components/Headline/headline";
 
 interface Props {
-  initialSavedAnalysisId?: string;
   initialSessionId?: string;
 }
 
-export const AssistantView = ({
-  initialSavedAnalysisId,
-  initialSessionId,
-}: Props): JSX.Element => {
+export const AssistantView = ({ initialSessionId }: Props): JSX.Element => {
   const isAssistantEnabled = useFeatureFlag("assistant");
   const {
     error,
@@ -42,7 +38,6 @@ export const AssistantView = ({
     sendMessage,
     suggestions,
   } = useAssistantChat({
-    initialSavedAnalysisId,
     initialSessionId,
   });
   const [info, setInfo] = useState<AssistantInfoResponse | null>(null);

@@ -97,10 +97,7 @@ export default function SavedAnalysesPage(): JSX.Element {
       const restored = await brcAPIClient.restoreSavedAnalysis(id);
       await router.push({
         pathname: "/assistant",
-        query: {
-          savedAnalysisId: id,
-          sessionId: restored.session_id,
-        },
+        query: { sessionId: restored.session_id },
       });
     } catch (err) {
       setError(

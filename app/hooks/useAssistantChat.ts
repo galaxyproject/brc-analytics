@@ -5,7 +5,6 @@ import { brcAPIClient } from "../services/brc-api-client";
 import {
   AnalysisSchema,
   AssistantChatResponse,
-  SavedAnalysisDetail,
   SuggestionChip,
 } from "../types/api";
 
@@ -34,7 +33,6 @@ interface UseAssistantChatReturn {
 }
 
 interface UseAssistantChatOptions {
-  initialSavedAnalysisId?: string;
   initialSessionId?: string;
 }
 
@@ -43,12 +41,10 @@ interface UseAssistantChatOptions {
  * Persists session_id to localStorage and restores on mount; explicit
  * `initialSessionId` from URL params takes precedence over the stored value.
  * @param root0 - Hook options.
- * @param root0.initialSavedAnalysisId - Saved analysis to hydrate into the chat.
  * @param root0.initialSessionId - Existing assistant session to continue.
  * @returns Chat state, sendMessage, save/reset/retry functions.
  */
 export const useAssistantChat = ({
-  initialSavedAnalysisId,
   initialSessionId,
 }: UseAssistantChatOptions = {}): UseAssistantChatReturn => {
   const [messages, setMessages] = useState<ChatMessageDisplay[]>([]);
@@ -74,21 +70,23 @@ export const useAssistantChat = ({
     }
   }, [initialSessionId]);
 
-  // Restore last session from localStorage on mount, unless an explicit
-  // initialSessionId was provided (URL > localStorage).
+  // Hydrate from either an explicit initialSessionId (URL param, set by the
+  // saved-analysis restore flow) or a localStorage-stored session. URL wins.
+  // Either way we call the restore endpoint so we get computed handoff state
+  // (handoff_url, is_complete, suggestions), not just messages + schema.
   useEffect(() => {
-    if (initialSessionId) return;
-    const storedId = localStorage.getItem(SESSION_KEY);
-    if (!storedId) return;
+    const sourceId = initialSessionId ?? localStorage.getItem(SESSION_KEY);
+    if (!sourceId) return;
 
     let cancelled = false;
     setIsRestoring(true);
 
     assistantAPIClient
-      .assistantRestore(storedId)
+      .assistantRestore(sourceId)
       .then((restored) => {
         if (cancelled) return;
         sessionIdRef.current = restored.session_id;
+        localStorage.setItem(SESSION_KEY, restored.session_id);
         setMessages(restored.messages);
         setSchema(restored.schema_state);
         setSuggestions(restored.suggestions);
@@ -97,7 +95,8 @@ export const useAssistantChat = ({
       })
       .catch(() => {
         if (cancelled) return;
-        localStorage.removeItem(SESSION_KEY);
+        if (!initialSessionId) localStorage.removeItem(SESSION_KEY);
+        setError("Failed to restore the previous conversation.");
       })
       .finally(() => {
         if (!cancelled) setIsRestoring(false);
@@ -106,32 +105,7 @@ export const useAssistantChat = ({
     return (): void => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-only restore
-  }, []);
-
-  // Hydrate the chat from a saved analysis when one is requested via URL.
-  useEffect(() => {
-    if (!initialSavedAnalysisId) return;
-
-    let isMounted = true;
-    setError(null);
-
-    brcAPIClient
-      .getSavedAnalysis(initialSavedAnalysisId)
-      .then((savedAnalysis: SavedAnalysisDetail) => {
-        if (!isMounted) return;
-        setMessages(savedAnalysis.messages);
-        setSchema(savedAnalysis.schema);
-      })
-      .catch(() => {
-        if (!isMounted) return;
-        setError("Failed to restore the saved analysis.");
-      });
-
-    return (): void => {
-      isMounted = false;
-    };
-  }, [initialSavedAnalysisId]);
+  }, [initialSessionId]);
 
   const sendMessage = useCallback(async (message: string): Promise<void> => {
     if (!message.trim() || sendingRef.current) return;

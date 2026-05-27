@@ -7,19 +7,10 @@ import { AssistantView } from "../../app/views/AssistantView/assistantView";
 
 export const Assistant = (): JSX.Element => {
   const { query } = useRouter();
-  const initialSavedAnalysisId =
-    typeof query.savedAnalysisId === "string"
-      ? query.savedAnalysisId
-      : undefined;
   const initialSessionId =
     typeof query.sessionId === "string" ? query.sessionId : undefined;
 
-  return (
-    <AssistantView
-      initialSavedAnalysisId={initialSavedAnalysisId}
-      initialSessionId={initialSessionId}
-    />
-  );
+  return <AssistantView initialSessionId={initialSessionId} />;
 };
 
 export const getStaticProps: GetStaticProps = async () => {
