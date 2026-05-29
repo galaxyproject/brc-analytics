@@ -35,7 +35,8 @@ def _build_mirror(path: str) -> None:
             (5833, 'Plasmodium falciparum 3D7'),
             (1773, 'Mycobacterium tuberculosis'),
             (777, 'Duplicatus exampleus'),
-            (778, 'Duplicatus exampleus')
+            (778, 'Duplicatus exampleus'),
+            (42, 'Sameday organism')
         """
     )
     con.execute(
@@ -57,7 +58,15 @@ def _build_mirror(path: str) -> None:
              'OXFORD_NANOPORE','MinION','SINGLE', DATE '2021-06-01',
              'United Kingdom', 200),
             ('SRR003','SRP002','PRJNA99999','Mycobacterium tuberculosis','WGS',
-             'ILLUMINA','NovaSeq','PAIRED', DATE '2019-01-01','USA', 300)
+             'ILLUMINA','NovaSeq','PAIRED', DATE '2019-01-01','USA', 300),
+            -- Three runs with an identical releasedate, inserted ascending by
+            -- accession, so an ORDER BY without a tiebreaker is ambiguous.
+            ('SRRA','SRP9','PRJNA9','Sameday organism','WGS','ILLUMINA','X',
+             'PAIRED', DATE '2022-01-01','Kenya', 1),
+            ('SRRB','SRP9','PRJNA9','Sameday organism','WGS','ILLUMINA','X',
+             'PAIRED', DATE '2022-01-01','Kenya', 2),
+            ('SRRC','SRP9','PRJNA9','Sameday organism','WGS','ILLUMINA','X',
+             'PAIRED', DATE '2022-01-01','Kenya', 3)
         """
     )
     con.close()
@@ -226,6 +235,39 @@ class TestCacheHygiene:
         # Casing + extra whitespace should hit the same cache entry.
         mirror.summary_for_organism("  plasmodium   falciparum ")
         assert len(mirror._cache) == n_after_first
+
+
+class TestLimitClamp:
+    """F14: the service must clamp limit itself, not rely on the tool layer --
+    a non-tool caller shouldn't be able to request unbounded rows."""
+
+    def test_search_limit_clamped_high(self, mirror):
+        result = mirror.search_runs("Plasmodium falciparum", limit=10_000)
+        assert result["limit"] == 200
+
+    def test_search_limit_floored(self, mirror):
+        result = mirror.search_runs("Plasmodium falciparum", limit=0)
+        assert result["limit"] == 1
+
+    def test_study_runs_limit_clamped_high(self, mirror):
+        result = mirror.get_study_runs("PRJNA12345", limit=10_000)
+        assert result["limit"] == 500
+
+
+class TestStableOrdering:
+    """F15: same-day batches are common and releasedate is nullable, so an
+    ORDER BY releasedate alone shuffles rows at the LIMIT boundary. A stable
+    secondary sort (acc) keeps results reproducible."""
+
+    def test_search_same_date_orders_by_acc_desc(self, mirror):
+        result = mirror.search_runs("Sameday organism")
+        accs = [r["accession"] for r in result["runs"]]
+        assert accs == ["SRRC", "SRRB", "SRRA"]
+
+    def test_study_runs_same_date_orders_by_acc_desc(self, mirror):
+        result = mirror.get_study_runs("PRJNA9")
+        accs = [r["accession"] for r in result["runs"]]
+        assert accs == ["SRRC", "SRRB", "SRRA"]
 
 
 class TestInitErrorHandling:

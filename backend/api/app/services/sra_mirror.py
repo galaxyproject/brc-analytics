@@ -410,7 +410,7 @@ class SRAMirrorService:
             SELECT bioproject, COUNT(*) AS n_runs, MIN(releasedate) AS earliest, MAX(releasedate) AS latest
             FROM runs
             WHERE organism IN (SELECT UNNEST(?)) AND bioproject IS NOT NULL
-            GROUP BY bioproject ORDER BY n_runs DESC LIMIT 10
+            GROUP BY bioproject ORDER BY n_runs DESC, bioproject DESC LIMIT 10
             """,
             [names],
         ).fetchall()
@@ -464,6 +464,10 @@ class SRAMirrorService:
         if not self._con:
             return {"error": "SRA mirror not available"}
 
+        # Clamp here too (the tool layer also clamps) so a non-tool caller
+        # can't request an unbounded result set.
+        limit = max(1, min(limit, 200))
+
         cache_key = (
             "search",
             _norm_organism(organism),
@@ -511,7 +515,7 @@ class SRAMirrorService:
                    instrument, librarylayout, releasedate,
                    geo_loc_name_country_calc, mbases
             FROM runs WHERE {where}
-            ORDER BY releasedate DESC
+            ORDER BY releasedate DESC, acc DESC
             LIMIT ?
             """,
             params + [limit],
@@ -563,6 +567,8 @@ class SRAMirrorService:
         if not self._con:
             return {"error": "SRA mirror not available"}
 
+        limit = max(1, min(limit, 100))
+
         cache_key = ("top_bioprojects", _norm_organism(organism), limit)
         if (cached := self._cache_get(cache_key)) is not None:
             return cached
@@ -578,7 +584,7 @@ class SRAMirrorService:
             FROM runs
             WHERE organism IN (SELECT UNNEST(?)) AND bioproject IS NOT NULL
             GROUP BY bioproject
-            ORDER BY n_runs DESC
+            ORDER BY n_runs DESC, bioproject DESC
             LIMIT ?
             """,
             [names, limit],
@@ -612,6 +618,7 @@ class SRAMirrorService:
         # lowercase or whitespace-padded "prjna12345" still routes to the
         # bioproject column instead of silently missing on sra_study.
         accession = accession.strip().upper()
+        limit = max(1, min(limit, 500))
 
         cache_key = ("study_runs", accession, limit)
         if (cached := self._cache_get(cache_key)) is not None:
@@ -625,7 +632,7 @@ class SRAMirrorService:
                    geo_loc_name_country_calc, mbases
             FROM runs
             WHERE {column} = ?
-            ORDER BY releasedate DESC
+            ORDER BY releasedate DESC, acc DESC
             LIMIT ?
             """,
             [accession, limit],
