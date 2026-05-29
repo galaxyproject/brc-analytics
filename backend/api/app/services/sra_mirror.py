@@ -92,6 +92,40 @@ _ORGANISM_ALIASES: Dict[str, int] = {
 }
 
 
+# Common abbreviations / colloquial names -> the normalized forms NCBI uses
+# in geo_loc_name_country_calc. Keys and values are lowercased; the lookup
+# lowercases the user term. Matching is case-insensitive regardless, so this
+# only needs to cover genuine abbreviation/synonym gaps, not casing.
+_COUNTRY_SYNONYMS: Dict[str, List[str]] = {
+    "uk": ["united kingdom"],
+    "u.k.": ["united kingdom"],
+    "great britain": ["united kingdom"],
+    "england": ["united kingdom"],
+    "usa": ["united states", "usa"],
+    "us": ["united states", "usa"],
+    "u.s.": ["united states", "usa"],
+    "u.s.a.": ["united states", "usa"],
+    "united states of america": ["united states", "usa"],
+    "uae": ["united arab emirates"],
+    "drc": ["democratic republic of the congo"],
+    "south korea": ["south korea", "republic of korea"],
+    "north korea": ["north korea", "democratic people's republic of korea"],
+}
+
+
+def _country_candidates(country: str) -> List[str]:
+    """Lowercased candidate names to match a user country term against.
+
+    Always includes the term itself (so case-insensitive matching works) plus
+    any known synonyms, so 'UK' finds 'United Kingdom' and 'kenya' finds
+    'Kenya' -- the old exact `=` match silently returned nothing for both.
+    """
+    key = " ".join(country.strip().lower().split())
+    candidates = {key}
+    candidates.update(_COUNTRY_SYNONYMS.get(key, []))
+    return list(candidates)
+
+
 def _normalize_since(value: str) -> Optional[str]:
     """Normalize a `since` filter to an ISO date string, or None if invalid.
 
@@ -393,8 +427,10 @@ class SRAMirrorService:
             clauses.append("platform = ?")
             params.append(platform)
         if country:
-            clauses.append("geo_loc_name_country_calc = ?")
-            params.append(country)
+            clauses.append(
+                "LOWER(geo_loc_name_country_calc) IN (SELECT UNNEST(?))"
+            )
+            params.append(_country_candidates(country))
         if since:
             normalized_since = _normalize_since(since)
             if normalized_since is None:

@@ -176,3 +176,25 @@ class TestSinceValidation:
     def test_no_since_returns_all(self, mirror):
         result = mirror.search_runs("Plasmodium falciparum")
         assert result["n_returned"] == 2
+
+
+class TestCountryMatching:
+    """F8: country filter was exact-match, so 'kenya' (case) and 'UK'
+    (synonym of 'United Kingdom') silently returned nothing."""
+
+    def test_case_insensitive_country(self, mirror):
+        result = mirror.search_runs("Plasmodium falciparum", country="kenya")
+        assert result["n_returned"] == 1
+        assert result["runs"][0]["accession"] == "SRR001"
+
+    def test_uk_synonym_matches_united_kingdom(self, mirror):
+        result = mirror.search_runs("Plasmodium falciparum", country="UK")
+        assert result["n_returned"] == 1
+        assert result["runs"][0]["accession"] == "SRR002"
+
+    def test_exact_country_still_matches(self, mirror):
+        result = mirror.search_runs(
+            "Plasmodium falciparum", country="United Kingdom"
+        )
+        assert result["n_returned"] == 1
+        assert result["runs"][0]["accession"] == "SRR002"
