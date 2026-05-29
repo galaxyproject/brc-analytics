@@ -8,6 +8,7 @@ interface UseAssemblyFavoritesReturn {
   favorites: FavoriteResponse[];
   isFavorited: (entityId: string) => boolean;
   isLoading: boolean;
+  isToggling: boolean;
   toggleFavorite: (entityId: string) => Promise<void>;
 }
 
@@ -15,6 +16,7 @@ export function useAssemblyFavorites(): UseAssemblyFavoritesReturn {
   const { isAuthenticated, isConfigured } = useAuth();
   const [favorites, setFavorites] = useState<FavoriteResponse[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isToggling, setIsToggling] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   const favoriteIds = useMemo(
@@ -49,6 +51,9 @@ export function useAssemblyFavorites(): UseAssemblyFavoritesReturn {
   const toggleFavorite = useCallback(
     async (entityId: string): Promise<void> => {
       setError(null);
+      // Gate re-entry so a double-click can't fire two create/delete calls
+      // off the same pre-toggle `favoriteIds` snapshot.
+      setIsToggling(true);
       try {
         if (!favoriteIds.has(entityId)) {
           const favorite = await brcAPIClient.createFavorite(entityId);
@@ -65,6 +70,8 @@ export function useAssemblyFavorites(): UseAssemblyFavoritesReturn {
         // failure becomes an unhandled promise rejection and the button
         // state silently disagrees with the server.
         setError(err instanceof Error ? err : new Error(String(err)));
+      } finally {
+        setIsToggling(false);
       }
     },
     [favoriteIds]
@@ -80,6 +87,7 @@ export function useAssemblyFavorites(): UseAssemblyFavoritesReturn {
     favorites,
     isFavorited,
     isLoading,
+    isToggling,
     toggleFavorite,
   };
 }
