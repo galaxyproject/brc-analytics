@@ -183,22 +183,43 @@ class SRAMirrorService:
                 self.mirror_path,
             )
             return
+        # Build into locals and only publish to self on full success, so a
+        # query failure after connect() can't leave self._con pointing at a
+        # half-initialized handle. Distinct except arms give an actionable log
+        # line instead of one flattened "failed" with a raw traceback.
+        con: Optional[duckdb.DuckDBPyConnection] = None
         try:
-            self._con = duckdb.connect(self.mirror_path, read_only=True)
-            self._meta = dict(
-                self._con.execute("SELECT key, value FROM mirror_meta").fetchall()
+            con = duckdb.connect(self.mirror_path, read_only=True)
+            meta = dict(
+                con.execute("SELECT key, value FROM mirror_meta").fetchall()
             )
-            self._total_runs = self._con.execute(
-                "SELECT COUNT(*) FROM runs"
-            ).fetchone()[0]
+            total_runs = con.execute("SELECT COUNT(*) FROM runs").fetchone()[0]
+        except duckdb.IOException as exc:
+            logger.error("Could not open SRA mirror at %s: %s", self.mirror_path, exc)
+        except duckdb.CatalogException as exc:
+            logger.error(
+                "SRA mirror at %s is missing an expected table: %s",
+                self.mirror_path,
+                exc,
+            )
+        except duckdb.Error as exc:
+            logger.error("Failed to load SRA mirror at %s: %s", self.mirror_path, exc)
+        else:
+            self._con = con
+            self._meta = meta
+            self._total_runs = total_runs
             logger.info(
                 "SRA mirror loaded: %s rows, built %s",
-                f"{self._total_runs:,}",
-                self._meta.get("mirror_built_at", "unknown"),
+                f"{total_runs:,}",
+                meta.get("mirror_built_at", "unknown"),
             )
-        except Exception:
-            logger.exception("Failed to open SRA mirror at %s", self.mirror_path)
-            self._con = None
+            return
+
+        # Reached only on a caught failure: close the opened handle so the
+        # file lock doesn't linger until GC, and stay unavailable.
+        if con is not None:
+            con.close()
+        self._con = None
 
     def is_available(self) -> bool:
         return self._con is not None

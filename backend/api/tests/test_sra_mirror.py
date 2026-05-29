@@ -198,3 +198,25 @@ class TestCountryMatching:
         )
         assert result["n_returned"] == 1
         assert result["runs"][0]["accession"] == "SRR002"
+
+
+class TestInitErrorHandling:
+    """F9: an incomplete/corrupt mirror should fail with a specific, clean
+    log -- not a raw traceback from a bare `except Exception` -- and must not
+    leave the opened connection dangling behind a None self._con."""
+
+    def test_missing_tables_logs_specific_error_without_traceback(
+        self, tmp_path, caplog
+    ):
+        # A real DuckDB file that exists but lacks the expected tables.
+        bad = str(tmp_path / "empty.duckdb")
+        duckdb.connect(bad).close()
+        with caplog.at_level(logging.ERROR):
+            svc = SRAMirrorService(bad)
+        assert svc.is_available() is False
+        errors = [r for r in caplog.records if r.levelno >= logging.ERROR]
+        assert errors, "expected an error log for the incomplete mirror"
+        # logger.exception() attaches exc_info (a raw traceback); the fix uses
+        # a specific message via logger.error instead.
+        assert all(r.exc_info is None for r in errors)
+        assert any("table" in r.getMessage().lower() for r in errors)
