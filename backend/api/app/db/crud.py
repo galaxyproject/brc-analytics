@@ -34,11 +34,24 @@ async def upsert_user_from_claims(
             name=claims.get("name"),
         )
         session.add(user)
+        try:
+            await session.commit()
+        except IntegrityError:
+            # Concurrent first-login for the same sub: the other callback
+            # won the INSERT. Recover by loading its row and applying our
+            # claim values, mirroring upsert_favorite's race handling.
+            await session.rollback()
+            user = await get_user_by_keycloak_sub(session, keycloak_sub)
+            if user is None:
+                raise
+            user.email = claims.get("email")
+            user.name = claims.get("name")
+            await session.commit()
     else:
         user.email = claims.get("email")
         user.name = claims.get("name")
+        await session.commit()
 
-    await session.commit()
     await session.refresh(user)
     return user
 

@@ -6,6 +6,7 @@ from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from app.core.config import get_settings
@@ -15,7 +16,7 @@ from app.db.crud import (
     upsert_favorite,
     upsert_user_from_claims,
 )
-from app.db.models import Base
+from app.db.models import Base, User
 from app.db.session import get_db_session
 from app.models.assistant import AnalysisSchema, ChatMessage, MessageRole, SessionState
 from tests.test_catalog_data import SAMPLE_ORGANISMS, SAMPLE_WORKFLOWS
@@ -276,3 +277,58 @@ def test_preferences_payload_is_bounded(persistence_client):
     )
 
     assert response.status_code == 413
+
+
+def test_upsert_user_recovers_from_concurrent_insert_race(persistence_app, monkeypatch):
+    """A second concurrent first-login for the same sub must not 500.
+
+    Two OIDC callbacks for a brand-new user can both miss the SELECT and
+    both INSERT; the loser trips the unique keycloak_sub constraint. The
+    upsert must recover (rollback, refetch, apply claims) the way
+    upsert_favorite does, instead of letting the IntegrityError surface.
+    """
+    _app, session_factory, _current_sub, _agent = persistence_app
+
+    from app.db import crud
+
+    real_lookup = crud.get_user_by_keycloak_sub
+    lookup_calls = {"count": 0}
+
+    async def lookup_missing_first(session, keycloak_sub):
+        # Simulate losing the race: the first SELECT runs before the other
+        # transaction commits, so it sees no existing row.
+        lookup_calls["count"] += 1
+        if lookup_calls["count"] == 1:
+            return None
+        return await real_lookup(session, keycloak_sub)
+
+    async def scenario() -> None:
+        # First login lands the row normally (real lookup, not patched yet).
+        async with session_factory() as session:
+            await upsert_user_from_claims(
+                session,
+                {"sub": "racer", "email": "racer@example.com", "name": "Racer"},
+            )
+
+        # Second concurrent login: forced SELECT-miss -> INSERT -> row already
+        # exists -> IntegrityError -> must recover instead of raising.
+        monkeypatch.setattr(crud, "get_user_by_keycloak_sub", lookup_missing_first)
+        async with session_factory() as session:
+            user = await upsert_user_from_claims(
+                session,
+                {"sub": "racer", "email": "updated@example.com", "name": "Racer Two"},
+            )
+        assert user is not None
+        assert user.keycloak_sub == "racer"
+
+        # Exactly one row, and the recovering call applied its field updates.
+        monkeypatch.setattr(crud, "get_user_by_keycloak_sub", real_lookup)
+        async with session_factory() as session:
+            rows = await session.execute(
+                select(User).where(User.keycloak_sub == "racer")
+            )
+            users = list(rows.scalars().all())
+        assert len(users) == 1
+        assert users[0].email == "updated@example.com"
+
+    asyncio.run(scenario())
