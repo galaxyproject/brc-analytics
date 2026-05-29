@@ -2,12 +2,74 @@
 
 These exercise initialization gating and query-layer correctness/error
 handling without requiring a real mirror file -- a small DuckDB fixture is
-built in-memory and written to a temp path where a real connection is needed.
+built at a temp path so the service's real read-only queries run against it.
 """
 
 import logging
 
+import duckdb
+import pytest
+
 from app.services.sra_mirror import SRAMirrorService
+
+
+def _build_mirror(path: str) -> None:
+    """Create a minimal but representative mirror at `path`.
+
+    Tables mirror the production schema's used columns. Rows cover the
+    scenarios F4-F9 exercise: a BioProject lookup, case/synonym country
+    matches, an ambiguous name (one name -> two taxids), and a resolvable
+    organism that has zero runs.
+    """
+    con = duckdb.connect(path)
+    con.execute("CREATE TABLE mirror_meta (key VARCHAR, value VARCHAR)")
+    con.execute(
+        "INSERT INTO mirror_meta VALUES ('mirror_built_at', '2026-05-20'), "
+        "('taxdump_version', '2026-05-01')"
+    )
+    con.execute("CREATE TABLE taxid_names (taxid INTEGER, name VARCHAR)")
+    con.execute(
+        """
+        INSERT INTO taxid_names VALUES
+            (5833, 'Plasmodium falciparum'),
+            (5833, 'Plasmodium falciparum 3D7'),
+            (1773, 'Mycobacterium tuberculosis'),
+            (777, 'Duplicatus exampleus'),
+            (778, 'Duplicatus exampleus')
+        """
+    )
+    con.execute(
+        """
+        CREATE TABLE runs (
+            acc VARCHAR, sra_study VARCHAR, bioproject VARCHAR, organism VARCHAR,
+            assay_type VARCHAR, platform VARCHAR, instrument VARCHAR,
+            librarylayout VARCHAR, releasedate DATE,
+            geo_loc_name_country_calc VARCHAR, mbases INTEGER
+        )
+        """
+    )
+    con.execute(
+        """
+        INSERT INTO runs VALUES
+            ('SRR001','SRP001','PRJNA12345','Plasmodium falciparum','WGS',
+             'ILLUMINA','HiSeq','PAIRED', DATE '2020-06-01','Kenya', 100),
+            ('SRR002','SRP001','PRJNA12345','Plasmodium falciparum','WGS',
+             'OXFORD_NANOPORE','MinION','SINGLE', DATE '2021-06-01',
+             'United Kingdom', 200),
+            ('SRR003','SRP002','PRJNA99999','Mycobacterium tuberculosis','WGS',
+             'ILLUMINA','NovaSeq','PAIRED', DATE '2019-01-01','USA', 300)
+        """
+    )
+    con.close()
+
+
+@pytest.fixture()
+def mirror(tmp_path):
+    path = str(tmp_path / "test-mirror.duckdb")
+    _build_mirror(path)
+    svc = SRAMirrorService(path)
+    assert svc.is_available()
+    return svc
 
 
 class TestInitializeGating:
@@ -41,3 +103,29 @@ class TestInitializeGating:
             svc = SRAMirrorService(str(tmp_path))
         assert svc.is_available() is False
         assert not [r for r in caplog.records if r.levelno >= logging.ERROR]
+
+
+class TestGetStudyRunsPrefix:
+    """F4: BioProject lookup must normalize the accession before the PRJ
+    prefix test -- 'prjna12345' or ' PRJNA12345 ' should hit the bioproject
+    column, not fall through to sra_study and return nothing."""
+
+    def test_uppercase_prj_matches_bioproject(self, mirror):
+        result = mirror.get_study_runs("PRJNA12345")
+        assert result["matched_column"] == "bioproject"
+        assert result["n_returned"] == 2
+
+    def test_lowercase_prj_matches_bioproject(self, mirror):
+        result = mirror.get_study_runs("prjna12345")
+        assert result["matched_column"] == "bioproject"
+        assert result["n_returned"] == 2
+
+    def test_whitespace_padded_prj_matches_bioproject(self, mirror):
+        result = mirror.get_study_runs("  PRJNA12345  ")
+        assert result["matched_column"] == "bioproject"
+        assert result["n_returned"] == 2
+
+    def test_study_accession_still_matches_sra_study(self, mirror):
+        result = mirror.get_study_runs("SRP001")
+        assert result["matched_column"] == "sra_study"
+        assert result["n_returned"] == 2

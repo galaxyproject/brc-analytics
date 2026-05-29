@@ -466,6 +466,11 @@ class SRAMirrorService:
         if not self._con:
             return {"error": "SRA mirror not available"}
 
+        # Accessions are conventionally upper-case; normalize so a
+        # lowercase or whitespace-padded "prjna12345" still routes to the
+        # bioproject column instead of silently missing on sra_study.
+        accession = accession.strip().upper()
+
         cache_key = ("study_runs", accession, limit)
         if (cached := self._cache_get(cache_key)) is not None:
             return cached
