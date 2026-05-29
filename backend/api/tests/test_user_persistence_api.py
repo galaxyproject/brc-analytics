@@ -9,7 +9,8 @@ from fastapi.testclient import TestClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from app.core.config import get_settings
+from app.core.config import SESSION_COOKIE_NAME, get_settings
+from app.core.session_signing import sign_session_id
 from app.db.crud import (
     create_saved_analysis,
     get_user_by_keycloak_sub,
@@ -277,6 +278,48 @@ def test_preferences_payload_is_bounded(persistence_client):
     )
 
     assert response.status_code == 413
+
+
+def test_saved_analysis_snapshot_enforces_session_cookie_when_secret_set(
+    persistence_client, monkeypatch
+):
+    """With SESSION_COOKIE_SECRET configured, saving an anonymous session
+    requires a valid signed cookie -- knowing the session_id is not enough.
+
+    The companion test (test_saved_analysis_snapshot_claims_anonymous_session)
+    succeeds cookieless only because its fixture leaves the secret unset; this
+    one pins the gate so it can't be silently dropped from the save endpoint.
+    """
+    client, _session_factory, current_sub, agent = persistence_client
+
+    secret = "test-cookie-secret"
+    monkeypatch.setenv("SESSION_COOKIE_SECRET", secret)
+    get_settings.cache_clear()
+
+    agent.session_service.sessions["session-anon"] = SessionState(
+        session_id="session-anon",
+        owner_keycloak_sub=None,
+        messages=[ChatMessage(role=MessageRole.USER, content="hello")],
+        schema_state=AnalysisSchema(),
+    )
+    current_sub["value"] = "user-a"
+
+    # No cookie -> rejected, session stays anonymous (gate runs before claim).
+    missing = client.post("/api/v1/saved_analyses", json={"session_id": "session-anon"})
+    assert missing.status_code == 403
+    assert agent.session_service.sessions["session-anon"].owner_keycloak_sub is None
+
+    # Wrong signature -> rejected.
+    client.cookies.set(SESSION_COOKIE_NAME, "not-a-valid-signature")
+    wrong = client.post("/api/v1/saved_analyses", json={"session_id": "session-anon"})
+    assert wrong.status_code == 403
+    client.cookies.clear()
+
+    # Valid signed cookie -> the session is claimed and saved.
+    client.cookies.set(SESSION_COOKIE_NAME, sign_session_id("session-anon", secret))
+    ok = client.post("/api/v1/saved_analyses", json={"session_id": "session-anon"})
+    assert ok.status_code == 200
+    assert agent.session_service.sessions["session-anon"].owner_keycloak_sub == "user-a"
 
 
 def test_upsert_user_recovers_from_concurrent_insert_race(persistence_app, monkeypatch):
