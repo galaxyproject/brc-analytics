@@ -163,6 +163,29 @@ class TestOrganismResolution:
         assert result["resolved"] is True
 
 
+class TestResolvedFlagAcrossOutputs:
+    """F6 follow-up: the `resolved` flag belongs on every organism-based
+    output, not just summary -- top_bioprojects is offered for cohort
+    questions, so a typo there shouldn't read as an authoritative empty set."""
+
+    def test_search_runs_flags_unrecognized(self, mirror):
+        result = mirror.search_runs("Notarealorganism xyzzy")
+        assert result["resolved"] is False
+        assert result["n_returned"] == 0
+
+    def test_search_runs_resolved_true_when_found(self, mirror):
+        result = mirror.search_runs("Plasmodium falciparum")
+        assert result["resolved"] is True
+
+    def test_top_bioprojects_flags_unrecognized(self, mirror):
+        result = mirror.top_bioprojects_for_organism("Notarealorganism xyzzy")
+        assert result["resolved"] is False
+
+    def test_top_bioprojects_resolved_true_when_found(self, mirror):
+        result = mirror.top_bioprojects_for_organism("Plasmodium falciparum")
+        assert result["resolved"] is True
+
+
 class TestSinceValidation:
     """F7: a malformed `since` must come back as a polite message, not crash
     the tool turn with a DuckDB conversion/binder error."""

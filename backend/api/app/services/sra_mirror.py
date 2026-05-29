@@ -538,9 +538,11 @@ class SRAMirrorService:
             for r in rows
         ]
 
+        resolved = taxid is not None or len(results) > 0
         result = {
             "input": organism,
             "resolved_taxid": taxid,
+            "resolved": resolved,
             "filters_applied": {
                 k: v
                 for k, v in {
@@ -556,6 +558,11 @@ class SRAMirrorService:
             "runs": results,
             "_meta": self._provenance(names),
         }
+        if not resolved:
+            result["message"] = (
+                f"Couldn't resolve '{organism}' to a known organism -- check "
+                "the spelling, or try the scientific name or NCBI taxid."
+            )
         self._cache_put(cache_key, result)
         return result
 
@@ -590,9 +597,11 @@ class SRAMirrorService:
             [names, limit],
         ).fetchall()
 
+        resolved = taxid is not None or len(rows) > 0
         result = {
             "input": organism,
             "resolved_taxid": taxid,
+            "resolved": resolved,
             "n_returned": len(rows),
             "bioprojects": [
                 {
@@ -606,6 +615,11 @@ class SRAMirrorService:
             ],
             "_meta": self._provenance(names),
         }
+        if not resolved:
+            result["message"] = (
+                f"Couldn't resolve '{organism}' to a known organism -- check "
+                "the spelling, or try the scientific name or NCBI taxid."
+            )
         self._cache_put(cache_key, result)
         return result
 
