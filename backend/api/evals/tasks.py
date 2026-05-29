@@ -68,6 +68,26 @@ class EvalDeps:
         )
 
 
+class DatasetRequirementError(RuntimeError):
+    """A dataset build() precondition was not met.
+
+    The runner catches this and skips the dataset with a clear message,
+    rather than running cases that would score a misleading 0.0.
+    """
+
+
+def require_sra_mirror(deps: EvalDeps) -> None:
+    """Guard SRA datasets: without an available mirror, no sra_* tools
+    register and every case scores a flat 0.0 that reads like a model
+    regression. Fail loudly with an actionable message instead."""
+    if deps.sra_mirror is None or not deps.sra_mirror.is_available():
+        raise DatasetRequirementError(
+            "This dataset requires SRA_MIRROR_PATH to point at a built SRA "
+            "mirror. Without it, no sra_* tools register and every case "
+            "scores a misleading 0.0. Set SRA_MIRROR_PATH and re-run."
+        )
+
+
 @dataclass
 class AgentTurnOutput:
     reply: str

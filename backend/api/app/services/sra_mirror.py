@@ -115,8 +115,14 @@ class SRAMirrorService:
         self._cache[key] = (time.monotonic(), value)
 
     def _initialize(self) -> None:
-        path = Path(self.mirror_path)
-        if not path.exists():
+        # Path('').exists() is True (it resolves to '.'), so guard the empty
+        # case explicitly and require an actual file -- otherwise an unset
+        # SRA_MIRROR_PATH falls through to duckdb.connect('', read_only=True),
+        # which raises and logs a scary traceback on every default-deploy boot.
+        if not self.mirror_path:
+            logger.info("SRA_MIRROR_PATH not set -- SRA mirror service disabled")
+            return
+        if not Path(self.mirror_path).is_file():
             logger.warning(
                 "SRA mirror not found at %s -- service will report unavailable",
                 self.mirror_path,

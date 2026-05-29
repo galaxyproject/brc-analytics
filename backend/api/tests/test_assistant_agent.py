@@ -725,6 +725,87 @@ class TestSystemPromptHardening:
         assert "off-topic" in lower or "redirect" in lower
 
 
+class TestSystemPromptSRAGating:
+    """F1: the prompt must not advertise SRA tools that aren't registered.
+
+    Tool registration is gated on the mirror being available; the prompt
+    that teaches the model to call those tools has to be gated on the same
+    condition, or a default deploy (no SRA_MIRROR_PATH) tells the model to
+    call tools that don't exist.
+    """
+
+    SRA_TOOL_NAMES = (
+        "sra_summary_for_organism",
+        "search_sra_runs",
+        "top_bioprojects_for_organism",
+        "get_sra_study_runs",
+    )
+
+    def test_prompt_omits_sra_tools_when_unavailable(self):
+        from app.services.assistant_agent import build_system_prompt
+
+        prompt = build_system_prompt(include_sra_tools=False)
+        for name in self.SRA_TOOL_NAMES:
+            assert name not in prompt
+
+    def test_prompt_includes_sra_tools_when_available(self):
+        from app.services.assistant_agent import build_system_prompt
+
+        prompt = build_system_prompt(include_sra_tools=True)
+        for name in self.SRA_TOOL_NAMES:
+            assert name in prompt
+
+    def test_default_system_prompt_has_no_sra_tools(self):
+        # The module-level SYSTEM_PROMPT is the safe default (no SRA),
+        # so importers that don't know about the mirror don't leak it.
+        from app.services.assistant_agent import SYSTEM_PROMPT
+
+        for name in self.SRA_TOOL_NAMES:
+            assert name not in SYSTEM_PROMPT
+
+
+def _build_agent_via_init(sra_available):
+    """Drive the real _init_agent with an offline TestModel.
+
+    sra_available: None -> no mirror injected; True/False -> mirror with
+    is_available() returning that value.
+    """
+    from pydantic_ai.models.test import TestModel
+
+    instance = object.__new__(AssistantAgent)
+    instance.settings = MagicMock()
+    instance.settings.AI_API_KEY = "test-key"
+    instance.settings.AI_PRIMARY_MODEL = "test"
+    instance.settings.AI_API_BASE_URL = None
+    if sra_available is None:
+        instance.sra_mirror = None
+    else:
+        mirror = MagicMock()
+        mirror.is_available.return_value = sra_available
+        instance.sra_mirror = mirror
+    instance._build_model = lambda *a, **k: TestModel()
+    instance._init_agent()
+    return instance
+
+
+class TestInitAgentSRAGating:
+    """F1 wiring: the effective prompt the agent is built with must track
+    tool registration -- both gated on the same mirror-availability flag."""
+
+    def test_no_mirror_builds_agent_without_sra_prompt(self):
+        agent = _build_agent_via_init(sra_available=None)
+        assert agent.agent is not None
+        assert "sra_summary_for_organism" not in agent.system_prompt
+
+    def test_unavailable_mirror_omits_sra_prompt(self):
+        agent = _build_agent_via_init(sra_available=False)
+        assert "sra_summary_for_organism" not in agent.system_prompt
+
+    def test_available_mirror_includes_sra_prompt(self):
+        agent = _build_agent_via_init(sra_available=True)
+        assert "sra_summary_for_organism" in agent.system_prompt
+
+
 class TestMessageHistoryCap:
     def test_state_messages_capped(self, agent):
         from app.models.assistant import ChatMessage, MessageRole, SessionState

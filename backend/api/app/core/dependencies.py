@@ -1,5 +1,6 @@
 import logging
 from functools import lru_cache
+from typing import Optional
 
 from fastapi import Cookie, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -49,8 +50,11 @@ def get_ena_service() -> ENAService:
 
 
 @lru_cache(maxsize=1)
-def get_sra_mirror_service() -> SRAMirrorService:
+def get_sra_mirror_service() -> Optional[SRAMirrorService]:
     settings = get_settings()
+    if not settings.SRA_MIRROR_PATH:
+        logger.info("SRA_MIRROR_PATH not set -- SRA mirror service disabled")
+        return None
     service = SRAMirrorService(settings.SRA_MIRROR_PATH)
     logger.info(
         f"SRA mirror service initialized (singleton), available: {service.is_available()}"

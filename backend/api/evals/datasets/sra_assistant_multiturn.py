@@ -17,7 +17,7 @@ from pydantic_evals.evaluators import Evaluator, EvaluatorContext, LLMJudge
 
 from evals.datasets.assistant_multiturn import FinalSchemaContains, IsCompleteEquals
 from evals.model_registry import ModelEntry
-from evals.tasks import EvalDeps, make_assistant_conversation_task
+from evals.tasks import EvalDeps, make_assistant_conversation_task, require_sra_mirror
 
 
 @dataclass
@@ -106,6 +106,7 @@ def build(
     judge_model: Model,
     only: list[str] | None = None,
 ) -> tuple[Dataset, Callable, str]:
+    require_sra_mirror(deps)
     cases = []
     for c in _CASES:
         if only and c["name"] not in only:

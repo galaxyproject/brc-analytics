@@ -24,7 +24,7 @@ from evals.judge import build_pydantic_ai_model
 from evals.model_registry import load_registry
 from evals.report import RunResult, render_report
 from evals.specs import SPECS
-from evals.tasks import build_deps
+from evals.tasks import DatasetRequirementError, build_deps
 
 logger = logging.getLogger("evals")
 
@@ -214,10 +214,26 @@ async def _amain(args) -> int:
     for dataset_name in dataset_names:
         for model_name, entry in wanted.items():
             logger.info("running %s on %s", dataset_name, model_name)
-            run = await _run_one(
-                dataset_name, model_name, deps, entry, judge_model, only, args.repeat
-            )
+            try:
+                run = await _run_one(
+                    dataset_name,
+                    model_name,
+                    deps,
+                    entry,
+                    judge_model,
+                    only,
+                    args.repeat,
+                )
+            except DatasetRequirementError as exc:
+                # Precondition (e.g. SRA_MIRROR_PATH) is model-independent, so
+                # skip the whole dataset rather than re-failing per model.
+                logger.warning("skipping dataset %s: %s", dataset_name, exc)
+                break
             runs.append(run)
+
+    if not runs:
+        print("no datasets ran (all requested datasets were skipped)")
+        return 1
 
     sha = _git_sha()
     md = render_report(runs, sha=sha)
