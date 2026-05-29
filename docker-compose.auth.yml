@@ -63,6 +63,9 @@ services:
       - "8000:8000"
     environment:
       DATABASE_URL: postgresql+asyncpg://brc:brc@brc-app-db:5432/brc_app
+      # Create the persistent app tables on boot; without this the
+      # favorites/saved-analyses/workflow-runs endpoints 500 on a fresh stack.
+      RUN_MIGRATIONS_ON_STARTUP: "true"
       REDIS_URL: redis://redis:6379/0
       KEYCLOAK_ISSUER_URL: http://keycloak:8180/realms/galaxy
       KEYCLOAK_CLIENT_ID: brc-analytics
