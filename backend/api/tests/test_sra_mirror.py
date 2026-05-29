@@ -200,6 +200,34 @@ class TestCountryMatching:
         assert result["runs"][0]["accession"] == "SRR002"
 
 
+class TestCacheHygiene:
+    """F10/F12/F13: the in-process TTL cache must stay bounded, hand back
+    copies (not shared references), and key on a normalized organism so
+    casing/whitespace variants don't each trigger a fresh aggregate."""
+
+    def test_cache_is_bounded(self, mirror):
+        from app.services.sra_mirror import _CACHE_MAX_ENTRIES
+
+        for i in range(_CACHE_MAX_ENTRIES + 50):
+            mirror.summary_for_organism(f"unknown organism {i}")
+        assert len(mirror._cache) <= _CACHE_MAX_ENTRIES
+
+    def test_cached_result_not_mutated_by_caller(self, mirror):
+        r1 = mirror.summary_for_organism("Plasmodium falciparum")
+        r1["n_runs"] = -999
+        r1["top_platforms"].append({"platform": "BOGUS", "n_runs": 1})
+        r2 = mirror.summary_for_organism("Plasmodium falciparum")
+        assert r2["n_runs"] != -999
+        assert all(p["platform"] != "BOGUS" for p in r2["top_platforms"])
+
+    def test_organism_cache_key_is_normalized(self, mirror):
+        mirror.summary_for_organism("Plasmodium falciparum")
+        n_after_first = len(mirror._cache)
+        # Casing + extra whitespace should hit the same cache entry.
+        mirror.summary_for_organism("  plasmodium   falciparum ")
+        assert len(mirror._cache) == n_after_first
+
+
 class TestInitErrorHandling:
     """F9: an incomplete/corrupt mirror should fail with a specific, clean
     log -- not a raw traceback from a bare `except Exception` -- and must not

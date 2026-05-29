@@ -8,6 +8,7 @@ plus a `mirror_meta` table for provenance metadata.
 """
 from __future__ import annotations
 
+import copy
 import datetime
 import logging
 import time
@@ -25,6 +26,9 @@ logger = logging.getLogger(__name__)
 # are sync and run in the asyncio event loop's thread, so a plain dict is
 # safe without locks.
 _CACHE_TTL_SECONDS = 300
+# Cap the entry count so a long-lived worker can't grow the cache without
+# bound -- the search key is a 7-tuple, so the keyspace is effectively open.
+_CACHE_MAX_ENTRIES = 512
 
 
 # Curated abbreviations and colloquial names. NCBI's taxonomy `names.dmp`
@@ -113,6 +117,13 @@ _COUNTRY_SYNONYMS: Dict[str, List[str]] = {
 }
 
 
+def _norm_organism(organism: str) -> str:
+    """Collapse casing and whitespace for use as a cache key, so
+    "Plasmodium falciparum", "plasmodium  falciparum" and "  ... " share one
+    entry instead of each triggering a full aggregate."""
+    return " ".join(organism.strip().lower().split())
+
+
 def _country_candidates(country: str) -> List[str]:
     """Lowercased candidate names to match a user country term against.
 
@@ -163,11 +174,31 @@ class SRAMirrorService:
             return None
         ts, value = entry
         if time.monotonic() - ts >= _CACHE_TTL_SECONDS:
+            # Pop the expired entry instead of leaving it to shadow the slot.
+            del self._cache[key]
             return None
-        return value
+        # Hand back a copy so a caller mutating the result can't corrupt the
+        # shared cache entry.
+        return copy.deepcopy(value)
 
     def _cache_put(self, key: Tuple, value: Any) -> None:
-        self._cache[key] = (time.monotonic(), value)
+        if key not in self._cache and len(self._cache) >= _CACHE_MAX_ENTRIES:
+            self._evict()
+        # Store an independent copy so a caller mutating the returned dict
+        # (which it still holds a reference to) can't reach into the cache.
+        self._cache[key] = (time.monotonic(), copy.deepcopy(value))
+
+    def _evict(self) -> None:
+        now = time.monotonic()
+        expired = [
+            k for k, (ts, _) in self._cache.items() if now - ts >= _CACHE_TTL_SECONDS
+        ]
+        for k in expired:
+            del self._cache[k]
+        # Still full after dropping expired entries: evict oldest-inserted
+        # (dicts preserve insertion order) until there's room.
+        while len(self._cache) >= _CACHE_MAX_ENTRIES:
+            del self._cache[next(iter(self._cache))]
 
     def _initialize(self) -> None:
         # Path('').exists() is True (it resolves to '.'), so guard the empty
@@ -299,7 +330,7 @@ class SRAMirrorService:
         if not self._con:
             return {"error": "SRA mirror not available"}
 
-        cache_key = ("summary", organism)
+        cache_key = ("summary", _norm_organism(organism))
         if (cached := self._cache_get(cache_key)) is not None:
             return cached
 
@@ -433,7 +464,15 @@ class SRAMirrorService:
         if not self._con:
             return {"error": "SRA mirror not available"}
 
-        cache_key = ("search", organism, assay_type, platform, country, since, limit)
+        cache_key = (
+            "search",
+            _norm_organism(organism),
+            assay_type,
+            platform,
+            country,
+            since,
+            limit,
+        )
         if (cached := self._cache_get(cache_key)) is not None:
             return cached
 
@@ -524,7 +563,7 @@ class SRAMirrorService:
         if not self._con:
             return {"error": "SRA mirror not available"}
 
-        cache_key = ("top_bioprojects", organism, limit)
+        cache_key = ("top_bioprojects", _norm_organism(organism), limit)
         if (cached := self._cache_get(cache_key)) is not None:
             return cached
 
