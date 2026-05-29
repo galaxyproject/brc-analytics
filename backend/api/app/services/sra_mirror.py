@@ -198,10 +198,14 @@ class SRAMirrorService:
             """
             SELECT DISTINCT taxid FROM taxid_names
             WHERE LOWER(name) = LOWER(?)
+            ORDER BY taxid
             """,
             [term],
         ).fetchall()
         if rows:
+            # Deterministic pick when a name maps to multiple taxids -- the
+            # ORDER BY makes restarts/processes agree instead of taking
+            # whatever row DuckDB happened to return first.
             taxid = rows[0][0]
             names = self._con.execute(
                 "SELECT name FROM taxid_names WHERE taxid = ?", [taxid]
@@ -240,15 +244,26 @@ class SRAMirrorService:
         ).fetchone()
 
         if not n_runs:
+            # Distinguish "we don't recognize this term" (likely a typo) from
+            # "real organism, just no data" -- otherwise the model relays an
+            # authoritative "no data" for a misspelling.
+            resolved = taxid is not None
+            if resolved:
+                message = (
+                    f"'{organism}' resolved to a known organism (taxid {taxid}) "
+                    "but the SRA mirror has no runs for it."
+                )
+            else:
+                message = (
+                    f"Couldn't resolve '{organism}' to a known organism -- check "
+                    "the spelling, or try the scientific name or NCBI taxid."
+                )
             empty = {
                 "input": organism,
                 "resolved_taxid": taxid,
+                "resolved": resolved,
                 "n_runs": 0,
-                "message": (
-                    f"No runs found in the SRA mirror for '{organism}'. "
-                    "The organism may not be in the BRC catalog or there is "
-                    "no public SRA data."
-                ),
+                "message": message,
                 "_meta": self._provenance(names),
             }
             self._cache_put(cache_key, empty)
@@ -305,6 +320,7 @@ class SRAMirrorService:
         result = {
             "input": organism,
             "resolved_taxid": taxid,
+            "resolved": True,
             "n_runs": n_runs,
             "n_bioprojects": n_projects,
             "n_studies": n_studies,

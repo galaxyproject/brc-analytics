@@ -129,3 +129,26 @@ class TestGetStudyRunsPrefix:
         result = mirror.get_study_runs("SRP001")
         assert result["matched_column"] == "sra_study"
         assert result["n_returned"] == 2
+
+
+class TestOrganismResolution:
+    """F5/F6: resolution must be deterministic for ambiguous names, and a
+    summary must distinguish an unrecognized term (likely a typo) from a
+    real organism that simply has no runs."""
+
+    def test_ambiguous_name_resolves_to_min_taxid(self, mirror):
+        # 'Duplicatus exampleus' maps to taxids 777 and 778. Without a
+        # deterministic ORDER BY, different runs could pick either.
+        taxid, _ = mirror._resolve_organism("Duplicatus exampleus")
+        assert taxid == 777
+
+    def test_summary_flags_unrecognized_organism(self, mirror):
+        result = mirror.summary_for_organism("Notarealorganism xyzzy")
+        assert result["n_runs"] == 0
+        assert result["resolved"] is False
+
+    def test_summary_resolved_but_zero_runs_is_not_unresolved(self, mirror):
+        # Resolves to a real taxid (777) but has no runs -- distinct from a typo.
+        result = mirror.summary_for_organism("Duplicatus exampleus")
+        assert result["n_runs"] == 0
+        assert result["resolved"] is True
