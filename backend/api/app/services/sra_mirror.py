@@ -8,6 +8,7 @@ plus a `mirror_meta` table for provenance metadata.
 """
 from __future__ import annotations
 
+import datetime
 import logging
 import time
 from pathlib import Path
@@ -89,6 +90,26 @@ _ORGANISM_ALIASES: Dict[str, int] = {
     "d. melanogaster": 7227,
     "d.melanogaster": 7227,
 }
+
+
+def _normalize_since(value: str) -> Optional[str]:
+    """Normalize a `since` filter to an ISO date string, or None if invalid.
+
+    Accepts YYYY, YYYY-MM, or YYYY-MM-DD (coercing the first two to the first
+    day of the period). Returns None for anything that isn't a real date so
+    the caller can reply politely instead of handing 'last year' to DuckDB,
+    which raises a conversion error that escapes the tool turn.
+    """
+    s = value.strip()
+    if len(s) == 4 and s.isdigit():
+        s = f"{s}-01-01"
+    elif len(s) == 7 and s[:4].isdigit() and s[4] == "-" and s[5:7].isdigit():
+        s = f"{s}-01"
+    try:
+        datetime.date.fromisoformat(s)
+    except ValueError:
+        return None
+    return s
 
 
 class SRAMirrorService:
@@ -375,8 +396,17 @@ class SRAMirrorService:
             clauses.append("geo_loc_name_country_calc = ?")
             params.append(country)
         if since:
+            normalized_since = _normalize_since(since)
+            if normalized_since is None:
+                return {
+                    "input": organism,
+                    "error": (
+                        f"Invalid 'since' date {since!r}. Use ISO format "
+                        "YYYY-MM-DD (e.g. 2024-01-01)."
+                    ),
+                }
             clauses.append("releasedate >= ?")
-            params.append(since)
+            params.append(normalized_since)
 
         where = " AND ".join(clauses)
         rows = self._con.execute(

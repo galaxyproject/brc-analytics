@@ -152,3 +152,27 @@ class TestOrganismResolution:
         result = mirror.summary_for_organism("Duplicatus exampleus")
         assert result["n_runs"] == 0
         assert result["resolved"] is True
+
+
+class TestSinceValidation:
+    """F7: a malformed `since` must come back as a polite message, not crash
+    the tool turn with a DuckDB conversion/binder error."""
+
+    def test_garbage_since_returns_error_not_exception(self, mirror):
+        result = mirror.search_runs("Plasmodium falciparum", since="last year")
+        assert "error" in result
+        assert "since" in result["error"].lower()
+
+    def test_valid_since_filters_runs(self, mirror):
+        result = mirror.search_runs("Plasmodium falciparum", since="2021-01-01")
+        assert result["n_returned"] == 1
+        assert result["runs"][0]["accession"] == "SRR002"
+
+    def test_year_only_since_is_coerced(self, mirror):
+        result = mirror.search_runs("Plasmodium falciparum", since="2021")
+        assert "error" not in result
+        assert result["n_returned"] == 1
+
+    def test_no_since_returns_all(self, mirror):
+        result = mirror.search_runs("Plasmodium falciparum")
+        assert result["n_returned"] == 2
