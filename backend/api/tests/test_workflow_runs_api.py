@@ -261,3 +261,24 @@ def test_workflow_run_accepts_anonymous_assistant_session(workflow_runs_client):
 
     assert response.status_code == 200
     assert response.json()["assistant_session_id"] == "session-anon"
+
+
+def test_workflow_run_corrects_mislabeled_launch_source(workflow_runs_client):
+    # A hand-crafted request claims launch_source="assistant" but sends no
+    # assistant_session_id. The server derives launch_source from the (absent)
+    # session, so it's stored as "site" instead of polluting assistant analytics.
+    client, current_sub, _session_service = workflow_runs_client
+    current_sub["value"] = None
+
+    response = client.post(
+        "/api/v1/workflow_runs",
+        json={
+            "workflow_trs_id": "#workflow/github.com/iwc/rnaseq-pe/main",
+            "handoff_url": "https://usegalaxy.org/workflow_landings/abc",
+            "launch_source": "assistant",
+            "parameters": {},
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["launch_source"] == "site"

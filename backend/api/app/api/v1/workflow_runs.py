@@ -67,6 +67,18 @@ async def create_tracked_workflow_run(
                 detail="Assistant session belongs to another user",
             )
 
+    # launch_source feeds launch analytics and is otherwise client-reported.
+    # The one label we can verify is "assistant" -- it must be backed by a
+    # real, ownership-checked assistant session (validated above) -- so derive
+    # it instead of trusting the body. Mirrors the frontend, which sets
+    # "assistant" iff there's an assistant session. Other labels pass through.
+    if payload.assistant_session_id:
+        launch_source = "assistant"
+    elif payload.launch_source == "assistant":
+        launch_source = "site"
+    else:
+        launch_source = payload.launch_source
+
     workflow_run = await create_workflow_run(
         session,
         current_user_db,
@@ -75,7 +87,7 @@ async def create_tracked_workflow_run(
         galaxy_instance_url=payload.galaxy_instance_url,
         handoff_url=payload.handoff_url,
         assembly_accession=payload.assembly_accession,
-        launch_source=payload.launch_source,
+        launch_source=launch_source,
         assistant_session_id=payload.assistant_session_id,
         parameters=payload.parameters,
     )
