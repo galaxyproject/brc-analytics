@@ -6,6 +6,7 @@ the sra-poc plan in ~/work/brain/plans/brc-analytics-sra-duckdb-metadata)
 and includes a `taxid_names` table for taxid-anchored name resolution
 plus a `mirror_meta` table for provenance metadata.
 """
+
 from __future__ import annotations
 
 import copy
@@ -124,6 +125,13 @@ def _norm_organism(organism: str) -> str:
     return " ".join(organism.strip().lower().split())
 
 
+def _norm_filter(value: Optional[str]) -> Optional[str]:
+    """Normalize an optional filter value (assay/platform/country) for the
+    cache key, so equivalent casings share one entry -- matches the
+    case-insensitive comparison the SQL now does for these columns."""
+    return " ".join(value.strip().lower().split()) if value else value
+
+
 def _country_candidates(country: str) -> List[str]:
     """Lowercased candidate names to match a user country term against.
 
@@ -221,9 +229,7 @@ class SRAMirrorService:
         con: Optional[duckdb.DuckDBPyConnection] = None
         try:
             con = duckdb.connect(self.mirror_path, read_only=True)
-            meta = dict(
-                con.execute("SELECT key, value FROM mirror_meta").fetchall()
-            )
+            meta = dict(con.execute("SELECT key, value FROM mirror_meta").fetchall())
             total_runs = con.execute("SELECT COUNT(*) FROM runs").fetchone()[0]
         except duckdb.IOException as exc:
             logger.error("Could not open SRA mirror at %s: %s", self.mirror_path, exc)
@@ -471,9 +477,9 @@ class SRAMirrorService:
         cache_key = (
             "search",
             _norm_organism(organism),
-            assay_type,
-            platform,
-            country,
+            _norm_filter(assay_type),
+            _norm_filter(platform),
+            _norm_filter(country),
             since,
             limit,
         )
@@ -485,15 +491,13 @@ class SRAMirrorService:
         params: List[Any] = [names]
 
         if assay_type:
-            clauses.append("assay_type = ?")
-            params.append(assay_type)
+            clauses.append("LOWER(assay_type) = ?")
+            params.append(_norm_filter(assay_type))
         if platform:
-            clauses.append("platform = ?")
-            params.append(platform)
+            clauses.append("LOWER(platform) = ?")
+            params.append(_norm_filter(platform))
         if country:
-            clauses.append(
-                "LOWER(geo_loc_name_country_calc) IN (SELECT UNNEST(?))"
-            )
+            clauses.append("LOWER(geo_loc_name_country_calc) IN (SELECT UNNEST(?))")
             params.append(_country_candidates(country))
         if since:
             normalized_since = _normalize_since(since)

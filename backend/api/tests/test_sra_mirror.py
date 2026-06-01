@@ -225,9 +225,7 @@ class TestCountryMatching:
         assert result["runs"][0]["accession"] == "SRR002"
 
     def test_exact_country_still_matches(self, mirror):
-        result = mirror.search_runs(
-            "Plasmodium falciparum", country="United Kingdom"
-        )
+        result = mirror.search_runs("Plasmodium falciparum", country="United Kingdom")
         assert result["n_returned"] == 1
         assert result["runs"][0]["accession"] == "SRR002"
 
@@ -313,3 +311,28 @@ class TestInitErrorHandling:
         # a specific message via logger.error instead.
         assert all(r.exc_info is None for r in errors)
         assert any("table" in r.getMessage().lower() for r in errors)
+
+
+class TestPlatformAssayMatching:
+    """Platform/assay_type were exact-match, so 'illumina' (lowercase) silently
+    returned nothing even though the stored value is 'ILLUMINA'. Now matched
+    case-insensitively, like the country filter."""
+
+    def test_case_insensitive_platform(self, mirror):
+        result = mirror.search_runs("Plasmodium falciparum", platform="illumina")
+        assert result["n_returned"] == 1
+        assert result["runs"][0]["accession"] == "SRR001"
+        # Whitespace-padded input normalizes identically for the cache key and
+        # the SQL param, so it returns the same result instead of caching a
+        # zero-result under the shared key.
+        padded = mirror.search_runs("Plasmodium falciparum", platform="  ILLUMINA  ")
+        assert padded["n_returned"] == 1
+
+    def test_case_insensitive_assay_type(self, mirror):
+        # Both P. falciparum rows are WGS, so a lowercase match returns both...
+        result = mirror.search_runs("Plasmodium falciparum", assay_type="wgs")
+        assert result["n_returned"] == 2
+        # ...and a non-matching assay type returns none -- proves the filter
+        # actually excludes rather than being a no-op, and handles mixed case.
+        none = mirror.search_runs("Plasmodium falciparum", assay_type="RNA-Seq")
+        assert none["n_returned"] == 0
