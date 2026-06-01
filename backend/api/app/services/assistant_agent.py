@@ -538,13 +538,12 @@ class AssistantAgent:
         state = None
         if session_id:
             try:
+                # PermissionError (session owned by a different user) is left
+                # to propagate so the API layer can return a 403 rather than
+                # folding it into the generic 503 RuntimeError path.
                 state = await self.session_service.require_session(
                     session_id, owner_keycloak_sub
                 )
-            except PermissionError as e:
-                raise RuntimeError(
-                    "Assistant session does not belong to this user"
-                ) from e
             except KeyError:
                 state = None
         if state is None:

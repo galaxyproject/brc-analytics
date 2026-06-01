@@ -194,6 +194,25 @@ class TestAnonymousSessionClaim:
         assert resp.status_code == 403
         assert "another user" in resp.json()["detail"]
 
+    def test_chat_maps_permission_error_to_403(self, app_with_stubbed_agent, client):
+        # An anonymous caller citing a session owned by someone else skips the
+        # claim block and hits agent.chat(), which raises PermissionError from
+        # require_session(). That must surface as 403, not the generic 503.
+        agent = app_with_stubbed_agent.dependency_overrides[
+            __import__(
+                "app.core.dependencies", fromlist=["get_assistant_agent"]
+            ).get_assistant_agent
+        ]()
+        agent.chat = AsyncMock(side_effect=PermissionError("sess-abc"))
+
+        resp = client.post(
+            "/api/v1/assistant/chat",
+            json={"message": "hello", "session_id": "sess-abc"},
+        )
+
+        assert resp.status_code == 403
+        assert "another user" in resp.json()["detail"]
+
     def test_anonymous_chat_does_not_attempt_claim(
         self, app_with_stubbed_agent, client
     ):

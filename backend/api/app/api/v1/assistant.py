@@ -86,6 +86,11 @@ async def assistant_chat(
     except AssistantTimeoutError as e:
         logger.exception("Assistant chat timed out")
         raise HTTPException(status_code=504, detail=str(e)) from e
+    except PermissionError as e:
+        raise HTTPException(
+            status_code=403,
+            detail="Assistant session belongs to another user",
+        ) from e
     except RuntimeError as e:
         logger.exception("Assistant chat unavailable (RuntimeError)")
         raise HTTPException(status_code=503, detail=str(e)) from e
