@@ -129,8 +129,11 @@ def build(
         )
     dataset = Dataset(cases=cases)
     task = make_assistant_conversation_task(deps, entry)
+    # Compute against the cases actually built (respects --only) rather than the
+    # full _CASES, so a filtered run reports a metric its selected cases carry.
     primary_score = (
-        FinalSchemaContains.__name__ if any(c.get("expected_schema") for c in _CASES)
+        FinalSchemaContains.__name__
+        if any(case.metadata.get("expected_schema") for case in cases)
         else _ReplyMustMention.__name__
     )
     return dataset, task, primary_score
