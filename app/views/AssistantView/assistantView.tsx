@@ -1,7 +1,8 @@
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import { Box, Button } from "@mui/material";
+import { Box, Button, Link } from "@mui/material";
 import Error from "next/error";
+import NextLink from "next/link";
 import { JSX, useEffect, useState } from "react";
 import { ChatPanel, SchemaPanel } from "../../components/Assistant";
 import { useAssistantChat } from "../../hooks/useAssistantChat";
@@ -60,11 +61,15 @@ export const AssistantView = (): JSX.Element => {
         <StyledTitle>Analysis Assistant (Beta)</StyledTitle>
         <Box
           sx={{
+            alignItems: "center",
             display: "flex",
-            justifyContent: "flex-end",
+            justifyContent: "space-between",
             pb: 1,
           }}
         >
+          <Link component={NextLink} href="/learn/assistant" variant="body2">
+            About the Assistant →
+          </Link>
           <Button
             onClick={resetSession}
             size="small"
