@@ -6,7 +6,7 @@ import json
 import logging
 import re
 import time
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic_ai import Agent, RunContext, Tool
 from pydantic_ai.messages import ModelMessage, ModelMessagesTypeAdapter
@@ -135,6 +135,15 @@ especially if it has a gene annotation (GTF) available.
 - When all required fields are filled, tell the user their configuration is \
   complete and they can continue to the workflow setup.
 - Don't hallucinate data — if a tool returns no results, say so.
+- **Only offer real catalog data.** Never present a specific organism, \
+  assembly, or workflow -- in your prose OR as a suggestion chip -- unless a \
+  tool call in this conversation actually returned it. To narrow things down \
+  (e.g. "which species?"), call the relevant tool (search_organisms, \
+  get_workflows_in_category, etc.) first and offer only what it returns, or \
+  ask an open question. Do NOT list example organisms, assemblies, or \
+  workflows from your own knowledge. For instance, if the user mentions \
+  Candida, do not rattle off "C. albicans, C. auris, C. glabrata" from \
+  memory -- search the catalog and offer only the species we actually have.
 - If the user asks about something outside bioinformatics/BRC Analytics, \
   politely redirect.
 - Each message includes the current analysis state in brackets. Use this to \
@@ -197,9 +206,22 @@ NOT emit it.
 
 After each response, suggest 2-4 short phrases the user might want to say next. \
 Format them as a JSON array at the very end of your response, on its own line, \
-prefixed with "SUGGESTIONS:". For example:
-SUGGESTIONS: ["Search ENA for public data", "Use the reference assembly", \
-"Tell me about variant calling"]
+prefixed with "SUGGESTIONS:". Each item is either:
+- a plain string for a generic action, e.g. "Tell me about variant calling"; or
+- an object that proposes a SPECIFIC catalog entity you have already confirmed \
+  via a tool this conversation, tagging it so it can be double-checked: \
+  {"label": "Use the P. falciparum reference", "assembly": "GCF_000002765.6"}. \
+  Valid entity keys: "organism" (scientific name), "assembly" (accession), \
+  "workflow" (IWC id).
+
+Only tag a chip with an entity a tool actually returned -- never offer a \
+specific organism, assembly, or workflow you haven't verified. Tagged chips \
+that don't match the catalog are dropped before the user sees them, so an \
+invented entity simply won't appear. Generic action chips don't need a tag.
+
+Example:
+SUGGESTIONS: ["Tell me about variant calling", {"label": "Use the \
+P. falciparum reference", "assembly": "GCF_000002765.6"}]
 
 If no suggestions are appropriate, omit the SUGGESTIONS line entirely.
 """
@@ -589,12 +611,8 @@ class AssistantAgent:
                 try:
                     json_str = line[s_match.end() :].strip()
                     items = json.loads(json_str)
-                    if isinstance(items, list) and all(
-                        isinstance(s, str) for s in items
-                    ):
-                        suggestions = [
-                            SuggestionChip(label=s, message=s) for s in items
-                        ]
+                    if isinstance(items, list):
+                        suggestions = self._build_suggestion_chips(items)
                     else:
                         reply_lines.append(line)
                 except (json.JSONDecodeError, TypeError):
@@ -616,6 +634,56 @@ class AssistantAgent:
                 reply_lines.append(line)
 
         return "\n".join(reply_lines).rstrip(), suggestions, schema_updates
+
+    def _build_suggestion_chips(self, items: List[Any]) -> List[SuggestionChip]:
+        """Build suggestion chips, dropping any that reference data we don't have.
+
+        Each item is either a plain string (a generic action chip) or an object
+        like {"label": ..., "organism"/"assembly"/"workflow": ...} that proposes
+        a specific catalog entity. Entity-tagged chips are validated against the
+        catalog and dropped when the referenced organism/assembly/workflow isn't
+        present, so the assistant never offers a selection we can't fulfill
+        (#1297). Plain action chips pass through untouched.
+        """
+        chips: List[SuggestionChip] = []
+        for item in items:
+            if isinstance(item, str):
+                label = item.strip()
+                if label:
+                    chips.append(SuggestionChip(label=label, message=label))
+            elif isinstance(item, dict):
+                label = str(item.get("label", "")).strip()
+                if not label:
+                    continue
+                if not self._chip_entities_in_catalog(item):
+                    logger.info("Dropping ungrounded suggestion chip: %s", label)
+                    continue
+                chips.append(SuggestionChip(label=label, message=label))
+            # Anything else (numbers, nested lists) is ignored.
+        return chips
+
+    def _chip_entities_in_catalog(self, chip: Dict[str, Any]) -> bool:
+        """Return True when every catalog entity a chip references actually exists.
+
+        A chip may tag itself with an organism (scientific name), assembly
+        (accession), or workflow (IWC id). Untagged chips are trivially valid.
+        Any lookup error is treated as "not present" so we fail closed and
+        don't surface an unverified option.
+        """
+        try:
+            organism = chip.get("organism")
+            if organism and not self.catalog.search_organisms(str(organism)):
+                return False
+            assembly = chip.get("assembly")
+            if assembly and self.catalog.get_assembly_details(str(assembly)) is None:
+                return False
+            workflow = chip.get("workflow")
+            if workflow and self.catalog.get_workflow_details(str(workflow)) is None:
+                return False
+            return True
+        except Exception:
+            logger.warning("Catalog lookup failed validating a suggestion chip")
+            return False
 
     def _apply_schema_updates(
         self,

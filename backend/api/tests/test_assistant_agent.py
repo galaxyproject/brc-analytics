@@ -124,6 +124,64 @@ class TestParseStructuredOutput:
         _, _, updates = agent._parse_structured_output(raw)
         assert updates == {"organism": "E. coli"}
 
+    # ---- catalog-grounded suggestion chips (#1297) ----
+
+    def test_tagged_chip_in_catalog_kept(self, agent):
+        agent.catalog.search_organisms.return_value = [{"taxonomyId": "5476"}]
+        raw = (
+            'SUGGESTIONS: [{"label": "Use Candida albicans", '
+            '"organism": "Candida albicans"}]'
+        )
+        _, suggestions, _ = agent._parse_structured_output(raw)
+        assert len(suggestions) == 1
+        assert suggestions[0].label == "Use Candida albicans"
+        assert suggestions[0].message == "Use Candida albicans"
+
+    def test_tagged_organism_not_in_catalog_dropped(self, agent):
+        agent.catalog.search_organisms.return_value = []
+        raw = (
+            'SUGGESTIONS: [{"label": "Use C. glabrata", '
+            '"organism": "Candida glabrata"}]'
+        )
+        text, suggestions, _ = agent._parse_structured_output(raw)
+        assert suggestions == []
+        # The dropped chip must not leak into the visible reply text.
+        assert "glabrata" not in text
+
+    def test_mixed_string_and_tagged_chips(self, agent):
+        agent.catalog.search_organisms.return_value = []
+        raw = (
+            'SUGGESTIONS: ["Tell me about variant calling", '
+            '{"label": "Use C. glabrata", "organism": "Candida glabrata"}]'
+        )
+        _, suggestions, _ = agent._parse_structured_output(raw)
+        assert len(suggestions) == 1
+        assert suggestions[0].label == "Tell me about variant calling"
+
+    def test_tagged_assembly_not_in_catalog_dropped(self, agent):
+        agent.catalog.get_assembly_details.return_value = None
+        raw = (
+            'SUGGESTIONS: [{"label": "Use GCF_999999999.9", '
+            '"assembly": "GCF_999999999.9"}]'
+        )
+        _, suggestions, _ = agent._parse_structured_output(raw)
+        assert suggestions == []
+
+    def test_tagged_workflow_not_in_catalog_dropped(self, agent):
+        agent.catalog.get_workflow_details.return_value = None
+        raw = (
+            'SUGGESTIONS: [{"label": "Run mystery workflow", '
+            '"workflow": "not-a-real-iwc-id"}]'
+        )
+        _, suggestions, _ = agent._parse_structured_output(raw)
+        assert suggestions == []
+
+    def test_tagged_chip_without_label_dropped(self, agent):
+        agent.catalog.search_organisms.return_value = [{"taxonomyId": "5476"}]
+        raw = 'SUGGESTIONS: [{"organism": "Candida albicans"}]'
+        _, suggestions, _ = agent._parse_structured_output(raw)
+        assert suggestions == []
+
 
 # ---------- _apply_schema_updates ----------
 
