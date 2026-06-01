@@ -1,10 +1,10 @@
+import { Breadcrumbs } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import { Box, Button } from "@mui/material";
 import Error from "next/error";
-import { Fragment, JSX, useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import { ChatPanel, SchemaPanel } from "../../components/Assistant";
-import { SectionHero } from "../../components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import { useAssistantChat } from "../../hooks/useAssistantChat";
 import { llmAPIClient } from "../../services/llm-api-client";
 import { AssistantInfoResponse } from "../../types/api";
@@ -12,6 +12,8 @@ import {
   AssistantDisclaimer,
   AssistantSection,
   ChatColumn,
+  CompactHead,
+  CompactHeader,
   SchemaColumn,
   SectionContent,
   TwoPanelLayout,
@@ -56,48 +58,45 @@ export const AssistantView = (): JSX.Element => {
   const modelLabel = formatModelLabel(info);
 
   return (
-    <Fragment>
-      <SectionHero
-        breadcrumbs={BREADCRUMBS}
-        head="Analysis Assistant (Beta)"
-        subHead="Explore data and configure analyses with AI guidance"
-      />
-      <AssistantSection>
-        <SectionContent>
-          <Box sx={{ display: "flex", justifyContent: "flex-end", pb: 1 }}>
-            <Button
-              onClick={resetSession}
-              size="small"
-              startIcon={<RestartAltIcon />}
-              sx={{ visibility: showReset ? "visible" : "hidden" }}
-              variant="text"
-            >
-              New Conversation
-            </Button>
-          </Box>
-          <TwoPanelLayout>
-            <ChatColumn>
-              <ChatPanel
-                error={error}
-                isRestoring={isRestoring}
-                loading={loading}
-                messages={messages}
-                onRetry={onRetry}
-                onSend={sendMessage}
-                suggestions={suggestions}
-              />
-            </ChatColumn>
-            <SchemaColumn>
-              <SchemaPanel handoffUrl={handoffUrl} schema={schema} />
-            </SchemaColumn>
-          </TwoPanelLayout>
-          <AssistantDisclaimer>
-            AI assistant — {modelLabel}. Responses can be inaccurate; verify
-            anything important before relying on it.
-          </AssistantDisclaimer>
-        </SectionContent>
-      </AssistantSection>
-    </Fragment>
+    <AssistantSection>
+      <SectionContent>
+        <CompactHeader>
+          <Breadcrumbs breadcrumbs={BREADCRUMBS} />
+          <CompactHead>Analysis Assistant (Beta)</CompactHead>
+        </CompactHeader>
+        <Box sx={{ display: "flex", justifyContent: "flex-end", pb: 1 }}>
+          <Button
+            onClick={resetSession}
+            size="small"
+            startIcon={<RestartAltIcon />}
+            sx={{ visibility: showReset ? "visible" : "hidden" }}
+            variant="text"
+          >
+            New Conversation
+          </Button>
+        </Box>
+        <TwoPanelLayout>
+          <ChatColumn>
+            <ChatPanel
+              error={error}
+              isRestoring={isRestoring}
+              loading={loading}
+              messages={messages}
+              onRetry={onRetry}
+              onSend={sendMessage}
+              suggestions={suggestions}
+            />
+          </ChatColumn>
+          <SchemaColumn>
+            <SchemaPanel handoffUrl={handoffUrl} schema={schema} />
+          </SchemaColumn>
+        </TwoPanelLayout>
+        <AssistantDisclaimer>
+          AI assistant — {modelLabel}. Responses can be inaccurate; verify
+          anything important before relying on it.
+        </AssistantDisclaimer>
+      </SectionContent>
+    </AssistantSection>
   );
 };
 

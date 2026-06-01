@@ -14,6 +14,18 @@ export const SectionContent = styled(Box)`
   width: calc(100% - 32px);
 `;
 
+export const CompactHeader = styled(Box)`
+  padding-bottom: 16px;
+`;
+
+export const CompactHead = styled(Box)`
+  font-family: "Inter", sans-serif;
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 36px;
+  margin-top: 8px;
+`;
+
 export const TwoPanelLayout = styled(Box)({
   "@media (min-width: 960px)": {
     flexDirection: "row",
