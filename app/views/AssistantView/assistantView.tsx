@@ -59,7 +59,7 @@ export const AssistantView = (): JSX.Element => {
     <Fragment>
       <SectionHero
         breadcrumbs={BREADCRUMBS}
-        head="Analysis Assistant"
+        head="Analysis Assistant (Beta)"
         subHead="Explore data and configure analyses with AI guidance"
       />
       <AssistantSection>
