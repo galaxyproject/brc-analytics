@@ -4,6 +4,7 @@ These tools answer "what sequencing data is available?" questions
 grounded in 17M real SRA runs filtered to BRC-relevant organisms via
 taxid-anchored name resolution.
 """
+
 from __future__ import annotations
 
 import json
@@ -52,7 +53,8 @@ def search_sra_runs(
         organism: organism scientific name or NCBI taxonomy ID
         assay_type: optional, e.g. "RNA-Seq", "WGS", "ChIP-Seq", "AMPLICON"
         platform: optional, e.g. "ILLUMINA", "OXFORD_NANOPORE", "PACBIO_SMRT"
-        country: optional, exact country name as recorded in SRA, e.g. "Kenya"
+        country: optional country name, matched case-insensitively with common
+            synonyms accepted (e.g. "UK", "USA"); e.g. "Kenya"
         since: optional ISO date filter, e.g. "2024-01-01" (release date >=)
         limit: max number of runs to return (default 50, max 200)
     """
@@ -90,9 +92,7 @@ def top_bioprojects_for_organism(
     return json.dumps(result, indent=2, default=str)
 
 
-def get_sra_study_runs(
-    deps: AssistantDeps, accession: str, limit: int = 200
-) -> str:
+def get_sra_study_runs(deps: AssistantDeps, accession: str, limit: int = 200) -> str:
     """Get the runs belonging to a specific SRA study or BioProject.
 
     Accepts either an SRA study accession (SRP*/ERP*/DRP*) or a BioProject
