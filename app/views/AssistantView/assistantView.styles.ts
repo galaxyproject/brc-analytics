@@ -18,12 +18,12 @@ export const CompactHeader = styled(Box)`
   padding-bottom: 16px;
 `;
 
-export const CompactHead = styled(Box)`
-  font-family: "Inter", sans-serif;
+export const CompactHead = styled.h1`
+  font-family: "Inter Tight", sans-serif;
   font-size: 28px;
   font-weight: 500;
   line-height: 36px;
-  margin-top: 8px;
+  margin: 8px 0 0;
 `;
 
 export const TwoPanelLayout = styled(Box)({
