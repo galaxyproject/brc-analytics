@@ -212,6 +212,25 @@ class TestParseStructuredOutput:
         _, suggestions, _ = agent._parse_structured_output(raw)
         assert suggestions == []
 
+    def test_tagged_non_string_entity_is_validated_not_bypassed(self, agent):
+        # A non-string entity value (e.g. a numeric taxid) must still be
+        # validated, not silently passed through (codex re-review regression).
+        agent.catalog.find_organism_exact.return_value = None
+        raw = 'SUGGESTIONS: [{"label": "Use C. glabrata", "organism": 5476}]'
+        _, suggestions, _ = agent._parse_structured_output(raw)
+        assert suggestions == []
+        agent.catalog.find_organism_exact.assert_called_once_with("5476")
+
+    def test_tagged_numeric_taxid_validated_and_kept(self, agent):
+        # A valid numeric taxid is coerced to a string, validated, and kept.
+        agent.catalog.find_organism_exact.return_value = {
+            "species": "Plasmodium falciparum"
+        }
+        raw = 'SUGGESTIONS: [{"label": "Use P. falciparum", "organism": 5833}]'
+        _, suggestions, _ = agent._parse_structured_output(raw)
+        assert len(suggestions) == 1
+        assert suggestions[0].label == "Use P. falciparum"
+
 
 # ---------- _apply_schema_updates ----------
 

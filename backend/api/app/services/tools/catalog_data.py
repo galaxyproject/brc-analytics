@@ -91,9 +91,11 @@ class CatalogData:
         Used to validate that a *specific* organism actually exists before the
         assistant offers it (#1297).
         """
-        if not name or not name.strip():
+        if name is None:
             return None
-        q = name.strip().lower()
+        q = str(name).strip().lower()
+        if not q:
+            return None
         for org in self.organisms:
             candidates = {
                 (org.get("taxonomicLevelSpecies") or "").lower(),

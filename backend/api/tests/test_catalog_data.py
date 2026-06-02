@@ -191,6 +191,11 @@ class TestFindOrganismExact:
     def test_taxonomy_id_match(self, catalog):
         assert catalog.find_organism_exact("5833") is not None
 
+    def test_non_string_taxid_input(self, catalog):
+        # Robust to a non-string caller (e.g. a numeric taxid from a chip tag).
+        assert catalog.find_organism_exact(5833) is not None
+        assert catalog.find_organism_exact(None) is None
+
     def test_genus_alone_does_not_match(self, catalog):
         # search_organisms matches genus; find_organism_exact must NOT -- this is
         # the false-positive that let ungrounded species through (#1297).

@@ -668,35 +668,38 @@ class AssistantAgent:
     def _chip_entities_in_catalog(self, chip: Dict[str, Any]) -> bool:
         """Return True when every catalog entity a chip references actually exists.
 
-        A chip may tag itself with an organism (scientific name), assembly
-        (accession), or workflow (IWC id). Keys are matched case-insensitively
-        and empty/whitespace tags are treated as absent. Organisms are matched
-        EXACTLY (not via the fuzzy search_organisms), so a genus or partial name
-        can't sneak through; assemblies and workflows are looked up by their
-        canonical id (accession / IWC id) per the chip contract -- a chip that
-        tags a display name instead will be dropped.
+        A chip may tag itself with an organism (scientific name or taxonomy id),
+        assembly (accession), or workflow (IWC id). Keys are matched
+        case-insensitively; a recognized entity value is coerced to a string and
+        looked up, so a non-string value (e.g. a numeric taxid) is still
+        validated rather than silently passed through. An empty/whitespace tag is
+        treated as absent. Organisms are matched EXACTLY (not via the fuzzy
+        search_organisms), so a genus or partial name can't sneak through;
+        assemblies and workflows are looked up by their canonical id per the chip
+        contract -- a chip that tags a display name instead will be dropped.
 
-        This is defense-in-depth, not a hard guarantee: it validates the tag,
-        but the visible label is free text and only constrained by the prompt.
-        Any lookup error fails closed (drop the chip).
+        This is defense-in-depth, not a hard guarantee: it validates the tag, but
+        the visible label is free text and only constrained by the prompt. Any
+        lookup error fails closed (drop the chip).
         """
-        # Normalize keys to lowercase and strip values so "Organism", padded
-        # whitespace, etc. don't bypass validation.
-        tags = {
-            k.lower(): v.strip()
-            for k, v in chip.items()
-            if isinstance(k, str) and isinstance(v, str)
-        }
+        # Lowercase keys so "Organism" etc. don't bypass validation.
+        tags = {k.lower(): v for k, v in chip.items() if isinstance(k, str)}
+        lookups = (
+            ("organism", self.catalog.find_organism_exact),
+            ("assembly", self.catalog.get_assembly_details),
+            ("workflow", self.catalog.get_workflow_details),
+        )
         try:
-            organism = tags.get("organism")
-            if organism and self.catalog.find_organism_exact(organism) is None:
-                return False
-            assembly = tags.get("assembly")
-            if assembly and self.catalog.get_assembly_details(assembly) is None:
-                return False
-            workflow = tags.get("workflow")
-            if workflow and self.catalog.get_workflow_details(workflow) is None:
-                return False
+            for key, lookup in lookups:
+                if key not in tags:
+                    continue
+                # Coerce to string so a numeric/None/list value is validated
+                # (and fails closed) rather than skipped.
+                value = str(tags[key]).strip()
+                if not value:
+                    continue  # empty/whitespace tag -> treat as untagged
+                if lookup(value) is None:
+                    return False
             return True
         except Exception:
             logger.warning(
