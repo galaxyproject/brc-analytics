@@ -173,7 +173,11 @@ function processOrganismPaths(
 
     if (!entityId) continue;
 
-    const compatibleCategories = buildOrganismWorkflows(entity, workflows);
+    const compatibleCategories = buildOrganismWorkflows(
+      entity,
+      workflows,
+      true
+    );
     const compatibleWorkflows = compatibleCategories.flatMap(
       (category) => category.workflows
     );

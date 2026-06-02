@@ -34,6 +34,8 @@ jest.mock("../../../app/views/AnalyzeWorkflowsView/lexicmap/constants", () => ({
 
 describe("getConfiguredValues - scope-based logic", () => {
   const BASE_WORKFLOW: Workflow = {
+    assemblyCountMax: 1,
+    assemblyCountMin: 1,
     iwcId: "iwc-test",
     parameters: [],
     ploidy: WORKFLOW_PLOIDY.ANY,

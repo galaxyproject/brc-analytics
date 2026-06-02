@@ -5,6 +5,8 @@ import {
 } from "../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 
 export const DIFFERENTIAL_EXPRESSION_ANALYSIS: Workflow = {
+  assemblyCountMax: 1,
+  assemblyCountMin: 1,
   iwcId: "",
   parameters: [],
   ploidy: WORKFLOW_PLOIDY.ANY,

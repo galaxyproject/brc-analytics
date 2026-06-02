@@ -3,6 +3,7 @@ import type {
   WorkflowAssemblyMapping,
   WorkflowCategory,
 } from "../../apis/catalog/brc-analytics-catalog/common/entities";
+import { workflowMeetsAssemblyMinimum } from "../../apis/catalog/brc-analytics-catalog/common/workflowAssembly";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { LEXICMAP } from "../AnalyzeWorkflowsView/lexicmap/constants";
 import { LOGAN_SEARCH } from "../AnalyzeWorkflowsView/loganSearch/constants";
@@ -109,11 +110,9 @@ export function getWorkflows(
 
   const assemblyByTaxonomyId = indexAssemblyByTaxonomyId(organisms);
 
-  // Create a lookup set for workflows with compatible assemblies.
-  const workflowsWithAssemblies = new Set(
-    mappings
-      .filter((m) => m.compatibleAssemblyCount > 0)
-      .map((m) => m.workflowTrsId)
+  // Create a lookup map from TRS ID to compatible assembly count.
+  const compatibleCountByTrsId = new Map(
+    mappings.map((m) => [m.workflowTrsId, m.compatibleAssemblyCount])
   );
 
   for (const category of workflowCategories) {
@@ -129,8 +128,9 @@ export function getWorkflows(
         continue;
       }
 
-      // Skip workflows with no compatible assemblies.
-      if (!workflowsWithAssemblies.has(workflow.trsId)) {
+      // Skip workflows whose minimum assembly requirement cannot be met.
+      const count = compatibleCountByTrsId.get(workflow.trsId) ?? 0;
+      if (!workflowMeetsAssemblyMinimum(workflow.assemblyCountMin, count)) {
         continue;
       }
 

@@ -5,6 +5,8 @@ import {
 } from "../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 
 export const LOGAN_SEARCH: Workflow = {
+  assemblyCountMax: 0,
+  assemblyCountMin: 0,
   iwcId: "",
   parameters: [],
   ploidy: WORKFLOW_PLOIDY.ANY,

@@ -13,6 +13,8 @@ jest.mock(
   "../../../app/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants",
   () => ({
     DIFFERENTIAL_EXPRESSION_ANALYSIS: {
+      assemblyCountMax: 1,
+      assemblyCountMin: 1,
       iwcId: "iwc-deseq2",
       parameters: [],
       ploidy: "ANY",
@@ -55,6 +57,8 @@ describe("getWorkflows - scope handling", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 1,
+            assemblyCountMin: 1,
             iwcId: "iwc-assembly",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -84,6 +88,8 @@ describe("getWorkflows - scope handling", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 1,
+            assemblyCountMin: 1,
             iwcId: "iwc-assembly",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -112,6 +118,8 @@ describe("getWorkflows - scope handling", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-organism",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -139,6 +147,8 @@ describe("getWorkflows - scope handling", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-sequence",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -166,6 +176,8 @@ describe("getWorkflows - scope handling", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 1,
+            assemblyCountMin: 1,
             iwcId: "iwc-no-scope",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -193,6 +205,8 @@ describe("getWorkflows - scope handling", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 1,
+            assemblyCountMin: 1,
             iwcId: "iwc-assembly",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -203,6 +217,8 @@ describe("getWorkflows - scope handling", () => {
             workflowName: "Assembly Workflow",
           },
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-organism",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -213,6 +229,8 @@ describe("getWorkflows - scope handling", () => {
             workflowName: "Organism Workflow",
           },
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-sequence",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -255,6 +273,8 @@ describe("getWorkflows - scope handling", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 1,
+            assemblyCountMin: 1,
             iwcId: "iwc-no-assemblies",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -292,7 +312,7 @@ describe("getWorkflows - scope handling", () => {
   test("includes LMLS workflows when feature flag is enabled", () => {
     const categories: WorkflowCategory[] = [];
 
-    const result = getWorkflows(categories, MAPPINGS, ORGANISMS, true);
+    const result = getWorkflows(categories, MAPPINGS, ORGANISMS, false, true);
 
     // Should include DEA + Logan Search + Lexicmap
     expect(result).toHaveLength(3);
@@ -306,7 +326,7 @@ describe("getWorkflows - scope handling", () => {
   test("LMLS workflows have SEQUENCE scope when feature flag is enabled", () => {
     const categories: WorkflowCategory[] = [];
 
-    const result = getWorkflows(categories, MAPPINGS, ORGANISMS, true);
+    const result = getWorkflows(categories, MAPPINGS, ORGANISMS, false, true);
 
     const loganSearch = result.find((w) => w.trsId === "logan-search");
     const lexicmap = result.find((w) => w.trsId === "lexicmap");
@@ -318,7 +338,7 @@ describe("getWorkflows - scope handling", () => {
   test("LMLS workflows have correct category when feature flag is enabled", () => {
     const categories: WorkflowCategory[] = [];
 
-    const result = getWorkflows(categories, MAPPINGS, ORGANISMS, true);
+    const result = getWorkflows(categories, MAPPINGS, ORGANISMS, false, true);
 
     const loganSearch = result.find((w) => w.trsId === "logan-search");
     const lexicmap = result.find((w) => w.trsId === "lexicmap");

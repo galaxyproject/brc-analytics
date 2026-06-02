@@ -23,6 +23,8 @@ import { buildSteps } from "../../../app/components/Entity/components/ConfigureW
 
 describe("buildSteps - scope handling", () => {
   const BASE_WORKFLOW: Workflow = {
+    assemblyCountMax: 1,
+    assemblyCountMin: 1,
     iwcId: "iwc-test",
     parameters: [
       {
