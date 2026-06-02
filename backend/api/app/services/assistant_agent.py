@@ -653,9 +653,12 @@ class AssistantAgent:
                 if label:
                     chips.append(SuggestionChip(label=label, message=label))
             elif isinstance(item, dict):
-                label = str(item.get("label", "")).strip()
-                if not label:
+                # Only accept a real string label -- a null/missing label must
+                # be dropped, not coerced into the literal "None".
+                label = item.get("label")
+                if not isinstance(label, str) or not label.strip():
                     continue
+                label = label.strip()
                 if not self._chip_entities_in_catalog(item):
                     logger.info("Dropping ungrounded suggestion chip: %s", label)
                     continue
@@ -682,8 +685,8 @@ class AssistantAgent:
         the visible label is free text and only constrained by the prompt. Any
         lookup error fails closed (drop the chip).
         """
-        # Lowercase keys so "Organism" etc. don't bypass validation.
-        tags = {k.lower(): v for k, v in chip.items() if isinstance(k, str)}
+        # Strip + lowercase keys so "Organism" or "organism " don't bypass.
+        tags = {k.strip().lower(): v for k, v in chip.items() if isinstance(k, str)}
         lookups = (
             ("organism", self.catalog.find_organism_exact),
             ("assembly", self.catalog.get_assembly_details),

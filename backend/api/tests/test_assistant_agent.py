@@ -231,6 +231,23 @@ class TestParseStructuredOutput:
         assert len(suggestions) == 1
         assert suggestions[0].label == "Use P. falciparum"
 
+    def test_tagged_chip_with_non_string_label_dropped(self, agent):
+        # A null label must be dropped, not coerced into the literal "None".
+        agent.catalog.find_organism_exact.return_value = {"species": "Yeast"}
+        raw = 'SUGGESTIONS: [{"label": null, "organism": "Saccharomyces cerevisiae"}]'
+        _, suggestions, _ = agent._parse_structured_output(raw)
+        assert suggestions == []
+
+    def test_tagged_entity_key_with_trailing_space_is_validated(self, agent):
+        # A key like "organism " (trailing space) must not bypass validation.
+        agent.catalog.find_organism_exact.return_value = None
+        raw = (
+            'SUGGESTIONS: [{"label": "Use C. glabrata", '
+            '"organism ": "Candida glabrata"}]'
+        )
+        _, suggestions, _ = agent._parse_structured_output(raw)
+        assert suggestions == []
+
 
 # ---------- _apply_schema_updates ----------
 

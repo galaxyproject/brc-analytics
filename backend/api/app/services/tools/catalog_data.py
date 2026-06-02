@@ -82,9 +82,12 @@ class CatalogData:
                 return self._summarize_organism(org)
         return None
 
-    def find_organism_exact(self, name: str) -> Optional[Dict[str, Any]]:
+    def find_organism_exact(self, name: Any) -> Optional[Dict[str, Any]]:
         """Find an organism by an exact (case-insensitive) species name, common
         name, or NCBI taxonomy id.
+
+        Accepts any input (e.g. a numeric taxid or None); the value is coerced
+        to a string before matching.
 
         Unlike search_organisms, this does NOT match on genus or substrings, so
         a genus ("Candida") or a partial string ("almonella") will not resolve.
