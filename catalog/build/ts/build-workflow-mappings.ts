@@ -173,7 +173,7 @@ export function generateWorkflowMappingsQC(
   lines.push("", "## Summary Statistics", "");
   lines.push(`- Total active workflows: ${workflows.length}`);
   lines.push(
-    `- Workflows with ≥1 compatible assembly: ${workflows.length - workflowsWithUnmetMinimum.length}`
+    `- Workflows that meet their minimum assembly requirement: ${workflows.length - workflowsWithUnmetMinimum.length}`
   );
   lines.push(
     `- Workflows that cannot meet minimum assembly requirement: ${workflowsWithUnmetMinimum.length}`

@@ -41,5 +41,5 @@ None
 ## Summary Statistics
 
 - Total active workflows: 29
-- Workflows with ≥1 compatible assembly: 29
+- Workflows that meet their minimum assembly requirement: 29
 - Workflows that cannot meet minimum assembly requirement: 0
