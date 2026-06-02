@@ -82,6 +82,29 @@ class CatalogData:
                 return self._summarize_organism(org)
         return None
 
+    def find_organism_exact(self, name: str) -> Optional[Dict[str, Any]]:
+        """Find an organism by an exact (case-insensitive) species name, common
+        name, or NCBI taxonomy id.
+
+        Unlike search_organisms, this does NOT match on genus or substrings, so
+        a genus ("Candida") or a partial string ("almonella") will not resolve.
+        Used to validate that a *specific* organism actually exists before the
+        assistant offers it (#1297).
+        """
+        if not name or not name.strip():
+            return None
+        q = name.strip().lower()
+        for org in self.organisms:
+            candidates = {
+                (org.get("taxonomicLevelSpecies") or "").lower(),
+                (org.get("commonName") or "").lower(),
+                str(org.get("ncbiTaxonomyId") or "").lower(),
+            }
+            candidates.discard("")
+            if q in candidates:
+                return self._summarize_organism(org)
+        return None
+
     def _summarize_organism(self, org: Dict[str, Any]) -> Dict[str, Any]:
         """Return a compact summary suitable for LLM context."""
         genomes = org.get("genomes", [])

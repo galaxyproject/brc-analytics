@@ -173,6 +173,42 @@ class TestSearchOrganisms:
         assert "HAPLOID" in org["ploidies"]
 
 
+# ---------- find_organism_exact (catalog grounding, #1297) ----------
+
+
+class TestFindOrganismExact:
+    def test_exact_species_match(self, catalog):
+        org = catalog.find_organism_exact("Plasmodium falciparum")
+        assert org is not None
+        assert org["species"] == "Plasmodium falciparum"
+
+    def test_case_insensitive(self, catalog):
+        assert catalog.find_organism_exact("plasmodium falciparum") is not None
+
+    def test_common_name_match(self, catalog):
+        assert catalog.find_organism_exact("malaria parasite") is not None
+
+    def test_taxonomy_id_match(self, catalog):
+        assert catalog.find_organism_exact("5833") is not None
+
+    def test_genus_alone_does_not_match(self, catalog):
+        # search_organisms matches genus; find_organism_exact must NOT -- this is
+        # the false-positive that let ungrounded species through (#1297).
+        assert catalog.search_organisms("Plasmodium")  # fuzzy still matches
+        assert catalog.find_organism_exact("Plasmodium") is None
+
+    def test_partial_string_does_not_match(self, catalog):
+        assert catalog.find_organism_exact("Plasmod") is None
+        assert catalog.find_organism_exact("falciparum") is None
+
+    def test_absent_organism_returns_none(self, catalog):
+        assert catalog.find_organism_exact("Candida glabrata") is None
+
+    def test_blank_returns_none(self, catalog):
+        assert catalog.find_organism_exact("") is None
+        assert catalog.find_organism_exact("   ") is None
+
+
 # ---------- Assembly queries ----------
 
 

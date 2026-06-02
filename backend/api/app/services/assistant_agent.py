@@ -216,8 +216,9 @@ prefixed with "SUGGESTIONS:". Each item is either:
 
 Only tag a chip with an entity a tool actually returned -- never offer a \
 specific organism, assembly, or workflow you haven't verified. Tagged chips \
-that don't match the catalog are dropped before the user sees them, so an \
-invented entity simply won't appear. Generic action chips don't need a tag.
+whose entity isn't in the catalog are dropped before the user sees them, and \
+the label must name the same entity you tagged. Generic action chips don't \
+need a tag.
 
 Example:
 SUGGESTIONS: ["Tell me about variant calling", {"label": "Use the \
@@ -658,6 +659,8 @@ class AssistantAgent:
                 if not self._chip_entities_in_catalog(item):
                     logger.info("Dropping ungrounded suggestion chip: %s", label)
                     continue
+                # The tag is validated above; the label itself is free text the
+                # prompt is responsible for keeping consistent with the tag.
                 chips.append(SuggestionChip(label=label, message=label))
             # Anything else (numbers, nested lists) is ignored.
         return chips
@@ -666,23 +669,39 @@ class AssistantAgent:
         """Return True when every catalog entity a chip references actually exists.
 
         A chip may tag itself with an organism (scientific name), assembly
-        (accession), or workflow (IWC id). Untagged chips are trivially valid.
-        Any lookup error is treated as "not present" so we fail closed and
-        don't surface an unverified option.
+        (accession), or workflow (IWC id). Keys are matched case-insensitively
+        and empty/whitespace tags are treated as absent. Organisms are matched
+        EXACTLY (not via the fuzzy search_organisms), so a genus or partial name
+        can't sneak through; assemblies and workflows are looked up by their
+        canonical id (accession / IWC id) per the chip contract -- a chip that
+        tags a display name instead will be dropped.
+
+        This is defense-in-depth, not a hard guarantee: it validates the tag,
+        but the visible label is free text and only constrained by the prompt.
+        Any lookup error fails closed (drop the chip).
         """
+        # Normalize keys to lowercase and strip values so "Organism", padded
+        # whitespace, etc. don't bypass validation.
+        tags = {
+            k.lower(): v.strip()
+            for k, v in chip.items()
+            if isinstance(k, str) and isinstance(v, str)
+        }
         try:
-            organism = chip.get("organism")
-            if organism and not self.catalog.search_organisms(str(organism)):
+            organism = tags.get("organism")
+            if organism and self.catalog.find_organism_exact(organism) is None:
                 return False
-            assembly = chip.get("assembly")
-            if assembly and self.catalog.get_assembly_details(str(assembly)) is None:
+            assembly = tags.get("assembly")
+            if assembly and self.catalog.get_assembly_details(assembly) is None:
                 return False
-            workflow = chip.get("workflow")
-            if workflow and self.catalog.get_workflow_details(str(workflow)) is None:
+            workflow = tags.get("workflow")
+            if workflow and self.catalog.get_workflow_details(workflow) is None:
                 return False
             return True
         except Exception:
-            logger.warning("Catalog lookup failed validating a suggestion chip")
+            logger.warning(
+                "Catalog lookup failed validating a suggestion chip", exc_info=True
+            )
             return False
 
     def _apply_schema_updates(

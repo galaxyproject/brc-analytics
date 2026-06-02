@@ -127,7 +127,7 @@ class TestParseStructuredOutput:
     # ---- catalog-grounded suggestion chips (#1297) ----
 
     def test_tagged_chip_in_catalog_kept(self, agent):
-        agent.catalog.search_organisms.return_value = [{"taxonomyId": "5476"}]
+        agent.catalog.find_organism_exact.return_value = {"species": "Candida albicans"}
         raw = (
             'SUGGESTIONS: [{"label": "Use Candida albicans", '
             '"organism": "Candida albicans"}]'
@@ -138,7 +138,7 @@ class TestParseStructuredOutput:
         assert suggestions[0].message == "Use Candida albicans"
 
     def test_tagged_organism_not_in_catalog_dropped(self, agent):
-        agent.catalog.search_organisms.return_value = []
+        agent.catalog.find_organism_exact.return_value = None
         raw = (
             'SUGGESTIONS: [{"label": "Use C. glabrata", '
             '"organism": "Candida glabrata"}]'
@@ -149,7 +149,7 @@ class TestParseStructuredOutput:
         assert "glabrata" not in text
 
     def test_mixed_string_and_tagged_chips(self, agent):
-        agent.catalog.search_organisms.return_value = []
+        agent.catalog.find_organism_exact.return_value = None
         raw = (
             'SUGGESTIONS: ["Tell me about variant calling", '
             '{"label": "Use C. glabrata", "organism": "Candida glabrata"}]'
@@ -177,8 +177,38 @@ class TestParseStructuredOutput:
         assert suggestions == []
 
     def test_tagged_chip_without_label_dropped(self, agent):
-        agent.catalog.search_organisms.return_value = [{"taxonomyId": "5476"}]
+        agent.catalog.find_organism_exact.return_value = {"species": "Candida albicans"}
         raw = 'SUGGESTIONS: [{"organism": "Candida albicans"}]'
+        _, suggestions, _ = agent._parse_structured_output(raw)
+        assert suggestions == []
+
+    def test_tagged_organism_mixed_case_key_is_validated(self, agent):
+        # A capital "Organism" key must NOT bypass validation.
+        agent.catalog.find_organism_exact.return_value = None
+        raw = (
+            'SUGGESTIONS: [{"label": "Use C. glabrata", '
+            '"Organism": "Candida glabrata"}]'
+        )
+        _, suggestions, _ = agent._parse_structured_output(raw)
+        assert suggestions == []
+
+    def test_tagged_empty_entity_treated_as_untagged(self, agent):
+        # An empty/whitespace tag is treated as absent -- the chip passes as a
+        # generic action chip (the catalog is never consulted).
+        raw = 'SUGGESTIONS: [{"label": "Sounds good", "organism": "   "}]'
+        _, suggestions, _ = agent._parse_structured_output(raw)
+        assert len(suggestions) == 1
+        assert suggestions[0].label == "Sounds good"
+        agent.catalog.find_organism_exact.assert_not_called()
+
+    def test_tagged_chip_dropped_if_any_entity_invalid(self, agent):
+        # Organism resolves but the assembly doesn't -- the whole chip is dropped.
+        agent.catalog.find_organism_exact.return_value = {"species": "Yeast"}
+        agent.catalog.get_assembly_details.return_value = None
+        raw = (
+            'SUGGESTIONS: [{"label": "Use this combo", '
+            '"organism": "Saccharomyces cerevisiae", "assembly": "GCA_bogus.1"}]'
+        )
         _, suggestions, _ = agent._parse_structured_output(raw)
         assert suggestions == []
 
