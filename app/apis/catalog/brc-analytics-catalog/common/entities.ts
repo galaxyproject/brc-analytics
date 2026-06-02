@@ -117,6 +117,8 @@ export interface WorkflowCategory {
 }
 
 export interface Workflow {
+  assemblyCountMax: number | null;
+  assemblyCountMin: number;
   iwcId: string;
   parameters: WorkflowParameter[];
   ploidy: WORKFLOW_PLOIDY;
