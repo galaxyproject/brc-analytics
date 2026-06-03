@@ -211,8 +211,10 @@ prefixed with "SUGGESTIONS:". Each item is either:
 - an object that proposes a SPECIFIC catalog entity you have already confirmed \
   via a tool this conversation, tagging it so it can be double-checked: \
   {"label": "Use the P. falciparum reference", "assembly": "GCF_000002765.6"}. \
-  Valid entity keys: "organism" (scientific name), "assembly" (accession), \
-  "workflow" (IWC id).
+  Valid entity keys: "organism" (NCBI taxonomy id), "assembly" (accession), \
+  "workflow" (IWC id). Tag organisms by the numeric taxonomy id a tool \
+  returned (the taxonomy_id field), not the species name -- it's the stable, \
+  unambiguous key.
 
 Only tag a chip with an entity a tool actually returned -- never offer a \
 specific organism, assembly, or workflow you haven't verified. Tagged chips \
@@ -221,7 +223,8 @@ the label must name the same entity you tagged. Generic action chips don't \
 need a tag.
 
 Example:
-SUGGESTIONS: ["Tell me about variant calling", {"label": "Use the \
+SUGGESTIONS: ["Tell me about variant calling", {"label": "Explore \
+Plasmodium falciparum", "organism": "5833"}, {"label": "Use the \
 P. falciparum reference", "assembly": "GCF_000002765.6"}]
 
 If no suggestions are appropriate, omit the SUGGESTIONS line entirely.
@@ -671,15 +674,17 @@ class AssistantAgent:
     def _chip_entities_in_catalog(self, chip: Dict[str, Any]) -> bool:
         """Return True when every catalog entity a chip references actually exists.
 
-        A chip may tag itself with an organism (scientific name or taxonomy id),
-        assembly (accession), or workflow (IWC id). Keys are matched
-        case-insensitively; a recognized entity value is coerced to a string and
-        looked up, so a non-string value (e.g. a numeric taxid) is still
-        validated rather than silently passed through. An empty/whitespace tag is
-        treated as absent. Organisms are matched EXACTLY (not via the fuzzy
-        search_organisms), so a genus or partial name can't sneak through;
-        assemblies and workflows are looked up by their canonical id per the chip
-        contract -- a chip that tags a display name instead will be dropped.
+        A chip may tag itself with an organism (NCBI taxonomy id), assembly
+        (accession), or workflow (IWC id) -- each entity's stable, canonical key.
+        Keys are matched case-insensitively; a recognized entity value is coerced
+        to a string and looked up, so a non-string value (e.g. a numeric taxid)
+        is still validated rather than silently passed through. An empty/
+        whitespace tag is treated as absent. Organisms resolve on the taxonomy id
+        (an exact species/common name is still accepted as a fail-soft fallback);
+        either way the match is EXACT -- not the fuzzy search_organisms -- so a
+        genus or partial name can't sneak through. Assemblies and workflows are
+        looked up by their canonical id per the chip contract -- a chip that tags
+        a display name instead will be dropped.
 
         This is defense-in-depth, not a hard guarantee: it validates the tag, but
         the visible label is free text and only constrained by the prompt. Any

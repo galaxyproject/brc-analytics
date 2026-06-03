@@ -83,16 +83,16 @@ class CatalogData:
         return None
 
     def find_organism_exact(self, name: Any) -> Optional[Dict[str, Any]]:
-        """Find an organism by an exact (case-insensitive) species name, common
-        name, or NCBI taxonomy id.
+        """Find an organism by its NCBI taxonomy id -- the stable, canonical key
+        suggestion chips tag organisms with (#1297). An exact (case-insensitive)
+        species or common name is also accepted as a fail-soft fallback so a chip
+        the model mis-tags by name isn't needlessly dropped.
 
         Accepts any input (e.g. a numeric taxid or None); the value is coerced
         to a string before matching.
 
         Unlike search_organisms, this does NOT match on genus or substrings, so
         a genus ("Candida") or a partial string ("almonella") will not resolve.
-        Used to validate that a *specific* organism actually exists before the
-        assistant offers it (#1297).
         """
         if name is None:
             return None
