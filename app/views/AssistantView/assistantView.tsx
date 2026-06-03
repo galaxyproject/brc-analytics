@@ -1,4 +1,3 @@
-import { Breadcrumbs } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import { Box, Button } from "@mui/material";
@@ -10,15 +9,13 @@ import { llmAPIClient } from "../../services/llm-api-client";
 import { AssistantInfoResponse } from "../../types/api";
 import {
   AssistantDisclaimer,
-  AssistantSection,
   ChatColumn,
-  CompactHead,
-  CompactHeader,
   SchemaColumn,
   SectionContent,
+  StyledSection,
+  StyledTitle,
   TwoPanelLayout,
 } from "./assistantView.styles";
-import { BREADCRUMBS } from "./common/constants";
 
 export const AssistantView = (): JSX.Element => {
   const isAssistantEnabled = useFeatureFlag("assistant");
@@ -58,13 +55,16 @@ export const AssistantView = (): JSX.Element => {
   const modelLabel = formatModelLabel(info);
 
   return (
-    <AssistantSection>
+    <StyledSection>
       <SectionContent>
-        <CompactHeader>
-          <Breadcrumbs breadcrumbs={BREADCRUMBS} />
-          <CompactHead>Analysis Assistant (Beta)</CompactHead>
-        </CompactHeader>
-        <Box sx={{ display: "flex", justifyContent: "flex-end", pb: 1 }}>
+        <StyledTitle>Analysis Assistant (Beta)</StyledTitle>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            pb: 1,
+          }}
+        >
           <Button
             onClick={resetSession}
             size="small"
@@ -96,7 +96,7 @@ export const AssistantView = (): JSX.Element => {
           anything important before relying on it.
         </AssistantDisclaimer>
       </SectionContent>
-    </AssistantSection>
+    </StyledSection>
   );
 };
 
