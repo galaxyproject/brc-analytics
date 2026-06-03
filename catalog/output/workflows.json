@@ -6,6 +6,8 @@
     "showComingSoon": true,
     "workflows": [
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "generic-non-segmented-viral-variant-calling-main",
         "parameters": [
           {
@@ -36,6 +38,8 @@
         "workflowName": "Variant calling and consensus construction from paired end short read data of non-segmented viral genomes"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "haploid-variant-calling-wgs-pe-main",
         "parameters": [
           {
@@ -65,6 +69,8 @@
         "workflowName": "Paired end variant calling in haploid system"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "ploidy-aware-genotype-calling-main",
         "parameters": [
           {
@@ -88,6 +94,8 @@
         "workflowName": "Paired end variant and ploidy-aware genotype calling"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "sars-cov-2-pe-illumina-artic-variant-calling-covid-19-pe-artic-illumina",
         "parameters": [
           {
@@ -129,6 +137,8 @@
         "workflowName": "COVID-19: variation analysis on ARTIC PE data"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "sars-cov-2-pe-illumina-wgs-variant-calling-covid-19-pe-wgs-illumina",
         "parameters": [
           {
@@ -154,6 +164,8 @@
         "workflowName": "COVID-19: variation analysis on WGS PE data"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "sars-cov-2-se-illumina-wgs-variant-calling-covid-19-se-wgs-illumina",
         "parameters": [
           {
@@ -187,6 +199,8 @@
     "showComingSoon": true,
     "workflows": [
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-cellplex",
         "parameters": [
           {
@@ -216,6 +230,8 @@
         "workflowName": "Single-Cell RNA-seq Preprocessing: 10X Genomics CellPlex Multiplexed Samples"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-v3",
         "parameters": [
           {
@@ -245,6 +261,8 @@
         "workflowName": "Single-Cell RNA-seq Preprocessing: 10X Genomics v3 to Seurat and Scanpy Compatible Format"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "rnaseq-pe-main",
         "parameters": [
           {
@@ -274,6 +292,8 @@
         "workflowName": "RNA-Seq Analysis: Paired-End Read Processing and Quantification"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "rnaseq-sr-main",
         "parameters": [
           {
@@ -311,6 +331,8 @@
     "showComingSoon": true,
     "workflows": [
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "atacseq-main",
         "parameters": [
           {
@@ -336,6 +358,8 @@
         "workflowName": "ATAC-seq Analysis: Chromatin Accessibility Profiling"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "chipseq-pe-main",
         "parameters": [
           {
@@ -361,6 +385,8 @@
         "workflowName": "ChIP-seq Analysis: Paired-End Read Processing"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "chipseq-sr-main",
         "parameters": [
           {
@@ -386,6 +412,8 @@
         "workflowName": "ChIP-seq Analysis: Single-End Read Processing"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "consensus-peaks-consensus-peaks-atac-cutandrun",
         "parameters": [],
         "ploidy": "ANY",
@@ -396,6 +424,8 @@
         "workflowName": "Consensus Peak Calling for ATAC-seq and CUT and RUN Replicates"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "cutandrun-main",
         "parameters": [
           {
@@ -422,6 +452,8 @@
         "workflowName": "CUT&amp;RUN/CUT&amp;TAG Analysis: Protein-DNA Interaction Mapping"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "hic-hicup-cooler-chic-fastq-to-cool-hicup-cooler",
         "parameters": [
           {
@@ -447,6 +479,8 @@
         "workflowName": "Capture Hi-C Processing: FASTQ to Balanced Cool Files"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "hic-hicup-cooler-hic-fastq-to-cool-hicup-cooler",
         "parameters": [
           {
@@ -472,6 +506,8 @@
         "workflowName": "Hi-C Processing: FASTQ to Balanced Cool Files"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "hic-hicup-cooler-hic-fastq-to-pairs-hicup",
         "parameters": [
           {
@@ -505,6 +541,8 @@
     "showComingSoon": false,
     "workflows": [
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "generic-non-segmented-viral-variant-calling-main",
         "parameters": [
           {
@@ -535,6 +573,8 @@
         "workflowName": "Variant calling and consensus construction from paired end short read data of non-segmented viral genomes"
       },
       {
+        "assemblyCountMax": 0,
+        "assemblyCountMin": 0,
         "iwcId": "influenza-isolates-consensus-and-subtyping-main",
         "parameters": [
           {
@@ -607,6 +647,8 @@
         "workflowName": "Influenza A isolate subtyping and consensus sequence generation"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "pox-virus-amplicon-main",
         "parameters": [
           {
@@ -630,6 +672,8 @@
     "showComingSoon": true,
     "workflows": [
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "amr_gene_detection-main",
         "parameters": [
           {
@@ -645,6 +689,8 @@
         "workflowName": "AMR Gene Detection"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "annotation-braker3-main",
         "parameters": [
           {
@@ -660,6 +706,8 @@
         "workflowName": "Genome annotation with Braker3"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "bacterial_genome_annotation-main",
         "parameters": [
           {
@@ -675,6 +723,8 @@
         "workflowName": "Bacterial Genome Annotation"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "lncrnas-annotation-main",
         "parameters": [
           {
@@ -702,6 +752,8 @@
     "showComingSoon": false,
     "workflows": [
       {
+        "assemblyCountMax": 0,
+        "assemblyCountMin": 0,
         "iwcId": "assembly-with-flye-main",
         "parameters": [
           {
@@ -717,6 +769,8 @@
         "workflowName": "Genome assembly with Flye"
       },
       {
+        "assemblyCountMax": 0,
+        "assemblyCountMin": 0,
         "iwcId": "bacterial-genome-assembly-main",
         "parameters": [],
         "ploidy": "ANY",
@@ -727,6 +781,8 @@
         "workflowName": "Bacterial Genome Assembly using Shovill"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "polish-with-long-reads-main",
         "parameters": [
           {
@@ -761,6 +817,8 @@
     "showComingSoon": false,
     "workflows": [
       {
+        "assemblyCountMax": null,
+        "assemblyCountMin": 2,
         "iwcId": "hyphy-capheine-core-and-compare",
         "parameters": [],
         "ploidy": "ANY",

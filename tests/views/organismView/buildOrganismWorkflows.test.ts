@@ -26,6 +26,8 @@ describe("buildOrganismWorkflows", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-organism",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -55,6 +57,8 @@ describe("buildOrganismWorkflows", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-universal",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -83,6 +87,8 @@ describe("buildOrganismWorkflows", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 1,
+            assemblyCountMin: 1,
             iwcId: "iwc-assembly",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -110,6 +116,8 @@ describe("buildOrganismWorkflows", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-sequence",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -137,6 +145,8 @@ describe("buildOrganismWorkflows", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-other",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -164,6 +174,8 @@ describe("buildOrganismWorkflows", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-leaf",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -192,6 +204,8 @@ describe("buildOrganismWorkflows", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-organism",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -202,6 +216,8 @@ describe("buildOrganismWorkflows", () => {
             workflowName: "Organism Workflow",
           },
           {
+            assemblyCountMax: 1,
+            assemblyCountMin: 1,
             iwcId: "iwc-assembly",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -238,6 +254,8 @@ describe("buildOrganismWorkflows", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-organism",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,

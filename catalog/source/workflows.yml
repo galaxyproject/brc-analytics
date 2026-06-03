@@ -104,6 +104,8 @@ workflows:
       and assembly graph
     ploidy: ANY
     scope: ORGANISM
+    assembly_count_min: 0
+    assembly_count_max: 0
     parameters:
       - key: Input sequence reads
         variable: SANGER_READ_RUN_SINGLE
@@ -175,6 +177,8 @@ workflows:
     workflow_description: Assembly of bacterial paired-end short read data
     ploidy: ANY
     scope: ORGANISM
+    assembly_count_min: 0
+    assembly_count_max: 0
     taxonomy_id: 2
     parameters:
       - key: Input adapter trimmed sequence reads (forward)
@@ -896,6 +900,7 @@ workflows:
       branch labeling for branch comparisons.
     ploidy: ANY
     scope: ORGANISM
+    assembly_count_min: 2
     taxonomy_id: 10239
     parameters:
       - key: reference cds
@@ -997,6 +1002,8 @@ workflows:
       for batches of Illumina PE sequenced Influenza A isolates.
     ploidy: ANY
     scope: ORGANISM
+    assembly_count_min: 0
+    assembly_count_max: 0
     taxonomy_id: 11320
     parameters:
       - key: References per segment collection
