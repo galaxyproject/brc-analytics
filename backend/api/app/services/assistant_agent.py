@@ -6,7 +6,7 @@ import json
 import logging
 import re
 import time
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic_ai import Agent, RunContext, Tool
 from pydantic_ai.messages import ModelMessage, ModelMessagesTypeAdapter
@@ -135,6 +135,15 @@ especially if it has a gene annotation (GTF) available.
 - When all required fields are filled, tell the user their configuration is \
   complete and they can continue to the workflow setup.
 - Don't hallucinate data — if a tool returns no results, say so.
+- **Only offer real catalog data.** Never present a specific organism, \
+  assembly, or workflow -- in your prose OR as a suggestion chip -- unless a \
+  tool call in this conversation actually returned it. To narrow things down \
+  (e.g. "which species?"), call the relevant tool (search_organisms, \
+  get_workflows_in_category, etc.) first and offer only what it returns, or \
+  ask an open question. Do NOT list example organisms, assemblies, or \
+  workflows from your own knowledge. For instance, if the user mentions \
+  Candida, do not rattle off "C. albicans, C. auris, C. glabrata" from \
+  memory -- search the catalog and offer only the species we actually have.
 - If the user asks about something outside bioinformatics/BRC Analytics, \
   politely redirect.
 - Each message includes the current analysis state in brackets. Use this to \
@@ -197,9 +206,26 @@ NOT emit it.
 
 After each response, suggest 2-4 short phrases the user might want to say next. \
 Format them as a JSON array at the very end of your response, on its own line, \
-prefixed with "SUGGESTIONS:". For example:
-SUGGESTIONS: ["Search ENA for public data", "Use the reference assembly", \
-"Tell me about variant calling"]
+prefixed with "SUGGESTIONS:". Each item is either:
+- a plain string for a generic action, e.g. "Tell me about variant calling"; or
+- an object that proposes a SPECIFIC catalog entity you have already confirmed \
+  via a tool this conversation, tagging it so it can be double-checked: \
+  {"label": "Use the P. falciparum reference", "assembly": "GCF_000002765.6"}. \
+  Valid entity keys: "organism" (NCBI taxonomy id), "assembly" (accession), \
+  "workflow" (IWC id). Tag organisms by the numeric taxonomy id a tool \
+  returned (the taxonomy_id field), not the species name -- it's the stable, \
+  unambiguous key.
+
+Only tag a chip with an entity a tool actually returned -- never offer a \
+specific organism, assembly, or workflow you haven't verified. Tagged chips \
+whose entity isn't in the catalog are dropped before the user sees them, and \
+the label must name the same entity you tagged. Generic action chips don't \
+need a tag.
+
+Example:
+SUGGESTIONS: ["Tell me about variant calling", {"label": "Explore \
+Plasmodium falciparum", "organism": "5833"}, {"label": "Use the \
+P. falciparum reference", "assembly": "GCF_000002765.6"}]
 
 If no suggestions are appropriate, omit the SUGGESTIONS line entirely.
 """
@@ -589,12 +615,8 @@ class AssistantAgent:
                 try:
                     json_str = line[s_match.end() :].strip()
                     items = json.loads(json_str)
-                    if isinstance(items, list) and all(
-                        isinstance(s, str) for s in items
-                    ):
-                        suggestions = [
-                            SuggestionChip(label=s, message=s) for s in items
-                        ]
+                    if isinstance(items, list):
+                        suggestions = self._build_suggestion_chips(items)
                     else:
                         reply_lines.append(line)
                 except (json.JSONDecodeError, TypeError):
@@ -616,6 +638,82 @@ class AssistantAgent:
                 reply_lines.append(line)
 
         return "\n".join(reply_lines).rstrip(), suggestions, schema_updates
+
+    def _build_suggestion_chips(self, items: List[Any]) -> List[SuggestionChip]:
+        """Build suggestion chips, dropping any that reference data we don't have.
+
+        Each item is either a plain string (a generic action chip) or an object
+        like {"label": ..., "organism"/"assembly"/"workflow": ...} that proposes
+        a specific catalog entity. Entity-tagged chips are validated against the
+        catalog and dropped when the referenced organism/assembly/workflow isn't
+        present, so the assistant never offers a selection we can't fulfill
+        (#1297). Plain action chips pass through untouched.
+        """
+        chips: List[SuggestionChip] = []
+        for item in items:
+            if isinstance(item, str):
+                label = item.strip()
+                if label:
+                    chips.append(SuggestionChip(label=label, message=label))
+            elif isinstance(item, dict):
+                # Only accept a real string label -- a null/missing label must
+                # be dropped, not coerced into the literal "None".
+                label = item.get("label")
+                if not isinstance(label, str) or not label.strip():
+                    continue
+                label = label.strip()
+                if not self._chip_entities_in_catalog(item):
+                    logger.info("Dropping ungrounded suggestion chip: %s", label)
+                    continue
+                # The tag is validated above; the label itself is free text the
+                # prompt is responsible for keeping consistent with the tag.
+                chips.append(SuggestionChip(label=label, message=label))
+            # Anything else (numbers, nested lists) is ignored.
+        return chips
+
+    def _chip_entities_in_catalog(self, chip: Dict[str, Any]) -> bool:
+        """Return True when every catalog entity a chip references actually exists.
+
+        A chip may tag itself with an organism (NCBI taxonomy id), assembly
+        (accession), or workflow (IWC id) -- each entity's stable, canonical key.
+        Keys are matched case-insensitively; a recognized entity value is coerced
+        to a string and looked up, so a non-string value (e.g. a numeric taxid)
+        is still validated rather than silently passed through. An empty/
+        whitespace tag is treated as absent. Organisms resolve on the taxonomy id
+        (an exact species/common name is still accepted as a fail-soft fallback);
+        either way the match is EXACT -- not the fuzzy search_organisms -- so a
+        genus or partial name can't sneak through. Assemblies and workflows are
+        looked up by their canonical id per the chip contract -- a chip that tags
+        a display name instead will be dropped.
+
+        This is defense-in-depth, not a hard guarantee: it validates the tag, but
+        the visible label is free text and only constrained by the prompt. Any
+        lookup error fails closed (drop the chip).
+        """
+        # Strip + lowercase keys so "Organism" or "organism " don't bypass.
+        tags = {k.strip().lower(): v for k, v in chip.items() if isinstance(k, str)}
+        lookups = (
+            ("organism", self.catalog.find_organism_exact),
+            ("assembly", self.catalog.get_assembly_details),
+            ("workflow", self.catalog.get_workflow_details),
+        )
+        try:
+            for key, lookup in lookups:
+                if key not in tags:
+                    continue
+                # Coerce to string so a numeric/None/list value is validated
+                # (and fails closed) rather than skipped.
+                value = str(tags[key]).strip()
+                if not value:
+                    continue  # empty/whitespace tag -> treat as untagged
+                if lookup(value) is None:
+                    return False
+            return True
+        except Exception:
+            logger.warning(
+                "Catalog lookup failed validating a suggestion chip", exc_info=True
+            )
+            return False
 
     def _apply_schema_updates(
         self,
