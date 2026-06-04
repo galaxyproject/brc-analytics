@@ -7,6 +7,7 @@ import {
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
 import { getPageMeta } from "../../../../../app/common/meta/utils";
+import { EntityDataGate } from "../../../../../app/components/EntityDataGate/entityDataGate";
 import { config } from "../../../../../app/config/config";
 import { getEntities } from "../../../../../app/utils/entityUtils";
 import { seedDatabase } from "../../../../../app/utils/seedDatabase";
@@ -73,7 +74,11 @@ export const getStaticProps: GetStaticProps<Props> = async ({
  * @returns Custom workflow view component.
  */
 const Page = (props: Props): JSX.Element => {
-  return <WorkflowInputsView {...props} />;
+  return (
+    <EntityDataGate>
+      <WorkflowInputsView {...props} />
+    </EntityDataGate>
+  );
 };
 
 export default Page;

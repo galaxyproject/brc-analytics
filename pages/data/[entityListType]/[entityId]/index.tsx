@@ -9,6 +9,7 @@ import {
 } from "../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { GA2Catalog } from "../../../../app/apis/catalog/ga2/entities";
 import { getEntityDetailMeta } from "../../../../app/common/meta/utils";
+import { EntityDataGate } from "../../../../app/components/EntityDataGate/entityDataGate";
 import { config } from "../../../../app/config/config";
 import { getEntities, getEntity } from "../../../../app/utils/entityUtils";
 import { seedDatabase } from "../../../../app/utils/seedDatabase";
@@ -38,9 +39,21 @@ export interface EntityPageProps<R> {
  * @returns Entity detail view component.
  */
 const EntityDetailPage = <R,>(props: EntityPageProps<R>): JSX.Element => {
-  if (props.entityListType === "assemblies")
-    return <AnalyzeView entityId={props.entityId} />;
-  return <EntityDetailView {...props} />;
+  // AnalyzeView reads from the workflows cache directly; EntityDetailView's
+  // tab configs (e.g. OrganismView main column) also consume the cache via
+  // getWorkflows(). Both branches need the cache before rendering.
+  if (props.entityListType === "assemblies") {
+    return (
+      <EntityDataGate>
+        <AnalyzeView entityId={props.entityId} />
+      </EntityDataGate>
+    );
+  }
+  return (
+    <EntityDataGate>
+      <EntityDetailView {...props} />
+    </EntityDataGate>
+  );
 };
 
 /**

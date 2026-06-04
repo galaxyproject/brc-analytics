@@ -56,8 +56,8 @@ const queryClient = new QueryClient();
 function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
   // Set up the site configuration, layout and theme.
   const appConfig = config();
-  // Load entities into the in-memory cache.
-  const isEntitiesLoaded = useEntities();
+  // Kick off entity cache load. Per-page EntityDataGate handles the loading state.
+  useEntities();
   const {
     layout,
     redirectRootToPath,
@@ -87,24 +87,18 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
     };
   }, [header, isAssistantEnabled]);
 
-  const ogMeta = (
-    <OgMeta
-      appTitle={appConfig.appTitle}
-      browserURL={appConfig.browserURL}
-      defaultDescription={getDefaultDescription(appConfig.appKey)}
-      pageDescription={pageDescription}
-      pageTitle={pageTitle}
-    />
-  );
-
-  if (!isEntitiesLoaded) return ogMeta;
-
   return (
     <EmotionThemeProvider theme={appTheme}>
       <ThemeProvider theme={appTheme}>
         <DXConfigProvider config={appConfig} entityListType={entityListType}>
           <Head pageTitle={pageTitle} />
-          {ogMeta}
+          <OgMeta
+            appTitle={appConfig.appTitle}
+            browserURL={appConfig.browserURL}
+            defaultDescription={getDefaultDescription(appConfig.appKey)}
+            pageDescription={pageDescription}
+            pageTitle={pageTitle}
+          />
           <CssBaseline />
           <QueryClientProvider client={queryClient}>
             <ServicesProvider>
