@@ -1,29 +1,25 @@
-import { GridPaperSection } from "@databiosphere/findable-ui/lib/components/common/Section/section.styles";
+import { Title } from "@databiosphere/findable-ui/lib/components/common/Title/title";
 import styled from "@emotion/styled";
-import { Box } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import { sectionLayout } from "../../components/Layout/components/AppLayout/components/Section/section.styles";
 
-export const AssistantSection = styled(GridPaperSection)`
-  padding: 24px 0;
+export const StyledSection = styled.section`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
   width: 100%;
 `;
 
-export const SectionContent = styled(Box)`
+export const StyledTitle = styled(Title)`
+  & {
+    line-height: 56px;
+  }
+`;
+
+export const SectionContent = styled(Stack)`
   ${sectionLayout};
   padding: 0 16px;
   width: calc(100% - 32px);
-`;
-
-export const CompactHeader = styled(Box)`
-  padding-bottom: 16px;
-`;
-
-export const CompactHead = styled.h1`
-  font-family: "Inter Tight", sans-serif;
-  font-size: 28px;
-  font-weight: 500;
-  line-height: 36px;
-  margin: 8px 0 0;
 `;
 
 export const TwoPanelLayout = styled(Box)({
