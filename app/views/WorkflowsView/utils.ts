@@ -1,7 +1,9 @@
+import { WorkflowCategoryId } from "../../../catalog/schema/generated/schema";
 import type {
   WorkflowAssemblyMapping,
   WorkflowCategory,
 } from "../../apis/catalog/brc-analytics-catalog/common/entities";
+import { workflowMeetsAssemblyMinimum } from "../../apis/catalog/brc-analytics-catalog/common/workflowAssembly";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { LEXICMAP } from "../AnalyzeWorkflowsView/lexicmap/constants";
 import { LOGAN_SEARCH } from "../AnalyzeWorkflowsView/loganSearch/constants";
@@ -84,10 +86,12 @@ function shouldIncludeWorkflow(
  * LMLS workflows (Logan Search and Lexicmap) are included when the 'lmls' feature flag is enabled.
  * Flu workflow is conditionally included based on the 'flu' feature flag.
  * Hyphy workflow is conditionally included based on the 'hyphy' feature flag.
+ * Assembly workflows are conditionally included based on the 'assembly-workflows' feature flag.
  * Each workflow includes the properties of the workflow itself along with the name of its category and the compatible assembly (if any).
  * @param workflowCategories - An array of workflow categories, each containing an array of workflows.
  * @param mappings - Workflow-assembly mappings for the current site.
  * @param organisms - Organisms.
+ * @param isAssemblyWorkflowsEnabled - Whether the 'assembly-workflows' feature flag is enabled.
  * @param isLmlsEnabled - Whether the 'lmls' feature flag is enabled.
  * @param isFluEnabled - Whether the 'flu' feature flag is enabled.
  * @param isHyphyEnabled - Whether the 'hyphy' feature flag is enabled.
@@ -97,6 +101,7 @@ export function getWorkflows(
   workflowCategories: WorkflowCategory[],
   mappings: WorkflowAssemblyMapping[],
   organisms: Organism[],
+  isAssemblyWorkflowsEnabled = false,
   isLmlsEnabled = false,
   isFluEnabled = false,
   isHyphyEnabled = false
@@ -105,23 +110,27 @@ export function getWorkflows(
 
   const assemblyByTaxonomyId = indexAssemblyByTaxonomyId(organisms);
 
-  // Create a lookup set for workflows with compatible assemblies.
-  const workflowsWithAssemblies = new Set(
-    mappings
-      .filter((m) => m.compatibleAssemblyCount > 0)
-      .map((m) => m.workflowTrsId)
+  // Create a lookup map from TRS ID to compatible assembly count.
+  const compatibleCountByTrsId = new Map(
+    mappings.map((m) => [m.workflowTrsId, m.compatibleAssemblyCount])
   );
 
   for (const category of workflowCategories) {
     if (!category.workflows) continue;
+    if (
+      category.category === WorkflowCategoryId.ASSEMBLY &&
+      !isAssemblyWorkflowsEnabled
+    )
+      continue;
     for (const workflow of category.workflows) {
       // Skip workflows based on feature flags.
       if (!shouldIncludeWorkflow(workflow, isFluEnabled, isHyphyEnabled)) {
         continue;
       }
 
-      // Skip workflows with no compatible assemblies.
-      if (!workflowsWithAssemblies.has(workflow.trsId)) {
+      // Skip workflows whose minimum assembly requirement cannot be met.
+      const count = compatibleCountByTrsId.get(workflow.trsId) ?? 0;
+      if (!workflowMeetsAssemblyMinimum(workflow.assemblyCountMin, count)) {
         continue;
       }
 

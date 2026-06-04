@@ -7,6 +7,7 @@ import {
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_PLOIDY,
 } from "../../../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { workflowMeetsAssemblyMinimum } from "../../../app/apis/catalog/brc-analytics-catalog/common/workflowAssembly";
 
 // Type constraint: both BRC and GA2 assemblies have these fields
 type AssemblyForCompatibility = {
@@ -127,25 +128,32 @@ export function generateWorkflowMappingsQC(
     mappings.map((m) => [m.workflowTrsId, m.compatibleAssemblyCount])
   );
 
-  const workflowsWithNoAssemblies = workflows.filter(
-    (wf) => (mappingsByTrsId.get(wf.trsId) ?? 0) === 0
+  const workflowsWithUnmetMinimum = workflows.filter(
+    (wf) =>
+      !workflowMeetsAssemblyMinimum(
+        wf.assemblyCountMin,
+        mappingsByTrsId.get(wf.trsId) ?? 0
+      )
   );
 
   const lines: string[] = [
     `# Workflow-Assembly Mappings QC Report (${siteName})`,
     "",
-    "## Workflows with no compatible assemblies",
+    "## Workflows that cannot meet their minimum assembly requirement",
     "",
   ];
 
-  if (workflowsWithNoAssemblies.length === 0) {
+  if (workflowsWithUnmetMinimum.length === 0) {
     lines.push("None", "");
   } else {
-    for (const wf of workflowsWithNoAssemblies) {
+    for (const wf of workflowsWithUnmetMinimum) {
+      const count = mappingsByTrsId.get(wf.trsId) ?? 0;
       const reason = wf.taxonomyId
         ? `taxonomy_id: ${wf.taxonomyId}`
         : `ploidy: ${wf.ploidy}`;
-      lines.push(`- ${wf.workflowName} (${wf.trsId}) — ${reason}`);
+      lines.push(
+        `- ${wf.workflowName} (${wf.trsId}) — needs >= ${wf.assemblyCountMin}, ${count} compatible (${reason})`
+      );
     }
     lines.push("");
   }
@@ -165,10 +173,10 @@ export function generateWorkflowMappingsQC(
   lines.push("", "## Summary Statistics", "");
   lines.push(`- Total active workflows: ${workflows.length}`);
   lines.push(
-    `- Workflows with ≥1 compatible assembly: ${workflows.length - workflowsWithNoAssemblies.length}`
+    `- Workflows that meet their minimum assembly requirement: ${workflows.length - workflowsWithUnmetMinimum.length}`
   );
   lines.push(
-    `- Workflows with 0 compatible assemblies: ${workflowsWithNoAssemblies.length}`
+    `- Workflows that cannot meet minimum assembly requirement: ${workflowsWithUnmetMinimum.length}`
   );
   lines.push("");
 

@@ -3,8 +3,9 @@
 from unittest.mock import AsyncMock, Mock
 
 import pytest
-from app.services.llm_service import LLMService
 from conftest import INVALID_QUERIES, VALID_QUERIES
+
+from app.services.llm_service import LLMService
 
 
 class TestLLMService:

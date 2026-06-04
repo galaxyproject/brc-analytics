@@ -1,6 +1,5 @@
-import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
-import { ColumnDef, getSortedRowModel } from "@tanstack/react-table";
+import { ColumnDef, RowData } from "@tanstack/react-table";
 import { ComponentProps } from "react";
 import { ROUTES } from "../../../../routes/constants";
 import {
@@ -18,6 +17,7 @@ import {
   buildGenomeTaxonomicLevelStrain,
   buildIsRef,
   formatNumber,
+  getGenomeStrainText,
 } from "../brc-analytics-catalog/common/viewModelBuilders";
 
 /**
@@ -32,9 +32,23 @@ export const buildOrganismHero = (
     breadcrumbs: [
       { path: ROUTES.ORGANISMS, text: "Organisms" },
       { path: "", text: entity.taxonomicLevelSpecies },
-      { path: "", text: "Assemblies" },
     ],
     title: entity.taxonomicLevelSpecies,
+  };
+};
+
+/**
+ * Build props for the organism detail main content.
+ * @param entity - GA2 organism entity.
+ * @returns Props for the OrganismViewMain component.
+ */
+export const buildOrganismViewMain = (
+  entity: GA2OrganismEntity
+): ComponentProps<typeof C.OrganismViewMain> => {
+  return {
+    entityId: sanitizeEntityId(entity.ncbiTaxonomyId),
+    organism: entity,
+    tableOptions: buildOrganismGenomesTable(entity),
   };
 };
 
@@ -53,30 +67,24 @@ export const buildOrganismImageThumbnail = (
 };
 
 /**
- * Build props for the genomes table for the given organism.
- * @param entity - Entity.
- * @returns props to be used for the table.
+ * Build table options (columns, data, initial state) for the genomes table for the given organism.
+ * @param entity - Organism entity with genomes to be displayed in the table.
+ * @returns table options.
  */
 export function buildOrganismGenomesTable(
   entity: GA2OrganismEntity
-): ComponentProps<typeof C.DetailViewTable<GA2AssemblyEntity>> {
+): ComponentProps<typeof C.OrganismViewMain>["tableOptions"] {
   return {
-    Paper: C.FluidPaper as typeof FluidPaper,
-    columns: buildOrganismGenomesTableColumns(),
-    gridTemplateColumns: "auto repeat(13, minmax(152px, 1fr))",
-    items: entity.genomes,
-    noResultsTitle: "No Assemblies",
-    tableOptions: {
-      enableRowPosition: false,
-      enableSorting: true,
-      getSortedRowModel: getSortedRowModel(),
-      initialState: {
-        columnVisibility: { [COLUMN_IDENTIFIER.ROW_POSITION]: false },
-        sorting: [
-          { desc: true, id: GA2_CATEGORY_KEY.IS_REF },
-          { desc: false, id: GA2_CATEGORY_KEY.ACCESSION },
-        ],
-      },
+    // Cast: ColumnDef<T> is invariant in T, so the catalog-specific row type
+    // cannot widen to RowData even though GA2AssemblyEntity extends it.
+    columns: buildOrganismGenomesTableColumns() as ColumnDef<RowData>[],
+    data: entity.genomes,
+    initialState: {
+      columnVisibility: { [COLUMN_IDENTIFIER.ROW_POSITION]: false },
+      sorting: [
+        { desc: true, id: GA2_CATEGORY_KEY.IS_REF },
+        { desc: false, id: GA2_CATEGORY_KEY.ACCESSION },
+      ],
     },
   };
 }
@@ -90,67 +98,82 @@ function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
     {
       accessorKey: GA2_CATEGORY_KEY.ANALYZE_GENOME,
       cell: ({ row }) => C.AnalyzeGenome(buildAnalyzeGenome(row.original)),
+      enableSorting: false,
       header: GA2_CATEGORY_LABEL.ANALYZE_GENOME,
+      meta: { width: "auto" },
     },
     {
       accessorKey: GA2_CATEGORY_KEY.ACCESSION,
       header: GA2_CATEGORY_LABEL.ACCESSION,
-      meta: { columnPinned: true },
+      meta: { columnPinned: true, width: { max: "1fr", min: "152px" } },
     },
     {
-      accessorKey: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,
+      accessorFn: (row) => getGenomeStrainText(row),
       cell: ({ row }) =>
         C.BasicCell(buildGenomeTaxonomicLevelStrain(row.original)),
       header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
+      id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,
+      meta: { width: { max: "1fr", min: "152px" } },
     },
     {
       accessorKey: GA2_CATEGORY_KEY.TAXONOMY_ID,
       header: GA2_CATEGORY_LABEL.TAXONOMY_ID,
+      meta: { width: { max: "1fr", min: "152px" } },
     },
     {
       accessorKey: GA2_CATEGORY_KEY.IS_REF,
       cell: ({ row }) => C.ChipCell(buildIsRef(row.original)),
       header: GA2_CATEGORY_LABEL.IS_REF,
+      meta: { width: { max: "1fr", min: "152px" } },
     },
     {
       accessorKey: GA2_CATEGORY_KEY.LEVEL,
       header: GA2_CATEGORY_LABEL.LEVEL,
+      meta: { width: { max: "1fr", min: "152px" } },
     },
     {
       accessorKey: GA2_CATEGORY_KEY.CHROMOSOMES,
       header: GA2_CATEGORY_LABEL.CHROMOSOMES,
+      meta: { width: { max: "1fr", min: "152px" } },
     },
     {
       accessorKey: GA2_CATEGORY_KEY.LENGTH,
       cell: ({ getValue }) => formatNumber(getValue()),
       header: GA2_CATEGORY_LABEL.LENGTH,
+      meta: { width: { max: "1fr", min: "152px" } },
     },
     {
       accessorKey: GA2_CATEGORY_KEY.SCAFFOLD_COUNT,
       cell: ({ getValue }) => formatNumber(getValue()),
       header: GA2_CATEGORY_LABEL.SCAFFOLD_COUNT,
+      meta: { width: { max: "1fr", min: "152px" } },
     },
     {
       accessorKey: GA2_CATEGORY_KEY.SCAFFOLD_N50,
       cell: ({ getValue }) => formatNumber(getValue()),
       header: GA2_CATEGORY_LABEL.SCAFFOLD_N50,
+      meta: { width: { max: "1fr", min: "152px" } },
     },
     {
       accessorKey: GA2_CATEGORY_KEY.SCAFFOLD_L50,
       cell: ({ getValue }) => formatNumber(getValue()),
       header: GA2_CATEGORY_LABEL.SCAFFOLD_L50,
+      meta: { width: { max: "1fr", min: "152px" } },
     },
     {
       accessorKey: GA2_CATEGORY_KEY.COVERAGE,
       header: GA2_CATEGORY_LABEL.COVERAGE,
+      meta: { width: { max: "1fr", min: "152px" } },
     },
     {
       accessorKey: GA2_CATEGORY_KEY.GC_PERCENT,
       header: GA2_CATEGORY_LABEL.GC_PERCENT,
+      meta: { width: { max: "1fr", min: "152px" } },
     },
     {
       accessorKey: GA2_CATEGORY_KEY.ANNOTATION_STATUS,
       header: GA2_CATEGORY_LABEL.ANNOTATION_STATUS,
+      meta: { width: { max: "1fr", min: "152px" } },
     },
   ];
 }

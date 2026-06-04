@@ -26,4 +26,5 @@ export const ENA_FIELDS = [
   "scientific_name",
   "study_accession",
   "tax_id",
+  "tax_lineage",
 ];

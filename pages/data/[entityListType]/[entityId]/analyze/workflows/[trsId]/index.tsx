@@ -17,6 +17,9 @@ import {
   workflowIsCompatibleWithAssembly,
 } from "../../../../../../../app/views/AnalyzeWorkflowsView/components/Main/utils";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../../../app/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
+import { buildOrganismWorkflows } from "../../../../../../../app/views/OrganismView/components/Main/utils";
+import type { Organism } from "../../../../../../../app/views/OrganismView/types";
+import { OrganismWorkflowInputsView } from "../../../../../../../app/views/OrganismWorkflowInputsView/organismWorkflowInputsView";
 import { Assembly } from "../../../../../../../app/views/WorkflowInputsView/types";
 import { WorkflowInputsView } from "../../../../../../../app/views/WorkflowInputsView/workflowInputsView";
 import workflows from "../../../../../../../catalog/output/workflows.json";
@@ -41,14 +44,26 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
   const paths: GetStaticPathsResult<Params>["paths"] = [];
 
-  const entityConfig = entities.find(({ route }) => route === "assemblies");
+  // Generate paths for assemblies.
+  const assemblyConfig = entities.find(({ route }) => route === "assemblies");
 
-  if (entityConfig) {
-    await seedDatabase("assemblies", entityConfig);
+  if (assemblyConfig) {
+    await seedDatabase("assemblies", assemblyConfig);
 
-    const entitiesResponse = await getEntities<Assembly>(entityConfig);
+    const entitiesResponse = await getEntities<Assembly>(assemblyConfig);
 
-    processEntityPaths(entityConfig, entitiesResponse, paths);
+    processAssemblyPaths(assemblyConfig, entitiesResponse, paths);
+  }
+
+  // Generate paths for organisms.
+  const organismConfig = entities.find(({ route }) => route === "organisms");
+
+  if (organismConfig) {
+    await seedDatabase("organisms", organismConfig);
+
+    const entitiesResponse = await getEntities<Organism>(organismConfig);
+
+    processOrganismPaths(organismConfig, entitiesResponse, paths);
   }
 
   return {
@@ -63,7 +78,8 @@ export const getStaticProps = async (
   const { entityId, entityListType, trsId } = context.params as Params;
 
   if (!entityListType || !entityId || !trsId) return { notFound: true };
-  if (entityListType !== "assemblies") return { notFound: true };
+  if (entityListType !== "assemblies" && entityListType !== "organisms")
+    return { notFound: true };
 
   return {
     props: {
@@ -76,18 +92,26 @@ export const getStaticProps = async (
 };
 
 const Page = (props: Props): JSX.Element => {
+  if (props.entityListType === "organisms") {
+    return (
+      <OrganismWorkflowInputsView
+        entityId={props.entityId}
+        trsId={props.trsId}
+      />
+    );
+  }
   return <WorkflowInputsView {...props} />;
 };
 
 export default Page;
 
 /**
- * Processes the static paths for the given entity response.
+ * Processes the static paths for assembly entities.
  * @param entityConfig - Entity config.
  * @param entitiesResponse - Entities response.
  * @param paths - Static paths.
  */
-function processEntityPaths(
+function processAssemblyPaths(
   entityConfig: EntityConfig,
   entitiesResponse: EntitiesResponse<Assembly>,
   paths: GetStaticPathsResult<Params>["paths"]
@@ -118,6 +142,47 @@ function processEntityPaths(
     // Create paths for each compatible workflow.
     compatibleWorkflows.forEach((workflow) => {
       // Format the trsId for URL use
+      const trsId = formatTrsId(workflow.trsId);
+      paths.push({
+        params: {
+          entityId,
+          entityListType,
+          trsId,
+        },
+      });
+    });
+  }
+}
+
+/**
+ * Processes the static paths for organism entities.
+ * @param entityConfig - Entity config.
+ * @param entitiesResponse - Entities response.
+ * @param paths - Static paths.
+ */
+function processOrganismPaths(
+  entityConfig: EntityConfig,
+  entitiesResponse: EntitiesResponse<Organism>,
+  paths: GetStaticPathsResult<Params>["paths"]
+): void {
+  const { route: entityListType } = entityConfig;
+  const { hits: entities } = entitiesResponse;
+
+  for (const entity of entities) {
+    const entityId = entityConfig.getId?.(entity);
+
+    if (!entityId) continue;
+
+    const compatibleCategories = buildOrganismWorkflows(
+      entity,
+      workflows,
+      true
+    );
+    const compatibleWorkflows = compatibleCategories.flatMap(
+      (category) => category.workflows
+    );
+
+    compatibleWorkflows.forEach((workflow) => {
       const trsId = formatTrsId(workflow.trsId);
       paths.push({
         params: {

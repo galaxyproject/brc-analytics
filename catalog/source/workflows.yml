@@ -103,11 +103,15 @@ workflows:
       Assemble long reads with Flye, then view assembly statistics
       and assembly graph
     ploidy: ANY
+    scope: ORGANISM
+    assembly_count_min: 0
+    assembly_count_max: 0
     parameters:
       - key: Input sequence reads
+        variable: SANGER_READ_RUN_SINGLE
         type_guide:
           class: File
-    active: false
+    active: true
     iwc_id: assembly-with-flye-main
   - trs_id: "#workflow/github.com/iwc-workflows/atacseq/main/versions/v2.0"
     categories:
@@ -172,6 +176,10 @@ workflows:
     workflow_name: Bacterial Genome Assembly using Shovill
     workflow_description: Assembly of bacterial paired-end short read data
     ploidy: ANY
+    scope: ORGANISM
+    assembly_count_min: 0
+    assembly_count_max: 0
+    taxonomy_id: 2
     parameters:
       - key: Input adapter trimmed sequence reads (forward)
         type_guide:
@@ -189,7 +197,7 @@ workflows:
             - fastq.gz
             - fastqsanger
             - fastqsanger.gz
-    active: false
+    active: true
     iwc_id: bacterial-genome-assembly-main
   - trs_id: "#workflow/github.com/iwc-workflows/bacterial_genome_annotation/main/versions/v1.2.0"
     categories:
@@ -892,6 +900,7 @@ workflows:
       branch labeling for branch comparisons.
     ploidy: ANY
     scope: ORGANISM
+    assembly_count_min: 2
     taxonomy_id: 10239
     parameters:
       - key: reference cds
@@ -967,7 +976,7 @@ workflows:
   - trs_id: "#workflow/github.com/iwc-workflows/hyphy/hyphy-preprocessing/versions/v0.1"
     categories:
       - COMPARATIVE_GENOMICS
-    workflow_name: "HyPhy: Preprocessing"
+    workflow_name: "HyPhy: Preprocessing "
     workflow_description:
       Generates codon-aware alignments and phylogenetic trees compatible
       with downstream HyPhy analyses.
@@ -993,6 +1002,8 @@ workflows:
       for batches of Illumina PE sequenced Influenza A isolates.
     ploidy: ANY
     scope: ORGANISM
+    assembly_count_min: 0
+    assembly_count_max: 0
     taxonomy_id: 11320
     parameters:
       - key: References per segment collection
@@ -1105,7 +1116,7 @@ workflows:
           class: boolean
     active: false
     iwc_id: metagenomic-genes-catalogue-main
-  - trs_id: "#workflow/github.com/iwc-workflows/ploidy-aware-genotype-calling/main/versions/v0.1.1"
+  - trs_id: "#workflow/github.com/iwc-workflows/ploidy-aware-genotype-calling/main/versions/v0.1.2"
     categories:
       - VARIANT_CALLING
     workflow_name: Paired end variant and ploidy-aware genotype calling
@@ -1144,15 +1155,17 @@ workflows:
     ploidy: ANY
     parameters:
       - key: Assembly to be polished
+        variable: ASSEMBLY_FASTA_URL
         type_guide:
           class: File
       - key: long reads
+        variable: SANGER_READ_RUN_SINGLE
         type_guide:
           class: File
       - key: "minimap setting (for long reads) "
         type_guide:
           class: text
-    active: false
+    active: true
     iwc_id: polish-with-long-reads-main
   - trs_id: "#workflow/github.com/iwc-workflows/pox-virus-amplicon/main/versions/v0.4"
     categories:
@@ -1445,7 +1458,7 @@ workflows:
           class: text
     active: false
     iwc_id: sars-cov-2-pe-illumina-artic-ivar-analysis-sars-cov-2-illumina-amplicon-ivar-pangolin-nextclade
-  - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-variant-calling/COVID-19-PE-ARTIC-ILLUMINA/versions/v0.5.4"
+  - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-variant-calling/COVID-19-PE-ARTIC-ILLUMINA/versions/v0.5.5"
     categories:
       - VARIANT_CALLING
     workflow_name: "COVID-19: variation analysis on ARTIC PE data"

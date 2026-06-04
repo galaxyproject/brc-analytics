@@ -60,6 +60,8 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 1,
+            assemblyCountMin: 1,
             iwcId: "iwc-assembly",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -89,6 +91,8 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 1,
+            assemblyCountMin: 1,
             iwcId: "iwc-no-scope",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -118,6 +122,8 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-organism",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -146,6 +152,8 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-sequence",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -174,6 +182,8 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 1,
+            assemblyCountMin: 1,
             iwcId: "iwc-assembly",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -184,6 +194,8 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
             workflowName: "Assembly Workflow",
           },
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-organism",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -194,6 +206,8 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
             workflowName: "Organism Workflow",
           },
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-sequence",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -230,6 +244,8 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 1,
+            assemblyCountMin: 1,
             iwcId: "iwc-rna-seq",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -266,6 +282,8 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
         showComingSoon: true,
         workflows: [
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-organism",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,

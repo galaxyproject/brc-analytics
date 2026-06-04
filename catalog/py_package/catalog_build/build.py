@@ -19,20 +19,20 @@ MAX_NCBI_URL_LENGTH = 2000  # The actual limit seems to be a bit over 4000
 log = logging.getLogger(__name__)
 
 
-def rate_limit_handler(request_call):
-    try:
+def rate_limit_handler(request_call, max_retries=5):
+    response = request_call()
+    for attempt in range(max_retries):
+        if response.status_code != 429:
+            break
+        # Use Retry-After if provided, otherwise use exponential backoff
+        retry_after = max(
+            int(response.headers.get("Retry-After", 0)), 2 ** (attempt + 1)
+        )
+        print(f"Rate limited, waiting {retry_after} seconds")
+        time.sleep(retry_after)
         response = request_call()
-        response.raise_for_status()
-        return response
-    except requests.HTTPError:
-        if response.status_code == 429:
-            retry_after = int(response.headers.get("Retry-After"))
-            print(f"Rate limited, waiting {retry_after} seconds")
-            time.sleep(retry_after)
-            response = request_call()
-            response.raise_for_status()
-            return response
-        raise
+    response.raise_for_status()
+    return response
 
 
 def post_ncbi_request(url, json_data, batch_size=1000, min_batch_size=50):

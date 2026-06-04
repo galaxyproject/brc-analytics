@@ -703,6 +703,20 @@ class Workflow(ConfiguredBaseModel):
             "linkml_meta": {"alias": "scope", "domain_of": ["Workflow"]}
         },
     )
+    assembly_count_min: Optional[int] = Field(
+        default=None,
+        description="""The minimum number of genome assemblies a user must select for this workflow. Defaults to 1 for ASSEMBLY-scope workflows; must be set explicitly for ORGANISM and SEQUENCE scope. Use 0 for workflows that take no user-selected assemblies (e.g. assembly-building or curated-FASTA workflows).""",
+        json_schema_extra={
+            "linkml_meta": {"alias": "assembly_count_min", "domain_of": ["Workflow"]}
+        },
+    )
+    assembly_count_max: Optional[int] = Field(
+        default=None,
+        description="""The maximum number of genome assemblies a user may select for this workflow. Null/absent means no upper limit. Defaults to 1 for ASSEMBLY-scope workflows; must be set explicitly for ORGANISM and SEQUENCE scope.""",
+        json_schema_extra={
+            "linkml_meta": {"alias": "assembly_count_max", "domain_of": ["Workflow"]}
+        },
+    )
     taxonomy_id: Optional[int] = Field(
         default=None,
         description="""The NCBI Taxonomy ID of the organism this workflow is designed for. If specified, the workflow will be available for all assemblies with this ID in their taxonomic lineage.""",

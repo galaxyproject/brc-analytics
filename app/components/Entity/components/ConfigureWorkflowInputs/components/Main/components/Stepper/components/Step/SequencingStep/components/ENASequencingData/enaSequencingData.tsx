@@ -17,7 +17,6 @@ export const ENASequencingData = ({
   selectedCount,
   switchBrowseMethod,
   table,
-  taxonomicLevelSpecies,
   taxonomyMatches,
 }: Props): JSX.Element => {
   const accessionDialog = useDialog();
@@ -30,7 +29,6 @@ export const ENASequencingData = ({
         onContinue={collectionDialog.onOpen}
         onOpen={accessionDialog.onOpen}
         selectedCount={selectedCount}
-        taxonomicLevelSpecies={taxonomicLevelSpecies}
         taxonomyCount={enaTaxonomyId.data?.length}
         taxonomyMatches={taxonomyMatches}
       />

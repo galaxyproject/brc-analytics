@@ -1,18 +1,24 @@
 import { Loading } from "@databiosphere/findable-ui/lib/components/Loading/loading";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { PAPER_PANEL_STYLE } from "@databiosphere/findable-ui/lib/components/common/Paper/paper";
+import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
+import { Typography } from "@mui/material";
 import { JSX, useState } from "react";
 import { Workflow } from "../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import { useLaunchGalaxy } from "./components/Stepper/components/Step/hooks/UseLaunchGalaxy/useLaunchGalaxy";
 import { Stepper } from "./components/Stepper/stepper";
-import { StyledButton, StyledMainContainer } from "./main.styles";
+import {
+  StyledButton,
+  StyledFluidPaper,
+  StyledMainContainer,
+} from "./main.styles";
 import { Props } from "./types";
 
 export const Main = ({
   activeStep,
   configuredInput,
   configuredSteps,
-  genome,
+  initialDataSourceView,
   onConfigure,
   onContinue,
   onEdit,
@@ -29,18 +35,27 @@ export const Main = ({
   return (
     <StyledMainContainer>
       <Loading loading={status.loading} panelStyle={PAPER_PANEL_STYLE.FLUID} />
-      <Stepper
-        activeStep={activeStep}
-        configuredInput={configuredInput}
-        configuredSteps={configuredSteps}
-        genome={genome}
-        onConfigure={onConfigure}
-        onContinue={onContinue}
-        onEdit={onEdit}
-        onLaunchGalaxy={onLaunchGalaxy}
-        status={status}
-        workflow={workflow}
-      />
+      {configuredSteps.length === 0 ? (
+        <StyledFluidPaper>
+          <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}>
+            No additional configuration is required. Launch this workflow
+            directly in Galaxy.
+          </Typography>
+        </StyledFluidPaper>
+      ) : (
+        <Stepper
+          activeStep={activeStep}
+          configuredInput={configuredInput}
+          configuredSteps={configuredSteps}
+          initialDataSourceView={initialDataSourceView}
+          onConfigure={onConfigure}
+          onContinue={onContinue}
+          onEdit={onEdit}
+          onLaunchGalaxy={onLaunchGalaxy}
+          status={status}
+          workflow={workflow}
+        />
+      )}
       <StyledButton
         {...BUTTON_PROPS.PRIMARY_CONTAINED}
         data-testid="launch-galaxy-button"

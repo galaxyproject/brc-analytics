@@ -145,6 +145,21 @@ export interface AssistantChatResponse {
   token_usage?: TokenUsage;
 }
 
+export interface SessionRestoreResponse {
+  handoff_url: string | null;
+  is_complete: boolean;
+  messages: { content: string; role: "user" | "assistant" }[];
+  schema_state: AnalysisSchema;
+  session_id: string;
+  suggestions: SuggestionChip[];
+}
+
+export interface AssistantInfoResponse {
+  available: boolean;
+  model: string | null;
+  provider: string | null;
+}
+
 export interface UnifiedSearchResponse {
   datasets?: {
     cached: boolean;

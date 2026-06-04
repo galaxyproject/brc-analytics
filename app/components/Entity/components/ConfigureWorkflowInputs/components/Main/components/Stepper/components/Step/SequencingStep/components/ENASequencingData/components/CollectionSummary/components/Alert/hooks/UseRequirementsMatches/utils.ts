@@ -1,8 +1,8 @@
 import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import { ColumnFiltersState, Row } from "@tanstack/react-table";
-import { Assembly } from "../../../../../../../../../../../../../../../../../../../views/WorkflowInputsView/types";
 import { ReadRun } from "../../../../../../types";
 import { COLUMN_KEY_TO_LABEL } from "./constants";
+import type { SpeciesInfo } from "./types";
 
 /**
  * Builds warnings for column filter mismatches.
@@ -54,16 +54,16 @@ function buildDataWarnings(
  * Aggregates species mismatch warnings and data (column filter) mismatch warnings.
  * @param initialColumnFilters - Pre-selected column filters.
  * @param rows - Selected table rows.
- * @param genome - Target genome entity used to validate selection.
+ * @param speciesInfo - Taxonomy fields used to validate species selection.
  * @returns Array of warning messages.
  */
 export function buildRequirementWarnings(
   initialColumnFilters: ColumnFiltersState,
   rows: Row<ReadRun>[],
-  genome?: Assembly
+  speciesInfo?: SpeciesInfo
 ): string[] {
   if (rows.length === 0) return [];
-  const speciesWarnings = buildSpeciesWarnings(rows, genome);
+  const speciesWarnings = buildSpeciesWarnings(rows, speciesInfo);
   const dataWarnings = buildDataWarnings(initialColumnFilters, rows);
   return speciesWarnings.concat(dataWarnings);
 }
@@ -71,23 +71,34 @@ export function buildRequirementWarnings(
 /**
  * Builds warnings for species mismatches.
  * @param rows - Selected rows.
- * @param genome - Genome entity.
+ * @param speciesInfo - Taxonomy fields used to validate species selection.
  * @returns Array of warning messages.
  */
 function buildSpeciesWarnings(
   rows: Row<ReadRun>[],
-  genome?: Assembly
+  speciesInfo?: SpeciesInfo
 ): string[] {
-  if (!genome) return [];
+  const { ncbiTaxonomyId, speciesTaxonomyId, taxonomicLevelSpecies } =
+    speciesInfo ?? {};
+  if (!ncbiTaxonomyId || !taxonomicLevelSpecies) return [];
 
-  const { ncbiTaxonomyId, taxonomicLevelSpecies } = genome;
+  // For organism-scoped workflows speciesTaxonomyId is undefined; fall back to
+  // ncbiTaxonomyId so descendant rows whose tax_lineage contains the selected
+  // organism's taxonomy ID are not flagged as mismatches.
+  const lineageId = speciesTaxonomyId ?? ncbiTaxonomyId;
 
   // Build a set of unmatched values.
   const unmatchedSet = new Set();
   for (const { original } of rows) {
-    const { scientific_name = LABEL.UNSPECIFIED, tax_id } = original;
+    const {
+      scientific_name = LABEL.UNSPECIFIED,
+      tax_id,
+      tax_lineage = "",
+    } = original;
     // Compare the row value to the expected value.
-    if (ncbiTaxonomyId === tax_id) continue;
+    if (tax_id === ncbiTaxonomyId) continue;
+    if (speciesTaxonomyId && tax_id === speciesTaxonomyId) continue;
+    if (tax_lineage.split(";").includes(lineageId)) continue;
 
     // Add the unmatched value to the set.
     unmatchedSet.add(`${tax_id} (${scientific_name})`);

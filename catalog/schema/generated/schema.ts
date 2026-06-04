@@ -360,6 +360,10 @@ export interface Workflow {
     ploidy: WorkflowPloidy,
     /** The scope level at which this workflow operates, determining where it is displayed in the UI and what the first configuration step should be. Defaults to ASSEMBLY for backward compatibility. */
     scope?: WorkflowScope | null,
+    /** The minimum number of genome assemblies a user must select for this workflow. Defaults to 1 for ASSEMBLY-scope workflows; must be set explicitly for ORGANISM and SEQUENCE scope. Use 0 for workflows that take no user-selected assemblies (e.g. assembly-building or curated-FASTA workflows). */
+    assembly_count_min?: number | null,
+    /** The maximum number of genome assemblies a user may select for this workflow. Null/absent means no upper limit. Defaults to 1 for ASSEMBLY-scope workflows; must be set explicitly for ORGANISM and SEQUENCE scope. */
+    assembly_count_max?: number | null,
     /** The NCBI Taxonomy ID of the organism this workflow is designed for. If specified, the workflow will be available for all assemblies with this ID in their taxonomic lineage. */
     taxonomy_id?: number | null,
     /** Collection of input parameters that will be passed to the workflow when it is executed, including data sources and configuration options. */

@@ -15,7 +15,7 @@ export const Alert = ({
   if (taxonomyMatches > 0) return null;
 
   return (
-    <StyledAlert {...ALERT_PROPS.STANDARD_WARNING} size={SIZE.LARGE}>
+    <StyledAlert {...ALERT_PROPS.STANDARD_INFO} size={SIZE.LARGE}>
       <AlertTitle>No matching read runs found by Taxonomy ID</AlertTitle>
       Data labels may not always be accurate. You can still select and use any
       available sequences.

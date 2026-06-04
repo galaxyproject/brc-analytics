@@ -1,0 +1,186 @@
+---
+breadcrumbs:
+  - path: "/learn"
+    text: "Learn"
+  - path: ""
+    text: "Sequence Search Workflows"
+contentType: "ARTICLE"
+description: ""
+enableOutline: true
+title: "Sequence Search Workflows"
+---
+
+## Overview
+
+BRC Analytics provides two powerful workflows for searching and retrieving sequencing data based on genetic content: **kmindex** and **LexicMap**. These workflows allow researchers to find and download SRA (Sequence Read Archive) accessions containing specific nucleotide sequences without needing to download entire datasets or perform full-scale alignments.
+
+## Running the Workflows in BRC Analytics
+
+These workflows are designed for broad, sequence-based searches and are not tied to a specific organism or reference assembly. Follow this step-by-step guide to access and run them.
+
+### Step 1: Access the Workflows Page
+
+Navigate to the main **Workflows** page from the top navigation bar. This page lists all available analysis workflows in BRC Analytics.
+
+![Workflow listing page showing all available workflows](/learn/workflow_listing.png)
+
+### Step 2: Filter to Sequence Search Workflows
+
+Set the **Biological Context** filter to **Sequence**. This displays the kmindex and LexicMap workflows that operate on sequence data directly, filtering out organism- and assembly-specific workflows that require a reference assembly.
+
+![Workflow listing filtered to show kmindex and LexicMap workflows](/learn/lmls_workflows.png)
+
+### Step 3: Select and Configure a Workflow
+
+Click on either **kmindex (Logan Search)** or **LexicMap** to begin configuration:
+
+- **kmindex (Logan Search):** Uses fast k-mer matching for strict sequence identification
+- **LexicMap:** Uses alignment-based matching for flexible similarity search with BLAST-like results
+
+The configuration page allows you to upload your query sequence and set parameters:
+
+![Workflow configuration page showing FASTA upload and parameter options](/learn/lmls_configure.png)
+
+**Configuration options:**
+
+1. **Query sequence:** Provide your sequence in FASTA format
+2. **Number of Accessions to Download:** Controls how many top-scoring SRA runs are automatically downloaded
+   - If the search returns 100 matching runs and you set this to `5`, only the top 5 are downloaded
+   - **Warning:** Setting to `0` attempts to download **all** matching runs—this can quickly exhaust your Galaxy storage quota if many hits are found
+
+Additional search parameters (k-mer size, match thresholds, alignment sensitivity) are available in Galaxy with sensible defaults. You can override these in the Galaxy interface if you need to tune the search behavior.
+
+### Step 4: Launch and Review Results
+
+Launch the workflow to Galaxy for execution. The search and download run in sequence automatically.
+
+After completion, your Galaxy history will contain:
+
+- A **tabular summary** listing all matching SRA accessions with match statistics
+- A **Galaxy collection** of FASTQ files for the number of top hits you specified to download. Use this collection directly as input for other Galaxy workflows (assembly, variant calling, etc.)
+
+## The Underlying Tools
+
+### kmindex
+
+**kmindex** is a k-mer index-based tool designed for fast, exact sequence matching against large-scale nucleotide datasets. It indexes sequences using k-mer signatures—short, overlapping subsequences of length _k_—to enable rapid lookup.
+
+**Key features:**
+
+- Uses k-mer hashing for fast exact matching
+- Supports queries against very large sequence collections
+- Provides strict matches for quick identification
+- Optimized for speed when searching for exact or near-exact sequences
+
+### LexicMap
+
+**LexicMap** is a sequence alignment tool that builds alignments for flexible matching. It returns BLAST-like results by performing Smith-Waterman or similar alignment algorithms against indexed sequences.
+
+**Key features:**
+
+- Builds alignments for more flexible matching
+- Returns BLAST-like results with similarity scores
+- Tolerates sequence variation (mismatches, gaps)
+- Well-suited for finding related sequences with divergence
+
+## The LOGAN Indexes
+
+Both workflows run against the **LOGAN (Lossless Genome Archive)** unitig indexes. LOGAN is a resource that compresses and indexes sequencing data from SRA into compact, searchable structures called **unitigs** (unitigs are the maximal unbranched paths in a de Bruijn graph, representing consensus sequences from overlapping reads).
+
+**About the indexes:**
+
+- **Scope:** Contains unitigs assembled from millions of SRA runs
+- **Scale:** Represents petabytes of raw sequencing data in a compressed, searchable format
+- **Format:** Pre-computed indexes allow performant queries against massive datasets
+
+By querying these pre-built indexes rather than raw reads, kmindex and LexicMap can return results in seconds to minutes instead of hours or days.
+
+## What the Workflows Do
+
+Both workflows follow a similar high-level process:
+
+1. **Input:** Accept query sequence(s) in FASTA format
+2. **Index Query:** Search the LOGAN unitig indexes for matching k-mers or seeds
+3. **Accession Mapping:** Map matching unitigs back to their source SRA accessions
+4. **Result Retrieval:** Return a list of SRA accessions that contain sequences matching the query
+5. **Data Download:** Download runs containing the matching sequences
+
+## When to Use Each Workflow
+
+### Use kmindex when:
+
+- You need fast, strict matching
+- Your query sequences are well-defined and you expect high similarity
+- Speed is critical and you need quick identification
+- You're searching for exact sequences (primers, barcodes, adapters)
+- You want to confirm presence of specific sequences
+
+**Example scenarios:**
+
+- Confirming presence of specific primer or probe sequences
+- Finding datasets containing exact barcode or adapter sequences
+- Quick screening for known marker sequences
+- When speed matters more than catching divergent variants
+
+### Use LexicMap when:
+
+- You expect sequence variation (SNPs, indels) in your target
+- You need alignment-based similarity scoring
+- You're searching for conserved regions in divergent sequences
+- You want to find related sequences that may not be identical
+- You need BLAST-like results with e-values or bit-scores
+
+**Example scenarios:**
+
+- Searching for antimicrobial resistance genes that may have allelic variation
+- Finding viral variants with mutations in specific genes
+- Detecting conserved protein domains across diverse taxa
+- When sensitivity to sequence divergence is more important than speed
+
+## Example Use Cases
+
+### Antimicrobial Resistance (AMR) Gene Surveillance
+
+Researchers can query resistance genes against the entire SRA to:
+
+- **Track resistance gene spread:** Identify which bacterial isolates carry specific AMR genes
+- **Map geographic distribution:** Determine where resistance genes have been detected
+- **Monitor temporal trends:** Track emergence and spread of resistance over time
+- **Identify novel contexts:** Discover resistance genes in unexpected species or environments
+
+**Workflow:** Query known AMR gene sequences (e.g., *bla*CTX-M, _mcr_-1, _vanA_) → Retrieve matching SRA accessions → Download reads for assembly and characterization → Compare flanking regions and genetic contexts
+
+### Antigen Surveillance
+
+For viral pathogens, these workflows enable:
+
+- **Variant tracking:** Find sequences containing specific antigenic variants
+- **Epitope mapping:** Identify datasets with known antigenic epitopes
+- **Vaccine escape monitoring:** Search for mutations in vaccine target regions
+- **Cross-reactivity studies:** Find related sequences in different viral strains
+
+**Workflow:** Query antigen sequences or epitope regions → Find all SRA runs containing matches → Download and analyze full genomes → Perform phylogenetic and evolutionary analyses
+
+### Pathogen Discovery
+
+Search for known pathogen signatures in:
+
+- **Metagenomic samples:** Identify uncharacterized infections in clinical or environmental samples
+- **Unexpected hosts:** Find zoonotic pathogens in potential reservoir species
+- **Co-infections:** Detect multiple pathogens in complex clinical samples
+
+**Workflow:** Query pathogen-specific marker genes → Screen across all SRA metagenomic datasets → Identify runs with unexpected hits → Download and assemble to characterize
+
+### Environmental Monitoring
+
+Track genetic markers in environmental sequencing:
+
+- **Biosurveillance:** Monitor for pathogens in wastewater or environmental samples
+- **Biomarker tracking:** Follow specific genetic signatures through ecosystems
+- **Biodiversity assessment:** Query taxonomic marker genes in environmental samples
+
+## Further Reading
+
+- **LOGAN (GitHub):** [IndexThePlanet/Logan](https://github.com/IndexThePlanet/Logan)
+- **kmindex (Documentation):** [tlemane.github.io/kmindex](https://tlemane.github.io/kmindex/)
+- **LexicMap (GitHub):** [shenwei356/LexicMap](https://github.com/shenwei356/LexicMap)

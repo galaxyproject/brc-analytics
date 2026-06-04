@@ -6,9 +6,9 @@ import { BRCDataCatalogOrganism } from "../../../../../app/apis/catalog/brc-anal
 import * as C from "../../../../../app/components";
 import * as V from "../../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 
-export const assembliesTop: ComponentsConfig = [
+export const organismTop: ComponentsConfig = [
   {
     component: C.BackPageHero,
-    viewBuilder: V.buildOrganismAssembliesHero,
+    viewBuilder: V.buildOrganismHero,
   } as ComponentConfig<typeof C.BackPageHero, BRCDataCatalogOrganism>,
 ];

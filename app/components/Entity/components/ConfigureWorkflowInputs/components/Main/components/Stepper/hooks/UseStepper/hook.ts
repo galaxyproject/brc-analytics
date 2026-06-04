@@ -3,9 +3,12 @@ import { StepConfig } from "../../components/Step/types";
 import { UseStepper } from "./types";
 import { getInitialActiveStep, getNextActiveStep } from "./utils";
 
-export const useStepper = (steps: StepConfig[]): UseStepper => {
+export const useStepper = (
+  steps: StepConfig[],
+  initialActiveStepOverride?: number
+): UseStepper => {
   const [activeStep, setActiveStep] = useState<number>(
-    getInitialActiveStep(steps)
+    initialActiveStepOverride ?? getInitialActiveStep(steps)
   );
 
   const onContinue = useCallback((): void => {

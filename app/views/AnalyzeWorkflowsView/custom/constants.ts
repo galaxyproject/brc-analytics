@@ -6,6 +6,8 @@ import {
 } from "../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 
 export const CUSTOM_WORKFLOW: Workflow = {
+  assemblyCountMax: 1,
+  assemblyCountMin: 1,
   iwcId: "",
   parameters: [
     {

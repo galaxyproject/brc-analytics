@@ -94,6 +94,8 @@ function buildWorkflow(
   sourceWorkflow: SourceWorkflow
 ): void {
   const {
+    assembly_count_max: assemblyCountMax,
+    assembly_count_min: assemblyCountMin,
     categories,
     iwc_id: iwcId,
     parameters: sourceParameters,
@@ -174,11 +176,33 @@ function buildWorkflow(
     // Add parameter if it has variable, url_spec, or collection_spec
     if (variable || url_spec || collection_spec) parameters.push(parameter);
   }
+  const resolvedScope = scope ?? WorkflowScope.ASSEMBLY;
+
+  // Resolve assembly count defaults based on scope.
+  // ASSEMBLY scope: default 1/1 (single assembly selection).
+  // ORGANISM and SEQUENCE: must be declared explicitly.
+  let resolvedMin: number;
+  let resolvedMax: number | null;
+  if (resolvedScope === WorkflowScope.ASSEMBLY) {
+    resolvedMin = assemblyCountMin ?? 1;
+    resolvedMax = assemblyCountMax ?? 1;
+  } else {
+    if (assemblyCountMin === null || assemblyCountMin === undefined) {
+      throw new Error(
+        `Workflow "${workflowName}" (scope: ${resolvedScope}): assembly_count_min is required for ORGANISM and SEQUENCE scope workflows`
+      );
+    }
+    resolvedMin = assemblyCountMin;
+    resolvedMax = assemblyCountMax ?? null;
+  }
+
   const workflow: Workflow = {
+    assemblyCountMax: resolvedMax,
+    assemblyCountMin: resolvedMin,
     iwcId,
     parameters,
     ploidy,
-    scope: scope ?? WorkflowScope.ASSEMBLY,
+    scope: resolvedScope,
     taxonomyId: typeof taxonomyId === "number" ? String(taxonomyId) : null,
     trsId,
     workflowDescription,
