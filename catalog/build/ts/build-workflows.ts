@@ -6,6 +6,7 @@ import {
 import {
   Workflow as SourceWorkflow,
   WorkflowCategories as SourceWorkflowCategories,
+  WorkflowParameterVariable,
   Workflows as SourceWorkflows,
   WorkflowScope,
 } from "../../schema/generated/schema";
@@ -176,6 +177,22 @@ function buildWorkflow(
     // Add parameter if it has variable, url_spec, or collection_spec
     if (variable || url_spec || collection_spec) parameters.push(parameter);
   }
+
+  // Validate paired-file variable consistency: both forward and reverse must be present together
+  const variables = parameters.map((p) => p.variable).filter((v) => !!v);
+  const hasForward = variables.includes(
+    WorkflowParameterVariable.SANGER_READ_RUN_FORWARD_FILE
+  );
+  const hasReverse = variables.includes(
+    WorkflowParameterVariable.SANGER_READ_RUN_REVERSE_FILE
+  );
+  if (hasForward !== hasReverse) {
+    console.warn(
+      `Workflow "${workflowName}" skipped: SANGER_READ_RUN_FORWARD_FILE and SANGER_READ_RUN_REVERSE_FILE must both be present or both absent.`
+    );
+    return;
+  }
+
   const resolvedScope = scope ?? WorkflowScope.ASSEMBLY;
 
   // Resolve assembly count defaults based on scope.
