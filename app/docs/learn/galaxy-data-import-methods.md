@@ -4,7 +4,7 @@ During the course of using BRC-Analytics and working through configurations for 
 
 ![Select from ENA dialog box](./select_from_ENA.png)
 
-which makes it really easy to fetch public data from SRA/ENA. But what if your data is sitting on your laptop, or on your local network shared drive, or on another web site, or in a cloud storage service?  You can click the "Upload my data" option in this dialog, which puts off dealing with data until you arrive at Galaxy:
+which makes it really easy to fetch public data from SRA/ENA. But what if your data is sitting on your laptop, or on your local network shared drive, or on another web site, or in a cloud storage service? You can click the "Upload my data" option in this dialog, which puts off dealing with data until you arrive at Galaxy:
 
 ![Upload in Galaxy history message](upload_data_in_galaxy.png)
 
@@ -16,7 +16,7 @@ When you launch a workflow from BRC-Analytics, you will land on a workflow run p
 
 **Create collection** — Select and organize datasets already in your current history into a collection to pass to the workflow.
 
-**Upload Files to Add to Collection** — Upload new files directly into the workflow input. This opens an upload interface similar to the standalone Upload Tool (see section 2), but without the tabs across the top. A hint above the buttons indicates the file type(s) the workflow expects (e.g., *fastqsanger.gz or fastqsanger*). The same buttons are available along the bottom: **Choose Local File**, **Choose from Repository**, and **Paste/Fetch Data**.
+**Upload Files to Add to Collection** — Upload new files directly into the workflow input. This opens an upload interface similar to the standalone Upload Tool (see section 2), but without the tabs across the top. A hint above the buttons indicates the file type(s) the workflow expects (e.g., _fastqsanger.gz or fastqsanger_). The same buttons are available along the bottom: **Choose Local File**, **Choose from Repository**, and **Paste/Fetch Data**.
 
 ---
 
@@ -32,7 +32,7 @@ The Upload tool is accessible via the activity bar on the left side of the page 
 
 **Composite** — For uploading composite dataset types that consist of multiple files (e.g. formats that require a data file plus an index file). It is unlikely to be needed in the context of BRC-Analytics.
 
-**Collection** *(TODO: add description)* — Upload files and organize them directly into a dataset collection.
+**Collection** _(TODO: add description)_ — Upload files and organize them directly into a dataset collection.
 
 **[Rule-Based](https://training.galaxyproject.org/training-material/topics/galaxy-interface/tutorials/upload-rules/tutorial.html)** — A powerful bulk import interface where you provide a table or list of URLs/accessions, then define rules (column assignments, transformations, filters) to map them to dataset names, types, genome builds, and collection structures. Can load the initial metadata from a pasted table, a CSV/TSV, or from an existing dataset in your history. Ideal for importing dozens to hundreds of files at once and organizing them directly into collections.
 
@@ -44,7 +44,7 @@ The Upload tool is accessible via the activity bar on the left side of the page 
 
 **[Paste/Fetch Data](https://training.galaxyproject.org/training-material/topics/galaxy-interface/tutorials/get-data/slides-plain.html#directly-enter-text)** — Paste raw text data directly (e.g., a FASTA sequence, a BED interval, a list of IDs), or paste one or more URLs (HTTP, HTTPS, FTP). Galaxy fetches the remote file and deposits it into your history. Supports multiple URLs at once (one per line).
 
-*Note: [FTP upload](https://docs.galaxyproject.org/en/master/admin/special_topics/ftp.html) is **not** currently supported on usegalaxy.org (it is available on usegalaxy.eu and other instances).*
+_Note: [FTP upload](https://docs.galaxyproject.org/en/master/admin/special_topics/ftp.html) is **not** currently supported on usegalaxy.org (it is available on usegalaxy.eu and other instances)._
 
 ---
 
@@ -128,15 +128,15 @@ Access all history views via the **Histories** button in the activity bar on the
 
 ## Summary Table
 
-| Category | Method |
-|---|---|
-| Workflow Run Page | Upload inline via + Create button (local file, repository, paste/fetch) |
-| Upload Tool | Local file, Paste/Fetch URL, Choose from Repository, Rule-Based Bulk Import |
-| Get Data Tools | UCSC, EBI SRA, NCBI SRA, EBI Search, EBI Metagenomics, EGA, NCBI Datasets, NCBI Accession, UniProt, Unipept, IEDB, fastq-dl, pysradb |
-| Data Libraries | Server-side shared reference datasets |
-| Shared Histories | Histories shared with me, Public histories |
-| API / Programmatic | REST API, BioBlend (Python), galaxy-upload CLI |
-| Cross-Server | History import/export, Onedata |
+| Category           | Method                                                                                                                               |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Workflow Run Page  | Upload inline via + Create button (local file, repository, paste/fetch)                                                              |
+| Upload Tool        | Local file, Paste/Fetch URL, Choose from Repository, Rule-Based Bulk Import                                                          |
+| Get Data Tools     | UCSC, EBI SRA, NCBI SRA, EBI Search, EBI Metagenomics, EGA, NCBI Datasets, NCBI Accession, UniProt, Unipept, IEDB, fastq-dl, pysradb |
+| Data Libraries     | Server-side shared reference datasets                                                                                                |
+| Shared Histories   | Histories shared with me, Public histories                                                                                           |
+| API / Programmatic | REST API, BioBlend (Python), galaxy-upload CLI                                                                                       |
+| Cross-Server       | History import/export, Onedata                                                                                                       |
 
 ---
 
