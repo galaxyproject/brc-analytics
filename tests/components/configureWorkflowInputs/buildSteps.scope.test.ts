@@ -6,8 +6,11 @@ jest.mock(
       ACCESSION_COUNT: { key: "numberOfHits", label: "Accessions to Download" },
       ASSEMBLY_ID: { key: "ASSEMBLY_ID" },
       GENE_MODEL_URL: { key: "GENE_MODEL_URL" },
+      SANGER_READ_RUN_FORWARD_FILE: { key: "readRunPairedFile" },
       SANGER_READ_RUN_PAIRED: { key: "SANGER_READ_RUN_PAIRED" },
+      SANGER_READ_RUN_REVERSE_FILE: { key: "readRunPairedFile" },
       SANGER_READ_RUN_SINGLE: { key: "SANGER_READ_RUN_SINGLE" },
+      SANGER_READ_RUN_SINGLE_FILE: { key: "readRunSingleFile" },
       SEQUENCE: { key: "sequence", label: "Sequence" },
     },
   })
@@ -158,8 +161,8 @@ describe("buildSteps - scope handling", () => {
 
       expect(steps.map((s) => s.key)).toEqual([
         "ASSEMBLY_ID",
-        "SANGER_READ_RUN_SINGLE",
         "SANGER_READ_RUN_PAIRED",
+        "SANGER_READ_RUN_SINGLE",
       ]);
     });
 
@@ -192,9 +195,48 @@ describe("buildSteps - scope handling", () => {
       expect(steps.map((s) => s.key)).toEqual([
         "ASSEMBLY_ID",
         "GENE_MODEL_URL",
-        "SANGER_READ_RUN_SINGLE",
         "SANGER_READ_RUN_PAIRED",
+        "SANGER_READ_RUN_SINGLE",
       ]);
+    });
+
+    test("includes single-file step for SANGER_READ_RUN_SINGLE_FILE", () => {
+      const workflow: Workflow = {
+        ...BASE_WORKFLOW,
+        parameters: [
+          {
+            key: "Single FASTQ",
+            variable: WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE_FILE,
+          },
+        ],
+        scope: WORKFLOW_SCOPE.ORGANISM,
+      };
+
+      const steps = buildSteps(workflow);
+
+      expect(steps.map((s) => s.key)).toEqual(["readRunSingleFile"]);
+    });
+
+    test("deduplicates paired-file step when both forward and reverse are present", () => {
+      const workflow: Workflow = {
+        ...BASE_WORKFLOW,
+        parameters: [
+          {
+            key: "Forward reads",
+            variable: WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_FORWARD_FILE,
+          },
+          {
+            key: "Reverse reads",
+            variable: WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_REVERSE_FILE,
+          },
+        ],
+        scope: WORKFLOW_SCOPE.ORGANISM,
+      };
+
+      const steps = buildSteps(workflow);
+
+      expect(steps.map((s) => s.key)).toEqual(["readRunPairedFile"]);
+      expect(steps).toHaveLength(1);
     });
   });
 });

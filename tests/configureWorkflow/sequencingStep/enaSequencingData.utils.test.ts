@@ -38,6 +38,8 @@ const READ_RUNS: Record<string, ReadRun> = {
 describe("clearSequencingData", () => {
   test("returns nulls by default", () => {
     expect(clearSequencingData()).toEqual({
+      readRunPairedFile: null,
+      readRunSingleFile: null,
       readRunsPaired: null,
       readRunsSingle: null,
     });
@@ -45,6 +47,8 @@ describe("clearSequencingData", () => {
 
   test("returns empty arrays when provided []", () => {
     expect(clearSequencingData([])).toEqual({
+      readRunPairedFile: null,
+      readRunSingleFile: null,
       readRunsPaired: [],
       readRunsSingle: [],
     });
@@ -70,6 +74,15 @@ describe("getRowSelectionState", () => {
         readRunsPaired: CONFIGURED_INPUT.PAIRED,
         readRunsSingle: CONFIGURED_INPUT.SINGLE,
       })
+    ).toEqual({ P1: true, S1: true });
+  });
+
+  test("returns row selection state for scalar file fields", () => {
+    expect(
+      getRowSelectionState({
+        readRunPairedFile: CONFIGURED_INPUT.PAIRED[0],
+        readRunSingleFile: CONFIGURED_INPUT.SINGLE[0],
+      } as ConfiguredInput)
     ).toEqual({ P1: true, S1: true });
   });
 });
@@ -114,6 +127,20 @@ describe("getSelectedCount", () => {
     expect(
       getSelectedCount({
         readRunsPaired: CONFIGURED_INPUT.PAIRED,
+        readRunsSingle: CONFIGURED_INPUT.SINGLE,
+      } as ConfiguredInput)
+    ).toBe(2);
+  });
+
+  test("counts scalar file fields as 1 each", () => {
+    expect(
+      getSelectedCount({
+        readRunSingleFile: CONFIGURED_INPUT.SINGLE[0],
+      } as ConfiguredInput)
+    ).toBe(1);
+    expect(
+      getSelectedCount({
+        readRunPairedFile: CONFIGURED_INPUT.PAIRED[0],
         readRunsSingle: CONFIGURED_INPUT.SINGLE,
       } as ConfiguredInput)
     ).toBe(2);
@@ -184,6 +211,20 @@ describe("getUploadMyOwnSequencingData", () => {
   test("returns empty array for paired type", () => {
     expect(getUploadMyOwnSequencingData("readRunsPaired")).toEqual({
       readRunsPaired: [],
+      readRunsSingle: null,
+    });
+  });
+
+  test("returns null arrays for single-file type", () => {
+    expect(getUploadMyOwnSequencingData("readRunSingleFile")).toEqual({
+      readRunsPaired: null,
+      readRunsSingle: null,
+    });
+  });
+
+  test("returns null arrays for paired-file type", () => {
+    expect(getUploadMyOwnSequencingData("readRunPairedFile")).toEqual({
+      readRunsPaired: null,
       readRunsSingle: null,
     });
   });
