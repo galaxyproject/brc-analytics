@@ -6,8 +6,8 @@ import {
 import {
   Workflow as SourceWorkflow,
   WorkflowCategories as SourceWorkflowCategories,
-  WorkflowParameterVariable,
   Workflows as SourceWorkflows,
+  WorkflowParameterVariable,
   WorkflowScope,
 } from "../../schema/generated/schema";
 import { readYamlFile } from "./utils";
