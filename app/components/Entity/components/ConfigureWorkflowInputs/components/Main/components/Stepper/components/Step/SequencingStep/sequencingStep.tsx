@@ -1,7 +1,7 @@
 import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepContent/stepContent";
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
-import { JSX, useEffect } from "react";
+import { JSX, useCallback, useEffect } from "react";
 import { ToggleButtonGroup } from "../components/ToggleButtonGroup/toggleButtonGroup";
 import { useToggleButtonGroup } from "../hooks/UseToggleButtonGroup/useToggleButtonGroup";
 import { StepProps } from "../types";
@@ -39,7 +39,43 @@ export const SequencingStep = ({
   const columnFilters = useColumnFilters(workflow, stepKey);
   const rowSelection = useRowSelection(configuredInput);
   const state = { columnFilters, rowSelection };
-  const { actions, table } = useTable(enaTaxonomyId, state, onConfigure);
+
+  // For single-file steps, translate array-based selection output to scalar fields.
+  const wrappedOnConfigure: typeof onConfigure = useCallback(
+    (partialInput) => {
+      if (stepKey === "readRunSingleFile") {
+        const runs = partialInput.readRunsSingle;
+        if (runs !== undefined) {
+          onConfigure({
+            readRunSingleFile: runs && runs.length > 0 ? runs[0] : null,
+            readRunsSingle: null,
+          });
+          return;
+        }
+      }
+      if (stepKey === "readRunPairedFile") {
+        const runs = partialInput.readRunsPaired;
+        if (runs !== undefined) {
+          onConfigure({
+            readRunPairedFile: runs && runs.length > 0 ? runs[0] : null,
+            readRunsPaired: null,
+          });
+          return;
+        }
+      }
+      onConfigure(partialInput);
+    },
+    [onConfigure, stepKey]
+  );
+
+  const singleSelect =
+    stepKey === "readRunSingleFile" || stepKey === "readRunPairedFile";
+  const { actions, table } = useTable(
+    enaTaxonomyId,
+    state,
+    wrappedOnConfigure,
+    singleSelect
+  );
   const initialView =
     initialDataSourceView === VIEW.UPLOAD_MY_DATA
       ? VIEW.UPLOAD_MY_DATA
@@ -55,9 +91,9 @@ export const SequencingStep = ({
     // per mount, and the first ReferenceAssembly setup REPLACES state
     // before the second SequencingStep setup gets a chance to re-seed
     // readRunsPaired from the assistant handoff.
-    onConfigure(clearSequencingData());
-    onConfigure(getUploadMyOwnSequencingData(stepKey));
-  }, [initialDataSourceView, onConfigure, stepKey]);
+    wrappedOnConfigure(clearSequencingData());
+    wrappedOnConfigure(getUploadMyOwnSequencingData(stepKey));
+  }, [initialDataSourceView, wrappedOnConfigure, stepKey]);
 
   return (
     <Step active={active} completed={completed} index={index}>
@@ -65,9 +101,9 @@ export const SequencingStep = ({
       <StepContent>
         <ToggleButtonGroup
           onChange={(e, v) => {
-            onConfigure(clearSequencingData());
+            wrappedOnConfigure(clearSequencingData());
             if (v === VIEW.UPLOAD_MY_DATA) {
-              onConfigure(getUploadMyOwnSequencingData(stepKey));
+              wrappedOnConfigure(getUploadMyOwnSequencingData(stepKey));
             }
             onChange?.(e, v);
           }}
@@ -79,7 +115,7 @@ export const SequencingStep = ({
             enaAccessionActions={enaAccession.actions}
             enaAccessionStatus={enaAccession.status}
             enaTaxonomyId={enaTaxonomyId}
-            onConfigure={onConfigure}
+            onConfigure={wrappedOnConfigure}
             requirementsMatches={requirementsMatches}
             selectedCount={getSelectedCount(configuredInput)}
             switchBrowseMethod={actions.switchBrowseMethod}
