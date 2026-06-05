@@ -1,4 +1,3 @@
-import { Title } from "@databiosphere/findable-ui/lib/components/common/Title/title";
 import styled from "@emotion/styled";
 import { Box, Stack } from "@mui/material";
 import { sectionLayout } from "../../components/Layout/components/AppLayout/components/Section/section.styles";
@@ -8,12 +7,6 @@ export const StyledSection = styled.section`
   flex-direction: column;
   flex: 1;
   width: 100%;
-`;
-
-export const StyledTitle = styled(Title)`
-  & {
-    line-height: 56px;
-  }
 `;
 
 export const SectionContent = styled(Stack)`

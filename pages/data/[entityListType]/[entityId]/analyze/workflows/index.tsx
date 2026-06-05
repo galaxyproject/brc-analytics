@@ -7,6 +7,7 @@ import {
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
 import { getPageMeta } from "../../../../../../app/common/meta/utils";
+import { EntityDataGate } from "../../../../../../app/components/EntityDataGate/entityDataGate";
 import { config } from "../../../../../../app/config/config";
 import { getEntities } from "../../../../../../app/utils/entityUtils";
 import { seedDatabase } from "../../../../../../app/utils/seedDatabase";
@@ -73,7 +74,11 @@ export const getStaticProps: GetStaticProps<Props> = async ({
  * @returns Analyze Workflows view component.
  */
 const Page = (props: Props): JSX.Element => {
-  return <AnalyzeWorkflowsView entityId={props.entityId} />;
+  return (
+    <EntityDataGate>
+      <AnalyzeWorkflowsView entityId={props.entityId} />
+    </EntityDataGate>
+  );
 };
 
 export default Page;

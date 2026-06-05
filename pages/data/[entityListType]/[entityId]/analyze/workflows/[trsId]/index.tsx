@@ -9,6 +9,7 @@ import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
 import { EntitiesResponse } from "../../../../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { getPageMeta } from "../../../../../../../app/common/meta/utils";
+import { EntityDataGate } from "../../../../../../../app/components/EntityDataGate/entityDataGate";
 import { config } from "../../../../../../../app/config/config";
 import { getEntities } from "../../../../../../../app/utils/entityUtils";
 import { seedDatabase } from "../../../../../../../app/utils/seedDatabase";
@@ -92,15 +93,18 @@ export const getStaticProps = async (
 };
 
 const Page = (props: Props): JSX.Element => {
-  if (props.entityListType === "organisms") {
-    return (
-      <OrganismWorkflowInputsView
-        entityId={props.entityId}
-        trsId={props.trsId}
-      />
-    );
-  }
-  return <WorkflowInputsView {...props} />;
+  return (
+    <EntityDataGate>
+      {props.entityListType === "organisms" ? (
+        <OrganismWorkflowInputsView
+          entityId={props.entityId}
+          trsId={props.trsId}
+        />
+      ) : (
+        <WorkflowInputsView {...props} />
+      )}
+    </EntityDataGate>
+  );
 };
 
 export default Page;

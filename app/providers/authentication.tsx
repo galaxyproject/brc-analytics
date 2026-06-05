@@ -8,6 +8,10 @@ import {
   useState,
 } from "react";
 
+// Optional base URL for the BFF auth endpoints. Empty = same-origin (the
+// deployed case, where nginx routes /api/v1/* to the backend). Set it only for
+// cross-origin local dev (frontend :3000 -> backend :8000). It is NOT a gate --
+// loginEnabled alone controls whether the login UI shows.
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "";
 
 interface BrcUser {
@@ -53,7 +57,7 @@ export function BrcAuthProvider({
   const [user, setUser] = useState<BrcUser | null>(null);
 
   useEffect(() => {
-    if (!loginEnabled || !BACKEND_URL) {
+    if (!loginEnabled) {
       setIsLoading(false);
       return;
     }
@@ -93,7 +97,7 @@ export function BrcAuthProvider({
     <AuthContext.Provider
       value={{
         isAuthenticated: !!user,
-        isConfigured: loginEnabled && !!BACKEND_URL,
+        isConfigured: loginEnabled,
         isLoading,
         login,
         logout,
