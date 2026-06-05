@@ -5,9 +5,9 @@ import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/m
 import { Alert } from "@mui/material";
 import { RowData } from "@tanstack/react-table";
 import { JSX } from "react";
-import WORKFLOW_CATEGORIES from "../../../../../catalog/output/workflows.json";
 import { ROUTES } from "../../../../../routes/constants";
 import { Table } from "../../../../components/common/Table/table";
+import { getWorkflows } from "../../../../services/workflows/entities";
 import { Accordion } from "../../../AnalyzeWorkflowsView/components/Main/components/Accordion/accordion";
 import { EmptyState } from "./components/EmptyState/emptyState";
 import { StyledSectionTitle } from "./main.styles";
@@ -34,7 +34,7 @@ export const Main = <T extends RowData>({
   const isAssemblyWorkflowsEnabled = useFeatureFlag("assembly-workflows");
   const workflowCategories = buildOrganismWorkflows(
     organism,
-    WORKFLOW_CATEGORIES,
+    getWorkflows(),
     isAssemblyWorkflowsEnabled
   );
   return (
