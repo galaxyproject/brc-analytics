@@ -99,11 +99,15 @@ function getAssemblyScopeConfiguredValues(
   if (requiredParams.GENE_MODEL_URL && geneModelUrl === null) return;
   if (requiredParams.SANGER_READ_RUN_SINGLE && !readRunsSingle) return;
   if (requiredParams.SANGER_READ_RUN_PAIRED && !readRunsPaired) return;
-  if (requiredParams.SANGER_READ_RUN_SINGLE_FILE && !readRunSingleFile) return;
+  if (
+    requiredParams.SANGER_READ_RUN_SINGLE_FILE &&
+    readRunSingleFile === undefined
+  )
+    return;
   if (
     (requiredParams.SANGER_READ_RUN_FORWARD_FILE ||
       requiredParams.SANGER_READ_RUN_REVERSE_FILE) &&
-    !readRunPairedFile
+    readRunPairedFile === undefined
   )
     return;
 
@@ -147,11 +151,15 @@ function getOrganismScopeConfiguredValues(
 
   if (requiredParams.SANGER_READ_RUN_SINGLE && !readRunsSingle) return;
   if (requiredParams.SANGER_READ_RUN_PAIRED && !readRunsPaired) return;
-  if (requiredParams.SANGER_READ_RUN_SINGLE_FILE && !readRunSingleFile) return;
+  if (
+    requiredParams.SANGER_READ_RUN_SINGLE_FILE &&
+    readRunSingleFile === undefined
+  )
+    return;
   if (
     (requiredParams.SANGER_READ_RUN_FORWARD_FILE ||
       requiredParams.SANGER_READ_RUN_REVERSE_FILE) &&
-    !readRunPairedFile
+    readRunPairedFile === undefined
   )
     return;
 
