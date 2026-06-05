@@ -16,7 +16,7 @@ export const Headline = (): JSX.Element => {
         href="/learn/assistant"
         underline={LINK_PROPS.UNDERLINE.NONE}
       >
-        About the Assistant
+        <span>About the Assistant</span>
         <ArrowForwardRounded fontSize={SVG_ICON_PROPS.FONT_SIZE.XXSMALL} />
       </StyledLink>
     </StyledStack>
