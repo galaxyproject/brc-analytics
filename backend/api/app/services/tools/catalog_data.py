@@ -10,6 +10,13 @@ from typing import Any, Dict, List, Optional, Set
 
 logger = logging.getLogger(__name__)
 
+# NOTE: the workflow/organism compatibility rule (taxonomy lineage + ploidy +
+# assembly-id requirement) below is duplicated in three other places that drift
+# out of sync -- the MCP server's catalog_data.py, the frontend's
+# AnalyzeWorkflowsView/components/Main/utils.ts, and the catalog build's
+# build-workflow-mappings.ts. #1319 was caused by that drift. Consolidating to a
+# single source of truth is tracked in #1327; until then, change all four together.
+
 # Ploidy compatibility: a workflow is compatible when its ploidy is ANY
 # or matches at least one of the organism's ploidy values.
 _PLOIDY_ANY = "ANY"
