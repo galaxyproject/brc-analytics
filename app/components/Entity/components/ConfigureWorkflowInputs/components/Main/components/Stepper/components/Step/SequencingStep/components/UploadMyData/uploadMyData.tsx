@@ -2,7 +2,7 @@ import { ALERT_PROPS } from "@databiosphere/findable-ui/lib/components/common/Al
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { AlertTitle, Typography } from "@mui/material";
 import { JSX } from "react";
-import { AppLink } from "../../../../../../../../../../../../../components/common/AppLink/appLink";
+import { AppLink } from "app/components/common/AppLink/appLink";
 import { StyledAlert } from "./uploadMyData.styles";
 
 export const UploadMyData = (): JSX.Element => {
