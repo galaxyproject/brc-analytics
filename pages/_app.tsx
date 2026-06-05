@@ -27,6 +27,7 @@ import { OgMeta } from "../app/components/common/OgMeta/ogMeta";
 import { StyledFooter } from "../app/components/Layout/components/Footer/footer.styles";
 import { config } from "../app/config/config";
 import { BrcAuthProvider } from "../app/providers/authentication";
+import { EntitiesLoadedProvider } from "../app/providers/entitiesLoaded/provider";
 import { useEntities } from "../app/services/workflows/hooks/UseEntities/hook";
 import "../app/styles/fonts/fonts.css";
 import { mergeAppTheme } from "../app/theme/theme";
@@ -56,7 +57,8 @@ const queryClient = new QueryClient();
 function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
   // Set up the site configuration, layout and theme.
   const appConfig = config();
-  // Load entities into the in-memory cache.
+  // Kick off entity cache load and distribute the boolean via context so
+  // per-page EntityDataGate consumers share a single source of truth.
   const isEntitiesLoaded = useEntities();
   const {
     layout,
@@ -87,24 +89,18 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
     };
   }, [header, isAssistantEnabled]);
 
-  const ogMeta = (
-    <OgMeta
-      appTitle={appConfig.appTitle}
-      browserURL={appConfig.browserURL}
-      defaultDescription={getDefaultDescription(appConfig.appKey)}
-      pageDescription={pageDescription}
-      pageTitle={pageTitle}
-    />
-  );
-
-  if (!isEntitiesLoaded) return ogMeta;
-
   return (
     <EmotionThemeProvider theme={appTheme}>
       <ThemeProvider theme={appTheme}>
         <DXConfigProvider config={appConfig} entityListType={entityListType}>
           <Head pageTitle={pageTitle} />
-          {ogMeta}
+          <OgMeta
+            appTitle={appConfig.appTitle}
+            browserURL={appConfig.browserURL}
+            defaultDescription={getDefaultDescription(appConfig.appKey)}
+            pageDescription={pageDescription}
+            pageTitle={pageTitle}
+          />
           <CssBaseline />
           <QueryClientProvider client={queryClient}>
             <ServicesProvider>
@@ -131,8 +127,10 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
                               />
                             )}
                           >
-                            <Component {...pageProps} />
-                            <Floating {...floating} />
+                            <EntitiesLoadedProvider value={isEntitiesLoaded}>
+                              <Component {...pageProps} />
+                              <Floating {...floating} />
+                            </EntitiesLoadedProvider>
                           </ErrorBoundary>
                         </Main>
                       </ExploreStateProvider>

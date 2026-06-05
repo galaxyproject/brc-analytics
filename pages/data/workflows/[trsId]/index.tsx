@@ -2,6 +2,7 @@ import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
 import { getPageMeta } from "../../../../app/common/meta/utils";
+import { EntityDataGate } from "../../../../app/components/EntityDataGate/entityDataGate";
 import { config } from "../../../../app/config/config";
 import { formatTrsId } from "../../../../app/views/AnalyzeWorkflowsView/components/Main/utils";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../app/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
@@ -68,7 +69,11 @@ export const getStaticProps: GetStaticProps<Props> = async ({
  * @returns Workflow view component.
  */
 const Page = (props: Props): JSX.Element => {
-  return <WorkflowView {...props} />;
+  return (
+    <EntityDataGate>
+      <WorkflowView {...props} />
+    </EntityDataGate>
+  );
 };
 
 export default Page;

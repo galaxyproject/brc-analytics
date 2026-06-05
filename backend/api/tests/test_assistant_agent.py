@@ -124,6 +124,130 @@ class TestParseStructuredOutput:
         _, _, updates = agent._parse_structured_output(raw)
         assert updates == {"organism": "E. coli"}
 
+    # ---- catalog-grounded suggestion chips (#1297) ----
+
+    def test_tagged_chip_in_catalog_kept(self, agent):
+        agent.catalog.find_organism_exact.return_value = {"species": "Candida albicans"}
+        raw = (
+            'SUGGESTIONS: [{"label": "Use Candida albicans", '
+            '"organism": "Candida albicans"}]'
+        )
+        _, suggestions, _ = agent._parse_structured_output(raw)
+        assert len(suggestions) == 1
+        assert suggestions[0].label == "Use Candida albicans"
+        assert suggestions[0].message == "Use Candida albicans"
+
+    def test_tagged_organism_not_in_catalog_dropped(self, agent):
+        agent.catalog.find_organism_exact.return_value = None
+        raw = (
+            'SUGGESTIONS: [{"label": "Use C. glabrata", '
+            '"organism": "Candida glabrata"}]'
+        )
+        text, suggestions, _ = agent._parse_structured_output(raw)
+        assert suggestions == []
+        # The dropped chip must not leak into the visible reply text.
+        assert "glabrata" not in text
+
+    def test_mixed_string_and_tagged_chips(self, agent):
+        agent.catalog.find_organism_exact.return_value = None
+        raw = (
+            'SUGGESTIONS: ["Tell me about variant calling", '
+            '{"label": "Use C. glabrata", "organism": "Candida glabrata"}]'
+        )
+        _, suggestions, _ = agent._parse_structured_output(raw)
+        assert len(suggestions) == 1
+        assert suggestions[0].label == "Tell me about variant calling"
+
+    def test_tagged_assembly_not_in_catalog_dropped(self, agent):
+        agent.catalog.get_assembly_details.return_value = None
+        raw = (
+            'SUGGESTIONS: [{"label": "Use GCF_999999999.9", '
+            '"assembly": "GCF_999999999.9"}]'
+        )
+        _, suggestions, _ = agent._parse_structured_output(raw)
+        assert suggestions == []
+
+    def test_tagged_workflow_not_in_catalog_dropped(self, agent):
+        agent.catalog.get_workflow_details.return_value = None
+        raw = (
+            'SUGGESTIONS: [{"label": "Run mystery workflow", '
+            '"workflow": "not-a-real-iwc-id"}]'
+        )
+        _, suggestions, _ = agent._parse_structured_output(raw)
+        assert suggestions == []
+
+    def test_tagged_chip_without_label_dropped(self, agent):
+        agent.catalog.find_organism_exact.return_value = {"species": "Candida albicans"}
+        raw = 'SUGGESTIONS: [{"organism": "Candida albicans"}]'
+        _, suggestions, _ = agent._parse_structured_output(raw)
+        assert suggestions == []
+
+    def test_tagged_organism_mixed_case_key_is_validated(self, agent):
+        # A capital "Organism" key must NOT bypass validation.
+        agent.catalog.find_organism_exact.return_value = None
+        raw = (
+            'SUGGESTIONS: [{"label": "Use C. glabrata", '
+            '"Organism": "Candida glabrata"}]'
+        )
+        _, suggestions, _ = agent._parse_structured_output(raw)
+        assert suggestions == []
+
+    def test_tagged_empty_entity_treated_as_untagged(self, agent):
+        # An empty/whitespace tag is treated as absent -- the chip passes as a
+        # generic action chip (the catalog is never consulted).
+        raw = 'SUGGESTIONS: [{"label": "Sounds good", "organism": "   "}]'
+        _, suggestions, _ = agent._parse_structured_output(raw)
+        assert len(suggestions) == 1
+        assert suggestions[0].label == "Sounds good"
+        agent.catalog.find_organism_exact.assert_not_called()
+
+    def test_tagged_chip_dropped_if_any_entity_invalid(self, agent):
+        # Organism resolves but the assembly doesn't -- the whole chip is dropped.
+        agent.catalog.find_organism_exact.return_value = {"species": "Yeast"}
+        agent.catalog.get_assembly_details.return_value = None
+        raw = (
+            'SUGGESTIONS: [{"label": "Use this combo", '
+            '"organism": "Saccharomyces cerevisiae", "assembly": "GCA_bogus.1"}]'
+        )
+        _, suggestions, _ = agent._parse_structured_output(raw)
+        assert suggestions == []
+
+    def test_tagged_non_string_entity_is_validated_not_bypassed(self, agent):
+        # A non-string entity value (e.g. a numeric taxid) must still be
+        # validated, not silently passed through (codex re-review regression).
+        agent.catalog.find_organism_exact.return_value = None
+        raw = 'SUGGESTIONS: [{"label": "Use C. glabrata", "organism": 5476}]'
+        _, suggestions, _ = agent._parse_structured_output(raw)
+        assert suggestions == []
+        agent.catalog.find_organism_exact.assert_called_once_with("5476")
+
+    def test_tagged_numeric_taxid_validated_and_kept(self, agent):
+        # A valid numeric taxid is coerced to a string, validated, and kept.
+        agent.catalog.find_organism_exact.return_value = {
+            "species": "Plasmodium falciparum"
+        }
+        raw = 'SUGGESTIONS: [{"label": "Use P. falciparum", "organism": 5833}]'
+        _, suggestions, _ = agent._parse_structured_output(raw)
+        assert len(suggestions) == 1
+        assert suggestions[0].label == "Use P. falciparum"
+
+    def test_tagged_chip_with_non_string_label_dropped(self, agent):
+        # A null label must be dropped, not coerced into the literal "None".
+        agent.catalog.find_organism_exact.return_value = {"species": "Yeast"}
+        raw = 'SUGGESTIONS: [{"label": null, "organism": "Saccharomyces cerevisiae"}]'
+        _, suggestions, _ = agent._parse_structured_output(raw)
+        assert suggestions == []
+
+    def test_tagged_entity_key_with_trailing_space_is_validated(self, agent):
+        # A key like "organism " (trailing space) must not bypass validation.
+        agent.catalog.find_organism_exact.return_value = None
+        raw = (
+            'SUGGESTIONS: [{"label": "Use C. glabrata", '
+            '"organism ": "Candida glabrata"}]'
+        )
+        _, suggestions, _ = agent._parse_structured_output(raw)
+        assert suggestions == []
+
 
 # ---------- _apply_schema_updates ----------
 

@@ -17,6 +17,13 @@ export const CARDS: ComponentProps<typeof SectionContentCard>[] = [
     title: "Getting Started",
   },
   {
+    StartIcon: SmartToyIcon,
+    cardUrl: "/learn/assistant",
+    secondaryText:
+      "Set up an analysis by chatting in plain language, then hand off to Galaxy to run it.",
+    title: "About the Assistant",
+  },
+  {
     StartIcon: GalaxyIcon,
     cardUrl: "/learn/using-galaxy",
     secondaryText:

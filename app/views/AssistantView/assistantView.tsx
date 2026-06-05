@@ -1,6 +1,6 @@
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import { Box, Button } from "@mui/material";
+import { Button } from "@mui/material";
 import Error from "next/error";
 import { JSX, useEffect, useState } from "react";
 import { ChatPanel, SchemaPanel } from "../../components/Assistant";
@@ -13,9 +13,9 @@ import {
   SchemaColumn,
   SectionContent,
   StyledSection,
-  StyledTitle,
   TwoPanelLayout,
 } from "./assistantView.styles";
+import { Headline } from "./components/Headline/headline";
 
 export const AssistantView = (): JSX.Element => {
   const isAssistantEnabled = useFeatureFlag("assistant");
@@ -57,24 +57,16 @@ export const AssistantView = (): JSX.Element => {
   return (
     <StyledSection>
       <SectionContent>
-        <StyledTitle>Analysis Assistant (Beta)</StyledTitle>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "flex-end",
-            pb: 1,
-          }}
+        <Headline />
+        <Button
+          onClick={resetSession}
+          size="small"
+          startIcon={<RestartAltIcon />}
+          sx={{ visibility: showReset ? "visible" : "hidden" }}
+          variant="text"
         >
-          <Button
-            onClick={resetSession}
-            size="small"
-            startIcon={<RestartAltIcon />}
-            sx={{ visibility: showReset ? "visible" : "hidden" }}
-            variant="text"
-          >
-            New Conversation
-          </Button>
-        </Box>
+          New Conversation
+        </Button>
         <TwoPanelLayout>
           <ChatColumn>
             <ChatPanel

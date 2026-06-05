@@ -27,6 +27,10 @@ const APP_TITLE = "BRC Analytics";
 const BROWSER_URL = LOCALHOST;
 const GIT_HUB_REPO_URL = "https://github.com/galaxyproject/brc-analytics";
 
+// Login UI is gated by a build-time env var so deployments (the playbook) flip
+// it per environment without an app-code change. Defaults off when unset.
+const LOGIN_ENABLED = process.env.NEXT_PUBLIC_LOGIN_ENABLED === "true";
+
 /**
  * Make site config object.
  * @param browserUrl - Browser URL.
@@ -48,7 +52,7 @@ export function makeConfig(
   browserUrl: string,
   gitHubUrl = GIT_HUB_REPO_URL,
   taxTreeData = data as TaxonomyNode,
-  loginEnabled = false
+  loginEnabled = LOGIN_ENABLED
 ): AppSiteConfig {
   return {
     appKey: APP_KEYS.BRC_ANALYTICS,
