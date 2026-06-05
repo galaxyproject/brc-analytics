@@ -333,3 +333,119 @@ class TestCompatibilityCheck:
         )
         assert result["compatible"] is False
         assert "not found" in result["reason"].lower()
+
+
+# ---------- Lineage-based taxonomy matching (#1319) ----------
+
+LINEAGE_ORGANISMS = [
+    {
+        "ncbiTaxonomyId": 562,
+        "taxonomicLevelSpecies": "Escherichia coli",
+        "taxonomicLevelGenus": "Escherichia",
+        "commonName": "E. coli",
+        "assemblyCount": 1,
+        "taxonomicGroup": ["Bacteria"],
+        "genomes": [
+            {
+                "accession": "GCF_000005845.2",
+                "taxonomicLevelSpecies": "Escherichia coli",
+                "isRef": "Yes",
+                "level": "Complete Genome",
+                "ploidy": ["HAPLOID"],
+                "geneModelUrl": "https://example.com/ecoli.gtf",
+                "ncbiTaxonomyId": 562,
+                "speciesTaxonomyId": 562,
+                # Bacteria (2) is an ancestor of E. coli (562)
+                "lineageTaxonomyIds": ["1", "131567", "2", "1224", "561", "562"],
+            },
+        ],
+    },
+    {
+        "ncbiTaxonomyId": 559292,
+        "taxonomicLevelSpecies": "Saccharomyces cerevisiae",
+        "taxonomicLevelGenus": "Saccharomyces",
+        "commonName": "yeast",
+        "assemblyCount": 1,
+        "taxonomicGroup": ["Fungi"],
+        "genomes": [
+            {
+                "accession": "GCF_000146045.2",
+                "taxonomicLevelSpecies": "Saccharomyces cerevisiae",
+                "isRef": "Yes",
+                "level": "Chromosome",
+                "ploidy": ["HAPLOID"],
+                "ncbiTaxonomyId": 559292,
+                "speciesTaxonomyId": 559292,
+                # Fungal lineage -- Bacteria (2) is NOT present
+                "lineageTaxonomyIds": ["1", "131567", "2759", "4751", "4932", "559292"],
+            },
+        ],
+    },
+]
+
+LINEAGE_WORKFLOWS = [
+    {
+        "category": "ANNOTATION",
+        "name": "Annotation",
+        "description": "Annotation workflows",
+        "workflows": [
+            {
+                "iwcId": "amr-gene-detection",
+                "workflowName": "AMR Gene Detection",
+                "workflowDescription": "Bacterial AMR gene detection",
+                "ploidy": "HAPLOID",
+                "taxonomyId": 2,  # Bacteria -- applies to all descendant taxa
+                "trsId": "#workflow/github.com/iwc/amr/main",
+                "parameters": [],
+            },
+            {
+                "iwcId": "generic-assembly",
+                "workflowName": "Generic Assembly",
+                "workflowDescription": "Taxon-agnostic assembly",
+                "ploidy": "ANY",
+                "taxonomyId": None,
+                "trsId": "#workflow/github.com/iwc/assembly/main",
+                "parameters": [],
+            },
+        ],
+    },
+]
+
+
+@pytest.fixture()
+def lineage_catalog(tmp_path):
+    (tmp_path / "organisms.json").write_text(json.dumps(LINEAGE_ORGANISMS))
+    (tmp_path / "workflows.json").write_text(json.dumps(LINEAGE_WORKFLOWS))
+    return CatalogData(str(tmp_path))
+
+
+class TestLineageTaxonomyMatching:
+    def test_compatible_includes_ancestor_targeted_workflow(self, lineage_catalog):
+        # E. coli (562); AMR workflow targets Bacteria (2), which is in its
+        # lineage, so it should be returned even though 2 != 562.
+        wfs = lineage_catalog.get_compatible_workflows(["HAPLOID"], taxonomy_id="562")
+        iwc_ids = {w["iwc_id"] for w in wfs}
+        assert "amr-gene-detection" in iwc_ids
+
+    def test_compatible_excludes_unrelated_lineage(self, lineage_catalog):
+        # Yeast (559292) is a fungus; Bacteria (2) is not in its lineage, so
+        # the Bacteria-targeted AMR workflow should not be returned.
+        wfs = lineage_catalog.get_compatible_workflows(
+            ["HAPLOID"], taxonomy_id="559292"
+        )
+        iwc_ids = {w["iwc_id"] for w in wfs}
+        assert "amr-gene-detection" not in iwc_ids
+
+    def test_check_compatible_with_descendant_assembly(self, lineage_catalog):
+        result = lineage_catalog.check_workflow_assembly_compatibility(
+            "amr-gene-detection", "GCF_000005845.2"
+        )
+        assert result["compatible"] is True
+        assert result["issues"] == []
+
+    def test_check_incompatible_with_unrelated_assembly(self, lineage_catalog):
+        result = lineage_catalog.check_workflow_assembly_compatibility(
+            "amr-gene-detection", "GCF_000146045.2"
+        )
+        assert result["compatible"] is False
+        assert any("taxonom" in issue.lower() for issue in result["issues"])
