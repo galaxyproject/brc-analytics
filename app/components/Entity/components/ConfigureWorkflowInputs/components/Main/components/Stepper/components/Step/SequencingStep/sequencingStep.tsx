@@ -40,10 +40,13 @@ export const SequencingStep = ({
   const rowSelection = useRowSelection(configuredInput);
   const state = { columnFilters, rowSelection };
 
+  const isSingleFileStep = stepKey === "readRunSingleFile";
+  const isPairedFileStep = stepKey === "readRunPairedFile";
+
   // For single-file steps, translate array-based selection output to scalar fields.
   const wrappedOnConfigure: typeof onConfigure = useCallback(
     (partialInput) => {
-      if (stepKey === "readRunSingleFile") {
+      if (isSingleFileStep) {
         const runs = partialInput.readRunsSingle;
         if (runs !== undefined) {
           onConfigure({
@@ -53,7 +56,7 @@ export const SequencingStep = ({
           return;
         }
       }
-      if (stepKey === "readRunPairedFile") {
+      if (isPairedFileStep) {
         const runs = partialInput.readRunsPaired;
         if (runs !== undefined) {
           onConfigure({
@@ -65,11 +68,10 @@ export const SequencingStep = ({
       }
       onConfigure(partialInput);
     },
-    [onConfigure, stepKey]
+    [isPairedFileStep, isSingleFileStep, onConfigure]
   );
 
-  const singleSelect =
-    stepKey === "readRunSingleFile" || stepKey === "readRunPairedFile";
+  const singleSelect = isSingleFileStep || isPairedFileStep;
   const { actions, table } = useTable(
     enaTaxonomyId,
     state,

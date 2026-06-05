@@ -568,7 +568,6 @@ function buildSingleReadRunRequestValue(
   if (!run) return null;
   const { forward } = getSingleRunUrlsInfo(run.urls, run.md5Hashes);
   return {
-    dbKey: run.runAccession,
     ext: FILE_EXT.FASTQ_SANGER_GZ,
     hashes: createMd5Hash(forward.md5),
     identifier: run.runAccession,
@@ -582,7 +581,6 @@ function buildForwardReadRunRequestValue(
   if (!run) return null;
   const { forward } = getPairedRunUrlsInfo(run.urls, run.md5Hashes);
   return {
-    dbKey: run.runAccession,
     ext: FILE_EXT.FASTQ_SANGER_GZ,
     hashes: createMd5Hash(forward.md5),
     identifier: run.runAccession,
@@ -596,7 +594,6 @@ function buildReverseReadRunRequestValue(
   if (!run) return null;
   const { reverse } = getPairedRunUrlsInfo(run.urls, run.md5Hashes);
   return {
-    dbKey: run.runAccession,
     ext: FILE_EXT.FASTQ_SANGER_GZ,
     hashes: createMd5Hash(reverse.md5),
     identifier: run.runAccession,
