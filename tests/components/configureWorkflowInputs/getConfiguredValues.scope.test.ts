@@ -201,9 +201,33 @@ describe("getConfiguredValues - scope-based logic", () => {
         scope: WORKFLOW_SCOPE.ORGANISM,
       };
 
-      const result = getConfiguredValues(BASE_CONFIGURED_INPUT, workflow);
+      const configuredInput: ConfiguredInput = {
+        ...BASE_CONFIGURED_INPUT,
+        readRunSingleFile: undefined,
+      };
+
+      const result = getConfiguredValues(configuredInput, workflow);
 
       expect(result).toBeUndefined();
+    });
+
+    test("returns value when single-file reads are null (user upload)", () => {
+      const workflow: Workflow = {
+        ...BASE_WORKFLOW,
+        parameters: [
+          {
+            key: "Single FASTQ",
+            variable: WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE_FILE,
+          },
+        ],
+        scope: WORKFLOW_SCOPE.ORGANISM,
+      };
+
+      const result = getConfiguredValues(BASE_CONFIGURED_INPUT, workflow);
+
+      expect(result).toBeDefined();
+      expect(result?._scope).toBe("ORGANISM");
+      expect(result).toHaveProperty("readRunSingleFile", null);
     });
 
     test("returns value when required single-file reads are provided", () => {
@@ -249,9 +273,37 @@ describe("getConfiguredValues - scope-based logic", () => {
         scope: WORKFLOW_SCOPE.ORGANISM,
       };
 
-      const result = getConfiguredValues(BASE_CONFIGURED_INPUT, workflow);
+      const configuredInput: ConfiguredInput = {
+        ...BASE_CONFIGURED_INPUT,
+        readRunPairedFile: undefined,
+      };
+
+      const result = getConfiguredValues(configuredInput, workflow);
 
       expect(result).toBeUndefined();
+    });
+
+    test("returns value when paired-file reads are null (user upload)", () => {
+      const workflow: Workflow = {
+        ...BASE_WORKFLOW,
+        parameters: [
+          {
+            key: "Forward reads",
+            variable: WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_FORWARD_FILE,
+          },
+          {
+            key: "Reverse reads",
+            variable: WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_REVERSE_FILE,
+          },
+        ],
+        scope: WORKFLOW_SCOPE.ORGANISM,
+      };
+
+      const result = getConfiguredValues(BASE_CONFIGURED_INPUT, workflow);
+
+      expect(result).toBeDefined();
+      expect(result?._scope).toBe("ORGANISM");
+      expect(result).toHaveProperty("readRunPairedFile", null);
     });
 
     test("returns value when required paired-file reads are provided", () => {
