@@ -14,6 +14,7 @@ from .generated_schema.schema import (
     Workflow,
     WorkflowCategoryId,
     WorkflowParameter,
+    WorkflowParameterVariable,
     WorkflowPloidy,
     Workflows,
 )
@@ -461,6 +462,24 @@ def to_workflows_yaml(
     else:
         final_workflows = sorted_workflows
 
+    # Validate paired-file parameter consistency in final active workflows
+    paired_file_inconsistent: List[str] = []
+    for wf in final_workflows:
+        if not getattr(wf, "active", False):
+            continue
+        variables = [
+            p.variable for p in (wf.parameters or []) if p.variable is not None
+        ]
+        has_forward = (
+            WorkflowParameterVariable.SANGER_READ_RUN_FORWARD_FILE in variables
+        )
+        has_reverse = (
+            WorkflowParameterVariable.SANGER_READ_RUN_REVERSE_FILE in variables
+        )
+        if has_forward != has_reverse:
+            trs_base = wf.trs_id.rsplit("/versions/v", 1)[0]
+            paired_file_inconsistent.append(trs_base)
+
     with open(workflows_path, "w") as out:
         yaml.safe_dump(
             Workflows(workflows=final_workflows).model_dump(exclude_none=True),
@@ -618,6 +637,7 @@ def to_workflows_yaml(
             new_workflow_qc_items,
             inactive_workflows,
             excluded_iwc_workflows,
+            paired_file_inconsistent,
             qc_report_path,
         )
 
@@ -706,6 +726,7 @@ def write_workflows_qc_report(
     new_workflow_qc_items: List[Dict[str, str]],
     inactive_workflows: List[Dict[str, Any]],
     excluded_iwc_workflows: List[Dict[str, str]],
+    paired_file_inconsistent: List[str],
     out_path: str,
 ):
     """Write a modular Markdown QC report for workflows using shared qc_utils."""
@@ -769,6 +790,12 @@ def write_workflows_qc_report(
     ]
     report_lines += format_list_section(
         "## Workflows with multiple valid categories", multiple_valid_items
+    )
+
+    # Section: Workflows with inconsistent paired-file parameters
+    report_lines += format_list_section(
+        "## Workflows with inconsistent paired-file parameters (forward/reverse must both be present or both absent)",
+        sorted(set(paired_file_inconsistent)),
     )
 
     # Section 5: Parameter changes (stale and new, grouped by workflow)
