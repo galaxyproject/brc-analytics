@@ -13,7 +13,12 @@ import { ReadRun } from "./types";
 export function clearSequencingData(
   value: EnaSequencingReads[] | null = null
 ): Partial<ConfiguredInput> {
-  return { readRunsPaired: value, readRunsSingle: value };
+  return {
+    readRunPairedFile: null,
+    readRunSingleFile: null,
+    readRunsPaired: value,
+    readRunsSingle: value,
+  };
 }
 
 /**
@@ -22,8 +27,18 @@ export function clearSequencingData(
  * @returns Number of selected sequencing runs.
  */
 export function getSelectedCount(configuredInput: ConfiguredInput): number {
-  const { readRunsPaired, readRunsSingle } = configuredInput;
-  return (readRunsPaired?.length ?? 0) + (readRunsSingle?.length ?? 0);
+  const {
+    readRunPairedFile,
+    readRunSingleFile,
+    readRunsPaired,
+    readRunsSingle,
+  } = configuredInput;
+  return (
+    (readRunPairedFile ? 1 : 0) +
+    (readRunsPaired?.length ?? 0) +
+    (readRunSingleFile ? 1 : 0) +
+    (readRunsSingle?.length ?? 0)
+  );
 }
 
 /**
@@ -85,6 +100,13 @@ export function getUploadMyOwnSequencingData(
 ): Partial<ConfiguredInput> {
   if (stepKey === SEQUENCING_DATA_TYPE.READ_RUNS_ANY) {
     return { readRunsPaired: [], readRunsSingle: [] };
+  }
+
+  if (
+    stepKey === SEQUENCING_DATA_TYPE.READ_RUNS_SINGLE_FILE ||
+    stepKey === SEQUENCING_DATA_TYPE.READ_RUNS_PAIRED_FILE
+  ) {
+    return { readRunsPaired: null, readRunsSingle: null };
   }
 
   return { readRunsPaired: null, readRunsSingle: null, [stepKey]: [] };

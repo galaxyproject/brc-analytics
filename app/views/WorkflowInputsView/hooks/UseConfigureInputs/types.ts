@@ -19,6 +19,8 @@ export interface ConfiguredInput {
   numberOfHits?: number;
   primaryContrasts?: PrimaryContrasts | null;
   primaryFactor?: string | null;
+  readRunPairedFile?: EnaSequencingReads | null;
+  readRunSingleFile?: EnaSequencingReads | null;
   readRunsPaired?: EnaSequencingReads[] | null;
   readRunsSingle?: EnaSequencingReads[] | null;
   referenceAssembly?: string;

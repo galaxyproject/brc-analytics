@@ -9,10 +9,17 @@ import { ConfiguredInput } from "../../../../../../../../../../../../../../../..
 export function getRowSelectionState(
   configuredInput: ConfiguredInput
 ): RowSelectionState {
-  return [
+  const runs = [
     ...(configuredInput.readRunsPaired ?? []),
     ...(configuredInput.readRunsSingle ?? []),
-  ].reduce<RowSelectionState>((acc, run) => {
+  ];
+  if (configuredInput.readRunPairedFile) {
+    runs.push(configuredInput.readRunPairedFile);
+  }
+  if (configuredInput.readRunSingleFile) {
+    runs.push(configuredInput.readRunSingleFile);
+  }
+  return runs.reduce<RowSelectionState>((acc, run) => {
     if (run) acc[run.runAccession] = true;
     return acc;
   }, {});

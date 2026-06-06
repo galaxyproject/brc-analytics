@@ -102,7 +102,9 @@ async function getLandingUrlForWorkflow(
     isAssemblyConfiguredValue(configuredValue)
       ? configuredValue.geneModelUrl
       : null,
+    configuredValue.readRunSingleFile,
     configuredValue.readRunsSingle,
+    configuredValue.readRunPairedFile,
     configuredValue.readRunsPaired,
     null,
     workflow.parameters,

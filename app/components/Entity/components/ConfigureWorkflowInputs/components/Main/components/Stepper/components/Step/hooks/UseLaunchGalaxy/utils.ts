@@ -56,6 +56,8 @@ function getDEConfiguredValues(
     designFormula,
     geneModelUrl,
     primaryContrasts: primaryContrasts ?? null,
+    readRunPairedFile: null,
+    readRunSingleFile: null,
     readRunsPaired: null,
     readRunsSingle: null,
     referenceAssembly,
@@ -76,8 +78,14 @@ function getAssemblyScopeConfiguredValues(
   configuredInput: ConfiguredInput,
   workflow: Workflow
 ): ConfiguredValue | undefined {
-  const { geneModelUrl, readRunsPaired, readRunsSingle, referenceAssembly } =
-    configuredInput;
+  const {
+    geneModelUrl,
+    readRunPairedFile,
+    readRunSingleFile,
+    readRunsPaired,
+    readRunsSingle,
+    referenceAssembly,
+  } = configuredInput;
 
   // If workflow is not available yet, return undefined
   if (!workflow?.parameters) return;
@@ -91,12 +99,25 @@ function getAssemblyScopeConfiguredValues(
   if (requiredParams.GENE_MODEL_URL && geneModelUrl === null) return;
   if (requiredParams.SANGER_READ_RUN_SINGLE && !readRunsSingle) return;
   if (requiredParams.SANGER_READ_RUN_PAIRED && !readRunsPaired) return;
+  if (
+    requiredParams.SANGER_READ_RUN_SINGLE_FILE &&
+    readRunSingleFile === undefined
+  )
+    return;
+  if (
+    (requiredParams.SANGER_READ_RUN_FORWARD_FILE ||
+      requiredParams.SANGER_READ_RUN_REVERSE_FILE) &&
+    readRunPairedFile === undefined
+  )
+    return;
 
   return {
     _scope: "ASSEMBLY",
     designFormula: null,
     geneModelUrl: geneModelUrl ?? null,
     primaryContrasts: null,
+    readRunPairedFile: readRunPairedFile ?? null,
+    readRunSingleFile: readRunSingleFile ?? null,
     readRunsPaired: readRunsPaired ?? null,
     readRunsSingle: readRunsSingle ?? null,
     referenceAssembly,
@@ -117,7 +138,12 @@ function getOrganismScopeConfiguredValues(
   configuredInput: ConfiguredInput,
   workflow: Workflow
 ): ConfiguredValue | undefined {
-  const { readRunsPaired, readRunsSingle } = configuredInput;
+  const {
+    readRunPairedFile,
+    readRunSingleFile,
+    readRunsPaired,
+    readRunsSingle,
+  } = configuredInput;
 
   if (!workflow?.parameters) return;
 
@@ -125,10 +151,23 @@ function getOrganismScopeConfiguredValues(
 
   if (requiredParams.SANGER_READ_RUN_SINGLE && !readRunsSingle) return;
   if (requiredParams.SANGER_READ_RUN_PAIRED && !readRunsPaired) return;
+  if (
+    requiredParams.SANGER_READ_RUN_SINGLE_FILE &&
+    readRunSingleFile === undefined
+  )
+    return;
+  if (
+    (requiredParams.SANGER_READ_RUN_FORWARD_FILE ||
+      requiredParams.SANGER_READ_RUN_REVERSE_FILE) &&
+    readRunPairedFile === undefined
+  )
+    return;
 
   return {
     _scope: "ORGANISM",
     fastaCollection: null,
+    readRunPairedFile: readRunPairedFile ?? null,
+    readRunSingleFile: readRunSingleFile ?? null,
     readRunsPaired: readRunsPaired ?? null,
     readRunsSingle: readRunsSingle ?? null,
     tracks: null,
@@ -154,6 +193,8 @@ function getSequenceScopeConfiguredValues(
   return {
     _scope: "SEQUENCE",
     numberOfHits,
+    readRunPairedFile: null,
+    readRunSingleFile: null,
     readRunsPaired: null,
     readRunsSingle: null,
     sequence,

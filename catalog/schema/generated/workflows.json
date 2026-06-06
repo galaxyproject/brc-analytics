@@ -331,8 +331,11 @@
                 "ASSEMBLY_FASTA_URL",
                 "FASTA_COLLECTION",
                 "GENE_MODEL_URL",
+                "SANGER_READ_RUN_FORWARD_FILE",
                 "SANGER_READ_RUN_PAIRED",
-                "SANGER_READ_RUN_SINGLE"
+                "SANGER_READ_RUN_REVERSE_FILE",
+                "SANGER_READ_RUN_SINGLE",
+                "SANGER_READ_RUN_SINGLE_FILE"
             ],
             "title": "WorkflowParameterVariable",
             "type": "string"

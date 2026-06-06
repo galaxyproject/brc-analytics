@@ -22,6 +22,18 @@ export const PAIRED_END_STEP = {
   },
 } satisfies StepConfig;
 
+export const PAIRED_FILE_STEP = {
+  Step: SequencingStep,
+  disabled: false,
+  key: "readRunPairedFile",
+  label: "Paired-End FASTQ Files",
+  renderValue({ readRunPairedFile }): string | undefined {
+    if (readRunPairedFile === null) return LABEL.NONE;
+    if (readRunPairedFile === undefined) return undefined;
+    return readRunPairedFile.runAccession;
+  },
+} satisfies StepConfig;
+
 export const SINGLE_END_STEP = {
   Step: SequencingStep,
   disabled: false,
@@ -32,5 +44,17 @@ export const SINGLE_END_STEP = {
     if (readRunsSingle === undefined) return undefined;
     if (readRunsSingle.length === 0) return "User upload to Galaxy";
     return readRunsSingle.map(({ runAccession }) => runAccession).join(", ");
+  },
+} satisfies StepConfig;
+
+export const SINGLE_FILE_STEP = {
+  Step: SequencingStep,
+  disabled: false,
+  key: "readRunSingleFile",
+  label: "Single-End FASTQ File",
+  renderValue({ readRunSingleFile }): string | undefined {
+    if (readRunSingleFile === null) return LABEL.NONE;
+    if (readRunSingleFile === undefined) return undefined;
+    return readRunSingleFile.runAccession;
   },
 } satisfies StepConfig;

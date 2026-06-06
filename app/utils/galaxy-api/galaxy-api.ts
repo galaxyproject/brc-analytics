@@ -64,8 +64,10 @@ const dataLandingUrl = `${galaxyInstanceUrl}/tool_landings`;
  * @param workflowId - Value for the `workflow_id` parameter sent to the API.
  * @param referenceGenome - Genome version/assembly ID.
  * @param geneModelUrl - URL for gene model parameter sent to the API.
- * @param readRunsSingle - Single read runs parameter sent to the API.
- * @param readRunsPaired - Paired read runs parameter sent to the API.
+ * @param readRunSingleFile - Single read run (single-end FASTQ file) parameter sent to the API.
+ * @param readRunsSingle - Single read runs (collection) parameter sent to the API.
+ * @param readRunPairedFile - Paired read run (paired-end FASTQ files) parameter sent to the API.
+ * @param readRunsPaired - Paired read runs (collection) parameter sent to the API.
  * @param fastaCollection - Array of assembly accessions for FASTA collection.
  * @param parameters - Parameters for this workflow.
  * @param origin - Origin URL of the site making the request.
@@ -75,7 +77,9 @@ export async function getWorkflowLandingUrl(
   workflowId: string,
   referenceGenome: string,
   geneModelUrl: string | null,
+  readRunSingleFile: EnaSequencingReads | null,
   readRunsSingle: EnaSequencingReads[] | null,
+  readRunPairedFile: EnaSequencingReads | null,
   readRunsPaired: EnaSequencingReads[] | null,
   fastaCollection: string[] | null,
   parameters: WorkflowParameter[],
@@ -88,7 +92,9 @@ export async function getWorkflowLandingUrl(
     request_state: getWorkflowLandingsRequestState(
       referenceGenome,
       geneModelUrl,
+      readRunSingleFile,
       readRunsSingle,
+      readRunPairedFile,
       readRunsPaired,
       fastaCollection,
       parameters,
@@ -170,7 +176,9 @@ function galaxyUrlDataToCommonApi(data: GalaxyUrlData): GalaxyApiCommonUrlData {
 function paramVariableToRequestValue(
   variable: WORKFLOW_PARAMETER_VARIABLE,
   geneModelUrl: string | null,
+  readRunSingleFile: EnaSequencingReads | null,
   readRunsSingle: EnaSequencingReads[] | null,
+  readRunPairedFile: EnaSequencingReads | null,
   readRunsPaired: EnaSequencingReads[] | null,
   fastaCollection: string[] | null,
   referenceGenome: string,
@@ -202,6 +210,21 @@ function paramVariableToRequestValue(
       return galaxyCollectionToWorkflowParameter(
         buildPairedReadRunsRequestValue(readRunsPaired)
       );
+    }
+    case WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE_FILE: {
+      const urlData = buildSingleReadRunRequestValue(readRunSingleFile);
+      if (urlData === null) return null;
+      return galaxyUrlDataToCommonApi(urlData);
+    }
+    case WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_FORWARD_FILE: {
+      const urlData = buildForwardReadRunRequestValue(readRunPairedFile);
+      if (urlData === null) return null;
+      return galaxyUrlDataToCommonApi(urlData);
+    }
+    case WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_REVERSE_FILE: {
+      const urlData = buildReverseReadRunRequestValue(readRunPairedFile);
+      if (urlData === null) return null;
+      return galaxyUrlDataToCommonApi(urlData);
     }
     case WORKFLOW_PARAMETER_VARIABLE.FASTA_COLLECTION:
       if (!fastaCollection?.length) return null;
@@ -253,8 +276,10 @@ function galaxyCollectionElementToWorkflowLandings(
  * Get the `request_state` value for the workflow landings request body.
  * @param referenceGenome - Genome version/assembly ID.
  * @param geneModelUrl - URL for gene model parameter sent to the API.
- * @param readRunsSingle - Single read runs parameter sent to the API.
- * @param readRunsPaired - Paired read runs parameter sent to the API.
+ * @param readRunSingleFile - Single read run (single-end FASTQ file) parameter sent to the API.
+ * @param readRunsSingle - Single read runs (collection) parameter sent to the API.
+ * @param readRunPairedFile - Paired read run (paired-end FASTQ files) parameter sent to the API.
+ * @param readRunsPaired - Paired read runs (collection) parameter sent to the API.
  * @param fastaCollection - Array of assembly accessions for FASTA collection.
  * @param parameters - Parameters for this workflow.
  * @param md5Checksums - Map of filename to MD5 hash.
@@ -263,7 +288,9 @@ function galaxyCollectionElementToWorkflowLandings(
 function getWorkflowLandingsRequestState(
   referenceGenome: string,
   geneModelUrl: string | null,
+  readRunSingleFile: EnaSequencingReads | null,
   readRunsSingle: EnaSequencingReads[] | null,
+  readRunPairedFile: EnaSequencingReads | null,
   readRunsPaired: EnaSequencingReads[] | null,
   fastaCollection: string[] | null,
   parameters: WorkflowParameter[],
@@ -283,7 +310,9 @@ function getWorkflowLandingsRequestState(
       const value = paramVariableToRequestValue(
         variable,
         geneModelUrl,
+        readRunSingleFile,
         readRunsSingle,
+        readRunPairedFile,
         readRunsPaired,
         fastaCollection,
         referenceGenome,
@@ -530,6 +559,45 @@ function buildPairedReadRunsRequestValue(
       };
     }),
     identifier: "Paired End Reads",
+  };
+}
+
+function buildSingleReadRunRequestValue(
+  run: EnaSequencingReads | null
+): GalaxyUrlData | null {
+  if (!run) return null;
+  const { forward } = getSingleRunUrlsInfo(run.urls, run.md5Hashes);
+  return {
+    ext: FILE_EXT.FASTQ_SANGER_GZ,
+    hashes: createMd5Hash(forward.md5),
+    identifier: run.runAccession,
+    url: forward.url,
+  };
+}
+
+function buildForwardReadRunRequestValue(
+  run: EnaSequencingReads | null
+): GalaxyUrlData | null {
+  if (!run) return null;
+  const { forward } = getPairedRunUrlsInfo(run.urls, run.md5Hashes);
+  return {
+    ext: FILE_EXT.FASTQ_SANGER_GZ,
+    hashes: createMd5Hash(forward.md5),
+    identifier: run.runAccession,
+    url: forward.url,
+  };
+}
+
+function buildReverseReadRunRequestValue(
+  run: EnaSequencingReads | null
+): GalaxyUrlData | null {
+  if (!run) return null;
+  const { reverse } = getPairedRunUrlsInfo(run.urls, run.md5Hashes);
+  return {
+    ext: FILE_EXT.FASTQ_SANGER_GZ,
+    hashes: createMd5Hash(reverse.md5),
+    identifier: run.runAccession,
+    url: reverse.url,
   };
 }
 

@@ -10,6 +10,8 @@ import { Strandedness } from "../../StrandednessStep/types";
 
 // Base configured values shared across all scopes
 export interface BaseConfiguredValue {
+  readRunPairedFile: EnaSequencingReads | null;
+  readRunSingleFile: EnaSequencingReads | null;
   readRunsPaired: EnaSequencingReads[] | null;
   readRunsSingle: EnaSequencingReads[] | null;
   tracks: UcscTrack[] | null;

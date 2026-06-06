@@ -39,7 +39,8 @@ export const useTable = (
     columnFilters,
     rowSelection,
   }: Pick<TableState, "columnFilters" | "rowSelection">,
-  onConfigure: OnConfigure
+  onConfigure: OnConfigure,
+  singleSelect = false
 ): UseTable => {
   const [data, setData] = useState<ReadRun[]>([]);
 
@@ -80,6 +81,7 @@ export const useTable = (
     downloadFilename: "read-runs",
     enableColumnFilters: true,
     enableFilters: true,
+    enableMultiRowSelection: !singleSelect,
     enableMultiSort: true,
     enableRowSelection,
     enableRowSelectionValidation: true,
