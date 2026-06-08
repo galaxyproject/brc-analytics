@@ -802,7 +802,40 @@ class AssistantAgent:
 
             setattr(schema, key, field)
 
+        self._reflect_gene_annotation_requirement(schema)
+
         return schema
+
+    def _reflect_gene_annotation_requirement(self, schema: AnalysisSchema) -> None:
+        """Mark gene annotation as needing attention when the selected workflow
+        actually requires a GTF, so the panel doesn't render a required
+        annotation as "Optional" (#1324/#1331). Workflows that take no GTF leave
+        it empty/optional; a filled annotation is left untouched.
+        """
+        if (
+            schema.workflow.status != FieldStatus.FILLED
+            or schema.gene_annotation.status == FieldStatus.FILLED
+        ):
+            return
+        if self._workflow_requires_gene_model(schema.workflow.detail):
+            schema.gene_annotation.status = FieldStatus.NEEDS_ATTENTION
+        elif schema.gene_annotation.status == FieldStatus.NEEDS_ATTENTION:
+            # Workflow changed to one that no longer needs a GTF.
+            schema.gene_annotation.status = FieldStatus.EMPTY
+
+    def _workflow_requires_gene_model(self, workflow_ref: Optional[str]) -> bool:
+        """True when the workflow (matched by trsId or iwcId) takes a
+        GENE_MODEL_URL parameter."""
+        if not workflow_ref:
+            return False
+        for cat in self.catalog.workflows_by_category:
+            for wf in cat.get("workflows", []):
+                if workflow_ref in (wf.get("trsId"), wf.get("iwcId")):
+                    return any(
+                        p.get("variable") == "GENE_MODEL_URL"
+                        for p in wf.get("parameters", [])
+                    )
+        return False
 
     def _find_assembly_accession(
         self, value: str, schema: AnalysisSchema
