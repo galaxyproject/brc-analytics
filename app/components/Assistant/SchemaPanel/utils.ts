@@ -19,6 +19,11 @@ export function extractAccessions(field: SchemaFieldState): string[] {
   return field.value.match(/[ESD]RR\d{6,}/g) ?? [];
 }
 
+// Word-bound to avoid false positives like "own" matching "unknown". "user"
+// is included because the backend evals observe the LLM emitting that token
+// (e.g. "user upload", "user-provided FASTQs") for the upload path.
+const UPLOAD_KEYWORDS = /\b(upload|user|own|local)\b/i;
+
 /**
  * Normalise the LLM's free-text data-source string into a `SEQUENCING_SOURCE`.
  * Falls back to `SEQUENCING_SOURCE.ENA` for empty/unknown input — matches the
@@ -30,13 +35,6 @@ export function resolveSequencingSource(
   value: string | null | undefined
 ): SEQUENCING_SOURCE {
   if (!value) return SEQUENCING_SOURCE.ENA;
-  const lower = value.toLowerCase();
-  if (
-    lower.includes("upload") ||
-    lower.includes("own") ||
-    lower.includes("local")
-  ) {
-    return SEQUENCING_SOURCE.UPLOAD;
-  }
+  if (UPLOAD_KEYWORDS.test(value)) return SEQUENCING_SOURCE.UPLOAD;
   return SEQUENCING_SOURCE.ENA;
 }

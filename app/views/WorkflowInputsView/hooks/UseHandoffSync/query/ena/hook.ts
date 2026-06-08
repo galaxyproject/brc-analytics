@@ -21,8 +21,12 @@ export const useHandoffEnaQuery = (): UseQueryResult<BaseReadRun[]> => {
   const cacheKey = [...accessions].sort().join(",");
 
   return useReactQuery<BaseReadRun[], DefaultError, BaseReadRun[], QueryKey>({
+    // staleTime: Infinity keeps the resolved data warm for the lifetime of the
+    // session, so the user doesn't see a re-fetch flicker if they revisit the
+    // stepper. gcTime stays at the React Query default (~5 min after last
+    // unmount) so distinct accession sets from prior assistant sessions don't
+    // accumulate in cache for the whole tab lifetime.
     enabled: accessions.length > 0,
-    gcTime: Infinity,
     queryFn: queryFn(),
     queryKey: ["AssistantHandoffEna", cacheKey],
     staleTime: Infinity,

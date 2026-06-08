@@ -93,4 +93,22 @@ describe("resolveSequencingSource", () => {
   test("'ENA' returns ENA", () => {
     expect(resolveSequencingSource("ENA")).toBe(SEQUENCING_SOURCE.ENA);
   });
+
+  test("'unknown source' returns ENA (word-bound — 'own' substring doesn't match)", () => {
+    expect(resolveSequencingSource("unknown source")).toBe(
+      SEQUENCING_SOURCE.ENA
+    );
+  });
+
+  test("'user upload' returns UPLOAD", () => {
+    expect(resolveSequencingSource("user upload")).toBe(
+      SEQUENCING_SOURCE.UPLOAD
+    );
+  });
+
+  test("'user-provided FASTQs' returns UPLOAD (user keyword)", () => {
+    expect(resolveSequencingSource("user-provided FASTQs")).toBe(
+      SEQUENCING_SOURCE.UPLOAD
+    );
+  });
 });
