@@ -22,6 +22,13 @@ logger = logging.getLogger(__name__)
 _PLOIDY_ANY = "ANY"
 
 
+def _is_assembly_scope(wf: Dict[str, Any]) -> bool:
+    """The assistant only drives the single-organism/single-assembly flow, so it
+    only sees ASSEMBLY-scope workflows (matching the frontend's default view).
+    Organism- and comparative-scoped workflows are hidden from it."""
+    return (wf.get("scope") or "ASSEMBLY") == "ASSEMBLY"
+
+
 class CatalogData:
     def __init__(self, catalog_path: str):
         self.catalog_path = Path(catalog_path)
@@ -235,7 +242,9 @@ class CatalogData:
                 "category": cat.get("category"),
                 "name": cat.get("name"),
                 "description": cat.get("description"),
-                "workflow_count": len(cat.get("workflows", [])),
+                "workflow_count": sum(
+                    1 for wf in cat.get("workflows", []) if _is_assembly_scope(wf)
+                ),
             }
             for cat in self.workflows_by_category
         ]
@@ -247,6 +256,7 @@ class CatalogData:
                 return [
                     self._summarize_workflow(wf, cat.get("name", ""))
                     for wf in cat.get("workflows", [])
+                    if _is_assembly_scope(wf)
                 ]
         return []
 
@@ -257,6 +267,8 @@ class CatalogData:
         results = []
         for cat in self.workflows_by_category:
             for wf in cat.get("workflows", []):
+                if not _is_assembly_scope(wf):
+                    continue
                 wf_ploidy = wf.get("ploidy", _PLOIDY_ANY)
                 wf_tax = wf.get("taxonomyId")
 
@@ -272,7 +284,7 @@ class CatalogData:
     def get_workflow_details(self, iwc_id: str) -> Optional[Dict[str, Any]]:
         for cat in self.workflows_by_category:
             for wf in cat.get("workflows", []):
-                if wf.get("iwcId") == iwc_id:
+                if wf.get("iwcId") == iwc_id and _is_assembly_scope(wf):
                     return self._summarize_workflow(
                         wf, cat.get("name", ""), include_params=True
                     )

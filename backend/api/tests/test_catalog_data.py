@@ -85,6 +85,7 @@ SAMPLE_WORKFLOWS = [
                 "iwcId": "rnaseq-pe",
                 "workflowName": "RNA-Seq Paired End",
                 "workflowDescription": "PE RNA-Seq analysis",
+                "scope": "ASSEMBLY",
                 "ploidy": "ANY",
                 "trsId": "#workflow/github.com/iwc/rnaseq-pe/main",
                 "parameters": [
@@ -102,6 +103,7 @@ SAMPLE_WORKFLOWS = [
                 "iwcId": "varcall-haploid",
                 "workflowName": "Variant Calling (Haploid)",
                 "workflowDescription": "Haploid variant calling",
+                "scope": "ASSEMBLY",
                 "ploidy": "HAPLOID",
                 "trsId": "#workflow/github.com/iwc/varcall-haploid/main",
                 "taxonomyId": None,
@@ -111,8 +113,23 @@ SAMPLE_WORKFLOWS = [
                 "iwcId": "varcall-diploid",
                 "workflowName": "Variant Calling (Diploid)",
                 "workflowDescription": "Diploid variant calling",
+                "scope": "ASSEMBLY",
                 "ploidy": "DIPLOID",
                 "trsId": "#workflow/github.com/iwc/varcall-diploid/main",
+                "taxonomyId": None,
+                "parameters": [],
+            },
+            {
+                # ORGANISM-scope (assembly-building) workflow: ANY ploidy and no
+                # taxonomy restriction, so it WOULD match if scope were ignored.
+                # The assistant can't drive its 0/2+-assembly flow, so it must be
+                # hidden from every catalog tool (#1321).
+                "iwcId": "assembly-with-flye",
+                "workflowName": "Assembly with Flye",
+                "workflowDescription": "Long-read de novo genome assembly",
+                "scope": "ORGANISM",
+                "ploidy": "ANY",
+                "trsId": "#workflow/github.com/iwc/assembly-with-flye/main",
                 "taxonomyId": None,
                 "parameters": [],
             },
@@ -333,6 +350,64 @@ class TestCompatibilityCheck:
         )
         assert result["compatible"] is False
         assert "not found" in result["reason"].lower()
+
+
+# ---------- Scope filtering (#1321) ----------
+
+
+class TestScopeFiltering:
+    """Non-ASSEMBLY-scope workflows are hidden from every assistant tool.
+
+    The assistant only drives the single-organism/single-assembly flow, so
+    ORGANISM- and comparative-scope workflows it can't drive must not surface
+    (matching the frontend's default ASSEMBLY-only view).
+    """
+
+    def test_organism_scope_absent_from_category_listing(self, catalog):
+        wfs = catalog.get_workflows_in_category("VARIANT_CALLING")
+        iwc_ids = {w["iwc_id"] for w in wfs}
+        assert "assembly-with-flye" not in iwc_ids
+        # only the two ASSEMBLY-scope workflows remain
+        assert len(wfs) == 2
+
+    def test_organism_scope_absent_from_compatible(self, catalog):
+        # ANY ploidy + no taxonomy restriction would match if scope were ignored.
+        wfs = catalog.get_compatible_workflows(["HAPLOID"])
+        iwc_ids = {w["iwc_id"] for w in wfs}
+        assert "assembly-with-flye" not in iwc_ids
+
+    def test_organism_scope_details_returns_none(self, catalog):
+        assert catalog.get_workflow_details("assembly-with-flye") is None
+
+    def test_organism_scope_not_counted_in_categories(self, catalog):
+        by_cat = {c["category"]: c for c in catalog.get_workflow_categories()}
+        # VARIANT_CALLING holds 3 raw workflows but one is ORGANISM-scope.
+        assert by_cat["VARIANT_CALLING"]["workflow_count"] == 2
+
+    def test_missing_scope_defaults_to_assembly(self, tmp_path):
+        # A workflow with no scope field is treated as ASSEMBLY (frontend default).
+        workflows = [
+            {
+                "category": "OTHER",
+                "name": "Other",
+                "description": "No-scope workflow",
+                "workflows": [
+                    {
+                        "iwcId": "no-scope-wf",
+                        "workflowName": "Scopeless",
+                        "workflowDescription": "Has no scope field",
+                        "ploidy": "ANY",
+                        "trsId": "#workflow/github.com/iwc/no-scope/main",
+                        "parameters": [],
+                    },
+                ],
+            },
+        ]
+        (tmp_path / "organisms.json").write_text(json.dumps([]))
+        (tmp_path / "workflows.json").write_text(json.dumps(workflows))
+        c = CatalogData(str(tmp_path))
+        assert c.get_workflow_details("no-scope-wf") is not None
+        assert c.get_workflow_categories()[0]["workflow_count"] == 1
 
 
 # ---------- Lineage-based taxonomy matching (#1319) ----------
