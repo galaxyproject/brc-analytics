@@ -13,16 +13,20 @@ import {
 import Link from "next/link";
 import { JSX } from "react";
 import { ROUTES } from "../../../../../routes/constants";
+import { SOURCE_KEYS } from "../../../WorkflowInputsView/state/constants";
+import { useSourceDispatch } from "../../../WorkflowInputsView/state/hooks/UseSourceDispatch/hook";
 import { Props } from "../../types";
 import { StyledCard } from "./main.styles";
 
 export const Main = ({ entityId }: Props): JSX.Element => {
+  const { onClearSource } = useSourceDispatch(SOURCE_KEYS.ASSISTANT);
   return (
     <BackPageContentMainColumn>
       <StyledCard component={FluidPaper}>
         <CardActionArea
           component={Link}
           href={replaceParameters(ROUTES.ANALYZE_WORKFLOWS, { entityId })}
+          onClick={onClearSource}
         >
           <CardContent>
             <Typography variant={TYPOGRAPHY_PROPS.VARIANT.HEADING_XSMALL}>
@@ -51,6 +55,7 @@ export const Main = ({ entityId }: Props): JSX.Element => {
           href={replaceParameters(ROUTES.CONFIGURE_CUSTOM_WORKFLOW, {
             entityId,
           })}
+          onClick={onClearSource}
         >
           <CardContent>
             <Typography variant={TYPOGRAPHY_PROPS.VARIANT.HEADING_XSMALL}>

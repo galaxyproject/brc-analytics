@@ -7,6 +7,8 @@ import { Button, Grid, Typography } from "@mui/material";
 import Link from "next/link";
 import { Fragment, JSX } from "react";
 import { ROUTES } from "../../../../../../../../../routes/constants";
+import { SOURCE_KEYS } from "../../../../../../../WorkflowInputsView/state/constants";
+import { useSourceDispatch } from "../../../../../../../WorkflowInputsView/state/hooks/UseSourceDispatch/hook";
 import { formatTrsId } from "../../../../utils";
 import { TYPOGRAPHY_PROPS as COMPONENT_TYPOGRAPHY_PROPS } from "../../constants";
 import { GRID_PROPS } from "./constants";
@@ -27,6 +29,7 @@ export const Workflow = ({
   workflow,
 }: Props): JSX.Element => {
   const { iwcId, workflowDescription, workflowName } = workflow;
+  const { onClearSource } = useSourceDispatch(SOURCE_KEYS.ASSISTANT);
   return (
     <StyledGrid {...GRID_PROPS}>
       <Grid container direction="column" spacing={1}>
@@ -57,6 +60,7 @@ export const Workflow = ({
               entityId,
               trsId: formatTrsId(workflow.trsId),
             })}
+            onClick={onClearSource}
             rel={REL_ATTRIBUTE.NO_OPENER}
             variant={BUTTON_PROPS.VARIANT.CONTAINED}
           >

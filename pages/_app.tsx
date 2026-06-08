@@ -31,6 +31,7 @@ import { EntitiesLoadedProvider } from "../app/providers/entitiesLoaded/provider
 import { useEntities } from "../app/services/workflows/hooks/UseEntities/hook";
 import "../app/styles/fonts/fonts.css";
 import { mergeAppTheme } from "../app/theme/theme";
+import { WorkflowInputsStateProvider } from "../app/views/WorkflowInputsView/state/provider";
 import { ROUTES } from "../routes/constants";
 
 const DEFAULT_ENTITY_LIST_TYPE = "organisms";
@@ -110,29 +111,31 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
                     <AppLayout>
                       <DXHeader {...filteredHeader} />
                       <ExploreStateProvider entityListType={entityListType}>
-                        <Main>
-                          <ErrorBoundary
-                            fallbackRender={({
-                              error,
-                              reset,
-                            }: {
-                              error: DataExplorerError;
-                              reset: () => void;
-                            }): JSX.Element => (
-                              <Error
-                                errorMessage={error.message}
-                                requestUrlMessage={error.requestUrlMessage}
-                                rootPath={redirectRootToPath}
-                                onReset={reset}
-                              />
-                            )}
-                          >
-                            <EntitiesLoadedProvider value={isEntitiesLoaded}>
-                              <Component {...pageProps} />
-                              <Floating {...floating} />
-                            </EntitiesLoadedProvider>
-                          </ErrorBoundary>
-                        </Main>
+                        <WorkflowInputsStateProvider>
+                          <Main>
+                            <ErrorBoundary
+                              fallbackRender={({
+                                error,
+                                reset,
+                              }: {
+                                error: DataExplorerError;
+                                reset: () => void;
+                              }): JSX.Element => (
+                                <Error
+                                  errorMessage={error.message}
+                                  requestUrlMessage={error.requestUrlMessage}
+                                  rootPath={redirectRootToPath}
+                                  onReset={reset}
+                                />
+                              )}
+                            >
+                              <EntitiesLoadedProvider value={isEntitiesLoaded}>
+                                <Component {...pageProps} />
+                                <Floating {...floating} />
+                              </EntitiesLoadedProvider>
+                            </ErrorBoundary>
+                          </Main>
+                        </WorkflowInputsStateProvider>
                       </ExploreStateProvider>
                       <StyledFooter {...footer} />
                     </AppLayout>

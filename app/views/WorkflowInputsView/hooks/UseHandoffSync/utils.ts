@@ -1,4 +1,3 @@
-import type { ParsedUrlQuery } from "querystring";
 import {
   mapReadRuns,
   sanitizeReadRuns,
@@ -17,19 +16,4 @@ import { ConfiguredInput } from "../UseConfigureInputs/types";
  */
 export function buildEnaUpdates(data: BaseReadRun[]): Partial<ConfiguredInput> {
   return getSequencingData(sanitizeReadRuns(mapReadRuns(data)));
-}
-
-/**
- * Parse the comma-separated `accessions` query param into a sorted string
- * array. Sorting here keeps the React Query cache key stable regardless of
- * the order the assistant emits accessions in.
- * @param query - Parsed URL query from Next.js router.
- * @returns Sorted, de-noised accession strings.
- */
-export function extractAccessionsFromQuery(query: ParsedUrlQuery): string[] {
-  const { accessions } = query;
-
-  if (typeof accessions !== "string") return [];
-
-  return accessions.split(",").filter(Boolean).sort();
 }

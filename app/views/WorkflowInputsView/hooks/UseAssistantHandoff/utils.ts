@@ -1,28 +1,29 @@
-import type { ParsedUrlQuery } from "querystring";
 import { clearSequencingData } from "../../../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/utils";
+import { SEQUENCING_SOURCE } from "../../state/constants";
+import { SourceState } from "../../state/types";
 import { UseAssistantHandoff } from "./types";
 
 /**
- * Read the assistant handoff signal from URL query params and shape it into
- * the initial `ConfiguredInput` the stepper mounts with. `isHandoff` is true
- * only for known `dataSource` values ("ena", "upload") so unexpected/garbage
- * input doesn't trigger auto-advance past steps the user hasn't seen.
- * @param query - Parsed URL query from Next.js router.
+ * Derive the stepper's initial `ConfiguredInput` from the assistant's handoff
+ * state. `isHandoff` is true only when a known `sequencingSource` is present
+ * so unexpected/garbage values don't trigger auto-advance past steps the user
+ * hasn't seen.
+ * @param handoff - Current contribution from the assistant source.
  * @returns Initial configured input and handoff flag.
  */
-export function getInitialConfiguredInputFromQuery(
-  query: ParsedUrlQuery
+export function getInitialConfiguredInput(
+  handoff: SourceState
 ): UseAssistantHandoff {
-  const { dataSource } = query;
+  const { sequencingSource } = handoff;
 
-  if (dataSource === "upload") {
+  if (sequencingSource === SEQUENCING_SOURCE.UPLOAD) {
     return {
       initialConfiguredInput: clearSequencingData([]),
       isHandoff: true,
     };
   }
 
-  if (dataSource === "ena") {
+  if (sequencingSource === SEQUENCING_SOURCE.ENA) {
     // ENA handoffs have nothing to bake in synchronously — the accessions
     // are fetched and applied asynchronously by useHandoffSync. Start with
     // default empty state.

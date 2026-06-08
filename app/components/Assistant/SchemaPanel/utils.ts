@@ -1,30 +1,5 @@
-import { AnalysisSchema, SchemaFieldState } from "../../../types/api";
-
-/**
- * Build the handoff URL the assistant navigates to. Carries the user's
- * Sequencing-step preference (`dataSource`) and any ENA accessions as
- * query params; assembly + workflow are already in the URL path.
- * @param handoffUrl - Base path emitted by the assistant.
- * @param schema - Filled assistant schema.
- * @param origin - Window origin for URL resolution.
- * @returns Pathname + search string to navigate to.
- */
-export function buildHandoffUrl(
-  handoffUrl: string,
-  schema: AnalysisSchema,
-  origin: string
-): string {
-  const url = new URL(handoffUrl, origin);
-  url.searchParams.set(
-    "dataSource",
-    resolveDataSource(schema.data_source.value)
-  );
-  const accessions = extractAccessions(schema.data_source);
-  if (accessions.length > 0) {
-    url.searchParams.set("accessions", accessions.join(","));
-  }
-  return url.pathname + url.search;
-}
+import { SchemaFieldState } from "../../../types/api";
+import { SEQUENCING_SOURCE } from "../../../views/WorkflowInputsView/state/constants";
 
 /**
  * Extract ENA/SRA/DDBJ run accessions from the free-text `data_source.value`.
@@ -45,23 +20,23 @@ export function extractAccessions(field: SchemaFieldState): string[] {
 }
 
 /**
- * Normalise the LLM's free-text data-source string into "ena" | "upload".
- * Falls back to "ena" for empty/unknown input — matches the stepper's
- * default toggle.
- * @param value - Free-text value from `data_source.value`.
- * @returns Normalised data-source key.
+ * Normalise the LLM's free-text data-source string into a `SEQUENCING_SOURCE`.
+ * Falls back to `SEQUENCING_SOURCE.ENA` for empty/unknown input — matches the
+ * stepper's default toggle.
+ * @param value - Free-text value from the assistant's `data_source.value`.
+ * @returns Normalised sequencing-source key.
  */
-export function resolveDataSource(
+export function resolveSequencingSource(
   value: string | null | undefined
-): "ena" | "upload" {
-  if (!value) return "ena";
+): SEQUENCING_SOURCE {
+  if (!value) return SEQUENCING_SOURCE.ENA;
   const lower = value.toLowerCase();
   if (
     lower.includes("upload") ||
     lower.includes("own") ||
     lower.includes("local")
   ) {
-    return "upload";
+    return SEQUENCING_SOURCE.UPLOAD;
   }
-  return "ena";
+  return SEQUENCING_SOURCE.ENA;
 }

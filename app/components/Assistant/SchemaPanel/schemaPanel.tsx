@@ -1,17 +1,20 @@
 import { Box, Button, Chip, Divider, Typography } from "@mui/material";
+import Router from "next/router";
 import { JSX, useCallback } from "react";
 import {
   AnalysisSchema,
   FieldStatus,
   SchemaFieldState,
 } from "../../../types/api";
+import { SOURCE_KEYS } from "../../../views/WorkflowInputsView/state/constants";
+import { useSourceDispatch } from "../../../views/WorkflowInputsView/state/hooks/UseSourceDispatch/hook";
 import {
   FieldRow,
   FieldValue,
   PanelContainer,
   PanelHeader,
 } from "./schemaPanel.styles";
-import { buildHandoffUrl } from "./utils";
+import { extractAccessions, resolveSequencingSource } from "./utils";
 
 interface SchemaPanelProps {
   handoffUrl: string | null;
@@ -89,14 +92,20 @@ export const SchemaPanel = ({
   handoffUrl,
   schema,
 }: SchemaPanelProps): JSX.Element => {
+  const { onSetSource } = useSourceDispatch(SOURCE_KEYS.ASSISTANT);
+
   const handleContinue = useCallback((): void => {
     if (!handoffUrl || !schema) return;
-    window.location.href = buildHandoffUrl(
-      handoffUrl,
-      schema,
-      window.location.origin
-    );
-  }, [handoffUrl, schema]);
+    onSetSource({
+      accessions: extractAccessions(schema.data_source),
+      sequencingSource: resolveSequencingSource(schema.data_source.value),
+    });
+    // Singleton Router.push (not useRouter) — SPA nav, no reactive value to
+    // track in deps. A full-page nav (window.location.href) would tear down
+    // the WorkflowInputsView provider before the consumer reads dispatched
+    // state.
+    Router.push(handoffUrl);
+  }, [handoffUrl, onSetSource, schema]);
 
   const isEmpty = !schema;
   const activeSchema = schema ?? PLACEHOLDER_SCHEMA;
