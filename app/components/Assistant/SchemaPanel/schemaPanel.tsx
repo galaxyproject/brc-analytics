@@ -5,13 +5,13 @@ import {
   FieldStatus,
   SchemaFieldState,
 } from "../../../types/api";
-import { ASSISTANT_HANDOFF_KEY } from "../../../views/WorkflowInputsView/hooks/UseAssistantHandoff/types";
 import {
   FieldRow,
   FieldValue,
   PanelContainer,
   PanelHeader,
 } from "./schemaPanel.styles";
+import { buildHandoffUrl } from "./utils";
 
 interface SchemaPanelProps {
   handoffUrl: string | null;
@@ -62,19 +62,6 @@ const PLACEHOLDER_SCHEMA: AnalysisSchema = {
   workflow: EMPTY_FIELD,
 };
 
-function resolveDataSource(value: string | null | undefined): "ena" | "upload" {
-  if (!value) return "ena";
-  const lower = value.toLowerCase();
-  if (
-    lower.includes("upload") ||
-    lower.includes("own") ||
-    lower.includes("local")
-  ) {
-    return "upload";
-  }
-  return "ena";
-}
-
 /**
  * Get the status indicator for a schema field.
  * @param props - Component props
@@ -104,12 +91,11 @@ export const SchemaPanel = ({
 }: SchemaPanelProps): JSX.Element => {
   const handleContinue = useCallback((): void => {
     if (!handoffUrl || !schema) return;
-    const handoff = {
-      dataSource: resolveDataSource(schema.data_source.value),
-      timestamp: Date.now(),
-    };
-    localStorage.setItem(ASSISTANT_HANDOFF_KEY, JSON.stringify(handoff));
-    window.location.href = handoffUrl;
+    window.location.href = buildHandoffUrl(
+      handoffUrl,
+      schema,
+      window.location.origin
+    );
   }, [handoffUrl, schema]);
 
   const isEmpty = !schema;
