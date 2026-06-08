@@ -146,8 +146,9 @@ export const SchemaPanel = ({
       {isEmpty && (
         <Box sx={{ pb: 1, pt: 2, px: 2 }}>
           <Typography color="text.secondary" variant="body2">
-            Tell the assistant what you&apos;re working on (an organism, a
-            paper, a kind of analysis) and it&apos;ll help fill these in:
+            Tell the assistant what you&apos;re working on (an organism, an
+            analysis type, or the kind of data you have) and it&apos;ll help
+            fill these in:
           </Typography>
         </Box>
       )}
