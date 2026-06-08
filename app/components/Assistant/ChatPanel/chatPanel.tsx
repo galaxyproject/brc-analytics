@@ -81,8 +81,9 @@ export const ChatPanel = ({
         {!isRestoring && messages.length === 0 && (
           <Box sx={{ p: 4, textAlign: "center" }}>
             <Typography color="text.secondary" variant="body1">
-              Welcome! I can help you explore BRC Analytics data and set up
-              analyses. Try asking about organisms, assemblies, or workflows.
+              Welcome! I can help you explore the BRC catalog -- organisms,
+              assemblies, and workflows -- and set up an analysis to run in
+              Galaxy. Try naming an organism or an analysis type to get started.
             </Typography>
           </Box>
         )}
