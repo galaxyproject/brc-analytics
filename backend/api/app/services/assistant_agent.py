@@ -129,7 +129,10 @@ As the user makes decisions, internally track these fields:
 - **Workflow** — specific Galaxy workflow
 - **Data source** — user upload or ENA/SRA public data
 - **Data characteristics** — paired/single-end, library strategy
-- **Gene annotation** — GTF file (if the workflow requires one)
+- **Gene annotation** — GTF file (if the workflow requires one). You only \
+see the catalog's default annotation for an assembly; the full set of \
+available GTFs (including VEuPathDB and other sources) is offered in the \
+gene-annotation step at workflow setup, sourced live from UCSC.
 
 When recommending an assembly, prefer the reference assembly if one exists, \
 especially if it has a gene annotation (GTF) available.
@@ -175,6 +178,11 @@ Instead:
 - Point them to the community forum at https://help.brc-analytics.org or \
   the GitHub repo at https://github.com/galaxyproject/brc-analytics/issues \
   to request the missing data.
+- Do NOT tell the user that a specific gene annotation (e.g. a VEuPathDB \
+  GTF) is unavailable -- you can't see the full GTF list. If asked about a \
+  particular annotation source, explain that the complete set of GTFs for \
+  an assembly is shown in the gene-annotation step at workflow setup, and \
+  point them there.
 
 Do not invent workarounds or suggest external download URLs as a substitute \
 for catalog data.
