@@ -69,17 +69,30 @@ const PLACEHOLDER_SCHEMA: AnalysisSchema = {
 /**
  * Get the status indicator for a schema field.
  * @param props - Component props
+ * @param props.optional - Whether the field is optional (not required to hand off)
  * @param props.status - Field status
  * @returns Status chip element
  */
-function StatusIndicator({ status }: { status: FieldStatus }): JSX.Element {
+function StatusIndicator({
+  optional,
+  status,
+}: {
+  optional: boolean;
+  status: FieldStatus;
+}): JSX.Element {
   if (status === "filled") {
     return <Chip color="success" label="Done" size="small" />;
   }
   if (status === "needs_attention") {
     return <Chip color="warning" label="Attention" size="small" />;
   }
-  return <Chip label="Pending" size="small" variant="outlined" />;
+  return (
+    <Chip
+      label={optional ? "Optional" : "Pending"}
+      size="small"
+      variant="outlined"
+    />
+  );
 }
 
 /**
@@ -154,7 +167,10 @@ export const SchemaPanel = ({
                 }}
               >
                 <Typography variant="body2">{FIELD_LABELS[key]}</Typography>
-                <StatusIndicator status={field.status} />
+                <StatusIndicator
+                  optional={OPTIONAL_FIELDS.includes(key)}
+                  status={field.status}
+                />
               </Box>
               {field.value && (
                 <FieldValue variant="body2">{field.value}</FieldValue>
