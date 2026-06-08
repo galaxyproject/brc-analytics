@@ -42,3 +42,10 @@ class TestMcpScopeFiltering:
         by_cat = {c["category"]: c for c in mcp_catalog.get_workflow_categories()}
         # VARIANT_CALLING holds 3 raw workflows but one is ORGANISM-scope.
         assert by_cat["VARIANT_CALLING"]["workflowCount"] == 2
+
+    def test_organism_scope_inputs_not_resolved(self, mcp_catalog):
+        # resolve_workflow_inputs must fail closed -- otherwise it leaks the
+        # hidden workflow's name/TRS id/params to any caller that knows the
+        # IWC id (#1321). Scope check fires before the assembly lookup.
+        with pytest.raises(ValueError):
+            mcp_catalog.resolve_workflow_inputs("assembly-with-flye", "GCF_000000000.0")

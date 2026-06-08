@@ -290,7 +290,10 @@ class CatalogData:
         (sequencing data) as unresolved.
         """
         wf = self._workflows_by_iwc_id.get(iwc_id)
-        if not wf:
+        # Fail closed for non-ASSEMBLY-scope workflows: resolving inputs for one
+        # would expose its name/TRS id/parameters by IWC id even though the
+        # listing tools hide it (#1321).
+        if not wf or not _is_assembly_scope(wf):
             raise ValueError(f"Workflow '{iwc_id}' not found")
         asm = self._assemblies_by_accession.get(accession)
         if not asm:
