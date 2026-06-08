@@ -6,6 +6,14 @@ from typing import Any, Dict, List, Optional, Set
 logger = logging.getLogger(__name__)
 
 
+def _is_assembly_scope(wf: Dict[str, Any]) -> bool:
+    """The guided single-organism/single-assembly flow can't drive ORGANISM- or
+    comparative-scoped workflows, so they're hidden from the workflow-enumeration
+    tools (matching the frontend's default ASSEMBLY-only view). Missing scope
+    defaults to ASSEMBLY."""
+    return (wf.get("scope") or "ASSEMBLY") == "ASSEMBLY"
+
+
 class CatalogData:
     """
     Loads the full BRC catalog (organisms, assemblies, workflows) into memory
@@ -175,7 +183,9 @@ class CatalogData:
                 "category": cat.get("category"),
                 "name": cat.get("name"),
                 "description": cat.get("description"),
-                "workflowCount": len(cat.get("workflows", [])),
+                "workflowCount": sum(
+                    1 for wf in cat.get("workflows", []) if _is_assembly_scope(wf)
+                ),
             }
             for cat in self.workflow_categories
         ]
@@ -187,7 +197,11 @@ class CatalogData:
                 cat.get("category", "").lower() == cat_lower
                 or cat.get("name", "").lower() == cat_lower
             ):
-                return [self._condense_workflow(wf) for wf in cat.get("workflows", [])]
+                return [
+                    self._condense_workflow(wf)
+                    for wf in cat.get("workflows", [])
+                    if _is_assembly_scope(wf)
+                ]
         return []
 
     def get_compatible_workflows(
@@ -197,6 +211,8 @@ class CatalogData:
         results = []
         for cat in self.workflow_categories:
             for wf in cat.get("workflows", []):
+                if not _is_assembly_scope(wf):
+                    continue
                 wf_ploidy = wf.get("ploidy")
                 wf_tax = wf.get("taxonomyId")
                 # Ploidy must match (None/ANY = universal)
@@ -218,7 +234,7 @@ class CatalogData:
 
     def get_workflow_details(self, iwc_id: str) -> Optional[Dict[str, Any]]:
         wf = self._workflows_by_iwc_id.get(iwc_id)
-        if wf:
+        if wf and _is_assembly_scope(wf):
             return self._condense_workflow(wf)
         return None
 
@@ -227,7 +243,7 @@ class CatalogData:
     ) -> Dict[str, Any]:
         wf = self._workflows_by_iwc_id.get(iwc_id)
         asm = self._assemblies_by_accession.get(accession)
-        if not wf:
+        if not wf or not _is_assembly_scope(wf):
             return {"compatible": False, "reason": f"Workflow '{iwc_id}' not found"}
         if not asm:
             return {"compatible": False, "reason": f"Assembly '{accession}' not found"}
