@@ -110,6 +110,25 @@ _CASES = [
             "sources) is offered."
         ),
     },
+    {
+        # #1320 as a SINGLE turn. The multi-turn case above only judges the
+        # FINAL reply, so a wrong "no VEuPath GTF is available" denial on the
+        # first turn would slip through. Here the only reply is the one judged.
+        "name": "vivax_veupath_gtf_availability",
+        "turns": [
+            "Do any Plasmodium vivax assemblies have a VEuPath GTF available?",
+        ],
+        "expected_schema": {},
+        "expected_complete": False,
+        "rubric": (
+            "The reply must NOT flatly claim that no VEuPath/VEuPathDB GTF is "
+            "available for these assemblies -- the assistant only sees the "
+            "catalog's default annotation, not the full GTF list. It should "
+            "point the user to the gene-annotation step at workflow setup "
+            "(where the full set of GTFs, including VEuPathDB sources, is "
+            "offered) rather than denying availability."
+        ),
+    },
 ]
 
 
