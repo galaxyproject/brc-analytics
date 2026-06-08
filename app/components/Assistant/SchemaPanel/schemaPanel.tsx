@@ -115,7 +115,7 @@ export const SchemaPanel = ({
   const isEmpty = !schema;
   const activeSchema = schema ?? PLACEHOLDER_SCHEMA;
 
-  const filledCount = REQUIRED_FIELDS.filter(
+  const filledCount = FIELD_ORDER.filter(
     (key) => activeSchema[key].status === "filled"
   ).length;
 
@@ -124,7 +124,7 @@ export const SchemaPanel = ({
       <PanelHeader>
         <Typography variant="subtitle1">Analysis Setup</Typography>
         <Typography color="text.secondary" variant="caption">
-          {filledCount} / {REQUIRED_FIELDS.length} configured
+          {filledCount} / {FIELD_ORDER.length} configured
         </Typography>
       </PanelHeader>
 
