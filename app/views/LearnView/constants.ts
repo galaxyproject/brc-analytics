@@ -1,10 +1,10 @@
 import { SearchIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/SearchIcon/searchIcon";
 import { ComponentProps } from "react";
 import { SectionContentCard } from "../../components/common/Card/components/SectionContentCard/sectionContentCard";
+import { GalaxyIcon } from "../../components/common/CustomIcon/components/GalaxyIcon/galaxyIcon";
+import { RocketLaunchIcon } from "../../components/common/CustomIcon/components/RocketLaunchIcon/rocketLaunchIcon";
 import { BookmarkStarIcon } from "./components/icon/BookmarkStarIcon/bookmarkStarIcon";
-import { GalaxyIcon } from "./components/icon/GalaxyIcon/galaxyIcon";
 import { LiveHelpIcon } from "./components/icon/LiveHelpIcon/liveHelpIcon";
-import { RocketLaunchIcon } from "./components/icon/RocketLaunchIcon/rocketLaunchIcon";
 import { SmartToyIcon } from "./components/icon/SmartToyIcon/smartToyIcon";
 import { YouTubeIcon } from "./components/icon/YouTubeIcon/youTubeIcon";
 
