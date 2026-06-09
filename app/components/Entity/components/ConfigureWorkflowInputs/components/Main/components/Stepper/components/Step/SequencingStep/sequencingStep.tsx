@@ -5,10 +5,9 @@ import {
 import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepContent/stepContent";
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
-import { JSX, useCallback } from "react";
-import { useHandoffEnaQuery } from "../../../../../../../../../../../views/WorkflowInputsView/hooks/UseHandoffSync/query/ena/hook";
+import { JSX, useCallback, useContext } from "react";
+import { HandoffContext } from "../../../../../../../../../../../views/WorkflowInputsView/hooks/UseHandoffSync/context";
 import { ToggleButtonGroup } from "../components/ToggleButtonGroup/toggleButtonGroup";
-import { useToggleButtonGroup } from "../hooks/UseToggleButtonGroup/useToggleButtonGroup";
 import { StepProps } from "../types";
 import { getStepActiveState } from "../utils/stepUtils";
 import { useColumnFilters } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseColumnFilters/hook";
@@ -28,7 +27,7 @@ import {
 import { TOGGLE_BUTTONS } from "./components/ToggleButtonGroup/toggleButtons";
 import { VIEW } from "./components/ToggleButtonGroup/types";
 import { UploadMyData } from "./components/UploadMyData/uploadMyData";
-import { getInitialView, translateForSequencingStep } from "./utils";
+import { getToggleButtonValue, translateForSequencingStep } from "./utils";
 
 export const SequencingStep = ({
   active,
@@ -62,13 +61,15 @@ export const SequencingStep = ({
     wrappedOnConfigure,
     singleSelect
   );
-  const { onChange, value } = useToggleButtonGroup(
-    getInitialView(configuredInput)
-  );
+  const value = getToggleButtonValue(configuredInput);
   const { taxonomyMatches } = useTaxonomyMatches(table);
   const { requirementsMatches } = useRequirementsMatches(table);
 
-  const { isLoading } = useHandoffEnaQuery();
+  const {
+    sequencing: {
+      status: { isLoading },
+    },
+  } = useContext(HandoffContext);
 
   return (
     <Step
@@ -80,12 +81,13 @@ export const SequencingStep = ({
       <StepLabel>{entryLabel}</StepLabel>
       <StepContent>
         <ToggleButtonGroup
-          onChange={(e, v) => {
+          onChange={(_e, v) => {
+            // MUI emits null when the user re-clicks the active toggle.
+            if (v === null) return;
             wrappedOnConfigure(clearSequencingData());
             if (v === VIEW.UPLOAD_MY_DATA) {
               wrappedOnConfigure(getUploadMyOwnSequencingData(stepKey));
             }
-            onChange?.(e, v);
           }}
           toggleButtons={TOGGLE_BUTTONS}
           value={value}

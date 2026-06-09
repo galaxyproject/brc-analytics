@@ -10,7 +10,7 @@ import { VIEW } from "./components/ToggleButtonGroup/types";
  * @param configuredInput - Current stepper input state.
  * @returns Initial toggle view for the sequencing step.
  */
-export function getInitialView(configuredInput: ConfiguredInput): VIEW {
+export function getToggleButtonValue(configuredInput: ConfiguredInput): VIEW {
   if (
     (Array.isArray(configuredInput.readRunsPaired) &&
       configuredInput.readRunsPaired.length === 0) ||

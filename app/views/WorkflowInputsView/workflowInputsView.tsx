@@ -19,6 +19,7 @@ import { buildWorkflowEntityValue } from "../../components/Entity/components/Con
 import { getAssembly, getWorkflow } from "../../services/workflows/entities";
 import { useAssistantHandoff } from "./hooks/UseAssistantHandoff/useAssistantHandoff";
 import { useConfigureInputs } from "./hooks/UseConfigureInputs/useConfigureInputs";
+import { HandoffContext } from "./hooks/UseHandoffSync/context";
 import { useHandoffSync } from "./hooks/UseHandoffSync/useHandoffSync";
 import { SEQUENCING_STEP_KEYS } from "./sequencing/constants";
 import { Assembly, Props } from "./types";
@@ -42,7 +43,7 @@ export const WorkflowInputsView = ({ entityId, trsId }: Props): JSX.Element => {
   );
 
   const { configuredSteps } = useConfiguredSteps(workflow);
-  useHandoffSync(onConfigure, configuredSteps);
+  const handoff = useHandoffSync(onConfigure, configuredSteps);
 
   const handoffTargetStep = isHandoff
     ? findFirstDataStep(configuredSteps)
@@ -62,37 +63,39 @@ export const WorkflowInputsView = ({ entityId, trsId }: Props): JSX.Element => {
   return (
     <WorkflowEntityContext.Provider value={workflowEntityValue}>
       <AssemblyContext.Provider value={genome}>
-        <BackPageView>
-          <BackPageHero>
-            <Top entityId={entityId} genome={genome} workflow={workflow} />
-          </BackPageHero>
-          <BackPageContent>
-            <StyledBackPageContentMainColumn hasSidePanel={hasSidePanel}>
-              <Main
-                activeStep={activeStep}
-                configuredInput={configuredInput}
-                configuredSteps={configuredSteps}
-                onConfigure={onConfigure}
-                onContinue={onContinue}
-                onEdit={onEdit}
-                workflow={workflow}
-              />
-            </StyledBackPageContentMainColumn>
-            {!hasSidePanel && (
-              <BackPageContentSideColumn>
-                <SideColumn
+        <HandoffContext.Provider value={handoff}>
+          <BackPageView>
+            <BackPageHero>
+              <Top entityId={entityId} genome={genome} workflow={workflow} />
+            </BackPageHero>
+            <BackPageContent>
+              <StyledBackPageContentMainColumn hasSidePanel={hasSidePanel}>
+                <Main
+                  activeStep={activeStep}
                   configuredInput={configuredInput}
-                  configuredSteps={augmentConfiguredSteps(
-                    configuredSteps,
-                    configuredInput,
-                    SEQUENCING_STEPS
-                  )}
+                  configuredSteps={configuredSteps}
+                  onConfigure={onConfigure}
+                  onContinue={onContinue}
+                  onEdit={onEdit}
                   workflow={workflow}
                 />
-              </BackPageContentSideColumn>
-            )}
-          </BackPageContent>
-        </BackPageView>
+              </StyledBackPageContentMainColumn>
+              {!hasSidePanel && (
+                <BackPageContentSideColumn>
+                  <SideColumn
+                    configuredInput={configuredInput}
+                    configuredSteps={augmentConfiguredSteps(
+                      configuredSteps,
+                      configuredInput,
+                      SEQUENCING_STEPS
+                    )}
+                    workflow={workflow}
+                  />
+                </BackPageContentSideColumn>
+              )}
+            </BackPageContent>
+          </BackPageView>
+        </HandoffContext.Provider>
       </AssemblyContext.Provider>
     </WorkflowEntityContext.Provider>
   );
