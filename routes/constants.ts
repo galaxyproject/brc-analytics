@@ -1,5 +1,7 @@
 export const ROUTES = {
   ABOUT: "/about",
+  ABOUT_PARTNER_RESOURCES: "/about/partner-resources",
+  ABOUT_ROADMAP: "/about/roadmap",
   ANALYZE_WORKFLOWS: "/data/assemblies/{entityId}/analyze/workflows",
   ASSISTANT: "/assistant",
   CALENDAR: "/calendar",

@@ -49,6 +49,11 @@ export const GA2_PAGE_META = {
       "View organism details and available genome assemblies on Genome Ark 2.",
     pageTitle: "Organism",
   },
+  PARTNER_RESOURCES: {
+    pageDescription:
+      "Learn about the partner projects behind Genome Ark 2: Galaxy, UCSC Genome Browser, TACC, and Jetstream2.",
+    pageTitle: "Partner Resources",
+  },
   ROADMAP: {
     pageDescription: "View the development roadmap for Genome Ark 2.",
     pageTitle: "Roadmap",

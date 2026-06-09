@@ -63,6 +63,11 @@ export const BRC_PAGE_META = {
       "View organism details and available genome assemblies on BRC Analytics.",
     pageTitle: "Organism",
   },
+  PARTNER_RESOURCES: {
+    pageDescription:
+      "Learn about the partner projects behind BRC Analytics: Galaxy, UCSC Genome Browser, HyPhy, and TACC.",
+    pageTitle: "Partner Resources",
+  },
   PRIORITY_PATHOGENS: {
     pageDescription:
       "Browse priority pathogens available for analysis on BRC Analytics.",
@@ -80,6 +85,11 @@ export const BRC_PAGE_META = {
     pageDescription:
       "Search across organisms, assemblies, and workflows on BRC Analytics.",
     pageTitle: "Search",
+  },
+  VISION: {
+    pageDescription:
+      "Learn about the vision, goals, and commitments behind BRC Analytics.",
+    pageTitle: "Vision",
   },
   WORKFLOW: {
     pageDescription: "View workflow details on BRC Analytics.",
