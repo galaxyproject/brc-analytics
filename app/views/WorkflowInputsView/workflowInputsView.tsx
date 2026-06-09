@@ -16,10 +16,11 @@ import { Top } from "../../components/Entity/components/ConfigureWorkflowInputs/
 import { AssemblyContext } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/context";
 import { WorkflowEntityContext } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
 import { buildWorkflowEntityValue } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/utils";
+import { ENTITY_KEYS } from "../../providers/workflowHandoff/constants";
+import { HandoffStatusContext } from "../../providers/workflowHandoff/contexts/HandoffStatus/context";
 import { getAssembly, getWorkflow } from "../../services/workflows/entities";
 import { useAssistantHandoff } from "./hooks/UseAssistantHandoff/useAssistantHandoff";
 import { useConfigureInputs } from "./hooks/UseConfigureInputs/useConfigureInputs";
-import { HandoffContext } from "./hooks/UseHandoffSync/context";
 import { useHandoffSync } from "./hooks/UseHandoffSync/useHandoffSync";
 import { SEQUENCING_STEP_KEYS } from "./sequencing/constants";
 import { Assembly, Props } from "./types";
@@ -36,14 +37,20 @@ export const WorkflowInputsView = ({ entityId, trsId }: Props): JSX.Element => {
   const genome = getAssembly<Assembly>(entityId);
   const workflow = getWorkflow(trsId);
 
-  const { initialConfiguredInput, isHandoff } = useAssistantHandoff();
+  const { initialConfiguredInput, isHandoff } = useAssistantHandoff(
+    ENTITY_KEYS.ASSEMBLIES
+  );
 
   const { configuredInput, onConfigure } = useConfigureInputs(
     initialConfiguredInput
   );
 
   const { configuredSteps } = useConfiguredSteps(workflow);
-  const handoff = useHandoffSync(onConfigure, configuredSteps);
+  const handoff = useHandoffSync(
+    onConfigure,
+    configuredSteps,
+    ENTITY_KEYS.ASSEMBLIES
+  );
 
   const handoffTargetStep = isHandoff
     ? findFirstDataStep(configuredSteps)
@@ -63,7 +70,7 @@ export const WorkflowInputsView = ({ entityId, trsId }: Props): JSX.Element => {
   return (
     <WorkflowEntityContext.Provider value={workflowEntityValue}>
       <AssemblyContext.Provider value={genome}>
-        <HandoffContext.Provider value={handoff}>
+        <HandoffStatusContext.Provider value={handoff}>
           <BackPageView>
             <BackPageHero>
               <Top entityId={entityId} genome={genome} workflow={workflow} />
@@ -95,7 +102,7 @@ export const WorkflowInputsView = ({ entityId, trsId }: Props): JSX.Element => {
               )}
             </BackPageContent>
           </BackPageView>
-        </HandoffContext.Provider>
+        </HandoffStatusContext.Provider>
       </AssemblyContext.Provider>
     </WorkflowEntityContext.Provider>
   );

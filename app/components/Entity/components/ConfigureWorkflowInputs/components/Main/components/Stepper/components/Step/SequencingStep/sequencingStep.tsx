@@ -6,7 +6,7 @@ import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/c
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
 import { JSX, useCallback, useContext } from "react";
-import { HandoffContext } from "../../../../../../../../../../../views/WorkflowInputsView/hooks/UseHandoffSync/context";
+import { HandoffStatusContext } from "../../../../../../../../../../../providers/workflowHandoff/contexts/HandoffStatus/context";
 import { ToggleButtonGroup } from "../components/ToggleButtonGroup/toggleButtonGroup";
 import { StepProps } from "../types";
 import { getStepActiveState } from "../utils/stepUtils";
@@ -69,7 +69,7 @@ export const SequencingStep = ({
     sequencing: {
       status: { isLoading },
     },
-  } = useContext(HandoffContext);
+  } = useContext(HandoffStatusContext);
 
   return (
     <Step

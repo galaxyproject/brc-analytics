@@ -1,13 +1,14 @@
 import { Box, Button, Chip, Divider, Typography } from "@mui/material";
 import Router from "next/router";
 import { JSX, useCallback } from "react";
+import { normalizePagePath } from "../../../hooks/UseCurrentPath/utils";
+import { ENTITY_KEYS } from "../../../providers/workflowHandoff/constants";
+import { useHandoffDispatch } from "../../../providers/workflowHandoff/hooks/UseHandoffDispatch/hook";
 import {
   AnalysisSchema,
   FieldStatus,
   SchemaFieldState,
 } from "../../../types/api";
-import { SOURCE_KEYS } from "../../../views/WorkflowInputsView/state/constants";
-import { useSourceDispatch } from "../../../views/WorkflowInputsView/state/hooks/UseSourceDispatch/hook";
 import {
   FieldRow,
   FieldValue,
@@ -92,20 +93,26 @@ export const SchemaPanel = ({
   handoffUrl,
   schema,
 }: SchemaPanelProps): JSX.Element => {
-  const { onSetSource } = useSourceDispatch(SOURCE_KEYS.ASSISTANT);
+  const { onSetHandoff } = useHandoffDispatch();
 
   const handleContinue = useCallback((): void => {
     if (!handoffUrl || !schema) return;
-    onSetSource({
-      accessions: extractAccessions(schema.data_source),
-      sequencingSource: resolveSequencingSource(schema.data_source.value),
+    onSetHandoff({
+      entity: ENTITY_KEYS.ASSEMBLIES,
+      inputs: {
+        accessions: extractAccessions(schema.data_source),
+        sequencingSource: resolveSequencingSource(schema.data_source.value),
+      },
+      // Normalise so the dispatch key matches the read site (useCurrentPath)
+      // regardless of trailing slash / query / fragment from the backend.
+      path: normalizePagePath(handoffUrl),
     });
     // Singleton Router.push (not useRouter) — SPA nav, no reactive value to
     // track in deps. A full-page nav (window.location.href) would tear down
     // the WorkflowInputsView provider before the consumer reads dispatched
     // state.
     Router.push(handoffUrl);
-  }, [handoffUrl, onSetSource, schema]);
+  }, [handoffUrl, onSetHandoff, schema]);
 
   const isEmpty = !schema;
   const activeSchema = schema ?? PLACEHOLDER_SCHEMA;

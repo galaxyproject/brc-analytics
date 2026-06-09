@@ -1,6 +1,6 @@
 import { JSX, ReactNode } from "react";
-import { WorkflowInputsContext } from "./context";
-import { useWorkflowInputsReducer } from "./hooks/UseWorkflowInputsReducer/hook";
+import { WorkflowHandoffContext } from "./context";
+import { useWorkflowHandoffReducer } from "./hooks/UseWorkflowHandoffReducer/hook";
 
 /**
  * Provider for WorkflowInputsView state. Holds per-source handoff payloads
@@ -10,15 +10,15 @@ import { useWorkflowInputsReducer } from "./hooks/UseWorkflowInputsReducer/hook"
  * @param props.children - Children.
  * @returns Context provider wrapping the given children.
  */
-export function WorkflowInputsStateProvider({
+export function WorkflowHandoffProvider({
   children,
 }: {
   children: ReactNode;
 }): JSX.Element {
-  const reducer = useWorkflowInputsReducer();
+  const reducer = useWorkflowHandoffReducer();
   return (
-    <WorkflowInputsContext.Provider value={reducer}>
+    <WorkflowHandoffContext.Provider value={reducer}>
       {children}
-    </WorkflowInputsContext.Provider>
+    </WorkflowHandoffContext.Provider>
   );
 }

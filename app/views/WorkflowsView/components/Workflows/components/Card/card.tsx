@@ -20,8 +20,6 @@ import { JSX } from "react";
 import { ROUTES } from "../../../../../../../routes/constants";
 import { TruncatedText } from "../../../../../../components/common/TruncatedText/truncatedText";
 import { CHIP_PROPS } from "../../../../../AnalyzeWorkflowsView/components/Main/components/Accordion/constants";
-import { SOURCE_KEYS } from "../../../../../WorkflowInputsView/state/constants";
-import { useSourceDispatch } from "../../../../../WorkflowInputsView/state/hooks/UseSourceDispatch/hook";
 import { StyledCard } from "./card.styles";
 import { Props } from "./types";
 
@@ -32,7 +30,6 @@ import { Props } from "./types";
  * @returns Card.
  */
 export const Card = ({ row }: Props): JSX.Element => {
-  const { onClearSource } = useSourceDispatch(SOURCE_KEYS.ASSISTANT);
   return (
     <StyledCard component={RoundedPaper}>
       <CardContent>
@@ -78,7 +75,6 @@ export const Card = ({ row }: Props): JSX.Element => {
             href={replaceParameters(ROUTES.WORKFLOW, {
               trsId: row.id,
             })}
-            onClick={onClearSource}
             variant={BUTTON_PROPS.VARIANT.CONTAINED}
           >
             Configure

@@ -1,5 +1,5 @@
+import { SEQUENCING_SOURCE } from "../../../providers/workflowHandoff/constants";
 import { SchemaFieldState } from "../../../types/api";
-import { SEQUENCING_SOURCE } from "../../../views/WorkflowInputsView/state/constants";
 
 /**
  * Extract ENA/SRA/DDBJ run accessions from the free-text `data_source.value`.

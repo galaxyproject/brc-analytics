@@ -28,10 +28,10 @@ import { StyledFooter } from "../app/components/Layout/components/Footer/footer.
 import { config } from "../app/config/config";
 import { BrcAuthProvider } from "../app/providers/authentication";
 import { EntitiesLoadedProvider } from "../app/providers/entitiesLoaded/provider";
+import { WorkflowHandoffProvider } from "../app/providers/workflowHandoff/provider";
 import { useEntities } from "../app/services/workflows/hooks/UseEntities/hook";
 import "../app/styles/fonts/fonts.css";
 import { mergeAppTheme } from "../app/theme/theme";
-import { WorkflowInputsStateProvider } from "../app/views/WorkflowInputsView/state/provider";
 import { ROUTES } from "../routes/constants";
 
 const DEFAULT_ENTITY_LIST_TYPE = "organisms";
@@ -111,7 +111,7 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
                     <AppLayout>
                       <DXHeader {...filteredHeader} />
                       <ExploreStateProvider entityListType={entityListType}>
-                        <WorkflowInputsStateProvider>
+                        <WorkflowHandoffProvider>
                           <Main>
                             <ErrorBoundary
                               fallbackRender={({
@@ -135,7 +135,7 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
                               </EntitiesLoadedProvider>
                             </ErrorBoundary>
                           </Main>
-                        </WorkflowInputsStateProvider>
+                        </WorkflowHandoffProvider>
                       </ExploreStateProvider>
                       <StyledFooter {...footer} />
                     </AppLayout>
