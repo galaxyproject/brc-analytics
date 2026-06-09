@@ -5,6 +5,7 @@ import { StyledPagesMain } from "../../../app/components/Layout/components/Main/
 import { config } from "../../../app/config/config";
 import { PartnerResourcesView } from "../../../app/views/PartnerResourcesView/partnerResourcesView";
 import { PartnerResourcesViewGA2 } from "../../../app/views/PartnerResourcesView/partnerResourcesViewGA2";
+import { ROUTES } from "../../../routes/constants";
 import { APP_KEYS } from "../../../site-config/common/constants";
 import type { PageProps } from "../../_app";
 
@@ -19,7 +20,12 @@ export const getStaticProps: GetStaticProps<
     themeOptions: object;
   }
 > = async () => {
-  const { appKey } = config();
+  const { allowedPaths, appKey } = config();
+
+  if (allowedPaths && !allowedPaths.includes(ROUTES.ABOUT_PARTNER_RESOURCES)) {
+    return { notFound: true };
+  }
+
   return {
     props: {
       ...getPageMeta(appKey).PARTNER_RESOURCES,

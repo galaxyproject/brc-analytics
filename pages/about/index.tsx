@@ -8,6 +8,7 @@ import {
   BRC_CARDS,
   GA2_CARDS,
 } from "../../app/views/AboutView/common/constants";
+import { ROUTES } from "../../routes/constants";
 import { APP_KEYS } from "../../site-config/common/constants";
 import type { PageProps } from "../_app";
 
@@ -21,7 +22,12 @@ export const getStaticProps: GetStaticProps<
     themeOptions: object;
   }
 > = async () => {
-  const { appKey } = config();
+  const { allowedPaths, appKey } = config();
+
+  if (allowedPaths && !allowedPaths.includes(ROUTES.ABOUT)) {
+    return { notFound: true };
+  }
+
   return {
     props: {
       ...getPageMeta(appKey).ABOUT,
