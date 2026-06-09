@@ -2,9 +2,9 @@ import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureF
 import { Fragment, JSX } from "react";
 import { SectionContentCard } from "../../components/common/Card/components/SectionContentCard/sectionContentCard";
 import { SectionContent } from "../../components/Docs/components/SectionContent/sectionContent";
+import { StyledStack } from "../../components/Docs/components/SectionContentCards/sectionContentCards.styles";
 import { StyledSectionHero } from "../../components/Docs/components/SectionHero/sectionHero.styles";
 import { CARDS } from "./constants";
-import { StyledStack } from "./learnView.styles";
 
 export const LearnView = (): JSX.Element => {
   const isLmlsEnabled = useFeatureFlag("lmls");
