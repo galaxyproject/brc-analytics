@@ -19,7 +19,7 @@ import { organismEntityConfig } from "./index/organismEntityConfig";
 import { priorityPathogensEntityConfig } from "./index/priorityPathogensEntityConfig";
 import { WorkflowEntity } from "./index/workflow/types";
 import { workflowEntityConfig } from "./index/workflowEntityConfig";
-import { socialMedia, socialMenuItems } from "./socialMedia";
+import { socialMedia } from "./socialMedia";
 import { THEME_OPTIONS } from "./theme/constants";
 
 const LOCALHOST = "http://localhost:3000";
@@ -106,20 +106,6 @@ export function makeConfig(
             { label: "Workflows", url: ROUTES.WORKFLOWS },
             { label: "Priority Pathogens", url: ROUTES.PRIORITY_PATHOGENS },
             { label: "Assistant", url: ROUTES.ASSISTANT },
-            {
-              flatten: { lg: true, md: true, sm: false, xs: true },
-              label: "More",
-              menuItems: [
-                { label: "Roadmap", url: ROUTES.ROADMAP },
-                {
-                  label: "Join Us",
-                  menuItems: socialMenuItems,
-                  url: "",
-                  visible: { lg: false, xs: false },
-                },
-              ],
-              url: "",
-            },
           ],
           undefined,
         ],
