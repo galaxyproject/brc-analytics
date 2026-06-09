@@ -19,6 +19,7 @@
             - **Differential expression workflow for bulk RNA-seq** — available on assembly pages alongside other RNA-seq workflows, and through the workflows-first route.
             - **Expanded Learn tab** — more walkthroughs and instructional content added.
             - **Workflows-first navigation** — direct entry points that let users start from a workflow and find relevant data.
+            - **Galaxy DataCache integration** — downloadable genome FASTA files, pre-built indices, and other reference assets are now linked directly from BRC Analytics for supported organisms.
 
             #### In beta / feature-flagged
 
@@ -42,6 +43,7 @@
             - **Instructional pathways for exporting results back into VEuPathDB user datasets.**
             - **Reference-guided eukaryotic pathogen annotation pipeline** inspired by the COMPANION Nextflow pipeline.
             - **PlasmoGenEpi-adjacent surveillance workflows** for resistance screening and situational awareness.
+            - **Orthogroups with pre-computed HyPhy results** — browsable orthogroup tables with associated codon alignments and HyPhy selection analysis outputs.
           </AccordionDetails>
         </Accordion>
         <Accordion>
@@ -49,10 +51,10 @@
           <AccordionDetails>
             To keep progress tangible for the community, we are focusing on:
 
-            1. Publishing deeper walkthroughs in the Learn tab, paired with templated workflows-first journeys.
+            1. Publishing deeper walkthroughs in the Learn tab, including reproductions of key analyses for target organisms that can serve as starting points for the community.
             2. Capturing analysis provenance (via upcoming user accounts) so users can share reproducible histories.
-            3. Documenting how to round-trip BRC Analytics outputs back into VEuPathDB and other community resources.
-            4. Opening contribution lanes for curated workflows, organism primers, and instructional content.
+            3. Documenting how to export results from BRC Analytics into VEuPathDB user datasets and other downstream resources.
+            4. Providing guidance on contributing workflows to the IWC, so community members can help shape the analyses available on the platform.
           </AccordionDetails>
         </Accordion>
         <Accordion>
@@ -60,10 +62,10 @@
           <AccordionDetails>
             We recognize that each organism is different, with unique biology, research communities, and funding landscapes that drive diverse analytical needs. Our next phase emphasizes:
 
-            1. Species-specific pangenome assets (indices, annotations, contextual metadata) curated with domain experts.
+            1. Species-specific pangenome assets curated with domain experts — including pangenome graphs, cross-strain annotation projections, consensus ortholog tables, and per-orthogroup alignments and phylogenies.
             2. Assembly building and annotation pipelines that adapt to pathogen-specific constraints, including reference-guided workflows.
-            3. Sequencing-first pathways (Logan, LexicMap, flu subtyping) so researchers can start with reads rather than taxonomy IDs.
-            4. Scenario-driven experiences for prototype pathogens, biodefense priorities, and emerging threats.
+            3. Sequence-first analysis pathways (Logan, LexicMap) that let researchers search SRA using a nucleotide or protein sequence rather than navigating by organism.
+            4. Dedicated resources for priority pathogens, with combinations of data, workflows, and training tailored to specific research communities.
             5. Support for both emerging and established research communities with the right combinations of data, workflows, and training.
           </AccordionDetails>
         </Accordion>
@@ -73,11 +75,10 @@
             We aim to create a unified experience that brings together diverse data sources and analysis capabilities. Upcoming integration work targets:
 
             1. Automated ingestion of MalariaGEN releases and other surveillance datasets as UCSC/track hub layers.
-            2. Round-tripping Galaxy results into VEuPathDB user datasets with clear guidance and validation.
+            2. Exporting Galaxy results into VEuPathDB user datasets with clear guidance and validation.
             3. Continuous import of gene models and annotations from public resources (e.g. VEuPathDB) alongside NCBI assets.
-            4. Pre-built resources (indices, workflows, metadata packages) aligned to species- or outbreak-specific needs.
-            5. Fast, natural-language-powered search across ENA/SRA with one-click upload to Galaxy.
-            6. Seamlessly embedding Galaxy analysis outputs back into BRC Analytics entity pages.
+            4. Natural-language-powered search across ENA/SRA with streamlined upload to Galaxy.
+            5. Embedding Galaxy analysis outputs back into BRC Analytics entity pages.
           </AccordionDetails>
         </Accordion>
         <Accordion>
@@ -87,9 +88,9 @@
 
             1. Launch linked user accounts with Galaxy single sign-on so researchers keep their histories without extra logins.
             2. Expose MCP-backed natural language helpers that translate research questions into runnable workflows.
-            3. Integrate curated, community-developed Galaxy workflows from the Intergalactic Workflow Commission (IWC).
-            4. Provide prescriptive instructional content for moving results between BRC Analytics, Galaxy, and VEuPathDB.
-            5. Utilize TACC compute plus managed storage, removing the need for institutional hardware and configuration.
+            3. Continue surfacing curated, community-developed Galaxy workflows from the Intergalactic Workflow Commission (IWC) as the IWC catalog grows.
+            4. Provide instructional content for exporting results from BRC Analytics into VEuPathDB user datasets and other downstream resources.
+            5. Continue providing TACC compute and managed storage so researchers can run analyses without institutional hardware.
             6. Create intuitive interfaces that bring together multiple resources (data, workflows, training) in one experience.
           </AccordionDetails>
         </Accordion>
