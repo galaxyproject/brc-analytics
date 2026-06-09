@@ -10,7 +10,7 @@ import { VIEW } from "./components/ToggleButtonGroup/types";
  * @param configuredInput - Current stepper input state.
  * @returns Initial toggle view for the sequencing step.
  */
-export function getToggleButtonValue(configuredInput: ConfiguredInput): VIEW {
+export function getInitialToggleValue(configuredInput: ConfiguredInput): VIEW {
   if (
     (Array.isArray(configuredInput.readRunsPaired) &&
       configuredInput.readRunsPaired.length === 0) ||
@@ -20,6 +20,23 @@ export function getToggleButtonValue(configuredInput: ConfiguredInput): VIEW {
     return VIEW.UPLOAD_MY_DATA;
   }
   return VIEW.ENA;
+}
+
+/**
+ * True when all sequencing read-run fields are `undefined` — the signature of
+ * a `DEFAULT_CONFIGURED_INPUT` wipe (e.g. assembly re-pick via SelectCell).
+ * Distinct from `null` (set by `clearSequencingData()` on user toggle) and
+ * from `[]` (the explicit upload signal).
+ * @param configuredInput - Current stepper input state.
+ * @returns True if every read-run field is undefined.
+ */
+export function areReadRunsCleared(configuredInput: ConfiguredInput): boolean {
+  return (
+    configuredInput.readRunsPaired === undefined &&
+    configuredInput.readRunsSingle === undefined &&
+    configuredInput.readRunPairedFile === undefined &&
+    configuredInput.readRunSingleFile === undefined
+  );
 }
 
 /**

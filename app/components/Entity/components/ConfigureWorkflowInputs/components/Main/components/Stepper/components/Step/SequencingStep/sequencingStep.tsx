@@ -8,6 +8,7 @@ import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/componen
 import { JSX, useCallback, useContext } from "react";
 import { HandoffStatusContext } from "../../../../../../../../../../../providers/workflowHandoff/contexts/HandoffStatus/context";
 import { ToggleButtonGroup } from "../components/ToggleButtonGroup/toggleButtonGroup";
+import { useToggleButtonGroup } from "../hooks/UseToggleButtonGroup/useToggleButtonGroup";
 import { StepProps } from "../types";
 import { getStepActiveState } from "../utils/stepUtils";
 import { useColumnFilters } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseColumnFilters/hook";
@@ -27,7 +28,11 @@ import {
 import { TOGGLE_BUTTONS } from "./components/ToggleButtonGroup/toggleButtons";
 import { VIEW } from "./components/ToggleButtonGroup/types";
 import { UploadMyData } from "./components/UploadMyData/uploadMyData";
-import { getToggleButtonValue, translateForSequencingStep } from "./utils";
+import {
+  areReadRunsCleared,
+  getInitialToggleValue,
+  translateForSequencingStep,
+} from "./utils";
 
 export const SequencingStep = ({
   active,
@@ -61,7 +66,13 @@ export const SequencingStep = ({
     wrappedOnConfigure,
     singleSelect
   );
-  const value = getToggleButtonValue(configuredInput);
+  const { onChange, value: rawValue } = useToggleButtonGroup(
+    getInitialToggleValue(configuredInput)
+  );
+  // After an assembly re-pick wipes via DEFAULT_CONFIGURED_INPUT, every
+  // read-run field is undefined — force the toggle back to ENA so its
+  // internal state can't show stale UPLOAD from before the wipe.
+  const value = areReadRunsCleared(configuredInput) ? VIEW.ENA : rawValue;
   const { taxonomyMatches } = useTaxonomyMatches(table);
   const { requirementsMatches } = useRequirementsMatches(table);
 
@@ -81,13 +92,12 @@ export const SequencingStep = ({
       <StepLabel>{entryLabel}</StepLabel>
       <StepContent>
         <ToggleButtonGroup
-          onChange={(_e, v) => {
-            // MUI emits null when the user re-clicks the active toggle.
-            if (v === null) return;
+          onChange={(e, v) => {
             wrappedOnConfigure(clearSequencingData());
             if (v === VIEW.UPLOAD_MY_DATA) {
               wrappedOnConfigure(getUploadMyOwnSequencingData(stepKey));
             }
+            onChange?.(e, v);
           }}
           toggleButtons={TOGGLE_BUTTONS}
           value={value}

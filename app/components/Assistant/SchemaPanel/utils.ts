@@ -16,7 +16,9 @@ export function extractAccessions(field: SchemaFieldState): string[] {
   if (!field.value) return [];
   // Require ≥6 digits — real ENA/SRA/DDBJ run accessions are typically 6-8.
   // Loose `\d+` would match "ERR12" mid-sentence, which then fails downstream.
-  return field.value.match(/[ESD]RR\d{6,}/g) ?? [];
+  // De-dup so a free-text mention of the same accession twice doesn't fan out
+  // into a distinct React Query cache key + duplicated fetch payload.
+  return [...new Set(field.value.match(/[ESD]RR\d{6,}/g) ?? [])];
 }
 
 // Word-bound to avoid false positives like "own" matching "unknown". "user"

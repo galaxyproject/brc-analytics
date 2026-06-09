@@ -1,8 +1,8 @@
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
 import { Button } from "@mui/material";
 import { CellContext } from "@tanstack/react-table";
+import { DEFAULT_CONFIGURED_INPUT } from "app/views/WorkflowInputsView/hooks/UseConfigureInputs/constants";
 import { JSX } from "react";
-import { DEFAULT_CONFIGURED_INPUT } from "../../../../../../../../../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/constants";
 import { useStepContext } from "../../../../../../../../../../provider/hook";
 import { Assembly } from "../../../../../../hooks/UseTable/types";
 

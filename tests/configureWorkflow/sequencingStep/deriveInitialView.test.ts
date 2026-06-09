@@ -1,26 +1,26 @@
 import { VIEW } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ToggleButtonGroup/types";
-import { getToggleButtonValue } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/utils";
+import { getInitialToggleValue } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/utils";
 
 describe("getInitialView", () => {
   test("empty configuredInput returns ENA (default)", () => {
-    expect(getToggleButtonValue({})).toBe(VIEW.ENA);
+    expect(getInitialToggleValue({})).toBe(VIEW.ENA);
   });
 
   test("readRunsPaired === [] returns UPLOAD_MY_DATA", () => {
-    expect(getToggleButtonValue({ readRunsPaired: [] })).toBe(
+    expect(getInitialToggleValue({ readRunsPaired: [] })).toBe(
       VIEW.UPLOAD_MY_DATA
     );
   });
 
   test("readRunsSingle === [] returns UPLOAD_MY_DATA", () => {
-    expect(getToggleButtonValue({ readRunsSingle: [] })).toBe(
+    expect(getInitialToggleValue({ readRunsSingle: [] })).toBe(
       VIEW.UPLOAD_MY_DATA
     );
   });
 
   test("both empty arrays return UPLOAD_MY_DATA (assistant upload handoff shape)", () => {
     expect(
-      getToggleButtonValue({
+      getInitialToggleValue({
         readRunPairedFile: null,
         readRunSingleFile: null,
         readRunsPaired: [],
@@ -30,12 +30,12 @@ describe("getInitialView", () => {
   });
 
   test("readRunsPaired === null returns ENA", () => {
-    expect(getToggleButtonValue({ readRunsPaired: null })).toBe(VIEW.ENA);
+    expect(getInitialToggleValue({ readRunsPaired: null })).toBe(VIEW.ENA);
   });
 
   test("non-empty readRunsPaired returns ENA (user has ENA selections)", () => {
     expect(
-      getToggleButtonValue({
+      getInitialToggleValue({
         readRunsPaired: [
           { md5Hashes: "m", runAccession: "ERR1", urls: "ftp://e" },
         ],
@@ -45,7 +45,7 @@ describe("getInitialView", () => {
 
   test("scalar file fields alone do not signal upload (file mode is array=[] driven)", () => {
     expect(
-      getToggleButtonValue({
+      getInitialToggleValue({
         readRunPairedFile: null,
         readRunSingleFile: null,
       })
