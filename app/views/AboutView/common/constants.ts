@@ -1,6 +1,46 @@
-import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
+import { ComponentProps } from "react";
+import { SectionContentCard } from "../../../components/common/Card/components/SectionContentCard/sectionContentCard";
+import { GalaxyIcon } from "../../../components/common/CustomIcon/components/GalaxyIcon/galaxyIcon";
+import { RocketLaunchIcon } from "../../../components/common/CustomIcon/components/RocketLaunchIcon/rocketLaunchIcon";
+import { SparkleIcon } from "../../../components/common/CustomIcon/components/SparkleIcon/sparkleIcon";
 
-export const BREADCRUMBS: Breadcrumb[] = [
-  { path: "/", text: "Home" },
-  { path: "", text: "About" },
+export const BRC_CARDS: ComponentProps<typeof SectionContentCard>[] = [
+  {
+    StartIcon: SparkleIcon,
+    cardUrl: "/about/vision",
+    secondaryText:
+      "What we're building, who we're building it for, and our commitments to the research community.",
+    title: "Vision",
+  },
+  {
+    StartIcon: GalaxyIcon,
+    cardUrl: "/about/partner-resources",
+    secondaryText:
+      "The four partner projects behind BRC Analytics: Galaxy, UCSC Genome Browser, HyPhy, and TACC.",
+    title: "Partner Resources",
+  },
+  {
+    StartIcon: RocketLaunchIcon,
+    cardUrl: "/about/roadmap",
+    secondaryText:
+      "Our current priorities, upcoming features, and longer-term direction for the platform.",
+    title: "Roadmap",
+  },
+];
+
+export const GA2_CARDS: ComponentProps<typeof SectionContentCard>[] = [
+  {
+    StartIcon: GalaxyIcon,
+    cardUrl: "/about/partner-resources",
+    secondaryText:
+      "The partner projects behind Genome Ark 2: Galaxy, UCSC Genome Browser, TACC, and Jetstream2.",
+    title: "Partner Resources",
+  },
+  {
+    StartIcon: RocketLaunchIcon,
+    cardUrl: "/about/roadmap",
+    secondaryText:
+      "Our current priorities, upcoming features, and longer-term direction for the platform.",
+    title: "Roadmap",
+  },
 ];
