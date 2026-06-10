@@ -1,7 +1,7 @@
 import { VIEW } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ToggleButtonGroup/types";
 import { getInitialToggleValue } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/utils";
 
-describe("getInitialView", () => {
+describe("getInitialToggleValue", () => {
   test("empty configuredInput returns ENA (default)", () => {
     expect(getInitialToggleValue({})).toBe(VIEW.ENA);
   });
