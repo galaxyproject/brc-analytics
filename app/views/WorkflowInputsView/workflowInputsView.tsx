@@ -5,7 +5,6 @@ import {
   BackPageView,
 } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { JSX, useMemo } from "react";
-import { VIEW } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ToggleButtonGroup/types";
 import { StepConfig } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { useStepper } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/hook";
 import { SEQUENCING_STEPS } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/constants";
@@ -17,18 +16,17 @@ import { Top } from "../../components/Entity/components/ConfigureWorkflowInputs/
 import { AssemblyContext } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/context";
 import { WorkflowEntityContext } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
 import { buildWorkflowEntityValue } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/utils";
+import { ENTITY_KEYS } from "../../providers/workflowHandoff/constants";
+import { HandoffStatusContext } from "../../providers/workflowHandoff/contexts/HandoffStatus/context";
 import { getAssembly, getWorkflow } from "../../services/workflows/entities";
 import { useAssistantHandoff } from "./hooks/UseAssistantHandoff/useAssistantHandoff";
 import { useConfigureInputs } from "./hooks/UseConfigureInputs/useConfigureInputs";
+import { useHandoffSync } from "./hooks/UseHandoffSync/useHandoffSync";
+import { SEQUENCING_STEP_KEYS } from "./sequencing/constants";
 import { Assembly, Props } from "./types";
 import { StyledBackPageContentMainColumn } from "./workflowInputsView.styles";
 
-const DATA_STEP_KEYS = new Set([
-  "readRunsPaired",
-  "readRunsSingle",
-  "readRunsAny",
-  "sampleSheet",
-]);
+const DATA_STEP_KEYS = new Set([...SEQUENCING_STEP_KEYS, "sampleSheet"]);
 
 function findFirstDataStep(steps: StepConfig[]): number | undefined {
   const idx = steps.findIndex((s) => DATA_STEP_KEYS.has(s.key));
@@ -39,15 +37,24 @@ export const WorkflowInputsView = ({ entityId, trsId }: Props): JSX.Element => {
   const genome = getAssembly<Assembly>(entityId);
   const workflow = getWorkflow(trsId);
 
-  const { handoff } = useAssistantHandoff();
-  const { configuredInput, onConfigure } = useConfigureInputs();
-  const { configuredSteps } = useConfiguredSteps(workflow);
+  const { initialConfiguredInput, isHandoff } = useAssistantHandoff(
+    ENTITY_KEYS.ASSEMBLIES
+  );
 
-  const handoffTargetStep = handoff
+  const { configuredInput, onConfigure } = useConfigureInputs(
+    initialConfiguredInput
+  );
+
+  const { configuredSteps } = useConfiguredSteps(workflow);
+  const handoff = useHandoffSync(
+    onConfigure,
+    configuredSteps,
+    ENTITY_KEYS.ASSEMBLIES
+  );
+
+  const handoffTargetStep = isHandoff
     ? findFirstDataStep(configuredSteps)
     : undefined;
-  const initialDataSourceView =
-    handoff?.dataSource === "upload" ? VIEW.UPLOAD_MY_DATA : undefined;
 
   const { activeStep, onContinue, onEdit } = useStepper(
     configuredSteps,
@@ -63,38 +70,39 @@ export const WorkflowInputsView = ({ entityId, trsId }: Props): JSX.Element => {
   return (
     <WorkflowEntityContext.Provider value={workflowEntityValue}>
       <AssemblyContext.Provider value={genome}>
-        <BackPageView>
-          <BackPageHero>
-            <Top entityId={entityId} genome={genome} workflow={workflow} />
-          </BackPageHero>
-          <BackPageContent>
-            <StyledBackPageContentMainColumn hasSidePanel={hasSidePanel}>
-              <Main
-                activeStep={activeStep}
-                configuredInput={configuredInput}
-                configuredSteps={configuredSteps}
-                initialDataSourceView={initialDataSourceView}
-                onConfigure={onConfigure}
-                onContinue={onContinue}
-                onEdit={onEdit}
-                workflow={workflow}
-              />
-            </StyledBackPageContentMainColumn>
-            {!hasSidePanel && (
-              <BackPageContentSideColumn>
-                <SideColumn
+        <HandoffStatusContext.Provider value={handoff}>
+          <BackPageView>
+            <BackPageHero>
+              <Top entityId={entityId} genome={genome} workflow={workflow} />
+            </BackPageHero>
+            <BackPageContent>
+              <StyledBackPageContentMainColumn hasSidePanel={hasSidePanel}>
+                <Main
+                  activeStep={activeStep}
                   configuredInput={configuredInput}
-                  configuredSteps={augmentConfiguredSteps(
-                    configuredSteps,
-                    configuredInput,
-                    SEQUENCING_STEPS
-                  )}
+                  configuredSteps={configuredSteps}
+                  onConfigure={onConfigure}
+                  onContinue={onContinue}
+                  onEdit={onEdit}
                   workflow={workflow}
                 />
-              </BackPageContentSideColumn>
-            )}
-          </BackPageContent>
-        </BackPageView>
+              </StyledBackPageContentMainColumn>
+              {!hasSidePanel && (
+                <BackPageContentSideColumn>
+                  <SideColumn
+                    configuredInput={configuredInput}
+                    configuredSteps={augmentConfiguredSteps(
+                      configuredSteps,
+                      configuredInput,
+                      SEQUENCING_STEPS
+                    )}
+                    workflow={workflow}
+                  />
+                </BackPageContentSideColumn>
+              )}
+            </BackPageContent>
+          </BackPageView>
+        </HandoffStatusContext.Provider>
       </AssemblyContext.Provider>
     </WorkflowEntityContext.Provider>
   );

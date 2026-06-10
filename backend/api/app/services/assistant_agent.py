@@ -119,7 +119,7 @@ As the user makes decisions, internally track these fields:
 - **Assembly** — reference genome to use
 - **Analysis type** — category (Transcriptomics, Variant Calling, etc.)
 - **Workflow** — specific Galaxy workflow
-- **Data source** — user upload or ENA/SRA public data
+- **Data source** — user upload, or public ENA/SRA data the user enters in the ENA picker at workflow setup (you can't search ENA/SRA yourself today, so don't offer to)
 - **Data characteristics** — paired/single-end, library strategy
 - **Gene annotation** — GTF file (if the workflow requires one)
 

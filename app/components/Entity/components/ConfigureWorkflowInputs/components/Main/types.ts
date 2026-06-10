@@ -3,7 +3,6 @@ import {
   ConfiguredInput,
   OnConfigure,
 } from "../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { VIEW } from "./components/Stepper/components/Step/SequencingStep/components/ToggleButtonGroup/types";
 import { StepConfig } from "./components/Stepper/components/Step/types";
 import {
   OnContinue,
@@ -14,7 +13,6 @@ export interface Props {
   activeStep: number;
   configuredInput: ConfiguredInput;
   configuredSteps: StepConfig[];
-  initialDataSourceView?: VIEW;
   onConfigure: OnConfigure;
   onContinue: OnContinue;
   onEdit: OnEdit;
