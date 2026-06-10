@@ -1,9 +1,12 @@
-import { GetStaticProps } from "next";
-
-export const getStaticProps: GetStaticProps = async () => {
-  return { redirect: { destination: "/about/roadmap", permanent: false } };
-};
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 export default function Roadmap(): null {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace("/about/roadmap");
+  }, [router]);
+
   return null;
 }
