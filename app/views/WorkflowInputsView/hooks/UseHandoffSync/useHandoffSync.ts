@@ -2,8 +2,10 @@ import { useEffect, useMemo } from "react";
 import { translateForSequencingStep } from "../../../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/utils";
 import { StepConfig } from "../../../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { useCurrentPath } from "../../../../hooks/UseCurrentPath/hook";
+import { SEQUENCING_SOURCE } from "../../../../providers/workflowHandoff/constants";
 import { HandoffStatus } from "../../../../providers/workflowHandoff/contexts/HandoffStatus/types";
 import { useHandoffDispatch } from "../../../../providers/workflowHandoff/hooks/UseHandoffDispatch/hook";
+import { useHandoffInputs } from "../../../../providers/workflowHandoff/hooks/UseHandoffInputs/hook";
 import { EntityKey } from "../../../../providers/workflowHandoff/types";
 import { findSequencingStepKey } from "../../sequencing/utils";
 import { OnConfigure } from "../UseConfigureInputs/types";
@@ -32,23 +34,43 @@ export const useHandoffSync = (
   entity: EntityKey
 ): HandoffStatus => {
   const path = useCurrentPath();
+  const { sequencingSource } = useHandoffInputs(entity, path);
   const ena = useHandoffEnaQuery(entity, path);
   const sequencingStepKey = findSequencingStepKey(configuredSteps);
   const { onClearHandoff } = useHandoffDispatch();
 
   useEffect(() => {
+    // No handoff for this cell — nothing to consume.
+    if (sequencingSource === null) return;
+    // UPLOAD path: the initial input was captured synchronously by
+    // `useAssistantHandoff` via `useConfigureInputs`'s `useState`. Just
+    // consume the handoff so it doesn't re-apply on a future visit to
+    // the same path.
+    if (sequencingSource === SEQUENCING_SOURCE.UPLOAD) {
+      onClearHandoff({ entity, path });
+      return;
+    }
+    // ENA path: wait for the fetch to resolve, then apply + consume.
     // Empty arrays are truthy in JS — guard explicitly so an empty ENA
-    // response doesn't clobber existing configuredInput (e.g. the upload
-    // signal) with null read-run fields via buildEnaUpdates. This same
-    // check makes re-firing the effect after `onClearHandoff` a no-op
-    // (cleared state → empty accessions → ena.data undefined), and lets
-    // a re-dispatched handoff on the same mount apply correctly.
+    // response doesn't clobber configuredInput with null read-run fields
+    // via buildEnaUpdates. This same check makes re-firing the effect
+    // after `onClearHandoff` a no-op (cleared state → empty accessions →
+    // ena.data undefined) and lets a re-dispatched handoff on the same
+    // mount apply correctly.
     if (!ena.data || ena.data.length === 0) return;
     onConfigure(
       translateForSequencingStep(buildEnaUpdates(ena.data), sequencingStepKey)
     );
     onClearHandoff({ entity, path });
-  }, [ena.data, entity, onClearHandoff, onConfigure, path, sequencingStepKey]);
+  }, [
+    ena.data,
+    entity,
+    onClearHandoff,
+    onConfigure,
+    path,
+    sequencingSource,
+    sequencingStepKey,
+  ]);
 
   // Memoised so HandoffContext consumers only re-render when isLoading
   // actually changes — not on every parent render.
