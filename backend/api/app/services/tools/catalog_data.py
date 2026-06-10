@@ -25,7 +25,9 @@ _PLOIDY_ANY = "ANY"
 def _is_assembly_scope(wf: Dict[str, Any]) -> bool:
     """The assistant only drives the single-organism/single-assembly flow, so it
     only sees ASSEMBLY-scope workflows (matching the frontend's default view).
-    Organism- and comparative-scoped workflows are hidden from it."""
+    Organism- and comparative-scoped workflows are hidden from it. A workflow
+    with no scope set is treated as ASSEMBLY, matching the MCP server's
+    CatalogData."""
     return (wf.get("scope") or "ASSEMBLY") == "ASSEMBLY"
 
 
