@@ -341,9 +341,9 @@ class CatalogData:
         wf_tax = wf.get("taxonomy_id")
         if wf_tax and not self._workflow_taxon_matches(wf_tax, asm.get("taxonomy_id")):
             issues.append(
-                f"Workflow is organism-specific (taxonomy {wf_tax}) "
-                f"but assembly taxonomy {asm.get('taxonomy_id')} is not within "
-                f"its lineage"
+                f"Workflow is organism-specific (taxonomy {wf_tax}), but that "
+                f"taxon is not in the lineage of assembly taxonomy "
+                f"{asm.get('taxonomy_id')}"
             )
 
         # Gene annotation check
