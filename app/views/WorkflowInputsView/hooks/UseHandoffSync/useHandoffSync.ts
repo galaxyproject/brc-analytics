@@ -34,7 +34,7 @@ export const useHandoffSync = (
   entity: EntityKey
 ): HandoffStatus => {
   const path = useCurrentPath();
-  const { accessions, sequencingSource } = useHandoffInputs(entity, path);
+  const { sequencingSource } = useHandoffInputs(entity, path);
   const ena = useHandoffEnaQuery(entity, path);
   const sequencingStepKey = findSequencingStepKey(configuredSteps);
   const { onClearHandoff } = useHandoffDispatch();
@@ -50,9 +50,11 @@ export const useHandoffSync = (
       onClearHandoff({ entity, path });
       return;
     }
-    // ENA path. Wait for the fetch to settle (only relevant when there's
-    // something to fetch — `enabled: accessions.length > 0`).
-    if (accessions.length > 0 && !ena.isFetched) return;
+    // ENA path. `isLoading` is true only when a first fetch is in flight,
+    // so this single check covers both "settled" (success/error/empty data)
+    // AND "disabled, never runs" (no accessions to fetch) — they both have
+    // `isLoading === false`.
+    if (ena.isLoading) return;
     // Apply only when we have non-empty data — `[]` from a settled fetch
     // (no matches / off-taxonomy / etc.) would clobber configuredInput
     // with null read-run fields via buildEnaUpdates. But consume the
@@ -65,9 +67,8 @@ export const useHandoffSync = (
     }
     onClearHandoff({ entity, path });
   }, [
-    accessions.length,
     ena.data,
-    ena.isFetched,
+    ena.isLoading,
     entity,
     onClearHandoff,
     onConfigure,
