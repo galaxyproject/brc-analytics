@@ -12,7 +12,7 @@ export const PartnerResourcesViewGA2 = (): JSX.Element => {
           { path: "", text: "Partner Resources" },
         ]}
         head="Partner Resources"
-        subHead="GenomeArk 2 is a collaborative effort of four mature software and infrastructure projects that have been sustained for decades."
+        subHead="GenomeArk2 is a collaborative effort of four mature software and infrastructure projects that have been sustained for decades."
       />
       <SectionAboutGA2 />
     </Fragment>

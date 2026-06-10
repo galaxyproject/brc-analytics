@@ -22,8 +22,8 @@ export const AboutView = ({ cards }: AboutViewProps): JSX.Element => {
       <SectionContent
         content={
           <StyledStack>
-            {cards.map((card, index) => (
-              <SectionContentCard key={index} {...card} />
+            {cards.map((card) => (
+              <SectionContentCard key={card.cardUrl} {...card} />
             ))}
           </StyledStack>
         }
