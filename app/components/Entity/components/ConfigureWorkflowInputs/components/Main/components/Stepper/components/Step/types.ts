@@ -7,7 +7,6 @@ import {
 } from "../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { OnContinue, OnEdit } from "../../hooks/UseStepper/types";
 import { OnLaunchGalaxy, Status } from "./hooks/UseLaunchGalaxy/types";
-import { VIEW } from "./SequencingStep/components/ToggleButtonGroup/types";
 
 export interface StepConfig {
   description?: ReactNode;
@@ -26,7 +25,6 @@ export interface StepProps
     Required<Pick<MStepProps, "index" | "active">> {
   configuredInput: ConfiguredInput;
   entryLabel: string;
-  initialDataSourceView?: VIEW;
   onConfigure: OnConfigure;
   onContinue: OnContinue;
   onEdit: OnEdit;

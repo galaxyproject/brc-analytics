@@ -1,6 +1,7 @@
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
 import { Button } from "@mui/material";
 import { CellContext } from "@tanstack/react-table";
+import { DEFAULT_CONFIGURED_INPUT } from "app/views/WorkflowInputsView/hooks/UseConfigureInputs/constants";
 import { JSX } from "react";
 import { useStepContext } from "../../../../../../../../../../provider/hook";
 import { Assembly } from "../../../../../../hooks/UseTable/types";
@@ -22,13 +23,15 @@ export const SelectCell = ({
       color={BUTTON_PROPS.COLOR.PRIMARY}
       onClick={() => {
         if (row.getIsSelected()) {
-          // Deselecting the row.
+          // Deselecting the row — wipe everything: user is starting over.
           row.toggleSelected(false);
-          onConfigure({ [stepKey]: undefined });
+          onConfigure(DEFAULT_CONFIGURED_INPUT);
           return;
         }
+        // Switching to a new assembly — wipe everything else so stale gtf /
+        // sequencing / etc. from the previous assembly don't leak through.
         row.toggleSelected(true);
-        onConfigure({ [stepKey]: row.id });
+        onConfigure({ ...DEFAULT_CONFIGURED_INPUT, [stepKey]: row.id });
         onContinue();
         // Resets filters to initial state after a selection is made and the dialog is closed, ensuring the next time the dialog is opened, it shows the pre-filtered list of assemblies.
         // The timeout ensures this runs after the dialog close animation completes.

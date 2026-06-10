@@ -1,17 +1,21 @@
 import { Box, Button, Chip, Divider, Typography } from "@mui/material";
+import Router from "next/router";
 import { JSX, useCallback } from "react";
+import { normalizePagePath } from "../../../hooks/UseCurrentPath/utils";
+import { ENTITY_KEYS } from "../../../providers/workflowHandoff/constants";
+import { useHandoffDispatch } from "../../../providers/workflowHandoff/hooks/UseHandoffDispatch/hook";
 import {
   AnalysisSchema,
   FieldStatus,
   SchemaFieldState,
 } from "../../../types/api";
-import { ASSISTANT_HANDOFF_KEY } from "../../../views/WorkflowInputsView/hooks/UseAssistantHandoff/types";
 import {
   FieldRow,
   FieldValue,
   PanelContainer,
   PanelHeader,
 } from "./schemaPanel.styles";
+import { extractAccessions, resolveSequencingSource } from "./utils";
 
 interface SchemaPanelProps {
   handoffUrl: string | null;
@@ -62,19 +66,6 @@ const PLACEHOLDER_SCHEMA: AnalysisSchema = {
   workflow: EMPTY_FIELD,
 };
 
-function resolveDataSource(value: string | null | undefined): "ena" | "upload" {
-  if (!value) return "ena";
-  const lower = value.toLowerCase();
-  if (
-    lower.includes("upload") ||
-    lower.includes("own") ||
-    lower.includes("local")
-  ) {
-    return "upload";
-  }
-  return "ena";
-}
-
 /**
  * Get the status indicator for a schema field.
  * @param props - Component props
@@ -102,15 +93,26 @@ export const SchemaPanel = ({
   handoffUrl,
   schema,
 }: SchemaPanelProps): JSX.Element => {
+  const { onSetHandoff } = useHandoffDispatch();
+
   const handleContinue = useCallback((): void => {
     if (!handoffUrl || !schema) return;
-    const handoff = {
-      dataSource: resolveDataSource(schema.data_source.value),
-      timestamp: Date.now(),
-    };
-    localStorage.setItem(ASSISTANT_HANDOFF_KEY, JSON.stringify(handoff));
-    window.location.href = handoffUrl;
-  }, [handoffUrl, schema]);
+    onSetHandoff({
+      entity: ENTITY_KEYS.ASSEMBLIES,
+      inputs: {
+        accessions: extractAccessions(schema.data_source),
+        sequencingSource: resolveSequencingSource(schema.data_source.value),
+      },
+      // Normalise so the dispatch key matches the read site (useCurrentPath)
+      // regardless of trailing slash / query / fragment from the backend.
+      path: normalizePagePath(handoffUrl),
+    });
+    // Singleton Router.push (not useRouter) — SPA nav, no reactive value to
+    // track in deps. A full-page nav (window.location.href) would tear down
+    // the WorkflowInputsView provider before the consumer reads dispatched
+    // state.
+    Router.push(handoffUrl);
+  }, [handoffUrl, onSetHandoff, schema]);
 
   const isEmpty = !schema;
   const activeSchema = schema ?? PLACEHOLDER_SCHEMA;

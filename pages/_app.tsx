@@ -28,6 +28,7 @@ import { StyledFooter } from "../app/components/Layout/components/Footer/footer.
 import { config } from "../app/config/config";
 import { BrcAuthProvider } from "../app/providers/authentication";
 import { EntitiesLoadedProvider } from "../app/providers/entitiesLoaded/provider";
+import { WorkflowHandoffProvider } from "../app/providers/workflowHandoff/provider";
 import { useEntities } from "../app/services/workflows/hooks/UseEntities/hook";
 import "../app/styles/fonts/fonts.css";
 import { mergeAppTheme } from "../app/theme/theme";
@@ -110,29 +111,31 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
                     <AppLayout>
                       <DXHeader {...filteredHeader} />
                       <ExploreStateProvider entityListType={entityListType}>
-                        <Main>
-                          <ErrorBoundary
-                            fallbackRender={({
-                              error,
-                              reset,
-                            }: {
-                              error: DataExplorerError;
-                              reset: () => void;
-                            }): JSX.Element => (
-                              <Error
-                                errorMessage={error.message}
-                                requestUrlMessage={error.requestUrlMessage}
-                                rootPath={redirectRootToPath}
-                                onReset={reset}
-                              />
-                            )}
-                          >
-                            <EntitiesLoadedProvider value={isEntitiesLoaded}>
-                              <Component {...pageProps} />
-                              <Floating {...floating} />
-                            </EntitiesLoadedProvider>
-                          </ErrorBoundary>
-                        </Main>
+                        <WorkflowHandoffProvider>
+                          <Main>
+                            <ErrorBoundary
+                              fallbackRender={({
+                                error,
+                                reset,
+                              }: {
+                                error: DataExplorerError;
+                                reset: () => void;
+                              }): JSX.Element => (
+                                <Error
+                                  errorMessage={error.message}
+                                  requestUrlMessage={error.requestUrlMessage}
+                                  rootPath={redirectRootToPath}
+                                  onReset={reset}
+                                />
+                              )}
+                            >
+                              <EntitiesLoadedProvider value={isEntitiesLoaded}>
+                                <Component {...pageProps} />
+                                <Floating {...floating} />
+                              </EntitiesLoadedProvider>
+                            </ErrorBoundary>
+                          </Main>
+                        </WorkflowHandoffProvider>
                       </ExploreStateProvider>
                       <StyledFooter {...footer} />
                     </AppLayout>
