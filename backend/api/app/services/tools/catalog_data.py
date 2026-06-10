@@ -27,9 +27,10 @@ class CatalogData:
         self.catalog_path = Path(catalog_path)
         self.organisms: List[Dict[str, Any]] = []
         self.workflows_by_category: List[Dict[str, Any]] = []
-        # Maps each taxonomy ID to the set of IDs in its lineage so a workflow
-        # annotated with an ancestor taxon (e.g. Bacteria=2) matches every
-        # organism below it (e.g. E. coli=562). Built from genome lineages.
+        # Maps each taxonomy ID to its own ancestor lineage -- the IDs from the
+        # root down to and including itself, never its descendants -- so a
+        # workflow annotated with an ancestor taxon (e.g. Bacteria=2) matches
+        # every organism below it (e.g. E. coli=562). Built from genome lineages.
         self._lineage_by_tax_id: Dict[str, Set[str]] = {}
         self._load()
 
@@ -39,12 +40,16 @@ class CatalogData:
         self._build_lineage_index()
 
     def _build_lineage_index(self) -> None:
-        """Index each taxonomy ID to the full set of IDs in its lineage.
+        """Index each taxonomy ID to its own ancestor lineage (root..tid).
 
         Lets ancestor lookups answer "is Bacteria (2) in E. coli's (562)
         lineage?" so a workflow targeting a higher-rank taxon applies to all
-        taxa below it. When several genomes share a tax ID their lineages are
-        merged into that ID's set.
+        taxa below it. lineageTaxonomyIds is root-first, so each ID maps only
+        to the prefix up to and including itself -- mapping it to the full
+        lineage would pollute ancestor keys with their descendants (key "2"
+        would contain "562"), wrongly matching a descendant-targeted workflow
+        against a higher-rank organism. When several genomes share a tax ID
+        their ancestor sets are merged.
         """
         for org in self.organisms:
             for genome in org.get("genomes", []):
@@ -52,12 +57,13 @@ class CatalogData:
                 if not lineage:
                     continue
                 lineage_strs = [str(t) for t in lineage]
-                for tid in lineage_strs:
+                for i, tid in enumerate(lineage_strs):
+                    ancestors = set(lineage_strs[: i + 1])
                     existing = self._lineage_by_tax_id.get(tid)
                     if existing is None:
-                        self._lineage_by_tax_id[tid] = set(lineage_strs)
+                        self._lineage_by_tax_id[tid] = ancestors
                     else:
-                        existing.update(lineage_strs)
+                        existing.update(ancestors)
 
     def _workflow_taxon_matches(
         self, workflow_tax_id: Any, target_tax_id: Optional[str]

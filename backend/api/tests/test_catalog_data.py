@@ -449,3 +449,13 @@ class TestLineageTaxonomyMatching:
         )
         assert result["compatible"] is False
         assert any("taxonom" in issue.lower() for issue in result["issues"])
+
+    def test_ancestor_index_excludes_descendants(self, lineage_catalog):
+        # Bacteria (2) is an ancestor of E. coli (562). The lineage index for an
+        # ancestor must not pull in its descendants, or a workflow targeting a
+        # descendant taxon would wrongly match a higher-rank organism.
+        assert "562" not in lineage_catalog._lineage_by_tax_id.get("2", set())
+        # A workflow for E. coli (562) does not apply to a Bacteria (2) target...
+        assert lineage_catalog._workflow_taxon_matches(562, "2") is False
+        # ...but a Bacteria (2) workflow still applies to E. coli (562).
+        assert lineage_catalog._workflow_taxon_matches(2, "562") is True
