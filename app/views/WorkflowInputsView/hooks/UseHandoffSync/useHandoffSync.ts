@@ -34,7 +34,7 @@ export const useHandoffSync = (
   entity: EntityKey
 ): HandoffStatus => {
   const path = useCurrentPath();
-  const { sequencingSource } = useHandoffInputs(entity, path);
+  const { accessions, sequencingSource } = useHandoffInputs(entity, path);
   const ena = useHandoffEnaQuery(entity, path);
   const sequencingStepKey = findSequencingStepKey(configuredSteps);
   const { onClearHandoff } = useHandoffDispatch();
@@ -50,20 +50,24 @@ export const useHandoffSync = (
       onClearHandoff({ entity, path });
       return;
     }
-    // ENA path: wait for the fetch to resolve, then apply + consume.
-    // Empty arrays are truthy in JS — guard explicitly so an empty ENA
-    // response doesn't clobber configuredInput with null read-run fields
-    // via buildEnaUpdates. This same check makes re-firing the effect
-    // after `onClearHandoff` a no-op (cleared state → empty accessions →
-    // ena.data undefined) and lets a re-dispatched handoff on the same
-    // mount apply correctly.
-    if (!ena.data || ena.data.length === 0) return;
-    onConfigure(
-      translateForSequencingStep(buildEnaUpdates(ena.data), sequencingStepKey)
-    );
+    // ENA path. Wait for the fetch to settle (only relevant when there's
+    // something to fetch — `enabled: accessions.length > 0`).
+    if (accessions.length > 0 && !ena.isFetched) return;
+    // Apply only when we have non-empty data — `[]` from a settled fetch
+    // (no matches / off-taxonomy / etc.) would clobber configuredInput
+    // with null read-run fields via buildEnaUpdates. But consume the
+    // handoff regardless of outcome so a settled-empty / errored fetch
+    // doesn't leave the cell hanging for future visits to retry against.
+    if (ena.data && ena.data.length > 0) {
+      onConfigure(
+        translateForSequencingStep(buildEnaUpdates(ena.data), sequencingStepKey)
+      );
+    }
     onClearHandoff({ entity, path });
   }, [
+    accessions.length,
     ena.data,
+    ena.isFetched,
     entity,
     onClearHandoff,
     onConfigure,
