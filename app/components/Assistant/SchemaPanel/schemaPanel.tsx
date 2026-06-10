@@ -71,14 +71,17 @@ const PLACEHOLDER_SCHEMA: AnalysisSchema = {
  * @param props - Component props
  * @param props.optional - Whether the field is optional (not required to hand off)
  * @param props.status - Field status
+ * @param props.workflowSelected - Whether a workflow has been chosen yet
  * @returns Status chip element
  */
 function StatusIndicator({
   optional,
   status,
+  workflowSelected,
 }: {
   optional: boolean;
   status: FieldStatus;
+  workflowSelected: boolean;
 }): JSX.Element {
   if (status === "filled") {
     return <Chip color="success" label="Done" size="small" />;
@@ -86,9 +89,11 @@ function StatusIndicator({
   if (status === "needs_attention") {
     return <Chip color="warning" label="Attention" size="small" />;
   }
+  // Only call an optional field "Optional" once a workflow is chosen -- until
+  // then we don't yet know whether it (e.g. a GTF) will turn out to be required.
   return (
     <Chip
-      label={optional ? "Optional" : "Pending"}
+      label={optional && workflowSelected ? "Optional" : "Pending"}
       size="small"
       variant="outlined"
     />
@@ -171,6 +176,7 @@ export const SchemaPanel = ({
                 <StatusIndicator
                   optional={OPTIONAL_FIELDS.includes(key)}
                   status={field.status}
+                  workflowSelected={activeSchema.workflow.status === "filled"}
                 />
               </Box>
               {field.value && (
