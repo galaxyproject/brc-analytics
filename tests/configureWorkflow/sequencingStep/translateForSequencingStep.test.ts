@@ -16,19 +16,21 @@ describe("translateForSequencingStep", () => {
   describe("array-based step (or undefined stepKey) — pass-through", () => {
     test("undefined stepKey returns partial unchanged", () => {
       const partial = { readRunsPaired: [RUN_A] };
-      expect(translateForSequencingStep(partial, undefined)).toBe(partial);
+      expect(translateForSequencingStep(partial, undefined)).toEqual(partial);
     });
 
     test("readRunsPaired stepKey returns partial unchanged", () => {
       const partial = { readRunsPaired: [RUN_A, RUN_B] };
-      expect(translateForSequencingStep(partial, "readRunsPaired")).toBe(
+      expect(translateForSequencingStep(partial, "readRunsPaired")).toEqual(
         partial
       );
     });
 
     test("readRunsAny stepKey returns partial unchanged", () => {
       const partial = { readRunsPaired: [RUN_A], readRunsSingle: [RUN_B] };
-      expect(translateForSequencingStep(partial, "readRunsAny")).toBe(partial);
+      expect(translateForSequencingStep(partial, "readRunsAny")).toEqual(
+        partial
+      );
     });
   });
 
