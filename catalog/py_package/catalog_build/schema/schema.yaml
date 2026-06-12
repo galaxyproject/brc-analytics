@@ -9,5 +9,6 @@ imports:
   - ./assemblies
   - ./organisms
   - ./outbreaks
+  - ./pangenomes
   - ./workflow_categories
   - ./workflows

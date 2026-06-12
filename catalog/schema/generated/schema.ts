@@ -308,6 +308,24 @@ export interface MarkdownFileReference {
 
 
 /**
+ * Root object containing a collection of pangenome definitions for the BRC Analytics platform.
+ */
+export interface Pangenomes {
+    /** Collection of pangenome entries that will be available in the BRC Analytics platform. */
+    pangenomes: Pangenome[],
+}
+
+
+/**
+ * Definition of a pangenome with its unique identifier.
+ */
+export interface Pangenome {
+    /** The unique identifier for the pangenome. */
+    id: string,
+}
+
+
+/**
  * Root object containing a collection of workflow category definitions used to organize workflows in the BRC Analytics platform.
  */
 export interface WorkflowCategories {

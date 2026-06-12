@@ -51,6 +51,7 @@ linkml_meta = LinkMLMeta(
             "./assemblies",
             "./organisms",
             "./outbreaks",
+            "./pangenomes",
             "./workflow_categories",
             "./workflows",
         ],
@@ -554,6 +555,45 @@ class MarkdownFileReference(ConfiguredBaseModel):
         return v
 
 
+class Pangenomes(ConfiguredBaseModel):
+    """
+    Root object containing a collection of pangenome definitions for the BRC Analytics platform.
+    """
+
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
+        {
+            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/pangenomes.yaml#",
+            "tree_root": True,
+        }
+    )
+
+    pangenomes: List[Pangenome] = Field(
+        default=...,
+        description="""Collection of pangenome entries that will be available in the BRC Analytics platform.""",
+        json_schema_extra={
+            "linkml_meta": {"alias": "pangenomes", "domain_of": ["Pangenomes"]}
+        },
+    )
+
+
+class Pangenome(ConfiguredBaseModel):
+    """
+    Definition of a pangenome with its unique identifier.
+    """
+
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
+        {
+            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/pangenomes.yaml#"
+        }
+    )
+
+    id: str = Field(
+        default=...,
+        description="""The unique identifier for the pangenome.""",
+        json_schema_extra={"linkml_meta": {"alias": "id", "domain_of": ["Pangenome"]}},
+    )
+
+
 class WorkflowCategories(ConfiguredBaseModel):
     """
     Root object containing a collection of workflow category definitions used to organize workflows in the BRC Analytics platform.
@@ -992,6 +1032,8 @@ Outbreaks.model_rebuild()
 Outbreak.model_rebuild()
 OutbreakResource.model_rebuild()
 MarkdownFileReference.model_rebuild()
+Pangenomes.model_rebuild()
+Pangenome.model_rebuild()
 WorkflowCategories.model_rebuild()
 WorkflowCategory.model_rebuild()
 Workflows.model_rebuild()
