@@ -1,0 +1,100 @@
+<Section border>
+  <SectionLayout paired>
+    <SectionHeadline paired>
+      ## Our vision
+      <SubHeadline>
+        Making complex genomic analysis accessible to researchers who study
+        pathogens, their hosts, and vectors — regardless of computational
+        background.
+      </SubHeadline>
+    </SectionHeadline>
+    <SectionContent paired>
+      <Grid gridSx={{ gap: 4 }}>
+        <Accordion>
+          <AccordionSummary>What we're building</AccordionSummary>
+          <AccordionDetails>
+            The biological questions that matter most — how a pathogen evolves
+            under selection, which genes are differentially expressed during
+            infection, how a new variant compares against reference strains —
+            require integrating data, computation, and domain knowledge in ways
+            that have historically demanded significant bioinformatics expertise.
+            We believe that barrier should not exist.
+
+            BRC Analytics is a platform that brings together:
+
+            - **Curated genomic data** from NCBI, VEuPathDB, and other authoritative sources, organized by organism and assembly
+            - **Ready-to-run workflows** built by the research community and distributed through the [Intergalactic Workflow Commission (IWC)](https://iwc.galaxyproject.org), pre-configured with the right reference files for each organism
+            - **Free computational resources** via [UseGalaxy.org](https://usegalaxy.org), backed by TACC infrastructure, so researchers can run analyses at scale without institutional hardware
+            - **Natural language tooling** that helps researchers translate a biological question into a runnable workflow
+          </AccordionDetails>
+        </Accordion>
+        <Accordion>
+          <AccordionSummary>Who we're building it for</AccordionSummary>
+          <AccordionDetails>
+            BRC Analytics supports researchers studying pathogens across the
+            tree of life — viruses, bacteria, eukaryotic pathogens, helminths,
+            vectors (including mosquitoes, ticks, and other arthropods), and
+            their hosts. The platform is designed to be broadly useful across
+            pathogen genomics, and we are actively expanding organism coverage.
+
+            We prioritize researchers who:
+
+            - Have domain expertise in their organism but limited bioinformatics infrastructure
+            - Need reproducible, citable analyses they can share with collaborators or reference in publications
+            - Want to move quickly from genomic data — whether from public databases or their own sequencing — to biological insight
+          </AccordionDetails>
+        </Accordion>
+        <Accordion>
+          <AccordionSummary>Our relationship with VEuPathDB</AccordionSummary>
+          <AccordionDetails>
+            BRC Analytics and [VEuPathDB](https://veupathdb.org) are
+            complementary resources with a shared community. VEuPathDB offers
+            genome browsing, gene pages, rich annotation, and a wealth of
+            curated data for supported organisms. BRC Analytics focuses on the
+            analysis side: a streamlined path from genomic data to running
+            workflows and interpreting results.
+
+            Our vision is that researchers move fluidly between the two. We
+            import foundational data and gene models from VEuPathDB so that BRC
+            Analytics users are working with the same annotations their
+            community relies on. And we are building a route for researchers to
+            take their analysis results — differential expression outputs,
+            variant calls, custom gene lists — back into VEuPathDB as user
+            datasets, completing the circle. We see the two resources as entry
+            points into the same ecosystem, not alternatives to each other.
+          </AccordionDetails>
+        </Accordion>
+        <Accordion>
+          <AccordionSummary>Our approach</AccordionSummary>
+          <AccordionDetails>
+            We are not building a closed system. Every curated workflow we
+            surface comes from the open IWC catalog, and researchers can also
+            bring their own data directly into Galaxy and run any tool or
+            workflow available there. Our data is drawn from public NCBI
+            releases and VEuPathDB. Our compute runs on UseGalaxy.org, which is
+            itself open-source and publicly accessible.
+
+            We believe the future of pathogen genomics infrastructure is
+            community-driven: researchers contribute workflows, curate reference
+            data, and share reproducible analyses. BRC Analytics is designed to
+            be a platform where that community can thrive.
+          </AccordionDetails>
+        </Accordion>
+        <Accordion>
+          <AccordionSummary>Our commitments</AccordionSummary>
+          <AccordionDetails>
+            - **Free to use**: Funded by NIAID, no fees for access, analysis, or storage within standard allocations
+            - **Open source**: Built on open platforms; our code is [publicly available on GitHub](https://github.com/galaxyproject/brc-analytics)
+            - **Organism-aware**: Data, workflows, and reference assets are curated at the species level, not one-size-fits-all
+            - **Reproducible**: Every analysis preserves full provenance in Galaxy so results can be reproduced and shared
+
+            See the [Roadmap](/about/roadmap) for what we are actively building
+            next, or reach out at [help@brc-analytics.org](mailto:help@brc-analytics.org)
+            with questions or feature requests.
+          </AccordionDetails>
+        </Accordion>
+      </Grid>
+    </SectionContent>
+
+  </SectionLayout>
+</Section>

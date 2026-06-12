@@ -20,10 +20,11 @@ import { THEME_OPTIONS } from "./theme/constants";
 
 const ALLOWED_PATHS = [
   ROUTES.ABOUT,
+  ROUTES.ABOUT_PARTNER_RESOURCES,
+  ROUTES.ABOUT_ROADMAP,
   ROUTES.ORGANISMS,
   ROUTES.GENOMES,
   ROUTES.WORKFLOWS,
-  ROUTES.ROADMAP,
 ];
 const LOCALHOST = "http://localhost:3000";
 const APP_TITLE = "Genome Ark 2";
@@ -93,7 +94,6 @@ export function makeConfig(
             { label: "Organisms", url: ROUTES.ORGANISMS },
             { label: "Assemblies", url: ROUTES.GENOMES },
             { label: "Workflows", url: ROUTES.WORKFLOWS },
-            { label: "Roadmap", url: ROUTES.ROADMAP },
           ],
           undefined,
         ],

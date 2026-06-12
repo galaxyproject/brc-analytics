@@ -1,17 +1,36 @@
-import { Fragment, JSX } from "react";
-import { SectionAbout } from "../../components/content";
-import { SectionHero } from "../../components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
-import { BREADCRUMBS } from "./common/constants";
+import { ComponentProps, Fragment, JSX } from "react";
+import { SectionContentCard } from "../../components/common/Card/components/SectionContentCard/sectionContentCard";
+import { SectionContent } from "../../components/Docs/components/SectionContent/sectionContent";
+import { StyledStack } from "../../components/Docs/components/SectionContentCards/sectionContentCards.styles";
+import { StyledSectionHero } from "../../components/Docs/components/SectionHero/sectionHero.styles";
 
-export const AboutView = (): JSX.Element => {
+interface AboutViewProps {
+  cards: ComponentProps<typeof SectionContentCard>[];
+}
+
+export const AboutView = ({ cards }: AboutViewProps): JSX.Element => {
   return (
     <Fragment>
-      <SectionHero
-        breadcrumbs={BREADCRUMBS}
-        head="About BRC Analytics"
-        subHead="BRC Analytics is a collaborative effort of four mature software and infrastructure projects that have been sustained for decades."
+      <StyledSectionHero
+        breadcrumbs={[
+          { path: "/", text: "Home" },
+          { path: "", text: "About" },
+        ]}
+        head="About"
+        subHead={null}
       />
-      <SectionAbout />
+      <SectionContent
+        content={
+          <StyledStack>
+            {cards.map((card) => (
+              <SectionContentCard key={card.cardUrl} {...card} />
+            ))}
+          </StyledStack>
+        }
+        frontmatter={null}
+        pageTitle="About"
+        slug={[]}
+      />
     </Fragment>
   );
 };
