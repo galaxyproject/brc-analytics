@@ -18,14 +18,19 @@ type AssemblyForCompatibility = {
 };
 
 /**
- * NOTE: The compatibility functions below are intentionally duplicated from:
- * - app/apis/catalog/brc-analytics-catalog/common/utils.ts (workflowPloidyMatchesOrganismPloidy)
- * - app/views/AnalyzeWorkflowsView/components/Main/utils.ts (workflowIsCompatibleWithAssembly, workflowRequiresAssemblyId)
+ * NOTE: This workflow/assembly compatibility rule (taxonomy lineage + ploidy +
+ * assembly-id requirement) is duplicated in four places that drift out of sync:
+ * - this file (build time)
+ * - app/views/AnalyzeWorkflowsView/components/Main/utils.ts (frontend runtime;
+ *   shares only workflowPloidyMatchesOrganismPloidy from common/utils.ts)
+ * - backend/api/app/services/catalog_data.py (MCP server)
+ * - backend/api/app/services/tools/catalog_data.py (assistant agent)
  *
- * They cannot be imported directly because this build script uses generics to work with both
- * BRC and GA2 assembly types, while the app functions have concrete type signatures.
- * If you modify the compatibility logic, update BOTH locations to keep them in sync.
- * Consider creating a shared utility module to avoid duplication.
+ * The TS copies can't import each other today only because this build script is
+ * generic over BRC/GA2 assembly types while the app function has a concrete
+ * signature -- a single generic in common/ would fix that. #1319 was caused by
+ * this drift. If you change the rule, update all four. Consolidating to a single
+ * source of truth is tracked in #1327.
  */
 
 // Helper function to check if workflow requires ASSEMBLY_ID parameter
