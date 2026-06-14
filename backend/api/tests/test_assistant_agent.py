@@ -408,6 +408,48 @@ class TestApplySchemaUpdates:
         )
         assert result.workflow.detail == "#workflow/github.com/iwc/rnaseq-pe/main"
 
+    def test_gene_annotation_needs_attention_when_workflow_requires_gtf(self, agent):
+        # A GTF-requiring workflow must not leave gene annotation looking optional
+        # (#1324/#1331) -- it should surface as needing attention.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "TRANSCRIPTOMICS",
+                "workflows": [
+                    {
+                        "iwcId": "rnaseq-pe",
+                        "trsId": "trs-rnaseq",
+                        "parameters": [{"variable": "GENE_MODEL_URL"}],
+                    }
+                ],
+            }
+        ]
+        result = agent._apply_schema_updates(
+            AnalysisSchema(), {"workflow": "RNA-Seq (rnaseq-pe)"}
+        )
+        assert result.workflow.status == FieldStatus.FILLED
+        assert result.gene_annotation.status == FieldStatus.NEEDS_ATTENTION
+
+    def test_gene_annotation_stays_optional_when_workflow_has_no_gtf(self, agent):
+        # A workflow with no GENE_MODEL_URL param leaves gene annotation empty so
+        # the panel can render it as "Optional".
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "ASSEMBLY",
+                "workflows": [
+                    {
+                        "iwcId": "asm-only",
+                        "trsId": "trs-asm",
+                        "parameters": [{"variable": "ASSEMBLY_ID"}],
+                    }
+                ],
+            }
+        ]
+        result = agent._apply_schema_updates(
+            AnalysisSchema(), {"workflow": "Assembly (asm-only)"}
+        )
+        assert result.workflow.status == FieldStatus.FILLED
+        assert result.gene_annotation.status == FieldStatus.EMPTY
+
 
 # ---------- compute_handoff ----------
 

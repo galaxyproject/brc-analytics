@@ -69,17 +69,35 @@ const PLACEHOLDER_SCHEMA: AnalysisSchema = {
 /**
  * Get the status indicator for a schema field.
  * @param props - Component props
+ * @param props.optional - Whether the field is optional (not required to hand off)
  * @param props.status - Field status
+ * @param props.workflowSelected - Whether a workflow has been chosen yet
  * @returns Status chip element
  */
-function StatusIndicator({ status }: { status: FieldStatus }): JSX.Element {
+function StatusIndicator({
+  optional,
+  status,
+  workflowSelected,
+}: {
+  optional: boolean;
+  status: FieldStatus;
+  workflowSelected: boolean;
+}): JSX.Element {
   if (status === "filled") {
     return <Chip color="success" label="Done" size="small" />;
   }
   if (status === "needs_attention") {
     return <Chip color="warning" label="Attention" size="small" />;
   }
-  return <Chip label="Pending" size="small" variant="outlined" />;
+  // Only call an optional field "Optional" once a workflow is chosen -- until
+  // then we don't yet know whether it (e.g. a GTF) will turn out to be required.
+  return (
+    <Chip
+      label={optional && workflowSelected ? "Optional" : "Pending"}
+      size="small"
+      variant="outlined"
+    />
+  );
 }
 
 /**
@@ -117,7 +135,7 @@ export const SchemaPanel = ({
   const isEmpty = !schema;
   const activeSchema = schema ?? PLACEHOLDER_SCHEMA;
 
-  const filledCount = REQUIRED_FIELDS.filter(
+  const filledCount = FIELD_ORDER.filter(
     (key) => activeSchema[key].status === "filled"
   ).length;
 
@@ -126,15 +144,16 @@ export const SchemaPanel = ({
       <PanelHeader>
         <Typography variant="subtitle1">Analysis Setup</Typography>
         <Typography color="text.secondary" variant="caption">
-          {filledCount} / {REQUIRED_FIELDS.length} configured
+          {filledCount} / {FIELD_ORDER.length} configured
         </Typography>
       </PanelHeader>
 
       {isEmpty && (
         <Box sx={{ pb: 1, pt: 2, px: 2 }}>
           <Typography color="text.secondary" variant="body2">
-            Tell the assistant what you&apos;re working on (an organism, a
-            paper, a kind of analysis) and it&apos;ll help fill these in:
+            Tell the assistant what you&apos;re working on (an organism, an
+            analysis type, or the kind of data you have) and it&apos;ll help
+            fill these in:
           </Typography>
         </Box>
       )}
@@ -154,7 +173,11 @@ export const SchemaPanel = ({
                 }}
               >
                 <Typography variant="body2">{FIELD_LABELS[key]}</Typography>
-                <StatusIndicator status={field.status} />
+                <StatusIndicator
+                  optional={OPTIONAL_FIELDS.includes(key)}
+                  status={field.status}
+                  workflowSelected={activeSchema.workflow.status === "filled"}
+                />
               </Box>
               {field.value && (
                 <FieldValue variant="body2">{field.value}</FieldValue>
