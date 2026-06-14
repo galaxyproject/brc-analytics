@@ -11,7 +11,9 @@ SCHEMA_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../schem
 GENERATOR_TYPES = {
     "Pydantic": (
         lambda path: PydanticGenerator(
-            path, metadata_mode=pydanticgen.MetadataMode.NONE
+            # LinkML metadata is omitted, as it's unlikely to be useful and includes awkward absolute paths
+            path,
+            metadata_mode=pydanticgen.MetadataMode.NONE,
         ),
         "py",
     ),
