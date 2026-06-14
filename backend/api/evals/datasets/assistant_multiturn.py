@@ -83,6 +83,52 @@ _CASES = [
         "expected_schema": {},
         "expected_complete": False,
     },
+    {
+        # Regression guard for #1318 (off-topic "doesn't know who you are"
+        # deflection on an in-domain clarification) and #1320 (wrongly
+        # asserting a specific GTF is unavailable). The assistant can only see
+        # the catalog's default annotation, so it must point users to the
+        # workflow-setup gene-annotation step rather than denying the GTF.
+        "name": "vivax_veupath_gtf_clarification",
+        "turns": [
+            "Do any Plasmodium vivax assemblies have a VEuPath GTF?",
+            "I mean a VEuPathDB GTF.",
+        ],
+        # Purely exploratory clarification -- nothing is committed.
+        "expected_schema": {},
+        "expected_complete": False,
+        "rubric": (
+            "This is an in-domain clarification about gene annotations, so the "
+            "final reply must read as a normal continuation of the "
+            "conversation. It must NOT say the assistant doesn't know who the "
+            "user is or what they're asking, and must NOT treat the question "
+            "as off-topic or a role-override. It must also NOT flatly claim "
+            "that no VEuPath/VEuPathDB GTF is available for these assemblies "
+            "-- the assistant only sees the catalog's default annotation. "
+            "Instead it should point the user to the gene-annotation step at "
+            "workflow setup, where the full list of GTFs (including VEuPathDB "
+            "sources) is offered."
+        ),
+    },
+    {
+        # #1320 as a SINGLE turn. The multi-turn case above only judges the
+        # FINAL reply, so a wrong "no VEuPath GTF is available" denial on the
+        # first turn would slip through. Here the only reply is the one judged.
+        "name": "vivax_veupath_gtf_availability",
+        "turns": [
+            "Do any Plasmodium vivax assemblies have a VEuPath GTF available?",
+        ],
+        "expected_schema": {},
+        "expected_complete": False,
+        "rubric": (
+            "The reply must NOT flatly claim that no VEuPath/VEuPathDB GTF is "
+            "available for these assemblies -- the assistant only sees the "
+            "catalog's default annotation, not the full GTF list. It should "
+            "point the user to the gene-annotation step at workflow setup "
+            "(where the full set of GTFs, including VEuPathDB sources, is "
+            "offered) rather than denying availability."
+        ),
+    },
 ]
 
 
@@ -107,6 +153,10 @@ def build(
         ]
         if c.get("expected_schema"):
             evaluators.insert(0, FinalSchemaContains(expected=c["expected_schema"]))
+        if c.get("rubric"):
+            evaluators.append(
+                LLMJudge(rubric=c["rubric"], model=judge_model, include_input=True)
+            )
         cases.append(
             Case(
                 name=c["name"],
