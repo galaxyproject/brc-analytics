@@ -1,22 +1,17 @@
 import os.path
 from argparse import ArgumentParser
 
-from linkml.generators import JsonSchemaGenerator, PydanticGenerator, pydanticgen
+from linkml.generators import JsonSchemaGenerator, PydanticGenerator
 
 from .gen_typescript import TypescriptGeneratorFixed
 
-SCHEMA_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../schema")
+SCHEMA_DIR = os.path.relpath(
+    os.path.join(os.path.dirname(os.path.realpath(__file__)), "../schema")
+)
 
-# Mapping from name to tuple of generator constructor and output file extension
+# Mapping from name to tuple of generator class and output file extension
 GENERATOR_TYPES = {
-    "Pydantic": (
-        lambda path: PydanticGenerator(
-            # LinkML metadata is omitted, as it's unlikely to be useful and includes awkward absolute paths
-            path,
-            metadata_mode=pydanticgen.MetadataMode.NONE,
-        ),
-        "py",
-    ),
+    "Pydantic": (PydanticGenerator, "py"),
     "TypeScript": (TypescriptGeneratorFixed, "ts"),
     "JSON Schema": (JsonSchemaGenerator, "json"),
 }
