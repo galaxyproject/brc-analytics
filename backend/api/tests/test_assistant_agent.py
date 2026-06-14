@@ -364,6 +364,50 @@ class TestApplySchemaUpdates:
         assert result.organism.value == "Existing"
         assert result.assembly.detail == "GCF_000146045.2"
 
+    def test_organism_scope_workflow_not_resolved(self, agent):
+        # An ORGANISM-scope workflow named in a SCHEMA_UPDATE must NOT populate a
+        # handoff-capable trsId, even on an exact iwcId match -- otherwise it
+        # bypasses the scope filter on the catalog tools (#1321).
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "ASSEMBLY",
+                "workflows": [
+                    {
+                        "iwcId": "assembly-with-flye",
+                        "workflowName": "Assembly with Flye",
+                        "scope": "ORGANISM",
+                        "trsId": "#workflow/github.com/iwc/assembly-with-flye/main",
+                    }
+                ],
+            }
+        ]
+        schema = AnalysisSchema()
+        result = agent._apply_schema_updates(
+            schema, {"workflow": "Assembly with Flye (assembly-with-flye)"}
+        )
+        assert result.workflow.detail is None
+
+    def test_assembly_scope_workflow_still_resolves(self, agent):
+        # Sanity: a same-shaped ASSEMBLY-scope workflow still resolves its trsId.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "TRANSCRIPTOMICS",
+                "workflows": [
+                    {
+                        "iwcId": "rnaseq-pe",
+                        "workflowName": "RNA-Seq PE",
+                        "scope": "ASSEMBLY",
+                        "trsId": "#workflow/github.com/iwc/rnaseq-pe/main",
+                    }
+                ],
+            }
+        ]
+        schema = AnalysisSchema()
+        result = agent._apply_schema_updates(
+            schema, {"workflow": "RNA-Seq PE (rnaseq-pe)"}
+        )
+        assert result.workflow.detail == "#workflow/github.com/iwc/rnaseq-pe/main"
+
 
 # ---------- compute_handoff ----------
 

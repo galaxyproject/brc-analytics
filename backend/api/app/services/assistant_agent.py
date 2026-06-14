@@ -31,7 +31,7 @@ from app.models.assistant import (
     TokenUsage,
 )
 from app.services.session_service import SessionService
-from app.services.tools.catalog_data import CatalogData
+from app.services.tools.catalog_data import CatalogData, _is_assembly_scope
 from app.services.tools.catalog_tools import (
     AssistantDeps,
     check_compatibility,
@@ -765,6 +765,11 @@ class AssistantAgent:
                 workflow_value = str(value)
                 for cat in self.catalog.workflows_by_category:
                     for wf in cat.get("workflows", []):
+                        # Skip non-ASSEMBLY-scope workflows so an LLM-emitted
+                        # SCHEMA_UPDATE can't populate a handoff-capable detail
+                        # for a workflow the catalog tools hide (#1321).
+                        if not _is_assembly_scope(wf):
+                            continue
                         iwc_id = wf.get("iwcId")
                         if iwc_id and iwc_id in workflow_value:
                             # `.get("trsId", iwc_id)` would keep a None trsId;
@@ -830,6 +835,8 @@ class AssistantAgent:
         val_lower = value.lower()
         for cat in self.catalog.workflows_by_category:
             for wf in cat.get("workflows", []):
+                if not _is_assembly_scope(wf):
+                    continue
                 wf_name = (wf.get("workflowName") or "").lower()
                 if wf_name and (wf_name in val_lower or val_lower in wf_name):
                     logger.info("Workflow fallback matched name '%s'", wf_name)
