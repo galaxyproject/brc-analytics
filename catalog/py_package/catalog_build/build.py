@@ -126,8 +126,16 @@ def post_ncbi_request(url, json_data, batch_size=1000, min_batch_size=50):
                         else:
                             # Some other issue with the response
                             raise Exception(f"Unexpected response format: {data}")
-                    elif len(data["reports"][0].get("errors", [])) > 0:
-                        raise Exception(data["reports"][0])
+                    else:
+                        invalid = [r for r in data["reports"] if r.get("errors")]
+                        if invalid:
+                            for r in invalid:
+                                print(
+                                    f"Warning: Skipping unrecognized taxonomy ID(s): {r.get('query', [])}"
+                                )
+                            data["reports"] = [
+                                r for r in data["reports"] if not r.get("errors")
+                            ]
 
                     batch_reports.extend(data["reports"])
 

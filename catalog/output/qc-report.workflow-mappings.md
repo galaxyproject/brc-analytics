@@ -46,4 +46,4 @@ None
 
 ## Workflow taxonomy ID issues (not in catalog or below species rank)
 
-- Pox Virus Illumina Amplicon Workflow from half-genomes (#workflow/github.com/iwc-workflows/pox-virus-amplicon/main/versions/v0.4): taxonomy ID appears to be below species rank
+None

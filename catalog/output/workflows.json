@@ -658,7 +658,7 @@
         ],
         "ploidy": "HAPLOID",
         "scope": "ASSEMBLY",
-        "taxonomyId": "10244",
+        "taxonomyId": "3431483",
         "trsId": "#workflow/github.com/iwc-workflows/pox-virus-amplicon/main/versions/v0.4",
         "workflowDescription": "A workflow for the analysis of pox virus genomes sequenced as half-genomes (for ITR resolution) in a tiled-amplicon approach",
         "workflowName": "Pox Virus Illumina Amplicon Workflow from half-genomes"

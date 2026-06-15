@@ -50,7 +50,9 @@
         "type": "HGPHYLOPLACE"
       }
     ],
-    "taxonomy_id": 2955291
+    "taxonomy_id": 2955291,
+    "taxonNameField": "taxonomicLevelSpecies",
+    "taxonName": "Alphainfluenzavirus influenzae"
   },
   {
     "description": {
@@ -138,9 +140,9 @@
         "type": "HGPHYLOPLACE"
       }
     ],
-    "taxonomy_id": 10244,
-    "taxonNameField": "otherTaxa",
-    "taxonName": "Monkeypox virus"
+    "taxonomy_id": 3431483,
+    "taxonNameField": "taxonomicLevelSpecies",
+    "taxonName": "Orthopoxvirus monkeypox"
   },
   {
     "description": {

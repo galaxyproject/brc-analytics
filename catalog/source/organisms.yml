@@ -6668,6 +6668,3 @@ organisms:
   - taxonomy_id: 3703354
     ploidy:
       - HAPLOID
-  - taxonomy_id: 12451280
-    ploidy:
-      - DIPLOID
