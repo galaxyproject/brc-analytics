@@ -40,7 +40,12 @@ async function buildCatalog(): Promise<void> {
     await saveJson("catalog/output/workflow-assembly-mappings.json", mappings);
 
     // Generate workflow mappings QC report (pass "BRC" as site name)
-    const qcReport = generateWorkflowMappingsQC(mappings, workflows, "BRC");
+    const qcReport = generateWorkflowMappingsQC(
+      mappings,
+      workflows,
+      "BRC",
+      genomes
+    );
     await fsp.writeFile(
       "catalog/output/qc-report.workflow-mappings.md",
       qcReport

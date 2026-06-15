@@ -120,11 +120,18 @@ export function buildWorkflowAssemblyMappings<
   return mappings;
 }
 
+export type AssemblyForTaxonomyCheck = {
+  lineageTaxonomyIds: string[];
+  ncbiTaxonomyId: string;
+  speciesTaxonomyId: string;
+};
+
 // Generic QC report generator - site name is parameterized
 export function generateWorkflowMappingsQC(
   mappings: WorkflowAssemblyMapping[],
   workflowCategories: WorkflowCategory[],
-  siteName: string
+  siteName: string,
+  assemblies?: AssemblyForTaxonomyCheck[]
 ): string {
   const workflows = workflowCategories.flatMap((cat) => cat.workflows);
 
@@ -185,5 +192,90 @@ export function generateWorkflowMappingsQC(
   );
   lines.push("");
 
+  lines.push(
+    "## Workflow taxonomy ID issues (not in catalog or below species rank)",
+    ""
+  );
+  lines.push(...formatTaxonomyIssuesLines(workflows, assemblies));
+
   return lines.join("\n");
+}
+
+function formatTaxonomyIssuesLines(
+  workflows: {
+    taxonomyId: string | null;
+    trsId: string;
+    workflowName: string;
+  }[],
+  assemblies: AssemblyForTaxonomyCheck[] | undefined
+): string[] {
+  if (assemblies === undefined) return ["N/A", ""];
+  const issues = checkWorkflowTaxonomyIds(workflows, assemblies);
+  if (issues.length === 0) return ["None", ""];
+  return [
+    ...issues.map(
+      ({ reason, trsId, workflowName }) =>
+        `- ${workflowName} (${trsId}): ${reason}`
+    ),
+    "",
+  ];
+}
+
+/**
+ * Check workflow taxonomy IDs against assembly lineage data.
+ * Flags taxonomy IDs that are not in any assembly's lineage (not in catalog),
+ * or that only appear as sub-species assembly IDs (below species rank).
+ * A taxonomy ID is considered at species rank or above if it equals the
+ * speciesTaxonomyId of at least one assembly, or if it appears in assembly
+ * lineages but is not the direct ncbiTaxonomyId of any sub-species assembly.
+ * @param workflows - Workflows to check, each with a nullable taxonomyId.
+ * @param assemblies - Assembly data providing lineage and species taxonomy IDs.
+ * @returns List of issues, each with a reason, trsId, and workflowName.
+ */
+function checkWorkflowTaxonomyIds(
+  workflows: {
+    taxonomyId: string | null;
+    trsId: string;
+    workflowName: string;
+  }[],
+  assemblies: AssemblyForTaxonomyCheck[]
+): { reason: string; trsId: string; workflowName: string }[] {
+  const allLineageIds = new Set(
+    assemblies.flatMap((a) => a.lineageTaxonomyIds)
+  );
+  const speciesIds = new Set(assemblies.map((a) => a.speciesTaxonomyId));
+  // ncbiTaxonomyIds that are below species rank (assembly is a strain/serotype/etc.)
+  const subSpeciesNcbiIds = new Set(
+    assemblies
+      .filter((a) => a.ncbiTaxonomyId !== a.speciesTaxonomyId)
+      .map((a) => a.ncbiTaxonomyId)
+  );
+
+  // Deduplicate workflows by trsId before checking
+  const seenTrsIds = new Set<string>();
+  const issues: { reason: string; trsId: string; workflowName: string }[] = [];
+
+  for (const wf of workflows) {
+    if (wf.taxonomyId === null || seenTrsIds.has(wf.trsId)) continue;
+    seenTrsIds.add(wf.trsId);
+
+    if (!allLineageIds.has(wf.taxonomyId)) {
+      issues.push({
+        reason: "taxonomy ID not found in any assembly's lineage",
+        trsId: wf.trsId,
+        workflowName: wf.workflowName,
+      });
+    } else if (
+      !speciesIds.has(wf.taxonomyId) &&
+      subSpeciesNcbiIds.has(wf.taxonomyId)
+    ) {
+      issues.push({
+        reason: "taxonomy ID appears to be below species rank",
+        trsId: wf.trsId,
+        workflowName: wf.workflowName,
+      });
+    }
+  }
+
+  return issues;
 }

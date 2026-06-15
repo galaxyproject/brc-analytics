@@ -6,6 +6,8 @@ from ....py_package.catalog_build import build_files, create_taxonomy_read_run_c
 
 ASSEMBLIES_PATH = "catalog/ga2/source/assemblies.yml"
 
+ORGANISMS_PATH = "catalog/ga2/source/organisms.yml"
+
 UCSC_ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/VGP/assemblyList.json"
 
 GENOMES_OUTPUT_PATH = "catalog/ga2/build/intermediate/genomes-from-ncbi.tsv"
@@ -97,6 +99,7 @@ def build_ncbi_data():
             "tolId": TOLIDS_BY_TAXONOMY_ID,
         },
         do_gene_model_urls=False,
+        organisms_path=ORGANISMS_PATH,
         primary_output_path=PRIMARYDATA_OUTPUT_PATH,
         qc_report_path=QC_REPORT_PATH,
         extract_primary_data=False,
