@@ -61,7 +61,7 @@ linkml_meta = LinkMLMeta(
                 "prefix_reference": "https://w3id.org/linkml/",
             }
         },
-        "source_file": "/home/danielle/Documents/brc-analytics/brc-analytics/catalog/py_package/catalog_build/schema_utils/../schema/schema.yaml",
+        "source_file": "catalog/py_package/catalog_build/schema/schema.yaml",
     }
 )
 
