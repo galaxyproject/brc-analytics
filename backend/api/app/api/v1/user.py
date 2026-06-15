@@ -39,10 +39,10 @@ async def update_preferences(
     current_user_db: User = Depends(get_current_user_db),
     session: AsyncSession = Depends(get_db_session),
 ) -> UserPreferences:
-    # Reject obviously-oversized payloads before they're parsed. The
-    # serialized check below is still authoritative for cases where
-    # Content-Length is missing or lies, but this saves Pydantic from
-    # parsing a pathological 100MB blob in the common case.
+    # Best-effort early rejection from the Content-Length header. FastAPI has
+    # already parsed the body by the time we get here, so this is just a fast
+    # 413 in the common case; the serialized-size check below is authoritative
+    # (Content-Length can be missing or lie).
     content_length = request.headers.get("content-length")
     if content_length is not None:
         try:
