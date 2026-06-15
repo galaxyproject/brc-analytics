@@ -161,7 +161,7 @@ export default function WorkflowRunsPage(): JSX.Element {
       <SectionHero
         breadcrumbs={BREADCRUMBS}
         head="Workflow Runs"
-        subHead="Workflow handoffs are tracked here once they are associated with your account. Anonymous launches are still recorded in the database, but only authenticated runs are listed on this page."
+        subHead="Workflow handoffs are tracked here once they are associated with your account. Anonymous launches are still recorded, but only authenticated runs are listed on this page."
       />
       <Box sx={{ maxWidth: 960, mx: "auto", px: 3, py: 6, width: "100%" }}>
         {renderContent()}

@@ -89,9 +89,9 @@ export default function PreferencesPage(): JSX.Element {
     return (
       <Stack spacing={3}>
         <Typography variant="body1">
-          This page currently acts as a JSON-backed placeholder for account
-          preferences. Saving `{}` is valid and confirms the persistent user
-          settings path works end to end.
+          Preferences are saved to your account as JSON. Specific settings will
+          appear here as they are added; until then you can edit the raw object
+          directly.
         </Typography>
         {error && <Alert severity="error">{error}</Alert>}
         {saveMessage && <Alert severity="success">{saveMessage}</Alert>}
@@ -141,7 +141,7 @@ export default function PreferencesPage(): JSX.Element {
       <SectionHero
         breadcrumbs={BREADCRUMBS}
         head="Preferences"
-        subHead="Persistent account-backed preferences are available here. V1 keeps the schema intentionally open so the API wire is in place before product-specific toggles are added."
+        subHead="Preferences are saved to your BRC account. Specific settings will be added here over time."
       />
       <Box sx={{ maxWidth: 960, mx: "auto", px: 3, py: 6, width: "100%" }}>
         {renderContent()}
