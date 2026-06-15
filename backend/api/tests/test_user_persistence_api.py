@@ -117,7 +117,7 @@ def persistence_app(tmp_path, monkeypatch):
 
     asyncio.run(_create_schema(database_url))
 
-    from app.db.session import get_session_factory
+    from app.db.session import close_db, get_session_factory
     from app.main import create_app
 
     app = create_app()
@@ -143,6 +143,12 @@ def persistence_app(tmp_path, monkeypatch):
     app.dependency_overrides[dependencies.get_assistant_agent] = lambda: agent
 
     yield app, session_factory, current_sub, agent
+
+    # Dispose the global engine the fixture created. Client-based tests get
+    # this via the app lifespan shutdown, but persistence_app used directly
+    # (e.g. the concurrent-insert race test) would otherwise leak the cached
+    # engine/session factory into the next test.
+    asyncio.run(close_db())
 
 
 @pytest.fixture()
