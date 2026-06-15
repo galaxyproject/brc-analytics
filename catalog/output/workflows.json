@@ -641,7 +641,7 @@
         ],
         "ploidy": "ANY",
         "scope": "ORGANISM",
-        "taxonomyId": "11320",
+        "taxonomyId": "2955291",
         "trsId": "#workflow/github.com/iwc-workflows/influenza-isolates-consensus-and-subtyping/main/versions/v0.3",
         "workflowDescription": "This workflow performs subtyping and consensus sequence generation for batches of Illumina PE sequenced Influenza A isolates.",
         "workflowName": "Influenza A isolate subtyping and consensus sequence generation"

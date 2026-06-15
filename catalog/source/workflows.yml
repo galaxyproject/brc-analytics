@@ -1012,7 +1012,7 @@ workflows:
     scope: ORGANISM
     assembly_count_min: 0
     assembly_count_max: 0
-    taxonomy_id: 11320
+    taxonomy_id: 2955291
     parameters:
       - key: References per segment collection
         collection_spec:
@@ -1183,7 +1183,7 @@ workflows:
       A workflow for the analysis of pox virus genomes sequenced
       as half-genomes (for ITR resolution) in a tiled-amplicon approach
     ploidy: HAPLOID
-    taxonomy_id: 10244
+    taxonomy_id: 3431483
     parameters:
       - key: Reference FASTA
         variable: ASSEMBLY_FASTA_URL

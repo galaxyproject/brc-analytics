@@ -43,3 +43,7 @@ None
 - Total active workflows: 29
 - Workflows that meet their minimum assembly requirement: 29
 - Workflows that cannot meet minimum assembly requirement: 0
+
+## Workflow taxonomy ID issues (not in catalog or below species rank)
+
+- Pox Virus Illumina Amplicon Workflow from half-genomes (#workflow/github.com/iwc-workflows/pox-virus-amplicon/main/versions/v0.4): taxonomy ID appears to be below species rank
