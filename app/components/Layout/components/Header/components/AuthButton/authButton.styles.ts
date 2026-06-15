@@ -16,6 +16,18 @@ export const UserChip = styled(Button)(({ theme }) => ({
   ".MuiButton-startIcon, .MuiButton-endIcon": {
     margin: 0,
   },
+  // The avatar is the Button's startIcon, whose default rule
+  // (.MuiButton-startIcon > :nth-of-type(1)) forces a 20px font on its child and
+  // ties a plain .MuiAvatar-root override on specificity. Scope to the startIcon
+  // context so the initials actually shrink to fit the 28px circle.
+  ".MuiButton-startIcon .MuiAvatar-root": {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
+    fontSize: 12,
+    fontWeight: 600,
+    height: 28,
+    width: 28,
+  },
 }));
 
 export const UserMenuHeader = styled("div")({

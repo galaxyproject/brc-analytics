@@ -75,20 +75,7 @@ export function AuthButton(): JSX.Element | null {
         endIcon={<KeyboardArrowDownRoundedIcon fontSize="small" />}
         id={MENU_BUTTON_ID}
         onClick={handleOpen}
-        startIcon={
-          <Avatar
-            sx={{
-              bgcolor: "primary.main",
-              fontSize: 12,
-              fontWeight: 600,
-              height: 28,
-              lineHeight: 1,
-              width: 28,
-            }}
-          >
-            {getInitials(displayName)}
-          </Avatar>
-        }
+        startIcon={<Avatar>{getInitials(displayName)}</Avatar>}
         variant="text"
       >
         {displayName}
