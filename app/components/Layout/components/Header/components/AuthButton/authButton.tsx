@@ -15,6 +15,7 @@ import { useAuth } from "../../../../../../providers/authentication";
 import { UserChip, UserMenuHeader } from "./authButton.styles";
 
 const MENU_ID = "user-account-menu";
+const MENU_BUTTON_ID = "user-account-button";
 
 /**
  * Build up-to-two-letter initials from a display name.
@@ -68,10 +69,11 @@ export function AuthButton(): JSX.Element | null {
     <>
       <UserChip
         aria-controls={isOpen ? MENU_ID : undefined}
-        aria-expanded={isOpen}
-        aria-haspopup="true"
+        aria-expanded={isOpen || undefined}
+        aria-haspopup="menu"
         color="inherit"
         endIcon={<KeyboardArrowDownRoundedIcon fontSize="small" />}
+        id={MENU_BUTTON_ID}
         onClick={handleOpen}
         startIcon={
           <Avatar
@@ -97,7 +99,10 @@ export function AuthButton(): JSX.Element | null {
         id={MENU_ID}
         onClose={handleClose}
         open={isOpen}
-        slotProps={{ paper: { sx: { minWidth: 220 } } }}
+        slotProps={{
+          list: { "aria-labelledby": MENU_BUTTON_ID },
+          paper: { sx: { minWidth: 220 } },
+        }}
         transformOrigin={{ horizontal: "right", vertical: "top" }}
       >
         <UserMenuHeader>
