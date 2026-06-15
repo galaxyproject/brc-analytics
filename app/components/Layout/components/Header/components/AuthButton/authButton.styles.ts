@@ -1,29 +1,25 @@
-import styled from "@emotion/styled";
-import { Button } from "@mui/material";
+import { Button, styled } from "@mui/material";
 
 // Clickable, pill-shaped user chip (avatar + name + caret) that anchors the
 // account menu. Reads as a grouped control rather than loose text next to a
 // button, and visually separates the account from the nav links.
-export const UserChip = styled(Button)`
-  background-color: rgba(0, 0, 0, 0.04);
-  border-radius: 9999px;
-  gap: 6px;
-  min-width: 0;
-  padding: 4px 10px 4px 4px;
-  text-transform: none;
+export const UserChip = styled(Button)(({ theme }) => ({
+  backgroundColor: theme.palette.action.hover,
+  borderRadius: 9999,
+  gap: "6px",
+  minWidth: 0,
+  padding: "4px 10px 4px 4px",
+  textTransform: "none",
+  "&:hover": {
+    backgroundColor: theme.palette.action.selected,
+  },
+  ".MuiButton-startIcon, .MuiButton-endIcon": {
+    margin: 0,
+  },
+}));
 
-  &:hover {
-    background-color: rgba(0, 0, 0, 0.08);
-  }
-
-  .MuiButton-startIcon,
-  .MuiButton-endIcon {
-    margin: 0;
-  }
-`;
-
-export const UserMenuHeader = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 8px 16px;
-`;
+export const UserMenuHeader = styled("div")({
+  display: "flex",
+  flexDirection: "column",
+  padding: "8px 16px",
+});
