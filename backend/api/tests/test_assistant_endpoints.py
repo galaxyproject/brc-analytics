@@ -122,6 +122,30 @@ class TestSessionCookieBinding:
         resp = client.delete("/api/v1/assistant/session/sess-abc")
         assert resp.status_code == 204
 
+    def test_logout_clears_assistant_session_cookie(self, client):
+        # A shared browser must not keep the prior user's assistant session
+        # reachable after logout -- the restore/delete endpoints gate purely
+        # on possession of this cookie.
+        # Key the override on the reference the route actually captured at
+        # import (monkeypatching app.core.dependencies doesn't rebind it).
+        from app.api.v1 import auth as auth_module
+
+        fake_auth = MagicMock()
+        fake_auth.revoke_session_tokens = AsyncMock()
+        client.app.dependency_overrides[auth_module.get_auth_service] = (
+            lambda: fake_auth
+        )
+
+        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
+        resp = client.post("/api/v1/auth/logout")
+        assert resp.status_code == 200, resp.text
+        cleared = [
+            h
+            for h in resp.headers.get_list("set-cookie")
+            if h.startswith("brc_assistant_session=") and "Max-Age=0" in h
+        ]
+        assert cleared, resp.headers.get_list("set-cookie")
+
 
 class TestAnonymousSessionClaim:
     """When an authenticated user continues a session started anonymously,
