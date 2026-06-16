@@ -1478,7 +1478,7 @@ workflows:
       affected by ARTIC primer-binding site mutations and tries to exclude reads derived
       from such tainted amplicons when calculating allele-frequencies of other variants.
     ploidy: HAPLOID
-    taxonomy_id: 694009
+    taxonomy_id: 3418604
     parameters:
       - key: Paired Collection
         variable: SANGER_READ_RUN_PAIRED
@@ -1525,7 +1525,7 @@ workflows:
       This workflows performs paired end read mapping with bwa-mem
       followed by sensitive variant calling across a wide range of AFs with lofreq
     ploidy: HAPLOID
-    taxonomy_id: 694009
+    taxonomy_id: 3418604
     parameters:
       - key: Paired Collection
         variable: SANGER_READ_RUN_PAIRED
@@ -1550,7 +1550,7 @@ workflows:
       This workflows performs single end read mapping with bowtie2
       followed by sensitive variant calling across a wide range of AFs with lofreq
     ploidy: HAPLOID
-    taxonomy_id: 694009
+    taxonomy_id: 3418604
     parameters:
       - key: Single End Collection
         variable: SANGER_READ_RUN_SINGLE

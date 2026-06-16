@@ -11,9 +11,9 @@ None
 | Variant calling and consensus construction from paired end short read data of non-segmented viral genomes | 13 |
 | Paired end variant calling in haploid system | 4509 |
 | Paired end variant and ploidy-aware genotype calling | 5499 |
-| COVID-19: variation analysis on ARTIC PE data | 1 |
-| COVID-19: variation analysis on WGS PE data | 1 |
-| COVID-19: variation analysis on WGS SE data | 1 |
+| COVID-19: variation analysis on ARTIC PE data | 2 |
+| COVID-19: variation analysis on WGS PE data | 2 |
+| COVID-19: variation analysis on WGS SE data | 2 |
 | Single-Cell RNA-seq Preprocessing: 10X Genomics CellPlex Multiplexed Samples | 5495 |
 | Single-Cell RNA-seq Preprocessing: 10X Genomics v3 to Seurat and Scanpy Compatible Format | 5495 |
 | RNA-Seq Analysis: Paired-End Read Processing and Quantification | 5495 |

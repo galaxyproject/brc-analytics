@@ -131,7 +131,7 @@
         ],
         "ploidy": "HAPLOID",
         "scope": "ASSEMBLY",
-        "taxonomyId": "694009",
+        "taxonomyId": "3418604",
         "trsId": "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-variant-calling/COVID-19-PE-ARTIC-ILLUMINA/versions/v0.5.5",
         "workflowDescription": "The workflow for Illumina-sequenced ARTIC data builds on the RNASeq workflow for paired-end data using the same steps for mapping and variant calling, but adds extra logic for trimming ARTIC primer sequences off reads with the ivar package. In addition, this workflow uses ivar also to identify amplicons affected by ARTIC primer-binding site mutations and tries to exclude reads derived from such tainted amplicons when calculating allele-frequencies of other variants.",
         "workflowName": "COVID-19: variation analysis on ARTIC PE data"
@@ -158,7 +158,7 @@
         ],
         "ploidy": "HAPLOID",
         "scope": "ASSEMBLY",
-        "taxonomyId": "694009",
+        "taxonomyId": "3418604",
         "trsId": "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-wgs-variant-calling/COVID-19-PE-WGS-ILLUMINA/versions/v0.2.4",
         "workflowDescription": "This workflows performs paired end read mapping with bwa-mem followed by sensitive variant calling across a wide range of AFs with lofreq",
         "workflowName": "COVID-19: variation analysis on WGS PE data"
@@ -185,7 +185,7 @@
         ],
         "ploidy": "HAPLOID",
         "scope": "ASSEMBLY",
-        "taxonomyId": "694009",
+        "taxonomyId": "3418604",
         "trsId": "#workflow/github.com/iwc-workflows/sars-cov-2-se-illumina-wgs-variant-calling/COVID-19-SE-WGS-ILLUMINA/versions/v0.1.6",
         "workflowDescription": "This workflows performs single end read mapping with bowtie2 followed by sensitive variant calling across a wide range of AFs with lofreq",
         "workflowName": "COVID-19: variation analysis on WGS SE data"
