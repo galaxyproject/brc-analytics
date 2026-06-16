@@ -324,11 +324,26 @@ class AssistantAgent:
 
         try:
             if base_url and "anthropic" in base_url.lower():
-                from pydantic_ai.models.anthropic import AnthropicModel
+                from pydantic_ai.models.anthropic import (
+                    AnthropicModel,
+                    AnthropicModelSettings,
+                )
                 from pydantic_ai.providers.anthropic import AnthropicProvider
 
                 provider = AnthropicProvider(api_key=settings.AI_API_KEY)
-                return AnthropicModel(model_name, provider=provider)
+                # Cache the static request prefix (system prompt + tool
+                # definitions) so it isn't re-billed at full input rate on every
+                # request. A single turn issues multiple requests (one per tool
+                # round plus the final answer), so this pays off within one
+                # conversation. Anthropic only caches when explicitly asked --
+                # pydantic-ai won't enable it for us.
+                model_settings = AnthropicModelSettings(
+                    anthropic_cache_tool_definitions=True,
+                    anthropic_cache_instructions=True,
+                )
+                return AnthropicModel(
+                    model_name, provider=provider, settings=model_settings
+                )
             else:
                 # Default: assume model string like "openai:gpt-4o" or
                 # "anthropic:claude-sonnet-4-20250514" handled by pydantic-ai

@@ -652,6 +652,26 @@ class TestGetProvider:
         assert agent.get_provider() is None
 
 
+# ---------- _build_model ----------
+
+
+class TestBuildModel:
+    def _agent_with_settings(self, base_url=None, api_key="test-key"):
+        instance = object.__new__(AssistantAgent)
+        instance.settings = MagicMock()
+        instance.settings.AI_API_BASE_URL = base_url
+        instance.settings.AI_API_KEY = api_key
+        return instance
+
+    def test_anthropic_model_enables_prompt_caching(self):
+        agent = self._agent_with_settings(base_url="https://api.anthropic.com/v1")
+        model = agent._build_model("claude-sonnet-4-6")
+
+        settings = model.settings or {}
+        assert settings.get("anthropic_cache_tool_definitions") is True
+        assert settings.get("anthropic_cache_instructions") is True
+
+
 class TestSystemPromptHardening:
     def test_prompt_calls_out_injection_attempts(self):
         from app.services.assistant_agent import SYSTEM_PROMPT
