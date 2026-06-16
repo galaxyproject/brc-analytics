@@ -4,17 +4,8 @@ import { Button, styled } from "@mui/material";
 // account menu. Reads as a grouped control rather than loose text next to a
 // button, and visually separates the account from the nav links.
 export const UserChip = styled(Button)(({ theme }) => ({
-  backgroundColor: theme.palette.action.hover,
-  borderRadius: 9999,
-  gap: "6px",
-  minWidth: 0,
-  padding: "4px 10px 4px 4px",
-  textTransform: "none",
   "&:hover": {
     backgroundColor: theme.palette.action.selected,
-  },
-  ".MuiButton-startIcon, .MuiButton-endIcon": {
-    margin: 0,
   },
   // The avatar is the Button's startIcon, whose default rule
   // (.MuiButton-startIcon > :nth-of-type(1)) forces a 20px font on its child and
@@ -28,6 +19,15 @@ export const UserChip = styled(Button)(({ theme }) => ({
     height: 28,
     width: 28,
   },
+  ".MuiButton-startIcon, .MuiButton-endIcon": {
+    margin: 0,
+  },
+  backgroundColor: theme.palette.action.hover,
+  borderRadius: 9999,
+  gap: "6px",
+  minWidth: 0,
+  padding: "4px 10px 4px 4px",
+  textTransform: "none",
 }));
 
 export const UserMenuHeader = styled("div")({
