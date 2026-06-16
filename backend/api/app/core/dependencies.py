@@ -10,7 +10,6 @@ from app.services.assistant_agent import AssistantAgent
 from app.services.auth_service import AuthService
 from app.services.catalog_data import CatalogData
 from app.services.ena_service import ENAService
-from app.services.llm_service import LLMService
 
 logger = logging.getLogger(__name__)
 
@@ -33,16 +32,6 @@ def get_cache_service() -> CacheService:
 def get_catalog_data() -> CatalogData:
     settings = get_settings()
     return CatalogData(settings.CATALOG_PATH)
-
-
-@lru_cache(maxsize=1)
-def get_llm_service() -> LLMService:
-    cache = get_cache_service()
-    service = LLMService(cache)
-    logger.info(
-        f"LLM service initialized (singleton), available: {service.is_available()}"
-    )
-    return service
 
 
 @lru_cache(maxsize=1)
@@ -92,7 +81,6 @@ def reset_all_services() -> None:
     get_auth_service.cache_clear()
     get_cache_service.cache_clear()
     get_catalog_data.cache_clear()
-    get_llm_service.cache_clear()
     get_ena_service.cache_clear()
     get_assistant_agent.cache_clear()
     get_rate_limiter.cache_clear()

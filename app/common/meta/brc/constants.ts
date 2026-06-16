@@ -81,11 +81,6 @@ export const BRC_PAGE_META = {
     pageDescription: "View the development roadmap for BRC Analytics.",
     pageTitle: "Roadmap",
   },
-  SEARCH: {
-    pageDescription:
-      "Search across organisms, assemblies, and workflows on BRC Analytics.",
-    pageTitle: "Search",
-  },
   VISION: {
     pageDescription:
       "Learn about the vision, goals, and commitments behind BRC Analytics.",

@@ -292,7 +292,6 @@ class AssistantAgent:
             logger.warning("AI_API_KEY not set — assistant agent unavailable")
             return
 
-        # Build model the same way LLMService does
         model = self._build_model(settings.AI_PRIMARY_MODEL)
         if model is None:
             return
@@ -319,10 +318,7 @@ class AssistantAgent:
         logger.info("Assistant agent initialized")
 
     def _build_model(self, model_name: str):
-        """Build a pydantic-ai model from the configured provider.
-
-        TODO: Shares logic with LLMService.__init__; extract a shared utility.
-        """
+        """Build a pydantic-ai model from the configured provider."""
         settings = self.settings
         base_url = settings.AI_API_BASE_URL
 

@@ -17,9 +17,7 @@ from pydantic_ai.messages import ModelResponse, ToolCallPart
 
 from app.core.cache import CacheService
 from app.core.config import Settings, get_settings
-from app.models.llm import WorkflowSuggestionRequest
 from app.services.assistant_agent import AssistantAgent
-from app.services.llm_service import LLMService
 from app.services.tools.catalog_data import CatalogData
 from app.services.tools.catalog_tools import AssistantDeps
 from evals.judge import build_pydantic_ai_model
@@ -51,9 +49,8 @@ class EvalDeps:
     """Shared per-run state.
 
     Settings and catalog are reused across the whole CLI invocation; cache is
-    rebuilt per (dataset, model) run via `with_fresh_cache()` so that
-    LLMService's content-keyed cache entries (llm:interpret, llm:workflow)
-    can't leak from one model's output into another model's input.
+    rebuilt per (dataset, model) run via `with_fresh_cache()` so that one
+    model's session state can't leak into another model's input.
     """
 
     settings: Settings
@@ -64,22 +61,6 @@ class EvalDeps:
         return EvalDeps(
             settings=self.settings, cache=_make_cache(), catalog=self.catalog
         )
-
-
-@dataclass
-class SearchOutput:
-    organism: Optional[str]
-    taxonomy_id: Optional[str]
-    library_strategy: Optional[str]
-    sequencing_platform: Optional[str]
-    confidence: float
-    raw: dict
-
-
-@dataclass
-class WorkflowRecOutput:
-    iwc_ids: list[str]
-    raw: list[dict]
 
 
 @dataclass
@@ -101,9 +82,9 @@ class ConversationOutput:
 @dataclass
 class _InMemoryCache:
     """Dict-backed cache that satisfies the CacheService surface used by
-    SessionService and LLMService. Persists for the lifetime of the run so
-    multi-turn conversations can actually load their session between turns.
-    Naturally case-isolated because session_ids are minted fresh per case."""
+    SessionService. Persists for the lifetime of the run so multi-turn
+    conversations can actually load their session between turns. Naturally
+    case-isolated because session_ids are minted fresh per case."""
 
     _store: dict[str, Any] = field(default_factory=dict)
 
@@ -142,22 +123,12 @@ def build_deps(skip_env_vars: Optional[set[str]] = None) -> EvalDeps:
 
 
 def _override_model(svc: Any, entry: ModelEntry) -> None:
-    """Swap agent models on a service to the eval target.
+    """Swap the agent's model to the eval target.
 
     Mutates `_model` directly because pydantic-ai exposes `model` as a
-    read-only property. All three legacy LLMService agents share the same
-    candidate model -- we score the candidate end-to-end, not the
-    primary/secondary split.
+    read-only property.
     """
     new_model = build_pydantic_ai_model(entry)
-    if hasattr(svc, "primary_model"):
-        svc.primary_model = new_model
-    if hasattr(svc, "secondary_model"):
-        svc.secondary_model = new_model
-    for attr in ("reasoning_agent", "formatting_agent", "workflow_agent"):
-        agent = getattr(svc, attr, None)
-        if agent is not None:
-            agent._model = new_model
     if getattr(svc, "agent", None) is not None:
         svc.agent._model = new_model
 
@@ -169,54 +140,6 @@ def _prepare_service(svc: Any, entry: ModelEntry) -> None:
             f"{type(svc).__name__} failed to initialize -- check AI_API_KEY in env"
         )
     _override_model(svc, entry)
-
-
-# ---------- Search query interpretation ----------
-
-
-def make_search_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
-    svc = LLMService(deps.cache)
-    _prepare_service(svc, entry)
-
-    async def task(case_input: dict) -> SearchOutput:
-        resp = await svc.interpret_search_query(case_input["query"])
-        # For INVALID_QUERY (gibberish, off-topic) LLMService returns success=False
-        # but still populates data with low-confidence values. Pass that through so
-        # evaluators can score "did the model correctly reject this?" -- only treat
-        # a truly empty data payload as a structural failure.
-        if resp.data is None:
-            raise RuntimeError(resp.error or "LLMService returned failure")
-        d = resp.data
-        return SearchOutput(
-            organism=d.organism,
-            taxonomy_id=d.taxonomy_id,
-            library_strategy=d.library_strategy,
-            sequencing_platform=d.sequencing_platform,
-            confidence=float(d.confidence or 0.0),
-            raw=d.model_dump(),
-        )
-
-    return task
-
-
-# ---------- Workflow recommendation ----------
-
-
-def make_workflow_rec_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
-    svc = LLMService(deps.cache)
-    _prepare_service(svc, entry)
-
-    async def task(case_input: dict) -> WorkflowRecOutput:
-        req = WorkflowSuggestionRequest(**case_input)
-        resp = await svc.suggest_workflows(req)
-        if not resp.success or resp.data is None:
-            raise RuntimeError(resp.error or "suggest_workflows returned failure")
-        return WorkflowRecOutput(
-            iwc_ids=[r.workflow_id for r in resp.data],
-            raw=[r.model_dump() for r in resp.data],
-        )
-
-    return task
 
 
 # ---------- Single-turn assistant tool selection ----------

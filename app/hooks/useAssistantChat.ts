@@ -1,6 +1,6 @@
 import { HTTPError } from "ky";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { llmAPIClient } from "../services/llm-api-client";
+import { assistantAPIClient } from "../services/assistant-api-client";
 import {
   AnalysisSchema,
   AssistantChatResponse,
@@ -56,7 +56,7 @@ export const useAssistantChat = (): UseAssistantChatReturn => {
     let cancelled = false;
     setIsRestoring(true);
 
-    llmAPIClient
+    assistantAPIClient
       .assistantRestore(storedId)
       .then((restored) => {
         if (cancelled) return;
@@ -92,10 +92,11 @@ export const useAssistantChat = (): UseAssistantChatReturn => {
     setMessages((prev) => [...prev, { content: message, role: "user" }]);
 
     try {
-      const response: AssistantChatResponse = await llmAPIClient.assistantChat({
-        message,
-        session_id: sessionIdRef.current ?? undefined,
-      });
+      const response: AssistantChatResponse =
+        await assistantAPIClient.assistantChat({
+          message,
+          session_id: sessionIdRef.current ?? undefined,
+        });
 
       sessionIdRef.current = response.session_id;
       localStorage.setItem(SESSION_KEY, response.session_id);
@@ -132,7 +133,7 @@ export const useAssistantChat = (): UseAssistantChatReturn => {
   const resetSession = useCallback((): void => {
     const oldId = sessionIdRef.current;
     if (oldId) {
-      llmAPIClient.assistantDeleteSession(oldId).catch(() => {});
+      assistantAPIClient.assistantDeleteSession(oldId).catch(() => {});
     }
     sessionIdRef.current = null;
     localStorage.removeItem(SESSION_KEY);
