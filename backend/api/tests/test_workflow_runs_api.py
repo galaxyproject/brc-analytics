@@ -44,18 +44,14 @@ def workflow_runs_client(tmp_path, monkeypatch):
     fake_cache.close = AsyncMock()
     fake_auth = MagicMock()
     fake_auth.close = AsyncMock()
-    fake_llm = MagicMock()
 
     get_cache_service = MagicMock(return_value=fake_cache)
     get_cache_service.cache_clear = MagicMock()
     get_auth_service = MagicMock(return_value=fake_auth)
     get_auth_service.cache_clear = MagicMock()
-    get_llm_service = MagicMock(return_value=fake_llm)
-    get_llm_service.cache_clear = MagicMock()
 
     monkeypatch.setattr(dependencies, "get_cache_service", get_cache_service)
     monkeypatch.setattr(dependencies, "get_auth_service", get_auth_service)
-    monkeypatch.setattr(dependencies, "get_llm_service", get_llm_service)
 
     # Mock the agent so the workflow_runs endpoint's assistant-session
     # validation has a controllable session_service. Each test reconfigures
