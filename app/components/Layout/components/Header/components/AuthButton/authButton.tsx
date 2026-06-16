@@ -100,7 +100,7 @@ export function AuthButton(): JSX.Element | null {
             </Typography>
           )}
         </UserMenuHeader>
-        <Divider />
+        <Divider component="li" />
         <MenuItem onClick={handleSignOut}>
           <ListItemIcon>
             <LogoutRoundedIcon fontSize="small" />
