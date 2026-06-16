@@ -15,7 +15,10 @@ interface UseAssemblyFavoritesReturn {
 export function useAssemblyFavorites(): UseAssemblyFavoritesReturn {
   const { isAuthenticated, isConfigured } = useAuth();
   const [favorites, setFavorites] = useState<FavoriteResponse[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  // Default to loading so an authenticated page shows a spinner on first
+  // paint instead of briefly flashing the "no favorites yet" empty state
+  // before the initial load resolves.
+  const [isLoading, setIsLoading] = useState(true);
   const [isToggling, setIsToggling] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -28,6 +31,7 @@ export function useAssemblyFavorites(): UseAssemblyFavoritesReturn {
     if (!isAuthenticated || !isConfigured) {
       setFavorites([]);
       setError(null);
+      setIsLoading(false);
       return;
     }
 
