@@ -5,7 +5,7 @@ import Error from "next/error";
 import { JSX, useEffect, useState } from "react";
 import { ChatPanel, SchemaPanel } from "../../components/Assistant";
 import { useAssistantChat } from "../../hooks/useAssistantChat";
-import { llmAPIClient } from "../../services/llm-api-client";
+import { assistantAPIClient } from "../../services/assistant-api-client";
 import { AssistantInfoResponse } from "../../types/api";
 import {
   AssistantDisclaimer,
@@ -36,7 +36,7 @@ export const AssistantView = (): JSX.Element => {
   useEffect(() => {
     if (!isAssistantEnabled) return;
     let cancelled = false;
-    llmAPIClient
+    assistantAPIClient
       .assistantInfo()
       .then((data) => {
         if (!cancelled) setInfo(data);
