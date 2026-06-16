@@ -1,7 +1,7 @@
 """CLI runner for the brc-analytics evals harness.
 
 Examples:
-  python -m evals.run_evals --datasets search_interpretation
+  python -m evals.run_evals --datasets tool_selection
   python -m evals.run_evals --datasets all --models claude-sonnet-4-6,gpt-5
   python -m evals.run_evals --datasets tool_selection --repeat 3
 """

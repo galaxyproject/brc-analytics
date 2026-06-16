@@ -45,9 +45,6 @@ def app_with_stubbed_agent(tmp_path, monkeypatch):
     monkeypatch.setattr(
         dependencies, "get_auth_service", MagicMock(return_value=fake_auth)
     )
-    monkeypatch.setattr(
-        dependencies, "get_llm_service", MagicMock(return_value=MagicMock())
-    )
 
     fake_agent = MagicMock()
     fake_agent.is_available.return_value = True

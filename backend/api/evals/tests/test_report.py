@@ -14,7 +14,7 @@ class _StubCase:
 def test_render_report_basic():
     runs = [
         RunResult(
-            dataset="search_interpretation",
+            dataset="tool_selection",
             model="claude-sonnet-4-6",
             cases=[
                 _StubCase(name="yeast_rnaseq_2023", scores={"FieldEquals": 1.0}),
@@ -28,7 +28,7 @@ def test_render_report_basic():
     md = render_report(runs, sha="abc123")
     assert "# BRC Analytics evals" in md
     assert "abc123" in md
-    assert "search_interpretation" in md
+    assert "tool_selection" in md
     assert "claude-sonnet-4-6" in md
     assert "yeast_rnaseq_2023" in md
     # Failure declared FieldEquals: total = 2 cases + 1 failure, score 1.0/3
@@ -66,7 +66,7 @@ def test_failure_only_counts_for_declared_evaluators():
 def test_failure_only_evaluators_still_render_summary_columns():
     runs = [
         RunResult(
-            dataset="search_interpretation",
+            dataset="tool_selection",
             model="m",
             cases=[],
             failures=[("x", "boom", frozenset({"FieldEquals", "LLMJudge"}))],
@@ -83,7 +83,7 @@ def test_failure_only_evaluators_still_render_summary_columns():
 
 def test_duplicate_evaluator_failures_count_by_suffixed_name():
     run = RunResult(
-        dataset="search_interpretation",
+        dataset="tool_selection",
         model="m",
         cases=[
             _StubCase(
