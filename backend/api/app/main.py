@@ -5,14 +5,13 @@ import sentry_sdk
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1 import assistant, auth, cache, ena, health, links, llm, version
+from app.api.v1 import assistant, auth, cache, ena, health, links, version
 from app.core.config import get_settings
 from app.core.dependencies import (
     get_auth_service,
     get_cache_service,
     get_catalog_data,
     get_ena_service,
-    get_llm_service,
     reset_all_services,
 )
 from app.services.mcp_server import create_mcp_server
@@ -46,10 +45,6 @@ def create_app() -> FastAPI:
             await cache_service.flush_all()
             logger.info("Cache cleared on startup")
 
-            get_llm_service()
-
-            logger.info("All services initialized")
-
             yield
 
             auth_service = get_auth_service()
@@ -79,7 +74,6 @@ def create_app() -> FastAPI:
     app.include_router(cache.router, prefix="/api/v1/cache", tags=["cache"])
     app.include_router(version.router, prefix="/api/v1/version", tags=["version"])
     app.include_router(links.router, prefix="/api/v1", tags=["links"])
-    app.include_router(llm.router, prefix="/api/v1/llm", tags=["llm"])
     app.include_router(ena.router, prefix="/api/v1/ena", tags=["ena"])
     app.include_router(assistant.router, prefix="/api/v1/assistant", tags=["assistant"])
     app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])

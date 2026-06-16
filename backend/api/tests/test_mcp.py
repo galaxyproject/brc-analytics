@@ -42,9 +42,6 @@ def mcp_app(tmp_path, monkeypatch):
     monkeypatch.setattr(
         dependencies, "get_auth_service", MagicMock(return_value=fake_auth)
     )
-    monkeypatch.setattr(
-        dependencies, "get_llm_service", MagicMock(return_value=MagicMock())
-    )
 
     from app.main import create_app
 
