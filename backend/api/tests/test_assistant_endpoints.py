@@ -146,6 +146,23 @@ class TestSessionCookieBinding:
         ]
         assert cleared, resp.headers.get_list("set-cookie")
 
+    def test_anonymous_chat_with_session_id_requires_cookie(self, client):
+        # Continuing a session by id must require the signed cookie even for
+        # anonymous callers -- session ids leak via URLs (assistantSessionId).
+        resp = client.post(
+            "/api/v1/assistant/chat",
+            json={"message": "hello", "session_id": "sess-abc"},
+        )
+        assert resp.status_code == 403
+
+    def test_anonymous_chat_with_session_id_and_valid_cookie_succeeds(self, client):
+        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
+        resp = client.post(
+            "/api/v1/assistant/chat",
+            json={"message": "hello", "session_id": "sess-abc"},
+        )
+        assert resp.status_code == 200, resp.text
+
 
 class TestAnonymousSessionClaim:
     """When an authenticated user continues a session started anonymously,
@@ -219,15 +236,17 @@ class TestAnonymousSessionClaim:
         assert "another user" in resp.json()["detail"]
 
     def test_chat_maps_permission_error_to_403(self, app_with_stubbed_agent, client):
-        # An anonymous caller citing a session owned by someone else skips the
-        # claim block and hits agent.chat(), which raises PermissionError from
-        # require_session(). That must surface as 403, not the generic 503.
+        # An anonymous caller holding the session cookie but citing a session
+        # owned by someone else skips the claim block and hits agent.chat(),
+        # which raises PermissionError from require_session(). That must
+        # surface as 403, not the generic 503.
         agent = app_with_stubbed_agent.dependency_overrides[
             __import__(
                 "app.core.dependencies", fromlist=["get_assistant_agent"]
             ).get_assistant_agent
         ]()
         agent.chat = AsyncMock(side_effect=PermissionError("sess-abc"))
+        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
 
         resp = client.post(
             "/api/v1/assistant/chat",
@@ -246,7 +265,10 @@ class TestAnonymousSessionClaim:
             ).get_assistant_agent
         ]()
         agent.session_service.claim_session = AsyncMock()
-        # No authenticated-user override -- caller is anonymous.
+        # No authenticated-user override -- caller is anonymous. Continuing a
+        # session still requires the cookie, but an anonymous caller never
+        # triggers a claim.
+        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
 
         resp = client.post(
             "/api/v1/assistant/chat",

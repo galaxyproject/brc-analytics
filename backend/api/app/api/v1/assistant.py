@@ -57,12 +57,17 @@ async def assistant_chat(
             detail="Analysis assistant is unavailable (LLM not configured)",
         )
 
-    # If an authenticated user is continuing a session that started
-    # anonymously, claim it on their behalf. The signed session cookie
-    # proves the same browser holds the session, so this can't be used
-    # to hijack another user's anonymous session.
-    if current_user and request.session_id:
+    # Continuing an existing session requires proof the same browser holds
+    # it -- possession of the signed session cookie. Session IDs travel in
+    # URLs (e.g. the assistantSessionId handoff param), so knowing the id
+    # alone must not let a caller continue or mutate a session, anonymous or
+    # owned. No-ops in local/dev where SESSION_COOKIE_SECRET is unset.
+    if request.session_id:
         require_session_cookie(request.session_id, session_cookie)
+
+    # If an authenticated user is continuing a session that started
+    # anonymously, claim it on their behalf.
+    if current_user and request.session_id:
         try:
             await agent.session_service.claim_session(
                 request.session_id, current_user.sub
