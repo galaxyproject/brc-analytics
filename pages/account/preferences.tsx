@@ -33,6 +33,11 @@ export default function PreferencesPage(): JSX.Element {
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    // Clear any prior status so a stale error/success banner can't linger
+    // across a re-load or a sign-out/in.
+    setError(null);
+    setSaveMessage(null);
+
     if (!isAuthenticated) {
       setIsLoadingPreferences(false);
       return;
