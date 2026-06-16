@@ -1,10 +1,10 @@
 """SRA-DuckDB mirror service.
 
-Wraps a read-only DuckDB connection to a local mirror of SRA run metadata
-filtered to BRC-relevant organisms. The mirror is built externally (see
-the sra-poc plan in ~/work/brain/plans/brc-analytics-sra-duckdb-metadata)
-and includes a `taxid_names` table for taxid-anchored name resolution
-plus a `mirror_meta` table for provenance metadata.
+Wraps a read-only DuckDB connection to a local mirror of SRA run metadata.
+The mirror is built externally -- a taxdump-resolved ingest from the public
+SRA metadata parquet, filtered to BRC-relevant organisms -- and includes a
+`taxid_names` table for taxid-anchored name resolution plus a `mirror_meta`
+table for provenance metadata.
 """
 
 from __future__ import annotations
