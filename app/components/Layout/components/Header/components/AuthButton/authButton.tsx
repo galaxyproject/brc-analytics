@@ -91,7 +91,7 @@ export function AuthButton(): JSX.Element | null {
         }}
         transformOrigin={{ horizontal: "right", vertical: "top" }}
       >
-        <UserMenuHeader>
+        <UserMenuHeader role="presentation">
           <Typography variant="subtitle2">{displayName}</Typography>
           {user?.email && (
             <Typography color="text.secondary" variant="caption">
