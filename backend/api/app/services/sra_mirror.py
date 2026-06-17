@@ -505,8 +505,8 @@ class SRAMirrorService:
                 return {
                     "input": organism,
                     "error": (
-                        f"Invalid 'since' date {since!r}. Use ISO format "
-                        "YYYY-MM-DD (e.g. 2024-01-01)."
+                        f"Invalid 'since' date {since!r}. Use YYYY, YYYY-MM, "
+                        "or YYYY-MM-DD (e.g. 2024, 2024-01, or 2024-01-01)."
                     ),
                 }
             clauses.append("releasedate >= ?")
