@@ -126,8 +126,16 @@ def post_ncbi_request(url, json_data, batch_size=1000, min_batch_size=50):
                         else:
                             # Some other issue with the response
                             raise Exception(f"Unexpected response format: {data}")
-                    elif len(data["reports"][0].get("errors", [])) > 0:
-                        raise Exception(data["reports"][0])
+                    else:
+                        invalid = [r for r in data["reports"] if r.get("errors")]
+                        if invalid:
+                            for r in invalid:
+                                print(
+                                    f"Warning: Skipping unrecognized taxonomy ID(s): {r.get('query', [])}"
+                                )
+                            data["reports"] = [
+                                r for r in data["reports"] if not r.get("errors")
+                            ]
 
                     batch_reports.extend(data["reports"])
 
@@ -1133,6 +1141,91 @@ def find_gca_with_paired_gcf(genomes_df):
     return paired_assemblies
 
 
+def check_outbreak_taxonomy_issues(
+    outbreak_taxonomy_ids,
+    taxon_rank_map,
+    taxon_name_map,
+    all_lineage_ids,
+    taxonomic_levels_for_tree,
+):
+    """
+    Check outbreak primary taxonomy IDs for two issues:
+    - Not found in any assembly's lineage (not in catalog)
+    - At a rank below species (e.g. strain, serotype, isolate)
+
+    Args:
+        outbreak_taxonomy_ids: List of primary outbreak taxonomy IDs (strings)
+        taxon_rank_map: Dict mapping taxonomy ID strings to rank strings
+        taxon_name_map: Dict mapping taxonomy ID strings to name strings
+        all_lineage_ids: Set of all taxonomy IDs present in any assembly's lineage
+        taxonomic_levels_for_tree: Ordered list of taxonomic levels (highest to lowest)
+
+    Returns:
+        List of (id, name, reason) tuples for problematic IDs
+    """
+    sub_species_ranks = set()
+    if "species" in taxonomic_levels_for_tree:
+        species_idx = taxonomic_levels_for_tree.index("species")
+        sub_species_ranks = set(taxonomic_levels_for_tree[species_idx + 1 :])
+
+    issues = []
+    for tax_id in outbreak_taxonomy_ids:
+        name = taxon_name_map.get(str(tax_id), str(tax_id))
+        rank = taxon_rank_map.get(str(tax_id), "").lower()
+        if str(tax_id) not in all_lineage_ids:
+            issues.append((tax_id, name, "not in catalog"))
+        elif rank and rank in sub_species_ranks:
+            issues.append((tax_id, name, f"below species rank ({rank})"))
+    return issues
+
+
+def check_organism_ranks(organism_taxonomy_ids, taxon_rank_map, taxon_name_map):
+    """
+    Check organism taxonomy IDs for non-species rank.
+    Organisms are expected to always be at species rank by convention.
+
+    Args:
+        organism_taxonomy_ids: List of organism taxonomy IDs (strings)
+        taxon_rank_map: Dict mapping taxonomy ID strings to rank strings
+        taxon_name_map: Dict mapping taxonomy ID strings to name strings
+
+    Returns:
+        List of (id, name, rank) tuples for organisms not at species rank
+    """
+    return [
+        (
+            tax_id,
+            taxon_name_map.get(str(tax_id), str(tax_id)),
+            taxon_rank_map.get(str(tax_id), "unknown").lower(),
+        )
+        for tax_id in organism_taxonomy_ids
+        if taxon_rank_map.get(str(tax_id), "").lower() != "species"
+    ]
+
+
+def check_organisms_without_assemblies(
+    organism_taxonomy_ids, species_taxonomy_ids, taxon_name_map
+):
+    """
+    Check for organisms whose taxonomy ID does not appear as any assembly's species
+    taxonomy ID. This can indicate missing catalog coverage or a non-species-rank ID.
+
+    Args:
+        organism_taxonomy_ids: List of organism taxonomy IDs (strings)
+        species_taxonomy_ids: Collection of speciesTaxonomyId values from assembly data
+        taxon_name_map: Dict mapping taxonomy ID strings to name strings
+
+    Returns:
+        List of (id, name) tuples for organisms with no matching assemblies
+    """
+    species_ids_set = {str(t) for t in species_taxonomy_ids}
+    return [
+        (tax_id, taxon_name_map.get(str(tax_id), str(tax_id)))
+        for tax_id in organism_taxonomy_ids
+        if str(tax_id) not in species_ids_set
+    ]
+
+
 def make_qc_report(
     missing_ncbi_assemblies,
     inconsistent_taxonomy_ids,
@@ -1145,6 +1238,9 @@ def make_qc_report(
     outdated_accessions=None,
     suppressed_genomes=None,
     paired_accessions=None,
+    outbreak_taxonomy_issues=None,
+    organisms_not_species_rank=None,
+    organisms_without_assemblies=None,
 ):
     # Convert simple lists to items for format_list_section
     ncbi_assemblies_items = (
@@ -1225,6 +1321,27 @@ def make_qc_report(
         if paired_accessions
         else []
     )
+    outbreak_taxonomy_issues_items = (
+        [
+            f"{tax_id}: {name} ({reason})"
+            for tax_id, name, reason in outbreak_taxonomy_issues
+        ]
+        if outbreak_taxonomy_issues
+        else []
+    )
+    organisms_not_species_rank_items = (
+        [
+            f"{tax_id}: {name} (rank: {rank})"
+            for tax_id, name, rank in organisms_not_species_rank
+        ]
+        if organisms_not_species_rank
+        else []
+    )
+    organisms_without_assemblies_items = (
+        [f"{tax_id}: {name}" for tax_id, name in organisms_without_assemblies]
+        if organisms_without_assemblies
+        else []
+    )
     # Compose report modularly using shared QC utils
     lines = ["# Catalog Data QC report", ""]
     lines += format_list_section(
@@ -1259,6 +1376,16 @@ def make_qc_report(
     lines += format_list_section(
         "## Outbreak descendant taxonomy IDs not found in genomes data",
         outbreak_descendants_items,
+    )
+    lines += format_list_section(
+        "## Outbreak primary taxonomy ID issues (not in catalog or below species rank)",
+        outbreak_taxonomy_issues_items,
+    )
+    lines += format_list_section(
+        "## Organisms not at species rank", organisms_not_species_rank_items
+    )
+    lines += format_list_section(
+        "## Organisms not matched to any assembly", organisms_without_assemblies_items
     )
     lines += format_list_section(
         "## Outdated assembly accessions", outdated_accessions_items
@@ -1539,6 +1666,19 @@ def build_files(
         # Drop the temporary column
         species_df = species_df.drop(columns=["lineageTaxonomyIdsList"])
 
+        all_lineage_ids = {
+            id_str
+            for lineage in species_df["lineageTaxonomyIds"]
+            for id_str in lineage.split(",")
+        }
+        qc_report_params["outbreak_taxonomy_issues"] = check_outbreak_taxonomy_issues(
+            outbreak_taxonomy_ids,
+            outbreak_taxon_rank_map,
+            outbreak_taxon_name_map,
+            all_lineage_ids,
+            taxonomic_levels_for_tree,
+        )
+
     qc_report_params["missing_outbreak_descendants"] = (
         check_missing_outbreak_descendants(
             get_outbreak_taxonomy_ids(
@@ -1732,6 +1872,27 @@ def build_files(
             genomes_df, organisms_df
         )
         print(f"Checked ploidy for {len(genomes_df)} assemblies")
+
+        organism_taxon_name_map = {}
+        organism_taxon_rank_map = {}
+        fetch_taxa_info(
+            organisms_df["taxonomy_id"].tolist(),
+            organism_taxon_name_map,
+            organism_taxon_rank_map,
+            "organism taxa",
+        )
+        qc_report_params["organisms_not_species_rank"] = check_organism_ranks(
+            organisms_df["taxonomy_id"].tolist(),
+            organism_taxon_rank_map,
+            organism_taxon_name_map,
+        )
+        qc_report_params["organisms_without_assemblies"] = (
+            check_organisms_without_assemblies(
+                organisms_df["taxonomy_id"].tolist(),
+                genomes_df["speciesTaxonomyId"],
+                organism_taxon_name_map,
+            )
+        )
 
     if qc_report_path is not None:
         qc_report_text = make_qc_report(**qc_report_params)

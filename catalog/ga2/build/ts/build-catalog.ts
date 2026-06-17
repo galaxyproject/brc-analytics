@@ -77,7 +77,8 @@ async function buildCatalog(): Promise<void> {
   const qcReport = generateWorkflowMappingsQC(
     mappings,
     workflowCategories,
-    "GA2"
+    "GA2",
+    genomes
   );
   await fsp.writeFile(
     "catalog/ga2/output/qc-report.workflow-mappings.md",

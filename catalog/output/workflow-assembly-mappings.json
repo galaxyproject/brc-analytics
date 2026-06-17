@@ -12,15 +12,15 @@
     "workflowTrsId": "#workflow/github.com/iwc-workflows/ploidy-aware-genotype-calling/main/versions/v0.1.2"
   },
   {
-    "compatibleAssemblyCount": 1,
+    "compatibleAssemblyCount": 2,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-variant-calling/COVID-19-PE-ARTIC-ILLUMINA/versions/v0.5.5"
   },
   {
-    "compatibleAssemblyCount": 1,
+    "compatibleAssemblyCount": 2,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-wgs-variant-calling/COVID-19-PE-WGS-ILLUMINA/versions/v0.2.4"
   },
   {
-    "compatibleAssemblyCount": 1,
+    "compatibleAssemblyCount": 2,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/sars-cov-2-se-illumina-wgs-variant-calling/COVID-19-SE-WGS-ILLUMINA/versions/v0.1.6"
   },
   {

@@ -5885,18 +5885,18 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Cyberlindnera fabianii",
+                                                                    "name": "Petasospora fabianii",
                                                                     "ncbi_tax_id": "36022",
                                                                     "rank": "species"
                                                                 }
                                                             ],
-                                                            "name": "Cyberlindnera",
-                                                            "ncbi_tax_id": "604195",
+                                                            "name": "Petasospora",
+                                                            "ncbi_tax_id": "3713381",
                                                             "rank": "genus"
                                                         }
                                                     ],
-                                                    "name": "Phaffomycetaceae",
-                                                    "ncbi_tax_id": "115784",
+                                                    "name": "Wickerhamomycetaceae",
+                                                    "ncbi_tax_id": "599729",
                                                     "rank": "family"
                                                 }
                                             ],
@@ -11577,10 +11577,18 @@
                                                     "children": [
                                                         {
                                                             "assembly_count": 1,
-                                                            "children": [],
-                                                            "name": "[Candida] blankii",
-                                                            "ncbi_tax_id": "45524",
-                                                            "rank": "species"
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Blastobotrys ciferrii",
+                                                                    "ncbi_tax_id": "44093",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Blastobotrys",
+                                                            "ncbi_tax_id": "43971",
+                                                            "rank": "genus"
                                                         },
                                                         {
                                                             "assembly_count": 6,
@@ -11603,13 +11611,13 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Trichomonascus ciferrii",
-                                                                    "ncbi_tax_id": "44093",
+                                                                    "name": "Tardiomyces blankii",
+                                                                    "ncbi_tax_id": "45524",
                                                                     "rank": "species"
                                                                 }
                                                             ],
-                                                            "name": "Trichomonascus",
-                                                            "ncbi_tax_id": "229045",
+                                                            "name": "Tardiomyces",
+                                                            "ncbi_tax_id": "3712562",
                                                             "rank": "genus"
                                                         }
                                                     ],
@@ -11734,7 +11742,7 @@
                                                             "rank": "genus"
                                                         },
                                                         {
-                                                            "assembly_count": 165,
+                                                            "assembly_count": 124,
                                                             "children": [
                                                                 {
                                                                     "assembly_count": 73,
@@ -11983,13 +11991,6 @@
                                                                     "rank": "species"
                                                                 },
                                                                 {
-                                                                    "assembly_count": 33,
-                                                                    "children": [],
-                                                                    "name": "Candida parapsilosis",
-                                                                    "ncbi_tax_id": "5480",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
                                                                     "assembly_count": 46,
                                                                     "children": [
                                                                         {
@@ -12018,13 +12019,6 @@
                                                                     "name": "Candida dubliniensis",
                                                                     "ncbi_tax_id": "42374",
                                                                     "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 8,
-                                                                    "children": [],
-                                                                    "name": "Candida metapsilosis",
-                                                                    "ncbi_tax_id": "273372",
-                                                                    "rank": "species"
                                                                 }
                                                             ],
                                                             "name": "Candida",
@@ -12032,8 +12026,15 @@
                                                             "rank": "genus"
                                                         },
                                                         {
-                                                            "assembly_count": 1,
+                                                            "assembly_count": 42,
                                                             "children": [
+                                                                {
+                                                                    "assembly_count": 33,
+                                                                    "children": [],
+                                                                    "name": "Lodderomyces parapsilosis",
+                                                                    "ncbi_tax_id": "5480",
+                                                                    "rank": "species"
+                                                                },
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [
@@ -12048,25 +12049,17 @@
                                                                     "name": "Lodderomyces elongisporus",
                                                                     "ncbi_tax_id": "36914",
                                                                     "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 8,
+                                                                    "children": [],
+                                                                    "name": "Lodderomyces metapsilosis",
+                                                                    "ncbi_tax_id": "273372",
+                                                                    "rank": "species"
                                                                 }
                                                             ],
                                                             "name": "Lodderomyces",
                                                             "ncbi_tax_id": "36913",
-                                                            "rank": "genus"
-                                                        },
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "[Candida] oleophila",
-                                                                    "ncbi_tax_id": "45573",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Kurtzmaniella",
-                                                            "ncbi_tax_id": "549703",
                                                             "rank": "genus"
                                                         },
                                                         {
@@ -12105,6 +12098,21 @@
                                                             ],
                                                             "name": "Diutina",
                                                             "ncbi_tax_id": "1910789",
+                                                            "rank": "genus"
+                                                        },
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Dujonia oleophila",
+                                                                    "ncbi_tax_id": "45573",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Dujonia",
+                                                            "ncbi_tax_id": "3712547",
                                                             "rank": "genus"
                                                         }
                                                     ],
@@ -15563,7 +15571,7 @@
                                         {
                                             "assembly_count": 1,
                                             "children": [],
-                                            "name": "Nematocida sp. ERTm5",
+                                            "name": "Nematocida ironsii",
                                             "ncbi_tax_id": "1805481",
                                             "rank": "species"
                                         },
@@ -17880,15 +17888,7 @@
                                                     "children": [
                                                         {
                                                             "assembly_count": 2,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Neospora caninum Liverpool",
-                                                                    "ncbi_tax_id": "572307",
-                                                                    "rank": "strain"
-                                                                }
-                                                            ],
+                                                            "children": [],
                                                             "name": "Neospora caninum",
                                                             "ncbi_tax_id": "29176",
                                                             "rank": "species"
@@ -22218,7 +22218,7 @@
                                                             "assembly_count": 5,
                                                             "children": [
                                                                 {
-                                                                    "assembly_count": 1,
+                                                                    "assembly_count": 2,
                                                                     "children": [],
                                                                     "name": "Leishmania infantum JPCM5",
                                                                     "ncbi_tax_id": "435258",
@@ -23383,13 +23383,6 @@
             "children": [],
             "name": "Human DNA virus",
             "ncbi_tax_id": "1904876",
-            "rank": "species"
-        },
-        {
-            "assembly_count": 1,
-            "children": [],
-            "name": "Hudisavirus sp.",
-            "ncbi_tax_id": "2021738",
             "rank": "species"
         },
         {
@@ -25148,59 +25141,8 @@
                                             "assembly_count": 36,
                                             "children": [
                                                 {
-                                                    "assembly_count": 36,
+                                                    "assembly_count": 25,
                                                     "children": [
-                                                        {
-                                                            "assembly_count": 5,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 4,
-                                                                    "children": [],
-                                                                    "name": "Orthohepacivirus hominis",
-                                                                    "ncbi_tax_id": "3052230",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Orthohepacivirus platyrrhini",
-                                                                    "ncbi_tax_id": "3052236",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Orthohepacivirus",
-                                                            "ncbi_tax_id": "11102",
-                                                            "rank": "genus"
-                                                        },
-                                                        {
-                                                            "assembly_count": 6,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 2,
-                                                                    "children": [],
-                                                                    "name": "Pegivirus columbiaense",
-                                                                    "ncbi_tax_id": "3052606",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Pegivirus hominis",
-                                                                    "ncbi_tax_id": "3052608",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 3,
-                                                                    "children": [],
-                                                                    "name": "Pegivirus platyrrhini",
-                                                                    "ncbi_tax_id": "3052610",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Pegivirus",
-                                                            "ncbi_tax_id": "1307799",
-                                                            "rank": "genus"
-                                                        },
                                                         {
                                                             "assembly_count": 25,
                                                             "children": [
@@ -25310,6 +25252,65 @@
                                                     ],
                                                     "name": "Flaviviridae",
                                                     "ncbi_tax_id": "11050",
+                                                    "rank": "family"
+                                                },
+                                                {
+                                                    "assembly_count": 11,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 5,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 4,
+                                                                    "children": [],
+                                                                    "name": "Orthohepacivirus hominis",
+                                                                    "ncbi_tax_id": "3052230",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Orthohepacivirus platyrrhini",
+                                                                    "ncbi_tax_id": "3052236",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Orthohepacivirus",
+                                                            "ncbi_tax_id": "11102",
+                                                            "rank": "genus"
+                                                        },
+                                                        {
+                                                            "assembly_count": 6,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 2,
+                                                                    "children": [],
+                                                                    "name": "Pegivirus columbiaense",
+                                                                    "ncbi_tax_id": "3052606",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Pegivirus hominis",
+                                                                    "ncbi_tax_id": "3052608",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 3,
+                                                                    "children": [],
+                                                                    "name": "Pegivirus platyrrhini",
+                                                                    "ncbi_tax_id": "3052610",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Pegivirus",
+                                                            "ncbi_tax_id": "1307799",
+                                                            "rank": "genus"
+                                                        }
+                                                    ],
+                                                    "name": "Hepaciviridae",
+                                                    "ncbi_tax_id": "3700683",
                                                     "rank": "family"
                                                 }
                                             ],
@@ -26496,10 +26497,10 @@
             "rank": "realm"
         },
         {
-            "assembly_count": 214,
+            "assembly_count": 215,
             "children": [
                 {
-                    "assembly_count": 214,
+                    "assembly_count": 215,
                     "children": [
                         {
                             "assembly_count": 98,
@@ -27565,13 +27566,13 @@
                             "rank": "phylum"
                         },
                         {
-                            "assembly_count": 43,
+                            "assembly_count": 44,
                             "children": [
                                 {
-                                    "assembly_count": 33,
+                                    "assembly_count": 34,
                                     "children": [
                                         {
-                                            "assembly_count": 17,
+                                            "assembly_count": 18,
                                             "children": [
                                                 {
                                                     "assembly_count": 17,
@@ -27714,6 +27715,29 @@
                                                     ],
                                                     "name": "Circoviridae",
                                                     "ncbi_tax_id": "39724",
+                                                    "rank": "family"
+                                                },
+                                                {
+                                                    "assembly_count": 1,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Hudisavirus sp.",
+                                                                    "ncbi_tax_id": "2021738",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Hudisavirus",
+                                                            "ncbi_tax_id": "3152695",
+                                                            "rank": "genus"
+                                                        }
+                                                    ],
+                                                    "name": "Endolinaviridae",
+                                                    "ncbi_tax_id": "3152118",
                                                     "rank": "family"
                                                 }
                                             ],

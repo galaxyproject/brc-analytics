@@ -6,7 +6,10 @@ import {
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
 } from "../../../../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { generateWorkflowMappingsQC } from "../../../../catalog/build/ts/build-workflow-mappings";
+import {
+  AssemblyForTaxonomyCheck,
+  generateWorkflowMappingsQC,
+} from "../../../../catalog/build/ts/build-workflow-mappings";
 
 describe("generateWorkflowMappingsQC - assembly count aware", () => {
   const makeWorkflow = (
@@ -98,5 +101,123 @@ describe("generateWorkflowMappingsQC - assembly count aware", () => {
     expect(report).not.toContain("Assembly Wf");
     expect(report).not.toContain("Organism Wf");
     expect(report).not.toContain("Hyphy Wf");
+  });
+});
+
+describe("generateWorkflowMappingsQC - workflow taxonomy ID issues", () => {
+  const noMappings: {
+    compatibleAssemblyCount: number;
+    workflowTrsId: string;
+  }[] = [];
+
+  const makeWorkflow = (
+    name: string,
+    trsId: string,
+    taxonomyId: string | null
+  ): Workflow => ({
+    assemblyCountMax: 1,
+    assemblyCountMin: 1,
+    iwcId: "",
+    parameters: [],
+    ploidy: WORKFLOW_PLOIDY.ANY,
+    scope: WORKFLOW_SCOPE.ASSEMBLY,
+    taxonomyId,
+    trsId,
+    workflowDescription: "desc",
+    workflowName: name,
+  });
+
+  const makeAssembly = (
+    ncbiTaxonomyId: string,
+    speciesTaxonomyId: string,
+    extraLineageIds: string[] = []
+  ): AssemblyForTaxonomyCheck => ({
+    lineageTaxonomyIds: [
+      ...extraLineageIds,
+      speciesTaxonomyId,
+      ncbiTaxonomyId,
+    ].filter((v, i, a) => a.indexOf(v) === i),
+    ncbiTaxonomyId,
+    speciesTaxonomyId,
+  });
+
+  const assemblies = [
+    makeAssembly("1000", "999", ["1", "10"]), // strain 1000, species 999
+    makeAssembly("999", "999", ["1", "10"]), // assembly directly at species level
+    makeAssembly("2000", "1999", ["1", "20"]), // strain 2000, species 1999
+  ];
+
+  const categories = (taxonomyId: string | null): WorkflowCategory[] => [
+    {
+      category: "Test",
+      description: "d",
+      name: "test",
+      showComingSoon: false,
+      workflows: [makeWorkflow("Taxon Wf", "#trs-taxon", taxonomyId)],
+    },
+  ];
+
+  test("shows N/A when no assemblies are passed", () => {
+    const report = generateWorkflowMappingsQC(
+      noMappings,
+      categories(null),
+      "Test"
+    );
+    expect(report).toContain("N/A");
+  });
+
+  test("does not flag workflow with null taxonomyId", () => {
+    const report = generateWorkflowMappingsQC(
+      noMappings,
+      categories(null),
+      "Test",
+      assemblies
+    );
+    expect(report).toContain("None");
+    expect(report).not.toContain("Taxon Wf");
+  });
+
+  test("flags workflow whose taxonomyId is not in any assembly lineage", () => {
+    const report = generateWorkflowMappingsQC(
+      noMappings,
+      categories("9999"),
+      "Test",
+      assemblies
+    );
+    expect(report).toContain("Taxon Wf");
+    expect(report).toContain("not found in any assembly's lineage");
+  });
+
+  test("does not flag workflow whose taxonomyId is a speciesTaxonomyId", () => {
+    const report = generateWorkflowMappingsQC(
+      noMappings,
+      categories("999"),
+      "Test",
+      assemblies
+    );
+    expect(report).toContain("None");
+    expect(report).not.toContain("Taxon Wf");
+  });
+
+  test("flags workflow whose taxonomyId is only a sub-species ncbiTaxonomyId", () => {
+    const report = generateWorkflowMappingsQC(
+      noMappings,
+      categories("1000"),
+      "Test",
+      assemblies
+    );
+    expect(report).toContain("Taxon Wf");
+    expect(report).toContain("below species rank");
+  });
+
+  test("does not flag workflow whose taxonomyId is a genus/family ancestor (in lineage, not a direct assembly taxon)", () => {
+    const report = generateWorkflowMappingsQC(
+      noMappings,
+      categories("10"),
+      "Test",
+      assemblies
+    );
+    expect(report).toContain("None");
+    expect(report).not.toContain("Taxon Wf");
   });
 });
