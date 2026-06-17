@@ -10,12 +10,9 @@ import {
   MenuItem,
   Typography,
 } from "@mui/material";
-import { JSX, MouseEvent, useState } from "react";
+import { JSX, MouseEvent, useId, useState } from "react";
 import { useAuth } from "../../../../../../providers/authentication";
 import { UserChip, UserMenuHeader } from "./authButton.styles";
-
-const MENU_ID = "user-account-menu";
-const MENU_BUTTON_ID = "user-account-button";
 
 /**
  * Build up-to-two-letter initials from a display name.
@@ -39,6 +36,8 @@ export function AuthButton(): JSX.Element | null {
     useAuth();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const isOpen = Boolean(anchorEl);
+  const menuButtonId = useId();
+  const menuId = useId();
 
   if (!isConfigured || isLoading) return null;
 
@@ -68,12 +67,12 @@ export function AuthButton(): JSX.Element | null {
   return (
     <>
       <UserChip
-        aria-controls={isOpen ? MENU_ID : undefined}
+        aria-controls={isOpen ? menuId : undefined}
         aria-expanded={isOpen || undefined}
         aria-haspopup="menu"
         color="inherit"
         endIcon={<KeyboardArrowDownRoundedIcon fontSize="small" />}
-        id={MENU_BUTTON_ID}
+        id={menuButtonId}
         onClick={handleOpen}
         startIcon={<Avatar>{getInitials(displayName)}</Avatar>}
         variant="text"
@@ -83,11 +82,11 @@ export function AuthButton(): JSX.Element | null {
       <Menu
         anchorEl={anchorEl}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-        id={MENU_ID}
+        id={menuId}
         onClose={handleClose}
         open={isOpen}
         slotProps={{
-          list: { "aria-labelledby": MENU_BUTTON_ID },
+          list: { "aria-labelledby": menuButtonId },
           paper: { sx: { minWidth: 220 } },
         }}
         transformOrigin={{ horizontal: "right", vertical: "top" }}
