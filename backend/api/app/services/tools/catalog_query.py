@@ -385,7 +385,9 @@ def execute(q: CatalogQuery, con) -> dict:
             # a species column) would otherwise return thousands of buckets.
             rows = con.execute(
                 f"SELECT {col} AS k, count(*) AS c FROM {q.entity} "
-                f"WHERE {where} GROUP BY {col} ORDER BY c DESC LIMIT {_FACET_LIMIT}",
+                # `, k` is a stable tiebreaker so equal-count buckets (and which
+                # ones fall at the LIMIT boundary) don't shuffle across runs.
+                f"WHERE {where} GROUP BY {col} ORDER BY c DESC, k LIMIT {_FACET_LIMIT}",
                 params,
             ).fetchall()
             out[col] = {("(none)" if k is None else str(k)): c for k, c in rows}
@@ -404,14 +406,15 @@ def execute(q: CatalogQuery, con) -> dict:
     # Display columns are validated against the table at connect() time (the
     # engine fails closed on drift), so the projection is trusted here.
     cols = _DISPLAY_COLUMNS.get(q.entity)
-    if q.sort:
-        order = "ORDER BY " + ", ".join(
-            f"{s.field} {'DESC' if s.desc else 'ASC'}" for s in q.sort
-        )
-    else:
-        # Deterministic default so the capped page / truncation is reproducible
-        # across runs (LIMIT without ORDER BY is unordered).
-        order = f"ORDER BY {cols[0]}" if cols else ""
+    # Always order by a stable key so the capped page / truncation is reproducible
+    # (LIMIT without a total order is unordered). For an explicit sort, append that
+    # key as a tiebreaker so rows at the page boundary can't shuffle when the
+    # requested sort fields tie.
+    tiebreak = cols[0] if cols else None
+    terms = [f"{s.field} {'DESC' if s.desc else 'ASC'}" for s in q.sort]
+    if tiebreak and tiebreak not in {s.field for s in q.sort}:
+        terms.append(tiebreak)
+    order = "ORDER BY " + ", ".join(terms) if terms else ""
     select = ", ".join(cols) if cols else "*"
     cur = con.execute(
         f"SELECT {select} FROM {q.entity} WHERE {where} {order} "
