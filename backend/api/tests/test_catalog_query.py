@@ -30,6 +30,13 @@ def test_unknown_entity_rejected():
         CatalogQuery(entity="protein")
 
 
+def test_known_but_unloaded_entity_rejected():
+    # organism vocab exists but connect() loads no organism table yet — reject at
+    # validation with a clear message rather than failing mid-execution.
+    with pytest.raises(ValueError, match="not queryable yet"):
+        CatalogQuery(entity="organism")
+
+
 def test_unknown_operation_rejected():
     with pytest.raises(ValueError, match="unknown operation"):
         CatalogQuery(operation="aggregate")

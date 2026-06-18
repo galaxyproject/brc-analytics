@@ -82,6 +82,12 @@ ENTITY_FIELDS: dict[str, set[str]] = {
     "organism": ORGANISM_FIELDS,
 }
 
+# Entities the executor can actually run — connect() must load a table for each.
+# organism vocab is defined above but no table is loaded yet (assembly-first), so
+# querying it is rejected at validation rather than failing mid-execution. Add an
+# entity here only once connect() loads its table.
+QUERYABLE_ENTITIES: set[str] = {"assembly"}
+
 LIST_FIELDS: set[str] = {"lineageTaxonomyIds", "ploidy", "taxonomicGroup", "otherTaxa"}
 NUMERIC_FIELDS: set[str] = {
     "length",
@@ -167,6 +173,11 @@ class CatalogQuery(BaseModel):
         if self.entity not in ENTITY_FIELDS:
             raise ValueError(
                 f"unknown entity {self.entity!r}; valid: {sorted(ENTITY_FIELDS)}"
+            )
+        if self.entity not in QUERYABLE_ENTITIES:
+            raise ValueError(
+                f"entity {self.entity!r} is not queryable yet (no table loaded); "
+                f"supported: {sorted(QUERYABLE_ENTITIES)}"
             )
         if self.operation not in ("count", "list", "facets"):
             raise ValueError(f"unknown operation {self.operation!r}")
