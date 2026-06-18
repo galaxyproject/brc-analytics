@@ -24,6 +24,7 @@ from app.core.dependencies import (
     get_cache_service,
     get_catalog_data,
     get_ena_service,
+    get_sra_mirror_service,
     reset_all_services,
 )
 from app.db.session import close_db, init_db
@@ -48,7 +49,11 @@ def create_app() -> FastAPI:
             traces_sample_rate=1.0,
         )
 
-    mcp = create_mcp_server(get_catalog_data(), get_ena_service())
+    mcp = create_mcp_server(
+        get_catalog_data(),
+        get_ena_service(),
+        sra_mirror=get_sra_mirror_service(),
+    )
     mcp_app = mcp.http_app(path="/", stateless_http=True)
 
     @asynccontextmanager

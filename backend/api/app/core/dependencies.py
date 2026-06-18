@@ -1,5 +1,6 @@
 import logging
 from functools import lru_cache
+from typing import Optional
 
 from fastapi import Cookie, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,6 +16,7 @@ from app.services.assistant_agent import AssistantAgent
 from app.services.auth_service import COOKIE_NAME, AuthService
 from app.services.catalog_data import CatalogData
 from app.services.ena_service import ENAService
+from app.services.sra_mirror import SRAMirrorService
 
 logger = logging.getLogger(__name__)
 
@@ -48,9 +50,23 @@ def get_ena_service() -> ENAService:
 
 
 @lru_cache(maxsize=1)
+def get_sra_mirror_service() -> Optional[SRAMirrorService]:
+    settings = get_settings()
+    if not settings.SRA_MIRROR_PATH:
+        logger.info("SRA_MIRROR_PATH not set -- SRA mirror service disabled")
+        return None
+    service = SRAMirrorService(settings.SRA_MIRROR_PATH)
+    logger.info(
+        f"SRA mirror service initialized (singleton), available: {service.is_available()}"
+    )
+    return service
+
+
+@lru_cache(maxsize=1)
 def get_assistant_agent() -> AssistantAgent:
     cache = get_cache_service()
-    agent = AssistantAgent(cache)
+    sra_mirror = get_sra_mirror_service()
+    agent = AssistantAgent(cache, sra_mirror=sra_mirror)
     logger.info(
         f"Assistant agent initialized (singleton), available: {agent.is_available()}"
     )
@@ -130,5 +146,6 @@ def reset_all_services() -> None:
     get_cache_service.cache_clear()
     get_catalog_data.cache_clear()
     get_ena_service.cache_clear()
+    get_sra_mirror_service.cache_clear()
     get_assistant_agent.cache_clear()
     get_rate_limiter.cache_clear()

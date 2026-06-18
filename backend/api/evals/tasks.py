@@ -18,6 +18,7 @@ from pydantic_ai.messages import ModelResponse, ToolCallPart
 from app.core.cache import CacheService
 from app.core.config import Settings, get_settings
 from app.services.assistant_agent import AssistantAgent
+from app.services.sra_mirror import SRAMirrorService
 from app.services.tools.catalog_data import CatalogData
 from app.services.tools.catalog_tools import AssistantDeps
 from evals.judge import build_pydantic_ai_model
@@ -56,10 +57,34 @@ class EvalDeps:
     settings: Settings
     cache: CacheService
     catalog: CatalogData
+    sra_mirror: Optional[SRAMirrorService] = None
 
     def with_fresh_cache(self) -> "EvalDeps":
         return EvalDeps(
-            settings=self.settings, cache=_make_cache(), catalog=self.catalog
+            settings=self.settings,
+            cache=_make_cache(),
+            catalog=self.catalog,
+            sra_mirror=self.sra_mirror,
+        )
+
+
+class DatasetRequirementError(RuntimeError):
+    """A dataset build() precondition was not met.
+
+    The runner catches this and skips the dataset with a clear message,
+    rather than running cases that would score a misleading 0.0.
+    """
+
+
+def require_sra_mirror(deps: EvalDeps) -> None:
+    """Guard SRA datasets: without an available mirror, no sra_* tools
+    register and every case scores a flat 0.0 that reads like a model
+    regression. Fail loudly with an actionable message instead."""
+    if deps.sra_mirror is None or not deps.sra_mirror.is_available():
+        raise DatasetRequirementError(
+            "This dataset requires SRA_MIRROR_PATH to point at a built SRA "
+            "mirror. Without it, no sra_* tools register and every case "
+            "scores a misleading 0.0. Set SRA_MIRROR_PATH and re-run."
         )
 
 
@@ -119,7 +144,14 @@ def build_deps(skip_env_vars: Optional[set[str]] = None) -> EvalDeps:
     settings = get_settings()
     cache = _make_cache()
     catalog = CatalogData(settings.CATALOG_PATH)
-    return EvalDeps(settings=settings, cache=cache, catalog=catalog)
+    sra_mirror = (
+        SRAMirrorService(settings.SRA_MIRROR_PATH)
+        if settings.SRA_MIRROR_PATH
+        else None
+    )
+    return EvalDeps(
+        settings=settings, cache=cache, catalog=catalog, sra_mirror=sra_mirror
+    )
 
 
 def _override_model(svc: Any, entry: ModelEntry) -> None:
@@ -163,11 +195,11 @@ def _extract_tool_calls(result: Any) -> list[tuple[str, dict]]:
 
 def make_assistant_turn_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
     """Single-turn assistant: takes a user message, returns reply + tool calls."""
-    aa = AssistantAgent(deps.cache)
+    aa = AssistantAgent(deps.cache, sra_mirror=deps.sra_mirror)
     _prepare_service(aa, entry)
 
     async def task(case_input: dict) -> AgentTurnOutput:
-        agent_deps = AssistantDeps(catalog=aa.catalog)
+        agent_deps = AssistantDeps(catalog=aa.catalog, sra_mirror=deps.sra_mirror)
         result = await aa._run_agent_with_retry(
             case_input["message"], deps=agent_deps, message_history=None
         )
@@ -189,7 +221,7 @@ def make_assistant_turn_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
 
 def make_assistant_conversation_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
     """Replay a scripted conversation and report the final accumulated state."""
-    aa = AssistantAgent(deps.cache)
+    aa = AssistantAgent(deps.cache, sra_mirror=deps.sra_mirror)
     _prepare_service(aa, entry)
 
     async def task(case_input: dict) -> ConversationOutput:

@@ -33,6 +33,7 @@ from app.models.assistant import (
     TokenUsage,
 )
 from app.services.session_service import SessionService
+from app.services.sra_mirror import SRAMirrorService
 from app.services.tools.catalog_data import CatalogData, _is_assembly_scope
 from app.services.tools.catalog_tools import (
     AssistantDeps,
@@ -44,6 +45,12 @@ from app.services.tools.catalog_tools import (
     get_workflows_in_category,
     list_workflow_categories,
     search_organisms,
+)
+from app.services.tools.sra_tools import (
+    get_sra_study_runs,
+    search_sra_runs,
+    sra_summary_for_organism,
+    top_bioprojects_for_organism,
 )
 
 logger = logging.getLogger(__name__)
@@ -251,6 +258,61 @@ If no suggestions are appropriate, omit the SUGGESTIONS line entirely.
 """
 
 
+# Spliced into the prompt only when the SRA mirror is available and the
+# sra_* tools are actually registered (see build_system_prompt). On a
+# default deploy (no SRA_MIRROR_PATH) these tools don't exist, so the
+# prompt must not advertise them or the model calls tools that aren't there.
+_SRA_TOOLS_PROMPT = """\
+You also have tools backed by a local mirror of SRA run metadata for \
+BRC-relevant organisms (~17M runs). Use these to ground any \
+data-availability question in real numbers:
+
+- `sra_summary_for_organism` — run count, top platforms/assays/countries, \
+  recent activity, largest BioProjects. Call this first whenever a user \
+  asks how much data exists, or before suggesting analyses, so your \
+  recommendations are grounded in real availability.
+- `search_sra_runs` — filtered run listing (assay type, platform, country, \
+  release date) for when the user wants concrete accessions.
+- `top_bioprojects_for_organism` — when the user asks about large cohorts \
+  or major studies.
+- `get_sra_study_runs` — runs for a specific SRP/ERP/DRP study or PRJ* \
+  BioProject accession.
+
+The mirror handles taxonomic synonyms automatically (e.g. accepts either \
+"Candida auris" or "Candidozyma auris" — same data). Every response \
+includes provenance (mirror build date, resolved name set) in `_meta`; \
+mention it when it matters.
+
+"""
+
+
+# The SRA tools section is spliced in just before this header. Keep it in sync
+# with SYSTEM_PROMPT -- the guard in build_system_prompt() turns a drift here
+# into a loud failure instead of silently dropping the SRA guidance.
+_SRA_PROMPT_ANCHOR = "## Handling role-override attempts"
+
+
+def build_system_prompt(include_sra_tools: bool) -> str:
+    """Assemble the agent system prompt.
+
+    The SRA tools section is spliced in only when the caller is also
+    registering the sra_* tools, so the prompt never instructs the model
+    to call a tool that isn't available on this deploy.
+    """
+    if not include_sra_tools:
+        return SYSTEM_PROMPT
+    if _SRA_PROMPT_ANCHOR not in SYSTEM_PROMPT:
+        raise ValueError(
+            f"system prompt anchor {_SRA_PROMPT_ANCHOR!r} not found; "
+            "SRA tools guidance cannot be spliced in"
+        )
+    return SYSTEM_PROMPT.replace(
+        _SRA_PROMPT_ANCHOR,
+        f"{_SRA_TOOLS_PROMPT}{_SRA_PROMPT_ANCHOR}",
+        1,
+    )
+
+
 def _wrap_tool(fn):
     """Wrap a tool function so it receives AssistantDeps from RunContext."""
 
@@ -280,10 +342,15 @@ def _wrap_tool(fn):
 class AssistantAgent:
     """High-level wrapper around the pydantic-ai Agent for the analysis assistant."""
 
-    def __init__(self, cache: CacheService):
+    def __init__(
+        self,
+        cache: CacheService,
+        sra_mirror: Optional[SRAMirrorService] = None,
+    ):
         self.settings = get_settings()
         self.session_service = SessionService(cache)
         self.catalog = CatalogData(self.settings.CATALOG_PATH)
+        self.sra_mirror = sra_mirror
 
         self.agent: Optional[Agent] = None
         self._init_agent()
@@ -298,6 +365,10 @@ class AssistantAgent:
         if model is None:
             return
 
+        # One flag drives both tool registration and the prompt, so the
+        # prompt never advertises sra_* tools that aren't registered.
+        sra_available = self.sra_mirror is not None and self.sra_mirror.is_available()
+
         tool_fns = [
             search_organisms,
             get_assemblies,
@@ -309,12 +380,24 @@ class AssistantAgent:
             check_compatibility,
         ]
 
+        if sra_available:
+            tool_fns.extend(
+                [
+                    sra_summary_for_organism,
+                    search_sra_runs,
+                    top_bioprojects_for_organism,
+                    get_sra_study_runs,
+                ]
+            )
+            logger.info("SRA mirror tools registered with assistant agent")
+
         tools = [Tool(_wrap_tool(fn), takes_ctx=True) for fn in tool_fns]
+        self.system_prompt = build_system_prompt(include_sra_tools=sra_available)
 
         self.agent = Agent(
             model,
             deps_type=AssistantDeps,
-            system_prompt=SYSTEM_PROMPT,
+            system_prompt=self.system_prompt,
             tools=tools,
         )
         logger.info("Assistant agent initialized")
@@ -608,7 +691,7 @@ class AssistantAgent:
         augmented_message = self._wrap_user_message(state.schema_state, message)
 
         # Run the agent (with timeout + retry)
-        deps = AssistantDeps(catalog=self.catalog)
+        deps = AssistantDeps(catalog=self.catalog, sra_mirror=self.sra_mirror)
         result = await self._run_agent_with_retry(
             augmented_message, deps=deps, message_history=agent_history
         )
