@@ -102,9 +102,38 @@ def test_compile_list_membership_and_coercion():
     frag, params = compile_predicate(Filter(field="ploidy", op=Op.eq, value="DIPLOID"))
     assert frag == "len(list_intersect(ploidy, ?)) > 0"
     assert params == [["DIPLOID"]]
-    # ne on a list field coerces to negated membership
+    # ne on a list field coerces to NULL-safe negated membership
     frag, _ = compile_predicate(Filter(field="ploidy", op=Op.ne, value="DIPLOID"))
-    assert frag == "NOT (len(list_intersect(ploidy, ?)) > 0)"
+    assert frag == "(NOT (len(list_intersect(ploidy, ?)) > 0) OR ploidy IS NULL)"
+
+
+def test_compile_ne_and_not_in_are_null_safe():
+    # SQL `col != x` / `col NOT IN (...)` drop NULL rows; negation must include them.
+    frag, _ = compile_predicate(Filter(field="level", op=Op.ne, value="Contig"))
+    assert frag == "(level != ? OR level IS NULL)"
+    frag, _ = compile_predicate(Filter(field="level", op=Op.not_in, value=["Contig"]))
+    assert frag == "(level NOT IN (?) OR level IS NULL)"
+
+
+def test_facet_on_list_field_rejected():
+    with pytest.raises(ValueError, match="cannot facet on list field"):
+        CatalogQuery(operation="facets", facet_by=["ploidy"])
+
+
+def test_empty_value_list_rejected():
+    with pytest.raises(ValueError, match="non-empty value list"):
+        CatalogQuery(filters=[Filter(field="level", op=Op.in_, value=[])])
+    with pytest.raises(ValueError, match="non-empty value list"):
+        CatalogQuery(filters=[Filter(field="ploidy", op=Op.contains_any, value=[])])
+
+
+def test_limit_and_offset_bounds():
+    with pytest.raises(ValueError):
+        CatalogQuery(limit=5000)  # exceeds the page cap
+    with pytest.raises(ValueError):
+        CatalogQuery(limit=0)
+    with pytest.raises(ValueError):
+        CatalogQuery(offset=-1)
 
 
 # --- executor against a synthetic table ---------------------------------------
@@ -266,6 +295,16 @@ def test_list_field_eq_coercion_matches_contains(con):
         filters=[Filter(field="ploidy", op=Op.contains, value="DIPLOID")],
     )
     assert execute(eq_q, con) == execute(contains_q, con) == {"total": 4}
+
+
+def test_ne_includes_null_rows(con):
+    # All fixture rows have NULL strainName; `ne` must count them as "not X"
+    # (plain SQL != would drop NULLs and return 0).
+    q = CatalogQuery(
+        operation="count",
+        filters=[Filter(field="strainName", op=Op.ne, value="ABC")],
+    )
+    assert execute(q, con) == {"total": 5}
 
 
 def test_list_truncation_attaches_facets(con):

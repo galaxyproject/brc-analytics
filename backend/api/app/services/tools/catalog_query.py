@@ -164,8 +164,10 @@ class CatalogQuery(BaseModel):
     filters: list[Filter] = Field(default_factory=list)
     operation: str = "list"  # count | list | facets
     facet_by: list[str] = Field(default_factory=list)
-    limit: int = 25
-    offset: int = 0
+    # Bound the page so a `list` result can never dump the corpus into context —
+    # the whole point of the summary contract is bounded output.
+    limit: int = Field(default=25, ge=1, le=100)
+    offset: int = Field(default=0, ge=0)
     sort: list[Sort] = Field(default_factory=list)
 
     @model_validator(mode="after")
@@ -193,6 +195,14 @@ class CatalogQuery(BaseModel):
                 f"unknown field(s) {unknown} for entity {self.entity!r}; "
                 f"valid fields: {sorted(allowed)}"
             )
+        # GROUP BY on a list column buckets by whole-list equality (and yields
+        # list-repr keys), not per-element counts — reject it rather than mislead.
+        list_facets = sorted({c for c in self.facet_by if c in LIST_FIELDS})
+        if list_facets:
+            raise ValueError(
+                f"cannot facet on list field(s) {list_facets}; "
+                "group-by needs a scalar field"
+            )
         for f in self.filters:
             if f.op in (Op.gt, Op.gte, Op.lt, Op.lte) and f.field not in NUMERIC_FIELDS:
                 raise ValueError(
@@ -200,6 +210,14 @@ class CatalogQuery(BaseModel):
                 )
             if f.op in (Op.contains, Op.contains_any) and f.field not in LIST_FIELDS:
                 raise ValueError(f"{f.op.value} needs a list field, got {f.field!r}")
+            # `in`/`not_in`/`contains_any` over an empty list is either invalid SQL
+            # (IN ()) or a silent match-nothing — require a non-empty value list.
+            if (
+                f.op in (Op.in_, Op.not_in, Op.contains_any)
+                and isinstance(f.value, list)
+                and not f.value
+            ):
+                raise ValueError(f"{f.op.value} needs a non-empty value list")
         return self
 
 
@@ -231,13 +249,20 @@ def compile_predicate(f: Filter) -> tuple[str, list]:
     if col in LIST_FIELDS and f.op in (Op.eq, Op.ne, Op.in_, Op.not_in):
         vals = f.value if isinstance(f.value, list) else [f.value]
         expr = _list_membership(col)
-        neg = f.op in (Op.ne, Op.not_in)
-        return (f"NOT ({expr})" if neg else expr), [list(vals)]
+        if f.op in (Op.ne, Op.not_in):
+            # NULL-safe negation: a row with no value is "not a member" too, so
+            # count it — otherwise count(eq) + count(ne) wouldn't sum to total.
+            return f"(NOT ({expr}) OR {col} IS NULL)", [list(vals)]
+        return expr, [list(vals)]
     if f.op in (Op.in_, Op.not_in):
         vals = f.value if isinstance(f.value, list) else [f.value]
         ph = ", ".join(["?"] * len(vals))
-        neg = "NOT " if f.op is Op.not_in else ""
-        return f"{col} {neg}IN ({ph})", list(vals)
+        if f.op is Op.not_in:
+            return f"({col} NOT IN ({ph}) OR {col} IS NULL)", list(vals)
+        return f"{col} IN ({ph})", list(vals)
+    if f.op is Op.ne:
+        # NULL-safe inequality (SQL `col != x` drops NULL rows).
+        return f"({col} != ? OR {col} IS NULL)", [f.value]
     if f.op is Op.contains:
         return f"list_contains({col}, ?)", [f.value]
     if f.op is Op.contains_any:
@@ -290,6 +315,18 @@ def connect(catalog_dir: str):
             "format='array', maximum_object_size=20000000)"
         )
         total = con.execute("SELECT count(*) FROM assembly").fetchone()[0]
+        # The field allowlist and display projection are hand-maintained; warn
+        # loudly at boot if the catalog schema has drifted out from under them
+        # (a missing display column would otherwise crash every `list` query).
+        actual = {row[0] for row in con.execute("DESCRIBE assembly").fetchall()}
+        configured = ASSEMBLY_FIELDS | set(_DISPLAY_COLUMNS["assembly"])
+        missing = sorted(configured - actual)
+        if missing:
+            logger.warning(
+                "Catalog query: configured columns missing from the assembly "
+                "table: %s — filters/projections referencing them will error",
+                missing,
+            )
     except duckdb.IOException as exc:
         logger.error("Could not read catalog at %s: %s", json_path, exc)
     except duckdb.CatalogException as exc:
