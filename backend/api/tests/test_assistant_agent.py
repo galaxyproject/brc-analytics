@@ -652,6 +652,61 @@ class TestGetProvider:
         assert agent.get_provider() is None
 
 
+# ---------- _build_model ----------
+
+
+class TestBuildModel:
+    def _agent_with_settings(self, base_url=None, api_key="test-key"):
+        instance = object.__new__(AssistantAgent)
+        instance.settings = MagicMock()
+        instance.settings.AI_API_BASE_URL = base_url
+        instance.settings.AI_API_KEY = api_key
+        return instance
+
+    def _assert_caching_enabled(self, model):
+        settings = model.settings or {}
+        assert settings.get("anthropic_cache_tool_definitions") is True
+        assert settings.get("anthropic_cache_instructions") is True
+
+    def test_anthropic_base_url_enables_prompt_caching(self):
+        agent = self._agent_with_settings(base_url="https://api.anthropic.com/v1")
+        self._assert_caching_enabled(agent._build_model("claude-sonnet-4-6"))
+
+    def test_anthropic_base_url_strips_provider_prefix(self):
+        # The "anthropic:" prefix must be stripped on the base-URL path too.
+        agent = self._agent_with_settings(base_url="https://api.anthropic.com/v1")
+        model = agent._build_model("anthropic:claude-sonnet-4-6")
+        self._assert_caching_enabled(model)
+        assert model.model_name == "claude-sonnet-4-6"
+
+    def test_non_anthropic_base_url_uses_openai_not_caching(self):
+        # A claude-named model behind an OpenAI-compatible proxy must route to
+        # the proxy (base_url wins over model-name detection), not to a cached
+        # Anthropic model.
+        agent = self._agent_with_settings(base_url="https://proxy.example/v1")
+        model = agent._build_model("claude-sonnet-4-6")
+        assert type(model).__name__ == "OpenAIChatModel"
+
+    def test_bare_claude_model_enables_prompt_caching(self):
+        # No base URL: a "claude-..." name auto-resolves to Anthropic, and
+        # caching must still be enabled on that path.
+        agent = self._agent_with_settings(base_url=None)
+        self._assert_caching_enabled(agent._build_model("claude-sonnet-4-6"))
+
+    def test_anthropic_prefixed_model_enables_prompt_caching(self):
+        # "anthropic:claude-..." must enable caching and have its provider
+        # prefix stripped before reaching AnthropicModel.
+        agent = self._agent_with_settings(base_url=None)
+        model = agent._build_model("anthropic:claude-sonnet-4-6")
+        self._assert_caching_enabled(model)
+        assert model.model_name == "claude-sonnet-4-6"
+
+    def test_non_anthropic_model_left_for_pydantic_ai(self):
+        # A non-Anthropic model with no base URL is passed through untouched.
+        agent = self._agent_with_settings(base_url=None)
+        assert agent._build_model("openai:gpt-4o") == "openai:gpt-4o"
+
+
 class TestSystemPromptHardening:
     def test_prompt_calls_out_injection_attempts(self):
         from app.services.assistant_agent import SYSTEM_PROMPT

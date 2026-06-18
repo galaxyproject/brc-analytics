@@ -324,36 +324,71 @@ class AssistantAgent:
 
         try:
             if base_url and "anthropic" in base_url.lower():
-                from pydantic_ai.models.anthropic import AnthropicModel
-                from pydantic_ai.providers.anthropic import AnthropicProvider
+                return self._build_anthropic_model(model_name)
+            elif base_url:
+                # Custom / OpenAI-compatible endpoint.
+                import httpx
+                from pydantic_ai.models.openai import OpenAIChatModel
+                from pydantic_ai.providers.openai import OpenAIProvider
 
-                provider = AnthropicProvider(api_key=settings.AI_API_KEY)
-                return AnthropicModel(model_name, provider=provider)
+                http_client = httpx.AsyncClient(verify=not settings.AI_SKIP_SSL_VERIFY)
+                provider = OpenAIProvider(
+                    api_key=settings.AI_API_KEY,
+                    base_url=base_url,
+                    http_client=http_client,
+                )
+                return OpenAIChatModel(model_name, provider=provider)
+            elif self._model_is_anthropic(model_name):
+                # No base_url, but the model string auto-resolves to Anthropic
+                # (e.g. "claude-..." or "anthropic:claude-..."). Build it
+                # explicitly so prompt caching is enabled on this path too --
+                # otherwise pydantic-ai resolves a plain AnthropicModel with no
+                # caching and no AI_API_KEY wiring.
+                return self._build_anthropic_model(model_name)
             else:
-                # Default: assume model string like "openai:gpt-4o" or
-                # "anthropic:claude-sonnet-4-20250514" handled by pydantic-ai
-                # auto-detection. If a base_url is set, use OpenAI-compatible.
-                if base_url:
-                    import httpx
-                    from pydantic_ai.models.openai import OpenAIChatModel
-                    from pydantic_ai.providers.openai import OpenAIProvider
-
-                    http_client = httpx.AsyncClient(
-                        verify=not settings.AI_SKIP_SSL_VERIFY
-                    )
-                    provider = OpenAIProvider(
-                        api_key=settings.AI_API_KEY,
-                        base_url=base_url,
-                        http_client=http_client,
-                    )
-                    return OpenAIChatModel(model_name, provider=provider)
-                else:
-                    # Let pydantic-ai resolve the model string (supports
-                    # "openai:gpt-4o", "anthropic:claude-...", etc.)
-                    return model_name
+                # Let pydantic-ai resolve the model string (e.g. "openai:gpt-4o").
+                return model_name
         except Exception:
             logger.exception("Failed to build LLM model for assistant")
             return None
+
+    def _build_anthropic_model(self, model_name: str):
+        """Build an Anthropic model with prompt caching enabled.
+
+        Caches the static request prefix (system prompt + tool definitions) so
+        it isn't re-billed at full input rate on every request. A single turn
+        issues multiple requests (one per tool round plus the final answer), so
+        this pays off within one conversation. Anthropic only caches when
+        explicitly asked -- pydantic-ai won't enable it for us.
+        """
+        from pydantic_ai.models.anthropic import (
+            AnthropicModel,
+            AnthropicModelSettings,
+        )
+        from pydantic_ai.providers.anthropic import AnthropicProvider
+
+        # AnthropicModel wants a bare model id; drop any "anthropic:" prefix
+        # (case-insensitive, to stay consistent with _model_is_anthropic).
+        if model_name.lower().startswith("anthropic:"):
+            model_name = model_name.split(":", 1)[1]
+
+        provider = AnthropicProvider(api_key=self.settings.AI_API_KEY)
+        model_settings = AnthropicModelSettings(
+            anthropic_cache_tool_definitions=True,
+            anthropic_cache_instructions=True,
+        )
+        return AnthropicModel(model_name, provider=provider, settings=model_settings)
+
+    @staticmethod
+    def _model_is_anthropic(model_name: str) -> bool:
+        """Whether a model string (no base_url) resolves to Anthropic.
+
+        Mirrors the model-name detection in get_provider.
+        """
+        name = (model_name or "").lower()
+        if ":" in name:
+            return name.split(":", 1)[0] == "anthropic"
+        return "claude" in name
 
     def is_available(self) -> bool:
         return self.agent is not None
