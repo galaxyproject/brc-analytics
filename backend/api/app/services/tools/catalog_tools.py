@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, TYPE_CHECKING
 
@@ -11,6 +12,8 @@ from app.services.tools.catalog_query import CatalogQuery, execute
 
 if TYPE_CHECKING:
     from app.services.sra_mirror import SRAMirrorService
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -129,5 +132,6 @@ def query_catalog(deps: AssistantDeps, query: CatalogQuery) -> str:
     try:
         result = execute(query, deps.con)
     except Exception as e:  # noqa: BLE001
+        logger.warning("query_catalog execution failed: %s", e)
         return f"Query error: {e}"
     return json.dumps(result, indent=2, default=str)

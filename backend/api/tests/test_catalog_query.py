@@ -127,6 +127,15 @@ def test_empty_value_list_rejected():
         CatalogQuery(filters=[Filter(field="ploidy", op=Op.contains_any, value=[])])
 
 
+def test_missing_value_rejected():
+    # ops other than is_null/not_null need a value; None would compile to a
+    # comparison against NULL that silently matches nothing.
+    with pytest.raises(ValueError, match="needs a value"):
+        CatalogQuery(filters=[Filter(field="level", op=Op.eq, value=None)])
+    # is_null needs no value
+    CatalogQuery(filters=[Filter(field="geneModelUrl", op=Op.is_null)])
+
+
 def test_limit_and_offset_bounds():
     with pytest.raises(ValueError):
         CatalogQuery(limit=5000)  # exceeds the page cap
@@ -229,7 +238,8 @@ def con():
         ),
     ]
     c.executemany("INSERT INTO assembly VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", rows)
-    return c
+    yield c
+    c.close()
 
 
 @pytest.mark.parametrize(

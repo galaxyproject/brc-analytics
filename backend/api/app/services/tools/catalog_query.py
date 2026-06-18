@@ -204,6 +204,10 @@ class CatalogQuery(BaseModel):
                 "group-by needs a scalar field"
             )
         for f in self.filters:
+            # Every op except the null checks needs a value; without this, a None
+            # compiles to a comparison against NULL that silently matches nothing.
+            if f.op not in (Op.is_null, Op.not_null) and f.value is None:
+                raise ValueError(f"{f.op.value} needs a value")
             if f.op in (Op.gt, Op.gte, Op.lt, Op.lte) and f.field not in NUMERIC_FIELDS:
                 raise ValueError(
                     f"range op {f.op.value} needs a numeric field, got {f.field!r}"
@@ -309,9 +313,12 @@ def connect(catalog_dir: str):
     con: Optional["duckdb.DuckDBPyConnection"] = None
     try:
         con = duckdb.connect()
+        # Escape single quotes so a path containing one can't break the SQL
+        # string literal (the path is server-controlled, but cheap to harden).
+        safe_path = str(json_path).replace("'", "''")
         con.execute(
             "CREATE TABLE assembly AS "
-            f"SELECT * FROM read_json_auto('{json_path}', "
+            f"SELECT * FROM read_json_auto('{safe_path}', "
             "format='array', maximum_object_size=20000000)"
         )
         total = con.execute("SELECT count(*) FROM assembly").fetchone()[0]
@@ -376,12 +383,15 @@ def execute(q: CatalogQuery, con) -> dict:
         result["facets"] = _facets(q.facet_by)
         return result
 
-    order = ""
+    cols = _DISPLAY_COLUMNS.get(q.entity)
     if q.sort:
         order = "ORDER BY " + ", ".join(
             f"{s.field} {'DESC' if s.desc else 'ASC'}" for s in q.sort
         )
-    cols = _DISPLAY_COLUMNS.get(q.entity)
+    else:
+        # Deterministic default so the capped page / truncation is reproducible
+        # across runs (LIMIT without ORDER BY is unordered).
+        order = f"ORDER BY {cols[0]}" if cols else ""
     select = ", ".join(cols) if cols else "*"
     cur = con.execute(
         f"SELECT {select} FROM {q.entity} WHERE {where} {order} "
