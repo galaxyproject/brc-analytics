@@ -36,6 +36,7 @@ def agent():
     instance = object.__new__(AssistantAgent)
     instance.catalog = MagicMock()
     instance.catalog.workflows_by_category = []
+    instance.sra_mirror = None
     return instance
 
 
