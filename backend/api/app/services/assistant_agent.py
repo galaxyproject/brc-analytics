@@ -390,14 +390,13 @@ class AssistantAgent:
         """In-process DuckDB connection backing the query_catalog tool.
 
         Degrades to None (tool reports unavailable) if duckdb or the catalog
-        can't load, so the rest of the agent still works.
+        can't load, so the rest of the agent still works. connect() fail-softs to
+        None with typed logging; this guards the duckdb-not-installed case too.
         """
         try:
             from app.services.tools.catalog_query import connect
 
-            con = connect(self.settings.CATALOG_PATH)
-            logger.info("Catalog query engine (DuckDB) initialized")
-            return con
+            return connect(self.settings.CATALOG_PATH)
         except Exception as e:  # noqa: BLE001
             logger.warning("Catalog query engine unavailable: %s", e)
             return None

@@ -14,10 +14,14 @@ Assembly-first; organism is sketched. Workflows stay on their dedicated tools.
 
 from __future__ import annotations
 
+import logging
 from enum import Enum
+from pathlib import Path
 from typing import Optional, Union
 
 from pydantic import BaseModel, Field, model_validator
+
+logger = logging.getLogger(__name__)
 
 ASSEMBLY_FIELDS: set[str] = {
     "accession",
@@ -238,16 +242,54 @@ def compile_where(q: CatalogQuery) -> tuple[str, list]:
 
 
 def connect(catalog_dir: str):
-    """Load the catalog into an in-memory DuckDB connection (assembly table)."""
+    """Load the catalog into an in-memory DuckDB connection (assembly table).
+
+    Returns the connection, or None if the catalog can't be loaded (the caller
+    degrades to a "query engine unavailable" tool response).
+
+    Concurrency invariant: the assistant's tools are sync and run on the asyncio
+    event-loop thread, so this single connection is only ever touched by one
+    thread at a time and needs no lock or per-thread cursor. If tool execution is
+    ever moved to a threadpool, that invariant breaks — DuckDB does not allow
+    concurrent use of one connection across threads (use con.cursor() per thread).
+    """
     import duckdb
 
-    con = duckdb.connect()
-    con.execute(
-        "CREATE TABLE assembly AS "
-        f"SELECT * FROM read_json_auto('{catalog_dir}/assemblies.json', "
-        "format='array', maximum_object_size=20000000)"
-    )
-    return con
+    json_path = Path(catalog_dir) / "assemblies.json"
+    if not json_path.is_file():
+        logger.warning(
+            "Catalog assemblies not found at %s — query engine disabled", json_path
+        )
+        return None
+
+    # Build into a local handle and publish only on full success, so a load
+    # failure can't leave a half-initialized connection in play. Distinct except
+    # arms give an actionable log line instead of one flattened traceback.
+    con: Optional["duckdb.DuckDBPyConnection"] = None
+    try:
+        con = duckdb.connect()
+        con.execute(
+            "CREATE TABLE assembly AS "
+            f"SELECT * FROM read_json_auto('{json_path}', "
+            "format='array', maximum_object_size=20000000)"
+        )
+        total = con.execute("SELECT count(*) FROM assembly").fetchone()[0]
+    except duckdb.IOException as exc:
+        logger.error("Could not read catalog at %s: %s", json_path, exc)
+    except duckdb.CatalogException as exc:
+        logger.error(
+            "Catalog at %s is missing an expected structure: %s", json_path, exc
+        )
+    except duckdb.Error as exc:
+        logger.error("Failed to load catalog into DuckDB from %s: %s", json_path, exc)
+    else:
+        logger.info("Catalog query engine (DuckDB) loaded: %s assemblies", f"{total:,}")
+        return con
+
+    # Reached only on a caught failure: close the opened handle and stay disabled.
+    if con is not None:
+        con.close()
+    return None
 
 
 def execute(q: CatalogQuery, con, cap: Optional[int] = None) -> dict:
