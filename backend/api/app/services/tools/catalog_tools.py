@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import logging
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Optional
 
 from app.services.tools.catalog_data import CatalogData
 from app.services.tools.catalog_query import CatalogQuery, execute
