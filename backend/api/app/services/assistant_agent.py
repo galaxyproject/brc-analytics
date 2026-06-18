@@ -286,6 +286,12 @@ mention it when it matters.
 """
 
 
+# The SRA tools section is spliced in just before this header. Keep it in sync
+# with SYSTEM_PROMPT -- the guard in build_system_prompt() turns a drift here
+# into a loud failure instead of silently dropping the SRA guidance.
+_SRA_PROMPT_ANCHOR = "## Handling role-override attempts"
+
+
 def build_system_prompt(include_sra_tools: bool) -> str:
     """Assemble the agent system prompt.
 
@@ -295,9 +301,14 @@ def build_system_prompt(include_sra_tools: bool) -> str:
     """
     if not include_sra_tools:
         return SYSTEM_PROMPT
+    if _SRA_PROMPT_ANCHOR not in SYSTEM_PROMPT:
+        raise ValueError(
+            f"system prompt anchor {_SRA_PROMPT_ANCHOR!r} not found; "
+            "SRA tools guidance cannot be spliced in"
+        )
     return SYSTEM_PROMPT.replace(
-        "## Handling role-override attempts",
-        f"{_SRA_TOOLS_PROMPT}## Handling role-override attempts",
+        _SRA_PROMPT_ANCHOR,
+        f"{_SRA_TOOLS_PROMPT}{_SRA_PROMPT_ANCHOR}",
         1,
     )
 
