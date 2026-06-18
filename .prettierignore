@@ -13,6 +13,8 @@ coverage
 # python
 venv
 .venv
+.pytest_cache
+.ruff_cache
 
 # releases
 /CHANGELOG.md

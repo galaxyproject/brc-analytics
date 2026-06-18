@@ -120,6 +120,7 @@ class SessionState(BaseModel):
     """The full state stored in Redis for one assistant session."""
 
     session_id: str
+    owner_keycloak_sub: Optional[str] = None
     schema_state: AnalysisSchema = Field(default_factory=AnalysisSchema)
     messages: List[ChatMessage] = Field(default_factory=list)
     suggestions: List[SuggestionChip] = Field(default_factory=list)

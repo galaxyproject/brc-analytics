@@ -60,3 +60,73 @@ export interface AssistantInfoResponse {
   model: string | null;
   provider: string | null;
 }
+
+export interface UserPreferences {
+  [key: string]: unknown;
+}
+
+export interface UserMeResponse {
+  email: string | null;
+  email_verified: boolean | null;
+  family_name: string | null;
+  given_name: string | null;
+  name: string | null;
+  preferences: UserPreferences;
+  preferred_username: string | null;
+  realm_roles: string[];
+  sub: string;
+}
+
+export interface FavoriteResponse {
+  created_at: string;
+  entity_id: string;
+  entity_type: string;
+}
+
+export interface SavedAnalysisSummary {
+  created_at: string;
+  id: string;
+  source_session: string | null;
+  title: string | null;
+  updated_at: string;
+}
+
+export interface SavedAnalysisDetail extends SavedAnalysisSummary {
+  messages: Array<{
+    content: string;
+    role: "user" | "assistant";
+  }>;
+  schema: AnalysisSchema;
+}
+
+export interface SavedAnalysisRestoreResponse {
+  session_id: string;
+}
+
+export interface WorkflowRunCreateRequest {
+  assembly_accession?: string | null;
+  assistant_session_id?: string | null;
+  galaxy_instance_url?: string | null;
+  handoff_url: string;
+  launch_source: string;
+  parameters?: Record<string, unknown>;
+  workflow_id?: string | null;
+  workflow_trs_id: string;
+}
+
+export interface WorkflowRunResponse {
+  assembly_accession: string | null;
+  assistant_session_id: string | null;
+  completed_at: string | null;
+  created_at: string;
+  galaxy_instance_url: string | null;
+  galaxy_invocation_id: string | null;
+  handoff_url: string;
+  id: string;
+  launch_source: string;
+  parameters: Record<string, unknown>;
+  status: string;
+  updated_at: string;
+  workflow_id: string | null;
+  workflow_trs_id: string;
+}

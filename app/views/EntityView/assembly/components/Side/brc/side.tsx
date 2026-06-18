@@ -1,6 +1,8 @@
 import { BackPageContentSideColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
+import { Box } from "@mui/material";
 import { JSX } from "react";
 import { AnalysisPortals } from "../../../../../../components/Entity/components/AnalysisPortals/analysisPortals";
+import { AssemblyFavoriteButton } from "../../../../../../components/Favorites/AssemblyFavoriteButton/assemblyFavoriteButton";
 import {
   buildAssemblyDetails,
   buildAssemblyResources,
@@ -19,6 +21,9 @@ export const Side = ({ assembly }: Props): JSX.Element => {
   return (
     <BackPageContentSideColumn>
       <StyledFluidPaper>
+        <Box sx={{ p: 2 }}>
+          <AssemblyFavoriteButton accession={assembly.accession} />
+        </Box>
         <KeyValueSection
           {...buildAssemblyDetails(assembly)}
           title="Assembly Details"

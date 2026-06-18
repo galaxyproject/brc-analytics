@@ -7,6 +7,7 @@ import logging
 import re
 import time
 from typing import Any, Dict, List, Optional
+from urllib.parse import urlencode
 
 from pydantic_ai import Agent, RunContext, Tool
 from pydantic_ai.messages import ModelMessage, ModelMessagesTypeAdapter
@@ -27,6 +28,7 @@ from app.models.assistant import (
     FieldStatus,
     MessageRole,
     SchemaField,
+    SessionState,
     SuggestionChip,
     TokenUsage,
 )
@@ -410,8 +412,18 @@ class AssistantAgent:
         return None
 
     @staticmethod
-    def compute_handoff(schema_state: AnalysisSchema) -> tuple[bool, Optional[str]]:
-        """Compute is_complete and handoff_url from schema state."""
+    def compute_handoff(
+        schema_state: AnalysisSchema,
+        session_id: Optional[str] = None,
+    ) -> tuple[bool, Optional[str]]:
+        """Compute is_complete and handoff_url from schema state.
+
+        When a session_id is supplied, append it as an `assistantSessionId`
+        query param so the Galaxy launch tracker can correlate the run
+        with the assistant session that produced it. Callers that have a
+        session in hand (chat, restore_session) should always pass it;
+        callers that don't (e.g. ad-hoc compute) can leave it unset.
+        """
         handoff_url = None
         if schema_state.is_complete():
             accession = schema_state.assembly.detail or ""
@@ -422,6 +434,10 @@ class AssistantAgent:
                 handoff_url = (
                     f"/data/assemblies/{entity_id}/analyze/workflows/{workflow_id}"
                 )
+                if session_id:
+                    handoff_url = (
+                        f"{handoff_url}?{urlencode({'assistantSessionId': session_id})}"
+                    )
         return handoff_url is not None, handoff_url
 
     @staticmethod
@@ -541,7 +557,10 @@ class AssistantAgent:
             ) from e
 
     async def chat(
-        self, message: str, session_id: Optional[str] = None
+        self,
+        message: str,
+        session_id: Optional[str] = None,
+        owner_keycloak_sub: Optional[str] = None,
     ) -> ChatResponse:
         """Process one user message and return the assistant's reply.
 
@@ -553,9 +572,19 @@ class AssistantAgent:
         # Get or create session
         state = None
         if session_id:
-            state = await self.session_service.get_session(session_id)
+            try:
+                # PermissionError (session owned by a different user) is left
+                # to propagate so the API layer can return a 403 rather than
+                # folding it into the generic 503 RuntimeError path.
+                state = await self.session_service.require_session(
+                    session_id, owner_keycloak_sub
+                )
+            except KeyError:
+                state = None
         if state is None:
-            state = await self.session_service.create_session()
+            state = await self.session_service.create_session(
+                owner_keycloak_sub=owner_keycloak_sub
+            )
 
         # Record user message
         state.messages.append(ChatMessage(role=MessageRole.USER, content=message))
@@ -625,7 +654,9 @@ class AssistantAgent:
         self._cap_state_messages(state)
         await self.session_service.save_session(state)
 
-        is_complete, handoff_url = self.compute_handoff(schema_state)
+        is_complete, handoff_url = self.compute_handoff(
+            schema_state, session_id=state.session_id
+        )
 
         return ChatResponse(
             session_id=state.session_id,
@@ -635,6 +666,19 @@ class AssistantAgent:
             is_complete=is_complete,
             handoff_url=handoff_url,
             token_usage=token_usage,
+        )
+
+    async def restore_saved_session(
+        self,
+        *,
+        owner_keycloak_sub: str,
+        schema_state: AnalysisSchema,
+        messages: list[ChatMessage],
+    ) -> SessionState:
+        return await self.session_service.create_session(
+            owner_keycloak_sub=owner_keycloak_sub,
+            schema_state=schema_state,
+            messages=messages,
         )
 
     def _parse_structured_output(

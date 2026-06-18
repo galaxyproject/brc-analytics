@@ -1,6 +1,7 @@
 import { HTTPError } from "ky";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { assistantAPIClient } from "../services/assistant-api-client";
+import { brcAPIClient } from "../services/brc-api-client";
 import {
   AnalysisSchema,
   AssistantChatResponse,
@@ -23,17 +24,29 @@ interface UseAssistantChatReturn {
   messages: ChatMessageDisplay[];
   onRetry?: () => Promise<void>;
   resetSession: () => void;
+  saveAnalysis: () => Promise<void>;
+  saveLoading: boolean;
+  saveMessage: string | null;
   schema: AnalysisSchema | null;
   sendMessage: (message: string) => Promise<void>;
   suggestions: SuggestionChip[];
 }
 
+interface UseAssistantChatOptions {
+  initialSessionId?: string;
+}
+
 /**
  * Manages assistant chat state: messages, session, schema, and suggestions.
- * Persists session_id to localStorage and restores on mount.
- * @returns Chat state, sendMessage, resetSession, and retry functions
+ * Persists session_id to localStorage and restores on mount; explicit
+ * `initialSessionId` from URL params takes precedence over the stored value.
+ * @param root0 - Hook options.
+ * @param root0.initialSessionId - Existing assistant session to continue.
+ * @returns Chat state, sendMessage, save/reset/retry functions.
  */
-export const useAssistantChat = (): UseAssistantChatReturn => {
+export const useAssistantChat = ({
+  initialSessionId,
+}: UseAssistantChatOptions = {}): UseAssistantChatReturn => {
   const [messages, setMessages] = useState<ChatMessageDisplay[]>([]);
   const [schema, setSchema] = useState<AnalysisSchema | null>(null);
   const [suggestions, setSuggestions] = useState<SuggestionChip[]>([]);
@@ -45,22 +58,35 @@ export const useAssistantChat = (): UseAssistantChatReturn => {
   const [lastFailedMessage, setLastFailedMessage] = useState<string | null>(
     null
   );
-  const sessionIdRef = useRef<string | null>(null);
+  const [saveLoading, setSaveLoading] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const sessionIdRef = useRef<string | null>(initialSessionId ?? null);
   const sendingRef = useRef(false);
 
-  // Restore session from localStorage on mount
+  // Sync the session ref when caller swaps initialSessionId.
   useEffect(() => {
-    const storedId = localStorage.getItem(SESSION_KEY);
-    if (!storedId) return;
+    if (initialSessionId !== undefined) {
+      sessionIdRef.current = initialSessionId;
+    }
+  }, [initialSessionId]);
+
+  // Hydrate from either an explicit initialSessionId (URL param, set by the
+  // saved-analysis restore flow) or a localStorage-stored session. URL wins.
+  // Either way we call the restore endpoint so we get computed handoff state
+  // (handoff_url, is_complete, suggestions), not just messages + schema.
+  useEffect(() => {
+    const sourceId = initialSessionId ?? localStorage.getItem(SESSION_KEY);
+    if (!sourceId) return;
 
     let cancelled = false;
     setIsRestoring(true);
 
     assistantAPIClient
-      .assistantRestore(storedId)
+      .assistantRestore(sourceId)
       .then((restored) => {
         if (cancelled) return;
         sessionIdRef.current = restored.session_id;
+        localStorage.setItem(SESSION_KEY, restored.session_id);
         setMessages(restored.messages);
         setSchema(restored.schema_state);
         setSuggestions(restored.suggestions);
@@ -69,7 +95,8 @@ export const useAssistantChat = (): UseAssistantChatReturn => {
       })
       .catch(() => {
         if (cancelled) return;
-        localStorage.removeItem(SESSION_KEY);
+        if (!initialSessionId) localStorage.removeItem(SESSION_KEY);
+        setError("Failed to restore the previous conversation.");
       })
       .finally(() => {
         if (!cancelled) setIsRestoring(false);
@@ -78,7 +105,7 @@ export const useAssistantChat = (): UseAssistantChatReturn => {
     return (): void => {
       cancelled = true;
     };
-  }, []);
+  }, [initialSessionId]);
 
   const sendMessage = useCallback(async (message: string): Promise<void> => {
     if (!message.trim() || sendingRef.current) return;
@@ -87,6 +114,7 @@ export const useAssistantChat = (): UseAssistantChatReturn => {
     setLoading(true);
     setError(null);
     setLastFailedMessage(null);
+    setSaveMessage(null);
 
     // Add user message immediately for responsiveness
     setMessages((prev) => [...prev, { content: message, role: "user" }]);
@@ -144,6 +172,29 @@ export const useAssistantChat = (): UseAssistantChatReturn => {
     setHandoffUrl(null);
     setError(null);
     setLastFailedMessage(null);
+    setSaveMessage(null);
+  }, []);
+
+  const saveAnalysis = useCallback(async (): Promise<void> => {
+    if (!sessionIdRef.current) {
+      setSaveMessage("There is no active assistant session to save.");
+      return;
+    }
+
+    setSaveLoading(true);
+    setSaveMessage(null);
+    try {
+      const savedAnalysis = await brcAPIClient.saveAnalysis(
+        sessionIdRef.current
+      );
+      setSaveMessage(
+        savedAnalysis.title ? `Saved: ${savedAnalysis.title}` : "Saved."
+      );
+    } catch {
+      setSaveMessage("Failed to save this analysis.");
+    } finally {
+      setSaveLoading(false);
+    }
   }, []);
 
   return {
@@ -155,6 +206,9 @@ export const useAssistantChat = (): UseAssistantChatReturn => {
     messages,
     onRetry: lastFailedMessage ? retry : undefined,
     resetSession,
+    saveAnalysis,
+    saveLoading,
+    saveMessage,
     schema,
     sendMessage,
     suggestions,

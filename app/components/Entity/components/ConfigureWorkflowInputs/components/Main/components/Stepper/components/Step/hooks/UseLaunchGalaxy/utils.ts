@@ -4,9 +4,14 @@ import {
 } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { Workflow } from "../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import { WORKFLOW_PARAMETER_VARIABLE } from "../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { WorkflowRunCreateRequest } from "../../../../../../../../../../../../types/api";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { ConfiguredInput } from "../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { ConfiguredValue } from "./types";
+import {
+  ConfiguredValue,
+  isAssemblyConfiguredValue,
+  isSequenceConfiguredValue,
+} from "./types";
 
 export function getRequiredParameterTypes(
   workflow: Workflow
@@ -241,4 +246,82 @@ export function launchGalaxy(url: string): void {
   document.body.appendChild(el);
   el.click();
   document.body.removeChild(el);
+}
+
+interface BuildWorkflowRunPayloadParams {
+  assistantSessionId: string | null;
+  configuredInput: ConfiguredInput;
+  configuredValue: ConfiguredValue;
+  handoffUrl: string;
+  workflow: Workflow;
+}
+
+export function buildWorkflowRunPayload({
+  assistantSessionId,
+  configuredInput,
+  configuredValue,
+  handoffUrl,
+  workflow,
+}: BuildWorkflowRunPayloadParams): WorkflowRunCreateRequest {
+  let galaxyInstanceUrl: string | null = null;
+
+  try {
+    galaxyInstanceUrl = new URL(handoffUrl).origin;
+  } catch {
+    galaxyInstanceUrl = null;
+  }
+
+  // Assembly-scope and sequence-scope variants carry distinct fields; narrow
+  // before reading so the tracking payload tolerates any scope.
+  const isAssembly = isAssemblyConfiguredValue(configuredValue);
+  const isSequence = isSequenceConfiguredValue(configuredValue);
+
+  return {
+    assembly_accession: isAssembly ? configuredValue.referenceAssembly : null,
+    assistant_session_id: assistantSessionId,
+    galaxy_instance_url: galaxyInstanceUrl,
+    handoff_url: handoffUrl,
+    launch_source: assistantSessionId ? "assistant" : "site",
+    parameters: {
+      design_formula: isAssembly
+        ? (configuredValue.designFormula ?? null)
+        : null,
+      gene_model_url: isAssembly
+        ? (configuredValue.geneModelUrl ?? null)
+        : null,
+      number_of_hits: isSequence
+        ? (configuredValue.numberOfHits ?? null)
+        : null,
+      primary_contrasts: isAssembly
+        ? (configuredValue.primaryContrasts ?? null)
+        : null,
+      read_runs_paired:
+        configuredValue.readRunsPaired?.map(
+          ({ runAccession }) => runAccession
+        ) ?? [],
+      read_runs_single:
+        configuredValue.readRunsSingle?.map(
+          ({ runAccession }) => runAccession
+        ) ?? [],
+      sample_sheet_classification: isAssembly
+        ? (configuredValue.sampleSheetClassification ?? null)
+        : null,
+      sample_sheet_rows: isAssembly
+        ? (configuredValue.sampleSheet?.length ?? 0)
+        : 0,
+      sequence_file_name: configuredInput.sequenceFileName ?? null,
+      sequence_length: isSequence
+        ? (configuredValue.sequence?.length ?? null)
+        : null,
+      strandedness: isAssembly ? (configuredValue.strandedness ?? null) : null,
+      tracks:
+        configuredValue.tracks?.map((track) => ({
+          group_id: track.groupId,
+          name: track.shortLabel ?? track.longLabel ?? track.bigDataUrl,
+          url: track.bigDataUrl,
+        })) ?? [],
+    },
+    workflow_id: workflow.workflowId ?? null,
+    workflow_trs_id: workflow.trsId,
+  };
 }
