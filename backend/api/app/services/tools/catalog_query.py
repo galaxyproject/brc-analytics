@@ -335,18 +335,21 @@ def connect(catalog_dir: str):
             [str(json_path)],
         )
         total = con.execute("SELECT count(*) FROM assembly").fetchone()[0]
-        # The field allowlist and display projection are hand-maintained; warn
-        # loudly at boot if the catalog schema has drifted out from under them
-        # (a missing display column would otherwise crash every `list` query).
+        # The field allowlist and display projection are hand-maintained against
+        # the catalog schema. If the schema has drifted (a configured column is
+        # gone), fail closed — disable the engine rather than serve queries that
+        # would error or silently mislead. A drift is a build problem to fix, not
+        # something to paper over.
         actual = {row[0] for row in con.execute("DESCRIBE assembly").fetchall()}
-        configured = ASSEMBLY_FIELDS | set(_DISPLAY_COLUMNS["assembly"])
-        missing = sorted(configured - actual)
+        missing = sorted((ASSEMBLY_FIELDS | set(_DISPLAY_COLUMNS["assembly"])) - actual)
         if missing:
-            logger.warning(
-                "Catalog query: configured columns missing from the assembly "
-                "table: %s — filters/projections referencing them will error",
+            logger.error(
+                "Catalog query disabled: assembly table is missing configured "
+                "columns %s — the catalog schema has drifted from catalog_query.py",
                 missing,
             )
+            con.close()
+            return None
     except duckdb.IOException as exc:
         logger.error("Could not read catalog at %s: %s", json_path, exc)
     except duckdb.CatalogException as exc:
@@ -398,13 +401,9 @@ def execute(q: CatalogQuery, con) -> dict:
         result["facets"] = _facets(q.facet_by)
         return result
 
+    # Display columns are validated against the table at connect() time (the
+    # engine fails closed on drift), so the projection is trusted here.
     cols = _DISPLAY_COLUMNS.get(q.entity)
-    if cols:
-        # Project only columns that actually exist, so a catalog schema drift
-        # (a renamed/dropped display column) degrades the page gracefully instead
-        # of failing every list query. connect() logs a warning when this happens.
-        present = {r[0] for r in con.execute(f"DESCRIBE {q.entity}").fetchall()}
-        cols = [c for c in cols if c in present] or None
     if q.sort:
         order = "ORDER BY " + ", ".join(
             f"{s.field} {'DESC' if s.desc else 'ASC'}" for s in q.sort
