@@ -399,6 +399,12 @@ def execute(q: CatalogQuery, con) -> dict:
         return result
 
     cols = _DISPLAY_COLUMNS.get(q.entity)
+    if cols:
+        # Project only columns that actually exist, so a catalog schema drift
+        # (a renamed/dropped display column) degrades the page gracefully instead
+        # of failing every list query. connect() logs a warning when this happens.
+        present = {r[0] for r in con.execute(f"DESCRIBE {q.entity}").fetchall()}
+        cols = [c for c in cols if c in present] or None
     if q.sort:
         order = "ORDER BY " + ", ".join(
             f"{s.field} {'DESC' if s.desc else 'ASC'}" for s in q.sort

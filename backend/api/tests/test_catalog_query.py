@@ -351,3 +351,23 @@ def test_list_no_truncation_when_under_limit(con):
     assert out["returned"] == 5
     assert out["truncated"] is False
     assert "facets" not in out
+
+
+def test_list_degrades_when_display_column_missing():
+    # A table missing a display column (ucscBrowserUrl) must not crash list
+    # queries — the projection drops the absent column gracefully.
+    duckdb = pytest.importorskip("duckdb")
+    c = duckdb.connect()
+    c.execute(
+        "CREATE TABLE assembly (accession VARCHAR, taxonomicLevelSpecies VARCHAR, "
+        "strainName VARCHAR, level VARCHAR, isRef VARCHAR, ploidy VARCHAR[], "
+        "length BIGINT, scaffoldN50 BIGINT, geneModelUrl VARCHAR)"  # no ucscBrowserUrl
+    )
+    c.execute(
+        "INSERT INTO assembly VALUES ('A1','S','st','Contig','No',['HAPLOID'],1,1,'g')"
+    )
+    out = execute(CatalogQuery(operation="list"), c)
+    assert out["returned"] == 1
+    assert "ucscBrowserUrl" not in out["rows"][0]
+    assert out["rows"][0]["accession"] == "A1"
+    c.close()
