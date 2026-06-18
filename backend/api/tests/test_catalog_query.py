@@ -196,54 +196,46 @@ def con():
     return c
 
 
-def test_count_subtree_via_rank(con):
+@pytest.mark.parametrize(
+    "label, filters, expected",
+    [
+        # subtree via a denormalized rank column (no lineage walk)
+        ("subtree_via_rank", [("taxonomicLevelGenus", Op.eq, "Anopheles")], 3),
+        # OR within a field via `in`, AND with another field
+        (
+            "or_within_field",
+            [
+                ("taxonomicLevelGenus", Op.eq, "Anopheles"),
+                ("level", Op.in_, ["Chromosome", "Contig"]),  # A1 + A3
+            ],
+            2,
+        ),
+        # empty intersection -> honest zero (no constraint silently dropped)
+        (
+            "empty_intersection",
+            [
+                ("taxonomicLevelSpecies", Op.eq, "Candida albicans"),
+                ("isRef", Op.eq, "Yes"),
+                ("level", Op.eq, "Complete Genome"),
+            ],
+            0,
+        ),
+        # numeric range = two predicates on the same field (A1, A2)
+        (
+            "numeric_range",
+            [("length", Op.gte, 1_000_000_000), ("length", Op.lte, 5_000_000_000)],
+            2,
+        ),
+        # is_null = "missing" (A2, C2 have no gene annotation)
+        ("is_null_missing", [("geneModelUrl", Op.is_null, None)], 2),
+    ],
+)
+def test_count_shapes(con, label, filters, expected):
     q = CatalogQuery(
         operation="count",
-        filters=[Filter(field="taxonomicLevelGenus", op=Op.eq, value="Anopheles")],
+        filters=[Filter(field=f, op=op, value=v) for f, op, v in filters],
     )
-    assert execute(q, con) == {"total": 3}
-
-
-def test_count_or_within_field(con):
-    q = CatalogQuery(
-        operation="count",
-        filters=[
-            Filter(field="taxonomicLevelGenus", op=Op.eq, value="Anopheles"),
-            Filter(field="level", op=Op.in_, value=["Chromosome", "Contig"]),
-        ],
-    )
-    assert execute(q, con) == {"total": 2}  # A1 + A3
-
-
-def test_count_empty_intersection_is_honest_zero(con):
-    q = CatalogQuery(
-        operation="count",
-        filters=[
-            Filter(field="taxonomicLevelSpecies", op=Op.eq, value="Candida albicans"),
-            Filter(field="isRef", op=Op.eq, value="Yes"),
-            Filter(field="level", op=Op.eq, value="Complete Genome"),
-        ],
-    )
-    assert execute(q, con) == {"total": 0}
-
-
-def test_count_numeric_range(con):
-    q = CatalogQuery(
-        operation="count",
-        filters=[
-            Filter(field="length", op=Op.gte, value=1_000_000_000),
-            Filter(field="length", op=Op.lte, value=5_000_000_000),
-        ],
-    )
-    assert execute(q, con) == {"total": 2}  # A1, A2
-
-
-def test_count_is_null_for_missing_annotation(con):
-    q = CatalogQuery(
-        operation="count",
-        filters=[Filter(field="geneModelUrl", op=Op.is_null)],
-    )
-    assert execute(q, con) == {"total": 2}  # A2, C2
+    assert execute(q, con) == {"total": expected}
 
 
 def test_facets_group_by_level(con):

@@ -202,6 +202,11 @@ _SQL_BINOP = {
 }
 
 
+def _list_membership(col: str) -> str:
+    """SQL truthy when list column `col` shares any element with the ? param list."""
+    return f"len(list_intersect({col}, ?)) > 0"
+
+
 def compile_predicate(f: Filter) -> tuple[str, list]:
     col = f.field
     if f.op is Op.is_null:
@@ -214,7 +219,7 @@ def compile_predicate(f: Filter) -> tuple[str, list]:
     # without a failed round-trip.
     if col in LIST_FIELDS and f.op in (Op.eq, Op.ne, Op.in_, Op.not_in):
         vals = f.value if isinstance(f.value, list) else [f.value]
-        expr = f"len(list_intersect({col}, ?)) > 0"
+        expr = _list_membership(col)
         neg = f.op in (Op.ne, Op.not_in)
         return (f"NOT ({expr})" if neg else expr), [list(vals)]
     if f.op in (Op.in_, Op.not_in):
@@ -226,7 +231,7 @@ def compile_predicate(f: Filter) -> tuple[str, list]:
         return f"list_contains({col}, ?)", [f.value]
     if f.op is Op.contains_any:
         vals = f.value if isinstance(f.value, list) else [f.value]
-        return f"len(list_intersect({col}, ?)) > 0", [list(vals)]
+        return _list_membership(col), [list(vals)]
     return f"{col} {_SQL_BINOP[f.op]} ?", [f.value]
 
 
@@ -292,10 +297,15 @@ def connect(catalog_dir: str):
     return None
 
 
-def execute(q: CatalogQuery, con, cap: Optional[int] = None) -> dict:
-    """Run a CatalogQuery against DuckDB; return the summary contract."""
+def execute(q: CatalogQuery, con) -> dict:
+    """Run a CatalogQuery against DuckDB; return the summary contract.
+
+    Entity/column/sort identifiers are interpolated into SQL, not parameterized
+    (SQL identifiers can't be) — the CatalogQuery allowlist validator is what
+    gates that interpolation, so don't loosen it without revisiting this.
+    """
     where, params = compile_where(q)
-    cap = cap or q.limit
+    cap = q.limit
 
     def _facets(cols: list[str]) -> dict:
         out = {}
@@ -333,9 +343,9 @@ def execute(q: CatalogQuery, con, cap: Optional[int] = None) -> dict:
     colnames = [d[0] for d in cur.description]
     raw = cur.fetchall()
     rows = [dict(zip(colnames, r)) for r in raw]
-    result["returned"] = min(len(rows), cap)
     result["truncated"] = len(rows) > cap
     result["rows"] = rows[:cap]
+    result["returned"] = len(result["rows"])
     if result["truncated"]:
         result["facets"] = _facets(_AUTO_FACET_FIELDS.get(q.entity, []))
     return result
