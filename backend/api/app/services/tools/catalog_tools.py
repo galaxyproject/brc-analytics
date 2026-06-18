@@ -110,10 +110,12 @@ def query_catalog(deps: AssistantDeps, query: CatalogQuery) -> str:
     """Count, filter, list, or aggregate genome ASSEMBLIES with a structured query.
 
     Prefer this over enumerating assemblies yourself: it runs the filter/count in
-    the database and returns a summary correct at any scale. The summary always
-    has `total`; `list` adds `rows`/`returned`/`truncated` (capped page) and
-    `facets` when truncated; `facets` adds `facets`. Use it for "how many",
-    attribute filters, clade queries, and "by/per X" breakdowns.
+    the database and returns a JSON summary correct at any scale. The summary
+    always has `total`; `list` adds `rows`/`returned`/`truncated` (capped page)
+    and `facets` when truncated; `facets` adds `facets`. Use it for "how many",
+    attribute filters, clade queries, and "by/per X" breakdowns. On a failure or
+    when the engine is unavailable it returns a short plain-text message instead
+    of JSON.
 
     The query has: entity ("assembly"), filters (a list of {field, op, value},
     AND-combined), operation ("count" | "list" | "facets"), facet_by, limit, sort.

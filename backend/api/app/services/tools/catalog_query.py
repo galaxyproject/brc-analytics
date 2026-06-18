@@ -253,7 +253,7 @@ def _list_membership(col: str) -> str:
     return f"len(list_intersect({col}, ?)) > 0"
 
 
-def compile_predicate(f: Filter) -> tuple[str, list]:
+def _compile_predicate(f: Filter) -> tuple[str, list]:
     col = f.field
     if f.op is Op.is_null:
         return f"{col} IS NULL", []
@@ -288,12 +288,12 @@ def compile_predicate(f: Filter) -> tuple[str, list]:
     return f"{col} {_SQL_BINOP[f.op]} ?", [f.value]
 
 
-def compile_where(q: CatalogQuery) -> tuple[str, list]:
+def _compile_where(q: CatalogQuery) -> tuple[str, list]:
     if not q.filters:
         return "TRUE", []
     frags, params = [], []
     for f in q.filters:
-        frag, p = compile_predicate(f)
+        frag, p = _compile_predicate(f)
         frags.append(frag)
         params.extend(p)
     return " AND ".join(frags), params
@@ -375,7 +375,7 @@ def execute(q: CatalogQuery, con) -> dict:
     (SQL identifiers can't be) — the CatalogQuery allowlist validator is what
     gates that interpolation, so don't loosen it without revisiting this.
     """
-    where, params = compile_where(q)
+    where, params = _compile_where(q)
     cap = q.limit
 
     def _facets(cols: list[str]) -> dict:
@@ -388,7 +388,7 @@ def execute(q: CatalogQuery, con) -> dict:
                 f"WHERE {where} GROUP BY {col} ORDER BY c DESC LIMIT {_FACET_LIMIT}",
                 params,
             ).fetchall()
-            out[col] = {str(k): c for k, c in rows}
+            out[col] = {("(none)" if k is None else str(k)): c for k, c in rows}
         return out
 
     total = con.execute(
@@ -420,7 +420,7 @@ def execute(q: CatalogQuery, con) -> dict:
     )
     colnames = [d[0] for d in cur.description]
     raw = cur.fetchall()
-    rows = [dict(zip(colnames, r)) for r in raw]
+    rows = [dict(zip(colnames, r, strict=True)) for r in raw]
     result["truncated"] = len(rows) > cap
     result["rows"] = rows[:cap]
     result["returned"] = len(result["rows"])

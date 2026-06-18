@@ -18,7 +18,7 @@ from app.services.tools.catalog_query import (
     Filter,
     Op,
     Sort,
-    compile_predicate,
+    _compile_predicate,
     connect,
     execute,
 )
@@ -77,23 +77,23 @@ def test_contains_rejects_list_value():
 
 
 def test_compile_scalar_and_range():
-    assert compile_predicate(Filter(field="level", op=Op.eq, value="Chromosome")) == (
+    assert _compile_predicate(Filter(field="level", op=Op.eq, value="Chromosome")) == (
         "level = ?",
         ["Chromosome"],
     )
-    assert compile_predicate(Filter(field="length", op=Op.gte, value=1000)) == (
+    assert _compile_predicate(Filter(field="length", op=Op.gte, value=1000)) == (
         "length >= ?",
         [1000],
     )
 
 
 def test_compile_in_and_null():
-    frag, params = compile_predicate(
+    frag, params = _compile_predicate(
         Filter(field="level", op=Op.in_, value=["Chromosome", "Complete Genome"])
     )
     assert frag == "level IN (?, ?)"
     assert params == ["Chromosome", "Complete Genome"]
-    assert compile_predicate(Filter(field="geneModelUrl", op=Op.is_null)) == (
+    assert _compile_predicate(Filter(field="geneModelUrl", op=Op.is_null)) == (
         "geneModelUrl IS NULL",
         [],
     )
@@ -101,26 +101,26 @@ def test_compile_in_and_null():
 
 def test_compile_list_membership_and_coercion():
     # explicit contains / contains_any
-    assert compile_predicate(
+    assert _compile_predicate(
         Filter(field="ploidy", op=Op.contains, value="DIPLOID")
     ) == (
         "list_contains(ploidy, ?)",
         ["DIPLOID"],
     )
     # scalar eq on a list field coerces to membership (no failed round-trip)
-    frag, params = compile_predicate(Filter(field="ploidy", op=Op.eq, value="DIPLOID"))
+    frag, params = _compile_predicate(Filter(field="ploidy", op=Op.eq, value="DIPLOID"))
     assert frag == "len(list_intersect(ploidy, ?)) > 0"
     assert params == [["DIPLOID"]]
     # ne on a list field coerces to NULL-safe negated membership
-    frag, _ = compile_predicate(Filter(field="ploidy", op=Op.ne, value="DIPLOID"))
+    frag, _ = _compile_predicate(Filter(field="ploidy", op=Op.ne, value="DIPLOID"))
     assert frag == "(NOT (len(list_intersect(ploidy, ?)) > 0) OR ploidy IS NULL)"
 
 
 def test_compile_ne_and_not_in_are_null_safe():
     # SQL `col != x` / `col NOT IN (...)` drop NULL rows; negation must include them.
-    frag, _ = compile_predicate(Filter(field="level", op=Op.ne, value="Contig"))
+    frag, _ = _compile_predicate(Filter(field="level", op=Op.ne, value="Contig"))
     assert frag == "(level != ? OR level IS NULL)"
-    frag, _ = compile_predicate(Filter(field="level", op=Op.not_in, value=["Contig"]))
+    frag, _ = _compile_predicate(Filter(field="level", op=Op.not_in, value=["Contig"]))
     assert frag == "(level NOT IN (?) OR level IS NULL)"
 
 
@@ -188,7 +188,7 @@ def con():
         """
     )
     rows = [
-        # accession, species, genus, strain, level, isRef, ploidy, length, n50, gtf, ucsc
+        # accession, species, genus, strain, level, isRef, ploidy, len, n50, gtf, ucsc
         (
             "A1",
             "Anopheles gambiae",
