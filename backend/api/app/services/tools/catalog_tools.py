@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, TYPE_CHECKING
 
 from app.services.tools.catalog_data import CatalogData
+from app.services.tools.catalog_query import CatalogQuery, execute
 
 if TYPE_CHECKING:
     from app.services.sra_mirror import SRAMirrorService
@@ -16,6 +17,7 @@ if TYPE_CHECKING:
 class AssistantDeps:
     catalog: CatalogData
     sra_mirror: Optional["SRAMirrorService"] = None
+    con: Any = None  # in-process DuckDB connection for query_catalog (optional)
 
 
 def search_organisms(deps: AssistantDeps, query: str) -> str:
@@ -28,18 +30,6 @@ def search_organisms(deps: AssistantDeps, query: str) -> str:
     if not results:
         return f"No organisms found matching '{query}'."
     return json.dumps(results, indent=2)
-
-
-def get_assemblies(deps: AssistantDeps, taxonomy_id: str) -> str:
-    """Get all genome assemblies available for an organism by its NCBI taxonomy ID.
-
-    Args:
-        taxonomy_id: the NCBI taxonomy ID of the organism
-    """
-    assemblies = deps.catalog.get_assemblies_for_organism(taxonomy_id)
-    if not assemblies:
-        return f"No assemblies found for taxonomy ID {taxonomy_id}."
-    return json.dumps(assemblies, indent=2)
 
 
 def get_assembly_details(deps: AssistantDeps, accession: str) -> str:
@@ -111,3 +101,33 @@ def check_compatibility(deps: AssistantDeps, iwc_id: str, accession: str) -> str
     """
     result = deps.catalog.check_workflow_assembly_compatibility(iwc_id, accession)
     return json.dumps(result, indent=2)
+
+
+def query_catalog(deps: AssistantDeps, query: CatalogQuery) -> str:
+    """Count, filter, list, or aggregate genome ASSEMBLIES with a structured query.
+
+    Prefer this over enumerating assemblies yourself: it runs the filter/count in
+    the database and returns a summary {total, returned, truncated, facets, rows},
+    correct at any scale. Use it for "how many", attribute filters, clade queries,
+    and "by/per X" breakdowns.
+
+    The query has: entity ("assembly"), filters (a list of {field, op, value},
+    AND-combined), operation ("count" | "list" | "facets"), facet_by, limit, sort.
+    Ops: eq, ne, in, not_in, gt/gte/lt/lte (numeric), contains/contains_any (list
+    fields), is_null/not_null. OR within a field = `in` (scalar) or `contains_any`
+    (list); a range = two predicates (gte + lte).
+
+    Filter an organism by scientific name via taxonomicLevelSpecies, a clade via
+    the matching rank column (e.g. taxonomicLevelGenus). When a list comes back
+    truncated, summarize the facets and offer to narrow rather than paging.
+
+    Args:
+        query: the structured catalog query
+    """
+    if deps.con is None:
+        return "Catalog query engine is not available."
+    try:
+        result = execute(query, deps.con)
+    except Exception as e:  # noqa: BLE001
+        return f"Query error: {e}"
+    return json.dumps(result, indent=2, default=str)

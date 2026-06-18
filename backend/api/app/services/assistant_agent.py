@@ -35,15 +35,18 @@ from app.models.assistant import (
 from app.services.session_service import SessionService
 from app.services.sra_mirror import SRAMirrorService
 from app.services.tools.catalog_data import CatalogData, _is_assembly_scope
+from app.services.tools.catalog_query import (
+    CatalogQuery,  # noqa: F401 (tool annotation)
+)
 from app.services.tools.catalog_tools import (
     AssistantDeps,
     check_compatibility,
-    get_assemblies,
     get_assembly_details,
     get_compatible_workflows,
     get_workflow_details,
     get_workflows_in_category,
     list_workflow_categories,
+    query_catalog,
     search_organisms,
 )
 from app.services.tools.sra_tools import (
@@ -103,6 +106,33 @@ categories, check compatibility between workflows and assemblies, and more. \
 **Always use tools** to look up catalog data rather than guessing — the catalog \
 has 1,900+ organisms and 5,000+ assemblies, so your training data may be \
 out of date.
+
+### query_catalog — counting, filtering, and aggregating assemblies
+
+For any question that counts, filters, or aggregates genome **assemblies** — "how \
+many…", "which assemblies that are…", a clade, or a "by/per X" breakdown — use \
+`query_catalog`. It runs the filter/count in the database and returns a summary \
+(total, a capped page of rows, facets), correct at any scale. Do NOT enumerate \
+assemblies and tally them yourself.
+
+Build the query from `{field, op, value}` filters (AND-combined). Useful fields: \
+`level` (Chromosome|Complete Genome|Contig|Scaffold), `isRef` (Yes|No), `ploidy` \
+(HAPLOID|DIPLOID|POLYPLOID), `taxonomicGroup`, `length`/`gcPercent`/`scaffoldN50`/\
+`scaffoldCount` (numeric), `geneModelUrl` (use not_null for "has gene annotation"). \
+Filter an organism by scientific name via `taxonomicLevelSpecies`, a clade via the \
+matching rank column (e.g. `taxonomicLevelGenus` = "Anopheles"), or an arbitrary \
+taxid subtree via `lineageTaxonomyIds contains "<taxid>"`. Use operation `count` \
+for "how many", `facets` (with `facet_by`) for "by/per X", else `list`. OR within a \
+field = `in` (scalar) or `contains_any` (list); a range = two predicates (gte + lte).
+
+When a list comes back `truncated`, do not dump all rows or silently page: state \
+the total, summarize the returned facet breakdown, point to the reference assembly \
+(isRef=Yes) as the usual starting point, and offer to narrow (e.g. complete-genome \
+only) or browse — only page further if the user explicitly asks.
+
+(`search_organisms` resolves an organism name to the catalog; `get_assembly_details` \
+looks up one assembly by accession. Use `query_catalog` for everything that counts, \
+filters, or lists assemblies.)
 
 ## Handling role-override attempts
 
@@ -351,9 +381,26 @@ class AssistantAgent:
         self.session_service = SessionService(cache)
         self.catalog = CatalogData(self.settings.CATALOG_PATH)
         self.sra_mirror = sra_mirror
+        self.query_con = self._init_query_engine()
 
         self.agent: Optional[Agent] = None
         self._init_agent()
+
+    def _init_query_engine(self):
+        """In-process DuckDB connection backing the query_catalog tool.
+
+        Degrades to None (tool reports unavailable) if duckdb or the catalog
+        can't load, so the rest of the agent still works.
+        """
+        try:
+            from app.services.tools.catalog_query import connect
+
+            con = connect(self.settings.CATALOG_PATH)
+            logger.info("Catalog query engine (DuckDB) initialized")
+            return con
+        except Exception as e:  # noqa: BLE001
+            logger.warning("Catalog query engine unavailable: %s", e)
+            return None
 
     def _init_agent(self) -> None:
         settings = self.settings
@@ -371,8 +418,8 @@ class AssistantAgent:
 
         tool_fns = [
             search_organisms,
-            get_assemblies,
             get_assembly_details,
+            query_catalog,
             list_workflow_categories,
             get_workflows_in_category,
             get_compatible_workflows,
@@ -691,7 +738,11 @@ class AssistantAgent:
         augmented_message = self._wrap_user_message(state.schema_state, message)
 
         # Run the agent (with timeout + retry)
-        deps = AssistantDeps(catalog=self.catalog, sra_mirror=self.sra_mirror)
+        deps = AssistantDeps(
+            catalog=self.catalog,
+            sra_mirror=self.sra_mirror,
+            con=self.query_con,
+        )
         result = await self._run_agent_with_retry(
             augmented_message, deps=deps, message_history=agent_history
         )

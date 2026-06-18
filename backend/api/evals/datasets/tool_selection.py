@@ -52,8 +52,7 @@ _CASES = [
         "message": (
             "Show me the genome assemblies for Mycobacterium tuberculosis (taxid 1773)."
         ),
-        "expected_tool": "get_assemblies",
-        "expected_args": {"taxonomy_id": "1773"},
+        "expected_tool": "query_catalog",
     },
     {
         "name": "list_workflow_categories",
