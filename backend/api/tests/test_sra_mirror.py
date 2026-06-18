@@ -201,6 +201,9 @@ class TestSinceValidation:
         result = mirror.search_runs("Plasmodium falciparum", since="last year")
         assert "error" in result
         assert "since" in result["error"].lower()
+        # The error path still carries provenance, like every other response.
+        assert result["resolved"] is True
+        assert "_meta" in result
 
     def test_valid_since_filters_runs(self, mirror):
         result = mirror.search_runs("Plasmodium falciparum", since="2021-01-01")

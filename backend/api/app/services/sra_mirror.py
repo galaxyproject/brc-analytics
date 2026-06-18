@@ -539,12 +539,17 @@ class SRAMirrorService:
         if since:
             normalized_since = _normalize_since(since)
             if normalized_since is None:
+                # Still honor the provenance contract -- every response carries
+                # resolution info and _meta, even when a filter is rejected.
                 return {
                     "input": organism,
+                    "resolved_taxid": taxid,
+                    "resolved": taxid is not None,
                     "error": (
                         f"Invalid 'since' date {since!r}. Use YYYY, YYYY-MM, "
                         "or YYYY-MM-DD (e.g. 2024, 2024-01, or 2024-01-01)."
                     ),
+                    "_meta": self._provenance(names),
                 }
             clauses.append("releasedate >= ?")
             params.append(normalized_since)
