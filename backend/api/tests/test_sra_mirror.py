@@ -336,3 +336,47 @@ class TestPlatformAssayMatching:
         # actually excludes rather than being a no-op, and handles mixed case.
         none = mirror.search_runs("Plasmodium falciparum", assay_type="RNA-Seq")
         assert none["n_returned"] == 0
+
+
+class TestConcurrentAccess:
+    """FastMCP offloads sync MCP tools to a worker threadpool, so the singleton
+    service's shared DuckDB connection and in-process cache are hit from many
+    threads at once. A single DuckDB connection is not safe for concurrent
+    execute()/fetch() (a second thread's execute() resets the pending result,
+    so the first thread's fetch returns None -> TypeError), and the plain-dict
+    cache is not safe for concurrent mutation under eviction. The public methods
+    serialize on an instance lock; this exercises that.
+
+    Every call below uses a UNIQUE cache key (distinct limit per iteration) so
+    it misses the cache and actually hits the connection -- a shared key would
+    let the cache absorb every call after the first and hide the race. The
+    distinct keys also push the cache past _CACHE_MAX_ENTRIES, exercising the
+    _evict() iteration alongside concurrent inserts.
+    """
+
+    def test_parallel_misses_hit_connection_safely(self, mirror):
+        import concurrent.futures
+
+        from app.services import sra_mirror as sra_mod
+
+        errors: list[Exception] = []
+        n_iter = max(800, sra_mod._CACHE_MAX_ENTRIES * 2)
+
+        def hammer(i: int):
+            try:
+                # Unique limit -> unique cache key -> guaranteed connection hit.
+                # P. falciparum has 2 runs and PRJNA12345 has 2 runs, so the
+                # returned count is a stable invariant we can assert: a torn
+                # execute()/fetch() shows up as a wrong count or a crash.
+                limit = (i % 200) + 1
+                pf = mirror.search_runs("Plasmodium falciparum", limit=limit)
+                assert pf["n_returned"] == min(2, limit), pf["n_returned"]
+                study = mirror.get_study_runs("PRJNA12345", limit=limit)
+                assert study["n_returned"] == min(2, limit), study["n_returned"]
+            except Exception as exc:  # noqa: BLE001 -- surface to the assertion
+                errors.append(exc)
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=16) as pool:
+            list(pool.map(hammer, range(n_iter)))
+
+        assert not errors, errors[:5]

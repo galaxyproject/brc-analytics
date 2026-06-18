@@ -11,7 +11,9 @@ from __future__ import annotations
 
 import copy
 import datetime
+import functools
 import logging
+import threading
 import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -24,8 +26,10 @@ logger = logging.getLogger(__name__)
 # about the same organism across turns). DuckDB queries are already fast
 # but `summary_for_organism` runs ~6 aggregates -- caching collapses that
 # to a hashmap hit for the second-and-later asks in a session. Tool calls
-# are sync and run in the asyncio event loop's thread, so a plain dict is
-# safe without locks.
+# are sync; on the assistant path they run on the event loop thread, but
+# FastMCP offloads the MCP tools to a worker threadpool, so the shared
+# DuckDB connection and this dict are reachable from multiple threads and
+# are guarded by self._lock (see the @_synchronized decorator).
 _CACHE_TTL_SECONDS = 300
 # Cap the entry count so a long-lived worker can't grow the cache without
 # bound -- the search key is a 7-tuple, so the keyspace is effectively open.
@@ -165,6 +169,31 @@ def _normalize_since(value: str) -> Optional[str]:
     return s
 
 
+def _synchronized(method):
+    """Serialize a public method on the instance lock.
+
+    FastMCP offloads sync MCP tools to a worker threadpool (sync tool fns
+    are run via anyio.to_thread), and the SRAMirrorService singleton is
+    shared between that threadpool and the assistant's event-loop thread.
+    A single DuckDB connection is not safe for concurrent execute()/fetch()
+    -- a second thread's execute() rebinds the connection's pending result
+    between the first thread's execute() and fetch() -- and the plain-dict
+    cache is not safe for concurrent mutation. Holding the lock for the whole
+    call keeps each lookup (cache check + queries + cache store) atomic.
+
+    Queries are sub-200ms and usually cache hits, so the serialization cost
+    is negligible; per-thread duckdb cursors could restore read parallelism
+    later if it ever matters.
+    """
+
+    @functools.wraps(method)
+    def wrapper(self, *args, **kwargs):
+        with self._lock:
+            return method(self, *args, **kwargs)
+
+    return wrapper
+
+
 class SRAMirrorService:
     """Read-only access to the local SRA-DuckDB mirror."""
 
@@ -174,6 +203,10 @@ class SRAMirrorService:
         self._meta: Dict[str, str] = {}
         self._total_runs: Optional[int] = None
         self._cache: Dict[Tuple, Tuple[float, Any]] = {}
+        # Guards the shared DuckDB connection and the cache dict: the MCP
+        # tools execute in FastMCP's worker threadpool, so both are touched
+        # from multiple threads. RLock so a future nested call can't deadlock.
+        self._lock = threading.RLock()
         self._initialize()
 
     def _cache_get(self, key: Tuple) -> Optional[Any]:
@@ -327,6 +360,7 @@ class SRAMirrorService:
 
         return None, [term]
 
+    @_synchronized
     def summary_for_organism(self, organism: str) -> Dict[str, Any]:
         """High-leverage one-call snapshot for an organism.
 
@@ -457,6 +491,7 @@ class SRAMirrorService:
         self._cache_put(cache_key, result)
         return result
 
+    @_synchronized
     def search_runs(
         self,
         organism: str,
@@ -570,6 +605,7 @@ class SRAMirrorService:
         self._cache_put(cache_key, result)
         return result
 
+    @_synchronized
     def top_bioprojects_for_organism(
         self, organism: str, limit: int = 20
     ) -> Dict[str, Any]:
@@ -627,6 +663,7 @@ class SRAMirrorService:
         self._cache_put(cache_key, result)
         return result
 
+    @_synchronized
     def get_study_runs(self, accession: str, limit: int = 200) -> Dict[str, Any]:
         """Get runs by SRA study (SRP*/ERP*/DRP*) or BioProject (PRJ*) accession."""
         if not self._con:
