@@ -110,9 +110,10 @@ def query_catalog(deps: AssistantDeps, query: CatalogQuery) -> str:
     """Count, filter, list, or aggregate genome ASSEMBLIES with a structured query.
 
     Prefer this over enumerating assemblies yourself: it runs the filter/count in
-    the database and returns a summary {total, returned, truncated, facets, rows},
-    correct at any scale. Use it for "how many", attribute filters, clade queries,
-    and "by/per X" breakdowns.
+    the database and returns a summary correct at any scale. The summary always
+    has `total`; `list` adds `rows`/`returned`/`truncated` (capped page) and
+    `facets` when truncated; `facets` adds `facets`. Use it for "how many",
+    attribute filters, clade queries, and "by/per X" breakdowns.
 
     The query has: entity ("assembly"), filters (a list of {field, op, value},
     AND-combined), operation ("count" | "list" | "facets"), facet_by, limit, sort.
@@ -131,7 +132,10 @@ def query_catalog(deps: AssistantDeps, query: CatalogQuery) -> str:
         return "Catalog query engine is not available."
     try:
         result = execute(query, deps.con)
-    except Exception as e:  # noqa: BLE001
-        logger.warning("query_catalog execution failed: %s", e)
-        return f"Query error: {e}"
+    except Exception:  # noqa: BLE001
+        # Log the detail; return a controlled message rather than echoing raw
+        # exception text (which can carry SQL fragments) to the model/user.
+        # Invalid queries are already rejected by validation before this runs.
+        logger.exception("query_catalog execution failed")
+        return "Query failed — try simplifying or narrowing the query."
     return json.dumps(result, indent=2, default=str)

@@ -99,6 +99,10 @@ NUMERIC_FIELDS: set[str] = {
     "assemblyCount",
 }
 
+# Cap on buckets returned per faceted column (top-N by count) — keeps a facet on
+# a high-cardinality field from returning thousands of rows.
+_FACET_LIMIT = 50
+
 # Facets auto-returned on a truncated list, so the model can offer narrowing.
 _AUTO_FACET_FIELDS: dict[str, list[str]] = {
     "assembly": ["level", "isRef"],
@@ -165,8 +169,9 @@ class CatalogQuery(BaseModel):
     operation: str = "list"  # count | list | facets
     facet_by: list[str] = Field(default_factory=list)
     # Bound the page so a `list` result can never dump the corpus into context —
-    # the whole point of the summary contract is bounded output.
-    limit: int = Field(default=25, ge=1, le=100)
+    # the contract is a bounded summary; over the cap we truncate and offer to
+    # narrow rather than page, so the max matches the default.
+    limit: int = Field(default=25, ge=1, le=25)
     offset: int = Field(default=0, ge=0)
     sort: list[Sort] = Field(default_factory=list)
 
@@ -208,6 +213,8 @@ class CatalogQuery(BaseModel):
             # compiles to a comparison against NULL that silently matches nothing.
             if f.op not in (Op.is_null, Op.not_null) and f.value is None:
                 raise ValueError(f"{f.op.value} needs a value")
+            # (A None *inside* a value list — IN (NULL, ...) — is already rejected
+            # by the Filter type: list[Scalar] excludes None, so it can't occur.)
             if f.op in (Op.gt, Op.gte, Op.lt, Op.lte) and f.field not in NUMERIC_FIELDS:
                 raise ValueError(
                     f"range op {f.op.value} needs a numeric field, got {f.field!r}"
@@ -365,9 +372,11 @@ def execute(q: CatalogQuery, con) -> dict:
     def _facets(cols: list[str]) -> dict:
         out = {}
         for col in cols:
+            # Cap to the top buckets by count — a high-cardinality field (e.g.
+            # a species column) would otherwise return thousands of buckets.
             rows = con.execute(
                 f"SELECT {col} AS k, count(*) AS c FROM {q.entity} "
-                f"WHERE {where} GROUP BY {col} ORDER BY c DESC",
+                f"WHERE {where} GROUP BY {col} ORDER BY c DESC LIMIT {_FACET_LIMIT}",
                 params,
             ).fetchall()
             out[col] = {str(k): c for k, c in rows}

@@ -136,9 +136,18 @@ def test_missing_value_rejected():
     CatalogQuery(filters=[Filter(field="geneModelUrl", op=Op.is_null)])
 
 
+def test_null_in_value_list_rejected():
+    # A None element is rejected by the Filter type (list[Scalar] excludes None),
+    # so `IN (NULL, ...)` can never be constructed.
+    with pytest.raises(ValueError):
+        Filter(field="level", op=Op.in_, value=[None, "Contig"])
+
+
 def test_limit_and_offset_bounds():
     with pytest.raises(ValueError):
         CatalogQuery(limit=5000)  # exceeds the page cap
+    with pytest.raises(ValueError):
+        CatalogQuery(limit=26)  # just over the cap
     with pytest.raises(ValueError):
         CatalogQuery(limit=0)
     with pytest.raises(ValueError):
