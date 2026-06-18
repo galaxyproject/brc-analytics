@@ -37,6 +37,7 @@ def agent():
     instance.catalog = MagicMock()
     instance.catalog.workflows_by_category = []
     instance.sra_mirror = None
+    instance.query_con = None  # query_catalog degrades to "unavailable"
     return instance
 
 
