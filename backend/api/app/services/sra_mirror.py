@@ -326,7 +326,9 @@ class SRAMirrorService:
             ).fetchall()
             if rows:
                 return taxid, [r[0] for r in rows]
-            return taxid, [term]
+            # A numeric taxid we don't know about isn't "resolved" -- mirror the
+            # unknown-name path below so callers don't report a phantom organism.
+            return None, [term]
 
         # Curated abbreviation alias check (case-insensitive, whitespace-
         # tolerant). NCBI's name table doesn't list lay abbreviations like

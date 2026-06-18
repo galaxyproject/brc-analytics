@@ -162,6 +162,13 @@ class TestOrganismResolution:
         assert result["n_runs"] == 0
         assert result["resolved"] is True
 
+    def test_unknown_numeric_taxid_is_not_resolved(self, mirror):
+        # A numeric taxid absent from taxid_names matches nothing, so it should
+        # read as unresolved -- not a phantom "known organism" with zero runs.
+        result = mirror.summary_for_organism("999999")
+        assert result["n_runs"] == 0
+        assert result["resolved"] is False
+
 
 class TestResolvedFlagAcrossOutputs:
     """F6 follow-up: the `resolved` flag belongs on every organism-based
