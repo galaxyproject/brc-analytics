@@ -64,6 +64,14 @@ def test_contains_op_requires_list_field():
         CatalogQuery(filters=[Filter(field="level", op=Op.contains, value="x")])
 
 
+def test_contains_rejects_list_value():
+    # contains tests a single scalar element; a list value belongs to contains_any.
+    with pytest.raises(ValueError, match="use contains_any for a list"):
+        CatalogQuery(
+            filters=[Filter(field="ploidy", op=Op.contains, value=["DIPLOID"])]
+        )
+
+
 # --- predicate compilation (no DB) --------------------------------------------
 
 

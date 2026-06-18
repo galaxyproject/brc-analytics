@@ -221,6 +221,12 @@ class CatalogQuery(BaseModel):
                 )
             if f.op in (Op.contains, Op.contains_any) and f.field not in LIST_FIELDS:
                 raise ValueError(f"{f.op.value} needs a list field, got {f.field!r}")
+            # `contains` tests one scalar element (list_contains needs a scalar);
+            # a list value belongs to `contains_any`.
+            if f.op is Op.contains and isinstance(f.value, list):
+                raise ValueError(
+                    "contains needs a scalar value; use contains_any for a list"
+                )
             # `in`/`not_in`/`contains_any` over an empty list is either invalid SQL
             # (IN ()) or a silent match-nothing — require a non-empty value list.
             if (
@@ -320,13 +326,13 @@ def connect(catalog_dir: str):
     con: Optional["duckdb.DuckDBPyConnection"] = None
     try:
         con = duckdb.connect()
-        # Escape single quotes so a path containing one can't break the SQL
-        # string literal (the path is server-controlled, but cheap to harden).
-        safe_path = str(json_path).replace("'", "''")
+        # Bind the path as a parameter so DuckDB handles any special characters
+        # (no bespoke quoting needed).
         con.execute(
             "CREATE TABLE assembly AS "
-            f"SELECT * FROM read_json_auto('{safe_path}', "
-            "format='array', maximum_object_size=20000000)"
+            "SELECT * FROM read_json_auto(?, "
+            "format='array', maximum_object_size=20000000)",
+            [str(json_path)],
         )
         total = con.execute("SELECT count(*) FROM assembly").fetchone()[0]
         # The field allowlist and display projection are hand-maintained; warn
