@@ -12,6 +12,17 @@ import json
 from app.services.tools.catalog_tools import AssistantDeps
 
 
+def _mirror_unavailable() -> str:
+    """Structured error for the unavailable-mirror path.
+
+    Tool outputs are otherwise JSON, so keep this machine-readable too rather
+    than emitting a bare sentence a JSON-parsing consumer would choke on.
+    """
+    return json.dumps(
+        {"error": "SRA mirror is not currently available.", "available": False}
+    )
+
+
 def sra_summary_for_organism(deps: AssistantDeps, organism: str) -> str:
     """Get a high-level snapshot of SRA sequencing data available for an organism.
 
@@ -28,7 +39,7 @@ def sra_summary_for_organism(deps: AssistantDeps, organism: str) -> str:
             or NCBI taxonomy ID as a string (e.g. "5833").
     """
     if not deps.sra_mirror or not deps.sra_mirror.is_available():
-        return "SRA mirror is not currently available."
+        return _mirror_unavailable()
     result = deps.sra_mirror.summary_for_organism(organism)
     return json.dumps(result, indent=2, default=str)
 
@@ -59,7 +70,7 @@ def search_sra_runs(
         limit: max number of runs to return (default 50, max 200)
     """
     if not deps.sra_mirror or not deps.sra_mirror.is_available():
-        return "SRA mirror is not currently available."
+        return _mirror_unavailable()
     limit = max(1, min(limit, 200))
     result = deps.sra_mirror.search_runs(
         organism=organism,
@@ -86,7 +97,7 @@ def top_bioprojects_for_organism(
         limit: max projects to return (default 20)
     """
     if not deps.sra_mirror or not deps.sra_mirror.is_available():
-        return "SRA mirror is not currently available."
+        return _mirror_unavailable()
     limit = max(1, min(limit, 100))
     result = deps.sra_mirror.top_bioprojects_for_organism(organism, limit=limit)
     return json.dumps(result, indent=2, default=str)
@@ -104,7 +115,7 @@ def get_sra_study_runs(deps: AssistantDeps, accession: str, limit: int = 200) ->
         limit: max runs to return (default 200, max 500)
     """
     if not deps.sra_mirror or not deps.sra_mirror.is_available():
-        return "SRA mirror is not currently available."
+        return _mirror_unavailable()
     limit = max(1, min(limit, 500))
     result = deps.sra_mirror.get_study_runs(accession, limit=limit)
     return json.dumps(result, indent=2, default=str)
