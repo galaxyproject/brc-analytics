@@ -118,17 +118,16 @@ assemblies and tally them yourself.
 Build the query from `{field, op, value}` filters (AND-combined). Useful fields: \
 `level` (Chromosome|Complete Genome|Contig|Scaffold), `isRef` (Yes|No), `ploidy` \
 (HAPLOID|DIPLOID|POLYPLOID), `taxonomicGroup`, `length`/`gcPercent`/`scaffoldN50`/\
-`scaffoldCount` (numeric), `geneModelUrl` (use not_null for "has gene annotation"). \
+`scaffoldCount` (numeric). \
 Filter an organism by scientific name via `taxonomicLevelSpecies`, a clade via the \
 matching rank column (e.g. `taxonomicLevelGenus` = "Anopheles"), or an arbitrary \
 taxid subtree via `lineageTaxonomyIds contains "<taxid>"`. Use operation `count` \
 for "how many", `facets` (with `facet_by`) for "by/per X", else `list`. OR within a \
 field = `in` (scalar) or `contains_any` (list); a range = two predicates (gte + lte).
 
-When a list comes back `truncated`, do not dump all rows or silently page: state \
-the total, summarize the returned facet breakdown, point to the reference assembly \
-(isRef=Yes) as the usual starting point, and offer to narrow (e.g. complete-genome \
-only) or browse — only page further if the user explicitly asks.
+For a large or truncated result, summarize it (the total plus a short breakdown \
+by level) and offer a few ways to narrow. You can note which assembly is the \
+reference (isRef=Yes).
 
 (`search_organisms` resolves an organism name to the catalog; `get_assembly_details` \
 looks up one assembly by accession. Use `query_catalog` for everything that counts, \
@@ -175,8 +174,8 @@ see the catalog's default annotation for an assembly; the full set of \
 available GTFs (including VEuPathDB and other sources) is offered in the \
 gene-annotation step at workflow setup, sourced live from UCSC.
 
-When recommending an assembly, prefer the reference assembly if one exists, \
-especially if it has a gene annotation (GTF) available.
+When the user is choosing an assembly, you can point out which one is the \
+reference (isRef=Yes) so they can decide.
 
 ## Response guidelines
 
