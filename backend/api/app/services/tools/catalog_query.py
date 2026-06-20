@@ -253,6 +253,11 @@ def _list_membership(col: str) -> str:
     return f"len(list_intersect({col}, ?)) > 0"
 
 
+def _as_list(value) -> list:
+    """Normalize a scalar-or-list filter value to a list."""
+    return value if isinstance(value, list) else [value]
+
+
 def _compile_predicate(f: Filter) -> tuple[str, list]:
     col = f.field
     if f.op is Op.is_null:
@@ -264,27 +269,25 @@ def _compile_predicate(f: Filter) -> tuple[str, list]:
     # reading. Coercing it lets the model's natural `eq`/`in` phrasing work
     # without a failed round-trip.
     if col in LIST_FIELDS and f.op in (Op.eq, Op.ne, Op.in_, Op.not_in):
-        vals = f.value if isinstance(f.value, list) else [f.value]
         expr = _list_membership(col)
         if f.op in (Op.ne, Op.not_in):
             # NULL-safe negation: a row with no value is "not a member" too, so
             # count it — otherwise count(eq) + count(ne) wouldn't sum to total.
-            return f"(NOT ({expr}) OR {col} IS NULL)", [list(vals)]
-        return expr, [list(vals)]
+            return f"(NOT ({expr}) OR {col} IS NULL)", [_as_list(f.value)]
+        return expr, [_as_list(f.value)]
     if f.op in (Op.in_, Op.not_in):
-        vals = f.value if isinstance(f.value, list) else [f.value]
+        vals = _as_list(f.value)
         ph = ", ".join(["?"] * len(vals))
         if f.op is Op.not_in:
-            return f"({col} NOT IN ({ph}) OR {col} IS NULL)", list(vals)
-        return f"{col} IN ({ph})", list(vals)
+            return f"({col} NOT IN ({ph}) OR {col} IS NULL)", vals
+        return f"{col} IN ({ph})", vals
     if f.op is Op.ne:
         # NULL-safe inequality (SQL `col != x` drops NULL rows).
         return f"({col} != ? OR {col} IS NULL)", [f.value]
     if f.op is Op.contains:
         return f"list_contains({col}, ?)", [f.value]
     if f.op is Op.contains_any:
-        vals = f.value if isinstance(f.value, list) else [f.value]
-        return _list_membership(col), [list(vals)]
+        return _list_membership(col), [_as_list(f.value)]
     return f"{col} {_SQL_BINOP[f.op]} ?", [f.value]
 
 

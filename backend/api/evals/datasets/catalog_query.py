@@ -9,6 +9,7 @@ so they don't drift as the catalog snapshot changes.
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass, field
 from typing import Callable
 
@@ -33,6 +34,13 @@ class QueryCatalogShape(Evaluator):
     operation: str | None = None
     must_contain: list[str] = field(default_factory=list)
 
+    @staticmethod
+    def _has(blob: str, token: str) -> bool:
+        # Match at alpha boundaries so a field fragment like "level" doesn't
+        # spuriously match "taxonomiclevelgenus", while a partial value token
+        # like "neoformans" still matches inside "cryptococcus neoformans".
+        return re.search(rf"(?<![a-z]){re.escape(token)}(?![a-z])", blob) is not None
+
     def evaluate(self, ctx: EvaluatorContext) -> float:
         for name, args in getattr(ctx.output, "tool_calls", None) or []:
             if name != "query_catalog":
@@ -41,7 +49,7 @@ class QueryCatalogShape(Evaluator):
             if self.operation and op != self.operation:
                 continue
             blob = json.dumps(args, default=str).lower()
-            if all(s.lower() in blob for s in self.must_contain):
+            if all(self._has(blob, s.lower()) for s in self.must_contain):
                 return 1.0
         return 0.0
 
