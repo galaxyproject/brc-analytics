@@ -461,7 +461,10 @@ def execute(q: CatalogQuery, con) -> dict:
     terms = [f"{s.field} {'DESC' if s.desc else 'ASC'}" for s in q.sort]
     if tiebreak and tiebreak not in {s.field for s in q.sort}:
         terms.append(tiebreak)
-    order = "ORDER BY " + ", ".join(terms) if terms else ""
+    # Always emit an ORDER BY so LIMIT/OFFSET is reproducible. For assembly the
+    # tiebreak (accession) guarantees a term; `1` is a last-resort positional
+    # fallback for any future entity without display columns.
+    order = "ORDER BY " + ", ".join(terms or ["1"])
     select = ", ".join(cols) if cols else "*"
     cur = con.execute(
         f"SELECT {select} FROM {q.entity} WHERE {where} {order} "
