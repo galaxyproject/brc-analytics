@@ -17,7 +17,7 @@ from __future__ import annotations
 import logging
 from enum import Enum
 from pathlib import Path
-from typing import Optional, Union
+from typing import Literal, Optional, Union
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -77,16 +77,14 @@ ORGANISM_FIELDS: set[str] = {
     "taxonomicLevelSpecies",
 }
 
+# Field vocab per entity. Only "assembly" is queryable today (see the `entity`
+# Literal on CatalogQuery and the assembly-only table in connect()); the organism
+# vocab is kept as roadmap data — to enable it, add "organism" to that Literal and
+# load its table in connect().
 ENTITY_FIELDS: dict[str, set[str]] = {
     "assembly": ASSEMBLY_FIELDS,
     "organism": ORGANISM_FIELDS,
 }
-
-# Entities the executor can actually run — connect() must load a table for each.
-# organism vocab is defined above but no table is loaded yet (assembly-first), so
-# querying it is rejected at validation rather than failing mid-execution. Add an
-# entity here only once connect() loads its table.
-QUERYABLE_ENTITIES: set[str] = {"assembly"}
 
 LIST_FIELDS: set[str] = {"lineageTaxonomyIds", "ploidy", "taxonomicGroup", "otherTaxa"}
 NUMERIC_FIELDS: set[str] = {
@@ -207,9 +205,9 @@ class Sort(BaseModel):
 class CatalogQuery(BaseModel):
     """A structured query over the BRC catalog; compiled to SQL and run."""
 
-    entity: str = "assembly"
+    entity: Literal["assembly"] = "assembly"
     filters: list[Filter] = Field(default_factory=list)
-    operation: str = "list"  # count | list | facets
+    operation: Literal["count", "list", "facets"] = "list"
     facet_by: list[str] = Field(default_factory=list)
     # Bound the page so a `list` result can never dump the corpus into context —
     # the contract is a bounded summary; over the cap we truncate and offer to
@@ -220,17 +218,8 @@ class CatalogQuery(BaseModel):
 
     @model_validator(mode="after")
     def _validate(self) -> "CatalogQuery":
-        if self.entity not in ENTITY_FIELDS:
-            raise ValueError(
-                f"unknown entity {self.entity!r}; valid: {sorted(ENTITY_FIELDS)}"
-            )
-        if self.entity not in QUERYABLE_ENTITIES:
-            raise ValueError(
-                f"entity {self.entity!r} is not queryable yet (no table loaded); "
-                f"supported: {sorted(QUERYABLE_ENTITIES)}"
-            )
-        if self.operation not in ("count", "list", "facets"):
-            raise ValueError(f"unknown operation {self.operation!r}")
+        # entity/operation are Literals — pydantic already rejects bad values and
+        # advertises the allowed set in the tool schema.
         if self.operation == "facets" and not self.facet_by:
             raise ValueError("operation 'facets' needs at least one facet_by field")
         allowed = ENTITY_FIELDS[self.entity]
@@ -260,10 +249,16 @@ class CatalogQuery(BaseModel):
                 raise ValueError(f"{f.op.value} needs a value")
             # (A None *inside* a value list — IN (NULL, ...) — is already rejected
             # by the Filter type: list[Scalar] excludes None, so it can't occur.)
-            if f.op in (Op.gt, Op.gte, Op.lt, Op.lte) and f.field not in NUMERIC_FIELDS:
-                raise ValueError(
-                    f"range op {f.op.value} needs a numeric field, got {f.field!r}"
-                )
+            if f.op in (Op.gt, Op.gte, Op.lt, Op.lte):
+                if f.field not in NUMERIC_FIELDS:
+                    raise ValueError(
+                        f"range op {f.op.value} needs a numeric field, got {f.field!r}"
+                    )
+                # bool is an int subclass, so guard it explicitly.
+                if isinstance(f.value, bool) or not isinstance(f.value, (int, float)):
+                    raise ValueError(
+                        f"range op {f.op.value} needs a numeric value, got {f.value!r}"
+                    )
             if f.op in (Op.contains, Op.contains_any) and f.field not in LIST_FIELDS:
                 raise ValueError(f"{f.op.value} needs a list field, got {f.field!r}")
             # `contains` tests one scalar element (list_contains needs a scalar);

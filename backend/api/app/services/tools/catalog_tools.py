@@ -118,7 +118,8 @@ def query_catalog(deps: AssistantDeps, query: CatalogQuery) -> str:
     of JSON.
 
     The query has: entity ("assembly"), filters (a list of {field, op, value},
-    AND-combined), operation ("count" | "list" | "facets"), facet_by, limit, sort.
+    AND-combined), operation ("count" | "list" | "facets"), facet_by, limit,
+    offset, sort.
     Ops: eq, ne, in, not_in, gt/gte/lt/lte (numeric), contains/contains_any (list
     fields), is_null/not_null. OR within a field = `in` (scalar) or `contains_any`
     (list); a range = two predicates (gte + lte).

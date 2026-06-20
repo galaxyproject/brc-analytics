@@ -31,20 +31,16 @@ from app.services.tools.catalog_query import (
 # --- IR validation (no DB) ----------------------------------------------------
 
 
-def test_unknown_entity_rejected():
-    with pytest.raises(ValueError, match="unknown entity"):
-        CatalogQuery(entity="protein")
-
-
-def test_known_but_unloaded_entity_rejected():
-    # organism vocab exists but connect() loads no organism table yet — reject at
-    # validation with a clear message rather than failing mid-execution.
-    with pytest.raises(ValueError, match="not queryable yet"):
-        CatalogQuery(entity="organism")
+def test_invalid_entity_rejected():
+    # entity is a Literal["assembly"]; anything else — including the roadmap
+    # "organism" whose table isn't loaded yet — is rejected by the schema.
+    for bad in ("protein", "organism"):
+        with pytest.raises(ValueError):
+            CatalogQuery(entity=bad)
 
 
 def test_unknown_operation_rejected():
-    with pytest.raises(ValueError, match="unknown operation"):
+    with pytest.raises(ValueError):
         CatalogQuery(operation="aggregate")
 
 
@@ -61,8 +57,16 @@ def test_unknown_facet_and_sort_fields_rejected():
 
 
 def test_range_op_requires_numeric_field():
-    with pytest.raises(ValueError, match="range op"):
+    with pytest.raises(ValueError, match="numeric field"):
         CatalogQuery(filters=[Filter(field="level", op=Op.gt, value=1)])
+
+
+def test_range_op_requires_numeric_value():
+    # a numeric field with a non-numeric value (string, or bool) must be rejected
+    with pytest.raises(ValueError, match="numeric value"):
+        CatalogQuery(filters=[Filter(field="length", op=Op.gt, value="1000")])
+    with pytest.raises(ValueError, match="numeric value"):
+        CatalogQuery(filters=[Filter(field="length", op=Op.gt, value=True)])
 
 
 def test_contains_op_requires_list_field():
