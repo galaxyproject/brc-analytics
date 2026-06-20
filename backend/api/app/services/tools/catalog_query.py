@@ -350,12 +350,14 @@ def connect(catalog_dir: str):
 
     Concurrency invariant: the assistant's tools are sync and run on the asyncio
     event-loop thread, so this single connection is only ever touched by one
-    thread at a time and needs no lock. If tool execution is ever moved to a
-    threadpool, that invariant breaks — a single DuckDBPyConnection is not safe
-    for concurrent use across threads. The fix is a per-thread connection via
-    `con.cursor()`, which returns a separate connection that shares THIS in-memory
-    database (a fresh `duckdb.connect()` would be a new, empty database without the
-    loaded table); alternatively, serialize access through a single-thread executor.
+    thread at a time and needs no lock. DuckDB connections are not thread-safe,
+    and per the DuckDB docs `cursor()` does NOT help — it is another handle on the
+    same connection, and cursors from one connection cannot run queries at the
+    same time. If tool execution is ever moved to a threadpool, "each thread must
+    have its own connection" — but a fresh `duckdb.connect()` here would be a new,
+    empty in-memory database without the loaded table, so true concurrency would
+    require loading the catalog into a file-backed/shared DuckDB database, or
+    serializing access through a single-thread executor.
     """
     import duckdb
 
