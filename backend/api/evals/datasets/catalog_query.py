@@ -36,10 +36,11 @@ class QueryCatalogShape(Evaluator):
 
     @staticmethod
     def _has(blob: str, token: str) -> bool:
-        # Match at alpha boundaries so a field fragment like "level" doesn't
-        # spuriously match "taxonomiclevelgenus", while a partial value token
-        # like "neoformans" still matches inside "cryptococcus neoformans".
-        return re.search(rf"(?<![a-z]){re.escape(token)}(?![a-z])", blob) is not None
+        # Match on word boundaries so a fragment like "level" doesn't spuriously
+        # match "taxonomiclevelgenus" and a numeric token like "1773" doesn't
+        # match "17730", while a partial value token like "neoformans" still
+        # matches inside "cryptococcus neoformans".
+        return re.search(rf"\b{re.escape(token)}\b", blob) is not None
 
     def evaluate(self, ctx: EvaluatorContext) -> float:
         for name, args in getattr(ctx.output, "tool_calls", None) or []:

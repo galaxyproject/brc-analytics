@@ -14,11 +14,16 @@ from __future__ import annotations
 import pytest
 
 from app.services.tools.catalog_query import (
+    _DISPLAY_COLUMNS,
+    ASSEMBLY_FIELDS,
+    LIST_FIELDS,
+    NUMERIC_FIELDS,
     CatalogQuery,
     Filter,
     Op,
     Sort,
     _compile_predicate,
+    _schema_issues,
     connect,
     execute,
 )
@@ -127,6 +132,12 @@ def test_compile_ne_and_not_in_are_null_safe():
 def test_facet_on_list_field_rejected():
     with pytest.raises(ValueError, match="cannot facet on list field"):
         CatalogQuery(operation="facets", facet_by=["ploidy"])
+
+
+def test_facets_requires_facet_by():
+    # operation=facets with no facet_by would return an empty {} — reject it.
+    with pytest.raises(ValueError, match="needs at least one facet_by"):
+        CatalogQuery(operation="facets")
 
 
 def test_empty_value_list_rejected():
@@ -360,6 +371,44 @@ def test_connect_fails_closed_on_schema_drift(tmp_path):
     pytest.importorskip("duckdb")
     (tmp_path / "assemblies.json").write_text('[{"accession": "A1"}]')
     assert connect(str(tmp_path)) is None
+
+
+def _ok_coltypes() -> dict[str, str]:
+    """A schema where every configured column is present and correctly typed."""
+    configured = ASSEMBLY_FIELDS | set(_DISPLAY_COLUMNS["assembly"])
+    out = {}
+    for c in configured:
+        if c in NUMERIC_FIELDS:
+            out[c] = "BIGINT"
+        elif c in LIST_FIELDS:
+            out[c] = "VARCHAR[]"
+        else:
+            out[c] = "VARCHAR"
+    return out
+
+
+def test_schema_issues_accepts_correct_schema():
+    missing, mistyped = _schema_issues(_ok_coltypes())
+    assert missing == [] and mistyped == []
+
+
+def test_schema_issues_flags_missing_and_mistyped():
+    cols = _ok_coltypes()
+    cols["length"] = "VARCHAR"  # numeric field inferred as text
+    cols["ploidy"] = "VARCHAR"  # list field inferred as scalar
+    del cols["isRef"]  # a configured column dropped
+    missing, mistyped = _schema_issues(cols)
+    assert "isRef" in missing
+    assert any(m.startswith("length=") for m in mistyped)
+    assert any(m.startswith("ploidy=") for m in mistyped)
+
+
+def test_schema_issues_accepts_numeric_type_variants():
+    cols = _ok_coltypes()
+    cols["gcPercent"] = "DOUBLE"
+    cols["length"] = "DECIMAL(18,3)"  # parameterized numeric type
+    _, mistyped = _schema_issues(cols)
+    assert mistyped == []
 
 
 def test_explicit_sort_gets_stable_tiebreaker(con):

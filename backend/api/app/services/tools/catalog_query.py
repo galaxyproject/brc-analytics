@@ -103,6 +103,49 @@ NUMERIC_FIELDS: set[str] = {
 # a high-cardinality field from returning thousands of rows.
 _FACET_LIMIT = 50
 
+# DuckDB base type names treated as numeric for the connect() schema-drift check.
+_NUMERIC_DUCKDB_TYPES = {
+    "TINYINT",
+    "SMALLINT",
+    "INTEGER",
+    "BIGINT",
+    "HUGEINT",
+    "UTINYINT",
+    "USMALLINT",
+    "UINTEGER",
+    "UBIGINT",
+    "UHUGEINT",
+    "FLOAT",
+    "DOUBLE",
+    "REAL",
+    "DECIMAL",
+    "NUMERIC",
+}
+
+
+def _schema_issues(coltypes: dict[str, str]) -> tuple[list[str], list[str]]:
+    """Compare the loaded assembly columns (name -> UPPERCASE DuckDB type) against
+    the hand-maintained allowlist. Returns (missing, mistyped):
+
+    - missing: configured columns absent from the table.
+    - mistyped: numeric fields not inferred numeric, or list fields not inferred
+      as lists — these compile to SQL that errors or mis-sorts at query time.
+    """
+    actual = set(coltypes)
+    configured = ASSEMBLY_FIELDS | set(_DISPLAY_COLUMNS["assembly"])
+    missing = sorted(configured - actual)
+    mistyped = sorted(
+        f"{c}={coltypes[c]}"
+        for c in NUMERIC_FIELDS & actual
+        if coltypes[c].split("(")[0] not in _NUMERIC_DUCKDB_TYPES
+    ) + sorted(
+        f"{c}={coltypes[c]}"
+        for c in LIST_FIELDS & actual
+        if not coltypes[c].endswith("[]")
+    )
+    return missing, mistyped
+
+
 # Facets auto-returned on a truncated list, so the model can offer narrowing.
 _AUTO_FACET_FIELDS: dict[str, list[str]] = {
     "assembly": ["level", "isRef"],
@@ -188,6 +231,8 @@ class CatalogQuery(BaseModel):
             )
         if self.operation not in ("count", "list", "facets"):
             raise ValueError(f"unknown operation {self.operation!r}")
+        if self.operation == "facets" and not self.facet_by:
+            raise ValueError("operation 'facets' needs at least one facet_by field")
         allowed = ENTITY_FIELDS[self.entity]
         referenced = (
             [f.field for f in self.filters]
@@ -343,13 +388,17 @@ def connect(catalog_dir: str):
         # gone), fail closed — disable the engine rather than serve queries that
         # would error or silently mislead. A drift is a build problem to fix, not
         # something to paper over.
-        actual = {row[0] for row in con.execute("DESCRIBE assembly").fetchall()}
-        missing = sorted((ASSEMBLY_FIELDS | set(_DISPLAY_COLUMNS["assembly"])) - actual)
-        if missing:
+        coltypes = {
+            row[0]: str(row[1]).upper()
+            for row in con.execute("DESCRIBE assembly").fetchall()
+        }
+        missing, mistyped = _schema_issues(coltypes)
+        if missing or mistyped:
             logger.error(
-                "Catalog query disabled: assembly table is missing configured "
-                "columns %s — the catalog schema has drifted from catalog_query.py",
+                "Catalog query disabled: assembly schema has drifted from "
+                "catalog_query.py — missing columns %s, mistyped %s",
                 missing,
+                mistyped,
             )
             con.close()
             return None
