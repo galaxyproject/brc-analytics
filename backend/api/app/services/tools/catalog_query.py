@@ -176,9 +176,11 @@ _DISPLAY_COLUMNS: dict[str, list[str]] = {
 
 # Default ordering for a `list` with no explicit sort: most relevant first —
 # the reference assembly, then best quality (largest scaffold N50), with accession
-# as a stable tiebreaker. Beats ordering by an arbitrary accession id.
-_DEFAULT_ORDER: dict[str, str] = {
-    "assembly": "isRef DESC, scaffoldN50 DESC NULLS LAST, accession",
+# as a stable tiebreaker. Beats ordering by an arbitrary accession id. Stored as
+# (field, desc) terms so the same _qi()-quoting / NULLS LAST builder serves both
+# this and the explicit-sort path (no raw identifiers embedded in a string).
+_DEFAULT_ORDER: dict[str, list[tuple[str, bool]]] = {
+    "assembly": [("isRef", True), ("scaffoldN50", True), ("accession", False)],
 }
 
 
@@ -217,7 +219,10 @@ class CatalogQuery(BaseModel):
     entity: Literal["assembly"] = "assembly"
     filters: list[Filter] = Field(default_factory=list)
     operation: Literal["count", "list", "facets"] = "list"
-    facet_by: list[str] = Field(default_factory=list)
+    # Each facet column is a separate GROUP BY query in execute(); cap the count
+    # so one call can't fan out into a burst of DB work. Realistic group-bys use
+    # one or two columns — 4 is comfortable headroom.
+    facet_by: list[str] = Field(default_factory=list, max_length=4)
     # Bound the page to a small, fixed size so a `list` is always a short, fully
     # rendered table — never a corpus dump or a variable-length one. The cap is the
     # default (the model can't inflate it); over it we truncate and offer to narrow
@@ -320,6 +325,17 @@ def _qi(identifier: str) -> str:
     the field allowlist already carries the catalog's canonical casing.
     """
     return '"' + identifier.replace('"', '""') + '"'
+
+
+def _order_by(terms: list[tuple[str, bool]]) -> str:
+    """Build an ORDER BY body from (field, desc) terms — quoted, with NULLS LAST.
+
+    NULLS LAST so a column with missing values keeps the rows that have data at
+    the top of the page (DuckDB defaults NULLs first on DESC).
+    """
+    return ", ".join(
+        f"{_qi(field)} {'DESC' if desc else 'ASC'} NULLS LAST" for field, desc in terms
+    )
 
 
 def _list_membership(col: str) -> str:
@@ -500,21 +516,19 @@ def execute(q: CatalogQuery, con) -> dict:
     if q.sort:
         # Honor the requested sort, appending a stable key (the first display
         # column) as a tiebreaker so equal-sort rows can't shuffle at the boundary.
-        # NULLS LAST so a column with missing values sorts the rows with data to
-        # the top of the page (DuckDB defaults NULLs first on DESC).
-        terms = [
-            f"{_qi(s.field)} {'DESC' if s.desc else 'ASC'} NULLS LAST" for s in q.sort
-        ]
+        terms = [(s.field, s.desc) for s in q.sort]
         tiebreak = cols[0] if cols else None
         if tiebreak and tiebreak not in {s.field for s in q.sort}:
-            terms.append(_qi(tiebreak))
-        order = "ORDER BY " + ", ".join(terms)
+            terms.append((tiebreak, False))
+        order = "ORDER BY " + _order_by(terms)
     else:
         # No explicit sort: most-relevant-first per _DEFAULT_ORDER; fall back to a
         # stable key (or positional `1`) for any entity without a default.
-        order = "ORDER BY " + _DEFAULT_ORDER.get(
-            q.entity, _qi(cols[0]) if cols else "1"
-        )
+        default = _DEFAULT_ORDER.get(q.entity)
+        if default:
+            order = "ORDER BY " + _order_by(default)
+        else:
+            order = "ORDER BY " + (_qi(cols[0]) if cols else "1")
     select = ", ".join(_qi(c) for c in cols) if cols else "*"
     cur = con.execute(
         f"SELECT {select} FROM {entity} WHERE {where} {order} "

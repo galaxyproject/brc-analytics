@@ -152,6 +152,22 @@ def test_facet_on_list_field_rejected():
         CatalogQuery(operation="facets", facet_by=["ploidy"])
 
 
+def test_facet_by_count_is_capped():
+    # Each facet column is a separate GROUP BY; the schema caps how many a single
+    # call can request so it can't fan out into a burst of DB work.
+    with pytest.raises(ValueError):
+        CatalogQuery(
+            operation="facets",
+            facet_by=[
+                "level",
+                "isRef",
+                "strainName",
+                "taxonomicLevelGenus",
+                "taxonomicLevelSpecies",
+            ],
+        )
+
+
 def test_facets_requires_facet_by():
     # operation=facets with no facet_by would return an empty {} — reject it.
     with pytest.raises(ValueError, match="needs at least one facet_by"):
