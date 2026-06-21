@@ -101,6 +101,11 @@ NUMERIC_FIELDS: set[str] = {
 # a high-cardinality field from returning thousands of rows.
 _FACET_LIMIT = 50
 
+# Max size (bytes) of a single JSON object read_json_auto will accept. The
+# catalog is one big array; this raises the per-record ceiling well above
+# DuckDB's default so a large assembly record can't trip the parser.
+_MAX_JSON_OBJECT_SIZE = 20_000_000
+
 # DuckDB base type names treated as numeric for the connect() schema-drift check.
 _NUMERIC_DUCKDB_TYPES = {
     "TINYINT",
@@ -440,7 +445,7 @@ def connect(catalog_dir: str):
         con.execute(
             "CREATE TABLE assembly AS "
             "SELECT * FROM read_json_auto(?, "
-            "format='array', maximum_object_size=20000000)",
+            f"format='array', maximum_object_size={_MAX_JSON_OBJECT_SIZE})",
             [str(json_path)],
         )
         total = con.execute("SELECT count(*) FROM assembly").fetchone()[0]
