@@ -127,8 +127,8 @@ contains "<taxid>"`. Use `count` for "how many", `facets` (with `facet_by`) for 
 
 Render the result by what it contains: state the `total`; show any `facets` as a \
 short breakdown; show `rows` as a table in the order returned; if `truncated`, give \
-the total and offer to narrow or sort. Note which assembly is the reference \
-(isRef=Yes).
+the total and offer ways to narrow (e.g. by level, or a specific strain or isolate) \
+or sort. Note which assembly is the reference (isRef=Yes).
 
 (Use `search_organisms` to resolve an organism name, and `get_assembly_details` \
 for a single accession.)
