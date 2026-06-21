@@ -267,6 +267,18 @@ class CatalogQuery(BaseModel):
                     raise ValueError(
                         f"range op {f.op.value} needs a numeric value, got {f.value!r}"
                     )
+            # eq/ne on a scalar field take a scalar; a list value would compile to
+            # `col = [..]` and error at execution. (On a list field, eq/ne coerce
+            # to membership, so a list there is fine.)
+            if (
+                f.op in (Op.eq, Op.ne)
+                and f.field not in LIST_FIELDS
+                and isinstance(f.value, list)
+            ):
+                raise ValueError(
+                    f"{f.op.value} on {f.field!r} needs a scalar value; "
+                    "use in/not_in for multiple values"
+                )
             if f.op in (Op.contains, Op.contains_any) and f.field not in LIST_FIELDS:
                 raise ValueError(f"{f.op.value} needs a list field, got {f.field!r}")
             # `contains` tests one scalar element (list_contains needs a scalar);

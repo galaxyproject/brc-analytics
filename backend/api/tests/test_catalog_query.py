@@ -82,6 +82,19 @@ def test_contains_rejects_list_value():
         )
 
 
+def test_eq_ne_reject_list_value_on_scalar_field():
+    # a list value on eq/ne for a scalar field would compile to `col = [..]`
+    # and error at execution — reject up front, pointing to in/not_in.
+    with pytest.raises(ValueError, match="use in/not_in"):
+        CatalogQuery(filters=[Filter(field="level", op=Op.eq, value=["Chromosome"])])
+    with pytest.raises(ValueError, match="use in/not_in"):
+        CatalogQuery(
+            filters=[Filter(field="level", op=Op.ne, value=["Contig", "Scaffold"])]
+        )
+    # but eq/ne on a list field with a list value is fine (coerced to membership)
+    CatalogQuery(filters=[Filter(field="ploidy", op=Op.eq, value=["DIPLOID"])])
+
+
 # --- predicate compilation (no DB) --------------------------------------------
 
 
