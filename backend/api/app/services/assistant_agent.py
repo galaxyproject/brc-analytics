@@ -390,15 +390,20 @@ class AssistantAgent:
 
         Degrades to None (tool reports unavailable) if duckdb or the catalog
         can't load, so the rest of the agent still works. connect() fail-softs to
-        None (with typed logging) for catalog problems; this method's try/except
-        additionally catches the ImportError connect() raises if duckdb is missing.
+        None (with typed logging) for catalog problems, so the only expected
+        failure here is the ImportError it raises when duckdb isn't installed.
+        Anything else is unexpected — keep the agent working but log a traceback
+        rather than swallow it silently.
         """
         try:
             from app.services.tools.catalog_query import connect
 
             return connect(self.settings.CATALOG_PATH)
-        except Exception as e:  # noqa: BLE001
-            logger.warning("Catalog query engine unavailable: %s", e)
+        except ImportError as e:
+            logger.warning("Catalog query engine unavailable (duckdb missing): %s", e)
+            return None
+        except Exception:
+            logger.exception("Catalog query engine failed to initialize")
             return None
 
     def _init_agent(self) -> None:
