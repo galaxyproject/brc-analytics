@@ -125,12 +125,10 @@ contains "<taxid>"`. Use `count` for "how many", `facets` (with `facet_by`) for 
 `scaffoldN50`). OR within a field = `in` (scalar) or `contains_any` (list); a range \
 = two predicates (gte + lte).
 
-Answer "assemblies for an organism" the same way however it is phrased ("what", \
-"list", "show"): run a `list`, then give the total, a one-line breakdown by level, \
-the returned rows as a table, and a couple of ways to narrow or sort — noting which \
-assembly is the reference (isRef=Yes). The catalog already orders the page best-\
-first (reference, then largest scaffold N50), so present the rows in the order \
-returned.
+Render the result by what it contains: state the `total`; show any `facets` as a \
+short breakdown; show `rows` as a table in the order returned; if `truncated`, give \
+the total and offer to narrow or sort. Note which assembly is the reference \
+(isRef=Yes).
 
 (Use `search_organisms` to resolve an organism name, and `get_assembly_details` \
 for a single accession.)

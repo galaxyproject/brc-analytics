@@ -216,10 +216,11 @@ class CatalogQuery(BaseModel):
     filters: list[Filter] = Field(default_factory=list)
     operation: Literal["count", "list", "facets"] = "list"
     facet_by: list[str] = Field(default_factory=list)
-    # Bound the page so a `list` result can never dump the corpus into context —
-    # the contract is a bounded summary; over the cap we truncate and offer to
-    # narrow rather than page, so the max matches the default.
-    limit: int = Field(default=25, ge=1, le=25)
+    # Bound the page to a small, fixed size so a `list` is always a short, fully
+    # rendered table — never a corpus dump or a variable-length one. The cap is the
+    # default (the model can't inflate it); over it we truncate and offer to narrow
+    # or sort rather than page.
+    limit: int = Field(default=10, ge=1, le=10)
     offset: int = Field(default=0, ge=0)
     sort: list[Sort] = Field(default_factory=list)
 

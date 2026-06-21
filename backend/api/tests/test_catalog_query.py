@@ -171,7 +171,7 @@ def test_limit_and_offset_bounds():
     with pytest.raises(ValueError):
         CatalogQuery(limit=5000)  # exceeds the page cap
     with pytest.raises(ValueError):
-        CatalogQuery(limit=26)  # just over the cap
+        CatalogQuery(limit=11)  # just over the cap (max 10)
     with pytest.raises(ValueError):
         CatalogQuery(limit=0)
     with pytest.raises(ValueError):
@@ -362,7 +362,7 @@ def test_list_truncation_attaches_facets(con):
 
 
 def test_list_no_truncation_when_under_limit(con):
-    q = CatalogQuery(operation="list", limit=25)
+    q = CatalogQuery(operation="list", limit=10)
     out = execute(q, con)
     assert out["returned"] == 5
     assert out["truncated"] is False
@@ -372,7 +372,7 @@ def test_list_no_truncation_when_under_limit(con):
 def test_default_order_is_reference_then_quality(con):
     # No explicit sort: reference assemblies first, then largest scaffold N50,
     # accession as the stable tiebreaker. (Fixture refs: C1 n50=2000, A1 n50=1000.)
-    out = execute(CatalogQuery(operation="list", limit=25), con)
+    out = execute(CatalogQuery(operation="list", limit=10), con)
     accs = [r["accession"] for r in out["rows"]]
     assert accs[:2] == ["C1", "A1"]  # both isRef=Yes, ordered by N50 desc
     refs = [r["isRef"] for r in out["rows"]]
