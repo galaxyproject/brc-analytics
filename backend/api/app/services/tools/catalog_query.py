@@ -493,5 +493,14 @@ def execute(q: CatalogQuery, con) -> dict:
     result["rows"] = rows[:cap]
     result["returned"] = len(result["rows"])
     if result["truncated"]:
-        result["facets"] = _facets(_AUTO_FACET_FIELDS.get(q.entity, []))
+        # Auto-facets are narrowing hints: only surface a breakdown that actually
+        # discriminates (>1 bucket). A single-bucket facet (e.g. isRef={No: N}
+        # when nothing is a reference) offers no choice, so drop it.
+        auto = {
+            col: buckets
+            for col, buckets in _facets(_AUTO_FACET_FIELDS.get(q.entity, [])).items()
+            if len(buckets) > 1
+        }
+        if auto:
+            result["facets"] = auto
     return result

@@ -361,6 +361,20 @@ def test_list_truncation_attaches_facets(con):
     assert "level" in out["facets"] and "isRef" in out["facets"]
 
 
+def test_auto_facets_drop_single_bucket(con):
+    # Filtered to non-reference only: isRef collapses to one bucket (no narrowing
+    # value) so it's dropped; level still discriminates and stays.
+    q = CatalogQuery(
+        operation="list",
+        filters=[Filter(field="isRef", op=Op.eq, value="No")],
+        limit=2,
+    )
+    out = execute(q, con)
+    assert out["truncated"] is True
+    assert "isRef" not in out["facets"]
+    assert "level" in out["facets"]
+
+
 def test_list_no_truncation_when_under_limit(con):
     q = CatalogQuery(operation="list", limit=10)
     out = execute(q, con)
