@@ -299,13 +299,14 @@ class CatalogQuery(BaseModel):
                 raise ValueError(
                     "contains needs a scalar value; use contains_any for a list"
                 )
-            # `in`/`not_in`/`contains_any` over an empty list is either invalid SQL
-            # (IN ()) or a silent match-nothing — require a non-empty value list.
-            if (
-                f.op in (Op.in_, Op.not_in, Op.contains_any)
-                and isinstance(f.value, list)
-                and not f.value
-            ):
+            # An empty list value is never meaningful: invalid SQL (IN ()) or a
+            # silent match-nothing/everything. Reject it for every op that
+            # consumes a list — in/not_in/contains_any always, plus eq/ne when
+            # they coerce to list membership on a list field.
+            consumes_list = f.op in (Op.in_, Op.not_in, Op.contains_any) or (
+                f.op in (Op.eq, Op.ne) and f.field in LIST_FIELDS
+            )
+            if consumes_list and isinstance(f.value, list) and not f.value:
                 raise ValueError(f"{f.op.value} needs a non-empty value list")
         return self
 

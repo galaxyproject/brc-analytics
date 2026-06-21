@@ -198,6 +198,12 @@ def test_empty_value_list_rejected():
         CatalogQuery(filters=[Filter(field="level", op=Op.in_, value=[])])
     with pytest.raises(ValueError, match="non-empty value list"):
         CatalogQuery(filters=[Filter(field="ploidy", op=Op.contains_any, value=[])])
+    # eq/ne on a list field coerce to membership, so an empty list there is the
+    # same silent always-false/always-true trap — reject it too.
+    with pytest.raises(ValueError, match="non-empty value list"):
+        CatalogQuery(filters=[Filter(field="ploidy", op=Op.eq, value=[])])
+    with pytest.raises(ValueError, match="non-empty value list"):
+        CatalogQuery(filters=[Filter(field="ploidy", op=Op.ne, value=[])])
 
 
 def test_missing_value_rejected():
