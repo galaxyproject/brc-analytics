@@ -310,6 +310,18 @@ _SQL_BINOP = {
 }
 
 
+def _qi(identifier: str) -> str:
+    """Quote a SQL identifier (column/table name) for safe interpolation.
+
+    Every dynamic identifier reaching the SQL string is allowlist-validated by
+    the CatalogQuery model first; quoting is defense-in-depth and also lets the
+    catalog use names that need quoting (mixed case, reserved words). DuckDB
+    folds unquoted identifiers to lower case, so quoting pins the exact case —
+    the field allowlist already carries the catalog's canonical casing.
+    """
+    return '"' + identifier.replace('"', '""') + '"'
+
+
 def _list_membership(col: str) -> str:
     """SQL truthy when list column `col` shares any element with the ? param list."""
     return f"len(list_intersect({col}, ?)) > 0"
@@ -321,7 +333,7 @@ def _as_list(value) -> list:
 
 
 def _compile_predicate(f: Filter) -> tuple[str, list]:
-    col = f.field
+    col = _qi(f.field)
     if f.op is Op.is_null:
         return f"{col} IS NULL", []
     if f.op is Op.not_null:
@@ -330,7 +342,7 @@ def _compile_predicate(f: Filter) -> tuple[str, list]:
     # membership — a list never equals a scalar, so this is the only sensible
     # reading. Coercing it lets the model's natural `eq`/`in` phrasing work
     # without a failed round-trip.
-    if col in LIST_FIELDS and f.op in (Op.eq, Op.ne, Op.in_, Op.not_in):
+    if f.field in LIST_FIELDS and f.op in (Op.eq, Op.ne, Op.in_, Op.not_in):
         expr = _list_membership(col)
         if f.op in (Op.ne, Op.not_in):
             # NULL-safe negation: a row with no value is "not a member" too, so
@@ -452,23 +464,26 @@ def execute(q: CatalogQuery, con) -> dict:
     where, params = _compile_where(q)
     cap = q.limit
 
+    entity = _qi(q.entity)
+
     def _facets(cols: list[str]) -> dict:
         out = {}
         for col in cols:
+            qcol = _qi(col)
             # Cap to the top buckets by count — a high-cardinality field (e.g.
             # a species column) would otherwise return thousands of buckets.
             rows = con.execute(
-                f"SELECT {col} AS k, count(*) AS c FROM {q.entity} "
+                f"SELECT {qcol} AS k, count(*) AS c FROM {entity} WHERE {where} "
                 # `, k` is a stable tiebreaker so equal-count buckets (and which
                 # ones fall at the LIMIT boundary) don't shuffle across runs.
-                f"WHERE {where} GROUP BY {col} ORDER BY c DESC, k LIMIT {_FACET_LIMIT}",
+                f"GROUP BY {qcol} ORDER BY c DESC, k LIMIT {_FACET_LIMIT}",
                 params,
             ).fetchall()
             out[col] = {("(none)" if k is None else str(k)): c for k, c in rows}
         return out
 
     total = con.execute(
-        f"SELECT count(*) FROM {q.entity} WHERE {where}", params
+        f"SELECT count(*) FROM {entity} WHERE {where}", params
     ).fetchone()[0]
     result: dict = {"total": total}
     if q.operation == "count":
@@ -485,18 +500,24 @@ def execute(q: CatalogQuery, con) -> dict:
     if q.sort:
         # Honor the requested sort, appending a stable key (the first display
         # column) as a tiebreaker so equal-sort rows can't shuffle at the boundary.
-        terms = [f"{s.field} {'DESC' if s.desc else 'ASC'}" for s in q.sort]
+        # NULLS LAST so a column with missing values sorts the rows with data to
+        # the top of the page (DuckDB defaults NULLs first on DESC).
+        terms = [
+            f"{_qi(s.field)} {'DESC' if s.desc else 'ASC'} NULLS LAST" for s in q.sort
+        ]
         tiebreak = cols[0] if cols else None
         if tiebreak and tiebreak not in {s.field for s in q.sort}:
-            terms.append(tiebreak)
+            terms.append(_qi(tiebreak))
         order = "ORDER BY " + ", ".join(terms)
     else:
         # No explicit sort: most-relevant-first per _DEFAULT_ORDER; fall back to a
         # stable key (or positional `1`) for any entity without a default.
-        order = "ORDER BY " + _DEFAULT_ORDER.get(q.entity, cols[0] if cols else "1")
-    select = ", ".join(cols) if cols else "*"
+        order = "ORDER BY " + _DEFAULT_ORDER.get(
+            q.entity, _qi(cols[0]) if cols else "1"
+        )
+    select = ", ".join(_qi(c) for c in cols) if cols else "*"
     cur = con.execute(
-        f"SELECT {select} FROM {q.entity} WHERE {where} {order} "
+        f"SELECT {select} FROM {entity} WHERE {where} {order} "
         f"LIMIT {cap + 1} OFFSET {q.offset}",
         params,
     )

@@ -65,6 +65,15 @@ _CASES = [
         "must_contain": ["anopheles"],
     },
     {
+        # the taxon must actually be applied as a filter (taxid given explicitly)
+        "name": "lookup_by_taxid",
+        "message": (
+            "Show me the genome assemblies for Mycobacterium tuberculosis (taxid 1773)."
+        ),
+        "operation": None,
+        "must_contain": ["1773"],
+    },
+    {
         "name": "count_chromosome_total",
         "message": "How many chromosome-level assemblies are there in total?",
         "operation": "count",

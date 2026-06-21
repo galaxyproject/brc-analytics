@@ -390,7 +390,8 @@ class AssistantAgent:
 
         Degrades to None (tool reports unavailable) if duckdb or the catalog
         can't load, so the rest of the agent still works. connect() fail-softs to
-        None with typed logging; this guards the duckdb-not-installed case too.
+        None (with typed logging) for catalog problems; this method's try/except
+        additionally catches the ImportError connect() raises if duckdb is missing.
         """
         try:
             from app.services.tools.catalog_query import connect

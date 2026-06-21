@@ -107,7 +107,7 @@ def check_compatibility(deps: AssistantDeps, iwc_id: str, accession: str) -> str
 
 
 def query_catalog(deps: AssistantDeps, query: CatalogQuery) -> str:
-    """Count, filter, list, or aggregate genome ASSEMBLIES with a structured query.
+    """Count, filter, list, or facet (group-by) genome ASSEMBLIES with a structured query.
 
     Prefer this over enumerating assemblies yourself: it runs the filter/count in
     the database and returns a JSON summary correct at any scale. The summary

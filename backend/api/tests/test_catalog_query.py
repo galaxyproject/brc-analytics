@@ -99,12 +99,13 @@ def test_eq_ne_reject_list_value_on_scalar_field():
 
 
 def test_compile_scalar_and_range():
+    # Identifiers are quoted (defense-in-depth + exact-case pinning).
     assert _compile_predicate(Filter(field="level", op=Op.eq, value="Chromosome")) == (
-        "level = ?",
+        '"level" = ?',
         ["Chromosome"],
     )
     assert _compile_predicate(Filter(field="length", op=Op.gte, value=1000)) == (
-        "length >= ?",
+        '"length" >= ?',
         [1000],
     )
 
@@ -113,10 +114,10 @@ def test_compile_in_and_null():
     frag, params = _compile_predicate(
         Filter(field="level", op=Op.in_, value=["Chromosome", "Complete Genome"])
     )
-    assert frag == "level IN (?, ?)"
+    assert frag == '"level" IN (?, ?)'
     assert params == ["Chromosome", "Complete Genome"]
     assert _compile_predicate(Filter(field="geneModelUrl", op=Op.is_null)) == (
-        "geneModelUrl IS NULL",
+        '"geneModelUrl" IS NULL',
         [],
     )
 
@@ -126,24 +127,24 @@ def test_compile_list_membership_and_coercion():
     assert _compile_predicate(
         Filter(field="ploidy", op=Op.contains, value="DIPLOID")
     ) == (
-        "list_contains(ploidy, ?)",
+        'list_contains("ploidy", ?)',
         ["DIPLOID"],
     )
     # scalar eq on a list field coerces to membership (no failed round-trip)
     frag, params = _compile_predicate(Filter(field="ploidy", op=Op.eq, value="DIPLOID"))
-    assert frag == "len(list_intersect(ploidy, ?)) > 0"
+    assert frag == 'len(list_intersect("ploidy", ?)) > 0'
     assert params == [["DIPLOID"]]
     # ne on a list field coerces to NULL-safe negated membership
     frag, _ = _compile_predicate(Filter(field="ploidy", op=Op.ne, value="DIPLOID"))
-    assert frag == "(NOT (len(list_intersect(ploidy, ?)) > 0) OR ploidy IS NULL)"
+    assert frag == '(NOT (len(list_intersect("ploidy", ?)) > 0) OR "ploidy" IS NULL)'
 
 
 def test_compile_ne_and_not_in_are_null_safe():
     # SQL `col != x` / `col NOT IN (...)` drop NULL rows; negation must include them.
     frag, _ = _compile_predicate(Filter(field="level", op=Op.ne, value="Contig"))
-    assert frag == "(level != ? OR level IS NULL)"
+    assert frag == '("level" != ? OR "level" IS NULL)'
     frag, _ = _compile_predicate(Filter(field="level", op=Op.not_in, value=["Contig"]))
-    assert frag == "(level NOT IN (?) OR level IS NULL)"
+    assert frag == '("level" NOT IN (?) OR "level" IS NULL)'
 
 
 def test_facet_on_list_field_rejected():
@@ -459,6 +460,17 @@ def test_explicit_sort_gets_stable_tiebreaker(con):
     accs = [r["accession"] for r in execute(q, con)["rows"]]
     # within the "No" group (A2, A3, C2) the tiebreaker orders by accession
     assert [a for a in accs if a in {"A2", "A3", "C2"}] == ["A2", "A3", "C2"]
+
+
+def test_explicit_sort_puts_nulls_last(con):
+    # A DESC sort on a column with missing values must keep the rows that have
+    # data at the top of the page (DuckDB defaults NULLs first on DESC).
+    # Fixture geneModelUrl: A2 and C2 are NULL; the rest have values.
+    q = CatalogQuery(operation="list", sort=[Sort(field="geneModelUrl", desc=True)])
+    gtfs = [r["geneModelUrl"] for r in execute(q, con)["rows"]]
+    # every non-null value precedes every null
+    assert gtfs[-2:] == [None, None]
+    assert all(g is not None for g in gtfs[:-2])
 
 
 def test_facets_have_stable_order_on_count_ties(con):

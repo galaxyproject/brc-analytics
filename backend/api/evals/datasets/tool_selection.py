@@ -52,10 +52,9 @@ _CASES = [
         "message": (
             "Show me the genome assemblies for Mycobacterium tuberculosis (taxid 1773)."
         ),
+        # Tool-selection only: that the taxon is actually applied as a filter is
+        # asserted in the catalog_query dataset (QueryCatalogShape), its proper home.
         "expected_tool": "query_catalog",
-        # Guard that the requested taxon is actually applied as a filter, not an
-        # empty query returning the whole catalog (the taxid lives in `filters`).
-        "expected_args": {"filters": "1773"},
     },
     {
         "name": "list_workflow_categories",
