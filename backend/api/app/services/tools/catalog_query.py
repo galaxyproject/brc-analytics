@@ -348,6 +348,17 @@ def _as_list(value) -> list:
     return value if isinstance(value, list) else [value]
 
 
+def _list_text(value) -> list[str]:
+    """Stringify membership value(s) for a VARCHAR[] list column.
+
+    Every LIST_FIELDS column is VARCHAR[] (taxonomy-id lists, ploidy, ...), but
+    the model naturally passes a taxid as a JSON number — and
+    `list_contains(VARCHAR[], INTEGER)` / `list_intersect` is a DuckDB binder
+    error, not a no-match. Compare as text so a numeric taxid still works.
+    """
+    return [str(v) for v in _as_list(value)]
+
+
 def _compile_predicate(f: Filter) -> tuple[str, list]:
     col = _qi(f.field)
     if f.op is Op.is_null:
@@ -363,8 +374,8 @@ def _compile_predicate(f: Filter) -> tuple[str, list]:
         if f.op in (Op.ne, Op.not_in):
             # NULL-safe negation: a row with no value is "not a member" too, so
             # count it — otherwise count(eq) + count(ne) wouldn't sum to total.
-            return f"(NOT ({expr}) OR {col} IS NULL)", [_as_list(f.value)]
-        return expr, [_as_list(f.value)]
+            return f"(NOT ({expr}) OR {col} IS NULL)", [_list_text(f.value)]
+        return expr, [_list_text(f.value)]
     if f.op in (Op.in_, Op.not_in):
         vals = _as_list(f.value)
         ph = ", ".join(["?"] * len(vals))
@@ -375,9 +386,9 @@ def _compile_predicate(f: Filter) -> tuple[str, list]:
         # NULL-safe inequality (SQL `col != x` drops NULL rows).
         return f"({col} != ? OR {col} IS NULL)", [f.value]
     if f.op is Op.contains:
-        return f"list_contains({col}, ?)", [f.value]
+        return f"list_contains({col}, ?)", [str(f.value)]
     if f.op is Op.contains_any:
-        return _list_membership(col), [_as_list(f.value)]
+        return _list_membership(col), [_list_text(f.value)]
     return f"{col} {_SQL_BINOP[f.op]} ?", [f.value]
 
 

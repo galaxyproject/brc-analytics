@@ -139,6 +139,25 @@ def test_compile_list_membership_and_coercion():
     assert frag == '(NOT (len(list_intersect("ploidy", ?)) > 0) OR "ploidy" IS NULL)'
 
 
+def test_list_field_value_is_stringified():
+    # LIST_FIELDS columns are VARCHAR[]; a numeric value (e.g. a taxid the model
+    # passes as a JSON number) must be compared as text — list_contains/intersect
+    # on VARCHAR[] with an INTEGER is a DuckDB binder error, not a no-match.
+    _, params = _compile_predicate(
+        Filter(field="lineageTaxonomyIds", op=Op.contains, value=1773)
+    )
+    assert params == ["1773"]
+    _, params = _compile_predicate(
+        Filter(field="lineageTaxonomyIds", op=Op.contains_any, value=[1773, 5833])
+    )
+    assert params == [["1773", "5833"]]
+    # coerced scalar eq on a list field stringifies too
+    _, params = _compile_predicate(
+        Filter(field="lineageTaxonomyIds", op=Op.eq, value=1773)
+    )
+    assert params == [["1773"]]
+
+
 def test_compile_ne_and_not_in_are_null_safe():
     # SQL `col != x` / `col NOT IN (...)` drop NULL rows; negation must include them.
     frag, _ = _compile_predicate(Filter(field="level", op=Op.ne, value="Contig"))
