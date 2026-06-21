@@ -369,6 +369,16 @@ def test_list_no_truncation_when_under_limit(con):
     assert "facets" not in out
 
 
+def test_default_order_is_reference_then_quality(con):
+    # No explicit sort: reference assemblies first, then largest scaffold N50,
+    # accession as the stable tiebreaker. (Fixture refs: C1 n50=2000, A1 n50=1000.)
+    out = execute(CatalogQuery(operation="list", limit=25), con)
+    accs = [r["accession"] for r in out["rows"]]
+    assert accs[:2] == ["C1", "A1"]  # both isRef=Yes, ordered by N50 desc
+    refs = [r["isRef"] for r in out["rows"]]
+    assert refs == sorted(refs, reverse=True)  # all "Yes" precede all "No"
+
+
 def test_connect_fails_closed_on_schema_drift(tmp_path):
     # If the catalog is missing configured columns, the engine must disable
     # itself (return None) rather than degrade — drift is a build problem to fix.

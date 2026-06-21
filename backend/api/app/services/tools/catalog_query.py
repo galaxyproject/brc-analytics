@@ -172,6 +172,13 @@ _DISPLAY_COLUMNS: dict[str, list[str]] = {
     ],
 }
 
+# Default ordering for a `list` with no explicit sort: most relevant first —
+# the reference assembly, then best quality (largest scaffold N50), with accession
+# as a stable tiebreaker. Beats ordering by an arbitrary accession id.
+_DEFAULT_ORDER: dict[str, str] = {
+    "assembly": "isRef DESC, scaffoldN50 DESC NULLS LAST, accession",
+}
+
 
 class Op(str, Enum):
     eq = "eq"
@@ -458,18 +465,20 @@ def execute(q: CatalogQuery, con) -> dict:
     # Display columns are validated against the table at connect() time (the
     # engine fails closed on drift), so the projection is trusted here.
     cols = _DISPLAY_COLUMNS.get(q.entity)
-    # Always order by a stable key so the capped page / truncation is reproducible
-    # (LIMIT without a total order is unordered). For an explicit sort, append that
-    # key as a tiebreaker so rows at the page boundary can't shuffle when the
-    # requested sort fields tie.
-    tiebreak = cols[0] if cols else None
-    terms = [f"{s.field} {'DESC' if s.desc else 'ASC'}" for s in q.sort]
-    if tiebreak and tiebreak not in {s.field for s in q.sort}:
-        terms.append(tiebreak)
-    # Always emit an ORDER BY so LIMIT/OFFSET is reproducible. For assembly the
-    # tiebreak (accession) guarantees a term; `1` is a last-resort positional
-    # fallback for any future entity without display columns.
-    order = "ORDER BY " + ", ".join(terms or ["1"])
+    # Always emit an ORDER BY so the capped page / truncation is reproducible
+    # (LIMIT without a total order is unordered).
+    if q.sort:
+        # Honor the requested sort, appending a stable key (the first display
+        # column) as a tiebreaker so equal-sort rows can't shuffle at the boundary.
+        terms = [f"{s.field} {'DESC' if s.desc else 'ASC'}" for s in q.sort]
+        tiebreak = cols[0] if cols else None
+        if tiebreak and tiebreak not in {s.field for s in q.sort}:
+            terms.append(tiebreak)
+        order = "ORDER BY " + ", ".join(terms)
+    else:
+        # No explicit sort: most-relevant-first per _DEFAULT_ORDER; fall back to a
+        # stable key (or positional `1`) for any entity without a default.
+        order = "ORDER BY " + _DEFAULT_ORDER.get(q.entity, cols[0] if cols else "1")
     select = ", ".join(cols) if cols else "*"
     cur = con.execute(
         f"SELECT {select} FROM {q.entity} WHERE {where} {order} "
