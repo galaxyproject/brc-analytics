@@ -153,12 +153,14 @@ _AUTO_FACET_FIELDS: dict[str, list[str]] = {
 # Curated projection for `list` rows (keeps tokens bounded vs SELECT *).
 _DISPLAY_COLUMNS: dict[str, list[str]] = {
     "assembly": [
+        # ploidy is intentionally omitted — it's an organism-level attribute
+        # (constant across all of an organism's assemblies), so a per-row column
+        # is redundant. It stays a filterable field, just not displayed.
         "accession",
         "taxonomicLevelSpecies",
         "strainName",
         "level",
         "isRef",
-        "ploidy",
         "length",
         "scaffoldN50",
         "geneModelUrl",
