@@ -14,11 +14,10 @@ from __future__ import annotations
 import pytest
 
 from app.services.tools.catalog_query import (
-    _DISPLAY_COLUMNS,
-    ASSEMBLY_FIELDS,
-    LIST_FIELDS,
-    NUMERIC_FIELDS,
+    ENTITY_SCHEMA,
+    SCALAR,
     CatalogQuery,
+    EntitySchema,
     Filter,
     Op,
     Sort,
@@ -100,11 +99,15 @@ def test_eq_ne_reject_list_value_on_scalar_field():
 
 def test_compile_scalar_and_range():
     # Identifiers are quoted (defense-in-depth + exact-case pinning).
-    assert _compile_predicate(Filter(field="level", op=Op.eq, value="Chromosome")) == (
+    assert _compile_predicate(
+        Filter(field="level", op=Op.eq, value="Chromosome"), "assembly"
+    ) == (
         '"level" = ?',
         ["Chromosome"],
     )
-    assert _compile_predicate(Filter(field="length", op=Op.gte, value=1000)) == (
+    assert _compile_predicate(
+        Filter(field="length", op=Op.gte, value=1000), "assembly"
+    ) == (
         '"length" >= ?',
         [1000],
     )
@@ -112,11 +115,14 @@ def test_compile_scalar_and_range():
 
 def test_compile_in_and_null():
     frag, params = _compile_predicate(
-        Filter(field="level", op=Op.in_, value=["Chromosome", "Complete Genome"])
+        Filter(field="level", op=Op.in_, value=["Chromosome", "Complete Genome"]),
+        "assembly",
     )
     assert frag == '"level" IN (?, ?)'
     assert params == ["Chromosome", "Complete Genome"]
-    assert _compile_predicate(Filter(field="geneModelUrl", op=Op.is_null)) == (
+    assert _compile_predicate(
+        Filter(field="geneModelUrl", op=Op.is_null), "assembly"
+    ) == (
         '"geneModelUrl" IS NULL',
         [],
     )
@@ -125,44 +131,53 @@ def test_compile_in_and_null():
 def test_compile_list_membership_and_coercion():
     # explicit contains / contains_any
     assert _compile_predicate(
-        Filter(field="ploidy", op=Op.contains, value="DIPLOID")
+        Filter(field="ploidy", op=Op.contains, value="DIPLOID"), "assembly"
     ) == (
         'list_contains("ploidy", ?)',
         ["DIPLOID"],
     )
     # scalar eq on a list field coerces to membership (no failed round-trip)
-    frag, params = _compile_predicate(Filter(field="ploidy", op=Op.eq, value="DIPLOID"))
+    frag, params = _compile_predicate(
+        Filter(field="ploidy", op=Op.eq, value="DIPLOID"), "assembly"
+    )
     assert frag == 'len(list_intersect("ploidy", ?)) > 0'
     assert params == [["DIPLOID"]]
     # ne on a list field coerces to NULL-safe negated membership
-    frag, _ = _compile_predicate(Filter(field="ploidy", op=Op.ne, value="DIPLOID"))
+    frag, _ = _compile_predicate(
+        Filter(field="ploidy", op=Op.ne, value="DIPLOID"), "assembly"
+    )
     assert frag == '(NOT (len(list_intersect("ploidy", ?)) > 0) OR "ploidy" IS NULL)'
 
 
 def test_list_field_value_is_stringified():
-    # LIST_FIELDS columns are VARCHAR[]; a numeric value (e.g. a taxid the model
+    # List-typed columns are VARCHAR[]; a numeric value (e.g. a taxid the model
     # passes as a JSON number) must be compared as text — list_contains/intersect
     # on VARCHAR[] with an INTEGER is a DuckDB binder error, not a no-match.
     _, params = _compile_predicate(
-        Filter(field="lineageTaxonomyIds", op=Op.contains, value=1773)
+        Filter(field="lineageTaxonomyIds", op=Op.contains, value=1773), "assembly"
     )
     assert params == ["1773"]
     _, params = _compile_predicate(
-        Filter(field="lineageTaxonomyIds", op=Op.contains_any, value=[1773, 5833])
+        Filter(field="lineageTaxonomyIds", op=Op.contains_any, value=[1773, 5833]),
+        "assembly",
     )
     assert params == [["1773", "5833"]]
     # coerced scalar eq on a list field stringifies too
     _, params = _compile_predicate(
-        Filter(field="lineageTaxonomyIds", op=Op.eq, value=1773)
+        Filter(field="lineageTaxonomyIds", op=Op.eq, value=1773), "assembly"
     )
     assert params == [["1773"]]
 
 
 def test_compile_ne_and_not_in_are_null_safe():
     # SQL `col != x` / `col NOT IN (...)` drop NULL rows; negation must include them.
-    frag, _ = _compile_predicate(Filter(field="level", op=Op.ne, value="Contig"))
+    frag, _ = _compile_predicate(
+        Filter(field="level", op=Op.ne, value="Contig"), "assembly"
+    )
     assert frag == '("level" != ? OR "level" IS NULL)'
-    frag, _ = _compile_predicate(Filter(field="level", op=Op.not_in, value=["Contig"]))
+    frag, _ = _compile_predicate(
+        Filter(field="level", op=Op.not_in, value=["Contig"]), "assembly"
+    )
     assert frag == '("level" NOT IN (?) OR "level" IS NULL)'
 
 
@@ -456,14 +471,15 @@ def test_connect_fails_closed_on_schema_drift(tmp_path):
     assert connect(str(tmp_path)) is None
 
 
-def _ok_coltypes() -> dict[str, str]:
-    """A schema where every configured column is present and correctly typed."""
-    configured = ASSEMBLY_FIELDS | set(_DISPLAY_COLUMNS["assembly"])
+def _ok_coltypes(entity: str = "assembly") -> dict[str, str]:
+    """A schema where every column the entity is configured for is present and
+    correctly typed (numeric -> BIGINT, list -> VARCHAR[], else VARCHAR)."""
+    schema = ENTITY_SCHEMA[entity]
     out = {}
-    for c in configured:
-        if c in NUMERIC_FIELDS:
+    for c in schema.configured_columns:
+        if c in schema.numeric_fields:
             out[c] = "BIGINT"
-        elif c in LIST_FIELDS:
+        elif c in schema.list_fields:
             out[c] = "VARCHAR[]"
         else:
             out[c] = "VARCHAR"
@@ -471,7 +487,7 @@ def _ok_coltypes() -> dict[str, str]:
 
 
 def test_schema_issues_accepts_correct_schema():
-    missing, mistyped = _schema_issues(_ok_coltypes())
+    missing, mistyped = _schema_issues(_ok_coltypes(), "assembly")
     assert missing == [] and mistyped == []
 
 
@@ -480,7 +496,7 @@ def test_schema_issues_flags_missing_and_mistyped():
     cols["length"] = "VARCHAR"  # numeric field inferred as text
     cols["ploidy"] = "VARCHAR"  # list field inferred as scalar
     del cols["isRef"]  # a configured column dropped
-    missing, mistyped = _schema_issues(cols)
+    missing, mistyped = _schema_issues(cols, "assembly")
     assert "isRef" in missing
     assert any(m.startswith("length=") for m in mistyped)
     assert any(m.startswith("ploidy=") for m in mistyped)
@@ -490,8 +506,75 @@ def test_schema_issues_accepts_numeric_type_variants():
     cols = _ok_coltypes()
     cols["gcPercent"] = "DOUBLE"
     cols["length"] = "DECIMAL(18,3)"  # parameterized numeric type
-    _, mistyped = _schema_issues(cols)
+    _, mistyped = _schema_issues(cols, "assembly")
     assert mistyped == []
+
+
+# --- per-entity type classification -------------------------------------------
+
+
+def test_type_classification_is_entity_scoped():
+    # Derived views are subsets of the entity's declared fields (by construction).
+    for schema in ENTITY_SCHEMA.values():
+        assert schema.list_fields <= schema.field_names
+        assert schema.numeric_fields <= schema.field_names
+    # The classifications genuinely diverge: otherTaxa is a list on assembly but
+    # not even a field on organism; assemblyCount is numeric only on organism;
+    # taxonomicGroup is a list on both.
+    asm, org = ENTITY_SCHEMA["assembly"], ENTITY_SCHEMA["organism"]
+    assert "otherTaxa" in asm.list_fields
+    assert "otherTaxa" not in org.list_fields
+    assert "assemblyCount" in org.numeric_fields
+    assert "assemblyCount" not in asm.numeric_fields
+    assert "taxonomicGroup" in asm.list_fields
+    assert "taxonomicGroup" in org.list_fields
+
+
+def test_entity_schema_rejects_misdeclaration():
+    # A `list` always needs a projection.
+    with pytest.raises(ValueError, match="display must be non-empty"):
+        EntitySchema(fields={"a": SCALAR}, display=())
+    # default_order / auto_facets must name configured columns (caught at import,
+    # not late as malformed SQL).
+    with pytest.raises(ValueError, match="unknown column"):
+        EntitySchema(fields={"a": SCALAR}, display=("a",), auto_facets=("ghost",))
+    with pytest.raises(ValueError, match="unknown column"):
+        EntitySchema(
+            fields={"a": SCALAR}, display=("a",), default_order=(("ghost", True),)
+        )
+    # A display-only column (absent from fields) is a valid order/facet target.
+    EntitySchema(
+        fields={"a": SCALAR}, display=("a", "b"), default_order=(("b", False),)
+    )
+
+
+def test_compile_predicate_respects_entity_type():
+    # Same field, same op — but otherTaxa is a list on assembly (eq coerces to
+    # membership) and a scalar on organism (eq stays a plain `=`).
+    frag_asm, _ = _compile_predicate(
+        Filter(field="otherTaxa", op=Op.eq, value="x"), "assembly"
+    )
+    assert frag_asm == 'len(list_intersect("otherTaxa", ?)) > 0'
+    frag_org, params_org = _compile_predicate(
+        Filter(field="otherTaxa", op=Op.eq, value="x"), "organism"
+    )
+    assert frag_org == '"otherTaxa" = ?'
+    assert params_org == ["x"]
+
+
+def test_schema_issues_ignores_other_entity_list_field():
+    # organisms.json carries a scalar otherTaxa column. It's a list field on
+    # assembly but not queryable on organism, so the organism drift check must not
+    # flag it as mistyped (which would wrongly disable the engine).
+    cols = _ok_coltypes("organism")
+    cols["otherTaxa"] = "VARCHAR"  # present in the table, scalar, not in org fields
+    missing, mistyped = _schema_issues(cols, "organism")
+    assert missing == [] and mistyped == []
+    # The same scalar otherTaxa IS flagged under assembly, where it's a list field.
+    asm = _ok_coltypes()
+    asm["otherTaxa"] = "VARCHAR"
+    _, asm_mistyped = _schema_issues(asm, "assembly")
+    assert any(m.startswith("otherTaxa=") for m in asm_mistyped)
 
 
 def test_explicit_sort_gets_stable_tiebreaker(con):
