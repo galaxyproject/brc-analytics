@@ -57,6 +57,14 @@ _CASES = [
         "expected_tool": "query_catalog",
     },
     {
+        # A clade-organism question must use the bounded query engine, NOT the
+        # legacy fuzzy search_organisms (the core re-routing #1371 promises). Arg
+        # shape (entity="organism") is asserted in the catalog_query dataset.
+        "name": "organisms_for_clade_uses_query_catalog",
+        "message": "What organisms do you have for the genus Anopheles?",
+        "expected_tool": "query_catalog",
+    },
+    {
         "name": "list_workflow_categories",
         "message": "What kinds of analyses can I run?",
         "expected_tool": "list_workflow_categories",

@@ -108,6 +108,31 @@ _CASES = [
         "operation": None,
         "must_contain": ["isref", "vivax"],
     },
+    {
+        # organism entity: "what organisms" is a per-taxon query, not assemblies.
+        # "organism" in the args asserts entity="organism".
+        "name": "list_organisms_clade_anopheles",
+        "message": "What organisms do you have for Anopheles?",
+        "operation": None,
+        "must_contain": ["organism", "anopheles"],
+    },
+    {
+        # organism count — the headline "28" number is a count over the organism
+        # entity, not the assembly entity.
+        "name": "count_organisms_clade_anopheles",
+        "message": "How many organisms do you have for Anopheles?",
+        "operation": "count",
+        "must_contain": ["organism", "anopheles"],
+    },
+    {
+        # broad "what's here" (UC3): summarize a large clade with a facet over the
+        # organism entity rather than enumerating. Filtering to fungi requires the
+        # kingdom value, so "fungi" appears in the args.
+        "name": "facets_organisms_broad_fungi",
+        "message": "What fungi do you have?",
+        "operation": "facets",
+        "must_contain": ["organism", "fungi"],
+    },
 ]
 
 
