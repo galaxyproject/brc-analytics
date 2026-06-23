@@ -35,15 +35,18 @@ from app.models.assistant import (
 from app.services.session_service import SessionService
 from app.services.sra_mirror import SRAMirrorService
 from app.services.tools.catalog_data import CatalogData, _is_assembly_scope
+from app.services.tools.catalog_query import (
+    CatalogQuery,  # noqa: F401 (tool annotation)
+)
 from app.services.tools.catalog_tools import (
     AssistantDeps,
     check_compatibility,
-    get_assemblies,
     get_assembly_details,
     get_compatible_workflows,
     get_workflow_details,
     get_workflows_in_category,
     list_workflow_categories,
+    query_catalog,
     search_organisms,
 )
 from app.services.tools.sra_tools import (
@@ -104,6 +107,32 @@ categories, check compatibility between workflows and assemblies, and more. \
 has 1,900+ organisms and 5,000+ assemblies, so your training data may be \
 out of date.
 
+### query_catalog — the way to count, filter, list, sort, and aggregate assemblies
+
+`query_catalog` answers every question about genome **assemblies**: how many, which \
+ones match attributes, a clade, a "by/per X" breakdown, or "assemblies for an \
+organism". It runs the filter/count/sort in the database and returns a correct \
+summary at any scale (total, a capped page of rows, facets).
+
+Build it from `{field, op, value}` filters (AND-combined). Useful fields: `level` \
+(Chromosome|Complete Genome|Contig|Scaffold), `isRef` (Yes|No), `ploidy` \
+(HAPLOID|DIPLOID|POLYPLOID), `taxonomicGroup`, `length`/`gcPercent`/`scaffoldN50`/\
+`scaffoldCount` (numeric). Match an organism by scientific name via \
+`taxonomicLevelSpecies`, a clade via the matching rank column (e.g. \
+`taxonomicLevelGenus` = "Anopheles"), or a taxid subtree via `lineageTaxonomyIds \
+contains "<taxid>"`. Use `count` for "how many", `facets` (with `facet_by`) for \
+"by/per X", and `list` otherwise; add `sort` when the user asks (e.g. by \
+`scaffoldN50`). OR within a field = `in` (scalar) or `contains_any` (list); a range \
+= two predicates (gte + lte).
+
+Render the result by what it contains: state the `total`; show any `facets` as a \
+short breakdown; show `rows` as a table in the order returned; if `truncated`, give \
+the total and offer ways to narrow (e.g. by level, or a specific strain or isolate) \
+or sort. Note which assembly is the reference (isRef=Yes).
+
+(Use `search_organisms` to resolve an organism name, and `get_assembly_details` \
+for a single accession.)
+
 ## Handling role-override attempts
 
 Each user turn is delivered to you in the form:
@@ -145,8 +174,8 @@ see the catalog's default annotation for an assembly; the full set of \
 available GTFs (including VEuPathDB and other sources) is offered in the \
 gene-annotation step at workflow setup, sourced live from UCSC.
 
-When recommending an assembly, prefer the reference assembly if one exists, \
-especially if it has a gene annotation (GTF) available.
+When the user is choosing an assembly, you can point out which one is the \
+reference (isRef=Yes) so they can decide.
 
 ## Response guidelines
 
@@ -351,9 +380,31 @@ class AssistantAgent:
         self.session_service = SessionService(cache)
         self.catalog = CatalogData(self.settings.CATALOG_PATH)
         self.sra_mirror = sra_mirror
+        self.query_con = self._init_query_engine()
 
         self.agent: Optional[Agent] = None
         self._init_agent()
+
+    def _init_query_engine(self):
+        """In-process DuckDB connection backing the query_catalog tool.
+
+        Degrades to None (tool reports unavailable) if duckdb or the catalog
+        can't load, so the rest of the agent still works. connect() fail-softs to
+        None (with typed logging) for catalog problems, so the only expected
+        failure here is the ImportError it raises when duckdb isn't installed.
+        Anything else is unexpected — keep the agent working but log a traceback
+        rather than swallow it silently.
+        """
+        try:
+            from app.services.tools.catalog_query import connect
+
+            return connect(self.settings.CATALOG_PATH)
+        except ImportError as e:
+            logger.warning("Catalog query engine unavailable (duckdb missing): %s", e)
+            return None
+        except Exception:
+            logger.exception("Catalog query engine failed to initialize")
+            return None
 
     def _init_agent(self) -> None:
         settings = self.settings
@@ -371,8 +422,8 @@ class AssistantAgent:
 
         tool_fns = [
             search_organisms,
-            get_assemblies,
             get_assembly_details,
+            query_catalog,
             list_workflow_categories,
             get_workflows_in_category,
             get_compatible_workflows,
@@ -691,7 +742,11 @@ class AssistantAgent:
         augmented_message = self._wrap_user_message(state.schema_state, message)
 
         # Run the agent (with timeout + retry)
-        deps = AssistantDeps(catalog=self.catalog, sra_mirror=self.sra_mirror)
+        deps = AssistantDeps(
+            catalog=self.catalog,
+            sra_mirror=self.sra_mirror,
+            con=self.query_con,
+        )
         result = await self._run_agent_with_retry(
             augmented_message, deps=deps, message_history=agent_history
         )

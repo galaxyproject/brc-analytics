@@ -199,7 +199,9 @@ def make_assistant_turn_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
     _prepare_service(aa, entry)
 
     async def task(case_input: dict) -> AgentTurnOutput:
-        agent_deps = AssistantDeps(catalog=aa.catalog, sra_mirror=deps.sra_mirror)
+        agent_deps = AssistantDeps(
+            catalog=aa.catalog, sra_mirror=deps.sra_mirror, con=aa.query_con
+        )
         result = await aa._run_agent_with_retry(
             case_input["message"], deps=agent_deps, message_history=None
         )

@@ -5,6 +5,7 @@ from typing import Any
 
 from pydantic_evals.evaluators import EvaluatorContext
 
+from evals.datasets.catalog_query import QueryCatalogShape
 from evals.evaluators import FieldEquals, LowConfidence, MustMention, ToolCallMatch
 
 
@@ -149,3 +150,44 @@ def test_tool_call_match_pulls_from_metadata():
         )
         == 1.0
     )
+
+
+# ---------- QueryCatalogShape ----------
+
+
+def test_query_shape_matches_field_and_value():
+    out = _FakeRun(
+        tool_calls=[
+            ("query_catalog", {"operation": "facets", "facet_by": ["level"]}),
+        ]
+    )
+    ev = QueryCatalogShape(operation="facets", must_contain=["level"])
+    assert ev.evaluate(_ctx(out)) == 1.0
+
+
+def test_query_shape_rejects_field_fragment():
+    # faceting the wrong field must NOT satisfy must_contain=["level"]
+    out = _FakeRun(
+        tool_calls=[
+            (
+                "query_catalog",
+                {"operation": "facets", "facet_by": ["taxonomicLevelGenus"]},
+            ),
+        ]
+    )
+    ev = QueryCatalogShape(operation="facets", must_contain=["level"])
+    assert ev.evaluate(_ctx(out)) == 0.0
+
+
+def test_query_shape_numeric_token_is_digit_bounded():
+    # "1773" must not match the wrong taxid "17730"
+    out = _FakeRun(
+        tool_calls=[
+            (
+                "query_catalog",
+                {"filters": [{"field": "speciesTaxonomyId", "value": "17730"}]},
+            ),
+        ]
+    )
+    ev = QueryCatalogShape(must_contain=["1773"])
+    assert ev.evaluate(_ctx(out)) == 0.0
