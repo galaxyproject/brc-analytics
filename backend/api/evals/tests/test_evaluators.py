@@ -276,6 +276,15 @@ def test_query_shape_must_filter_list_value():
     assert ev.evaluate(_ctx(out)) == 1.0
 
 
+def test_query_shape_facets_requires_facet_by():
+    # operation=facets with empty facet_by is invalid (execute() rejects it), so a
+    # facets case must not credit it even when the rank column isn't asserted.
+    out = _FakeRun(
+        tool_calls=[("query_catalog", {"operation": "facets", "facet_by": []})]
+    )
+    assert QueryCatalogShape(operation="facets").evaluate(_ctx(out)) == 0.0
+
+
 def test_query_shape_must_facet_membership():
     out = _FakeRun(
         tool_calls=[("query_catalog", {"operation": "facets", "facet_by": ["level"]})]

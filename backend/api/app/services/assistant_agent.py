@@ -123,8 +123,9 @@ for Anopheles?" is an `organism` query; "what assemblies for Anopheles?" is an \
 Build it from `{field, op, value}` filters (AND-combined). Assembly-only fields: \
 `level` (Chromosome|Complete Genome|Contig|Scaffold), `isRef` (Yes|No), `ploidy` \
 (HAPLOID|DIPLOID|POLYPLOID), `length`/`gcPercent`/`scaffoldN50`/`scaffoldCount` \
-(numeric). Both entities share the taxonomy ranks. Match a scientific name via \
-`taxonomicLevelSpecies`, a clade via the matching rank column (e.g. \
+(numeric). Both entities share the taxonomy ranks from domain to species (the \
+lower ranks strain/serotype/isolate/realm are assembly-only). Match a scientific \
+name via `taxonomicLevelSpecies`, a clade via the matching rank column (e.g. \
 `taxonomicLevelGenus` = "Anopheles"); on `assembly` you can also match a taxid \
 subtree via `lineageTaxonomyIds contains "<taxid>"`. Use `count` for "how many", \
 `facets` (with `facet_by`) for "by/per X", and `list` otherwise; add `sort` when \
