@@ -128,7 +128,8 @@ Build it from `{field, op, value}` filters (AND-combined). Assembly-only fields:
 `taxonomicLevelGenus` = "Anopheles"); on `assembly` you can also match a taxid \
 subtree via `lineageTaxonomyIds contains "<taxid>"`. Use `count` for "how many", \
 `facets` (with `facet_by`) for "by/per X", and `list` otherwise; add `sort` when \
-the user asks (e.g. by `scaffoldN50` or `assemblyCount`). OR within a field = `in` \
+the user asks, by an entity-valid field (assemblies by `scaffoldN50`, organisms by \
+`assemblyCount`). OR within a field = `in` \
 (scalar) or `contains_any` (list); a range = two predicates (gte + lte).
 
 Render the result by what it contains: state the `total`; show any `facets` as a \

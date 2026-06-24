@@ -6,8 +6,9 @@ A typed, column-agnostic query the model authors and the backend compiles to SQL
   - cross-field OR is deliberately not expressible.
   - `field`/`facet_by`/`sort` are validated against a per-entity allowlist.
   - the executor returns a summary ({total, returned, truncated, facets, rows}),
-    never the raw corpus; facets attach automatically when a list is truncated so
-    the model can offer narrowing instead of paging.
+    never the raw corpus; on a truncated list, facets attach automatically *when a
+    breakdown discriminates* (single-bucket facets are dropped, so `facets` may be
+    absent even when truncated) so the model can offer narrowing instead of paging.
 
 Assembly and organism entities are queryable; workflows stay on their dedicated
 tools.
