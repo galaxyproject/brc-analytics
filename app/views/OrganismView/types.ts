@@ -1,4 +1,4 @@
-import { OUTBREAK_PRIORITY } from "app/apis/catalog/brc-analytics-catalog/common/schema-entities";
+import type { OUTBREAK_PRIORITY } from "app/apis/catalog/brc-analytics-catalog/common/schema-entities";
 
 /**
  * Organism-scoped shape shared across BRC and GA2 and consumed by the workflow
