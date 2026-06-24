@@ -107,26 +107,33 @@ def check_compatibility(deps: AssistantDeps, iwc_id: str, accession: str) -> str
 
 
 def query_catalog(deps: AssistantDeps, query: CatalogQuery) -> str:
-    """Count, filter, list, or facet (group-by) genome ASSEMBLIES with a structured query.
+    """Count, filter, list, or facet (group-by) ASSEMBLIES or ORGANISMS with a query.
 
-    Prefer this over enumerating assemblies yourself: it runs the filter/count in
-    the database and returns a JSON summary correct at any scale. The summary
-    always has `total`; `list` adds `rows`/`returned`/`truncated` (capped page)
-    and `facets` when truncated; `facets` adds `facets`. Use it for "how many",
+    Prefer this over enumerating rows yourself: it runs the filter/count in the
+    database and returns a JSON summary correct at any scale. The summary always
+    has `total`; `list` adds `rows`/`returned`/`truncated` (capped page) and may
+    add `facets` on truncation (only when a breakdown discriminates, so don't
+    assume it's present); `facets` adds `facets`. Use it for "how many",
     attribute filters, clade queries, and "by/per X" breakdowns. On a failure or
     when the engine is unavailable it returns a short plain-text message instead
     of JSON.
 
-    The query has: entity ("assembly"), filters (a list of {field, op, value},
-    AND-combined), operation ("count" | "list" | "facets"), facet_by, limit,
-    offset, sort.
+    Pick `entity` by what a result row should be: "assembly" for genome
+    assemblies (accession, level, isRef, strain), "organism" for distinct
+    organisms/taxa (one row per species, with assemblyCount). "How many/which
+    organisms do you have for <clade>" is an organism query; "assemblies for an
+    organism" is an assembly query.
+
+    The query has: entity ("assembly" | "organism"), filters (a list of
+    {field, op, value}, AND-combined), operation ("count" | "list" | "facets"),
+    facet_by, limit, offset, sort.
     Ops: eq, ne, in, not_in, gt/gte/lt/lte (numeric), contains/contains_any (list
     fields), is_null/not_null. OR within a field = `in` (scalar) or `contains_any`
     (list); a range = two predicates (gte + lte).
 
-    Filter an organism by scientific name via taxonomicLevelSpecies, a clade via
-    the matching rank column (e.g. taxonomicLevelGenus). When a list comes back
-    truncated, summarize the facets and offer to narrow rather than paging.
+    Filter by scientific name via taxonomicLevelSpecies, a clade via the matching
+    rank column (e.g. taxonomicLevelGenus). When a list comes back truncated,
+    state the total and offer to narrow rather than paging.
 
     Args:
         query: the structured catalog query

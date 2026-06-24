@@ -6,10 +6,12 @@ A typed, column-agnostic query the model authors and the backend compiles to SQL
   - cross-field OR is deliberately not expressible.
   - `field`/`facet_by`/`sort` are validated against a per-entity allowlist.
   - the executor returns a summary ({total, returned, truncated, facets, rows}),
-    never the raw corpus; facets attach automatically when a list is truncated so
-    the model can offer narrowing instead of paging.
+    never the raw corpus; on a truncated list, facets attach automatically *when a
+    breakdown discriminates* (single-bucket facets are dropped, so `facets` may be
+    absent even when truncated) so the model can offer narrowing instead of paging.
 
-Assembly-first; organism is sketched. Workflows stay on their dedicated tools.
+Assembly and organism entities are queryable; workflows stay on their dedicated
+tools.
 """
 
 from __future__ import annotations
@@ -59,6 +61,11 @@ class EntitySchema:
     # display-only columns absent from `fields` (e.g. ucscBrowserUrl) — shown but
     # not filterable; connect()'s drift check still requires them to exist.
     display: tuple[str, ...]
+    # Catalog JSON file backing this entity's DuckDB table. The table is named for
+    # the entity (execute() interpolates the allowlist-validated entity as the
+    # table identifier). Kept here so the schema is the single source of truth —
+    # no parallel entity->file map to drift out of sync.
+    source: str
     # Default ordering for a `list` with no explicit sort, as (field, desc) terms.
     default_order: tuple[tuple[str, bool], ...] = ()
     # Facets auto-returned on a truncated list so the model can offer narrowing.
@@ -77,6 +84,8 @@ class EntitySchema:
         # SQL or an IndexError: a `list` always needs a projection, and every
         # column named for ordering/faceting must be a configured column (so the
         # connect() drift check guarantees it exists in the table).
+        if not self.source:
+            raise ValueError("EntitySchema.source (backing file) must be set")
         if not self.display:
             raise ValueError("EntitySchema.display must be non-empty")
         referenced = {field for field, _ in self.default_order} | set(self.auto_facets)
@@ -89,11 +98,11 @@ class EntitySchema:
 
 
 # Single source of truth for the catalog schema the query engine knows about.
-# Only "assembly" is queryable today (see the `entity` Literal on CatalogQuery and
-# the assembly-only table in connect()); the organism schema is kept as roadmap
-# data — to enable it, add "organism" to that Literal and load its table.
+# Both entities are queryable: the `entity` Literal on CatalogQuery admits them and
+# connect() loads one DuckDB table per entity from its `source` file.
 ENTITY_SCHEMA: dict[str, EntitySchema] = {
     "assembly": EntitySchema(
+        source="assemblies.json",
         fields={
             "accession": SCALAR,
             "ncbiTaxonomyId": SCALAR,
@@ -151,6 +160,7 @@ ENTITY_SCHEMA: dict[str, EntitySchema] = {
         auto_facets=("level", "isRef"),
     ),
     "organism": EntitySchema(
+        source="organisms.json",
         fields={
             "ncbiTaxonomyId": SCALAR,
             "commonName": SCALAR,
@@ -173,6 +183,9 @@ ENTITY_SCHEMA: dict[str, EntitySchema] = {
             "commonName",
             "assemblyCount",
         ),
+        # Most relevant first: best-covered organisms (most assemblies), with the
+        # stable taxonomy id as a tiebreaker.
+        default_order=(("assemblyCount", True), ("ncbiTaxonomyId", False)),
         auto_facets=("taxonomicLevelDomain",),
     ),
 }
@@ -267,7 +280,7 @@ class Sort(BaseModel):
 class CatalogQuery(BaseModel):
     """A structured query over the BRC catalog; compiled to SQL and run."""
 
-    entity: Literal["assembly"] = "assembly"
+    entity: Literal["assembly", "organism"] = "assembly"
     filters: list[Filter] = Field(default_factory=list)
     operation: Literal["count", "list", "facets"] = "list"
     # Each facet column is a separate GROUP BY query in execute(); cap the count
@@ -464,10 +477,13 @@ def _compile_where(q: CatalogQuery) -> tuple[str, list]:
 
 
 def connect(catalog_dir: str):
-    """Load the catalog into an in-memory DuckDB connection (assembly table).
+    """Load the catalog into an in-memory DuckDB connection (one table per entity).
 
-    Returns the connection, or None if the catalog can't be loaded (the caller
-    degrades to a "query engine unavailable" tool response).
+    Returns the connection, or None if any entity can't be loaded (the caller
+    degrades to a "query engine unavailable" tool response). All entities are
+    loaded as a unit — they come from one build, so a partial load is treated as
+    a build problem and fails the whole engine closed rather than serving some
+    entities and not others.
 
     Concurrency invariant: the assistant's tools are sync and run on the asyncio
     event-loop thread, so this single connection is only ever touched by one
@@ -476,18 +492,21 @@ def connect(catalog_dir: str):
     same connection, and cursors from one connection cannot run queries at the
     same time. If tool execution is ever moved to a threadpool, "each thread must
     have its own connection" — but a fresh `duckdb.connect()` here would be a new,
-    empty in-memory database without the loaded table, so true concurrency would
+    empty in-memory database without the loaded tables, so true concurrency would
     require loading the catalog into a file-backed/shared DuckDB database, or
     serializing access through a single-thread executor.
     """
     import duckdb
 
-    json_path = Path(catalog_dir) / "assemblies.json"
-    if not json_path.is_file():
-        logger.warning(
-            "Catalog assemblies not found at %s — query engine disabled", json_path
-        )
-        return None
+    catalog = Path(catalog_dir)
+    for entity, schema in ENTITY_SCHEMA.items():
+        if not (catalog / schema.source).is_file():
+            logger.warning(
+                "Catalog %s not found at %s — query engine disabled",
+                entity,
+                catalog / schema.source,
+            )
+            return None
 
     # Build into a local handle and publish only on full success, so a load
     # failure can't leave a half-initialized connection in play. Distinct except
@@ -495,44 +514,51 @@ def connect(catalog_dir: str):
     con: Optional["duckdb.DuckDBPyConnection"] = None
     try:
         con = duckdb.connect()
-        # Bind the path as a parameter so DuckDB handles any special characters
-        # (no bespoke quoting needed).
-        con.execute(
-            "CREATE TABLE assembly AS "
-            "SELECT * FROM read_json_auto(?, "
-            f"format='array', maximum_object_size={_MAX_JSON_OBJECT_SIZE})",
-            [str(json_path)],
-        )
-        total = con.execute("SELECT count(*) FROM assembly").fetchone()[0]
-        # The field allowlist and display projection are hand-maintained against
-        # the catalog schema. If the schema has drifted (a configured column is
-        # gone), fail closed — disable the engine rather than serve queries that
-        # would error or silently mislead. A drift is a build problem to fix, not
-        # something to paper over.
-        coltypes = {
-            row[0]: str(row[1]).upper()
-            for row in con.execute("DESCRIBE assembly").fetchall()
-        }
-        missing, mistyped = _schema_issues(coltypes, "assembly")
-        if missing or mistyped:
-            logger.error(
-                "Catalog query disabled: assembly schema has drifted from "
-                "catalog_query.py — missing columns %s, mistyped %s",
-                missing,
-                mistyped,
+        counts: dict[str, int] = {}
+        for entity, schema in ENTITY_SCHEMA.items():
+            # Bind the path as a parameter so DuckDB handles any special characters
+            # (no bespoke quoting needed). The table name is the entity, matching
+            # execute()'s _qi(q.entity) projection.
+            con.execute(
+                f"CREATE TABLE {_qi(entity)} AS "
+                "SELECT * FROM read_json_auto(?, "
+                f"format='array', maximum_object_size={_MAX_JSON_OBJECT_SIZE})",
+                [str(catalog / schema.source)],
             )
-            con.close()
-            return None
+            # The field allowlist and display projection are hand-maintained
+            # against the catalog schema. If the schema has drifted (a configured
+            # column is gone or mistyped), fail closed — disable the engine rather
+            # than serve queries that would error or silently mislead. A drift is a
+            # build problem to fix, not something to paper over.
+            coltypes = {
+                row[0]: str(row[1]).upper()
+                for row in con.execute(f"DESCRIBE {_qi(entity)}").fetchall()
+            }
+            missing, mistyped = _schema_issues(coltypes, entity)
+            if missing or mistyped:
+                logger.error(
+                    "Catalog query disabled: %s schema has drifted from "
+                    "catalog_query.py — missing columns %s, mistyped %s",
+                    entity,
+                    missing,
+                    mistyped,
+                )
+                con.close()
+                return None
+            counts[entity] = con.execute(
+                f"SELECT count(*) FROM {_qi(entity)}"
+            ).fetchone()[0]
     except duckdb.IOException as exc:
-        logger.error("Could not read catalog at %s: %s", json_path, exc)
+        logger.error("Could not read catalog at %s: %s", catalog, exc)
     except duckdb.CatalogException as exc:
-        logger.error(
-            "Catalog at %s is missing an expected structure: %s", json_path, exc
-        )
+        logger.error("Catalog at %s is missing an expected structure: %s", catalog, exc)
     except duckdb.Error as exc:
-        logger.error("Failed to load catalog into DuckDB from %s: %s", json_path, exc)
+        logger.error("Failed to load catalog into DuckDB from %s: %s", catalog, exc)
     else:
-        logger.info("Catalog query engine (DuckDB) loaded: %s assemblies", f"{total:,}")
+        logger.info(
+            "Catalog query engine (DuckDB) loaded: %s",
+            ", ".join(f"{e}={n:,}" for e, n in counts.items()),
+        )
         return con
 
     # Reached only on a caught failure: close the opened handle and stay disabled.

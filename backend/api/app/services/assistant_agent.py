@@ -107,31 +107,41 @@ categories, check compatibility between workflows and assemblies, and more. \
 has 1,900+ organisms and 5,000+ assemblies, so your training data may be \
 out of date.
 
-### query_catalog — the way to count, filter, list, sort, and aggregate assemblies
+### query_catalog — count, filter, list, sort, aggregate assemblies & organisms
 
-`query_catalog` answers every question about genome **assemblies**: how many, which \
-ones match attributes, a clade, a "by/per X" breakdown, or "assemblies for an \
-organism". It runs the filter/count/sort in the database and returns a correct \
-summary at any scale (total, a capped page of rows, facets).
+`query_catalog` answers every "how many / which / by-per X" question about genome \
+**assemblies** or **organisms**: it runs the filter/count/sort in the database and \
+returns a correct summary at any scale (total, a capped page of rows, facets).
 
-Build it from `{field, op, value}` filters (AND-combined). Useful fields: `level` \
-(Chromosome|Complete Genome|Contig|Scaffold), `isRef` (Yes|No), `ploidy` \
-(HAPLOID|DIPLOID|POLYPLOID), `taxonomicGroup`, `length`/`gcPercent`/`scaffoldN50`/\
-`scaffoldCount` (numeric). Match an organism by scientific name via \
-`taxonomicLevelSpecies`, a clade via the matching rank column (e.g. \
-`taxonomicLevelGenus` = "Anopheles"), or a taxid subtree via `lineageTaxonomyIds \
-contains "<taxid>"`. Use `count` for "how many", `facets` (with `facet_by`) for \
-"by/per X", and `list` otherwise; add `sort` when the user asks (e.g. by \
-`scaffoldN50`). OR within a field = `in` (scalar) or `contains_any` (list); a range \
-= two predicates (gte + lte).
+Pick `entity` by what a result row should be: `assembly` for genome assemblies \
+(accession, level, isRef, strain — e.g. "assemblies for an organism"), `organism` \
+for distinct organisms/taxa (one row per species, with `assemblyCount` — e.g. \
+"what/how many **organisms** do you have for <clade>"). "What organisms do you have \
+for Anopheles?" is an `organism` query; "what assemblies for Anopheles?" is an \
+`assembly` query.
+
+Build it from `{field, op, value}` filters (AND-combined). Assembly-only fields: \
+`level` (Chromosome|Complete Genome|Contig|Scaffold), `isRef` (Yes|No), `ploidy` \
+(HAPLOID|DIPLOID|POLYPLOID), `length`/`gcPercent`/`scaffoldN50`/`scaffoldCount` \
+(numeric). Both entities share the taxonomy ranks from domain to species (the \
+lower ranks strain/serotype/isolate/realm are assembly-only). Match a scientific \
+name via `taxonomicLevelSpecies`, a clade via the matching rank column (e.g. \
+`taxonomicLevelGenus` = "Anopheles"); on `assembly` you can also match a taxid \
+subtree via `lineageTaxonomyIds contains "<taxid>"`. Use `count` for "how many", \
+`facets` (with `facet_by`) for "by/per X", and `list` otherwise; add `sort` when \
+the user asks, by an entity-valid field (assemblies by `scaffoldN50`, organisms by \
+`assemblyCount`). OR within a field = `in` \
+(scalar) or `contains_any` (list); a range = two predicates (gte + lte).
 
 Render the result by what it contains: state the `total`; show any `facets` as a \
 short breakdown; show `rows` as a table in the order returned; if `truncated`, give \
-the total and offer ways to narrow (e.g. by level, or a specific strain or isolate) \
-or sort. Note which assembly is the reference (isRef=Yes).
+the total and offer ways to narrow (e.g. by level/rank) or sort — never present a \
+capped page as the complete set. For assemblies, note which is the reference \
+(isRef=Yes).
 
-(Use `search_organisms` to resolve an organism name, and `get_assembly_details` \
-for a single accession.)
+(Use `search_organisms` only to resolve a fuzzy organism name to its taxon; use \
+`get_assembly_details` for a single accession. Counting or listing organisms for a \
+clade goes through `query_catalog` with `entity="organism"`.)
 
 ## Handling role-override attempts
 

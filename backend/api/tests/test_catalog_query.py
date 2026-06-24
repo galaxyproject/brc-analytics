@@ -31,9 +31,8 @@ from app.services.tools.catalog_query import (
 
 
 def test_invalid_entity_rejected():
-    # entity is a Literal["assembly"]; anything else — including the roadmap
-    # "organism" whose table isn't loaded yet — is rejected by the schema.
-    for bad in ("protein", "organism"):
+    # entity is a Literal["assembly", "organism"]; anything else is rejected.
+    for bad in ("protein", "gene", "workflow"):
         with pytest.raises(ValueError):
             CatalogQuery(entity=bad)
 
@@ -463,9 +462,137 @@ def test_default_order_is_reference_then_quality(con):
     assert refs == sorted(refs, reverse=True)  # all "Yes" precede all "No"
 
 
+# --- organism entity executor -------------------------------------------------
+
+
+@pytest.fixture()
+def organism_con():
+    duckdb = pytest.importorskip("duckdb")
+    c = duckdb.connect()
+    c.execute(
+        """
+        CREATE TABLE organism (
+            ncbiTaxonomyId VARCHAR,
+            taxonomicLevelSpecies VARCHAR,
+            taxonomicLevelGenus VARCHAR,
+            taxonomicLevelDomain VARCHAR,
+            commonName VARCHAR,
+            assemblyCount BIGINT,
+            taxonomicGroup VARCHAR[]
+        )
+        """
+    )
+    rows = [
+        # taxid, species, genus, domain, common, assemblyCount, group
+        (
+            "7165",
+            "Anopheles gambiae",
+            "Anopheles",
+            "Eukaryota",
+            "mosquito",
+            12,
+            ["Inv"],
+        ),
+        ("7173", "Anopheles stephensi", "Anopheles", "Eukaryota", None, 5, ["Inv"]),
+        ("62324", "Anopheles funestus", "Anopheles", "Eukaryota", None, 3, ["Inv"]),
+        ("5476", "Candida albicans", "Candida", "Eukaryota", None, 8, ["Fungi"]),
+    ]
+    c.executemany("INSERT INTO organism VALUES (?, ?, ?, ?, ?, ?, ?)", rows)
+    yield c
+    c.close()
+
+
+def test_organism_entity_accepts_its_fields():
+    # entity="organism" validates against the organism allowlist (assemblyCount is
+    # numeric there, so a range op is fine).
+    q = CatalogQuery(
+        entity="organism",
+        filters=[Filter(field="assemblyCount", op=Op.gte, value=5)],
+    )
+    assert q.entity == "organism"
+
+
+def test_organism_rejects_assembly_only_field():
+    # `level` is assembly-only — not in the organism allowlist.
+    with pytest.raises(ValueError, match="unknown field"):
+        CatalogQuery(
+            entity="organism",
+            filters=[Filter(field="level", op=Op.eq, value="Chromosome")],
+        )
+
+
+def test_organism_clade_list_is_bounded(organism_con):
+    # The core of #1371: a clade list reports its true total and flags truncation
+    # instead of silently returning a capped page as the full set.
+    q = CatalogQuery(
+        entity="organism",
+        operation="list",
+        limit=2,
+        filters=[Filter(field="taxonomicLevelGenus", op=Op.eq, value="Anopheles")],
+    )
+    out = execute(q, organism_con)
+    assert out["total"] == 3
+    assert out["returned"] == 2
+    assert out["truncated"] is True
+    assert len(out["rows"]) == 2
+    # rows carry the organism display projection
+    assert set(out["rows"][0]) == {
+        "ncbiTaxonomyId",
+        "taxonomicLevelSpecies",
+        "commonName",
+        "assemblyCount",
+    }
+
+
+def test_organism_small_clade_not_truncated(organism_con):
+    q = CatalogQuery(
+        entity="organism",
+        operation="list",
+        filters=[Filter(field="taxonomicLevelGenus", op=Op.eq, value="Candida")],
+    )
+    out = execute(q, organism_con)
+    assert out["total"] == 1
+    assert out["truncated"] is False
+
+
+def test_organism_count(organism_con):
+    q = CatalogQuery(
+        entity="organism",
+        operation="count",
+        filters=[Filter(field="taxonomicLevelGenus", op=Op.eq, value="Anopheles")],
+    )
+    assert execute(q, organism_con) == {"total": 3}
+
+
+def test_organism_default_order_by_assembly_count(organism_con):
+    # No explicit sort: most-covered organisms first (assemblyCount desc).
+    out = execute(
+        CatalogQuery(
+            entity="organism",
+            operation="list",
+            filters=[Filter(field="taxonomicLevelGenus", op=Op.eq, value="Anopheles")],
+        ),
+        organism_con,
+    )
+    counts = [r["assemblyCount"] for r in out["rows"]]
+    assert counts == sorted(counts, reverse=True)
+    assert out["rows"][0]["ncbiTaxonomyId"] == "7165"  # 12 assemblies, the most
+
+
 def test_connect_fails_closed_on_schema_drift(tmp_path):
-    # If the catalog is missing configured columns, the engine must disable
+    # If a catalog table is missing configured columns, the engine must disable
     # itself (return None) rather than degrade — drift is a build problem to fix.
+    # Both files must exist so this exercises the drift path, not the missing-file
+    # path (assembly is loaded first, so its drift trips before organism loads).
+    pytest.importorskip("duckdb")
+    (tmp_path / "assemblies.json").write_text('[{"accession": "A1"}]')
+    (tmp_path / "organisms.json").write_text('[{"ncbiTaxonomyId": "1"}]')
+    assert connect(str(tmp_path)) is None
+
+
+def test_connect_requires_every_entity_table(tmp_path):
+    # All entities load as a unit: a present-but-alone assembly table is not
+    # enough — a missing organisms.json disables the whole engine.
     pytest.importorskip("duckdb")
     (tmp_path / "assemblies.json").write_text('[{"accession": "A1"}]')
     assert connect(str(tmp_path)) is None
@@ -533,18 +660,29 @@ def test_type_classification_is_entity_scoped():
 def test_entity_schema_rejects_misdeclaration():
     # A `list` always needs a projection.
     with pytest.raises(ValueError, match="display must be non-empty"):
-        EntitySchema(fields={"a": SCALAR}, display=())
+        EntitySchema(fields={"a": SCALAR}, display=(), source="x.json")
     # default_order / auto_facets must name configured columns (caught at import,
     # not late as malformed SQL).
     with pytest.raises(ValueError, match="unknown column"):
-        EntitySchema(fields={"a": SCALAR}, display=("a",), auto_facets=("ghost",))
+        EntitySchema(
+            fields={"a": SCALAR},
+            display=("a",),
+            source="x.json",
+            auto_facets=("ghost",),
+        )
     with pytest.raises(ValueError, match="unknown column"):
         EntitySchema(
-            fields={"a": SCALAR}, display=("a",), default_order=(("ghost", True),)
+            fields={"a": SCALAR},
+            display=("a",),
+            source="x.json",
+            default_order=(("ghost", True),),
         )
     # A display-only column (absent from fields) is a valid order/facet target.
     EntitySchema(
-        fields={"a": SCALAR}, display=("a", "b"), default_order=(("b", False),)
+        fields={"a": SCALAR},
+        display=("a", "b"),
+        source="x.json",
+        default_order=(("b", False),),
     )
 
 
