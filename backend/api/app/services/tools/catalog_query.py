@@ -15,6 +15,8 @@ Assembly-first; organism is sketched. Workflows stay on their dedicated tools.
 from __future__ import annotations
 
 import logging
+from collections.abc import Sequence
+from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 from typing import Literal, Optional, Union
@@ -23,78 +25,156 @@ from pydantic import BaseModel, Field, model_validator
 
 logger = logging.getLogger(__name__)
 
-ASSEMBLY_FIELDS: set[str] = {
-    "accession",
-    "ncbiTaxonomyId",
-    "speciesTaxonomyId",
-    "lineageTaxonomyIds",
-    "taxonomicLevelDomain",
-    "taxonomicLevelKingdom",
-    "taxonomicLevelPhylum",
-    "taxonomicLevelClass",
-    "taxonomicLevelOrder",
-    "taxonomicLevelFamily",
-    "taxonomicLevelGenus",
-    "taxonomicLevelSpecies",
-    "taxonomicLevelStrain",
-    "taxonomicLevelSerotype",
-    "taxonomicLevelIsolate",
-    "taxonomicLevelRealm",
-    "taxonomicGroup",
-    "otherTaxa",
-    "level",
-    "isRef",
-    "ploidy",
-    "priority",
-    "priorityPathogenName",
-    "annotationStatus",
-    "length",
-    "gcPercent",
-    "scaffoldN50",
-    "scaffoldL50",
-    "scaffoldCount",
-    "chromosomes",
-    "strainName",
-    "coverage",
-    "commonName",
-    "geneModelUrl",
-}
 
-ORGANISM_FIELDS: set[str] = {
-    "ncbiTaxonomyId",
-    "commonName",
-    "assemblyCount",
-    "priority",
-    "priorityPathogenName",
-    "taxonomicGroup",
-    "taxonomicLevelDomain",
-    "taxonomicLevelKingdom",
-    "taxonomicLevelPhylum",
-    "taxonomicLevelClass",
-    "taxonomicLevelOrder",
-    "taxonomicLevelFamily",
-    "taxonomicLevelGenus",
-    "taxonomicLevelSpecies",
-}
+class FieldType(str, Enum):
+    """How a queryable field is typed — decides how a filter compiles to SQL.
 
-# Field vocab per entity. Only "assembly" is queryable today (see the `entity`
-# Literal on CatalogQuery and the assembly-only table in connect()); the organism
-# vocab is kept as roadmap data — to enable it, add "organism" to that Literal and
-# load its table in connect().
-ENTITY_FIELDS: dict[str, set[str]] = {
-    "assembly": ASSEMBLY_FIELDS,
-    "organism": ORGANISM_FIELDS,
-}
+    The same column name can be typed differently per entity (e.g. otherTaxa is a
+    VARCHAR[] on assembly but scalar on organism), which is why types are declared
+    per entity in ENTITY_SCHEMA rather than in one global set.
+    """
 
-LIST_FIELDS: set[str] = {"lineageTaxonomyIds", "ploidy", "taxonomicGroup", "otherTaxa"}
-NUMERIC_FIELDS: set[str] = {
-    "length",
-    "gcPercent",
-    "scaffoldN50",
-    "scaffoldL50",
-    "scaffoldCount",
-    "chromosomes",
-    "assemblyCount",
+    SCALAR = "scalar"  # plain column: eq/ne/in/not_in (no range)
+    NUMERIC = "numeric"  # scalar that also supports range ops (gt/gte/lt/lte)
+    LIST = "list"  # VARCHAR[] column: membership; eq/in coerce to membership
+
+
+# Bare aliases so the per-entity field tables below read like a schema.
+SCALAR, NUMERIC, LIST = FieldType.SCALAR, FieldType.NUMERIC, FieldType.LIST
+
+
+@dataclass
+class EntitySchema:
+    """The catalog schema for one entity, declared once.
+
+    Each queryable field is declared with its FieldType; the derived views
+    (`field_names` / `list_fields` / `numeric_fields` / `configured_columns`) are
+    computed from that single declaration, so the allowlist, list-ness and
+    numeric-ness can never drift apart.
+    """
+
+    # Field name -> type. The model may filter / sort / facet on exactly these.
+    fields: dict[str, FieldType]
+    # Curated projection for `list` rows (bounded tokens vs SELECT *). May include
+    # display-only columns absent from `fields` (e.g. ucscBrowserUrl) — shown but
+    # not filterable; connect()'s drift check still requires them to exist.
+    display: tuple[str, ...]
+    # Default ordering for a `list` with no explicit sort, as (field, desc) terms.
+    default_order: tuple[tuple[str, bool], ...] = ()
+    # Facets auto-returned on a truncated list so the model can offer narrowing.
+    auto_facets: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        self.field_names: set[str] = set(self.fields)
+        self.list_fields: set[str] = {
+            f for f, t in self.fields.items() if t is FieldType.LIST
+        }
+        self.numeric_fields: set[str] = {
+            f for f, t in self.fields.items() if t is FieldType.NUMERIC
+        }
+        self.configured_columns: set[str] = self.field_names | set(self.display)
+        # Fail at import on a misdeclared schema rather than late with malformed
+        # SQL or an IndexError: a `list` always needs a projection, and every
+        # column named for ordering/faceting must be a configured column (so the
+        # connect() drift check guarantees it exists in the table).
+        if not self.display:
+            raise ValueError("EntitySchema.display must be non-empty")
+        referenced = {field for field, _ in self.default_order} | set(self.auto_facets)
+        unknown = referenced - self.configured_columns
+        if unknown:
+            raise ValueError(
+                f"EntitySchema default_order/auto_facets reference unknown "
+                f"column(s) {sorted(unknown)}"
+            )
+
+
+# Single source of truth for the catalog schema the query engine knows about.
+# Only "assembly" is queryable today (see the `entity` Literal on CatalogQuery and
+# the assembly-only table in connect()); the organism schema is kept as roadmap
+# data — to enable it, add "organism" to that Literal and load its table.
+ENTITY_SCHEMA: dict[str, EntitySchema] = {
+    "assembly": EntitySchema(
+        fields={
+            "accession": SCALAR,
+            "ncbiTaxonomyId": SCALAR,
+            "speciesTaxonomyId": SCALAR,
+            "lineageTaxonomyIds": LIST,
+            "taxonomicLevelDomain": SCALAR,
+            "taxonomicLevelKingdom": SCALAR,
+            "taxonomicLevelPhylum": SCALAR,
+            "taxonomicLevelClass": SCALAR,
+            "taxonomicLevelOrder": SCALAR,
+            "taxonomicLevelFamily": SCALAR,
+            "taxonomicLevelGenus": SCALAR,
+            "taxonomicLevelSpecies": SCALAR,
+            "taxonomicLevelStrain": SCALAR,
+            "taxonomicLevelSerotype": SCALAR,
+            "taxonomicLevelIsolate": SCALAR,
+            "taxonomicLevelRealm": SCALAR,
+            "taxonomicGroup": LIST,
+            "otherTaxa": LIST,
+            "level": SCALAR,
+            "isRef": SCALAR,
+            "ploidy": LIST,
+            "priority": SCALAR,
+            "priorityPathogenName": SCALAR,
+            "annotationStatus": SCALAR,
+            "length": NUMERIC,
+            "gcPercent": NUMERIC,
+            "scaffoldN50": NUMERIC,
+            "scaffoldL50": NUMERIC,
+            "scaffoldCount": NUMERIC,
+            "chromosomes": NUMERIC,
+            "strainName": SCALAR,
+            "coverage": SCALAR,
+            "commonName": SCALAR,
+            "geneModelUrl": SCALAR,
+        },
+        # ploidy is intentionally omitted from display — it's an organism-level
+        # attribute (constant across an organism's assemblies), so a per-row column
+        # is redundant. It stays a filterable field, just not displayed.
+        display=(
+            "accession",
+            "taxonomicLevelSpecies",
+            "strainName",
+            "level",
+            "isRef",
+            "length",
+            "scaffoldN50",
+            "geneModelUrl",
+            "ucscBrowserUrl",
+        ),
+        # Most relevant first: the reference assembly, then best quality (largest
+        # scaffold N50), with accession as a stable tiebreaker — beats ordering by
+        # an arbitrary accession id.
+        default_order=(("isRef", True), ("scaffoldN50", True), ("accession", False)),
+        auto_facets=("level", "isRef"),
+    ),
+    "organism": EntitySchema(
+        fields={
+            "ncbiTaxonomyId": SCALAR,
+            "commonName": SCALAR,
+            "assemblyCount": NUMERIC,
+            "priority": SCALAR,
+            "priorityPathogenName": SCALAR,
+            "taxonomicGroup": LIST,
+            "taxonomicLevelDomain": SCALAR,
+            "taxonomicLevelKingdom": SCALAR,
+            "taxonomicLevelPhylum": SCALAR,
+            "taxonomicLevelClass": SCALAR,
+            "taxonomicLevelOrder": SCALAR,
+            "taxonomicLevelFamily": SCALAR,
+            "taxonomicLevelGenus": SCALAR,
+            "taxonomicLevelSpecies": SCALAR,
+        },
+        display=(
+            "ncbiTaxonomyId",
+            "taxonomicLevelSpecies",
+            "commonName",
+            "assemblyCount",
+        ),
+        auto_facets=("taxonomicLevelDomain",),
+    ),
 }
 
 # Cap on buckets returned per faceted column (top-N by count) — keeps a facet on
@@ -126,67 +206,33 @@ _NUMERIC_DUCKDB_TYPES = {
 }
 
 
-def _schema_issues(coltypes: dict[str, str]) -> tuple[list[str], list[str]]:
-    """Compare the loaded assembly columns (name -> UPPERCASE DuckDB type) against
-    the hand-maintained allowlist. Returns (missing, mistyped):
+def _schema_issues(
+    coltypes: dict[str, str], entity: str
+) -> tuple[list[str], list[str]]:
+    """Compare an entity's loaded columns (name -> UPPERCASE DuckDB type) against
+    its declared schema. Returns (missing, mistyped):
 
     - missing: configured columns absent from the table.
     - mistyped: numeric fields not inferred numeric, or list fields not inferred
       as lists — these compile to SQL that errors or mis-sorts at query time.
+
+    Scoped to the entity's own fields: a column that is a list on another entity
+    (e.g. assembly's otherTaxa) must not be flagged just because it appears as a
+    scalar here.
     """
+    schema = ENTITY_SCHEMA[entity]
     actual = set(coltypes)
-    configured = ASSEMBLY_FIELDS | set(_DISPLAY_COLUMNS["assembly"])
-    missing = sorted(configured - actual)
+    missing = sorted(schema.configured_columns - actual)
     mistyped = sorted(
         f"{c}={coltypes[c]}"
-        for c in NUMERIC_FIELDS & actual
+        for c in schema.numeric_fields & actual
         if coltypes[c].split("(")[0] not in _NUMERIC_DUCKDB_TYPES
     ) + sorted(
         f"{c}={coltypes[c]}"
-        for c in LIST_FIELDS & actual
+        for c in schema.list_fields & actual
         if not coltypes[c].endswith("[]")
     )
     return missing, mistyped
-
-
-# Facets auto-returned on a truncated list, so the model can offer narrowing.
-_AUTO_FACET_FIELDS: dict[str, list[str]] = {
-    "assembly": ["level", "isRef"],
-    "organism": ["taxonomicLevelDomain"],
-}
-
-# Curated projection for `list` rows (keeps tokens bounded vs SELECT *).
-_DISPLAY_COLUMNS: dict[str, list[str]] = {
-    "assembly": [
-        # ploidy is intentionally omitted — it's an organism-level attribute
-        # (constant across all of an organism's assemblies), so a per-row column
-        # is redundant. It stays a filterable field, just not displayed.
-        "accession",
-        "taxonomicLevelSpecies",
-        "strainName",
-        "level",
-        "isRef",
-        "length",
-        "scaffoldN50",
-        "geneModelUrl",
-        "ucscBrowserUrl",
-    ],
-    "organism": [
-        "ncbiTaxonomyId",
-        "taxonomicLevelSpecies",
-        "commonName",
-        "assemblyCount",
-    ],
-}
-
-# Default ordering for a `list` with no explicit sort: most relevant first —
-# the reference assembly, then best quality (largest scaffold N50), with accession
-# as a stable tiebreaker. Beats ordering by an arbitrary accession id. Stored as
-# (field, desc) terms so the same _qi()-quoting / NULLS LAST builder serves both
-# this and the explicit-sort path (no raw identifiers embedded in a string).
-_DEFAULT_ORDER: dict[str, list[tuple[str, bool]]] = {
-    "assembly": [("isRef", True), ("scaffoldN50", True), ("accession", False)],
-}
 
 
 class Op(str, Enum):
@@ -242,7 +288,8 @@ class CatalogQuery(BaseModel):
         # advertises the allowed set in the tool schema.
         if self.operation == "facets" and not self.facet_by:
             raise ValueError("operation 'facets' needs at least one facet_by field")
-        allowed = ENTITY_FIELDS[self.entity]
+        schema = ENTITY_SCHEMA[self.entity]
+        allowed = schema.field_names
         referenced = (
             [f.field for f in self.filters]
             + list(self.facet_by)
@@ -256,7 +303,9 @@ class CatalogQuery(BaseModel):
             )
         # GROUP BY on a list column buckets by whole-list equality (and yields
         # list-repr keys), not per-element counts — reject it rather than mislead.
-        list_facets = sorted({c for c in self.facet_by if c in LIST_FIELDS})
+        list_fields = schema.list_fields
+        numeric_fields = schema.numeric_fields
+        list_facets = sorted({c for c in self.facet_by if c in list_fields})
         if list_facets:
             raise ValueError(
                 f"cannot facet on list field(s) {list_facets}; "
@@ -270,7 +319,7 @@ class CatalogQuery(BaseModel):
             # (A None *inside* a value list — IN (NULL, ...) — is already rejected
             # by the Filter type: list[Scalar] excludes None, so it can't occur.)
             if f.op in (Op.gt, Op.gte, Op.lt, Op.lte):
-                if f.field not in NUMERIC_FIELDS:
+                if f.field not in numeric_fields:
                     raise ValueError(
                         f"range op {f.op.value} needs a numeric field, got {f.field!r}"
                     )
@@ -284,14 +333,14 @@ class CatalogQuery(BaseModel):
             # to membership, so a list there is fine.)
             if (
                 f.op in (Op.eq, Op.ne)
-                and f.field not in LIST_FIELDS
+                and f.field not in list_fields
                 and isinstance(f.value, list)
             ):
                 raise ValueError(
                     f"{f.op.value} on {f.field!r} needs a scalar value; "
                     "use in/not_in for multiple values"
                 )
-            if f.op in (Op.contains, Op.contains_any) and f.field not in LIST_FIELDS:
+            if f.op in (Op.contains, Op.contains_any) and f.field not in list_fields:
                 raise ValueError(f"{f.op.value} needs a list field, got {f.field!r}")
             # `contains` tests one scalar element (list_contains needs a scalar);
             # a list value belongs to `contains_any`.
@@ -304,7 +353,7 @@ class CatalogQuery(BaseModel):
             # consumes a list — in/not_in/contains_any always, plus eq/ne when
             # they coerce to list membership on a list field.
             consumes_list = f.op in (Op.in_, Op.not_in, Op.contains_any) or (
-                f.op in (Op.eq, Op.ne) and f.field in LIST_FIELDS
+                f.op in (Op.eq, Op.ne) and f.field in list_fields
             )
             if consumes_list and isinstance(f.value, list) and not f.value:
                 raise ValueError(f"{f.op.value} needs a non-empty value list")
@@ -333,7 +382,7 @@ def _qi(identifier: str) -> str:
     return '"' + identifier.replace('"', '""') + '"'
 
 
-def _order_by(terms: list[tuple[str, bool]]) -> str:
+def _order_by(terms: Sequence[tuple[str, bool]]) -> str:
     """Build an ORDER BY body from (field, desc) terms — quoted, with NULLS LAST.
 
     NULLS LAST so a column with missing values keeps the rows that have data at
@@ -357,7 +406,7 @@ def _as_list(value) -> list:
 def _list_text(value) -> list[str]:
     """Stringify membership value(s) for a VARCHAR[] list column.
 
-    Every LIST_FIELDS column is VARCHAR[] (taxonomy-id lists, ploidy, ...), but
+    Every list-typed column is VARCHAR[] (taxonomy-id lists, ploidy, ...), but
     the model naturally passes a taxid as a JSON number — and
     `list_contains(VARCHAR[], INTEGER)` / `list_intersect` is a DuckDB binder
     error, not a no-match. Compare as text so a numeric taxid still works.
@@ -365,7 +414,7 @@ def _list_text(value) -> list[str]:
     return [str(v) for v in _as_list(value)]
 
 
-def _compile_predicate(f: Filter) -> tuple[str, list]:
+def _compile_predicate(f: Filter, entity: str) -> tuple[str, list]:
     col = _qi(f.field)
     if f.op is Op.is_null:
         return f"{col} IS NULL", []
@@ -375,7 +424,12 @@ def _compile_predicate(f: Filter) -> tuple[str, list]:
     # membership — a list never equals a scalar, so this is the only sensible
     # reading. Coercing it lets the model's natural `eq`/`in` phrasing work
     # without a failed round-trip.
-    if f.field in LIST_FIELDS and f.op in (Op.eq, Op.ne, Op.in_, Op.not_in):
+    if f.field in ENTITY_SCHEMA[entity].list_fields and f.op in (
+        Op.eq,
+        Op.ne,
+        Op.in_,
+        Op.not_in,
+    ):
         expr = _list_membership(col)
         if f.op in (Op.ne, Op.not_in):
             # NULL-safe negation: a row with no value is "not a member" too, so
@@ -403,7 +457,7 @@ def _compile_where(q: CatalogQuery) -> tuple[str, list]:
         return "TRUE", []
     frags, params = [], []
     for f in q.filters:
-        frag, p = _compile_predicate(f)
+        frag, p = _compile_predicate(f, q.entity)
         frags.append(frag)
         params.extend(p)
     return " AND ".join(frags), params
@@ -459,7 +513,7 @@ def connect(catalog_dir: str):
             row[0]: str(row[1]).upper()
             for row in con.execute("DESCRIBE assembly").fetchall()
         }
-        missing, mistyped = _schema_issues(coltypes)
+        missing, mistyped = _schema_issues(coltypes, "assembly")
         if missing or mistyped:
             logger.error(
                 "Catalog query disabled: assembly schema has drifted from "
@@ -499,7 +553,7 @@ def execute(q: CatalogQuery, con) -> dict:
 
     entity = _qi(q.entity)
 
-    def _facets(cols: list[str]) -> dict:
+    def _facets(cols: Sequence[str]) -> dict:
         out = {}
         for col in cols:
             qcol = _qi(col)
@@ -527,26 +581,24 @@ def execute(q: CatalogQuery, con) -> dict:
 
     # Display columns are validated against the table at connect() time (the
     # engine fails closed on drift), so the projection is trusted here.
-    cols = _DISPLAY_COLUMNS.get(q.entity)
+    schema = ENTITY_SCHEMA[q.entity]
+    cols = schema.display
     # Always emit an ORDER BY so the capped page / truncation is reproducible
     # (LIMIT without a total order is unordered).
     if q.sort:
         # Honor the requested sort, appending a stable key (the first display
         # column) as a tiebreaker so equal-sort rows can't shuffle at the boundary.
         terms = [(s.field, s.desc) for s in q.sort]
-        tiebreak = cols[0] if cols else None
-        if tiebreak and tiebreak not in {s.field for s in q.sort}:
+        tiebreak = cols[0]
+        if tiebreak not in {s.field for s in q.sort}:
             terms.append((tiebreak, False))
         order = "ORDER BY " + _order_by(terms)
     else:
-        # No explicit sort: most-relevant-first per _DEFAULT_ORDER; fall back to a
-        # stable key (or positional `1`) for any entity without a default.
-        default = _DEFAULT_ORDER.get(q.entity)
-        if default:
-            order = "ORDER BY " + _order_by(default)
-        else:
-            order = "ORDER BY " + (_qi(cols[0]) if cols else "1")
-    select = ", ".join(_qi(c) for c in cols) if cols else "*"
+        # No explicit sort: most-relevant-first per the entity's default_order;
+        # fall back to the first display column for an entity without a default.
+        default = schema.default_order
+        order = "ORDER BY " + (_order_by(default) if default else _qi(cols[0]))
+    select = ", ".join(_qi(c) for c in cols)
     cur = con.execute(
         f"SELECT {select} FROM {entity} WHERE {where} {order} "
         f"LIMIT {cap + 1} OFFSET {q.offset}",
@@ -564,7 +616,7 @@ def execute(q: CatalogQuery, con) -> dict:
         # when nothing is a reference) offers no choice, so drop it.
         auto = {
             col: buckets
-            for col, buckets in _facets(_AUTO_FACET_FIELDS.get(q.entity, [])).items()
+            for col, buckets in _facets(schema.auto_facets).items()
             if len(buckets) > 1
         }
         if auto:
