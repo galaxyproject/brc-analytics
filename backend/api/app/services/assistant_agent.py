@@ -239,10 +239,14 @@ for catalog data.
 
 ## Schema updates
 
-When the user **makes a decision** (selects an organism, picks an assembly, \
-chooses an analysis type, etc.), emit a SCHEMA_UPDATE line at the end of your \
-response with the fields that changed. Only include fields where the user has \
-committed to a choice — do NOT set fields just because you listed options.
+On every turn where the user has committed to one or more choices so far in \
+this conversation, emit a SCHEMA_UPDATE line at the end of your response. \
+Include **all** fields the user has committed to up to now — re-emit the fields \
+you set on earlier turns, not only the one that changed this turn. Re-emitting \
+the already-known fields every turn is required: it keeps the analysis tracker \
+in sync even when an earlier turn left one out. Only include a field once the \
+user has actually committed to a choice — do NOT set fields just because you \
+listed options.
 
 Format: a JSON object on its own line prefixed with "SCHEMA_UPDATE:". \
 Valid keys: organism, assembly, analysis_type, workflow, data_source, \
@@ -264,9 +268,9 @@ Example — user switches from RNA-seq to variant calling:
 SCHEMA_UPDATE: {"analysis_type": "Variant Calling", "workflow": null, \
 "data_characteristics": null, "gene_annotation": null}
 
-Only emit this when the user has actually chosen or changed something. If the \
-conversation is purely exploratory (listing options, answering questions), do \
-NOT emit it.
+Emit this line on every turn once at least one field is committed, re-stating \
+all committed fields. Only when the user has committed to nothing at all yet \
+(purely browsing or asking questions) should you omit it entirely.
 
 ## Suggestion chips
 
