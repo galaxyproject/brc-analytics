@@ -7,7 +7,7 @@ import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Tab
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { ColumnDef, RowData } from "@tanstack/react-table";
-import { Organism } from "app/views/OrganismView/types";
+import type { Organism } from "app/views/OrganismView/types";
 import { LinkProps } from "next/link";
 import Router from "next/router";
 import { ComponentProps } from "react";
