@@ -5,8 +5,8 @@ import {
   BackPageView,
 } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { JSX, useMemo } from "react";
-import { BRCDataCatalogOrganism } from "../../apis/catalog/brc-analytics-catalog/common/entities";
-import { GA2OrganismEntity } from "../../apis/catalog/ga2/entities";
+import type { BRCDataCatalogOrganism } from "../../apis/catalog/brc-analytics-catalog/common/entities";
+import type { GA2OrganismEntity } from "../../apis/catalog/ga2/entities";
 import { useStepper } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/hook";
 import { SEQUENCING_STEPS } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/constants";
 import { useConfiguredSteps } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/hook";
