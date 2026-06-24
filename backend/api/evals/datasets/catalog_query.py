@@ -86,10 +86,11 @@ class QueryCatalogShape(Evaluator):
             op = str(args.get("operation", "")).lower()
             if want_op and op != want_op:
                 continue
-            # A facets query is invalid without facet_by (execute() rejects it), so
-            # never credit a facets case that lacks one — even if the rank column
-            # is the model's choice and thus not asserted via must_facet.
-            if want_op == "facets" and not (args.get("facet_by") or []):
+            # A facets call is invalid without facet_by (execute() rejects it), so
+            # never credit one — keyed on the call's ACTUAL op, not the expected
+            # one, so an invalid facets call isn't credited even by a case that
+            # left operation unasserted (operation=None).
+            if op == "facets" and not (args.get("facet_by") or []):
                 continue
             filters = args.get("filters") or []
             if not all(

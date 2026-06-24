@@ -285,6 +285,34 @@ def test_query_shape_facets_requires_facet_by():
     assert QueryCatalogShape(operation="facets").evaluate(_ctx(out)) == 0.0
     # operation matching is case-insensitive; the facets guard must be too
     assert QueryCatalogShape(operation="FACETS").evaluate(_ctx(out)) == 0.0
+    # the invalid facets shape is rejected even when the case doesn't assert
+    # operation (keyed on the call's actual op, not the expected one)
+    assert (
+        QueryCatalogShape(
+            must_filter=[{"field": "taxonomicLevelGenus", "value": "Anopheles"}]
+        ).evaluate(
+            _ctx(
+                _FakeRun(
+                    tool_calls=[
+                        (
+                            "query_catalog",
+                            {
+                                "operation": "facets",
+                                "facet_by": [],
+                                "filters": [
+                                    {
+                                        "field": "taxonomicLevelGenus",
+                                        "value": "Anopheles",
+                                    }
+                                ],
+                            },
+                        )
+                    ]
+                )
+            )
+        )
+        == 0.0
+    )
 
 
 def test_query_shape_must_facet_membership():
