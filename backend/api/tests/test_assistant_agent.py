@@ -457,6 +457,99 @@ class TestApplySchemaUpdates:
         assert result.workflow.status == FieldStatus.FILLED
         assert result.gene_annotation.status == FieldStatus.EMPTY
 
+    def test_data_characteristics_filled_from_paired_workflow(self, agent):
+        # Read layout is a workflow constraint -- derive it from the workflow's
+        # SANGER_READ_RUN_PAIRED param instead of waiting on the model to emit it.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "VARIANT_CALLING",
+                "workflows": [
+                    {
+                        "iwcId": "ploidy-main",
+                        "trsId": "trs-ploidy",
+                        "parameters": [
+                            {"variable": "SANGER_READ_RUN_PAIRED"},
+                            {"variable": "ASSEMBLY_FASTA_URL"},
+                        ],
+                    }
+                ],
+            }
+        ]
+        result = agent._apply_schema_updates(
+            AnalysisSchema(), {"workflow": "Ploidy-aware calling (ploidy-main)"}
+        )
+        assert result.data_characteristics.status == FieldStatus.FILLED
+        assert result.data_characteristics.value == "Paired-end sequencing reads"
+
+    def test_data_characteristics_includes_library_strategy(self, agent):
+        # When the catalog declares a library strategy, fold it into the label.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "VARIANT_CALLING",
+                "workflows": [
+                    {
+                        "iwcId": "wgs-pe",
+                        "trsId": "trs-wgs",
+                        "parameters": [
+                            {
+                                "variable": "SANGER_READ_RUN_PAIRED",
+                                "data_requirements": {
+                                    "library_layout": "PAIRED",
+                                    "library_strategy": ["WGS"],
+                                },
+                            }
+                        ],
+                    }
+                ],
+            }
+        ]
+        result = agent._apply_schema_updates(
+            AnalysisSchema(), {"workflow": "WGS PE (wgs-pe)"}
+        )
+        assert result.data_characteristics.status == FieldStatus.FILLED
+        assert result.data_characteristics.value == "Paired-end WGS reads"
+
+    def test_data_characteristics_empty_when_workflow_takes_no_reads(self, agent):
+        # A workflow with no SANGER_READ_RUN param leaves data characteristics empty.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "ASSEMBLY",
+                "workflows": [
+                    {
+                        "iwcId": "asm-only",
+                        "trsId": "trs-asm",
+                        "parameters": [{"variable": "ASSEMBLY_ID"}],
+                    }
+                ],
+            }
+        ]
+        result = agent._apply_schema_updates(
+            AnalysisSchema(), {"workflow": "Assembly (asm-only)"}
+        )
+        assert result.data_characteristics.status == FieldStatus.EMPTY
+
+    def test_data_characteristics_genome_fasta_workflow(self, agent):
+        # A workflow that takes an assembled genome instead of reads -- e.g.
+        # Braker3 annotation -- characterises its input as a FASTA assembly so
+        # the field fills and the analysis can complete.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "ANNOTATION",
+                "workflows": [
+                    {
+                        "iwcId": "braker3",
+                        "trsId": "trs-braker3",
+                        "parameters": [{"variable": "ASSEMBLY_FASTA_URL"}],
+                    }
+                ],
+            }
+        ]
+        result = agent._apply_schema_updates(
+            AnalysisSchema(), {"workflow": "Braker3 annotation (braker3)"}
+        )
+        assert result.data_characteristics.status == FieldStatus.FILLED
+        assert result.data_characteristics.value == "Assembled genome (FASTA)"
+
 
 # ---------- compute_handoff ----------
 

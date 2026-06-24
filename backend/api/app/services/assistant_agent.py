@@ -1025,9 +1025,84 @@ class AssistantAgent:
 
             setattr(schema, key, field)
 
+        self._reflect_data_characteristics(schema)
         self._reflect_gene_annotation_requirement(schema)
 
         return schema
+
+    def _reflect_data_characteristics(self, schema: AnalysisSchema) -> None:
+        """Fill data characteristics from the selected workflow's read inputs.
+
+        The required read layout (paired/single) and library strategy are a
+        property of the workflow, not a user choice -- so derive them from the
+        catalog rather than relying on the model to emit a SCHEMA_UPDATE for a
+        field it (correctly) doesn't treat as user input. Always recompute when
+        a workflow is set so a workflow change refreshes the value; clear it
+        when no workflow is selected.
+        """
+        if schema.workflow.status != FieldStatus.FILLED:
+            return
+        derived = self._data_characteristics_for_workflow(schema.workflow.detail)
+        if derived is None:
+            return
+        value, detail = derived
+        schema.data_characteristics = SchemaField(
+            value=value, status=FieldStatus.FILLED, detail=detail
+        )
+
+    def _data_characteristics_for_workflow(
+        self, workflow_ref: Optional[str]
+    ) -> Optional[tuple[str, str]]:
+        """Return (display label, detail) for the data a workflow expects from
+        the user, read from its input parameters. Sequencing-read workflows
+        report the layout (PAIRED/SINGLE, encoded in the variable name) plus any
+        library strategy from a data_requirements block. Workflows that instead
+        consume an assembled genome (no reads, an ASSEMBLY_FASTA_URL input --
+        e.g. genome annotation) report that. Returns None when neither applies."""
+        if not workflow_ref:
+            return None
+        for cat in self.catalog.workflows_by_category:
+            for wf in cat.get("workflows", []):
+                if workflow_ref not in (wf.get("trsId"), wf.get("iwcId")):
+                    continue
+                for p in wf.get("parameters", []):
+                    variable = p.get("variable")
+                    if variable not in (
+                        "SANGER_READ_RUN_PAIRED",
+                        "SANGER_READ_RUN_SINGLE",
+                    ):
+                        continue
+                    req = p.get("data_requirements") or {}
+                    layout = req.get("library_layout") or (
+                        "PAIRED" if variable == "SANGER_READ_RUN_PAIRED" else "SINGLE"
+                    )
+                    layout_label = {
+                        "PAIRED": "Paired-end",
+                        "SINGLE": "Single-end",
+                    }.get(layout, layout)
+                    strategy = req.get("library_strategy") or req.get("library_source")
+                    if isinstance(strategy, list):
+                        strategy_label = "/".join(str(s) for s in strategy)
+                    else:
+                        strategy_label = strategy
+                    if strategy_label:
+                        value = f"{layout_label} {strategy_label} reads"
+                    else:
+                        value = f"{layout_label} sequencing reads"
+                    return value, "Required by the selected workflow"
+                # No sequencing-read input: workflows that consume an assembled
+                # genome directly (e.g. genome annotation) characterise their
+                # input as a FASTA assembly.
+                if any(
+                    p.get("variable") == "ASSEMBLY_FASTA_URL"
+                    for p in wf.get("parameters", [])
+                ):
+                    return (
+                        "Assembled genome (FASTA)",
+                        "Required by the selected workflow",
+                    )
+                return None
+        return None
 
     def _reflect_gene_annotation_requirement(self, schema: AnalysisSchema) -> None:
         """Mark gene annotation as needing attention when the selected workflow
