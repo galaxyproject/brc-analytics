@@ -191,3 +191,100 @@ def test_query_shape_numeric_token_is_digit_bounded():
     )
     ev = QueryCatalogShape(must_contain=["1773"])
     assert ev.evaluate(_ctx(out)) == 0.0
+
+
+def test_query_shape_must_filter_field_and_value():
+    out = _FakeRun(
+        tool_calls=[
+            (
+                "query_catalog",
+                {
+                    "operation": "count",
+                    "filters": [
+                        {
+                            "field": "taxonomicLevelGenus",
+                            "op": "eq",
+                            "value": "Anopheles",
+                        }
+                    ],
+                },
+            ),
+        ]
+    )
+    ev = QueryCatalogShape(
+        operation="count",
+        must_filter=[{"field": "taxonomicLevelGenus", "value": "Anopheles"}],
+    )
+    assert ev.evaluate(_ctx(out)) == 1.0
+
+
+def test_query_shape_must_filter_rejects_wrong_field():
+    # The value "Anopheles" is present (inside a species value) but NOT on the
+    # genus column — the old substring check would pass, the structural one must not.
+    out = _FakeRun(
+        tool_calls=[
+            (
+                "query_catalog",
+                {
+                    "filters": [
+                        {
+                            "field": "taxonomicLevelSpecies",
+                            "op": "eq",
+                            "value": "Anopheles gambiae",
+                        }
+                    ],
+                },
+            ),
+        ]
+    )
+    ev = QueryCatalogShape(
+        must_filter=[{"field": "taxonomicLevelGenus", "value": "Anopheles"}]
+    )
+    assert ev.evaluate(_ctx(out)) == 0.0
+
+
+def test_query_shape_entity_default_is_assembly():
+    # entity omitted ⇒ defaults to "assembly"
+    out = _FakeRun(tool_calls=[("query_catalog", {"operation": "count"})])
+    assert QueryCatalogShape(entity="assembly").evaluate(_ctx(out)) == 1.0
+    assert QueryCatalogShape(entity="organism").evaluate(_ctx(out)) == 0.0
+
+
+def test_query_shape_entity_organism():
+    out = _FakeRun(
+        tool_calls=[("query_catalog", {"entity": "organism", "operation": "count"})]
+    )
+    assert QueryCatalogShape(entity="organism").evaluate(_ctx(out)) == 1.0
+    assert QueryCatalogShape(entity="assembly").evaluate(_ctx(out)) == 0.0
+
+
+def test_query_shape_must_filter_list_value():
+    # value may be a list (in / contains_any); membership counts as a match
+    out = _FakeRun(
+        tool_calls=[
+            (
+                "query_catalog",
+                {
+                    "filters": [
+                        {"field": "ploidy", "op": "in", "value": ["HAPLOID", "DIPLOID"]}
+                    ]
+                },
+            ),
+        ]
+    )
+    ev = QueryCatalogShape(must_filter=[{"field": "ploidy", "value": "DIPLOID"}])
+    assert ev.evaluate(_ctx(out)) == 1.0
+
+
+def test_query_shape_must_facet_membership():
+    out = _FakeRun(
+        tool_calls=[("query_catalog", {"operation": "facets", "facet_by": ["level"]})]
+    )
+    assert (
+        QueryCatalogShape(operation="facets", must_facet=["level"]).evaluate(_ctx(out))
+        == 1.0
+    )
+    assert (
+        QueryCatalogShape(operation="facets", must_facet=["isRef"]).evaluate(_ctx(out))
+        == 0.0
+    )
