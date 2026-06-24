@@ -7,6 +7,7 @@ import { CollapsableSection } from "@databiosphere/findable-ui/lib/components/co
 import { JSX } from "react";
 import {
   buildAssemblyDetails,
+  buildOrganismDetails,
   buildWorkflowConfiguration,
   buildWorkflowDetails,
 } from "../../../../../../viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
@@ -16,6 +17,7 @@ import { Props } from "./types";
 export const SideColumn = ({
   configuredInput,
   configuredSteps,
+  organism,
   workflow,
 }: Props): JSX.Element => {
   const assembly = useAssembly();
@@ -25,6 +27,11 @@ export const SideColumn = ({
         <CollapsableSection key="workflow-details" title="Workflow Details">
           <KeyValuePairs {...buildWorkflowDetails(workflow)} />
         </CollapsableSection>
+        {organism && (
+          <CollapsableSection key="organism-details" title="Organism Details">
+            <KeyValuePairs {...buildOrganismDetails(organism)} />
+          </CollapsableSection>
+        )}
         {assembly && (
           <CollapsableSection key="assembly-details" title="Assembly Details">
             <KeyValuePairs {...buildAssemblyDetails(assembly)} />
