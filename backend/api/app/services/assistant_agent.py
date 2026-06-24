@@ -836,53 +836,81 @@ class AssistantAgent:
     def _parse_structured_output(
         self, raw_reply: str
     ) -> tuple[str, List[SuggestionChip], Dict[str, Optional[str]]]:
-        """Extract SCHEMA_UPDATE and SUGGESTIONS lines from the reply.
+        """Extract SCHEMA_UPDATE and SUGGESTIONS from the reply.
 
-        Handles common LLM formatting variations: bold markdown wrapping,
-        mixed case, extra whitespace around the prefix.
+        The marker may sit at the start of a line, inline after prose, or with
+        its JSON value spanning several lines -- smaller models don't always put
+        it on its own line, and when they don't, a line-by-line scan leaves the
+        raw JSON visible to the user. So we search the whole reply for each
+        marker and decode the JSON value that follows it, wherever it is.
+        Markdown bold/italic around the marker and mixed case are tolerated; a
+        marker not followed by valid JSON is left untouched in the text.
         """
         suggestions: List[SuggestionChip] = []
         schema_updates: Dict[str, Optional[str]] = {}
-        reply_lines = []
+        text = raw_reply
 
-        # Match SUGGESTIONS or SCHEMA_UPDATE with optional markdown bold/italic.
-        # The colon may be inside or outside the bold markers:
-        #   SUGGESTIONS: ...  |  **SUGGESTIONS:** ...  |  **SUGGESTIONS**: ...
-        suggestions_re = re.compile(
-            r"^\s*\*{0,2}suggestions:?\*{0,2}:?\s*", re.IGNORECASE
-        )
-        schema_re = re.compile(r"^\s*\*{0,2}schema_update:?\*{0,2}:?\s*", re.IGNORECASE)
-
-        for line in raw_reply.rstrip().split("\n"):
-            s_match = suggestions_re.match(line)
-            u_match = schema_re.match(line)
-            if s_match:
+        def _extract(text: str, keyword: str, validate) -> tuple[str, Any]:
+            # Optional **bold**/italic and colon on either side, anywhere in the
+            # text (not anchored to line start). \b stops it matching mid-word.
+            marker = re.compile(
+                r"\*{0,2}\b" + keyword + r"\b:?\*{0,2}:?[ \t]*", re.IGNORECASE
+            )
+            for m in marker.finditer(text):
+                rest = text[m.end() :]
+                json_at = None
+                for i, ch in enumerate(rest):
+                    if ch in "[{":
+                        json_at = m.end() + i
+                        break
+                    if not ch.isspace():
+                        break  # prose follows, not a JSON payload -- leave it
+                if json_at is None:
+                    continue
+                # The real markers are emitted in uppercase per the prompt, so
+                # only an uppercase marker is excised when its payload won't
+                # parse -- a mid-prose lowercase "suggestions: [...]" that just
+                # looks JSON-ish is left untouched rather than stripped as prose.
+                marker_is_real = keyword.upper() in m.group(0)
                 try:
-                    json_str = line[s_match.end() :].strip()
-                    items = json.loads(json_str)
-                    if isinstance(items, list):
-                        suggestions = self._build_suggestion_chips(items)
-                    else:
-                        reply_lines.append(line)
-                except (json.JSONDecodeError, TypeError):
-                    reply_lines.append(line)
-            elif u_match:
-                try:
-                    json_str = line[u_match.end() :].strip()
-                    data = json.loads(json_str)
-                    if isinstance(data, dict) and all(
-                        isinstance(k, str) and (isinstance(v, str) or v is None)
-                        for k, v in data.items()
-                    ):
-                        schema_updates = data
-                    else:
-                        reply_lines.append(line)
-                except (json.JSONDecodeError, TypeError):
-                    reply_lines.append(line)
-            else:
-                reply_lines.append(line)
+                    # raw_decode reads one JSON value and reports where it ends,
+                    # so a multi-line array/object is handled in one shot.
+                    value, end = json.JSONDecoder().raw_decode(text, json_at)
+                except json.JSONDecodeError:
+                    # The model mangled the JSON (smaller models sometimes emit
+                    # broken brackets). Excise from the marker through the last
+                    # bracket so raw JSON never reaches the user.
+                    if not marker_is_real:
+                        continue
+                    last = max(text.rfind("]"), text.rfind("}"))
+                    cut = last + 1 if last > json_at else len(text)
+                    return (text[: m.start()] + text[cut:]).strip(), None
+                if not validate(value):
+                    # Parsed but the wrong shape -- still strip a real trailer.
+                    if not marker_is_real:
+                        continue
+                    return (text[: m.start()] + text[end:]).strip(), None
+                return text[: m.start()] + text[end:], value
+            return text, None
 
-        return "\n".join(reply_lines).rstrip(), suggestions, schema_updates
+        text, parsed = _extract(text, "suggestions", lambda v: isinstance(v, list))
+        if parsed is not None:
+            suggestions = self._build_suggestion_chips(parsed)
+
+        def _valid_schema(v: Any) -> bool:
+            return isinstance(v, dict) and all(
+                isinstance(k, str) and (isinstance(val, str) or val is None)
+                for k, val in v.items()
+            )
+
+        text, parsed = _extract(text, "schema_update", _valid_schema)
+        if parsed is not None:
+            schema_updates = parsed
+
+        # Tidy whitespace left where an inline marker was spliced out.
+        text = re.sub(r"[ \t]+\n", "\n", text)
+        text = re.sub(r"\n{3,}", "\n\n", text)
+        return text.strip(), suggestions, schema_updates
 
     def _build_suggestion_chips(self, items: List[Any]) -> List[SuggestionChip]:
         """Build suggestion chips, dropping any that reference data we don't have.

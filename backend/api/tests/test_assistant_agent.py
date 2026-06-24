@@ -108,11 +108,32 @@ class TestParseStructuredOutput:
         assert suggestions == []
         assert "not valid json" in text
 
-    def test_malformed_schema_kept_as_text(self, agent):
-        raw = "SCHEMA_UPDATE: {broken"
+    def test_malformed_schema_payload_stripped(self, agent):
+        # A marker followed by a broken JSON payload is excised, not shown --
+        # raw JSON must never leak into the visible reply.
+        raw = "Recorded it. SCHEMA_UPDATE: {broken"
         text, _, updates = agent._parse_structured_output(raw)
         assert updates == {}
-        assert "{broken" in text
+        assert "SCHEMA_UPDATE" not in text
+        assert "broken" not in text
+        assert text == "Recorded it."
+
+    def test_malformed_suggestions_json_stripped_not_leaked(self, agent):
+        # Real-world MiniMax failure: a SUGGESTIONS array with broken brackets
+        # (a string where an object belongs, then a second stray array). It
+        # can't be parsed, but it must still be stripped so the user never sees
+        # raw JSON -- we just produce no chips that turn.
+        raw = (
+            "Which Plasmodium species is your data from?\n\n"
+            'SUGGESTIONS: [{"label": "Use P. falciparum", "organism": "5833"}, '
+            '{"label": "Tell me about variant calling for malaria"], '
+            '[{"label": "Tell me about transcriptomics for malaria"]'
+        )
+        text, suggestions, _ = agent._parse_structured_output(raw)
+        assert "SUGGESTIONS" not in text
+        assert "[" not in text and "{" not in text
+        assert suggestions == []
+        assert text == "Which Plasmodium species is your data from?"
 
     def test_multiline_body_preserved(self, agent):
         raw = 'Line 1\nLine 2\nLine 3\nSUGGESTIONS: ["Next"]'
@@ -130,6 +151,40 @@ class TestParseStructuredOutput:
         raw = '**SCHEMA_UPDATE:** {"organism": "E. coli"}'
         _, _, updates = agent._parse_structured_output(raw)
         assert updates == {"organism": "E. coli"}
+
+    def test_suggestions_inline_after_prose(self, agent):
+        # The marker can land inline at the end of a prose line (smaller models
+        # don't always put it on its own line). It must still be stripped, not
+        # leaked into the visible reply.
+        raw = 'Which species is your data from? SUGGESTIONS: ["P. falciparum", "P. knowlesi"]'
+        text, suggestions, _ = agent._parse_structured_output(raw)
+        assert text == "Which species is your data from?"
+        assert "SUGGESTIONS" not in text
+        assert len(suggestions) == 2
+
+    def test_suggestions_multiline_json(self, agent):
+        # A JSON value spanning multiple lines must be decoded and removed whole.
+        raw = 'Pick one.\nSUGGESTIONS: [\n  "Variant calling",\n  "Transcriptomics"\n]'
+        text, suggestions, _ = agent._parse_structured_output(raw)
+        assert text == "Pick one."
+        assert "SUGGESTIONS" not in text
+        assert len(suggestions) == 2
+
+    def test_inline_suggestions_invalid_json_left_as_prose(self, agent):
+        # A mid-prose "suggestions:" with JSON-ish but invalid text must be left
+        # alone -- only a line-start trailer is excised when it cannot parse.
+        raw = "I have a few suggestions: [check the docs, ask the forum]"
+        text, suggestions, _ = agent._parse_structured_output(raw)
+        assert text == raw
+        assert suggestions == []
+
+    def test_schema_update_inline_after_prose(self, agent):
+        # Same for SCHEMA_UPDATE emitted inline after prose.
+        raw = 'Recorded it. SCHEMA_UPDATE: {"organism": "Plasmodium falciparum"}'
+        text, _, updates = agent._parse_structured_output(raw)
+        assert "SCHEMA_UPDATE" not in text
+        assert updates == {"organism": "Plasmodium falciparum"}
+        assert text == "Recorded it."
 
     # ---- catalog-grounded suggestion chips (#1297) ----
 
