@@ -283,6 +283,8 @@ def test_query_shape_facets_requires_facet_by():
         tool_calls=[("query_catalog", {"operation": "facets", "facet_by": []})]
     )
     assert QueryCatalogShape(operation="facets").evaluate(_ctx(out)) == 0.0
+    # operation matching is case-insensitive; the facets guard must be too
+    assert QueryCatalogShape(operation="FACETS").evaluate(_ctx(out)) == 0.0
 
 
 def test_query_shape_must_facet_membership():

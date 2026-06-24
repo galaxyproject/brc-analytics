@@ -82,13 +82,14 @@ class QueryCatalogShape(Evaluator):
                 and str(args.get("entity", "assembly")).lower() != self.entity.lower()
             ):
                 continue
+            want_op = self.operation.lower() if self.operation else None
             op = str(args.get("operation", "")).lower()
-            if self.operation and op != self.operation.lower():
+            if want_op and op != want_op:
                 continue
             # A facets query is invalid without facet_by (execute() rejects it), so
             # never credit a facets case that lacks one — even if the rank column
             # is the model's choice and thus not asserted via must_facet.
-            if self.operation == "facets" and not (args.get("facet_by") or []):
+            if want_op == "facets" and not (args.get("facet_by") or []):
                 continue
             filters = args.get("filters") or []
             if not all(
