@@ -23,7 +23,7 @@ import {
   Outbreak,
   Workflow,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
-import { OUTBREAK_PRIORITY } from "../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
+import type { OUTBREAK_PRIORITY } from "../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 import {
   getGenomeOrganismId,
   getOrganismId,
