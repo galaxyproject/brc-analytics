@@ -111,8 +111,9 @@ def query_catalog(deps: AssistantDeps, query: CatalogQuery) -> str:
 
     Prefer this over enumerating rows yourself: it runs the filter/count in the
     database and returns a JSON summary correct at any scale. The summary always
-    has `total`; `list` adds `rows`/`returned`/`truncated` (capped page) and
-    `facets` when truncated; `facets` adds `facets`. Use it for "how many",
+    has `total`; `list` adds `rows`/`returned`/`truncated` (capped page) and may
+    add `facets` on truncation (only when a breakdown discriminates, so don't
+    assume it's present); `facets` adds `facets`. Use it for "how many",
     attribute filters, clade queries, and "by/per X" breakdowns. On a failure or
     when the engine is unavailable it returns a short plain-text message instead
     of JSON.
