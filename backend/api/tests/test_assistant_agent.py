@@ -550,6 +550,69 @@ class TestApplySchemaUpdates:
         assert result.data_characteristics.status == FieldStatus.FILLED
         assert result.data_characteristics.value == "Assembled genome (FASTA)"
 
+    def test_gene_annotation_filled_when_assembly_has_gene_model(self, agent):
+        # A GTF-requiring workflow whose assembly ships a gene model fills the
+        # annotation (setup resolves the URL automatically).
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "VARIANT_CALLING",
+                "workflows": [
+                    {
+                        "iwcId": "var-pe",
+                        "trsId": "trs-var",
+                        "parameters": [
+                            {"variable": "SANGER_READ_RUN_PAIRED"},
+                            {"variable": "GENE_MODEL_URL"},
+                        ],
+                    }
+                ],
+            }
+        ]
+        agent.catalog.get_assembly_details.return_value = {
+            "gene_model_url": "https://example.org/genes.gtf.gz"
+        }
+        schema = AnalysisSchema(
+            assembly=SchemaField(
+                value="P. falciparum GCF_000002765.6",
+                detail="GCF_000002765.6",
+                status=FieldStatus.FILLED,
+            )
+        )
+        result = agent._apply_schema_updates(
+            schema, {"workflow": "Variant calling (var-pe)"}
+        )
+        assert result.gene_annotation.status == FieldStatus.FILLED
+        assert result.gene_annotation.value == "Reference GTF"
+
+    def test_gene_annotation_needs_attention_when_assembly_lacks_gene_model(
+        self, agent
+    ):
+        # Same workflow, but the assembly has no gene model -> needs attention.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "VARIANT_CALLING",
+                "workflows": [
+                    {
+                        "iwcId": "var-pe",
+                        "trsId": "trs-var",
+                        "parameters": [{"variable": "GENE_MODEL_URL"}],
+                    }
+                ],
+            }
+        ]
+        agent.catalog.get_assembly_details.return_value = {"gene_model_url": "None"}
+        schema = AnalysisSchema(
+            assembly=SchemaField(
+                value="Some assembly GCF_999999999.1",
+                detail="GCF_999999999.1",
+                status=FieldStatus.FILLED,
+            )
+        )
+        result = agent._apply_schema_updates(
+            schema, {"workflow": "Variant calling (var-pe)"}
+        )
+        assert result.gene_annotation.status == FieldStatus.NEEDS_ATTENTION
+
 
 # ---------- compute_handoff ----------
 

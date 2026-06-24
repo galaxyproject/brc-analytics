@@ -1105,10 +1105,14 @@ class AssistantAgent:
         return None
 
     def _reflect_gene_annotation_requirement(self, schema: AnalysisSchema) -> None:
-        """Mark gene annotation as needing attention when the selected workflow
-        actually requires a GTF, so the panel doesn't render a required
-        annotation as "Optional" (#1324/#1331). Workflows that take no GTF leave
-        it empty/optional; a filled annotation is left untouched.
+        """Reconcile gene annotation against the workflow and assembly (#1324/#1331).
+
+        When the workflow requires a GTF: if the selected assembly ships a gene
+        model, fill it (the setup step resolves that URL automatically, and the
+        user can still override); otherwise surface it as needing attention so
+        the panel doesn't render a required annotation as "Optional". Workflows
+        that take no GTF leave it empty/optional. A filled annotation set
+        elsewhere (e.g. an explicit user choice) is left untouched.
         """
         if (
             schema.workflow.status != FieldStatus.FILLED
@@ -1116,10 +1120,32 @@ class AssistantAgent:
         ):
             return
         if self._workflow_requires_gene_model(schema.workflow.detail):
-            schema.gene_annotation.status = FieldStatus.NEEDS_ATTENTION
+            if self._assembly_gene_model_url(schema):
+                schema.gene_annotation = SchemaField(
+                    value="Reference GTF",
+                    status=FieldStatus.FILLED,
+                    detail="Auto-selected from the assembly",
+                )
+            else:
+                schema.gene_annotation.status = FieldStatus.NEEDS_ATTENTION
         elif schema.gene_annotation.status == FieldStatus.NEEDS_ATTENTION:
             # Workflow changed to one that no longer needs a GTF.
             schema.gene_annotation.status = FieldStatus.EMPTY
+
+    def _assembly_gene_model_url(self, schema: AnalysisSchema) -> Optional[str]:
+        """Return the selected assembly's gene model URL, or None when the
+        assembly is unknown or has no gene model (catalog uses the string
+        "None" for the latter)."""
+        accession = schema.assembly.detail
+        if not accession:
+            return None
+        details = self.catalog.get_assembly_details(accession)
+        if not details:
+            return None
+        url = details.get("gene_model_url")
+        if url and url != "None":
+            return url
+        return None
 
     def _workflow_requires_gene_model(self, workflow_ref: Optional[str]) -> bool:
         """True when the workflow (matched by trsId or iwcId) takes a
