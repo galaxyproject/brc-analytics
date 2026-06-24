@@ -14,6 +14,7 @@ export const CORE_SOURCE_GENOME_KEYS = [
   "length",
   "level",
   "lineageTaxonomyIds",
+  "releaseDate",
   "scaffoldCount",
   "scaffoldL50",
   "scaffoldN50",

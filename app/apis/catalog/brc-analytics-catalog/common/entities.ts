@@ -33,6 +33,7 @@ export interface BRCDataCatalogGenome {
   ploidy: ORGANISM_PLOIDY[];
   priority: OUTBREAK_PRIORITY | null;
   priorityPathogenName: string | null;
+  releaseDate: string;
   scaffoldCount: number | null;
   scaffoldL50: number | null;
   scaffoldN50: number | null;
