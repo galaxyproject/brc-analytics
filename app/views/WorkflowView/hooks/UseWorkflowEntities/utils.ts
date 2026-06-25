@@ -6,8 +6,8 @@ import { WORKFLOW_SCOPE } from "../../../../apis/catalog/brc-analytics-catalog/c
 import { sanitizeEntityId } from "../../../../apis/catalog/common/utils";
 import type { GA2OrganismEntity } from "../../../../apis/catalog/ga2/entities";
 import {
+  findOrganism,
   getAssembly,
-  getOrganisms,
 } from "../../../../services/workflows/entities";
 import type { Organism } from "../../../OrganismView/types";
 import { mapOrganismEntityToOrganism } from "../../../OrganismWorkflowInputsView/utils";
@@ -57,8 +57,7 @@ export function getWorkflowOrganismEntity(
   if (workflow.scope !== WORKFLOW_SCOPE.ORGANISM || !workflow.taxonomyId) {
     return undefined;
   }
-  const organismId = sanitizeEntityId(workflow.taxonomyId);
-  return getOrganisms<BRCDataCatalogOrganism | GA2OrganismEntity>().find(
-    (organism) => sanitizeEntityId(organism.ncbiTaxonomyId) === organismId
+  return findOrganism<BRCDataCatalogOrganism | GA2OrganismEntity>(
+    sanitizeEntityId(workflow.taxonomyId)
   );
 }

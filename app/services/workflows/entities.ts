@@ -8,7 +8,18 @@ import {
   GA2AssemblyEntity,
   GA2OrganismEntity,
 } from "../../apis/catalog/ga2/entities";
-import { getEntities, getEntity } from "./query";
+import { findEntity, getEntities, getEntity } from "./query";
+
+/**
+ * Finds an organism by entity id, returning undefined when there is no match.
+ * @param entityId - Entity id.
+ * @returns Organism, or undefined when not found.
+ */
+export function findOrganism<
+  T extends BRCDataCatalogOrganism | GA2OrganismEntity,
+>(entityId: string): T | undefined {
+  return findEntity<T>("organisms", entityId);
+}
 
 /**
  * Gets assemblies.
