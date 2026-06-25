@@ -113,7 +113,7 @@ export function makeConfig(
       },
     },
     loginEnabled,
-    maxReadRunsForBrowseAll: 60000,
+    maxReadRunsForBrowseAll: 80000,
     redirectRootToPath: "/",
     taxTree: taxTreeData,
     themeOptions: THEME_OPTIONS,
