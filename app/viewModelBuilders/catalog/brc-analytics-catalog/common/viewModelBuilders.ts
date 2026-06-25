@@ -7,6 +7,7 @@ import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Tab
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { ColumnDef, RowData } from "@tanstack/react-table";
+import type { SpeciesTag } from "app/components/Table/components/TableCell/components/SpeciesCell/types";
 import type { Organism } from "app/views/OrganismView/types";
 import { LinkProps } from "next/link";
 import Router from "next/router";
@@ -201,16 +202,41 @@ export const buildGcPercent = (
 };
 
 /**
- * Build props for the species cell.
+ * Build props for the consolidated species cell on the assembly list page.
+ * Combines the species name and taxonomy id with the populated minor taxonomy
+ * fields (strain, serotype, isolate, taxonomic group) and priority pathogen,
+ * each surfaced as a chip only when present.
  * @param genome - Genome entity.
- * @returns Props to be used for the cell.
+ * @returns Props to be used for the SpeciesCell component.
  */
-export const buildGenomeTaxonomicLevelSpecies = (
+export const buildGenomeSpecies = (
   genome: BRCDataCatalogGenome
-): ComponentProps<typeof C.Link> => {
+): ComponentProps<typeof C.SpeciesCell> => {
+  const tags: SpeciesTag[] = [];
+  const strain = getGenomeStrainText(genome);
+  if (strain) tags.push({ label: "strain", value: strain });
+  const serotype = getGenomeSerotypeText(genome);
+  if (serotype) tags.push({ label: "serotype", value: serotype });
+  const isolate = getGenomeIsolateText(genome);
+  if (isolate) tags.push({ label: "isolate", value: isolate });
+  if (genome.taxonomicGroup.length > 0)
+    tags.push({
+      label: "taxonomic group",
+      value: genome.taxonomicGroup.join(", "),
+    });
   return {
-    label: genome.taxonomicLevelSpecies,
-    url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(genome))}`,
+    ncbiTaxonomyId: genome.ncbiTaxonomyId,
+    priorityPathogen: genome.priorityPathogenName
+      ? {
+          chip: buildPriorityPathogen(genome),
+          tooltip: buildPriorityPathogenTooltip(genome),
+        }
+      : undefined,
+    species: {
+      label: genome.taxonomicLevelSpecies,
+      url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(genome))}`,
+    },
+    tags,
   };
 };
 

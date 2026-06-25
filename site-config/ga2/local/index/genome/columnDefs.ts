@@ -229,6 +229,7 @@ export const TAXONOMIC_GROUP: ColumnConfig<GA2AssemblyEntity> = {
     component: C.NTagCell,
     viewBuilder: buildTaxonomicGroup,
   } as ComponentConfig<typeof C.NTagCell, GA2AssemblyEntity>,
+  enableHiding: false,
   header: GA2_CATEGORY_LABEL.TAXONOMIC_GROUP,
   id: GA2_CATEGORY_KEY.TAXONOMIC_GROUP,
   width: { max: "0.5fr", min: "142px" },
@@ -236,12 +237,12 @@ export const TAXONOMIC_GROUP: ColumnConfig<GA2AssemblyEntity> = {
 
 export const TAXONOMIC_LEVEL_SPECIES: ColumnConfig<GA2AssemblyEntity> = {
   componentConfig: {
-    component: C.Link,
-    viewBuilder: V.buildTaxonomicLevelSpecies,
-  } as ComponentConfig<typeof C.Link, GA2AssemblyEntity>,
+    component: C.SpeciesCell,
+    viewBuilder: V.buildAssemblySpecies,
+  } as ComponentConfig<typeof C.SpeciesCell, GA2AssemblyEntity>,
   header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
   id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
-  width: { max: "1fr", min: "200px" },
+  width: { max: "1.5fr", min: "320px" },
 };
 
 export const TAXONOMIC_LEVEL_STRAIN: ColumnConfig<GA2AssemblyEntity> = {
@@ -249,6 +250,7 @@ export const TAXONOMIC_LEVEL_STRAIN: ColumnConfig<GA2AssemblyEntity> = {
     component: C.BasicCell,
     viewBuilder: buildGenomeTaxonomicLevelStrain,
   } as ComponentConfig<typeof C.BasicCell, GA2AssemblyEntity>,
+  enableHiding: false,
   header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
   id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,
   width: { max: "0.5fr", min: "160px" },
@@ -259,6 +261,7 @@ export const TAXONOMY_ID: ColumnConfig<GA2AssemblyEntity> = {
     component: C.BasicCell,
     viewBuilder: buildTaxonomyId,
   } as ComponentConfig<typeof C.BasicCell, GA2AssemblyEntity>,
+  enableHiding: false,
   header: GA2_CATEGORY_LABEL.TAXONOMY_ID,
   id: GA2_CATEGORY_KEY.TAXONOMY_ID,
   width: { max: "0.5fr", min: "144px" },

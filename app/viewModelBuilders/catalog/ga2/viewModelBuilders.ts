@@ -12,6 +12,7 @@ import {
   GA2OrganismEntity,
 } from "../../../apis/catalog/ga2/entities";
 import * as C from "../../../components";
+import type { SpeciesTag } from "../../../components/Table/components/TableCell/components/SpeciesCell/types";
 import {
   buildAnalyzeGenome,
   buildGenomeTaxonomicLevelStrain,
@@ -193,15 +194,30 @@ export const buildOrganismSpecies = (
 };
 
 /**
- * Build props for the species cell.
- * @param entity - Entity with a species property.
- * @returns Props for the Link component.
+ * Build props for the consolidated species cell on the assembly list page.
+ * Combines the species name and taxonomy id with the populated minor taxonomy
+ * fields (strain, taxonomic group), each surfaced as a chip only when present.
+ * GA2 assemblies have no serotype, isolate or priority pathogen.
+ * @param entity - Assembly entity.
+ * @returns Props to be used for the SpeciesCell component.
  */
-export const buildTaxonomicLevelSpecies = (
+export const buildAssemblySpecies = (
   entity: GA2AssemblyEntity
-): ComponentProps<typeof C.Link> => {
+): ComponentProps<typeof C.SpeciesCell> => {
+  const tags: SpeciesTag[] = [];
+  const strain = getGenomeStrainText(entity);
+  if (strain) tags.push({ label: "strain", value: strain });
+  if (entity.taxonomicGroup.length > 0)
+    tags.push({
+      label: "taxonomic group",
+      value: entity.taxonomicGroup.join(", "),
+    });
   return {
-    label: entity.taxonomicLevelSpecies,
-    url: `${ROUTES.ORGANISMS}/${sanitizeEntityId(entity.speciesTaxonomyId)}`,
+    ncbiTaxonomyId: entity.ncbiTaxonomyId,
+    species: {
+      label: entity.taxonomicLevelSpecies,
+      url: `${ROUTES.ORGANISMS}/${sanitizeEntityId(entity.speciesTaxonomyId)}`,
+    },
+    tags,
   };
 };
