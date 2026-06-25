@@ -4,19 +4,16 @@ import {
   BackPageHero,
   BackPageView,
 } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
-import { JSX, useMemo } from "react";
-import { sanitizeEntityId } from "../../apis/catalog/common/utils";
+import { JSX } from "react";
 import { useStepper } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/hook";
 import { Main } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/main";
 import { SideColumn } from "../../components/Entity/components/ConfigureWorkflowInputs/components/SideColumn/sideColumn";
 import { AssemblyContext } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/context";
 import { WorkflowEntityContext } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
-import { buildWorkflowEntityValue } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/utils";
-import { getAssembly, getWorkflow } from "../../services/workflows/entities";
+import { getWorkflow } from "../../services/workflows/entities";
 import { useConfigureInputs } from "../WorkflowInputsView/hooks/UseConfigureInputs/useConfigureInputs";
-import { Assembly } from "../WorkflowInputsView/types";
-import { mapAssemblyToOrganism } from "../WorkflowInputsView/utils";
 import { Top } from "./components/Top/top";
+import { useWorkflowEntities } from "./hooks/UseWorkflowEntities/hook";
 import { useConfiguredSteps } from "./steps/hook";
 import { Props } from "./types";
 import { StyledBackPageContentMainColumn } from "./workflowView.styles";
@@ -31,26 +28,16 @@ export const WorkflowView = ({ trsId }: Props): JSX.Element => {
   const workflow = getWorkflow(trsId);
 
   const { configuredInput, onConfigure } = useConfigureInputs();
-  const { referenceAssembly } = configuredInput;
   const { configuredSteps } = useConfiguredSteps(workflow);
   const { activeStep, onContinue, onEdit } = useStepper(configuredSteps);
   const { hasSidePanel } = configuredSteps[activeStep] || {};
 
-  const assemblyId = sanitizeEntityId(referenceAssembly);
-
-  const genome = useMemo(
-    () => (assemblyId ? getAssembly<Assembly>(assemblyId) : undefined),
-    [assemblyId]
-  );
-
-  const workflowEntityValue = useMemo(
-    () => buildWorkflowEntityValue(genome),
-    [genome]
-  );
-
-  const organism = useMemo(
-    () => (genome ? mapAssemblyToOrganism(genome) : undefined),
-    [genome]
+  // Resolve the assembly/organism that anchors the workflow config (and the ENA
+  // picker + side panel) — by reference assembly, or by the workflow's taxonomy
+  // for organism-scoped workflows.
+  const { genome, organism, workflowEntityValue } = useWorkflowEntities(
+    workflow,
+    configuredInput.referenceAssembly
   );
 
   return (
