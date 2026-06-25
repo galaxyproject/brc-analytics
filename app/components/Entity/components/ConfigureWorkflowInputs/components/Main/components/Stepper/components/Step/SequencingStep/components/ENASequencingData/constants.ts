@@ -1,6 +1,8 @@
 import { SEQUENCING_DATA_TYPE } from "../../types";
 import { ReadRun } from "./types";
 
+export const ENA_PORTAL_API_BASE_URL = `${process.env.NEXT_PUBLIC_ENA_PROXY_DOMAIN}/ena/portal/api`;
+
 export const LIBRARY_LAYOUT_TO_CONFIGURE_INPUT_KEY: Record<
   ReadRun["library_layout"],
   SEQUENCING_DATA_TYPE

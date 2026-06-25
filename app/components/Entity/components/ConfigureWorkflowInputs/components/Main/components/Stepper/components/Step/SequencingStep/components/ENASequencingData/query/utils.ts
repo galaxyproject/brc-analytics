@@ -1,23 +1,18 @@
-import taxonomyReadCounts from "./taxonomy_read_counts.json";
-
 /**
- * Determines whether ENA data should be pre-fetched by taxonomy ID.
- * Pre-fetching occurs when the read count is less than the maximum allowable count.
- * A 0 read count is not a valid value and should not be pre-fetched; the user will only be able to browse data by accession.
- * @param taxonomyId - Taxonomy ID.
- * @param maxReadRuns - Maximum allowable read runs for pre-fetching (default is 2000).
- * @returns True if ENA data by taxonomy ID should be pre-fetched.
+ * Determines whether ENA read runs should be pre-fetched for browsing, based on
+ * the live read-run count. Pre-fetching only happens when the count is known
+ * (not still loading), greater than zero, and under the browse-all cap;
+ * otherwise the user enters accessions manually at the ENA picker step.
+ * @param count - Live ENA read-run count, or undefined while it is loading.
+ * @param maxReadRuns - Maximum read runs eligible for browse-all pre-fetch.
+ * @returns True if read runs should be pre-fetched for browsing.
  */
 export function isEligible(
-  taxonomyId: string | undefined,
-  maxReadRuns: number = 2000
+  count: number | undefined,
+  maxReadRuns: number
 ): boolean {
-  if (!taxonomyId) return false;
-  const taxonomyIdReadCounts = new Map(Object.entries(taxonomyReadCounts));
-  const readCount = taxonomyIdReadCounts.get(taxonomyId);
-
-  // If the read count is not found -- or is 0, we should not pre-fetch ENA data by taxonomy ID.
-  if (!readCount) return false;
-
-  return readCount < maxReadRuns;
+  // A 0 (or still-loading) count is not browsable — there are no read runs to
+  // show, so fall through to the "Enter Accession(s)" path.
+  if (!count) return false;
+  return count < maxReadRuns;
 }
