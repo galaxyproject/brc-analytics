@@ -6,7 +6,6 @@ import { ROW_POSITION } from "@databiosphere/findable-ui/lib/components/Table/fe
 import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/features/RowPreview/constants";
 import { ROW_SELECTION_VALIDATION } from "@databiosphere/findable-ui/lib/components/Table/features/RowSelectionValidation/constants";
 import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/features/TableDownload/constants";
-import { UseQueryResult } from "@tanstack/react-query";
 import {
   functionalUpdate,
   getCoreRowModel,
@@ -19,7 +18,7 @@ import {
 } from "@tanstack/react-table";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { OnConfigure } from "../../../../../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { BaseReadRun, ReadRun } from "../../../../types";
+import { BaseReadRun, ENAReadRunsQuery, ReadRun } from "../../../../types";
 import { getSequencingData } from "../../../../utils";
 import { CATEGORY_GROUPS } from "./categoryGroups";
 import { columns } from "./columnDef";
@@ -34,7 +33,7 @@ import {
 } from "./utils";
 
 export const useTable = (
-  enaTaxonomyId: UseQueryResult<BaseReadRun[]>,
+  enaTaxonomyId: ENAReadRunsQuery,
   {
     columnFilters,
     rowSelection,

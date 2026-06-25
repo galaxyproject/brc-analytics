@@ -1,12 +1,8 @@
 import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
-import {
-  DefaultError,
-  UseQueryResult,
-  useQuery as useReactQuery,
-} from "@tanstack/react-query";
+import { DefaultError, useQuery as useReactQuery } from "@tanstack/react-query";
 import { AppSiteConfig } from "../../../../../../../../../../../../../../../site-config/common/entities";
 import { useWorkflowEntity } from "../../../../../../../../../../providers/WorkflowEntity/hook";
-import { BaseReadRun } from "../types";
+import { BaseReadRun, ENAReadRunsQuery } from "../types";
 import { countQueryFn } from "./options/countQueryFn";
 import { queryFn } from "./options/queryFn";
 import { CountQueryKey, QueryKey } from "./types";
@@ -19,9 +15,10 @@ import { isEligible } from "./utils";
  * runs themselves are only pre-fetched when that count is under the browse-all
  * cap. Otherwise the user enters accessions at the ENA picker step.
  *
- * @returns React Query result containing ENA sequencing data or an error.
+ * @returns The fields of the read-run query the picker consumes; `isLoading`
+ * covers both the count fetch and the read-run download.
  */
-export const useQuery = (): UseQueryResult<BaseReadRun[]> => {
+export const useQuery = (): ENAReadRunsQuery => {
   const { config } = useConfig();
   const { ncbiTaxonomyId } = useWorkflowEntity() ?? {};
   const { maxReadRunsForBrowseAll } = config as AppSiteConfig;
@@ -54,10 +51,13 @@ export const useQuery = (): UseQueryResult<BaseReadRun[]> => {
     queryKey: ["ReadRunsByTaxonomyId", ncbiTaxonomyId],
   });
 
-  // Treat the count fetch as part of loading, so the picker shows a spinner
-  // while the count resolves rather than briefly flashing the accession-only UI.
+  // Return only the fields the picker reads. isLoading folds in the count fetch
+  // so the picker shows a spinner while the count resolves rather than briefly
+  // flashing the accession-only UI.
   return {
-    ...query,
+    data: query.data,
+    isEnabled: query.isEnabled,
     isLoading: countQuery.isLoading || query.isLoading,
-  } as UseQueryResult<BaseReadRun[]>;
+    isSuccess: query.isSuccess,
+  };
 };

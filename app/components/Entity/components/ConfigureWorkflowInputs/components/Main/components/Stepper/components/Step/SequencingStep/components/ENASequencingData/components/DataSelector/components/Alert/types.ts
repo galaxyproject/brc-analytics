@@ -1,7 +1,6 @@
-import { UseQueryResult } from "@tanstack/react-query";
-import { BaseReadRun } from "../../../../types";
+import { ENAReadRunsQuery } from "../../../../types";
 
 export interface Props {
-  enaTaxonomyId: UseQueryResult<BaseReadRun[]>;
+  enaTaxonomyId: ENAReadRunsQuery;
   taxonomyMatches: number;
 }

@@ -24,6 +24,16 @@ export interface BaseReadRun {
   tax_lineage?: string;
 }
 
+/**
+ * Result of the ENA read-run query hook — the subset of the react-query result
+ * the picker consumes. `isLoading` covers both the live count fetch and the
+ * read-run download.
+ */
+export type ENAReadRunsQuery = Pick<
+  UseQueryResult<BaseReadRun[]>,
+  "data" | "isEnabled" | "isLoading" | "isSuccess"
+>;
+
 export interface ReadRun extends BaseReadRun {
   validation: Validation;
 }
@@ -36,7 +46,7 @@ export interface Validation {
 export interface Props {
   enaAccessionActions: Actions<BaseReadRun>;
   enaAccessionStatus: Status;
-  enaTaxonomyId: UseQueryResult<BaseReadRun[]>;
+  enaTaxonomyId: ENAReadRunsQuery;
   onConfigure: OnConfigure;
   requirementsMatches: string[];
   selectedCount: number;
