@@ -59,7 +59,7 @@ function workflowIsCompatibleWithOrganism(
   organism: Organism
 ): boolean {
   if (workflow.taxonomyId === null) return true;
-  return organism.genomes.some((genome) =>
+  return (organism.genomes ?? []).some((genome) =>
     genome.lineageTaxonomyIds.includes(workflow.taxonomyId as string)
   );
 }

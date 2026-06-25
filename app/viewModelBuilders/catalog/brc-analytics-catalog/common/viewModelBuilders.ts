@@ -7,6 +7,7 @@ import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Tab
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { ColumnDef, RowData } from "@tanstack/react-table";
+import type { Organism } from "app/views/OrganismView/types";
 import { LinkProps } from "next/link";
 import Router from "next/router";
 import { ComponentProps } from "react";
@@ -22,6 +23,7 @@ import {
   Outbreak,
   Workflow,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
+import type { OUTBREAK_PRIORITY } from "../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 import {
   getGenomeOrganismId,
   getOrganismId,
@@ -119,46 +121,12 @@ export const buildAssemblyDetails = (
 ): ComponentProps<typeof C.KeyValuePairs> => {
   const keyValuePairs = new Map<Key, Value>();
   keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
-    C.Link({
-      label: assembly.taxonomicLevelSpecies,
-      url: `${ROUTES.ORGANISMS}/${encodeURIComponent(sanitizeEntityId(assembly.speciesTaxonomyId))}`,
-    })
-  );
-  const strain = getGenomeStrainText(assembly);
-  if (strain) {
-    keyValuePairs.set(
-      BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
-      strain
-    );
-  }
-  const serotype = getGenomeSerotypeText(assembly);
-  if (serotype) {
-    keyValuePairs.set(
-      BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SEROTYPE,
-      serotype
-    );
-  }
-  const isolate = getGenomeIsolateText(assembly);
-  if (isolate) {
-    keyValuePairs.set(
-      BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_ISOLATE,
-      isolate
-    );
-  }
-  keyValuePairs.set(
     BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
     C.CopyText({
       children: assembly.accession,
       value: assembly.accession,
     })
   );
-  if ("priorityPathogenName" in assembly) {
-    keyValuePairs.set(
-      BRC_DATA_CATALOG_CATEGORY_LABEL.PRIORITY_PATHOGEN_NAME,
-      C.Chip(buildPriorityPathogen(assembly))
-    );
-  }
   return {
     KeyElType: C.KeyElType,
     KeyValuesElType: (props) => C.Stack({ ...props, gap: 4 }),
@@ -346,6 +314,64 @@ export const buildOrganismAssemblyTaxonomyIds = (
 };
 
 /**
+ * Build props for the organism details KeyValuePairs component.
+ * @param organism - Organism details (mapped from an assembly or organism source).
+ * @returns Props to be used for the KeyValuePairs component.
+ */
+export const buildOrganismDetails = (
+  organism: Organism
+): ComponentProps<typeof C.KeyValuePairs> => {
+  const {
+    ncbiTaxonomyId,
+    priorityPathogenName,
+    taxonomicLevelIsolate,
+    taxonomicLevelSerotype,
+    taxonomicLevelSpecies,
+    taxonomicLevelStrain,
+  } = organism;
+
+  const keyValuePairs = new Map<Key, Value>();
+
+  keyValuePairs.set(
+    BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
+    C.Link({
+      label: taxonomicLevelSpecies,
+      url: `${ROUTES.ORGANISMS}/${encodeURIComponent(sanitizeEntityId(ncbiTaxonomyId))}`,
+    })
+  );
+  const taxonomicLevels: [Key, string[] | undefined][] = [
+    [
+      BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
+      taxonomicLevelStrain,
+    ],
+    [
+      BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SEROTYPE,
+      taxonomicLevelSerotype,
+    ],
+    [
+      BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_ISOLATE,
+      taxonomicLevelIsolate,
+    ],
+  ];
+  for (const [label, values] of taxonomicLevels) {
+    if (values?.length) keyValuePairs.set(label, values.join(", "));
+  }
+  if (priorityPathogenName) {
+    keyValuePairs.set(
+      BRC_DATA_CATALOG_CATEGORY_LABEL.PRIORITY_PATHOGEN_NAME,
+      C.Chip(buildPriorityPathogen(organism))
+    );
+  }
+
+  return {
+    KeyElType: C.KeyElType,
+    KeyValuesElType: (props) => C.Stack({ ...props, gap: 4 }),
+    ValueElType: C.ValueElType,
+    keyValuePairs,
+  };
+};
+
+/**
  * Build props for the species cell.
  * @param organism - Organism entity.
  * @returns Props to be used for the cell.
@@ -416,12 +442,15 @@ export const buildPriority = (
 
 /**
  * Build props for the priority pathogen cell.
- * @param entity - Genome or organism entity.
+ * @param entity - Source carrying priority pathogen fields.
+ * @param entity.priority - Priority.
+ * @param entity.priorityPathogenName - Priority pathogen name.
  * @returns Props to be used for the Chip component.
  */
-export const buildPriorityPathogen = (
-  entity: BRCDataCatalogGenome | BRCDataCatalogOrganism
-): ComponentProps<typeof C.Chip> => {
+export const buildPriorityPathogen = (entity: {
+  priority?: OUTBREAK_PRIORITY | null;
+  priorityPathogenName?: string | null;
+}): ComponentProps<typeof C.Chip> => {
   const { priority, priorityPathogenName } = entity;
   return {
     color: getPriorityColor(priority),

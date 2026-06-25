@@ -8,7 +8,6 @@ import type { Organism } from "../../../app/views/OrganismView/types";
 
 describe("buildOrganismWorkflows", () => {
   const ORGANISM: Organism = {
-    assemblyCount: 2,
     genomes: [
       { lineageTaxonomyIds: ["1", "10239", "11320", "130760"] },
       { lineageTaxonomyIds: ["1", "10239", "11320", "93838"] },
@@ -240,7 +239,6 @@ describe("buildOrganismWorkflows", () => {
 
   test("returns empty array for organism with no genomes", () => {
     const emptyOrganism: Organism = {
-      assemblyCount: 0,
       genomes: [],
       ncbiTaxonomyId: "0",
       taxonomicLevelSpecies: "Empty Organism",

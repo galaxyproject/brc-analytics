@@ -15,6 +15,7 @@ import { buildWorkflowEntityValue } from "../../components/Entity/components/Con
 import { getAssembly, getWorkflow } from "../../services/workflows/entities";
 import { useConfigureInputs } from "../WorkflowInputsView/hooks/UseConfigureInputs/useConfigureInputs";
 import { Assembly } from "../WorkflowInputsView/types";
+import { mapAssemblyToOrganism } from "../WorkflowInputsView/utils";
 import { Top } from "./components/Top/top";
 import { useConfiguredSteps } from "./steps/hook";
 import { Props } from "./types";
@@ -47,6 +48,11 @@ export const WorkflowView = ({ trsId }: Props): JSX.Element => {
     [genome]
   );
 
+  const organism = useMemo(
+    () => (genome ? mapAssemblyToOrganism(genome) : undefined),
+    [genome]
+  );
+
   return (
     <WorkflowEntityContext.Provider value={workflowEntityValue}>
       <AssemblyContext.Provider value={genome ?? null}>
@@ -71,6 +77,7 @@ export const WorkflowView = ({ trsId }: Props): JSX.Element => {
                 <SideColumn
                   configuredInput={configuredInput}
                   configuredSteps={configuredSteps}
+                  organism={organism}
                   workflow={workflow}
                 />
               </BackPageContentSideColumn>

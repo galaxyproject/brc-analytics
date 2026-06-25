@@ -24,6 +24,7 @@ import { useConfigureInputs } from "./hooks/UseConfigureInputs/useConfigureInput
 import { useHandoffSync } from "./hooks/UseHandoffSync/useHandoffSync";
 import { SEQUENCING_STEP_KEYS } from "./sequencing/constants";
 import { Assembly, Props } from "./types";
+import { mapAssemblyToOrganism } from "./utils";
 import { StyledBackPageContentMainColumn } from "./workflowInputsView.styles";
 
 const DATA_STEP_KEYS = new Set([...SEQUENCING_STEP_KEYS, "sampleSheet"]);
@@ -67,6 +68,8 @@ export const WorkflowInputsView = ({ entityId, trsId }: Props): JSX.Element => {
     [genome]
   );
 
+  const organism = useMemo(() => mapAssemblyToOrganism(genome), [genome]);
+
   return (
     <WorkflowEntityContext.Provider value={workflowEntityValue}>
       <AssemblyContext.Provider value={genome}>
@@ -96,6 +99,7 @@ export const WorkflowInputsView = ({ entityId, trsId }: Props): JSX.Element => {
                       configuredInput,
                       SEQUENCING_STEPS
                     )}
+                    organism={organism}
                     workflow={workflow}
                   />
                 </BackPageContentSideColumn>
