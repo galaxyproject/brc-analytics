@@ -1931,7 +1931,10 @@ def create_taxonomy_read_run_count(genomes_tsv_path: str, output_path: str):
 
 def generate_taxon_read_run_count(taxonomy_ids):
     taxon_counter = {}
-    url = "https://www.ebi.ac.uk/ena/portal/api/search"
+    # Use ENA's dedicated /count endpoint, which returns the read-run count as a
+    # server-side aggregate (~0.6s regardless of magnitude) instead of the
+    # /search endpoint, which would download every read_run row just to len() it.
+    url = "https://www.ebi.ac.uk/ena/portal/api/count"
     counter = 0
     num_taxids = len(taxonomy_ids)
     for tId in taxonomy_ids:
@@ -1942,7 +1945,6 @@ def generate_taxon_read_run_count(taxonomy_ids):
         params = {
             "result": "read_run",
             "query": f"tax_tree({tId})",
-            "fields": "experiment_accession,study_accession",
             "format": "json",
         }
         try:
@@ -1953,7 +1955,8 @@ def generate_taxon_read_run_count(taxonomy_ids):
             time.sleep(10)
             resp = requests.get(url, params=params)
             resp.raise_for_status()
-        taxon_counter[tId] = len(resp.json())
+        # /count?format=json returns {"count": "<n>"}.
+        taxon_counter[tId] = int(resp.json()["count"])
         counter += 1
     print(f"Processed {counter} taxonomy IDs", end="\n")
     return dict(sorted(taxon_counter.items(), key=lambda x: x[1], reverse=True))
