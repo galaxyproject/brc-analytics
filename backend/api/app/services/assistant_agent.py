@@ -843,8 +843,10 @@ class AssistantAgent:
         it on its own line, and when they don't, a line-by-line scan leaves the
         raw JSON visible to the user. So we search the whole reply for each
         marker and decode the JSON value that follows it, wherever it is.
-        Markdown bold/italic around the marker and mixed case are tolerated; a
-        marker not followed by valid JSON is left untouched in the text.
+        Markdown bold/italic and mixed case are tolerated. An uppercase marker
+        (the real trailer) has its payload removed even when it will not parse,
+        so raw JSON never reaches the user; a lowercase or payload-less
+        "suggestions: ..." is treated as prose and left in place.
         """
         suggestions: List[SuggestionChip] = []
         schema_updates: Dict[str, Optional[str]] = {}
@@ -1068,9 +1070,8 @@ class AssistantAgent:
         The required read layout (paired/single) and library strategy are a
         property of the workflow, not a user choice -- so derive them from the
         catalog rather than relying on the model to emit a SCHEMA_UPDATE for a
-        field it (correctly) doesn't treat as user input. Always recompute when
-        a workflow is set so a workflow change refreshes the value; clear it
-        when no workflow is selected.
+        field it (correctly) doesn't treat as user input. Recompute whenever a
+        workflow is set so a workflow change refreshes the value.
         """
         if schema.workflow.status != FieldStatus.FILLED:
             return
@@ -1086,54 +1087,37 @@ class AssistantAgent:
         self, workflow_ref: Optional[str]
     ) -> Optional[tuple[str, str]]:
         """Return (display label, detail) for the data a workflow expects from
-        the user, read from its input parameters. Sequencing-read workflows
-        report the layout (PAIRED/SINGLE, encoded in the variable name) plus any
-        library strategy from a data_requirements block. Workflows that instead
-        consume an assembled genome (no reads, an ASSEMBLY_FASTA_URL input --
-        e.g. genome annotation) report that. Returns None when neither applies."""
-        if not workflow_ref:
+        the user, or None. Read workflows report the layout plus any library
+        strategy; workflows that consume an assembled genome report that."""
+        wf = self._workflow_by_ref(workflow_ref)
+        if wf is None:
             return None
-        for cat in self.catalog.workflows_by_category:
-            for wf in cat.get("workflows", []):
-                if workflow_ref not in (wf.get("trsId"), wf.get("iwcId")):
-                    continue
-                for p in wf.get("parameters", []):
-                    variable = p.get("variable")
-                    if variable not in (
-                        "SANGER_READ_RUN_PAIRED",
-                        "SANGER_READ_RUN_SINGLE",
-                    ):
-                        continue
-                    req = p.get("data_requirements") or {}
-                    layout = req.get("library_layout") or (
-                        "PAIRED" if variable == "SANGER_READ_RUN_PAIRED" else "SINGLE"
-                    )
-                    layout_label = {
-                        "PAIRED": "Paired-end",
-                        "SINGLE": "Single-end",
-                    }.get(layout, layout)
-                    strategy = req.get("library_strategy") or req.get("library_source")
-                    if isinstance(strategy, list):
-                        strategy_label = "/".join(str(s) for s in strategy)
-                    else:
-                        strategy_label = strategy
-                    if strategy_label:
-                        value = f"{layout_label} {strategy_label} reads"
-                    else:
-                        value = f"{layout_label} sequencing reads"
-                    return value, "Required by the selected workflow"
-                # No sequencing-read input: workflows that consume an assembled
-                # genome directly (e.g. genome annotation) characterise their
-                # input as a FASTA assembly.
-                if any(
-                    p.get("variable") == "ASSEMBLY_FASTA_URL"
-                    for p in wf.get("parameters", [])
-                ):
-                    return (
-                        "Assembled genome (FASTA)",
-                        "Required by the selected workflow",
-                    )
-                return None
+        params = wf.get("parameters", [])
+        for p in params:
+            variable = p.get("variable")
+            if variable not in ("SANGER_READ_RUN_PAIRED", "SANGER_READ_RUN_SINGLE"):
+                continue
+            req = p.get("data_requirements") or {}
+            layout = req.get("library_layout") or (
+                "PAIRED" if variable == "SANGER_READ_RUN_PAIRED" else "SINGLE"
+            )
+            layout_label = {"PAIRED": "Paired-end", "SINGLE": "Single-end"}.get(
+                layout, layout
+            )
+            strategy = req.get("library_strategy") or req.get("library_source")
+            if isinstance(strategy, list):
+                strategy_label = "/".join(str(s) for s in strategy)
+            else:
+                strategy_label = strategy
+            if strategy_label:
+                value = f"{layout_label} {strategy_label} reads"
+            else:
+                value = f"{layout_label} sequencing reads"
+            return value, "Required by the selected workflow"
+        # No sequencing-read input: workflows that consume an assembled genome
+        # directly (e.g. genome annotation) characterise their input as a FASTA.
+        if any(p.get("variable") == "ASSEMBLY_FASTA_URL" for p in params):
+            return "Assembled genome (FASTA)", "Required by the selected workflow"
         return None
 
     def _reflect_gene_annotation_requirement(self, schema: AnalysisSchema) -> None:
@@ -1179,19 +1163,23 @@ class AssistantAgent:
             return url
         return None
 
-    def _workflow_requires_gene_model(self, workflow_ref: Optional[str]) -> bool:
-        """True when the workflow (matched by trsId or iwcId) takes a
-        GENE_MODEL_URL parameter."""
+    def _workflow_by_ref(self, workflow_ref: Optional[str]) -> Optional[Dict[str, Any]]:
+        """Return the catalog workflow dict matched by trsId or iwcId, or None."""
         if not workflow_ref:
-            return False
+            return None
         for cat in self.catalog.workflows_by_category:
             for wf in cat.get("workflows", []):
                 if workflow_ref in (wf.get("trsId"), wf.get("iwcId")):
-                    return any(
-                        p.get("variable") == "GENE_MODEL_URL"
-                        for p in wf.get("parameters", [])
-                    )
-        return False
+                    return wf
+        return None
+
+    def _workflow_requires_gene_model(self, workflow_ref: Optional[str]) -> bool:
+        """True when the workflow (matched by trsId or iwcId) takes a
+        GENE_MODEL_URL parameter."""
+        wf = self._workflow_by_ref(workflow_ref)
+        return wf is not None and any(
+            p.get("variable") == "GENE_MODEL_URL" for p in wf.get("parameters", [])
+        )
 
     def _find_assembly_accession(
         self, value: str, schema: AnalysisSchema
