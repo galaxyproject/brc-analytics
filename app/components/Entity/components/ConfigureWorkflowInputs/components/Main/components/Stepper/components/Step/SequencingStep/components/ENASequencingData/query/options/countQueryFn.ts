@@ -26,6 +26,14 @@ export function countQueryFn(): (
       signal,
     }).json<{ count: string }>();
 
-    return Number(count);
+    // Validate the response; throw on anything non-finite or negative so the
+    // query is treated as an error (which falls back to the accession path)
+    // rather than caching NaN/garbage.
+    const parsedCount = Number(count);
+    if (!Number.isFinite(parsedCount) || parsedCount < 0) {
+      throw new Error(`Unexpected ENA read-run count response: ${count}`);
+    }
+
+    return parsedCount;
   };
 }

@@ -9,6 +9,14 @@ describe("isEligible", () => {
     expect(isEligible(0, 60000)).toBe(false);
   });
 
+  test("returns false for a negative count", () => {
+    expect(isEligible(-1, 60000)).toBe(false);
+  });
+
+  test("returns false for a NaN count", () => {
+    expect(isEligible(NaN, 60000)).toBe(false);
+  });
+
   test("returns true when count is between 1 and the cap", () => {
     expect(isEligible(123, 60000)).toBe(true);
   });

@@ -11,8 +11,8 @@ export function isEligible(
   count: number | undefined,
   maxReadRuns: number
 ): boolean {
-  // A 0 (or still-loading) count is not browsable — there are no read runs to
-  // show, so fall through to the "Enter Accession(s)" path.
-  if (!count) return false;
-  return count < maxReadRuns;
+  // Eligible only when the count is known, positive, and under the cap. A 0,
+  // negative, NaN, or still-loading count falls through to the
+  // "Enter Accession(s)" path.
+  return count !== undefined && count > 0 && count < maxReadRuns;
 }
