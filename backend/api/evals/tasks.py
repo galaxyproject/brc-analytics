@@ -145,9 +145,7 @@ def build_deps(skip_env_vars: Optional[set[str]] = None) -> EvalDeps:
     cache = _make_cache()
     catalog = CatalogData(settings.CATALOG_PATH)
     sra_mirror = (
-        SRAMirrorService(settings.SRA_MIRROR_PATH)
-        if settings.SRA_MIRROR_PATH
-        else None
+        SRAMirrorService(settings.SRA_MIRROR_PATH) if settings.SRA_MIRROR_PATH else None
     )
     return EvalDeps(
         settings=settings, cache=cache, catalog=catalog, sra_mirror=sra_mirror
