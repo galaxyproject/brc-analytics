@@ -48,3 +48,4 @@ export {
 export { VersionInfoWithServerStatus } from "./Layout/components/Footer/components/VersionInfoWithServerStatus/versionInfoWithServerStatus";
 export { AuthButton } from "./Layout/components/Header/components/AuthButton/authButton";
 export { AnalyzeGenome } from "./Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
+export { SpeciesCell } from "./Table/components/TableCell/components/SpeciesCell/speciesCell";

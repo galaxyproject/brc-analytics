@@ -7,7 +7,9 @@ import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Tab
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { ColumnDef, RowData } from "@tanstack/react-table";
+import type { SpeciesTag } from "app/components/Table/components/TableCell/components/SpeciesCell/types";
 import type { Organism } from "app/views/OrganismView/types";
+import { parseISO } from "date-fns";
 import { LinkProps } from "next/link";
 import Router from "next/router";
 import { ComponentProps } from "react";
@@ -37,6 +39,7 @@ import { SLUGIFY_OPTIONS } from "../../../../common/constants";
 import * as C from "../../../../components";
 import { StepConfig } from "../../../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { KeyValueSection } from "../../../../components/Entity/components/Section/KeyValueSection/keyValueSection";
+import { formatDate } from "../../../../utils/date-fns";
 import {
   getPriorityColor,
   getPriorityLabel,
@@ -201,16 +204,42 @@ export const buildGcPercent = (
 };
 
 /**
- * Build props for the species cell.
+ * Build props for the consolidated species cell on the assembly list page.
+ * Combines the species name and taxonomy id with the populated minor taxonomy
+ * fields (strain, serotype, isolate, taxonomic group) and priority pathogen,
+ * each surfaced as a chip only when present.
  * @param genome - Genome entity.
- * @returns Props to be used for the cell.
+ * @returns Props to be used for the SpeciesCell component.
  */
-export const buildGenomeTaxonomicLevelSpecies = (
+export const buildGenomeSpecies = (
   genome: BRCDataCatalogGenome
-): ComponentProps<typeof C.Link> => {
+): ComponentProps<typeof C.SpeciesCell> => {
+  const tags: SpeciesTag[] = [];
+  const strain = getGenomeStrainText(genome);
+  if (strain) tags.push({ label: "strain", value: strain });
+  const serotype = getGenomeSerotypeText(genome);
+  if (serotype) tags.push({ label: "serotype", value: serotype });
+  const isolate = getGenomeIsolateText(genome);
+  if (isolate) tags.push({ label: "isolate", value: isolate });
+  if (genome.taxonomicGroup.length > 0)
+    tags.push({
+      label: "group",
+      value: genome.taxonomicGroup.join(", "),
+    });
+  if (genome.priority)
+    tags.push({
+      color: getPriorityColor(genome.priority),
+      label: "priority",
+      tooltip: genome.priorityPathogenName ?? undefined,
+      value: genome.priority.toLowerCase().replace(/_/g, " "),
+    });
   return {
-    label: genome.taxonomicLevelSpecies,
-    url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(genome))}`,
+    ncbiTaxonomyId: genome.ncbiTaxonomyId,
+    species: {
+      label: genome.taxonomicLevelSpecies,
+      url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(genome))}`,
+    },
+    tags,
   };
 };
 
@@ -700,6 +729,37 @@ export const buildTaxonomicLevelRealm = (
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.taxonomicLevelRealm,
+  };
+};
+
+/**
+ * Build props for the release date cell, displaying the release year.
+ * @param entity - Entity with a releaseDate property.
+ * @returns Props for the BasicCell component.
+ */
+export const buildReleaseDate = (
+  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: entity.releaseDate
+      ? formatDate(parseISO(entity.releaseDate), "yyyy")
+      : "",
+  };
+};
+
+/**
+ * Build props for the release date tooltip, showing the full release date.
+ * @param entity - Entity with a releaseDate property.
+ * @returns Props for the Tooltip component.
+ */
+export const buildReleaseDateTooltip = (
+  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+): Omit<ComponentProps<typeof C.Tooltip>, "children"> => {
+  return {
+    arrow: true,
+    title: entity.releaseDate
+      ? formatDate(parseISO(entity.releaseDate))
+      : undefined,
   };
 };
 

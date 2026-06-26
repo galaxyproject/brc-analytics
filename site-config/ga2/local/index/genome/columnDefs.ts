@@ -15,6 +15,8 @@ import {
   buildIsRef,
   buildLength,
   buildLevel,
+  buildReleaseDate,
+  buildReleaseDateTooltip,
   buildScaffoldCount,
   buildScaffoldL50,
   buildScaffoldN50,
@@ -32,7 +34,6 @@ import * as V from "../../../../../app/viewModelBuilders/catalog/ga2/viewModelBu
 import { GA2_CATEGORY_KEY, GA2_CATEGORY_LABEL } from "../../../category";
 
 export const ACCESSION: ColumnConfig<GA2AssemblyEntity> = {
-  columnPinned: true,
   componentConfig: {
     component: C.BasicCell,
     viewBuilder: buildAccession,
@@ -122,6 +123,22 @@ export const LEVEL: ColumnConfig<GA2AssemblyEntity> = {
   header: GA2_CATEGORY_LABEL.LEVEL,
   id: GA2_CATEGORY_KEY.LEVEL,
   width: { max: "0.5fr", min: "142px" },
+};
+
+export const RELEASE_DATE: ColumnConfig<GA2AssemblyEntity> = {
+  componentConfig: {
+    children: [
+      {
+        component: C.BasicCell,
+        viewBuilder: buildReleaseDate,
+      } as ComponentConfig<typeof C.BasicCell, GA2AssemblyEntity>,
+    ],
+    component: C.Tooltip,
+    viewBuilder: buildReleaseDateTooltip,
+  } as ComponentConfig<typeof C.Tooltip, GA2AssemblyEntity>,
+  header: GA2_CATEGORY_LABEL.RELEASE_DATE,
+  id: GA2_CATEGORY_KEY.RELEASE_DATE,
+  width: { max: "1fr", min: "120px" },
 };
 
 export const SCAFFOLD_COUNT: ColumnConfig<GA2AssemblyEntity> = {
@@ -229,19 +246,21 @@ export const TAXONOMIC_GROUP: ColumnConfig<GA2AssemblyEntity> = {
     component: C.NTagCell,
     viewBuilder: buildTaxonomicGroup,
   } as ComponentConfig<typeof C.NTagCell, GA2AssemblyEntity>,
+  enableHiding: false,
   header: GA2_CATEGORY_LABEL.TAXONOMIC_GROUP,
   id: GA2_CATEGORY_KEY.TAXONOMIC_GROUP,
   width: { max: "0.5fr", min: "142px" },
 };
 
 export const TAXONOMIC_LEVEL_SPECIES: ColumnConfig<GA2AssemblyEntity> = {
+  columnPinned: true,
   componentConfig: {
-    component: C.Link,
-    viewBuilder: V.buildTaxonomicLevelSpecies,
-  } as ComponentConfig<typeof C.Link, GA2AssemblyEntity>,
+    component: C.SpeciesCell,
+    viewBuilder: V.buildAssemblySpecies,
+  } as ComponentConfig<typeof C.SpeciesCell, GA2AssemblyEntity>,
   header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
   id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
-  width: { max: "1fr", min: "200px" },
+  width: { max: "1.5fr", min: "340px" },
 };
 
 export const TAXONOMIC_LEVEL_STRAIN: ColumnConfig<GA2AssemblyEntity> = {
@@ -249,6 +268,7 @@ export const TAXONOMIC_LEVEL_STRAIN: ColumnConfig<GA2AssemblyEntity> = {
     component: C.BasicCell,
     viewBuilder: buildGenomeTaxonomicLevelStrain,
   } as ComponentConfig<typeof C.BasicCell, GA2AssemblyEntity>,
+  enableHiding: false,
   header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
   id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,
   width: { max: "0.5fr", min: "160px" },
@@ -259,6 +279,7 @@ export const TAXONOMY_ID: ColumnConfig<GA2AssemblyEntity> = {
     component: C.BasicCell,
     viewBuilder: buildTaxonomyId,
   } as ComponentConfig<typeof C.BasicCell, GA2AssemblyEntity>,
+  enableHiding: false,
   header: GA2_CATEGORY_LABEL.TAXONOMY_ID,
   id: GA2_CATEGORY_KEY.TAXONOMY_ID,
   width: { max: "0.5fr", min: "144px" },
