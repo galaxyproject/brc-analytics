@@ -522,6 +522,7 @@ def get_genome_row(genome_info):
         .get("infraspecific_names", {})
         .get("strain", ""),
         "taxonomyId": str(genome_info["organism"]["tax_id"]),
+        "releaseDate": genome_info["assembly_info"]["release_date"],
         "accession": genome_info["accession"],
         "currentAccession": genome_info.get(
             "current_accession", genome_info["accession"]

@@ -25177,6 +25177,13 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
+                                                                    "name": "Orthoflavivirus loupingi",
+                                                                    "ncbi_tax_id": "3048184",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
                                                                     "name": "Orthoflavivirus murrayense",
                                                                     "ncbi_tax_id": "3048215",
                                                                     "rank": "species"
@@ -25235,13 +25242,6 @@
                                                                     "children": [],
                                                                     "name": "Orthoflavivirus louisense",
                                                                     "ncbi_tax_id": "3052468",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Orthoflavivirus mediterranense",
-                                                                    "ncbi_tax_id": "3703354",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -25346,8 +25346,8 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Orthopicobirnavirus equi",
-                                                                    "ncbi_tax_id": "2956251",
+                                                                    "name": "Orthopicobirnavirus hominis",
+                                                                    "ncbi_tax_id": "2956252",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -25793,8 +25793,8 @@
                                                                 {
                                                                     "assembly_count": 2,
                                                                     "children": [],
-                                                                    "name": "Hepatovirus fejalco",
-                                                                    "ncbi_tax_id": "3429217",
+                                                                    "name": "Hepatovirus ahepa",
+                                                                    "ncbi_tax_id": "3407641",
                                                                     "rank": "species"
                                                                 }
                                                             ],
@@ -28272,13 +28272,6 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Betatorquevirus homini32",
-                                                                    "ncbi_tax_id": "3048399",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
                                                                     "name": "Betatorquevirus homini2",
                                                                     "ncbi_tax_id": "3048400",
                                                                     "rank": "species"
@@ -28330,6 +28323,13 @@
                                                                     "children": [],
                                                                     "name": "Betatorquevirus homini9",
                                                                     "ncbi_tax_id": "3048407",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Betatorquevirus homini18",
+                                                                    "ncbi_tax_id": "3050361",
                                                                     "rank": "species"
                                                                 },
                                                                 {
@@ -28712,6 +28712,13 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
+                                                                    "name": "Mastadenovirus caesari",
+                                                                    "ncbi_tax_id": "3241411",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
                                                                     "name": "Mastadenovirus dominans",
                                                                     "ncbi_tax_id": "3241420",
                                                                     "rank": "species"
@@ -28735,13 +28742,6 @@
                                                                     "children": [],
                                                                     "name": "Mastadenovirus russelli",
                                                                     "ncbi_tax_id": "3241445",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Mastadenovirus hylobatidae",
-                                                                    "ncbi_tax_id": "3703201",
                                                                     "rank": "species"
                                                                 }
                                                             ],

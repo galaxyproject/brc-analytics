@@ -30,6 +30,7 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
     ploidy: [ORGANISM_PLOIDY.DIPLOID],
     priority: null,
     priorityPathogenName: null,
+    releaseDate: "2026-06-24",
     scaffoldCount: null,
     scaffoldL50: null,
     scaffoldN50: null,
