@@ -244,6 +244,20 @@ export const buildGenomeSpecies = (
 };
 
 /**
+ * Build props for the species cell on the organism detail page assembly table.
+ * Same as buildGenomeSpecies but with an empty species url — the species is the
+ * page's own organism, so Link renders the name as plain text (no self-link).
+ * @param genome - Genome entity.
+ * @returns Props to be used for the SpeciesCell component.
+ */
+export const buildOrganismGenomeSpecies = (
+  genome: BRCDataCatalogGenome
+): ComponentProps<typeof C.SpeciesCell> => {
+  const props = buildGenomeSpecies(genome);
+  return { ...props, species: { ...props.species, url: "" } };
+};
+
+/**
  * Build props for the strain cell.
  * @param entity - Entity with a strainName and taxonomicLevelStrain property.
  * @returns Props to be used for the BasicCell component.
@@ -941,40 +955,17 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
       meta: { width: "auto" },
     },
     {
+      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
+      cell: ({ row }) =>
+        C.SpeciesCell(buildOrganismGenomeSpecies(row.original)),
+      header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
+      meta: { columnPinned: true, width: { max: "1.5fr", min: "340px" } },
+    },
+    {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION,
       cell: ({ row }) => C.BasicCell(buildAccession(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
-      meta: { columnPinned: true, width: { max: "1fr", min: "164px" } },
-    },
-    {
-      accessorFn: (row) => getGenomeStrainText(row),
-      cell: ({ row }) =>
-        C.BasicCell(buildGenomeTaxonomicLevelStrain(row.original)),
-      header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
-      id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,
-      meta: { width: { max: "0.5fr", min: "180px" } },
-    },
-    {
-      accessorFn: (row) => getGenomeSerotypeText(row),
-      cell: ({ row }) =>
-        C.BasicCell(buildGenomeTaxonomicLevelSerotype(row.original)),
-      header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SEROTYPE,
-      id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SEROTYPE,
-      meta: { width: { max: "0.5fr", min: "180px" } },
-    },
-    {
-      accessorFn: (row) => getGenomeIsolateText(row),
-      cell: ({ row }) =>
-        C.BasicCell(buildGenomeTaxonomicLevelIsolate(row.original)),
-      header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_ISOLATE,
-      id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ISOLATE,
-      meta: { width: { max: "0.5fr", min: "180px" } },
-    },
-    {
-      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMY_ID,
-      cell: ({ row }) => C.BasicCell(buildTaxonomyId(row.original)),
-      header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMY_ID,
-      meta: { width: { max: "0.5fr", min: "144px" } },
+      meta: { width: { max: "1fr", min: "164px" } },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.IS_REF,

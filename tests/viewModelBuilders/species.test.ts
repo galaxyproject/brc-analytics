@@ -4,8 +4,14 @@ jest.mock("app/components", () => ({}));
 
 import type { BRCDataCatalogGenome } from "../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import type { GA2AssemblyEntity } from "../../app/apis/catalog/ga2/entities";
-import { buildGenomeSpecies } from "../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { buildAssemblySpecies } from "../../app/viewModelBuilders/catalog/ga2/viewModelBuilders";
+import {
+  buildGenomeSpecies,
+  buildOrganismGenomeSpecies,
+} from "../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import {
+  buildAssemblySpecies,
+  buildOrganismAssemblySpecies,
+} from "../../app/viewModelBuilders/catalog/ga2/viewModelBuilders";
 
 describe("buildGenomeSpecies", () => {
   test("surfaces species, taxonomy id and all populated minor fields", () => {
@@ -96,5 +102,46 @@ describe("buildAssemblySpecies", () => {
     const props = buildAssemblySpecies(assembly);
 
     expect(props.tags).toEqual([]);
+  });
+});
+
+describe("organism detail species cell (no self-link)", () => {
+  test("buildOrganismGenomeSpecies blanks the species url, keeps tags", () => {
+    const genome = {
+      ncbiTaxonomyId: "5833",
+      speciesTaxonomyId: "5833",
+      strainName: "3D7",
+      taxonomicGroup: [],
+      taxonomicLevelIsolate: "None",
+      taxonomicLevelSerotype: "None",
+      taxonomicLevelSpecies: "Plasmodium falciparum",
+      taxonomicLevelStrain: "3D7",
+    } as unknown as BRCDataCatalogGenome;
+
+    const props = buildOrganismGenomeSpecies(genome);
+
+    expect(props.species.label).toBe("Plasmodium falciparum");
+    expect(props.species.url).toBe("");
+    expect(props.tags).toEqual([{ label: "strain", value: "3D7" }]);
+  });
+
+  test("buildOrganismAssemblySpecies blanks the species url, keeps tags", () => {
+    const assembly = {
+      ncbiTaxonomyId: "9606",
+      speciesTaxonomyId: "9606",
+      strainName: "",
+      taxonomicGroup: ["Vertebrates"],
+      taxonomicLevelSpecies: "Homo sapiens",
+      taxonomicLevelStrain: "GRCh38",
+    } as unknown as GA2AssemblyEntity;
+
+    const props = buildOrganismAssemblySpecies(assembly);
+
+    expect(props.species.label).toBe("Homo sapiens");
+    expect(props.species.url).toBe("");
+    expect(props.tags).toEqual([
+      { label: "strain", value: "GRCh38" },
+      { label: "group", value: "Vertebrates" },
+    ]);
   });
 });
