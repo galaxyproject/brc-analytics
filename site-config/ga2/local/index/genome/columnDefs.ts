@@ -32,7 +32,6 @@ import * as V from "../../../../../app/viewModelBuilders/catalog/ga2/viewModelBu
 import { GA2_CATEGORY_KEY, GA2_CATEGORY_LABEL } from "../../../category";
 
 export const ACCESSION: ColumnConfig<GA2AssemblyEntity> = {
-  columnPinned: true,
   componentConfig: {
     component: C.BasicCell,
     viewBuilder: buildAccession,
@@ -236,13 +235,14 @@ export const TAXONOMIC_GROUP: ColumnConfig<GA2AssemblyEntity> = {
 };
 
 export const TAXONOMIC_LEVEL_SPECIES: ColumnConfig<GA2AssemblyEntity> = {
+  columnPinned: true,
   componentConfig: {
     component: C.SpeciesCell,
     viewBuilder: V.buildAssemblySpecies,
   } as ComponentConfig<typeof C.SpeciesCell, GA2AssemblyEntity>,
   header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
   id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
-  width: { max: "1.5fr", min: "320px" },
+  width: { max: "1.5fr", min: "340px" },
 };
 
 export const TAXONOMIC_LEVEL_STRAIN: ColumnConfig<GA2AssemblyEntity> = {

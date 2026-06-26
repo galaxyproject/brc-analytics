@@ -221,17 +221,18 @@ export const buildGenomeSpecies = (
   if (isolate) tags.push({ label: "isolate", value: isolate });
   if (genome.taxonomicGroup.length > 0)
     tags.push({
-      label: "taxonomic group",
+      label: "group",
       value: genome.taxonomicGroup.join(", "),
+    });
+  if (genome.priority)
+    tags.push({
+      color: getPriorityColor(genome.priority),
+      label: "priority",
+      tooltip: genome.priorityPathogenName ?? undefined,
+      value: genome.priority.toLowerCase().replace(/_/g, " "),
     });
   return {
     ncbiTaxonomyId: genome.ncbiTaxonomyId,
-    priorityPathogen: genome.priorityPathogenName
-      ? {
-          chip: buildPriorityPathogen(genome),
-          tooltip: buildPriorityPathogenTooltip(genome),
-        }
-      : undefined,
     species: {
       label: genome.taxonomicLevelSpecies,
       url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(genome))}`,

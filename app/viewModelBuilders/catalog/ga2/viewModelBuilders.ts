@@ -209,7 +209,7 @@ export const buildAssemblySpecies = (
   if (strain) tags.push({ label: "strain", value: strain });
   if (entity.taxonomicGroup.length > 0)
     tags.push({
-      label: "taxonomic group",
+      label: "group",
       value: entity.taxonomicGroup.join(", "),
     });
   return {

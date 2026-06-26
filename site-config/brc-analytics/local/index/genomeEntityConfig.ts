@@ -143,16 +143,6 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
         width: "auto",
       },
       {
-        columnPinned: true,
-        componentConfig: {
-          component: C.BasicCell,
-          viewBuilder: V.buildAccession,
-        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION,
-        width: { max: "1fr", min: "164px" },
-      },
-      {
         componentConfig: {
           component: C.BasicCell,
           viewBuilder: V.buildTaxonomicLevelDomain,
@@ -225,13 +215,23 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
         width: { max: "1fr", min: "212px" },
       },
       {
+        columnPinned: true,
         componentConfig: {
           component: C.SpeciesCell,
           viewBuilder: V.buildGenomeSpecies,
         } as ComponentConfig<typeof C.SpeciesCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
-        width: { max: "1.5fr", min: "320px" },
+        width: { max: "1.5fr", min: "340px" },
+      },
+      {
+        componentConfig: {
+          component: C.BasicCell,
+          viewBuilder: V.buildAccession,
+        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
+        id: BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION,
+        width: { max: "1fr", min: "164px" },
       },
       {
         componentConfig: {
@@ -303,7 +303,6 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
           component: C.Tooltip,
           viewBuilder: V.buildPriorityPathogenTooltip,
         } as ComponentConfig<typeof C.Tooltip, BRCDataCatalogGenome>,
-        enableHiding: false,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.PRIORITY_PATHOGEN_NAME,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.PRIORITY_PATHOGEN_NAME,
         width: { max: "0.5fr", min: "142px" },
@@ -398,7 +397,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
         id: BRC_DATA_CATALOG_CATEGORY_KEY.ANNOTATION_STATUS,
         width: { max: "0.5fr", min: "180px" },
       },
-      COLUMN_REGISTRY.PRIORITY,
+      { ...COLUMN_REGISTRY.PRIORITY, enableHiding: false },
     ],
     tableOptions: {
       downloadFilename: "assemblies",

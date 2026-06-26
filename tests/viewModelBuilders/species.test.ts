@@ -8,10 +8,10 @@ import { buildGenomeSpecies } from "../../app/viewModelBuilders/catalog/brc-anal
 import { buildAssemblySpecies } from "../../app/viewModelBuilders/catalog/ga2/viewModelBuilders";
 
 describe("buildGenomeSpecies", () => {
-  test("surfaces species, taxonomy id, all populated minor fields and priority pathogen", () => {
+  test("surfaces species, taxonomy id and all populated minor fields", () => {
     const genome = {
       ncbiTaxonomyId: "208964",
-      priority: "HIGH",
+      priority: "CRITICAL",
       priorityPathogenName: "Pseudomonas aeruginosa",
       speciesTaxonomyId: "287",
       strainName: "PAO1",
@@ -31,18 +31,19 @@ describe("buildGenomeSpecies", () => {
       { label: "strain", value: "PAO1" },
       { label: "serotype", value: "O1" },
       { label: "isolate", value: "ISO-1" },
-      { label: "taxonomic group", value: "Bacteria, Proteobacteria" },
+      { label: "group", value: "Bacteria, Proteobacteria" },
+      {
+        color: "warning",
+        label: "priority",
+        tooltip: "Pseudomonas aeruginosa",
+        value: "critical",
+      },
     ]);
-    expect(props.priorityPathogen?.chip.label).toBe("Pseudomonas aeruginosa");
-    expect(props.priorityPathogen?.tooltip.title).toBe(
-      "Pseudomonas aeruginosa - High Priority"
-    );
   });
 
-  test("omits unpopulated minor fields and priority pathogen", () => {
+  test("omits unpopulated minor fields", () => {
     const genome = {
       ncbiTaxonomyId: "5833",
-      priorityPathogenName: null,
       speciesTaxonomyId: "5833",
       strainName: "",
       taxonomicGroup: [],
@@ -57,7 +58,6 @@ describe("buildGenomeSpecies", () => {
     expect(props.species.label).toBe("Plasmodium falciparum");
     expect(props.ncbiTaxonomyId).toBe("5833");
     expect(props.tags).toEqual([]);
-    expect(props.priorityPathogen).toBeUndefined();
   });
 });
 
@@ -79,9 +79,8 @@ describe("buildAssemblySpecies", () => {
     expect(props.ncbiTaxonomyId).toBe("9606");
     expect(props.tags).toEqual([
       { label: "strain", value: "GRCh38" },
-      { label: "taxonomic group", value: "Vertebrates" },
+      { label: "group", value: "Vertebrates" },
     ]);
-    expect(props.priorityPathogen).toBeUndefined();
   });
 
   test("omits unpopulated minor fields", () => {
