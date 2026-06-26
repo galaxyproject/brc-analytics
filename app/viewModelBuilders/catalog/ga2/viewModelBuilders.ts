@@ -15,7 +15,6 @@ import * as C from "../../../components";
 import type { SpeciesTag } from "../../../components/Table/components/TableCell/components/SpeciesCell/types";
 import {
   buildAnalyzeGenome,
-  buildGenomeTaxonomicLevelStrain,
   buildIsRef,
   formatNumber,
   getGenomeStrainText,
@@ -104,21 +103,15 @@ function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
       meta: { width: "auto" },
     },
     {
+      accessorKey: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
+      cell: ({ row }) =>
+        C.SpeciesCell(buildOrganismAssemblySpecies(row.original)),
+      header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
+      meta: { columnPinned: true, width: { max: "1.5fr", min: "340px" } },
+    },
+    {
       accessorKey: GA2_CATEGORY_KEY.ACCESSION,
       header: GA2_CATEGORY_LABEL.ACCESSION,
-      meta: { columnPinned: true, width: { max: "1fr", min: "152px" } },
-    },
-    {
-      accessorFn: (row) => getGenomeStrainText(row),
-      cell: ({ row }) =>
-        C.BasicCell(buildGenomeTaxonomicLevelStrain(row.original)),
-      header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
-      id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,
-      meta: { width: { max: "1fr", min: "152px" } },
-    },
-    {
-      accessorKey: GA2_CATEGORY_KEY.TAXONOMY_ID,
-      header: GA2_CATEGORY_LABEL.TAXONOMY_ID,
       meta: { width: { max: "1fr", min: "152px" } },
     },
     {
@@ -220,4 +213,18 @@ export const buildAssemblySpecies = (
     },
     tags,
   };
+};
+
+/**
+ * Build props for the species cell on the organism detail page assembly table.
+ * Same as buildAssemblySpecies but with an empty species url — the species is the
+ * page's own organism, so Link renders the name as plain text (no self-link).
+ * @param entity - Assembly entity.
+ * @returns Props to be used for the SpeciesCell component.
+ */
+export const buildOrganismAssemblySpecies = (
+  entity: GA2AssemblyEntity
+): ComponentProps<typeof C.SpeciesCell> => {
+  const props = buildAssemblySpecies(entity);
+  return { ...props, species: { ...props.species, url: "" } };
 };
