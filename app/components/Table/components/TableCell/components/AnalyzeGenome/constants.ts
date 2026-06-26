@@ -7,6 +7,7 @@ export const BUTTON_PROPS = {
 } satisfies ButtonProps;
 
 export const GRID_PROPS: Partial<GridProps> = {
+  alignSelf: "flex-start",
   container: true,
   direction: "row",
   spacing: 2,
