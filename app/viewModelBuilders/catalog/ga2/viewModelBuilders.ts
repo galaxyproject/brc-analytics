@@ -16,6 +16,7 @@ import type { SpeciesTag } from "../../../components/Table/components/TableCell/
 import {
   buildAnalyzeGenome,
   buildIsRef,
+  buildLevel,
   formatNumber,
   getGenomeStrainText,
 } from "../brc-analytics-catalog/common/viewModelBuilders";
@@ -122,6 +123,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
     },
     {
       accessorKey: GA2_CATEGORY_KEY.LEVEL,
+      cell: ({ row }) => C.LevelCell(buildLevel(row.original)),
       header: GA2_CATEGORY_LABEL.LEVEL,
       meta: { width: { max: "1fr", min: "152px" } },
     },

@@ -333,9 +333,9 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       },
       {
         componentConfig: {
-          component: C.BasicCell,
+          component: C.LevelCell,
           viewBuilder: V.buildLevel,
-        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
+        } as ComponentConfig<typeof C.LevelCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.LEVEL,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.LEVEL,
         width: { max: "0.5fr", min: "142px" },
