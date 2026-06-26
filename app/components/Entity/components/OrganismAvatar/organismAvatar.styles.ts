@@ -22,8 +22,9 @@ export const CardMedia = styled(MuiCardMedia)`
 `;
 
 export const Thumbnail = styled.img`
-  height: 40px;
-  width: 40px;
+  align-self: flex-start;
+  height: 36px;
+  width: 36px;
   border-radius: 20%;
   object-fit: cover;
 `;
