@@ -139,5 +139,5 @@ export const ORGANISM_IMAGE: ColumnConfig<GA2OrganismEntity> = {
   enableSorting: false,
   header: GA2_CATEGORY_LABEL.ORGANISM_AVATAR,
   id: GA2_CATEGORY_KEY.ORGANISM_AVATAR,
-  width: { max: "100px", min: "100px" },
+  width: "auto",
 };
