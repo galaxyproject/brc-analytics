@@ -117,9 +117,9 @@ export const LENGTH: ColumnConfig<GA2AssemblyEntity> = {
 
 export const LEVEL: ColumnConfig<GA2AssemblyEntity> = {
   componentConfig: {
-    component: C.BasicCell,
+    component: C.LevelCell,
     viewBuilder: buildLevel,
-  } as ComponentConfig<typeof C.BasicCell, GA2AssemblyEntity>,
+  } as ComponentConfig<typeof C.LevelCell, GA2AssemblyEntity>,
   header: GA2_CATEGORY_LABEL.LEVEL,
   id: GA2_CATEGORY_KEY.LEVEL,
   width: { max: "0.5fr", min: "142px" },

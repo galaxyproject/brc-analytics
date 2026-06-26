@@ -330,15 +330,26 @@ export const buildLength = (
 };
 
 /**
- * Build props for the level cell.
+ * Maps each NCBI assembly level to its filled-bar count (most → least complete).
+ */
+const LEVEL_FILLED_COUNT: Record<string, number> = {
+  Chromosome: 3,
+  "Complete Genome": 4,
+  Contig: 1,
+  Scaffold: 2,
+};
+
+/**
+ * Build props for the level cell — a tiered bar indicator plus the level label.
  * @param entity - Entity with a level property.
- * @returns Props for the BasicCell component.
+ * @returns Props for the LevelCell component.
  */
 export const buildLevel = (
   entity: BRCDataCatalogGenome | GA2AssemblyEntity
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof C.LevelCell> => {
   return {
-    value: entity.level,
+    filledCount: LEVEL_FILLED_COUNT[entity.level] ?? 0,
+    label: entity.level,
   };
 };
 
@@ -975,7 +986,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.LEVEL,
-      cell: ({ row }) => C.BasicCell(buildLevel(row.original)),
+      cell: ({ row }) => C.LevelCell(buildLevel(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.LEVEL,
       meta: { width: { max: "0.5fr", min: "142px" } },
     },
