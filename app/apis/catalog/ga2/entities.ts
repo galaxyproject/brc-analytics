@@ -17,6 +17,7 @@ export interface GA2AssemblyEntity {
   lineageTaxonomyIds: string[];
   ncbiTaxonomyId: string;
   ploidy: ORGANISM_PLOIDY[];
+  releaseDate: string;
   scaffoldCount: number | null;
   scaffoldL50: number | null;
   scaffoldN50: number | null;
