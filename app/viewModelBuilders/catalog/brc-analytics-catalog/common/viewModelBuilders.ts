@@ -9,6 +9,7 @@ import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceP
 import { ColumnDef, RowData } from "@tanstack/react-table";
 import type { SpeciesTag } from "app/components/Table/components/TableCell/components/SpeciesCell/types";
 import type { Organism } from "app/views/OrganismView/types";
+import { parseISO } from "date-fns";
 import { LinkProps } from "next/link";
 import Router from "next/router";
 import { ComponentProps } from "react";
@@ -38,6 +39,7 @@ import { SLUGIFY_OPTIONS } from "../../../../common/constants";
 import * as C from "../../../../components";
 import { StepConfig } from "../../../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { KeyValueSection } from "../../../../components/Entity/components/Section/KeyValueSection/keyValueSection";
+import { formatDate } from "../../../../utils/date-fns";
 import {
   getPriorityColor,
   getPriorityLabel,
@@ -727,6 +729,37 @@ export const buildTaxonomicLevelRealm = (
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.taxonomicLevelRealm,
+  };
+};
+
+/**
+ * Build props for the release date cell, displaying the release year.
+ * @param entity - Entity with a releaseDate property.
+ * @returns Props for the BasicCell component.
+ */
+export const buildReleaseDate = (
+  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+): ComponentProps<typeof C.BasicCell> => {
+  return {
+    value: entity.releaseDate
+      ? formatDate(parseISO(entity.releaseDate), "yyyy")
+      : "",
+  };
+};
+
+/**
+ * Build props for the release date tooltip, showing the full release date.
+ * @param entity - Entity with a releaseDate property.
+ * @returns Props for the Tooltip component.
+ */
+export const buildReleaseDateTooltip = (
+  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+): Omit<ComponentProps<typeof C.Tooltip>, "children"> => {
+  return {
+    arrow: true,
+    title: entity.releaseDate
+      ? formatDate(parseISO(entity.releaseDate))
+      : undefined,
   };
 };
 

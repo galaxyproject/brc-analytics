@@ -15,6 +15,8 @@ import {
   buildIsRef,
   buildLength,
   buildLevel,
+  buildReleaseDate,
+  buildReleaseDateTooltip,
   buildScaffoldCount,
   buildScaffoldL50,
   buildScaffoldN50,
@@ -121,6 +123,22 @@ export const LEVEL: ColumnConfig<GA2AssemblyEntity> = {
   header: GA2_CATEGORY_LABEL.LEVEL,
   id: GA2_CATEGORY_KEY.LEVEL,
   width: { max: "0.5fr", min: "142px" },
+};
+
+export const RELEASE_DATE: ColumnConfig<GA2AssemblyEntity> = {
+  componentConfig: {
+    children: [
+      {
+        component: C.BasicCell,
+        viewBuilder: buildReleaseDate,
+      } as ComponentConfig<typeof C.BasicCell, GA2AssemblyEntity>,
+    ],
+    component: C.Tooltip,
+    viewBuilder: buildReleaseDateTooltip,
+  } as ComponentConfig<typeof C.Tooltip, GA2AssemblyEntity>,
+  header: GA2_CATEGORY_LABEL.RELEASE_DATE,
+  id: GA2_CATEGORY_KEY.RELEASE_DATE,
+  width: { max: "1fr", min: "120px" },
 };
 
 export const SCAFFOLD_COUNT: ColumnConfig<GA2AssemblyEntity> = {

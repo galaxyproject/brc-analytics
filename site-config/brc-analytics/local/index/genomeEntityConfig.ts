@@ -235,6 +235,21 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       },
       {
         componentConfig: {
+          children: [
+            {
+              component: C.BasicCell,
+              viewBuilder: V.buildReleaseDate,
+            } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
+          ],
+          component: C.Tooltip,
+          viewBuilder: V.buildReleaseDateTooltip,
+        } as ComponentConfig<typeof C.Tooltip, BRCDataCatalogGenome>,
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.RELEASE_DATE,
+        id: BRC_DATA_CATALOG_CATEGORY_KEY.RELEASE_DATE,
+        width: { max: "1fr", min: "120px" },
+      },
+      {
+        componentConfig: {
           component: C.BasicCell,
           viewBuilder: V.buildGenomeTaxonomicLevelStrain,
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
