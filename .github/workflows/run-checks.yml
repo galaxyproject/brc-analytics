@@ -59,6 +59,8 @@ jobs:
           cache-dependency-path: "./catalog/build/py/requirements.txt"
       - name: Install Python dependencies
         run: pip install -r ./catalog/build/py/requirements.txt
+      - name: Check Python formatting
+        run: npm run format:python -- --check
       - name: Run linkml-lint
         # Run linting on the LinkML schemas, to enforce conventions such as in naming, and to catch simple errors.
         run: npm run lint-schema
