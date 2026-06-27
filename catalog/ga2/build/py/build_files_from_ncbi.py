@@ -2,7 +2,7 @@ import json
 
 import pandas as pd
 
-from ....py_package.catalog_build import build_files, create_taxonomy_read_run_count
+from ....py_package.catalog_build import build_files
 
 ASSEMBLIES_PATH = "catalog/ga2/source/assemblies.yml"
 
@@ -21,10 +21,6 @@ PRIMARYDATA_OUTPUT_PATH = "catalog/ga2/build/intermediate/primary-data-ncbi.tsv"
 QC_REPORT_PATH = "catalog/ga2/output/qc-report.data.md"
 
 TREE_OUTPUT_PATH = "catalog/ga2/output/ncbi-taxa-tree.json"
-
-TAXONOMY_READ_RUN_COUNTS_OUTPUT_PATH = (
-    "catalog/ga2/build/intermediate/taxIdReadCount.json"
-)
 
 TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
     40674: "Mammalia",
@@ -106,9 +102,6 @@ def build_ncbi_data():
         organism_image_path=ORGANISM_IMAGE_PATH,
         organism_image_source_information_path=ORGANISM_IMAGE_INFO_PATH,
         datacache_base_url="http://datacache.galaxyproject.org/vgp/data/genomes",
-    )
-    create_taxonomy_read_run_count(
-        GENOMES_OUTPUT_PATH, TAXONOMY_READ_RUN_COUNTS_OUTPUT_PATH
     )
 
 

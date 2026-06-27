@@ -23,8 +23,7 @@ export const useQuery = (): ENAReadRunsQuery => {
   const { ncbiTaxonomyId } = useWorkflowEntity() ?? {};
   const { maxReadRunsForBrowseAll } = config as AppSiteConfig;
 
-  // Live read-run count from ENA, replacing the precomputed
-  // taxonomy_read_counts.json lookup. On error we don't retry — the count is
+  // Live read-run count from ENA. On error we don't retry — the count is
   // just a gate, so a failure falls back to the "Enter Accession(s)" path.
   const countQuery = useReactQuery<number, DefaultError, number, CountQueryKey>(
     {
