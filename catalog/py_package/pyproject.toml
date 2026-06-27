@@ -5,13 +5,16 @@ dependencies = [
     "requests==2.32.4",
     "PyYAML==6.0.2",
     "beautifulsoup4==4.13.4",
-    "lxml==6.0.0"
+    "lxml==6.0.0",
+    "dlt[duckdb] (>=1.28.1,<2.0.0)",
+    "duckdb (>=1.5.4,<2.0.0)",
+    "dbt-duckdb (>=1.10.1,<2.0.0)"
 ]
 description = "The package provides modules that can be used to run scripts to manage the catalog and schema; it may be desirable to set up shortcuts for running these."
 license = "MIT"
 name = "catalog_build"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10,<3.15"
 version = "2.2.0"
 
 [project.urls]
