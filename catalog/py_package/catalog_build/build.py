@@ -1912,54 +1912,6 @@ def build_files(
         )
 
 
-def create_taxonomy_read_run_count(genomes_tsv_path: str, output_path: str):
-    """Create taxonomy read run count JSON file from genomes TSV.
-    Args:
-        genomes_tsv_path: Path to the genomes TSV file
-        output_path: Path where the taxonomy read run count JSON will be written
-    """
-    df = pd.read_csv(genomes_tsv_path, sep="\t")
-    unique_taxonomy_ids = df["taxonomyId"].drop_duplicates()
-    print("Creating taxonomy read run counts")
-    with open(output_path, "w") as writer:
-        writer.write(
-            json.dumps(
-                generate_taxon_read_run_count(unique_taxonomy_ids.tolist()), indent=2
-            )
-        )
-    print("Taxonomy read run counts created")
-
-
-def generate_taxon_read_run_count(taxonomy_ids):
-    taxon_counter = {}
-    url = "https://www.ebi.ac.uk/ena/portal/api/search"
-    counter = 0
-    num_taxids = len(taxonomy_ids)
-    for tId in taxonomy_ids:
-        processing = (
-            f"Processed {counter} taxonomy IDs of {num_taxids}, processing tx id: {tId}"
-        )
-        print(f"{processing:<120}", end="\r")
-        params = {
-            "result": "read_run",
-            "query": f"tax_tree({tId})",
-            "fields": "experiment_accession,study_accession",
-            "format": "json",
-        }
-        try:
-            resp = requests.get(url, params=params)
-            resp.raise_for_status()
-        except ConnectTimeout:
-            print("Timeout, sleeping 10s")
-            time.sleep(10)
-            resp = requests.get(url, params=params)
-            resp.raise_for_status()
-        taxon_counter[tId] = len(resp.json())
-        counter += 1
-    print(f"Processed {counter} taxonomy IDs", end="\n")
-    return dict(sorted(taxon_counter.items(), key=lambda x: x[1], reverse=True))
-
-
 def get_image_path(
     folder_path: str, species_name: str, file_suffix: str = "_1024x1024.jpg"
 ) -> str:

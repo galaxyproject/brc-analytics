@@ -14,8 +14,6 @@ OUTBREAK_TAXONOMY_MAPPING_PATH = (
 QC_REPORT_PATH = "catalog/output/qc-report.data.md"
 TREE_OUTPUT_PATH = "catalog/output/ncbi-taxa-tree.json"
 
-TAXONOMY_READ_RUN_COUNTS_OUTPUT_PATH = "catalog/build/intermediate/taxIdReadCount.json"
-
 TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
     2: "Bacteria",
     10239: "Viruses",
@@ -68,7 +66,4 @@ if __name__ == "__main__":
         outbreaks_path=OUTBREAKS_PATH,
         outbreak_taxonomy_mapping_path=OUTBREAK_TAXONOMY_MAPPING_PATH,
         datacache_base_url="http://datacache.galaxyproject.org/brc/data/genomes",
-    )
-    create_taxonomy_read_run_count(
-        GENOMES_OUTPUT_PATH, TAXONOMY_READ_RUN_COUNTS_OUTPUT_PATH
     )
