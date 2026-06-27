@@ -1,4 +1,4 @@
-from ...py_package.catalog_build import build_files, create_taxonomy_read_run_count
+from ...py_package.catalog_build import build_files
 
 ASSEMBLIES_PATH = "catalog/source/assemblies.yml"
 ORGANISMS_PATH = "catalog/source/organisms.yml"
