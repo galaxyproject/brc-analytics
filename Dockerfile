@@ -28,7 +28,8 @@ RUN ./scripts/sync-api-brc-analytics.sh
 RUN npm run build-brc-db
 
 # Build Next.js static export (outputs to /app/out)
-RUN npm run build:local -- --no-lint
+# Next 16 removed the `--no-lint` flag and no longer runs ESLint during build.
+RUN npm run build:local
 
 # Stage 2: Serve with nginx
 FROM nginx:alpine AS runtime
