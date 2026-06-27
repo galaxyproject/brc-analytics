@@ -45,6 +45,7 @@ export function useExplicitContrasts(
   );
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset-on-dependency-change effect (react-hooks v7 anti-pattern); refactor tracked in #1393
     setPairs(createInitialPairs());
   }, [primaryFactor]);
 

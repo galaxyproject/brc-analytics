@@ -1,5 +1,5 @@
 import { Title } from "@databiosphere/findable-ui/lib/components/Index/components/EntityView/components/layout/Title/title";
-import { StyledGridEntityView } from "@databiosphere/findable-ui/lib/components/Index/index.styles";
+import { StyledGridEntityView } from "@databiosphere/findable-ui/lib/components/Index/indexView.styles";
 import {
   bpDownSm,
   bpUpSm,

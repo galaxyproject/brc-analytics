@@ -58,6 +58,7 @@ export function BrcAuthProvider({
 
   useEffect(() => {
     if (!loginEnabled) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- react-hooks v7 anti-pattern (setState in effect)
       setIsLoading(false);
       return;
     }

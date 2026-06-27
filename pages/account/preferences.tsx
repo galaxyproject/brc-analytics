@@ -35,6 +35,7 @@ export default function PreferencesPage(): JSX.Element {
   useEffect(() => {
     // Clear any prior status so a stale error/success banner can't linger
     // across a re-load or a sign-out/in.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- react-hooks v7 anti-pattern (setState in effect)
     setError(null);
     setSaveMessage(null);
 

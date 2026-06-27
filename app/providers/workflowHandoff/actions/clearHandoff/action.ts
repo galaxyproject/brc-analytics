@@ -17,7 +17,7 @@ export function clearHandoffAction(
 
   if (!entityPaths || !(path in entityPaths)) return state;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, sonarjs/no-unused-vars -- destructured to omit `path` from `rest`
+  // eslint-disable-next-line sonarjs/no-unused-vars -- destructured to omit `path` from `rest`
   const { [path]: _removed, ...otherEntityPaths } = entityPaths;
 
   return {

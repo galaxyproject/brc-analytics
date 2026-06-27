@@ -7,7 +7,10 @@ import {
 } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
-import { EntitiesResponse } from "../../../../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
+import {
+  EntitiesResponse,
+  WorkflowCategory,
+} from "../../../../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { getPageMeta } from "../../../../../../../app/common/meta/utils";
 import { EntityDataGate } from "../../../../../../../app/components/EntityDataGate/entityDataGate";
 import { config } from "../../../../../../../app/config/config";
@@ -23,7 +26,10 @@ import type { Organism } from "../../../../../../../app/views/OrganismView/types
 import { OrganismWorkflowInputsView } from "../../../../../../../app/views/OrganismWorkflowInputsView/organismWorkflowInputsView";
 import { Assembly } from "../../../../../../../app/views/WorkflowInputsView/types";
 import { WorkflowInputsView } from "../../../../../../../app/views/WorkflowInputsView/workflowInputsView";
-import workflows from "../../../../../../../catalog/output/workflows.json";
+import workflowsData from "../../../../../../../catalog/output/workflows.json";
+
+// Cast the schema-validated catalog JSON to its typed shape.
+const workflows = workflowsData as unknown as WorkflowCategory[];
 
 interface Params extends ParsedUrlQuery {
   entityId: string;

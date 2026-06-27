@@ -43,6 +43,7 @@ export function useColumnClassification(
 
   useEffect(() => {
     if (columnNames.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- init-on-dependency-change effect (react-hooks v7 anti-pattern); refactor tracked in #1393
       setClassificationMap(initClassifications(columnNames));
     }
   }, [columnNames]);
