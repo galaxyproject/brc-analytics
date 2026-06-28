@@ -11686,7 +11686,15 @@
                                                                 },
                                                                 {
                                                                     "assembly_count": 6,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Candidozyma auris B8441",
+                                                                            "ncbi_tax_id": "3712126",
+                                                                            "rank": "strain"
+                                                                        }
+                                                                    ],
                                                                     "name": "Candidozyma auris",
                                                                     "ncbi_tax_id": "498019",
                                                                     "rank": "species"
@@ -28796,7 +28804,14 @@
                             "assembly_count": 7,
                             "children": [
                                 {
-                                    "assembly_count": 5,
+                                    "assembly_count": 1,
+                                    "children": [],
+                                    "name": "Deltavirus cameroonense",
+                                    "ncbi_tax_id": "2844072",
+                                    "rank": "species"
+                                },
+                                {
+                                    "assembly_count": 2,
                                     "children": [],
                                     "name": "Deltavirus italiense",
                                     "ncbi_tax_id": "2844074",
@@ -28812,8 +28827,22 @@
                                 {
                                     "assembly_count": 1,
                                     "children": [],
+                                    "name": "Deltavirus senegalense",
+                                    "ncbi_tax_id": "2844077",
+                                    "rank": "species"
+                                },
+                                {
+                                    "assembly_count": 1,
+                                    "children": [],
                                     "name": "Deltavirus taiwanense",
                                     "ncbi_tax_id": "2844078",
+                                    "rank": "species"
+                                },
+                                {
+                                    "assembly_count": 1,
+                                    "children": [],
+                                    "name": "Deltavirus togense",
+                                    "ncbi_tax_id": "2844079",
                                     "rank": "species"
                                 }
                             ],
