@@ -6,10 +6,9 @@ dependencies = [
     "PyYAML==6.0.2",
     "beautifulsoup4==4.13.4",
     "lxml==6.0.0",
-    "dlt[duckdb] (>=1.28.1,<2.0.0)",
+    "dlt[parquet] (>=1.28.1,<2.0.0)",
     "duckdb (>=1.5.4,<2.0.0)",
     "dbt-duckdb (>=1.10.1,<2.0.0)"
-    # TODO: install dlt[parquet], assuming dataframes need to be loaded
 ]
 description = "The package provides modules that can be used to run scripts to manage the catalog and schema; it may be desirable to set up shortcuts for running these."
 license = "MIT"
