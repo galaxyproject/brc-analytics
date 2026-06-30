@@ -13,7 +13,7 @@ outbreak_taxa = pd.DataFrame({"taxonomy_id": get_outbreak_taxonomy_ids(OUTBREAKS
 
 load_taxonomy_data(
     TEMP_DIR_PATH,
-    assembly_taxa=organism_taxa,  # substituting for simplicity/efficiency
-    organism_taxa=organism_taxa,
-    outbreak_taxa=outbreak_taxa,
+    assembly_taxa_df=organism_taxa,  # substituting for simplicity/efficiency
+    organism_taxa_df=organism_taxa,
+    outbreak_taxa_df=outbreak_taxa,
 )
