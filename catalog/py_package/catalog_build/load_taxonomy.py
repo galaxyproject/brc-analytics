@@ -13,34 +13,41 @@ TAXDUMP_NODES_FILE_NAME = "nodes.dmp"
 TAXDUMP_NAMES_FILE_NAME = "names.dmp"
 
 
-def catalog_taxa_type(name: str, taxa_df: pd.DataFrame):
-    @dlt.resource(name=name, write_disposition="replace")
-    def taxa():
-        yield taxa_df
+@dlt.resource(name="outbreak_taxa", write_disposition="replace")
+def outbreak_taxa(df: pd.DataFrame):
+    yield df
 
-    return taxa
+
+@dlt.resource(name="organism_taxa", write_disposition="replace")
+def organism_taxa(df: pd.DataFrame):
+    yield df
+
+
+@dlt.resource(name="assembly_taxa", write_disposition="replace")
+def assembly_taxa(df: pd.DataFrame):
+    yield df
 
 
 @dlt.source
 def catalog_taxa(
     *,
-    assembly_taxa: pd.DataFrame,
-    organism_taxa: pd.DataFrame,
-    outbreak_taxa: pd.DataFrame,
+    assembly_taxa_df: pd.DataFrame,
+    organism_taxa_df: pd.DataFrame,
+    outbreak_taxa_df: pd.DataFrame,
 ):
     return [
-        catalog_taxa_type("assembly_taxa", assembly_taxa),
-        catalog_taxa_type("organism_taxa", organism_taxa),
-        catalog_taxa_type("outbreak_taxa", outbreak_taxa),
+        assembly_taxa(assembly_taxa_df),
+        organism_taxa(organism_taxa_df),
+        outbreak_taxa(outbreak_taxa_df),
     ]
 
 
 def import_catalog_taxa(
     temp_folder_path: Path,
     *,
-    assembly_taxa: pd.DataFrame,
-    organism_taxa: pd.DataFrame,
-    outbreak_taxa: pd.DataFrame,
+    assembly_taxa_df: pd.DataFrame,
+    organism_taxa_df: pd.DataFrame,
+    outbreak_taxa_df: pd.DataFrame,
 ):
     pipeline = dlt.pipeline(
         pipeline_name="catalog_data",
@@ -49,9 +56,9 @@ def import_catalog_taxa(
     )
     pipeline.run(
         catalog_taxa(
-            assembly_taxa=assembly_taxa,
-            organism_taxa=organism_taxa,
-            outbreak_taxa=outbreak_taxa,
+            assembly_taxa_df=assembly_taxa_df,
+            organism_taxa_df=organism_taxa_df,
+            outbreak_taxa_df=outbreak_taxa_df,
         )
     )
 
@@ -63,20 +70,26 @@ def dmp_rows(path: Path, cols: list[str | None]):
             yield {col: value for col, value in zip(cols, values) if col is not None}
 
 
-def ncbi_dmp(name: str, path: Path, cols: list[str | None]):
-    @dlt.resource(name=name, write_disposition="replace")
-    def dmp_df():
-        yield pd.DataFrame(dmp_rows(path, cols))
+@dlt.resource(name="ncbi_taxonomy_names", write_disposition="replace")
+def ncbi_taxonomy_names(path: Path):
+    yield pd.DataFrame(
+        dmp_rows(
+            path,
+            [
+                "tax_id",
+                "name_txt",
+                None,  # unique name
+                "name_class",
+            ],
+        )
+    )
 
-    return dmp_df()
 
-
-@dlt.source
-def ncbi_taxdump(dmp_dir: Path):
-    return [
-        ncbi_dmp(
-            "ncbi_taxonomy_nodes",
-            dmp_dir / TAXDUMP_NODES_FILE_NAME,
+@dlt.resource(name="ncbi_taxonomy_nodes", write_disposition="replace")
+def ncbi_taxonomy_nodes(path: Path):
+    yield pd.DataFrame(
+        dmp_rows(
+            path,
             [
                 "tax_id",
                 "parent_tax_id",
@@ -92,17 +105,15 @@ def ncbi_taxdump(dmp_dir: Path):
                 # "hidden_subtree_root_flag",
                 # "comments"
             ],
-        ),
-        ncbi_dmp(
-            "ncbi_taxonomy_names",
-            dmp_dir / TAXDUMP_NAMES_FILE_NAME,
-            [
-                "tax_id",
-                "name_txt",
-                None,  # unique name
-                "name_class",
-            ],
-        ),
+        )
+    )
+
+
+@dlt.source
+def ncbi_taxdump(dmp_dir: Path):
+    return [
+        ncbi_taxonomy_nodes(dmp_dir / TAXDUMP_NODES_FILE_NAME),
+        ncbi_taxonomy_names(dmp_dir / TAXDUMP_NAMES_FILE_NAME),
     ]
 
 
@@ -142,9 +153,9 @@ def download_taxdump(temp_folder_path: Path):
 def load_taxonomy_data(
     temp_folder_path_string: str,
     *,
-    assembly_taxa: pd.DataFrame,
-    organism_taxa: pd.DataFrame,
-    outbreak_taxa: pd.DataFrame,
+    assembly_taxa_df: pd.DataFrame,
+    organism_taxa_df: pd.DataFrame,
+    outbreak_taxa_df: pd.DataFrame,
 ):
     temp_folder_path = Path(temp_folder_path_string).resolve()
     temp_folder_path.mkdir(exist_ok=True)
@@ -155,8 +166,7 @@ def load_taxonomy_data(
 
     import_catalog_taxa(
         temp_folder_path,
-        assembly_taxa=assembly_taxa,
-        organism_taxa=organism_taxa,
-        outbreak_taxa=outbreak_taxa,
+        assembly_taxa_df=assembly_taxa_df,
+        organism_taxa_df=organism_taxa_df,
+        outbreak_taxa_df=outbreak_taxa_df,
     )
-
