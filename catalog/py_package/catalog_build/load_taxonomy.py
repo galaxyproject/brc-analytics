@@ -122,15 +122,17 @@ def ncbi_taxdump(dmp_dir: Path):
 
 def ncbi_dmp(name: str, path: Path, cols: list[str | None]):
     @dlt.resource(name=name, write_disposition="replace")
-    def dmp_rows():
-        with open(path) as f:
-            for line in f:
-                values = line.rstrip("\t|\n").split("\t|\t")
-                yield {
-                    col: value for col, value in zip(cols, values) if col is not None
-                }
+    def dmp_df():
+        yield pd.DataFrame(dmp_rows(path, cols))
 
-    return dmp_rows()
+    return dmp_df()
+
+
+def dmp_rows(path: Path, cols: list[str | None]):
+    with open(path) as f:
+        for line in f:
+            values = line.rstrip("\t|\n").split("\t|\t")
+            yield {col: value for col, value in zip(cols, values) if col is not None}
 
 
 def download_taxdump(temp_folder_path: Path):
