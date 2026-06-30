@@ -64,10 +64,17 @@ def import_catalog_taxa(
 
 
 def dmp_rows(path: Path, cols: list[str | None]):
+    n_cols = len(cols)
     with open(path) as f:
+        line_num = 1
         for line in f:
-            values = line.rstrip("\t|\n").split("\t|\t")
+            values = line.removesuffix("\t|\n").split("\t|\t")
+            if len(values) != n_cols:
+                raise Exception(
+                    f"Column number mismatch in {path}: expected {n_cols}, found {len(values)} on line {line_num}"
+                )
             yield {col: value for col, value in zip(cols, values) if col is not None}
+            line_num += 1
 
 
 @dlt.resource(name="ncbi_taxonomy_names", write_disposition="replace")
@@ -94,16 +101,16 @@ def ncbi_taxonomy_nodes(path: Path):
                 "tax_id",
                 "parent_tax_id",
                 "rank",
-                # "embl_code",
-                # "division_id",
-                # "inherited_div_flag",
-                # "genetic_code_id",
-                # "inherited_gc_flag",
-                # "mitochondrial_genetic_code_id",
-                # "inherited_mgc_flag",
-                # "genbank_hidden_flag",
-                # "hidden_subtree_root_flag",
-                # "comments"
+                None,  # embl code
+                None,  # division id
+                None,  # inherited div flag
+                None,  # genetic code id
+                None,  # inherited GC  flag
+                None,  # mitochondrial genetic code id
+                None,  # inherited MGC flag
+                None,  # GenBank hidden flag
+                None,  # hidden subtree root flag
+                None,  # comments
             ],
         )
     )
