@@ -45,6 +45,7 @@ export default function SavedAnalysesPage(): JSX.Element {
 
   useEffect(() => {
     if (!isAuthenticated || !isConfigured) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- react-hooks v7 anti-pattern (setState in effect)
       setSavedAnalyses([]);
       setError(null);
       setIsLoading(false);

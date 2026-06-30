@@ -2,9 +2,16 @@
 import { JSX } from "react";
 
 import { ReactNode, useEffect, useRef, useState } from "react";
-import type { VisualizationSpec } from "vega-embed";
+import type { Spec as VgSpec } from "vega";
 import embed from "vega-embed";
+import type { TopLevelSpec as VlSpec } from "vega-lite";
 import { VegaEmbedContainer } from "./vegaEmbed.styles";
+
+// vega-embed's exports map is malformed (bare condition keys, no "." subpath),
+// so its VisualizationSpec type can't be imported under bundler module
+// resolution. Reconstruct it from its source packages, which have well-formed
+// exports maps: VisualizationSpec = vega-lite TopLevelSpec | vega Spec.
+type VisualizationSpec = VlSpec | VgSpec;
 
 export interface VegaEmbedProps {
   caption?: ReactNode;
@@ -48,7 +55,7 @@ function calculateGenomePosExtent(
   let xMin = Infinity;
   let xMax = -Infinity;
 
-  if (vegaSpec.datasets) {
+  if ("datasets" in vegaSpec && vegaSpec.datasets) {
     const datasets = Object.values(
       vegaSpec.datasets as Record<string, unknown>
     );

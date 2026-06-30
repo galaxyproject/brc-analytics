@@ -17,6 +17,7 @@ export const useTaxonomyMatches = (
     if (taxonomyMatches !== null) return;
     if (coreCount) {
       // The table data is ready, set the taxonomy matches to the number of filtered rows.
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-shot sync of derived count once table data is ready; refactor tracked in #1393
       setTaxonomyMatches(filteredCount);
     }
   }, [coreCount, filteredCount, taxonomyMatches]);

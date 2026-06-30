@@ -123,6 +123,7 @@ export function useSwipeInteraction(
 
   useEffect(() => {
     if (swipeAction === SWIPE_ACTION.SWIPE_FORWARD) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- swipe state-machine resets action after handling; refactor tracked in #1393
       onSwipeToIndex(1);
       setSwipeAction(SWIPE_ACTION.NONE);
     } else if (swipeAction === SWIPE_ACTION.SWIPE_BACKWARD) {
