@@ -14,7 +14,7 @@ description = "The package provides modules that can be used to run scripts to m
 license = "MIT"
 name = "catalog_build"
 readme = "README.md"
-requires-python = ">=3.10,<3.15"
+requires-python = ">=3.12,<3.15"
 version = "2.2.0"
 
 [project.urls]
