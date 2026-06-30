@@ -140,7 +140,7 @@ def dmp_rows(path: Path, cols: list[str | None]):
 def download_taxdump(temp_folder_path: Path):
     taxdump_path = temp_folder_path / TAXDUMP_DOWNLOAD_NAME
 
-    with requests.get(TAXDUMP_URL, stream=True) as response:
+    with requests.get(TAXDUMP_URL, stream=True, timeout=(10, 60)) as response:
         response.raise_for_status()
         with open(taxdump_path, "wb") as file:
             for chunk in response.iter_content(chunk_size=8192):
