@@ -9,6 +9,8 @@ TAXDUMP_URL = "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz"
 TAXDUMP_MD5_URL = "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz.md5"
 TAXDUMP_DOWNLOAD_NAME = "ncbi_taxdump.tar.gz"
 TAXDUMP_DIR_NAME = "ncbi_taxdump"
+TAXDUMP_NODES_FILE_NAME = "nodes.dmp"
+TAXDUMP_NAMES_FILE_NAME = "names.dmp"
 
 
 def load_taxonomy_data(
@@ -90,7 +92,7 @@ def ncbi_taxdump(dmp_dir: Path):
     return [
         ncbi_dmp(
             "ncbi_taxonomy_nodes",
-            dmp_dir / "nodes.dmp",
+            dmp_dir / TAXDUMP_NODES_FILE_NAME,
             [
                 "tax_id",
                 "parent_tax_id",
@@ -109,7 +111,7 @@ def ncbi_taxdump(dmp_dir: Path):
         ),
         ncbi_dmp(
             "ncbi_taxonomy_names",
-            dmp_dir / "names.dmp",
+            dmp_dir / TAXDUMP_NAMES_FILE_NAME,
             [
                 "tax_id",
                 "name_txt",
@@ -149,4 +151,11 @@ def download_taxdump(temp_folder_path: Path):
     taxdump_dir_path.mkdir(exist_ok=True)
 
     with tarfile.open(taxdump_path) as tar:
-        tar.extractall(taxdump_dir_path)
+        tar.extractall(
+            taxdump_dir_path,
+            members=[
+                tar.getmember(TAXDUMP_NODES_FILE_NAME),
+                tar.getmember(TAXDUMP_NAMES_FILE_NAME),
+            ],
+            filter="data",
+        )
