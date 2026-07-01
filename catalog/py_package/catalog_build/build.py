@@ -5,6 +5,7 @@ import logging
 import os
 import time
 import urllib
+from pathlib import Path
 
 import pandas as pd
 import requests
@@ -12,7 +13,9 @@ import yaml
 from bs4 import BeautifulSoup
 from requests.exceptions import ConnectTimeout
 
+from .load import do_dlt_load
 from .qc_utils import format_list_section, format_raw_section, join_report
+from .utils import get_db_path
 
 MAX_NCBI_URL_LENGTH = 2000  # The actual limit seems to be a bit over 4000
 
@@ -1526,6 +1529,30 @@ def add_galaxy_datacache_url(genomes_df, base_url, batch_size=20, timeout=5):
     genomes_df["galaxyDatacacheUrl"] = datacache_urls
 
     return genomes_df, missing_accessions
+
+
+def load_and_transform(
+    temp_folder_path_string: str,
+    *,
+    assemblies_df: pd.DataFrame,
+    organisms_df: pd.DataFrame,
+    outbreaks_df: pd.DataFrame,
+):
+    temp_folder_path = Path(temp_folder_path_string).resolve()
+
+    # Create temp folder if needed
+    temp_folder_path.mkdir(exist_ok=True)
+
+    # Delete any existing temporary database, to make runs more consistent
+    get_db_path(temp_folder_path).unlink(missing_ok=True)
+
+    # Load data via dlt
+    do_dlt_load(
+        temp_folder_path,
+        assembly_taxa_df=assemblies_df,
+        organism_taxa_df=organisms_df,
+        outbreak_taxa_df=outbreaks_df,
+    )
 
 
 def build_files(

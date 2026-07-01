@@ -5,62 +5,14 @@ import dlt
 import pandas as pd
 import requests
 
+from ..utils import get_db_path_string
+
 TAXDUMP_URL = "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz"
 TAXDUMP_MD5_URL = "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz.md5"
 TAXDUMP_DOWNLOAD_NAME = "ncbi_taxdump.tar.gz"
 TAXDUMP_DIR_NAME = "ncbi_taxdump"
 TAXDUMP_NODES_FILE_NAME = "nodes.dmp"
 TAXDUMP_NAMES_FILE_NAME = "names.dmp"
-
-
-@dlt.resource(name="outbreak_taxa", write_disposition="replace")
-def outbreak_taxa(df: pd.DataFrame):
-    yield df
-
-
-@dlt.resource(name="organism_taxa", write_disposition="replace")
-def organism_taxa(df: pd.DataFrame):
-    yield df
-
-
-@dlt.resource(name="assembly_taxa", write_disposition="replace")
-def assembly_taxa(df: pd.DataFrame):
-    yield df
-
-
-@dlt.source
-def catalog_taxa(
-    *,
-    assembly_taxa_df: pd.DataFrame,
-    organism_taxa_df: pd.DataFrame,
-    outbreak_taxa_df: pd.DataFrame,
-):
-    return [
-        assembly_taxa(assembly_taxa_df),
-        organism_taxa(organism_taxa_df),
-        outbreak_taxa(outbreak_taxa_df),
-    ]
-
-
-def import_catalog_taxa(
-    temp_folder_path: Path,
-    *,
-    assembly_taxa_df: pd.DataFrame,
-    organism_taxa_df: pd.DataFrame,
-    outbreak_taxa_df: pd.DataFrame,
-):
-    pipeline = dlt.pipeline(
-        pipeline_name="catalog_data",
-        destination=dlt.destinations.duckdb(str(temp_folder_path / "catalog.duckdb")),
-        dataset_name="catalog_data",
-    )
-    pipeline.run(
-        catalog_taxa(
-            assembly_taxa_df=assembly_taxa_df,
-            organism_taxa_df=organism_taxa_df,
-            outbreak_taxa_df=outbreak_taxa_df,
-        )
-    )
 
 
 def dmp_rows(path: Path, cols: list[str | None]):
@@ -124,10 +76,10 @@ def ncbi_taxdump(dmp_dir: Path):
     ]
 
 
-def import_taxdump(temp_folder_path: Path):
+def load_taxdump(temp_folder_path: Path):
     pipeline = dlt.pipeline(
         pipeline_name="ncbi_taxonomy",
-        destination=dlt.destinations.duckdb(str(temp_folder_path / "catalog.duckdb")),
+        destination=dlt.destinations.duckdb(get_db_path_string(temp_folder_path)),
         dataset_name="raw",
     )
     pipeline.run(ncbi_taxdump(temp_folder_path / TAXDUMP_DIR_NAME))
@@ -157,23 +109,6 @@ def download_taxdump(temp_folder_path: Path):
         )
 
 
-def load_taxonomy_data(
-    temp_folder_path_string: str,
-    *,
-    assembly_taxa_df: pd.DataFrame,
-    organism_taxa_df: pd.DataFrame,
-    outbreak_taxa_df: pd.DataFrame,
-):
-    temp_folder_path = Path(temp_folder_path_string).resolve()
-    temp_folder_path.mkdir(exist_ok=True)
-
+def load_ncbi_taxonomy(temp_folder_path: Path):
     download_taxdump(temp_folder_path)
-
-    import_taxdump(temp_folder_path)
-
-    import_catalog_taxa(
-        temp_folder_path,
-        assembly_taxa_df=assembly_taxa_df,
-        organism_taxa_df=organism_taxa_df,
-        outbreak_taxa_df=outbreak_taxa_df,
-    )
+    load_taxdump(temp_folder_path)
