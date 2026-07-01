@@ -3,8 +3,7 @@ catalog_taxonomy:
   outputs:
     dev:
       type: duckdb
-      # Path to the DuckDB file the dlt pipeline writes. The orchestration layer
-      # should set TAXONOMY_DUCKDB_PATH; the default keeps the project runnable
-      # on its own from this directory.
-      path: "{{ env_var('TAXONOMY_DUCKDB_PATH', 'taxonomy.duckdb') }}"
+      # Path to the DuckDB file that dlt will have populated and that dbt should read/write.
+      # The orchestration layer should set CATALOG_BUILD_DUCKDB_PATH.
+      path: "{{ env_var('CATALOG_BUILD_DUCKDB_PATH') }}"
       threads: 4
