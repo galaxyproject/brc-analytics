@@ -12,7 +12,7 @@ import type { Organism } from "app/views/OrganismView/types";
 import { parseISO } from "date-fns";
 import { LinkProps } from "next/link";
 import Router from "next/router";
-import { ComponentProps } from "react";
+import { ComponentProps, createElement } from "react";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
@@ -40,6 +40,10 @@ import * as C from "../../../../components";
 import { StepConfig } from "../../../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { KeyValueSection } from "../../../../components/Entity/components/Section/KeyValueSection/keyValueSection";
 import { formatDate } from "../../../../utils/date-fns";
+import {
+  COLUMN_PRESET_KEY,
+  COLUMN_PRESET_LABEL,
+} from "../../../../views/OrganismView/components/Main/constants";
 import {
   getPriorityColor,
   getPriorityLabel,
@@ -340,6 +344,14 @@ const LEVEL_FILLED_COUNT: Record<string, number> = {
 };
 
 /**
+ * Overrides the displayed label for specific NCBI assembly levels; levels not
+ * listed here display their raw value.
+ */
+const LEVEL_LABEL: Record<string, string> = {
+  "Complete Genome": "Genome",
+};
+
+/**
  * Build props for the level cell — a tiered bar indicator plus the level label.
  * @param entity - Entity with a level property.
  * @returns Props for the LevelCell component.
@@ -349,7 +361,7 @@ export const buildLevel = (
 ): ComponentProps<typeof C.LevelCell> => {
   return {
     filledCount: LEVEL_FILLED_COUNT[entity.level] ?? 0,
-    label: entity.level,
+    label: LEVEL_LABEL[entity.level] ?? entity.level,
   };
 };
 
@@ -923,11 +935,49 @@ export const buildOrganismViewMain = (
   organism: BRCDataCatalogOrganism
 ): ComponentProps<typeof C.OrganismViewMain> => {
   return {
+    columnPresets: ORGANISM_GENOMES_COLUMN_PRESETS,
     entityId: getOrganismId(organism),
     organism,
     tableOptions: buildOrganismGenomesTable(organism),
   };
 };
+
+/**
+ * The column presets (Default, Quality) for the organism genomes table. Each
+ * preset lists the columns hidden in that view; unlisted columns remain
+ * visible.
+ */
+const ORGANISM_GENOMES_COLUMN_PRESETS: ComponentProps<
+  typeof C.OrganismViewMain
+>["columnPresets"] = [
+  {
+    // Complete visibility state applied via table.setColumnVisibility on toggle;
+    // columns not listed here are shown. The internal row-position column is
+    // always hidden.
+    columnVisibility: {
+      [COLUMN_IDENTIFIER.ROW_POSITION]: false,
+      [BRC_DATA_CATALOG_CATEGORY_KEY.CHROMOSOMES]: false,
+      [BRC_DATA_CATALOG_CATEGORY_KEY.COVERAGE]: false,
+      [BRC_DATA_CATALOG_CATEGORY_KEY.GC_PERCENT]: false,
+      [BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_COUNT]: false,
+      [BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_L50]: false,
+      [BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_N50]: false,
+    },
+    key: COLUMN_PRESET_KEY.DEFAULT,
+    label: COLUMN_PRESET_LABEL.DEFAULT,
+  },
+  {
+    columnVisibility: {
+      [COLUMN_IDENTIFIER.ROW_POSITION]: false,
+      [BRC_DATA_CATALOG_CATEGORY_KEY.ANNOTATION_STATUS]: false,
+      [BRC_DATA_CATALOG_CATEGORY_KEY.IS_REF]: false,
+      [BRC_DATA_CATALOG_CATEGORY_KEY.LENGTH]: false,
+      [BRC_DATA_CATALOG_CATEGORY_KEY.RELEASE_DATE]: false,
+    },
+    key: COLUMN_PRESET_KEY.QUALITY,
+    label: COLUMN_PRESET_LABEL.QUALITY,
+  },
+];
 
 /**
  * Build table options (columns, data, initial state) for the genomes table for the given organism.
@@ -943,7 +993,10 @@ export function buildOrganismGenomesTable(
     columns: buildOrganismGenomesTableColumns() as ColumnDef<RowData>[],
     data: organism.genomes,
     initialState: {
-      columnVisibility: { [COLUMN_IDENTIFIER.ROW_POSITION]: false },
+      // Mount on the Default preset so the table matches the toggle.
+      columnVisibility: ORGANISM_GENOMES_COLUMN_PRESETS.find(
+        ({ key }) => key === COLUMN_PRESET_KEY.DEFAULT
+      )?.columnVisibility,
       sorting: [
         { desc: true, id: BRC_DATA_CATALOG_CATEGORY_KEY.IS_REF },
         { desc: false, id: BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION },
@@ -963,80 +1016,133 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
       cell: ({ row }) => C.AnalyzeGenome(buildAnalyzeGenome(row.original)),
       enableSorting: false,
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANALYZE_GENOME,
-      meta: { width: "auto" },
+      meta: {
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANALYZE_GENOME,
+        width: "auto",
+      },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
       cell: ({ row }) =>
         C.SpeciesCell(buildOrganismGenomeSpecies(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
-      meta: { columnPinned: true, width: { max: "1.5fr", min: "340px" } },
+      meta: {
+        columnPinned: true,
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
+        width: { max: "1.5fr", min: "340px" },
+      },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION,
       cell: ({ row }) => C.BasicCell(buildAccession(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
-      meta: { width: { max: "1fr", min: "164px" } },
+      meta: {
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
+        width: { max: "1fr", min: "164px" },
+      },
+    },
+    {
+      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.RELEASE_DATE,
+      cell: ({ row }) =>
+        C.Tooltip({
+          ...buildReleaseDateTooltip(row.original),
+          children: createElement(C.BasicCell, buildReleaseDate(row.original)),
+        }),
+      header: BRC_DATA_CATALOG_CATEGORY_LABEL.RELEASE_DATE,
+      meta: {
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.RELEASE_DATE,
+        width: { max: "0.5fr", min: "120px" },
+      },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.IS_REF,
       cell: ({ row }) => C.ChipCell(buildIsRef(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.IS_REF,
-      meta: { width: { max: "0.5fr", min: "100px" } },
+      meta: {
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.IS_REF,
+        width: { max: "0.5fr", min: "100px" },
+      },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.LEVEL,
       cell: ({ row }) => C.LevelCell(buildLevel(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.LEVEL,
-      meta: { width: { max: "0.5fr", min: "142px" } },
+      meta: {
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.LEVEL,
+        width: { max: "0.5fr", min: "142px" },
+      },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.CHROMOSOMES,
       cell: ({ row }) => C.BasicCell(buildChromosomes(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.CHROMOSOMES,
-      meta: { width: { max: "0.5fr", min: "142px" } },
+      meta: {
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.CHROMOSOMES,
+        width: { max: "0.5fr", min: "142px" },
+      },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.LENGTH,
       cell: ({ row }) => C.BasicCell(buildLength(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.LENGTH,
-      meta: { width: { max: "0.5fr", min: "132px" } },
+      meta: {
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.LENGTH,
+        width: { max: "0.5fr", min: "132px" },
+      },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_COUNT,
       cell: ({ row }) => C.BasicCell(buildScaffoldCount(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_COUNT,
-      meta: { width: { max: "0.5fr", min: "120px" } },
+      meta: {
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_COUNT,
+        width: { max: "0.5fr", min: "120px" },
+      },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_N50,
       cell: ({ row }) => C.BasicCell(buildScaffoldN50(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_N50,
-      meta: { width: { max: "0.5fr", min: "120px" } },
+      meta: {
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_N50,
+        width: { max: "0.5fr", min: "120px" },
+      },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_L50,
       cell: ({ row }) => C.BasicCell(buildScaffoldL50(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_L50,
-      meta: { width: { max: "0.5fr", min: "120px" } },
+      meta: {
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_L50,
+        width: { max: "0.5fr", min: "120px" },
+      },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.COVERAGE,
       cell: ({ row }) => C.BasicCell(buildCoverage(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.COVERAGE,
-      meta: { width: { max: "0.5fr", min: "120px" } },
+      meta: {
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.COVERAGE,
+        width: { max: "0.5fr", min: "120px" },
+      },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.GC_PERCENT,
       cell: ({ row }) => C.BasicCell(buildGcPercent(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.GC_PERCENT,
-      meta: { width: { max: "0.5fr", min: "120px" } },
+      meta: {
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.GC_PERCENT,
+        width: { max: "0.5fr", min: "120px" },
+      },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.ANNOTATION_STATUS,
       cell: ({ row }) => C.BasicCell(buildAnnotationStatus(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANNOTATION_STATUS,
-      meta: { width: { max: "0.5fr", min: "180px" } },
+      meta: {
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANNOTATION_STATUS,
+        width: { max: "0.5fr", min: "140px" },
+      },
     },
   ];
 }
