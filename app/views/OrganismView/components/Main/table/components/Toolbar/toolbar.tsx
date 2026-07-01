@@ -16,7 +16,8 @@ export const Toolbar = <T extends RowData>({
   columnPresets,
   table,
 }: Props<T>): JSX.Element | null => {
-  if (columnPresets.length === 0) return null;
+  // Nothing to switch between with fewer than two presets.
+  if (columnPresets.length < 2) return null;
   return (
     <StyledToolbar>
       <ColumnPresetToggle presets={columnPresets} table={table} />
