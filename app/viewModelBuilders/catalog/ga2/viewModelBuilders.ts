@@ -1,5 +1,5 @@
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
-import { ColumnDef, RowData } from "@tanstack/react-table";
+import { ColumnDef, RowData, VisibilityState } from "@tanstack/react-table";
 import { ComponentProps, createElement } from "react";
 import { ROUTES } from "../../../../routes/constants";
 import {
@@ -61,26 +61,30 @@ export const buildOrganismViewMain = (
 };
 
 /**
+ * Complete visibility state for the Default preset, also used as the table's
+ * initial state. Columns not listed here are shown; the internal row-position
+ * column is always hidden.
+ */
+const DEFAULT_COLUMN_VISIBILITY: VisibilityState = {
+  [COLUMN_IDENTIFIER.ROW_POSITION]: false,
+  [GA2_CATEGORY_KEY.CHROMOSOMES]: false,
+  [GA2_CATEGORY_KEY.COVERAGE]: false,
+  [GA2_CATEGORY_KEY.GC_PERCENT]: false,
+  [GA2_CATEGORY_KEY.SCAFFOLD_COUNT]: false,
+  [GA2_CATEGORY_KEY.SCAFFOLD_L50]: false,
+  [GA2_CATEGORY_KEY.SCAFFOLD_N50]: false,
+};
+
+/**
  * The column presets (Default, Quality) for the organism genomes table. Each
- * preset lists the columns hidden in that view; unlisted columns remain
- * visible.
+ * preset's complete visibility state is applied via table.setColumnVisibility
+ * on toggle; columns not listed are shown.
  */
 const ORGANISM_GENOMES_COLUMN_PRESETS: ComponentProps<
   typeof C.OrganismViewMain
 >["columnPresets"] = [
   {
-    // Complete visibility state applied via table.setColumnVisibility on toggle;
-    // columns not listed here are shown. The internal row-position column is
-    // always hidden.
-    columnVisibility: {
-      [COLUMN_IDENTIFIER.ROW_POSITION]: false,
-      [GA2_CATEGORY_KEY.CHROMOSOMES]: false,
-      [GA2_CATEGORY_KEY.COVERAGE]: false,
-      [GA2_CATEGORY_KEY.GC_PERCENT]: false,
-      [GA2_CATEGORY_KEY.SCAFFOLD_COUNT]: false,
-      [GA2_CATEGORY_KEY.SCAFFOLD_L50]: false,
-      [GA2_CATEGORY_KEY.SCAFFOLD_N50]: false,
-    },
+    columnVisibility: DEFAULT_COLUMN_VISIBILITY,
     key: COLUMN_PRESET_KEY.DEFAULT,
     label: COLUMN_PRESET_LABEL.DEFAULT,
   },
@@ -126,9 +130,7 @@ export function buildOrganismGenomesTable(
     data: entity.genomes,
     initialState: {
       // Mount on the Default preset so the table matches the toggle.
-      columnVisibility: ORGANISM_GENOMES_COLUMN_PRESETS.find(
-        ({ key }) => key === COLUMN_PRESET_KEY.DEFAULT
-      )?.columnVisibility,
+      columnVisibility: DEFAULT_COLUMN_VISIBILITY,
       sorting: [
         { desc: true, id: GA2_CATEGORY_KEY.IS_REF },
         { desc: false, id: GA2_CATEGORY_KEY.ACCESSION },
