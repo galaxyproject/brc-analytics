@@ -16,7 +16,7 @@ with recursive lineage as (
         n.parent_tax_id,
         n.rank,
         0 as depth
-    from {{ ref("catalog_taxa") }} c
+    from {{ ref("taxonomy_catalog_taxa") }} c
     join {{ source("ncbi_taxonomy_raw", "ncbi_taxonomy_nodes") }} n
         on n.tax_id = c.taxonomy_id
 
