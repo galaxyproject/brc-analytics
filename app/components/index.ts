@@ -49,4 +49,5 @@ export { VersionInfoWithServerStatus } from "./Layout/components/Footer/componen
 export { AuthButton } from "./Layout/components/Header/components/AuthButton/authButton";
 export { AnalyzeGenome } from "./Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 export { LevelCell } from "./Table/components/TableCell/components/LevelCell/levelCell";
+export { TagList } from "./Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
 export { SpeciesCell } from "./Table/components/TableCell/components/SpeciesCell/speciesCell";

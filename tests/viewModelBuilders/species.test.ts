@@ -34,10 +34,14 @@ describe("buildGenomeSpecies", () => {
     expect(props.species.url).toBe("/data/organisms/287");
     expect(props.ncbiTaxonomyId).toBe("208964");
     expect(props.tags).toEqual([
-      { label: "strain", value: "PAO1" },
-      { label: "serotype", value: "O1" },
-      { label: "isolate", value: "ISO-1" },
-      { label: "group", value: "Bacteria, Proteobacteria" },
+      { label: "strain", tooltip: "PAO1", value: "PAO1" },
+      { label: "serotype", tooltip: "O1", value: "O1" },
+      { label: "isolate", tooltip: "ISO-1", value: "ISO-1" },
+      {
+        label: "group",
+        tooltip: "Bacteria, Proteobacteria",
+        value: "Bacteria, Proteobacteria",
+      },
       {
         color: "warning",
         label: "priority",
@@ -84,8 +88,8 @@ describe("buildAssemblySpecies", () => {
     expect(props.species.url).toBe("/data/organisms/9606");
     expect(props.ncbiTaxonomyId).toBe("9606");
     expect(props.tags).toEqual([
-      { label: "strain", value: "GRCh38" },
-      { label: "group", value: "Vertebrates" },
+      { label: "strain", tooltip: "GRCh38", value: "GRCh38" },
+      { label: "group", tooltip: "Vertebrates", value: "Vertebrates" },
     ]);
   });
 
@@ -105,9 +109,10 @@ describe("buildAssemblySpecies", () => {
   });
 });
 
-describe("organism detail species cell (no self-link)", () => {
-  test("buildOrganismGenomeSpecies blanks the species url, keeps tags", () => {
+describe("organism detail species cell (accession primary, no self-link)", () => {
+  test("buildOrganismGenomeSpecies uses the accession as an unlinked label, keeps per-assembly tags", () => {
     const genome = {
+      accession: "GCF_000002765.6",
       ncbiTaxonomyId: "5833",
       speciesTaxonomyId: "5833",
       strainName: "3D7",
@@ -120,13 +125,16 @@ describe("organism detail species cell (no self-link)", () => {
 
     const props = buildOrganismGenomeSpecies(genome);
 
-    expect(props.species.label).toBe("Plasmodium falciparum");
+    expect(props.species.label).toBe("GCF_000002765.6");
     expect(props.species.url).toBe("");
-    expect(props.tags).toEqual([{ label: "strain", value: "3D7" }]);
+    expect(props.tags).toEqual([
+      { label: "strain", tooltip: "3D7", value: "3D7" },
+    ]);
   });
 
-  test("buildOrganismAssemblySpecies blanks the species url, keeps tags", () => {
+  test("buildOrganismAssemblySpecies uses the accession as an unlinked label and drops the organism-scoped group tag", () => {
     const assembly = {
+      accession: "GCF_000001405.40",
       ncbiTaxonomyId: "9606",
       speciesTaxonomyId: "9606",
       strainName: "",
@@ -137,11 +145,10 @@ describe("organism detail species cell (no self-link)", () => {
 
     const props = buildOrganismAssemblySpecies(assembly);
 
-    expect(props.species.label).toBe("Homo sapiens");
+    expect(props.species.label).toBe("GCF_000001405.40");
     expect(props.species.url).toBe("");
     expect(props.tags).toEqual([
-      { label: "strain", value: "GRCh38" },
-      { label: "group", value: "Vertebrates" },
+      { label: "strain", tooltip: "GRCh38", value: "GRCh38" },
     ]);
   });
 });

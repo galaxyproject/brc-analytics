@@ -6,10 +6,10 @@ import { TagList } from "./components/TagList/tagList";
 import { SpeciesCellProps } from "./types";
 
 /*
- * Renders the consolidated species cell: the species name as a link, the
+ * Renders the consolidated species cell: the primary label as a link, the
  * populated minor taxonomy fields (strain, isolate, serotype, taxonomic group)
- * as chips, then the NCBI taxonomy id. Minor fields are provided pre-filtered by
- * the view builder, so a chip renders only when present.
+ * as chips, then the NCBI taxonomy id. Minor fields are provided pre-filtered
+ * by the view builder, so a chip renders only when present.
  */
 export const SpeciesCell = ({
   ncbiTaxonomyId,
