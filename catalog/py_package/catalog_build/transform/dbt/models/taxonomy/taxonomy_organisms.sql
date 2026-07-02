@@ -5,4 +5,4 @@ select
   l.rank,
   l.taxon_name
 from {{ source("catalog", "organism_taxa") }} t
-join {{ ref("taxonomy_lineages_with_names") }} l on l.query_tax_id = t.taxonomy_id and l.tax_id = t.taxonomy_id
+join {{ ref("taxonomy_lineages_with_names") }} l on l.query_tax_id = t.taxonomy_id and l.is_query_taxon
