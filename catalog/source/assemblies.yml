@@ -8901,3 +8901,7 @@ assemblies:
   - accession: GCF_036630325.1
   # organism: Verticillium dahliae
   - accession: GCA_030450075.1
+  # organism: Cochliomyia hominivorax
+  - accession: GCA_004302925.2
+  - accession: GCA_051144935.1
+  - accession: GCA_051144965.1
