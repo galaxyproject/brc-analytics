@@ -43,5 +43,6 @@ select
     tax_id,
     parent_tax_id,
     rank,
-    depth
+    depth,
+    is_query_taxon
 from lineage
