@@ -8,7 +8,7 @@
     "workflowTrsId": "#workflow/github.com/iwc-workflows/haploid-variant-calling-wgs-pe/main/versions/v0.1"
   },
   {
-    "compatibleAssemblyCount": 5499,
+    "compatibleAssemblyCount": 5502,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/ploidy-aware-genotype-calling/main/versions/v0.1.2"
   },
   {
@@ -52,7 +52,7 @@
     "workflowTrsId": "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v1.1"
   },
   {
-    "compatibleAssemblyCount": 5499,
+    "compatibleAssemblyCount": 5502,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.5"
   },
   {
@@ -84,7 +84,7 @@
     "workflowTrsId": "#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.7"
   },
   {
-    "compatibleAssemblyCount": 4475,
+    "compatibleAssemblyCount": 4478,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/annotation-braker3/main/versions/v0.1"
   },
   {
@@ -92,11 +92,11 @@
     "workflowTrsId": "#workflow/github.com/iwc-workflows/bacterial_genome_annotation/main/versions/v1.2.0"
   },
   {
-    "compatibleAssemblyCount": 4475,
+    "compatibleAssemblyCount": 4478,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/lncRNAs-annotation/main/versions/v0.1"
   },
   {
-    "compatibleAssemblyCount": 5499,
+    "compatibleAssemblyCount": 5502,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/assembly-with-flye/main/versions/v0.4"
   },
   {
@@ -104,7 +104,7 @@
     "workflowTrsId": "#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v2.0.1"
   },
   {
-    "compatibleAssemblyCount": 5499,
+    "compatibleAssemblyCount": 5502,
     "workflowTrsId": "#workflow/github.com/iwc-workflows/polish-with-long-reads/main/versions/v0.1"
   },
   {
