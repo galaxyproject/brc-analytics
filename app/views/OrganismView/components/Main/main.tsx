@@ -11,6 +11,7 @@ import { getWorkflows } from "../../../../services/workflows/entities";
 import { Accordion } from "../../../AnalyzeWorkflowsView/components/Main/components/Accordion/accordion";
 import { EmptyState } from "./components/EmptyState/emptyState";
 import { StyledSectionTitle } from "./main.styles";
+import { Toolbar } from "./table/components/Toolbar/toolbar";
 import { useTable } from "./table/hooks/UseTable/hook";
 import { StyledFluidPaper } from "./table/table.styles";
 import type { Props } from "./types";
@@ -20,12 +21,14 @@ import { buildOrganismWorkflows } from "./utils";
  * Main column for the organism detail page: organism-scoped workflows section
  * and the assemblies section (header, info alert, and assemblies table).
  * @param props - Component props.
+ * @param props.columnPresets - Column presets for the assemblies table.
  * @param props.entityId - Organism entity ID.
  * @param props.organism - Organism.
  * @param props.tableOptions - Options for the assemblies table.
  * @returns A JSX element with the organism detail main content.
  */
 export const Main = <T extends RowData>({
+  columnPresets,
   entityId,
   organism,
   tableOptions,
@@ -76,6 +79,7 @@ export const Main = <T extends RowData>({
         </EmptyState>
       ) : (
         <StyledFluidPaper elevation={0}>
+          <Toolbar columnPresets={columnPresets} table={table} />
           <Table table={table} />
         </StyledFluidPaper>
       )}
