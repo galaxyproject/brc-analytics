@@ -19,12 +19,14 @@ import {
 } from "../../../views/OrganismView/components/Main/constants";
 import {
   buildAnalyzeGenome,
+  buildGroupTag,
   buildIsRef,
   buildLevel,
   buildReleaseDate,
   buildReleaseDateTooltip,
   formatNumber,
   getGenomeStrainText,
+  ORGANISM_SCOPED_TAG_LABELS,
 } from "../brc-analytics-catalog/common/viewModelBuilders";
 
 /**
@@ -35,11 +37,17 @@ import {
 export const buildOrganismHero = (
   entity: GA2OrganismEntity
 ): ComponentProps<typeof C.BackPageHero> => {
+  // The species/group are constant across the organism's assemblies, so surface
+  // the group as a header chip rather than repeating it on every assembly row.
+  const groupTag = buildGroupTag(entity.taxonomicGroup);
   return {
     breadcrumbs: [
       { path: ROUTES.ORGANISMS, text: "Organisms" },
       { path: "", text: entity.taxonomicLevelSpecies },
     ],
+    subTitle: groupTag
+      ? createElement(C.TagList, { tags: [groupTag] })
+      : undefined,
     title: entity.taxonomicLevelSpecies,
   };
 };
@@ -144,6 +152,12 @@ export function buildOrganismGenomesTable(
 }
 
 /**
+ * Header for the pinned species column on the organism detail table: relabelled
+ * "Assembly" since the cell's primary text is the assembly accession.
+ */
+const ASSEMBLY_COLUMN_HEADER = "Assembly";
+
+/**
  * Build the column definitions for the organism genomes table.
  * @returns column definitions.
  */
@@ -160,11 +174,11 @@ function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
       accessorKey: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
       cell: ({ row }) =>
         C.SpeciesCell(buildOrganismAssemblySpecies(row.original)),
-      header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
+      header: ASSEMBLY_COLUMN_HEADER,
       meta: {
         columnPinned: true,
-        header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
-        width: { max: "1.5fr", min: "340px" },
+        header: ASSEMBLY_COLUMN_HEADER,
+        width: { max: "0.75fr", min: "176px" },
       },
     },
     {
@@ -211,7 +225,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
       header: GA2_CATEGORY_LABEL.CHROMOSOMES,
       meta: {
         header: GA2_CATEGORY_LABEL.CHROMOSOMES,
-        width: { max: "1fr", min: "152px" },
+        width: { max: "1fr", min: "142px" },
       },
     },
     {
@@ -229,7 +243,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
       header: GA2_CATEGORY_LABEL.SCAFFOLD_COUNT,
       meta: {
         header: GA2_CATEGORY_LABEL.SCAFFOLD_COUNT,
-        width: { max: "1fr", min: "152px" },
+        width: { max: "1fr", min: "116px" },
       },
     },
     {
@@ -238,7 +252,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
       header: GA2_CATEGORY_LABEL.SCAFFOLD_N50,
       meta: {
         header: GA2_CATEGORY_LABEL.SCAFFOLD_N50,
-        width: { max: "1fr", min: "152px" },
+        width: { max: "1fr", min: "120px" },
       },
     },
     {
@@ -247,7 +261,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
       header: GA2_CATEGORY_LABEL.SCAFFOLD_L50,
       meta: {
         header: GA2_CATEGORY_LABEL.SCAFFOLD_L50,
-        width: { max: "1fr", min: "152px" },
+        width: { max: "1fr", min: "116px" },
       },
     },
     {
@@ -255,7 +269,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
       header: GA2_CATEGORY_LABEL.COVERAGE,
       meta: {
         header: GA2_CATEGORY_LABEL.COVERAGE,
-        width: { max: "1fr", min: "152px" },
+        width: { max: "1fr", min: "116px" },
       },
     },
     {
@@ -263,7 +277,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
       header: GA2_CATEGORY_LABEL.GC_PERCENT,
       meta: {
         header: GA2_CATEGORY_LABEL.GC_PERCENT,
-        width: { max: "1fr", min: "152px" },
+        width: { max: "1fr", min: "116px" },
       },
     },
     {
@@ -304,12 +318,9 @@ export const buildAssemblySpecies = (
 ): ComponentProps<typeof C.SpeciesCell> => {
   const tags: SpeciesTag[] = [];
   const strain = getGenomeStrainText(entity);
-  if (strain) tags.push({ label: "strain", value: strain });
-  if (entity.taxonomicGroup.length > 0)
-    tags.push({
-      label: "group",
-      value: entity.taxonomicGroup.join(", "),
-    });
+  if (strain) tags.push({ label: "strain", tooltip: strain, value: strain });
+  const groupTag = buildGroupTag(entity.taxonomicGroup);
+  if (groupTag) tags.push(groupTag);
   return {
     ncbiTaxonomyId: entity.ncbiTaxonomyId,
     species: {
@@ -322,8 +333,10 @@ export const buildAssemblySpecies = (
 
 /**
  * Build props for the species cell on the organism detail page assembly table.
- * Same as buildAssemblySpecies but with an empty species url — the species is the
- * page's own organism, so Link renders the name as plain text (no self-link).
+ * The accession is the cell's primary (unlinked) label — the species name is
+ * redundant on a single-organism page and moves to the hero title. The
+ * organism-scoped group tag is dropped here as it moves to the hero; only
+ * per-assembly tags (strain) remain.
  * @param entity - Assembly entity.
  * @returns Props to be used for the SpeciesCell component.
  */
@@ -333,7 +346,11 @@ export const buildOrganismAssemblySpecies = (
   const props = buildAssemblySpecies(entity);
   return {
     ...props,
-    accession: entity.accession,
-    species: { ...props.species, url: "" },
+    // Accession replaces the species name as the cell's primary text (rendered
+    // as plain text — no link). Organism-scoped tags move to the page header.
+    species: { label: entity.accession, url: "" },
+    tags: props.tags?.filter(
+      ({ label }) => !ORGANISM_SCOPED_TAG_LABELS.includes(label)
+    ),
   };
 };

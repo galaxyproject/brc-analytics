@@ -220,23 +220,20 @@ export const buildGenomeSpecies = (
 ): ComponentProps<typeof C.SpeciesCell> => {
   const tags: SpeciesTag[] = [];
   const strain = getGenomeStrainText(genome);
-  if (strain) tags.push({ label: "strain", value: strain });
+  if (strain) tags.push({ label: "strain", tooltip: strain, value: strain });
   const serotype = getGenomeSerotypeText(genome);
-  if (serotype) tags.push({ label: "serotype", value: serotype });
+  if (serotype)
+    tags.push({ label: "serotype", tooltip: serotype, value: serotype });
   const isolate = getGenomeIsolateText(genome);
-  if (isolate) tags.push({ label: "isolate", value: isolate });
-  if (genome.taxonomicGroup.length > 0)
-    tags.push({
-      label: "group",
-      value: genome.taxonomicGroup.join(", "),
-    });
-  if (genome.priority)
-    tags.push({
-      color: getPriorityColor(genome.priority),
-      label: "priority",
-      tooltip: genome.priorityPathogenName ?? undefined,
-      value: genome.priority.toLowerCase().replace(/_/g, " "),
-    });
+  if (isolate)
+    tags.push({ label: "isolate", tooltip: isolate, value: isolate });
+  const groupTag = buildGroupTag(genome.taxonomicGroup);
+  if (groupTag) tags.push(groupTag);
+  const priorityTag = buildPriorityTag(
+    genome.priority,
+    genome.priorityPathogenName
+  );
+  if (priorityTag) tags.push(priorityTag);
   return {
     ncbiTaxonomyId: genome.ncbiTaxonomyId,
     species: {
@@ -248,9 +245,60 @@ export const buildGenomeSpecies = (
 };
 
 /**
+ * Species-cell tag labels. Single source of truth shared by the tag builders
+ * and the organism-scoped filter so they can't drift apart.
+ */
+const SPECIES_TAG_LABEL = {
+  GROUP: "group",
+  PRIORITY: "priority",
+} as const;
+
+/**
+ * Labels of the species/organism-scoped tags (constant across an organism's
+ * assemblies). On the organism detail page these move to the header, so the
+ * per-assembly species cell omits them.
+ */
+export const ORGANISM_SCOPED_TAG_LABELS: string[] = [
+  SPECIES_TAG_LABEL.GROUP,
+  SPECIES_TAG_LABEL.PRIORITY,
+];
+
+/**
+ * Build the taxonomic group tag, or null when there is no group.
+ * @param taxonomicGroup - Taxonomic group values.
+ * @returns Group tag, or null.
+ */
+export function buildGroupTag(taxonomicGroup: string[]): SpeciesTag | null {
+  if (taxonomicGroup.length === 0) return null;
+  const value = taxonomicGroup.join(", ");
+  return { label: SPECIES_TAG_LABEL.GROUP, tooltip: value, value };
+}
+
+/**
+ * Build the priority pathogen tag, or null when the entity has no priority.
+ * @param priority - Outbreak priority.
+ * @param priorityPathogenName - Priority pathogen name (tag tooltip).
+ * @returns Priority tag, or null.
+ */
+function buildPriorityTag(
+  priority: OUTBREAK_PRIORITY | null,
+  priorityPathogenName: string | null
+): SpeciesTag | null {
+  if (!priority) return null;
+  return {
+    color: getPriorityColor(priority),
+    label: SPECIES_TAG_LABEL.PRIORITY,
+    tooltip: priorityPathogenName ?? undefined,
+    value: priority.toLowerCase().replace(/_/g, " "),
+  };
+}
+
+/**
  * Build props for the species cell on the organism detail page assembly table.
- * Same as buildGenomeSpecies but with an empty species url — the species is the
- * page's own organism, so Link renders the name as plain text (no self-link).
+ * The accession is the cell's primary (unlinked) label — the species name is
+ * redundant on a single-organism page and moves to the hero title. The
+ * organism-scoped tags (group, priority) are dropped here as they move to the
+ * hero; only per-assembly tags (strain, serotype, isolate) remain.
  * @param genome - Genome entity.
  * @returns Props to be used for the SpeciesCell component.
  */
@@ -260,8 +308,12 @@ export const buildOrganismGenomeSpecies = (
   const props = buildGenomeSpecies(genome);
   return {
     ...props,
-    accession: genome.accession,
-    species: { ...props.species, url: "" },
+    // Accession replaces the species name as the cell's primary text (rendered
+    // as plain text — no link). Organism-scoped tags move to the page header.
+    species: { label: genome.accession, url: "" },
+    tags: props.tags?.filter(
+      ({ label }) => !ORGANISM_SCOPED_TAG_LABELS.includes(label)
+    ),
   };
 };
 
@@ -924,8 +976,20 @@ export const buildAssemblyResources = (
 export const buildOrganismHero = (
   organism: BRCDataCatalogOrganism
 ): ComponentProps<typeof C.BackPageHero> => {
+  // The species/group/priority are constant across the organism's assemblies,
+  // so surface group + priority as header chips rather than repeating them on
+  // every assembly row.
+  const tags: SpeciesTag[] = [];
+  const groupTag = buildGroupTag(organism.taxonomicGroup);
+  if (groupTag) tags.push(groupTag);
+  const priorityTag = buildPriorityTag(
+    organism.priority,
+    organism.priorityPathogenName
+  );
+  if (priorityTag) tags.push(priorityTag);
   return {
     breadcrumbs: getOrganismEntityBreadcrumbs(organism),
+    subTitle: tags.length > 0 ? createElement(C.TagList, { tags }) : undefined,
     title: organism.taxonomicLevelSpecies,
   };
 };
@@ -1016,6 +1080,12 @@ export function buildOrganismGenomesTable(
 }
 
 /**
+ * Header for the pinned species column on the organism detail table: relabelled
+ * "Assembly" since the cell's primary text is the assembly accession.
+ */
+const ASSEMBLY_COLUMN_HEADER = "Assembly";
+
+/**
  * Build the column definitions for the organism genomes table.
  * @returns column definitions.
  */
@@ -1035,11 +1105,11 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
       cell: ({ row }) =>
         C.SpeciesCell(buildOrganismGenomeSpecies(row.original)),
-      header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
+      header: ASSEMBLY_COLUMN_HEADER,
       meta: {
         columnPinned: true,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
-        width: { max: "1.5fr", min: "340px" },
+        header: ASSEMBLY_COLUMN_HEADER,
+        width: { max: "0.75fr", min: "176px" },
       },
     },
     {
@@ -1106,7 +1176,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_COUNT,
       meta: {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_COUNT,
-        width: { max: "0.5fr", min: "120px" },
+        width: { max: "0.5fr", min: "116px" },
       },
     },
     {
@@ -1115,7 +1185,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_N50,
       meta: {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_N50,
-        width: { max: "0.5fr", min: "120px" },
+        width: { max: "0.5fr", min: "116px" },
       },
     },
     {
@@ -1124,7 +1194,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_L50,
       meta: {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_L50,
-        width: { max: "0.5fr", min: "120px" },
+        width: { max: "0.5fr", min: "116px" },
       },
     },
     {
@@ -1133,7 +1203,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.COVERAGE,
       meta: {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.COVERAGE,
-        width: { max: "0.5fr", min: "120px" },
+        width: { max: "0.5fr", min: "116px" },
       },
     },
     {
@@ -1142,7 +1212,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.GC_PERCENT,
       meta: {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.GC_PERCENT,
-        width: { max: "0.5fr", min: "120px" },
+        width: { max: "0.5fr", min: "116px" },
       },
     },
     {
