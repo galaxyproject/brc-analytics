@@ -258,7 +258,11 @@ export const buildOrganismGenomeSpecies = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.SpeciesCell> => {
   const props = buildGenomeSpecies(genome);
-  return { ...props, species: { ...props.species, url: "" } };
+  return {
+    ...props,
+    accession: genome.accession,
+    species: { ...props.species, url: "" },
+  };
 };
 
 /**
@@ -949,6 +953,9 @@ export const buildOrganismViewMain = (
  */
 const DEFAULT_COLUMN_VISIBILITY: VisibilityState = {
   [COLUMN_IDENTIFIER.ROW_POSITION]: false,
+  // Accession is shown within the species cell on the detail page; its column
+  // is hidden but retained so the table can still sort by accession.
+  [BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION]: false,
   [BRC_DATA_CATALOG_CATEGORY_KEY.CHROMOSOMES]: false,
   [BRC_DATA_CATALOG_CATEGORY_KEY.COVERAGE]: false,
   [BRC_DATA_CATALOG_CATEGORY_KEY.GC_PERCENT]: false,
@@ -973,6 +980,7 @@ const ORGANISM_GENOMES_COLUMN_PRESETS: ComponentProps<
   {
     columnVisibility: {
       [COLUMN_IDENTIFIER.ROW_POSITION]: false,
+      [BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION]: false,
       [BRC_DATA_CATALOG_CATEGORY_KEY.ANNOTATION_STATUS]: false,
       [BRC_DATA_CATALOG_CATEGORY_KEY.IS_REF]: false,
       [BRC_DATA_CATALOG_CATEGORY_KEY.LENGTH]: false,

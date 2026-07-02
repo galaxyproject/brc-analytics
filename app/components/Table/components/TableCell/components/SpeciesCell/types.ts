@@ -2,6 +2,7 @@ import { LinkProps } from "@databiosphere/findable-ui/lib/components/Links/compo
 import { ChipProps } from "@mui/material";
 
 export interface SpeciesCellProps {
+  accession?: string;
   ncbiTaxonomyId?: string;
   species: LinkProps;
   tags?: SpeciesTag[];

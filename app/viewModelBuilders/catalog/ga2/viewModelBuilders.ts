@@ -67,6 +67,9 @@ export const buildOrganismViewMain = (
  */
 const DEFAULT_COLUMN_VISIBILITY: VisibilityState = {
   [COLUMN_IDENTIFIER.ROW_POSITION]: false,
+  // Accession is shown within the species cell on the detail page; its column
+  // is hidden but retained so the table can still sort by accession.
+  [GA2_CATEGORY_KEY.ACCESSION]: false,
   [GA2_CATEGORY_KEY.CHROMOSOMES]: false,
   [GA2_CATEGORY_KEY.COVERAGE]: false,
   [GA2_CATEGORY_KEY.GC_PERCENT]: false,
@@ -91,6 +94,7 @@ const ORGANISM_GENOMES_COLUMN_PRESETS: ComponentProps<
   {
     columnVisibility: {
       [COLUMN_IDENTIFIER.ROW_POSITION]: false,
+      [GA2_CATEGORY_KEY.ACCESSION]: false,
       [GA2_CATEGORY_KEY.ANNOTATION_STATUS]: false,
       [GA2_CATEGORY_KEY.IS_REF]: false,
       [GA2_CATEGORY_KEY.LENGTH]: false,
@@ -327,5 +331,9 @@ export const buildOrganismAssemblySpecies = (
   entity: GA2AssemblyEntity
 ): ComponentProps<typeof C.SpeciesCell> => {
   const props = buildAssemblySpecies(entity);
-  return { ...props, species: { ...props.species, url: "" } };
+  return {
+    ...props,
+    accession: entity.accession,
+    species: { ...props.species, url: "" },
+  };
 };
