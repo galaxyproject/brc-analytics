@@ -20,7 +20,6 @@ export const WorkflowsView = (): JSX.Element => {
   const workflowCategories = getWorkflowCategories();
   const organisms = getOrganisms<Organism>();
   const isAssemblyWorkflowsEnabled = useFeatureFlag("assembly-workflows");
-  const isFluEnabled = useFeatureFlag("flu");
   const isHyphyEnabled = useFeatureFlag("hyphy");
   const isLmlsEnabled = useFeatureFlag("lmls");
   const [mappings, setMappings] = useState<WorkflowAssemblyMapping[] | null>(
@@ -49,13 +48,11 @@ export const WorkflowsView = (): JSX.Element => {
             organisms,
             isAssemblyWorkflowsEnabled,
             isLmlsEnabled,
-            isFluEnabled,
             isHyphyEnabled
           )
         : [],
     [
       isAssemblyWorkflowsEnabled,
-      isFluEnabled,
       isHyphyEnabled,
       isLmlsEnabled,
       mappings,
