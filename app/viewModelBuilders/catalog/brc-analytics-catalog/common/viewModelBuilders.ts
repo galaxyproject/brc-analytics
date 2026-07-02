@@ -1017,9 +1017,6 @@ export const buildOrganismViewMain = (
  */
 const DEFAULT_COLUMN_VISIBILITY: VisibilityState = {
   [COLUMN_IDENTIFIER.ROW_POSITION]: false,
-  // Accession is shown within the species cell on the detail page; its column
-  // is hidden but retained so the table can still sort by accession.
-  [BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION]: false,
   [BRC_DATA_CATALOG_CATEGORY_KEY.CHROMOSOMES]: false,
   [BRC_DATA_CATALOG_CATEGORY_KEY.COVERAGE]: false,
   [BRC_DATA_CATALOG_CATEGORY_KEY.GC_PERCENT]: false,
@@ -1044,7 +1041,6 @@ const ORGANISM_GENOMES_COLUMN_PRESETS: ComponentProps<
   {
     columnVisibility: {
       [COLUMN_IDENTIFIER.ROW_POSITION]: false,
-      [BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION]: false,
       [BRC_DATA_CATALOG_CATEGORY_KEY.ANNOTATION_STATUS]: false,
       [BRC_DATA_CATALOG_CATEGORY_KEY.IS_REF]: false,
       [BRC_DATA_CATALOG_CATEGORY_KEY.LENGTH]: false,
@@ -1102,7 +1098,10 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
       },
     },
     {
-      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
+      // Keyed on accession so the pinned "Assembly" column sorts by accession
+      // (its primary text); the SpeciesCell renders the accession + per-assembly
+      // tags.
+      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION,
       cell: ({ row }) =>
         C.SpeciesCell(buildOrganismGenomeSpecies(row.original)),
       header: ASSEMBLY_COLUMN_HEADER,
@@ -1110,15 +1109,6 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
         columnPinned: true,
         header: ASSEMBLY_COLUMN_HEADER,
         width: { max: "0.75fr", min: "176px" },
-      },
-    },
-    {
-      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION,
-      cell: ({ row }) => C.BasicCell(buildAccession(row.original)),
-      header: BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
-      meta: {
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
-        width: { max: "1fr", min: "164px" },
       },
     },
     {

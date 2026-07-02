@@ -75,9 +75,6 @@ export const buildOrganismViewMain = (
  */
 const DEFAULT_COLUMN_VISIBILITY: VisibilityState = {
   [COLUMN_IDENTIFIER.ROW_POSITION]: false,
-  // Accession is shown within the species cell on the detail page; its column
-  // is hidden but retained so the table can still sort by accession.
-  [GA2_CATEGORY_KEY.ACCESSION]: false,
   [GA2_CATEGORY_KEY.CHROMOSOMES]: false,
   [GA2_CATEGORY_KEY.COVERAGE]: false,
   [GA2_CATEGORY_KEY.GC_PERCENT]: false,
@@ -102,7 +99,6 @@ const ORGANISM_GENOMES_COLUMN_PRESETS: ComponentProps<
   {
     columnVisibility: {
       [COLUMN_IDENTIFIER.ROW_POSITION]: false,
-      [GA2_CATEGORY_KEY.ACCESSION]: false,
       [GA2_CATEGORY_KEY.ANNOTATION_STATUS]: false,
       [GA2_CATEGORY_KEY.IS_REF]: false,
       [GA2_CATEGORY_KEY.LENGTH]: false,
@@ -171,7 +167,10 @@ function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
       meta: { header: GA2_CATEGORY_LABEL.ANALYZE_GENOME, width: "auto" },
     },
     {
-      accessorKey: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
+      // Keyed on accession so the pinned "Assembly" column sorts by accession
+      // (its primary text); the SpeciesCell renders the accession + per-assembly
+      // tags.
+      accessorKey: GA2_CATEGORY_KEY.ACCESSION,
       cell: ({ row }) =>
         C.SpeciesCell(buildOrganismAssemblySpecies(row.original)),
       header: ASSEMBLY_COLUMN_HEADER,
@@ -179,14 +178,6 @@ function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
         columnPinned: true,
         header: ASSEMBLY_COLUMN_HEADER,
         width: { max: "0.75fr", min: "176px" },
-      },
-    },
-    {
-      accessorKey: GA2_CATEGORY_KEY.ACCESSION,
-      header: GA2_CATEGORY_LABEL.ACCESSION,
-      meta: {
-        header: GA2_CATEGORY_LABEL.ACCESSION,
-        width: { max: "1fr", min: "152px" },
       },
     },
     {
