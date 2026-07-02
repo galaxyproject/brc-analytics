@@ -15,6 +15,7 @@ from requests.exceptions import ConnectTimeout
 
 from .load import do_dlt_load
 from .qc_utils import format_list_section, format_raw_section, join_report
+from .transform import do_dbt_transformations
 from .utils import get_db_path
 
 MAX_NCBI_URL_LENGTH = 2000  # The actual limit seems to be a bit over 4000
@@ -1553,6 +1554,9 @@ def load_and_transform(
         organism_taxa_df=organisms_df,
         outbreak_taxa_df=outbreaks_df,
     )
+
+    # Transform loaded data via dbt
+    do_dbt_transformations(temp_folder_path)
 
 
 def build_files(
