@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ConfiguredInput } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { UseBaselineContrasts } from "./types";
 import {
@@ -22,6 +22,16 @@ export function useBaselineContrasts(
   const [baseline, setBaseline] = useState<string | null>(null);
   const [compare, setCompare] = useState<Set<string>>(createInitialCompare);
 
+  // Reset state when primaryFactor changes. Adjusting state during render
+  // (tracking the previous value) is React's recommended alternative to a
+  // reset-in-effect — it avoids the extra commit + re-render.
+  const [prevPrimaryFactor, setPrevPrimaryFactor] = useState(primaryFactor);
+  if (primaryFactor !== prevPrimaryFactor) {
+    setPrevPrimaryFactor(primaryFactor);
+    setBaseline(null);
+    setCompare(createInitialCompare());
+  }
+
   const primaryContrasts = useMemo(
     () => buildBaselineContrasts(baseline, compare),
     [baseline, compare]
@@ -40,12 +50,6 @@ export function useBaselineContrasts(
   const onToggleCompare = useCallback((value: string): void => {
     setCompare(toggleCompareUpdater(value));
   }, []);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset-on-dependency-change effect (react-hooks v7 anti-pattern); refactor tracked in #1393
-    setBaseline(null);
-    setCompare(createInitialCompare());
-  }, [primaryFactor]);
 
   return {
     baseline,
