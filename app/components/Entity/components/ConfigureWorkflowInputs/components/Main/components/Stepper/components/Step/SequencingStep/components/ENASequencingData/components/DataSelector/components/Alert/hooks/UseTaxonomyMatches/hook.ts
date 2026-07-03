@@ -1,7 +1,7 @@
-import { Table } from "@tanstack/react-table";
+import type { Table } from "@tanstack/react-table";
 import { useState } from "react";
-import { ReadRun } from "../../../../../../types";
-import { UseTaxonomyMatches } from "./types";
+import type { ReadRun } from "../../../../../../types";
+import type { UseTaxonomyMatches } from "./types";
 
 export const useTaxonomyMatches = (
   table: Table<ReadRun>
