@@ -19,14 +19,14 @@ export function useColumnClassification(
     () => initClassifications(columnNames)
   );
 
-  // Re-initialize when the columns change. Adjusting state during render
-  // (tracking the previous value) is React's recommended alternative to an
-  // init-in-effect — it avoids the extra commit + re-render.
+  // Re-initialize when the columns change (including when cleared to none, so
+  // no stale classifications linger). Adjusting state during render (tracking
+  // the previous value) is React's recommended alternative to an init-in-effect
+  // — it avoids the extra commit + re-render.
   const [prevColumnNames, setPrevColumnNames] = useState(columnNames);
   if (columnNames !== prevColumnNames) {
     setPrevColumnNames(columnNames);
-    if (columnNames.length > 0)
-      setClassificationMap(initClassifications(columnNames));
+    setClassificationMap(initClassifications(columnNames));
   }
 
   const classifications = useMemo(

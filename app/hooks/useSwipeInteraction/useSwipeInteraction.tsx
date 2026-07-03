@@ -127,9 +127,11 @@ export function useSwipeInteraction(
   // NONE. The reset is the "ack" half of a reducer-style action cycle rather
   // than derived state, so it's kept as an effect deliberately: the shared
   // external entry point means the logic can't simply move into event handlers.
+  /* eslint-disable react-hooks/set-state-in-effect -- intentional: this effect
+     consumes a dispatched swipe action (see comment above) and acknowledges it
+     by resetting to NONE in every branch; it is not syncing derived state. */
   useEffect(() => {
     if (swipeAction === SWIPE_ACTION.SWIPE_FORWARD) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: acking a dispatched action, not syncing derived state (see comment above)
       onSwipeToIndex(1);
       setSwipeAction(SWIPE_ACTION.NONE);
     } else if (swipeAction === SWIPE_ACTION.SWIPE_BACKWARD) {
@@ -139,6 +141,7 @@ export function useSwipeInteraction(
       setSwipeAction(SWIPE_ACTION.NONE);
     }
   }, [swipeAction, onSwipeToIndex]);
+  /* eslint-enable react-hooks/set-state-in-effect -- re-enable after the intentional ack effect above */
 
   useEffect(() => {
     if (interactiveDelay === 0) return;
