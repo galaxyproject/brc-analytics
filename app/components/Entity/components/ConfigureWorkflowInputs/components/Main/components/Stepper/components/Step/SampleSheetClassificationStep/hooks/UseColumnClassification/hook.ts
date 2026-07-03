@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ConfiguredInput } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { ClassificationMap, COLUMN_TYPE } from "../../types";
 import { getColumnNames, validateClassifications } from "../../utils";
@@ -13,11 +13,21 @@ import { initClassifications, updateClassification } from "./utils";
 export function useColumnClassification(
   sampleSheet: ConfiguredInput["sampleSheet"]
 ): UseColumnClassification {
+  const columnNames = useMemo(() => getColumnNames(sampleSheet), [sampleSheet]);
+
   const [classificationMap, setClassificationMap] = useState<ClassificationMap>(
-    new Map()
+    () => initClassifications(columnNames)
   );
 
-  const columnNames = useMemo(() => getColumnNames(sampleSheet), [sampleSheet]);
+  // Re-initialize when the columns change. Adjusting state during render
+  // (tracking the previous value) is React's recommended alternative to an
+  // init-in-effect — it avoids the extra commit + re-render.
+  const [prevColumnNames, setPrevColumnNames] = useState(columnNames);
+  if (columnNames !== prevColumnNames) {
+    setPrevColumnNames(columnNames);
+    if (columnNames.length > 0)
+      setClassificationMap(initClassifications(columnNames));
+  }
 
   const classifications = useMemo(
     () => Object.fromEntries(classificationMap),
@@ -40,13 +50,6 @@ export function useColumnClassification(
     },
     []
   );
-
-  useEffect(() => {
-    if (columnNames.length > 0) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- init-on-dependency-change effect (react-hooks v7 anti-pattern); refactor tracked in #1393
-      setClassificationMap(initClassifications(columnNames));
-    }
-  }, [columnNames]);
 
   return {
     classifications,
