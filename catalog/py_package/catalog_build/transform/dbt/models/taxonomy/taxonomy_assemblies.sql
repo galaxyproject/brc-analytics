@@ -2,9 +2,10 @@
 
 select
   t.taxonomy_id,
-  list(l.tax_id order by depth) as lineage_taxonomy_ids,
-  list(l.rank order by depth) as lineage_ranks,
-  list(l.taxon_name order by depth) as lineage_names,
+  {% for taxonomic_level in var("taxonomic_levels") %}
+  first(l.taxon_name) filter (l.rank = '{{taxonomic_level}}') as taxonomic_level_{{taxonomic_level}},
+  first(l.tax_id) filter (l.rank = '{{taxonomic_level}}') as taxonomic_level_{{taxonomic_level}}_id,
+  {% endfor %}
   first(l.common_names) filter (l.is_query_taxon) as common_names
 from {{ source("catalog", "assembly_taxa") }} t
 join {{ ref("taxonomy_lineages_with_names") }} l on l.query_tax_id = t.taxonomy_id
