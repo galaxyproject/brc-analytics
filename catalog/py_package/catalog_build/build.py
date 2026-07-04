@@ -7,6 +7,7 @@ import time
 import urllib
 from pathlib import Path
 
+import duckdb
 import pandas as pd
 import requests
 import yaml
@@ -1558,6 +1559,14 @@ def load_and_transform(
 
     # Transform loaded data via dbt
     do_dbt_transformations(temp_folder_path, taxonomic_levels=taxonomic_levels)
+
+    # Get transformed data
+    with duckdb.connect(get_db_path(temp_folder_path)) as con:
+        return (
+            con.query("select * from taxonomy_assemblies").df(),
+            con.query("select * from taxonomy_organisms").df(),
+            con.query("select * from taxonomy_outbreaks").df(),
+        )
 
 
 def build_files(

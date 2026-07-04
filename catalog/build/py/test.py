@@ -16,10 +16,13 @@ TEMP_DIR_PATH = "catalog/build/temp"
 organisms_df = read_organisms(ORGANISMS_PATH)
 outbreaks_df = pd.DataFrame({"taxonomy_id": get_outbreak_taxonomy_ids(OUTBREAKS_PATH)})
 
-load_and_transform(
+dfs = load_and_transform(
     TEMP_DIR_PATH,
     taxonomic_levels=TAXANOMIC_LEVELS_FOR_TREE,
     assemblies_df=organisms_df,  # substituting for simplicity/efficiency
     organisms_df=organisms_df,
     outbreaks_df=outbreaks_df,
 )
+
+for df in dfs:
+    print(df)
