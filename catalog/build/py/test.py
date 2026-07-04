@@ -13,13 +13,13 @@ from .build_files_from_ncbi import (
 
 TEMP_DIR_PATH = "catalog/build/temp"
 
-organism_taxa = read_organisms(ORGANISMS_PATH)[["taxonomy_id"]]
-outbreak_taxa = pd.DataFrame({"taxonomy_id": get_outbreak_taxonomy_ids(OUTBREAKS_PATH)})
+organisms_df = read_organisms(ORGANISMS_PATH)
+outbreaks_df = pd.DataFrame({"taxonomy_id": get_outbreak_taxonomy_ids(OUTBREAKS_PATH)})
 
 load_and_transform(
     TEMP_DIR_PATH,
     taxonomic_levels=TAXANOMIC_LEVELS_FOR_TREE,
-    assemblies_df=organism_taxa,  # substituting for simplicity/efficiency
-    organisms_df=organism_taxa,
-    outbreaks_df=outbreak_taxa,
+    assemblies_df=organisms_df,  # substituting for simplicity/efficiency
+    organisms_df=organisms_df,
+    outbreaks_df=outbreaks_df,
 )

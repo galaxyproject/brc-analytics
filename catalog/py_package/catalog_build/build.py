@@ -1551,9 +1551,9 @@ def load_and_transform(
     # Load data via dlt
     do_dlt_load(
         temp_folder_path,
-        assembly_taxa_df=assemblies_df,
-        organism_taxa_df=organisms_df,
-        outbreak_taxa_df=outbreaks_df,
+        assemblies_df=assemblies_df,
+        organisms_df=organisms_df,
+        outbreaks_df=outbreaks_df,
     )
 
     # Transform loaded data via dbt

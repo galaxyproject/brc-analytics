@@ -38,10 +38,15 @@ def catalog_taxa(
 def load_catalog_taxa(
     temp_folder_path: Path,
     *,
-    assembly_taxa_df: pd.DataFrame,
-    organism_taxa_df: pd.DataFrame,
-    outbreak_taxa_df: pd.DataFrame,
+    assemblies_df: pd.DataFrame,
+    organisms_df: pd.DataFrame,
+    outbreaks_df: pd.DataFrame,
 ):
+    # Get dataframes with just taxonomy IDs as ints
+    assembly_taxa_df = assemblies_df[["taxonomy_id"]].astype(int)
+    organism_taxa_df = organisms_df[["taxonomy_id"]].astype(int)
+    outbreak_taxa_df = outbreaks_df[["taxonomy_id"]].astype(int)
+
     pipeline = dlt.pipeline(
         pipeline_name="catalog_data",
         destination=dlt.destinations.duckdb(get_db_path_string(temp_folder_path)),
