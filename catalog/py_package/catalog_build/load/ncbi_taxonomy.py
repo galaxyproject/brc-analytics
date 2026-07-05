@@ -76,9 +76,9 @@ def ncbi_taxdump(dmp_dir: Path):
     ]
 
 
-def load_taxdump(temp_folder_path: Path):
+def load_taxdump(*, temp_folder_path: Path, dlt_pipeline_prefix: str):
     pipeline = dlt.pipeline(
-        pipeline_name="ncbi_taxonomy",
+        pipeline_name=dlt_pipeline_prefix + "ncbi_taxonomy",
         destination=dlt.destinations.duckdb(get_db_path_string(temp_folder_path)),
         dataset_name="raw",
     )
@@ -109,6 +109,8 @@ def download_taxdump(temp_folder_path: Path):
         )
 
 
-def load_ncbi_taxonomy(temp_folder_path: Path):
+def load_ncbi_taxonomy(*, temp_folder_path: Path, dlt_pipeline_prefix: str):
     download_taxdump(temp_folder_path)
-    load_taxdump(temp_folder_path)
+    load_taxdump(
+        temp_folder_path=temp_folder_path, dlt_pipeline_prefix=dlt_pipeline_prefix
+    )

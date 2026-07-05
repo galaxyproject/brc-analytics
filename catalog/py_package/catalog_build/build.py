@@ -1534,8 +1534,9 @@ def add_galaxy_datacache_url(genomes_df, base_url, batch_size=20, timeout=5):
 
 
 def load_and_transform(
-    temp_folder_path_string: str,
     *,
+    temp_folder_path_string: str,
+    dlt_pipeline_prefix: str,
     taxonomic_levels: list[str],
     assemblies_df: pd.DataFrame,
     organisms_df: pd.DataFrame,
@@ -1551,7 +1552,8 @@ def load_and_transform(
 
     # Load data via dlt
     do_dlt_load(
-        temp_folder_path,
+        temp_folder_path=temp_folder_path,
+        dlt_pipeline_prefix=dlt_pipeline_prefix,
         assemblies_df=assemblies_df,
         organisms_df=organisms_df,
         outbreaks_df=outbreaks_df,

@@ -17,7 +17,8 @@ organisms_df = read_organisms(ORGANISMS_PATH)
 outbreaks_df = pd.DataFrame({"taxonomy_id": get_outbreak_taxonomy_ids(OUTBREAKS_PATH)})
 
 dfs = load_and_transform(
-    TEMP_DIR_PATH,
+    temp_folder_path_string=TEMP_DIR_PATH,
+    dlt_pipeline_prefix="brc_catalog_",
     taxonomic_levels=TAXANOMIC_LEVELS_FOR_TREE,
     assemblies_df=organisms_df,  # substituting for simplicity/efficiency
     organisms_df=organisms_df,

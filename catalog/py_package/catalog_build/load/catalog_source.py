@@ -36,8 +36,9 @@ def catalog_taxa(
 
 
 def load_catalog_taxa(
-    temp_folder_path: Path,
     *,
+    temp_folder_path: Path,
+    dlt_pipeline_prefix: str,
     assemblies_df: pd.DataFrame,
     organisms_df: pd.DataFrame,
     outbreaks_df: pd.DataFrame,
@@ -48,7 +49,7 @@ def load_catalog_taxa(
     outbreak_taxa_df = outbreaks_df[["taxonomy_id"]].astype(int)
 
     pipeline = dlt.pipeline(
-        pipeline_name="catalog_data",
+        pipeline_name=dlt_pipeline_prefix + "catalog_data",
         destination=dlt.destinations.duckdb(get_db_path_string(temp_folder_path)),
         dataset_name="catalog_data",
     )
