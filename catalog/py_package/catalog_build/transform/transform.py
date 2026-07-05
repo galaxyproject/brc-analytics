@@ -22,5 +22,4 @@ def do_dbt_transformations(temp_folder_path: Path, *, taxonomic_levels: list[str
             package_additional_vars={"taxonomic_levels": taxonomic_levels},
         ),
     )
-    models = runner.run_all()
-    print(models)
+    runner.run_all()
