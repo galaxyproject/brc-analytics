@@ -60,7 +60,7 @@ if __name__ == "__main__":
         UCSC_ASSEMBLIES_URL,
         TREE_OUTPUT_PATH,
         TAXANOMIC_LEVELS_FOR_TREE,
-        {"taxonomicGroup": TAXONOMIC_GROUPS_BY_TAXONOMY_ID},
+        taxonomic_group_sets={"taxonomicGroup": TAXONOMIC_GROUPS_BY_TAXONOMY_ID},
         qc_report_path=QC_REPORT_PATH,
         organisms_path=ORGANISMS_PATH,
         outbreaks_path=OUTBREAKS_PATH,

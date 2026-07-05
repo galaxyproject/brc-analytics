@@ -1575,6 +1575,7 @@ def build_files(
     ucsc_assemblies_url,
     tree_output_path,
     taxonomic_levels_for_tree,
+    *,
     taxonomic_group_sets=None,
     do_gene_model_urls=True,
     extract_primary_data=False,

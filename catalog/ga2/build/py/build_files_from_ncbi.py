@@ -90,7 +90,7 @@ def build_ncbi_data():
         UCSC_ASSEMBLIES_URL,
         TREE_OUTPUT_PATH,
         TAXANOMIC_LEVELS_FOR_TREE,
-        {
+        taxonomic_group_sets={
             "taxonomicGroup": TAXONOMIC_GROUPS_BY_TAXONOMY_ID,
             "tolId": TOLIDS_BY_TAXONOMY_ID,
         },
