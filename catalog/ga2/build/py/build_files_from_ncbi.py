@@ -22,6 +22,8 @@ QC_REPORT_PATH = "catalog/ga2/output/qc-report.data.md"
 
 TREE_OUTPUT_PATH = "catalog/ga2/output/ncbi-taxa-tree.json"
 
+TEMP_FOLDER_PATH = "catalog/ga2/build/temp"
+
 TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
     40674: "Mammalia",
     8782: "Aves",
@@ -94,6 +96,8 @@ def build_ncbi_data():
             "taxonomicGroup": TAXONOMIC_GROUPS_BY_TAXONOMY_ID,
             "tolId": TOLIDS_BY_TAXONOMY_ID,
         },
+        temp_folder_path=TEMP_FOLDER_PATH,
+        dlt_pipeline_prefix="ga2_catalog_",
         do_gene_model_urls=False,
         organisms_path=ORGANISMS_PATH,
         primary_output_path=PRIMARYDATA_OUTPUT_PATH,
