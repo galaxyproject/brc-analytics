@@ -41,6 +41,10 @@ def ncbi_taxonomy_names(path: Path):
                 "name_class",
             ],
         )
+    ).astype(
+        {
+            "tax_id": "Int64",
+        }
     )
 
 
@@ -65,6 +69,11 @@ def ncbi_taxonomy_nodes(path: Path):
                 None,  # comments
             ],
         )
+    ).astype(
+        {
+            "tax_id": "Int64",
+            "parent_tax_id": "Int64",
+        }
     )
 
 
