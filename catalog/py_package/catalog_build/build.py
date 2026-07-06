@@ -1520,7 +1520,7 @@ def build_files(
             temp_folder_path_string=temp_folder_path,
             dlt_pipeline_prefix=dlt_pipeline_prefix,
             taxonomic_levels=taxonomic_levels_for_tree,
-            assemblies_df=base_genomes_df,
+            assemblies_df=base_genomes_df.rename(columns={"taxonomyId": "taxonomy_id"}),
             organisms_df=source_organisms_df,
             outbreaks_df=source_outbreaks_df,
         )
