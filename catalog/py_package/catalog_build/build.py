@@ -1391,6 +1391,8 @@ def load_and_transform(
 ):
     temp_folder_path = Path(temp_folder_path_string).resolve()
 
+    print("Loading and transforming data via dlt + dbt")
+
     # Create temp folder if needed
     temp_folder_path.mkdir(exist_ok=True)
 
