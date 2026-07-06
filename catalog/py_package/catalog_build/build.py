@@ -301,6 +301,10 @@ def get_species_df(assembly_taxonomy_df, taxonomic_group_sets, taxonomic_levels)
             "lineageTaxonomyIds": assembly_taxonomy_df["lineage_taxonomy_ids"].map(
                 lambda ids: ",".join([str(id) for id in ids])
             ),
+            # TODO: this may not be the most significant common name
+            "commonName": assembly_taxonomy_df["common_names"].map(
+                lambda names: names[0] if len(names) else None
+            ),
             **taxonomic_group_columns,
             **taxonomic_level_columns,
             **taxonomic_level_id_columns,
