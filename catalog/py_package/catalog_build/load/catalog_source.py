@@ -44,9 +44,9 @@ def load_catalog_taxa(
     outbreaks_df: pd.DataFrame,
 ):
     # Get dataframes with just unique taxonomy IDs as ints
-    assembly_taxa_df = assemblies_df[["taxonomy_id"]].astype(int).drop_duplicates()
-    organism_taxa_df = organisms_df[["taxonomy_id"]].astype(int).drop_duplicates()
-    outbreak_taxa_df = outbreaks_df[["taxonomy_id"]].astype(int).drop_duplicates()
+    assembly_taxa_df = assemblies_df[["taxonomy_id"]].astype("Int64").drop_duplicates()
+    organism_taxa_df = organisms_df[["taxonomy_id"]].astype("Int64").drop_duplicates()
+    outbreak_taxa_df = outbreaks_df[["taxonomy_id"]].astype("Int64").drop_duplicates()
 
     pipeline = dlt.pipeline(
         pipeline_name=dlt_pipeline_prefix + "catalog_data",

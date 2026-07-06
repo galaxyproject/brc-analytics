@@ -288,16 +288,16 @@ def get_species_df(assembly_taxonomy_df, taxonomic_group_sets, taxonomic_levels)
     taxonomic_level_id_columns = {
         get_taxonomic_level_id_key(level): assembly_taxonomy_df[
             f"taxonomic_level_{level}_id"
-        ].astype(str)
+        ].astype("string")
         for level in taxonomic_levels
     }
     return pd.DataFrame(
         {
-            "taxonomyId": assembly_taxonomy_df["taxonomy_id"].astype(str),
+            "taxonomyId": assembly_taxonomy_df["taxonomy_id"].astype("string"),
             "species": assembly_taxonomy_df["taxonomic_level_species"],
             "speciesTaxonomyId": assembly_taxonomy_df[
                 "taxonomic_level_species_id"
-            ].astype(str),
+            ].astype("string"),
             "lineageTaxonomyIds": assembly_taxonomy_df["lineage_taxonomy_ids"].map(
                 lambda ids: ",".join([str(id) for id in ids])
             ),
@@ -1280,13 +1280,17 @@ def get_outbreak_taxonomy_ids(
     return list(
         {
             # Add primary taxonomy IDs
-            *(source_outbreaks_df["taxonomy_id"].astype(str) if get_primary else ()),
+            *(
+                source_outbreaks_df["taxonomy_id"].astype("string")
+                if get_primary
+                else ()
+            ),
             # Add any highlight descendant taxonomy IDs
             *(
                 source_outbreaks_df["highlight_descendant_taxonomy_ids"]
                 .explode()
                 .dropna()
-                .astype(str)
+                .astype("string")
                 if get_descendants
                 else ()
             ),
@@ -1545,7 +1549,7 @@ def build_files(
         )
 
         # Get taxon names and ranks for outbreak taxonomy IDs
-        outbreak_taxon_id_strings = outbreak_taxonomy_df["taxonomy_id"].astype(str)
+        outbreak_taxon_id_strings = outbreak_taxonomy_df["taxonomy_id"].astype("string")
         outbreak_taxon_name_map = dict(
             zip(outbreak_taxon_id_strings, outbreak_taxonomy_df["taxon_name"])
         )
@@ -1781,7 +1785,9 @@ def build_files(
         )
         print(f"Checked ploidy for {len(genomes_df)} assemblies")
 
-        organism_taxonomy_id_strings = organism_taxonomy_df["taxonomy_id"].astype(str)
+        organism_taxonomy_id_strings = organism_taxonomy_df["taxonomy_id"].astype(
+            "string"
+        )
         organism_taxon_name_map = dict(
             zip(organism_taxonomy_id_strings, organism_taxonomy_df["taxon_name"])
         )
