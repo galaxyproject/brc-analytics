@@ -294,7 +294,7 @@ def get_species_df(assembly_taxonomy_df, taxonomic_group_sets, taxonomic_levels)
     return pd.DataFrame(
         {
             "taxonomyId": assembly_taxonomy_df["taxonomy_id"].astype(str),
-            "species": assembly_taxonomy_df["taxonomy_level_species"],
+            "species": assembly_taxonomy_df["taxonomic_level_species"],
             "speciesTaxonomyId": assembly_taxonomy_df[
                 "taxonomic_level_species_id"
             ].astype(str),
