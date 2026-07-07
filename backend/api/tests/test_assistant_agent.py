@@ -135,6 +135,21 @@ class TestParseStructuredOutput:
         assert suggestions == []
         assert text == "Which Plasmodium species is your data from?"
 
+    def test_malformed_suggestions_before_schema_update_preserved(self, agent):
+        # A malformed SUGGESTIONS trailer is excised through the last bracket in
+        # the reply. If a valid SCHEMA_UPDATE follows it, pulling SCHEMA_UPDATE
+        # out first keeps the update from being swallowed with the bad chips.
+        raw = (
+            "Recorded it.\n"
+            'SUGGESTIONS: [{"label": "broken"\n'
+            'SCHEMA_UPDATE: {"organism": "Plasmodium falciparum"}'
+        )
+        text, suggestions, updates = agent._parse_structured_output(raw)
+        assert updates == {"organism": "Plasmodium falciparum"}
+        assert "SCHEMA_UPDATE" not in text
+        assert "SUGGESTIONS" not in text
+        assert suggestions == []
+
     def test_multiline_body_preserved(self, agent):
         raw = 'Line 1\nLine 2\nLine 3\nSUGGESTIONS: ["Next"]'
         text, suggestions, _ = agent._parse_structured_output(raw)

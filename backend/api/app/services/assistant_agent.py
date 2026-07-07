@@ -895,19 +895,23 @@ class AssistantAgent:
                 return text[: m.start()] + text[end:], value
             return text, None
 
-        text, parsed = _extract(text, "suggestions", lambda v: isinstance(v, list))
-        if parsed is not None:
-            suggestions = self._build_suggestion_chips(parsed)
-
         def _valid_schema(v: Any) -> bool:
             return isinstance(v, dict) and all(
                 isinstance(k, str) and (isinstance(val, str) or val is None)
                 for k, val in v.items()
             )
 
+        # Extract SCHEMA_UPDATE before SUGGESTIONS. A malformed SUGGESTIONS
+        # trailer is excised through the last bracket in the reply, which would
+        # swallow a SCHEMA_UPDATE that follows it. Schema state matters more
+        # than cosmetic chips, so pull it out first.
         text, parsed = _extract(text, "schema_update", _valid_schema)
         if parsed is not None:
             schema_updates = parsed
+
+        text, parsed = _extract(text, "suggestions", lambda v: isinstance(v, list))
+        if parsed is not None:
+            suggestions = self._build_suggestion_chips(parsed)
 
         # Tidy whitespace left where an inline marker was spliced out.
         text = re.sub(r"[ \t]+\n", "\n", text)
