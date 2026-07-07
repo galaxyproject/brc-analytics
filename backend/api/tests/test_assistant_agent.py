@@ -671,31 +671,40 @@ class TestApplySchemaUpdates:
         )
         assert swapped.data_characteristics.status == FieldStatus.EMPTY
 
-    def test_data_characteristics_user_value_not_cleared(self, agent):
-        # A value that isn't catalog-derived (no derived-detail marker) is left
-        # untouched even when the workflow supplies no characteristics.
+    def test_data_characteristics_recomputed_when_model_reemits_value(self, agent):
+        # The prompt has the model re-emit committed fields each turn, so it can
+        # re-send a derived data_characteristics as a plain value (detail lost).
+        # The catalog is authoritative: recompute from the new workflow rather
+        # than trust the re-emitted value.
         agent.catalog.workflows_by_category = [
             {
-                "category": "ASSEMBLY",
+                "category": "VARIANT_CALLING",
                 "workflows": [
+                    {
+                        "iwcId": "ploidy-main",
+                        "trsId": "trs-ploidy",
+                        "parameters": [{"variable": "SANGER_READ_RUN_PAIRED"}],
+                    },
                     {
                         "iwcId": "asm-only",
                         "trsId": "trs-asm",
                         "parameters": [{"variable": "ASSEMBLY_ID"}],
-                    }
+                    },
                 ],
             }
         ]
-        schema = AnalysisSchema(
-            data_characteristics=SchemaField(
-                value="Long reads (user note)", status=FieldStatus.FILLED
-            )
+        filled = agent._apply_schema_updates(
+            AnalysisSchema(), {"workflow": "Ploidy-aware calling (ploidy-main)"}
         )
+        assert filled.data_characteristics.value == "Paired-end sequencing reads"
         result = agent._apply_schema_updates(
-            schema, {"workflow": "Assembly (asm-only)"}
+            filled,
+            {
+                "workflow": "Assembly (asm-only)",
+                "data_characteristics": "Paired-end sequencing reads",
+            },
         )
-        assert result.data_characteristics.status == FieldStatus.FILLED
-        assert result.data_characteristics.value == "Long reads (user note)"
+        assert result.data_characteristics.status == FieldStatus.EMPTY
 
     def test_gene_annotation_filled_when_assembly_has_gene_model(self, agent):
         # A GTF-requiring workflow whose assembly ships a gene model fills the
@@ -829,9 +838,10 @@ class TestApplySchemaUpdates:
         cleared = agent._apply_schema_updates(filled, {"workflow": None})
         assert cleared.gene_annotation.status == FieldStatus.EMPTY
 
-    def test_gene_annotation_user_choice_preserved(self, agent):
-        # A gene annotation the user set explicitly (no auto-selected marker) is
-        # left untouched even under a GTF-requiring workflow.
+    def test_gene_annotation_recomputed_when_model_reemits_value(self, agent):
+        # Same for gene annotation: a re-emitted "Reference GTF" (detail lost)
+        # must not pin the field FILLED after the user switches to an assembly
+        # with no gene model.
         agent.catalog.workflows_by_category = [
             {
                 "category": "VARIANT_CALLING",
@@ -844,24 +854,30 @@ class TestApplySchemaUpdates:
                 ],
             }
         ]
-        agent.catalog.get_assembly_details.return_value = {
-            "gene_model_url": "https://example.org/genes.gtf.gz"
-        }
+        agent.catalog.get_assembly_details.side_effect = lambda acc: (
+            {"gene_model_url": "https://example.org/genes.gtf.gz"}
+            if acc == "GCF_000002765.6"
+            else {"gene_model_url": "None"}
+        )
         schema = AnalysisSchema(
             assembly=SchemaField(
                 value="Has model GCF_000002765.6",
                 detail="GCF_000002765.6",
                 status=FieldStatus.FILLED,
-            ),
-            gene_annotation=SchemaField(
-                value="My custom annotation", status=FieldStatus.FILLED
-            ),
+            )
         )
-        result = agent._apply_schema_updates(
+        filled = agent._apply_schema_updates(
             schema, {"workflow": "Variant calling (var-pe)"}
         )
-        assert result.gene_annotation.status == FieldStatus.FILLED
-        assert result.gene_annotation.value == "My custom annotation"
+        assert filled.gene_annotation.value == "Reference GTF"
+        result = agent._apply_schema_updates(
+            filled,
+            {
+                "assembly": "No model GCF_999999999.1",
+                "gene_annotation": "Reference GTF",
+            },
+        )
+        assert result.gene_annotation.status == FieldStatus.NEEDS_ATTENTION
 
 
 # ---------- compute_handoff ----------
@@ -1322,6 +1338,9 @@ async def test_chat_handoff_url_carries_assistant_session_id(agent):
             all_messages=lambda: [],
         )
     )
+    # data_characteristics is derived from the workflow's read inputs (a real
+    # varcall workflow takes reads), so the fixture carries the param; the
+    # model's re-emitted "Paired-end reads" is overridden by the catalog.
     agent.catalog.workflows_by_category = [
         {
             "category": "VARIANT_CALLING",
@@ -1329,6 +1348,7 @@ async def test_chat_handoff_url_carries_assistant_session_id(agent):
                 {
                     "iwcId": "varcall-haploid",
                     "trsId": "#workflow/github.com/iwc/varcall-haploid/main",
+                    "parameters": [{"variable": "SANGER_READ_RUN_PAIRED"}],
                 }
             ],
         }

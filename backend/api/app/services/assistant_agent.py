@@ -73,10 +73,9 @@ MAX_HISTORY_MESSAGES = 40
 MAX_USER_FACING_MESSAGES = 100
 ASSISTANT_RUN_TIMEOUT_SECONDS = 105.0
 
-# Detail marker stamped on tracker fields the catalog derives (vs. an explicit
-# user/model value). Lets the reconcilers recognise their own prior output and
-# recompute or clear it on a workflow/assembly change without stomping a value
-# set elsewhere.
+# Human-readable "detail" labels for the tracker fields the catalog derives
+# (data characteristics, gene annotation). These fields are always recomputed
+# from the workflow/assembly, so the labels are informational only.
 _DATA_CHARACTERISTICS_DERIVED_DETAIL = "Required by the selected workflow"
 _GENE_ANNOTATION_AUTO_DETAIL = "Auto-selected from the assembly"
 
@@ -1076,16 +1075,14 @@ class AssistantAgent:
         return schema
 
     def _reflect_data_characteristics(self, schema: AnalysisSchema) -> None:
-        """Fill data characteristics from the selected workflow's read inputs.
+        """Derive data characteristics from the selected workflow's inputs.
 
-        The required read layout (paired/single) and library strategy are a
-        property of the workflow, not a user choice -- so derive them from the
-        catalog rather than relying on the model to emit a SCHEMA_UPDATE for a
-        field it (correctly) doesn't treat as user input. Recompute whenever a
-        workflow is set, and clear a previously derived value when the workflow
-        is cleared or swapped for one that supplies no characteristics, so a
-        stale layout can't linger or falsely complete the schema. A value set
-        elsewhere (its detail marker won't match) is left alone.
+        Read layout (paired/single) and library strategy are a property of the
+        workflow, not a user choice, so the catalog is authoritative here: the
+        model may re-emit this field, but its value is always recomputed from
+        the workflow, never trusted. Recomputing from scratch every apply means
+        a workflow change (or clear) can't leave a stale value -- and a
+        re-emitted value can't block reconciliation.
         """
         derived = None
         if schema.workflow.status == FieldStatus.FILLED:
@@ -1095,7 +1092,7 @@ class AssistantAgent:
             schema.data_characteristics = SchemaField(
                 value=value, status=FieldStatus.FILLED, detail=detail
             )
-        elif schema.data_characteristics.detail == _DATA_CHARACTERISTICS_DERIVED_DETAIL:
+        else:
             schema.data_characteristics = SchemaField()
 
     def _data_characteristics_for_workflow(
@@ -1138,29 +1135,20 @@ class AssistantAgent:
     def _reflect_gene_annotation_requirement(self, schema: AnalysisSchema) -> None:
         """Reconcile gene annotation against the workflow and assembly (#1324/#1331).
 
-        When the workflow requires a GTF: if the selected assembly ships a gene
-        model, auto-fill it (setup resolves the URL automatically, and the user
-        can still override); otherwise surface it as needing attention so the
-        panel doesn't render a required annotation as "Optional". A workflow that
-        takes no GTF, or no workflow at all, clears the derived state.
+        Whether an annotation is needed, and whether the assembly can supply it,
+        is a property of the workflow+assembly, not a user choice (the annotation
+        source is picked later at workflow setup). The catalog is authoritative:
+        the model may re-emit this field, but it's always recomputed, never
+        trusted. Recompute every apply:
 
-        Only this field's own derived output (auto-selected or needs-attention)
-        is recomputed -- so switching to an assembly with no gene model demotes a
-        previously auto-selected GTF, and clearing the workflow drops it. An
-        explicit user/model choice (FILLED without the auto-selected marker) is
-        left untouched.
+        - workflow needs a GTF and the assembly ships a gene model -> auto-fill
+          (setup resolves the URL automatically);
+        - workflow needs a GTF but the assembly has none -> needs attention, so
+          the panel doesn't render a required annotation as "Optional";
+        - no GTF required, or no workflow -> empty.
         """
-        gene_annotation = schema.gene_annotation
-        auto_selected = gene_annotation.detail == _GENE_ANNOTATION_AUTO_DETAIL
-        if gene_annotation.status == FieldStatus.FILLED and not auto_selected:
-            return
-        derived_state = (
-            auto_selected or gene_annotation.status == FieldStatus.NEEDS_ATTENTION
-        )
-
         if schema.workflow.status != FieldStatus.FILLED:
-            if derived_state:
-                schema.gene_annotation = SchemaField()
+            schema.gene_annotation = SchemaField()
             return
         if self._workflow_requires_gene_model(schema.workflow.detail):
             if self._assembly_gene_model_url(schema):
@@ -1171,8 +1159,7 @@ class AssistantAgent:
                 )
             else:
                 schema.gene_annotation = SchemaField(status=FieldStatus.NEEDS_ATTENTION)
-        elif derived_state:
-            # Workflow no longer needs a GTF -- drop the derived state.
+        else:
             schema.gene_annotation = SchemaField()
 
     def _assembly_gene_model_url(self, schema: AnalysisSchema) -> Optional[str]:
