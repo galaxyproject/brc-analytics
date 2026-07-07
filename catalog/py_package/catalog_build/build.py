@@ -212,6 +212,8 @@ def read_organisms(organisms_path):
 
 
 def read_outbreaks(outbreaks_path):
+    if outbreaks_path is None:
+        return None
     with open(outbreaks_path) as stream:
         return pd.DataFrame(yaml.safe_load(stream)["outbreaks"])
 
@@ -1276,6 +1278,10 @@ def get_outbreak_taxonomy_ids(
     if not get_primary and not get_descendants:
         raise ValueError("At least one of get_primary or get_descendants must be True")
 
+    # Catalogs without outbreaks pass no outbreaks DataFrame
+    if source_outbreaks_df is None:
+        return []
+
     # Return list of unique taxonomy IDs, converted to strings
     return list(
         {
@@ -1395,7 +1401,7 @@ def load_and_transform(
     taxonomic_levels: list[str],
     assemblies_df: pd.DataFrame,
     organisms_df: pd.DataFrame,
-    outbreaks_df: pd.DataFrame,
+    outbreaks_df: pd.DataFrame | None,
 ):
     temp_folder_path = Path(temp_folder_path_string).resolve()
 
@@ -1417,7 +1423,11 @@ def load_and_transform(
     )
 
     # Transform loaded data via dbt
-    do_dbt_transformations(temp_folder_path, taxonomic_levels=taxonomic_levels)
+    do_dbt_transformations(
+        temp_folder_path,
+        taxonomic_levels=taxonomic_levels,
+        has_outbreaks=outbreaks_df is not None,
+    )
 
     # Get transformed data
     with duckdb.connect(get_db_path(temp_folder_path)) as con:
@@ -1516,11 +1526,10 @@ def build_files(
         base_genomes_df["accession"],
     )
 
-    # Load source organisms and outbreaks
+    # Load source organisms and outbreaks; outbreaks are optional (only some
+    # catalogs use them), so source_outbreaks_df is None when no path is given
     source_organisms_df = read_organisms(organisms_path)
-    source_outbreaks_df = read_outbreaks(
-        outbreaks_path
-    )  # TODO account for the path being absent
+    source_outbreaks_df = read_outbreaks(outbreaks_path)
 
     # Do database-based loading and transformation
     assembly_taxonomy_df, organism_taxonomy_df, outbreak_taxonomy_df = (

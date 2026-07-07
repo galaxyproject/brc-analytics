@@ -12,7 +12,7 @@ def do_dlt_load(
     dlt_pipeline_prefix: str,
     assemblies_df: pd.DataFrame,
     organisms_df: pd.DataFrame,
-    outbreaks_df: pd.DataFrame,
+    outbreaks_df: pd.DataFrame | None,
 ):
     load_ncbi_taxonomy(
         temp_folder_path=temp_folder_path, dlt_pipeline_prefix=dlt_pipeline_prefix

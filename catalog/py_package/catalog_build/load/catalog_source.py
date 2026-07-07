@@ -26,13 +26,17 @@ def catalog_taxa(
     *,
     assembly_taxa_df: pd.DataFrame,
     organism_taxa_df: pd.DataFrame,
-    outbreak_taxa_df: pd.DataFrame,
+    outbreak_taxa_df: pd.DataFrame | None,
 ):
-    return [
+    resources = [
         assembly_taxa(assembly_taxa_df),
         organism_taxa(organism_taxa_df),
-        outbreak_taxa(outbreak_taxa_df),
     ]
+    # Only load outbreak taxa for catalogs that have outbreaks; when absent, the
+    # shared dbt models skip the outbreak_taxa source entirely (see has_outbreaks var)
+    if outbreak_taxa_df is not None:
+        resources.append(outbreak_taxa(outbreak_taxa_df))
+    return resources
 
 
 def load_catalog_taxa(
@@ -41,12 +45,16 @@ def load_catalog_taxa(
     dlt_pipeline_prefix: str,
     assemblies_df: pd.DataFrame,
     organisms_df: pd.DataFrame,
-    outbreaks_df: pd.DataFrame,
+    outbreaks_df: pd.DataFrame | None,
 ):
     # Get dataframes with just unique taxonomy IDs as ints
     assembly_taxa_df = assemblies_df[["taxonomy_id"]].astype("Int64").drop_duplicates()
     organism_taxa_df = organisms_df[["taxonomy_id"]].astype("Int64").drop_duplicates()
-    outbreak_taxa_df = outbreaks_df[["taxonomy_id"]].astype("Int64").drop_duplicates()
+    outbreak_taxa_df = (
+        outbreaks_df[["taxonomy_id"]].astype("Int64").drop_duplicates()
+        if outbreaks_df is not None
+        else None
+    )
 
     pipeline = dlt.pipeline(
         pipeline_name=dlt_pipeline_prefix + "catalog_data",
