@@ -801,7 +801,7 @@ class TestApplySchemaUpdates:
                 ],
             }
         ]
-        agent.catalog.get_assembly_details.return_value = {"gene_model_url": "None"}
+        agent.catalog.get_assembly_details.return_value = {"gene_model_url": None}
         schema = AnalysisSchema(
             assembly=SchemaField(
                 value="Some assembly GCF_999999999.1",
@@ -813,6 +813,20 @@ class TestApplySchemaUpdates:
             schema, {"workflow": "Variant calling (var-pe)"}
         )
         assert result.gene_annotation.status == FieldStatus.NEEDS_ATTENTION
+
+    def test_assembly_gene_model_url_treats_none_string_defensively(self, agent):
+        # The catalog stores a missing gene model as null (-> Python None); the
+        # lookup also treats a literal "None" string as absent, guarding against
+        # a stringified null upstream.
+        agent.catalog.get_assembly_details.return_value = {"gene_model_url": "None"}
+        schema = AnalysisSchema(
+            assembly=SchemaField(
+                value="A GCF_000000001.1",
+                detail="GCF_000000001.1",
+                status=FieldStatus.FILLED,
+            )
+        )
+        assert agent._assembly_gene_model_url(schema) is None
 
     def test_gene_annotation_reevaluated_when_assembly_loses_gene_model(self, agent):
         # An auto-selected GTF must be re-evaluated when the user switches to an
@@ -832,7 +846,7 @@ class TestApplySchemaUpdates:
         agent.catalog.get_assembly_details.side_effect = lambda acc: (
             {"gene_model_url": "https://example.org/genes.gtf.gz"}
             if acc == "GCF_000002765.6"
-            else {"gene_model_url": "None"}
+            else {"gene_model_url": None}
         )
         schema = AnalysisSchema(
             assembly=SchemaField(
@@ -902,7 +916,7 @@ class TestApplySchemaUpdates:
         agent.catalog.get_assembly_details.side_effect = lambda acc: (
             {"gene_model_url": "https://example.org/genes.gtf.gz"}
             if acc == "GCF_000002765.6"
-            else {"gene_model_url": "None"}
+            else {"gene_model_url": None}
         )
         schema = AnalysisSchema(
             assembly=SchemaField(

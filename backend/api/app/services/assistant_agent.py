@@ -1186,8 +1186,9 @@ class AssistantAgent:
 
     def _assembly_gene_model_url(self, schema: AnalysisSchema) -> Optional[str]:
         """Return the selected assembly's gene model URL, or None when the
-        assembly is unknown or has no gene model (catalog uses the string
-        "None" for the latter)."""
+        assembly is unknown or has no gene model. The catalog stores a missing
+        model as null (surfaced as Python None); a literal "None" string is also
+        treated as absent, defensively against a stringified null upstream."""
         accession = schema.assembly.detail
         if not accession:
             return None
