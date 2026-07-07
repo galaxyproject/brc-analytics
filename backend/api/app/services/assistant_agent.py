@@ -849,10 +849,11 @@ class AssistantAgent:
         it on its own line, and when they don't, a line-by-line scan leaves the
         raw JSON visible to the user. So we search the whole reply for each
         marker and decode the JSON value that follows it, wherever it is.
-        Markdown bold/italic and mixed case are tolerated. An uppercase marker
-        (the real trailer) has its payload removed even when it will not parse,
-        so raw JSON never reaches the user; a lowercase or payload-less
-        "suggestions: ..." is treated as prose and left in place.
+        Markdown bold/italic and mixed case are tolerated. A marker at line
+        start, or written with any uppercase, is a real trailer: its payload is
+        removed even when it will not parse, so raw JSON never reaches the user.
+        An all-lowercase marker mid-prose (e.g. "...a few suggestions: [...]") is
+        left in place as prose, even when its brackets are valid JSON.
         """
         suggestions: List[SuggestionChip] = []
         schema_updates: Dict[str, Optional[str]] = {}
@@ -875,11 +876,14 @@ class AssistantAgent:
                         break  # prose follows, not a JSON payload -- leave it
                 if json_at is None:
                     continue
-                # The real markers are emitted in uppercase per the prompt, so
-                # only an uppercase marker is excised when its payload won't
-                # parse -- a mid-prose lowercase "suggestions: [...]" that just
-                # looks JSON-ish is left untouched rather than stripped as prose.
-                marker_is_real = keyword.upper() in m.group(0)
+                # A real trailer is either at line start (the model's own line)
+                # or written with some uppercase -- the markers are emitted in
+                # caps per the prompt. An all-lowercase marker mid-prose (e.g.
+                # "...a few suggestions: [...]") is prose and is left untouched,
+                # even when the brackets happen to be valid JSON.
+                line_start = text.rfind("\n", 0, m.start()) + 1
+                at_line_start = text[line_start : m.start()].strip() == ""
+                marker_is_real = at_line_start or any(c.isupper() for c in m.group(0))
                 try:
                     # raw_decode reads one JSON value and reports where it ends,
                     # so a multi-line array/object is handled in one shot.
@@ -893,10 +897,10 @@ class AssistantAgent:
                     last = max(text.rfind("]"), text.rfind("}"))
                     cut = last + 1 if last > json_at else len(text)
                     return (text[: m.start()] + text[cut:]).strip(), None
+                if not marker_is_real:
+                    continue  # prose that merely looks JSON-ish -- leave it
                 if not validate(value):
                     # Parsed but the wrong shape -- still strip a real trailer.
-                    if not marker_is_real:
-                        continue
                     return (text[: m.start()] + text[end:]).strip(), None
                 return text[: m.start()] + text[end:], value
             return text, None

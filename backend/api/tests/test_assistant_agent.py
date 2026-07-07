@@ -193,6 +193,28 @@ class TestParseStructuredOutput:
         assert text == raw
         assert suggestions == []
 
+    def test_lowercase_prose_valid_json_left_as_prose(self, agent):
+        # A lowercase "suggestions:" mid-prose is prose, not a trailer -- even
+        # when the brackets are valid JSON it is left untouched and yields no
+        # chips (only a line-start or uppercase marker is a trailer).
+        raw = (
+            'I have a few suggestions: ["check the docs", "ask the forum"] '
+            "before you decide."
+        )
+        text, suggestions, _ = agent._parse_structured_output(raw)
+        assert text == raw
+        assert suggestions == []
+
+    def test_mixed_case_marker_wrong_shape_stripped(self, agent):
+        # A mixed-case "Schema_Update" is still a real (if mangled) trailer -- its
+        # wrong-shape payload must be excised, never left visible as raw JSON.
+        raw = 'Recorded it. Schema_Update: {"organism": 5833}'
+        text, _, updates = agent._parse_structured_output(raw)
+        assert updates == {}
+        assert "Schema_Update" not in text
+        assert "5833" not in text
+        assert text == "Recorded it."
+
     def test_schema_update_inline_after_prose(self, agent):
         # Same for SCHEMA_UPDATE emitted inline after prose.
         raw = 'Recorded it. SCHEMA_UPDATE: {"organism": "Plasmodium falciparum"}'
