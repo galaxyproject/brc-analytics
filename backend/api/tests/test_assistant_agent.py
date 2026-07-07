@@ -215,6 +215,29 @@ class TestParseStructuredOutput:
         assert "5833" not in text
         assert text == "Recorded it."
 
+    def test_duplicate_schema_update_markers_merged(self, agent):
+        # A model that emits SCHEMA_UPDATE twice must not leave the second block
+        # (and its raw JSON) visible -- both are stripped and merged.
+        raw = (
+            "Recorded.\n"
+            'SCHEMA_UPDATE: {"organism": "A"}\n'
+            'SCHEMA_UPDATE: {"assembly": "B"}'
+        )
+        text, _, updates = agent._parse_structured_output(raw)
+        assert updates == {"organism": "A", "assembly": "B"}
+        assert "SCHEMA_UPDATE" not in text
+        assert "{" not in text and "}" not in text
+        assert text == "Recorded."
+
+    def test_duplicate_suggestions_markers_not_leaked(self, agent):
+        # Two SUGGESTIONS blocks -- neither may leak; the last one wins.
+        raw = 'Pick.\nSUGGESTIONS: ["A"]\nSUGGESTIONS: ["B", "C"]'
+        text, suggestions, _ = agent._parse_structured_output(raw)
+        assert "SUGGESTIONS" not in text
+        assert "[" not in text and "]" not in text
+        assert [c.label for c in suggestions] == ["B", "C"]
+        assert text == "Pick."
+
     def test_schema_update_inline_after_prose(self, agent):
         # Same for SCHEMA_UPDATE emitted inline after prose.
         raw = 'Recorded it. SCHEMA_UPDATE: {"organism": "Plasmodium falciparum"}'

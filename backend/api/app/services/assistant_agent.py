@@ -865,45 +865,63 @@ class AssistantAgent:
             marker = re.compile(
                 r"\*{0,2}\b" + keyword + r"\b:?\*{0,2}:?[ \t]*", re.IGNORECASE
             )
-            for m in marker.finditer(text):
-                rest = text[m.end() :]
-                json_at = None
-                for i, ch in enumerate(rest):
-                    if ch in "[{":
-                        json_at = m.end() + i
-                        break
-                    if not ch.isspace():
-                        break  # prose follows, not a JSON payload -- leave it
-                if json_at is None:
-                    continue
-                # A real trailer is either at line start (the model's own line)
-                # or written with some uppercase -- the markers are emitted in
-                # caps per the prompt. An all-lowercase marker mid-prose (e.g.
-                # "...a few suggestions: [...]") is prose and is left untouched,
-                # even when the brackets happen to be valid JSON.
-                line_start = text.rfind("\n", 0, m.start()) + 1
-                at_line_start = text[line_start : m.start()].strip() == ""
-                marker_is_real = at_line_start or any(c.isupper() for c in m.group(0))
-                try:
-                    # raw_decode reads one JSON value and reports where it ends,
-                    # so a multi-line array/object is handled in one shot.
-                    value, end = json.JSONDecoder().raw_decode(text, json_at)
-                except json.JSONDecodeError:
-                    # The model mangled the JSON (smaller models sometimes emit
-                    # broken brackets). Excise from the marker through the last
-                    # bracket so raw JSON never reaches the user.
-                    if not marker_is_real:
+            result: Any = None
+            # Loop so *every* real trailer of this type is handled: a model that
+            # emits the marker twice must not leave the second block (and its raw
+            # JSON) visible. Re-search after each splice since positions shift.
+            while True:
+                for m in marker.finditer(text):
+                    rest = text[m.end() :]
+                    json_at = None
+                    for i, ch in enumerate(rest):
+                        if ch in "[{":
+                            json_at = m.end() + i
+                            break
+                        if not ch.isspace():
+                            break  # prose follows, not a JSON payload -- leave it
+                    if json_at is None:
                         continue
-                    last = max(text.rfind("]"), text.rfind("}"))
-                    cut = last + 1 if last > json_at else len(text)
-                    return (text[: m.start()] + text[cut:]).strip(), None
-                if not marker_is_real:
-                    continue  # prose that merely looks JSON-ish -- leave it
-                if not validate(value):
-                    # Parsed but the wrong shape -- still strip a real trailer.
-                    return (text[: m.start()] + text[end:]).strip(), None
-                return text[: m.start()] + text[end:], value
-            return text, None
+                    # A real trailer is either at line start (the model's own
+                    # line) or written with some uppercase -- the markers are
+                    # emitted in caps per the prompt. An all-lowercase marker
+                    # mid-prose (e.g. "...a few suggestions: [...]") is prose and
+                    # is left untouched, even when the brackets are valid JSON.
+                    line_start = text.rfind("\n", 0, m.start()) + 1
+                    at_line_start = text[line_start : m.start()].strip() == ""
+                    marker_is_real = at_line_start or any(
+                        c.isupper() for c in m.group(0)
+                    )
+                    try:
+                        # raw_decode reads one JSON value and reports where it
+                        # ends, so a multi-line array/object is read in one shot.
+                        value, end = json.JSONDecoder().raw_decode(text, json_at)
+                    except json.JSONDecodeError:
+                        # The model mangled the JSON (smaller models sometimes
+                        # emit broken brackets). Excise from the marker through
+                        # the last bracket so raw JSON never reaches the user.
+                        if not marker_is_real:
+                            continue
+                        last = max(text.rfind("]"), text.rfind("}"))
+                        cut = last + 1 if last > json_at else len(text)
+                        text = (text[: m.start()] + text[cut:]).strip()
+                        break
+                    if not marker_is_real:
+                        continue  # prose that merely looks JSON-ish -- leave it
+                    if not validate(value):
+                        # Parsed but the wrong shape -- still strip a real trailer.
+                        text = (text[: m.start()] + text[end:]).strip()
+                        break
+                    # Merge repeated SCHEMA_UPDATE dicts (later keys win); for a
+                    # repeated list marker the last one wins.
+                    if isinstance(result, dict) and isinstance(value, dict):
+                        result = {**result, **value}
+                    else:
+                        result = value
+                    text = text[: m.start()] + text[end:]
+                    break
+                else:
+                    break  # no marker spliced this pass -- done
+            return text, result
 
         def _valid_schema(v: Any) -> bool:
             return isinstance(v, dict) and all(
