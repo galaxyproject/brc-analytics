@@ -620,6 +620,83 @@ class TestApplySchemaUpdates:
         assert result.data_characteristics.status == FieldStatus.FILLED
         assert result.data_characteristics.value == "Assembled genome (FASTA)"
 
+    def test_data_characteristics_cleared_when_workflow_unset(self, agent):
+        # Clearing the workflow (a mid-conversation correction) must drop a value
+        # derived from the old workflow rather than leave it stale.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "VARIANT_CALLING",
+                "workflows": [
+                    {
+                        "iwcId": "ploidy-main",
+                        "trsId": "trs-ploidy",
+                        "parameters": [{"variable": "SANGER_READ_RUN_PAIRED"}],
+                    }
+                ],
+            }
+        ]
+        filled = agent._apply_schema_updates(
+            AnalysisSchema(), {"workflow": "Ploidy-aware calling (ploidy-main)"}
+        )
+        assert filled.data_characteristics.status == FieldStatus.FILLED
+        cleared = agent._apply_schema_updates(filled, {"workflow": None})
+        assert cleared.data_characteristics.status == FieldStatus.EMPTY
+
+    def test_data_characteristics_cleared_when_workflow_has_no_derivation(self, agent):
+        # Swapping to a workflow that supplies no characteristics clears the value
+        # derived from the previous workflow.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "VARIANT_CALLING",
+                "workflows": [
+                    {
+                        "iwcId": "ploidy-main",
+                        "trsId": "trs-ploidy",
+                        "parameters": [{"variable": "SANGER_READ_RUN_PAIRED"}],
+                    },
+                    {
+                        "iwcId": "asm-only",
+                        "trsId": "trs-asm",
+                        "parameters": [{"variable": "ASSEMBLY_ID"}],
+                    },
+                ],
+            }
+        ]
+        filled = agent._apply_schema_updates(
+            AnalysisSchema(), {"workflow": "Ploidy-aware calling (ploidy-main)"}
+        )
+        assert filled.data_characteristics.status == FieldStatus.FILLED
+        swapped = agent._apply_schema_updates(
+            filled, {"workflow": "Assembly (asm-only)"}
+        )
+        assert swapped.data_characteristics.status == FieldStatus.EMPTY
+
+    def test_data_characteristics_user_value_not_cleared(self, agent):
+        # A value that isn't catalog-derived (no derived-detail marker) is left
+        # untouched even when the workflow supplies no characteristics.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "ASSEMBLY",
+                "workflows": [
+                    {
+                        "iwcId": "asm-only",
+                        "trsId": "trs-asm",
+                        "parameters": [{"variable": "ASSEMBLY_ID"}],
+                    }
+                ],
+            }
+        ]
+        schema = AnalysisSchema(
+            data_characteristics=SchemaField(
+                value="Long reads (user note)", status=FieldStatus.FILLED
+            )
+        )
+        result = agent._apply_schema_updates(
+            schema, {"workflow": "Assembly (asm-only)"}
+        )
+        assert result.data_characteristics.status == FieldStatus.FILLED
+        assert result.data_characteristics.value == "Long reads (user note)"
+
     def test_gene_annotation_filled_when_assembly_has_gene_model(self, agent):
         # A GTF-requiring workflow whose assembly ships a gene model fills the
         # annotation (setup resolves the URL automatically).

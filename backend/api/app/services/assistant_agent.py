@@ -73,6 +73,12 @@ MAX_HISTORY_MESSAGES = 40
 MAX_USER_FACING_MESSAGES = 100
 ASSISTANT_RUN_TIMEOUT_SECONDS = 105.0
 
+# Detail marker stamped on tracker fields the catalog derives (vs. an explicit
+# user/model value). Lets the reconcilers recognise their own prior output and
+# recompute or clear it on a workflow/assembly change without stomping a value
+# set elsewhere.
+_DATA_CHARACTERISTICS_DERIVED_DETAIL = "Required by the selected workflow"
+
 
 class AssistantTimeoutError(RuntimeError):
     """Raised when the assistant run exceeds the server-side timeout."""
@@ -1075,17 +1081,21 @@ class AssistantAgent:
         property of the workflow, not a user choice -- so derive them from the
         catalog rather than relying on the model to emit a SCHEMA_UPDATE for a
         field it (correctly) doesn't treat as user input. Recompute whenever a
-        workflow is set so a workflow change refreshes the value.
+        workflow is set, and clear a previously derived value when the workflow
+        is cleared or swapped for one that supplies no characteristics, so a
+        stale layout can't linger or falsely complete the schema. A value set
+        elsewhere (its detail marker won't match) is left alone.
         """
-        if schema.workflow.status != FieldStatus.FILLED:
-            return
-        derived = self._data_characteristics_for_workflow(schema.workflow.detail)
-        if derived is None:
-            return
-        value, detail = derived
-        schema.data_characteristics = SchemaField(
-            value=value, status=FieldStatus.FILLED, detail=detail
-        )
+        derived = None
+        if schema.workflow.status == FieldStatus.FILLED:
+            derived = self._data_characteristics_for_workflow(schema.workflow.detail)
+        if derived is not None:
+            value, detail = derived
+            schema.data_characteristics = SchemaField(
+                value=value, status=FieldStatus.FILLED, detail=detail
+            )
+        elif schema.data_characteristics.detail == _DATA_CHARACTERISTICS_DERIVED_DETAIL:
+            schema.data_characteristics = SchemaField()
 
     def _data_characteristics_for_workflow(
         self, workflow_ref: Optional[str]
@@ -1117,11 +1127,11 @@ class AssistantAgent:
                 value = f"{layout_label} {strategy_label} reads"
             else:
                 value = f"{layout_label} sequencing reads"
-            return value, "Required by the selected workflow"
+            return value, _DATA_CHARACTERISTICS_DERIVED_DETAIL
         # No sequencing-read input: workflows that consume an assembled genome
         # directly (e.g. genome annotation) characterise their input as a FASTA.
         if any(p.get("variable") == "ASSEMBLY_FASTA_URL" for p in params):
-            return "Assembled genome (FASTA)", "Required by the selected workflow"
+            return "Assembled genome (FASTA)", _DATA_CHARACTERISTICS_DERIVED_DETAIL
         return None
 
     def _reflect_gene_annotation_requirement(self, schema: AnalysisSchema) -> None:
