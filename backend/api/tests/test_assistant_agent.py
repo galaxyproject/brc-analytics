@@ -760,6 +760,109 @@ class TestApplySchemaUpdates:
         )
         assert result.gene_annotation.status == FieldStatus.NEEDS_ATTENTION
 
+    def test_gene_annotation_reevaluated_when_assembly_loses_gene_model(self, agent):
+        # An auto-selected GTF must be re-evaluated when the user switches to an
+        # assembly with no gene model -- it can't stay FILLED as "Reference GTF".
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "VARIANT_CALLING",
+                "workflows": [
+                    {
+                        "iwcId": "var-pe",
+                        "trsId": "trs-var",
+                        "parameters": [{"variable": "GENE_MODEL_URL"}],
+                    }
+                ],
+            }
+        ]
+        agent.catalog.get_assembly_details.side_effect = lambda acc: (
+            {"gene_model_url": "https://example.org/genes.gtf.gz"}
+            if acc == "GCF_000002765.6"
+            else {"gene_model_url": "None"}
+        )
+        schema = AnalysisSchema(
+            assembly=SchemaField(
+                value="Has model GCF_000002765.6",
+                detail="GCF_000002765.6",
+                status=FieldStatus.FILLED,
+            )
+        )
+        filled = agent._apply_schema_updates(
+            schema, {"workflow": "Variant calling (var-pe)"}
+        )
+        assert filled.gene_annotation.status == FieldStatus.FILLED
+        assert filled.gene_annotation.value == "Reference GTF"
+        switched = agent._apply_schema_updates(
+            filled, {"assembly": "No model GCF_999999999.1"}
+        )
+        assert switched.gene_annotation.status == FieldStatus.NEEDS_ATTENTION
+
+    def test_gene_annotation_cleared_when_workflow_unset(self, agent):
+        # Clearing the workflow drops an auto-selected GTF rather than leaving it
+        # stale with no workflow selected.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "VARIANT_CALLING",
+                "workflows": [
+                    {
+                        "iwcId": "var-pe",
+                        "trsId": "trs-var",
+                        "parameters": [{"variable": "GENE_MODEL_URL"}],
+                    }
+                ],
+            }
+        ]
+        agent.catalog.get_assembly_details.return_value = {
+            "gene_model_url": "https://example.org/genes.gtf.gz"
+        }
+        schema = AnalysisSchema(
+            assembly=SchemaField(
+                value="Has model GCF_000002765.6",
+                detail="GCF_000002765.6",
+                status=FieldStatus.FILLED,
+            )
+        )
+        filled = agent._apply_schema_updates(
+            schema, {"workflow": "Variant calling (var-pe)"}
+        )
+        assert filled.gene_annotation.status == FieldStatus.FILLED
+        cleared = agent._apply_schema_updates(filled, {"workflow": None})
+        assert cleared.gene_annotation.status == FieldStatus.EMPTY
+
+    def test_gene_annotation_user_choice_preserved(self, agent):
+        # A gene annotation the user set explicitly (no auto-selected marker) is
+        # left untouched even under a GTF-requiring workflow.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "VARIANT_CALLING",
+                "workflows": [
+                    {
+                        "iwcId": "var-pe",
+                        "trsId": "trs-var",
+                        "parameters": [{"variable": "GENE_MODEL_URL"}],
+                    }
+                ],
+            }
+        ]
+        agent.catalog.get_assembly_details.return_value = {
+            "gene_model_url": "https://example.org/genes.gtf.gz"
+        }
+        schema = AnalysisSchema(
+            assembly=SchemaField(
+                value="Has model GCF_000002765.6",
+                detail="GCF_000002765.6",
+                status=FieldStatus.FILLED,
+            ),
+            gene_annotation=SchemaField(
+                value="My custom annotation", status=FieldStatus.FILLED
+            ),
+        )
+        result = agent._apply_schema_updates(
+            schema, {"workflow": "Variant calling (var-pe)"}
+        )
+        assert result.gene_annotation.status == FieldStatus.FILLED
+        assert result.gene_annotation.value == "My custom annotation"
+
 
 # ---------- compute_handoff ----------
 

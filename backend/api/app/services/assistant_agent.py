@@ -78,6 +78,7 @@ ASSISTANT_RUN_TIMEOUT_SECONDS = 105.0
 # recompute or clear it on a workflow/assembly change without stomping a value
 # set elsewhere.
 _DATA_CHARACTERISTICS_DERIVED_DETAIL = "Required by the selected workflow"
+_GENE_ANNOTATION_AUTO_DETAIL = "Auto-selected from the assembly"
 
 
 class AssistantTimeoutError(RuntimeError):
@@ -1138,29 +1139,41 @@ class AssistantAgent:
         """Reconcile gene annotation against the workflow and assembly (#1324/#1331).
 
         When the workflow requires a GTF: if the selected assembly ships a gene
-        model, fill it (the setup step resolves that URL automatically, and the
-        user can still override); otherwise surface it as needing attention so
-        the panel doesn't render a required annotation as "Optional". Workflows
-        that take no GTF leave it empty/optional. A filled annotation set
-        elsewhere (e.g. an explicit user choice) is left untouched.
+        model, auto-fill it (setup resolves the URL automatically, and the user
+        can still override); otherwise surface it as needing attention so the
+        panel doesn't render a required annotation as "Optional". A workflow that
+        takes no GTF, or no workflow at all, clears the derived state.
+
+        Only this field's own derived output (auto-selected or needs-attention)
+        is recomputed -- so switching to an assembly with no gene model demotes a
+        previously auto-selected GTF, and clearing the workflow drops it. An
+        explicit user/model choice (FILLED without the auto-selected marker) is
+        left untouched.
         """
-        if (
-            schema.workflow.status != FieldStatus.FILLED
-            or schema.gene_annotation.status == FieldStatus.FILLED
-        ):
+        gene_annotation = schema.gene_annotation
+        auto_selected = gene_annotation.detail == _GENE_ANNOTATION_AUTO_DETAIL
+        if gene_annotation.status == FieldStatus.FILLED and not auto_selected:
+            return
+        derived_state = (
+            auto_selected or gene_annotation.status == FieldStatus.NEEDS_ATTENTION
+        )
+
+        if schema.workflow.status != FieldStatus.FILLED:
+            if derived_state:
+                schema.gene_annotation = SchemaField()
             return
         if self._workflow_requires_gene_model(schema.workflow.detail):
             if self._assembly_gene_model_url(schema):
                 schema.gene_annotation = SchemaField(
                     value="Reference GTF",
                     status=FieldStatus.FILLED,
-                    detail="Auto-selected from the assembly",
+                    detail=_GENE_ANNOTATION_AUTO_DETAIL,
                 )
             else:
-                schema.gene_annotation.status = FieldStatus.NEEDS_ATTENTION
-        elif schema.gene_annotation.status == FieldStatus.NEEDS_ATTENTION:
-            # Workflow changed to one that no longer needs a GTF.
-            schema.gene_annotation.status = FieldStatus.EMPTY
+                schema.gene_annotation = SchemaField(status=FieldStatus.NEEDS_ATTENTION)
+        elif derived_state:
+            # Workflow no longer needs a GTF -- drop the derived state.
+            schema.gene_annotation = SchemaField()
 
     def _assembly_gene_model_url(self, schema: AnalysisSchema) -> Optional[str]:
         """Return the selected assembly's gene model URL, or None when the
