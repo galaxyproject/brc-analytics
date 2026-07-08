@@ -21,6 +21,7 @@
     "test": "jest --runInBand --passWithNoTests",
     "test:e2e": "npx playwright test",
     "test:e2e:api": "npx playwright test --config=playwright.api.config.ts",
+    "test:e2e:ga2": "npx playwright test --config=playwright.ga2.config.ts",
     "select-ga2-organism-images": "python3 -m catalog.ga2.build.py.select_images_for_organism",
     "build-brc-db": "NODE_ENV=production esrun catalog/build/ts/build-catalog.ts",
     "build-ga2-db": "esrun catalog/ga2/build/ts/build-catalog.ts",
