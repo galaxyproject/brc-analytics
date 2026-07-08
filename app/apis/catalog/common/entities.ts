@@ -1,4 +1,5 @@
 import type { OutbreakPriority as OUTBREAK_PRIORITY } from "../../../../catalog/schema/generated/schema";
+import type { ORGANISM_PLOIDY } from "./schema-entities";
 
 /**
  * Site-neutral structural contract for an assembly as consumed by the shared
@@ -17,7 +18,9 @@ export interface AssemblyContract {
   isRef: string;
   length: number;
   level: string;
+  lineageTaxonomyIds: string[];
   ncbiTaxonomyId: string;
+  ploidy: ORGANISM_PLOIDY[];
   releaseDate: string;
   scaffoldCount: number | null;
   scaffoldL50: number | null;
