@@ -1,6 +1,5 @@
 import { WorkflowCategoryId } from "../../../../../catalog/schema/generated/schema";
 import {
-  BRCDataCatalogGenome,
   Workflow,
   WorkflowCategory,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
@@ -9,7 +8,7 @@ import {
   WORKFLOW_SCOPE,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { workflowPloidyMatchesOrganismPloidy } from "../../../../apis/catalog/brc-analytics-catalog/common/utils";
-import { GA2AssemblyEntity } from "../../../../apis/catalog/ga2/entities";
+import type { AssemblyContract } from "../../../../apis/catalog/common/entities";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../differentialExpressionAnalysis/constants";
 
 /**
@@ -21,7 +20,7 @@ import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../differentialExpressionAn
  * @returns Workflow categories compatible with the given assembly.
  */
 export function buildAssemblyWorkflows(
-  assembly: BRCDataCatalogGenome | GA2AssemblyEntity,
+  assembly: AssemblyContract,
   allWorkflowCategories: WorkflowCategory[],
   isAssemblyWorkflowsEnabled = false
 ): WorkflowCategory[] {
@@ -108,7 +107,7 @@ export function workflowRequiresAssemblyId(workflow: Workflow): boolean {
  */
 export function workflowIsCompatibleWithAssembly(
   workflow: Workflow,
-  assembly: BRCDataCatalogGenome | GA2AssemblyEntity
+  assembly: AssemblyContract
 ): boolean {
   if (
     workflow.taxonomyId !== null &&
