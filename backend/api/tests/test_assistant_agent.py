@@ -682,6 +682,58 @@ class TestApplySchemaUpdates:
         assert result.data_characteristics.status == FieldStatus.FILLED
         assert result.data_characteristics.value == "Assembled genome (FASTA)"
 
+    def test_data_characteristics_single_file_read_variant(self, agent):
+        # Flye-style read input uses SANGER_READ_RUN_SINGLE_FILE (not the bare
+        # _SINGLE name); the layout comes from data_requirements.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "ASSEMBLY",
+                "workflows": [
+                    {
+                        "iwcId": "flye",
+                        "trsId": "trs-flye",
+                        "parameters": [
+                            {
+                                "variable": "SANGER_READ_RUN_SINGLE_FILE",
+                                "data_requirements": {"library_layout": "SINGLE"},
+                            }
+                        ],
+                    }
+                ],
+            }
+        ]
+        result = agent._data_characteristics_for_workflow("trs-flye")
+        assert result is not None
+        assert result[0] == "Single-end sequencing reads"
+
+    def test_data_characteristics_forward_reverse_file_read_variant(self, agent):
+        # Shovill-style paired reads use SANGER_READ_RUN_FORWARD_FILE +
+        # REVERSE_FILE; both carry library_layout PAIRED.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "ASSEMBLY",
+                "workflows": [
+                    {
+                        "iwcId": "shovill",
+                        "trsId": "trs-shovill",
+                        "parameters": [
+                            {
+                                "variable": "SANGER_READ_RUN_FORWARD_FILE",
+                                "data_requirements": {"library_layout": "PAIRED"},
+                            },
+                            {
+                                "variable": "SANGER_READ_RUN_REVERSE_FILE",
+                                "data_requirements": {"library_layout": "PAIRED"},
+                            },
+                        ],
+                    }
+                ],
+            }
+        ]
+        result = agent._data_characteristics_for_workflow("trs-shovill")
+        assert result is not None
+        assert result[0] == "Paired-end sequencing reads"
+
     def test_data_characteristics_cleared_when_workflow_unset(self, agent):
         # Clearing the workflow (a mid-conversation correction) must drop a value
         # derived from the old workflow rather than leave it stale.

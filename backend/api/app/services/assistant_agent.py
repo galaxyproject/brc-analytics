@@ -1148,12 +1148,17 @@ class AssistantAgent:
             return None
         params = wf.get("parameters", [])
         for p in params:
-            variable = p.get("variable")
-            if variable not in ("SANGER_READ_RUN_PAIRED", "SANGER_READ_RUN_SINGLE"):
+            variable = p.get("variable") or ""
+            # Read inputs are SANGER_READ_RUN_* params: PAIRED/SINGLE plus the
+            # _FILE, FORWARD_FILE and REVERSE_FILE variants some workflows use
+            # (e.g. Flye, Shovill). Match the family, not the two exact names.
+            if not variable.startswith("SANGER_READ_RUN"):
                 continue
             req = p.get("data_requirements") or {}
+            # Prefer the declared layout; else infer from the name -- only the
+            # SINGLE variants are single-end, forward/reverse imply paired.
             layout = req.get("library_layout") or (
-                "PAIRED" if variable == "SANGER_READ_RUN_PAIRED" else "SINGLE"
+                "SINGLE" if "SINGLE" in variable else "PAIRED"
             )
             layout_label = {"PAIRED": "Paired-end", "SINGLE": "Single-end"}.get(
                 layout, layout
