@@ -1318,7 +1318,10 @@ export function getGenomeSerotypeText(
   genome: AssemblyContract,
   defaultValue = ""
 ): string {
-  if (genome.taxonomicLevelSerotype && genome.taxonomicLevelSerotype !== "None")
+  if (
+    genome.taxonomicLevelSerotype !== undefined &&
+    genome.taxonomicLevelSerotype !== "None"
+  )
     return genome.taxonomicLevelSerotype;
   return defaultValue;
 }
@@ -1333,7 +1336,10 @@ export function getGenomeIsolateText(
   genome: AssemblyContract,
   defaultValue = ""
 ): string {
-  if (genome.taxonomicLevelIsolate && genome.taxonomicLevelIsolate !== "None")
+  if (
+    genome.taxonomicLevelIsolate !== undefined &&
+    genome.taxonomicLevelIsolate !== "None"
+  )
     return genome.taxonomicLevelIsolate;
   return defaultValue;
 }
