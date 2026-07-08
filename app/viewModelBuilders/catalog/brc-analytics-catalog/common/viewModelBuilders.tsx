@@ -708,7 +708,7 @@ export const buildPriorityPathogenResources = (
 // both organisms and assemblies across both sites. Splitting these into
 // per-contract variants is deferred — the taxonomic-level fields live on the
 // organism *entity* but not on the assembly-derived organism projection, so it
-// needs the entity-vs-projection contract separation (tracked in #1414).
+// needs the entity-vs-projection contract separation (tracked in #1428).
 type TaxonomicGroupEntity =
   | BRCDataCatalogOrganism
   | BRCDataCatalogGenome
