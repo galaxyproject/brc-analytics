@@ -30,6 +30,7 @@ import {
   getGenomeOrganismId,
   getOrganismId,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/utils";
+import type { AssemblyContract } from "../../../../apis/catalog/common/entities";
 import { sanitizeEntityId } from "../../../../apis/catalog/common/utils";
 import {
   GA2AssemblyEntity,
@@ -64,7 +65,7 @@ import {
  * @returns Props to be used for the cell.
  */
 export const buildAccession = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.accession,
@@ -77,7 +78,7 @@ export const buildAccession = (
  * @returns Props to be used for the AnalyzeGenome component.
  */
 export const buildAnalyzeGenome = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.AnalyzeGenome> => {
   const { accession, ncbiTaxonomyId, ucscBrowserUrl } = entity;
   return {
@@ -111,7 +112,7 @@ export const buildAnalyzeGenome = (
  * @returns Props for the BasicCell component.
  */
 export const buildAnnotationStatus = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.annotationStatus,
@@ -124,7 +125,7 @@ export const buildAnnotationStatus = (
  * @returns Props to be used for the KeyValuePairs component.
  */
 export const buildAssemblyDetails = (
-  assembly: BRCDataCatalogGenome | GA2AssemblyEntity
+  assembly: AssemblyContract
 ): ComponentProps<typeof C.KeyValuePairs> => {
   const keyValuePairs = new Map<Key, Value>();
   keyValuePairs.set(
@@ -161,7 +162,7 @@ export const buildAssemblyCount = (
  * @returns Props for the BasicCell component.
  */
 export const buildChromosomes = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: formatNumber(entity.chromosomes),
@@ -187,7 +188,7 @@ export const buildCommonName = (
  * @returns Props for the BasicCell component.
  */
 export const buildCoverage = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.coverage,
@@ -200,7 +201,7 @@ export const buildCoverage = (
  * @returns Props for the BasicCell component.
  */
 export const buildGcPercent = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.gcPercent,
@@ -323,7 +324,7 @@ export const buildOrganismGenomeSpecies = (
  * @returns Props to be used for the BasicCell component.
  */
 export const buildGenomeTaxonomicLevelStrain = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: getGenomeStrainText(entity),
@@ -362,7 +363,7 @@ export const buildGenomeTaxonomicLevelIsolate = (
  * @returns Props for the ChipCell component.
  */
 export const buildIsRef = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.ChipCell> => {
   return {
     getValue: () => ({
@@ -382,7 +383,7 @@ export const buildIsRef = (
  * @returns Props for the BasicCell component.
  */
 export const buildLength = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: formatNumber(entity.length),
@@ -413,7 +414,7 @@ const LEVEL_LABEL: Record<string, string> = {
  * @returns Props for the LevelCell component.
  */
 export const buildLevel = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.LevelCell> => {
   return {
     filledCount: LEVEL_FILLED_COUNT[entity.level] ?? 0,
@@ -831,7 +832,7 @@ export const buildTaxonomicLevelRealm = (
  * @returns Props for the BasicCell component.
  */
 export const buildReleaseDate = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.releaseDate
@@ -846,7 +847,7 @@ export const buildReleaseDate = (
  * @returns Props for the Tooltip component.
  */
 export const buildReleaseDateTooltip = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): Omit<ComponentProps<typeof C.Tooltip>, "children"> => {
   return {
     arrow: true,
@@ -862,7 +863,7 @@ export const buildReleaseDateTooltip = (
  * @returns Props for the BasicCell component.
  */
 export const buildScaffoldCount = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: formatNumber(entity.scaffoldCount),
@@ -875,7 +876,7 @@ export const buildScaffoldCount = (
  * @returns Props for the BasicCell component.
  */
 export const buildScaffoldL50 = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: formatNumber(entity.scaffoldL50),
@@ -888,7 +889,7 @@ export const buildScaffoldL50 = (
  * @returns Props for the BasicCell component.
  */
 export const buildScaffoldN50 = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: formatNumber(entity.scaffoldN50),
@@ -914,7 +915,7 @@ export const buildTaxonomyId = (
  * @returns Props to be used for the AnalysisPortals component.
  */
 export const buildAssemblyResources = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): Pick<ComponentProps<typeof C.AnalysisPortals>, "portals"> => {
   return {
     portals: [
@@ -1298,7 +1299,7 @@ function getEntityLinkWithPriorityPathogenFilter(
  * @returns strain text.
  */
 export function getGenomeStrainText(
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity,
+  entity: AssemblyContract,
   defaultValue = ""
 ): string {
   if (entity.strainName) return entity.strainName;
@@ -1314,13 +1315,10 @@ export function getGenomeStrainText(
  * @returns serotype text.
  */
 export function getGenomeSerotypeText(
-  genome: BRCDataCatalogGenome | GA2AssemblyEntity,
+  genome: AssemblyContract,
   defaultValue = ""
 ): string {
-  if (
-    "taxonomicLevelSerotype" in genome &&
-    genome.taxonomicLevelSerotype !== "None"
-  )
+  if (genome.taxonomicLevelSerotype && genome.taxonomicLevelSerotype !== "None")
     return genome.taxonomicLevelSerotype;
   return defaultValue;
 }
@@ -1332,13 +1330,10 @@ export function getGenomeSerotypeText(
  * @returns isolate text.
  */
 export function getGenomeIsolateText(
-  genome: BRCDataCatalogGenome | GA2AssemblyEntity,
+  genome: AssemblyContract,
   defaultValue = ""
 ): string {
-  if (
-    "taxonomicLevelIsolate" in genome &&
-    genome.taxonomicLevelIsolate !== "None"
-  )
+  if (genome.taxonomicLevelIsolate && genome.taxonomicLevelIsolate !== "None")
     return genome.taxonomicLevelIsolate;
   return defaultValue;
 }
