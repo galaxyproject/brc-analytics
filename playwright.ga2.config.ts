@@ -5,9 +5,12 @@ import { defineConfig, devices } from "@playwright/test";
  * required).
  *
  * The default playwright.config.ts builds and tests the BRC Analytics site.
- * This config builds and serves the GA2 site and runs the GA2-only smoke suite
- * in tests/e2e/ga2. It is kept separate so the default `npx playwright test`
- * (BRC) is unaffected — the two sites are exercised by independent jobs.
+ * This config runs the GA2-only smoke suite in tests/e2e/ga2 against a served
+ * GA2 build. Locally the webServer builds GA2 first (`build-local:ga2 &&
+ * start`); in CI it only runs `npm run start`, relying on the ga2-smoke-tests
+ * workflow job to build GA2 beforehand. It is kept separate so the default
+ * `npx playwright test` (BRC) is unaffected — the two sites are exercised by
+ * independent jobs.
  *
  * Run with:
  *   npx playwright test --config=playwright.ga2.config.ts
