@@ -19,6 +19,11 @@ sources:
       - name: assembly_taxa
         columns:
           - name: taxonomy_id
+            tests:
+              - relationships:
+                  arguments:
+                    to: ref('taxonomy_assemblies')
+                    field: taxonomy_id
       - name: organism_taxa
         columns:
           - name: taxonomy_id
