@@ -8,6 +8,7 @@ import {
   buildAccession,
   buildAnalyzeGenome,
   buildAnnotationStatus,
+  buildAssemblyTaxonomicGroup,
   buildChromosomes,
   buildCoverage,
   buildGcPercent,
@@ -20,7 +21,6 @@ import {
   buildScaffoldCount,
   buildScaffoldL50,
   buildScaffoldN50,
-  buildTaxonomicGroup,
   buildTaxonomicLevelClass,
   buildTaxonomicLevelDomain,
   buildTaxonomicLevelFamily,
@@ -248,7 +248,7 @@ export const TAXONOMIC_LEVEL_GENUS: ColumnConfig<GA2AssemblyEntity> = {
 export const TAXONOMIC_GROUP: ColumnConfig<GA2AssemblyEntity> = {
   componentConfig: {
     component: C.NTagCell,
-    viewBuilder: buildTaxonomicGroup,
+    viewBuilder: buildAssemblyTaxonomicGroup,
   } as ComponentConfig<typeof C.NTagCell, GA2AssemblyEntity>,
   enableHiding: false,
   header: GA2_CATEGORY_LABEL.TAXONOMIC_GROUP,

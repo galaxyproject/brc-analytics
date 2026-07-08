@@ -305,7 +305,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: C.NTagCell,
-          viewBuilder: V.buildTaxonomicGroup,
+          viewBuilder: V.buildAssemblyTaxonomicGroup,
         } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogGenome>,
         enableHiding: false,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_GROUP,

@@ -4,7 +4,7 @@ import {
 } from "@databiosphere/findable-ui/lib/config/entities";
 import {
   buildAssemblyCount,
-  buildTaxonomicGroup,
+  buildOrganismTaxonomicGroup,
   buildTaxonomicLevelClass,
   buildTaxonomicLevelDomain,
   buildTaxonomicLevelFamily,
@@ -112,7 +112,7 @@ export const TAXONOMIC_LEVEL_GENUS: ColumnConfig<GA2OrganismEntity> = {
 export const TAXONOMIC_GROUP: ColumnConfig<GA2OrganismEntity> = {
   componentConfig: {
     component: C.NTagCell,
-    viewBuilder: buildTaxonomicGroup,
+    viewBuilder: buildOrganismTaxonomicGroup,
   } as ComponentConfig<typeof C.NTagCell, GA2OrganismEntity>,
   header: GA2_CATEGORY_LABEL.TAXONOMIC_GROUP,
   id: GA2_CATEGORY_KEY.TAXONOMIC_GROUP,

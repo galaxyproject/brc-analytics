@@ -31,7 +31,10 @@ import {
   getGenomeOrganismId,
   getOrganismId,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/utils";
-import type { AssemblyContract } from "../../../../apis/catalog/common/entities";
+import type {
+  AssemblyContract,
+  OrganismContract,
+} from "../../../../apis/catalog/common/entities";
 import { sanitizeEntityId } from "../../../../apis/catalog/common/utils";
 import {
   GA2AssemblyEntity,
@@ -147,7 +150,7 @@ export const buildAssemblyDetails = (
  * @returns Props for the BasicCell component.
  */
 export const buildAssemblyCount = (
-  entity: BRCDataCatalogOrganism | GA2OrganismEntity
+  entity: OrganismContract
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: formatNumber(entity.assemblyCount),
@@ -426,11 +429,11 @@ export const buildLevel = (
  * @returns Props for the NTagCell component.
  */
 export const buildOrganismAssemblyTaxonomyIds = (
-  entity: BRCDataCatalogOrganism | GA2OrganismEntity
+  entity: OrganismContract
 ): ComponentProps<typeof C.NTagCell> => {
   return {
     label: "taxonomy IDs",
-    values: entity.assemblyTaxonomyIds,
+    values: entity.assemblyTaxonomyIds ?? [],
   };
 };
 
@@ -701,23 +704,42 @@ export const buildPriorityPathogenResources = (
   };
 };
 
-/**
- * Build props for the taxonomic group cell.
- * @param entity - Entity with a taxonomicGroup property.
- * @returns Props for the NTagCell component.
- */
+// Union consumed by the buildTaxonomicLevel* cell builders below, which run on
+// both organisms and assemblies across both sites. Splitting these into
+// per-contract variants is deferred — the taxonomic-level fields live on the
+// organism *entity* but not on the assembly-derived organism projection, so it
+// needs the entity-vs-projection contract separation (tracked in #1414).
 type TaxonomicGroupEntity =
   | BRCDataCatalogOrganism
   | BRCDataCatalogGenome
   | GA2AssemblyEntity
   | GA2OrganismEntity;
 
-export const buildTaxonomicGroup = (
-  entity: TaxonomicGroupEntity
+/**
+ * Build props for the taxonomic group cell of an assembly.
+ * @param entity - Assembly with a taxonomicGroup property.
+ * @returns Props for the NTagCell component.
+ */
+export const buildAssemblyTaxonomicGroup = (
+  entity: AssemblyContract
 ): ComponentProps<typeof C.NTagCell> => {
   return {
     label: "taxonomic groups",
     values: entity.taxonomicGroup,
+  };
+};
+
+/**
+ * Build props for the taxonomic group cell of an organism.
+ * @param entity - Organism with an optional taxonomicGroup property.
+ * @returns Props for the NTagCell component.
+ */
+export const buildOrganismTaxonomicGroup = (
+  entity: OrganismContract
+): ComponentProps<typeof C.NTagCell> => {
+  return {
+    label: "taxonomic groups",
+    values: entity.taxonomicGroup ?? [],
   };
 };
 
@@ -901,7 +923,7 @@ export const buildScaffoldN50 = (
  * @returns Props for the BasicCell component.
  */
 export const buildTaxonomyId = (
-  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.ncbiTaxonomyId,
