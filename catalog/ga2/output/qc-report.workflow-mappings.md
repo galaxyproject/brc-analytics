@@ -11,7 +11,7 @@
 - Pox Virus Illumina Amplicon Workflow from half-genomes (#workflow/github.com/iwc-workflows/pox-virus-amplicon/main/versions/v0.4) — needs >= 1, 0 compatible (taxonomy_id: 3431483)
 - AMR Gene Detection (#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.7) — needs >= 1, 0 compatible (taxonomy_id: 2)
 - Bacterial Genome Annotation (#workflow/github.com/iwc-workflows/bacterial_genome_annotation/main/versions/v1.2.0) — needs >= 1, 0 compatible (taxonomy_id: 2)
-- CAPHEINE: Combined HyPhy Core and Compare (#workflow/github.com/iwc-workflows/hyphy/capheine-core-and-compare/versions/v0.1) — needs >= 2, 0 compatible (taxonomy_id: 10239)
+- CAPHEINE: Combined HyPhy Core and Compare (#workflow/github.com/iwc-workflows/hyphy/capheine-core-and-compare/versions/v0.2) — needs >= 2, 0 compatible (taxonomy_id: 10239)
 
 ## Workflow-Assembly Coverage Summary
 
@@ -64,4 +64,4 @@
 - AMR Gene Detection (#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.7): taxonomy ID not found in any assembly's lineage
 - Bacterial Genome Annotation (#workflow/github.com/iwc-workflows/bacterial_genome_annotation/main/versions/v1.2.0): taxonomy ID not found in any assembly's lineage
 - Bacterial Genome Assembly using Shovill (#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v2.0.1): taxonomy ID not found in any assembly's lineage
-- CAPHEINE: Combined HyPhy Core and Compare (#workflow/github.com/iwc-workflows/hyphy/capheine-core-and-compare/versions/v0.1): taxonomy ID not found in any assembly's lineage
+- CAPHEINE: Combined HyPhy Core and Compare (#workflow/github.com/iwc-workflows/hyphy/capheine-core-and-compare/versions/v0.2): taxonomy ID not found in any assembly's lineage
