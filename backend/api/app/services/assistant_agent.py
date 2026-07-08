@@ -64,6 +64,11 @@ logger = logging.getLogger(__name__)
 # fence-break attempts in user text.
 _USER_INPUT_CLOSE_TAG = re.compile(r"</\s*user_input\s*>", re.IGNORECASE)
 
+# Either structured-output trailer keyword. Used to bound a malformed marker's
+# excision so it can't reach past the next trailer -- the prompt places
+# SUGGESTIONS after SCHEMA_UPDATE, so a broken SCHEMA_UPDATE must not swallow it.
+_TRAILER_MARKER = re.compile(r"\*{0,2}\b(?:schema_update|suggestions)\b", re.IGNORECASE)
+
 # ~20 turn-pairs; tool-heavy turns produce 3-5 messages each, so this
 # bounds total context while preserving good conversational continuity.
 MAX_HISTORY_MESSAGES = 40
@@ -898,11 +903,26 @@ class AssistantAgent:
                     except json.JSONDecodeError:
                         # The model mangled the JSON (smaller models sometimes
                         # emit broken brackets). Excise from the marker through
-                        # the last bracket so raw JSON never reaches the user.
+                        # the last bracket so raw JSON never reaches the user --
+                        # but bound the reach to this marker's own payload: stop
+                        # at the next real trailer (line start or uppercase) so a
+                        # broken SCHEMA_UPDATE can't swallow the SUGGESTIONS the
+                        # prompt places after it.
                         if not marker_is_real:
                             continue
-                        last = max(text.rfind("]"), text.rfind("}"))
-                        cut = last + 1 if last > json_at else len(text)
+                        region_end = len(text)
+                        for bm in _TRAILER_MARKER.finditer(text, m.end()):
+                            bls = text.rfind("\n", 0, bm.start()) + 1
+                            if text[bls : bm.start()].strip() == "" or any(
+                                c.isupper() for c in bm.group(0)
+                            ):
+                                region_end = bm.start()
+                                break
+                        last = max(
+                            text.rfind("]", json_at, region_end),
+                            text.rfind("}", json_at, region_end),
+                        )
+                        cut = last + 1 if last >= json_at else region_end
                         text = (text[: m.start()] + text[cut:]).strip()
                         break
                     if not marker_is_real:

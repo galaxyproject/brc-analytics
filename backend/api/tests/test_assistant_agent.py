@@ -238,6 +238,23 @@ class TestParseStructuredOutput:
         assert [c.label for c in suggestions] == ["B", "C"]
         assert text == "Pick."
 
+    def test_malformed_schema_update_preserves_following_suggestions(self, agent):
+        # A broken SCHEMA_UPDATE trailer must not reach through and delete the
+        # SUGGESTIONS the prompt places after it. The malformed update is
+        # dropped (never leaked), but the valid chips survive.
+        raw = (
+            "I found a few variant-calling workflows that fit your data.\n"
+            'SCHEMA_UPDATE: {"organism": "Plasmodium falciparum", "workflow": broken\n'
+            'SUGGESTIONS: ["Variant calling", "Transcriptomics"]'
+        )
+        text, suggestions, updates = agent._parse_structured_output(raw)
+        assert updates == {}
+        assert [c.label for c in suggestions] == ["Variant calling", "Transcriptomics"]
+        assert "SCHEMA_UPDATE" not in text
+        assert "broken" not in text
+        assert "{" not in text
+        assert text == "I found a few variant-calling workflows that fit your data."
+
     def test_schema_update_inline_after_prose(self, agent):
         # Same for SCHEMA_UPDATE emitted inline after prose.
         raw = 'Recorded it. SCHEMA_UPDATE: {"organism": "Plasmodium falciparum"}'
