@@ -1,4 +1,4 @@
-import { ORGANISM_PLOIDY } from "../brc-analytics-catalog/common/schema-entities";
+import type { ORGANISM_PLOIDY } from "../common/schema-entities";
 
 export type GA2Catalog = GA2AssemblyEntity | GA2OrganismEntity;
 
