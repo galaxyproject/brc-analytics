@@ -243,7 +243,12 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
           ],
           component: C.Tooltip,
           viewBuilder: V.buildReleaseDateTooltip,
-        } as ComponentConfig<typeof C.Tooltip, BRCDataCatalogGenome>,
+          // The shared release-date builders take the site-neutral
+          // AssemblyContract, which TS can't reconcile with this cast:
+          // ComponentConfig's data type is invariant and the Tooltip viewBuilder
+          // omits `children` (supplied above). Double cast is the repo's
+          // escape-hatch for this findable-ui typing limitation.
+        } as unknown as ComponentConfig<typeof C.Tooltip, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.RELEASE_DATE,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.RELEASE_DATE,
         width: { max: "1fr", min: "120px" },
