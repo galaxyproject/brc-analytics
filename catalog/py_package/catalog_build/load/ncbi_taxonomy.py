@@ -1,3 +1,4 @@
+import hashlib
 import tarfile
 from pathlib import Path
 
@@ -94,6 +95,17 @@ def load_taxdump(*, temp_folder_path: Path, dlt_pipeline_prefix: str):
     pipeline.run(ncbi_taxdump(temp_folder_path / TAXDUMP_DIR_NAME))
 
 
+def calc_taxdump_md5(temp_folder_path: Path) -> str:
+    taxdump_path = temp_folder_path / TAXDUMP_DOWNLOAD_NAME
+    with open(taxdump_path, "rb") as f:
+        return hashlib.file_digest(f, "md5").hexdigest()
+
+
+def verify_taxdump_md5(temp_folder_path: Path, fetched_md5: str):
+    if calc_taxdump_md5(temp_folder_path).lower() != fetched_md5.lower():
+        raise Exception("Taxdump MD5 provided by NCBI does not match calculated MD5")
+
+
 def fetch_taxdump_md5() -> str:
     return requests.get(TAXDUMP_MD5_URL).text[:32]
 
@@ -125,6 +137,7 @@ def download_taxdump(temp_folder_path: Path):
 def load_ncbi_taxonomy(*, temp_folder_path: Path, dlt_pipeline_prefix: str) -> str:
     download_taxdump(temp_folder_path)
     fetched_md5 = fetch_taxdump_md5()
+    verify_taxdump_md5(temp_folder_path, fetched_md5)
     load_taxdump(
         temp_folder_path=temp_folder_path, dlt_pipeline_prefix=dlt_pipeline_prefix
     )
