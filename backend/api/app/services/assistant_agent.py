@@ -962,10 +962,10 @@ class AssistantAgent:
                 for k, val in v.items()
             )
 
-        # Extract SCHEMA_UPDATE before SUGGESTIONS. A malformed SUGGESTIONS
-        # trailer is excised through the last bracket in the reply, which would
-        # swallow a SCHEMA_UPDATE that follows it. Schema state matters more
-        # than cosmetic chips, so pull it out first.
+        # Extract SCHEMA_UPDATE before SUGGESTIONS: schema state matters more
+        # than cosmetic chips, so if the two ever interfere the schema wins. (A
+        # malformed SUGGESTIONS is excised only up to the next real trailer, so
+        # pulling SCHEMA_UPDATE out first keeps it safe regardless of ordering.)
         text, parsed = _extract(text, "schema_update", _valid_schema)
         if parsed is not None:
             schema_updates = parsed
@@ -1131,10 +1131,22 @@ class AssistantAgent:
 
             setattr(schema, key, field)
 
+        self._reflect_workflow(schema)
         self._reflect_data_characteristics(schema)
         self._reflect_gene_annotation_requirement(schema)
 
         return schema
+
+    def _reflect_workflow(self, schema: AnalysisSchema) -> None:
+        """Drop a FILLED workflow whose detail no longer maps to a visible
+        catalog entry -- e.g. a restored session carrying a stale or
+        organism-scope workflow detail. Runs before the derived reflectors so
+        the tracker can't complete or hand off on a phantom workflow (Copilot)."""
+        if (
+            schema.workflow.status == FieldStatus.FILLED
+            and self._workflow_by_ref(schema.workflow.detail) is None
+        ):
+            schema.workflow = SchemaField()
 
     def _reflect_data_characteristics(self, schema: AnalysisSchema) -> None:
         """Derive data characteristics from the selected workflow's inputs.

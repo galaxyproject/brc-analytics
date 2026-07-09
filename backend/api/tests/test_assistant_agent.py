@@ -526,6 +526,24 @@ class TestApplySchemaUpdates:
         assert result.workflow.status == FieldStatus.EMPTY
         assert result.workflow.detail is None
 
+    def test_restored_invalid_workflow_cleared(self, agent):
+        # A restored session with a FILLED workflow whose detail no longer maps
+        # to a visible catalog entry is cleared, so it can't complete or hand off
+        # on a phantom workflow (Copilot).
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "ASSEMBLY",
+                "workflows": [{"iwcId": "real", "trsId": "trs-real"}],
+            }
+        ]
+        schema = AnalysisSchema(
+            workflow=SchemaField(
+                value="Old WF", detail="trs-gone", status=FieldStatus.FILLED
+            )
+        )
+        result = agent._apply_schema_updates(schema, {})
+        assert result.workflow.status == FieldStatus.EMPTY
+
     def test_preserves_existing_fields(self, agent):
         schema = AnalysisSchema(
             organism=SchemaField(value="Existing", status=FieldStatus.FILLED)
@@ -1731,6 +1749,17 @@ class TestParserInvariants:
         assert updates == {}
         assert not any(ch in text for ch in "{}[]")
         assert "SCHEMA_UPDATE" not in text
+
+    def test_inline_trailer_after_malformed_dropped_no_leak(self, agent):
+        # Trade-off: an inline trailer sharing a line with a malformed one is
+        # dropped rather than risk a leak (an inline boundary can't be told apart
+        # from a marker inside a string). No raw JSON leaks; chips are lost.
+        raw = 'Recorded. SCHEMA_UPDATE: {"organism": broken SUGGESTIONS: ["Next"]'
+        text, suggestions, updates = agent._parse_structured_output(raw)
+        assert updates == {}
+        assert not any(ch in text for ch in "{}[]")
+        assert text == "Recorded."
+        assert suggestions == []
 
     def test_whitespace_before_colon_extracted(self, agent):
         raw = 'Recorded. SCHEMA_UPDATE : {"organism": "P. falciparum"}'
