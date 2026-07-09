@@ -6,9 +6,7 @@ None
 
 ## Assemblies not found in UCSC list
 
-- GCA_051144965.1
-- GCA_051144935.1
-- GCA_004302925.2
+None
 
 ## Assemblies with gene model URLs not found
 
@@ -23,6 +21,7 @@ None
 - GCF_000008445.1
 - GCF_000018225.1
 - GCA_006535965.1
+- GCA_012977735.1
 - GCA_051144965.1
 - GCA_051144935.1
 - GCA_004302925.2
@@ -30,65 +29,65 @@ None
 ## Species and strain combinations with multiple taxonomy IDs
 
 - Acanthamoeba castellanii strain Neff: 1257118, 5755
-- Aedes aegypti: 7159, 1769044
-- Alphapapillomavirus 12: 990303, 10570
-- Alphapapillomavirus 14: 120686, 333769
-- Alphapapillomavirus 6: 333765, 10611
-- Asfivirus haemorrhagiae: 443876, 10497, 443878
-- Batrachochytrium dendrobatidis strain JEL423: 403673, 109871
+- Aedes aegypti: 1769044, 7159
+- Alphapapillomavirus 12: 10570, 990303
+- Alphapapillomavirus 14: 333769, 120686
+- Alphapapillomavirus 6: 10611, 333765
+- Asfivirus haemorrhagiae: 443878, 10497, 443876
+- Batrachochytrium dendrobatidis strain JEL423: 109871, 403673
 - Betacoronavirus pandemicum: 227984, 2697049
-- Betapapillomavirus 1: 333923, 889813
-- Blumeria graminis: 62690, 1689686
+- Betapapillomavirus 1: 889813, 333923
+- Blumeria graminis: 1689686, 62690
 - Candida albicans strain SC5314: 5476, 237561
 - Candida tropicalis strain MYA-3404: 294747, 5482
-- Cryptococcus gattii strain WM276: 367775, 37769
-- Cryptococcus neoformans strain A5-35-17: 1230080, 5207
+- Cryptococcus gattii strain WM276: 37769, 367775
+- Cryptococcus neoformans strain A5-35-17: 5207, 1230080
 - Cryptococcus neoformans strain C23: 1295831, 5207
-- Cryptococcus neoformans strain H99: 235443, 5207
+- Cryptococcus neoformans strain H99: 5207, 235443
 - Cryptosporidium parvum: 353152, 5807
-- Culex pipiens: 42434, 233155, 7175
-- Deltaretrovirus priTlym1: 194440, 11908
+- Culex pipiens: 233155, 42434, 7175
+- Deltaretrovirus priTlym1: 11908, 194440
 - Dependoparvovirus mammalian1: 256548, 82300
-- Dependoparvovirus primate1: 57579, 202812, 85106, 202813, 10804
+- Dependoparvovirus primate1: 85106, 202813, 202812, 10804, 57579
 - Encephalitozoon intestinalis strain ATCC 50506: 58839, 876142
-- Enterovirus alphacoxsackie: 156647, 150846
+- Enterovirus alphacoxsackie: 150846, 156647
 - Enterovirus betarhino: 44130, 12131
 - Fusarium fujikuroi strain B14: 1215603, 5127
-- Fusarium oxysporum: 1940294, 61366, 396575, 299031, 224912, 61374, 5507, 330941, 1229664, 654392
+- Fusarium oxysporum: 1229664, 330941, 1940294, 654392, 61366, 299031, 5507, 396575, 61374, 224912
 - Fusarium oxysporum strain Fo5176: 5507, 100902
-- Fusarium vanettenii: 660122, 2747968
+- Fusarium vanettenii: 2747968, 660122
 - Fusarium verticillioides strain 7600: 117187, 334819
-- Gammapapillomavirus 11: 1070409, 1195796, 1070413
-- Gammapapillomavirus 12: 909331, 746832
-- Gammapapillomavirus 15: 1472342, 1070408
-- Gammapapillomavirus 19: 1315264, 1315259
-- Gemykibivirus humas1: 1519409, 1516081
+- Gammapapillomavirus 11: 1195796, 1070409, 1070413
+- Gammapapillomavirus 12: 746832, 909331
+- Gammapapillomavirus 15: 1070408, 1472342
+- Gammapapillomavirus 19: 1315259, 1315264
+- Gemykibivirus humas1: 1516081, 1519409
 - Giardia duodenalis: 5741, 941442
-- Glossina fuscipes: 201502, 7396
+- Glossina fuscipes: 7396, 201502
 - Heligmosomoides polygyrus: 6339, 375939
-- Hemileia vastatrix: 203904, 1291517
-- Leishmania braziliensis: 5660, 420245
-- Leishmania infantum: 435258, 5671
+- Hemileia vastatrix: 1291517, 203904
+- Leishmania braziliensis: 420245, 5660
+- Leishmania infantum: 5671, 435258
 - Meyerozyma guilliermondii strain ATCC 6260: 294746, 4929
-- Microsporum canis strain CBS 113480: 63405, 554155
+- Microsporum canis strain CBS 113480: 554155, 63405
 - Mucor lusitanicus strain CBS 277.49: 29924, 747725
-- Norovirus norwalkense: 1529918, 122929, 490039, 1529924, 1529909, 122928, 1246677
-- Orthoflavivirus denguei: 11070, 11053, 11069
-- Orthohepacivirus hominis: 33745, 1544901, 356114
-- Orthomarburgvirus marburgense: 448086, 3052505
-- Pegivirus columbiaense: 1729141, 1704090
-- Plasmodium falciparum: 36329, 5833
-- Plasmodium ovale: 864142, 864141
-- Plasmodium vinckei: 119398, 138297, 54757, 5860, 138298
+- Norovirus norwalkense: 122929, 1529918, 122928, 1529909, 1529924, 490039, 1246677
+- Orthoflavivirus denguei: 11053, 11069, 11070
+- Orthohepacivirus hominis: 1544901, 33745, 356114
+- Orthomarburgvirus marburgense: 3052505, 448086
+- Pegivirus columbiaense: 1704090, 1729141
+- Plasmodium falciparum: 5833, 36329
+- Plasmodium ovale: 864141, 864142
+- Plasmodium vinckei: 54757, 5860, 138298, 119398, 138297
 - Plasmodium yoelii strain 17X: 1323249, 5861
-- Puccinia striiformis strain 93-210: 168172, 27350
+- Puccinia striiformis strain 93-210: 27350, 168172
 - Small anellovirus: 289366, 289367
-- Torbevirus brisa: 2571075, 2571076, 2571078, 2571077
+- Torbevirus brisa: 2571075, 2571077, 2571078, 2571076
 - Toxoplasma gondii strain ME49: 5811, 508771
-- Trichoderma virens strain Gv29-8: 29875, 413071
+- Trichoderma virens strain Gv29-8: 413071, 29875
 - Trichophyton rubrum strain CBS 289.86: 1215329, 5551
 - Trichophyton rubrum strain CBS 735.88: 5551, 1215332
-- Trypanosoma cruzi strain Dm28c: 5693, 1416333, 85057
+- Trypanosoma cruzi strain Dm28c: 1416333, 85057, 5693
 - Vesivirus exanthema: 146073, 35612
 
 ## Assemblies without ploidy information
@@ -432,6 +431,8 @@ None
 - GCA_051996125.1 (current: GCA_051996125.2)
 - GCA_051988555.1 (current: GCA_051988555.2)
 - GCA_051988445.1 (current: GCA_051988445.2)
+- GCA_029168785.1 (current: GCA_029168785.2)
+- GCA_029168835.1 (current: GCA_029168835.2)
 
 ## Suppressed or retired genomes
 

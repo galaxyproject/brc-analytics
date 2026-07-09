@@ -1,5 +1,5 @@
 {
-    "assembly_count": 5502,
+    "assembly_count": 5506,
     "children": [
         {
             "assembly_count": 398,
@@ -5063,7 +5063,7 @@
             "rank": "domain"
         },
         {
-            "assembly_count": 4478,
+            "assembly_count": 4482,
             "children": [
                 {
                     "assembly_count": 2,
@@ -5112,7 +5112,7 @@
                     "rank": "class"
                 },
                 {
-                    "assembly_count": 3433,
+                    "assembly_count": 3437,
                     "children": [
                         {
                             "assembly_count": 49,
@@ -5769,7 +5769,7 @@
                             "rank": "phylum"
                         },
                         {
-                            "assembly_count": 2775,
+                            "assembly_count": 2779,
                             "children": [
                                 {
                                     "assembly_count": 80,
@@ -8531,7 +8531,7 @@
                                     "rank": "class"
                                 },
                                 {
-                                    "assembly_count": 1376,
+                                    "assembly_count": 1380,
                                     "children": [
                                         {
                                             "assembly_count": 109,
@@ -8615,7 +8615,7 @@
                                             "rank": "order"
                                         },
                                         {
-                                            "assembly_count": 1221,
+                                            "assembly_count": 1225,
                                             "children": [
                                                 {
                                                     "assembly_count": 9,
@@ -8762,10 +8762,10 @@
                                                     "rank": "family"
                                                 },
                                                 {
-                                                    "assembly_count": 1160,
+                                                    "assembly_count": 1164,
                                                     "children": [
                                                         {
-                                                            "assembly_count": 1160,
+                                                            "assembly_count": 1164,
                                                             "children": [
                                                                 {
                                                                     "assembly_count": 23,
@@ -8797,7 +8797,7 @@
                                                                     "rank": "species"
                                                                 },
                                                                 {
-                                                                    "assembly_count": 486,
+                                                                    "assembly_count": 489,
                                                                     "children": [
                                                                         {
                                                                             "assembly_count": 2,
@@ -9789,7 +9789,7 @@
                                                                     "rank": "species"
                                                                 },
                                                                 {
-                                                                    "assembly_count": 1,
+                                                                    "assembly_count": 2,
                                                                     "children": [],
                                                                     "name": "Fusarium keratoplasticum",
                                                                     "ncbi_tax_id": "1328300",

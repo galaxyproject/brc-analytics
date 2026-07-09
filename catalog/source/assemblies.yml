@@ -5941,7 +5941,6 @@ assemblies:
   - accession: GCA_015586375.1
   - accession: GCA_015832375.1
   - accession: GCA_015951145.1
-  # - accession: GCA_016068325.1
   - accession: GCA_016097715.1
   - accession: GCA_016097735.1
   - accession: GCA_016097755.1
@@ -6900,8 +6899,6 @@ assemblies:
   - accession: GCA_029405315.1
   - accession: GCA_029405325.1
   - accession: GCA_029405515.1
-  # - accession: GCA_029449215.1
-  # - accession: GCA_029449265.1
   - accession: GCA_029603225.1
   - accession: GCA_029618165.1
   - accession: GCA_029618175.1
@@ -8758,19 +8755,19 @@ assemblies:
   # organism: Fusarium falciforme
   - accession: GCF_026873545.1
   # organism: Fusarium keratoplasticum
-  # - accession: GCF_025433545.1  # temporarily disabled: missing from UCSC (2026-03)
+  - accession: GCF_025433545.1
   # organism: Fusarium luffae
   # - accession: GCA_054821325.1  # temporarily disabled: missing from UCSC (2026-03)
   # organism: Fusarium oxysporum
   # - accession: GCA_054643155.1  # temporarily disabled: missing from UCSC (2026-03)
   # organism: Fusarium oxysporum f. sp. cubense
-  # - accession: GCA_053754955.1  # temporarily disabled: missing from UCSC (2026-03)
+  - accession: GCA_053754955.1
   # organism: Fusarium oxysporum f. sp. cubense
-  # - accession: GCA_053754965.1  # temporarily disabled: missing from UCSC (2026-03)
+  - accession: GCA_053754965.1
   # organism: Fusarium oxysporum f. sp. phaseoli
   # - accession: GCA_054643655.1  # temporarily disabled: missing from UCSC (2026-03)
   # organism: Fusarium oxysporum f. sp. phaseoli
-  # - accession: GCA_054130785.1  # temporarily disabled: missing from UCSC (2026-03)
+  - accession: GCA_054130785.1
   # organism: Fusarium poae
   - accession: GCF_019609905.1
   # organism: Fusarium verticillioides
