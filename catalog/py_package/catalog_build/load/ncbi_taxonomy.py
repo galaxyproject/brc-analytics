@@ -107,7 +107,9 @@ def verify_taxdump_md5(temp_folder_path: Path, fetched_md5: str):
 
 
 def fetch_taxdump_md5() -> str:
-    return requests.get(TAXDUMP_MD5_URL).text[:32]
+    response = requests.get(TAXDUMP_MD5_URL, timeout=(10, 30))
+    response.raise_for_status()
+    return response.text[:32]
 
 
 def download_taxdump(temp_folder_path: Path):
