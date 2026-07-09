@@ -1651,6 +1651,22 @@ class TestParserInvariants:
         assert not any(ch in text for ch in "[]")
         assert text == "Pick."
 
+    def test_malformed_bracket_in_string_no_leak(self, agent):
+        # A malformed payload with a ]/} inside a string literal must be fully
+        # excised -- cutting at that inner bracket leaves the tail visible
+        # (Copilot). No raw JSON may reach the user.
+        raw = (
+            "Recorded.\n"
+            'SCHEMA_UPDATE: {"note": "has ] bracket", "x": broken\n'
+            'SUGGESTIONS: ["Next"]'
+        )
+        text, suggestions, updates = agent._parse_structured_output(raw)
+        assert updates == {}
+        assert [c.label for c in suggestions] == ["Next"]
+        assert "bracket" not in text
+        assert not any(ch in text for ch in "{}[]")
+        assert text == "Recorded."
+
     def test_whitespace_before_colon_extracted(self, agent):
         raw = 'Recorded. SCHEMA_UPDATE : {"organism": "P. falciparum"}'
         text, _, updates = agent._parse_structured_output(raw)

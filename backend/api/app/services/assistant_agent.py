@@ -904,12 +904,11 @@ class AssistantAgent:
                         value, end = json.JSONDecoder().raw_decode(text, json_at)
                     except json.JSONDecodeError:
                         # The model mangled the JSON (smaller models sometimes
-                        # emit broken brackets). Excise from the marker through
-                        # the last bracket so raw JSON never reaches the user --
-                        # but bound the reach to this marker's own payload: stop
-                        # at the next real trailer (on its own line) so a
-                        # broken SCHEMA_UPDATE can't swallow the SUGGESTIONS the
-                        # prompt places after it.
+                        # emit broken brackets). Excise the whole bounded region
+                        # -- from the marker to the next real trailer (on its own
+                        # line), else end of reply -- so raw JSON never reaches
+                        # the user. Cutting at the "last bracket" instead could
+                        # stop at a ]/} inside a string literal and leak the tail.
                         if not marker_is_real:
                             continue
                         region_end = len(text)
@@ -917,17 +916,11 @@ class AssistantAgent:
                             bls = text.rfind("\n", 0, bm.start()) + 1
                             # Only a trailer on its own line bounds the reach; a
                             # marker word mid-line (e.g. inside a JSON string) is
-                            # not a real boundary, so we over-strip past it rather
-                            # than stop inside it and leak the tail.
+                            # not a real boundary.
                             if text[bls : bm.start()].strip() == "":
                                 region_end = bm.start()
                                 break
-                        last = max(
-                            text.rfind("]", json_at, region_end),
-                            text.rfind("}", json_at, region_end),
-                        )
-                        cut = last + 1 if last >= json_at else region_end
-                        text = (text[: m.start()] + text[cut:]).strip()
+                        text = (text[: m.start()] + text[region_end:]).strip()
                         break
                     if not marker_is_real:
                         continue  # prose that merely looks JSON-ish -- leave it
