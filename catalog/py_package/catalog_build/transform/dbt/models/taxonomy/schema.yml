@@ -1,9 +1,42 @@
 version: 2
 
 models:
+  - name: taxonomy_catalog_taxa
+    columns:
+      - name: taxonomy_id
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              field: query_tax_id
+              to: ref('taxonomy_lineages_with_names')
   - name: taxonomy_assemblies
     columns:
       - name: taxonomy_id
         tests:
           - unique
+          - not_null
+      - name: taxonomic_level_species
+        tests:
+          - not_null
+      - name: taxonomic_level_species_id
+        tests:
+          - not_null
+      - name: lineage_taxonomy_ids
+        tests:
+          - not_null
+      - name: common_names
+        tests:
+          - not_null
+  - name: taxonomy_organisms
+    columns:
+      - name: taxonomy_id
+        tests:
+          - unique
+          - not_null
+      - name: rank
+        tests:
+          - not_null
+      - name: taxon_name
+        tests:
           - not_null

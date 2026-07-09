@@ -27,6 +27,11 @@ sources:
       - name: organism_taxa
         columns:
           - name: taxonomy_id
+            tests:
+              - relationships:
+                  arguments:
+                    to: ref('taxonomy_organisms')
+                    field: taxonomy_id
       - name: outbreak_taxa
         columns:
           - name: taxonomy_id
