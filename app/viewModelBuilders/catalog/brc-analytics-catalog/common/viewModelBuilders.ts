@@ -6,13 +6,13 @@ import {
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
-import { ColumnDef, RowData } from "@tanstack/react-table";
+import { ColumnDef, RowData, VisibilityState } from "@tanstack/react-table";
 import type { SpeciesTag } from "app/components/Table/components/TableCell/components/SpeciesCell/types";
 import type { Organism } from "app/views/OrganismView/types";
 import { parseISO } from "date-fns";
 import { LinkProps } from "next/link";
 import Router from "next/router";
-import { ComponentProps } from "react";
+import { ComponentProps, createElement } from "react";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
@@ -30,6 +30,7 @@ import {
   getGenomeOrganismId,
   getOrganismId,
 } from "../../../../apis/catalog/brc-analytics-catalog/common/utils";
+import type { AssemblyContract } from "../../../../apis/catalog/common/entities";
 import { sanitizeEntityId } from "../../../../apis/catalog/common/utils";
 import {
   GA2AssemblyEntity,
@@ -40,6 +41,10 @@ import * as C from "../../../../components";
 import { StepConfig } from "../../../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { KeyValueSection } from "../../../../components/Entity/components/Section/KeyValueSection/keyValueSection";
 import { formatDate } from "../../../../utils/date-fns";
+import {
+  COLUMN_PRESET_KEY,
+  COLUMN_PRESET_LABEL,
+} from "../../../../views/OrganismView/components/Main/constants";
 import {
   getPriorityColor,
   getPriorityLabel,
@@ -60,7 +65,7 @@ import {
  * @returns Props to be used for the cell.
  */
 export const buildAccession = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.accession,
@@ -73,7 +78,7 @@ export const buildAccession = (
  * @returns Props to be used for the AnalyzeGenome component.
  */
 export const buildAnalyzeGenome = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.AnalyzeGenome> => {
   const { accession, ncbiTaxonomyId, ucscBrowserUrl } = entity;
   return {
@@ -107,7 +112,7 @@ export const buildAnalyzeGenome = (
  * @returns Props for the BasicCell component.
  */
 export const buildAnnotationStatus = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.annotationStatus,
@@ -120,7 +125,7 @@ export const buildAnnotationStatus = (
  * @returns Props to be used for the KeyValuePairs component.
  */
 export const buildAssemblyDetails = (
-  assembly: BRCDataCatalogGenome | GA2AssemblyEntity
+  assembly: AssemblyContract
 ): ComponentProps<typeof C.KeyValuePairs> => {
   const keyValuePairs = new Map<Key, Value>();
   keyValuePairs.set(
@@ -157,7 +162,7 @@ export const buildAssemblyCount = (
  * @returns Props for the BasicCell component.
  */
 export const buildChromosomes = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: formatNumber(entity.chromosomes),
@@ -183,7 +188,7 @@ export const buildCommonName = (
  * @returns Props for the BasicCell component.
  */
 export const buildCoverage = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.coverage,
@@ -196,7 +201,7 @@ export const buildCoverage = (
  * @returns Props for the BasicCell component.
  */
 export const buildGcPercent = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.gcPercent,
@@ -216,23 +221,20 @@ export const buildGenomeSpecies = (
 ): ComponentProps<typeof C.SpeciesCell> => {
   const tags: SpeciesTag[] = [];
   const strain = getGenomeStrainText(genome);
-  if (strain) tags.push({ label: "strain", value: strain });
+  if (strain) tags.push({ label: "strain", tooltip: strain, value: strain });
   const serotype = getGenomeSerotypeText(genome);
-  if (serotype) tags.push({ label: "serotype", value: serotype });
+  if (serotype)
+    tags.push({ label: "serotype", tooltip: serotype, value: serotype });
   const isolate = getGenomeIsolateText(genome);
-  if (isolate) tags.push({ label: "isolate", value: isolate });
-  if (genome.taxonomicGroup.length > 0)
-    tags.push({
-      label: "group",
-      value: genome.taxonomicGroup.join(", "),
-    });
-  if (genome.priority)
-    tags.push({
-      color: getPriorityColor(genome.priority),
-      label: "priority",
-      tooltip: genome.priorityPathogenName ?? undefined,
-      value: genome.priority.toLowerCase().replace(/_/g, " "),
-    });
+  if (isolate)
+    tags.push({ label: "isolate", tooltip: isolate, value: isolate });
+  const groupTag = buildGroupTag(genome.taxonomicGroup);
+  if (groupTag) tags.push(groupTag);
+  const priorityTag = buildPriorityTag(
+    genome.priority,
+    genome.priorityPathogenName
+  );
+  if (priorityTag) tags.push(priorityTag);
   return {
     ncbiTaxonomyId: genome.ncbiTaxonomyId,
     species: {
@@ -244,9 +246,60 @@ export const buildGenomeSpecies = (
 };
 
 /**
+ * Species-cell tag labels. Single source of truth shared by the tag builders
+ * and the organism-scoped filter so they can't drift apart.
+ */
+const SPECIES_TAG_LABEL = {
+  GROUP: "group",
+  PRIORITY: "priority",
+} as const;
+
+/**
+ * Labels of the species/organism-scoped tags (constant across an organism's
+ * assemblies). On the organism detail page these move to the header, so the
+ * per-assembly species cell omits them.
+ */
+export const ORGANISM_SCOPED_TAG_LABELS: string[] = [
+  SPECIES_TAG_LABEL.GROUP,
+  SPECIES_TAG_LABEL.PRIORITY,
+];
+
+/**
+ * Build the taxonomic group tag, or null when there is no group.
+ * @param taxonomicGroup - Taxonomic group values.
+ * @returns Group tag, or null.
+ */
+export function buildGroupTag(taxonomicGroup: string[]): SpeciesTag | null {
+  if (taxonomicGroup.length === 0) return null;
+  const value = taxonomicGroup.join(", ");
+  return { label: SPECIES_TAG_LABEL.GROUP, tooltip: value, value };
+}
+
+/**
+ * Build the priority pathogen tag, or null when the entity has no priority.
+ * @param priority - Outbreak priority.
+ * @param priorityPathogenName - Priority pathogen name (tag tooltip).
+ * @returns Priority tag, or null.
+ */
+function buildPriorityTag(
+  priority: OUTBREAK_PRIORITY | null,
+  priorityPathogenName: string | null
+): SpeciesTag | null {
+  if (!priority) return null;
+  return {
+    color: getPriorityColor(priority),
+    label: SPECIES_TAG_LABEL.PRIORITY,
+    tooltip: priorityPathogenName ?? undefined,
+    value: priority.toLowerCase().replace(/_/g, " "),
+  };
+}
+
+/**
  * Build props for the species cell on the organism detail page assembly table.
- * Same as buildGenomeSpecies but with an empty species url — the species is the
- * page's own organism, so Link renders the name as plain text (no self-link).
+ * The accession is the cell's primary (unlinked) label — the species name is
+ * redundant on a single-organism page and moves to the hero title. The
+ * organism-scoped tags (group, priority) are dropped here as they move to the
+ * hero; only per-assembly tags (strain, serotype, isolate) remain.
  * @param genome - Genome entity.
  * @returns Props to be used for the SpeciesCell component.
  */
@@ -254,7 +307,15 @@ export const buildOrganismGenomeSpecies = (
   genome: BRCDataCatalogGenome
 ): ComponentProps<typeof C.SpeciesCell> => {
   const props = buildGenomeSpecies(genome);
-  return { ...props, species: { ...props.species, url: "" } };
+  return {
+    ...props,
+    // Accession replaces the species name as the cell's primary text (rendered
+    // as plain text — no link). Organism-scoped tags move to the page header.
+    species: { label: genome.accession, url: "" },
+    tags: props.tags?.filter(
+      ({ label }) => !ORGANISM_SCOPED_TAG_LABELS.includes(label)
+    ),
+  };
 };
 
 /**
@@ -263,7 +324,7 @@ export const buildOrganismGenomeSpecies = (
  * @returns Props to be used for the BasicCell component.
  */
 export const buildGenomeTaxonomicLevelStrain = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: getGenomeStrainText(entity),
@@ -302,7 +363,7 @@ export const buildGenomeTaxonomicLevelIsolate = (
  * @returns Props for the ChipCell component.
  */
 export const buildIsRef = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.ChipCell> => {
   return {
     getValue: () => ({
@@ -322,7 +383,7 @@ export const buildIsRef = (
  * @returns Props for the BasicCell component.
  */
 export const buildLength = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: formatNumber(entity.length),
@@ -340,16 +401,24 @@ const LEVEL_FILLED_COUNT: Record<string, number> = {
 };
 
 /**
+ * Overrides the displayed label for specific NCBI assembly levels; levels not
+ * listed here display their raw value.
+ */
+const LEVEL_LABEL: Record<string, string> = {
+  "Complete Genome": "Genome",
+};
+
+/**
  * Build props for the level cell — a tiered bar indicator plus the level label.
  * @param entity - Entity with a level property.
  * @returns Props for the LevelCell component.
  */
 export const buildLevel = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.LevelCell> => {
   return {
     filledCount: LEVEL_FILLED_COUNT[entity.level] ?? 0,
-    label: entity.level,
+    label: LEVEL_LABEL[entity.level] ?? entity.level,
   };
 };
 
@@ -763,7 +832,7 @@ export const buildTaxonomicLevelRealm = (
  * @returns Props for the BasicCell component.
  */
 export const buildReleaseDate = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: entity.releaseDate
@@ -778,7 +847,7 @@ export const buildReleaseDate = (
  * @returns Props for the Tooltip component.
  */
 export const buildReleaseDateTooltip = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): Omit<ComponentProps<typeof C.Tooltip>, "children"> => {
   return {
     arrow: true,
@@ -794,7 +863,7 @@ export const buildReleaseDateTooltip = (
  * @returns Props for the BasicCell component.
  */
 export const buildScaffoldCount = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: formatNumber(entity.scaffoldCount),
@@ -807,7 +876,7 @@ export const buildScaffoldCount = (
  * @returns Props for the BasicCell component.
  */
 export const buildScaffoldL50 = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: formatNumber(entity.scaffoldL50),
@@ -820,7 +889,7 @@ export const buildScaffoldL50 = (
  * @returns Props for the BasicCell component.
  */
 export const buildScaffoldN50 = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: formatNumber(entity.scaffoldN50),
@@ -846,7 +915,7 @@ export const buildTaxonomyId = (
  * @returns Props to be used for the AnalysisPortals component.
  */
 export const buildAssemblyResources = (
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity
+  entity: AssemblyContract
 ): Pick<ComponentProps<typeof C.AnalysisPortals>, "portals"> => {
   return {
     portals: [
@@ -908,8 +977,20 @@ export const buildAssemblyResources = (
 export const buildOrganismHero = (
   organism: BRCDataCatalogOrganism
 ): ComponentProps<typeof C.BackPageHero> => {
+  // The species/group/priority are constant across the organism's assemblies,
+  // so surface group + priority as header chips rather than repeating them on
+  // every assembly row.
+  const tags: SpeciesTag[] = [];
+  const groupTag = buildGroupTag(organism.taxonomicGroup);
+  if (groupTag) tags.push(groupTag);
+  const priorityTag = buildPriorityTag(
+    organism.priority,
+    organism.priorityPathogenName
+  );
+  if (priorityTag) tags.push(priorityTag);
   return {
     breadcrumbs: getOrganismEntityBreadcrumbs(organism),
+    subTitle: tags.length > 0 ? createElement(C.TagList, { tags }) : undefined,
     title: organism.taxonomicLevelSpecies,
   };
 };
@@ -923,11 +1004,53 @@ export const buildOrganismViewMain = (
   organism: BRCDataCatalogOrganism
 ): ComponentProps<typeof C.OrganismViewMain> => {
   return {
+    columnPresets: ORGANISM_GENOMES_COLUMN_PRESETS,
     entityId: getOrganismId(organism),
     organism,
     tableOptions: buildOrganismGenomesTable(organism),
   };
 };
+
+/**
+ * Complete visibility state for the Default preset, also used as the table's
+ * initial state. Columns not listed here are shown; the internal row-position
+ * column is always hidden.
+ */
+const DEFAULT_COLUMN_VISIBILITY: VisibilityState = {
+  [COLUMN_IDENTIFIER.ROW_POSITION]: false,
+  [BRC_DATA_CATALOG_CATEGORY_KEY.CHROMOSOMES]: false,
+  [BRC_DATA_CATALOG_CATEGORY_KEY.COVERAGE]: false,
+  [BRC_DATA_CATALOG_CATEGORY_KEY.GC_PERCENT]: false,
+  [BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_COUNT]: false,
+  [BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_L50]: false,
+  [BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_N50]: false,
+};
+
+/**
+ * The column presets (Default, Quality) for the organism genomes table. Each
+ * preset's complete visibility state is applied via table.setColumnVisibility
+ * on toggle; columns not listed are shown.
+ */
+const ORGANISM_GENOMES_COLUMN_PRESETS: ComponentProps<
+  typeof C.OrganismViewMain
+>["columnPresets"] = [
+  {
+    columnVisibility: DEFAULT_COLUMN_VISIBILITY,
+    key: COLUMN_PRESET_KEY.DEFAULT,
+    label: COLUMN_PRESET_LABEL.DEFAULT,
+  },
+  {
+    columnVisibility: {
+      [COLUMN_IDENTIFIER.ROW_POSITION]: false,
+      [BRC_DATA_CATALOG_CATEGORY_KEY.ANNOTATION_STATUS]: false,
+      [BRC_DATA_CATALOG_CATEGORY_KEY.IS_REF]: false,
+      [BRC_DATA_CATALOG_CATEGORY_KEY.LENGTH]: false,
+      [BRC_DATA_CATALOG_CATEGORY_KEY.RELEASE_DATE]: false,
+    },
+    key: COLUMN_PRESET_KEY.QUALITY,
+    label: COLUMN_PRESET_LABEL.QUALITY,
+  },
+];
 
 /**
  * Build table options (columns, data, initial state) for the genomes table for the given organism.
@@ -943,7 +1066,8 @@ export function buildOrganismGenomesTable(
     columns: buildOrganismGenomesTableColumns() as ColumnDef<RowData>[],
     data: organism.genomes,
     initialState: {
-      columnVisibility: { [COLUMN_IDENTIFIER.ROW_POSITION]: false },
+      // Mount on the Default preset so the table matches the toggle.
+      columnVisibility: DEFAULT_COLUMN_VISIBILITY,
       sorting: [
         { desc: true, id: BRC_DATA_CATALOG_CATEGORY_KEY.IS_REF },
         { desc: false, id: BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION },
@@ -951,6 +1075,12 @@ export function buildOrganismGenomesTable(
     },
   };
 }
+
+/**
+ * Header for the pinned species column on the organism detail table: relabelled
+ * "Assembly" since the cell's primary text is the assembly accession.
+ */
+const ASSEMBLY_COLUMN_HEADER = "Assembly";
 
 /**
  * Build the column definitions for the organism genomes table.
@@ -963,80 +1093,127 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
       cell: ({ row }) => C.AnalyzeGenome(buildAnalyzeGenome(row.original)),
       enableSorting: false,
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANALYZE_GENOME,
-      meta: { width: "auto" },
+      meta: {
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANALYZE_GENOME,
+        width: "auto",
+      },
     },
     {
-      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
+      // Keyed on accession so the pinned "Assembly" column sorts by accession
+      // (its primary text); the SpeciesCell renders the accession + per-assembly
+      // tags.
+      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION,
       cell: ({ row }) =>
         C.SpeciesCell(buildOrganismGenomeSpecies(row.original)),
-      header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
-      meta: { columnPinned: true, width: { max: "1.5fr", min: "340px" } },
+      header: ASSEMBLY_COLUMN_HEADER,
+      meta: {
+        columnPinned: true,
+        header: ASSEMBLY_COLUMN_HEADER,
+        width: { max: "0.75fr", min: "176px" },
+      },
     },
     {
-      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION,
-      cell: ({ row }) => C.BasicCell(buildAccession(row.original)),
-      header: BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
-      meta: { width: { max: "1fr", min: "164px" } },
+      accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.RELEASE_DATE,
+      cell: ({ row }) =>
+        C.Tooltip({
+          ...buildReleaseDateTooltip(row.original),
+          children: createElement(C.BasicCell, buildReleaseDate(row.original)),
+        }),
+      header: BRC_DATA_CATALOG_CATEGORY_LABEL.RELEASE_DATE,
+      meta: {
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.RELEASE_DATE,
+        width: { max: "0.5fr", min: "120px" },
+      },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.IS_REF,
       cell: ({ row }) => C.ChipCell(buildIsRef(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.IS_REF,
-      meta: { width: { max: "0.5fr", min: "100px" } },
+      meta: {
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.IS_REF,
+        width: { max: "0.5fr", min: "100px" },
+      },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.LEVEL,
       cell: ({ row }) => C.LevelCell(buildLevel(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.LEVEL,
-      meta: { width: { max: "0.5fr", min: "142px" } },
+      meta: {
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.LEVEL,
+        width: { max: "0.5fr", min: "142px" },
+      },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.CHROMOSOMES,
       cell: ({ row }) => C.BasicCell(buildChromosomes(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.CHROMOSOMES,
-      meta: { width: { max: "0.5fr", min: "142px" } },
+      meta: {
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.CHROMOSOMES,
+        width: { max: "0.5fr", min: "142px" },
+      },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.LENGTH,
       cell: ({ row }) => C.BasicCell(buildLength(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.LENGTH,
-      meta: { width: { max: "0.5fr", min: "132px" } },
+      meta: {
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.LENGTH,
+        width: { max: "0.5fr", min: "132px" },
+      },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_COUNT,
       cell: ({ row }) => C.BasicCell(buildScaffoldCount(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_COUNT,
-      meta: { width: { max: "0.5fr", min: "120px" } },
+      meta: {
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_COUNT,
+        width: { max: "0.5fr", min: "116px" },
+      },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_N50,
       cell: ({ row }) => C.BasicCell(buildScaffoldN50(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_N50,
-      meta: { width: { max: "0.5fr", min: "120px" } },
+      meta: {
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_N50,
+        width: { max: "0.5fr", min: "116px" },
+      },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_L50,
       cell: ({ row }) => C.BasicCell(buildScaffoldL50(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_L50,
-      meta: { width: { max: "0.5fr", min: "120px" } },
+      meta: {
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_L50,
+        width: { max: "0.5fr", min: "116px" },
+      },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.COVERAGE,
       cell: ({ row }) => C.BasicCell(buildCoverage(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.COVERAGE,
-      meta: { width: { max: "0.5fr", min: "120px" } },
+      meta: {
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.COVERAGE,
+        width: { max: "0.5fr", min: "116px" },
+      },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.GC_PERCENT,
       cell: ({ row }) => C.BasicCell(buildGcPercent(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.GC_PERCENT,
-      meta: { width: { max: "0.5fr", min: "120px" } },
+      meta: {
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.GC_PERCENT,
+        width: { max: "0.5fr", min: "116px" },
+      },
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.ANNOTATION_STATUS,
       cell: ({ row }) => C.BasicCell(buildAnnotationStatus(row.original)),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANNOTATION_STATUS,
-      meta: { width: { max: "0.5fr", min: "180px" } },
+      meta: {
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANNOTATION_STATUS,
+        width: { max: "0.5fr", min: "140px" },
+      },
     },
   ];
 }
@@ -1122,7 +1299,7 @@ function getEntityLinkWithPriorityPathogenFilter(
  * @returns strain text.
  */
 export function getGenomeStrainText(
-  entity: BRCDataCatalogGenome | GA2AssemblyEntity,
+  entity: AssemblyContract,
   defaultValue = ""
 ): string {
   if (entity.strainName) return entity.strainName;
@@ -1138,11 +1315,11 @@ export function getGenomeStrainText(
  * @returns serotype text.
  */
 export function getGenomeSerotypeText(
-  genome: BRCDataCatalogGenome | GA2AssemblyEntity,
+  genome: AssemblyContract,
   defaultValue = ""
 ): string {
   if (
-    "taxonomicLevelSerotype" in genome &&
+    genome.taxonomicLevelSerotype !== undefined &&
     genome.taxonomicLevelSerotype !== "None"
   )
     return genome.taxonomicLevelSerotype;
@@ -1156,11 +1333,11 @@ export function getGenomeSerotypeText(
  * @returns isolate text.
  */
 export function getGenomeIsolateText(
-  genome: BRCDataCatalogGenome | GA2AssemblyEntity,
+  genome: AssemblyContract,
   defaultValue = ""
 ): string {
   if (
-    "taxonomicLevelIsolate" in genome &&
+    genome.taxonomicLevelIsolate !== undefined &&
     genome.taxonomicLevelIsolate !== "None"
   )
     return genome.taxonomicLevelIsolate;

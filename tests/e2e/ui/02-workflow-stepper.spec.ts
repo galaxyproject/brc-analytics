@@ -18,11 +18,11 @@ const ASSEMBLY_ENTITY_ID = sanitizeEntityId(ASSEMBLY_ACCESSION);
 
 // RNA-seq PE workflow (3 steps: Reference Assembly [disabled], GTF Files, Paired-End Sequencing Data).
 const RNASEQ_PE_TRS_ID =
-  "workflow-github-com-iwc-workflows-rnaseq-pe-main-versions-v1-3";
+  "workflow-github-com-iwc-workflows-rnaseq-pe-main-versions-v1-4";
 
 // ATAC-seq workflow (2 steps: Reference Assembly [disabled], Paired-End Sequencing Data).
 const ATACSEQ_TRS_ID =
-  "workflow-github-com-iwc-workflows-atacseq-main-versions-v2-0";
+  "workflow-github-com-iwc-workflows-atacseq-main-versions-v2-1";
 
 // Step labels.
 const STEP_LABELS = {

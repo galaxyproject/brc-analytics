@@ -218,5 +218,28 @@ describe("useColumnClassification", () => {
       expect(result.current.classifications.col4).toBeNull();
       expect(result.current.classifications.col5).toBeNull();
     });
+
+    test("clears classifications when the columns become empty", () => {
+      const initialSampleSheet: Record<string, string>[] = [
+        { col1: "a", col2: "b" },
+      ];
+
+      const { rerender, result } = renderHook(
+        (props: { sampleSheet: Record<string, string>[] }) =>
+          useColumnClassification(props.sampleSheet),
+        { initialProps: { sampleSheet: initialSampleSheet } }
+      );
+
+      act(() => {
+        result.current.onClassify("col1", COLUMN_TYPE.IDENTIFIER);
+      });
+      expect(result.current.classifications.col1).toBe(COLUMN_TYPE.IDENTIFIER);
+
+      // Clearing the sample sheet clears the stale classifications rather than
+      // leaving them hanging around for columns that no longer exist.
+      rerender({ sampleSheet: [] });
+
+      expect(Object.keys(result.current.classifications).length).toBe(0);
+    });
   });
 });

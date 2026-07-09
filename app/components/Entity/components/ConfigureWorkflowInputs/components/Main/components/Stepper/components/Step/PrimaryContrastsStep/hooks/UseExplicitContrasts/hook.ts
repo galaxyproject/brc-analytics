@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ConfiguredInput } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { ContrastPairs, UseExplicitContrasts } from "./types";
 import {
@@ -22,6 +22,15 @@ export function useExplicitContrasts(
 ): UseExplicitContrasts {
   const [pairs, setPairs] = useState<ContrastPairs>(createInitialPairs);
 
+  // Reset pairs when primaryFactor changes. Adjusting state during render
+  // (tracking the previous value) is React's recommended alternative to a
+  // reset-in-effect — it avoids the extra commit + re-render.
+  const [prevPrimaryFactor, setPrevPrimaryFactor] = useState(primaryFactor);
+  if (primaryFactor !== prevPrimaryFactor) {
+    setPrevPrimaryFactor(primaryFactor);
+    setPairs(createInitialPairs());
+  }
+
   const primaryContrasts = useMemo(
     () => buildExplicitContrasts(pairs),
     [pairs]
@@ -43,11 +52,6 @@ export function useExplicitContrasts(
     },
     []
   );
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset-on-dependency-change effect (react-hooks v7 anti-pattern); refactor tracked in #1393
-    setPairs(createInitialPairs());
-  }, [primaryFactor]);
 
   return {
     onAddPair,

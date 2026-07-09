@@ -38,7 +38,17 @@ None
 
 > **Note:** New parameters are added to workflows.yml on each run. On subsequent runs, they will no longer appear as 'new' even if stale parameters haven't been addressed yet. If you see both stale and new params for a workflow, commit or save this report before re-running so you don't lose the pairing info (useful for identifying renames).
 
-None
+### #workflow/github.com/iwc-workflows/hyphy/hyphy-core (inactive)
+
+**New (added from IWC):**
+- reference Fasta
+- reference GTF
+
+### #workflow/github.com/iwc-workflows/hyphy/hyphy-preprocessing (inactive)
+
+**New (added from IWC):**
+- reference Fasta
+- reference GTF
 
 ## Inactive workflows in workflows.yml
 
@@ -53,16 +63,6 @@ None
 - Bigwig to average
 - bin_size
 
-### HyPhy: Core - COMPARATIVE_GENOMICS (2 parameters)
-
-- reference cds
-- unaligned sequences
-
-### HyPhy: Preprocessing  - COMPARATIVE_GENOMICS (2 parameters)
-
-- reference cds
-- unaligned sequences
-
 ### Generic variation analysis on WGS PE data - VARIANT_CALLING (3 parameters)
 
 - Paired Collection
@@ -74,6 +74,18 @@ None
 - Codon-aware alignment(s)
 - Phylogenetic tree(s)
 - Foreground Sequences List
+
+### HyPhy: Core - COMPARATIVE_GENOMICS (3 parameters)
+
+- unaligned sequences
+- reference GTF
+- reference Fasta
+
+### HyPhy: Preprocessing  - COMPARATIVE_GENOMICS (3 parameters)
+
+- unaligned sequences
+- reference GTF
+- reference Fasta
 
 ### Single-Cell Mixture Analysis: baredSC 1D Log-Normalized Models - TRANSCRIPTOMICS (4 parameters)
 
@@ -238,6 +250,7 @@ None
 - Mass spectrometry: GCMS with metaMS ( (from Dockstore: Computational Chemistry, Metabolomics))
 - Mass spectrometry: LC-MS preprocessing with XCMS ( (from Dockstore: Computational Chemistry, Metabolomics))
 - MetaProSIP OpenMS ( (from Dockstore: Proteomics))
+- Metadata and Sequences from BioProject IDs (none)
 - Metagenome-Assembled Genomes (MAGs) generation ( (from Dockstore: Microbiome))
 - Metagenomics Taxonomic and Antibiotic Resistance Gene (ARG) Profiling ( (from Dockstore: Metagenomics))
 - Mitogenome Assembly VGP0 ( (from Dockstore: Vertebrate Genome Project))

@@ -135,7 +135,11 @@ export const RELEASE_DATE: ColumnConfig<GA2AssemblyEntity> = {
     ],
     component: C.Tooltip,
     viewBuilder: buildReleaseDateTooltip,
-  } as ComponentConfig<typeof C.Tooltip, GA2AssemblyEntity>,
+    // The shared release-date builders take the site-neutral AssemblyContract,
+    // which TS can't reconcile with this cast: ComponentConfig's data type is
+    // invariant and the Tooltip viewBuilder omits `children` (supplied above).
+    // Double cast is the repo's escape-hatch for this findable-ui limitation.
+  } as unknown as ComponentConfig<typeof C.Tooltip, GA2AssemblyEntity>,
   header: GA2_CATEGORY_LABEL.RELEASE_DATE,
   id: GA2_CATEGORY_KEY.RELEASE_DATE,
   width: { max: "1fr", min: "120px" },
