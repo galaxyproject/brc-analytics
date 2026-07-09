@@ -914,10 +914,14 @@ class AssistantAgent:
                         region_end = len(text)
                         for bm in _TRAILER_MARKER.finditer(text, m.end()):
                             bls = text.rfind("\n", 0, bm.start()) + 1
-                            # Only a trailer on its own line bounds the reach; a
-                            # marker word mid-line (e.g. inside a JSON string) is
-                            # not a real boundary.
-                            if text[bls : bm.start()].strip() == "":
+                            if text[bls : bm.start()].strip() != "":
+                                continue  # not on its own line
+                            # A real boundary also needs trailer syntax: after
+                            # the keyword (optional colon/bold/space) a JSON
+                            # opener. A marker word that only starts a line inside
+                            # a malformed string is not a boundary.
+                            after = text[bm.end() :].lstrip(" \t:*")
+                            if after[:1] in ("[", "{"):
                                 region_end = bm.start()
                                 break
                         text = (text[: m.start()] + text[region_end:]).strip()
@@ -925,8 +929,13 @@ class AssistantAgent:
                     if not marker_is_real:
                         continue  # prose that merely looks JSON-ish -- leave it
                     if not validate(value):
-                        # Parsed but the wrong shape -- still strip a real trailer.
-                        text = (text[: m.start()] + text[end:]).strip()
+                        # Parsed but the wrong shape -- strip the marker through
+                        # its own line so trailing junk (a second object, extra
+                        # tokens) after the parsed value can't leak.
+                        line_end = text.find("\n", end)
+                        if line_end == -1:
+                            line_end = len(text)
+                        text = (text[: m.start()] + text[line_end:]).strip()
                         break
                     # Merge repeated SCHEMA_UPDATE dicts (later keys win); for a
                     # repeated list marker the last one wins.
@@ -1113,9 +1122,11 @@ class AssistantAgent:
                     field.detail = self._find_workflow_trs_id(workflow_value)
                 if not field.detail:
                     # Named a workflow we can't map to a visible (assembly-scope)
-                    # catalog entry -- don't commit it FILLED with no detail, so
-                    # the tracker stays honest and no handoff fires on a phantom
-                    # workflow (Codex #10).
+                    # catalog entry. Clear the field rather than commit a phantom
+                    # or silently keep a stale prior workflow the user was trying
+                    # to change -- either would let a handoff fire on the wrong
+                    # workflow (Codex).
+                    setattr(schema, key, SchemaField())
                     continue
 
             setattr(schema, key, field)

@@ -503,6 +503,29 @@ class TestApplySchemaUpdates:
         # FILLED with a null detail (Codex #10).
         assert result.workflow.status == FieldStatus.EMPTY
 
+    def test_unresolvable_workflow_clears_existing(self, agent):
+        # Switching to an unresolvable workflow must clear the field, not keep
+        # the OLD filled workflow -- otherwise a handoff fires on the wrong one
+        # (Codex).
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "ASSEMBLY",
+                "workflows": [
+                    {"iwcId": "real", "trsId": "trs-real", "workflowName": "Real"}
+                ],
+            }
+        ]
+        schema = AnalysisSchema(
+            workflow=SchemaField(
+                value="Variant A", detail="trs-a", status=FieldStatus.FILLED
+            )
+        )
+        result = agent._apply_schema_updates(
+            schema, {"workflow": "not-a-visible-workflow"}
+        )
+        assert result.workflow.status == FieldStatus.EMPTY
+        assert result.workflow.detail is None
+
     def test_preserves_existing_fields(self, agent):
         schema = AnalysisSchema(
             organism=SchemaField(value="Existing", status=FieldStatus.FILLED)
@@ -1666,6 +1689,48 @@ class TestParserInvariants:
         assert "bracket" not in text
         assert not any(ch in text for ch in "{}[]")
         assert text == "Recorded."
+
+    def test_marker_word_line_inside_malformed_string_no_leak(self, agent):
+        # A malformed multi-line payload whose string value contains a line that
+        # *starts* with a marker word (but no trailer syntax) must not bound the
+        # excision there and leak the tail (Codex).
+        raw = (
+            "Recorded.\n"
+            'SCHEMA_UPDATE: {"note": "first line\n'
+            'SUGGESTIONS are [not json", "workflow": broken}\n'
+            'SUGGESTIONS: ["Next"]'
+        )
+        text, suggestions, updates = agent._parse_structured_output(raw)
+        assert updates == {}
+        assert [c.label for c in suggestions] == ["Next"]
+        assert not any(ch in text for ch in "{}[]")
+        assert "SUGGESTIONS are" not in text and "broken" not in text
+        assert text == "Recorded."
+
+    def test_wrong_shape_trailing_junk_no_leak(self, agent):
+        # A parseable-but-wrong-shape payload followed by same-line junk (e.g. a
+        # second object) must strip the whole trailer line, not leak the tail.
+        raw = (
+            'Recorded. SCHEMA_UPDATE: {"organism": 5833}, '
+            '{"assembly": "GCF_000146045.2"}'
+        )
+        text, _, updates = agent._parse_structured_output(raw)
+        assert updates == {}
+        assert not any(ch in text for ch in "{}[]")
+        assert "assembly" not in text
+        assert text == "Recorded."
+
+    @_pi_settings
+    @given(prose=_pi_prose, junk=st.text(alphabet="abc [{,: ", max_size=30))
+    def test_malformed_embedding_marker_line_never_leaks(self, agent, prose, junk):
+        # Malformed payloads that embed a newline and a line starting with a
+        # marker word must never leak raw JSON or a marker into the reply.
+        payload = '{"note": "' + junk + '\nSUGGESTIONS are broken [x", "y": nope'
+        raw = prose + "\nSCHEMA_UPDATE: " + payload
+        text, _, updates = agent._parse_structured_output(raw)
+        assert updates == {}
+        assert not any(ch in text for ch in "{}[]")
+        assert "SCHEMA_UPDATE" not in text
 
     def test_whitespace_before_colon_extracted(self, agent):
         raw = 'Recorded. SCHEMA_UPDATE : {"organism": "P. falciparum"}'
