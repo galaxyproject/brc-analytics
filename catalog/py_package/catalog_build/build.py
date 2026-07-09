@@ -1,3 +1,4 @@
+import datetime
 import gzip
 import io
 import json
@@ -5,6 +6,7 @@ import logging
 import os
 import time
 import urllib
+from dataclasses import asdict, dataclass
 from pathlib import Path
 
 import duckdb
@@ -1394,6 +1396,27 @@ def add_galaxy_datacache_url(genomes_df, base_url, batch_size=20, timeout=5):
     return genomes_df, missing_accessions
 
 
+@dataclass
+class BuildMetadata:
+    start_time: str
+    end_time: str
+    ncbi_taxdump_md5: str
+
+
+def save_build_metadata(path: str, meta: BuildMetadata):
+    meta_dict = asdict(meta)
+    with open(path, mode="w", encoding="utf-8") as fh:
+        json.dump(meta_dict, fh, indent=2)
+
+
+@dataclass
+class LoadAndTransformResult:
+    taxonomy_assemblies: pd.DataFrame
+    taxonomy_organisms: pd.DataFrame
+    taxonomy_outbreaks: pd.DataFrame
+    ncbi_taxdump_md5: str
+
+
 def load_and_transform(
     *,
     temp_folder_path_string: str,
@@ -1414,7 +1437,7 @@ def load_and_transform(
     get_db_path(temp_folder_path).unlink(missing_ok=True)
 
     # Load data via dlt
-    do_dlt_load(
+    load_result = do_dlt_load(
         temp_folder_path=temp_folder_path,
         dlt_pipeline_prefix=dlt_pipeline_prefix,
         assemblies_df=assemblies_df,
@@ -1429,12 +1452,13 @@ def load_and_transform(
         has_outbreaks=outbreaks_df is not None,
     )
 
-    # Get transformed data
+    # Get transformed data and return along with metadata
     with duckdb.connect(get_db_path(temp_folder_path)) as con:
-        return (
-            con.query("select * from taxonomy_assemblies").df(),
-            con.query("select * from taxonomy_organisms").df(),
-            con.query("select * from taxonomy_outbreaks").df(),
+        return LoadAndTransformResult(
+            taxonomy_assemblies=con.query("select * from taxonomy_assemblies").df(),
+            taxonomy_organisms=con.query("select * from taxonomy_organisms").df(),
+            taxonomy_outbreaks=con.query("select * from taxonomy_outbreaks").df(),
+            ncbi_taxdump_md5=load_result.ncbi_taxdump_md5,
         )
 
 
@@ -1447,6 +1471,7 @@ def build_files(
     *,
     temp_folder_path,
     dlt_pipeline_prefix,
+    build_meta_output_path,
     taxonomic_group_sets=None,
     do_gene_model_urls=True,
     extract_primary_data=False,
@@ -1482,6 +1507,8 @@ def build_files(
     if taxonomic_group_sets is None:
         taxonomic_group_sets = {}
     print("Building files")
+
+    start_time = datetime.datetime.now(datetime.UTC).isoformat()
 
     qc_report_params = {}
 
@@ -1532,16 +1559,17 @@ def build_files(
     source_outbreaks_df = read_outbreaks(outbreaks_path)
 
     # Do database-based loading and transformation
-    assembly_taxonomy_df, organism_taxonomy_df, outbreak_taxonomy_df = (
-        load_and_transform(
-            temp_folder_path_string=temp_folder_path,
-            dlt_pipeline_prefix=dlt_pipeline_prefix,
-            taxonomic_levels=taxonomic_levels_for_tree,
-            assemblies_df=base_genomes_df.rename(columns={"taxonomyId": "taxonomy_id"}),
-            organisms_df=source_organisms_df,
-            outbreaks_df=source_outbreaks_df,
-        )
+    load_and_transform_result = load_and_transform(
+        temp_folder_path_string=temp_folder_path,
+        dlt_pipeline_prefix=dlt_pipeline_prefix,
+        taxonomic_levels=taxonomic_levels_for_tree,
+        assemblies_df=base_genomes_df.rename(columns={"taxonomyId": "taxonomy_id"}),
+        organisms_df=source_organisms_df,
+        outbreaks_df=source_outbreaks_df,
     )
+    assembly_taxonomy_df = load_and_transform_result.taxonomy_assemblies
+    organism_taxonomy_df = load_and_transform_result.taxonomy_organisms
+    outbreak_taxonomy_df = load_and_transform_result.taxonomy_outbreaks
 
     # Create species DataFrame using the assemblies' taxonomy
     species_df = get_species_df(
@@ -1831,6 +1859,17 @@ def build_files(
             outbreak_taxon_rank_map,
             outbreak_taxonomy_mapping_path,
         )
+
+    end_time = datetime.datetime.now(datetime.UTC).isoformat()
+
+    save_build_metadata(
+        build_meta_output_path,
+        BuildMetadata(
+            start_time=start_time,
+            end_time=end_time,
+            ncbi_taxdump_md5=load_and_transform_result.ncbi_taxdump_md5,
+        ),
+    )
 
 
 def get_image_path(

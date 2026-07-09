@@ -1,9 +1,15 @@
+from dataclasses import dataclass
 from pathlib import Path
 
 import pandas as pd
 
 from .catalog_source import load_catalog_taxa
 from .ncbi_taxonomy import load_ncbi_taxonomy
+
+
+@dataclass
+class LoadResult:
+    ncbi_taxdump_md5: str
 
 
 def do_dlt_load(
@@ -14,7 +20,7 @@ def do_dlt_load(
     organisms_df: pd.DataFrame,
     outbreaks_df: pd.DataFrame | None,
 ):
-    load_ncbi_taxonomy(
+    ncbi_taxdump_md5 = load_ncbi_taxonomy(
         temp_folder_path=temp_folder_path, dlt_pipeline_prefix=dlt_pipeline_prefix
     )
 
@@ -25,3 +31,5 @@ def do_dlt_load(
         organisms_df=organisms_df,
         outbreaks_df=outbreaks_df,
     )
+
+    return LoadResult(ncbi_taxdump_md5=ncbi_taxdump_md5)

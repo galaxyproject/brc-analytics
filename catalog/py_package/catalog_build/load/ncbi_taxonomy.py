@@ -94,6 +94,10 @@ def load_taxdump(*, temp_folder_path: Path, dlt_pipeline_prefix: str):
     pipeline.run(ncbi_taxdump(temp_folder_path / TAXDUMP_DIR_NAME))
 
 
+def fetch_taxdump_md5() -> str:
+    return requests.get(TAXDUMP_MD5_URL).text[:32]
+
+
 def download_taxdump(temp_folder_path: Path):
     taxdump_path = temp_folder_path / TAXDUMP_DOWNLOAD_NAME
 
@@ -118,8 +122,10 @@ def download_taxdump(temp_folder_path: Path):
         )
 
 
-def load_ncbi_taxonomy(*, temp_folder_path: Path, dlt_pipeline_prefix: str):
+def load_ncbi_taxonomy(*, temp_folder_path: Path, dlt_pipeline_prefix: str) -> str:
     download_taxdump(temp_folder_path)
+    fetched_md5 = fetch_taxdump_md5()
     load_taxdump(
         temp_folder_path=temp_folder_path, dlt_pipeline_prefix=dlt_pipeline_prefix
     )
+    return fetched_md5

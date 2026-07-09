@@ -18,6 +18,8 @@ ORGANISM_IMAGE_INFO_PATH = "catalog/ga2/source/organism_image_data.json"
 
 PRIMARYDATA_OUTPUT_PATH = "catalog/ga2/build/intermediate/primary-data-ncbi.tsv"
 
+BUILD_META_OUTPUT_PATH = "catalog/ga2/output/data-build-meta.json"
+
 QC_REPORT_PATH = "catalog/ga2/output/qc-report.data.md"
 
 TREE_OUTPUT_PATH = "catalog/ga2/output/ncbi-taxa-tree.json"
@@ -100,6 +102,7 @@ def build_ncbi_data():
         dlt_pipeline_prefix="ga2_catalog_",
         do_gene_model_urls=False,
         organisms_path=ORGANISMS_PATH,
+        build_meta_output_path=BUILD_META_OUTPUT_PATH,
         primary_output_path=PRIMARYDATA_OUTPUT_PATH,
         qc_report_path=QC_REPORT_PATH,
         extract_primary_data=False,
