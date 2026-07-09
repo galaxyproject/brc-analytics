@@ -1222,8 +1222,10 @@ class AssistantAgent:
 
         - workflow needs a GTF and the assembly ships a gene model -> auto-fill
           (setup resolves the URL automatically);
-        - workflow needs a GTF but the assembly has none -> needs attention, so
-          the panel doesn't render a required annotation as "Optional";
+        - workflow needs a GTF, an assembly is chosen but has none -> needs
+          attention, so the panel doesn't render a required annotation as
+          "Optional";
+        - workflow needs a GTF but no assembly chosen yet -> pending;
         - no GTF required, or no workflow -> empty.
         """
         if schema.workflow.status != FieldStatus.FILLED:
@@ -1236,8 +1238,19 @@ class AssistantAgent:
                     status=FieldStatus.FILLED,
                     detail=_GENE_ANNOTATION_AUTO_DETAIL,
                 )
+            elif schema.assembly.status == FieldStatus.FILLED:
+                # Assembly chosen but ships no gene model -- flag it (with a
+                # stable display value) so the panel doesn't render a required
+                # annotation as "Optional".
+                schema.gene_annotation = SchemaField(
+                    value="Reference GTF",
+                    status=FieldStatus.NEEDS_ATTENTION,
+                    detail="No gene model for the selected assembly",
+                )
             else:
-                schema.gene_annotation = SchemaField(status=FieldStatus.NEEDS_ATTENTION)
+                # Needs a GTF but no assembly chosen yet -- can't judge
+                # availability, so stay pending rather than flag attention early.
+                schema.gene_annotation = SchemaField()
         else:
             schema.gene_annotation = SchemaField()
 

@@ -596,9 +596,12 @@ class TestApplySchemaUpdates:
         )
         assert result.workflow.detail == "#workflow/github.com/iwc/rnaseq-pe/main"
 
-    def test_gene_annotation_needs_attention_when_workflow_requires_gtf(self, agent):
-        # A GTF-requiring workflow must not leave gene annotation looking optional
-        # (#1324/#1331) -- it should surface as needing attention.
+    def test_gene_annotation_pending_when_workflow_needs_gtf_but_no_assembly(
+        self, agent
+    ):
+        # A GTF-requiring workflow with no assembly chosen yet must stay pending,
+        # not prematurely flag attention -- availability can't be judged without
+        # an assembly (Copilot).
         agent.catalog.workflows_by_category = [
             {
                 "category": "TRANSCRIPTOMICS",
@@ -615,7 +618,7 @@ class TestApplySchemaUpdates:
             AnalysisSchema(), {"workflow": "RNA-Seq (rnaseq-pe)"}
         )
         assert result.workflow.status == FieldStatus.FILLED
-        assert result.gene_annotation.status == FieldStatus.NEEDS_ATTENTION
+        assert result.gene_annotation.status == FieldStatus.EMPTY
 
     def test_gene_annotation_stays_optional_when_workflow_has_no_gtf(self, agent):
         # A workflow with no GENE_MODEL_URL param leaves gene annotation empty so
@@ -986,6 +989,7 @@ class TestApplySchemaUpdates:
             schema, {"workflow": "Variant calling (var-pe)"}
         )
         assert result.gene_annotation.status == FieldStatus.NEEDS_ATTENTION
+        assert result.gene_annotation.value == "Reference GTF"
 
     def test_assembly_gene_model_url_treats_none_string_defensively(self, agent):
         # The catalog stores a missing gene model as null (-> Python None); the
