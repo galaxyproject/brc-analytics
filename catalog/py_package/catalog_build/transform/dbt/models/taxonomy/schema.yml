@@ -4,7 +4,7 @@ models:
   - name: taxonomy_catalog_taxa
     columns:
       - name: taxonomy_id
-        tests:
+        data_tests:
           - unique
           - not_null
           - relationships:
@@ -13,30 +13,30 @@ models:
   - name: taxonomy_assemblies
     columns:
       - name: taxonomy_id
-        tests:
+        data_tests:
           - unique
           - not_null
       - name: taxonomic_level_species
-        tests:
+        data_tests:
           - not_null
       - name: taxonomic_level_species_id
-        tests:
+        data_tests:
           - not_null
       - name: lineage_taxonomy_ids
-        tests:
+        data_tests:
           - not_null
       - name: common_names
-        tests:
+        data_tests:
           - not_null
   - name: taxonomy_organisms
     columns:
       - name: taxonomy_id
-        tests:
+        data_tests:
           - unique
           - not_null
       - name: rank
-        tests:
+        data_tests:
           - not_null
       - name: taxon_name
-        tests:
+        data_tests:
           - not_null

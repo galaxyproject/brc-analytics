@@ -19,7 +19,7 @@ sources:
       - name: assembly_taxa
         columns:
           - name: taxonomy_id
-            tests:
+            data_tests:
               - relationships:
                   arguments:
                     to: ref('taxonomy_assemblies')
@@ -27,7 +27,7 @@ sources:
       - name: organism_taxa
         columns:
           - name: taxonomy_id
-            tests:
+            data_tests:
               - relationships:
                   arguments:
                     to: ref('taxonomy_organisms')
