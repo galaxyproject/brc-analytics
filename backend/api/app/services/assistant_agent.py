@@ -1050,11 +1050,10 @@ class AssistantAgent:
         """Apply LLM-emitted schema updates to the current schema.
 
         Values of None clear the field back to EMPTY (supports mid-conversation
-        corrections when the user changes their mind).
+        corrections when the user changes their mind). The catalog-derived fields
+        are reconciled on every call -- even with no updates -- so a restored
+        session carrying stale derived state is corrected on the next turn.
         """
-        if not updates:
-            return current
-
         schema = current.model_copy(deep=True)
         valid_fields = {
             "organism",
@@ -1108,6 +1107,12 @@ class AssistantAgent:
                         break
                 if not field.detail:
                     field.detail = self._find_workflow_trs_id(workflow_value)
+                if not field.detail:
+                    # Named a workflow we can't map to a visible (assembly-scope)
+                    # catalog entry -- don't commit it FILLED with no detail, so
+                    # the tracker stays honest and no handoff fires on a phantom
+                    # workflow (Codex #10).
+                    continue
 
             setattr(schema, key, field)
 
@@ -1226,11 +1231,18 @@ class AssistantAgent:
         return None
 
     def _workflow_by_ref(self, workflow_ref: Optional[str]) -> Optional[Dict[str, Any]]:
-        """Return the catalog workflow dict matched by trsId or iwcId, or None."""
+        """Return the catalog workflow dict matched by trsId or iwcId, or None.
+
+        Only ASSEMBLY-scope workflows are visible to the assistant, so an
+        organism/comparative-scope ref -- e.g. one carried in a restored session
+        -- resolves to None and never drives derivation or handoff (Codex #5).
+        """
         if not workflow_ref:
             return None
         for cat in self.catalog.workflows_by_category:
             for wf in cat.get("workflows", []):
+                if not _is_assembly_scope(wf):
+                    continue
                 if workflow_ref in (wf.get("trsId"), wf.get("iwcId")):
                     return wf
         return None

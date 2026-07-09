@@ -392,10 +392,14 @@ class TestParseStructuredOutput:
 
 
 class TestApplySchemaUpdates:
-    def test_empty_updates_returns_same(self, agent):
+    def test_empty_updates_reconciles_copy(self, agent):
+        # Empty updates no longer short-circuits: it returns a reconciled copy so
+        # a restored session's derived fields are always recomputed (Codex #9).
         schema = AnalysisSchema()
         result = agent._apply_schema_updates(schema, {})
-        assert result is schema  # same object, not a copy
+        assert result is not schema
+        assert result.organism.status == FieldStatus.EMPTY
+        assert result.data_characteristics.status == FieldStatus.EMPTY
 
     def test_sets_organism(self, agent):
         schema = AnalysisSchema()
@@ -492,8 +496,9 @@ class TestApplySchemaUpdates:
         result = agent._apply_schema_updates(
             schema, {"workflow": "some-other-workflow"}
         )
-        assert result.workflow.status == FieldStatus.FILLED
-        assert result.workflow.detail is None
+        # No visible catalog match -> not committed: stays EMPTY rather than
+        # FILLED with a null detail (Codex #10).
+        assert result.workflow.status == FieldStatus.EMPTY
 
     def test_preserves_existing_fields(self, agent):
         schema = AnalysisSchema(
@@ -733,6 +738,61 @@ class TestApplySchemaUpdates:
         result = agent._data_characteristics_for_workflow("trs-shovill")
         assert result is not None
         assert result[0] == "Paired-end sequencing reads"
+
+    def test_workflow_by_ref_ignores_organism_scope(self, agent):
+        # A ref to a hidden ORGANISM-scope workflow (e.g. carried in a restored
+        # session) must not resolve, so its inputs can't drive derivation or a
+        # handoff (Codex #5).
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "ASSEMBLY",
+                "workflows": [
+                    {
+                        "iwcId": "flye",
+                        "trsId": "trs-flye",
+                        "scope": "ORGANISM",
+                        "parameters": [
+                            {
+                                "variable": "SANGER_READ_RUN_SINGLE_FILE",
+                                "data_requirements": {"library_layout": "SINGLE"},
+                            }
+                        ],
+                    }
+                ],
+            }
+        ]
+        assert agent._workflow_by_ref("trs-flye") is None
+        assert agent._data_characteristics_for_workflow("trs-flye") is None
+
+    def test_empty_updates_still_reconciles_stale_derived(self, agent):
+        # A restored session can carry stale derived state with no new updates;
+        # the reflectors must still run so it is corrected (Codex #9).
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "ASSEMBLY",
+                "workflows": [
+                    {
+                        "iwcId": "asm-only",
+                        "trsId": "trs-asm",
+                        "parameters": [{"variable": "ASSEMBLY_ID"}],
+                    }
+                ],
+            }
+        ]
+        stale = AnalysisSchema(
+            workflow=SchemaField(
+                value="Assembly (asm-only)",
+                detail="trs-asm",
+                status=FieldStatus.FILLED,
+            ),
+            data_characteristics=SchemaField(
+                value="Paired-end sequencing reads",
+                detail="Required by the selected workflow",
+                status=FieldStatus.FILLED,
+            ),
+        )
+        result = agent._apply_schema_updates(stale, {})
+        assert result.data_characteristics.status == FieldStatus.EMPTY
 
     def test_data_characteristics_cleared_when_workflow_unset(self, agent):
         # Clearing the workflow (a mid-conversation correction) must drop a value
