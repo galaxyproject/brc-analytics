@@ -1,10 +1,13 @@
 """Tests for AssistantAgent parsing and schema update logic."""
 
 import asyncio
+import json
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+from hypothesis import HealthCheck, given, settings
+from hypothesis import strategies as st
 from pydantic_ai.messages import (
     ModelRequest,
     ModelResponse,
@@ -1555,3 +1558,127 @@ async def test_chat_handoff_url_carries_assistant_session_id(agent):
     assert state.messages[-1] == ChatMessage(
         role=MessageRole.ASSISTANT, content="Ready to go."
     )
+
+
+# ---------- parser invariants (property-based net) ----------
+
+_pi_prose = st.text(
+    alphabet="abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ.,?!()-",
+    max_size=60,
+).filter(lambda t: "schema_update" not in t.lower() and "suggestions" not in t.lower())
+_pi_field = st.sampled_from(
+    ["organism", "assembly", "analysis_type", "workflow", "data_source"]
+)
+_pi_val = (
+    st.text(alphabet="abcdefghijklmnopqrstuvwxyz ", min_size=1, max_size=15)
+    .map(str.strip)
+    .filter(lambda x: x)
+)
+_pi_schema = st.dictionaries(_pi_field, _pi_val, min_size=1, max_size=3)
+_pi_sugg = st.lists(_pi_val, min_size=1, max_size=4, unique=True)
+_pi_ws = st.sampled_from(["", " ", "  "])
+_pi_settings = settings(
+    max_examples=150,
+    suppress_health_check=[HealthCheck.function_scoped_fixture],
+)
+
+
+class TestParserInvariants:
+    """Property net over _parse_structured_output so new parsing misses surface
+    here, not in review. Three invariants across fuzzed inputs: valid trailers
+    round-trip, malformed trailers never leak raw JSON, pure prose is preserved.
+    Scoped to the trailer-on-its-own-line space the prompt requests; the
+    inherent-ambiguity cases are xfail below and are resolved by the
+    structured-output migration, not by more heuristics."""
+
+    @_pi_settings
+    @given(prose=_pi_prose, su=_pi_schema, sg=_pi_sugg, ws=_pi_ws, bold=st.booleans())
+    def test_valid_trailers_round_trip(self, agent, prose, su, sg, ws, bold):
+        marker = "**SCHEMA_UPDATE**" if bold else "SCHEMA_UPDATE"
+        raw = (
+            prose
+            + "\n"
+            + marker
+            + ws
+            + ": "
+            + json.dumps(su)
+            + "\nSUGGESTIONS: "
+            + json.dumps(sg)
+        )
+        text, suggestions, updates = agent._parse_structured_output(raw)
+        assert updates == su
+        assert [c.label for c in suggestions] == sg
+        assert text == prose.strip()
+        assert "SCHEMA_UPDATE" not in text and "SUGGESTIONS" not in text
+
+    @_pi_settings
+    @given(prose=_pi_prose, su=_pi_schema)
+    def test_malformed_schema_never_leaks(self, agent, prose, su):
+        raw = prose + "\nSCHEMA_UPDATE: " + json.dumps(su)[:-1]
+        text, _, updates = agent._parse_structured_output(raw)
+        assert updates == {}
+        assert not any(ch in text for ch in "{}[]")
+        assert "SCHEMA_UPDATE" not in text
+
+    @_pi_settings
+    @given(prose=_pi_prose)
+    def test_pure_prose_preserved(self, agent, prose):
+        text, suggestions, updates = agent._parse_structured_output(prose)
+        assert text == prose.strip()
+        assert suggestions == []
+        assert updates == {}
+
+    # ---- specific residual leaks surfaced by the Codex adversarial pass ----
+
+    def test_marker_word_inside_malformed_string_no_leak(self, agent):
+        raw = (
+            "Recorded.\n"
+            'SCHEMA_UPDATE: {"organism": "has SUGGESTIONS inside", '
+            '"workflow": broken}\n'
+            'SUGGESTIONS: ["Next"]'
+        )
+        text, suggestions, updates = agent._parse_structured_output(raw)
+        assert updates == {}
+        assert [c.label for c in suggestions] == ["Next"]
+        assert "SUGGESTIONS inside" not in text
+        assert not any(ch in text for ch in "{}")
+        assert text == "Recorded."
+
+    def test_valid_prefix_trailing_junk_stripped(self, agent):
+        raw = 'Pick.\nSUGGESTIONS: ["A"], ["B"]'
+        text, suggestions, _ = agent._parse_structured_output(raw)
+        assert [c.label for c in suggestions] == ["A"]
+        assert not any(ch in text for ch in "[]")
+        assert text == "Pick."
+
+    def test_whitespace_before_colon_extracted(self, agent):
+        raw = 'Recorded. SCHEMA_UPDATE : {"organism": "P. falciparum"}'
+        text, _, updates = agent._parse_structured_output(raw)
+        assert updates == {"organism": "P. falciparum"}
+        assert "SCHEMA_UPDATE" not in text
+        assert text == "Recorded."
+
+    # ---- inherent scrape ambiguity: deferred to the structured-output migration ----
+
+    @pytest.mark.xfail(
+        strict=True,
+        reason="Inherent to scraping: an uppercase marker inside a string is "
+        "indistinguishable from a real inline trailer. Resolved by the "
+        "structured-output migration (follow-up PR), not more heuristics.",
+    )
+    def test_uppercase_marker_with_brace_in_suggestion(self, agent):
+        raw = 'Pick.\nSUGGESTIONS: ["config uses SCHEMA_UPDATE: {values}"]'
+        _, suggestions, updates = agent._parse_structured_output(raw)
+        assert updates == {}
+        assert [c.label for c in suggestions] == ["config uses SCHEMA_UPDATE: {values}"]
+
+    @pytest.mark.xfail(
+        strict=True,
+        reason="Inherent to scraping: all-caps inline prose is indistinguishable "
+        "from an inline trailer. Resolved by the structured-output migration.",
+    )
+    def test_all_caps_prose_not_a_trailer(self, agent):
+        raw = 'MY SUGGESTIONS: ["check the docs"] before you decide.'
+        text, suggestions, _ = agent._parse_structured_output(raw)
+        assert suggestions == []
+        assert text == raw

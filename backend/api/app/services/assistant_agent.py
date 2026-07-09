@@ -865,10 +865,12 @@ class AssistantAgent:
         text = raw_reply
 
         def _extract(text: str, keyword: str, validate) -> tuple[str, Any]:
-            # Optional **bold**/italic and colon on either side, anywhere in the
-            # text (not anchored to line start). \b stops it matching mid-word.
+            # Optional **bold** and a colon (with optional surrounding spaces)
+            # on either side, anywhere in the text (not anchored to line start).
+            # \b stops it matching mid-word.
             marker = re.compile(
-                r"\*{0,2}\b" + keyword + r"\b:?\*{0,2}:?[ \t]*", re.IGNORECASE
+                r"\*{0,2}\b" + keyword + r"\b[ \t]*:?[ \t]*\*{0,2}[ \t]*:?[ \t]*",
+                re.IGNORECASE,
             )
             result: Any = None
             # Loop so *every* real trailer of this type is handled: a model that
@@ -905,7 +907,7 @@ class AssistantAgent:
                         # emit broken brackets). Excise from the marker through
                         # the last bracket so raw JSON never reaches the user --
                         # but bound the reach to this marker's own payload: stop
-                        # at the next real trailer (line start or uppercase) so a
+                        # at the next real trailer (on its own line) so a
                         # broken SCHEMA_UPDATE can't swallow the SUGGESTIONS the
                         # prompt places after it.
                         if not marker_is_real:
@@ -913,9 +915,11 @@ class AssistantAgent:
                         region_end = len(text)
                         for bm in _TRAILER_MARKER.finditer(text, m.end()):
                             bls = text.rfind("\n", 0, bm.start()) + 1
-                            if text[bls : bm.start()].strip() == "" or any(
-                                c.isupper() for c in bm.group(0)
-                            ):
+                            # Only a trailer on its own line bounds the reach; a
+                            # marker word mid-line (e.g. inside a JSON string) is
+                            # not a real boundary, so we over-strip past it rather
+                            # than stop inside it and leak the tail.
+                            if text[bls : bm.start()].strip() == "":
                                 region_end = bm.start()
                                 break
                         last = max(
@@ -937,7 +941,14 @@ class AssistantAgent:
                         result = {**result, **value}
                     else:
                         result = value
-                    text = text[: m.start()] + text[end:]
+                    # raw_decode stops at the end of the first JSON value; drop
+                    # any trailing junk on the trailer's own line (e.g. a stray
+                    # second array) rather than leave it visible.
+                    line_end = text.find("\n", end)
+                    if line_end == -1:
+                        line_end = len(text)
+                    tail = end if text[end:line_end].strip() == "" else line_end
+                    text = text[: m.start()] + text[tail:]
                     break
                 else:
                     break  # no marker spliced this pass -- done
