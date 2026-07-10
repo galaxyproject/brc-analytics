@@ -18,7 +18,7 @@ from requests.exceptions import ConnectTimeout
 
 from .load import do_dlt_load
 from .qc_utils import format_list_section, format_raw_section, join_report
-from .transform import do_dbt_transformations
+from .transform import DBTTestResult, do_dbt_transformations
 from .utils import get_db_path
 
 MAX_NCBI_URL_LENGTH = 2000  # The actual limit seems to be a bit over 4000
@@ -1096,9 +1096,11 @@ def check_organisms_without_assemblies(
 
 
 def make_qc_report(
+    *,
     missing_ncbi_assemblies,
     inconsistent_taxonomy_ids,
     missing_ucsc_assemblies,
+    dbt_test_results,
     missing_gene_model_urls=None,
     missing_datacache_urls=None,
     missing_ploidy_assemblies=None,
@@ -1211,6 +1213,12 @@ def make_qc_report(
         if organisms_without_assemblies
         else []
     )
+    failing_dbt_tests_items = [
+        f"`{result.test_name}`{'' if result.message is None else ': ' + result.message}"
+        for result in dbt_test_results
+        if result.failed
+    ]
+
     # Compose report modularly using shared QC utils
     lines = ["# Catalog Data QC report", ""]
     lines += format_list_section(
@@ -1267,6 +1275,8 @@ def make_qc_report(
         paired_accessions_items,
     )
     lines += format_raw_section("## Taxonomy tree", tree_checks_text)
+    lines += format_list_section("## Failing dbt tests", failing_dbt_tests_items)
+
     return join_report(lines)
 
 
@@ -1415,6 +1425,7 @@ class LoadAndTransformResult:
     taxonomy_organisms: pd.DataFrame
     taxonomy_outbreaks: pd.DataFrame
     ncbi_taxdump_md5: str
+    dbt_test_results: list[DBTTestResult]
 
 
 def load_and_transform(
@@ -1446,7 +1457,7 @@ def load_and_transform(
     )
 
     # Transform loaded data via dbt
-    do_dbt_transformations(
+    transform_result = do_dbt_transformations(
         temp_folder_path,
         taxonomic_levels=taxonomic_levels,
         has_outbreaks=outbreaks_df is not None,
@@ -1459,6 +1470,7 @@ def load_and_transform(
             taxonomy_organisms=con.query("select * from taxonomy_organisms").df(),
             taxonomy_outbreaks=con.query("select * from taxonomy_outbreaks").df(),
             ncbi_taxdump_md5=load_result.ncbi_taxdump_md5,
+            dbt_test_results=transform_result.dbt_test_results,
         )
 
 
@@ -1570,6 +1582,7 @@ def build_files(
     assembly_taxonomy_df = load_and_transform_result.taxonomy_assemblies
     organism_taxonomy_df = load_and_transform_result.taxonomy_organisms
     outbreak_taxonomy_df = load_and_transform_result.taxonomy_outbreaks
+    qc_report_params["dbt_test_results"] = load_and_transform_result.dbt_test_results
 
     # Create species DataFrame using the assemblies' taxonomy
     species_df = get_species_df(
