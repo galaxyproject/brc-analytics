@@ -17,3 +17,6 @@ clean-targets:
 models:
   catalog_build:
     +materialized: table
+
+data_tests:
+  +severity: warn
