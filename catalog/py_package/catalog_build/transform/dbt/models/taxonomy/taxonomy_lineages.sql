@@ -18,7 +18,7 @@ with recursive lineage as (
         0 as depth,
         true as is_query_taxon
     from {{ ref("taxonomy_catalog_taxa") }} c
-    join {{ source("ncbi_taxonomy_raw", "ncbi_taxonomy_nodes") }} n
+    join {{ source("ncbi", "taxonomy_nodes") }} n
         on n.tax_id = c.taxonomy_id
 
     union all
@@ -32,7 +32,7 @@ with recursive lineage as (
         l.depth + 1,
         false as is_query_taxon
     from lineage l
-    join {{ source("ncbi_taxonomy_raw", "ncbi_taxonomy_nodes") }} n
+    join {{ source("ncbi", "taxonomy_nodes") }} n
         on n.tax_id = l.parent_tax_id
     where l.tax_id <> l.parent_tax_id
 

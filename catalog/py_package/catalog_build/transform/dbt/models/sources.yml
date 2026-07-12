@@ -1,20 +1,20 @@
 version: 2
 
 sources:
-  - name: ncbi_taxonomy_raw
+  - name: ncbi
     description: >
       Raw NCBI taxdump tables loaded by the dlt pipeline. The schema matches the
       dlt pipeline's dataset_name.
-    schema: raw
+    schema: ncbi
     tables:
-      - name: ncbi_taxonomy_nodes
+      - name: taxonomy_nodes
         description: "nodes.dmp — one row per taxon: tax_id, parent_tax_id, rank."
-      - name: ncbi_taxonomy_names
+      - name: taxonomy_names
 
-  - name: catalog
+  - name: catalog_source
     description: >
       Catalog inputs written into DuckDB by build.py before the dbt run.
-    schema: catalog_data
+    schema: catalog_source
     tables:
       - name: assembly_taxa
         columns:

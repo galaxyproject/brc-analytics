@@ -39,7 +39,7 @@ def catalog_taxa(
     return resources
 
 
-def load_catalog_taxa(
+def load_catalog_source_data(
     *,
     temp_folder_path: Path,
     dlt_pipeline_prefix: str,
@@ -57,9 +57,9 @@ def load_catalog_taxa(
     )
 
     pipeline = dlt.pipeline(
-        pipeline_name=dlt_pipeline_prefix + "catalog_data",
+        pipeline_name=dlt_pipeline_prefix + "catalog_source",
         destination=dlt.destinations.duckdb(get_db_path_string(temp_folder_path)),
-        dataset_name="catalog_data",
+        dataset_name="catalog_source",
     )
     pipeline.run(
         catalog_taxa(

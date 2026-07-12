@@ -30,7 +30,7 @@ def dmp_rows(path: Path, cols: list[str | None]):
             line_num += 1
 
 
-@dlt.resource(name="ncbi_taxonomy_names", write_disposition="replace")
+@dlt.resource(name="taxonomy_names", write_disposition="replace")
 def ncbi_taxonomy_names(path: Path):
     yield pd.DataFrame(
         dmp_rows(
@@ -49,7 +49,7 @@ def ncbi_taxonomy_names(path: Path):
     )
 
 
-@dlt.resource(name="ncbi_taxonomy_nodes", write_disposition="replace")
+@dlt.resource(name="taxonomy_nodes", write_disposition="replace")
 def ncbi_taxonomy_nodes(path: Path):
     yield pd.DataFrame(
         dmp_rows(
@@ -90,7 +90,7 @@ def load_taxdump(*, temp_folder_path: Path, dlt_pipeline_prefix: str):
     pipeline = dlt.pipeline(
         pipeline_name=dlt_pipeline_prefix + "ncbi_taxonomy",
         destination=dlt.destinations.duckdb(get_db_path_string(temp_folder_path)),
-        dataset_name="raw",
+        dataset_name="ncbi",
     )
     pipeline.run(ncbi_taxdump(temp_folder_path / TAXDUMP_DIR_NAME))
 
