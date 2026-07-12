@@ -564,7 +564,7 @@ N/A
 
 ## Species and strain combinations with multiple taxonomy IDs
 
-- Canis lupus: 9612, 143281, 9615
+- Canis lupus: 143281, 9615, 9612
 
 ## Assemblies without ploidy information
 
