@@ -33,5 +33,13 @@ sources:
                     to: ref('taxonomy_organisms')
                     field: taxonomy_id
       - name: outbreak_taxa
+        # Only tested when the catalog has outbreaks
         columns:
           - name: taxonomy_id
+            data_tests:
+              - relationships:
+                  arguments:
+                    to: ref('taxonomy_outbreaks')
+                    field: taxonomy_id
+                config:
+                  enabled: "{{ var('has_outbreaks', false) }}"

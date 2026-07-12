@@ -40,3 +40,25 @@ models:
       - name: taxon_name
         data_tests:
           - not_null
+  - name: taxonomy_outbreaks
+    # Only tested when the catalog has outbreaks; otherwise the model is an
+    # empty placeholder and these assertions would be meaningless.
+    columns:
+      - name: taxonomy_id
+        data_tests:
+          - unique:
+              config:
+                enabled: "{{ var('has_outbreaks', false) }}"
+          - not_null:
+              config:
+                enabled: "{{ var('has_outbreaks', false) }}"
+      - name: rank
+        data_tests:
+          - not_null:
+              config:
+                enabled: "{{ var('has_outbreaks', false) }}"
+      - name: taxon_name
+        data_tests:
+          - not_null:
+              config:
+                enabled: "{{ var('has_outbreaks', false) }}"
