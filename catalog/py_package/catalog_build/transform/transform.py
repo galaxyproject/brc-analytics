@@ -39,9 +39,6 @@ def do_dbt_transformations(
     """
     Run the dbt transformations against the loaded DuckDB database.
 
-    Sets the `CATALOG_BUILD_DUCKDB_PATH` environment variable, which the dbt profile
-    reads to locate the database.
-
     Args:
       temp_folder_path: Path of the temporary folder holding the DuckDB database
       taxonomic_levels: Taxonomic levels to build columns for, passed to dbt as a var
@@ -51,7 +48,6 @@ def do_dbt_transformations(
     Returns:
       A TransformResult containing the dbt test results
     """
-    os.environ["CATALOG_BUILD_DUCKDB_PATH"] = get_db_path_string(temp_folder_path)
     runner = create_runner(
         None,
         None,
@@ -61,6 +57,7 @@ def do_dbt_transformations(
             package_profiles_dir=DBT_FOLDER_PATH,
             package_profile_name="catalog_build",
             package_additional_vars={
+                "duckdb_path": get_db_path_string(temp_folder_path),
                 "taxonomic_levels": taxonomic_levels,
                 "has_outbreaks": has_outbreaks,
             },
