@@ -20,4 +20,3 @@ models:
 
 data_tests:
   +severity: warn
-  +store_failures: true
