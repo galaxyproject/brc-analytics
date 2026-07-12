@@ -20,6 +20,19 @@ def do_dlt_load(
     organisms_df: pd.DataFrame,
     outbreaks_df: pd.DataFrame | None,
 ):
+    """
+    Load NCBI taxonomy and catalog source taxa into DuckDB via dlt.
+
+    Args:
+      temp_folder_path: Path of the temporary folder holding the DuckDB database
+      dlt_pipeline_prefix: Catalog-specific prefix applied to dlt pipeline names
+      assemblies_df: DataFrame of source assemblies (must include a `taxonomy_id` column)
+      organisms_df: DataFrame of source organisms (must include a `taxonomy_id` column)
+      outbreaks_df: DataFrame of source outbreaks (must include a `taxonomy_id` column), or None for catalogs without outbreaks
+
+    Returns:
+      A LoadResult with the verified NCBI taxdump MD5 digest
+    """
     ncbi_taxdump_md5 = load_ncbi_taxonomy(
         temp_folder_path=temp_folder_path, dlt_pipeline_prefix=dlt_pipeline_prefix
     )

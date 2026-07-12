@@ -17,6 +17,23 @@ TAXDUMP_NAMES_FILE_NAME = "names.dmp"
 
 
 def dmp_rows(path: Path, cols: list[str | None]):
+    """
+    Parse rows from an NCBI taxdump `.dmp` file.
+
+    These files terminate each row with `\\t|\\n` and separate fields with `\\t|\\t`,
+    rather than using a plain tab delimiter.
+
+    Args:
+      path: Path of the `.dmp` file to read
+      cols: Column names, in file order; an entry of None omits that column from the
+        yielded rows (used to skip columns that aren't needed)
+
+    Yields:
+      A dict mapping each named column to its value, for each row in the file
+
+    Raises:
+      Exception: If a row's field count doesn't match the number of columns provided
+    """
     n_cols = len(cols)
     with open(path) as f:
         line_num = 1
@@ -107,6 +124,13 @@ def verify_taxdump_md5(temp_folder_path: Path, fetched_md5: str):
 
 
 def fetch_taxdump_md5() -> str:
+    """
+    Fetch the expected MD5 digest of the taxdump archive from NCBI.
+
+    Returns:
+      The MD5 digest as a hex string. NCBI's `.md5` file has the form
+      "<md5>  <filename>", so the first 32 characters are the digest.
+    """
     response = requests.get(TAXDUMP_MD5_URL, timeout=(10, 30))
     response.raise_for_status()
     return response.text[:32]
@@ -137,6 +161,16 @@ def download_taxdump(temp_folder_path: Path):
 
 
 def load_ncbi_taxonomy(*, temp_folder_path: Path, dlt_pipeline_prefix: str) -> str:
+    """
+    Download the NCBI taxdump, verify its MD5, and load its nodes and names into DuckDB.
+
+    Args:
+      temp_folder_path: Path of the temporary folder used for downloads and the DuckDB database
+      dlt_pipeline_prefix: Catalog-specific prefix applied to the dlt pipeline name
+
+    Returns:
+      The verified MD5 digest of the downloaded taxdump archive
+    """
     download_taxdump(temp_folder_path)
     fetched_md5 = fetch_taxdump_md5()
     verify_taxdump_md5(temp_folder_path, fetched_md5)

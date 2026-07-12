@@ -36,6 +36,21 @@ def get_test_results(runner: DBTPackageRunner) -> list[DBTTestResult]:
 def do_dbt_transformations(
     temp_folder_path: Path, *, taxonomic_levels: list[str], has_outbreaks: bool
 ) -> TransformResult:
+    """
+    Run the dbt transformations against the loaded DuckDB database.
+
+    Sets the `CATALOG_BUILD_DUCKDB_PATH` environment variable, which the dbt profile
+    reads to locate the database.
+
+    Args:
+      temp_folder_path: Path of the temporary folder holding the DuckDB database
+      taxonomic_levels: Taxonomic levels to build columns for, passed to dbt as a var
+      has_outbreaks: Whether the catalog includes outbreaks, passed to dbt as a var so
+        the shared models can skip outbreak-specific logic when absent
+
+    Returns:
+      A TransformResult containing the dbt test results
+    """
     os.environ["CATALOG_BUILD_DUCKDB_PATH"] = get_db_path_string(temp_folder_path)
     runner = create_runner(
         None,
