@@ -8,8 +8,29 @@ sources:
     schema: ncbi
     tables:
       - name: taxonomy_nodes
-        description: "nodes.dmp — one row per taxon: tax_id, parent_tax_id, rank."
+        description: "nodes.dmp — one row per taxon."
+        columns:
+          - name: tax_id
+            data_tests:
+              - not_null
+          - name: parent_tax_id
+            data_tests:
+              - not_null
+          - name: rank
+            data_tests:
+              - not_null
       - name: taxonomy_names
+        description: "names.dmp - one row per name."
+        columns:
+          - name: tax_id
+            data_tests:
+              - not_null
+          - name: name_txt
+            data_tests:
+              - not_null
+          - name: name_class
+            data_tests:
+              - not_null
 
   - name: catalog_source
     description: >
@@ -20,6 +41,7 @@ sources:
         columns:
           - name: taxonomy_id
             data_tests:
+              - not_null
               - relationships:
                   arguments:
                     to: ref('taxonomy_assemblies')
@@ -28,6 +50,7 @@ sources:
         columns:
           - name: taxonomy_id
             data_tests:
+              - not_null
               - relationships:
                   arguments:
                     to: ref('taxonomy_organisms')
@@ -37,6 +60,9 @@ sources:
         columns:
           - name: taxonomy_id
             data_tests:
+              - not_null:
+                  config:
+                    enabled: "{{ var('has_outbreaks', false) }}"
               - relationships:
                   arguments:
                     to: ref('taxonomy_outbreaks')
