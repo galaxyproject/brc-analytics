@@ -41,5 +41,5 @@ sources:
                   arguments:
                     to: ref('taxonomy_outbreaks')
                     field: taxonomy_id
-                config:
-                  enabled: "{{ var('has_outbreaks', false) }}"
+                  config:
+                    enabled: "{{ var('has_outbreaks', false) }}"
