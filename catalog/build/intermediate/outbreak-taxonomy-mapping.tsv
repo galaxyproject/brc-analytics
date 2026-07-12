@@ -1,25 +1,25 @@
 taxonomy_id	name	rank
-498019	Candidozyma auris	SPECIES
-4827	Mucorales	ORDER
-3418604	Betacoronavirus pandemicum	SPECIES
-1773	Mycobacterium tuberculosis	SPECIES
-5807	Cryptosporidium parvum	SPECIES
-11266	Filoviridae	FAMILY
-11158	Paramyxoviridae	FAMILY
-1980413	Hantaviridae	FAMILY
-5037	Histoplasma capsulatum	SPECIES
-1980415	Nairoviridae	FAMILY
-1980416	Peribunyaviridae	FAMILY
-38574	Leishmania donovani species complex	SPECIES_GROUP
-11617	Arenaviridae	FAMILY
-12058	Picornaviridae	FAMILY
-5833	Plasmodium falciparum	SPECIES
-5207	Cryptococcus neoformans	SPECIES
-3431483	Orthopoxvirus monkeypox	SPECIES
-5052	Aspergillus	GENUS
-199306	Coccidioides posadasii	SPECIES
-5763	Naegleria fowleri	SPECIES
-1980418	Phenuiviridae	FAMILY
-2955291	Alphainfluenzavirus influenzae	SPECIES
-11018	Togaviridae	FAMILY
-11050	Flaviviridae	FAMILY
+11018	Togaviridae	family
+3418604	Betacoronavirus pandemicum	species
+3431483	Orthopoxvirus monkeypox	species
+1980416	Peribunyaviridae	family
+38574	Leishmania donovani species complex	species group
+1980415	Nairoviridae	family
+199306	Coccidioides posadasii	species
+12058	Picornaviridae	family
+5052	Aspergillus	genus
+11617	Arenaviridae	family
+1980418	Phenuiviridae	family
+11266	Filoviridae	family
+2955291	Alphainfluenzavirus influenzae	species
+498019	Candidozyma auris	species
+1773	Mycobacterium tuberculosis	species
+5763	Naegleria fowleri	species
+1980413	Hantaviridae	family
+5807	Cryptosporidium parvum	species
+5037	Histoplasma capsulatum	species
+11158	Paramyxoviridae	family
+11050	Flaviviridae	family
+5207	Cryptococcus neoformans	species
+4827	Mucorales	order
+5833	Plasmodium falciparum	species
