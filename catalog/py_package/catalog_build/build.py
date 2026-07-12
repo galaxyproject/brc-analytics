@@ -1507,7 +1507,7 @@ def build_files(
     extract_primary_data=False,
     primary_output_path=None,
     qc_report_path=None,
-    organisms_path=None,
+    organisms_path,
     outbreaks_path=None,
     outbreak_taxonomy_mapping_path=None,
     organism_image_path=None,
@@ -1846,34 +1846,30 @@ def build_files(
             species_tree, taxonomic_levels_for_tree, genomes_df.shape[0]
         )
 
-    if organisms_path is not None:
-        organisms_df = read_organisms(organisms_path)
-        qc_report_params["missing_ploidy_assemblies"] = report_missing_ploidy_info(
-            genomes_df, organisms_df
-        )
-        print(f"Checked ploidy for {len(genomes_df)} assemblies")
+    qc_report_params["missing_ploidy_assemblies"] = report_missing_ploidy_info(
+        genomes_df, source_organisms_df
+    )
+    print(f"Checked ploidy for {len(genomes_df)} assemblies")
 
-        organism_taxonomy_id_strings = organism_taxonomy_df["taxonomy_id"].astype(
-            "string"
-        )
-        organism_taxon_name_map = dict(
-            zip(organism_taxonomy_id_strings, organism_taxonomy_df["taxon_name"])
-        )
-        organism_taxon_rank_map = dict(
-            zip(organism_taxonomy_id_strings, organism_taxonomy_df["rank"])
-        )
-        qc_report_params["organisms_not_species_rank"] = check_organism_ranks(
-            organisms_df["taxonomy_id"].tolist(),
-            organism_taxon_rank_map,
+    organism_taxonomy_id_strings = organism_taxonomy_df["taxonomy_id"].astype("string")
+    organism_taxon_name_map = dict(
+        zip(organism_taxonomy_id_strings, organism_taxonomy_df["taxon_name"])
+    )
+    organism_taxon_rank_map = dict(
+        zip(organism_taxonomy_id_strings, organism_taxonomy_df["rank"])
+    )
+    qc_report_params["organisms_not_species_rank"] = check_organism_ranks(
+        source_organisms_df["taxonomy_id"].tolist(),
+        organism_taxon_rank_map,
+        organism_taxon_name_map,
+    )
+    qc_report_params["organisms_without_assemblies"] = (
+        check_organisms_without_assemblies(
+            source_organisms_df["taxonomy_id"].tolist(),
+            genomes_df["speciesTaxonomyId"],
             organism_taxon_name_map,
         )
-        qc_report_params["organisms_without_assemblies"] = (
-            check_organisms_without_assemblies(
-                organisms_df["taxonomy_id"].tolist(),
-                genomes_df["speciesTaxonomyId"],
-                organism_taxon_name_map,
-            )
-        )
+    )
 
     if qc_report_path is not None:
         qc_report_text = make_qc_report(**qc_report_params)
