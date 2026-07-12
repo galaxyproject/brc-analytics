@@ -6,7 +6,6 @@ import logging
 import os
 import time
 import urllib
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -1368,40 +1367,35 @@ def add_galaxy_datacache_url(genomes_df, base_url, batch_size=20, timeout=5):
     normalized_base_url = base_url if base_url.endswith("/") else f"{base_url}/"
 
     print("Validating Galaxy Datacache URLs...")
+    missing_accessions = []
+    datacache_urls = []
 
-    accessions = genomes_df["accession"].tolist()
-    total_genomes = len(accessions)
-
-    def validate_accession(accession):
-        url = f"{normalized_base_url}{accession}/"
-        try:
-            response = requests.get(url, timeout=timeout)
-            if response.status_code == 200:
-                return url
-        except (requests.RequestException, requests.Timeout) as e:
-            log.debug(f"Failed to validate datacache URL for {accession}: {e}")
-        return ""
-
-    # Validate URLs concurrently while preserving the row order of genomes_df.
-    datacache_urls = [""] * total_genomes
+    total_genomes = len(genomes_df)
     processed = 0
 
-    with ThreadPoolExecutor(max_workers=batch_size) as executor:
-        future_to_index = {
-            executor.submit(validate_accession, accession): index
-            for index, accession in enumerate(accessions)
-        }
+    for i in range(0, total_genomes, batch_size):
+        batch_df = genomes_df.iloc[i : i + batch_size]
 
-        for future in as_completed(future_to_index):
-            index = future_to_index[future]
-            datacache_urls[index] = future.result()
+        for _, row in batch_df.iterrows():
+            accession = row["accession"]
+            url = f"{normalized_base_url}{accession}/"
+
+            try:
+                response = requests.get(url, timeout=timeout)
+                if response.status_code == 200:
+                    datacache_urls.append(url)
+                else:
+                    datacache_urls.append("")
+                    missing_accessions.append(accession)
+            except (requests.RequestException, requests.Timeout) as e:
+                log.debug(f"Failed to validate datacache URL for {accession}: {e}")
+                datacache_urls.append("")
+                missing_accessions.append(accession)
 
             processed += 1
             print(f"Validated {processed} of {total_genomes} datacache URLs", end="\r")
 
-    missing_accessions = [
-        accession for accession, url in zip(accessions, datacache_urls) if not url
-    ]
+        time.sleep(0.1)
 
     print(
         f"\nValidated {total_genomes} datacache URLs, {len(missing_accessions)} not found"
