@@ -1,5 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { PangenomeMember } from "../../../../../../../apis/catalog/brc-analytics-catalog/common/pangenome";
+import type { PangenomeMember } from "../../../../../../../apis/catalog/brc-analytics-catalog/common/pangenome";
 import { RefCell } from "../../../../../../../components/Table/components/TableCell/components/RefCell/refCell";
 import { AssemblyCell } from "../../../table/components/TableCell/components/AssemblyCell/assemblyCell";
 import { SelectionTracksCell } from "../../../table/components/TableCell/components/SelectionTracksCell/selectionTracksCell";
@@ -15,6 +15,9 @@ const ASSEMBLY: ColumnDef<PangenomeMember> = {
 
 const LENGTH: ColumnDef<PangenomeMember> = {
   accessorKey: "length",
+  // `length` is a display string ("29.05 Mb"), so sorting would be
+  // lexicographic and wrong. Opt out until #1341 provides a numeric length.
+  enableSorting: false,
   header: "Length",
   meta: { header: "Length", width: { max: "0.75fr", min: "132px" } },
 };

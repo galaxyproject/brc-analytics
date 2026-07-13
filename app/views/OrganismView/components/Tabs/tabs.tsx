@@ -1,11 +1,10 @@
 import { TabScrollFuzz } from "@databiosphere/findable-ui/lib/components/common/Tabs/tabs.styles";
 import { BackPageTabs } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { useHash } from "@databiosphere/findable-ui/lib/components/Layout/components/Outline/hooks/UseHash/hook";
-import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import { Tabs as MTabs, Tab } from "@mui/material";
 import { useRouter } from "next/router";
 import { type JSX } from "react";
-import { getPangenome } from "../../../../services/workflows/entities";
+import { useShowPangenome } from "../../hooks/UseShowPangenome/hook";
 import { TAB } from "./constants";
 import { Props } from "./types";
 import { getActiveTab } from "./utils";
@@ -19,11 +18,9 @@ import { getActiveTab } from "./utils";
  * @returns The organism-page tabs.
  */
 export const Tabs = ({ ncbiTaxonomyId }: Props): JSX.Element => {
-  const isPangenomeEnabled = useFeatureFlag("pangenome");
   const { hash } = useHash();
   const { push } = useRouter();
-  const pangenome = getPangenome(ncbiTaxonomyId);
-  const showPangenome = isPangenomeEnabled && Boolean(pangenome);
+  const showPangenome = Boolean(useShowPangenome(ncbiTaxonomyId));
   return (
     <BackPageTabs>
       <MTabs

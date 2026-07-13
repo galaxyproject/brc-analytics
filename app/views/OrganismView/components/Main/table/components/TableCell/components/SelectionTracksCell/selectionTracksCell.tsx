@@ -2,7 +2,7 @@ import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chi
 import { Chip } from "@mui/material";
 import { CellContext } from "@tanstack/react-table";
 import { JSX } from "react";
-import { PangenomeMember } from "../../../../../../../../../apis/catalog/brc-analytics-catalog/common/pangenome";
+import type { PangenomeMember } from "../../../../../../../../../apis/catalog/brc-analytics-catalog/common/pangenome";
 
 /**
  * Selection tracks cell for the pangenome members table: a chip indicating

@@ -6,7 +6,7 @@ import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/b
 import { Button } from "@mui/material";
 import { CellContext } from "@tanstack/react-table";
 import { JSX } from "react";
-import { PangenomeMember } from "../../../../../../../../../apis/catalog/brc-analytics-catalog/common/pangenome";
+import type { PangenomeMember } from "../../../../../../../../../apis/catalog/brc-analytics-catalog/common/pangenome";
 
 /**
  * View cell for the pangenome members table: a button linking to the member

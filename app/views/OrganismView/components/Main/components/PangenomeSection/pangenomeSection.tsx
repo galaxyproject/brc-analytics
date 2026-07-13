@@ -1,4 +1,3 @@
-import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { STACK_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/stack";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
@@ -12,7 +11,7 @@ import {
 } from "@mui/material";
 import { JSX } from "react";
 import { Table } from "../../../../../../components/common/Table/table";
-import { getPangenome } from "../../../../../../services/workflows/entities";
+import { useShowPangenome } from "../../../../hooks/UseShowPangenome/hook";
 import { StyledSectionTitle } from "../../main.styles";
 import { useTable } from "../../table/hooks/UseTable/hook";
 import { StyledFluidPaper } from "./pangenomeSection.styles";
@@ -31,12 +30,11 @@ import { getTrackTypes } from "./utils";
  * @returns The Pangenome section, or null when there is no pangenome to show.
  */
 export const PangenomeSection = ({ organism }: Props): JSX.Element | null => {
-  const isPangenomeEnabled = useFeatureFlag("pangenome");
-  const pangenome = getPangenome(organism.ncbiTaxonomyId);
+  const pangenome = useShowPangenome(organism.ncbiTaxonomyId);
   const { members } = pangenome ?? {};
   const table = useTable({ columns: COLUMNS, data: members ?? [] });
 
-  if (!isPangenomeEnabled || !pangenome) return null;
+  if (!pangenome) return null;
 
   return (
     <Stack spacing={4} useFlexGap>

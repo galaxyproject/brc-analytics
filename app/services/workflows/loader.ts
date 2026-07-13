@@ -75,7 +75,10 @@ export async function loadPangenomes(): Promise<void> {
   let pangenomes: Pangenome[];
   try {
     pangenomes = (await fetchEntities(API.pangenomes)) as Pangenome[];
-  } catch {
+  } catch (error) {
+    // Optional data: stay non-fatal, but surface the error so a real
+    // regression (vs. an intentionally-absent file) is debuggable.
+    console.warn("Failed to load pangenomes; skipping.", error);
     return;
   }
 
