@@ -21,6 +21,16 @@ export const Tabs = ({ ncbiTaxonomyId }: Props): JSX.Element => {
   const { hash } = useHash();
   const { push } = useRouter();
   const hasPangenome = Boolean(getPangenome(ncbiTaxonomyId));
+  const showPangenome = isPangenomeEnabled && hasPangenome;
+  // Normalize the active tab to one that's actually rendered: a deep-link to
+  // #pangenome while the tab is hidden would otherwise leave MUI Tabs with an
+  // unmatched value (no selection + a runtime warning).
+  const tabValues = [
+    "workflows",
+    "assemblies",
+    ...(showPangenome ? ["pangenome"] : []),
+  ];
+  const value = hash && tabValues.includes(hash) ? hash : "workflows";
   return (
     <BackPageTabs>
       <MTabs
@@ -29,13 +39,11 @@ export const Tabs = ({ ncbiTaxonomyId }: Props): JSX.Element => {
           push(`#${v}`);
         }}
         slots={{ scrollButtons: TabScrollFuzz }}
-        value={hash || "workflows"}
+        value={value}
       >
         <Tab label="Workflows" value="workflows" />
         <Tab label="Assemblies" value="assemblies" />
-        {isPangenomeEnabled && hasPangenome && (
-          <Tab label="Pangenome" value="pangenome" />
-        )}
+        {showPangenome && <Tab label="Pangenome" value="pangenome" />}
       </MTabs>
     </BackPageTabs>
   );
