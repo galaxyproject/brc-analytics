@@ -13,7 +13,7 @@
         "levelFilledCount": 4,
         "levelLabel": "Genome",
         "name": "PvP01",
-        "ucscBrowserUrl": ""
+        "ucscBrowserUrl": "https://genome.ucsc.edu/cgi-bin/hgTracks?genome=GCA_900093555.2&hubUrl=https://genome.ucsc.edu/hubspace/a6/anekrut/BRC_Pangenome_Pv_v1/hub.txt&udcTimeout=5"
       },
       {
         "accession": "GCA_000002415.2",
@@ -24,7 +24,7 @@
         "levelFilledCount": 3,
         "levelLabel": "Chromosome",
         "name": "Sal-I",
-        "ucscBrowserUrl": ""
+        "ucscBrowserUrl": "https://genome.ucsc.edu/cgi-bin/hgTracks?genome=GCA_000002415.2&hubUrl=https://genome.ucsc.edu/hubspace/a6/anekrut/BRC_Pangenome_Pv_v1/hub.txt&udcTimeout=5"
       },
       {
         "accession": "GCA_914969965.1",
@@ -35,7 +35,7 @@
         "levelFilledCount": 3,
         "levelLabel": "Chromosome",
         "name": "PvW1",
-        "ucscBrowserUrl": ""
+        "ucscBrowserUrl": "https://genome.ucsc.edu/cgi-bin/hgTracks?genome=GCA_914969965.1&hubUrl=https://genome.ucsc.edu/hubspace/a6/anekrut/BRC_Pangenome_Pv_v1/hub.txt&udcTimeout=5"
       },
       {
         "accession": "GCA_949152365.1",
@@ -46,7 +46,7 @@
         "levelFilledCount": 2,
         "levelLabel": "Scaffold",
         "name": "PAM",
-        "ucscBrowserUrl": ""
+        "ucscBrowserUrl": "https://genome.ucsc.edu/cgi-bin/hgTracks?genome=GCA_949152365.1&hubUrl=https://genome.ucsc.edu/hubspace/a6/anekrut/BRC_Pangenome_Pv_v1/hub.txt&udcTimeout=5"
       },
       {
         "accession": "GCA_003402215.1",
@@ -57,7 +57,7 @@
         "levelFilledCount": 2,
         "levelLabel": "Scaffold",
         "name": "PvSY56",
-        "ucscBrowserUrl": ""
+        "ucscBrowserUrl": "https://genome.ucsc.edu/cgi-bin/hgTracks?genome=GCA_003402215.1&hubUrl=https://genome.ucsc.edu/hubspace/a6/anekrut/BRC_Pangenome_Pv_v1/hub.txt&udcTimeout=5"
       },
       {
         "accession": "GCA_900093545.1",
@@ -68,7 +68,7 @@
         "levelFilledCount": 2,
         "levelLabel": "Scaffold",
         "name": "PvT01",
-        "ucscBrowserUrl": ""
+        "ucscBrowserUrl": "https://genome.ucsc.edu/cgi-bin/hgTracks?genome=GCA_900093545.1&hubUrl=https://genome.ucsc.edu/hubspace/a6/anekrut/BRC_Pangenome_Pv_v1/hub.txt&udcTimeout=5"
       },
       {
         "accession": "GCA_900093535.1",
@@ -79,7 +79,7 @@
         "levelFilledCount": 2,
         "levelLabel": "Scaffold",
         "name": "PvC01",
-        "ucscBrowserUrl": ""
+        "ucscBrowserUrl": "https://genome.ucsc.edu/cgi-bin/hgTracks?genome=GCA_900093535.1&hubUrl=https://genome.ucsc.edu/hubspace/a6/anekrut/BRC_Pangenome_Pv_v1/hub.txt&udcTimeout=5"
       },
       {
         "accession": "GCA_040114635.1",
@@ -90,7 +90,7 @@
         "levelFilledCount": 3,
         "levelLabel": "Chromosome",
         "name": "MHC087",
-        "ucscBrowserUrl": ""
+        "ucscBrowserUrl": "https://genome.ucsc.edu/cgi-bin/hgTracks?genome=GCA_040114635.1&hubUrl=https://genome.ucsc.edu/hubspace/a6/anekrut/BRC_Pangenome_Pv_v1/hub.txt&udcTimeout=5"
       }
     ]
   }
