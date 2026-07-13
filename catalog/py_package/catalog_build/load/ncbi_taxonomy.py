@@ -136,7 +136,7 @@ def fetch_taxdump_md5() -> str:
     return response.text[:32]
 
 
-def download_taxdump(temp_folder_path: Path):
+def download_taxdump(temp_folder_path: Path, fetched_md5: str):
     taxdump_path = temp_folder_path / TAXDUMP_DOWNLOAD_NAME
 
     with requests.get(TAXDUMP_URL, stream=True, timeout=(10, 60)) as response:
@@ -145,6 +145,8 @@ def download_taxdump(temp_folder_path: Path):
             for chunk in response.iter_content(chunk_size=8192):
                 if chunk:
                     file.write(chunk)
+
+    verify_taxdump_md5(temp_folder_path, fetched_md5)
 
     taxdump_dir_path = temp_folder_path / TAXDUMP_DIR_NAME
     taxdump_dir_path.mkdir(exist_ok=True)
@@ -171,9 +173,8 @@ def load_ncbi_taxonomy(*, temp_folder_path: Path, dlt_pipeline_prefix: str) -> s
     Returns:
       The verified MD5 digest of the downloaded taxdump archive
     """
-    download_taxdump(temp_folder_path)
     fetched_md5 = fetch_taxdump_md5()
-    verify_taxdump_md5(temp_folder_path, fetched_md5)
+    download_taxdump(temp_folder_path, fetched_md5)
     load_taxdump(
         temp_folder_path=temp_folder_path, dlt_pipeline_prefix=dlt_pipeline_prefix
     )
