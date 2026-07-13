@@ -41,7 +41,7 @@ const EXPERIMENT_ACCESSION: ColumnDef<ReadRun> = {
 const FASTQ_FTP: ColumnDef<ReadRun> = {
   ...SORTING_COLUMN_DEF,
   accessorKey: CATEGORY_CONFIGS.FASTQ_FTP.key,
-  cell: (ctx) => BasicCell(buildFastqFTP(ctx)),
+  cell: (ctx) => <BasicCell {...buildFastqFTP(ctx)} />,
   filterFn: SELECT_FILTER_FN,
   header: CATEGORY_CONFIGS.FASTQ_FTP.label,
   meta: { width: { max: "1.8fr", min: "200px" } },
@@ -140,7 +140,7 @@ const SCIENTIFIC_NAME: ColumnDef<ReadRun> = {
 const STUDY_ACCESSION: ColumnDef<ReadRun> = {
   ...SORTING_COLUMN_DEF,
   accessorKey: CATEGORY_CONFIGS.STUDY_ACCESSION.key,
-  cell: (ctx) => LinkCell(buildStudyAccession(ctx)),
+  cell: (ctx) => <LinkCell {...buildStudyAccession(ctx)} />,
   filterFn: SELECT_FILTER_FN,
   header: CATEGORY_CONFIGS.STUDY_ACCESSION.label,
   meta: META,
