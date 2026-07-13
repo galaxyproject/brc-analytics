@@ -989,7 +989,7 @@ export const buildOrganismHero = (
   if (priorityTag) tags.push(priorityTag);
   return {
     breadcrumbs: getOrganismEntityBreadcrumbs(organism),
-    children: <Tabs />,
+    children: <Tabs ncbiTaxonomyId={organism.ncbiTaxonomyId} />,
     subTitle: tags.length > 0 ? <C.TagList tags={tags} /> : undefined,
     title: organism.taxonomicLevelSpecies,
   };
