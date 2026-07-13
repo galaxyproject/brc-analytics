@@ -1,4 +1,5 @@
 import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
+import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
 import { useAuth } from "@/providers/authentication";
 import { brcAPIClient } from "@/services/brc-api-client";
 import { WorkflowRunResponse } from "@/types/api";
@@ -170,3 +171,5 @@ export default function WorkflowRunsPage(): JSX.Element {
     </>
   );
 }
+
+WorkflowRunsPage.Main = StyledPagesMain;

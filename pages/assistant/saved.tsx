@@ -1,4 +1,5 @@
 import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
+import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
 import { useAuth } from "@/providers/authentication";
 import { brcAPIClient } from "@/services/brc-api-client";
 import { SavedAnalysisSummary } from "@/types/api";
@@ -197,3 +198,5 @@ export default function SavedAnalysesPage(): JSX.Element {
     </>
   );
 }
+
+SavedAnalysesPage.Main = StyledPagesMain;

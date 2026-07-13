@@ -1,5 +1,6 @@
 import { sanitizeEntityId } from "@/apis/catalog/common/utils";
 import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
+import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
 import { useAssemblyFavorites } from "@/hooks/useAssemblyFavorites";
 import { useAuth } from "@/providers/authentication";
 import { getEntity } from "@/services/workflows/query";
@@ -130,3 +131,5 @@ export default function FavoritesPage(): JSX.Element {
     </>
   );
 }
+
+FavoritesPage.Main = StyledPagesMain;
