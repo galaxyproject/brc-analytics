@@ -6,7 +6,9 @@ import { Tabs as MTabs, Tab } from "@mui/material";
 import { useRouter } from "next/router";
 import { type JSX } from "react";
 import { getPangenome } from "../../../../services/workflows/entities";
+import { TAB } from "./constants";
 import { Props } from "./types";
+import { getActiveTab } from "./utils";
 
 /**
  * Organism-page section tabs. The Pangenome tab is shown only when the
@@ -20,17 +22,8 @@ export const Tabs = ({ ncbiTaxonomyId }: Props): JSX.Element => {
   const isPangenomeEnabled = useFeatureFlag("pangenome");
   const { hash } = useHash();
   const { push } = useRouter();
-  const hasPangenome = Boolean(getPangenome(ncbiTaxonomyId));
-  const showPangenome = isPangenomeEnabled && hasPangenome;
-  // Normalize the active tab to one that's actually rendered: a deep-link to
-  // #pangenome while the tab is hidden would otherwise leave MUI Tabs with an
-  // unmatched value (no selection + a runtime warning).
-  const tabValues = [
-    "workflows",
-    "assemblies",
-    ...(showPangenome ? ["pangenome"] : []),
-  ];
-  const value = hash && tabValues.includes(hash) ? hash : "workflows";
+  const pangenome = getPangenome(ncbiTaxonomyId);
+  const showPangenome = isPangenomeEnabled && Boolean(pangenome);
   return (
     <BackPageTabs>
       <MTabs
@@ -39,11 +32,11 @@ export const Tabs = ({ ncbiTaxonomyId }: Props): JSX.Element => {
           push(`#${v}`);
         }}
         slots={{ scrollButtons: TabScrollFuzz }}
-        value={value}
+        value={getActiveTab(hash, showPangenome)}
       >
-        <Tab label="Workflows" value="workflows" />
-        <Tab label="Assemblies" value="assemblies" />
-        {showPangenome && <Tab label="Pangenome" value="pangenome" />}
+        <Tab label="Workflows" value={TAB.WORKFLOWS} />
+        <Tab label="Assemblies" value={TAB.ASSEMBLIES} />
+        {showPangenome && <Tab label="Pangenome" value={TAB.PANGENOME} />}
       </MTabs>
     </BackPageTabs>
   );
