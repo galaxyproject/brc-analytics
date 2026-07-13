@@ -48,7 +48,7 @@ const VIEW: ColumnDef<PangenomeMember> = {
   enableSorting: false,
   header: "View",
   id: "view",
-  meta: { header: "View", width: "auto" },
+  meta: { header: "View", width: { max: "0.75fr", min: "164px" } },
 };
 
 export const COLUMNS: ColumnDef<PangenomeMember>[] = [
