@@ -1,0 +1,97 @@
+[
+  {
+    "bundleId": "plasmodium-vivax-v1",
+    "speciesTaxonomyId": "5855",
+    "version": "2026-05",
+    "members": [
+      {
+        "accession": "GCA_900093555.2",
+        "hasSelectionTracks": true,
+        "isAnchor": true,
+        "isRef": true,
+        "length": "29.05 Mb",
+        "levelFilledCount": 4,
+        "levelLabel": "Genome",
+        "name": "PvP01",
+        "ucscBrowserUrl": ""
+      },
+      {
+        "accession": "GCA_000002415.2",
+        "hasSelectionTracks": false,
+        "isAnchor": false,
+        "isRef": false,
+        "length": "26.99 Mb",
+        "levelFilledCount": 3,
+        "levelLabel": "Chromosome",
+        "name": "Sal-I",
+        "ucscBrowserUrl": ""
+      },
+      {
+        "accession": "GCA_914969965.1",
+        "hasSelectionTracks": false,
+        "isAnchor": false,
+        "isRef": false,
+        "length": "28.35 Mb",
+        "levelFilledCount": 3,
+        "levelLabel": "Chromosome",
+        "name": "PvW1",
+        "ucscBrowserUrl": ""
+      },
+      {
+        "accession": "GCA_949152365.1",
+        "hasSelectionTracks": false,
+        "isAnchor": false,
+        "isRef": false,
+        "length": "27.86 Mb",
+        "levelFilledCount": 2,
+        "levelLabel": "Scaffold",
+        "name": "PAM",
+        "ucscBrowserUrl": ""
+      },
+      {
+        "accession": "GCA_003402215.1",
+        "hasSelectionTracks": false,
+        "isAnchor": false,
+        "isRef": false,
+        "length": "29.44 Mb",
+        "levelFilledCount": 2,
+        "levelLabel": "Scaffold",
+        "name": "PvSY56",
+        "ucscBrowserUrl": ""
+      },
+      {
+        "accession": "GCA_900093545.1",
+        "hasSelectionTracks": false,
+        "isAnchor": false,
+        "isRef": false,
+        "length": "28.13 Mb",
+        "levelFilledCount": 2,
+        "levelLabel": "Scaffold",
+        "name": "PvT01",
+        "ucscBrowserUrl": ""
+      },
+      {
+        "accession": "GCA_900093535.1",
+        "hasSelectionTracks": false,
+        "isAnchor": false,
+        "isRef": false,
+        "length": "27.51 Mb",
+        "levelFilledCount": 2,
+        "levelLabel": "Scaffold",
+        "name": "PvC01",
+        "ucscBrowserUrl": ""
+      },
+      {
+        "accession": "GCA_040114635.1",
+        "hasSelectionTracks": false,
+        "isAnchor": false,
+        "isRef": false,
+        "length": "28.62 Mb",
+        "levelFilledCount": 3,
+        "levelLabel": "Chromosome",
+        "name": "MHC087",
+        "ucscBrowserUrl": ""
+      }
+    ]
+  }
+]

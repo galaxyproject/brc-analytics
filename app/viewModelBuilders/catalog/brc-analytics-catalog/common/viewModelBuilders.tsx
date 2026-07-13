@@ -8,6 +8,7 @@ import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chi
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { ColumnDef, RowData, VisibilityState } from "@tanstack/react-table";
 import type { SpeciesTag } from "app/components/Table/components/TableCell/components/SpeciesCell/types";
+import { Tabs } from "app/views/OrganismView/components/Tabs/tabs";
 import type { Organism } from "app/views/OrganismView/types";
 import { parseISO } from "date-fns";
 import { LinkProps } from "next/link";
@@ -988,6 +989,7 @@ export const buildOrganismHero = (
   if (priorityTag) tags.push(priorityTag);
   return {
     breadcrumbs: getOrganismEntityBreadcrumbs(organism),
+    children: <Tabs />,
     subTitle: tags.length > 0 ? <C.TagList tags={tags} /> : undefined,
     title: organism.taxonomicLevelSpecies,
   };
@@ -1002,10 +1004,12 @@ export const buildOrganismViewMain = (
   organism: BRCDataCatalogOrganism
 ): ComponentProps<typeof C.OrganismViewMain> => {
   return {
-    columnPresets: ORGANISM_GENOMES_COLUMN_PRESETS,
+    assembly: {
+      columnPresets: ORGANISM_GENOMES_COLUMN_PRESETS,
+      tableOptions: buildOrganismGenomesTable(organism),
+    },
     entityId: getOrganismId(organism),
     organism,
-    tableOptions: buildOrganismGenomesTable(organism),
   };
 };
 
@@ -1031,7 +1035,7 @@ const DEFAULT_COLUMN_VISIBILITY: VisibilityState = {
  */
 const ORGANISM_GENOMES_COLUMN_PRESETS: ComponentProps<
   typeof C.OrganismViewMain
->["columnPresets"] = [
+>["assembly"]["columnPresets"] = [
   {
     columnVisibility: DEFAULT_COLUMN_VISIBILITY,
     key: COLUMN_PRESET_KEY.DEFAULT,
@@ -1057,7 +1061,7 @@ const ORGANISM_GENOMES_COLUMN_PRESETS: ComponentProps<
  */
 export function buildOrganismGenomesTable(
   organism: BRCDataCatalogOrganism
-): ComponentProps<typeof C.OrganismViewMain>["tableOptions"] {
+): ComponentProps<typeof C.OrganismViewMain>["assembly"]["tableOptions"] {
   return {
     // Cast: ColumnDef<T> is invariant in T, so the catalog-specific row type
     // cannot widen to RowData even though BRCDataCatalogGenome extends it.

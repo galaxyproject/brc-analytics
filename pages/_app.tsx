@@ -52,7 +52,13 @@ export type AppPropsWithComponent = AppProps & {
   pageProps: PageProps;
 };
 
-setFeatureFlags(["assembly-workflows", "assistant", "hyphy", "lmls"]);
+setFeatureFlags([
+  "assembly-workflows",
+  "assistant",
+  "hyphy",
+  "lmls",
+  "pangenome",
+]);
 
 const queryClient = new QueryClient();
 

@@ -3,6 +3,7 @@ import {
   Workflow,
   WorkflowCategory,
 } from "../../apis/catalog/brc-analytics-catalog/common/entities";
+import type { Pangenome } from "../../apis/catalog/brc-analytics-catalog/common/pangenome";
 import { formatTrsId } from "../../views/AnalyzeWorkflowsView/components/Main/utils";
 import { CUSTOM_WORKFLOW } from "../../views/AnalyzeWorkflowsView/custom/constants";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
@@ -61,6 +62,30 @@ export async function loadEntities(config: SiteConfig): Promise<void> {
     setEntitiesById(route, entityById);
     setEntitiesByType(route, entities);
   }
+}
+
+/**
+ * Loads the pangenomes store from the API, keyed by species taxonomy ID.
+ * Pangenome data is optional (BRC-only and may be absent before its build
+ * lands), so a missing or failed fetch is skipped rather than fatal.
+ */
+export async function loadPangenomes(): Promise<void> {
+  if (getEntitiesById().has("pangenomes")) return;
+
+  let pangenomes: Pangenome[];
+  try {
+    pangenomes = (await fetchEntities(API.pangenomes)) as Pangenome[];
+  } catch {
+    return;
+  }
+
+  const pangenomeBySpeciesTaxonomyId = new Map<string, Pangenome>();
+  for (const pangenome of pangenomes) {
+    pangenomeBySpeciesTaxonomyId.set(pangenome.speciesTaxonomyId, pangenome);
+  }
+
+  setEntitiesById("pangenomes", pangenomeBySpeciesTaxonomyId);
+  setEntitiesByType("pangenomes", pangenomes);
 }
 
 /**

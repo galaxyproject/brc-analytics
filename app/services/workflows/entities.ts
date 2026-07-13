@@ -2,6 +2,7 @@ import {
   Workflow,
   WorkflowCategory,
 } from "../../apis/catalog/brc-analytics-catalog/common/entities";
+import type { Pangenome } from "../../apis/catalog/brc-analytics-catalog/common/pangenome";
 import type {
   AssemblyContract,
   OrganismContract,
@@ -51,6 +52,16 @@ export function getOrganism<T extends OrganismContract>(entityId: string): T {
  */
 export function getOrganisms<T extends OrganismContract>(): T[] {
   return getEntities<T>("organisms");
+}
+
+/**
+ * Gets the pangenome bundle for a species, or undefined when the species has no
+ * pangenome.
+ * @param speciesTaxonomyId - Species taxonomy ID.
+ * @returns Pangenome bundle, or undefined.
+ */
+export function getPangenome(speciesTaxonomyId: string): Pangenome | undefined {
+  return findEntity<Pangenome>("pangenomes", speciesTaxonomyId);
 }
 
 /**
