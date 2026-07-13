@@ -1,5 +1,5 @@
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/components/FluidPaper/fluidPaper";
-import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font.js";
+import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import styled from "@emotion/styled";
 

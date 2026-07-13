@@ -1,6 +1,6 @@
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
-import { STACK_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/stack.js";
+import { STACK_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/stack";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import {
   Chip,
@@ -66,7 +66,7 @@ export const PangenomeSection = ({ organism }: Props): JSX.Element | null => {
               Each assembly&apos;s UCSC browser carries 4 pangenome tracks:
             </Typography>
             <List disablePadding>
-              {getTrackTypes(pangenome.members.length).map((trackType) => (
+              {getTrackTypes(members?.length ?? 0).map((trackType) => (
                 <ListItem key={trackType} disablePadding>
                   {trackType}
                 </ListItem>

@@ -12,8 +12,8 @@ export function ensureEntitiesLoaded(config: SiteConfig): Promise<void> {
   if (loadPromise) return loadPromise;
 
   loadPromise = (async (): Promise<void> => {
-    // Load in parallel: the optional pangenome fetch must not add serial
-    // latency to (or gate) the entity load, which every data page depends on.
+    // Load in parallel so the optional pangenome fetch adds no serial latency
+    // to the core workflows/entities load that every data page depends on.
     await Promise.all([
       loadWorkflows(),
       loadPangenomes(),
