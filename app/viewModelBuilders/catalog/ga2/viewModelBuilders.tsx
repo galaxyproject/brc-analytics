@@ -1,6 +1,6 @@
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
 import { ColumnDef, RowData, VisibilityState } from "@tanstack/react-table";
-import { ComponentProps, createElement } from "react";
+import { ComponentProps } from "react";
 import { ROUTES } from "../../../../routes/constants";
 import {
   GA2_CATEGORY_KEY,
@@ -45,9 +45,7 @@ export const buildOrganismHero = (
       { path: ROUTES.ORGANISMS, text: "Organisms" },
       { path: "", text: entity.taxonomicLevelSpecies },
     ],
-    subTitle: groupTag
-      ? createElement(C.TagList, { tags: [groupTag] })
-      : undefined,
+    subTitle: groupTag ? <C.TagList tags={[groupTag]} /> : undefined,
     title: entity.taxonomicLevelSpecies,
   };
 };
@@ -161,7 +159,9 @@ function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
   return [
     {
       accessorKey: GA2_CATEGORY_KEY.ANALYZE_GENOME,
-      cell: ({ row }) => C.AnalyzeGenome(buildAnalyzeGenome(row.original)),
+      cell: ({ row }) => (
+        <C.AnalyzeGenome {...buildAnalyzeGenome(row.original)} />
+      ),
       enableSorting: false,
       header: GA2_CATEGORY_LABEL.ANALYZE_GENOME,
       meta: { header: GA2_CATEGORY_LABEL.ANALYZE_GENOME, width: "auto" },
@@ -171,8 +171,9 @@ function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
       // (its primary text); the SpeciesCell renders the accession + per-assembly
       // tags.
       accessorKey: GA2_CATEGORY_KEY.ACCESSION,
-      cell: ({ row }) =>
-        C.SpeciesCell(buildOrganismAssemblySpecies(row.original)),
+      cell: ({ row }) => (
+        <C.SpeciesCell {...buildOrganismAssemblySpecies(row.original)} />
+      ),
       header: ASSEMBLY_COLUMN_HEADER,
       meta: {
         columnPinned: true,
@@ -182,11 +183,11 @@ function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
     },
     {
       accessorKey: GA2_CATEGORY_KEY.RELEASE_DATE,
-      cell: ({ row }) =>
-        C.Tooltip({
-          ...buildReleaseDateTooltip(row.original),
-          children: createElement(C.BasicCell, buildReleaseDate(row.original)),
-        }),
+      cell: ({ row }) => (
+        <C.Tooltip {...buildReleaseDateTooltip(row.original)}>
+          <C.BasicCell {...buildReleaseDate(row.original)} />
+        </C.Tooltip>
+      ),
       header: GA2_CATEGORY_LABEL.RELEASE_DATE,
       meta: {
         header: GA2_CATEGORY_LABEL.RELEASE_DATE,
@@ -195,7 +196,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
     },
     {
       accessorKey: GA2_CATEGORY_KEY.IS_REF,
-      cell: ({ row }) => C.ChipCell(buildIsRef(row.original)),
+      cell: ({ row }) => <C.ChipCell {...buildIsRef(row.original)} />,
       header: GA2_CATEGORY_LABEL.IS_REF,
       meta: {
         header: GA2_CATEGORY_LABEL.IS_REF,
@@ -204,7 +205,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
     },
     {
       accessorKey: GA2_CATEGORY_KEY.LEVEL,
-      cell: ({ row }) => C.LevelCell(buildLevel(row.original)),
+      cell: ({ row }) => <C.LevelCell {...buildLevel(row.original)} />,
       header: GA2_CATEGORY_LABEL.LEVEL,
       meta: {
         header: GA2_CATEGORY_LABEL.LEVEL,

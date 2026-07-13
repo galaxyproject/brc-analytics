@@ -12,7 +12,7 @@ import type { Organism } from "app/views/OrganismView/types";
 import { parseISO } from "date-fns";
 import { LinkProps } from "next/link";
 import Router from "next/router";
-import { ComponentProps, createElement } from "react";
+import { ComponentProps } from "react";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
@@ -130,14 +130,11 @@ export const buildAssemblyDetails = (
   const keyValuePairs = new Map<Key, Value>();
   keyValuePairs.set(
     BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
-    C.CopyText({
-      children: assembly.accession,
-      value: assembly.accession,
-    })
+    <C.CopyText value={assembly.accession}>{assembly.accession}</C.CopyText>
   );
   return {
     KeyElType: C.KeyElType,
-    KeyValuesElType: (props) => C.Stack({ ...props, gap: 4 }),
+    KeyValuesElType: (props) => <C.Stack {...props} gap={4} />,
     ValueElType: C.ValueElType,
     keyValuePairs,
   };
@@ -457,10 +454,10 @@ export const buildOrganismDetails = (
 
   keyValuePairs.set(
     BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
-    C.Link({
-      label: taxonomicLevelSpecies,
-      url: `${ROUTES.ORGANISMS}/${encodeURIComponent(sanitizeEntityId(ncbiTaxonomyId))}`,
-    })
+    <C.Link
+      label={taxonomicLevelSpecies}
+      url={`${ROUTES.ORGANISMS}/${encodeURIComponent(sanitizeEntityId(ncbiTaxonomyId))}`}
+    />
   );
   const taxonomicLevels: [Key, string[] | undefined][] = [
     [
@@ -482,13 +479,13 @@ export const buildOrganismDetails = (
   if (priorityPathogenName) {
     keyValuePairs.set(
       BRC_DATA_CATALOG_CATEGORY_LABEL.PRIORITY_PATHOGEN_NAME,
-      C.Chip(buildPriorityPathogen(organism))
+      <C.Chip {...buildPriorityPathogen(organism)} />
     );
   }
 
   return {
     KeyElType: C.KeyElType,
-    KeyValuesElType: (props) => C.Stack({ ...props, gap: 4 }),
+    KeyValuesElType: (props) => <C.Stack {...props} gap={4} />,
     ValueElType: C.ValueElType,
     keyValuePairs,
   };
@@ -648,10 +645,10 @@ export const buildPriorityPathogenDetails = (
   const keyValuePairs = new Map<Key, Value>();
   keyValuePairs.set(
     BRC_DATA_CATALOG_CATEGORY_LABEL.PRIORITY,
-    C.Chip({
-      color: getPriorityColor(priorityPathogen.priority),
-      label: getPriorityLabel(priorityPathogen.priority),
-      onClick: (): void => {
+    <C.Chip
+      color={getPriorityColor(priorityPathogen.priority)}
+      label={getPriorityLabel(priorityPathogen.priority)}
+      onClick={(): void => {
         Router.push({
           pathname: ROUTES.ORGANISMS,
           query: {
@@ -663,9 +660,9 @@ export const buildPriorityPathogenDetails = (
             ]),
           },
         });
-      },
-      variant: CHIP_PROPS.VARIANT.STATUS,
-    })
+      }}
+      variant={CHIP_PROPS.VARIANT.STATUS}
+    />
   );
   [
     ["Organisms", ROUTES.ORGANISMS],
@@ -673,13 +670,14 @@ export const buildPriorityPathogenDetails = (
   ].forEach(([key, pathname]) => {
     keyValuePairs.set(
       key,
-      C.AppLink({
-        children: priorityPathogen.taxonName,
-        href: getEntityLinkWithPriorityPathogenFilter(
+      <C.AppLink
+        href={getEntityLinkWithPriorityPathogenFilter(
           priorityPathogen,
           pathname
-        ),
-      })
+        )}
+      >
+        {priorityPathogen.taxonName}
+      </C.AppLink>
     );
   });
   return {
@@ -990,7 +988,7 @@ export const buildOrganismHero = (
   if (priorityTag) tags.push(priorityTag);
   return {
     breadcrumbs: getOrganismEntityBreadcrumbs(organism),
-    subTitle: tags.length > 0 ? createElement(C.TagList, { tags }) : undefined,
+    subTitle: tags.length > 0 ? <C.TagList tags={tags} /> : undefined,
     title: organism.taxonomicLevelSpecies,
   };
 };
@@ -1090,7 +1088,9 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
   return [
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.ANALYZE_GENOME,
-      cell: ({ row }) => C.AnalyzeGenome(buildAnalyzeGenome(row.original)),
+      cell: ({ row }) => (
+        <C.AnalyzeGenome {...buildAnalyzeGenome(row.original)} />
+      ),
       enableSorting: false,
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANALYZE_GENOME,
       meta: {
@@ -1103,8 +1103,9 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
       // (its primary text); the SpeciesCell renders the accession + per-assembly
       // tags.
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION,
-      cell: ({ row }) =>
-        C.SpeciesCell(buildOrganismGenomeSpecies(row.original)),
+      cell: ({ row }) => (
+        <C.SpeciesCell {...buildOrganismGenomeSpecies(row.original)} />
+      ),
       header: ASSEMBLY_COLUMN_HEADER,
       meta: {
         columnPinned: true,
@@ -1114,11 +1115,11 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.RELEASE_DATE,
-      cell: ({ row }) =>
-        C.Tooltip({
-          ...buildReleaseDateTooltip(row.original),
-          children: createElement(C.BasicCell, buildReleaseDate(row.original)),
-        }),
+      cell: ({ row }) => (
+        <C.Tooltip {...buildReleaseDateTooltip(row.original)}>
+          <C.BasicCell {...buildReleaseDate(row.original)} />
+        </C.Tooltip>
+      ),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.RELEASE_DATE,
       meta: {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.RELEASE_DATE,
@@ -1127,7 +1128,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.IS_REF,
-      cell: ({ row }) => C.ChipCell(buildIsRef(row.original)),
+      cell: ({ row }) => <C.ChipCell {...buildIsRef(row.original)} />,
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.IS_REF,
       meta: {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.IS_REF,
@@ -1136,7 +1137,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.LEVEL,
-      cell: ({ row }) => C.LevelCell(buildLevel(row.original)),
+      cell: ({ row }) => <C.LevelCell {...buildLevel(row.original)} />,
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.LEVEL,
       meta: {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.LEVEL,
@@ -1145,7 +1146,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.CHROMOSOMES,
-      cell: ({ row }) => C.BasicCell(buildChromosomes(row.original)),
+      cell: ({ row }) => <C.BasicCell {...buildChromosomes(row.original)} />,
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.CHROMOSOMES,
       meta: {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.CHROMOSOMES,
@@ -1154,7 +1155,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.LENGTH,
-      cell: ({ row }) => C.BasicCell(buildLength(row.original)),
+      cell: ({ row }) => <C.BasicCell {...buildLength(row.original)} />,
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.LENGTH,
       meta: {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.LENGTH,
@@ -1163,7 +1164,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_COUNT,
-      cell: ({ row }) => C.BasicCell(buildScaffoldCount(row.original)),
+      cell: ({ row }) => <C.BasicCell {...buildScaffoldCount(row.original)} />,
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_COUNT,
       meta: {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_COUNT,
@@ -1172,7 +1173,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_N50,
-      cell: ({ row }) => C.BasicCell(buildScaffoldN50(row.original)),
+      cell: ({ row }) => <C.BasicCell {...buildScaffoldN50(row.original)} />,
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_N50,
       meta: {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_N50,
@@ -1181,7 +1182,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_L50,
-      cell: ({ row }) => C.BasicCell(buildScaffoldL50(row.original)),
+      cell: ({ row }) => <C.BasicCell {...buildScaffoldL50(row.original)} />,
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_L50,
       meta: {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_L50,
@@ -1190,7 +1191,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.COVERAGE,
-      cell: ({ row }) => C.BasicCell(buildCoverage(row.original)),
+      cell: ({ row }) => <C.BasicCell {...buildCoverage(row.original)} />,
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.COVERAGE,
       meta: {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.COVERAGE,
@@ -1199,7 +1200,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.GC_PERCENT,
-      cell: ({ row }) => C.BasicCell(buildGcPercent(row.original)),
+      cell: ({ row }) => <C.BasicCell {...buildGcPercent(row.original)} />,
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.GC_PERCENT,
       meta: {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.GC_PERCENT,
@@ -1208,7 +1209,9 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.ANNOTATION_STATUS,
-      cell: ({ row }) => C.BasicCell(buildAnnotationStatus(row.original)),
+      cell: ({ row }) => (
+        <C.BasicCell {...buildAnnotationStatus(row.original)} />
+      ),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANNOTATION_STATUS,
       meta: {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANNOTATION_STATUS,
@@ -1244,7 +1247,7 @@ export const buildWorkflowConfiguration = (
   }
   return {
     KeyElType: C.KeyElType,
-    KeyValuesElType: (props) => C.Stack({ ...props, gap: 4 }),
+    KeyValuesElType: (props) => <C.Stack {...props} gap={4} />,
     ValueElType: C.TypographyWordBreak,
     keyValuePairs,
   };
@@ -1263,7 +1266,7 @@ export const buildWorkflowDetails = (
   keyValuePairs.set("Description", workflow.workflowDescription);
   return {
     KeyElType: C.KeyElType,
-    KeyValuesElType: (props) => C.Stack({ ...props, gap: 4 }),
+    KeyValuesElType: (props) => <C.Stack {...props} gap={4} />,
     ValueElType: C.ValueElType,
     keyValuePairs,
   };
