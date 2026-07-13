@@ -79,6 +79,10 @@ export async function loadPangenomes(): Promise<void> {
     return;
   }
 
+  // Optional data: a malformed (non-array) 200 payload must not throw and gate
+  // the core entity load.
+  if (!Array.isArray(pangenomes)) return;
+
   const pangenomeBySpeciesTaxonomyId = new Map<string, Pangenome>();
   for (const pangenome of pangenomes) {
     pangenomeBySpeciesTaxonomyId.set(pangenome.speciesTaxonomyId, pangenome);
