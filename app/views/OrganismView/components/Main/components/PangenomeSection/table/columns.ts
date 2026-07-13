@@ -30,6 +30,7 @@ const LEVEL: ColumnDef<PangenomeMember> = {
 };
 
 const REF: ColumnDef<PangenomeMember> = {
+  accessorKey: "isRef",
   cell: RefCell,
   header: "Ref",
   id: "isRef",
@@ -37,6 +38,7 @@ const REF: ColumnDef<PangenomeMember> = {
 };
 
 const SELECTION_TRACKS: ColumnDef<PangenomeMember> = {
+  accessorKey: "hasSelectionTracks",
   cell: SelectionTracksCell,
   header: "Selection tracks",
   id: "selectionTracks",
