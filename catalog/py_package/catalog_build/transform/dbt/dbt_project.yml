@@ -1,0 +1,22 @@
+name: "catalog_build"
+version: "1.0.0"
+config-version: 2
+
+# Profile is defined in the profiles.yml shipped alongside this project; point
+# dbt at it with `--profiles-dir` (build.py does this when it orchestrates the run).
+profile: "catalog_build"
+
+model-paths: ["models"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+  - "logs"
+
+models:
+  catalog_build:
+    +materialized: table
+
+data_tests:
+  +severity: warn
