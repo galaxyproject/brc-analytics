@@ -31,7 +31,7 @@ export const SPECIES_TAG_LABEL = {
  * assemblies). On the organism detail page these move to the header, so the
  * per-assembly species cell omits them.
  */
-export const ORGANISM_SCOPED_TAG_LABELS: string[] = [
+export const ORGANISM_SCOPED_TAG_LABELS: readonly string[] = [
   SPECIES_TAG_LABEL.GROUP,
   SPECIES_TAG_LABEL.PRIORITY,
 ];
