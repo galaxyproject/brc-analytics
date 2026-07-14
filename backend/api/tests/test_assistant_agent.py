@@ -1,10 +1,13 @@
 """Tests for AssistantAgent parsing and schema update logic."""
 
 import asyncio
+import json
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+from hypothesis import HealthCheck, given, settings
+from hypothesis import strategies as st
 from pydantic_ai.messages import (
     ModelRequest,
     ModelResponse,
@@ -108,11 +111,47 @@ class TestParseStructuredOutput:
         assert suggestions == []
         assert "not valid json" in text
 
-    def test_malformed_schema_kept_as_text(self, agent):
-        raw = "SCHEMA_UPDATE: {broken"
+    def test_malformed_schema_payload_stripped(self, agent):
+        # A marker followed by a broken JSON payload is excised, not shown --
+        # raw JSON must never leak into the visible reply.
+        raw = "Recorded it. SCHEMA_UPDATE: {broken"
         text, _, updates = agent._parse_structured_output(raw)
         assert updates == {}
-        assert "{broken" in text
+        assert "SCHEMA_UPDATE" not in text
+        assert "broken" not in text
+        assert text == "Recorded it."
+
+    def test_malformed_suggestions_json_stripped_not_leaked(self, agent):
+        # Real-world MiniMax failure: a SUGGESTIONS array with broken brackets
+        # (a string where an object belongs, then a second stray array). It
+        # can't be parsed, but it must still be stripped so the user never sees
+        # raw JSON -- we just produce no chips that turn.
+        raw = (
+            "Which Plasmodium species is your data from?\n\n"
+            'SUGGESTIONS: [{"label": "Use P. falciparum", "organism": "5833"}, '
+            '{"label": "Tell me about variant calling for malaria"], '
+            '[{"label": "Tell me about transcriptomics for malaria"]'
+        )
+        text, suggestions, _ = agent._parse_structured_output(raw)
+        assert "SUGGESTIONS" not in text
+        assert "[" not in text and "{" not in text
+        assert suggestions == []
+        assert text == "Which Plasmodium species is your data from?"
+
+    def test_malformed_suggestions_before_schema_update_preserved(self, agent):
+        # A malformed SUGGESTIONS trailer is excised through the last bracket in
+        # the reply. If a valid SCHEMA_UPDATE follows it, pulling SCHEMA_UPDATE
+        # out first keeps the update from being swallowed with the bad chips.
+        raw = (
+            "Recorded it.\n"
+            'SUGGESTIONS: [{"label": "broken"\n'
+            'SCHEMA_UPDATE: {"organism": "Plasmodium falciparum"}'
+        )
+        text, suggestions, updates = agent._parse_structured_output(raw)
+        assert updates == {"organism": "Plasmodium falciparum"}
+        assert "SCHEMA_UPDATE" not in text
+        assert "SUGGESTIONS" not in text
+        assert suggestions == []
 
     def test_multiline_body_preserved(self, agent):
         raw = 'Line 1\nLine 2\nLine 3\nSUGGESTIONS: ["Next"]'
@@ -130,6 +169,102 @@ class TestParseStructuredOutput:
         raw = '**SCHEMA_UPDATE:** {"organism": "E. coli"}'
         _, _, updates = agent._parse_structured_output(raw)
         assert updates == {"organism": "E. coli"}
+
+    def test_suggestions_inline_after_prose(self, agent):
+        # The marker can land inline at the end of a prose line (smaller models
+        # don't always put it on its own line). It must still be stripped, not
+        # leaked into the visible reply.
+        raw = 'Which species is your data from? SUGGESTIONS: ["P. falciparum", "P. knowlesi"]'
+        text, suggestions, _ = agent._parse_structured_output(raw)
+        assert text == "Which species is your data from?"
+        assert "SUGGESTIONS" not in text
+        assert len(suggestions) == 2
+
+    def test_suggestions_multiline_json(self, agent):
+        # A JSON value spanning multiple lines must be decoded and removed whole.
+        raw = 'Pick one.\nSUGGESTIONS: [\n  "Variant calling",\n  "Transcriptomics"\n]'
+        text, suggestions, _ = agent._parse_structured_output(raw)
+        assert text == "Pick one."
+        assert "SUGGESTIONS" not in text
+        assert len(suggestions) == 2
+
+    def test_inline_suggestions_invalid_json_left_as_prose(self, agent):
+        # A mid-prose "suggestions:" with JSON-ish but invalid text must be left
+        # alone -- only a line-start trailer is excised when it cannot parse.
+        raw = "I have a few suggestions: [check the docs, ask the forum]"
+        text, suggestions, _ = agent._parse_structured_output(raw)
+        assert text == raw
+        assert suggestions == []
+
+    def test_lowercase_prose_valid_json_left_as_prose(self, agent):
+        # A lowercase "suggestions:" mid-prose is prose, not a trailer -- even
+        # when the brackets are valid JSON it is left untouched and yields no
+        # chips (only a line-start or uppercase marker is a trailer).
+        raw = (
+            'I have a few suggestions: ["check the docs", "ask the forum"] '
+            "before you decide."
+        )
+        text, suggestions, _ = agent._parse_structured_output(raw)
+        assert text == raw
+        assert suggestions == []
+
+    def test_mixed_case_marker_wrong_shape_stripped(self, agent):
+        # A mixed-case "Schema_Update" is still a real (if mangled) trailer -- its
+        # wrong-shape payload must be excised, never left visible as raw JSON.
+        raw = 'Recorded it. Schema_Update: {"organism": 5833}'
+        text, _, updates = agent._parse_structured_output(raw)
+        assert updates == {}
+        assert "Schema_Update" not in text
+        assert "5833" not in text
+        assert text == "Recorded it."
+
+    def test_duplicate_schema_update_markers_merged(self, agent):
+        # A model that emits SCHEMA_UPDATE twice must not leave the second block
+        # (and its raw JSON) visible -- both are stripped and merged.
+        raw = (
+            "Recorded.\n"
+            'SCHEMA_UPDATE: {"organism": "A"}\n'
+            'SCHEMA_UPDATE: {"assembly": "B"}'
+        )
+        text, _, updates = agent._parse_structured_output(raw)
+        assert updates == {"organism": "A", "assembly": "B"}
+        assert "SCHEMA_UPDATE" not in text
+        assert "{" not in text and "}" not in text
+        assert text == "Recorded."
+
+    def test_duplicate_suggestions_markers_not_leaked(self, agent):
+        # Two SUGGESTIONS blocks -- neither may leak; the last one wins.
+        raw = 'Pick.\nSUGGESTIONS: ["A"]\nSUGGESTIONS: ["B", "C"]'
+        text, suggestions, _ = agent._parse_structured_output(raw)
+        assert "SUGGESTIONS" not in text
+        assert "[" not in text and "]" not in text
+        assert [c.label for c in suggestions] == ["B", "C"]
+        assert text == "Pick."
+
+    def test_malformed_schema_update_preserves_following_suggestions(self, agent):
+        # A broken SCHEMA_UPDATE trailer must not reach through and delete the
+        # SUGGESTIONS the prompt places after it. The malformed update is
+        # dropped (never leaked), but the valid chips survive.
+        raw = (
+            "I found a few variant-calling workflows that fit your data.\n"
+            'SCHEMA_UPDATE: {"organism": "Plasmodium falciparum", "workflow": broken\n'
+            'SUGGESTIONS: ["Variant calling", "Transcriptomics"]'
+        )
+        text, suggestions, updates = agent._parse_structured_output(raw)
+        assert updates == {}
+        assert [c.label for c in suggestions] == ["Variant calling", "Transcriptomics"]
+        assert "SCHEMA_UPDATE" not in text
+        assert "broken" not in text
+        assert "{" not in text
+        assert text == "I found a few variant-calling workflows that fit your data."
+
+    def test_schema_update_inline_after_prose(self, agent):
+        # Same for SCHEMA_UPDATE emitted inline after prose.
+        raw = 'Recorded it. SCHEMA_UPDATE: {"organism": "Plasmodium falciparum"}'
+        text, _, updates = agent._parse_structured_output(raw)
+        assert "SCHEMA_UPDATE" not in text
+        assert updates == {"organism": "Plasmodium falciparum"}
+        assert text == "Recorded it."
 
     # ---- catalog-grounded suggestion chips (#1297) ----
 
@@ -260,10 +395,14 @@ class TestParseStructuredOutput:
 
 
 class TestApplySchemaUpdates:
-    def test_empty_updates_returns_same(self, agent):
+    def test_empty_updates_reconciles_copy(self, agent):
+        # Empty updates no longer short-circuits: it returns a reconciled copy so
+        # a restored session's derived fields are always recomputed (Codex #9).
         schema = AnalysisSchema()
         result = agent._apply_schema_updates(schema, {})
-        assert result is schema  # same object, not a copy
+        assert result is not schema
+        assert result.organism.status == FieldStatus.EMPTY
+        assert result.data_characteristics.status == FieldStatus.EMPTY
 
     def test_sets_organism(self, agent):
         schema = AnalysisSchema()
@@ -360,8 +499,50 @@ class TestApplySchemaUpdates:
         result = agent._apply_schema_updates(
             schema, {"workflow": "some-other-workflow"}
         )
-        assert result.workflow.status == FieldStatus.FILLED
+        # No visible catalog match -> not committed: stays EMPTY rather than
+        # FILLED with a null detail (Codex #10).
+        assert result.workflow.status == FieldStatus.EMPTY
+
+    def test_unresolvable_workflow_clears_existing(self, agent):
+        # Switching to an unresolvable workflow must clear the field, not keep
+        # the OLD filled workflow -- otherwise a handoff fires on the wrong one
+        # (Codex).
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "ASSEMBLY",
+                "workflows": [
+                    {"iwcId": "real", "trsId": "trs-real", "workflowName": "Real"}
+                ],
+            }
+        ]
+        schema = AnalysisSchema(
+            workflow=SchemaField(
+                value="Variant A", detail="trs-a", status=FieldStatus.FILLED
+            )
+        )
+        result = agent._apply_schema_updates(
+            schema, {"workflow": "not-a-visible-workflow"}
+        )
+        assert result.workflow.status == FieldStatus.EMPTY
         assert result.workflow.detail is None
+
+    def test_restored_invalid_workflow_cleared(self, agent):
+        # A restored session with a FILLED workflow whose detail no longer maps
+        # to a visible catalog entry is cleared, so it can't complete or hand off
+        # on a phantom workflow (Copilot).
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "ASSEMBLY",
+                "workflows": [{"iwcId": "real", "trsId": "trs-real"}],
+            }
+        ]
+        schema = AnalysisSchema(
+            workflow=SchemaField(
+                value="Old WF", detail="trs-gone", status=FieldStatus.FILLED
+            )
+        )
+        result = agent._apply_schema_updates(schema, {})
+        assert result.workflow.status == FieldStatus.EMPTY
 
     def test_preserves_existing_fields(self, agent):
         schema = AnalysisSchema(
@@ -415,9 +596,12 @@ class TestApplySchemaUpdates:
         )
         assert result.workflow.detail == "#workflow/github.com/iwc/rnaseq-pe/main"
 
-    def test_gene_annotation_needs_attention_when_workflow_requires_gtf(self, agent):
-        # A GTF-requiring workflow must not leave gene annotation looking optional
-        # (#1324/#1331) -- it should surface as needing attention.
+    def test_gene_annotation_pending_when_workflow_needs_gtf_but_no_assembly(
+        self, agent
+    ):
+        # A GTF-requiring workflow with no assembly chosen yet must stay pending,
+        # not prematurely flag attention -- availability can't be judged without
+        # an assembly (Copilot).
         agent.catalog.workflows_by_category = [
             {
                 "category": "TRANSCRIPTOMICS",
@@ -434,7 +618,7 @@ class TestApplySchemaUpdates:
             AnalysisSchema(), {"workflow": "RNA-Seq (rnaseq-pe)"}
         )
         assert result.workflow.status == FieldStatus.FILLED
-        assert result.gene_annotation.status == FieldStatus.NEEDS_ATTENTION
+        assert result.gene_annotation.status == FieldStatus.EMPTY
 
     def test_gene_annotation_stays_optional_when_workflow_has_no_gtf(self, agent):
         # A workflow with no GENE_MODEL_URL param leaves gene annotation empty so
@@ -456,6 +640,480 @@ class TestApplySchemaUpdates:
         )
         assert result.workflow.status == FieldStatus.FILLED
         assert result.gene_annotation.status == FieldStatus.EMPTY
+
+    def test_data_characteristics_filled_from_paired_workflow(self, agent):
+        # Read layout is a workflow constraint -- derive it from the workflow's
+        # SANGER_READ_RUN_PAIRED param instead of waiting on the model to emit it.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "VARIANT_CALLING",
+                "workflows": [
+                    {
+                        "iwcId": "ploidy-main",
+                        "trsId": "trs-ploidy",
+                        "parameters": [
+                            {"variable": "SANGER_READ_RUN_PAIRED"},
+                            {"variable": "ASSEMBLY_FASTA_URL"},
+                        ],
+                    }
+                ],
+            }
+        ]
+        result = agent._apply_schema_updates(
+            AnalysisSchema(), {"workflow": "Ploidy-aware calling (ploidy-main)"}
+        )
+        assert result.data_characteristics.status == FieldStatus.FILLED
+        assert result.data_characteristics.value == "Paired-end sequencing reads"
+
+    def test_data_characteristics_includes_library_strategy(self, agent):
+        # When the catalog declares a library strategy, fold it into the label.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "VARIANT_CALLING",
+                "workflows": [
+                    {
+                        "iwcId": "wgs-pe",
+                        "trsId": "trs-wgs",
+                        "parameters": [
+                            {
+                                "variable": "SANGER_READ_RUN_PAIRED",
+                                "data_requirements": {
+                                    "library_layout": "PAIRED",
+                                    "library_strategy": ["WGS"],
+                                },
+                            }
+                        ],
+                    }
+                ],
+            }
+        ]
+        result = agent._apply_schema_updates(
+            AnalysisSchema(), {"workflow": "WGS PE (wgs-pe)"}
+        )
+        assert result.data_characteristics.status == FieldStatus.FILLED
+        assert result.data_characteristics.value == "Paired-end WGS reads"
+
+    def test_data_characteristics_empty_when_workflow_takes_no_reads(self, agent):
+        # A workflow with no SANGER_READ_RUN param leaves data characteristics empty.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "ASSEMBLY",
+                "workflows": [
+                    {
+                        "iwcId": "asm-only",
+                        "trsId": "trs-asm",
+                        "parameters": [{"variable": "ASSEMBLY_ID"}],
+                    }
+                ],
+            }
+        ]
+        result = agent._apply_schema_updates(
+            AnalysisSchema(), {"workflow": "Assembly (asm-only)"}
+        )
+        assert result.data_characteristics.status == FieldStatus.EMPTY
+
+    def test_data_characteristics_genome_fasta_workflow(self, agent):
+        # A workflow that takes an assembled genome instead of reads -- e.g.
+        # Braker3 annotation -- characterises its input as a FASTA assembly so
+        # the field fills and the analysis can complete.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "ANNOTATION",
+                "workflows": [
+                    {
+                        "iwcId": "braker3",
+                        "trsId": "trs-braker3",
+                        "parameters": [{"variable": "ASSEMBLY_FASTA_URL"}],
+                    }
+                ],
+            }
+        ]
+        result = agent._apply_schema_updates(
+            AnalysisSchema(), {"workflow": "Braker3 annotation (braker3)"}
+        )
+        assert result.data_characteristics.status == FieldStatus.FILLED
+        assert result.data_characteristics.value == "Assembled genome (FASTA)"
+
+    def test_data_characteristics_single_file_read_variant(self, agent):
+        # Flye-style read input uses SANGER_READ_RUN_SINGLE_FILE (not the bare
+        # _SINGLE name); the layout comes from data_requirements.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "ASSEMBLY",
+                "workflows": [
+                    {
+                        "iwcId": "flye",
+                        "trsId": "trs-flye",
+                        "parameters": [
+                            {
+                                "variable": "SANGER_READ_RUN_SINGLE_FILE",
+                                "data_requirements": {"library_layout": "SINGLE"},
+                            }
+                        ],
+                    }
+                ],
+            }
+        ]
+        result = agent._data_characteristics_for_workflow("trs-flye")
+        assert result is not None
+        assert result[0] == "Single-end sequencing reads"
+
+    def test_data_characteristics_forward_reverse_file_read_variant(self, agent):
+        # Shovill-style paired reads use SANGER_READ_RUN_FORWARD_FILE +
+        # REVERSE_FILE; both carry library_layout PAIRED.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "ASSEMBLY",
+                "workflows": [
+                    {
+                        "iwcId": "shovill",
+                        "trsId": "trs-shovill",
+                        "parameters": [
+                            {
+                                "variable": "SANGER_READ_RUN_FORWARD_FILE",
+                                "data_requirements": {"library_layout": "PAIRED"},
+                            },
+                            {
+                                "variable": "SANGER_READ_RUN_REVERSE_FILE",
+                                "data_requirements": {"library_layout": "PAIRED"},
+                            },
+                        ],
+                    }
+                ],
+            }
+        ]
+        result = agent._data_characteristics_for_workflow("trs-shovill")
+        assert result is not None
+        assert result[0] == "Paired-end sequencing reads"
+
+    def test_workflow_by_ref_ignores_organism_scope(self, agent):
+        # A ref to a hidden ORGANISM-scope workflow (e.g. carried in a restored
+        # session) must not resolve, so its inputs can't drive derivation or a
+        # handoff (Codex #5).
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "ASSEMBLY",
+                "workflows": [
+                    {
+                        "iwcId": "flye",
+                        "trsId": "trs-flye",
+                        "scope": "ORGANISM",
+                        "parameters": [
+                            {
+                                "variable": "SANGER_READ_RUN_SINGLE_FILE",
+                                "data_requirements": {"library_layout": "SINGLE"},
+                            }
+                        ],
+                    }
+                ],
+            }
+        ]
+        assert agent._workflow_by_ref("trs-flye") is None
+        assert agent._data_characteristics_for_workflow("trs-flye") is None
+
+    def test_empty_updates_still_reconciles_stale_derived(self, agent):
+        # A restored session can carry stale derived state with no new updates;
+        # the reflectors must still run so it is corrected (Codex #9).
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "ASSEMBLY",
+                "workflows": [
+                    {
+                        "iwcId": "asm-only",
+                        "trsId": "trs-asm",
+                        "parameters": [{"variable": "ASSEMBLY_ID"}],
+                    }
+                ],
+            }
+        ]
+        stale = AnalysisSchema(
+            workflow=SchemaField(
+                value="Assembly (asm-only)",
+                detail="trs-asm",
+                status=FieldStatus.FILLED,
+            ),
+            data_characteristics=SchemaField(
+                value="Paired-end sequencing reads",
+                detail="Required by the selected workflow",
+                status=FieldStatus.FILLED,
+            ),
+        )
+        result = agent._apply_schema_updates(stale, {})
+        assert result.data_characteristics.status == FieldStatus.EMPTY
+
+    def test_data_characteristics_cleared_when_workflow_unset(self, agent):
+        # Clearing the workflow (a mid-conversation correction) must drop a value
+        # derived from the old workflow rather than leave it stale.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "VARIANT_CALLING",
+                "workflows": [
+                    {
+                        "iwcId": "ploidy-main",
+                        "trsId": "trs-ploidy",
+                        "parameters": [{"variable": "SANGER_READ_RUN_PAIRED"}],
+                    }
+                ],
+            }
+        ]
+        filled = agent._apply_schema_updates(
+            AnalysisSchema(), {"workflow": "Ploidy-aware calling (ploidy-main)"}
+        )
+        assert filled.data_characteristics.status == FieldStatus.FILLED
+        cleared = agent._apply_schema_updates(filled, {"workflow": None})
+        assert cleared.data_characteristics.status == FieldStatus.EMPTY
+
+    def test_data_characteristics_cleared_when_workflow_has_no_derivation(self, agent):
+        # Swapping to a workflow that supplies no characteristics clears the value
+        # derived from the previous workflow.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "VARIANT_CALLING",
+                "workflows": [
+                    {
+                        "iwcId": "ploidy-main",
+                        "trsId": "trs-ploidy",
+                        "parameters": [{"variable": "SANGER_READ_RUN_PAIRED"}],
+                    },
+                    {
+                        "iwcId": "asm-only",
+                        "trsId": "trs-asm",
+                        "parameters": [{"variable": "ASSEMBLY_ID"}],
+                    },
+                ],
+            }
+        ]
+        filled = agent._apply_schema_updates(
+            AnalysisSchema(), {"workflow": "Ploidy-aware calling (ploidy-main)"}
+        )
+        assert filled.data_characteristics.status == FieldStatus.FILLED
+        swapped = agent._apply_schema_updates(
+            filled, {"workflow": "Assembly (asm-only)"}
+        )
+        assert swapped.data_characteristics.status == FieldStatus.EMPTY
+
+    def test_data_characteristics_recomputed_when_model_reemits_value(self, agent):
+        # The prompt has the model re-emit committed fields each turn, so it can
+        # re-send a derived data_characteristics as a plain value (detail lost).
+        # The catalog is authoritative: recompute from the new workflow rather
+        # than trust the re-emitted value.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "VARIANT_CALLING",
+                "workflows": [
+                    {
+                        "iwcId": "ploidy-main",
+                        "trsId": "trs-ploidy",
+                        "parameters": [{"variable": "SANGER_READ_RUN_PAIRED"}],
+                    },
+                    {
+                        "iwcId": "asm-only",
+                        "trsId": "trs-asm",
+                        "parameters": [{"variable": "ASSEMBLY_ID"}],
+                    },
+                ],
+            }
+        ]
+        filled = agent._apply_schema_updates(
+            AnalysisSchema(), {"workflow": "Ploidy-aware calling (ploidy-main)"}
+        )
+        assert filled.data_characteristics.value == "Paired-end sequencing reads"
+        result = agent._apply_schema_updates(
+            filled,
+            {
+                "workflow": "Assembly (asm-only)",
+                "data_characteristics": "Paired-end sequencing reads",
+            },
+        )
+        assert result.data_characteristics.status == FieldStatus.EMPTY
+
+    def test_gene_annotation_filled_when_assembly_has_gene_model(self, agent):
+        # A GTF-requiring workflow whose assembly ships a gene model fills the
+        # annotation (setup resolves the URL automatically).
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "VARIANT_CALLING",
+                "workflows": [
+                    {
+                        "iwcId": "var-pe",
+                        "trsId": "trs-var",
+                        "parameters": [
+                            {"variable": "SANGER_READ_RUN_PAIRED"},
+                            {"variable": "GENE_MODEL_URL"},
+                        ],
+                    }
+                ],
+            }
+        ]
+        agent.catalog.get_assembly_details.return_value = {
+            "gene_model_url": "https://example.org/genes.gtf.gz"
+        }
+        schema = AnalysisSchema(
+            assembly=SchemaField(
+                value="P. falciparum GCF_000002765.6",
+                detail="GCF_000002765.6",
+                status=FieldStatus.FILLED,
+            )
+        )
+        result = agent._apply_schema_updates(
+            schema, {"workflow": "Variant calling (var-pe)"}
+        )
+        assert result.gene_annotation.status == FieldStatus.FILLED
+        assert result.gene_annotation.value == "Reference GTF"
+
+    def test_gene_annotation_needs_attention_when_assembly_lacks_gene_model(
+        self, agent
+    ):
+        # Same workflow, but the assembly has no gene model -> needs attention.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "VARIANT_CALLING",
+                "workflows": [
+                    {
+                        "iwcId": "var-pe",
+                        "trsId": "trs-var",
+                        "parameters": [{"variable": "GENE_MODEL_URL"}],
+                    }
+                ],
+            }
+        ]
+        agent.catalog.get_assembly_details.return_value = {"gene_model_url": None}
+        schema = AnalysisSchema(
+            assembly=SchemaField(
+                value="Some assembly GCF_999999999.1",
+                detail="GCF_999999999.1",
+                status=FieldStatus.FILLED,
+            )
+        )
+        result = agent._apply_schema_updates(
+            schema, {"workflow": "Variant calling (var-pe)"}
+        )
+        assert result.gene_annotation.status == FieldStatus.NEEDS_ATTENTION
+        assert result.gene_annotation.value == "Reference GTF"
+
+    def test_assembly_gene_model_url_treats_none_string_defensively(self, agent):
+        # The catalog stores a missing gene model as null (-> Python None); the
+        # lookup also treats a literal "None" string as absent, guarding against
+        # a stringified null upstream.
+        agent.catalog.get_assembly_details.return_value = {"gene_model_url": "None"}
+        schema = AnalysisSchema(
+            assembly=SchemaField(
+                value="A GCF_000000001.1",
+                detail="GCF_000000001.1",
+                status=FieldStatus.FILLED,
+            )
+        )
+        assert agent._assembly_gene_model_url(schema) is None
+
+    def test_gene_annotation_reevaluated_when_assembly_loses_gene_model(self, agent):
+        # An auto-selected GTF must be re-evaluated when the user switches to an
+        # assembly with no gene model -- it can't stay FILLED as "Reference GTF".
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "VARIANT_CALLING",
+                "workflows": [
+                    {
+                        "iwcId": "var-pe",
+                        "trsId": "trs-var",
+                        "parameters": [{"variable": "GENE_MODEL_URL"}],
+                    }
+                ],
+            }
+        ]
+        agent.catalog.get_assembly_details.side_effect = lambda acc: (
+            {"gene_model_url": "https://example.org/genes.gtf.gz"}
+            if acc == "GCF_000002765.6"
+            else {"gene_model_url": None}
+        )
+        schema = AnalysisSchema(
+            assembly=SchemaField(
+                value="Has model GCF_000002765.6",
+                detail="GCF_000002765.6",
+                status=FieldStatus.FILLED,
+            )
+        )
+        filled = agent._apply_schema_updates(
+            schema, {"workflow": "Variant calling (var-pe)"}
+        )
+        assert filled.gene_annotation.status == FieldStatus.FILLED
+        assert filled.gene_annotation.value == "Reference GTF"
+        switched = agent._apply_schema_updates(
+            filled, {"assembly": "No model GCF_999999999.1"}
+        )
+        assert switched.gene_annotation.status == FieldStatus.NEEDS_ATTENTION
+
+    def test_gene_annotation_cleared_when_workflow_unset(self, agent):
+        # Clearing the workflow drops an auto-selected GTF rather than leaving it
+        # stale with no workflow selected.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "VARIANT_CALLING",
+                "workflows": [
+                    {
+                        "iwcId": "var-pe",
+                        "trsId": "trs-var",
+                        "parameters": [{"variable": "GENE_MODEL_URL"}],
+                    }
+                ],
+            }
+        ]
+        agent.catalog.get_assembly_details.return_value = {
+            "gene_model_url": "https://example.org/genes.gtf.gz"
+        }
+        schema = AnalysisSchema(
+            assembly=SchemaField(
+                value="Has model GCF_000002765.6",
+                detail="GCF_000002765.6",
+                status=FieldStatus.FILLED,
+            )
+        )
+        filled = agent._apply_schema_updates(
+            schema, {"workflow": "Variant calling (var-pe)"}
+        )
+        assert filled.gene_annotation.status == FieldStatus.FILLED
+        cleared = agent._apply_schema_updates(filled, {"workflow": None})
+        assert cleared.gene_annotation.status == FieldStatus.EMPTY
+
+    def test_gene_annotation_recomputed_when_model_reemits_value(self, agent):
+        # Same for gene annotation: a re-emitted "Reference GTF" (detail lost)
+        # must not pin the field FILLED after the user switches to an assembly
+        # with no gene model.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "VARIANT_CALLING",
+                "workflows": [
+                    {
+                        "iwcId": "var-pe",
+                        "trsId": "trs-var",
+                        "parameters": [{"variable": "GENE_MODEL_URL"}],
+                    }
+                ],
+            }
+        ]
+        agent.catalog.get_assembly_details.side_effect = lambda acc: (
+            {"gene_model_url": "https://example.org/genes.gtf.gz"}
+            if acc == "GCF_000002765.6"
+            else {"gene_model_url": None}
+        )
+        schema = AnalysisSchema(
+            assembly=SchemaField(
+                value="Has model GCF_000002765.6",
+                detail="GCF_000002765.6",
+                status=FieldStatus.FILLED,
+            )
+        )
+        filled = agent._apply_schema_updates(
+            schema, {"workflow": "Variant calling (var-pe)"}
+        )
+        assert filled.gene_annotation.value == "Reference GTF"
+        result = agent._apply_schema_updates(
+            filled,
+            {
+                "assembly": "No model GCF_999999999.1",
+                "gene_annotation": "Reference GTF",
+            },
+        )
+        assert result.gene_annotation.status == FieldStatus.NEEDS_ATTENTION
 
 
 # ---------- compute_handoff ----------
@@ -916,6 +1574,9 @@ async def test_chat_handoff_url_carries_assistant_session_id(agent):
             all_messages=lambda: [],
         )
     )
+    # data_characteristics is derived from the workflow's read inputs (a real
+    # varcall workflow takes reads), so the fixture carries the param; the
+    # model's re-emitted "Paired-end reads" is overridden by the catalog.
     agent.catalog.workflows_by_category = [
         {
             "category": "VARIANT_CALLING",
@@ -923,6 +1584,7 @@ async def test_chat_handoff_url_carries_assistant_session_id(agent):
                 {
                     "iwcId": "varcall-haploid",
                     "trsId": "#workflow/github.com/iwc/varcall-haploid/main",
+                    "parameters": [{"variable": "SANGER_READ_RUN_PAIRED"}],
                 }
             ],
         }
@@ -941,3 +1603,196 @@ async def test_chat_handoff_url_carries_assistant_session_id(agent):
     assert state.messages[-1] == ChatMessage(
         role=MessageRole.ASSISTANT, content="Ready to go."
     )
+
+
+# ---------- parser invariants (property-based net) ----------
+
+_pi_prose = st.text(
+    alphabet="abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ.,?!()-",
+    max_size=60,
+).filter(lambda t: "schema_update" not in t.lower() and "suggestions" not in t.lower())
+_pi_field = st.sampled_from(
+    ["organism", "assembly", "analysis_type", "workflow", "data_source"]
+)
+_pi_val = (
+    st.text(alphabet="abcdefghijklmnopqrstuvwxyz ", min_size=1, max_size=15)
+    .map(str.strip)
+    .filter(lambda x: x)
+)
+_pi_schema = st.dictionaries(_pi_field, _pi_val, min_size=1, max_size=3)
+_pi_sugg = st.lists(_pi_val, min_size=1, max_size=4, unique=True)
+_pi_ws = st.sampled_from(["", " ", "  "])
+_pi_settings = settings(
+    max_examples=150,
+    suppress_health_check=[HealthCheck.function_scoped_fixture],
+)
+
+
+class TestParserInvariants:
+    """Property net over _parse_structured_output so new parsing misses surface
+    here, not in review. Three invariants across fuzzed inputs: valid trailers
+    round-trip, malformed trailers never leak raw JSON, pure prose is preserved.
+    Scoped to the trailer-on-its-own-line space the prompt requests; the
+    inherent-ambiguity cases are xfail below and are resolved by the
+    structured-output migration, not by more heuristics."""
+
+    @_pi_settings
+    @given(prose=_pi_prose, su=_pi_schema, sg=_pi_sugg, ws=_pi_ws, bold=st.booleans())
+    def test_valid_trailers_round_trip(self, agent, prose, su, sg, ws, bold):
+        marker = "**SCHEMA_UPDATE**" if bold else "SCHEMA_UPDATE"
+        raw = (
+            prose
+            + "\n"
+            + marker
+            + ws
+            + ": "
+            + json.dumps(su)
+            + "\nSUGGESTIONS: "
+            + json.dumps(sg)
+        )
+        text, suggestions, updates = agent._parse_structured_output(raw)
+        assert updates == su
+        assert [c.label for c in suggestions] == sg
+        assert text == prose.strip()
+        assert "SCHEMA_UPDATE" not in text and "SUGGESTIONS" not in text
+
+    @_pi_settings
+    @given(prose=_pi_prose, su=_pi_schema)
+    def test_malformed_schema_never_leaks(self, agent, prose, su):
+        raw = prose + "\nSCHEMA_UPDATE: " + json.dumps(su)[:-1]
+        text, _, updates = agent._parse_structured_output(raw)
+        assert updates == {}
+        assert not any(ch in text for ch in "{}[]")
+        assert "SCHEMA_UPDATE" not in text
+
+    @_pi_settings
+    @given(prose=_pi_prose)
+    def test_pure_prose_preserved(self, agent, prose):
+        text, suggestions, updates = agent._parse_structured_output(prose)
+        assert text == prose.strip()
+        assert suggestions == []
+        assert updates == {}
+
+    # ---- specific residual leaks surfaced by the Codex adversarial pass ----
+
+    def test_marker_word_inside_malformed_string_no_leak(self, agent):
+        raw = (
+            "Recorded.\n"
+            'SCHEMA_UPDATE: {"organism": "has SUGGESTIONS inside", '
+            '"workflow": broken}\n'
+            'SUGGESTIONS: ["Next"]'
+        )
+        text, suggestions, updates = agent._parse_structured_output(raw)
+        assert updates == {}
+        assert [c.label for c in suggestions] == ["Next"]
+        assert "SUGGESTIONS inside" not in text
+        assert not any(ch in text for ch in "{}")
+        assert text == "Recorded."
+
+    def test_valid_prefix_trailing_junk_stripped(self, agent):
+        raw = 'Pick.\nSUGGESTIONS: ["A"], ["B"]'
+        text, suggestions, _ = agent._parse_structured_output(raw)
+        assert [c.label for c in suggestions] == ["A"]
+        assert not any(ch in text for ch in "[]")
+        assert text == "Pick."
+
+    def test_malformed_bracket_in_string_no_leak(self, agent):
+        # A malformed payload with a ]/} inside a string literal must be fully
+        # excised -- cutting at that inner bracket leaves the tail visible
+        # (Copilot). No raw JSON may reach the user.
+        raw = (
+            "Recorded.\n"
+            'SCHEMA_UPDATE: {"note": "has ] bracket", "x": broken\n'
+            'SUGGESTIONS: ["Next"]'
+        )
+        text, suggestions, updates = agent._parse_structured_output(raw)
+        assert updates == {}
+        assert [c.label for c in suggestions] == ["Next"]
+        assert "bracket" not in text
+        assert not any(ch in text for ch in "{}[]")
+        assert text == "Recorded."
+
+    def test_marker_word_line_inside_malformed_string_no_leak(self, agent):
+        # A malformed multi-line payload whose string value contains a line that
+        # *starts* with a marker word (but no trailer syntax) must not bound the
+        # excision there and leak the tail (Codex).
+        raw = (
+            "Recorded.\n"
+            'SCHEMA_UPDATE: {"note": "first line\n'
+            'SUGGESTIONS are [not json", "workflow": broken}\n'
+            'SUGGESTIONS: ["Next"]'
+        )
+        text, suggestions, updates = agent._parse_structured_output(raw)
+        assert updates == {}
+        assert [c.label for c in suggestions] == ["Next"]
+        assert not any(ch in text for ch in "{}[]")
+        assert "SUGGESTIONS are" not in text and "broken" not in text
+        assert text == "Recorded."
+
+    def test_wrong_shape_trailing_junk_no_leak(self, agent):
+        # A parseable-but-wrong-shape payload followed by same-line junk (e.g. a
+        # second object) must strip the whole trailer line, not leak the tail.
+        raw = (
+            'Recorded. SCHEMA_UPDATE: {"organism": 5833}, '
+            '{"assembly": "GCF_000146045.2"}'
+        )
+        text, _, updates = agent._parse_structured_output(raw)
+        assert updates == {}
+        assert not any(ch in text for ch in "{}[]")
+        assert "assembly" not in text
+        assert text == "Recorded."
+
+    @_pi_settings
+    @given(prose=_pi_prose, junk=st.text(alphabet="abc [{,: ", max_size=30))
+    def test_malformed_embedding_marker_line_never_leaks(self, agent, prose, junk):
+        # Malformed payloads that embed a newline and a line starting with a
+        # marker word must never leak raw JSON or a marker into the reply.
+        payload = '{"note": "' + junk + '\nSUGGESTIONS are broken [x", "y": nope'
+        raw = prose + "\nSCHEMA_UPDATE: " + payload
+        text, _, updates = agent._parse_structured_output(raw)
+        assert updates == {}
+        assert not any(ch in text for ch in "{}[]")
+        assert "SCHEMA_UPDATE" not in text
+
+    def test_inline_trailer_after_malformed_dropped_no_leak(self, agent):
+        # Trade-off: an inline trailer sharing a line with a malformed one is
+        # dropped rather than risk a leak (an inline boundary can't be told apart
+        # from a marker inside a string). No raw JSON leaks; chips are lost.
+        raw = 'Recorded. SCHEMA_UPDATE: {"organism": broken SUGGESTIONS: ["Next"]'
+        text, suggestions, updates = agent._parse_structured_output(raw)
+        assert updates == {}
+        assert not any(ch in text for ch in "{}[]")
+        assert text == "Recorded."
+        assert suggestions == []
+
+    def test_whitespace_before_colon_extracted(self, agent):
+        raw = 'Recorded. SCHEMA_UPDATE : {"organism": "P. falciparum"}'
+        text, _, updates = agent._parse_structured_output(raw)
+        assert updates == {"organism": "P. falciparum"}
+        assert "SCHEMA_UPDATE" not in text
+        assert text == "Recorded."
+
+    # ---- inherent scrape ambiguity: deferred to the structured-output migration ----
+
+    @pytest.mark.xfail(
+        strict=True,
+        reason="Inherent to scraping: an uppercase marker inside a string is "
+        "indistinguishable from a real inline trailer. Resolved by the "
+        "structured-output migration (follow-up PR), not more heuristics.",
+    )
+    def test_uppercase_marker_with_brace_in_suggestion(self, agent):
+        raw = 'Pick.\nSUGGESTIONS: ["config uses SCHEMA_UPDATE: {values}"]'
+        _, suggestions, updates = agent._parse_structured_output(raw)
+        assert updates == {}
+        assert [c.label for c in suggestions] == ["config uses SCHEMA_UPDATE: {values}"]
+
+    @pytest.mark.xfail(
+        strict=True,
+        reason="Inherent to scraping: all-caps inline prose is indistinguishable "
+        "from an inline trailer. Resolved by the structured-output migration.",
+    )
+    def test_all_caps_prose_not_a_trailer(self, agent):
+        raw = 'MY SUGGESTIONS: ["check the docs"] before you decide.'
+        text, suggestions, _ = agent._parse_structured_output(raw)
+        assert suggestions == []
+        assert text == raw

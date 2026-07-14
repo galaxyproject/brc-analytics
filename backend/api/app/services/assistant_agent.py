@@ -64,6 +64,11 @@ logger = logging.getLogger(__name__)
 # fence-break attempts in user text.
 _USER_INPUT_CLOSE_TAG = re.compile(r"</\s*user_input\s*>", re.IGNORECASE)
 
+# Either structured-output trailer keyword. Used to bound a malformed marker's
+# excision so it can't reach past the next trailer -- the prompt places
+# SUGGESTIONS after SCHEMA_UPDATE, so a broken SCHEMA_UPDATE must not swallow it.
+_TRAILER_MARKER = re.compile(r"\*{0,2}\b(?:schema_update|suggestions)\b", re.IGNORECASE)
+
 # ~20 turn-pairs; tool-heavy turns produce 3-5 messages each, so this
 # bounds total context while preserving good conversational continuity.
 MAX_HISTORY_MESSAGES = 40
@@ -72,6 +77,12 @@ MAX_HISTORY_MESSAGES = 40
 # session payload size bounded even if a client carries a session for hours.
 MAX_USER_FACING_MESSAGES = 100
 ASSISTANT_RUN_TIMEOUT_SECONDS = 105.0
+
+# Human-readable "detail" labels for the tracker fields the catalog derives
+# (data characteristics, gene annotation). These fields are always recomputed
+# from the workflow/assembly, so the labels are informational only.
+_DATA_CHARACTERISTICS_DERIVED_DETAIL = "Required by the selected workflow"
+_GENE_ANNOTATION_AUTO_DETAIL = "Auto-selected from the assembly"
 
 
 class AssistantTimeoutError(RuntimeError):
@@ -239,10 +250,14 @@ for catalog data.
 
 ## Schema updates
 
-When the user **makes a decision** (selects an organism, picks an assembly, \
-chooses an analysis type, etc.), emit a SCHEMA_UPDATE line at the end of your \
-response with the fields that changed. Only include fields where the user has \
-committed to a choice — do NOT set fields just because you listed options.
+On every turn where the user has committed to one or more choices so far in \
+this conversation, emit a SCHEMA_UPDATE line at the end of your response. \
+Include **all** fields the user has committed to up to now — re-emit the fields \
+you set on earlier turns, not only the one that changed this turn. Re-emitting \
+the already-known fields every turn is required: it keeps the analysis tracker \
+in sync even when an earlier turn left one out. Only include a field once the \
+user has actually committed to a choice — do NOT set fields just because you \
+listed options.
 
 Format: a JSON object on its own line prefixed with "SCHEMA_UPDATE:". \
 Valid keys: organism, assembly, analysis_type, workflow, data_source, \
@@ -264,9 +279,9 @@ Example — user switches from RNA-seq to variant calling:
 SCHEMA_UPDATE: {"analysis_type": "Variant Calling", "workflow": null, \
 "data_characteristics": null, "gene_annotation": null}
 
-Only emit this when the user has actually chosen or changed something. If the \
-conversation is purely exploratory (listing options, answering questions), do \
-NOT emit it.
+Emit this line on every turn once at least one field is committed, re-stating \
+all committed fields. Only when the user has committed to nothing at all yet \
+(purely browsing or asking questions) should you omit it entirely.
 
 ## Suggestion chips
 
@@ -832,53 +847,137 @@ class AssistantAgent:
     def _parse_structured_output(
         self, raw_reply: str
     ) -> tuple[str, List[SuggestionChip], Dict[str, Optional[str]]]:
-        """Extract SCHEMA_UPDATE and SUGGESTIONS lines from the reply.
+        """Extract SCHEMA_UPDATE and SUGGESTIONS from the reply.
 
-        Handles common LLM formatting variations: bold markdown wrapping,
-        mixed case, extra whitespace around the prefix.
+        The marker may sit at the start of a line, inline after prose, or with
+        its JSON value spanning several lines -- smaller models don't always put
+        it on its own line, and when they don't, a line-by-line scan leaves the
+        raw JSON visible to the user. So we search the whole reply for each
+        marker and decode the JSON value that follows it, wherever it is.
+        Markdown bold/italic and mixed case are tolerated. A marker at line
+        start, or written with any uppercase, is a real trailer: its payload is
+        removed even when it will not parse, so raw JSON never reaches the user.
+        An all-lowercase marker mid-prose (e.g. "...a few suggestions: [...]") is
+        left in place as prose, even when its brackets are valid JSON.
         """
         suggestions: List[SuggestionChip] = []
         schema_updates: Dict[str, Optional[str]] = {}
-        reply_lines = []
+        text = raw_reply
 
-        # Match SUGGESTIONS or SCHEMA_UPDATE with optional markdown bold/italic.
-        # The colon may be inside or outside the bold markers:
-        #   SUGGESTIONS: ...  |  **SUGGESTIONS:** ...  |  **SUGGESTIONS**: ...
-        suggestions_re = re.compile(
-            r"^\s*\*{0,2}suggestions:?\*{0,2}:?\s*", re.IGNORECASE
-        )
-        schema_re = re.compile(r"^\s*\*{0,2}schema_update:?\*{0,2}:?\s*", re.IGNORECASE)
-
-        for line in raw_reply.rstrip().split("\n"):
-            s_match = suggestions_re.match(line)
-            u_match = schema_re.match(line)
-            if s_match:
-                try:
-                    json_str = line[s_match.end() :].strip()
-                    items = json.loads(json_str)
-                    if isinstance(items, list):
-                        suggestions = self._build_suggestion_chips(items)
+        def _extract(text: str, keyword: str, validate) -> tuple[str, Any]:
+            # Optional **bold** and a colon (with optional surrounding spaces)
+            # on either side, anywhere in the text (not anchored to line start).
+            # \b stops it matching mid-word.
+            marker = re.compile(
+                r"\*{0,2}\b" + keyword + r"\b[ \t]*:?[ \t]*\*{0,2}[ \t]*:?[ \t]*",
+                re.IGNORECASE,
+            )
+            result: Any = None
+            # Loop so *every* real trailer of this type is handled: a model that
+            # emits the marker twice must not leave the second block (and its raw
+            # JSON) visible. Re-search after each splice since positions shift.
+            while True:
+                for m in marker.finditer(text):
+                    rest = text[m.end() :]
+                    json_at = None
+                    for i, ch in enumerate(rest):
+                        if ch in "[{":
+                            json_at = m.end() + i
+                            break
+                        if not ch.isspace():
+                            break  # prose follows, not a JSON payload -- leave it
+                    if json_at is None:
+                        continue
+                    # A real trailer is either at line start (the model's own
+                    # line) or written with some uppercase -- the markers are
+                    # emitted in caps per the prompt. An all-lowercase marker
+                    # mid-prose (e.g. "...a few suggestions: [...]") is prose and
+                    # is left untouched, even when the brackets are valid JSON.
+                    line_start = text.rfind("\n", 0, m.start()) + 1
+                    at_line_start = text[line_start : m.start()].strip() == ""
+                    marker_is_real = at_line_start or any(
+                        c.isupper() for c in m.group(0)
+                    )
+                    try:
+                        # raw_decode reads one JSON value and reports where it
+                        # ends, so a multi-line array/object is read in one shot.
+                        value, end = json.JSONDecoder().raw_decode(text, json_at)
+                    except json.JSONDecodeError:
+                        # The model mangled the JSON (smaller models sometimes
+                        # emit broken brackets). Excise the whole bounded region
+                        # -- from the marker to the next real trailer (on its own
+                        # line), else end of reply -- so raw JSON never reaches
+                        # the user. Cutting at the "last bracket" instead could
+                        # stop at a ]/} inside a string literal and leak the tail.
+                        if not marker_is_real:
+                            continue
+                        region_end = len(text)
+                        for bm in _TRAILER_MARKER.finditer(text, m.end()):
+                            bls = text.rfind("\n", 0, bm.start()) + 1
+                            if text[bls : bm.start()].strip() != "":
+                                continue  # not on its own line
+                            # A real boundary also needs trailer syntax: after
+                            # the keyword (optional colon/bold/space) a JSON
+                            # opener. A marker word that only starts a line inside
+                            # a malformed string is not a boundary.
+                            after = text[bm.end() :].lstrip(" \t:*")
+                            if after[:1] in ("[", "{"):
+                                region_end = bm.start()
+                                break
+                        text = (text[: m.start()] + text[region_end:]).strip()
+                        break
+                    if not marker_is_real:
+                        continue  # prose that merely looks JSON-ish -- leave it
+                    if not validate(value):
+                        # Parsed but the wrong shape -- strip the marker through
+                        # its own line so trailing junk (a second object, extra
+                        # tokens) after the parsed value can't leak.
+                        line_end = text.find("\n", end)
+                        if line_end == -1:
+                            line_end = len(text)
+                        text = (text[: m.start()] + text[line_end:]).strip()
+                        break
+                    # Merge repeated SCHEMA_UPDATE dicts (later keys win); for a
+                    # repeated list marker the last one wins.
+                    if isinstance(result, dict) and isinstance(value, dict):
+                        result = {**result, **value}
                     else:
-                        reply_lines.append(line)
-                except (json.JSONDecodeError, TypeError):
-                    reply_lines.append(line)
-            elif u_match:
-                try:
-                    json_str = line[u_match.end() :].strip()
-                    data = json.loads(json_str)
-                    if isinstance(data, dict) and all(
-                        isinstance(k, str) and (isinstance(v, str) or v is None)
-                        for k, v in data.items()
-                    ):
-                        schema_updates = data
-                    else:
-                        reply_lines.append(line)
-                except (json.JSONDecodeError, TypeError):
-                    reply_lines.append(line)
-            else:
-                reply_lines.append(line)
+                        result = value
+                    # raw_decode stops at the end of the first JSON value; drop
+                    # any trailing junk on the trailer's own line (e.g. a stray
+                    # second array) rather than leave it visible.
+                    line_end = text.find("\n", end)
+                    if line_end == -1:
+                        line_end = len(text)
+                    tail = end if text[end:line_end].strip() == "" else line_end
+                    text = text[: m.start()] + text[tail:]
+                    break
+                else:
+                    break  # no marker spliced this pass -- done
+            return text, result
 
-        return "\n".join(reply_lines).rstrip(), suggestions, schema_updates
+        def _valid_schema(v: Any) -> bool:
+            return isinstance(v, dict) and all(
+                isinstance(k, str) and (isinstance(val, str) or val is None)
+                for k, val in v.items()
+            )
+
+        # Extract SCHEMA_UPDATE before SUGGESTIONS: schema state matters more
+        # than cosmetic chips, so if the two ever interfere the schema wins. (A
+        # malformed SUGGESTIONS is excised only up to the next real trailer, so
+        # pulling SCHEMA_UPDATE out first keeps it safe regardless of ordering.)
+        text, parsed = _extract(text, "schema_update", _valid_schema)
+        if parsed is not None:
+            schema_updates = parsed
+
+        text, parsed = _extract(text, "suggestions", lambda v: isinstance(v, list))
+        if parsed is not None:
+            suggestions = self._build_suggestion_chips(parsed)
+
+        # Tidy whitespace left where an inline marker was spliced out.
+        text = re.sub(r"[ \t]+\n", "\n", text)
+        text = re.sub(r"\n{3,}", "\n\n", text)
+        return text.strip(), suggestions, schema_updates
 
     def _build_suggestion_chips(self, items: List[Any]) -> List[SuggestionChip]:
         """Build suggestion chips, dropping any that reference data we don't have.
@@ -964,11 +1063,10 @@ class AssistantAgent:
         """Apply LLM-emitted schema updates to the current schema.
 
         Values of None clear the field back to EMPTY (supports mid-conversation
-        corrections when the user changes their mind).
+        corrections when the user changes their mind). The catalog-derived fields
+        are reconciled on every call -- even with no updates -- so a restored
+        session carrying stale derived state is corrected on the next turn.
         """
-        if not updates:
-            return current
-
         schema = current.model_copy(deep=True)
         valid_fields = {
             "organism",
@@ -1022,43 +1120,180 @@ class AssistantAgent:
                         break
                 if not field.detail:
                     field.detail = self._find_workflow_trs_id(workflow_value)
+                if not field.detail:
+                    # Named a workflow we can't map to a visible (assembly-scope)
+                    # catalog entry. Clear the field rather than commit a phantom
+                    # or silently keep a stale prior workflow the user was trying
+                    # to change -- either would let a handoff fire on the wrong
+                    # workflow (Codex).
+                    setattr(schema, key, SchemaField())
+                    continue
 
             setattr(schema, key, field)
 
+        self._reflect_workflow(schema)
+        self._reflect_data_characteristics(schema)
         self._reflect_gene_annotation_requirement(schema)
 
         return schema
 
-    def _reflect_gene_annotation_requirement(self, schema: AnalysisSchema) -> None:
-        """Mark gene annotation as needing attention when the selected workflow
-        actually requires a GTF, so the panel doesn't render a required
-        annotation as "Optional" (#1324/#1331). Workflows that take no GTF leave
-        it empty/optional; a filled annotation is left untouched.
-        """
+    def _reflect_workflow(self, schema: AnalysisSchema) -> None:
+        """Drop a FILLED workflow whose detail no longer maps to a visible
+        catalog entry -- e.g. a restored session carrying a stale or
+        organism-scope workflow detail. Runs before the derived reflectors so
+        the tracker can't complete or hand off on a phantom workflow (Copilot)."""
         if (
-            schema.workflow.status != FieldStatus.FILLED
-            or schema.gene_annotation.status == FieldStatus.FILLED
+            schema.workflow.status == FieldStatus.FILLED
+            and self._workflow_by_ref(schema.workflow.detail) is None
         ):
+            schema.workflow = SchemaField()
+
+    def _reflect_data_characteristics(self, schema: AnalysisSchema) -> None:
+        """Derive data characteristics from the selected workflow's inputs.
+
+        Read layout (paired/single) and library strategy are a property of the
+        workflow, not a user choice, so the catalog is authoritative here: the
+        model may re-emit this field, but its value is always recomputed from
+        the workflow, never trusted. Recomputing from scratch every apply means
+        a workflow change (or clear) can't leave a stale value -- and a
+        re-emitted value can't block reconciliation.
+        """
+        derived = None
+        if schema.workflow.status == FieldStatus.FILLED:
+            derived = self._data_characteristics_for_workflow(schema.workflow.detail)
+        if derived is not None:
+            value, detail = derived
+            schema.data_characteristics = SchemaField(
+                value=value, status=FieldStatus.FILLED, detail=detail
+            )
+        else:
+            schema.data_characteristics = SchemaField()
+
+    def _data_characteristics_for_workflow(
+        self, workflow_ref: Optional[str]
+    ) -> Optional[tuple[str, str]]:
+        """Return (display label, detail) for the data a workflow expects from
+        the user, or None. Read workflows report the layout plus any library
+        strategy; workflows that consume an assembled genome report that."""
+        wf = self._workflow_by_ref(workflow_ref)
+        if wf is None:
+            return None
+        params = wf.get("parameters", [])
+        for p in params:
+            variable = p.get("variable") or ""
+            # Read inputs are SANGER_READ_RUN_* params: PAIRED/SINGLE plus the
+            # _FILE, FORWARD_FILE and REVERSE_FILE variants some workflows use
+            # (e.g. Flye, Shovill). Match the family, not the two exact names.
+            if not variable.startswith("SANGER_READ_RUN"):
+                continue
+            req = p.get("data_requirements") or {}
+            # Prefer the declared layout; else infer from the name -- only the
+            # SINGLE variants are single-end, forward/reverse imply paired.
+            layout = req.get("library_layout") or (
+                "SINGLE" if "SINGLE" in variable else "PAIRED"
+            )
+            layout_label = {"PAIRED": "Paired-end", "SINGLE": "Single-end"}.get(
+                layout, layout
+            )
+            strategy = req.get("library_strategy") or req.get("library_source")
+            if isinstance(strategy, list):
+                strategy_label = "/".join(str(s) for s in strategy)
+            else:
+                strategy_label = strategy
+            if strategy_label:
+                value = f"{layout_label} {strategy_label} reads"
+            else:
+                value = f"{layout_label} sequencing reads"
+            return value, _DATA_CHARACTERISTICS_DERIVED_DETAIL
+        # No sequencing-read input: workflows that consume an assembled genome
+        # directly (e.g. genome annotation) characterise their input as a FASTA.
+        if any(p.get("variable") == "ASSEMBLY_FASTA_URL" for p in params):
+            return "Assembled genome (FASTA)", _DATA_CHARACTERISTICS_DERIVED_DETAIL
+        return None
+
+    def _reflect_gene_annotation_requirement(self, schema: AnalysisSchema) -> None:
+        """Reconcile gene annotation against the workflow and assembly (#1324/#1331).
+
+        Whether an annotation is needed, and whether the assembly can supply it,
+        is a property of the workflow+assembly, not a user choice (the annotation
+        source is picked later at workflow setup). The catalog is authoritative:
+        the model may re-emit this field, but it's always recomputed, never
+        trusted. Recompute every apply:
+
+        - workflow needs a GTF and the assembly ships a gene model -> auto-fill
+          (setup resolves the URL automatically);
+        - workflow needs a GTF, an assembly is chosen but has none -> needs
+          attention, so the panel doesn't render a required annotation as
+          "Optional";
+        - workflow needs a GTF but no assembly chosen yet -> pending;
+        - no GTF required, or no workflow -> empty.
+        """
+        if schema.workflow.status != FieldStatus.FILLED:
+            schema.gene_annotation = SchemaField()
             return
         if self._workflow_requires_gene_model(schema.workflow.detail):
-            schema.gene_annotation.status = FieldStatus.NEEDS_ATTENTION
-        elif schema.gene_annotation.status == FieldStatus.NEEDS_ATTENTION:
-            # Workflow changed to one that no longer needs a GTF.
-            schema.gene_annotation.status = FieldStatus.EMPTY
+            if self._assembly_gene_model_url(schema):
+                schema.gene_annotation = SchemaField(
+                    value="Reference GTF",
+                    status=FieldStatus.FILLED,
+                    detail=_GENE_ANNOTATION_AUTO_DETAIL,
+                )
+            elif schema.assembly.status == FieldStatus.FILLED:
+                # Assembly chosen but ships no gene model -- flag it (with a
+                # stable display value) so the panel doesn't render a required
+                # annotation as "Optional".
+                schema.gene_annotation = SchemaField(
+                    value="Reference GTF",
+                    status=FieldStatus.NEEDS_ATTENTION,
+                    detail="No gene model for the selected assembly",
+                )
+            else:
+                # Needs a GTF but no assembly chosen yet -- can't judge
+                # availability, so stay pending rather than flag attention early.
+                schema.gene_annotation = SchemaField()
+        else:
+            schema.gene_annotation = SchemaField()
+
+    def _assembly_gene_model_url(self, schema: AnalysisSchema) -> Optional[str]:
+        """Return the selected assembly's gene model URL, or None when the
+        assembly is unknown or has no gene model. The catalog stores a missing
+        model as null (surfaced as Python None); a literal "None" string is also
+        treated as absent, defensively against a stringified null upstream."""
+        accession = schema.assembly.detail
+        if not accession:
+            return None
+        details = self.catalog.get_assembly_details(accession)
+        if not details:
+            return None
+        url = details.get("gene_model_url")
+        if url and url != "None":
+            return url
+        return None
+
+    def _workflow_by_ref(self, workflow_ref: Optional[str]) -> Optional[Dict[str, Any]]:
+        """Return the catalog workflow dict matched by trsId or iwcId, or None.
+
+        Only ASSEMBLY-scope workflows are visible to the assistant, so an
+        organism/comparative-scope ref -- e.g. one carried in a restored session
+        -- resolves to None and never drives derivation or handoff (Codex #5).
+        """
+        if not workflow_ref:
+            return None
+        for cat in self.catalog.workflows_by_category:
+            for wf in cat.get("workflows", []):
+                if not _is_assembly_scope(wf):
+                    continue
+                if workflow_ref in (wf.get("trsId"), wf.get("iwcId")):
+                    return wf
+        return None
 
     def _workflow_requires_gene_model(self, workflow_ref: Optional[str]) -> bool:
         """True when the workflow (matched by trsId or iwcId) takes a
         GENE_MODEL_URL parameter."""
-        if not workflow_ref:
-            return False
-        for cat in self.catalog.workflows_by_category:
-            for wf in cat.get("workflows", []):
-                if workflow_ref in (wf.get("trsId"), wf.get("iwcId")):
-                    return any(
-                        p.get("variable") == "GENE_MODEL_URL"
-                        for p in wf.get("parameters", [])
-                    )
-        return False
+        wf = self._workflow_by_ref(workflow_ref)
+        return wf is not None and any(
+            p.get("variable") == "GENE_MODEL_URL" for p in wf.get("parameters", [])
+        )
 
     def _find_assembly_accession(
         self, value: str, schema: AnalysisSchema
