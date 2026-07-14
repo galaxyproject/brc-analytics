@@ -1,8 +1,8 @@
-import { SectionAboutGA2 } from "@/components/content";
+import { SectionAbout } from "@/components/content/ga2";
 import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import { Fragment, JSX } from "react";
 
-export const PartnerResourcesViewGA2 = (): JSX.Element => {
+export const PartnerResourcesView = (): JSX.Element => {
   return (
     <Fragment>
       <SectionHero
@@ -14,7 +14,7 @@ export const PartnerResourcesViewGA2 = (): JSX.Element => {
         head="Partner Resources"
         subHead="GenomeArk2 is a collaborative effort of four mature software and infrastructure projects that have been sustained for decades."
       />
-      <SectionAboutGA2 />
+      <SectionAbout />
     </Fragment>
   );
 };
