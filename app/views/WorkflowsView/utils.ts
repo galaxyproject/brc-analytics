@@ -3,13 +3,13 @@ import type {
   WorkflowCategory,
 } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { workflowMeetsAssemblyMinimum } from "@/apis/catalog/brc-analytics-catalog/common/workflowAssembly";
+import type { AssemblyContract } from "@/apis/catalog/common/entities";
 import { WorkflowCategoryId } from "../../../catalog/schema/generated/schema";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { LEXICMAP } from "../AnalyzeWorkflowsView/lexicmap/constants";
 import { LOGAN_SEARCH } from "../AnalyzeWorkflowsView/loganSearch/constants";
-import { Assembly } from "../WorkflowInputsView/types";
-import type { WorkflowAssembly, WorkflowEntity } from "./types";
-import { Organism } from "./types";
+import type { Assembly } from "../WorkflowInputsView/types";
+import type { Organism, WorkflowAssembly, WorkflowEntity } from "./types";
 
 /**
  * Finds the first assembly matching the given taxonomy ID from a pre-built index.
@@ -32,12 +32,11 @@ function findAssemblyByTaxonomyId(
  * @param assembly - Assembly.
  * @returns The common name, "null", or "Any".
  */
-function getCommonName(assembly: Assembly | undefined): string {
-  if (hasCommonName(assembly)) {
-    return assembly.commonName ?? "null";
-  }
-
-  return "Any";
+function getCommonName(assembly: AssemblyContract | undefined): string {
+  // A missing commonName field (GA2 assemblies) reads as "Any"; a present-but-
+  // null commonName (BRC) reads as the string "null".
+  if (!assembly || assembly.commonName === undefined) return "Any";
+  return assembly.commonName ?? "null";
 }
 
 /**
@@ -46,11 +45,10 @@ function getCommonName(assembly: Assembly | undefined): string {
  * @param assembly - Assembly.
  * @returns The taxonomic level realm, or "Any".
  */
-function getTaxonomicLevelRealm(assembly: Assembly | undefined): string {
-  if (assembly && "taxonomicLevelRealm" in assembly)
-    return assembly.taxonomicLevelRealm;
-
-  return "Any";
+function getTaxonomicLevelRealm(
+  assembly: AssemblyContract | undefined
+): string {
+  return assembly?.taxonomicLevelRealm ?? "Any";
 }
 
 /**
@@ -164,17 +162,6 @@ export function getWorkflows(
   }
 
   return workflows;
-}
-
-/**
- * Type guard to check if an assembly has a commonName property.
- * @param assembly - The assembly to check.
- * @returns True if the assembly has a commonName property; false otherwise.
- */
-function hasCommonName(
-  assembly: Assembly | undefined
-): assembly is Assembly & { commonName: string | null } {
-  return assembly !== undefined && "commonName" in assembly;
 }
 
 /**
