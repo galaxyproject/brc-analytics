@@ -1,9 +1,9 @@
-import { WorkflowCategoryId } from "../../../catalog/schema/generated/schema";
 import type {
   WorkflowAssemblyMapping,
   WorkflowCategory,
-} from "../../apis/catalog/brc-analytics-catalog/common/entities";
-import { workflowMeetsAssemblyMinimum } from "../../apis/catalog/brc-analytics-catalog/common/workflowAssembly";
+} from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import { workflowMeetsAssemblyMinimum } from "@/apis/catalog/brc-analytics-catalog/common/workflowAssembly";
+import { WorkflowCategoryId } from "../../../catalog/schema/generated/schema";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { LEXICMAP } from "../AnalyzeWorkflowsView/lexicmap/constants";
 import { LOGAN_SEARCH } from "../AnalyzeWorkflowsView/loganSearch/constants";

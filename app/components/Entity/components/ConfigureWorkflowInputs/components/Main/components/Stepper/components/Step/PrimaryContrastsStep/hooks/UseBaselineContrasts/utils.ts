@@ -1,4 +1,4 @@
-import { BaselineContrasts } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { BaselineContrasts } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { CONTRAST_MODE } from "../UseRadioGroup/types";
 
 /**

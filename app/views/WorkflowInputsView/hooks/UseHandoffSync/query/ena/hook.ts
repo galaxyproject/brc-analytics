@@ -1,11 +1,11 @@
+import { BaseReadRun } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
+import { useHandoffInputs } from "@/providers/workflowHandoff/hooks/UseHandoffInputs/hook";
+import { EntityKey } from "@/providers/workflowHandoff/types";
 import {
   DefaultError,
   UseQueryResult,
   useQuery as useReactQuery,
 } from "@tanstack/react-query";
-import { BaseReadRun } from "../../../../../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
-import { useHandoffInputs } from "../../../../../../providers/workflowHandoff/hooks/UseHandoffInputs/hook";
-import { EntityKey } from "../../../../../../providers/workflowHandoff/types";
 import { queryFn } from "./options/queryFn";
 import { QueryKey } from "./types";
 

@@ -1,9 +1,9 @@
 import {
   extractAccessions,
   resolveSequencingSource,
-} from "../../../app/components/Assistant/SchemaPanel/utils";
-import { SEQUENCING_SOURCE } from "../../../app/providers/workflowHandoff/constants";
-import type { SchemaFieldState } from "../../../app/types/api";
+} from "@/components/Assistant/SchemaPanel/utils";
+import { SEQUENCING_SOURCE } from "@/providers/workflowHandoff/constants";
+import type { SchemaFieldState } from "@/types/api";
 
 function field(value: string | null): SchemaFieldState {
   return { detail: null, status: "filled", value };

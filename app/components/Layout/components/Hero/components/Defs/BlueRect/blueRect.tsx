@@ -1,16 +1,19 @@
-import { JSX } from "react";
 import {
   ANIMATE_MOTION,
   FILL,
   SHAPE_HEIGHT,
   SHAPE_WIDTH,
   X_POSITION,
-} from "../../../common/constants";
-import { ELEMENT_ID, PATTERN_UNIT } from "../../../common/entities";
+} from "@/components/Layout/components/Hero/common/constants";
+import {
+  ELEMENT_ID,
+  PATTERN_UNIT,
+} from "@/components/Layout/components/Hero/common/entities";
 import {
   getAnimateMotionPathBlueRect,
   getElementHref,
-} from "../../../common/utils";
+} from "@/components/Layout/components/Hero/common/utils";
+import { JSX } from "react";
 
 export interface BlueRectProps {
   gridSize: number;

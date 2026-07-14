@@ -1,1 +1,1 @@
-export type { WorkflowEntity } from "../../../../../app/views/WorkflowsView/types";
+export type { WorkflowEntity } from "@/views/WorkflowsView/types";

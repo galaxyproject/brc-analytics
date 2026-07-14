@@ -1,9 +1,9 @@
+import { useAssemblyFavorites } from "@/hooks/useAssemblyFavorites";
+import { useAuth } from "@/providers/authentication";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { Button, CircularProgress, Tooltip } from "@mui/material";
 import { JSX } from "react";
-import { useAssemblyFavorites } from "../../../hooks/useAssemblyFavorites";
-import { useAuth } from "../../../providers/authentication";
 
 interface Props {
   accession: string;

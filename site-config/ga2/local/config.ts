@@ -1,15 +1,15 @@
-import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
-import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
-import data from "catalog/ga2/output/ncbi-taxa-tree.json";
 import {
   GA2AssemblyEntity,
   GA2OrganismEntity,
-} from "../../../app/apis/catalog/ga2/entities";
-import * as C from "../../../app/components";
-import { TaxonomyNode } from "../../../app/components/Home/components/Section/components/SectionViz/data";
+} from "@/apis/catalog/ga2/entities";
+import * as C from "@/components";
+import { TaxonomyNode } from "@/components/Home/components/Section/components/SectionViz/data";
+import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
+import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import { APP_KEYS } from "@site-config/common/constants";
+import { AppSiteConfig } from "@site-config/common/entities";
+import data from "catalog/ga2/output/ncbi-taxa-tree.json";
 import { ROUTES } from "../../../routes/constants";
-import { APP_KEYS } from "../../common/constants";
-import { AppSiteConfig } from "../../common/entities";
 import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genome/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organism/organismEntityConfig";

@@ -1,3 +1,7 @@
+import { Table } from "@/components/common/Table/table";
+import { StyledSectionTitle } from "@/views/OrganismView/components/Main/main.styles";
+import { useTable } from "@/views/OrganismView/components/Main/table/hooks/UseTable/hook";
+import { useShowPangenome } from "@/views/OrganismView/hooks/UseShowPangenome/hook";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { STACK_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/stack";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
@@ -10,10 +14,6 @@ import {
   Typography,
 } from "@mui/material";
 import { JSX } from "react";
-import { Table } from "../../../../../../components/common/Table/table";
-import { useShowPangenome } from "../../../../hooks/UseShowPangenome/hook";
-import { StyledSectionTitle } from "../../main.styles";
-import { useTable } from "../../table/hooks/UseTable/hook";
 import { StyledFluidPaper } from "./pangenomeSection.styles";
 import { COLUMNS } from "./table/columns";
 import { Props } from "./types";

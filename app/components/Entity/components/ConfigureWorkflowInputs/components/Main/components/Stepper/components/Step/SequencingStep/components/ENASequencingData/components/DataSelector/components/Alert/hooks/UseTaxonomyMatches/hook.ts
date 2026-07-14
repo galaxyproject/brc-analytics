@@ -1,6 +1,6 @@
+import type { ReadRun } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
 import type { Table } from "@tanstack/react-table";
 import { useState } from "react";
-import type { ReadRun } from "../../../../../../types";
 import type { UseTaxonomyMatches } from "./types";
 
 export const useTaxonomyMatches = (

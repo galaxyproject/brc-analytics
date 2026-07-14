@@ -1,32 +1,32 @@
+import { sanitizeEntityId } from "@/apis/catalog/common/utils";
+import {
+  GA2AssemblyEntity,
+  GA2OrganismEntity,
+} from "@/apis/catalog/ga2/entities";
+import { Tooltip } from "@/components/common/Tooltip/tooltip";
+import { OrganismAvatar } from "@/components/Entity/components/OrganismAvatar/organismAvatar";
+import { AnalyzeGenome } from "@/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
+import { LevelCell } from "@/components/Table/components/TableCell/components/LevelCell/levelCell";
+import { TagList } from "@/components/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
+import { SpeciesCell } from "@/components/Table/components/TableCell/components/SpeciesCell/speciesCell";
+import type { SpeciesTag } from "@/components/Table/components/TableCell/components/SpeciesCell/types";
+import {
+  COLUMN_PRESET_KEY,
+  COLUMN_PRESET_LABEL,
+} from "@/views/OrganismView/components/Main/constants";
+import { Main as OrganismViewMain } from "@/views/OrganismView/components/Main/main";
 import { BackPageHero } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/components/BackPageHero/backPageHero";
 import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
 import { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
 import { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/ChipCell/chipCell";
-import { ColumnDef, RowData, VisibilityState } from "@tanstack/react-table";
-import { ComponentProps } from "react";
-import { ROUTES } from "../../../../routes/constants";
 import {
   GA2_CATEGORY_KEY,
   GA2_CATEGORY_LABEL,
-} from "../../../../site-config/ga2/category";
-import { sanitizeEntityId } from "../../../apis/catalog/common/utils";
-import {
-  GA2AssemblyEntity,
-  GA2OrganismEntity,
-} from "../../../apis/catalog/ga2/entities";
-import { Tooltip } from "../../../components/common/Tooltip/tooltip";
-import { OrganismAvatar } from "../../../components/Entity/components/OrganismAvatar/organismAvatar";
-import { AnalyzeGenome } from "../../../components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
-import { LevelCell } from "../../../components/Table/components/TableCell/components/LevelCell/levelCell";
-import { TagList } from "../../../components/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
-import { SpeciesCell } from "../../../components/Table/components/TableCell/components/SpeciesCell/speciesCell";
-import type { SpeciesTag } from "../../../components/Table/components/TableCell/components/SpeciesCell/types";
-import {
-  COLUMN_PRESET_KEY,
-  COLUMN_PRESET_LABEL,
-} from "../../../views/OrganismView/components/Main/constants";
-import { Main as OrganismViewMain } from "../../../views/OrganismView/components/Main/main";
+} from "@site-config/ga2/category";
+import { ColumnDef, RowData, VisibilityState } from "@tanstack/react-table";
+import { ComponentProps } from "react";
+import { ROUTES } from "../../../../routes/constants";
 import {
   buildAnalyzeGenome,
   buildGroupTag,

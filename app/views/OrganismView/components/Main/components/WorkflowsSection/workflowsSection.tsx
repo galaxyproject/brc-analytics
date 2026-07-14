@@ -1,12 +1,12 @@
+import { getWorkflows } from "@/services/workflows/entities";
+import { Accordion } from "@/views/AnalyzeWorkflowsView/components/Main/components/Accordion/accordion";
+import { StyledSectionTitle } from "@/views/OrganismView/components/Main/main.styles";
+import { buildOrganismWorkflows } from "@/views/OrganismView/components/Main/utils";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Stack } from "@mui/material";
 import { JSX } from "react";
 import { ROUTES } from "../../../../../../../routes/constants";
-import { getWorkflows } from "../../../../../../services/workflows/entities";
-import { Accordion } from "../../../../../AnalyzeWorkflowsView/components/Main/components/Accordion/accordion";
-import { StyledSectionTitle } from "../../main.styles";
-import { buildOrganismWorkflows } from "../../utils";
 import { EmptyState } from "../EmptyState/emptyState";
 import { Props } from "./types";
 

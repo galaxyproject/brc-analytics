@@ -1,7 +1,7 @@
 import {
   ContrastPair,
   ContrastPairs,
-} from "../../../../hooks/UseExplicitContrasts/types";
+} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseExplicitContrasts/types";
 
 export interface Props {
   factorValues: string[];

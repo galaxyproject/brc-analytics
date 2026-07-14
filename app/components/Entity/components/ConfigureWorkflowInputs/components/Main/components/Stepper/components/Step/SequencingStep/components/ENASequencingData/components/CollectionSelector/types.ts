@@ -1,6 +1,6 @@
+import { ReadRun } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
 import { DialogProps } from "@mui/material";
 import { Table } from "@tanstack/react-table";
-import { ReadRun } from "../../types";
 
 export interface Props extends Pick<
   DialogProps,

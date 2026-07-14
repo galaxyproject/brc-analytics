@@ -1,7 +1,7 @@
+import { useAuth } from "@/providers/authentication";
 import { Button, Menu, MenuItem, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import { JSX, MouseEvent, useState } from "react";
-import { useAuth } from "../../../../../../providers/authentication";
 import { AuthButtonWrapper } from "./authButton.styles";
 
 /**

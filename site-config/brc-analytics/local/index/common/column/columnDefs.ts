@@ -1,14 +1,14 @@
-import { ColumnConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import {
   BRCDataCatalogGenome,
   BRCDataCatalogOrganism,
-} from "../../../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
-import * as C from "../../../../../../app/components";
-import * as V from "../../../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+} from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import * as C from "@/components";
+import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import { ColumnConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
-} from "../../../../category";
+} from "@site-config/brc-analytics/category";
 
 export const PRIORITY: ColumnConfig<
   BRCDataCatalogGenome | BRCDataCatalogOrganism

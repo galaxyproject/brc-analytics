@@ -1,3 +1,5 @@
+import { Section } from "@/views/EntityView/ui/Section/section";
+import { SectionTitle } from "@/views/EntityView/ui/SectionTitle/sectionTitle";
 import {
   StaticImage,
   StaticImageProps,
@@ -9,8 +11,6 @@ import {
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Typography } from "@mui/material";
 import { JSX } from "react";
-import { Section } from "../../../../views/EntityView/ui/Section/section";
-import { SectionTitle } from "../../../../views/EntityView/ui/SectionTitle/sectionTitle";
 import { StyledButtonBase } from "./analysisPortals.styles";
 
 export interface AnalysisPortals {

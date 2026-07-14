@@ -1,7 +1,7 @@
+import type { PangenomeMember } from "@/apis/catalog/brc-analytics-catalog/common/pangenome";
+import { LevelCell } from "@/components/Table/components/TableCell/components/LevelCell/levelCell";
 import { CellContext } from "@tanstack/react-table";
 import { JSX } from "react";
-import type { PangenomeMember } from "../../../../../../../apis/catalog/brc-analytics-catalog/common/pangenome";
-import { LevelCell } from "../../../../../../../components/Table/components/TableCell/components/LevelCell/levelCell";
 
 /**
  * Renders the assembly level cell — a tiered bar indicator plus the label.

@@ -1,5 +1,8 @@
+import {
+  BaseReadRun,
+  ReadRun,
+} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
 import { Table } from "@tanstack/react-table";
-import { BaseReadRun, ReadRun } from "../../../../types";
 
 export interface Actions {
   switchBrowseMethod: (data?: BaseReadRun[]) => void;

@@ -1,7 +1,7 @@
+import { ENA_PORTAL_API_BASE_URL } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/constants";
+import { ENA_FIELDS } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/hooks/UseENADataByAccession/constants";
 import { QueryFunctionContext } from "@tanstack/react-query";
 import ky from "ky";
-import { ENA_PORTAL_API_BASE_URL } from "../../constants";
-import { ENA_FIELDS } from "../../hooks/UseENADataByAccession/constants";
 import { QueryKey } from "../types";
 
 /**

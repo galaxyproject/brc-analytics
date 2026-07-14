@@ -1,7 +1,7 @@
+import { useWorkflowEntity } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/hook";
 import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
+import { AppSiteConfig } from "@site-config/common/entities";
 import { DefaultError, useQuery as useReactQuery } from "@tanstack/react-query";
-import { AppSiteConfig } from "../../../../../../../../../../../../../../../site-config/common/entities";
-import { useWorkflowEntity } from "../../../../../../../../../../providers/WorkflowEntity/hook";
 import { BaseReadRun, ENAReadRunsQuery } from "../types";
 import { countQueryFn } from "./options/countQueryFn";
 import { queryFn } from "./options/queryFn";

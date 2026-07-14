@@ -1,6 +1,6 @@
+import { ImageData } from "@/apis/catalog/ga2/entities";
 import InfoIcon from "@mui/icons-material/Info";
 import { Tooltip } from "@mui/material";
-import { ImageData } from "app/apis/catalog/ga2/entities";
 import React from "react";
 import {
   Card,

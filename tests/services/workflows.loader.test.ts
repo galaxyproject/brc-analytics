@@ -1,14 +1,11 @@
-import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import {
   loadEntities,
   loadPangenomes,
   loadWorkflows,
-} from "../../app/services/workflows/loader";
-import { API } from "../../app/services/workflows/routes";
-import {
-  getEntitiesById,
-  getEntitiesByType,
-} from "../../app/services/workflows/store";
+} from "@/services/workflows/loader";
+import { API } from "@/services/workflows/routes";
+import { getEntitiesById, getEntitiesByType } from "@/services/workflows/store";
+import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 
 const CONFIG = {
   entities: [{ getId, route: "assemblies" }],

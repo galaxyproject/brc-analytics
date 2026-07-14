@@ -1,5 +1,5 @@
+import { useEntitiesLoaded } from "@/providers/entitiesLoaded/hook";
 import { JSX } from "react";
-import { useEntitiesLoaded } from "../../providers/entitiesLoaded/hook";
 import { EntityDataGateProps } from "./types";
 
 /**

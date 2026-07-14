@@ -1,5 +1,5 @@
+import { ENA_PORTAL_API_BASE_URL } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/constants";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
-import { ENA_PORTAL_API_BASE_URL } from "../../constants";
 import { ENA_FIELDS } from "./constants";
 import { AccessionInfo } from "./entities";
 import { SubmitOptions } from "./types";

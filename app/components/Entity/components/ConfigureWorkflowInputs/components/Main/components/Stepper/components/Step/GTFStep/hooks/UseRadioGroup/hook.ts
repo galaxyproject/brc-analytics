@@ -1,6 +1,6 @@
+import { useRadioGroup as useBaseRadioGroup } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseRadioGroup/hook";
+import { UseRadioGroup } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseRadioGroup/types";
 import { useMemo } from "react";
-import { useRadioGroup as useBaseRadioGroup } from "../../../hooks/UseRadioGroup/hook";
-import { UseRadioGroup } from "../../../hooks/UseRadioGroup/types";
 import { mapControl } from "./utils";
 
 export const useRadioGroup = (

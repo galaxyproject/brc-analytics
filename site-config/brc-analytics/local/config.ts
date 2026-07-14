@@ -1,18 +1,18 @@
-import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
-import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
-import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
-import data from "catalog/output/ncbi-taxa-tree.json";
-import { createElement } from "react";
 import {
   BRCDataCatalogGenome,
   BRCDataCatalogOrganism,
   Outbreak,
-} from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
-import * as C from "../../../app/components";
-import { TaxonomyNode } from "../../../app/components/Home/components/Section/components/SectionViz/data";
+} from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import * as C from "@/components";
+import { TaxonomyNode } from "@/components/Home/components/Section/components/SectionViz/data";
+import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
+import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
+import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import { APP_KEYS } from "@site-config/common/constants";
+import { AppSiteConfig } from "@site-config/common/entities";
+import data from "catalog/output/ncbi-taxa-tree.json";
+import { createElement } from "react";
 import { ROUTES } from "../../../routes/constants";
-import { APP_KEYS } from "../../common/constants";
-import { AppSiteConfig } from "../../common/entities";
 import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organismEntityConfig";

@@ -1,4 +1,4 @@
-import { WorkflowHandoffState } from "../../types";
+import { WorkflowHandoffState } from "@/providers/workflowHandoff/types";
 import { SetHandoffPayload } from "./types";
 
 /**

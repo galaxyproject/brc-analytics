@@ -1,4 +1,4 @@
-import { ftpToAscp } from "../../../app/utils/galaxy-api/url-utils";
+import { ftpToAscp } from "@/utils/galaxy-api/url-utils";
 
 const TEST_DATA = {
   ASCP_URL:

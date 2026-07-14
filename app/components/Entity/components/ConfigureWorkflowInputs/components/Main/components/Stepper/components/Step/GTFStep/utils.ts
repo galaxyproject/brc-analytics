@@ -1,4 +1,4 @@
-import { OnConfigure } from "../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { OnConfigure } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { UseRadioGroup } from "../hooks/UseRadioGroup/types";
 import { STEP } from "./step";
 

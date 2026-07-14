@@ -1,3 +1,9 @@
+import { getPageMeta } from "@/common/meta/utils";
+import { EntityDataGate } from "@/components/EntityDataGate/entityDataGate";
+import { config } from "@/config/config";
+import { getEntities } from "@/utils/entityUtils";
+import { seedDatabase } from "@/utils/seedDatabase";
+import { AnalyzeWorkflowsView } from "@/views/AnalyzeWorkflowsView/analyzeWorkflowsView";
 import {
   GetStaticPaths,
   GetStaticPathsResult,
@@ -6,12 +12,6 @@ import {
 } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
-import { getPageMeta } from "../../../../../../app/common/meta/utils";
-import { EntityDataGate } from "../../../../../../app/components/EntityDataGate/entityDataGate";
-import { config } from "../../../../../../app/config/config";
-import { getEntities } from "../../../../../../app/utils/entityUtils";
-import { seedDatabase } from "../../../../../../app/utils/seedDatabase";
-import { AnalyzeWorkflowsView } from "../../../../../../app/views/AnalyzeWorkflowsView/analyzeWorkflowsView";
 
 interface Params extends ParsedUrlQuery {
   entityId: string;

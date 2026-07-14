@@ -1,7 +1,7 @@
+import { useTaxonomyMatches } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/DataSelector/components/Alert/hooks/UseTaxonomyMatches/hook";
+import type { ReadRun } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
 import type { Table } from "@tanstack/react-table";
 import { renderHook } from "@testing-library/react";
-import { useTaxonomyMatches } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/DataSelector/components/Alert/hooks/UseTaxonomyMatches/hook";
-import type { ReadRun } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
 
 /**
  * Build a minimal Table stub exposing just the row models the hook reads.

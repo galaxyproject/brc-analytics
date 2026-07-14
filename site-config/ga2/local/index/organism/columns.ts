@@ -1,5 +1,5 @@
+import { GA2OrganismEntity } from "@/apis/catalog/ga2/entities";
 import { ColumnConfig } from "@databiosphere/findable-ui/lib/config/entities";
-import { GA2OrganismEntity } from "../../../../../app/apis/catalog/ga2/entities";
 import {
   ASSEMBLY_COUNT,
   ASSEMBLY_TAXONOMY_IDS,

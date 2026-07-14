@@ -1,11 +1,11 @@
 import {
   Workflow,
   WorkflowCategory,
-} from "../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
+} from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
-} from "../../../../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
+} from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
 import {
   AssemblyForTaxonomyCheck,
   generateWorkflowMappingsQC,

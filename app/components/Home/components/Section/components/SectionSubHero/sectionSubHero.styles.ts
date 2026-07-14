@@ -1,12 +1,12 @@
+import {
+  sectionGrid,
+  sectionLayout,
+} from "@/components/Layout/components/AppLayout/components/Section/section.styles";
 import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { bpDownSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
 import { Accordion, Box, Button, Grid } from "@mui/material";
-import {
-  sectionGrid,
-  sectionLayout,
-} from "../../../../../Layout/components/AppLayout/components/Section/section.styles";
 
 export const Section = styled.section`
   background-color: ${PALETTE.COMMON_WHITE};

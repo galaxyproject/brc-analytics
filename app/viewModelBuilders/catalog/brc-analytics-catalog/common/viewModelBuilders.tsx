@@ -1,3 +1,51 @@
+import {
+  BRCDataCatalogGenome,
+  BRCDataCatalogOrganism,
+  Outbreak,
+  Workflow,
+} from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import type { OUTBREAK_PRIORITY } from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
+import {
+  getGenomeOrganismId,
+  getOrganismId,
+} from "@/apis/catalog/brc-analytics-catalog/common/utils";
+import type {
+  AssemblyContract,
+  OrganismContract,
+} from "@/apis/catalog/common/entities";
+import { sanitizeEntityId } from "@/apis/catalog/common/utils";
+import {
+  GA2AssemblyEntity,
+  GA2OrganismEntity,
+} from "@/apis/catalog/ga2/entities";
+import { SLUGIFY_OPTIONS } from "@/common/constants";
+import { AppLink } from "@/components/common/AppLink/appLink";
+import { Chip } from "@/components/common/Chip/chip";
+import { CopyText } from "@/components/common/CopyText/copyText";
+import { Tooltip } from "@/components/common/Tooltip/tooltip";
+import { AnalysisPortals } from "@/components/Entity/components/AnalysisPortals/analysisPortals";
+import { StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
+import { KeyValueSection } from "@/components/Entity/components/Section/KeyValueSection/keyValueSection";
+import { MDXSection } from "@/components/Entity/components/Section/MDXSection/mdxSection";
+import { AnalyzeGenome } from "@/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
+import { LevelCell } from "@/components/Table/components/TableCell/components/LevelCell/levelCell";
+import { TagList } from "@/components/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
+import { SpeciesCell } from "@/components/Table/components/TableCell/components/SpeciesCell/speciesCell";
+import type { SpeciesTag } from "@/components/Table/components/TableCell/components/SpeciesCell/types";
+import { formatDate } from "@/utils/date-fns";
+import {
+  COLUMN_PRESET_KEY,
+  COLUMN_PRESET_LABEL,
+} from "@/views/OrganismView/components/Main/constants";
+import { Main as OrganismViewMain } from "@/views/OrganismView/components/Main/main";
+import { Tabs } from "@/views/OrganismView/components/Tabs/tabs";
+import type { Organism } from "@/views/OrganismView/types";
+import {
+  getPriorityColor,
+  getPriorityLabel,
+} from "@/views/PriorityPathogensView/components/PriorityPathogens/utils";
+import { ResourcesSection } from "@/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
+import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import { KeyElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/KeyElType/keyElType";
 import { ValueElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/ValueElType/valueElType";
@@ -16,65 +64,17 @@ import { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/compon
 import { NTagCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/NTagCell/nTagCell";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
+import {
+  BRC_DATA_CATALOG_CATEGORY_KEY,
+  BRC_DATA_CATALOG_CATEGORY_LABEL,
+} from "@site-config/brc-analytics/category";
 import { ColumnDef, RowData, VisibilityState } from "@tanstack/react-table";
-import type { SpeciesTag } from "app/components/Table/components/TableCell/components/SpeciesCell/types";
-import { Tabs } from "app/views/OrganismView/components/Tabs/tabs";
-import type { Organism } from "app/views/OrganismView/types";
 import { parseISO } from "date-fns";
 import { LinkProps } from "next/link";
 import Router from "next/router";
 import { ComponentProps } from "react";
-import {
-  BRC_DATA_CATALOG_CATEGORY_KEY,
-  BRC_DATA_CATALOG_CATEGORY_LABEL,
-} from "site-config/brc-analytics/category";
 import slugify from "slugify";
 import { ROUTES } from "../../../../../routes/constants";
-import {
-  BRCDataCatalogGenome,
-  BRCDataCatalogOrganism,
-  Outbreak,
-  Workflow,
-} from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
-import type { OUTBREAK_PRIORITY } from "../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
-import {
-  getGenomeOrganismId,
-  getOrganismId,
-} from "../../../../apis/catalog/brc-analytics-catalog/common/utils";
-import type {
-  AssemblyContract,
-  OrganismContract,
-} from "../../../../apis/catalog/common/entities";
-import { sanitizeEntityId } from "../../../../apis/catalog/common/utils";
-import {
-  GA2AssemblyEntity,
-  GA2OrganismEntity,
-} from "../../../../apis/catalog/ga2/entities";
-import { SLUGIFY_OPTIONS } from "../../../../common/constants";
-import { AppLink } from "../../../../components/common/AppLink/appLink";
-import { Chip } from "../../../../components/common/Chip/chip";
-import { CopyText } from "../../../../components/common/CopyText/copyText";
-import { Tooltip } from "../../../../components/common/Tooltip/tooltip";
-import { AnalysisPortals } from "../../../../components/Entity/components/AnalysisPortals/analysisPortals";
-import { StepConfig } from "../../../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
-import { KeyValueSection } from "../../../../components/Entity/components/Section/KeyValueSection/keyValueSection";
-import { MDXSection } from "../../../../components/Entity/components/Section/MDXSection/mdxSection";
-import { AnalyzeGenome } from "../../../../components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
-import { LevelCell } from "../../../../components/Table/components/TableCell/components/LevelCell/levelCell";
-import { TagList } from "../../../../components/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
-import { SpeciesCell } from "../../../../components/Table/components/TableCell/components/SpeciesCell/speciesCell";
-import { formatDate } from "../../../../utils/date-fns";
-import {
-  COLUMN_PRESET_KEY,
-  COLUMN_PRESET_LABEL,
-} from "../../../../views/OrganismView/components/Main/constants";
-import { Main as OrganismViewMain } from "../../../../views/OrganismView/components/Main/main";
-import {
-  getPriorityColor,
-  getPriorityLabel,
-} from "../../../../views/PriorityPathogensView/components/PriorityPathogens/utils";
-import { ResourcesSection } from "../../../../views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
-import { ConfiguredInput } from "../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import {
   GALAXY_DATACACHE,
   GENOME_BROWSER,

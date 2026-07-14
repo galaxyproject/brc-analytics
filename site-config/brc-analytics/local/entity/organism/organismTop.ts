@@ -1,10 +1,10 @@
+import { BRCDataCatalogOrganism } from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import * as C from "@/components";
+import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import {
   ComponentConfig,
   ComponentsConfig,
 } from "@databiosphere/findable-ui/lib/config/entities";
-import { BRCDataCatalogOrganism } from "../../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
-import * as C from "../../../../../app/components";
-import * as V from "../../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 
 export const organismTop: ComponentsConfig = [
   {

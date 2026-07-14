@@ -1,6 +1,6 @@
+import { OnConfigure } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { UseQueryResult } from "@tanstack/react-query";
 import { Table } from "@tanstack/react-table";
-import { OnConfigure } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { Actions, Status } from "./hooks/UseENADataByAccession/types";
 
 export interface BaseReadRun {

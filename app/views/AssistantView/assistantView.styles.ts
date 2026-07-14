@@ -1,6 +1,6 @@
+import { sectionLayout } from "@/components/Layout/components/AppLayout/components/Section/section.styles";
 import styled from "@emotion/styled";
 import { Box, Stack } from "@mui/material";
-import { sectionLayout } from "../../components/Layout/components/AppLayout/components/Section/section.styles";
 
 export const StyledSection = styled.section`
   display: flex;

@@ -1,4 +1,8 @@
-import { BaseReadRun, ReadRun, Validation } from "../../../../types";
+import {
+  BaseReadRun,
+  ReadRun,
+  Validation,
+} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
 
 /**
  * Returns validation object for the read run (includes error message and validation status).

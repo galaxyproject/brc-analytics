@@ -1,4 +1,4 @@
-import { Organism } from "../../../../types";
+import { Organism } from "@/views/OrganismView/types";
 
 export interface Props {
   entityId: string;

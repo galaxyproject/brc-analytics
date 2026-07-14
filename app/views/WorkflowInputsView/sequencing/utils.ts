@@ -1,4 +1,4 @@
-import { StepConfig } from "../../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
+import { StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { SEQUENCING_STEP_KEYS } from "./constants";
 
 /**

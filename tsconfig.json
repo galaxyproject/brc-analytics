@@ -16,6 +16,8 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
+      "@/*": ["app/*"],
+      "@site-config/*": ["site-config/*"],
       "images/*": ["images/*"]
     },
     "plugins": [
