@@ -1,5 +1,5 @@
 import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
-import { loadEntities, loadWorkflows } from "../../loader";
+import { loadEntities, loadPangenomes, loadWorkflows } from "../../loader";
 
 let loadPromise: Promise<void> | null = null;
 
@@ -12,8 +12,13 @@ export function ensureEntitiesLoaded(config: SiteConfig): Promise<void> {
   if (loadPromise) return loadPromise;
 
   loadPromise = (async (): Promise<void> => {
-    await loadWorkflows();
-    await loadEntities(config);
+    // Load in parallel so the optional pangenome fetch adds no serial latency
+    // to the core workflows/entities load that every data page depends on.
+    await Promise.all([
+      loadWorkflows(),
+      loadPangenomes(),
+      loadEntities(config),
+    ]);
   })();
 
   return loadPromise;

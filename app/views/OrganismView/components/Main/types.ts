@@ -12,8 +12,10 @@ export interface ColumnPreset {
 }
 
 export interface Props<T extends RowData> {
-  columnPresets: ColumnPreset[];
+  assembly: {
+    columnPresets: ColumnPreset[];
+    tableOptions: Pick<TableOptions<T>, "columns" | "data" | "initialState">;
+  };
   entityId: string;
   organism: Organism;
-  tableOptions: Pick<TableOptions<T>, "columns" | "data" | "initialState">;
 }

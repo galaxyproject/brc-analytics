@@ -59,10 +59,12 @@ export const buildOrganismViewMain = (
   entity: GA2OrganismEntity
 ): ComponentProps<typeof C.OrganismViewMain> => {
   return {
-    columnPresets: ORGANISM_GENOMES_COLUMN_PRESETS,
+    assembly: {
+      columnPresets: ORGANISM_GENOMES_COLUMN_PRESETS,
+      tableOptions: buildOrganismGenomesTable(entity),
+    },
     entityId: sanitizeEntityId(entity.ncbiTaxonomyId),
     organism: entity,
-    tableOptions: buildOrganismGenomesTable(entity),
   };
 };
 
@@ -88,7 +90,7 @@ const DEFAULT_COLUMN_VISIBILITY: VisibilityState = {
  */
 const ORGANISM_GENOMES_COLUMN_PRESETS: ComponentProps<
   typeof C.OrganismViewMain
->["columnPresets"] = [
+>["assembly"]["columnPresets"] = [
   {
     columnVisibility: DEFAULT_COLUMN_VISIBILITY,
     key: COLUMN_PRESET_KEY.DEFAULT,
@@ -128,7 +130,7 @@ export const buildOrganismImageThumbnail = (
  */
 export function buildOrganismGenomesTable(
   entity: GA2OrganismEntity
-): ComponentProps<typeof C.OrganismViewMain>["tableOptions"] {
+): ComponentProps<typeof C.OrganismViewMain>["assembly"]["tableOptions"] {
   return {
     // Cast: ColumnDef<T> is invariant in T, so the catalog-specific row type
     // cannot widen to RowData even though GA2AssemblyEntity extends it.
