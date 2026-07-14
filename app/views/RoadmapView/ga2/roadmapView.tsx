@@ -1,9 +1,9 @@
-import { SectionRoadmapGA2 } from "@/components/content";
+import { SectionRoadmap } from "@/components/content/ga2";
 import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import { Fragment, JSX } from "react";
-import { BREADCRUMBS } from "./common/constants";
+import { BREADCRUMBS } from "../common/constants";
 
-export const RoadmapViewGA2 = (): JSX.Element => {
+export const RoadmapView = (): JSX.Element => {
   return (
     <Fragment>
       <SectionHero
@@ -21,7 +21,7 @@ export const RoadmapViewGA2 = (): JSX.Element => {
           </>
         }
       />
-      <SectionRoadmapGA2 />
+      <SectionRoadmap />
     </Fragment>
   );
 };
