@@ -3,7 +3,7 @@ import { AssemblyFavoriteButton } from "@/components/Favorites/AssemblyFavoriteB
 import {
   buildAssemblyResources,
   buildOrganismDetails,
-} from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+} from "@/viewModelBuilders/catalog/common/viewModelBuilders";
 import { AssemblyDetails } from "@/views/EntityView/assembly/components/Side/ga2/components/AssemblyDetails/AssemblyDetails";
 import { KeyValueSection } from "@/views/EntityView/components/KeyValueSection/keyValueSection";
 import { mapAssemblyToOrganism } from "@/views/WorkflowInputsView/utils";

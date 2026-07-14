@@ -27,6 +27,7 @@ import {
 import { ColumnDef, RowData, VisibilityState } from "@tanstack/react-table";
 import { ComponentProps } from "react";
 import { ROUTES } from "../../../../routes/constants";
+import { ORGANISM_SCOPED_TAG_LABELS } from "../common/constants";
 import {
   buildAnalyzeGenome,
   buildGroupTag,
@@ -36,8 +37,7 @@ import {
   buildReleaseDateTooltip,
   formatNumber,
   getGenomeStrainText,
-  ORGANISM_SCOPED_TAG_LABELS,
-} from "../brc-analytics-catalog/common/viewModelBuilders";
+} from "../common/viewModelBuilders";
 
 /**
  * Build props for the organism BackPageHero component.
