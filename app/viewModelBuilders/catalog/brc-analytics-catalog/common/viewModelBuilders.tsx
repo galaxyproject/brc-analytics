@@ -1,9 +1,19 @@
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
+import { KeyElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/KeyElType/keyElType";
+import { ValueElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/ValueElType/valueElType";
 import {
   Key,
+  KeyValuePairs,
   Value,
 } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/keyValuePairs";
+import { Stack } from "@databiosphere/findable-ui/lib/components/common/Stack/stack";
+import { TypographyWordBreak } from "@databiosphere/findable-ui/lib/components/common/Typography/TypographyWordBreak/TypographyWordBreak";
+import { BackPageHero } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/components/BackPageHero/backPageHero";
+import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
+import { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
+import { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/ChipCell/chipCell";
+import { NTagCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/NTagCell/nTagCell";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { ColumnDef, RowData, VisibilityState } from "@tanstack/react-table";
@@ -41,14 +51,24 @@ import {
   GA2OrganismEntity,
 } from "../../../../apis/catalog/ga2/entities";
 import { SLUGIFY_OPTIONS } from "../../../../common/constants";
-import * as C from "../../../../components";
+import { AppLink } from "../../../../components/common/AppLink/appLink";
+import { Chip } from "../../../../components/common/Chip/chip";
+import { CopyText } from "../../../../components/common/CopyText/copyText";
+import { Tooltip } from "../../../../components/common/Tooltip/tooltip";
+import { AnalysisPortals } from "../../../../components/Entity/components/AnalysisPortals/analysisPortals";
 import { StepConfig } from "../../../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { KeyValueSection } from "../../../../components/Entity/components/Section/KeyValueSection/keyValueSection";
+import { MDXSection } from "../../../../components/Entity/components/Section/MDXSection/mdxSection";
+import { AnalyzeGenome } from "../../../../components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
+import { LevelCell } from "../../../../components/Table/components/TableCell/components/LevelCell/levelCell";
+import { TagList } from "../../../../components/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
+import { SpeciesCell } from "../../../../components/Table/components/TableCell/components/SpeciesCell/speciesCell";
 import { formatDate } from "../../../../utils/date-fns";
 import {
   COLUMN_PRESET_KEY,
   COLUMN_PRESET_LABEL,
 } from "../../../../views/OrganismView/components/Main/constants";
+import { Main as OrganismViewMain } from "../../../../views/OrganismView/components/Main/main";
 import {
   getPriorityColor,
   getPriorityLabel,
@@ -70,7 +90,7 @@ import {
  */
 export const buildAccession = (
   entity: AssemblyContract
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.accession,
   };
@@ -83,7 +103,7 @@ export const buildAccession = (
  */
 export const buildAnalyzeGenome = (
   entity: AssemblyContract
-): ComponentProps<typeof C.AnalyzeGenome> => {
+): ComponentProps<typeof AnalyzeGenome> => {
   const { accession, ncbiTaxonomyId, ucscBrowserUrl } = entity;
   return {
     analyze: {
@@ -117,7 +137,7 @@ export const buildAnalyzeGenome = (
  */
 export const buildAnnotationStatus = (
   entity: AssemblyContract
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.annotationStatus,
   };
@@ -130,16 +150,16 @@ export const buildAnnotationStatus = (
  */
 export const buildAssemblyDetails = (
   assembly: AssemblyContract
-): ComponentProps<typeof C.KeyValuePairs> => {
+): ComponentProps<typeof KeyValuePairs> => {
   const keyValuePairs = new Map<Key, Value>();
   keyValuePairs.set(
     BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
-    <C.CopyText value={assembly.accession}>{assembly.accession}</C.CopyText>
+    <CopyText value={assembly.accession}>{assembly.accession}</CopyText>
   );
   return {
-    KeyElType: C.KeyElType,
-    KeyValuesElType: (props) => <C.Stack {...props} gap={4} />,
-    ValueElType: C.ValueElType,
+    KeyElType: KeyElType,
+    KeyValuesElType: (props) => <Stack {...props} gap={4} />,
+    ValueElType: ValueElType,
     keyValuePairs,
   };
 };
@@ -153,7 +173,7 @@ export const buildAssemblyCount = (
   // `assemblyCount` is optional on OrganismContract; require it here so callers
   // can't pass a projection without it and silently render an empty value.
   entity: OrganismContract & { assemblyCount: number }
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof BasicCell> => {
   return {
     value: formatNumber(entity.assemblyCount),
   };
@@ -166,7 +186,7 @@ export const buildAssemblyCount = (
  */
 export const buildChromosomes = (
   entity: AssemblyContract
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof BasicCell> => {
   return {
     value: formatNumber(entity.chromosomes),
   };
@@ -179,7 +199,7 @@ export const buildChromosomes = (
  */
 export const buildCommonName = (
   entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.commonName,
   };
@@ -192,7 +212,7 @@ export const buildCommonName = (
  */
 export const buildCoverage = (
   entity: AssemblyContract
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.coverage,
   };
@@ -205,7 +225,7 @@ export const buildCoverage = (
  */
 export const buildGcPercent = (
   entity: AssemblyContract
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.gcPercent,
   };
@@ -221,7 +241,7 @@ export const buildGcPercent = (
  */
 export const buildGenomeSpecies = (
   genome: BRCDataCatalogGenome
-): ComponentProps<typeof C.SpeciesCell> => {
+): ComponentProps<typeof SpeciesCell> => {
   const tags: SpeciesTag[] = [];
   const strain = getGenomeStrainText(genome);
   if (strain) tags.push({ label: "strain", tooltip: strain, value: strain });
@@ -308,7 +328,7 @@ function buildPriorityTag(
  */
 export const buildOrganismGenomeSpecies = (
   genome: BRCDataCatalogGenome
-): ComponentProps<typeof C.SpeciesCell> => {
+): ComponentProps<typeof SpeciesCell> => {
   const props = buildGenomeSpecies(genome);
   return {
     ...props,
@@ -328,7 +348,7 @@ export const buildOrganismGenomeSpecies = (
  */
 export const buildGenomeTaxonomicLevelStrain = (
   entity: AssemblyContract
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof BasicCell> => {
   return {
     value: getGenomeStrainText(entity),
   };
@@ -341,7 +361,7 @@ export const buildGenomeTaxonomicLevelStrain = (
  */
 export const buildGenomeTaxonomicLevelSerotype = (
   genome: BRCDataCatalogGenome
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof BasicCell> => {
   return {
     value: getGenomeSerotypeText(genome),
   };
@@ -354,7 +374,7 @@ export const buildGenomeTaxonomicLevelSerotype = (
  */
 export const buildGenomeTaxonomicLevelIsolate = (
   genome: BRCDataCatalogGenome
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof BasicCell> => {
   return {
     value: getGenomeIsolateText(genome),
   };
@@ -367,7 +387,7 @@ export const buildGenomeTaxonomicLevelIsolate = (
  */
 export const buildIsRef = (
   entity: AssemblyContract
-): ComponentProps<typeof C.ChipCell> => {
+): ComponentProps<typeof ChipCell> => {
   return {
     getValue: () => ({
       color:
@@ -377,7 +397,7 @@ export const buildIsRef = (
       label: entity.isRef,
       variant: CHIP_PROPS.VARIANT.STATUS,
     }),
-  } as ComponentProps<typeof C.ChipCell>;
+  } as ComponentProps<typeof ChipCell>;
 };
 
 /**
@@ -387,7 +407,7 @@ export const buildIsRef = (
  */
 export const buildLength = (
   entity: AssemblyContract
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof BasicCell> => {
   return {
     value: formatNumber(entity.length),
   };
@@ -418,7 +438,7 @@ const LEVEL_LABEL: Record<string, string> = {
  */
 export const buildLevel = (
   entity: AssemblyContract
-): ComponentProps<typeof C.LevelCell> => {
+): ComponentProps<typeof LevelCell> => {
   return {
     filledCount: LEVEL_FILLED_COUNT[entity.level] ?? 0,
     label: LEVEL_LABEL[entity.level] ?? entity.level,
@@ -432,7 +452,7 @@ export const buildLevel = (
  */
 export const buildOrganismAssemblyTaxonomyIds = (
   entity: OrganismContract
-): ComponentProps<typeof C.NTagCell> => {
+): ComponentProps<typeof NTagCell> => {
   return {
     label: "taxonomy IDs",
     values: entity.assemblyTaxonomyIds ?? [],
@@ -446,7 +466,7 @@ export const buildOrganismAssemblyTaxonomyIds = (
  */
 export const buildOrganismDetails = (
   organism: Organism
-): ComponentProps<typeof C.KeyValuePairs> => {
+): ComponentProps<typeof KeyValuePairs> => {
   const {
     ncbiTaxonomyId,
     priorityPathogenName,
@@ -460,7 +480,7 @@ export const buildOrganismDetails = (
 
   keyValuePairs.set(
     BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
-    <C.Link
+    <Link
       label={taxonomicLevelSpecies}
       url={`${ROUTES.ORGANISMS}/${encodeURIComponent(sanitizeEntityId(ncbiTaxonomyId))}`}
     />
@@ -485,14 +505,14 @@ export const buildOrganismDetails = (
   if (priorityPathogenName) {
     keyValuePairs.set(
       BRC_DATA_CATALOG_CATEGORY_LABEL.PRIORITY_PATHOGEN_NAME,
-      <C.Chip {...buildPriorityPathogen(organism)} />
+      <Chip {...buildPriorityPathogen(organism)} />
     );
   }
 
   return {
-    KeyElType: C.KeyElType,
-    KeyValuesElType: (props) => <C.Stack {...props} gap={4} />,
-    ValueElType: C.ValueElType,
+    KeyElType: KeyElType,
+    KeyValuesElType: (props) => <Stack {...props} gap={4} />,
+    ValueElType: ValueElType,
     keyValuePairs,
   };
 };
@@ -504,7 +524,7 @@ export const buildOrganismDetails = (
  */
 export const buildOrganismTaxonomicLevelSpecies = (
   organism: BRCDataCatalogOrganism
-): ComponentProps<typeof C.Link> => {
+): ComponentProps<typeof Link> => {
   return {
     label: organism.taxonomicLevelSpecies,
     url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getOrganismId(organism))}`,
@@ -518,7 +538,7 @@ export const buildOrganismTaxonomicLevelSpecies = (
  */
 export const buildOrganismTaxonomicLevelStrain = (
   organism: BRCDataCatalogOrganism
-): ComponentProps<typeof C.NTagCell> => {
+): ComponentProps<typeof NTagCell> => {
   return {
     label: "strains",
     values: organism.taxonomicLevelStrain,
@@ -532,7 +552,7 @@ export const buildOrganismTaxonomicLevelStrain = (
  */
 export const buildOrganismTaxonomicLevelSerotype = (
   organism: BRCDataCatalogOrganism
-): ComponentProps<typeof C.NTagCell> => {
+): ComponentProps<typeof NTagCell> => {
   return {
     label: "serotypes",
     values: organism.taxonomicLevelSerotype,
@@ -546,7 +566,7 @@ export const buildOrganismTaxonomicLevelSerotype = (
  */
 export const buildOrganismTaxonomicLevelIsolate = (
   organism: BRCDataCatalogOrganism
-): ComponentProps<typeof C.NTagCell> => {
+): ComponentProps<typeof NTagCell> => {
   return {
     label: "isolates",
     values: organism.taxonomicLevelIsolate,
@@ -560,7 +580,7 @@ export const buildOrganismTaxonomicLevelIsolate = (
  */
 export const buildPriority = (
   entity: BRCDataCatalogGenome | BRCDataCatalogOrganism
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.priority ?? "Unprioritized",
   };
@@ -576,7 +596,7 @@ export const buildPriority = (
 export const buildPriorityPathogen = (entity: {
   priority?: OUTBREAK_PRIORITY | null;
   priorityPathogenName?: string | null;
-}): ComponentProps<typeof C.Chip> => {
+}): ComponentProps<typeof Chip> => {
   const { priority, priorityPathogenName } = entity;
   return {
     color: getPriorityColor(priority),
@@ -603,7 +623,7 @@ export const buildPriorityPathogen = (entity: {
  */
 export const buildPriorityPathogenTooltip = (
   entity: BRCDataCatalogGenome | BRCDataCatalogOrganism
-): Omit<ComponentProps<typeof C.Tooltip>, "children"> => {
+): Omit<ComponentProps<typeof Tooltip>, "children"> => {
   return {
     arrow: true,
     title: entity.priorityPathogenName
@@ -619,7 +639,7 @@ export const buildPriorityPathogenTooltip = (
  */
 export const buildPriorityPathogenHero = (
   priorityPathogen: Outbreak
-): ComponentProps<typeof C.BackPageHero> => {
+): ComponentProps<typeof BackPageHero> => {
   return {
     breadcrumbs: getPriorityPathogenEntityBreadcrumbs(priorityPathogen),
     title: priorityPathogen.name,
@@ -633,7 +653,7 @@ export const buildPriorityPathogenHero = (
  */
 export const buildPriorityPathogenDescription = (
   priorityPathogen: Outbreak
-): ComponentProps<typeof C.MDXSection> => {
+): ComponentProps<typeof MDXSection> => {
   return {
     mdxRemoteSerializeResult: priorityPathogen.description,
     title: "Description",
@@ -651,7 +671,7 @@ export const buildPriorityPathogenDetails = (
   const keyValuePairs = new Map<Key, Value>();
   keyValuePairs.set(
     BRC_DATA_CATALOG_CATEGORY_LABEL.PRIORITY,
-    <C.Chip
+    <Chip
       color={getPriorityColor(priorityPathogen.priority)}
       label={getPriorityLabel(priorityPathogen.priority)}
       onClick={(): void => {
@@ -676,14 +696,14 @@ export const buildPriorityPathogenDetails = (
   ].forEach(([key, pathname]) => {
     keyValuePairs.set(
       key,
-      <C.AppLink
+      <AppLink
         href={getEntityLinkWithPriorityPathogenFilter(
           priorityPathogen,
           pathname
         )}
       >
         {priorityPathogen.taxonName}
-      </C.AppLink>
+      </AppLink>
     );
   });
   return {
@@ -724,7 +744,7 @@ type TaxonomicGroupEntity =
  */
 export const buildAssemblyTaxonomicGroup = (
   entity: AssemblyContract
-): ComponentProps<typeof C.NTagCell> => {
+): ComponentProps<typeof NTagCell> => {
   return {
     label: "taxonomic groups",
     values: entity.taxonomicGroup,
@@ -738,7 +758,7 @@ export const buildAssemblyTaxonomicGroup = (
  */
 export const buildOrganismTaxonomicGroup = (
   entity: OrganismContract
-): ComponentProps<typeof C.NTagCell> => {
+): ComponentProps<typeof NTagCell> => {
   return {
     label: "taxonomic groups",
     values: entity.taxonomicGroup ?? [],
@@ -752,7 +772,7 @@ export const buildOrganismTaxonomicGroup = (
  */
 export const buildTaxonomicLevelClass = (
   entity: TaxonomicGroupEntity
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.taxonomicLevelClass,
   };
@@ -765,7 +785,7 @@ export const buildTaxonomicLevelClass = (
  */
 export const buildTaxonomicLevelDomain = (
   entity: TaxonomicGroupEntity
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.taxonomicLevelDomain,
   };
@@ -778,7 +798,7 @@ export const buildTaxonomicLevelDomain = (
  */
 export const buildTaxonomicLevelFamily = (
   entity: TaxonomicGroupEntity
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.taxonomicLevelFamily,
   };
@@ -791,7 +811,7 @@ export const buildTaxonomicLevelFamily = (
  */
 export const buildTaxonomicLevelGenus = (
   entity: TaxonomicGroupEntity
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.taxonomicLevelGenus,
   };
@@ -804,7 +824,7 @@ export const buildTaxonomicLevelGenus = (
  */
 export const buildTaxonomicLevelKingdom = (
   entity: TaxonomicGroupEntity
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.taxonomicLevelKingdom,
   };
@@ -817,7 +837,7 @@ export const buildTaxonomicLevelKingdom = (
  */
 export const buildTaxonomicLevelOrder = (
   entity: TaxonomicGroupEntity
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.taxonomicLevelOrder,
   };
@@ -830,7 +850,7 @@ export const buildTaxonomicLevelOrder = (
  */
 export const buildTaxonomicLevelPhylum = (
   entity: TaxonomicGroupEntity
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.taxonomicLevelPhylum,
   };
@@ -843,7 +863,7 @@ export const buildTaxonomicLevelPhylum = (
  */
 export const buildTaxonomicLevelRealm = (
   entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.taxonomicLevelRealm,
   };
@@ -856,7 +876,7 @@ export const buildTaxonomicLevelRealm = (
  */
 export const buildReleaseDate = (
   entity: AssemblyContract
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.releaseDate
       ? formatDate(parseISO(entity.releaseDate), "yyyy")
@@ -871,7 +891,7 @@ export const buildReleaseDate = (
  */
 export const buildReleaseDateTooltip = (
   entity: AssemblyContract
-): Omit<ComponentProps<typeof C.Tooltip>, "children"> => {
+): Omit<ComponentProps<typeof Tooltip>, "children"> => {
   return {
     arrow: true,
     title: entity.releaseDate
@@ -887,7 +907,7 @@ export const buildReleaseDateTooltip = (
  */
 export const buildScaffoldCount = (
   entity: AssemblyContract
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof BasicCell> => {
   return {
     value: formatNumber(entity.scaffoldCount),
   };
@@ -900,7 +920,7 @@ export const buildScaffoldCount = (
  */
 export const buildScaffoldL50 = (
   entity: AssemblyContract
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof BasicCell> => {
   return {
     value: formatNumber(entity.scaffoldL50),
   };
@@ -913,7 +933,7 @@ export const buildScaffoldL50 = (
  */
 export const buildScaffoldN50 = (
   entity: AssemblyContract
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof BasicCell> => {
   return {
     value: formatNumber(entity.scaffoldN50),
   };
@@ -926,7 +946,7 @@ export const buildScaffoldN50 = (
  */
 export const buildTaxonomyId = (
   entity: AssemblyContract
-): ComponentProps<typeof C.BasicCell> => {
+): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.ncbiTaxonomyId,
   };
@@ -939,7 +959,7 @@ export const buildTaxonomyId = (
  */
 export const buildAssemblyResources = (
   entity: AssemblyContract
-): Pick<ComponentProps<typeof C.AnalysisPortals>, "portals"> => {
+): Pick<ComponentProps<typeof AnalysisPortals>, "portals"> => {
   return {
     portals: [
       ...(entity.galaxyDatacacheUrl
@@ -999,7 +1019,7 @@ export const buildAssemblyResources = (
  */
 export const buildOrganismHero = (
   organism: BRCDataCatalogOrganism
-): ComponentProps<typeof C.BackPageHero> => {
+): ComponentProps<typeof BackPageHero> => {
   // The species/group/priority are constant across the organism's assemblies,
   // so surface group + priority as header chips rather than repeating them on
   // every assembly row.
@@ -1014,7 +1034,7 @@ export const buildOrganismHero = (
   return {
     breadcrumbs: getOrganismEntityBreadcrumbs(organism),
     children: <Tabs ncbiTaxonomyId={organism.ncbiTaxonomyId} />,
-    subTitle: tags.length > 0 ? <C.TagList tags={tags} /> : undefined,
+    subTitle: tags.length > 0 ? <TagList tags={tags} /> : undefined,
     title: organism.taxonomicLevelSpecies,
   };
 };
@@ -1026,7 +1046,7 @@ export const buildOrganismHero = (
  */
 export const buildOrganismViewMain = (
   organism: BRCDataCatalogOrganism
-): ComponentProps<typeof C.OrganismViewMain> => {
+): ComponentProps<typeof OrganismViewMain> => {
   return {
     assembly: {
       columnPresets: ORGANISM_GENOMES_COLUMN_PRESETS,
@@ -1058,7 +1078,7 @@ const DEFAULT_COLUMN_VISIBILITY: VisibilityState = {
  * on toggle; columns not listed are shown.
  */
 const ORGANISM_GENOMES_COLUMN_PRESETS: ComponentProps<
-  typeof C.OrganismViewMain
+  typeof OrganismViewMain
 >["assembly"]["columnPresets"] = [
   {
     columnVisibility: DEFAULT_COLUMN_VISIBILITY,
@@ -1085,7 +1105,7 @@ const ORGANISM_GENOMES_COLUMN_PRESETS: ComponentProps<
  */
 export function buildOrganismGenomesTable(
   organism: BRCDataCatalogOrganism
-): ComponentProps<typeof C.OrganismViewMain>["assembly"]["tableOptions"] {
+): ComponentProps<typeof OrganismViewMain>["assembly"]["tableOptions"] {
   return {
     // Cast: ColumnDef<T> is invariant in T, so the catalog-specific row type
     // cannot widen to RowData even though BRCDataCatalogGenome extends it.
@@ -1117,7 +1137,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.ANALYZE_GENOME,
       cell: ({ row }) => (
-        <C.AnalyzeGenome {...buildAnalyzeGenome(row.original)} />
+        <AnalyzeGenome {...buildAnalyzeGenome(row.original)} />
       ),
       enableSorting: false,
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANALYZE_GENOME,
@@ -1132,7 +1152,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
       // tags.
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION,
       cell: ({ row }) => (
-        <C.SpeciesCell {...buildOrganismGenomeSpecies(row.original)} />
+        <SpeciesCell {...buildOrganismGenomeSpecies(row.original)} />
       ),
       header: ASSEMBLY_COLUMN_HEADER,
       meta: {
@@ -1144,9 +1164,9 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.RELEASE_DATE,
       cell: ({ row }) => (
-        <C.Tooltip {...buildReleaseDateTooltip(row.original)}>
-          <C.BasicCell {...buildReleaseDate(row.original)} />
-        </C.Tooltip>
+        <Tooltip {...buildReleaseDateTooltip(row.original)}>
+          <BasicCell {...buildReleaseDate(row.original)} />
+        </Tooltip>
       ),
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.RELEASE_DATE,
       meta: {
@@ -1156,7 +1176,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.IS_REF,
-      cell: ({ row }) => <C.ChipCell {...buildIsRef(row.original)} />,
+      cell: ({ row }) => <ChipCell {...buildIsRef(row.original)} />,
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.IS_REF,
       meta: {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.IS_REF,
@@ -1165,7 +1185,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.LEVEL,
-      cell: ({ row }) => <C.LevelCell {...buildLevel(row.original)} />,
+      cell: ({ row }) => <LevelCell {...buildLevel(row.original)} />,
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.LEVEL,
       meta: {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.LEVEL,
@@ -1174,7 +1194,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.CHROMOSOMES,
-      cell: ({ row }) => <C.BasicCell {...buildChromosomes(row.original)} />,
+      cell: ({ row }) => <BasicCell {...buildChromosomes(row.original)} />,
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.CHROMOSOMES,
       meta: {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.CHROMOSOMES,
@@ -1183,7 +1203,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.LENGTH,
-      cell: ({ row }) => <C.BasicCell {...buildLength(row.original)} />,
+      cell: ({ row }) => <BasicCell {...buildLength(row.original)} />,
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.LENGTH,
       meta: {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.LENGTH,
@@ -1192,7 +1212,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_COUNT,
-      cell: ({ row }) => <C.BasicCell {...buildScaffoldCount(row.original)} />,
+      cell: ({ row }) => <BasicCell {...buildScaffoldCount(row.original)} />,
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_COUNT,
       meta: {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_COUNT,
@@ -1201,7 +1221,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_N50,
-      cell: ({ row }) => <C.BasicCell {...buildScaffoldN50(row.original)} />,
+      cell: ({ row }) => <BasicCell {...buildScaffoldN50(row.original)} />,
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_N50,
       meta: {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_N50,
@@ -1210,7 +1230,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_L50,
-      cell: ({ row }) => <C.BasicCell {...buildScaffoldL50(row.original)} />,
+      cell: ({ row }) => <BasicCell {...buildScaffoldL50(row.original)} />,
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_L50,
       meta: {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_L50,
@@ -1219,7 +1239,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.COVERAGE,
-      cell: ({ row }) => <C.BasicCell {...buildCoverage(row.original)} />,
+      cell: ({ row }) => <BasicCell {...buildCoverage(row.original)} />,
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.COVERAGE,
       meta: {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.COVERAGE,
@@ -1228,7 +1248,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.GC_PERCENT,
-      cell: ({ row }) => <C.BasicCell {...buildGcPercent(row.original)} />,
+      cell: ({ row }) => <BasicCell {...buildGcPercent(row.original)} />,
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.GC_PERCENT,
       meta: {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.GC_PERCENT,
@@ -1237,9 +1257,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
     },
     {
       accessorKey: BRC_DATA_CATALOG_CATEGORY_KEY.ANNOTATION_STATUS,
-      cell: ({ row }) => (
-        <C.BasicCell {...buildAnnotationStatus(row.original)} />
-      ),
+      cell: ({ row }) => <BasicCell {...buildAnnotationStatus(row.original)} />,
       header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANNOTATION_STATUS,
       meta: {
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANNOTATION_STATUS,
@@ -1258,7 +1276,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<BRCDataCatalogGenome>[] {
 export const buildWorkflowConfiguration = (
   configuredInput: ConfiguredInput,
   configuredSteps: StepConfig[]
-): ComponentProps<typeof C.KeyValuePairs> => {
+): ComponentProps<typeof KeyValuePairs> => {
   const keyValuePairs = new Map<Key, Value>();
   for (const key of Object.keys(configuredInput)) {
     // Find the step config, for the configured input.
@@ -1274,9 +1292,9 @@ export const buildWorkflowConfiguration = (
     keyValuePairs.set("", "None");
   }
   return {
-    KeyElType: C.KeyElType,
-    KeyValuesElType: (props) => <C.Stack {...props} gap={4} />,
-    ValueElType: C.TypographyWordBreak,
+    KeyElType: KeyElType,
+    KeyValuesElType: (props) => <Stack {...props} gap={4} />,
+    ValueElType: TypographyWordBreak,
     keyValuePairs,
   };
 };
@@ -1288,14 +1306,14 @@ export const buildWorkflowConfiguration = (
  */
 export const buildWorkflowDetails = (
   workflow: Workflow
-): ComponentProps<typeof C.KeyValuePairs> => {
+): ComponentProps<typeof KeyValuePairs> => {
   const keyValuePairs = new Map<Key, Value>();
   keyValuePairs.set("Workflow", workflow.workflowName);
   keyValuePairs.set("Description", workflow.workflowDescription);
   return {
-    KeyElType: C.KeyElType,
-    KeyValuesElType: (props) => <C.Stack {...props} gap={4} />,
-    ValueElType: C.ValueElType,
+    KeyElType: KeyElType,
+    KeyValuesElType: (props) => <Stack {...props} gap={4} />,
+    ValueElType: ValueElType,
     keyValuePairs,
   };
 };

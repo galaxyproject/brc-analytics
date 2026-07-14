@@ -1,4 +1,8 @@
+import { BackPageHero } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/components/BackPageHero/backPageHero";
+import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
+import { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
+import { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/ChipCell/chipCell";
 import { ColumnDef, RowData, VisibilityState } from "@tanstack/react-table";
 import { ComponentProps } from "react";
 import { ROUTES } from "../../../../routes/constants";
@@ -11,12 +15,18 @@ import {
   GA2AssemblyEntity,
   GA2OrganismEntity,
 } from "../../../apis/catalog/ga2/entities";
-import * as C from "../../../components";
+import { Tooltip } from "../../../components/common/Tooltip/tooltip";
+import { OrganismAvatar } from "../../../components/Entity/components/OrganismAvatar/organismAvatar";
+import { AnalyzeGenome } from "../../../components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
+import { LevelCell } from "../../../components/Table/components/TableCell/components/LevelCell/levelCell";
+import { TagList } from "../../../components/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
+import { SpeciesCell } from "../../../components/Table/components/TableCell/components/SpeciesCell/speciesCell";
 import type { SpeciesTag } from "../../../components/Table/components/TableCell/components/SpeciesCell/types";
 import {
   COLUMN_PRESET_KEY,
   COLUMN_PRESET_LABEL,
 } from "../../../views/OrganismView/components/Main/constants";
+import { Main as OrganismViewMain } from "../../../views/OrganismView/components/Main/main";
 import {
   buildAnalyzeGenome,
   buildGroupTag,
@@ -36,7 +46,7 @@ import {
  */
 export const buildOrganismHero = (
   entity: GA2OrganismEntity
-): ComponentProps<typeof C.BackPageHero> => {
+): ComponentProps<typeof BackPageHero> => {
   // The species/group are constant across the organism's assemblies, so surface
   // the group as a header chip rather than repeating it on every assembly row.
   const groupTag = buildGroupTag(entity.taxonomicGroup);
@@ -45,7 +55,7 @@ export const buildOrganismHero = (
       { path: ROUTES.ORGANISMS, text: "Organisms" },
       { path: "", text: entity.taxonomicLevelSpecies },
     ],
-    subTitle: groupTag ? <C.TagList tags={[groupTag]} /> : undefined,
+    subTitle: groupTag ? <TagList tags={[groupTag]} /> : undefined,
     title: entity.taxonomicLevelSpecies,
   };
 };
@@ -57,7 +67,7 @@ export const buildOrganismHero = (
  */
 export const buildOrganismViewMain = (
   entity: GA2OrganismEntity
-): ComponentProps<typeof C.OrganismViewMain> => {
+): ComponentProps<typeof OrganismViewMain> => {
   return {
     assembly: {
       columnPresets: ORGANISM_GENOMES_COLUMN_PRESETS,
@@ -89,7 +99,7 @@ const DEFAULT_COLUMN_VISIBILITY: VisibilityState = {
  * on toggle; columns not listed are shown.
  */
 const ORGANISM_GENOMES_COLUMN_PRESETS: ComponentProps<
-  typeof C.OrganismViewMain
+  typeof OrganismViewMain
 >["assembly"]["columnPresets"] = [
   {
     columnVisibility: DEFAULT_COLUMN_VISIBILITY,
@@ -116,7 +126,7 @@ const ORGANISM_GENOMES_COLUMN_PRESETS: ComponentProps<
  */
 export const buildOrganismImageThumbnail = (
   entity: GA2OrganismEntity | GA2AssemblyEntity
-): ComponentProps<typeof C.OrganismAvatar> => {
+): ComponentProps<typeof OrganismAvatar> => {
   return {
     image: entity.image,
     isThumbnail: true,
@@ -130,7 +140,7 @@ export const buildOrganismImageThumbnail = (
  */
 export function buildOrganismGenomesTable(
   entity: GA2OrganismEntity
-): ComponentProps<typeof C.OrganismViewMain>["assembly"]["tableOptions"] {
+): ComponentProps<typeof OrganismViewMain>["assembly"]["tableOptions"] {
   return {
     // Cast: ColumnDef<T> is invariant in T, so the catalog-specific row type
     // cannot widen to RowData even though GA2AssemblyEntity extends it.
@@ -162,7 +172,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
     {
       accessorKey: GA2_CATEGORY_KEY.ANALYZE_GENOME,
       cell: ({ row }) => (
-        <C.AnalyzeGenome {...buildAnalyzeGenome(row.original)} />
+        <AnalyzeGenome {...buildAnalyzeGenome(row.original)} />
       ),
       enableSorting: false,
       header: GA2_CATEGORY_LABEL.ANALYZE_GENOME,
@@ -174,7 +184,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
       // tags.
       accessorKey: GA2_CATEGORY_KEY.ACCESSION,
       cell: ({ row }) => (
-        <C.SpeciesCell {...buildOrganismAssemblySpecies(row.original)} />
+        <SpeciesCell {...buildOrganismAssemblySpecies(row.original)} />
       ),
       header: ASSEMBLY_COLUMN_HEADER,
       meta: {
@@ -186,9 +196,9 @@ function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
     {
       accessorKey: GA2_CATEGORY_KEY.RELEASE_DATE,
       cell: ({ row }) => (
-        <C.Tooltip {...buildReleaseDateTooltip(row.original)}>
-          <C.BasicCell {...buildReleaseDate(row.original)} />
-        </C.Tooltip>
+        <Tooltip {...buildReleaseDateTooltip(row.original)}>
+          <BasicCell {...buildReleaseDate(row.original)} />
+        </Tooltip>
       ),
       header: GA2_CATEGORY_LABEL.RELEASE_DATE,
       meta: {
@@ -198,7 +208,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
     },
     {
       accessorKey: GA2_CATEGORY_KEY.IS_REF,
-      cell: ({ row }) => <C.ChipCell {...buildIsRef(row.original)} />,
+      cell: ({ row }) => <ChipCell {...buildIsRef(row.original)} />,
       header: GA2_CATEGORY_LABEL.IS_REF,
       meta: {
         header: GA2_CATEGORY_LABEL.IS_REF,
@@ -207,7 +217,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
     },
     {
       accessorKey: GA2_CATEGORY_KEY.LEVEL,
-      cell: ({ row }) => <C.LevelCell {...buildLevel(row.original)} />,
+      cell: ({ row }) => <LevelCell {...buildLevel(row.original)} />,
       header: GA2_CATEGORY_LABEL.LEVEL,
       meta: {
         header: GA2_CATEGORY_LABEL.LEVEL,
@@ -292,7 +302,7 @@ function buildOrganismGenomesTableColumns(): ColumnDef<GA2AssemblyEntity>[] {
  */
 export const buildOrganismSpecies = (
   entity: GA2OrganismEntity
-): ComponentProps<typeof C.Link> => {
+): ComponentProps<typeof Link> => {
   return {
     label: entity.taxonomicLevelSpecies,
     url: `${ROUTES.ORGANISMS}/${sanitizeEntityId(entity.ncbiTaxonomyId)}`,
@@ -309,7 +319,7 @@ export const buildOrganismSpecies = (
  */
 export const buildAssemblySpecies = (
   entity: GA2AssemblyEntity
-): ComponentProps<typeof C.SpeciesCell> => {
+): ComponentProps<typeof SpeciesCell> => {
   const tags: SpeciesTag[] = [];
   const strain = getGenomeStrainText(entity);
   if (strain) tags.push({ label: "strain", tooltip: strain, value: strain });
@@ -336,7 +346,7 @@ export const buildAssemblySpecies = (
  */
 export const buildOrganismAssemblySpecies = (
   entity: GA2AssemblyEntity
-): ComponentProps<typeof C.SpeciesCell> => {
+): ComponentProps<typeof SpeciesCell> => {
   const props = buildAssemblySpecies(entity);
   return {
     ...props,
