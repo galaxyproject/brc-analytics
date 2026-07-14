@@ -2,9 +2,12 @@ import {
   ColumnConfig,
   ComponentConfig,
 } from "@databiosphere/findable-ui/lib/config/entities";
+import { GA2OrganismEntity } from "../../../../../app/apis/catalog/ga2/entities";
+import * as C from "../../../../../app/components";
 import {
   buildAssemblyCount,
-  buildTaxonomicGroup,
+  buildOrganismAssemblyTaxonomyIds,
+  buildOrganismTaxonomicGroup,
   buildTaxonomicLevelClass,
   buildTaxonomicLevelDomain,
   buildTaxonomicLevelFamily,
@@ -12,10 +15,7 @@ import {
   buildTaxonomicLevelKingdom,
   buildTaxonomicLevelOrder,
   buildTaxonomicLevelPhylum,
-} from "app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { GA2OrganismEntity } from "../../../../../app/apis/catalog/ga2/entities";
-import * as C from "../../../../../app/components";
-import { buildOrganismAssemblyTaxonomyIds } from "../../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+} from "../../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import * as V from "../../../../../app/viewModelBuilders/catalog/ga2/viewModelBuilders";
 import { GA2_CATEGORY_KEY, GA2_CATEGORY_LABEL } from "../../../category";
 
@@ -112,7 +112,7 @@ export const TAXONOMIC_LEVEL_GENUS: ColumnConfig<GA2OrganismEntity> = {
 export const TAXONOMIC_GROUP: ColumnConfig<GA2OrganismEntity> = {
   componentConfig: {
     component: C.NTagCell,
-    viewBuilder: buildTaxonomicGroup,
+    viewBuilder: buildOrganismTaxonomicGroup,
   } as ComponentConfig<typeof C.NTagCell, GA2OrganismEntity>,
   header: GA2_CATEGORY_LABEL.TAXONOMIC_GROUP,
   id: GA2_CATEGORY_KEY.TAXONOMIC_GROUP,

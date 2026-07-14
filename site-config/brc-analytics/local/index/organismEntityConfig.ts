@@ -228,7 +228,7 @@ export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
       {
         componentConfig: {
           component: C.NTagCell,
-          viewBuilder: V.buildTaxonomicGroup,
+          viewBuilder: V.buildOrganismTaxonomicGroup,
         } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_GROUP,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_GROUP,

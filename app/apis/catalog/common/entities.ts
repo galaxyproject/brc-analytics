@@ -21,10 +21,15 @@ export interface AssemblyContract {
   lineageTaxonomyIds: string[];
   ncbiTaxonomyId: string;
   ploidy: ORGANISM_PLOIDY[];
+  // Priority/priorityPathogenName are BRC-only assembly fields; GA2 assemblies
+  // lack them, so they are optional and consumers must default when absent.
+  priority?: OUTBREAK_PRIORITY | null;
+  priorityPathogenName?: string | null;
   releaseDate: string;
   scaffoldCount: number | null;
   scaffoldL50: number | null;
   scaffoldN50: number | null;
+  speciesTaxonomyId: string;
   strainName: string | null;
   taxonomicGroup: string[];
   taxonomicLevelClass: string;
@@ -52,10 +57,16 @@ export interface AssemblyContract {
  * display when undefined.
  */
 export interface OrganismContract {
+  // assemblyCount/assemblyTaxonomyIds/taxonomicGroup are organism-entity fields
+  // absent on the assembly-derived projection, so they are optional and
+  // consumers must default when absent.
+  assemblyCount?: number;
+  assemblyTaxonomyIds?: string[];
   genomes?: OrganismGenome[];
   ncbiTaxonomyId: string;
   priority?: OUTBREAK_PRIORITY | null;
   priorityPathogenName?: string | null;
+  taxonomicGroup?: string[];
   taxonomicLevelIsolate?: string[];
   taxonomicLevelSerotype?: string[];
   taxonomicLevelSpecies: string;

@@ -1,5 +1,4 @@
-import type { BRCDataCatalogOrganism } from "../../apis/catalog/brc-analytics-catalog/common/entities";
-import type { GA2OrganismEntity } from "../../apis/catalog/ga2/entities";
+import type { OrganismContract } from "../../apis/catalog/common/entities";
 import type { Organism } from "../OrganismView/types";
 
 /**
@@ -15,16 +14,13 @@ import type { Organism } from "../OrganismView/types";
  * @returns Organism shape for the side panel.
  */
 export function mapOrganismEntityToOrganism(
-  organism: BRCDataCatalogOrganism | GA2OrganismEntity
+  organism: OrganismContract
 ): Organism {
   return {
     genomes: organism.genomes,
     ncbiTaxonomyId: organism.ncbiTaxonomyId,
-    priority: "priority" in organism ? organism.priority : undefined,
-    priorityPathogenName:
-      "priorityPathogenName" in organism
-        ? organism.priorityPathogenName
-        : undefined,
+    priority: organism.priority,
+    priorityPathogenName: organism.priorityPathogenName,
     taxonomicLevelSpecies: organism.taxonomicLevelSpecies,
   };
 }
