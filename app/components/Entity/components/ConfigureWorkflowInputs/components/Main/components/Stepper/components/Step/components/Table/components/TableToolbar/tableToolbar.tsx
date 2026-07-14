@@ -1,3 +1,4 @@
+import { Props } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/Table/types";
 import { TableDownload } from "@databiosphere/findable-ui/lib/components/Table/components/TableFeatures/TableDownload/tableDownload";
 import {
   StyledStack,
@@ -6,7 +7,6 @@ import {
 import { Divider } from "@mui/material";
 import { RowData } from "@tanstack/react-table";
 import { Fragment, JSX } from "react";
-import { Props } from "../../types";
 import { ResultsSummary } from "./components/ResultsSummary/resultsSummary";
 
 /**

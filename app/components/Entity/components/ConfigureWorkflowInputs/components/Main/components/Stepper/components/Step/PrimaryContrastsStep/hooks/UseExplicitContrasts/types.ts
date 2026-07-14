@@ -1,4 +1,4 @@
-import { ExplicitContrasts } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { ExplicitContrasts } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 
 export type ContrastPair = [string, string];
 

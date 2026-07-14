@@ -1,7 +1,7 @@
+import { BUTTON_PROPS } from "@/components/Home/components/Section/components/SectionHero/constants";
 import { Button } from "@mui/material";
 import { JSX } from "react";
 import { ROUTES } from "../../../../../../../../routes/constants";
-import { BUTTON_PROPS } from "../../SectionHero/constants";
 import { HeroImage } from "./components/HeroImage/heroImage";
 import {
   Head,

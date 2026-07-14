@@ -2,8 +2,8 @@
 // component barrel so importing it doesn't pull untransformable MDX modules.
 jest.mock("app/components", () => ({}));
 
-import type { BRCDataCatalogGenome } from "../../app/apis/catalog/brc-analytics-catalog/common/entities";
-import { buildLevel } from "../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import type { BRCDataCatalogGenome } from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import { buildLevel } from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 
 describe("buildLevel", () => {
   test.each([

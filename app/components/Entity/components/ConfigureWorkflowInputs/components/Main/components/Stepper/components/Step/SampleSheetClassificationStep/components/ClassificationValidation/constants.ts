@@ -1,4 +1,4 @@
-import { COLUMN_TYPE } from "../../types";
+import { COLUMN_TYPE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 
 export const VALIDATION_LABELS: Record<
   Extract<

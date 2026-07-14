@@ -1,4 +1,4 @@
-import { WORKFLOW_SCOPE } from "../../../../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { WORKFLOW_SCOPE } from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { buildWorkflows } from "../../../../catalog/build/ts/build-workflows";
 
 // Mock YAML file reading so we can inject source workflows.

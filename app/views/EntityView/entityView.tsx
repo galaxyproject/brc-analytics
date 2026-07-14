@@ -4,9 +4,9 @@ import { ComponentsConfig } from "@databiosphere/findable-ui/lib/config/entities
 import { useCurrentDetailTab } from "@databiosphere/findable-ui/lib/hooks/useCurrentDetailTab";
 import { useEntityHeadTitle } from "@databiosphere/findable-ui/lib/hooks/useEntityHeadTitle";
 import { useFetchEntity } from "@databiosphere/findable-ui/lib/hooks/useFetchEntity";
+import { AppBackPageTabConfig } from "@site-config/common/entities";
 import Head from "next/head";
 import { Fragment, JSX } from "react";
-import { AppBackPageTabConfig } from "../../../site-config/common/entities";
 
 export interface EntityViewProps<R> {
   data?: R;

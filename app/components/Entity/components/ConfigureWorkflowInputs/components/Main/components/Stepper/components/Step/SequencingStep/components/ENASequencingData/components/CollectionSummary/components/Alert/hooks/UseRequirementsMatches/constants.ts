@@ -1,5 +1,5 @@
-import { ReadRun } from "../../../../../../types";
-import { CATEGORY_CONFIGS } from "../../../../../CollectionSelector/hooks/UseTable/categoryConfigs";
+import { CATEGORY_CONFIGS } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/CollectionSelector/hooks/UseTable/categoryConfigs";
+import { ReadRun } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
 
 export const COLUMN_KEY_TO_LABEL: Partial<Record<keyof ReadRun, string>> = {
   [CATEGORY_CONFIGS.DESCRIPTION.key]: "Description",

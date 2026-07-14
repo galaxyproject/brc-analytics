@@ -1,3 +1,15 @@
+import type { BRCDataCatalogOrganism } from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import type { GA2OrganismEntity } from "@/apis/catalog/ga2/entities";
+import { useStepper } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/hook";
+import { SEQUENCING_STEPS } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/constants";
+import { useConfiguredSteps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/hook";
+import { augmentConfiguredSteps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/utils";
+import { Main } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/main";
+import { SideColumn } from "@/components/Entity/components/ConfigureWorkflowInputs/components/SideColumn/sideColumn";
+import { WorkflowEntityContext } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
+import { buildWorkflowEntityValue } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/utils";
+import { getWorkflow } from "@/services/workflows/entities";
+import { getEntity } from "@/services/workflows/query";
 import {
   BackPageContent,
   BackPageContentSideColumn,
@@ -5,18 +17,6 @@ import {
   BackPageView,
 } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { JSX, useMemo } from "react";
-import type { BRCDataCatalogOrganism } from "../../apis/catalog/brc-analytics-catalog/common/entities";
-import type { GA2OrganismEntity } from "../../apis/catalog/ga2/entities";
-import { useStepper } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/hook";
-import { SEQUENCING_STEPS } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/constants";
-import { useConfiguredSteps } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/hook";
-import { augmentConfiguredSteps } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/utils";
-import { Main } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/main";
-import { SideColumn } from "../../components/Entity/components/ConfigureWorkflowInputs/components/SideColumn/sideColumn";
-import { WorkflowEntityContext } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
-import { buildWorkflowEntityValue } from "../../components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/utils";
-import { getWorkflow } from "../../services/workflows/entities";
-import { getEntity } from "../../services/workflows/query";
 import { useConfigureInputs } from "../WorkflowInputsView/hooks/UseConfigureInputs/useConfigureInputs";
 import { StyledBackPageContentMainColumn } from "../WorkflowInputsView/workflowInputsView.styles";
 import { Top } from "./components/Top/top";

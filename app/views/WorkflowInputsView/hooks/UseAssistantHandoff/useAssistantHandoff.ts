@@ -1,6 +1,6 @@
-import { useCurrentPath } from "../../../../hooks/UseCurrentPath/hook";
-import { useHandoffInputs } from "../../../../providers/workflowHandoff/hooks/UseHandoffInputs/hook";
-import { EntityKey } from "../../../../providers/workflowHandoff/types";
+import { useCurrentPath } from "@/hooks/UseCurrentPath/hook";
+import { useHandoffInputs } from "@/providers/workflowHandoff/hooks/UseHandoffInputs/hook";
+import { EntityKey } from "@/providers/workflowHandoff/types";
 import { UseAssistantHandoff } from "./types";
 import { getInitialConfiguredInput } from "./utils";
 

@@ -1,6 +1,6 @@
-import { WorkflowEntity } from "../../../../../site-config/brc-analytics/local/index/workflow/types";
-import { formatTrsId } from "../../../../views/AnalyzeWorkflowsView/components/Main/utils";
-import { sanitizeEntityId } from "../../common/utils";
+import { sanitizeEntityId } from "@/apis/catalog/common/utils";
+import { formatTrsId } from "@/views/AnalyzeWorkflowsView/components/Main/utils";
+import { WorkflowEntity } from "@site-config/brc-analytics/local/index/workflow/types";
 import { BRCDataCatalogGenome, BRCDataCatalogOrganism } from "./entities";
 import { ORGANISM_PLOIDY, WORKFLOW_PLOIDY } from "./schema-entities";
 

@@ -1,9 +1,9 @@
+import { Section } from "@/components/content/content.styles";
+import { StaticProps } from "@/docs/common/staticGeneration/types";
 import { PANEL_BACKGROUND_COLOR } from "@databiosphere/findable-ui/lib/components/Layout/components/ContentLayout/common/entities";
 import { ContentGrid } from "@databiosphere/findable-ui/lib/components/Layout/components/ContentLayout/contentLayout.styles";
 import { ContentViewProps } from "@databiosphere/findable-ui/lib/views/ContentView/contentView";
 import { JSX } from "react";
-import { Section } from "../../../../components/content/content.styles";
-import { StaticProps } from "../../../../docs/common/staticGeneration/types";
 import {
   StyledContent,
   StyledContentLayout,

@@ -1,5 +1,8 @@
 import { CategoryConfig } from "@databiosphere/findable-ui/lib/common/categories/config/types";
-import { GA2_CATEGORY_KEY, GA2_CATEGORY_LABEL } from "../../../../category";
+import {
+  GA2_CATEGORY_KEY,
+  GA2_CATEGORY_LABEL,
+} from "@site-config/ga2/category";
 
 export const ACCESSION: CategoryConfig = {
   key: GA2_CATEGORY_KEY.ACCESSION,

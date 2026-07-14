@@ -1,11 +1,11 @@
+import { Outbreak } from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import * as C from "@/components";
+import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import { ResourcesSection } from "@/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
 import {
   ComponentConfig,
   ComponentsConfig,
 } from "@databiosphere/findable-ui/lib/config/entities";
-import { Outbreak } from "../../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
-import * as C from "../../../../../app/components";
-import * as V from "../../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { ResourcesSection } from "../../../../../app/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
 
 export const priorityPathogenMainColumn: ComponentsConfig = [
   {

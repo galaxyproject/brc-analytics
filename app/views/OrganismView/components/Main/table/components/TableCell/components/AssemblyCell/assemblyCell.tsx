@@ -1,10 +1,10 @@
+import type { PangenomeMember } from "@/apis/catalog/brc-analytics-catalog/common/pangenome";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { STACK_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/stack";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Chip, Stack, Typography } from "@mui/material";
 import { CellContext } from "@tanstack/react-table";
 import { JSX } from "react";
-import type { PangenomeMember } from "../../../../../../../../../apis/catalog/brc-analytics-catalog/common/pangenome";
 
 /**
  * Assembly cell for the pangenome members table: the member name, an optional

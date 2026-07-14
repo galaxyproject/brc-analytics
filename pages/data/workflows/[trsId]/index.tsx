@@ -1,14 +1,14 @@
+import { getPageMeta } from "@/common/meta/utils";
+import { EntityDataGate } from "@/components/EntityDataGate/entityDataGate";
+import { config } from "@/config/config";
+import { formatTrsId } from "@/views/AnalyzeWorkflowsView/components/Main/utils";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
+import { LEXICMAP } from "@/views/AnalyzeWorkflowsView/lexicmap/constants";
+import { LOGAN_SEARCH } from "@/views/AnalyzeWorkflowsView/loganSearch/constants";
+import { WorkflowView } from "@/views/WorkflowView/workflowView";
 import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
-import { getPageMeta } from "../../../../app/common/meta/utils";
-import { EntityDataGate } from "../../../../app/components/EntityDataGate/entityDataGate";
-import { config } from "../../../../app/config/config";
-import { formatTrsId } from "../../../../app/views/AnalyzeWorkflowsView/components/Main/utils";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../app/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
-import { LEXICMAP } from "../../../../app/views/AnalyzeWorkflowsView/lexicmap/constants";
-import { LOGAN_SEARCH } from "../../../../app/views/AnalyzeWorkflowsView/loganSearch/constants";
-import { WorkflowView } from "../../../../app/views/WorkflowView/workflowView";
 import workflowCategories from "../../../../catalog/output/workflows.json";
 
 interface Params extends ParsedUrlQuery {

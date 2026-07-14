@@ -1,8 +1,8 @@
+import { SectionRoadmap } from "@/components/content";
+import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Typography } from "@mui/material";
 import { Fragment, JSX } from "react";
-import { SectionRoadmap } from "../../components/content";
-import { SectionHero } from "../../components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import { BREADCRUMBS } from "./common/constants";
 
 export const RoadmapView = (): JSX.Element => {

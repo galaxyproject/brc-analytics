@@ -1,8 +1,8 @@
-import { isOptionDisabled } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/components/ClassificationTable/components/Select/utils";
+import { isOptionDisabled } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/components/ClassificationTable/components/Select/utils";
 import {
   COLUMN_TYPE,
   ColumnClassifications,
-} from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
+} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 
 describe("isOptionDisabled", () => {
   describe("single-select types", () => {

@@ -1,9 +1,5 @@
-import {
-  ColumnConfig,
-  ComponentConfig,
-} from "@databiosphere/findable-ui/lib/config/entities";
-import { GA2OrganismEntity } from "../../../../../app/apis/catalog/ga2/entities";
-import * as C from "../../../../../app/components";
+import { GA2OrganismEntity } from "@/apis/catalog/ga2/entities";
+import * as C from "@/components";
 import {
   buildAssemblyCount,
   buildOrganismAssemblyTaxonomyIds,
@@ -15,9 +11,16 @@ import {
   buildTaxonomicLevelKingdom,
   buildTaxonomicLevelOrder,
   buildTaxonomicLevelPhylum,
-} from "../../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import * as V from "../../../../../app/viewModelBuilders/catalog/ga2/viewModelBuilders";
-import { GA2_CATEGORY_KEY, GA2_CATEGORY_LABEL } from "../../../category";
+} from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import * as V from "@/viewModelBuilders/catalog/ga2/viewModelBuilders";
+import {
+  ColumnConfig,
+  ComponentConfig,
+} from "@databiosphere/findable-ui/lib/config/entities";
+import {
+  GA2_CATEGORY_KEY,
+  GA2_CATEGORY_LABEL,
+} from "@site-config/ga2/category";
 
 export const ASSEMBLY_COUNT: ColumnConfig<GA2OrganismEntity> = {
   componentConfig: {

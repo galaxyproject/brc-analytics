@@ -1,3 +1,22 @@
+import {
+  EntitiesResponse,
+  WorkflowCategory,
+} from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import { getPageMeta } from "@/common/meta/utils";
+import { EntityDataGate } from "@/components/EntityDataGate/entityDataGate";
+import { config } from "@/config/config";
+import { getEntities } from "@/utils/entityUtils";
+import { seedDatabase } from "@/utils/seedDatabase";
+import {
+  formatTrsId,
+  workflowIsCompatibleWithAssembly,
+} from "@/views/AnalyzeWorkflowsView/components/Main/utils";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
+import { buildOrganismWorkflows } from "@/views/OrganismView/components/Main/utils";
+import type { Organism } from "@/views/OrganismView/types";
+import { OrganismWorkflowInputsView } from "@/views/OrganismWorkflowInputsView/organismWorkflowInputsView";
+import { Assembly } from "@/views/WorkflowInputsView/types";
+import { WorkflowInputsView } from "@/views/WorkflowInputsView/workflowInputsView";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import {
   GetStaticPaths,
@@ -7,25 +26,6 @@ import {
 } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
-import {
-  EntitiesResponse,
-  WorkflowCategory,
-} from "../../../../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
-import { getPageMeta } from "../../../../../../../app/common/meta/utils";
-import { EntityDataGate } from "../../../../../../../app/components/EntityDataGate/entityDataGate";
-import { config } from "../../../../../../../app/config/config";
-import { getEntities } from "../../../../../../../app/utils/entityUtils";
-import { seedDatabase } from "../../../../../../../app/utils/seedDatabase";
-import {
-  formatTrsId,
-  workflowIsCompatibleWithAssembly,
-} from "../../../../../../../app/views/AnalyzeWorkflowsView/components/Main/utils";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../../../app/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
-import { buildOrganismWorkflows } from "../../../../../../../app/views/OrganismView/components/Main/utils";
-import type { Organism } from "../../../../../../../app/views/OrganismView/types";
-import { OrganismWorkflowInputsView } from "../../../../../../../app/views/OrganismWorkflowInputsView/organismWorkflowInputsView";
-import { Assembly } from "../../../../../../../app/views/WorkflowInputsView/types";
-import { WorkflowInputsView } from "../../../../../../../app/views/WorkflowInputsView/workflowInputsView";
 import workflowsData from "../../../../../../../catalog/output/workflows.json";
 
 // Cast the schema-validated catalog JSON to its typed shape.

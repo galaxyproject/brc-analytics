@@ -1,4 +1,4 @@
-import { StepConfig } from "../../components/Step/types";
+import { StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 
 /**
  * Returns the index of the first step that is not disabled.

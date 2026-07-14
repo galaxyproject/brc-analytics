@@ -1,7 +1,7 @@
-import { EnaSequencingReads } from "../../../../../../../../../../../../../utils/galaxy-api/entities";
-import { ConfiguredInput } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { StepProps } from "../../../types";
-import { SEQUENCING_DATA_TYPE } from "../../types";
+import { SEQUENCING_DATA_TYPE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/types";
+import { StepProps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
+import { EnaSequencingReads } from "@/utils/galaxy-api/entities";
+import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { LIBRARY_LAYOUT_TO_CONFIGURE_INPUT_KEY } from "./constants";
 import { ReadRun } from "./types";
 

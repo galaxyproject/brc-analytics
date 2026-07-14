@@ -1,5 +1,4 @@
-import { act, renderHook } from "@testing-library/react";
-import { useBaselineContrasts } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseBaselineContrasts/hook";
+import { useBaselineContrasts } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseBaselineContrasts/hook";
 import {
   buildBaselineContrasts,
   createInitialCompare,
@@ -7,7 +6,8 @@ import {
   selectBaselineUpdater,
   toggleCompareUpdater,
   validateBaselineContrasts,
-} from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseBaselineContrasts/utils";
+} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseBaselineContrasts/utils";
+import { act, renderHook } from "@testing-library/react";
 
 describe("useBaselineContrasts", () => {
   describe("initialization", () => {

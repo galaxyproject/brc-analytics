@@ -1,17 +1,17 @@
-import { WorkflowParameter } from "../../apis/catalog/brc-analytics-catalog/common/entities";
+import { WorkflowParameter } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   WORKFLOW_PARAMETER_VARIABLE,
   WorkflowCollectionSpec,
   WorkflowUrlSpec,
-} from "../../apis/catalog/brc-analytics-catalog/common/schema-entities";
+} from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
 
 const FILE_EXT = {
   FASTQ_SANGER_GZ: "fastqsanger.gz",
 } as const;
 
+import { COLUMN_TYPE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
+import { PrimaryContrasts } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import ky from "ky";
-import { COLUMN_TYPE } from "../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
-import { PrimaryContrasts } from "../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { UcscTrack } from "../ucsc-tracks-api/entities";
 import {
   fetchUcscMd5Checksums,

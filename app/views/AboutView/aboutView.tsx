@@ -1,8 +1,8 @@
+import { SectionContentCard } from "@/components/common/Card/components/SectionContentCard/sectionContentCard";
+import { SectionContent } from "@/components/Docs/components/SectionContent/sectionContent";
+import { StyledStack } from "@/components/Docs/components/SectionContentCards/sectionContentCards.styles";
+import { StyledSectionHero } from "@/components/Docs/components/SectionHero/sectionHero.styles";
 import { ComponentProps, Fragment, JSX } from "react";
-import { SectionContentCard } from "../../components/common/Card/components/SectionContentCard/sectionContentCard";
-import { SectionContent } from "../../components/Docs/components/SectionContent/sectionContent";
-import { StyledStack } from "../../components/Docs/components/SectionContentCards/sectionContentCards.styles";
-import { StyledSectionHero } from "../../components/Docs/components/SectionHero/sectionHero.styles";
 
 interface AboutViewProps {
   cards: ComponentProps<typeof SectionContentCard>[];

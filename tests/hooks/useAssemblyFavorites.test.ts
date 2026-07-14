@@ -1,8 +1,8 @@
+import { useAssemblyFavorites } from "@/hooks/useAssemblyFavorites";
+import { useAuth } from "@/providers/authentication";
+import { brcAPIClient } from "@/services/brc-api-client";
+import { FavoriteResponse } from "@/types/api";
 import { act, renderHook, waitFor } from "@testing-library/react";
-import { useAssemblyFavorites } from "../../app/hooks/useAssemblyFavorites";
-import { useAuth } from "../../app/providers/authentication";
-import { brcAPIClient } from "../../app/services/brc-api-client";
-import { FavoriteResponse } from "../../app/types/api";
 
 jest.mock("../../app/providers/authentication", () => ({
   useAuth: jest.fn(),

@@ -1,10 +1,10 @@
+import { useShowPangenome } from "@/views/OrganismView/hooks/UseShowPangenome/hook";
 import { TabScrollFuzz } from "@databiosphere/findable-ui/lib/components/common/Tabs/tabs.styles";
 import { BackPageTabs } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { useHash } from "@databiosphere/findable-ui/lib/components/Layout/components/Outline/hooks/UseHash/hook";
 import { Tabs as MTabs, Tab } from "@mui/material";
 import { useRouter } from "next/router";
 import { type JSX } from "react";
-import { useShowPangenome } from "../../hooks/UseShowPangenome/hook";
 import { TAB } from "./constants";
 import { Props } from "./types";
 import { getActiveTab } from "./utils";

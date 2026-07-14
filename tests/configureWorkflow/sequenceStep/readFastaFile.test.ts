@@ -1,8 +1,8 @@
 import {
   MAX_FILE_SIZE_BYTES,
   VALIDATION_ERROR,
-} from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequenceStep/hooks/UseFilePicker/constants";
-import { readFastaFile } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequenceStep/hooks/UseFilePicker/utils";
+} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequenceStep/hooks/UseFilePicker/constants";
+import { readFastaFile } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequenceStep/hooks/UseFilePicker/utils";
 
 /**
  * Creates a mock File with the given content and name.

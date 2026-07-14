@@ -1,10 +1,10 @@
+import { Workflow } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { Loading } from "@databiosphere/findable-ui/lib/components/Loading/loading";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { PAPER_PANEL_STYLE } from "@databiosphere/findable-ui/lib/components/common/Paper/paper";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Typography } from "@mui/material";
 import { JSX, useState } from "react";
-import { Workflow } from "../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import { useLaunchGalaxy } from "./components/Stepper/components/Step/hooks/UseLaunchGalaxy/useLaunchGalaxy";
 import { Stepper } from "./components/Stepper/stepper";
 import {

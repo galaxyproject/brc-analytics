@@ -1,14 +1,14 @@
 import type {
   BRCDataCatalogGenome,
   WorkflowCategory,
-} from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
+} from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   ORGANISM_PLOIDY,
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
-} from "../../../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { buildAssemblyWorkflows } from "../../../app/views/AnalyzeWorkflowsView/components/Main/utils";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../app/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
+} from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { buildAssemblyWorkflows } from "@/views/AnalyzeWorkflowsView/components/Main/utils";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { WorkflowCategoryId } from "../../../catalog/schema/generated/schema";
 
 describe("buildAssemblyWorkflows - scope filtering", () => {

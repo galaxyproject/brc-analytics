@@ -1,12 +1,12 @@
 import {
   Workflow,
   WorkflowCategory,
-} from "../../apis/catalog/brc-analytics-catalog/common/entities";
-import type { Pangenome } from "../../apis/catalog/brc-analytics-catalog/common/pangenome";
+} from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import type { Pangenome } from "@/apis/catalog/brc-analytics-catalog/common/pangenome";
 import type {
   AssemblyContract,
   OrganismContract,
-} from "../../apis/catalog/common/entities";
+} from "@/apis/catalog/common/entities";
 import { findEntity, getEntities, getEntity } from "./query";
 
 /**

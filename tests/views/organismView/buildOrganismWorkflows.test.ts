@@ -1,10 +1,10 @@
-import type { WorkflowCategory } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
+import type { WorkflowCategory } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
-} from "../../../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { buildOrganismWorkflows } from "../../../app/views/OrganismView/components/Main/utils";
-import type { Organism } from "../../../app/views/OrganismView/types";
+} from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { buildOrganismWorkflows } from "@/views/OrganismView/components/Main/utils";
+import type { Organism } from "@/views/OrganismView/types";
 
 describe("buildOrganismWorkflows", () => {
   const ORGANISM: Organism = {

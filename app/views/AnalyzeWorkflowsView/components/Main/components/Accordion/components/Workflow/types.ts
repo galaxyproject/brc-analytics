@@ -1,4 +1,4 @@
-import { Workflow } from "../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
+import { Workflow } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 
 export interface Props {
   configureRoute?: string;

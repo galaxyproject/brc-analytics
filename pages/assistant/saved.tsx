@@ -1,3 +1,7 @@
+import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
+import { useAuth } from "@/providers/authentication";
+import { brcAPIClient } from "@/services/brc-api-client";
+import { SavedAnalysisSummary } from "@/types/api";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
   Alert,
@@ -9,10 +13,6 @@ import {
 } from "@mui/material";
 import { useRouter } from "next/router";
 import { JSX, useEffect, useState } from "react";
-import { SectionHero } from "../../app/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
-import { useAuth } from "../../app/providers/authentication";
-import { brcAPIClient } from "../../app/services/brc-api-client";
-import { SavedAnalysisSummary } from "../../app/types/api";
 
 const BREADCRUMBS: Breadcrumb[] = [
   {

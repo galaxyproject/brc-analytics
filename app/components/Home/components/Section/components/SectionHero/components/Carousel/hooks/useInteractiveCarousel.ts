@@ -1,9 +1,9 @@
-import { CardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
-import { useMemo } from "react";
 import {
   UseSwipeInteraction,
   useSwipeInteraction,
-} from "../../../../../../../../../hooks/useSwipeInteraction/useSwipeInteraction";
+} from "@/hooks/useSwipeInteraction/useSwipeInteraction";
+import { CardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
+import { useMemo } from "react";
 import { CAROUSEL_CARDS } from "../cards/constants";
 
 export interface UseInteractiveCarousel {

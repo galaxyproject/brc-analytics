@@ -1,4 +1,4 @@
-import { EntityKey } from "../../types";
+import { EntityKey } from "@/providers/workflowHandoff/types";
 import { WorkflowHandoffActionKind } from "../types";
 
 /**

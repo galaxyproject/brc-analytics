@@ -1,14 +1,14 @@
+import { GA2OrganismEntity } from "@/apis/catalog/ga2/entities";
+import { getOrganismId } from "@/apis/catalog/ga2/utils";
 import {
   ListConfig,
   SORT_DIRECTION,
 } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
-import { GA2OrganismEntity } from "../../../../../app/apis/catalog/ga2/entities";
-import { getOrganismId } from "../../../../../app/apis/catalog/ga2/utils";
-import { AppEntityConfig } from "../../../../common/entities";
-import { GA2_CATEGORY_KEY } from "../../../category";
-import { organismMainColumn } from "../../entity/organism/organismMainColumn";
-import { organismTop } from "../../entity/organism/organismTop";
+import { AppEntityConfig } from "@site-config/common/entities";
+import { GA2_CATEGORY_KEY } from "@site-config/ga2/category";
+import { organismMainColumn } from "@site-config/ga2/local/entity/organism/organismMainColumn";
+import { organismTop } from "@site-config/ga2/local/entity/organism/organismTop";
 import { CATEGORY_GROUPS } from "./categoryGroups";
 import { COLUMNS } from "./columns";
 

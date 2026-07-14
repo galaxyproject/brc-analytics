@@ -1,9 +1,5 @@
-import {
-  ColumnConfig,
-  ComponentConfig,
-} from "@databiosphere/findable-ui/lib/config/entities";
-import { GA2AssemblyEntity } from "../../../../../app/apis/catalog/ga2/entities";
-import * as C from "../../../../../app/components";
+import { GA2AssemblyEntity } from "@/apis/catalog/ga2/entities";
+import * as C from "@/components";
 import {
   buildAccession,
   buildAnalyzeGenome,
@@ -29,9 +25,16 @@ import {
   buildTaxonomicLevelOrder,
   buildTaxonomicLevelPhylum,
   buildTaxonomyId,
-} from "../../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import * as V from "../../../../../app/viewModelBuilders/catalog/ga2/viewModelBuilders";
-import { GA2_CATEGORY_KEY, GA2_CATEGORY_LABEL } from "../../../category";
+} from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import * as V from "@/viewModelBuilders/catalog/ga2/viewModelBuilders";
+import {
+  ColumnConfig,
+  ComponentConfig,
+} from "@databiosphere/findable-ui/lib/config/entities";
+import {
+  GA2_CATEGORY_KEY,
+  GA2_CATEGORY_LABEL,
+} from "@site-config/ga2/category";
 
 export const ACCESSION: ColumnConfig<GA2AssemblyEntity> = {
   componentConfig: {

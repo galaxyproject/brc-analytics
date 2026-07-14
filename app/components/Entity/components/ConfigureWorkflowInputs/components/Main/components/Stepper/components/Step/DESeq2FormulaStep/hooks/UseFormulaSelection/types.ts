@@ -1,4 +1,4 @@
-import { COLUMN_TYPE } from "../../../SampleSheetClassificationStep/types";
+import { COLUMN_TYPE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 
 export interface CategorizedCovariates {
   biologicalFactors: string[];

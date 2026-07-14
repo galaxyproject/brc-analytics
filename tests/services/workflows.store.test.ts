@@ -3,7 +3,7 @@ import {
   getEntitiesByType,
   setEntitiesById,
   setEntitiesByType,
-} from "../../app/services/workflows/store";
+} from "@/services/workflows/store";
 
 describe("workflows store", () => {
   beforeEach(() => {

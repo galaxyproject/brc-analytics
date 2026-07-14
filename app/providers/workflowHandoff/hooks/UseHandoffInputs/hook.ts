@@ -1,7 +1,7 @@
+import { DEFAULT_HANDOFF_INPUTS } from "@/providers/workflowHandoff/constants";
+import { WorkflowHandoffContext } from "@/providers/workflowHandoff/context";
+import { EntityKey } from "@/providers/workflowHandoff/types";
 import { useContext } from "react";
-import { DEFAULT_HANDOFF_INPUTS } from "../../constants";
-import { WorkflowHandoffContext } from "../../context";
-import { EntityKey } from "../../types";
 import { UseHandoffInputs } from "./types";
 
 /**

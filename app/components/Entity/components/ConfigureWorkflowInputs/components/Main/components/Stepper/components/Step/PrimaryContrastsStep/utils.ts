@@ -1,4 +1,4 @@
-import { ConfiguredInput } from "../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 
 /**
  * Extracts unique values from the primary factor column in the sample sheet.

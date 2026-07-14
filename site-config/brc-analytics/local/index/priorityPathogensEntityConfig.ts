@@ -1,8 +1,8 @@
+import { Outbreak } from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import { SLUGIFY_OPTIONS } from "@/common/constants";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
+import { AppEntityConfig } from "@site-config/common/entities";
 import slugify from "slugify";
-import { Outbreak } from "../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
-import { SLUGIFY_OPTIONS } from "../../../../app/common/constants";
-import { AppEntityConfig } from "../../../common/entities";
 import { priorityPathogenMainColumn } from "../entity/priorityPathogen/priorityPathogenMainColumn";
 import { priorityPathogenSideColumn } from "../entity/priorityPathogen/priorityPathogenSideColumn";
 import { priorityPathogenTop } from "../entity/priorityPathogen/priorityPathogenTop";

@@ -1,9 +1,9 @@
+import type { Organism } from "@/views/OrganismView/types";
 import type {
   RowData,
   TableOptions,
   VisibilityState,
 } from "@tanstack/react-table";
-import type { Organism } from "../../types";
 
 export interface ColumnPreset {
   columnVisibility: VisibilityState;

@@ -1,11 +1,11 @@
-import type { Workflow } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
+import type { Workflow } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
-} from "../../../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { getConfiguredValues } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseLaunchGalaxy/utils";
-import type { ConfiguredInput } from "../../../app/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+} from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { getConfiguredValues } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseLaunchGalaxy/utils";
+import type { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 
 // Mock workflow constants to avoid pulling in unneeded modules
 jest.mock(

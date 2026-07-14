@@ -1,4 +1,4 @@
-import { getColumnNames } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/utils";
+import { getColumnNames } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/utils";
 
 describe("getColumnNames", () => {
   test("returns empty set when fields is undefined", () => {

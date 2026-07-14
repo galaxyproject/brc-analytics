@@ -1,4 +1,4 @@
-import { config } from "../../../../../../../app/config/config";
+import { config } from "@/config/config";
 
 /**
  * Interface representing a node in the NCBI taxonomy tree

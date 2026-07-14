@@ -1,6 +1,6 @@
+import type { Pangenome } from "@/apis/catalog/brc-analytics-catalog/common/pangenome";
+import { getPangenome } from "@/services/workflows/entities";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
-import type { Pangenome } from "../../../../apis/catalog/brc-analytics-catalog/common/pangenome";
-import { getPangenome } from "../../../../services/workflows/entities";
 
 /**
  * Returns the pangenome bundle to show for a species — the bundle when the

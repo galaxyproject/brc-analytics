@@ -3,7 +3,7 @@ import {
   BaselineContrasts,
   ExplicitContrasts,
   PrimaryContrasts,
-} from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+} from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { CONTRAST_MODE } from "../UseRadioGroup/types";
 
 /**

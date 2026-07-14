@@ -1,8 +1,8 @@
+import { SectionContent } from "@/components/content/content.styles";
 import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import { SectionContent } from "../../../content/content.styles";
 
 interface Props {
   offset: number;

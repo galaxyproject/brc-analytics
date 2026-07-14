@@ -1,7 +1,7 @@
+import { INITIAL_STATE } from "@/providers/workflowHandoff/constants";
+import { workflowHandoffReducer } from "@/providers/workflowHandoff/reducer";
+import { WorkflowHandoffContextValue } from "@/providers/workflowHandoff/types";
 import { useReducer } from "react";
-import { INITIAL_STATE } from "../../constants";
-import { workflowHandoffReducer } from "../../reducer";
-import { WorkflowHandoffContextValue } from "../../types";
 
 /**
  * Internal hook wiring the reducer used by `WorkflowHandoffProvider`.

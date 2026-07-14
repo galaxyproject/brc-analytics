@@ -1,19 +1,19 @@
-import { Fragment, JSX } from "react";
 import {
   FILL,
   GRID_SIZE,
-} from "../../../../../../../Layout/components/Hero/common/constants";
-import { ELEMENT_ID } from "../../../../../../../Layout/components/Hero/common/entities";
+} from "@/components/Layout/components/Hero/common/constants";
+import { ELEMENT_ID } from "@/components/Layout/components/Hero/common/entities";
 import {
   getFillUrl,
   getViewBox,
-} from "../../../../../../../Layout/components/Hero/common/utils";
-import { BlueCircle } from "../../../../../../../Layout/components/Hero/components/Defs/BlueCircle/blueCircle";
-import { BlueRect } from "../../../../../../../Layout/components/Hero/components/Defs/BlueRect/blueRect";
-import { CoralPinkCircle } from "../../../../../../../Layout/components/Hero/components/Defs/CoralPinkCircle/coralPinkCircle";
-import { SmokeCircle } from "../../../../../../../Layout/components/Hero/components/Defs/SmokeCircle/smokeCircle";
-import { SmokeRect } from "../../../../../../../Layout/components/Hero/components/Defs/SmokeRect/smokeRect";
-import { YellowRect } from "../../../../../../../Layout/components/Hero/components/Defs/YellowRect/yellowRect";
+} from "@/components/Layout/components/Hero/common/utils";
+import { BlueCircle } from "@/components/Layout/components/Hero/components/Defs/BlueCircle/blueCircle";
+import { BlueRect } from "@/components/Layout/components/Hero/components/Defs/BlueRect/blueRect";
+import { CoralPinkCircle } from "@/components/Layout/components/Hero/components/Defs/CoralPinkCircle/coralPinkCircle";
+import { SmokeCircle } from "@/components/Layout/components/Hero/components/Defs/SmokeCircle/smokeCircle";
+import { SmokeRect } from "@/components/Layout/components/Hero/components/Defs/SmokeRect/smokeRect";
+import { YellowRect } from "@/components/Layout/components/Hero/components/Defs/YellowRect/yellowRect";
+import { Fragment, JSX } from "react";
 import { SVG } from "./hero.styles";
 
 export interface HeroProps {

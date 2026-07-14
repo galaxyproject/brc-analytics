@@ -1,5 +1,5 @@
+import { URLS } from "@/components/Home/common/constants";
 import { CardProps as DXCardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
-import { URLS } from "../../../../../../../../common/constants";
 
 const CARD_ACTION_LABEL = {
   LEARN_MORE: "Learn More",

@@ -1,3 +1,9 @@
+import { sanitizeEntityId } from "@/apis/catalog/common/utils";
+import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
+import { useAssemblyFavorites } from "@/hooks/useAssemblyFavorites";
+import { useAuth } from "@/providers/authentication";
+import { getEntity } from "@/services/workflows/query";
+import { Assembly } from "@/views/WorkflowInputsView/types";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
   Alert,
@@ -9,12 +15,6 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 import { JSX } from "react";
-import { sanitizeEntityId } from "../../app/apis/catalog/common/utils";
-import { SectionHero } from "../../app/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
-import { useAssemblyFavorites } from "../../app/hooks/useAssemblyFavorites";
-import { useAuth } from "../../app/providers/authentication";
-import { getEntity } from "../../app/services/workflows/query";
-import { Assembly } from "../../app/views/WorkflowInputsView/types";
 
 const BREADCRUMBS: Breadcrumb[] = [
   {

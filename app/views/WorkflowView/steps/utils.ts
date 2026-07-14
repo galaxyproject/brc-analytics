@@ -1,4 +1,4 @@
-import { StepConfig } from "../../../components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
+import { StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 
 /**
  * Enables the Reference Assembly step in the step configuration.

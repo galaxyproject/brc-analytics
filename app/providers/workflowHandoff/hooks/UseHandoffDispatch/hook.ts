@@ -1,9 +1,9 @@
+import { clearHandoff as clearHandoffAction } from "@/providers/workflowHandoff/actions/clearHandoff/dispatch";
+import { ClearHandoffPayload } from "@/providers/workflowHandoff/actions/clearHandoff/types";
+import { setHandoff as setHandoffAction } from "@/providers/workflowHandoff/actions/setHandoff/dispatch";
+import { SetHandoffPayload } from "@/providers/workflowHandoff/actions/setHandoff/types";
+import { WorkflowHandoffContext } from "@/providers/workflowHandoff/context";
 import { useCallback, useContext } from "react";
-import { clearHandoff as clearHandoffAction } from "../../actions/clearHandoff/dispatch";
-import { ClearHandoffPayload } from "../../actions/clearHandoff/types";
-import { setHandoff as setHandoffAction } from "../../actions/setHandoff/dispatch";
-import { SetHandoffPayload } from "../../actions/setHandoff/types";
-import { WorkflowHandoffContext } from "../../context";
 import { UseHandoffDispatch } from "./types";
 
 /**
