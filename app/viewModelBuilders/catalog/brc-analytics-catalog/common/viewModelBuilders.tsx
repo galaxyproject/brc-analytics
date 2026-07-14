@@ -14,10 +14,6 @@ import type {
   OrganismContract,
 } from "@/apis/catalog/common/entities";
 import { sanitizeEntityId } from "@/apis/catalog/common/utils";
-import {
-  GA2AssemblyEntity,
-  GA2OrganismEntity,
-} from "@/apis/catalog/ga2/entities";
 import { SLUGIFY_OPTIONS } from "@/common/constants";
 import { AppLink } from "@/components/common/AppLink/appLink";
 import { Chip } from "@/components/common/Chip/chip";
@@ -726,17 +722,6 @@ export const buildPriorityPathogenResources = (
   };
 };
 
-// Union consumed by the buildTaxonomicLevel* cell builders below, which run on
-// both organisms and assemblies across both sites. Splitting these into
-// per-contract variants is deferred — the taxonomic-level fields live on the
-// organism *entity* but not on the assembly-derived organism projection, so it
-// needs the entity-vs-projection contract separation (tracked in #1428).
-type TaxonomicGroupEntity =
-  | BRCDataCatalogOrganism
-  | BRCDataCatalogGenome
-  | GA2AssemblyEntity
-  | GA2OrganismEntity;
-
 /**
  * Build props for the taxonomic group cell of an assembly.
  * @param entity - Assembly with a taxonomicGroup property.
@@ -767,12 +752,13 @@ export const buildOrganismTaxonomicGroup = (
 
 /**
  * Build props for the class cell.
- * @param entity - Organism or genome entity.
+ * @param entity - Entity with a taxonomicLevelClass property.
+ * @param entity.taxonomicLevelClass - Taxonomic class.
  * @returns Props to be used for the cell.
  */
-export const buildTaxonomicLevelClass = (
-  entity: TaxonomicGroupEntity
-): ComponentProps<typeof BasicCell> => {
+export const buildTaxonomicLevelClass = (entity: {
+  taxonomicLevelClass: string;
+}): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.taxonomicLevelClass,
   };
@@ -780,12 +766,13 @@ export const buildTaxonomicLevelClass = (
 
 /**
  * Build props for the domain cell.
- * @param entity - Organism or genome entity.
+ * @param entity - Entity with a taxonomicLevelDomain property.
+ * @param entity.taxonomicLevelDomain - Taxonomic domain.
  * @returns Props to be used for the cell.
  */
-export const buildTaxonomicLevelDomain = (
-  entity: TaxonomicGroupEntity
-): ComponentProps<typeof BasicCell> => {
+export const buildTaxonomicLevelDomain = (entity: {
+  taxonomicLevelDomain: string;
+}): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.taxonomicLevelDomain,
   };
@@ -793,12 +780,13 @@ export const buildTaxonomicLevelDomain = (
 
 /**
  * Build props for the family cell.
- * @param entity - Organism or genome entity.
+ * @param entity - Entity with a taxonomicLevelFamily property.
+ * @param entity.taxonomicLevelFamily - Taxonomic family.
  * @returns Props to be used for the cell.
  */
-export const buildTaxonomicLevelFamily = (
-  entity: TaxonomicGroupEntity
-): ComponentProps<typeof BasicCell> => {
+export const buildTaxonomicLevelFamily = (entity: {
+  taxonomicLevelFamily: string;
+}): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.taxonomicLevelFamily,
   };
@@ -806,12 +794,13 @@ export const buildTaxonomicLevelFamily = (
 
 /**
  * Build props for the genus cell.
- * @param entity - Organism or genome entity.
+ * @param entity - Entity with a taxonomicLevelGenus property.
+ * @param entity.taxonomicLevelGenus - Taxonomic genus.
  * @returns Props to be used for the cell.
  */
-export const buildTaxonomicLevelGenus = (
-  entity: TaxonomicGroupEntity
-): ComponentProps<typeof BasicCell> => {
+export const buildTaxonomicLevelGenus = (entity: {
+  taxonomicLevelGenus: string;
+}): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.taxonomicLevelGenus,
   };
@@ -819,12 +808,13 @@ export const buildTaxonomicLevelGenus = (
 
 /**
  * Build props for the kingdom cell.
- * @param entity - Organism or genome entity.
+ * @param entity - Entity with a taxonomicLevelKingdom property.
+ * @param entity.taxonomicLevelKingdom - Taxonomic kingdom.
  * @returns Props to be used for the cell.
  */
-export const buildTaxonomicLevelKingdom = (
-  entity: TaxonomicGroupEntity
-): ComponentProps<typeof BasicCell> => {
+export const buildTaxonomicLevelKingdom = (entity: {
+  taxonomicLevelKingdom: string;
+}): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.taxonomicLevelKingdom,
   };
@@ -832,12 +822,13 @@ export const buildTaxonomicLevelKingdom = (
 
 /**
  * Build props for the order cell.
- * @param entity - Organism or genome entity.
+ * @param entity - Entity with a taxonomicLevelOrder property.
+ * @param entity.taxonomicLevelOrder - Taxonomic order.
  * @returns Props to be used for the cell.
  */
-export const buildTaxonomicLevelOrder = (
-  entity: TaxonomicGroupEntity
-): ComponentProps<typeof BasicCell> => {
+export const buildTaxonomicLevelOrder = (entity: {
+  taxonomicLevelOrder: string;
+}): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.taxonomicLevelOrder,
   };
@@ -845,12 +836,13 @@ export const buildTaxonomicLevelOrder = (
 
 /**
  * Build props for the phylum cell.
- * @param entity - Organism or genome entity.
+ * @param entity - Entity with a taxonomicLevelPhylum property.
+ * @param entity.taxonomicLevelPhylum - Taxonomic phylum.
  * @returns Props to be used for the cell.
  */
-export const buildTaxonomicLevelPhylum = (
-  entity: TaxonomicGroupEntity
-): ComponentProps<typeof BasicCell> => {
+export const buildTaxonomicLevelPhylum = (entity: {
+  taxonomicLevelPhylum: string;
+}): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.taxonomicLevelPhylum,
   };
@@ -858,12 +850,13 @@ export const buildTaxonomicLevelPhylum = (
 
 /**
  * Build props for the realm cell.
- * @param entity - Organism or genome entity.
+ * @param entity - Entity with a taxonomicLevelRealm property.
+ * @param entity.taxonomicLevelRealm - Taxonomic realm.
  * @returns Props to be used for the cell.
  */
-export const buildTaxonomicLevelRealm = (
-  entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
-): ComponentProps<typeof BasicCell> => {
+export const buildTaxonomicLevelRealm = (entity: {
+  taxonomicLevelRealm: string;
+}): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.taxonomicLevelRealm,
   };

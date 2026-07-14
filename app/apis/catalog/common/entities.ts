@@ -12,6 +12,9 @@ export interface AssemblyContract {
   accession: string;
   annotationStatus: string | null;
   chromosomes: number | null;
+  // commonName is a BRC-only assembly field; GA2 assemblies lack it, so it is
+  // optional and consumers must default when absent.
+  commonName?: string | null;
   coverage: string | null;
   galaxyDatacacheUrl: string | null;
   gcPercent: number | null;
@@ -42,6 +45,9 @@ export interface AssemblyContract {
   taxonomicLevelKingdom: string;
   taxonomicLevelOrder: string;
   taxonomicLevelPhylum: string;
+  // taxonomicLevelRealm is a BRC-only assembly field; GA2 assemblies lack it, so
+  // it is optional and consumers must default when absent.
+  taxonomicLevelRealm?: string;
   taxonomicLevelSerotype?: string;
   taxonomicLevelSpecies: string;
   taxonomicLevelStrain: string;
