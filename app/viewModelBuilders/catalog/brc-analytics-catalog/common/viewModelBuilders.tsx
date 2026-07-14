@@ -758,7 +758,7 @@ export const buildAssemblyTaxonomicGroup = (
  */
 export const buildOrganismTaxonomicGroup = (
   entity: OrganismContract
-): ComponentProps<typeof C.NTagCell> => {
+): ComponentProps<typeof NTagCell> => {
   return {
     label: "taxonomic groups",
     values: entity.taxonomicGroup ?? [],
