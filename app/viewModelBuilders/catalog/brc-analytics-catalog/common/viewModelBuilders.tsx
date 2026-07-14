@@ -146,11 +146,13 @@ export const buildAssemblyDetails = (
 
 /**
  * Build props for the assemblies cell.
- * @param entity - Entity with an assemblyCount property.
+ * @param entity - Entity with a required assemblyCount property.
  * @returns Props for the BasicCell component.
  */
 export const buildAssemblyCount = (
-  entity: OrganismContract
+  // `assemblyCount` is optional on OrganismContract; require it here so callers
+  // can't pass a projection without it and silently render an empty value.
+  entity: OrganismContract & { assemblyCount: number }
 ): ComponentProps<typeof C.BasicCell> => {
   return {
     value: formatNumber(entity.assemblyCount),
