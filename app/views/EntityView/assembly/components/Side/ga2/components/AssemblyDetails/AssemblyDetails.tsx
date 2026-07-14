@@ -1,5 +1,5 @@
 import { OrganismAvatar } from "@/components/Entity/components/OrganismAvatar/organismAvatar";
-import { buildAssemblyDetails } from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import { buildAssemblyDetails } from "@/viewModelBuilders/catalog/common/viewModelBuilders";
 import { StyledSection } from "@/views/EntityView/components/KeyValueSection/keyValueSection.styles";
 import { KeyElType } from "@/views/EntityView/ui/KeyElType/keyElType";
 import { KeyValueElType } from "@/views/EntityView/ui/KeyValueElType/keyValueElType";

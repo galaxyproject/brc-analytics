@@ -13,13 +13,10 @@ import type {
   AssemblyContract,
   OrganismContract,
 } from "@/apis/catalog/common/entities";
-import { sanitizeEntityId } from "@/apis/catalog/common/utils";
 import { SLUGIFY_OPTIONS } from "@/common/constants";
 import { AppLink } from "@/components/common/AppLink/appLink";
 import { Chip } from "@/components/common/Chip/chip";
-import { CopyText } from "@/components/common/CopyText/copyText";
 import { Tooltip } from "@/components/common/Tooltip/tooltip";
-import { AnalysisPortals } from "@/components/Entity/components/AnalysisPortals/analysisPortals";
 import { StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { KeyValueSection } from "@/components/Entity/components/Section/KeyValueSection/keyValueSection";
 import { MDXSection } from "@/components/Entity/components/Section/MDXSection/mdxSection";
@@ -28,7 +25,25 @@ import { LevelCell } from "@/components/Table/components/TableCell/components/Le
 import { TagList } from "@/components/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
 import { SpeciesCell } from "@/components/Table/components/TableCell/components/SpeciesCell/speciesCell";
 import type { SpeciesTag } from "@/components/Table/components/TableCell/components/SpeciesCell/types";
-import { formatDate } from "@/utils/date-fns";
+import {
+  ORGANISM_SCOPED_TAG_LABELS,
+  SPECIES_TAG_LABEL,
+} from "@/viewModelBuilders/catalog/common/constants";
+import {
+  buildAnalyzeGenome,
+  buildAssemblyDetails,
+  buildAssemblyResources,
+  buildGroupTag,
+  buildIsRef,
+  buildLevel,
+  buildOrganismDetails as buildOrganismDetailsBase,
+  buildReleaseDate,
+  buildReleaseDateTooltip,
+  formatNumber,
+  getGenomeIsolateText,
+  getGenomeSerotypeText,
+  getGenomeStrainText,
+} from "@/viewModelBuilders/catalog/common/viewModelBuilders";
 import {
   COLUMN_PRESET_KEY,
   COLUMN_PRESET_LABEL,
@@ -59,25 +74,35 @@ import { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/compo
 import { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/ChipCell/chipCell";
 import { NTagCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/NTagCell/nTagCell";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
-import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
 } from "@site-config/brc-analytics/category";
 import { ColumnDef, RowData, VisibilityState } from "@tanstack/react-table";
-import { parseISO } from "date-fns";
 import { LinkProps } from "next/link";
 import Router from "next/router";
 import { ComponentProps } from "react";
 import slugify from "slugify";
 import { ROUTES } from "../../../../../routes/constants";
-import {
-  GALAXY_DATACACHE,
-  GENOME_BROWSER,
-  NCBI_ASSEMBLY,
-  NCBI_DATASETS_URL,
-  NCBI_TAXONOMY,
-} from "./constants";
+
+// Transitional shim for the GA2/BRC split (monorepo-split): shared builders
+// moved to the site-neutral common home. Re-export them from this BRC path so
+// existing BRC importers keep resolving; repoint importers at
+// @/viewModelBuilders/catalog/common and drop these re-exports, then remove.
+export {
+  buildAnalyzeGenome,
+  buildAssemblyDetails,
+  buildAssemblyResources,
+  buildGroupTag,
+  buildIsRef,
+  buildLevel,
+  buildReleaseDate,
+  buildReleaseDateTooltip,
+  formatNumber,
+  getGenomeIsolateText,
+  getGenomeSerotypeText,
+  getGenomeStrainText,
+};
 
 /**
  * Build props for the accession cell.
@@ -93,40 +118,6 @@ export const buildAccession = (
 };
 
 /**
- * Build props for the genome analysis cell.
- * @param entity - Entity with an accession, ncbiTaxonomyId, and ucscBrowserUrl.
- * @returns Props to be used for the AnalyzeGenome component.
- */
-export const buildAnalyzeGenome = (
-  entity: AssemblyContract
-): ComponentProps<typeof AnalyzeGenome> => {
-  const { accession, ncbiTaxonomyId, ucscBrowserUrl } = entity;
-  return {
-    analyze: {
-      label: "Analyze",
-      url: replaceParameters(ROUTES.GENOME, {
-        entityId: sanitizeEntityId(accession),
-      }),
-    },
-    views: [
-      ...(ucscBrowserUrl
-        ? [{ label: "UCSC Genome Browser", url: ucscBrowserUrl }]
-        : []),
-      {
-        label: "NCBI Genome Assembly",
-        url: `${NCBI_DATASETS_URL}/genome/${accession}`,
-      },
-      {
-        label: "NCBI Taxonomy",
-        url: `${NCBI_DATASETS_URL}/taxonomy/${encodeURIComponent(
-          ncbiTaxonomyId
-        )}`,
-      },
-    ],
-  };
-};
-
-/**
  * Build props for the annotation status cell.
  * @param entity - Entity with an annotationStatus property.
  * @returns Props for the BasicCell component.
@@ -136,27 +127,6 @@ export const buildAnnotationStatus = (
 ): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.annotationStatus,
-  };
-};
-
-/**
- * Build props for the assembly details KeyValuePairs component.
- * @param assembly - Assembly entity.
- * @returns Props to be used for the KeyValuePairs component.
- */
-export const buildAssemblyDetails = (
-  assembly: AssemblyContract
-): ComponentProps<typeof KeyValuePairs> => {
-  const keyValuePairs = new Map<Key, Value>();
-  keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
-    <CopyText value={assembly.accession}>{assembly.accession}</CopyText>
-  );
-  return {
-    KeyElType: KeyElType,
-    KeyValuesElType: (props) => <Stack {...props} gap={4} />,
-    ValueElType: ValueElType,
-    keyValuePairs,
   };
 };
 
@@ -265,36 +235,6 @@ export const buildGenomeSpecies = (
 };
 
 /**
- * Species-cell tag labels. Single source of truth shared by the tag builders
- * and the organism-scoped filter so they can't drift apart.
- */
-const SPECIES_TAG_LABEL = {
-  GROUP: "group",
-  PRIORITY: "priority",
-} as const;
-
-/**
- * Labels of the species/organism-scoped tags (constant across an organism's
- * assemblies). On the organism detail page these move to the header, so the
- * per-assembly species cell omits them.
- */
-export const ORGANISM_SCOPED_TAG_LABELS: string[] = [
-  SPECIES_TAG_LABEL.GROUP,
-  SPECIES_TAG_LABEL.PRIORITY,
-];
-
-/**
- * Build the taxonomic group tag, or null when there is no group.
- * @param taxonomicGroup - Taxonomic group values.
- * @returns Group tag, or null.
- */
-export function buildGroupTag(taxonomicGroup: string[]): SpeciesTag | null {
-  if (taxonomicGroup.length === 0) return null;
-  const value = taxonomicGroup.join(", ");
-  return { label: SPECIES_TAG_LABEL.GROUP, tooltip: value, value };
-}
-
-/**
  * Build the priority pathogen tag, or null when the entity has no priority.
  * @param priority - Outbreak priority.
  * @param priorityPathogenName - Priority pathogen name (tag tooltip).
@@ -377,26 +317,6 @@ export const buildGenomeTaxonomicLevelIsolate = (
 };
 
 /**
- * Build props for the "is ref" cell.
- * @param entity - Entity with an isRef property.
- * @returns Props for the ChipCell component.
- */
-export const buildIsRef = (
-  entity: AssemblyContract
-): ComponentProps<typeof ChipCell> => {
-  return {
-    getValue: () => ({
-      color:
-        entity.isRef.toLowerCase() === "yes"
-          ? CHIP_PROPS.COLOR.SUCCESS
-          : CHIP_PROPS.COLOR.DEFAULT,
-      label: entity.isRef,
-      variant: CHIP_PROPS.VARIANT.STATUS,
-    }),
-  } as ComponentProps<typeof ChipCell>;
-};
-
-/**
  * Build props for the length cell.
  * @param entity - Entity with a length property.
  * @returns Props for the BasicCell component.
@@ -406,38 +326,6 @@ export const buildLength = (
 ): ComponentProps<typeof BasicCell> => {
   return {
     value: formatNumber(entity.length),
-  };
-};
-
-/**
- * Maps each NCBI assembly level to its filled-bar count (most → least complete).
- */
-const LEVEL_FILLED_COUNT: Record<string, number> = {
-  Chromosome: 3,
-  "Complete Genome": 4,
-  Contig: 1,
-  Scaffold: 2,
-};
-
-/**
- * Overrides the displayed label for specific NCBI assembly levels; levels not
- * listed here display their raw value.
- */
-const LEVEL_LABEL: Record<string, string> = {
-  "Complete Genome": "Genome",
-};
-
-/**
- * Build props for the level cell — a tiered bar indicator plus the level label.
- * @param entity - Entity with a level property.
- * @returns Props for the LevelCell component.
- */
-export const buildLevel = (
-  entity: AssemblyContract
-): ComponentProps<typeof LevelCell> => {
-  return {
-    filledCount: LEVEL_FILLED_COUNT[entity.level] ?? 0,
-    label: LEVEL_LABEL[entity.level] ?? entity.level,
   };
 };
 
@@ -456,61 +344,23 @@ export const buildOrganismAssemblyTaxonomyIds = (
 };
 
 /**
- * Build props for the organism details KeyValuePairs component.
+ * Build props for the organism details KeyValuePairs component. Composes the
+ * shared taxonomic-level core and appends the BRC-only priority-pathogen chip
+ * when the organism is a priority pathogen.
  * @param organism - Organism details (mapped from an assembly or organism source).
  * @returns Props to be used for the KeyValuePairs component.
  */
 export const buildOrganismDetails = (
   organism: Organism
 ): ComponentProps<typeof KeyValuePairs> => {
-  const {
-    ncbiTaxonomyId,
-    priorityPathogenName,
-    taxonomicLevelIsolate,
-    taxonomicLevelSerotype,
-    taxonomicLevelSpecies,
-    taxonomicLevelStrain,
-  } = organism;
-
-  const keyValuePairs = new Map<Key, Value>();
-
-  keyValuePairs.set(
-    BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
-    <Link
-      label={taxonomicLevelSpecies}
-      url={`${ROUTES.ORGANISMS}/${encodeURIComponent(sanitizeEntityId(ncbiTaxonomyId))}`}
-    />
-  );
-  const taxonomicLevels: [Key, string[] | undefined][] = [
-    [
-      BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
-      taxonomicLevelStrain,
-    ],
-    [
-      BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SEROTYPE,
-      taxonomicLevelSerotype,
-    ],
-    [
-      BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_ISOLATE,
-      taxonomicLevelIsolate,
-    ],
-  ];
-  for (const [label, values] of taxonomicLevels) {
-    if (values?.length) keyValuePairs.set(label, values.join(", "));
-  }
-  if (priorityPathogenName) {
-    keyValuePairs.set(
+  const details = buildOrganismDetailsBase(organism);
+  if (organism.priorityPathogenName) {
+    details.keyValuePairs?.set(
       BRC_DATA_CATALOG_CATEGORY_LABEL.PRIORITY_PATHOGEN_NAME,
       <Chip {...buildPriorityPathogen(organism)} />
     );
   }
-
-  return {
-    KeyElType: KeyElType,
-    KeyValuesElType: (props) => <Stack {...props} gap={4} />,
-    ValueElType: ValueElType,
-    keyValuePairs,
-  };
+  return details;
 };
 
 /**
@@ -863,37 +713,6 @@ export const buildTaxonomicLevelRealm = (entity: {
 };
 
 /**
- * Build props for the release date cell, displaying the release year.
- * @param entity - Entity with a releaseDate property.
- * @returns Props for the BasicCell component.
- */
-export const buildReleaseDate = (
-  entity: AssemblyContract
-): ComponentProps<typeof BasicCell> => {
-  return {
-    value: entity.releaseDate
-      ? formatDate(parseISO(entity.releaseDate), "yyyy")
-      : "",
-  };
-};
-
-/**
- * Build props for the release date tooltip, showing the full release date.
- * @param entity - Entity with a releaseDate property.
- * @returns Props for the Tooltip component.
- */
-export const buildReleaseDateTooltip = (
-  entity: AssemblyContract
-): Omit<ComponentProps<typeof Tooltip>, "children"> => {
-  return {
-    arrow: true,
-    title: entity.releaseDate
-      ? formatDate(parseISO(entity.releaseDate))
-      : undefined,
-  };
-};
-
-/**
  * Build props for the scaffold count cell.
  * @param entity - Entity with a scaffoldCount property.
  * @returns Props for the BasicCell component.
@@ -942,66 +761,6 @@ export const buildTaxonomyId = (
 ): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.ncbiTaxonomyId,
-  };
-};
-
-/**
- * Build props for the assembly AnalysisPortals component.
- * @param entity - Entity with an accession, ucscBrowserUrl and ncbiTaxonomyId property.
- * @returns Props to be used for the AnalysisPortals component.
- */
-export const buildAssemblyResources = (
-  entity: AssemblyContract
-): Pick<ComponentProps<typeof AnalysisPortals>, "portals"> => {
-  return {
-    portals: [
-      ...(entity.galaxyDatacacheUrl
-        ? [
-            {
-              imageProps: {
-                alt: GALAXY_DATACACHE,
-                src: "/analysis-portals/galaxy.svg",
-                width: 20,
-              },
-              label: GALAXY_DATACACHE,
-              url: entity.galaxyDatacacheUrl,
-            },
-          ]
-        : []),
-      ...(entity.ucscBrowserUrl
-        ? [
-            {
-              imageProps: {
-                alt: GENOME_BROWSER,
-                src: "/analysis-portals/ucsc-genome.png",
-                width: 20,
-              },
-              label: GENOME_BROWSER,
-              url: entity.ucscBrowserUrl,
-            },
-          ]
-        : []),
-      {
-        imageProps: {
-          alt: NCBI_ASSEMBLY,
-          src: "/analysis-portals/ncbi.png",
-          width: 20,
-        },
-        label: NCBI_ASSEMBLY,
-        url: `${NCBI_DATASETS_URL}/genome/${entity.accession}`,
-      },
-      {
-        imageProps: {
-          alt: NCBI_TAXONOMY,
-          src: "/analysis-portals/ncbi.png",
-          width: 20,
-        },
-        label: NCBI_TAXONOMY,
-        url: `${NCBI_DATASETS_URL}/taxonomy/${encodeURIComponent(
-          entity.ncbiTaxonomyId
-        )}`,
-      },
-    ],
   };
 };
 
@@ -1335,58 +1094,6 @@ function getEntityLinkWithPriorityPathogenFilter(
 }
 
 /**
- * Get text for genome strain, consisting of, from highest to lowest priority, either: strain-only name; strain name including species; or the specified default value.
- * @param entity - Entity with a strainName and taxonomicLevelStrain property.
- * @param defaultValue - Default value to use if there's no strain.
- * @returns strain text.
- */
-export function getGenomeStrainText(
-  entity: AssemblyContract,
-  defaultValue = ""
-): string {
-  if (entity.strainName) return entity.strainName;
-  if (entity.taxonomicLevelStrain !== "None")
-    return entity.taxonomicLevelStrain;
-  return defaultValue;
-}
-
-/**
- * Get the genome serotype text.
- * @param genome - Genome entity.
- * @param defaultValue - Default value if no serotype is found.
- * @returns serotype text.
- */
-export function getGenomeSerotypeText(
-  genome: AssemblyContract,
-  defaultValue = ""
-): string {
-  if (
-    genome.taxonomicLevelSerotype !== undefined &&
-    genome.taxonomicLevelSerotype !== "None"
-  )
-    return genome.taxonomicLevelSerotype;
-  return defaultValue;
-}
-
-/**
- * Get the genome isolate text.
- * @param genome - Genome entity.
- * @param defaultValue - Default value if no isolate is found.
- * @returns isolate text.
- */
-export function getGenomeIsolateText(
-  genome: AssemblyContract,
-  defaultValue = ""
-): string {
-  if (
-    genome.taxonomicLevelIsolate !== undefined &&
-    genome.taxonomicLevelIsolate !== "None"
-  )
-    return genome.taxonomicLevelIsolate;
-  return defaultValue;
-}
-
-/**
  * Get the organism entity breadcrumbs.
  * @param organism - Organism entity.
  * @returns Breadcrumbs.
@@ -1412,14 +1119,4 @@ function getPriorityPathogenEntityBreadcrumbs(
     { path: ROUTES.PRIORITY_PATHOGENS, text: "Priority Pathogens" },
     { path: "", text: priorityPathogen.name },
   ];
-}
-
-/**
- * Format a number to a string.
- * @param value - Number to format.
- * @returns Formatted number or empty string if invalid.
- */
-export function formatNumber(value: unknown): string {
-  if (typeof value !== "number" || Number.isNaN(value)) return "";
-  return value.toLocaleString();
 }
