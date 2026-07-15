@@ -1,4 +1,5 @@
 import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
+import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
 import { useAuth } from "@/providers/authentication";
 import { brcAPIClient } from "@/services/brc-api-client";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
@@ -155,3 +156,5 @@ export default function PreferencesPage(): JSX.Element {
     </>
   );
 }
+
+PreferencesPage.Main = StyledPagesMain;
