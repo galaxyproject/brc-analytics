@@ -563,8 +563,7 @@ def add_gene_model_url(genomes_df: pd.DataFrame):
 def report_missing_values_from(
     values_name, message_predicate, all_values_series, *partial_values_series
 ):
-    present_values_mask = all_values_series.astype(bool)
-    present_values_mask[:] = False
+    present_values_mask = pd.Series(False, index=all_values_series.index)
     for series in partial_values_series:
         present_values_mask |= all_values_series.isin(series)
     return report_missing_values(
