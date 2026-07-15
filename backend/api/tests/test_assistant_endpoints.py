@@ -64,6 +64,11 @@ def app_with_stubbed_agent(tmp_path, monkeypatch):
     )
     fake_agent.session_service.delete_session = AsyncMock(return_value=True)
     fake_agent.compute_handoff = MagicMock(return_value=(False, None))
+    # restore_session reconciles persisted state before handoff and re-derives
+    # suggestions from it; stub both so the endpoint returns the real schema and a
+    # concrete suggestions list, not MagicMocks.
+    fake_agent.reconcile_schema = MagicMock(side_effect=lambda schema: schema)
+    fake_agent._derive_suggestions = MagicMock(return_value=[])
 
     from app.main import create_app
 
