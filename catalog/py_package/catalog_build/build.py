@@ -4,6 +4,7 @@ import io
 import json
 import logging
 import os
+import re
 import time
 import urllib
 from dataclasses import asdict, dataclass
@@ -1362,15 +1363,17 @@ def save_taxonomy_mapping(taxonomy_ids, taxon_name_map, taxon_rank_map, output_p
         print(f"Wrote taxonomy mapping to {output_path}")
 
 
-def add_galaxy_datacache_url(genomes_df, base_url, batch_size=20, timeout=5):
+def add_galaxy_datacache_url(genomes_df, base_url, timeout=30):
     """
     Add Galaxy Datacache URLs to genomes dataframe after validating they exist.
+
+    Fetches the parent directory listing once and checks accession membership
+    against it, rather than issuing a request per accession.
 
     Args:
         genomes_df: DataFrame containing genome information with 'accession' column
         base_url: Base URL used to construct the datacache link per accession
-        batch_size: Number of URLs to validate concurrently (default: 20)
-        timeout: Timeout in seconds for each request (default: 5)
+        timeout: Timeout in seconds for the listing request (default: 30)
 
     Returns:
         tuple: (updated genomes_df with galaxyDatacacheUrl column, list of missing accessions)
@@ -1384,38 +1387,33 @@ def add_galaxy_datacache_url(genomes_df, base_url, batch_size=20, timeout=5):
     normalized_base_url = base_url if base_url.endswith("/") else f"{base_url}/"
 
     print("Validating Galaxy Datacache URLs...")
-    missing_accessions = []
-    datacache_urls = []
 
-    total_genomes = len(genomes_df)
-    processed = 0
+    response = requests.get(normalized_base_url, timeout=timeout)
+    response.raise_for_status()
+    available = {
+        entry
+        for entry in re.findall(r'href="([^"]+)/"', response.text)
+        if not entry.startswith(("/", ".", "?", "http"))
+    }
 
-    for i in range(0, total_genomes, batch_size):
-        batch_df = genomes_df.iloc[i : i + batch_size]
+    # If autoindex is disabled or the response is unexpected, we'd otherwise
+    # silently mark every accession as missing. Fail loudly instead.
+    if not available:
+        raise RuntimeError(
+            f"Datacache listing at {normalized_base_url} returned no directory entries; "
+            "server may have disabled directory listing."
+        )
 
-        for _, row in batch_df.iterrows():
-            accession = row["accession"]
-            url = f"{normalized_base_url}{accession}/"
-
-            try:
-                response = requests.get(url, timeout=timeout)
-                if response.status_code == 200:
-                    datacache_urls.append(url)
-                else:
-                    datacache_urls.append("")
-                    missing_accessions.append(accession)
-            except (requests.RequestException, requests.Timeout) as e:
-                log.debug(f"Failed to validate datacache URL for {accession}: {e}")
-                datacache_urls.append("")
-                missing_accessions.append(accession)
-
-            processed += 1
-            print(f"Validated {processed} of {total_genomes} datacache URLs", end="\r")
-
-        time.sleep(0.1)
+    accessions = genomes_df["accession"].tolist()
+    datacache_urls = [
+        f"{normalized_base_url}{accession}/" if accession in available else ""
+        for accession in accessions
+    ]
+    missing_accessions = [a for a, url in zip(accessions, datacache_urls) if not url]
 
     print(
-        f"\nValidated {total_genomes} datacache URLs, {len(missing_accessions)} not found"
+        f"Validated {len(accessions)} datacache URLs against {len(available)}-entry listing, "
+        f"{len(missing_accessions)} not found"
     )
 
     genomes_df["galaxyDatacacheUrl"] = datacache_urls
