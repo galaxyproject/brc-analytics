@@ -1627,12 +1627,15 @@ def build_files(
             zip(outbreak_taxon_id_strings, outbreak_taxonomy_df["rank"])
         )
 
+        # Set for O(1) membership tests in the per-row loop below
+        outbreak_taxonomy_id_set = set(outbreak_taxonomy_ids)
+
         # For each row, check if any lineage taxonomy ID is in the outbreak taxonomy IDs
         # and add the corresponding taxon name to otherTaxa only if its rank is not in taxonomic_levels_for_tree
         def get_other_taxa(lineage_ids):
             taxa = []
             for tax_id in lineage_ids:
-                if tax_id in outbreak_taxonomy_ids:
+                if tax_id in outbreak_taxonomy_id_set:
                     # Check if this taxon's rank is already covered by taxonomic_levels_for_tree
                     rank = outbreak_taxon_rank_map.get(str(tax_id), "").lower()
                     if rank not in taxonomic_levels_for_tree:
