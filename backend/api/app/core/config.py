@@ -40,6 +40,18 @@ class Settings:
         self.AI_SKIP_SSL_VERIFY: bool = (
             os.getenv("AI_SKIP_SSL_VERIFY", "false").lower() == "true"
         )
+        # How the state EXTRACTOR emits its structured output. The reply is a
+        # separate plain-text call; a focused second call extracts the tracker
+        # snapshot.
+        # The eval showed MiniMax on TACC only post-hoc-validates json_schema
+        # (drifts to prose -> 400) but follows a prompted JSON instruction, while
+        # Anthropic honors tool output -- so the mode is provider-dependent.
+        #   auto (default): prompted for OpenAI-compatible endpoints, tool for
+        #                   Anthropic.
+        #   native | tool | prompted: force a specific pydantic-ai output mode.
+        self.ASSISTANT_OUTPUT_MODE: str = os.getenv(
+            "ASSISTANT_OUTPUT_MODE", "auto"
+        ).lower()
 
         # Database settings -- required for persistent user data (favorites,
         # saved analyses, workflow runs). Anonymous / non-persistent flows
