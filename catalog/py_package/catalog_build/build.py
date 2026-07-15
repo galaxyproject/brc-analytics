@@ -1613,11 +1613,6 @@ def build_files(
     print(f"Found {len(outbreak_taxonomy_ids)} outbreak taxonomy IDs")
     # Add otherTaxa field with outbreak-associated taxa names
     if outbreak_taxonomy_ids:
-        # Convert lineageTaxonomyIds from comma-separated string to list of strings
-        species_df["lineageTaxonomyIdsList"] = species_df["lineageTaxonomyIds"].apply(
-            lambda x: [id for id in x.split(",")]
-        )
-
         # Get taxon names and ranks for outbreak taxonomy IDs
         outbreak_taxon_id_strings = outbreak_taxonomy_df["taxonomy_id"].astype("string")
         outbreak_taxon_name_map = dict(
@@ -1632,9 +1627,9 @@ def build_files(
 
         # For each row, check if any lineage taxonomy ID is in the outbreak taxonomy IDs
         # and add the corresponding taxon name to otherTaxa only if its rank is not in taxonomic_levels_for_tree
-        def get_other_taxa(lineage_ids):
+        def get_other_taxa(lineage_taxonomy_ids):
             taxa = []
-            for tax_id in lineage_ids:
+            for tax_id in lineage_taxonomy_ids.split(","):
                 if tax_id in outbreak_taxonomy_id_set:
                     # Check if this taxon's rank is already covered by taxonomic_levels_for_tree
                     rank = outbreak_taxon_rank_map.get(str(tax_id), "").lower()
@@ -1644,12 +1639,7 @@ def build_files(
             # Convert list to comma-separated string for build-assemblies.ts
             return ",".join(taxa) if taxa else None
 
-        species_df["otherTaxa"] = species_df["lineageTaxonomyIdsList"].apply(
-            get_other_taxa
-        )
-
-        # Drop the temporary column
-        species_df = species_df.drop(columns=["lineageTaxonomyIdsList"])
+        species_df["otherTaxa"] = species_df["lineageTaxonomyIds"].apply(get_other_taxa)
 
         all_lineage_ids = {
             id_str
