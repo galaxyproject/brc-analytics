@@ -1303,13 +1303,15 @@ def get_outbreak_taxonomy_ids(
                 if get_primary
                 else ()
             ),
-            # Add any highlight descendant taxonomy IDs
+            # Add any highlight descendant taxonomy IDs. This field is
+            # optional per outbreak, so the column may be absent entirely.
             *(
                 source_outbreaks_df["highlight_descendant_taxonomy_ids"]
                 .explode()
                 .dropna()
                 .astype("string")
                 if get_descendants
+                and "highlight_descendant_taxonomy_ids" in source_outbreaks_df.columns
                 else ()
             ),
         }
