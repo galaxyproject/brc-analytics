@@ -6,12 +6,52 @@ Mirrors the Galaxy `agent-evals-harness` shape: a thin runner around
 
 ## Surfaces evaluated
 
-| Dataset                   | Service                             | What it scores                                                                                   |
-| ------------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `search_interpretation`   | `LLMService.interpret_search_query` | NL query -> `DatasetQuery` (taxonomy_id, library_strategy, platform). Deterministic + LLM judge. |
-| `tool_selection`          | `AssistantAgent` (single turn)      | Did the agent call the right MCP tool with the right args?                                       |
-| `workflow_recommendation` | `LLMService.suggest_workflows`      | Did the model recommend a workflow whose IWC ID is in the accepted set?                          |
-| `assistant_multiturn`     | `AssistantAgent` (scripted convo)   | Final accumulated `AnalysisSchema` matches expected fields.                                      |
+| Dataset                   | Service                             | What it scores                                                                                                                 |
+| ------------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `search_interpretation`   | `LLMService.interpret_search_query` | NL query -> `DatasetQuery` (taxonomy_id, library_strategy, platform). Deterministic + LLM judge.                               |
+| `tool_selection`          | `AssistantAgent` (single turn)      | Did the agent call the right MCP tool with the right args?                                                                     |
+| `workflow_recommendation` | `LLMService.suggest_workflows`      | Did the model recommend a workflow whose IWC ID is in the accepted set?                                                        |
+| `assistant_multiturn`     | `AssistantAgent` (scripted convo)   | Final accumulated `AnalysisSchema` matches expected fields.                                                                    |
+| `structured_channel`      | `AssistantAgent` (scripted convo)   | Per-model reply/extract production, capture-on-change, no-leak, and tracker-correctness for the extraction-pass state capture. |
+
+## `structured_channel` -- the MiniMax make-or-break
+
+The assistant captures tracker state with an **extraction pass**: the
+conversational reply is plain text, and a separate, focused call extracts the
+tracker snapshot (see the state-capture decision record in `results/`). What
+varies per model -- and what this dataset measures over scripted multi-turn
+scenarios (build a decision, switch one, clear a field, drive toward handoff,
+pure exploration, and an offered-not-committed regression) -- is whether the
+endpoint reliably produces both calls and captures the right state:
+
+- `ExtractSuccessRate` (primary) -- of turns that got a reply, how many the
+  extractor produced a snapshot for (a stack that 400s on structured output
+  can't run it).
+- `ReplySuccessRate` -- the conversational call is plain text, so this should be
+  ~1.0; a low value means the endpoint itself is flaky.
+- `CaptureOnChange` -- of turns that should change state, how many the extractor
+  produced a NON-EMPTY snapshot for (a completeness signal, not a correctness
+  check -- `FinalSchemaContains` is the correctness one).
+- `NoLeak` -- must be 1.0: no state trailer in any user-visible reply.
+- `FinalSchemaContains` / `SchemaFieldEmpty` / `IsCompleteEquals` -- end-state
+  correctness (fields present, cleared/uncommitted fields empty, handoff
+  readiness).
+
+Go/no-go, per model: reply + extract production at/near 1.0 with capture holding
+means the model can run the extraction pass; a low extract rate means its
+endpoint can't produce constrained output (investigate guided decoding). Run it
+against the primary target with:
+
+```bash
+cd backend/api
+AI_PRIMARY_MODEL=MiniMax-M2.7 python -m evals.run_evals \
+  --datasets structured_channel --models MiniMax-M2.7 --repeat 3
+```
+
+Add `gpt-oss-120b-tacc,claude-sonnet-4-6` to `--models` to compare the
+secondary target and the strong-model control. (Meta-Llama-3.3-70B is out of
+scope -- its TACC serving stack was incompatible with the earlier tool+trailer
+design.)
 
 ## Setup
 
