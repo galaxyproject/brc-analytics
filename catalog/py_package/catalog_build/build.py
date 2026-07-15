@@ -1279,6 +1279,22 @@ def make_qc_report(
     return join_report(lines)
 
 
+def build_taxon_maps(taxonomy_df):
+    """
+    Build lookups from taxonomy ID (as string) to taxon name and rank.
+
+    Args:
+        taxonomy_df: DataFrame with taxonomy_id, taxon_name and rank columns
+
+    Returns:
+        Tuple of (name_map, rank_map) dicts keyed by taxonomy ID string
+    """
+    taxon_id_strings = taxonomy_df["taxonomy_id"].astype("string")
+    name_map = dict(zip(taxon_id_strings, taxonomy_df["taxon_name"]))
+    rank_map = dict(zip(taxon_id_strings, taxonomy_df["rank"]))
+    return name_map, rank_map
+
+
 def get_outbreak_taxonomy_ids(
     source_outbreaks_df, get_primary=True, get_descendants=False
 ):
@@ -1613,12 +1629,8 @@ def build_files(
     # Add otherTaxa field with outbreak-associated taxa names
     if outbreak_taxonomy_ids:
         # Get taxon names and ranks for outbreak taxonomy IDs
-        outbreak_taxon_id_strings = outbreak_taxonomy_df["taxonomy_id"].astype("string")
-        outbreak_taxon_name_map = dict(
-            zip(outbreak_taxon_id_strings, outbreak_taxonomy_df["taxon_name"])
-        )
-        outbreak_taxon_rank_map = dict(
-            zip(outbreak_taxon_id_strings, outbreak_taxonomy_df["rank"])
+        outbreak_taxon_name_map, outbreak_taxon_rank_map = build_taxon_maps(
+            outbreak_taxonomy_df
         )
 
         # Set for O(1) membership tests in the per-row loop below
@@ -1845,12 +1857,8 @@ def build_files(
     )
     print(f"Checked ploidy for {len(genomes_df)} assemblies")
 
-    organism_taxonomy_id_strings = organism_taxonomy_df["taxonomy_id"].astype("string")
-    organism_taxon_name_map = dict(
-        zip(organism_taxonomy_id_strings, organism_taxonomy_df["taxon_name"])
-    )
-    organism_taxon_rank_map = dict(
-        zip(organism_taxonomy_id_strings, organism_taxonomy_df["rank"])
+    organism_taxon_name_map, organism_taxon_rank_map = build_taxon_maps(
+        organism_taxonomy_df
     )
     qc_report_params["organisms_not_species_rank"] = check_organism_ranks(
         source_organisms_df["taxonomy_id"].tolist(),
