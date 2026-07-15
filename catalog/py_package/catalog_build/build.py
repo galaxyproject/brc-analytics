@@ -1635,7 +1635,7 @@ def build_files(
                     rank = outbreak_taxon_rank_map.get(str(tax_id), "").lower()
                     if rank not in taxonomic_levels_for_tree:
                         # Use the taxon name instead of the raw ID
-                        taxa.append(outbreak_taxon_name_map[str(tax_id)])
+                        taxa.append(outbreak_taxon_name_map.get(str(tax_id), ""))
             # Convert list to comma-separated string for build-assemblies.ts
             return ",".join(taxa) if taxa else None
 
