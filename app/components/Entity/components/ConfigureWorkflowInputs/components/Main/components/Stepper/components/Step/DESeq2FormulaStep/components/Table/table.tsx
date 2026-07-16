@@ -1,3 +1,5 @@
+import { COLUMN_TYPE_LABEL } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/DESeq2FormulaStep/components/Table/constants";
+import { StyledTableContainer } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/DESeq2FormulaStep/components/Table/table.styles";
 import { CheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/CheckedIcon/checkedIcon";
 import { RadioCheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioCheckedIcon/radioCheckedIcon";
 import { RadioUncheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioUncheckedIcon/radioUncheckedIcon";
@@ -13,8 +15,6 @@ import {
   TableRow,
 } from "@mui/material";
 import { JSX } from "react";
-import { COLUMN_TYPE_LABEL } from "./constants";
-import { StyledTableContainer } from "./table.styles";
 import { Props } from "./types";
 
 export const Table = ({

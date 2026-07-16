@@ -1,4 +1,4 @@
-import { isValid } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/AccessionCountStep/hooks/UseAccessionCount/utils";
+import { isValid } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/AccessionCountStep/hooks/UseAccessionCount/utils";
 
 describe("isValid", () => {
   test("returns true for valid positive integer string", () => {

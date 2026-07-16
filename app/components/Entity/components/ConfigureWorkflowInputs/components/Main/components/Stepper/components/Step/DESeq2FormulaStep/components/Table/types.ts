@@ -1,10 +1,10 @@
+import { OnConfigure } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import {
   FormulaColumn,
   FormulaSelection,
   OnSelectPrimary,
   OnToggleCovariate,
-} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/DESeq2FormulaStep/hooks/UseFormulaSelection/types";
-import { OnConfigure } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/DESeq2FormulaStep/hooks/UseFormulaSelection/types";
 
 export interface Props {
   columns: FormulaColumn[];

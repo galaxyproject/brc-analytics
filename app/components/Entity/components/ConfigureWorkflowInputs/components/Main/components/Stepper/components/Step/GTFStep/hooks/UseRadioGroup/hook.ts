@@ -1,5 +1,5 @@
-import { useRadioGroup as useBaseRadioGroup } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseRadioGroup/hook";
-import { UseRadioGroup } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseRadioGroup/types";
+import { useRadioGroup as useBaseRadioGroup } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseRadioGroup/hook";
+import { UseRadioGroup } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseRadioGroup/types";
 import { useMemo } from "react";
 import { mapControl } from "./utils";
 

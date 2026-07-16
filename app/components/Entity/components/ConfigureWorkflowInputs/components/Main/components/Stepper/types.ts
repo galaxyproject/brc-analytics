@@ -4,11 +4,14 @@ import {
   OnConfigure,
 } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import {
+  OnContinue,
+  OnEdit,
+} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/types";
+import {
   OnLaunchGalaxy,
   Status,
 } from "./components/Step/hooks/UseLaunchGalaxy/types";
 import { StepConfig } from "./components/Step/types";
-import { OnContinue, OnEdit } from "./hooks/UseStepper/types";
 
 export interface Props {
   activeStep: number;

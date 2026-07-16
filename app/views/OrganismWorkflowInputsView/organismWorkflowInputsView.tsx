@@ -6,9 +6,9 @@ import { useConfiguredSteps } from "@/components/Entity/components/ConfigureWork
 import { augmentConfiguredSteps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/utils";
 import { Main } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/main";
 import { SideColumn } from "@/components/Entity/components/ConfigureWorkflowInputs/components/SideColumn/sideColumn";
-import { WorkflowEntityContext } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
-import { buildWorkflowEntityValue } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/utils";
 import { getWorkflow } from "@/services/workflows/entities";
+import { WorkflowEntityContext } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
+import { buildWorkflowEntityValue } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/utils";
 import { getEntity } from "@brc-analytics/core/services/workflows/query";
 import {
   BackPageContent,

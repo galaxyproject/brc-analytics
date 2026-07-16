@@ -1,8 +1,8 @@
-import { COLUMN_TYPE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
+import { StyledTableContainer } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/components/ClassificationTable/classificationTable.styles";
+import { COLUMN_TYPE } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 import { GridTable } from "@databiosphere/findable-ui/lib/components/Table/table.styles";
 import { TableBody, TableCell, TableHead, TableRow } from "@mui/material";
 import { JSX } from "react";
-import { StyledTableContainer } from "./classificationTable.styles";
 import { Select } from "./components/Select/select";
 import { Props } from "./types";
 

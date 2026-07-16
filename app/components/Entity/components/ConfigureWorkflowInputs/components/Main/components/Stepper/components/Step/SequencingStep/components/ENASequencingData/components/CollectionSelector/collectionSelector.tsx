@@ -1,6 +1,6 @@
-import { ColumnFilters } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/ColumnFilters/columnFilters";
-import { Table } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/Table/table";
 import { ReadRun } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
+import { ColumnFilters } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/ColumnFilters/columnFilters";
+import { Table } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/Table/table";
 import { StyledDialog } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/CollectionSelector/collectionSelector.styles";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { DialogTitle } from "@databiosphere/findable-ui/lib/components/common/Dialog/components/DialogTitle/dialogTitle";

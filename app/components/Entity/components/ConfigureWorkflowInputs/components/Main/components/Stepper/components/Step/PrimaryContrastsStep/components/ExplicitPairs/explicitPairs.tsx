@@ -1,5 +1,6 @@
 import { isAllPairsUsed } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseExplicitContrasts/utils";
-import { CONTRAST_MODE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseRadioGroup/types";
+import { StyledStack } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/components/ExplicitPairs/explicitPairs.styles";
+import { CONTRAST_MODE } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseRadioGroup/types";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
@@ -7,7 +8,6 @@ import { AddRounded } from "@mui/icons-material";
 import { Button, Typography } from "@mui/material";
 import { JSX } from "react";
 import { PairRow } from "./components/PairRow/pairRow";
-import { StyledStack } from "./explicitPairs.styles";
 import { Props } from "./types";
 
 export const ExplicitPairs = ({

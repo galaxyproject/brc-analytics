@@ -1,4 +1,10 @@
 import { useAssembly } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/hook";
+import { StepWarning } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/StepWarning/stepWarning";
+import { StyledGrid } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/GTFStep/gtfStep.styles";
+import {
+  getButtonDisabledState,
+  getStepActiveState,
+} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/utils/stepUtils";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { RadioCheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioCheckedIcon/radioCheckedIcon";
 import { RadioUncheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioUncheckedIcon/radioUncheckedIcon";
@@ -21,10 +27,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Fragment, JSX, useEffect } from "react";
-import { StepWarning } from "../components/StepWarning/stepWarning";
 import { StepProps } from "../types";
-import { getButtonDisabledState, getStepActiveState } from "../utils/stepUtils";
-import { StyledGrid } from "./gtfStep.styles";
 import { useRadioGroup } from "./hooks/UseRadioGroup/hook";
 import { useQuery } from "./query/hook";
 import { STEP } from "./step";

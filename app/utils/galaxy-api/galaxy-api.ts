@@ -9,8 +9,8 @@ const FILE_EXT = {
   FASTQ_SANGER_GZ: "fastqsanger.gz",
 } as const;
 
-import { COLUMN_TYPE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 import { PrimaryContrasts } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { COLUMN_TYPE } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 import { UcscTrack } from "@brc-analytics/core/utils/ucsc-tracks-api/types";
 import {
   fetchUcscMd5Checksums,

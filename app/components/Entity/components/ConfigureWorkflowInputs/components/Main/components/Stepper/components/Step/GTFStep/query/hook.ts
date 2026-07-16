@@ -1,12 +1,12 @@
 import { Assembly } from "@/views/WorkflowInputsView/types";
+import { queryFn } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/GTFStep/query/options/queryFn";
+import { select } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/GTFStep/query/options/select";
+import { QueryKey } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/GTFStep/query/types";
 import {
   DefaultError,
   UseQueryResult,
   useQuery as useReactQuery,
 } from "@tanstack/react-query";
-import { queryFn } from "./options/queryFn";
-import { select } from "./options/select";
-import { QueryKey } from "./types";
 import { getAssemblyId } from "./utils";
 
 /**

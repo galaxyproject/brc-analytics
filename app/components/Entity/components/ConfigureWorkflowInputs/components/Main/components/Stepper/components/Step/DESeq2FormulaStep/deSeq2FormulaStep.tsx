@@ -1,3 +1,6 @@
+import { Alert } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/DESeq2FormulaStep/components/Alert/alert";
+import { StyledStepContent } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/DESeq2FormulaStep/deSeq2FormulaStep.styles";
+import { StyledStack } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/step.styles";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Optional/optional";
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
@@ -5,11 +8,8 @@ import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/componen
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Button, Typography } from "@mui/material";
 import { Fragment, JSX } from "react";
-import { StyledStack } from "../step.styles";
 import { StepProps } from "../types";
-import { Alert } from "./components/Alert/alert";
 import { Table } from "./components/Table/table";
-import { StyledStepContent } from "./deSeq2FormulaStep.styles";
 import { useFormulaSelection } from "./hooks/UseFormulaSelection/hook";
 import { STEP } from "./step";
 

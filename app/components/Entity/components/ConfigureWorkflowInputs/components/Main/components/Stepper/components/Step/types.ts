@@ -1,12 +1,12 @@
 import { Workflow } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import {
-  OnContinue,
-  OnEdit,
-} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/types";
-import {
   ConfiguredInput,
   OnConfigure,
 } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import {
+  OnContinue,
+  OnEdit,
+} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/types";
 import { StepProps as MStepProps } from "@mui/material";
 import { ComponentType, ReactNode } from "react";
 import { OnLaunchGalaxy, Status } from "./hooks/UseLaunchGalaxy/types";

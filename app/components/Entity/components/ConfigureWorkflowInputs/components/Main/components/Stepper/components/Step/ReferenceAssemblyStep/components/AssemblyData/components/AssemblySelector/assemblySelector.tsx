@@ -1,9 +1,9 @@
-import { ColumnFilters } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/ColumnFilters/columnFilters";
-import { Table } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/Table/table";
+import { ColumnFilters } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/ColumnFilters/columnFilters";
+import { Table } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/Table/table";
+import { StyledDialog } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/ReferenceAssemblyStep/components/AssemblyData/components/AssemblySelector/assemblySelector.styles";
 import { DialogTitle } from "@databiosphere/findable-ui/lib/components/common/Dialog/components/DialogTitle/dialogTitle";
 import { DialogContent } from "@mui/material";
 import { JSX } from "react";
-import { StyledDialog } from "./assemblySelector.styles";
 import { Props } from "./types";
 
 /**

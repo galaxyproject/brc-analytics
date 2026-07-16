@@ -2,8 +2,8 @@ import { useStepper } from "@/components/Entity/components/ConfigureWorkflowInpu
 import { Main } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/main";
 import { SideColumn } from "@/components/Entity/components/ConfigureWorkflowInputs/components/SideColumn/sideColumn";
 import { AssemblyContext } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/context";
-import { WorkflowEntityContext } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
 import { getWorkflow } from "@/services/workflows/entities";
+import { WorkflowEntityContext } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
 import {
   BackPageContent,
   BackPageContentSideColumn,

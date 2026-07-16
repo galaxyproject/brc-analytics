@@ -1,8 +1,8 @@
-import { DEFAULT_ACCESSION_COUNT } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/AccessionCountStep/constants";
 import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { DEFAULT_ACCESSION_COUNT } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/AccessionCountStep/constants";
+import { UseAccessionCount } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/AccessionCountStep/hooks/UseAccessionCount/types";
+import { isValid } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/AccessionCountStep/hooks/UseAccessionCount/utils";
 import { ChangeEvent, useCallback, useState } from "react";
-import { UseAccessionCount } from "./types";
-import { isValid } from "./utils";
 
 /**
  * Hook for managing accession count input state and validation.

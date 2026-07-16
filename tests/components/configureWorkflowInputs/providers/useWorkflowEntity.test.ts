@@ -1,5 +1,5 @@
-import { WorkflowEntityContext } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
-import { useWorkflowEntity } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/hook";
+import { WorkflowEntityContext } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
+import { useWorkflowEntity } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/hook";
 import { renderHook } from "@testing-library/react";
 import { createElement, JSX, ReactNode } from "react";
 

@@ -1,15 +1,15 @@
+import { ClassificationValidation } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/components/ClassificationValidation/classificationValidation";
+import { StyledStepContent } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/sampleSheetClassificationStep.styles";
+import { StyledStack } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/step.styles";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Button, Typography } from "@mui/material";
 import { Fragment, JSX } from "react";
-import { StyledStack } from "../step.styles";
 import { StepProps } from "../types";
 import { ClassificationTable } from "./components/ClassificationTable/classificationTable";
-import { ClassificationValidation } from "./components/ClassificationValidation/classificationValidation";
 import { useColumnClassification } from "./hooks/UseColumnClassification/hook";
-import { StyledStepContent } from "./sampleSheetClassificationStep.styles";
 import { STEP } from "./step";
 
 export const SampleSheetClassificationStep = ({

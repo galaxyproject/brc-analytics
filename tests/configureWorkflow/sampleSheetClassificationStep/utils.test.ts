@@ -1,11 +1,11 @@
 import {
   COLUMN_TYPE,
   ColumnClassifications,
-} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
+} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 import {
   getColumnNames,
   validateClassifications,
-} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/utils";
+} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/utils";
 
 const EXPECTED = {
   BIOLOGICAL_FACTOR_REQUIRED:

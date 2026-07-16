@@ -1,6 +1,9 @@
 import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import {
+  FormulaSelection,
+  UseFormulaSelection,
+} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/DESeq2FormulaStep/hooks/UseFormulaSelection/types";
 import { useCallback, useMemo, useState } from "react";
-import { FormulaSelection, UseFormulaSelection } from "./types";
 import {
   generateFormula,
   getFormulaColumns,

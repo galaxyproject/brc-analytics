@@ -1,7 +1,7 @@
+import { CONTRAST_MODE } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseRadioGroup/types";
 import { useMemo } from "react";
 import { UseBaselineContrasts } from "../UseBaselineContrasts/types";
 import { UseExplicitContrasts } from "../UseExplicitContrasts/types";
-import { CONTRAST_MODE } from "../UseRadioGroup/types";
 import { UsePrimaryContrasts } from "./types";
 import { getPrimaryContrasts, isDisabled } from "./utils";
 

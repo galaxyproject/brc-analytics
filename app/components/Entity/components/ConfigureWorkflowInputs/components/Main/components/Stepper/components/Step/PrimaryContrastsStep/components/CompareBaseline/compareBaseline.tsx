@@ -1,4 +1,8 @@
-import { CONTRAST_MODE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseRadioGroup/types";
+import {
+  StyledStack,
+  StyledTableContainer,
+} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/components/CompareBaseline/compareBaseline.styles";
+import { CONTRAST_MODE } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseRadioGroup/types";
 import { CheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/CheckedIcon/checkedIcon";
 import { RadioCheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioCheckedIcon/radioCheckedIcon";
 import { RadioUncheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioUncheckedIcon/radioUncheckedIcon";
@@ -16,7 +20,6 @@ import {
   Typography,
 } from "@mui/material";
 import { JSX, ReactNode } from "react";
-import { StyledStack, StyledTableContainer } from "./compareBaseline.styles";
 import { Props } from "./types";
 
 export const CompareBaseline = ({

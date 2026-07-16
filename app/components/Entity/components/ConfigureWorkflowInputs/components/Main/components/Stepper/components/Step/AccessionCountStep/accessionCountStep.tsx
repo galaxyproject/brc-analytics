@@ -1,3 +1,4 @@
+import { StyledStack } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/AccessionCountStep/accessionCountStep.styles";
 import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepContent/stepContent";
 import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Optional/optional";
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
@@ -6,7 +7,6 @@ import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/B
 import { Button, OutlinedInput } from "@mui/material";
 import { Fragment, JSX } from "react";
 import { StepProps } from "../types";
-import { StyledStack } from "./accessionCountStep.styles";
 import { useAccessionCount } from "./hooks/UseAccessionCount/hook";
 
 /**

@@ -3,11 +3,11 @@ import {
   ConfiguredInput,
   OnConfigure,
 } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { StepConfig } from "./components/Stepper/components/Step/types";
 import {
   OnContinue,
   OnEdit,
-} from "./components/Stepper/hooks/UseStepper/types";
+} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/types";
+import { StepConfig } from "./components/Stepper/components/Step/types";
 
 export interface Props {
   activeStep: number;

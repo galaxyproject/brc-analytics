@@ -1,3 +1,7 @@
+import {
+  StyledRoundedPaper,
+  StyledStack,
+} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/ReferenceAssemblyStep/components/AssemblyData/components/AssemblySummary/assemblySummary.styles";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { GridTable } from "@databiosphere/findable-ui/lib/components/Table/table.styles";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
@@ -12,7 +16,6 @@ import {
   Typography,
 } from "@mui/material";
 import { Fragment, JSX } from "react";
-import { StyledRoundedPaper, StyledStack } from "./assemblySummary.styles";
 import { Props } from "./types";
 
 /**

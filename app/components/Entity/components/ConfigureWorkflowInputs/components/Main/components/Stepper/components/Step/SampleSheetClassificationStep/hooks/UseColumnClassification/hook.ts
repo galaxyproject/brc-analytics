@@ -1,15 +1,18 @@
+import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { UseColumnClassification } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/hooks/UseColumnClassification/types";
+import {
+  initClassifications,
+  updateClassification,
+} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/hooks/UseColumnClassification/utils";
 import {
   ClassificationMap,
   COLUMN_TYPE,
-} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
+} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 import {
   getColumnNames,
   validateClassifications,
-} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/utils";
-import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/utils";
 import { useCallback, useMemo, useState } from "react";
-import { UseColumnClassification } from "./types";
-import { initClassifications, updateClassification } from "./utils";
 
 /**
  * Hook to manage column classification state and validation.

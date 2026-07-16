@@ -1,4 +1,9 @@
 import { Workflow } from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import {
+  StyledButton,
+  StyledFluidPaper,
+  StyledMainContainer,
+} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/main.styles";
 import { Loading } from "@databiosphere/findable-ui/lib/components/Loading/loading";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { PAPER_PANEL_STYLE } from "@databiosphere/findable-ui/lib/components/common/Paper/paper";
@@ -7,11 +12,6 @@ import { Typography } from "@mui/material";
 import { JSX, useState } from "react";
 import { useLaunchGalaxy } from "./components/Stepper/components/Step/hooks/UseLaunchGalaxy/useLaunchGalaxy";
 import { Stepper } from "./components/Stepper/stepper";
-import {
-  StyledButton,
-  StyledFluidPaper,
-  StyledMainContainer,
-} from "./main.styles";
 import { Props } from "./types";
 
 export const Main = ({

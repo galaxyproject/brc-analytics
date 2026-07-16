@@ -1,11 +1,11 @@
-import { COLUMN_TYPE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { FORMULA_COLUMN_TYPES } from "./constants";
+import { FORMULA_COLUMN_TYPES } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/DESeq2FormulaStep/hooks/UseFormulaSelection/constants";
 import {
   CategorizedCovariates,
   FormulaColumn,
   FormulaSelection,
-} from "./types";
+} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/DESeq2FormulaStep/hooks/UseFormulaSelection/types";
+import { COLUMN_TYPE } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 
 /**
  * Builds a DESeq2 formula string from categorized covariates and primary.

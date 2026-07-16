@@ -1,6 +1,9 @@
+import { ToggleButtonGroup } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/ToggleButtonGroup/toggleButtonGroup";
+import { useToggleButtonGroup } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseToggleButtonGroup/useToggleButtonGroup";
 import { TOGGLE_BUTTONS } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ToggleButtonGroup/toggleButtons";
 import { VIEW } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ToggleButtonGroup/types";
 import { UploadMyData } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/UploadMyData/uploadMyData";
+import { getStepActiveState } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/utils/stepUtils";
 import { HandoffStatusContext } from "@brc-analytics/core/providers/workflowHandoff/contexts/HandoffStatus/context";
 import {
   Loading,
@@ -10,10 +13,7 @@ import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/c
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
 import { JSX, useCallback, useContext } from "react";
-import { ToggleButtonGroup } from "../components/ToggleButtonGroup/toggleButtonGroup";
-import { useToggleButtonGroup } from "../hooks/UseToggleButtonGroup/useToggleButtonGroup";
 import { StepProps } from "../types";
-import { getStepActiveState } from "../utils/stepUtils";
 import { useColumnFilters } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseColumnFilters/hook";
 import { useRowSelection } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseRowSelection/hook";
 import { useTable } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseTable/hook";

@@ -7,9 +7,9 @@ import { Main } from "@/components/Entity/components/ConfigureWorkflowInputs/com
 import { SideColumn } from "@/components/Entity/components/ConfigureWorkflowInputs/components/SideColumn/sideColumn";
 import { Top } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Top/top";
 import { AssemblyContext } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/context";
-import { WorkflowEntityContext } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
-import { buildWorkflowEntityValue } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/utils";
 import { getAssembly, getWorkflow } from "@/services/workflows/entities";
+import { WorkflowEntityContext } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
+import { buildWorkflowEntityValue } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/utils";
 import { ENTITY_KEYS } from "@brc-analytics/core/providers/workflowHandoff/constants";
 import { HandoffStatusContext } from "@brc-analytics/core/providers/workflowHandoff/contexts/HandoffStatus/context";
 import {

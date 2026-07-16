@@ -1,9 +1,9 @@
-import { useWorkflowEntity } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/hook";
 import {
   CountQueryKey,
   QueryKey,
 } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/query/types";
 import { isEligible } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/query/utils";
+import { useWorkflowEntity } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/hook";
 import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
 import { AppSiteConfig } from "@site-config/common/entities";
 import { DefaultError, useQuery as useReactQuery } from "@tanstack/react-query";

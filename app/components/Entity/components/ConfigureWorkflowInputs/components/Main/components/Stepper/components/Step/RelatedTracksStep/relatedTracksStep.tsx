@@ -1,4 +1,6 @@
 import { useAssembly } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/hook";
+import { ToggleButtonGroup } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/ToggleButtonGroup/toggleButtonGroup";
+import { useToggleButtonGroup } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseToggleButtonGroup/useToggleButtonGroup";
 import { useTable } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/components/GenomeBrowser/components/TracksSelector/hooks/UseTable/hook";
 import { TOGGLE_BUTTONS } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/components/ToggleButtonGroup/toggleButtons";
 import { VIEW } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/components/ToggleButtonGroup/types";
@@ -12,8 +14,6 @@ import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/com
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
 import { Button } from "@mui/material";
 import { Fragment, JSX } from "react";
-import { ToggleButtonGroup } from "../components/ToggleButtonGroup/toggleButtonGroup";
-import { useToggleButtonGroup } from "../hooks/UseToggleButtonGroup/useToggleButtonGroup";
 import { StepProps } from "../types";
 import { getTracksData } from "./components/GenomeBrowser/components/TracksSelector/utils";
 import { GenomeBrowser } from "./components/GenomeBrowser/genomeBrowser";

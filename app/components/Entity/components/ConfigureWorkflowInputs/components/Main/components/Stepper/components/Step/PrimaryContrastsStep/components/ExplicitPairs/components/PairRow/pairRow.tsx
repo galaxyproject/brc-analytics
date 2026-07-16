@@ -1,10 +1,17 @@
 import { getDisabledValues } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseExplicitContrasts/utils";
 import { DeleteIcon } from "@brc-analytics/core/components/common/CustomIcon/components/DeleteIcon/deleteIcon";
+import {
+  ICON_BUTTON_PROPS,
+  SELECT_PROPS,
+  SVG_ICON_PROPS,
+} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/components/ExplicitPairs/components/PairRow/constants";
+import {
+  StyledSelect,
+  StyledStack,
+} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/components/ExplicitPairs/components/PairRow/pairRow.styles";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { IconButton, MenuItem, Stack, Typography } from "@mui/material";
 import { JSX } from "react";
-import { ICON_BUTTON_PROPS, SELECT_PROPS, SVG_ICON_PROPS } from "./constants";
-import { StyledSelect, StyledStack } from "./pairRow.styles";
 import { Props } from "./types";
 
 export const PairRow = ({

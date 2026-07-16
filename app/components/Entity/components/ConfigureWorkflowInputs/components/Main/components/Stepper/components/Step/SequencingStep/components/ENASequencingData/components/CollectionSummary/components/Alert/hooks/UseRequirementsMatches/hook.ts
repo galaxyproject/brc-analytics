@@ -1,7 +1,7 @@
 import { ReadRun } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
 import { useAssembly } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/hook";
-import { useWorkflowEntity } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/hook";
 import type { UseRequirementsMatches } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/CollectionSummary/components/Alert/hooks/UseRequirementsMatches/types";
+import { useWorkflowEntity } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/hook";
 import { Table } from "@tanstack/react-table";
 import { useMemo } from "react";
 import { buildRequirementWarnings } from "./utils";

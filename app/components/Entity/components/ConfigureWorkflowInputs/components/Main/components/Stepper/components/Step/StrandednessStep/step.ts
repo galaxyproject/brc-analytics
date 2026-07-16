@@ -1,6 +1,6 @@
+import { getStepLabel } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/StrandednessStep/utils";
 import { StepConfig } from "../types";
 import { StrandednessStep } from "./strandednessStep";
-import { getStepLabel } from "./utils";
 
 export const STEP = {
   Step: StrandednessStep,

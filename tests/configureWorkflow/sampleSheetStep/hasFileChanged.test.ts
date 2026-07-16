@@ -1,4 +1,4 @@
-import { hasFileChanged } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseFilePicker/utils";
+import { hasFileChanged } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseFilePicker/utils";
 
 function createMockFile(
   name: string,

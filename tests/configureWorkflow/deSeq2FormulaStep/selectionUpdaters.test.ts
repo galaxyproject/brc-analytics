@@ -1,8 +1,8 @@
-import { FormulaSelection } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/DESeq2FormulaStep/hooks/UseFormulaSelection/types";
 import {
   selectPrimary,
   toggleCovariate,
 } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/DESeq2FormulaStep/hooks/UseFormulaSelection/utils";
+import { FormulaSelection } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/DESeq2FormulaStep/hooks/UseFormulaSelection/types";
 
 describe("selectPrimary", () => {
   test("sets the primary column", () => {
