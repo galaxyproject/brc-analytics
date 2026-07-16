@@ -1644,9 +1644,13 @@ def build_files(
                 if tax_id in outbreak_taxonomy_id_set:
                     # Check if this taxon's rank is already covered by taxonomic_levels_for_tree
                     rank = outbreak_taxon_rank_map.get(str(tax_id), "").lower()
-                    if rank not in taxonomic_levels_for_tree:
-                        # Use the taxon name instead of the raw ID
-                        taxa.append(outbreak_taxon_name_map.get(str(tax_id), ""))
+                    tax_id_str = str(tax_id)
+                    if (
+                        rank not in taxonomic_levels_for_tree
+                        and tax_id_str in outbreak_taxon_name_map
+                    ):
+                        # Add the taxon name (note: not the raw ID) if available
+                        taxa.append(outbreak_taxon_name_map[tax_id_str])
             # Convert list to comma-separated string for build-assemblies.ts
             return ",".join(taxa) if taxa else None
 
