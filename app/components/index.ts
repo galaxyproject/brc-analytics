@@ -1,4 +1,3 @@
-export { Chip } from "@brc-analytics/core/components/common/Chip/chip";
 export { CalendarIcon } from "@brc-analytics/core/components/common/CustomIcon/components/CalendarIcon/calendarIcon";
 export { Tooltip } from "@brc-analytics/core/components/common/Tooltip/tooltip";
 export { Alert } from "@databiosphere/findable-ui/lib/components/common/Alert/alert";
@@ -17,6 +16,7 @@ export { Link } from "@databiosphere/findable-ui/lib/components/Links/components
 export { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
 export { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/ChipCell/chipCell";
 export { NTagCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/NTagCell/nTagCell";
+export { Chip } from "@mui/material";
 export { Main as OrganismViewMain } from "../views/OrganismView/components/Main/main";
 export { OrganismAvatar } from "./Entity/components/OrganismAvatar/organismAvatar";
 export { MDXSection } from "./Entity/components/Section/MDXSection/mdxSection";

@@ -55,7 +55,6 @@ import {
 import { ResourcesSection } from "@/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
 import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { AppLink } from "@brc-analytics/core/components/common/AppLink/appLink";
-import { Chip } from "@brc-analytics/core/components/common/Chip/chip";
 import { Tooltip } from "@brc-analytics/core/components/common/Tooltip/tooltip";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import { KeyElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/KeyElType/keyElType";
@@ -74,6 +73,7 @@ import { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/compo
 import { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/ChipCell/chipCell";
 import { NTagCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/NTagCell/nTagCell";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
+import { Chip } from "@mui/material";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
