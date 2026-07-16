@@ -9,9 +9,9 @@ import { Top } from "@/components/Entity/components/ConfigureWorkflowInputs/comp
 import { AssemblyContext } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/context";
 import { WorkflowEntityContext } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
 import { buildWorkflowEntityValue } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/utils";
-import { ENTITY_KEYS } from "@/providers/workflowHandoff/constants";
-import { HandoffStatusContext } from "@/providers/workflowHandoff/contexts/HandoffStatus/context";
 import { getAssembly, getWorkflow } from "@/services/workflows/entities";
+import { ENTITY_KEYS } from "@brc-analytics/core/providers/workflowHandoff/constants";
+import { HandoffStatusContext } from "@brc-analytics/core/providers/workflowHandoff/contexts/HandoffStatus/context";
 import {
   BackPageContent,
   BackPageContentSideColumn,

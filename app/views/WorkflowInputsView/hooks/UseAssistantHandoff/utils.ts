@@ -1,6 +1,6 @@
 import { clearSequencingData } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/utils";
-import { SEQUENCING_SOURCE } from "@/providers/workflowHandoff/constants";
-import { HandoffInputs } from "@/providers/workflowHandoff/types";
+import { SEQUENCING_SOURCE } from "@brc-analytics/core/providers/workflowHandoff/constants";
+import { HandoffInputs } from "@brc-analytics/core/providers/workflowHandoff/types";
 import { UseAssistantHandoff } from "./types";
 
 /**

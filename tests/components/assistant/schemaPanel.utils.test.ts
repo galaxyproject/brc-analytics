@@ -1,8 +1,8 @@
 import {
   extractAccessions,
   resolveSequencingSource,
-} from "@/components/Assistant/SchemaPanel/utils";
-import { SEQUENCING_SOURCE } from "@/providers/workflowHandoff/constants";
+} from "@brc-analytics/core/components/Assistant/SchemaPanel/utils";
+import { SEQUENCING_SOURCE } from "@brc-analytics/core/providers/workflowHandoff/constants";
 import type { SchemaFieldState } from "@brc-analytics/core/types/api";
 
 function field(value: string | null): SchemaFieldState {

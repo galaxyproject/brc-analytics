@@ -1,4 +1,4 @@
-import { HandoffStatusContext } from "@/providers/workflowHandoff/contexts/HandoffStatus/context";
+import { HandoffStatusContext } from "@brc-analytics/core/providers/workflowHandoff/contexts/HandoffStatus/context";
 import {
   Loading,
   LOADING_PANEL_STYLE,

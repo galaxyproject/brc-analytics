@@ -4,11 +4,11 @@ import {
 } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { GA2Catalog } from "@/apis/catalog/ga2/entities";
 import { getEntityDetailMeta } from "@/common/meta/utils";
-import { EntityDataGate } from "@/components/EntityDataGate/entityDataGate";
 import { config } from "@/config/config";
 import { getEntities, getEntity } from "@/utils/entityUtils";
 import { AnalyzeView } from "@/views/AnalyzeView/analyzeView";
 import { EntityDetailView } from "@/views/EntityView/entityView";
+import { EntityDataGate } from "@brc-analytics/core/components/EntityDataGate/entityDataGate";
 import { seedDatabase } from "@brc-analytics/core/utils/seedDatabase";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { getEntityConfig } from "@databiosphere/findable-ui/lib/config/utils";

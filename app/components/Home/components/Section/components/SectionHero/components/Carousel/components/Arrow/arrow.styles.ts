@@ -3,7 +3,7 @@ import { getArrowTransform } from "@/components/Home/components/Section/componen
 import {
   SWIPE_ACTION,
   SwipeAction,
-} from "@/hooks/useSwipeInteraction/common/entities";
+} from "@brc-analytics/core/hooks/useSwipeInteraction/common/entities";
 import { COLOR_MIXES } from "@databiosphere/findable-ui/lib/styles/common/constants/colorMixes";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { bpDownSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";

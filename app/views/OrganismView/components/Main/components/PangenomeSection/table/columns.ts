@@ -1,8 +1,8 @@
 import type { PangenomeMember } from "@/apis/catalog/brc-analytics-catalog/common/pangenome";
-import { RefCell } from "@/components/Table/components/TableCell/components/RefCell/refCell";
 import { AssemblyCell } from "@/views/OrganismView/components/Main/table/components/TableCell/components/AssemblyCell/assemblyCell";
 import { SelectionTracksCell } from "@/views/OrganismView/components/Main/table/components/TableCell/components/SelectionTracksCell/selectionTracksCell";
 import { ViewCell } from "@/views/OrganismView/components/Main/table/components/TableCell/components/ViewCell/viewCell";
+import { RefCell } from "@brc-analytics/core/components/Table/components/TableCell/components/RefCell/refCell";
 import { ColumnDef } from "@tanstack/react-table";
 import { renderLevel } from "./viewBuilder";
 

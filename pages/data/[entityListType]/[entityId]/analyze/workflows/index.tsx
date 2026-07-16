@@ -1,8 +1,8 @@
 import { getPageMeta } from "@/common/meta/utils";
-import { EntityDataGate } from "@/components/EntityDataGate/entityDataGate";
 import { config } from "@/config/config";
 import { getEntities } from "@/utils/entityUtils";
 import { AnalyzeWorkflowsView } from "@/views/AnalyzeWorkflowsView/analyzeWorkflowsView";
+import { EntityDataGate } from "@brc-analytics/core/components/EntityDataGate/entityDataGate";
 import { seedDatabase } from "@brc-analytics/core/utils/seedDatabase";
 import {
   GetStaticPaths,

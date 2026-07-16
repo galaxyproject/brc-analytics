@@ -1,12 +1,12 @@
 import { translateForSequencingStep } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/utils";
 import { StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
-import { useCurrentPath } from "@/hooks/UseCurrentPath/hook";
-import { SEQUENCING_SOURCE } from "@/providers/workflowHandoff/constants";
-import { HandoffStatus } from "@/providers/workflowHandoff/contexts/HandoffStatus/types";
-import { useHandoffDispatch } from "@/providers/workflowHandoff/hooks/UseHandoffDispatch/hook";
-import { useHandoffInputs } from "@/providers/workflowHandoff/hooks/UseHandoffInputs/hook";
-import { EntityKey } from "@/providers/workflowHandoff/types";
 import { findSequencingStepKey } from "@/views/WorkflowInputsView/sequencing/utils";
+import { useCurrentPath } from "@brc-analytics/core/hooks/UseCurrentPath/hook";
+import { SEQUENCING_SOURCE } from "@brc-analytics/core/providers/workflowHandoff/constants";
+import { HandoffStatus } from "@brc-analytics/core/providers/workflowHandoff/contexts/HandoffStatus/types";
+import { useHandoffDispatch } from "@brc-analytics/core/providers/workflowHandoff/hooks/UseHandoffDispatch/hook";
+import { useHandoffInputs } from "@brc-analytics/core/providers/workflowHandoff/hooks/UseHandoffInputs/hook";
+import { EntityKey } from "@brc-analytics/core/providers/workflowHandoff/types";
 import { useEffect, useMemo } from "react";
 import { OnConfigure } from "../UseConfigureInputs/types";
 import { useHandoffEnaQuery } from "./query/ena/hook";

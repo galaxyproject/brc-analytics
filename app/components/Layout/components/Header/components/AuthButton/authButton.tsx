@@ -1,4 +1,4 @@
-import { useAuth } from "@/providers/authentication";
+import { useAuth } from "@brc-analytics/core/providers/authentication";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import {

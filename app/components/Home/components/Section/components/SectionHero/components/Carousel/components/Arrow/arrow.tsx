@@ -1,4 +1,4 @@
-import { SwipeAction } from "@/hooks/useSwipeInteraction/common/entities";
+import { SwipeAction } from "@brc-analytics/core/hooks/useSwipeInteraction/common/entities";
 import { SouthIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/SouthIcon/southIcon";
 import { JSX } from "react";
 import { IconButton } from "./arrow.styles";

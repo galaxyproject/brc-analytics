@@ -1,5 +1,5 @@
 import { ANALYTICS_TOOLS } from "@/components/Home/components/Section/components/ga2/SectionAnalyticsAndData/components/AnalyticsToolsAndData/common/constants";
-import { useSwipeInteraction } from "@/hooks/useSwipeInteraction/useSwipeInteraction";
+import { useSwipeInteraction } from "@brc-analytics/core/hooks/useSwipeInteraction/useSwipeInteraction";
 import { CardProps as DXCardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
 import { RefObject, useEffect, useMemo } from "react";
 import { useIntersectionObserver } from "../useIntersectionObserver/useIntersectionObserver";

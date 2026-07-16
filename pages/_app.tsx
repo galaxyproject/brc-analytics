@@ -14,6 +14,9 @@ import { ExploreStateProvider } from "@databiosphere/findable-ui/lib/providers/e
 
 import { mergeAppTheme } from "@/theme/theme";
 import { OgMeta } from "@brc-analytics/core/components/common/OgMeta/ogMeta";
+import { BrcAuthProvider } from "@brc-analytics/core/providers/authentication";
+import { EntitiesLoadedProvider } from "@brc-analytics/core/providers/entitiesLoaded/provider";
+import { WorkflowHandoffProvider } from "@brc-analytics/core/providers/workflowHandoff/provider";
 import { LayoutDimensionsProvider } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/provider";
 import { ServicesProvider } from "@databiosphere/findable-ui/lib/providers/services/provider";
 import { SystemStatusProvider } from "@databiosphere/findable-ui/lib/providers/systemStatus";
@@ -28,9 +31,6 @@ import { JSX, useMemo } from "react";
 import { getDefaultDescription } from "../app/common/meta/utils";
 import { StyledFooter } from "../app/components/Layout/components/Footer/footer.styles";
 import { config } from "../app/config/config";
-import { BrcAuthProvider } from "../app/providers/authentication";
-import { EntitiesLoadedProvider } from "../app/providers/entitiesLoaded/provider";
-import { WorkflowHandoffProvider } from "../app/providers/workflowHandoff/provider";
 import { useEntities } from "../app/services/workflows/hooks/UseEntities/hook";
 import "../app/styles/fonts/fonts.css";
 import { ROUTES } from "../routes/constants";

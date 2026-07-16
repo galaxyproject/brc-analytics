@@ -1,11 +1,11 @@
 import { getPageMeta } from "@/common/meta/utils";
-import { EntityDataGate } from "@/components/EntityDataGate/entityDataGate";
 import { config } from "@/config/config";
 import { formatTrsId } from "@/views/AnalyzeWorkflowsView/components/Main/utils";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { LEXICMAP } from "@/views/AnalyzeWorkflowsView/lexicmap/constants";
 import { LOGAN_SEARCH } from "@/views/AnalyzeWorkflowsView/loganSearch/constants";
 import { WorkflowView } from "@/views/WorkflowView/workflowView";
+import { EntityDataGate } from "@brc-analytics/core/components/EntityDataGate/entityDataGate";
 import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";

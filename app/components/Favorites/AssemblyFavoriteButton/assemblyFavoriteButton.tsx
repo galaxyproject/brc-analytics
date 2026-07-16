@@ -1,5 +1,5 @@
-import { useAssemblyFavorites } from "@/hooks/useAssemblyFavorites";
-import { useAuth } from "@/providers/authentication";
+import { useAssemblyFavorites } from "@brc-analytics/core/hooks/useAssemblyFavorites";
+import { useAuth } from "@brc-analytics/core/providers/authentication";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { Button, CircularProgress, Tooltip } from "@mui/material";

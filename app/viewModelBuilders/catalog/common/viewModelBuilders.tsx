@@ -4,15 +4,15 @@ import type {
 } from "@/apis/catalog/common/entities";
 import { sanitizeEntityId } from "@/apis/catalog/common/utils";
 import { AnalysisPortals } from "@/components/Entity/components/AnalysisPortals/analysisPortals";
-import { AnalyzeGenome } from "@/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
+import { CopyText } from "@brc-analytics/core/components/common/CopyText/copyText";
+import { Tooltip } from "@brc-analytics/core/components/common/Tooltip/tooltip";
+import { AnalyzeGenome } from "@brc-analytics/core/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 import {
   LEVEL_FILLED_COUNT,
   LEVEL_LABEL,
-} from "@/components/Table/components/TableCell/components/LevelCell/constants";
-import { LevelCell } from "@/components/Table/components/TableCell/components/LevelCell/levelCell";
-import type { SpeciesTag } from "@/components/Table/components/TableCell/components/SpeciesCell/types";
-import { CopyText } from "@brc-analytics/core/components/common/CopyText/copyText";
-import { Tooltip } from "@brc-analytics/core/components/common/Tooltip/tooltip";
+} from "@brc-analytics/core/components/Table/components/TableCell/components/LevelCell/constants";
+import { LevelCell } from "@brc-analytics/core/components/Table/components/TableCell/components/LevelCell/levelCell";
+import type { SpeciesTag } from "@brc-analytics/core/components/Table/components/TableCell/components/SpeciesCell/types";
 import { formatDate } from "@brc-analytics/core/utils/date-fns";
 import { KeyElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/KeyElType/keyElType";
 import { ValueElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/ValueElType/valueElType";

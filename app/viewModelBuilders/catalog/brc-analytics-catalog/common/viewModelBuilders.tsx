@@ -17,11 +17,6 @@ import { SLUGIFY_OPTIONS } from "@/common/constants";
 import { StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { KeyValueSection } from "@/components/Entity/components/Section/KeyValueSection/keyValueSection";
 import { MDXSection } from "@/components/Entity/components/Section/MDXSection/mdxSection";
-import { AnalyzeGenome } from "@/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
-import { LevelCell } from "@/components/Table/components/TableCell/components/LevelCell/levelCell";
-import { TagList } from "@/components/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
-import { SpeciesCell } from "@/components/Table/components/TableCell/components/SpeciesCell/speciesCell";
-import type { SpeciesTag } from "@/components/Table/components/TableCell/components/SpeciesCell/types";
 import {
   ORGANISM_SCOPED_TAG_LABELS,
   SPECIES_TAG_LABEL,
@@ -56,6 +51,11 @@ import { ResourcesSection } from "@/views/PriorityPathogenView/components/Resour
 import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { AppLink } from "@brc-analytics/core/components/common/AppLink/appLink";
 import { Tooltip } from "@brc-analytics/core/components/common/Tooltip/tooltip";
+import { AnalyzeGenome } from "@brc-analytics/core/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
+import { LevelCell } from "@brc-analytics/core/components/Table/components/TableCell/components/LevelCell/levelCell";
+import { TagList } from "@brc-analytics/core/components/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
+import { SpeciesCell } from "@brc-analytics/core/components/Table/components/TableCell/components/SpeciesCell/speciesCell";
+import type { SpeciesTag } from "@brc-analytics/core/components/Table/components/TableCell/components/SpeciesCell/types";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import { KeyElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/KeyElType/keyElType";
 import { ValueElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/ValueElType/valueElType";
