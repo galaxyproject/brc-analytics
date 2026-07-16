@@ -1,4 +1,4 @@
-import { UcscTrackNode } from "@/utils/ucsc-tracks-api/entities";
+import { UcscTrackNode } from "@brc-analytics/core/utils/ucsc-tracks-api/entities";
 import { Row } from "@tanstack/react-table";
 import { GROUP_ID_LABEL } from "./constants";
 

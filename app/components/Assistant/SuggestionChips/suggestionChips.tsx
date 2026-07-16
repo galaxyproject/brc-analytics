@@ -1,4 +1,4 @@
-import { SuggestionChip } from "@/types/api";
+import { SuggestionChip } from "@brc-analytics/core/types/api";
 import { JSX } from "react";
 import { ChipsContainer, StyledSuggestionChip } from "./suggestionChips.styles";
 

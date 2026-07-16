@@ -1,11 +1,11 @@
-import ky, { HTTPError } from "ky";
-import { API_BASE_URL } from "../config/api";
 import {
   AssistantChatRequest,
   AssistantChatResponse,
   AssistantInfoResponse,
   SessionRestoreResponse,
-} from "../types/api";
+} from "@brc-analytics/core/types/api";
+import ky, { HTTPError } from "ky";
+import { API_BASE_URL } from "../config/api";
 
 const apiClient = ky.create({
   // Send the assistant session-binding cookie cross-origin. Without

@@ -1,7 +1,7 @@
 import {
   fetchUcscMd5Checksums,
   getChecksumForPath,
-} from "../app/utils/ucsc-tracks-api/ucsc-tracks-api";
+} from "@brc-analytics/core/utils/ucsc-tracks-api/ucsc-tracks-api";
 
 const TEST_DATA = {
   ASSEMBLY_ID: "GCF_045689255.1",

@@ -1,12 +1,12 @@
-import { HTTPError } from "ky";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { assistantAPIClient } from "../services/assistant-api-client";
-import { brcAPIClient } from "../services/brc-api-client";
 import {
   AnalysisSchema,
   AssistantChatResponse,
   SuggestionChip,
-} from "../types/api";
+} from "@brc-analytics/core/types/api";
+import { HTTPError } from "ky";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { assistantAPIClient } from "../services/assistant-api-client";
+import { brcAPIClient } from "../services/brc-api-client";
 
 const SESSION_KEY = "brc-assistant-session-id";
 

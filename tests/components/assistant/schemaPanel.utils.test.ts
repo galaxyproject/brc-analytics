@@ -3,7 +3,7 @@ import {
   resolveSequencingSource,
 } from "@/components/Assistant/SchemaPanel/utils";
 import { SEQUENCING_SOURCE } from "@/providers/workflowHandoff/constants";
-import type { SchemaFieldState } from "@/types/api";
+import type { SchemaFieldState } from "@brc-analytics/core/types/api";
 
 function field(value: string | null): SchemaFieldState {
   return { detail: null, status: "filled", value };

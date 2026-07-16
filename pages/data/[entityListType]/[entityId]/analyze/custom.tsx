@@ -2,9 +2,9 @@ import { getPageMeta } from "@/common/meta/utils";
 import { EntityDataGate } from "@/components/EntityDataGate/entityDataGate";
 import { config } from "@/config/config";
 import { getEntities } from "@/utils/entityUtils";
-import { seedDatabase } from "@/utils/seedDatabase";
 import { CUSTOM_WORKFLOW } from "@/views/AnalyzeWorkflowsView/custom/constants";
 import { WorkflowInputsView } from "@/views/WorkflowInputsView/workflowInputsView";
+import { seedDatabase } from "@brc-analytics/core/utils/seedDatabase";
 import {
   GetStaticPaths,
   GetStaticPathsResult,

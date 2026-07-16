@@ -1,5 +1,5 @@
 import { RowSelectOrExpand } from "@/components/Table/components/TableCell/components/RowSelectOrExpand/rowSelectOrExpand";
-import { UcscTrackNode } from "@/utils/ucsc-tracks-api/entities";
+import { UcscTrackNode } from "@brc-analytics/core/utils/ucsc-tracks-api/entities";
 import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
 import { ColumnDef } from "@tanstack/react-table";

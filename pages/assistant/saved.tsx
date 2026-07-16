@@ -2,7 +2,7 @@ import { SectionHero } from "@/components/Layout/components/AppLayout/components
 import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
 import { useAuth } from "@/providers/authentication";
 import { brcAPIClient } from "@/services/brc-api-client";
-import { SavedAnalysisSummary } from "@/types/api";
+import { SavedAnalysisSummary } from "@brc-analytics/core/types/api";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
   Alert,

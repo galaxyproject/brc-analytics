@@ -1,5 +1,3 @@
-import ky, { HTTPError } from "ky";
-import { API_BASE_URL } from "../config/api";
 import {
   FavoriteResponse,
   SavedAnalysisDetail,
@@ -9,7 +7,9 @@ import {
   UserPreferences,
   WorkflowRunCreateRequest,
   WorkflowRunResponse,
-} from "../types/api";
+} from "@brc-analytics/core/types/api";
+import ky, { HTTPError } from "ky";
+import { API_BASE_URL } from "../config/api";
 
 const apiClient = ky.create({
   credentials: "include",

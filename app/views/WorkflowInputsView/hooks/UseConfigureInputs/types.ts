@@ -1,7 +1,7 @@
 import { COLUMN_TYPE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 import { Strandedness } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/StrandednessStep/types";
 import { EnaSequencingReads } from "@/utils/galaxy-api/entities";
-import { UcscTrack } from "@/utils/ucsc-tracks-api/entities";
+import { UcscTrack } from "@brc-analytics/core/utils/ucsc-tracks-api/entities";
 
 export interface AllVAllContrasts {
   type: "ALL_AGAINST_ALL";

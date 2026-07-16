@@ -11,12 +11,12 @@ const FILE_EXT = {
 
 import { COLUMN_TYPE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 import { PrimaryContrasts } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import ky from "ky";
-import { UcscTrack } from "../ucsc-tracks-api/entities";
+import { UcscTrack } from "@brc-analytics/core/utils/ucsc-tracks-api/entities";
 import {
   fetchUcscMd5Checksums,
   getChecksumForPath,
-} from "../ucsc-tracks-api/ucsc-tracks-api";
+} from "@brc-analytics/core/utils/ucsc-tracks-api/ucsc-tracks-api";
+import ky from "ky";
 import {
   DataLandingsBody,
   DataLandingsBodyRequestState,

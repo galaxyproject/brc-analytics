@@ -6,9 +6,9 @@ import {
 import { GA2Catalog } from "@/apis/catalog/ga2/entities";
 import { getEntityListMeta } from "@/common/meta/utils";
 import { config } from "@/config/config";
-import { seedDatabase } from "@/utils/seedDatabase";
 import { StyledExploreView } from "@/views/ExploreView/exploreView.styles";
 import { PriorityPathogensView } from "@/views/PriorityPathogensView/priorityPathogensView";
+import { seedDatabase } from "@brc-analytics/core/utils/seedDatabase";
 import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main.styles";
 import { getEntityConfig } from "@databiosphere/findable-ui/lib/config/utils";
 import { getEntityService } from "@databiosphere/findable-ui/lib/hooks/useEntityService";

@@ -1,7 +1,7 @@
+import { FavoriteResponse } from "@brc-analytics/core/types/api";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "../providers/authentication";
 import { brcAPIClient } from "../services/brc-api-client";
-import { FavoriteResponse } from "../types/api";
 
 interface UseAssemblyFavoritesReturn {
   error: Error | null;
