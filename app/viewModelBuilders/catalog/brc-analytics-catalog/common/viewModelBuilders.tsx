@@ -50,12 +50,12 @@ import {
 import { ResourcesSection } from "@/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
 import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { AppLink } from "@brc-analytics/core/components/common/AppLink/appLink";
+import { AnalyzeGenome } from "@brc-analytics/core/components/common/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
+import { LevelCell } from "@brc-analytics/core/components/common/Table/components/TableCell/components/LevelCell/levelCell";
+import { TagList } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
+import { SpeciesCell } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/speciesCell";
+import type { SpeciesTag } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/types";
 import { Tooltip } from "@brc-analytics/core/components/common/Tooltip/tooltip";
-import { AnalyzeGenome } from "@brc-analytics/core/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
-import { LevelCell } from "@brc-analytics/core/components/Table/components/TableCell/components/LevelCell/levelCell";
-import { TagList } from "@brc-analytics/core/components/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
-import { SpeciesCell } from "@brc-analytics/core/components/Table/components/TableCell/components/SpeciesCell/speciesCell";
-import type { SpeciesTag } from "@brc-analytics/core/components/Table/components/TableCell/components/SpeciesCell/types";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import { KeyElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/KeyElType/keyElType";
 import { ValueElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/ValueElType/valueElType";

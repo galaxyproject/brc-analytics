@@ -1,6 +1,6 @@
 import { getSelectedTracks } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/utils";
 import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { UcscTrackNode } from "@brc-analytics/core/utils/ucsc-tracks-api/entities";
+import { UcscTrackNode } from "@brc-analytics/core/utils/ucsc-tracks-api/types";
 import { Table } from "@tanstack/react-table";
 
 /**

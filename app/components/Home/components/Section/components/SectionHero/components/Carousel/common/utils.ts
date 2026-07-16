@@ -1,4 +1,4 @@
-import { SWIPE_ACTION } from "@brc-analytics/core/hooks/useSwipeInteraction/common/entities";
+import { SWIPE_ACTION } from "@brc-analytics/core/hooks/UseSwipeInteraction/types";
 import {
   ARROW_OFFSET_Y,
   CARD_OFFSET_Y,

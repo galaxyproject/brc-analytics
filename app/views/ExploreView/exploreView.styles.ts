@@ -1,4 +1,4 @@
-import { tableStyles } from "@brc-analytics/core/components/Table/table.styles";
+import { tableStyles } from "@brc-analytics/core/components/common/Table/table.styles";
 import { bpDownSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import { ExploreView as DXExploreView } from "@databiosphere/findable-ui/lib/views/ExploreView/exploreView";
 import styled from "@emotion/styled";

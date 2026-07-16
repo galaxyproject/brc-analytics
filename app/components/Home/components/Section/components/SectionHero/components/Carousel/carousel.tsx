@@ -1,4 +1,4 @@
-import { SWIPE_ACTION } from "@brc-analytics/core/hooks/useSwipeInteraction/common/entities";
+import { SWIPE_ACTION } from "@brc-analytics/core/hooks/UseSwipeInteraction/types";
 import { JSX } from "react";
 import {
   Carousel as CarouselCards,

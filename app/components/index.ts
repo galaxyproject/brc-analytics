@@ -1,8 +1,8 @@
 export { CalendarIcon } from "@brc-analytics/core/components/common/CustomIcon/components/CalendarIcon/calendarIcon";
+export { AnalyzeGenome } from "@brc-analytics/core/components/common/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
+export { LevelCell } from "@brc-analytics/core/components/common/Table/components/TableCell/components/LevelCell/levelCell";
+export { SpeciesCell } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/speciesCell";
 export { Tooltip } from "@brc-analytics/core/components/common/Tooltip/tooltip";
-export { AnalyzeGenome } from "@brc-analytics/core/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
-export { LevelCell } from "@brc-analytics/core/components/Table/components/TableCell/components/LevelCell/levelCell";
-export { SpeciesCell } from "@brc-analytics/core/components/Table/components/TableCell/components/SpeciesCell/speciesCell";
 export { Alert } from "@databiosphere/findable-ui/lib/components/common/Alert/alert";
 export { DiscourseIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/DiscourseIcon/discourseIcon";
 export { GitHubIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/GitHubIcon/gitHubIcon";

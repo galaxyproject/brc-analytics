@@ -6,7 +6,7 @@ import {
   ConfiguredInput,
   PrimaryContrasts,
 } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { UcscTrack } from "@brc-analytics/core/utils/ucsc-tracks-api/entities";
+import { UcscTrack } from "@brc-analytics/core/utils/ucsc-tracks-api/types";
 
 // Base configured values shared across all scopes
 export interface BaseConfiguredValue {

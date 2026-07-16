@@ -1,5 +1,5 @@
 import type { PangenomeMember } from "@/apis/catalog/brc-analytics-catalog/common/pangenome";
-import { LevelCell } from "@brc-analytics/core/components/Table/components/TableCell/components/LevelCell/levelCell";
+import { LevelCell } from "@brc-analytics/core/components/common/Table/components/TableCell/components/LevelCell/levelCell";
 import { CellContext } from "@tanstack/react-table";
 import { JSX } from "react";
 

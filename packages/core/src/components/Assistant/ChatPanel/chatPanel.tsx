@@ -1,4 +1,4 @@
-import { useAuth } from "@brc-analytics/core/providers/authentication";
+import { useAuth } from "@brc-analytics/core/providers/authentication/provider";
 import { SuggestionChip } from "@brc-analytics/core/types/api";
 import {
   Alert,

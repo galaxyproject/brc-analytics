@@ -1,9 +1,7 @@
-import { Table as DXTable } from "@databiosphere/findable-ui/lib/components/Detail/components/Table/table";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { bpUpSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import { ThemeProps } from "@databiosphere/findable-ui/lib/theme/types";
 import { css } from "@emotion/react";
-import styled from "@emotion/styled";
 
 export const tableStyles = (props: ThemeProps) => css`
   .MuiTable-root {
@@ -32,9 +30,3 @@ export const tableStyles = (props: ThemeProps) => css`
     }
   }
 `;
-
-export const Table = styled(DXTable)`
-  &.MuiTableContainer-root {
-    ${tableStyles}
-  }
-` as typeof DXTable;

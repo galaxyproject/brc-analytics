@@ -1,7 +1,5 @@
-import {
-  UseSwipeInteraction,
-  useSwipeInteraction,
-} from "@brc-analytics/core/hooks/useSwipeInteraction/useSwipeInteraction";
+import { useSwipeInteraction } from "@brc-analytics/core/hooks/UseSwipeInteraction/hook";
+import { UseSwipeInteraction } from "@brc-analytics/core/hooks/UseSwipeInteraction/types";
 import { CardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
 import { useMemo } from "react";
 import { CAROUSEL_CARDS } from "../cards/constants";

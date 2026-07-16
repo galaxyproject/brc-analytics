@@ -14,7 +14,7 @@ import { ExploreStateProvider } from "@databiosphere/findable-ui/lib/providers/e
 
 import { mergeAppTheme } from "@/theme/theme";
 import { OgMeta } from "@brc-analytics/core/components/common/OgMeta/ogMeta";
-import { BrcAuthProvider } from "@brc-analytics/core/providers/authentication";
+import { BrcAuthProvider } from "@brc-analytics/core/providers/authentication/provider";
 import { EntitiesLoadedProvider } from "@brc-analytics/core/providers/entitiesLoaded/provider";
 import { WorkflowHandoffProvider } from "@brc-analytics/core/providers/workflowHandoff/provider";
 import { LayoutDimensionsProvider } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/provider";

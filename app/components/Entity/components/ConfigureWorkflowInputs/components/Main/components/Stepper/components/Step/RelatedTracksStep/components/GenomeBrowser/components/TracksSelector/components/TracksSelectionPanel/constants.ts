@@ -1,4 +1,4 @@
-import { UcscTrackNode } from "@brc-analytics/core/utils/ucsc-tracks-api/entities";
+import { UcscTrackNode } from "@brc-analytics/core/utils/ucsc-tracks-api/types";
 
 export const GROUP_ID_LABEL: Record<UcscTrackNode["groupId"], string> = {
   genes: "Genes and Gene Predictions",

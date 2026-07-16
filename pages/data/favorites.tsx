@@ -3,8 +3,8 @@ import { SectionHero } from "@/components/Layout/components/AppLayout/components
 import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
 import { getEntity } from "@/services/workflows/query";
 import { Assembly } from "@/views/WorkflowInputsView/types";
-import { useAssemblyFavorites } from "@brc-analytics/core/hooks/useAssemblyFavorites";
-import { useAuth } from "@brc-analytics/core/providers/authentication";
+import { useAssemblyFavorites } from "@brc-analytics/core/hooks/UseAssemblyFavorites/hook";
+import { useAuth } from "@brc-analytics/core/providers/authentication/provider";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
   Alert,

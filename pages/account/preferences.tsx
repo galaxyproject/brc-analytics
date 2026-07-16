@@ -1,7 +1,7 @@
 import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
 import { brcAPIClient } from "@/services/brc-api-client";
-import { useAuth } from "@brc-analytics/core/providers/authentication";
+import { useAuth } from "@brc-analytics/core/providers/authentication/provider";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
   Alert,
