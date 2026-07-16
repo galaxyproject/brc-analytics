@@ -1,4 +1,4 @@
-import { formatDate } from "@/utils/date-fns";
+import { formatDate } from "@brc-analytics/core/utils/date-fns";
 import { FrontmatterProps } from "./types";
 
 /**

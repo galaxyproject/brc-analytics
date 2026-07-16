@@ -1,5 +1,5 @@
 import { SectionTitle } from "@/components/Home/components/Section/section.styles";
-import { formatDate } from "@/utils/date-fns";
+import { formatDate } from "@brc-analytics/core/utils/date-fns";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import {
   CardActionArea,

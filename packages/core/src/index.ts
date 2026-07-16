@@ -1,4 +1,3 @@
-// Public barrel for shared, site-agnostic code — components, views, services,
-// hooks, viewModelBuilders, and contract types consumed by the site apps.
-// Empty until shared code is added.
+// Package entry point. Shared code is imported by subpath
+// (e.g. "@brc-analytics/core/utils/date-fns"), not through this barrel.
 export {};
