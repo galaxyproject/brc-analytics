@@ -563,8 +563,7 @@ def add_gene_model_url(genomes_df: pd.DataFrame):
 def report_missing_values_from(
     values_name, message_predicate, all_values_series, *partial_values_series
 ):
-    present_values_mask = all_values_series.astype(bool)
-    present_values_mask[:] = False
+    present_values_mask = pd.Series(False, index=all_values_series.index)
     for series in partial_values_series:
         present_values_mask |= all_values_series.isin(series)
     return report_missing_values(
@@ -1280,6 +1279,22 @@ def make_qc_report(
     return join_report(lines)
 
 
+def build_taxon_maps(taxonomy_df):
+    """
+    Build lookups from taxonomy ID (as string) to taxon name and rank.
+
+    Args:
+        taxonomy_df: DataFrame with taxonomy_id, taxon_name and rank columns
+
+    Returns:
+        Tuple of (name_map, rank_map) dicts keyed by taxonomy ID string
+    """
+    taxon_id_strings = taxonomy_df["taxonomy_id"].astype("string")
+    name_map = dict(zip(taxon_id_strings, taxonomy_df["taxon_name"]))
+    rank_map = dict(zip(taxon_id_strings, taxonomy_df["rank"]))
+    return name_map, rank_map
+
+
 def get_outbreak_taxonomy_ids(
     source_outbreaks_df, get_primary=True, get_descendants=False
 ):
@@ -1303,13 +1318,15 @@ def get_outbreak_taxonomy_ids(
                 if get_primary
                 else ()
             ),
-            # Add any highlight descendant taxonomy IDs
+            # Add any highlight descendant taxonomy IDs. This field is
+            # optional per outbreak, so the column may be absent entirely.
             *(
                 source_outbreaks_df["highlight_descendant_taxonomy_ids"]
                 .explode()
                 .dropna()
                 .astype("string")
                 if get_descendants
+                and "highlight_descendant_taxonomy_ids" in source_outbreaks_df.columns
                 else ()
             ),
         }
@@ -1611,40 +1628,33 @@ def build_files(
     print(f"Found {len(outbreak_taxonomy_ids)} outbreak taxonomy IDs")
     # Add otherTaxa field with outbreak-associated taxa names
     if outbreak_taxonomy_ids:
-        # Convert lineageTaxonomyIds from comma-separated string to list of strings
-        species_df["lineageTaxonomyIdsList"] = species_df["lineageTaxonomyIds"].apply(
-            lambda x: [id for id in x.split(",")]
+        # Get taxon names and ranks for outbreak taxonomy IDs
+        outbreak_taxon_name_map, outbreak_taxon_rank_map = build_taxon_maps(
+            outbreak_taxonomy_df
         )
 
-        # Get taxon names and ranks for outbreak taxonomy IDs
-        outbreak_taxon_id_strings = outbreak_taxonomy_df["taxonomy_id"].astype("string")
-        outbreak_taxon_name_map = dict(
-            zip(outbreak_taxon_id_strings, outbreak_taxonomy_df["taxon_name"])
-        )
-        outbreak_taxon_rank_map = dict(
-            zip(outbreak_taxon_id_strings, outbreak_taxonomy_df["rank"])
-        )
+        # Set for O(1) membership tests in the per-row loop below
+        outbreak_taxonomy_id_set = set(outbreak_taxonomy_ids)
 
         # For each row, check if any lineage taxonomy ID is in the outbreak taxonomy IDs
         # and add the corresponding taxon name to otherTaxa only if its rank is not in taxonomic_levels_for_tree
-        def get_other_taxa(lineage_ids):
+        def get_other_taxa(lineage_taxonomy_ids):
             taxa = []
-            for tax_id in lineage_ids:
-                if tax_id in outbreak_taxonomy_ids:
+            for tax_id in lineage_taxonomy_ids.split(","):
+                if tax_id in outbreak_taxonomy_id_set:
                     # Check if this taxon's rank is already covered by taxonomic_levels_for_tree
                     rank = outbreak_taxon_rank_map.get(str(tax_id), "").lower()
-                    if rank not in taxonomic_levels_for_tree:
-                        # Use the taxon name instead of the raw ID
-                        taxa.append(outbreak_taxon_name_map[str(tax_id)])
+                    tax_id_str = str(tax_id)
+                    if (
+                        rank not in taxonomic_levels_for_tree
+                        and tax_id_str in outbreak_taxon_name_map
+                    ):
+                        # Add the taxon name (note: not the raw ID) if available
+                        taxa.append(outbreak_taxon_name_map[tax_id_str])
             # Convert list to comma-separated string for build-assemblies.ts
             return ",".join(taxa) if taxa else None
 
-        species_df["otherTaxa"] = species_df["lineageTaxonomyIdsList"].apply(
-            get_other_taxa
-        )
-
-        # Drop the temporary column
-        species_df = species_df.drop(columns=["lineageTaxonomyIdsList"])
+        species_df["otherTaxa"] = species_df["lineageTaxonomyIds"].apply(get_other_taxa)
 
         all_lineage_ids = {
             id_str
@@ -1851,12 +1861,8 @@ def build_files(
     )
     print(f"Checked ploidy for {len(genomes_df)} assemblies")
 
-    organism_taxonomy_id_strings = organism_taxonomy_df["taxonomy_id"].astype("string")
-    organism_taxon_name_map = dict(
-        zip(organism_taxonomy_id_strings, organism_taxonomy_df["taxon_name"])
-    )
-    organism_taxon_rank_map = dict(
-        zip(organism_taxonomy_id_strings, organism_taxonomy_df["rank"])
+    organism_taxon_name_map, organism_taxon_rank_map = build_taxon_maps(
+        organism_taxonomy_df
     )
     qc_report_params["organisms_not_species_rank"] = check_organism_ranks(
         source_organisms_df["taxonomy_id"].tolist(),
