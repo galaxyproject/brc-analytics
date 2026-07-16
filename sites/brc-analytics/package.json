@@ -1,0 +1,6 @@
+{
+  "name": "@brc-analytics/brc",
+  "version": "0.0.0",
+  "private": true,
+  "description": "BRC Analytics: explore, analyze, and share genomic data across organisms using Galaxy workflows."
+}
