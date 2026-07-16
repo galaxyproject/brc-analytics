@@ -3,15 +3,15 @@ import {
   WorkflowParameter,
 } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { WORKFLOW_PARAMETER_BY_STEP_KEY } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/CollectionSelector/constants";
+import { StepProps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
+import { isSequencingDataType } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/CollectionSelector/hooks/UseColumnFilters/typeGuards";
+import { CATEGORY_CONFIGS } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/CollectionSelector/hooks/UseTable/categoryConfigs";
 import {
   SEQUENCING_DATA_FILE_TYPE,
   SEQUENCING_DATA_TYPE,
   STEP_KEY_TO_LIBRARY_LAYOUT,
-} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/types";
-import { StepProps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
+} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/types";
 import { ColumnFiltersState } from "@tanstack/react-table";
-import { CATEGORY_CONFIGS } from "../UseTable/categoryConfigs";
-import { isSequencingDataType } from "./typeGuards";
 
 /**
  * Gets library strategy requirements from a workflow parameter.

@@ -1,10 +1,13 @@
+import { SCHEMA } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/hooks/UseENADataByAccession/schema";
+import {
+  SubmitOptions,
+  UseENADataByAccession,
+} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/hooks/UseENADataByAccession/types";
+import { parseAccessionList } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/hooks/UseENADataByAccession/utils";
 import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
 import { FormEvent, useCallback, useState } from "react";
 import { ValidationError } from "yup";
 import { fetchENAData } from "./request";
-import { SCHEMA } from "./schema";
-import { SubmitOptions, UseENADataByAccession } from "./types";
-import { parseAccessionList } from "./utils";
 
 export const useENADataByAccession = <T>(): UseENADataByAccession<T> => {
   const { data, isLoading: loading, run } = useAsync<T[] | undefined>();

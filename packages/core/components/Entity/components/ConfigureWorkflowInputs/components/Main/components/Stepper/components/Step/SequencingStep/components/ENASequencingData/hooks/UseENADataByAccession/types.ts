@@ -1,5 +1,10 @@
 import { FormEvent } from "react";
 
+export interface AccessionInfo {
+  accession: string;
+  accessionType: string;
+}
+
 export interface Actions<T> {
   clearErrors: () => void;
   onRequestData: OnRequestData<T>;

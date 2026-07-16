@@ -1,4 +1,12 @@
 import { useWorkflowEntity } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/hook";
+import {
+  GRID_PROPS,
+  PAPER_PROPS,
+} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/DataSelector/constants";
+import {
+  StyledGrid,
+  StyledPaper,
+} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/DataSelector/dataSelector.styles";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { LoadingIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/LoadingIcon/loadingIcon";
 import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
@@ -6,8 +14,6 @@ import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/m
 import { Button, Divider, Stack, Typography } from "@mui/material";
 import { Fragment, JSX } from "react";
 import { Alert } from "./components/Alert/alert";
-import { GRID_PROPS, PAPER_PROPS } from "./constants";
-import { StyledGrid, StyledPaper } from "./dataSelector.styles";
 import { Props } from "./types";
 
 export const DataSelector = ({

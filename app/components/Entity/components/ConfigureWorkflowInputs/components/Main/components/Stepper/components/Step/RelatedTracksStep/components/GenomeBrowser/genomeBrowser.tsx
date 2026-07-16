@@ -1,11 +1,14 @@
+import { DataSelector } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/components/GenomeBrowser/components/DataSelector/dataSelector";
+import { TracksSummary } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/components/GenomeBrowser/components/TracksSummary/tracksSummary";
+import {
+  getSelectedTracksCount,
+  getTracksCount,
+} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/components/GenomeBrowser/utils";
 import { useDialog } from "@databiosphere/findable-ui/lib/components/common/Dialog/hooks/useDialog";
 import { Fragment, JSX } from "react";
-import { DataSelector } from "./components/DataSelector/dataSelector";
 import { TracksSelector } from "./components/TracksSelector/tracksSelector";
 import { clearTracksData } from "./components/TracksSelector/utils";
-import { TracksSummary } from "./components/TracksSummary/tracksSummary";
 import { Props } from "./types";
-import { getSelectedTracksCount, getTracksCount } from "./utils";
 
 export const GenomeBrowser = ({
   onConfigure,

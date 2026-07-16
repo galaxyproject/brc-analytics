@@ -1,8 +1,8 @@
 import { ReadRun } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
+import type { SpeciesInfo } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/CollectionSummary/components/Alert/hooks/UseRequirementsMatches/types";
 import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import { ColumnFiltersState, Row } from "@tanstack/react-table";
 import { COLUMN_KEY_TO_LABEL } from "./constants";
-import type { SpeciesInfo } from "./types";
 
 /**
  * Builds warnings for column filter mismatches.

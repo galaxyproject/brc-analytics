@@ -1,4 +1,4 @@
-import { GROUP_ID_LABEL } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/components/GenomeBrowser/components/TracksSelector/components/TracksSelectionPanel/constants";
+import { GROUP_ID_LABEL } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/components/GenomeBrowser/components/TracksSelector/components/TracksSelectionPanel/constants";
 import { CategoryConfig } from "@databiosphere/findable-ui/lib/common/categories/config/types";
 import { mapSelectCategoryValue } from "@site-config/brc-analytics/local/index/common/category/mapSelectCategoryValue";
 

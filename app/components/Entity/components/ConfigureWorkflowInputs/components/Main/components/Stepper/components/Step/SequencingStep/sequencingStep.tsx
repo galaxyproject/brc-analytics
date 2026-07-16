@@ -1,3 +1,6 @@
+import { TOGGLE_BUTTONS } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ToggleButtonGroup/toggleButtons";
+import { VIEW } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ToggleButtonGroup/types";
+import { UploadMyData } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/UploadMyData/uploadMyData";
 import { HandoffStatusContext } from "@brc-analytics/core/providers/workflowHandoff/contexts/HandoffStatus/context";
 import {
   Loading,
@@ -25,9 +28,6 @@ import {
   getSelectedCount,
   getUploadMyOwnSequencingData,
 } from "./components/ENASequencingData/utils";
-import { TOGGLE_BUTTONS } from "./components/ToggleButtonGroup/toggleButtons";
-import { VIEW } from "./components/ToggleButtonGroup/types";
-import { UploadMyData } from "./components/UploadMyData/uploadMyData";
 import {
   areReadRunsCleared,
   getInitialToggleValue,

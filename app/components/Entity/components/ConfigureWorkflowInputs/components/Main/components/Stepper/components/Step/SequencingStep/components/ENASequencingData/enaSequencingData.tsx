@@ -1,9 +1,9 @@
+import { CollectionSummary } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/CollectionSummary/collectionSummary";
 import { useDialog } from "@databiosphere/findable-ui/lib/components/common/Dialog/hooks/useDialog";
 import { RowSelectionState } from "@tanstack/react-table";
 import { Fragment, JSX, useRef } from "react";
 import { AccessionSelector } from "./components/AccessionSelector/accessionSelector";
 import { CollectionSelector } from "./components/CollectionSelector/collectionSelector";
-import { CollectionSummary } from "./components/CollectionSummary/collectionSummary";
 import { DataSelector } from "./components/DataSelector/dataSelector";
 import { Props } from "./types";
 import { clearSequencingData } from "./utils";

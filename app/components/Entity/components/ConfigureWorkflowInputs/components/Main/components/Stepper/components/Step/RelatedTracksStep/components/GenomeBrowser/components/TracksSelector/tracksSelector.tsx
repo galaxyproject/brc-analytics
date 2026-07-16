@@ -1,11 +1,11 @@
 import { ColumnFilters } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/ColumnFilters/columnFilters";
+import { TracksSelectionPanel } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/components/GenomeBrowser/components/TracksSelector/components/TracksSelectionPanel/tracksSelectionPanel";
+import { StyledDialog } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/components/GenomeBrowser/components/TracksSelector/tracksSelector.styles";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { DialogTitle } from "@databiosphere/findable-ui/lib/components/common/Dialog/components/DialogTitle/dialogTitle";
 import { Button, DialogActions, DialogContent } from "@mui/material";
 import { RowSelectionState } from "@tanstack/table-core";
 import { JSX, useCallback, useState } from "react";
-import { TracksSelectionPanel } from "./components/TracksSelectionPanel/tracksSelectionPanel";
-import { StyledDialog } from "./tracksSelector.styles";
 import { Props } from "./types";
 import { getTracksData } from "./utils";
 

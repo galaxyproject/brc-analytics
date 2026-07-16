@@ -1,4 +1,10 @@
 import { useAssembly } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/hook";
+import { useTable } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/components/GenomeBrowser/components/TracksSelector/hooks/UseTable/hook";
+import { TOGGLE_BUTTONS } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/components/ToggleButtonGroup/toggleButtons";
+import { VIEW } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/components/ToggleButtonGroup/types";
+import { UploadMyData } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/components/UploadMyData/uploadMyData";
+import { useUCSCTracks } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/hooks/UseUCSCTracks/hook";
+import { renderValue } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/utils";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepContent/stepContent";
 import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Optional/optional";
@@ -9,14 +15,8 @@ import { Fragment, JSX } from "react";
 import { ToggleButtonGroup } from "../components/ToggleButtonGroup/toggleButtonGroup";
 import { useToggleButtonGroup } from "../hooks/UseToggleButtonGroup/useToggleButtonGroup";
 import { StepProps } from "../types";
-import { useTable } from "./components/GenomeBrowser/components/TracksSelector/hooks/UseTable/hook";
 import { getTracksData } from "./components/GenomeBrowser/components/TracksSelector/utils";
 import { GenomeBrowser } from "./components/GenomeBrowser/genomeBrowser";
-import { TOGGLE_BUTTONS } from "./components/ToggleButtonGroup/toggleButtons";
-import { VIEW } from "./components/ToggleButtonGroup/types";
-import { UploadMyData } from "./components/UploadMyData/uploadMyData";
-import { useUCSCTracks } from "./hooks/UseUCSCTracks/hook";
-import { renderValue } from "./utils";
 
 export const RelatedTracksStep = ({
   active,

@@ -1,5 +1,5 @@
 import { WORKFLOW_PARAMETER_VARIABLE } from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { SEQUENCING_DATA_FILE_TYPE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/types";
+import { SEQUENCING_DATA_FILE_TYPE } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/types";
 
 // Maps each sequencing step key to the workflow parameter variable it configures.
 // readRunPairedFile maps to SANGER_READ_RUN_FORWARD_FILE because the paired-file

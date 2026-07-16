@@ -1,7 +1,10 @@
 import { OnConfigure } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import {
+  Actions,
+  Status,
+} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/hooks/UseENADataByAccession/types";
 import { UseQueryResult } from "@tanstack/react-query";
 import { Table } from "@tanstack/react-table";
-import { Actions, Status } from "./hooks/UseENADataByAccession/types";
 
 export interface BaseReadRun {
   base_count: number;

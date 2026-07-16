@@ -1,4 +1,4 @@
-import { UseUCSCTracks } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/hooks/UseUCSCTracks/types";
+import { UseUCSCTracks } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/hooks/UseUCSCTracks/types";
 import { UcscTrackNode } from "@brc-analytics/core/utils/ucsc-tracks-api/types";
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 import { arrIncludesSome } from "@databiosphere/findable-ui/lib/components/Table/columnDef/columnFilters/filterFn";

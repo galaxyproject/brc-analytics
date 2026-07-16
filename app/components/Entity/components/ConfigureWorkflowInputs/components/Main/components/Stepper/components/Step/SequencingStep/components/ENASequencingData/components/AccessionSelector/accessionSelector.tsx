@@ -1,3 +1,4 @@
+import { StyledDialog } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/AccessionSelector/accessionSelector.styles";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { ErrorIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/ErrorIcon/errorIcon";
 import { DialogTitle } from "@databiosphere/findable-ui/lib/components/common/Dialog/components/DialogTitle/dialogTitle";
@@ -14,7 +15,6 @@ import {
   Typography,
 } from "@mui/material";
 import { FormEvent, JSX } from "react";
-import { StyledDialog } from "./accessionSelector.styles";
 import { Props } from "./types";
 
 export const AccessionSelector = ({

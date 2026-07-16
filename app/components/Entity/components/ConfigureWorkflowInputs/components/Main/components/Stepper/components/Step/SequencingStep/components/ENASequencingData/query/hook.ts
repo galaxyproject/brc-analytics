@@ -1,12 +1,15 @@
 import { useWorkflowEntity } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/hook";
+import {
+  CountQueryKey,
+  QueryKey,
+} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/query/types";
+import { isEligible } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/query/utils";
 import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
 import { AppSiteConfig } from "@site-config/common/entities";
 import { DefaultError, useQuery as useReactQuery } from "@tanstack/react-query";
 import { BaseReadRun, ENAReadRunsQuery } from "../types";
 import { countQueryFn } from "./options/countQueryFn";
 import { queryFn } from "./options/queryFn";
-import { CountQueryKey, QueryKey } from "./types";
-import { isEligible } from "./utils";
 
 /**
  * Custom hook to fetch ENA sequencing data for the workflow entity's taxonomy ID.
