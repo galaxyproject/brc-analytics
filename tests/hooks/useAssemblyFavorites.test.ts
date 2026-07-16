@@ -1,14 +1,14 @@
-import { brcAPIClient } from "@/services/brc-api-client";
 import { useAssemblyFavorites } from "@brc-analytics/core/hooks/UseAssemblyFavorites/hook";
 import { useAuth } from "@brc-analytics/core/providers/authentication/provider";
+import { apiClient } from "@brc-analytics/core/services/api-client";
 import { FavoriteResponse } from "@brc-analytics/core/types/api";
 import { act, renderHook, waitFor } from "@testing-library/react";
 
 jest.mock("@brc-analytics/core/providers/authentication/provider", () => ({
   useAuth: jest.fn(),
 }));
-jest.mock("../../app/services/brc-api-client", () => ({
-  brcAPIClient: {
+jest.mock("@brc-analytics/core/services/api-client", () => ({
+  apiClient: {
     createFavorite: jest.fn(),
     deleteFavorite: jest.fn(),
     getFavorites: jest.fn(),
@@ -16,7 +16,7 @@ jest.mock("../../app/services/brc-api-client", () => ({
 }));
 
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
-const mockClient = brcAPIClient as jest.Mocked<typeof brcAPIClient>;
+const mockClient = apiClient as jest.Mocked<typeof apiClient>;
 
 const ACCESSION = "GCF_000001405.40";
 

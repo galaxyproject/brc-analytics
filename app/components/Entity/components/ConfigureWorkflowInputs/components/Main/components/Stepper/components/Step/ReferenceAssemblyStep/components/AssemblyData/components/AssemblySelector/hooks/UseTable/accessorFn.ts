@@ -1,4 +1,4 @@
-import type { AssemblyContract } from "@/apis/catalog/common/entities";
+import type { AssemblyContract } from "@brc-analytics/core/apis/types";
 import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 
 /**

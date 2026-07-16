@@ -4,12 +4,12 @@ import {
 } from "@/apis/catalog/ga2/entities";
 import * as C from "@/components";
 import { TaxonomyNode } from "@/components/Home/components/Section/components/SectionViz/data";
+import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { APP_KEYS } from "@site-config/common/constants";
 import { AppSiteConfig } from "@site-config/common/entities";
 import data from "catalog/ga2/output/ncbi-taxa-tree.json";
-import { ROUTES } from "../../../routes/constants";
 import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genome/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organism/organismEntityConfig";

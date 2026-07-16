@@ -1,4 +1,3 @@
-import { sanitizeEntityId } from "@/apis/catalog/common/utils";
 import {
   GA2AssemblyEntity,
   GA2OrganismEntity,
@@ -9,12 +8,25 @@ import {
   COLUMN_PRESET_LABEL,
 } from "@/views/OrganismView/components/Main/constants";
 import { Main as OrganismViewMain } from "@/views/OrganismView/components/Main/main";
+import { sanitizeEntityId } from "@brc-analytics/core/apis/utils";
 import { AnalyzeGenome } from "@brc-analytics/core/components/common/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 import { LevelCell } from "@brc-analytics/core/components/common/Table/components/TableCell/components/LevelCell/levelCell";
 import { TagList } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
 import { SpeciesCell } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/speciesCell";
 import type { SpeciesTag } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/types";
 import { Tooltip } from "@brc-analytics/core/components/common/Tooltip/tooltip";
+import { ROUTES } from "@brc-analytics/core/routes/constants";
+import { ORGANISM_SCOPED_TAG_LABELS } from "@brc-analytics/core/viewModelBuilders/constants";
+import {
+  buildAnalyzeGenome,
+  buildGroupTag,
+  buildIsRef,
+  buildLevel,
+  buildReleaseDate,
+  buildReleaseDateTooltip,
+  formatNumber,
+  getGenomeStrainText,
+} from "@brc-analytics/core/viewModelBuilders/viewModelBuilders";
 import { BackPageHero } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/components/BackPageHero/backPageHero";
 import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
@@ -26,18 +38,6 @@ import {
 } from "@site-config/ga2/category";
 import { ColumnDef, RowData, VisibilityState } from "@tanstack/react-table";
 import { ComponentProps } from "react";
-import { ROUTES } from "../../../../routes/constants";
-import { ORGANISM_SCOPED_TAG_LABELS } from "../common/constants";
-import {
-  buildAnalyzeGenome,
-  buildGroupTag,
-  buildIsRef,
-  buildLevel,
-  buildReleaseDate,
-  buildReleaseDateTooltip,
-  formatNumber,
-  getGenomeStrainText,
-} from "../common/viewModelBuilders";
 
 /**
  * Build props for the organism BackPageHero component.

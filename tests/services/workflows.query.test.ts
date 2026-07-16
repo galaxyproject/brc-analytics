@@ -1,10 +1,13 @@
-import { getEntities, getEntity } from "@/services/workflows/query";
+import {
+  getEntities,
+  getEntity,
+} from "@brc-analytics/core/services/workflows/query";
 import {
   getEntitiesById,
   getEntitiesByType,
   setEntitiesById,
   setEntitiesByType,
-} from "@/services/workflows/store";
+} from "@brc-analytics/core/services/workflows/store";
 
 describe("workflows query", () => {
   beforeEach(() => {

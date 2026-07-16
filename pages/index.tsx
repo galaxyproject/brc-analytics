@@ -1,10 +1,10 @@
+import { config } from "@/config/config";
 import { StyledMain } from "@brc-analytics/core/components/Layout/components/Main/main.styles";
 import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
 import { useLayoutDimensions } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/hook";
 import { GetStaticProps } from "next";
 import { JSX } from "react";
 import { getPageMeta } from "../app/common/meta/utils";
-import { config } from "../app/config/config";
 import { HomeView as GA2HomeView } from "../app/views/HomeView/ga2/homeView";
 import { HomeView } from "../app/views/HomeView/homeView";
 import { APP_KEYS } from "../site-config/common/constants";

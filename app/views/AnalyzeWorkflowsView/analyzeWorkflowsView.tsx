@@ -1,4 +1,4 @@
-import { getEntity } from "@/services/workflows/query";
+import { getEntity } from "@brc-analytics/core/services/workflows/query";
 import {
   BackPageContent,
   BackPageHero,

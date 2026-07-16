@@ -1,7 +1,7 @@
-import { brcAPIClient } from "@/services/brc-api-client";
 import { SectionHero } from "@brc-analytics/core/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import { StyledPagesMain } from "@brc-analytics/core/components/Layout/components/Main/main.styles";
 import { useAuth } from "@brc-analytics/core/providers/authentication/provider";
+import { apiClient } from "@brc-analytics/core/services/api-client";
 import { SavedAnalysisSummary } from "@brc-analytics/core/types/api";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
@@ -57,7 +57,7 @@ export default function SavedAnalysesPage(): JSX.Element {
     setIsLoading(true);
     setError(null);
 
-    brcAPIClient
+    apiClient
       .getSavedAnalyses()
       .then((response) => {
         if (!isMounted) return;
@@ -84,7 +84,7 @@ export default function SavedAnalysesPage(): JSX.Element {
   async function handleDelete(id: string): Promise<void> {
     setError(null);
     try {
-      await brcAPIClient.deleteSavedAnalysis(id);
+      await apiClient.deleteSavedAnalysis(id);
       setSavedAnalyses((current) => current.filter((item) => item.id !== id));
     } catch (err) {
       setError(
@@ -96,7 +96,7 @@ export default function SavedAnalysesPage(): JSX.Element {
   async function handleRestore(id: string): Promise<void> {
     setError(null);
     try {
-      const restored = await brcAPIClient.restoreSavedAnalysis(id);
+      const restored = await apiClient.restoreSavedAnalysis(id);
       await router.push({
         pathname: "/assistant",
         query: { sessionId: restored.session_id },

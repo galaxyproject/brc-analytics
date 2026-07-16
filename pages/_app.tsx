@@ -12,12 +12,14 @@ import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureF
 import { ConfigProvider as DXConfigProvider } from "@databiosphere/findable-ui/lib/providers/config";
 import { ExploreStateProvider } from "@databiosphere/findable-ui/lib/providers/exploreState";
 
+import { config } from "@/config/config";
 import { mergeAppTheme } from "@/theme/theme";
 import { OgMeta } from "@brc-analytics/core/components/common/OgMeta/ogMeta";
 import { StyledFooter } from "@brc-analytics/core/components/Layout/components/Footer/footer.styles";
 import { BrcAuthProvider } from "@brc-analytics/core/providers/authentication/provider";
 import { EntitiesLoadedProvider } from "@brc-analytics/core/providers/entitiesLoaded/provider";
 import { WorkflowHandoffProvider } from "@brc-analytics/core/providers/workflowHandoff/provider";
+import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { LayoutDimensionsProvider } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/provider";
 import { ServicesProvider } from "@databiosphere/findable-ui/lib/providers/services/provider";
 import { SystemStatusProvider } from "@databiosphere/findable-ui/lib/providers/systemStatus";
@@ -30,10 +32,8 @@ import { NextPage } from "next";
 import type { AppProps } from "next/app";
 import { JSX, useMemo } from "react";
 import { getDefaultDescription } from "../app/common/meta/utils";
-import { config } from "../app/config/config";
 import { useEntities } from "../app/services/workflows/hooks/UseEntities/hook";
 import "../app/styles/fonts/fonts.css";
-import { ROUTES } from "../routes/constants";
 
 const DEFAULT_ENTITY_LIST_TYPE = "organisms";
 

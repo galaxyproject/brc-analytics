@@ -20,6 +20,7 @@
       "@brc-analytics/core": ["packages/core/src/index.ts"],
       "@brc-analytics/core/*": ["packages/core/src/*"],
       "@site-config/*": ["site-config/*"],
+      "catalog/*": ["catalog/*"],
       "images/*": ["images/*"]
     },
     "plugins": [

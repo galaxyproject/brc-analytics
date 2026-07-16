@@ -1,6 +1,6 @@
+import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
-import { ROUTES } from "../../../../../../../routes/constants";
 import { Props } from "./types";
 
 /**

@@ -1,4 +1,5 @@
 import { Props } from "@/views/AnalyzeView/types";
+import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/components/FluidPaper/fluidPaper";
 import { BackPageContentMainColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
@@ -13,7 +14,6 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 import { JSX } from "react";
-import { ROUTES } from "../../../../../routes/constants";
 import { StyledCard } from "./main.styles";
 
 export const Main = ({ entityId }: Props): JSX.Element => {

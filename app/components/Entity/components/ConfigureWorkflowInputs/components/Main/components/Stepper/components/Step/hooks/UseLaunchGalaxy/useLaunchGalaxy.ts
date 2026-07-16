@@ -1,5 +1,4 @@
 import { Workflow } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import { brcAPIClient } from "@/services/brc-api-client";
 import {
   getDataLandingUrl,
   getDeSeq2LandingUrl,
@@ -10,6 +9,7 @@ import { CUSTOM_WORKFLOW } from "@/views/AnalyzeWorkflowsView/custom/constants";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { LEXICMAP } from "@/views/AnalyzeWorkflowsView/lexicmap/constants";
 import { LOGAN_SEARCH } from "@/views/AnalyzeWorkflowsView/loganSearch/constants";
+import { apiClient } from "@brc-analytics/core/services/api-client";
 import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
 import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
 import { useRouter } from "next/router";
@@ -141,7 +141,7 @@ export const useLaunchGalaxy = ({
     }
 
     try {
-      await brcAPIClient.createWorkflowRun(
+      await apiClient.createWorkflowRun(
         buildWorkflowRunPayload({
           assistantSessionId:
             typeof router.query.assistantSessionId === "string"

@@ -1,9 +1,9 @@
-import { assistantAPIClient } from "@/services/assistant-api-client";
 import {
   ChatPanel,
   SchemaPanel,
 } from "@brc-analytics/core/components/Assistant";
 import { useAssistantChat } from "@brc-analytics/core/hooks/UseAssistantChat/hook";
+import { assistantAPIClient } from "@brc-analytics/core/services/assistant-api-client";
 import { AssistantInfoResponse } from "@brc-analytics/core/types/api";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";

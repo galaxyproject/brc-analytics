@@ -1,11 +1,11 @@
 import * as C from "@/components";
+import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { SocialMedia } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/common/entities";
 import { MenuItem } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/components/Content/components/Navigation/components/NavigationMenuItems/navigationMenuItems";
 import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,
 } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
-import { ROUTES } from "../../../routes/constants";
 
 export const SOCIALS = {
   CALENDAR: {

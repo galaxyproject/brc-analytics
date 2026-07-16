@@ -9,7 +9,7 @@ import { SideColumn } from "@/components/Entity/components/ConfigureWorkflowInpu
 import { WorkflowEntityContext } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
 import { buildWorkflowEntityValue } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/utils";
 import { getWorkflow } from "@/services/workflows/entities";
-import { getEntity } from "@/services/workflows/query";
+import { getEntity } from "@brc-analytics/core/services/workflows/query";
 import {
   BackPageContent,
   BackPageContentSideColumn,

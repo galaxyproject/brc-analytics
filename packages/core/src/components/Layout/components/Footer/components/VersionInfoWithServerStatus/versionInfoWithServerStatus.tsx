@@ -1,6 +1,6 @@
 "use client";
 
-import { API_BASE_URL } from "@/config/api";
+import { API_BASE_URL } from "@brc-analytics/core/config/api";
 import { VersionInfo } from "@databiosphere/findable-ui/lib/components/Layout/components/Footer/components/VersionInfo/versionInfo";
 import DnsOutlinedIcon from "@mui/icons-material/DnsOutlined";
 import { Box, Tooltip } from "@mui/material";

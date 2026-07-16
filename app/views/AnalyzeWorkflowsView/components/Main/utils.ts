@@ -7,8 +7,8 @@ import {
   WORKFLOW_SCOPE,
 } from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { workflowPloidyMatchesOrganismPloidy } from "@/apis/catalog/brc-analytics-catalog/common/utils";
-import type { AssemblyContract } from "@/apis/catalog/common/entities";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
+import type { AssemblyContract } from "@brc-analytics/core/apis/types";
 import { WorkflowCategoryId } from "../../../../../catalog/schema/generated/schema";
 
 /**

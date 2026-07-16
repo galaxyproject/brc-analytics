@@ -1,6 +1,6 @@
 import { formatTrsId } from "@/views/AnalyzeWorkflowsView/components/Main/utils";
+import { sanitizeEntityId } from "@brc-analytics/core/apis/utils";
 import { WorkflowEntity } from "@site-config/ga2/local/index/workflow/types";
-import { sanitizeEntityId } from "../common/utils";
 import { GA2AssemblyEntity, GA2OrganismEntity } from "./entities";
 
 /**

@@ -8,10 +8,14 @@ import { CUSTOM_WORKFLOW } from "@/views/AnalyzeWorkflowsView/custom/constants";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { LEXICMAP } from "@/views/AnalyzeWorkflowsView/lexicmap/constants";
 import { LOGAN_SEARCH } from "@/views/AnalyzeWorkflowsView/loganSearch/constants";
+import { API } from "@brc-analytics/core/services/workflows/routes";
+import {
+  getEntitiesById,
+  setEntitiesById,
+  setEntitiesByType,
+} from "@brc-analytics/core/services/workflows/store";
+import { EntityRoute } from "@brc-analytics/core/services/workflows/types";
 import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
-import { API } from "./routes";
-import { getEntitiesById, setEntitiesById, setEntitiesByType } from "./store";
-import { EntityRoute } from "./types";
 
 /**
  * Fetches entities from the API.

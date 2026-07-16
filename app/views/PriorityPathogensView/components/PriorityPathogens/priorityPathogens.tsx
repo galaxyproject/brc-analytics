@@ -1,4 +1,5 @@
 import { SLUGIFY_OPTIONS } from "@/common/constants";
+import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import {
   Section,
@@ -11,7 +12,6 @@ import { MDXRemote } from "next-mdx-remote";
 import { useRouter } from "next/router";
 import { JSX } from "react";
 import slugify from "slugify";
-import { ROUTES } from "../../../../../routes/constants";
 import { StyledGrid, StyledSectionText } from "./priorityPathogens.styles";
 import { Props } from "./types";
 import { getPriorityColor, getPriorityLabel } from "./utils";

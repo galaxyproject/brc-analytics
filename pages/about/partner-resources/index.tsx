@@ -3,10 +3,10 @@ import { config } from "@/config/config";
 import { PartnerResourcesView as PartnerResourcesViewGA2 } from "@/views/PartnerResourcesView/ga2/partnerResourcesView";
 import { PartnerResourcesView } from "@/views/PartnerResourcesView/partnerResourcesView";
 import { StyledPagesMain } from "@brc-analytics/core/components/Layout/components/Main/main.styles";
+import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { APP_KEYS } from "@site-config/common/constants";
 import { GetStaticProps } from "next";
 import { JSX } from "react";
-import { ROUTES } from "../../../routes/constants";
 import type { PageProps } from "../../_app";
 
 const Page = (): JSX.Element => {

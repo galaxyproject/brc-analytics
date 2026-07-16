@@ -1,5 +1,5 @@
-import { assistantAPIClient } from "@/services/assistant-api-client";
-import { brcAPIClient } from "@/services/brc-api-client";
+import { apiClient } from "@brc-analytics/core/services/api-client";
+import { assistantAPIClient } from "@brc-analytics/core/services/assistant-api-client";
 import {
   AnalysisSchema,
   AssistantChatResponse,
@@ -185,9 +185,7 @@ export const useAssistantChat = ({
     setSaveLoading(true);
     setSaveMessage(null);
     try {
-      const savedAnalysis = await brcAPIClient.saveAnalysis(
-        sessionIdRef.current
-      );
+      const savedAnalysis = await apiClient.saveAnalysis(sessionIdRef.current);
       setSaveMessage(
         savedAnalysis.title ? `Saved: ${savedAnalysis.title}` : "Saved."
       );

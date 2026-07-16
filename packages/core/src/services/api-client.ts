@@ -11,7 +11,7 @@ import {
 import ky, { HTTPError } from "ky";
 import { API_BASE_URL } from "../config/api";
 
-const apiClient = ky.create({
+const httpClient = ky.create({
   credentials: "include",
   hooks: {
     beforeError: [
@@ -29,12 +29,12 @@ const apiClient = ky.create({
   timeout: 30000,
 });
 
-export const brcAPIClient = {
+export const apiClient = {
   createFavorite: async (
     entity_id: string,
     entity_type = "assembly"
   ): Promise<FavoriteResponse> => {
-    return apiClient
+    return httpClient
       .post("favorites", { json: { entity_id, entity_type } })
       .json();
   },
@@ -42,57 +42,59 @@ export const brcAPIClient = {
   createWorkflowRun: async (
     payload: WorkflowRunCreateRequest
   ): Promise<WorkflowRunResponse> => {
-    return apiClient.post("workflow_runs", { json: payload }).json();
+    return httpClient.post("workflow_runs", { json: payload }).json();
   },
 
   deleteFavorite: async (
     entity_id: string,
     entity_type = "assembly"
   ): Promise<void> => {
-    await apiClient.delete(`favorites/${entity_type}/${entity_id}`);
+    await httpClient.delete(`favorites/${entity_type}/${entity_id}`);
   },
 
   deleteSavedAnalysis: async (id: string): Promise<void> => {
-    await apiClient.delete(`saved_analyses/${id}`);
+    await httpClient.delete(`saved_analyses/${id}`);
   },
 
   getFavorites: async (
     entity_type = "assembly"
   ): Promise<FavoriteResponse[]> => {
-    return apiClient.get("favorites", { searchParams: { entity_type } }).json();
+    return httpClient
+      .get("favorites", { searchParams: { entity_type } })
+      .json();
   },
 
   getPreferences: async (): Promise<UserPreferences> => {
-    return apiClient.get("user/preferences").json();
+    return httpClient.get("user/preferences").json();
   },
 
   getSavedAnalyses: async (): Promise<SavedAnalysisSummary[]> => {
-    return apiClient.get("saved_analyses").json();
+    return httpClient.get("saved_analyses").json();
   },
 
   getSavedAnalysis: async (id: string): Promise<SavedAnalysisDetail> => {
-    return apiClient.get(`saved_analyses/${id}`).json();
+    return httpClient.get(`saved_analyses/${id}`).json();
   },
 
   getUser: async (): Promise<UserMeResponse> => {
-    return apiClient.get("user/me").json();
+    return httpClient.get("user/me").json();
   },
 
   getWorkflowRuns: async (): Promise<WorkflowRunResponse[]> => {
-    return apiClient.get("workflow_runs").json();
+    return httpClient.get("workflow_runs").json();
   },
 
   restoreSavedAnalysis: async (
     id: string
   ): Promise<SavedAnalysisRestoreResponse> => {
-    return apiClient.post(`saved_analyses/${id}/restore`).json();
+    return httpClient.post(`saved_analyses/${id}/restore`).json();
   },
 
   saveAnalysis: async (
     session_id: string,
     title?: string
   ): Promise<SavedAnalysisSummary> => {
-    return apiClient
+    return httpClient
       .post("saved_analyses", { json: { session_id, title } })
       .json();
   },
@@ -100,6 +102,6 @@ export const brcAPIClient = {
   updatePreferences: async (
     preferences: UserPreferences
   ): Promise<UserPreferences> => {
-    return apiClient.put("user/preferences", { json: preferences }).json();
+    return httpClient.put("user/preferences", { json: preferences }).json();
   },
 };

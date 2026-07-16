@@ -2,9 +2,9 @@ import { BRC_PAGE_META } from "@/common/meta/brc/constants";
 import { config } from "@/config/config";
 import { VisionView } from "@/views/VisionView/visionView";
 import { StyledPagesMain } from "@brc-analytics/core/components/Layout/components/Main/main.styles";
+import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { GetStaticProps } from "next";
 import { JSX } from "react";
-import { ROUTES } from "../../../routes/constants";
 import type { PageProps } from "../../_app";
 
 const Page = (): JSX.Element => {

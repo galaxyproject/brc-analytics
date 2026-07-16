@@ -1,5 +1,8 @@
+import {
+  BRC_DEFAULT_DESCRIPTION,
+  BRC_PAGE_META,
+} from "@/common/meta/brc/constants";
 import { APP_KEYS } from "@site-config/common/constants";
-import { BRC_DEFAULT_DESCRIPTION, BRC_PAGE_META } from "./brc/constants";
 import { GA2_DEFAULT_DESCRIPTION, GA2_PAGE_META } from "./ga2/constants";
 
 type AppKey = (typeof APP_KEYS)[keyof typeof APP_KEYS];

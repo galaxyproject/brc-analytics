@@ -1,5 +1,6 @@
 import { TYPOGRAPHY_PROPS as COMPONENT_TYPOGRAPHY_PROPS } from "@/views/AnalyzeWorkflowsView/components/Main/components/Accordion/constants";
 import { formatTrsId } from "@/views/AnalyzeWorkflowsView/components/Main/utils";
+import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { REL_ATTRIBUTE } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { Link as DXLink } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
@@ -8,7 +9,6 @@ import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceP
 import { Button, Grid, Typography } from "@mui/material";
 import Link from "next/link";
 import { Fragment, JSX } from "react";
-import { ROUTES } from "../../../../../../../../../routes/constants";
 import { GRID_PROPS } from "./constants";
 import { Props } from "./types";
 import { StyledGrid } from "./workflow.styles";

@@ -6,8 +6,12 @@ import type { Pangenome } from "@/apis/catalog/brc-analytics-catalog/common/pang
 import type {
   AssemblyContract,
   OrganismContract,
-} from "@/apis/catalog/common/entities";
-import { findEntity, getEntities, getEntity } from "./query";
+} from "@brc-analytics/core/apis/types";
+import {
+  findEntity,
+  getEntities,
+  getEntity,
+} from "@brc-analytics/core/services/workflows/query";
 
 /**
  * Finds an organism by entity id, returning undefined when there is no match.

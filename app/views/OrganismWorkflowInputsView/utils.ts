@@ -1,4 +1,4 @@
-import type { OrganismContract } from "@/apis/catalog/common/entities";
+import type { OrganismContract } from "@brc-analytics/core/apis/types";
 import type { Organism } from "../OrganismView/types";
 
 /**

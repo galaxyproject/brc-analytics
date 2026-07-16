@@ -3,8 +3,11 @@ import {
   loadPangenomes,
   loadWorkflows,
 } from "@/services/workflows/loader";
-import { API } from "@/services/workflows/routes";
-import { getEntitiesById, getEntitiesByType } from "@/services/workflows/store";
+import { API } from "@brc-analytics/core/services/workflows/routes";
+import {
+  getEntitiesById,
+  getEntitiesByType,
+} from "@brc-analytics/core/services/workflows/store";
 import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 
 const CONFIG = {

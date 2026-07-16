@@ -1,7 +1,7 @@
 import { calculateGridSize } from "@brc-analytics/core/components/Layout/components/Hero/common/utils";
+import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { Button } from "@mui/material";
 import { Fragment, JSX } from "react";
-import { ROUTES } from "../../../../../../../routes/constants";
 import { Carousel } from "./components/Carousel/carousel";
 import { Hero } from "./components/Hero/hero";
 import { BUTTON_PROPS } from "./constants";

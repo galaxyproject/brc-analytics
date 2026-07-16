@@ -1,5 +1,5 @@
-import type { OutbreakPriority as OUTBREAK_PRIORITY } from "../../../../catalog/schema/generated/schema";
-import type { ORGANISM_PLOIDY } from "./schema-entities";
+import type { OutbreakPriority as OUTBREAK_PRIORITY } from "catalog/schema/generated/schema";
+import type { ORGANISM_PLOIDY } from "./schema-types";
 
 /**
  * Site-neutral structural contract for an assembly as consumed by the shared

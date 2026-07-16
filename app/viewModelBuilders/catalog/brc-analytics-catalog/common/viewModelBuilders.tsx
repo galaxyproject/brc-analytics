@@ -9,18 +9,39 @@ import {
   getGenomeOrganismId,
   getOrganismId,
 } from "@/apis/catalog/brc-analytics-catalog/common/utils";
-import type {
-  AssemblyContract,
-  OrganismContract,
-} from "@/apis/catalog/common/entities";
 import { SLUGIFY_OPTIONS } from "@/common/constants";
 import { StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { KeyValueSection } from "@/components/Entity/components/Section/KeyValueSection/keyValueSection";
 import { MDXSection } from "@/components/Entity/components/Section/MDXSection/mdxSection";
 import {
+  COLUMN_PRESET_KEY,
+  COLUMN_PRESET_LABEL,
+} from "@/views/OrganismView/components/Main/constants";
+import { Main as OrganismViewMain } from "@/views/OrganismView/components/Main/main";
+import { Tabs } from "@/views/OrganismView/components/Tabs/tabs";
+import type { Organism } from "@/views/OrganismView/types";
+import {
+  getPriorityColor,
+  getPriorityLabel,
+} from "@/views/PriorityPathogensView/components/PriorityPathogens/utils";
+import { ResourcesSection } from "@/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
+import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import type {
+  AssemblyContract,
+  OrganismContract,
+} from "@brc-analytics/core/apis/types";
+import { AppLink } from "@brc-analytics/core/components/common/AppLink/appLink";
+import { AnalyzeGenome } from "@brc-analytics/core/components/common/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
+import { LevelCell } from "@brc-analytics/core/components/common/Table/components/TableCell/components/LevelCell/levelCell";
+import { TagList } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
+import { SpeciesCell } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/speciesCell";
+import type { SpeciesTag } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/types";
+import { Tooltip } from "@brc-analytics/core/components/common/Tooltip/tooltip";
+import { ROUTES } from "@brc-analytics/core/routes/constants";
+import {
   ORGANISM_SCOPED_TAG_LABELS,
   SPECIES_TAG_LABEL,
-} from "@/viewModelBuilders/catalog/common/constants";
+} from "@brc-analytics/core/viewModelBuilders/constants";
 import {
   buildAnalyzeGenome,
   buildAssemblyDetails,
@@ -35,27 +56,7 @@ import {
   getGenomeIsolateText,
   getGenomeSerotypeText,
   getGenomeStrainText,
-} from "@/viewModelBuilders/catalog/common/viewModelBuilders";
-import {
-  COLUMN_PRESET_KEY,
-  COLUMN_PRESET_LABEL,
-} from "@/views/OrganismView/components/Main/constants";
-import { Main as OrganismViewMain } from "@/views/OrganismView/components/Main/main";
-import { Tabs } from "@/views/OrganismView/components/Tabs/tabs";
-import type { Organism } from "@/views/OrganismView/types";
-import {
-  getPriorityColor,
-  getPriorityLabel,
-} from "@/views/PriorityPathogensView/components/PriorityPathogens/utils";
-import { ResourcesSection } from "@/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
-import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { AppLink } from "@brc-analytics/core/components/common/AppLink/appLink";
-import { AnalyzeGenome } from "@brc-analytics/core/components/common/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
-import { LevelCell } from "@brc-analytics/core/components/common/Table/components/TableCell/components/LevelCell/levelCell";
-import { TagList } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
-import { SpeciesCell } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/speciesCell";
-import type { SpeciesTag } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/types";
-import { Tooltip } from "@brc-analytics/core/components/common/Tooltip/tooltip";
+} from "@brc-analytics/core/viewModelBuilders/viewModelBuilders";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import { KeyElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/KeyElType/keyElType";
 import { ValueElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/ValueElType/valueElType";
@@ -83,7 +84,6 @@ import { LinkProps } from "next/link";
 import Router from "next/router";
 import { ComponentProps } from "react";
 import slugify from "slugify";
-import { ROUTES } from "../../../../../routes/constants";
 
 // Transitional shim for the GA2/BRC split (monorepo-split): shared builders
 // moved to the site-neutral common home. Re-export them from this BRC path so

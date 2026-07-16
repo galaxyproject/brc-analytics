@@ -1,8 +1,8 @@
 import { config } from "@/config/config";
+import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { GetStaticProps } from "next";
 import Head from "next/head";
 import { JSX } from "react";
-import { ROUTES } from "../../routes/constants";
 
 export default function Roadmap(): JSX.Element {
   return (

@@ -1,9 +1,9 @@
+import { AnalysisPortals } from "@/components/Entity/components/AnalysisPortals/analysisPortals";
 import type {
   AssemblyContract,
   OrganismContract,
-} from "@/apis/catalog/common/entities";
-import { sanitizeEntityId } from "@/apis/catalog/common/utils";
-import { AnalysisPortals } from "@/components/Entity/components/AnalysisPortals/analysisPortals";
+} from "@brc-analytics/core/apis/types";
+import { sanitizeEntityId } from "@brc-analytics/core/apis/utils";
 import { CopyText } from "@brc-analytics/core/components/common/CopyText/copyText";
 import { AnalyzeGenome } from "@brc-analytics/core/components/common/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 import {
@@ -13,6 +13,7 @@ import {
 import { LevelCell } from "@brc-analytics/core/components/common/Table/components/TableCell/components/LevelCell/levelCell";
 import type { SpeciesTag } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/types";
 import { Tooltip } from "@brc-analytics/core/components/common/Tooltip/tooltip";
+import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { formatDate } from "@brc-analytics/core/utils/date-fns";
 import { KeyElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/KeyElType/keyElType";
 import { ValueElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/ValueElType/valueElType";
@@ -29,7 +30,6 @@ import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chi
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { parseISO } from "date-fns";
 import { ComponentProps } from "react";
-import { ROUTES } from "../../../../routes/constants";
 import {
   ENTITY_DETAIL_LABEL,
   GALAXY_DATACACHE,

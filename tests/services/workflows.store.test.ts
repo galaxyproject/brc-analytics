@@ -3,7 +3,7 @@ import {
   getEntitiesByType,
   setEntitiesById,
   setEntitiesByType,
-} from "@/services/workflows/store";
+} from "@brc-analytics/core/services/workflows/store";
 
 describe("workflows store", () => {
   beforeEach(() => {

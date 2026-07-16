@@ -1,5 +1,6 @@
 import { CHIP_PROPS } from "@/views/AnalyzeWorkflowsView/components/Main/components/Accordion/constants";
 import { TruncatedText } from "@brc-analytics/core/components/common/TruncatedText/truncatedText";
+import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/components/RoundedPaper/roundedPaper";
 import {
   ANCHOR_TARGET,
@@ -19,7 +20,6 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 import { JSX } from "react";
-import { ROUTES } from "../../../../../../../routes/constants";
 import { StyledCard } from "./card.styles";
 import { Props } from "./types";
 
