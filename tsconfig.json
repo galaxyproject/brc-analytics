@@ -17,8 +17,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["app/*"],
-      "@brc-analytics/core": ["packages/core/src/index.ts"],
-      "@brc-analytics/core/*": ["packages/core/src/*"],
+      "@brc-analytics/core": ["packages/core/index.ts"],
+      "@brc-analytics/core/*": ["packages/core/*"],
       "@site-config/*": ["site-config/*"],
       "catalog/*": ["catalog/*"],
       "images/*": ["images/*"]

@@ -12,8 +12,8 @@ const customJestConfig = {
   // resolves this for imports via tsconfig paths, but jest.mock() needs an
   // explicit mapper to resolve the same specifiers.
   moduleNameMapper: {
-    "^@brc-analytics/core$": "<rootDir>/packages/core/src/index.ts",
-    "^@brc-analytics/core/(.*)$": "<rootDir>/packages/core/src/$1",
+    "^@brc-analytics/core$": "<rootDir>/packages/core/index.ts",
+    "^@brc-analytics/core/(.*)$": "<rootDir>/packages/core/$1",
   },
   testEnvironment: "jest-environment-jsdom",
   // Excludes Playwright e2e tests which Jest cannot parse
