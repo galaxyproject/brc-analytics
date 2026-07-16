@@ -1,5 +1,5 @@
 import type { OrganismContract } from "@brc-analytics/core/apis/types";
-import type { Organism } from "../OrganismView/types";
+import type { Organism } from "@brc-analytics/core/views/OrganismView/types";
 
 /**
  * Projects a BRC or GA2 organism entity onto the shared organism shape consumed by

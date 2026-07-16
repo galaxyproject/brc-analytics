@@ -1,4 +1,4 @@
-import type { Organism } from "@/views/OrganismView/types";
+import type { Organism } from "@brc-analytics/core/views/OrganismView/types";
 import type {
   RowData,
   TableOptions,

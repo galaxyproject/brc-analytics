@@ -3,10 +3,6 @@ import {
   GA2OrganismEntity,
 } from "@/apis/catalog/ga2/entities";
 import { OrganismAvatar } from "@/components/Entity/components/OrganismAvatar/organismAvatar";
-import {
-  COLUMN_PRESET_KEY,
-  COLUMN_PRESET_LABEL,
-} from "@/views/OrganismView/components/Main/constants";
 import { Main as OrganismViewMain } from "@/views/OrganismView/components/Main/main";
 import { sanitizeEntityId } from "@brc-analytics/core/apis/utils";
 import { AnalyzeGenome } from "@brc-analytics/core/components/common/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
@@ -27,6 +23,10 @@ import {
   formatNumber,
   getGenomeStrainText,
 } from "@brc-analytics/core/viewModelBuilders/viewModelBuilders";
+import {
+  COLUMN_PRESET_KEY,
+  COLUMN_PRESET_LABEL,
+} from "@brc-analytics/core/views/OrganismView/components/Main/constants";
 import { BackPageHero } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/components/BackPageHero/backPageHero";
 import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";

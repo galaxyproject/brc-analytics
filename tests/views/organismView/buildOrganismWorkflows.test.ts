@@ -4,7 +4,7 @@ import {
   WORKFLOW_SCOPE,
 } from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { buildOrganismWorkflows } from "@/views/OrganismView/components/Main/utils";
-import type { Organism } from "@/views/OrganismView/types";
+import type { Organism } from "@brc-analytics/core/views/OrganismView/types";
 
 describe("buildOrganismWorkflows", () => {
   const ORGANISM: Organism = {

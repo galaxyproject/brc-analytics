@@ -1,14 +1,14 @@
 import { getWorkflows } from "@/services/workflows/entities";
 import { Accordion } from "@/views/AnalyzeWorkflowsView/components/Main/components/Accordion/accordion";
-import { StyledSectionTitle } from "@/views/OrganismView/components/Main/main.styles";
 import { buildOrganismWorkflows } from "@/views/OrganismView/components/Main/utils";
 import { ROUTES } from "@brc-analytics/core/routes/constants";
+import { EmptyState } from "@brc-analytics/core/views/OrganismView/components/Main/components/EmptyState/emptyState";
+import { Props } from "@brc-analytics/core/views/OrganismView/components/Main/components/WorkflowsSection/types";
+import { StyledSectionTitle } from "@brc-analytics/core/views/OrganismView/components/Main/main.styles";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Stack } from "@mui/material";
 import { JSX } from "react";
-import { EmptyState } from "../EmptyState/emptyState";
-import { Props } from "./types";
 
 /**
  * Organism-specific workflows section for the organism page: a header and the

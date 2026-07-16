@@ -1,10 +1,10 @@
+import { AssembliesSection } from "@brc-analytics/core/views/OrganismView/components/Main/components/AssembliesSection/assembliesSection";
+import type { Props } from "@brc-analytics/core/views/OrganismView/components/Main/types";
 import { Stack } from "@mui/material";
 import { RowData } from "@tanstack/react-table";
 import { JSX } from "react";
-import { AssembliesSection } from "./components/AssembliesSection/assembliesSection";
 import { PangenomeSection } from "./components/PangenomeSection/pangenomeSection";
 import { WorkflowsSection } from "./components/WorkflowsSection/workflowsSection";
-import type { Props } from "./types";
 
 /**
  * Main column for the organism detail page: composes the organism-scoped

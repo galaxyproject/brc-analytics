@@ -11,12 +11,12 @@ import {
 } from "@/views/AnalyzeWorkflowsView/components/Main/utils";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { buildOrganismWorkflows } from "@/views/OrganismView/components/Main/utils";
-import type { Organism } from "@/views/OrganismView/types";
 import { OrganismWorkflowInputsView } from "@/views/OrganismWorkflowInputsView/organismWorkflowInputsView";
 import { Assembly } from "@/views/WorkflowInputsView/types";
 import { WorkflowInputsView } from "@/views/WorkflowInputsView/workflowInputsView";
 import { EntityDataGate } from "@brc-analytics/core/components/EntityDataGate/entityDataGate";
 import { seedDatabase } from "@brc-analytics/core/utils/seedDatabase";
+import type { Organism } from "@brc-analytics/core/views/OrganismView/types";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import {
   GetStaticPaths,

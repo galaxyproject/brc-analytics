@@ -3,7 +3,7 @@ import type {
   WorkflowCategory,
 } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { WORKFLOW_SCOPE } from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
-import type { Organism } from "@/views/OrganismView/types";
+import type { Organism } from "@brc-analytics/core/views/OrganismView/types";
 import { WorkflowCategoryId } from "../../../../../catalog/schema/generated/schema";
 
 /**

@@ -1,8 +1,8 @@
-import { StyledSectionTitle } from "@/views/OrganismView/components/Main/main.styles";
-import { Toolbar } from "@/views/OrganismView/components/Main/table/components/Toolbar/toolbar";
-import { useTable } from "@/views/OrganismView/components/Main/table/hooks/UseTable/hook";
-import { StyledFluidPaper } from "@/views/OrganismView/components/Main/table/table.styles";
 import { Table } from "@brc-analytics/core/components/common/Table/table";
+import { StyledSectionTitle } from "@brc-analytics/core/views/OrganismView/components/Main/main.styles";
+import { Toolbar } from "@brc-analytics/core/views/OrganismView/components/Main/table/components/Toolbar/toolbar";
+import { useTable } from "@brc-analytics/core/views/OrganismView/components/Main/table/hooks/UseTable/hook";
+import { StyledFluidPaper } from "@brc-analytics/core/views/OrganismView/components/Main/table/table.styles";
 import { ALERT_PROPS } from "@databiosphere/findable-ui/lib/components/common/Alert/constants";
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/components/FluidPaper/fluidPaper";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";

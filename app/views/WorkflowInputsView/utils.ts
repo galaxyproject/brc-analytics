@@ -4,7 +4,7 @@ import {
   getGenomeStrainText,
 } from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import type { AssemblyContract } from "@brc-analytics/core/apis/types";
-import type { Organism } from "../OrganismView/types";
+import type { Organism } from "@brc-analytics/core/views/OrganismView/types";
 
 /**
  * Maps an assembly to the shared organism shape consumed by the side panel, so the

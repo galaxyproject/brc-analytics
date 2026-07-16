@@ -13,13 +13,8 @@ import { SLUGIFY_OPTIONS } from "@/common/constants";
 import { StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { KeyValueSection } from "@/components/Entity/components/Section/KeyValueSection/keyValueSection";
 import { MDXSection } from "@/components/Entity/components/Section/MDXSection/mdxSection";
-import {
-  COLUMN_PRESET_KEY,
-  COLUMN_PRESET_LABEL,
-} from "@/views/OrganismView/components/Main/constants";
 import { Main as OrganismViewMain } from "@/views/OrganismView/components/Main/main";
 import { Tabs } from "@/views/OrganismView/components/Tabs/tabs";
-import type { Organism } from "@/views/OrganismView/types";
 import {
   getPriorityColor,
   getPriorityLabel,
@@ -57,6 +52,11 @@ import {
   getGenomeSerotypeText,
   getGenomeStrainText,
 } from "@brc-analytics/core/viewModelBuilders/viewModelBuilders";
+import {
+  COLUMN_PRESET_KEY,
+  COLUMN_PRESET_LABEL,
+} from "@brc-analytics/core/views/OrganismView/components/Main/constants";
+import type { Organism } from "@brc-analytics/core/views/OrganismView/types";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import { KeyElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/KeyElType/keyElType";
 import { ValueElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/ValueElType/valueElType";
