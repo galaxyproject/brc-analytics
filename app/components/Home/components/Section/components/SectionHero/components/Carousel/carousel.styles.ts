@@ -1,4 +1,4 @@
-import { Bullets } from "@/components/common/Bullets/bullets";
+import { Bullets } from "@brc-analytics/core/components/common/Bullets/bullets";
 import {
   bpUpMd,
   bpUpSm,

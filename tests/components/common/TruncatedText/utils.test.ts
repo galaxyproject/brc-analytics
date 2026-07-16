@@ -1,7 +1,7 @@
 import {
   calculateTruncation,
   renderText,
-} from "@/components/common/TruncatedText/utils";
+} from "@brc-analytics/core/components/common/TruncatedText/utils";
 
 // Mock canvas context for text measurement.
 const mockMeasureText = jest.fn();

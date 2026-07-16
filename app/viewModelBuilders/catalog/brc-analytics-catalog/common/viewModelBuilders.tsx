@@ -14,9 +14,6 @@ import type {
   OrganismContract,
 } from "@/apis/catalog/common/entities";
 import { SLUGIFY_OPTIONS } from "@/common/constants";
-import { AppLink } from "@/components/common/AppLink/appLink";
-import { Chip } from "@/components/common/Chip/chip";
-import { Tooltip } from "@/components/common/Tooltip/tooltip";
 import { StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { KeyValueSection } from "@/components/Entity/components/Section/KeyValueSection/keyValueSection";
 import { MDXSection } from "@/components/Entity/components/Section/MDXSection/mdxSection";
@@ -57,6 +54,9 @@ import {
 } from "@/views/PriorityPathogensView/components/PriorityPathogens/utils";
 import { ResourcesSection } from "@/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
 import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { AppLink } from "@brc-analytics/core/components/common/AppLink/appLink";
+import { Chip } from "@brc-analytics/core/components/common/Chip/chip";
+import { Tooltip } from "@brc-analytics/core/components/common/Tooltip/tooltip";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import { KeyElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/KeyElType/keyElType";
 import { ValueElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/ValueElType/valueElType";

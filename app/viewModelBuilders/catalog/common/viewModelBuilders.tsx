@@ -3,8 +3,6 @@ import type {
   OrganismContract,
 } from "@/apis/catalog/common/entities";
 import { sanitizeEntityId } from "@/apis/catalog/common/utils";
-import { CopyText } from "@/components/common/CopyText/copyText";
-import { Tooltip } from "@/components/common/Tooltip/tooltip";
 import { AnalysisPortals } from "@/components/Entity/components/AnalysisPortals/analysisPortals";
 import { AnalyzeGenome } from "@/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 import {
@@ -13,6 +11,8 @@ import {
 } from "@/components/Table/components/TableCell/components/LevelCell/constants";
 import { LevelCell } from "@/components/Table/components/TableCell/components/LevelCell/levelCell";
 import type { SpeciesTag } from "@/components/Table/components/TableCell/components/SpeciesCell/types";
+import { CopyText } from "@brc-analytics/core/components/common/CopyText/copyText";
+import { Tooltip } from "@brc-analytics/core/components/common/Tooltip/tooltip";
 import { formatDate } from "@brc-analytics/core/utils/date-fns";
 import { KeyElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/KeyElType/keyElType";
 import { ValueElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/ValueElType/valueElType";

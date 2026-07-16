@@ -1,9 +1,9 @@
-import { Section } from "@/components/common/Section/section";
 import {
   section,
   sectionGrid,
   sectionLayout,
 } from "@/components/Layout/components/AppLayout/components/Section/section.styles";
+import { Section } from "@brc-analytics/core/components/common/Section/section";
 import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { bpUpMd } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";

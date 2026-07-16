@@ -1,7 +1,7 @@
-import { Table } from "@/components/common/Table/table";
 import { StyledSectionTitle } from "@/views/OrganismView/components/Main/main.styles";
 import { useTable } from "@/views/OrganismView/components/Main/table/hooks/UseTable/hook";
 import { useShowPangenome } from "@/views/OrganismView/hooks/UseShowPangenome/hook";
+import { Table } from "@brc-analytics/core/components/common/Table/table";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { STACK_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/stack";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";

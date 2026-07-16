@@ -1,5 +1,5 @@
-import { DeleteIcon } from "@/components/common/CustomIcon/components/DeleteIcon/deleteIcon";
 import { getDisabledValues } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseExplicitContrasts/utils";
+import { DeleteIcon } from "@brc-analytics/core/components/common/CustomIcon/components/DeleteIcon/deleteIcon";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { IconButton, MenuItem, Stack, Typography } from "@mui/material";
 import { JSX } from "react";
