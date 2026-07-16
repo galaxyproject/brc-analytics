@@ -7,6 +7,8 @@ export { AnalyzeGenome } from "@brc-analytics/core/components/common/Table/compo
 export { LevelCell } from "@brc-analytics/core/components/common/Table/components/TableCell/components/LevelCell/levelCell";
 export { SpeciesCell } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/speciesCell";
 export { Tooltip } from "@brc-analytics/core/components/common/Tooltip/tooltip";
+export { MDXSection } from "@brc-analytics/core/components/Entity/components/Section/MDXSection/mdxSection";
+export { Sections } from "@brc-analytics/core/components/Entity/components/Sections/sections";
 export { VersionInfoWithServerStatus } from "@brc-analytics/core/components/Layout/components/Footer/components/VersionInfoWithServerStatus/versionInfoWithServerStatus";
 export { AuthButton } from "@brc-analytics/core/components/Layout/components/Header/components/AuthButton/authButton";
 export { Alert } from "@databiosphere/findable-ui/lib/components/common/Alert/alert";
@@ -28,5 +30,3 @@ export { NTagCell } from "@databiosphere/findable-ui/lib/components/Table/compon
 export { Chip } from "@mui/material";
 export { Main as OrganismViewMain } from "../views/OrganismView/components/Main/main";
 export { OrganismAvatar } from "./Entity/components/OrganismAvatar/organismAvatar";
-export { MDXSection } from "./Entity/components/Section/MDXSection/mdxSection";
-export { Sections } from "./Entity/components/Sections/sections";

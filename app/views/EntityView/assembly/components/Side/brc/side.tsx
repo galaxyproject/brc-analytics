@@ -1,4 +1,3 @@
-import { AnalysisPortals } from "@/components/Entity/components/AnalysisPortals/analysisPortals";
 import { AssemblyFavoriteButton } from "@/components/Favorites/AssemblyFavoriteButton/assemblyFavoriteButton";
 import {
   buildAssemblyDetails,
@@ -6,6 +5,7 @@ import {
   buildOrganismDetails,
 } from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import { mapAssemblyToOrganism } from "@/views/WorkflowInputsView/utils";
+import { AnalysisPortals } from "@brc-analytics/core/components/Entity/components/AnalysisPortals/analysisPortals";
 import { StyledSection } from "@brc-analytics/core/views/EntityView/assembly/components/Side/brc/side.styles";
 import { StyledFluidPaper } from "@brc-analytics/core/views/EntityView/assembly/components/Side/side.styles";
 import { KeyValueSection } from "@brc-analytics/core/views/EntityView/components/KeyValueSection/keyValueSection";

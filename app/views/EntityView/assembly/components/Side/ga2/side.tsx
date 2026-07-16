@@ -1,7 +1,7 @@
-import { AnalysisPortals } from "@/components/Entity/components/AnalysisPortals/analysisPortals";
 import { AssemblyFavoriteButton } from "@/components/Favorites/AssemblyFavoriteButton/assemblyFavoriteButton";
 import { AssemblyDetails } from "@/views/EntityView/assembly/components/Side/ga2/components/AssemblyDetails/AssemblyDetails";
 import { mapAssemblyToOrganism } from "@/views/WorkflowInputsView/utils";
+import { AnalysisPortals } from "@brc-analytics/core/components/Entity/components/AnalysisPortals/analysisPortals";
 import {
   buildAssemblyResources,
   buildOrganismDetails,

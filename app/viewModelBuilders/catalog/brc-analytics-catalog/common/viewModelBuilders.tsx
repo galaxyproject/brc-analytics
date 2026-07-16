@@ -11,8 +11,6 @@ import {
 } from "@/apis/catalog/brc-analytics-catalog/common/utils";
 import { SLUGIFY_OPTIONS } from "@/common/constants";
 import { StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
-import { KeyValueSection } from "@/components/Entity/components/Section/KeyValueSection/keyValueSection";
-import { MDXSection } from "@/components/Entity/components/Section/MDXSection/mdxSection";
 import { Main as OrganismViewMain } from "@/views/OrganismView/components/Main/main";
 import { Tabs } from "@/views/OrganismView/components/Tabs/tabs";
 import {
@@ -32,6 +30,8 @@ import { TagList } from "@brc-analytics/core/components/common/Table/components/
 import { SpeciesCell } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/speciesCell";
 import type { SpeciesTag } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/types";
 import { Tooltip } from "@brc-analytics/core/components/common/Tooltip/tooltip";
+import { KeyValueSection } from "@brc-analytics/core/components/Entity/components/Section/KeyValueSection/keyValueSection";
+import { MDXSection } from "@brc-analytics/core/components/Entity/components/Section/MDXSection/mdxSection";
 import { ROUTES } from "@brc-analytics/core/routes/constants";
 import {
   ORGANISM_SCOPED_TAG_LABELS,
