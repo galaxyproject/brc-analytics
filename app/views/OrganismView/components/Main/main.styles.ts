@@ -1,4 +1,4 @@
-import { SectionTitle } from "@/views/EntityView/ui/SectionTitle/sectionTitle";
+import { SectionTitle } from "@brc-analytics/core/views/EntityView/ui/SectionTitle/sectionTitle";
 import { bpDownSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
 

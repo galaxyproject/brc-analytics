@@ -1,7 +1,7 @@
-import { KeyElType } from "@/views/EntityView/ui/KeyElType/keyElType";
-import { KeyValueElType } from "@/views/EntityView/ui/KeyValueElType/keyValueElType";
-import { SectionTitle } from "@/views/EntityView/ui/SectionTitle/sectionTitle";
-import { ValueElType } from "@/views/EntityView/ui/ValueElType/valueElType";
+import { KeyElType } from "@brc-analytics/core/views/EntityView/ui/KeyElType/keyElType";
+import { KeyValueElType } from "@brc-analytics/core/views/EntityView/ui/KeyValueElType/keyValueElType";
+import { SectionTitle } from "@brc-analytics/core/views/EntityView/ui/SectionTitle/sectionTitle";
+import { ValueElType } from "@brc-analytics/core/views/EntityView/ui/ValueElType/valueElType";
 import { KeyValuePairs } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/keyValuePairs";
 import { Fragment, JSX } from "react";
 import { StyledSection } from "./keyValueSection.styles";

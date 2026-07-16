@@ -1,5 +1,5 @@
-import { Props } from "@/views/AnalyzeView/types";
 import { ROUTES } from "@brc-analytics/core/routes/constants";
+import { Props } from "@brc-analytics/core/views/AnalyzeView/types";
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/components/FluidPaper/fluidPaper";
 import { BackPageContentMainColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";

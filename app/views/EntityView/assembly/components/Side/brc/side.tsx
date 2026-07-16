@@ -5,12 +5,12 @@ import {
   buildAssemblyResources,
   buildOrganismDetails,
 } from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { KeyValueSection } from "@/views/EntityView/components/KeyValueSection/keyValueSection";
 import { mapAssemblyToOrganism } from "@/views/WorkflowInputsView/utils";
+import { StyledSection } from "@brc-analytics/core/views/EntityView/assembly/components/Side/brc/side.styles";
+import { StyledFluidPaper } from "@brc-analytics/core/views/EntityView/assembly/components/Side/side.styles";
+import { KeyValueSection } from "@brc-analytics/core/views/EntityView/components/KeyValueSection/keyValueSection";
 import { BackPageContentSideColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { JSX } from "react";
-import { StyledFluidPaper } from "../side.styles";
-import { StyledSection } from "./side.styles";
 import { Props } from "./types";
 
 /**

@@ -1,4 +1,4 @@
-import { SECTION_PADDING } from "@/views/EntityView/ui/styles";
+import { SECTION_PADDING } from "@brc-analytics/core/views/EntityView/ui/styles";
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/components/FluidPaper/fluidPaper";
 import { bpDownSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";

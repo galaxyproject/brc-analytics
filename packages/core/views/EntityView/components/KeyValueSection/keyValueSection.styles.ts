@@ -1,4 +1,4 @@
-import { Section } from "@/views/EntityView/ui/Section/section";
+import { Section } from "@brc-analytics/core/views/EntityView/ui/Section/section";
 import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 import styled from "@emotion/styled";
 

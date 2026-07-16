@@ -1,5 +1,5 @@
-import { Section } from "@/views/EntityView/ui/Section/section";
-import { SectionTitle } from "@/views/EntityView/ui/SectionTitle/sectionTitle";
+import { Section } from "@brc-analytics/core/views/EntityView/ui/Section/section";
+import { SectionTitle } from "@brc-analytics/core/views/EntityView/ui/SectionTitle/sectionTitle";
 import {
   StaticImage,
   StaticImageProps,

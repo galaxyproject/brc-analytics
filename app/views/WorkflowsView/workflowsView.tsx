@@ -4,9 +4,9 @@ import {
   getWorkflows as getWorkflowCategories,
 } from "@/services/workflows/entities";
 import { API } from "@brc-analytics/core/services/workflows/routes";
+import { ExploreView } from "@brc-analytics/core/views/ExploreView/exploreView";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import { JSX, useEffect, useMemo, useState } from "react";
-import { ExploreView } from "../ExploreView/exploreView";
 import { Workflows } from "./components/Workflows/workflows";
 import { Organism } from "./types";
 import { getWorkflows } from "./utils";

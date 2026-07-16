@@ -1,15 +1,15 @@
 import { AnalysisPortals } from "@/components/Entity/components/AnalysisPortals/analysisPortals";
 import { AssemblyFavoriteButton } from "@/components/Favorites/AssemblyFavoriteButton/assemblyFavoriteButton";
 import { AssemblyDetails } from "@/views/EntityView/assembly/components/Side/ga2/components/AssemblyDetails/AssemblyDetails";
-import { KeyValueSection } from "@/views/EntityView/components/KeyValueSection/keyValueSection";
 import { mapAssemblyToOrganism } from "@/views/WorkflowInputsView/utils";
 import {
   buildAssemblyResources,
   buildOrganismDetails,
 } from "@brc-analytics/core/viewModelBuilders/viewModelBuilders";
+import { StyledFluidPaper } from "@brc-analytics/core/views/EntityView/assembly/components/Side/side.styles";
+import { KeyValueSection } from "@brc-analytics/core/views/EntityView/components/KeyValueSection/keyValueSection";
 import { BackPageContentSideColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { JSX } from "react";
-import { StyledFluidPaper } from "../side.styles";
 import { StyledSection } from "./side.styles";
 import { Props } from "./types";
 

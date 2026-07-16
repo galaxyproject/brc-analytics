@@ -1,4 +1,6 @@
 import { getEntity } from "@brc-analytics/core/services/workflows/query";
+import { Main } from "@brc-analytics/core/views/AnalyzeView/components/Main/main";
+import { Props } from "@brc-analytics/core/views/AnalyzeView/types";
 import {
   BackPageContent,
   BackPageHero,
@@ -7,9 +9,7 @@ import {
 import { JSX } from "react";
 import { Side } from "../EntityView/assembly/components/Side/side";
 import { Assembly } from "../WorkflowInputsView/types";
-import { Main } from "./components/Main/main";
 import { Top } from "./components/Top/top";
-import { Props } from "./types";
 
 /**
  * AnalyzeView component displays the option to select a workflow, or a custom workflow to configure.
