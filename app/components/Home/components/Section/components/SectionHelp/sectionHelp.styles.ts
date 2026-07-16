@@ -6,7 +6,7 @@ import {
 import {
   sectionGrid,
   sectionLayout,
-} from "@/components/Layout/components/AppLayout/components/Section/section.styles";
+} from "@brc-analytics/core/components/Layout/components/AppLayout/components/Section/section.styles";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { bpUpSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";

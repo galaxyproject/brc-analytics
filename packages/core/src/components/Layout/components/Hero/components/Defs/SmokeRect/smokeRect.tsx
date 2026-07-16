@@ -1,9 +1,9 @@
-import { FILL } from "@/components/Layout/components/Hero/common/constants";
+import { FILL } from "@brc-analytics/core/components/Layout/components/Hero/common/constants";
 import {
   ELEMENT_ID,
   PATTERN_UNIT,
-} from "@/components/Layout/components/Hero/common/entities";
-import { getElementHref } from "@/components/Layout/components/Hero/common/utils";
+} from "@brc-analytics/core/components/Layout/components/Hero/common/types";
+import { getElementHref } from "@brc-analytics/core/components/Layout/components/Hero/common/utils";
 import { JSX } from "react";
 
 export interface SmokeRectProps {

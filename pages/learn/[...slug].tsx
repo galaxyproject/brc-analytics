@@ -1,8 +1,8 @@
-import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
 import { sanitizeFrontmatter } from "@/docs/common/frontmatter/utils";
 import { StaticProps } from "@/docs/common/staticGeneration/types";
 import { sanitizeStaticProps } from "@/docs/common/staticGeneration/utils";
 import { LearnContentView } from "@/views/LearnContentView/learnContentView";
+import { StyledPagesMain } from "@brc-analytics/core/components/Layout/components/Main/main.styles";
 import { buildStaticPaths } from "@databiosphere/findable-ui/lib/utils/mdx/staticGeneration/staticPaths";
 import { buildStaticProps } from "@databiosphere/findable-ui/lib/utils/mdx/staticGeneration/staticProps";
 import {

@@ -1,5 +1,5 @@
 import { SectionAbout } from "@/components/content";
-import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
+import { SectionHero } from "@brc-analytics/core/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import { Fragment, JSX } from "react";
 
 export const PartnerResourcesView = (): JSX.Element => {

@@ -1,4 +1,4 @@
-import { sectionGrid } from "@/components/Layout/components/AppLayout/components/Section/section.styles";
+import { sectionGrid } from "@brc-analytics/core/components/Layout/components/AppLayout/components/Section/section.styles";
 import { bpUpSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
 

@@ -4,15 +4,15 @@ import {
   SHAPE_HEIGHT,
   SHAPE_WIDTH,
   Y_POSITION,
-} from "@/components/Layout/components/Hero/common/constants";
+} from "@brc-analytics/core/components/Layout/components/Hero/common/constants";
 import {
   ELEMENT_ID,
   PATTERN_UNIT,
-} from "@/components/Layout/components/Hero/common/entities";
+} from "@brc-analytics/core/components/Layout/components/Hero/common/types";
 import {
   getAnimateMotionPathYellowRect,
   getElementHref,
-} from "@/components/Layout/components/Hero/common/utils";
+} from "@brc-analytics/core/components/Layout/components/Hero/common/utils";
 import { JSX } from "react";
 
 export interface YellowRectProps {

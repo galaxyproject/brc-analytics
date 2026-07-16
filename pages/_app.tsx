@@ -14,6 +14,7 @@ import { ExploreStateProvider } from "@databiosphere/findable-ui/lib/providers/e
 
 import { mergeAppTheme } from "@/theme/theme";
 import { OgMeta } from "@brc-analytics/core/components/common/OgMeta/ogMeta";
+import { StyledFooter } from "@brc-analytics/core/components/Layout/components/Footer/footer.styles";
 import { BrcAuthProvider } from "@brc-analytics/core/providers/authentication/provider";
 import { EntitiesLoadedProvider } from "@brc-analytics/core/providers/entitiesLoaded/provider";
 import { WorkflowHandoffProvider } from "@brc-analytics/core/providers/workflowHandoff/provider";
@@ -29,7 +30,6 @@ import { NextPage } from "next";
 import type { AppProps } from "next/app";
 import { JSX, useMemo } from "react";
 import { getDefaultDescription } from "../app/common/meta/utils";
-import { StyledFooter } from "../app/components/Layout/components/Footer/footer.styles";
 import { config } from "../app/config/config";
 import { useEntities } from "../app/services/workflows/hooks/UseEntities/hook";
 import "../app/styles/fonts/fonts.css";

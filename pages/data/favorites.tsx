@@ -1,8 +1,8 @@
 import { sanitizeEntityId } from "@/apis/catalog/common/utils";
-import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
-import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
 import { getEntity } from "@/services/workflows/query";
 import { Assembly } from "@/views/WorkflowInputsView/types";
+import { SectionHero } from "@brc-analytics/core/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
+import { StyledPagesMain } from "@brc-analytics/core/components/Layout/components/Main/main.styles";
 import { useAssemblyFavorites } from "@brc-analytics/core/hooks/UseAssemblyFavorites/hook";
 import { useAuth } from "@brc-analytics/core/providers/authentication/provider";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";

@@ -1,10 +1,10 @@
+import { PALETTE_BRAND } from "@/styles/common/constants/palette";
+import { bpUp1024 } from "@/styles/mixins/breakpoints";
 import {
   section,
   sectionGrid,
   sectionLayout,
-} from "@/components/Layout/components/AppLayout/components/Section/section.styles";
-import { PALETTE_BRAND } from "@/styles/common/constants/palette";
-import { bpUp1024 } from "@/styles/mixins/breakpoints";
+} from "@brc-analytics/core/components/Layout/components/AppLayout/components/Section/section.styles";
 import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 import {
   bpUpLg,

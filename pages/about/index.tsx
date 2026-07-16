@@ -1,8 +1,8 @@
 import { getPageMeta } from "@/common/meta/utils";
-import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
 import { config } from "@/config/config";
 import { AboutView } from "@/views/AboutView/aboutView";
 import { BRC_CARDS, GA2_CARDS } from "@/views/AboutView/common/constants";
+import { StyledPagesMain } from "@brc-analytics/core/components/Layout/components/Main/main.styles";
 import { APP_KEYS } from "@site-config/common/constants";
 import { GetStaticProps } from "next";
 import { JSX } from "react";

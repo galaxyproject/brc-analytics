@@ -2,13 +2,13 @@ import {
   ANIMATE_MOTION,
   FILL,
   SHAPE_HEIGHT,
-} from "@/components/Layout/components/Hero/common/constants";
-import { ELEMENT_ID } from "@/components/Layout/components/Hero/common/entities";
+} from "@brc-analytics/core/components/Layout/components/Hero/common/constants";
+import { ELEMENT_ID } from "@brc-analytics/core/components/Layout/components/Hero/common/types";
 import {
   calculateCircleXPosition,
   calculateCircleYPosition,
   getAnimateMotionTransformCircle,
-} from "@/components/Layout/components/Hero/common/utils";
+} from "@brc-analytics/core/components/Layout/components/Hero/common/utils";
 import { JSX } from "react";
 
 export interface CoralPinkCircleProps {

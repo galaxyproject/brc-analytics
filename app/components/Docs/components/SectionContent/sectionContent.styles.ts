@@ -1,8 +1,8 @@
-import { sectionLayout } from "@/components/Layout/components/AppLayout/components/Section/section.styles";
 import {
   CONTENT_TYPE,
   FrontmatterProps,
 } from "@/docs/common/frontmatter/types";
+import { sectionLayout } from "@brc-analytics/core/components/Layout/components/AppLayout/components/Section/section.styles";
 import {
   Content,
   ContentLayout,

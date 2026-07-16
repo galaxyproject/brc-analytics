@@ -1,8 +1,3 @@
-import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
-import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
-import { bpUpSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
-import { css } from "@emotion/react";
-import styled from "@emotion/styled";
 import {
   headline,
   sectionGrid,
@@ -10,7 +5,12 @@ import {
   sectionLayout,
   sectionSubHero,
   sectionWithDivider,
-} from "../Layout/components/AppLayout/components/Section/section.styles";
+} from "@brc-analytics/core/components/Layout/components/AppLayout/components/Section/section.styles";
+import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
+import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
+import { bpUpSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
+import { css } from "@emotion/react";
+import styled from "@emotion/styled";
 
 export interface LayoutProps {
   centered?: boolean;

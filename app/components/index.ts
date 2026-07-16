@@ -1,8 +1,14 @@
+export {
+  Branding,
+  GA2Branding,
+} from "@/components/Layout/components/Footer/components/Branding/branding";
 export { CalendarIcon } from "@brc-analytics/core/components/common/CustomIcon/components/CalendarIcon/calendarIcon";
 export { AnalyzeGenome } from "@brc-analytics/core/components/common/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 export { LevelCell } from "@brc-analytics/core/components/common/Table/components/TableCell/components/LevelCell/levelCell";
 export { SpeciesCell } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/speciesCell";
 export { Tooltip } from "@brc-analytics/core/components/common/Tooltip/tooltip";
+export { VersionInfoWithServerStatus } from "@brc-analytics/core/components/Layout/components/Footer/components/VersionInfoWithServerStatus/versionInfoWithServerStatus";
+export { AuthButton } from "@brc-analytics/core/components/Layout/components/Header/components/AuthButton/authButton";
 export { Alert } from "@databiosphere/findable-ui/lib/components/common/Alert/alert";
 export { DiscourseIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/DiscourseIcon/discourseIcon";
 export { GitHubIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/GitHubIcon/gitHubIcon";
@@ -24,9 +30,3 @@ export { Main as OrganismViewMain } from "../views/OrganismView/components/Main/
 export { OrganismAvatar } from "./Entity/components/OrganismAvatar/organismAvatar";
 export { MDXSection } from "./Entity/components/Section/MDXSection/mdxSection";
 export { Sections } from "./Entity/components/Sections/sections";
-export {
-  Branding,
-  GA2Branding,
-} from "./Layout/components/Footer/components/Branding/branding";
-export { VersionInfoWithServerStatus } from "./Layout/components/Footer/components/VersionInfoWithServerStatus/versionInfoWithServerStatus";
-export { AuthButton } from "./Layout/components/Header/components/AuthButton/authButton";

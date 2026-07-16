@@ -1,6 +1,6 @@
-import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
-import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
 import { brcAPIClient } from "@/services/brc-api-client";
+import { SectionHero } from "@brc-analytics/core/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
+import { StyledPagesMain } from "@brc-analytics/core/components/Layout/components/Main/main.styles";
 import { useAuth } from "@brc-analytics/core/providers/authentication/provider";
 import { SavedAnalysisSummary } from "@brc-analytics/core/types/api";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";

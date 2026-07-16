@@ -1,5 +1,5 @@
 import { SectionHeadline } from "@/components/Home/components/Section/section.styles";
-import { sectionLayout } from "@/components/Layout/components/AppLayout/components/Section/section.styles";
+import { sectionLayout } from "@brc-analytics/core/components/Layout/components/AppLayout/components/Section/section.styles";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import styled from "@emotion/styled";
 
