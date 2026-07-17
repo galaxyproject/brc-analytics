@@ -1,7 +1,3 @@
-import {
-  ChatPanel,
-  SchemaPanel,
-} from "@brc-analytics/core/components/Assistant";
 import { useAssistantChat } from "@brc-analytics/core/hooks/UseAssistantChat/hook";
 import { assistantAPIClient } from "@brc-analytics/core/services/assistant-api-client";
 import { AssistantInfoResponse } from "@brc-analytics/core/types/api";
@@ -18,7 +14,9 @@ import {
   StyledSection,
   TwoPanelLayout,
 } from "./assistantView.styles";
+import { ChatPanel } from "./components/ChatPanel/chatPanel";
 import { Headline } from "./components/Headline/headline";
+import { SchemaPanel } from "./components/SchemaPanel/schemaPanel";
 
 interface Props {
   initialSessionId?: string;

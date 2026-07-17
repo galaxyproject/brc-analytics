@@ -1,9 +1,9 @@
+import { SEQUENCING_SOURCE } from "@brc-analytics/core/providers/workflowHandoff/constants";
+import type { SchemaFieldState } from "@brc-analytics/core/types/api";
 import {
   extractAccessions,
   resolveSequencingSource,
-} from "@brc-analytics/core/components/Assistant/SchemaPanel/utils";
-import { SEQUENCING_SOURCE } from "@brc-analytics/core/providers/workflowHandoff/constants";
-import type { SchemaFieldState } from "@brc-analytics/core/types/api";
+} from "@brc-analytics/core/views/AssistantView/components/SchemaPanel/utils";
 
 function field(value: string | null): SchemaFieldState {
   return { detail: null, status: "filled", value };
