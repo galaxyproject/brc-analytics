@@ -1,16 +1,13 @@
-import { FILL } from "@brc-analytics/core/components/Layout/components/Hero/common/constants";
+import { FILL } from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/common/constants";
 import {
   ELEMENT_ID,
   PATTERN_UNIT,
-} from "@brc-analytics/core/components/Layout/components/Hero/common/types";
-import { getElementHref } from "@brc-analytics/core/components/Layout/components/Hero/common/utils";
+} from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/common/types";
+import { getElementHref } from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/common/utils";
 import { JSX } from "react";
+import { Props } from "./types";
 
-export interface SmokeRectProps {
-  gridSize: number;
-}
-
-export const SmokeRect = ({ gridSize }: SmokeRectProps): JSX.Element => {
+export const SmokeRect = ({ gridSize }: Props): JSX.Element => {
   return (
     <defs>
       <g id={ELEMENT_ID.GROUP_SMOKE_RECT} opacity="0.5">

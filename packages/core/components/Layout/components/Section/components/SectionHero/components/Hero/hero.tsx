@@ -1,16 +1,16 @@
 import {
   FILL,
   GRID_SIZE,
-} from "@brc-analytics/core/components/Layout/components/Hero/common/constants";
-import { ELEMENT_ID } from "@brc-analytics/core/components/Layout/components/Hero/common/types";
+} from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/common/constants";
+import { ELEMENT_ID } from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/common/types";
 import {
   getFillUrl,
   getViewBox,
-} from "@brc-analytics/core/components/Layout/components/Hero/common/utils";
-import { CoralPinkCircle } from "@brc-analytics/core/components/Layout/components/Hero/components/Defs/CoralPinkCircle/coralPinkCircle";
-import { SmokeCircle } from "@brc-analytics/core/components/Layout/components/Hero/components/Defs/SmokeCircle/smokeCircle";
-import { SmokeRect } from "@brc-analytics/core/components/Layout/components/Hero/components/Defs/SmokeRect/smokeRect";
-import { YellowRect } from "@brc-analytics/core/components/Layout/components/Hero/components/Defs/YellowRect/yellowRect";
+} from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/common/utils";
+import { CoralPinkCircle } from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/components/Defs/CoralPinkCircle/coralPinkCircle";
+import { SmokeCircle } from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/components/Defs/SmokeCircle/smokeCircle";
+import { SmokeRect } from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/components/Defs/SmokeRect/smokeRect";
+import { YellowRect } from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/components/Defs/YellowRect/yellowRect";
 import { Fragment, JSX } from "react";
 import { SVG } from "./hero.styles";
 import { Props } from "./types";

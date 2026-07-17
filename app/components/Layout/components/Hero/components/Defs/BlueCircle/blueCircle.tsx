@@ -2,13 +2,13 @@ import {
   ANIMATE_MOTION,
   FILL,
   SHAPE_HEIGHT,
-} from "@brc-analytics/core/components/Layout/components/Hero/common/constants";
-import { ELEMENT_ID } from "@brc-analytics/core/components/Layout/components/Hero/common/types";
+} from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/common/constants";
+import { ELEMENT_ID } from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/common/types";
 import {
   calculateCircleXPosition,
   calculateCircleYPosition,
   getAnimateMotionTransformCircle,
-} from "@brc-analytics/core/components/Layout/components/Hero/common/utils";
+} from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/common/utils";
 import { JSX } from "react";
 
 export interface BlueCircleProps {

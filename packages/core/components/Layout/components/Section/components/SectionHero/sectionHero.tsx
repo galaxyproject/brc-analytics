@@ -1,4 +1,4 @@
-import { calculateGridSize } from "@brc-analytics/core/components/Layout/components/Hero/common/utils";
+import { calculateGridSize } from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/common/utils";
 import { Breadcrumbs } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import { Fragment, JSX } from "react";
 import { Hero } from "./components/Hero/hero";

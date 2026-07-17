@@ -4,15 +4,15 @@ import {
   SHAPE_HEIGHT,
   SHAPE_WIDTH,
   X_POSITION,
-} from "@brc-analytics/core/components/Layout/components/Hero/common/constants";
+} from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/common/constants";
 import {
   ELEMENT_ID,
   PATTERN_UNIT,
-} from "@brc-analytics/core/components/Layout/components/Hero/common/types";
+} from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/common/types";
 import {
   getAnimateMotionPathBlueRect,
   getElementHref,
-} from "@brc-analytics/core/components/Layout/components/Hero/common/utils";
+} from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/common/utils";
 import { JSX } from "react";
 
 export interface BlueRectProps {
