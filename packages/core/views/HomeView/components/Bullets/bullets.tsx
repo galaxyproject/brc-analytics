@@ -1,13 +1,6 @@
 import { JSX } from "react";
 import { Bullet, Bullets as SectionBullets, StyledDot } from "./bullets.styles";
-
-interface BulletsProps {
-  activeBullet: number;
-  bullets: number[];
-  className?: string;
-  interactionEnabled?: boolean;
-  onBullet: (index: number) => void;
-}
+import { Props } from "./types";
 
 export const Bullets = ({
   activeBullet,
@@ -15,7 +8,7 @@ export const Bullets = ({
   className,
   interactionEnabled = true,
   onBullet,
-}: BulletsProps): JSX.Element | null => {
+}: Props): JSX.Element | null => {
   if (!interactionEnabled) return null;
   return (
     <SectionBullets className={className}>

@@ -1,4 +1,4 @@
-import { AppLink } from "@brc-analytics/core/components/common/AppLink/appLink";
+import { AppLink } from "@brc-analytics/core/components/AppLink/appLink";
 import { ALERT_PROPS } from "@databiosphere/findable-ui/lib/components/common/Alert/constants";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { AlertTitle, Typography } from "@mui/material";

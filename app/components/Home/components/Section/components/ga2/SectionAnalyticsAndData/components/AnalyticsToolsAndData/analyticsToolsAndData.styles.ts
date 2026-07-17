@@ -1,4 +1,4 @@
-import { Bullets } from "@brc-analytics/core/components/common/Bullets/bullets";
+import { Bullets } from "@brc-analytics/core/views/HomeView/components/Bullets/bullets";
 import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { css } from "@emotion/react";

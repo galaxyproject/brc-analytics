@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 
-export const CardMedia = styled.div`
+export const StyledContainer = styled.div`
   img {
     margin: 0;
   }

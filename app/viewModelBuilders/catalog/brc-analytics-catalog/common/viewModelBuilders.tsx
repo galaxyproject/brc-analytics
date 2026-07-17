@@ -23,7 +23,7 @@ import type {
   AssemblyContract,
   OrganismContract,
 } from "@brc-analytics/core/apis/types";
-import { AppLink } from "@brc-analytics/core/components/common/AppLink/appLink";
+import { AppLink } from "@brc-analytics/core/components/AppLink/appLink";
 import { AnalyzeGenome } from "@brc-analytics/core/components/common/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 import { LevelCell } from "@brc-analytics/core/components/common/Table/components/TableCell/components/LevelCell/levelCell";
 import { TagList } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
