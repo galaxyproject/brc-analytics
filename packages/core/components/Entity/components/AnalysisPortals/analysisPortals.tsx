@@ -1,9 +1,6 @@
 import { Section } from "@brc-analytics/core/views/EntityView/ui/Section/section";
 import { SectionTitle } from "@brc-analytics/core/views/EntityView/ui/SectionTitle/sectionTitle";
-import {
-  StaticImage,
-  StaticImageProps,
-} from "@databiosphere/findable-ui/lib/components/common/StaticImage/staticImage";
+import { StaticImage } from "@databiosphere/findable-ui/lib/components/common/StaticImage/staticImage";
 import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,
@@ -12,22 +9,9 @@ import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/m
 import { Typography } from "@mui/material";
 import { JSX } from "react";
 import { StyledButtonBase } from "./analysisPortals.styles";
+import { Props } from "./types";
 
-export interface AnalysisPortals {
-  imageProps: StaticImageProps;
-  label: string;
-  url: string;
-}
-
-interface AnalysisPortalsProps {
-  portals: AnalysisPortals[];
-  title: string;
-}
-
-export const AnalysisPortals = ({
-  portals,
-  title,
-}: AnalysisPortalsProps): JSX.Element => {
+export const AnalysisPortals = ({ portals, title }: Props): JSX.Element => {
   if (portals.length === 0) return <span>None</span>;
   return (
     <Section>
