@@ -1,3 +1,4 @@
+import { BRC_ROUTES } from "@/routes/constants";
 import { useAuth } from "@brc-analytics/core/providers/authentication/provider";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
@@ -107,16 +108,16 @@ export function AuthButton(): JSX.Element | null {
           )}
         </UserMenuHeader>
         <Divider component="li" />
-        <MenuItem onClick={() => navigateTo("/data/favorites")}>
+        <MenuItem onClick={() => navigateTo(BRC_ROUTES.FAVORITES)}>
           Favorites
         </MenuItem>
-        <MenuItem onClick={() => navigateTo("/assistant/saved")}>
+        <MenuItem onClick={() => navigateTo(BRC_ROUTES.ASSISTANT_SAVED)}>
           Saved Analyses
         </MenuItem>
-        <MenuItem onClick={() => navigateTo("/account/workflow-runs")}>
+        <MenuItem onClick={() => navigateTo(BRC_ROUTES.ACCOUNT_WORKFLOW_RUNS)}>
           Workflow Runs
         </MenuItem>
-        <MenuItem onClick={() => navigateTo("/account/preferences")}>
+        <MenuItem onClick={() => navigateTo(BRC_ROUTES.ACCOUNT_PREFERENCES)}>
           Preferences
         </MenuItem>
         <Divider component="li" />
