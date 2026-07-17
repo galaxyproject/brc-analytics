@@ -4,7 +4,7 @@ import {
   buildOrganismDetails,
 } from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import { mapAssemblyToOrganism } from "@/views/WorkflowInputsView/utils";
-import { AssemblyFavoriteButton } from "@brc-analytics/core/components/Favorites/AssemblyFavoriteButton/assemblyFavoriteButton";
+import { AssemblyFavoriteButton } from "@brc-analytics/core/components/Favorites/components/AssemblyFavoriteButton/assemblyFavoriteButton";
 import { AnalysisPortals } from "@brc-analytics/core/views/EntityView/assembly/components/Side/AnalysisPortals/analysisPortals";
 import { KeyValueSection } from "@brc-analytics/core/views/EntityView/components/KeyValueSection/keyValueSection";
 import { BackPageContentSideColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";

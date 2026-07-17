@@ -1,4 +1,4 @@
-import { useAssemblyFavorites } from "@brc-analytics/core/hooks/UseAssemblyFavorites/hook";
+import { useAssemblyFavorites } from "@brc-analytics/core/components/Favorites/hooks/UseAssemblyFavorites/hook";
 import { useAuth } from "@brc-analytics/core/providers/authentication/provider";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";

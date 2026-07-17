@@ -1,6 +1,6 @@
 import { AssemblyDetails } from "@/views/EntityView/assembly/components/Side/ga2/components/AssemblyDetails/AssemblyDetails";
 import { mapAssemblyToOrganism } from "@/views/WorkflowInputsView/utils";
-import { AssemblyFavoriteButton } from "@brc-analytics/core/components/Favorites/AssemblyFavoriteButton/assemblyFavoriteButton";
+import { AssemblyFavoriteButton } from "@brc-analytics/core/components/Favorites/components/AssemblyFavoriteButton/assemblyFavoriteButton";
 import {
   buildAssemblyResources,
   buildOrganismDetails,

@@ -1,4 +1,4 @@
-import { useAssemblyFavorites } from "@brc-analytics/core/hooks/UseAssemblyFavorites/hook";
+import { useAssemblyFavorites } from "@brc-analytics/core/components/Favorites/hooks/UseAssemblyFavorites/hook";
 import { useAuth } from "@brc-analytics/core/providers/authentication/provider";
 import { apiClient } from "@brc-analytics/core/services/api-client";
 import { FavoriteResponse } from "@brc-analytics/core/types/api";
