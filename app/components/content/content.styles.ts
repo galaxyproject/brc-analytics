@@ -1,16 +1,14 @@
-import { headline } from "@brc-analytics/core/components/Layout/components/Section/headline.styles";
 import {
+  section,
   sectionGrid,
-  sectionGridAreas,
   sectionLayout,
-  sectionSubHero,
-  sectionWithDivider,
-} from "@brc-analytics/core/components/Layout/components/Section/sectionLayout.styles";
+} from "@brc-analytics/core/components/Layout/components/Section/section.styles";
 import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { bpUpSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
+import { headline } from "./headline.styles";
 
 export interface LayoutProps {
   centered?: boolean;
@@ -46,6 +44,31 @@ export const listItem = css`
     &:last-child {
       margin-bottom: 0;
     }
+  }
+`;
+
+export const sectionGridAreas = css`
+  grid-template-areas: "feature feature feature feature . detail detail detail detail detail detail detail";
+`;
+
+export const sectionSubHero = css`
+  ${section};
+  background-color: ${PALETTE.COMMON_WHITE};
+  border-top: 1px solid ${PALETTE.SMOKE_MAIN};
+`;
+
+export const sectionWithDivider = css`
+  position: relative; /* positions divider */
+  width: 100%;
+
+  > div:before {
+    background-color: ${PALETTE.SMOKE_MAIN};
+    content: "";
+    height: 1px;
+    max-width: min(1136px, calc(100vw - 32px));
+    position: absolute;
+    top: 0;
+    width: 100%;
   }
 `;
 

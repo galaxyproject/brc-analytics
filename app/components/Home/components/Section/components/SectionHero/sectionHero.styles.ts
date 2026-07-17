@@ -3,7 +3,7 @@ import {
   section,
   sectionGrid,
   sectionLayout,
-} from "@brc-analytics/core/components/Layout/components/Section/sectionLayout.styles";
+} from "@brc-analytics/core/components/Layout/components/Section/section.styles";
 import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { bpUpMd } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
