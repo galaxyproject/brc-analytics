@@ -2,7 +2,7 @@ import { OnConfigure } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs
 import {
   Actions,
   Status,
-} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/hooks/UseENADataByAccession/types";
+} from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/hooks/UseENADataByAccession/types";
 import { UseQueryResult } from "@tanstack/react-query";
 import { Table } from "@tanstack/react-table";
 

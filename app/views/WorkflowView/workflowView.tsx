@@ -3,7 +3,7 @@ import { Main } from "@/components/Entity/components/ConfigureWorkflowInputs/com
 import { SideColumn } from "@/components/Entity/components/ConfigureWorkflowInputs/components/SideColumn/sideColumn";
 import { AssemblyContext } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/context";
 import { getWorkflow } from "@/services/workflows/entities";
-import { WorkflowEntityContext } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
+import { WorkflowEntityContext } from "@brc-analytics/core/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
 import {
   BackPageContent,
   BackPageContentSideColumn,

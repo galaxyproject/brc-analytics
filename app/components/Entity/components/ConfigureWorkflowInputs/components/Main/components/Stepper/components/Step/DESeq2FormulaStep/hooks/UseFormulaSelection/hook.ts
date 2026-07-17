@@ -2,7 +2,7 @@ import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureIn
 import {
   FormulaSelection,
   UseFormulaSelection,
-} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/DESeq2FormulaStep/hooks/UseFormulaSelection/types";
+} from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/DESeq2FormulaStep/hooks/UseFormulaSelection/types";
 import { useCallback, useMemo, useState } from "react";
 import {
   generateFormula,

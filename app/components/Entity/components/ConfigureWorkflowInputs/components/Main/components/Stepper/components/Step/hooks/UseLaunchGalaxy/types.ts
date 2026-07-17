@@ -4,8 +4,8 @@ import {
   ConfiguredInput,
   PrimaryContrasts,
 } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { COLUMN_TYPE } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
-import { Strandedness } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/StrandednessStep/types";
+import { COLUMN_TYPE } from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
+import { Strandedness } from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/StrandednessStep/types";
 import { UcscTrack } from "@brc-analytics/core/utils/ucsc-tracks-api/types";
 
 // Base configured values shared across all scopes

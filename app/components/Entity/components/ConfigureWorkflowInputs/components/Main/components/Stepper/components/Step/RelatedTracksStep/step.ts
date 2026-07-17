@@ -1,4 +1,4 @@
-import { renderValue } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/utils";
+import { renderValue } from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/utils";
 import { StepConfig } from "../types";
 import { RelatedTracksStep } from "./relatedTracksStep";
 

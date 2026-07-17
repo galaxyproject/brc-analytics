@@ -1,5 +1,5 @@
 import type { Workflow } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import { buildWorkflowEntityValue } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/utils";
+import { buildWorkflowEntityValue } from "@brc-analytics/core/components/ConfigureWorkflowInputs/providers/WorkflowEntity/utils";
 import { useMemo } from "react";
 import type { UseWorkflowEntities } from "./types";
 import {

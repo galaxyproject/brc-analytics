@@ -1,5 +1,5 @@
 import { Assembly } from "@/views/WorkflowInputsView/types";
-import { SPECIAL_CASE_ASSEMBLY_LOOKUP } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/GTFStep/query/constants";
+import { SPECIAL_CASE_ASSEMBLY_LOOKUP } from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/GTFStep/query/constants";
 
 /**
  * Gets the assembly ID from the genome assembly information, applying any necessary special case lookups.

@@ -1,5 +1,5 @@
-import { STEPPER_PROPS } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/constants";
-import { StyledStepper } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/stepper.styles";
+import { STEPPER_PROPS } from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/constants";
+import { StyledStepper } from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/stepper.styles";
 import { JSX } from "react";
 import { Props } from "./types";
 

@@ -3,7 +3,7 @@ import {
   StyledButton,
   StyledFluidPaper,
   StyledMainContainer,
-} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/main.styles";
+} from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/main.styles";
 import { Loading } from "@databiosphere/findable-ui/lib/components/Loading/loading";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { PAPER_PANEL_STYLE } from "@databiosphere/findable-ui/lib/components/common/Paper/paper";

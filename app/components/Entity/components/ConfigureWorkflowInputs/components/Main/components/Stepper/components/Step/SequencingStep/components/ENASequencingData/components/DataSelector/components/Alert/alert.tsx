@@ -1,4 +1,4 @@
-import { StyledAlert } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/DataSelector/components/Alert/alert.styles";
+import { StyledAlert } from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/DataSelector/components/Alert/alert.styles";
 import { ALERT_PROPS } from "@databiosphere/findable-ui/lib/components/common/Alert/constants";
 import { SIZE } from "@databiosphere/findable-ui/lib/styles/common/constants/size";
 import { AlertTitle } from "@mui/material";

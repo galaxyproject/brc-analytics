@@ -1,7 +1,7 @@
 import type { Workflow } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { WORKFLOW_PARAMETER_VARIABLE } from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { preSelectColumnFilters } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/CollectionSelector/hooks/UseColumnFilters/utils";
-import { SEQUENCING_DATA_TYPE } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/types";
+import { SEQUENCING_DATA_TYPE } from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/types";
 
 const PARAMETERS: Record<string, Pick<Workflow, "parameters">> = {
   EMPTY: { parameters: [] },

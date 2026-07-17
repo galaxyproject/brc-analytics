@@ -2,7 +2,7 @@ import {
   getPrimaryContrasts,
   isDisabled,
 } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UsePrimaryContrasts/utils";
-import { CONTRAST_MODE } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseRadioGroup/types";
+import { CONTRAST_MODE } from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseRadioGroup/types";
 
 describe("getPrimaryContrasts", () => {
   test("returns ALL_AGAINST_ALL contrasts for ALL_AGAINST_ALL mode", () => {

@@ -2,8 +2,8 @@ import { SelectCell } from "@/components/Entity/components/ConfigureWorkflowInpu
 import {
   getAssemblyIsolate,
   getAssemblySerotype,
-} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/ReferenceAssemblyStep/components/AssemblyData/components/AssemblySelector/hooks/UseTable/accessorFn";
-import { CATEGORY_CONFIGS } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/ReferenceAssemblyStep/components/AssemblyData/components/AssemblySelector/hooks/UseTable/categoryConfigs";
+} from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/ReferenceAssemblyStep/components/AssemblyData/components/AssemblySelector/hooks/UseTable/accessorFn";
+import { CATEGORY_CONFIGS } from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/ReferenceAssemblyStep/components/AssemblyData/components/AssemblySelector/hooks/UseTable/categoryConfigs";
 import {
   buildNTagProps,
   renderNTagCell,

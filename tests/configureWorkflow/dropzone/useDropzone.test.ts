@@ -1,4 +1,4 @@
-import { useDropzone } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/Dropzone/hooks/useDropzone";
+import { useDropzone } from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/Dropzone/hooks/useDropzone";
 import { act, renderHook } from "@testing-library/react";
 import { DragEvent } from "react";
 

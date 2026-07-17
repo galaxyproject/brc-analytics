@@ -1,5 +1,5 @@
 import type { ReadRun } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
-import type { UseTaxonomyMatches } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/DataSelector/components/Alert/hooks/UseTaxonomyMatches/types";
+import type { UseTaxonomyMatches } from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/DataSelector/components/Alert/hooks/UseTaxonomyMatches/types";
 import type { Table } from "@tanstack/react-table";
 import { useState } from "react";
 

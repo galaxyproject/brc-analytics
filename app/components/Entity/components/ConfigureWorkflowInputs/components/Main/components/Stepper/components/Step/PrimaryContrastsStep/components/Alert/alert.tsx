@@ -1,4 +1,4 @@
-import { StyledAlert } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/components/Alert/alert.styles";
+import { StyledAlert } from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/components/Alert/alert.styles";
 import { ALERT_PROPS } from "@databiosphere/findable-ui/lib/components/common/Alert/constants";
 import { JSX } from "react";
 import { Props } from "./types";

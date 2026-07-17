@@ -2,7 +2,7 @@ import { BaseReadRun } from "@/components/Entity/components/ConfigureWorkflowInp
 import {
   OnRequestData,
   Status,
-} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/hooks/UseENADataByAccession/types";
+} from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/hooks/UseENADataByAccession/types";
 
 export interface Props {
   clearErrors: () => void;

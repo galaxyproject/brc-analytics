@@ -4,7 +4,7 @@ import {
   ExplicitContrasts,
   PrimaryContrasts,
 } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { CONTRAST_MODE } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseRadioGroup/types";
+import { CONTRAST_MODE } from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseRadioGroup/types";
 
 /**
  * Builds the primary contrasts configuration based on mode.

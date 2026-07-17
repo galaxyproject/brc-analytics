@@ -4,7 +4,7 @@ import {
   FormulaSelection,
   OnSelectPrimary,
   OnToggleCovariate,
-} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/DESeq2FormulaStep/hooks/UseFormulaSelection/types";
+} from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/DESeq2FormulaStep/hooks/UseFormulaSelection/types";
 
 export interface Props {
   columns: FormulaColumn[];

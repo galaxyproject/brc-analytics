@@ -6,7 +6,7 @@ import {
 import {
   OnContinue,
   OnEdit,
-} from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/types";
+} from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/types";
 import { StepConfig } from "./components/Stepper/components/Step/types";
 
 export interface Props {

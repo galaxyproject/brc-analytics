@@ -1,4 +1,4 @@
-import { getStepLabel } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/StrandednessStep/utils";
+import { getStepLabel } from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/StrandednessStep/utils";
 import { StepConfig } from "../types";
 import { StrandednessStep } from "./strandednessStep";
 

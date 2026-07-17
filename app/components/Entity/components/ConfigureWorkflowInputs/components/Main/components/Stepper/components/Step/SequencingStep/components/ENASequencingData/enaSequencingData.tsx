@@ -1,4 +1,4 @@
-import { CollectionSummary } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/CollectionSummary/collectionSummary";
+import { CollectionSummary } from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/CollectionSummary/collectionSummary";
 import { useDialog } from "@databiosphere/findable-ui/lib/components/common/Dialog/hooks/useDialog";
 import { RowSelectionState } from "@tanstack/react-table";
 import { Fragment, JSX, useRef } from "react";
