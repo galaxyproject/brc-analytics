@@ -100,7 +100,7 @@ export function makeConfig(
         navigation: [
           undefined,
           [
-            { label: "About", url: ROUTES.ABOUT },
+            { label: "About", url: BRC_ROUTES.ABOUT },
             { label: "Learn", url: BRC_ROUTES.LEARN },
             { label: "Organisms", url: ROUTES.ORGANISMS },
             { label: "Assemblies", url: ROUTES.GENOMES },

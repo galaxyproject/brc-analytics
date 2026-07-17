@@ -4,6 +4,7 @@ import {
 } from "@/apis/catalog/ga2/entities";
 import * as C from "@/components";
 import { TaxonomyNode } from "@/components/Home/components/Section/components/SectionViz/data";
+import { GA2_ROUTES } from "@/routes/constants";
 import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
@@ -19,9 +20,9 @@ import { socialMedia } from "./socialMedia";
 import { THEME_OPTIONS } from "./theme/constants";
 
 const ALLOWED_PATHS = [
-  ROUTES.ABOUT,
-  ROUTES.ABOUT_PARTNER_RESOURCES,
-  ROUTES.ABOUT_ROADMAP,
+  GA2_ROUTES.ABOUT,
+  GA2_ROUTES.ABOUT_PARTNER_RESOURCES,
+  GA2_ROUTES.ABOUT_ROADMAP,
   ROUTES.ORGANISMS,
   ROUTES.GENOMES,
   ROUTES.WORKFLOWS,
@@ -90,7 +91,7 @@ export function makeConfig(
         navigation: [
           undefined,
           [
-            { label: "About", url: ROUTES.ABOUT },
+            { label: "About", url: GA2_ROUTES.ABOUT },
             { label: "Organisms", url: ROUTES.ORGANISMS },
             { label: "Assemblies", url: ROUTES.GENOMES },
             { label: "Workflows", url: ROUTES.WORKFLOWS },

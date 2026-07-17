@@ -1,5 +1,5 @@
-import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { config } from "@/config/config";
+import { BRC_ROUTES } from "@/routes/constants";
 import { GetStaticProps } from "next";
 import Head from "next/head";
 import { JSX } from "react";
@@ -15,7 +15,7 @@ export default function Roadmap(): JSX.Element {
 export const getStaticProps: GetStaticProps = async () => {
   const { allowedPaths } = config();
 
-  if (allowedPaths && !allowedPaths.includes(ROUTES.ABOUT_ROADMAP)) {
+  if (allowedPaths && !allowedPaths.includes(BRC_ROUTES.ABOUT_ROADMAP)) {
     return { notFound: true };
   }
 

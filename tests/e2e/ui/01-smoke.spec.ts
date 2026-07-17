@@ -3,12 +3,12 @@ import { ROUTES } from "../../../packages/core/routes/constants";
 import { expect, test } from "../utils/fixtures";
 
 const PAGES = [
-  { name: "About", url: ROUTES.ABOUT },
+  { name: "About", url: BRC_ROUTES.ABOUT },
   { name: "Learn", url: BRC_ROUTES.LEARN },
   { name: "Organisms", url: ROUTES.ORGANISMS },
   { name: "Assemblies", url: ROUTES.GENOMES },
   { name: "Priority Pathogens", url: BRC_ROUTES.PRIORITY_PATHOGENS },
-  { name: "Roadmap", url: ROUTES.ROADMAP },
+  { name: "Roadmap", url: BRC_ROUTES.ABOUT_ROADMAP },
   { name: "Calendar", url: BRC_ROUTES.CALENDAR },
 ];
 

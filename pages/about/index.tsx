@@ -1,9 +1,9 @@
 import { getPageMeta } from "@/common/meta/utils";
 import { config } from "@/config/config";
+import { BRC_ROUTES } from "@/routes/constants";
 import { AboutView } from "@/views/AboutView/aboutView";
 import { BRC_CARDS, GA2_CARDS } from "@/views/AboutView/common/constants";
 import { StyledPagesMain } from "@brc-analytics/core/components/Layout/components/Main/main.styles";
-import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { APP_KEYS } from "@site-config/common/constants";
 import { GetStaticProps } from "next";
 import { JSX } from "react";
@@ -21,7 +21,7 @@ export const getStaticProps: GetStaticProps<
 > = async () => {
   const { allowedPaths, appKey } = config();
 
-  if (allowedPaths && !allowedPaths.includes(ROUTES.ABOUT)) {
+  if (allowedPaths && !allowedPaths.includes(BRC_ROUTES.ABOUT)) {
     return { notFound: true };
   }
 

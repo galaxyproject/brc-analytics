@@ -1,6 +1,6 @@
-import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { getPageMeta } from "@/common/meta/utils";
 import { config } from "@/config/config";
+import { BRC_ROUTES } from "@/routes/constants";
 import { PartnerResourcesView as PartnerResourcesViewGA2 } from "@/views/PartnerResourcesView/ga2/partnerResourcesView";
 import { PartnerResourcesView } from "@/views/PartnerResourcesView/partnerResourcesView";
 import { StyledPagesMain } from "@brc-analytics/core/components/Layout/components/Main/main.styles";
@@ -22,7 +22,10 @@ export const getStaticProps: GetStaticProps<
 > = async () => {
   const { allowedPaths, appKey } = config();
 
-  if (allowedPaths && !allowedPaths.includes(ROUTES.ABOUT_PARTNER_RESOURCES)) {
+  if (
+    allowedPaths &&
+    !allowedPaths.includes(BRC_ROUTES.ABOUT_PARTNER_RESOURCES)
+  ) {
     return { notFound: true };
   }
 

@@ -1,7 +1,4 @@
 export const ROUTES = {
-  ABOUT: "/about",
-  ABOUT_PARTNER_RESOURCES: "/about/partner-resources",
-  ABOUT_ROADMAP: "/about/roadmap",
   ANALYZE_WORKFLOWS: "/data/assemblies/{entityId}/analyze/workflows",
   CONFIGURE_CUSTOM_WORKFLOW: "/data/assemblies/{entityId}/analyze/custom",
   CONFIGURE_ORGANISM_WORKFLOW:
@@ -11,7 +8,6 @@ export const ROUTES = {
   GENOMES: "/data/assemblies",
   ORGANISM: "/data/organisms/{entityId}",
   ORGANISMS: "/data/organisms",
-  ROADMAP: "/roadmap",
   WORKFLOW: "/data/workflows/{trsId}",
   WORKFLOWS: "/data/workflows",
 };

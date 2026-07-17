@@ -1,10 +1,11 @@
+import { GA2_ROUTES } from "../../../app/routes/constants";
 import { ROUTES } from "../../../packages/core/routes/constants";
 import { expect, test } from "../utils/fixtures";
 
 const PAGES = [
-  { name: "About", url: ROUTES.ABOUT },
-  { name: "Partner Resources", url: ROUTES.ABOUT_PARTNER_RESOURCES },
-  { name: "Roadmap", url: ROUTES.ABOUT_ROADMAP },
+  { name: "About", url: GA2_ROUTES.ABOUT },
+  { name: "Partner Resources", url: GA2_ROUTES.ABOUT_PARTNER_RESOURCES },
+  { name: "Roadmap", url: GA2_ROUTES.ABOUT_ROADMAP },
   { name: "Organisms", url: ROUTES.ORGANISMS },
   { name: "Assemblies", url: ROUTES.GENOMES },
   { name: "Workflows", url: ROUTES.WORKFLOWS },
