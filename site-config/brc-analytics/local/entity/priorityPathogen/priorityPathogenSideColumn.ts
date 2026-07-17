@@ -1,7 +1,7 @@
 import { Outbreak } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "@/components";
 import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { KeyValueSection } from "@brc-analytics/core/components/Entity/components/Section/KeyValueSection/keyValueSection";
+import { KeyValueSection } from "@/views/PriorityPathogenView/ui/Section/KeyValueSection/keyValueSection";
 import { FluidPaper } from "@brc-analytics/core/components/Paper/components/FluidPaper/fluidPaper";
 import {
   ComponentConfig,

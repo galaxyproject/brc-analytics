@@ -4,9 +4,9 @@ export {
 } from "@/components/Layout/components/Footer/components/Branding/branding";
 export { VersionInfoWithServerStatus } from "@/components/Layout/components/Footer/components/VersionInfoWithServerStatus/versionInfoWithServerStatus";
 export { AuthButton } from "@/components/Layout/components/Header/components/AuthButton/authButton";
+export { MDXSection } from "@/views/PriorityPathogenView/ui/Section/MDXSection/mdxSection";
+export { Sections } from "@/views/PriorityPathogenView/ui/Sections/sections";
 export { CalendarIcon } from "@brc-analytics/core/components/CustomIcon/components/CalendarIcon/calendarIcon";
-export { MDXSection } from "@brc-analytics/core/components/Entity/components/Section/MDXSection/mdxSection";
-export { Sections } from "@brc-analytics/core/components/Entity/components/Sections/sections";
 export { AnalyzeGenome } from "@brc-analytics/core/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 export { LevelCell } from "@brc-analytics/core/components/Table/components/TableCell/components/LevelCell/levelCell";
 export { SpeciesCell } from "@brc-analytics/core/components/Table/components/TableCell/components/SpeciesCell/speciesCell";

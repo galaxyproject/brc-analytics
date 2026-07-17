@@ -18,14 +18,14 @@ import {
   getPriorityLabel,
 } from "@/views/PriorityPathogensView/components/PriorityPathogens/utils";
 import { ResourcesSection } from "@/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
+import { KeyValueSection } from "@/views/PriorityPathogenView/ui/Section/KeyValueSection/keyValueSection";
+import { MDXSection } from "@/views/PriorityPathogenView/ui/Section/MDXSection/mdxSection";
 import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import type {
   AssemblyContract,
   OrganismContract,
 } from "@brc-analytics/core/apis/types";
 import { AppLink } from "@brc-analytics/core/components/AppLink/appLink";
-import { KeyValueSection } from "@brc-analytics/core/components/Entity/components/Section/KeyValueSection/keyValueSection";
-import { MDXSection } from "@brc-analytics/core/components/Entity/components/Section/MDXSection/mdxSection";
 import { AnalyzeGenome } from "@brc-analytics/core/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 import { LevelCell } from "@brc-analytics/core/components/Table/components/TableCell/components/LevelCell/levelCell";
 import { TagList } from "@brc-analytics/core/components/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
