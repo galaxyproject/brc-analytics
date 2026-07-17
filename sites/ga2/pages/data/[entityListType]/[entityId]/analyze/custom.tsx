@@ -26,6 +26,19 @@ export interface Props {
   trsId: string;
 }
 
+/**
+ * Custom workflow view page.
+ * @param props - Page props.
+ * @returns Custom workflow view component.
+ */
+const Page = (props: Props): JSX.Element => {
+  return (
+    <EntityDataGate>
+      <WorkflowInputsView {...props} />
+    </EntityDataGate>
+  );
+};
+
 export const getStaticPaths: GetStaticPaths<Params> = async () => {
   const paths: GetStaticPathsResult<Params>["paths"] = [];
 
@@ -66,19 +79,6 @@ export const getStaticProps: GetStaticProps<Props> = async ({
       trsId: CUSTOM_WORKFLOW.trsId,
     },
   };
-};
-
-/**
- * Custom workflow view page.
- * @param props - Page props.
- * @returns Custom workflow view component.
- */
-const Page = (props: Props): JSX.Element => {
-  return (
-    <EntityDataGate>
-      <WorkflowInputsView {...props} />
-    </EntityDataGate>
-  );
 };
 
 export default Page;

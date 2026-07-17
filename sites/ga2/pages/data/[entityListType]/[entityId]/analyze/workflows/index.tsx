@@ -25,6 +25,19 @@ export interface Props {
   pageTitle?: string;
 }
 
+/**
+ * Analyze Workflows view page.
+ * @param props - Page props.
+ * @returns Analyze Workflows view component.
+ */
+const Page = (props: Props): JSX.Element => {
+  return (
+    <EntityDataGate>
+      <AnalyzeWorkflowsView entityId={props.entityId} />
+    </EntityDataGate>
+  );
+};
+
 export const getStaticPaths: GetStaticPaths<Params> = async () => {
   const paths: GetStaticPathsResult<Params>["paths"] = [];
 
@@ -64,19 +77,6 @@ export const getStaticProps: GetStaticProps<Props> = async ({
       ...GA2_PAGE_META.ANALYZE_WORKFLOWS,
     },
   };
-};
-
-/**
- * Analyze Workflows view page.
- * @param props - Page props.
- * @returns Analyze Workflows view component.
- */
-const Page = (props: Props): JSX.Element => {
-  return (
-    <EntityDataGate>
-      <AnalyzeWorkflowsView entityId={props.entityId} />
-    </EntityDataGate>
-  );
 };
 
 export default Page;

@@ -45,6 +45,21 @@ interface Props {
   trsId: string;
 }
 
+const Page = (props: Props): JSX.Element => {
+  return (
+    <EntityDataGate>
+      {props.entityListType === "organisms" ? (
+        <OrganismWorkflowInputsView
+          entityId={props.entityId}
+          trsId={props.trsId}
+        />
+      ) : (
+        <WorkflowInputsView {...props} />
+      )}
+    </EntityDataGate>
+  );
+};
+
 export const getStaticPaths: GetStaticPaths = async () => {
   const appConfig = config();
   const { entities } = appConfig;
@@ -97,21 +112,6 @@ export const getStaticProps = async (
       trsId,
     },
   };
-};
-
-const Page = (props: Props): JSX.Element => {
-  return (
-    <EntityDataGate>
-      {props.entityListType === "organisms" ? (
-        <OrganismWorkflowInputsView
-          entityId={props.entityId}
-          trsId={props.trsId}
-        />
-      ) : (
-        <WorkflowInputsView {...props} />
-      )}
-    </EntityDataGate>
-  );
 };
 
 export default Page;

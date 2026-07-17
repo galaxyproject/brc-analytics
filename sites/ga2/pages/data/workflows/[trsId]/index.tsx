@@ -31,6 +31,19 @@ const GA2_WORKFLOW_TRS_IDS = new Set(
   ga2WorkflowMappings.map((mapping) => mapping.workflowTrsId)
 );
 
+/**
+ * Workflow view page.
+ * @param props - Page props.
+ * @returns Workflow view component.
+ */
+const Page = (props: Props): JSX.Element => {
+  return (
+    <EntityDataGate>
+      <WorkflowView {...props} />
+    </EntityDataGate>
+  );
+};
+
 export const getStaticPaths: GetStaticPaths<Params> = async () => {
   const paths = workflowCategories.reduce(
     (acc, { workflows }) => {
@@ -67,19 +80,6 @@ export const getStaticProps: GetStaticProps<Props> = async ({
       trsId,
     },
   };
-};
-
-/**
- * Workflow view page.
- * @param props - Page props.
- * @returns Workflow view component.
- */
-const Page = (props: Props): JSX.Element => {
-  return (
-    <EntityDataGate>
-      <WorkflowView {...props} />
-    </EntityDataGate>
-  );
 };
 
 export default Page;

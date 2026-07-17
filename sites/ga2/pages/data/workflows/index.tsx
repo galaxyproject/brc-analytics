@@ -5,6 +5,14 @@ import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout
 import { GetStaticProps } from "next";
 import { JSX } from "react";
 
+const Page = (): JSX.Element => {
+  return (
+    <EntityDataGate>
+      <WorkflowsView />
+    </EntityDataGate>
+  );
+};
+
 export const getStaticProps: GetStaticProps = () => {
   return {
     props: {
@@ -14,14 +22,6 @@ export const getStaticProps: GetStaticProps = () => {
   };
 };
 
-const Page = (): JSX.Element => {
-  return (
-    <EntityDataGate>
-      <WorkflowsView />
-    </EntityDataGate>
-  );
-};
+export default Page;
 
 Page.Main = DXMain;
-
-export default Page;
