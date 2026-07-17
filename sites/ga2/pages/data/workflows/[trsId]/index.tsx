@@ -5,7 +5,12 @@ import { WorkflowView } from "@/views/WorkflowView/workflowView";
 import { EntityDataGate } from "@brc-analytics/core/components/EntityDataGate/entityDataGate";
 import ga2WorkflowMappings from "catalog/ga2/output/workflow-assembly-mappings.json";
 import workflowCategories from "catalog/output/workflows.json";
-import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
+import {
+  GetStaticPaths,
+  GetStaticPathsResult,
+  GetStaticProps,
+  GetStaticPropsContext,
+} from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
 
@@ -35,7 +40,7 @@ export const getStaticPaths: GetStaticPaths<Params> = async () => {
       }
       return acc;
     },
-    [] as { params: Params }[]
+    [] as GetStaticPathsResult<Params>["paths"]
   );
 
   // Add Differential Expression Analysis workflow (interim measure).

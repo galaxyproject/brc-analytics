@@ -9,7 +9,12 @@ import { seedDatabase } from "@brc-analytics/core/utils/seedDatabase";
 import { EntityDetailView } from "@brc-analytics/core/views/EntityView/entityView";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { getEntityConfig } from "@databiosphere/findable-ui/lib/config/utils";
-import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
+import {
+  GetStaticPaths,
+  GetStaticPathsResult,
+  GetStaticProps,
+  GetStaticPropsContext,
+} from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
 
@@ -66,7 +71,7 @@ export const getStaticPaths: GetStaticPaths<Params> = async () => {
   const appConfig = config();
   const { entities } = appConfig;
 
-  const paths: { params: Params }[] = [];
+  const paths: GetStaticPathsResult<Params>["paths"] = [];
 
   for (const entityConfig of entities) {
     const { route: entityListType } = entityConfig;
@@ -133,7 +138,7 @@ export default Page;
 function processEntityPaths<R>(
   entityConfig: EntityConfig,
   entitiesResponse: EntitiesResponse<R>,
-  paths: { params: Params }[]
+  paths: GetStaticPathsResult<Params>["paths"]
 ): void {
   const { route: entityListType } = entityConfig;
   const { hits: entities } = entitiesResponse;
