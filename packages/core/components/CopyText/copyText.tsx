@@ -1,14 +1,7 @@
-import { Grid, GridProps, Typography } from "@mui/material";
-import { JSX, ReactNode } from "react";
-import {
-  ClipboardCopy,
-  CopyToClipboardProps,
-} from "./components/ClipboardCopy/clipboardCopy";
-
-export interface CopyTextProps extends CopyToClipboardProps {
-  children: ReactNode;
-  gridProps?: Partial<GridProps>;
-}
+import { Grid, Typography } from "@mui/material";
+import { JSX } from "react";
+import { ClipboardCopy } from "./components/ClipboardCopy/clipboardCopy";
+import { Props } from "./types";
 
 export const CopyText = ({
   children,
@@ -16,7 +9,7 @@ export const CopyText = ({
   timeoutDelay,
   tooltipProps,
   value,
-}: CopyTextProps): JSX.Element => {
+}: Props): JSX.Element => {
   return (
     <Grid container columnSpacing={1} wrap="nowrap" {...gridProps}>
       <Typography component="span" noWrap>

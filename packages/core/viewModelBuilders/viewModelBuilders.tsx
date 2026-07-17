@@ -3,7 +3,7 @@ import type {
   OrganismContract,
 } from "@brc-analytics/core/apis/types";
 import { sanitizeEntityId } from "@brc-analytics/core/apis/utils";
-import { CopyText } from "@brc-analytics/core/components/common/CopyText/copyText";
+import { CopyText } from "@brc-analytics/core/components/CopyText/copyText";
 import { AnalyzeGenome } from "@brc-analytics/core/components/common/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 import {
   LEVEL_FILLED_COUNT,
