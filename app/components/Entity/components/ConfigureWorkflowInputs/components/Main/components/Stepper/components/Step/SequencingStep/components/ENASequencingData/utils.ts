@@ -1,5 +1,5 @@
 import { StepProps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
-import { EnaSequencingReads } from "@/utils/galaxy-api/entities";
+import { EnaSequencingReads } from "@/utils/galaxy-api/types";
 import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { SEQUENCING_DATA_TYPE } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/types";
 import { LIBRARY_LAYOUT_TO_CONFIGURE_INPUT_KEY } from "./constants";

@@ -1,5 +1,5 @@
 import { translateForSequencingStep } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/utils";
-import type { EnaSequencingReads } from "@/utils/galaxy-api/entities";
+import type { EnaSequencingReads } from "@/utils/galaxy-api/types";
 
 const RUN_A: EnaSequencingReads = {
   md5Hashes: "md5-a",

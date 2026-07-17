@@ -44,7 +44,7 @@ import {
   WorkflowLandingsBody,
   WorkflowLandingsBodyRequestState,
   WorkflowParameterValue,
-} from "./entities";
+} from "./types";
 
 const DOCKSTORE_API_URL = "https://dockstore.org/api/ga4gh/trs/v2/tools";
 

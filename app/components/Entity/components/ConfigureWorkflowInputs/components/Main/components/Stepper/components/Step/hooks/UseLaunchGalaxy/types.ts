@@ -1,5 +1,5 @@
 import { Workflow } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import { EnaSequencingReads } from "@/utils/galaxy-api/entities";
+import { EnaSequencingReads } from "@/utils/galaxy-api/types";
 import {
   ConfiguredInput,
   PrimaryContrasts,

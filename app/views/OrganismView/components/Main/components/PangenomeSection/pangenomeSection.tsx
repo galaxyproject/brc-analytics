@@ -1,8 +1,5 @@
 import { useShowPangenome } from "@/views/OrganismView/hooks/UseShowPangenome/hook";
 import { Table } from "@brc-analytics/core/components/common/Table/table";
-import { StyledFluidPaper } from "@brc-analytics/core/views/OrganismView/components/Main/components/PangenomeSection/pangenomeSection.styles";
-import { Props } from "@brc-analytics/core/views/OrganismView/components/Main/components/PangenomeSection/types";
-import { getTrackTypes } from "@brc-analytics/core/views/OrganismView/components/Main/components/PangenomeSection/utils";
 import { StyledSectionTitle } from "@brc-analytics/core/views/OrganismView/components/Main/main.styles";
 import { useTable } from "@brc-analytics/core/views/OrganismView/components/Main/table/hooks/UseTable/hook";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
@@ -17,7 +14,10 @@ import {
   Typography,
 } from "@mui/material";
 import { JSX } from "react";
+import { StyledFluidPaper } from "./pangenomeSection.styles";
 import { COLUMNS } from "./table/columns";
+import { Props } from "./types";
+import { getTrackTypes } from "./utils";
 
 /**
  * Pangenome section for the organism page: a bundle header (id + version), a

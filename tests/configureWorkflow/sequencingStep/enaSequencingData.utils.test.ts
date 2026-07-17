@@ -9,7 +9,7 @@ import {
   getUploadMyOwnSequencingData,
   mapSequencingDataToConfiguredValue,
 } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/utils";
-import type { EnaSequencingReads } from "@/utils/galaxy-api/entities";
+import type { EnaSequencingReads } from "@/utils/galaxy-api/types";
 import type { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { SEQUENCING_DATA_TYPE } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/types";
 
