@@ -1,3 +1,4 @@
+import { BRC_ROUTES } from "@/routes/constants";
 import "@databiosphere/findable-ui";
 import { AzulEntitiesStaticResponse } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import { Error } from "@databiosphere/findable-ui/lib/components/Error/error";
@@ -19,7 +20,6 @@ import { StyledFooter } from "@brc-analytics/core/components/Layout/components/F
 import { BrcAuthProvider } from "@brc-analytics/core/providers/authentication/provider";
 import { EntitiesLoadedProvider } from "@brc-analytics/core/providers/entitiesLoaded/provider";
 import { WorkflowHandoffProvider } from "@brc-analytics/core/providers/workflowHandoff/provider";
-import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { LayoutDimensionsProvider } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/provider";
 import { ServicesProvider } from "@databiosphere/findable-ui/lib/providers/services/provider";
 import { SystemStatusProvider } from "@databiosphere/findable-ui/lib/providers/systemStatus";
@@ -93,7 +93,7 @@ function MyApp(props: AppPropsWithComponent): JSX.Element {
     return {
       ...rest,
       navigation: navigation.map((group) =>
-        group?.filter((item) => item.url !== ROUTES.ASSISTANT)
+        group?.filter((item) => item.url !== BRC_ROUTES.ASSISTANT)
       ) as typeof navigation,
     };
   }, [header, isAssistantEnabled]);

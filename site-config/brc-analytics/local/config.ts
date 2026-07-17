@@ -5,6 +5,7 @@ import {
 } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "@/components";
 import { TaxonomyNode } from "@/components/Home/components/Section/components/SectionViz/data";
+import { BRC_ROUTES } from "@/routes/constants";
 import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
@@ -100,12 +101,12 @@ export function makeConfig(
           undefined,
           [
             { label: "About", url: ROUTES.ABOUT },
-            { label: "Learn", url: ROUTES.LEARN },
+            { label: "Learn", url: BRC_ROUTES.LEARN },
             { label: "Organisms", url: ROUTES.ORGANISMS },
             { label: "Assemblies", url: ROUTES.GENOMES },
             { label: "Workflows", url: ROUTES.WORKFLOWS },
-            { label: "Priority Pathogens", url: ROUTES.PRIORITY_PATHOGENS },
-            { label: "Assistant", url: ROUTES.ASSISTANT },
+            { label: "Priority Pathogens", url: BRC_ROUTES.PRIORITY_PATHOGENS },
+            { label: "Assistant", url: BRC_ROUTES.ASSISTANT },
           ],
           undefined,
         ],

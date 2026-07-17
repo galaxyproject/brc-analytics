@@ -1,5 +1,5 @@
 import * as C from "@/components";
-import { ROUTES } from "@brc-analytics/core/routes/constants";
+import { BRC_ROUTES } from "@/routes/constants";
 import { SocialMedia } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/common/entities";
 import { MenuItem } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/components/Content/components/Navigation/components/NavigationMenuItems/navigationMenuItems";
 import {
@@ -10,7 +10,7 @@ import {
 export const SOCIALS = {
   CALENDAR: {
     label: "Calendar",
-    url: ROUTES.CALENDAR,
+    url: BRC_ROUTES.CALENDAR,
   },
   DISCOURSE: {
     label: "Discourse",

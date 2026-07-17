@@ -1,4 +1,4 @@
-import { ROUTES } from "@brc-analytics/core/routes/constants";
+import { BRC_ROUTES } from "@/routes/constants";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 
 export const BREADCRUMBS: Breadcrumb[] = [
@@ -7,7 +7,7 @@ export const BREADCRUMBS: Breadcrumb[] = [
     text: "Home",
   },
   {
-    path: ROUTES.CALENDAR,
+    path: BRC_ROUTES.CALENDAR,
     text: "Calendar",
   },
 ];

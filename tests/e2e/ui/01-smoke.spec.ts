@@ -1,14 +1,15 @@
-import { ROUTES } from "@brc-analytics/core/routes/constants";
+import { BRC_ROUTES } from "../../../app/routes/constants";
+import { ROUTES } from "../../../packages/core/routes/constants";
 import { expect, test } from "../utils/fixtures";
 
 const PAGES = [
   { name: "About", url: ROUTES.ABOUT },
-  { name: "Learn", url: ROUTES.LEARN },
+  { name: "Learn", url: BRC_ROUTES.LEARN },
   { name: "Organisms", url: ROUTES.ORGANISMS },
   { name: "Assemblies", url: ROUTES.GENOMES },
-  { name: "Priority Pathogens", url: ROUTES.PRIORITY_PATHOGENS },
+  { name: "Priority Pathogens", url: BRC_ROUTES.PRIORITY_PATHOGENS },
   { name: "Roadmap", url: ROUTES.ROADMAP },
-  { name: "Calendar", url: ROUTES.CALENDAR },
+  { name: "Calendar", url: BRC_ROUTES.CALENDAR },
 ];
 
 test.describe("BRC Analytics - UI Smoke Tests", () => {

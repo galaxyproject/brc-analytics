@@ -1,5 +1,5 @@
-import { config } from "@/config/config";
 import { ROUTES } from "@brc-analytics/core/routes/constants";
+import { config } from "@/config/config";
 import { GetStaticProps } from "next";
 import Head from "next/head";
 import { JSX } from "react";

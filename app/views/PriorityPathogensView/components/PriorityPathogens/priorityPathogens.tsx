@@ -1,4 +1,4 @@
-import { ROUTES } from "@brc-analytics/core/routes/constants";
+import { BRC_ROUTES } from "@/routes/constants";
 import { SLUGIFY_OPTIONS } from "@brc-analytics/core/utils/slugify/constants";
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import {
@@ -29,7 +29,7 @@ export const PriorityPathogens = ({
             <CardActionArea
               onClick={() =>
                 push({
-                  pathname: ROUTES.PRIORITY_PATHOGEN,
+                  pathname: BRC_ROUTES.PRIORITY_PATHOGEN,
                   query: { entityId, entityListType: "priority-pathogens" },
                 })
               }

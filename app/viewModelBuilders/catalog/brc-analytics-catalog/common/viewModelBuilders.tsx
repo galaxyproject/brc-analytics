@@ -10,6 +10,7 @@ import {
   getOrganismId,
 } from "@/apis/catalog/brc-analytics-catalog/common/utils";
 import { StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
+import { BRC_ROUTES } from "@/routes/constants";
 import { Main as OrganismViewMain } from "@/views/OrganismView/components/Main/main";
 import { Tabs } from "@/views/OrganismView/components/Tabs/tabs";
 import {
@@ -450,7 +451,7 @@ export const buildPriorityPathogen = (entity: {
     onClick: priorityPathogenName
       ? (): void => {
           Router.push({
-            pathname: ROUTES.PRIORITY_PATHOGEN,
+            pathname: BRC_ROUTES.PRIORITY_PATHOGEN,
             query: {
               entityId: slugify(priorityPathogenName, SLUGIFY_OPTIONS),
               entityListType: "priority-pathogens",
@@ -1116,7 +1117,7 @@ function getPriorityPathogenEntityBreadcrumbs(
   priorityPathogen: Outbreak
 ): Breadcrumb[] {
   return [
-    { path: ROUTES.PRIORITY_PATHOGENS, text: "Priority Pathogens" },
+    { path: BRC_ROUTES.PRIORITY_PATHOGENS, text: "Priority Pathogens" },
     { path: "", text: priorityPathogen.name },
   ];
 }

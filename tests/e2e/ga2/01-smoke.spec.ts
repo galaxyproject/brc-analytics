@@ -1,4 +1,4 @@
-import { ROUTES } from "@brc-analytics/core/routes/constants";
+import { ROUTES } from "../../../packages/core/routes/constants";
 import { expect, test } from "../utils/fixtures";
 
 const PAGES = [

@@ -1,9 +1,9 @@
 // .js extension required: Playwright uses Node's native module resolution which
 // enforces the package exports field strictly (no auto-resolving extensions).
-import { sanitizeEntityId } from "@brc-analytics/core/apis/utils";
-import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters.js";
 import { Locator, Page } from "@playwright/test";
+import { sanitizeEntityId } from "../../../packages/core/apis/utils";
+import { ROUTES } from "../../../packages/core/routes/constants";
 import { expect, test } from "../utils/fixtures";
 
 /**

@@ -1,8 +1,8 @@
 import { BRC_PAGE_META } from "@/common/meta/brc/constants";
 import { config } from "@/config/config";
+import { BRC_ROUTES } from "@/routes/constants";
 import { CalendarView } from "@/views/CalendarView/calendarView";
 import { StyledPagesMain } from "@brc-analytics/core/components/Layout/components/Main/main.styles";
-import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { GetStaticProps } from "next";
 import { JSX } from "react";
 
@@ -13,7 +13,7 @@ export const Calendar = (): JSX.Element => {
 export const getStaticProps: GetStaticProps = async () => {
   const { allowedPaths } = config();
 
-  if (allowedPaths && !allowedPaths.includes(ROUTES.CALENDAR)) {
+  if (allowedPaths && !allowedPaths.includes(BRC_ROUTES.CALENDAR)) {
     return { notFound: true };
   }
 
