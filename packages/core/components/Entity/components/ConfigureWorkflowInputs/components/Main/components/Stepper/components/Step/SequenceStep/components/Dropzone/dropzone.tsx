@@ -1,10 +1,10 @@
+import { FileUploadIcon } from "@brc-analytics/core/components/CustomIcon/components/FileUploadIcon/fileUploadIcon";
 import { StyledButtonBase } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/Dropzone/components/FileUploadButton/fileUploadButton.styles";
 import {
   TYPOGRAPHY_PROPS as COMPONENT_TYPOGRAPHY_PROPS,
   STACK_PROPS,
 } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/Dropzone/constants";
 import { Dropzone as DropzoneBase } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/Dropzone/dropzone";
-import { FileUploadIcon } from "@brc-analytics/core/components/common/CustomIcon/components/FileUploadIcon/fileUploadIcon";
 import { Dot } from "@databiosphere/findable-ui/lib/components/common/Dot/dot";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Stack, Typography } from "@mui/material";

@@ -1,5 +1,5 @@
-import { DeleteIcon } from "@brc-analytics/core/components/common/CustomIcon/components/DeleteIcon/deleteIcon";
-import { ScanDeleteIcon } from "@brc-analytics/core/components/common/CustomIcon/components/ScanDeleteIcon/scanDeleteIcon";
+import { DeleteIcon } from "@brc-analytics/core/components/CustomIcon/components/DeleteIcon/deleteIcon";
+import { ScanDeleteIcon } from "@brc-analytics/core/components/CustomIcon/components/ScanDeleteIcon/scanDeleteIcon";
 import { ICON_BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/iconButton";
 import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";

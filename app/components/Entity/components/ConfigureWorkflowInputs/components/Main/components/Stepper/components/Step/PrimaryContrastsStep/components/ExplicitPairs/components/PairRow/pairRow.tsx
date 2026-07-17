@@ -1,5 +1,5 @@
 import { getDisabledValues } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseExplicitContrasts/utils";
-import { DeleteIcon } from "@brc-analytics/core/components/common/CustomIcon/components/DeleteIcon/deleteIcon";
+import { DeleteIcon } from "@brc-analytics/core/components/CustomIcon/components/DeleteIcon/deleteIcon";
 import {
   ICON_BUTTON_PROPS,
   SELECT_PROPS,
