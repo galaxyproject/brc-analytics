@@ -1,5 +1,5 @@
+import { headline } from "@brc-analytics/core/components/Layout/components/AppLayout/components/Section/headline.styles";
 import {
-  headline,
   sectionGrid,
   sectionGridAreas,
   sectionLayout,
