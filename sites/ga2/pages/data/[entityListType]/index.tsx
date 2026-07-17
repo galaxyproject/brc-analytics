@@ -12,11 +12,11 @@ import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
 
-interface PageUrl extends ParsedUrlQuery {
+interface Params extends ParsedUrlQuery {
   entityListType: string;
 }
 
-interface EntitiesPageProps<R> {
+interface Props<R> {
   data?: EntitiesResponse<R>;
   entityListType: string;
   pageDescription?: string;
@@ -29,10 +29,7 @@ interface EntitiesPageProps<R> {
  * @param props.entityListType - Entity list type.
  * @returns ExploreView component.
  */
-const IndexPage = <R,>({
-  entityListType,
-  ...props
-}: EntitiesPageProps<R>): JSX.Element => {
+const Page = <R,>({ entityListType, ...props }: Props<R>): JSX.Element => {
   if (!entityListType) return <></>;
   return <StyledExploreView entityListType={entityListType} {...props} />;
 };
@@ -62,11 +59,11 @@ export const getStaticPaths: GetStaticPaths = async () => {
  * @param context - Object containing values related to the current context.
  * @returns static props.
  */
-export const getStaticProps: GetStaticProps<
-  EntitiesPageProps<GA2Catalog>
-> = async (context: GetStaticPropsContext) => {
+export const getStaticProps: GetStaticProps<Props<GA2Catalog>> = async (
+  context: GetStaticPropsContext
+) => {
   const appConfig = config();
-  const { entityListType } = context.params as PageUrl;
+  const { entityListType } = context.params as Params;
   const { entities } = appConfig;
   const entityConfig = getEntityConfig(entities, entityListType);
   const { exploreMode } = entityConfig;
@@ -74,7 +71,7 @@ export const getStaticProps: GetStaticProps<
 
   const entityMeta = getEntityListMeta(appConfig.appKey)[entityListType];
 
-  const props: EntitiesPageProps<GA2Catalog> = {
+  const props: Props<GA2Catalog> = {
     entityListType,
     pageDescription: entityMeta?.pageDescription,
     pageTitle: entityMeta?.pageTitle,
@@ -96,6 +93,6 @@ export const getStaticProps: GetStaticProps<
   };
 };
 
-IndexPage.Main = DXMain;
+Page.Main = DXMain;
 
-export default IndexPage;
+export default Page;
