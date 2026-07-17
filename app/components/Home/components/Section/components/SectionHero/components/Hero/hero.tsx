@@ -1,5 +1,3 @@
-import { BlueCircle } from "@/components/Layout/components/Hero/components/Defs/BlueCircle/blueCircle";
-import { BlueRect } from "@/components/Layout/components/Hero/components/Defs/BlueRect/blueRect";
 import {
   FILL,
   GRID_SIZE,
@@ -9,10 +7,8 @@ import {
   getFillUrl,
   getViewBox,
 } from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/common/utils";
-import { CoralPinkCircle } from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/components/Defs/CoralPinkCircle/coralPinkCircle";
 import { SmokeCircle } from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/components/Defs/SmokeCircle/smokeCircle";
 import { SmokeRect } from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/components/Defs/SmokeRect/smokeRect";
-import { YellowRect } from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/components/Defs/YellowRect/yellowRect";
 import { Fragment, JSX } from "react";
 import { SVG } from "./hero.styles";
 
@@ -38,10 +34,6 @@ export const Hero = ({
     >
       <SmokeRect gridSize={gridSize} />
       <SmokeCircle gridSize={gridSize} />
-      <BlueRect gridSize={gridSize} />
-      <YellowRect gridSize={gridSize} />
-      <BlueCircle gridSize={gridSize} />
-      <CoralPinkCircle gridSize={gridSize} />
       {[ELEMENT_ID.PATTERN_SMOKE_RECT, ELEMENT_ID.PATTERN_SMOKE_CIRCLE].map(
         (elementId) => (
           <Fragment key={elementId}>

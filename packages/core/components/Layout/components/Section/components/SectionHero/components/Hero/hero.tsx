@@ -7,10 +7,8 @@ import {
   getFillUrl,
   getViewBox,
 } from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/common/utils";
-import { CoralPinkCircle } from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/components/Defs/CoralPinkCircle/coralPinkCircle";
 import { SmokeCircle } from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/components/Defs/SmokeCircle/smokeCircle";
 import { SmokeRect } from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/components/Defs/SmokeRect/smokeRect";
-import { YellowRect } from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Hero/components/Defs/YellowRect/yellowRect";
 import { Fragment, JSX } from "react";
 import { SVG } from "./hero.styles";
 import { Props } from "./types";
@@ -30,8 +28,6 @@ export const Hero = ({
     >
       <SmokeRect gridSize={gridSize} />
       <SmokeCircle gridSize={gridSize} />
-      <YellowRect gridShift={3} gridSize={gridSize} />
-      <CoralPinkCircle gridSize={gridSize} />
       {[ELEMENT_ID.PATTERN_SMOKE_RECT, ELEMENT_ID.PATTERN_SMOKE_CIRCLE].map(
         (elementId) => (
           <Fragment key={elementId}>
