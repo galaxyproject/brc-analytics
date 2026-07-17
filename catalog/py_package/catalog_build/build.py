@@ -4,7 +4,6 @@ import io
 import json
 import logging
 import os
-import re
 import time
 import urllib
 from dataclasses import asdict, dataclass
@@ -1390,10 +1389,13 @@ def add_galaxy_datacache_url(genomes_df, base_url, timeout=30):
 
     response = requests.get(normalized_base_url, timeout=timeout)
     response.raise_for_status()
+    soup = BeautifulSoup(response.text, "html.parser")
     available = {
-        entry
-        for entry in re.findall(r'href="([^"]+)/"', response.text)
-        if not entry.startswith(("/", ".", "?", "http"))
+        href[:-1]
+        for link in soup.find_all("a")
+        if isinstance(href := link.get("href"), str)
+        and href.endswith("/")
+        and not href.startswith(("/", ".", "?", "http"))
     }
 
     # If autoindex is disabled or the response is unexpected, we'd otherwise
