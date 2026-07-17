@@ -11,6 +11,7 @@ const FILE_EXT = {
 
 import { PrimaryContrasts } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { COLUMN_TYPE } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
+import { ftpToAscp } from "@brc-analytics/core/utils/galaxy-api/url-utils";
 import { UcscTrack } from "@brc-analytics/core/utils/ucsc-tracks-api/types";
 import {
   fetchUcscMd5Checksums,
@@ -44,7 +45,6 @@ import {
   WorkflowLandingsBodyRequestState,
   WorkflowParameterValue,
 } from "./entities";
-import { ftpToAscp } from "./url-utils";
 
 const DOCKSTORE_API_URL = "https://dockstore.org/api/ga4gh/trs/v2/tools";
 

@@ -1,5 +1,5 @@
-import { SLUGIFY_OPTIONS } from "@/common/constants";
 import { ROUTES } from "@brc-analytics/core/routes/constants";
+import { SLUGIFY_OPTIONS } from "@brc-analytics/core/utils/slugify/constants";
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import {
   Section,

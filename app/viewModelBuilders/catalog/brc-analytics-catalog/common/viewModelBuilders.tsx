@@ -9,7 +9,6 @@ import {
   getGenomeOrganismId,
   getOrganismId,
 } from "@/apis/catalog/brc-analytics-catalog/common/utils";
-import { SLUGIFY_OPTIONS } from "@/common/constants";
 import { StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { Main as OrganismViewMain } from "@/views/OrganismView/components/Main/main";
 import { Tabs } from "@/views/OrganismView/components/Tabs/tabs";
@@ -33,6 +32,7 @@ import { Tooltip } from "@brc-analytics/core/components/common/Tooltip/tooltip";
 import { KeyValueSection } from "@brc-analytics/core/components/Entity/components/Section/KeyValueSection/keyValueSection";
 import { MDXSection } from "@brc-analytics/core/components/Entity/components/Section/MDXSection/mdxSection";
 import { ROUTES } from "@brc-analytics/core/routes/constants";
+import { SLUGIFY_OPTIONS } from "@brc-analytics/core/utils/slugify/constants";
 import {
   ORGANISM_SCOPED_TAG_LABELS,
   SPECIES_TAG_LABEL,

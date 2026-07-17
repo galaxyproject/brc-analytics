@@ -1,4 +1,3 @@
-import { AssemblyFavoriteButton } from "@/components/Favorites/AssemblyFavoriteButton/assemblyFavoriteButton";
 import {
   buildAssemblyDetails,
   buildAssemblyResources,
@@ -6,11 +5,12 @@ import {
 } from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import { mapAssemblyToOrganism } from "@/views/WorkflowInputsView/utils";
 import { AnalysisPortals } from "@brc-analytics/core/components/Entity/components/AnalysisPortals/analysisPortals";
-import { StyledSection } from "@brc-analytics/core/views/EntityView/assembly/components/Side/brc/side.styles";
-import { StyledFluidPaper } from "@brc-analytics/core/views/EntityView/assembly/components/Side/side.styles";
+import { AssemblyFavoriteButton } from "@brc-analytics/core/components/Favorites/AssemblyFavoriteButton/assemblyFavoriteButton";
 import { KeyValueSection } from "@brc-analytics/core/views/EntityView/components/KeyValueSection/keyValueSection";
 import { BackPageContentSideColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { JSX } from "react";
+import { StyledFluidPaper } from "../side.styles";
+import { StyledSection } from "./side.styles";
 import { Props } from "./types";
 
 /**

@@ -1,5 +1,5 @@
 import { Outbreak } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import { SLUGIFY_OPTIONS } from "@/common/constants";
+import { SLUGIFY_OPTIONS } from "@brc-analytics/core/utils/slugify/constants";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
 import { AppEntityConfig } from "@site-config/common/entities";
 import slugify from "slugify";
