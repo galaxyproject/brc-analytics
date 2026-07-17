@@ -1,6 +1,6 @@
 import { EntitiesResponse } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { GA2Catalog } from "@/apis/catalog/ga2/entities";
-import { getEntityListMeta } from "@/common/meta/utils";
+import { GA2_PAGE_META } from "@/common/meta/ga2/constants";
 import { config } from "@/config/config";
 import { seedDatabase } from "@brc-analytics/core/utils/seedDatabase";
 import { StyledExploreView } from "@brc-analytics/core/views/ExploreView/exploreView.styles";
@@ -22,6 +22,15 @@ interface Props<R> {
   pageDescription?: string;
   pageTitle?: string;
 }
+
+// GA2 list-route page metadata.
+const ENTITY_LIST_META: Record<
+  string,
+  { pageDescription: string; pageTitle: string }
+> = {
+  assemblies: GA2_PAGE_META.ASSEMBLIES,
+  organisms: GA2_PAGE_META.ORGANISMS,
+};
 
 /**
  * Explore view page for GA2 list routes (organisms, genomes).
@@ -69,7 +78,7 @@ export const getStaticProps: GetStaticProps<Props<GA2Catalog>> = async (
   const { exploreMode } = entityConfig;
   const { fetchAllEntities } = getEntityService(entityConfig, undefined); // Determine the type of fetch, either from an API endpoint or a TSV.
 
-  const entityMeta = getEntityListMeta(appConfig.appKey)[entityListType];
+  const entityMeta = ENTITY_LIST_META[entityListType];
 
   const props: Props<GA2Catalog> = {
     entityListType,

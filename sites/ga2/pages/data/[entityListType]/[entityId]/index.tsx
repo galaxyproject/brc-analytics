@@ -1,6 +1,6 @@
 import { EntitiesResponse } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { GA2Catalog } from "@/apis/catalog/ga2/entities";
-import { getEntityDetailMeta } from "@/common/meta/utils";
+import { GA2_PAGE_META } from "@/common/meta/ga2/constants";
 import { config } from "@/config/config";
 import { getEntities, getEntity } from "@/utils/entityUtils";
 import { AnalyzeView } from "@/views/AnalyzeView/analyzeView";
@@ -25,6 +25,15 @@ export interface Props<R> {
   pageDescription?: string;
   pageTitle?: string;
 }
+
+// GA2 detail-route page metadata.
+const ENTITY_DETAIL_META: Record<
+  string,
+  { pageDescription: string; pageTitle: string }
+> = {
+  assemblies: GA2_PAGE_META.ASSEMBLY_DETAIL,
+  organisms: GA2_PAGE_META.ORGANISM_DETAIL,
+};
 
 /**
  * Entity detail view page.
@@ -98,7 +107,7 @@ export const getStaticProps: GetStaticProps<Props<GA2Catalog>> = async ({
   };
 
   const entityConfig = getEntityConfig(entities, entityListType);
-  const entityMeta = getEntityDetailMeta(appConfig.appKey)[entityListType];
+  const entityMeta = ENTITY_DETAIL_META[entityListType];
 
   const props: Props<GA2Catalog> = {
     entityId,
