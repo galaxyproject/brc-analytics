@@ -1,4 +1,4 @@
-import { sectionLayout } from "@brc-analytics/core/components/Layout/components/AppLayout/components/Section/section.styles";
+import { sectionLayout } from "@brc-analytics/core/components/Layout/components/Section/sectionLayout.styles";
 import styled from "@emotion/styled";
 import { Box, Stack } from "@mui/material";
 

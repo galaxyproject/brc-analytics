@@ -2,7 +2,7 @@ import {
   CONTENT_TYPE,
   FrontmatterProps,
 } from "@/docs/common/frontmatter/types";
-import { sectionLayout } from "@brc-analytics/core/components/Layout/components/AppLayout/components/Section/section.styles";
+import { sectionLayout } from "@brc-analytics/core/components/Layout/components/Section/sectionLayout.styles";
 import {
   Content,
   ContentLayout,

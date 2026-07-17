@@ -1,11 +1,11 @@
-import { headline } from "@brc-analytics/core/components/Layout/components/AppLayout/components/Section/headline.styles";
+import { headline } from "@brc-analytics/core/components/Layout/components/Section/headline.styles";
 import {
   sectionGrid,
   sectionGridAreas,
   sectionLayout,
   sectionSubHero,
   sectionWithDivider,
-} from "@brc-analytics/core/components/Layout/components/AppLayout/components/Section/section.styles";
+} from "@brc-analytics/core/components/Layout/components/Section/sectionLayout.styles";
 import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { bpUpSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";

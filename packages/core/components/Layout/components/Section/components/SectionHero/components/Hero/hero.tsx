@@ -13,18 +13,13 @@ import { SmokeRect } from "@brc-analytics/core/components/Layout/components/Hero
 import { YellowRect } from "@brc-analytics/core/components/Layout/components/Hero/components/Defs/YellowRect/yellowRect";
 import { Fragment, JSX } from "react";
 import { SVG } from "./hero.styles";
-
-export interface HeroProps {
-  gridSize?: number;
-  height?: number;
-  width?: number;
-}
+import { Props } from "./types";
 
 export const Hero = ({
   gridSize = GRID_SIZE,
   height = gridSize * 1.5,
   width = 0,
-}: HeroProps): JSX.Element => {
+}: Props): JSX.Element => {
   return (
     <SVG
       fill={FILL.NONE}

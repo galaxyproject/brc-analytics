@@ -2,11 +2,11 @@ import {
   CONTENT_TYPE,
   FrontmatterProps,
 } from "@/docs/common/frontmatter/types";
-import { SectionHero } from "@brc-analytics/core/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
+import { SectionHero } from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/sectionHero";
 import {
   Head,
   SectionLayout,
-} from "@brc-analytics/core/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero.styles";
+} from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/sectionHero.styles";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 

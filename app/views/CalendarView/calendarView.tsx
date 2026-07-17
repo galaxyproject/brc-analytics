@@ -3,7 +3,7 @@ import {
   SectionContent,
   SectionLayout,
 } from "@/components/content/content.styles";
-import { SectionHero } from "@brc-analytics/core/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
+import { SectionHero } from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/sectionHero";
 import { Fragment, JSX } from "react";
 import { BREADCRUMBS } from "./common/constants";
 

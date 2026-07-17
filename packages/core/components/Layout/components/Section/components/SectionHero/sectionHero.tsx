@@ -1,10 +1,6 @@
 import { calculateGridSize } from "@brc-analytics/core/components/Layout/components/Hero/common/utils";
-import {
-  Breadcrumb,
-  Breadcrumbs,
-} from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
-import { BaseComponentProps } from "@databiosphere/findable-ui/lib/components/types";
-import { Fragment, JSX, ReactNode } from "react";
+import { Breadcrumbs } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
+import { Fragment, JSX } from "react";
 import { Hero } from "./components/Hero/hero";
 import {
   Head,
@@ -14,19 +10,14 @@ import {
   Subhead,
   SubHeadline,
 } from "./sectionHero.styles";
-
-export interface SectionHeroProps extends BaseComponentProps {
-  breadcrumbs: Breadcrumb[];
-  head: ReactNode;
-  subHead: ReactNode;
-}
+import { Props } from "./types";
 
 export const SectionHero = ({
   breadcrumbs,
   className,
   head,
   subHead,
-}: SectionHeroProps): JSX.Element => {
+}: Props): JSX.Element => {
   return (
     <StyledSection className={className}>
       {(height, width): JSX.Element => (

@@ -1,8 +1,8 @@
+import { Section } from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/components/Section/section";
 import {
   sectionGrid,
   sectionLayout,
-} from "@brc-analytics/core/components/Layout/components/AppLayout/components/Section/section.styles";
-import { Section } from "@brc-analytics/core/components/common/Section/section";
+} from "@brc-analytics/core/components/Layout/components/Section/sectionLayout.styles";
 import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { bpUpSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";

@@ -4,13 +4,9 @@ import {
 } from "@databiosphere/findable-ui/lib/hooks/useResizeObserver";
 import { JSX, useRef } from "react";
 import { StyledSection } from "./section.styles";
+import { Props } from "./types";
 
-export interface SectionProps {
-  children: (height?: number, width?: number) => JSX.Element;
-  className?: string;
-}
-
-export const Section = ({ children, className }: SectionProps): JSX.Element => {
+export const Section = ({ children, className }: Props): JSX.Element => {
   const sectionRef = useRef<HTMLElement>(null);
   const { height, width } =
     useResizeObserver(sectionRef, getBorderBoxSize) || {};

@@ -1,6 +1,6 @@
 import { BRC_ROUTES } from "@/routes/constants";
-import { SectionHero } from "@brc-analytics/core/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import { StyledPagesMain } from "@brc-analytics/core/components/Layout/components/Main/main.styles";
+import { SectionHero } from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/sectionHero";
 import { useAuth } from "@brc-analytics/core/providers/authentication/provider";
 import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { apiClient } from "@brc-analytics/core/services/api-client";

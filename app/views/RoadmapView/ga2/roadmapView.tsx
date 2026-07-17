@@ -1,5 +1,5 @@
 import { SectionRoadmap } from "@/components/content/ga2";
-import { SectionHero } from "@brc-analytics/core/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
+import { SectionHero } from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/sectionHero";
 import { Fragment, JSX } from "react";
 import { BREADCRUMBS } from "../common/constants";
 

@@ -1,5 +1,5 @@
 import { SectionVision } from "@/components/content";
-import { SectionHero } from "@brc-analytics/core/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
+import { SectionHero } from "@brc-analytics/core/components/Layout/components/Section/components/SectionHero/sectionHero";
 import { Fragment, JSX } from "react";
 
 export const VisionView = (): JSX.Element => {
