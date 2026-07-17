@@ -12,9 +12,9 @@ import {
 import { LevelCell } from "@brc-analytics/core/components/common/Table/components/TableCell/components/LevelCell/levelCell";
 import type { SpeciesTag } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/types";
 import { Tooltip } from "@brc-analytics/core/components/common/Tooltip/tooltip";
-import { AnalysisPortals } from "@brc-analytics/core/components/Entity/components/AnalysisPortals/analysisPortals";
 import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { formatDate } from "@brc-analytics/core/utils/date-fns";
+import { AnalysisPortals } from "@brc-analytics/core/views/EntityView/assembly/components/Side/AnalysisPortals/analysisPortals";
 import { KeyElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/KeyElType/keyElType";
 import { ValueElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/ValueElType/valueElType";
 import {
