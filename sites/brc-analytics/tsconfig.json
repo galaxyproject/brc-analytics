@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["../../app/*"],
+      "@brc-analytics/core": ["../../packages/core/index.ts"],
+      "@brc-analytics/core/*": ["../../packages/core/*"],
+      "@site-config/*": ["../../site-config/*"],
+      "catalog/*": ["../../catalog/*"],
+      "images/*": ["../../images/*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}

@@ -2,5 +2,13 @@
   "name": "@brc-analytics/ga2",
   "version": "0.0.0",
   "private": true,
-  "description": "Genome Ark 2: explore and analyze reference genome assemblies using Galaxy workflows."
+  "description": "Genome Ark 2: explore and analyze reference genome assemblies using Galaxy workflows.",
+  "scripts": {
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@brc-analytics/core": "*"
+  }
 }

@@ -62,3 +62,7 @@ playwright-report/
 
 # Claude
 .claude/rules*
+
+# per-site Next build artifacts
+sites/*/.next/
+sites/*/out/
