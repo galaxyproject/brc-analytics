@@ -1,5 +1,5 @@
 import { Section } from "@brc-analytics/core/components/Entity/components/Section/section";
-import { FluidPaper } from "@brc-analytics/core/components/common/Paper/components/FluidPaper/fluidPaper";
+import { FluidPaper } from "@brc-analytics/core/components/Paper/components/FluidPaper/fluidPaper";
 import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { ListItem } from "@mui/material";
 import { JSX } from "react";

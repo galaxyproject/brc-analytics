@@ -24,14 +24,14 @@ import type {
   OrganismContract,
 } from "@brc-analytics/core/apis/types";
 import { AppLink } from "@brc-analytics/core/components/AppLink/appLink";
-import { AnalyzeGenome } from "@brc-analytics/core/components/common/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
-import { LevelCell } from "@brc-analytics/core/components/common/Table/components/TableCell/components/LevelCell/levelCell";
-import { TagList } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
-import { SpeciesCell } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/speciesCell";
-import type { SpeciesTag } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/types";
-import { Tooltip } from "@brc-analytics/core/components/common/Tooltip/tooltip";
 import { KeyValueSection } from "@brc-analytics/core/components/Entity/components/Section/KeyValueSection/keyValueSection";
 import { MDXSection } from "@brc-analytics/core/components/Entity/components/Section/MDXSection/mdxSection";
+import { AnalyzeGenome } from "@brc-analytics/core/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
+import { LevelCell } from "@brc-analytics/core/components/Table/components/TableCell/components/LevelCell/levelCell";
+import { TagList } from "@brc-analytics/core/components/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
+import { SpeciesCell } from "@brc-analytics/core/components/Table/components/TableCell/components/SpeciesCell/speciesCell";
+import type { SpeciesTag } from "@brc-analytics/core/components/Table/components/TableCell/components/SpeciesCell/types";
+import { Tooltip } from "@brc-analytics/core/components/Tooltip/tooltip";
 import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { SLUGIFY_OPTIONS } from "@brc-analytics/core/utils/slugify/constants";
 import {

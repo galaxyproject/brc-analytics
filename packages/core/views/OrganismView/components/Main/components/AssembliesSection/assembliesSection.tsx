@@ -1,4 +1,4 @@
-import { Table } from "@brc-analytics/core/components/common/Table/table";
+import { Table } from "@brc-analytics/core/components/Table/table";
 import { StyledSectionTitle } from "@brc-analytics/core/views/OrganismView/components/Main/main.styles";
 import { Toolbar } from "@brc-analytics/core/views/OrganismView/components/Main/table/components/Toolbar/toolbar";
 import { useTable } from "@brc-analytics/core/views/OrganismView/components/Main/table/hooks/UseTable/hook";

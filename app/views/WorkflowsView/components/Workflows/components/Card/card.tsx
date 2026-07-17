@@ -1,5 +1,5 @@
 import { CHIP_PROPS } from "@/views/AnalyzeWorkflowsView/components/Main/components/Accordion/constants";
-import { TruncatedText } from "@brc-analytics/core/components/common/TruncatedText/truncatedText";
+import { TruncatedText } from "@brc-analytics/core/components/TruncatedText/truncatedText";
 import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/components/RoundedPaper/roundedPaper";
 import {

@@ -5,12 +5,12 @@ import {
 import { OrganismAvatar } from "@/components/Entity/components/OrganismAvatar/organismAvatar";
 import { Main as OrganismViewMain } from "@/views/OrganismView/components/Main/main";
 import { sanitizeEntityId } from "@brc-analytics/core/apis/utils";
-import { AnalyzeGenome } from "@brc-analytics/core/components/common/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
-import { LevelCell } from "@brc-analytics/core/components/common/Table/components/TableCell/components/LevelCell/levelCell";
-import { TagList } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
-import { SpeciesCell } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/speciesCell";
-import type { SpeciesTag } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/types";
-import { Tooltip } from "@brc-analytics/core/components/common/Tooltip/tooltip";
+import { AnalyzeGenome } from "@brc-analytics/core/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
+import { LevelCell } from "@brc-analytics/core/components/Table/components/TableCell/components/LevelCell/levelCell";
+import { TagList } from "@brc-analytics/core/components/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
+import { SpeciesCell } from "@brc-analytics/core/components/Table/components/TableCell/components/SpeciesCell/speciesCell";
+import type { SpeciesTag } from "@brc-analytics/core/components/Table/components/TableCell/components/SpeciesCell/types";
+import { Tooltip } from "@brc-analytics/core/components/Tooltip/tooltip";
 import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { ORGANISM_SCOPED_TAG_LABELS } from "@brc-analytics/core/viewModelBuilders/constants";
 import {

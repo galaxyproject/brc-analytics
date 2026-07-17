@@ -1,13 +1,13 @@
 import { SelectCell } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/ReferenceAssemblyStep/components/AssemblyData/components/AssemblySelector/components/Table/components/TableCell/components/SelectCell/selectCell";
 import {
-  buildNTagProps,
-  renderNTagCell,
-} from "@brc-analytics/core/components/common/Table/components/TableCell/components/NTagCell/utils";
-import {
   getAssemblyIsolate,
   getAssemblySerotype,
 } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/ReferenceAssemblyStep/components/AssemblyData/components/AssemblySelector/hooks/UseTable/accessorFn";
 import { CATEGORY_CONFIGS } from "@brc-analytics/core/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/ReferenceAssemblyStep/components/AssemblyData/components/AssemblySelector/hooks/UseTable/categoryConfigs";
+import {
+  buildNTagProps,
+  renderNTagCell,
+} from "@brc-analytics/core/components/Table/components/TableCell/components/NTagCell/utils";
 import { ColumnDef, SortingColumnDef } from "@tanstack/react-table";
 import { Assembly } from "./types";
 import { renderIsRef, renderNumber, renderPloidy } from "./viewBuilders";

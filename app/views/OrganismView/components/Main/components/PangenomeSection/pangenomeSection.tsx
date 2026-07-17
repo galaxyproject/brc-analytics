@@ -1,5 +1,5 @@
 import { useShowPangenome } from "@/views/OrganismView/hooks/UseShowPangenome/hook";
-import { Table } from "@brc-analytics/core/components/common/Table/table";
+import { Table } from "@brc-analytics/core/components/Table/table";
 import { StyledSectionTitle } from "@brc-analytics/core/views/OrganismView/components/Main/main.styles";
 import { useTable } from "@brc-analytics/core/views/OrganismView/components/Main/table/hooks/UseTable/hook";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";

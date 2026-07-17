@@ -1,5 +1,5 @@
-import { SpeciesCellProps } from "@brc-analytics/core/components/common/Table/components/TableCell/components/SpeciesCell/types";
-import { Tooltip } from "@brc-analytics/core/components/common/Tooltip/tooltip";
+import { SpeciesCellProps } from "@brc-analytics/core/components/Table/components/TableCell/components/SpeciesCell/types";
+import { Tooltip } from "@brc-analytics/core/components/Tooltip/tooltip";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { STACK_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/stack";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";

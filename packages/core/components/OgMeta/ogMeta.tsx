@@ -1,14 +1,7 @@
 import NextHead from "next/head";
 import { useRouter } from "next/router";
 import { JSX } from "react";
-
-interface OgMetaProps {
-  appTitle: string;
-  browserURL: string;
-  defaultDescription: string;
-  pageDescription?: string;
-  pageTitle?: string;
-}
+import { Props } from "./types";
 
 export const OgMeta = ({
   appTitle,
@@ -16,7 +9,7 @@ export const OgMeta = ({
   defaultDescription,
   pageDescription,
   pageTitle,
-}: OgMetaProps): JSX.Element => {
+}: Props): JSX.Element => {
   const { asPath } = useRouter();
   const title =
     pageTitle && pageTitle !== appTitle
