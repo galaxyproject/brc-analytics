@@ -1,3 +1,4 @@
+import { EntitiesResponse } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { getDefaultDescription } from "@/common/meta/utils";
 import { config } from "@/config/config";
 import { useEntities } from "@/services/workflows/hooks/UseEntities/hook";
@@ -8,7 +9,6 @@ import { OgMeta } from "@brc-analytics/core/components/OgMeta/ogMeta";
 import { EntitiesLoadedProvider } from "@brc-analytics/core/providers/entitiesLoaded/provider";
 import { WorkflowHandoffProvider } from "@brc-analytics/core/providers/workflowHandoff/provider";
 import "@databiosphere/findable-ui";
-import { AzulEntitiesStaticResponse } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import { Error } from "@databiosphere/findable-ui/lib/components/Error/error";
 import { ErrorBoundary } from "@databiosphere/findable-ui/lib/components/ErrorBoundary/errorBoundary";
 import { Head } from "@databiosphere/findable-ui/lib/components/Head/head";
@@ -38,13 +38,14 @@ import { JSX } from "react";
 
 const DEFAULT_ENTITY_LIST_TYPE = "organisms";
 
-export interface PageProps extends AzulEntitiesStaticResponse {
+export interface PageProps {
+  data?: EntitiesResponse<unknown>;
+  entityListType?: string;
   pageDescription?: string;
   pageTitle?: string;
 }
 
 export type NextPageWithComponent = NextPage & {
-  AppLayout?: typeof DXAppLayout;
   Main?: typeof DXMain;
 };
 
@@ -77,7 +78,6 @@ function GA2App(props: AppPropsWithComponent): JSX.Element {
     themeOptions,
   } = pageProps;
   const appTheme = mergeAppTheme(baseThemeOptions, themeOptions);
-  const AppLayout = Component.AppLayout || DXAppLayout;
   const Main = Component.Main || DXMain;
 
   return (
@@ -98,7 +98,7 @@ function GA2App(props: AppPropsWithComponent): JSX.Element {
               <ServicesProvider>
                 <SystemStatusProvider>
                   <LayoutDimensionsProvider>
-                    <AppLayout>
+                    <DXAppLayout>
                       <DXHeader {...header} />
                       <ExploreStateProvider entityListType={entityListType}>
                         <WorkflowHandoffProvider>
@@ -128,7 +128,7 @@ function GA2App(props: AppPropsWithComponent): JSX.Element {
                         </WorkflowHandoffProvider>
                       </ExploreStateProvider>
                       <StyledFooter {...footer} />
-                    </AppLayout>
+                    </DXAppLayout>
                   </LayoutDimensionsProvider>
                 </SystemStatusProvider>
               </ServicesProvider>
