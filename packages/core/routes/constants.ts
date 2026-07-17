@@ -6,6 +6,7 @@ export const ROUTES = {
   CONFIGURE_WORKFLOW: "/data/assemblies/{entityId}/analyze/workflows/{trsId}",
   GENOME: "/data/assemblies/{entityId}",
   GENOMES: "/data/assemblies",
+  HOME: "/",
   ORGANISM: "/data/organisms/{entityId}",
   ORGANISMS: "/data/organisms",
   WORKFLOW: "/data/workflows/{trsId}",

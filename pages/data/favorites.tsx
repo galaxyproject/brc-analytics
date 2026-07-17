@@ -1,9 +1,11 @@
+import { BRC_ROUTES } from "@/routes/constants";
 import { Assembly } from "@/views/WorkflowInputsView/types";
 import { sanitizeEntityId } from "@brc-analytics/core/apis/utils";
 import { useAssemblyFavorites } from "@brc-analytics/core/components/Favorites/hooks/UseAssemblyFavorites/hook";
 import { SectionHero } from "@brc-analytics/core/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import { StyledPagesMain } from "@brc-analytics/core/components/Layout/components/Main/main.styles";
 import { useAuth } from "@brc-analytics/core/providers/authentication/provider";
+import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { getEntity } from "@brc-analytics/core/services/workflows/query";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
@@ -19,11 +21,11 @@ import { JSX } from "react";
 
 const BREADCRUMBS: Breadcrumb[] = [
   {
-    path: "/",
+    path: ROUTES.HOME,
     text: "Home",
   },
   {
-    path: "/data/favorites",
+    path: BRC_ROUTES.FAVORITES,
     text: "Favorites",
   },
 ];

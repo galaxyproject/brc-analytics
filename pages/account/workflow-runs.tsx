@@ -1,6 +1,8 @@
+import { BRC_ROUTES } from "@/routes/constants";
 import { SectionHero } from "@brc-analytics/core/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import { StyledPagesMain } from "@brc-analytics/core/components/Layout/components/Main/main.styles";
 import { useAuth } from "@brc-analytics/core/providers/authentication/provider";
+import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { apiClient } from "@brc-analytics/core/services/api-client";
 import { WorkflowRunResponse } from "@brc-analytics/core/types/api";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
@@ -17,11 +19,11 @@ import { JSX, useEffect, useState } from "react";
 
 const BREADCRUMBS: Breadcrumb[] = [
   {
-    path: "/",
+    path: ROUTES.HOME,
     text: "Home",
   },
   {
-    path: "/account/workflow-runs",
+    path: BRC_ROUTES.ACCOUNT_WORKFLOW_RUNS,
     text: "Workflow Runs",
   },
 ];
