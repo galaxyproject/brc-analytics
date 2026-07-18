@@ -13,6 +13,7 @@ import duckdb
 import pandas as pd
 import requests
 import yaml
+import bs4
 from bs4 import BeautifulSoup
 from requests.exceptions import ConnectTimeout
 
@@ -1393,7 +1394,8 @@ def add_galaxy_datacache_url(genomes_df, base_url, timeout=30):
     available = {
         href[:-1]
         for link in soup.find_all("a")
-        if isinstance(href := link.get("href"), str)
+        if isinstance(link, bs4.Tag)
+        and isinstance(href := link.get("href"), str)
         and href.endswith("/")
         and not href.startswith(("/", ".", "?", "http"))
     }
