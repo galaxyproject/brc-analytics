@@ -2,8 +2,7 @@ import {
   BRCCatalog,
   EntitiesResponse,
 } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import { GA2Catalog } from "@/apis/catalog/ga2/entities";
-import { getEntityDetailMeta } from "@/common/meta/utils";
+import { BRC_PAGE_META } from "@/common/meta/brc/constants";
 import { config } from "@/config/config";
 import { getEntities, getEntity } from "@/utils/entityUtils";
 import { AnalyzeView } from "@/views/AnalyzeView/analyzeView";
@@ -12,20 +11,21 @@ import { seedDatabase } from "@brc-analytics/core/utils/seedDatabase";
 import { EntityDetailView } from "@brc-analytics/core/views/EntityView/entityView";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { getEntityConfig } from "@databiosphere/findable-ui/lib/config/utils";
-import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
+import {
+  GetStaticPaths,
+  GetStaticPathsResult,
+  GetStaticProps,
+  GetStaticPropsContext,
+} from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
 
-interface StaticPath {
-  params: PageUrl;
-}
-
-interface PageUrl extends ParsedUrlQuery {
+interface Params extends ParsedUrlQuery {
   entityId: string;
   entityListType: string;
 }
 
-export interface EntityPageProps<R> {
+export interface Props<R> {
   data?: R;
   entityId: string;
   entityListType: string;
@@ -33,12 +33,22 @@ export interface EntityPageProps<R> {
   pageTitle?: string;
 }
 
+// BRC detail-route page metadata.
+const ENTITY_DETAIL_META: Record<
+  string,
+  { pageDescription: string; pageTitle: string }
+> = {
+  assemblies: BRC_PAGE_META.ASSEMBLY_DETAIL,
+  organisms: BRC_PAGE_META.ORGANISM_DETAIL,
+  "priority-pathogens": BRC_PAGE_META.PRIORITY_PATHOGEN_DETAIL,
+};
+
 /**
  * Entity detail view page.
  * @param props - Entity detail view page props.
  * @returns Entity detail view component.
  */
-const EntityDetailPage = <R,>(props: EntityPageProps<R>): JSX.Element => {
+const Page = <R,>(props: Props<R>): JSX.Element => {
   // AnalyzeView reads from the workflows cache directly; EntityDetailView's
   // tab configs (e.g. OrganismView main column) also consume the cache via
   // getWorkflows(). Both branches need the cache before rendering.
@@ -58,13 +68,13 @@ const EntityDetailPage = <R,>(props: EntityPageProps<R>): JSX.Element => {
 
 /**
  * getStaticPaths - return the list of paths to prerender for each entity type and its tabs.
- * @returns Promise<GetStaticPaths<PageUrl>>.
+ * @returns Promise<GetStaticPaths<Params>>.
  */
-export const getStaticPaths: GetStaticPaths<PageUrl> = async () => {
+export const getStaticPaths: GetStaticPaths<Params> = async () => {
   const appConfig = config();
   const { entities } = appConfig;
 
-  const paths: StaticPath[] = [];
+  const paths: GetStaticPathsResult<Params>["paths"] = [];
 
   for (const entityConfig of entities) {
     const { route: entityListType } = entityConfig;
@@ -72,7 +82,7 @@ export const getStaticPaths: GetStaticPaths<PageUrl> = async () => {
     if (entityListType === "workflows") continue;
 
     await seedDatabase(entityListType, entityConfig);
-    const entitiesResponse: EntitiesResponse<BRCCatalog | GA2Catalog> =
+    const entitiesResponse: EntitiesResponse<BRCCatalog> =
       await getEntities(entityConfig);
     processEntityPaths(entityConfig, entitiesResponse, paths);
   }
@@ -87,11 +97,11 @@ export const getStaticPaths: GetStaticPaths<PageUrl> = async () => {
  * getStaticProps - return the entity data for the given entity type and entity ID.
  * @param context - GetStaticPropsContext.
  * @param context.params - Entity type and entity ID.
- * @returns Promise<GetStaticPropsContext<PageUrl>>.
+ * @returns Promise<GetStaticPropsContext<Params>>.
  */
-export const getStaticProps: GetStaticProps<
-  EntityPageProps<BRCCatalog | GA2Catalog>
-> = async ({ params }: GetStaticPropsContext) => {
+export const getStaticProps: GetStaticProps<Props<BRCCatalog>> = async ({
+  params,
+}: GetStaticPropsContext) => {
   const appConfig = config();
   const { entities } = appConfig;
 
@@ -105,9 +115,9 @@ export const getStaticProps: GetStaticProps<
   };
 
   const entityConfig = getEntityConfig(entities, entityListType);
-  const entityMeta = getEntityDetailMeta(appConfig.appKey)[entityListType];
+  const entityMeta = ENTITY_DETAIL_META[entityListType];
 
-  const props: EntityPageProps<BRCCatalog | GA2Catalog> = {
+  const props: Props<BRCCatalog> = {
     entityId,
     entityListType,
     pageDescription: entityMeta?.pageDescription,
@@ -117,12 +127,10 @@ export const getStaticProps: GetStaticProps<
   // Process entity props.
   await processEntityProps(entityConfig, entityId, props);
 
-  return {
-    props,
-  };
+  return { props };
 };
 
-export default EntityDetailPage;
+export default Page;
 
 /**
  * Processes the static paths for the given entity response.
@@ -133,7 +141,7 @@ export default EntityDetailPage;
 function processEntityPaths<R>(
   entityConfig: EntityConfig,
   entitiesResponse: EntitiesResponse<R>,
-  paths: StaticPath[]
+  paths: GetStaticPathsResult<Params>["paths"]
 ): void {
   const { route: entityListType } = entityConfig;
   const { hits: entities } = entitiesResponse;
@@ -158,7 +166,7 @@ function processEntityPaths<R>(
 async function processEntityProps<R>(
   entityConfig: EntityConfig,
   entityId: string,
-  props: EntityPageProps<R>
+  props: Props<R>
 ): Promise<void> {
   const {
     detail: { staticLoad },

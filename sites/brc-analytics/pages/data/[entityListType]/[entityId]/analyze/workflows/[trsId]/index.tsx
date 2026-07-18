@@ -1,8 +1,9 @@
 import {
+  BRCDataCatalogGenome,
   EntitiesResponse,
   WorkflowCategory,
 } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import { getPageMeta } from "@/common/meta/utils";
+import { BRC_PAGE_META } from "@/common/meta/brc/constants";
 import { config } from "@/config/config";
 import { getEntities } from "@/utils/entityUtils";
 import {
@@ -12,12 +13,12 @@ import {
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { buildOrganismWorkflows } from "@/views/OrganismView/components/Main/utils";
 import { OrganismWorkflowInputsView } from "@/views/OrganismWorkflowInputsView/organismWorkflowInputsView";
-import { Assembly } from "@/views/WorkflowInputsView/types";
 import { WorkflowInputsView } from "@/views/WorkflowInputsView/workflowInputsView";
 import { EntityDataGate } from "@brc-analytics/core/components/EntityDataGate/entityDataGate";
 import { seedDatabase } from "@brc-analytics/core/utils/seedDatabase";
 import type { Organism } from "@brc-analytics/core/views/OrganismView/types";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import workflowsData from "catalog/output/workflows.json";
 import {
   GetStaticPaths,
   GetStaticPathsResult,
@@ -26,7 +27,6 @@ import {
 } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
-import workflowsData from "../../../../../../../catalog/output/workflows.json";
 
 // Cast the schema-validated catalog JSON to its typed shape.
 const workflows = workflowsData as unknown as WorkflowCategory[];
@@ -45,6 +45,21 @@ interface Props {
   trsId: string;
 }
 
+const Page = (props: Props): JSX.Element => {
+  return (
+    <EntityDataGate>
+      {props.entityListType === "organisms" ? (
+        <OrganismWorkflowInputsView
+          entityId={props.entityId}
+          trsId={props.trsId}
+        />
+      ) : (
+        <WorkflowInputsView {...props} />
+      )}
+    </EntityDataGate>
+  );
+};
+
 export const getStaticPaths: GetStaticPaths = async () => {
   const appConfig = config();
   const { entities } = appConfig;
@@ -57,7 +72,8 @@ export const getStaticPaths: GetStaticPaths = async () => {
   if (assemblyConfig) {
     await seedDatabase("assemblies", assemblyConfig);
 
-    const entitiesResponse = await getEntities<Assembly>(assemblyConfig);
+    const entitiesResponse =
+      await getEntities<BRCDataCatalogGenome>(assemblyConfig);
 
     processAssemblyPaths(assemblyConfig, entitiesResponse, paths);
   }
@@ -92,25 +108,10 @@ export const getStaticProps = async (
     props: {
       entityId,
       entityListType,
-      ...getPageMeta(config().appKey).CONFIGURE_WORKFLOW,
+      ...BRC_PAGE_META.CONFIGURE_WORKFLOW,
       trsId,
     },
   };
-};
-
-const Page = (props: Props): JSX.Element => {
-  return (
-    <EntityDataGate>
-      {props.entityListType === "organisms" ? (
-        <OrganismWorkflowInputsView
-          entityId={props.entityId}
-          trsId={props.trsId}
-        />
-      ) : (
-        <WorkflowInputsView {...props} />
-      )}
-    </EntityDataGate>
-  );
 };
 
 export default Page;
@@ -123,7 +124,7 @@ export default Page;
  */
 function processAssemblyPaths(
   entityConfig: EntityConfig,
-  entitiesResponse: EntitiesResponse<Assembly>,
+  entitiesResponse: EntitiesResponse<BRCDataCatalogGenome>,
   paths: GetStaticPathsResult<Params>["paths"]
 ): void {
   const { route: entityListType } = entityConfig;
@@ -151,7 +152,7 @@ function processAssemblyPaths(
 
     // Create paths for each compatible workflow.
     compatibleWorkflows.forEach((workflow) => {
-      // Format the trsId for URL use
+      // Format the trsId for URL use.
       const trsId = formatTrsId(workflow.trsId);
       paths.push({
         params: {

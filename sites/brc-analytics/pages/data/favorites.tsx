@@ -1,5 +1,5 @@
 import { BRC_ROUTES } from "@/routes/constants";
-import { Assembly } from "@/views/WorkflowInputsView/types";
+import type { AssemblyContract } from "@brc-analytics/core/apis/types";
 import { sanitizeEntityId } from "@brc-analytics/core/apis/utils";
 import { useAssemblyFavorites } from "@brc-analytics/core/components/Favorites/hooks/UseAssemblyFavorites/hook";
 import { StyledPagesMain } from "@brc-analytics/core/components/Layout/components/Main/main.styles";
@@ -39,9 +39,12 @@ export default function FavoritesPage(): JSX.Element {
   } = useAuth();
   const { error, favorites, isLoading } = useAssemblyFavorites();
 
-  function getAssembly(accession: string): Assembly | null {
+  function getAssembly(accession: string): AssemblyContract | null {
     try {
-      return getEntity<Assembly>("assemblies", sanitizeEntityId(accession));
+      return getEntity<AssemblyContract>(
+        "assemblies",
+        sanitizeEntityId(accession)
+      );
     } catch {
       return null;
     }

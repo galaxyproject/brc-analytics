@@ -1,7 +1,8 @@
-import { getPageMeta } from "@/common/meta/utils";
+import { BRC_PAGE_META } from "@/common/meta/brc/constants";
 import { config } from "@/config/config";
 import { getEntities } from "@/utils/entityUtils";
-import { AnalyzeWorkflowsView } from "@/views/AnalyzeWorkflowsView/analyzeWorkflowsView";
+import { CUSTOM_WORKFLOW } from "@/views/AnalyzeWorkflowsView/custom/constants";
+import { WorkflowInputsView } from "@/views/WorkflowInputsView/workflowInputsView";
 import { EntityDataGate } from "@brc-analytics/core/components/EntityDataGate/entityDataGate";
 import { seedDatabase } from "@brc-analytics/core/utils/seedDatabase";
 import {
@@ -20,10 +21,23 @@ interface Params extends ParsedUrlQuery {
 
 export interface Props {
   entityId: string;
-  entityListType: string;
   pageDescription?: string;
   pageTitle?: string;
+  trsId: string;
 }
+
+/**
+ * Custom workflow view page.
+ * @param props - Page props.
+ * @returns Custom workflow view component.
+ */
+const Page = (props: Props): JSX.Element => {
+  return (
+    <EntityDataGate>
+      <WorkflowInputsView {...props} />
+    </EntityDataGate>
+  );
+};
 
 export const getStaticPaths: GetStaticPaths<Params> = async () => {
   const paths: GetStaticPathsResult<Params>["paths"] = [];
@@ -31,7 +45,7 @@ export const getStaticPaths: GetStaticPaths<Params> = async () => {
   for (const entityConfig of config().entities) {
     const { route: entityListType } = entityConfig;
 
-    // Only statically generate paths for assemblies.
+    // Only statically generate paths for each assembly.
     if (entityListType !== "assemblies") continue;
 
     await seedDatabase(entityListType, entityConfig);
@@ -53,32 +67,18 @@ export const getStaticPaths: GetStaticPaths<Params> = async () => {
 export const getStaticProps: GetStaticProps<Props> = async ({
   params,
 }: GetStaticPropsContext) => {
-  const { entityId, entityListType } = params as Params;
+  const { entityId } = params as Params;
 
-  if (!entityId || !entityListType) return { notFound: true };
+  if (!entityId) return { notFound: true };
 
-  const pageMeta = getPageMeta(config().appKey).ANALYZE_WORKFLOWS;
-
+  // Pass the custom workflow TRS ID so the correct workflow loads in WorkflowInputsView.
   return {
     props: {
       entityId,
-      entityListType,
-      ...pageMeta,
+      ...BRC_PAGE_META.CUSTOM_WORKFLOW,
+      trsId: CUSTOM_WORKFLOW.trsId,
     },
   };
-};
-
-/**
- * Analyze Workflows view page.
- * @param props - Page props.
- * @returns Analyze Workflows view component.
- */
-const Page = (props: Props): JSX.Element => {
-  return (
-    <EntityDataGate>
-      <AnalyzeWorkflowsView entityId={props.entityId} />
-    </EntityDataGate>
-  );
 };
 
 export default Page;

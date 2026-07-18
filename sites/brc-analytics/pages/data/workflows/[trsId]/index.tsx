@@ -1,15 +1,19 @@
-import { getPageMeta } from "@/common/meta/utils";
-import { config } from "@/config/config";
+import { BRC_PAGE_META } from "@/common/meta/brc/constants";
 import { formatTrsId } from "@/views/AnalyzeWorkflowsView/components/Main/utils";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { LEXICMAP } from "@/views/AnalyzeWorkflowsView/lexicmap/constants";
 import { LOGAN_SEARCH } from "@/views/AnalyzeWorkflowsView/loganSearch/constants";
 import { WorkflowView } from "@/views/WorkflowView/workflowView";
 import { EntityDataGate } from "@brc-analytics/core/components/EntityDataGate/entityDataGate";
-import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
+import workflowCategories from "catalog/output/workflows.json";
+import {
+  GetStaticPaths,
+  GetStaticPathsResult,
+  GetStaticProps,
+  GetStaticPropsContext,
+} from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
-import workflowCategories from "../../../../catalog/output/workflows.json";
 
 interface Params extends ParsedUrlQuery {
   trsId: string;
@@ -21,6 +25,19 @@ export interface Props {
   trsId: string;
 }
 
+/**
+ * Workflow view page.
+ * @param props - Page props.
+ * @returns Workflow view component.
+ */
+const Page = (props: Props): JSX.Element => {
+  return (
+    <EntityDataGate>
+      <WorkflowView {...props} />
+    </EntityDataGate>
+  );
+};
+
 export const getStaticPaths: GetStaticPaths<Params> = async () => {
   const paths = workflowCategories.reduce(
     (acc, { workflows }) => {
@@ -29,7 +46,7 @@ export const getStaticPaths: GetStaticPaths<Params> = async () => {
       }
       return acc;
     },
-    [] as { params: Params }[]
+    [] as GetStaticPathsResult<Params>["paths"]
   );
 
   // Add Differential Expression Analysis workflow (interim measure).
@@ -57,23 +74,10 @@ export const getStaticProps: GetStaticProps<Props> = async ({
 
   return {
     props: {
-      ...getPageMeta(config().appKey).WORKFLOW,
+      ...BRC_PAGE_META.WORKFLOW,
       trsId,
     },
   };
-};
-
-/**
- * Workflow view page.
- * @param props - Page props.
- * @returns Workflow view component.
- */
-const Page = (props: Props): JSX.Element => {
-  return (
-    <EntityDataGate>
-      <WorkflowView {...props} />
-    </EntityDataGate>
-  );
 };
 
 export default Page;
