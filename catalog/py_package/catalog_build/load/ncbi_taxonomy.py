@@ -1,5 +1,6 @@
 import hashlib
 import tarfile
+from itertools import batched
 from pathlib import Path
 
 import dlt
@@ -14,6 +15,10 @@ TAXDUMP_DOWNLOAD_NAME = "ncbi_taxdump.tar.gz"
 TAXDUMP_DIR_NAME = "ncbi_taxdump"
 TAXDUMP_NODES_FILE_NAME = "nodes.dmp"
 TAXDUMP_NAMES_FILE_NAME = "names.dmp"
+
+# Rows per yielded DataFrame. Tuning knob: larger means fewer dlt round-trips but
+# higher peak memory; smaller means lower memory but more per-chunk overhead.
+DMP_CHUNK_SIZE = 100_000
 
 
 def dmp_rows(path: Path, cols: list[str | None]):
@@ -47,51 +52,64 @@ def dmp_rows(path: Path, cols: list[str | None]):
             line_num += 1
 
 
+def dmp_dataframes(path: Path, cols: list[str | None], dtypes: dict[str, str]):
+    """
+    Yield DataFrames of at most `DMP_CHUNK_SIZE` rows parsed from a `.dmp` file.
+
+    Chunking the file into multiple DataFrames avoids materializing the entire file
+    in memory at once, at the cost of more items handed to dlt.
+
+    Args:
+      path: Path of the `.dmp` file to read
+      cols: Column names passed through to `dmp_rows`
+      dtypes: Column dtypes applied to each yielded DataFrame
+
+    Yields:
+      A DataFrame for each chunk of rows read from the file
+    """
+    for chunk in batched(dmp_rows(path, cols), DMP_CHUNK_SIZE):
+        yield pd.DataFrame(chunk).astype(dtypes)
+
+
 @dlt.resource(name="taxonomy_names", write_disposition="replace")
 def ncbi_taxonomy_names(path: Path):
-    yield pd.DataFrame(
-        dmp_rows(
-            path,
-            [
-                "tax_id",
-                "name_txt",
-                None,  # unique name
-                "name_class",
-            ],
-        )
-    ).astype(
+    yield from dmp_dataframes(
+        path,
+        [
+            "tax_id",
+            "name_txt",
+            None,  # unique name
+            "name_class",
+        ],
         {
             "tax_id": "Int64",
-        }
+        },
     )
 
 
 @dlt.resource(name="taxonomy_nodes", write_disposition="replace")
 def ncbi_taxonomy_nodes(path: Path):
-    yield pd.DataFrame(
-        dmp_rows(
-            path,
-            [
-                "tax_id",
-                "parent_tax_id",
-                "rank",
-                None,  # embl code
-                None,  # division id
-                None,  # inherited div flag
-                None,  # genetic code id
-                None,  # inherited GC  flag
-                None,  # mitochondrial genetic code id
-                None,  # inherited MGC flag
-                None,  # GenBank hidden flag
-                None,  # hidden subtree root flag
-                None,  # comments
-            ],
-        )
-    ).astype(
+    yield from dmp_dataframes(
+        path,
+        [
+            "tax_id",
+            "parent_tax_id",
+            "rank",
+            None,  # embl code
+            None,  # division id
+            None,  # inherited div flag
+            None,  # genetic code id
+            None,  # inherited GC  flag
+            None,  # mitochondrial genetic code id
+            None,  # inherited MGC flag
+            None,  # GenBank hidden flag
+            None,  # hidden subtree root flag
+            None,  # comments
+        ],
         {
             "tax_id": "Int64",
             "parent_tax_id": "Int64",
-        }
+        },
     )
 
 
