@@ -68,7 +68,8 @@ def dmp_dataframes(path: Path, cols: list[str | None], dtypes: dict[str, str]):
       A DataFrame for each chunk of rows read from the file
     """
     for chunk in batched(dmp_rows(path, cols), DMP_CHUNK_SIZE):
-        yield pd.DataFrame(chunk).astype(dtypes)
+        df = pd.DataFrame(chunk)
+        yield df.astype(dtypes, copy=False) if dtypes else df
 
 
 @dlt.resource(name="taxonomy_names", write_disposition="replace")
