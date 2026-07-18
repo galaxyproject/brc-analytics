@@ -1398,12 +1398,12 @@ def add_galaxy_datacache_url(genomes_df, base_url, timeout=30):
         and not href.startswith(("/", ".", "?", "http"))
     }
 
-    # If autoindex is disabled or the response is unexpected, we'd otherwise
+    # If the response's contents are not as expected, we'd otherwise
     # silently mark every accession as missing. Fail loudly instead.
     if not available:
         raise RuntimeError(
             f"Datacache listing at {normalized_base_url} returned no directory entries; "
-            "server may have disabled directory listing."
+            "server's handling of directory listings may have changed."
         )
 
     accessions = genomes_df["accession"].tolist()
