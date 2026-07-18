@@ -9,11 +9,11 @@ import urllib
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
+import bs4
 import duckdb
 import pandas as pd
 import requests
 import yaml
-import bs4
 from bs4 import BeautifulSoup
 from requests.exceptions import ConnectTimeout
 
