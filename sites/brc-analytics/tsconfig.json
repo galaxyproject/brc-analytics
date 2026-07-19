@@ -3,24 +3,12 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "../../app/*"
-      ],
-      "@brc-analytics/core": [
-        "../../packages/core/index.ts"
-      ],
-      "@brc-analytics/core/*": [
-        "../../packages/core/*"
-      ],
-      "@site-config/*": [
-        "../../site-config/*"
-      ],
-      "catalog/*": [
-        "../../catalog/*"
-      ],
-      "images/*": [
-        "../../images/*"
-      ]
+      "@/*": ["../../app/*"],
+      "@brc-analytics/core": ["../../packages/core/index.ts"],
+      "@brc-analytics/core/*": ["../../packages/core/*"],
+      "@site-config/*": ["../../site-config/*"],
+      "catalog/*": ["../../catalog/*"],
+      "images/*": ["../../images/*"]
     }
   },
   "include": [
@@ -30,7 +18,5 @@
     ".next/types/**/*.ts",
     "../../@types/**/*.d.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }
