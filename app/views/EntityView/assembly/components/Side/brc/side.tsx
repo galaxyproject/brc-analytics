@@ -1,14 +1,14 @@
-import { BackPageContentSideColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
-import { JSX } from "react";
-import { AnalysisPortals } from "../../../../../../components/Entity/components/AnalysisPortals/analysisPortals";
-import { AssemblyFavoriteButton } from "../../../../../../components/Favorites/AssemblyFavoriteButton/assemblyFavoriteButton";
+import { AnalysisPortals } from "@/components/Entity/components/AnalysisPortals/analysisPortals";
+import { AssemblyFavoriteButton } from "@/components/Favorites/AssemblyFavoriteButton/assemblyFavoriteButton";
 import {
   buildAssemblyDetails,
   buildAssemblyResources,
   buildOrganismDetails,
-} from "../../../../../../viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { mapAssemblyToOrganism } from "../../../../../WorkflowInputsView/utils";
-import { KeyValueSection } from "../../../../components/KeyValueSection/keyValueSection";
+} from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import { KeyValueSection } from "@/views/EntityView/components/KeyValueSection/keyValueSection";
+import { mapAssemblyToOrganism } from "@/views/WorkflowInputsView/utils";
+import { BackPageContentSideColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
+import { JSX } from "react";
 import { StyledFluidPaper } from "../side.styles";
 import { StyledSection } from "./side.styles";
 import { Props } from "./types";

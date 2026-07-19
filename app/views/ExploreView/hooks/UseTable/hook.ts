@@ -1,3 +1,4 @@
+import type { Props } from "@/views/ExploreView/types";
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 import { arrIncludesSome } from "@databiosphere/findable-ui/lib/components/Table/columnDef/columnFilters/filterFn";
 import { getFacetedUniqueValuesWithArrayValues } from "@databiosphere/findable-ui/lib/components/Table/common/utils";
@@ -11,7 +12,6 @@ import {
   Table,
   useReactTable,
 } from "@tanstack/react-table";
-import type { Props } from "../../types";
 
 /**
  * React hook to create and configure a table instance using TanStack Table.

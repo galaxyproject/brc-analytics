@@ -1,3 +1,10 @@
+import {
+  BaseReadRun,
+  ENAReadRunsQuery,
+  ReadRun,
+} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
+import { getSequencingData } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/utils";
+import { OnConfigure } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 import { arrIncludesSome } from "@databiosphere/findable-ui/lib/components/Table/columnDef/columnFilters/filterFn";
 import { getFacetedUniqueValuesWithArrayValues } from "@databiosphere/findable-ui/lib/components/Table/common/utils";
@@ -17,9 +24,6 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { OnConfigure } from "../../../../../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { BaseReadRun, ENAReadRunsQuery, ReadRun } from "../../../../types";
-import { getSequencingData } from "../../../../utils";
 import { CATEGORY_GROUPS } from "./categoryGroups";
 import { columns } from "./columnDef";
 import { COLUMN_VISIBILITY, SORTING } from "./constants";

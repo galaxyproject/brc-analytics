@@ -1,3 +1,8 @@
+import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
+import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
+import { useAuth } from "@/providers/authentication";
+import { brcAPIClient } from "@/services/brc-api-client";
+import { WorkflowRunResponse } from "@/types/api";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
   Alert,
@@ -9,10 +14,6 @@ import {
   Typography,
 } from "@mui/material";
 import { JSX, useEffect, useState } from "react";
-import { SectionHero } from "../../app/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
-import { useAuth } from "../../app/providers/authentication";
-import { brcAPIClient } from "../../app/services/brc-api-client";
-import { WorkflowRunResponse } from "../../app/types/api";
 
 const BREADCRUMBS: Breadcrumb[] = [
   {
@@ -38,6 +39,7 @@ export default function WorkflowRunsPage(): JSX.Element {
 
   useEffect(() => {
     if (!isAuthenticated || !isConfigured) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- react-hooks v7 anti-pattern (setState in effect)
       setWorkflowRuns([]);
       setError(null);
       setIsLoading(false);
@@ -169,3 +171,5 @@ export default function WorkflowRunsPage(): JSX.Element {
     </>
   );
 }
+
+WorkflowRunsPage.Main = StyledPagesMain;

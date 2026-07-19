@@ -1,9 +1,9 @@
-import { Workflow } from "../../../apis/catalog/brc-analytics-catalog/common/entities";
+import { Workflow } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
-} from "../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
+} from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
 
 export const CUSTOM_WORKFLOW: Workflow = {
   assemblyCountMax: 1,

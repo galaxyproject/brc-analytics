@@ -1,3 +1,4 @@
+import { CONTRAST_MODE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseRadioGroup/types";
 import { CheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/CheckedIcon/checkedIcon";
 import { RadioCheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioCheckedIcon/radioCheckedIcon";
 import { RadioUncheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioUncheckedIcon/radioUncheckedIcon";
@@ -15,7 +16,6 @@ import {
   Typography,
 } from "@mui/material";
 import { JSX, ReactNode } from "react";
-import { CONTRAST_MODE } from "../../hooks/UseRadioGroup/types";
 import { StyledStack, StyledTableContainer } from "./compareBaseline.styles";
 import { Props } from "./types";
 

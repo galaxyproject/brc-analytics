@@ -40,7 +40,28 @@ models:
     base_url: http://localhost:4000/v1
     api_key: sk-local-test-master-key
 
-  # TACC SambaNova endpoint (shared key with galaxy agent-evals-harness).
+  # TACC Tejas endpoint (shared key with galaxy agent-evals-harness).
+  #
+  # MiniMax-M2.7 is the PRIMARY target for the structured_channel eval: it's the
+  # self-hosted weak model that surfaced most of the prose-scraping failures, so
+  # its tool-call-emission rate decides whether it can run typed-only or keeps
+  # the scraper fallback. gpt-oss-120b is the secondary target; claude-sonnet
+  # above is the strong-model control. (Meta-Llama-3.3-70B is left in the
+  # registry for other datasets but is out of scope for structured_channel --
+  # its TACC serving stack 400s on our mixed tool+trailer output; see the
+  # findings note in evals/results/.)
+  MiniMax-M2.7:
+    provider: openai-compatible
+    model: MiniMax-M2.7
+    base_url: https://ai.tejas.tacc.utexas.edu/v1
+    api_key_env: TACC_API_KEY
+
+  gpt-oss-120b-tacc:
+    provider: openai-compatible
+    model: gpt-oss-120b
+    base_url: https://ai.tejas.tacc.utexas.edu/v1
+    api_key_env: TACC_API_KEY
+
   Llama-4-Maverick-17B-128E-Instruct:
     provider: openai-compatible
     model: Llama-4-Maverick-17B-128E-Instruct

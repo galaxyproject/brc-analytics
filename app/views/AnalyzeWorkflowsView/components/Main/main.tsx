@@ -1,3 +1,4 @@
+import { WorkflowCategory } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { BackPageContentMainColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import { JSX } from "react";
@@ -17,7 +18,7 @@ export const Main = ({ assembly, entityId }: Props): JSX.Element => {
   const isAssemblyWorkflowsEnabled = useFeatureFlag("assembly-workflows");
   const workflowCategories = buildAssemblyWorkflows(
     assembly,
-    WORKFLOW_CATEGORIES,
+    WORKFLOW_CATEGORIES as unknown as WorkflowCategory[], // Cast the schema-validated catalog JSON to its typed shape.
     isAssemblyWorkflowsEnabled
   );
   return (

@@ -1,7 +1,7 @@
+import { getCardPosition } from "@/components/Home/components/Section/components/SectionHero/components/Carousel/common/utils";
 import { CardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
 import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import { Fragment, JSX } from "react";
-import { getCardPosition } from "../../common/utils";
 import { Card, CardContent, CardPositioner, CardSection } from "./cards.styles";
 
 export interface CardsProps {

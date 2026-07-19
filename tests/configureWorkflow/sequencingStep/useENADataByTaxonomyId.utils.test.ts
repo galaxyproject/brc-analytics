@@ -1,4 +1,4 @@
-import { isEligible } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/query/utils";
+import { isEligible } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/query/utils";
 
 describe("isEligible", () => {
   test("returns false when count is undefined (still loading)", () => {

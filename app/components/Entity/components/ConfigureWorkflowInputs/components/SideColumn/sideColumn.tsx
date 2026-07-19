@@ -1,3 +1,10 @@
+import { useAssembly } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/hook";
+import {
+  buildAssemblyDetails,
+  buildOrganismDetails,
+  buildWorkflowConfiguration,
+  buildWorkflowDetails,
+} from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import { KeyValuePairs } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/keyValuePairs";
 import {
   FluidPaper,
@@ -5,13 +12,6 @@ import {
 } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import { CollapsableSection } from "@databiosphere/findable-ui/lib/components/common/Section/components/CollapsableSection/collapsableSection";
 import { JSX } from "react";
-import {
-  buildAssemblyDetails,
-  buildOrganismDetails,
-  buildWorkflowConfiguration,
-  buildWorkflowDetails,
-} from "../../../../../../viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { useAssembly } from "../../providers/Assembly/hook";
 import { Props } from "./types";
 
 export const SideColumn = ({

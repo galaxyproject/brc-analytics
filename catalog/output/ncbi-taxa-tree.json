@@ -1,5 +1,5 @@
 {
-    "assembly_count": 5499,
+    "assembly_count": 5506,
     "children": [
         {
             "assembly_count": 398,
@@ -5063,7 +5063,7 @@
             "rank": "domain"
         },
         {
-            "assembly_count": 4475,
+            "assembly_count": 4482,
             "children": [
                 {
                     "assembly_count": 2,
@@ -5112,7 +5112,7 @@
                     "rank": "class"
                 },
                 {
-                    "assembly_count": 3433,
+                    "assembly_count": 3437,
                     "children": [
                         {
                             "assembly_count": 49,
@@ -5769,7 +5769,7 @@
                             "rank": "phylum"
                         },
                         {
-                            "assembly_count": 2775,
+                            "assembly_count": 2779,
                             "children": [
                                 {
                                     "assembly_count": 80,
@@ -8531,7 +8531,7 @@
                                     "rank": "class"
                                 },
                                 {
-                                    "assembly_count": 1376,
+                                    "assembly_count": 1380,
                                     "children": [
                                         {
                                             "assembly_count": 109,
@@ -8615,7 +8615,7 @@
                                             "rank": "order"
                                         },
                                         {
-                                            "assembly_count": 1221,
+                                            "assembly_count": 1225,
                                             "children": [
                                                 {
                                                     "assembly_count": 9,
@@ -8762,10 +8762,10 @@
                                                     "rank": "family"
                                                 },
                                                 {
-                                                    "assembly_count": 1160,
+                                                    "assembly_count": 1164,
                                                     "children": [
                                                         {
-                                                            "assembly_count": 1160,
+                                                            "assembly_count": 1164,
                                                             "children": [
                                                                 {
                                                                     "assembly_count": 23,
@@ -8797,7 +8797,7 @@
                                                                     "rank": "species"
                                                                 },
                                                                 {
-                                                                    "assembly_count": 486,
+                                                                    "assembly_count": 489,
                                                                     "children": [
                                                                         {
                                                                             "assembly_count": 2,
@@ -9789,7 +9789,7 @@
                                                                     "rank": "species"
                                                                 },
                                                                 {
-                                                                    "assembly_count": 1,
+                                                                    "assembly_count": 2,
                                                                     "children": [],
                                                                     "name": "Fusarium keratoplasticum",
                                                                     "ncbi_tax_id": "1328300",
@@ -11686,7 +11686,15 @@
                                                                 },
                                                                 {
                                                                     "assembly_count": 6,
-                                                                    "children": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Candidozyma auris B8441",
+                                                                            "ncbi_tax_id": "3712126",
+                                                                            "rank": "strain"
+                                                                        }
+                                                                    ],
                                                                     "name": "Candidozyma auris",
                                                                     "ncbi_tax_id": "498019",
                                                                     "rank": "species"
@@ -18171,7 +18179,7 @@
                     "rank": "kingdom"
                 },
                 {
-                    "assembly_count": 448,
+                    "assembly_count": 451,
                     "children": [
                         {
                             "assembly_count": 4,
@@ -20561,7 +20569,7 @@
                             "rank": "phylum"
                         },
                         {
-                            "assembly_count": 178,
+                            "assembly_count": 181,
                             "children": [
                                 {
                                     "assembly_count": 34,
@@ -20875,10 +20883,10 @@
                                     "rank": "class"
                                 },
                                 {
-                                    "assembly_count": 144,
+                                    "assembly_count": 147,
                                     "children": [
                                         {
-                                            "assembly_count": 121,
+                                            "assembly_count": 124,
                                             "children": [
                                                 {
                                                     "assembly_count": 100,
@@ -21313,6 +21321,29 @@
                                                     ],
                                                     "name": "Muscidae",
                                                     "ncbi_tax_id": "7366",
+                                                    "rank": "family"
+                                                },
+                                                {
+                                                    "assembly_count": 3,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 3,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 3,
+                                                                    "children": [],
+                                                                    "name": "Cochliomyia hominivorax",
+                                                                    "ncbi_tax_id": "115425",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Cochliomyia",
+                                                            "ncbi_tax_id": "66360",
+                                                            "rank": "genus"
+                                                        }
+                                                    ],
+                                                    "name": "Calliphoridae",
+                                                    "ncbi_tax_id": "7371",
                                                     "rank": "family"
                                                 },
                                                 {
@@ -28796,7 +28827,14 @@
                             "assembly_count": 7,
                             "children": [
                                 {
-                                    "assembly_count": 5,
+                                    "assembly_count": 1,
+                                    "children": [],
+                                    "name": "Deltavirus cameroonense",
+                                    "ncbi_tax_id": "2844072",
+                                    "rank": "species"
+                                },
+                                {
+                                    "assembly_count": 2,
                                     "children": [],
                                     "name": "Deltavirus italiense",
                                     "ncbi_tax_id": "2844074",
@@ -28812,8 +28850,22 @@
                                 {
                                     "assembly_count": 1,
                                     "children": [],
+                                    "name": "Deltavirus senegalense",
+                                    "ncbi_tax_id": "2844077",
+                                    "rank": "species"
+                                },
+                                {
+                                    "assembly_count": 1,
+                                    "children": [],
                                     "name": "Deltavirus taiwanense",
                                     "ncbi_tax_id": "2844078",
+                                    "rank": "species"
+                                },
+                                {
+                                    "assembly_count": 1,
+                                    "children": [],
+                                    "name": "Deltavirus togense",
+                                    "ncbi_tax_id": "2844079",
                                     "rank": "species"
                                 }
                             ],

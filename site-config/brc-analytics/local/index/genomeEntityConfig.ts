@@ -1,21 +1,21 @@
+import { BRCDataCatalogGenome } from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import {
+  getGenomeId,
+  getGenomeTitle,
+} from "@/apis/catalog/brc-analytics-catalog/common/utils";
+import * as C from "@/components";
+import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import {
   ComponentConfig,
   ListConfig,
   SORT_DIRECTION,
 } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
-import { BRCDataCatalogGenome } from "../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
-import {
-  getGenomeId,
-  getGenomeTitle,
-} from "../../../../app/apis/catalog/brc-analytics-catalog/common/utils";
-import * as C from "../../../../app/components";
-import * as V from "../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { AppEntityConfig } from "../../../common/entities";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
-} from "../../category";
+} from "@site-config/brc-analytics/category";
+import { AppEntityConfig } from "@site-config/common/entities";
 import { CATEGORY_GROUPS } from "./common/category/categories";
 import { COLUMN_REGISTRY } from "./common/column/columnRegistry";
 
@@ -243,7 +243,12 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
           ],
           component: C.Tooltip,
           viewBuilder: V.buildReleaseDateTooltip,
-        } as ComponentConfig<typeof C.Tooltip, BRCDataCatalogGenome>,
+          // The shared release-date builders take the site-neutral
+          // AssemblyContract, which TS can't reconcile with this cast:
+          // ComponentConfig's data type is invariant and the Tooltip viewBuilder
+          // omits `children` (supplied above). Double cast is the repo's
+          // escape-hatch for this findable-ui typing limitation.
+        } as unknown as ComponentConfig<typeof C.Tooltip, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.RELEASE_DATE,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.RELEASE_DATE,
         width: { max: "1fr", min: "120px" },
@@ -300,7 +305,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: C.NTagCell,
-          viewBuilder: V.buildTaxonomicGroup,
+          viewBuilder: V.buildAssemblyTaxonomicGroup,
         } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogGenome>,
         enableHiding: false,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_GROUP,

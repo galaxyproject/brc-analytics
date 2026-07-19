@@ -1,13 +1,10 @@
-import {
-  ColumnConfig,
-  ComponentConfig,
-} from "@databiosphere/findable-ui/lib/config/entities";
-import { GA2AssemblyEntity } from "../../../../../app/apis/catalog/ga2/entities";
-import * as C from "../../../../../app/components";
+import { GA2AssemblyEntity } from "@/apis/catalog/ga2/entities";
+import * as C from "@/components";
 import {
   buildAccession,
   buildAnalyzeGenome,
   buildAnnotationStatus,
+  buildAssemblyTaxonomicGroup,
   buildChromosomes,
   buildCoverage,
   buildGcPercent,
@@ -20,7 +17,6 @@ import {
   buildScaffoldCount,
   buildScaffoldL50,
   buildScaffoldN50,
-  buildTaxonomicGroup,
   buildTaxonomicLevelClass,
   buildTaxonomicLevelDomain,
   buildTaxonomicLevelFamily,
@@ -29,9 +25,16 @@ import {
   buildTaxonomicLevelOrder,
   buildTaxonomicLevelPhylum,
   buildTaxonomyId,
-} from "../../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import * as V from "../../../../../app/viewModelBuilders/catalog/ga2/viewModelBuilders";
-import { GA2_CATEGORY_KEY, GA2_CATEGORY_LABEL } from "../../../category";
+} from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import * as V from "@/viewModelBuilders/catalog/ga2/viewModelBuilders";
+import {
+  ColumnConfig,
+  ComponentConfig,
+} from "@databiosphere/findable-ui/lib/config/entities";
+import {
+  GA2_CATEGORY_KEY,
+  GA2_CATEGORY_LABEL,
+} from "@site-config/ga2/category";
 
 export const ACCESSION: ColumnConfig<GA2AssemblyEntity> = {
   componentConfig: {
@@ -135,7 +138,11 @@ export const RELEASE_DATE: ColumnConfig<GA2AssemblyEntity> = {
     ],
     component: C.Tooltip,
     viewBuilder: buildReleaseDateTooltip,
-  } as ComponentConfig<typeof C.Tooltip, GA2AssemblyEntity>,
+    // The shared release-date builders take the site-neutral AssemblyContract,
+    // which TS can't reconcile with this cast: ComponentConfig's data type is
+    // invariant and the Tooltip viewBuilder omits `children` (supplied above).
+    // Double cast is the repo's escape-hatch for this findable-ui limitation.
+  } as unknown as ComponentConfig<typeof C.Tooltip, GA2AssemblyEntity>,
   header: GA2_CATEGORY_LABEL.RELEASE_DATE,
   id: GA2_CATEGORY_KEY.RELEASE_DATE,
   width: { max: "1fr", min: "120px" },
@@ -244,7 +251,7 @@ export const TAXONOMIC_LEVEL_GENUS: ColumnConfig<GA2AssemblyEntity> = {
 export const TAXONOMIC_GROUP: ColumnConfig<GA2AssemblyEntity> = {
   componentConfig: {
     component: C.NTagCell,
-    viewBuilder: buildTaxonomicGroup,
+    viewBuilder: buildAssemblyTaxonomicGroup,
   } as ComponentConfig<typeof C.NTagCell, GA2AssemblyEntity>,
   enableHiding: false,
   header: GA2_CATEGORY_LABEL.TAXONOMIC_GROUP,

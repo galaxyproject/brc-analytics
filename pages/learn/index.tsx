@@ -1,8 +1,8 @@
+import { BRC_PAGE_META } from "@/common/meta/brc/constants";
+import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
+import { LearnView } from "@/views/LearnView/learnView";
 import { GetStaticProps } from "next";
 import { JSX } from "react";
-import { BRC_PAGE_META } from "../../app/common/meta/brc/constants";
-import { StyledPagesMain } from "../../app/components/Layout/components/Main/main.styles";
-import { LearnView } from "../../app/views/LearnView/learnView";
 import type { PageProps } from "../_app";
 
 const Page = (): JSX.Element => {

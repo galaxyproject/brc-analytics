@@ -1,5 +1,5 @@
+import { ParseResult } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseFilePicker/types";
 import Papa from "papaparse";
-import { ParseResult } from "../../../hooks/UseFilePicker/types";
 import {
   MAX_FILE_SIZE_BYTES,
   MIN_COLUMNS,

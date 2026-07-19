@@ -1,5 +1,8 @@
-import { COLUMN_TYPE, ColumnClassifications } from "../../types";
-import { ValidationResult } from "../../utils";
+import {
+  COLUMN_TYPE,
+  ColumnClassifications,
+} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
+import { ValidationResult } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/utils";
 
 export type OnClassify = (columnName: string, columnType: COLUMN_TYPE) => void;
 

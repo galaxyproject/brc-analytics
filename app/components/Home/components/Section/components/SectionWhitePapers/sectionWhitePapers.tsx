@@ -1,3 +1,5 @@
+import { SectionTitle } from "@/components/Home/components/Section/section.styles";
+import { formatDate } from "@/utils/date-fns";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import {
   CardActionArea,
@@ -7,8 +9,6 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 import { JSX } from "react";
-import { formatDate } from "../../../../../../utils/date-fns";
-import { SectionTitle } from "../../section.styles";
 import { WHITE_PAPERS } from "./constants";
 import {
   Section,

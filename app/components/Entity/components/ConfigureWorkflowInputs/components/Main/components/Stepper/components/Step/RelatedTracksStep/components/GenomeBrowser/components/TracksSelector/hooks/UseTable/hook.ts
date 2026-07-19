@@ -1,3 +1,5 @@
+import { UseUCSCTracks } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/hooks/UseUCSCTracks/types";
+import { UcscTrackNode } from "@/utils/ucsc-tracks-api/entities";
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 import { arrIncludesSome } from "@databiosphere/findable-ui/lib/components/Table/columnDef/columnFilters/filterFn";
 import { getFacetedUniqueValuesWithArrayValues } from "@databiosphere/findable-ui/lib/components/Table/common/utils";
@@ -15,8 +17,6 @@ import {
   Table,
   useReactTable,
 } from "@tanstack/react-table";
-import { UcscTrackNode } from "../../../../../../../../../../../../../../../../../utils/ucsc-tracks-api/entities";
-import { UseUCSCTracks } from "../../../../../../hooks/UseUCSCTracks/types";
 import { CATEGORY_GROUPS } from "./categoryGroups";
 import { columns } from "./columnDef";
 import { COLUMN_VISIBILITY, GROUPING } from "./constants";

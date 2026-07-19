@@ -1,6 +1,6 @@
+import { ReadRun } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
 import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import { ColumnFiltersState, Row } from "@tanstack/react-table";
-import { ReadRun } from "../../../../../../types";
 import { COLUMN_KEY_TO_LABEL } from "./constants";
 import type { SpeciesInfo } from "./types";
 

@@ -10,6 +10,8 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
+import time
 from dataclasses import dataclass, field
 from typing import Any, Callable, Optional
 
@@ -17,6 +19,7 @@ from pydantic_ai.messages import ModelResponse, ToolCallPart
 
 from app.core.cache import CacheService
 from app.core.config import Settings, get_settings
+from app.models.assistant import AnalysisSchema
 from app.services.assistant_agent import AssistantAgent
 from app.services.sra_mirror import SRAMirrorService
 from app.services.tools.catalog_data import CatalogData
@@ -153,14 +156,26 @@ def build_deps(skip_env_vars: Optional[set[str]] = None) -> EvalDeps:
 
 
 def _override_model(svc: Any, entry: ModelEntry) -> None:
-    """Swap the agent's model to the eval target.
+    """Swap the agent's model(s) to the eval target.
 
     Mutates `_model` directly because pydantic-ai exposes `model` as a
-    read-only property.
+    read-only property. Covers both the conversational agent and the state
+    extractor.
+
+    The extractor's OUTPUT MODE was fixed at init from the deploy's settings,
+    not this target -- so after the swap we re-derive it from the target's
+    provider (tool for Anthropic, prompted otherwise). Without this a
+    mixed-provider run could run the extractor in the wrong mode (e.g. tool mode
+    against MiniMax, which loops), skewing ExtractSuccessRate.
     """
     new_model = build_pydantic_ai_model(entry)
-    if getattr(svc, "agent", None) is not None:
-        svc.agent._model = new_model
+    for attr in ("agent", "extract_agent"):
+        agent = getattr(svc, attr, None)
+        if agent is not None:
+            agent._model = new_model
+    rebuild = getattr(svc, "rebuild_extractor", None)
+    if rebuild is not None:
+        rebuild("tool" if entry.provider == "anthropic" else "prompted")
 
 
 def _prepare_service(svc: Any, entry: ModelEntry) -> None:
@@ -236,6 +251,166 @@ def make_assistant_conversation_task(deps: EvalDeps, entry: ModelEntry) -> Calla
             is_complete=last_resp.is_complete,
             reply=last_resp.reply,
             handoff_url=last_resp.handoff_url,
+        )
+
+    return task
+
+
+# ---------- Structured channel (extraction pass: reply + state extractor) ----------
+
+# State is captured by a separate extractor, not the conversational reply. The
+# crux this task measures per model: the conversational reply produces reliably
+# (plain text, ~always), the extractor produces its snapshot reliably, capture
+# on state-changing turns, no state leak in the reply, and final-tracker
+# correctness. See datasets/structured_channel.py for the metrics.
+
+# A leak is a state TRAILER in the reply -- a SCHEMA_UPDATE:/SUGGESTIONS: marker
+# followed by a JSON opener -- not the bare English word. Matching the word
+# would false-positive on prose like "here are a few suggestions" and skew
+# NoLeak on the extraction pass, where the reply is plain prose.
+# \s* before the opener (not just [ \t]*) so a next-line trailer -- SUGGESTIONS:\n
+# [...] / SCHEMA_UPDATE:\n{...} -- is still caught; the production parser skips
+# any whitespace (incl newlines) between the marker and the JSON opener, so the
+# leak detector must too or NoLeak reads clean while a trailer survived (Copilot).
+_LEAK_RE = re.compile(
+    r"\*{0,2}\b(?:schema_update|suggestions)\b\*{0,2}[ \t]*:?[ \t]*\*{0,2}\s*[\[{]",
+    re.IGNORECASE,
+)
+
+
+@dataclass
+class TurnTrace:
+    """Per-turn instrumentation of the extraction pass."""
+
+    index: int
+    expected_change: bool
+    reply_produced: bool  # the conversational call returned a reply (no error)
+    extract_produced: bool  # the extractor returned a valid snapshot (no error)
+    state_nonempty: bool  # applying the updates changed a tracked field's value/status
+    leaked: bool  # a state marker survived into the visible reply
+
+
+@dataclass
+class StructuredChannelOutput:
+    turns: list[TurnTrace]
+    final_schema: dict
+    is_complete: bool
+    replies: list[str]
+
+
+def _has_leak_marker(text: str) -> bool:
+    return bool(_LEAK_RE.search(text))
+
+
+def make_structured_channel_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
+    """Replay a scripted conversation through the extraction pass, reporting
+    per-turn reply/extract production, capture, leak, and the final schema.
+
+    Runs the conversational call and the extractor separately (mirroring chat())
+    so an endpoint failure in either scores as a non-production, not a crash. The
+    extractor is called directly (not aa._extract_state, which swallows failures)
+    so extract-success can be measured.
+    """
+    from app.services.assistant_agent import (
+        _STATE_FIELDS,
+        ASSISTANT_TURN_BUDGET_SECONDS,
+        EXTRACT_MIN_BUDGET_SECONDS,
+        EXTRACT_RUN_TIMEOUT_SECONDS,
+    )
+
+    aa = AssistantAgent(deps.cache, sra_mirror=deps.sra_mirror)
+    _prepare_service(aa, entry)
+
+    async def task(case_input: dict) -> StructuredChannelOutput:
+        schema = AnalysisSchema()
+        history: Optional[list] = None
+        turns: list[TurnTrace] = []
+        replies: list[str] = []
+        for i, turn in enumerate(case_input["turns"]):
+            agent_deps = AssistantDeps(
+                catalog=aa.catalog, sra_mirror=deps.sra_mirror, con=aa.query_con
+            )
+            augmented = aa._wrap_user_message(schema, turn["text"])
+            # Mirror production: truncate restored history before the run so a long
+            # eval conversation doesn't feed the model more context than chat()
+            # would.
+            if history:
+                history = aa._truncate_history(history)
+            reply_produced = True
+            reply_text = ""
+            turn_start = time.time()
+            try:
+                result = await aa._run_agent_with_retry(
+                    augmented, deps=agent_deps, message_history=history
+                )
+                reply_text, _c, _s = aa._parse_structured_output(str(result.output))
+                history = result.all_messages()
+            except Exception:
+                reply_produced = False
+                history = None
+
+            # Extractor: a separate focused call. Call it directly so we can see
+            # a failure (aa._extract_state would swallow it as copy-forward).
+            # Starts False -- if the reply failed the extractor never runs, so
+            # the turn genuinely produced no snapshot; it flips True only on a
+            # successful extraction.
+            extract_produced = False
+            state_nonempty = False
+            # Mirror production's turn budget: the extractor only runs with the
+            # time left after the reply, and is skipped (copy-forward, no capture)
+            # if the reply already spent the budget.
+            remaining = ASSISTANT_TURN_BUDGET_SECONDS - (time.time() - turn_start)
+            if reply_produced and remaining >= EXTRACT_MIN_BUDGET_SECONDS:
+                payload = aa.build_extract_payload(schema, turn["text"], reply_text)
+                try:
+                    # Mirror production chat() exactly: no-retry extractor call
+                    # (_run_agent_once) + delta-safe apply (_snapshot_to_updates,
+                    # keying off model_fields_set) so an omitted field carries
+                    # forward instead of being read as a clear. Building a full
+                    # {n: getattr(...)} dict here would collapse the omitted-vs-
+                    # explicit-null distinction and make the eval diverge from
+                    # real behavior.
+                    er = await aa._run_agent_once(
+                        payload,
+                        agent=aa.extract_agent,
+                        timeout=min(EXTRACT_RUN_TIMEOUT_SECONDS, remaining),
+                    )
+                    updates = aa._snapshot_to_updates(er.output, schema)
+                    # "Captured a change" = the apply actually changed a tracked
+                    # field. A clear of an already-empty field, or a no-op
+                    # restatement, must NOT count (bool(updates) would over-count
+                    # those). Compare the tracked fields' (value, status) pre/post.
+                    before = {
+                        n: (getattr(schema, n).value, getattr(schema, n).status)
+                        for n in _STATE_FIELDS
+                    }
+                    schema = aa._apply_schema_updates(schema, updates)
+                    state_nonempty = any(
+                        before[n]
+                        != (getattr(schema, n).value, getattr(schema, n).status)
+                        for n in _STATE_FIELDS
+                    )
+                    extract_produced = True
+                except Exception:
+                    extract_produced = False
+
+            turns.append(
+                TurnTrace(
+                    index=i,
+                    expected_change=bool(turn.get("expect_state_change", False)),
+                    reply_produced=reply_produced,
+                    extract_produced=extract_produced,
+                    state_nonempty=state_nonempty,
+                    leaked=_has_leak_marker(reply_text),
+                )
+            )
+            replies.append(reply_text)
+
+        return StructuredChannelOutput(
+            turns=turns,
+            final_schema=schema.model_dump(),
+            is_complete=schema.is_complete(),
+            replies=replies,
         )
 
     return task

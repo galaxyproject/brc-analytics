@@ -1,4 +1,4 @@
-import { getPriorityLabel } from "../../../../../../app/views/PriorityPathogensView/components/PriorityPathogens/utils";
+import { getPriorityLabel } from "@/views/PriorityPathogensView/components/PriorityPathogens/utils";
 import { isOutbreakPriority } from "./typeGuards";
 
 /**

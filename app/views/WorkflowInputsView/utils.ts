@@ -1,10 +1,10 @@
+import type { AssemblyContract } from "@/apis/catalog/common/entities";
 import {
   getGenomeIsolateText,
   getGenomeSerotypeText,
   getGenomeStrainText,
-} from "app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+} from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import type { Organism } from "../OrganismView/types";
-import type { Assembly } from "./types";
 
 /**
  * Maps an assembly to the shared organism shape consumed by the side panel, so the
@@ -14,16 +14,13 @@ import type { Assembly } from "./types";
  * @param assembly - Assembly to derive organism-level details from.
  * @returns Organism shape for the side panel.
  */
-export function mapAssemblyToOrganism(assembly: Assembly): Organism {
+export function mapAssemblyToOrganism(assembly: AssemblyContract): Organism {
   return {
     // Organism-level link target: the species taxon, not the assembly's own
     // (possibly strain-level) ncbiTaxonomyId.
     ncbiTaxonomyId: assembly.speciesTaxonomyId,
-    priority: "priority" in assembly ? assembly.priority : undefined,
-    priorityPathogenName:
-      "priorityPathogenName" in assembly
-        ? assembly.priorityPathogenName
-        : undefined,
+    priority: assembly.priority,
+    priorityPathogenName: assembly.priorityPathogenName,
     taxonomicLevelIsolate: toValues(getGenomeIsolateText(assembly)),
     taxonomicLevelSerotype: toValues(getGenomeSerotypeText(assembly)),
     taxonomicLevelSpecies: assembly.taxonomicLevelSpecies,

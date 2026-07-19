@@ -1,3 +1,7 @@
+import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
+import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
+import { useAuth } from "@/providers/authentication";
+import { brcAPIClient } from "@/services/brc-api-client";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
   Alert,
@@ -9,9 +13,6 @@ import {
   Typography,
 } from "@mui/material";
 import { JSX, useEffect, useState } from "react";
-import { SectionHero } from "../../app/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
-import { useAuth } from "../../app/providers/authentication";
-import { brcAPIClient } from "../../app/services/brc-api-client";
 
 const BREADCRUMBS: Breadcrumb[] = [
   {
@@ -35,6 +36,7 @@ export default function PreferencesPage(): JSX.Element {
   useEffect(() => {
     // Clear any prior status so a stale error/success banner can't linger
     // across a re-load or a sign-out/in.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- react-hooks v7 anti-pattern (setState in effect)
     setError(null);
     setSaveMessage(null);
 
@@ -154,3 +156,5 @@ export default function PreferencesPage(): JSX.Element {
     </>
   );
 }
+
+PreferencesPage.Main = StyledPagesMain;

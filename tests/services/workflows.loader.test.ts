@@ -1,13 +1,11 @@
-import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import {
   loadEntities,
+  loadPangenomes,
   loadWorkflows,
-} from "../../app/services/workflows/loader";
-import { API } from "../../app/services/workflows/routes";
-import {
-  getEntitiesById,
-  getEntitiesByType,
-} from "../../app/services/workflows/store";
+} from "@/services/workflows/loader";
+import { API } from "@/services/workflows/routes";
+import { getEntitiesById, getEntitiesByType } from "@/services/workflows/store";
+import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 
 const CONFIG = {
   entities: [{ getId, route: "assemblies" }],
@@ -129,6 +127,50 @@ describe("workflows loader", () => {
       await expect(loadWorkflows()).rejects.toThrow(
         `Failed to fetch: ${API.workflows}`
       );
+    });
+  });
+
+  describe("loadPangenomes", () => {
+    test("loads pangenomes from API and populates the store keyed by species taxonomy ID", async () => {
+      const payload = [
+        {
+          bundleId: "pv-v1",
+          members: [],
+          speciesTaxonomyId: "5855",
+          version: "2026-05",
+        },
+      ];
+
+      fetchMock.mockResolvedValue(mockFetchResponse(payload));
+
+      await loadPangenomes();
+
+      expect(fetchMock).toHaveBeenCalledWith(API.pangenomes);
+
+      const byId = getEntitiesById().get("pangenomes");
+      const byType = getEntitiesByType().get("pangenomes");
+
+      expect(byType).toEqual(payload);
+      expect(byId?.get("5855")).toEqual(payload[0]);
+    });
+
+    test("is non-fatal when the fetch fails", async () => {
+      fetchMock.mockResolvedValue(mockFetchResponse([], false));
+
+      await expect(loadPangenomes()).resolves.toBeUndefined();
+      expect(getEntitiesById().has("pangenomes")).toBe(false);
+      expect(getEntitiesByType().has("pangenomes")).toBe(false);
+    });
+
+    test("ignores a non-array 200 payload", async () => {
+      fetchMock.mockResolvedValue({
+        json: async () => ({}),
+        ok: true,
+      } as Response);
+
+      await expect(loadPangenomes()).resolves.toBeUndefined();
+      expect(getEntitiesById().has("pangenomes")).toBe(false);
+      expect(getEntitiesByType().has("pangenomes")).toBe(false);
     });
   });
 });

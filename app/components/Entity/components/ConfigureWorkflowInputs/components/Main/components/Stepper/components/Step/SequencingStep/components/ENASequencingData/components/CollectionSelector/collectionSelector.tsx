@@ -1,11 +1,11 @@
+import { ColumnFilters } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/ColumnFilters/columnFilters";
+import { Table } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/Table/table";
+import { ReadRun } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { DialogTitle } from "@databiosphere/findable-ui/lib/components/common/Dialog/components/DialogTitle/dialogTitle";
 import { Button, DialogActions, DialogContent } from "@mui/material";
 import { Table as TanStackTable } from "@tanstack/react-table";
 import { JSX } from "react";
-import { ColumnFilters } from "../../../../../components/ColumnFilters/columnFilters";
-import { Table } from "../../../../../components/Table/table";
-import { ReadRun } from "../../types";
 import { StyledDialog } from "./collectionSelector.styles";
 import { Props } from "./types";
 

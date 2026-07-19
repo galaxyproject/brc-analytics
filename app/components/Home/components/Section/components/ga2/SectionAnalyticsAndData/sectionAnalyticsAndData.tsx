@@ -1,5 +1,8 @@
+import {
+  SectionSubtitle,
+  SectionTitle,
+} from "@/components/Home/components/Section/section.styles";
 import { JSX } from "react";
-import { SectionSubtitle, SectionTitle } from "../../../section.styles";
 import { AnalyticsToolsAndData } from "./components/AnalyticsToolsAndData/analyticsToolsAndData";
 import {
   Headline,

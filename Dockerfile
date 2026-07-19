@@ -1,6 +1,6 @@
 # Multi-stage build for Next.js static export
 # Stage 1: Build the application
-FROM node:22-alpine AS builder
+FROM node:22.13.0-alpine AS builder
 
 # Install bash and git for build scripts
 RUN apk add --no-cache bash git
@@ -28,7 +28,8 @@ RUN ./scripts/sync-api-brc-analytics.sh
 RUN npm run build-brc-db
 
 # Build Next.js static export (outputs to /app/out)
-RUN npm run build:local -- --no-lint
+# Next 16 removed the `--no-lint` flag and no longer runs ESLint during build.
+RUN npm run build:local
 
 # Stage 2: Serve with nginx
 FROM nginx:alpine AS runtime

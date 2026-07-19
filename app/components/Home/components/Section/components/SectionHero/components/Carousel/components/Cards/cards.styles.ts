@@ -1,3 +1,13 @@
+import {
+  MAX_CARD_HEIGHT,
+  MAX_CARD_HEIGHT_SM,
+  MAX_CARD_WIDTH,
+} from "@/components/Home/components/Section/components/SectionHero/components/Carousel/common/constants";
+import {
+  getCardTransform,
+  getCardTransition,
+  getCardZIndex,
+} from "@/components/Home/components/Section/components/SectionHero/components/Carousel/common/utils";
 import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { SHADOWS } from "@databiosphere/findable-ui/lib/styles/common/constants/shadows";
@@ -7,16 +17,6 @@ import {
 } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
 import { Card as MCard } from "@mui/material";
-import {
-  MAX_CARD_HEIGHT,
-  MAX_CARD_HEIGHT_SM,
-  MAX_CARD_WIDTH,
-} from "../../common/constants";
-import {
-  getCardTransform,
-  getCardTransition,
-  getCardZIndex,
-} from "../../common/utils";
 
 interface Props {
   cardPosition: number;

@@ -1,8 +1,8 @@
+import { StyledViewSupport } from "@/components/Support/components/ViewSupport/ga2/viewSupport.styles";
 import {
   ComponentConfig,
   FloatingConfig,
 } from "@databiosphere/findable-ui/lib/config/entities";
-import { StyledViewSupport } from "../../../../app/components/Support/components/ViewSupport/ga2/viewSupport.styles";
 
 export const floating: FloatingConfig = {
   components: [

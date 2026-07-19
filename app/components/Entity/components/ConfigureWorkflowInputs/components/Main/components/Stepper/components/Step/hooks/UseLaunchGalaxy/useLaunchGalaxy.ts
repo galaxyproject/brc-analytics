@@ -1,19 +1,19 @@
-import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
-import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
-import { brcAPIClient } from "app/services/brc-api-client";
-import { useRouter } from "next/router";
-import { useCallback } from "react";
-import { Workflow } from "../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
+import { Workflow } from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import { brcAPIClient } from "@/services/brc-api-client";
 import {
   getDataLandingUrl,
   getDeSeq2LandingUrl,
   getLMLSLandingUrl,
   getWorkflowLandingUrl,
-} from "../../../../../../../../../../../../utils/galaxy-api/galaxy-api";
-import { CUSTOM_WORKFLOW } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/custom/constants";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
-import { LEXICMAP } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/lexicmap/constants";
-import { LOGAN_SEARCH } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/loganSearch/constants";
+} from "@/utils/galaxy-api/galaxy-api";
+import { CUSTOM_WORKFLOW } from "@/views/AnalyzeWorkflowsView/custom/constants";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
+import { LEXICMAP } from "@/views/AnalyzeWorkflowsView/lexicmap/constants";
+import { LOGAN_SEARCH } from "@/views/AnalyzeWorkflowsView/loganSearch/constants";
+import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
+import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
+import { useRouter } from "next/router";
+import { useCallback } from "react";
 import {
   ConfiguredValue,
   isAssemblyConfiguredValue,

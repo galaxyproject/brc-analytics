@@ -1,5 +1,5 @@
+import { COLUMN_TYPE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 import { SelectProps } from "@mui/material";
-import { COLUMN_TYPE } from "../../../../types";
 
 export const SELECT_PROPS: SelectProps = {
   MenuProps: {

@@ -1,4 +1,4 @@
-import { OUTBREAK_PRIORITY } from "app/apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { OUTBREAK_PRIORITY } from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
 
 /**
  * Checks if the value is an Outbreak Priority.

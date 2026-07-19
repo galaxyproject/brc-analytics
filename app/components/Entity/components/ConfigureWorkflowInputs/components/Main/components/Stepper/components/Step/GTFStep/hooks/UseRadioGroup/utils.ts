@@ -1,4 +1,4 @@
-import { getGeneModelLabel } from "../../utils";
+import { getGeneModelLabel } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/GTFStep/utils";
 
 /**
  * Maps a gene model URL to a form control with display label and value.

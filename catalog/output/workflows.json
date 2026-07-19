@@ -225,7 +225,7 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.5",
+        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.6",
         "workflowDescription": "Comprehensive preprocessing for 10X Genomics CellPlex multiplexed single-cell RNA-seq data. Processes Cell Multiplexing Oligo (CMO) FASTQ files with CITE-seq-Count including required CellPlex-specific translation steps. Simultaneously processes gene expression FASTQ files with STARsolo and DropletUtils for alignment and cell filtering, and formats outputs for seamless import into Seurat/Scanpy (Read10X function).",
         "workflowName": "Single-Cell RNA-seq Preprocessing: 10X Genomics CellPlex Multiplexed Samples"
       },
@@ -256,7 +256,7 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.5",
+        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.6",
         "workflowDescription": "Complete preprocessing pipeline for 10X Genomics v3 single-cell RNA-seq data. Aligns raw FASTQ files using STARsolo, performs cell calling and quality filtering with DropletUtils, and formats outputs for seamless import into Seurat/Scanpy (Read10X function).",
         "workflowName": "Single-Cell RNA-seq Preprocessing: 10X Genomics v3 to Seurat and Scanpy Compatible Format"
       },
@@ -287,7 +287,7 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.3",
+        "trsId": "#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.4",
         "workflowDescription": "Complete RNA-Seq analysis for paired-end data: Processes raw FASTQ data through adapter and bad quality removal (fastp), alignment with STAR using ENCODE parameters, gene quantification via multiple methods (STAR and featureCounts), and expression calculation (FPKM with Cufflinks/StringTie, normalized coverage with bedtools). Produces count tables, normalized expression values, and genomic coverage tracks. Supports stranded and unstranded libraries, generating both HTSeq-compatible counts and normalized measures for downstream analysis.",
         "workflowName": "RNA-Seq Analysis: Paired-End Read Processing and Quantification"
       },
@@ -318,7 +318,7 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.3",
+        "trsId": "#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.4",
         "workflowDescription": "Complete RNA-Seq analysis for single-end data:  Processes raw FASTQ data through adapter and bad quality removal (fastp), alignment with STAR using ENCODE parameters, gene quantification via multiple methods (STAR and featureCounts), and expression calculation (FPKM with Cufflinks/StringTie, normalized coverage with bedtools). Produces count tables, normalized expression values, and genomic coverage tracks. Supports stranded and unstranded libraries, generating both HTSeq-compatible counts and normalized measures for downstream analysis.",
         "workflowName": "RNA-Seq Analysis: Single-End Read Processing and Quantification"
       }
@@ -353,7 +353,7 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/atacseq/main/versions/v2.0",
+        "trsId": "#workflow/github.com/iwc-workflows/atacseq/main/versions/v2.1",
         "workflowDescription": "Complete ATAC-seq analysis pipeline for paired-end reads. Processes raw FASTQ data through adapter and bad quality removal (fastp), alignment (Bowtie2 end-to-end), and filtering (removes MT reads, discordant pairs, low mapping quality below 30, PCR duplicates). Generates 5' cut site pileups (±100bp), performs peak calling, and quantifies reads in 1kb summit-centered regions. Produces two normalized coverage tracks (per million mapped reads and per million reads in peaks) and fragment length distribution plots for quality assessment.",
         "workflowName": "ATAC-seq Analysis: Chromatin Accessibility Profiling"
       },
@@ -380,7 +380,7 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v1.1",
+        "trsId": "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v1.2",
         "workflowDescription": "Complete ChIP-seq analysis for paired-end sequencing data. Processes raw FASTQ files through adapter removal (fastp), alignment to reference genome (Bowtie2), and stringent quality filtering (MAPQ greater than 30, concordant pairs only). Peak calling with MACS2 optimized for paired-end reads identifies protein-DNA binding sites. Generates alignment files, coverage, peak calls, and quality metrics for downstream analysis.",
         "workflowName": "ChIP-seq Analysis: Paired-End Read Processing"
       },
@@ -407,7 +407,7 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v1.1",
+        "trsId": "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v1.2",
         "workflowDescription": "Complete ChIP-seq analysis for single-end sequencing data. Processes raw FASTQ files through adapter removal (fastp), alignment to reference genome (Bowtie2), and quality filtering (MAPQ greater than 30). Peak calling with MACS2 uses a fixed extension of 200bp to identify protein-DNA binding sites. Generates alignment files, coverage, peak calls, and quality metrics for downstream analysis.",
         "workflowName": "ChIP-seq Analysis: Single-End Read Processing"
       },
@@ -419,7 +419,7 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.5",
+        "trsId": "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.6",
         "workflowDescription": "Identifies high-confidence consensus peaks from ATAC-seq or CUT and RUN replicate experiments. The workflow calls peaks on individual replicates and identifies their intersection. To control for sequencing depth differences, it subsamples all replicates to the smallest library size, performs peak calling on the combined normalized data, and retains only peaks whose summits overlap with intersections from a user-defined minimum number of replicates.",
         "workflowName": "Consensus Peak Calling for ATAC-seq and CUT and RUN Replicates"
       },
@@ -447,7 +447,7 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.18",
+        "trsId": "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.19",
         "workflowDescription": "Complete CUT&amp;RUN/CUT&amp;TAG analysis workflow for paired-end sequencing data. Processes raw FASTQ files through adapter removal (cutadapt) and alignment (Bowtie2 with dovetail option enabled). Applies quality filtering (MAPQ ≥ 30, concordant pairs only), converts BAM to BED format, and performs peak calling using MACS2 with parameters optimized for the punctate signal profile characteristic of CUT&amp;RUN/CUT&amp;TAG experiments.",
         "workflowName": "CUT&amp;RUN/CUT&amp;TAG Analysis: Protein-DNA Interaction Mapping"
       },
@@ -474,7 +474,7 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": "131567",
-        "trsId": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/chic-fastq-to-cool-hicup-cooler/versions/v0.3",
+        "trsId": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/chic-fastq-to-cool-hicup-cooler/versions/v0.4",
         "workflowDescription": "End-to-end processing of Capture Hi-C paired-end sequencing data. Transforms raw FASTQ files into balanced contact matrices using HiCUP for processing Hi-C reads (adapter trimming, mapping, filtering for valid pairs) with additional filtering for MAPQ and captured regions. The workflow generates sorted tabix files via cooler and produces balanced cool files at user-specified resolution for downstream analysis and visualization.",
         "workflowName": "Capture Hi-C Processing: FASTQ to Balanced Cool Files"
       },
@@ -501,7 +501,7 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": "131567",
-        "trsId": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-cool-hicup-cooler/versions/v0.3",
+        "trsId": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-cool-hicup-cooler/versions/v0.4",
         "workflowDescription": "Comprehensive Hi-C data processing workflow that converts paired-end FASTQ files to balanced contact matrices. Uses HiCUP for pre-processing (adapter trimming, mapping, filtering) with fragment midpoint coordinate assignment, filters reads by mapping quality, and generates sorted tabix files. The final output is a balanced cool file at user-specified resolution created with cooler, ready for multi-resolution contact matrix analysis.",
         "workflowName": "Hi-C Processing: FASTQ to Balanced Cool Files"
       },
@@ -528,7 +528,7 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": "131567",
-        "trsId": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-pairs-hicup/versions/v0.3",
+        "trsId": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-pairs-hicup/versions/v0.4",
         "workflowDescription": "Processes Hi-C paired-end FASTQ files to generate validated interaction pairs using HiCUP. The workflow truncates reads at ligation junctions, maps to reference genome, assigns to restriction fragments, and filters out experimental artifacts (self-ligated, dangling ends, internal fragments, and size outliers). Removes duplicates and converts outputs to formats compatible with Juicebox/cooler using fragment midpoints as coordinates. Final filtering by mapping quality ensures high-confidence interaction data.",
         "workflowName": "Hi-C Data Processing: FASTQ to Valid Interaction Pairs"
       }
@@ -838,11 +838,24 @@
         "assemblyCountMax": null,
         "assemblyCountMin": 2,
         "iwcId": "hyphy-capheine-core-and-compare",
-        "parameters": [],
+        "parameters": [
+          {
+            "key": "reference Fasta",
+            "variable": "ASSEMBLY_FASTA_URL"
+          },
+          {
+            "key": "reference GTF",
+            "variable": "GENE_MODEL_URL"
+          },
+          {
+            "key": "unaligned sequences",
+            "variable": "FASTA_COLLECTION"
+          }
+        ],
         "ploidy": "ANY",
         "scope": "ORGANISM",
         "taxonomyId": "10239",
-        "trsId": "#workflow/github.com/iwc-workflows/hyphy/capheine-core-and-compare/versions/v0.1",
+        "trsId": "#workflow/github.com/iwc-workflows/hyphy/capheine-core-and-compare/versions/v0.2",
         "workflowDescription": "Runs CAPHEINE selection analyses with optional foreground/background branch labeling for branch comparisons.",
         "workflowName": "CAPHEINE: Combined HyPhy Core and Compare"
       }

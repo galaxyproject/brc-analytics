@@ -1,13 +1,13 @@
 import type {
   WorkflowAssemblyMapping,
   WorkflowCategory,
-} from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
+} from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
-} from "../../../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
-import type { Organism } from "../../../app/views/WorkflowsView/types";
-import { getWorkflows } from "../../../app/views/WorkflowsView/utils";
+} from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
+import type { Organism } from "@/views/WorkflowsView/types";
+import { getWorkflows } from "@/views/WorkflowsView/utils";
 
 jest.mock(
   "../../../app/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants",

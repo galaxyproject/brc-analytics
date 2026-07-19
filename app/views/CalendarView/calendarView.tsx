@@ -1,10 +1,10 @@
-import { Fragment, JSX } from "react";
-import { SectionHero } from "../../components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
+import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import {
   Section,
   SectionContent,
   SectionLayout,
-} from "../../components/content/content.styles";
+} from "@/components/content/content.styles";
+import { Fragment, JSX } from "react";
 import { BREADCRUMBS } from "./common/constants";
 
 export const CalendarView = (): JSX.Element => {

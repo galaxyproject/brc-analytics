@@ -1,5 +1,5 @@
+import { SuggestionChip } from "@/types/api";
 import { JSX } from "react";
-import { SuggestionChip } from "../../../types/api";
 import { ChipsContainer, StyledSuggestionChip } from "./suggestionChips.styles";
 
 interface SuggestionChipsProps {

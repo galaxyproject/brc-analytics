@@ -23,6 +23,7 @@ venv
 /catalog/output
 /catalog/ga2/output
 /catalog/schema/generated
+/catalog/py_package/catalog_build/transform/dbt/target
 
 # claude code config
 .claude

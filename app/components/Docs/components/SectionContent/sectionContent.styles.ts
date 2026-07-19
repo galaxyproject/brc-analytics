@@ -1,3 +1,8 @@
+import { sectionLayout } from "@/components/Layout/components/AppLayout/components/Section/section.styles";
+import {
+  CONTENT_TYPE,
+  FrontmatterProps,
+} from "@/docs/common/frontmatter/types";
 import {
   Content,
   ContentLayout,
@@ -11,11 +16,6 @@ import {
 } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import {
-  CONTENT_TYPE,
-  FrontmatterProps,
-} from "../../../../docs/common/frontmatter/types";
-import { sectionLayout } from "../../../Layout/components/AppLayout/components/Section/section.styles";
 
 export const PADDING_Y = 64;
 

@@ -1,20 +1,20 @@
+import {
+  BRCCatalog,
+  EntitiesResponse,
+} from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import { GA2Catalog } from "@/apis/catalog/ga2/entities";
+import { getEntityDetailMeta } from "@/common/meta/utils";
+import { EntityDataGate } from "@/components/EntityDataGate/entityDataGate";
+import { config } from "@/config/config";
+import { getEntities, getEntity } from "@/utils/entityUtils";
+import { seedDatabase } from "@/utils/seedDatabase";
+import { AnalyzeView } from "@/views/AnalyzeView/analyzeView";
+import { EntityDetailView } from "@/views/EntityView/entityView";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { getEntityConfig } from "@databiosphere/findable-ui/lib/config/utils";
 import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
-import {
-  BRCCatalog,
-  EntitiesResponse,
-} from "../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
-import { GA2Catalog } from "../../../../app/apis/catalog/ga2/entities";
-import { getEntityDetailMeta } from "../../../../app/common/meta/utils";
-import { EntityDataGate } from "../../../../app/components/EntityDataGate/entityDataGate";
-import { config } from "../../../../app/config/config";
-import { getEntities, getEntity } from "../../../../app/utils/entityUtils";
-import { seedDatabase } from "../../../../app/utils/seedDatabase";
-import { AnalyzeView } from "../../../../app/views/AnalyzeView/analyzeView";
-import { EntityDetailView } from "../../../../app/views/EntityView/entityView";
 
 interface StaticPath {
   params: PageUrl;

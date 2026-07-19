@@ -1,12 +1,12 @@
+import { getPageMeta } from "@/common/meta/utils";
+import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
+import { config } from "@/config/config";
+import { PartnerResourcesView as PartnerResourcesViewGA2 } from "@/views/PartnerResourcesView/ga2/partnerResourcesView";
+import { PartnerResourcesView } from "@/views/PartnerResourcesView/partnerResourcesView";
+import { APP_KEYS } from "@site-config/common/constants";
 import { GetStaticProps } from "next";
 import { JSX } from "react";
-import { getPageMeta } from "../../../app/common/meta/utils";
-import { StyledPagesMain } from "../../../app/components/Layout/components/Main/main.styles";
-import { config } from "../../../app/config/config";
-import { PartnerResourcesView } from "../../../app/views/PartnerResourcesView/partnerResourcesView";
-import { PartnerResourcesViewGA2 } from "../../../app/views/PartnerResourcesView/partnerResourcesViewGA2";
 import { ROUTES } from "../../../routes/constants";
-import { APP_KEYS } from "../../../site-config/common/constants";
 import type { PageProps } from "../../_app";
 
 const Page = (): JSX.Element => {

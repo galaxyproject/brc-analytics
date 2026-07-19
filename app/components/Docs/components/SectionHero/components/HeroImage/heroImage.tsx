@@ -1,5 +1,5 @@
+import { FrontmatterProps } from "@/docs/common/frontmatter/types";
 import { JSX } from "react";
-import { FrontmatterProps } from "../../../../../../docs/common/frontmatter/types";
 import { StyledImage } from "./heroImage.styles";
 
 export const HeroImage = ({

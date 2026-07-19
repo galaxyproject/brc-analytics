@@ -1,5 +1,5 @@
+import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { RowSelectionState } from "@tanstack/react-table";
-import { ConfiguredInput } from "../../../../../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 
 /**
  * Returns the row selection state for the configured input.

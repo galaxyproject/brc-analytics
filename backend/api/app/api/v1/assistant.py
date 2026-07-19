@@ -123,14 +123,24 @@ async def restore_session(
     if state is None:
         raise HTTPException(status_code=404, detail="Session not found or expired")
 
+    # Reconcile the persisted schema against the current catalog before deciding
+    # handoff. The chat path does this every turn; restore read the stored state
+    # directly, so without it a session whose workflow was since removed from the
+    # catalog would still yield a handoff URL from its stale detail (sol review).
+    schema_state = agent.reconcile_schema(state.schema_state)
+    # Re-derive suggestions from the reconciled schema too: the persisted chips
+    # can be inconsistent with a schema that just lost a removed workflow (e.g. a
+    # stale "continue to handoff" chip), which would steer the user down an
+    # invalid path (Copilot). This is the same derivation the chat path runs.
+    suggestions = agent._derive_suggestions(schema_state)
     is_complete, handoff_url = agent.compute_handoff(
-        state.schema_state, session_id=state.session_id
+        schema_state, session_id=state.session_id
     )
     return SessionRestoreResponse(
         session_id=state.session_id,
         messages=state.messages,
-        schema_state=state.schema_state,
-        suggestions=state.suggestions,
+        schema_state=schema_state,
+        suggestions=suggestions,
         is_complete=is_complete,
         handoff_url=handoff_url,
     )

@@ -1,7 +1,7 @@
 import "@databiosphere/findable-ui";
 import { AzulEntitiesStaticResponse } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import { Error } from "@databiosphere/findable-ui/lib/components/Error/error";
-import { ErrorBoundary } from "@databiosphere/findable-ui/lib/components/ErrorBoundary";
+import { ErrorBoundary } from "@databiosphere/findable-ui/lib/components/ErrorBoundary/errorBoundary";
 import { Head } from "@databiosphere/findable-ui/lib/components/Head/head";
 import { AppLayout as DXAppLayout } from "@databiosphere/findable-ui/lib/components/Layout/components/AppLayout/appLayout.styles";
 import { Floating } from "@databiosphere/findable-ui/lib/components/Layout/components/Floating/floating";
@@ -18,6 +18,7 @@ import { SystemStatusProvider } from "@databiosphere/findable-ui/lib/providers/s
 import { DataExplorerError } from "@databiosphere/findable-ui/lib/types/error";
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { CssBaseline, ThemeProvider } from "@mui/material";
+import { AppCacheProvider } from "@mui/material-nextjs/v16-pagesRouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NextPage } from "next";
 import type { AppProps } from "next/app";
@@ -51,11 +52,18 @@ export type AppPropsWithComponent = AppProps & {
   pageProps: PageProps;
 };
 
-setFeatureFlags(["assembly-workflows", "assistant", "flu", "hyphy", "lmls"]);
+setFeatureFlags([
+  "assembly-workflows",
+  "assistant",
+  "hyphy",
+  "lmls",
+  "pangenome",
+]);
 
 const queryClient = new QueryClient();
 
-function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
+function MyApp(props: AppPropsWithComponent): JSX.Element {
+  const { Component, pageProps } = props;
   // Set up the site configuration, layout and theme.
   const appConfig = config();
   // Kick off entity cache load and distribute the boolean via context so
@@ -91,62 +99,66 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
   }, [header, isAssistantEnabled]);
 
   return (
-    <EmotionThemeProvider theme={appTheme}>
-      <ThemeProvider theme={appTheme}>
-        <DXConfigProvider config={appConfig} entityListType={entityListType}>
-          <Head pageTitle={pageTitle} />
-          <OgMeta
-            appTitle={appConfig.appTitle}
-            browserURL={appConfig.browserURL}
-            defaultDescription={getDefaultDescription(appConfig.appKey)}
-            pageDescription={pageDescription}
-            pageTitle={pageTitle}
-          />
-          <CssBaseline />
-          <QueryClientProvider client={queryClient}>
-            <ServicesProvider>
-              <SystemStatusProvider>
-                <BrcAuthProvider loginEnabled={appConfig.loginEnabled}>
-                  <LayoutDimensionsProvider>
-                    <AppLayout>
-                      <DXHeader {...filteredHeader} />
-                      <ExploreStateProvider entityListType={entityListType}>
-                        <WorkflowHandoffProvider>
-                          <Main>
-                            <ErrorBoundary
-                              fallbackRender={({
-                                error,
-                                reset,
-                              }: {
-                                error: DataExplorerError;
-                                reset: () => void;
-                              }): JSX.Element => (
-                                <Error
-                                  errorMessage={error.message}
-                                  requestUrlMessage={error.requestUrlMessage}
-                                  rootPath={redirectRootToPath}
-                                  onReset={reset}
-                                />
-                              )}
-                            >
-                              <EntitiesLoadedProvider value={isEntitiesLoaded}>
-                                <Component {...pageProps} />
-                                <Floating {...floating} />
-                              </EntitiesLoadedProvider>
-                            </ErrorBoundary>
-                          </Main>
-                        </WorkflowHandoffProvider>
-                      </ExploreStateProvider>
-                      <StyledFooter {...footer} />
-                    </AppLayout>
-                  </LayoutDimensionsProvider>
-                </BrcAuthProvider>
-              </SystemStatusProvider>
-            </ServicesProvider>
-          </QueryClientProvider>
-        </DXConfigProvider>
-      </ThemeProvider>
-    </EmotionThemeProvider>
+    <AppCacheProvider {...props}>
+      <EmotionThemeProvider theme={appTheme}>
+        <ThemeProvider theme={appTheme}>
+          <DXConfigProvider config={appConfig} entityListType={entityListType}>
+            <Head pageTitle={pageTitle} />
+            <OgMeta
+              appTitle={appConfig.appTitle}
+              browserURL={appConfig.browserURL}
+              defaultDescription={getDefaultDescription(appConfig.appKey)}
+              pageDescription={pageDescription}
+              pageTitle={pageTitle}
+            />
+            <CssBaseline />
+            <QueryClientProvider client={queryClient}>
+              <ServicesProvider>
+                <SystemStatusProvider>
+                  <BrcAuthProvider loginEnabled={appConfig.loginEnabled}>
+                    <LayoutDimensionsProvider>
+                      <AppLayout>
+                        <DXHeader {...filteredHeader} />
+                        <ExploreStateProvider entityListType={entityListType}>
+                          <WorkflowHandoffProvider>
+                            <Main>
+                              <ErrorBoundary
+                                fallbackRender={({
+                                  error,
+                                  reset,
+                                }: {
+                                  error: DataExplorerError;
+                                  reset: () => void;
+                                }): JSX.Element => (
+                                  <Error
+                                    errorMessage={error.message}
+                                    requestUrlMessage={error.requestUrlMessage}
+                                    rootPath={redirectRootToPath}
+                                    onReset={reset}
+                                  />
+                                )}
+                              >
+                                <EntitiesLoadedProvider
+                                  value={isEntitiesLoaded}
+                                >
+                                  <Component {...pageProps} />
+                                  <Floating {...floating} />
+                                </EntitiesLoadedProvider>
+                              </ErrorBoundary>
+                            </Main>
+                          </WorkflowHandoffProvider>
+                        </ExploreStateProvider>
+                        <StyledFooter {...footer} />
+                      </AppLayout>
+                    </LayoutDimensionsProvider>
+                  </BrcAuthProvider>
+                </SystemStatusProvider>
+              </ServicesProvider>
+            </QueryClientProvider>
+          </DXConfigProvider>
+        </ThemeProvider>
+      </EmotionThemeProvider>
+    </AppCacheProvider>
   );
 }
 

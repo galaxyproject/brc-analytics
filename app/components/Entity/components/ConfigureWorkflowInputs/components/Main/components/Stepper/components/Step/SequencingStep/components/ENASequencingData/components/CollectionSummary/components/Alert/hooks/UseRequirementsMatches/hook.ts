@@ -1,8 +1,8 @@
+import { ReadRun } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
+import { useAssembly } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/hook";
+import { useWorkflowEntity } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/hook";
 import { Table } from "@tanstack/react-table";
 import { useMemo } from "react";
-import { useAssembly } from "../../../../../../../../../../../../../../../providers/Assembly/hook";
-import { useWorkflowEntity } from "../../../../../../../../../../../../../../../providers/WorkflowEntity/hook";
-import { ReadRun } from "../../../../../../types";
 import type { UseRequirementsMatches } from "./types";
 import { buildRequirementWarnings } from "./utils";
 

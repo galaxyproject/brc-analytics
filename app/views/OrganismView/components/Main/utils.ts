@@ -1,10 +1,10 @@
-import { WorkflowCategoryId } from "../../../../../catalog/schema/generated/schema";
 import type {
   Workflow,
   WorkflowCategory,
-} from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
-import { WORKFLOW_SCOPE } from "../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
-import type { Organism } from "../../types";
+} from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import { WORKFLOW_SCOPE } from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
+import type { Organism } from "@/views/OrganismView/types";
+import { WorkflowCategoryId } from "../../../../../catalog/schema/generated/schema";
 
 /**
  * Builds workflow categories for the given organism.

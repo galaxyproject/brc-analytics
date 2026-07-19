@@ -1,8 +1,8 @@
+import { AssemblyContext } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/context";
+import { useAssembly } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/hook";
+import type { Assembly } from "@/views/WorkflowInputsView/types";
 import { renderHook } from "@testing-library/react";
 import { createElement, JSX, ReactNode } from "react";
-import { AssemblyContext } from "../../../../app/components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/context";
-import { useAssembly } from "../../../../app/components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/hook";
-import type { Assembly } from "../../../../app/views/WorkflowInputsView/types";
 
 describe("useAssembly", () => {
   test("returns undefined when used outside of provider", () => {

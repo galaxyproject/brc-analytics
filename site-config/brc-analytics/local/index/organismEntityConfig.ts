@@ -1,18 +1,18 @@
+import { BRCDataCatalogOrganism } from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import { getOrganismId } from "@/apis/catalog/brc-analytics-catalog/common/utils";
+import * as C from "@/components";
+import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import {
   ComponentConfig,
   ListConfig,
   SORT_DIRECTION,
 } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
-import { BRCDataCatalogOrganism } from "../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
-import { getOrganismId } from "../../../../app/apis/catalog/brc-analytics-catalog/common/utils";
-import * as C from "../../../../app/components";
-import * as V from "../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { AppEntityConfig } from "../../../common/entities";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
-} from "../../category";
+} from "@site-config/brc-analytics/category";
+import { AppEntityConfig } from "@site-config/common/entities";
 import { organismMainColumn } from "../entity/organism/organismMainColumn";
 import { organismTop } from "../entity/organism/organismTop";
 import { CATEGORY_GROUPS } from "./common/category/categories";
@@ -228,7 +228,7 @@ export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
       {
         componentConfig: {
           component: C.NTagCell,
-          viewBuilder: V.buildTaxonomicGroup,
+          viewBuilder: V.buildOrganismTaxonomicGroup,
         } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_GROUP,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_GROUP,

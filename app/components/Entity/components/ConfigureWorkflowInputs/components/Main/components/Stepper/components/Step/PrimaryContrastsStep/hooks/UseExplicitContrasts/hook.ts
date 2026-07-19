@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { ConfiguredInput } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { useCallback, useMemo, useState } from "react";
 import { ContrastPairs, UseExplicitContrasts } from "./types";
 import {
   addPairUpdater,
@@ -22,6 +22,15 @@ export function useExplicitContrasts(
 ): UseExplicitContrasts {
   const [pairs, setPairs] = useState<ContrastPairs>(createInitialPairs);
 
+  // Reset pairs when primaryFactor changes. Adjusting state during render
+  // (tracking the previous value) is React's recommended alternative to a
+  // reset-in-effect — it avoids the extra commit + re-render.
+  const [prevPrimaryFactor, setPrevPrimaryFactor] = useState(primaryFactor);
+  if (primaryFactor !== prevPrimaryFactor) {
+    setPrevPrimaryFactor(primaryFactor);
+    setPairs(createInitialPairs());
+  }
+
   const primaryContrasts = useMemo(
     () => buildExplicitContrasts(pairs),
     [pairs]
@@ -43,10 +52,6 @@ export function useExplicitContrasts(
     },
     []
   );
-
-  useEffect(() => {
-    setPairs(createInitialPairs());
-  }, [primaryFactor]);
 
   return {
     onAddPair,

@@ -1,6 +1,6 @@
+import { sectionGrid } from "@/components/Layout/components/AppLayout/components/Section/section.styles";
 import { bpUpSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
-import { sectionGrid } from "../../../../../../../Layout/components/AppLayout/components/Section/section.styles";
 
 export const Grid = styled.div`
   ${sectionGrid};

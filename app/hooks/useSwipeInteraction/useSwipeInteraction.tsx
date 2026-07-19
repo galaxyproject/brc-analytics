@@ -121,6 +121,17 @@ export function useSwipeInteraction(
     swipeStartCoordsRef.current = getTouchCoords(touchEvent);
   }, []);
 
+  // Consume a dispatched swipe action: `swipeAction` is set both by the pointer
+  // handlers and by the public `onSetSwipeAction` API (e.g. the Carousel arrow
+  // buttons). This effect handles the discrete actions (FORWARD/BACKWARD advance
+  // the index; SELECT is a no-op) and acknowledges each by resetting to NONE;
+  // SCROLL/NONE are intentionally ignored. The reset is the "ack" half of a
+  // reducer-style action cycle rather than derived state, so it's kept as an
+  // effect deliberately: the shared external entry point means the logic can't
+  // simply move into event handlers.
+  /* eslint-disable react-hooks/set-state-in-effect -- intentional: this effect
+     consumes a dispatched swipe action (see comment above) and acknowledges the
+     discrete actions by resetting to NONE; it is not syncing derived state. */
   useEffect(() => {
     if (swipeAction === SWIPE_ACTION.SWIPE_FORWARD) {
       onSwipeToIndex(1);
@@ -132,6 +143,7 @@ export function useSwipeInteraction(
       setSwipeAction(SWIPE_ACTION.NONE);
     }
   }, [swipeAction, onSwipeToIndex]);
+  /* eslint-enable react-hooks/set-state-in-effect -- re-enable after the intentional ack effect above */
 
   useEffect(() => {
     if (interactiveDelay === 0) return;

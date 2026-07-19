@@ -1,8 +1,8 @@
+import { Props } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/Table/types";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Typography } from "@mui/material";
 import { RowData, Table } from "@tanstack/react-table";
 import { JSX } from "react";
-import { Props } from "../../../../types";
 
 /**
  * Results summary component displaying table row counts.

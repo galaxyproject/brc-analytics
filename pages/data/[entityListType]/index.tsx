@@ -1,3 +1,14 @@
+import {
+  BRCCatalog,
+  EntitiesResponse,
+  Outbreak,
+} from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import { GA2Catalog } from "@/apis/catalog/ga2/entities";
+import { getEntityListMeta } from "@/common/meta/utils";
+import { config } from "@/config/config";
+import { seedDatabase } from "@/utils/seedDatabase";
+import { StyledExploreView } from "@/views/ExploreView/exploreView.styles";
+import { PriorityPathogensView } from "@/views/PriorityPathogensView/priorityPathogensView";
 import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main.styles";
 import { getEntityConfig } from "@databiosphere/findable-ui/lib/config/utils";
 import { getEntityService } from "@databiosphere/findable-ui/lib/hooks/useEntityService";
@@ -5,17 +16,6 @@ import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMod
 import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
-import {
-  BRCCatalog,
-  EntitiesResponse,
-  Outbreak,
-} from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
-import { GA2Catalog } from "../../../app/apis/catalog/ga2/entities";
-import { getEntityListMeta } from "../../../app/common/meta/utils";
-import { config } from "../../../app/config/config";
-import { seedDatabase } from "../../../app/utils/seedDatabase";
-import { StyledExploreView } from "../../../app/views/ExploreView/exploreView.styles";
-import { PriorityPathogensView } from "../../../app/views/PriorityPathogensView/priorityPathogensView";
 
 interface PageUrl extends ParsedUrlQuery {
   entityListType: string;

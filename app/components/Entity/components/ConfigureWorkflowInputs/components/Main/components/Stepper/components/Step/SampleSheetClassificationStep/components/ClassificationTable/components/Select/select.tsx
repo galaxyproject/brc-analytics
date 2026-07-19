@@ -1,6 +1,6 @@
+import { COLUMN_TYPE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 import { MenuItem } from "@mui/material";
 import { JSX } from "react";
-import { COLUMN_TYPE } from "../../../../types";
 import { SELECT_PROPS } from "./constants";
 import { OPTIONS } from "./options";
 import { StyledSelect } from "./select.styles";

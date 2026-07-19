@@ -1,13 +1,12 @@
 import {
-  BRCDataCatalogGenome,
-  BRCDataCatalogOrganism,
   Workflow,
   WorkflowCategory,
-} from "../../apis/catalog/brc-analytics-catalog/common/entities";
-import {
-  GA2AssemblyEntity,
-  GA2OrganismEntity,
-} from "../../apis/catalog/ga2/entities";
+} from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import type { Pangenome } from "@/apis/catalog/brc-analytics-catalog/common/pangenome";
+import type {
+  AssemblyContract,
+  OrganismContract,
+} from "@/apis/catalog/common/entities";
 import { findEntity, getEntities, getEntity } from "./query";
 
 /**
@@ -15,9 +14,9 @@ import { findEntity, getEntities, getEntity } from "./query";
  * @param entityId - Entity id.
  * @returns Organism, or undefined when not found.
  */
-export function findOrganism<
-  T extends BRCDataCatalogOrganism | GA2OrganismEntity,
->(entityId: string): T | undefined {
+export function findOrganism<T extends OrganismContract>(
+  entityId: string
+): T | undefined {
   return findEntity<T>("organisms", entityId);
 }
 
@@ -25,9 +24,7 @@ export function findOrganism<
  * Gets assemblies.
  * @returns Assemblies.
  */
-export function getAssemblies<
-  T extends BRCDataCatalogGenome | GA2AssemblyEntity,
->(): T[] {
+export function getAssemblies<T extends AssemblyContract>(): T[] {
   return getEntities<T>("assemblies");
 }
 
@@ -36,9 +33,7 @@ export function getAssemblies<
  * @param entityId - Entity id.
  * @returns Assembly.
  */
-export function getAssembly<T extends BRCDataCatalogGenome | GA2AssemblyEntity>(
-  entityId: string
-): T {
+export function getAssembly<T extends AssemblyContract>(entityId: string): T {
   return getEntity<T>("assemblies", entityId);
 }
 
@@ -47,9 +42,7 @@ export function getAssembly<T extends BRCDataCatalogGenome | GA2AssemblyEntity>(
  * @param entityId - Entity id.
  * @returns Organism.
  */
-export function getOrganism<
-  T extends BRCDataCatalogOrganism | GA2OrganismEntity,
->(entityId: string): T {
+export function getOrganism<T extends OrganismContract>(entityId: string): T {
   return getEntity<T>("organisms", entityId);
 }
 
@@ -57,10 +50,18 @@ export function getOrganism<
  * Gets organisms.
  * @returns Organisms.
  */
-export function getOrganisms<
-  T extends BRCDataCatalogOrganism | GA2OrganismEntity,
->(): T[] {
+export function getOrganisms<T extends OrganismContract>(): T[] {
   return getEntities<T>("organisms");
+}
+
+/**
+ * Gets the pangenome bundle for a species, or undefined when the species has no
+ * pangenome.
+ * @param speciesTaxonomyId - Species taxonomy ID.
+ * @returns Pangenome bundle, or undefined.
+ */
+export function getPangenome(speciesTaxonomyId: string): Pangenome | undefined {
+  return findEntity<Pangenome>("pangenomes", speciesTaxonomyId);
 }
 
 /**
