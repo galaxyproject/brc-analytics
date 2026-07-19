@@ -1,11 +1,9 @@
 import {
   BRCDataCatalogGenome,
-  EntitiesResponse,
   WorkflowCategory,
 } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { BRC_PAGE_META } from "@/common/meta/brc/constants";
 import { config } from "@/config/config";
-import { getEntities } from "@/utils/entityUtils";
 import {
   formatTrsId,
   workflowIsCompatibleWithAssembly,
@@ -15,6 +13,8 @@ import { buildOrganismWorkflows } from "@/views/OrganismView/components/Main/uti
 import { OrganismWorkflowInputsView } from "@/views/OrganismWorkflowInputsView/organismWorkflowInputsView";
 import { WorkflowInputsView } from "@/views/WorkflowInputsView/workflowInputsView";
 import { EntityDataGate } from "@brc-analytics/core/components/EntityDataGate/entityDataGate";
+import { EntitiesResponse } from "@brc-analytics/core/services/staticGeneration/entities/types";
+import { getEntities } from "@brc-analytics/core/services/staticGeneration/entities/utils";
 import { seedDatabase } from "@brc-analytics/core/utils/seedDatabase";
 import type { Organism } from "@brc-analytics/core/views/OrganismView/types";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";

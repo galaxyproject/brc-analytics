@@ -79,19 +79,6 @@ export interface BRCDataCatalogOrganism {
   taxonomicLevelStrain: string[];
 }
 
-export interface EntitiesResponse<R> {
-  hits: R[];
-  pagination: EntitiesResponsePagination;
-  termFacets: Record<never, never>;
-}
-
-export interface EntitiesResponsePagination {
-  count: number;
-  pages: number;
-  size: number;
-  total: number;
-}
-
 export interface Outbreak {
   description: MDXRemoteSerializeResult;
   highlight_descendant_taxonomy_ids: number[] | null;

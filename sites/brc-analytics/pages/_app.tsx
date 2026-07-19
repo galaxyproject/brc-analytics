@@ -1,4 +1,3 @@
-import { EntitiesResponse } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { getDefaultDescription } from "@/common/meta/utils";
 import { config } from "@/config/config";
 import { BRC_ROUTES } from "@/routes/constants";
@@ -10,6 +9,7 @@ import { OgMeta } from "@brc-analytics/core/components/OgMeta/ogMeta";
 import { BrcAuthProvider } from "@brc-analytics/core/providers/authentication/provider";
 import { EntitiesLoadedProvider } from "@brc-analytics/core/providers/entitiesLoaded/provider";
 import { WorkflowHandoffProvider } from "@brc-analytics/core/providers/workflowHandoff/provider";
+import { EntitiesResponse } from "@brc-analytics/core/services/staticGeneration/entities/types";
 import "@databiosphere/findable-ui";
 import { Error } from "@databiosphere/findable-ui/lib/components/Error/error";
 import { ErrorBoundary } from "@databiosphere/findable-ui/lib/components/ErrorBoundary/errorBoundary";

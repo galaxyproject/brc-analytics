@@ -1,7 +1,7 @@
-import { EntitiesResponse } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { GA2Catalog } from "@/apis/catalog/ga2/entities";
 import { GA2_PAGE_META } from "@/common/meta/ga2/constants";
 import { config } from "@/config/config";
+import { EntitiesResponse } from "@brc-analytics/core/services/staticGeneration/entities/types";
 import { seedDatabase } from "@brc-analytics/core/utils/seedDatabase";
 import { StyledExploreView } from "@brc-analytics/core/views/ExploreView/exploreView.styles";
 import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main.styles";
