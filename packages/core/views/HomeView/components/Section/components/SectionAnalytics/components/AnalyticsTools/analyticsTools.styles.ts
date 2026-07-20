@@ -8,7 +8,7 @@ interface Props {
   interactionEnabled: boolean;
 }
 
-export const Grid = styled("div")<Props>`
+export const StyledGrid = styled("div")<Props>`
   display: grid;
   gap: 16px;
   grid-column: 1 / -1;

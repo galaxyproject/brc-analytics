@@ -8,14 +8,14 @@ import {
   CardContent,
   CardSection,
   CardTitle,
-  Grid,
   StyledBullets,
   StyledCard,
   StyledCardActions,
+  StyledGrid,
 } from "./analyticsTools.styles";
-import { ANALYTICS_TOOLS } from "./common/constants";
+import { Props } from "./types";
 
-export const AnalyticsTools = (): JSX.Element => {
+export const AnalyticsTools = ({ cards }: Props): JSX.Element => {
   const toolsRef = useRef<HTMLDivElement>(null);
   const {
     activeIndex,
@@ -24,10 +24,10 @@ export const AnalyticsTools = (): JSX.Element => {
     interactiveCards,
     interactiveIndexes,
     onSetActiveIndex,
-  } = useInteractiveAnalytics(toolsRef, ANALYTICS_TOOLS);
+  } = useInteractiveAnalytics(toolsRef, cards);
   return (
     <div>
-      <Grid
+      <StyledGrid
         ref={toolsRef}
         interactionEnabled={interactionEnabled}
         {...interactiveAction}
@@ -55,7 +55,7 @@ export const AnalyticsTools = (): JSX.Element => {
             </CardSection>
           </StyledCard>
         ))}
-      </Grid>
+      </StyledGrid>
       <StyledBullets
         activeBullet={activeIndex}
         bullets={interactiveIndexes}

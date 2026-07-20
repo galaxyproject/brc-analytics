@@ -2,8 +2,9 @@ import {
   SectionSubtitle,
   SectionTitle,
 } from "@/components/Home/components/Section/section.styles";
+import { AnalyticsTools } from "@brc-analytics/core/views/HomeView/components/Section/components/SectionAnalytics/components/AnalyticsTools/analyticsTools";
 import { JSX } from "react";
-import { AnalyticsTools } from "./components/AnalyticsTools/analyticsTools";
+import { ANALYTICS_TOOLS } from "./components/AnalyticsTools/common/constants";
 import { Headline, Section, SectionLayout } from "./sectionAnalytics.styles";
 
 export const SectionAnalytics = (): JSX.Element => {
@@ -19,7 +20,7 @@ export const SectionAnalytics = (): JSX.Element => {
             (TACC).
           </SectionSubtitle>
         </Headline>
-        <AnalyticsTools />
+        <AnalyticsTools cards={ANALYTICS_TOOLS} />
       </SectionLayout>
     </Section>
   );
