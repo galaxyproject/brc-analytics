@@ -1,8 +1,8 @@
-import { PartnerResourcesView } from "@/views/PartnerResourcesView/ga2/partnerResourcesView";
 import { StyledPagesMain } from "@brc-analytics/core/components/Layout/components/Main/main.styles";
 import { GetStaticProps } from "next";
 import { JSX } from "react";
 import { GA2_PAGE_META } from "~/meta/constants";
+import { PartnerResourcesView } from "~/views/PartnerResourcesView/partnerResourcesView";
 import type { PageProps } from "../../_app";
 
 const Page = (): JSX.Element => {
