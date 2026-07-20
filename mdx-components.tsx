@@ -1,3 +1,4 @@
+import { Figure } from "@brc-analytics/core/components/mdx/Figure/figure";
 import {
   AlertTitle,
   AccordionDetails as MAccordionDetails,
@@ -7,7 +8,6 @@ import * as C from "./app/components";
 import { CardActions } from "./app/components/Home/components/Section/components/SectionHero/components/Carousel/components/Cards/cards.styles";
 import { Accordion } from "./app/components/common/Accordion/accordion";
 import { AccordionSummary } from "./app/components/common/Accordion/components/AccordionSummary/accordionSummary";
-import { Figure } from "./app/components/common/Figure/figure";
 import {
   Section,
   SectionContent,
