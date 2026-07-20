@@ -1,4 +1,4 @@
-import { CalendarView } from "@/views/CalendarView/calendarView";
+import { CalendarView } from "~/views/CalendarView/calendarView";
 import { StyledPagesMain } from "@brc-analytics/core/components/Layout/components/Main/main.styles";
 import { GetStaticProps } from "next";
 import { JSX } from "react";
