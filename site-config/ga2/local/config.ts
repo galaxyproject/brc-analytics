@@ -19,14 +19,6 @@ import { workflowEntityConfig } from "./index/workflow/workflowEntityConfig";
 import { socialMedia } from "./socialMedia";
 import { THEME_OPTIONS } from "./theme/constants";
 
-const ALLOWED_PATHS = [
-  GA2_ROUTES.ABOUT,
-  GA2_ROUTES.ABOUT_PARTNER_RESOURCES,
-  GA2_ROUTES.ABOUT_ROADMAP,
-  ROUTES.ORGANISMS,
-  ROUTES.GENOMES,
-  ROUTES.WORKFLOWS,
-];
 const LOCALHOST = "http://localhost:3000";
 const APP_TITLE = "Genome Ark 2";
 const BROWSER_URL = LOCALHOST;
@@ -54,7 +46,6 @@ export function makeConfig(
   taxTreeData = data as TaxonomyNode
 ): AppSiteConfig {
   return {
-    allowedPaths: ALLOWED_PATHS,
     appKey: APP_KEYS.GA2,
     appTitle: APP_TITLE,
     browserURL: browserUrl,
