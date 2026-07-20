@@ -1,10 +1,10 @@
-import { HomeView } from "@/views/HomeView/homeView";
 import { StyledMain } from "@brc-analytics/core/components/Layout/components/Main/main.styles";
 import { useLayoutDimensions } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/hook";
 import { config } from "@site-config/brc-analytics/config";
 import { GetStaticProps } from "next";
 import { JSX } from "react";
 import { BRC_PAGE_META } from "~/meta/constants";
+import { HomeView } from "~/views/HomeView/homeView";
 
 const Page = (): JSX.Element | null => {
   const { dimensions } = useLayoutDimensions();
