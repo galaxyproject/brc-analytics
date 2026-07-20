@@ -4,7 +4,7 @@ set -euo pipefail
 # JSON source root
 SRC_ROOT="catalog/ga2/output"
 
-API_DIR="public/api"
+API_DIR="sites/ga2/public/api"
 mkdir -p "$API_DIR"
 
 PER_APP_JSONS=("assemblies" "organisms" "workflow-assembly-mappings")
