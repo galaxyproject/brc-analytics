@@ -2,6 +2,7 @@ import { Outbreak } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "@/components";
 import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import { ResourcesSection } from "@/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
+import { MDXSection } from "@/views/PriorityPathogenView/ui/Section/MDXSection/mdxSection";
 import {
   ComponentConfig,
   ComponentsConfig,
@@ -11,9 +12,9 @@ export const priorityPathogenMainColumn: ComponentsConfig = [
   {
     children: [
       {
-        component: C.MDXSection,
+        component: MDXSection,
         viewBuilder: V.buildPriorityPathogenDescription,
-      } as ComponentConfig<typeof C.MDXSection, Outbreak>,
+      } as ComponentConfig<typeof MDXSection, Outbreak>,
       {
         component: ResourcesSection,
         viewBuilder: V.buildPriorityPathogenResources,
