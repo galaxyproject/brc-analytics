@@ -1,22 +1,14 @@
 import { BRC_PAGE_META } from "@/common/meta/brc/constants";
-import { config } from "@/config/config";
-import { BRC_ROUTES } from "@/routes/constants";
 import { CalendarView } from "@/views/CalendarView/calendarView";
 import { StyledPagesMain } from "@brc-analytics/core/components/Layout/components/Main/main.styles";
 import { GetStaticProps } from "next";
 import { JSX } from "react";
 
-export const Calendar = (): JSX.Element => {
+const Page = (): JSX.Element => {
   return <CalendarView />;
 };
 
 export const getStaticProps: GetStaticProps = async () => {
-  const { allowedPaths } = config();
-
-  if (allowedPaths && !allowedPaths.includes(BRC_ROUTES.CALENDAR)) {
-    return { notFound: true };
-  }
-
   return {
     props: {
       ...BRC_PAGE_META.CALENDAR,
@@ -27,6 +19,6 @@ export const getStaticProps: GetStaticProps = async () => {
   };
 };
 
-export default Calendar;
+export default Page;
 
-Calendar.Main = StyledPagesMain;
+Page.Main = StyledPagesMain;
