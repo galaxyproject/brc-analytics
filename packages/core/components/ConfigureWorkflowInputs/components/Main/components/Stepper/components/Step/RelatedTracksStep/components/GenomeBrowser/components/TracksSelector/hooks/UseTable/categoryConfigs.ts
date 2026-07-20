@@ -1,6 +1,6 @@
 import { GROUP_ID_LABEL } from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/components/GenomeBrowser/components/TracksSelector/components/TracksSelectionPanel/constants";
+import { mapSelectCategoryValue } from "@brc-analytics/core/utils/mapSelectCategoryValue";
 import { CategoryConfig } from "@databiosphere/findable-ui/lib/common/categories/config/types";
-import { mapSelectCategoryValue } from "@site-config/brc-analytics/local/index/common/category/mapSelectCategoryValue";
 
 export const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
   GROUP_ID: {

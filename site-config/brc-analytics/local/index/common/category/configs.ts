@@ -1,9 +1,9 @@
+import { mapSelectCategoryValue } from "@brc-analytics/core/utils/mapSelectCategoryValue";
 import { CategoryConfig } from "@databiosphere/findable-ui/lib/common/categories/config/types";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
 } from "@site-config/brc-analytics/category";
-import { mapSelectCategoryValue } from "./mapSelectCategoryValue";
 import { mapPriority, mapPriorityPathogenName } from "./utils";
 
 export const PRIORITY: CategoryConfig = {
