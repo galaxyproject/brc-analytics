@@ -6,7 +6,6 @@ import {
   SiteConfig as BaseSiteConfig,
   ComponentsConfig,
 } from "@databiosphere/findable-ui/lib/config/entities";
-import { APP_KEYS } from "./constants";
 
 export interface AppBackPageConfig extends Omit<
   BaseBackPageConfig,
@@ -28,7 +27,6 @@ export interface AppEntityConfig<R> extends Omit<
 }
 
 export interface AppSiteConfig extends BaseSiteConfig {
-  appKey?: (typeof APP_KEYS)[keyof typeof APP_KEYS];
   loginEnabled?: boolean;
   maxReadRunsForBrowseAll: number;
   taxTree?: TaxonomyNode;

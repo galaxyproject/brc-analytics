@@ -10,7 +10,6 @@ import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
-import { APP_KEYS } from "@site-config/common/constants";
 import { AppSiteConfig } from "@site-config/common/entities";
 import data from "catalog/output/ncbi-taxa-tree.json";
 import { createElement } from "react";
@@ -56,7 +55,6 @@ export function makeConfig(
   loginEnabled = LOGIN_ENABLED
 ): AppSiteConfig {
   return {
-    appKey: APP_KEYS.BRC_ANALYTICS,
     appTitle: APP_TITLE,
     browserURL: browserUrl,
     dataSource: {

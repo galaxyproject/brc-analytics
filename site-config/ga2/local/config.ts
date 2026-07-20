@@ -8,7 +8,6 @@ import { GA2_ROUTES } from "@/routes/constants";
 import { ROUTES } from "@brc-analytics/core/routes/constants";
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
-import { APP_KEYS } from "@site-config/common/constants";
 import { AppSiteConfig } from "@site-config/common/entities";
 import data from "catalog/ga2/output/ncbi-taxa-tree.json";
 import { floating } from "./floating/floating";
@@ -46,7 +45,6 @@ export function makeConfig(
   taxTreeData = data as TaxonomyNode
 ): AppSiteConfig {
   return {
-    appKey: APP_KEYS.GA2,
     appTitle: APP_TITLE,
     browserURL: browserUrl,
     dataSource: {
