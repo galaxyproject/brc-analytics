@@ -1,4 +1,4 @@
-import { OUTBREAK_PRIORITY } from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { OUTBREAK_PRIORITY } from "@/apis/catalog/brc-analytics-catalog/common/schema-types";
 import { CHIP_PROPS as APP_CHIP_PROPS } from "@/styles/common/mui/chip";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { ChipProps } from "@mui/material";

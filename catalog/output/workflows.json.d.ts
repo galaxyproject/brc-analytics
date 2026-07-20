@@ -1,4 +1,4 @@
-import { WorkflowCategory } from "../../app/apis/catalog/brc-analytics-catalog/common/entities";
+import type { WorkflowCategory } from "../../packages/core/apis/workflow";
 
 const workflows: WorkflowCategory[];
 export default workflows;

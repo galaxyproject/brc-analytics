@@ -1,9 +1,9 @@
-import {
-  BRCDataCatalogOrganism,
+import { BRCDataCatalogOrganism } from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import { GA2OrganismEntity } from "@/apis/catalog/ga2/entities";
+import type {
   Workflow,
   WorkflowCategory,
-} from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import { GA2OrganismEntity } from "@/apis/catalog/ga2/entities";
+} from "@brc-analytics/core/apis/workflow";
 import { Assembly } from "../WorkflowInputsView/types";
 
 export type BaseWorkflowAssembly = Pick<

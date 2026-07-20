@@ -1,5 +1,4 @@
 import fsp from "fs/promises";
-import { WorkflowCategory } from "../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   GA2AssemblyEntity,
   GA2OrganismEntity,
@@ -9,6 +8,7 @@ import {
   getAssemblyId,
   getOrganismId,
 } from "../../../../app/apis/catalog/ga2/utils";
+import type { WorkflowCategory } from "../../../../packages/core/apis/workflow";
 import {
   buildWorkflowAssemblyMappings,
   generateWorkflowMappingsQC,

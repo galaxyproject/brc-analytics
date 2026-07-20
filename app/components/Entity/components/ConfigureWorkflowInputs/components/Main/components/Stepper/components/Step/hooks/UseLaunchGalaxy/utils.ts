@@ -1,7 +1,7 @@
-import { Workflow } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import { WORKFLOW_PARAMETER_VARIABLE } from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { WORKFLOW_PARAMETER_VARIABLE } from "@brc-analytics/core/apis/schema-types";
+import type { Workflow } from "@brc-analytics/core/apis/workflow";
 import { WorkflowRunCreateRequest } from "@brc-analytics/core/types/api";
 import {
   ANCHOR_TARGET,

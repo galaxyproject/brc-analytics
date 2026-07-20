@@ -1,14 +1,14 @@
-import {
-  Workflow,
-  WorkflowCategory,
-} from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import { workflowPloidyMatchesOrganismPloidy } from "@/apis/catalog/brc-analytics-catalog/common/utils";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import {
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_SCOPE,
-} from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { workflowPloidyMatchesOrganismPloidy } from "@/apis/catalog/brc-analytics-catalog/common/utils";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
+} from "@brc-analytics/core/apis/schema-types";
 import type { AssemblyContract } from "@brc-analytics/core/apis/types";
+import type {
+  Workflow,
+  WorkflowCategory,
+} from "@brc-analytics/core/apis/workflow";
 import { WorkflowCategoryId } from "../../../../../catalog/schema/generated/schema";
 
 /**

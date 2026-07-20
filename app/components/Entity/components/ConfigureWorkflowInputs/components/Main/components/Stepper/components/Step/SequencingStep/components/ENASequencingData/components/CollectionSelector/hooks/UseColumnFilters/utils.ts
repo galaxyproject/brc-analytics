@@ -1,9 +1,9 @@
-import {
-  Workflow,
-  WorkflowParameter,
-} from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { WORKFLOW_PARAMETER_BY_STEP_KEY } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/CollectionSelector/constants";
 import { StepProps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
+import type {
+  Workflow,
+  WorkflowParameter,
+} from "@brc-analytics/core/apis/workflow";
 import { isSequencingDataType } from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/CollectionSelector/hooks/UseColumnFilters/typeGuards";
 import { CATEGORY_CONFIGS } from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/CollectionSelector/hooks/UseTable/categoryConfigs";
 import {

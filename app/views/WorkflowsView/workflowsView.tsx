@@ -1,8 +1,8 @@
-import { WorkflowAssemblyMapping } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   getOrganisms,
   getWorkflows as getWorkflowCategories,
 } from "@/services/workflows/entities";
+import type { WorkflowAssemblyMapping } from "@brc-analytics/core/apis/workflow";
 import { API } from "@brc-analytics/core/services/workflows/routes";
 import { ExploreView } from "@brc-analytics/core/views/ExploreView/exploreView";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";

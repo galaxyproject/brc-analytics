@@ -16,13 +16,13 @@ jest.mock(
   })
 );
 
-import type { Workflow } from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import { buildSteps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/utils";
 import {
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
-} from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { buildSteps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/utils";
+} from "@brc-analytics/core/apis/schema-types";
+import type { Workflow } from "@brc-analytics/core/apis/workflow";
 
 describe("buildSteps - scope handling", () => {
   const BASE_WORKFLOW: Workflow = {

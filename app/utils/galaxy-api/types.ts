@@ -1,4 +1,4 @@
-import { WorkflowUrlSpec } from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
+import type { WorkflowUrlSpec } from "@brc-analytics/core/apis/schema-types";
 
 //// ENA types
 

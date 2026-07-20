@@ -1,8 +1,11 @@
 import { formatTrsId } from "@/views/AnalyzeWorkflowsView/components/Main/utils";
+import {
+  ORGANISM_PLOIDY,
+  WORKFLOW_PLOIDY,
+} from "@brc-analytics/core/apis/schema-types";
 import { sanitizeEntityId } from "@brc-analytics/core/apis/utils";
 import { WorkflowEntity } from "@site-config/brc-analytics/local/index/workflow/types";
 import { BRCDataCatalogGenome, BRCDataCatalogOrganism } from "./entities";
-import { ORGANISM_PLOIDY, WORKFLOW_PLOIDY } from "./schema-entities";
 
 export function getGenomeId(genome: BRCDataCatalogGenome): string {
   return sanitizeEntityId(genome.accession);

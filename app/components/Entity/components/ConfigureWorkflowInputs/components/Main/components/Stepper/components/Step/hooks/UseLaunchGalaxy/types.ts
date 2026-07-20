@@ -1,9 +1,9 @@
-import { Workflow } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { EnaSequencingReads } from "@/utils/galaxy-api/types";
 import {
   ConfiguredInput,
   PrimaryContrasts,
 } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import type { Workflow } from "@brc-analytics/core/apis/workflow";
 import { COLUMN_TYPE } from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 import { Strandedness } from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/StrandednessStep/types";
 import { UcscTrack } from "@brc-analytics/core/utils/ucsc-tracks-api/types";

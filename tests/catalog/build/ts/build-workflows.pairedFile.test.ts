@@ -1,4 +1,4 @@
-import { WORKFLOW_PARAMETER_VARIABLE } from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { WORKFLOW_PARAMETER_VARIABLE } from "@brc-analytics/core/apis/schema-types";
 import { buildWorkflows } from "../../../../catalog/build/ts/build-workflows";
 
 // Mock YAML file reading so we can inject source workflows.

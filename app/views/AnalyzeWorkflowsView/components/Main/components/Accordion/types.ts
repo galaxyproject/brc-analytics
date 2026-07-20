@@ -1,7 +1,7 @@
-import {
+import type {
   Workflow,
   WorkflowCategory,
-} from "@/apis/catalog/brc-analytics-catalog/common/entities";
+} from "@brc-analytics/core/apis/workflow";
 import { AccordionProps } from "@mui/material";
 
 export interface Props extends Pick<AccordionProps, "disabled"> {

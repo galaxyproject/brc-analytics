@@ -1,13 +1,13 @@
-import {
-  Workflow,
-  WorkflowCategory,
-} from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import type { Pangenome } from "@/apis/catalog/brc-analytics-catalog/common/pangenome";
 import { formatTrsId } from "@/views/AnalyzeWorkflowsView/components/Main/utils";
 import { CUSTOM_WORKFLOW } from "@/views/AnalyzeWorkflowsView/custom/constants";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { LEXICMAP } from "@/views/AnalyzeWorkflowsView/lexicmap/constants";
 import { LOGAN_SEARCH } from "@/views/AnalyzeWorkflowsView/loganSearch/constants";
+import type {
+  Workflow,
+  WorkflowCategory,
+} from "@brc-analytics/core/apis/workflow";
 import { API } from "@brc-analytics/core/services/workflows/routes";
 import {
   getEntitiesById,

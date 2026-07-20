@@ -1,4 +1,4 @@
-import { WORKFLOW_PARAMETER_VARIABLE } from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { WORKFLOW_PARAMETER_VARIABLE } from "@brc-analytics/core/apis/schema-types";
 import { SEQUENCING_DATA_FILE_TYPE } from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/types";
 
 // Maps each sequencing step key to the workflow parameter variable it configures.

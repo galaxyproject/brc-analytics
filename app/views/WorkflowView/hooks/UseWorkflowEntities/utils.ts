@@ -1,14 +1,12 @@
-import type {
-  BRCDataCatalogOrganism,
-  Workflow,
-} from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import { WORKFLOW_SCOPE } from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
+import type { BRCDataCatalogOrganism } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import type { GA2OrganismEntity } from "@/apis/catalog/ga2/entities";
 import { findOrganism, getAssembly } from "@/services/workflows/entities";
 import { mapOrganismEntityToOrganism } from "@/views/OrganismWorkflowInputsView/utils";
 import type { Assembly } from "@/views/WorkflowInputsView/types";
 import { mapAssemblyToOrganism } from "@/views/WorkflowInputsView/utils";
+import { WORKFLOW_SCOPE } from "@brc-analytics/core/apis/schema-types";
 import { sanitizeEntityId } from "@brc-analytics/core/apis/utils";
+import type { Workflow } from "@brc-analytics/core/apis/workflow";
 import type { Organism } from "@brc-analytics/core/views/OrganismView/types";
 
 /**

@@ -2,9 +2,8 @@ import {
   BRCDataCatalogGenome,
   BRCDataCatalogOrganism,
   Outbreak,
-  Workflow,
 } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import type { OUTBREAK_PRIORITY } from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
+import type { OUTBREAK_PRIORITY } from "@/apis/catalog/brc-analytics-catalog/common/schema-types";
 import {
   getGenomeOrganismId,
   getOrganismId,
@@ -25,6 +24,7 @@ import type {
   AssemblyContract,
   OrganismContract,
 } from "@brc-analytics/core/apis/types";
+import type { Workflow } from "@brc-analytics/core/apis/workflow";
 import { AppLink } from "@brc-analytics/core/components/AppLink/appLink";
 import { AnalyzeGenome } from "@brc-analytics/core/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 import { LevelCell } from "@brc-analytics/core/components/Table/components/TableCell/components/LevelCell/levelCell";

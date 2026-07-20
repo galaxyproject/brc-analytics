@@ -1,6 +1,6 @@
-import { Workflow } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import { WORKFLOW_PLOIDY } from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { workflowRequiresAssemblyId } from "@/views/AnalyzeWorkflowsView/components/Main/utils";
+import { WORKFLOW_PLOIDY } from "@brc-analytics/core/apis/schema-types";
+import type { Workflow } from "@brc-analytics/core/apis/workflow";
 import { CATEGORY_CONFIGS } from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/ReferenceAssemblyStep/components/AssemblyData/components/AssemblySelector/hooks/UseTable/categoryConfigs";
 import { ColumnFiltersState, Table } from "@tanstack/react-table";
 import { Assembly } from "./types";

@@ -1,7 +1,4 @@
-import {
-  BRCDataCatalogGenome,
-  WorkflowCategory,
-} from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import { BRCDataCatalogGenome } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   formatTrsId,
   workflowIsCompatibleWithAssembly,
@@ -10,6 +7,7 @@ import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/d
 import { buildOrganismWorkflows } from "@/views/OrganismView/components/Main/utils";
 import { OrganismWorkflowInputsView } from "@/views/OrganismWorkflowInputsView/organismWorkflowInputsView";
 import { WorkflowInputsView } from "@/views/WorkflowInputsView/workflowInputsView";
+import type { WorkflowCategory } from "@brc-analytics/core/apis/workflow";
 import { EntityDataGate } from "@brc-analytics/core/components/EntityDataGate/entityDataGate";
 import { EntitiesResponse } from "@brc-analytics/core/services/staticGeneration/entities/types";
 import { getEntities } from "@brc-analytics/core/services/staticGeneration/entities/utils";

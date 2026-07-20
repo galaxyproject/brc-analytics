@@ -1,8 +1,8 @@
-import { Workflow } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   ConfiguredInput,
   OnConfigure,
 } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import type { Workflow } from "@brc-analytics/core/apis/workflow";
 import {
   OnContinue,
   OnEdit,

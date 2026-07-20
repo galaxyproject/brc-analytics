@@ -1,4 +1,4 @@
-import { WorkflowCategory } from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import type { WorkflowCategory } from "@brc-analytics/core/apis/workflow";
 import { BackPageContentMainColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import { JSX } from "react";

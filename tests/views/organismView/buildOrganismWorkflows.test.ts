@@ -1,9 +1,9 @@
-import type { WorkflowCategory } from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import { buildOrganismWorkflows } from "@/views/OrganismView/components/Main/utils";
 import {
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
-} from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { buildOrganismWorkflows } from "@/views/OrganismView/components/Main/utils";
+} from "@brc-analytics/core/apis/schema-types";
+import type { WorkflowCategory } from "@brc-analytics/core/apis/workflow";
 import type { Organism } from "@brc-analytics/core/views/OrganismView/types";
 
 describe("buildOrganismWorkflows", () => {

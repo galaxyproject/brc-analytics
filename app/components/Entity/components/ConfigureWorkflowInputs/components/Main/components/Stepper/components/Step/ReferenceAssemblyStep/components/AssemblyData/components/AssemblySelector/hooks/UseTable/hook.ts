@@ -1,4 +1,4 @@
-import { Workflow } from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import type { Workflow } from "@brc-analytics/core/apis/workflow";
 import { CATEGORY_GROUPS } from "@brc-analytics/core/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/ReferenceAssemblyStep/components/AssemblyData/components/AssemblySelector/hooks/UseTable/categoryGroups";
 import {
   COLUMN_VISIBILITY,

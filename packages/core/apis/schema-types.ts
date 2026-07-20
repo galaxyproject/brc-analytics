@@ -1,9 +1,14 @@
 /**
- * Site-neutral re-exports of shared catalog schema enums.
- *
- * These enums originate from the shared LinkML-generated schema and are
- * consumed by both the BRC and GA2 catalogs. Re-exporting them here gives each
- * site a site-neutral import path so that neither catalog has to import from
- * the other's directory.
+ * Re-exports of catalog schema enums and types from the LinkML-generated
+ * schema.
  */
-export { OrganismPloidy as ORGANISM_PLOIDY } from "catalog/schema/generated/schema";
+export {
+  OrganismPloidy as ORGANISM_PLOIDY,
+  WorkflowParameterVariable as WORKFLOW_PARAMETER_VARIABLE,
+  WorkflowPloidy as WORKFLOW_PLOIDY,
+  WorkflowScope as WORKFLOW_SCOPE,
+} from "catalog/schema/generated/schema";
+export type {
+  WorkflowCollectionSpec,
+  WorkflowUrlSpec,
+} from "catalog/schema/generated/schema";

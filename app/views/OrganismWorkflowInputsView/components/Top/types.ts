@@ -1,4 +1,4 @@
-import type { Workflow } from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import type { Workflow } from "@brc-analytics/core/apis/workflow";
 import type { Organism } from "@brc-analytics/core/views/OrganismView/types";
 
 export interface Props {

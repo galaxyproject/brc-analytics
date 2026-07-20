@@ -1,5 +1,5 @@
-import { Workflow } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { StepProps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
+import type { Workflow } from "@brc-analytics/core/apis/workflow";
 import { ColumnFiltersState } from "@tanstack/react-table";
 import { useMemo } from "react";
 import { preSelectColumnFilters } from "./utils";
