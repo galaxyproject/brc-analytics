@@ -1,17 +1,11 @@
-import { getPageMeta } from "@/common/meta/utils";
-import { config } from "@/config/config";
-import { BRC_ROUTES } from "@/routes/constants";
-import { RoadmapView as RoadmapViewGA2 } from "@/views/RoadmapView/ga2/roadmapView";
+import { BRC_PAGE_META } from "@/common/meta/brc/constants";
 import { RoadmapView } from "@/views/RoadmapView/roadmapView";
 import { StyledPagesMain } from "@brc-analytics/core/components/Layout/components/Main/main.styles";
-import { APP_KEYS } from "@site-config/common/constants";
 import { GetStaticProps } from "next";
 import { JSX } from "react";
 import type { PageProps } from "../../_app";
 
 const Page = (): JSX.Element => {
-  const { appKey } = config();
-  if (appKey === APP_KEYS.GA2) return <RoadmapViewGA2 />;
   return <RoadmapView />;
 };
 
@@ -20,15 +14,9 @@ export const getStaticProps: GetStaticProps<
     themeOptions: object;
   }
 > = async () => {
-  const { allowedPaths, appKey } = config();
-
-  if (allowedPaths && !allowedPaths.includes(BRC_ROUTES.ABOUT_ROADMAP)) {
-    return { notFound: true };
-  }
-
   return {
     props: {
-      ...getPageMeta(appKey).ROADMAP,
+      ...BRC_PAGE_META.ROADMAP,
       themeOptions: {
         palette: { background: { default: "#FAFBFB" } }, // SMOKE_LIGHTEST
       },

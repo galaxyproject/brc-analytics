@@ -1,14 +1,13 @@
 import { BRC_PAGE_META } from "@/common/meta/brc/constants";
-import { config } from "@/config/config";
-import { BRC_ROUTES } from "@/routes/constants";
-import { VisionView } from "@/views/VisionView/visionView";
+import { AboutView } from "@/views/AboutView/aboutView";
+import { BRC_CARDS } from "@/views/AboutView/common/constants";
 import { StyledPagesMain } from "@brc-analytics/core/components/Layout/components/Main/main.styles";
 import { GetStaticProps } from "next";
 import { JSX } from "react";
-import type { PageProps } from "../../_app";
+import type { PageProps } from "../_app";
 
 const Page = (): JSX.Element => {
-  return <VisionView />;
+  return <AboutView cards={BRC_CARDS} />;
 };
 
 export const getStaticProps: GetStaticProps<
@@ -16,15 +15,9 @@ export const getStaticProps: GetStaticProps<
     themeOptions: object;
   }
 > = async () => {
-  const { allowedPaths } = config();
-
-  if (allowedPaths && !allowedPaths.includes(BRC_ROUTES.ABOUT_VISION)) {
-    return { notFound: true };
-  }
-
   return {
     props: {
-      ...BRC_PAGE_META.VISION,
+      ...BRC_PAGE_META.ABOUT,
       themeOptions: {
         palette: { background: { default: "#FAFBFB" } }, // SMOKE_LIGHTEST
       },
