@@ -1,4 +1,4 @@
-import { getDefaultDescription } from "@/common/meta/utils";
+import { GA2_DEFAULT_DESCRIPTION } from "@/common/meta/ga2/constants";
 import { useEntities } from "@/services/workflows/hooks/UseEntities/hook";
 import "@/styles/fonts/fonts.css";
 import { mergeAppTheme } from "@/theme/theme";
@@ -89,7 +89,7 @@ function GA2App(props: AppPropsWithComponent): JSX.Element {
             <OgMeta
               appTitle={appConfig.appTitle}
               browserURL={appConfig.browserURL}
-              defaultDescription={getDefaultDescription(appConfig.appKey)}
+              defaultDescription={GA2_DEFAULT_DESCRIPTION}
               pageDescription={pageDescription}
               pageTitle={pageTitle}
             />

@@ -1,4 +1,4 @@
-import { getDefaultDescription } from "@/common/meta/utils";
+import { BRC_DEFAULT_DESCRIPTION } from "@/common/meta/brc/constants";
 import { BRC_ROUTES } from "@/routes/constants";
 import { useEntities } from "@/services/workflows/hooks/UseEntities/hook";
 import "@/styles/fonts/fonts.css";
@@ -110,7 +110,7 @@ function BRCApp(props: AppPropsWithComponent): JSX.Element {
             <OgMeta
               appTitle={appConfig.appTitle}
               browserURL={appConfig.browserURL}
-              defaultDescription={getDefaultDescription(appConfig.appKey)}
+              defaultDescription={BRC_DEFAULT_DESCRIPTION}
               pageDescription={pageDescription}
               pageTitle={pageTitle}
             />
