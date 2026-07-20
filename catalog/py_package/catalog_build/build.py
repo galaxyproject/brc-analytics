@@ -1216,7 +1216,7 @@ def make_qc_report(
     failing_dbt_tests_items = [
         f"`{result.test_name}`{'' if result.message is None else ': ' + result.message}"
         for result in dbt_test_results
-        if result.failed
+        if not result.success
     ]
 
     # Compose report modularly using shared QC utils
