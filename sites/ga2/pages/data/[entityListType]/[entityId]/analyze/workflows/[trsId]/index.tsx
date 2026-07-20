@@ -1,6 +1,5 @@
 import { WorkflowCategory } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { GA2AssemblyEntity } from "@/apis/catalog/ga2/entities";
-import { GA2_PAGE_META } from "@/common/meta/ga2/constants";
 import {
   formatTrsId,
   workflowIsCompatibleWithAssembly,
@@ -25,6 +24,7 @@ import {
 } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
+import { GA2_PAGE_META } from "~/meta/constants";
 
 // Cast the schema-validated catalog JSON to its typed shape.
 const workflows = workflowsData as unknown as WorkflowCategory[];

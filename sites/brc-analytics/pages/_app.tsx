@@ -1,4 +1,3 @@
-import { BRC_DEFAULT_DESCRIPTION } from "@/common/meta/brc/constants";
 import { BRC_ROUTES } from "@/routes/constants";
 import { useEntities } from "@/services/workflows/hooks/UseEntities/hook";
 import "@/styles/fonts/fonts.css";
@@ -9,7 +8,6 @@ import { BrcAuthProvider } from "@brc-analytics/core/providers/authentication/pr
 import { EntitiesLoadedProvider } from "@brc-analytics/core/providers/entitiesLoaded/provider";
 import { WorkflowHandoffProvider } from "@brc-analytics/core/providers/workflowHandoff/provider";
 import { EntitiesResponse } from "@brc-analytics/core/services/staticGeneration/entities/types";
-import "@databiosphere/findable-ui";
 import { Error } from "@databiosphere/findable-ui/lib/components/Error/error";
 import { ErrorBoundary } from "@databiosphere/findable-ui/lib/components/ErrorBoundary/errorBoundary";
 import { Head } from "@databiosphere/findable-ui/lib/components/Head/head";
@@ -33,6 +31,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NextPage } from "next";
 import type { AppProps } from "next/app";
 import { JSX, useMemo } from "react";
+import { BRC_DEFAULT_DESCRIPTION } from "~/meta/constants";
 
 // NOTE(#1419): config() still resolves via the shared NEXT_PUBLIC_SITE_CONFIG map during
 // transition; imports of theme/styles/meta/services resolve to the root app/ via the @/

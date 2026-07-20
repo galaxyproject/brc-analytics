@@ -1,4 +1,3 @@
-import { BRC_PAGE_META } from "@/common/meta/brc/constants";
 import { CUSTOM_WORKFLOW } from "@/views/AnalyzeWorkflowsView/custom/constants";
 import { WorkflowInputsView } from "@/views/WorkflowInputsView/workflowInputsView";
 import { EntityDataGate } from "@brc-analytics/core/components/EntityDataGate/entityDataGate";
@@ -9,6 +8,7 @@ import {
 import { CustomWorkflowProps } from "@brc-analytics/core/services/staticGeneration/customWorkflow/types";
 import { config } from "@site-config/brc-analytics/config";
 import { JSX } from "react";
+import { BRC_PAGE_META } from "~/meta/constants";
 
 /**
  * Custom workflow view page.

@@ -1,4 +1,3 @@
-import { GA2_PAGE_META } from "@/common/meta/ga2/constants";
 import { formatTrsId } from "@/views/AnalyzeWorkflowsView/components/Main/utils";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { WorkflowView } from "@/views/WorkflowView/workflowView";
@@ -13,6 +12,7 @@ import {
 } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
+import { GA2_PAGE_META } from "~/meta/constants";
 
 interface Params extends ParsedUrlQuery {
   trsId: string;

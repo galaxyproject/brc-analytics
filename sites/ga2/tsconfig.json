@@ -3,6 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "~/*": ["./*"],
       "@/*": ["../../app/*"],
       "@brc-analytics/core": ["../../packages/core/index.ts"],
       "@brc-analytics/core/*": ["../../packages/core/*"],

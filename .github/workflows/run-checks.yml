@@ -82,6 +82,10 @@ jobs:
         run: npm run lint
       - name: Type Check
         run: npx tsc --noEmit
+      - name: Type Check (BRC site)
+        run: npx tsc --noEmit -p sites/brc-analytics/tsconfig.json
+      - name: Type Check (GA2 site)
+        run: npx tsc --noEmit -p sites/ga2/tsconfig.json
 
       - name: Set up Python
         uses: actions/setup-python@v5

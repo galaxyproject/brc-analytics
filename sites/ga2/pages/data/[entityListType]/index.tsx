@@ -1,5 +1,4 @@
 import { GA2Catalog } from "@/apis/catalog/ga2/entities";
-import { GA2_PAGE_META } from "@/common/meta/ga2/constants";
 import {
   makeEntitiesStaticPaths,
   makeEntitiesStaticProps,
@@ -9,6 +8,7 @@ import { StyledExploreView } from "@brc-analytics/core/views/ExploreView/explore
 import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main.styles";
 import { config } from "@site-config/ga2/config";
 import { JSX } from "react";
+import { GA2_PAGE_META } from "~/meta/constants";
 
 // GA2 list-route page metadata.
 const ENTITY_LIST_META = {

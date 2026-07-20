@@ -1,4 +1,3 @@
-import { BRC_PAGE_META } from "@/common/meta/brc/constants";
 import { AnalyzeWorkflowsView } from "@/views/AnalyzeWorkflowsView/analyzeWorkflowsView";
 import { EntityDataGate } from "@brc-analytics/core/components/EntityDataGate/entityDataGate";
 import { getEntities } from "@brc-analytics/core/services/staticGeneration/entities/utils";
@@ -12,6 +11,7 @@ import {
 } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
+import { BRC_PAGE_META } from "~/meta/constants";
 
 interface Params extends ParsedUrlQuery {
   entityId: string;

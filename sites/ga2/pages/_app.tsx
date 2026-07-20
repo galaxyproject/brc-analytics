@@ -1,4 +1,3 @@
-import { GA2_DEFAULT_DESCRIPTION } from "@/common/meta/ga2/constants";
 import { useEntities } from "@/services/workflows/hooks/UseEntities/hook";
 import "@/styles/fonts/fonts.css";
 import { mergeAppTheme } from "@/theme/theme";
@@ -7,7 +6,6 @@ import { OgMeta } from "@brc-analytics/core/components/OgMeta/ogMeta";
 import { EntitiesLoadedProvider } from "@brc-analytics/core/providers/entitiesLoaded/provider";
 import { WorkflowHandoffProvider } from "@brc-analytics/core/providers/workflowHandoff/provider";
 import { EntitiesResponse } from "@brc-analytics/core/services/staticGeneration/entities/types";
-import "@databiosphere/findable-ui";
 import { Error } from "@databiosphere/findable-ui/lib/components/Error/error";
 import { ErrorBoundary } from "@databiosphere/findable-ui/lib/components/ErrorBoundary/errorBoundary";
 import { Head } from "@databiosphere/findable-ui/lib/components/Head/head";
@@ -30,6 +28,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NextPage } from "next";
 import type { AppProps } from "next/app";
 import { JSX } from "react";
+import { GA2_DEFAULT_DESCRIPTION } from "~/meta/constants";
 
 // NOTE(#1419): config() still resolves via the shared NEXT_PUBLIC_SITE_CONFIG map during
 // transition; removing that env mechanism (site imports its own config directly) is the

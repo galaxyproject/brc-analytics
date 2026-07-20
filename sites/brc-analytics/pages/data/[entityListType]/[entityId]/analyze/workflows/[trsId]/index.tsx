@@ -2,7 +2,6 @@ import {
   BRCDataCatalogGenome,
   WorkflowCategory,
 } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import { BRC_PAGE_META } from "@/common/meta/brc/constants";
 import {
   formatTrsId,
   workflowIsCompatibleWithAssembly,
@@ -27,6 +26,7 @@ import {
 } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
+import { BRC_PAGE_META } from "~/meta/constants";
 
 // Cast the schema-validated catalog JSON to its typed shape.
 const workflows = workflowsData as unknown as WorkflowCategory[];

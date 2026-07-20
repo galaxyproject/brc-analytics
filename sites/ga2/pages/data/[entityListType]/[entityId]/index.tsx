@@ -1,5 +1,4 @@
 import { GA2Catalog } from "@/apis/catalog/ga2/entities";
-import { GA2_PAGE_META } from "@/common/meta/ga2/constants";
 import { AnalyzeView } from "@/views/AnalyzeView/analyzeView";
 import { EntityDataGate } from "@brc-analytics/core/components/EntityDataGate/entityDataGate";
 import {
@@ -10,6 +9,7 @@ import { EntityPageProps } from "@brc-analytics/core/services/staticGeneration/e
 import { EntityDetailView } from "@brc-analytics/core/views/EntityView/entityView";
 import { config } from "@site-config/ga2/config";
 import { JSX } from "react";
+import { GA2_PAGE_META } from "~/meta/constants";
 
 // GA2 detail-route page metadata.
 const ENTITY_DETAIL_META = {

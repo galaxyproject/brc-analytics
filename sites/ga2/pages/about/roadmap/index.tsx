@@ -1,8 +1,8 @@
-import { GA2_PAGE_META } from "@/common/meta/ga2/constants";
 import { RoadmapView } from "@/views/RoadmapView/ga2/roadmapView";
 import { StyledPagesMain } from "@brc-analytics/core/components/Layout/components/Main/main.styles";
 import { GetStaticProps } from "next";
 import { JSX } from "react";
+import { GA2_PAGE_META } from "~/meta/constants";
 import type { PageProps } from "../../_app";
 
 const Page = (): JSX.Element => {

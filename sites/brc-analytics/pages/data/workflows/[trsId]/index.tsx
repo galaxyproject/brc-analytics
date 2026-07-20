@@ -1,4 +1,3 @@
-import { BRC_PAGE_META } from "@/common/meta/brc/constants";
 import { formatTrsId } from "@/views/AnalyzeWorkflowsView/components/Main/utils";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { LEXICMAP } from "@/views/AnalyzeWorkflowsView/lexicmap/constants";
@@ -14,6 +13,7 @@ import {
 } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
+import { BRC_PAGE_META } from "~/meta/constants";
 
 interface Params extends ParsedUrlQuery {
   trsId: string;
