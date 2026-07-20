@@ -1,5 +1,6 @@
 import { JSX } from "react";
 import { Bullet, Bullets as SectionBullets, StyledDot } from "./bullets.styles";
+import { BULLETS_CLASSES } from "./constants";
 import { Props } from "./types";
 
 export const Bullets = ({
@@ -15,6 +16,9 @@ export const Bullets = ({
       {bullets.map((bullet) => (
         <Bullet
           key={bullet}
+          className={
+            activeBullet === bullet ? BULLETS_CLASSES.BULLET_ACTIVE : undefined
+          }
           onClick={(): void => {
             onBullet(bullet);
           }}

@@ -27,6 +27,6 @@ export const StyledDot = styled(Dot, {
   ${({ isActive }) =>
     isActive &&
     css`
-      background-color: #fc5e60;
+      background-color: ${PALETTE.PRIMARY_MAIN};
     `}
 `;

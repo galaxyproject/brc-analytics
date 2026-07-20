@@ -1,4 +1,10 @@
+import { BULLETS_CLASSES } from "@brc-analytics/core/views/HomeView/components/Bullets/constants";
 import { PaletteColorOptions, ThemeOptions } from "@mui/material";
+
+/**
+ * Active bullet accent.
+ */
+const BULLET_ACTIVE_COLOR = "#fc5e60";
 
 /**
  * Palette "Primary"
@@ -21,6 +27,17 @@ const primary: PaletteColorOptions = {
  * Theme Options
  */
 export const THEME_OPTIONS: ThemeOptions = {
+  components: {
+    MuiButtonBase: {
+      styleOverrides: {
+        root: {
+          [`&.${BULLETS_CLASSES.BULLET_ACTIVE} span`]: {
+            backgroundColor: BULLET_ACTIVE_COLOR,
+          },
+        },
+      },
+    },
+  },
   palette: {
     primary,
   },
