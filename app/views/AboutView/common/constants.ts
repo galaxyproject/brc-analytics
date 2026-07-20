@@ -1,6 +1,6 @@
 import { SectionContentCard } from "@/components/common/Card/components/SectionContentCard/sectionContentCard";
-import { GalaxyIcon } from "@/components/common/CustomIcon/components/GalaxyIcon/galaxyIcon";
-import { RocketLaunchIcon } from "@/components/common/CustomIcon/components/RocketLaunchIcon/rocketLaunchIcon";
+import { GalaxyIcon } from "@brc-analytics/core/components/CustomIcon/components/GalaxyIcon/galaxyIcon";
+import { RocketLaunchIcon } from "@brc-analytics/core/components/CustomIcon/components/RocketLaunchIcon/rocketLaunchIcon";
 import { SparkleIcon } from "@brc-analytics/core/components/CustomIcon/components/SparkleIcon/sparkleIcon";
 import { ComponentProps } from "react";
 
