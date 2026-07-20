@@ -4,8 +4,6 @@ const withMDX = nextMDX({
   extension: /\.mdx?$/,
 });
 
-// TODO(#1418): per-site Sentry (withSentryConfig + project name) is wired up in the
-// deploy ticket; kept out of the transitional scaffold to avoid needing Sentry env here.
 const nextConfig = {
   basePath: "",
   compiler: { emotion: true },

@@ -1,11 +1,10 @@
 import nextMDX from "@next/mdx";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const withMDX = nextMDX({
   extension: /\.mdx?$/,
 });
 
-// TODO(#1418): per-site Sentry (withSentryConfig + project name) is wired up in the
-// deploy ticket; kept out of the transitional scaffold to avoid needing Sentry env here.
 const nextConfig = {
   basePath: "",
   compiler: { emotion: true },
@@ -18,4 +17,17 @@ const nextConfig = {
   transpilePackages: ["@databiosphere/findable-ui"],
 };
 
-export default withMDX(nextConfig);
+// Sentry is DSN-gated in instrumentation-client.ts (enabled only when
+// NEXT_PUBLIC_SENTRY_DSN is set — i.e. BRC prod). sourcemaps are disabled, so
+// no Sentry auth token is needed at build.
+export default withSentryConfig(withMDX(nextConfig), {
+  disableLogger: true,
+  org: "galaxy",
+  project: "brc-analytics-dev",
+  sentryUrl: "https://sentry.galaxyproject.org/",
+  silent: true,
+  sourcemaps: {
+    disable: true,
+  },
+  suppressGlobalErrorHandlerFileWarning: true,
+});
