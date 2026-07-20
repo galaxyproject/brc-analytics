@@ -12,10 +12,6 @@ import { StepConfig } from "@/components/Entity/components/ConfigureWorkflowInpu
 import { BRC_ROUTES } from "@/routes/constants";
 import { Main as OrganismViewMain } from "@/views/OrganismView/components/Main/main";
 import { Tabs } from "@/views/OrganismView/components/Tabs/tabs";
-import {
-  getPriorityColor,
-  getPriorityLabel,
-} from "@/views/PriorityPathogensView/components/PriorityPathogens/utils";
 import { ResourcesSection } from "@/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
 import { KeyValueSection } from "@/views/PriorityPathogenView/ui/Section/KeyValueSection/keyValueSection";
 import { MDXSection } from "@/views/PriorityPathogenView/ui/Section/MDXSection/mdxSection";
@@ -85,6 +81,7 @@ import { LinkProps } from "next/link";
 import Router from "next/router";
 import { ComponentProps } from "react";
 import slugify from "slugify";
+import { getPriorityColor, getPriorityLabel } from "./priority";
 
 // Transitional shim for the GA2/BRC split (monorepo-split): shared builders
 // moved to the site-neutral common home. Re-export them from this BRC path so

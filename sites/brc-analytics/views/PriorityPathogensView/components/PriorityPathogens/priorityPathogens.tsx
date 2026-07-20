@@ -1,4 +1,8 @@
 import { BRC_ROUTES } from "@/routes/constants";
+import {
+  getPriorityColor,
+  getPriorityLabel,
+} from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/priority";
 import { SLUGIFY_OPTIONS } from "@brc-analytics/core/utils/slugify/constants";
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import {
@@ -14,7 +18,6 @@ import { JSX } from "react";
 import slugify from "slugify";
 import { StyledGrid, StyledSectionText } from "./priorityPathogens.styles";
 import { Props } from "./types";
-import { getPriorityColor, getPriorityLabel } from "./utils";
 
 export const PriorityPathogens = ({
   priorityPathogens,
