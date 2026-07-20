@@ -4,7 +4,7 @@ import { JSX } from "react";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import type { Spec as VgSpec } from "vega";
 import embed from "vega-embed";
-import type { TopLevelSpec as VlSpec } from "vega-lite";
+import type { Config, TopLevelSpec as VlSpec } from "vega-lite";
 import { VegaEmbedContainer } from "./vegaEmbed.styles";
 
 // vega-embed's exports map is malformed (bare condition keys, no "." subpath),
@@ -168,9 +168,12 @@ export const VegaEmbed = ({ caption, spec }: VegaEmbedProps): JSX.Element => {
               resize: true,
               type: "fit-x",
             },
+            // vega-embed's Config (via its malformed exports) omits `scale.nice`,
+            // though vega applies it at runtime; cast so the excess property
+            // isn't rejected at the call site.
             scale: {
               nice: false,
-            },
+            } as Config["scale"],
           },
         });
         setError(null);
