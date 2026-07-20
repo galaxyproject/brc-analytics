@@ -3,7 +3,6 @@ import {
   WorkflowCategory,
 } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { BRC_PAGE_META } from "@/common/meta/brc/constants";
-import { config } from "@/config/config";
 import {
   formatTrsId,
   workflowIsCompatibleWithAssembly,
@@ -18,6 +17,7 @@ import { getEntities } from "@brc-analytics/core/services/staticGeneration/entit
 import { seedDatabase } from "@brc-analytics/core/utils/seedDatabase";
 import type { Organism } from "@brc-analytics/core/views/OrganismView/types";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import { config } from "@site-config/brc-analytics/config";
 import workflowsData from "catalog/output/workflows.json";
 import {
   GetStaticPaths,

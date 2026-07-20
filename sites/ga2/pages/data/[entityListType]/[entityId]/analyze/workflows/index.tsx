@@ -1,9 +1,9 @@
 import { GA2_PAGE_META } from "@/common/meta/ga2/constants";
-import { config } from "@/config/config";
 import { AnalyzeWorkflowsView } from "@/views/AnalyzeWorkflowsView/analyzeWorkflowsView";
 import { EntityDataGate } from "@brc-analytics/core/components/EntityDataGate/entityDataGate";
 import { getEntities } from "@brc-analytics/core/services/staticGeneration/entities/utils";
 import { seedDatabase } from "@brc-analytics/core/utils/seedDatabase";
+import { config } from "@site-config/ga2/config";
 import {
   GetStaticPaths,
   GetStaticPathsResult,

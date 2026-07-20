@@ -1,8 +1,8 @@
 import { BRC_PAGE_META } from "@/common/meta/brc/constants";
-import { config } from "@/config/config";
 import { HomeView } from "@/views/HomeView/homeView";
 import { StyledMain } from "@brc-analytics/core/components/Layout/components/Main/main.styles";
 import { useLayoutDimensions } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/hook";
+import { config } from "@site-config/brc-analytics/config";
 import { GetStaticProps } from "next";
 import { JSX } from "react";
 

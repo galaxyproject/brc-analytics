@@ -1,4 +1,5 @@
-import { config } from "@/config/config";
+import { getConfig } from "@databiosphere/findable-ui/lib/config/config";
+import { AppSiteConfig } from "@site-config/common/entities";
 
 /**
  * Interface representing a node in the NCBI taxonomy tree
@@ -32,7 +33,7 @@ export interface TaxonomyNode {
 }
 
 export function getData(): TaxonomyNode {
-  const { taxTree } = config();
+  const { taxTree } = getConfig() as AppSiteConfig;
   if (!taxTree) {
     return {
       assembly_count: 0,

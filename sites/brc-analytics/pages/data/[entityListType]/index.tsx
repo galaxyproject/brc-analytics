@@ -3,7 +3,6 @@ import {
   Outbreak,
 } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { BRC_PAGE_META } from "@/common/meta/brc/constants";
-import { config } from "@/config/config";
 import { PriorityPathogensView } from "@/views/PriorityPathogensView/priorityPathogensView";
 import {
   makeEntitiesStaticPaths,
@@ -15,6 +14,7 @@ import {
 } from "@brc-analytics/core/services/staticGeneration/entities/types";
 import { StyledExploreView } from "@brc-analytics/core/views/ExploreView/exploreView.styles";
 import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main.styles";
+import { config } from "@site-config/brc-analytics/config";
 import { JSX } from "react";
 
 // BRC list-route page metadata.

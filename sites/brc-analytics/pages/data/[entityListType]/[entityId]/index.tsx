@@ -1,6 +1,5 @@
 import { BRCCatalog } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { BRC_PAGE_META } from "@/common/meta/brc/constants";
-import { config } from "@/config/config";
 import { AnalyzeView } from "@/views/AnalyzeView/analyzeView";
 import { EntityDataGate } from "@brc-analytics/core/components/EntityDataGate/entityDataGate";
 import {
@@ -9,6 +8,7 @@ import {
 } from "@brc-analytics/core/services/staticGeneration/entity/entity";
 import { EntityPageProps } from "@brc-analytics/core/services/staticGeneration/entity/types";
 import { EntityDetailView } from "@brc-analytics/core/views/EntityView/entityView";
+import { config } from "@site-config/brc-analytics/config";
 import { JSX } from "react";
 
 // BRC detail-route page metadata.

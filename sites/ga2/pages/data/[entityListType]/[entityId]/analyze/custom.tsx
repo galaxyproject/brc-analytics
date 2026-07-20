@@ -1,5 +1,4 @@
 import { GA2_PAGE_META } from "@/common/meta/ga2/constants";
-import { config } from "@/config/config";
 import { CUSTOM_WORKFLOW } from "@/views/AnalyzeWorkflowsView/custom/constants";
 import { WorkflowInputsView } from "@/views/WorkflowInputsView/workflowInputsView";
 import { EntityDataGate } from "@brc-analytics/core/components/EntityDataGate/entityDataGate";
@@ -8,6 +7,7 @@ import {
   makeCustomWorkflowStaticProps,
 } from "@brc-analytics/core/services/staticGeneration/customWorkflow/customWorkflow";
 import { CustomWorkflowProps } from "@brc-analytics/core/services/staticGeneration/customWorkflow/types";
+import { config } from "@site-config/ga2/config";
 import { JSX } from "react";
 
 /**

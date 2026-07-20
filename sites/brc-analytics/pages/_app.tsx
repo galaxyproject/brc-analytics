@@ -1,5 +1,4 @@
 import { getDefaultDescription } from "@/common/meta/utils";
-import { config } from "@/config/config";
 import { BRC_ROUTES } from "@/routes/constants";
 import { useEntities } from "@/services/workflows/hooks/UseEntities/hook";
 import "@/styles/fonts/fonts.css";
@@ -29,6 +28,7 @@ import { DataExplorerError } from "@databiosphere/findable-ui/lib/types/error";
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { AppCacheProvider } from "@mui/material-nextjs/v16-pagesRouter";
+import { config } from "@site-config/brc-analytics/config";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NextPage } from "next";
 import type { AppProps } from "next/app";
