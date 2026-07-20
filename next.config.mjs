@@ -1,34 +1,12 @@
-import nextMDX from "@next/mdx";
-import { withSentryConfig } from "@sentry/nextjs";
-import withPlugins from "next-compose-plugins";
+// This root Next config is no longer built — the apps live in sites/*. It is
+// kept solely because next/jest (jest.config.js, dir: "./") reads it to set up
+// the SWC transform for unit tests. Keep it minimal and site-neutral: only the
+// options that affect how test files are transformed (emotion's css prop +
+// transpiling the ESM findable-ui package). Real build config lives per-site
+// in sites/<site>/next.config.mjs.
+const nextConfig = {
+  compiler: { emotion: true },
+  transpilePackages: ["@databiosphere/findable-ui"],
+};
 
-const withMDX = nextMDX({
-  extension: /\.mdx?$/,
-});
-
-const nextConfig = withPlugins(
-  [[withMDX, { pageExtensions: ["md", "mdx", "ts", "tsx"] }]],
-  {
-    basePath: "",
-    // distDir: "out/data",
-    compiler: { emotion: true },
-    images: {
-      unoptimized: true,
-    },
-    output: "export",
-    reactStrictMode: true,
-    transpilePackages: ["@databiosphere/findable-ui"],
-  }
-);
-
-export default withSentryConfig(nextConfig, {
-  disableLogger: true,
-  org: "galaxy",
-  project: "brc-analytics-dev",
-  sentryUrl: "https://sentry.galaxyproject.org/",
-  silent: true,
-  sourcemaps: {
-    disable: true,
-  },
-  suppressGlobalErrorHandlerFileWarning: true,
-});
+export default nextConfig;
