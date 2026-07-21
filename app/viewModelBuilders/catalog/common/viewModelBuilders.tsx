@@ -8,7 +8,6 @@ import {
 } from "@/components/Table/components/TableCell/components/LevelCell/constants";
 import { LevelCell } from "@/components/Table/components/TableCell/components/LevelCell/levelCell";
 import type { SpeciesTag } from "@/components/Table/components/TableCell/components/SpeciesCell/types";
-import { formatDate } from "@/utils/date-fns";
 import { KeyElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/KeyElType/keyElType";
 import { ValueElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/ValueElType/valueElType";
 import {
@@ -27,6 +26,7 @@ import type {
   OrganismContract,
 } from "@repo/shared/apis/types";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
+import { formatDate } from "@repo/shared/utils/date-fns/utils";
 import { parseISO } from "date-fns";
 import { ComponentProps } from "react";
 import { ROUTES } from "../../../../routes/constants";
