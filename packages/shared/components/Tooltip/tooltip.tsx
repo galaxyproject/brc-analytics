@@ -1,4 +1,5 @@
-import { Tooltip as MTooltip, TooltipProps } from "@mui/material";
+import type { TooltipProps } from "@mui/material";
+import { Tooltip as MTooltip } from "@mui/material";
 import { JSX } from "react";
 import { SLOT_PROPS } from "./constants";
 import { StyledSpan } from "./tooltip.styles";

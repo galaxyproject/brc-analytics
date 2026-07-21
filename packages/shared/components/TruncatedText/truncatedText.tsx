@@ -5,7 +5,7 @@ import {
 import { JSX, useEffect, useRef, useState } from "react";
 import { MAX_LINES, READ_LESS_TEXT, READ_MORE_TEXT } from "./constants";
 import { StyledButtonBase, StyledSpan } from "./truncatedText.styles";
-import { Props } from "./types";
+import type { Props } from "./types";
 import { calculateTruncation, renderText } from "./utils";
 
 /**

@@ -1,4 +1,4 @@
-import { TooltipProps } from "@mui/material";
+import type { TooltipProps } from "@mui/material";
 
 export const SLOT_PROPS: TooltipProps["slotProps"] = {
   popper: {

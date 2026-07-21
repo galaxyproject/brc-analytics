@@ -1,7 +1,7 @@
 import {
   calculateTruncation,
   renderText,
-} from "@/components/common/TruncatedText/utils";
+} from "@repo/shared/components/TruncatedText/utils";
 
 // Mock canvas context for text measurement.
 const mockMeasureText = jest.fn();

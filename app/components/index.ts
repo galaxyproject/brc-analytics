@@ -15,9 +15,9 @@ export { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/compo
 export { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/ChipCell/chipCell";
 export { NTagCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/NTagCell/nTagCell";
 export { CalendarIcon } from "@repo/shared/components/CustomIcon/components/CalendarIcon/calendarIcon";
+export { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
 export { Main as OrganismViewMain } from "../views/OrganismView/components/Main/main";
 export { Chip } from "./common/Chip/chip";
-export { Tooltip } from "./common/Tooltip/tooltip";
 export { OrganismAvatar } from "./Entity/components/OrganismAvatar/organismAvatar";
 export { MDXSection } from "./Entity/components/Section/MDXSection/mdxSection";
 export { Sections } from "./Entity/components/Sections/sections";
