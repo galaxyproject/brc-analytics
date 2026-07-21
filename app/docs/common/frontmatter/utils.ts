@@ -1,4 +1,4 @@
-import { formatDate } from "@/utils/date-fns";
+import { formatDate } from "@repo/shared/utils/date-fns/utils";
 import { FrontmatterProps } from "./types";
 
 /**
