@@ -1227,8 +1227,8 @@ class TestComputeHandoff:
 
         assert is_complete is True
         assert handoff_url == (
-            "/data/assemblies/GCF_000146045_2/analyze/workflows/"
-            "workflow-github-com-iwc-rnaseq-pe-main"
+            "/data/assemblies/GCF_000146045_2/analyze/workflows"
+            "?trsId=workflow-github-com-iwc-rnaseq-pe-main"
         )
 
     def test_incomplete_schema_has_no_handoff_url(self):
@@ -1741,11 +1741,11 @@ async def test_chat_handoff_url_carries_assistant_session_id(agent):
 
     assert response.is_complete is True
     # URL shape produced by main's compute_handoff (sanitized accession +
-    # /analyze/workflows/ segment), with brc-db's assistantSessionId query
-    # param appended.
+    # analyze/workflows page with the workflow as a `trsId` query param), with
+    # brc-db's assistantSessionId query param appended.
     assert (
         response.handoff_url
-        == "/data/assemblies/GCF_000001405_40/analyze/workflows/workflow-github-com-iwc-varcall-haploid-main?assistantSessionId=assistant-session-123"
+        == "/data/assemblies/GCF_000001405_40/analyze/workflows?trsId=workflow-github-com-iwc-varcall-haploid-main&assistantSessionId=assistant-session-123"
     )
     assert state.messages[-1] == ChatMessage(
         role=MessageRole.ASSISTANT, content="Ready to go."

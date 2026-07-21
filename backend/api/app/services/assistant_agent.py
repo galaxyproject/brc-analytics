@@ -685,13 +685,13 @@ class AssistantAgent:
             if accession and trs_id:
                 entity_id = AssistantAgent._sanitize_entity_id(accession)
                 workflow_id = AssistantAgent._format_trs_id_for_url(trs_id)
-                handoff_url = (
-                    f"/data/assemblies/{entity_id}/analyze/workflows/{workflow_id}"
-                )
+                query_params = {"trsId": workflow_id}
                 if session_id:
-                    handoff_url = (
-                        f"{handoff_url}?{urlencode({'assistantSessionId': session_id})}"
-                    )
+                    query_params["assistantSessionId"] = session_id
+                handoff_url = (
+                    f"/data/assemblies/{entity_id}/analyze/workflows"
+                    f"?{urlencode(query_params)}"
+                )
         return handoff_url is not None, handoff_url
 
     def reconcile_schema(self, schema: AnalysisSchema) -> AnalysisSchema:
