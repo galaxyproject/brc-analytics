@@ -1213,8 +1213,8 @@ def make_qc_report(
         if organisms_without_assemblies
         else []
     )
-    failing_dbt_tests_items = [
-        f"`{result.test_name}`{'' if result.message is None else ': ' + result.message}"
+    unsuccessful_dbt_tests_items = [
+        f"`{result.test_name}` (status `{result.status}`){'' if result.message is None else ': ' + result.message}"
         for result in dbt_test_results
         if not result.success
     ]
@@ -1275,7 +1275,9 @@ def make_qc_report(
         paired_accessions_items,
     )
     lines += format_raw_section("## Taxonomy tree", tree_checks_text)
-    lines += format_list_section("## Failing dbt tests", failing_dbt_tests_items)
+    lines += format_list_section(
+        "## Unsuccessful dbt tests", unsuccessful_dbt_tests_items
+    )
 
     return join_report(lines)
 
