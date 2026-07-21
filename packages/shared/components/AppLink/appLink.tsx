@@ -1,6 +1,7 @@
-import { ChildrenProps } from "@databiosphere/findable-ui/lib/components/types";
+import type { ChildrenProps } from "@databiosphere/findable-ui/lib/components/types";
 import { Link as MLink } from "@mui/material";
-import Link, { LinkProps } from "next/link";
+import type { LinkProps } from "next/link";
+import Link from "next/link";
 import { JSX } from "react";
 
 export const AppLink = ({

@@ -1,7 +1,7 @@
 import { SectionContentCard } from "@/components/common/Card/components/SectionContentCard/sectionContentCard";
-import { GalaxyIcon } from "@/components/common/CustomIcon/components/GalaxyIcon/galaxyIcon";
-import { RocketLaunchIcon } from "@/components/common/CustomIcon/components/RocketLaunchIcon/rocketLaunchIcon";
 import { SearchIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/SearchIcon/searchIcon";
+import { GalaxyIcon } from "@repo/shared/components/CustomIcon/components/GalaxyIcon/galaxyIcon";
+import { RocketLaunchIcon } from "@repo/shared/components/CustomIcon/components/RocketLaunchIcon/rocketLaunchIcon";
 import { ComponentProps } from "react";
 import { BookmarkStarIcon } from "./components/icon/BookmarkStarIcon/bookmarkStarIcon";
 import { LiveHelpIcon } from "./components/icon/LiveHelpIcon/liveHelpIcon";

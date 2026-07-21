@@ -1,4 +1,3 @@
-import { FileUploadIcon } from "@/components/common/CustomIcon/components/FileUploadIcon/fileUploadIcon";
 import { StyledButtonBase } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/Dropzone/components/FileUploadButton/fileUploadButton.styles";
 import {
   TYPOGRAPHY_PROPS as COMPONENT_TYPOGRAPHY_PROPS,
@@ -8,6 +7,7 @@ import { Dropzone as DropzoneBase } from "@/components/Entity/components/Configu
 import { Dot } from "@databiosphere/findable-ui/lib/components/common/Dot/dot";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Stack, Typography } from "@mui/material";
+import { FileUploadIcon } from "@repo/shared/components/CustomIcon/components/FileUploadIcon/fileUploadIcon";
 import { JSX } from "react";
 import { Props } from "./types";
 

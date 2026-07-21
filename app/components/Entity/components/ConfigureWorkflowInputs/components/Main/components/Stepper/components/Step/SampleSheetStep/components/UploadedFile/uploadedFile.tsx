@@ -1,11 +1,11 @@
-import { DeleteIcon } from "@/components/common/CustomIcon/components/DeleteIcon/deleteIcon";
-import { ScanDeleteIcon } from "@/components/common/CustomIcon/components/ScanDeleteIcon/scanDeleteIcon";
 import { ICON_BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/iconButton";
 import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { formatFileSize } from "@databiosphere/findable-ui/lib/utils/formatFileSize";
 import { FolderZipRounded } from "@mui/icons-material";
 import { IconButton, Stack, Typography } from "@mui/material";
+import { DeleteIcon } from "@repo/shared/components/CustomIcon/components/DeleteIcon/deleteIcon";
+import { ScanDeleteIcon } from "@repo/shared/components/CustomIcon/components/ScanDeleteIcon/scanDeleteIcon";
 import { JSX, ReactNode } from "react";
 import { Props } from "./types";
 import { StyledRoundedPaper } from "./uploadedFile.styles";
