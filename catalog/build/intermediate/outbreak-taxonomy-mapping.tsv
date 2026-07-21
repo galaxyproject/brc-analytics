@@ -1,25 +1,25 @@
 taxonomy_id	name	rank
-11266	Filoviridae	family
-1980416	Peribunyaviridae	family
-12058	Picornaviridae	family
-5037	Histoplasma capsulatum	species
+4827	Mucorales	order
+1773	Mycobacterium tuberculosis	species
 498019	Candidozyma auris	species
 11617	Arenaviridae	family
-11050	Flaviviridae	family
-5763	Naegleria fowleri	species
-3431483	Orthopoxvirus monkeypox	species
-1773	Mycobacterium tuberculosis	species
-4827	Mucorales	order
-5833	Plasmodium falciparum	species
 38574	Leishmania donovani species complex	species group
-1980418	Phenuiviridae	family
+1980415	Nairoviridae	family
+11266	Filoviridae	family
 2955291	Alphainfluenzavirus influenzae	species
-5207	Cryptococcus neoformans	species
-11158	Paramyxoviridae	family
+1980418	Phenuiviridae	family
+5763	Naegleria fowleri	species
 5052	Aspergillus	genus
 3418604	Betacoronavirus pandemicum	species
-11018	Togaviridae	family
-199306	Coccidioides posadasii	species
 1980413	Hantaviridae	family
-1980415	Nairoviridae	family
+11158	Paramyxoviridae	family
+5207	Cryptococcus neoformans	species
+3431483	Orthopoxvirus monkeypox	species
+199306	Coccidioides posadasii	species
 5807	Cryptosporidium parvum	species
+5037	Histoplasma capsulatum	species
+12058	Picornaviridae	family
+11050	Flaviviridae	family
+1980416	Peribunyaviridae	family
+5833	Plasmodium falciparum	species
+11018	Togaviridae	family

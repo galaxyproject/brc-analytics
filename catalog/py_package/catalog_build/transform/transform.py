@@ -12,7 +12,8 @@ DBT_FOLDER_PATH = str(Path(__file__).parent / "dbt")
 @dataclass
 class DBTTestResult:
     test_name: str
-    failed: bool
+    success: bool
+    status: str
     message: str | None
 
 
@@ -25,7 +26,8 @@ def get_test_results(runner: DBTPackageRunner) -> list[DBTTestResult]:
     return [
         DBTTestResult(
             test_name=runner_result.model_name,
-            failed=runner_result.status != "pass",
+            success=runner_result.status == "pass",
+            status=runner_result.status,
             message=runner_result.message,
         )
         for runner_result in runner.test()

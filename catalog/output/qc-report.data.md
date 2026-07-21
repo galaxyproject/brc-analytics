@@ -30,63 +30,63 @@ None
 - Acanthamoeba castellanii strain Neff: 5755, 1257118
 - Aedes aegypti: 7159, 1769044
 - Alphapapillomavirus 12: 990303, 10570
-- Alphapapillomavirus 14: 333769, 120686
-- Alphapapillomavirus 6: 333765, 10611
-- Asfivirus haemorrhagiae: 443878, 10497, 443876
+- Alphapapillomavirus 14: 120686, 333769
+- Alphapapillomavirus 6: 10611, 333765
+- Asfivirus haemorrhagiae: 10497, 443876, 443878
 - Batrachochytrium dendrobatidis strain JEL423: 403673, 109871
 - Betacoronavirus pandemicum: 227984, 2697049
-- Betapapillomavirus 1: 333923, 889813
+- Betapapillomavirus 1: 889813, 333923
 - Blumeria graminis: 1689686, 62690
-- Candida albicans strain SC5314: 237561, 5476
-- Candida tropicalis strain MYA-3404: 294747, 5482
+- Candida albicans strain SC5314: 5476, 237561
+- Candida tropicalis strain MYA-3404: 5482, 294747
 - Cryptococcus gattii strain WM276: 367775, 37769
-- Cryptococcus neoformans strain A5-35-17: 1230080, 5207
-- Cryptococcus neoformans strain C23: 1295831, 5207
-- Cryptococcus neoformans strain H99: 235443, 5207
-- Cryptosporidium parvum: 5807, 353152
-- Culex pipiens: 233155, 42434, 7175
+- Cryptococcus neoformans strain A5-35-17: 5207, 1230080
+- Cryptococcus neoformans strain C23: 5207, 1295831
+- Cryptococcus neoformans strain H99: 5207, 235443
+- Cryptosporidium parvum: 353152, 5807
+- Culex pipiens: 7175, 42434, 233155
 - Deltaretrovirus priTlym1: 11908, 194440
-- Dependoparvovirus mammalian1: 82300, 256548
-- Dependoparvovirus primate1: 85106, 202812, 10804, 57579, 202813
-- Encephalitozoon intestinalis strain ATCC 50506: 58839, 876142
-- Enterovirus alphacoxsackie: 156647, 150846
+- Dependoparvovirus mammalian1: 256548, 82300
+- Dependoparvovirus primate1: 10804, 202812, 57579, 202813, 85106
+- Encephalitozoon intestinalis strain ATCC 50506: 876142, 58839
+- Enterovirus alphacoxsackie: 150846, 156647
 - Enterovirus betarhino: 44130, 12131
 - Fusarium fujikuroi strain B14: 5127, 1215603
-- Fusarium oxysporum: 1229664, 330941, 396575, 224912, 299031, 1940294, 61366, 654392, 5507, 61374
+- Fusarium oxysporum: 61374, 1229664, 654392, 396575, 1940294, 61366, 330941, 5507, 299031, 224912
 - Fusarium oxysporum strain Fo5176: 100902, 5507
 - Fusarium vanettenii: 2747968, 660122
 - Fusarium verticillioides strain 7600: 117187, 334819
-- Gammapapillomavirus 11: 1070413, 1195796, 1070409
-- Gammapapillomavirus 12: 746832, 909331
-- Gammapapillomavirus 15: 1472342, 1070408
-- Gammapapillomavirus 19: 1315259, 1315264
+- Gammapapillomavirus 11: 1195796, 1070413, 1070409
+- Gammapapillomavirus 12: 909331, 746832
+- Gammapapillomavirus 15: 1070408, 1472342
+- Gammapapillomavirus 19: 1315264, 1315259
 - Gemykibivirus humas1: 1516081, 1519409
-- Giardia duodenalis: 941442, 5741
-- Glossina fuscipes: 201502, 7396
-- Heligmosomoides polygyrus: 6339, 375939
-- Hemileia vastatrix: 203904, 1291517
+- Giardia duodenalis: 5741, 941442
+- Glossina fuscipes: 7396, 201502
+- Heligmosomoides polygyrus: 375939, 6339
+- Hemileia vastatrix: 1291517, 203904
 - Leishmania braziliensis: 5660, 420245
 - Leishmania infantum: 435258, 5671
-- Meyerozyma guilliermondii strain ATCC 6260: 4929, 294746
+- Meyerozyma guilliermondii strain ATCC 6260: 294746, 4929
 - Microsporum canis strain CBS 113480: 63405, 554155
-- Mucor lusitanicus strain CBS 277.49: 29924, 747725
-- Norovirus norwalkense: 1529918, 122928, 1529924, 1246677, 490039, 122929, 1529909
-- Orthoflavivirus denguei: 11069, 11053, 11070
-- Orthohepacivirus hominis: 1544901, 356114, 33745
-- Orthomarburgvirus marburgense: 3052505, 448086
-- Pegivirus columbiaense: 1704090, 1729141
-- Plasmodium falciparum: 5833, 36329
+- Mucor lusitanicus strain CBS 277.49: 747725, 29924
+- Norovirus norwalkense: 1529924, 490039, 1246677, 122929, 122928, 1529918, 1529909
+- Orthoflavivirus denguei: 11070, 11053, 11069
+- Orthohepacivirus hominis: 33745, 1544901, 356114
+- Orthomarburgvirus marburgense: 448086, 3052505
+- Pegivirus columbiaense: 1729141, 1704090
+- Plasmodium falciparum: 36329, 5833
 - Plasmodium ovale: 864141, 864142
-- Plasmodium vinckei: 5860, 138298, 138297, 119398, 54757
+- Plasmodium vinckei: 119398, 54757, 138297, 138298, 5860
 - Plasmodium yoelii strain 17X: 5861, 1323249
-- Puccinia striiformis strain 93-210: 27350, 168172
-- Small anellovirus: 289366, 289367
-- Torbevirus brisa: 2571078, 2571077, 2571076, 2571075
-- Toxoplasma gondii strain ME49: 508771, 5811
+- Puccinia striiformis strain 93-210: 168172, 27350
+- Small anellovirus: 289367, 289366
+- Torbevirus brisa: 2571075, 2571078, 2571077, 2571076
+- Toxoplasma gondii strain ME49: 5811, 508771
 - Trichoderma virens strain Gv29-8: 29875, 413071
-- Trichophyton rubrum strain CBS 289.86: 5551, 1215329
-- Trichophyton rubrum strain CBS 735.88: 1215332, 5551
-- Trypanosoma cruzi strain Dm28c: 5693, 85057, 1416333
+- Trichophyton rubrum strain CBS 289.86: 1215329, 5551
+- Trichophyton rubrum strain CBS 735.88: 5551, 1215332
+- Trypanosoma cruzi strain Dm28c: 1416333, 5693, 85057
 - Vesivirus exanthema: 35612, 146073
 
 ## Assemblies without ploidy information
@@ -518,7 +518,7 @@ List of taxa with assembly count 0: None
 
 List of taxonomic levels specified in parameters but absent in tree: None
 
-## Failing dbt tests
+## Unsuccessful dbt tests
 
-- `relationships_taxonomy_catalog_taxa_taxonomy_id__query_tax_id__ref_taxonomy_lineages_with_names_`: Got 4 results, configured to warn if != 0
-- `source_relationships_catalog_source_organism_taxa_taxonomy_id__taxonomy_id__ref_taxonomy_organisms_`: Got 4 results, configured to warn if != 0
+- `relationships_taxonomy_catalog_taxa_taxonomy_id__query_tax_id__ref_taxonomy_lineages_with_names_` (status `warn`): Got 4 results, configured to warn if != 0
+- `source_relationships_catalog_source_organism_taxa_taxonomy_id__taxonomy_id__ref_taxonomy_organisms_` (status `warn`): Got 4 results, configured to warn if != 0
