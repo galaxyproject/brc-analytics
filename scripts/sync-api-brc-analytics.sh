@@ -31,3 +31,7 @@ for name in "${OPTIONAL_JSONS[@]}"; do
     echo "Skipping optional ${name}.json (not found at $src)"
   fi
 done
+
+# Priority pathogens: the catalog output is outbreaks.json, served at the
+# priority-pathogens route so the client entity store can load it.
+cp "$SRC_ROOT/outbreaks.json" "$API_DIR/priority-pathogens.json"
