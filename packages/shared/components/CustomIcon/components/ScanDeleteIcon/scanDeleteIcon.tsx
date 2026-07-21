@@ -1,4 +1,6 @@
-import { SvgIcon, SvgIconProps } from "@mui/material";
+import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
+import type { SvgIconProps } from "@mui/material";
+import { SvgIcon } from "@mui/material";
 import { JSX } from "react";
 
 /**
@@ -6,7 +8,7 @@ import { JSX } from "react";
  */
 
 export const ScanDeleteIcon = ({
-  fontSize = "xsmall",
+  fontSize = SVG_ICON_PROPS.FONT_SIZE.XSMALL,
   viewBox = "0 0 18 18",
   ...props
 }: SvgIconProps): JSX.Element => {

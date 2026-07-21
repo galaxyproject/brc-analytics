@@ -9,7 +9,6 @@ import {
   getOrganismId,
 } from "@/apis/catalog/brc-analytics-catalog/common/utils";
 import { SLUGIFY_OPTIONS } from "@/common/constants";
-import { AppLink } from "@/components/common/AppLink/appLink";
 import { Chip } from "@/components/common/Chip/chip";
 import { Tooltip } from "@/components/common/Tooltip/tooltip";
 import { StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
@@ -74,6 +73,7 @@ import type {
   OrganismContract,
 } from "@repo/shared/apis/types";
 import type { Workflow } from "@repo/shared/apis/workflow";
+import { AppLink } from "@repo/shared/components/AppLink/appLink";
 import { ROUTES } from "@repo/shared/routes/constants";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
