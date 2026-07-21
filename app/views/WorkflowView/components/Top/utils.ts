@@ -1,5 +1,5 @@
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
-import { ROUTES } from "../../../../../routes/constants";
+import { ROUTES } from "@repo/shared/routes/constants";
 import { Props } from "./types";
 
 /**

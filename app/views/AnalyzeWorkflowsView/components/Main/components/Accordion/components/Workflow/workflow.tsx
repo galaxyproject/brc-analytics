@@ -6,9 +6,9 @@ import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/b
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { Button, Grid, Typography } from "@mui/material";
+import { ROUTES } from "@repo/shared/routes/constants";
 import Link from "next/link";
 import { Fragment, JSX } from "react";
-import { ROUTES } from "../../../../../../../../../routes/constants";
 import { GRID_PROPS } from "./constants";
 import { Props } from "./types";
 import { StyledGrid } from "./workflow.styles";

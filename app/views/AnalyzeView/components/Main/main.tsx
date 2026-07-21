@@ -11,9 +11,9 @@ import {
   IconButton,
   Typography,
 } from "@mui/material";
+import { ROUTES } from "@repo/shared/routes/constants";
 import Link from "next/link";
 import { JSX } from "react";
-import { ROUTES } from "../../../../../routes/constants";
 import { StyledCard } from "./main.styles";
 
 export const Main = ({ entityId }: Props): JSX.Element => {

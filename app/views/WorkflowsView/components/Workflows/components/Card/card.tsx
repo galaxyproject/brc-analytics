@@ -17,9 +17,9 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { ROUTES } from "@repo/shared/routes/constants";
 import Link from "next/link";
 import { JSX } from "react";
-import { ROUTES } from "../../../../../../../routes/constants";
 import { StyledCard } from "./card.styles";
 import { Props } from "./types";
 

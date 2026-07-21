@@ -3,7 +3,7 @@
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters.js";
 import { Locator, Page } from "@playwright/test";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
-import { ROUTES } from "../../../routes/constants";
+import { ROUTES } from "@repo/shared/routes/constants";
 import { expect, test } from "../utils/fixtures";
 
 /**
