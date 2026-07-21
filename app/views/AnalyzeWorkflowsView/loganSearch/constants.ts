@@ -1,8 +1,8 @@
-import { Workflow } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
-} from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
+} from "@repo/shared/apis/schema-types";
+import type { Workflow } from "@repo/shared/apis/workflow";
 
 export const LOGAN_SEARCH: Workflow = {
   assemblyCountMax: 0,

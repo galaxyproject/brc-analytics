@@ -1,4 +1,4 @@
-import { WorkflowAssemblyMapping } from "../../app/apis/catalog/brc-analytics-catalog/common/entities";
+import type { WorkflowAssemblyMapping } from "@repo/shared/apis/workflow";
 
 const workflowAssemblyMappings: WorkflowAssemblyMapping[];
 export default workflowAssemblyMappings;

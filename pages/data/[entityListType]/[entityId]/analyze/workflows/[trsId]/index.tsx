@@ -1,7 +1,4 @@
-import {
-  EntitiesResponse,
-  WorkflowCategory,
-} from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import { EntitiesResponse } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { getPageMeta } from "@/common/meta/utils";
 import { EntityDataGate } from "@/components/EntityDataGate/entityDataGate";
 import { config } from "@/config/config";
@@ -18,6 +15,7 @@ import { OrganismWorkflowInputsView } from "@/views/OrganismWorkflowInputsView/o
 import { Assembly } from "@/views/WorkflowInputsView/types";
 import { WorkflowInputsView } from "@/views/WorkflowInputsView/workflowInputsView";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import type { WorkflowCategory } from "@repo/shared/apis/workflow";
 import {
   GetStaticPaths,
   GetStaticPathsResult,

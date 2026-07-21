@@ -2,17 +2,12 @@ import {
   BRCDataCatalogGenome,
   BRCDataCatalogOrganism,
   Outbreak,
-  Workflow,
 } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import type { OUTBREAK_PRIORITY } from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
 import {
   getGenomeOrganismId,
   getOrganismId,
 } from "@/apis/catalog/brc-analytics-catalog/common/utils";
-import type {
-  AssemblyContract,
-  OrganismContract,
-} from "@/apis/catalog/common/entities";
 import { SLUGIFY_OPTIONS } from "@/common/constants";
 import { AppLink } from "@/components/common/AppLink/appLink";
 import { Chip } from "@/components/common/Chip/chip";
@@ -74,6 +69,11 @@ import { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/compo
 import { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/ChipCell/chipCell";
 import { NTagCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/NTagCell/nTagCell";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
+import type {
+  AssemblyContract,
+  OrganismContract,
+} from "@repo/shared/apis/types";
+import type { Workflow } from "@repo/shared/apis/workflow";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,

@@ -1,4 +1,4 @@
-import { Workflow } from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import type { Workflow } from "@repo/shared/apis/workflow";
 
 export interface Props {
   workflow: Workflow;

@@ -1,9 +1,6 @@
-import type {
-  Workflow,
-  WorkflowCategory,
-} from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import { WORKFLOW_SCOPE } from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
 import type { Organism } from "@/views/OrganismView/types";
+import { WORKFLOW_SCOPE } from "@repo/shared/apis/schema-types";
+import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
 import { WorkflowCategoryId } from "../../../../../catalog/schema/generated/schema";
 
 /**

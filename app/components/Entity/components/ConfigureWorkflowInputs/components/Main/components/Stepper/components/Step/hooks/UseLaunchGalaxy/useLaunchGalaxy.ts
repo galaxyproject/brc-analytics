@@ -1,4 +1,3 @@
-import { Workflow } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { brcAPIClient } from "@/services/brc-api-client";
 import {
   getDataLandingUrl,
@@ -12,6 +11,7 @@ import { LEXICMAP } from "@/views/AnalyzeWorkflowsView/lexicmap/constants";
 import { LOGAN_SEARCH } from "@/views/AnalyzeWorkflowsView/loganSearch/constants";
 import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
 import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
+import type { Workflow } from "@repo/shared/apis/workflow";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
 import {

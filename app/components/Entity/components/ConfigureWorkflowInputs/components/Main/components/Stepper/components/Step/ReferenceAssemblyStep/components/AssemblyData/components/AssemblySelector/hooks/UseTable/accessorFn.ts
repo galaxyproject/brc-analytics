@@ -1,5 +1,5 @@
-import type { AssemblyContract } from "@/apis/catalog/common/entities";
 import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
+import type { AssemblyContract } from "@repo/shared/apis/types";
 
 /**
  * Returns the isolate value for an assembly, or LABEL.UNSPECIFIED if not available.

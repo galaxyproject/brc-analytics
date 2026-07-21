@@ -1,5 +1,3 @@
-import { Workflow } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import { WORKFLOW_PARAMETER_VARIABLE } from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
 import { WorkflowRunCreateRequest } from "@/types/api";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
@@ -7,6 +5,8 @@ import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,
 } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
+import { WORKFLOW_PARAMETER_VARIABLE } from "@repo/shared/apis/schema-types";
+import type { Workflow } from "@repo/shared/apis/workflow";
 import {
   ConfiguredValue,
   isAssemblyConfiguredValue,

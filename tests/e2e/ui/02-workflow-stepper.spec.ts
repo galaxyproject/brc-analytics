@@ -2,7 +2,7 @@
 // enforces the package exports field strictly (no auto-resolving extensions).
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters.js";
 import { Locator, Page } from "@playwright/test";
-import { sanitizeEntityId } from "../../../app/apis/catalog/common/utils";
+import { sanitizeEntityId } from "@repo/shared/apis/utils";
 import { ROUTES } from "../../../routes/constants";
 import { expect, test } from "../utils/fixtures";
 

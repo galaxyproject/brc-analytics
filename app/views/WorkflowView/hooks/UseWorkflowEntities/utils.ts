@@ -1,15 +1,13 @@
-import type {
-  BRCDataCatalogOrganism,
-  Workflow,
-} from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import { WORKFLOW_SCOPE } from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { sanitizeEntityId } from "@/apis/catalog/common/utils";
+import type { BRCDataCatalogOrganism } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import type { GA2OrganismEntity } from "@/apis/catalog/ga2/entities";
 import { findOrganism, getAssembly } from "@/services/workflows/entities";
 import type { Organism } from "@/views/OrganismView/types";
 import { mapOrganismEntityToOrganism } from "@/views/OrganismWorkflowInputsView/utils";
 import type { Assembly } from "@/views/WorkflowInputsView/types";
 import { mapAssemblyToOrganism } from "@/views/WorkflowInputsView/utils";
+import { WORKFLOW_SCOPE } from "@repo/shared/apis/schema-types";
+import { sanitizeEntityId } from "@repo/shared/apis/utils";
+import type { Workflow } from "@repo/shared/apis/workflow";
 
 /**
  * Resolves the reference-assembly genome, when one is configured.
