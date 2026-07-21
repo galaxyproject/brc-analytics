@@ -74,6 +74,7 @@ import type {
   OrganismContract,
 } from "@repo/shared/apis/types";
 import type { Workflow } from "@repo/shared/apis/workflow";
+import { ROUTES } from "@repo/shared/routes/constants";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
@@ -83,7 +84,7 @@ import { LinkProps } from "next/link";
 import Router from "next/router";
 import { ComponentProps } from "react";
 import slugify from "slugify";
-import { ROUTES } from "../../../../../routes/constants";
+import { ROUTES as SITE_ROUTES } from "../../../../../routes/constants";
 
 // Transitional shim for the GA2/BRC split (monorepo-split): shared builders
 // moved to the site-neutral common home. Re-export them from this BRC path so
@@ -450,7 +451,7 @@ export const buildPriorityPathogen = (entity: {
     onClick: priorityPathogenName
       ? (): void => {
           Router.push({
-            pathname: ROUTES.PRIORITY_PATHOGEN,
+            pathname: SITE_ROUTES.PRIORITY_PATHOGEN,
             query: {
               entityId: slugify(priorityPathogenName, SLUGIFY_OPTIONS),
               entityListType: "priority-pathogens",
@@ -1116,7 +1117,7 @@ function getPriorityPathogenEntityBreadcrumbs(
   priorityPathogen: Outbreak
 ): Breadcrumb[] {
   return [
-    { path: ROUTES.PRIORITY_PATHOGENS, text: "Priority Pathogens" },
+    { path: SITE_ROUTES.PRIORITY_PATHOGENS, text: "Priority Pathogens" },
     { path: "", text: priorityPathogen.name },
   ];
 }

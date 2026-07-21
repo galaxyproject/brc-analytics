@@ -6,10 +6,11 @@ import * as C from "@/components";
 import { TaxonomyNode } from "@/components/Home/components/Section/components/SectionViz/data";
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import { ROUTES } from "@repo/shared/routes/constants";
 import { APP_KEYS } from "@site-config/common/constants";
 import { AppSiteConfig } from "@site-config/common/entities";
 import data from "catalog/ga2/output/ncbi-taxa-tree.json";
-import { ROUTES } from "../../../routes/constants";
+import { ROUTES as SITE_ROUTES } from "../../../routes/constants";
 import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genome/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organism/organismEntityConfig";
@@ -19,9 +20,9 @@ import { socialMedia } from "./socialMedia";
 import { THEME_OPTIONS } from "./theme/constants";
 
 const ALLOWED_PATHS = [
-  ROUTES.ABOUT,
-  ROUTES.ABOUT_PARTNER_RESOURCES,
-  ROUTES.ABOUT_ROADMAP,
+  SITE_ROUTES.ABOUT,
+  SITE_ROUTES.ABOUT_PARTNER_RESOURCES,
+  SITE_ROUTES.ABOUT_ROADMAP,
   ROUTES.ORGANISMS,
   ROUTES.GENOMES,
   ROUTES.WORKFLOWS,
@@ -90,7 +91,7 @@ export function makeConfig(
         navigation: [
           undefined,
           [
-            { label: "About", url: ROUTES.ABOUT },
+            { label: "About", url: SITE_ROUTES.ABOUT },
             { label: "Organisms", url: ROUTES.ORGANISMS },
             { label: "Assemblies", url: ROUTES.GENOMES },
             { label: "Workflows", url: ROUTES.WORKFLOWS },

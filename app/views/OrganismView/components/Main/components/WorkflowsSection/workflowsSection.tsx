@@ -5,8 +5,8 @@ import { buildOrganismWorkflows } from "@/views/OrganismView/components/Main/uti
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Stack } from "@mui/material";
+import { ROUTES } from "@repo/shared/routes/constants";
 import { JSX } from "react";
-import { ROUTES } from "../../../../../../../routes/constants";
 import { EmptyState } from "../EmptyState/emptyState";
 import { Props } from "./types";
 

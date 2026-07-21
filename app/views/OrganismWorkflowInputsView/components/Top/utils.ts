@@ -1,6 +1,6 @@
 import type { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
-import { ROUTES } from "../../../../../routes/constants";
+import { ROUTES } from "@repo/shared/routes/constants";
 import type { Props } from "./types";
 
 /**

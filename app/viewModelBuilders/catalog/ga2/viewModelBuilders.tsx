@@ -20,13 +20,13 @@ import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Tab
 import { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
 import { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/ChipCell/chipCell";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
+import { ROUTES } from "@repo/shared/routes/constants";
 import {
   GA2_CATEGORY_KEY,
   GA2_CATEGORY_LABEL,
 } from "@site-config/ga2/category";
 import { ColumnDef, RowData, VisibilityState } from "@tanstack/react-table";
 import { ComponentProps } from "react";
-import { ROUTES } from "../../../../routes/constants";
 import { ORGANISM_SCOPED_TAG_LABELS } from "../common/constants";
 import {
   buildAnalyzeGenome,

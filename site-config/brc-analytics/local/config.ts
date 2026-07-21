@@ -8,11 +8,12 @@ import { TaxonomyNode } from "@/components/Home/components/Section/components/Se
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import { ROUTES } from "@repo/shared/routes/constants";
 import { APP_KEYS } from "@site-config/common/constants";
 import { AppSiteConfig } from "@site-config/common/entities";
 import data from "catalog/output/ncbi-taxa-tree.json";
 import { createElement } from "react";
-import { ROUTES } from "../../../routes/constants";
+import { ROUTES as SITE_ROUTES } from "../../../routes/constants";
 import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organismEntityConfig";
@@ -99,13 +100,16 @@ export function makeConfig(
         navigation: [
           undefined,
           [
-            { label: "About", url: ROUTES.ABOUT },
-            { label: "Learn", url: ROUTES.LEARN },
+            { label: "About", url: SITE_ROUTES.ABOUT },
+            { label: "Learn", url: SITE_ROUTES.LEARN },
             { label: "Organisms", url: ROUTES.ORGANISMS },
             { label: "Assemblies", url: ROUTES.GENOMES },
             { label: "Workflows", url: ROUTES.WORKFLOWS },
-            { label: "Priority Pathogens", url: ROUTES.PRIORITY_PATHOGENS },
-            { label: "Assistant", url: ROUTES.ASSISTANT },
+            {
+              label: "Priority Pathogens",
+              url: SITE_ROUTES.PRIORITY_PATHOGENS,
+            },
+            { label: "Assistant", url: SITE_ROUTES.ASSISTANT },
           ],
           undefined,
         ],

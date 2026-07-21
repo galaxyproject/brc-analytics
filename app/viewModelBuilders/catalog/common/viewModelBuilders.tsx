@@ -26,10 +26,10 @@ import type {
   OrganismContract,
 } from "@repo/shared/apis/types";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
+import { ROUTES } from "@repo/shared/routes/constants";
 import { formatDate } from "@repo/shared/utils/date-fns/utils";
 import { parseISO } from "date-fns";
 import { ComponentProps } from "react";
-import { ROUTES } from "../../../../routes/constants";
 import {
   ENTITY_DETAIL_LABEL,
   GALAXY_DATACACHE,
