@@ -3,20 +3,15 @@ import { EntityDataGate } from "@/components/EntityDataGate/entityDataGate";
 import { config } from "@/config/config";
 import { getEntities } from "@/utils/entityUtils";
 import { seedDatabase } from "@/utils/seedDatabase";
-import { AnalyzeWorkflowsView } from "@/views/AnalyzeWorkflowsView/analyzeWorkflowsView";
-import { OrganismWorkflowInputsView } from "@/views/OrganismWorkflowInputsView/organismWorkflowInputsView";
-import { WorkflowInputsView } from "@/views/WorkflowInputsView/workflowInputsView";
-import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
-import { ROUTES } from "@repo/shared/routes/constants";
+import { AnalyzeWorkflowsRouteView } from "@/views/AnalyzeWorkflowsRouteView/analyzeWorkflowsRouteView";
 import type {
   GetStaticPaths,
   GetStaticPathsResult,
   GetStaticProps,
   GetStaticPropsContext,
 } from "next";
-import { useRouter } from "next/router";
 import type { ParsedUrlQuery } from "querystring";
-import { JSX, useEffect } from "react";
+import { JSX } from "react";
 
 const ENTITY_LIST_TYPE_ORGANISMS = "organisms";
 
@@ -81,39 +76,19 @@ export const getStaticProps: GetStaticProps<Props> = async ({
 };
 
 /**
- * Analyze workflows page. Renders the compatible-workflows list for an assembly,
- * or — when a workflow is selected via the `trsId` query param — the configure
- * inputs view for that workflow. A bare organism URL (no `trsId`) redirects to
- * the organism detail page, where organism workflows are listed.
+ * Analyze workflows page.
  * @param props - Page props.
  * @param props.entityId - Entity ID.
  * @param props.entityListType - Entity list type.
- * @returns Analyze workflows page component.
+ * @returns Analyze workflows route view.
  */
-const Page = ({ entityId, entityListType }: Props): JSX.Element => {
-  const router = useRouter();
-  const trsId =
-    typeof router.query.trsId === "string" ? router.query.trsId : undefined;
-  const isOrganism = entityListType === ENTITY_LIST_TYPE_ORGANISMS;
-
-  useEffect(() => {
-    if (router.isReady && isOrganism && !trsId) {
-      router.replace(replaceParameters(ROUTES.ORGANISM, { entityId }));
-    }
-  }, [router, isOrganism, trsId, entityId]);
-
-  if (!router.isReady || (isOrganism && !trsId)) return <></>;
-
-  let content: JSX.Element;
-  if (!trsId) {
-    content = <AnalyzeWorkflowsView entityId={entityId} />;
-  } else if (isOrganism) {
-    content = <OrganismWorkflowInputsView entityId={entityId} trsId={trsId} />;
-  } else {
-    content = <WorkflowInputsView entityId={entityId} trsId={trsId} />;
-  }
-
-  return <EntityDataGate>{content}</EntityDataGate>;
-};
+const Page = ({ entityId, entityListType }: Props): JSX.Element => (
+  <EntityDataGate>
+    <AnalyzeWorkflowsRouteView
+      entityId={entityId}
+      entityListType={entityListType}
+    />
+  </EntityDataGate>
+);
 
 export default Page;
