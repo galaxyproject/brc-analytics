@@ -5,7 +5,7 @@ import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceP
 import { ROUTES } from "@repo/shared/routes/constants";
 import Router, { useRouter } from "next/router";
 import { JSX, useEffect } from "react";
-import { Props } from "./types";
+import type { Props } from "./types";
 
 /**
  * Analyze workflows route view. Renders the compatible-workflows list, or — when
