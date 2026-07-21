@@ -1,58 +1,31 @@
-import {
-  BRCCatalog,
-  EntitiesResponse,
-  Outbreak,
-} from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import { GA2Catalog } from "@/apis/catalog/ga2/entities";
 import { getEntityListMeta } from "@/common/meta/utils";
+import { EntityDataGate } from "@/components/EntityDataGate/entityDataGate";
 import { config } from "@/config/config";
-import { seedDatabase } from "@/utils/seedDatabase";
-import { StyledExploreView } from "@/views/ExploreView/exploreView.styles";
-import { PriorityPathogensView } from "@/views/PriorityPathogensView/priorityPathogensView";
+import { EntitiesView } from "@/views/EntitiesView/entitiesView";
+import type { Props as EntitiesPageProps } from "@/views/EntitiesView/types";
 import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main.styles";
-import { getEntityConfig } from "@databiosphere/findable-ui/lib/config/utils";
-import { getEntityService } from "@databiosphere/findable-ui/lib/hooks/useEntityService";
-import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
 import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
 
-interface PageUrl extends ParsedUrlQuery {
+interface Params extends ParsedUrlQuery {
   entityListType: string;
-}
-
-interface EntitiesPageProps<R> {
-  data?: EntitiesResponse<R>;
-  entityListType: string;
-  pageDescription?: string;
-  pageTitle?: string;
 }
 
 /**
- * Explore view page.
- * @param props - Explore view page props.
+ * Explore view page for client-side loaded entity lists (assemblies, organisms).
+ * @param props - Page props.
  * @param props.entityListType - Entity list type.
- * @returns ExploreView component.
+ * @returns EntitiesView component.
  */
-const IndexPage = <R,>({
-  entityListType,
-  ...props
-}: EntitiesPageProps<R>): JSX.Element => {
+const Page = ({ entityListType, ...props }: EntitiesPageProps): JSX.Element => {
   if (!entityListType) return <></>;
 
-  // Return the PriorityPathogensView component for the priority pathogens route.
-  if (entityListType === "priority-pathogens") {
-    // Throw an error if no priority pathogen data is provided.
-    if (!props.data) throw new Error("No priority pathogen data provided");
-
-    // Return the PriorityPathogensView component.
-    return (
-      <PriorityPathogensView data={props.data as EntitiesResponse<Outbreak>} />
-    );
-  }
-
-  // Return the ExploreView component for all other routes.
-  return <StyledExploreView entityListType={entityListType} {...props} />;
+  return (
+    <EntityDataGate>
+      <EntitiesView entityListType={entityListType} {...props} />
+    </EntityDataGate>
+  );
 };
 
 /**
@@ -63,7 +36,11 @@ export const getStaticPaths: GetStaticPaths = async () => {
   const appConfig = config();
   const entities = appConfig.entities;
   const paths = entities
-    .filter((entity) => entity.route !== "workflows")
+    // Workflows has no explore list page; priority-pathogens has its own page.
+    .filter(
+      (entity) =>
+        entity.route !== "workflows" && entity.route !== "priority-pathogens"
+    )
     .map((entity) => ({
       params: {
         entityListType: entity.route,
@@ -80,40 +57,22 @@ export const getStaticPaths: GetStaticPaths = async () => {
  * @param context - Object containing values related to the current context.
  * @returns static props.
  */
-export const getStaticProps: GetStaticProps<
-  EntitiesPageProps<BRCCatalog | GA2Catalog>
-> = async (context: GetStaticPropsContext) => {
+export const getStaticProps: GetStaticProps<EntitiesPageProps> = async (
+  context: GetStaticPropsContext
+) => {
   const appConfig = config();
-  const { entityListType } = context.params as PageUrl;
-  const { entities } = appConfig;
-  const entityConfig = getEntityConfig(entities, entityListType);
-  const { exploreMode } = entityConfig;
-  const { fetchAllEntities } = getEntityService(entityConfig, undefined); // Determine the type of fetch, either from an API endpoint or a TSV.
-
+  const { entityListType } = context.params as Params;
   const entityMeta = getEntityListMeta(appConfig.appKey)[entityListType];
 
-  const props: EntitiesPageProps<BRCCatalog | GA2Catalog> = {
-    entityListType,
-    pageDescription: entityMeta?.pageDescription,
-    pageTitle: entityMeta?.pageTitle,
-  };
-
-  // Seed database.
-  if (exploreMode === EXPLORE_MODE.CS_FETCH_CS_FILTERING) {
-    await seedDatabase(entityListType, entityConfig);
-  } else {
-    // Entities are fetched server-side.
-    return { props };
-  }
-
-  // Entities are client-side fetched from a local database seeded from a configured TSV.
-  props.data = await fetchAllEntities(entityListType, undefined);
-
   return {
-    props,
+    props: {
+      entityListType,
+      pageDescription: entityMeta?.pageDescription,
+      pageTitle: entityMeta?.pageTitle,
+    },
   };
 };
 
-IndexPage.Main = DXMain;
+Page.Main = DXMain;
 
-export default IndexPage;
+export default Page;
