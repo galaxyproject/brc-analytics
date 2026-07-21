@@ -7,10 +7,12 @@ import { Fragment, JSX } from "react";
 import { CARDS } from "./constants";
 
 export const LearnView = (): JSX.Element => {
+  const isAssistantEnabled = useFeatureFlag("assistant");
   const isLmlsEnabled = useFeatureFlag("lmls");
   const filteredCards = CARDS.filter(
     (card) =>
-      card.cardUrl !== "/learn/sequence-search-workflows" || isLmlsEnabled
+      (card.cardUrl !== "/learn/sequence-search-workflows" || isLmlsEnabled) &&
+      (card.cardUrl !== "/learn/assistant" || isAssistantEnabled)
   );
 
   return (
