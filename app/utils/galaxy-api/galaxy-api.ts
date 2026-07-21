@@ -1,9 +1,9 @@
-import { WorkflowParameter } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   WORKFLOW_PARAMETER_VARIABLE,
-  WorkflowCollectionSpec,
-  WorkflowUrlSpec,
-} from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
+  type WorkflowCollectionSpec,
+  type WorkflowUrlSpec,
+} from "@repo/shared/apis/schema-types";
+import type { WorkflowParameter } from "@repo/shared/apis/workflow";
 
 const FILE_EXT = {
   FASTQ_SANGER_GZ: "fastqsanger.gz",

@@ -1,8 +1,3 @@
-import type {
-  AssemblyContract,
-  OrganismContract,
-} from "@/apis/catalog/common/entities";
-import { sanitizeEntityId } from "@/apis/catalog/common/utils";
 import { CopyText } from "@/components/common/CopyText/copyText";
 import { Tooltip } from "@/components/common/Tooltip/tooltip";
 import { AnalysisPortals } from "@/components/Entity/components/AnalysisPortals/analysisPortals";
@@ -27,6 +22,11 @@ import { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/compo
 import { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/ChipCell/chipCell";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
+import type {
+  AssemblyContract,
+  OrganismContract,
+} from "@repo/shared/apis/types";
+import { sanitizeEntityId } from "@repo/shared/apis/utils";
 import { parseISO } from "date-fns";
 import { ComponentProps } from "react";
 import { ROUTES } from "../../../../routes/constants";

@@ -1,5 +1,5 @@
+import type { WorkflowCategory } from "@repo/shared/apis/workflow";
 import fsp from "fs/promises";
-import { WorkflowCategory } from "../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   GA2AssemblyEntity,
   GA2OrganismEntity,

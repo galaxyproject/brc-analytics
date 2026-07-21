@@ -1,8 +1,8 @@
-import {
+import type {
   Workflow,
   WorkflowCategory,
   WorkflowParameter,
-} from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
+} from "@repo/shared/apis/workflow";
 import {
   Workflow as SourceWorkflow,
   WorkflowCategories as SourceWorkflowCategories,

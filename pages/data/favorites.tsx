@@ -1,4 +1,3 @@
-import { sanitizeEntityId } from "@/apis/catalog/common/utils";
 import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
 import { useAssemblyFavorites } from "@/hooks/useAssemblyFavorites";
@@ -14,6 +13,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { sanitizeEntityId } from "@repo/shared/apis/utils";
 import Link from "next/link";
 import { JSX } from "react";
 

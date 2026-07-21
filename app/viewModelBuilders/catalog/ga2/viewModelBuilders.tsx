@@ -1,4 +1,3 @@
-import { sanitizeEntityId } from "@/apis/catalog/common/utils";
 import {
   GA2AssemblyEntity,
   GA2OrganismEntity,
@@ -20,6 +19,7 @@ import { Link } from "@databiosphere/findable-ui/lib/components/Links/components
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
 import { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
 import { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/ChipCell/chipCell";
+import { sanitizeEntityId } from "@repo/shared/apis/utils";
 import {
   GA2_CATEGORY_KEY,
   GA2_CATEGORY_LABEL,

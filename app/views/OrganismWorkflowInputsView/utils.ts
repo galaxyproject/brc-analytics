@@ -1,4 +1,4 @@
-import type { OrganismContract } from "@/apis/catalog/common/entities";
+import type { OrganismContract } from "@repo/shared/apis/types";
 import type { Organism } from "../OrganismView/types";
 
 /**

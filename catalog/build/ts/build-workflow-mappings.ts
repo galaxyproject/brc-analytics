@@ -1,12 +1,12 @@
 import {
-  WorkflowAssemblyMapping,
-  WorkflowCategory,
-} from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
-import {
   ORGANISM_PLOIDY,
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_PLOIDY,
-} from "../../../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
+} from "@repo/shared/apis/schema-types";
+import type {
+  WorkflowAssemblyMapping,
+  WorkflowCategory,
+} from "@repo/shared/apis/workflow";
 import { workflowMeetsAssemblyMinimum } from "../../../app/apis/catalog/brc-analytics-catalog/common/workflowAssembly";
 
 // Type constraint: both BRC and GA2 assemblies have these fields

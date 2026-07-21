@@ -1,12 +1,10 @@
-import type {
-  BRCDataCatalogGenome,
-  WorkflowCategory,
-} from "../app/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   ORGANISM_PLOIDY,
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
-} from "../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
+} from "@repo/shared/apis/schema-types";
+import type { WorkflowCategory } from "@repo/shared/apis/workflow";
+import type { BRCDataCatalogGenome } from "../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { buildAssemblyWorkflows } from "../app/views/AnalyzeWorkflowsView/components/Main/utils";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../app/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { WorkflowCategoryId } from "../catalog/schema/generated/schema";

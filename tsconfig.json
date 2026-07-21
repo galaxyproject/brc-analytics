@@ -17,6 +17,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["app/*"],
+      "@repo/shared": ["packages/shared/index.ts"],
+      "@repo/shared/*": ["packages/shared/*"],
       "@site-config/*": ["site-config/*"],
       "images/*": ["images/*"]
     },

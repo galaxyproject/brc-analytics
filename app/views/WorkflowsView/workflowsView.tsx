@@ -1,10 +1,10 @@
-import { WorkflowAssemblyMapping } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   getOrganisms,
   getWorkflows as getWorkflowCategories,
 } from "@/services/workflows/entities";
 import { API } from "@/services/workflows/routes";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
+import type { WorkflowAssemblyMapping } from "@repo/shared/apis/workflow";
 import { JSX, useEffect, useMemo, useState } from "react";
 import { ExploreView } from "../ExploreView/exploreView";
 import { Workflows } from "./components/Workflows/workflows";

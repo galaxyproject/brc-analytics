@@ -1,9 +1,9 @@
-import type { AssemblyContract } from "@/apis/catalog/common/entities";
 import {
   getGenomeIsolateText,
   getGenomeSerotypeText,
   getGenomeStrainText,
 } from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import type { AssemblyContract } from "@repo/shared/apis/types";
 import type { Organism } from "../OrganismView/types";
 
 /**

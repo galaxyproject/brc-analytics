@@ -1,4 +1,3 @@
-import { Workflow } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   OnContinue,
   OnEdit,
@@ -8,6 +7,7 @@ import {
   OnConfigure,
 } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { StepProps as MStepProps } from "@mui/material";
+import type { Workflow } from "@repo/shared/apis/workflow";
 import { ComponentType, ReactNode } from "react";
 import { OnLaunchGalaxy, Status } from "./hooks/UseLaunchGalaxy/types";
 

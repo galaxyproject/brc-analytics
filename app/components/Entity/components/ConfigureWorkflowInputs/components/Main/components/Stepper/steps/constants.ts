@@ -1,4 +1,4 @@
-import { WORKFLOW_PARAMETER_VARIABLE } from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { WORKFLOW_PARAMETER_VARIABLE } from "@repo/shared/apis/schema-types";
 import { STEP as ACCESSION_COUNT_STEP } from "../components/Step/AccessionCountStep/step";
 import { STEP as DESEQ2_FORMULA_STEP } from "../components/Step/DESeq2FormulaStep/step";
 import { STEP as GTF_STEP } from "../components/Step/GTFStep/step";
