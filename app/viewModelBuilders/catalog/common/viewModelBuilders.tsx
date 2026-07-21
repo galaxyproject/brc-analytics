@@ -1,5 +1,4 @@
 import { CopyText } from "@/components/common/CopyText/copyText";
-import { Tooltip } from "@/components/common/Tooltip/tooltip";
 import { AnalysisPortals } from "@/components/Entity/components/AnalysisPortals/analysisPortals";
 import { AnalyzeGenome } from "@/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 import {
@@ -26,6 +25,7 @@ import type {
   OrganismContract,
 } from "@repo/shared/apis/types";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
+import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { formatDate } from "@repo/shared/utils/date-fns/utils";
 import { parseISO } from "date-fns";

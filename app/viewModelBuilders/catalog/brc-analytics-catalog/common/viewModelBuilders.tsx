@@ -10,7 +10,6 @@ import {
 } from "@/apis/catalog/brc-analytics-catalog/common/utils";
 import { SLUGIFY_OPTIONS } from "@/common/constants";
 import { Chip } from "@/components/common/Chip/chip";
-import { Tooltip } from "@/components/common/Tooltip/tooltip";
 import { StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { KeyValueSection } from "@/components/Entity/components/Section/KeyValueSection/keyValueSection";
 import { MDXSection } from "@/components/Entity/components/Section/MDXSection/mdxSection";
@@ -74,6 +73,7 @@ import type {
 } from "@repo/shared/apis/types";
 import type { Workflow } from "@repo/shared/apis/workflow";
 import { AppLink } from "@repo/shared/components/AppLink/appLink";
+import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
 import { ROUTES } from "@repo/shared/routes/constants";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,

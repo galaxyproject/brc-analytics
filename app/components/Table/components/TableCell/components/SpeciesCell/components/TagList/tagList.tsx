@@ -1,9 +1,9 @@
-import { Tooltip } from "@/components/common/Tooltip/tooltip";
 import { SpeciesCellProps } from "@/components/Table/components/TableCell/components/SpeciesCell/types";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { STACK_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/stack";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Chip, Stack, Typography } from "@mui/material";
+import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
 import { Fragment, JSX } from "react";
 
 /**

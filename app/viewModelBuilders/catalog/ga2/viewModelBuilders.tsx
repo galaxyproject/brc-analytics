@@ -2,7 +2,6 @@ import {
   GA2AssemblyEntity,
   GA2OrganismEntity,
 } from "@/apis/catalog/ga2/entities";
-import { Tooltip } from "@/components/common/Tooltip/tooltip";
 import { OrganismAvatar } from "@/components/Entity/components/OrganismAvatar/organismAvatar";
 import { AnalyzeGenome } from "@/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 import { LevelCell } from "@/components/Table/components/TableCell/components/LevelCell/levelCell";
@@ -20,6 +19,7 @@ import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Tab
 import { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
 import { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/ChipCell/chipCell";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
+import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
 import { ROUTES } from "@repo/shared/routes/constants";
 import {
   GA2_CATEGORY_KEY,
