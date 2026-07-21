@@ -1,4 +1,5 @@
 import { getEntityListMeta } from "@/common/meta/utils";
+import { EntityDataGate } from "@/components/EntityDataGate/entityDataGate";
 import { config } from "@/config/config";
 import { EntitiesView } from "@/views/EntitiesView/entitiesView";
 import type { Props as EntitiesPageProps } from "@/views/EntitiesView/types";
@@ -20,7 +21,11 @@ interface Params extends ParsedUrlQuery {
 const Page = ({ entityListType, ...props }: EntitiesPageProps): JSX.Element => {
   if (!entityListType) return <></>;
 
-  return <EntitiesView entityListType={entityListType} {...props} />;
+  return (
+    <EntityDataGate>
+      <EntitiesView entityListType={entityListType} {...props} />
+    </EntityDataGate>
+  );
 };
 
 /**

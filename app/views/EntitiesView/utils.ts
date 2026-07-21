@@ -4,23 +4,24 @@ import type { EntityRoute } from "@/services/workflows/types";
 
 /**
  * Build an explore-view data response from the client-loaded entity store.
- * Throws (via getEntities) when the store has no entry for the requested type,
- * so a misconfigured or unloaded route surfaces through the error boundary
- * instead of silently rendering an empty table.
+ * Throws (via getEntities) for an unknown entity list type, so a misconfigured
+ * route surfaces through the error boundary instead of silently rendering an
+ * empty table. Returns a shallow copy of the store's array so downstream
+ * in-place operations (e.g. sorting) can't mutate the shared store.
  * @param entityListType - Entity list type.
  * @returns entities response consumed by the explore view.
  */
 export function getEntitiesResponse<T>(
   entityListType: string
 ): EntitiesResponse<T> {
-  const hits = getEntities<T>(entityListType as EntityRoute);
+  const entities = getEntities<T>(entityListType as EntityRoute);
   return {
-    hits,
+    hits: [...entities],
     pagination: {
-      count: hits.length,
+      count: entities.length,
       pages: 1,
-      size: hits.length,
-      total: hits.length,
+      size: entities.length,
+      total: entities.length,
     },
     termFacets: {},
   };
