@@ -15,6 +15,7 @@ const ENTITY_LIST_TYPE = "priority-pathogens";
 
 interface PriorityPathogensPageProps {
   data: EntitiesResponse<Outbreak>;
+  entityListType: string;
   pageDescription?: string;
   pageTitle?: string;
 }
@@ -58,6 +59,7 @@ export const getStaticProps: GetStaticProps<
   return {
     props: {
       data,
+      entityListType: ENTITY_LIST_TYPE,
       pageDescription: entityMeta?.pageDescription,
       pageTitle: entityMeta?.pageTitle,
     },
