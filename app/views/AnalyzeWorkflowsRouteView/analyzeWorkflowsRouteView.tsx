@@ -22,7 +22,9 @@ export const AnalyzeWorkflowsRouteView = ({
   entityListType,
 }: Props): JSX.Element => {
   const { isReady, query } = useRouter();
-  const trsId = typeof query.trsId === "string" ? query.trsId : undefined;
+  // An empty `?trsId=` is treated as missing (falls back to the list / redirect).
+  const trsId =
+    typeof query.trsId === "string" && query.trsId ? query.trsId : undefined;
   const isOrganism = entityListType === "organisms";
   const shouldRedirect = isReady && isOrganism && !trsId;
 
