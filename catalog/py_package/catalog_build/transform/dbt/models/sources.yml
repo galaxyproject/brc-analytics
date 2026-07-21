@@ -31,6 +31,15 @@ sources:
           - name: name_class
             data_tests:
               - not_null
+      - name: taxonomy_merged
+        description: "merged.dmp — maps a merged (old) tax_id to its current tax_id."
+        columns:
+          - name: old_tax_id
+            data_tests:
+              - not_null
+          - name: new_tax_id
+            data_tests:
+              - not_null
 
   - name: catalog_source
     description: >
