@@ -35,7 +35,7 @@ def dmp_rows(path: Path, cols: list[str | None]):
       Exception: If a row's field count doesn't match the number of columns provided
     """
     n_cols = len(cols)
-    with open(path) as f:
+    with open(path, encoding="utf-8") as f:
         line_num = 1
         for line in f:
             values = line.removesuffix("\t|\n").split("\t|\t")
