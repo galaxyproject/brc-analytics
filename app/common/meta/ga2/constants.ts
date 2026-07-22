@@ -26,11 +26,6 @@ export const GA2_PAGE_META = {
       "Select and configure workflows for genome analysis on Genome Ark 2.",
     pageTitle: "Analyze",
   },
-  CONFIGURE_WORKFLOW: {
-    pageDescription:
-      "Configure workflow inputs for genome analysis on Genome Ark 2.",
-    pageTitle: "Configure Workflow",
-  },
   CUSTOM_WORKFLOW: {
     pageDescription:
       "Configure a custom workflow for genome analysis on Genome Ark 2.",

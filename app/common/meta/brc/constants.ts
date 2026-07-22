@@ -35,11 +35,6 @@ export const BRC_PAGE_META = {
     pageDescription: "View upcoming events and workshops for BRC Analytics.",
     pageTitle: "Calendar",
   },
-  CONFIGURE_WORKFLOW: {
-    pageDescription:
-      "Configure workflow inputs for genome analysis on BRC Analytics.",
-    pageTitle: "Configure Workflow",
-  },
   CUSTOM_WORKFLOW: {
     pageDescription:
       "Configure a custom workflow for genome analysis on BRC Analytics.",

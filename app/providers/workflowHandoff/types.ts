@@ -3,7 +3,7 @@ import { WorkflowHandoffAction } from "./actions/types";
 import { ENTITY_KEYS, SEQUENCING_SOURCE } from "./constants";
 
 /**
- * Known entity key (matches URL `entityListType`; currently only "assemblies").
+ * Known entity key (matches the URL `entityListType` segment).
  */
 export type EntityKey = (typeof ENTITY_KEYS)[keyof typeof ENTITY_KEYS];
 

@@ -7,6 +7,7 @@ import { HandoffInputs, WorkflowHandoffState } from "./types";
  */
 export const ENTITY_KEYS = {
   ASSEMBLIES: "assemblies",
+  ORGANISMS: "organisms",
 } as const;
 
 /**

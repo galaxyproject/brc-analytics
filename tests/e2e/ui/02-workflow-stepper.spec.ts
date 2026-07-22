@@ -252,3 +252,42 @@ test.describe("Workflow Stepper", () => {
     });
   });
 });
+
+// Organism: Alphainfluenzavirus influenzae (2955291) with a compatible
+// organism-scope workflow (influenza isolate subtyping / consensus generation).
+const ORGANISM_ENTITY_ID = "2955291";
+const ORGANISM_TRS_ID =
+  "workflow-github-com-iwc-workflows-influenza-isolates-consensus-and-subtyping-main-versions-v0-3";
+
+test.describe("Organism workflow route", () => {
+  test("should render the configure inputs view for an organism trsId deep-link", async ({
+    page,
+  }) => {
+    await page.goto(
+      replaceParameters(ROUTES.CONFIGURE_ORGANISM_WORKFLOW, {
+        entityId: ORGANISM_ENTITY_ID,
+        trsId: ORGANISM_TRS_ID,
+      })
+    );
+
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Configure Inputs" })
+    ).toBeVisible();
+  });
+
+  test("should redirect an organism workflows URL without a trsId to the organism detail page", async ({
+    page,
+  }) => {
+    const workflowsPath = replaceParameters(
+      ROUTES.CONFIGURE_ORGANISM_WORKFLOW.split("?")[0],
+      { entityId: ORGANISM_ENTITY_ID }
+    );
+    const organismPath = replaceParameters(ROUTES.ORGANISM, {
+      entityId: ORGANISM_ENTITY_ID,
+    });
+
+    await page.goto(workflowsPath);
+
+    await expect(page).toHaveURL(new RegExp(`${organismPath}$`));
+  });
+});
