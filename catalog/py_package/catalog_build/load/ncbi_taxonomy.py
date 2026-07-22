@@ -15,6 +15,7 @@ TAXDUMP_DOWNLOAD_NAME = "ncbi_taxdump.tar.gz"
 TAXDUMP_DIR_NAME = "ncbi_taxdump"
 TAXDUMP_NODES_FILE_NAME = "nodes.dmp"
 TAXDUMP_NAMES_FILE_NAME = "names.dmp"
+TAXDUMP_MERGED_FILE_NAME = "merged.dmp"
 
 # Rows per yielded DataFrame. Tuning knob: larger means fewer dlt round-trips but
 # higher peak memory; smaller means lower memory but more per-chunk overhead.
@@ -113,11 +114,27 @@ def ncbi_taxonomy_nodes(path: Path):
     )
 
 
+@dlt.resource(name="taxonomy_merged", write_disposition="replace")
+def ncbi_taxonomy_merged(path: Path):
+    yield from dmp_dataframes(
+        path,
+        [
+            "old_tax_id",
+            "new_tax_id",
+        ],
+        {
+            "old_tax_id": "Int64",
+            "new_tax_id": "Int64",
+        },
+    )
+
+
 @dlt.source
 def ncbi_taxdump(dmp_dir: Path):
     return [
         ncbi_taxonomy_nodes(dmp_dir / TAXDUMP_NODES_FILE_NAME),
         ncbi_taxonomy_names(dmp_dir / TAXDUMP_NAMES_FILE_NAME),
+        ncbi_taxonomy_merged(dmp_dir / TAXDUMP_MERGED_FILE_NAME),
     ]
 
 
@@ -175,6 +192,7 @@ def download_taxdump(temp_folder_path: Path, fetched_md5: str):
             members=[
                 tar.getmember(TAXDUMP_NODES_FILE_NAME),
                 tar.getmember(TAXDUMP_NAMES_FILE_NAME),
+                tar.getmember(TAXDUMP_MERGED_FILE_NAME),
             ],
             filter="data",
         )
