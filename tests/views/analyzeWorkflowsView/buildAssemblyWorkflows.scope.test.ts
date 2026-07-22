@@ -14,7 +14,7 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
     accession: "AC",
     annotationStatus: null,
     chromosomes: null,
-    commonName: null,
+    commonNames: [],
     coverage: null,
     galaxyDatacacheUrl: null,
     gcPercent: null,

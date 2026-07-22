@@ -5,7 +5,7 @@ export const BRC_DATA_CATALOG_CATEGORY_KEY = {
   ASSEMBLY_COUNT: "assemblyCount",
   ASSEMBLY_TAXONOMY_IDS: "assemblyTaxonomyIds",
   CHROMOSOMES: "chromosomes",
-  COMMON_NAME: "commonName",
+  COMMON_NAME: "commonNames",
   COVERAGE: "coverage",
   GC_PERCENT: "gcPercent",
   IS_REF: "isRef",

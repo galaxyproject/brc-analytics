@@ -11,7 +11,7 @@ export interface BRCDataCatalogGenome {
   accession: string;
   annotationStatus: string | null;
   chromosomes: number | null;
-  commonName: string | null;
+  commonNames: string[];
   coverage: string | null;
   galaxyDatacacheUrl: string | null;
   gcPercent: number | null;
@@ -50,7 +50,7 @@ export interface BRCDataCatalogGenome {
 export interface BRCDataCatalogOrganism {
   assemblyCount: number;
   assemblyTaxonomyIds: string[];
-  commonName: string | null;
+  commonNames: string[];
   genomes: BRCDataCatalogGenome[];
   ncbiTaxonomyId: string;
   otherTaxa: string[] | null;

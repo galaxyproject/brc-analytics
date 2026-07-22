@@ -2,7 +2,7 @@ import type { CategoryGroupConfig } from "@databiosphere/findable-ui/lib/config/
 
 export const CATEGORY_CONFIG = {
   CATEGORY: { key: "category", label: "Category" },
-  COMMON_NAME: { key: "assembly.commonName", label: "Common Name" },
+  COMMON_NAME: { key: "assembly.commonNames", label: "Common Name" },
   PLOIDY: { key: "ploidy", label: "Ploidy" },
   SCOPE: { key: "scope", label: "Biological Context" },
   TAXONOMIC_LEVEL_CLASS: {

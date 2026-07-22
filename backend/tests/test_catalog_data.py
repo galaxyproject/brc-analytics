@@ -50,7 +50,7 @@ class TestSearchOrganisms:
     def test_search_by_common_name(self, catalog):
         results = catalog.search_organisms("malaria")
         assert len(results) > 0
-        names = [r.get("commonName") or "" for r in results]
+        names = [name for r in results for name in (r.get("commonNames") or [])]
         assert any("malaria" in n.lower() for n in names)
 
     def test_search_by_taxonomy_id(self, catalog):

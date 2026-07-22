@@ -161,15 +161,16 @@ export const buildChromosomes = (
 };
 
 /**
- * Build props for the common name cell.
+ * Build props for the common names cell.
  * @param entity - Organism or genome entity.
- * @returns Props to be used for the cell.
+ * @returns Props for the NTagCell component.
  */
-export const buildCommonName = (
+export const buildCommonNames = (
   entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
-): ComponentProps<typeof BasicCell> => {
+): ComponentProps<typeof NTagCell> => {
   return {
-    value: entity.commonName,
+    label: "common names",
+    values: entity.commonNames,
   };
 };
 

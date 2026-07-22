@@ -129,11 +129,16 @@ class CatalogData:
         results = []
         for org in self.organisms:
             species = (org.get("taxonomicLevelSpecies") or "").lower()
-            common = (org.get("commonName") or "").lower()
+            commons = [(name or "").lower() for name in org.get("commonNames") or []]
             tax_id = str(org.get("ncbiTaxonomyId") or "")
             genus = (org.get("taxonomicLevelGenus") or "").lower()
 
-            if q in species or q in common or q == tax_id or q in genus:
+            if (
+                q in species
+                or any(q in common for common in commons)
+                or q == tax_id
+                or q in genus
+            ):
                 results.append(self._summarize_organism(org))
                 if len(results) >= limit:
                     break
@@ -165,8 +170,8 @@ class CatalogData:
         for org in self.organisms:
             candidates = {
                 (org.get("taxonomicLevelSpecies") or "").lower(),
-                (org.get("commonName") or "").lower(),
                 str(org.get("ncbiTaxonomyId") or "").lower(),
+                *((name or "").lower() for name in org.get("commonNames") or []),
             }
             candidates.discard("")
             if q in candidates:
@@ -185,7 +190,7 @@ class CatalogData:
 
         return {
             "species": org.get("taxonomicLevelSpecies"),
-            "common_name": org.get("commonName"),
+            "common_names": org.get("commonNames"),
             "taxonomy_id": str(org.get("ncbiTaxonomyId")),
             "assembly_count": org.get("assemblyCount", len(genomes)),
             "reference_assembly_count": len(ref_genomes),
