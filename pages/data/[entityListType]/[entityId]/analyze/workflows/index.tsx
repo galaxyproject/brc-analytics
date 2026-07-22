@@ -1,6 +1,8 @@
 import { getPageMeta } from "@/common/meta/utils";
 import { EntityDataGate } from "@/components/EntityDataGate/entityDataGate";
 import { config } from "@/config/config";
+import { ENTITY_KEYS } from "@/providers/workflowHandoff/constants";
+import type { EntityKey } from "@/providers/workflowHandoff/types";
 import { getEntities } from "@/utils/entityUtils";
 import { seedDatabase } from "@/utils/seedDatabase";
 import { AnalyzeWorkflowsRouteView } from "@/views/AnalyzeWorkflowsRouteView/analyzeWorkflowsRouteView";
@@ -13,8 +15,6 @@ import type {
 import type { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
 
-const ENTITY_LIST_TYPE_ORGANISMS = "organisms";
-
 interface Params extends ParsedUrlQuery {
   entityId: string;
   entityListType: string;
@@ -22,7 +22,7 @@ interface Params extends ParsedUrlQuery {
 
 export interface Props {
   entityId: string;
-  entityListType: string;
+  entityListType: EntityKey;
   pageDescription?: string;
   pageTitle?: string;
 }
@@ -36,8 +36,8 @@ export const getStaticPaths: GetStaticPaths<Params> = async () => {
     // Statically generate a single base path per assembly and per organism; the
     // selected workflow is carried at runtime as a `trsId` query param.
     if (
-      entityListType !== "assemblies" &&
-      entityListType !== ENTITY_LIST_TYPE_ORGANISMS
+      entityListType !== ENTITY_KEYS.ASSEMBLIES &&
+      entityListType !== ENTITY_KEYS.ORGANISMS
     )
       continue;
 
@@ -69,7 +69,8 @@ export const getStaticProps: GetStaticProps<Props> = async ({
   return {
     props: {
       entityId,
-      entityListType,
+      // getStaticPaths only emits assembly/organism paths, so this is an EntityKey.
+      entityListType: entityListType as EntityKey,
       ...pageMeta,
     },
   };

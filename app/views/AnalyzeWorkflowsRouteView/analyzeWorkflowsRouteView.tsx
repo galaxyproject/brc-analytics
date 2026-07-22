@@ -1,3 +1,4 @@
+import { ENTITY_KEYS } from "@/providers/workflowHandoff/constants";
 import { AnalyzeWorkflowsView } from "@/views/AnalyzeWorkflowsView/analyzeWorkflowsView";
 import { OrganismWorkflowInputsView } from "@/views/OrganismWorkflowInputsView/organismWorkflowInputsView";
 import { WorkflowInputsView } from "@/views/WorkflowInputsView/workflowInputsView";
@@ -25,7 +26,7 @@ export const AnalyzeWorkflowsRouteView = ({
   // An empty `?trsId=` is treated as missing (falls back to the list / redirect).
   const trsId =
     typeof query.trsId === "string" && query.trsId ? query.trsId : undefined;
-  const isOrganism = entityListType === "organisms";
+  const isOrganism = entityListType === ENTITY_KEYS.ORGANISMS;
   const shouldRedirect = isReady && isOrganism && !trsId;
 
   useEffect(() => {
