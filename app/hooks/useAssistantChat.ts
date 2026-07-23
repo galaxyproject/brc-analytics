@@ -1,12 +1,12 @@
-import { HTTPError } from "ky";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { assistantAPIClient } from "../services/assistant-api-client";
-import { brcAPIClient } from "../services/brc-api-client";
-import {
+import { apiClient } from "@repo/shared/services/api-client/api-client";
+import type {
   AnalysisSchema,
   AssistantChatResponse,
   SuggestionChip,
-} from "../types/api";
+} from "@repo/shared/services/api-client/types";
+import { HTTPError } from "ky";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { assistantAPIClient } from "../services/assistant-api-client";
 
 const SESSION_KEY = "brc-assistant-session-id";
 
@@ -185,9 +185,7 @@ export const useAssistantChat = ({
     setSaveLoading(true);
     setSaveMessage(null);
     try {
-      const savedAnalysis = await brcAPIClient.saveAnalysis(
-        sessionIdRef.current
-      );
+      const savedAnalysis = await apiClient.saveAnalysis(sessionIdRef.current);
       setSaveMessage(
         savedAnalysis.title ? `Saved: ${savedAnalysis.title}` : "Saved."
       );

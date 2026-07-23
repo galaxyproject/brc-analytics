@@ -1,8 +1,12 @@
 import { normalizePagePath } from "@/hooks/UseCurrentPath/utils";
 import { ENTITY_KEYS } from "@/providers/workflowHandoff/constants";
 import { useHandoffDispatch } from "@/providers/workflowHandoff/hooks/UseHandoffDispatch/hook";
-import { AnalysisSchema, FieldStatus, SchemaFieldState } from "@/types/api";
 import { Box, Button, Chip, Divider, Typography } from "@mui/material";
+import type {
+  AnalysisSchema,
+  FieldStatus,
+  SchemaFieldState,
+} from "@repo/shared/services/api-client/types";
 import Router from "next/router";
 import { JSX, useCallback } from "react";
 import {

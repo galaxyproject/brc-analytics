@@ -1,10 +1,10 @@
 import { ChatPanel, SchemaPanel } from "@/components/Assistant";
 import { useAssistantChat } from "@/hooks/useAssistantChat";
 import { assistantAPIClient } from "@/services/assistant-api-client";
-import { AssistantInfoResponse } from "@/types/api";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import { Button } from "@mui/material";
+import type { AssistantInfoResponse } from "@repo/shared/services/api-client/types";
 import Error from "next/error";
 import { JSX, useEffect, useState } from "react";
 import {

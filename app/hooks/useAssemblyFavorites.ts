@@ -1,7 +1,7 @@
+import { apiClient } from "@repo/shared/services/api-client/api-client";
+import type { FavoriteResponse } from "@repo/shared/services/api-client/types";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "../providers/authentication";
-import { brcAPIClient } from "../services/brc-api-client";
-import { FavoriteResponse } from "../types/api";
 
 interface UseAssemblyFavoritesReturn {
   error: Error | null;
@@ -38,7 +38,7 @@ export function useAssemblyFavorites(): UseAssemblyFavoritesReturn {
     setIsLoading(true);
     setError(null);
     try {
-      setFavorites(await brcAPIClient.getFavorites());
+      setFavorites(await apiClient.getFavorites());
     } catch (err) {
       // Surface the failure so the page can render an error state
       // instead of falsely showing "no favorites yet."
@@ -61,12 +61,12 @@ export function useAssemblyFavorites(): UseAssemblyFavoritesReturn {
       setIsToggling(true);
       try {
         if (!favoriteIds.has(entityId)) {
-          const favorite = await brcAPIClient.createFavorite(entityId);
+          const favorite = await apiClient.createFavorite(entityId);
           setFavorites((current) => [favorite, ...current]);
           return;
         }
 
-        await brcAPIClient.deleteFavorite(entityId);
+        await apiClient.deleteFavorite(entityId);
         setFavorites((current) =>
           current.filter((favorite) => favorite.entity_id !== entityId)
         );

@@ -1,7 +1,6 @@
 import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
 import { useAuth } from "@/providers/authentication";
-import { brcAPIClient } from "@/services/brc-api-client";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
   Alert,
@@ -12,6 +11,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { apiClient } from "@repo/shared/services/api-client/api-client";
 import { JSX, useEffect, useState } from "react";
 
 const BREADCRUMBS: Breadcrumb[] = [
@@ -48,7 +48,7 @@ export default function PreferencesPage(): JSX.Element {
     let isMounted = true;
     setIsLoadingPreferences(true);
 
-    brcAPIClient
+    apiClient
       .getPreferences()
       .then((preferences) => {
         if (!isMounted) return;
@@ -133,7 +133,7 @@ export default function PreferencesPage(): JSX.Element {
 
     setIsSaving(true);
     try {
-      const saved = await brcAPIClient.updatePreferences(parsed);
+      const saved = await apiClient.updatePreferences(parsed);
       setEditorValue(JSON.stringify(saved, null, 2));
       setSaveMessage("Preferences saved.");
     } catch {
