@@ -1,6 +1,6 @@
 import { JSX } from "react";
 import { EntitiesLoadedContext } from "./context";
-import { EntitiesLoadedProviderProps } from "./types";
+import type { Props } from "./types";
 
 /**
  * Distributes the workflows-entity-cache loaded boolean to descendants.
@@ -15,7 +15,7 @@ import { EntitiesLoadedProviderProps } from "./types";
 export function EntitiesLoadedProvider({
   children,
   value,
-}: EntitiesLoadedProviderProps): JSX.Element {
+}: Props): JSX.Element {
   return (
     <EntitiesLoadedContext.Provider value={value}>
       {children}
