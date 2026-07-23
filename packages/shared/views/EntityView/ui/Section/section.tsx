@@ -1,4 +1,4 @@
-import { StackProps } from "@mui/material";
+import type { StackProps } from "@mui/material";
 import { JSX } from "react";
 import { StyledStack } from "./section.styles";
 

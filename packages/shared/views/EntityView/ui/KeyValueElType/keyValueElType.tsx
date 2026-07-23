@@ -1,6 +1,6 @@
 import { Stack } from "@mui/material";
 import { JSX } from "react";
-import { Props } from "./types";
+import type { Props } from "./types";
 
 /**
  * Renders a key-value element type for the KeyValuePairs component.
