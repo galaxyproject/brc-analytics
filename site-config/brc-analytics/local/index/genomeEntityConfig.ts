@@ -11,6 +11,9 @@ import {
   SORT_DIRECTION,
 } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
+import { AnalyzeGenome } from "@repo/shared/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
+import { LevelCell } from "@repo/shared/components/Table/components/TableCell/components/LevelCell/levelCell";
+import { SpeciesCell } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/speciesCell";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
@@ -133,9 +136,9 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
     columns: [
       {
         componentConfig: {
-          component: C.AnalyzeGenome,
+          component: AnalyzeGenome,
           viewBuilder: V.buildAnalyzeGenome,
-        } as ComponentConfig<typeof C.AnalyzeGenome, BRCDataCatalogGenome>,
+        } as ComponentConfig<typeof AnalyzeGenome, BRCDataCatalogGenome>,
         enableSorting: false,
         enableTableDownload: false,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANALYZE_GENOME,
@@ -217,9 +220,9 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         columnPinned: true,
         componentConfig: {
-          component: C.SpeciesCell,
+          component: SpeciesCell,
           viewBuilder: V.buildGenomeSpecies,
-        } as ComponentConfig<typeof C.SpeciesCell, BRCDataCatalogGenome>,
+        } as ComponentConfig<typeof SpeciesCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
         width: { max: "1.5fr", min: "340px" },
@@ -338,9 +341,9 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       },
       {
         componentConfig: {
-          component: C.LevelCell,
+          component: LevelCell,
           viewBuilder: V.buildLevel,
-        } as ComponentConfig<typeof C.LevelCell, BRCDataCatalogGenome>,
+        } as ComponentConfig<typeof LevelCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.LEVEL,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.LEVEL,
         width: { max: "0.5fr", min: "142px" },

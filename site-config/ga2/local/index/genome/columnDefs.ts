@@ -31,6 +31,9 @@ import {
   ColumnConfig,
   ComponentConfig,
 } from "@databiosphere/findable-ui/lib/config/entities";
+import { AnalyzeGenome } from "@repo/shared/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
+import { LevelCell } from "@repo/shared/components/Table/components/TableCell/components/LevelCell/levelCell";
+import { SpeciesCell } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/speciesCell";
 import {
   GA2_CATEGORY_KEY,
   GA2_CATEGORY_LABEL,
@@ -48,9 +51,9 @@ export const ACCESSION: ColumnConfig<GA2AssemblyEntity> = {
 
 export const ANALYZE_GENOME: ColumnConfig<GA2AssemblyEntity> = {
   componentConfig: {
-    component: C.AnalyzeGenome,
+    component: AnalyzeGenome,
     viewBuilder: buildAnalyzeGenome,
-  } as ComponentConfig<typeof C.AnalyzeGenome, GA2AssemblyEntity>,
+  } as ComponentConfig<typeof AnalyzeGenome, GA2AssemblyEntity>,
   enableSorting: false,
   enableTableDownload: false,
   header: GA2_CATEGORY_LABEL.ANALYZE_GENOME,
@@ -120,9 +123,9 @@ export const LENGTH: ColumnConfig<GA2AssemblyEntity> = {
 
 export const LEVEL: ColumnConfig<GA2AssemblyEntity> = {
   componentConfig: {
-    component: C.LevelCell,
+    component: LevelCell,
     viewBuilder: buildLevel,
-  } as ComponentConfig<typeof C.LevelCell, GA2AssemblyEntity>,
+  } as ComponentConfig<typeof LevelCell, GA2AssemblyEntity>,
   header: GA2_CATEGORY_LABEL.LEVEL,
   id: GA2_CATEGORY_KEY.LEVEL,
   width: { max: "0.5fr", min: "142px" },
@@ -262,9 +265,9 @@ export const TAXONOMIC_GROUP: ColumnConfig<GA2AssemblyEntity> = {
 export const TAXONOMIC_LEVEL_SPECIES: ColumnConfig<GA2AssemblyEntity> = {
   columnPinned: true,
   componentConfig: {
-    component: C.SpeciesCell,
+    component: SpeciesCell,
     viewBuilder: V.buildAssemblySpecies,
-  } as ComponentConfig<typeof C.SpeciesCell, GA2AssemblyEntity>,
+  } as ComponentConfig<typeof SpeciesCell, GA2AssemblyEntity>,
   header: GA2_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
   id: GA2_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
   width: { max: "1.5fr", min: "340px" },

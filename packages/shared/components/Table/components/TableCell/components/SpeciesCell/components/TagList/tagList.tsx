@@ -1,10 +1,10 @@
-import { SpeciesCellProps } from "@/components/Table/components/TableCell/components/SpeciesCell/types";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { STACK_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/stack";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Chip, Stack, Typography } from "@mui/material";
 import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
 import { Fragment, JSX } from "react";
+import type { Props } from "../../types";
 
 /**
  * Renders the species cell's minor taxonomy fields as a wrapping row of chips —
@@ -17,7 +17,7 @@ import { Fragment, JSX } from "react";
  */
 export const TagList = ({
   tags = [],
-}: Pick<SpeciesCellProps, "tags">): JSX.Element | null => {
+}: Pick<Props, "tags">): JSX.Element | null => {
   if (tags.length === 0) return null;
   return (
     <Stack

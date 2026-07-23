@@ -27,6 +27,3 @@ export {
 } from "./Layout/components/Footer/components/Branding/branding";
 export { VersionInfoWithServerStatus } from "./Layout/components/Footer/components/VersionInfoWithServerStatus/versionInfoWithServerStatus";
 export { AuthButton } from "./Layout/components/Header/components/AuthButton/authButton";
-export { AnalyzeGenome } from "./Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
-export { LevelCell } from "./Table/components/TableCell/components/LevelCell/levelCell";
-export { SpeciesCell } from "./Table/components/TableCell/components/SpeciesCell/speciesCell";

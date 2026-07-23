@@ -3,17 +3,14 @@ import { Stack } from "@mui/material";
 import { JSX } from "react";
 import { BAR_COUNT } from "./constants";
 import { StyledBox } from "./levelCell.styles";
-import { LevelCellProps } from "./types";
+import type { Props } from "./types";
 
 /*
  * Renders the assembly level as a tiered bar indicator (one filled bar per tier:
  * Complete Genome = 4, Chromosome = 3, Scaffold = 2, Contig = 1) followed by the
  * level label. The view builder maps the level value to its filled-bar count.
  */
-export const LevelCell = ({
-  filledCount,
-  label,
-}: LevelCellProps): JSX.Element => {
+export const LevelCell = ({ filledCount, label }: Props): JSX.Element => {
   return (
     <Stack
       alignItems={STACK_PROPS.ALIGN_ITEMS.CENTER}

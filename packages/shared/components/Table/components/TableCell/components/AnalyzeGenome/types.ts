@@ -1,9 +1,9 @@
-export interface ActionItem {
+interface ActionItem {
   label: string;
   url: string;
 }
 
-export interface AnalyzeGenomeProps {
+export interface Props {
   analyze: ActionItem;
   views: ActionItem[];
 }

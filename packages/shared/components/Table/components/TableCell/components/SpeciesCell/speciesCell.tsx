@@ -3,7 +3,7 @@ import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/m
 import { Stack, Typography } from "@mui/material";
 import { JSX } from "react";
 import { TagList } from "./components/TagList/tagList";
-import { SpeciesCellProps } from "./types";
+import type { Props } from "./types";
 
 /*
  * Renders the consolidated species cell: the primary label as a link, the
@@ -15,7 +15,7 @@ export const SpeciesCell = ({
   ncbiTaxonomyId,
   species,
   tags,
-}: SpeciesCellProps): JSX.Element => {
+}: Props): JSX.Element => {
   return (
     <Stack spacing={2} useFlexGap>
       <Link {...species} />
