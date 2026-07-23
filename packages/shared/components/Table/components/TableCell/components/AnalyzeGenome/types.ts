@@ -1,4 +1,4 @@
-export interface ActionItem {
+interface ActionItem {
   label: string;
   url: string;
 }

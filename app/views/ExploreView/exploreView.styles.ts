@@ -1,7 +1,7 @@
-import { tableStyles } from "@/components/Table/table.styles";
 import { bpDownSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import { ExploreView as DXExploreView } from "@databiosphere/findable-ui/lib/views/ExploreView/exploreView";
 import styled from "@emotion/styled";
+import { tableStyles } from "@repo/shared/components/Table/table.styles";
 
 export const StyledExploreView = styled(DXExploreView)`
   & .MuiToolbar-root.MuiToolbar-table {

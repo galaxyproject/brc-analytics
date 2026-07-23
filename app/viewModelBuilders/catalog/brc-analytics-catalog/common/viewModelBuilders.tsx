@@ -13,11 +13,6 @@ import { Chip } from "@/components/common/Chip/chip";
 import { StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { KeyValueSection } from "@/components/Entity/components/Section/KeyValueSection/keyValueSection";
 import { MDXSection } from "@/components/Entity/components/Section/MDXSection/mdxSection";
-import { AnalyzeGenome } from "@/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
-import { LevelCell } from "@/components/Table/components/TableCell/components/LevelCell/levelCell";
-import { TagList } from "@/components/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
-import { SpeciesCell } from "@/components/Table/components/TableCell/components/SpeciesCell/speciesCell";
-import type { SpeciesTag } from "@/components/Table/components/TableCell/components/SpeciesCell/types";
 import {
   ORGANISM_SCOPED_TAG_LABELS,
   SPECIES_TAG_LABEL,
@@ -73,6 +68,11 @@ import type {
 } from "@repo/shared/apis/types";
 import type { Workflow } from "@repo/shared/apis/workflow";
 import { AppLink } from "@repo/shared/components/AppLink/appLink";
+import { AnalyzeGenome } from "@repo/shared/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
+import { LevelCell } from "@repo/shared/components/Table/components/TableCell/components/LevelCell/levelCell";
+import { TagList } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
+import { SpeciesCell } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/speciesCell";
+import type { SpeciesTag } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/types";
 import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
 import { ROUTES } from "@repo/shared/routes/constants";
 import {

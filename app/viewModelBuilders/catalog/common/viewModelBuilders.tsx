@@ -1,12 +1,5 @@
 import { CopyText } from "@/components/common/CopyText/copyText";
 import { AnalysisPortals } from "@/components/Entity/components/AnalysisPortals/analysisPortals";
-import { AnalyzeGenome } from "@/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
-import {
-  LEVEL_FILLED_COUNT,
-  LEVEL_LABEL,
-} from "@/components/Table/components/TableCell/components/LevelCell/constants";
-import { LevelCell } from "@/components/Table/components/TableCell/components/LevelCell/levelCell";
-import type { SpeciesTag } from "@/components/Table/components/TableCell/components/SpeciesCell/types";
 import { KeyElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/KeyElType/keyElType";
 import { ValueElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/ValueElType/valueElType";
 import {
@@ -25,6 +18,13 @@ import type {
   OrganismContract,
 } from "@repo/shared/apis/types";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
+import { AnalyzeGenome } from "@repo/shared/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
+import {
+  LEVEL_FILLED_COUNT,
+  LEVEL_LABEL,
+} from "@repo/shared/components/Table/components/TableCell/components/LevelCell/constants";
+import { LevelCell } from "@repo/shared/components/Table/components/TableCell/components/LevelCell/levelCell";
+import type { SpeciesTag } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/types";
 import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { formatDate } from "@repo/shared/utils/date-fns/utils";

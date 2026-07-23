@@ -3,11 +3,6 @@ import {
   GA2OrganismEntity,
 } from "@/apis/catalog/ga2/entities";
 import { OrganismAvatar } from "@/components/Entity/components/OrganismAvatar/organismAvatar";
-import { AnalyzeGenome } from "@/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
-import { LevelCell } from "@/components/Table/components/TableCell/components/LevelCell/levelCell";
-import { TagList } from "@/components/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
-import { SpeciesCell } from "@/components/Table/components/TableCell/components/SpeciesCell/speciesCell";
-import type { SpeciesTag } from "@/components/Table/components/TableCell/components/SpeciesCell/types";
 import {
   COLUMN_PRESET_KEY,
   COLUMN_PRESET_LABEL,
@@ -19,6 +14,11 @@ import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Tab
 import { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
 import { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/ChipCell/chipCell";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
+import { AnalyzeGenome } from "@repo/shared/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
+import { LevelCell } from "@repo/shared/components/Table/components/TableCell/components/LevelCell/levelCell";
+import { TagList } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
+import { SpeciesCell } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/speciesCell";
+import type { SpeciesTag } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/types";
 import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
 import { ROUTES } from "@repo/shared/routes/constants";
 import {
