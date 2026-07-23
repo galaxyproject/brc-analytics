@@ -1,13 +1,10 @@
-import { useAssemblyFavorites } from "@/hooks/useAssemblyFavorites";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { Button, CircularProgress, Tooltip } from "@mui/material";
 import { useAuth } from "@repo/shared/providers/authentication/provider";
 import { JSX } from "react";
-
-interface Props {
-  accession: string;
-}
+import { useAssemblyFavorites } from "../../hooks/UseAssemblyFavorites/hook";
+import type { Props } from "./types";
 
 export function AssemblyFavoriteButton({ accession }: Props): JSX.Element {
   const {

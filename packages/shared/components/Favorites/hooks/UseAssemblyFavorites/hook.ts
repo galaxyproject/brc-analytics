@@ -2,15 +2,7 @@ import { useAuth } from "@repo/shared/providers/authentication/provider";
 import { apiClient } from "@repo/shared/services/api-client/api-client";
 import type { FavoriteResponse } from "@repo/shared/services/api-client/types";
 import { useCallback, useEffect, useMemo, useState } from "react";
-
-interface UseAssemblyFavoritesReturn {
-  error: Error | null;
-  favorites: FavoriteResponse[];
-  isFavorited: (entityId: string) => boolean;
-  isLoading: boolean;
-  isToggling: boolean;
-  toggleFavorite: (entityId: string) => Promise<void>;
-}
+import type { UseAssemblyFavoritesReturn } from "./types";
 
 export function useAssemblyFavorites(): UseAssemblyFavoritesReturn {
   const { isAuthenticated, isConfigured } = useAuth();
