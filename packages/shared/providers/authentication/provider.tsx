@@ -14,7 +14,7 @@ import {
 // loginEnabled alone controls whether the login UI shows.
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "";
 
-interface BrcUser {
+interface AuthUser {
   email: string;
   name: string;
   preferred_username: string;
@@ -27,7 +27,7 @@ interface AuthContextValue {
   isLoading: boolean;
   login: () => void;
   logout: () => Promise<void>;
-  user: BrcUser | null;
+  user: AuthUser | null;
 }
 
 const AuthContext = createContext<AuthContextValue>({
@@ -46,7 +46,7 @@ const AuthContext = createContext<AuthContextValue>({
  * @param props.loginEnabled - Whether login UI should be shown.
  * @returns auth context provider wrapping children.
  */
-export function BrcAuthProvider({
+export function AuthProvider({
   children,
   loginEnabled = false,
 }: {
@@ -54,7 +54,7 @@ export function BrcAuthProvider({
   loginEnabled?: boolean;
 }): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState<BrcUser | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
 
   useEffect(() => {
     if (!loginEnabled) {
@@ -69,7 +69,7 @@ export function BrcAuthProvider({
       })
       .then((data) => {
         if (data && !data.error) {
-          setUser(data as BrcUser);
+          setUser(data as AuthUser);
         }
       })
       .catch(() => {

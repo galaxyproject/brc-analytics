@@ -1,4 +1,3 @@
-import { useAuth } from "@/providers/authentication";
 import {
   Alert,
   Box,
@@ -7,6 +6,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { useAuth } from "@repo/shared/providers/authentication/provider";
 import type { SuggestionChip } from "@repo/shared/services/api-client/types";
 import { JSX, useEffect, useRef, useState } from "react";
 import { ChatMessage } from "../ChatMessage/chatMessage";

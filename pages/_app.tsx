@@ -19,6 +19,7 @@ import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { AppCacheProvider } from "@mui/material-nextjs/v16-pagesRouter";
 import { OgMeta } from "@repo/shared/components/OgMeta/ogMeta";
+import { AuthProvider } from "@repo/shared/providers/authentication/provider";
 import { EntitiesLoadedProvider } from "@repo/shared/providers/entitiesLoaded/provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NextPage } from "next";
@@ -27,7 +28,6 @@ import { JSX, useMemo } from "react";
 import { getDefaultDescription } from "../app/common/meta/utils";
 import { StyledFooter } from "../app/components/Layout/components/Footer/footer.styles";
 import { config } from "../app/config/config";
-import { BrcAuthProvider } from "../app/providers/authentication";
 import { WorkflowHandoffProvider } from "../app/providers/workflowHandoff/provider";
 import { useEntities } from "../app/services/workflows/hooks/UseEntities/hook";
 import "../app/styles/fonts/fonts.css";
@@ -114,7 +114,7 @@ function MyApp(props: AppPropsWithComponent): JSX.Element {
             <QueryClientProvider client={queryClient}>
               <ServicesProvider>
                 <SystemStatusProvider>
-                  <BrcAuthProvider loginEnabled={appConfig.loginEnabled}>
+                  <AuthProvider loginEnabled={appConfig.loginEnabled}>
                     <LayoutDimensionsProvider>
                       <AppLayout>
                         <DXHeader {...filteredHeader} />
@@ -150,7 +150,7 @@ function MyApp(props: AppPropsWithComponent): JSX.Element {
                         <StyledFooter {...footer} />
                       </AppLayout>
                     </LayoutDimensionsProvider>
-                  </BrcAuthProvider>
+                  </AuthProvider>
                 </SystemStatusProvider>
               </ServicesProvider>
             </QueryClientProvider>

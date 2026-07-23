@@ -1,4 +1,3 @@
-import { useAuth } from "@/providers/authentication";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import {
@@ -11,6 +10,7 @@ import {
   MenuItem,
   Typography,
 } from "@mui/material";
+import { useAuth } from "@repo/shared/providers/authentication/provider";
 import { useRouter } from "next/router";
 import { JSX, MouseEvent, useId, useState } from "react";
 import { UserChip, UserMenuHeader } from "./authButton.styles";
