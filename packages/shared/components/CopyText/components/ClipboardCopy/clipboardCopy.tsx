@@ -1,20 +1,15 @@
 import ContentCopyRoundedIcon from "@mui/icons-material/ContentCopyRounded";
-import { IconButton, Tooltip, TooltipProps } from "@mui/material";
+import { IconButton, Tooltip } from "@mui/material";
 import copy from "copy-to-clipboard";
 import { JSX, useCallback, useEffect, useState } from "react";
 import { ICON_BUTTON_PROPS, ICON_PROPS, TOOLTIP_PROPS } from "./constants";
-
-export interface CopyToClipboardProps {
-  timeoutDelay?: number;
-  tooltipProps?: Partial<TooltipProps>;
-  value: boolean | number | string;
-}
+import type { Props } from "./types";
 
 export const ClipboardCopy = ({
   timeoutDelay = 2000,
   tooltipProps,
   value,
-}: CopyToClipboardProps): JSX.Element => {
+}: Props): JSX.Element => {
   const [open, setOpen] = useState<boolean>(false);
 
   const onCopy = useCallback((): void => {
