@@ -4,7 +4,6 @@ import {
 } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { GA2Catalog } from "@/apis/catalog/ga2/entities";
 import { getEntityDetailMeta } from "@/common/meta/utils";
-import { EntityDataGate } from "@/components/EntityDataGate/entityDataGate";
 import { config } from "@/config/config";
 import { getEntities, getEntity } from "@/utils/entityUtils";
 import { seedDatabase } from "@/utils/seedDatabase";
@@ -12,6 +11,7 @@ import { AnalyzeView } from "@/views/AnalyzeView/analyzeView";
 import { EntityDetailView } from "@/views/EntityView/entityView";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { getEntityConfig } from "@databiosphere/findable-ui/lib/config/utils";
+import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
 import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";

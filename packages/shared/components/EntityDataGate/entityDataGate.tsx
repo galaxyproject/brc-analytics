@@ -1,6 +1,6 @@
-import { useEntitiesLoaded } from "@/providers/entitiesLoaded/hook";
 import { JSX } from "react";
-import { EntityDataGateProps } from "./types";
+import { useEntitiesLoaded } from "../../providers/entitiesLoaded/hook";
+import type { Props } from "./types";
 
 /**
  * Gate page-level content on the workflows entity cache being loaded.
@@ -17,7 +17,7 @@ import { EntityDataGateProps } from "./types";
 export function EntityDataGate({
   children,
   fallback = null,
-}: EntityDataGateProps): JSX.Element {
+}: Props): JSX.Element {
   const isLoaded = useEntitiesLoaded();
   return <>{isLoaded ? children : fallback}</>;
 }
