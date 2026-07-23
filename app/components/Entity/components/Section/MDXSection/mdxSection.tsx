@@ -1,4 +1,4 @@
-import { FluidPaper } from "@/components/common/Paper/components/FluidPaper/fluidPaper";
+import { FluidPaper } from "@repo/shared/components/Paper/components/FluidPaper/fluidPaper";
 import { MDXRemote } from "next-mdx-remote";
 import { JSX } from "react";
 import { Section } from "../section";

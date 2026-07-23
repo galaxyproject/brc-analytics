@@ -1,4 +1,3 @@
-import { CopyText } from "@/components/common/CopyText/copyText";
 import { AnalysisPortals } from "@/components/Entity/components/AnalysisPortals/analysisPortals";
 import { KeyElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/KeyElType/keyElType";
 import { ValueElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/ValueElType/valueElType";
@@ -18,6 +17,7 @@ import type {
   OrganismContract,
 } from "@repo/shared/apis/types";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
+import { CopyText } from "@repo/shared/components/CopyText/copyText";
 import { AnalyzeGenome } from "@repo/shared/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 import {
   LEVEL_FILLED_COUNT,
