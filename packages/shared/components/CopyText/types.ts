@@ -1,8 +1,8 @@
 import type { GridProps } from "@mui/material";
-import type { ComponentProps, ReactNode } from "react";
-import { ClipboardCopy } from "./components/ClipboardCopy/clipboardCopy";
+import type { ReactNode } from "react";
+import type { Props as ClipboardCopyProps } from "./components/ClipboardCopy/types";
 
-export interface Props extends ComponentProps<typeof ClipboardCopy> {
+export interface Props extends ClipboardCopyProps {
   children: ReactNode;
   gridProps?: Partial<GridProps>;
 }
