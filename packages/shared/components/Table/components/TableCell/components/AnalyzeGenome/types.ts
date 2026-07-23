@@ -3,7 +3,7 @@ interface ActionItem {
   url: string;
 }
 
-export interface AnalyzeGenomeProps {
+export interface Props {
   analyze: ActionItem;
   views: ActionItem[];
 }

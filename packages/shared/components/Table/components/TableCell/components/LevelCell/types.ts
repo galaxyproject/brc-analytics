@@ -1,4 +1,4 @@
-export interface LevelCellProps {
+export interface Props {
   filledCount: number;
   label: string;
 }

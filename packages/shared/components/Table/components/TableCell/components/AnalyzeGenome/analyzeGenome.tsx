@@ -9,12 +9,9 @@ import { Button, Grid, MenuItem } from "@mui/material";
 import NLink from "next/link";
 import { JSX } from "react";
 import { BUTTON_PROPS, GRID_PROPS, MENU_PROPS } from "./constants";
-import { AnalyzeGenomeProps } from "./types";
+import type { Props } from "./types";
 
-export const AnalyzeGenome = ({
-  analyze,
-  views,
-}: AnalyzeGenomeProps): JSX.Element => {
+export const AnalyzeGenome = ({ analyze, views }: Props): JSX.Element => {
   return (
     <Grid {...GRID_PROPS}>
       <Button
