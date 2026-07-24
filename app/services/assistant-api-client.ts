@@ -1,11 +1,11 @@
-import ky, { HTTPError } from "ky";
-import { API_BASE_URL } from "../config/api";
-import {
+import { API_BASE_URL } from "@repo/shared/config/api";
+import type {
   AssistantChatRequest,
   AssistantChatResponse,
   AssistantInfoResponse,
   SessionRestoreResponse,
-} from "../types/api";
+} from "@repo/shared/services/api-client/types";
+import ky, { HTTPError } from "ky";
 
 const apiClient = ky.create({
   // Send the assistant session-binding cookie cross-origin. Without

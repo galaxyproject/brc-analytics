@@ -1,5 +1,5 @@
 import { SEQUENCING_SOURCE } from "@/providers/workflowHandoff/constants";
-import { SchemaFieldState } from "@/types/api";
+import type { SchemaFieldState } from "@repo/shared/services/api-client/types";
 
 /**
  * Extract ENA/SRA/DDBJ run accessions from the free-text `data_source.value`.

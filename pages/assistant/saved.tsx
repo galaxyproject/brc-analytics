@@ -1,8 +1,6 @@
 import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
 import { useAuth } from "@/providers/authentication";
-import { brcAPIClient } from "@/services/brc-api-client";
-import { SavedAnalysisSummary } from "@/types/api";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
   Alert,
@@ -12,6 +10,8 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { apiClient } from "@repo/shared/services/api-client/api-client";
+import type { SavedAnalysisSummary } from "@repo/shared/services/api-client/types";
 import { useRouter } from "next/router";
 import { JSX, useEffect, useState } from "react";
 
@@ -57,7 +57,7 @@ export default function SavedAnalysesPage(): JSX.Element {
     setIsLoading(true);
     setError(null);
 
-    brcAPIClient
+    apiClient
       .getSavedAnalyses()
       .then((response) => {
         if (!isMounted) return;
@@ -84,7 +84,7 @@ export default function SavedAnalysesPage(): JSX.Element {
   async function handleDelete(id: string): Promise<void> {
     setError(null);
     try {
-      await brcAPIClient.deleteSavedAnalysis(id);
+      await apiClient.deleteSavedAnalysis(id);
       setSavedAnalyses((current) => current.filter((item) => item.id !== id));
     } catch (err) {
       setError(
@@ -96,7 +96,7 @@ export default function SavedAnalysesPage(): JSX.Element {
   async function handleRestore(id: string): Promise<void> {
     setError(null);
     try {
-      const restored = await brcAPIClient.restoreSavedAnalysis(id);
+      const restored = await apiClient.restoreSavedAnalysis(id);
       await router.push({
         pathname: "/assistant",
         query: { sessionId: restored.session_id },

@@ -1,8 +1,6 @@
 import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
 import { useAuth } from "@/providers/authentication";
-import { brcAPIClient } from "@/services/brc-api-client";
-import { WorkflowRunResponse } from "@/types/api";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
   Alert,
@@ -13,6 +11,8 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { apiClient } from "@repo/shared/services/api-client/api-client";
+import type { WorkflowRunResponse } from "@repo/shared/services/api-client/types";
 import { JSX, useEffect, useState } from "react";
 
 const BREADCRUMBS: Breadcrumb[] = [
@@ -50,7 +50,7 @@ export default function WorkflowRunsPage(): JSX.Element {
     setIsLoading(true);
     setError(null);
 
-    brcAPIClient
+    apiClient
       .getWorkflowRuns()
       .then((response) => {
         if (!isMounted) return;
