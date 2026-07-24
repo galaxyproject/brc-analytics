@@ -1,11 +1,11 @@
 import { OrganismAvatar } from "@/components/Entity/components/OrganismAvatar/organismAvatar";
 import { buildAssemblyDetails } from "@/viewModelBuilders/catalog/common/viewModelBuilders";
 import { StyledSection } from "@/views/EntityView/components/KeyValueSection/keyValueSection.styles";
-import { KeyElType } from "@/views/EntityView/ui/KeyElType/keyElType";
-import { KeyValueElType } from "@/views/EntityView/ui/KeyValueElType/keyValueElType";
-import { SectionTitle } from "@/views/EntityView/ui/SectionTitle/sectionTitle";
-import { ValueElType } from "@/views/EntityView/ui/ValueElType/valueElType";
 import { KeyValuePairs } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/keyValuePairs";
+import { KeyElType } from "@repo/shared/views/EntityView/ui/KeyElType/keyElType";
+import { KeyValueElType } from "@repo/shared/views/EntityView/ui/KeyValueElType/keyValueElType";
+import { SectionTitle } from "@repo/shared/views/EntityView/ui/SectionTitle/sectionTitle";
+import { ValueElType } from "@repo/shared/views/EntityView/ui/ValueElType/valueElType";
 import { Fragment, JSX } from "react";
 import { Props } from "./types";
 

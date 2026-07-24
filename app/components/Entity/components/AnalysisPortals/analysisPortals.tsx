@@ -1,5 +1,3 @@
-import { Section } from "@/views/EntityView/ui/Section/section";
-import { SectionTitle } from "@/views/EntityView/ui/SectionTitle/sectionTitle";
 import {
   StaticImage,
   StaticImageProps,
@@ -10,6 +8,8 @@ import {
 } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Typography } from "@mui/material";
+import { Section } from "@repo/shared/views/EntityView/ui/Section/section";
+import { SectionTitle } from "@repo/shared/views/EntityView/ui/SectionTitle/sectionTitle";
 import { JSX } from "react";
 import { StyledButtonBase } from "./analysisPortals.styles";
 
