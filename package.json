@@ -1,8 +1,10 @@
 {
   "name": "brc-analytics",
-  "version": "0.28.0",
+  "version": "0.29.0",
   "private": true,
-  "workspaces": ["packages/*"],
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "./scripts/dev.sh brc-analytics && ./scripts/set-version.sh dev && ./scripts/sync-api-brc-analytics.sh && next dev --webpack",
     "build:local": "./scripts/build.sh brc-analytics local && ./scripts/set-version.sh && ./scripts/sync-api-brc-analytics.sh && next build --webpack",
