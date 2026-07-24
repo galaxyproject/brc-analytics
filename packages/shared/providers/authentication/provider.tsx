@@ -7,12 +7,7 @@ import {
   useEffect,
   useState,
 } from "react";
-
-// Optional base URL for the BFF auth endpoints. Empty = same-origin (the
-// deployed case, where nginx routes /api/v1/* to the backend). Set it only for
-// cross-origin local dev (frontend :3000 -> backend :8000). It is NOT a gate --
-// loginEnabled alone controls whether the login UI shows.
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "";
+import { API_BASE_URL } from "../../config/api";
 
 interface AuthUser {
   email: string;
@@ -62,7 +57,7 @@ export function AuthProvider({
       setIsLoading(false);
       return;
     }
-    fetch(`${BACKEND_URL}/api/v1/auth/me`, { credentials: "include" })
+    fetch(`${API_BASE_URL}/auth/me`, { credentials: "include" })
       .then((res) => {
         if (res.ok) return res.json();
         return null;
@@ -79,12 +74,12 @@ export function AuthProvider({
   }, [loginEnabled]);
 
   const login = useCallback(() => {
-    window.location.href = `${BACKEND_URL}/api/v1/auth/login`;
+    window.location.href = `${API_BASE_URL}/auth/login`;
   }, []);
 
   const logout = useCallback(async () => {
     try {
-      await fetch(`${BACKEND_URL}/api/v1/auth/logout`, {
+      await fetch(`${API_BASE_URL}/auth/logout`, {
         credentials: "include",
         method: "POST",
       });
