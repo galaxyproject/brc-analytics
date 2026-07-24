@@ -1,0 +1,9 @@
+catalog_build:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      # Path to the DuckDB file that dlt will have populated and that dbt should read/write.
+      # The orchestration layer should set the `duckdb_path` dbt variable.
+      path: "{{ var('duckdb_path') }}"
+      threads: 4

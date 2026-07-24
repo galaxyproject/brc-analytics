@@ -1,0 +1,8 @@
+{
+  "name": "@repo/shared",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Site-agnostic code shared across the apps in this repo.",
+  "main": "./index.ts",
+  "types": "./index.ts"
+}

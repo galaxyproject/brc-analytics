@@ -5,7 +5,10 @@ from linkml.generators import JsonSchemaGenerator, PydanticGenerator
 
 from .gen_typescript import TypescriptGeneratorFixed
 
-SCHEMA_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../schema")
+# A relative path is used to ensure that no absolute paths are included in generated files
+SCHEMA_DIR = os.path.relpath(
+    os.path.join(os.path.dirname(os.path.realpath(__file__)), "../schema")
+)
 
 # Mapping from name to tuple of generator class and output file extension
 GENERATOR_TYPES = {

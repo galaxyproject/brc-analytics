@@ -1,14 +1,12 @@
-import type {
-  BRCDataCatalogGenome,
-  WorkflowCategory,
-} from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
+import type { BRCDataCatalogGenome } from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import { buildAssemblyWorkflows } from "@/views/AnalyzeWorkflowsView/components/Main/utils";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import {
   ORGANISM_PLOIDY,
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
-} from "../../../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { buildAssemblyWorkflows } from "../../../app/views/AnalyzeWorkflowsView/components/Main/utils";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../app/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
+} from "@repo/shared/apis/schema-types";
+import type { WorkflowCategory } from "@repo/shared/apis/workflow";
 import { WorkflowCategoryId } from "../../../catalog/schema/generated/schema";
 
 describe("buildAssemblyWorkflows - scope filtering", () => {
@@ -30,6 +28,7 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
     ploidy: [ORGANISM_PLOIDY.DIPLOID],
     priority: null,
     priorityPathogenName: null,
+    releaseDate: "2026-06-24",
     scaffoldCount: null,
     scaffoldL50: null,
     scaffoldN50: null,
@@ -60,6 +59,8 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 1,
+            assemblyCountMin: 1,
             iwcId: "iwc-assembly",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -89,6 +90,8 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 1,
+            assemblyCountMin: 1,
             iwcId: "iwc-no-scope",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -118,6 +121,8 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-organism",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -146,6 +151,8 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-sequence",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -174,6 +181,8 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 1,
+            assemblyCountMin: 1,
             iwcId: "iwc-assembly",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -184,6 +193,8 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
             workflowName: "Assembly Workflow",
           },
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-organism",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -194,6 +205,8 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
             workflowName: "Organism Workflow",
           },
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-sequence",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -230,6 +243,8 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 1,
+            assemblyCountMin: 1,
             iwcId: "iwc-rna-seq",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -266,6 +281,8 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
         showComingSoon: true,
         workflows: [
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-organism",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,

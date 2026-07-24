@@ -1,4 +1,4 @@
-import { MIN_ACCESSION_COUNT } from "../../constants";
+import { MIN_ACCESSION_COUNT } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/AccessionCountStep/constants";
 
 /**
  * Checks if a raw input string represents a valid accession count.

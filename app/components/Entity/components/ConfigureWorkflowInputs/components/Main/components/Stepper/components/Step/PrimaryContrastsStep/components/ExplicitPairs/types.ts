@@ -3,8 +3,8 @@ import {
   OnAddPair,
   OnRemovePair,
   OnUpdatePair,
-} from "../../hooks/UseExplicitContrasts/types";
-import { CONTRAST_MODE } from "../../hooks/UseRadioGroup/types";
+} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseExplicitContrasts/types";
+import { CONTRAST_MODE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseRadioGroup/types";
 
 export interface Props {
   factorValues: string[];

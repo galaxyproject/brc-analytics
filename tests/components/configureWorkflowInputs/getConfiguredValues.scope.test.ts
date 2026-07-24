@@ -1,11 +1,11 @@
-import type { Workflow } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
+import { getConfiguredValues } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseLaunchGalaxy/utils";
+import type { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import {
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
-} from "../../../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { getConfiguredValues } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseLaunchGalaxy/utils";
-import type { ConfiguredInput } from "../../../app/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+} from "@repo/shared/apis/schema-types";
+import type { Workflow } from "@repo/shared/apis/workflow";
 
 // Mock workflow constants to avoid pulling in unneeded modules
 jest.mock(
@@ -34,6 +34,8 @@ jest.mock("../../../app/views/AnalyzeWorkflowsView/lexicmap/constants", () => ({
 
 describe("getConfiguredValues - scope-based logic", () => {
   const BASE_WORKFLOW: Workflow = {
+    assemblyCountMax: 1,
+    assemblyCountMin: 1,
     iwcId: "iwc-test",
     parameters: [],
     ploidy: WORKFLOW_PLOIDY.ANY,
@@ -48,6 +50,8 @@ describe("getConfiguredValues - scope-based logic", () => {
     designFormula: undefined,
     geneModelUrl: null,
     primaryContrasts: null,
+    readRunPairedFile: null,
+    readRunSingleFile: null,
     readRunsPaired: null,
     readRunsSingle: null,
     referenceAssembly: undefined,
@@ -177,6 +181,154 @@ describe("getConfiguredValues - scope-based logic", () => {
         readRunsPaired: [
           { md5Hashes: "abc", runAccession: "SRR123", urls: "http://x" },
         ],
+      };
+
+      const result = getConfiguredValues(configuredInput, workflow);
+
+      expect(result).toBeDefined();
+      expect(result?._scope).toBe("ORGANISM");
+    });
+
+    test("returns undefined when required single-file reads are missing", () => {
+      const workflow: Workflow = {
+        ...BASE_WORKFLOW,
+        parameters: [
+          {
+            key: "Single FASTQ",
+            variable: WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE_FILE,
+          },
+        ],
+        scope: WORKFLOW_SCOPE.ORGANISM,
+      };
+
+      const configuredInput: ConfiguredInput = {
+        ...BASE_CONFIGURED_INPUT,
+        readRunSingleFile: undefined,
+      };
+
+      const result = getConfiguredValues(configuredInput, workflow);
+
+      expect(result).toBeUndefined();
+    });
+
+    test("returns value when single-file reads are null (user upload)", () => {
+      const workflow: Workflow = {
+        ...BASE_WORKFLOW,
+        parameters: [
+          {
+            key: "Single FASTQ",
+            variable: WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE_FILE,
+          },
+        ],
+        scope: WORKFLOW_SCOPE.ORGANISM,
+      };
+
+      const result = getConfiguredValues(BASE_CONFIGURED_INPUT, workflow);
+
+      expect(result).toBeDefined();
+      expect(result?._scope).toBe("ORGANISM");
+      expect(result).toHaveProperty("readRunSingleFile", null);
+    });
+
+    test("returns value when required single-file reads are provided", () => {
+      const workflow: Workflow = {
+        ...BASE_WORKFLOW,
+        parameters: [
+          {
+            key: "Single FASTQ",
+            variable: WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE_FILE,
+          },
+        ],
+        scope: WORKFLOW_SCOPE.ORGANISM,
+      };
+
+      const configuredInput: ConfiguredInput = {
+        ...BASE_CONFIGURED_INPUT,
+        readRunSingleFile: {
+          md5Hashes: "abc",
+          runAccession: "SRR123",
+          urls: "http://x",
+        },
+      };
+
+      const result = getConfiguredValues(configuredInput, workflow);
+
+      expect(result).toBeDefined();
+      expect(result?._scope).toBe("ORGANISM");
+    });
+
+    test("returns undefined when required paired-file reads are missing", () => {
+      const workflow: Workflow = {
+        ...BASE_WORKFLOW,
+        parameters: [
+          {
+            key: "Forward reads",
+            variable: WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_FORWARD_FILE,
+          },
+          {
+            key: "Reverse reads",
+            variable: WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_REVERSE_FILE,
+          },
+        ],
+        scope: WORKFLOW_SCOPE.ORGANISM,
+      };
+
+      const configuredInput: ConfiguredInput = {
+        ...BASE_CONFIGURED_INPUT,
+        readRunPairedFile: undefined,
+      };
+
+      const result = getConfiguredValues(configuredInput, workflow);
+
+      expect(result).toBeUndefined();
+    });
+
+    test("returns value when paired-file reads are null (user upload)", () => {
+      const workflow: Workflow = {
+        ...BASE_WORKFLOW,
+        parameters: [
+          {
+            key: "Forward reads",
+            variable: WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_FORWARD_FILE,
+          },
+          {
+            key: "Reverse reads",
+            variable: WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_REVERSE_FILE,
+          },
+        ],
+        scope: WORKFLOW_SCOPE.ORGANISM,
+      };
+
+      const result = getConfiguredValues(BASE_CONFIGURED_INPUT, workflow);
+
+      expect(result).toBeDefined();
+      expect(result?._scope).toBe("ORGANISM");
+      expect(result).toHaveProperty("readRunPairedFile", null);
+    });
+
+    test("returns value when required paired-file reads are provided", () => {
+      const workflow: Workflow = {
+        ...BASE_WORKFLOW,
+        parameters: [
+          {
+            key: "Forward reads",
+            variable: WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_FORWARD_FILE,
+          },
+          {
+            key: "Reverse reads",
+            variable: WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_REVERSE_FILE,
+          },
+        ],
+        scope: WORKFLOW_SCOPE.ORGANISM,
+      };
+
+      const configuredInput: ConfiguredInput = {
+        ...BASE_CONFIGURED_INPUT,
+        readRunPairedFile: {
+          md5Hashes: "abc",
+          runAccession: "SRR123",
+          urls: "http://x",
+        },
       };
 
       const result = getConfiguredValues(configuredInput, workflow);

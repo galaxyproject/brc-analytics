@@ -4,10 +4,7 @@
 
 > **Note:** This section shows workflows added to workflows.yml in this script run. On subsequent runs, these will no longer appear here. Commit or save this report if you need to track what was added.
 
-- CAPHEINE: Combined HyPhy Core and Compare (COMPARATIVE_GENOMICS)
-- HyPhy: Compare (COMPARATIVE_GENOMICS)
-- HyPhy: Core (COMPARATIVE_GENOMICS)
-- HyPhy: Preprocessing  (COMPARATIVE_GENOMICS)
+None
 
 ## Active workflows with version not on Dockstore
 
@@ -33,24 +30,29 @@ None
 
 - #workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main (categories: CONSENSUS_SEQUENCES, VARIANT_CALLING)
 
+## Workflows with inconsistent paired-file parameters (forward/reverse must both be present or both absent)
+
+None
+
 ## Parameter changes by workflow
 
 > **Note:** New parameters are added to workflows.yml on each run. On subsequent runs, they will no longer appear as 'new' even if stale parameters haven't been addressed yet. If you see both stale and new params for a workflow, commit or save this report before re-running so you don't lose the pairing info (useful for identifying renames).
 
-### #workflow/github.com/iwc-workflows/atacseq/main (ACTIVE)
+### #workflow/github.com/iwc-workflows/hyphy/hyphy-core (inactive)
 
-**Stale (not in IWC, kept for review):**
-- bin_size
-- effective_genome_size
-- reference_genome
+**New (added from IWC):**
+- reference Fasta
+- reference GTF
+
+### #workflow/github.com/iwc-workflows/hyphy/hyphy-preprocessing (inactive)
+
+**New (added from IWC):**
+- reference Fasta
+- reference GTF
 
 ## Inactive workflows in workflows.yml
 
 > **Note:** These workflows are in workflows.yml but not marked active. Parameter counts can help assess complexity for potential activation.
-
-### Genome assembly with Flye - ASSEMBLY (1 parameters)
-
-- Input sequence reads
 
 ### Repeat masking with RepeatModeler and RepeatMasker - ANNOTATION (1 parameters)
 
@@ -60,21 +62,6 @@ None
 
 - Bigwig to average
 - bin_size
-
-### Bacterial Genome Assembly using Shovill - ASSEMBLY (2 parameters)
-
-- Input adapter trimmed sequence reads (forward)
-- Input adapter trimmed sequence reads (reverse)
-
-### HyPhy: Core - COMPARATIVE_GENOMICS (2 parameters)
-
-- reference cds
-- unaligned sequences
-
-### HyPhy: Preprocessing  - COMPARATIVE_GENOMICS (2 parameters)
-
-- reference cds
-- unaligned sequences
 
 ### Generic variation analysis on WGS PE data - VARIANT_CALLING (3 parameters)
 
@@ -88,11 +75,17 @@ None
 - Phylogenetic tree(s)
 - Foreground Sequences List
 
-### Assembly polishing with long reads - ASSEMBLY (3 parameters)
+### HyPhy: Core - COMPARATIVE_GENOMICS (3 parameters)
 
-- Assembly to be polished
-- long reads
-- minimap setting (for long reads) 
+- unaligned sequences
+- reference GTF
+- reference Fasta
+
+### HyPhy: Preprocessing  - COMPARATIVE_GENOMICS (3 parameters)
+
+- unaligned sequences
+- reference GTF
+- reference Fasta
 
 ### Single-Cell Mixture Analysis: baredSC 1D Log-Normalized Models - TRANSCRIPTOMICS (4 parameters)
 
@@ -121,13 +114,6 @@ None
 - genome name
 - Juicer Medium Tabix with validPairs
 - Interactions to consider to calculate weights in normalization step
-
-### CAPHEINE: Combined HyPhy Core and Compare - COMPARATIVE_GENOMICS (4 parameters)
-
-- reference cds
-- unaligned sequences
-- foreground regexp (optional)
-- foreground list (optional)
 
 ### Generic variation analysis reporting - VARIANT_CALLING (4 parameters)
 
@@ -246,6 +232,7 @@ None
 - Genome Assembly from Hifi reads - VGP3 ( (from Dockstore: Vertebrate Genome Project))
 - Genome Assembly from Hifi reads with HiC phasing - VGP4 ( (from Dockstore: Vertebrate Genome Project))
 - Genome Assembly with Pacbio Hifi reads and Trio data for phasing - VGP5 ( (from Dockstore: Vertebrate Genome Project))
+- Histological Staining Area Quantification (none)
 - Host or Contamination Removal on Long-Reads ( (from Dockstore: Metagenomics, Microbiome))
 - Host or Contamination Removal on Short-Reads ( (from Dockstore: Metagenomics, Microbiome))
 - K-mer profiling and reads statistics VGP1 ( (from Dockstore: Vertebrate Genome Project))
@@ -263,6 +250,7 @@ None
 - Mass spectrometry: GCMS with metaMS ( (from Dockstore: Computational Chemistry, Metabolomics))
 - Mass spectrometry: LC-MS preprocessing with XCMS ( (from Dockstore: Computational Chemistry, Metabolomics))
 - MetaProSIP OpenMS ( (from Dockstore: Proteomics))
+- Metadata and Sequences from BioProject IDs (none)
 - Metagenome-Assembled Genomes (MAGs) generation ( (from Dockstore: Microbiome))
 - Metagenomics Taxonomic and Antibiotic Resistance Gene (ARG) Profiling ( (from Dockstore: Metagenomics))
 - Mitogenome Assembly VGP0 ( (from Dockstore: Vertebrate Genome Project))
@@ -272,6 +260,7 @@ None
 - Parallel Accession Download ( (from Dockstore: Data Fetching))
 - Pathogen Detection PathoGFAIR Samples Aggregation and Visualisation ( (from Dockstore: Microbiome))
 - Post-Assembly Quality Control and Contamination Check for Bacterial Genomes ( (from Dockstore: Metagenomics, Microbiome, Bacterial Genomics))
+- Post-curation assembly processing and evaluation (none)
 - PretextMap Generation from 1 or 2 haplotypes ( (from Dockstore: Vertebrate Genome Project))
 - Purge duplicate contigs from a diploid assembly VGP6 ( (from Dockstore: Vertebrate Genome Project))
 - Purging duplicates in one haplotype VGP6b ( (from Dockstore: Vertebrate Genome Project))

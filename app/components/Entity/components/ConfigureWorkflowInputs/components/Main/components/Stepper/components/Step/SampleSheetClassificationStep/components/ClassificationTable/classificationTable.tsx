@@ -1,7 +1,7 @@
+import { COLUMN_TYPE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 import { GridTable } from "@databiosphere/findable-ui/lib/components/Table/table.styles";
 import { TableBody, TableCell, TableHead, TableRow } from "@mui/material";
 import { JSX } from "react";
-import { COLUMN_TYPE } from "../../types";
 import { StyledTableContainer } from "./classificationTable.styles";
 import { Select } from "./components/Select/select";
 import { Props } from "./types";

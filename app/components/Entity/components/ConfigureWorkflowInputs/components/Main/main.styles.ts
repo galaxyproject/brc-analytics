@@ -2,7 +2,7 @@ import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Pap
 import { bpDownSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
 import { Button } from "@mui/material";
-import { SECTION_PADDING } from "../../../../../../views/EntityView/ui/styles";
+import { SECTION_PADDING } from "@repo/shared/views/EntityView/ui/styles";
 
 export const StyledMainContainer = styled.div`
   display: grid;

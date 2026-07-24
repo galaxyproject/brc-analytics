@@ -1,9 +1,10 @@
+import { ENA_PORTAL_API_BASE_URL } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/constants";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { ENA_FIELDS } from "./constants";
 import { AccessionInfo } from "./entities";
 import { SubmitOptions } from "./types";
 
-export const ENA_API = `${process.env.NEXT_PUBLIC_ENA_PROXY_DOMAIN}/ena/portal/api/search?result=read_run&query={query}&fields=${ENA_FIELDS.join(",")}&format=json`;
+export const ENA_API = `${ENA_PORTAL_API_BASE_URL}/search?result=read_run&query={query}&fields=${ENA_FIELDS.join(",")}&format=json`;
 
 /**
  * Fetch ENA data for a given accession number.

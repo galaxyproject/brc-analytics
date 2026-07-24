@@ -1,7 +1,6 @@
-import "@databiosphere/findable-ui";
 import { AzulEntitiesStaticResponse } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import { Error } from "@databiosphere/findable-ui/lib/components/Error/error";
-import { ErrorBoundary } from "@databiosphere/findable-ui/lib/components/ErrorBoundary";
+import { ErrorBoundary } from "@databiosphere/findable-ui/lib/components/ErrorBoundary/errorBoundary";
 import { Head } from "@databiosphere/findable-ui/lib/components/Head/head";
 import { AppLayout as DXAppLayout } from "@databiosphere/findable-ui/lib/components/Layout/components/AppLayout/appLayout.styles";
 import { Floating } from "@databiosphere/findable-ui/lib/components/Layout/components/Floating/floating";
@@ -18,15 +17,18 @@ import { SystemStatusProvider } from "@databiosphere/findable-ui/lib/providers/s
 import { DataExplorerError } from "@databiosphere/findable-ui/lib/types/error";
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { CssBaseline, ThemeProvider } from "@mui/material";
+import { AppCacheProvider } from "@mui/material-nextjs/v16-pagesRouter";
+import { OgMeta } from "@repo/shared/components/OgMeta/ogMeta";
+import { AuthProvider } from "@repo/shared/providers/authentication/provider";
+import { EntitiesLoadedProvider } from "@repo/shared/providers/entitiesLoaded/provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NextPage } from "next";
 import type { AppProps } from "next/app";
 import { JSX, useMemo } from "react";
 import { getDefaultDescription } from "../app/common/meta/utils";
-import { OgMeta } from "../app/components/common/OgMeta/ogMeta";
 import { StyledFooter } from "../app/components/Layout/components/Footer/footer.styles";
 import { config } from "../app/config/config";
-import { BrcAuthProvider } from "../app/providers/authentication";
+import { WorkflowHandoffProvider } from "../app/providers/workflowHandoff/provider";
 import { useEntities } from "../app/services/workflows/hooks/UseEntities/hook";
 import "../app/styles/fonts/fonts.css";
 import { mergeAppTheme } from "../app/theme/theme";
@@ -49,14 +51,22 @@ export type AppPropsWithComponent = AppProps & {
   pageProps: PageProps;
 };
 
-setFeatureFlags(["assistant", "flu", "hyphy", "lmls"]);
+setFeatureFlags([
+  "assembly-workflows",
+  "assistant",
+  "hyphy",
+  "lmls",
+  "pangenome",
+]);
 
 const queryClient = new QueryClient();
 
-function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
+function MyApp(props: AppPropsWithComponent): JSX.Element {
+  const { Component, pageProps } = props;
   // Set up the site configuration, layout and theme.
   const appConfig = config();
-  // Load entities into the in-memory cache.
+  // Kick off entity cache load and distribute the boolean via context so
+  // per-page EntityDataGate consumers share a single source of truth.
   const isEntitiesLoaded = useEntities();
   const {
     layout,
@@ -87,65 +97,67 @@ function MyApp({ Component, pageProps }: AppPropsWithComponent): JSX.Element {
     };
   }, [header, isAssistantEnabled]);
 
-  const ogMeta = (
-    <OgMeta
-      appTitle={appConfig.appTitle}
-      browserURL={appConfig.browserURL}
-      defaultDescription={getDefaultDescription(appConfig.appKey)}
-      pageDescription={pageDescription}
-      pageTitle={pageTitle}
-    />
-  );
-
-  if (!isEntitiesLoaded) return ogMeta;
-
   return (
-    <EmotionThemeProvider theme={appTheme}>
-      <ThemeProvider theme={appTheme}>
-        <DXConfigProvider config={appConfig} entityListType={entityListType}>
-          <Head pageTitle={pageTitle} />
-          {ogMeta}
-          <CssBaseline />
-          <QueryClientProvider client={queryClient}>
-            <ServicesProvider>
-              <SystemStatusProvider>
-                <BrcAuthProvider loginEnabled={appConfig.loginEnabled}>
-                  <LayoutDimensionsProvider>
-                    <AppLayout>
-                      <DXHeader {...filteredHeader} />
-                      <ExploreStateProvider entityListType={entityListType}>
-                        <Main>
-                          <ErrorBoundary
-                            fallbackRender={({
-                              error,
-                              reset,
-                            }: {
-                              error: DataExplorerError;
-                              reset: () => void;
-                            }): JSX.Element => (
-                              <Error
-                                errorMessage={error.message}
-                                requestUrlMessage={error.requestUrlMessage}
-                                rootPath={redirectRootToPath}
-                                onReset={reset}
-                              />
-                            )}
-                          >
-                            <Component {...pageProps} />
-                            <Floating {...floating} />
-                          </ErrorBoundary>
-                        </Main>
-                      </ExploreStateProvider>
-                      <StyledFooter {...footer} />
-                    </AppLayout>
-                  </LayoutDimensionsProvider>
-                </BrcAuthProvider>
-              </SystemStatusProvider>
-            </ServicesProvider>
-          </QueryClientProvider>
-        </DXConfigProvider>
-      </ThemeProvider>
-    </EmotionThemeProvider>
+    <AppCacheProvider {...props}>
+      <EmotionThemeProvider theme={appTheme}>
+        <ThemeProvider theme={appTheme}>
+          <DXConfigProvider config={appConfig} entityListType={entityListType}>
+            <Head pageTitle={pageTitle} />
+            <OgMeta
+              appTitle={appConfig.appTitle}
+              browserURL={appConfig.browserURL}
+              defaultDescription={getDefaultDescription(appConfig.appKey)}
+              pageDescription={pageDescription}
+              pageTitle={pageTitle}
+            />
+            <CssBaseline />
+            <QueryClientProvider client={queryClient}>
+              <ServicesProvider>
+                <SystemStatusProvider>
+                  <AuthProvider loginEnabled={appConfig.loginEnabled}>
+                    <LayoutDimensionsProvider>
+                      <AppLayout>
+                        <DXHeader {...filteredHeader} />
+                        <ExploreStateProvider entityListType={entityListType}>
+                          <WorkflowHandoffProvider>
+                            <Main>
+                              <ErrorBoundary
+                                fallbackRender={({
+                                  error,
+                                  reset,
+                                }: {
+                                  error: DataExplorerError;
+                                  reset: () => void;
+                                }): JSX.Element => (
+                                  <Error
+                                    errorMessage={error.message}
+                                    requestUrlMessage={error.requestUrlMessage}
+                                    rootPath={redirectRootToPath}
+                                    onReset={reset}
+                                  />
+                                )}
+                              >
+                                <EntitiesLoadedProvider
+                                  value={isEntitiesLoaded}
+                                >
+                                  <Component {...pageProps} />
+                                  <Floating {...floating} />
+                                </EntitiesLoadedProvider>
+                              </ErrorBoundary>
+                            </Main>
+                          </WorkflowHandoffProvider>
+                        </ExploreStateProvider>
+                        <StyledFooter {...footer} />
+                      </AppLayout>
+                    </LayoutDimensionsProvider>
+                  </AuthProvider>
+                </SystemStatusProvider>
+              </ServicesProvider>
+            </QueryClientProvider>
+          </DXConfigProvider>
+        </ThemeProvider>
+      </EmotionThemeProvider>
+    </AppCacheProvider>
   );
 }
 

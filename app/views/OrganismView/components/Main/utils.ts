@@ -1,24 +1,30 @@
-import type {
-  Workflow,
-  WorkflowCategory,
-} from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
-import { WORKFLOW_SCOPE } from "../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
-import type { Organism } from "../../types";
+import type { Organism } from "@/views/OrganismView/types";
+import { WORKFLOW_SCOPE } from "@repo/shared/apis/schema-types";
+import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
+import { WorkflowCategoryId } from "../../../../../catalog/schema/generated/schema";
 
 /**
  * Builds workflow categories for the given organism.
  * Filters workflows to include only ORGANISM-scoped workflows compatible with the organism's taxonomy.
  * @param organism - Organism.
  * @param allWorkflowCategories - Workflow categories.
+ * @param isAssemblyWorkflowsEnabled - Whether the 'assembly-workflows' feature flag is enabled.
  * @returns Workflow categories compatible with the given organism.
  */
 export function buildOrganismWorkflows(
   organism: Organism,
-  allWorkflowCategories: WorkflowCategory[]
+  allWorkflowCategories: WorkflowCategory[],
+  isAssemblyWorkflowsEnabled = false
 ): WorkflowCategory[] {
   const workflowCategories: WorkflowCategory[] = [];
 
   for (const workflowCategory of allWorkflowCategories) {
+    if (
+      workflowCategory.category === WorkflowCategoryId.ASSEMBLY &&
+      !isAssemblyWorkflowsEnabled
+    )
+      continue;
+
     const { workflows: categoryWorkflows } = workflowCategory;
 
     const compatibleWorkflows = categoryWorkflows.filter(
@@ -50,7 +56,7 @@ function workflowIsCompatibleWithOrganism(
   organism: Organism
 ): boolean {
   if (workflow.taxonomyId === null) return true;
-  return organism.genomes.some((genome) =>
+  return (organism.genomes ?? []).some((genome) =>
     genome.lineageTaxonomyIds.includes(workflow.taxonomyId as string)
   );
 }

@@ -1,6 +1,7 @@
+import { ENA_PORTAL_API_BASE_URL } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/constants";
+import { ENA_FIELDS } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/hooks/UseENADataByAccession/constants";
 import { QueryFunctionContext } from "@tanstack/react-query";
 import ky from "ky";
-import { ENA_FIELDS } from "../../hooks/UseENADataByAccession/constants";
 import { QueryKey } from "../types";
 
 /**
@@ -15,17 +16,14 @@ export function queryFn<T = unknown>(): (
     // The second element of the queryKey is the taxonomy ID.
     const { 1: taxonomyId } = queryKey;
 
-    return ky(
-      `${process.env.NEXT_PUBLIC_ENA_PROXY_DOMAIN}/ena/portal/api/search`,
-      {
-        searchParams: {
-          fields: ENA_FIELDS.join(","),
-          format: "json",
-          query: `tax_tree(${taxonomyId})`,
-          result: "read_run",
-        },
-        signal,
-      }
-    ).json<T>();
+    return ky(`${ENA_PORTAL_API_BASE_URL}/search`, {
+      searchParams: {
+        fields: ENA_FIELDS.join(","),
+        format: "json",
+        query: `tax_tree(${taxonomyId})`,
+        result: "read_run",
+      },
+      signal,
+    }).json<T>();
   };
 }

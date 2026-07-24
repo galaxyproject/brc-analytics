@@ -1,4 +1,7 @@
-import { ClassificationMap, COLUMN_TYPE } from "../../types";
+import {
+  ClassificationMap,
+  COLUMN_TYPE,
+} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 
 /**
  * Auto-detect MD5 column type from column name.

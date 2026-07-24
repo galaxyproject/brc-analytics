@@ -1,4 +1,4 @@
-import { ORGANISM_PLOIDY } from "../brc-analytics-catalog/common/schema-entities";
+import type { ORGANISM_PLOIDY } from "@repo/shared/apis/schema-types";
 
 export type GA2Catalog = GA2AssemblyEntity | GA2OrganismEntity;
 
@@ -17,6 +17,7 @@ export interface GA2AssemblyEntity {
   lineageTaxonomyIds: string[];
   ncbiTaxonomyId: string;
   ploidy: ORGANISM_PLOIDY[];
+  releaseDate: string;
   scaffoldCount: number | null;
   scaffoldL50: number | null;
   scaffoldN50: number | null;

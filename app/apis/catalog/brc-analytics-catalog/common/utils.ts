@@ -1,26 +1,22 @@
-import { WorkflowEntity } from "../../../../../site-config/brc-analytics/local/index/workflow/types";
-import { formatTrsId } from "../../../../views/AnalyzeWorkflowsView/components/Main/utils";
-import { sanitizeEntityId } from "../../common/utils";
-import { GA2AssemblyEntity, GA2OrganismEntity } from "../../ga2/entities";
+import { formatTrsId } from "@/views/AnalyzeWorkflowsView/components/Main/utils";
+import {
+  ORGANISM_PLOIDY,
+  WORKFLOW_PLOIDY,
+} from "@repo/shared/apis/schema-types";
+import { sanitizeEntityId } from "@repo/shared/apis/utils";
+import { WorkflowEntity } from "@site-config/brc-analytics/local/index/workflow/types";
 import { BRCDataCatalogGenome, BRCDataCatalogOrganism } from "./entities";
-import { ORGANISM_PLOIDY, WORKFLOW_PLOIDY } from "./schema-entities";
 
-export function getGenomeId(
-  genome: BRCDataCatalogGenome | GA2AssemblyEntity
-): string {
+export function getGenomeId(genome: BRCDataCatalogGenome): string {
   return sanitizeEntityId(genome.accession);
 }
 
-export function getGenomeTitle(
-  genome?: BRCDataCatalogGenome | GA2AssemblyEntity
-): string {
+export function getGenomeTitle(genome?: BRCDataCatalogGenome): string {
   if (!genome) return "";
   return `${genome.taxonomicLevelSpecies}`;
 }
 
-export function getOrganismId(
-  organism: BRCDataCatalogOrganism | GA2OrganismEntity
-): string {
+export function getOrganismId(organism: BRCDataCatalogOrganism): string {
   return sanitizeEntityId(organism.ncbiTaxonomyId);
 }
 
@@ -29,9 +25,7 @@ export function getOrganismId(
  * @param genome - Genome.
  * @returns organism ID.
  */
-export function getGenomeOrganismId(
-  genome: BRCDataCatalogGenome | GA2AssemblyEntity
-): string {
+export function getGenomeOrganismId(genome: BRCDataCatalogGenome): string {
   return sanitizeEntityId(genome.speciesTaxonomyId);
 }
 

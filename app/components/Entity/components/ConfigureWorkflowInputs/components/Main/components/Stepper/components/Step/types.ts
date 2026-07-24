@@ -1,13 +1,15 @@
-import { StepProps as MStepProps } from "@mui/material";
-import { ComponentType, ReactNode } from "react";
-import { Workflow } from "../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
+import {
+  OnContinue,
+  OnEdit,
+} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/types";
 import {
   ConfiguredInput,
   OnConfigure,
-} from "../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { OnContinue, OnEdit } from "../../hooks/UseStepper/types";
+} from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { StepProps as MStepProps } from "@mui/material";
+import type { Workflow } from "@repo/shared/apis/workflow";
+import { ComponentType, ReactNode } from "react";
 import { OnLaunchGalaxy, Status } from "./hooks/UseLaunchGalaxy/types";
-import { VIEW } from "./SequencingStep/components/ToggleButtonGroup/types";
 
 export interface StepConfig {
   description?: ReactNode;
@@ -26,7 +28,6 @@ export interface StepProps
     Required<Pick<MStepProps, "index" | "active">> {
   configuredInput: ConfiguredInput;
   entryLabel: string;
-  initialDataSourceView?: VIEW;
   onConfigure: OnConfigure;
   onContinue: OnContinue;
   onEdit: OnEdit;

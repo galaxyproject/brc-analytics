@@ -1,8 +1,8 @@
 import {
   MAX_FILE_SIZE_BYTES,
   VALIDATION_ERROR,
-} from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/constants";
-import { parseFile } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/utils";
+} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/constants";
+import { parseFile } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/utils";
 
 const TEST_DATA = {
   VALID_CSV: "a,b,c,d\n1,2,3,4\n5,6,7,8",

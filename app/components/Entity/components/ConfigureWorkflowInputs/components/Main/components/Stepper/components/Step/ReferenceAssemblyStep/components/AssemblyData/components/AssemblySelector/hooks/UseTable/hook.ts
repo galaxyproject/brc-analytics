@@ -1,3 +1,4 @@
+import { getEntities } from "@/services/workflows/query";
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 import { arrIncludesSome } from "@databiosphere/findable-ui/lib/components/Table/columnDef/columnFilters/filterFn";
 import { getFacetedUniqueValuesWithArrayValues } from "@databiosphere/findable-ui/lib/components/Table/common/utils";
@@ -5,6 +6,7 @@ import { getFacetedMinMaxValues } from "@databiosphere/findable-ui/lib/component
 import { ROW_POSITION } from "@databiosphere/findable-ui/lib/components/Table/features/RowPosition/constants";
 import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/features/RowPreview/constants";
 import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/features/TableDownload/constants";
+import type { Workflow } from "@repo/shared/apis/workflow";
 import {
   getCoreRowModel,
   getFacetedRowModel,
@@ -14,8 +16,6 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useMemo } from "react";
-import { Workflow } from "../../../../../../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
-import { getEntities } from "../../../../../../../../../../../../../../../../../services/workflows/query";
 import { CATEGORY_GROUPS } from "./categoryGroups";
 import { columns } from "./columnDef";
 import { COLUMN_VISIBILITY, SORTING } from "./constants";

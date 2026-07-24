@@ -6,13 +6,29 @@ Provides search and lookup methods used by the assistant agent's tools.
 import json
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set
 
 logger = logging.getLogger(__name__)
+
+# NOTE: the workflow/organism compatibility rule (taxonomy lineage + ploidy +
+# assembly-id requirement) below is duplicated in three other places that drift
+# out of sync -- the MCP server's catalog_data.py, the frontend's
+# AnalyzeWorkflowsView/components/Main/utils.ts, and the catalog build's
+# build-workflow-mappings.ts. #1319 was caused by that drift. Consolidating to a
+# single source of truth is tracked in #1327; until then, change all four together.
 
 # Ploidy compatibility: a workflow is compatible when its ploidy is ANY
 # or matches at least one of the organism's ploidy values.
 _PLOIDY_ANY = "ANY"
+
+
+def _is_assembly_scope(wf: Dict[str, Any]) -> bool:
+    """The assistant only drives the single-organism/single-assembly flow, so it
+    only sees ASSEMBLY-scope workflows (matching the frontend's default view).
+    Organism- and comparative-scoped workflows are hidden from it. A workflow
+    with no scope set is treated as ASSEMBLY, matching the MCP server's
+    CatalogData."""
+    return (wf.get("scope") or "ASSEMBLY") == "ASSEMBLY"
 
 
 class CatalogData:
@@ -20,11 +36,58 @@ class CatalogData:
         self.catalog_path = Path(catalog_path)
         self.organisms: List[Dict[str, Any]] = []
         self.workflows_by_category: List[Dict[str, Any]] = []
+        # Maps each taxonomy ID to its own ancestor lineage -- the IDs from the
+        # root down to and including itself, never its descendants -- so a
+        # workflow annotated with an ancestor taxon (e.g. Bacteria=2) matches
+        # every organism below it (e.g. E. coli=562). Built from genome lineages.
+        self._lineage_by_tax_id: Dict[str, Set[str]] = {}
         self._load()
 
     def _load(self) -> None:
         self._load_organisms()
         self._load_workflows()
+        self._build_lineage_index()
+
+    def _build_lineage_index(self) -> None:
+        """Index each taxonomy ID to its own ancestor lineage (root..tid).
+
+        Lets ancestor lookups answer "is Bacteria (2) in E. coli's (562)
+        lineage?" so a workflow targeting a higher-rank taxon applies to all
+        taxa below it. lineageTaxonomyIds is root-first, so each ID maps only
+        to the prefix up to and including itself -- mapping it to the full
+        lineage would pollute ancestor keys with their descendants (key "2"
+        would contain "562"), wrongly matching a descendant-targeted workflow
+        against a higher-rank organism. When several genomes share a tax ID
+        their ancestor sets are merged.
+        """
+        for org in self.organisms:
+            for genome in org.get("genomes", []):
+                lineage = genome.get("lineageTaxonomyIds") or []
+                if not lineage:
+                    continue
+                lineage_strs = [str(t) for t in lineage]
+                for i, tid in enumerate(lineage_strs):
+                    ancestors = set(lineage_strs[: i + 1])
+                    existing = self._lineage_by_tax_id.get(tid)
+                    if existing is None:
+                        self._lineage_by_tax_id[tid] = ancestors
+                    else:
+                        existing.update(ancestors)
+
+    def _workflow_taxon_matches(
+        self, workflow_tax_id: Any, target_tax_id: Optional[str]
+    ) -> bool:
+        """True if an organism-specific workflow applies to target_tax_id.
+
+        A match means the workflow's taxon is anywhere in target_tax_id's
+        lineage -- a workflow for Bacteria (2) applies to E. coli (562) and
+        every other taxon below it. Returns False when there's no organism to
+        check against or its lineage is unknown.
+        """
+        if not target_tax_id:
+            return False
+        lineage = self._lineage_by_tax_id.get(str(target_tax_id), set())
+        return str(workflow_tax_id) in lineage
 
     def _load_organisms(self) -> None:
         path = self.catalog_path / "organisms.json"
@@ -79,6 +142,34 @@ class CatalogData:
     def get_organism_by_taxonomy_id(self, taxonomy_id: str) -> Optional[Dict[str, Any]]:
         for org in self.organisms:
             if str(org.get("ncbiTaxonomyId")) == str(taxonomy_id):
+                return self._summarize_organism(org)
+        return None
+
+    def find_organism_exact(self, name: Any) -> Optional[Dict[str, Any]]:
+        """Find an organism by its NCBI taxonomy id -- the stable, canonical key
+        suggestion chips tag organisms with (#1297). An exact (case-insensitive)
+        species or common name is also accepted as a fail-soft fallback so a chip
+        the model mis-tags by name isn't needlessly dropped.
+
+        Accepts any input (e.g. a numeric taxid or None); the value is coerced
+        to a string before matching.
+
+        Unlike search_organisms, this does NOT match on genus or substrings, so
+        a genus ("Candida") or a partial string ("almonella") will not resolve.
+        """
+        if name is None:
+            return None
+        q = str(name).strip().lower()
+        if not q:
+            return None
+        for org in self.organisms:
+            candidates = {
+                (org.get("taxonomicLevelSpecies") or "").lower(),
+                (org.get("commonName") or "").lower(),
+                str(org.get("ncbiTaxonomyId") or "").lower(),
+            }
+            candidates.discard("")
+            if q in candidates:
                 return self._summarize_organism(org)
         return None
 
@@ -153,7 +244,9 @@ class CatalogData:
                 "category": cat.get("category"),
                 "name": cat.get("name"),
                 "description": cat.get("description"),
-                "workflow_count": len(cat.get("workflows", [])),
+                "workflow_count": sum(
+                    1 for wf in cat.get("workflows", []) if _is_assembly_scope(wf)
+                ),
             }
             for cat in self.workflows_by_category
         ]
@@ -165,6 +258,7 @@ class CatalogData:
                 return [
                     self._summarize_workflow(wf, cat.get("name", ""))
                     for wf in cat.get("workflows", [])
+                    if _is_assembly_scope(wf)
                 ]
         return []
 
@@ -175,12 +269,14 @@ class CatalogData:
         results = []
         for cat in self.workflows_by_category:
             for wf in cat.get("workflows", []):
+                if not _is_assembly_scope(wf):
+                    continue
                 wf_ploidy = wf.get("ploidy", _PLOIDY_ANY)
                 wf_tax = wf.get("taxonomyId")
 
                 ploidy_ok = wf_ploidy == _PLOIDY_ANY or wf_ploidy in organism_ploidies
-                tax_ok = wf_tax is None or (
-                    taxonomy_id and str(wf_tax) == str(taxonomy_id)
+                tax_ok = wf_tax is None or self._workflow_taxon_matches(
+                    wf_tax, taxonomy_id
                 )
 
                 if ploidy_ok and tax_ok:
@@ -190,7 +286,7 @@ class CatalogData:
     def get_workflow_details(self, iwc_id: str) -> Optional[Dict[str, Any]]:
         for cat in self.workflows_by_category:
             for wf in cat.get("workflows", []):
-                if wf.get("iwcId") == iwc_id:
+                if wf.get("iwcId") == iwc_id and _is_assembly_scope(wf):
                     return self._summarize_workflow(
                         wf, cat.get("name", ""), include_params=True
                     )
@@ -254,12 +350,14 @@ class CatalogData:
                 f"Workflow requires {wf_ploidy} but assembly is {', '.join(asm_ploidies)}"
             )
 
-        # Taxonomy check
+        # Taxonomy check: the workflow's taxon must be in the assembly's
+        # lineage, so a Bacteria-targeted workflow matches any bacterium.
         wf_tax = wf.get("taxonomy_id")
-        if wf_tax and str(wf_tax) != asm.get("taxonomy_id"):
+        if wf_tax and not self._workflow_taxon_matches(wf_tax, asm.get("taxonomy_id")):
             issues.append(
-                f"Workflow is organism-specific (taxonomy {wf_tax}) "
-                f"but assembly has taxonomy {asm.get('taxonomy_id')}"
+                f"Workflow is organism-specific (taxonomy {wf_tax}), but that "
+                f"taxon is not in the lineage of assembly taxonomy "
+                f"{asm.get('taxonomy_id')}"
             )
 
         # Gene annotation check

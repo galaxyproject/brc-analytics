@@ -1,10 +1,10 @@
+import { calculateGridSize } from "@/components/Layout/components/Hero/common/utils";
 import {
   Breadcrumb,
   Breadcrumbs,
 } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import { BaseComponentProps } from "@databiosphere/findable-ui/lib/components/types";
 import { Fragment, JSX, ReactNode } from "react";
-import { calculateGridSize } from "../../../../../Hero/common/utils";
 import { Hero } from "./components/Hero/hero";
 import {
   Head,

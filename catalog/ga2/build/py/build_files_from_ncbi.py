@@ -2,9 +2,11 @@ import json
 
 import pandas as pd
 
-from ....py_package.catalog_build import build_files, create_taxonomy_read_run_count
+from ....py_package.catalog_build import build_files
 
 ASSEMBLIES_PATH = "catalog/ga2/source/assemblies.yml"
+
+ORGANISMS_PATH = "catalog/ga2/source/organisms.yml"
 
 UCSC_ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/VGP/assemblyList.json"
 
@@ -16,13 +18,13 @@ ORGANISM_IMAGE_INFO_PATH = "catalog/ga2/source/organism_image_data.json"
 
 PRIMARYDATA_OUTPUT_PATH = "catalog/ga2/build/intermediate/primary-data-ncbi.tsv"
 
+BUILD_META_OUTPUT_PATH = "catalog/ga2/output/data-build-meta.json"
+
 QC_REPORT_PATH = "catalog/ga2/output/qc-report.data.md"
 
 TREE_OUTPUT_PATH = "catalog/ga2/output/ncbi-taxa-tree.json"
 
-TAXONOMY_READ_RUN_COUNTS_OUTPUT_PATH = (
-    "catalog/ga2/build/intermediate/taxIdReadCount.json"
-)
+TEMP_FOLDER_PATH = "catalog/ga2/build/temp"
 
 TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
     40674: "Mammalia",
@@ -92,20 +94,21 @@ def build_ncbi_data():
         UCSC_ASSEMBLIES_URL,
         TREE_OUTPUT_PATH,
         TAXANOMIC_LEVELS_FOR_TREE,
-        {
+        taxonomic_group_sets={
             "taxonomicGroup": TAXONOMIC_GROUPS_BY_TAXONOMY_ID,
             "tolId": TOLIDS_BY_TAXONOMY_ID,
         },
+        temp_folder_path=TEMP_FOLDER_PATH,
+        dlt_pipeline_prefix="ga2_catalog_",
         do_gene_model_urls=False,
+        organisms_path=ORGANISMS_PATH,
+        build_meta_output_path=BUILD_META_OUTPUT_PATH,
         primary_output_path=PRIMARYDATA_OUTPUT_PATH,
         qc_report_path=QC_REPORT_PATH,
         extract_primary_data=False,
         organism_image_path=ORGANISM_IMAGE_PATH,
         organism_image_source_information_path=ORGANISM_IMAGE_INFO_PATH,
         datacache_base_url="http://datacache.galaxyproject.org/vgp/data/genomes",
-    )
-    create_taxonomy_read_run_count(
-        GENOMES_OUTPUT_PATH, TAXONOMY_READ_RUN_COUNTS_OUTPUT_PATH
     )
 
 

@@ -103,13 +103,19 @@ workflows:
       Assemble long reads with Flye, then view assembly statistics
       and assembly graph
     ploidy: ANY
+    scope: ORGANISM
+    assembly_count_min: 0
+    assembly_count_max: 0
     parameters:
       - key: Input sequence reads
+        variable: SANGER_READ_RUN_SINGLE_FILE
+        data_requirements:
+          library_layout: SINGLE
         type_guide:
           class: File
-    active: false
+    active: true
     iwc_id: assembly-with-flye-main
-  - trs_id: "#workflow/github.com/iwc-workflows/atacseq/main/versions/v2.0"
+  - trs_id: "#workflow/github.com/iwc-workflows/atacseq/main/versions/v2.1"
     categories:
       - REGULATION
     workflow_name: "ATAC-seq Analysis: Chromatin Accessibility Profiling"
@@ -172,8 +178,15 @@ workflows:
     workflow_name: Bacterial Genome Assembly using Shovill
     workflow_description: Assembly of bacterial paired-end short read data
     ploidy: ANY
+    scope: ORGANISM
+    assembly_count_min: 0
+    assembly_count_max: 0
+    taxonomy_id: 2
     parameters:
       - key: Input adapter trimmed sequence reads (forward)
+        variable: SANGER_READ_RUN_FORWARD_FILE
+        data_requirements:
+          library_layout: PAIRED
         type_guide:
           class: File
           ext:
@@ -182,6 +195,9 @@ workflows:
             - fastqsanger
             - fastqsanger.gz
       - key: Input adapter trimmed sequence reads (reverse)
+        variable: SANGER_READ_RUN_REVERSE_FILE
+        data_requirements:
+          library_layout: PAIRED
         type_guide:
           class: File
           ext:
@@ -189,7 +205,7 @@ workflows:
             - fastq.gz
             - fastqsanger
             - fastqsanger.gz
-    active: false
+    active: true
     iwc_id: bacterial-genome-assembly-main
   - trs_id: "#workflow/github.com/iwc-workflows/bacterial_genome_annotation/main/versions/v1.2.0"
     categories:
@@ -217,7 +233,7 @@ workflows:
           class: boolean
     active: true
     iwc_id: bacterial_genome_annotation-main
-  - trs_id: "#workflow/github.com/iwc-workflows/baredsc/baredSC-1d-logNorm/versions/v0.6"
+  - trs_id: "#workflow/github.com/iwc-workflows/baredsc/baredSC-1d-logNorm/versions/v0.7"
     categories:
       - TRANSCRIPTOMICS
     workflow_name: "Single-Cell Mixture Analysis: baredSC 1D Log-Normalized Models"
@@ -244,7 +260,7 @@ workflows:
           class: integer
     active: false
     iwc_id: baredsc-baredsc-1d-lognorm
-  - trs_id: "#workflow/github.com/iwc-workflows/baredsc/baredSC-2d-logNorm/versions/v0.6"
+  - trs_id: "#workflow/github.com/iwc-workflows/baredsc/baredSC-2d-logNorm/versions/v0.7"
     categories:
       - TRANSCRIPTOMICS
     workflow_name: "Single-Cell Mixture Analysis: baredSC 2D Log-Normalized Models"
@@ -280,7 +296,7 @@ workflows:
           class: boolean
     active: false
     iwc_id: baredsc-baredsc-2d-lognorm
-  - trs_id: "#workflow/github.com/iwc-workflows/brew3r/main/versions/v0.2"
+  - trs_id: "#workflow/github.com/iwc-workflows/brew3r/main/versions/v0.3"
     categories:
       - TRANSCRIPTOMICS
     workflow_name: BREW3R
@@ -312,7 +328,7 @@ workflows:
           class: float
     active: false
     iwc_id: brew3r-main
-  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v1.1"
+  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v1.2"
     categories:
       - REGULATION
     workflow_name: "ChIP-seq Analysis: Paired-End Read Processing"
@@ -347,7 +363,7 @@ workflows:
           class: integer
     active: true
     iwc_id: chipseq-pe-main
-  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v1.1"
+  - trs_id: "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v1.2"
     categories:
       - REGULATION
     workflow_name: "ChIP-seq Analysis: Single-End Read Processing"
@@ -384,7 +400,7 @@ workflows:
           class: integer
     active: true
     iwc_id: chipseq-sr-main
-  - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.5"
+  - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.6"
     categories:
       - REGULATION
     workflow_name: Consensus Peak Calling for ATAC-seq and CUT and RUN Replicates
@@ -413,7 +429,7 @@ workflows:
           class: integer
     active: true
     iwc_id: consensus-peaks-consensus-peaks-atac-cutandrun
-  - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-pe/versions/v1.5"
+  - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-pe/versions/v1.6"
     categories:
       - REGULATION
     workflow_name: Consensus Peak Calling for ChIP-seq Paired-End Replicates
@@ -442,7 +458,7 @@ workflows:
           class: integer
     active: false
     iwc_id: consensus-peaks-consensus-peaks-chip-pe
-  - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-sr/versions/v1.5"
+  - trs_id: "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-sr/versions/v1.6"
     categories:
       - REGULATION
     workflow_name: Consensus Peak Calling for ChIP-seq Single-End Replicates
@@ -471,7 +487,7 @@ workflows:
           class: integer
     active: false
     iwc_id: consensus-peaks-consensus-peaks-chip-sr
-  - trs_id: "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.18"
+  - trs_id: "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.19"
     categories:
       - REGULATION
     workflow_name: "CUT&amp;RUN/CUT&amp;TAG Analysis: Protein-DNA Interaction Mapping"
@@ -510,7 +526,7 @@ workflows:
           class: boolean
     active: true
     iwc_id: cutandrun-main
-  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.5"
+  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.6"
     categories:
       - TRANSCRIPTOMICS
     workflow_name:
@@ -558,7 +574,7 @@ workflows:
           class: integer
     active: true
     iwc_id: fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-cellplex
-  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.5"
+  - trs_id: "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.6"
     categories:
       - TRANSCRIPTOMICS
     workflow_name:
@@ -724,7 +740,7 @@ workflows:
         variable: ASSEMBLY_FASTA_URL
     active: true
     iwc_id: haploid-variant-calling-wgs-pe-main
-  - trs_id: "#workflow/github.com/iwc-workflows/hic-hicup-cooler/chic-fastq-to-cool-hicup-cooler/versions/v0.3"
+  - trs_id: "#workflow/github.com/iwc-workflows/hic-hicup-cooler/chic-fastq-to-cool-hicup-cooler/versions/v0.4"
     categories:
       - REGULATION
     workflow_name: "Capture Hi-C Processing: FASTQ to Balanced Cool Files"
@@ -775,7 +791,7 @@ workflows:
           class: integer
     active: true
     iwc_id: hic-hicup-cooler-chic-fastq-to-cool-hicup-cooler
-  - trs_id: "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-cool-hicup-cooler/versions/v0.3"
+  - trs_id: "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-cool-hicup-cooler/versions/v0.4"
     categories:
       - REGULATION
     workflow_name: "Hi-C Processing: FASTQ to Balanced Cool Files"
@@ -820,7 +836,7 @@ workflows:
           class: text
     active: true
     iwc_id: hic-hicup-cooler-hic-fastq-to-cool-hicup-cooler
-  - trs_id: "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-pairs-hicup/versions/v0.3"
+  - trs_id: "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-pairs-hicup/versions/v0.4"
     categories:
       - REGULATION
     workflow_name: "Hi-C Data Processing: FASTQ to Valid Interaction Pairs"
@@ -857,7 +873,7 @@ workflows:
           class: integer
     active: true
     iwc_id: hic-hicup-cooler-hic-fastq-to-pairs-hicup
-  - trs_id: "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-juicermediumtabix-to-cool-cooler/versions/v0.3"
+  - trs_id: "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-juicermediumtabix-to-cool-cooler/versions/v0.4"
     categories:
       - REGULATION
     workflow_name: "Hi-C Format Conversion: Juicer Medium to Cooler Files"
@@ -883,7 +899,7 @@ workflows:
           class: text
     active: false
     iwc_id: hic-hicup-cooler-hic-juicermediumtabix-to-cool-cooler
-  - trs_id: "#workflow/github.com/iwc-workflows/hyphy/capheine-core-and-compare/versions/v0.1"
+  - trs_id: "#workflow/github.com/iwc-workflows/hyphy/capheine-core-and-compare/versions/v0.2"
     categories:
       - COMPARATIVE_GENOMICS
     workflow_name: "CAPHEINE: Combined HyPhy Core and Compare"
@@ -892,13 +908,21 @@ workflows:
       branch labeling for branch comparisons.
     ploidy: ANY
     scope: ORGANISM
+    assembly_count_min: 2
     taxonomy_id: 10239
     parameters:
-      - key: reference cds
+      - key: reference Fasta
+        variable: ASSEMBLY_FASTA_URL
         type_guide:
           class: File
           ext: fasta
+      - key: reference GTF
+        variable: GENE_MODEL_URL
+        type_guide:
+          class: File
+          ext: gtf
       - key: unaligned sequences
+        variable: FASTA_COLLECTION
         type_guide:
           class: Collection
           ext: fasta
@@ -914,7 +938,7 @@ workflows:
             - tabular
     active: true
     iwc_id: hyphy-capheine-core-and-compare
-  - trs_id: "#workflow/github.com/iwc-workflows/hyphy/hyphy-compare/versions/v0.1"
+  - trs_id: "#workflow/github.com/iwc-workflows/hyphy/hyphy-compare/versions/v0.2"
     categories:
       - COMPARATIVE_GENOMICS
     workflow_name: "HyPhy: Compare"
@@ -944,7 +968,7 @@ workflows:
             - tabular
     active: false
     iwc_id: hyphy-hyphy-compare
-  - trs_id: "#workflow/github.com/iwc-workflows/hyphy/hyphy-core/versions/v0.1"
+  - trs_id: "#workflow/github.com/iwc-workflows/hyphy/hyphy-core/versions/v0.2"
     categories:
       - COMPARATIVE_GENOMICS
     workflow_name: "HyPhy: Core"
@@ -953,35 +977,43 @@ workflows:
       of fasta.
     ploidy: ANY
     parameters:
-      - key: reference cds
-        type_guide:
-          class: File
-          ext: fasta
       - key: unaligned sequences
         type_guide:
           class: Collection
           ext: fasta
           collection_type: list
+      - key: reference GTF
+        type_guide:
+          class: File
+          ext: gtf
+      - key: reference Fasta
+        type_guide:
+          class: File
+          ext: fasta
     active: false
     iwc_id: hyphy-hyphy-core
-  - trs_id: "#workflow/github.com/iwc-workflows/hyphy/hyphy-preprocessing/versions/v0.1"
+  - trs_id: "#workflow/github.com/iwc-workflows/hyphy/hyphy-preprocessing/versions/v0.2"
     categories:
       - COMPARATIVE_GENOMICS
-    workflow_name: "HyPhy: Preprocessing"
+    workflow_name: "HyPhy: Preprocessing "
     workflow_description:
       Generates codon-aware alignments and phylogenetic trees compatible
       with downstream HyPhy analyses.
     ploidy: ANY
     parameters:
-      - key: reference cds
-        type_guide:
-          class: File
-          ext: fasta
       - key: unaligned sequences
         type_guide:
           class: Collection
           ext: fasta
           collection_type: list
+      - key: reference GTF
+        type_guide:
+          class: File
+          ext: gtf
+      - key: reference Fasta
+        type_guide:
+          class: File
+          ext: fasta
     active: false
     iwc_id: hyphy-hyphy-preprocessing
   - trs_id: "#workflow/github.com/iwc-workflows/influenza-isolates-consensus-and-subtyping/main/versions/v0.3"
@@ -993,7 +1025,9 @@ workflows:
       for batches of Illumina PE sequenced Influenza A isolates.
     ploidy: ANY
     scope: ORGANISM
-    taxonomy_id: 11320
+    assembly_count_min: 0
+    assembly_count_max: 0
+    taxonomy_id: 2955291
     parameters:
       - key: References per segment collection
         collection_spec:
@@ -1105,7 +1139,7 @@ workflows:
           class: boolean
     active: false
     iwc_id: metagenomic-genes-catalogue-main
-  - trs_id: "#workflow/github.com/iwc-workflows/ploidy-aware-genotype-calling/main/versions/v0.1.1"
+  - trs_id: "#workflow/github.com/iwc-workflows/ploidy-aware-genotype-calling/main/versions/v0.1.2"
     categories:
       - VARIANT_CALLING
     workflow_name: Paired end variant and ploidy-aware genotype calling
@@ -1144,15 +1178,17 @@ workflows:
     ploidy: ANY
     parameters:
       - key: Assembly to be polished
+        variable: ASSEMBLY_FASTA_URL
         type_guide:
           class: File
       - key: long reads
+        variable: SANGER_READ_RUN_SINGLE
         type_guide:
           class: File
       - key: "minimap setting (for long reads) "
         type_guide:
           class: text
-    active: false
+    active: true
     iwc_id: polish-with-long-reads-main
   - trs_id: "#workflow/github.com/iwc-workflows/pox-virus-amplicon/main/versions/v0.4"
     categories:
@@ -1162,7 +1198,7 @@ workflows:
       A workflow for the analysis of pox virus genomes sequenced
       as half-genomes (for ITR resolution) in a tiled-amplicon approach
     ploidy: HAPLOID
-    taxonomy_id: 10244
+    taxonomy_id: 3431483
     parameters:
       - key: Reference FASTA
         variable: ASSEMBLY_FASTA_URL
@@ -1240,7 +1276,7 @@ workflows:
           class: File
     active: false
     iwc_id: repeatmasking-main
-  - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-de/main/versions/v0.8"
+  - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-de/main/versions/v0.9"
     categories:
       - TRANSCRIPTOMICS
     workflow_name: RNA-Seq Differential Expression Analysis with Visualization
@@ -1274,7 +1310,7 @@ workflows:
           class: float
     active: false
     iwc_id: rnaseq-de-main
-  - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.3"
+  - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.4"
     categories:
       - TRANSCRIPTOMICS
     workflow_name: "RNA-Seq Analysis: Paired-End Read Processing and Quantification"
@@ -1327,7 +1363,7 @@ workflows:
           class: boolean
     active: true
     iwc_id: rnaseq-pe-main
-  - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.3"
+  - trs_id: "#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.4"
     categories:
       - TRANSCRIPTOMICS
     workflow_name: "RNA-Seq Analysis: Single-End Read Processing and Quantification"
@@ -1445,7 +1481,7 @@ workflows:
           class: text
     active: false
     iwc_id: sars-cov-2-pe-illumina-artic-ivar-analysis-sars-cov-2-illumina-amplicon-ivar-pangolin-nextclade
-  - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-variant-calling/COVID-19-PE-ARTIC-ILLUMINA/versions/v0.5.4"
+  - trs_id: "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-variant-calling/COVID-19-PE-ARTIC-ILLUMINA/versions/v0.5.5"
     categories:
       - VARIANT_CALLING
     workflow_name: "COVID-19: variation analysis on ARTIC PE data"
@@ -1457,7 +1493,7 @@ workflows:
       affected by ARTIC primer-binding site mutations and tries to exclude reads derived
       from such tainted amplicons when calculating allele-frequencies of other variants.
     ploidy: HAPLOID
-    taxonomy_id: 694009
+    taxonomy_id: 3418604
     parameters:
       - key: Paired Collection
         variable: SANGER_READ_RUN_PAIRED
@@ -1504,7 +1540,7 @@ workflows:
       This workflows performs paired end read mapping with bwa-mem
       followed by sensitive variant calling across a wide range of AFs with lofreq
     ploidy: HAPLOID
-    taxonomy_id: 694009
+    taxonomy_id: 3418604
     parameters:
       - key: Paired Collection
         variable: SANGER_READ_RUN_PAIRED
@@ -1529,7 +1565,7 @@ workflows:
       This workflows performs single end read mapping with bowtie2
       followed by sensitive variant calling across a wide range of AFs with lofreq
     ploidy: HAPLOID
-    taxonomy_id: 694009
+    taxonomy_id: 3418604
     parameters:
       - key: Single End Collection
         variable: SANGER_READ_RUN_SINGLE

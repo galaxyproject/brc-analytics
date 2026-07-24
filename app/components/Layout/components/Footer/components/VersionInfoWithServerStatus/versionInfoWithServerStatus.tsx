@@ -3,8 +3,8 @@
 import { VersionInfo } from "@databiosphere/findable-ui/lib/components/Layout/components/Footer/components/VersionInfo/versionInfo";
 import DnsOutlinedIcon from "@mui/icons-material/DnsOutlined";
 import { Box, Tooltip } from "@mui/material";
+import { API_BASE_URL } from "@repo/shared/config/api";
 import { JSX, useEffect, useState } from "react";
-import { API_BASE_URL } from "../../../../../../config/api";
 
 export const VersionInfoWithServerStatus = (): JSX.Element => {
   const [backendVersion, setBackendVersion] = useState<string | null>(null);

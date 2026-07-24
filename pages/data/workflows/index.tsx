@@ -1,9 +1,10 @@
+import { getPageMeta } from "@/common/meta/utils";
+import { config } from "@/config/config";
+import { WorkflowsView } from "@/views/WorkflowsView/workflowsView";
 import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main.styles";
+import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
 import { GetStaticProps } from "next";
 import { JSX } from "react";
-import { getPageMeta } from "../../../app/common/meta/utils";
-import { config } from "../../../app/config/config";
-import { WorkflowsView } from "../../../app/views/WorkflowsView/workflowsView";
 
 export const getStaticProps: GetStaticProps = () => {
   return {
@@ -15,7 +16,11 @@ export const getStaticProps: GetStaticProps = () => {
 };
 
 const Page = (): JSX.Element => {
-  return <WorkflowsView />;
+  return (
+    <EntityDataGate>
+      <WorkflowsView />
+    </EntityDataGate>
+  );
 };
 
 Page.Main = DXMain;

@@ -1,10 +1,10 @@
+import { SectionContentCard } from "@/components/common/Card/components/SectionContentCard/sectionContentCard";
 import { SearchIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/SearchIcon/searchIcon";
+import { GalaxyIcon } from "@repo/shared/components/CustomIcon/components/GalaxyIcon/galaxyIcon";
+import { RocketLaunchIcon } from "@repo/shared/components/CustomIcon/components/RocketLaunchIcon/rocketLaunchIcon";
 import { ComponentProps } from "react";
-import { SectionContentCard } from "../../components/common/Card/components/SectionContentCard/sectionContentCard";
 import { BookmarkStarIcon } from "./components/icon/BookmarkStarIcon/bookmarkStarIcon";
-import { GalaxyIcon } from "./components/icon/GalaxyIcon/galaxyIcon";
 import { LiveHelpIcon } from "./components/icon/LiveHelpIcon/liveHelpIcon";
-import { RocketLaunchIcon } from "./components/icon/RocketLaunchIcon/rocketLaunchIcon";
 import { SmartToyIcon } from "./components/icon/SmartToyIcon/smartToyIcon";
 import { YouTubeIcon } from "./components/icon/YouTubeIcon/youTubeIcon";
 
@@ -15,6 +15,13 @@ export const CARDS: ComponentProps<typeof SectionContentCard>[] = [
     secondaryText:
       "Set up your account and run your first genomic analysis with BRC Analytics.",
     title: "Getting Started",
+  },
+  {
+    StartIcon: SmartToyIcon,
+    cardUrl: "/learn/assistant",
+    secondaryText:
+      "Set up an analysis by chatting in plain language, then hand off to Galaxy to run it.",
+    title: "About the Assistant",
   },
   {
     StartIcon: GalaxyIcon,

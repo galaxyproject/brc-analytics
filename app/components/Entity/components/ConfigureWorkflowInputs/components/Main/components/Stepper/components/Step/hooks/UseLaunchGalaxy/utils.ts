@@ -1,12 +1,17 @@
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
+import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,
 } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
-import { Workflow } from "../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
-import { WORKFLOW_PARAMETER_VARIABLE } from "../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
-import { ConfiguredInput } from "../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { ConfiguredValue } from "./types";
+import { WORKFLOW_PARAMETER_VARIABLE } from "@repo/shared/apis/schema-types";
+import type { Workflow } from "@repo/shared/apis/workflow";
+import type { WorkflowRunCreateRequest } from "@repo/shared/services/api-client/types";
+import {
+  ConfiguredValue,
+  isAssemblyConfiguredValue,
+  isSequenceConfiguredValue,
+} from "./types";
 
 export function getRequiredParameterTypes(
   workflow: Workflow
@@ -56,6 +61,8 @@ function getDEConfiguredValues(
     designFormula,
     geneModelUrl,
     primaryContrasts: primaryContrasts ?? null,
+    readRunPairedFile: null,
+    readRunSingleFile: null,
     readRunsPaired: null,
     readRunsSingle: null,
     referenceAssembly,
@@ -76,8 +83,14 @@ function getAssemblyScopeConfiguredValues(
   configuredInput: ConfiguredInput,
   workflow: Workflow
 ): ConfiguredValue | undefined {
-  const { geneModelUrl, readRunsPaired, readRunsSingle, referenceAssembly } =
-    configuredInput;
+  const {
+    geneModelUrl,
+    readRunPairedFile,
+    readRunSingleFile,
+    readRunsPaired,
+    readRunsSingle,
+    referenceAssembly,
+  } = configuredInput;
 
   // If workflow is not available yet, return undefined
   if (!workflow?.parameters) return;
@@ -91,12 +104,25 @@ function getAssemblyScopeConfiguredValues(
   if (requiredParams.GENE_MODEL_URL && geneModelUrl === null) return;
   if (requiredParams.SANGER_READ_RUN_SINGLE && !readRunsSingle) return;
   if (requiredParams.SANGER_READ_RUN_PAIRED && !readRunsPaired) return;
+  if (
+    requiredParams.SANGER_READ_RUN_SINGLE_FILE &&
+    readRunSingleFile === undefined
+  )
+    return;
+  if (
+    (requiredParams.SANGER_READ_RUN_FORWARD_FILE ||
+      requiredParams.SANGER_READ_RUN_REVERSE_FILE) &&
+    readRunPairedFile === undefined
+  )
+    return;
 
   return {
     _scope: "ASSEMBLY",
     designFormula: null,
     geneModelUrl: geneModelUrl ?? null,
     primaryContrasts: null,
+    readRunPairedFile: readRunPairedFile ?? null,
+    readRunSingleFile: readRunSingleFile ?? null,
     readRunsPaired: readRunsPaired ?? null,
     readRunsSingle: readRunsSingle ?? null,
     referenceAssembly,
@@ -117,7 +143,12 @@ function getOrganismScopeConfiguredValues(
   configuredInput: ConfiguredInput,
   workflow: Workflow
 ): ConfiguredValue | undefined {
-  const { readRunsPaired, readRunsSingle } = configuredInput;
+  const {
+    readRunPairedFile,
+    readRunSingleFile,
+    readRunsPaired,
+    readRunsSingle,
+  } = configuredInput;
 
   if (!workflow?.parameters) return;
 
@@ -125,10 +156,23 @@ function getOrganismScopeConfiguredValues(
 
   if (requiredParams.SANGER_READ_RUN_SINGLE && !readRunsSingle) return;
   if (requiredParams.SANGER_READ_RUN_PAIRED && !readRunsPaired) return;
+  if (
+    requiredParams.SANGER_READ_RUN_SINGLE_FILE &&
+    readRunSingleFile === undefined
+  )
+    return;
+  if (
+    (requiredParams.SANGER_READ_RUN_FORWARD_FILE ||
+      requiredParams.SANGER_READ_RUN_REVERSE_FILE) &&
+    readRunPairedFile === undefined
+  )
+    return;
 
   return {
     _scope: "ORGANISM",
     fastaCollection: null,
+    readRunPairedFile: readRunPairedFile ?? null,
+    readRunSingleFile: readRunSingleFile ?? null,
     readRunsPaired: readRunsPaired ?? null,
     readRunsSingle: readRunsSingle ?? null,
     tracks: null,
@@ -154,6 +198,8 @@ function getSequenceScopeConfiguredValues(
   return {
     _scope: "SEQUENCE",
     numberOfHits,
+    readRunPairedFile: null,
+    readRunSingleFile: null,
     readRunsPaired: null,
     readRunsSingle: null,
     sequence,
@@ -200,4 +246,82 @@ export function launchGalaxy(url: string): void {
   document.body.appendChild(el);
   el.click();
   document.body.removeChild(el);
+}
+
+interface BuildWorkflowRunPayloadParams {
+  assistantSessionId: string | null;
+  configuredInput: ConfiguredInput;
+  configuredValue: ConfiguredValue;
+  handoffUrl: string;
+  workflow: Workflow;
+}
+
+export function buildWorkflowRunPayload({
+  assistantSessionId,
+  configuredInput,
+  configuredValue,
+  handoffUrl,
+  workflow,
+}: BuildWorkflowRunPayloadParams): WorkflowRunCreateRequest {
+  let galaxyInstanceUrl: string | null = null;
+
+  try {
+    galaxyInstanceUrl = new URL(handoffUrl).origin;
+  } catch {
+    galaxyInstanceUrl = null;
+  }
+
+  // Assembly-scope and sequence-scope variants carry distinct fields; narrow
+  // before reading so the tracking payload tolerates any scope.
+  const isAssembly = isAssemblyConfiguredValue(configuredValue);
+  const isSequence = isSequenceConfiguredValue(configuredValue);
+
+  return {
+    assembly_accession: isAssembly ? configuredValue.referenceAssembly : null,
+    assistant_session_id: assistantSessionId,
+    galaxy_instance_url: galaxyInstanceUrl,
+    handoff_url: handoffUrl,
+    launch_source: assistantSessionId ? "assistant" : "site",
+    parameters: {
+      design_formula: isAssembly
+        ? (configuredValue.designFormula ?? null)
+        : null,
+      gene_model_url: isAssembly
+        ? (configuredValue.geneModelUrl ?? null)
+        : null,
+      number_of_hits: isSequence
+        ? (configuredValue.numberOfHits ?? null)
+        : null,
+      primary_contrasts: isAssembly
+        ? (configuredValue.primaryContrasts ?? null)
+        : null,
+      read_runs_paired:
+        configuredValue.readRunsPaired?.map(
+          ({ runAccession }) => runAccession
+        ) ?? [],
+      read_runs_single:
+        configuredValue.readRunsSingle?.map(
+          ({ runAccession }) => runAccession
+        ) ?? [],
+      sample_sheet_classification: isAssembly
+        ? (configuredValue.sampleSheetClassification ?? null)
+        : null,
+      sample_sheet_rows: isAssembly
+        ? (configuredValue.sampleSheet?.length ?? 0)
+        : 0,
+      sequence_file_name: configuredInput.sequenceFileName ?? null,
+      sequence_length: isSequence
+        ? (configuredValue.sequence?.length ?? null)
+        : null,
+      strandedness: isAssembly ? (configuredValue.strandedness ?? null) : null,
+      tracks:
+        configuredValue.tracks?.map((track) => ({
+          group_id: track.groupId,
+          name: track.shortLabel ?? track.longLabel ?? track.bigDataUrl,
+          url: track.bigDataUrl,
+        })) ?? [],
+    },
+    workflow_id: workflow.workflowId ?? null,
+    workflow_trs_id: workflow.trsId,
+  };
 }

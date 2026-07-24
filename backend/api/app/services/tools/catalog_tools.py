@@ -3,15 +3,24 @@
 from __future__ import annotations
 
 import json
+import logging
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from app.services.tools.catalog_data import CatalogData
+from app.services.tools.catalog_query import CatalogQuery, execute
+
+if TYPE_CHECKING:
+    from app.services.sra_mirror import SRAMirrorService
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
 class AssistantDeps:
     catalog: CatalogData
+    sra_mirror: Optional["SRAMirrorService"] = None
+    con: Any = None  # in-process DuckDB connection for query_catalog (optional)
 
 
 def search_organisms(deps: AssistantDeps, query: str) -> str:
@@ -24,18 +33,6 @@ def search_organisms(deps: AssistantDeps, query: str) -> str:
     if not results:
         return f"No organisms found matching '{query}'."
     return json.dumps(results, indent=2)
-
-
-def get_assemblies(deps: AssistantDeps, taxonomy_id: str) -> str:
-    """Get all genome assemblies available for an organism by its NCBI taxonomy ID.
-
-    Args:
-        taxonomy_id: the NCBI taxonomy ID of the organism
-    """
-    assemblies = deps.catalog.get_assemblies_for_organism(taxonomy_id)
-    if not assemblies:
-        return f"No assemblies found for taxonomy ID {taxonomy_id}."
-    return json.dumps(assemblies, indent=2)
 
 
 def get_assembly_details(deps: AssistantDeps, accession: str) -> str:
@@ -107,3 +104,48 @@ def check_compatibility(deps: AssistantDeps, iwc_id: str, accession: str) -> str
     """
     result = deps.catalog.check_workflow_assembly_compatibility(iwc_id, accession)
     return json.dumps(result, indent=2)
+
+
+def query_catalog(deps: AssistantDeps, query: CatalogQuery) -> str:
+    """Count, filter, list, or facet (group-by) ASSEMBLIES or ORGANISMS with a query.
+
+    Prefer this over enumerating rows yourself: it runs the filter/count in the
+    database and returns a JSON summary correct at any scale. The summary always
+    has `total`; `list` adds `rows`/`returned`/`truncated` (capped page) and may
+    add `facets` on truncation (only when a breakdown discriminates, so don't
+    assume it's present); `facets` adds `facets`. Use it for "how many",
+    attribute filters, clade queries, and "by/per X" breakdowns. On a failure or
+    when the engine is unavailable it returns a short plain-text message instead
+    of JSON.
+
+    Pick `entity` by what a result row should be: "assembly" for genome
+    assemblies (accession, level, isRef, strain), "organism" for distinct
+    organisms/taxa (one row per species, with assemblyCount). "How many/which
+    organisms do you have for <clade>" is an organism query; "assemblies for an
+    organism" is an assembly query.
+
+    The query has: entity ("assembly" | "organism"), filters (a list of
+    {field, op, value}, AND-combined), operation ("count" | "list" | "facets"),
+    facet_by, limit, offset, sort.
+    Ops: eq, ne, in, not_in, gt/gte/lt/lte (numeric), contains/contains_any (list
+    fields), is_null/not_null. OR within a field = `in` (scalar) or `contains_any`
+    (list); a range = two predicates (gte + lte).
+
+    Filter by scientific name via taxonomicLevelSpecies, a clade via the matching
+    rank column (e.g. taxonomicLevelGenus). When a list comes back truncated,
+    state the total and offer to narrow rather than paging.
+
+    Args:
+        query: the structured catalog query
+    """
+    if deps.con is None:
+        return "Catalog query engine is not available."
+    try:
+        result = execute(query, deps.con)
+    except Exception:  # noqa: BLE001
+        # Log the detail; return a controlled message rather than echoing raw
+        # exception text (which can carry SQL fragments) to the model/user.
+        # Invalid queries are already rejected by validation before this runs.
+        logger.exception("query_catalog execution failed")
+        return "Query failed — try simplifying or narrowing the query."
+    return json.dumps(result, indent=2, default=str)

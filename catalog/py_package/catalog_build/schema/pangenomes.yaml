@@ -1,0 +1,28 @@
+id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/pangenomes.yaml#
+name: pangenomes
+description: Schema for defining pangenomes available in the BRC Analytics platform.
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+
+imports:
+  - linkml:types
+
+classes:
+  Pangenomes:
+    description: Root object containing a collection of pangenome definitions for the BRC Analytics platform.
+    tree_root: true
+    attributes:
+      pangenomes:
+        description: Collection of pangenome entries that will be available in the BRC Analytics platform.
+        required: true
+        multivalued: true
+        range: Pangenome
+
+  Pangenome:
+    description: Definition of a pangenome with its unique identifier.
+    attributes:
+      id:
+        description: The unique identifier for the pangenome.
+        required: true
+        range: string

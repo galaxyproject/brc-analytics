@@ -2,8 +2,8 @@
 // enforces the package exports field strictly (no auto-resolving extensions).
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters.js";
 import { Locator, Page } from "@playwright/test";
-import { sanitizeEntityId } from "../../../app/apis/catalog/common/utils";
-import { ROUTES } from "../../../routes/constants";
+import { sanitizeEntityId } from "@repo/shared/apis/utils";
+import { ROUTES } from "@repo/shared/routes/constants";
 import { expect, test } from "../utils/fixtures";
 
 /**
@@ -18,11 +18,11 @@ const ASSEMBLY_ENTITY_ID = sanitizeEntityId(ASSEMBLY_ACCESSION);
 
 // RNA-seq PE workflow (3 steps: Reference Assembly [disabled], GTF Files, Paired-End Sequencing Data).
 const RNASEQ_PE_TRS_ID =
-  "workflow-github-com-iwc-workflows-rnaseq-pe-main-versions-v1-3";
+  "workflow-github-com-iwc-workflows-rnaseq-pe-main-versions-v1-4";
 
 // ATAC-seq workflow (2 steps: Reference Assembly [disabled], Paired-End Sequencing Data).
 const ATACSEQ_TRS_ID =
-  "workflow-github-com-iwc-workflows-atacseq-main-versions-v2-0";
+  "workflow-github-com-iwc-workflows-atacseq-main-versions-v2-1";
 
 // Step labels.
 const STEP_LABELS = {
@@ -250,5 +250,44 @@ test.describe("Workflow Stepper", () => {
       await expect(nav).toContainText(ASSEMBLY_ACCESSION);
       await expect(nav).toContainText("Configure Inputs");
     });
+  });
+});
+
+// Organism: Alphainfluenzavirus influenzae (2955291) with a compatible
+// organism-scope workflow (influenza isolate subtyping / consensus generation).
+const ORGANISM_ENTITY_ID = "2955291";
+const ORGANISM_TRS_ID =
+  "workflow-github-com-iwc-workflows-influenza-isolates-consensus-and-subtyping-main-versions-v0-3";
+
+test.describe("Organism workflow route", () => {
+  test("should render the configure inputs view for an organism trsId deep-link", async ({
+    page,
+  }) => {
+    await page.goto(
+      replaceParameters(ROUTES.CONFIGURE_ORGANISM_WORKFLOW, {
+        entityId: ORGANISM_ENTITY_ID,
+        trsId: ORGANISM_TRS_ID,
+      })
+    );
+
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Configure Inputs" })
+    ).toBeVisible();
+  });
+
+  test("should redirect an organism workflows URL without a trsId to the organism detail page", async ({
+    page,
+  }) => {
+    const workflowsPath = replaceParameters(
+      ROUTES.CONFIGURE_ORGANISM_WORKFLOW.split("?")[0],
+      { entityId: ORGANISM_ENTITY_ID }
+    );
+    const organismPath = replaceParameters(ROUTES.ORGANISM, {
+      entityId: ORGANISM_ENTITY_ID,
+    });
+
+    await page.goto(workflowsPath);
+
+    await expect(page).toHaveURL(new RegExp(`${organismPath}$`));
   });
 });

@@ -1,17 +1,27 @@
 import logging
-from typing import List
+from typing import List, Optional
 
 from fastmcp import FastMCP
 
 from app.services.catalog_data import CatalogData
 from app.services.ena_service import ENAService
+from app.services.sra_mirror import SRAMirrorService
 
 logger = logging.getLogger(__name__)
 
 ENA_RESULT_CAP = 50
 
 
-def create_mcp_server(catalog_data: CatalogData, ena_service: ENAService) -> FastMCP:
+def create_mcp_server(
+    catalog_data: CatalogData,
+    ena_service: ENAService,
+    sra_mirror: Optional[SRAMirrorService] = None,
+) -> FastMCP:
+    # Opt-in: the SRA mirror tools only exist when a mirror file is configured
+    # and openable. A default deploy (no SRA_MIRROR_PATH) advertises exactly
+    # the tools it does today -- same discipline as the assistant prompt.
+    sra_enabled = sra_mirror is not None and sra_mirror.is_available()
+
     wf_count = sum(
         len(c.get("workflows", [])) for c in catalog_data.workflow_categories
     )
@@ -25,6 +35,18 @@ def create_mcp_server(catalog_data: CatalogData, ena_service: ENAService) -> Fas
         "Use the catalog tools to explore organisms, assemblies, and workflows. "
         "Use the ENA tools to find raw sequencing data for a given organism."
     )
+    if sra_enabled:
+        instructions += (
+            "\n\nThis server also exposes a local SRA metadata mirror "
+            "(search_sra, sra_data_summary, get_sra_study_runs): fast, "
+            "structured multi-facet search (platform / assay type / country / "
+            "release date) over SRA runs scoped to BRC-relevant organisms, "
+            "refreshed weekly and resilient to ENA/EBI outages. Prefer the SRA "
+            "tools for broad or filtered 'what data exists' queries on BRC "
+            "pathogens; prefer the ENA tools (search_ena, search_ena_keywords) "
+            "for the very latest submissions, non-BRC organisms, or free-text "
+            "keyword search."
+        )
     mcp = FastMCP("BRC Analytics", instructions=instructions)
 
     # Catalog tools use two error conventions:
@@ -145,6 +167,78 @@ def create_mcp_server(catalog_data: CatalogData, ena_service: ENAService) -> Fas
         has_more = len(data) > ENA_RESULT_CAP
         capped = data[:ENA_RESULT_CAP]
         return {"count": len(capped), "has_more": has_more, "records": capped}
+
+    # -- SRA mirror tools (sync, local read-only DuckDB) --
+    #
+    # Thin wrappers over the shared SRAMirrorService. They return the service
+    # dicts as-is: already JSON-friendly, and carrying useful structure (the
+    # `_meta` provenance block, the `resolved` flag + spelling hint, n_returned,
+    # filters_applied). Unlike the ENA tools, these don't raise on a bad input
+    # -- the service returns a structured {"error": ...} or resolved=false that
+    # is more useful to an agent than an exception. Result caps come from the
+    # service's own clamps (search 200, get_study_runs 500).
+
+    if sra_enabled:
+
+        @mcp.tool()
+        def search_sra(
+            organism: str,
+            assay_type: Optional[str] = None,
+            platform: Optional[str] = None,
+            country: Optional[str] = None,
+            since: Optional[str] = None,
+            limit: int = 50,
+        ) -> dict:
+            """Search the local SRA mirror for sequencing runs matching an
+            organism plus optional facet filters. Fast, structured, scoped to
+            BRC-relevant organisms, refreshed weekly. Prefer over search_ena for
+            filtered "what data exists" queries on BRC pathogens.
+
+            Args:
+                organism: scientific name or NCBI taxonomy ID (e.g. "Plasmodium
+                    falciparum" or "5833"). Old/new name variants both resolve.
+                assay_type: optional, e.g. "RNA-Seq", "WGS", "ChIP-Seq".
+                platform: optional, e.g. "ILLUMINA", "OXFORD_NANOPORE".
+                country: optional country name (case-insensitive, common
+                    synonyms like "UK"/"USA" accepted).
+                since: optional release-date floor, ISO format (YYYY, YYYY-MM,
+                    or YYYY-MM-DD).
+                limit: max runs to return (default 50, capped at 200).
+            """
+            return sra_mirror.search_runs(
+                organism=organism,
+                assay_type=assay_type,
+                platform=platform,
+                country=country,
+                since=since,
+                limit=limit,
+            )
+
+        @mcp.tool()
+        def sra_data_summary(organism: str) -> dict:
+            """Snapshot of SRA data available for an organism: total run count,
+            top platforms / assay types / countries, recent submission activity,
+            and the largest BioProjects by run count. Use as the first call for
+            "how much data is there for X?" on BRC pathogens.
+
+            Args:
+                organism: scientific name or NCBI taxonomy ID. Old/new name
+                    variants both resolve.
+            """
+            return sra_mirror.summary_for_organism(organism)
+
+        @mcp.tool()
+        def get_sra_study_runs(accession: str, limit: int = 200) -> dict:
+            """Get the runs belonging to a specific SRA study (SRP*/ERP*/DRP*)
+            or BioProject (PRJNA*/PRJEB*/PRJDB*).
+
+            Args:
+                accession: SRA study or BioProject accession.
+                limit: max runs to return (default 200, capped at 500).
+            """
+            return sra_mirror.get_study_runs(accession, limit=limit)
+
+        logger.info("SRA mirror tools registered on MCP server")
 
     logger.info("MCP server created")
     return mcp

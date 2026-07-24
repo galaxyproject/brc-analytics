@@ -1,5 +1,5 @@
+import type { WorkflowCategory } from "@repo/shared/apis/workflow";
 import fsp from "fs/promises";
-import { WorkflowCategory } from "../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   GA2AssemblyEntity,
   GA2OrganismEntity,
@@ -77,7 +77,8 @@ async function buildCatalog(): Promise<void> {
   const qcReport = generateWorkflowMappingsQC(
     mappings,
     workflowCategories,
-    "GA2"
+    "GA2",
+    genomes
   );
   await fsp.writeFile(
     "catalog/ga2/output/qc-report.workflow-mappings.md",
@@ -158,6 +159,7 @@ async function buildAssemblies(
       lineageTaxonomyIds: parseList(row.lineageTaxonomyIds),
       ncbiTaxonomyId: row.taxonomyId,
       ploidy,
+      releaseDate: row.releaseDate,
       scaffoldCount: parseNumberOrNull(row.scaffoldCount),
       scaffoldL50: parseNumberOrNull(row.scaffoldL50),
       scaffoldN50: parseNumberOrNull(row.scaffoldN50),

@@ -1,7 +1,7 @@
+import { getWorkflowId } from "@/apis/catalog/ga2/utils";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
-import { getWorkflowId } from "../../../../../app/apis/catalog/ga2/utils";
-import { AppEntityConfig } from "../../../../common/entities";
+import { AppEntityConfig } from "@site-config/common/entities";
 import { CATEGORY_GROUP_CONFIG } from "./categoryGroupConfig";
 import { COLUMNS } from "./columns";
 import { TABLE_OPTIONS } from "./tableOptions";

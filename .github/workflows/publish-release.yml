@@ -8,7 +8,6 @@ on:
         required: true
 
 permissions:
-  actions: write
   contents: write
   pull-requests: write
 
@@ -25,7 +24,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22.12.0"
+          node-version: "22.13.0"
 
       - name: Configure git
         run: |
@@ -61,13 +60,6 @@ jobs:
           # Push production branch and updated tag
           git push origin production
           git push origin ${{ steps.get_release.outputs.tag }} --force
-
-      - name: Trigger production deploy
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # GITHUB_TOKEN pushes don't trigger workflows, so we manually trigger the deploy
-          gh workflow run publish.yml --ref production
 
       - name: Publish release
         env:

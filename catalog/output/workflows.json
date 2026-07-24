@@ -6,6 +6,8 @@
     "showComingSoon": true,
     "workflows": [
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "generic-non-segmented-viral-variant-calling-main",
         "parameters": [
           {
@@ -36,6 +38,8 @@
         "workflowName": "Variant calling and consensus construction from paired end short read data of non-segmented viral genomes"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "haploid-variant-calling-wgs-pe-main",
         "parameters": [
           {
@@ -65,6 +69,8 @@
         "workflowName": "Paired end variant calling in haploid system"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "ploidy-aware-genotype-calling-main",
         "parameters": [
           {
@@ -83,11 +89,13 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/ploidy-aware-genotype-calling/main/versions/v0.1.1",
+        "trsId": "#workflow/github.com/iwc-workflows/ploidy-aware-genotype-calling/main/versions/v0.1.2",
         "workflowDescription": "This workflow performs variant and genotype calling on whole-genome paired-end sequencing data from organisms of any ploidy to produce annotated VCF and TSV files",
         "workflowName": "Paired end variant and ploidy-aware genotype calling"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "sars-cov-2-pe-illumina-artic-variant-calling-covid-19-pe-artic-illumina",
         "parameters": [
           {
@@ -123,12 +131,14 @@
         ],
         "ploidy": "HAPLOID",
         "scope": "ASSEMBLY",
-        "taxonomyId": "694009",
-        "trsId": "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-variant-calling/COVID-19-PE-ARTIC-ILLUMINA/versions/v0.5.4",
+        "taxonomyId": "3418604",
+        "trsId": "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-variant-calling/COVID-19-PE-ARTIC-ILLUMINA/versions/v0.5.5",
         "workflowDescription": "The workflow for Illumina-sequenced ARTIC data builds on the RNASeq workflow for paired-end data using the same steps for mapping and variant calling, but adds extra logic for trimming ARTIC primer sequences off reads with the ivar package. In addition, this workflow uses ivar also to identify amplicons affected by ARTIC primer-binding site mutations and tries to exclude reads derived from such tainted amplicons when calculating allele-frequencies of other variants.",
         "workflowName": "COVID-19: variation analysis on ARTIC PE data"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "sars-cov-2-pe-illumina-wgs-variant-calling-covid-19-pe-wgs-illumina",
         "parameters": [
           {
@@ -148,12 +158,14 @@
         ],
         "ploidy": "HAPLOID",
         "scope": "ASSEMBLY",
-        "taxonomyId": "694009",
+        "taxonomyId": "3418604",
         "trsId": "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-wgs-variant-calling/COVID-19-PE-WGS-ILLUMINA/versions/v0.2.4",
         "workflowDescription": "This workflows performs paired end read mapping with bwa-mem followed by sensitive variant calling across a wide range of AFs with lofreq",
         "workflowName": "COVID-19: variation analysis on WGS PE data"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "sars-cov-2-se-illumina-wgs-variant-calling-covid-19-se-wgs-illumina",
         "parameters": [
           {
@@ -173,7 +185,7 @@
         ],
         "ploidy": "HAPLOID",
         "scope": "ASSEMBLY",
-        "taxonomyId": "694009",
+        "taxonomyId": "3418604",
         "trsId": "#workflow/github.com/iwc-workflows/sars-cov-2-se-illumina-wgs-variant-calling/COVID-19-SE-WGS-ILLUMINA/versions/v0.1.6",
         "workflowDescription": "This workflows performs single end read mapping with bowtie2 followed by sensitive variant calling across a wide range of AFs with lofreq",
         "workflowName": "COVID-19: variation analysis on WGS SE data"
@@ -187,6 +199,8 @@
     "showComingSoon": true,
     "workflows": [
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-cellplex",
         "parameters": [
           {
@@ -211,11 +225,13 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.5",
+        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.6",
         "workflowDescription": "Comprehensive preprocessing for 10X Genomics CellPlex multiplexed single-cell RNA-seq data. Processes Cell Multiplexing Oligo (CMO) FASTQ files with CITE-seq-Count including required CellPlex-specific translation steps. Simultaneously processes gene expression FASTQ files with STARsolo and DropletUtils for alignment and cell filtering, and formats outputs for seamless import into Seurat/Scanpy (Read10X function).",
         "workflowName": "Single-Cell RNA-seq Preprocessing: 10X Genomics CellPlex Multiplexed Samples"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-v3",
         "parameters": [
           {
@@ -240,11 +256,13 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.5",
+        "trsId": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.6",
         "workflowDescription": "Complete preprocessing pipeline for 10X Genomics v3 single-cell RNA-seq data. Aligns raw FASTQ files using STARsolo, performs cell calling and quality filtering with DropletUtils, and formats outputs for seamless import into Seurat/Scanpy (Read10X function).",
         "workflowName": "Single-Cell RNA-seq Preprocessing: 10X Genomics v3 to Seurat and Scanpy Compatible Format"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "rnaseq-pe-main",
         "parameters": [
           {
@@ -269,11 +287,13 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.3",
+        "trsId": "#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.4",
         "workflowDescription": "Complete RNA-Seq analysis for paired-end data: Processes raw FASTQ data through adapter and bad quality removal (fastp), alignment with STAR using ENCODE parameters, gene quantification via multiple methods (STAR and featureCounts), and expression calculation (FPKM with Cufflinks/StringTie, normalized coverage with bedtools). Produces count tables, normalized expression values, and genomic coverage tracks. Supports stranded and unstranded libraries, generating both HTSeq-compatible counts and normalized measures for downstream analysis.",
         "workflowName": "RNA-Seq Analysis: Paired-End Read Processing and Quantification"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "rnaseq-sr-main",
         "parameters": [
           {
@@ -298,7 +318,7 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.3",
+        "trsId": "#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.4",
         "workflowDescription": "Complete RNA-Seq analysis for single-end data:  Processes raw FASTQ data through adapter and bad quality removal (fastp), alignment with STAR using ENCODE parameters, gene quantification via multiple methods (STAR and featureCounts), and expression calculation (FPKM with Cufflinks/StringTie, normalized coverage with bedtools). Produces count tables, normalized expression values, and genomic coverage tracks. Supports stranded and unstranded libraries, generating both HTSeq-compatible counts and normalized measures for downstream analysis.",
         "workflowName": "RNA-Seq Analysis: Single-End Read Processing and Quantification"
       }
@@ -311,6 +331,8 @@
     "showComingSoon": true,
     "workflows": [
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "atacseq-main",
         "parameters": [
           {
@@ -331,11 +353,13 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/atacseq/main/versions/v2.0",
+        "trsId": "#workflow/github.com/iwc-workflows/atacseq/main/versions/v2.1",
         "workflowDescription": "Complete ATAC-seq analysis pipeline for paired-end reads. Processes raw FASTQ data through adapter and bad quality removal (fastp), alignment (Bowtie2 end-to-end), and filtering (removes MT reads, discordant pairs, low mapping quality below 30, PCR duplicates). Generates 5' cut site pileups (±100bp), performs peak calling, and quantifies reads in 1kb summit-centered regions. Produces two normalized coverage tracks (per million mapped reads and per million reads in peaks) and fragment length distribution plots for quality assessment.",
         "workflowName": "ATAC-seq Analysis: Chromatin Accessibility Profiling"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "chipseq-pe-main",
         "parameters": [
           {
@@ -356,11 +380,13 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v1.1",
+        "trsId": "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v1.2",
         "workflowDescription": "Complete ChIP-seq analysis for paired-end sequencing data. Processes raw FASTQ files through adapter removal (fastp), alignment to reference genome (Bowtie2), and stringent quality filtering (MAPQ greater than 30, concordant pairs only). Peak calling with MACS2 optimized for paired-end reads identifies protein-DNA binding sites. Generates alignment files, coverage, peak calls, and quality metrics for downstream analysis.",
         "workflowName": "ChIP-seq Analysis: Paired-End Read Processing"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "chipseq-sr-main",
         "parameters": [
           {
@@ -381,21 +407,25 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v1.1",
+        "trsId": "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v1.2",
         "workflowDescription": "Complete ChIP-seq analysis for single-end sequencing data. Processes raw FASTQ files through adapter removal (fastp), alignment to reference genome (Bowtie2), and quality filtering (MAPQ greater than 30). Peak calling with MACS2 uses a fixed extension of 200bp to identify protein-DNA binding sites. Generates alignment files, coverage, peak calls, and quality metrics for downstream analysis.",
         "workflowName": "ChIP-seq Analysis: Single-End Read Processing"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "consensus-peaks-consensus-peaks-atac-cutandrun",
         "parameters": [],
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.5",
+        "trsId": "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.6",
         "workflowDescription": "Identifies high-confidence consensus peaks from ATAC-seq or CUT and RUN replicate experiments. The workflow calls peaks on individual replicates and identifies their intersection. To control for sequencing depth differences, it subsamples all replicates to the smallest library size, performs peak calling on the combined normalized data, and retains only peaks whose summits overlap with intersections from a user-defined minimum number of replicates.",
         "workflowName": "Consensus Peak Calling for ATAC-seq and CUT and RUN Replicates"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "cutandrun-main",
         "parameters": [
           {
@@ -417,11 +447,13 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": null,
-        "trsId": "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.18",
+        "trsId": "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.19",
         "workflowDescription": "Complete CUT&amp;RUN/CUT&amp;TAG analysis workflow for paired-end sequencing data. Processes raw FASTQ files through adapter removal (cutadapt) and alignment (Bowtie2 with dovetail option enabled). Applies quality filtering (MAPQ ≥ 30, concordant pairs only), converts BAM to BED format, and performs peak calling using MACS2 with parameters optimized for the punctate signal profile characteristic of CUT&amp;RUN/CUT&amp;TAG experiments.",
         "workflowName": "CUT&amp;RUN/CUT&amp;TAG Analysis: Protein-DNA Interaction Mapping"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "hic-hicup-cooler-chic-fastq-to-cool-hicup-cooler",
         "parameters": [
           {
@@ -442,11 +474,13 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": "131567",
-        "trsId": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/chic-fastq-to-cool-hicup-cooler/versions/v0.3",
+        "trsId": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/chic-fastq-to-cool-hicup-cooler/versions/v0.4",
         "workflowDescription": "End-to-end processing of Capture Hi-C paired-end sequencing data. Transforms raw FASTQ files into balanced contact matrices using HiCUP for processing Hi-C reads (adapter trimming, mapping, filtering for valid pairs) with additional filtering for MAPQ and captured regions. The workflow generates sorted tabix files via cooler and produces balanced cool files at user-specified resolution for downstream analysis and visualization.",
         "workflowName": "Capture Hi-C Processing: FASTQ to Balanced Cool Files"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "hic-hicup-cooler-hic-fastq-to-cool-hicup-cooler",
         "parameters": [
           {
@@ -467,11 +501,13 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": "131567",
-        "trsId": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-cool-hicup-cooler/versions/v0.3",
+        "trsId": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-cool-hicup-cooler/versions/v0.4",
         "workflowDescription": "Comprehensive Hi-C data processing workflow that converts paired-end FASTQ files to balanced contact matrices. Uses HiCUP for pre-processing (adapter trimming, mapping, filtering) with fragment midpoint coordinate assignment, filters reads by mapping quality, and generates sorted tabix files. The final output is a balanced cool file at user-specified resolution created with cooler, ready for multi-resolution contact matrix analysis.",
         "workflowName": "Hi-C Processing: FASTQ to Balanced Cool Files"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "hic-hicup-cooler-hic-fastq-to-pairs-hicup",
         "parameters": [
           {
@@ -492,7 +528,7 @@
         "ploidy": "ANY",
         "scope": "ASSEMBLY",
         "taxonomyId": "131567",
-        "trsId": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-pairs-hicup/versions/v0.3",
+        "trsId": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-pairs-hicup/versions/v0.4",
         "workflowDescription": "Processes Hi-C paired-end FASTQ files to generate validated interaction pairs using HiCUP. The workflow truncates reads at ligation junctions, maps to reference genome, assigns to restriction fragments, and filters out experimental artifacts (self-ligated, dangling ends, internal fragments, and size outliers). Removes duplicates and converts outputs to formats compatible with Juicebox/cooler using fragment midpoints as coordinates. Final filtering by mapping quality ensures high-confidence interaction data.",
         "workflowName": "Hi-C Data Processing: FASTQ to Valid Interaction Pairs"
       }
@@ -505,6 +541,8 @@
     "showComingSoon": false,
     "workflows": [
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "generic-non-segmented-viral-variant-calling-main",
         "parameters": [
           {
@@ -535,6 +573,8 @@
         "workflowName": "Variant calling and consensus construction from paired end short read data of non-segmented viral genomes"
       },
       {
+        "assemblyCountMax": 0,
+        "assemblyCountMin": 0,
         "iwcId": "influenza-isolates-consensus-and-subtyping-main",
         "parameters": [
           {
@@ -601,12 +641,14 @@
         ],
         "ploidy": "ANY",
         "scope": "ORGANISM",
-        "taxonomyId": "11320",
+        "taxonomyId": "2955291",
         "trsId": "#workflow/github.com/iwc-workflows/influenza-isolates-consensus-and-subtyping/main/versions/v0.3",
         "workflowDescription": "This workflow performs subtyping and consensus sequence generation for batches of Illumina PE sequenced Influenza A isolates.",
         "workflowName": "Influenza A isolate subtyping and consensus sequence generation"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "pox-virus-amplicon-main",
         "parameters": [
           {
@@ -616,7 +658,7 @@
         ],
         "ploidy": "HAPLOID",
         "scope": "ASSEMBLY",
-        "taxonomyId": "10244",
+        "taxonomyId": "3431483",
         "trsId": "#workflow/github.com/iwc-workflows/pox-virus-amplicon/main/versions/v0.4",
         "workflowDescription": "A workflow for the analysis of pox virus genomes sequenced as half-genomes (for ITR resolution) in a tiled-amplicon approach",
         "workflowName": "Pox Virus Illumina Amplicon Workflow from half-genomes"
@@ -630,6 +672,8 @@
     "showComingSoon": true,
     "workflows": [
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "amr_gene_detection-main",
         "parameters": [
           {
@@ -645,6 +689,8 @@
         "workflowName": "AMR Gene Detection"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "annotation-braker3-main",
         "parameters": [
           {
@@ -660,6 +706,8 @@
         "workflowName": "Genome annotation with Braker3"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "bacterial_genome_annotation-main",
         "parameters": [
           {
@@ -675,6 +723,8 @@
         "workflowName": "Bacterial Genome Annotation"
       },
       {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
         "iwcId": "lncrnas-annotation-main",
         "parameters": [
           {
@@ -700,7 +750,76 @@
     "description": "Assemble prokaryotic and eukaryotic genomes sequenced with a variety of technologies.",
     "name": "Assembly",
     "showComingSoon": false,
-    "workflows": []
+    "workflows": [
+      {
+        "assemblyCountMax": 0,
+        "assemblyCountMin": 0,
+        "iwcId": "assembly-with-flye-main",
+        "parameters": [
+          {
+            "key": "Input sequence reads",
+            "variable": "SANGER_READ_RUN_SINGLE_FILE",
+            "data_requirements": {
+              "library_layout": "SINGLE"
+            }
+          }
+        ],
+        "ploidy": "ANY",
+        "scope": "ORGANISM",
+        "taxonomyId": null,
+        "trsId": "#workflow/github.com/iwc-workflows/assembly-with-flye/main/versions/v0.4",
+        "workflowDescription": "Assemble long reads with Flye, then view assembly statistics and assembly graph",
+        "workflowName": "Genome assembly with Flye"
+      },
+      {
+        "assemblyCountMax": 0,
+        "assemblyCountMin": 0,
+        "iwcId": "bacterial-genome-assembly-main",
+        "parameters": [
+          {
+            "key": "Input adapter trimmed sequence reads (forward)",
+            "variable": "SANGER_READ_RUN_FORWARD_FILE",
+            "data_requirements": {
+              "library_layout": "PAIRED"
+            }
+          },
+          {
+            "key": "Input adapter trimmed sequence reads (reverse)",
+            "variable": "SANGER_READ_RUN_REVERSE_FILE",
+            "data_requirements": {
+              "library_layout": "PAIRED"
+            }
+          }
+        ],
+        "ploidy": "ANY",
+        "scope": "ORGANISM",
+        "taxonomyId": "2",
+        "trsId": "#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v2.0.1",
+        "workflowDescription": "Assembly of bacterial paired-end short read data",
+        "workflowName": "Bacterial Genome Assembly using Shovill"
+      },
+      {
+        "assemblyCountMax": 1,
+        "assemblyCountMin": 1,
+        "iwcId": "polish-with-long-reads-main",
+        "parameters": [
+          {
+            "key": "Assembly to be polished",
+            "variable": "ASSEMBLY_FASTA_URL"
+          },
+          {
+            "key": "long reads",
+            "variable": "SANGER_READ_RUN_SINGLE"
+          }
+        ],
+        "ploidy": "ANY",
+        "scope": "ASSEMBLY",
+        "taxonomyId": null,
+        "trsId": "#workflow/github.com/iwc-workflows/polish-with-long-reads/main/versions/v0.1",
+        "workflowDescription": "Racon polish with long reads, x4",
+        "workflowName": "Assembly polishing with long reads"
+      }
+    ]
   },
   {
     "category": "PROTEIN_FOLDING",
@@ -716,12 +835,27 @@
     "showComingSoon": false,
     "workflows": [
       {
+        "assemblyCountMax": null,
+        "assemblyCountMin": 2,
         "iwcId": "hyphy-capheine-core-and-compare",
-        "parameters": [],
+        "parameters": [
+          {
+            "key": "reference Fasta",
+            "variable": "ASSEMBLY_FASTA_URL"
+          },
+          {
+            "key": "reference GTF",
+            "variable": "GENE_MODEL_URL"
+          },
+          {
+            "key": "unaligned sequences",
+            "variable": "FASTA_COLLECTION"
+          }
+        ],
         "ploidy": "ANY",
         "scope": "ORGANISM",
         "taxonomyId": "10239",
-        "trsId": "#workflow/github.com/iwc-workflows/hyphy/capheine-core-and-compare/versions/v0.1",
+        "trsId": "#workflow/github.com/iwc-workflows/hyphy/capheine-core-and-compare/versions/v0.2",
         "workflowDescription": "Runs CAPHEINE selection analyses with optional foreground/background branch labeling for branch comparisons.",
         "workflowName": "CAPHEINE: Combined HyPhy Core and Compare"
       }

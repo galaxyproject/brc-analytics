@@ -1,3 +1,4 @@
+import { CHIP_PROPS } from "@/views/AnalyzeWorkflowsView/components/Main/components/Accordion/constants";
 import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/components/RoundedPaper/roundedPaper";
 import {
   ANCHOR_TARGET,
@@ -15,11 +16,10 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { TruncatedText } from "@repo/shared/components/TruncatedText/truncatedText";
+import { ROUTES } from "@repo/shared/routes/constants";
 import Link from "next/link";
 import { JSX } from "react";
-import { ROUTES } from "../../../../../../../routes/constants";
-import { TruncatedText } from "../../../../../../components/common/TruncatedText/truncatedText";
-import { CHIP_PROPS } from "../../../../../AnalyzeWorkflowsView/components/Main/components/Accordion/constants";
 import { StyledCard } from "./card.styles";
 import { Props } from "./types";
 

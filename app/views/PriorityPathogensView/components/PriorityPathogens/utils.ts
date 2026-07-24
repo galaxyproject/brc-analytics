@@ -1,7 +1,7 @@
+import { OUTBREAK_PRIORITY } from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { CHIP_PROPS as APP_CHIP_PROPS } from "@/styles/common/mui/chip";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { ChipProps } from "@mui/material";
-import { OUTBREAK_PRIORITY } from "app/apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { CHIP_PROPS as APP_CHIP_PROPS } from "../../../../styles/common/mui/chip";
 
 /**
  * Returns the color for the priority of the outbreak.
@@ -9,7 +9,7 @@ import { CHIP_PROPS as APP_CHIP_PROPS } from "../../../../styles/common/mui/chip
  * @returns The color for the priority of the outbreak.
  */
 export function getPriorityColor(
-  priority: OUTBREAK_PRIORITY | null
+  priority?: OUTBREAK_PRIORITY | null
 ): ChipProps["color"] {
   switch (priority) {
     case OUTBREAK_PRIORITY.CRITICAL:

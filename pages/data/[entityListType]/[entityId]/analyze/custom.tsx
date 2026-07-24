@@ -1,3 +1,10 @@
+import { getPageMeta } from "@/common/meta/utils";
+import { config } from "@/config/config";
+import { getEntities } from "@/utils/entityUtils";
+import { seedDatabase } from "@/utils/seedDatabase";
+import { CUSTOM_WORKFLOW } from "@/views/AnalyzeWorkflowsView/custom/constants";
+import { WorkflowInputsView } from "@/views/WorkflowInputsView/workflowInputsView";
+import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
 import {
   GetStaticPaths,
   GetStaticPathsResult,
@@ -6,12 +13,6 @@ import {
 } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
-import { getPageMeta } from "../../../../../app/common/meta/utils";
-import { config } from "../../../../../app/config/config";
-import { getEntities } from "../../../../../app/utils/entityUtils";
-import { seedDatabase } from "../../../../../app/utils/seedDatabase";
-import { CUSTOM_WORKFLOW } from "../../../../../app/views/AnalyzeWorkflowsView/custom/constants";
-import { WorkflowInputsView } from "../../../../../app/views/WorkflowInputsView/workflowInputsView";
 
 interface Params extends ParsedUrlQuery {
   entityId: string;
@@ -73,7 +74,11 @@ export const getStaticProps: GetStaticProps<Props> = async ({
  * @returns Custom workflow view component.
  */
 const Page = (props: Props): JSX.Element => {
-  return <WorkflowInputsView {...props} />;
+  return (
+    <EntityDataGate>
+      <WorkflowInputsView {...props} />
+    </EntityDataGate>
+  );
 };
 
 export default Page;

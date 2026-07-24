@@ -1021,9 +1021,6 @@ organisms:
   - taxonomy_id: 10141
     ploidy:
       - DIPLOID
-  - taxonomy_id: 10244
-    ploidy:
-      - HAPLOID
   - taxonomy_id: 10245
     ploidy:
       - HAPLOID
@@ -2703,6 +2700,9 @@ organisms:
     ploidy:
       - DIPLOID
       - POLYPLOID
+  - taxonomy_id: 115425
+    ploidy:
+      - DIPLOID
   - taxonomy_id: 117008
     ploidy:
       - HAPLOID
@@ -3837,9 +3837,6 @@ organisms:
       - DIPLOID
       - POLYPLOID
   - taxonomy_id: 688661
-    ploidy:
-      - HAPLOID
-  - taxonomy_id: 694009
     ploidy:
       - HAPLOID
   - taxonomy_id: 694270
@@ -5463,13 +5460,22 @@ organisms:
   - taxonomy_id: 2838947
     ploidy:
       - HAPLOID
+  - taxonomy_id: 2844072
+    ploidy:
+      - HAPLOID
   - taxonomy_id: 2844074
     ploidy:
       - HAPLOID
   - taxonomy_id: 2844075
     ploidy:
       - HAPLOID
+  - taxonomy_id: 2844077
+    ploidy:
+      - HAPLOID
   - taxonomy_id: 2844078
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 2844079
     ploidy:
       - HAPLOID
   - taxonomy_id: 2844554
@@ -6671,6 +6677,3 @@ organisms:
   - taxonomy_id: 3703354
     ploidy:
       - HAPLOID
-  - taxonomy_id: 12451280
-    ploidy:
-      - DIPLOID

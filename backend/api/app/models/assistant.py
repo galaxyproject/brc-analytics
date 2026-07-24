@@ -80,6 +80,52 @@ class SuggestionChip(BaseModel):
     message: str = Field(description="The message sent when the chip is tapped")
 
 
+class AnalysisStateUpdate(BaseModel):
+    """The analysis-tracker snapshot the state extractor produces each turn.
+
+    The extractor is asked for a FULL SNAPSHOT: given the prior tracker, it
+    restates every committed field using the display label and emits ``null`` for
+    a field that isn't decided yet or was cleared. But because a weak model
+    routinely drops a key it meant to keep, the server applies the output
+    delta-safe (see _extract_state): a field OMITTED from the output carries its
+    prior value forward untouched, and only an explicitly-emitted field is
+    applied -- a value fills it, an explicit ``null`` clears it. Every field
+    therefore defaults to None (optional in the schema) so a partial output
+    validates instead of erroring. Only user-committed decisions belong here; the
+    catalog-derived fields (data characteristics, gene annotation) are recomputed
+    by the system.
+    """
+
+    organism: Optional[str] = Field(
+        None, description="Species being studied, e.g. 'Saccharomyces cerevisiae'."
+    )
+    assembly: Optional[str] = Field(
+        None,
+        description=(
+            "Reference genome assembly. Include the accession, e.g. "
+            "'S288C (GCF_000146045.2)'."
+        ),
+    )
+    analysis_type: Optional[str] = Field(
+        None,
+        description="Analysis category, e.g. 'Transcriptomics' or 'Variant Calling'.",
+    )
+    workflow: Optional[str] = Field(
+        None,
+        description=(
+            "Specific Galaxy workflow. Include the IWC ID, e.g. "
+            "'Haploid variant calling (varcall-haploid)'."
+        ),
+    )
+    data_source: Optional[str] = Field(
+        None,
+        description=(
+            "Where the input data comes from -- the user's own upload, or public "
+            "ENA/SRA data they'll enter at workflow setup."
+        ),
+    )
+
+
 class ChatRequest(BaseModel):
     """Request body for POST /api/v1/assistant/chat."""
 
@@ -120,6 +166,7 @@ class SessionState(BaseModel):
     """The full state stored in Redis for one assistant session."""
 
     session_id: str
+    owner_keycloak_sub: Optional[str] = None
     schema_state: AnalysisSchema = Field(default_factory=AnalysisSchema)
     messages: List[ChatMessage] = Field(default_factory=list)
     suggestions: List[SuggestionChip] = Field(default_factory=list)

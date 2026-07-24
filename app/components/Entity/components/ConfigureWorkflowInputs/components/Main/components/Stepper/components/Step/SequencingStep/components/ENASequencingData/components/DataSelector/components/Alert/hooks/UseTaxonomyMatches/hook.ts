@@ -1,7 +1,7 @@
-import { Table } from "@tanstack/react-table";
-import { useEffect, useState } from "react";
-import { ReadRun } from "../../../../../../types";
-import { UseTaxonomyMatches } from "./types";
+import type { ReadRun } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
+import type { Table } from "@tanstack/react-table";
+import { useState } from "react";
+import type { UseTaxonomyMatches } from "./types";
 
 export const useTaxonomyMatches = (
   table: Table<ReadRun>
@@ -13,13 +13,12 @@ export const useTaxonomyMatches = (
   const coreCount = coreRows.length;
   const filteredCount = filteredRows.length;
 
-  useEffect(() => {
-    if (taxonomyMatches !== null) return;
-    if (coreCount) {
-      // The table data is ready, set the taxonomy matches to the number of filtered rows.
-      setTaxonomyMatches(filteredCount);
-    }
-  }, [coreCount, filteredCount, taxonomyMatches]);
+  // Once the table data is ready, capture the filtered-row count a single time.
+  // Adjusting state during render is React's recommended alternative to a
+  // sync-in-effect; the null guard means this fires at most once.
+  if (taxonomyMatches === null && coreCount > 0) {
+    setTaxonomyMatches(filteredCount);
+  }
 
   return { taxonomyMatches };
 };

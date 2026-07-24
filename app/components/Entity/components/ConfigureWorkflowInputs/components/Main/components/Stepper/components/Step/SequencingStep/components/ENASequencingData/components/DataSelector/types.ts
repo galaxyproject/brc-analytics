@@ -1,8 +1,7 @@
-import { UseQueryResult } from "@tanstack/react-query";
-import { BaseReadRun } from "../../types";
+import { ENAReadRunsQuery } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
 
 export interface Props {
-  enaTaxonomyId: UseQueryResult<BaseReadRun[]>;
+  enaTaxonomyId: ENAReadRunsQuery;
   onContinue: () => void;
   onOpen: () => void;
   selectedCount: number;

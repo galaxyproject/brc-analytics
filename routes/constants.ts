@@ -1,20 +1,12 @@
 export const ROUTES = {
   ABOUT: "/about",
-  ANALYZE_WORKFLOWS: "/data/assemblies/{entityId}/analyze/workflows",
+  ABOUT_PARTNER_RESOURCES: "/about/partner-resources",
+  ABOUT_ROADMAP: "/about/roadmap",
+  ABOUT_VISION: "/about/vision",
   ASSISTANT: "/assistant",
   CALENDAR: "/calendar",
-  CONFIGURE_CUSTOM_WORKFLOW: "/data/assemblies/{entityId}/analyze/custom",
-  CONFIGURE_ORGANISM_WORKFLOW:
-    "/data/organisms/{entityId}/analyze/workflows/{trsId}",
-  CONFIGURE_WORKFLOW: "/data/assemblies/{entityId}/analyze/workflows/{trsId}",
-  GENOME: "/data/assemblies/{entityId}",
-  GENOMES: "/data/assemblies",
   LEARN: "/learn",
-  ORGANISM: "/data/organisms/{entityId}",
-  ORGANISMS: "/data/organisms",
   PRIORITY_PATHOGEN: "/data/[entityListType]/[entityId]",
   PRIORITY_PATHOGENS: "/data/priority-pathogens",
   ROADMAP: "/roadmap",
-  WORKFLOW: "/data/workflows/{trsId}",
-  WORKFLOWS: "/data/workflows",
 };

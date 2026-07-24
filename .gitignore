@@ -33,6 +33,10 @@ backend/**/.env
 # favicons
 /public/favicons/*
 
+# catalog build
+/catalog/build/temp
+/catalog/ga2/build/temp
+
 # Build Dir
 /out
 

@@ -1,5 +1,5 @@
+import { SectionContentCard } from "@/components/common/Card/components/SectionContentCard/sectionContentCard";
 import { JSX } from "react";
-import { SectionContentCard } from "../../../common/Card/components/SectionContentCard/sectionContentCard";
 import { StyledStack } from "./sectionContentCards.styles";
 import { Props } from "./types";
 

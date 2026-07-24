@@ -1,11 +1,12 @@
-import { ColumnFiltersState } from "@tanstack/react-table";
+import { WORKFLOW_PARAMETER_BY_STEP_KEY } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/CollectionSelector/constants";
 import {
-  Workflow,
-  WorkflowParameter,
-} from "../../../../../../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
-import { StepProps } from "../../../../../../../types";
-import { SEQUENCING_DATA_TYPE } from "../../../../../../types";
-import { WORKFLOW_PARAMETER_BY_STEP_KEY } from "../../constants";
+  SEQUENCING_DATA_FILE_TYPE,
+  SEQUENCING_DATA_TYPE,
+  STEP_KEY_TO_LIBRARY_LAYOUT,
+} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/types";
+import { StepProps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
+import type { Workflow, WorkflowParameter } from "@repo/shared/apis/workflow";
+import { ColumnFiltersState } from "@tanstack/react-table";
 import { CATEGORY_CONFIGS } from "../UseTable/categoryConfigs";
 import { isSequencingDataType } from "./typeGuards";
 
@@ -71,9 +72,7 @@ export function getDescriptionRequirement(
  */
 export function getWorkflowParameter(
   workflow: Pick<Workflow, "parameters">,
-  stepKey:
-    | SEQUENCING_DATA_TYPE.READ_RUNS_PAIRED
-    | SEQUENCING_DATA_TYPE.READ_RUNS_SINGLE
+  stepKey: SEQUENCING_DATA_FILE_TYPE
 ): WorkflowParameter | undefined {
   return workflow.parameters.find(
     ({ variable }) => variable === WORKFLOW_PARAMETER_BY_STEP_KEY[stepKey]
@@ -87,9 +86,7 @@ export function getWorkflowParameter(
  * @returns Filters with layout, strategy, source, and other requirements.
  */
 export function buildFilters(
-  stepKey:
-    | SEQUENCING_DATA_TYPE.READ_RUNS_PAIRED
-    | SEQUENCING_DATA_TYPE.READ_RUNS_SINGLE,
+  stepKey: SEQUENCING_DATA_FILE_TYPE,
   workflowParameter?: WorkflowParameter
 ): Record<string, string[]> {
   const filters: Record<string, string[]> = {};
@@ -100,10 +97,10 @@ export function buildFilters(
     filters[CATEGORY_CONFIGS.LIBRARY_LAYOUT.key] = [
       workflowParameter.data_requirements.library_layout,
     ];
-  } else if (stepKey === SEQUENCING_DATA_TYPE.READ_RUNS_PAIRED) {
-    filters[CATEGORY_CONFIGS.LIBRARY_LAYOUT.key] = ["PAIRED"];
-  } else if (stepKey === SEQUENCING_DATA_TYPE.READ_RUNS_SINGLE) {
-    filters[CATEGORY_CONFIGS.LIBRARY_LAYOUT.key] = ["SINGLE"];
+  } else {
+    filters[CATEGORY_CONFIGS.LIBRARY_LAYOUT.key] = [
+      STEP_KEY_TO_LIBRARY_LAYOUT[stepKey],
+    ];
   }
 
   // Add library strategy requirements if specified in the workflow parameter

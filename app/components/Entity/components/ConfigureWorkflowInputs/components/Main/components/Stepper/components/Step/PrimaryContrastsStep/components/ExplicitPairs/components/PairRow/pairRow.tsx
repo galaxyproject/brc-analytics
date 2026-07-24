@@ -1,8 +1,8 @@
+import { getDisabledValues } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseExplicitContrasts/utils";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { IconButton, MenuItem, Stack, Typography } from "@mui/material";
+import { DeleteIcon } from "@repo/shared/components/CustomIcon/components/DeleteIcon/deleteIcon";
 import { JSX } from "react";
-import { DeleteIcon } from "../../../../../../../../../../../../../../common/CustomIcon/components/DeleteIcon/deleteIcon";
-import { getDisabledValues } from "../../../../hooks/UseExplicitContrasts/utils";
 import { ICON_BUTTON_PROPS, SELECT_PROPS, SVG_ICON_PROPS } from "./constants";
 import { StyledSelect, StyledStack } from "./pairRow.styles";
 import { Props } from "./types";

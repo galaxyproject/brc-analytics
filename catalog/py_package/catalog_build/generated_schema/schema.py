@@ -51,6 +51,7 @@ linkml_meta = LinkMLMeta(
             "./assemblies",
             "./organisms",
             "./outbreaks",
+            "./pangenomes",
             "./workflow_categories",
             "./workflows",
         ],
@@ -61,7 +62,7 @@ linkml_meta = LinkMLMeta(
                 "prefix_reference": "https://w3id.org/linkml/",
             }
         },
-        "source_file": "/home/danielle/Documents/brc-analytics/brc-analytics/catalog/py_package/catalog_build/schema_utils/../schema/schema.yaml",
+        "source_file": "catalog/py_package/catalog_build/schema/schema.yaml",
     }
 )
 
@@ -138,8 +139,11 @@ class WorkflowParameterVariable(str, Enum):
     ASSEMBLY_FASTA_URL = "ASSEMBLY_FASTA_URL"
     FASTA_COLLECTION = "FASTA_COLLECTION"
     GENE_MODEL_URL = "GENE_MODEL_URL"
+    SANGER_READ_RUN_FORWARD_FILE = "SANGER_READ_RUN_FORWARD_FILE"
     SANGER_READ_RUN_PAIRED = "SANGER_READ_RUN_PAIRED"
+    SANGER_READ_RUN_REVERSE_FILE = "SANGER_READ_RUN_REVERSE_FILE"
     SANGER_READ_RUN_SINGLE = "SANGER_READ_RUN_SINGLE"
+    SANGER_READ_RUN_SINGLE_FILE = "SANGER_READ_RUN_SINGLE_FILE"
 
 
 class WorkflowPloidy(str, Enum):
@@ -551,6 +555,45 @@ class MarkdownFileReference(ConfiguredBaseModel):
         return v
 
 
+class Pangenomes(ConfiguredBaseModel):
+    """
+    Root object containing a collection of pangenome definitions for the BRC Analytics platform.
+    """
+
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
+        {
+            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/pangenomes.yaml#",
+            "tree_root": True,
+        }
+    )
+
+    pangenomes: List[Pangenome] = Field(
+        default=...,
+        description="""Collection of pangenome entries that will be available in the BRC Analytics platform.""",
+        json_schema_extra={
+            "linkml_meta": {"alias": "pangenomes", "domain_of": ["Pangenomes"]}
+        },
+    )
+
+
+class Pangenome(ConfiguredBaseModel):
+    """
+    Definition of a pangenome with its unique identifier.
+    """
+
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
+        {
+            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/pangenomes.yaml#"
+        }
+    )
+
+    id: str = Field(
+        default=...,
+        description="""The unique identifier for the pangenome.""",
+        json_schema_extra={"linkml_meta": {"alias": "id", "domain_of": ["Pangenome"]}},
+    )
+
+
 class WorkflowCategories(ConfiguredBaseModel):
     """
     Root object containing a collection of workflow category definitions used to organize workflows in the BRC Analytics platform.
@@ -701,6 +744,20 @@ class Workflow(ConfiguredBaseModel):
         description="""The scope level at which this workflow operates, determining where it is displayed in the UI and what the first configuration step should be. Defaults to ASSEMBLY for backward compatibility.""",
         json_schema_extra={
             "linkml_meta": {"alias": "scope", "domain_of": ["Workflow"]}
+        },
+    )
+    assembly_count_min: Optional[int] = Field(
+        default=None,
+        description="""The minimum number of genome assemblies a user must select for this workflow. Defaults to 1 for ASSEMBLY-scope workflows; must be set explicitly for ORGANISM and SEQUENCE scope. Use 0 for workflows that take no user-selected assemblies (e.g. assembly-building or curated-FASTA workflows).""",
+        json_schema_extra={
+            "linkml_meta": {"alias": "assembly_count_min", "domain_of": ["Workflow"]}
+        },
+    )
+    assembly_count_max: Optional[int] = Field(
+        default=None,
+        description="""The maximum number of genome assemblies a user may select for this workflow. Null/absent means no upper limit. Defaults to 1 for ASSEMBLY-scope workflows; must be set explicitly for ORGANISM and SEQUENCE scope.""",
+        json_schema_extra={
+            "linkml_meta": {"alias": "assembly_count_max", "domain_of": ["Workflow"]}
         },
     )
     taxonomy_id: Optional[int] = Field(
@@ -975,6 +1032,8 @@ Outbreaks.model_rebuild()
 Outbreak.model_rebuild()
 OutbreakResource.model_rebuild()
 MarkdownFileReference.model_rebuild()
+Pangenomes.model_rebuild()
+Pangenome.model_rebuild()
 WorkflowCategories.model_rebuild()
 WorkflowCategory.model_rebuild()
 Workflows.model_rebuild()

@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { ConfiguredInput } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { useCallback, useMemo, useState } from "react";
 import { FormulaSelection, UseFormulaSelection } from "./types";
 import {
   generateFormula,
@@ -21,6 +21,17 @@ export function useFormulaSelection(
     primary: null,
   });
 
+  // Reset selection when the classification changes. Adjusting state during
+  // render (tracking the previous value) is React's recommended alternative to
+  // a reset-in-effect — it avoids the extra commit + re-render.
+  const [prevClassification, setPrevClassification] = useState(
+    sampleSheetClassification
+  );
+  if (sampleSheetClassification !== prevClassification) {
+    setPrevClassification(sampleSheetClassification);
+    setSelection({ covariates: new Set(), primary: null });
+  }
+
   // Grab the columns that are relevant to the formula.
   const columns = useMemo(
     () => getFormulaColumns(sampleSheetClassification),
@@ -39,11 +50,6 @@ export function useFormulaSelection(
   const onToggleCovariate = useCallback((columnName: string): void => {
     setSelection(toggleCovariate(columnName));
   }, []);
-
-  // Reset selection when classification changes.
-  useEffect(() => {
-    setSelection({ covariates: new Set(), primary: null });
-  }, [sampleSheetClassification]);
 
   return {
     columns,

@@ -1,3 +1,10 @@
+import {
+  BaseReadRun,
+  ENAReadRunsQuery,
+  ReadRun,
+} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
+import { getSequencingData } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/utils";
+import { OnConfigure } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 import { arrIncludesSome } from "@databiosphere/findable-ui/lib/components/Table/columnDef/columnFilters/filterFn";
 import { getFacetedUniqueValuesWithArrayValues } from "@databiosphere/findable-ui/lib/components/Table/common/utils";
@@ -6,7 +13,6 @@ import { ROW_POSITION } from "@databiosphere/findable-ui/lib/components/Table/fe
 import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/features/RowPreview/constants";
 import { ROW_SELECTION_VALIDATION } from "@databiosphere/findable-ui/lib/components/Table/features/RowSelectionValidation/constants";
 import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/features/TableDownload/constants";
-import { UseQueryResult } from "@tanstack/react-query";
 import {
   functionalUpdate,
   getCoreRowModel,
@@ -18,9 +24,6 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { OnConfigure } from "../../../../../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { BaseReadRun, ReadRun } from "../../../../types";
-import { getSequencingData } from "../../../../utils";
 import { CATEGORY_GROUPS } from "./categoryGroups";
 import { columns } from "./columnDef";
 import { COLUMN_VISIBILITY, SORTING } from "./constants";
@@ -34,12 +37,13 @@ import {
 } from "./utils";
 
 export const useTable = (
-  enaTaxonomyId: UseQueryResult<BaseReadRun[]>,
+  enaTaxonomyId: ENAReadRunsQuery,
   {
     columnFilters,
     rowSelection,
   }: Pick<TableState, "columnFilters" | "rowSelection">,
-  onConfigure: OnConfigure
+  onConfigure: OnConfigure,
+  singleSelect = false
 ): UseTable => {
   const [data, setData] = useState<ReadRun[]>([]);
 
@@ -80,6 +84,7 @@ export const useTable = (
     downloadFilename: "read-runs",
     enableColumnFilters: true,
     enableFilters: true,
+    enableMultiRowSelection: !singleSelect,
     enableMultiSort: true,
     enableRowSelection,
     enableRowSelectionValidation: true,

@@ -1,9 +1,9 @@
+import { Bullets } from "@/components/common/Bullets/bullets";
 import {
   bpUpMd,
   bpUpSm,
 } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
-import { Bullets } from "../../../../../../../common/Bullets/bullets";
 import {
   CAROUSEL_HEIGHT,
   CAROUSEL_HEIGHT_SM,

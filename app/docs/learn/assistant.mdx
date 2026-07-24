@@ -1,0 +1,37 @@
+---
+breadcrumbs:
+  - path: "/learn"
+    text: "Learn"
+  - path: ""
+    text: "About the Assistant"
+contentType: "ARTICLE"
+description: ""
+enableOutline: true
+title: "About the Assistant"
+---
+
+## What is the Analysis Assistant?
+
+The Analysis Assistant is a chat interface that helps you set up a genomic analysis on BRC Analytics without hunting through the catalog yourself. You describe what you want to do in plain language, and the assistant helps you pick an organism, a genome assembly, and a compatible workflow from the BRC catalog. Once your setup is complete, it hands off to the workflow stepper so you can review the configuration and launch the analysis in Galaxy.
+
+The assistant is in **beta**. Like any AI tool, it can make mistakes -- double-check anything important before relying on it, and use the feedback link on the assistant page to tell us what's working and what isn't.
+
+## How to use it
+
+1. **Ask in plain language.** Start by describing your analysis -- for example, _"I want to call variants for Plasmodium falciparum"_ -- or just say what organism you're working with.
+2. **Explore the catalog.** The assistant looks up real organisms, assemblies, and workflows from the BRC catalog. It will suggest options and ask follow-up questions to narrow things down.
+3. **Configure your analysis.** As you answer, the assistant fills in the pieces it needs: the reference assembly, the workflow, and details about your data.
+4. **Hand off to the workflow stepper.** When the setup is ready, the assistant hands you off to the workflow stepper with your selections pre-filled. From there you can review everything and launch in Galaxy.
+
+If the assistant doesn't have what you're looking for -- for example, an organism or assembly that isn't in the catalog -- it will say so. You can browse the [catalog](/data/organisms) directly, or [open an issue](https://github.com/galaxyproject/brc-analytics/issues) to request that we add it.
+
+## What it can't do (yet)
+
+The assistant is focused on the catalog-to-Galaxy setup flow described above. It can't:
+
+- Help with analyses or workflows that aren't in the BRC catalog, or build a custom analysis pipeline from scratch.
+- Work with organisms, assemblies, or annotation files that aren't already in the catalog.
+- Interpret your results, write or summarize papers, or answer general research questions.
+- Browse external resources (like UCSC Genome Browser tracks) on your behalf.
+
+If you need something it can't do, [open an issue](https://github.com/galaxyproject/brc-analytics/issues) and let us know -- it helps us prioritize.

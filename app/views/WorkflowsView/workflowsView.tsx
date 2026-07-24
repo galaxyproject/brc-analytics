@@ -1,11 +1,11 @@
-import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
-import { JSX, useEffect, useMemo, useState } from "react";
 import {
   getOrganisms,
   getWorkflows as getWorkflowCategories,
-} from "../../../app/services/workflows/entities";
-import { WorkflowAssemblyMapping } from "../../apis/catalog/brc-analytics-catalog/common/entities";
-import { API } from "../../services/workflows/routes";
+} from "@/services/workflows/entities";
+import { API } from "@/services/workflows/routes";
+import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
+import type { WorkflowAssemblyMapping } from "@repo/shared/apis/workflow";
+import { JSX, useEffect, useMemo, useState } from "react";
 import { ExploreView } from "../ExploreView/exploreView";
 import { Workflows } from "./components/Workflows/workflows";
 import { Organism } from "./types";
@@ -19,7 +19,7 @@ import { getWorkflows } from "./utils";
 export const WorkflowsView = (): JSX.Element => {
   const workflowCategories = getWorkflowCategories();
   const organisms = getOrganisms<Organism>();
-  const isFluEnabled = useFeatureFlag("flu");
+  const isAssemblyWorkflowsEnabled = useFeatureFlag("assembly-workflows");
   const isHyphyEnabled = useFeatureFlag("hyphy");
   const isLmlsEnabled = useFeatureFlag("lmls");
   const [mappings, setMappings] = useState<WorkflowAssemblyMapping[] | null>(
@@ -46,13 +46,13 @@ export const WorkflowsView = (): JSX.Element => {
             workflowCategories,
             mappings,
             organisms,
+            isAssemblyWorkflowsEnabled,
             isLmlsEnabled,
-            isFluEnabled,
             isHyphyEnabled
           )
         : [],
     [
-      isFluEnabled,
+      isAssemblyWorkflowsEnabled,
       isHyphyEnabled,
       isLmlsEnabled,
       mappings,

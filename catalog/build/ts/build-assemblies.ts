@@ -67,6 +67,7 @@ export async function buildAssemblies(
       ploidy,
       priority: outbreak?.priority ?? null,
       priorityPathogenName: outbreak?.name ?? null,
+      releaseDate: row.releaseDate,
       scaffoldCount: parseNumberOrNull(row.scaffoldCount),
       scaffoldL50: parseNumberOrNull(row.scaffoldL50),
       scaffoldN50: parseNumberOrNull(row.scaffoldN50),

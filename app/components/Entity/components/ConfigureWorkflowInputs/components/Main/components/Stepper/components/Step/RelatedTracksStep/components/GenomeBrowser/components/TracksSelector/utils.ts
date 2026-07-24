@@ -1,7 +1,7 @@
+import { getSelectedTracks } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/utils";
+import { UcscTrackNode } from "@/utils/ucsc-tracks-api/entities";
+import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { Table } from "@tanstack/react-table";
-import { UcscTrackNode } from "../../../../../../../../../../../../../../../utils/ucsc-tracks-api/entities";
-import { ConfiguredInput } from "../../../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { getSelectedTracks } from "../../../../utils";
 
 /**
  * Clears the tracks data.

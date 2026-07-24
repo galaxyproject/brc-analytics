@@ -1,12 +1,12 @@
+import { OrganismAvatar } from "@/components/Entity/components/OrganismAvatar/organismAvatar";
 import { KeyValuePairs } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/keyValuePairs";
+import { buildAssemblyDetails } from "@repo/shared/viewModelBuilders/viewModelBuilders";
+import { StyledSection } from "@repo/shared/views/EntityView/components/KeyValueSection/keyValueSection.styles";
+import { KeyElType } from "@repo/shared/views/EntityView/ui/KeyElType/keyElType";
+import { KeyValueElType } from "@repo/shared/views/EntityView/ui/KeyValueElType/keyValueElType";
+import { SectionTitle } from "@repo/shared/views/EntityView/ui/SectionTitle/sectionTitle";
+import { ValueElType } from "@repo/shared/views/EntityView/ui/ValueElType/valueElType";
 import { Fragment, JSX } from "react";
-import { OrganismAvatar } from "../../../../../../../../components/Entity/components/OrganismAvatar/organismAvatar";
-import { buildAssemblyDetails } from "../../../../../../../../viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { StyledSection } from "../../../../../../components/KeyValueSection/keyValueSection.styles";
-import { KeyElType } from "../../../../../../ui/KeyElType/keyElType";
-import { KeyValueElType } from "../../../../../../ui/KeyValueElType/keyValueElType";
-import { SectionTitle } from "../../../../../../ui/SectionTitle/sectionTitle";
-import { ValueElType } from "../../../../../../ui/ValueElType/valueElType";
 import { Props } from "./types";
 
 /**

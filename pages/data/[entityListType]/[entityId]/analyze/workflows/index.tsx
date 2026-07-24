@@ -1,16 +1,19 @@
-import {
+import { getPageMeta } from "@/common/meta/utils";
+import { config } from "@/config/config";
+import { ENTITY_KEYS } from "@/providers/workflowHandoff/constants";
+import type { EntityKey } from "@/providers/workflowHandoff/types";
+import { getEntities } from "@/utils/entityUtils";
+import { seedDatabase } from "@/utils/seedDatabase";
+import { AnalyzeWorkflowsRouteView } from "@/views/AnalyzeWorkflowsRouteView/analyzeWorkflowsRouteView";
+import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
+import type {
   GetStaticPaths,
   GetStaticPathsResult,
   GetStaticProps,
   GetStaticPropsContext,
 } from "next";
-import { ParsedUrlQuery } from "querystring";
+import type { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
-import { getPageMeta } from "../../../../../../app/common/meta/utils";
-import { config } from "../../../../../../app/config/config";
-import { getEntities } from "../../../../../../app/utils/entityUtils";
-import { seedDatabase } from "../../../../../../app/utils/seedDatabase";
-import { AnalyzeWorkflowsView } from "../../../../../../app/views/AnalyzeWorkflowsView/analyzeWorkflowsView";
 
 interface Params extends ParsedUrlQuery {
   entityId: string;
@@ -19,7 +22,7 @@ interface Params extends ParsedUrlQuery {
 
 export interface Props {
   entityId: string;
-  entityListType: string;
+  entityListType: EntityKey;
   pageDescription?: string;
   pageTitle?: string;
 }
@@ -30,8 +33,13 @@ export const getStaticPaths: GetStaticPaths<Params> = async () => {
   for (const entityConfig of config().entities) {
     const { route: entityListType } = entityConfig;
 
-    // Only statically generate paths for assemblies.
-    if (entityListType !== "assemblies") continue;
+    // Statically generate a single base path per assembly and per organism; the
+    // selected workflow is carried at runtime as a `trsId` query param.
+    if (
+      entityListType !== ENTITY_KEYS.ASSEMBLIES &&
+      entityListType !== ENTITY_KEYS.ORGANISMS
+    )
+      continue;
 
     await seedDatabase(entityListType, entityConfig);
 
@@ -61,19 +69,27 @@ export const getStaticProps: GetStaticProps<Props> = async ({
   return {
     props: {
       entityId,
-      entityListType,
+      // getStaticPaths only emits assembly/organism paths, so this is an EntityKey.
+      entityListType: entityListType as EntityKey,
       ...pageMeta,
     },
   };
 };
 
 /**
- * Analyze Workflows view page.
+ * Analyze workflows page.
  * @param props - Page props.
- * @returns Analyze Workflows view component.
+ * @param props.entityId - Entity ID.
+ * @param props.entityListType - Entity list type.
+ * @returns Analyze workflows route view.
  */
-const Page = (props: Props): JSX.Element => {
-  return <AnalyzeWorkflowsView entityId={props.entityId} />;
-};
+const Page = ({ entityId, entityListType }: Props): JSX.Element => (
+  <EntityDataGate>
+    <AnalyzeWorkflowsRouteView
+      entityId={entityId}
+      entityListType={entityListType}
+    />
+  </EntityDataGate>
+);
 
 export default Page;

@@ -1,5 +1,5 @@
+import { Outbreak } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { COLLATOR_CASE_INSENSITIVE } from "@databiosphere/findable-ui/lib/common/constants";
-import { Outbreak } from "../../apis/catalog/brc-analytics-catalog/common/entities";
 import { PRIORITY } from "./constants";
 
 /**

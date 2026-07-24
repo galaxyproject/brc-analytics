@@ -1,24 +1,27 @@
+import { ChatPanel, SchemaPanel } from "@/components/Assistant";
+import { useAssistantChat } from "@/hooks/useAssistantChat";
+import { assistantAPIClient } from "@/services/assistant-api-client";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import { Box, Button } from "@mui/material";
+import { Button } from "@mui/material";
+import type { AssistantInfoResponse } from "@repo/shared/services/api-client/types";
 import Error from "next/error";
-import { Fragment, JSX, useEffect, useState } from "react";
-import { ChatPanel, SchemaPanel } from "../../components/Assistant";
-import { SectionHero } from "../../components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
-import { useAssistantChat } from "../../hooks/useAssistantChat";
-import { llmAPIClient } from "../../services/llm-api-client";
-import { AssistantInfoResponse } from "../../types/api";
+import { JSX, useEffect, useState } from "react";
 import {
   AssistantDisclaimer,
-  AssistantSection,
   ChatColumn,
   SchemaColumn,
   SectionContent,
+  StyledSection,
   TwoPanelLayout,
 } from "./assistantView.styles";
-import { BREADCRUMBS } from "./common/constants";
+import { Headline } from "./components/Headline/headline";
 
-export const AssistantView = (): JSX.Element => {
+interface Props {
+  initialSessionId?: string;
+}
+
+export const AssistantView = ({ initialSessionId }: Props): JSX.Element => {
   const isAssistantEnabled = useFeatureFlag("assistant");
   const {
     error,
@@ -28,16 +31,21 @@ export const AssistantView = (): JSX.Element => {
     messages,
     onRetry,
     resetSession,
+    saveAnalysis,
+    saveLoading,
+    saveMessage,
     schema,
     sendMessage,
     suggestions,
-  } = useAssistantChat();
+  } = useAssistantChat({
+    initialSessionId,
+  });
   const [info, setInfo] = useState<AssistantInfoResponse | null>(null);
 
   useEffect(() => {
     if (!isAssistantEnabled) return;
     let cancelled = false;
-    llmAPIClient
+    assistantAPIClient
       .assistantInfo()
       .then((data) => {
         if (!cancelled) setInfo(data);
@@ -56,48 +64,43 @@ export const AssistantView = (): JSX.Element => {
   const modelLabel = formatModelLabel(info);
 
   return (
-    <Fragment>
-      <SectionHero
-        breadcrumbs={BREADCRUMBS}
-        head="Analysis Assistant"
-        subHead="Explore data and configure analyses with AI guidance"
-      />
-      <AssistantSection>
-        <SectionContent>
-          <Box sx={{ display: "flex", justifyContent: "flex-end", pb: 1 }}>
-            <Button
-              onClick={resetSession}
-              size="small"
-              startIcon={<RestartAltIcon />}
-              sx={{ visibility: showReset ? "visible" : "hidden" }}
-              variant="text"
-            >
-              New Conversation
-            </Button>
-          </Box>
-          <TwoPanelLayout>
-            <ChatColumn>
-              <ChatPanel
-                error={error}
-                isRestoring={isRestoring}
-                loading={loading}
-                messages={messages}
-                onRetry={onRetry}
-                onSend={sendMessage}
-                suggestions={suggestions}
-              />
-            </ChatColumn>
-            <SchemaColumn>
-              <SchemaPanel handoffUrl={handoffUrl} schema={schema} />
-            </SchemaColumn>
-          </TwoPanelLayout>
-          <AssistantDisclaimer>
-            AI assistant — {modelLabel}. Responses can be inaccurate; verify
-            anything important before relying on it.
-          </AssistantDisclaimer>
-        </SectionContent>
-      </AssistantSection>
-    </Fragment>
+    <StyledSection>
+      <SectionContent>
+        <Headline />
+        <Button
+          onClick={resetSession}
+          size="small"
+          startIcon={<RestartAltIcon />}
+          sx={{ visibility: showReset ? "visible" : "hidden" }}
+          variant="text"
+        >
+          New Conversation
+        </Button>
+        <TwoPanelLayout>
+          <ChatColumn>
+            <ChatPanel
+              error={error}
+              isRestoring={isRestoring}
+              loading={loading}
+              messages={messages}
+              onRetry={onRetry}
+              onSave={saveAnalysis}
+              onSend={sendMessage}
+              saveLabel={saveMessage}
+              saveLoading={saveLoading}
+              suggestions={suggestions}
+            />
+          </ChatColumn>
+          <SchemaColumn>
+            <SchemaPanel handoffUrl={handoffUrl} schema={schema} />
+          </SchemaColumn>
+        </TwoPanelLayout>
+        <AssistantDisclaimer>
+          AI assistant — {modelLabel}. Responses can be inaccurate; verify
+          anything important before relying on it.
+        </AssistantDisclaimer>
+      </SectionContent>
+    </StyledSection>
   );
 };
 

@@ -4,9 +4,9 @@ import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/m
 import { formatFileSize } from "@databiosphere/findable-ui/lib/utils/formatFileSize";
 import { FolderZipRounded } from "@mui/icons-material";
 import { IconButton, Stack, Typography } from "@mui/material";
+import { DeleteIcon } from "@repo/shared/components/CustomIcon/components/DeleteIcon/deleteIcon";
+import { ScanDeleteIcon } from "@repo/shared/components/CustomIcon/components/ScanDeleteIcon/scanDeleteIcon";
 import { JSX, ReactNode } from "react";
-import { DeleteIcon } from "../../../../../../../../../../../../common/CustomIcon/components/DeleteIcon/deleteIcon";
-import { ScanDeleteIcon } from "../../../../../../../../../../../../common/CustomIcon/components/ScanDeleteIcon/scanDeleteIcon";
 import { Props } from "./types";
 import { StyledRoundedPaper } from "./uploadedFile.styles";
 

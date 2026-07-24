@@ -1,12 +1,13 @@
-import {
+import type {
   Workflow,
   WorkflowCategory,
   WorkflowParameter,
-} from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
+} from "@repo/shared/apis/workflow";
 import {
   Workflow as SourceWorkflow,
   WorkflowCategories as SourceWorkflowCategories,
   Workflows as SourceWorkflows,
+  WorkflowParameterVariable,
   WorkflowScope,
 } from "../../schema/generated/schema";
 import { readYamlFile } from "./utils";
@@ -94,6 +95,8 @@ function buildWorkflow(
   sourceWorkflow: SourceWorkflow
 ): void {
   const {
+    assembly_count_max: assemblyCountMax,
+    assembly_count_min: assemblyCountMin,
     categories,
     iwc_id: iwcId,
     parameters: sourceParameters,
@@ -174,11 +177,49 @@ function buildWorkflow(
     // Add parameter if it has variable, url_spec, or collection_spec
     if (variable || url_spec || collection_spec) parameters.push(parameter);
   }
+
+  // Validate paired-file variable consistency: both forward and reverse must be present together
+  const variables = parameters.map((p) => p.variable).filter((v) => !!v);
+  const hasForward = variables.includes(
+    WorkflowParameterVariable.SANGER_READ_RUN_FORWARD_FILE
+  );
+  const hasReverse = variables.includes(
+    WorkflowParameterVariable.SANGER_READ_RUN_REVERSE_FILE
+  );
+  if (hasForward !== hasReverse) {
+    console.warn(
+      `Workflow "${workflowName}" skipped: SANGER_READ_RUN_FORWARD_FILE and SANGER_READ_RUN_REVERSE_FILE must both be present or both absent.`
+    );
+    return;
+  }
+
+  const resolvedScope = scope ?? WorkflowScope.ASSEMBLY;
+
+  // Resolve assembly count defaults based on scope.
+  // ASSEMBLY scope: default 1/1 (single assembly selection).
+  // ORGANISM and SEQUENCE: must be declared explicitly.
+  let resolvedMin: number;
+  let resolvedMax: number | null;
+  if (resolvedScope === WorkflowScope.ASSEMBLY) {
+    resolvedMin = assemblyCountMin ?? 1;
+    resolvedMax = assemblyCountMax ?? 1;
+  } else {
+    if (assemblyCountMin === null || assemblyCountMin === undefined) {
+      throw new Error(
+        `Workflow "${workflowName}" (scope: ${resolvedScope}): assembly_count_min is required for ORGANISM and SEQUENCE scope workflows`
+      );
+    }
+    resolvedMin = assemblyCountMin;
+    resolvedMax = assemblyCountMax ?? null;
+  }
+
   const workflow: Workflow = {
+    assemblyCountMax: resolvedMax,
+    assemblyCountMin: resolvedMin,
     iwcId,
     parameters,
     ploidy,
-    scope: scope ?? WorkflowScope.ASSEMBLY,
+    scope: resolvedScope,
     taxonomyId: typeof taxonomyId === "number" ? String(taxonomyId) : null,
     trsId,
     workflowDescription,

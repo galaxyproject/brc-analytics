@@ -1,7 +1,10 @@
+import { FILL } from "@/components/Layout/components/Hero/common/constants";
+import {
+  ELEMENT_ID,
+  PATTERN_UNIT,
+} from "@/components/Layout/components/Hero/common/entities";
+import { getElementHref } from "@/components/Layout/components/Hero/common/utils";
 import { JSX } from "react";
-import { FILL } from "../../../common/constants";
-import { ELEMENT_ID, PATTERN_UNIT } from "../../../common/entities";
-import { getElementHref } from "../../../common/utils";
 
 export interface SmokeCircleProps {
   gridSize: number;

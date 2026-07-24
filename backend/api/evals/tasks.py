@@ -10,6 +10,8 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
+import time
 from dataclasses import dataclass, field
 from typing import Any, Callable, Optional
 
@@ -17,9 +19,9 @@ from pydantic_ai.messages import ModelResponse, ToolCallPart
 
 from app.core.cache import CacheService
 from app.core.config import Settings, get_settings
-from app.models.llm import WorkflowSuggestionRequest
+from app.models.assistant import AnalysisSchema
 from app.services.assistant_agent import AssistantAgent
-from app.services.llm_service import LLMService
+from app.services.sra_mirror import SRAMirrorService
 from app.services.tools.catalog_data import CatalogData
 from app.services.tools.catalog_tools import AssistantDeps
 from evals.judge import build_pydantic_ai_model
@@ -51,35 +53,42 @@ class EvalDeps:
     """Shared per-run state.
 
     Settings and catalog are reused across the whole CLI invocation; cache is
-    rebuilt per (dataset, model) run via `with_fresh_cache()` so that
-    LLMService's content-keyed cache entries (llm:interpret, llm:workflow)
-    can't leak from one model's output into another model's input.
+    rebuilt per (dataset, model) run via `with_fresh_cache()` so that one
+    model's session state can't leak into another model's input.
     """
 
     settings: Settings
     cache: CacheService
     catalog: CatalogData
+    sra_mirror: Optional[SRAMirrorService] = None
 
     def with_fresh_cache(self) -> "EvalDeps":
         return EvalDeps(
-            settings=self.settings, cache=_make_cache(), catalog=self.catalog
+            settings=self.settings,
+            cache=_make_cache(),
+            catalog=self.catalog,
+            sra_mirror=self.sra_mirror,
         )
 
 
-@dataclass
-class SearchOutput:
-    organism: Optional[str]
-    taxonomy_id: Optional[str]
-    library_strategy: Optional[str]
-    sequencing_platform: Optional[str]
-    confidence: float
-    raw: dict
+class DatasetRequirementError(RuntimeError):
+    """A dataset build() precondition was not met.
+
+    The runner catches this and skips the dataset with a clear message,
+    rather than running cases that would score a misleading 0.0.
+    """
 
 
-@dataclass
-class WorkflowRecOutput:
-    iwc_ids: list[str]
-    raw: list[dict]
+def require_sra_mirror(deps: EvalDeps) -> None:
+    """Guard SRA datasets: without an available mirror, no sra_* tools
+    register and every case scores a flat 0.0 that reads like a model
+    regression. Fail loudly with an actionable message instead."""
+    if deps.sra_mirror is None or not deps.sra_mirror.is_available():
+        raise DatasetRequirementError(
+            "This dataset requires SRA_MIRROR_PATH to point at a built SRA "
+            "mirror. Without it, no sra_* tools register and every case "
+            "scores a misleading 0.0. Set SRA_MIRROR_PATH and re-run."
+        )
 
 
 @dataclass
@@ -101,9 +110,9 @@ class ConversationOutput:
 @dataclass
 class _InMemoryCache:
     """Dict-backed cache that satisfies the CacheService surface used by
-    SessionService and LLMService. Persists for the lifetime of the run so
-    multi-turn conversations can actually load their session between turns.
-    Naturally case-isolated because session_ids are minted fresh per case."""
+    SessionService. Persists for the lifetime of the run so multi-turn
+    conversations can actually load their session between turns. Naturally
+    case-isolated because session_ids are minted fresh per case."""
 
     _store: dict[str, Any] = field(default_factory=dict)
 
@@ -122,9 +131,9 @@ class _InMemoryCache:
 
     def make_key(self, prefix: str, params: Any) -> str:
         param_str = json.dumps(params, sort_keys=True, default=str)
-        hash_val = hashlib.md5(
-            param_str.encode(), usedforsecurity=False
-        ).hexdigest()[:16]
+        hash_val = hashlib.md5(param_str.encode(), usedforsecurity=False).hexdigest()[
+            :16
+        ]
         return f"{prefix}:{hash_val}"
 
 
@@ -138,28 +147,35 @@ def build_deps(skip_env_vars: Optional[set[str]] = None) -> EvalDeps:
     settings = get_settings()
     cache = _make_cache()
     catalog = CatalogData(settings.CATALOG_PATH)
-    return EvalDeps(settings=settings, cache=cache, catalog=catalog)
+    sra_mirror = (
+        SRAMirrorService(settings.SRA_MIRROR_PATH) if settings.SRA_MIRROR_PATH else None
+    )
+    return EvalDeps(
+        settings=settings, cache=cache, catalog=catalog, sra_mirror=sra_mirror
+    )
 
 
 def _override_model(svc: Any, entry: ModelEntry) -> None:
-    """Swap agent models on a service to the eval target.
+    """Swap the agent's model(s) to the eval target.
 
     Mutates `_model` directly because pydantic-ai exposes `model` as a
-    read-only property. All three legacy LLMService agents share the same
-    candidate model -- we score the candidate end-to-end, not the
-    primary/secondary split.
+    read-only property. Covers both the conversational agent and the state
+    extractor.
+
+    The extractor's OUTPUT MODE was fixed at init from the deploy's settings,
+    not this target -- so after the swap we re-derive it from the target's
+    provider (tool for Anthropic, prompted otherwise). Without this a
+    mixed-provider run could run the extractor in the wrong mode (e.g. tool mode
+    against MiniMax, which loops), skewing ExtractSuccessRate.
     """
     new_model = build_pydantic_ai_model(entry)
-    if hasattr(svc, "primary_model"):
-        svc.primary_model = new_model
-    if hasattr(svc, "secondary_model"):
-        svc.secondary_model = new_model
-    for attr in ("reasoning_agent", "formatting_agent", "workflow_agent"):
+    for attr in ("agent", "extract_agent"):
         agent = getattr(svc, attr, None)
         if agent is not None:
             agent._model = new_model
-    if getattr(svc, "agent", None) is not None:
-        svc.agent._model = new_model
+    rebuild = getattr(svc, "rebuild_extractor", None)
+    if rebuild is not None:
+        rebuild("tool" if entry.provider == "anthropic" else "prompted")
 
 
 def _prepare_service(svc: Any, entry: ModelEntry) -> None:
@@ -169,54 +185,6 @@ def _prepare_service(svc: Any, entry: ModelEntry) -> None:
             f"{type(svc).__name__} failed to initialize -- check AI_API_KEY in env"
         )
     _override_model(svc, entry)
-
-
-# ---------- Search query interpretation ----------
-
-
-def make_search_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
-    svc = LLMService(deps.cache)
-    _prepare_service(svc, entry)
-
-    async def task(case_input: dict) -> SearchOutput:
-        resp = await svc.interpret_search_query(case_input["query"])
-        # For INVALID_QUERY (gibberish, off-topic) LLMService returns success=False
-        # but still populates data with low-confidence values. Pass that through so
-        # evaluators can score "did the model correctly reject this?" -- only treat
-        # a truly empty data payload as a structural failure.
-        if resp.data is None:
-            raise RuntimeError(resp.error or "LLMService returned failure")
-        d = resp.data
-        return SearchOutput(
-            organism=d.organism,
-            taxonomy_id=d.taxonomy_id,
-            library_strategy=d.library_strategy,
-            sequencing_platform=d.sequencing_platform,
-            confidence=float(d.confidence or 0.0),
-            raw=d.model_dump(),
-        )
-
-    return task
-
-
-# ---------- Workflow recommendation ----------
-
-
-def make_workflow_rec_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
-    svc = LLMService(deps.cache)
-    _prepare_service(svc, entry)
-
-    async def task(case_input: dict) -> WorkflowRecOutput:
-        req = WorkflowSuggestionRequest(**case_input)
-        resp = await svc.suggest_workflows(req)
-        if not resp.success or resp.data is None:
-            raise RuntimeError(resp.error or "suggest_workflows returned failure")
-        return WorkflowRecOutput(
-            iwc_ids=[r.workflow_id for r in resp.data],
-            raw=[r.model_dump() for r in resp.data],
-        )
-
-    return task
 
 
 # ---------- Single-turn assistant tool selection ----------
@@ -240,11 +208,13 @@ def _extract_tool_calls(result: Any) -> list[tuple[str, dict]]:
 
 def make_assistant_turn_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
     """Single-turn assistant: takes a user message, returns reply + tool calls."""
-    aa = AssistantAgent(deps.cache)
+    aa = AssistantAgent(deps.cache, sra_mirror=deps.sra_mirror)
     _prepare_service(aa, entry)
 
     async def task(case_input: dict) -> AgentTurnOutput:
-        agent_deps = AssistantDeps(catalog=aa.catalog)
+        agent_deps = AssistantDeps(
+            catalog=aa.catalog, sra_mirror=deps.sra_mirror, con=aa.query_con
+        )
         result = await aa._run_agent_with_retry(
             case_input["message"], deps=agent_deps, message_history=None
         )
@@ -266,7 +236,7 @@ def make_assistant_turn_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
 
 def make_assistant_conversation_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
     """Replay a scripted conversation and report the final accumulated state."""
-    aa = AssistantAgent(deps.cache)
+    aa = AssistantAgent(deps.cache, sra_mirror=deps.sra_mirror)
     _prepare_service(aa, entry)
 
     async def task(case_input: dict) -> ConversationOutput:
@@ -281,6 +251,166 @@ def make_assistant_conversation_task(deps: EvalDeps, entry: ModelEntry) -> Calla
             is_complete=last_resp.is_complete,
             reply=last_resp.reply,
             handoff_url=last_resp.handoff_url,
+        )
+
+    return task
+
+
+# ---------- Structured channel (extraction pass: reply + state extractor) ----------
+
+# State is captured by a separate extractor, not the conversational reply. The
+# crux this task measures per model: the conversational reply produces reliably
+# (plain text, ~always), the extractor produces its snapshot reliably, capture
+# on state-changing turns, no state leak in the reply, and final-tracker
+# correctness. See datasets/structured_channel.py for the metrics.
+
+# A leak is a state TRAILER in the reply -- a SCHEMA_UPDATE:/SUGGESTIONS: marker
+# followed by a JSON opener -- not the bare English word. Matching the word
+# would false-positive on prose like "here are a few suggestions" and skew
+# NoLeak on the extraction pass, where the reply is plain prose.
+# \s* before the opener (not just [ \t]*) so a next-line trailer -- SUGGESTIONS:\n
+# [...] / SCHEMA_UPDATE:\n{...} -- is still caught; the production parser skips
+# any whitespace (incl newlines) between the marker and the JSON opener, so the
+# leak detector must too or NoLeak reads clean while a trailer survived (Copilot).
+_LEAK_RE = re.compile(
+    r"\*{0,2}\b(?:schema_update|suggestions)\b\*{0,2}[ \t]*:?[ \t]*\*{0,2}\s*[\[{]",
+    re.IGNORECASE,
+)
+
+
+@dataclass
+class TurnTrace:
+    """Per-turn instrumentation of the extraction pass."""
+
+    index: int
+    expected_change: bool
+    reply_produced: bool  # the conversational call returned a reply (no error)
+    extract_produced: bool  # the extractor returned a valid snapshot (no error)
+    state_nonempty: bool  # applying the updates changed a tracked field's value/status
+    leaked: bool  # a state marker survived into the visible reply
+
+
+@dataclass
+class StructuredChannelOutput:
+    turns: list[TurnTrace]
+    final_schema: dict
+    is_complete: bool
+    replies: list[str]
+
+
+def _has_leak_marker(text: str) -> bool:
+    return bool(_LEAK_RE.search(text))
+
+
+def make_structured_channel_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
+    """Replay a scripted conversation through the extraction pass, reporting
+    per-turn reply/extract production, capture, leak, and the final schema.
+
+    Runs the conversational call and the extractor separately (mirroring chat())
+    so an endpoint failure in either scores as a non-production, not a crash. The
+    extractor is called directly (not aa._extract_state, which swallows failures)
+    so extract-success can be measured.
+    """
+    from app.services.assistant_agent import (
+        _STATE_FIELDS,
+        ASSISTANT_TURN_BUDGET_SECONDS,
+        EXTRACT_MIN_BUDGET_SECONDS,
+        EXTRACT_RUN_TIMEOUT_SECONDS,
+    )
+
+    aa = AssistantAgent(deps.cache, sra_mirror=deps.sra_mirror)
+    _prepare_service(aa, entry)
+
+    async def task(case_input: dict) -> StructuredChannelOutput:
+        schema = AnalysisSchema()
+        history: Optional[list] = None
+        turns: list[TurnTrace] = []
+        replies: list[str] = []
+        for i, turn in enumerate(case_input["turns"]):
+            agent_deps = AssistantDeps(
+                catalog=aa.catalog, sra_mirror=deps.sra_mirror, con=aa.query_con
+            )
+            augmented = aa._wrap_user_message(schema, turn["text"])
+            # Mirror production: truncate restored history before the run so a long
+            # eval conversation doesn't feed the model more context than chat()
+            # would.
+            if history:
+                history = aa._truncate_history(history)
+            reply_produced = True
+            reply_text = ""
+            turn_start = time.time()
+            try:
+                result = await aa._run_agent_with_retry(
+                    augmented, deps=agent_deps, message_history=history
+                )
+                reply_text, _c, _s = aa._parse_structured_output(str(result.output))
+                history = result.all_messages()
+            except Exception:
+                reply_produced = False
+                history = None
+
+            # Extractor: a separate focused call. Call it directly so we can see
+            # a failure (aa._extract_state would swallow it as copy-forward).
+            # Starts False -- if the reply failed the extractor never runs, so
+            # the turn genuinely produced no snapshot; it flips True only on a
+            # successful extraction.
+            extract_produced = False
+            state_nonempty = False
+            # Mirror production's turn budget: the extractor only runs with the
+            # time left after the reply, and is skipped (copy-forward, no capture)
+            # if the reply already spent the budget.
+            remaining = ASSISTANT_TURN_BUDGET_SECONDS - (time.time() - turn_start)
+            if reply_produced and remaining >= EXTRACT_MIN_BUDGET_SECONDS:
+                payload = aa.build_extract_payload(schema, turn["text"], reply_text)
+                try:
+                    # Mirror production chat() exactly: no-retry extractor call
+                    # (_run_agent_once) + delta-safe apply (_snapshot_to_updates,
+                    # keying off model_fields_set) so an omitted field carries
+                    # forward instead of being read as a clear. Building a full
+                    # {n: getattr(...)} dict here would collapse the omitted-vs-
+                    # explicit-null distinction and make the eval diverge from
+                    # real behavior.
+                    er = await aa._run_agent_once(
+                        payload,
+                        agent=aa.extract_agent,
+                        timeout=min(EXTRACT_RUN_TIMEOUT_SECONDS, remaining),
+                    )
+                    updates = aa._snapshot_to_updates(er.output, schema)
+                    # "Captured a change" = the apply actually changed a tracked
+                    # field. A clear of an already-empty field, or a no-op
+                    # restatement, must NOT count (bool(updates) would over-count
+                    # those). Compare the tracked fields' (value, status) pre/post.
+                    before = {
+                        n: (getattr(schema, n).value, getattr(schema, n).status)
+                        for n in _STATE_FIELDS
+                    }
+                    schema = aa._apply_schema_updates(schema, updates)
+                    state_nonempty = any(
+                        before[n]
+                        != (getattr(schema, n).value, getattr(schema, n).status)
+                        for n in _STATE_FIELDS
+                    )
+                    extract_produced = True
+                except Exception:
+                    extract_produced = False
+
+            turns.append(
+                TurnTrace(
+                    index=i,
+                    expected_change=bool(turn.get("expect_state_change", False)),
+                    reply_produced=reply_produced,
+                    extract_produced=extract_produced,
+                    state_nonempty=state_nonempty,
+                    leaked=_has_leak_marker(reply_text),
+                )
+            )
+            replies.append(reply_text)
+
+        return StructuredChannelOutput(
+            turns=turns,
+            final_schema=schema.model_dump(),
+            is_complete=schema.is_complete(),
+            replies=replies,
         )
 
     return task

@@ -85,6 +85,7 @@ SAMPLE_WORKFLOWS = [
                 "iwcId": "rnaseq-pe",
                 "workflowName": "RNA-Seq Paired End",
                 "workflowDescription": "PE RNA-Seq analysis",
+                "scope": "ASSEMBLY",
                 "ploidy": "ANY",
                 "trsId": "#workflow/github.com/iwc/rnaseq-pe/main",
                 "parameters": [
@@ -102,6 +103,7 @@ SAMPLE_WORKFLOWS = [
                 "iwcId": "varcall-haploid",
                 "workflowName": "Variant Calling (Haploid)",
                 "workflowDescription": "Haploid variant calling",
+                "scope": "ASSEMBLY",
                 "ploidy": "HAPLOID",
                 "trsId": "#workflow/github.com/iwc/varcall-haploid/main",
                 "taxonomyId": None,
@@ -111,8 +113,23 @@ SAMPLE_WORKFLOWS = [
                 "iwcId": "varcall-diploid",
                 "workflowName": "Variant Calling (Diploid)",
                 "workflowDescription": "Diploid variant calling",
+                "scope": "ASSEMBLY",
                 "ploidy": "DIPLOID",
                 "trsId": "#workflow/github.com/iwc/varcall-diploid/main",
+                "taxonomyId": None,
+                "parameters": [],
+            },
+            {
+                # ORGANISM-scope (assembly-building) workflow: ANY ploidy and no
+                # taxonomy restriction, so it WOULD match if scope were ignored.
+                # The assistant can't drive its 0/2+-assembly flow, so it must be
+                # hidden from every catalog tool (#1321).
+                "iwcId": "assembly-with-flye",
+                "workflowName": "Assembly with Flye",
+                "workflowDescription": "Long-read de novo genome assembly",
+                "scope": "ORGANISM",
+                "ploidy": "ANY",
+                "trsId": "#workflow/github.com/iwc/assembly-with-flye/main",
                 "taxonomyId": None,
                 "parameters": [],
             },
@@ -171,6 +188,47 @@ class TestSearchOrganisms:
         assert org["reference_assembly_count"] == 1
         assert org["has_gene_annotation"] is True
         assert "HAPLOID" in org["ploidies"]
+
+
+# ---------- find_organism_exact (catalog grounding, #1297) ----------
+
+
+class TestFindOrganismExact:
+    def test_exact_species_match(self, catalog):
+        org = catalog.find_organism_exact("Plasmodium falciparum")
+        assert org is not None
+        assert org["species"] == "Plasmodium falciparum"
+
+    def test_case_insensitive(self, catalog):
+        assert catalog.find_organism_exact("plasmodium falciparum") is not None
+
+    def test_common_name_match(self, catalog):
+        assert catalog.find_organism_exact("malaria parasite") is not None
+
+    def test_taxonomy_id_match(self, catalog):
+        assert catalog.find_organism_exact("5833") is not None
+
+    def test_non_string_taxid_input(self, catalog):
+        # Robust to a non-string caller (e.g. a numeric taxid from a chip tag).
+        assert catalog.find_organism_exact(5833) is not None
+        assert catalog.find_organism_exact(None) is None
+
+    def test_genus_alone_does_not_match(self, catalog):
+        # search_organisms matches genus; find_organism_exact must NOT -- this is
+        # the false-positive that let ungrounded species through (#1297).
+        assert catalog.search_organisms("Plasmodium")  # fuzzy still matches
+        assert catalog.find_organism_exact("Plasmodium") is None
+
+    def test_partial_string_does_not_match(self, catalog):
+        assert catalog.find_organism_exact("Plasmod") is None
+        assert catalog.find_organism_exact("falciparum") is None
+
+    def test_absent_organism_returns_none(self, catalog):
+        assert catalog.find_organism_exact("Candida glabrata") is None
+
+    def test_blank_returns_none(self, catalog):
+        assert catalog.find_organism_exact("") is None
+        assert catalog.find_organism_exact("   ") is None
 
 
 # ---------- Assembly queries ----------
@@ -292,3 +350,187 @@ class TestCompatibilityCheck:
         )
         assert result["compatible"] is False
         assert "not found" in result["reason"].lower()
+
+
+# ---------- Scope filtering (#1321) ----------
+
+
+class TestScopeFiltering:
+    """Non-ASSEMBLY-scope workflows are hidden from every assistant tool.
+
+    The assistant only drives the single-organism/single-assembly flow, so
+    ORGANISM- and comparative-scope workflows it can't drive must not surface
+    (matching the frontend's default ASSEMBLY-only view).
+    """
+
+    def test_organism_scope_absent_from_category_listing(self, catalog):
+        wfs = catalog.get_workflows_in_category("VARIANT_CALLING")
+        iwc_ids = {w["iwc_id"] for w in wfs}
+        assert "assembly-with-flye" not in iwc_ids
+        # only the two ASSEMBLY-scope workflows remain
+        assert len(wfs) == 2
+
+    def test_organism_scope_absent_from_compatible(self, catalog):
+        # ANY ploidy + no taxonomy restriction would match if scope were ignored.
+        wfs = catalog.get_compatible_workflows(["HAPLOID"])
+        iwc_ids = {w["iwc_id"] for w in wfs}
+        assert "assembly-with-flye" not in iwc_ids
+
+    def test_organism_scope_details_returns_none(self, catalog):
+        assert catalog.get_workflow_details("assembly-with-flye") is None
+
+    def test_organism_scope_not_counted_in_categories(self, catalog):
+        by_cat = {c["category"]: c for c in catalog.get_workflow_categories()}
+        # VARIANT_CALLING holds 3 raw workflows but one is ORGANISM-scope.
+        assert by_cat["VARIANT_CALLING"]["workflow_count"] == 2
+
+    def test_missing_scope_defaults_to_assembly(self, tmp_path):
+        # A workflow with no scope field is treated as ASSEMBLY (frontend default).
+        workflows = [
+            {
+                "category": "OTHER",
+                "name": "Other",
+                "description": "No-scope workflow",
+                "workflows": [
+                    {
+                        "iwcId": "no-scope-wf",
+                        "workflowName": "Scopeless",
+                        "workflowDescription": "Has no scope field",
+                        "ploidy": "ANY",
+                        "trsId": "#workflow/github.com/iwc/no-scope/main",
+                        "parameters": [],
+                    },
+                ],
+            },
+        ]
+        (tmp_path / "organisms.json").write_text(json.dumps([]))
+        (tmp_path / "workflows.json").write_text(json.dumps(workflows))
+        c = CatalogData(str(tmp_path))
+        assert c.get_workflow_details("no-scope-wf") is not None
+        assert c.get_workflow_categories()[0]["workflow_count"] == 1
+
+
+# ---------- Lineage-based taxonomy matching (#1319) ----------
+
+LINEAGE_ORGANISMS = [
+    {
+        "ncbiTaxonomyId": 562,
+        "taxonomicLevelSpecies": "Escherichia coli",
+        "taxonomicLevelGenus": "Escherichia",
+        "commonName": "E. coli",
+        "assemblyCount": 1,
+        "taxonomicGroup": ["Bacteria"],
+        "genomes": [
+            {
+                "accession": "GCF_000005845.2",
+                "taxonomicLevelSpecies": "Escherichia coli",
+                "isRef": "Yes",
+                "level": "Complete Genome",
+                "ploidy": ["HAPLOID"],
+                "geneModelUrl": "https://example.com/ecoli.gtf",
+                "ncbiTaxonomyId": 562,
+                "speciesTaxonomyId": 562,
+                # Bacteria (2) is an ancestor of E. coli (562)
+                "lineageTaxonomyIds": ["1", "131567", "2", "1224", "561", "562"],
+            },
+        ],
+    },
+    {
+        "ncbiTaxonomyId": 559292,
+        "taxonomicLevelSpecies": "Saccharomyces cerevisiae",
+        "taxonomicLevelGenus": "Saccharomyces",
+        "commonName": "yeast",
+        "assemblyCount": 1,
+        "taxonomicGroup": ["Fungi"],
+        "genomes": [
+            {
+                "accession": "GCF_000146045.2",
+                "taxonomicLevelSpecies": "Saccharomyces cerevisiae",
+                "isRef": "Yes",
+                "level": "Chromosome",
+                "ploidy": ["HAPLOID"],
+                "ncbiTaxonomyId": 559292,
+                "speciesTaxonomyId": 559292,
+                # Fungal lineage -- Bacteria (2) is NOT present
+                "lineageTaxonomyIds": ["1", "131567", "2759", "4751", "4932", "559292"],
+            },
+        ],
+    },
+]
+
+LINEAGE_WORKFLOWS = [
+    {
+        "category": "ANNOTATION",
+        "name": "Annotation",
+        "description": "Annotation workflows",
+        "workflows": [
+            {
+                "iwcId": "amr-gene-detection",
+                "workflowName": "AMR Gene Detection",
+                "workflowDescription": "Bacterial AMR gene detection",
+                "ploidy": "HAPLOID",
+                "taxonomyId": 2,  # Bacteria -- applies to all descendant taxa
+                "trsId": "#workflow/github.com/iwc/amr/main",
+                "parameters": [],
+            },
+            {
+                "iwcId": "generic-assembly",
+                "workflowName": "Generic Assembly",
+                "workflowDescription": "Taxon-agnostic assembly",
+                "ploidy": "ANY",
+                "taxonomyId": None,
+                "trsId": "#workflow/github.com/iwc/assembly/main",
+                "parameters": [],
+            },
+        ],
+    },
+]
+
+
+@pytest.fixture()
+def lineage_catalog(tmp_path):
+    (tmp_path / "organisms.json").write_text(json.dumps(LINEAGE_ORGANISMS))
+    (tmp_path / "workflows.json").write_text(json.dumps(LINEAGE_WORKFLOWS))
+    return CatalogData(str(tmp_path))
+
+
+class TestLineageTaxonomyMatching:
+    def test_compatible_includes_ancestor_targeted_workflow(self, lineage_catalog):
+        # E. coli (562); AMR workflow targets Bacteria (2), which is in its
+        # lineage, so it should be returned even though 2 != 562.
+        wfs = lineage_catalog.get_compatible_workflows(["HAPLOID"], taxonomy_id="562")
+        iwc_ids = {w["iwc_id"] for w in wfs}
+        assert "amr-gene-detection" in iwc_ids
+
+    def test_compatible_excludes_unrelated_lineage(self, lineage_catalog):
+        # Yeast (559292) is a fungus; Bacteria (2) is not in its lineage, so
+        # the Bacteria-targeted AMR workflow should not be returned.
+        wfs = lineage_catalog.get_compatible_workflows(
+            ["HAPLOID"], taxonomy_id="559292"
+        )
+        iwc_ids = {w["iwc_id"] for w in wfs}
+        assert "amr-gene-detection" not in iwc_ids
+
+    def test_check_compatible_with_descendant_assembly(self, lineage_catalog):
+        result = lineage_catalog.check_workflow_assembly_compatibility(
+            "amr-gene-detection", "GCF_000005845.2"
+        )
+        assert result["compatible"] is True
+        assert result["issues"] == []
+
+    def test_check_incompatible_with_unrelated_assembly(self, lineage_catalog):
+        result = lineage_catalog.check_workflow_assembly_compatibility(
+            "amr-gene-detection", "GCF_000146045.2"
+        )
+        assert result["compatible"] is False
+        assert any("taxonom" in issue.lower() for issue in result["issues"])
+
+    def test_ancestor_index_excludes_descendants(self, lineage_catalog):
+        # Bacteria (2) is an ancestor of E. coli (562). The lineage index for an
+        # ancestor must not pull in its descendants, or a workflow targeting a
+        # descendant taxon would wrongly match a higher-rank organism.
+        assert "562" not in lineage_catalog._lineage_by_tax_id.get("2", set())
+        # A workflow for E. coli (562) does not apply to a Bacteria (2) target...
+        assert lineage_catalog._workflow_taxon_matches(562, "2") is False
+        # ...but a Bacteria (2) workflow still applies to E. coli (562).
+        assert lineage_catalog._workflow_taxon_matches(2, "562") is True

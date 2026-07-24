@@ -9,13 +9,17 @@
     "noEmit": true,
     "esModuleInterop": true,
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "baseUrl": ".",
     "paths": {
+      "@/*": ["app/*"],
+      "@repo/shared": ["packages/shared/index.ts"],
+      "@repo/shared/*": ["packages/shared/*"],
+      "@site-config/*": ["site-config/*"],
       "images/*": ["images/*"]
     },
     "plugins": [
@@ -24,6 +28,12 @@
       }
     ]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
   "exclude": ["node_modules"]
 }

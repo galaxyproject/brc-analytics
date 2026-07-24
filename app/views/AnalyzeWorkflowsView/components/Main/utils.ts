@@ -1,31 +1,35 @@
-import { WorkflowCategoryId } from "../../../../../catalog/schema/generated/schema";
-import {
-  BRCDataCatalogGenome,
-  Workflow,
-  WorkflowCategory,
-} from "../../../../apis/catalog/brc-analytics-catalog/common/entities";
+import { workflowPloidyMatchesOrganismPloidy } from "@/apis/catalog/brc-analytics-catalog/common/utils";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import {
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_SCOPE,
-} from "../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { workflowPloidyMatchesOrganismPloidy } from "../../../../apis/catalog/brc-analytics-catalog/common/utils";
-import { GA2AssemblyEntity } from "../../../../apis/catalog/ga2/entities";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../differentialExpressionAnalysis/constants";
+} from "@repo/shared/apis/schema-types";
+import type { AssemblyContract } from "@repo/shared/apis/types";
+import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
+import { WorkflowCategoryId } from "../../../../../catalog/schema/generated/schema";
 
 /**
  * Builds workflow categories for the given assembly.
  * Differential Expression Analysis is added to the Transcriptomics category.
  * @param assembly - Assembly.
  * @param allWorkflowCategories - Workflow categories.
+ * @param isAssemblyWorkflowsEnabled - Whether the 'assembly-workflows' feature flag is enabled.
  * @returns Workflow categories compatible with the given assembly.
  */
 export function buildAssemblyWorkflows(
-  assembly: BRCDataCatalogGenome | GA2AssemblyEntity,
-  allWorkflowCategories: WorkflowCategory[]
+  assembly: AssemblyContract,
+  allWorkflowCategories: WorkflowCategory[],
+  isAssemblyWorkflowsEnabled = false
 ): WorkflowCategory[] {
   const workflowCategories: WorkflowCategory[] = [];
 
   for (const workflowCategory of allWorkflowCategories) {
+    if (
+      workflowCategory.category === WorkflowCategoryId.ASSEMBLY &&
+      !isAssemblyWorkflowsEnabled
+    )
+      continue;
+
     const { workflows: categoryWorkflows } = workflowCategory;
 
     // Filter workflows to only include those that are compatible with the given assembly
@@ -100,7 +104,7 @@ export function workflowRequiresAssemblyId(workflow: Workflow): boolean {
  */
 export function workflowIsCompatibleWithAssembly(
   workflow: Workflow,
-  assembly: BRCDataCatalogGenome | GA2AssemblyEntity
+  assembly: AssemblyContract
 ): boolean {
   if (
     workflow.taxonomyId !== null &&

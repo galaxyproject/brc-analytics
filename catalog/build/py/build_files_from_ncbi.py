@@ -1,4 +1,4 @@
-from ...py_package.catalog_build import build_files, create_taxonomy_read_run_count
+from ...py_package.catalog_build import build_files
 
 ASSEMBLIES_PATH = "catalog/source/assemblies.yml"
 ORGANISMS_PATH = "catalog/source/organisms.yml"
@@ -11,10 +11,11 @@ OUTBREAK_TAXONOMY_MAPPING_PATH = (
     "catalog/build/intermediate/outbreak-taxonomy-mapping.tsv"
 )
 
+BUILD_META_OUTPUT_PATH = "catalog/output/data-build-meta.json"
 QC_REPORT_PATH = "catalog/output/qc-report.data.md"
 TREE_OUTPUT_PATH = "catalog/output/ncbi-taxa-tree.json"
 
-TAXONOMY_READ_RUN_COUNTS_OUTPUT_PATH = "catalog/build/intermediate/taxIdReadCount.json"
+TEMP_FOLDER_PATH = "catalog/build/temp"
 
 TAXONOMIC_GROUPS_BY_TAXONOMY_ID = {
     2: "Bacteria",
@@ -62,13 +63,13 @@ if __name__ == "__main__":
         UCSC_ASSEMBLIES_URL,
         TREE_OUTPUT_PATH,
         TAXANOMIC_LEVELS_FOR_TREE,
-        {"taxonomicGroup": TAXONOMIC_GROUPS_BY_TAXONOMY_ID},
+        temp_folder_path=TEMP_FOLDER_PATH,
+        dlt_pipeline_prefix="brc_catalog_",
+        taxonomic_group_sets={"taxonomicGroup": TAXONOMIC_GROUPS_BY_TAXONOMY_ID},
+        build_meta_output_path=BUILD_META_OUTPUT_PATH,
         qc_report_path=QC_REPORT_PATH,
         organisms_path=ORGANISMS_PATH,
         outbreaks_path=OUTBREAKS_PATH,
         outbreak_taxonomy_mapping_path=OUTBREAK_TAXONOMY_MAPPING_PATH,
         datacache_base_url="http://datacache.galaxyproject.org/brc/data/genomes",
-    )
-    create_taxonomy_read_run_count(
-        GENOMES_OUTPUT_PATH, TAXONOMY_READ_RUN_COUNTS_OUTPUT_PATH
     )

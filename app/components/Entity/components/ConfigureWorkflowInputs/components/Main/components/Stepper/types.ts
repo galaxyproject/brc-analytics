@@ -1,13 +1,12 @@
-import { Workflow } from "../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import {
   ConfiguredInput,
   OnConfigure,
-} from "../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+} from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import type { Workflow } from "@repo/shared/apis/workflow";
 import {
   OnLaunchGalaxy,
   Status,
 } from "./components/Step/hooks/UseLaunchGalaxy/types";
-import { VIEW } from "./components/Step/SequencingStep/components/ToggleButtonGroup/types";
 import { StepConfig } from "./components/Step/types";
 import { OnContinue, OnEdit } from "./hooks/UseStepper/types";
 
@@ -15,7 +14,6 @@ export interface Props {
   activeStep: number;
   configuredInput: ConfiguredInput;
   configuredSteps: StepConfig[];
-  initialDataSourceView?: VIEW;
   onConfigure: OnConfigure;
   onContinue: OnContinue;
   onEdit: OnEdit;

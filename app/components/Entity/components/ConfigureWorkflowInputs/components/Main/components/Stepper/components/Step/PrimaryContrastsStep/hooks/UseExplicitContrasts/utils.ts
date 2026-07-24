@@ -1,4 +1,4 @@
-import { ExplicitContrasts } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { ExplicitContrasts } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { CONTRAST_MODE } from "../UseRadioGroup/types";
 import { ContrastPair, ContrastPairs } from "./types";
 

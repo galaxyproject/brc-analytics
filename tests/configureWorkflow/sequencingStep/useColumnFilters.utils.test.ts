@@ -1,7 +1,7 @@
-import type { Workflow } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
-import { WORKFLOW_PARAMETER_VARIABLE } from "../../../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { preSelectColumnFilters } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/CollectionSelector/hooks/UseColumnFilters/utils";
-import { SEQUENCING_DATA_TYPE } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/types";
+import { preSelectColumnFilters } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/CollectionSelector/hooks/UseColumnFilters/utils";
+import { SEQUENCING_DATA_TYPE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/types";
+import { WORKFLOW_PARAMETER_VARIABLE } from "@repo/shared/apis/schema-types";
+import type { Workflow } from "@repo/shared/apis/workflow";
 
 const PARAMETERS: Record<string, Pick<Workflow, "parameters">> = {
   EMPTY: { parameters: [] },

@@ -1,6 +1,6 @@
 import { BUTTON_PROPS as MUI_BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
 import { ButtonProps } from "@mui/material";
-import { ROUTES } from "../../../../../../../routes/constants";
+import { ROUTES } from "@repo/shared/routes/constants";
 
 export const ACCORDION: Record<string, { details?: string; title: string }> = {
   "0": {

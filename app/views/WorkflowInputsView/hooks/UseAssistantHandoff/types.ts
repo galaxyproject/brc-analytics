@@ -1,8 +1,6 @@
-export const ASSISTANT_HANDOFF_KEY = "brc-assistant-handoff";
+import { ConfiguredInput } from "../UseConfigureInputs/types";
 
-export type HandoffDataSource = "ena" | "upload";
-
-export interface AssistantHandoff {
-  dataSource: HandoffDataSource;
-  timestamp: number;
+export interface UseAssistantHandoff {
+  initialConfiguredInput: ConfiguredInput | undefined;
+  isHandoff: boolean;
 }

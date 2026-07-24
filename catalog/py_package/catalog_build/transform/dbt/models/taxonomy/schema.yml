@@ -1,0 +1,64 @@
+version: 2
+
+models:
+  - name: taxonomy_catalog_taxa
+    columns:
+      - name: taxonomy_id
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              field: query_tax_id
+              to: ref('taxonomy_lineages_with_names')
+  - name: taxonomy_assemblies
+    columns:
+      - name: taxonomy_id
+        data_tests:
+          - unique
+          - not_null
+      - name: taxonomic_level_species
+        data_tests:
+          - not_null
+      - name: taxonomic_level_species_id
+        data_tests:
+          - not_null
+      - name: lineage_taxonomy_ids
+        data_tests:
+          - not_null
+      - name: common_names
+        data_tests:
+          - not_null
+  - name: taxonomy_organisms
+    columns:
+      - name: taxonomy_id
+        data_tests:
+          - unique
+          - not_null
+      - name: rank
+        data_tests:
+          - not_null
+      - name: taxon_name
+        data_tests:
+          - not_null
+  - name: taxonomy_outbreaks
+    # Only tested when the catalog has outbreaks; otherwise the model is an
+    # empty placeholder and these assertions would be meaningless.
+    columns:
+      - name: taxonomy_id
+        data_tests:
+          - unique:
+              config:
+                enabled: "{{ var('has_outbreaks', false) }}"
+          - not_null:
+              config:
+                enabled: "{{ var('has_outbreaks', false) }}"
+      - name: rank
+        data_tests:
+          - not_null:
+              config:
+                enabled: "{{ var('has_outbreaks', false) }}"
+      - name: taxon_name
+        data_tests:
+          - not_null:
+              config:
+                enabled: "{{ var('has_outbreaks', false) }}"

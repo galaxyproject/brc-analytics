@@ -1,10 +1,16 @@
+import { HandoffStatusContext } from "@/providers/workflowHandoff/contexts/HandoffStatus/context";
+import {
+  Loading,
+  LOADING_PANEL_STYLE,
+} from "@databiosphere/findable-ui/lib/components/Loading/loading";
 import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepContent/stepContent";
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
-import { JSX, useEffect } from "react";
+import { JSX, useCallback, useContext } from "react";
 import { ToggleButtonGroup } from "../components/ToggleButtonGroup/toggleButtonGroup";
 import { useToggleButtonGroup } from "../hooks/UseToggleButtonGroup/useToggleButtonGroup";
 import { StepProps } from "../types";
+import { getStepActiveState } from "../utils/stepUtils";
 import { useColumnFilters } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseColumnFilters/hook";
 import { useRowSelection } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseRowSelection/hook";
 import { useTable } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseTable/hook";
@@ -22,6 +28,11 @@ import {
 import { TOGGLE_BUTTONS } from "./components/ToggleButtonGroup/toggleButtons";
 import { VIEW } from "./components/ToggleButtonGroup/types";
 import { UploadMyData } from "./components/UploadMyData/uploadMyData";
+import {
+  areReadRunsCleared,
+  getInitialToggleValue,
+  translateForSequencingStep,
+} from "./utils";
 
 export const SequencingStep = ({
   active,
@@ -29,7 +40,6 @@ export const SequencingStep = ({
   configuredInput,
   entryLabel,
   index,
-  initialDataSourceView,
   onConfigure,
   stepKey,
   workflow,
@@ -39,35 +49,53 @@ export const SequencingStep = ({
   const columnFilters = useColumnFilters(workflow, stepKey);
   const rowSelection = useRowSelection(configuredInput);
   const state = { columnFilters, rowSelection };
-  const { actions, table } = useTable(enaTaxonomyId, state, onConfigure);
-  const initialView =
-    initialDataSourceView === VIEW.UPLOAD_MY_DATA
-      ? VIEW.UPLOAD_MY_DATA
-      : VIEW.ENA;
-  const { onChange, value } = useToggleButtonGroup(initialView);
+
+  const isSingleFileStep = stepKey === "readRunSingleFile";
+  const isPairedFileStep = stepKey === "readRunPairedFile";
+  const singleSelect = isSingleFileStep || isPairedFileStep;
+
+  const wrappedOnConfigure: typeof onConfigure = useCallback(
+    (partialInput) =>
+      onConfigure(translateForSequencingStep(partialInput, stepKey)),
+    [onConfigure, stepKey]
+  );
+
+  const { actions, table } = useTable(
+    enaTaxonomyId,
+    state,
+    wrappedOnConfigure,
+    singleSelect
+  );
+  const { onChange, value: rawValue } = useToggleButtonGroup(
+    getInitialToggleValue(configuredInput)
+  );
+  // After an assembly re-pick wipes via DEFAULT_CONFIGURED_INPUT, every
+  // read-run field is undefined — force the toggle back to ENA so its
+  // internal state can't show stale UPLOAD from before the wipe.
+  const value = areReadRunsCleared(configuredInput) ? VIEW.ENA : rawValue;
   const { taxonomyMatches } = useTaxonomyMatches(table);
   const { requirementsMatches } = useRequirementsMatches(table);
 
-  useEffect(() => {
-    if (initialDataSourceView !== VIEW.UPLOAD_MY_DATA) return;
-    // The clear + upload pair is idempotent. Running it on every effect
-    // setup matters in dev: React strict-mode runs effect setup twice
-    // per mount, and the first ReferenceAssembly setup REPLACES state
-    // before the second SequencingStep setup gets a chance to re-seed
-    // readRunsPaired from the assistant handoff.
-    onConfigure(clearSequencingData());
-    onConfigure(getUploadMyOwnSequencingData(stepKey));
-  }, [initialDataSourceView, onConfigure, stepKey]);
+  const {
+    sequencing: {
+      status: { isLoading },
+    },
+  } = useContext(HandoffStatusContext);
 
   return (
-    <Step active={active} completed={completed} index={index}>
+    <Step
+      active={getStepActiveState(active, isLoading)}
+      completed={completed}
+      index={index}
+    >
+      <Loading loading={isLoading} panelStyle={LOADING_PANEL_STYLE.INHERIT} />
       <StepLabel>{entryLabel}</StepLabel>
       <StepContent>
         <ToggleButtonGroup
           onChange={(e, v) => {
-            onConfigure(clearSequencingData());
+            wrappedOnConfigure(clearSequencingData());
             if (v === VIEW.UPLOAD_MY_DATA) {
-              onConfigure(getUploadMyOwnSequencingData(stepKey));
+              wrappedOnConfigure(getUploadMyOwnSequencingData(stepKey));
             }
             onChange?.(e, v);
           }}
@@ -79,7 +107,7 @@ export const SequencingStep = ({
             enaAccessionActions={enaAccession.actions}
             enaAccessionStatus={enaAccession.status}
             enaTaxonomyId={enaTaxonomyId}
-            onConfigure={onConfigure}
+            onConfigure={wrappedOnConfigure}
             requirementsMatches={requirementsMatches}
             selectedCount={getSelectedCount(configuredInput)}
             switchBrowseMethod={actions.switchBrowseMethod}

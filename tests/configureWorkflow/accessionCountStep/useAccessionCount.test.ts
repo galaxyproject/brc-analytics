@@ -1,7 +1,7 @@
+import { useAccessionCount } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/AccessionCountStep/hooks/UseAccessionCount/hook";
+import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { act, renderHook } from "@testing-library/react";
 import { ChangeEvent } from "react";
-import { useAccessionCount } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/AccessionCountStep/hooks/UseAccessionCount/hook";
-import { ConfiguredInput } from "../../../app/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 
 /**
  * Creates a mock ChangeEvent for an input element.

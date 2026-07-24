@@ -1,5 +1,5 @@
+import { GA2AssemblyEntity } from "@/apis/catalog/ga2/entities";
 import { ColumnConfig } from "@databiosphere/findable-ui/lib/config/entities";
-import { GA2AssemblyEntity } from "../../../../../app/apis/catalog/ga2/entities";
 import {
   ACCESSION,
   ANALYZE_GENOME,
@@ -11,6 +11,7 @@ import {
   LENGTH,
   LEVEL,
   ORGANISM_IMAGE,
+  RELEASE_DATE,
   SCAFFOLD_COUNT,
   SCAFFOLD_L50,
   SCAFFOLD_N50,
@@ -30,7 +31,6 @@ import {
 export const COLUMNS: ColumnConfig<GA2AssemblyEntity>[] = [
   ORGANISM_IMAGE,
   ANALYZE_GENOME,
-  ACCESSION,
   TAXONOMIC_LEVEL_DOMAIN,
   TAXONOMIC_LEVEL_KINGDOM,
   TAXONOMIC_LEVEL_PHYLUM,
@@ -39,6 +39,8 @@ export const COLUMNS: ColumnConfig<GA2AssemblyEntity>[] = [
   TAXONOMIC_LEVEL_FAMILY,
   TAXONOMIC_LEVEL_GENUS,
   TAXONOMIC_LEVEL_SPECIES,
+  ACCESSION,
+  RELEASE_DATE,
   TAXONOMIC_LEVEL_STRAIN,
   TAXONOMY_ID,
   TAXONOMIC_GROUP,

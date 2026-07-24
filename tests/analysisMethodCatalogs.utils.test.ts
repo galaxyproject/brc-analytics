@@ -1,12 +1,10 @@
-import type {
-  BRCDataCatalogGenome,
-  WorkflowCategory,
-} from "../app/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   ORGANISM_PLOIDY,
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
-} from "../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
+} from "@repo/shared/apis/schema-types";
+import type { WorkflowCategory } from "@repo/shared/apis/workflow";
+import type { BRCDataCatalogGenome } from "../app/apis/catalog/brc-analytics-catalog/common/entities";
 import { buildAssemblyWorkflows } from "../app/views/AnalyzeWorkflowsView/components/Main/utils";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../app/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { WorkflowCategoryId } from "../catalog/schema/generated/schema";
@@ -20,6 +18,8 @@ describe("buildAssemblyWorkflows", () => {
       showComingSoon: false,
       workflows: [
         {
+          assemblyCountMax: 1,
+          assemblyCountMin: 1,
           iwcId: "iwc-any",
           parameters: [],
           ploidy: WORKFLOW_PLOIDY.ANY,
@@ -30,6 +30,8 @@ describe("buildAssemblyWorkflows", () => {
           workflowName: "ANY Workflow",
         },
         {
+          assemblyCountMax: 1,
+          assemblyCountMin: 1,
           iwcId: "iwc-haploid-999",
           parameters: [],
           ploidy: WORKFLOW_PLOIDY.HAPLOID,
@@ -48,6 +50,8 @@ describe("buildAssemblyWorkflows", () => {
       showComingSoon: true,
       workflows: [
         {
+          assemblyCountMax: 1,
+          assemblyCountMin: 1,
           iwcId: "iwc-diploid-not-lineage",
           parameters: [],
           ploidy: WORKFLOW_PLOIDY.DIPLOID,
@@ -66,6 +70,8 @@ describe("buildAssemblyWorkflows", () => {
       showComingSoon: false,
       workflows: [
         {
+          assemblyCountMax: 1,
+          assemblyCountMin: 1,
           iwcId: "iwc-haploid-other",
           parameters: [],
           ploidy: WORKFLOW_PLOIDY.HAPLOID,
@@ -84,6 +90,8 @@ describe("buildAssemblyWorkflows", () => {
       showComingSoon: false,
       workflows: [
         {
+          assemblyCountMax: 1,
+          assemblyCountMin: 1,
           iwcId: "iwc-transcriptomics-any",
           parameters: [],
           ploidy: WORKFLOW_PLOIDY.ANY,
@@ -115,6 +123,7 @@ describe("buildAssemblyWorkflows", () => {
     ploidy: [ORGANISM_PLOIDY.DIPLOID],
     priority: null,
     priorityPathogenName: null,
+    releaseDate: "2026-06-24",
     scaffoldCount: null,
     scaffoldL50: null,
     scaffoldN50: null,

@@ -1,3 +1,4 @@
+import { SLUGIFY_OPTIONS } from "@/common/constants";
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import {
   Section,
@@ -11,7 +12,6 @@ import { useRouter } from "next/router";
 import { JSX } from "react";
 import slugify from "slugify";
 import { ROUTES } from "../../../../../routes/constants";
-import { SLUGIFY_OPTIONS } from "../../../../common/constants";
 import { StyledGrid, StyledSectionText } from "./priorityPathogens.styles";
 import { Props } from "./types";
 import { getPriorityColor, getPriorityLabel } from "./utils";

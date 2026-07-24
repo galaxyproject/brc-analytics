@@ -1,17 +1,19 @@
-import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
-import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
-import { useCallback } from "react";
-import { Workflow } from "../../../../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
 import {
   getDataLandingUrl,
   getDeSeq2LandingUrl,
   getLMLSLandingUrl,
   getWorkflowLandingUrl,
-} from "../../../../../../../../../../../../utils/galaxy-api/galaxy-api";
-import { CUSTOM_WORKFLOW } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/custom/constants";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
-import { LEXICMAP } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/lexicmap/constants";
-import { LOGAN_SEARCH } from "../../../../../../../../../../../../views/AnalyzeWorkflowsView/loganSearch/constants";
+} from "@/utils/galaxy-api/galaxy-api";
+import { CUSTOM_WORKFLOW } from "@/views/AnalyzeWorkflowsView/custom/constants";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
+import { LEXICMAP } from "@/views/AnalyzeWorkflowsView/lexicmap/constants";
+import { LOGAN_SEARCH } from "@/views/AnalyzeWorkflowsView/loganSearch/constants";
+import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
+import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
+import type { Workflow } from "@repo/shared/apis/workflow";
+import { apiClient } from "@repo/shared/services/api-client/api-client";
+import { useRouter } from "next/router";
+import { useCallback } from "react";
 import {
   ConfiguredValue,
   isAssemblyConfiguredValue,
@@ -19,7 +21,11 @@ import {
   Props,
   UseLaunchGalaxy,
 } from "./types";
-import { getConfiguredValues, launchGalaxy } from "./utils";
+import {
+  buildWorkflowRunPayload,
+  getConfiguredValues,
+  launchGalaxy,
+} from "./utils";
 
 /**
  * Gets the appropriate landing URL based on workflow type.
@@ -102,7 +108,9 @@ async function getLandingUrlForWorkflow(
     isAssemblyConfiguredValue(configuredValue)
       ? configuredValue.geneModelUrl
       : null,
+    configuredValue.readRunSingleFile,
     configuredValue.readRunsSingle,
+    configuredValue.readRunPairedFile,
     configuredValue.readRunsPaired,
     null,
     workflow.parameters,
@@ -116,6 +124,7 @@ export const useLaunchGalaxy = ({
 }: Props): UseLaunchGalaxy => {
   const { error, isLoading: loading, run } = useAsync<string>();
   const { config } = useConfig();
+  const router = useRouter();
   const configuredValue = getConfiguredValues(configuredInput, workflow);
   const disabled = !configuredValue;
 
@@ -131,8 +140,25 @@ export const useLaunchGalaxy = ({
       throw new Error("Failed to retrieve Galaxy workflow launch URL.");
     }
 
+    try {
+      await apiClient.createWorkflowRun(
+        buildWorkflowRunPayload({
+          assistantSessionId:
+            typeof router.query.assistantSessionId === "string"
+              ? router.query.assistantSessionId
+              : null,
+          configuredInput,
+          configuredValue,
+          handoffUrl: landingUrl,
+          workflow,
+        })
+      );
+    } catch (trackingError) {
+      console.warn("Failed to record workflow launch handoff", trackingError);
+    }
+
     launchGalaxy(landingUrl);
-  }, [config, configuredValue, run, workflow]);
+  }, [config, configuredInput, configuredValue, router.query, run, workflow]);
 
   let errorMessage: string | null = null;
   if (error) {

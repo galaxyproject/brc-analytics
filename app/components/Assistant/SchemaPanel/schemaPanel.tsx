@@ -1,17 +1,21 @@
+import { normalizePagePath } from "@/hooks/UseCurrentPath/utils";
+import { ENTITY_KEYS } from "@/providers/workflowHandoff/constants";
+import { useHandoffDispatch } from "@/providers/workflowHandoff/hooks/UseHandoffDispatch/hook";
 import { Box, Button, Chip, Divider, Typography } from "@mui/material";
-import { JSX, useCallback } from "react";
-import {
+import type {
   AnalysisSchema,
   FieldStatus,
   SchemaFieldState,
-} from "../../../types/api";
-import { ASSISTANT_HANDOFF_KEY } from "../../../views/WorkflowInputsView/hooks/UseAssistantHandoff/types";
+} from "@repo/shared/services/api-client/types";
+import Router from "next/router";
+import { JSX, useCallback } from "react";
 import {
   FieldRow,
   FieldValue,
   PanelContainer,
   PanelHeader,
 } from "./schemaPanel.styles";
+import { extractAccessions, resolveSequencingSource } from "./utils";
 
 interface SchemaPanelProps {
   handoffUrl: string | null;
@@ -62,33 +66,38 @@ const PLACEHOLDER_SCHEMA: AnalysisSchema = {
   workflow: EMPTY_FIELD,
 };
 
-function resolveDataSource(value: string | null | undefined): "ena" | "upload" {
-  if (!value) return "ena";
-  const lower = value.toLowerCase();
-  if (
-    lower.includes("upload") ||
-    lower.includes("own") ||
-    lower.includes("local")
-  ) {
-    return "upload";
-  }
-  return "ena";
-}
-
 /**
  * Get the status indicator for a schema field.
  * @param props - Component props
+ * @param props.optional - Whether the field is optional (not required to hand off)
  * @param props.status - Field status
+ * @param props.workflowSelected - Whether a workflow has been chosen yet
  * @returns Status chip element
  */
-function StatusIndicator({ status }: { status: FieldStatus }): JSX.Element {
+function StatusIndicator({
+  optional,
+  status,
+  workflowSelected,
+}: {
+  optional: boolean;
+  status: FieldStatus;
+  workflowSelected: boolean;
+}): JSX.Element {
   if (status === "filled") {
     return <Chip color="success" label="Done" size="small" />;
   }
   if (status === "needs_attention") {
     return <Chip color="warning" label="Attention" size="small" />;
   }
-  return <Chip label="Pending" size="small" variant="outlined" />;
+  // Only call an optional field "Optional" once a workflow is chosen -- until
+  // then we don't yet know whether it (e.g. a GTF) will turn out to be required.
+  return (
+    <Chip
+      label={optional && workflowSelected ? "Optional" : "Pending"}
+      size="small"
+      variant="outlined"
+    />
+  );
 }
 
 /**
@@ -102,20 +111,31 @@ export const SchemaPanel = ({
   handoffUrl,
   schema,
 }: SchemaPanelProps): JSX.Element => {
+  const { onSetHandoff } = useHandoffDispatch();
+
   const handleContinue = useCallback((): void => {
     if (!handoffUrl || !schema) return;
-    const handoff = {
-      dataSource: resolveDataSource(schema.data_source.value),
-      timestamp: Date.now(),
-    };
-    localStorage.setItem(ASSISTANT_HANDOFF_KEY, JSON.stringify(handoff));
-    window.location.href = handoffUrl;
-  }, [handoffUrl, schema]);
+    onSetHandoff({
+      entity: ENTITY_KEYS.ASSEMBLIES,
+      inputs: {
+        accessions: extractAccessions(schema.data_source),
+        sequencingSource: resolveSequencingSource(schema.data_source.value),
+      },
+      // Normalise so the dispatch key matches the read site (useCurrentPath)
+      // regardless of trailing slash / query / fragment from the backend.
+      path: normalizePagePath(handoffUrl),
+    });
+    // Singleton Router.push (not useRouter) — SPA nav, no reactive value to
+    // track in deps. A full-page nav (window.location.href) would tear down
+    // the WorkflowInputsView provider before the consumer reads dispatched
+    // state.
+    Router.push(handoffUrl);
+  }, [handoffUrl, onSetHandoff, schema]);
 
   const isEmpty = !schema;
   const activeSchema = schema ?? PLACEHOLDER_SCHEMA;
 
-  const filledCount = REQUIRED_FIELDS.filter(
+  const filledCount = FIELD_ORDER.filter(
     (key) => activeSchema[key].status === "filled"
   ).length;
 
@@ -124,15 +144,16 @@ export const SchemaPanel = ({
       <PanelHeader>
         <Typography variant="subtitle1">Analysis Setup</Typography>
         <Typography color="text.secondary" variant="caption">
-          {filledCount} / {REQUIRED_FIELDS.length} configured
+          {filledCount} / {FIELD_ORDER.length} configured
         </Typography>
       </PanelHeader>
 
       {isEmpty && (
         <Box sx={{ pb: 1, pt: 2, px: 2 }}>
           <Typography color="text.secondary" variant="body2">
-            Tell the assistant what you&apos;re working on (an organism, a
-            paper, a kind of analysis) and it&apos;ll help fill these in:
+            Tell the assistant what you&apos;re working on (an organism, an
+            analysis type, or the kind of data you have) and it&apos;ll help
+            fill these in:
           </Typography>
         </Box>
       )}
@@ -152,7 +173,11 @@ export const SchemaPanel = ({
                 }}
               >
                 <Typography variant="body2">{FIELD_LABELS[key]}</Typography>
-                <StatusIndicator status={field.status} />
+                <StatusIndicator
+                  optional={OPTIONAL_FIELDS.includes(key)}
+                  status={field.status}
+                  workflowSelected={activeSchema.workflow.status === "filled"}
+                />
               </Box>
               {field.value && (
                 <FieldValue variant="body2">{field.value}</FieldValue>

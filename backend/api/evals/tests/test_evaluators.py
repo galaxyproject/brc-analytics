@@ -5,6 +5,7 @@ from typing import Any
 
 from pydantic_evals.evaluators import EvaluatorContext
 
+from evals.datasets.catalog_query import QueryCatalogShape
 from evals.evaluators import FieldEquals, LowConfidence, MustMention, ToolCallMatch
 
 
@@ -148,4 +149,181 @@ def test_tool_call_match_pulls_from_metadata():
             )
         )
         == 1.0
+    )
+
+
+# ---------- QueryCatalogShape ----------
+
+
+def test_query_shape_matches_field_and_value():
+    out = _FakeRun(
+        tool_calls=[
+            ("query_catalog", {"operation": "facets", "facet_by": ["level"]}),
+        ]
+    )
+    ev = QueryCatalogShape(operation="facets", must_contain=["level"])
+    assert ev.evaluate(_ctx(out)) == 1.0
+
+
+def test_query_shape_rejects_field_fragment():
+    # faceting the wrong field must NOT satisfy must_contain=["level"]
+    out = _FakeRun(
+        tool_calls=[
+            (
+                "query_catalog",
+                {"operation": "facets", "facet_by": ["taxonomicLevelGenus"]},
+            ),
+        ]
+    )
+    ev = QueryCatalogShape(operation="facets", must_contain=["level"])
+    assert ev.evaluate(_ctx(out)) == 0.0
+
+
+def test_query_shape_numeric_token_is_digit_bounded():
+    # "1773" must not match the wrong taxid "17730"
+    out = _FakeRun(
+        tool_calls=[
+            (
+                "query_catalog",
+                {"filters": [{"field": "speciesTaxonomyId", "value": "17730"}]},
+            ),
+        ]
+    )
+    ev = QueryCatalogShape(must_contain=["1773"])
+    assert ev.evaluate(_ctx(out)) == 0.0
+
+
+def test_query_shape_must_filter_field_and_value():
+    out = _FakeRun(
+        tool_calls=[
+            (
+                "query_catalog",
+                {
+                    "operation": "count",
+                    "filters": [
+                        {
+                            "field": "taxonomicLevelGenus",
+                            "op": "eq",
+                            "value": "Anopheles",
+                        }
+                    ],
+                },
+            ),
+        ]
+    )
+    ev = QueryCatalogShape(
+        operation="count",
+        must_filter=[{"field": "taxonomicLevelGenus", "value": "Anopheles"}],
+    )
+    assert ev.evaluate(_ctx(out)) == 1.0
+
+
+def test_query_shape_must_filter_rejects_wrong_field():
+    # The value "Anopheles" is present (inside a species value) but NOT on the
+    # genus column — the old substring check would pass, the structural one must not.
+    out = _FakeRun(
+        tool_calls=[
+            (
+                "query_catalog",
+                {
+                    "filters": [
+                        {
+                            "field": "taxonomicLevelSpecies",
+                            "op": "eq",
+                            "value": "Anopheles gambiae",
+                        }
+                    ],
+                },
+            ),
+        ]
+    )
+    ev = QueryCatalogShape(
+        must_filter=[{"field": "taxonomicLevelGenus", "value": "Anopheles"}]
+    )
+    assert ev.evaluate(_ctx(out)) == 0.0
+
+
+def test_query_shape_entity_default_is_assembly():
+    # entity omitted ⇒ defaults to "assembly"
+    out = _FakeRun(tool_calls=[("query_catalog", {"operation": "count"})])
+    assert QueryCatalogShape(entity="assembly").evaluate(_ctx(out)) == 1.0
+    assert QueryCatalogShape(entity="organism").evaluate(_ctx(out)) == 0.0
+
+
+def test_query_shape_entity_organism():
+    out = _FakeRun(
+        tool_calls=[("query_catalog", {"entity": "organism", "operation": "count"})]
+    )
+    assert QueryCatalogShape(entity="organism").evaluate(_ctx(out)) == 1.0
+    assert QueryCatalogShape(entity="assembly").evaluate(_ctx(out)) == 0.0
+
+
+def test_query_shape_must_filter_list_value():
+    # value may be a list (in / contains_any); membership counts as a match
+    out = _FakeRun(
+        tool_calls=[
+            (
+                "query_catalog",
+                {
+                    "filters": [
+                        {"field": "ploidy", "op": "in", "value": ["HAPLOID", "DIPLOID"]}
+                    ]
+                },
+            ),
+        ]
+    )
+    ev = QueryCatalogShape(must_filter=[{"field": "ploidy", "value": "DIPLOID"}])
+    assert ev.evaluate(_ctx(out)) == 1.0
+
+
+def test_query_shape_facets_requires_facet_by():
+    # operation=facets with empty facet_by is invalid (execute() rejects it), so a
+    # facets case must not credit it even when the rank column isn't asserted.
+    out = _FakeRun(
+        tool_calls=[("query_catalog", {"operation": "facets", "facet_by": []})]
+    )
+    assert QueryCatalogShape(operation="facets").evaluate(_ctx(out)) == 0.0
+    # operation matching is case-insensitive; the facets guard must be too
+    assert QueryCatalogShape(operation="FACETS").evaluate(_ctx(out)) == 0.0
+    # the invalid facets shape is rejected even when the case doesn't assert
+    # operation (keyed on the call's actual op, not the expected one)
+    assert (
+        QueryCatalogShape(
+            must_filter=[{"field": "taxonomicLevelGenus", "value": "Anopheles"}]
+        ).evaluate(
+            _ctx(
+                _FakeRun(
+                    tool_calls=[
+                        (
+                            "query_catalog",
+                            {
+                                "operation": "facets",
+                                "facet_by": [],
+                                "filters": [
+                                    {
+                                        "field": "taxonomicLevelGenus",
+                                        "value": "Anopheles",
+                                    }
+                                ],
+                            },
+                        )
+                    ]
+                )
+            )
+        )
+        == 0.0
+    )
+
+
+def test_query_shape_must_facet_membership():
+    out = _FakeRun(
+        tool_calls=[("query_catalog", {"operation": "facets", "facet_by": ["level"]})]
+    )
+    assert (
+        QueryCatalogShape(operation="facets", must_facet=["level"]).evaluate(_ctx(out))
+        == 1.0
+    )
+    assert (
+        QueryCatalogShape(operation="facets", must_facet=["isRef"]).evaluate(_ctx(out))
+        == 0.0
     )

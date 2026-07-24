@@ -1,3 +1,4 @@
+import datetime
 import gzip
 import io
 import json
@@ -5,14 +6,21 @@ import logging
 import os
 import time
 import urllib
+from dataclasses import asdict, dataclass
+from pathlib import Path
 
+import bs4
+import duckdb
 import pandas as pd
 import requests
 import yaml
 from bs4 import BeautifulSoup
 from requests.exceptions import ConnectTimeout
 
+from .load import do_dlt_load
 from .qc_utils import format_list_section, format_raw_section, join_report
+from .transform import DBTTestResult, do_dbt_transformations
+from .utils import get_db_path
 
 MAX_NCBI_URL_LENGTH = 2000  # The actual limit seems to be a bit over 4000
 
@@ -126,8 +134,16 @@ def post_ncbi_request(url, json_data, batch_size=1000, min_batch_size=50):
                         else:
                             # Some other issue with the response
                             raise Exception(f"Unexpected response format: {data}")
-                    elif len(data["reports"][0].get("errors", [])) > 0:
-                        raise Exception(data["reports"][0])
+                    else:
+                        invalid = [r for r in data["reports"] if r.get("errors")]
+                        if invalid:
+                            for r in invalid:
+                                print(
+                                    f"Warning: Skipping unrecognized taxonomy ID(s): {r.get('query', [])}"
+                                )
+                            data["reports"] = [
+                                r for r in data["reports"] if not r.get("errors")
+                            ]
 
                     batch_reports.extend(data["reports"])
 
@@ -198,6 +214,13 @@ def read_organisms(organisms_path):
         return pd.DataFrame(organisms_data)
 
 
+def read_outbreaks(outbreaks_path):
+    if outbreaks_path is None:
+        return None
+    with open(outbreaks_path) as stream:
+        return pd.DataFrame(yaml.safe_load(stream)["outbreaks"])
+
+
 def match_taxonomic_group(tax_id, lineage, taxonomic_groups):
     if tax_id not in taxonomic_groups:
         return None
@@ -242,154 +265,56 @@ def get_taxonomic_level_id_key(level):
     return f"{get_taxonomic_level_key(level)}Id"
 
 
-def get_species_row(
-    taxon_info,
-    taxonomic_group_sets,
-    taxonomic_levels,
-    name_info=None,
-    taxon_name_map=None,
-    taxon_rank_map=None,
-):
-    # print(f"get_species_row: {taxon_info}")
-    classification = taxon_info["taxonomy"]["classification"]
-    species_info = classification["species"]
-    taxonomy_id = taxon_info["taxonomy"]["tax_id"]
-    ancestor_taxonomy_ids = taxon_info["taxonomy"]["parents"]
-
-    # If we need to support serotype and isolate, ensure we have name and rank maps
-    if any(level in taxonomic_levels for level in ["serotype", "isolate"]):
-        if taxon_name_map is None:
-            taxon_name_map = {}
-        if taxon_rank_map is None:
-            taxon_rank_map = {}
-
-        # Fetch info for all ancestor taxonomy IDs
-        fetch_taxa_info(ancestor_taxonomy_ids, taxon_name_map, taxon_rank_map)
-
-        # Now extend the classification with serotype and isolate if they exist
-        for tax_id in ancestor_taxonomy_ids:
-            str_tax_id = str(tax_id)
-            if str_tax_id in taxon_rank_map:
-                rank = taxon_rank_map[str_tax_id].lower()
-                if rank in taxonomic_levels and rank not in classification:
-                    classification[rank] = {
-                        "name": taxon_name_map[str_tax_id],
-                        "id": str_tax_id,
-                    }
-
-    own_level = (
-        taxon_info["taxonomy"]["rank"].lower()
-        if "rank" in taxon_info["taxonomy"]
-        else None
-    )
-    if own_level in taxonomic_levels and own_level not in classification:
-        classification = {
-            **classification,
-            own_level: {
-                "name": taxon_info["taxonomy"]["current_scientific_name"]["name"],
-                "id": taxonomy_id,
-            },
-        }
-    taxonomic_level_fields = {
-        get_taxonomic_level_key(level): classification.get(level, {}).get("name")
-        for level in taxonomic_levels
-    }
-    taxonomic_level_id_fields = {
-        get_taxonomic_level_id_key(level): (
-            str(classification[level]["id"]) if level in classification else None
-        )
-        for level in taxonomic_levels
-    }
-
-    if name_info:
-        common_names = name_info["taxonomy"].get("other_common_names")
-        if common_names:
-            taxonomic_level_fields["commonName"] = common_names[0]
-
-    return {
-        "taxonomyId": str(taxonomy_id),
-        "species": species_info["name"],
-        "speciesTaxonomyId": str(species_info["id"]),
-        "lineageTaxonomyIds": ",".join(
-            [str(id) for id in ancestor_taxonomy_ids + [taxonomy_id]]
-        ),
-        **get_taxonomic_group_sets(ancestor_taxonomy_ids, taxonomic_group_sets),
-        **taxonomic_level_fields,
-        **taxonomic_level_id_fields,
-    }
-
-
-def get_species_info(taxonomy_ids):
+def get_species_df(assembly_taxonomy_df, taxonomic_group_sets, taxonomic_levels):
     """
-    Fetches species information from NCBI API for the given taxonomy IDs.
+    Converts assembly taxonomy information into a DataFrame to be joined with the assembly list.
 
     Args:
-      taxonomy_ids: List of taxonomy IDs to fetch information for
-
-    Returns:
-      List of species information dictionaries from NCBI
-    """
-    url = "https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/dataset_report"
-    taxon_ids = list(set(str(id) for id in taxonomy_ids))
-    return post_ncbi_request(url, {"taxons": taxon_ids})
-
-
-def get_species_name_info(taxonomy_ids):
-    """
-    Fetches species name information from NCBI API for the given taxonomy IDs.
-
-    Args:
-      taxonomy_ids: List of taxonomy IDs to fetch information for
-
-    Returns:
-      List of species name information dictionaries from NCBI
-    """
-    url = "https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/name_report"
-    taxon_ids = list(set(str(id) for id in taxonomy_ids))
-    return post_ncbi_request(url, {"taxons": taxon_ids})
-
-
-def get_species_df(
-    species_info, species_name_info, taxonomic_group_sets, taxonomic_levels
-):
-    """
-    Converts species information into a DataFrame.
-
-    Args:
-      species_info: List of species information dictionaries from NCBI
-      species_name_info: List of species name information dictionaries from NCBI
+      assembly_taxonomy_df: DataFrame containing assembly taxonomy data built in the database
       taxonomic_group_sets: Dictionary of taxonomic group sets
       taxonomic_levels: List of taxonomic levels to include
 
     Returns:
-      DataFrame containing species information
+      DataFrame containing taxonomy information for assembly taxa
     """
-    # Create maps to store taxon names and ranks if we need serotype or isolate
-    taxon_name_map = {}
-    taxon_rank_map = {}
-
-    # Create a dictionary mapping tax_id to name_info for easy lookup
-    name_info_dict = {
-        str(info["taxonomy"]["tax_id"]): info for info in species_name_info
+    taxonomic_group_sets_df = pd.DataFrame(
+        [
+            get_taxonomic_group_sets(lineage, taxonomic_group_sets)
+            for lineage in assembly_taxonomy_df["lineage_taxonomy_ids"]
+        ]
+    )
+    taxonomic_group_columns = {
+        col: taxonomic_group_sets_df[col] for col in taxonomic_group_sets_df.columns
     }
-
-    # Create rows with both species_info and corresponding name_info
-    rows = []
-    for info in species_info:
-        tax_id = str(info["taxonomy"]["tax_id"])
-        name_info = name_info_dict.get(tax_id)
-        rows.append(
-            get_species_row(
-                info,
-                taxonomic_group_sets,
-                taxonomic_levels,
-                name_info,
-                taxon_name_map,
-                taxon_rank_map,
-            )
-        )
-
-    return pd.DataFrame(rows)
+    taxonomic_level_columns = {
+        get_taxonomic_level_key(level): assembly_taxonomy_df[f"taxonomic_level_{level}"]
+        for level in taxonomic_levels
+    }
+    taxonomic_level_id_columns = {
+        get_taxonomic_level_id_key(level): assembly_taxonomy_df[
+            f"taxonomic_level_{level}_id"
+        ].astype("string")
+        for level in taxonomic_levels
+    }
+    return pd.DataFrame(
+        {
+            "taxonomyId": assembly_taxonomy_df["taxonomy_id"].astype("string"),
+            "species": assembly_taxonomy_df["taxonomic_level_species"],
+            "speciesTaxonomyId": assembly_taxonomy_df[
+                "taxonomic_level_species_id"
+            ].astype("string"),
+            "lineageTaxonomyIds": assembly_taxonomy_df["lineage_taxonomy_ids"].map(
+                lambda ids: ",".join([str(id) for id in ids])
+            ),
+            # TODO: this may not be the most significant common name
+            "commonName": assembly_taxonomy_df["common_names"].map(
+                lambda names: names[0] if len(names) else None
+            ),
+            **taxonomic_group_columns,
+            **taxonomic_level_columns,
+            **taxonomic_level_id_columns,
+        }
+    )
 
 
 def get_species_tree(assemblies_df, taxonomic_levels):
@@ -459,54 +384,6 @@ def get_species_subtree(
     }
 
 
-def fetch_taxa_info(tax_ids, taxon_name_map, taxon_rank_map, description="taxa"):
-    """
-    Fetches taxonomic information and updates the provided name and rank maps.
-
-    Args:
-      tax_ids: List or set of taxonomy IDs to fetch
-      taxon_name_map: Dictionary to update with taxon ID to name mappings
-      taxon_rank_map: Dictionary to update with taxon ID to rank mappings
-      description: Description of the taxa being fetched for logging
-
-    Returns:
-      None (updates the provided maps in-place)
-    """
-    # Filter out tax_ids that are already in the map and convert to strings
-    missing_tax_ids = [
-        str(tid)
-        for tid in tax_ids
-        if str(tid) not in taxon_name_map and str(tid) != "1"
-    ]
-
-    if not missing_tax_ids:
-        return
-
-    # Fetch in batches to avoid overwhelming the NCBI server
-    url = "https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/dataset_report"
-    batch_size = 2500
-    total = len(missing_tax_ids)
-    total_batches = (total + batch_size - 1) // batch_size
-    print(f"Fetching information for {total} {description} in {total_batches} batches")
-    for batch_index in range(total_batches):
-        batch = missing_tax_ids[
-            batch_index * batch_size : (batch_index + 1) * batch_size
-        ]
-        print(
-            f"  Batch {batch_index + 1}/{total_batches}: fetching {len(batch)} {description}"
-        )
-        reports = post_ncbi_request(url, {"taxons": batch})
-        for report in reports:
-            tax_id = str(report["taxonomy"]["tax_id"])
-            taxon_name_map[tax_id] = report["taxonomy"]["current_scientific_name"][
-                "name"
-            ]
-            if "rank" in report["taxonomy"]:
-                taxon_rank_map[tax_id] = report["taxonomy"]["rank"]
-            else:
-                print(f"rank not found for tax_id: {tax_id}")
-
-
 def get_genome_row(genome_info):
     refseq_category = genome_info["assembly_info"].get("refseq_category")
     return {
@@ -514,6 +391,7 @@ def get_genome_row(genome_info):
         .get("infraspecific_names", {})
         .get("strain", ""),
         "taxonomyId": str(genome_info["organism"]["tax_id"]),
+        "releaseDate": genome_info["assembly_info"]["release_date"],
         "accession": genome_info["accession"],
         "currentAccession": genome_info.get(
             "current_accession", genome_info["accession"]
@@ -686,8 +564,7 @@ def add_gene_model_url(genomes_df: pd.DataFrame):
 def report_missing_values_from(
     values_name, message_predicate, all_values_series, *partial_values_series
 ):
-    present_values_mask = all_values_series.astype(bool)
-    present_values_mask[:] = False
+    present_values_mask = pd.Series(False, index=all_values_series.index)
     for series in partial_values_series:
         present_values_mask |= all_values_series.isin(series)
     return report_missing_values(
@@ -1133,10 +1010,97 @@ def find_gca_with_paired_gcf(genomes_df):
     return paired_assemblies
 
 
+def check_outbreak_taxonomy_issues(
+    outbreak_taxonomy_ids,
+    taxon_rank_map,
+    taxon_name_map,
+    all_lineage_ids,
+    taxonomic_levels_for_tree,
+):
+    """
+    Check outbreak primary taxonomy IDs for two issues:
+    - Not found in any assembly's lineage (not in catalog)
+    - At a rank below species (e.g. strain, serotype, isolate)
+
+    Args:
+        outbreak_taxonomy_ids: List of primary outbreak taxonomy IDs (strings)
+        taxon_rank_map: Dict mapping taxonomy ID strings to rank strings
+        taxon_name_map: Dict mapping taxonomy ID strings to name strings
+        all_lineage_ids: Set of all taxonomy IDs present in any assembly's lineage
+        taxonomic_levels_for_tree: Ordered list of taxonomic levels (highest to lowest)
+
+    Returns:
+        List of (id, name, reason) tuples for problematic IDs
+    """
+    sub_species_ranks = set()
+    if "species" in taxonomic_levels_for_tree:
+        species_idx = taxonomic_levels_for_tree.index("species")
+        sub_species_ranks = set(taxonomic_levels_for_tree[species_idx + 1 :])
+
+    issues = []
+    for tax_id in outbreak_taxonomy_ids:
+        name = taxon_name_map.get(str(tax_id), str(tax_id))
+        rank = taxon_rank_map.get(str(tax_id), "").lower()
+        if str(tax_id) not in all_lineage_ids:
+            issues.append((tax_id, name, "not in catalog"))
+        elif rank and rank in sub_species_ranks:
+            issues.append((tax_id, name, f"below species rank ({rank})"))
+    return issues
+
+
+def check_organism_ranks(organism_taxonomy_ids, taxon_rank_map, taxon_name_map):
+    """
+    Check organism taxonomy IDs for non-species rank.
+    Organisms are expected to always be at species rank by convention.
+
+    Args:
+        organism_taxonomy_ids: List of organism taxonomy IDs (strings)
+        taxon_rank_map: Dict mapping taxonomy ID strings to rank strings
+        taxon_name_map: Dict mapping taxonomy ID strings to name strings
+
+    Returns:
+        List of (id, name, rank) tuples for organisms not at species rank
+    """
+    return [
+        (
+            tax_id,
+            taxon_name_map.get(str(tax_id), str(tax_id)),
+            taxon_rank_map.get(str(tax_id), "unknown").lower(),
+        )
+        for tax_id in organism_taxonomy_ids
+        if taxon_rank_map.get(str(tax_id), "").lower() != "species"
+    ]
+
+
+def check_organisms_without_assemblies(
+    organism_taxonomy_ids, species_taxonomy_ids, taxon_name_map
+):
+    """
+    Check for organisms whose taxonomy ID does not appear as any assembly's species
+    taxonomy ID. This can indicate missing catalog coverage or a non-species-rank ID.
+
+    Args:
+        organism_taxonomy_ids: List of organism taxonomy IDs (strings)
+        species_taxonomy_ids: Collection of speciesTaxonomyId values from assembly data
+        taxon_name_map: Dict mapping taxonomy ID strings to name strings
+
+    Returns:
+        List of (id, name) tuples for organisms with no matching assemblies
+    """
+    species_ids_set = {str(t) for t in species_taxonomy_ids}
+    return [
+        (tax_id, taxon_name_map.get(str(tax_id), str(tax_id)))
+        for tax_id in organism_taxonomy_ids
+        if str(tax_id) not in species_ids_set
+    ]
+
+
 def make_qc_report(
+    *,
     missing_ncbi_assemblies,
     inconsistent_taxonomy_ids,
     missing_ucsc_assemblies,
+    dbt_test_results,
     missing_gene_model_urls=None,
     missing_datacache_urls=None,
     missing_ploidy_assemblies=None,
@@ -1145,6 +1109,9 @@ def make_qc_report(
     outdated_accessions=None,
     suppressed_genomes=None,
     paired_accessions=None,
+    outbreak_taxonomy_issues=None,
+    organisms_not_species_rank=None,
+    organisms_without_assemblies=None,
 ):
     # Convert simple lists to items for format_list_section
     ncbi_assemblies_items = (
@@ -1225,6 +1192,33 @@ def make_qc_report(
         if paired_accessions
         else []
     )
+    outbreak_taxonomy_issues_items = (
+        [
+            f"{tax_id}: {name} ({reason})"
+            for tax_id, name, reason in outbreak_taxonomy_issues
+        ]
+        if outbreak_taxonomy_issues
+        else []
+    )
+    organisms_not_species_rank_items = (
+        [
+            f"{tax_id}: {name} (rank: {rank})"
+            for tax_id, name, rank in organisms_not_species_rank
+        ]
+        if organisms_not_species_rank
+        else []
+    )
+    organisms_without_assemblies_items = (
+        [f"{tax_id}: {name}" for tax_id, name in organisms_without_assemblies]
+        if organisms_without_assemblies
+        else []
+    )
+    unsuccessful_dbt_tests_items = [
+        f"`{result.test_name}` (status `{result.status}`){'' if result.message is None else ': ' + result.message}"
+        for result in dbt_test_results
+        if not result.success
+    ]
+
     # Compose report modularly using shared QC utils
     lines = ["# Catalog Data QC report", ""]
     lines += format_list_section(
@@ -1261,6 +1255,16 @@ def make_qc_report(
         outbreak_descendants_items,
     )
     lines += format_list_section(
+        "## Outbreak primary taxonomy ID issues (not in catalog or below species rank)",
+        outbreak_taxonomy_issues_items,
+    )
+    lines += format_list_section(
+        "## Organisms not at species rank", organisms_not_species_rank_items
+    )
+    lines += format_list_section(
+        "## Organisms not matched to any assembly", organisms_without_assemblies_items
+    )
+    lines += format_list_section(
         "## Outdated assembly accessions", outdated_accessions_items
     )
     lines += format_list_section(
@@ -1271,10 +1275,32 @@ def make_qc_report(
         paired_accessions_items,
     )
     lines += format_raw_section("## Taxonomy tree", tree_checks_text)
+    lines += format_list_section(
+        "## Unsuccessful dbt tests", unsuccessful_dbt_tests_items
+    )
+
     return join_report(lines)
 
 
-def get_outbreak_taxonomy_ids(outbreaks_path, get_primary=True, get_descendants=False):
+def build_taxon_maps(taxonomy_df):
+    """
+    Build lookups from taxonomy ID (as string) to taxon name and rank.
+
+    Args:
+        taxonomy_df: DataFrame with taxonomy_id, taxon_name and rank columns
+
+    Returns:
+        Tuple of (name_map, rank_map) dicts keyed by taxonomy ID string
+    """
+    taxon_id_strings = taxonomy_df["taxonomy_id"].astype("string")
+    name_map = dict(zip(taxon_id_strings, taxonomy_df["taxon_name"]))
+    rank_map = dict(zip(taxon_id_strings, taxonomy_df["rank"]))
+    return name_map, rank_map
+
+
+def get_outbreak_taxonomy_ids(
+    source_outbreaks_df, get_primary=True, get_descendants=False
+):
     """Read outbreaks from YAML file and return a list of taxonomy IDs.
 
     Includes both primary taxonomy_id and any highlight_descendant_taxonomy_ids.
@@ -1282,32 +1308,32 @@ def get_outbreak_taxonomy_ids(outbreaks_path, get_primary=True, get_descendants=
     if not get_primary and not get_descendants:
         raise ValueError("At least one of get_primary or get_descendants must be True")
 
-    if outbreaks_path is None:
+    # Catalogs without outbreaks pass no outbreaks DataFrame
+    if source_outbreaks_df is None:
         return []
 
-    taxonomy_ids = []
-    with open(outbreaks_path) as stream:
-        outbreaks_data = yaml.safe_load(stream)
-        if not outbreaks_data:
-            return []
-
-        for outbreak in outbreaks_data.get("outbreaks", []):
-            # Add primary taxonomy ID
-            if get_primary:
-                taxonomy_ids.append(str(outbreak["taxonomy_id"]))
-
-            # Add any highlight descendant taxonomy IDs
-            if get_descendants and outbreak.get("highlight_descendant_taxonomy_ids"):
-                # Convert each ID to string before adding
-                taxonomy_ids.extend(
-                    [
-                        str(tax_id)
-                        for tax_id in outbreak["highlight_descendant_taxonomy_ids"]
-                    ]
-                )
-
-    # Return unique taxonomy IDs
-    return list(set(taxonomy_ids))
+    # Return list of unique taxonomy IDs, converted to strings
+    return list(
+        {
+            # Add primary taxonomy IDs
+            *(
+                source_outbreaks_df["taxonomy_id"].astype("string")
+                if get_primary
+                else ()
+            ),
+            # Add any highlight descendant taxonomy IDs. This field is
+            # optional per outbreak, so the column may be absent entirely.
+            *(
+                source_outbreaks_df["highlight_descendant_taxonomy_ids"]
+                .explode()
+                .dropna()
+                .astype("string")
+                if get_descendants
+                and "highlight_descendant_taxonomy_ids" in source_outbreaks_df.columns
+                else ()
+            ),
+        }
+    )
 
 
 def save_taxonomy_mapping(taxonomy_ids, taxon_name_map, taxon_rank_map, output_path):
@@ -1339,15 +1365,17 @@ def save_taxonomy_mapping(taxonomy_ids, taxon_name_map, taxon_rank_map, output_p
         print(f"Wrote taxonomy mapping to {output_path}")
 
 
-def add_galaxy_datacache_url(genomes_df, base_url, batch_size=20, timeout=5):
+def add_galaxy_datacache_url(genomes_df, base_url, timeout=30):
     """
     Add Galaxy Datacache URLs to genomes dataframe after validating they exist.
+
+    Fetches the parent directory listing once and checks accession membership
+    against it, rather than issuing a request per accession.
 
     Args:
         genomes_df: DataFrame containing genome information with 'accession' column
         base_url: Base URL used to construct the datacache link per accession
-        batch_size: Number of URLs to validate concurrently (default: 20)
-        timeout: Timeout in seconds for each request (default: 5)
+        timeout: Timeout in seconds for the listing request (default: 30)
 
     Returns:
         tuple: (updated genomes_df with galaxyDatacacheUrl column, list of missing accessions)
@@ -1361,43 +1389,128 @@ def add_galaxy_datacache_url(genomes_df, base_url, batch_size=20, timeout=5):
     normalized_base_url = base_url if base_url.endswith("/") else f"{base_url}/"
 
     print("Validating Galaxy Datacache URLs...")
-    missing_accessions = []
-    datacache_urls = []
 
-    total_genomes = len(genomes_df)
-    processed = 0
+    response = requests.get(normalized_base_url, timeout=timeout)
+    response.raise_for_status()
+    soup = BeautifulSoup(response.text, "html.parser")
+    available = {
+        href[:-1]
+        for link in soup.find_all("a")
+        if isinstance(link, bs4.element.Tag)
+        and isinstance(href := link.get("href"), str)
+        and href.endswith("/")
+        and not href.startswith(("/", ".", "?", "http"))
+    }
 
-    for i in range(0, total_genomes, batch_size):
-        batch_df = genomes_df.iloc[i : i + batch_size]
+    # If the response's contents are not as expected, we'd otherwise
+    # silently mark every accession as missing. Fail loudly instead.
+    if not available:
+        raise RuntimeError(
+            f"Datacache listing at {normalized_base_url} returned no directory entries; "
+            "server's handling of directory listings may have changed."
+        )
 
-        for _, row in batch_df.iterrows():
-            accession = row["accession"]
-            url = f"{normalized_base_url}{accession}/"
-
-            try:
-                response = requests.get(url, timeout=timeout)
-                if response.status_code == 200:
-                    datacache_urls.append(url)
-                else:
-                    datacache_urls.append("")
-                    missing_accessions.append(accession)
-            except (requests.RequestException, requests.Timeout) as e:
-                log.debug(f"Failed to validate datacache URL for {accession}: {e}")
-                datacache_urls.append("")
-                missing_accessions.append(accession)
-
-            processed += 1
-            print(f"Validated {processed} of {total_genomes} datacache URLs", end="\r")
-
-        time.sleep(0.1)
+    accessions = genomes_df["accession"].tolist()
+    datacache_urls = [
+        f"{normalized_base_url}{accession}/" if accession in available else ""
+        for accession in accessions
+    ]
+    missing_accessions = [a for a, url in zip(accessions, datacache_urls) if not url]
 
     print(
-        f"\nValidated {total_genomes} datacache URLs, {len(missing_accessions)} not found"
+        f"Validated {len(accessions)} datacache URLs against {len(available)}-entry listing, "
+        f"{len(missing_accessions)} not found"
     )
 
     genomes_df["galaxyDatacacheUrl"] = datacache_urls
 
     return genomes_df, missing_accessions
+
+
+@dataclass
+class BuildMetadata:
+    start_time: str
+    end_time: str
+    ncbi_taxdump_md5: str
+
+
+def save_build_metadata(path: str, meta: BuildMetadata):
+    meta_dict = asdict(meta)
+    with open(path, mode="w", encoding="utf-8") as fh:
+        json.dump(meta_dict, fh, indent=2)
+
+
+@dataclass
+class LoadAndTransformResult:
+    taxonomy_assemblies: pd.DataFrame
+    taxonomy_organisms: pd.DataFrame
+    taxonomy_outbreaks: pd.DataFrame
+    ncbi_taxdump_md5: str
+    dbt_test_results: list[DBTTestResult]
+
+
+def load_and_transform(
+    *,
+    temp_folder_path_string: str,
+    dlt_pipeline_prefix: str,
+    taxonomic_levels: list[str],
+    assemblies_df: pd.DataFrame,
+    organisms_df: pd.DataFrame,
+    outbreaks_df: pd.DataFrame | None,
+):
+    """
+    Load source data and NCBI taxonomy via dlt, transform it via dbt, and return the results.
+
+    Recreates the temporary DuckDB database on each run (any existing one is deleted first)
+    so that runs are consistent.
+
+    Args:
+      temp_folder_path_string: Path of the temporary folder to hold downloads and the DuckDB database
+      dlt_pipeline_prefix: Catalog-specific prefix applied to dlt pipeline names
+      taxonomic_levels: Taxonomic levels to build columns for during transformation
+      assemblies_df: DataFrame of source assemblies (must include a `taxonomy_id` column)
+      organisms_df: DataFrame of source organisms (must include a `taxonomy_id` column)
+      outbreaks_df: DataFrame of source outbreaks (must include a `taxonomy_id` column), or None for catalogs without outbreaks
+
+    Returns:
+      A LoadAndTransformResult with the transformed taxonomy DataFrames, the NCBI taxdump
+      MD5, and the dbt test results
+    """
+    temp_folder_path = Path(temp_folder_path_string).resolve()
+
+    print("Loading and transforming data via dlt + dbt")
+
+    # Create temp folder if needed
+    temp_folder_path.mkdir(exist_ok=True)
+
+    # Delete any existing temporary database, to make runs more consistent
+    get_db_path(temp_folder_path).unlink(missing_ok=True)
+
+    # Load data via dlt
+    load_result = do_dlt_load(
+        temp_folder_path=temp_folder_path,
+        dlt_pipeline_prefix=dlt_pipeline_prefix,
+        assemblies_df=assemblies_df,
+        organisms_df=organisms_df,
+        outbreaks_df=outbreaks_df,
+    )
+
+    # Transform loaded data via dbt
+    transform_result = do_dbt_transformations(
+        temp_folder_path,
+        taxonomic_levels=taxonomic_levels,
+        has_outbreaks=outbreaks_df is not None,
+    )
+
+    # Get transformed data and return along with metadata
+    with duckdb.connect(get_db_path(temp_folder_path)) as con:
+        return LoadAndTransformResult(
+            taxonomy_assemblies=con.query("select * from taxonomy_assemblies").df(),
+            taxonomy_organisms=con.query("select * from taxonomy_organisms").df(),
+            taxonomy_outbreaks=con.query("select * from taxonomy_outbreaks").df(),
+            ncbi_taxdump_md5=load_result.ncbi_taxdump_md5,
+            dbt_test_results=transform_result.dbt_test_results,
+        )
 
 
 def build_files(
@@ -1406,12 +1519,16 @@ def build_files(
     ucsc_assemblies_url,
     tree_output_path,
     taxonomic_levels_for_tree,
+    *,
+    temp_folder_path,
+    dlt_pipeline_prefix,
+    build_meta_output_path,
     taxonomic_group_sets=None,
     do_gene_model_urls=True,
     extract_primary_data=False,
     primary_output_path=None,
     qc_report_path=None,
-    organisms_path=None,
+    organisms_path,
     outbreaks_path=None,
     outbreak_taxonomy_mapping_path=None,
     organism_image_path=None,
@@ -1442,13 +1559,9 @@ def build_files(
         taxonomic_group_sets = {}
     print("Building files")
 
-    qc_report_params = {}
+    start_time = datetime.datetime.now(datetime.UTC).isoformat()
 
-    # Read outbreak taxonomy IDs if outbreaks path is provided
-    outbreak_taxonomy_ids = []
-    if outbreaks_path:
-        outbreak_taxonomy_ids = get_outbreak_taxonomy_ids(outbreaks_path)
-    print(f"Found {len(outbreak_taxonomy_ids)} outbreak taxonomy IDs")
+    qc_report_params = {}
 
     # We'll get the taxa names after we've built the species info to reuse the taxon maps
 
@@ -1491,58 +1604,79 @@ def build_files(
         base_genomes_df["accession"],
     )
 
-    # Fetch species information once to be used by both species_df and species_tree
-    species_info = get_species_info(base_genomes_df["taxonomyId"])
-    species_name_info = get_species_name_info(base_genomes_df["taxonomyId"])
+    # Load source organisms and outbreaks; outbreaks are optional (only some
+    # catalogs use them), so source_outbreaks_df is None when no path is given
+    source_organisms_df = read_organisms(organisms_path)
+    source_outbreaks_df = read_outbreaks(outbreaks_path)
 
-    # Create species DataFrame using the fetched species_info
+    # Do database-based loading and transformation
+    load_and_transform_result = load_and_transform(
+        temp_folder_path_string=temp_folder_path,
+        dlt_pipeline_prefix=dlt_pipeline_prefix,
+        taxonomic_levels=taxonomic_levels_for_tree,
+        assemblies_df=base_genomes_df.rename(columns={"taxonomyId": "taxonomy_id"}),
+        organisms_df=source_organisms_df,
+        outbreaks_df=source_outbreaks_df,
+    )
+    assembly_taxonomy_df = load_and_transform_result.taxonomy_assemblies
+    organism_taxonomy_df = load_and_transform_result.taxonomy_organisms
+    outbreak_taxonomy_df = load_and_transform_result.taxonomy_outbreaks
+    qc_report_params["dbt_test_results"] = load_and_transform_result.dbt_test_results
+
+    # Create species DataFrame using the assemblies' taxonomy
     species_df = get_species_df(
-        species_info, species_name_info, taxonomic_group_sets, taxonomic_levels_for_tree
+        assembly_taxonomy_df, taxonomic_group_sets, taxonomic_levels_for_tree
     )
 
+    outbreak_taxonomy_ids = get_outbreak_taxonomy_ids(source_outbreaks_df)
     print(f"Found {len(outbreak_taxonomy_ids)} outbreak taxonomy IDs")
     # Add otherTaxa field with outbreak-associated taxa names
     if outbreak_taxonomy_ids:
-        # Convert lineageTaxonomyIds from comma-separated string to list of strings
-        species_df["lineageTaxonomyIdsList"] = species_df["lineageTaxonomyIds"].apply(
-            lambda x: [id for id in x.split(",")]
+        # Get taxon names and ranks for outbreak taxonomy IDs
+        outbreak_taxon_name_map, outbreak_taxon_rank_map = build_taxon_maps(
+            outbreak_taxonomy_df
         )
 
-        # Get taxon names and ranks for outbreak taxonomy IDs
-        outbreak_taxon_name_map = {}
-        outbreak_taxon_rank_map = {}
-        fetch_taxa_info(
-            outbreak_taxonomy_ids,
-            outbreak_taxon_name_map,
-            outbreak_taxon_rank_map,
-            "outbreak taxa",
-        )
+        # Set for O(1) membership tests in the per-row loop below
+        outbreak_taxonomy_id_set = set(outbreak_taxonomy_ids)
 
         # For each row, check if any lineage taxonomy ID is in the outbreak taxonomy IDs
         # and add the corresponding taxon name to otherTaxa only if its rank is not in taxonomic_levels_for_tree
-        def get_other_taxa(lineage_ids):
+        def get_other_taxa(lineage_taxonomy_ids):
             taxa = []
-            for tax_id in lineage_ids:
-                if tax_id in outbreak_taxonomy_ids:
+            for tax_id in lineage_taxonomy_ids.split(","):
+                if tax_id in outbreak_taxonomy_id_set:
                     # Check if this taxon's rank is already covered by taxonomic_levels_for_tree
                     rank = outbreak_taxon_rank_map.get(str(tax_id), "").lower()
-                    if rank not in taxonomic_levels_for_tree:
-                        # Use the taxon name instead of the raw ID
-                        taxa.append(outbreak_taxon_name_map[str(tax_id)])
+                    tax_id_str = str(tax_id)
+                    if (
+                        rank not in taxonomic_levels_for_tree
+                        and tax_id_str in outbreak_taxon_name_map
+                    ):
+                        # Add the taxon name (note: not the raw ID) if available
+                        taxa.append(outbreak_taxon_name_map[tax_id_str])
             # Convert list to comma-separated string for build-assemblies.ts
             return ",".join(taxa) if taxa else None
 
-        species_df["otherTaxa"] = species_df["lineageTaxonomyIdsList"].apply(
-            get_other_taxa
-        )
+        species_df["otherTaxa"] = species_df["lineageTaxonomyIds"].apply(get_other_taxa)
 
-        # Drop the temporary column
-        species_df = species_df.drop(columns=["lineageTaxonomyIdsList"])
+        all_lineage_ids = {
+            id_str
+            for lineage in species_df["lineageTaxonomyIds"]
+            for id_str in lineage.split(",")
+        }
+        qc_report_params["outbreak_taxonomy_issues"] = check_outbreak_taxonomy_issues(
+            outbreak_taxonomy_ids,
+            outbreak_taxon_rank_map,
+            outbreak_taxon_name_map,
+            all_lineage_ids,
+            taxonomic_levels_for_tree,
+        )
 
     qc_report_params["missing_outbreak_descendants"] = (
         check_missing_outbreak_descendants(
             get_outbreak_taxonomy_ids(
-                outbreaks_path, get_primary=False, get_descendants=True
+                source_outbreaks_df, get_primary=False, get_descendants=True
             ),
             species_df["speciesTaxonomyId"],
         )
@@ -1726,12 +1860,26 @@ def build_files(
             species_tree, taxonomic_levels_for_tree, genomes_df.shape[0]
         )
 
-    if organisms_path is not None:
-        organisms_df = read_organisms(organisms_path)
-        qc_report_params["missing_ploidy_assemblies"] = report_missing_ploidy_info(
-            genomes_df, organisms_df
+    qc_report_params["missing_ploidy_assemblies"] = report_missing_ploidy_info(
+        genomes_df, source_organisms_df
+    )
+    print(f"Checked ploidy for {len(genomes_df)} assemblies")
+
+    organism_taxon_name_map, organism_taxon_rank_map = build_taxon_maps(
+        organism_taxonomy_df
+    )
+    qc_report_params["organisms_not_species_rank"] = check_organism_ranks(
+        source_organisms_df["taxonomy_id"].tolist(),
+        organism_taxon_rank_map,
+        organism_taxon_name_map,
+    )
+    qc_report_params["organisms_without_assemblies"] = (
+        check_organisms_without_assemblies(
+            source_organisms_df["taxonomy_id"].tolist(),
+            genomes_df["speciesTaxonomyId"],
+            organism_taxon_name_map,
         )
-        print(f"Checked ploidy for {len(genomes_df)} assemblies")
+    )
 
     if qc_report_path is not None:
         qc_report_text = make_qc_report(**qc_report_params)
@@ -1749,53 +1897,16 @@ def build_files(
             outbreak_taxonomy_mapping_path,
         )
 
+    end_time = datetime.datetime.now(datetime.UTC).isoformat()
 
-def create_taxonomy_read_run_count(genomes_tsv_path: str, output_path: str):
-    """Create taxonomy read run count JSON file from genomes TSV.
-    Args:
-        genomes_tsv_path: Path to the genomes TSV file
-        output_path: Path where the taxonomy read run count JSON will be written
-    """
-    df = pd.read_csv(genomes_tsv_path, sep="\t")
-    unique_taxonomy_ids = df["taxonomyId"].drop_duplicates()
-    print("Creating taxonomy read run counts")
-    with open(output_path, "w") as writer:
-        writer.write(
-            json.dumps(
-                generate_taxon_read_run_count(unique_taxonomy_ids.tolist()), indent=2
-            )
-        )
-    print("Taxonomy read run counts created")
-
-
-def generate_taxon_read_run_count(taxonomy_ids):
-    taxon_counter = {}
-    url = "https://www.ebi.ac.uk/ena/portal/api/search"
-    counter = 0
-    num_taxids = len(taxonomy_ids)
-    for tId in taxonomy_ids:
-        processing = (
-            f"Processed {counter} taxonomy IDs of {num_taxids}, processing tx id: {tId}"
-        )
-        print(f"{processing:<120}", end="\r")
-        params = {
-            "result": "read_run",
-            "query": f"tax_tree({tId})",
-            "fields": "experiment_accession,study_accession",
-            "format": "json",
-        }
-        try:
-            resp = requests.get(url, params=params)
-            resp.raise_for_status()
-        except ConnectTimeout:
-            print("Timeout, sleeping 10s")
-            time.sleep(10)
-            resp = requests.get(url, params=params)
-            resp.raise_for_status()
-        taxon_counter[tId] = len(resp.json())
-        counter += 1
-    print(f"Processed {counter} taxonomy IDs", end="\n")
-    return dict(sorted(taxon_counter.items(), key=lambda x: x[1], reverse=True))
+    save_build_metadata(
+        build_meta_output_path,
+        BuildMetadata(
+            start_time=start_time,
+            end_time=end_time,
+            ncbi_taxdump_md5=load_and_transform_result.ncbi_taxdump_md5,
+        ),
+    )
 
 
 def get_image_path(

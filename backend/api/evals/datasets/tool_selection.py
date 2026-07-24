@@ -52,8 +52,17 @@ _CASES = [
         "message": (
             "Show me the genome assemblies for Mycobacterium tuberculosis (taxid 1773)."
         ),
-        "expected_tool": "get_assemblies",
-        "expected_args": {"taxonomy_id": "1773"},
+        # Tool-selection only: that the taxon is actually applied as a filter is
+        # asserted in the catalog_query dataset (QueryCatalogShape), its proper home.
+        "expected_tool": "query_catalog",
+    },
+    {
+        # A clade-organism question must use the bounded query engine, NOT the
+        # legacy fuzzy search_organisms (the core re-routing #1371 promises). Arg
+        # shape (entity="organism") is asserted in the catalog_query dataset.
+        "name": "organisms_for_clade_uses_query_catalog",
+        "message": "What organisms do you have for the genus Anopheles?",
+        "expected_tool": "query_catalog",
     },
     {
         "name": "list_workflow_categories",

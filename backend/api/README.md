@@ -72,6 +72,23 @@ Services:
 - `GET /api/docs` - Interactive Swagger UI
 - `GET /api/redoc` - ReDoc API documentation
 
+## MCP Server
+
+The API embeds a Model Context Protocol server at `/api/v1/mcp`, giving AI
+clients (Claude Desktop, the Galaxy MCP integration) direct access to the BRC
+catalog and sequencing-data search.
+
+**Catalog tools** -- organisms, assemblies, workflows, and compatibility checks
+(in-memory, always available).
+
+**ENA tools** (`search_ena`, `search_ena_keywords`) -- live sequencing-run
+search against the European Nucleotide Archive.
+
+**SRA mirror tools** (`search_sra`, `sra_data_summary`, `get_sra_study_runs`) --
+fast structured search over a local SRA metadata mirror scoped to BRC-relevant
+organisms. Opt-in: registered only when `SRA_MIRROR_PATH` points at a built
+mirror file; a default deploy exposes only the catalog and ENA tools.
+
 ## Configuration
 
 Environment variables (see `.env.example`):

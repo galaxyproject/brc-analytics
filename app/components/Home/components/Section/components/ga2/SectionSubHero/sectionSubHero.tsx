@@ -1,12 +1,12 @@
-import { AccordionDetails, AccordionSummary, Fade, Slide } from "@mui/material";
-import { JSX } from "react";
-import { SubHeroContentGA2 } from "../../../../../content";
 import {
   ACCORDION_PROPS,
   FADE_PROPS,
   SLIDE_PROPS,
-} from "../../SectionSubHero/constants";
-import { useAutoCycle } from "../../SectionSubHero/hooks";
+} from "@/components/Home/components/Section/components/SectionSubHero/constants";
+import { useAutoCycle } from "@/components/Home/components/Section/components/SectionSubHero/hooks";
+import { SubHeroContent } from "@/components/Home/content/ga2";
+import { AccordionDetails, AccordionSummary, Fade, Slide } from "@mui/material";
+import { JSX } from "react";
 import { ACCORDION, BUTTON, IMAGE } from "./instructions";
 import {
   AccordionBox,
@@ -30,7 +30,7 @@ export const SectionSubHero = (): JSX.Element => {
       <SectionLayout>
         <SectionSubLayout>
           <Subhead>
-            <SubHeroContentGA2 />
+            <SubHeroContent />
           </Subhead>
           <AccordionBox>
             {Object.entries(ACCORDION).map(([value, { details, title }]) => (

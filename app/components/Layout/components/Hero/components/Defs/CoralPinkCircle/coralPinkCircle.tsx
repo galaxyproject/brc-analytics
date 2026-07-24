@@ -1,11 +1,15 @@
-import { JSX } from "react";
-import { ANIMATE_MOTION, FILL, SHAPE_HEIGHT } from "../../../common/constants";
-import { ELEMENT_ID } from "../../../common/entities";
+import {
+  ANIMATE_MOTION,
+  FILL,
+  SHAPE_HEIGHT,
+} from "@/components/Layout/components/Hero/common/constants";
+import { ELEMENT_ID } from "@/components/Layout/components/Hero/common/entities";
 import {
   calculateCircleXPosition,
   calculateCircleYPosition,
   getAnimateMotionTransformCircle,
-} from "../../../common/utils";
+} from "@/components/Layout/components/Hero/common/utils";
+import { JSX } from "react";
 
 export interface CoralPinkCircleProps {
   gridSize: number;

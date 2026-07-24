@@ -40,9 +40,31 @@ class Settings:
         self.AI_SKIP_SSL_VERIFY: bool = (
             os.getenv("AI_SKIP_SSL_VERIFY", "false").lower() == "true"
         )
+        # How the state EXTRACTOR emits its structured output. The reply is a
+        # separate plain-text call; a focused second call extracts the tracker
+        # snapshot.
+        # The eval showed MiniMax on TACC only post-hoc-validates json_schema
+        # (drifts to prose -> 400) but follows a prompted JSON instruction, while
+        # Anthropic honors tool output -- so the mode is provider-dependent.
+        #   auto (default): prompted for OpenAI-compatible endpoints, tool for
+        #                   Anthropic.
+        #   native | tool | prompted: force a specific pydantic-ai output mode.
+        self.ASSISTANT_OUTPUT_MODE: str = os.getenv(
+            "ASSISTANT_OUTPUT_MODE", "auto"
+        ).lower()
 
-        # Database settings (for future use)
+        # Database settings -- required for persistent user data (favorites,
+        # saved analyses, workflow runs). Anonymous / non-persistent flows
+        # don't touch the DB.
         self.DATABASE_URL: str = os.getenv("DATABASE_URL", "")
+        self.DATABASE_ECHO: bool = os.getenv("DATABASE_ECHO", "false").lower() == "true"
+        self.DATABASE_POOL_SIZE: int = int(os.getenv("DATABASE_POOL_SIZE", "5"))
+        self.DATABASE_MAX_OVERFLOW: int = int(os.getenv("DATABASE_MAX_OVERFLOW", "10"))
+        # Off by default so prod deploys retain explicit migration control.
+        # Enable for local/dev/CI where a one-shot upgrade-on-startup is convenient.
+        self.RUN_MIGRATIONS_ON_STARTUP: bool = (
+            os.getenv("RUN_MIGRATIONS_ON_STARTUP", "false").lower() == "true"
+        )
 
         # ENA API settings
         self.ENA_API_BASE: str = os.getenv(
@@ -111,6 +133,9 @@ class Settings:
 
         # Catalog path
         self.CATALOG_PATH: str = os.getenv("CATALOG_PATH", "/catalog/output")
+
+        # SRA-DuckDB mirror. Empty path disables the assistant's SRA tools.
+        self.SRA_MIRROR_PATH: str = os.getenv("SRA_MIRROR_PATH", "")
 
         # Keycloak / OIDC settings
         self.KEYCLOAK_ISSUER_URL: str = os.getenv(

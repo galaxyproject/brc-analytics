@@ -1,15 +1,16 @@
-import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
-import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
-import data from "catalog/ga2/output/ncbi-taxa-tree.json";
 import {
   GA2AssemblyEntity,
   GA2OrganismEntity,
-} from "../../../app/apis/catalog/ga2/entities";
-import * as C from "../../../app/components";
-import { TaxonomyNode } from "../../../app/components/Home/components/Section/components/SectionViz/data";
-import { ROUTES } from "../../../routes/constants";
-import { APP_KEYS } from "../../common/constants";
-import { AppSiteConfig } from "../../common/entities";
+} from "@/apis/catalog/ga2/entities";
+import * as C from "@/components";
+import { TaxonomyNode } from "@/components/Home/components/Section/components/SectionViz/data";
+import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
+import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import { ROUTES } from "@repo/shared/routes/constants";
+import { APP_KEYS } from "@site-config/common/constants";
+import { AppSiteConfig } from "@site-config/common/entities";
+import data from "catalog/ga2/output/ncbi-taxa-tree.json";
+import { ROUTES as SITE_ROUTES } from "../../../routes/constants";
 import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genome/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organism/organismEntityConfig";
@@ -19,11 +20,12 @@ import { socialMedia } from "./socialMedia";
 import { THEME_OPTIONS } from "./theme/constants";
 
 const ALLOWED_PATHS = [
-  ROUTES.ABOUT,
+  SITE_ROUTES.ABOUT,
+  SITE_ROUTES.ABOUT_PARTNER_RESOURCES,
+  SITE_ROUTES.ABOUT_ROADMAP,
   ROUTES.ORGANISMS,
   ROUTES.GENOMES,
   ROUTES.WORKFLOWS,
-  ROUTES.ROADMAP,
 ];
 const LOCALHOST = "http://localhost:3000";
 const APP_TITLE = "Genome Ark 2";
@@ -89,17 +91,16 @@ export function makeConfig(
         navigation: [
           undefined,
           [
-            { label: "About", url: ROUTES.ABOUT },
+            { label: "About", url: SITE_ROUTES.ABOUT },
             { label: "Organisms", url: ROUTES.ORGANISMS },
             { label: "Assemblies", url: ROUTES.GENOMES },
             { label: "Workflows", url: ROUTES.WORKFLOWS },
-            { label: "Roadmap", url: ROUTES.ROADMAP },
           ],
           undefined,
         ],
       },
     },
-    maxReadRunsForBrowseAll: 60000,
+    maxReadRunsForBrowseAll: 80000,
     redirectRootToPath: "/",
     taxTree: taxTreeData,
     themeOptions: THEME_OPTIONS,

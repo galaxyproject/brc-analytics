@@ -6,23 +6,28 @@ jest.mock(
       ACCESSION_COUNT: { key: "numberOfHits", label: "Accessions to Download" },
       ASSEMBLY_ID: { key: "ASSEMBLY_ID" },
       GENE_MODEL_URL: { key: "GENE_MODEL_URL" },
+      SANGER_READ_RUN_FORWARD_FILE: { key: "readRunPairedFile" },
       SANGER_READ_RUN_PAIRED: { key: "SANGER_READ_RUN_PAIRED" },
+      SANGER_READ_RUN_REVERSE_FILE: { key: "readRunPairedFile" },
       SANGER_READ_RUN_SINGLE: { key: "SANGER_READ_RUN_SINGLE" },
+      SANGER_READ_RUN_SINGLE_FILE: { key: "readRunSingleFile" },
       SEQUENCE: { key: "sequence", label: "Sequence" },
     },
   })
 );
 
-import type { Workflow } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
+import { buildSteps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/utils";
 import {
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
-} from "../../../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { buildSteps } from "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/utils";
+} from "@repo/shared/apis/schema-types";
+import type { Workflow } from "@repo/shared/apis/workflow";
 
 describe("buildSteps - scope handling", () => {
   const BASE_WORKFLOW: Workflow = {
+    assemblyCountMax: 1,
+    assemblyCountMin: 1,
     iwcId: "iwc-test",
     parameters: [
       {
@@ -156,8 +161,8 @@ describe("buildSteps - scope handling", () => {
 
       expect(steps.map((s) => s.key)).toEqual([
         "ASSEMBLY_ID",
-        "SANGER_READ_RUN_SINGLE",
         "SANGER_READ_RUN_PAIRED",
+        "SANGER_READ_RUN_SINGLE",
       ]);
     });
 
@@ -190,9 +195,48 @@ describe("buildSteps - scope handling", () => {
       expect(steps.map((s) => s.key)).toEqual([
         "ASSEMBLY_ID",
         "GENE_MODEL_URL",
-        "SANGER_READ_RUN_SINGLE",
         "SANGER_READ_RUN_PAIRED",
+        "SANGER_READ_RUN_SINGLE",
       ]);
+    });
+
+    test("includes single-file step for SANGER_READ_RUN_SINGLE_FILE", () => {
+      const workflow: Workflow = {
+        ...BASE_WORKFLOW,
+        parameters: [
+          {
+            key: "Single FASTQ",
+            variable: WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE_FILE,
+          },
+        ],
+        scope: WORKFLOW_SCOPE.ORGANISM,
+      };
+
+      const steps = buildSteps(workflow);
+
+      expect(steps.map((s) => s.key)).toEqual(["readRunSingleFile"]);
+    });
+
+    test("deduplicates paired-file step when both forward and reverse are present", () => {
+      const workflow: Workflow = {
+        ...BASE_WORKFLOW,
+        parameters: [
+          {
+            key: "Forward reads",
+            variable: WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_FORWARD_FILE,
+          },
+          {
+            key: "Reverse reads",
+            variable: WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_REVERSE_FILE,
+          },
+        ],
+        scope: WORKFLOW_SCOPE.ORGANISM,
+      };
+
+      const steps = buildSteps(workflow);
+
+      expect(steps.map((s) => s.key)).toEqual(["readRunPairedFile"]);
+      expect(steps).toHaveLength(1);
     });
   });
 });

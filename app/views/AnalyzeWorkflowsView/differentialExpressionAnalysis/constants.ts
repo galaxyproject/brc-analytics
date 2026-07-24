@@ -1,10 +1,12 @@
-import { Workflow } from "../../../apis/catalog/brc-analytics-catalog/common/entities";
 import {
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
-} from "../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
+} from "@repo/shared/apis/schema-types";
+import type { Workflow } from "@repo/shared/apis/workflow";
 
 export const DIFFERENTIAL_EXPRESSION_ANALYSIS: Workflow = {
+  assemblyCountMax: 1,
+  assemblyCountMin: 1,
   iwcId: "",
   parameters: [],
   ploidy: WORKFLOW_PLOIDY.ANY,

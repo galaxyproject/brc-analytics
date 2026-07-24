@@ -1,21 +1,24 @@
+import { BRCDataCatalogGenome } from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import {
+  getGenomeId,
+  getGenomeTitle,
+} from "@/apis/catalog/brc-analytics-catalog/common/utils";
+import * as C from "@/components";
+import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import {
   ComponentConfig,
   ListConfig,
   SORT_DIRECTION,
 } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
-import { BRCDataCatalogGenome } from "../../../../app/apis/catalog/brc-analytics-catalog/common/entities";
-import {
-  getGenomeId,
-  getGenomeTitle,
-} from "../../../../app/apis/catalog/brc-analytics-catalog/common/utils";
-import * as C from "../../../../app/components";
-import * as V from "../../../../app/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { AppEntityConfig } from "../../../common/entities";
+import { AnalyzeGenome } from "@repo/shared/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
+import { LevelCell } from "@repo/shared/components/Table/components/TableCell/components/LevelCell/levelCell";
+import { SpeciesCell } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/speciesCell";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
-} from "../../category";
+} from "@site-config/brc-analytics/category";
+import { AppEntityConfig } from "@site-config/common/entities";
 import { CATEGORY_GROUPS } from "./common/category/categories";
 import { COLUMN_REGISTRY } from "./common/column/columnRegistry";
 
@@ -133,24 +136,14 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
     columns: [
       {
         componentConfig: {
-          component: C.AnalyzeGenome,
+          component: AnalyzeGenome,
           viewBuilder: V.buildAnalyzeGenome,
-        } as ComponentConfig<typeof C.AnalyzeGenome, BRCDataCatalogGenome>,
+        } as ComponentConfig<typeof AnalyzeGenome, BRCDataCatalogGenome>,
         enableSorting: false,
         enableTableDownload: false,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANALYZE_GENOME,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.ANALYZE_GENOME,
         width: "auto",
-      },
-      {
-        columnPinned: true,
-        componentConfig: {
-          component: C.BasicCell,
-          viewBuilder: V.buildAccession,
-        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION,
-        width: { max: "1fr", min: "164px" },
       },
       {
         componentConfig: {
@@ -225,19 +218,50 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
         width: { max: "1fr", min: "212px" },
       },
       {
+        columnPinned: true,
         componentConfig: {
-          component: C.Link,
-          viewBuilder: V.buildGenomeTaxonomicLevelSpecies,
-        } as ComponentConfig<typeof C.Link, BRCDataCatalogGenome>,
+          component: SpeciesCell,
+          viewBuilder: V.buildGenomeSpecies,
+        } as ComponentConfig<typeof SpeciesCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
-        width: { max: "1fr", min: "200px" },
+        width: { max: "1.5fr", min: "340px" },
+      },
+      {
+        componentConfig: {
+          component: C.BasicCell,
+          viewBuilder: V.buildAccession,
+        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
+        id: BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION,
+        width: { max: "1fr", min: "164px" },
+      },
+      {
+        componentConfig: {
+          children: [
+            {
+              component: C.BasicCell,
+              viewBuilder: V.buildReleaseDate,
+            } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
+          ],
+          component: C.Tooltip,
+          viewBuilder: V.buildReleaseDateTooltip,
+          // The shared release-date builders take the site-neutral
+          // AssemblyContract, which TS can't reconcile with this cast:
+          // ComponentConfig's data type is invariant and the Tooltip viewBuilder
+          // omits `children` (supplied above). Double cast is the repo's
+          // escape-hatch for this findable-ui typing limitation.
+        } as unknown as ComponentConfig<typeof C.Tooltip, BRCDataCatalogGenome>,
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.RELEASE_DATE,
+        id: BRC_DATA_CATALOG_CATEGORY_KEY.RELEASE_DATE,
+        width: { max: "1fr", min: "120px" },
       },
       {
         componentConfig: {
           component: C.BasicCell,
           viewBuilder: V.buildGenomeTaxonomicLevelStrain,
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
+        enableHiding: false,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,
         width: { max: "0.5fr", min: "160px" },
@@ -247,6 +271,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
           component: C.BasicCell,
           viewBuilder: V.buildGenomeTaxonomicLevelSerotype,
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
+        enableHiding: false,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SEROTYPE,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SEROTYPE,
         width: { max: "0.5fr", min: "160px" },
@@ -256,6 +281,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
           component: C.BasicCell,
           viewBuilder: V.buildGenomeTaxonomicLevelIsolate,
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
+        enableHiding: false,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_ISOLATE,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ISOLATE,
         width: { max: "0.5fr", min: "160px" },
@@ -274,6 +300,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
           component: C.BasicCell,
           viewBuilder: V.buildTaxonomyId,
         } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
+        enableHiding: false,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMY_ID,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMY_ID,
         width: { max: "0.5fr", min: "144px" },
@@ -281,8 +308,9 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: C.NTagCell,
-          viewBuilder: V.buildTaxonomicGroup,
+          viewBuilder: V.buildAssemblyTaxonomicGroup,
         } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogGenome>,
+        enableHiding: false,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_GROUP,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_GROUP,
         width: { max: "0.5fr", min: "142px" },
@@ -313,9 +341,9 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       },
       {
         componentConfig: {
-          component: C.BasicCell,
+          component: LevelCell,
           viewBuilder: V.buildLevel,
-        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
+        } as ComponentConfig<typeof LevelCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.LEVEL,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.LEVEL,
         width: { max: "0.5fr", min: "142px" },
@@ -392,7 +420,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
         id: BRC_DATA_CATALOG_CATEGORY_KEY.ANNOTATION_STATUS,
         width: { max: "0.5fr", min: "180px" },
       },
-      COLUMN_REGISTRY.PRIORITY,
+      { ...COLUMN_REGISTRY.PRIORITY, enableHiding: false },
     ],
     tableOptions: {
       downloadFilename: "assemblies",
@@ -400,6 +428,12 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       initialState: {
         columnVisibility: {
           [BRC_DATA_CATALOG_CATEGORY_KEY.PRIORITY]: false,
+          [BRC_DATA_CATALOG_CATEGORY_KEY.PRIORITY_PATHOGEN_NAME]: false,
+          [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_GROUP]: false,
+          [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ISOLATE]: false,
+          [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SEROTYPE]: false,
+          [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN]: false,
+          [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMY_ID]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_CLASS]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_FAMILY]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_GENUS]: false,

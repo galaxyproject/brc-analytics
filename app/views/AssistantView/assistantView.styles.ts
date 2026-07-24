@@ -1,14 +1,15 @@
-import { GridPaperSection } from "@databiosphere/findable-ui/lib/components/common/Section/section.styles";
+import { sectionLayout } from "@/components/Layout/components/AppLayout/components/Section/section.styles";
 import styled from "@emotion/styled";
-import { Box } from "@mui/material";
-import { sectionLayout } from "../../components/Layout/components/AppLayout/components/Section/section.styles";
+import { Box, Stack } from "@mui/material";
 
-export const AssistantSection = styled(GridPaperSection)`
-  padding: 24px 0;
+export const StyledSection = styled.section`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
   width: 100%;
 `;
 
-export const SectionContent = styled(Box)`
+export const SectionContent = styled(Stack)`
   ${sectionLayout};
   padding: 0 16px;
   width: calc(100% - 32px);

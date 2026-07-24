@@ -1,14 +1,14 @@
+import { TYPOGRAPHY_PROPS as COMPONENT_TYPOGRAPHY_PROPS } from "@/views/AnalyzeWorkflowsView/components/Main/components/Accordion/constants";
+import { formatTrsId } from "@/views/AnalyzeWorkflowsView/components/Main/utils";
 import { REL_ATTRIBUTE } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { Link as DXLink } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { Button, Grid, Typography } from "@mui/material";
+import { ROUTES } from "@repo/shared/routes/constants";
 import Link from "next/link";
 import { Fragment, JSX } from "react";
-import { ROUTES } from "../../../../../../../../../routes/constants";
-import { formatTrsId } from "../../../../utils";
-import { TYPOGRAPHY_PROPS as COMPONENT_TYPOGRAPHY_PROPS } from "../../constants";
 import { GRID_PROPS } from "./constants";
 import { Props } from "./types";
 import { StyledGrid } from "./workflow.styles";

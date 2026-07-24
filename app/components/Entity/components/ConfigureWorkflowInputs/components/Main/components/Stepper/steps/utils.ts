@@ -1,16 +1,17 @@
-import { Workflow } from "../../../../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
+import { CUSTOM_WORKFLOW } from "@/views/AnalyzeWorkflowsView/custom/constants";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
+import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import {
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_SCOPE,
-} from "../../../../../../../../../apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { CUSTOM_WORKFLOW } from "../../../../../../../../../views/AnalyzeWorkflowsView/custom/constants";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../../../../../../../../../views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
-import { ConfiguredInput } from "../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+} from "@repo/shared/apis/schema-types";
+import type { Workflow } from "@repo/shared/apis/workflow";
 import { StepConfig } from "../components/Step/types";
 import { STEP } from "./constants";
 
 /**
- * Augment the configured steps with two additional sequencing steps "READ_RUNS_PAIRED" and "READ_RUNS_SINGLE".
+ * Augment the configured steps with sequencing steps: READ_RUNS_PAIRED, READ_RUNS_SINGLE,
+ * READ_RUNS_PAIRED_FILE, and READ_RUNS_SINGLE_FILE.
  * Allows the user to configure both single and paired end reads and render those values in the summary.
  * @param configuredSteps - Configured steps.
  * @param configuredInput - Configured input.
@@ -75,30 +76,40 @@ export function buildSteps(workflow: Workflow): StepConfig[] {
   switch (workflowScope) {
     case WORKFLOW_SCOPE.ASSEMBLY:
       // ASSEMBLY scope: Include assembly selection as first step
-      return [
-        WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_ID,
-        WORKFLOW_PARAMETER_VARIABLE.GENE_MODEL_URL,
-        WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE,
-        WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_PAIRED,
-      ]
-        .filter(
-          (variable) =>
-            // ASSEMBLY_ID is always included for ASSEMBLY scope
-            variable === WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_ID ||
-            // Include other variables that the workflow has
-            variables.includes(variable)
-        )
-        .map((variable) => STEP[variable])
-        .filter(isStepConfigured);
+      return deduplicateSteps(
+        [
+          WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_ID,
+          WORKFLOW_PARAMETER_VARIABLE.GENE_MODEL_URL,
+          WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_FORWARD_FILE,
+          WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_PAIRED,
+          WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_REVERSE_FILE,
+          WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE,
+          WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE_FILE,
+        ]
+          .filter(
+            (variable) =>
+              // ASSEMBLY_ID is always included for ASSEMBLY scope
+              variable === WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_ID ||
+              // Include other variables that the workflow has
+              variables.includes(variable)
+          )
+          .map((variable) => STEP[variable])
+          .filter(isStepConfigured)
+      );
 
     case WORKFLOW_SCOPE.ORGANISM:
-      return [
-        WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE,
-        WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_PAIRED,
-      ]
-        .filter((variable) => variables.includes(variable))
-        .map((variable) => STEP[variable])
-        .filter(isStepConfigured);
+      return deduplicateSteps(
+        [
+          WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_FORWARD_FILE,
+          WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_PAIRED,
+          WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_REVERSE_FILE,
+          WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE,
+          WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE_FILE,
+        ]
+          .filter((variable) => variables.includes(variable))
+          .map((variable) => STEP[variable])
+          .filter(isStepConfigured)
+      );
 
     case WORKFLOW_SCOPE.SEQUENCE:
       return [STEP.SEQUENCE, STEP.ACCESSION_COUNT].filter(isStepConfigured);
@@ -107,6 +118,22 @@ export function buildSteps(workflow: Workflow): StepConfig[] {
       console.error(`Unknown workflow scope: ${workflowScope}`);
       return [];
   }
+}
+
+/**
+ * Removes duplicate steps by key, keeping only the first occurrence.
+ * Needed when a workflow has both SANGER_READ_RUN_FORWARD_FILE and
+ * SANGER_READ_RUN_REVERSE_FILE, which both map to PAIRED_FILE_STEP.
+ * @param steps - Steps to deduplicate.
+ * @returns Deduplicated steps.
+ */
+function deduplicateSteps(steps: StepConfig[]): StepConfig[] {
+  const seen = new Set<string>();
+  return steps.filter((step) => {
+    if (seen.has(step.key)) return false;
+    seen.add(step.key);
+    return true;
+  });
 }
 
 /**

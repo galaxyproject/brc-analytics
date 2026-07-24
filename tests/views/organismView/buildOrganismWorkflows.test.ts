@@ -1,14 +1,13 @@
-import type { WorkflowCategory } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
+import { buildOrganismWorkflows } from "@/views/OrganismView/components/Main/utils";
+import type { Organism } from "@/views/OrganismView/types";
 import {
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
-} from "../../../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
-import { buildOrganismWorkflows } from "../../../app/views/OrganismView/components/Main/utils";
-import type { Organism } from "../../../app/views/OrganismView/types";
+} from "@repo/shared/apis/schema-types";
+import type { WorkflowCategory } from "@repo/shared/apis/workflow";
 
 describe("buildOrganismWorkflows", () => {
   const ORGANISM: Organism = {
-    assemblyCount: 2,
     genomes: [
       { lineageTaxonomyIds: ["1", "10239", "11320", "130760"] },
       { lineageTaxonomyIds: ["1", "10239", "11320", "93838"] },
@@ -26,6 +25,8 @@ describe("buildOrganismWorkflows", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-organism",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -55,6 +56,8 @@ describe("buildOrganismWorkflows", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-universal",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -83,6 +86,8 @@ describe("buildOrganismWorkflows", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 1,
+            assemblyCountMin: 1,
             iwcId: "iwc-assembly",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -110,6 +115,8 @@ describe("buildOrganismWorkflows", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-sequence",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -137,6 +144,8 @@ describe("buildOrganismWorkflows", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-other",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -164,6 +173,8 @@ describe("buildOrganismWorkflows", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-leaf",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -192,6 +203,8 @@ describe("buildOrganismWorkflows", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-organism",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -202,6 +215,8 @@ describe("buildOrganismWorkflows", () => {
             workflowName: "Organism Workflow",
           },
           {
+            assemblyCountMax: 1,
+            assemblyCountMin: 1,
             iwcId: "iwc-assembly",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,
@@ -224,7 +239,6 @@ describe("buildOrganismWorkflows", () => {
 
   test("returns empty array for organism with no genomes", () => {
     const emptyOrganism: Organism = {
-      assemblyCount: 0,
       genomes: [],
       ncbiTaxonomyId: "0",
       taxonomicLevelSpecies: "Empty Organism",
@@ -238,6 +252,8 @@ describe("buildOrganismWorkflows", () => {
         showComingSoon: false,
         workflows: [
           {
+            assemblyCountMax: 0,
+            assemblyCountMin: 0,
             iwcId: "iwc-organism",
             parameters: [],
             ploidy: WORKFLOW_PLOIDY.ANY,

@@ -1,4 +1,7 @@
-import { COLUMN_TYPE, ColumnClassifications } from "../../../../types";
+import {
+  COLUMN_TYPE,
+  ColumnClassifications,
+} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 import { SINGLE_SELECT_TYPES } from "./constants";
 
 /**

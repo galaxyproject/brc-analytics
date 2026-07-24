@@ -1,8 +1,5 @@
 import { AccordionProps } from "@mui/material";
-import {
-  Workflow,
-  WorkflowCategory,
-} from "../../../../../../apis/catalog/brc-analytics-catalog/common/entities";
+import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
 
 export interface Props extends Pick<AccordionProps, "disabled"> {
   configureRoute?: string;

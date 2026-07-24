@@ -1,7 +1,13 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { ConfiguredInput } from "../../../../../../../../../../../../../views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { ClassificationMap, COLUMN_TYPE } from "../../types";
-import { getColumnNames, validateClassifications } from "../../utils";
+import {
+  ClassificationMap,
+  COLUMN_TYPE,
+} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
+import {
+  getColumnNames,
+  validateClassifications,
+} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/utils";
+import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { useCallback, useMemo, useState } from "react";
 import { UseColumnClassification } from "./types";
 import { initClassifications, updateClassification } from "./utils";
 
@@ -13,11 +19,21 @@ import { initClassifications, updateClassification } from "./utils";
 export function useColumnClassification(
   sampleSheet: ConfiguredInput["sampleSheet"]
 ): UseColumnClassification {
+  const columnNames = useMemo(() => getColumnNames(sampleSheet), [sampleSheet]);
+
   const [classificationMap, setClassificationMap] = useState<ClassificationMap>(
-    new Map()
+    () => initClassifications(columnNames)
   );
 
-  const columnNames = useMemo(() => getColumnNames(sampleSheet), [sampleSheet]);
+  // Re-initialize when the columns change (including when cleared to none, so
+  // no stale classifications linger). Adjusting state during render (tracking
+  // the previous value) is React's recommended alternative to an init-in-effect
+  // — it avoids the extra commit + re-render.
+  const [prevColumnNames, setPrevColumnNames] = useState(columnNames);
+  if (columnNames !== prevColumnNames) {
+    setPrevColumnNames(columnNames);
+    setClassificationMap(initClassifications(columnNames));
+  }
 
   const classifications = useMemo(
     () => Object.fromEntries(classificationMap),
@@ -40,12 +56,6 @@ export function useColumnClassification(
     },
     []
   );
-
-  useEffect(() => {
-    if (columnNames.length > 0) {
-      setClassificationMap(initClassifications(columnNames));
-    }
-  }, [columnNames]);
 
   return {
     classifications,

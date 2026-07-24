@@ -1,0 +1,57 @@
+{
+    "$defs": {
+        "Pangenome": {
+            "additionalProperties": false,
+            "description": "Definition of a pangenome with its unique identifier.",
+            "properties": {
+                "id": {
+                    "description": "The unique identifier for the pangenome.",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id"
+            ],
+            "title": "Pangenome",
+            "type": "object"
+        },
+        "Pangenomes": {
+            "additionalProperties": false,
+            "description": "Root object containing a collection of pangenome definitions for the BRC Analytics platform.",
+            "properties": {
+                "pangenomes": {
+                    "description": "Collection of pangenome entries that will be available in the BRC Analytics platform.",
+                    "items": {
+                        "$ref": "#/$defs/Pangenome"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "pangenomes"
+            ],
+            "title": "Pangenomes",
+            "type": "object"
+        }
+    },
+    "$id": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/pangenomes.yaml#",
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "additionalProperties": true,
+    "description": "Root object containing a collection of pangenome definitions for the BRC Analytics platform.",
+    "metamodel_version": "1.7.0",
+    "properties": {
+        "pangenomes": {
+            "description": "Collection of pangenome entries that will be available in the BRC Analytics platform.",
+            "items": {
+                "$ref": "#/$defs/Pangenome"
+            },
+            "type": "array"
+        }
+    },
+    "required": [
+        "pangenomes"
+    ],
+    "title": "pangenomes",
+    "type": "object",
+    "version": null
+}

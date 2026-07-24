@@ -1,12 +1,16 @@
-import { BackPageContentSideColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
-import { JSX } from "react";
-import { AnalysisPortals } from "../../../../../../components/Entity/components/AnalysisPortals/analysisPortals";
 import {
   buildAssemblyDetails,
   buildAssemblyResources,
-} from "../../../../../../viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { KeyValueSection } from "../../../../components/KeyValueSection/keyValueSection";
+  buildOrganismDetails,
+} from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import { mapAssemblyToOrganism } from "@/views/WorkflowInputsView/utils";
+import { BackPageContentSideColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
+import { AssemblyFavoriteButton } from "@repo/shared/components/Favorites/components/AssemblyFavoriteButton/assemblyFavoriteButton";
+import { AnalysisPortals } from "@repo/shared/views/EntityView/assembly/components/Side/AnalysisPortals/analysisPortals";
+import { KeyValueSection } from "@repo/shared/views/EntityView/components/KeyValueSection/keyValueSection";
+import { JSX } from "react";
 import { StyledFluidPaper } from "../side.styles";
+import { StyledSection } from "./side.styles";
 import { Props } from "./types";
 
 /**
@@ -19,6 +23,13 @@ export const Side = ({ assembly }: Props): JSX.Element => {
   return (
     <BackPageContentSideColumn>
       <StyledFluidPaper>
+        <StyledSection>
+          <AssemblyFavoriteButton accession={assembly.accession} />
+        </StyledSection>
+        <KeyValueSection
+          {...buildOrganismDetails(mapAssemblyToOrganism(assembly))}
+          title="Organism Details"
+        />
         <KeyValueSection
           {...buildAssemblyDetails(assembly)}
           title="Assembly Details"

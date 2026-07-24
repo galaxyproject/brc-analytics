@@ -1,3 +1,4 @@
+import { useAssembly } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/hook";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { RadioCheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioCheckedIcon/radioCheckedIcon";
 import { RadioUncheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioUncheckedIcon/radioUncheckedIcon";
@@ -20,7 +21,6 @@ import {
   Typography,
 } from "@mui/material";
 import { Fragment, JSX, useEffect } from "react";
-import { useAssembly } from "../../../../../../../providers/Assembly/hook";
 import { StepWarning } from "../components/StepWarning/stepWarning";
 import { StepProps } from "../types";
 import { getButtonDisabledState, getStepActiveState } from "../utils/stepUtils";

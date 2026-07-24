@@ -1,12 +1,13 @@
 import {
-  WorkflowAssemblyMapping,
-  WorkflowCategory,
-} from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
-import {
   ORGANISM_PLOIDY,
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_PLOIDY,
-} from "../../../app/apis/catalog/brc-analytics-catalog/common/schema-entities";
+} from "@repo/shared/apis/schema-types";
+import type {
+  WorkflowAssemblyMapping,
+  WorkflowCategory,
+} from "@repo/shared/apis/workflow";
+import { workflowMeetsAssemblyMinimum } from "../../../app/apis/catalog/brc-analytics-catalog/common/workflowAssembly";
 
 // Type constraint: both BRC and GA2 assemblies have these fields
 type AssemblyForCompatibility = {
@@ -17,14 +18,19 @@ type AssemblyForCompatibility = {
 };
 
 /**
- * NOTE: The compatibility functions below are intentionally duplicated from:
- * - app/apis/catalog/brc-analytics-catalog/common/utils.ts (workflowPloidyMatchesOrganismPloidy)
- * - app/views/AnalyzeWorkflowsView/components/Main/utils.ts (workflowIsCompatibleWithAssembly, workflowRequiresAssemblyId)
+ * NOTE: This workflow/assembly compatibility rule (taxonomy lineage + ploidy +
+ * assembly-id requirement) is duplicated in four places that drift out of sync:
+ * - this file (build time)
+ * - app/views/AnalyzeWorkflowsView/components/Main/utils.ts (frontend runtime;
+ *   shares only workflowPloidyMatchesOrganismPloidy from common/utils.ts)
+ * - backend/api/app/services/catalog_data.py (MCP server)
+ * - backend/api/app/services/tools/catalog_data.py (assistant agent)
  *
- * They cannot be imported directly because this build script uses generics to work with both
- * BRC and GA2 assembly types, while the app functions have concrete type signatures.
- * If you modify the compatibility logic, update BOTH locations to keep them in sync.
- * Consider creating a shared utility module to avoid duplication.
+ * The TS copies can't import each other today only because this build script is
+ * generic over BRC/GA2 assembly types while the app function has a concrete
+ * signature -- a single generic in common/ would fix that. #1319 was caused by
+ * this drift. If you change the rule, update all four. Consolidating to a single
+ * source of truth is tracked in #1327.
  */
 
 // Helper function to check if workflow requires ASSEMBLY_ID parameter
@@ -114,11 +120,18 @@ export function buildWorkflowAssemblyMappings<
   return mappings;
 }
 
+export type AssemblyForTaxonomyCheck = {
+  lineageTaxonomyIds: string[];
+  ncbiTaxonomyId: string;
+  speciesTaxonomyId: string;
+};
+
 // Generic QC report generator - site name is parameterized
 export function generateWorkflowMappingsQC(
   mappings: WorkflowAssemblyMapping[],
   workflowCategories: WorkflowCategory[],
-  siteName: string
+  siteName: string,
+  assemblies?: AssemblyForTaxonomyCheck[]
 ): string {
   const workflows = workflowCategories.flatMap((cat) => cat.workflows);
 
@@ -127,25 +140,32 @@ export function generateWorkflowMappingsQC(
     mappings.map((m) => [m.workflowTrsId, m.compatibleAssemblyCount])
   );
 
-  const workflowsWithNoAssemblies = workflows.filter(
-    (wf) => (mappingsByTrsId.get(wf.trsId) ?? 0) === 0
+  const workflowsWithUnmetMinimum = workflows.filter(
+    (wf) =>
+      !workflowMeetsAssemblyMinimum(
+        wf.assemblyCountMin,
+        mappingsByTrsId.get(wf.trsId) ?? 0
+      )
   );
 
   const lines: string[] = [
     `# Workflow-Assembly Mappings QC Report (${siteName})`,
     "",
-    "## Workflows with no compatible assemblies",
+    "## Workflows that cannot meet their minimum assembly requirement",
     "",
   ];
 
-  if (workflowsWithNoAssemblies.length === 0) {
+  if (workflowsWithUnmetMinimum.length === 0) {
     lines.push("None", "");
   } else {
-    for (const wf of workflowsWithNoAssemblies) {
+    for (const wf of workflowsWithUnmetMinimum) {
+      const count = mappingsByTrsId.get(wf.trsId) ?? 0;
       const reason = wf.taxonomyId
         ? `taxonomy_id: ${wf.taxonomyId}`
         : `ploidy: ${wf.ploidy}`;
-      lines.push(`- ${wf.workflowName} (${wf.trsId}) — ${reason}`);
+      lines.push(
+        `- ${wf.workflowName} (${wf.trsId}) — needs >= ${wf.assemblyCountMin}, ${count} compatible (${reason})`
+      );
     }
     lines.push("");
   }
@@ -165,12 +185,97 @@ export function generateWorkflowMappingsQC(
   lines.push("", "## Summary Statistics", "");
   lines.push(`- Total active workflows: ${workflows.length}`);
   lines.push(
-    `- Workflows with ≥1 compatible assembly: ${workflows.length - workflowsWithNoAssemblies.length}`
+    `- Workflows that meet their minimum assembly requirement: ${workflows.length - workflowsWithUnmetMinimum.length}`
   );
   lines.push(
-    `- Workflows with 0 compatible assemblies: ${workflowsWithNoAssemblies.length}`
+    `- Workflows that cannot meet minimum assembly requirement: ${workflowsWithUnmetMinimum.length}`
   );
   lines.push("");
 
+  lines.push(
+    "## Workflow taxonomy ID issues (not in catalog or below species rank)",
+    ""
+  );
+  lines.push(...formatTaxonomyIssuesLines(workflows, assemblies));
+
   return lines.join("\n");
+}
+
+function formatTaxonomyIssuesLines(
+  workflows: {
+    taxonomyId: string | null;
+    trsId: string;
+    workflowName: string;
+  }[],
+  assemblies: AssemblyForTaxonomyCheck[] | undefined
+): string[] {
+  if (assemblies === undefined) return ["N/A", ""];
+  const issues = checkWorkflowTaxonomyIds(workflows, assemblies);
+  if (issues.length === 0) return ["None", ""];
+  return [
+    ...issues.map(
+      ({ reason, trsId, workflowName }) =>
+        `- ${workflowName} (${trsId}): ${reason}`
+    ),
+    "",
+  ];
+}
+
+/**
+ * Check workflow taxonomy IDs against assembly lineage data.
+ * Flags taxonomy IDs that are not in any assembly's lineage (not in catalog),
+ * or that only appear as sub-species assembly IDs (below species rank).
+ * A taxonomy ID is considered at species rank or above if it equals the
+ * speciesTaxonomyId of at least one assembly, or if it appears in assembly
+ * lineages but is not the direct ncbiTaxonomyId of any sub-species assembly.
+ * @param workflows - Workflows to check, each with a nullable taxonomyId.
+ * @param assemblies - Assembly data providing lineage and species taxonomy IDs.
+ * @returns List of issues, each with a reason, trsId, and workflowName.
+ */
+function checkWorkflowTaxonomyIds(
+  workflows: {
+    taxonomyId: string | null;
+    trsId: string;
+    workflowName: string;
+  }[],
+  assemblies: AssemblyForTaxonomyCheck[]
+): { reason: string; trsId: string; workflowName: string }[] {
+  const allLineageIds = new Set(
+    assemblies.flatMap((a) => a.lineageTaxonomyIds)
+  );
+  const speciesIds = new Set(assemblies.map((a) => a.speciesTaxonomyId));
+  // ncbiTaxonomyIds that are below species rank (assembly is a strain/serotype/etc.)
+  const subSpeciesNcbiIds = new Set(
+    assemblies
+      .filter((a) => a.ncbiTaxonomyId !== a.speciesTaxonomyId)
+      .map((a) => a.ncbiTaxonomyId)
+  );
+
+  // Deduplicate workflows by trsId before checking
+  const seenTrsIds = new Set<string>();
+  const issues: { reason: string; trsId: string; workflowName: string }[] = [];
+
+  for (const wf of workflows) {
+    if (wf.taxonomyId === null || seenTrsIds.has(wf.trsId)) continue;
+    seenTrsIds.add(wf.trsId);
+
+    if (!allLineageIds.has(wf.taxonomyId)) {
+      issues.push({
+        reason: "taxonomy ID not found in any assembly's lineage",
+        trsId: wf.trsId,
+        workflowName: wf.workflowName,
+      });
+    } else if (
+      !speciesIds.has(wf.taxonomyId) &&
+      subSpeciesNcbiIds.has(wf.taxonomyId)
+    ) {
+      issues.push({
+        reason: "taxonomy ID appears to be below species rank",
+        trsId: wf.trsId,
+        workflowName: wf.workflowName,
+      });
+    }
+  }
+
+  return issues;
 }

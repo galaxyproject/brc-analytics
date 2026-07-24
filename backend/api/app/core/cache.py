@@ -109,9 +109,9 @@ class CacheService:
         """Generate a cache key from prefix and parameters"""
         # Sort parameters for consistent keys
         param_str = json.dumps(params, sort_keys=True, default=str)
-        hash_val = hashlib.md5(
-            param_str.encode(), usedforsecurity=False
-        ).hexdigest()[:16]
+        hash_val = hashlib.md5(param_str.encode(), usedforsecurity=False).hexdigest()[
+            :16
+        ]
         return f"{prefix}:{hash_val}"
 
     async def close(self):
