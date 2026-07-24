@@ -19,32 +19,32 @@
 |----------|----------------------|
 | Variant calling and consensus construction from paired end short read data of non-segmented viral genomes | 0 |
 | Paired end variant calling in haploid system | 0 |
-| Paired end variant and ploidy-aware genotype calling | 1226 |
+| Paired end variant and ploidy-aware genotype calling | 1223 |
 | COVID-19: variation analysis on ARTIC PE data | 0 |
 | COVID-19: variation analysis on WGS PE data | 0 |
 | COVID-19: variation analysis on WGS SE data | 0 |
-| Single-Cell RNA-seq Preprocessing: 10X Genomics CellPlex Multiplexed Samples | 679 |
-| Single-Cell RNA-seq Preprocessing: 10X Genomics v3 to Seurat and Scanpy Compatible Format | 679 |
-| RNA-Seq Analysis: Paired-End Read Processing and Quantification | 679 |
-| RNA-Seq Analysis: Single-End Read Processing and Quantification | 679 |
-| ATAC-seq Analysis: Chromatin Accessibility Profiling | 679 |
-| ChIP-seq Analysis: Paired-End Read Processing | 679 |
-| ChIP-seq Analysis: Single-End Read Processing | 679 |
-| Consensus Peak Calling for ATAC-seq and CUT and RUN Replicates | 1226 |
-| CUT&amp;RUN/CUT&amp;TAG Analysis: Protein-DNA Interaction Mapping | 679 |
-| Capture Hi-C Processing: FASTQ to Balanced Cool Files | 679 |
-| Hi-C Processing: FASTQ to Balanced Cool Files | 679 |
-| Hi-C Data Processing: FASTQ to Valid Interaction Pairs | 679 |
+| Single-Cell RNA-seq Preprocessing: 10X Genomics CellPlex Multiplexed Samples | 676 |
+| Single-Cell RNA-seq Preprocessing: 10X Genomics v3 to Seurat and Scanpy Compatible Format | 676 |
+| RNA-Seq Analysis: Paired-End Read Processing and Quantification | 676 |
+| RNA-Seq Analysis: Single-End Read Processing and Quantification | 676 |
+| ATAC-seq Analysis: Chromatin Accessibility Profiling | 676 |
+| ChIP-seq Analysis: Paired-End Read Processing | 676 |
+| ChIP-seq Analysis: Single-End Read Processing | 676 |
+| Consensus Peak Calling for ATAC-seq and CUT and RUN Replicates | 1223 |
+| CUT&amp;RUN/CUT&amp;TAG Analysis: Protein-DNA Interaction Mapping | 676 |
+| Capture Hi-C Processing: FASTQ to Balanced Cool Files | 676 |
+| Hi-C Processing: FASTQ to Balanced Cool Files | 676 |
+| Hi-C Data Processing: FASTQ to Valid Interaction Pairs | 676 |
 | Variant calling and consensus construction from paired end short read data of non-segmented viral genomes | 0 |
 | Influenza A isolate subtyping and consensus sequence generation | 0 |
 | Pox Virus Illumina Amplicon Workflow from half-genomes | 0 |
 | AMR Gene Detection | 0 |
-| Genome annotation with Braker3 | 1226 |
+| Genome annotation with Braker3 | 1223 |
 | Bacterial Genome Annotation | 0 |
-| lncRNAs annotation workflow | 1226 |
-| Genome assembly with Flye | 1226 |
+| lncRNAs annotation workflow | 1223 |
+| Genome assembly with Flye | 1223 |
 | Bacterial Genome Assembly using Shovill | 0 |
-| Assembly polishing with long reads | 1226 |
+| Assembly polishing with long reads | 1223 |
 | CAPHEINE: Combined HyPhy Core and Compare | 0 |
 
 ## Summary Statistics
