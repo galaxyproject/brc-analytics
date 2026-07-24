@@ -5,7 +5,7 @@ import { SectionTitle } from "@repo/shared/views/EntityView/ui/SectionTitle/sect
 import { ValueElType } from "@repo/shared/views/EntityView/ui/ValueElType/valueElType";
 import { Fragment, JSX } from "react";
 import { StyledSection } from "./keyValueSection.styles";
-import { Props } from "./types";
+import type { Props } from "./types";
 
 /**
  * Renders a key-value section.
