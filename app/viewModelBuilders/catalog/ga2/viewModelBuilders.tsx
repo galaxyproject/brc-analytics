@@ -21,13 +21,7 @@ import { SpeciesCell } from "@repo/shared/components/Table/components/TableCell/
 import type { SpeciesTag } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/types";
 import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
 import { ROUTES } from "@repo/shared/routes/constants";
-import {
-  GA2_CATEGORY_KEY,
-  GA2_CATEGORY_LABEL,
-} from "@site-config/ga2/category";
-import { ColumnDef, RowData, VisibilityState } from "@tanstack/react-table";
-import { ComponentProps } from "react";
-import { ORGANISM_SCOPED_TAG_LABELS } from "../common/constants";
+import { ORGANISM_SCOPED_TAG_LABELS } from "@repo/shared/viewModelBuilders/constants";
 import {
   buildAnalyzeGenome,
   buildGroupTag,
@@ -37,7 +31,13 @@ import {
   buildReleaseDateTooltip,
   formatNumber,
   getGenomeStrainText,
-} from "../common/viewModelBuilders";
+} from "@repo/shared/viewModelBuilders/viewModelBuilders";
+import {
+  GA2_CATEGORY_KEY,
+  GA2_CATEGORY_LABEL,
+} from "@site-config/ga2/category";
+import { ColumnDef, RowData, VisibilityState } from "@tanstack/react-table";
+import type { ComponentProps } from "react";
 
 /**
  * Build props for the organism BackPageHero component.

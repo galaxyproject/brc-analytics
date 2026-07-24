@@ -1,6 +1,6 @@
 import { OrganismAvatar } from "@/components/Entity/components/OrganismAvatar/organismAvatar";
-import { buildAssemblyDetails } from "@/viewModelBuilders/catalog/common/viewModelBuilders";
 import { KeyValuePairs } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/keyValuePairs";
+import { buildAssemblyDetails } from "@repo/shared/viewModelBuilders/viewModelBuilders";
 import { StyledSection } from "@repo/shared/views/EntityView/components/KeyValueSection/keyValueSection.styles";
 import { KeyElType } from "@repo/shared/views/EntityView/ui/KeyElType/keyElType";
 import { KeyValueElType } from "@repo/shared/views/EntityView/ui/KeyValueElType/keyValueElType";

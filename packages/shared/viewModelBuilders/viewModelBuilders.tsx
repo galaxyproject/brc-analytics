@@ -1,10 +1,10 @@
 import { KeyElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/KeyElType/keyElType";
 import { ValueElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/ValueElType/valueElType";
-import {
+import type {
   Key,
-  KeyValuePairs,
   Value,
 } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/keyValuePairs";
+import { KeyValuePairs } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/keyValuePairs";
 import { Stack } from "@databiosphere/findable-ui/lib/components/common/Stack/stack";
 import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
@@ -29,7 +29,7 @@ import { ROUTES } from "@repo/shared/routes/constants";
 import { formatDate } from "@repo/shared/utils/date-fns/utils";
 import { AnalysisPortals } from "@repo/shared/views/EntityView/assembly/components/Side/AnalysisPortals/analysisPortals";
 import { parseISO } from "date-fns";
-import { ComponentProps } from "react";
+import type { ComponentProps } from "react";
 import {
   ENTITY_DETAIL_LABEL,
   GALAXY_DATACACHE,

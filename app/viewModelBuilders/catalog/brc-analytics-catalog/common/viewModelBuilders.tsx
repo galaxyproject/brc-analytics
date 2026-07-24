@@ -14,25 +14,6 @@ import { StepConfig } from "@/components/Entity/components/ConfigureWorkflowInpu
 import { KeyValueSection } from "@/components/Entity/components/Section/KeyValueSection/keyValueSection";
 import { MDXSection } from "@/components/Entity/components/Section/MDXSection/mdxSection";
 import {
-  ORGANISM_SCOPED_TAG_LABELS,
-  SPECIES_TAG_LABEL,
-} from "@/viewModelBuilders/catalog/common/constants";
-import {
-  buildAnalyzeGenome,
-  buildAssemblyDetails,
-  buildAssemblyResources,
-  buildGroupTag,
-  buildIsRef,
-  buildLevel,
-  buildOrganismDetails as buildOrganismDetailsBase,
-  buildReleaseDate,
-  buildReleaseDateTooltip,
-  formatNumber,
-  getGenomeIsolateText,
-  getGenomeSerotypeText,
-  getGenomeStrainText,
-} from "@/viewModelBuilders/catalog/common/viewModelBuilders";
-import {
   COLUMN_PRESET_KEY,
   COLUMN_PRESET_LABEL,
 } from "@/views/OrganismView/components/Main/constants";
@@ -76,6 +57,25 @@ import type { SpeciesTag } from "@repo/shared/components/Table/components/TableC
 import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
 import { ROUTES } from "@repo/shared/routes/constants";
 import {
+  ORGANISM_SCOPED_TAG_LABELS,
+  SPECIES_TAG_LABEL,
+} from "@repo/shared/viewModelBuilders/constants";
+import {
+  buildAnalyzeGenome,
+  buildAssemblyDetails,
+  buildAssemblyResources,
+  buildGroupTag,
+  buildIsRef,
+  buildLevel,
+  buildOrganismDetails as buildOrganismDetailsBase,
+  buildReleaseDate,
+  buildReleaseDateTooltip,
+  formatNumber,
+  getGenomeIsolateText,
+  getGenomeSerotypeText,
+  getGenomeStrainText,
+} from "@repo/shared/viewModelBuilders/viewModelBuilders";
+import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
 } from "@site-config/brc-analytics/category";
@@ -89,7 +89,8 @@ import { ROUTES as SITE_ROUTES } from "../../../../../routes/constants";
 // Transitional shim for the GA2/BRC split (monorepo-split): shared builders
 // moved to the site-neutral common home. Re-export them from this BRC path so
 // existing BRC importers keep resolving; repoint importers at
-// @/viewModelBuilders/catalog/common and drop these re-exports, then remove.
+// @repo/shared/viewModelBuilders/viewModelBuilders (and /constants) and drop these
+// re-exports, then remove.
 export {
   buildAnalyzeGenome,
   buildAssemblyDetails,
