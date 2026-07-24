@@ -7,7 +7,7 @@ import type {
 } from "@repo/shared/services/api-client/types";
 import ky, { HTTPError } from "ky";
 
-const apiClient = ky.create({
+const httpClient = ky.create({
   // Send the assistant session-binding cookie cross-origin. Without
   // this, ky inherits fetch's "same-origin" default and the browser
   // strips the cookie when NEXT_PUBLIC_BACKEND_URL points off-origin
@@ -44,7 +44,7 @@ export const assistantAPIClient = {
   assistantChat: async (
     request: AssistantChatRequest
   ): Promise<AssistantChatResponse> => {
-    return apiClient
+    return httpClient
       .post("assistant/chat", {
         json: request,
         retry: { limit: 0 },
@@ -58,7 +58,7 @@ export const assistantAPIClient = {
    * @param sessionId - Session to delete
    */
   assistantDeleteSession: async (sessionId: string): Promise<void> => {
-    await apiClient.delete(`assistant/session/${sessionId}`);
+    await httpClient.delete(`assistant/session/${sessionId}`);
   },
 
   /**
@@ -66,7 +66,7 @@ export const assistantAPIClient = {
    * @returns Promise resolving to assistant info
    */
   assistantInfo: async (): Promise<AssistantInfoResponse> => {
-    return apiClient.get("assistant/info").json();
+    return httpClient.get("assistant/info").json();
   },
 
   /**
@@ -77,6 +77,6 @@ export const assistantAPIClient = {
   assistantRestore: async (
     sessionId: string
   ): Promise<SessionRestoreResponse> => {
-    return apiClient.get(`assistant/session/${sessionId}`).json();
+    return httpClient.get(`assistant/session/${sessionId}`).json();
   },
 };
