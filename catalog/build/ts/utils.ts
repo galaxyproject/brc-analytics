@@ -194,6 +194,14 @@ export function defaultStringToNone(value: string): string {
   return value || "None";
 }
 
+export function parseJsonList(value: string): string[] {
+  const parsed: unknown = JSON.parse(value);
+  if (!Array.isArray(parsed)) throw new Error("JSON value is not an array");
+  if (!parsed.every((item) => typeof item === "string"))
+    throw new Error("JSON array contains non-string value");
+  return parsed;
+}
+
 export function parseListOrNull(value: string): string[] | null {
   return value ? value.split(",") : null;
 }

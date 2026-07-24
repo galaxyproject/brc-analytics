@@ -310,7 +310,7 @@ def get_species_df(assembly_taxonomy_df, taxonomic_group_sets, taxonomic_levels)
             # in the taxonomy_lineages_with_names dbt model). Joined on "," to match
             # the list serialization used for other list-valued columns.
             "commonNames": assembly_taxonomy_df["common_names"].map(
-                lambda names: ",".join(names)
+                lambda names: json.dumps(list(names))
             ),
             **taxonomic_group_columns,
             **taxonomic_level_columns,
