@@ -1,4 +1,3 @@
-import { AnalysisPortals } from "@/components/Entity/components/AnalysisPortals/analysisPortals";
 import { KeyElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/KeyElType/keyElType";
 import { ValueElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/ValueElType/valueElType";
 import {
@@ -28,6 +27,7 @@ import type { SpeciesTag } from "@repo/shared/components/Table/components/TableC
 import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { formatDate } from "@repo/shared/utils/date-fns/utils";
+import { AnalysisPortals } from "@repo/shared/views/EntityView/assembly/components/Side/AnalysisPortals/analysisPortals";
 import { parseISO } from "date-fns";
 import { ComponentProps } from "react";
 import {
