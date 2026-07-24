@@ -1,4 +1,3 @@
-import { Table } from "@/components/common/Table/table";
 import { StyledSectionTitle } from "@/views/OrganismView/components/Main/main.styles";
 import { Toolbar } from "@/views/OrganismView/components/Main/table/components/Toolbar/toolbar";
 import { useTable } from "@/views/OrganismView/components/Main/table/hooks/UseTable/hook";
@@ -7,6 +6,7 @@ import { ALERT_PROPS } from "@databiosphere/findable-ui/lib/components/common/Al
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/components/FluidPaper/fluidPaper";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Alert, Stack } from "@mui/material";
+import { Table } from "@repo/shared/components/Table/table";
 import { RowData } from "@tanstack/react-table";
 import { JSX } from "react";
 import { EmptyState } from "../EmptyState/emptyState";

@@ -1,4 +1,3 @@
-import { Table } from "@/components/common/Table/table";
 import { StyledSectionTitle } from "@/views/OrganismView/components/Main/main.styles";
 import { useTable } from "@/views/OrganismView/components/Main/table/hooks/UseTable/hook";
 import { useShowPangenome } from "@/views/OrganismView/hooks/UseShowPangenome/hook";
@@ -13,6 +12,7 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
+import { Table } from "@repo/shared/components/Table/table";
 import { JSX } from "react";
 import { StyledFluidPaper } from "./pangenomeSection.styles";
 import { COLUMNS } from "./table/columns";
