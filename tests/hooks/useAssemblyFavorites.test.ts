@@ -1,10 +1,10 @@
 import { useAssemblyFavorites } from "@/hooks/useAssemblyFavorites";
-import { useAuth } from "@/providers/authentication";
+import { useAuth } from "@repo/shared/providers/authentication/provider";
 import { apiClient } from "@repo/shared/services/api-client/api-client";
 import type { FavoriteResponse } from "@repo/shared/services/api-client/types";
 import { act, renderHook, waitFor } from "@testing-library/react";
 
-jest.mock("../../app/providers/authentication", () => ({
+jest.mock("@repo/shared/providers/authentication/provider", () => ({
   useAuth: jest.fn(),
 }));
 jest.mock("@repo/shared/services/api-client/api-client", () => ({

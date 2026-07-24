@@ -1,6 +1,5 @@
 import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
-import { useAuth } from "@/providers/authentication";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
   Alert,
@@ -11,6 +10,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { useAuth } from "@repo/shared/providers/authentication/provider";
 import { apiClient } from "@repo/shared/services/api-client/api-client";
 import { JSX, useEffect, useState } from "react";
 

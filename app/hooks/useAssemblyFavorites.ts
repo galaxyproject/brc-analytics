@@ -1,7 +1,7 @@
+import { useAuth } from "@repo/shared/providers/authentication/provider";
 import { apiClient } from "@repo/shared/services/api-client/api-client";
 import type { FavoriteResponse } from "@repo/shared/services/api-client/types";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useAuth } from "../providers/authentication";
 
 interface UseAssemblyFavoritesReturn {
   error: Error | null;
