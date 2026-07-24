@@ -1,4 +1,4 @@
-import { useAssemblyFavorites } from "@/hooks/useAssemblyFavorites";
+import { useAssemblyFavorites } from "@repo/shared/components/Favorites/hooks/UseAssemblyFavorites/hook";
 import { useAuth } from "@repo/shared/providers/authentication/provider";
 import { apiClient } from "@repo/shared/services/api-client/api-client";
 import type { FavoriteResponse } from "@repo/shared/services/api-client/types";
