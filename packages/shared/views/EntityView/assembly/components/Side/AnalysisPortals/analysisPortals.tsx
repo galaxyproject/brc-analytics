@@ -1,7 +1,4 @@
-import {
-  StaticImage,
-  StaticImageProps,
-} from "@databiosphere/findable-ui/lib/components/common/StaticImage/staticImage";
+import { StaticImage } from "@databiosphere/findable-ui/lib/components/common/StaticImage/staticImage";
 import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,
@@ -12,22 +9,9 @@ import { Section } from "@repo/shared/views/EntityView/ui/Section/section";
 import { SectionTitle } from "@repo/shared/views/EntityView/ui/SectionTitle/sectionTitle";
 import { JSX } from "react";
 import { StyledButtonBase } from "./analysisPortals.styles";
+import type { Props } from "./types";
 
-export interface AnalysisPortals {
-  imageProps: StaticImageProps;
-  label: string;
-  url: string;
-}
-
-interface AnalysisPortalsProps {
-  portals: AnalysisPortals[];
-  title: string;
-}
-
-export const AnalysisPortals = ({
-  portals,
-  title,
-}: AnalysisPortalsProps): JSX.Element => {
+export const AnalysisPortals = ({ portals, title }: Props): JSX.Element => {
   if (portals.length === 0) return <span>None</span>;
   return (
     <Section>
