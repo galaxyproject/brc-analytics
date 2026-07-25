@@ -171,7 +171,7 @@ class CatalogData:
             candidates = {
                 (org.get("taxonomicLevelSpecies") or "").lower(),
                 str(org.get("ncbiTaxonomyId") or "").lower(),
-                *((name or "").lower() for name in org.get("commonNames") or []),
+                *((common or "").lower() for common in org.get("commonNames") or []),
             }
             candidates.discard("")
             if q in candidates:
