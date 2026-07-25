@@ -568,9 +568,7 @@ N/A
 
 ## Assemblies without ploidy information
 
-- GCA_024803745.1 (speciesTaxonomyId: 3774380)
-- GCA_031878665.1 (speciesTaxonomyId: 3774380)
-- GCA_031878675.1 (speciesTaxonomyId: 3774380)
+N/A
 
 ## Outbreak descendant taxonomy IDs not found in genomes data
 
@@ -587,7 +585,6 @@ None
 ## Organisms not matched to any assembly
 
 - 7924: Amia calva
-- 10013: Megascapheus bottae
 
 ## Outdated assembly accessions
 
