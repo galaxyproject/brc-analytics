@@ -307,8 +307,8 @@ def get_species_df(assembly_taxonomy_df, taxonomic_group_sets, taxonomic_levels)
                 lambda ids: ",".join([str(id) for id in ids])
             ),
             # All available common names, genbank common name first (ordering set
-            # in the taxonomy_lineages_with_names dbt model). Joined on "," to match
-            # the list serialization used for other list-valued columns.
+            # in the taxonomy_lineages_with_names dbt model). Serialized as JSON
+            # because names may contain arbitrary characters (including commas).
             "commonNames": assembly_taxonomy_df["common_names"].map(
                 lambda names: json.dumps(list(names))
             ),
