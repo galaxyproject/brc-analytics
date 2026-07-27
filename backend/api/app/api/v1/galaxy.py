@@ -3,7 +3,7 @@
 import logging
 from typing import Any, Dict
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.core.cache import CacheService
 from app.core.dependencies import get_cache_service
@@ -12,6 +12,8 @@ from app.models.galaxy import (
     GalaxyJobResult,
     GalaxyJobStatus,
     GalaxyJobSubmission,
+    KmindexQuerySubmission,
+    KmindexResults,
 )
 from app.services.galaxy_service import GalaxyService
 
@@ -92,6 +94,89 @@ async def submit_galaxy_job(
         logger.error(f"Failed to submit Galaxy job: {str(e)}")
         raise HTTPException(
             status_code=500, detail=f"Failed to submit job to Galaxy: {str(e)}"
+        ) from e
+
+
+@router.get("/kmindex/indexes")
+async def list_kmindex_indexes(
+    galaxy_service: GalaxyService = Depends(get_galaxy_service),
+):
+    """List the Logan/kmindex indexes available on the Galaxy instance."""
+    if not galaxy_service.is_available():
+        raise HTTPException(status_code=503, detail="Galaxy service is not available")
+
+    try:
+        indexes = await galaxy_service.list_kmindex_indexes()
+        return {"count": len(indexes), "indexes": indexes}
+    except Exception as e:
+        logger.error(f"Failed to list kmindex indexes: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to list kmindex indexes: {str(e)}"
+        ) from e
+
+
+@router.post("/kmindex/submit", response_model=GalaxyJobResponse)
+async def submit_kmindex_query(
+    submission: KmindexQuerySubmission,
+    galaxy_service: GalaxyService = Depends(get_galaxy_service),
+):
+    """Submit a Logan/kmindex sequence search. Poll the returned job_id for status."""
+    try:
+        if not galaxy_service.is_available():
+            raise HTTPException(
+                status_code=503,
+                detail="Galaxy service is not available. Please check configuration.",
+            )
+
+        if not submission.sequence.strip():
+            raise HTTPException(
+                status_code=400, detail="Query sequence cannot be empty"
+            )
+
+        response = await galaxy_service.submit_kmindex_query(submission)
+        logger.info(f"kmindex query submitted successfully: {response.job_id}")
+        return response
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to submit kmindex query: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to submit kmindex query: {str(e)}"
+        ) from e
+
+
+@router.get("/kmindex/jobs/{job_id}/results", response_model=KmindexResults)
+async def get_kmindex_results(
+    job_id: str,
+    limit: int = Query(default=100, ge=1, le=1000),
+    offset: int = Query(default=0, ge=0),
+    galaxy_service: GalaxyService = Depends(get_galaxy_service),
+):
+    """
+    Get merged, score-ranked hits from a completed kmindex query.
+
+    kmindex writes one JSON per index shard; this unions them into a single
+    ranked list so callers don't have to fetch and merge dozens of datasets.
+    """
+    try:
+        if not galaxy_service.is_available():
+            raise HTTPException(
+                status_code=503, detail="Galaxy service is not available"
+            )
+
+        return await galaxy_service.get_kmindex_results(job_id, limit, offset)
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        if "not yet complete" in str(e):
+            raise HTTPException(status_code=202, detail=str(e)) from e
+        if "failed" in str(e).lower():
+            raise HTTPException(status_code=422, detail=str(e)) from e
+        logger.error(f"Failed to get kmindex results for {job_id}: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to get kmindex results: {str(e)}"
         ) from e
 
 
