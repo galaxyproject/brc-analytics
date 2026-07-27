@@ -1,17 +1,24 @@
 import pytest
+import redis.asyncio as redis
 
 from app.models.assistant import AnalysisSchema, ChatMessage, MessageRole
 from app.services.session_service import SessionService
 
 
 class FakeCache:
-    def __init__(self):
+    def __init__(self, fail_reads: bool = False):
         self.values: dict[str, dict] = {}
+        self.fail_reads = fail_reads
 
     async def delete(self, key: str) -> bool:
         return self.values.pop(key, None) is not None
 
     async def get(self, key: str):
+        return self.values.get(key)
+
+    async def get_strict(self, key: str):
+        if self.fail_reads:
+            raise redis.RedisError("redis is unreachable")
         return self.values.get(key)
 
     async def set(self, key: str, value, ttl: int = 3600) -> bool:
@@ -81,3 +88,31 @@ async def test_claim_session_raises_keyerror_for_missing_session():
 
     with pytest.raises(KeyError):
         await service.claim_session("does-not-exist", "user-a")
+
+
+@pytest.mark.asyncio
+async def test_get_session_surfaces_redis_failure_instead_of_reporting_a_miss():
+    """A Redis outage must not be indistinguishable from an expired session.
+
+    If it returns None the endpoint answers 404, and the client takes that as
+    "this conversation is gone" and discards its only pointer to a session that
+    is still very much alive.
+    """
+    cache = FakeCache()
+    service = SessionService(cache)
+    state = await service.create_session(
+        messages=[ChatMessage(role=MessageRole.USER, content="hello")],
+    )
+
+    cache.fail_reads = True
+
+    with pytest.raises(redis.RedisError):
+        await service.get_session(state.session_id)
+
+
+@pytest.mark.asyncio
+async def test_get_session_still_returns_none_for_a_genuine_miss():
+    cache = FakeCache()
+    service = SessionService(cache)
+
+    assert await service.get_session("never-existed") is None

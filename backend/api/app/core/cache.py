@@ -15,6 +15,11 @@ logger = logging.getLogger(__name__)
 # dropped at boot, which is the safe direction to be wrong in.
 CACHE_KEY_PATTERNS = ("ena:*", "v1:*")
 
+# Deletes go out in batches so neither the DELETE argument list nor our own key
+# buffer grows with the size of the namespace -- this Redis also serves live
+# session and rate-limit traffic on the same event loop.
+CLEAR_BATCH_SIZE = 500
+
 
 class CacheService:
     """Redis-based cache service with TTL support and key management"""
@@ -31,6 +36,29 @@ class CacheService:
             return None
         except (redis.RedisError, json.JSONDecodeError) as e:
             logger.error(f"Cache get error for key {key}: {e}")
+            return None
+
+    async def get_strict(self, key: str) -> Optional[Any]:
+        """Read a key, telling "absent" apart from "Redis unavailable".
+
+        get() answers None to both, which is the right call for a cache and the
+        wrong one for state that merely lives in one: a Redis blip would be
+        indistinguishable from an expired session, and the caller would tell the
+        user their conversation is gone. Raises RedisError so callers can tell
+        the difference. A genuine miss, or a value that won't decode, is still
+        None -- there's nothing to recover in either case.
+        """
+        try:
+            value = await self.redis.get(key)
+        except redis.RedisError:
+            logger.exception(f"Cache read failed for key {key}")
+            raise
+        if not value:
+            return None
+        try:
+            return json.loads(value)
+        except json.JSONDecodeError as e:
+            logger.error(f"Cache value for key {key} is not valid JSON: {e}")
             return None
 
     async def set(self, key: str, value: Any, ttl: int = 3600) -> bool:
@@ -89,9 +117,14 @@ class CacheService:
         cleared = 0
         try:
             for pattern in CACHE_KEY_PATTERNS:
-                keys = [key async for key in self.redis.scan_iter(match=pattern)]
-                if keys:
-                    cleared += await self.redis.delete(*keys)
+                batch: list[str] = []
+                async for key in self.redis.scan_iter(match=pattern):
+                    batch.append(key)
+                    if len(batch) >= CLEAR_BATCH_SIZE:
+                        cleared += await self.redis.delete(*batch)
+                        batch.clear()
+                if batch:
+                    cleared += await self.redis.delete(*batch)
         except redis.RedisError as e:
             logger.error(f"Cache clear error: {e}")
         return cleared

@@ -5,7 +5,6 @@ import type {
   AssistantChatResponse,
   SuggestionChip,
 } from "@repo/shared/services/api-client/types";
-import { HTTPError } from "ky";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const SESSION_KEY = "brc-assistant-session-id";
@@ -79,6 +78,11 @@ export const useAssistantChat = ({
     if (!sourceId) return;
 
     let cancelled = false;
+    // Adopt the id before the round trip. Keeping a pointer through a failed
+    // restore is pointless if the next message ignores it -- an unset ref sends
+    // session_id: undefined, the server opens a fresh session, and success
+    // overwrites the pointer we were trying to protect.
+    sessionIdRef.current = sourceId;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- react-hooks v7 anti-pattern (setState in effect)
     setIsRestoring(true);
 
@@ -96,19 +100,19 @@ export const useAssistantChat = ({
       })
       .catch((error: unknown) => {
         if (cancelled) return;
-        const status =
-          error instanceof HTTPError ? error.response.status : undefined;
+        const status = httpStatus(error);
         if (status === 404) {
           // The session reached the end of its life -- aged out on the server's
-          // TTL, or dropped. Nothing is broken. A pointer we kept in
-          // localStorage is just stale, so bin it and start fresh without
-          // alarming anyone; a session id that came in on the URL was asked for
-          // by name, so say it's gone rather than showing a blank page.
-          if (!initialSessionId) {
-            localStorage.removeItem(SESSION_KEY);
-            return;
+          // TTL, or dropped. Nothing is broken, and there's nothing to go back
+          // to, so drop the id and let the next message open a fresh session.
+          sessionIdRef.current = null;
+          localStorage.removeItem(SESSION_KEY);
+          // A localStorage pointer going stale is unremarkable, so say nothing.
+          // An id that arrived on the URL was asked for by name -- that one
+          // deserves an answer rather than a blank page.
+          if (initialSessionId) {
+            setError("That conversation is no longer available.");
           }
-          setError("That conversation is no longer available.");
           return;
         }
         // Anything else may well be transient with the session still alive on
@@ -236,9 +240,25 @@ export const useAssistantChat = ({
  * @param error - The caught error
  * @returns A user-facing error string
  */
+/**
+ * Pull the HTTP status off a thrown request error, if it carries one.
+ *
+ * Duck-typed rather than `instanceof HTTPError`: class identity is one
+ * duplicated ky copy or bundling quirk away from failing silently, and the
+ * consequence here is a mis-classified restore. Anything without a numeric
+ * status -- a network failure, an aborted request -- reports undefined, which
+ * every caller treats as the transient case.
+ * @param error - The thrown value from a failed request
+ * @returns The HTTP status, or undefined if the error doesn't carry one
+ */
+function httpStatus(error: unknown): number | undefined {
+  const response = (error as { response?: { status?: unknown } } | null)
+    ?.response;
+  return typeof response?.status === "number" ? response.status : undefined;
+}
+
 function handleChatError(error: unknown): string {
-  const status =
-    error instanceof HTTPError ? error.response?.status : undefined;
+  const status = httpStatus(error);
   const name = (error as { name?: string }).name;
   if (name === "TimeoutError" || status === 504) {
     return "The assistant took too long to respond. Please try again.";

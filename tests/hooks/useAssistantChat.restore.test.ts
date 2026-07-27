@@ -1,0 +1,95 @@
+import { act, renderHook, waitFor } from "@testing-library/react";
+import { useAssistantChat } from "../../app/hooks/useAssistantChat";
+import { assistantAPIClient } from "../../app/services/assistant-api-client";
+
+jest.mock("../../app/services/assistant-api-client", () => ({
+  assistantAPIClient: {
+    assistantChat: jest.fn(),
+    assistantRestore: jest.fn(),
+  },
+}));
+// Keeps ESM-only ky out of the jest module graph, which it enters through the
+// shared client the hook imports for saved analyses.
+jest.mock("@repo/shared/services/api-client/api-client", () => ({
+  apiClient: { saveAnalysis: jest.fn() },
+}));
+
+const mockClient = assistantAPIClient as jest.Mocked<typeof assistantAPIClient>;
+
+const SESSION_KEY = "brc-assistant-session-id";
+const STORED_ID = "stored1111222233334444555566667777";
+
+/**
+ * Shaped like the ky HTTPError the client throws -- the hook reads `.response.status`.
+ * @param status - HTTP status to attach
+ * @returns An error carrying that status
+ */
+function httpError(status: number): Error & { response: { status: number } } {
+  return Object.assign(new Error(`${status}`), { response: { status } });
+}
+
+describe("useAssistantChat restore", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    localStorage.clear();
+  });
+
+  test("a 404 on a stored session clears the pointer without alarming the user", async () => {
+    localStorage.setItem(SESSION_KEY, STORED_ID);
+    mockClient.assistantRestore.mockRejectedValue(httpError(404));
+
+    const { result } = renderHook(() => useAssistantChat({}));
+
+    await waitFor(() => expect(result.current.isRestoring).toBe(false));
+    expect(localStorage.getItem(SESSION_KEY)).toBeNull();
+    expect(result.current.error).toBeNull();
+  });
+
+  test("a 404 on a session named in the URL says so rather than rendering blank", async () => {
+    mockClient.assistantRestore.mockRejectedValue(httpError(404));
+
+    const { result } = renderHook(() =>
+      useAssistantChat({ initialSessionId: STORED_ID })
+    );
+
+    await waitFor(() => expect(result.current.isRestoring).toBe(false));
+    expect(result.current.error).toMatch(/no longer available/i);
+  });
+
+  test("a 5xx keeps the pointer -- the session is probably still alive", async () => {
+    localStorage.setItem(SESSION_KEY, STORED_ID);
+    mockClient.assistantRestore.mockRejectedValue(httpError(503));
+
+    const { result } = renderHook(() => useAssistantChat({}));
+
+    await waitFor(() => expect(result.current.error).not.toBeNull());
+    expect(localStorage.getItem(SESSION_KEY)).toBe(STORED_ID);
+  });
+
+  test("after a 5xx the next message continues the kept session, not a new one", async () => {
+    // Preserving the pointer is pointless if the next send ignores it: an
+    // unadopted id sends session_id undefined, the server opens a fresh session
+    // and success overwrites the very pointer we kept.
+    localStorage.setItem(SESSION_KEY, STORED_ID);
+    mockClient.assistantRestore.mockRejectedValue(httpError(503));
+    mockClient.assistantChat.mockResolvedValue({
+      handoff_url: null,
+      is_complete: false,
+      reply: "ok",
+      schema_state: null,
+      session_id: STORED_ID,
+      suggestions: [],
+    } as unknown as Awaited<ReturnType<typeof mockClient.assistantChat>>);
+
+    const { result } = renderHook(() => useAssistantChat({}));
+    await waitFor(() => expect(result.current.error).not.toBeNull());
+
+    await act(async () => {
+      await result.current.sendMessage("still there?");
+    });
+
+    expect(mockClient.assistantChat).toHaveBeenCalledWith(
+      expect.objectContaining({ session_id: STORED_ID })
+    );
+  });
+});
