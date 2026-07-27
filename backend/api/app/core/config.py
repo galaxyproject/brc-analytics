@@ -179,6 +179,12 @@ class Settings:
         self.GALAXY_RANDOM_LINES_TOOL_ID: str = os.getenv(
             "GALAXY_RANDOM_LINES_TOOL_ID", "random_lines1"
         )
+        # Versioned rather than short id: kmindex_query's parameter shape has
+        # changed across releases, so pinning keeps tool_inputs valid.
+        self.GALAXY_KMINDEX_TOOL_ID: str = os.getenv(
+            "GALAXY_KMINDEX_TOOL_ID",
+            "toolshed.g2.bx.psu.edu/repos/iuc/kmindex/kmindex_query/0.6.1+galaxy3",
+        )
 
         # Keycloak / OIDC settings
         self.KEYCLOAK_ISSUER_URL: str = os.getenv(

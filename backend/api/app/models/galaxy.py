@@ -33,6 +33,49 @@ class GalaxyJobSubmission(BaseModel):
     )
 
 
+class KmindexQuerySubmission(BaseModel):
+    """Request model for a Logan/kmindex sequence search."""
+
+    sequence: str = Field(..., description="Query sequence in FASTA format")
+    index: str = Field(
+        ..., description="kmindex index name, e.g. 'METAGENOMIC_ENV' or 'GENOMIC_BCT'"
+    )
+    # kmindex indexes s-mers and queries (s+z)-mers; z=6 is the tool default and
+    # matches a standard k-mer query.
+    zvalue: int = Field(default=6, ge=0, le=16, description="Z-value")
+    threshold: float = Field(
+        default=0.0, ge=0.0, le=1.0, description="Minimum proportion of shared k-mers"
+    )
+    filename: Optional[str] = Field(
+        default="query", description="Name for the uploaded query file"
+    )
+
+
+class KmindexHit(BaseModel):
+    """A single SRA accession matched by a kmindex query."""
+
+    accession: str = Field(..., description="SRA run accession, e.g. SRR13392923")
+    score: float = Field(..., description="Fraction of query k-mers shared, 0.0-1.0")
+    shard: str = Field(..., description="Index shard the hit came from")
+
+
+class KmindexResults(BaseModel):
+    """Hits from a kmindex query, merged across every index shard."""
+
+    job_id: str
+    query_name: Optional[str] = None
+    total_hits: int = Field(..., description="Hits across all shards before paging")
+    shards_searched: int
+    shards_with_hits: int
+    truncated: bool = Field(
+        default=False,
+        description="True when the merged hit list hit the aggregation cap",
+    )
+    limit: int
+    offset: int
+    hits: List[KmindexHit] = []
+
+
 class GalaxyJobResponse(BaseModel):
     """Response model for job submission."""
 
