@@ -7,6 +7,14 @@ import redis.asyncio as redis
 
 logger = logging.getLogger(__name__)
 
+# Key namespaces holding cached upstream responses, safe to drop on deploy.
+# Everything else in the database is live state -- assistant sessions
+# (assistant:session:*), auth sessions and in-flight PKCE (auth:*), rate-limit
+# counters (ratelimit:*) -- and has to survive a restart. New cache namespaces
+# belong here; missing one only means it ages out via its TTL instead of being
+# dropped at boot, which is the safe direction to be wrong in.
+CACHE_KEY_PATTERNS = ("ena:*", "v1:*")
+
 
 class CacheService:
     """Redis-based cache service with TTL support and key management"""
@@ -71,8 +79,28 @@ class CacheService:
             logger.error(f"Cache clear pattern error for {pattern}: {e}")
             return 0
 
+    async def clear_caches(self) -> int:
+        """Drop cached upstream responses, leaving live state intact.
+
+        Scoped to CACHE_KEY_PATTERNS rather than flushing the database, because
+        the same Redis holds sessions and rate-limit counters. Scans rather than
+        KEYS so a large keyspace doesn't block the server.
+        """
+        cleared = 0
+        try:
+            for pattern in CACHE_KEY_PATTERNS:
+                keys = [key async for key in self.redis.scan_iter(match=pattern)]
+                if keys:
+                    cleared += await self.redis.delete(*keys)
+        except redis.RedisError as e:
+            logger.error(f"Cache clear error: {e}")
+        return cleared
+
     async def flush_all(self) -> bool:
-        """Flush all keys from the current database"""
+        """Flush every key in the database, live state included.
+
+        Destructive -- clear_caches() is the deploy-safe version.
+        """
         try:
             await self.redis.flushdb()
             logger.info("Cache flushed successfully")
