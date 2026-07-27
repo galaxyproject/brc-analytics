@@ -94,9 +94,26 @@ export const useAssistantChat = ({
         setIsComplete(restored.is_complete);
         setHandoffUrl(restored.handoff_url);
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         if (cancelled) return;
-        if (!initialSessionId) localStorage.removeItem(SESSION_KEY);
+        const status =
+          error instanceof HTTPError ? error.response.status : undefined;
+        if (status === 404) {
+          // The session reached the end of its life -- aged out on the server's
+          // TTL, or dropped. Nothing is broken. A pointer we kept in
+          // localStorage is just stale, so bin it and start fresh without
+          // alarming anyone; a session id that came in on the URL was asked for
+          // by name, so say it's gone rather than showing a blank page.
+          if (!initialSessionId) {
+            localStorage.removeItem(SESSION_KEY);
+            return;
+          }
+          setError("That conversation is no longer available.");
+          return;
+        }
+        // Anything else may well be transient with the session still alive on
+        // the server, so hold on to the pointer -- dropping it here would turn
+        // a blip into permanent loss of the conversation.
         setError("Failed to restore the previous conversation.");
       })
       .finally(() => {
