@@ -10,6 +10,7 @@ export function getTrackTypes(memberCount: number): string[] {
     `Multi-z alignment (${memberCount}-way)`,
     "Pairwise chains to each other strain",
     "Cross-strain gene projections",
+    // eslint-disable-next-line sonarjs/todo-tag -- pre-existing TODO tracked in #1341
     // TODO(#1341): species-specific — the cohort-variants track is Plasmodium
     // (MalariaGEN) only. Source this per-bundle from pangenomes.json once the
     // real build lands rather than hardcoding it for every species here.
