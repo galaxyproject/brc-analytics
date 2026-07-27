@@ -116,3 +116,24 @@ async def test_get_session_still_returns_none_for_a_genuine_miss():
     service = SessionService(cache)
 
     assert await service.get_session("never-existed") is None
+
+
+@pytest.mark.asyncio
+async def test_eval_harness_cache_double_satisfies_session_service():
+    """The evals run SessionService against their own dict-backed cache.
+
+    It's duck-typed, so adding a read method to CacheService breaks it at
+    runtime with nothing at import time to catch it -- get_strict already did
+    once. Round-trip a session through it so the next one fails here instead.
+    """
+    from evals.tasks import _InMemoryCache
+
+    service = SessionService(_InMemoryCache())
+    state = await service.create_session(
+        messages=[ChatMessage(role=MessageRole.USER, content="hello")],
+    )
+
+    loaded = await service.get_session(state.session_id)
+
+    assert loaded is not None
+    assert loaded.messages[0].content == "hello"

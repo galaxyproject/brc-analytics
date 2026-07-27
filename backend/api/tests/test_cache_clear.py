@@ -13,8 +13,12 @@ class FakeRedis:
     def __init__(self, keys: dict[str, str]):
         self.values = dict(keys)
         self.delete_batch_sizes: list[int] = []
+        self.scan_counts: list[int | None] = []
 
-    async def scan_iter(self, match: str) -> AsyncIterator[str]:
+    async def scan_iter(
+        self, match: str, count: int | None = None
+    ) -> AsyncIterator[str]:
+        self.scan_counts.append(count)
         # Snapshot the key list the way a real cursor scan does not: this fake
         # can't model concurrent mutation, so tests here cover selection and
         # batching only.
@@ -79,13 +83,20 @@ async def test_clear_caches_batches_its_deletes():
     assert cleared == 1200
     assert service.redis.values == {}
     assert max(service.redis.delete_batch_sizes) <= CLEAR_BATCH_SIZE
+    # SCAN's default COUNT of 10 would be thousands of round trips on a warm
+    # cache, all on the connection live traffic is using.
+    assert service.redis.scan_counts == [CLEAR_BATCH_SIZE] * len(
+        service.redis.scan_counts
+    )
 
 
-def test_startup_uses_the_scoped_clear_and_not_a_full_flush():
-    """The bug was the lifespan calling flush_all(). Assert on the source so a
-    future edit can't quietly reintroduce it -- exercising the real lifespan
-    needs Redis, a DB and the MCP app, which is why this regressed unnoticed."""
+def test_startup_clears_caches_rather_than_flushing_the_database():
+    """#1523 was the lifespan calling flush_all(), which took live sessions with
+    it. Asserted against the source because main.py binds get_cache_service at
+    import time, so a fixture can't substitute the cache the lifespan actually
+    uses -- which is also why no existing test caught the original bug."""
     source = (Path(__file__).resolve().parents[1] / "app" / "main.py").read_text()
 
     assert "clear_caches()" in source
-    assert "flush_all()" not in source
+    assert "flushdb" not in source
+    assert "flush_all" not in source

@@ -119,6 +119,11 @@ class _InMemoryCache:
     async def get(self, key: str) -> Optional[Any]:
         return self._store.get(key)
 
+    async def get_strict(self, key: str) -> Optional[Any]:
+        # SessionService reads through this one. A dict has no backend to fail,
+        # so there's nothing to raise -- a miss is just a miss.
+        return self._store.get(key)
+
     async def set(self, key: str, value: Any, ttl: int = 3600) -> bool:  # noqa: ARG002
         self._store[key] = value
         return True

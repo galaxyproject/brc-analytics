@@ -56,6 +56,28 @@ describe("useAssistantChat restore", () => {
     expect(result.current.error).toMatch(/no longer available/i);
   });
 
+  test("a 403 drops the pointer -- this browser can never restore that session", async () => {
+    // The signing cookie no longer matches the id, which is permanent. Keeping
+    // it would re-send the same id on every message and wedge the chat.
+    localStorage.setItem(SESSION_KEY, STORED_ID);
+    mockClient.assistantRestore.mockRejectedValue(httpError(403));
+
+    const { result } = renderHook(() => useAssistantChat({}));
+
+    await waitFor(() => expect(result.current.isRestoring).toBe(false));
+    expect(localStorage.getItem(SESSION_KEY)).toBeNull();
+  });
+
+  test("a 429 keeps the pointer -- throttling is transient", async () => {
+    localStorage.setItem(SESSION_KEY, STORED_ID);
+    mockClient.assistantRestore.mockRejectedValue(httpError(429));
+
+    const { result } = renderHook(() => useAssistantChat({}));
+
+    await waitFor(() => expect(result.current.error).not.toBeNull());
+    expect(localStorage.getItem(SESSION_KEY)).toBe(STORED_ID);
+  });
+
   test("a 5xx keeps the pointer -- the session is probably still alive", async () => {
     localStorage.setItem(SESSION_KEY, STORED_ID);
     mockClient.assistantRestore.mockRejectedValue(httpError(503));

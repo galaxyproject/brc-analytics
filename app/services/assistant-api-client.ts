@@ -77,6 +77,12 @@ export const assistantAPIClient = {
   assistantRestore: async (
     sessionId: string
   ): Promise<SessionRestoreResponse> => {
-    return httpClient.get(`assistant/session/${sessionId}`).json();
+    // One attempt only. A Redis outage now surfaces as 500, which is in the
+    // shared retry list, so the default would spend three tries plus any
+    // Retry-After the proxy asks for -- all with a person watching a spinner.
+    // Failing fast is fine here: the pointer is kept and a reload retries.
+    return httpClient
+      .get(`assistant/session/${sessionId}`, { retry: { limit: 0 } })
+      .json();
   },
 };
