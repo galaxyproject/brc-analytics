@@ -166,6 +166,20 @@ class Settings:
         # SRA-DuckDB mirror. Empty path disables the assistant's SRA tools.
         self.SRA_MIRROR_PATH: str = os.getenv("SRA_MIRROR_PATH", "")
 
+        # Galaxy job execution. Empty API key disables the Galaxy endpoints --
+        # the key is a service account, so jobs land in one shared account
+        # rather than the visitor's own Galaxy session.
+        self.GALAXY_API_URL: str = os.getenv(
+            "GALAXY_API_URL", "https://test.galaxyproject.org/api"
+        )
+        self.GALAXY_API_KEY: str = os.getenv("GALAXY_API_KEY", "")
+
+        # Galaxy tool IDs
+        self.GALAXY_UPLOAD_TOOL_ID: str = os.getenv("GALAXY_UPLOAD_TOOL_ID", "upload1")
+        self.GALAXY_RANDOM_LINES_TOOL_ID: str = os.getenv(
+            "GALAXY_RANDOM_LINES_TOOL_ID", "random_lines1"
+        )
+
         # Keycloak / OIDC settings
         self.KEYCLOAK_ISSUER_URL: str = os.getenv(
             "KEYCLOAK_ISSUER_URL",
