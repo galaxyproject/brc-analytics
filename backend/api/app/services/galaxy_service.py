@@ -3,6 +3,7 @@
 import asyncio
 import json
 import logging
+import random
 import time
 from typing import List, Optional
 
@@ -30,9 +31,18 @@ logger = logging.getLogger(__name__)
 # kmindex splits an index into shards and emits one JSON dataset per shard, so a
 # single query fans out into dozens of dataset downloads. Galaxy answers 429 if
 # those go out unthrottled.
-KMINDEX_MAX_CONCURRENT_DOWNLOADS = 4
-KMINDEX_DOWNLOAD_ATTEMPTS = 5
-KMINDEX_BACKOFF_SECONDS = 2.0
+# Tuned against GENOMIC_BCT (55 shards), which blew through a 4-way/5-attempt
+# budget and lost 12 shards to nginx 429s. The limiter is per-IP rate rather
+# than per-connection, so fewer workers backing off longer beats more workers
+# retrying sooner.
+KMINDEX_MAX_CONCURRENT_DOWNLOADS = 2
+KMINDEX_DOWNLOAD_ATTEMPTS = 7
+KMINDEX_BACKOFF_SECONDS = 3.0
+# Without jitter the workers fall into lockstep -- they get limited together,
+# sleep the same doubling schedule, and hit the limit again in unison.
+KMINDEX_BACKOFF_JITTER = 0.5
+# Cooldown before the straggler sweep, to let the limiter's window roll over.
+KMINDEX_RETRY_SWEEP_DELAY = 20.0
 
 # Ceiling on the merged hit list. A permissive threshold against a large index
 # can return far more than anyone will page through, and the whole list is
@@ -207,7 +217,9 @@ class GalaxyService:
                 if not is_rate_limit or attempt == KMINDEX_DOWNLOAD_ATTEMPTS - 1:
                     logger.warning(f"Shard {dataset_id} download failed: {e}")
                     return None
-                await asyncio.sleep(delay)
+                await asyncio.sleep(
+                    delay * (1 + random.random() * KMINDEX_BACKOFF_JITTER)
+                )
                 delay *= 2
         return None
 
@@ -219,22 +231,23 @@ class GalaxyService:
             raise Exception("Galaxy service not available")
 
         cache_key = self.cache.make_key("galaxy:kmindex_agg", {"job_id": job_id})
-        cached = await self.cache.get(cache_key)
-        if cached:
-            return self._page_kmindex(cached, job_id, limit, offset)
+        aggregate = await self.cache.get(cache_key)
 
-        # Serialize aggregation across the whole process. Without this, several
-        # callers landing on a cold cache each pull every shard at once, which
-        # multiplies the load Galaxy is already rate-limiting and leaves them
-        # racing to overwrite the same cache entry with partial results.
-        async with _AGGREGATION_LOCK:
-            cached = await self.cache.get(cache_key)
-            if cached:
-                return await self._annotate_with_sra(
-                    self._page_kmindex(cached, job_id, limit, offset)
-                )
-            aggregate = await self._aggregate_shards(job_id)
+        if aggregate is None:
+            # Serialize aggregation across the whole process. Without this,
+            # several callers landing on a cold cache each pull every shard at
+            # once, which multiplies the load Galaxy is already rate-limiting
+            # and leaves them racing to overwrite the same cache entry with
+            # partial results.
+            async with _AGGREGATION_LOCK:
+                # Re-check: whoever held the lock may have just built it.
+                aggregate = await self.cache.get(cache_key)
+                if aggregate is None:
+                    aggregate = await self._aggregate_shards(job_id)
 
+        # Single exit, so a cache hit can't skip annotation -- an earlier
+        # version returned straight from the pre-lock hit and silently served
+        # every warm request unannotated.
         return await self._annotate_with_sra(
             self._page_kmindex(aggregate, job_id, limit, offset)
         )
@@ -281,9 +294,32 @@ class GalaxyService:
             raise Exception(f"Job {job_id} failed with state: {status.state}")
 
         semaphore = asyncio.Semaphore(KMINDEX_MAX_CONCURRENT_DOWNLOADS)
-        shards = await asyncio.gather(
-            *(self._download_shard(o.dataset.id, semaphore) for o in status.outputs)
+        shards = list(
+            await asyncio.gather(
+                *(self._download_shard(o.dataset.id, semaphore) for o in status.outputs)
+            )
         )
+
+        # Second pass for stragglers. The rate limiter is bursty, so a handful
+        # of shards can exhaust their budget while the rest sail through --
+        # letting the pressure drop and retrying just those one at a time
+        # recovers them without making every shard wait on a longer budget.
+        stragglers = [i for i, shard in enumerate(shards) if shard is None]
+        if stragglers:
+            logger.info(
+                f"kmindex job {job_id}: retrying {len(stragglers)} shards after "
+                f"a {KMINDEX_RETRY_SWEEP_DELAY}s cooldown"
+            )
+            await asyncio.sleep(KMINDEX_RETRY_SWEEP_DELAY)
+            single = asyncio.Semaphore(1)
+            recovered = await asyncio.gather(
+                *(
+                    self._download_shard(status.outputs[i].dataset.id, single)
+                    for i in stragglers
+                )
+            )
+            for index, shard in zip(stragglers, recovered):
+                shards[index] = shard
 
         hits: List[dict] = []
         query_name = None
