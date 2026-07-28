@@ -51,12 +51,31 @@ class KmindexQuerySubmission(BaseModel):
     )
 
 
+class SraRunMetadata(BaseModel):
+    """Run metadata from the local SRA mirror, joined onto a search hit."""
+
+    assay_type: Optional[str] = None
+    bioproject: Optional[str] = None
+    country: Optional[str] = None
+    instrument: Optional[str] = None
+    library_layout: Optional[str] = None
+    mbases: Optional[int] = None
+    organism: Optional[str] = None
+    platform: Optional[str] = None
+    release_date: Optional[str] = None
+    study: Optional[str] = None
+
+
 class KmindexHit(BaseModel):
     """A single SRA accession matched by a kmindex query."""
 
     accession: str = Field(..., description="SRA run accession, e.g. SRR13392923")
     score: float = Field(..., description="Fraction of query k-mers shared, 0.0-1.0")
     shard: str = Field(..., description="Index shard the hit came from")
+    sra: Optional[SraRunMetadata] = Field(
+        default=None,
+        description="Mirror metadata, absent when the accession isn't mirrored",
+    )
 
 
 class KmindexResults(BaseModel):
@@ -78,6 +97,12 @@ class KmindexResults(BaseModel):
     )
     limit: int
     offset: int
+    sra_mirror_available: bool = Field(
+        default=False, description="Whether the SRA mirror was queryable"
+    )
+    sra_annotated: int = Field(
+        default=0, description="Hits on this page found in the SRA mirror"
+    )
     hits: List[KmindexHit] = []
 
 

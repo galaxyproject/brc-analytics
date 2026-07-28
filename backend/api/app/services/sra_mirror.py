@@ -35,6 +35,11 @@ _CACHE_TTL_SECONDS = 300
 # bound -- the search key is a 7-tuple, so the keyspace is effectively open.
 _CACHE_MAX_ENTRIES = 512
 
+# Ceiling on a single accession-batch lookup. Callers annotate one page of
+# search hits at a time, so this is generous; it exists to keep a caller from
+# passing a whole result set and building an enormous IN list.
+_MAX_ACCESSION_LOOKUP = 500
+
 
 # Curated abbreviations and colloquial names. NCBI's taxonomy `names.dmp`
 # has scientific names and a thicket of historical synonyms, but it
@@ -667,6 +672,56 @@ class SRAMirrorService:
                 f"Couldn't resolve '{organism}' to a known organism -- check "
                 "the spelling, or try the scientific name or NCBI taxid."
             )
+        self._cache_put(cache_key, result)
+        return result
+
+    @_synchronized
+    def runs_by_accession(self, accessions: List[str]) -> Dict[str, Dict[str, Any]]:
+        """
+        Look up run metadata for a batch of run accessions.
+
+        Built for annotating a page of sequence-search hits, so it takes the
+        accessions as they come and returns only the ones the mirror knows --
+        a caller should expect misses. The mirror is filtered to BRC-relevant
+        organisms, and a Logan query can match anything in SRA.
+        """
+        if not self._con or not accessions:
+            return {}
+
+        wanted = sorted({a.strip().upper() for a in accessions if a and a.strip()})
+        if not wanted:
+            return {}
+        wanted = wanted[:_MAX_ACCESSION_LOOKUP]
+
+        cache_key = ("runs_by_accession", tuple(wanted))
+        if (cached := self._cache_get(cache_key)) is not None:
+            return cached
+
+        rows = self._con.execute(
+            """
+            SELECT acc, sra_study, bioproject, organism, assay_type, platform,
+                   instrument, librarylayout, releasedate,
+                   geo_loc_name_country_calc, mbases
+            FROM runs WHERE acc IN (SELECT UNNEST(?))
+            """,
+            [wanted],
+        ).fetchall()
+
+        result = {
+            r[0]: {
+                "assay_type": r[4],
+                "bioproject": r[2],
+                "country": r[9],
+                "instrument": r[6],
+                "library_layout": r[7],
+                "mbases": r[10],
+                "organism": r[3],
+                "platform": r[5],
+                "release_date": str(r[8]) if r[8] else None,
+                "study": r[1],
+            }
+            for r in rows
+        }
         self._cache_put(cache_key, result)
         return result
 

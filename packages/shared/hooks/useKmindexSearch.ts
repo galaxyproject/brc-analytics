@@ -2,10 +2,24 @@ import { API_BASE_URL } from "@repo/shared/config/api";
 import ky from "ky";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+export interface SraRunMetadata {
+  assay_type: string | null;
+  bioproject: string | null;
+  country: string | null;
+  instrument: string | null;
+  library_layout: string | null;
+  mbases: number | null;
+  organism: string | null;
+  platform: string | null;
+  release_date: string | null;
+  study: string | null;
+}
+
 export interface KmindexHit {
   accession: string;
   score: number;
   shard: string;
+  sra: SraRunMetadata | null;
 }
 
 export interface KmindexResults {
@@ -17,6 +31,8 @@ export interface KmindexResults {
   shards_failed: number;
   shards_searched: number;
   shards_with_hits: number;
+  sra_annotated: number;
+  sra_mirror_available: boolean;
   total_hits: number;
   truncated: boolean;
 }

@@ -1,12 +1,12 @@
 """Galaxy API integration endpoints."""
 
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.core.cache import CacheService
-from app.core.dependencies import get_cache_service
+from app.core.dependencies import get_cache_service, get_sra_mirror_service
 from app.models.galaxy import (
     GalaxyJobResponse,
     GalaxyJobResult,
@@ -16,6 +16,7 @@ from app.models.galaxy import (
     KmindexResults,
 )
 from app.services.galaxy_service import GalaxyService
+from app.services.sra_mirror import SRAMirrorService
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -23,9 +24,10 @@ router = APIRouter()
 
 async def get_galaxy_service(
     cache: CacheService = Depends(get_cache_service),
+    sra_mirror: Optional[SRAMirrorService] = Depends(get_sra_mirror_service),
 ) -> GalaxyService:
     """Dependency to get Galaxy service instance."""
-    return GalaxyService(cache)
+    return GalaxyService(cache, sra_mirror=sra_mirror)
 
 
 @router.get("/health")
