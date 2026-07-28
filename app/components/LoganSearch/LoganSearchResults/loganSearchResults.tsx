@@ -58,6 +58,14 @@ export const LoganSearchResults = ({
               size="small"
               sx={{ mr: 1 }}
             />
+            {results.sra_mirror_available && (
+              <Chip
+                label={`${results.sra_annotated}/${results.hits.length} in SRA mirror`}
+                size="small"
+                sx={{ mr: 1 }}
+                title="Logan indexes all of SRA; the mirror covers BRC-relevant organisms, so hits outside that scope have no metadata"
+              />
+            )}
             {results.truncated && (
               <Chip
                 color="warning"
@@ -74,7 +82,10 @@ export const LoganSearchResults = ({
             <TableRow>
               <TableCell>Accession</TableCell>
               <TableCell align="right">Shared k-mers</TableCell>
-              <TableCell>Shard</TableCell>
+              <TableCell>Organism</TableCell>
+              <TableCell>Platform</TableCell>
+              <TableCell>Country</TableCell>
+              <TableCell>Released</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -97,8 +108,27 @@ export const LoganSearchResults = ({
                 </TableCell>
                 <TableCell align="right">{hit.score.toFixed(4)}</TableCell>
                 <TableCell>
+                  {hit.sra?.organism ? (
+                    <Typography variant="body2">{hit.sra.organism}</Typography>
+                  ) : (
+                    <Typography color="textSecondary" variant="caption">
+                      {hit.shard}
+                    </Typography>
+                  )}
+                </TableCell>
+                <TableCell>
                   <Typography color="textSecondary" variant="caption">
-                    {hit.shard}
+                    {hit.sra?.platform ?? "--"}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography color="textSecondary" variant="caption">
+                    {hit.sra?.country ?? "--"}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography color="textSecondary" variant="caption">
+                    {hit.sra?.release_date?.slice(0, 10) ?? "--"}
                   </Typography>
                 </TableCell>
               </TableRow>

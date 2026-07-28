@@ -33,6 +33,11 @@ def _make_app(tmp_path, monkeypatch, sra_mirror_path=None):
     monkeypatch.setenv("CATALOG_PATH", str(tmp_path))
     if sra_mirror_path is not None:
         monkeypatch.setenv("SRA_MIRROR_PATH", sra_mirror_path)
+    else:
+        # Clear it explicitly -- config.py load_dotenv()s the developer's .env,
+        # so without this the no-mirror tests pass or fail depending on whether
+        # whoever is running them happens to have a mirror configured.
+        monkeypatch.delenv("SRA_MIRROR_PATH", raising=False)
 
     fake_cache = MagicMock()
     fake_cache.clear_caches = AsyncMock(return_value=0)

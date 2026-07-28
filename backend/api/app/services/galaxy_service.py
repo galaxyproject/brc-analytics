@@ -21,7 +21,9 @@ from app.models.galaxy import (
     KmindexHit,
     KmindexQuerySubmission,
     KmindexResults,
+    SraRunMetadata,
 )
+from app.services.sra_mirror import SRAMirrorService
 
 logger = logging.getLogger(__name__)
 
@@ -58,8 +60,11 @@ def _find_kmindex_options(inputs: List[dict]) -> List[str]:
 class GalaxyService:
     """Service for interacting with Galaxy API using BioBLEND."""
 
-    def __init__(self, cache: CacheService):
+    def __init__(
+        self, cache: CacheService, sra_mirror: Optional[SRAMirrorService] = None
+    ):
         self.cache = cache
+        self.sra_mirror = sra_mirror
         self.settings = get_settings()
 
         # Check if Galaxy is configured
@@ -225,10 +230,45 @@ class GalaxyService:
         async with _AGGREGATION_LOCK:
             cached = await self.cache.get(cache_key)
             if cached:
-                return self._page_kmindex(cached, job_id, limit, offset)
+                return await self._annotate_with_sra(
+                    self._page_kmindex(cached, job_id, limit, offset)
+                )
             aggregate = await self._aggregate_shards(job_id)
 
-        return self._page_kmindex(aggregate, job_id, limit, offset)
+        return await self._annotate_with_sra(
+            self._page_kmindex(aggregate, job_id, limit, offset)
+        )
+
+    async def _annotate_with_sra(self, results: KmindexResults) -> KmindexResults:
+        """
+        Join SRA mirror metadata onto the hits on this page.
+
+        Only the current page is annotated -- a query can match tens of
+        thousands of accessions, and nobody needs metadata for the ones they
+        aren't looking at. Misses are expected and left as None: the mirror
+        covers BRC-relevant organisms, while Logan indexes all of SRA.
+        """
+        if not self.sra_mirror or not self.sra_mirror.is_available():
+            return results
+
+        try:
+            by_accession = await asyncio.to_thread(
+                self.sra_mirror.runs_by_accession,
+                [hit.accession for hit in results.hits],
+            )
+        except Exception as e:
+            # Annotation is additive; a mirror problem shouldn't cost the
+            # caller their search results.
+            logger.warning(f"SRA annotation failed: {e}")
+            return results
+
+        results.sra_mirror_available = True
+        for hit in results.hits:
+            metadata = by_accession.get(hit.accession)
+            if metadata:
+                hit.sra = SraRunMetadata(**metadata)
+                results.sra_annotated += 1
+        return results
 
     async def _aggregate_shards(self, job_id: str) -> dict:
         """Download and merge every shard for a completed kmindex job."""
