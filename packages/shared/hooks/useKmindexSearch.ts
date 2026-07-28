@@ -258,6 +258,7 @@ export const useKmindexSearch = (): KmindexSearchActions &
 
   const reset = useCallback((): void => {
     stopPolling();
+    fetchedRef.current = null;
     setState((prev) => ({
       ...INITIAL_STATE,
       indexes: prev.indexes,

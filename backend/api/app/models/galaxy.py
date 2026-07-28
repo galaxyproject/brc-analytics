@@ -3,7 +3,7 @@
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class GalaxyJobState(str, Enum):
@@ -49,6 +49,23 @@ class KmindexQuerySubmission(BaseModel):
     filename: Optional[str] = Field(
         default="query", description="Name for the uploaded query file"
     )
+
+    @field_validator("sequence")
+    @classmethod
+    def single_record(cls, value: str) -> str:
+        """
+        Reject multi-record FASTA.
+
+        kmindex reports hits per query record, but the merged view collapses
+        them into one ranked list -- so a two-record query silently returns
+        both sets of accessions under the first record's name. Until the
+        aggregate is keyed by query, one record per submission.
+        """
+        if sum(1 for line in value.splitlines() if line.startswith(">")) > 1:
+            raise ValueError(
+                "Submit one sequence per query; multi-record FASTA is not supported"
+            )
+        return value
 
 
 class SraRunMetadata(BaseModel):

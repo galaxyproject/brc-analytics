@@ -66,8 +66,11 @@ export const LoganSearchForm = ({
   const index = toIndexName(strategy, division);
   const bases = countBases(sequence);
   const tooLong = bases > MAX_QUERY_BASES;
+  // An errored job keeps its jobId with no results forever, so leaving the
+  // error out of this leaves the form stuck "running" with no way back.
   const isRunning =
-    search.isSubmitting || Boolean(search.jobId && !search.results);
+    search.isSubmitting ||
+    Boolean(search.jobId && !search.results && !search.error);
 
   const canSubmit =
     Boolean(index) &&
@@ -177,11 +180,9 @@ export const LoganSearchForm = ({
             >
               {isRunning ? "Searching..." : "Search Logan"}
             </Button>
-            <Button
-              disabled={isRunning}
-              onClick={search.reset}
-              variant="outlined"
-            >
+            {/* Never disabled -- Reset is the escape hatch when a search is
+                wedged, which is exactly when it would be disabled otherwise. */}
+            <Button onClick={search.reset} variant="outlined">
               Reset
             </Button>
             {index && (
