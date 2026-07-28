@@ -37,6 +37,11 @@ KMINDEX_BACKOFF_SECONDS = 2.0
 # cached as one Redis value.
 KMINDEX_MAX_HITS = 50000
 
+# Aggregation is process-wide serialized: it is I/O bound against a service that
+# rate-limits us, so overlapping runs make each other slower and can each end up
+# with a different partial view of the same job.
+_AGGREGATION_LOCK = asyncio.Lock()
+
 
 def _find_kmindex_options(inputs: List[dict]) -> List[str]:
     """Pull the index names out of kmindex_query's nested conditional inputs."""
@@ -213,6 +218,22 @@ class GalaxyService:
         if cached:
             return self._page_kmindex(cached, job_id, limit, offset)
 
+        # Serialize aggregation across the whole process. Without this, several
+        # callers landing on a cold cache each pull every shard at once, which
+        # multiplies the load Galaxy is already rate-limiting and leaves them
+        # racing to overwrite the same cache entry with partial results.
+        async with _AGGREGATION_LOCK:
+            cached = await self.cache.get(cache_key)
+            if cached:
+                return self._page_kmindex(cached, job_id, limit, offset)
+            aggregate = await self._aggregate_shards(job_id)
+
+        return self._page_kmindex(aggregate, job_id, limit, offset)
+
+    async def _aggregate_shards(self, job_id: str) -> dict:
+        """Download and merge every shard for a completed kmindex job."""
+        cache_key = self.cache.make_key("galaxy:kmindex_agg", {"job_id": job_id})
+
         status = await self.get_job_status(job_id)
         if not status.is_complete:
             raise Exception(f"Job {job_id} is not yet complete (state: {status.state})")
@@ -227,8 +248,10 @@ class GalaxyService:
         hits: List[dict] = []
         query_name = None
         shards_with_hits = 0
+        shards_failed = 0
         for shard in shards:
             if not shard:
+                shards_failed += 1
                 continue
             # Shape is {shard_name: {query_name: {accession: score}}}.
             for shard_name, queries in shard.items():
@@ -257,12 +280,24 @@ class GalaxyService:
         aggregate = {
             "hits": hits,
             "query_name": query_name,
+            "shards_failed": shards_failed,
             "shards_searched": len(shards),
             "shards_with_hits": shards_with_hits,
             "truncated": truncated,
         }
-        await self.cache.set(cache_key, aggregate, CacheTTL.ONE_DAY)
-        return self._page_kmindex(aggregate, job_id, limit, offset)
+
+        # A dropped shard means missing accessions, and a hit count that looks
+        # authoritative while being wrong is worse than a slow answer. Report it,
+        # and don't cache it -- the next request gets a clean attempt.
+        if shards_failed:
+            logger.error(
+                f"kmindex job {job_id}: {shards_failed}/{len(shards)} shards "
+                "failed to download; returning a partial result uncached"
+            )
+        else:
+            await self.cache.set(cache_key, aggregate, CacheTTL.ONE_DAY)
+
+        return aggregate
 
     @staticmethod
     def _page_kmindex(
@@ -274,6 +309,7 @@ class GalaxyService:
             job_id=job_id,
             query_name=aggregate.get("query_name"),
             total_hits=len(hits),
+            shards_failed=aggregate.get("shards_failed", 0),
             shards_searched=aggregate.get("shards_searched", 0),
             shards_with_hits=aggregate.get("shards_with_hits", 0),
             truncated=aggregate.get("truncated", False),
