@@ -67,6 +67,11 @@ class KmindexResults(BaseModel):
     total_hits: int = Field(..., description="Hits across all shards before paging")
     shards_searched: int
     shards_with_hits: int
+    shards_failed: int = Field(
+        default=0,
+        description="Shards whose output could not be fetched; >0 means the "
+        "hit list is incomplete",
+    )
     truncated: bool = Field(
         default=False,
         description="True when the merged hit list hit the aggregation cap",
