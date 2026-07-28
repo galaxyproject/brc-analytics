@@ -2,6 +2,7 @@ import logging
 from typing import Optional
 
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
+from pydantic_ai.exceptions import AgentRunError
 
 from app.core.config import SESSION_COOKIE_NAME
 from app.core.dependencies import (
@@ -96,7 +97,18 @@ async def assistant_chat(
             status_code=403,
             detail="Assistant session belongs to another user",
         ) from e
+    except AgentRunError as e:
+        # pydantic-ai hangs every agent failure off AgentRunError, which is a
+        # RuntimeError -- so a single malformed tool call, a provider 4xx and a
+        # usage cap all used to land in the branch below and tell the user the
+        # assistant was down. It isn't: the run failed, nobody else is affected,
+        # and "try again later" is wrong because the same question fails again.
+        logger.exception("Assistant chat run failed")
+        raise HTTPException(
+            status_code=500, detail="The assistant could not complete that request"
+        ) from e
     except RuntimeError as e:
+        # What's left is the deliberate one: the agent isn't configured.
         logger.exception("Assistant chat unavailable (RuntimeError)")
         raise HTTPException(status_code=503, detail=str(e)) from e
     except Exception as e:

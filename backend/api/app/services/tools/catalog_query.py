@@ -79,6 +79,10 @@ class EntitySchema:
         self.numeric_fields: set[str] = {
             f for f, t in self.fields.items() if t is FieldType.NUMERIC
         }
+        # GROUP BY on a list column buckets by whole-list equality, so only
+        # scalars can be faceted. Derived here with the rest so the tool schema,
+        # the validator and this declaration can't drift apart.
+        self.facetable_fields: set[str] = self.field_names - self.list_fields
         self.configured_columns: set[str] = self.field_names | set(self.display)
         # Fail at import on a misdeclared schema rather than late with malformed
         # SQL or an IndexError: a `list` always needs a projection, and every
@@ -265,6 +269,17 @@ class Op(str, Enum):
 
 Scalar = Union[str, int, float, bool]
 
+# Every field either entity can be grouped on, as a schema-level enum rather than
+# a bare string. A list field named here used to validate fine and then fail at
+# run time, and the model -- given no way to see the constraint -- reliably made
+# the same call on retry and killed the whole turn. Union across entities is
+# deliberate: the per-entity check below still catches an assembly field asked of
+# organisms, and it does so with a message naming the valid ones.
+FACETABLE_FIELDS: tuple[str, ...] = tuple(
+    sorted({f for s in ENTITY_SCHEMA.values() for f in s.facetable_fields})
+)
+FacetField = Literal[FACETABLE_FIELDS]  # type: ignore[valid-type]
+
 
 class Filter(BaseModel):
     field: str
@@ -286,7 +301,7 @@ class CatalogQuery(BaseModel):
     # Each facet column is a separate GROUP BY query in execute(); cap the count
     # so one call can't fan out into a burst of DB work. Realistic group-bys use
     # one or two columns — 4 is comfortable headroom.
-    facet_by: list[str] = Field(default_factory=list, max_length=4)
+    facet_by: list[FacetField] = Field(default_factory=list, max_length=4)
     # Bound the page to a small, fixed size so a `list` is always a short, fully
     # rendered table — never a corpus dump or a variable-length one. The cap is the
     # default (the model can't inflate it); over it we truncate and offer to narrow
@@ -320,9 +335,13 @@ class CatalogQuery(BaseModel):
         numeric_fields = schema.numeric_fields
         list_facets = sorted({c for c in self.facet_by if c in list_fields})
         if list_facets:
+            # Name the alternatives, as the unknown-field message above does. A
+            # retry that's only told "no" has nothing to go on and repeats the
+            # same call, which costs the whole turn rather than one tool call.
             raise ValueError(
-                f"cannot facet on list field(s) {list_facets}; "
-                "group-by needs a scalar field"
+                f"cannot facet on list field(s) {list_facets}; group-by needs a "
+                f"scalar field. Valid facet fields for entity "
+                f"{self.entity!r}: {sorted(schema.facetable_fields)}"
             )
         for f in self.filters:
             # Every op except the null checks needs a value; without this, a None
