@@ -292,6 +292,13 @@ class GalaxyService:
             raise Exception(f"Job {job_id} is not yet complete (state: {status.state})")
         if not status.is_successful:
             raise Exception(f"Job {job_id} failed with state: {status.state}")
+        if not status.outputs:
+            # A successful kmindex job always writes at least one shard, so no
+            # outputs means we failed to read them rather than that the query
+            # matched nothing. Refuse rather than cache an empty result.
+            raise Exception(
+                f"Job {job_id} reported success but exposed no output datasets"
+            )
 
         semaphore = asyncio.Semaphore(KMINDEX_MAX_CONCURRENT_DOWNLOADS)
         shards = list(
@@ -330,11 +337,14 @@ class GalaxyService:
                 shards_failed += 1
                 continue
             # Shape is {shard_name: {query_name: {accession: score}}}.
+            shard_had_hits = False
             for shard_name, queries in shard.items():
                 for name, accessions in (queries or {}).items():
                     query_name = query_name or name
                     if accessions:
-                        shards_with_hits += 1
+                        # Count the shard, not the (shard, query) pair -- the
+                        # latter can exceed shards_searched.
+                        shard_had_hits = True
                     for accession, score in accessions.items():
                         hits.append(
                             {
@@ -343,8 +353,13 @@ class GalaxyService:
                                 "shard": shard_name,
                             }
                         )
+            if shard_had_hits:
+                shards_with_hits += 1
 
-        hits.sort(key=lambda h: h["score"], reverse=True)
+        # Sort on accession as well as score: ties are common, and shards land
+        # in completion order, so score alone leaves equal-scoring hits free to
+        # reshuffle between aggregations and make paged offsets incoherent.
+        hits.sort(key=lambda h: (-h["score"], h["accession"]))
         truncated = len(hits) > KMINDEX_MAX_HITS
         if truncated:
             logger.warning(
@@ -660,9 +675,12 @@ class GalaxyService:
             return outputs
 
         except Exception as e:
-            logger.error(f"BioBLEND error getting job outputs: {e}")
-            # Fallback to empty outputs list
-            return []
+            # Never degrade to an empty list here. A kmindex job's outputs ARE
+            # its results, so "we couldn't read them" and "there weren't any"
+            # are indistinguishable downstream -- and the caller would go on to
+            # cache the empty set for a day as a complete, zero-hit answer.
+            logger.error(f"BioBLEND error getting job outputs for {job_id}: {e}")
+            raise Exception(f"Failed to get outputs for job {job_id}: {str(e)}") from e
 
     async def _get_dataset_content(self, dataset_id: str) -> str:
         """Get the actual content of a dataset using BioBLEND."""
