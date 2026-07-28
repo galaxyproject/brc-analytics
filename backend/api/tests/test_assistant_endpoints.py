@@ -267,6 +267,44 @@ class TestAnonymousSessionClaim:
         assert resp.status_code == 500
         assert "could not complete" in resp.json()["detail"]
 
+    def test_chat_preserves_upstream_throttling_as_429(
+        self, app_with_stubbed_agent, client
+    ):
+        # A provider 429 is transient and the client already words it properly.
+        # Flattening it to 500 would lose that for users and for alerting.
+        from pydantic_ai.exceptions import ModelHTTPError
+
+        agent = self._agent(app_with_stubbed_agent)
+        agent.chat = AsyncMock(
+            side_effect=ModelHTTPError(status_code=429, model_name="m", body=None)
+        )
+
+        resp = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+
+        assert resp.status_code == 429
+
+    def test_chat_maps_an_upstream_outage_to_503(self, app_with_stubbed_agent, client):
+        from pydantic_ai.exceptions import ModelHTTPError
+
+        agent = self._agent(app_with_stubbed_agent)
+        agent.chat = AsyncMock(
+            side_effect=ModelHTTPError(status_code=529, model_name="m", body=None)
+        )
+
+        resp = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+
+        assert resp.status_code == 503
+
+    def test_chat_maps_a_usage_cap_to_429(self, app_with_stubbed_agent, client):
+        from pydantic_ai.exceptions import UsageLimitExceeded
+
+        agent = self._agent(app_with_stubbed_agent)
+        agent.chat = AsyncMock(side_effect=UsageLimitExceeded("cap"))
+
+        resp = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+
+        assert resp.status_code == 429
+
     def test_chat_still_maps_an_unconfigured_agent_to_503(
         self, app_with_stubbed_agent, client
     ):

@@ -318,31 +318,31 @@ class CatalogQuery(BaseModel):
             raise ValueError("operation 'facets' needs at least one facet_by field")
         schema = ENTITY_SCHEMA[self.entity]
         allowed = schema.field_names
-        referenced = (
-            [f.field for f in self.filters]
-            + list(self.facet_by)
-            + [s.field for s in self.sort]
+        # facet_by is checked first, and against this entity's facetable set
+        # rather than its full field list. The enum spans both entities, so an
+        # assembly-only scalar reaches here on an organism query; answering that
+        # with the generic "valid fields" list would offer taxonomicGroup, the
+        # model would take the suggestion, and the Literal would reject it on the
+        # retry -- the exact exhaustion this branch exists to stop. Every field
+        # named here is one that would actually work.
+        bad_facets = sorted(
+            {c for c in self.facet_by if c not in schema.facetable_fields}
         )
+        if bad_facets:
+            raise ValueError(
+                f"cannot facet on {bad_facets} for entity {self.entity!r}; "
+                f"group-by needs a scalar field of that entity. Valid facet "
+                f"fields: {sorted(schema.facetable_fields)}"
+            )
+        referenced = [f.field for f in self.filters] + [s.field for s in self.sort]
         unknown = sorted({f for f in referenced if f not in allowed})
         if unknown:
             raise ValueError(
                 f"unknown field(s) {unknown} for entity {self.entity!r}; "
                 f"valid fields: {sorted(allowed)}"
             )
-        # GROUP BY on a list column buckets by whole-list equality (and yields
-        # list-repr keys), not per-element counts — reject it rather than mislead.
         list_fields = schema.list_fields
         numeric_fields = schema.numeric_fields
-        list_facets = sorted({c for c in self.facet_by if c in list_fields})
-        if list_facets:
-            # Name the alternatives, as the unknown-field message above does. A
-            # retry that's only told "no" has nothing to go on and repeats the
-            # same call, which costs the whole turn rather than one tool call.
-            raise ValueError(
-                f"cannot facet on list field(s) {list_facets}; group-by needs a "
-                f"scalar field. Valid facet fields for entity "
-                f"{self.entity!r}: {sorted(schema.facetable_fields)}"
-            )
         for f in self.filters:
             # Every op except the null checks needs a value; without this, a None
             # compiles to a comparison against NULL that silently matches nothing.

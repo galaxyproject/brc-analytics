@@ -2,7 +2,12 @@ import logging
 from typing import Optional
 
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
-from pydantic_ai.exceptions import AgentRunError
+from pydantic_ai.exceptions import (
+    AgentRunError,
+    ConcurrencyLimitExceeded,
+    ModelHTTPError,
+    UsageLimitExceeded,
+)
 
 from app.core.config import SESSION_COOKIE_NAME
 from app.core.dependencies import (
@@ -97,12 +102,33 @@ async def assistant_chat(
             status_code=403,
             detail="Assistant session belongs to another user",
         ) from e
+    except ModelHTTPError as e:
+        # Upstream said no. Keep its meaning: throttling stays throttling and an
+        # upstream outage stays an outage, both of which are worth retrying and
+        # both of which the client already has distinct messaging for. Only a
+        # provider 4xx we can't act on falls through to a generic failure.
+        logger.exception("Assistant model call failed upstream (%s)", e.status_code)
+        if e.status_code == 429:
+            raise HTTPException(
+                status_code=429, detail="The assistant is rate limited right now"
+            ) from e
+        if e.status_code >= 500:
+            raise HTTPException(
+                status_code=503, detail="The assistant's model provider is unavailable"
+            ) from e
+        raise HTTPException(
+            status_code=500, detail="The assistant could not complete that request"
+        ) from e
+    except (UsageLimitExceeded, ConcurrencyLimitExceeded) as e:
+        # A cap we set, not a broken run: retrying later is the right advice.
+        logger.exception("Assistant chat hit a usage or concurrency limit")
+        raise HTTPException(
+            status_code=429, detail="The assistant is at capacity right now"
+        ) from e
     except AgentRunError as e:
-        # pydantic-ai hangs every agent failure off AgentRunError, which is a
-        # RuntimeError -- so a single malformed tool call, a provider 4xx and a
-        # usage cap all used to land in the branch below and tell the user the
-        # assistant was down. It isn't: the run failed, nobody else is affected,
-        # and "try again later" is wrong because the same question fails again.
+        # What's left is the run itself going wrong -- a tool exhausting its
+        # retries, unparseable model output. One broken turn, not an outage, and
+        # not worth retrying: the same question fails the same way.
         logger.exception("Assistant chat run failed")
         raise HTTPException(
             status_code=500, detail="The assistant could not complete that request"
