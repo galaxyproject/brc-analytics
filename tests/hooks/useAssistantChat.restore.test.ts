@@ -5,8 +5,22 @@ import { assistantAPIClient } from "../../app/services/assistant-api-client";
 jest.mock("../../app/services/assistant-api-client", () => ({
   assistantAPIClient: {
     assistantChat: jest.fn(),
+    assistantDeleteSession: jest.fn().mockResolvedValue(undefined),
     assistantRestore: jest.fn(),
   },
+}));
+const mockReplace = jest.fn().mockResolvedValue(true);
+let mockQuery: Record<string, string> = {};
+jest.mock("next/router", () => ({
+  useRouter: (): {
+    pathname: string;
+    query: Record<string, string>;
+    replace: jest.Mock;
+  } => ({
+    pathname: "/assistant",
+    query: mockQuery,
+    replace: mockReplace,
+  }),
 }));
 // Keeps ESM-only ky out of the jest module graph, which it enters through the
 // shared client the hook imports for saved analyses.
@@ -32,6 +46,7 @@ describe("useAssistantChat restore", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     localStorage.clear();
+    mockQuery = {};
   });
 
   test("a 404 on a stored session clears the pointer without alarming the user", async () => {
@@ -112,6 +127,27 @@ describe("useAssistantChat restore", () => {
 
     expect(mockClient.assistantChat).toHaveBeenCalledWith(
       expect.objectContaining({ session_id: STORED_ID })
+    );
+  });
+
+  test("reset strips ?sessionId= so a reload can't resurrect the old session", async () => {
+    // initialSessionId outranks localStorage on mount. Leaving the query param
+    // behind means reloading restores the conversation the user just left and
+    // orphans whatever they started instead.
+    mockQuery = { sessionId: STORED_ID };
+    mockClient.assistantRestore.mockRejectedValue(httpError(503));
+
+    const { result } = renderHook(() =>
+      useAssistantChat({ initialSessionId: STORED_ID })
+    );
+    await waitFor(() => expect(result.current.error).not.toBeNull());
+
+    act(() => result.current.resetSession());
+
+    expect(mockReplace).toHaveBeenCalledWith(
+      expect.objectContaining({ query: {} }),
+      undefined,
+      { shallow: true }
     );
   });
 });

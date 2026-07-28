@@ -5,6 +5,7 @@ import type {
   AssistantChatResponse,
   SuggestionChip,
 } from "@repo/shared/services/api-client/types";
+import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const SESSION_KEY = "brc-assistant-session-id";
@@ -61,6 +62,7 @@ export const useAssistantChat = ({
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const sessionIdRef = useRef<string | null>(initialSessionId ?? null);
   const sendingRef = useRef(false);
+  const router = useRouter();
 
   // Hydrate from either an explicit initialSessionId (URL param, set by the
   // saved-analysis restore flow) or a localStorage-stored session. URL wins.
@@ -108,7 +110,11 @@ export const useAssistantChat = ({
         // 404 it's gone, 403 the signing cookie no longer matches it. Drop the
         // id so the next message opens a fresh session instead of re-failing.
         sessionIdRef.current = null;
-        localStorage.removeItem(SESSION_KEY);
+        // Only clear the pointer if it's still the one that failed -- a newer
+        // session may have replaced it while this request was in flight.
+        if (localStorage.getItem(SESSION_KEY) === sourceId) {
+          localStorage.removeItem(SESSION_KEY);
+        }
         // Only worth mentioning if the id came from the URL; a stale
         // localStorage pointer going bad is routine.
         if (initialSessionId) {
@@ -182,6 +188,20 @@ export const useAssistantChat = ({
     }
     sessionIdRef.current = null;
     localStorage.removeItem(SESSION_KEY);
+    // Drop ?sessionId= as well. It outranks localStorage on mount, so leaving it
+    // means a reload restores the conversation we just walked away from and
+    // orphans whatever replaced it.
+    if (router.query.sessionId) {
+      const query = { ...router.query };
+      delete query.sessionId;
+      router
+        .replace({ pathname: router.pathname, query }, undefined, {
+          shallow: true,
+        })
+        .catch(() => {
+          // Cosmetic: the session is already reset either way.
+        });
+    }
     setMessages([]);
     setSchema(null);
     setSuggestions([]);
@@ -190,7 +210,7 @@ export const useAssistantChat = ({
     setError(null);
     setLastFailedMessage(null);
     setSaveMessage(null);
-  }, []);
+  }, [router]);
 
   const saveAnalysis = useCallback(async (): Promise<void> => {
     if (!sessionIdRef.current) {
