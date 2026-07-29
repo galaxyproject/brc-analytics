@@ -23,7 +23,10 @@ from app.models.assistant import (
     SessionRestoreResponse,
 )
 from app.models.user_data import UserMeResponse
-from app.services.assistant_agent import AssistantTimeoutError
+from app.services.assistant_agent import (
+    AssistantTimeoutError,
+    AssistantUnavailableError,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -102,6 +105,14 @@ async def assistant_chat(
             status_code=403,
             detail="Assistant session belongs to another user",
         ) from e
+    except AssistantUnavailableError as e:
+        # The one case where "unavailable" is the truth. Narrowed from a bare
+        # RuntimeError catch, which also swallowed unrelated runtime bugs and
+        # returned their messages to the client.
+        logger.exception("Assistant chat unavailable (not configured)")
+        raise HTTPException(
+            status_code=503, detail="The analysis assistant is not configured"
+        ) from e
     except ModelHTTPError as e:
         # Upstream said no. Keep its meaning: throttling stays throttling and an
         # upstream outage stays an outage, both of which are worth retrying and
@@ -133,10 +144,6 @@ async def assistant_chat(
         raise HTTPException(
             status_code=500, detail="The assistant could not complete that request"
         ) from e
-    except RuntimeError as e:
-        # What's left is the deliberate one: the agent isn't configured.
-        logger.exception("Assistant chat unavailable (RuntimeError)")
-        raise HTTPException(status_code=503, detail=str(e)) from e
     except Exception as e:
         logger.exception("Assistant chat error")
         raise HTTPException(status_code=500, detail="Internal assistant error") from e

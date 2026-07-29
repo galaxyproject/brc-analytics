@@ -308,17 +308,28 @@ class TestAnonymousSessionClaim:
     def test_chat_still_maps_an_unconfigured_agent_to_503(
         self, app_with_stubbed_agent, client
     ):
-        # The one RuntimeError we raise on purpose does mean unavailable.
+        # The one error we raise on purpose does mean unavailable.
+        from app.services.assistant_agent import AssistantUnavailableError
+
         agent = self._agent(app_with_stubbed_agent)
-        agent.chat = AsyncMock(
-            side_effect=RuntimeError(
-                "Assistant agent is not available (check AI_API_KEY)"
-            )
-        )
+        agent.chat = AsyncMock(side_effect=AssistantUnavailableError("no key"))
 
         resp = client.post("/api/v1/assistant/chat", json={"message": "hello"})
 
         assert resp.status_code == 503
+
+    def test_chat_does_not_leak_an_unrelated_runtime_error(
+        self, app_with_stubbed_agent, client
+    ):
+        # A bare RuntimeError is a bug, not an outage, and its message can name
+        # internal config. It must not reach the client as a 503 with details.
+        agent = self._agent(app_with_stubbed_agent)
+        agent.chat = AsyncMock(side_effect=RuntimeError("REDIS_URL=redis://secret"))
+
+        resp = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+
+        assert resp.status_code == 500
+        assert "secret" not in resp.text
 
     def test_chat_maps_permission_error_to_403(self, app_with_stubbed_agent, client):
         # An anonymous caller holding the session cookie but citing a session

@@ -185,8 +185,8 @@ def test_compile_ne_and_not_in_are_null_safe():
 
 def test_facet_on_list_field_rejected():
     # A list field is no longer offered in the facet_by enum at all, so the model
-    # cannot name one. The runtime "cannot facet on list field" check stays as a
-    # guard for a field that is scalar on one entity and a list on another.
+    # cannot name one. A field that is scalar on one entity and a list on another
+    # would clear the enum and be caught by the per-entity facetable check.
     with pytest.raises(ValueError):
         CatalogQuery(operation="facets", facet_by=["ploidy"])
 

@@ -278,7 +278,7 @@ Scalar = Union[str, int, float, bool]
 FACETABLE_FIELDS: tuple[str, ...] = tuple(
     sorted({f for s in ENTITY_SCHEMA.values() for f in s.facetable_fields})
 )
-FacetField = Literal[FACETABLE_FIELDS]  # type: ignore[valid-type]
+FacetField = Literal[*FACETABLE_FIELDS]  # type: ignore[valid-type]
 
 
 class Filter(BaseModel):
