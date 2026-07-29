@@ -1097,6 +1097,66 @@ def check_organisms_without_assemblies(
     ]
 
 
+def _format_dbt_failure_cell(value):
+    # Keep row values on a single markdown table cell/line.
+    if value is None:
+        return ""
+    return str(value).replace("\\", "\\\\").replace("|", "\\|").replace("\n", " ")
+
+
+def _format_dbt_failure_rows(sample_rows, failure_count):
+    # Render a sample of failing rows as a markdown table.
+    columns = list(sample_rows[0].keys())
+    lines = [
+        "| " + " | ".join(columns) + " |",
+        "| " + " | ".join("---" for _ in columns) + " |",
+    ]
+    for row in sample_rows:
+        lines.append(
+            "| "
+            + " | ".join(_format_dbt_failure_cell(row[col]) for col in columns)
+            + " |"
+        )
+    lines.append("")
+    if failure_count is not None and failure_count > len(sample_rows):
+        lines += [
+            f"_Showing {len(sample_rows)} of {failure_count} failing rows._",
+            "",
+        ]
+    return lines
+
+
+def format_dbt_test_failures_section(title, dbt_test_results):
+    """
+    Render the unsuccessful dbt tests, each with a sample of failing rows.
+
+    Each entry is keyed by the readable test name (set in schema.yml) and shows
+    the status, failing-row count, dbt's message, and a small table of sample
+    failing rows when available.
+    """
+    lines = [title, ""]
+    unsuccessful = [result for result in dbt_test_results if not result.success]
+    if not unsuccessful:
+        lines += ["None", ""]
+        return lines
+    for result in unsuccessful:
+        count = result.failure_count
+        count_text = (
+            f", {count} failing row{'' if count == 1 else 's'}"
+            if count is not None
+            else ""
+        )
+        lines += [
+            f"### `{result.test_name}` — status `{result.status}`{count_text}",
+            "",
+        ]
+        if result.message:
+            lines += [result.message, ""]
+        if result.failure_sample:
+            lines += _format_dbt_failure_rows(result.failure_sample, count)
+    return lines
+
+
 def make_qc_report(
     *,
     missing_ncbi_assemblies,
@@ -1215,11 +1275,6 @@ def make_qc_report(
         if organisms_without_assemblies
         else []
     )
-    unsuccessful_dbt_tests_items = [
-        f"`{result.test_name}` (status `{result.status}`){'' if result.message is None else ': ' + result.message}"
-        for result in dbt_test_results
-        if not result.success
-    ]
 
     # Compose report modularly using shared QC utils
     lines = ["# Catalog Data QC report", ""]
@@ -1277,8 +1332,8 @@ def make_qc_report(
         paired_accessions_items,
     )
     lines += format_raw_section("## Taxonomy tree", tree_checks_text)
-    lines += format_list_section(
-        "## Unsuccessful dbt tests", unsuccessful_dbt_tests_items
+    lines += format_dbt_test_failures_section(
+        "## Unsuccessful dbt tests", dbt_test_results
     )
 
     return join_report(lines)
