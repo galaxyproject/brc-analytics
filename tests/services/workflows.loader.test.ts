@@ -1,11 +1,12 @@
-import {
-  loadEntities,
-  loadPangenomes,
-  loadWorkflows,
-} from "@/services/workflows/loader";
-import { API } from "@/services/workflows/routes";
-import { getEntitiesById, getEntitiesByType } from "@/services/workflows/store";
+import { loadPangenomes, loadWorkflows } from "@/services/workflows/brc/loader";
+import { API as BRC_API } from "@/services/workflows/brc/routes";
 import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import { loadEntities } from "@repo/shared/services/workflows/loader";
+import { API } from "@repo/shared/services/workflows/routes";
+import {
+  getEntitiesById,
+  getEntitiesByType,
+} from "@repo/shared/services/workflows/store";
 
 const CONFIG = {
   entities: [{ getId, route: "assemblies" }],
@@ -145,7 +146,7 @@ describe("workflows loader", () => {
 
       await loadPangenomes();
 
-      expect(fetchMock).toHaveBeenCalledWith(API.pangenomes);
+      expect(fetchMock).toHaveBeenCalledWith(BRC_API.pangenomes);
 
       const byId = getEntitiesById().get("pangenomes");
       const byType = getEntitiesByType().get("pangenomes");

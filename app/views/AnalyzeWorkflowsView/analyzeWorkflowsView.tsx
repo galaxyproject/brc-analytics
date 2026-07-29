@@ -1,9 +1,9 @@
-import { getEntity } from "@/services/workflows/query";
 import {
   BackPageContent,
   BackPageHero,
   BackPageView,
 } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
+import { getEntity } from "@repo/shared/services/workflows/query";
 import { JSX } from "react";
 import { Side } from "../EntityView/assembly/components/Side/side";
 import { Assembly } from "../WorkflowInputsView/types";
