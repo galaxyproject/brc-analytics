@@ -1,13 +1,6 @@
-import type {
-  AssemblyContract,
-  OrganismContract,
-} from "@repo/shared/apis/types";
-import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
-import {
-  findEntity,
-  getEntities,
-  getEntity,
-} from "@repo/shared/services/workflows/query";
+import type { AssemblyContract, OrganismContract } from "../../apis/types";
+import type { Workflow, WorkflowCategory } from "../../apis/workflow";
+import { findEntity, getEntities, getEntity } from "./query";
 
 /**
  * Finds an organism by entity id, returning undefined when there is no match.

@@ -11,7 +11,7 @@ const ENTITIES_BY_ENTITY_ID = new Map<EntityStoreKey, Map<string, unknown>>();
  * @returns Map of entity list types to entity id to entity.
  */
 export function getEntitiesById(): Map<EntityStoreKey, Map<string, unknown>> {
-  return ENTITIES_BY_ENTITY_ID as Map<EntityStoreKey, Map<string, unknown>>;
+  return ENTITIES_BY_ENTITY_ID;
 }
 
 /**
@@ -19,7 +19,7 @@ export function getEntitiesById(): Map<EntityStoreKey, Map<string, unknown>> {
  * @returns Map of entity list types to entities.
  */
 export function getEntitiesByType(): Map<EntityStoreKey, unknown[]> {
-  return ENTITIES_BY_TYPE as Map<EntityStoreKey, unknown[]>;
+  return ENTITIES_BY_TYPE;
 }
 
 /**
