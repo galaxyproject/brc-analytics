@@ -1,6 +1,6 @@
-import { SectionVision } from "@/components/content";
 import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import { Fragment, JSX } from "react";
+import SectionVision from "./content/sectionVision.mdx";
 
 export const VisionView = (): JSX.Element => {
   return (
