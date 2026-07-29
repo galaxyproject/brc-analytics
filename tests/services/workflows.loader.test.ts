@@ -1,7 +1,11 @@
-import { loadPangenomes, loadWorkflows } from "@/services/workflows/brc/loader";
+import { loadPangenomes } from "@/services/workflows/brc/loader";
 import { API as BRC_API } from "@/services/workflows/brc/routes";
 import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
-import { loadEntities } from "@repo/shared/services/workflows/loader";
+import type { Workflow } from "@repo/shared/apis/workflow";
+import {
+  loadEntities,
+  loadWorkflows,
+} from "@repo/shared/services/workflows/loader";
 import { API } from "@repo/shared/services/workflows/routes";
 import {
   getEntitiesById,
@@ -11,14 +15,6 @@ import {
 const CONFIG = {
   entities: [{ getId, route: "assemblies" }],
 } as SiteConfig;
-
-jest.mock("../../app/views/AnalyzeWorkflowsView/components/Main/utils", () => ({
-  formatTrsId: (trsId: string): string => trsId,
-}));
-
-jest.mock("../../app/views/AnalyzeWorkflowsView/custom/constants", () => ({
-  CUSTOM_WORKFLOW: { trsId: "custom-workflow" },
-}));
 
 describe("workflows loader", () => {
   let fetchMock: jest.MockedFunction<typeof fetch>;
@@ -105,10 +101,11 @@ describe("workflows loader", () => {
   describe("loadWorkflows", () => {
     test("loads workflow categories, flattens workflows, and populates store", async () => {
       const categories = [{ workflows: [{ trsId: "trs-1" }] }];
+      const extraWorkflows = [{ trsId: "custom-workflow" } as Workflow];
 
       fetchMock.mockResolvedValue(mockFetchResponse(categories));
 
-      await loadWorkflows();
+      await loadWorkflows(extraWorkflows);
 
       expect(fetchMock).toHaveBeenCalledWith(API.workflows);
 

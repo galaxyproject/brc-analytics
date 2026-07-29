@@ -1,11 +1,11 @@
 import { workflowPloidyMatchesOrganismPloidy } from "@/apis/catalog/brc-analytics-catalog/common/utils";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import {
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_SCOPE,
 } from "@repo/shared/apis/schema-types";
 import type { AssemblyContract } from "@repo/shared/apis/types";
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
 import { WorkflowCategoryId } from "../../../../../catalog/schema/generated/schema";
 
 /**
@@ -57,16 +57,6 @@ export function buildAssemblyWorkflows(
 
   // Sort workflow categories (coming soon categories last).
   return workflowCategories.sort(sortWorkflowCategories);
-}
-
-/**
- * Formats a trsId for use in URLs by removing the hash character if it begins with one
- * and replacing any special characters with hyphens.
- * @param trsId - The trsId to format.
- * @returns The formatted trsId.
- */
-export function formatTrsId(trsId: string): string {
-  return trsId.replace(/^#/, "").replace(/[^a-zA-Z0-9]/g, "-");
 }
 
 /**

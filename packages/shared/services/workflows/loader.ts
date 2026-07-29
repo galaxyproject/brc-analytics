@@ -1,4 +1,6 @@
 import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import type { Workflow, WorkflowCategory } from "../../apis/workflow";
+import { formatTrsId } from "../../workflow/utils";
 import { API } from "./routes";
 import { getEntitiesById, setEntitiesById, setEntitiesByType } from "./store";
 import type { EntityRoute } from "./types";
@@ -52,4 +54,34 @@ export async function loadEntities(config: SiteConfig): Promise<void> {
     setEntitiesById(route, entityById);
     setEntitiesByType(route, entities);
   }
+}
+
+/**
+ * Loads the workflows store with workflows from the API, plus any additional
+ * workflows supplied by the caller.
+ * @param extraWorkflows - Additional workflows to add to the store, keyed by their trsId.
+ */
+export async function loadWorkflows(
+  extraWorkflows: Workflow[] = []
+): Promise<void> {
+  if (getEntitiesById().has("workflows")) return;
+
+  const workflowCategories = (await fetchEntities(
+    API.workflows
+  )) as WorkflowCategory[];
+
+  const workflows = workflowCategories.flatMap((w) => w.workflows);
+
+  const workflowById = new Map<string, Workflow>();
+
+  for (const workflow of workflows) {
+    workflowById.set(formatTrsId(workflow.trsId), workflow);
+  }
+
+  for (const workflow of extraWorkflows) {
+    workflowById.set(workflow.trsId, workflow);
+  }
+
+  setEntitiesById("workflows", workflowById);
+  setEntitiesByType("workflows", workflowCategories);
 }

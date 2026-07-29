@@ -4,10 +4,10 @@ import type {
   WorkflowAssemblyMapping,
   WorkflowCategory,
 } from "@repo/shared/apis/workflow";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
+import { LEXICMAP } from "@repo/shared/workflow/lexicmap";
+import { LOGAN_SEARCH } from "@repo/shared/workflow/loganSearch";
 import { WorkflowCategoryId } from "../../../catalog/schema/generated/schema";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
-import { LEXICMAP } from "../AnalyzeWorkflowsView/lexicmap/constants";
-import { LOGAN_SEARCH } from "../AnalyzeWorkflowsView/loganSearch/constants";
 import type { Assembly } from "../WorkflowInputsView/types";
 import type { Organism, WorkflowAssembly, WorkflowEntity } from "./types";
 

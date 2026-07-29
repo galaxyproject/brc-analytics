@@ -1,6 +1,13 @@
-import { loadPangenomes, loadWorkflows } from "@/services/workflows/brc/loader";
+import { loadPangenomes } from "@/services/workflows/brc/loader";
 import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
-import { loadEntities } from "@repo/shared/services/workflows/loader";
+import {
+  loadEntities,
+  loadWorkflows,
+} from "@repo/shared/services/workflows/loader";
+import { CUSTOM_WORKFLOW } from "@repo/shared/workflow/custom";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
+import { LEXICMAP } from "@repo/shared/workflow/lexicmap";
+import { LOGAN_SEARCH } from "@repo/shared/workflow/loganSearch";
 
 let loadPromise: Promise<void> | null = null;
 
@@ -16,7 +23,12 @@ export function ensureEntitiesLoaded(config: SiteConfig): Promise<void> {
     // Load in parallel so the optional pangenome fetch adds no serial latency
     // to the core workflows/entities load that every data page depends on.
     await Promise.all([
-      loadWorkflows(),
+      loadWorkflows([
+        CUSTOM_WORKFLOW,
+        DIFFERENTIAL_EXPRESSION_ANALYSIS,
+        LOGAN_SEARCH,
+        LEXICMAP,
+      ]),
       loadPangenomes(),
       loadEntities(config),
     ]);

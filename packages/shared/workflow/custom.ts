@@ -2,8 +2,8 @@ import {
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
-} from "@repo/shared/apis/schema-types";
-import type { Workflow } from "@repo/shared/apis/workflow";
+} from "../apis/schema-types";
+import type { Workflow } from "../apis/workflow";
 
 export const CUSTOM_WORKFLOW: Workflow = {
   assemblyCountMax: 1,

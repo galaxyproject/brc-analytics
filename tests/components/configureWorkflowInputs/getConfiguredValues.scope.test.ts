@@ -8,25 +8,19 @@ import {
 import type { Workflow } from "@repo/shared/apis/workflow";
 
 // Mock workflow constants to avoid pulling in unneeded modules
-jest.mock(
-  "../../../app/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants",
-  () => ({
-    DIFFERENTIAL_EXPRESSION_ANALYSIS: {
-      trsId: "differential-expression-analysis",
-    },
-  })
-);
+jest.mock("@repo/shared/workflow/differentialExpressionAnalysis", () => ({
+  DIFFERENTIAL_EXPRESSION_ANALYSIS: {
+    trsId: "differential-expression-analysis",
+  },
+}));
 
-jest.mock(
-  "../../../app/views/AnalyzeWorkflowsView/loganSearch/constants",
-  () => ({
-    LOGAN_SEARCH: {
-      trsId: "logan-search",
-    },
-  })
-);
+jest.mock("@repo/shared/workflow/loganSearch", () => ({
+  LOGAN_SEARCH: {
+    trsId: "logan-search",
+  },
+}));
 
-jest.mock("../../../app/views/AnalyzeWorkflowsView/lexicmap/constants", () => ({
+jest.mock("@repo/shared/workflow/lexicmap", () => ({
   LEXICMAP: {
     trsId: "lexicmap",
   },
