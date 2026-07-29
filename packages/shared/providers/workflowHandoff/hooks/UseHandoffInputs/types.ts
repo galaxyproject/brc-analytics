@@ -1,4 +1,4 @@
-import { HandoffInputs } from "@/providers/workflowHandoff/types";
+import { HandoffInputs } from "../../types";
 
 /**
  * Return type for the useHandoffInputs hook.

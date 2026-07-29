@@ -1,6 +1,6 @@
 import { BaseReadRun } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
-import { useHandoffInputs } from "@/providers/workflowHandoff/hooks/UseHandoffInputs/hook";
-import { EntityKey } from "@/providers/workflowHandoff/types";
+import { useHandoffInputs } from "@repo/shared/providers/workflowHandoff/hooks/UseHandoffInputs/hook";
+import { EntityKey } from "@repo/shared/providers/workflowHandoff/types";
 import {
   DefaultError,
   UseQueryResult,

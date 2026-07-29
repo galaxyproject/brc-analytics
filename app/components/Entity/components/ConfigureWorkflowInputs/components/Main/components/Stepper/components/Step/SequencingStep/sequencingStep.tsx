@@ -1,4 +1,3 @@
-import { HandoffStatusContext } from "@/providers/workflowHandoff/contexts/HandoffStatus/context";
 import {
   Loading,
   LOADING_PANEL_STYLE,
@@ -6,6 +5,7 @@ import {
 import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepContent/stepContent";
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
+import { HandoffStatusContext } from "@repo/shared/providers/workflowHandoff/contexts/HandoffStatus/context";
 import { JSX, useCallback, useContext } from "react";
 import { ToggleButtonGroup } from "../components/ToggleButtonGroup/toggleButtonGroup";
 import { useToggleButtonGroup } from "../hooks/UseToggleButtonGroup/useToggleButtonGroup";

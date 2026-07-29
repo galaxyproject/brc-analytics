@@ -1,4 +1,4 @@
-import { SEQUENCING_SOURCE } from "@/providers/workflowHandoff/constants";
+import { SEQUENCING_SOURCE } from "@repo/shared/providers/workflowHandoff/constants";
 import type { SchemaFieldState } from "@repo/shared/services/api-client/types";
 
 /**

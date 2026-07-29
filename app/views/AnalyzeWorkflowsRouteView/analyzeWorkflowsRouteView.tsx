@@ -1,8 +1,8 @@
-import { ENTITY_KEYS } from "@/providers/workflowHandoff/constants";
 import { AnalyzeWorkflowsView } from "@/views/AnalyzeWorkflowsView/analyzeWorkflowsView";
 import { OrganismWorkflowInputsView } from "@/views/OrganismWorkflowInputsView/organismWorkflowInputsView";
 import { WorkflowInputsView } from "@/views/WorkflowInputsView/workflowInputsView";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
+import { ENTITY_KEYS } from "@repo/shared/providers/workflowHandoff/constants";
 import { ROUTES } from "@repo/shared/routes/constants";
 import Router, { useRouter } from "next/router";
 import { JSX, useEffect } from "react";

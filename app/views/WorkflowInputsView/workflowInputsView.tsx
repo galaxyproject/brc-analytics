@@ -9,14 +9,14 @@ import { Top } from "@/components/Entity/components/ConfigureWorkflowInputs/comp
 import { AssemblyContext } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/context";
 import { WorkflowEntityContext } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
 import { buildWorkflowEntityValue } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/utils";
-import { ENTITY_KEYS } from "@/providers/workflowHandoff/constants";
-import { HandoffStatusContext } from "@/providers/workflowHandoff/contexts/HandoffStatus/context";
 import {
   BackPageContent,
   BackPageContentSideColumn,
   BackPageHero,
   BackPageView,
 } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
+import { ENTITY_KEYS } from "@repo/shared/providers/workflowHandoff/constants";
+import { HandoffStatusContext } from "@repo/shared/providers/workflowHandoff/contexts/HandoffStatus/context";
 import {
   getAssembly,
   getWorkflow,
