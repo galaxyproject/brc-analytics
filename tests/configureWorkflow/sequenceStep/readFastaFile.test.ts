@@ -150,6 +150,24 @@ describe("readFastaFile", () => {
       expect(result.data).toBe(`>seq1\n${makeSequence(MIN_SEQUENCE_LENGTH)}`);
     });
 
+    test("returns error when file is empty", async () => {
+      const file = createMockFile("");
+
+      const result = await readFastaFile(file);
+
+      expect(result.errors).toEqual([VALIDATION_ERROR.EMPTY_CONTENT]);
+      expect(result.data).toBe("");
+    });
+
+    test("returns error when file contains only whitespace", async () => {
+      const file = createMockFile("   \n\n  ");
+
+      const result = await readFastaFile(file);
+
+      expect(result.errors).toEqual([VALIDATION_ERROR.EMPTY_CONTENT]);
+      expect(result.data).toBe("");
+    });
+
     test("returns error when file size exceeds maximum", async () => {
       const file = createMockFileWithSize(MAX_FILE_SIZE_BYTES + 1);
 
