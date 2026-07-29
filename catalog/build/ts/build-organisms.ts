@@ -37,7 +37,10 @@ function buildOrganism(
       organism?.assemblyTaxonomyIds,
       genome.ncbiTaxonomyId
     ),
-    commonName: genome.commonName,
+    commonNames: accumulateArrayValue(
+      organism?.commonNames,
+      ...genome.commonNames
+    ),
     genomes: accumulateArrayValue(organism?.genomes, genome),
     ncbiTaxonomyId: genome.speciesTaxonomyId,
     otherTaxa: accumulateArrayOrNullValues(

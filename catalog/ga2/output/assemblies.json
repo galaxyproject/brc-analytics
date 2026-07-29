@@ -43286,11 +43286,11 @@
     "gcPercent": 41.5,
     "geneModelUrl": null,
     "image": {
-      "credit": "Chuck Abbe",
-      "license": "CC BY 2.0",
-      "sourceName": "Wikimedia",
-      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Botta%27s_Pocket_Gopher_%28Thomomys_bottae%29.jpg",
-      "url": "/organism_image/Thomomys_bottae_1024x1024.jpg"
+      "credit": "",
+      "license": "",
+      "sourceName": "",
+      "sourceUrl": "",
+      "url": "/organism_image/missing_image_1024x1024.jpg"
     },
     "isRef": "No",
     "length": 2845613926,
@@ -43323,8 +43323,8 @@
       "9989",
       "1963757",
       "10010",
-      "10011",
-      "10013"
+      "3774376",
+      "3774380"
     ],
     "ncbiTaxonomyId": "10013",
     "ploidy": [
@@ -43334,7 +43334,7 @@
     "scaffoldCount": 2791,
     "scaffoldL50": 29,
     "scaffoldN50": 23603529,
-    "speciesTaxonomyId": "10013",
+    "speciesTaxonomyId": "3774380",
     "sra_data": [
       {
         "accession": "GCA_024803745.1",
@@ -43386,13 +43386,13 @@
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelDomain": "Eukaryota",
     "taxonomicLevelFamily": "Geomyidae",
-    "taxonomicLevelGenus": "Thomomys",
+    "taxonomicLevelGenus": "Megascapheus",
     "taxonomicLevelKingdom": "Metazoa",
     "taxonomicLevelOrder": "Rodentia",
     "taxonomicLevelPhylum": "Chordata",
-    "taxonomicLevelSpecies": "Thomomys bottae",
+    "taxonomicLevelSpecies": "Megascapheus bottae",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/Thomomys_bottae_300x300.jpg",
+    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
     "tolId": "m",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_024803745.1"
   },
@@ -64268,11 +64268,11 @@
     "gcPercent": 41,
     "geneModelUrl": null,
     "image": {
-      "credit": "Chuck Abbe",
-      "license": "CC BY 2.0",
-      "sourceName": "Wikimedia",
-      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Botta%27s_Pocket_Gopher_%28Thomomys_bottae%29.jpg",
-      "url": "/organism_image/Thomomys_bottae_1024x1024.jpg"
+      "credit": "",
+      "license": "",
+      "sourceName": "",
+      "sourceUrl": "",
+      "url": "/organism_image/missing_image_1024x1024.jpg"
     },
     "isRef": "No",
     "length": 1879249320,
@@ -64305,8 +64305,8 @@
       "9989",
       "1963757",
       "10010",
-      "10011",
-      "10013"
+      "3774376",
+      "3774380"
     ],
     "ncbiTaxonomyId": "10013",
     "ploidy": [
@@ -64316,7 +64316,7 @@
     "scaffoldCount": 340,
     "scaffoldL50": 12,
     "scaffoldN50": 61325068,
-    "speciesTaxonomyId": "10013",
+    "speciesTaxonomyId": "3774380",
     "sra_data": [
       {
         "accession": "GCA_031878665.1",
@@ -64676,13 +64676,13 @@
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelDomain": "Eukaryota",
     "taxonomicLevelFamily": "Geomyidae",
-    "taxonomicLevelGenus": "Thomomys",
+    "taxonomicLevelGenus": "Megascapheus",
     "taxonomicLevelKingdom": "Metazoa",
     "taxonomicLevelOrder": "Rodentia",
     "taxonomicLevelPhylum": "Chordata",
-    "taxonomicLevelSpecies": "Thomomys bottae",
+    "taxonomicLevelSpecies": "Megascapheus bottae",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/Thomomys_bottae_300x300.jpg",
+    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
     "tolId": "m",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_031878665.1"
   },
@@ -64695,11 +64695,11 @@
     "gcPercent": 41,
     "geneModelUrl": null,
     "image": {
-      "credit": "Chuck Abbe",
-      "license": "CC BY 2.0",
-      "sourceName": "Wikimedia",
-      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Botta%27s_Pocket_Gopher_%28Thomomys_bottae%29.jpg",
-      "url": "/organism_image/Thomomys_bottae_1024x1024.jpg"
+      "credit": "",
+      "license": "",
+      "sourceName": "",
+      "sourceUrl": "",
+      "url": "/organism_image/missing_image_1024x1024.jpg"
     },
     "isRef": "No",
     "length": 2025633870,
@@ -64732,8 +64732,8 @@
       "9989",
       "1963757",
       "10010",
-      "10011",
-      "10013"
+      "3774376",
+      "3774380"
     ],
     "ncbiTaxonomyId": "10013",
     "ploidy": [
@@ -64743,7 +64743,7 @@
     "scaffoldCount": 629,
     "scaffoldL50": 12,
     "scaffoldN50": 64418693,
-    "speciesTaxonomyId": "10013",
+    "speciesTaxonomyId": "3774380",
     "sra_data": [
       {
         "accession": "GCA_031878675.1",
@@ -65103,13 +65103,13 @@
     "taxonomicLevelClass": "Mammalia",
     "taxonomicLevelDomain": "Eukaryota",
     "taxonomicLevelFamily": "Geomyidae",
-    "taxonomicLevelGenus": "Thomomys",
+    "taxonomicLevelGenus": "Megascapheus",
     "taxonomicLevelKingdom": "Metazoa",
     "taxonomicLevelOrder": "Rodentia",
     "taxonomicLevelPhylum": "Chordata",
-    "taxonomicLevelSpecies": "Thomomys bottae",
+    "taxonomicLevelSpecies": "Megascapheus bottae",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/Thomomys_bottae_300x300.jpg",
+    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
     "tolId": "m",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_031878675.1"
   },
@@ -205572,7 +205572,7 @@
   },
   {
     "accession": "GCF_043159975.1",
-    "annotationStatus": "Full annotation",
+    "annotationStatus": "Updated annotation",
     "chromosomes": 22,
     "coverage": "38.4",
     "galaxyDatacacheUrl": null,

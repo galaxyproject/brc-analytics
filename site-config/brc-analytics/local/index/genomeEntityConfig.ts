@@ -288,9 +288,9 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       },
       {
         componentConfig: {
-          component: C.BasicCell,
-          viewBuilder: V.buildCommonName,
-        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogGenome>,
+          component: C.NTagCell,
+          viewBuilder: V.buildCommonNames,
+        } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.COMMON_NAME,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME,
         width: { max: "1fr", min: "160px" },

@@ -476,26 +476,26 @@ def organism_con():
             taxonomicLevelSpecies VARCHAR,
             taxonomicLevelGenus VARCHAR,
             taxonomicLevelDomain VARCHAR,
-            commonName VARCHAR,
+            commonNames VARCHAR[],
             assemblyCount BIGINT,
             taxonomicGroup VARCHAR[]
         )
         """
     )
     rows = [
-        # taxid, species, genus, domain, common, assemblyCount, group
+        # taxid, species, genus, domain, commonNames, assemblyCount, group
         (
             "7165",
             "Anopheles gambiae",
             "Anopheles",
             "Eukaryota",
-            "mosquito",
+            ["mosquito", "African malaria mosquito"],
             12,
             ["Inv"],
         ),
-        ("7173", "Anopheles stephensi", "Anopheles", "Eukaryota", None, 5, ["Inv"]),
-        ("62324", "Anopheles funestus", "Anopheles", "Eukaryota", None, 3, ["Inv"]),
-        ("5476", "Candida albicans", "Candida", "Eukaryota", None, 8, ["Fungi"]),
+        ("7173", "Anopheles stephensi", "Anopheles", "Eukaryota", [], 5, ["Inv"]),
+        ("62324", "Anopheles funestus", "Anopheles", "Eukaryota", [], 3, ["Inv"]),
+        ("5476", "Candida albicans", "Candida", "Eukaryota", [], 8, ["Fungi"]),
     ]
     c.executemany("INSERT INTO organism VALUES (?, ?, ?, ?, ?, ?, ?)", rows)
     yield c
@@ -539,7 +539,7 @@ def test_organism_clade_list_is_bounded(organism_con):
     assert set(out["rows"][0]) == {
         "ncbiTaxonomyId",
         "taxonomicLevelSpecies",
-        "commonName",
+        "commonNames",
         "assemblyCount",
     }
 
