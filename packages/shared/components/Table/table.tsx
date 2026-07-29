@@ -4,10 +4,10 @@ import { useVirtualization } from "@databiosphere/findable-ui/lib/components/Tab
 import { GridTable } from "@databiosphere/findable-ui/lib/components/Table/table.styles";
 import { getColumnTrackSizing } from "@databiosphere/findable-ui/lib/components/TableCreator/options/columnTrackSizing/utils";
 import { TableContainer } from "@mui/material";
-import { RowData } from "@tanstack/react-table";
+import type { RowData } from "@tanstack/react-table";
 import { JSX } from "react";
 import { useRowDirection } from "./hooks/UseRowDirection/hook";
-import { Props } from "./types";
+import type { Props } from "./types";
 
 /**
  * Renders a virtualized table for a TanStack Table instance, with responsive

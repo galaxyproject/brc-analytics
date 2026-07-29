@@ -1,9 +1,9 @@
+import { SelectCell } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/ReferenceAssemblyStep/components/AssemblyData/components/AssemblySelector/components/Table/components/TableCell/components/SelectCell/selectCell";
 import {
   buildNTagProps,
   renderNTagCell,
-} from "@/components/common/Table/components/TableCell/components/NTagCell/utils";
-import { SelectCell } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/ReferenceAssemblyStep/components/AssemblyData/components/AssemblySelector/components/Table/components/TableCell/components/SelectCell/selectCell";
-import { ColumnDef, SortingColumnDef } from "@tanstack/react-table";
+} from "@repo/shared/components/Table/components/TableCell/components/NTagCell/utils";
+import type { ColumnDef, SortingColumnDef } from "@tanstack/react-table";
 import { getAssemblyIsolate, getAssemblySerotype } from "./accessorFn";
 import { CATEGORY_CONFIGS } from "./categoryConfigs";
 import { Assembly } from "./types";

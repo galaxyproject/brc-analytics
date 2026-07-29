@@ -1,6 +1,7 @@
 import { NTagCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/NTagCell/nTagCell";
-import { CellContext, RowData } from "@tanstack/react-table";
-import { ComponentProps, JSX } from "react";
+import type { CellContext, RowData } from "@tanstack/react-table";
+import type { ComponentProps } from "react";
+import { JSX } from "react";
 
 /**
  * Builds props for NTagCell component.
