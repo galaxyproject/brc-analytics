@@ -109,6 +109,24 @@ async function toErrorMessage(
 }
 
 /**
+ * Put the running job in the URL, or clear it.
+ *
+ * replaceState rather than pushState: successive searches shouldn't stack up
+ * as history entries the Back button walks through one at a time.
+ * @param jobId - Galaxy job id to record, or null to drop the parameter.
+ */
+function syncJobParam(jobId: string | null): void {
+  if (typeof window === "undefined") return;
+  const url = new URL(window.location.href);
+  if (jobId) {
+    url.searchParams.set("job", jobId);
+  } else {
+    url.searchParams.delete("job");
+  }
+  window.history.replaceState(null, "", url);
+}
+
+/**
  * Drives a Logan/kmindex sequence search: lists the available indexes, submits
  * a FASTA query, polls the resulting Galaxy job, and pages through the merged
  * hits once it completes.
@@ -217,6 +235,21 @@ export const useKmindexSearch = (): KmindexSearchActions &
     [fetchResults, stopPolling]
   );
 
+  // Reattach to a job named in the URL (?job=<galaxy job id>). A search can
+  // outlive its page by a long way -- Vista queues have run past 40 minutes --
+  // so the job id needs to be shareable and survive a reload. Polling handles
+  // both cases: still running, or finished and ready to page.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const jobId = new URLSearchParams(window.location.search).get("job");
+    if (!jobId) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- react-hooks v7 anti-pattern (setState in effect)
+    setState((prev) => ({ ...prev, jobId }));
+    startPolling(jobId);
+    // Mount only -- re-running this would restart polling on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional mount-only reattach
+  }, []);
+
   const submit = useCallback(
     async (submission: KmindexSubmission): Promise<void> => {
       stopPolling();
@@ -239,6 +272,7 @@ export const useKmindexSearch = (): KmindexSearchActions &
           .json<{ job_id: string }>();
 
         setState((prev) => ({ ...prev, isSubmitting: false, jobId: job_id }));
+        syncJobParam(job_id);
         startPolling(job_id);
       } catch (error: unknown) {
         const message = await toErrorMessage(error, "Failed to submit query");
@@ -259,6 +293,7 @@ export const useKmindexSearch = (): KmindexSearchActions &
   const reset = useCallback((): void => {
     stopPolling();
     fetchedRef.current = null;
+    syncJobParam(null);
     setState((prev) => ({
       ...INITIAL_STATE,
       indexes: prev.indexes,
