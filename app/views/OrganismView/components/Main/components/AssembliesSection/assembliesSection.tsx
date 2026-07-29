@@ -7,7 +7,7 @@ import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Pap
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Alert, Stack } from "@mui/material";
 import { Table } from "@repo/shared/components/Table/table";
-import { RowData } from "@tanstack/react-table";
+import type { RowData } from "@tanstack/react-table";
 import { JSX } from "react";
 import { EmptyState } from "../EmptyState/emptyState";
 import { Props } from "./types";

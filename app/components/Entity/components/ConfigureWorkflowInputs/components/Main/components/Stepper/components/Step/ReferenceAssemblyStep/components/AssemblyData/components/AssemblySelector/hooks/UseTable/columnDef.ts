@@ -3,7 +3,7 @@ import {
   buildNTagProps,
   renderNTagCell,
 } from "@repo/shared/components/Table/components/TableCell/components/NTagCell/utils";
-import { ColumnDef, SortingColumnDef } from "@tanstack/react-table";
+import type { ColumnDef, SortingColumnDef } from "@tanstack/react-table";
 import { getAssemblyIsolate, getAssemblySerotype } from "./accessorFn";
 import { CATEGORY_CONFIGS } from "./categoryConfigs";
 import { Assembly } from "./types";
