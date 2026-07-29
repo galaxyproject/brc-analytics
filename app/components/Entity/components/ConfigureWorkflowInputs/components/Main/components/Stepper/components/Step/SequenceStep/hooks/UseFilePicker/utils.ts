@@ -1,8 +1,14 @@
 import { ParseResult } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseFilePicker/types";
-import { MAX_FILE_SIZE_BYTES, VALIDATION_ERROR } from "./constants";
+import {
+  MAX_FILE_SIZE_BYTES,
+  MAX_SEQUENCE_LENGTH,
+  MIN_SEQUENCE_LENGTH,
+  VALIDATION_ERROR,
+} from "./constants";
 
 /**
  * Reads a FASTA file and validates its content.
+ * Validates that the file contains a single sequence between 50 and 5000 bases.
  * @param file - The file to read.
  * @returns Promise resolving to the sequence string and validation errors.
  */
@@ -25,6 +31,29 @@ export function readFastaFile(file: File): Promise<ParseResult<string>> {
 
       if (!content.startsWith(">")) {
         resolve({ data: "", errors: [VALIDATION_ERROR.INVALID_FASTA] });
+        return;
+      }
+
+      const lines = content.split("\n");
+      const headerCount = lines.filter((line) => line.startsWith(">")).length;
+
+      if (headerCount > 1) {
+        resolve({ data: "", errors: [VALIDATION_ERROR.MULTIPLE_SEQUENCES] });
+        return;
+      }
+
+      const sequenceLength = lines
+        .filter((line) => !line.startsWith(">"))
+        .join("")
+        .replace(/\s/g, "").length;
+
+      if (sequenceLength < MIN_SEQUENCE_LENGTH) {
+        resolve({ data: "", errors: [VALIDATION_ERROR.SEQUENCE_TOO_SHORT] });
+        return;
+      }
+
+      if (sequenceLength > MAX_SEQUENCE_LENGTH) {
+        resolve({ data: "", errors: [VALIDATION_ERROR.SEQUENCE_TOO_LONG] });
         return;
       }
 
