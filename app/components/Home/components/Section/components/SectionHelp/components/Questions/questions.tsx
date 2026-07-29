@@ -1,5 +1,3 @@
-import { Accordion } from "@/components/common/Accordion/accordion";
-import { AccordionSummary } from "@/components/common/Accordion/components/AccordionSummary/accordionSummary";
 import { URLS } from "@/components/Home/common/constants";
 import { Link as DXLink } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
@@ -7,6 +5,8 @@ import {
   AccordionDetails as MAccordionDetails,
   Typography,
 } from "@mui/material";
+import { Accordion } from "@repo/shared/components/Accordion/accordion";
+import { AccordionSummary } from "@repo/shared/components/Accordion/components/AccordionSummary/accordionSummary";
 import { JSX } from "react";
 import { Grid } from "./questions.styles";
 

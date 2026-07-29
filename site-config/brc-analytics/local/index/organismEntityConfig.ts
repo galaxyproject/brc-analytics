@@ -8,6 +8,7 @@ import {
   SORT_DIRECTION,
 } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
+import { Chip } from "@mui/material";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
@@ -238,9 +239,9 @@ export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
         componentConfig: {
           children: [
             {
-              component: C.Chip,
+              component: Chip,
               viewBuilder: V.buildPriorityPathogen,
-            } as ComponentConfig<typeof C.Chip, BRCDataCatalogOrganism>,
+            } as ComponentConfig<typeof Chip, BRCDataCatalogOrganism>,
           ],
           component: C.Tooltip,
           viewBuilder: V.buildPriorityPathogenTooltip,

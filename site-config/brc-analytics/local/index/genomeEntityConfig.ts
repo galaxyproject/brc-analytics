@@ -11,6 +11,7 @@ import {
   SORT_DIRECTION,
 } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
+import { Chip } from "@mui/material";
 import { AnalyzeGenome } from "@repo/shared/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 import { LevelCell } from "@repo/shared/components/Table/components/TableCell/components/LevelCell/levelCell";
 import { SpeciesCell } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/speciesCell";
@@ -319,9 +320,9 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
         componentConfig: {
           children: [
             {
-              component: C.Chip,
+              component: Chip,
               viewBuilder: V.buildPriorityPathogen,
-            } as ComponentConfig<typeof C.Chip, BRCDataCatalogGenome>,
+            } as ComponentConfig<typeof Chip, BRCDataCatalogGenome>,
           ],
           component: C.Tooltip,
           viewBuilder: V.buildPriorityPathogenTooltip,
