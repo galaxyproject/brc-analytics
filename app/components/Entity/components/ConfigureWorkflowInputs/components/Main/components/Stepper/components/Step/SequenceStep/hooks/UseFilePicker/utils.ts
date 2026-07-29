@@ -7,8 +7,48 @@ import {
 } from "./constants";
 
 /**
+ * Validates FASTA content and returns validation errors.
+ * Checks that the content is a valid FASTA with a single sequence
+ * between the configured minimum and maximum base lengths.
+ * @param content - The trimmed file content.
+ * @returns Array of validation errors (empty if valid).
+ */
+export function validateFastaContent(content: string): string[] {
+  if (!content) {
+    return [VALIDATION_ERROR.EMPTY_CONTENT];
+  }
+
+  if (!content.startsWith(">")) {
+    return [VALIDATION_ERROR.INVALID_FASTA];
+  }
+
+  const lines = content.split("\n");
+  const headerCount = lines.filter((line) => line.startsWith(">")).length;
+
+  if (headerCount > 1) {
+    return [VALIDATION_ERROR.MULTIPLE_SEQUENCES];
+  }
+
+  const sequenceLength = lines
+    .filter((line) => !line.startsWith(">"))
+    .join("")
+    .replace(/\s/g, "").length;
+
+  if (sequenceLength < MIN_SEQUENCE_LENGTH) {
+    return [VALIDATION_ERROR.SEQUENCE_TOO_SHORT];
+  }
+
+  if (sequenceLength > MAX_SEQUENCE_LENGTH) {
+    return [VALIDATION_ERROR.SEQUENCE_TOO_LONG];
+  }
+
+  return [];
+}
+
+/**
  * Reads a FASTA file and validates its content.
- * Validates that the file contains a single sequence between 50 and 5000 bases.
+ * Validates that the file contains a single sequence within the configured
+ * minimum and maximum base lengths.
  * @param file - The file to read.
  * @returns Promise resolving to the sequence string and validation errors.
  */
@@ -22,42 +62,10 @@ export function readFastaFile(file: File): Promise<ParseResult<string>> {
     const reader = new FileReader();
 
     reader.onload = (): void => {
-      const content = (reader.result as string).trim();
-
-      if (!content) {
-        resolve({ data: "", errors: [VALIDATION_ERROR.EMPTY_CONTENT] });
-        return;
-      }
-
-      if (!content.startsWith(">")) {
-        resolve({ data: "", errors: [VALIDATION_ERROR.INVALID_FASTA] });
-        return;
-      }
-
-      const lines = content.split("\n");
-      const headerCount = lines.filter((line) => line.startsWith(">")).length;
-
-      if (headerCount > 1) {
-        resolve({ data: "", errors: [VALIDATION_ERROR.MULTIPLE_SEQUENCES] });
-        return;
-      }
-
-      const sequenceLength = lines
-        .filter((line) => !line.startsWith(">"))
-        .join("")
-        .replace(/\s/g, "").length;
-
-      if (sequenceLength < MIN_SEQUENCE_LENGTH) {
-        resolve({ data: "", errors: [VALIDATION_ERROR.SEQUENCE_TOO_SHORT] });
-        return;
-      }
-
-      if (sequenceLength > MAX_SEQUENCE_LENGTH) {
-        resolve({ data: "", errors: [VALIDATION_ERROR.SEQUENCE_TOO_LONG] });
-        return;
-      }
-
-      resolve({ data: content, errors: [] });
+      const normalized = (reader.result as string).replace(/\r\n?/g, "\n");
+      const content = normalized.trim();
+      const errors = validateFastaContent(content);
+      resolve({ data: errors.length === 0 ? content : "", errors });
     };
 
     reader.onerror = (): void => {
