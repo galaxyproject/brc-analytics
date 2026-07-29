@@ -2,12 +2,11 @@ import {
   AlertTitle,
   AccordionDetails as MAccordionDetails,
 } from "@mui/material";
+import { Accordion } from "@repo/shared/components/Accordion/accordion";
+import { AccordionSummary } from "@repo/shared/components/Accordion/components/AccordionSummary/accordionSummary";
+import { Figure } from "@repo/shared/components/mdx/Figure/figure";
 import { MDXComponents } from "mdx/types";
 import * as C from "./app/components";
-import { CardActions } from "./app/components/Home/components/Section/components/SectionHero/components/Carousel/components/Cards/cards.styles";
-import { Accordion } from "./app/components/common/Accordion/accordion";
-import { AccordionSummary } from "./app/components/common/Accordion/components/AccordionSummary/accordionSummary";
-import { Figure } from "./app/components/common/Figure/figure";
 import {
   Section,
   SectionContent,
@@ -15,6 +14,7 @@ import {
   SectionLayout,
   SubHeadline,
 } from "./app/components/content/content.styles";
+import { CardActions } from "./app/components/Home/components/Section/components/SectionHero/components/Carousel/components/Cards/cards.styles";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
