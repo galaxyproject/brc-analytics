@@ -11,13 +11,16 @@ import { WorkflowEntityContext } from "@/components/Entity/components/ConfigureW
 import { buildWorkflowEntityValue } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/utils";
 import { ENTITY_KEYS } from "@/providers/workflowHandoff/constants";
 import { HandoffStatusContext } from "@/providers/workflowHandoff/contexts/HandoffStatus/context";
-import { getAssembly, getWorkflow } from "@/services/workflows/entities";
 import {
   BackPageContent,
   BackPageContentSideColumn,
   BackPageHero,
   BackPageView,
 } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
+import {
+  getAssembly,
+  getWorkflow,
+} from "@repo/shared/services/workflows/entities";
 import { JSX, useMemo } from "react";
 import { useAssistantHandoff } from "./hooks/UseAssistantHandoff/useAssistantHandoff";
 import { useConfigureInputs } from "./hooks/UseConfigureInputs/useConfigureInputs";

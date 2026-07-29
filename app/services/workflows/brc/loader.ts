@@ -1,77 +1,30 @@
 import type { Pangenome } from "@/apis/catalog/brc-analytics-catalog/common/pangenome";
+import { API as BRC_API } from "@/services/workflows/brc/routes";
 import { formatTrsId } from "@/views/AnalyzeWorkflowsView/components/Main/utils";
 import { CUSTOM_WORKFLOW } from "@/views/AnalyzeWorkflowsView/custom/constants";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { LEXICMAP } from "@/views/AnalyzeWorkflowsView/lexicmap/constants";
 import { LOGAN_SEARCH } from "@/views/AnalyzeWorkflowsView/loganSearch/constants";
-import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
-import { API } from "./routes";
-import { getEntitiesById, setEntitiesById, setEntitiesByType } from "./store";
-import { EntityRoute } from "./types";
-
-/**
- * Fetches entities from the API.
- * @param url - URL.
- * @returns Entity list.
- */
-async function fetchEntities(url: string): Promise<unknown[]> {
-  const res = await fetch(url);
-
-  if (!res.ok) throw new Error(`Failed to fetch: ${url}`);
-
-  return (await res.json()) as unknown[];
-}
-
-/**
- * Checks if the route is an entity route.
- * @param route - Route.
- * @returns True if the route is an entity route; false otherwise.
- */
-function isEntityRoute(route: string): route is EntityRoute {
-  return route in API;
-}
-
-/**
- * Loads the entities store with entities from the API.
- * @param config - Site config.
- */
-export async function loadEntities(config: SiteConfig): Promise<void> {
-  for (const entity of config.entities) {
-    const { getId, route } = entity;
-
-    if (!isEntityRoute(route)) continue;
-
-    const apiRoute = API[route];
-
-    // Entities are already loaded; skip.
-    if (getEntitiesById().has(route)) continue;
-
-    // Get id function is not configured; entities are excluded from preloading.
-    if (!getId) continue;
-
-    // Fetch the entities.
-    const entities = await fetchEntities(apiRoute);
-
-    const entityById = new Map<string, unknown>();
-    for (const entity of entities) entityById.set(getId(entity), entity);
-
-    setEntitiesById(route, entityById);
-    setEntitiesByType(route, entities);
-  }
-}
+import { fetchEntities } from "@repo/shared/services/workflows/loader";
+import { API } from "@repo/shared/services/workflows/routes";
+import {
+  getEntitiesById,
+  setEntitiesById,
+  setEntitiesByType,
+} from "@repo/shared/services/workflows/store";
 
 /**
  * Loads the pangenomes store from the API, keyed by species taxonomy ID.
- * Pangenome data is optional (BRC-only and may be absent before its build
- * lands), so a missing or failed fetch is skipped rather than fatal.
+ * Pangenome data is optional (may be absent before its build lands), so a
+ * missing or failed fetch is skipped rather than fatal.
  */
 export async function loadPangenomes(): Promise<void> {
   if (getEntitiesById().has("pangenomes")) return;
 
   let pangenomes: Pangenome[];
   try {
-    pangenomes = (await fetchEntities(API.pangenomes)) as Pangenome[];
+    pangenomes = (await fetchEntities(BRC_API.pangenomes)) as Pangenome[];
   } catch (error) {
     // Optional data: stay non-fatal, but surface the error so a real
     // regression (vs. an intentionally-absent file) is debuggable.

@@ -1,0 +1,55 @@
+import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import { API } from "./routes";
+import { getEntitiesById, setEntitiesById, setEntitiesByType } from "./store";
+import type { EntityRoute } from "./types";
+
+/**
+ * Fetches entities from the API.
+ * @param url - URL.
+ * @returns Entity list.
+ */
+export async function fetchEntities(url: string): Promise<unknown[]> {
+  const res = await fetch(url);
+
+  if (!res.ok) throw new Error(`Failed to fetch: ${url}`);
+
+  return (await res.json()) as unknown[];
+}
+
+/**
+ * Checks if the route is an entity route.
+ * @param route - Route.
+ * @returns True if the route is an entity route; false otherwise.
+ */
+function isEntityRoute(route: string): route is EntityRoute {
+  return route in API;
+}
+
+/**
+ * Loads the entities store with entities from the API.
+ * @param config - Site config.
+ */
+export async function loadEntities(config: SiteConfig): Promise<void> {
+  for (const entity of config.entities) {
+    const { getId, route } = entity;
+
+    if (!isEntityRoute(route)) continue;
+
+    const apiRoute = API[route];
+
+    // Entities are already loaded; skip.
+    if (getEntitiesById().has(route)) continue;
+
+    // Get id function is not configured; entities are excluded from preloading.
+    if (!getId) continue;
+
+    // Fetch the entities.
+    const entities = await fetchEntities(apiRoute);
+
+    const entityById = new Map<string, unknown>();
+    for (const entity of entities) entityById.set(getId(entity), entity);
+
+    setEntitiesById(route, entityById);
+    setEntitiesByType(route, entities);
+  }
+}

@@ -1,6 +1,6 @@
 import type { EntitiesResponse } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import { getEntities } from "@/services/workflows/query";
-import type { EntityRoute } from "@/services/workflows/types";
+import { getEntities } from "@repo/shared/services/workflows/query";
+import type { EntityRoute } from "@repo/shared/services/workflows/types";
 
 /**
  * Build an explore-view data response from the client-loaded entity store.

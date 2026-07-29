@@ -1,4 +1,3 @@
-import { getEntities } from "@/services/workflows/query";
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 import { arrIncludesSome } from "@databiosphere/findable-ui/lib/components/Table/columnDef/columnFilters/filterFn";
 import { getFacetedUniqueValuesWithArrayValues } from "@databiosphere/findable-ui/lib/components/Table/common/utils";
@@ -7,6 +6,7 @@ import { ROW_POSITION } from "@databiosphere/findable-ui/lib/components/Table/fe
 import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/features/RowPreview/constants";
 import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/features/TableDownload/constants";
 import type { Workflow } from "@repo/shared/apis/workflow";
+import { getEntities } from "@repo/shared/services/workflows/query";
 import {
   getCoreRowModel,
   getFacetedRowModel,

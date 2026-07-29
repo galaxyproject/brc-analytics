@@ -1,6 +1,5 @@
 import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
-import { getEntity } from "@/services/workflows/query";
 import { Assembly } from "@/views/WorkflowInputsView/types";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
@@ -14,6 +13,7 @@ import {
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
 import { useAssemblyFavorites } from "@repo/shared/components/Favorites/hooks/UseAssemblyFavorites/hook";
 import { useAuth } from "@repo/shared/providers/authentication/provider";
+import { getEntity } from "@repo/shared/services/workflows/query";
 import Link from "next/link";
 import { JSX } from "react";
 

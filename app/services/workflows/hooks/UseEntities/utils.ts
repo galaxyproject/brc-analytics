@@ -1,9 +1,6 @@
-import {
-  loadEntities,
-  loadPangenomes,
-  loadWorkflows,
-} from "@/services/workflows/loader";
+import { loadPangenomes, loadWorkflows } from "@/services/workflows/brc/loader";
 import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import { loadEntities } from "@repo/shared/services/workflows/loader";
 
 let loadPromise: Promise<void> | null = null;
 
