@@ -1,5 +1,8 @@
-import { UcscTrack, UcscTrackNode } from "@/utils/ucsc-tracks-api/entities";
 import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
+import {
+  UcscTrack,
+  UcscTrackNode,
+} from "@repo/shared/utils/ucsc-tracks-api/types";
 import { Table } from "@tanstack/react-table";
 
 /**
