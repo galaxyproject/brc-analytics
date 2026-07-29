@@ -1,11 +1,11 @@
 import { getPageMeta } from "@/common/meta/utils";
 import { config } from "@/config/config";
-import { ENTITY_KEYS } from "@/providers/workflowHandoff/constants";
-import type { EntityKey } from "@/providers/workflowHandoff/types";
 import { getEntities } from "@/utils/entityUtils";
 import { seedDatabase } from "@/utils/seedDatabase";
 import { AnalyzeWorkflowsRouteView } from "@/views/AnalyzeWorkflowsRouteView/analyzeWorkflowsRouteView";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
+import { ENTITY_KEYS } from "@repo/shared/providers/workflowHandoff/constants";
+import type { EntityKey } from "@repo/shared/providers/workflowHandoff/types";
 import type {
   GetStaticPaths,
   GetStaticPathsResult,
