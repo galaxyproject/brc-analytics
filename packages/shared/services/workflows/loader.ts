@@ -22,7 +22,7 @@ export async function fetchEntities(url: string): Promise<unknown[]> {
  * @returns True if the route is an entity route; false otherwise.
  */
 function isEntityRoute(route: string): route is EntityRoute {
-  return route in API;
+  return Object.hasOwn(API, route);
 }
 
 /**
