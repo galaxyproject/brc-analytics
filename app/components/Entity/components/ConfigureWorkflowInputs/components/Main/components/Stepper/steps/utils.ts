@@ -1,11 +1,11 @@
-import { CUSTOM_WORKFLOW } from "@/views/AnalyzeWorkflowsView/custom/constants";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import {
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_SCOPE,
 } from "@repo/shared/apis/schema-types";
 import type { Workflow } from "@repo/shared/apis/workflow";
+import { CUSTOM_WORKFLOW } from "@repo/shared/workflow/custom";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
 import { StepConfig } from "../components/Step/types";
 import { STEP } from "./constants";
 

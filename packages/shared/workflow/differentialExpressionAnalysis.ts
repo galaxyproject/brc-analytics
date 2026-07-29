@@ -1,8 +1,5 @@
-import {
-  WORKFLOW_PLOIDY,
-  WORKFLOW_SCOPE,
-} from "@repo/shared/apis/schema-types";
-import type { Workflow } from "@repo/shared/apis/workflow";
+import { WORKFLOW_PLOIDY, WORKFLOW_SCOPE } from "../apis/schema-types";
+import type { Workflow } from "../apis/workflow";
 
 export const DIFFERENTIAL_EXPRESSION_ANALYSIS: Workflow = {
   assemblyCountMax: 1,

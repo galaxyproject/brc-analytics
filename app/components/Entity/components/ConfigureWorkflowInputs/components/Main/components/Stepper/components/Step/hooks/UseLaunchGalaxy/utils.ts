@@ -1,4 +1,3 @@
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
 import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import {
   ANCHOR_TARGET,
@@ -7,6 +6,7 @@ import {
 import { WORKFLOW_PARAMETER_VARIABLE } from "@repo/shared/apis/schema-types";
 import type { Workflow } from "@repo/shared/apis/workflow";
 import type { WorkflowRunCreateRequest } from "@repo/shared/services/api-client/types";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
 import {
   ConfiguredValue,
   isAssemblyConfiguredValue,

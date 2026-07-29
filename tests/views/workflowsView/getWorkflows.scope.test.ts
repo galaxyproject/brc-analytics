@@ -9,23 +9,20 @@ import type {
   WorkflowCategory,
 } from "@repo/shared/apis/workflow";
 
-jest.mock(
-  "../../../app/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants",
-  () => ({
-    DIFFERENTIAL_EXPRESSION_ANALYSIS: {
-      assemblyCountMax: 1,
-      assemblyCountMin: 1,
-      iwcId: "iwc-deseq2",
-      parameters: [],
-      ploidy: "ANY",
-      scope: "ASSEMBLY",
-      taxonomyId: null,
-      trsId: "differential-expression-analysis",
-      workflowDescription: "DESeq2 workflow",
-      workflowName: "Differential Expression Analysis",
-    },
-  })
-);
+jest.mock("@repo/shared/workflow/differentialExpressionAnalysis", () => ({
+  DIFFERENTIAL_EXPRESSION_ANALYSIS: {
+    assemblyCountMax: 1,
+    assemblyCountMin: 1,
+    iwcId: "iwc-deseq2",
+    parameters: [],
+    ploidy: "ANY",
+    scope: "ASSEMBLY",
+    taxonomyId: null,
+    trsId: "differential-expression-analysis",
+    workflowDescription: "DESeq2 workflow",
+    workflowName: "Differential Expression Analysis",
+  },
+}));
 
 describe("getWorkflows - scope handling", () => {
   const ORGANISMS: Organism[] = [];

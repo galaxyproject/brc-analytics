@@ -4,14 +4,14 @@ import {
   getLMLSLandingUrl,
   getWorkflowLandingUrl,
 } from "@/utils/galaxy-api/galaxy-api";
-import { CUSTOM_WORKFLOW } from "@/views/AnalyzeWorkflowsView/custom/constants";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
-import { LEXICMAP } from "@/views/AnalyzeWorkflowsView/lexicmap/constants";
-import { LOGAN_SEARCH } from "@/views/AnalyzeWorkflowsView/loganSearch/constants";
 import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
 import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
 import type { Workflow } from "@repo/shared/apis/workflow";
 import { apiClient } from "@repo/shared/services/api-client/api-client";
+import { CUSTOM_WORKFLOW } from "@repo/shared/workflow/custom";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
+import { LEXICMAP } from "@repo/shared/workflow/lexicmap";
+import { LOGAN_SEARCH } from "@repo/shared/workflow/loganSearch";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
 import {
