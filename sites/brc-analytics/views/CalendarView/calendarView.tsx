@@ -5,7 +5,7 @@ import {
   SectionLayout,
 } from "@/components/content/content.styles";
 import { Fragment, JSX } from "react";
-import { BREADCRUMBS } from "./common/constants";
+import { BREADCRUMBS } from "./constants";
 
 export const CalendarView = (): JSX.Element => {
   return (
