@@ -79,7 +79,7 @@ describe("readFastaFile", () => {
       expect(result.data).toBe(content);
     });
 
-    test("accepts file with exactly 50 bases (lower boundary)", async () => {
+    test("accepts file with exactly 30 bases (lower boundary)", async () => {
       const content = `>seq1\n${makeSequence(MIN_SEQUENCE_LENGTH)}`;
       const file = createMockFile(content);
 
@@ -156,7 +156,7 @@ describe("readFastaFile", () => {
       expect(result.data).toBe("");
     });
 
-    test("returns error when sequence is shorter than 50 bases", async () => {
+    test("returns error when sequence is shorter than 30 bases", async () => {
       const content = `>seq1\n${makeSequence(MIN_SEQUENCE_LENGTH - 1)}`;
       const file = createMockFile(content);
 

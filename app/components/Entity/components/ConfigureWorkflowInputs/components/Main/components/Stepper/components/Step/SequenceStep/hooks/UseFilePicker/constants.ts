@@ -1,6 +1,6 @@
 export const MAX_FILE_SIZE_BYTES = 2 * 1024 * 1024; // 2MB
 export const MAX_SEQUENCE_LENGTH = 5000;
-export const MIN_SEQUENCE_LENGTH = 50;
+export const MIN_SEQUENCE_LENGTH = 30;
 
 export const VALIDATION_ERROR = {
   EMPTY_CONTENT: "File is empty",
@@ -9,5 +9,5 @@ export const VALIDATION_ERROR = {
   MULTIPLE_SEQUENCES: "File must contain only a single sequence",
   PARSE_FAILED: "Failed to read file",
   SEQUENCE_TOO_LONG: "Sequence must be at most 5000 bases",
-  SEQUENCE_TOO_SHORT: "Sequence must be at least 50 bases",
+  SEQUENCE_TOO_SHORT: "Sequence must be at least 30 bases",
 } as const;
