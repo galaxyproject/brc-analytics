@@ -1,7 +1,7 @@
-import { normalizePagePath } from "@/hooks/UseCurrentPath/utils";
 import { ENTITY_KEYS } from "@/providers/workflowHandoff/constants";
 import { useHandoffDispatch } from "@/providers/workflowHandoff/hooks/UseHandoffDispatch/hook";
 import { Box, Button, Chip, Divider, Typography } from "@mui/material";
+import { normalizePagePath } from "@repo/shared/hooks/UseCurrentPath/utils";
 import type {
   AnalysisSchema,
   FieldStatus,
