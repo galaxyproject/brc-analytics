@@ -1,6 +1,6 @@
-import { PADDING_Y_BOTTOM as HERO_SECTION_PADDING_Y_BOTTOM } from "@/components/Docs/components/SectionHero/sectionHero.styles";
 import styled from "@emotion/styled";
 import { PADDING_Y as SECTION_PADDING_Y } from "@repo/shared/views/docs/components/SectionContent/sectionContent.styles";
+import { PADDING_Y_BOTTOM as HERO_SECTION_PADDING_Y_BOTTOM } from "@repo/shared/views/docs/components/SectionHero/sectionHero.styles";
 
 const PADDING_Y = 56;
 
