@@ -1,8 +1,4 @@
 import {
-  CONTENT_TYPE,
-  FrontmatterProps,
-} from "@/docs/common/frontmatter/types";
-import {
   Content,
   ContentLayout,
   Outline,
@@ -16,6 +12,8 @@ import {
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { sectionLayout } from "@repo/shared/components/layout/Section/section.styles";
+import type { FrontmatterProps } from "@repo/shared/views/docs/common/frontmatter/types";
+import { CONTENT_TYPE } from "@repo/shared/views/docs/common/frontmatter/types";
 
 export const PADDING_Y = 64;
 

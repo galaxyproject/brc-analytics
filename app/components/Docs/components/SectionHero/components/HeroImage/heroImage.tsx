@@ -1,4 +1,4 @@
-import { FrontmatterProps } from "@/docs/common/frontmatter/types";
+import { FrontmatterProps } from "@repo/shared/views/docs/common/frontmatter/types";
 import { JSX } from "react";
 import { StyledImage } from "./heroImage.styles";
 

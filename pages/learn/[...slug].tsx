@@ -1,6 +1,5 @@
 import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
 import { sanitizeFrontmatter } from "@/docs/common/frontmatter/utils";
-import { StaticProps } from "@/docs/common/staticGeneration/types";
 import { sanitizeStaticProps } from "@/docs/common/staticGeneration/utils";
 import { LearnContentView } from "@/views/LearnContentView/learnContentView";
 import { buildStaticPaths } from "@databiosphere/findable-ui/lib/utils/mdx/staticGeneration/staticPaths";
@@ -9,6 +8,7 @@ import {
   buildMDXFilePath,
   buildMDXSlug,
 } from "@databiosphere/findable-ui/lib/utils/mdx/staticGeneration/utils";
+import { StaticProps } from "@repo/shared/views/docs/common/staticGeneration/types";
 import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
 import { JSX } from "react";
 
