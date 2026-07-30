@@ -2,11 +2,8 @@ import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/fon
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { bpUpSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
-import {
-  sectionGrid,
-  sectionLayout,
-} from "@repo/shared/components/layout/Section/section.styles";
-import { Section } from "@repo/shared/components/layout/SectionHero/components/Section/section";
+import { sectionGrid, sectionLayout } from "../Section/section.styles";
+import { Section } from "./components/Section/section";
 
 export const StyledSection = styled(Section)`
   background-color: ${PALETTE.SMOKE_LIGHTEST};
