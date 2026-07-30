@@ -1,7 +1,7 @@
 import { SectionHeadline } from "@/components/Home/components/Section/section.styles";
-import { sectionLayout } from "@/components/Layout/components/AppLayout/components/Section/section.styles";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import styled from "@emotion/styled";
+import { sectionLayout } from "@repo/shared/components/layout/Section/section.styles";
 
 export const Section = styled.section`
   background-color: ${PALETTE.SMOKE_LIGHTEST};

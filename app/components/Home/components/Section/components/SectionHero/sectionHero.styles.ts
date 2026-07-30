@@ -1,13 +1,13 @@
 import { Section } from "@/components/common/Section/section";
-import {
-  section,
-  sectionGrid,
-  sectionLayout,
-} from "@/components/Layout/components/AppLayout/components/Section/section.styles";
 import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { bpUpMd } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
+import {
+  section,
+  sectionGrid,
+  sectionLayout,
+} from "@repo/shared/components/layout/Section/section.styles";
 
 export const StyledSection = styled(Section)`
   ${section};
