@@ -1,12 +1,12 @@
-import { UcscTrack, UcscTrackComposite, UcscTrackNode } from "./entities";
 import { UcscApiResponseTrack, ucscApiResponseTrackSchema } from "./schema";
+import { UcscTrack, UcscTrackComposite, UcscTrackNode } from "./types";
 
 const TRACKS_API_URL = "https://api.genome.ucsc.edu/list/tracks";
 const FILES_API_URL = "https://api.genome.ucsc.edu/list/files";
 const DOWNLOAD_BASE_URL = "https://hgdownload.soe.ucsc.edu/";
 
 /**
- * Get tracks for the given assembly from the UCSC API, transformed for use in BRC Analytics.
+ * Get tracks for the given assembly from the UCSC API, transformed for use in the application.
  * @param assembly - Assembly accession.
  * @returns UCSC tracks.
  */
@@ -178,7 +178,7 @@ function parseMd5File(text: string): Map<string, string> {
 }
 
 /**
- * Transform a composite track from the API into an object to be used in BRC Analytics.
+ * Transform a composite track from the API into an object to be used in the application.
  * @param responseTrack - Composite track from the API.
  * @param assembly - Assembly accession.
  * @param md5Checksums - Map of filename to MD5 hash.
@@ -220,7 +220,7 @@ async function buildTrackComposite(
 }
 
 /**
- * Transform an individual track from the API into an object to be used in BRC Analytics.
+ * Transform an individual track from the API into an object to be used in the application.
  * @param responseTrack - Track from the API.
  * @param assembly - Assembly accession.
  * @param md5Checksums - Map of filename to MD5 hash.

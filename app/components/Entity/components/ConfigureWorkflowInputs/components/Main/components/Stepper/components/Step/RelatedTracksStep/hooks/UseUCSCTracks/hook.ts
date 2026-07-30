@@ -1,6 +1,6 @@
-import { UcscTrackNode } from "@/utils/ucsc-tracks-api/entities";
-import { getAssemblyTracks } from "@/utils/ucsc-tracks-api/ucsc-tracks-api";
 import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
+import { UcscTrackNode } from "@repo/shared/utils/ucsc-tracks-api/types";
+import { getAssemblyTracks } from "@repo/shared/utils/ucsc-tracks-api/ucsc-tracks-api";
 import { useCallback, useEffect } from "react";
 import { UseUCSCTracks } from "./types";
 
