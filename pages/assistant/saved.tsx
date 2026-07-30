@@ -1,4 +1,3 @@
-import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
@@ -9,6 +8,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { SectionHero } from "@repo/shared/components/layout/SectionHero/sectionHero";
 import { useAuth } from "@repo/shared/providers/authentication/provider";
 import { apiClient } from "@repo/shared/services/api-client/api-client";
 import type { SavedAnalysisSummary } from "@repo/shared/services/api-client/types";

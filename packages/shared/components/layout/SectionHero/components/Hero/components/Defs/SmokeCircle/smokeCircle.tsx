@@ -1,16 +1,13 @@
-import { FILL } from "@/components/Layout/components/Hero/common/constants";
+import { FILL } from "@repo/shared/components/layout/SectionHero/components/Hero/common/constants";
 import {
   ELEMENT_ID,
   PATTERN_UNIT,
-} from "@/components/Layout/components/Hero/common/entities";
-import { getElementHref } from "@/components/Layout/components/Hero/common/utils";
+} from "@repo/shared/components/layout/SectionHero/components/Hero/common/types";
+import { getElementHref } from "@repo/shared/components/layout/SectionHero/components/Hero/common/utils";
 import { JSX } from "react";
+import type { Props } from "./types";
 
-export interface SmokeCircleProps {
-  gridSize: number;
-}
-
-export const SmokeCircle = ({ gridSize }: SmokeCircleProps): JSX.Element => {
+export const SmokeCircle = ({ gridSize }: Props): JSX.Element => {
   return (
     <defs>
       <g id={ELEMENT_ID.GROUP_SMOKE_CIRCLE} opacity="0.5">

@@ -1,28 +1,17 @@
-import {
-  FILL,
-  GRID_SIZE,
-} from "@/components/Layout/components/Hero/common/constants";
-import { ELEMENT_ID } from "@/components/Layout/components/Hero/common/entities";
-import {
-  getFillUrl,
-  getViewBox,
-} from "@/components/Layout/components/Hero/common/utils";
-import { SmokeCircle } from "@/components/Layout/components/Hero/components/Defs/SmokeCircle/smokeCircle";
-import { SmokeRect } from "@/components/Layout/components/Hero/components/Defs/SmokeRect/smokeRect";
 import { Fragment, JSX } from "react";
+import { FILL, GRID_SIZE } from "./common/constants";
+import { ELEMENT_ID } from "./common/types";
+import { getFillUrl, getViewBox } from "./common/utils";
+import { SmokeCircle } from "./components/Defs/SmokeCircle/smokeCircle";
+import { SmokeRect } from "./components/Defs/SmokeRect/smokeRect";
 import { SVG } from "./hero.styles";
-
-export interface HeroProps {
-  gridSize?: number;
-  height?: number;
-  width?: number;
-}
+import type { Props } from "./types";
 
 export const Hero = ({
   gridSize = GRID_SIZE,
   height = gridSize * 1.5,
   width = 0,
-}: HeroProps): JSX.Element => {
+}: Props): JSX.Element => {
   return (
     <SVG
       fill={FILL.NONE}

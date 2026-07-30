@@ -1,4 +1,4 @@
-import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
+import { SectionHero } from "@repo/shared/components/layout/SectionHero/sectionHero";
 import { Fragment, JSX } from "react";
 import SectionAbout from "./content/sectionAbout.mdx";
 
