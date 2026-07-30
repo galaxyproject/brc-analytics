@@ -1,4 +1,3 @@
-import { Section } from "@/components/common/Section/section";
 import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { bpUpSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
@@ -7,6 +6,7 @@ import {
   sectionGrid,
   sectionLayout,
 } from "@repo/shared/components/layout/Section/section.styles";
+import { Section } from "@repo/shared/components/layout/SectionHero/components/Section/section";
 
 export const StyledSection = styled(Section)`
   background-color: ${PALETTE.SMOKE_LIGHTEST};

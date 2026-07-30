@@ -1,5 +1,5 @@
-import { calculateGridSize } from "@/components/Layout/components/Hero/common/utils";
 import { Button } from "@mui/material";
+import { calculateGridSize } from "@repo/shared/components/layout/SectionHero/components/Hero/common/utils";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { Fragment, JSX } from "react";
 import { Carousel } from "./components/Carousel/carousel";
