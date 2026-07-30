@@ -7,10 +7,8 @@ import {
   getFillUrl,
   getViewBox,
 } from "@/components/Layout/components/Hero/common/utils";
-import { CoralPinkCircle } from "@/components/Layout/components/Hero/components/Defs/CoralPinkCircle/coralPinkCircle";
 import { SmokeCircle } from "@/components/Layout/components/Hero/components/Defs/SmokeCircle/smokeCircle";
 import { SmokeRect } from "@/components/Layout/components/Hero/components/Defs/SmokeRect/smokeRect";
-import { YellowRect } from "@/components/Layout/components/Hero/components/Defs/YellowRect/yellowRect";
 import { Fragment, JSX } from "react";
 import { SVG } from "./hero.styles";
 
@@ -35,8 +33,6 @@ export const Hero = ({
     >
       <SmokeRect gridSize={gridSize} />
       <SmokeCircle gridSize={gridSize} />
-      <YellowRect gridShift={3} gridSize={gridSize} />
-      <CoralPinkCircle gridSize={gridSize} />
       {[ELEMENT_ID.PATTERN_SMOKE_RECT, ELEMENT_ID.PATTERN_SMOKE_CIRCLE].map(
         (elementId) => (
           <Fragment key={elementId}>
