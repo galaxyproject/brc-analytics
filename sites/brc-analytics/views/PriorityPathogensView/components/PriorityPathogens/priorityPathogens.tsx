@@ -1,4 +1,8 @@
 import { SLUGIFY_OPTIONS } from "@/common/constants";
+import {
+  getPriorityColor,
+  getPriorityLabel,
+} from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/priority";
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import {
   Section,
@@ -7,14 +11,13 @@ import {
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { CardActionArea, Chip, Typography } from "@mui/material";
+import { ROUTES } from "@routes/constants";
 import { MDXRemote } from "next-mdx-remote";
 import { useRouter } from "next/router";
 import { JSX } from "react";
 import slugify from "slugify";
-import { ROUTES } from "../../../../../routes/constants";
 import { StyledGrid, StyledSectionText } from "./priorityPathogens.styles";
 import { Props } from "./types";
-import { getPriorityColor, getPriorityLabel } from "./utils";
 
 export const PriorityPathogens = ({
   priorityPathogens,

@@ -8,8 +8,8 @@ import styled from "@emotion/styled";
 
 export const StyledGrid = styled(StyledGridEntityView)`
   grid-template-columns: 1fr;
-  max-height: unset; // remove the max-height limitation inherited from StyledGridEntityView
-  overflow: unset; // remove the overflow limitation inherited from StyledGridEntityView
+  max-height: unset; /* remove the max-height limitation inherited from StyledGridEntityView */
+  overflow: unset; /* remove the overflow limitation inherited from StyledGridEntityView */
   padding-bottom: 24px;
 
   ${bpUpSm} {

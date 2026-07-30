@@ -19,10 +19,6 @@ import {
 import { Main as OrganismViewMain } from "@/views/OrganismView/components/Main/main";
 import { Tabs } from "@/views/OrganismView/components/Tabs/tabs";
 import type { Organism } from "@/views/OrganismView/types";
-import {
-  getPriorityColor,
-  getPriorityLabel,
-} from "@/views/PriorityPathogensView/components/PriorityPathogens/utils";
 import { ResourcesSection } from "@/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
 import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
@@ -85,6 +81,7 @@ import Router from "next/router";
 import { ComponentProps } from "react";
 import slugify from "slugify";
 import { ROUTES as SITE_ROUTES } from "../../../../../routes/constants";
+import { getPriorityColor, getPriorityLabel } from "./priority";
 
 // Transitional shim for the GA2/BRC split (monorepo-split): shared builders
 // moved to the site-neutral common home. Re-export them from this BRC path so

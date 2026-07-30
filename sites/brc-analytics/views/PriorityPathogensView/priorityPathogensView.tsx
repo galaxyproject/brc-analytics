@@ -12,8 +12,8 @@ export const PriorityPathogensView = (props: Props): JSX.Element => {
   const { data } = props;
   const { hits } = data;
 
-  // Sort priority pathogens.
-  const priorityPathogens = hits.sort(sortPriorityPathogen);
+  // Sort priority pathogens (copy first — avoid mutating props-derived data).
+  const priorityPathogens = [...hits].sort(sortPriorityPathogen);
 
   return (
     <StyledGrid {...spacing}>
