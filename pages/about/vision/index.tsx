@@ -1,7 +1,7 @@
 import { BRC_PAGE_META } from "@/common/meta/brc/constants";
 import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
 import { config } from "@/config/config";
-import { VisionView } from "@/views/VisionView/visionView";
+import { VisionView } from "@brc/views/VisionView/visionView";
 import { GetStaticProps } from "next";
 import { JSX } from "react";
 import { ROUTES } from "../../../routes/constants";
