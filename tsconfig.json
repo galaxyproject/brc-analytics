@@ -18,6 +18,7 @@
     "paths": {
       "@/*": ["app/*"],
       "@brc/*": ["sites/brc-analytics/*"],
+      "@ga2/*": ["sites/ga2/*"],
       "@repo/shared": ["packages/shared/index.ts"],
       "@repo/shared/*": ["packages/shared/*"],
       "@site-config/*": ["site-config/*"],
