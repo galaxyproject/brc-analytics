@@ -1,9 +1,9 @@
+import { SectionHero } from "@repo/shared/components/layout/SectionHero/sectionHero";
 import {
   Section,
   SectionContent,
   SectionLayout,
-} from "@/components/content/content.styles";
-import { SectionHero } from "@repo/shared/components/layout/SectionHero/sectionHero";
+} from "@repo/shared/views/docs/content.styles";
 import { Fragment, JSX } from "react";
 import { BREADCRUMBS } from "./constants";
 

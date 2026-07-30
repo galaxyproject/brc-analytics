@@ -1,11 +1,11 @@
 import { Content } from "@/components/Docs/components/Content/content";
-import { SectionContent } from "@/components/Docs/components/SectionContent/sectionContent";
 import { HeroImage } from "@/components/Docs/components/SectionHero/components/HeroImage/heroImage";
 import { StyledSectionHero } from "@/components/Docs/components/SectionHero/sectionHero.styles";
 import { MDX_COMPONENTS } from "@/docs/common/mdx/constants";
-import { StaticProps } from "@/docs/common/staticGeneration/types";
 import { ContentsTab } from "@databiosphere/findable-ui/lib/components/Layout/components/Outline/components/ContentsTab/contentsTab";
 import { Outline } from "@databiosphere/findable-ui/lib/components/Layout/components/Outline/outline";
+import { StaticProps } from "@repo/shared/views/docs/common/staticGeneration/types";
+import { SectionContent } from "@repo/shared/views/docs/components/SectionContent/sectionContent";
 import { MDXRemote } from "next-mdx-remote";
 import { Fragment, JSX } from "react";
 
