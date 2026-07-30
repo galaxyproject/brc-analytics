@@ -1,42 +1,31 @@
-import { SectionContentCard } from "@/components/common/Card/components/SectionContentCard/sectionContentCard";
-import { StyledStack } from "@/components/Docs/components/SectionContentCards/sectionContentCards.styles";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
-import { SectionContent } from "@repo/shared/views/docs/components/SectionContent/sectionContent";
-import { StyledSectionHero } from "@repo/shared/views/docs/components/SectionHero/sectionHero.styles";
-import { Fragment, type JSX } from "react";
-import { CARDS } from "./constants";
+import { SectionContentCards } from "@repo/shared/views/docs/components/SectionContentCards/sectionContentCards";
+import { ContentIndexView } from "@repo/shared/views/docs/ContentIndexView/contentIndexView";
+import { type JSX } from "react";
+import { getFilteredCards } from "./utils";
 
 export const LearnView = (): JSX.Element => {
   const isAssistantEnabled = useFeatureFlag("assistant");
   const isLmlsEnabled = useFeatureFlag("lmls");
-  const filteredCards = CARDS.filter(
-    (card) =>
-      (card.cardUrl !== "/learn/sequence-search-workflows" || isLmlsEnabled) &&
-      (card.cardUrl !== "/learn/assistant" || isAssistantEnabled)
-  );
-
+  const cards = getFilteredCards(isAssistantEnabled, isLmlsEnabled);
   return (
-    <Fragment>
-      <StyledSectionHero
-        breadcrumbs={[
-          { path: "/", text: "Home" },
-          { path: "", text: "Learn" },
-        ]}
-        head="Learn"
-        subHead={null}
-      />
-      <SectionContent
-        content={
-          <StyledStack>
-            {filteredCards.map((card, index) => (
-              <SectionContentCard key={index} {...card} />
-            ))}
-          </StyledStack>
-        }
-        frontmatter={null}
-        pageTitle="Learn"
-        slug={[]}
-      />
-    </Fragment>
+    <ContentIndexView
+      slotProps={{
+        content: {
+          content: <SectionContentCards cards={cards} />,
+          frontmatter: null,
+          pageTitle: "Learn",
+          slug: [],
+        },
+        hero: {
+          breadcrumbs: [
+            { path: "/", text: "Home" },
+            { path: "", text: "Learn" },
+          ],
+          head: "Learn",
+          subHead: null,
+        },
+      }}
+    />
   );
 };
