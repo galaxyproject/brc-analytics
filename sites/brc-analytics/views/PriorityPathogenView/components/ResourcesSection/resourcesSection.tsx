@@ -4,7 +4,7 @@ import { ListItem } from "@mui/material";
 import { FluidPaper } from "@repo/shared/components/Paper/components/FluidPaper/fluidPaper";
 import { JSX } from "react";
 import { StyledList } from "./resourcesSection.styles";
-import { Props } from "./types";
+import type { Props } from "./types";
 
 export const ResourcesSection = ({
   resources,
