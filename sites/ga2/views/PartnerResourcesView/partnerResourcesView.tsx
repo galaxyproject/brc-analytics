@@ -1,6 +1,6 @@
-import { SectionAbout } from "@/components/content/ga2";
 import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
 import { Fragment, JSX } from "react";
+import SectionAbout from "./content/sectionAbout.mdx";
 
 export const PartnerResourcesView = (): JSX.Element => {
   return (
