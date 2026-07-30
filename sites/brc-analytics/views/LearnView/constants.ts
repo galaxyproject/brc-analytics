@@ -1,12 +1,12 @@
-import { type SectionContentCard } from "@/components/common/Card/components/SectionContentCard/sectionContentCard";
+import { SectionContentCard } from "@/components/common/Card/components/SectionContentCard/sectionContentCard";
 import { SearchIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/SearchIcon/searchIcon";
+import { BookmarkStarIcon } from "@repo/shared/components/CustomIcon/components/BookmarkStarIcon/bookmarkStarIcon";
 import { GalaxyIcon } from "@repo/shared/components/CustomIcon/components/GalaxyIcon/galaxyIcon";
+import { LiveHelpIcon } from "@repo/shared/components/CustomIcon/components/LiveHelpIcon/liveHelpIcon";
 import { RocketLaunchIcon } from "@repo/shared/components/CustomIcon/components/RocketLaunchIcon/rocketLaunchIcon";
-import { type ComponentProps } from "react";
-import { BookmarkStarIcon } from "./components/icon/BookmarkStarIcon/bookmarkStarIcon";
-import { LiveHelpIcon } from "./components/icon/LiveHelpIcon/liveHelpIcon";
-import { SmartToyIcon } from "./components/icon/SmartToyIcon/smartToyIcon";
-import { YouTubeIcon } from "./components/icon/YouTubeIcon/youTubeIcon";
+import { SmartToyIcon } from "@repo/shared/components/CustomIcon/components/SmartToyIcon/smartToyIcon";
+import { YouTubeIcon } from "@repo/shared/components/CustomIcon/components/YouTubeIcon/youTubeIcon";
+import type { ComponentProps } from "react";
 
 export const CARDS: ComponentProps<typeof SectionContentCard>[] = [
   {

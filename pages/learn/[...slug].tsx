@@ -1,7 +1,7 @@
 import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
 import { sanitizeFrontmatter } from "@/docs/common/frontmatter/utils";
 import { sanitizeStaticProps } from "@/docs/common/staticGeneration/utils";
-import { LearnContentView } from "@/views/LearnContentView/learnContentView";
+import { LearnContentView } from "@brc/views/LearnContentView/learnContentView";
 import { buildStaticPaths } from "@databiosphere/findable-ui/lib/utils/mdx/staticGeneration/staticPaths";
 import { buildStaticProps } from "@databiosphere/findable-ui/lib/utils/mdx/staticGeneration/staticProps";
 import {
