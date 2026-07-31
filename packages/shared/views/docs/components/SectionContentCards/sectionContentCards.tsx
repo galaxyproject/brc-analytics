@@ -8,7 +8,7 @@ export const SectionContentCards = ({ cards }: Props): JSX.Element | null => {
   return (
     <StyledStack>
       {cards.map((card, i) => (
-        <SectionContentCard key={`${card.href}-${i}`} {...card} />
+        <SectionContentCard key={card.href ?? i} {...card} />
       ))}
     </StyledStack>
   );
