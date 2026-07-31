@@ -1,44 +1,8 @@
-import { Content } from "@/components/Docs/components/Content/content";
 import { MDX_COMPONENTS } from "@/docs/common/mdx/constants";
-import { ContentsTab } from "@databiosphere/findable-ui/lib/components/Layout/components/Outline/components/ContentsTab/contentsTab";
-import { Outline } from "@databiosphere/findable-ui/lib/components/Layout/components/Outline/outline";
 import type { StaticProps } from "@repo/shared/views/docs/common/staticGeneration/types";
-import { SectionContent } from "@repo/shared/views/docs/components/SectionContent/sectionContent";
-import { HeroImage } from "@repo/shared/views/docs/components/SectionHero/components/HeroImage/heroImage";
-import { StyledSectionHero } from "@repo/shared/views/docs/components/SectionHero/sectionHero.styles";
-import { MDXRemote } from "next-mdx-remote";
-import { Fragment, type JSX } from "react";
+import { ContentView } from "@repo/shared/views/docs/ContentView/contentView";
+import { type JSX } from "react";
 
 export const LearnContentView = (props: StaticProps): JSX.Element | null => {
-  const { frontmatter, mdxSource, outline, ...contentProps } = props;
-
-  if (!mdxSource) return null;
-
-  const { breadcrumbs, contentType, heroImage, title } = frontmatter || {};
-
-  return (
-    <Fragment>
-      <StyledSectionHero
-        breadcrumbs={breadcrumbs || []}
-        contentType={contentType}
-        head={title}
-        subHead={null}
-      />
-      <SectionContent
-        content={
-          <Fragment>
-            <HeroImage heroImage={heroImage} />
-            <Content>
-              <MDXRemote {...mdxSource} components={MDX_COMPONENTS} />
-            </Content>
-          </Fragment>
-        }
-        frontmatter={frontmatter}
-        outline={
-          outline && <Outline outline={outline} Contents={ContentsTab} />
-        }
-        {...contentProps}
-      />
-    </Fragment>
-  );
+  return <ContentView {...props} components={MDX_COMPONENTS} />;
 };
