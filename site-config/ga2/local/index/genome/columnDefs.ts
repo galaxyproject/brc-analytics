@@ -1,4 +1,4 @@
-import { GA2AssemblyEntity } from "@/apis/catalog/ga2/entities";
+import { type GA2AssemblyEntity } from "@/apis/catalog/ga2/entities";
 import * as C from "@/components";
 import {
   buildAccession,
@@ -28,8 +28,8 @@ import {
 } from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import * as V from "@/viewModelBuilders/catalog/ga2/viewModelBuilders";
 import {
-  ColumnConfig,
-  ComponentConfig,
+  type ColumnConfig,
+  type ComponentConfig,
 } from "@databiosphere/findable-ui/lib/config/entities";
 import { AnalyzeGenome } from "@repo/shared/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 import { LevelCell } from "@repo/shared/components/Table/components/TableCell/components/LevelCell/levelCell";

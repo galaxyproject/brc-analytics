@@ -12,7 +12,7 @@ import {
   SectionLayout,
   SubHeadline,
 } from "@repo/shared/views/docs/content.styles";
-import { MDXComponents } from "mdx/types";
+import { type MDXComponents } from "mdx/types";
 import * as C from "./app/components";
 import { CardActions } from "./app/components/Home/components/Section/components/SectionHero/components/Carousel/components/Cards/cards.styles";
 

@@ -1,5 +1,5 @@
-import { CONTRAST_MODE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseRadioGroup/types";
-import { RadioGroupProps, RadioProps } from "@mui/material";
+import { type CONTRAST_MODE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseRadioGroup/types";
+import { type RadioGroupProps, type RadioProps } from "@mui/material";
 
 export type Props = Pick<RadioGroupProps, "onChange" | "value"> &
   Pick<RadioProps, "disabled">;

@@ -2,7 +2,7 @@ import { Section } from "@/components/Entity/components/Section/section";
 import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { ListItem } from "@mui/material";
 import { FluidPaper } from "@repo/shared/components/Paper/components/FluidPaper/fluidPaper";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { StyledList } from "./resourcesSection.styles";
 import type { Props } from "./types";
 

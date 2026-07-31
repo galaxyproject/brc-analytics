@@ -3,7 +3,7 @@ import { AssemblyCell } from "@/views/OrganismView/components/Main/table/compone
 import { SelectionTracksCell } from "@/views/OrganismView/components/Main/table/components/TableCell/components/SelectionTracksCell/selectionTracksCell";
 import { ViewCell } from "@/views/OrganismView/components/Main/table/components/TableCell/components/ViewCell/viewCell";
 import { RefCell } from "@repo/shared/components/Table/components/TableCell/components/RefCell/refCell";
-import { ColumnDef } from "@tanstack/react-table";
+import { type ColumnDef } from "@tanstack/react-table";
 import { renderLevel } from "./viewBuilder";
 
 const ASSEMBLY: ColumnDef<PangenomeMember> = {

@@ -4,8 +4,8 @@ import { config } from "@/config/config";
 import { VisionView } from "@brc/views/VisionView/visionView";
 import type { PageProps } from "@pages/_app";
 import { ROUTES } from "@routes/constants";
-import { GetStaticProps } from "next";
-import { JSX } from "react";
+import { type GetStaticProps } from "next";
+import { type JSX } from "react";
 
 const Page = (): JSX.Element => {
   return <VisionView />;

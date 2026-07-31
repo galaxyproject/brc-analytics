@@ -1,4 +1,4 @@
-import { Fragment, JSX } from "react";
+import { Fragment, type JSX } from "react";
 import { FILL, GRID_SIZE } from "./common/constants";
 import { ELEMENT_ID } from "./common/types";
 import { getFillUrl, getViewBox } from "./common/utils";

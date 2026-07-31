@@ -1,4 +1,4 @@
-import { ChipProps } from "@mui/material";
+import { type ChipProps } from "@mui/material";
 
 type ChipPropsOptions = {
   COLOR: typeof COLOR;

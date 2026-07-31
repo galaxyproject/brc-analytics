@@ -1,10 +1,10 @@
 import { clearHandoff as clearHandoffAction } from "@repo/shared/providers/workflowHandoff/actions/clearHandoff/dispatch";
-import { ClearHandoffPayload } from "@repo/shared/providers/workflowHandoff/actions/clearHandoff/types";
+import { type ClearHandoffPayload } from "@repo/shared/providers/workflowHandoff/actions/clearHandoff/types";
 import { setHandoff as setHandoffAction } from "@repo/shared/providers/workflowHandoff/actions/setHandoff/dispatch";
-import { SetHandoffPayload } from "@repo/shared/providers/workflowHandoff/actions/setHandoff/types";
+import { type SetHandoffPayload } from "@repo/shared/providers/workflowHandoff/actions/setHandoff/types";
 import { WorkflowHandoffContext } from "@repo/shared/providers/workflowHandoff/context";
 import { useCallback, useContext } from "react";
-import { UseHandoffDispatch } from "./types";
+import { type UseHandoffDispatch } from "./types";
 
 /**
  * Hook returning handoff action dispatchers. Callers pass `entity` + `path`

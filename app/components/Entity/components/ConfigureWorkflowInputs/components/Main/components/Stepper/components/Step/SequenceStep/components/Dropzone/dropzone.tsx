@@ -8,8 +8,8 @@ import { Dot } from "@databiosphere/findable-ui/lib/components/common/Dot/dot";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Stack, Typography } from "@mui/material";
 import { FileUploadIcon } from "@repo/shared/components/CustomIcon/components/FileUploadIcon/fileUploadIcon";
-import { JSX } from "react";
-import { Props } from "./types";
+import { type JSX } from "react";
+import { type Props } from "./types";
 
 /**
  * FASTA file dropzone with click-to-upload support.

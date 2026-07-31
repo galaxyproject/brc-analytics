@@ -7,7 +7,7 @@ import {
 } from "@mui/material";
 import { Accordion } from "@repo/shared/components/Accordion/accordion";
 import { AccordionSummary } from "@repo/shared/components/Accordion/components/AccordionSummary/accordionSummary";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { Grid } from "./questions.styles";
 
 export const Questions = (): JSX.Element => {

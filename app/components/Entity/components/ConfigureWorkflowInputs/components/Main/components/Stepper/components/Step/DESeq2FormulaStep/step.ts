@@ -1,4 +1,4 @@
-import { StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
+import { type StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { DESeq2FormulaStep } from "./deSeq2FormulaStep";
 
 export const STEP = {

@@ -15,11 +15,11 @@ import { LOGAN_SEARCH } from "@repo/shared/workflow/loganSearch";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
 import {
-  ConfiguredValue,
+  type ConfiguredValue,
   isAssemblyConfiguredValue,
   isSequenceConfiguredValue,
-  Props,
-  UseLaunchGalaxy,
+  type Props,
+  type UseLaunchGalaxy,
 } from "./types";
 import {
   buildWorkflowRunPayload,

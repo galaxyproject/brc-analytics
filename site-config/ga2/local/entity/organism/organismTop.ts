@@ -1,9 +1,9 @@
-import { GA2OrganismEntity } from "@/apis/catalog/ga2/entities";
+import { type GA2OrganismEntity } from "@/apis/catalog/ga2/entities";
 import * as C from "@/components";
 import * as V from "@/viewModelBuilders/catalog/ga2/viewModelBuilders";
 import {
-  ComponentConfig,
-  ComponentsConfig,
+  type ComponentConfig,
+  type ComponentsConfig,
 } from "@databiosphere/findable-ui/lib/config/entities";
 
 export const organismTop: ComponentsConfig = [

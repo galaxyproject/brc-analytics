@@ -1,14 +1,14 @@
 import {
-  ClassificationMap,
-  COLUMN_TYPE,
+  type ClassificationMap,
+  type COLUMN_TYPE,
 } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 import {
   getColumnNames,
   validateClassifications,
 } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/utils";
-import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { type ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { useCallback, useMemo, useState } from "react";
-import { UseColumnClassification } from "./types";
+import { type UseColumnClassification } from "./types";
 import { initClassifications, updateClassification } from "./utils";
 
 /**

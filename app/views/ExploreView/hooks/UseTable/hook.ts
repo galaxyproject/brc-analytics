@@ -9,7 +9,7 @@ import {
   getFacetedRowModel,
   getFilteredRowModel,
   getSortedRowModel,
-  Table,
+  type Table,
   useReactTable,
 } from "@tanstack/react-table";
 

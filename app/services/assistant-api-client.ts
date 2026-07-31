@@ -5,7 +5,7 @@ import type {
   AssistantInfoResponse,
   SessionRestoreResponse,
 } from "@repo/shared/services/api-client/types";
-import ky, { HTTPError } from "ky";
+import ky, { type HTTPError } from "ky";
 
 const httpClient = ky.create({
   // Send the assistant session-binding cookie cross-origin. Without

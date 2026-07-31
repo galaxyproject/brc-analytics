@@ -3,8 +3,8 @@ import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chi
 import { STACK_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/stack";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Chip, Stack, Typography } from "@mui/material";
-import { CellContext } from "@tanstack/react-table";
-import { JSX } from "react";
+import { type CellContext } from "@tanstack/react-table";
+import { type JSX } from "react";
 
 /**
  * Assembly cell for the pangenome members table: the member name, an optional

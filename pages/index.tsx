@@ -6,9 +6,9 @@ import { HomeView } from "@/views/HomeView/homeView";
 import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
 import { useLayoutDimensions } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/hook";
 import { APP_KEYS } from "@site-config/common/constants";
-import { AppSiteConfig } from "@site-config/common/entities";
-import { GetStaticProps } from "next";
-import { JSX } from "react";
+import { type AppSiteConfig } from "@site-config/common/entities";
+import { type GetStaticProps } from "next";
+import { type JSX } from "react";
 
 export const Home = (): JSX.Element | null => {
   const { config } = useConfig();

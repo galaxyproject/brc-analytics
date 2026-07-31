@@ -2,7 +2,7 @@ import { MAX_DECK_SIZE } from "@/components/Home/components/Section/components/S
 import { getArrowTransform } from "@/components/Home/components/Section/components/SectionHero/components/Carousel/common/utils";
 import {
   SWIPE_ACTION,
-  SwipeAction,
+  type SwipeAction,
 } from "@/hooks/useSwipeInteraction/common/entities";
 import { COLOR_MIXES } from "@databiosphere/findable-ui/lib/styles/common/constants/colorMixes";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";

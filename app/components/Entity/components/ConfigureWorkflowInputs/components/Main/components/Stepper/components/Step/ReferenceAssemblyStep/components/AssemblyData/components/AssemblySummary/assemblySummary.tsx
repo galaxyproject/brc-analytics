@@ -11,9 +11,9 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { Fragment, JSX } from "react";
+import { Fragment, type JSX } from "react";
 import { StyledRoundedPaper, StyledStack } from "./assemblySummary.styles";
-import { Props } from "./types";
+import { type Props } from "./types";
 
 /**
  * Assembly summary component displaying the selected assembly details.

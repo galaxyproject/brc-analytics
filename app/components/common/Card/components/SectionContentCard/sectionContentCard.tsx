@@ -1,11 +1,11 @@
-import { CardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
+import { type CardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
 import { CardActionArea } from "@databiosphere/findable-ui/lib/components/common/Card/components/CardActionArea/cardActionArea";
 import { CardTitle } from "@databiosphere/findable-ui/lib/components/common/Card/components/CardTitle/cardTitle";
 import { ForwardArrowIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/ForwardArrowIcon/forwardArrowIcon";
 import { StaticImage } from "@databiosphere/findable-ui/lib/components/common/StaticImage/staticImage";
-import { BaseComponentProps } from "@databiosphere/findable-ui/lib/components/types";
+import { type BaseComponentProps } from "@databiosphere/findable-ui/lib/components/types";
 import { Typography } from "@mui/material";
-import { JSX } from "react";
+import { type JSX } from "react";
 import {
   CARD_PROPS,
   STACK_PROPS,
@@ -13,7 +13,7 @@ import {
   TYPOGRAPHY_PROPS,
 } from "./constants";
 import { StyledCard, StyledStack } from "./sectionContentCard.styles";
-import { Props } from "./types";
+import { type Props } from "./types";
 
 export const SectionContentCard = ({
   cardUrl,

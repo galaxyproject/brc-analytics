@@ -1,4 +1,4 @@
-import { ToggleButtonProps } from "@mui/material";
+import { type ToggleButtonProps } from "@mui/material";
 import { VIEW } from "./types";
 
 export const TOGGLE_BUTTONS: ToggleButtonProps[] = [

@@ -5,7 +5,7 @@ import { GridTable } from "@databiosphere/findable-ui/lib/components/Table/table
 import { getColumnTrackSizing } from "@databiosphere/findable-ui/lib/components/TableCreator/options/columnTrackSizing/utils";
 import { TableContainer } from "@mui/material";
 import type { RowData } from "@tanstack/react-table";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { useRowDirection } from "./hooks/UseRowDirection/hook";
 import type { Props } from "./types";
 

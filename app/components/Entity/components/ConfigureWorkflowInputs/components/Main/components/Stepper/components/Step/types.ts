@@ -1,15 +1,18 @@
 import {
-  OnContinue,
-  OnEdit,
+  type OnContinue,
+  type OnEdit,
 } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/types";
 import {
-  ConfiguredInput,
-  OnConfigure,
+  type ConfiguredInput,
+  type OnConfigure,
 } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { StepProps as MStepProps } from "@mui/material";
+import { type StepProps as MStepProps } from "@mui/material";
 import type { Workflow } from "@repo/shared/apis/workflow";
-import { ComponentType, ReactNode } from "react";
-import { OnLaunchGalaxy, Status } from "./hooks/UseLaunchGalaxy/types";
+import { type ComponentType, type ReactNode } from "react";
+import {
+  type OnLaunchGalaxy,
+  type Status,
+} from "./hooks/UseLaunchGalaxy/types";
 
 export interface StepConfig {
   description?: ReactNode;

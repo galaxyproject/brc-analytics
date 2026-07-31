@@ -8,9 +8,13 @@ import {
   buildMDXFilePath,
   buildMDXSlug,
 } from "@databiosphere/findable-ui/lib/utils/mdx/staticGeneration/utils";
-import { StaticProps } from "@repo/shared/views/docs/common/staticGeneration/types";
-import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
-import { JSX } from "react";
+import { type StaticProps } from "@repo/shared/views/docs/common/staticGeneration/types";
+import {
+  type GetStaticPaths,
+  type GetStaticProps,
+  type GetStaticPropsContext,
+} from "next";
+import { type JSX } from "react";
 
 const APPS_DIR = "app";
 const DOCS_DIR = "docs";

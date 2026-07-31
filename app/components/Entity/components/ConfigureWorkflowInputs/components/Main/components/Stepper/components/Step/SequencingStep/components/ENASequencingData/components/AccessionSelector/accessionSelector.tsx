@@ -13,9 +13,9 @@ import {
   OutlinedInput,
   Typography,
 } from "@mui/material";
-import { FormEvent, JSX } from "react";
+import { type FormEvent, type JSX } from "react";
 import { StyledDialog } from "./accessionSelector.styles";
-import { Props } from "./types";
+import { type Props } from "./types";
 
 export const AccessionSelector = ({
   clearErrors,

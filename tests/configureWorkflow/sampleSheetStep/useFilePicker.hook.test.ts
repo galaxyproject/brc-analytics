@@ -2,7 +2,7 @@ import { FALLBACK_ERROR } from "@/components/Entity/components/ConfigureWorkflow
 import { useFilePicker } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseFilePicker/hook";
 import { parseFile } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/utils";
 import { act, renderHook } from "@testing-library/react";
-import { ChangeEvent } from "react";
+import { type ChangeEvent } from "react";
 
 jest.mock(
   "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/hooks/UseFilePicker/utils",

@@ -10,39 +10,39 @@ const FILE_EXT = {
 } as const;
 
 import { COLUMN_TYPE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
-import { PrimaryContrasts } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { UcscTrack } from "@repo/shared/utils/ucsc-tracks-api/types";
+import { type PrimaryContrasts } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { type UcscTrack } from "@repo/shared/utils/ucsc-tracks-api/types";
 import {
   fetchUcscMd5Checksums,
   getChecksumForPath,
 } from "@repo/shared/utils/ucsc-tracks-api/ucsc-tracks-api";
 import ky from "ky";
 import {
-  DataLandingsBody,
-  DataLandingsBodyRequestState,
-  DataLandingsCollection,
-  DataLandingsCollectionTarget,
-  DataLandingsDatasetTarget,
-  DeSeq2ColumnDefinition,
-  DeSeq2PairedSample,
-  DeSeq2SampleSheetCollection,
-  DeSeq2WorkflowLandingsBody,
-  EnaFileInfo,
-  EnaSequencingReads,
-  GalaxyApiCommonUrlData,
-  GalaxyCollection,
-  GalaxyCollectionElement,
-  GalaxyLandingResponseData,
-  GalaxyListCollection,
-  GalaxyPairedCollection,
-  GalaxyUrlData,
-  LMLSWorkflowLandingsBody,
-  WorkflowCollectionElement,
-  WorkflowCollectionParameter,
-  WorkflowDatasetHash,
-  WorkflowLandingsBody,
-  WorkflowLandingsBodyRequestState,
-  WorkflowParameterValue,
+  type DataLandingsBody,
+  type DataLandingsBodyRequestState,
+  type DataLandingsCollection,
+  type DataLandingsCollectionTarget,
+  type DataLandingsDatasetTarget,
+  type DeSeq2ColumnDefinition,
+  type DeSeq2PairedSample,
+  type DeSeq2SampleSheetCollection,
+  type DeSeq2WorkflowLandingsBody,
+  type EnaFileInfo,
+  type EnaSequencingReads,
+  type GalaxyApiCommonUrlData,
+  type GalaxyCollection,
+  type GalaxyCollectionElement,
+  type GalaxyLandingResponseData,
+  type GalaxyListCollection,
+  type GalaxyPairedCollection,
+  type GalaxyUrlData,
+  type LMLSWorkflowLandingsBody,
+  type WorkflowCollectionElement,
+  type WorkflowCollectionParameter,
+  type WorkflowDatasetHash,
+  type WorkflowLandingsBody,
+  type WorkflowLandingsBodyRequestState,
+  type WorkflowParameterValue,
 } from "./entities";
 import { ftpToAscp } from "./url-utils";
 

@@ -1,6 +1,6 @@
 import { createContext } from "react";
 import { INITIAL_STATE } from "./constants";
-import { WorkflowHandoffContextValue } from "./types";
+import { type WorkflowHandoffContextValue } from "./types";
 
 /**
  * Context for the WorkflowInputsView state provider. The default `dispatch`

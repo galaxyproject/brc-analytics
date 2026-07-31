@@ -1,4 +1,4 @@
-import { COLUMN_TYPE, ColumnClassifications } from "./types";
+import { COLUMN_TYPE, type ColumnClassifications } from "./types";
 
 export interface ValidationResult {
   errors: string[];

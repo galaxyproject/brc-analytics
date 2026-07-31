@@ -1,5 +1,5 @@
 import { Stack } from "@mui/material";
-import { JSX } from "react";
+import { type JSX } from "react";
 import type { Props } from "./types";
 
 /**

@@ -1,4 +1,4 @@
-import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import { type SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
 import { formatTrsId } from "@repo/shared/workflow/utils";
 import { API } from "./routes";

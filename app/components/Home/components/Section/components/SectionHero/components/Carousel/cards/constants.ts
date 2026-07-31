@@ -1,5 +1,5 @@
 import * as MDX from "@/components/Home/components/Section/components/SectionHero/components/Carousel/content";
-import { CardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
+import { type CardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
 
 export const CAROUSEL_CARDS: Pick<CardProps, "text">[] = [
   {

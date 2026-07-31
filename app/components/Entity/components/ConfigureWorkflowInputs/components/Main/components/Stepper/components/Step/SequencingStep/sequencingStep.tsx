@@ -1,6 +1,6 @@
 import { ToggleButtonGroup } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/ToggleButtonGroup/toggleButtonGroup";
 import { useToggleButtonGroup } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseToggleButtonGroup/useToggleButtonGroup";
-import { StepProps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
+import { type StepProps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { getStepActiveState } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/utils/stepUtils";
 import {
   Loading,
@@ -10,7 +10,7 @@ import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/c
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
 import { HandoffStatusContext } from "@repo/shared/providers/workflowHandoff/contexts/HandoffStatus/context";
-import { JSX, useCallback, useContext } from "react";
+import { type JSX, useCallback, useContext } from "react";
 import { useColumnFilters } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseColumnFilters/hook";
 import { useRowSelection } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseRowSelection/hook";
 import { useTable } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseTable/hook";
@@ -19,7 +19,7 @@ import { useTaxonomyMatches } from "./components/ENASequencingData/components/Da
 import { ENASequencingData } from "./components/ENASequencingData/enaSequencingData";
 import { useENADataByAccession } from "./components/ENASequencingData/hooks/UseENADataByAccession/hook";
 import { useQuery } from "./components/ENASequencingData/query/hook";
-import { BaseReadRun } from "./components/ENASequencingData/types";
+import { type BaseReadRun } from "./components/ENASequencingData/types";
 import {
   clearSequencingData,
   getSelectedCount,

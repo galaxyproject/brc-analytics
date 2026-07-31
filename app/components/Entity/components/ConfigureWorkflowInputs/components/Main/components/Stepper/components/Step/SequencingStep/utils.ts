@@ -1,4 +1,4 @@
-import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { type ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { VIEW } from "./components/ToggleButtonGroup/types";
 
 /**

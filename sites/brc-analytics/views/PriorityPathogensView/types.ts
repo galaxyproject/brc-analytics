@@ -1,6 +1,6 @@
 import {
-  EntitiesResponse,
-  Outbreak,
+  type EntitiesResponse,
+  type Outbreak,
 } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 
 export interface Props {

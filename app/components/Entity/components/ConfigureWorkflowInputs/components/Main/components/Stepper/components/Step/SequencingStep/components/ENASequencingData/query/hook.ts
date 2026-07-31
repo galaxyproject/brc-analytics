@@ -1,14 +1,17 @@
 import {
-  BaseReadRun,
-  ENAReadRunsQuery,
+  type BaseReadRun,
+  type ENAReadRunsQuery,
 } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
 import { useWorkflowEntity } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/hook";
 import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
-import { AppSiteConfig } from "@site-config/common/entities";
-import { DefaultError, useQuery as useReactQuery } from "@tanstack/react-query";
+import { type AppSiteConfig } from "@site-config/common/entities";
+import {
+  type DefaultError,
+  useQuery as useReactQuery,
+} from "@tanstack/react-query";
 import { countQueryFn } from "./options/countQueryFn";
 import { queryFn } from "./options/queryFn";
-import { CountQueryKey, QueryKey } from "./types";
+import { type CountQueryKey, type QueryKey } from "./types";
 import { isEligible } from "./utils";
 
 /**

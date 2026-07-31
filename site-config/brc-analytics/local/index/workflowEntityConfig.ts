@@ -1,11 +1,11 @@
 import { getWorkflowId } from "@/apis/catalog/brc-analytics-catalog/common/utils";
-import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import { type EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
-import { AppEntityConfig } from "@site-config/common/entities";
+import { type AppEntityConfig } from "@site-config/common/entities";
 import { CATEGORY_GROUP_CONFIG } from "./workflow/categoryGroupConfig";
 import { COLUMNS } from "./workflow/columns";
 import { TABLE_OPTIONS } from "./workflow/tableOptions";
-import { WorkflowEntity } from "./workflow/types";
+import { type WorkflowEntity } from "./workflow/types";
 
 /**
  * Entity config object responsible to config anything related to the /workflows route.

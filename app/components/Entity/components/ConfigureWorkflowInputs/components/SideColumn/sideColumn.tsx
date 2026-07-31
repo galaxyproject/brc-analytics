@@ -11,8 +11,8 @@ import {
   GridPaper,
 } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import { CollapsableSection } from "@databiosphere/findable-ui/lib/components/common/Section/components/CollapsableSection/collapsableSection";
-import { JSX } from "react";
-import { Props } from "./types";
+import { type JSX } from "react";
+import { type Props } from "./types";
 
 export const SideColumn = ({
   configuredInput,

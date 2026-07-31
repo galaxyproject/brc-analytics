@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "@repo/shared/config/api";
-import ky, { HTTPError } from "ky";
+import ky, { type HTTPError } from "ky";
 import type {
   FavoriteResponse,
   SavedAnalysisDetail,

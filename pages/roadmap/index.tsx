@@ -1,8 +1,8 @@
 import { config } from "@/config/config";
 import { ROUTES } from "@routes/constants";
-import { GetStaticProps } from "next";
+import { type GetStaticProps } from "next";
 import Head from "next/head";
-import { JSX } from "react";
+import { type JSX } from "react";
 
 export default function Roadmap(): JSX.Element {
   return (

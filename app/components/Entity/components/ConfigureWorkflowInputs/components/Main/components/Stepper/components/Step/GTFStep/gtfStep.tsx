@@ -1,5 +1,5 @@
 import { StepWarning } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/StepWarning/stepWarning";
-import { StepProps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
+import { type StepProps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import {
   getButtonDisabledState,
   getStepActiveState,
@@ -26,7 +26,7 @@ import {
   RadioGroup,
   Typography,
 } from "@mui/material";
-import { Fragment, JSX, useEffect } from "react";
+import { Fragment, type JSX, useEffect } from "react";
 import { StyledGrid } from "./gtfStep.styles";
 import { useRadioGroup } from "./hooks/UseRadioGroup/hook";
 import { useQuery } from "./query/hook";

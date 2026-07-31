@@ -1,6 +1,6 @@
-import { SwipeAction } from "@/hooks/useSwipeInteraction/common/entities";
+import { type SwipeAction } from "@/hooks/useSwipeInteraction/common/entities";
 import { SouthIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/SouthIcon/southIcon";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { IconButton } from "./arrow.styles";
 
 interface ArrowProps {

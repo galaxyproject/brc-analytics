@@ -1,8 +1,8 @@
 import { useLayoutSpacing } from "@databiosphere/findable-ui/lib/hooks/UseLayoutSpacing/hook";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { PriorityPathogens } from "./components/PriorityPathogens/priorityPathogens";
 import { StyledGrid, StyledTitle } from "./priorityPathogensView.styles";
-import { Props } from "./types";
+import { type Props } from "./types";
 import { sortPriorityPathogen } from "./utils";
 
 export const PriorityPathogensView = (props: Props): JSX.Element => {

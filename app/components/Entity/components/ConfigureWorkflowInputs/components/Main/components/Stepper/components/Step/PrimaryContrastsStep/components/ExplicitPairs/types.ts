@@ -1,10 +1,10 @@
 import {
-  ContrastPairs,
-  OnAddPair,
-  OnRemovePair,
-  OnUpdatePair,
+  type ContrastPairs,
+  type OnAddPair,
+  type OnRemovePair,
+  type OnUpdatePair,
 } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseExplicitContrasts/types";
-import { CONTRAST_MODE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseRadioGroup/types";
+import { type CONTRAST_MODE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseRadioGroup/types";
 
 export interface Props {
   factorValues: string[];

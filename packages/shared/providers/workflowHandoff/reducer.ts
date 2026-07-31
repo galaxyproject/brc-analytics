@@ -1,10 +1,10 @@
 import { clearHandoffAction } from "./actions/clearHandoff/action";
 import { setHandoffAction } from "./actions/setHandoff/action";
 import {
-  WorkflowHandoffAction,
+  type WorkflowHandoffAction,
   WorkflowHandoffActionKind,
 } from "./actions/types";
-import { WorkflowHandoffState } from "./types";
+import { type WorkflowHandoffState } from "./types";
 
 /**
  * Reducer for the WorkflowInputsView state. Holds per-entity, per-path

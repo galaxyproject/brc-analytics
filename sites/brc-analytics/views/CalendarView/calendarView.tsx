@@ -4,7 +4,7 @@ import {
   SectionContent,
   SectionLayout,
 } from "@repo/shared/views/docs/content.styles";
-import { Fragment, JSX } from "react";
+import { Fragment, type JSX } from "react";
 import { BREADCRUMBS } from "./constants";
 
 export const CalendarView = (): JSX.Element => {

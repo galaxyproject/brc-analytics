@@ -1,13 +1,13 @@
 import { translateForSequencingStep } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/utils";
-import { StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
-import { OnConfigure } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { type StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
+import { type OnConfigure } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { findSequencingStepKey } from "@/views/WorkflowInputsView/sequencing/utils";
 import { useCurrentPath } from "@repo/shared/hooks/UseCurrentPath/hook";
 import { SEQUENCING_SOURCE } from "@repo/shared/providers/workflowHandoff/constants";
-import { HandoffStatus } from "@repo/shared/providers/workflowHandoff/contexts/HandoffStatus/types";
+import { type HandoffStatus } from "@repo/shared/providers/workflowHandoff/contexts/HandoffStatus/types";
 import { useHandoffDispatch } from "@repo/shared/providers/workflowHandoff/hooks/UseHandoffDispatch/hook";
 import { useHandoffInputs } from "@repo/shared/providers/workflowHandoff/hooks/UseHandoffInputs/hook";
-import { EntityKey } from "@repo/shared/providers/workflowHandoff/types";
+import { type EntityKey } from "@repo/shared/providers/workflowHandoff/types";
 import { useEffect, useMemo } from "react";
 import { useHandoffEnaQuery } from "./query/ena/hook";
 import { buildEnaUpdates } from "./utils";

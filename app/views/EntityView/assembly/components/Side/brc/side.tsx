@@ -9,9 +9,9 @@ import { BackPageContentSideColumn } from "@databiosphere/findable-ui/lib/compon
 import { AssemblyFavoriteButton } from "@repo/shared/components/Favorites/components/AssemblyFavoriteButton/assemblyFavoriteButton";
 import { AnalysisPortals } from "@repo/shared/views/EntityView/assembly/components/Side/AnalysisPortals/analysisPortals";
 import { KeyValueSection } from "@repo/shared/views/EntityView/components/KeyValueSection/keyValueSection";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { StyledSection } from "./side.styles";
-import { Props } from "./types";
+import { type Props } from "./types";
 
 /**
  * Side column component for the BRC AnalyzeView, displaying assembly details and resources.

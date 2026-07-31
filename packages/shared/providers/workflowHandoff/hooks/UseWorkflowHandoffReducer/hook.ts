@@ -1,6 +1,6 @@
 import { INITIAL_STATE } from "@repo/shared/providers/workflowHandoff/constants";
 import { workflowHandoffReducer } from "@repo/shared/providers/workflowHandoff/reducer";
-import { WorkflowHandoffContextValue } from "@repo/shared/providers/workflowHandoff/types";
+import { type WorkflowHandoffContextValue } from "@repo/shared/providers/workflowHandoff/types";
 import { useReducer } from "react";
 
 /**

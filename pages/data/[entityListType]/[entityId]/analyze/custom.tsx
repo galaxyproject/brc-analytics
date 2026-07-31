@@ -6,13 +6,13 @@ import { WorkflowInputsView } from "@/views/WorkflowInputsView/workflowInputsVie
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
 import { CUSTOM_WORKFLOW } from "@repo/shared/workflow/custom";
 import {
-  GetStaticPaths,
-  GetStaticPathsResult,
-  GetStaticProps,
-  GetStaticPropsContext,
+  type GetStaticPaths,
+  type GetStaticPathsResult,
+  type GetStaticProps,
+  type GetStaticPropsContext,
 } from "next";
-import { ParsedUrlQuery } from "querystring";
-import { JSX } from "react";
+import { type ParsedUrlQuery } from "querystring";
+import { type JSX } from "react";
 
 interface Params extends ParsedUrlQuery {
   entityId: string;

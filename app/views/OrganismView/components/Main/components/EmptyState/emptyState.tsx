@@ -1,8 +1,8 @@
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Typography } from "@mui/material";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { StyledFluidPaper } from "./emptyState.styles";
-import { Props } from "./types";
+import { type Props } from "./types";
 
 /**
  * Empty-state paper for an organism detail section.

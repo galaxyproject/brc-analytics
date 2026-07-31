@@ -1,7 +1,7 @@
 import { StyledViewSupport } from "@/components/Support/components/ViewSupport/viewSupport.styles";
 import {
-  ComponentConfig,
-  FloatingConfig,
+  type ComponentConfig,
+  type FloatingConfig,
 } from "@databiosphere/findable-ui/lib/config/entities";
 
 export const floating: FloatingConfig = {

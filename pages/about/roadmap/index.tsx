@@ -6,8 +6,8 @@ import { RoadmapView as RoadmapViewGA2 } from "@ga2/views/RoadmapView/roadmapVie
 import type { PageProps } from "@pages/_app";
 import { ROUTES } from "@routes/constants";
 import { APP_KEYS } from "@site-config/common/constants";
-import { GetStaticProps } from "next";
-import { JSX } from "react";
+import { type GetStaticProps } from "next";
+import { type JSX } from "react";
 
 const Page = (): JSX.Element => {
   const { appKey } = config();

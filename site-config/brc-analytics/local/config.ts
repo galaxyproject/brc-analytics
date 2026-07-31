@@ -1,24 +1,24 @@
 import {
-  BRCDataCatalogGenome,
-  BRCDataCatalogOrganism,
-  Outbreak,
+  type BRCDataCatalogGenome,
+  type BRCDataCatalogOrganism,
+  type Outbreak,
 } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "@/components";
-import { TaxonomyNode } from "@/components/Home/components/Section/components/SectionViz/data";
+import { type TaxonomyNode } from "@/components/Home/components/Section/components/SectionViz/data";
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
-import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import { type EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { ROUTES as SITE_ROUTES } from "@routes/constants";
 import { APP_KEYS } from "@site-config/common/constants";
-import { AppSiteConfig } from "@site-config/common/entities";
+import { type AppSiteConfig } from "@site-config/common/entities";
 import data from "catalog/output/ncbi-taxa-tree.json";
 import { createElement } from "react";
 import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organismEntityConfig";
 import { priorityPathogensEntityConfig } from "./index/priorityPathogensEntityConfig";
-import { WorkflowEntity } from "./index/workflow/types";
+import { type WorkflowEntity } from "./index/workflow/types";
 import { workflowEntityConfig } from "./index/workflowEntityConfig";
 import { socialMedia } from "./socialMedia";
 import { THEME_OPTIONS } from "./theme/constants";

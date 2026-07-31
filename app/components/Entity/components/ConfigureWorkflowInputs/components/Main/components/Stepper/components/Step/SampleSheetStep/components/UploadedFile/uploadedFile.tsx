@@ -6,8 +6,8 @@ import { FolderZipRounded } from "@mui/icons-material";
 import { IconButton, Stack, Typography } from "@mui/material";
 import { DeleteIcon } from "@repo/shared/components/CustomIcon/components/DeleteIcon/deleteIcon";
 import { ScanDeleteIcon } from "@repo/shared/components/CustomIcon/components/ScanDeleteIcon/scanDeleteIcon";
-import { JSX, ReactNode } from "react";
-import { Props } from "./types";
+import { type JSX, type ReactNode } from "react";
+import { type Props } from "./types";
 import { StyledRoundedPaper } from "./uploadedFile.styles";
 
 export const UploadedFile = ({

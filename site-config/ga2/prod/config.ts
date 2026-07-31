@@ -1,4 +1,4 @@
-import { AppSiteConfig } from "@site-config/common/entities";
+import { type AppSiteConfig } from "@site-config/common/entities";
 import { makeConfig } from "@site-config/ga2/local/config";
 
 const BROWSER_URL = "https://ga2.org";

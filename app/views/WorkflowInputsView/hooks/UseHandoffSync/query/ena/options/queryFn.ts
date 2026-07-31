@@ -1,9 +1,9 @@
-import { AccessionInfo } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/hooks/UseENADataByAccession/entities";
+import { type AccessionInfo } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/hooks/UseENADataByAccession/entities";
 import { fetchENAData } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/hooks/UseENADataByAccession/request";
 import { getAccessionType } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/hooks/UseENADataByAccession/utils";
-import { BaseReadRun } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
-import { QueryKey } from "@/views/WorkflowInputsView/hooks/UseHandoffSync/query/ena/types";
-import { QueryFunctionContext } from "@tanstack/react-query";
+import { type BaseReadRun } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
+import { type QueryKey } from "@/views/WorkflowInputsView/hooks/UseHandoffSync/query/ena/types";
+import { type QueryFunctionContext } from "@tanstack/react-query";
 
 /**
  * Fetch ENA read-run data for handoff accessions. Reuses `fetchENAData` so

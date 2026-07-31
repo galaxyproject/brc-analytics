@@ -1,7 +1,7 @@
-import { COLUMN_TYPE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
-import { Strandedness } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/StrandednessStep/types";
-import { EnaSequencingReads } from "@/utils/galaxy-api/entities";
-import { UcscTrack } from "@repo/shared/utils/ucsc-tracks-api/types";
+import { type COLUMN_TYPE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
+import { type Strandedness } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/StrandednessStep/types";
+import { type EnaSequencingReads } from "@/utils/galaxy-api/entities";
+import { type UcscTrack } from "@repo/shared/utils/ucsc-tracks-api/types";
 
 export interface AllVAllContrasts {
   type: "ALL_AGAINST_ALL";

@@ -1,4 +1,4 @@
-import { JSX, ReactNode } from "react";
+import { type JSX, type ReactNode } from "react";
 import { WorkflowHandoffContext } from "./context";
 import { useWorkflowHandoffReducer } from "./hooks/UseWorkflowHandoffReducer/hook";
 

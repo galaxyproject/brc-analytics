@@ -6,7 +6,7 @@ import {
 import { useAutoCycle } from "@/components/Home/components/Section/components/SectionSubHero/hooks";
 import { SubHeroContent } from "@/components/Home/content/ga2";
 import { AccordionDetails, AccordionSummary, Fade, Slide } from "@mui/material";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { ACCORDION, BUTTON, IMAGE } from "./instructions";
 import {
   AccordionBox,

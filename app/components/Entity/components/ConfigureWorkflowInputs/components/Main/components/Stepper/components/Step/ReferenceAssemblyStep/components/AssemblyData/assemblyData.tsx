@@ -1,9 +1,9 @@
 import { useDialog } from "@databiosphere/findable-ui/lib/components/common/Dialog/hooks/useDialog";
-import { Fragment, JSX } from "react";
+import { Fragment, type JSX } from "react";
 import { AssemblySelector } from "./components/AssemblySelector/assemblySelector";
 import { AssemblySummary } from "./components/AssemblySummary/assemblySummary";
 import { DataSelector } from "./components/DataSelector/dataSelector";
-import { Props } from "./types";
+import { type Props } from "./types";
 
 /**
  * Assembly data component managing the selector dialog and summary display.

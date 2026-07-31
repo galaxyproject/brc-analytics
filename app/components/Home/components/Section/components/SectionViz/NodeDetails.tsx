@@ -1,16 +1,16 @@
 import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import {
   Link as DXLink,
-  LinkProps,
+  type LinkProps,
 } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import {
   ArrowBackRounded,
   ChevronRightRounded,
   ViewListOutlined,
 } from "@mui/icons-material";
-import { HierarchyNode } from "d3";
-import React, { JSX } from "react";
-import { TaxonomyNode } from "./data";
+import { type HierarchyNode } from "d3";
+import React, { type JSX } from "react";
+import { type TaxonomyNode } from "./data";
 
 // Define additional properties used by D3 during transitions
 interface D3TransitionNode {

@@ -1,9 +1,9 @@
-import { BRCDataCatalogOrganism } from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import { type BRCDataCatalogOrganism } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "@/components";
 import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import {
-  ComponentConfig,
-  ComponentsConfig,
+  type ComponentConfig,
+  type ComponentsConfig,
 } from "@databiosphere/findable-ui/lib/config/entities";
 
 export const organismTop: ComponentsConfig = [

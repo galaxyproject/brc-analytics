@@ -3,7 +3,7 @@ import {
   ACCESSION_SEPARATOR_REGEX,
   ENA_ACCESSION_REGEX_PATTERN,
 } from "./constants";
-import { AccessionInfo } from "./entities";
+import { type AccessionInfo } from "./entities";
 
 /**
  * Determine the appropriate accession type based on the accession ID format.

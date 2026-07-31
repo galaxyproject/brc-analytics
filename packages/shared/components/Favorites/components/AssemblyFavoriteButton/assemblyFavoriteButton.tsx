@@ -3,7 +3,7 @@ import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { Button, CircularProgress, Tooltip } from "@mui/material";
 import { useAssemblyFavorites } from "@repo/shared/components/Favorites/hooks/UseAssemblyFavorites/hook";
 import { useAuth } from "@repo/shared/providers/authentication/provider";
-import { JSX } from "react";
+import { type JSX } from "react";
 import type { Props } from "./types";
 
 export function AssemblyFavoriteButton({ accession }: Props): JSX.Element {

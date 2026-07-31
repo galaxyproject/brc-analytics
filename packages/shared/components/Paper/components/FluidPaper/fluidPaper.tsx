@@ -1,6 +1,6 @@
-import { BaseComponentProps } from "@databiosphere/findable-ui/lib/components/types";
-import { PaperProps } from "@mui/material";
-import { JSX } from "react";
+import { type BaseComponentProps } from "@databiosphere/findable-ui/lib/components/types";
+import { type PaperProps } from "@mui/material";
+import { type JSX } from "react";
 import { StyledPaper } from "./fluidPaper.styles";
 
 export const FluidPaper = (

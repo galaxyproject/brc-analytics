@@ -1,6 +1,6 @@
 import {
-  ContrastPair,
-  ContrastPairs,
+  type ContrastPair,
+  type ContrastPairs,
 } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseExplicitContrasts/types";
 
 export interface Props {

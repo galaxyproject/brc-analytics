@@ -1,4 +1,4 @@
-import { DragEvent, ReactNode } from "react";
+import { type DragEvent, type ReactNode } from "react";
 
 export interface Props {
   children: ReactNode;

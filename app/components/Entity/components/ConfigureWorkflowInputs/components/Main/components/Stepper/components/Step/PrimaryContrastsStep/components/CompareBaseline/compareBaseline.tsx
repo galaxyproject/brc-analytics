@@ -15,9 +15,9 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { JSX, ReactNode } from "react";
+import { type JSX, type ReactNode } from "react";
 import { StyledStack, StyledTableContainer } from "./compareBaseline.styles";
-import { Props } from "./types";
+import { type Props } from "./types";
 
 export const CompareBaseline = ({
   baseline,

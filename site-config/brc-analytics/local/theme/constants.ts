@@ -1,4 +1,4 @@
-import { PaletteColorOptions, ThemeOptions } from "@mui/material";
+import { type PaletteColorOptions, type ThemeOptions } from "@mui/material";
 
 /**
  * Palette "Primary"

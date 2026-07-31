@@ -1,7 +1,7 @@
-import { ReadRun } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
+import { type ReadRun } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
 import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
-import { LinkProps } from "@mui/material";
-import { CellContext } from "@tanstack/react-table";
+import { type LinkProps } from "@mui/material";
+import { type CellContext } from "@tanstack/react-table";
 
 /**
  * Returns Fastq FTP cell context.

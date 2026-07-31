@@ -4,10 +4,10 @@ import { StyledSectionHero } from "@/components/Docs/components/SectionHero/sect
 import { MDX_COMPONENTS } from "@/docs/common/mdx/constants";
 import { ContentsTab } from "@databiosphere/findable-ui/lib/components/Layout/components/Outline/components/ContentsTab/contentsTab";
 import { Outline } from "@databiosphere/findable-ui/lib/components/Layout/components/Outline/outline";
-import { StaticProps } from "@repo/shared/views/docs/common/staticGeneration/types";
+import { type StaticProps } from "@repo/shared/views/docs/common/staticGeneration/types";
 import { SectionContent } from "@repo/shared/views/docs/components/SectionContent/sectionContent";
 import { MDXRemote } from "next-mdx-remote";
-import { Fragment, JSX } from "react";
+import { Fragment, type JSX } from "react";
 
 export const LearnContentView = (props: StaticProps): JSX.Element | null => {
   const { frontmatter, mdxSource, outline, ...contentProps } = props;

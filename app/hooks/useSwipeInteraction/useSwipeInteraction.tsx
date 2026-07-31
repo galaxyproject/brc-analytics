@@ -1,6 +1,6 @@
 import {
-  MouseEvent,
-  TouchEvent,
+  type MouseEvent,
+  type TouchEvent,
   useCallback,
   useEffect,
   useRef,
@@ -10,7 +10,11 @@ import {
   DEFAULT_ACTIVE_INDEX,
   DEFAULT_SWIPE_COORDINATES,
 } from "./common/constants";
-import { SWIPE_ACTION, SwipeAction, SwipeCoordinates } from "./common/entities";
+import {
+  SWIPE_ACTION,
+  type SwipeAction,
+  type SwipeCoordinates,
+} from "./common/entities";
 
 export interface InteractiveAction {
   onMouseDown: (mouseEvent: MouseEvent) => void;

@@ -1,5 +1,5 @@
-import { ColumnPreset } from "@/views/OrganismView/components/Main/types";
-import { RowData, TableOptions } from "@tanstack/react-table";
+import { type ColumnPreset } from "@/views/OrganismView/components/Main/types";
+import { type RowData, type TableOptions } from "@tanstack/react-table";
 
 export interface Props<T extends RowData> {
   columnPresets: ColumnPreset[];

@@ -15,7 +15,7 @@ import {
   SINGLE_FILE_STEP,
 } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/step";
 import { STEP as STRANDEDNESS_STEP } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/StrandednessStep/step";
-import { StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
+import { type StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { WORKFLOW_PARAMETER_VARIABLE } from "@repo/shared/apis/schema-types";
 
 export const SEQUENCING_STEPS: Record<string, StepConfig> = {

@@ -1,4 +1,4 @@
-import { CategoryGroup } from "@databiosphere/findable-ui/lib/config/entities";
+import { type CategoryGroup } from "@databiosphere/findable-ui/lib/config/entities";
 import { CATEGORY_CONFIGS } from "./categoryConfigs";
 
 export const CATEGORY_GROUPS: CategoryGroup[] = [

@@ -1,5 +1,5 @@
 import { StyledExploreView } from "@/views/ExploreView/exploreView.styles";
-import { JSX } from "react";
+import { type JSX } from "react";
 import type { Props } from "./types";
 import { getEntitiesResponse } from "./utils";
 

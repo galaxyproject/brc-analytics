@@ -1,7 +1,7 @@
 import { DEFAULT_ACCESSION_COUNT } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/AccessionCountStep/constants";
-import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { ChangeEvent, useCallback, useState } from "react";
-import { UseAccessionCount } from "./types";
+import { type ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { type ChangeEvent, useCallback, useState } from "react";
+import { type UseAccessionCount } from "./types";
 import { isValid } from "./utils";
 
 /**

@@ -1,10 +1,10 @@
-import { Assembly } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/ReferenceAssemblyStep/components/AssemblyData/components/AssemblySelector/hooks/UseTable/types";
+import { type Assembly } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/ReferenceAssemblyStep/components/AssemblyData/components/AssemblySelector/hooks/UseTable/types";
 import { useStepContext } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/ReferenceAssemblyStep/provider/hook";
 import { DEFAULT_CONFIGURED_INPUT } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/constants";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
 import { Button } from "@mui/material";
-import { CellContext } from "@tanstack/react-table";
-import { JSX } from "react";
+import { type CellContext } from "@tanstack/react-table";
+import { type JSX } from "react";
 
 /**
  * Select cell component rendering a select button for an assembly row.

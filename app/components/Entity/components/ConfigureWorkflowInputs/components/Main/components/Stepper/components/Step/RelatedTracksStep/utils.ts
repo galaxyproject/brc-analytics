@@ -1,9 +1,9 @@
 import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import {
-  UcscTrack,
-  UcscTrackNode,
+  type UcscTrack,
+  type UcscTrackNode,
 } from "@repo/shared/utils/ucsc-tracks-api/types";
-import { Table } from "@tanstack/react-table";
+import { type Table } from "@tanstack/react-table";
 
 /**
  * Returns the selected tracks.

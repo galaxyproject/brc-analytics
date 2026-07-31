@@ -1,14 +1,14 @@
 import {
-  ConfiguredInput,
-  OnConfigure,
+  type ConfiguredInput,
+  type OnConfigure,
 } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import type { Workflow } from "@repo/shared/apis/workflow";
 import {
-  OnLaunchGalaxy,
-  Status,
+  type OnLaunchGalaxy,
+  type Status,
 } from "./components/Step/hooks/UseLaunchGalaxy/types";
-import { StepConfig } from "./components/Step/types";
-import { OnContinue, OnEdit } from "./hooks/UseStepper/types";
+import { type StepConfig } from "./components/Step/types";
+import { type OnContinue, type OnEdit } from "./hooks/UseStepper/types";
 
 export interface Props {
   activeStep: number;

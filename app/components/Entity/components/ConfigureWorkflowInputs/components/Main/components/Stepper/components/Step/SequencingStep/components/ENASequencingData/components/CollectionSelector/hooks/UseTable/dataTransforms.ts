@@ -1,7 +1,7 @@
 import {
-  BaseReadRun,
-  ReadRun,
-  Validation,
+  type BaseReadRun,
+  type ReadRun,
+  type Validation,
 } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
 
 /**

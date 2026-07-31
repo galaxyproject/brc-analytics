@@ -1,5 +1,5 @@
-import { DragEvent, useCallback, useState } from "react";
-import { UseDropzone } from "./types";
+import { type DragEvent, useCallback, useState } from "react";
+import { type UseDropzone } from "./types";
 
 /**
  * Manages native HTML drag-and-drop state and event handlers for a dropzone element.

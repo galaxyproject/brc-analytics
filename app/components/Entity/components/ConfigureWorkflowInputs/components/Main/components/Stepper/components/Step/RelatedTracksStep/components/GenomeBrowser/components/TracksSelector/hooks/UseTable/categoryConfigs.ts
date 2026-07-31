@@ -1,5 +1,5 @@
 import { GROUP_ID_LABEL } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/components/GenomeBrowser/components/TracksSelector/components/TracksSelectionPanel/constants";
-import { CategoryConfig } from "@databiosphere/findable-ui/lib/common/categories/config/types";
+import { type CategoryConfig } from "@databiosphere/findable-ui/lib/common/categories/config/types";
 import { mapSelectCategoryValue } from "@repo/shared/utils/mapSelectCategoryValue";
 
 export const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {

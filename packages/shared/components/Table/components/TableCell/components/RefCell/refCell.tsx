@@ -1,7 +1,7 @@
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { Chip } from "@mui/material";
-import { CellContext } from "@tanstack/react-table";
-import { JSX } from "react";
+import { type CellContext } from "@tanstack/react-table";
+import { type JSX } from "react";
 
 interface BaseRowData {
   isRef: boolean;

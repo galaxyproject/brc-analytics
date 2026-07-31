@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { StepContext } from "./context";
-import { StepContextValue } from "./types";
+import { type StepContextValue } from "./types";
 
 /**
  * Custom hook to access the StepContext.

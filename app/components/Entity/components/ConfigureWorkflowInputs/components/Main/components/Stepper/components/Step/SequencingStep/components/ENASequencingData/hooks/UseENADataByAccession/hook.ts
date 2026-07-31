@@ -1,9 +1,9 @@
 import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
-import { FormEvent, useCallback, useState } from "react";
+import { type FormEvent, useCallback, useState } from "react";
 import { ValidationError } from "yup";
 import { fetchENAData } from "./request";
 import { SCHEMA } from "./schema";
-import { SubmitOptions, UseENADataByAccession } from "./types";
+import { type SubmitOptions, type UseENADataByAccession } from "./types";
 import { parseAccessionList } from "./utils";
 
 export const useENADataByAccession = <T>(): UseENADataByAccession<T> => {

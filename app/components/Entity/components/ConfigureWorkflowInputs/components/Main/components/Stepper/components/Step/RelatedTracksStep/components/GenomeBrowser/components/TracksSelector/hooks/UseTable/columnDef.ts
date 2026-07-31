@@ -1,8 +1,8 @@
 import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
 import { RowSelectOrExpand } from "@repo/shared/components/Table/components/TableCell/components/RowSelectOrExpand/rowSelectOrExpand";
-import { UcscTrackNode } from "@repo/shared/utils/ucsc-tracks-api/types";
-import { ColumnDef } from "@tanstack/react-table";
+import { type UcscTrackNode } from "@repo/shared/utils/ucsc-tracks-api/types";
+import { type ColumnDef } from "@tanstack/react-table";
 import { CATEGORY_CONFIGS } from "./categoryConfigs";
 
 const SELECT_FILTER_FN = "arrIncludesSome";

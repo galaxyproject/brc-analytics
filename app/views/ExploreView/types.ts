@@ -1,5 +1,5 @@
-import { Table } from "@tanstack/react-table";
-import { ComponentType } from "react";
+import { type Table } from "@tanstack/react-table";
+import { type ComponentType } from "react";
 
 export interface ComponentProps<T> {
   table: Table<T>;

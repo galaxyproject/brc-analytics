@@ -1,5 +1,5 @@
-import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { RowSelectionState } from "@tanstack/react-table";
+import { type ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { type RowSelectionState } from "@tanstack/react-table";
 import { useMemo } from "react";
 import { getRowSelectionState } from "./utils";
 

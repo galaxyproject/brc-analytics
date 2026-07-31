@@ -11,11 +11,11 @@ import {
   BackPageView,
 } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { getWorkflow } from "@repo/shared/services/workflows/entities";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { Top } from "./components/Top/top";
 import { useWorkflowEntities } from "./hooks/UseWorkflowEntities/hook";
 import { useConfiguredSteps } from "./steps/hook";
-import { Props } from "./types";
+import { type Props } from "./types";
 import { StyledBackPageContentMainColumn } from "./workflowView.styles";
 
 /**

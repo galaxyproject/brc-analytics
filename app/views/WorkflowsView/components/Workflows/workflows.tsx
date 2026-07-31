@@ -8,9 +8,9 @@ import { Title } from "@databiosphere/findable-ui/lib/components/Index/component
 import { useLayoutSpacing } from "@databiosphere/findable-ui/lib/hooks/UseLayoutSpacing/hook";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Typography } from "@mui/material";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { Card } from "./components/Card/card";
-import { Props } from "./types";
+import { type Props } from "./types";
 import {
   StyledContainer,
   StyledRoundedPaper,

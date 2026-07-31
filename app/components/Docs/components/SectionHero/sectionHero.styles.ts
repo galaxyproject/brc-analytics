@@ -7,7 +7,7 @@ import {
 } from "@repo/shared/components/layout/SectionHero/sectionHero.styles";
 import {
   CONTENT_TYPE,
-  FrontmatterProps,
+  type FrontmatterProps,
 } from "@repo/shared/views/docs/common/frontmatter/types";
 
 export const PADDING_Y_BOTTOM = 90;
