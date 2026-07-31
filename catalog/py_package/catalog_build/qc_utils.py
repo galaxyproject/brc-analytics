@@ -17,6 +17,8 @@ def _format_table_cell(value):
 
 def format_markdown_table(table_rows):
     # Render a list of dictionaries as a markdown table.
+    if not table_rows:
+        return ["_No rows present_", ""]
     columns = list(table_rows[0].keys())
     lines = [
         "| " + " | ".join(columns) + " |",
