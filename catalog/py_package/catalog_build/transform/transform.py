@@ -50,8 +50,12 @@ def _fetch_failure_sample(
 ) -> list[dict[str, object]]:
     # `relation_name` comes straight from dbt and is already fully qualified and
     # quoted, so we rely on it rather than reconstructing the (potentially
-    # truncated) audit table name ourselves.
-    relation = con.query(f"SELECT * FROM {relation_name} LIMIT {sample_size}")
+    # truncated) audit table name ourselves. `ORDER BY ALL` (sort by every
+    # column, left to right) makes the sampled rows deterministic across runs,
+    # since `LIMIT` on its own would otherwise return an arbitrary subset.
+    relation = con.query(
+        f"SELECT * FROM {relation_name} ORDER BY ALL LIMIT {sample_size}"
+    )
     columns = relation.columns
     return [dict(zip(columns, row)) for row in relation.fetchall()]
 
