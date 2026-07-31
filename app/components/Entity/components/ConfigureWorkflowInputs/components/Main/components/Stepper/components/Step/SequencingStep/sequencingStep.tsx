@@ -1,3 +1,7 @@
+import { ToggleButtonGroup } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/ToggleButtonGroup/toggleButtonGroup";
+import { useToggleButtonGroup } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseToggleButtonGroup/useToggleButtonGroup";
+import { StepProps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
+import { getStepActiveState } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/utils/stepUtils";
 import {
   Loading,
   LOADING_PANEL_STYLE,
@@ -7,10 +11,6 @@ import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/com
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
 import { HandoffStatusContext } from "@repo/shared/providers/workflowHandoff/contexts/HandoffStatus/context";
 import { JSX, useCallback, useContext } from "react";
-import { ToggleButtonGroup } from "../components/ToggleButtonGroup/toggleButtonGroup";
-import { useToggleButtonGroup } from "../hooks/UseToggleButtonGroup/useToggleButtonGroup";
-import { StepProps } from "../types";
-import { getStepActiveState } from "../utils/stepUtils";
 import { useColumnFilters } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseColumnFilters/hook";
 import { useRowSelection } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseRowSelection/hook";
 import { useTable } from "./components/ENASequencingData/components/CollectionSelector/hooks/UseTable/hook";

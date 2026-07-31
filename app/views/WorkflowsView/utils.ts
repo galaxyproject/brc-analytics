@@ -1,4 +1,6 @@
 import { workflowMeetsAssemblyMinimum } from "@/apis/catalog/brc-analytics-catalog/common/workflowAssembly";
+import type { Assembly } from "@/views/WorkflowInputsView/types";
+import { WorkflowCategoryId } from "@catalog/schema/generated/schema";
 import type { AssemblyContract } from "@repo/shared/apis/types";
 import type {
   WorkflowAssemblyMapping,
@@ -7,8 +9,6 @@ import type {
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
 import { LEXICMAP } from "@repo/shared/workflow/lexicmap";
 import { LOGAN_SEARCH } from "@repo/shared/workflow/loganSearch";
-import { WorkflowCategoryId } from "../../../catalog/schema/generated/schema";
-import type { Assembly } from "../WorkflowInputsView/types";
 import type { Organism, WorkflowAssembly, WorkflowEntity } from "./types";
 
 /**

@@ -3,11 +3,11 @@ import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles
 import { config } from "@/config/config";
 import { RoadmapView } from "@brc/views/RoadmapView/roadmapView";
 import { RoadmapView as RoadmapViewGA2 } from "@ga2/views/RoadmapView/roadmapView";
+import type { PageProps } from "@pages/_app";
+import { ROUTES } from "@routes/constants";
 import { APP_KEYS } from "@site-config/common/constants";
 import { GetStaticProps } from "next";
 import { JSX } from "react";
-import { ROUTES } from "../../../routes/constants";
-import type { PageProps } from "../../_app";
 
 const Page = (): JSX.Element => {
   const { appKey } = config();

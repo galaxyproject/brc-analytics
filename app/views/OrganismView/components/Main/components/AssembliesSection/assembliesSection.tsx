@@ -1,3 +1,4 @@
+import { EmptyState } from "@/views/OrganismView/components/Main/components/EmptyState/emptyState";
 import { StyledSectionTitle } from "@/views/OrganismView/components/Main/main.styles";
 import { Toolbar } from "@/views/OrganismView/components/Main/table/components/Toolbar/toolbar";
 import { useTable } from "@/views/OrganismView/components/Main/table/hooks/UseTable/hook";
@@ -9,7 +10,6 @@ import { Alert, Stack } from "@mui/material";
 import { Table } from "@repo/shared/components/Table/table";
 import type { RowData } from "@tanstack/react-table";
 import { JSX } from "react";
-import { EmptyState } from "../EmptyState/emptyState";
 import { Props } from "./types";
 
 /**

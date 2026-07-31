@@ -1,4 +1,4 @@
-import { WorkflowHandoffActionKind } from "../types";
+import { WorkflowHandoffActionKind } from "@repo/shared/providers/workflowHandoff/actions/types";
 import { ClearHandoffAction, ClearHandoffPayload } from "./types";
 
 /**

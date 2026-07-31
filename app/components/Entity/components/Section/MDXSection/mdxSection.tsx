@@ -1,7 +1,7 @@
+import { Section } from "@/components/Entity/components/Section/section";
 import { FluidPaper } from "@repo/shared/components/Paper/components/FluidPaper/fluidPaper";
 import { MDXRemote } from "next-mdx-remote";
 import { JSX } from "react";
-import { Section } from "../section";
 import { COMPONENTS } from "./constants";
 import { Props } from "./types";
 

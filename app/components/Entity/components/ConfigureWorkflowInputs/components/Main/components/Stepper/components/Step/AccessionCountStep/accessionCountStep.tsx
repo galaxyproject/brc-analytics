@@ -1,3 +1,4 @@
+import { StepProps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepContent/stepContent";
 import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Optional/optional";
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
@@ -5,7 +6,6 @@ import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/componen
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { Button, OutlinedInput } from "@mui/material";
 import { Fragment, JSX } from "react";
-import { StepProps } from "../types";
 import { StyledStack } from "./accessionCountStep.styles";
 import { useAccessionCount } from "./hooks/UseAccessionCount/hook";
 

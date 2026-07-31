@@ -1,4 +1,5 @@
 import { WORKFLOW_PARAMETER_BY_STEP_KEY } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/CollectionSelector/constants";
+import { CATEGORY_CONFIGS } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/CollectionSelector/hooks/UseTable/categoryConfigs";
 import {
   SEQUENCING_DATA_FILE_TYPE,
   SEQUENCING_DATA_TYPE,
@@ -7,7 +8,6 @@ import {
 import { StepProps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import type { Workflow, WorkflowParameter } from "@repo/shared/apis/workflow";
 import { ColumnFiltersState } from "@tanstack/react-table";
-import { CATEGORY_CONFIGS } from "../UseTable/categoryConfigs";
 import { isSequencingDataType } from "./typeGuards";
 
 /**

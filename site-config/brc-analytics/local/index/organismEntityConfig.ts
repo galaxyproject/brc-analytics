@@ -13,9 +13,9 @@ import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
 } from "@site-config/brc-analytics/category";
+import { organismMainColumn } from "@site-config/brc-analytics/local/entity/organism/organismMainColumn";
+import { organismTop } from "@site-config/brc-analytics/local/entity/organism/organismTop";
 import { AppEntityConfig } from "@site-config/common/entities";
-import { organismMainColumn } from "../entity/organism/organismMainColumn";
-import { organismTop } from "../entity/organism/organismTop";
 import { CATEGORY_GROUPS } from "./common/category/categories";
 import { COLUMN_REGISTRY } from "./common/column/columnRegistry";
 

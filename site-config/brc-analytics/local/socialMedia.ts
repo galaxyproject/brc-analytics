@@ -5,7 +5,7 @@ import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,
 } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
-import { ROUTES } from "../../../routes/constants";
+import { ROUTES } from "@routes/constants";
 
 export const SOCIALS = {
   CALENDAR: {

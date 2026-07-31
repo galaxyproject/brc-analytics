@@ -1,6 +1,6 @@
 import type { StaticProps as BaseStaticProps } from "@databiosphere/findable-ui/lib/utils/mdx/staticGeneration/types";
 import type { ThemeOptions } from "@mui/material";
-import type { FrontmatterProps } from "../frontmatter/types";
+import type { FrontmatterProps } from "@repo/shared/views/docs/common/frontmatter/types";
 
 export type StaticProps = BaseStaticProps<FrontmatterProps, PageStaticProps>;
 

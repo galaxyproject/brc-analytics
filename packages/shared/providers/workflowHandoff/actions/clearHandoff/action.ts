@@ -1,4 +1,4 @@
-import { WorkflowHandoffState } from "../../types";
+import { WorkflowHandoffState } from "@repo/shared/providers/workflowHandoff/types";
 import { ClearHandoffPayload } from "./types";
 
 /**
