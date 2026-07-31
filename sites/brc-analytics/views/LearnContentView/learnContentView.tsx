@@ -2,7 +2,7 @@ import { Content } from "@/components/Docs/components/Content/content";
 import { MDX_COMPONENTS } from "@/docs/common/mdx/constants";
 import { ContentsTab } from "@databiosphere/findable-ui/lib/components/Layout/components/Outline/components/ContentsTab/contentsTab";
 import { Outline } from "@databiosphere/findable-ui/lib/components/Layout/components/Outline/outline";
-import { type StaticProps } from "@repo/shared/views/docs/common/staticGeneration/types";
+import type { StaticProps } from "@repo/shared/views/docs/common/staticGeneration/types";
 import { SectionContent } from "@repo/shared/views/docs/components/SectionContent/sectionContent";
 import { HeroImage } from "@repo/shared/views/docs/components/SectionHero/components/HeroImage/heroImage";
 import { StyledSectionHero } from "@repo/shared/views/docs/components/SectionHero/sectionHero.styles";

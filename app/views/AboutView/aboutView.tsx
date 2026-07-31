@@ -1,8 +1,9 @@
-import { SectionContentCard } from "@/components/common/Card/components/SectionContentCard/sectionContentCard";
-import { StyledStack } from "@/components/Docs/components/SectionContentCards/sectionContentCards.styles";
 import { SectionContent } from "@repo/shared/views/docs/components/SectionContent/sectionContent";
+import { type SectionContentCard } from "@repo/shared/views/docs/components/SectionContentCard/sectionContentCard";
+import { SectionContentCards } from "@repo/shared/views/docs/components/SectionContentCards/sectionContentCards";
 import { StyledSectionHero } from "@repo/shared/views/docs/components/SectionHero/sectionHero.styles";
-import { type ComponentProps, Fragment, type JSX } from "react";
+import type { ComponentProps } from "react";
+import { Fragment, type JSX } from "react";
 
 interface AboutViewProps {
   cards: ComponentProps<typeof SectionContentCard>[];
@@ -20,13 +21,7 @@ export const AboutView = ({ cards }: AboutViewProps): JSX.Element => {
         subHead={null}
       />
       <SectionContent
-        content={
-          <StyledStack>
-            {cards.map((card) => (
-              <SectionContentCard key={card.cardUrl} {...card} />
-            ))}
-          </StyledStack>
-        }
+        content={<SectionContentCards cards={cards} />}
         frontmatter={null}
         pageTitle="About"
         slug={[]}

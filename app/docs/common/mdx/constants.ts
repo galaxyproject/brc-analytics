@@ -1,4 +1,3 @@
-import { SectionContentCards } from "@/components/Docs/components/SectionContentCards/sectionContentCards";
 import { SectionOverview } from "@/components/Docs/components/SectionOverview/sectionOverview";
 import { Link } from "@/components/Docs/components/common/Link/link";
 import { Table } from "@/components/Docs/components/common/Table/table";
@@ -7,6 +6,7 @@ import { VegaEmbed } from "@/components/common/VegaEmbed/vegaEmbed";
 import { Alert } from "@databiosphere/findable-ui/lib/components/common/Alert/alert";
 import { AnchorLink } from "@databiosphere/findable-ui/lib/components/common/AnchorLink/anchorLink";
 import { Figure } from "@repo/shared/components/mdx/Figure/figure";
+import { SectionContentCards } from "@repo/shared/views/docs/components/SectionContentCards/sectionContentCards";
 import { type MDXComponents } from "mdx/types";
 
 export const MDX_COMPONENTS: MDXComponents = {

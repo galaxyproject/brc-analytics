@@ -1,7 +1,7 @@
-import { CardActionArea } from "@databiosphere/findable-ui/lib/components/common/Card/components/CardActionArea/cardActionArea";
 import { CardTitle } from "@databiosphere/findable-ui/lib/components/common/Card/components/CardTitle/cardTitle";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { CardMedia, Stack, Typography } from "@mui/material";
+import { CardActionArea } from "@repo/shared/components/CardActionArea/cardActionArea";
 import { type Props } from "@repo/shared/views/docs/components/SectionOverview/types";
 import { type JSX } from "react";
 import { StyledCard, StyledStack } from "./sectionOverview.styles";
@@ -13,7 +13,7 @@ export const SectionOverview = ({ overview }: Props): JSX.Element | null => {
       {overview.map(({ date, href, image, title }) => {
         return (
           <StyledCard key={String(title)} elevation={0}>
-            <CardActionArea cardUrl={href}>
+            <CardActionArea href={href}>
               {typeof image?.src === "string" && (
                 <CardMedia alt={title} component="img" src={image.src} />
               )}
