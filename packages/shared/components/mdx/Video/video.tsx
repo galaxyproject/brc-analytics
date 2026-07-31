@@ -7,6 +7,7 @@ export const Video = ({ ...props }): JSX.Element | null => {
       allowFullScreen
       height="100%"
       sandbox="allow-scripts allow-same-origin allow-presentation"
+      title="Video"
       width="100%"
       {...props}
     />
