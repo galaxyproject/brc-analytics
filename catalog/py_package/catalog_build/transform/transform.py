@@ -60,26 +60,38 @@ def _fetch_failure_sample(
     return [dict(zip(columns, row)) for row in relation.fetchall()]
 
 
-def get_test_results(
-    runner: DBTPackageRunner, temp_folder_path: Path
-) -> list[DBTTestResult]:
+def _test_status_is_success(status: str) -> bool:
+    return status == "pass"
+
+
+def _get_test_results_from_runner(runner: DBTPackageRunner) -> list[DBTTestResult]:
+    return [
+        DBTTestResult(
+            test_name=runner_result.model_name,
+            success=_test_status_is_success(runner_result.status),
+            status=runner_result.status,
+            message=runner_result.message,
+        )
+        for runner_result in runner.test()
+    ]
+
+
+def _get_detailed_test_results(temp_folder_path: Path) -> list[DBTTestResult]:
     """
-    Run the dbt tests and collect their results, including a sample of failing
-    rows for each unsuccessful test.
+    Collect detailed results from a previous dbt test run, including a sample of
+    failing rows for each unsuccessful test.
 
     With store_failures enabled, dbt writes failing rows to audit tables; the
     run_results.json artifact records the exact table name for each test via its
     `relation_name`, which we query to pull the sample.
     """
-    # Execute the tests (this also refreshes run_results.json with the results).
-    runner.test()
     run_results = _load_run_results()
 
     results: list[DBTTestResult] = []
     with duckdb.connect(str(get_db_path(temp_folder_path)), read_only=True) as con:
         for node in run_results["results"]:
             status = node["status"]
-            success = status == "pass"
+            success = _test_status_is_success(status)
             test_name = _test_name_from_unique_id(node["unique_id"])
             failure_count = node.get("failures")
             relation_name = node.get("relation_name")
@@ -107,6 +119,24 @@ def get_test_results(
                 )
             )
     return results
+
+
+def get_test_results(
+    runner: DBTPackageRunner, temp_folder_path: Path
+) -> list[DBTTestResult]:
+    """
+    Run the dbt tests and collect their results.
+    """
+    # Execute the tests (this also refreshes run_results.json with the detailed results).
+    runner.test()
+
+    try:
+        return _get_detailed_test_results(temp_folder_path)
+    except Exception as e:
+        print(
+            f"Falling back to tests summary from dbt runner; reading detailed results failed: {e}"
+        )
+        return _get_test_results_from_runner(runner)
 
 
 def do_dbt_transformations(
