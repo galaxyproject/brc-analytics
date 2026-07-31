@@ -8,6 +8,28 @@ def write_markdown(path: str, text: str) -> None:
         fh.write(text)
 
 
+def _format_table_cell(value):
+    # Keep row values on a single markdown table cell/line.
+    if value is None:
+        return ""
+    return str(value).replace("\\", "\\\\").replace("|", "\\|").replace("\n", " ")
+
+
+def format_markdown_table(table_rows):
+    # Render a list of dictionaries as a markdown table.
+    columns = list(table_rows[0].keys())
+    lines = [
+        "| " + " | ".join(columns) + " |",
+        "| " + " | ".join("---" for _ in columns) + " |",
+    ]
+    for row in table_rows:
+        lines.append(
+            "| " + " | ".join(_format_table_cell(row[col]) for col in columns) + " |"
+        )
+    lines.append("")
+    return lines
+
+
 def section_header(title: str) -> List[str]:
     return [title, ""]
 

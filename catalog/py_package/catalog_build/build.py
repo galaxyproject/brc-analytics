@@ -18,7 +18,12 @@ from bs4 import BeautifulSoup
 from requests.exceptions import ConnectTimeout
 
 from .load import do_dlt_load
-from .qc_utils import format_list_section, format_raw_section, join_report
+from .qc_utils import (
+    format_list_section,
+    format_markdown_table,
+    format_raw_section,
+    join_report,
+)
 from .transform import DBTTestResult, do_dbt_transformations
 from .utils import get_db_path
 
@@ -1097,35 +1102,6 @@ def check_organisms_without_assemblies(
     ]
 
 
-def _format_dbt_failure_cell(value):
-    # Keep row values on a single markdown table cell/line.
-    if value is None:
-        return ""
-    return str(value).replace("\\", "\\\\").replace("|", "\\|").replace("\n", " ")
-
-
-def _format_dbt_failure_rows(sample_rows, failure_count):
-    # Render a sample of failing rows as a markdown table.
-    columns = list(sample_rows[0].keys())
-    lines = [
-        "| " + " | ".join(columns) + " |",
-        "| " + " | ".join("---" for _ in columns) + " |",
-    ]
-    for row in sample_rows:
-        lines.append(
-            "| "
-            + " | ".join(_format_dbt_failure_cell(row[col]) for col in columns)
-            + " |"
-        )
-    lines.append("")
-    if failure_count is not None and failure_count > len(sample_rows):
-        lines += [
-            f"_Showing {len(sample_rows)} of {failure_count} failing rows._",
-            "",
-        ]
-    return lines
-
-
 def format_dbt_test_failures_section(title, dbt_test_results):
     """
     Render the unsuccessful dbt tests, each with a sample of failing rows.
@@ -1153,7 +1129,13 @@ def format_dbt_test_failures_section(title, dbt_test_results):
         if result.message:
             lines += [result.message, ""]
         if result.failure_sample:
-            lines += _format_dbt_failure_rows(result.failure_sample, count)
+            sample_rows = result.failure_sample
+            lines += format_markdown_table(sample_rows)
+            if count is not None and count > len(sample_rows):
+                lines += [
+                    f"_Showing {len(sample_rows)} of {count} failing rows._",
+                    "",
+                ]
     return lines
 
 
