@@ -63,9 +63,9 @@ function shouldIncludeWorkflow(
   workflow: { trsId: string },
   isHyphyEnabled: boolean
 ): boolean {
-  const isHyphyWorkflow =
-    workflow.trsId ===
-    "#workflow/github.com/iwc-workflows/hyphy/capheine-core-and-compare/versions/v0.1";
+  const isHyphyWorkflow = workflow.trsId.startsWith(
+    "#workflow/github.com/iwc-workflows/hyphy/capheine-core-and-compare/versions/"
+  );
 
   return !isHyphyWorkflow || isHyphyEnabled;
 }
