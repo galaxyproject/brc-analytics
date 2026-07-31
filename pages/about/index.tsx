@@ -1,8 +1,8 @@
 import { getPageMeta } from "@/common/meta/utils";
 import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
 import { config } from "@/config/config";
-import { AboutView } from "@/views/AboutView/aboutView";
-import { BRC_CARDS, GA2_CARDS } from "@/views/AboutView/common/constants";
+import { AboutView } from "@brc/views/AboutView/aboutView";
+import { AboutView as GA2AboutView } from "@ga2/views/AboutView/aboutView";
 import type { PageProps } from "@pages/_app";
 import { ROUTES } from "@routes/constants";
 import { APP_KEYS } from "@site-config/common/constants";
@@ -11,7 +11,8 @@ import { type JSX } from "react";
 
 export const About = (): JSX.Element => {
   const { appKey } = config();
-  return <AboutView cards={appKey === APP_KEYS.GA2 ? GA2_CARDS : BRC_CARDS} />;
+  if (appKey === APP_KEYS.GA2) return <GA2AboutView />;
+  return <AboutView />;
 };
 
 export const getStaticProps: GetStaticProps<
