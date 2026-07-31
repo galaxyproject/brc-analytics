@@ -1,15 +1,15 @@
 import { useLayoutDimensions } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/hook";
-import { type JSX, type ReactNode } from "react";
+import { type JSX } from "react";
 import { StyledSectionContent } from "./content.styles";
+import { type Props } from "./types";
 
-export interface ContentProps {
-  children: ReactNode | ReactNode[];
-}
-
-export const Content = ({ children }: ContentProps): JSX.Element => {
+export const Content = ({ children, className }: Props): JSX.Element => {
   const { dimensions } = useLayoutDimensions();
   return (
-    <StyledSectionContent offset={dimensions.header.height}>
+    <StyledSectionContent
+      className={className}
+      offset={dimensions.header.height}
+    >
       {children}
     </StyledSectionContent>
   );
