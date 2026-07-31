@@ -1,9 +1,11 @@
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Sequence
 
 import duckdb
 from dlt.helpers.dbt.configuration import DBTRunnerConfiguration
+from dlt.helpers.dbt.exceptions import DBTNodeResult
 from dlt.helpers.dbt.runner import DBTPackageRunner, create_runner
 
 from ..utils import get_db_path, get_db_path_string
@@ -64,7 +66,9 @@ def _test_status_is_success(status: str) -> bool:
     return status == "pass"
 
 
-def _get_test_results_from_runner(runner: DBTPackageRunner) -> list[DBTTestResult]:
+def _get_test_results_from_runner(
+    runner_results: Sequence[DBTNodeResult],
+) -> list[DBTTestResult]:
     return [
         DBTTestResult(
             test_name=runner_result.model_name,
@@ -72,7 +76,7 @@ def _get_test_results_from_runner(runner: DBTPackageRunner) -> list[DBTTestResul
             status=runner_result.status,
             message=runner_result.message,
         )
-        for runner_result in runner.test()
+        for runner_result in runner_results
     ]
 
 
@@ -128,7 +132,7 @@ def get_test_results(
     Run the dbt tests and collect their results.
     """
     # Execute the tests (this also refreshes run_results.json with the detailed results).
-    runner.test()
+    runner_results = runner.test()
 
     try:
         return _get_detailed_test_results(temp_folder_path)
@@ -136,7 +140,7 @@ def get_test_results(
         print(
             f"Falling back to tests summary from dbt runner; reading detailed results failed: {e}"
         )
-        return _get_test_results_from_runner(runner)
+        return _get_test_results_from_runner(runner_results)
 
 
 def do_dbt_transformations(
