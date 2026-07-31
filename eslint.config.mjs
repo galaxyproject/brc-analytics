@@ -131,7 +131,7 @@ const config = [
         {
           patterns: [
             {
-              group: ["../*", "../**"],
+              group: ["..", "../*", "../**"],
               message:
                 "Reach outside this directory via the @/… alias; relative imports are for ./ same-dir and descendants only.",
             },
@@ -148,7 +148,7 @@ const config = [
         {
           patterns: [
             {
-              group: ["../*", "../**"],
+              group: ["..", "../*", "../**"],
               message:
                 "Reach outside this directory via the @repo/shared/… alias; relative imports are for ./ same-dir and descendants only.",
             },
@@ -165,7 +165,7 @@ const config = [
         {
           patterns: [
             {
-              group: ["../*", "../**"],
+              group: ["..", "../*", "../**"],
               message:
                 "Reach outside this directory via the @brc/… alias; relative imports are for ./ same-dir and descendants only.",
             },
@@ -182,7 +182,7 @@ const config = [
         {
           patterns: [
             {
-              group: ["../*", "../**"],
+              group: ["..", "../*", "../**"],
               message:
                 "Reach outside this directory via the @ga2/… alias; relative imports are for ./ same-dir and descendants only.",
             },
@@ -199,7 +199,7 @@ const config = [
         {
           patterns: [
             {
-              group: ["../*", "../**"],
+              group: ["..", "../*", "../**"],
               message:
                 "Reach outside this directory via an alias (@pages/…, @/…); relative imports are for ./ same-dir and descendants only.",
             },
@@ -216,7 +216,7 @@ const config = [
         {
           patterns: [
             {
-              group: ["../*", "../**"],
+              group: ["..", "../*", "../**"],
               message:
                 "Reach outside this directory via the @site-config/… alias; relative imports are for ./ same-dir and descendants only.",
             },
