@@ -1,6 +1,7 @@
 import { isClientSideNavigation } from "@databiosphere/findable-ui/lib/components/Links/common/utils";
 import { CardActionArea as MCardActionArea } from "@mui/material";
 import { type JSX } from "react";
+import { StyledCardActionArea } from "./cardActionArea.styles";
 import type { Props } from "./types";
 import { getLinkComponent, getRelAttribute, getTargetAttribute } from "./utils";
 
@@ -19,7 +20,7 @@ export const CardActionArea = ({
   const isInternalLink = isClientSideNavigation(href);
 
   return (
-    <MCardActionArea
+    <StyledCardActionArea
       className={className}
       LinkComponent={getLinkComponent(isInternalLink)}
       href={href}
@@ -27,6 +28,6 @@ export const CardActionArea = ({
       target={getTargetAttribute(isInternalLink)}
     >
       {children}
-    </MCardActionArea>
+    </StyledCardActionArea>
   );
 };
