@@ -1,3 +1,4 @@
+import { StepProps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { useAssembly } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/hook";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepContent/stepContent";
@@ -6,7 +7,6 @@ import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/com
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
 import { Button } from "@mui/material";
 import { Fragment, JSX, useEffect, useMemo } from "react";
-import { StepProps } from "../types";
 import { AssemblyData } from "./components/AssemblyData/assemblyData";
 import { useTable } from "./components/AssemblyData/components/AssemblySelector/hooks/UseTable/hook";
 import { StepContext } from "./provider/context";

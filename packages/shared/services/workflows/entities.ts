@@ -1,5 +1,8 @@
-import type { AssemblyContract, OrganismContract } from "../../apis/types";
-import type { Workflow, WorkflowCategory } from "../../apis/workflow";
+import type {
+  AssemblyContract,
+  OrganismContract,
+} from "@repo/shared/apis/types";
+import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
 import { findEntity, getEntities, getEntity } from "./query";
 
 /**

@@ -71,6 +71,7 @@ import {
   getGenomeSerotypeText,
   getGenomeStrainText,
 } from "@repo/shared/viewModelBuilders/viewModelBuilders";
+import { ROUTES as SITE_ROUTES } from "@routes/constants";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
@@ -80,7 +81,6 @@ import { LinkProps } from "next/link";
 import Router from "next/router";
 import { ComponentProps } from "react";
 import slugify from "slugify";
-import { ROUTES as SITE_ROUTES } from "../../../../../routes/constants";
 import { getPriorityColor, getPriorityLabel } from "./priority";
 
 // Transitional shim for the GA2/BRC split (monorepo-split): shared builders

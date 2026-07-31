@@ -2,10 +2,10 @@ import { BRC_PAGE_META } from "@/common/meta/brc/constants";
 import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
 import { config } from "@/config/config";
 import { VisionView } from "@brc/views/VisionView/visionView";
+import type { PageProps } from "@pages/_app";
+import { ROUTES } from "@routes/constants";
 import { GetStaticProps } from "next";
 import { JSX } from "react";
-import { ROUTES } from "../../../routes/constants";
-import type { PageProps } from "../../_app";
 
 const Page = (): JSX.Element => {
   return <VisionView />;

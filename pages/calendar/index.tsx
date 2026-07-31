@@ -2,9 +2,9 @@ import { BRC_PAGE_META } from "@/common/meta/brc/constants";
 import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
 import { config } from "@/config/config";
 import { CalendarView } from "@brc/views/CalendarView/calendarView";
+import { ROUTES } from "@routes/constants";
 import { GetStaticProps } from "next";
 import { JSX } from "react";
-import { ROUTES } from "../../routes/constants";
 
 export const Calendar = (): JSX.Element => {
   return <CalendarView />;

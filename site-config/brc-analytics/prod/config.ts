@@ -1,5 +1,5 @@
+import { makeConfig } from "@site-config/brc-analytics/local/config";
 import { AppSiteConfig } from "@site-config/common/entities";
-import { makeConfig } from "../local/config";
 
 const BROWSER_URL = "https://brc-analytics.org";
 

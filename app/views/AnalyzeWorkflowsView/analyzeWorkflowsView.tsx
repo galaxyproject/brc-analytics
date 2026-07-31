@@ -1,3 +1,5 @@
+import { Side } from "@/views/EntityView/assembly/components/Side/side";
+import { Assembly } from "@/views/WorkflowInputsView/types";
 import {
   BackPageContent,
   BackPageHero,
@@ -5,8 +7,6 @@ import {
 } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { getEntity } from "@repo/shared/services/workflows/query";
 import { JSX } from "react";
-import { Side } from "../EntityView/assembly/components/Side/side";
-import { Assembly } from "../WorkflowInputsView/types";
 import { Main } from "./components/Main/main";
 import { Top } from "./components/Top/top";
 import { Props } from "./types";

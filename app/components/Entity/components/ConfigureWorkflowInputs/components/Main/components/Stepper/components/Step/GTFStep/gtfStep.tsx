@@ -1,3 +1,9 @@
+import { StepWarning } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/StepWarning/stepWarning";
+import { StepProps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
+import {
+  getButtonDisabledState,
+  getStepActiveState,
+} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/utils/stepUtils";
 import { useAssembly } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/hook";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { RadioCheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioCheckedIcon/radioCheckedIcon";
@@ -21,9 +27,6 @@ import {
   Typography,
 } from "@mui/material";
 import { Fragment, JSX, useEffect } from "react";
-import { StepWarning } from "../components/StepWarning/stepWarning";
-import { StepProps } from "../types";
-import { getButtonDisabledState, getStepActiveState } from "../utils/stepUtils";
 import { StyledGrid } from "./gtfStep.styles";
 import { useRadioGroup } from "./hooks/UseRadioGroup/hook";
 import { useQuery } from "./query/hook";

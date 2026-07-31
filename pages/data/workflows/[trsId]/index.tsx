@@ -1,6 +1,7 @@
 import { getPageMeta } from "@/common/meta/utils";
 import { config } from "@/config/config";
 import { WorkflowView } from "@/views/WorkflowView/workflowView";
+import workflowCategories from "@catalog/output/workflows.json";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
 import { LEXICMAP } from "@repo/shared/workflow/lexicmap";
@@ -9,7 +10,6 @@ import { formatTrsId } from "@repo/shared/workflow/utils";
 import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { JSX } from "react";
-import workflowCategories from "../../../../catalog/output/workflows.json";
 
 interface Params extends ParsedUrlQuery {
   trsId: string;

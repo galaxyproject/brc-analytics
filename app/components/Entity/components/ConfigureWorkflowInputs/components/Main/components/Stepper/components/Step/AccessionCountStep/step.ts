@@ -1,4 +1,4 @@
-import { StepConfig } from "../types";
+import { StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { AccessionCountStep } from "./accessionCountStep";
 
 export const STEP = {

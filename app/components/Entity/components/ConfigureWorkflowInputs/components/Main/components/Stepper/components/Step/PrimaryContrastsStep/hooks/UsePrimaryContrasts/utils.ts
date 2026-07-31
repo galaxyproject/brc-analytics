@@ -1,10 +1,10 @@
+import { CONTRAST_MODE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseRadioGroup/types";
 import {
   AllVAllContrasts,
   BaselineContrasts,
   ExplicitContrasts,
   PrimaryContrasts,
 } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { CONTRAST_MODE } from "../UseRadioGroup/types";
 
 /**
  * Builds the primary contrasts configuration based on mode.

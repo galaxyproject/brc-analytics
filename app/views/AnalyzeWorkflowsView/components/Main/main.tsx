@@ -1,8 +1,8 @@
+import WORKFLOW_CATEGORIES from "@catalog/output/workflows.json";
 import { BackPageContentMainColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import type { WorkflowCategory } from "@repo/shared/apis/workflow";
 import { JSX } from "react";
-import WORKFLOW_CATEGORIES from "../../../../../catalog/output/workflows.json";
 import { Accordion } from "./components/Accordion/accordion";
 import { Props } from "./types";
 import { buildAssemblyWorkflows } from "./utils";

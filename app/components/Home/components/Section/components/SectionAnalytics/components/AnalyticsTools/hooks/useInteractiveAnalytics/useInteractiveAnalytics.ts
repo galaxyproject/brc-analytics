@@ -1,8 +1,8 @@
 import { ANALYTICS_TOOLS } from "@/components/Home/components/Section/components/SectionAnalytics/components/AnalyticsTools/common/constants";
+import { useIntersectionObserver } from "@/components/Home/components/Section/components/SectionAnalytics/components/AnalyticsTools/hooks/useIntersectionObserver/useIntersectionObserver";
 import { useSwipeInteraction } from "@/hooks/useSwipeInteraction/useSwipeInteraction";
 import { CardProps as DXCardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
 import { RefObject, useEffect, useMemo } from "react";
-import { useIntersectionObserver } from "../useIntersectionObserver/useIntersectionObserver";
 import { ROWS } from "./common/contants";
 import { UseInteractiveAnalytics } from "./common/entities";
 

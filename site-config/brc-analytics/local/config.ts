@@ -9,11 +9,11 @@ import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { ROUTES } from "@repo/shared/routes/constants";
+import { ROUTES as SITE_ROUTES } from "@routes/constants";
 import { APP_KEYS } from "@site-config/common/constants";
 import { AppSiteConfig } from "@site-config/common/entities";
 import data from "catalog/output/ncbi-taxa-tree.json";
 import { createElement } from "react";
-import { ROUTES as SITE_ROUTES } from "../../../routes/constants";
 import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organismEntityConfig";

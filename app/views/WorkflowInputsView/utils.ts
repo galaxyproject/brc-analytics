@@ -3,8 +3,8 @@ import {
   getGenomeSerotypeText,
   getGenomeStrainText,
 } from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import type { Organism } from "@/views/OrganismView/types";
 import type { AssemblyContract } from "@repo/shared/apis/types";
-import type { Organism } from "../OrganismView/types";
 
 /**
  * Maps an assembly to the shared organism shape consumed by the side panel, so the

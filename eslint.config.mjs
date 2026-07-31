@@ -117,6 +117,114 @@ const config = [
       "sonarjs/no-duplicate-string": "off",
     },
   },
+  // Intra-package import convention: relative imports only for same-directory
+  // and descendants (`./`); reach anything else through the package alias.
+  // Keeps a module's internal and external references to the same string
+  // (one grep finds every consumer) and stops the rule from depending on how
+  // deep a file happens to sit. Uses the typescript-eslint variant so it also
+  // catches `import type` specifiers.
+  {
+    files: ["app/**/*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["../*", "../**"],
+              message:
+                "Reach outside this directory via the @/… alias; relative imports are for ./ same-dir and descendants only.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["packages/shared/**/*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["../*", "../**"],
+              message:
+                "Reach outside this directory via the @repo/shared/… alias; relative imports are for ./ same-dir and descendants only.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["sites/brc-analytics/**/*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["../*", "../**"],
+              message:
+                "Reach outside this directory via the @brc/… alias; relative imports are for ./ same-dir and descendants only.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["sites/ga2/**/*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["../*", "../**"],
+              message:
+                "Reach outside this directory via the @ga2/… alias; relative imports are for ./ same-dir and descendants only.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["pages/**/*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["../*", "../**"],
+              message:
+                "Reach outside this directory via an alias (@pages/…, @/…); relative imports are for ./ same-dir and descendants only.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["site-config/**/*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["../*", "../**"],
+              message:
+                "Reach outside this directory via the @site-config/… alias; relative imports are for ./ same-dir and descendants only.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ];
 
 export default config;
