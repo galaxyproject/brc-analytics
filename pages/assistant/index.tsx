@@ -1,6 +1,6 @@
 import { BRC_PAGE_META } from "@/common/meta/brc/constants";
-import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
 import { AssistantView } from "@/views/AssistantView/assistantView";
+import { StyledPagesMain } from "@repo/shared/components/layout/Main/main.styles";
 import { type GetStaticProps } from "next";
 import { useRouter } from "next/router";
 import { type JSX } from "react";

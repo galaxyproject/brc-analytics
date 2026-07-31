@@ -1,3 +1,8 @@
+import { getDefaultDescription } from "@/common/meta/utils";
+import { config } from "@/config/config";
+import { useEntities } from "@/services/workflows/hooks/UseEntities/hook";
+import "@/styles/fonts/fonts.css";
+import { mergeAppTheme } from "@/theme/theme";
 import { type AzulEntitiesStaticResponse } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import { Error } from "@databiosphere/findable-ui/lib/components/Error/error";
 import { ErrorBoundary } from "@databiosphere/findable-ui/lib/components/ErrorBoundary/errorBoundary";
@@ -10,13 +15,6 @@ import { setFeatureFlags } from "@databiosphere/findable-ui/lib/hooks/useFeature
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import { ConfigProvider as DXConfigProvider } from "@databiosphere/findable-ui/lib/providers/config";
 import { ExploreStateProvider } from "@databiosphere/findable-ui/lib/providers/exploreState";
-
-import { getDefaultDescription } from "@/common/meta/utils";
-import { StyledFooter } from "@/components/Layout/components/Footer/footer.styles";
-import { config } from "@/config/config";
-import { useEntities } from "@/services/workflows/hooks/UseEntities/hook";
-import "@/styles/fonts/fonts.css";
-import { mergeAppTheme } from "@/theme/theme";
 import { LayoutDimensionsProvider } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/provider";
 import { ServicesProvider } from "@databiosphere/findable-ui/lib/providers/services/provider";
 import { SystemStatusProvider } from "@databiosphere/findable-ui/lib/providers/systemStatus";
@@ -24,6 +22,7 @@ import { type DataExplorerError } from "@databiosphere/findable-ui/lib/types/err
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { AppCacheProvider } from "@mui/material-nextjs/v16-pagesRouter";
+import { StyledFooter } from "@repo/shared/components/layout/Footer/footer.styles";
 import { OgMeta } from "@repo/shared/components/OgMeta/ogMeta";
 import { AuthProvider } from "@repo/shared/providers/authentication/provider";
 import { EntitiesLoadedProvider } from "@repo/shared/providers/entitiesLoaded/provider";

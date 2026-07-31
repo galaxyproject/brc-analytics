@@ -20,9 +20,3 @@ export { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
 export { OrganismAvatar } from "./Entity/components/OrganismAvatar/organismAvatar";
 export { MDXSection } from "./Entity/components/Section/MDXSection/mdxSection";
 export { Sections } from "./Entity/components/Sections/sections";
-export {
-  Branding,
-  GA2Branding,
-} from "./Layout/components/Footer/components/Branding/branding";
-export { VersionInfoWithServerStatus } from "./Layout/components/Footer/components/VersionInfoWithServerStatus/versionInfoWithServerStatus";
-export { AuthButton } from "./Layout/components/Header/components/AuthButton/authButton";

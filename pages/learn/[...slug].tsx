@@ -1,4 +1,3 @@
-import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
 import { config } from "@/config/config";
 import { LearnContentView } from "@brc/views/LearnContentView/learnContentView";
 import { buildStaticPaths } from "@databiosphere/findable-ui/lib/utils/mdx/staticGeneration/staticPaths";
@@ -7,6 +6,7 @@ import {
   buildMDXFilePath,
   buildMDXSlug,
 } from "@databiosphere/findable-ui/lib/utils/mdx/staticGeneration/utils";
+import { StyledPagesMain } from "@repo/shared/components/layout/Main/main.styles";
 import { sanitizeFrontmatter } from "@repo/shared/views/docs/common/frontmatter/utils";
 import type { StaticProps } from "@repo/shared/views/docs/common/staticGeneration/types";
 import { sanitizeStaticProps } from "@repo/shared/views/docs/common/staticGeneration/utils";

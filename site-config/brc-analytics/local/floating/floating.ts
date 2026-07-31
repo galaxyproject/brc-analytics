@@ -1,4 +1,4 @@
-import { StyledViewSupport } from "@/components/Support/components/ViewSupport/viewSupport.styles";
+import { StyledViewSupport } from "@brc/components/layout/ViewSupport/viewSupport.styles";
 import {
   type ComponentConfig,
   type FloatingConfig,

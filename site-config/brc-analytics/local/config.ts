@@ -5,6 +5,9 @@ import {
 } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "@/components";
 import { type TaxonomyNode } from "@/components/Home/components/Section/components/SectionViz/data";
+import { AuthButton } from "@brc/components/layout/AuthButton/authButton";
+import { Branding } from "@brc/components/layout/Branding/branding";
+import { VersionInfoWithServerStatus } from "@brc/components/layout/VersionInfoWithServerStatus/versionInfoWithServerStatus";
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { type EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
@@ -73,7 +76,7 @@ export function makeConfig(
     layout: {
       floating,
       footer: {
-        Branding: C.Branding(),
+        Branding: Branding(),
         navLinks: [
           {
             label: "BV-BRC",
@@ -87,10 +90,10 @@ export function makeConfig(
           },
         ],
         socials: socialMedia.socials,
-        versionInfo: createElement(C.VersionInfoWithServerStatus),
+        versionInfo: createElement(VersionInfoWithServerStatus),
       },
       header: {
-        actions: loginEnabled ? createElement(C.AuthButton) : undefined,
+        actions: loginEnabled ? createElement(AuthButton) : undefined,
         logo: C.Logo({
           alt: APP_TITLE,
           height: 26,

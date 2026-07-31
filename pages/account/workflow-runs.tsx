@@ -1,4 +1,3 @@
-import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
 import { type Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
   Alert,
@@ -9,6 +8,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { StyledPagesMain } from "@repo/shared/components/layout/Main/main.styles";
 import { SectionHero } from "@repo/shared/components/layout/SectionHero/sectionHero";
 import { useAuth } from "@repo/shared/providers/authentication/provider";
 import { apiClient } from "@repo/shared/services/api-client/api-client";
