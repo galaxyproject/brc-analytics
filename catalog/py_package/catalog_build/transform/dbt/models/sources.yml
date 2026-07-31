@@ -4,6 +4,7 @@ version: 2
 # so the test node names (reported by dlt's dbt runner) and the store_failures
 # audit table names stay readable. Without these, dbt's generated names for the
 # relationships tests in particular are long enough to be truncated and hashed.
+# The name lengths should be limited to 63 bytes for Postgres compatibility.
 sources:
   - name: ncbi
     description: >
@@ -17,41 +18,41 @@ sources:
           - name: tax_id
             data_tests:
               - not_null:
-                  name: not_null_ncbi_nodes_tax_id
+                  name: ncbi_nodes_have_tax_ids
           - name: parent_tax_id
             data_tests:
               - not_null:
-                  name: not_null_ncbi_nodes_parent_tax_id
+                  name: ncbi_nodes_have_parents
           - name: rank
             data_tests:
               - not_null:
-                  name: not_null_ncbi_nodes_rank
+                  name: ncbi_nodes_have_ranks
       - name: taxonomy_names
         description: "names.dmp - one row per name."
         columns:
           - name: tax_id
             data_tests:
               - not_null:
-                  name: not_null_ncbi_names_tax_id
+                  name: ncbi_names_have_tax_ids
           - name: name_txt
             data_tests:
               - not_null:
-                  name: not_null_ncbi_names_name_txt
+                  name: ncbi_names_have_names
           - name: name_class
             data_tests:
               - not_null:
-                  name: not_null_ncbi_names_name_class
+                  name: ncbi_names_have_classes
       - name: taxonomy_merged
         description: "merged.dmp — maps a merged (old) tax_id to its current tax_id."
         columns:
           - name: old_tax_id
             data_tests:
               - not_null:
-                  name: not_null_ncbi_merged_old_tax_id
+                  name: ncbi_merged_have_old_id
           - name: new_tax_id
             data_tests:
               - not_null:
-                  name: not_null_ncbi_merged_new_tax_id
+                  name: ncbi_merged_have_new_id
 
   - name: catalog_source
     description: >
@@ -63,9 +64,9 @@ sources:
           - name: taxonomy_id
             data_tests:
               - not_null:
-                  name: not_null_source_assembly_taxa_taxonomy_id
+                  name: catalog_assemblies_have_tax_ids
               - relationships:
-                  name: rel_source_assembly_taxa_to_assemblies
+                  name: catalog_assembly_taxa_in_assembly_taxonomy
                   arguments:
                     to: ref('taxonomy_assemblies')
                     field: taxonomy_id
@@ -74,9 +75,9 @@ sources:
           - name: taxonomy_id
             data_tests:
               - not_null:
-                  name: not_null_source_organism_taxa_taxonomy_id
+                  name: catalog_organisms_have_tax_ids
               - relationships:
-                  name: rel_source_organism_taxa_to_organisms
+                  name: catalog_organism_taxa_in_organism_taxonomy
                   arguments:
                     to: ref('taxonomy_organisms')
                     field: taxonomy_id
@@ -86,11 +87,11 @@ sources:
           - name: taxonomy_id
             data_tests:
               - not_null:
-                  name: not_null_source_outbreak_taxa_taxonomy_id
+                  name: catalog_outbreaks_have_tax_ids
                   config:
                     enabled: "{{ var('has_outbreaks', false) }}"
               - relationships:
-                  name: rel_source_outbreak_taxa_to_outbreaks
+                  name: catalog_outbreak_taxa_in_outbreak_taxonomy
                   arguments:
                     to: ref('taxonomy_outbreaks')
                     field: taxonomy_id
