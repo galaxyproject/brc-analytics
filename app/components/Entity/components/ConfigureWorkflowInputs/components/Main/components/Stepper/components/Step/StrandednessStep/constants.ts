@@ -1,4 +1,4 @@
-import { FormControlLabelProps } from "@mui/material";
+import { type FormControlLabelProps } from "@mui/material";
 import { STRANDEDNESS } from "./types";
 
 export const STRANDEDNESS_LABELS: Record<STRANDEDNESS, string> = {

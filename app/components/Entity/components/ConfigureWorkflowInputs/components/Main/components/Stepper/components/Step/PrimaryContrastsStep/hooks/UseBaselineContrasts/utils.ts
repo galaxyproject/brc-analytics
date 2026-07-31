@@ -1,5 +1,5 @@
 import { CONTRAST_MODE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseRadioGroup/types";
-import { BaselineContrasts } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { type BaselineContrasts } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 
 /**
  * Builds the primary contrasts for BASELINE mode.

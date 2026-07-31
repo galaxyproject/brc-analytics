@@ -1,5 +1,5 @@
-import { UseSwipeInteraction } from "@/hooks/useSwipeInteraction/useSwipeInteraction";
-import { CardProps as DXCardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
+import { type UseSwipeInteraction } from "@/hooks/useSwipeInteraction/useSwipeInteraction";
+import { type CardProps as DXCardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
 
 export interface UseInteractiveAnalyticsAndData {
   activeIndex: UseSwipeInteraction["activeIndex"];

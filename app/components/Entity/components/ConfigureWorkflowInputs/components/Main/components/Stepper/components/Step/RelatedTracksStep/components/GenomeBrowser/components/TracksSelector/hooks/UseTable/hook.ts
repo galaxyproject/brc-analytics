@@ -1,4 +1,4 @@
-import { UseUCSCTracks } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/hooks/UseUCSCTracks/types";
+import { type UseUCSCTracks } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/hooks/UseUCSCTracks/types";
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 import { arrIncludesSome } from "@databiosphere/findable-ui/lib/components/Table/columnDef/columnFilters/filterFn";
 import { getFacetedUniqueValuesWithArrayValues } from "@databiosphere/findable-ui/lib/components/Table/common/utils";
@@ -6,15 +6,15 @@ import { getFacetedMinMaxValues } from "@databiosphere/findable-ui/lib/component
 import { ROW_POSITION } from "@databiosphere/findable-ui/lib/components/Table/features/RowPosition/constants";
 import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/features/RowPreview/constants";
 import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/features/TableDownload/constants";
-import { UcscTrackNode } from "@repo/shared/utils/ucsc-tracks-api/types";
+import { type UcscTrackNode } from "@repo/shared/utils/ucsc-tracks-api/types";
 import {
   getCoreRowModel,
   getExpandedRowModel,
   getFacetedRowModel,
   getFilteredRowModel,
   getGroupedRowModel,
-  InitialTableState,
-  Table,
+  type InitialTableState,
+  type Table,
   useReactTable,
 } from "@tanstack/react-table";
 import { CATEGORY_GROUPS } from "./categoryGroups";

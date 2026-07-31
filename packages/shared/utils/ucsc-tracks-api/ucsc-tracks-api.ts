@@ -1,5 +1,12 @@
-import { UcscApiResponseTrack, ucscApiResponseTrackSchema } from "./schema";
-import { UcscTrack, UcscTrackComposite, UcscTrackNode } from "./types";
+import {
+  type UcscApiResponseTrack,
+  ucscApiResponseTrackSchema,
+} from "./schema";
+import {
+  type UcscTrack,
+  type UcscTrackComposite,
+  type UcscTrackNode,
+} from "./types";
 
 const TRACKS_API_URL = "https://api.genome.ucsc.edu/list/tracks";
 const FILES_API_URL = "https://api.genome.ucsc.edu/list/files";

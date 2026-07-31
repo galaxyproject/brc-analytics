@@ -1,5 +1,9 @@
 import { BUTTON_PROPS as MUI_BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
-import { ButtonProps, GridProps, MenuProps } from "@mui/material";
+import {
+  type ButtonProps,
+  type GridProps,
+  type MenuProps,
+} from "@mui/material";
 
 export const BUTTON_PROPS = {
   color: MUI_BUTTON_PROPS.COLOR.PRIMARY,

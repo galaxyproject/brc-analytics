@@ -1,7 +1,7 @@
 import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Stack, Typography } from "@mui/material";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { TagList } from "./components/TagList/tagList";
 import type { Props } from "./types";
 

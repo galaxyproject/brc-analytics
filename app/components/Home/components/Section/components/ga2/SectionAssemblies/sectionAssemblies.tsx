@@ -3,7 +3,7 @@ import {
   SectionSubtitle,
   SectionTitle,
 } from "@/components/Home/components/Section/section.styles";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { Headline, Section, SectionLayout } from "./sectionAssemblies.styles";
 
 export const SectionAssemblies = (): JSX.Element => {

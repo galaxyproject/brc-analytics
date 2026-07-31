@@ -1,5 +1,5 @@
 import { SectionHero } from "@repo/shared/components/layout/SectionHero/sectionHero";
-import { Fragment, JSX } from "react";
+import { Fragment, type JSX } from "react";
 import SectionAbout from "./content/sectionAbout.mdx";
 
 export const PartnerResourcesView = (): JSX.Element => {

@@ -1,4 +1,4 @@
-import { UcscTrack } from "@repo/shared/utils/ucsc-tracks-api/types";
+import { type UcscTrack } from "@repo/shared/utils/ucsc-tracks-api/types";
 
 export type Track = Omit<UcscTrack, "isComposite"> & {
   groupId: string;

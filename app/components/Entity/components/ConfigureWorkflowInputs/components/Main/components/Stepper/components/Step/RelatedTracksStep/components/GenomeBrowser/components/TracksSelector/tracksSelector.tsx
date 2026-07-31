@@ -2,11 +2,11 @@ import { ColumnFilters } from "@/components/Entity/components/ConfigureWorkflowI
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { DialogTitle } from "@databiosphere/findable-ui/lib/components/common/Dialog/components/DialogTitle/dialogTitle";
 import { Button, DialogActions, DialogContent } from "@mui/material";
-import { RowSelectionState } from "@tanstack/table-core";
-import { JSX, useCallback, useState } from "react";
+import { type RowSelectionState } from "@tanstack/table-core";
+import { type JSX, useCallback, useState } from "react";
 import { TracksSelectionPanel } from "./components/TracksSelectionPanel/tracksSelectionPanel";
 import { StyledDialog } from "./tracksSelector.styles";
-import { Props } from "./types";
+import { type Props } from "./types";
 import { getTracksData } from "./utils";
 
 export const TracksSelector = ({

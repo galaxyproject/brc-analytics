@@ -9,7 +9,7 @@ import {
 } from "@repo/shared/components/layout/SectionHero/components/Hero/common/utils";
 import { SmokeCircle } from "@repo/shared/components/layout/SectionHero/components/Hero/components/Defs/SmokeCircle/smokeCircle";
 import { SmokeRect } from "@repo/shared/components/layout/SectionHero/components/Hero/components/Defs/SmokeRect/smokeRect";
-import { Fragment, JSX } from "react";
+import { Fragment, type JSX } from "react";
 import { SVG } from "./hero.styles";
 
 export interface HeroProps {

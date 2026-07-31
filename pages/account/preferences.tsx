@@ -1,5 +1,5 @@
 import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
-import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
+import { type Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
   Alert,
   Box,
@@ -12,7 +12,7 @@ import {
 import { SectionHero } from "@repo/shared/components/layout/SectionHero/sectionHero";
 import { useAuth } from "@repo/shared/providers/authentication/provider";
 import { apiClient } from "@repo/shared/services/api-client/api-client";
-import { JSX, useEffect, useState } from "react";
+import { type JSX, useEffect, useState } from "react";
 
 const BREADCRUMBS: Breadcrumb[] = [
   {

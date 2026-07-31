@@ -7,7 +7,7 @@ import { VegaEmbed } from "@/components/common/VegaEmbed/vegaEmbed";
 import { Alert } from "@databiosphere/findable-ui/lib/components/common/Alert/alert";
 import { AnchorLink } from "@databiosphere/findable-ui/lib/components/common/AnchorLink/anchorLink";
 import { Figure } from "@repo/shared/components/mdx/Figure/figure";
-import { MDXComponents } from "mdx/types";
+import { type MDXComponents } from "mdx/types";
 
 export const MDX_COMPONENTS: MDXComponents = {
   Alert,

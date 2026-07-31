@@ -2,7 +2,7 @@ import { VALIDATION_LABELS } from "@/components/Entity/components/ConfigureWorkf
 import { mapValidation } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/components/ClassificationValidation/utils";
 import {
   COLUMN_TYPE,
-  ColumnClassifications,
+  type ColumnClassifications,
 } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 
 const EXPECTED = {

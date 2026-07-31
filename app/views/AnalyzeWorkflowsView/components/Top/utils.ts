@@ -1,7 +1,7 @@
-import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
+import { type Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { ROUTES } from "@repo/shared/routes/constants";
-import { Props } from "./types";
+import { type Props } from "./types";
 
 /**
  * Returns breadcrumbs for the AnalyzeWorkflowsView component.

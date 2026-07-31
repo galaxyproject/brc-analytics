@@ -1,4 +1,7 @@
-import { GroupingState, VisibilityState } from "@tanstack/react-table";
+import {
+  type GroupingState,
+  type VisibilityState,
+} from "@tanstack/react-table";
 import { CATEGORY_CONFIGS } from "./categoryConfigs";
 
 export const COLUMN_VISIBILITY: VisibilityState = {

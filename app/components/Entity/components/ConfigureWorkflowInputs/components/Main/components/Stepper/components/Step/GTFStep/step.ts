@@ -1,4 +1,4 @@
-import { StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
+import { type StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import { GTFStep } from "./gtfStep";
 import { getGeneModelLabel } from "./utils";

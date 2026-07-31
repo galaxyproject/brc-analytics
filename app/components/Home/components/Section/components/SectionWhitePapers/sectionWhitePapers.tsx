@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { formatDate } from "@repo/shared/utils/date-fns/utils";
 import Link from "next/link";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { WHITE_PAPERS } from "./constants";
 import {
   Section,

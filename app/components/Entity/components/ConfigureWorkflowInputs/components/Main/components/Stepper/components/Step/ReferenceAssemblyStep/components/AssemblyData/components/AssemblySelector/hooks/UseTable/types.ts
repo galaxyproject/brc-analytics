@@ -1,5 +1,5 @@
-import { Assembly as BaseAssembly } from "@/views/WorkflowInputsView/types";
-import { Table } from "@tanstack/react-table";
+import { type Assembly as BaseAssembly } from "@/views/WorkflowInputsView/types";
+import { type Table } from "@tanstack/react-table";
 
 export type Assembly = BaseAssembly;
 

@@ -55,6 +55,10 @@ const config = [
     ],
     rules: {
       "@eslint-community/eslint-comments/require-description": "error",
+      "@typescript-eslint/consistent-type-imports": [
+        "error",
+        { fixStyle: "inline-type-imports" },
+      ],
       "@typescript-eslint/no-unused-vars": [
         "error",
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },

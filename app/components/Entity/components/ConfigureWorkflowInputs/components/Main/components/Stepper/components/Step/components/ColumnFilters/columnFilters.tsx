@@ -1,14 +1,14 @@
 import { ColumnFiltersAdapter } from "@databiosphere/findable-ui/lib/components/Filter/components/adapters/tanstack/ColumnFiltersAdapter/columnFiltersAdapter";
 import { Controls } from "@databiosphere/findable-ui/lib/components/Filter/components/controls/Controls/controls";
 import { Filters } from "@databiosphere/findable-ui/lib/components/Filter/components/Filters/filters";
-import { SurfaceProps } from "@databiosphere/findable-ui/lib/components/Filter/components/surfaces/types";
-import { RowData } from "@tanstack/react-table";
-import { JSX } from "react";
+import { type SurfaceProps } from "@databiosphere/findable-ui/lib/components/Filter/components/surfaces/types";
+import { type RowData } from "@tanstack/react-table";
+import { type JSX } from "react";
 import {
   StyledContainer,
   StyledSearchAllFilters,
 } from "./columnFilters.styles";
-import { Props } from "./types";
+import { type Props } from "./types";
 import { getCategoryViews } from "./utils";
 
 export const ColumnFilters = <T extends RowData>({

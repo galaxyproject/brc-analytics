@@ -1,4 +1,4 @@
-import { SortingState, VisibilityState } from "@tanstack/react-table";
+import { type SortingState, type VisibilityState } from "@tanstack/react-table";
 import { CATEGORY_CONFIGS } from "./categoryConfigs";
 
 export const COLUMN_VISIBILITY: VisibilityState = { tax_id: false };

@@ -1,6 +1,6 @@
 import { ToggleButton } from "@mui/material";
-import { RowData } from "@tanstack/react-table";
-import { JSX } from "react";
+import { type RowData } from "@tanstack/react-table";
+import { type JSX } from "react";
 import { StyledToggleButtonGroup } from "./columnPresetToggle.styles";
 import { TOGGLE_BUTTON_GROUP_PROPS } from "./constants";
 import { useColumnPresets } from "./hooks/UseColumnPresets/hook";

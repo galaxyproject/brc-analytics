@@ -1,7 +1,7 @@
-import { WorkflowHandoffActionKind } from "@repo/shared/providers/workflowHandoff/actions/types";
+import { type WorkflowHandoffActionKind } from "@repo/shared/providers/workflowHandoff/actions/types";
 import {
-  EntityKey,
-  HandoffInputs,
+  type EntityKey,
+  type HandoffInputs,
 } from "@repo/shared/providers/workflowHandoff/types";
 
 /**

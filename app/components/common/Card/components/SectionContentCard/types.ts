@@ -1,5 +1,5 @@
-import { StaticImage } from "@databiosphere/findable-ui/lib/components/common/StaticImage/staticImage";
-import { ComponentProps, ElementType } from "react";
+import { type StaticImage } from "@databiosphere/findable-ui/lib/components/common/StaticImage/staticImage";
+import { type ComponentProps, type ElementType } from "react";
 
 export interface Props {
   EndIcon?: ElementType;

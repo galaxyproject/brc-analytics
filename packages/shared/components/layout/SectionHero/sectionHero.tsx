@@ -1,5 +1,5 @@
 import { Breadcrumbs } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
-import { Fragment, JSX } from "react";
+import { Fragment, type JSX } from "react";
 import { calculateGridSize } from "./components/Hero/common/utils";
 import { Hero } from "./components/Hero/hero";
 import {

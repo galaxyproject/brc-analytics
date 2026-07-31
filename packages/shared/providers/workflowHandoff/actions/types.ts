@@ -1,5 +1,5 @@
-import { ClearHandoffAction } from "./clearHandoff/types";
-import { SetHandoffAction } from "./setHandoff/types";
+import { type ClearHandoffAction } from "./clearHandoff/types";
+import { type SetHandoffAction } from "./setHandoff/types";
 
 /**
  * Union of all WorkflowInputsView actions.

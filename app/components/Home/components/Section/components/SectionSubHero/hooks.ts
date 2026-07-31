@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { UseAutoCycle } from "./types";
+import { type UseAutoCycle } from "./types";
 
 export function useAutoCycle(indexKeys: string[]): UseAutoCycle {
   const cycleRef = useRef<NodeJS.Timeout | null>(null);

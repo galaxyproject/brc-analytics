@@ -1,20 +1,24 @@
 import {
-  BRCCatalog,
-  EntitiesResponse,
+  type BRCCatalog,
+  type EntitiesResponse,
 } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import { GA2Catalog } from "@/apis/catalog/ga2/entities";
+import { type GA2Catalog } from "@/apis/catalog/ga2/entities";
 import { getEntityDetailMeta } from "@/common/meta/utils";
 import { config } from "@/config/config";
 import { getEntities, getEntity } from "@/utils/entityUtils";
 import { seedDatabase } from "@/utils/seedDatabase";
 import { AnalyzeView } from "@/views/AnalyzeView/analyzeView";
 import { EntityDetailView } from "@/views/EntityView/entityView";
-import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import { type EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { getEntityConfig } from "@databiosphere/findable-ui/lib/config/utils";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
-import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
-import { ParsedUrlQuery } from "querystring";
-import { JSX } from "react";
+import {
+  type GetStaticPaths,
+  type GetStaticProps,
+  type GetStaticPropsContext,
+} from "next";
+import { type ParsedUrlQuery } from "querystring";
+import { type JSX } from "react";
 
 interface StaticPath {
   params: PageUrl;

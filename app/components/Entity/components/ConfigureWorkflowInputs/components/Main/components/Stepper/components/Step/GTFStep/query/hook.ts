@@ -1,12 +1,12 @@
-import { Assembly } from "@/views/WorkflowInputsView/types";
+import { type Assembly } from "@/views/WorkflowInputsView/types";
 import {
-  DefaultError,
-  UseQueryResult,
+  type DefaultError,
+  type UseQueryResult,
   useQuery as useReactQuery,
 } from "@tanstack/react-query";
 import { queryFn } from "./options/queryFn";
 import { select } from "./options/select";
-import { QueryKey } from "./types";
+import { type QueryKey } from "./types";
 import { getAssemblyId } from "./utils";
 
 /**

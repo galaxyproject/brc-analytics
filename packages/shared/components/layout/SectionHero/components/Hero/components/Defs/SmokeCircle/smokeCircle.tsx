@@ -4,7 +4,7 @@ import {
   PATTERN_UNIT,
 } from "@repo/shared/components/layout/SectionHero/components/Hero/common/types";
 import { getElementHref } from "@repo/shared/components/layout/SectionHero/components/Hero/common/utils";
-import { JSX } from "react";
+import { type JSX } from "react";
 import type { Props } from "./types";
 
 export const SmokeCircle = ({ gridSize }: Props): JSX.Element => {

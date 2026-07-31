@@ -1,5 +1,5 @@
 import { CONTRAST_MODE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseRadioGroup/types";
-import { RadioGroupOption } from "./types";
+import { type RadioGroupOption } from "./types";
 
 export const OPTIONS: RadioGroupOption[] = [
   {

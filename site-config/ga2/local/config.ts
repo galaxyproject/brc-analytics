@@ -1,20 +1,20 @@
 import {
-  GA2AssemblyEntity,
-  GA2OrganismEntity,
+  type GA2AssemblyEntity,
+  type GA2OrganismEntity,
 } from "@/apis/catalog/ga2/entities";
 import * as C from "@/components";
-import { TaxonomyNode } from "@/components/Home/components/Section/components/SectionViz/data";
+import { type TaxonomyNode } from "@/components/Home/components/Section/components/SectionViz/data";
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
-import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import { type EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { ROUTES as SITE_ROUTES } from "@routes/constants";
 import { APP_KEYS } from "@site-config/common/constants";
-import { AppSiteConfig } from "@site-config/common/entities";
+import { type AppSiteConfig } from "@site-config/common/entities";
 import data from "catalog/ga2/output/ncbi-taxa-tree.json";
 import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genome/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organism/organismEntityConfig";
-import { WorkflowEntity } from "./index/workflow/types";
+import { type WorkflowEntity } from "./index/workflow/types";
 import { workflowEntityConfig } from "./index/workflow/workflowEntityConfig";
 import { socialMedia } from "./socialMedia";
 import { THEME_OPTIONS } from "./theme/constants";

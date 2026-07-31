@@ -8,9 +8,9 @@ import { Button, Grid, Typography } from "@mui/material";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { formatTrsId } from "@repo/shared/workflow/utils";
 import Link from "next/link";
-import { Fragment, JSX } from "react";
+import { Fragment, type JSX } from "react";
 import { GRID_PROPS } from "./constants";
-import { Props } from "./types";
+import { type Props } from "./types";
 import { StyledGrid } from "./workflow.styles";
 
 /**

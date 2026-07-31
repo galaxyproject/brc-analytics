@@ -1,5 +1,5 @@
-import { FrontmatterProps } from "@repo/shared/views/docs/common/frontmatter/types";
-import { JSX } from "react";
+import { type FrontmatterProps } from "@repo/shared/views/docs/common/frontmatter/types";
+import { type JSX } from "react";
 import { StyledImage } from "./heroImage.styles";
 
 export const HeroImage = ({

@@ -1,6 +1,6 @@
 import { RoundedPaper as DXRoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
-import { AccordionProps as MAccordionProps } from "@mui/material";
-import { JSX } from "react";
+import { type AccordionProps as MAccordionProps } from "@mui/material";
+import { type JSX } from "react";
 import { StyledAccordion } from "./accordion.styles";
 
 export const Accordion = ({

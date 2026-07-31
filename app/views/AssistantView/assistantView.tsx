@@ -6,7 +6,7 @@ import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import { Button } from "@mui/material";
 import type { AssistantInfoResponse } from "@repo/shared/services/api-client/types";
 import Error from "next/error";
-import { JSX, useEffect, useState } from "react";
+import { type JSX, useEffect, useState } from "react";
 import {
   AssistantDisclaimer,
   ChatColumn,

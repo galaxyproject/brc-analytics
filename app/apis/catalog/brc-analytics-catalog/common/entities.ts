@@ -1,6 +1,9 @@
-import { ORGANISM_PLOIDY } from "@repo/shared/apis/schema-types";
-import { MDXRemoteSerializeResult } from "next-mdx-remote";
-import { OUTBREAK_PRIORITY, OUTBREAK_RESOURCE_TYPE } from "./schema-entities";
+import { type ORGANISM_PLOIDY } from "@repo/shared/apis/schema-types";
+import { type MDXRemoteSerializeResult } from "next-mdx-remote";
+import {
+  type OUTBREAK_PRIORITY,
+  type OUTBREAK_RESOURCE_TYPE,
+} from "./schema-entities";
 
 export type BRCCatalog =
   | BRCDataCatalogGenome

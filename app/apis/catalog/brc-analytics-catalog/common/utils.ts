@@ -4,8 +4,11 @@ import {
 } from "@repo/shared/apis/schema-types";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
 import { formatTrsId } from "@repo/shared/workflow/utils";
-import { WorkflowEntity } from "@site-config/brc-analytics/local/index/workflow/types";
-import { BRCDataCatalogGenome, BRCDataCatalogOrganism } from "./entities";
+import { type WorkflowEntity } from "@site-config/brc-analytics/local/index/workflow/types";
+import {
+  type BRCDataCatalogGenome,
+  type BRCDataCatalogOrganism,
+} from "./entities";
 
 export function getGenomeId(genome: BRCDataCatalogGenome): string {
   return sanitizeEntityId(genome.accession);

@@ -1,7 +1,11 @@
 import { CHIP_PROPS as MUI_CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { SVG_ICON_PROPS as MUI_SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
 import { TYPOGRAPHY_PROPS as MUI_TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
-import { ChipProps, SvgIconProps, TypographyProps } from "@mui/material";
+import {
+  type ChipProps,
+  type SvgIconProps,
+  type TypographyProps,
+} from "@mui/material";
 
 export const CHIP_PROPS: Partial<ChipProps> = {
   color: MUI_CHIP_PROPS.COLOR.DEFAULT,

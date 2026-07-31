@@ -18,7 +18,7 @@ import {
 } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { getWorkflow } from "@repo/shared/services/workflows/entities";
 import { getEntity } from "@repo/shared/services/workflows/query";
-import { JSX, useMemo } from "react";
+import { type JSX, useMemo } from "react";
 import { Top } from "./components/Top/top";
 import type { Props } from "./types";
 import { mapOrganismEntityToOrganism } from "./utils";

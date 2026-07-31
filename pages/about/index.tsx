@@ -6,8 +6,8 @@ import { BRC_CARDS, GA2_CARDS } from "@/views/AboutView/common/constants";
 import type { PageProps } from "@pages/_app";
 import { ROUTES } from "@routes/constants";
 import { APP_KEYS } from "@site-config/common/constants";
-import { GetStaticProps } from "next";
-import { JSX } from "react";
+import { type GetStaticProps } from "next";
+import { type JSX } from "react";
 
 export const About = (): JSX.Element => {
   const { appKey } = config();

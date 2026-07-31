@@ -19,9 +19,9 @@ import {
 import { TruncatedText } from "@repo/shared/components/TruncatedText/truncatedText";
 import { ROUTES } from "@repo/shared/routes/constants";
 import Link from "next/link";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { StyledCard } from "./card.styles";
-import { Props } from "./types";
+import { type Props } from "./types";
 
 /**
  * Renders a card with workflow information and a configure button.

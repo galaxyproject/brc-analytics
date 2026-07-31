@@ -2,7 +2,7 @@ import { SectionContentCard } from "@/components/common/Card/components/SectionC
 import { StyledStack } from "@/components/Docs/components/SectionContentCards/sectionContentCards.styles";
 import { StyledSectionHero } from "@/components/Docs/components/SectionHero/sectionHero.styles";
 import { SectionContent } from "@repo/shared/views/docs/components/SectionContent/sectionContent";
-import { ComponentProps, Fragment, JSX } from "react";
+import { type ComponentProps, Fragment, type JSX } from "react";
 
 interface AboutViewProps {
   cards: ComponentProps<typeof SectionContentCard>[];

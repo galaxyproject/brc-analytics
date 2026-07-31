@@ -1,7 +1,7 @@
 import { WorkflowEntityContext } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
 import { useWorkflowEntity } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/hook";
 import { renderHook } from "@testing-library/react";
-import { createElement, JSX, ReactNode } from "react";
+import { createElement, type JSX, type ReactNode } from "react";
 
 describe("useWorkflowEntity", () => {
   test("returns undefined when used outside of provider", () => {

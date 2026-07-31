@@ -1,6 +1,6 @@
-import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { type ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { useCallback, useMemo, useState } from "react";
-import { ContrastPairs, UseExplicitContrasts } from "./types";
+import { type ContrastPairs, type UseExplicitContrasts } from "./types";
 import {
   addPairUpdater,
   buildExplicitContrasts,

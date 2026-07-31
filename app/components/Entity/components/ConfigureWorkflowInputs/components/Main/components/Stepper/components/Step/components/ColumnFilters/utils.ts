@@ -1,5 +1,5 @@
-import { CategoryView } from "@databiosphere/findable-ui/lib/common/categories/views/types";
-import { CategoryFilter } from "@databiosphere/findable-ui/lib/components/Filter/components/Filters/filters";
+import { type CategoryView } from "@databiosphere/findable-ui/lib/common/categories/views/types";
+import { type CategoryFilter } from "@databiosphere/findable-ui/lib/components/Filter/components/Filters/filters";
 
 /**
  * Returns all category views from the given category filters.

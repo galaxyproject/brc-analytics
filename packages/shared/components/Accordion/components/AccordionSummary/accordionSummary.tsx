@@ -1,9 +1,9 @@
 import { AddIcon as DXAddIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/AddIcon/addIcon";
 import {
   AccordionSummary as MAccordionSummary,
-  AccordionSummaryProps as MAccordionSummaryProps,
+  type AccordionSummaryProps as MAccordionSummaryProps,
 } from "@mui/material";
-import { JSX } from "react";
+import { type JSX } from "react";
 
 export const AccordionSummary = ({
   children,

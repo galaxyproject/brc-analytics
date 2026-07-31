@@ -1,12 +1,12 @@
 import {
-  ConfiguredInput,
-  OnConfigure,
+  type ConfiguredInput,
+  type OnConfigure,
 } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import type { Workflow } from "@repo/shared/apis/workflow";
-import { StepConfig } from "./components/Stepper/components/Step/types";
+import { type StepConfig } from "./components/Stepper/components/Step/types";
 import {
-  OnContinue,
-  OnEdit,
+  type OnContinue,
+  type OnEdit,
 } from "./components/Stepper/hooks/UseStepper/types";
 
 export interface Props {

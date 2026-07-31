@@ -3,8 +3,8 @@ import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles
 import { config } from "@/config/config";
 import { CalendarView } from "@brc/views/CalendarView/calendarView";
 import { ROUTES } from "@routes/constants";
-import { GetStaticProps } from "next";
-import { JSX } from "react";
+import { type GetStaticProps } from "next";
+import { type JSX } from "react";
 
 export const Calendar = (): JSX.Element => {
   return <CalendarView />;

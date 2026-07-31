@@ -4,13 +4,13 @@ import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/m
 import { ChevronRightRounded } from "@mui/icons-material";
 import { Typography } from "@mui/material";
 import { flexRender } from "@tanstack/react-table";
-import { Fragment, JSX } from "react";
+import { Fragment, type JSX } from "react";
 import {
   StyledContainer,
   StyledRoundedPaper,
   StyledStack,
 } from "./tracksSelectionPanel.styles";
-import { Props } from "./types";
+import { type Props } from "./types";
 import { getGroupLabel, getIsLastRowInGroup } from "./utils";
 
 export const TracksSelectionPanel = ({ table }: Props): JSX.Element => {

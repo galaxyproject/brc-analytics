@@ -1,4 +1,4 @@
-import { RadioGroupProps } from "@mui/material";
+import { type RadioGroupProps } from "@mui/material";
 
 export type Value = RadioGroupProps["value"];
 

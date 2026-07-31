@@ -1,7 +1,7 @@
 import { clearSequencingData } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/utils";
 import { SEQUENCING_SOURCE } from "@repo/shared/providers/workflowHandoff/constants";
-import { HandoffInputs } from "@repo/shared/providers/workflowHandoff/types";
-import { UseAssistantHandoff } from "./types";
+import { type HandoffInputs } from "@repo/shared/providers/workflowHandoff/types";
+import { type UseAssistantHandoff } from "./types";
 
 /**
  * Derive the stepper's initial `ConfiguredInput` from the assistant's handoff

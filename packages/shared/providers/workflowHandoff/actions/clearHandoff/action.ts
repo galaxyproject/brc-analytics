@@ -1,5 +1,5 @@
-import { WorkflowHandoffState } from "@repo/shared/providers/workflowHandoff/types";
-import { ClearHandoffPayload } from "./types";
+import { type WorkflowHandoffState } from "@repo/shared/providers/workflowHandoff/types";
+import { type ClearHandoffPayload } from "./types";
 
 /**
  * Reducer action to remove the handoff payload for an entity+path cell.

@@ -1,7 +1,7 @@
 "use client";
-import { JSX } from "react";
+import { type JSX } from "react";
 
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import type { Spec as VgSpec } from "vega";
 import embed from "vega-embed";
 import type { TopLevelSpec as VlSpec } from "vega-lite";

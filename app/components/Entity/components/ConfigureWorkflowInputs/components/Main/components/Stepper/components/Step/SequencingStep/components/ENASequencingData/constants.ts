@@ -1,5 +1,5 @@
 import { SEQUENCING_DATA_TYPE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/types";
-import { ReadRun } from "./types";
+import { type ReadRun } from "./types";
 
 export const ENA_PORTAL_API_BASE_URL = `${process.env.NEXT_PUBLIC_ENA_PROXY_DOMAIN}/ena/portal/api`;
 

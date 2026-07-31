@@ -1,7 +1,7 @@
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import { Select, SelectProps } from "@mui/material";
+import { Select, type SelectProps } from "@mui/material";
 
 export const StyledSelect = styled(Select)`
   height: 36px;

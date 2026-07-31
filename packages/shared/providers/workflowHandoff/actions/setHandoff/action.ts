@@ -1,5 +1,5 @@
-import { WorkflowHandoffState } from "@repo/shared/providers/workflowHandoff/types";
-import { SetHandoffPayload } from "./types";
+import { type WorkflowHandoffState } from "@repo/shared/providers/workflowHandoff/types";
+import { type SetHandoffPayload } from "./types";
 
 /**
  * Reducer action to set the handoff inputs for an entity+path cell. Replaces

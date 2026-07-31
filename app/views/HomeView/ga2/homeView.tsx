@@ -2,7 +2,7 @@ import { SectionAnalyticsAndData } from "@/components/Home/components/Section/co
 import { SectionAssemblies } from "@/components/Home/components/Section/components/ga2/SectionAssemblies/sectionAssemblies";
 import { SectionHero } from "@/components/Home/components/Section/components/ga2/SectionHero/sectionHero";
 import { SectionSubHero } from "@/components/Home/components/Section/components/ga2/SectionSubHero/sectionSubHero";
-import { Fragment, JSX } from "react";
+import { Fragment, type JSX } from "react";
 
 export const HomeView = (): JSX.Element => {
   return (

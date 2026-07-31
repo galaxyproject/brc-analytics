@@ -1,7 +1,7 @@
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import { Select, SelectProps, Stack } from "@mui/material";
+import { Select, type SelectProps, Stack } from "@mui/material";
 
 export const StyledStack = styled(Stack)`
   align-items: center;

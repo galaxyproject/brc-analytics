@@ -1,5 +1,5 @@
 import { STRANDEDNESS_LABELS } from "./constants";
-import { Strandedness } from "./types";
+import { type Strandedness } from "./types";
 
 /**
  * Get the label to display for a given strandedness value.

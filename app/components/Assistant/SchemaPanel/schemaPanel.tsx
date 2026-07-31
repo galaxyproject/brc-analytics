@@ -8,7 +8,7 @@ import type {
   SchemaFieldState,
 } from "@repo/shared/services/api-client/types";
 import Router from "next/router";
-import { JSX, useCallback } from "react";
+import { type JSX, useCallback } from "react";
 import {
   FieldRow,
   FieldValue,

@@ -1,5 +1,5 @@
-import { ChangeEvent, useCallback, useState } from "react";
-import { UseRadioGroup, Value } from "./types";
+import { type ChangeEvent, useCallback, useState } from "react";
+import { type UseRadioGroup, type Value } from "./types";
 
 export const useRadioGroup = (initialValue: Value): UseRadioGroup => {
   const [value, setValue] = useState<Value>(initialValue);

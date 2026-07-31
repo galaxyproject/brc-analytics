@@ -6,9 +6,9 @@ import {
   getWorkflows as getWorkflowCategories,
 } from "@repo/shared/services/workflows/entities";
 import { API } from "@repo/shared/services/workflows/routes";
-import { JSX, useEffect, useMemo, useState } from "react";
+import { type JSX, useEffect, useMemo, useState } from "react";
 import { Workflows } from "./components/Workflows/workflows";
-import { Organism } from "./types";
+import { type Organism } from "./types";
 import { getWorkflows } from "./utils";
 
 /**

@@ -5,8 +5,8 @@ import {
 } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
 import { Button } from "@mui/material";
-import { CellContext } from "@tanstack/react-table";
-import { JSX } from "react";
+import { type CellContext } from "@tanstack/react-table";
+import { type JSX } from "react";
 
 /**
  * View cell for the pangenome members table: a button linking to the member

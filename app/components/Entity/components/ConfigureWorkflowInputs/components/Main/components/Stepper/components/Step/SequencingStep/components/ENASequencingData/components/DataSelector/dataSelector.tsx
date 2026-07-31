@@ -4,11 +4,11 @@ import { LoadingIcon } from "@databiosphere/findable-ui/lib/components/common/Cu
 import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Button, Divider, Stack, Typography } from "@mui/material";
-import { Fragment, JSX } from "react";
+import { Fragment, type JSX } from "react";
 import { Alert } from "./components/Alert/alert";
 import { GRID_PROPS, PAPER_PROPS } from "./constants";
 import { StyledGrid, StyledPaper } from "./dataSelector.styles";
-import { Props } from "./types";
+import { type Props } from "./types";
 
 export const DataSelector = ({
   enaTaxonomyId,

@@ -1,10 +1,10 @@
 import { COLUMN_TYPE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
-import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { type ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { FORMULA_COLUMN_TYPES } from "./constants";
 import {
-  CategorizedCovariates,
-  FormulaColumn,
-  FormulaSelection,
+  type CategorizedCovariates,
+  type FormulaColumn,
+  type FormulaSelection,
 } from "./types";
 
 /**

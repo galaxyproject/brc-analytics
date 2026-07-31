@@ -3,9 +3,9 @@ import {
   formatNumber,
 } from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/ChipCell/chipCell";
-import { CellContext } from "@tanstack/react-table";
-import { JSX } from "react";
-import { Assembly } from "./types";
+import { type CellContext } from "@tanstack/react-table";
+import { type JSX } from "react";
+import { type Assembly } from "./types";
 
 /**
  * Renders Is Ref cell as "Yes" or "No" with a chip.

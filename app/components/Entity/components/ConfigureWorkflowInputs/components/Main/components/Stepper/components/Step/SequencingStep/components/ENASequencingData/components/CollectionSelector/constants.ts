@@ -1,4 +1,4 @@
-import { SEQUENCING_DATA_FILE_TYPE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/types";
+import { type SEQUENCING_DATA_FILE_TYPE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/types";
 import { WORKFLOW_PARAMETER_VARIABLE } from "@repo/shared/apis/schema-types";
 
 // Maps each sequencing step key to the workflow parameter variable it configures.

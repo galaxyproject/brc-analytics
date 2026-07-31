@@ -5,7 +5,7 @@ import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceP
 import { ENTITY_KEYS } from "@repo/shared/providers/workflowHandoff/constants";
 import { ROUTES } from "@repo/shared/routes/constants";
 import Router, { useRouter } from "next/router";
-import { JSX, useEffect } from "react";
+import { type JSX, useEffect } from "react";
 import type { Props } from "./types";
 
 /**

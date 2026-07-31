@@ -1,5 +1,5 @@
-import { StaticProps } from "@repo/shared/views/docs/common/staticGeneration/types";
-import { GetStaticPropsResult } from "next/types";
+import { type StaticProps } from "@repo/shared/views/docs/common/staticGeneration/types";
+import { type GetStaticPropsResult } from "next/types";
 
 /**
  * Processes the outline for the given static props.

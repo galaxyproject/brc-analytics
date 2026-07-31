@@ -8,8 +8,8 @@ import { seedDatabase } from "@/utils/seedDatabase";
 import { PriorityPathogensView } from "@brc/views/PriorityPathogensView/priorityPathogensView";
 import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main.styles";
 import { getEntityService } from "@databiosphere/findable-ui/lib/hooks/useEntityService";
-import { GetStaticProps } from "next";
-import { JSX } from "react";
+import { type GetStaticProps } from "next";
+import { type JSX } from "react";
 
 const ENTITY_LIST_TYPE = "priority-pathogens";
 

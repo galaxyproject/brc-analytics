@@ -1,4 +1,4 @@
-import { AzulEntitiesStaticResponse } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
+import { type AzulEntitiesStaticResponse } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import { Error } from "@databiosphere/findable-ui/lib/components/Error/error";
 import { ErrorBoundary } from "@databiosphere/findable-ui/lib/components/ErrorBoundary/errorBoundary";
 import { Head } from "@databiosphere/findable-ui/lib/components/Head/head";
@@ -20,7 +20,7 @@ import { mergeAppTheme } from "@/theme/theme";
 import { LayoutDimensionsProvider } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/provider";
 import { ServicesProvider } from "@databiosphere/findable-ui/lib/providers/services/provider";
 import { SystemStatusProvider } from "@databiosphere/findable-ui/lib/providers/systemStatus";
-import { DataExplorerError } from "@databiosphere/findable-ui/lib/types/error";
+import { type DataExplorerError } from "@databiosphere/findable-ui/lib/types/error";
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { AppCacheProvider } from "@mui/material-nextjs/v16-pagesRouter";
@@ -30,9 +30,9 @@ import { EntitiesLoadedProvider } from "@repo/shared/providers/entitiesLoaded/pr
 import { WorkflowHandoffProvider } from "@repo/shared/providers/workflowHandoff/provider";
 import { ROUTES } from "@routes/constants";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { NextPage } from "next";
+import { type NextPage } from "next";
 import type { AppProps } from "next/app";
-import { JSX, useMemo } from "react";
+import { type JSX, useMemo } from "react";
 
 const DEFAULT_ENTITY_LIST_TYPE = "organisms";
 

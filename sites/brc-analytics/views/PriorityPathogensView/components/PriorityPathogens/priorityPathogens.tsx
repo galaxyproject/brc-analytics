@@ -14,10 +14,10 @@ import { CardActionArea, Chip, Typography } from "@mui/material";
 import { ROUTES } from "@routes/constants";
 import { MDXRemote } from "next-mdx-remote";
 import { useRouter } from "next/router";
-import { JSX } from "react";
+import { type JSX } from "react";
 import slugify from "slugify";
 import { StyledGrid, StyledSectionText } from "./priorityPathogens.styles";
-import { Props } from "./types";
+import { type Props } from "./types";
 
 export const PriorityPathogens = ({
   priorityPathogens,

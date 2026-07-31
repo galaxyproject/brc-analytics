@@ -1,4 +1,4 @@
-import { ChangeEvent, DragEvent, RefObject } from "react";
+import { type ChangeEvent, type DragEvent, type RefObject } from "react";
 
 export interface OnFileChangeOptions<T> {
   onComplete?: (data: T, file: File) => void;

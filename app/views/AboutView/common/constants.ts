@@ -1,8 +1,8 @@
-import { SectionContentCard } from "@/components/common/Card/components/SectionContentCard/sectionContentCard";
+import { type SectionContentCard } from "@/components/common/Card/components/SectionContentCard/sectionContentCard";
 import { GalaxyIcon } from "@repo/shared/components/CustomIcon/components/GalaxyIcon/galaxyIcon";
 import { RocketLaunchIcon } from "@repo/shared/components/CustomIcon/components/RocketLaunchIcon/rocketLaunchIcon";
 import { SparkleIcon } from "@repo/shared/components/CustomIcon/components/SparkleIcon/sparkleIcon";
-import { ComponentProps } from "react";
+import { type ComponentProps } from "react";
 
 export const BRC_CARDS: ComponentProps<typeof SectionContentCard>[] = [
   {

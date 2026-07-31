@@ -1,4 +1,4 @@
-import { ImageData } from "@/apis/catalog/ga2/entities";
+import { type ImageData } from "@/apis/catalog/ga2/entities";
 import InfoIcon from "@mui/icons-material/Info";
 import { Tooltip } from "@mui/material";
 import React from "react";

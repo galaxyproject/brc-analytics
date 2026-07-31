@@ -1,4 +1,4 @@
-import { PaletteColorOptions, PaletteOptions } from "@mui/material";
+import { type PaletteColorOptions, type PaletteOptions } from "@mui/material";
 
 /**
  * Palette "Caution"

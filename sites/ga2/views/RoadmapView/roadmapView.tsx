@@ -1,5 +1,5 @@
 import { SectionHero } from "@repo/shared/components/layout/SectionHero/sectionHero";
-import { Fragment, JSX } from "react";
+import { Fragment, type JSX } from "react";
 import { BREADCRUMBS } from "./constants";
 import SectionRoadmap from "./content/sectionRoadmap.mdx";
 

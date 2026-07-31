@@ -2,7 +2,7 @@ import { Logo } from "@databiosphere/findable-ui/lib/components/Layout/component
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { Brands, FooterText, LargeBrand, SmallBrand } from "./branding.styles";
 
 export const Branding = (): JSX.Element => {

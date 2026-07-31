@@ -1,10 +1,10 @@
-import { BRCDataCatalogOrganism } from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import { type BRCDataCatalogOrganism } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { getOrganismId } from "@/apis/catalog/brc-analytics-catalog/common/utils";
 import * as C from "@/components";
 import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import {
-  ComponentConfig,
-  ListConfig,
+  type ComponentConfig,
+  type ListConfig,
   SORT_DIRECTION,
 } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
@@ -15,7 +15,7 @@ import {
 } from "@site-config/brc-analytics/category";
 import { organismMainColumn } from "@site-config/brc-analytics/local/entity/organism/organismMainColumn";
 import { organismTop } from "@site-config/brc-analytics/local/entity/organism/organismTop";
-import { AppEntityConfig } from "@site-config/common/entities";
+import { type AppEntityConfig } from "@site-config/common/entities";
 import { CATEGORY_GROUPS } from "./common/category/categories";
 import { COLUMN_REGISTRY } from "./common/column/columnRegistry";
 

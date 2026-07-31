@@ -6,11 +6,11 @@ import { useVirtualization } from "@databiosphere/findable-ui/lib/components/Tab
 import { GridTable } from "@databiosphere/findable-ui/lib/components/Table/table.styles";
 import { getColumnTrackSizing } from "@databiosphere/findable-ui/lib/components/TableCreator/options/columnTrackSizing/utils";
 import { TableContainer } from "@mui/material";
-import { RowData } from "@tanstack/react-table";
-import { JSX } from "react";
+import { type RowData } from "@tanstack/react-table";
+import { type JSX } from "react";
 import { TableToolbar } from "./components/TableToolbar/tableToolbar";
 import { StyledGrid, StyledRoundedPaper } from "./table.styles";
-import { Props } from "./types";
+import { type Props } from "./types";
 
 /**
  * Table component used to display tables in the workflow configuration steps.

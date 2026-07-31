@@ -1,4 +1,4 @@
-import { InferType, object, string } from "yup";
+import { type InferType, object, string } from "yup";
 
 export const ucscApiResponseTrackSchema = object({
   bigDataUrl: string(),

@@ -9,8 +9,8 @@ import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/m
 import { Alert, Stack } from "@mui/material";
 import { Table } from "@repo/shared/components/Table/table";
 import type { RowData } from "@tanstack/react-table";
-import { JSX } from "react";
-import { Props } from "./types";
+import { type JSX } from "react";
+import { type Props } from "./types";
 
 /**
  * Assemblies section for the organism page: header, an info alert, and the

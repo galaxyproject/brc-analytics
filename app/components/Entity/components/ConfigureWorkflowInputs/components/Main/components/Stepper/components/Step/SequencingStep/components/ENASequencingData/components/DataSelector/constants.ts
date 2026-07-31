@@ -1,4 +1,4 @@
-import { GridProps, PaperProps } from "@mui/material";
+import { type GridProps, type PaperProps } from "@mui/material";
 
 export const GRID_PROPS: GridProps = {
   alignItems: "center",

@@ -1,4 +1,4 @@
-import { CategoryConfig } from "@databiosphere/findable-ui/lib/common/categories/config/types";
+import { type CategoryConfig } from "@databiosphere/findable-ui/lib/common/categories/config/types";
 
 export const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
   ACCESSION: {

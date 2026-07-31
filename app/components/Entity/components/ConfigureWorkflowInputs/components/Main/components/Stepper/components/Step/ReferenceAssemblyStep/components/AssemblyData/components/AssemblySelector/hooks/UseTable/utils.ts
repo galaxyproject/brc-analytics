@@ -1,9 +1,9 @@
 import { workflowRequiresAssemblyId } from "@/views/AnalyzeWorkflowsView/components/Main/utils";
 import { WORKFLOW_PLOIDY } from "@repo/shared/apis/schema-types";
 import type { Workflow } from "@repo/shared/apis/workflow";
-import { ColumnFiltersState, Table } from "@tanstack/react-table";
+import { type ColumnFiltersState, type Table } from "@tanstack/react-table";
 import { CATEGORY_CONFIGS } from "./categoryConfigs";
-import { Assembly } from "./types";
+import { type Assembly } from "./types";
 
 /** Returns the initial column filters for the table based on the workflow's ploidy.
  * If the workflow's ploidy is not "ANY", it pre-selects the ploidy filter with the workflow's ploidy value.

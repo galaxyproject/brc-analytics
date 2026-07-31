@@ -1,10 +1,10 @@
-import { COLUMN_TYPE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
+import { type COLUMN_TYPE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 import { MenuItem } from "@mui/material";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { SELECT_PROPS } from "./constants";
 import { OPTIONS } from "./options";
 import { StyledSelect } from "./select.styles";
-import { Props } from "./types";
+import { type Props } from "./types";
 import { isOptionDisabled } from "./utils";
 
 const optionsMap = new Map(OPTIONS);

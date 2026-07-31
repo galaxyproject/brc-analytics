@@ -1,9 +1,9 @@
 import { roma_cyclic } from "@/theme/color-maps/crameri";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import * as d3 from "d3";
-import { JSX, useEffect, useRef, useState } from "react";
-import { getData, TaxonomyNode } from "./data";
-import { NodeDetails, TreeNode } from "./NodeDetails";
+import { type JSX, useEffect, useRef, useState } from "react";
+import { getData, type TaxonomyNode } from "./data";
+import { NodeDetails, type TreeNode } from "./NodeDetails";
 
 const data = getData();
 

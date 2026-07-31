@@ -1,4 +1,4 @@
-import { JSX } from "react";
+import { type JSX } from "react";
 import { Bullet, Bullets as SectionBullets, StyledDot } from "./bullets.styles";
 
 interface BulletsProps {

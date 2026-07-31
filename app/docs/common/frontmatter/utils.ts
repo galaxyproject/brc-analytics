@@ -1,5 +1,5 @@
 import { formatDate } from "@repo/shared/utils/date-fns/utils";
-import { FrontmatterProps } from "@repo/shared/views/docs/common/frontmatter/types";
+import { type FrontmatterProps } from "@repo/shared/views/docs/common/frontmatter/types";
 
 /**
  * Maps the overview list to add formatted dates.

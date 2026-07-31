@@ -1,13 +1,17 @@
 import {
-  ChangeEvent,
-  DragEvent,
+  type ChangeEvent,
+  type DragEvent,
   useCallback,
   useMemo,
   useRef,
   useState,
 } from "react";
 import { FALLBACK_ERROR } from "./constants";
-import { OnFileChangeOptions, ParseFn, UseFilePicker } from "./types";
+import {
+  type OnFileChangeOptions,
+  type ParseFn,
+  type UseFilePicker,
+} from "./types";
 import { hasFileChanged, isValid } from "./utils";
 
 /**

@@ -8,8 +8,8 @@ import {
 } from "@databiosphere/findable-ui/lib/components/Filter/components/surfaces/types";
 import { Sidebar } from "@databiosphere/findable-ui/lib/components/Layout/components/Sidebar/sidebar";
 import { useBreakpoint } from "@databiosphere/findable-ui/lib/hooks/useBreakpoint";
-import { RowData } from "@tanstack/react-table";
-import { JSX } from "react";
+import { type RowData } from "@tanstack/react-table";
+import { type JSX } from "react";
 import { StyledBox, StyledSearchAllFilters } from "./filters.styles";
 import type { Props } from "./types";
 

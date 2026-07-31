@@ -12,10 +12,10 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { COLUMN_TYPE_LABEL } from "./constants";
 import { StyledTableContainer } from "./table.styles";
-import { Props } from "./types";
+import { type Props } from "./types";
 
 export const Table = ({
   columns,

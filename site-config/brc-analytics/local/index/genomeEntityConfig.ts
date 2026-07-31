@@ -1,4 +1,4 @@
-import { BRCDataCatalogGenome } from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import { type BRCDataCatalogGenome } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import {
   getGenomeId,
   getGenomeTitle,
@@ -6,8 +6,8 @@ import {
 import * as C from "@/components";
 import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import {
-  ComponentConfig,
-  ListConfig,
+  type ComponentConfig,
+  type ListConfig,
   SORT_DIRECTION,
 } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
@@ -19,7 +19,7 @@ import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
 } from "@site-config/brc-analytics/category";
-import { AppEntityConfig } from "@site-config/common/entities";
+import { type AppEntityConfig } from "@site-config/common/entities";
 import { CATEGORY_GROUPS } from "./common/category/categories";
 import { COLUMN_REGISTRY } from "./common/column/columnRegistry";
 

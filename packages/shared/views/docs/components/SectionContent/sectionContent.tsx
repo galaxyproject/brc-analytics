@@ -3,7 +3,7 @@ import { ContentGrid } from "@databiosphere/findable-ui/lib/components/Layout/co
 import type { ContentViewProps } from "@databiosphere/findable-ui/lib/views/ContentView/contentView";
 import type { StaticProps } from "@repo/shared/views/docs/common/staticGeneration/types";
 import { Section } from "@repo/shared/views/docs/content.styles";
-import { JSX } from "react";
+import { type JSX } from "react";
 import {
   StyledContent,
   StyledContentLayout,

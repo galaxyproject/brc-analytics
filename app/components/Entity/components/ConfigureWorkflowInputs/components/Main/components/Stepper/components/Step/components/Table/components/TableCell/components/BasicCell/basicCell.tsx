@@ -1,7 +1,7 @@
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Typography } from "@mui/material";
-import { CellContext, RowData } from "@tanstack/react-table";
-import { JSX } from "react";
+import { type CellContext, type RowData } from "@tanstack/react-table";
+import { type JSX } from "react";
 
 /**
  * Basic cell component rendering a text value.

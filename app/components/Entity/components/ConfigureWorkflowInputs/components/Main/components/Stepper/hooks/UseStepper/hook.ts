@@ -1,6 +1,6 @@
-import { StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
+import { type StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { useCallback, useState } from "react";
-import { UseStepper } from "./types";
+import { type UseStepper } from "./types";
 import { getInitialActiveStep, getNextActiveStep } from "./utils";
 
 export const useStepper = (

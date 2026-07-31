@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { useAuth } from "@repo/shared/providers/authentication/provider";
 import { useRouter } from "next/router";
-import { JSX, MouseEvent, useId, useState } from "react";
+import { type JSX, type MouseEvent, useId, useState } from "react";
 import { UserChip, UserMenuHeader } from "./authButton.styles";
 
 /**

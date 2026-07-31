@@ -1,6 +1,6 @@
 import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
-import { Assembly } from "@/views/WorkflowInputsView/types";
-import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
+import { type Assembly } from "@/views/WorkflowInputsView/types";
+import { type Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
   Alert,
   Box,
@@ -15,7 +15,7 @@ import { SectionHero } from "@repo/shared/components/layout/SectionHero/sectionH
 import { useAuth } from "@repo/shared/providers/authentication/provider";
 import { getEntity } from "@repo/shared/services/workflows/query";
 import Link from "next/link";
-import { JSX } from "react";
+import { type JSX } from "react";
 
 const BREADCRUMBS: Breadcrumb[] = [
   {

@@ -1,5 +1,5 @@
 import { createAppTheme } from "@databiosphere/findable-ui/lib/theme/theme";
-import { Theme, ThemeOptions } from "@mui/material";
+import { type Theme, type ThemeOptions } from "@mui/material";
 import { deepmerge } from "@mui/utils";
 import { components } from "./common/components";
 import { palette } from "./common/palette";

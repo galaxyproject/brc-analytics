@@ -2,7 +2,7 @@ import { setConfig } from "@databiosphere/findable-ui/lib/config/config";
 import brcAnalyticsDev from "@site-config/brc-analytics/dev/config";
 import brcAnalyticsLocal from "@site-config/brc-analytics/local/config";
 import brcAnalyticsProd from "@site-config/brc-analytics/prod/config";
-import { AppSiteConfig } from "@site-config/common/entities";
+import { type AppSiteConfig } from "@site-config/common/entities";
 import ga2Dev from "@site-config/ga2/dev/config";
 import ga2Local from "@site-config/ga2/local/config";
 import ga2Prod from "@site-config/ga2/prod/config";

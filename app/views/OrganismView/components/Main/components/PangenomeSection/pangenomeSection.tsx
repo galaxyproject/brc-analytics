@@ -13,10 +13,10 @@ import {
   Typography,
 } from "@mui/material";
 import { Table } from "@repo/shared/components/Table/table";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { StyledFluidPaper } from "./pangenomeSection.styles";
 import { COLUMNS } from "./table/columns";
-import { Props } from "./types";
+import { type Props } from "./types";
 import { getTrackTypes } from "./utils";
 
 /**

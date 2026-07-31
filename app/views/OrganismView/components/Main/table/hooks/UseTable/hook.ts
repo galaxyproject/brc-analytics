@@ -3,9 +3,9 @@ import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/fea
 import {
   getCoreRowModel,
   getSortedRowModel,
-  RowData,
-  Table,
-  TableOptions,
+  type RowData,
+  type Table,
+  type TableOptions,
   useReactTable,
 } from "@tanstack/react-table";
 

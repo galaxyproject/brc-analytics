@@ -1,4 +1,8 @@
-import { AccordionProps, FadeProps, SlideProps } from "@mui/material";
+import {
+  type AccordionProps,
+  type FadeProps,
+  type SlideProps,
+} from "@mui/material";
 
 export const ACCORDION_PROPS: Omit<AccordionProps, "children"> = {
   slotProps: { transition: { easing: "ease-in-out", timeout: 500 } },

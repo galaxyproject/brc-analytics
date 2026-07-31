@@ -1,5 +1,5 @@
-import { GA2AssemblyEntity } from "@/apis/catalog/ga2/entities";
-import { ColumnConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import { type GA2AssemblyEntity } from "@/apis/catalog/ga2/entities";
+import { type ColumnConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import {
   ACCESSION,
   ANALYZE_GENOME,

@@ -7,9 +7,13 @@ import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differen
 import { LEXICMAP } from "@repo/shared/workflow/lexicmap";
 import { LOGAN_SEARCH } from "@repo/shared/workflow/loganSearch";
 import { formatTrsId } from "@repo/shared/workflow/utils";
-import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
-import { ParsedUrlQuery } from "querystring";
-import { JSX } from "react";
+import {
+  type GetStaticPaths,
+  type GetStaticProps,
+  type GetStaticPropsContext,
+} from "next";
+import { type ParsedUrlQuery } from "querystring";
+import { type JSX } from "react";
 
 interface Params extends ParsedUrlQuery {
   trsId: string;

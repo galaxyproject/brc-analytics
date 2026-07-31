@@ -8,7 +8,7 @@ import {
   Divider,
   Typography,
 } from "@mui/material";
-import { Fragment, JSX } from "react";
+import { Fragment, type JSX } from "react";
 import { StyledAccordion } from "./accordion.styles";
 import { Workflow } from "./components/Workflow/workflow";
 import {
@@ -16,7 +16,7 @@ import {
   TYPOGRAPHY_PROPS as COMPONENT_TYPOGRAPHY_PROPS,
   SVG_ICON_PROPS,
 } from "./constants";
-import { Props } from "./types";
+import { type Props } from "./types";
 
 /**
  * Accordion component that displays a category of workflows and its compatible workflows.

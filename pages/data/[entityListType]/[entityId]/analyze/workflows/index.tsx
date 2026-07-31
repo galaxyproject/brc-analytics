@@ -13,7 +13,7 @@ import type {
   GetStaticPropsContext,
 } from "next";
 import type { ParsedUrlQuery } from "querystring";
-import { JSX } from "react";
+import { type JSX } from "react";
 
 interface Params extends ParsedUrlQuery {
   entityId: string;

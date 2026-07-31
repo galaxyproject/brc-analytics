@@ -1,11 +1,11 @@
 import { getWorkflowId } from "@/apis/catalog/ga2/utils";
-import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import { type EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
-import { AppEntityConfig } from "@site-config/common/entities";
+import { type AppEntityConfig } from "@site-config/common/entities";
 import { CATEGORY_GROUP_CONFIG } from "./categoryGroupConfig";
 import { COLUMNS } from "./columns";
 import { TABLE_OPTIONS } from "./tableOptions";
-import { WorkflowEntity } from "./types";
+import { type WorkflowEntity } from "./types";
 
 /**
  * Entity config object responsible to config anything related to the /workflows route.
