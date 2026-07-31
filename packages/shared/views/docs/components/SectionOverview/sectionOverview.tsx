@@ -2,9 +2,9 @@ import { CardTitle } from "@databiosphere/findable-ui/lib/components/common/Card
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { CardMedia, Stack, Typography } from "@mui/material";
 import { CardActionArea } from "@repo/shared/components/CardActionArea/cardActionArea";
-import { type Props } from "@repo/shared/views/docs/components/SectionOverview/types";
 import { type JSX } from "react";
 import { StyledCard, StyledStack } from "./sectionOverview.styles";
+import { type Props } from "./types";
 
 export const SectionOverview = ({ overview }: Props): JSX.Element | null => {
   if (!overview) return null;
