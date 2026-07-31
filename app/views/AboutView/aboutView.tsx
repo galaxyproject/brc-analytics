@@ -1,7 +1,7 @@
 import { SectionContentCard } from "@/components/common/Card/components/SectionContentCard/sectionContentCard";
 import { StyledStack } from "@/components/Docs/components/SectionContentCards/sectionContentCards.styles";
-import { StyledSectionHero } from "@/components/Docs/components/SectionHero/sectionHero.styles";
 import { SectionContent } from "@repo/shared/views/docs/components/SectionContent/sectionContent";
+import { StyledSectionHero } from "@repo/shared/views/docs/components/SectionHero/sectionHero.styles";
 import { type ComponentProps, Fragment, type JSX } from "react";
 
 interface AboutViewProps {
