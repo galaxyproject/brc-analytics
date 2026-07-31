@@ -1130,7 +1130,7 @@ def format_dbt_test_failures_section(title, dbt_test_results):
             lines += [result.message, ""]
         if result.failure_sample:
             sample_rows = result.failure_sample
-            lines += format_markdown_table(sample_rows)
+            lines += format_markdown_table(sample_rows, cell_truncation_threshold=200)
             if count is not None and count > len(sample_rows):
                 lines += [
                     f"_Showing {len(sample_rows)} of {count} failing rows._",

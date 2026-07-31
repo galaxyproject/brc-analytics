@@ -8,14 +8,19 @@ def write_markdown(path: str, text: str) -> None:
         fh.write(text)
 
 
-def _format_table_cell(value):
-    # Keep row values on a single markdown table cell/line.
+def _format_table_cell(value, *, cell_truncation_threshold: int | None = None):
+    # Keep row values on a single markdown table cell/line, with optional limited length.
     if value is None:
         return ""
-    return str(value).replace("\\", "\\\\").replace("|", "\\|").replace("\n", " ")
+    string_value = str(value)
+    if cell_truncation_threshold is not None:
+        original_length = len(string_value)
+        if original_length > cell_truncation_threshold:
+            string_value = f"{string_value[:cell_truncation_threshold]} ({original_length - cell_truncation_threshold} characters truncated)"
+    return string_value.replace("\\", "\\\\").replace("|", "\\|").replace("\n", " ")
 
 
-def format_markdown_table(table_rows):
+def format_markdown_table(table_rows, **cell_options):
     # Render a list of dictionaries as a markdown table.
     if not table_rows:
         return ["_No rows present_", ""]
@@ -26,7 +31,11 @@ def format_markdown_table(table_rows):
     ]
     for row in table_rows:
         lines.append(
-            "| " + " | ".join(_format_table_cell(row[col]) for col in columns) + " |"
+            "| "
+            + " | ".join(
+                _format_table_cell(row[col], **cell_options) for col in columns
+            )
+            + " |"
         )
     lines.append("")
     return lines
