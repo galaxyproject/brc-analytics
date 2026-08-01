@@ -1,4 +1,4 @@
-import { MDX_COMPONENTS } from "@/docs/common/mdx/constants";
+import { MDX_COMPONENTS } from "@brc/mdx/constants";
 import type { StaticProps } from "@repo/shared/views/docs/common/staticGeneration/types";
 import { ContentView } from "@repo/shared/views/docs/ContentView/contentView";
 import { type JSX } from "react";
