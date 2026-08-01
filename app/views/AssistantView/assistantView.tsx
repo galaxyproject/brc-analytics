@@ -1,13 +1,14 @@
 import { ChatPanel, SchemaPanel } from "@/components/Assistant";
+import { config } from "@/config/config";
 import { useAssistantChat } from "@/hooks/useAssistantChat";
 import { assistantAPIClient } from "@/services/assistant-api-client";
-import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
+import FeedbackOutlinedIcon from "@mui/icons-material/FeedbackOutlined";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import { Button } from "@mui/material";
 import type { AssistantInfoResponse } from "@repo/shared/services/api-client/types";
-import Error from "next/error";
 import { type JSX, useEffect, useState } from "react";
 import {
+  ActionsRow,
   AssistantDisclaimer,
   ChatColumn,
   SchemaColumn,
@@ -22,7 +23,6 @@ interface Props {
 }
 
 export const AssistantView = ({ initialSessionId }: Props): JSX.Element => {
-  const isAssistantEnabled = useFeatureFlag("assistant");
   const {
     error,
     handoffUrl,
@@ -41,9 +41,11 @@ export const AssistantView = ({ initialSessionId }: Props): JSX.Element => {
     initialSessionId,
   });
   const [info, setInfo] = useState<AssistantInfoResponse | null>(null);
+  // Read per-site rather than importing one site's config, so the button can
+  // never point at another tenant's form.
+  const { supportUrl } = config();
 
   useEffect(() => {
-    if (!isAssistantEnabled) return;
     let cancelled = false;
     assistantAPIClient
       .assistantInfo()
@@ -56,9 +58,7 @@ export const AssistantView = ({ initialSessionId }: Props): JSX.Element => {
     return (): void => {
       cancelled = true;
     };
-  }, [isAssistantEnabled]);
-
-  if (!isAssistantEnabled) return <Error statusCode={404} />;
+  }, []);
 
   // On error there are no messages and no schema, which would hide Reset
   // exactly when it's the only way to clear a bad session id.
@@ -69,15 +69,31 @@ export const AssistantView = ({ initialSessionId }: Props): JSX.Element => {
     <StyledSection>
       <SectionContent>
         <Headline />
-        <Button
-          onClick={resetSession}
-          size="small"
-          startIcon={<RestartAltIcon />}
-          sx={{ visibility: showReset ? "visible" : "hidden" }}
-          variant="text"
-        >
-          New Conversation
-        </Button>
+        <ActionsRow>
+          <Button
+            onClick={resetSession}
+            size="small"
+            startIcon={<RestartAltIcon />}
+            sx={{ visibility: showReset ? "visible" : "hidden" }}
+            variant="text"
+          >
+            New Conversation
+          </Button>
+          {supportUrl && (
+            <Button
+              aria-label="Give feedback on the Analysis Assistant (opens in a new tab)"
+              component="a"
+              href={supportUrl}
+              rel="noopener noreferrer"
+              size="small"
+              startIcon={<FeedbackOutlinedIcon />}
+              target="_blank"
+              variant="outlined"
+            >
+              Feedback
+            </Button>
+          )}
+        </ActionsRow>
         <TwoPanelLayout>
           <ChatColumn>
             <ChatPanel
@@ -98,8 +114,10 @@ export const AssistantView = ({ initialSessionId }: Props): JSX.Element => {
           </SchemaColumn>
         </TwoPanelLayout>
         <AssistantDisclaimer>
-          AI assistant — {modelLabel}. Responses can be inaccurate; verify
-          anything important before relying on it.
+          AI assistant — {modelLabel}. Your messages are sent to the model
+          provider to generate a response, so avoid sharing sensitive or
+          identifying information. Responses can be inaccurate; verify anything
+          important before relying on it.
         </AssistantDisclaimer>
       </SectionContent>
     </StyledSection>

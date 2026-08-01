@@ -1,3 +1,4 @@
+import { config } from "@/config/config";
 import { type Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
   Alert,
@@ -12,6 +13,8 @@ import { SectionHero } from "@repo/shared/components/layout/SectionHero/sectionH
 import { useAuth } from "@repo/shared/providers/authentication/provider";
 import { apiClient } from "@repo/shared/services/api-client/api-client";
 import type { SavedAnalysisSummary } from "@repo/shared/services/api-client/types";
+import { ROUTES } from "@routes/constants";
+import { type GetStaticProps } from "next";
 import { useRouter } from "next/router";
 import { type JSX, useEffect, useState } from "react";
 
@@ -198,5 +201,17 @@ export default function SavedAnalysesPage(): JSX.Element {
     </>
   );
 }
+
+export const getStaticProps: GetStaticProps = async () => {
+  const { allowedPaths } = config();
+
+  // Guarded on the assistant route, not its own: everything under /assistant
+  // belongs to the same feature, and this page is only reachable from it.
+  if (allowedPaths && !allowedPaths.includes(ROUTES.ASSISTANT)) {
+    return { notFound: true };
+  }
+
+  return { props: {} };
+};
 
 SavedAnalysesPage.Main = StyledPagesMain;

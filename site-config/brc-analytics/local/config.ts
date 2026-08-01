@@ -17,6 +17,7 @@ import { APP_KEYS } from "@site-config/common/constants";
 import { type AppSiteConfig } from "@site-config/common/entities";
 import data from "catalog/output/ncbi-taxa-tree.json";
 import { createElement } from "react";
+import { SUPPORT_URL } from "./constants";
 import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organismEntityConfig";
@@ -122,6 +123,7 @@ export function makeConfig(
     loginEnabled,
     maxReadRunsForBrowseAll: 80000,
     redirectRootToPath: "/",
+    supportUrl: SUPPORT_URL,
     taxTree: taxTreeData,
     themeOptions: THEME_OPTIONS,
   };

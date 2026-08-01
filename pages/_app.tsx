@@ -12,7 +12,6 @@ import { Floating } from "@databiosphere/findable-ui/lib/components/Layout/compo
 import { Header as DXHeader } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/header";
 import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main";
 import { setFeatureFlags } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/common/utils";
-import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import { ConfigProvider as DXConfigProvider } from "@databiosphere/findable-ui/lib/providers/config";
 import { ExploreStateProvider } from "@databiosphere/findable-ui/lib/providers/exploreState";
 import { LayoutDimensionsProvider } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/provider";
@@ -27,11 +26,10 @@ import { OgMeta } from "@repo/shared/components/OgMeta/ogMeta";
 import { AuthProvider } from "@repo/shared/providers/authentication/provider";
 import { EntitiesLoadedProvider } from "@repo/shared/providers/entitiesLoaded/provider";
 import { WorkflowHandoffProvider } from "@repo/shared/providers/workflowHandoff/provider";
-import { ROUTES } from "@routes/constants";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { type NextPage } from "next";
 import type { AppProps } from "next/app";
-import { type JSX, useMemo } from "react";
+import { type JSX } from "react";
 
 const DEFAULT_ENTITY_LIST_TYPE = "organisms";
 
@@ -50,13 +48,7 @@ export type AppPropsWithComponent = AppProps & {
   pageProps: PageProps;
 };
 
-setFeatureFlags([
-  "assembly-workflows",
-  "assistant",
-  "hyphy",
-  "lmls",
-  "pangenome",
-]);
+setFeatureFlags(["assembly-workflows", "hyphy", "lmls", "pangenome"]);
 
 const queryClient = new QueryClient();
 
@@ -82,19 +74,6 @@ function MyApp(props: AppPropsWithComponent): JSX.Element {
   const appTheme = mergeAppTheme(baseThemeOptions, themeOptions);
   const AppLayout = Component.AppLayout || DXAppLayout;
   const Main = Component.Main || DXMain;
-  const isAssistantEnabled = useFeatureFlag("assistant");
-  const filteredHeader = useMemo(() => {
-    if (!header) return header;
-    if (isAssistantEnabled) return header;
-    const { navigation, ...rest } = header;
-    if (!navigation) return header;
-    return {
-      ...rest,
-      navigation: navigation.map((group) =>
-        group?.filter((item) => item.url !== ROUTES.ASSISTANT)
-      ) as typeof navigation,
-    };
-  }, [header, isAssistantEnabled]);
 
   return (
     <AppCacheProvider {...props}>
@@ -116,7 +95,7 @@ function MyApp(props: AppPropsWithComponent): JSX.Element {
                   <AuthProvider loginEnabled={appConfig.loginEnabled}>
                     <LayoutDimensionsProvider>
                       <AppLayout>
-                        <DXHeader {...filteredHeader} />
+                        <DXHeader {...header} />
                         <ExploreStateProvider entityListType={entityListType}>
                           <WorkflowHandoffProvider>
                             <Main>

@@ -14,7 +14,7 @@ title: "About the Assistant"
 
 The Analysis Assistant is a chat interface that helps you set up a genomic analysis on BRC Analytics without hunting through the catalog yourself. You describe what you want to do in plain language, and the assistant helps you pick an organism, a genome assembly, and a compatible workflow from the BRC catalog. Once your setup is complete, it hands off to the workflow stepper so you can review the configuration and launch the analysis in Galaxy.
 
-The assistant is in **beta**. Like any AI tool, it can make mistakes -- double-check anything important before relying on it, and use the feedback link on the assistant page to tell us what's working and what isn't.
+The assistant is in **beta**. Like any AI tool, it can make mistakes -- double-check anything important before relying on it, and use the **Feedback** button on the assistant page to tell us what's working and what isn't.
 
 ## How to use it
 
@@ -23,7 +23,7 @@ The assistant is in **beta**. Like any AI tool, it can make mistakes -- double-c
 3. **Configure your analysis.** As you answer, the assistant fills in the pieces it needs: the reference assembly, the workflow, and details about your data.
 4. **Hand off to the workflow stepper.** When the setup is ready, the assistant hands you off to the workflow stepper with your selections pre-filled. From there you can review everything and launch in Galaxy.
 
-If the assistant doesn't have what you're looking for -- for example, an organism or assembly that isn't in the catalog -- it will say so. You can browse the [catalog](/data/organisms) directly, or [open an issue](https://github.com/galaxyproject/brc-analytics/issues) to request that we add it.
+If the assistant doesn't have what you're looking for -- for example, an organism or assembly that isn't in the catalog -- it will say so. You can browse the [catalog](/data/organisms) directly, or ask us to add it on the [community forum](https://help.brc-analytics.org) or by [opening an issue](https://github.com/galaxyproject/brc-analytics/issues). Those are the same places the assistant will point you when it hits a gap.
 
 ## What it can't do (yet)
 
@@ -34,4 +34,17 @@ The assistant is focused on the catalog-to-Galaxy setup flow described above. It
 - Interpret your results, write or summarize papers, or answer general research questions.
 - Browse external resources (like UCSC Genome Browser tracks) on your behalf.
 
-If you need something it can't do, [open an issue](https://github.com/galaxyproject/brc-analytics/issues) and let us know -- it helps us prioritize.
+If you need something it can't do, let us know on the [community forum](https://help.brc-analytics.org) or by [opening an issue](https://github.com/galaxyproject/brc-analytics/issues) -- it helps us prioritize.
+
+## Feedback and getting help
+
+Two different things, and they go to two different places:
+
+- **How the assistant itself did** -- the **Feedback** button on the assistant page. It opens a short form and needs no account. Use it when a reply was wrong, confusing, or unhelpful. During the beta this is the signal we're watching most closely, so it's worth a sentence even when something only felt slightly off.
+- **Help with an analysis, or something missing from the catalog** -- the [community forum](https://help.brc-analytics.org) or [GitHub issues](https://github.com/galaxyproject/brc-analytics/issues). Both are public, so the next person with the same question finds the answer. Email [help@brc-analytics.org](mailto:help@brc-analytics.org) instead if you'd rather not post in the open.
+
+## What happens to your messages
+
+The assistant runs on a large language model hosted by a third-party provider. The model in use is named at the bottom of the assistant page. To generate a reply, what you type is sent to that provider along with the catalog context the assistant looked up on your behalf -- so please don't enter sensitive, confidential, or personally identifying information.
+
+Your conversation is held in short-lived server-side storage so you can pick up where you left off. It expires on its own about two hours after your last message, so an active conversation keeps going and an abandoned one clears itself. If you're signed in and save an analysis, a copy of the conversation is kept with your account until you delete it -- for a long chat that copy covers the most recent hundred messages rather than the whole thing.

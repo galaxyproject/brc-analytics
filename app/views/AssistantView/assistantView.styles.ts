@@ -15,6 +15,13 @@ export const SectionContent = styled(Stack)`
   width: calc(100% - 32px);
 `;
 
+export const ActionsRow = styled(Box)({
+  alignItems: "center",
+  display: "flex",
+  justifyContent: "space-between",
+  paddingBottom: "8px",
+});
+
 export const TwoPanelLayout = styled(Box)({
   "@media (min-width: 960px)": {
     flexDirection: "row",

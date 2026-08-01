@@ -12,6 +12,7 @@ import { ROUTES as SITE_ROUTES } from "@routes/constants";
 import { APP_KEYS } from "@site-config/common/constants";
 import { type AppSiteConfig } from "@site-config/common/entities";
 import data from "catalog/ga2/output/ncbi-taxa-tree.json";
+import { SUPPORT_URL } from "./constants";
 import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genome/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organism/organismEntityConfig";
@@ -103,6 +104,7 @@ export function makeConfig(
     },
     maxReadRunsForBrowseAll: 80000,
     redirectRootToPath: "/",
+    supportUrl: SUPPORT_URL,
     taxTree: taxTreeData,
     themeOptions: THEME_OPTIONS,
   };
