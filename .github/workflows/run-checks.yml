@@ -81,7 +81,7 @@ jobs:
       - name: Run Linter (ESLint)
         run: npm run lint
       - name: Type Check
-        run: npx tsc --noEmit
+        run: npm run typecheck
 
       - name: Set up Python
         uses: actions/setup-python@v5

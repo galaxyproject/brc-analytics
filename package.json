@@ -16,6 +16,7 @@
     "build-prod:ga2": "./scripts/build.sh ga2 prod && ./scripts/set-version.sh && ./scripts/sync-api-ga2.sh && next build --webpack",
     "start": "npx serve out",
     "lint": "eslint .",
+    "typecheck": "next typegen && tsc --noEmit",
     "check-format": "prettier --check .",
     "format": "prettier --write . --cache",
     "format:python": "./scripts/format-python.sh",
