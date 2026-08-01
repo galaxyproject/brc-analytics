@@ -1,10 +1,10 @@
+import { CAROUSEL_CARDS } from "@/components/Home/components/Section/components/SectionHero/components/Carousel/cards/constants";
 import {
-  UseSwipeInteraction,
+  type UseSwipeInteraction,
   useSwipeInteraction,
 } from "@/hooks/useSwipeInteraction/useSwipeInteraction";
-import { CardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
+import { type CardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
 import { useMemo } from "react";
-import { CAROUSEL_CARDS } from "../cards/constants";
 
 export interface UseInteractiveCarousel {
   activeIndex: UseSwipeInteraction["activeIndex"];

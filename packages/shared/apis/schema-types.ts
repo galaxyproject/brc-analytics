@@ -7,8 +7,8 @@ export {
   WorkflowParameterVariable as WORKFLOW_PARAMETER_VARIABLE,
   WorkflowPloidy as WORKFLOW_PLOIDY,
   WorkflowScope as WORKFLOW_SCOPE,
-} from "../../../catalog/schema/generated/schema";
+} from "@catalog/schema/generated/schema";
 export type {
   WorkflowCollectionSpec,
   WorkflowUrlSpec,
-} from "../../../catalog/schema/generated/schema";
+} from "@catalog/schema/generated/schema";

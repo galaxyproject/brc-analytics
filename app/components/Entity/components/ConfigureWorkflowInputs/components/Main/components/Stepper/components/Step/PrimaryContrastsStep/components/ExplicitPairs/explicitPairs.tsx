@@ -5,10 +5,10 @@ import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { AddRounded } from "@mui/icons-material";
 import { Button, Typography } from "@mui/material";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { PairRow } from "./components/PairRow/pairRow";
 import { StyledStack } from "./explicitPairs.styles";
-import { Props } from "./types";
+import { type Props } from "./types";
 
 export const ExplicitPairs = ({
   factorValues,

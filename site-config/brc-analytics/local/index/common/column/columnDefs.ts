@@ -1,10 +1,10 @@
 import {
-  BRCDataCatalogGenome,
-  BRCDataCatalogOrganism,
+  type BRCDataCatalogGenome,
+  type BRCDataCatalogOrganism,
 } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "@/components";
 import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { ColumnConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import { type ColumnConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,

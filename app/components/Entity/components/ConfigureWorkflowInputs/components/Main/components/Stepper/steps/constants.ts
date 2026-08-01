@@ -1,22 +1,22 @@
-import { WORKFLOW_PARAMETER_VARIABLE } from "@repo/shared/apis/schema-types";
-import { STEP as ACCESSION_COUNT_STEP } from "../components/Step/AccessionCountStep/step";
-import { STEP as DESEQ2_FORMULA_STEP } from "../components/Step/DESeq2FormulaStep/step";
-import { STEP as GTF_STEP } from "../components/Step/GTFStep/step";
-import { STEP as PRIMARY_CONTRASTS_STEP } from "../components/Step/PrimaryContrastsStep/step";
-import { STEP as REFERENCE_ASSEMBLY_STEP } from "../components/Step/ReferenceAssemblyStep/step";
-import { RELATED_TRACKS_STEP } from "../components/Step/RelatedTracksStep/step";
-import { STEP as SAMPLE_SHEET_CLASSIFICATION_STEP } from "../components/Step/SampleSheetClassificationStep/step";
-import { STEP as SAMPLE_SHEET_STEP } from "../components/Step/SampleSheetStep/step";
-import { STEP as SEQUENCE_STEP } from "../components/Step/SequenceStep/step";
+import { STEP as ACCESSION_COUNT_STEP } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/AccessionCountStep/step";
+import { STEP as DESEQ2_FORMULA_STEP } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/DESeq2FormulaStep/step";
+import { STEP as GTF_STEP } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/GTFStep/step";
+import { STEP as PRIMARY_CONTRASTS_STEP } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/step";
+import { STEP as REFERENCE_ASSEMBLY_STEP } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/ReferenceAssemblyStep/step";
+import { RELATED_TRACKS_STEP } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/step";
+import { STEP as SAMPLE_SHEET_CLASSIFICATION_STEP } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/step";
+import { STEP as SAMPLE_SHEET_STEP } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/step";
+import { STEP as SEQUENCE_STEP } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequenceStep/step";
 import {
   ANY_END_STEP,
   PAIRED_END_STEP,
   PAIRED_FILE_STEP,
   SINGLE_END_STEP,
   SINGLE_FILE_STEP,
-} from "../components/Step/SequencingStep/step";
-import { STEP as STRANDEDNESS_STEP } from "../components/Step/StrandednessStep/step";
-import { StepConfig } from "../components/Step/types";
+} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/step";
+import { STEP as STRANDEDNESS_STEP } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/StrandednessStep/step";
+import { type StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
+import { WORKFLOW_PARAMETER_VARIABLE } from "@repo/shared/apis/schema-types";
 
 export const SEQUENCING_STEPS: Record<string, StepConfig> = {
   readRunPairedFile: PAIRED_FILE_STEP,

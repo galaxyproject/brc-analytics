@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Fragment, JSX } from "react";
+import { Fragment, type JSX } from "react";
 import {
   IMAGE_PROPS,
   IMAGE_PROPS_SMALL,

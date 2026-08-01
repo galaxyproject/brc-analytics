@@ -1,7 +1,7 @@
 import { ALERT_PROPS } from "@databiosphere/findable-ui/lib/components/common/Alert/constants";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { StyledAlert } from "./alert.styles";
-import { Props } from "./types";
+import { type Props } from "./types";
 
 export const Alert = ({
   factorValues,

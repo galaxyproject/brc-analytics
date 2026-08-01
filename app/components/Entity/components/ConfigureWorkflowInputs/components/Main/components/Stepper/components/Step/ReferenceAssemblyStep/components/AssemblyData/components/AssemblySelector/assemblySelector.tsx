@@ -2,9 +2,9 @@ import { ColumnFilters } from "@/components/Entity/components/ConfigureWorkflowI
 import { Table } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/Table/table";
 import { DialogTitle } from "@databiosphere/findable-ui/lib/components/common/Dialog/components/DialogTitle/dialogTitle";
 import { DialogContent } from "@mui/material";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { StyledDialog } from "./assemblySelector.styles";
-import { Props } from "./types";
+import { type Props } from "./types";
 
 /**
  * Assembly selector dialog for browsing and selecting a reference assembly.

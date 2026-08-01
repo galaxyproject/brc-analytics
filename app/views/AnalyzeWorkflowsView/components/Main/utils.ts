@@ -1,4 +1,5 @@
 import { workflowPloidyMatchesOrganismPloidy } from "@/apis/catalog/brc-analytics-catalog/common/utils";
+import { WorkflowCategoryId } from "@catalog/schema/generated/schema";
 import {
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_SCOPE,
@@ -6,7 +7,6 @@ import {
 import type { AssemblyContract } from "@repo/shared/apis/types";
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
-import { WorkflowCategoryId } from "../../../../../catalog/schema/generated/schema";
 
 /**
  * Builds workflow categories for the given assembly.

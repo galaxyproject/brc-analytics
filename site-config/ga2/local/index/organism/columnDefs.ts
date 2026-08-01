@@ -1,4 +1,4 @@
-import { GA2OrganismEntity } from "@/apis/catalog/ga2/entities";
+import { type GA2OrganismEntity } from "@/apis/catalog/ga2/entities";
 import * as C from "@/components";
 import {
   buildAssemblyCount,
@@ -14,8 +14,8 @@ import {
 } from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import * as V from "@/viewModelBuilders/catalog/ga2/viewModelBuilders";
 import {
-  ColumnConfig,
-  ComponentConfig,
+  type ColumnConfig,
+  type ComponentConfig,
 } from "@databiosphere/findable-ui/lib/config/entities";
 import {
   GA2_CATEGORY_KEY,

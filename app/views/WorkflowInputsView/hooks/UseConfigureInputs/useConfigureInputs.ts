@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { ConfiguredInput, UseConfigureInputs } from "./types";
+import { type ConfiguredInput, type UseConfigureInputs } from "./types";
 
 export const useConfigureInputs = (
   initial: ConfiguredInput = {}

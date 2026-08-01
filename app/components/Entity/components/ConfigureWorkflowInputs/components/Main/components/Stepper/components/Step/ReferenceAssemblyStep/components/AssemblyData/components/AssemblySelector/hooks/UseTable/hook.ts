@@ -12,14 +12,14 @@ import {
   getFacetedRowModel,
   getFilteredRowModel,
   getSortedRowModel,
-  InitialTableState,
+  type InitialTableState,
   useReactTable,
 } from "@tanstack/react-table";
 import { useMemo } from "react";
 import { CATEGORY_GROUPS } from "./categoryGroups";
 import { columns } from "./columnDef";
 import { COLUMN_VISIBILITY, SORTING } from "./constants";
-import { Assembly, UseTable } from "./types";
+import { type Assembly, type UseTable } from "./types";
 import { getInitialColumnFilters, renderSummary } from "./utils";
 
 export const useTable = (workflow: Workflow): UseTable => {

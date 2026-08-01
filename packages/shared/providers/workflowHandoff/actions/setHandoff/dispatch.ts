@@ -1,5 +1,5 @@
-import { WorkflowHandoffActionKind } from "../types";
-import { SetHandoffAction, SetHandoffPayload } from "./types";
+import { WorkflowHandoffActionKind } from "@repo/shared/providers/workflowHandoff/actions/types";
+import { type SetHandoffAction, type SetHandoffPayload } from "./types";
 
 /**
  * Action creator for setting handoff inputs for an entity+path cell.

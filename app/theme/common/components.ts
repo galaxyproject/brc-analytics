@@ -3,7 +3,7 @@ import { CHIP_PROPS as APP_CHIP_PROPS } from "@/styles/common/mui/chip";
 import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
-import { Components, ThemeOptions } from "@mui/material";
+import { type Components, type ThemeOptions } from "@mui/material";
 
 const MuiChip: Components["MuiChip"] = {
   styleOverrides: {

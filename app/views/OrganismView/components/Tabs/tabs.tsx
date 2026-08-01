@@ -6,7 +6,7 @@ import { Tabs as MTabs, Tab } from "@mui/material";
 import { useRouter } from "next/router";
 import { type JSX } from "react";
 import { TAB } from "./constants";
-import { Props } from "./types";
+import { type Props } from "./types";
 import { getActiveTab } from "./utils";
 
 /**

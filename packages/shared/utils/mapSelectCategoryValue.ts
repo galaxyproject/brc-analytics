@@ -1,4 +1,4 @@
-import { SelectCategoryValue } from "@databiosphere/findable-ui/lib/common/entities";
+import { type SelectCategoryValue } from "@databiosphere/findable-ui/lib/common/entities";
 
 /**
  * Returns select category value with formatted label.

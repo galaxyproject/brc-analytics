@@ -1,13 +1,13 @@
-import { BaseReadRun } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
+import { type BaseReadRun } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
 import { useHandoffInputs } from "@repo/shared/providers/workflowHandoff/hooks/UseHandoffInputs/hook";
-import { EntityKey } from "@repo/shared/providers/workflowHandoff/types";
+import { type EntityKey } from "@repo/shared/providers/workflowHandoff/types";
 import {
-  DefaultError,
-  UseQueryResult,
+  type DefaultError,
+  type UseQueryResult,
   useQuery as useReactQuery,
 } from "@tanstack/react-query";
 import { queryFn } from "./options/queryFn";
-import { QueryKey } from "./types";
+import { type QueryKey } from "./types";
 
 /**
  * Fetch ENA read-run data for the handoff at this entity+path. Returns an

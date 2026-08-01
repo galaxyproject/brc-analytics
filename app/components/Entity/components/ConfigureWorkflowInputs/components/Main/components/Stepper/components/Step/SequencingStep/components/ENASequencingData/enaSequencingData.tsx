@@ -1,11 +1,11 @@
 import { useDialog } from "@databiosphere/findable-ui/lib/components/common/Dialog/hooks/useDialog";
-import { RowSelectionState } from "@tanstack/react-table";
-import { Fragment, JSX, useRef } from "react";
+import { type RowSelectionState } from "@tanstack/react-table";
+import { Fragment, type JSX, useRef } from "react";
 import { AccessionSelector } from "./components/AccessionSelector/accessionSelector";
 import { CollectionSelector } from "./components/CollectionSelector/collectionSelector";
 import { CollectionSummary } from "./components/CollectionSummary/collectionSummary";
 import { DataSelector } from "./components/DataSelector/dataSelector";
-import { Props } from "./types";
+import { type Props } from "./types";
 import { clearSequencingData } from "./utils";
 
 export const ENASequencingData = ({

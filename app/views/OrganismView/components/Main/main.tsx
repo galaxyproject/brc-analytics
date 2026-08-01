@@ -1,6 +1,6 @@
 import { Stack } from "@mui/material";
-import { RowData } from "@tanstack/react-table";
-import { JSX } from "react";
+import { type RowData } from "@tanstack/react-table";
+import { type JSX } from "react";
 import { AssembliesSection } from "./components/AssembliesSection/assembliesSection";
 import { PangenomeSection } from "./components/PangenomeSection/pangenomeSection";
 import { WorkflowsSection } from "./components/WorkflowsSection/workflowsSection";

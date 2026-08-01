@@ -1,4 +1,4 @@
-import { ConfiguredInput } from "./types";
+import { type ConfiguredInput } from "./types";
 
 /**
  * Empty configuration. Spread into an `onConfigure` call to wipe every field

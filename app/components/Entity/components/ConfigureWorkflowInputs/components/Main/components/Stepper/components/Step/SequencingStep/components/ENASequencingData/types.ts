@@ -1,7 +1,7 @@
-import { OnConfigure } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { UseQueryResult } from "@tanstack/react-query";
-import { Table } from "@tanstack/react-table";
-import { Actions, Status } from "./hooks/UseENADataByAccession/types";
+import { type OnConfigure } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { type UseQueryResult } from "@tanstack/react-query";
+import { type Table } from "@tanstack/react-table";
+import { type Actions, type Status } from "./hooks/UseENADataByAccession/types";
 
 export interface BaseReadRun {
   base_count: number;

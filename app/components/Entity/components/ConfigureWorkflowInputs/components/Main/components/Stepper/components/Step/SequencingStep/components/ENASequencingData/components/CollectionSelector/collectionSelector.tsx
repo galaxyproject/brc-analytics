@@ -1,13 +1,13 @@
 import { ColumnFilters } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/ColumnFilters/columnFilters";
 import { Table } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/Table/table";
-import { ReadRun } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
+import { type ReadRun } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { DialogTitle } from "@databiosphere/findable-ui/lib/components/common/Dialog/components/DialogTitle/dialogTitle";
 import { Button, DialogActions, DialogContent } from "@mui/material";
-import { Table as TanStackTable } from "@tanstack/react-table";
-import { JSX } from "react";
+import { type Table as TanStackTable } from "@tanstack/react-table";
+import { type JSX } from "react";
 import { StyledDialog } from "./collectionSelector.styles";
-import { Props } from "./types";
+import { type Props } from "./types";
 
 /**
  * Collection selector dialog for browsing and selecting sequencing runs.

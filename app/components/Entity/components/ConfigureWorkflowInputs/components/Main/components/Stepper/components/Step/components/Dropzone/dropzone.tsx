@@ -1,7 +1,7 @@
-import { JSX } from "react";
+import { type JSX } from "react";
 import { StyledPaper } from "./dropzone.styles";
 import { useDropzone } from "./hooks/useDropzone";
-import { Props } from "./types";
+import { type Props } from "./types";
 
 /**
  * Shared dropzone container that provides drag-and-drop file handling with visual feedback.

@@ -1,6 +1,4 @@
-import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
-import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
-import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
+import { type Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
   Alert,
   Box,
@@ -9,11 +7,13 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { StyledPagesMain } from "@repo/shared/components/layout/Main/main.styles";
+import { SectionHero } from "@repo/shared/components/layout/SectionHero/sectionHero";
 import { useAuth } from "@repo/shared/providers/authentication/provider";
 import { apiClient } from "@repo/shared/services/api-client/api-client";
 import type { SavedAnalysisSummary } from "@repo/shared/services/api-client/types";
 import { useRouter } from "next/router";
-import { JSX, useEffect, useState } from "react";
+import { type JSX, useEffect, useState } from "react";
 
 const BREADCRUMBS: Breadcrumb[] = [
   {

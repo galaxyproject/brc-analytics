@@ -2,9 +2,9 @@ import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chi
 import { STACK_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/stack";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Chip, Stack, Typography } from "@mui/material";
+import type { Props } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/types";
 import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
-import { Fragment, JSX } from "react";
-import type { Props } from "../../types";
+import { Fragment, type JSX } from "react";
 
 /**
  * Renders the species cell's minor taxonomy fields as a wrapping row of chips —

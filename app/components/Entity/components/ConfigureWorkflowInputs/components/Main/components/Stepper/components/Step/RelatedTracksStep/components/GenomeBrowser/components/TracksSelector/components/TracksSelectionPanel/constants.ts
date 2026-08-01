@@ -1,4 +1,4 @@
-import { UcscTrackNode } from "@/utils/ucsc-tracks-api/entities";
+import { type UcscTrackNode } from "@repo/shared/utils/ucsc-tracks-api/types";
 
 export const GROUP_ID_LABEL: Record<UcscTrackNode["groupId"], string> = {
   genes: "Genes and Gene Predictions",

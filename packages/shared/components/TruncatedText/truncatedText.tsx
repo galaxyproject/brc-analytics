@@ -2,7 +2,7 @@ import {
   getBorderBoxSize,
   useResizeObserver,
 } from "@databiosphere/findable-ui/lib/hooks/useResizeObserver";
-import { JSX, useEffect, useRef, useState } from "react";
+import { type JSX, useEffect, useRef, useState } from "react";
 import { MAX_LINES, READ_LESS_TEXT, READ_MORE_TEXT } from "./constants";
 import { StyledButtonBase, StyledSpan } from "./truncatedText.styles";
 import type { Props } from "./types";

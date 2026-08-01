@@ -1,5 +1,5 @@
 import {
-  ClassificationMap,
+  type ClassificationMap,
   COLUMN_TYPE,
 } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/types";
 

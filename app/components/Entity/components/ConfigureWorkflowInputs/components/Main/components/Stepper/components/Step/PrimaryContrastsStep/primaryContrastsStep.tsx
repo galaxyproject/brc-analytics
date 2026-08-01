@@ -1,11 +1,11 @@
+import { useRadioGroup } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseRadioGroup/hook";
+import { StyledStack as CommonStyledStack } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/step.styles";
+import { type StepProps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { Button, Divider } from "@mui/material";
-import { JSX, useMemo } from "react";
-import { useRadioGroup } from "../hooks/UseRadioGroup/hook";
-import { StyledStack as CommonStyledStack } from "../step.styles";
-import { StepProps } from "../types";
+import { type JSX, useMemo } from "react";
 import { Alert } from "./components/Alert/alert";
 import { CompareBaseline } from "./components/CompareBaseline/compareBaseline";
 import { ExplicitPairs } from "./components/ExplicitPairs/explicitPairs";

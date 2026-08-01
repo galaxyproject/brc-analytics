@@ -1,4 +1,4 @@
-import { PaperProps } from "@mui/material";
+import { type PaperProps } from "@mui/material";
 
 export const PAPER_PROPS: PaperProps = {
   elevation: 0,

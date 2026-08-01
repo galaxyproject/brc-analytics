@@ -6,8 +6,8 @@ import { KeyElType } from "@repo/shared/views/EntityView/ui/KeyElType/keyElType"
 import { KeyValueElType } from "@repo/shared/views/EntityView/ui/KeyValueElType/keyValueElType";
 import { SectionTitle } from "@repo/shared/views/EntityView/ui/SectionTitle/sectionTitle";
 import { ValueElType } from "@repo/shared/views/EntityView/ui/ValueElType/valueElType";
-import { Fragment, JSX } from "react";
-import { Props } from "./types";
+import { Fragment, type JSX } from "react";
+import { type Props } from "./types";
 
 /**
  * GA2-specific "Assembly Details" component for the side column of an entity view.

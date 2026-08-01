@@ -1,4 +1,4 @@
-import { ParseResult } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseFilePicker/types";
+import { type ParseResult } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseFilePicker/types";
 import {
   MAX_FILE_SIZE_BYTES,
   MAX_SEQUENCE_LENGTH,

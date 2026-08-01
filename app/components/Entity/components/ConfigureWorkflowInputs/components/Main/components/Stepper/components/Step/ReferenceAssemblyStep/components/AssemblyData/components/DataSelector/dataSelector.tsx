@@ -1,9 +1,9 @@
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Button, Stack, Typography } from "@mui/material";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { StyledPaper } from "./dataSelector.styles";
-import { Props } from "./types";
+import { type Props } from "./types";
 
 /**
  * Data selector component prompting the user to browse and select an assembly.

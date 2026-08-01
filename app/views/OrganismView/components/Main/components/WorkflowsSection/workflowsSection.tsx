@@ -1,4 +1,5 @@
 import { Accordion } from "@/views/AnalyzeWorkflowsView/components/Main/components/Accordion/accordion";
+import { EmptyState } from "@/views/OrganismView/components/Main/components/EmptyState/emptyState";
 import { StyledSectionTitle } from "@/views/OrganismView/components/Main/main.styles";
 import { buildOrganismWorkflows } from "@/views/OrganismView/components/Main/utils";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
@@ -6,9 +7,8 @@ import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/m
 import { Stack } from "@mui/material";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { getWorkflows } from "@repo/shared/services/workflows/entities";
-import { JSX } from "react";
-import { EmptyState } from "../EmptyState/emptyState";
-import { Props } from "./types";
+import { type JSX } from "react";
+import { type Props } from "./types";
 
 /**
  * Organism-specific workflows section for the organism page: a header and the

@@ -1,5 +1,5 @@
 import { TYPOGRAPHY_PROPS as MUI_TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
-import { StackProps, TypographyProps } from "@mui/material";
+import { type StackProps, type TypographyProps } from "@mui/material";
 
 export const STACK_PROPS: StackProps = {
   alignItems: "center",

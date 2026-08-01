@@ -1,4 +1,4 @@
-import { Assembly } from "@/views/WorkflowInputsView/types";
+import { type Assembly } from "@/views/WorkflowInputsView/types";
 import { SPECIAL_CASE_ASSEMBLY_LOOKUP } from "./constants";
 
 /**

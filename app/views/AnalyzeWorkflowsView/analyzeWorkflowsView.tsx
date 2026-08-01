@@ -1,15 +1,15 @@
+import { Side } from "@/views/EntityView/assembly/components/Side/side";
+import { type Assembly } from "@/views/WorkflowInputsView/types";
 import {
   BackPageContent,
   BackPageHero,
   BackPageView,
 } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { getEntity } from "@repo/shared/services/workflows/query";
-import { JSX } from "react";
-import { Side } from "../EntityView/assembly/components/Side/side";
-import { Assembly } from "../WorkflowInputsView/types";
+import { type JSX } from "react";
 import { Main } from "./components/Main/main";
 import { Top } from "./components/Top/top";
-import { Props } from "./types";
+import { type Props } from "./types";
 
 /**
  * AnalyzeWorkflowsView component displays the option to select a workflow from a list of compatible workflows.

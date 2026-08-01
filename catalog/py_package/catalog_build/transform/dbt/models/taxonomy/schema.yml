@@ -1,45 +1,66 @@
 version: 2
 
+# Each data test is given an explicit, short `name`. dbt derives the test's
+# node name (reported back by dlt's dbt runner) and its stored-failures table
+# name from this; the default generated names are long enough that dbt
+# truncates and hashes them, which makes both the runner results and the
+# `store_failures` audit tables hard to read and correlate. Keep these unique
+# across the project and comfortably under 63 bytes (for compatibility with
+# Postgres).
 models:
   - name: taxonomy_catalog_taxa
     columns:
       - name: taxonomy_id
         data_tests:
-          - unique
-          - not_null
+          - unique:
+              name: catalog_taxa_unique_ids
+          - not_null:
+              name: catalog_taxa_have_ids
           - relationships:
-              field: query_tax_id
-              to: ref('taxonomy_lineages_with_names')
+              name: catalog_taxa_in_taxonomy_lineages
+              arguments:
+                field: query_tax_id
+                to: ref('taxonomy_lineages_with_names')
   - name: taxonomy_assemblies
     columns:
       - name: taxonomy_id
         data_tests:
-          - unique
-          - not_null
+          - unique:
+              name: assembly_taxonomy_unique_ids
+          - not_null:
+              name: assembly_taxonomy_has_ids
       - name: taxonomic_level_species
         data_tests:
-          - not_null
+          - not_null:
+              name: assembly_taxonomy_has_species
       - name: taxonomic_level_species_id
         data_tests:
-          - not_null
+          - not_null:
+              name: assembly_taxonomy_has_species_ids
       - name: lineage_taxonomy_ids
         data_tests:
-          - not_null
+          - not_null:
+              name: assembly_taxonomy_has_lineage_ids
       - name: common_names
         data_tests:
-          - not_null
+          - not_null:
+              name: assembly_taxonomy_has_common_names
   - name: taxonomy_organisms
     columns:
       - name: taxonomy_id
         data_tests:
-          - unique
-          - not_null
+          - unique:
+              name: organism_taxonomy_unique_ids
+          - not_null:
+              name: organism_taxonomy_has_ids
       - name: rank
         data_tests:
-          - not_null
+          - not_null:
+              name: organism_taxonomy_has_ranks
       - name: taxon_name
         data_tests:
-          - not_null
+          - not_null:
+              name: organism_taxonomy_has_names
   - name: taxonomy_outbreaks
     # Only tested when the catalog has outbreaks; otherwise the model is an
     # empty placeholder and these assertions would be meaningless.
@@ -47,18 +68,22 @@ models:
       - name: taxonomy_id
         data_tests:
           - unique:
+              name: outbreak_taxonomy_unique_ids
               config:
                 enabled: "{{ var('has_outbreaks', false) }}"
           - not_null:
+              name: outbreak_taxonomy_has_ids
               config:
                 enabled: "{{ var('has_outbreaks', false) }}"
       - name: rank
         data_tests:
           - not_null:
+              name: outbreak_taxonomy_has_ranks
               config:
                 enabled: "{{ var('has_outbreaks', false) }}"
       - name: taxon_name
         data_tests:
           - not_null:
+              name: outbreak_taxonomy_has_names
               config:
                 enabled: "{{ var('has_outbreaks', false) }}"

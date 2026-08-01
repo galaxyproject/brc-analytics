@@ -1,10 +1,10 @@
 import { ANALYTICS_TOOLS } from "@/components/Home/components/Section/components/SectionAnalytics/components/AnalyticsTools/common/constants";
+import { useIntersectionObserver } from "@/components/Home/components/Section/components/SectionAnalytics/components/AnalyticsTools/hooks/useIntersectionObserver/useIntersectionObserver";
 import { useSwipeInteraction } from "@/hooks/useSwipeInteraction/useSwipeInteraction";
-import { CardProps as DXCardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
-import { RefObject, useEffect, useMemo } from "react";
-import { useIntersectionObserver } from "../useIntersectionObserver/useIntersectionObserver";
+import { type CardProps as DXCardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
+import { type RefObject, useEffect, useMemo } from "react";
 import { ROWS } from "./common/contants";
-import { UseInteractiveAnalytics } from "./common/entities";
+import { type UseInteractiveAnalytics } from "./common/entities";
 
 /**
  * Facilitates interaction capabilities for analytics cards, including swipe-able interactions based on viewport intersection.

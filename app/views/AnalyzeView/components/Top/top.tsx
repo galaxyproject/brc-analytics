@@ -1,6 +1,6 @@
 import { BackPageHero } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/components/BackPageHero/backPageHero";
-import { JSX } from "react";
-import { Props } from "./types";
+import { type JSX } from "react";
+import { type Props } from "./types";
 import { getBreadcrumbs } from "./utils";
 
 /**

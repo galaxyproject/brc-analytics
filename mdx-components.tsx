@@ -5,15 +5,15 @@ import {
 import { Accordion } from "@repo/shared/components/Accordion/accordion";
 import { AccordionSummary } from "@repo/shared/components/Accordion/components/AccordionSummary/accordionSummary";
 import { Figure } from "@repo/shared/components/mdx/Figure/figure";
-import { MDXComponents } from "mdx/types";
-import * as C from "./app/components";
 import {
   Section,
   SectionContent,
   SectionHeadline,
   SectionLayout,
   SubHeadline,
-} from "./app/components/content/content.styles";
+} from "@repo/shared/views/docs/content.styles";
+import { type MDXComponents } from "mdx/types";
+import * as C from "./app/components";
 import { CardActions } from "./app/components/Home/components/Section/components/SectionHero/components/Carousel/components/Cards/cards.styles";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {

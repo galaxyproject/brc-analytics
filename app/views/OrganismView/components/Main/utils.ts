@@ -1,7 +1,7 @@
 import type { Organism } from "@/views/OrganismView/types";
+import { WorkflowCategoryId } from "@catalog/schema/generated/schema";
 import { WORKFLOW_SCOPE } from "@repo/shared/apis/schema-types";
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
-import { WorkflowCategoryId } from "../../../../../catalog/schema/generated/schema";
 
 /**
  * Builds workflow categories for the given organism.

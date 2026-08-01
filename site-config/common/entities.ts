@@ -1,12 +1,12 @@
-import { TaxonomyNode } from "@/components/Home/components/Section/components/SectionViz/data";
+import { type TaxonomyNode } from "@/components/Home/components/Section/components/SectionViz/data";
 import {
-  BackPageConfig as BaseBackPageConfig,
-  BackPageTabConfig as BaseBackPageTabConfig,
-  EntityConfig as BaseEntityConfig,
-  SiteConfig as BaseSiteConfig,
-  ComponentsConfig,
+  type BackPageConfig as BaseBackPageConfig,
+  type BackPageTabConfig as BaseBackPageTabConfig,
+  type EntityConfig as BaseEntityConfig,
+  type SiteConfig as BaseSiteConfig,
+  type ComponentsConfig,
 } from "@databiosphere/findable-ui/lib/config/entities";
-import { APP_KEYS } from "./constants";
+import { type APP_KEYS } from "./constants";
 
 export interface AppBackPageConfig extends Omit<
   BaseBackPageConfig,

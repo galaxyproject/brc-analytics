@@ -1,4 +1,4 @@
-import { ComponentProps } from "react";
+import { type ComponentProps } from "react";
 
 export const ACCEPTED_FILE_TYPES = ".fasta,.fa,.fna,.faa,.ffn";
 

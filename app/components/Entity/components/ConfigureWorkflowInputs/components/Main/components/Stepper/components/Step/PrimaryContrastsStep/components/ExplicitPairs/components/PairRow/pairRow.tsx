@@ -2,10 +2,10 @@ import { getDisabledValues } from "@/components/Entity/components/ConfigureWorkf
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { IconButton, MenuItem, Stack, Typography } from "@mui/material";
 import { DeleteIcon } from "@repo/shared/components/CustomIcon/components/DeleteIcon/deleteIcon";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { ICON_BUTTON_PROPS, SELECT_PROPS, SVG_ICON_PROPS } from "./constants";
 import { StyledSelect, StyledStack } from "./pairRow.styles";
-import { Props } from "./types";
+import { type Props } from "./types";
 
 export const PairRow = ({
   factorValues,

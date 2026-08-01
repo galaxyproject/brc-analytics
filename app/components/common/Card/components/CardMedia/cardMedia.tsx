@@ -1,8 +1,8 @@
 import {
   StaticImage,
-  StaticImageProps,
+  type StaticImageProps,
 } from "@databiosphere/findable-ui/lib/components/common/StaticImage/staticImage";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { CardMedia as Media } from "./cardMedia.styles";
 
 export interface CardMediaProps {

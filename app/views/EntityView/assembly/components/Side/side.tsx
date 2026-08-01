@@ -1,7 +1,7 @@
-import { JSX } from "react";
+import { type JSX } from "react";
 import { Side as BRCSide } from "./brc/side";
 import { Side as GA2Side } from "./ga2/side";
-import { Props } from "./types";
+import { type Props } from "./types";
 
 /**
  * Side component for the AnalyzeView, which conditionally renders different side components based on GA2 or BRC assembly types.

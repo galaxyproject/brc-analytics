@@ -1,5 +1,5 @@
 import { StaticImage } from "@databiosphere/findable-ui/lib/components/common/StaticImage/staticImage";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { Figure as FigureWithCaption } from "./figure.styles";
 import type { Props } from "./types";
 

@@ -1,17 +1,17 @@
 import {
   documentGetInitialProps,
   DocumentHeadTags,
-  DocumentHeadTagsProps,
+  type DocumentHeadTagsProps,
 } from "@mui/material-nextjs/v16-pagesRouter";
 import Document, {
-  DocumentContext,
-  DocumentInitialProps,
+  type DocumentContext,
+  type DocumentInitialProps,
   Head,
   Html,
   Main,
   NextScript,
 } from "next/document";
-import { JSX } from "react";
+import { type JSX } from "react";
 
 const siteConfig = process.env.NEXT_PUBLIC_SITE_CONFIG;
 const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN;

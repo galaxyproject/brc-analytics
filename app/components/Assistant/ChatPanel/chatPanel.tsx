@@ -1,3 +1,5 @@
+import { ChatMessage } from "@/components/Assistant/ChatMessage/chatMessage";
+import { SuggestionChips } from "@/components/Assistant/SuggestionChips/suggestionChips";
 import {
   Alert,
   Box,
@@ -8,9 +10,7 @@ import {
 } from "@mui/material";
 import { useAuth } from "@repo/shared/providers/authentication/provider";
 import type { SuggestionChip } from "@repo/shared/services/api-client/types";
-import { JSX, useEffect, useRef, useState } from "react";
-import { ChatMessage } from "../ChatMessage/chatMessage";
-import { SuggestionChips } from "../SuggestionChips/suggestionChips";
+import { type JSX, useEffect, useRef, useState } from "react";
 import { ChatContainer, InputRow, MessagesContainer } from "./chatPanel.styles";
 
 interface ChatMessageDisplay {

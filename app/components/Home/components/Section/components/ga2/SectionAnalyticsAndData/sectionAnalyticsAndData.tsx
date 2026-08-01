@@ -2,7 +2,7 @@ import {
   SectionSubtitle,
   SectionTitle,
 } from "@/components/Home/components/Section/section.styles";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { AnalyticsToolsAndData } from "./components/AnalyticsToolsAndData/analyticsToolsAndData";
 import {
   Headline,

@@ -1,5 +1,5 @@
-import { JSX } from "react";
-import { useEntitiesLoaded } from "../../providers/entitiesLoaded/hook";
+import { useEntitiesLoaded } from "@repo/shared/providers/entitiesLoaded/hook";
+import { type JSX } from "react";
 import type { Props } from "./types";
 
 /**

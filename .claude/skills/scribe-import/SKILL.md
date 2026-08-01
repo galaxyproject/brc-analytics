@@ -35,7 +35,7 @@ Example: "What Are Assemblies" → `what-are-assemblies`
 
 ### 3. Create MDX page
 
-Create `app/docs/learn/getting-started/<slug>.mdx` with this structure:
+Create `sites/brc-analytics/docs/learn/getting-started/<slug>.mdx` with this structure:
 
 **Frontmatter:**
 ```yaml
@@ -73,12 +73,12 @@ One or two sentences describing what the user sees or should do. Fix any grammar
 - Use *italics* for species names
 
 **Reference these files for style guidance:**
-- `app/docs/learn/getting-started/what-are-organisms.mdx`
-- `app/docs/learn/getting-started/what-are-assemblies.mdx`
+- `sites/brc-analytics/docs/learn/getting-started/what-are-organisms.mdx`
+- `sites/brc-analytics/docs/learn/getting-started/what-are-assemblies.mdx`
 
 ### 4. Add card to getting-started page
 
-Read `app/docs/learn/getting-started.mdx` and append a new entry to the `cards` array in frontmatter:
+Read `sites/brc-analytics/docs/learn/getting-started.mdx` and append a new entry to the `cards` array in frontmatter:
 
 ```yaml
   - href: "/learn/getting-started/<slug>"

@@ -1,7 +1,5 @@
-import { SectionHero } from "@/components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
-import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
-import { Assembly } from "@/views/WorkflowInputsView/types";
-import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
+import { type Assembly } from "@/views/WorkflowInputsView/types";
+import { type Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
   Alert,
   Box,
@@ -12,10 +10,12 @@ import {
 } from "@mui/material";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
 import { useAssemblyFavorites } from "@repo/shared/components/Favorites/hooks/UseAssemblyFavorites/hook";
+import { StyledPagesMain } from "@repo/shared/components/layout/Main/main.styles";
+import { SectionHero } from "@repo/shared/components/layout/SectionHero/sectionHero";
 import { useAuth } from "@repo/shared/providers/authentication/provider";
 import { getEntity } from "@repo/shared/services/workflows/query";
 import Link from "next/link";
-import { JSX } from "react";
+import { type JSX } from "react";
 
 const BREADCRUMBS: Breadcrumb[] = [
   {

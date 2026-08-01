@@ -1,8 +1,8 @@
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Divider } from "@mui/material";
-import { Fragment, JSX } from "react";
+import { Fragment, type JSX } from "react";
 import { Content, StyledTypography } from "./section.styles";
-import { SectionProps } from "./types";
+import { type SectionProps } from "./types";
 
 export const Section = ({
   children,

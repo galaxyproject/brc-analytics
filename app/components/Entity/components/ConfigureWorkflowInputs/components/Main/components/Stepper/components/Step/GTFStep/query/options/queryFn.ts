@@ -1,6 +1,6 @@
-import { QueryFunctionContext } from "@tanstack/react-query";
+import { type QueryKey } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/GTFStep/query/types";
+import { type QueryFunctionContext } from "@tanstack/react-query";
 import ky from "ky";
-import { QueryKey } from "../types";
 import { UCSC_FILES_ENDPOINT } from "./constants";
 
 /**

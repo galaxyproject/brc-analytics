@@ -1,7 +1,7 @@
 import ContentCopyRoundedIcon from "@mui/icons-material/ContentCopyRounded";
 import { IconButton, Tooltip } from "@mui/material";
 import copy from "copy-to-clipboard";
-import { JSX, useCallback, useEffect, useState } from "react";
+import { type JSX, useCallback, useEffect, useState } from "react";
 import { ICON_BUTTON_PROPS, ICON_PROPS, TOOLTIP_PROPS } from "./constants";
 import type { Props } from "./types";
 

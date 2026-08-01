@@ -1,5 +1,5 @@
-import { UcscTrackNode } from "@/utils/ucsc-tracks-api/entities";
-import { Row } from "@tanstack/react-table";
+import { type UcscTrackNode } from "@repo/shared/utils/ucsc-tracks-api/types";
+import { type Row } from "@tanstack/react-table";
 import { GROUP_ID_LABEL } from "./constants";
 
 /**

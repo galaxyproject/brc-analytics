@@ -1,4 +1,4 @@
-import { JSX } from "react";
+import { type JSX } from "react";
 import { EntitiesLoadedContext } from "./context";
 import type { Props } from "./types";
 

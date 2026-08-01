@@ -1,7 +1,7 @@
 import {
-  BRCDataCatalogGenome,
-  BRCDataCatalogOrganism,
-  Outbreak,
+  type BRCDataCatalogGenome,
+  type BRCDataCatalogOrganism,
+  type Outbreak,
 } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import type { OUTBREAK_PRIORITY } from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
 import {
@@ -9,38 +9,34 @@ import {
   getOrganismId,
 } from "@/apis/catalog/brc-analytics-catalog/common/utils";
 import { SLUGIFY_OPTIONS } from "@/common/constants";
-import { StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
-import { KeyValueSection } from "@/components/Entity/components/Section/KeyValueSection/keyValueSection";
-import { MDXSection } from "@/components/Entity/components/Section/MDXSection/mdxSection";
+import { type StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
+import { type KeyValueSection } from "@/components/Entity/components/Section/KeyValueSection/keyValueSection";
+import { type MDXSection } from "@/components/Entity/components/Section/MDXSection/mdxSection";
 import {
   COLUMN_PRESET_KEY,
   COLUMN_PRESET_LABEL,
 } from "@/views/OrganismView/components/Main/constants";
-import { Main as OrganismViewMain } from "@/views/OrganismView/components/Main/main";
+import { type Main as OrganismViewMain } from "@/views/OrganismView/components/Main/main";
 import { Tabs } from "@/views/OrganismView/components/Tabs/tabs";
 import type { Organism } from "@/views/OrganismView/types";
-import {
-  getPriorityColor,
-  getPriorityLabel,
-} from "@/views/PriorityPathogensView/components/PriorityPathogens/utils";
-import { ResourcesSection } from "@/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
-import { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
+import { type ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { type ResourcesSection } from "@brc/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
+import { type Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import { KeyElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/KeyElType/keyElType";
 import { ValueElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/ValueElType/valueElType";
 import {
-  Key,
-  KeyValuePairs,
-  Value,
+  type Key,
+  type KeyValuePairs,
+  type Value,
 } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/keyValuePairs";
 import { Stack } from "@databiosphere/findable-ui/lib/components/common/Stack/stack";
 import { TypographyWordBreak } from "@databiosphere/findable-ui/lib/components/common/Typography/TypographyWordBreak/TypographyWordBreak";
-import { BackPageHero } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/components/BackPageHero/backPageHero";
-import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
+import { type BackPageHero } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/components/BackPageHero/backPageHero";
+import { type Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
 import { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
 import { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/ChipCell/chipCell";
-import { NTagCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/NTagCell/nTagCell";
+import { type NTagCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/NTagCell/nTagCell";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { Chip } from "@mui/material";
 import type {
@@ -75,16 +71,21 @@ import {
   getGenomeSerotypeText,
   getGenomeStrainText,
 } from "@repo/shared/viewModelBuilders/viewModelBuilders";
+import { ROUTES as SITE_ROUTES } from "@routes/constants";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
 } from "@site-config/brc-analytics/category";
-import { ColumnDef, RowData, VisibilityState } from "@tanstack/react-table";
-import { LinkProps } from "next/link";
+import {
+  type ColumnDef,
+  type RowData,
+  type VisibilityState,
+} from "@tanstack/react-table";
+import { type LinkProps } from "next/link";
 import Router from "next/router";
-import { ComponentProps } from "react";
+import { type ComponentProps } from "react";
 import slugify from "slugify";
-import { ROUTES as SITE_ROUTES } from "../../../../../routes/constants";
+import { getPriorityColor, getPriorityLabel } from "./priority";
 
 // Transitional shim for the GA2/BRC split (monorepo-split): shared builders
 // moved to the site-neutral common home. Re-export them from this BRC path so

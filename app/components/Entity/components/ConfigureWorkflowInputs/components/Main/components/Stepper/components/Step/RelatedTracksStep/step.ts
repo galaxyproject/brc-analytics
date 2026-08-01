@@ -1,4 +1,4 @@
-import { StepConfig } from "../types";
+import { type StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { RelatedTracksStep } from "./relatedTracksStep";
 import { renderValue } from "./utils";
 

@@ -1,6 +1,6 @@
-import { Dispatch } from "react";
-import { WorkflowHandoffAction } from "./actions/types";
-import { ENTITY_KEYS, SEQUENCING_SOURCE } from "./constants";
+import { type Dispatch } from "react";
+import { type WorkflowHandoffAction } from "./actions/types";
+import { type ENTITY_KEYS, type SEQUENCING_SOURCE } from "./constants";
 
 /**
  * Known entity key (matches the URL `entityListType` segment).

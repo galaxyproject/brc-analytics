@@ -1,12 +1,12 @@
-import { Props } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/Table/types";
+import { type Props } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/Table/types";
 import { TableDownload } from "@databiosphere/findable-ui/lib/components/Table/components/TableFeatures/TableDownload/tableDownload";
 import {
   StyledStack,
   StyledToolbar,
 } from "@databiosphere/findable-ui/lib/components/Table/components/TableToolbar2/tableToolbar2.styles";
 import { Divider } from "@mui/material";
-import { RowData } from "@tanstack/react-table";
-import { Fragment, JSX } from "react";
+import { type RowData } from "@tanstack/react-table";
+import { Fragment, type JSX } from "react";
 import { ResultsSummary } from "./components/ResultsSummary/resultsSummary";
 
 /**

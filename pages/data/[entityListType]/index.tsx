@@ -4,9 +4,13 @@ import { EntitiesView } from "@/views/EntitiesView/entitiesView";
 import type { Props as EntitiesPageProps } from "@/views/EntitiesView/types";
 import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main.styles";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
-import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
-import { ParsedUrlQuery } from "querystring";
-import { JSX } from "react";
+import {
+  type GetStaticPaths,
+  type GetStaticProps,
+  type GetStaticPropsContext,
+} from "next";
+import { type ParsedUrlQuery } from "querystring";
+import { type JSX } from "react";
 
 interface Params extends ParsedUrlQuery {
   entityListType: string;

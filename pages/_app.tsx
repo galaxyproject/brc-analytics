@@ -1,4 +1,9 @@
-import { AzulEntitiesStaticResponse } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
+import { getDefaultDescription } from "@/common/meta/utils";
+import { config } from "@/config/config";
+import { useEntities } from "@/services/workflows/hooks/UseEntities/hook";
+import "@/styles/fonts/fonts.css";
+import { mergeAppTheme } from "@/theme/theme";
+import { type AzulEntitiesStaticResponse } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import { Error } from "@databiosphere/findable-ui/lib/components/Error/error";
 import { ErrorBoundary } from "@databiosphere/findable-ui/lib/components/ErrorBoundary/errorBoundary";
 import { Head } from "@databiosphere/findable-ui/lib/components/Head/head";
@@ -10,29 +15,23 @@ import { setFeatureFlags } from "@databiosphere/findable-ui/lib/hooks/useFeature
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import { ConfigProvider as DXConfigProvider } from "@databiosphere/findable-ui/lib/providers/config";
 import { ExploreStateProvider } from "@databiosphere/findable-ui/lib/providers/exploreState";
-
 import { LayoutDimensionsProvider } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/provider";
 import { ServicesProvider } from "@databiosphere/findable-ui/lib/providers/services/provider";
 import { SystemStatusProvider } from "@databiosphere/findable-ui/lib/providers/systemStatus";
-import { DataExplorerError } from "@databiosphere/findable-ui/lib/types/error";
+import { type DataExplorerError } from "@databiosphere/findable-ui/lib/types/error";
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { AppCacheProvider } from "@mui/material-nextjs/v16-pagesRouter";
+import { StyledFooter } from "@repo/shared/components/layout/Footer/footer.styles";
 import { OgMeta } from "@repo/shared/components/OgMeta/ogMeta";
 import { AuthProvider } from "@repo/shared/providers/authentication/provider";
 import { EntitiesLoadedProvider } from "@repo/shared/providers/entitiesLoaded/provider";
 import { WorkflowHandoffProvider } from "@repo/shared/providers/workflowHandoff/provider";
+import { ROUTES } from "@routes/constants";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { NextPage } from "next";
+import { type NextPage } from "next";
 import type { AppProps } from "next/app";
-import { JSX, useMemo } from "react";
-import { getDefaultDescription } from "../app/common/meta/utils";
-import { StyledFooter } from "../app/components/Layout/components/Footer/footer.styles";
-import { config } from "../app/config/config";
-import { useEntities } from "../app/services/workflows/hooks/UseEntities/hook";
-import "../app/styles/fonts/fonts.css";
-import { mergeAppTheme } from "../app/theme/theme";
-import { ROUTES } from "../routes/constants";
+import { type JSX, useMemo } from "react";
 
 const DEFAULT_ENTITY_LIST_TYPE = "organisms";
 

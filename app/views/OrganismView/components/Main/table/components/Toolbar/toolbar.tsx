@@ -1,5 +1,5 @@
-import { RowData } from "@tanstack/react-table";
-import { JSX } from "react";
+import { type RowData } from "@tanstack/react-table";
+import { type JSX } from "react";
 import { ColumnPresetToggle } from "./components/ColumnPresetToggle/columnPresetToggle";
 import { StyledToolbar } from "./toolbar.styles";
 import type { Props } from "./types";

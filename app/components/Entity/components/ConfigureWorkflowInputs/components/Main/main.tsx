@@ -4,7 +4,7 @@ import { PAPER_PANEL_STYLE } from "@databiosphere/findable-ui/lib/components/com
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Typography } from "@mui/material";
 import type { Workflow } from "@repo/shared/apis/workflow";
-import { JSX, useState } from "react";
+import { type JSX, useState } from "react";
 import { useLaunchGalaxy } from "./components/Stepper/components/Step/hooks/UseLaunchGalaxy/useLaunchGalaxy";
 import { Stepper } from "./components/Stepper/stepper";
 import {
@@ -12,7 +12,7 @@ import {
   StyledFluidPaper,
   StyledMainContainer,
 } from "./main.styles";
-import { Props } from "./types";
+import { type Props } from "./types";
 
 export const Main = ({
   activeStep,

@@ -1,10 +1,10 @@
 import {
-  BaseReadRun,
-  ENAReadRunsQuery,
-  ReadRun,
+  type BaseReadRun,
+  type ENAReadRunsQuery,
+  type ReadRun,
 } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
 import { getSequencingData } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/utils";
-import { OnConfigure } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { type OnConfigure } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 import { arrIncludesSome } from "@databiosphere/findable-ui/lib/components/Table/columnDef/columnFilters/filterFn";
 import { getFacetedUniqueValuesWithArrayValues } from "@databiosphere/findable-ui/lib/components/Table/common/utils";
@@ -19,8 +19,8 @@ import {
   getFacetedRowModel,
   getFilteredRowModel,
   getSortedRowModel,
-  InitialTableState,
-  TableState,
+  type InitialTableState,
+  type TableState,
   useReactTable,
 } from "@tanstack/react-table";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -28,7 +28,7 @@ import { CATEGORY_GROUPS } from "./categoryGroups";
 import { columns } from "./columnDef";
 import { COLUMN_VISIBILITY, SORTING } from "./constants";
 import { mapReadRuns, sanitizeReadRuns } from "./dataTransforms";
-import { UseTable } from "./types";
+import { type UseTable } from "./types";
 import {
   enableRowSelection,
   getRowSelectionValidation,

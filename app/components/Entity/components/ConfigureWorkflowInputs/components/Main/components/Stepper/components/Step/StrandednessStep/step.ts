@@ -1,4 +1,4 @@
-import { StepConfig } from "../types";
+import { type StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { StrandednessStep } from "./strandednessStep";
 import { getStepLabel } from "./utils";
 

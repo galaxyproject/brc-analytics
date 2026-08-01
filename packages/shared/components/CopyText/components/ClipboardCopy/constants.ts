@@ -1,4 +1,8 @@
-import { IconButtonProps, IconProps, TooltipProps } from "@mui/material";
+import {
+  type IconButtonProps,
+  type IconProps,
+  type TooltipProps,
+} from "@mui/material";
 
 export const ICON_BUTTON_PROPS: Partial<IconButtonProps> = {
   size: "xxsmall",

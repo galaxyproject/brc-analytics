@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { HandoffStatus } from "./types";
+import { type HandoffStatus } from "./types";
 
 /**
  * Context for in-flight handoff status. Provided by `WorkflowInputsView`

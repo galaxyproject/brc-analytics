@@ -1,5 +1,5 @@
-import { UcscTrackNode } from "@/utils/ucsc-tracks-api/entities";
-import { Table } from "@tanstack/react-table";
+import { type UcscTrackNode } from "@repo/shared/utils/ucsc-tracks-api/types";
+import { type Table } from "@tanstack/react-table";
 
 /**
  * Returns the number of selected tracks.

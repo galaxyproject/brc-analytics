@@ -3,9 +3,9 @@ import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { CheckCircleRounded } from "@mui/icons-material";
 import { Stack, Typography } from "@mui/material";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { StyledFluidPaper } from "./classificationValidation.styles";
-import { Props } from "./types";
+import { type Props } from "./types";
 import { mapValidation } from "./utils";
 
 export const ClassificationValidation = ({

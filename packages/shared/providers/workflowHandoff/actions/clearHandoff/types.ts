@@ -1,5 +1,5 @@
-import { EntityKey } from "../../types";
-import { WorkflowHandoffActionKind } from "../types";
+import { type WorkflowHandoffActionKind } from "@repo/shared/providers/workflowHandoff/actions/types";
+import { type EntityKey } from "@repo/shared/providers/workflowHandoff/types";
 
 /**
  * Action to clear the handoff payload for an entity+path cell.

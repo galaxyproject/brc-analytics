@@ -1,4 +1,4 @@
-import type { OutbreakPriority as OUTBREAK_PRIORITY } from "../../../catalog/schema/generated/schema";
+import type { OutbreakPriority as OUTBREAK_PRIORITY } from "@catalog/schema/generated/schema";
 import type { ORGANISM_PLOIDY } from "./schema-types";
 
 /**

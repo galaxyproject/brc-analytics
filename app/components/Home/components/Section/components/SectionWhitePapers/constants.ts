@@ -1,4 +1,4 @@
-import { WhitePaper } from "./types";
+import { type WhitePaper } from "./types";
 
 export const WHITE_PAPERS: WhitePaper[] = [
   {

@@ -1,3 +1,5 @@
+import { useRadioGroup } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseRadioGroup/hook";
+import { type StepProps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { RadioCheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioCheckedIcon/radioCheckedIcon";
 import { RadioUncheckedIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/RadioUncheckedIcon/radioUncheckedIcon";
@@ -14,9 +16,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { Fragment, JSX } from "react";
-import { useRadioGroup } from "../hooks/UseRadioGroup/hook";
-import { StepProps } from "../types";
+import { Fragment, type JSX } from "react";
 import { CONTROLS } from "./constants";
 import { StyledStepContent } from "./strandednessStep.styles";
 import { getStepLabel } from "./utils";

@@ -3,6 +3,7 @@ import { Main } from "@/components/Entity/components/ConfigureWorkflowInputs/com
 import { SideColumn } from "@/components/Entity/components/ConfigureWorkflowInputs/components/SideColumn/sideColumn";
 import { AssemblyContext } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/context";
 import { WorkflowEntityContext } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
+import { useConfigureInputs } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/useConfigureInputs";
 import {
   BackPageContent,
   BackPageContentSideColumn,
@@ -10,12 +11,11 @@ import {
   BackPageView,
 } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { getWorkflow } from "@repo/shared/services/workflows/entities";
-import { JSX } from "react";
-import { useConfigureInputs } from "../WorkflowInputsView/hooks/UseConfigureInputs/useConfigureInputs";
+import { type JSX } from "react";
 import { Top } from "./components/Top/top";
 import { useWorkflowEntities } from "./hooks/UseWorkflowEntities/hook";
 import { useConfiguredSteps } from "./steps/hook";
-import { Props } from "./types";
+import { type Props } from "./types";
 import { StyledBackPageContentMainColumn } from "./workflowView.styles";
 
 /**

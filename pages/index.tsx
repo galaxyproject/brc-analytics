@@ -1,14 +1,14 @@
+import { getPageMeta } from "@/common/meta/utils";
+import { config } from "@/config/config";
+import { HomeView as GA2HomeView } from "@/views/HomeView/ga2/homeView";
+import { HomeView } from "@/views/HomeView/homeView";
 import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
 import { useLayoutDimensions } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/hook";
-import { GetStaticProps } from "next";
-import { JSX } from "react";
-import { getPageMeta } from "../app/common/meta/utils";
-import { StyledMain } from "../app/components/Layout/components/Main/main.styles";
-import { config } from "../app/config/config";
-import { HomeView as GA2HomeView } from "../app/views/HomeView/ga2/homeView";
-import { HomeView } from "../app/views/HomeView/homeView";
-import { APP_KEYS } from "../site-config/common/constants";
-import { AppSiteConfig } from "../site-config/common/entities";
+import { StyledMain } from "@repo/shared/components/layout/Main/main.styles";
+import { APP_KEYS } from "@site-config/common/constants";
+import { type AppSiteConfig } from "@site-config/common/entities";
+import { type GetStaticProps } from "next";
+import { type JSX } from "react";
 
 export const Home = (): JSX.Element | null => {
   const { config } = useConfig();

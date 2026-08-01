@@ -1,4 +1,4 @@
-import { DragEvent } from "react";
+import { type DragEvent } from "react";
 
 export interface UseDropzone {
   actions: {

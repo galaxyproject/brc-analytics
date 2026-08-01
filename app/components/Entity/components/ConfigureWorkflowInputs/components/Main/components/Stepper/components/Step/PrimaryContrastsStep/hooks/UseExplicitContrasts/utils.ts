@@ -1,6 +1,6 @@
-import { ExplicitContrasts } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { CONTRAST_MODE } from "../UseRadioGroup/types";
-import { ContrastPair, ContrastPairs } from "./types";
+import { CONTRAST_MODE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/hooks/UseRadioGroup/types";
+import { type ExplicitContrasts } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { type ContrastPair, type ContrastPairs } from "./types";
 
 /**
  * Creates an updater function to add a new empty pair with the given ID.

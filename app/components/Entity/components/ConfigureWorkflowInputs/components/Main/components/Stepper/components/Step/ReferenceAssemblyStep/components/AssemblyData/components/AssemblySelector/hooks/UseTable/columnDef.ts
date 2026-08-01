@@ -6,7 +6,7 @@ import {
 import type { ColumnDef, SortingColumnDef } from "@tanstack/react-table";
 import { getAssemblyIsolate, getAssemblySerotype } from "./accessorFn";
 import { CATEGORY_CONFIGS } from "./categoryConfigs";
-import { Assembly } from "./types";
+import { type Assembly } from "./types";
 import { renderIsRef, renderNumber, renderPloidy } from "./viewBuilders";
 
 const RANGE_FILTER_FN = "inNumberRange";

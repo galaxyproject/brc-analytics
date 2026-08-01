@@ -1,6 +1,12 @@
-import { RefObject, useCallback, useEffect, useRef, useState } from "react";
+import {
+  type RefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { INTERSECTION_OBSERVER_OPTIONS } from "./common/constants";
-import { UseIntersectionObserver } from "./common/entities";
+import { type UseIntersectionObserver } from "./common/entities";
 
 export function useIntersectionObserver(
   ref: RefObject<HTMLElement | null>

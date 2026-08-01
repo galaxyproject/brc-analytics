@@ -1,5 +1,9 @@
-import { ReadRun } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
-import { Row, RowSelectionState, Table } from "@tanstack/react-table";
+import { type ReadRun } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
+import {
+  type Row,
+  type RowSelectionState,
+  type Table,
+} from "@tanstack/react-table";
 
 /**
  * Checks if the row is selectable.

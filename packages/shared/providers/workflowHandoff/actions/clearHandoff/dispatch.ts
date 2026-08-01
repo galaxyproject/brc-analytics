@@ -1,5 +1,5 @@
-import { WorkflowHandoffActionKind } from "../types";
-import { ClearHandoffAction, ClearHandoffPayload } from "./types";
+import { WorkflowHandoffActionKind } from "@repo/shared/providers/workflowHandoff/actions/types";
+import { type ClearHandoffAction, type ClearHandoffPayload } from "./types";
 
 /**
  * Action creator for clearing a handoff payload.

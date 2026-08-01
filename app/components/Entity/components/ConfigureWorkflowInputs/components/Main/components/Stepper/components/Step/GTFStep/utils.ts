@@ -1,5 +1,5 @@
-import { OnConfigure } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { UseRadioGroup } from "../hooks/UseRadioGroup/types";
+import { type UseRadioGroup } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseRadioGroup/types";
+import { type OnConfigure } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { STEP } from "./step";
 
 /**

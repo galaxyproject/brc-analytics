@@ -8,6 +8,8 @@ import { Main } from "@/components/Entity/components/ConfigureWorkflowInputs/com
 import { SideColumn } from "@/components/Entity/components/ConfigureWorkflowInputs/components/SideColumn/sideColumn";
 import { WorkflowEntityContext } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
 import { buildWorkflowEntityValue } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/utils";
+import { useConfigureInputs } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/useConfigureInputs";
+import { StyledBackPageContentMainColumn } from "@/views/WorkflowInputsView/workflowInputsView.styles";
 import {
   BackPageContent,
   BackPageContentSideColumn,
@@ -16,9 +18,7 @@ import {
 } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { getWorkflow } from "@repo/shared/services/workflows/entities";
 import { getEntity } from "@repo/shared/services/workflows/query";
-import { JSX, useMemo } from "react";
-import { useConfigureInputs } from "../WorkflowInputsView/hooks/UseConfigureInputs/useConfigureInputs";
-import { StyledBackPageContentMainColumn } from "../WorkflowInputsView/workflowInputsView.styles";
+import { type JSX, useMemo } from "react";
 import { Top } from "./components/Top/top";
 import type { Props } from "./types";
 import { mapOrganismEntityToOrganism } from "./utils";

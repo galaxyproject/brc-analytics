@@ -1,4 +1,4 @@
-import { StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
+import { type StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { useStepper } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/hook";
 import { SEQUENCING_STEPS } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/constants";
 import { useConfiguredSteps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/hook";
@@ -21,12 +21,12 @@ import {
   getAssembly,
   getWorkflow,
 } from "@repo/shared/services/workflows/entities";
-import { JSX, useMemo } from "react";
+import { type JSX, useMemo } from "react";
 import { useAssistantHandoff } from "./hooks/UseAssistantHandoff/useAssistantHandoff";
 import { useConfigureInputs } from "./hooks/UseConfigureInputs/useConfigureInputs";
 import { useHandoffSync } from "./hooks/UseHandoffSync/useHandoffSync";
 import { SEQUENCING_STEP_KEYS } from "./sequencing/constants";
-import { Assembly, Props } from "./types";
+import { type Assembly, type Props } from "./types";
 import { mapAssemblyToOrganism } from "./utils";
 import { StyledBackPageContentMainColumn } from "./workflowInputsView.styles";
 

@@ -1,12 +1,12 @@
+import { useFilePicker } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseFilePicker/hook";
+import { type StepProps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepContent/stepContent";
 import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Optional/optional";
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { Button } from "@mui/material";
-import { Fragment, JSX } from "react";
-import { useFilePicker } from "../hooks/UseFilePicker/hook";
-import { StepProps } from "../types";
+import { Fragment, type JSX } from "react";
 import { Dropzone } from "./components/Dropzone/dropzone";
 import { UploadedFile } from "./components/UploadedFile/uploadedFile";
 import { INPUT_PROPS } from "./constants";

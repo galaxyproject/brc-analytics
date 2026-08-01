@@ -1,6 +1,6 @@
-import { StepProps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
+import { type StepProps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import type { Workflow } from "@repo/shared/apis/workflow";
-import { ColumnFiltersState } from "@tanstack/react-table";
+import { type ColumnFiltersState } from "@tanstack/react-table";
 import { useMemo } from "react";
 import { preSelectColumnFilters } from "./utils";
 

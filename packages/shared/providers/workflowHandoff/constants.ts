@@ -1,4 +1,4 @@
-import { HandoffInputs, WorkflowHandoffState } from "./types";
+import { type HandoffInputs, type WorkflowHandoffState } from "./types";
 
 /**
  * Known entity keys. Matches the `entityListType` segment in the URL path

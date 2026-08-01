@@ -1,5 +1,5 @@
+import { type StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
-import { StepConfig } from "../types";
 import { SequencingStep } from "./sequencingStep";
 
 export const ANY_END_STEP = {

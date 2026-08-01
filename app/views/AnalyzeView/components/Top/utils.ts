@@ -1,6 +1,6 @@
-import { Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
+import { type Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import { ROUTES } from "@repo/shared/routes/constants";
-import { Props } from "./types";
+import { type Props } from "./types";
 
 /**
  * Returns breadcrumbs for the AnalyzeView component.

@@ -1,4 +1,4 @@
-import { BaselineContrasts } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { type BaselineContrasts } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 
 export type OnSelectBaseline = (value: string) => void;
 

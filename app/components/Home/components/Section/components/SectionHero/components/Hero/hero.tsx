@@ -1,19 +1,15 @@
 import {
   FILL,
   GRID_SIZE,
-} from "@/components/Layout/components/Hero/common/constants";
-import { ELEMENT_ID } from "@/components/Layout/components/Hero/common/entities";
+} from "@repo/shared/components/layout/SectionHero/components/Hero/common/constants";
+import { ELEMENT_ID } from "@repo/shared/components/layout/SectionHero/components/Hero/common/types";
 import {
   getFillUrl,
   getViewBox,
-} from "@/components/Layout/components/Hero/common/utils";
-import { BlueCircle } from "@/components/Layout/components/Hero/components/Defs/BlueCircle/blueCircle";
-import { BlueRect } from "@/components/Layout/components/Hero/components/Defs/BlueRect/blueRect";
-import { CoralPinkCircle } from "@/components/Layout/components/Hero/components/Defs/CoralPinkCircle/coralPinkCircle";
-import { SmokeCircle } from "@/components/Layout/components/Hero/components/Defs/SmokeCircle/smokeCircle";
-import { SmokeRect } from "@/components/Layout/components/Hero/components/Defs/SmokeRect/smokeRect";
-import { YellowRect } from "@/components/Layout/components/Hero/components/Defs/YellowRect/yellowRect";
-import { Fragment, JSX } from "react";
+} from "@repo/shared/components/layout/SectionHero/components/Hero/common/utils";
+import { SmokeCircle } from "@repo/shared/components/layout/SectionHero/components/Hero/components/Defs/SmokeCircle/smokeCircle";
+import { SmokeRect } from "@repo/shared/components/layout/SectionHero/components/Hero/components/Defs/SmokeRect/smokeRect";
+import { Fragment, type JSX } from "react";
 import { SVG } from "./hero.styles";
 
 export interface HeroProps {
@@ -38,10 +34,6 @@ export const Hero = ({
     >
       <SmokeRect gridSize={gridSize} />
       <SmokeCircle gridSize={gridSize} />
-      <BlueRect gridSize={gridSize} />
-      <YellowRect gridSize={gridSize} />
-      <BlueCircle gridSize={gridSize} />
-      <CoralPinkCircle gridSize={gridSize} />
       {[ELEMENT_ID.PATTERN_SMOKE_RECT, ELEMENT_ID.PATTERN_SMOKE_CIRCLE].map(
         (elementId) => (
           <Fragment key={elementId}>
