@@ -6,6 +6,7 @@ import * as C from "@/components";
 import { type TaxonomyNode } from "@/components/Home/components/Section/components/SectionViz/data";
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { type EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import { Branding } from "@ga2/components/layout/Branding/branding";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { ROUTES as SITE_ROUTES } from "@routes/constants";
 import { APP_KEYS } from "@site-config/common/constants";
@@ -70,7 +71,7 @@ export function makeConfig(
     layout: {
       floating,
       footer: {
-        Branding: C.GA2Branding(),
+        Branding: Branding(),
         navLinks: [
           {
             label: "BRC Analytics",

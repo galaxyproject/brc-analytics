@@ -1,9 +1,9 @@
 import { getPageMeta } from "@/common/meta/utils";
-import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
 import { config } from "@/config/config";
 import { RoadmapView } from "@brc/views/RoadmapView/roadmapView";
 import { RoadmapView as RoadmapViewGA2 } from "@ga2/views/RoadmapView/roadmapView";
 import type { PageProps } from "@pages/_app";
+import { StyledPagesMain } from "@repo/shared/components/layout/Main/main.styles";
 import { ROUTES } from "@routes/constants";
 import { APP_KEYS } from "@site-config/common/constants";
 import { type GetStaticProps } from "next";
