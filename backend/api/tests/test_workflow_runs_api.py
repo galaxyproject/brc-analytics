@@ -40,7 +40,7 @@ def workflow_runs_client(tmp_path, monkeypatch):
     dependencies.reset_all_services()
 
     fake_cache = MagicMock()
-    fake_cache.flush_all = AsyncMock()
+    fake_cache.clear_caches = AsyncMock(return_value=0)
     fake_cache.close = AsyncMock()
     fake_auth = MagicMock()
     fake_auth.close = AsyncMock()

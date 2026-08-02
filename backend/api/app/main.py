@@ -60,8 +60,8 @@ def create_app() -> FastAPI:
     async def lifespan(app: FastAPI):
         async with mcp_app.lifespan(app):
             cache_service = get_cache_service()
-            await cache_service.flush_all()
-            logger.info("Cache cleared on startup")
+            cleared = await cache_service.clear_caches()
+            logger.info("Cleared %d cached response keys on startup", cleared)
 
             await init_db()
 

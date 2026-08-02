@@ -5,7 +5,7 @@ import type {
   AssistantChatResponse,
   SuggestionChip,
 } from "@repo/shared/services/api-client/types";
-import { HTTPError } from "ky";
+import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const SESSION_KEY = "brc-assistant-session-id";
@@ -62,13 +62,7 @@ export const useAssistantChat = ({
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const sessionIdRef = useRef<string | null>(initialSessionId ?? null);
   const sendingRef = useRef(false);
-
-  // Sync the session ref when caller swaps initialSessionId.
-  useEffect(() => {
-    if (initialSessionId !== undefined) {
-      sessionIdRef.current = initialSessionId;
-    }
-  }, [initialSessionId]);
+  const router = useRouter();
 
   // Hydrate from either an explicit initialSessionId (URL param, set by the
   // saved-analysis restore flow) or a localStorage-stored session. URL wins.
@@ -79,6 +73,9 @@ export const useAssistantChat = ({
     if (!sourceId) return;
 
     let cancelled = false;
+    // Adopt before the round trip: an unset ref sends session_id: undefined, so
+    // a failed restore would open a new session and overwrite the kept pointer.
+    sessionIdRef.current = sourceId;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- react-hooks v7 anti-pattern (setState in effect)
     setIsRestoring(true);
 
@@ -94,10 +91,35 @@ export const useAssistantChat = ({
         setIsComplete(restored.is_complete);
         setHandoffUrl(restored.handoff_url);
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         if (cancelled) return;
-        if (!initialSessionId) localStorage.removeItem(SESSION_KEY);
-        setError("Failed to restore the previous conversation.");
+        const status = httpStatus(error);
+        // No response, a server error, or a throttle: the session is probably
+        // still there, so keep the pointer and let a reload pick it up. Dropping
+        // it here would turn a blip into permanent loss.
+        if (
+          status === undefined ||
+          status >= 500 ||
+          status === 408 ||
+          status === 429
+        ) {
+          setError("Failed to restore the previous conversation.");
+          return;
+        }
+        // Any other 4xx and this browser is never getting that session back --
+        // 404 it's gone, 403 the signing cookie no longer matches it. Drop the
+        // id so the next message opens a fresh session instead of re-failing.
+        sessionIdRef.current = null;
+        // Only clear the pointer if it's still the one that failed -- a newer
+        // session may have replaced it while this request was in flight.
+        if (localStorage.getItem(SESSION_KEY) === sourceId) {
+          localStorage.removeItem(SESSION_KEY);
+        }
+        // Only worth mentioning if the id came from the URL; a stale
+        // localStorage pointer going bad is routine.
+        if (initialSessionId) {
+          setError("That conversation is no longer available.");
+        }
       })
       .finally(() => {
         if (!cancelled) setIsRestoring(false);
@@ -166,6 +188,20 @@ export const useAssistantChat = ({
     }
     sessionIdRef.current = null;
     localStorage.removeItem(SESSION_KEY);
+    // Drop ?sessionId= as well. It outranks localStorage on mount, so leaving it
+    // means a reload restores the conversation we just walked away from and
+    // orphans whatever replaced it.
+    if (router.query.sessionId) {
+      const query = { ...router.query };
+      delete query.sessionId;
+      router
+        .replace({ pathname: router.pathname, query }, undefined, {
+          shallow: true,
+        })
+        .catch(() => {
+          // Cosmetic: the session is already reset either way.
+        });
+    }
     setMessages([]);
     setSchema(null);
     setSuggestions([]);
@@ -174,7 +210,7 @@ export const useAssistantChat = ({
     setError(null);
     setLastFailedMessage(null);
     setSaveMessage(null);
-  }, []);
+  }, [router]);
 
   const saveAnalysis = useCallback(async (): Promise<void> => {
     if (!sessionIdRef.current) {
@@ -215,13 +251,26 @@ export const useAssistantChat = ({
 };
 
 /**
+ * Pull the HTTP status off a thrown request error, if it carries one.
+ *
+ * Duck-typed rather than `instanceof HTTPError` -- a duplicated ky copy would
+ * silently mis-classify a restore. No status reads as the transient case.
+ * @param error - The thrown value from a failed request
+ * @returns The HTTP status, or undefined if the error doesn't carry one
+ */
+function httpStatus(error: unknown): number | undefined {
+  const response = (error as { response?: { status?: unknown } } | null)
+    ?.response;
+  return typeof response?.status === "number" ? response.status : undefined;
+}
+
+/**
  * Map API errors to user-friendly messages.
  * @param error - The caught error
  * @returns A user-facing error string
  */
 function handleChatError(error: unknown): string {
-  const status =
-    error instanceof HTTPError ? error.response?.status : undefined;
+  const status = httpStatus(error);
   const name = (error as { name?: string }).name;
   if (name === "TimeoutError" || status === 504) {
     return "The assistant took too long to respond. Please try again.";

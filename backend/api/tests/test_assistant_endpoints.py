@@ -29,7 +29,7 @@ def app_with_stubbed_agent(tmp_path, monkeypatch):
     monkeypatch.setenv("AI_API_KEY", "stub")
 
     fake_cache = MagicMock()
-    fake_cache.flush_all = AsyncMock()
+    fake_cache.clear_caches = AsyncMock(return_value=0)
     fake_cache.close = AsyncMock()
     fake_auth = MagicMock()
     fake_auth.close = AsyncMock()

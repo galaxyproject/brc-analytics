@@ -60,7 +60,9 @@ export const AssistantView = ({ initialSessionId }: Props): JSX.Element => {
 
   if (!isAssistantEnabled) return <Error statusCode={404} />;
 
-  const showReset = messages.length > 0 || schema !== null;
+  // On error there are no messages and no schema, which would hide Reset
+  // exactly when it's the only way to clear a bad session id.
+  const showReset = messages.length > 0 || schema !== null || error !== null;
   const modelLabel = formatModelLabel(info);
 
   return (

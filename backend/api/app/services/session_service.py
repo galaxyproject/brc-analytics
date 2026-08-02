@@ -42,7 +42,10 @@ class SessionService:
         return state
 
     async def get_session(self, session_id: str) -> Optional[SessionState]:
-        raw = await self.cache.get(self._key(session_id))
+        # Strict read: a Redis outage has to surface as an error rather than as
+        # None. get() fails open, which would report a live conversation as
+        # expired and prompt the client to discard its only reference to it.
+        raw = await self.cache.get_strict(self._key(session_id))
         if raw is None:
             return None
         try:
