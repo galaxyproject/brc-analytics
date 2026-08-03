@@ -1,10 +1,9 @@
-import { Side } from "@/views/EntityView/assembly/components/Side/side";
-import { type Assembly } from "@/views/WorkflowInputsView/types";
 import {
   BackPageContent,
   BackPageHero,
   BackPageView,
 } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
+import { type AssemblyContract } from "@repo/shared/apis/types";
 import { getEntity } from "@repo/shared/services/workflows/query";
 import { type JSX } from "react";
 import { Main } from "./components/Main/main";
@@ -12,13 +11,18 @@ import { Top } from "./components/Top/top";
 import { type Props } from "./types";
 
 /**
- * AnalyzeView component displays the option to select a workflow, or a custom workflow to configure.
+ * Assembly detail view: renders the assembly header and analysis options, with
+ * the side column supplied by the caller.
  * @param props - Component props.
- * @param props.entityId - Assembly Entity ID.
- * @returns A JSX element representing the AnalyzeView.
+ * @param props.SideComponent - Side column rendered for the assembly.
+ * @param props.entityId - Assembly entity ID.
+ * @returns A JSX element representing the assembly detail view.
  */
-export const AnalyzeView = ({ entityId }: Props): JSX.Element => {
-  const assembly = getEntity<Assembly>("assemblies", entityId);
+export const AssemblyView = <T extends AssemblyContract = AssemblyContract>({
+  entityId,
+  SideComponent,
+}: Props<T>): JSX.Element => {
+  const assembly = getEntity<T>("assemblies", entityId);
   return (
     <BackPageView>
       <BackPageHero>
@@ -26,7 +30,7 @@ export const AnalyzeView = ({ entityId }: Props): JSX.Element => {
       </BackPageHero>
       <BackPageContent>
         <Main entityId={entityId} />
-        <Side assembly={assembly} />
+        <SideComponent assembly={assembly} />
       </BackPageContent>
     </BackPageView>
   );

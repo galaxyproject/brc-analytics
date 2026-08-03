@@ -7,11 +7,14 @@ import { getEntityDetailMeta } from "@/common/meta/utils";
 import { config } from "@/config/config";
 import { getEntities, getEntity } from "@/utils/entityUtils";
 import { seedDatabase } from "@/utils/seedDatabase";
-import { AnalyzeView } from "@/views/AnalyzeView/analyzeView";
+import { Side as BRCSide } from "@/views/EntityView/assembly/components/Side/brc/side";
+import { Side as GA2Side } from "@/views/EntityView/assembly/components/Side/ga2/side";
 import { EntityDetailView } from "@/views/EntityView/entityView";
 import { type EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { getEntityConfig } from "@databiosphere/findable-ui/lib/config/utils";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
+import { AssemblyView } from "@repo/shared/views/AssemblyView/assemblyView";
+import { APP_KEYS } from "@site-config/common/constants";
 import {
   type GetStaticPaths,
   type GetStaticProps,
@@ -43,13 +46,17 @@ export interface EntityPageProps<R> {
  * @returns Entity detail view component.
  */
 const EntityDetailPage = <R,>(props: EntityPageProps<R>): JSX.Element => {
-  // AnalyzeView reads from the workflows cache directly; EntityDetailView's
+  // AssemblyView reads from the workflows cache directly; EntityDetailView's
   // tab configs (e.g. OrganismView main column) also consume the cache via
   // getWorkflows(). Both branches need the cache before rendering.
   if (props.entityListType === "assemblies") {
     return (
       <EntityDataGate>
-        <AnalyzeView entityId={props.entityId} />
+        {config().appKey === APP_KEYS.GA2 ? (
+          <AssemblyView SideComponent={GA2Side} entityId={props.entityId} />
+        ) : (
+          <AssemblyView SideComponent={BRCSide} entityId={props.entityId} />
+        )}
       </EntityDataGate>
     );
   }
