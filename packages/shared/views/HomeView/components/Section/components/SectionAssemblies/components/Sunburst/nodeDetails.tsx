@@ -10,7 +10,7 @@ import {
 } from "@mui/icons-material";
 import { type HierarchyNode } from "d3";
 import React, { type JSX } from "react";
-import { type TaxonomyNode } from "./data";
+import { type TaxonomyNode } from "./types";
 
 // Define additional properties used by D3 during transitions
 interface D3TransitionNode {

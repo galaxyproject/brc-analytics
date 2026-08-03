@@ -1,4 +1,3 @@
-import { type TaxonomyNode } from "@/components/Home/components/Section/components/SectionViz/data";
 import {
   type BackPageConfig as BaseBackPageConfig,
   type BackPageTabConfig as BaseBackPageTabConfig,
@@ -35,5 +34,4 @@ export interface AppSiteConfig extends BaseSiteConfig {
   // Where this site's help and feedback go. Resolved per site so app code can
   // link it without naming one site's config directly.
   supportUrl?: string;
-  taxTree?: TaxonomyNode;
 }

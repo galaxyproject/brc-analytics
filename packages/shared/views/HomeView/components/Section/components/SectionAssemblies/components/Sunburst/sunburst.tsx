@@ -1,11 +1,10 @@
-import { roma_cyclic } from "@/theme/color-maps/crameri";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import * as d3 from "d3";
 import { type JSX, useEffect, useRef, useState } from "react";
-import { getData, type TaxonomyNode } from "./data";
-import { NodeDetails, type TreeNode } from "./NodeDetails";
-
-const data = getData();
+import { DEFAULT_TAXONOMY_NODE } from "./constants";
+import { roma_cyclic } from "./crameri";
+import { NodeDetails, type TreeNode } from "./nodeDetails";
+import { type TaxonomyNode } from "./types";
 
 const ATTR = {
   FILL_OPACITY: "fill-opacity",
@@ -18,16 +17,18 @@ const STYLE = {
   STROKE_WIDTH: "stroke-width",
 } as const;
 
-type SectionVizProps = {
+type SunburstProps = {
+  data?: TaxonomyNode;
   depth?: number;
-  logoPath?: string;
+  logoPath: string;
   startingNode?: string;
 };
-export const SectionViz = ({
+export const Sunburst = ({
+  data = DEFAULT_TAXONOMY_NODE,
   depth = 4,
-  logoPath = "/logo/brc.svg",
+  logoPath,
   startingNode = "root",
-}: SectionVizProps): JSX.Element => {
+}: SunburstProps): JSX.Element => {
   const [selectedNode, setSelectedNode] = useState<TreeNode | null>(null);
   const [rootNode, setRootNode] = useState<TreeNode | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -476,7 +477,7 @@ export const SectionViz = ({
       tooltip.remove();
       d3.select(svgNode).selectAll("*").remove();
     };
-  }, [DEPTH, LOGO_PATH, startingNode]);
+  }, [data, DEPTH, LOGO_PATH, startingNode]);
 
   // Handler for when a node is clicked in the NodeDetails component
   const handleNodeClick = (node: TreeNode): void => {
