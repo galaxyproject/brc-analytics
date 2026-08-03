@@ -1,9 +1,9 @@
 import { getPageMeta } from "@/common/meta/utils";
 import { config } from "@/config/config";
-import { HomeView as GA2HomeView } from "@/views/HomeView/ga2/homeView";
-import { HomeView } from "@/views/HomeView/homeView";
+import { HomeView } from "@brc/views/HomeView/homeView";
 import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
 import { useLayoutDimensions } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/hook";
+import { HomeView as GA2HomeView } from "@ga2/views/HomeView/homeView";
 import { StyledMain } from "@repo/shared/components/layout/Main/main.styles";
 import { APP_KEYS } from "@site-config/common/constants";
 import { type AppSiteConfig } from "@site-config/common/entities";
