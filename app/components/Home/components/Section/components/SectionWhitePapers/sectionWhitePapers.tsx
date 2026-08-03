@@ -1,4 +1,3 @@
-import { SectionTitle } from "@/components/Home/components/Section/section.styles";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import {
   CardActionArea,
@@ -7,6 +6,7 @@ import {
   Typography,
 } from "@mui/material";
 import { formatDate } from "@repo/shared/utils/date-fns/utils";
+import { SectionTitle } from "@repo/shared/views/HomeView/components/Section/section.styles";
 import Link from "next/link";
 import { type JSX } from "react";
 import { WHITE_PAPERS } from "./constants";

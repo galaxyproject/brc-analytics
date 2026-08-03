@@ -1,8 +1,8 @@
+import { AnalyticsTools } from "@repo/shared/views/HomeView/components/Section/components/SectionAnalytics/components/AnalyticsTools/analyticsTools";
 import {
   SectionSubtitle,
   SectionTitle,
-} from "@/components/Home/components/Section/section.styles";
-import { AnalyticsTools } from "@repo/shared/views/HomeView/components/Section/components/SectionAnalytics/components/AnalyticsTools/analyticsTools";
+} from "@repo/shared/views/HomeView/components/Section/section.styles";
 import { type JSX } from "react";
 import { ANALYTICS_TOOLS } from "./components/AnalyticsTools/common/constants";
 import { Headline, Section, SectionLayout } from "./sectionAnalytics.styles";
