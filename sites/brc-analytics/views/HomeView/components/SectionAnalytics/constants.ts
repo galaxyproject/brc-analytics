@@ -1,4 +1,4 @@
-import { URLS } from "@/components/Home/common/constants";
+import { URLS } from "@brc/views/HomeView/urls";
 import { type CardProps as DXCardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
 
 const CARD_ACTION_LABEL = {
