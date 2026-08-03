@@ -41,8 +41,10 @@ export const SectionSubHero = ({
                   expanded={activeIndex === key}
                   onClick={() => onSelectIndex(key)}
                 >
-                  <AccordionSummary>{title}</AccordionSummary>
-                  {details && <AccordionDetails>{details}</AccordionDetails>}
+                  <AccordionSummary key="summary">{title}</AccordionSummary>
+                  {details && (
+                    <AccordionDetails key="details">{details}</AccordionDetails>
+                  )}
                 </StyledAccordion>
               );
             })}
