@@ -1,9 +1,10 @@
-import { Bullets } from "@/components/common/Bullets/bullets";
 import {
   bpUpMd,
   bpUpSm,
 } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
+import { Bullets } from "@repo/shared/views/HomeView/components/Bullets/bullets";
+import { BULLETS_CLASSES } from "@repo/shared/views/HomeView/components/Bullets/constants";
 import {
   CAROUSEL_HEIGHT,
   CAROUSEL_HEIGHT_SM,
@@ -54,4 +55,8 @@ export const StyledBullets = styled(Bullets)`
   position: absolute;
   transform: translateX(-50%);
   z-index: 100;
+
+  .${BULLETS_CLASSES.BULLET_ACTIVE} {
+    --bullet-active-color: #fc5e60;
+  }
 `;
