@@ -2,7 +2,7 @@ import {
   type GA2AssemblyEntity,
   type GA2OrganismEntity,
 } from "@/apis/catalog/ga2/entities";
-import * as C from "@/components";
+import { Logo } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/components/Content/components/Logo/logo";
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { type EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { Branding } from "@ga2/components/layout/Branding/branding";
@@ -80,7 +80,7 @@ export function makeConfig(
         versionInfo: true,
       },
       header: {
-        logo: C.Logo({
+        logo: Logo({
           alt: APP_TITLE,
           height: 28,
           link: "/",

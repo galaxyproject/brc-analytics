@@ -1,7 +1,3 @@
-// The builders reference component types only (erased at runtime); mock the
-// component barrel so importing it doesn't pull untransformable MDX modules.
-jest.mock("app/components", () => ({}));
-
 import type { BRCDataCatalogGenome } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import type { GA2AssemblyEntity } from "@/apis/catalog/ga2/entities";
 import {

@@ -1,6 +1,6 @@
 import { type GA2OrganismEntity } from "@/apis/catalog/ga2/entities";
-import * as C from "@/components";
 import * as V from "@/viewModelBuilders/catalog/ga2/viewModelBuilders";
+import { BackPageHero } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/components/BackPageHero/backPageHero";
 import {
   type ComponentConfig,
   type ComponentsConfig,
@@ -8,7 +8,7 @@ import {
 
 export const organismTop: ComponentsConfig = [
   {
-    component: C.BackPageHero,
+    component: BackPageHero,
     viewBuilder: V.buildOrganismHero,
-  } as ComponentConfig<typeof C.BackPageHero, GA2OrganismEntity>,
+  } as ComponentConfig<typeof BackPageHero, GA2OrganismEntity>,
 ];
