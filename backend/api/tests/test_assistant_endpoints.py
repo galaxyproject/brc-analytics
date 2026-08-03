@@ -174,7 +174,7 @@ class TestAnonymousSessionClaim:
         from pydantic_ai.exceptions import UnexpectedModelBehavior
 
         agent = self._agent(app_with_stubbed_agent)
-        agent.chat = AsyncMock(
+        agent.chat_with_telemetry = AsyncMock(
             side_effect=UnexpectedModelBehavior(
                 "Tool 'query_catalog' exceeded max retries count of 1"
             )
@@ -193,7 +193,7 @@ class TestAnonymousSessionClaim:
         from pydantic_ai.exceptions import ModelHTTPError
 
         agent = self._agent(app_with_stubbed_agent)
-        agent.chat = AsyncMock(
+        agent.chat_with_telemetry = AsyncMock(
             side_effect=ModelHTTPError(status_code=429, model_name="m", body=None)
         )
 
@@ -205,7 +205,7 @@ class TestAnonymousSessionClaim:
         from pydantic_ai.exceptions import ModelHTTPError
 
         agent = self._agent(app_with_stubbed_agent)
-        agent.chat = AsyncMock(
+        agent.chat_with_telemetry = AsyncMock(
             side_effect=ModelHTTPError(status_code=529, model_name="m", body=None)
         )
 
@@ -217,7 +217,7 @@ class TestAnonymousSessionClaim:
         from pydantic_ai.exceptions import UsageLimitExceeded
 
         agent = self._agent(app_with_stubbed_agent)
-        agent.chat = AsyncMock(side_effect=UsageLimitExceeded("cap"))
+        agent.chat_with_telemetry = AsyncMock(side_effect=UsageLimitExceeded("cap"))
 
         resp = client.post("/api/v1/assistant/chat", json={"message": "hello"})
 
@@ -230,7 +230,7 @@ class TestAnonymousSessionClaim:
         from app.services.assistant_agent import AssistantUnavailableError
 
         agent = self._agent(app_with_stubbed_agent)
-        agent.chat = AsyncMock(
+        agent.chat_with_telemetry = AsyncMock(
             side_effect=AssistantUnavailableError("no key")
         )
 
@@ -244,7 +244,7 @@ class TestAnonymousSessionClaim:
         # A bare RuntimeError is a bug, not an outage, and its message can name
         # internal config. It must not reach the client as a 503 with details.
         agent = self._agent(app_with_stubbed_agent)
-        agent.chat = AsyncMock(
+        agent.chat_with_telemetry = AsyncMock(
             side_effect=RuntimeError("REDIS_URL=redis://secret")
         )
 
@@ -263,7 +263,7 @@ class TestAnonymousSessionClaim:
                 "app.core.dependencies", fromlist=["get_assistant_agent"]
             ).get_assistant_agent
         ]()
-        agent.chat = AsyncMock(side_effect=PermissionError("sess-abc"))
+        agent.chat_with_telemetry = AsyncMock(side_effect=PermissionError("sess-abc"))
         client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
 
         resp = client.post(

@@ -66,6 +66,21 @@ class Settings:
             os.getenv("RUN_MIGRATIONS_ON_STARTUP", "false").lower() == "true"
         )
 
+        # Durable per-turn assistant logging (#1294). Requires DATABASE_URL --
+        # without it there is no sink and the write is skipped. Retention is
+        # enforced out of band; see ASSISTANT_TURN_LOG_RETENTION_DAYS.
+        self.ASSISTANT_TURN_LOGGING_ENABLED: bool = os.getenv(
+            "ASSISTANT_TURN_LOGGING_ENABLED", "true"
+        ).lower() in ("1", "true", "yes")
+        self.ASSISTANT_TURN_LOG_RETENTION_DAYS: int = int(
+            os.getenv("ASSISTANT_TURN_LOG_RETENTION_DAYS", "90")
+        )
+        # Cap on how long the log write may delay the reply. The turn already
+        # cost the user up to ~110s; a stalled DB must not add to that.
+        self.ASSISTANT_TURN_LOG_TIMEOUT_SECONDS: float = float(
+            os.getenv("ASSISTANT_TURN_LOG_TIMEOUT_SECONDS", "5.0")
+        )
+
         # ENA API settings
         self.ENA_API_BASE: str = os.getenv(
             "ENA_API_BASE", "https://www.ebi.ac.uk/ena/portal/api"

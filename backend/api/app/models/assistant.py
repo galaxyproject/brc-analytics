@@ -162,6 +162,25 @@ class ChatResponse(BaseModel):
     token_usage: Optional[TokenUsage] = None
 
 
+class TurnTelemetry(BaseModel):
+    """Per-turn observability payload for durable logging (#1294).
+
+    Deliberately kept off ChatResponse: the transcript carries raw tool calls
+    and returns, which the browser has no business receiving.
+    """
+
+    session_id: str
+    turn_index: int = 0
+    owner_keycloak_sub: Optional[str] = None
+    user_message: str
+    assistant_reply: str
+    # This turn's new pydantic-ai messages only, not the rehydrated history.
+    transcript: List[Dict[str, Any]] = Field(default_factory=list)
+    schema_state: Dict[str, Any] = Field(default_factory=dict)
+    token_usage: TokenUsage = Field(default_factory=TokenUsage)
+    latency_ms: int = 0
+
+
 class SessionState(BaseModel):
     """The full state stored in Redis for one assistant session."""
 

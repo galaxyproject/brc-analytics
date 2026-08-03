@@ -16,6 +16,7 @@ from app.models.assistant import (
     AnalysisSchema,
     ChatResponse,
     SessionState,
+    TurnTelemetry,
 )
 from tests.test_catalog_data import SAMPLE_ORGANISMS, SAMPLE_WORKFLOWS
 
@@ -53,11 +54,18 @@ def app_with_stubbed_agent(tmp_path, monkeypatch):
     fake_agent.is_available.return_value = True
     fake_agent.settings = get_settings()
     fake_agent.get_provider.return_value = "anthropic"
-    fake_agent.chat = AsyncMock(
-        return_value=ChatResponse(
-            session_id="sess-abc",
-            reply="hi",
-            schema_state=AnalysisSchema(),
+    fake_agent.chat_with_telemetry = AsyncMock(
+        return_value=(
+            ChatResponse(
+                session_id="sess-abc",
+                reply="hi",
+                schema_state=AnalysisSchema(),
+            ),
+            TurnTelemetry(
+                session_id="sess-abc",
+                user_message="hello",
+                assistant_reply="hi",
+            ),
         )
     )
     fake_agent.session_service = MagicMock()
